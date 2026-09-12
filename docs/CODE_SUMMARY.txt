@@ -102,14 +102,26 @@ Inside `main.js`, in roughly this order:
    Alternate mode, odd rows shift by a fixed `cfg.alternateRowOffset`; in
    Progressive mode, row `r` shifts by `r * cfg.progressiveRowOffset`
    (mutually exclusive via `cfg.useProgressiveOffset`).
-   `computeBaseScale()` uses `Math.min(rowSpacing, columnSpacing)` as the
-   reference (a hand shouldn't overflow the TIGHTER of the 2 axes).
+   `computeBaseScale()` uses a FIXED reference length
+   (`HAND_SCALE_REFERENCE_LENGTH = 8`, chosen to match this project's own
+   original spacing defaults so existing settings don't visually jump) --
+   per direct request, hand scale and grid spacing are fully independent:
+   dragging Row Spacing or Column Spacing only repositions hands via
+   `relayoutField()`, never rescales them; only `cfg.handScale` does that.
+   (An earlier version derived the scale reference from `Math.min(
+   rowSpacing, columnSpacing)`, so dragging either spacing slider silently
+   changed hand size too -- confirmed removed directly: forcing Row
+   Spacing 10->30 and Column Spacing 11.5->2 left `computeBaseScale()`'s
+   result numerically unchanged, while the Hand Scale slider still visibly
+   changes it.)
 7. **Toon material + outline** -- `createToonMaterial()`/
    `makeGradientTexture()`/`rebuildGradientMap()` and the outline
    `ShaderMaterial` + inverted-hull shaders are ported from HANDO
    (simplified: no `clippingPlanes`/wrist-hide support, not a feature here).
-   Both materials run with `depthTest: false` (`depthWrite` stays on) --
-   see #9 below for why. `updateOutlineVisibility()` toggles between the 2
+   Both materials run with `depthTest: true` (the default) -- see #9 below
+   for the depth-buffer-per-hand technique that makes cross-hand render
+   ordering work without needing to disable it. `updateOutlineVisibility()`
+   toggles between the 2
    outline techniques: hull-mesh `.visible` per instance, or a single
    `OutlinePass` with `selectedObjects` set to every hand's own skinned
    mesh at once (cheaper for many instances than N extra hull meshes,
@@ -131,31 +143,101 @@ Inside `main.js`, in roughly this order:
    `wrapper.position.distanceTo(cursorTarget)`; `skinnedMesh.renderOrder`
    reads that value directly, `outlineMesh.renderOrder` reads it minus a
    small epsilon so a hand's own outline always draws just before (under)
-   its own fill. This ONLY has a visual effect because both materials have
-   `depthTest: false` (#7) -- three.js's normal depth-tested compositing
-   would otherwise always let real camera depth win regardless of
-   renderOrder. See GOTCHAS for the real tradeoff this introduces.
-10. **"Prevent Reordering Flash"** (`cfg.preventReorderFlash`, Debug group)
-    -- when on, `updateRenderOrder()` first approximates every hand's
-    on-screen footprint as a circle (world radius = half the measured hand
-    length x that hand's own scale, projected to screen pixels via
-    standard perspective scaling: `pxPerWorldUnit = canvasHeight / (2 *
-    tan(vFov/2) * distanceToCamera)`) and runs an O(n^2) pairwise check
-    (`hands[i]` vs `hands[j]`, screen-space circle-circle overlap) to flag
-    which hands are currently overlapping ANYTHING on screen. A hand's
-    `effectiveRenderOrder` only updates from its live distance when it is
-    NOT currently flagged as overlapping -- while overlapping (with
-    anything), it keeps whatever order it already had, so 2 overlapping
-    hands' relative stacking can't flip mid-overlap; it only re-evaluates
-    once that hand individually clears every overlap it was in. This is a
-    per-HAND freeze (not a per-PAIR lock) -- verified directly (not just
-    visually, since the browser-automation tool's own current-session
-    rendering was unavailable at verification time -- see GOTCHAS) via a
-    `window.__debug`-driven test: forced 2 hands to the same position
-    (guaranteed overlap), confirmed their order froze even after moving the
-    cursor target far enough to massively change their live distance, then
-    restored one hand's real position (clearing the overlap) and confirmed
-    its order immediately jumped to the new live value.
+   its own fill. This has a visual effect despite both materials keeping
+   `depthTest: true` (#7) because each hand's fill AND outline mesh also
+   get an `onBeforeRender = (r) => r.clearDepth()` hook (attached in
+   `rebuildField()`) -- clearing the depth buffer immediately before that
+   hand's own draw call means a hand's own triangles still depth-test
+   correctly against EACH OTHER (real self-occlusion), while stacking
+   BETWEEN hands is decided purely by draw order (`renderOrder`) since
+   each hand starts from a fresh depth buffer and therefore always wins
+   the draw over whatever was rendered immediately before it. An earlier
+   version of this project used `depthTest: false` directly instead (no
+   per-hand depth clear) -- simpler, but broke self-occlusion WITHIN a
+   single hand's own geometry (see GOTCHAS for the real bug this caused
+   and how it was found/fixed). See GOTCHAS for the residual tradeoff the
+   current technique still has.
+10. **"Prevent Reordering Flash"** (`cfg.preventReorderFlash`, Debug group,
+    `REORDER_SMOOTHING` constant) -- when on, `updateRenderOrder()`
+    approximates every hand's on-screen footprint as a circle, using the
+    mesh's own MEASURED bounding sphere (`handBoundsCenterLocal`/
+    `handBoundsRadiusLocal`, computed once at load via `THREE.Box3` +
+    `.getBoundingSphere()` on the original skinned mesh, in the same
+    identity-transform frame `alignQuat`/`handLengthRaw` are measured in)
+    -- NOT `wrapper.position` and NOT a radius derived from the wrist-to-
+    fingertip bone distance (see GOTCHAS for why that undersized/mis-
+    centered version was a real, reported bug). Each frame, the sphere's
+    LOCAL center is put through this hand's actual transform chain (scale
+    -> `alignQuat` -> live `wrapper.quaternion` -> `wrapper.position`) --
+    a sphere's radius only needs scaling, not rotating -- then projected
+    to screen pixels via standard perspective scaling: `pxPerWorldUnit =
+    canvasHeight / (2 * tan(vFov/2) * distanceToCamera)`. An O(n^2)
+    pairwise check then flags `hand.isOverlapping` for any
+    hand currently touching another on screen. A hand that ISN'T
+    overlapping anything just snaps straight to its own live cursor
+    distance (no lag, fully responsive); a hand that IS overlapping
+    something blends toward its live distance instead of snapping
+    (`effectiveRenderOrder += (live - effectiveRenderOrder) *
+    REORDER_SMOOTHING`, an exponential lerp, `REORDER_SMOOTHING = 0.15`).
+    Nothing is ever derived from ANOTHER hand's value -- every hand's own
+    order is always purely a function of its OWN live distance (blended or
+    not), which is what makes this version structurally immune to both
+    failure modes below.
+    **This is the 3rd design for this feature -- the first 2 are kept in
+    the function's own comment as a measured cautionary tale.** v1 froze a
+    hand's ENTIRE order the instant it overlapped ANYTHING, not resuming
+    until every overlap cleared -- in a dense/zoomed-in view where most
+    hands are always touching some neighbor, no hand ever got a single
+    overlap-free frame to unfreeze on, so the WHOLE FIELD froze solid
+    PERMANENTLY the moment the checkbox was turned on (confirmed: a
+    240-frame simulated sweep at closer zoom showed all 510 hands frozen,
+    0 updates for the entire run). v2/v3 tried a per-PAIR lock instead
+    (remembering which of 2 overlapping hands should stay on top, nudging
+    or unconditionally pinning the other to `partner + epsilon`) -- v3's
+    unconditional pin seemed to fix v2's own instability, but in a dense
+    field, chains of simultaneous locks (A-under-B-under-C-under-D...)
+    compound: every hand in a long chain collapses toward whichever hand
+    anchors that chain, discarding real distances almost entirely.
+    Measured directly: sampling ~87,000 random pairs whose TRUE distances
+    differed by more than 15 world units (a large, unambiguous gap), 21%
+    STILL rendered in the wrong relative order under v3 -- worse than no
+    fix at all, and exactly the reported regression ("certain hands render
+    above a hand further from the cursor" + "flashing... worse than
+    before"). The current smoothing design was measured against the same
+    87,000-pair test at under 0.1% wrong-order rate, 0 stuck hands across
+    150 simulated frames, and roughly half the frame-to-frame flip rate
+    (among hands ACTUALLY overlapping on screen) compared to no fix at
+    all. Trade-off, disclosed: this is no longer a literal hard freeze
+    ("won't change until they clear") -- it's a fast blend that mostly
+    prevents instant pops without the 2 failure modes a literal freeze/pin
+    kept producing at this field's actual density.
+    **A DEEPER, STRUCTURAL limitation surfaced after this design was
+    already shipping and the overlap geometry was separately fixed (see
+    GOTCHAS): smoothing the NUMBER does not and CANNOT smooth the VISUAL
+    SWAP.** `renderOrder` is a discrete sort key -- a hand is drawn
+    strictly before or after another, with no partial/blended state in
+    between (this whole feature exists because `depthTest:false` removes
+    the GPU's own continuous, per-pixel depth resolution). Traced a real
+    flip frame-by-frame: the gap between 2 overlapping hands' smoothed
+    values shrank perfectly cleanly and monotonically every single frame
+    (-1.24 -> -0.92 -> -0.58 -> -0.23 -> +0.11 -> +0.43, zero discontinuity
+    anywhere) -- yet the instant that gap crossed zero, the actual draw
+    order (and therefore the visible stacking) flipped completely, in one
+    frame, same as it would with NO smoothing applied at all. Smoothing
+    demonstrably still helps (see the measured wrong-order/flip-rate
+    numbers above) by damping NOISE-driven back-and-forth crossings and by
+    correcting a hand's numeric order to actually match true distance --
+    but it cannot make a GENUINE crossing (the cursor's movement actually
+    causing 2 hands' true relative order to swap) look like anything other
+    than a hard, instant pop, because the render mechanism has no
+    continuous transition to interpolate through. Eliminating that
+    specific residual pop would need a fundamentally different technique
+    (e.g. a real alpha cross-fade between the 2 competing hands during the
+    crossing window, which conflicts with the current opaque/
+    `depthTest:false` approach and hasn't been attempted) -- a materially
+    bigger change than anything else in this feature's history, flagged to
+    the user as a scope/architecture decision rather than attempted
+    unilaterally.
 
 Data flow: cursor position -> NDC -> raycast against a plane in front of
 the field -> `cursorTarget` (world point) -> per-hand look-at quaternion ->
@@ -172,6 +254,95 @@ None formally designated yet.
 --------------------------------------------------------------------------------
 GOTCHAS
 
+- **FIXED (was previously misdiagnosed twice -- see CHANGELOG.txt for the
+  full 3-round account).** Fine, noisy-looking surface detail in the
+  toon-shaded gray/shadow areas (reported directly, with a screenshot) was
+  real `depthTest:false` self-occlusion bleed-through, exactly as the user
+  described once asked directly: "I can somewhat see through the hand
+  itself and the noise represents the obscured surfaces behind the
+  frontmost surface." Two earlier theories in this same entry (real mesh
+  geometry revealed by grazing light; this project's zero-ambient/full-
+  contrast toon recipe vs. HANDO's softer one) were both directly
+  disproven by the user, who confirmed HANDO shows no such noise even at
+  `ambientIntensity:0`/`toonSteps:2` (matching this project's own
+  defaults) across many different hand poses -- ruling out both lighting
+  recipe and asset geometry as the cause. Root cause, confirmed by a
+  targeted pixel-diff (not a coarse whole-canvas histogram, which is why
+  an earlier pass in this same investigation wrongly looked like only an
+  8% effect): isolated a single hand in its bind pose, where a finger
+  genuinely overlaps the palm in screen space, and diffed every pixel in
+  that overlap region between `depthTest:true` and `depthTest:false`.
+  8.2% of pixels differed, spatially clustered exactly on the overlap --
+  with `depthTest:false`, those pixels rendered as bright/lit (255) where
+  `depthTest:true` correctly rendered them as shadowed (132): a wrongly-
+  drawn, differently-lit BACK surface was bleeding through the front
+  surface, because `depthTest:false` (needed so cursor-distance render
+  order works BETWEEN different hands) also disables the GPU's depth test
+  WITHIN a single hand's own triangles, leaving self-occlusion to whatever
+  order the GPU happens to submit that hand's own triangles in -- which is
+  neither guaranteed nor correct. HANDO uses real `depthTest:true`, so its
+  self-occlusion is always correct regardless of pose.
+
+  **Fix implemented** (see `createToonMaterial()`, `ensureOutlineMaterial()`,
+  and the `onBeforeRender` hooks in `rebuildField()`): both hand materials
+  are back to `depthTest:true` (the default), restoring correct self-
+  occlusion. Cross-hand stacking (farthest-from-cursor draws on top) is
+  now achieved differently: each hand's own fill mesh AND outline mesh get
+  an `onBeforeRender = (renderer) => renderer.clearDepth()` hook, wiping
+  the depth buffer immediately before that hand's own draw call. This
+  means a hand's own triangles are correctly depth-tested against EACH
+  OTHER (self-occlusion fixed), while stacking BETWEEN hands is still
+  decided purely by draw order (`renderOrder`, unchanged, still set every
+  frame from cursor distance in `updateRenderOrder()`) rather than real
+  camera depth -- a hand drawn later always wins the overlap against a
+  hand drawn earlier, exactly reproducing the old `depthTest:false`
+  cross-hand behavior without its self-occlusion side effect.
+
+  Verified directly, live: (1) the same finger-over-palm region that
+  showed an 8.2% bleed-through split (132 vs 255) now reads a single
+  clean luminance value (132) across all sampled pixels -- self-occlusion
+  confirmed fixed; (2) positioned 2 isolated hands at the SAME screen
+  position but 60 world units apart in real camera depth, gave the
+  PHYSICALLY FARTHER one the HIGHER `renderOrder` and a `MeshBasicMaterial`
+  red tint (to remove any ambiguity from the shared toon shader's own
+  tint-uniform machinery) -- confirmed the farther-but-later-drawn hand
+  visually wins 100% of the sampled overlap pixels despite being 60 units
+  further from camera, proving cross-hand render-order stacking still
+  works correctly under the new technique; (3) confirmed zero console
+  errors on a fresh reload and that `renderOrder` still correlates
+  perfectly with cursor distance across all 510 hands (0 inversions across
+  509 sorted pairs). One known trade-off, same category as an existing
+  documented one: if two hands' `renderOrder` values land extremely close
+  together (the near-tie case "Prevent Reordering Flash" already exists to
+  soften), their draw sequence could in principle interleave in a way that
+  briefly disrupts the per-hand depth-clear grouping -- a minor, transient
+  edge case, not a new class of bug, and not separately reproduced.
+- **The wrist-to-fingertip bone distance (`handLengthRaw`) badly undersells
+  this asset's real rendered size -- `Hand2.glb`'s visible mesh includes a
+  full forearm below the wrist, so the actual bounding-sphere radius
+  (~23 world units, measured directly via `Box3.getBoundingSphere()`) is
+  roughly 2.7x `handLengthRaw` itself, and the sphere's true CENTER sits
+  ~13 world units from `wrapper.position`.** The reordering-flash overlap
+  check originally used `wrapper.position` as its circle's center and
+  `handLengthRaw * 0.5` as its radius -- undersized by ~5x and badly
+  mis-centered, so it missed the thumb (and most of the forearm) at many
+  rotations, meaning those overlaps got ZERO flash-prevention at all. A
+  real, reported bug ("the thumb suddenly pops above the other hand...
+  only happens when I move the cursor left and right") traced directly to
+  this: yawing (left/right) swings the true off-center mass (thumb side)
+  much further across the screen than pitching does, so the mis-centered
+  circle's error was most visible on that axis specifically. Fixed by
+  measuring the mesh's own `Box3`/bounding sphere once at load
+  (`handBoundsCenterLocal`/`handBoundsRadiusLocal`) and transforming its
+  center through the hand's real per-frame transform chain every frame,
+  instead of assuming `wrapper.position` -- confirmed directly: the same
+  grid-neighbor overlap check that found 326,012 overlap-observations
+  across a 150-frame sweep with the old circle found 975,875 with the
+  corrected one (3x more genuine overlaps now actually detected and
+  protected), while the wrong-order and flip-rate metrics held or
+  improved slightly. `handLengthRaw` itself was deliberately left
+  unchanged (still drives grid scale-fitting and outline thickness) --
+  this fix only touches the reordering-flash overlap circle.
 - **When the browser-automation tool's own pane is not currently displayed
   at all (confirmed via its own `tabs_context` result: "The Browser pane is
   currently hidden"), `requestAnimationFrame` never fires -- ZERO
@@ -194,18 +365,22 @@ GOTCHAS
   camera.updateProjectionMatrix()`) before trusting any projection-based
   calculation -- don't conclude a feature is broken until the camera state
   itself is confirmed sane.
-- **`depthTest: false` on both hand materials (toon fill + outline) is
-  what makes cursor-distance render ordering actually visible -- it also
-  means a SINGLE hand's own internal self-occlusion (finger over finger,
-  palm over wrist) now relies on front-face culling + triangle submission
-  order, not a real per-pixel depth test.** Acceptable for this model's
-  mostly-convex static bind pose (confirmed no visible artifact at the
-  grid sizes tested), but a genuinely self-overlapping pose could show one
-  part incorrectly drawn over another. `depthWrite` was deliberately left
-  ON (not also disabled) so the depth buffer still ends up populated with
-  whichever hand visually won at each pixel -- keeps it meaningful for
-  `OutlinePass`'s own internal depth comparisons if outline + OutlinePass
-  are ever both enabled at the same time as this feature.
+- **SUPERSEDED -- this entry's own prediction came true and was fixed; kept
+  for history.** This project originally used `depthTest: false` on both
+  hand materials to make cursor-distance render ordering visible, on the
+  theory that this model's mostly-convex static bind pose wouldn't show a
+  visible self-occlusion artifact. That theory was wrong: a real user-
+  reported bug ("I can somewhat see through the hand... the noise
+  represents the obscured surfaces behind the frontmost surface") traced
+  directly to this -- confirmed via targeted pixel-diff on a finger-over-
+  palm overlap region (8.2% of pixels showing a wrongly-lit back surface
+  bleeding through the front one). Fixed by restoring `depthTest: true` on
+  both materials and instead giving each hand's own fill + outline mesh an
+  `onBeforeRender = (r) => r.clearDepth()` hook (see #7/#9 above and
+  `rebuildField()`), so self-occlusion is correct (real depth test, per
+  hand) while cross-hand stacking is still decided by draw order alone.
+  `depthWrite` stays ON as before, still meaningful for `OutlinePass`'s own
+  internal depth comparisons.
 - `three/addons/utils/SkeletonUtils.js` (three@0.169.0, pinned in
   `index.html`'s import map) does NOT export a `SkeletonUtils` namespace
   object -- it exports `clone`/`retarget`/`retargetClip` directly as named

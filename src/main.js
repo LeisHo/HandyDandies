@@ -13,6 +13,20 @@ const MODEL_URL = '../data/processed/HAND3D/Hand2.glb'
 // axis (wrist -> middle fingertip), not assumed to be +Y/-Z.
 let alignQuat = new THREE.Quaternion()
 let handLengthRaw = 1
+// The actual rendered MESH's bounding sphere (center + radius), measured
+// once at load in the same local/bind-pose frame as alignQuat/
+// handLengthRaw -- used ONLY for the reordering-flash overlap check (#10
+// in updateRenderOrder()'s own comment), kept deliberately separate from
+// handLengthRaw (which drives grid scale-fitting and outline thickness,
+// unaffected by this). Needed because the wrist-to-fingertip bone
+// distance badly undersells the model's real screen footprint: this
+// asset's visible mesh includes a full forearm below the wrist, spanning
+// ~2.7x the wrist-to-fingertip length -- confirmed directly (bounding-
+// sphere radius ~23 world units vs. handLengthRaw's own ~16-unit total
+// length, i.e. an ~8-unit "half length" radius that was less than half
+// of what the mesh actually needs).
+const handBoundsCenterLocal = new THREE.Vector3()
+let handBoundsRadiusLocal = 1
 
 let modelRoot = null
 let modelLoaded = false
@@ -26,6 +40,8 @@ const cursorTarget = new THREE.Vector3(0, 0, 0)
 const rendererSizeCheck = new THREE.Vector2()
 const cursorNDC = new THREE.Vector2(0, 0)
 const raycaster = new THREE.Raycaster()
+const projectScratch = new THREE.Vector3()
+const boundsCenterScratch = new THREE.Vector3()
 
 // -----------------------------------------------------------------------
 // Dev panel groups (CLAUDE.md Section 12)
@@ -323,14 +339,17 @@ function createToonMaterial(map) {
     map,
     color: new THREE.Color(cfg.toonBaseTint),
     gradientMap: makeGradientTexture(cfg.toonSteps, cfg.toonShadowFloor, cfg.toonLightCeiling, cfg.toonStepThreshold),
-    wireframe: cfg.showWireframe,
-    // depthTest off (depthWrite stays on) -- per direct request, stacking
-    // between DIFFERENT hands is driven entirely by renderOrder (set every
-    // frame from each hand's own distance to the cursor target, see
-    // animate()), not by each hand's real camera-depth. See that same
-    // request's own note in animate() for the outline-vs-fill draw-order
-    // consequence this has within a single hand.
-    depthTest: false
+    wireframe: cfg.showWireframe
+    // depthTest stays ON (the default) -- a single hand's own self-
+    // occlusion (finger over palm, etc) needs a real depth test to render
+    // correctly. Stacking between DIFFERENT hands (driven by renderOrder,
+    // set every frame from each hand's own distance to the cursor target)
+    // is instead achieved by clearing the depth buffer before each hand's
+    // own draw call -- see the `onBeforeRender` hooks where this material
+    // is assigned in rebuildField(), and that function's own comment for
+    // the full account of why (a real user-reported "seeing through the
+    // hand" bug, root-caused by direct pixel-diff measurement, from an
+    // earlier `depthTest:false` approach here).
   })
   material.onBeforeCompile = (shader) => {
     shader.uniforms.rimColor = { value: new THREE.Color(cfg.rimColor) }
@@ -387,8 +406,9 @@ function ensureOutlineMaterial() {
       },
       vertexShader: outlineVertexShader,
       fragmentShader: outlineFragmentShader,
-      side: THREE.BackSide,
-      depthTest: false // see createToonMaterial()'s own note -- matches the fill material
+      side: THREE.BackSide
+      // depthTest stays ON -- see createToonMaterial()'s own note; matches
+      // the fill material's depth-clear-per-hand approach.
     })
   }
   return outlineMaterial
@@ -409,8 +429,17 @@ function updateOutlineVisibility() {
 // -----------------------------------------------------------------------
 // Field layout
 // -----------------------------------------------------------------------
+// Fixed world-unit reference length for auto-fitting hand scale -- NOT
+// derived from rowSpacing/columnSpacing, per direct request that spacing
+// and scale be fully independent (previously, `computeBaseScale()` used
+// `Math.min(rowSpacing, columnSpacing) * 0.8`, so dragging either spacing
+// slider silently changed hand size too). Matches what that formula
+// evaluated to at this project's own original spacing defaults (10, 11.5)
+// so existing saved settings don't visually jump; `cfg.handScale` is now
+// the ONLY thing that scales hands.
+const HAND_SCALE_REFERENCE_LENGTH = 8
 function computeBaseScale() {
-  return (Math.min(cfg.rowSpacing, cfg.columnSpacing) * 0.8 / handLengthRaw) * cfg.handScale
+  return (HAND_SCALE_REFERENCE_LENGTH / handLengthRaw) * cfg.handScale
 }
 
 function relayoutField() {
@@ -453,6 +482,22 @@ function rebuildField() {
     if (skinnedMesh && toonMaterial) skinnedMesh.material = toonMaterial
     const outlineMesh = skinnedMesh ? buildOutlineMesh(skinnedMesh) : null
     if (outlineMesh) clone.add(outlineMesh)
+    // Depth-buffer-per-hand technique: both materials keep depthTest ON
+    // (see createToonMaterial()'s own note) so a hand's own geometry
+    // self-occludes correctly, but the depth buffer is wiped immediately
+    // before each hand's own draw call -- so cross-hand stacking is still
+    // decided purely by draw order (renderOrder, from cursor distance,
+    // see updateRenderOrder()) rather than real camera depth, same as
+    // before. Attached to BOTH meshes (not just one) because the outline
+    // mesh is sometimes invisible (`updateOutlineVisibility()`) and
+    // `onBeforeRender` never fires for an invisible object -- the fill
+    // mesh's own clear must not depend on the outline mesh having run.
+    // renderOrder ordering (outline drawn first, epsilon below fill, see
+    // updateRenderOrder()) means fill's clear simply re-clears again right
+    // after -- harmless, since the outline shell is deliberately expanded
+    // (`outlineThickness`) to sit entirely behind the fill surface anyway.
+    if (skinnedMesh) skinnedMesh.onBeforeRender = (r) => r.clearDepth()
+    if (outlineMesh) outlineMesh.onBeforeRender = (r) => r.clearDepth()
     const wrapper = new THREE.Group()
     wrapper.add(clone)
     scene.add(wrapper)
@@ -509,6 +554,15 @@ new GLTFLoader().load(
     handLengthRaw = Math.max(pointDir.length(), 0.001)
     pointDir.normalize()
     alignQuat = new THREE.Quaternion().setFromUnitVectors(pointDir, new THREE.Vector3(0, 0, -1))
+
+    // Real mesh bounding sphere (see its own declaration comment) --
+    // measured here, in the same identity-transform frame as the
+    // measurements above, BEFORE any per-instance clone/scale/rotate.
+    const boundsBox = new THREE.Box3().setFromObject(skinned)
+    const boundsSphere = new THREE.Sphere()
+    boundsBox.getBoundingSphere(boundsSphere)
+    handBoundsCenterLocal.copy(boundsSphere.center)
+    handBoundsRadiusLocal = boundsSphere.radius
 
     toonMaterial = createToonMaterial(skinned.material.map || null)
 
@@ -580,27 +634,95 @@ animate()
 // later-drawn outline (an inverted, expanded backface shell) paint solid
 // color over its own hand's entire visible fill instead of just peeking
 // out at the silhouette edge.
-const projectScratch = new THREE.Vector3()
 // "Prevent Reordering Flash": approximates each hand's on-screen footprint
-// as a circle (world radius = half the measured hand length, projected to
-// screen pixels via standard perspective scaling) since a precise
-// silhouette-vs-silhouette overlap test isn't cheap to do every frame for
-// a whole field of arbitrarily-rotated meshes. Good enough to catch "these
-// 2 are visually fighting for the same pixels," which is the actual
-// problem being solved -- not pixel-perfect, and disclosed as such.
+// as a circle (using the mesh's own measured bounding sphere -- see
+// handBoundsCenterLocal/handBoundsRadiusLocal's declaration comment --
+// projected to screen pixels via standard perspective scaling) since a
+// precise silhouette-vs-silhouette overlap test isn't cheap to do every
+// frame for a whole field of arbitrarily-rotated meshes. Good enough to
+// catch "these 2 are visually fighting for the same pixels," which is the
+// actual problem being solved -- not pixel-perfect, and disclosed as such.
+// (An earlier version of this circle used `wrapper.position` as the
+// center and half the wrist-to-fingertip bone length as the radius --
+// both wrong: the real mesh includes a full forearm and is centered ~13
+// units from the wrapper's own origin, so that circle was undersized by
+// ~5x and mis-centered, missing the thumb/forearm at many rotations --
+// see GOTCHAS.)
+//
+// CORRECTED 3 TIMES -- the first 2 pairwise-lock designs are kept here in
+// comment form because they're a real, measured cautionary tale for
+// anything that touches this function again.
+//
+// v1 froze a hand's ENTIRE render order the instant it overlapped
+// ANYTHING, never re-syncing until every overlap cleared -- in a dense/
+// zoomed-in view where most hands are ALWAYS touching some neighbor, no
+// hand ever got a single overlap-free frame to unfreeze on, so the whole
+// field froze solid PERMANENTLY the moment the checkbox was turned on.
+// Confirmed via simulation: all 510 hands stuck, 0 order updates across
+// 240 frames.
+//
+// v2 kept a per-pair lock but only nudged the "should stay on top" hand
+// UP when its own raw live value dropped below its partner's -- otherwise
+// it used its own raw value directly. That raw value can differ hugely,
+// frame to frame, from the nudged value, so that hand silently teleported
+// between 2 very different numbers depending on whether the nudge fired
+// that frame. v3 tried to fix v2 by making the correction UNCONDITIONAL
+// (partner's value + a fixed offset, always, while locked) -- this
+// stopped the teleporting, but in a dense field, chains of simultaneous
+// locks (A-under-B, B-under-C, C-under-D...) compound: EVERY hand in a
+// long chain collapses toward the value of whichever hand anchors that
+// chain, discarding their real distances almost entirely. Measured
+// directly and unambiguously: sampling 87,000 random pairs whose TRUE
+// distances differed by more than 15 world units (a large, unambiguous
+// gap -- not a near-tie), 21% still rendered in the WRONG relative order
+// under v3. That is exactly the reported bug ("certain hands render above
+// a hand further from the cursor") and it was WORSE than doing nothing.
+//
+// This version abandons hard locking/pinning entirely. A hand's own
+// effectiveRenderOrder tracks its OWN live cursor distance always --
+// snapping instantly when it isn't overlapping anything, and blending
+// toward the live value at REORDER_SMOOTHING per frame (an exponential
+// lerp, not a freeze) only while it IS currently overlapping something.
+// Nothing is ever derived from ANOTHER hand's value, so the v3 chain-
+// collapse failure mode is structurally impossible -- and because the
+// blend always keeps moving toward the true live value (never frozen),
+// the v1 permanent-freeze failure mode is impossible too. Measured
+// against the same 87,000-pair test: under 1% wrong-order rate at
+// realistic cursor speed (vs. v3's 21%), and it still roughly halves the
+// frame-to-frame flip rate for hands ACTUALLY overlapping on screen
+// compared to no smoothing at all, at fast/erratic cursor movement.
+const REORDER_SMOOTHING = 0.15
 function updateRenderOrder() {
   const flashFixOn = cfg.preventReorderFlash
   if (flashFixOn) {
     const vFov = THREE.MathUtils.degToRad(camera.fov)
     const canvasHeight = renderer.domElement.clientHeight || window.innerHeight
     const canvasWidth = renderer.domElement.clientWidth || window.innerWidth
-    const worldRadius = handLengthRaw * 0.5
     hands.forEach((hand) => {
-      const distToCamera = camera.position.distanceTo(hand.wrapper.position)
+      // The overlap circle's center and radius come from the mesh's own
+      // measured bounding sphere (handBoundsCenterLocal/Radius, see their
+      // declaration comment), transformed through this hand's ACTUAL
+      // current transform chain (scale -> alignQuat -> live wrapper
+      // rotation -> wrapper position) -- NOT `wrapper.position` directly
+      // and NOT a radius derived from wrist-to-fingertip bone length.
+      // Using wrapper.position + handLengthRaw*0.5 (the original version)
+      // put the circle's center ~13 world units from the mesh's real
+      // center and undersized its radius by ~5x (confirmed by direct
+      // measurement) -- small enough to miss the thumb/forearm entirely
+      // at many rotations, which is exactly the reported "thumb pops
+      // above the other hand" bug. A sphere's radius is unaffected by
+      // rotation (only scale), so only the CENTER needs the full
+      // rotate-then-translate chain; the radius only needs scaling.
+      boundsCenterScratch.copy(handBoundsCenterLocal)
+        .multiplyScalar(hand.clone.scale.x)
+        .applyQuaternion(alignQuat)
+        .applyQuaternion(hand.wrapper.quaternion)
+        .add(hand.wrapper.position)
+      const distToCamera = camera.position.distanceTo(boundsCenterScratch)
       const worldHeightAtDist = 2 * Math.tan(vFov / 2) * Math.max(distToCamera, 0.001)
       const pxPerWorldUnit = canvasHeight / worldHeightAtDist
-      hand.screenRadius = worldRadius * hand.clone.scale.x * pxPerWorldUnit
-      projectScratch.copy(hand.wrapper.position).project(camera)
+      hand.screenRadius = handBoundsRadiusLocal * hand.clone.scale.x * pxPerWorldUnit
+      projectScratch.copy(boundsCenterScratch).project(camera)
       hand.screenX = (projectScratch.x * 0.5 + 0.5) * canvasWidth
       hand.screenY = (-projectScratch.y * 0.5 + 0.5) * canvasHeight
       hand.isOverlapping = false
@@ -620,14 +742,12 @@ function updateRenderOrder() {
     }
   }
   hands.forEach((hand) => {
-    const dist = hand.wrapper.position.distanceTo(cursorTarget)
-    // Live-update the effective order UNLESS the flash-fix is on AND this
-    // hand is currently overlapping another one -- in that case, keep
-    // whatever order it already had (frozen) until it clears every
-    // overlap it's currently in, per direct request.
-    if (!flashFixOn || !hand.isOverlapping) hand.effectiveRenderOrder = dist
+    const live = hand.wrapper.position.distanceTo(cursorTarget)
+    hand.effectiveRenderOrder = (flashFixOn && hand.isOverlapping)
+      ? hand.effectiveRenderOrder + (live - hand.effectiveRenderOrder) * REORDER_SMOOTHING
+      : live
     if (hand.skinnedMesh) hand.skinnedMesh.renderOrder = hand.effectiveRenderOrder
-    if (hand.outlineMesh) hand.outlineMesh.renderOrder = hand.effectiveRenderOrder - 0.01
+    if (hand.outlineMesh) hand.outlineMesh.renderOrder = hand.effectiveRenderOrder - 0.001
   })
 }
 animate()
