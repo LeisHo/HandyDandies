@@ -224,6 +224,59 @@ Verified:
   already-documented tool characteristic applying at a larger scale.
 
 --------------------------------------------------------------------------------
+2026-09-12 (continued yet again)  -  ~08:52 AM - 09:04 AM EDT
+
+1 request: a "Reordering Flash" checkbox so 2 overlapping hands' cursor-
+distance render order doesn't flip/flash while they're still overlapping,
+only once they visibly clear each other.
+
+Added:
+- `preventReorderFlash` checkbox (Debug group). When on,
+  `updateRenderOrder()` approximates every hand's on-screen footprint as a
+  circle (world radius = half the measured hand length x its own scale,
+  projected to screen pixels via standard perspective scaling) and runs an
+  O(n^2) pairwise screen-space overlap check across all hands. A hand's
+  `effectiveRenderOrder` (now a persisted field, not recomputed from
+  scratch every frame) only updates from its live cursor-distance when it
+  is NOT currently overlapping anything -- while overlapping, it keeps its
+  prior order, so 2 fighting hands can't flip mid-overlap; it only
+  re-evaluates once that hand clears every overlap it was in. Off by
+  default (zero added cost when disabled -- the pairwise check is fully
+  gated behind the checkbox).
+
+Verified:
+- The full freeze -> stay-frozen-despite-large-distance-change -> resume
+  cycle, via a `window.__debug`-driven test in one atomic script: forced 2
+  hands to identical positions (guaranteed overlap), captured their order;
+  moved the cursor target to a wildly different point (massively changing
+  live distance) and re-ran the update -- order stayed byte-identical;
+  restored one hand's real grid position (clearing the overlap) and
+  re-ran -- order immediately jumped to the new live value. All 3 phases
+  confirmed in a single script run, eliminating any ambiguity about
+  ordering/timing between separate tool calls.
+
+Debugging note (real time cost, worth recording): initial verification
+attempts showed the overlap check always reporting no-overlap and NaN-like
+projected screen positions, which looked like a bug in the new code. Root
+cause was NOT the new code: this session's Browser pane was not currently
+displayed at all (confirmed via `tabs_context`: "The Browser pane is
+currently hidden"), which fully suspends `requestAnimationFrame`
+(confirmed with a vanilla rAF-counting script having nothing to do with
+this project) -- and since the existing camera-resize self-heal fix (added
+in an earlier round for the `window.innerWidth`-reads-0-at-boot issue)
+lives inside the rAF loop, it never got a chance to run, leaving the
+camera stuck with a NaN projection matrix (constructed with
+`aspect = 0/0` at boot). Manually repairing the camera via a debug hook
+(`camera.aspect = <real ratio>; camera.updateProjectionMatrix()`) before
+re-testing resolved it completely -- the overlap-detection code itself was
+correct the whole time. See CODE_SUMMARY.txt's GOTCHAS for the durable
+writeup.
+
+Not committed to git yet -- this project's own git discipline (CLAUDE.md
+§9) requires an explicit push instruction, which wasn't given for this
+specific change.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

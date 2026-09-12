@@ -75,6 +75,28 @@ Nothing in progress — see What's next.
   — confirmed directly via `renderOrder` values varying correctly with
   each hand's own measured distance.
 - Pushed to a new GitHub repo (see CHANGELOG.txt for the exact URL/commit).
+- 3rd same-day follow-on: "Prevent Reordering Flash" Debug-group checkbox
+  -- freezes a hand's cursor-distance render order the instant it starts
+  visually overlapping another hand (approximated via projected on-screen
+  circles), resuming live updates only once it clears every overlap it was
+  in. Verified directly via a `window.__debug`-driven test (not visually --
+  see below): forced 2 hands to identical positions, confirmed their order
+  froze even after moving the cursor target far enough to hugely change
+  their live distance, then cleared the overlap and confirmed the order
+  immediately resumed live-updating. **Not yet committed/pushed** to the
+  GitHub repo -- ask before doing so, per this project's normal git
+  discipline.
+  During verification, hit and correctly diagnosed a NEW variant of the
+  browser-automation tool's rendering-suspension quirk: the tool's own
+  Browser PANE (not just a tab) was not currently displayed, which
+  suspends `requestAnimationFrame` entirely (confirmed with a vanilla,
+  page-code-independent rAF-counting script) -- and since this project's
+  own camera-resize self-heal lives inside the rAF loop, the camera was
+  stuck with a NaN projection matrix the whole time, corrupting the
+  overlap check's screen-projection math in a way that looked like a real
+  bug until traced back to the camera state itself. See CODE_SUMMARY.txt's
+  own GOTCHAS for the full account -- useful precedent if this shows up
+  again.
 
 ## What's next
 

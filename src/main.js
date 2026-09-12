@@ -134,7 +134,14 @@ const DEV_GROUPS = [
     title: 'Debug',
     controls: [
       { key: 'showGridHelper', label: 'Show Grid Helper', type: 'checkbox', def: false, onChange: (v) => { if (gridHelper) gridHelper.visible = v } },
-      { key: 'showWireframe', label: 'Show Wireframe', type: 'checkbox', def: false, onChange: (v) => { if (toonMaterial) toonMaterial.wireframe = v } }
+      { key: 'showWireframe', label: 'Show Wireframe', type: 'checkbox', def: false, onChange: (v) => { if (toonMaterial) toonMaterial.wireframe = v } },
+      // Freezes a hand's own render-order value (see animate()'s own
+      // overlap-detection block) the instant it starts visually
+      // overlapping another hand, instead of letting cursor-distance
+      // render ordering keep re-sorting it live -- direct request: 2
+      // overlapping hands' stacking must not flash/flip while they're
+      // still overlapping, only once they visibly clear each other.
+      { key: 'preventReorderFlash', label: 'Prevent Reordering Flash (Freeze Order While Overlapping)', type: 'checkbox', def: false }
     ]
   }
 ]
@@ -449,7 +456,7 @@ function rebuildField() {
     const wrapper = new THREE.Group()
     wrapper.add(clone)
     scene.add(wrapper)
-    hands.push({ wrapper, clone, skinnedMesh, outlineMesh })
+    hands.push({ wrapper, clone, skinnedMesh, outlineMesh, effectiveRenderOrder: 0, screenX: 0, screenY: 0, screenRadius: 0 })
   }
   relayoutField()
   updateOutlineVisibility()
@@ -508,7 +515,7 @@ new GLTFLoader().load(
     modelRoot = root
     modelLoaded = true
     rebuildField()
-    window.__debug = { THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale }
+    window.__debug = { THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget }
     loadingEl.classList.add('hidden')
   },
   undefined,
@@ -556,23 +563,71 @@ function animate() {
       hand.wrapper.quaternion.slerp(desired, cfg.trackingDamping)
     })
   }
-  // Render-order stacking driven by distance from the cursor target, not
-  // real camera depth -- per direct request, hands FURTHEST from the
-  // cursor render on top, nearest render at the bottom. Requires
-  // depthTest:false on both hand materials (see createToonMaterial()'s own
-  // note) since three.js's normal depth-tested compositing would otherwise
-  // always let true camera-depth win regardless of draw/renderOrder.
-  // Each hand's own outline gets a SLIGHTLY lower renderOrder than its own
-  // fill mesh (same distance, minus a small epsilon) so the fill always
-  // draws on top of its own outline -- without this, disabling depthTest
-  // would let a later-drawn outline (an inverted, expanded backface shell)
-  // paint solid color over its own hand's entire visible fill instead of
-  // just peeking out at the silhouette edge.
+  updateRenderOrder()
+  composer.render()
+}
+animate()
+
+// Render-order stacking driven by distance from the cursor target, not
+// real camera depth -- per direct request, hands FURTHEST from the
+// cursor render on top, nearest render at the bottom. Requires
+// depthTest:false on both hand materials (see createToonMaterial()'s own
+// note) since three.js's normal depth-tested compositing would otherwise
+// always let true camera-depth win regardless of draw/renderOrder. Each
+// hand's own outline gets a SLIGHTLY lower renderOrder than its own fill
+// mesh (same distance, minus a small epsilon) so the fill always draws on
+// top of its own outline -- without this, disabling depthTest would let a
+// later-drawn outline (an inverted, expanded backface shell) paint solid
+// color over its own hand's entire visible fill instead of just peeking
+// out at the silhouette edge.
+const projectScratch = new THREE.Vector3()
+// "Prevent Reordering Flash": approximates each hand's on-screen footprint
+// as a circle (world radius = half the measured hand length, projected to
+// screen pixels via standard perspective scaling) since a precise
+// silhouette-vs-silhouette overlap test isn't cheap to do every frame for
+// a whole field of arbitrarily-rotated meshes. Good enough to catch "these
+// 2 are visually fighting for the same pixels," which is the actual
+// problem being solved -- not pixel-perfect, and disclosed as such.
+function updateRenderOrder() {
+  const flashFixOn = cfg.preventReorderFlash
+  if (flashFixOn) {
+    const vFov = THREE.MathUtils.degToRad(camera.fov)
+    const canvasHeight = renderer.domElement.clientHeight || window.innerHeight
+    const canvasWidth = renderer.domElement.clientWidth || window.innerWidth
+    const worldRadius = handLengthRaw * 0.5
+    hands.forEach((hand) => {
+      const distToCamera = camera.position.distanceTo(hand.wrapper.position)
+      const worldHeightAtDist = 2 * Math.tan(vFov / 2) * Math.max(distToCamera, 0.001)
+      const pxPerWorldUnit = canvasHeight / worldHeightAtDist
+      hand.screenRadius = worldRadius * hand.clone.scale.x * pxPerWorldUnit
+      projectScratch.copy(hand.wrapper.position).project(camera)
+      hand.screenX = (projectScratch.x * 0.5 + 0.5) * canvasWidth
+      hand.screenY = (-projectScratch.y * 0.5 + 0.5) * canvasHeight
+      hand.isOverlapping = false
+    })
+    // O(n^2) pairwise check -- fine at hundreds of hands; would need a
+    // spatial grid/broad-phase if the field grows into the low thousands.
+    for (let i = 0; i < hands.length; i++) {
+      const a = hands[i]
+      for (let j = i + 1; j < hands.length; j++) {
+        const b = hands[j]
+        if (a.isOverlapping && b.isOverlapping) continue
+        const dx = a.screenX - b.screenX
+        const dy = a.screenY - b.screenY
+        const combined = a.screenRadius + b.screenRadius
+        if (dx * dx + dy * dy < combined * combined) { a.isOverlapping = true; b.isOverlapping = true }
+      }
+    }
+  }
   hands.forEach((hand) => {
     const dist = hand.wrapper.position.distanceTo(cursorTarget)
-    if (hand.skinnedMesh) hand.skinnedMesh.renderOrder = dist
-    if (hand.outlineMesh) hand.outlineMesh.renderOrder = dist - 0.01
+    // Live-update the effective order UNLESS the flash-fix is on AND this
+    // hand is currently overlapping another one -- in that case, keep
+    // whatever order it already had (frozen) until it clears every
+    // overlap it's currently in, per direct request.
+    if (!flashFixOn || !hand.isOverlapping) hand.effectiveRenderOrder = dist
+    if (hand.skinnedMesh) hand.skinnedMesh.renderOrder = hand.effectiveRenderOrder
+    if (hand.outlineMesh) hand.outlineMesh.renderOrder = hand.effectiveRenderOrder - 0.01
   })
-  composer.render()
 }
 animate()

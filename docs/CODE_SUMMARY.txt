@@ -123,17 +123,39 @@ Inside `main.js`, in roughly this order:
    (#9), and finally `composer.render()` (RenderPass -> OutlinePass ->
    OutputPass) instead of a plain `renderer.render()`, now that
    post-processing exists.
-9. **Cursor-distance render ordering** -- per direct request, hands
-   FURTHEST from the cursor target render on top of nearer ones, not
-   whichever is actually closer to the camera. Every frame, each hand's
-   `skinnedMesh.renderOrder` is set to its own `wrapper.position.distanceTo(
-   cursorTarget)` (larger distance = drawn later = ends up on top); its
-   `outlineMesh.renderOrder` is that same value minus a small epsilon, so a
-   hand's own outline always draws just before (under) its own fill. This
-   ONLY has a visual effect because both materials have `depthTest: false`
-   (#7) -- three.js's normal depth-tested compositing would otherwise
-   always let real camera depth win regardless of renderOrder. See GOTCHAS
-   for the real tradeoff this introduces.
+9. **Cursor-distance render ordering** (`updateRenderOrder()`) -- per direct
+   request, hands FURTHEST from the cursor target render on top of nearer
+   ones, not whichever is actually closer to the camera. Each hand's
+   `effectiveRenderOrder` (persisted on the hand object, not recomputed
+   from scratch every frame) normally tracks its own live
+   `wrapper.position.distanceTo(cursorTarget)`; `skinnedMesh.renderOrder`
+   reads that value directly, `outlineMesh.renderOrder` reads it minus a
+   small epsilon so a hand's own outline always draws just before (under)
+   its own fill. This ONLY has a visual effect because both materials have
+   `depthTest: false` (#7) -- three.js's normal depth-tested compositing
+   would otherwise always let real camera depth win regardless of
+   renderOrder. See GOTCHAS for the real tradeoff this introduces.
+10. **"Prevent Reordering Flash"** (`cfg.preventReorderFlash`, Debug group)
+    -- when on, `updateRenderOrder()` first approximates every hand's
+    on-screen footprint as a circle (world radius = half the measured hand
+    length x that hand's own scale, projected to screen pixels via
+    standard perspective scaling: `pxPerWorldUnit = canvasHeight / (2 *
+    tan(vFov/2) * distanceToCamera)`) and runs an O(n^2) pairwise check
+    (`hands[i]` vs `hands[j]`, screen-space circle-circle overlap) to flag
+    which hands are currently overlapping ANYTHING on screen. A hand's
+    `effectiveRenderOrder` only updates from its live distance when it is
+    NOT currently flagged as overlapping -- while overlapping (with
+    anything), it keeps whatever order it already had, so 2 overlapping
+    hands' relative stacking can't flip mid-overlap; it only re-evaluates
+    once that hand individually clears every overlap it was in. This is a
+    per-HAND freeze (not a per-PAIR lock) -- verified directly (not just
+    visually, since the browser-automation tool's own current-session
+    rendering was unavailable at verification time -- see GOTCHAS) via a
+    `window.__debug`-driven test: forced 2 hands to the same position
+    (guaranteed overlap), confirmed their order froze even after moving the
+    cursor target far enough to massively change their live distance, then
+    restored one hand's real position (clearing the overlap) and confirmed
+    its order immediately jumped to the new live value.
 
 Data flow: cursor position -> NDC -> raycast against a plane in front of
 the field -> `cursorTarget` (world point) -> per-hand look-at quaternion ->
@@ -150,6 +172,28 @@ None formally designated yet.
 --------------------------------------------------------------------------------
 GOTCHAS
 
+- **When the browser-automation tool's own pane is not currently displayed
+  at all (confirmed via its own `tabs_context` result: "The Browser pane is
+  currently hidden"), `requestAnimationFrame` never fires -- ZERO
+  callbacks, confirmed with a vanilla rAF-counting script unrelated to this
+  project's own code -- even on a brand-new, explicitly-foregrounded tab.**
+  This is a DIFFERENT symptom than the already-documented "hidden TAB"
+  case (where `document.hidden`/`window.innerWidth` read as hidden/0): here
+  `document.hidden` can read `false` while rendering is still suspended,
+  because it's the whole PANE, not the tab, that isn't shown. Consequence
+  that cost real debugging time: since this project's own self-healing
+  resize fix (see the `window.innerWidth` entry below) lives INSIDE
+  `animate()`, it never gets a chance to run either while the pane is
+  hidden -- so the camera can get stuck with a NaN projection matrix
+  (constructed with `aspect = window.innerWidth/window.innerHeight = 0/0`)
+  indefinitely, and anything using `.project(camera)` (e.g. the reorder-
+  flash screen-space overlap check) then produces NaN/null-look ing
+  results (JSON-serialized as `null` since `NaN` isn't valid JSON) that
+  have NOTHING to do with the actual feature logic being tested. Fix when this happens mid-debugging: manually repair the camera
+  via a debug hook (`camera.aspect = knownGoodRatio;
+  camera.updateProjectionMatrix()`) before trusting any projection-based
+  calculation -- don't conclude a feature is broken until the camera state
+  itself is confirmed sane.
 - **`depthTest: false` on both hand materials (toon fill + outline) is
   what makes cursor-distance render ordering actually visible -- it also
   means a SINGLE hand's own internal self-occlusion (finger over finger,
