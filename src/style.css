@@ -1,0 +1,263 @@
+:root { color-scheme: dark; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #1c1e22;
+  font-family: system-ui, sans-serif;
+}
+
+#viewport {
+  display: block;
+  width: 100vw;
+  height: 100vh;
+  touch-action: none;
+}
+
+#loading {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #cfd3dc;
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  pointer-events: none;
+}
+#loading.hidden { display: none; }
+
+/* ---------------------------------------------------------------------
+   Dev panel (CLAUDE.md Section 12) -- reused verbatim from ADA BATHROOM's
+   devpanel/devPanel.js reference implementation (itself adapted from
+   DICKOCLICKO). Purely the chrome's visual styling; CSS custom properties
+   below are set inline by the panel's own built-in "Dev Panel" group.
+--------------------------------------------------------------------- */
+.dp-panel {
+  position: fixed; top: 10px; right: 10px;
+  width: min(320px, calc(100vw - 20px));
+  max-height: 88vh; min-width: 220px; min-height: 140px;
+  background: var(--dp-bg-color, rgba(18, 18, 26, 0.94));
+  opacity: var(--dp-opacity, 1);
+  color: var(--dp-text-color, #e8e8f0);
+  font: var(--dp-body-font-size, 12px)/1.4 var(--dp-font-family, -apple-system, Segoe UI, Roboto, sans-serif);
+  border: 1px solid #3a3a4a;
+  /* Accent-colored left edge, matching TEMPLATE_DEV_PANEL.html's own
+     "border-left: 2px solid var(--dev-accent-color)" visual identity mark. */
+  border-left: 3px solid var(--dp-accent-color, #7d8cff);
+  border-radius: 8px;
+  z-index: 9999; user-select: none;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5);
+  display: flex; flex-direction: column;
+}
+.dp-panel.hidden { display: none; }
+.dp-panel.dp-collapsed .dp-body,
+.dp-panel.dp-collapsed .dp-resize { display: none; }
+.dp-header {
+  padding: 8px 10px; font-weight: 600; font-size: var(--dp-title-font-size, 13px);
+  background: #25253a; border-radius: 8px 8px 0 0;
+  cursor: grab; touch-action: none;
+  display: flex; justify-content: space-between; align-items: center; gap: 8px;
+  flex: 0 0 auto;
+}
+.dp-header:active { cursor: grabbing; }
+.dp-title { letter-spacing: .06em; color: var(--dp-title-color, #e8e8f0); }
+.dp-icon-btn {
+  flex: 0 0 auto; width: 18px; height: 18px; line-height: 16px; text-align: center;
+  background: #3a3a4a; color: var(--dp-text-color, #e8e8f0); border: none; border-radius: 3px;
+  cursor: pointer; font-size: 12px; padding: 0;
+}
+.dp-body {
+  padding: 4px 8px 10px; overflow-y: auto; flex: 1 1 auto; min-height: 0;
+  /* Thin scrollbar (previously the browser default, ~15-17px) so its own
+     footprint stays clear of .dp-resize-e's inward reach -- see that
+     rule's own comment for the geometry. */
+  scrollbar-width: thin; scrollbar-color: var(--dp-accent-color, #7d8cff) #0f0f18;
+}
+.dp-body::-webkit-scrollbar { width: 8px; }
+.dp-body::-webkit-scrollbar-track { background: #0f0f18; }
+.dp-body::-webkit-scrollbar-thumb { background: var(--dp-accent-color, #7d8cff); border-radius: 4px; }
+/* Text Edit Mode's inline rename editor -- replaces a group title's or a
+   row label's own text content while active. */
+.dp-panel textarea {
+  width: 100%; min-width: 60px; background: #0f0f18; color: var(--dp-text-color, #e8e8f0);
+  border: 1px solid var(--dp-accent-color, #7d8cff); border-radius: 4px;
+  font: inherit; resize: none; padding: 1px 4px;
+}
+.dp-tabs { display: flex; gap: 4px; padding: 2px 2px 8px; }
+.dp-tabs .dp-tab {
+  flex: 1 1 auto; background: #25253a; color: var(--dp-text-color, #a9b4ff); border: none; border-radius: 4px;
+  padding: 5px 4px; font-size: var(--dp-tab-font-size, 11px); cursor: pointer;
+}
+.dp-tabs .dp-tab.dp-tab-active { background: var(--dp-accent-color, #7d8cff); color: #14142a; font-weight: 600; }
+.dp-actions { display: flex; gap: 6px; padding: 2px 2px 8px; }
+.dp-actions button {
+  flex: 1 1 auto; background: #3a3a4a; color: var(--dp-text-color, #e8e8f0); border: none; border-radius: 4px;
+  padding: 5px 4px; font-size: var(--dp-body-font-size, 11px); cursor: pointer;
+}
+.dp-actions button:active { background: #4a4a5e; }
+.dp-group { border-top: 1px solid #33333f; }
+.dp-group:first-child { border-top: none; }
+.dp-group.dp-dragging, .dp-row.dp-dragging { opacity: .4; }
+.dp-group-header {
+  padding: 7px 6px; font-weight: 600; font-size: var(--dp-group-title-font-size, 11px); letter-spacing: .04em;
+  color: var(--dp-text-color, #a9b4ff); cursor: pointer; display: flex; align-items: center; gap: 6px;
+  /* Accent-tinted chip, matching TEMPLATE_DEV_PANEL.html's own
+     ".dev-section-title { background: rgba(0,255,255,0.1) }". color-mix()
+     degrades to a transparent (i.e. no-op) background on a browser that
+     doesn't support it, rather than breaking. */
+  background: color-mix(in srgb, var(--dp-accent-color, #7d8cff) 12%, transparent);
+  border-radius: 4px;
+}
+.dp-group-header .arrow { transition: transform .15s; font-size: 9px; }
+.dp-group.collapsed .arrow { transform: rotate(-90deg); }
+.dp-group.collapsed .dp-group-body { display: none; }
+.dp-drag-handle, .dp-row-handle { flex: 0 0 auto; cursor: grab; color: #666; touch-action: none; padding: 0 2px; }
+.dp-drag-handle:active, .dp-row-handle:active { cursor: grabbing; }
+/* A freshly-created empty group (see addCustomGroup()) needs a visible,
+   hittable drop target even with 0 settings rows in it. */
+.dp-group-body:empty { min-height: 24px; border: 1px dashed #3a3a4a; border-radius: 4px; opacity: 0.6; }
+/* A group nested one level inside another (see setupReorder's own nesting
+   cap) gets an indent + accent border instead of its own top-level
+   top-border, so nesting is visually obvious without needing extra text. */
+.dp-group-body > .dp-group {
+  border-top: none;
+  margin-left: 8px;
+  border-left: 2px solid color-mix(in srgb, var(--dp-accent-color, #7d8cff) 25%, transparent);
+}
+.dp-group-body > .dp-group > .dp-group-header { font-size: calc(var(--dp-group-title-font-size, 11px) * 0.9); }
+.dp-add-group-row { margin: 0 2px 8px; }
+.dp-add-group-row button {
+  width: 100%; background: #3a3a4a; color: var(--dp-text-color, #e8e8f0); border: none; border-radius: 4px;
+  padding: 5px 4px; font-size: var(--dp-body-font-size, 11px); cursor: pointer;
+}
+.dp-add-group-row button:active { background: #4a4a5e; }
+.dp-row { display: flex; align-items: center; gap: 6px; padding: 3px 2px; }
+.dp-row label { flex: 0 0 auto; width: 112px; font-size: var(--dp-settings-title-font-size, 11px); color: var(--dp-text-color, #c9c9d8); }
+.dp-row.dp-per-device label { color: #ffd27d; }
+.dp-row input[type=range] { flex: 1 1 auto; min-width: 0; accent-color: var(--dp-slider-color, #7d8cff); }
+.dp-num {
+  flex: 0 0 auto; width: 52px; text-align: right; font-size: var(--dp-body-font-size, 11px);
+  background: #0f0f18; color: var(--dp-text-color, #e8e8f0); border: 1px solid #3a3a4a; border-radius: 4px;
+  padding: 2px 4px;
+}
+.dp-row input[type=color] { width: 40px; height: 22px; border: 1px solid #3a3a4a; border-radius: 4px; background: none; padding: 0; }
+.dp-text-input {
+  flex: 1 1 auto; min-width: 0; text-align: left; font-size: var(--dp-body-font-size, 11px);
+  background: #0f0f18; color: var(--dp-text-color, #e8e8f0); border: 1px solid #3a3a4a; border-radius: 4px;
+  padding: 3px 6px;
+}
+.dp-row input[type=checkbox] { width: 16px; height: 16px; }
+.dp-row.dp-list-picker-row-container label { width: auto; }
+.dp-list-picker {
+  resize: vertical; overflow: auto; min-height: 50px; max-height: 260px; height: 80px;
+  background: #0f0f18; border: 1px solid #3a3a4a; border-radius: 4px; padding: 2px; margin-top: 2px;
+}
+.dp-list-picker-row {
+  display: flex; align-items: center; gap: 5px; padding: 3px 4px; cursor: pointer; border-radius: 3px;
+  font-size: var(--dp-body-font-size, 11px); color: var(--dp-text-color, #c9c9d8);
+}
+.dp-list-picker-row-selected { background: #3a3a4a; color: var(--dp-title-color, #e8e8f0); }
+.dp-lp-row-label { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dp-list-picker-actions { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+.dp-list-picker-actions button {
+  flex: 1 1 auto; background: #3a3a4a; color: var(--dp-text-color, #e8e8f0); border: none; border-radius: 4px;
+  padding: 5px 4px; font-size: var(--dp-body-font-size, 11px); cursor: pointer;
+}
+.dp-list-picker-actions button:active { background: #4a4a5e; }
+/* A list-picker's OWN groups (§ direct user request: organize saved items
+   into groups, drag to reorder) -- deliberately smaller/lighter than the
+   outer settings-panel's own .dp-group so the 2 nesting levels (panel
+   group > list-picker > list-picker group) stay visually distinct. */
+.dp-lp-ungrouped-body { display: flex; flex-direction: column; }
+.dp-lp-group { margin-top: 3px; border-top: 1px solid #2a2a36; }
+.dp-lp-group-header {
+  display: flex; align-items: center; gap: 5px; padding: 4px; font-size: calc(var(--dp-body-font-size, 11px) * 0.95);
+  font-weight: 600; color: var(--dp-text-color, #a9b4ff); cursor: pointer; border-radius: 3px;
+  background: color-mix(in srgb, var(--dp-accent-color, #7d8cff) 8%, transparent);
+}
+.dp-lp-group-title { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: text; }
+/* A subgroup nested one level inside another list-picker group (same cap
+   as the outer settings panel's own groups) gets an indent + accent
+   border instead of its own top border, matching .dp-group-body's own
+   identical nested-group treatment. */
+.dp-lp-group-body > .dp-lp-group {
+  border-top: none; margin-left: 6px;
+  border-left: 2px solid color-mix(in srgb, var(--dp-accent-color, #7d8cff) 20%, transparent);
+}
+.dp-lp-group-body > .dp-lp-group > .dp-lp-group-header { font-size: calc(var(--dp-body-font-size, 11px) * 0.9); }
+.dp-lp-group-header .arrow { transition: transform .15s; font-size: 8px; }
+.dp-lp-group.collapsed .arrow { transform: rotate(-90deg); }
+.dp-lp-group.collapsed .dp-lp-group-body { display: none; }
+.dp-lp-group-body { display: flex; flex-direction: column; padding-left: 6px; }
+.dp-lp-group-body:empty { min-height: 20px; border: 1px dashed #3a3a4a; border-radius: 4px; opacity: 0.6; margin: 2px 0 2px 6px; }
+.dp-lp-group-remove {
+  flex: 0 0 auto; background: none; border: none; color: #888; cursor: pointer; font-size: 13px; line-height: 1;
+  padding: 0 2px;
+}
+.dp-lp-group-remove:active { color: #e8e8f0; }
+.dp-lp-row-handle, .dp-lp-group-handle { flex: 0 0 auto; cursor: grab; color: #666; touch-action: none; padding: 0 2px; }
+.dp-lp-row-handle:active, .dp-lp-group-handle:active { cursor: grabbing; }
+.dp-lp-group.dp-dragging, .dp-list-picker-row.dp-dragging { opacity: .4; }
+.dp-action-button {
+  flex: 1 1 auto; background: #3a3a4a; color: var(--dp-text-color, #e8e8f0); border: none; border-radius: 4px;
+  padding: 5px 4px; font-size: var(--dp-body-font-size, 11px); cursor: pointer;
+}
+.dp-action-button:active { background: #4a4a5e; }
+.dp-multi-select-list { display: flex; flex-direction: column; gap: 4px; margin-top: 2px; }
+.dp-multi-select-row { display: flex; gap: 4px; }
+.dp-multi-select-row select {
+  flex: 1 1 auto; min-width: 0; background: #0f0f18; color: var(--dp-text-color, #e8e8f0);
+  border: 1px solid #3a3a4a; border-radius: 4px; padding: 3px 4px; font-size: var(--dp-body-font-size, 11px);
+}
+.dp-multi-select-row .dp-action-button { flex: 0 0 auto; }
+
+/* Sizes/offsets match TEMPLATE_DEV_PANEL.html's resize handles (20px hit
+   target, -6px straddle-the-border overhang) -- "sized for real touch
+   targets", per that template's own comment; HANDO's previous 8px/14px
+   handles at -4px were the same undersized-hit-target class of bug the
+   template was built to fix (CLAUDE.md Section 12, 2026-09-08 note). */
+.dp-resize { position: absolute; z-index: 10; touch-action: none; }
+.dp-resize-n, .dp-resize-s { left: 16px; right: 16px; height: 20px; cursor: ns-resize; }
+.dp-resize-n { top: -6px; } .dp-resize-s { bottom: -6px; }
+/* right/left offset moved from -6px to -14px (inward reach 20-14=6px,
+   down from 14px) so this handle's hit-zone stops short of .dp-body's
+   scroll area -- previously it reached 14px inward, past .dp-body's 8px
+   right padding and directly on top of the vertical scrollbar, fighting
+   it for both clicks and visibility. Corners are unaffected (the
+   scrollbar only runs along the vertical edges, and the user's own
+   report named the edge resizer specifically). */
+.dp-resize-e, .dp-resize-w { top: 16px; bottom: 16px; width: 20px; cursor: ew-resize; }
+.dp-resize-e { right: -14px; } .dp-resize-w { left: -14px; }
+.dp-resize-ne, .dp-resize-nw, .dp-resize-se, .dp-resize-sw { width: 20px; height: 20px; z-index: 11; }
+.dp-resize-ne { top: -6px; right: -6px; cursor: nesw-resize; }
+.dp-resize-nw { top: -6px; left: -6px; cursor: nwse-resize; }
+.dp-resize-se { bottom: -6px; right: -6px; cursor: nwse-resize; }
+.dp-resize-sw { bottom: -6px; left: -6px; cursor: nesw-resize; }
+/* Visible grip cue, matching TEMPLATE_DEV_PANEL.html's own resize-handle
+   icons (a bar per edge, a mark per corner) -- HANDO's handles were
+   previously invisible hit-zones with no affordance at all. */
+.dp-resize::after { content: ''; position: absolute; background: var(--dp-accent-color, #7d8cff); opacity: 0.6; border-radius: 1px; }
+.dp-resize-n::after, .dp-resize-s::after { left: 50%; top: 50%; width: 14px; height: 2px; transform: translate(-50%, -50%); }
+.dp-resize-e::after, .dp-resize-w::after { left: 50%; top: 50%; width: 2px; height: 14px; transform: translate(-50%, -50%); }
+.dp-resize-ne::after, .dp-resize-nw::after, .dp-resize-se::after, .dp-resize-sw::after { width: 6px; height: 6px; border-radius: 50%; }
+.dp-resize-ne::after { top: 6px; right: 6px; }
+.dp-resize-nw::after { top: 6px; left: 6px; }
+.dp-resize-se::after { bottom: 6px; right: 6px; }
+.dp-resize-sw::after { bottom: 6px; left: 6px; }
+
+/* 4 independent capitalize toggles (CLAUDE.md §12i), applied on .dp-panel
+   itself by each control's own onChange -- kept decomposed (one per text
+   category) rather than a single shared toggle, matching this project
+   family's own "decompose, don't bundle" dev-panel convention. */
+.dp-panel.dp-caps-button-text .dp-actions button,
+.dp-panel.dp-caps-button-text .dp-add-group-row button,
+.dp-panel.dp-caps-button-text .dp-list-picker-actions button,
+.dp-panel.dp-caps-button-text .dp-action-button {
+  text-transform: uppercase;
+}
+.dp-panel.dp-caps-tab-text .dp-tab { text-transform: uppercase; }
+.dp-panel.dp-caps-group-names .dp-group-title-text { text-transform: uppercase; }
+.dp-panel.dp-caps-settings-text .dp-row label { text-transform: uppercase; }

@@ -1,0 +1,184 @@
+HANDY DANDIES -- PROJECT SUMMARY
+================================================================================
+
+Status: working three.js prototype -- a grid of rigged hand instances that
+individually rotate to point at the cursor, with pan/zoom camera navigation,
+toon shading, and an outline effect, as of 2026-09-12. See
+PROJECT_PROGRESS.md for what's actively being worked on right now, and
+CHANGELOG.txt for the full historical log -- this file stays a mid-altitude
+snapshot, not a duplicate of either.
+
+--------------------------------------------------------------------------------
+OBJECTIVE
+
+A browser-based three.js scene filled with a field (grid) of rigged 3D hand
+models. Every hand independently rotates to point toward the live cursor
+position: cursor near the top of the browser tilts hands upward (revealing
+their undersides), cursor near the bottom tilts them downward (revealing
+their tops/backs), and horizontal cursor movement yaws them left/right --
+each hand aims from its OWN position at the cursor's 3D target point, not a
+single shared rotation for the whole field. The camera pans on click-drag
+and zooms on scroll/pinch (desktop + mobile), independent of field layout.
+No backend, no build step, no accounts -- a static page.
+
+--------------------------------------------------------------------------------
+SCOPE
+
+In scope: the rigged-hand-field rendering pipeline (model loading, per-
+instance skeleton cloning, grid layout with row/column spacing and
+alternate/progressive row-offset patterns), the cursor-to-3D-target
+raycasting and per-hand look-at math, pan/zoom camera navigation, toon
+shading + outline visual treatment, the dev panel (Field Layout, Cursor
+Tracking, Camera, Lighting, Toon Shading, Outline, Background, Debug groups).
+
+Out of scope / dormant: finger/hand posing (curl, splay, wrist bend) --
+every hand instance uses the model's own static bind pose, nothing like
+HANDO's per-finger pose controls exists here. No touch/mobile equivalent for
+CURSOR TRACKING specifically (only the camera's pan/zoom has a mobile touch
+equivalent) -- desktop mouse only for the look-at mechanic itself.
+
+Audience / how it's used: single-user interactive visual toy/demo, deployed
+as a static page, same category as this workspace's other small interactive
+projects (HANDO, DOTFLICKO, DICKOCLICKO).
+
+--------------------------------------------------------------------------------
+CURRENT STATE
+
+Initial build (2026-09-12) plus 2 same-day follow-on rounds adding camera
+navigation, layout offset patterns, the full Toon Shading/Outline/Lighting
+groups, a 2-way Zoom slider, cursor-distance-based render ordering, and
+tuned default settings baked in directly from the user's own live-tuned
+dev-panel state. Loads HANDO's own `Hand2.glb` rigged hand asset (22-bone
+skeleton, GLB format), measures the model's own bind-pose "pointing"
+direction (wrist bone `rHand` -> middle-fingertip bone `rMid3`, not assumed
+to be a particular axis), and clones it per grid cell via three.js's
+`SkeletonUtils.clone()` so each hand has an independent skeleton. Default
+grid is 17 rows x 30 columns (510 hands), dev-panel tunable, with
+independent Row Spacing/Column Spacing sliders and a choice of Alternate
+(brick-style, every other row shifted, the current default) or Progressive
+(each row shifted further than the last) row-offset pattern. Each frame,
+the cursor's screen position is raycast against a plane positioned in front
+of the hand field; each hand slerps its rotation toward a look-at
+quaternion aimed at that 3D point. Camera is OrbitControls-driven with
+rotation disabled -- click-drag pans, scroll/pinch zooms (both desktop and
+mobile), plus a Zoom slider 2-way-synced with the live camera-to-target
+distance -- and is driven ONLY by explicit X/Y/Z/FOV/Zoom dev-panel sliders
+plus live user interaction, completely decoupled from Field Layout changes
+(confirmed directly: changing row count does not move the camera by even a
+fraction of a unit). Every hand instance shares one `MeshToonMaterial`
+(cel-shaded, with rim lighting and a duotone texture tint, ported from
+HANDO) and one of 2 outline techniques (an inverted-hull shader mesh per
+instance, or a single screen-space `OutlinePass` covering all instances),
+both dev-panel toggleable (currently defaulted off). Render STACKING
+between overlapping hands is driven by each hand's live distance from the
+cursor target (farthest drawn last/on top), not real camera depth -- both
+hand materials run with `depthTest: false` to make this actually take
+visual effect, per direct request.
+
+--------------------------------------------------------------------------------
+DECISIONS
+
+- Reused HANDO's rigged hand asset (`Hand2.glb`), its generic
+  `devpanel/devPanel.js` engine + `style.css` chrome, and its Toon Shading/
+  Outline/Camera/Lighting control sets and shader code, all per explicit
+  instruction to follow HANDO's own architecture as the reference. HANDO
+  itself does no cursor-tracking and no pan/zoom-only camera (it orbits) --
+  those parts are new work built for this project, not ports.
+- Multi-file structure (`index.html` + `src/main.js` ES module +
+  `src/devpanel/`), matching HANDO's own architecture, rather than a single
+  HTML file -- a real 3D rendering pipeline with a reusable dev-panel
+  module, not a small toy that fits the single-file exception (CLAUDE.md
+  §11).
+- Each hand instance gets its own cloned `Skeleton` (`SkeletonUtils.clone()`)
+  rather than sharing one skeleton across instances -- a shared skeleton
+  would make every hand mirror the same pose/rotation, defeating independent
+  per-hand aiming. Toon material IS shared across all instances (unlike a
+  skeleton, a material has no per-instance pose state, and every hand uses
+  the identical style) -- more efficient than HANDO's own per-model-variant
+  materials, which existed only because HANDO has 2 visually distinct model
+  variants.
+- The model's bind-pose "pointing" axis (wrist-to-fingertip direction) was
+  measured at load time via the `rHand`/`rMid3` bone world positions, not
+  assumed to be a fixed axis -- matching HANDO's own "measured, not assumed"
+  convention for this exact rig.
+- Cursor target is a real 3D raycast intersection against a plane positioned
+  IN FRONT of the hand field (toward the camera), not a flat projection onto
+  the same z=0 plane the hands sit on -- a same-plane target would only
+  produce in-plane (yaw-only) rotation, with no pitch component to reveal a
+  hand's top/underside.
+- Camera uses OrbitControls with `enableRotate: false` -- click-drag pans,
+  scroll/pinch zooms, on both desktop and mobile via OrbitControls' own
+  proven touch-gesture handling (`touches: { ONE: PAN, TWO: DOLLY_PAN }`) --
+  no custom touch-handling code was needed. No orbit/rotate gesture exists
+  at all, since a fixed-facing field doesn't need one.
+- Camera framing (position, target-plane depth, light distance) is derived
+  from the field's bounding size EXACTLY ONCE, the first time hands are
+  built, and frozen after that -- direct request ("Field layout shouldn't
+  affect view scale"). Confirmed directly: setting `fieldRows` from 6 to 10
+  live left `camera.position` numerically unchanged.
+- Alternate Row Offset was implemented as the standard brick/hex-pattern
+  reading (shifts every other row along the COLUMN axis) rather than a
+  Z-depth stagger -- "perpendicular direction" is genuinely ambiguous
+  phrasing, and this is the far more common meaning for "alternate row
+  offset" in grid/masonry contexts. Cheap to flip to a Z-axis shift instead
+  if that's not what was meant (one line in `relayoutField()`).
+- Cursor-distance render ordering required `depthTest: false` on both the
+  toon fill material and the outline material -- three.js's normal
+  depth-tested compositing always lets real camera depth win regardless of
+  draw/renderOrder, so there was no way to satisfy "farthest from cursor
+  renders on top" without disabling the depth test between hands. Kept
+  `depthWrite: true` so the depth buffer still ends up populated with
+  SOME meaningful values (whichever hand visually ended up on top at each
+  pixel) rather than staying empty, which keeps it useful for `OutlinePass`
+  if that's ever enabled at the same time as this. Each hand's own outline
+  mesh is given a renderOrder a hair below its own fill mesh so the fill
+  always draws on top of its own outline -- without this, the outline's
+  own expanded backface shell would paint over its whole hand, not just
+  peek out at the silhouette edge, once depth testing no longer stops it.
+  Known tradeoff, disclosed rather than silently accepted: a single hand's
+  OWN internal self-occlusion (e.g. one finger over another) now relies on
+  front-face culling and triangle submission order rather than a full
+  per-pixel depth test -- acceptable for this model's mostly-convex static
+  bind pose, but a genuinely self-overlapping pose could show an artifact.
+
+--------------------------------------------------------------------------------
+DATA SOURCES
+
+`data/processed/HAND3D/Hand2.glb` -- the rigged hand model, physically
+copied from `J:\CLAUDE\PROJECTS\HANDO\data\HAND3D\HAND-021\Hand2.glb` (this
+project has no cross-project asset serving, same convention as
+DOTFLICKO/DICKOCLICKO's own prior asset copies). 22-bone skeleton, single
+static bind pose, 0 animation clips -- posed entirely via whole-hand
+rotation, no per-finger curl/splay like HANDO has.
+
+--------------------------------------------------------------------------------
+KNOWN LIMITATIONS
+
+- No automated test suite -- validation has been manual/live: screenshots
+  at multiple cursor/camera states, plus direct `cfg`/scene-graph inspection
+  via a `window.__debug` hook to confirm numeric claims (e.g. the frozen-
+  camera-position claim above).
+- A hand directly above or below the cursor's own X position (same X
+  coordinate) is a look-at degenerate case (direction parallel to the
+  world-up vector) -- not specifically tested; low risk given real cursor
+  positions rarely align exactly, but not ruled out.
+- No touch/mobile equivalent for the CURSOR-TRACKING mechanic itself
+  (only the camera's pan/zoom has real mobile touch support) -- the dev
+  panel's own Mobile/Landscape tabs render only the built-in "Dev Panel"
+  appearance group.
+- Real mobile touch-gesture behavior (as opposed to the underlying
+  OrbitControls `touches` configuration, which is a proven three.js
+  library feature) was exercised via this session's own browser-automation
+  tool, which documents that its clicks/drags "still arrive as mouse
+  clicks" even under mobile viewport emulation -- genuine on-device
+  touch-drag/pinch confirmation is still the user's own to do.
+- "Alternate Row Offset"'s exact meaning ("perpendicular direction") was a
+  disclosed interpretation call, not a confirmed one -- see Decisions.
+
+--------------------------------------------------------------------------------
+NEXT ACTION
+
+No specific next action is currently pending -- awaiting the user's
+reaction to this round's build (whether Alternate Row Offset's axis
+interpretation is correct, real on-device mobile touch feel, default
+grid/spacing/toon-outline visual tuning).

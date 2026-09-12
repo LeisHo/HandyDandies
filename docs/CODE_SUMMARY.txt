@@ -1,0 +1,220 @@
+HANDY DANDIES -- CODE SUMMARY
+================================================================================
+
+Status: see ../README.md for the project-structure layout and how to run it;
+this file is a quick orientation pointer into the actual code, not a
+duplicate of the README's tree. Reflects the initial build plus a same-day
+follow-on round (camera pan/zoom, layout offsets, Toon Shading/Outline/full
+Lighting), 2026-09-12.
+
+--------------------------------------------------------------------------------
+FILE MAP
+
+- `index.html` -- entry point: import map pinning three.js@0.169.0 via the
+  unpkg CDN (no build step), the `<canvas id="viewport">`, a loading
+  indicator, and the `<script type="module" src="src/main.js">` tag. Its
+  own cache-busting query string (`?v=N`) is bumped by hand whenever a fix
+  doesn't appear to take effect after reload -- see GOTCHAS.
+- `src/main.js` -- all real logic: dev-panel group definitions, scene/
+  camera/lighting setup, OrbitControls (pan+zoom only), cursor-to-3D-target
+  raycasting, model loading + per-instance skeleton cloning, grid layout
+  with row-offset patterns, toon material + outline mesh/pass, and the
+  render loop. ~430 lines as of this entry.
+- `src/style.css` -- page chrome (canvas/loading text) + the dev panel's
+  full CSS (`.dp-*` classes) -- copied verbatim from HANDO's own
+  `src/style.css`, itself the workspace's generic dev-panel styling
+  (CLAUDE.md §12). No project-specific CSS beyond the page chrome.
+- `src/devpanel/devPanel.js` -- the generic, project-agnostic dev-panel
+  engine (CLAUDE.md §12a-12h). Copied verbatim from HANDO's own copy -- do
+  not fork it for project-specific behavior; add new controls via
+  `main.js`'s own `DEV_GROUPS` instead.
+- `data/processed/HAND3D/Hand2.glb` -- the rigged hand asset, copied from
+  HANDO's own `data/HAND3D/HAND-021/Hand2.glb`. See PROJECT_SUMMARY.txt's
+  Data Sources section.
+- `src/index.html`, `data/raw/`, `scripts/{active,archive}/`, `logs/`,
+  `results/`, `tests/` -- empty, standard project skeleton (CLAUDE.md §11),
+  not yet used by anything.
+
+--------------------------------------------------------------------------------
+ARCHITECTURE
+
+Inside `main.js`, in roughly this order:
+
+1. **Dev panel** (`DEV_GROUPS`, `initDevPanel()`) -- Field Layout (rows,
+   columns, ROW spacing and COLUMN spacing as 2 independent sliders, hand
+   scale, Alternate/Progressive row-offset controls + a mode-switch
+   checkbox), Cursor Tracking, Camera (X/Y/Z position + FOV only -- see #2),
+   Lighting (full parity with HANDO's own group, including Key Light Aim
+   Height), Toon Shading (steps/threshold/floor/ceiling/base tint/texture
+   influence/tint/rim intensity-power-color -- ported from HANDO), Outline
+   (enabled/use-pass/color/hull-thickness/pass thickness-strength-glow --
+   ported from HANDO), Background, Debug (grid helper, wireframe).
+   `initDevPanel()`'s onChange callbacks are detached and reattached around
+   the init call itself (see GOTCHAS).
+2. **Camera: pan + zoom only, no orbit** -- `OrbitControls` with
+   `enableRotate: false`, `mouseButtons: { LEFT: PAN, MIDDLE: DOLLY, RIGHT:
+   PAN }`, `touches: { ONE: PAN, TWO: DOLLY_PAN }` (gives mobile one-finger-
+   drag-pan/two-finger-pinch-zoom for free -- no custom touch code). Camera
+   X/Y/Z/FOV/Zoom dev-panel sliders all DRIVE the camera (`applyCameraControl()`)
+   and are kept in sync FROM the live camera every frame
+   (`syncCameraPanelFromLive()`, using the imported `syncValue()` -- it
+   skips a row currently focused, so this never fights a live slider edit).
+   `cameraZoom` specifically reads/writes `camera.position.distanceTo(
+   controls.target)` via `setCameraDistance()` (moves the camera along its
+   existing camera-to-target line, leaving `controls.target` untouched) --
+   the exact same axis OrbitControls' own scroll/pinch dolly already moves
+   the camera along, so the slider and a scroll tick are indistinguishable
+   to anything reading `camera.position` afterward. Ported from HANDO's own
+   2-way Camera-group pattern, simplified (no Yaw/Pitch, since a
+   non-orbiting camera has no "look direction" concept to expose).
+3. **Camera/lighting/target-plane framing is frozen after the FIRST build**
+   (`framedOnce` flag in `rebuildField()`) -- direct request ("Field layout
+   shouldn't affect view scale"). Rows/columns/spacing/offset changes only
+   ever touch `relayoutField()` (hand positions/scale), never camera or
+   `sceneState.fieldRadius` again after the first build.
+4. **Cursor -> 3D target** (`cursorNDC`, `updateCursorTarget()`) -- a
+   `window` `pointermove` listener updates `cursorNDC`; each frame, a
+   `THREE.Raycaster` casts from the camera through `cursorNDC` and
+   intersects a `THREE.Plane` (`targetPlane`) positioned in front of the
+   hand field, at a depth of `fieldRadius * cfg.targetDepthFactor` (frozen
+   per #3). A REAL 3D point with a depth offset from the hands' own z=0
+   plane -- critical for the requested pitch/reveal effect.
+5. **Model loading + bind-pose measurement** (the `GLTFLoader().load(...)`
+   callback) -- finds the skinned mesh, hides stray meshes, measures the
+   bind-pose "pointing" direction (bone `rHand` -> bone `rMid3`, world
+   space, root at identity transform at this point). `alignQuat` rotates
+   that direction onto local -Z; `handLengthRaw` is its measured length
+   (used for both auto-scaling AND the outline hull-thickness reference,
+   replacing HANDO's own bounding-radius reference since each hand instance
+   is its own separately-scaled object here). Also builds the ONE shared
+   `toonMaterial` here (`createToonMaterial(skinned.material.map)`).
+6. **Field layout** (`rebuildField()`, `relayoutField()`,
+   `computeBaseScale()`) -- `rebuildField()` clears and recreates every hand
+   instance: `cloneSkeletal(modelRoot)` (three.js `SkeletonUtils.clone`,
+   imported as `{ clone as cloneSkeletal }` -- see GOTCHAS), `clone`'s own
+   skinned mesh gets `.material = toonMaterial` (shared, not cloned -- see
+   DECISIONS), plus its own `outlineMesh` (`buildOutlineMesh()`, a
+   `sourceMesh.clone()` sharing that hand's own skeleton, using the ONE
+   shared `outlineMaterial`) parented under `clone` so it inherits the
+   bind-pose `alignQuat` automatically. `relayoutField()` (cheaper --
+   repositions/rescales only) lays out a centered grid using INDEPENDENT
+   `cfg.rowSpacing`/`cfg.columnSpacing`, applying a per-row X offset: in
+   Alternate mode, odd rows shift by a fixed `cfg.alternateRowOffset`; in
+   Progressive mode, row `r` shifts by `r * cfg.progressiveRowOffset`
+   (mutually exclusive via `cfg.useProgressiveOffset`).
+   `computeBaseScale()` uses `Math.min(rowSpacing, columnSpacing)` as the
+   reference (a hand shouldn't overflow the TIGHTER of the 2 axes).
+7. **Toon material + outline** -- `createToonMaterial()`/
+   `makeGradientTexture()`/`rebuildGradientMap()` and the outline
+   `ShaderMaterial` + inverted-hull shaders are ported from HANDO
+   (simplified: no `clippingPlanes`/wrist-hide support, not a feature here).
+   Both materials run with `depthTest: false` (`depthWrite` stays on) --
+   see #9 below for why. `updateOutlineVisibility()` toggles between the 2
+   outline techniques: hull-mesh `.visible` per instance, or a single
+   `OutlinePass` with `selectedObjects` set to every hand's own skinned
+   mesh at once (cheaper for many instances than N extra hull meshes,
+   though both are implemented and dev-panel toggleable, matching HANDO's
+   own choice; both default OFF currently).
+8. **Render loop** (`animate()`) -- self-heals renderer/composer size every
+   frame (see GOTCHAS' `window.innerWidth` entry) before `controls.update()`,
+   `syncCameraPanelFromLive()`, the cursor-target recompute, the per-hand
+   look-at slerp (via `new THREE.Matrix4().lookAt(...)`, not
+   `Object3D.lookAt()` -- see below), the per-hand render-order assignment
+   (#9), and finally `composer.render()` (RenderPass -> OutlinePass ->
+   OutputPass) instead of a plain `renderer.render()`, now that
+   post-processing exists.
+9. **Cursor-distance render ordering** -- per direct request, hands
+   FURTHEST from the cursor target render on top of nearer ones, not
+   whichever is actually closer to the camera. Every frame, each hand's
+   `skinnedMesh.renderOrder` is set to its own `wrapper.position.distanceTo(
+   cursorTarget)` (larger distance = drawn later = ends up on top); its
+   `outlineMesh.renderOrder` is that same value minus a small epsilon, so a
+   hand's own outline always draws just before (under) its own fill. This
+   ONLY has a visual effect because both materials have `depthTest: false`
+   (#7) -- three.js's normal depth-tested compositing would otherwise
+   always let real camera depth win regardless of renderOrder. See GOTCHAS
+   for the real tradeoff this introduces.
+
+Data flow: cursor position -> NDC -> raycast against a plane in front of
+the field -> `cursorTarget` (world point) -> per-hand look-at quaternion ->
+slerp toward `wrapper.quaternion` -> render. The model's own bind-pose
+alignment (`alignQuat`), per-hand grid position/scale, and camera/lighting
+framing are all set once (at load / on their own specific control's
+change) and never revisited by an unrelated control's change.
+
+--------------------------------------------------------------------------------
+UNTOUCHABLE SYSTEMS
+
+None formally designated yet.
+
+--------------------------------------------------------------------------------
+GOTCHAS
+
+- **`depthTest: false` on both hand materials (toon fill + outline) is
+  what makes cursor-distance render ordering actually visible -- it also
+  means a SINGLE hand's own internal self-occlusion (finger over finger,
+  palm over wrist) now relies on front-face culling + triangle submission
+  order, not a real per-pixel depth test.** Acceptable for this model's
+  mostly-convex static bind pose (confirmed no visible artifact at the
+  grid sizes tested), but a genuinely self-overlapping pose could show one
+  part incorrectly drawn over another. `depthWrite` was deliberately left
+  ON (not also disabled) so the depth buffer still ends up populated with
+  whichever hand visually won at each pixel -- keeps it meaningful for
+  `OutlinePass`'s own internal depth comparisons if outline + OutlinePass
+  are ever both enabled at the same time as this feature.
+- `three/addons/utils/SkeletonUtils.js` (three@0.169.0, pinned in
+  `index.html`'s import map) does NOT export a `SkeletonUtils` namespace
+  object -- it exports `clone`/`retarget`/`retargetClip` directly as named
+  exports (confirmed by fetching and reading the actual served module
+  source). Use `import { clone as cloneSkeletal } from
+  'three/addons/utils/SkeletonUtils.js'`.
+- `initDevPanel()` can fire a restored control's `onChange` synchronously
+  before scene objects (`camera`/`keyLight`/etc.) exist yet -- a TDZ crash.
+  `main.js` detaches every control's `onChange` into a `Map` immediately
+  before calling `initDevPanel()` and reattaches them right after -- the
+  same mitigation HANDO's own `main.js` uses. Any NEW `DEV_GROUPS` control
+  is automatically covered.
+- The model's bind-pose "pointing" direction was MEASURED (`rHand` ->
+  `rMid3`), not assumed. Re-verify if `Hand2.glb` is ever swapped for a
+  different export of the "same" rig -- HANDO's own GOTCHAS document a real
+  case where 2 exports of nominally the same rig had different rest-pose
+  quaternions for the same bone names.
+- Each hand instance's `clone.quaternion` (bind-pose alignment, set ONCE)
+  and its `wrapper.quaternion` (live cursor-tracking rotation, touched every
+  frame) are deliberately 2 separate transforms -- don't collapse them.
+- **`window.innerWidth`/`innerHeight` can read 0 at script-parse time in
+  this dev environment (a real, intermittent early-page-life quirk, same
+  class already documented in DOTFLICKO's own CODE_SUMMARY) -- confirmed
+  directly: constructing the renderer/`EffectComposer`/`OutlinePass` at 0x0
+  left every internal render target permanently zero-sized
+  (`renderer.getSize()` reporting `[0,0]`, `GL_INVALID_FRAMEBUFFER_OPERATION:
+  ...Attachment has zero size` spamming the console) until a real `resize`
+  event happened to fire.** Fixed by self-healing every frame in
+  `animate()`: compare `renderer.getSize()` against the CURRENT
+  `window.innerWidth`/`innerHeight` and re-apply the full resize (camera
+  aspect, renderer, composer, outlinePass resolution) on any mismatch,
+  factored into one `applyRendererSize()` function shared by both the
+  `resize` event listener and this per-frame check.
+- **Separately (NOT the same bug as above, and NOT fixed by the self-heal):
+  this session's own browser-automation tool reports `document.hidden ===
+  true` and `window.innerWidth/innerHeight === 0` whenever queried via its
+  JS-execution tool -- confirmed on a FRESH, explicitly-foregrounded tab,
+  not just a backgrounded one -- while a `screenshot` call on the exact same
+  tab at the exact same moment shows correct, fully-rendered output at the
+  real viewport size.** This is a characteristic of how that specific tool
+  drives/queries the page, not a bug in this project's own code -- a real
+  visitor's browser never reports its own actively-viewed tab as hidden.
+  Don't trust `document.hidden`/`window.innerWidth` read via that tool's JS
+  execution as ground truth for "is this page actually broken" -- cross-
+  check against an actual screenshot first, the same "don't trust one
+  signal over a fresh visual check" lesson as the stale-console-error
+  gotcha below, generalized to viewport/visibility state too.
+- A local static server / ES module imports can serve a stale cached copy
+  of `main.js` even after a hard reload, especially across a same-URL
+  reload within the SAME tab. A bare `location.reload()` is not reliably
+  sufficient for a multi-file ES-module page; bump the top-level URL's own
+  cache-busting query string (`index.html?t=N`) when a fix doesn't appear
+  to take effect. Separately, `read_console_messages` in this workspace's
+  own browser tooling can return STALE, already-fixed errors from before a
+  reload as if they were current -- cross-check against a fresh screenshot/
+  network request before trusting a lingering console error.

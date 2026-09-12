@@ -1,0 +1,23 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "static",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "8420"],
+      "port": 8420
+    },
+    {
+      "name": "static-alt",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "8421"],
+      "port": 8421
+    },
+    {
+      "name": "static-alt2",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "8422"],
+      "port": 8422
+    }
+  ]
+}

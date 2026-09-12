@@ -1,0 +1,233 @@
+HANDY DANDIES -- CHANGELOG
+================================================================================
+
+PROJECT START: 2026-09-12  -  06:53 AM EDT (approximate; see this entry's own note)
+
+--------------------------------------------------------------------------------
+2026-09-12  -  ~06:54 AM - 07:22 AM EDT (bounded by checkpoints; see Verified note)
+
+Initial build: a three.js scene filled with a grid of rigged hand instances
+that each independently rotate to point at the live cursor. Built per
+explicit instruction to follow HANDO's own hand-rendering architecture as
+the reference.
+
+Added:
+- Reused HANDO's rigged hand asset (`data/HAND3D/HAND-021/Hand2.glb`,
+  22-bone skeleton, GLB format), physically copied into this project's own
+  `data/processed/HAND3D/Hand2.glb` (no cross-project asset serving).
+- Reused HANDO's generic dev-panel engine (`src/devpanel/devPanel.js`) and
+  its dev-panel CSS chrome (`src/style.css`) verbatim.
+- New: cursor-to-3D-target math (HANDO itself has no cursor-tracking --
+  it's a manual single-hand pose tool). Each frame, the cursor's screen
+  position is raycast against a plane positioned in front of the hand
+  field (toward the camera); each hand instance slerps its rotation toward
+  a look-at quaternion aimed at that 3D point.
+- New: per-instance skeleton cloning (`SkeletonUtils.clone()`) so each of
+  the 54 (default 6x9 grid) hand instances can aim independently -- HANDO
+  only ever renders one hand, so this had no precedent to follow.
+- New: bind-pose "pointing direction" measurement (wrist bone `rHand` to
+  fingertip bone `rMid3`, in world space at load time) rather than assuming
+  a fixed axis -- matches HANDO's own "measured, not assumed" convention
+  for this rig.
+- Dev panel groups: Field Layout (rows/columns/spacing/hand scale), Cursor
+  Tracking (damping, target depth, target-marker toggle), Camera (FOV,
+  distance), Lighting (key light azimuth/elevation/intensity/color,
+  ambient), Background, Debug (grid helper).
+
+Fixed (both caught live during the build, before this entry):
+- `three/addons/utils/SkeletonUtils.js` (three@0.169.0, the pinned CDN
+  version) exports `clone`/`retarget`/`retargetClip` directly, not a
+  `SkeletonUtils` namespace object -- confirmed by directly fetching and
+  reading the served module source. `import { SkeletonUtils } from '...'`
+  threw `SyntaxError: does not provide an export named 'SkeletonUtils'` at
+  module-load time. Fixed via `import { clone as cloneSkeletal } from
+  'three/addons/utils/SkeletonUtils.js'`.
+- `initDevPanel()`'s synchronous onChange-on-restore behavior would throw a
+  TDZ (temporal dead zone) error against `camera`/`keyLight`/etc. (declared
+  later in the file, via `const`) the first time a returning visitor had
+  saved settings. Fixed with the same detach-onChange-before-init/
+  reattach-after mitigation HANDO's own `main.js` already uses for this
+  exact documented gotcha.
+
+Verified:
+- Live in the browser (a local `python3 -m http.server` on port 8421):
+  loaded with 0 real console errors (one lingering console-log entry from
+  the SkeletonUtils error was confirmed STALE -- it persisted in
+  `read_console_messages`'s own history even after a fresh reload where
+  the hands were already rendering correctly on screen, confirmed via
+  screenshot at the same moment; see CODE_SUMMARY.txt's own Gotchas).
+- The core requested behavior, via screenshots at 3 cursor positions:
+  center (idle default) showed all 54 hands radially converging on one
+  point in front of the field; cursor near the top of the browser pitched
+  every hand into a darker, silhouette-like underside view; cursor near
+  the bottom pitched them into a clearly-lit top/back view with visible
+  finger detail -- matching the user's stated spec (top -> see hand
+  undersides, bottom -> see hand tops) directly, not just plausibly.
+- The "Field Layout" dev-panel group renders and its controls (e.g. "Rows
+  (Count)") are reachable/clickable in the live panel.
+- Did NOT independently verify: the look-at math's behavior when a hand's
+  X position exactly matches the cursor target's X (a look-at degenerate
+  case), dev-panel Save/Reset round-tripping for this project's own new
+  controls, or any resolution/aspect ratio other than the ~800x450 and
+  1280x720 browser-pane sizes used during this session.
+
+Timing note: no single clean start timestamp was captured for this task
+(it began mid-conversation, not at a fresh prompt) -- the entry's own
+timestamp range is bounded by 2 real checkpoints taken during the work
+(07:01:07 and 07:13:28 EDT) plus this entry's own finish time, not a
+single measured start-to-finish interval. See the project's ETA History
+log entry for the same task for the precise measured segments.
+
+--------------------------------------------------------------------------------
+2026-09-12 (continued)  -  ~07:36 AM - 07:52 AM EDT
+
+10 follow-on requests in one turn: camera click-drag-to-pan + scroll/pinch-
+to-zoom with full mobile porting; Field Layout decoupled from view scale;
+independent Row/Column Spacing; Alternate + Progressive row-offset patterns
+with a mode-switch checkbox; Camera X/Y/Z position sliders; Lighting/Toon
+Shading/Outline settings "just like HANDO."
+
+Added:
+- OrbitControls with `enableRotate: false` -- click-drag pans, scroll/pinch
+  zooms, on both desktop and mobile via OrbitControls' own `touches: {
+  ONE: PAN, TWO: DOLLY_PAN }` config (no custom touch-handling code
+  needed). Camera X/Y/Z Position + FOV dev-panel sliders, 2-way synced with
+  live mouse pan/zoom (`applyCameraControl()`/`syncCameraPanelFromLive()`,
+  ported from HANDO's own Camera-group pattern, simplified since this
+  camera never orbits).
+- Row Spacing and Column Spacing as 2 independent sliders, replacing the
+  single shared "Cell Spacing." Alternate Row Offset (brick/hex-style,
+  every other row shifted along the column axis) and Progressive Row
+  Offset (row `r` shifted by `r` times the setting) as 2 mutually-exclusive
+  modes via a new checkbox.
+- Full Lighting group parity with HANDO (added Key Light Aim Height). New
+  Toon Shading group (steps/threshold/floor/ceiling/base tint/texture
+  influence/tint/rim intensity-power-color) and Outline group (enabled/
+  use-screen-space-pass/color/hull thickness/pass thickness-strength-glow)
+  -- both ported from HANDO's own shader code and control sets, adapted for
+  N hand instances (one shared toon material; a per-instance hull-outline
+  clone OR a single OutlinePass covering every instance's skinned mesh,
+  toggleable).
+
+Fixed:
+- Field Layout previously called camera/lighting/target-plane framing
+  functions on every rows/cols/spacing change, so changing the grid
+  visibly rescaled the camera view -- explicitly not wanted ("Field
+  layout shouldn't affect view scale"). Framing is now derived from the
+  field's bounding size exactly ONCE (`framedOnce` flag in
+  `rebuildField()`) and frozen after that; Field Layout changes only ever
+  touch `relayoutField()` (positions/scale), never camera/light/
+  target-plane again.
+- `window.innerWidth`/`innerHeight` reading 0 at script-parse time in this
+  dev environment left the renderer/`EffectComposer`/`OutlinePass`
+  permanently zero-sized once post-processing was added (confirmed:
+  `renderer.getSize()` reporting `[0,0]`, `GL_INVALID_FRAMEBUFFER_OPERATION:
+  ...Attachment has zero size` spamming the console). Fixed with a
+  per-frame self-healing size check in `animate()`, sharing one
+  `applyRendererSize()` function with the `resize` event listener --
+  same fix shape as a previously-documented DOTFLICKO gotcha for this
+  exact class of quirk.
+
+Verified:
+- Click-drag pan and scroll-wheel zoom, via screenshots showing the field
+  genuinely shift and scale on each gesture.
+- Field-layout/camera decoupling, DIRECTLY (not just visually): dispatched
+  a real `input`/`change` event on the live "Rows (Count)" slider (6 -> 10,
+  hand count 54 -> 90) and confirmed `camera.position` was numerically
+  IDENTICAL before and after, via a `window.__debug` inspection hook.
+- Progressive Row Offset visually produces the expected cascading/
+  staircase pattern across rows (screenshot-confirmed).
+- Both outline techniques (hull-mesh clone and screen-space OutlinePass)
+  render a visible black outline when toggled independently -- confirmed
+  via 2 separate screenshots with `Use OutlinePass` on and off.
+- Every new dev-panel group and control (Row/Column Spacing, Alternate/
+  Progressive Row Offset + mode checkbox, Camera X/Y/Z, Rim Light
+  Intensity, Use OutlinePass, etc.) is present and reachable in the live
+  panel (confirmed via `find` against their exact labels).
+- Mobile touch-drag was exercised under 375x812 viewport emulation and
+  produced a correct pan -- but NOT confirmed as a genuine touch-event
+  path: this session's own browser-automation tool documents that its
+  drags "still arrive as mouse clicks" even under mobile emulation, so
+  this only confirms the pan logic is viewport-size-agnostic, not that
+  real on-device touch/pinch gestures work. OrbitControls' `touches` config
+  is a proven three.js library feature, which lowers but doesn't eliminate
+  that residual risk.
+- Separately identified during this verification (NOT a page bug, and NOT
+  what the self-healing fix above addresses): this session's own browser
+  tool reports `document.hidden === true` and `window.innerWidth === 0`
+  whenever queried via its JS-execution path, confirmed even on a freshly-
+  created, explicitly-foregrounded tab -- while a `screenshot` call on the
+  identical tab at the identical moment renders correctly at full
+  resolution. Documented as a tool characteristic in CODE_SUMMARY.txt's
+  GOTCHAS so a future session doesn't mistake it for a real page defect.
+
+Disclosed interpretation call: "Alternate Row Offset in perpendicular
+direction" was ambiguous -- implemented as the standard brick/hex-pattern
+reading (shift along the column axis), not a Z-depth stagger. Flagged to
+the user rather than silently assumed; a 1-line change in `relayoutField()`
+if the other interpretation was actually meant.
+
+--------------------------------------------------------------------------------
+2026-09-12 (continued again)  -  ~08:19 AM - 08:29 AM EDT
+
+3 more requests: a Camera Zoom slider 2-way synced with scroll/pinch;
+baking the user's own pasted live-tuned dev-panel settings dump in as the
+new defaults; render-order stacking driven by distance from the cursor
+(farthest hands on top, nearest at the bottom). Plus: create a GitHub repo
+and push (see next entry).
+
+Added:
+- "Zoom (Distance To Pan Target)" slider in the Camera group --
+  `setCameraDistance()` moves the camera along its existing camera-to-
+  target line to a new distance (the same axis OrbitControls' own scroll/
+  pinch dolly already moves it along); `syncCameraPanelFromLive()` reads
+  `camera.position.distanceTo(controls.target)` back into the slider every
+  frame. Confirmed both directions live: scrolling moved the slider
+  259 -> 172; setting the slider to 400 moved the live camera distance to
+  exactly 400.
+- Cursor-distance render ordering: every frame, each hand's
+  `skinnedMesh.renderOrder` is set to its own live distance from the
+  cursor target (farther = higher = drawn later = ends up on top); its
+  `outlineMesh.renderOrder` is that value minus a small epsilon so a
+  hand's own outline always draws just under its own fill. Required
+  `depthTest: false` on both hand materials (kept `depthWrite: true`) --
+  three.js's normal depth-tested compositing otherwise always lets real
+  camera depth win over renderOrder. Disclosed tradeoff: a single hand's
+  own internal self-occlusion (finger over finger) now relies on
+  front-face culling + triangle order, not a real per-pixel depth test --
+  acceptable for this model's mostly-convex static bind pose.
+- Every dev-panel default baked directly from the user's own pasted
+  live-tuned settings dump (a raw `devPanel.js` `values`/`order` JSON
+  export): grid grew from 6x9/54 hands to 17x30/510 hands; Row/Column
+  Spacing 10/11.5; Alternate Row Offset -5.5; camera positioned at
+  (-1.80, -1.30, 259.09), FOV 35; Lighting/Toon/Outline/Background all
+  retuned (white background, ambient off, key light white at full
+  intensity from azimuth 231/elevation 28/aim height -100%, 2-step toon
+  shading, outline off by default). Also widened `fieldRows`/`fieldCols`
+  slider max (20/24 -> 40/40) since the new defaults (17/30) needed the
+  room.
+
+Verified:
+- All 3 features confirmed live (not just visually): `renderOrder` values
+  sampled directly via `window.__debug` showed 5 hands' render order
+  decreasing monotonically as their distance from the cursor target
+  decreased, with each outline's own renderOrder exactly 0.01 below its
+  fill's; the Zoom slider's 2-way sync (see Added, above); `depthTest:
+  false` confirmed present on the live material.
+- Re-confirmed the "hidden tab suspends rendering" environment quirk
+  (documented in the prior round) independently: at 510 hand instances,
+  an un-fronted tab's `requestAnimationFrame` genuinely never fires (a
+  frame-counting script itself timed out waiting), which first looked like
+  a real performance regression from the much larger hand count until the
+  tab was explicitly fronted (`tabs_select`) and rendered correctly at
+  full detail on the very next screenshot -- not a new bug, the same
+  already-documented tool characteristic applying at a larger scale.
+
+--------------------------------------------------------------------------------
+<next entry follows the same divider + dated-header pattern>
+
+================================================================================
+APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
+formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a
+correction, add a new entry noting the correction rather than editing the
+old one in place.
