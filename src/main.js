@@ -28,6 +28,28 @@ let handLengthRaw = 1
 const handBoundsCenterLocal = new THREE.Vector3()
 let handBoundsRadiusLocal = 1
 
+// Pose raw-frame measurements (ported from HANDO's own Pose group; same
+// identity-transform frame as alignQuat/handLengthRaw/handBoundsCenterLocal
+// above). boneRestQuat is captured once, right after load, from the
+// ORIGINAL un-cloned skeleton's bind pose -- shared across every hand's
+// own cloned skeleton (all clones share identical bone names/rest pose,
+// since they're all cloned from the same source GLB; unlike HANDO, which
+// needs a separate restQuatMap per model because it supports 2 DIFFERENT
+// model files with slightly different rest poses).
+const boneRestQuat = {}
+// Hide Wrist's own position-compensation -- the ABSOLUTE raw-frame
+// positions of the wrist and forearm-base bones (same frame as
+// alignQuat/handLengthRaw's own wristPos/tipPos measurements). Storing
+// the actual positions, not just the direction/distance between them, is
+// what lets updateClonePoseTransform() reconstruct exactly where the
+// current "cut" point sits relative to the model's own raw content-space
+// origin -- a direction+distance pair alone can't do that (it was tried
+// first and produced a real, measured bug: correct with Hide Wrist alone,
+// wrong once combined with Whole-Hand Rotation -- see CHANGELOG.txt for
+// the measured before/after).
+const wristPosRaw = new THREE.Vector3()
+const forearmPosRaw = new THREE.Vector3()
+
 let modelRoot = null
 let modelLoaded = false
 let framedOnce = false // camera/lighting/target-plane are framed ONCE, on first build -- Field Layout changes must never re-trigger this (direct request)
@@ -72,6 +94,51 @@ const DEV_GROUPS = [
       { key: 'trackingDamping', label: 'Look-At Damping (x)', type: 'slider', min: 0.02, max: 1, step: 0.01, def: 0.07 },
       { key: 'targetDepthFactor', label: 'Cursor Target Depth (x Field Radius)', type: 'slider', min: -2, max: 2, step: 0.05, def: 0.6, onChange: updateTargetPlane },
       { key: 'showTargetMarker', label: 'Show Target Marker', type: 'checkbox', def: true, onChange: (v) => { if (targetMarker) targetMarker.visible = v } }
+    ]
+  },
+  {
+    title: 'Pose',
+    controls: [
+      // Ported from HANDO's own Pose group (identical rig/bone names, same
+      // Hand2.glb asset) -- applies identically to every hand for now, per
+      // direct request ("For now, the pose settings apply to every hand").
+      { key: 'thumbCurl', label: 'Thumb Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 7, lockRange: true, onChange: () => applyCurl('thumb') },
+      { key: 'thumbSplay', label: 'Thumb Splay (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('thumb') },
+      { key: 'thumbSplay2', label: 'Thumb Tip Splay (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('thumb') },
+      { key: 'curlBiasThumb', label: 'Thumb Curl Bias (Base <-> Tip) (%)', type: 'slider', min: -100, max: 100, step: 1, def: 0, onChange: () => applyCurl('thumb') },
+      { key: 'tipTwistThumb', label: 'Thumb Tip Twist (%)', type: 'slider', min: -100, max: 100, step: 1, def: 0, onChange: () => applyCurl('thumb') },
+      { key: 'curlIndex', label: 'Index Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 73, lockRange: true, onChange: () => applyCurl('index') },
+      { key: 'splayIndex', label: 'Index Splay (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('index') },
+      { key: 'splayIndex2', label: 'Index 2nd Segment Splay (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('index') },
+      { key: 'curlBiasIndex', label: 'Index Curl Bias (Base <-> Tip) (%)', type: 'slider', min: -100, max: 100, step: 1, def: 0, onChange: () => applyCurl('index') },
+      { key: 'tipTwistIndex', label: 'Index Tip Twist (%)', type: 'slider', min: -100, max: 100, step: 1, def: 0, onChange: () => applyCurl('index') },
+      { key: 'curlMiddle', label: 'Middle Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: -100, lockRange: true, onChange: () => applyCurl('middle') },
+      { key: 'splayMiddle', label: 'Middle Splay (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('middle') },
+      { key: 'splayMiddle2', label: 'Middle 2nd Segment Splay (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('middle') },
+      { key: 'curlBiasMiddle', label: 'Middle Curl Bias (Base <-> Tip) (%)', type: 'slider', min: -100, max: 100, step: 1, def: 0, onChange: () => applyCurl('middle') },
+      { key: 'tipTwistMiddle', label: 'Middle Tip Twist (%)', type: 'slider', min: -100, max: 100, step: 1, def: 0, onChange: () => applyCurl('middle') },
+      { key: 'curlRing', label: 'Ring Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: -100, lockRange: true, onChange: () => applyCurl('ring') },
+      { key: 'splayRing', label: 'Ring Splay (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('ring') },
+      { key: 'splayRing2', label: 'Ring 2nd Segment Splay (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('ring') },
+      { key: 'curlBiasRing', label: 'Ring Curl Bias (Base <-> Tip) (%)', type: 'slider', min: -100, max: 100, step: 1, def: 0, onChange: () => applyCurl('ring') },
+      { key: 'tipTwistRing', label: 'Ring Tip Twist (%)', type: 'slider', min: -100, max: 100, step: 1, def: 0, onChange: () => applyCurl('ring') },
+      { key: 'curlPinky', label: 'Pinky Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 71, lockRange: true, onChange: () => applyCurl('pinky') },
+      { key: 'splayPinky', label: 'Pinky Splay (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('pinky') },
+      { key: 'splayPinky2', label: 'Pinky 2nd Segment Splay (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('pinky') },
+      { key: 'curlBiasPinky', label: 'Pinky Curl Bias (Base <-> Tip) (%)', type: 'slider', min: -100, max: 100, step: 1, def: 0, onChange: () => applyCurl('pinky') },
+      { key: 'tipTwistPinky', label: 'Pinky Tip Twist (%)', type: 'slider', min: -100, max: 100, step: 1, def: 0, onChange: () => applyCurl('pinky') },
+      { key: 'wristBend', label: 'Wrist Bend (Deg)', type: 'slider', min: -90, max: 90, step: 1, def: 0, onChange: () => applyWristPose() },
+      { key: 'wristSplay', label: 'Wrist Splay (Deg)', type: 'slider', min: -30, max: 30, step: 1, def: 0, onChange: () => applyWristPose() },
+      { key: 'modelRotX', label: 'Whole-Hand Rotation X (Deg)', type: 'slider', min: -200, max: 200, step: 1, def: 0, lockRange: true, onChange: () => onWholeHandRotationChange() },
+      { key: 'modelRotY', label: 'Whole-Hand Rotation Y (Deg)', type: 'slider', min: -200, max: 200, step: 1, def: 0, lockRange: true, onChange: () => onWholeHandRotationChange() },
+      { key: 'modelRotZ', label: 'Whole-Hand Rotation Z (Deg)', type: 'slider', min: -200, max: 200, step: 1, def: 0, lockRange: true, onChange: () => onWholeHandRotationChange() },
+      // Cuts away the forearm from a percentage down from the wrist -- 0%
+      // clips nothing, 100% cuts off exactly at the wrist joint (hiding
+      // the entire forearm). Per direct request, the whole hand shifts to
+      // compensate (see updateClonePoseTransform()) so the newly-visible
+      // cut base stays at this hand's own Field Layout grid point, rather
+      // than drifting away from it as more of the forearm gets clipped.
+      { key: 'hideWrist', label: 'Hide Wrist (%)', type: 'slider', min: 0, max: 100, step: 1, def: 0, onChange: () => updateClonePoseTransform() }
     ]
   },
   {
@@ -183,6 +250,10 @@ const renderer = new THREE.WebGLRenderer({ canvas, antialias: true })
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 renderer.setSize(window.innerWidth, window.innerHeight)
 renderer.outputColorSpace = THREE.SRGBColorSpace
+// Required for per-material `clippingPlanes` (Hide Wrist, see the Pose
+// section below) -- three.js ignores a material's own clippingPlanes
+// array unless this is set, per its own docs.
+renderer.localClippingEnabled = true
 
 const scene = new THREE.Scene()
 scene.background = new THREE.Color(cfg.bgColor)
@@ -339,7 +410,11 @@ function createToonMaterial(map) {
     map,
     color: new THREE.Color(cfg.toonBaseTint),
     gradientMap: makeGradientTexture(cfg.toonSteps, cfg.toonShadowFloor, cfg.toonLightCeiling, cfg.toonStepThreshold),
-    wireframe: cfg.showWireframe
+    wireframe: cfg.showWireframe,
+    // Hide Wrist (Pose group) -- see wristClipPlane's own declaration
+    // comment for why this is a single shared Plane mutated per-hand,
+    // not a per-material array.
+    clippingPlanes: [wristClipPlane]
     // depthTest stays ON (the default) -- a single hand's own self-
     // occlusion (finger over palm, etc) needs a real depth test to render
     // correctly. Stacking between DIFFERENT hands (driven by renderOrder,
@@ -406,7 +481,8 @@ function ensureOutlineMaterial() {
       },
       vertexShader: outlineVertexShader,
       fragmentShader: outlineFragmentShader,
-      side: THREE.BackSide
+      side: THREE.BackSide,
+      clippingPlanes: [wristClipPlane]
       // depthTest stays ON -- see createToonMaterial()'s own note; matches
       // the fill material's depth-clear-per-hand approach.
     })
@@ -424,6 +500,290 @@ function updateOutlineVisibility() {
   hands.forEach((h) => { if (h.outlineMesh) h.outlineMesh.visible = hullVisible })
   outlinePass.enabled = passOn
   outlinePass.selectedObjects = passOn ? hands.map((h) => h.skinnedMesh).filter(Boolean) : []
+}
+
+// -----------------------------------------------------------------------
+// Pose (ported from HANDO's own Pose dev-panel group) -- applies
+// identically to every hand for now, per direct request. Every hand has
+// its OWN skeleton (a separate SkeletonUtils.clone() per instance, see
+// rebuildField()), so posing means walking every hand's own bones and
+// applying the same rotation, not a single shared skeleton the way HANDO
+// poses its 1-2 posable models.
+// -----------------------------------------------------------------------
+const WORLD_X_AXIS = new THREE.Vector3(1, 0, 0)
+const WORLD_Y_AXIS = new THREE.Vector3(0, 1, 0)
+const WORLD_Z_AXIS = new THREE.Vector3(0, 0, 1)
+const FINGER_NAMES = ['thumb', 'index', 'middle', 'ring', 'pinky']
+const FINGER_JOINTS = {
+  thumb: ['rThumb1', 'rThumb2', 'rThumb3'],
+  index: ['rIndex1', 'rIndex2', 'rIndex3'],
+  middle: ['rMid1', 'rMid2', 'rMid3'],
+  ring: ['rRing1', 'rRing2', 'rRing3'],
+  pinky: ['rPinky1', 'rPinky2', 'rPinky3']
+}
+const FINGER_MAX_DEG = {
+  thumb: [45, 55, 45],
+  index: [90, 100, 70],
+  middle: [90, 100, 70],
+  ring: [90, 100, 70],
+  pinky: [90, 100, 70]
+}
+const FINGER_SIGN = { thumb: -1, index: 1, middle: -1, ring: -1, pinky: 1 }
+// Per-finger curl axis -- all 4 non-thumb fingers curl around WORLD_X, the
+// thumb around WORLD_Y (curls toward the palm center). Ported verbatim
+// from HANDO's own live-measured tables (same asset/rig) -- see its own
+// main.js for the measurement history behind these exact axes/signs.
+const FINGER_CURL_AXIS = { thumb: WORLD_Y_AXIS, index: WORLD_X_AXIS, middle: WORLD_X_AXIS, ring: WORLD_X_AXIS, pinky: WORLD_X_AXIS }
+const FINGER_SPLAY_AXIS = { thumb: WORLD_Z_AXIS, index: WORLD_Z_AXIS, middle: WORLD_Z_AXIS, ring: WORLD_Z_AXIS, pinky: WORLD_Z_AXIS }
+const FINGER_SPLAY_SIGN = { thumb: 1, index: 1, middle: 1, ring: -1, pinky: 1 }
+const FINGER_SPLAY_MAX_DEG = { thumb: 45, index: 30, middle: 30, ring: 30, pinky: 30 }
+const FINGER_SPLAY_JOINT_INDEX = { thumb: 1, index: 0, middle: 0, ring: 0, pinky: 0 }
+const FINGER_SPLAY2_JOINT_INDEX = { thumb: 1, index: 1, middle: 1, ring: 1, pinky: 1 }
+const FINGER_SPLAY2_AXIS = { thumb: WORLD_X_AXIS, index: WORLD_Z_AXIS, middle: WORLD_Z_AXIS, ring: WORLD_Z_AXIS, pinky: WORLD_Z_AXIS }
+const FINGER_SPLAY2_MAX_DEG = { thumb: 90, index: 30, middle: 30, ring: 30, pinky: 30 }
+const FINGER_SPLAY2_SIGN = { thumb: 1, index: 1, middle: 1, ring: -1, pinky: 1 }
+const FINGER_SPLAY2_KEY = { thumb: 'thumbSplay2', index: 'splayIndex2', middle: 'splayMiddle2', ring: 'splayRing2', pinky: 'splayPinky2' }
+const FINGER_CURL_KEY = { thumb: 'thumbCurl', index: 'curlIndex', middle: 'curlMiddle', ring: 'curlRing', pinky: 'curlPinky' }
+const FINGER_SPLAY_KEY = { thumb: 'thumbSplay', index: 'splayIndex', middle: 'splayMiddle', ring: 'splayRing', pinky: 'splayPinky' }
+const FINGER_CURL_BIAS_KEY = { thumb: 'curlBiasThumb', index: 'curlBiasIndex', middle: 'curlBiasMiddle', ring: 'curlBiasRing', pinky: 'curlBiasPinky' }
+const FINGER_TIP_TWIST_KEY = { thumb: 'tipTwistThumb', index: 'tipTwistIndex', middle: 'tipTwistMiddle', ring: 'tipTwistRing', pinky: 'tipTwistPinky' }
+const FINGER_TIP_TWIST_MAX_DEG = 90
+
+// Converts a rotation expressed around a WORLD axis into the correct LOCAL
+// delta for `bone` -- exact for any existing local rotation (not just
+// identity), via the bone's own FULL current world quaternion. Ported
+// verbatim from HANDO's own `rotateOnTrueWorldAxis` (see its own main.js
+// for why `Object3D.rotateOnWorldAxis` itself is NOT equivalent once a
+// bone's parent chain carries real rotation -- the same rig, same issue).
+// `excludeQuat`, when given, is factored OUT of the bone's world
+// quaternion before the conversion (`excludeQuat^-1 * boneWorldQuat`) --
+// needed ONLY for this project's own Curl/Splay/Splay2 axes (see
+// applyCurlToSkeleton()'s own comment on why: unlike HANDO, every hand
+// here sits under an EXTRA per-hand, per-frame rotation -- `wrapper`'s own
+// cursor-tracking look-at -- that HANDO's single modelRoot never had, and
+// a "world" curl axis must stay anatomically fixed relative to the hand's
+// own canonical pose, not relative to whichever way it currently happens
+// to be facing the cursor. Tip Twist's own axis (computed live from 2
+// bones' actual current world positions, see segmentDirection()) is
+// already correct as a true world-space direction and must NOT exclude
+// anything -- omit `excludeQuat` for that call.
+const _worldToLocalQuat = new THREE.Quaternion()
+const _localAxis = new THREE.Vector3()
+const _excludeQuatInv = new THREE.Quaternion()
+function rotateOnTrueWorldAxis(bone, worldAxis, angle, excludeQuat) {
+  bone.getWorldQuaternion(_worldToLocalQuat)
+  if (excludeQuat) _worldToLocalQuat.premultiply(_excludeQuatInv.copy(excludeQuat).invert())
+  _worldToLocalQuat.invert()
+  _localAxis.copy(worldAxis).applyQuaternion(_worldToLocalQuat).normalize()
+  bone.rotateOnAxis(_localAxis, angle)
+}
+const _segFromPos = new THREE.Vector3()
+const _segToPos = new THREE.Vector3()
+const _segDir = new THREE.Vector3()
+function segmentDirection(fromBone, toBone) {
+  fromBone.getWorldPosition(_segFromPos)
+  toBone.getWorldPosition(_segToPos)
+  return _segDir.subVectors(_segToPos, _segFromPos).normalize()
+}
+function curlBiasWeight(jointIndex, jointCount, bias) {
+  const p = jointIndex / (jointCount - 1) // 0 (base) .. 1 (tip)
+  return 1 - bias * (2 * p - 1)
+}
+
+// Applies Curl/Splay/Splay2/Curl Bias/Tip Twist for one finger to one
+// hand's own skeleton -- ported from HANDO's own applyCurlToSkeleton(),
+// with `modelRoot.quaternion` (HANDO's single posable object) replaced by
+// `baseQuat` (this project's own per-hand-identical `cloneBaseQuat` --
+// alignQuat composed with the live Whole-Hand Rotation sliders, see
+// updateClonePoseTransform()), passed in rather than read from a
+// module-level object, since the SAME value applies to every hand's own
+// distinct skeleton. Also takes `wrapperQuat` (THIS hand's own, per-hand,
+// per-frame cursor-tracking rotation -- see animate()) and passes it as
+// `rotateOnTrueWorldAxis()`'s own `excludeQuat`, which HANDO's identical
+// code never needed to: HANDO has no extra per-instance rotation layer on
+// top of its posed orientation, but every hand here does. Confirmed via a
+// direct live test this round that omitting this made 2 different hands'
+// SAME slider values produce 2 DIFFERENT local bone quaternions, purely
+// because they happened to be facing different directions at that moment
+// -- pre-rotating the axis by `baseQuat` (below) and excluding
+// `wrapperQuat` during the conversion together cancel out to leave the
+// axis fixed relative to the mesh's own raw/bind-pose frame regardless of
+// either rotation, matching HANDO's own anatomical intent exactly.
+const _curlAxisScratch = new THREE.Vector3()
+const _splayAxisScratch = new THREE.Vector3()
+const _splay2AxisScratch = new THREE.Vector3()
+function applyCurlToSkeleton(fingerName, skeleton, baseQuat, wrapperQuat) {
+  const joints = FINGER_JOINTS[fingerName]
+  const maxDegs = FINGER_MAX_DEG[fingerName]
+  const sign = FINGER_SIGN[fingerName]
+  const curlAxis = _curlAxisScratch.copy(FINGER_CURL_AXIS[fingerName]).applyQuaternion(baseQuat)
+  const splayAxis = _splayAxisScratch.copy(FINGER_SPLAY_AXIS[fingerName]).applyQuaternion(baseQuat)
+  const curlT = cfg[FINGER_CURL_KEY[fingerName]] / 100
+  const splayT = cfg[FINGER_SPLAY_KEY[fingerName]] / 100
+  const curlBias = cfg[FINGER_CURL_BIAS_KEY[fingerName]] / 100
+  const tipTwistT = cfg[FINGER_TIP_TWIST_KEY[fingerName]] / 100
+  const splayAngle = FINGER_SPLAY_SIGN[fingerName] * THREE.MathUtils.degToRad(FINGER_SPLAY_MAX_DEG[fingerName] * splayT)
+  const splayJointIndex = FINGER_SPLAY_JOINT_INDEX[fingerName]
+  const splay2JointIndex = FINGER_SPLAY2_JOINT_INDEX[fingerName]
+  const splay2Axis = _splay2AxisScratch.copy(FINGER_SPLAY2_AXIS[fingerName]).applyQuaternion(baseQuat)
+  const splay2T = cfg[FINGER_SPLAY2_KEY[fingerName]] / 100
+  const splay2Angle = FINGER_SPLAY2_SIGN[fingerName] * THREE.MathUtils.degToRad(FINGER_SPLAY2_MAX_DEG[fingerName] * splay2T)
+  const bones = []
+  joints.forEach((boneName, i) => {
+    const bone = skeleton.getBoneByName(boneName)
+    const rest = boneRestQuat[boneName]
+    if (!bone || !rest) return
+    bones[i] = bone
+    bone.quaternion.copy(rest)
+    bone.updateMatrixWorld(true)
+    if (i === splayJointIndex) {
+      rotateOnTrueWorldAxis(bone, splayAxis, splayAngle, wrapperQuat)
+      bone.updateMatrixWorld(true)
+    }
+    if (i === splay2JointIndex) {
+      rotateOnTrueWorldAxis(bone, splay2Axis, splay2Angle, wrapperQuat)
+      bone.updateMatrixWorld(true)
+    }
+    const weight = curlBiasWeight(i, joints.length, curlBias)
+    const angle = sign * THREE.MathUtils.degToRad(maxDegs[i] * curlT * weight)
+    rotateOnTrueWorldAxis(bone, curlAxis, angle, wrapperQuat)
+    bone.updateMatrixWorld(true)
+    if (i === joints.length - 1 && i > 0) {
+      // Tip Twist's own axis is already a true world-space direction,
+      // measured live from this joint's own actual current position (see
+      // segmentDirection()) -- no `wrapperQuat` exclusion here, unlike the
+      // fixed WORLD_X/Y/Z-based axes above.
+      const twistAxis = segmentDirection(bones[i - 1], bone)
+      rotateOnTrueWorldAxis(bone, twistAxis, THREE.MathUtils.degToRad(FINGER_TIP_TWIST_MAX_DEG * tipTwistT))
+      bone.updateMatrixWorld(true)
+    }
+  })
+}
+function applyCurl(fingerName) {
+  if (!modelLoaded) return
+  scene.updateMatrixWorld(true)
+  hands.forEach((hand) => { if (hand.skinnedMesh) applyCurlToSkeleton(fingerName, hand.skinnedMesh.skeleton, cloneBaseQuat, hand.wrapper.quaternion) })
+}
+function applyWristPoseToSkeleton(skeleton) {
+  const bone = skeleton.getBoneByName('rHand')
+  const rest = boneRestQuat.rHand
+  if (!bone || !rest) return
+  bone.quaternion.copy(rest)
+  bone.rotateX(THREE.MathUtils.degToRad(cfg.wristBend))
+  bone.rotateZ(THREE.MathUtils.degToRad(cfg.wristSplay))
+}
+function applyWristPose() {
+  if (!modelLoaded) return
+  hands.forEach((hand) => { if (hand.skinnedMesh) applyWristPoseToSkeleton(hand.skinnedMesh.skeleton) })
+}
+// Re-applies every finger + the wrist -- needed after rebuildField()
+// creates brand-new (bind-pose) skeletons, and after Whole-Hand Rotation
+// changes (its own axes are re-expressed relative to cloneBaseQuat, so an
+// already-curled finger's pose goes stale the moment that composition
+// changes -- see onWholeHandRotationChange()).
+function applyAllFingerPoses() {
+  FINGER_NAMES.forEach((name) => applyCurl(name))
+  applyWristPose()
+}
+
+// Whole-Hand Rotation X/Y/Z + Hide Wrist's own position compensation --
+// both change `clone.quaternion`/`clone.position` (never `wrapper`'s own
+// transform, which the per-frame cursor look-at owns exclusively, see
+// animate()), so they compose cleanly with tracking and never need to run
+// per frame, only when a Pose slider actually changes (or the field is
+// relaid-out, since the position term scales with hand scale).
+//
+// Hide Wrist's own grid-alignment is treated as the hard, always-exact
+// invariant (the direct request: "the cut wrist base should still
+// correspond to the Field Layout points") -- Whole-Hand Rotation
+// therefore pivots around the CURRENT cut point (wherever Hide Wrist has
+// it), not a fixed palm-center point the way HANDO's own
+// `updateModelRootRotation()` does. A single position value can't
+// satisfy "pivot around the palm center" AND "keep the cut point exactly
+// on the grid point" at the same time for an arbitrary rotation (they're
+// 2 different points on the mesh) -- measured directly: an earlier
+// version of this function DID preserve the palm-center pivot instead,
+// and a combined Whole-Hand Rotation + Hide Wrist test showed a real,
+// non-negligible 0.27-world-unit drift off the grid point (vs. exactly 0
+// with Whole-Hand Rotation alone at 0). Since grid-alignment was the
+// explicit, "main thing" request and palm-pivoting is a ported HANDO
+// convenience rather than something asked for here, correctness was
+// resolved in grid-alignment's favor. Trade-off, flagged to the user: with
+// Hide Wrist > 0%, Whole-Hand Rotation now visibly pivots around the cut
+// point instead of the palm center (at Hide Wrist = 0%, it pivots around
+// the original forearm-base point instead -- also not the palm center,
+// a behavior change from HANDO even in the DEFAULT case; revisit if a
+// closer-to-HANDO pivot feel is wanted later).
+const wholeHandRotQuat = new THREE.Quaternion()
+const cloneBaseQuat = new THREE.Quaternion()
+const _wholeHandRotEuler = new THREE.Euler()
+const _cutPointRaw = new THREE.Vector3()
+function updateClonePoseTransform() {
+  if (!modelLoaded) return
+  wholeHandRotQuat.setFromEuler(_wholeHandRotEuler.set(
+    THREE.MathUtils.degToRad(cfg.modelRotX),
+    THREE.MathUtils.degToRad(cfg.modelRotY),
+    THREE.MathUtils.degToRad(cfg.modelRotZ)
+  ))
+  cloneBaseQuat.copy(alignQuat).multiply(wholeHandRotQuat)
+  const scaleFactor = computeBaseScale()
+  // The "cut wrist base" point, as an ABSOLUTE position in the mesh's own
+  // raw/bind-pose frame -- linearly interpolated from the forearm-base
+  // bone (t=0, clips nothing) to the wrist bone (t=1, clips the entire
+  // forearm), matching updateWristClipPlaneForHand()'s own live version
+  // of this same interpolation. Solved so THIS point always lands exactly
+  // at this hand's own wrapper origin (its Field Layout grid point) for
+  // the CURRENT cloneBaseQuat: worldOffset = clone.position +
+  // scale*cloneBaseQuat.applied(cutPointRaw) must equal (0,0,0) -- solving
+  // for clone.position gives the negative of the 2nd term directly, exact
+  // for any rotation, not just identity.
+  const hideT = cfg.hideWrist / 100
+  _cutPointRaw.copy(forearmPosRaw).lerp(wristPosRaw, hideT)
+  const finalPos = _cutPointRaw.clone().applyQuaternion(cloneBaseQuat).multiplyScalar(-scaleFactor)
+  hands.forEach((hand) => {
+    hand.clone.quaternion.copy(cloneBaseQuat)
+    hand.clone.position.copy(finalPos)
+  })
+}
+// Whole-Hand Rotation's own axes are re-expressed relative to
+// cloneBaseQuat (see applyCurlToSkeleton()'s own `baseQuat` parameter) --
+// changing modelRotX/Y/Z therefore requires BOTH updating the transform
+// AND re-applying every finger's curl/splay with the new axis basis, or
+// an already-posed finger would keep its OLD (now stale) rotation.
+function onWholeHandRotationChange() {
+  updateClonePoseTransform()
+  applyAllFingerPoses()
+}
+
+// "Hide Wrist" clipping plane -- ported from HANDO's own wristClipPlane,
+// but PER-HAND rather than a single global plane: every hand faces a
+// different direction (pointing at the cursor), so each needs its own
+// plane geometry, recomputed from that hand's own live wrist/forearm bone
+// world positions right before it draws (`onBeforeRender`, the same
+// per-hand mechanism already used for the depth-clear technique -- see
+// rebuildField()). A single shared `THREE.Plane`, mutated in place
+// immediately before each hand's own draw call, works correctly even
+// though the fill/outline materials are shared across all 510 hands.
+// `material.clippingPlanes` (not `renderer.clippingPlanes`) confines the
+// clip to hand geometry only, so the cursor target marker/grid helper are
+// never affected regardless of draw order.
+const wristClipPlane = new THREE.Plane()
+const _clipFarPos = new THREE.Vector3()
+const _clipNearPos = new THREE.Vector3()
+const _clipDir = new THREE.Vector3()
+const _clipPoint = new THREE.Vector3()
+function updateWristClipPlaneForHand(hand) {
+  if (!hand.skinnedMesh) return
+  const farBone = hand.skinnedMesh.skeleton.getBoneByName('rForearmBend')
+  const nearBone = hand.skinnedMesh.skeleton.getBoneByName('rHand')
+  if (!farBone || !nearBone) return
+  farBone.getWorldPosition(_clipFarPos)
+  nearBone.getWorldPosition(_clipNearPos)
+  _clipDir.subVectors(_clipNearPos, _clipFarPos).normalize()
+  const armToWristDist = _clipFarPos.distanceTo(_clipNearPos)
+  const t = cfg.hideWrist / 100
+  _clipPoint.copy(_clipFarPos).addScaledVector(_clipDir, armToWristDist * t)
+  wristClipPlane.setFromNormalAndCoplanarPoint(_clipDir, _clipPoint)
 }
 
 // -----------------------------------------------------------------------
@@ -464,6 +824,10 @@ function relayoutField() {
       hand.clone.scale.setScalar(scaleFactor)
     }
   }
+  // Hide Wrist's own position compensation scales with hand scale, so any
+  // relayout (spacing, rows/cols, hand scale itself) needs to recompute it
+  // too, not just Pose-slider changes.
+  updateClonePoseTransform()
 }
 
 // Rows/columns/spacing/offsets NEVER touch camera/lighting/target-plane
@@ -496,14 +860,39 @@ function rebuildField() {
     // updateRenderOrder()) means fill's clear simply re-clears again right
     // after -- harmless, since the outline shell is deliberately expanded
     // (`outlineThickness`) to sit entirely behind the fill surface anyway.
-    if (skinnedMesh) skinnedMesh.onBeforeRender = (r) => r.clearDepth()
-    if (outlineMesh) outlineMesh.onBeforeRender = (r) => r.clearDepth()
     const wrapper = new THREE.Group()
     wrapper.add(clone)
     scene.add(wrapper)
-    hands.push({ wrapper, clone, skinnedMesh, outlineMesh, effectiveRenderOrder: 0, screenX: 0, screenY: 0, screenRadius: 0 })
+    const hand = { wrapper, clone, skinnedMesh, outlineMesh, effectiveRenderOrder: 0, screenX: 0, screenY: 0, screenRadius: 0 }
+    // Depth-buffer-per-hand technique: both materials keep depthTest ON
+    // (see createToonMaterial()'s own note) so a hand's own geometry
+    // self-occludes correctly, but the depth buffer is wiped immediately
+    // before each hand's own draw call -- so cross-hand stacking is still
+    // decided purely by draw order (renderOrder, from cursor distance,
+    // see updateRenderOrder()) rather than real camera depth, same as
+    // before. Attached to BOTH meshes (not just one) because the outline
+    // mesh is sometimes invisible (`updateOutlineVisibility()`) and
+    // `onBeforeRender` never fires for an invisible object -- the fill
+    // mesh's own clear must not depend on the outline mesh having run.
+    // renderOrder ordering (outline drawn first, epsilon below fill, see
+    // updateRenderOrder()) means fill's clear simply re-clears again right
+    // after -- harmless, since the outline shell is deliberately expanded
+    // (`outlineThickness`) to sit entirely behind the fill surface anyway.
+    // Also recomputes this hand's OWN Hide Wrist clip plane right before
+    // it draws (see updateWristClipPlaneForHand()'s own comment) -- every
+    // hand faces a different direction, so this can't be done once for
+    // the whole shared material the way the fixed depth-clear can.
+    if (skinnedMesh) skinnedMesh.onBeforeRender = (r) => { updateWristClipPlaneForHand(hand); r.clearDepth() }
+    if (outlineMesh) outlineMesh.onBeforeRender = (r) => { updateWristClipPlaneForHand(hand); r.clearDepth() }
+    hands.push(hand)
   }
   relayoutField()
+  // relayoutField() only recomputes clone.position/scale -- a freshly
+  // rebuilt hand's own skeleton is a brand-new (bind-pose) clone, so every
+  // finger/wrist Pose slider needs reapplying too, or a rebuild (e.g.
+  // changing row/column count) would silently reset every hand back to
+  // its bind pose.
+  applyAllFingerPoses()
   updateOutlineVisibility()
   if (!framedOnce) {
     framedOnce = true
@@ -563,6 +952,17 @@ new GLTFLoader().load(
     boundsBox.getBoundingSphere(boundsSphere)
     handBoundsCenterLocal.copy(boundsSphere.center)
     handBoundsRadiusLocal = boundsSphere.radius
+
+    // Pose raw-frame measurements (see their own declaration comments) --
+    // all taken here, in the same identity-transform frame as the
+    // measurements above, BEFORE any per-instance clone/scale/rotate.
+    // boneRestQuat MUST be captured before rebuildField() below ever
+    // clones this skeleton, so every hand's own clone starts from the
+    // true bind pose.
+    skinned.skeleton.bones.forEach((bone) => { boneRestQuat[bone.name] = bone.quaternion.clone() })
+    wristPosRaw.copy(wristPos)
+    const forearmBone = skinned.skeleton.getBoneByName('rForearmBend')
+    if (forearmBone) forearmBone.getWorldPosition(forearmPosRaw)
 
     toonMaterial = createToonMaterial(skinned.material.map || null)
 

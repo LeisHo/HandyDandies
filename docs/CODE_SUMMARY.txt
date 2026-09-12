@@ -239,6 +239,60 @@ Inside `main.js`, in roughly this order:
     the user as a scope/architecture decision rather than attempted
     unilaterally.
 
+11. **Pose** (Pose dev-panel group) -- ported from HANDO's own identical
+    group (same rig/bone names, same `Hand2.glb` asset): 25 finger sliders
+    (Curl/Splay/2nd-Segment-Splay/Curl-Bias/Tip-Twist x5 fingers),
+    Wrist Bend/Splay, Whole-Hand Rotation X/Y/Z, and Hide Wrist. Applies
+    IDENTICALLY to every hand for now, per direct request -- there is no
+    per-hand pose override yet. `boneRestQuat` (captured once, from the
+    ORIGINAL un-cloned skeleton's bind pose, right after load and BEFORE
+    `rebuildField()` ever clones it) is shared across every hand's own
+    distinct skeleton clone, unlike HANDO's per-model `restQuatMap` (which
+    only exists there to support 2 DIFFERENT model files with slightly
+    different rest poses -- not a factor here, one GLB cloned N times).
+    `applyCurl(fingerName)`/`applyWristPose()` loop over every hand in
+    `hands`, calling the same `applyCurlToSkeleton()`/
+    `applyWristPoseToSkeleton()` HANDO itself uses (ported near-verbatim,
+    including all of HANDO's own live-measured per-finger axis/sign/
+    magnitude tables) against that hand's own skeleton.
+
+    **A real bug, found and fixed this round, that HANDO's own identical
+    code never had to deal with:** HANDO's finger-curl axes are pre-
+    rotated by `modelRoot.quaternion` (its own single whole-hand
+    orientation) so a "world" curl axis stays anatomically fixed
+    regardless of how the hand is posed -- but HANDO has no OTHER rotation
+    layer on top of that. This project's own hands have one:
+    `wrapper.quaternion`, the per-hand, per-frame cursor-tracking look-at
+    (see `animate()`). Confirmed directly, live: with the SAME slider
+    values, 2 different hands (facing 2 different directions at that
+    moment) produced 2 DIFFERENT local bone quaternions for the identical
+    finger -- proof the curl axis was leaking each hand's own CURRENT
+    cursor-facing direction into what should be a purely anatomical
+    (pose-only) rotation. Fixed by extending `rotateOnTrueWorldAxis()`
+    with an optional `excludeQuat` parameter (that hand's own
+    `wrapper.quaternion`) factored out of the bone's world quaternion
+    before the axis conversion -- the algebra shows `wrapper` and the
+    pre-rotation by `cloneBaseQuat` (below) cancel exactly, leaving the
+    axis fixed relative to the mesh's own raw/bind-pose frame regardless
+    of EITHER rotation. Re-verified after the fix: the same 2-hands test
+    now produces byte-identical local bone quaternions. Tip Twist's own
+    axis (computed live from 2 bones' actual current positions, not a
+    fixed WORLD_X/Y/Z constant) does NOT get this treatment -- it's
+    already a true world-space direction and excluding anything from it
+    would be wrong.
+
+    **Whole-Hand Rotation X/Y/Z + Hide Wrist (`updateClonePoseTransform()`)**
+    -- both change `clone.quaternion`/`clone.position` only (never
+    `wrapper`'s own transform, which the per-frame cursor look-at owns
+    exclusively), so neither needs to run per frame, only when a Pose
+    slider changes (or the field is relaid-out, since the position term
+    scales with hand scale -- `relayoutField()` calls this too).
+    `cloneBaseQuat = alignQuat * wholeHandRotQuat` is identical for every
+    hand (computed once, applied to every hand's own `clone.quaternion`).
+    See GOTCHAS for Hide Wrist's own grid-alignment requirement and a real,
+    measured trade-off between it and HANDO's own palm-center rotation
+    pivot.
+
 Data flow: cursor position -> NDC -> raycast against a plane in front of
 the field -> `cursorTarget` (world point) -> per-hand look-at quaternion ->
 slerp toward `wrapper.quaternion` -> render. The model's own bind-pose
@@ -437,3 +491,76 @@ GOTCHAS
   own browser tooling can return STALE, already-fixed errors from before a
   reload as if they were current -- cross-check against a fresh screenshot/
   network request before trusting a lingering console error.
+- **Hide Wrist's own grid-alignment requirement (direct request: "the cut
+  wrist base should still correspond to the Field Layout points") and
+  HANDO's own Whole-Hand-Rotation palm-center pivot CANNOT both be
+  satisfied exactly at the same time, for an arbitrary rotation -- they
+  are 2 different points on the mesh.** `updateClonePoseTransform()`
+  resolves this in grid-alignment's favor (the explicit "main thing"
+  request), meaning Whole-Hand Rotation pivots around wherever Hide
+  Wrist's own cut point currently is, NOT the palm center HANDO itself
+  pivots around -- a real, disclosed behavior difference from HANDO, not
+  just at Hide Wrist > 0% but even at 0% (where it pivots around the
+  original forearm-base point instead). Measured directly: a first
+  implementation attempt DID preserve HANDO's own palm-pivot math (ported
+  near-verbatim, generalized with an extra baseline term for Hide Wrist)
+  and looked correct in EVERY isolated test (Hide Wrist alone: exact,
+  distance ~1e-14; Whole-Hand Rotation alone: exact) -- but a COMBINED
+  test (Hide Wrist 30% + Whole-Hand Rotation Y 90°) showed a real,
+  non-negligible 0.27-world-unit drift off the grid point, invisible until
+  specifically tested together. Root cause: preserving 2 different fixed
+  points under one rotation is only possible if the rotation axis happens
+  to pass through both, which a general X/Y/Z slider combination won't.
+  Fixed by dropping the palm-pivot preservation and instead solving
+  directly for whatever `clone.position` keeps the CURRENT cut point (not
+  the palm) at the wrapper origin for the CURRENT `cloneBaseQuat`, for any
+  rotation -- verified across isolated Hide Wrist, isolated Whole-Hand
+  Rotation, and multiple combined tests (all 3 rotation axes together
+  with Hide Wrist, multiple hands, multiple grid positions): every case
+  landed within float-precision of exactly 0.
+- **A direction+distance pair is NOT enough to reconstruct an absolute
+  raw-frame position -- a real bug hit while building the fix above.**
+  The very first Hide Wrist position-compensation attempt stored only
+  `armDownDirRaw` (a unit direction) and `armToWristDistRaw` (a scalar)
+  from the wrist/forearm bones, then tried to use
+  `direction * distance * hideT` as if it were the cut point's own
+  absolute raw-frame position -- it isn't; that expression is a
+  DISPLACEMENT, and treating it as a position implicitly (and wrongly)
+  assumes the OTHER endpoint sits exactly at the raw content-space
+  origin. It happened to look correct in ISOLATED Hide Wrist testing (the
+  sign error's effect was masked by another factor specific to that
+  simpler case) but broke as soon as Whole-Hand Rotation was combined
+  with it (see the entry above). Fixed by storing the actual ABSOLUTE raw
+  positions of both bones (`wristPosRaw`, `forearmPosRaw`) and computing
+  the cut point as `forearmPosRaw.lerp(wristPosRaw, hideT)` directly --
+  exact by construction, no reconstruction-from-a-displacement involved.
+  General lesson for this codebase: a "direction + distance" pair can
+  represent a displacement between 2 points, but reaching for it to
+  stand in for an absolute position anywhere in this project's own raw/
+  bind-pose measurement frame needs an explicit, verified anchor -- don't
+  assume one endpoint sits at the origin without checking (verified here
+  via a live measurement with the whole ancestor chain zeroed out).
+- **A "world" rotation axis (`FINGER_CURL_AXIS` etc, ported from HANDO)
+  is NOT actually anatomically fixed once a hand sits under an EXTRA
+  per-instance rotation layer HANDO never had.** HANDO pre-rotates these
+  axes by `modelRoot.quaternion` (its own single whole-hand orientation)
+  before `rotateOnTrueWorldAxis()` converts them via the bone's FULL
+  world quaternion -- correct for HANDO, because modelRoot IS the
+  hand's entire orientation authority. This project's own hands have an
+  EXTRA layer on top of the equivalent orientation (`cloneBaseQuat`):
+  `wrapper.quaternion`, the per-hand, per-frame cursor-tracking look-at.
+  Confirmed directly, live: with identical slider values, 2 hands facing
+  different directions at that moment produced 2 DIFFERENT local bone
+  quaternions for the same finger -- the ported axis math was leaking
+  each hand's own current cursor-facing direction into what should be a
+  purely anatomical rotation. Fixed by extending `rotateOnTrueWorldAxis()`
+  with an optional `excludeQuat` (that hand's own `wrapper.quaternion`),
+  factored out of the bone's world quaternion before the conversion; the
+  quaternion algebra shows this exactly cancels the pre-rotation by
+  `cloneBaseQuat`, leaving the axis fixed relative to the mesh's own raw
+  bind-pose frame regardless of EITHER rotation. Re-verified after the
+  fix: the same 2-hands test produces byte-identical local bone
+  quaternions. Applies only to the fixed WORLD_X/Y/Z-based axes (Curl,
+  Splay, Splay2) -- Tip Twist's own axis is computed live from 2 bones'
+  actual current world positions and must NOT get this treatment (it's
+  already a true world-space direction, not a canonical constant).

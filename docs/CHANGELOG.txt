@@ -677,6 +677,153 @@ residual pop, not separately reproduced or treated as a new bug class.
 Not committed/pushed yet.
 
 --------------------------------------------------------------------------------
+2026-09-12 (continued once more)  -  ~11:44 AM - 11:45 AM EDT
+
+"push" -- committed and pushed everything accumulated since the last push
+(`6d6ea29`): the depthTest self-occlusion fix above, the row/column-
+spacing-vs-hand-scale decoupling, the "Prevent Reordering Flash" smoothing
+rework, and the bounding-sphere overlap-check fix, plus their 3 doc files.
+Checked `git status`/`log`/`diff` first to confirm no concurrent session's
+changes were mixed into the working tree (clean; already up to date with
+origin, no merge needed). Single commit `0eb1f9b`, pushed to `main`
+cleanly, no conflicts.
+
+User confirmed the fix live immediately after: **"ok noise is gone now."**
+Closes out the toon-shading-noise investigation (3 rounds, 2 wrong
+diagnoses disproven by the user along the way, documented above) with a
+real user-side visual confirmation, not just this session's own pixel-
+level measurements.
+
+--------------------------------------------------------------------------------
+2026-09-12 (continued once more)  -  ~11:56 AM - 12:24 PM EDT
+
+"Add the pose settings from Hando. For now, the pose settings apply to
+every hand. Be sure to provide the Hide Wrist (%) setting input. The main
+thing is that a wrist that is cut will be shifted such that the cut wrist
+base should still correspond to the Field Layout points."
+
+Ported HANDO's own Pose dev-panel group (identical rig/bone names, same
+`Hand2.glb` asset): 25 finger sliders (Curl/Splay/2nd-Segment-Splay/
+Curl-Bias/Tip-Twist x5 fingers), Wrist Bend/Splay, Whole-Hand Rotation
+X/Y/Z, and Hide Wrist -- applied identically to every hand (a shared
+pose, per the user's own "for now" scoping; no per-hand override yet).
+Explicitly did NOT port HANDO's own Saved Poses list-picker / pose-tween
+system, since the request was about the pose CONTROLS, not the preset-
+management layer on top of them -- flagged as a scope boundary rather
+than silently omitted.
+
+Added:
+- New "Pose" dev-panel group (between Cursor Tracking and Camera), 31
+  controls total, defaults copied verbatim from HANDO's own.
+- `boneRestQuat` -- captured once, right after load, from the ORIGINAL
+  un-cloned skeleton's bind pose, BEFORE `rebuildField()` ever clones it.
+  Shared across every hand's own distinct skeleton clone (simpler than
+  HANDO's own per-model `restQuatMap`, since this project clones ONE GLB
+  N times rather than supporting 2 different model files).
+- `applyCurlToSkeleton()`/`applyCurl()`, `applyWristPoseToSkeleton()`/
+  `applyWristPose()` -- ported near-verbatim from HANDO's own identical
+  functions (including all of its live-measured per-finger axis/sign/
+  magnitude tables: `FINGER_CURL_AXIS`, `FINGER_SPLAY_AXIS`,
+  `FINGER_SPLAY2_AXIS`, `FINGER_MAX_DEG`, etc.), adapted to loop over
+  every hand in `hands` (each with its own skeleton) instead of HANDO's
+  1-2 `posableModels`.
+- `updateClonePoseTransform()` -- new, this project's own (no HANDO
+  equivalent needed one): computes `cloneBaseQuat` (`alignQuat` composed
+  with the live Whole-Hand Rotation sliders) and each hand's
+  `clone.position`, both identical across every hand, applied once per
+  slider change (not per frame -- `wrapper`'s own per-frame cursor-
+  tracking rotation is untouched by any of this).
+- `updateWristClipPlaneForHand()` + a shared `wristClipPlane` -- Hide
+  Wrist's own GPU clipping plane, ported from HANDO's own `wristClipPlane`
+  but recomputed PER-HAND (via `onBeforeRender`, the same mechanism
+  already used for the depth-clear technique) rather than once globally,
+  since every hand here faces a different direction. `material.
+  clippingPlanes` (requiring `renderer.localClippingEnabled = true`) was
+  used instead of HANDO's own `renderer.clippingPlanes` specifically so
+  the clip never affects the cursor target marker/grid helper.
+
+Fixed 3 real bugs this round, all found via direct empirical live
+testing (not caught by code review alone):
+
+1. **Hide Wrist + Whole-Hand Rotation combined drifted off the grid
+   point.** First implementation ported HANDO's own palm-center rotation
+   pivot math (generalized with an extra baseline term for Hide Wrist) --
+   passed EVERY isolated test (Hide Wrist alone: exact; Whole-Hand
+   Rotation alone: exact) but a COMBINED test (Hide Wrist 30% + Whole-Hand
+   Rotation Y 90°) measured a real 0.27-world-unit drift off the grid
+   point. Root cause: preserving 2 different fixed points (palm center
+   AND the cut point) under one rotation is only possible if the rotation
+   axis happens to pass through both, which a general slider combination
+   won't. Resolved in grid-alignment's favor (the user's own explicit
+   "main thing") by dropping the palm-pivot preservation entirely and
+   solving directly for whatever position keeps the CURRENT cut point at
+   the grid point for the CURRENT rotation -- a real, disclosed behavior
+   difference from HANDO (Whole-Hand Rotation now pivots around the cut
+   point, not the palm center, even at Hide Wrist=0%).
+2. **A direction+distance pair silently isn't an absolute position.** The
+   same first attempt stored `armDownDirRaw`/`armToWristDistRaw` (a unit
+   direction and a scalar) and used `direction*distance*t` as if it were
+   the cut point's own absolute raw-frame position -- it's a displacement,
+   not a position, and treating it as one implicitly (and wrongly)
+   assumed the wrist bone sat at the raw content-space origin. It looked
+   correct in ISOLATED testing (masked by the fact that the actual origin-
+   coincident bone is the FOREARM, not the wrist, confirmed via a live
+   measurement with the whole ancestor chain zeroed out: `forearmPosRaw ≈
+   (0,0,0)`, `wristPosRaw ≈ (0, 14.63, 0)`) but broke once rotation was
+   combined in (bug #1 above). Fixed by storing the actual ABSOLUTE raw
+   positions of both bones (`wristPosRaw`, `forearmPosRaw`) and computing
+   the cut point as `forearmPosRaw.lerp(wristPosRaw, hideT)` directly.
+3. **Finger curl axes leaked each hand's own current cursor-facing
+   direction into what should be a purely anatomical rotation.** HANDO's
+   own `applyCurlToSkeleton()` pre-rotates its fixed WORLD_X/Y/Z curl
+   axes by `modelRoot.quaternion` (its single whole-hand orientation)
+   before converting via the bone's full world quaternion -- correct for
+   HANDO, which has no OTHER rotation layer. This project's hands have an
+   extra one: `wrapper.quaternion`, the per-hand, per-frame cursor-
+   tracking look-at. Confirmed directly, live: 2 different hands, facing
+   2 different directions at that moment, produced 2 DIFFERENT local bone
+   quaternions for the IDENTICAL slider values on the identical finger --
+   proof the ported axis math wasn't actually anatomically fixed the way
+   it is for HANDO. Fixed by extending `rotateOnTrueWorldAxis()` with an
+   optional `excludeQuat` parameter (that hand's own `wrapper.quaternion`),
+   factored out of the bone's world quaternion before the axis conversion
+   -- the quaternion algebra shows this exactly cancels the existing
+   pre-rotation by `cloneBaseQuat`, leaving the axis fixed relative to the
+   mesh's own raw bind-pose frame regardless of either rotation. Does NOT
+   apply to Tip Twist's own axis (computed live from 2 bones' actual
+   current world positions -- already correct, excluding anything from it
+   would be wrong).
+
+Verified directly, live, after each fix (not just code-reviewed):
+- Grid-alignment: isolated Hide Wrist (60%, 30%), Hide Wrist + single-axis
+  Whole-Hand Rotation, Hide Wrist + all 3 rotation axes combined, across
+  multiple hands (index 0/50/200/300/400) at different grid positions and
+  different live cursor-tracking orientations -- every case measured
+  within floating-point precision (~1e-14 to exactly 0) of the grid point.
+- Finger-curl anatomical consistency: after the fix, 5 hands (indices 0,
+  50, 150, 300, 450) with genuinely different live wrapper orientations
+  produced byte-identical local bone quaternions for the same slider
+  values (curlIndex=150, splayIndex=80) -- confirmed via direct quaternion
+  comparison, not visual inspection.
+- A full combined stress test (Hide Wrist 40%, Whole-Hand Rotation Y 60°,
+  Curl Index 150%, Wrist Bend -30° all active at once) still measured
+  exact grid-alignment (~1e-16 to ~1e-17).
+- 0 console errors across every reload this round; a live screenshot
+  confirmed the field renders the new default pose (asymmetric per-finger
+  curl, matching HANDO's own defaults) with no visual regressions.
+
+Corrected `CODE_SUMMARY.txt` (new architecture entry #11 for Pose, plus 4
+new GOTCHAS entries documenting the 3 bugs above and the fix) and
+`PROJECT_PROGRESS.md`. Took the opportunity to consolidate
+`PROJECT_PROGRESS.md`'s own "Recently completed" section (which had grown
+into exactly the session-by-session historical narrative its own header
+warns against) into a shorter current-state summary -- the full detail
+this consolidation replaced remains permanently in this file's own prior
+entries, nothing was lost, only de-duplicated from the live-document copy.
+
+Not yet committed/pushed.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================
