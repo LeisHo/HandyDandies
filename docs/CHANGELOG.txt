@@ -824,6 +824,155 @@ entries, nothing was lost, only de-duplicated from the live-document copy.
 Not yet committed/pushed.
 
 --------------------------------------------------------------------------------
+2026-09-12 (continued once more)  -  ~2:17 PM - 2:18 PM EDT
+
+"push" -- the Pose port above (commit `25d47ce`) was committed and pushed
+in this same continued session. Correction to that entry's own "Not yet
+committed/pushed" line, recorded here rather than edited in place.
+
+--------------------------------------------------------------------------------
+2026-09-13  -  ~2:40 AM - 4:04 AM EDT
+
+User tested the pushed Pose/Hide Wrist build and reported 2 problems: "1.
+theyre not cropping correctly when the app is actually following the
+cursor. 2. When cropped, the hand should be placed in the grid from the
+crop point, not the original base of the 3d model." Extensive
+re-verification of the pushed code (both on `localhost` and, once the
+user shared it, the actual deployed `handy-dandies.vercel.app` URL with
+`?dev=1`, live mouse movement, and the exact same measurement approach
+already proven earlier) found the code correct in every test -- grid-
+alignment exact, clipping genuinely removing geometry, `armToWristDist`
+identical across hands. Confirmed the deployment WAS serving the latest
+code (`main.js?v=19`, matching `25d47ce`), ruling out a stale-cache
+explanation. Asked the user for a screenshot/recording rather than keep
+guessing blindly.
+
+User provided a screen recording (saved to
+`data/SCREENCAP/Recording 2026-09-13 032926.mp4`). Extracted 10 frames
+directly via a local OpenCV script (no `ffmpeg` available in this
+environment) rather than trying to infer the issue from description alone
+-- immediately visible: hands in different parts of the same frame showed
+dramatically different amounts of visible forearm, some looking almost
+fully uncropped. Root-caused by direct measurement, not further guessing:
+sampled 11 hands scattered around the field at that exact moment --
+`armToWristDist` (the TRUE 3D length of the remaining segment) was
+`14.630384832518` world units for every single one (differing only in the
+15th decimal place), and grid-alignment held exactly for all of them too,
+including the specific hands that looked least cropped. What varied was
+the SCREEN-PROJECTED length of that same fixed 3D segment -- 17px to 56px,
+over 3x -- purely because each hand independently tracks the cursor and
+so points in a different 3D direction relative to the camera at any given
+moment; a hand facing more edge-on to the camera shows the segment near
+its true length, one facing more toward/away from the camera shows it
+heavily foreshortened. **Not a bug** -- reported the exact measurements to
+the user rather than a vague "looks fine to me," and explained plainly
+that "cropped equally at all times" as a literal on-screen appearance
+isn't achievable with a fixed-fraction 3D clip on independently-rotating
+objects.
+
+User's actual follow-up request, once this was clear: stop thinking of it
+as a crop and think of it as arm length instead -- both short and long
+variants still spawn from the same grid plane, but the amount should react
+to live distance from the cursor (closer = shorter arm), with 4 new
+controls specified via this project's own `*D*` shorthand:
+- **Min / Max Arm Length** -- "a slider that can take multiple toggles,
+  similar to the color gradient slider in DickoClicko. Left side is 0 and
+  right side is 1. 1 is fully cropped, 0 is none." DICKOCLICKO's own
+  `type:'gradient'` control (a Photoshop-style draggable bar,
+  `cfg[key]` = `[{pos,color}]`) lives in ITS OWN monolithic index.html, not
+  the shared `devpanel.js` engine this project reuses verbatim from HANDO
+  -- ported the UI PATTERN (a draggable bar, values persisted through the
+  existing control machinery), not the code, since this needs exactly 2
+  numeric handles (min/max crop %), no color picker.
+- **Length Scaling Curve** -- "one of those input ui things where its like
+  a 2 axes graph and theres a curve showing the relationship between
+  distance and length, and i can manipulate the curve." No prior art for
+  this in the workspace -- built fresh: a small SVG plot, X=normalized
+  cursor distance (0-1), Y=raw crop fraction (0-1), draggable points
+  connected by straight segments (piecewise-linear, not a smoothed spline
+  -- a deliberate simplicity tradeoff, flagged to the user), click empty
+  space to add a point, double-click to remove (floored at 2, the 2
+  domain-spanning endpoints always present, only their Y draggable).
+- **Reactive Arm Length** checkbox, and **Default Arm Length** (the
+  original Hide Wrist slider, relabeled, used when Reactive is off) --
+  both straightforward.
+
+Neither new widget is a `devpanel.js` control type -- per this project's
+own explicit convention ("do not fork it, add controls via main.js's own
+DEV_GROUPS instead"), both are built as custom DOM/SVG laid directly over
+their own control's existing (hidden) generic `type:'text'` input, driven
+via a `commitTextControl()` helper that sets `.value` and dispatches a
+real `'input'` event -- routing through devPanel.js's own existing
+`commit()`/localStorage-save path exactly as if the user had typed into a
+plain text box, so Copy/Save/Reset all keep working without either widget
+knowing anything about devPanel.js internals.
+
+Architecture change: arm-length compensation (`applyHandArmLength()`,
+the direct descendant of the prior round's `updateClonePoseTransform()`)
+moved from a ONE-TIME, SHARED, slider-triggered calculation to PER-HAND,
+PER-FRAME -- necessary since Reactive mode means every hand can have a
+genuinely different crop value that changes continuously as the cursor
+moves. Reuses the live cursor-distance value `updateRenderOrder()` already
+computes for render ordering (no new per-frame distance calculation
+needed) rather than adding a redundant one. `cloneBaseQuat` (Whole-Hand
+Rotation's own shared quaternion) stays event-driven, computed only when
+those sliders change (renamed to `updateCloneBaseQuat()`, position-only
+logic split out of it).
+
+Hit and fixed 1 real bug during implementation, caught immediately on the
+first live reload rather than shipped: a TDZ crash
+(`ReferenceError: Cannot access 'armLengthWidgetResyncs' before
+initialization`) from declaring 3 new cached-state variables
+(`armLengthRangeParsed`, `armLengthCurveParsed`, `armLengthWidgetResyncs`)
+next to the functions that use them (well after `initDevPanel()`) while
+calling 2 of those functions immediately after `initDevPanel()` -- before
+the module's own top-to-bottom evaluation ever reached those
+declarations. Same crash class as this project's own documented
+`initDevPanel()`-detach-onChange gotcha. Fixed by moving all 3 to this
+file's own early shared-state block instead.
+
+Also added a small per-frame resync poll (`armLengthWidgetResyncs`,
+checked once per frame from `animate()`) so either widget's own displayed
+state stays in sync if devPanel.js's Reset/Copy-restore path ever writes
+a new value into the underlying hidden input directly (which it does,
+without firing an `'input'` event) -- couldn't directly verify this ONE
+mechanism firing live in this session's own test environment, since a
+pre-existing, already-documented tool quirk suspends
+`requestAnimationFrame` entirely whenever the Browser pane isn't
+displayed (confirmed directly with a vanilla, page-independent rAF
+counter: 0 ticks in 500ms even with `document.hidden` reporting false) --
+its logic is code-reviewed and pattern-matches the already-verified
+drag-commit path, but flagged as worth a real on-device check rather than
+claimed as fully verified.
+
+Verified directly, live, working around that same rAF-suspension quirk by
+manually invoking `updateRenderOrder()` via the debug hook wherever a real
+animation frame couldn't be relied on to have run naturally:
+- Dragging the Min/Max range handles and the curve's points both update
+  `cfg.armLengthRange`/`cfg.armLengthCurve` correctly (confirmed via
+  direct pointer-event simulation against the real DOM elements, not just
+  code reading).
+- With Reactive on and the cursor moved: the closest-to-cursor hand
+  (distance 111.08) measured crop T=0.660; the farthest (distance 216.49)
+  measured T=0.432 -- confirming "closer = shorter arm" (higher crop)
+  exactly as requested.
+- Grid-alignment held within floating-point precision of exactly 0 (2.7e-15
+  and 6.2e-17) for BOTH of those hands despite their genuinely different,
+  continuously-varying crop values -- the "same plane" requirement
+  survives Reactive mode intact.
+- 0 console errors on live reload after the TDZ fix; a screenshot with
+  Reactive on and the cursor positioned near one corner of the field
+  showed the expected visual gradient (shorter arms near the cursor,
+  longer arms farther away).
+
+Corrected `CODE_SUMMARY.txt` (new architecture entry #12 for Reactive Arm
+Length, a correction to the prior entry's `updateClonePoseTransform()`
+references now that it's split into `updateCloneBaseQuat()` +
+`applyHandArmLength()`, and 3 new GOTCHAS entries: the foreshortening
+finding, the TDZ crash, and re-confirmation that grid-alignment survives
+the Reactive round) and `PROJECT_PROGRESS.md`. Not yet committed/pushed.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

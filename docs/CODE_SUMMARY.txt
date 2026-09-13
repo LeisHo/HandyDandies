@@ -281,17 +281,64 @@ Inside `main.js`, in roughly this order:
     already a true world-space direction and excluding anything from it
     would be wrong.
 
-    **Whole-Hand Rotation X/Y/Z + Hide Wrist (`updateClonePoseTransform()`)**
-    -- both change `clone.quaternion`/`clone.position` only (never
-    `wrapper`'s own transform, which the per-frame cursor look-at owns
-    exclusively), so neither needs to run per frame, only when a Pose
-    slider changes (or the field is relaid-out, since the position term
-    scales with hand scale -- `relayoutField()` calls this too).
+    **Whole-Hand Rotation X/Y/Z (`updateCloneBaseQuat()`)** -- changes
+    `cloneBaseQuat` only, applied to every hand's own `clone.quaternion`
+    every frame alongside the Arm Length position update (#12 below).
     `cloneBaseQuat = alignQuat * wholeHandRotQuat` is identical for every
-    hand (computed once, applied to every hand's own `clone.quaternion`).
-    See GOTCHAS for Hide Wrist's own grid-alignment requirement and a real,
-    measured trade-off between it and HANDO's own palm-center rotation
-    pivot.
+    hand -- only needs recomputing when a Whole-Hand Rotation slider
+    actually changes, never `wrapper`'s own transform (the per-frame
+    cursor look-at owns that exclusively). See GOTCHAS for a real,
+    measured trade-off between Hide Wrist's own grid-alignment requirement
+    and HANDO's own palm-center rotation pivot.
+12. **Arm Length / Hide Wrist, made reactive** (direct follow-up request:
+    "make the crop or arm length dependent on distance from the cursor, so
+    the closer it is the shorter the arm length") -- what was a single
+    slider-triggered, shared-across-all-hands calculation is now PER-HAND,
+    PER-FRAME (`applyHandArmLength()`, called from `updateRenderOrder()`'s
+    own existing per-hand loop, reusing the live cursor-distance value that
+    loop already computes for render ordering -- no separate distance calc
+    needed). `computeArmLengthT(hand, distanceToCursor)` returns this
+    hand's current crop fraction: reactive OFF returns `cfg.hideWrist/100`
+    (renamed "Default Arm Length" in the panel, unchanged behavior from
+    before this round); reactive ON maps the hand's live cursor distance
+    (normalized against `sceneState.fieldRadius * ARM_LENGTH_DISTANCE_NORM`
+    -- a judgment call, not a derived constant, documented as such in the
+    code) through `armLengthCurveParsed` (a user-edited piecewise-linear
+    curve, X=normalized distance, Y=raw crop fraction) into
+    `armLengthRangeParsed`'s [min,max] bounds. The underlying math
+    (`applyHandArmLength()`) is otherwise identical to the original
+    single-hideT version -- same cut-point-lands-exactly-on-the-grid-point
+    derivation, just parameterized by a value that can now differ per hand
+    and per frame instead of being one shared constant.
+
+    **2 new dev-panel widgets that are NOT devPanel.js control types** --
+    Min/Max Arm Length (a 2-handle range bar) and Length Scaling Curve (a
+    draggable-point curve editor, piecewise-linear, X=distance/Y=crop).
+    Neither UI shape exists in the shared, reused-verbatim `devpanel.js`
+    engine, and per this project's own convention ("do not fork it, add
+    controls via main.js's own DEV_GROUPS instead") neither was added
+    there. Both are registered as plain `type:'text'` controls (`cfg[key]`
+    holds a JSON string, e.g. `{"min":30,"max":90}` or
+    `[{"x":0,"y":1},{"x":1,"y":0}]`) with their OWN custom DOM/SVG and
+    pointer-drag handling laid on top of that control's own (hidden)
+    generic text input by `buildArmLengthWidgets()`, called once right
+    after `initDevPanel()`. Interacting with either widget calls
+    `commitTextControl()`, which sets the hidden input's `.value` and
+    dispatches a real `'input'` event -- routing through devPanel.js's own
+    existing `commit()`/localStorage-save machinery exactly as if the user
+    had typed into a plain text box, so Copy/Save/Reset all keep working
+    without either widget knowing anything about devPanel.js internals.
+    `cfg.armLengthRange`/`cfg.armLengthCurve` (JSON strings) are parsed
+    once into `armLengthRangeParsed`/`armLengthCurveParsed` (cached,
+    module-level) by `parseArmLengthConfig()` -- called from each control's
+    own `onChange` and once right after `initDevPanel()` -- rather than
+    re-parsed 510 times a frame inside `computeArmLengthT()`. See GOTCHAS
+    for a real TDZ crash this caching introduced (and where these 3 cached
+    vars actually had to live to avoid it) and for why devPanel.js's own
+    Reset/Copy-restore path needed a small per-frame resync poll
+    (`armLengthWidgetResyncs`, polled once per frame from `animate()`)
+    since it writes the hidden input's value directly without firing an
+    `'input'` event either widget could otherwise just listen for.
 
 Data flow: cursor position -> NDC -> raycast against a plane in front of
 the field -> `cursorTarget` (world point) -> per-hand look-at quaternion ->
@@ -564,3 +611,57 @@ GOTCHAS
   Splay, Splay2) -- Tip Twist's own axis is computed live from 2 bones'
   actual current world positions and must NOT get this treatment (it's
   already a true world-space direction, not a canonical constant).
+- **"Not cropping correctly while tracking the cursor" / "every arm should
+  be cropped equally at all times" was NOT a bug -- it was pure perspective
+  foreshortening on a physically-uniform 3D crop, confirmed by direct
+  measurement from the user's own screen recording.** Sampled 11 hands
+  scattered around the field at the exact moment the recording showed the
+  biggest visual disparity: the TRUE 3D length of the remaining forearm
+  segment (`armToWristDist`, live bone-to-bone distance) was IDENTICAL
+  across every one, `14.630384832518` world units, differing only in the
+  15th decimal place -- and grid-alignment held exactly (`0` to `~1e-15`)
+  for all of them too, including the specific hands that looked LEAST
+  cropped in the recording. What varied was the SCREEN-PROJECTED length of
+  that same fixed 3D segment -- 17px for one hand, 56px for another, over
+  3x -- purely because each hand points in a different 3D direction
+  relative to the camera at any given moment (every hand independently
+  tracks the cursor). A hand pointing more edge-on to the camera shows the
+  segment near its true length; one pointing more toward/away from the
+  camera shows it heavily foreshortened -- the same reason a pencil looks
+  shorter viewed end-on than from the side. This is inherent to doing a
+  real 3D crop on independently-rotating objects under perspective, not a
+  code defect -- confirmed the SAME way the underlying feature itself was
+  verified throughout this round: direct measurement (armToWristDist,
+  screen-projected length via `.project(camera)`), not visual inspection
+  alone. Superseded by the Reactive Arm Length feature (#12 above), which
+  reframes this from "crop" to "arm length" and makes the visible amount a
+  deliberate function of cursor distance instead of trying to hide the
+  foreshortening effect.
+- **A cached-state TDZ crash, the same class this project has hit before
+  (see the `initDevPanel()`-detach-onChange gotcha) -- caught immediately
+  on the first live reload, not shipped.** `armLengthRangeParsed`/
+  `armLengthCurveParsed`/`armLengthWidgetResyncs` were first declared next
+  to the functions that use them (`parseArmLengthConfig()`,
+  `computeArmLengthT()`, `buildArmLengthWidgets()`, all in the Pose
+  section, well after `initDevPanel()`) -- but `parseArmLengthConfig()`
+  and `buildArmLengthWidgets()` are both CALLED immediately after
+  `initDevPanel()`, i.e. BEFORE the module's own top-to-bottom evaluation
+  ever reaches those declarations, hitting their temporal dead zone
+  (`ReferenceError: Cannot access 'armLengthWidgetResyncs' before
+  initialization`, confirmed directly in the console on first load). Fixed
+  by moving all 3 declarations up to this file's own early shared-state
+  block (alongside `boneRestQuat`/`wristPosRaw`/`forearmPosRaw`), matching
+  this file's own established convention that shared mutable state lives
+  at the top regardless of where the logic reading it happens to live --
+  not next to whichever function happens to use it first.
+- **Hide Wrist's grid-alignment guarantee (see #12 above) needed the SAME
+  underlying `applyHandArmLength()` math whether the crop value comes from
+  the flat Default Arm Length slider or the new per-hand-per-frame
+  Reactive computation -- reused directly, not reimplemented, and
+  re-verified after the Reactive round with the exact same measurement
+  technique as the original (live bone positions vs. `wrapper` world
+  position): closest-to-cursor and farthest-from-cursor hands, sampled
+  live while Reactive was on and the cursor was moving, both measured
+  within floating-point precision of exactly 0 distance from their own
+  grid point despite having genuinely different, continuously-changing
+  crop values.**

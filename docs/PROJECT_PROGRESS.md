@@ -94,15 +94,54 @@ still relevant to understanding current state, per this doc's own
   have an EXTRA one (`wrapper`'s per-frame cursor-tracking) -- confirmed
   live that 2 differently-facing hands produced different local bone
   quaternions for identical slider values, fixed by excluding `wrapper`'s
-  rotation from the axis conversion. Re-verified after each fix. Not yet
-  committed/pushed.
+  rotation from the axis conversion. Re-verified after each fix. Pushed as
+  commit `25d47ce`.
+- 9th same-day follow-on: user tested the pushed build and reported the
+  Hide Wrist crop "isn't working" while tracking, plus wanting the crop to
+  come "from the same plane" regardless of amount. Investigated via the
+  user's own screen recording (extracted frames directly, not just
+  described) -- **root cause was NOT a bug**: measured the true 3D crop
+  length across many hands at the exact moment the recording looked most
+  inconsistent and found it byte-identical (`14.630384832518` world units)
+  for every hand; what varied was the ON-SCREEN projected length of that
+  same fixed segment (17-56px, over 3x), purely perspective foreshortening
+  from each hand independently facing a different direction. Reported this
+  finding with the concrete measurements rather than continuing to guess
+  at fixes.
+  User's actual follow-up ask, once that was clear: reframe "crop" as "arm
+  length" and make it a deliberate function of live cursor distance
+  (closer = shorter arm), with 4 new Pose-group controls specified via
+  this project's own `*D*` shorthand. Shipped: **Reactive Arm Length**
+  (checkbox), **Min/Max Arm Length** (a custom 2-handle range-bar widget,
+  modeled on DICKOCLICKO's own gradient-bar UI pattern but built fresh in
+  this project since devPanel.js has no such control type and isn't
+  forked), **Length Scaling Curve** (a custom draggable-point curve editor,
+  piecewise-linear, distance-to-crop), and **Default Arm Length** (the
+  original Hide Wrist slider, relabeled, used when Reactive is off). Arm-
+  length compensation moved from a one-time, shared, slider-triggered
+  calculation to per-hand, per-frame (reusing the cursor-distance value
+  `updateRenderOrder()` already computes for render ordering, no new
+  per-frame cost of consequence). Hit and fixed a real TDZ crash on first
+  reload (3 cached-state vars declared next to their own functions instead
+  of this file's own early shared-state block, called before the module
+  reached their declarations -- same crash class as the documented
+  `initDevPanel()` gotcha). Verified directly: the closest-to-cursor hand
+  measured a higher crop value (0.660) than the farthest (0.432), matching
+  "closer = shorter arm" exactly; grid-alignment held within floating-
+  point precision of exactly 0 for both, confirming the reactive,
+  continuously-varying crop still spawns from the same grid point as
+  before. Not yet committed/pushed.
 
 ## What's next
 
-Awaiting the user's decision on the reordering-flash residual pop: accept
-it as an inherent limitation of render-order-based stacking, tune the
-smoothing rate further as a partial mitigation, or invest in a real alpha
-cross-fade.
+Two open architecture/tuning decisions awaiting the user:
+- **Reordering-flash residual pop**: accept it as an inherent limitation
+  of render-order-based stacking, tune the smoothing rate further as a
+  partial mitigation, or invest in a real alpha cross-fade.
+- **Whole-Hand Rotation's own pivot** now differs from HANDO's own palm-
+  center pivot once Hide Wrist/Arm Length is combined with it (see
+  CODE_SUMMARY.txt's GOTCHAS) — flag if a closer-to-HANDO pivot feel
+  matters enough to revisit.
 
 Other open items worth the user's own confirmation:
 - **Alternate Row Offset's axis** was implemented as the standard brick/
@@ -116,10 +155,18 @@ Other open items worth the user's own confirmation:
   user's own phrasing) — per-hand pose variation/randomization would be a
   new, separately-scoped feature if wanted later, not something this
   round attempted.
-- Whole-Hand Rotation's own rotation pivot now differs from HANDO's own
-  palm-center pivot once Hide Wrist is combined with it (see
-  CODE_SUMMARY.txt's GOTCHAS) — flag if a closer-to-HANDO pivot feel
-  matters enough to revisit.
+- **Length Scaling Curve is piecewise-linear**, not a smoothed spline/
+  bezier — a deliberate simplicity tradeoff; still genuinely user-
+  manipulable (draggable points, click to add, double-click to remove) but
+  flag if a smoother curve feel is wanted later.
+- The 2 new custom widgets' resync-from-Reset path (picking up a value
+  devPanel.js's own Reset/Copy-restore writes directly into the hidden
+  input without firing an event) is code-reviewed and pattern-matches the
+  already-verified drag-commit path, but could NOT be directly observed
+  firing in this session's own test environment (a pre-existing,
+  documented tool quirk suspends `requestAnimationFrame` entirely when the
+  Browser pane isn't displayed, confirmed with a vanilla, page-independent
+  counter) — worth a real on-device Reset-button check.
 
 ## Open questions / blockers
 

@@ -41,7 +41,7 @@ const boneRestQuat = {}
 // positions of the wrist and forearm-base bones (same frame as
 // alignQuat/handLengthRaw's own wristPos/tipPos measurements). Storing
 // the actual positions, not just the direction/distance between them, is
-// what lets updateClonePoseTransform() reconstruct exactly where the
+// what lets applyHandArmLength() reconstruct exactly where the
 // current "cut" point sits relative to the model's own raw content-space
 // origin -- a direction+distance pair alone can't do that (it was tried
 // first and produced a real, measured bug: correct with Hide Wrist alone,
@@ -49,6 +49,21 @@ const boneRestQuat = {}
 // the measured before/after).
 const wristPosRaw = new THREE.Vector3()
 const forearmPosRaw = new THREE.Vector3()
+// Arm Length's cached/parsed state -- declared up here, not next to the
+// functions that use them further down (parseArmLengthConfig(),
+// computeArmLengthT(), buildArmLengthWidgets()), because those functions
+// are CALLED right after initDevPanel() (this file's own established
+// pattern: shared mutable state lives at the top, regardless of where the
+// logic that reads it happens to live) -- calling them before reaching
+// this point in the module's own top-to-bottom evaluation would hit these
+// bindings' temporal dead zone, the same class of crash this project's
+// own initDevPanel()-detach-onChange mitigation exists to avoid (see that
+// code's own comment). Confirmed live: this exact TDZ crash is what
+// happened when these were first declared next to their own functions
+// instead.
+let armLengthRangeParsed = { min: 30, max: 90 }
+let armLengthCurveParsed = [{ x: 0, y: 1 }, { x: 1, y: 0 }]
+const armLengthWidgetResyncs = []
 
 let modelRoot = null
 let modelLoaded = false
@@ -134,11 +149,34 @@ const DEV_GROUPS = [
       { key: 'modelRotZ', label: 'Whole-Hand Rotation Z (Deg)', type: 'slider', min: -200, max: 200, step: 1, def: 0, lockRange: true, onChange: () => onWholeHandRotationChange() },
       // Cuts away the forearm from a percentage down from the wrist -- 0%
       // clips nothing, 100% cuts off exactly at the wrist joint (hiding
-      // the entire forearm). Per direct request, the whole hand shifts to
-      // compensate (see updateClonePoseTransform()) so the newly-visible
-      // cut base stays at this hand's own Field Layout grid point, rather
-      // than drifting away from it as more of the forearm gets clipped.
-      { key: 'hideWrist', label: 'Hide Wrist (%)', type: 'slider', min: 0, max: 100, step: 1, def: 0, onChange: () => updateClonePoseTransform() }
+      // the entire forearm). The whole hand shifts to compensate (see
+      // applyHandArmLength()) so the newly-visible cut base stays at this
+      // hand's own Field Layout grid point, rather than drifting away from
+      // it as more of the forearm gets clipped. Used directly whenever
+      // Reactive Arm Length (below) is off; no onChange needed -- read
+      // fresh every frame by computeArmLengthT(), same as the reactive
+      // controls below.
+      { key: 'hideWrist', label: 'Default Arm Length (Crop %, Reactive Off)', type: 'slider', min: 0, max: 100, step: 1, def: 0 },
+      // Direct follow-up request: "make the crop or arm length dependent
+      // on distance from the cursor, so the closer it is the shorter the
+      // arm length." When on, computeArmLengthT() drives the crop % from
+      // this hand's own live cursor distance through Length Scaling
+      // Curve, remapped into the Min/Max Arm Length bounds below, instead
+      // of the fixed Default Arm Length above.
+      { key: 'reactiveArmLengthEnabled', label: 'Reactive Arm Length (By Cursor Distance)', type: 'checkbox', def: false },
+      // Custom widgets (dual-handle range bar; a 2D curve editor), NOT
+      // devPanel.js control types -- that engine is reused verbatim from
+      // HANDO per this project's own convention ("do not fork it, add
+      // controls via main.js's own DEV_GROUPS instead"), and neither of
+      // these UI shapes exists there. Registered as plain 'text' controls
+      // (cfg[key] holds a JSON string, exactly like any other devPanel.js
+      // control, so Copy/Save/Reset all keep working transparently) with
+      // their OWN custom DOM/drag-handling laid on top of that hidden
+      // input by buildArmLengthWidgets(), called once right after
+      // initDevPanel() -- see that function's own comment for the full
+      // mechanism.
+      { key: 'armLengthRange', label: 'Min / Max Arm Length (Crop %)', type: 'text', def: '{"min":30,"max":90}', onChange: () => parseArmLengthConfig() },
+      { key: 'armLengthCurve', label: 'Length Scaling Curve (Distance -> Crop)', type: 'text', def: '[{"x":0,"y":1},{"x":1,"y":0}]', onChange: () => parseArmLengthConfig() }
     ]
   },
   {
@@ -239,6 +277,13 @@ DEV_GROUPS.forEach((g) => g.controls.forEach((c) => {
 }))
 const cfg = initDevPanel(DEV_GROUPS, { storageKeyPrefix: 'handyDandies' })
 onChangeByCtrl.forEach((fn, c) => { c.onChange = fn })
+// Arm Length's 2 custom widgets (see their own declaration comments,
+// Pose section below) -- parse whatever initDevPanel() just restored
+// (saved or default) into the cached vars computeArmLengthT() reads every
+// frame, then build the actual draggable UI on top of each control's own
+// (now-hidden) generic text input.
+parseArmLengthConfig()
+buildArmLengthWidgets()
 
 // -----------------------------------------------------------------------
 // Scene setup
@@ -595,7 +640,7 @@ function curlBiasWeight(jointIndex, jointCount, bias) {
 // with `modelRoot.quaternion` (HANDO's single posable object) replaced by
 // `baseQuat` (this project's own per-hand-identical `cloneBaseQuat` --
 // alignQuat composed with the live Whole-Hand Rotation sliders, see
-// updateClonePoseTransform()), passed in rather than read from a
+// updateCloneBaseQuat()), passed in rather than read from a
 // module-level object, since the SAME value applies to every hand's own
 // distinct skeleton. Also takes `wrapperQuat` (THIS hand's own, per-hand,
 // per-frame cursor-tracking rotation -- see animate()) and passes it as
@@ -686,39 +731,17 @@ function applyAllFingerPoses() {
   applyWristPose()
 }
 
-// Whole-Hand Rotation X/Y/Z + Hide Wrist's own position compensation --
-// both change `clone.quaternion`/`clone.position` (never `wrapper`'s own
-// transform, which the per-frame cursor look-at owns exclusively, see
-// animate()), so they compose cleanly with tracking and never need to run
-// per frame, only when a Pose slider actually changes (or the field is
-// relaid-out, since the position term scales with hand scale).
-//
-// Hide Wrist's own grid-alignment is treated as the hard, always-exact
-// invariant (the direct request: "the cut wrist base should still
-// correspond to the Field Layout points") -- Whole-Hand Rotation
-// therefore pivots around the CURRENT cut point (wherever Hide Wrist has
-// it), not a fixed palm-center point the way HANDO's own
-// `updateModelRootRotation()` does. A single position value can't
-// satisfy "pivot around the palm center" AND "keep the cut point exactly
-// on the grid point" at the same time for an arbitrary rotation (they're
-// 2 different points on the mesh) -- measured directly: an earlier
-// version of this function DID preserve the palm-center pivot instead,
-// and a combined Whole-Hand Rotation + Hide Wrist test showed a real,
-// non-negligible 0.27-world-unit drift off the grid point (vs. exactly 0
-// with Whole-Hand Rotation alone at 0). Since grid-alignment was the
-// explicit, "main thing" request and palm-pivoting is a ported HANDO
-// convenience rather than something asked for here, correctness was
-// resolved in grid-alignment's favor. Trade-off, flagged to the user: with
-// Hide Wrist > 0%, Whole-Hand Rotation now visibly pivots around the cut
-// point instead of the palm center (at Hide Wrist = 0%, it pivots around
-// the original forearm-base point instead -- also not the palm center,
-// a behavior change from HANDO even in the DEFAULT case; revisit if a
-// closer-to-HANDO pivot feel is wanted later).
+// Whole-Hand Rotation X/Y/Z -- changes `cloneBaseQuat` only (a single
+// shared quaternion, applied to every hand's own `clone.quaternion` every
+// frame alongside the arm-length position update below -- see
+// applyHandArmLength()) -- never touches `wrapper`'s own transform, which
+// the per-frame cursor look-at owns exclusively (see animate()). Only
+// needs recomputing when a Whole-Hand Rotation slider actually changes,
+// not per frame.
 const wholeHandRotQuat = new THREE.Quaternion()
 const cloneBaseQuat = new THREE.Quaternion()
 const _wholeHandRotEuler = new THREE.Euler()
-const _cutPointRaw = new THREE.Vector3()
-function updateClonePoseTransform() {
+function updateCloneBaseQuat() {
   if (!modelLoaded) return
   wholeHandRotQuat.setFromEuler(_wholeHandRotEuler.set(
     THREE.MathUtils.degToRad(cfg.modelRotX),
@@ -726,24 +749,6 @@ function updateClonePoseTransform() {
     THREE.MathUtils.degToRad(cfg.modelRotZ)
   ))
   cloneBaseQuat.copy(alignQuat).multiply(wholeHandRotQuat)
-  const scaleFactor = computeBaseScale()
-  // The "cut wrist base" point, as an ABSOLUTE position in the mesh's own
-  // raw/bind-pose frame -- linearly interpolated from the forearm-base
-  // bone (t=0, clips nothing) to the wrist bone (t=1, clips the entire
-  // forearm), matching updateWristClipPlaneForHand()'s own live version
-  // of this same interpolation. Solved so THIS point always lands exactly
-  // at this hand's own wrapper origin (its Field Layout grid point) for
-  // the CURRENT cloneBaseQuat: worldOffset = clone.position +
-  // scale*cloneBaseQuat.applied(cutPointRaw) must equal (0,0,0) -- solving
-  // for clone.position gives the negative of the 2nd term directly, exact
-  // for any rotation, not just identity.
-  const hideT = cfg.hideWrist / 100
-  _cutPointRaw.copy(forearmPosRaw).lerp(wristPosRaw, hideT)
-  const finalPos = _cutPointRaw.clone().applyQuaternion(cloneBaseQuat).multiplyScalar(-scaleFactor)
-  hands.forEach((hand) => {
-    hand.clone.quaternion.copy(cloneBaseQuat)
-    hand.clone.position.copy(finalPos)
-  })
 }
 // Whole-Hand Rotation's own axes are re-expressed relative to
 // cloneBaseQuat (see applyCurlToSkeleton()'s own `baseQuat` parameter) --
@@ -751,15 +756,318 @@ function updateClonePoseTransform() {
 // AND re-applying every finger's curl/splay with the new axis basis, or
 // an already-posed finger would keep its OLD (now stale) rotation.
 function onWholeHandRotationChange() {
-  updateClonePoseTransform()
+  updateCloneBaseQuat()
   applyAllFingerPoses()
 }
 
-// "Hide Wrist" clipping plane -- ported from HANDO's own wristClipPlane,
-// but PER-HAND rather than a single global plane: every hand faces a
-// different direction (pointing at the cursor), so each needs its own
-// plane geometry, recomputed from that hand's own live wrist/forearm bone
-// world positions right before it draws (`onBeforeRender`, the same
+// Arm Length / Hide Wrist -- per-hand, per-frame now (see
+// applyHandArmLength()'s own comment for why this moved out of a
+// slider-triggered one-time calculation): direct follow-up request,
+// "make the crop or arm length dependent on distance from the cursor, so
+// the closer it is the shorter the arm length," with the crop reframed
+// from "wrist cut %" to "arm length" -- both endpoints (cropped short vs.
+// long) still spawn from the SAME Field Layout grid point, per the
+// original "cut wrist base corresponds to grid points" request, now true
+// for every possible length rather than one fixed slider value.
+//
+// Reactive mode maps each hand's LIVE distance to the cursor target
+// through a user-editable curve (`cfg.armLengthCurve`, control points in
+// normalized [0,1] x [0,1] space) into the [min,max] crop-percent bounds
+// (`cfg.armLengthRange`) -- both new dev-panel widgets, built outside the
+// generic devPanel.js engine (kept "reused verbatim, don't fork it" per
+// this project's own convention) via buildArmLengthWidgets(), called once
+// after initDevPanel(). Non-reactive mode just uses `cfg.hideWrist` (the
+// original single slider, relabeled "Default Arm Length") -- unchanged
+// behavior from before this round.
+//
+// Distance is normalized against `sceneState.fieldRadius` -- a judgment
+// call (no measurement dictates this specific reference), documented as
+// such rather than presented as a derived constant; ARM_LENGTH_DISTANCE_NORM
+// scales it, adjustable if the default range feels too compressed/spread
+// out at typical grid sizes.
+const ARM_LENGTH_DISTANCE_NORM = 1.5
+function evaluateArmLengthCurve(points, x) {
+  if (!points || points.length === 0) return 1
+  if (points.length === 1) return points[0].y
+  const sorted = points // already kept sorted by the widget itself
+  if (x <= sorted[0].x) return sorted[0].y
+  if (x >= sorted[sorted.length - 1].x) return sorted[sorted.length - 1].y
+  for (let i = 0; i < sorted.length - 1; i++) {
+    const a = sorted[i], b = sorted[i + 1]
+    if (x >= a.x && x <= b.x) {
+      const segT = b.x === a.x ? 0 : (x - a.x) / (b.x - a.x)
+      return a.y + (b.y - a.y) * segT
+    }
+  }
+  return sorted[sorted.length - 1].y
+}
+// `cfg.armLengthRange`/`cfg.armLengthCurve` are plain JSON strings (the
+// generic devPanel.js 'text' control's own storage format -- see
+// buildArmLengthWidgets()'s own comment for why these 2 controls are
+// custom-built rather than new devPanel.js control types). Re-parsing a
+// JSON string 510 times a frame would be real, needless per-frame cost --
+// parsed once into `armLengthRangeParsed`/`armLengthCurveParsed` (declared
+// near this file's other early shared state, see that declaration's own
+// comment for why) instead, refreshed only when the underlying control's
+// value actually changes (called from each control's own onChange and
+// once right after initDevPanel() to pick up the restored/default value).
+function parseArmLengthConfig() {
+  try { armLengthRangeParsed = JSON.parse(cfg.armLengthRange) } catch (e) { /* keep last-good value */ }
+  try { armLengthCurveParsed = JSON.parse(cfg.armLengthCurve).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
+}
+function computeArmLengthT(hand, distanceToCursor) {
+  if (!cfg.reactiveArmLengthEnabled) return cfg.hideWrist / 100
+  const normDist = THREE.MathUtils.clamp(distanceToCursor / (sceneState.fieldRadius * ARM_LENGTH_DISTANCE_NORM || 1), 0, 1)
+  const curveY = THREE.MathUtils.clamp(evaluateArmLengthCurve(armLengthCurveParsed, normDist), 0, 1)
+  const minT = armLengthRangeParsed.min / 100, maxT = armLengthRangeParsed.max / 100
+  return minT + (maxT - minT) * curveY
+}
+
+// Small local DOM helper -- devPanel.js's own `el()` isn't exported, and
+// pulling in a whole helper just for 2 one-off widgets isn't worth it.
+function elLocal(tag, styles, attrs) {
+  const node = document.createElement(tag)
+  if (styles) Object.assign(node.style, styles)
+  if (attrs) Object.entries(attrs).forEach(([k, v]) => { if (k === 'text') node.textContent = v; else node.setAttribute(k, v) })
+  return node
+}
+// Drives a devPanel.js control's own hidden text input programmatically --
+// setting .value and dispatching a real 'input' event routes through that
+// control's existing commit()/onChange/localStorage-save machinery
+// exactly as if the user had typed into it, so Copy/Save/Reset all keep
+// working without either widget knowing anything about devPanel.js
+// internals beyond "it's a text input that reacts to 'input' events."
+function commitTextControl(input, value) {
+  input.value = value
+  input.dispatchEvent(new Event('input', { bubbles: true }))
+}
+// devPanel.js's own Reset/Copy-restore path writes straight to the hidden
+// text input's `.value` property without dispatching an 'input' event
+// (see its own `displayValue()`) -- there's no event for either widget to
+// listen for, so each one registers a cheap resync() into
+// `armLengthWidgetResyncs` (declared near this file's other early shared
+// state), polled once per frame from animate() (a single string compare
+// against last-seen value; only re-parses/redraws on an actual external
+// change, e.g. a Reset or a Named Setting State being applied -- not
+// every frame).
+
+// Min/Max Arm Length -- a 2-handle range bar on a 0-100 track, and Length
+// Scaling Curve -- a small draggable-point curve editor (distance 0-1 on
+// X, crop-fraction 0-1 on Y, piecewise-LINEAR between points, not a true
+// spline/bezier -- a deliberate simplicity tradeoff; genuinely
+// "manipulate the curve" per the request, just not smoothed). Both replace
+// their own control's generic `.dp-text-input` (hidden, not removed --
+// still the actual source of truth devPanel.js persists) with custom
+// markup inside that SAME `.dp-row`, per this project's "add controls via
+// main.js, don't fork devPanel.js" convention (parent CLAUDE.md §12 note
+// on this project's own file map).
+function buildArmLengthWidgets() {
+  const rangeRow = document.querySelector('.dp-row[data-key="armLengthRange"]')
+  const curveRow = document.querySelector('.dp-row[data-key="armLengthCurve"]')
+  if (rangeRow) buildArmLengthRangeWidget(rangeRow)
+  if (curveRow) buildArmLengthCurveWidget(curveRow)
+}
+
+function buildArmLengthRangeWidget(row) {
+  const input = row.querySelector('.dp-text-input')
+  if (!input) return
+  input.style.display = 'none'
+  row.style.flexDirection = 'column'
+  row.style.alignItems = 'stretch'
+
+  const wrap = elLocal('div', { flex: '1', padding: '6px 4px 2px' })
+  const track = elLocal('div', {
+    position: 'relative', height: '18px', margin: '0 9px',
+    background: 'rgba(255,255,255,0.12)', borderRadius: '9px'
+  })
+  const fill = elLocal('div', { position: 'absolute', top: '0', bottom: '0', background: 'var(--dp-accent, #7d8cff)', opacity: '0.5', borderRadius: '9px' })
+  const minHandle = elLocal('div', {
+    position: 'absolute', top: '-3px', width: '18px', height: '24px', marginLeft: '-9px',
+    background: 'var(--dp-accent, #7d8cff)', borderRadius: '4px', cursor: 'ew-resize', touchAction: 'none'
+  })
+  const maxHandle = elLocal('div', {
+    position: 'absolute', top: '-3px', width: '18px', height: '24px', marginLeft: '-9px',
+    background: 'var(--dp-accent, #7d8cff)', borderRadius: '4px', cursor: 'ew-resize', touchAction: 'none'
+  })
+  const readout = elLocal('div', { fontSize: '11px', textAlign: 'center', marginTop: '4px', opacity: '0.85' })
+  track.appendChild(fill); track.appendChild(minHandle); track.appendChild(maxHandle)
+  wrap.appendChild(track); wrap.appendChild(readout)
+  row.appendChild(wrap)
+
+  let current = { min: 30, max: 90 }
+  try { current = JSON.parse(input.value) } catch (e) { /* keep default */ }
+  let lastSeenValue = input.value
+
+  function redraw() {
+    fill.style.left = current.min + '%'
+    fill.style.right = (100 - current.max) + '%'
+    minHandle.style.left = current.min + '%'
+    maxHandle.style.left = current.max + '%'
+    readout.textContent = `Min: ${current.min}%  Max: ${current.max}%`
+  }
+  redraw()
+  armLengthWidgetResyncs.push(() => {
+    if (input.value === lastSeenValue) return
+    lastSeenValue = input.value
+    try { current = JSON.parse(input.value); redraw() } catch (e) { /* leave displayed state as-is */ }
+  })
+
+  function startDrag(handleKey, otherKey, isMin) {
+    return (downEv) => {
+      downEv.preventDefault()
+      function onMove(moveEv) {
+        const rect = track.getBoundingClientRect()
+        let pct = Math.round(THREE.MathUtils.clamp((moveEv.clientX - rect.left) / rect.width, 0, 1) * 100)
+        pct = isMin ? Math.min(pct, current[otherKey]) : Math.max(pct, current[otherKey])
+        current[handleKey] = pct
+        redraw()
+      }
+      function onUp() {
+        window.removeEventListener('pointermove', onMove)
+        window.removeEventListener('pointerup', onUp)
+        commitTextControl(input, JSON.stringify(current))
+      }
+      window.addEventListener('pointermove', onMove)
+      window.addEventListener('pointerup', onUp)
+    }
+  }
+  minHandle.addEventListener('pointerdown', startDrag('min', 'max', true))
+  maxHandle.addEventListener('pointerdown', startDrag('max', 'min', false))
+}
+
+function buildArmLengthCurveWidget(row) {
+  const input = row.querySelector('.dp-text-input')
+  if (!input) return
+  input.style.display = 'none'
+  row.style.flexDirection = 'column'
+  row.style.alignItems = 'stretch'
+
+  const W = 240, H = 120
+  const svgNS = 'http://www.w3.org/2000/svg'
+  const svg = document.createElementNS(svgNS, 'svg')
+  svg.setAttribute('width', W); svg.setAttribute('height', H)
+  Object.assign(svg.style, { background: 'rgba(255,255,255,0.06)', borderRadius: '4px', marginTop: '6px', touchAction: 'none', cursor: 'crosshair' })
+  const axisX = document.createElementNS(svgNS, 'line')
+  axisX.setAttribute('x1', 0); axisX.setAttribute('y1', H - 1); axisX.setAttribute('x2', W); axisX.setAttribute('y2', H - 1)
+  axisX.setAttribute('stroke', 'rgba(255,255,255,0.25)')
+  const axisY = document.createElementNS(svgNS, 'line')
+  axisY.setAttribute('x1', 1); axisY.setAttribute('y1', 0); axisY.setAttribute('x2', 1); axisY.setAttribute('y2', H)
+  axisY.setAttribute('stroke', 'rgba(255,255,255,0.25)')
+  const poly = document.createElementNS(svgNS, 'polyline')
+  poly.setAttribute('fill', 'none'); poly.setAttribute('stroke', 'var(--dp-accent, #7d8cff)'); poly.setAttribute('stroke-width', '2')
+  svg.appendChild(axisX); svg.appendChild(axisY); svg.appendChild(poly)
+  const caption = elLocal('div', { fontSize: '10px', opacity: '0.7', marginTop: '3px', textAlign: 'center' }, { text: 'X: Distance From Cursor (0-1)  ·  Y: Crop Fraction (0=None, 1=Full)' })
+  row.appendChild(svg)
+  row.appendChild(caption)
+
+  let points = [{ x: 0, y: 1 }, { x: 1, y: 0 }]
+  try {
+    const parsed = JSON.parse(input.value)
+    if (Array.isArray(parsed) && parsed.length >= 2) points = parsed.sort((a, b) => a.x - b.x)
+  } catch (e) { /* keep default */ }
+
+  const toPx = (p) => ({ x: p.x * W, y: (1 - p.y) * H })
+  const fromPx = (px, py) => ({ x: THREE.MathUtils.clamp(px / W, 0, 1), y: THREE.MathUtils.clamp(1 - py / H, 0, 1) })
+  let circles = []
+
+  function commitPoints() {
+    points.sort((a, b) => a.x - b.x)
+    commitTextControl(input, JSON.stringify(points))
+  }
+  function redraw() {
+    poly.setAttribute('points', points.map((p) => { const px = toPx(p); return `${px.x},${px.y}` }).join(' '))
+    circles.forEach((c) => svg.removeChild(c))
+    circles = points.map((p, i) => {
+      const px = toPx(p)
+      const c = document.createElementNS(svgNS, 'circle')
+      c.setAttribute('cx', px.x); c.setAttribute('cy', px.y); c.setAttribute('r', 5)
+      c.setAttribute('fill', 'var(--dp-accent, #7d8cff)')
+      Object.assign(c.style, { cursor: 'grab' })
+      let dragged = false
+      c.addEventListener('pointerdown', (downEv) => {
+        downEv.stopPropagation()
+        dragged = false
+        const isEndpoint = i === 0 || i === points.length - 1
+        function onMove(moveEv) {
+          dragged = true
+          const rect = svg.getBoundingClientRect()
+          const np = fromPx(moveEv.clientX - rect.left, moveEv.clientY - rect.top)
+          if (isEndpoint) { p.y = np.y } else { p.x = np.x; p.y = np.y }
+          redraw()
+        }
+        function onUp() {
+          window.removeEventListener('pointermove', onMove)
+          window.removeEventListener('pointerup', onUp)
+          if (dragged) commitPoints()
+        }
+        window.addEventListener('pointermove', onMove)
+        window.addEventListener('pointerup', onUp)
+      })
+      c.addEventListener('dblclick', (dblEv) => {
+        dblEv.stopPropagation()
+        if (points.length > 2 && i !== 0 && i !== points.length - 1) {
+          points.splice(points.indexOf(p), 1)
+          redraw()
+          commitPoints()
+        }
+      })
+      svg.appendChild(c)
+      return c
+    })
+  }
+  svg.addEventListener('click', (clickEv) => {
+    if (clickEv.target.tagName === 'circle') return
+    const rect = svg.getBoundingClientRect()
+    const np = fromPx(clickEv.clientX - rect.left, clickEv.clientY - rect.top)
+    if (np.x <= 0 || np.x >= 1) return // keep the domain-spanning endpoints unique
+    points.push(np)
+    redraw()
+    commitPoints()
+  })
+  redraw()
+  let lastSeenValue = input.value
+  armLengthWidgetResyncs.push(() => {
+    if (input.value === lastSeenValue) return
+    lastSeenValue = input.value
+    try {
+      const parsed = JSON.parse(input.value)
+      if (Array.isArray(parsed) && parsed.length >= 2) { points = parsed.sort((a, b) => a.x - b.x); redraw() }
+    } catch (e) { /* leave displayed state as-is */ }
+  })
+}
+// Sets this ONE hand's `clone.quaternion`/`clone.position` for its
+// CURRENT arm-length value `hideT` -- called every frame, per hand, from
+// updateRenderOrder()'s own existing per-hand loop (which already
+// computes the live cursor distance this needs, see that function),
+// replacing the old slider-triggered `updateClonePoseTransform()` now
+// that `hideT` can differ per hand and change every frame under Reactive
+// mode. Cheap enough at hundreds of hands (a handful of vector ops each,
+// same order of cost as the render-order distance calc it rides along
+// with); when Reactive is off `hideT` is constant across hands and
+// frames, so this is doing slightly redundant work in that case too, but
+// keeping ONE code path for both modes is simpler and not measurably
+// slower.
+//
+// Math identical to the prior single-hideT version (see CHANGELOG.txt for
+// the full derivation and the 2 bugs it took to get here): the "cut" point
+// -- interpolated from the forearm-base bone (hideT=0) to the wrist bone
+// (hideT=1), as an ABSOLUTE position in the mesh's own raw/bind-pose frame
+// -- is solved to land exactly at this hand's own wrapper origin (its
+// Field Layout grid point) for the CURRENT cloneBaseQuat, for ANY hideT.
+const _cutPointRaw = new THREE.Vector3()
+function applyHandArmLength(hand, hideT) {
+  const scaleFactor = computeBaseScale()
+  _cutPointRaw.copy(forearmPosRaw).lerp(wristPosRaw, hideT)
+  hand.clone.quaternion.copy(cloneBaseQuat)
+  hand.clone.position.copy(_cutPointRaw).applyQuaternion(cloneBaseQuat).multiplyScalar(-scaleFactor)
+}
+
+// "Hide Wrist"/Arm Length clipping plane -- ported from HANDO's own
+// wristClipPlane, but PER-HAND rather than a single global plane: every
+// hand faces a different direction (pointing at the cursor) and (under
+// Reactive mode) has its OWN current arm-length value, so each needs its
+// own plane geometry, recomputed from that hand's own live wrist/forearm
+// bone world positions right before it draws (`onBeforeRender`, the same
 // per-hand mechanism already used for the depth-clear technique -- see
 // rebuildField()). A single shared `THREE.Plane`, mutated in place
 // immediately before each hand's own draw call, works correctly even
@@ -781,7 +1089,12 @@ function updateWristClipPlaneForHand(hand) {
   nearBone.getWorldPosition(_clipNearPos)
   _clipDir.subVectors(_clipNearPos, _clipFarPos).normalize()
   const armToWristDist = _clipFarPos.distanceTo(_clipNearPos)
-  const t = cfg.hideWrist / 100
+  // Reads this hand's OWN current arm-length value, computed and cached
+  // this same frame by updateRenderOrder() (before composer.render() ever
+  // fires this onBeforeRender callback) -- falls back to the non-reactive
+  // value if that hasn't run yet for any reason (e.g. a manual render
+  // before the first animate() frame).
+  const t = hand.currentArmLengthT !== undefined ? hand.currentArmLengthT : cfg.hideWrist / 100
   _clipPoint.copy(_clipFarPos).addScaledVector(_clipDir, armToWristDist * t)
   wristClipPlane.setFromNormalAndCoplanarPoint(_clipDir, _clipPoint)
 }
@@ -824,10 +1137,14 @@ function relayoutField() {
       hand.clone.scale.setScalar(scaleFactor)
     }
   }
-  // Hide Wrist's own position compensation scales with hand scale, so any
-  // relayout (spacing, rows/cols, hand scale itself) needs to recompute it
-  // too, not just Pose-slider changes.
-  updateClonePoseTransform()
+  // Arm-length position compensation now recomputes every frame (see
+  // applyHandArmLength(), called from updateRenderOrder()) and reads
+  // computeBaseScale() fresh each time, so it automatically picks up a
+  // relayout-driven scale change on the very next frame -- nothing to
+  // trigger here for that. cloneBaseQuat itself doesn't depend on layout
+  // at all, but is kept current here too in case relayoutField() ever
+  // runs before the first animate() frame.
+  updateCloneBaseQuat()
 }
 
 // Rows/columns/spacing/offsets NEVER touch camera/lighting/target-plane
@@ -1010,6 +1327,7 @@ function animate() {
   controls.update()
   syncCameraPanelFromLive()
   updateCursorTarget()
+  armLengthWidgetResyncs.forEach((fn) => fn())
   if (cfg.trackingEnabled) {
     hands.forEach((hand) => {
       const m = new THREE.Matrix4().lookAt(hand.wrapper.position, cursorTarget, UP)
@@ -1148,6 +1466,14 @@ function updateRenderOrder() {
       : live
     if (hand.skinnedMesh) hand.skinnedMesh.renderOrder = hand.effectiveRenderOrder
     if (hand.outlineMesh) hand.outlineMesh.renderOrder = hand.effectiveRenderOrder - 0.001
+    // Arm Length (Hide Wrist) -- reuses this same live cursor-distance
+    // value (`live`, unsmoothed -- Reactive mode intentionally tracks the
+    // cursor instantly, no reason to inherit Reordering Flash's own
+    // smoothing, a different feature solving a different problem) rather
+    // than recomputing it. See computeArmLengthT()/applyHandArmLength()'s
+    // own comments for why this now runs every frame, per hand.
+    hand.currentArmLengthT = computeArmLengthT(hand, live)
+    if (hand.skinnedMesh) applyHandArmLength(hand, hand.currentArmLengthT)
   })
 }
 animate()
