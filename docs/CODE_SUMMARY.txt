@@ -1363,6 +1363,31 @@ GOTCHAS
   Wrist belongs to a separate, larger reactive Arm Length system,
   already deliberately excluded from Pose-preset capture -- see this
   group's own `POSE_PRESET_KEYS`/`savedPoses` comment).
+- **Same-day follow-on: both `organizeGroupSubgroups()` and
+  `organizeDevPanelSubgroups()` are now idempotent, and both get called
+  a 2nd time after `resetSettings()` runs.** Direct report, "you didnt
+  move the settings into the groups which was half the point" -- the
+  Pose port above WAS correct in code, but a saved order predating it
+  (this project's own already-documented "stale localStorage" gotcha,
+  previously only ever worked around by manually clearing storage in a
+  TEST tab, never fixed for a real user's browser) got applied by
+  `resetSettings()`'s own `applyOrder()` right after the fresh
+  structure was built, moving every row back out to a flat layout --
+  the exact same latent bug the Dev Panel group's own subgroup port had
+  been carrying since earlier this session, now actually fixed instead
+  of worked around. Both `makeSub()` (Dev Panel) and
+  `organizeGroupSubgroups()` (generic) now query for an existing
+  same-titled subgroup first, reusing it instead of always creating a
+  fresh one via `createGroupElement()` -- this is what makes calling
+  either function twice safe (no duplicate empty subgroup shells).
+  `initDevPanel()` calls both again immediately after `resetSettings()`,
+  so whatever a stale order just flattened gets correctly re-nested. A
+  genuinely current saved order (reflecting real post-port user
+  reorganization) is unaffected -- this only ever moves a spec'd key
+  INTO its subgroup, never fights a real saved position elsewhere.
+  Verified by deliberately staging a stale, fully-flat pre-port Pose
+  order into `localStorage` and confirming all 6 subgroups still
+  re-nested correctly on reload, with zero duplicate subgroup titles.
 - **"Palm Faces Cursor" REDEFINED, same day, from a full 3D palm-normal-
   aim to a 2D radial roll -- the 3-round-calibrated `palmNormalAligned`/
   `computePalmFaceCorrectionQuat()` mechanism is gone, deleted outright,

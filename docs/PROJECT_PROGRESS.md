@@ -222,6 +222,15 @@ still relevant to understanding current state, per this doc's own
   (plus an `initDevPanel({ organizeSubgroups })` hook) so this port
   didn't require forking the shared engine or touching the existing
   Dev-Panel-specific version of this same mechanism.
+  **Same-day follow-on fix ("you didnt move the settings into the
+  groups"): a saved order predating the port was flattening it right
+  back out on real page loads** (this project's own already-documented
+  stale-localStorage gotcha, previously only ever worked around by
+  clearing storage in a test tab, never actually fixed). Made both
+  `organizeGroupSubgroups()` and `organizeDevPanelSubgroups()` idempotent
+  and called again after `resetSettings()` restores a saved order.
+  Verified by staging a deliberately stale flat Pose order and
+  confirming all 6 subgroups still re-nest correctly on reload.
 - **Ported the built-in "Dev Panel" chrome-styling group's expansion
   from `TEMPLATE_DEV_PANEL.html`, scoped to "just the chrome group"**
   (the user's own choice when asked how much of the template's growth to
