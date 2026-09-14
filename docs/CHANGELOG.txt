@@ -2084,6 +2084,63 @@ produced no errors; zero console errors in the final check.
 Cache-buster bump: index.html's own main.js?v=38 -> ?v=39.
 
 --------------------------------------------------------------------------------
+2026-09-14  -  ~05:00 AM - 05:06 AM EDT (bounded by checkpoints; see Verified note)
+
+Two bundled direct requests:
+
+**1. "Default" pose button.** "didnt i ask you for a way to set the pose
+of the shown hands? if not, add a buttton in the pose selector,
+'Default', that just sets the pose to all the hands." Checked project
+history first: the user HAD asked for this once before (2026-09-13,
+"when i click Use, it doesnt apply it to all the hands on screen") but
+explicitly redirected it at the time toward a preview-only "Pose
+Preview" viewer instead -- so no, there wasn't currently a way to apply
+a pose to the actual field, that was a deliberate prior choice, not an
+oversight. Added a new `type: 'button'` control ("Default") next to the
+existing Saved Poses list-picker in the Pose group: resets every
+`POSE_PRESET_KEYS` slider to its own `POSE_KEY_DEFAULTS` value (via
+`syncValue()`, which updates `cfg`/`store`/the slider display but
+deliberately doesn't fire `onChange` -- see its own devpanel.js comment),
+then calls the existing `onWholeHandRotationChange()` once (already
+re-derives `cloneBaseQuat` from the now-reset rotation sliders AND
+re-applies every finger + the wrist internally) to actually re-pose.
+Since Pose is shared across every hand already (see this group's own
+top comment), one call resets the whole field -- no per-hand loop
+needed in the new code at all, entirely reused existing infrastructure.
+Verified live: forced 3 pose keys away from default, clicked the new
+button, confirmed all 3 read back exactly at their code defaults.
+
+**2. Palm Face Rotation slider, independent of Palm Faces Cursor.**
+"make the palm face rotation slider work even if palm faces cursor is
+turned off" / "it will just rotate every hand." The slider previously
+had zero effect with that checkbox off, since its angle only ever
+reached the hand composed INSIDE `computePalmFaceCorrectionQuat()`,
+which itself is only ever called while the checkbox is on. Factored the
+roll itself out into a new `computeRollQuat()` (just the rotation around
+the wrist-crop-plane axis, no palm-normal involved) and changed the
+render loop to use it directly when Palm Faces Cursor is off, instead of
+skipping the correction entirely -- `computePalmFaceCorrectionQuat()`
+still incorporates the same roll internally when the checkbox IS on, so
+that path's behavior is unchanged.
+
+Verified live: the intended live-render check (toggle the slider,
+measure `hand.wrapper.quaternion` before/after) initially showed NO
+change -- root-caused immediately to a known, already-documented
+environment limitation (the Browser pane's own `requestAnimationFrame`
+suspension while hidden, confirmed via `tabs_context` explicitly
+reporting "the Browser pane is currently hidden"), not a code defect.
+Verified the actual math directly instead, replicating the exact
+render-loop composition externally (same raw-bind-pose-frame
+reconstruction technique used for the axis-difference check 2 rounds
+ago): the composed `desired` quaternion at offset=0 vs. offset=90 (with
+Palm Faces Cursor off) differ by a quaternion dot product of exactly
+0.7071 (= cos(45 degrees) = the precise mathematical signature of a real
+90-degree rotation difference, not an approximation) -- confirming the
+fix works correctly. Zero console errors.
+
+Cache-buster bump: index.html's own main.js?v=40 -> ?v=41.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

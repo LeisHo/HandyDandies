@@ -214,6 +214,17 @@ still relevant to understanding current state, per this doc's own
   plane's normal (forearm-to-wrist, same direction the Arm Length crop
   already uses). Confirmed a real fix (not a no-op): the two directions
   differ by 28.35 degrees in this rig's bind pose.
+  **Same-day 3rd follow-on: the slider now works even with Palm Faces
+  Cursor off** (previously had zero effect in that state) -- factored
+  the roll out of the palm-facing correction so it applies on its own,
+  rolling every hand's default tracking orientation directly.
+- **"Default" pose button** (Pose group, next to Saved Poses) -- resets
+  every pose slider to its code default and re-poses the whole field in
+  one call, reusing existing `syncValue()`/`onWholeHandRotationChange()`
+  infrastructure entirely. Answers a direct question about whether this
+  had been asked before: yes, but the user had explicitly redirected
+  that earlier request toward the preview-only Pose Preview viewer
+  instead, so nothing applied a pose to the field until this button.
 - **Ported the built-in "Dev Panel" chrome-styling group's expansion
   from `TEMPLATE_DEV_PANEL.html`, scoped to "just the chrome group"**
   (the user's own choice when asked how much of the template's growth to

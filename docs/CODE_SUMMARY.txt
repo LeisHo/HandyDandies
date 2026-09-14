@@ -1299,3 +1299,34 @@ GOTCHAS
   (`builtInGroup.controls.forEach` right after `devGroups = [builtInGroup,
   ...]`) -- a control with neither field behaves exactly as before this
   existed.
+- **"Default" pose button (Pose group) reuses `syncValue()` +
+  `onWholeHandRotationChange()` entirely -- no new field-reset logic.**
+  `syncValue(key, v)` (devpanel.js's own public API, already imported for
+  the Camera group's live 2-way sync) updates `cfg`/`store`/the slider
+  display but deliberately does NOT call `onChange` -- it's built for
+  "panel follows an already-changed reality" (e.g. camera dragged by
+  OrbitControls), the opposite direction from "button click should
+  change reality." `resetPoseToDefault()` calls it once per
+  `POSE_PRESET_KEYS` entry (purely to sync the display), then a single
+  `onWholeHandRotationChange()` call does the actual re-posing --
+  already re-derives `cloneBaseQuat` AND re-applies every finger + the
+  wrist internally, so no new "reset and reapply" logic was needed at
+  all, just correct reuse of 2 existing pieces.
+- **Palm Face Rotation slider's roll, and the palm-facing correction it
+  used to be exclusively embedded inside, are now 2 separable pieces.**
+  `computeRollQuat()` (just the rotation around the wrist-crop-plane
+  axis) was factored out of `computePalmFaceCorrectionQuat()` (which
+  still calls it internally, composing the roll into where the
+  palm-normal aims) so the tracking loop can use `computeRollQuat()`
+  directly when Palm Faces Cursor is off -- previously the slider's
+  angle only ever reached the hand via the palm-facing path, so it had
+  literally zero effect with that checkbox unchecked. Verifying this
+  live via the wrapper's own `quaternion` before/after initially showed
+  NO change -- root-caused to the Browser pane's own already-documented
+  `requestAnimationFrame`-suspends-while-hidden limitation (confirmed via
+  `tabs_context` reporting the pane hidden), not a code defect. Verified
+  the actual composition math directly instead (replicating the exact
+  render-loop calculation externally, same technique as the axis-
+  difference check 2 rounds earlier): the quaternion dot product between
+  offset=0 and offset=90 came out to exactly 0.7071 = cos(45 degrees),
+  the precise signature of a genuine 90-degree rotation difference.
