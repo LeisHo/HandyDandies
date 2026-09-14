@@ -43,6 +43,9 @@ let storageKeyPrefix = 'devPanel'
 let textEditModeEnabled = false
 let textOverrides = {}
 const numEls = {} // key -> { slider, numInput } | { type: 'color' } | { type: 'checkbox' }
+// Set by initDevPanel()'s own saveSettings() closure (see its own comment) so
+// the exported saveCurrentSettings() below can trigger a real persisted save.
+let saveSettingsRef = null
 // §12f: 3 device profiles, not 2 -- Landscape is a phone/tablet held
 // sideways, a distinct profile from portrait Mobile, not merely a resize of
 // it. DEVICES is the single source of truth every desktop/mobile-pair spot
@@ -440,6 +443,15 @@ function fillSelectOptions(ctrl, select, preferredValue) {
   const next = options.includes(preferredValue) ? preferredValue : (options[0] || '')
   select.value = next
   return next
+}
+// Triggers a real persisted save (the same localStorage/remote write the
+// panel's own Save/Sync button performs) programmatically -- e.g. for a
+// host-app "set this as the startup default" action where waiting for
+// the user to separately click Save would be the wrong UX. No-ops if
+// initDevPanel() hasn't finished setting up saveSettingsRef yet, or if
+// DEV_MODE is off (no panel, no save button, nothing to trigger).
+export function saveCurrentSettings() {
+  if (saveSettingsRef) saveSettingsRef()
 }
 // Call after the underlying option list changes (e.g. a 'list-picker'
 // control's own onChange, once a Save/Delete alters what should be
@@ -1767,6 +1779,13 @@ export function initDevPanel(groups, opts = {}) {
       flash('Saved!')
     } catch (err) { flash('Save failed') /* localStorage unavailable -- dev-only convenience */ }
   }
+  // Exposes this call's own saveSettings() closure to the module-level
+  // saveCurrentSettings() export below, so a host app can trigger a real
+  // persisted save programmatically (e.g. a "set this as the startup
+  // default" action) without simulating a click on the actual Save
+  // button -- the same kind of host hook syncValue()/refreshSelectOptions()
+  // already are, just for "persist now" instead of "push a value."
+  saveSettingsRef = saveSettings
   function resetSettings() {
     if (opts.remoteSave) {
       fetchRemoteSettingsUntilSuccess(opts.remoteSave, (settings) => {

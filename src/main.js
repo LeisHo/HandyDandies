@@ -6,7 +6,7 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js'
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js'
 import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js'
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js'
-import { initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions } from './devpanel/devPanel.js?v=12'
+import { initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, saveCurrentSettings } from './devpanel/devPanel.js?v=13'
 
 // A defensive wrapper around devPanel.js's own refreshSelectOptions() --
 // found via live testing (direct user report: "I dont see any of the
@@ -303,14 +303,18 @@ const DEV_GROUPS = [
         // page reloads.
         onChange: () => { safeRefreshSelectOptions('chpTargetPose'); safeRefreshSelectOptions('rchpTargetPose') }
       },
-      // Direct follow-up ("add a buttton in the pose selector, 'Default',
-      // that just sets the pose to all the hands"): unlike a Saved Poses
-      // entry's own "Use" (preview-only, see that control's comment),
-      // this resets every POSE_PRESET_KEYS slider straight to its own
-      // code default and re-applies immediately -- since Pose is shared
-      // across every hand (see this group's own top comment), that alone
-      // resets the whole field, no per-hand loop needed here.
-      { key: 'resetPoseToDefaultBtn', label: 'Default', type: 'button', onClick: () => resetPoseToDefault() },
+      // The "Default" button used to live here as its own DEV_GROUPS row
+      // (reset every pose slider to its own CODE default). Direct
+      // follow-up request redefined it entirely: "the Default button
+      // should be next to the Save overwrite etc etc. When i click it
+      // sets the selected pose as the default pose. So its the pose on
+      // startup, as well as the pose that retransitions default back
+      // to." It's no longer a DEV_GROUPS control at all -- it's injected
+      // directly into the Saved Poses list-picker's own button row
+      // (buildPoseDefaultButton(), called from the main setup sequence)
+      // since devPanel.js's generic list-picker builder has no config
+      // hook for an extra button and this project's own convention is to
+      // not fork that shared engine (CLAUDE.md's own file-map note).
       // Master on/off for the whole Arm Length / Hide Wrist system --
       // direct request ("Crop Wrist Checkbox. To turn the cropping on and
       // off"). Off means full arm, always, on every hand -- no clip plane,
@@ -1347,6 +1351,22 @@ const POSE_KEY_DEFAULTS = {}
 DEV_GROUPS.find((g) => g.title === 'Pose').controls.forEach((c) => {
   if (POSE_PRESET_KEYS.includes(c.key)) POSE_KEY_DEFAULTS[c.key] = c.def
 })
+// The pose Click-Hold-Pose's own retransition animates back TOWARD, and
+// (by construction, see below) the pose already active on this very page
+// load -- direct request ("the Default button... sets the selected pose
+// as the default pose. So its the pose on startup, as well as the pose
+// that retransitions default back to"). Seeded from `cfg`'s OWN restored
+// values (whatever initDevPanel() just loaded from localStorage, or code
+// `def` if nothing was ever saved) rather than POSE_KEY_DEFAULTS itself
+// -- cfg already correctly reflects "the pose on startup" the moment
+// this line runs, by the SAME persistence mechanism every other setting
+// in this panel already uses, so no separate startup-specific logic is
+// needed here. `let`, not `const`: setSelectedPoseAsDefault() (below)
+// updates this live the moment "Default" is clicked, so a retransition
+// mid-session immediately targets the new default without needing a
+// page reload first.
+let poseDefaultValues = {}
+POSE_PRESET_KEYS.forEach((key) => { poseDefaultValues[key] = cfg[key] !== undefined ? cfg[key] : POSE_KEY_DEFAULTS[key] })
 // Builds ONE Click-Hold Pose group's control array -- called twice (see
 // DEV_GROUPS' own use of this, above), once per mouse button, so the 2
 // groups can never drift out of sync with each other. `p` is the short
@@ -1366,28 +1386,74 @@ function makeClickHoldPoseGroup(p, title) {
       // pattern as Crop Wrist / Responsive Wrist Splay's own checkboxes.
       { key: `${p}Enabled`, label: `${title} (Master On/Off)`, type: 'checkbox', def: false },
       { key: `${p}TargetPose`, label: 'Target Pose', type: 'select', def: '', options: () => (cfg.savedPoses || []).map((sp) => sp.name) },
-      { key: `${p}TransitionSpeedMs`, label: 'Pose Transition Speed (Ms)', type: 'slider', min: 0, max: 5000, step: 10, def: 400 },
+      { key: `${p}TransitionSpeedMs`, label: 'Pose Transition Speed (Ms)', type: 'slider', min: 0, max: 700, step: 10, def: 400 },
       { key: `${p}StartTimeCurve`, label: 'Pose Transition Start Time Curve (Distance -> Start Time)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickHoldConfig(p) },
       { key: `${p}StartTimeRange`, label: 'Pose Transition Min / Max Start Time (Ms)', type: 'text', def: '{"min":0,"max":300}', onChange: () => parseClickHoldConfig(p) },
-      { key: `${p}RetransitionSpeedMs`, label: 'Pose Retransition Speed (Ms)', type: 'slider', min: 0, max: 5000, step: 10, def: 400 },
+      { key: `${p}RetransitionSpeedMs`, label: 'Pose Retransition Speed (Ms)', type: 'slider', min: 0, max: 700, step: 10, def: 400 },
       { key: `${p}RetransitionStartTimeCurve`, label: 'Pose Retransition Start Time Curve (Distance -> Start Time)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickHoldConfig(p) },
       { key: `${p}RetransitionStartTimeRange`, label: 'Pose Retransition Min / Max Start Time (Ms)', type: 'text', def: '{"min":0,"max":300}', onChange: () => parseClickHoldConfig(p) }
     ]
   }
 }
-// "Default" button (Pose group, next to Saved Poses) -- syncs every pose
-// slider's cfg/store/display back to POSE_KEY_DEFAULTS (syncValue() does
-// NOT call onChange, by design -- see its own devpanel.js comment, it's
-// meant for "panel follows an already-changed reality," the opposite
-// direction from what's needed here), then onWholeHandRotationChange()
-// re-derives cloneBaseQuat from the now-reset rotation sliders AND
-// re-applies every finger + the wrist (it already calls
-// applyAllFingerPoses() internally) -- one call covers the whole pose,
-// same as a real Whole-Hand Rotation edit already does today.
-function resetPoseToDefault() {
-  POSE_PRESET_KEYS.forEach((key) => { syncValue(key, POSE_KEY_DEFAULTS[key]) })
-  onWholeHandRotationChange()
+// Reads whichever Saved Poses row currently carries devPanel.js's own
+// '.dp-list-picker-row-selected' class and returns its underlying item
+// object -- devPanel.js stores this directly on the row element itself
+// (`row.__item = item`, see renderListPickerItemRow()'s own selection-
+// click handler) specifically so a host app doesn't need its own
+// parallel "what's selected" tracking; reading it here rather than
+// forking devPanel.js to add a getter.
+function getSelectedSavedPoseItem() {
+  const selectedRow = document.querySelector('.dp-row[data-key="savedPoses"] .dp-list-picker-row-selected')
+  return selectedRow ? selectedRow.__item : null
 }
+// The "Default" button's own click handler (injected into the Saved
+// Poses list-picker's own button row by buildPoseDefaultButton(), below)
+// -- direct request: "sets the selected pose as the default pose. So
+// its the pose on startup, as well as the pose that retransitions
+// default back to." Applies the selected pose to every live slider +
+// re-poses the field (syncValue()+onWholeHandRotationChange(), the same
+// 2-step pattern the old code-default "Default" button used), updates
+// `poseDefaultValues` live (so an in-progress or future Click-Hold-Pose
+// retransition targets it immediately, no reload needed), and calls
+// saveCurrentSettings() so the CURRENT live cfg -- which now includes
+// this new default pose -- is what a fresh page load restores, making
+// it genuinely "the pose on startup" per the request's own wording (no
+// separate startup-specific persistence needed; this project's normal
+// restore-from-localStorage mechanism already covers it once saved).
+function setSelectedPoseAsDefault() {
+  const item = getSelectedSavedPoseItem()
+  if (!item) return
+  POSE_PRESET_KEYS.forEach((key) => {
+    const v = item[key] !== undefined ? item[key] : POSE_KEY_DEFAULTS[key]
+    syncValue(key, v)
+    poseDefaultValues[key] = v
+  })
+  onWholeHandRotationChange()
+  saveCurrentSettings()
+}
+// Injects the "Default" button directly into the Saved Poses list-
+// picker's own button row (next to Save/Overwrite/Use/Rename/Delete),
+// per direct request ("the Default button should be next to the Save
+// overwrite etc etc") -- devPanel.js's generic list-picker builder has
+// no config hook for an extra button, and this project's own convention
+// is not to fork that shared engine, so this is plain DOM injection
+// (matching how Arm Length/Wrist Splay/Click-Hold-Pose's own custom
+// widgets already find-and-augment an existing devPanel.js-built row)
+// rather than a new devPanel.js capability. Placed right after "Use" --
+// both act on the currently-selected item without renaming/removing it,
+// unlike Rename/Delete further down the row.
+function buildPoseDefaultButton() {
+  const actionsRow = document.querySelector('.dp-row[data-key="savedPoses"] .dp-list-picker-actions')
+  if (!actionsRow) return
+  const btn = document.createElement('button')
+  btn.type = 'button'
+  btn.textContent = 'Default'
+  btn.addEventListener('click', () => setSelectedPoseAsDefault())
+  const useBtn = Array.from(actionsRow.querySelectorAll('button')).find((b) => b.textContent === 'Use')
+  if (useBtn && useBtn.nextSibling) actionsRow.insertBefore(btn, useBtn.nextSibling)
+  else actionsRow.appendChild(btn)
+}
+buildPoseDefaultButton()
 
 // -----------------------------------------------------------------------
 // Pose Preview -- a small, independent Three.js viewport embedded in the
@@ -2240,7 +2306,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     const elapsed = now - chp.retransitionStartTime
     const speedMs = Math.max(cfg[`${p}RetransitionSpeedMs`], 1)
     const progress = elapsed < chp.retransitionDelay ? 0 : THREE.MathUtils.clamp((elapsed - chp.retransitionDelay) / speedMs, 0, 1)
-    const values = lerpPoseValues(chp.retransitionStart, POSE_KEY_DEFAULTS, progress)
+    const values = lerpPoseValues(chp.retransitionStart, poseDefaultValues, progress)
     applyPoseValuesToHand(hand, values, computeResponsiveWristSplayDeg(live, minLiveDist, liveDistRange))
     if (progress >= 1) chp.phase = 'idle' // fully settled at default -- stop overriding, normal cfg-driven posing (inert here since it only re-applies on slider change, not every frame) silently regains control
   }
@@ -2272,7 +2338,7 @@ function endClickHoldPose(p) {
   const range = Math.max(maxD - minD, 0.001)
   hands.forEach((hand, i) => {
     const chp = getOrInitHandCHP(hand)[p]
-    chp.retransitionStart = chp.lastAppliedValues || { ...POSE_KEY_DEFAULTS }
+    chp.retransitionStart = chp.lastAppliedValues || { ...poseDefaultValues }
     chp.retransitionStartTime = now
     chp.retransitionDelay = computeStartDelayMs(dists[i], minD, range, trig.retransitionCurveParsed, trig.retransitionRangeParsed)
     chp.phase = 'retransition'
