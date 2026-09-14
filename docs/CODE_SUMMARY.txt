@@ -116,8 +116,15 @@ Inside `main.js`, in roughly this order:
    changes it.)
 7. **Toon material + outline** -- `createToonMaterial()`/
    `makeGradientTexture()`/`rebuildGradientMap()` and the outline
-   `ShaderMaterial` + inverted-hull shaders are ported from HANDO
-   (simplified: no `clippingPlanes`/wrist-hide support, not a feature here).
+   `ShaderMaterial` + inverted-hull shaders are ported from HANDO. Each
+   field hand gets its own `.clone()` of both materials (own
+   `clippingPlanes`, for Hide Wrist/Arm Length -- see GOTCHAS for why a
+   shared material broke this); the single Pose Preview hand uses the
+   template materials directly. `forEachToonMaterial()`/
+   `forEachOutlineMaterial()` keep every existing "change a shared
+   material setting" dev-panel control (base tint, wireframe, outline
+   color/thickness, gradient rebuild) working across all the per-hand
+   clones plus the template.
    Both materials run with `depthTest: true` (the default) -- see #9 below
    for the depth-buffer-per-hand technique that makes cross-hand render
    ordering work without needing to disable it. `updateOutlineVisibility()`
@@ -418,6 +425,61 @@ GOTCHAS
   soften), their draw sequence could in principle interleave in a way that
   briefly disrupts the per-hand depth-clear grouping -- a minor, transient
   edge case, not a new class of bug, and not separately reproduced.
+- **FIXED — real "arms disappearing" bug, present since Hide Wrist/Arm
+  Length shipped, MISDIAGNOSED twice as perspective foreshortening before
+  being root-caused (see CHANGELOG.txt for the full account, including the
+  2 earlier "not a bug" reports this corrects).** User pushed back
+  directly ("bro. dont you see in the video arms dissappearing
+  completely?"), then gave the decisive clue once asked to point at a
+  specific moment: "the dissappearng happens when my mouse is very far
+  from the grid... furthest hands should be pointing at the cursor. so
+  they would not be pointing at the camera" -- correctly ruling out
+  foreshortening-by-orientation as the explanation. Root cause, confirmed
+  live via the debug hook (reproduced exactly with the user's own pasted
+  Copy Settings dump loaded into `localStorage`, not guessed defaults):
+  `clippingPlanes` lives on the MATERIAL, not the mesh, but every field
+  hand's fill mesh (and every outline mesh) shared ONE material instance
+  with ONE shared `wristClipPlane`, mutated per-hand via `onBeforeRender`
+  right before that hand's own draw call. Three.js does not re-resolve a
+  shared material's clipping-plane uniform per individual draw call the
+  way the original design assumed -- with 289 hands sharing one material,
+  direct measurement showed only 2/289 hands actually rendered anything
+  at their own correct, independently-verified screen position; stripping
+  `clippingPlanes` off the shared material entirely (as a falsification
+  test) immediately restored 288/289. This happened regardless of
+  `cropWristEnabled`/`reactiveArmLengthEnabled` (both were OFF in the
+  user's own settings the whole time) since `updateWristClipPlaneForHand()`
+  and the `clippingPlanes` assignment run unconditionally for every hand.
+
+  **Fix implemented:** every field hand now gets its own `.clone()` of the
+  toon material AND the outline material (see `rebuildField()`), each
+  with its own `clippingPlanes: [hand.wristClipPlane]` -- a genuine
+  per-hand `THREE.Plane` instance (`hand.wristClipPlane`), not a shared
+  one. `toonMaterial.customProgramCacheKey = () => 'handToonMaterial'`
+  keeps every clone (plus the template) sharing ONE compiled WebGL
+  program, since only the clip-plane uniform VALUES differ, not the plane
+  count or shader structure -- avoiding a 289-way shader recompile. Every
+  existing "change a shared material setting" control (Toon Base Tint,
+  Show Wireframe, Outline Color, Hull Outline Thickness, the toon gradient
+  rebuild on Toon Steps/Threshold/Shadow Floor/Light Ceiling) now goes
+  through 2 small helpers, `forEachToonMaterial()`/
+  `forEachOutlineMaterial()`, which apply the change to the template
+  material AND every per-hand clone -- the single Pose Preview hand still
+  uses the template materials directly (its own `clippingPlanes: []`,
+  since it never applies Hide Wrist/Arm Length and has no per-hand
+  conflict to begin with, being the only user of its own material).
+
+  Verified live: reproduced the exact failure with the user's own real
+  settings (17x17 field, camera FOV 35 at Z=352.46, etc, loaded via their
+  pasted Copy Settings dump) and cursor at their own logged (49,47) --
+  before the fix, 2/289 hands visible at their calculated screen position;
+  after, 276/289 (the remaining 13 are plausible legitimate off-screen/
+  overlap cases in a dense 17x17 grid, not re-investigated separately).
+  Confirmed the ACTUAL Arm Length feature (Crop Wrist ON + Reactive ON)
+  still produces the correct monotonic gradient afterward (nearest-to-
+  cursor hand T=0.9, farthest T=0.3, unchanged from before this fix) --
+  the bug was in the SHARING of the clip state, not the per-hand T-value
+  math itself, which was already correct.
 - **The wrist-to-fingertip bone distance (`handLengthRaw`) badly undersells
   this asset's real rendered size -- `Hand2.glb`'s visible mesh includes a
   full forearm below the wrist, so the actual bounding-sphere radius

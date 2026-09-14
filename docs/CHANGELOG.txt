@@ -1294,6 +1294,117 @@ move toward an orthographic camera / something else is still wrong).
 `PROJECT_PROGRESS.md` -- no further action planned on this item.
 
 --------------------------------------------------------------------------------
+2026-09-13 (continued once more, correcting the round above)  -  ~9:09 PM - 9:55 PM EDT
+
+Immediately after the round above shipped ("leave the foreshortening
+as-is"), the user pushed back hard: "but bro. dont you see in the video
+arms dissappearing completely?" Re-examined the same recording's actual
+pixels (not just the downsampled frame view) and found genuine 2-4px
+fragments where a hand had been -- more severe than the "looks shorter"
+framing the prior round's own AskUserQuestion had used. Re-opened the
+decision with the user rather than assuming the prior "leave as-is"
+answer still applied to this more severe picture.
+
+First hypothesis (extreme edge-on orientation, same class as the
+foreshortening finding, just more severe) did not survive contact with
+the user's own counter-evidence: "no its not the dissappearng happens
+when my mouse is very far from the grid. The furthest hands dissappear...
+The furtherst hands should be pointing at the cursor. so they would not
+be pointing at the camera" -- a correct, decisive rebuttal (a hand
+rotating to face a genuinely distant point can't simultaneously be
+edge-on to a camera pointed at the field's center).
+
+Reproduced the exact video moment (8-10s and 14-16s, per the user's own
+timestamps) via OpenCV frame extraction, then asked for and received the
+user's own Copy Settings JSON dump (17x17 field, camera FOV 35 at
+Z=352.46, `cropWristEnabled`/`reactiveArmLengthEnabled` both FALSE the
+entire time -- a fact the mouse-tracking log had already shown, since
+neither setting was ever toggled during the recording) to reproduce their
+EXACT scene rather than guessing at settings. Loaded it into a fresh
+browser's `localStorage` under `handyDandies.devSettings` (the exact key
+`initDevPanel({storageKeyPrefix:'handyDandies'})` reads) and reloaded --
+confirmed live that the reported cursor position (49,47) reproduced the
+video's own narrow-column collapse exactly, with Crop Wrist definitively
+OFF, ruling out the Arm Length feature entirely as a cause.
+
+Diagnosed via direct pixel-readback (`gl.readPixels`) cross-referenced
+against each hand's own verified world/screen position (confirmed correct
+by temporarily rendering a single isolated hand in solid red and matching
+its expected vs. actual screen position): only 2 of 289 hands actually
+rendered anything at their own calculated position; the other 287 showed
+pure background color there, even though their positions, rotations, and
+render-order values were all individually confirmed correct. Ruled out,
+in order, frustum culling (forcing `frustumCulled=false` on every mesh
+changed nothing), the EffectComposer/OutlinePass pipeline (bypassing it
+entirely with a direct `renderer.render()` call reproduced the identical
+failure), and stale camera matrices (`updateMatrixWorld(true)` before
+projecting changed nothing).
+
+Root cause: `clippingPlanes` (for Hide Wrist/Arm Length) lives on the
+MATERIAL, not the mesh, but every field hand's fill mesh AND outline mesh
+shared ONE material instance with ONE shared `wristClipPlane`, mutated
+in place per-hand via `onBeforeRender` right before that hand's own draw
+call -- the original design's own comment asserted this "works correctly
+even though the fill/outline materials are shared across all 510 hands,"
+which this investigation disproves directly. Three.js does not re-resolve
+a shared material's clipping-plane uniform per individual draw call the
+way that assumed; with 289 hands sharing one material, almost every hand
+ended up clipped against a stale/foreign plane (whichever hand's own
+`onBeforeRender` last wrote to it before the GPU actually consumed the
+uniform), discarding its entire mesh. Confirmed via a direct falsification
+test: setting `material.clippingPlanes = []` on the shared material,
+with nothing else changed, immediately took visible hands from 2/289 to
+288/289. This explains every symptom reported across both this round and
+the prior one -- happens with Crop Wrist on OR off (the clip-plane update
+runs unconditionally for every hand regardless of `cropWristEnabled`);
+happens specifically for far-cursor/farthest-hand cases only insofar as
+whichever hand's plane "wins" the race for a given render happens to
+discard geometry differently depending on scene state, not because of
+any actual distance-based logic; and was never a foreshortening effect
+at all, despite superficially resembling one in the recordings examined
+so far (real foreshortening likely still contributes some visual
+variation on top, per the earlier investigations, but is not the
+"disappearing" mechanism).
+
+**Fix implemented** (`main.js`): every field hand now gets its own
+`.clone()` of the toon material AND the outline material inside
+`rebuildField()`, each with `clippingPlanes: [hand.wristClipPlane]` -- a
+genuine per-hand `THREE.Plane` instance stored on the hand object, not a
+shared module-level one. `updateWristClipPlaneForHand()` now mutates
+`hand.wristClipPlane` instead of a shared plane. Added
+`toonMaterial.customProgramCacheKey = () => 'handToonMaterial'` so all
+289+ clones (plus the template) still share ONE compiled WebGL program --
+only the clip-plane uniform VALUES differ per clone, not the plane count
+or shader structure, so without this three.js would otherwise recompile
+the same shader hundreds of times. Added 2 helpers, `forEachToonMaterial()`
+and `forEachOutlineMaterial()`, and rewired every existing "mutate the
+shared material" control (Toon Base Tint, Show Wireframe, Outline Color,
+Hull Outline Thickness, `rebuildGradientMap()`'s own toon-gradient
+rebuild) through them, so every one of those dev-panel controls still
+correctly updates all per-hand clones plus the template -- the template
+itself stays directly assigned to the single Pose Preview hand, which has
+no per-hand clipping conflict to begin with (only one instance uses it).
+Corrected 2 stale comments that had asserted the shared-plane approach
+worked (in `createToonMaterial()` and `updateWristClipPlaneForHand()`'s
+own doc comments) and one unrelated pre-existing stale comment in
+`CODE_SUMMARY.txt` claiming this project had "no clippingPlanes support"
+(predates the Hide Wrist feature, never updated when it shipped).
+
+Verified live: reproduced the user's own exact failing scenario (their
+real settings dump, cursor at their own logged (49,47)) before and after
+the fix -- 2/289 visible hands before, 276/289 after (the remaining 13
+are plausible legitimate off-screen/dense-grid-overlap cases in a 17x17
+field, not separately investigated). Re-confirmed the Arm Length feature
+itself (Crop Wrist ON + Reactive ON) still produces the correct monotonic
+crop gradient afterward (nearest T=0.9, farthest T=0.3, matching every
+prior verification) -- the bug was entirely in the SHARED clip-plane
+mechanism, never in the per-hand T-value math. Corrected `CODE_SUMMARY.txt`
+(new GOTCHAS entry, and the #7 architecture-summary item) and
+`PROJECT_PROGRESS.md` (removed the now-incorrect "leave as-is" foreshortening
+resolution, replaced with this fix in Recently Completed). Cache-buster
+bumped `index.html`'s `src/main.js?v=26` -> `?v=27`.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

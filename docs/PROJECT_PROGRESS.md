@@ -127,27 +127,35 @@ still relevant to understanding current state, per this doc's own
   honest attribution in the commit message and `CODE_SUMMARY.txt` rather
   than silently claimed or held back. Not yet pushed at the time this was
   written -- see CHANGELOG.txt for the exact commit.
+- **Fixed a real "arms disappearing" bug, after 2 earlier rounds
+  misdiagnosed it as perspective foreshortening.** User pushed back
+  directly on the foreshortening explanation, then pinpointed it further:
+  disappearing happened even with Crop Wrist OFF, and specifically
+  affected the FARTHEST-from-cursor hands when the cursor was far from
+  the grid -- correctly reasoning those hands would be pointing AT the
+  distant cursor, not edge-on to the camera. Root-caused live (reproduced
+  exactly using the user's own pasted Copy Settings dump loaded into
+  `localStorage`, not guessed settings): every field hand's fill/outline
+  mesh shared ONE material instance with ONE shared, per-hand-mutated
+  `wristClipPlane` -- three.js doesn't re-resolve a shared material's
+  clipping-plane uniform per individual draw call, so with 289 hands only
+  2 actually rendered anything at their own correct, independently-
+  verified screen position. Confirmed by stripping `clippingPlanes` off
+  the shared material as a falsification test: 288/289 immediately
+  reappeared. Happened regardless of Crop Wrist/Reactive state, since the
+  clip-plane update runs unconditionally for every hand. Fixed by giving
+  every hand its own cloned material + own `THREE.Plane` instance (see
+  `CODE_SUMMARY.txt`'s GOTCHAS for the full technical account, including
+  the `customProgramCacheKey` fix to avoid a 289-way shader recompile).
+  Verified live: 276/289 hands now render correctly at the exact cursor
+  position that previously showed only 2/289; the Arm Length feature's
+  own T-value math re-confirmed unchanged and correct (nearest T=0.9,
+  farthest T=0.3) -- the bug was purely in the shared clip-plane
+  mechanism, not the crop math itself.
 
 ## What's next
 
-Three open architecture/tuning decisions awaiting the user:
-- ~~Perspective foreshortening still reads as "cropping isn't fixed."~~
-  -- resolved 2026-09-13 ~8:39 PM EDT. Investigated live via the debug
-  hook rather than guessing: with Crop Wrist OFF, every hand measured
-  `currentArmLengthT = 0` (confirmed, no cropping applied at all) and an
-  IDENTICAL true 3D forearm length (14.63 units, same measurement as the
-  original foreshortening finding) -- yet the SAME segment's on-screen
-  projected length still ranged ~11-27px across just a 20-hand sample in
-  the video's own visible column, purely from each hand's own rotation
-  angle toward the cursor combined with camera perspective. Separately,
-  with Crop ON + Reactive ON, direct measurement confirmed the crop math
-  itself IS monotonic and correct (nearest-to-cursor hand T=0.9, farthest
-  T=0.3, exactly per the curve/range design). Presented the finding plus
-  3 options (leave as-is / move toward an orthographic camera / something
-  else); **user chose to leave it as-is** -- the Arm Length/Crop feature
-  itself is confirmed correct, and the residual foreshortening look is
-  accepted as an inherent property of a perspective camera with hands
-  rotating to face a moving cursor. No further action planned here.
+Two open architecture/tuning decisions awaiting the user:
 - **Reordering-flash residual pop**: accept it as an inherent limitation
   of render-order-based stacking, tune the smoothing rate further as a
   partial mitigation, or invest in a real alpha cross-fade.

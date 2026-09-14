@@ -283,7 +283,7 @@ const DEV_GROUPS = [
       { key: 'toonStepThreshold', label: 'Toon Step Threshold (Bias)', type: 'slider', min: 0.2, max: 5, step: 0.05, def: 2.1, onChange: () => rebuildGradientMap() },
       { key: 'toonShadowFloor', label: 'Toon Shadow Floor (%)', type: 'slider', min: 0, max: 90, step: 1, def: 12, onChange: () => rebuildGradientMap() },
       { key: 'toonLightCeiling', label: 'Toon Light Ceiling (%)', type: 'slider', min: 10, max: 100, step: 1, def: 100, onChange: () => rebuildGradientMap() },
-      { key: 'toonBaseTint', label: 'Toon Base Tint', type: 'color', def: '#ffffff', onChange: (v) => { if (toonMaterial) toonMaterial.color.set(v) } },
+      { key: 'toonBaseTint', label: 'Toon Base Tint', type: 'color', def: '#ffffff', onChange: (v) => forEachToonMaterial((m) => m.color.set(v)) },
       { key: 'textureInfluence', label: 'Texture Influence (%)', type: 'slider', min: 0, max: 100, step: 1, def: 0, onChange: (v) => setToonUniform('textureInfluence', v / 100) },
       { key: 'toonTint', label: 'Toon Texture Tint', type: 'color', def: '#ffffff', onChange: (v) => setToonUniform('toonTint', new THREE.Color(v)) },
       { key: 'rimIntensity', label: 'Rim Light Intensity (x)', type: 'slider', min: 0, max: 3, step: 0.05, def: 0, onChange: (v) => setToonUniform('rimIntensity', v) },
@@ -297,10 +297,10 @@ const DEV_GROUPS = [
       { key: 'outlineEnabled', label: 'Outline Enabled', type: 'checkbox', def: false, onChange: () => updateOutlineVisibility() },
       { key: 'useOutlinePass', label: 'Use OutlinePass (Screen-Space)', type: 'checkbox', def: false, onChange: () => updateOutlineVisibility() },
       { key: 'outlineColor', label: 'Outline Color', type: 'color', def: '#000000', onChange: (v) => {
-        if (outlineMaterial) outlineMaterial.uniforms.outlineColor.value.set(v)
+        forEachOutlineMaterial((m) => m.uniforms.outlineColor.value.set(v))
         if (outlinePass) { outlinePass.visibleEdgeColor.set(v); outlinePass.hiddenEdgeColor.set(v) }
       } },
-      { key: 'hullThickness', label: 'Hull Outline Thickness (% Of Hand Length)', type: 'slider', min: 0, max: 6, step: 0.05, def: 6, onChange: (v) => { if (outlineMaterial) outlineMaterial.uniforms.outlineThickness.value = (v / 100) * handLengthRaw } },
+      { key: 'hullThickness', label: 'Hull Outline Thickness (% Of Hand Length)', type: 'slider', min: 0, max: 6, step: 0.05, def: 6, onChange: (v) => forEachOutlineMaterial((m) => { m.uniforms.outlineThickness.value = (v / 100) * handLengthRaw }) },
       { key: 'passThickness', label: 'Pass Edge Thickness (Px)', type: 'slider', min: 0.5, max: 15, step: 0.1, def: 0.9, onChange: (v) => { if (outlinePass) outlinePass.edgeThickness = v } },
       { key: 'passStrength', label: 'Pass Edge Strength (x)', type: 'slider', min: 0, max: 15, step: 0.5, def: 15, onChange: (v) => { if (outlinePass) outlinePass.edgeStrength = v } },
       { key: 'passGlow', label: 'Pass Edge Glow (x)', type: 'slider', min: 0, max: 5, step: 0.1, def: 0, onChange: (v) => { if (outlinePass) outlinePass.edgeGlow = v } }
@@ -316,7 +316,7 @@ const DEV_GROUPS = [
     title: 'Debug',
     controls: [
       { key: 'showGridHelper', label: 'Show Grid Helper', type: 'checkbox', def: false, onChange: (v) => { if (gridHelper) gridHelper.visible = v } },
-      { key: 'showWireframe', label: 'Show Wireframe', type: 'checkbox', def: false, onChange: (v) => { if (toonMaterial) toonMaterial.wireframe = v } },
+      { key: 'showWireframe', label: 'Show Wireframe', type: 'checkbox', def: false, onChange: (v) => forEachToonMaterial((m) => { m.wireframe = v }) },
       // Freezes a hand's own render-order value (see animate()'s own
       // overlap-detection block) the instant it starts visually
       // overlapping another hand, instead of letting cursor-distance
@@ -630,6 +630,20 @@ const toonShaderUniformsList = []
 function setToonUniform(name, value) {
   toonShaderUniformsList.forEach((u) => { if (u[name]) u[name].value = value })
 }
+// Every field hand now gets its OWN cloned toon/outline material (see
+// rebuildField()'s own comment on wristClipPlane for why) -- these two
+// helpers keep every existing "change a shared material property" control
+// working across all of them, plus the original template material itself
+// (still used directly by the single Pose Preview hand, which has no
+// per-hand clipping conflict since nothing else shares its material).
+function forEachToonMaterial(fn) {
+  if (toonMaterial) fn(toonMaterial)
+  hands.forEach((h) => { if (h.skinnedMesh && h.skinnedMesh.material !== toonMaterial) fn(h.skinnedMesh.material) })
+}
+function forEachOutlineMaterial(fn) {
+  if (outlineMaterial) fn(outlineMaterial)
+  hands.forEach((h) => { if (h.outlineMesh && h.outlineMesh.material !== outlineMaterial) fn(h.outlineMesh.material) })
+}
 function makeGradientTexture(steps, shadowFloor, lightCeiling, threshold) {
   const size = Math.max(2, Math.round(steps))
   const data = new Uint8Array(size * 4)
@@ -648,24 +662,30 @@ function makeGradientTexture(steps, shadowFloor, lightCeiling, threshold) {
 function rebuildGradientMap() {
   if (!toonMaterial) return
   if (toonMaterial.gradientMap) toonMaterial.gradientMap.dispose()
-  toonMaterial.gradientMap = makeGradientTexture(cfg.toonSteps, cfg.toonShadowFloor, cfg.toonLightCeiling, cfg.toonStepThreshold)
-  toonMaterial.needsUpdate = true
+  const gradientTex = makeGradientTexture(cfg.toonSteps, cfg.toonShadowFloor, cfg.toonLightCeiling, cfg.toonStepThreshold)
+  forEachToonMaterial((m) => { m.gradientMap = gradientTex; m.needsUpdate = true })
 }
 // Ported from HANDO's own createToonMaterial() -- a MeshToonMaterial with
 // an onBeforeCompile injecting rim lighting + a duotone texture-tint blend
 // (see HANDO's own code for why duotone rather than a flat color swap).
-// Dropped: HANDO's `clippingPlanes`/wrist-hide support -- not a feature
-// this project has.
+// This is a TEMPLATE material: the single Pose Preview hand uses it
+// directly (no wrist-clip support there currently, so no clipping
+// conflict), but every FIELD hand instead gets its own `.clone()` of this
+// template with its own `clippingPlanes` (see rebuildField() and
+// updateWristClipPlaneForHand()'s own corrected comment for why a shared
+// material can't support per-hand clip planes). `customProgramCacheKey`
+// keeps all those clones (plus this template) sharing ONE compiled WebGL
+// program, since only the clip-plane VALUES differ (a uniform), not the
+// plane COUNT or shader structure -- without it, three.js would otherwise
+// treat 289+ separately-cloned `onBeforeCompile` materials as needing
+// their own program, recompiling the same shader hundreds of times.
 function createToonMaterial(map) {
   const material = new THREE.MeshToonMaterial({
     map,
     color: new THREE.Color(cfg.toonBaseTint),
     gradientMap: makeGradientTexture(cfg.toonSteps, cfg.toonShadowFloor, cfg.toonLightCeiling, cfg.toonStepThreshold),
     wireframe: cfg.showWireframe,
-    // Hide Wrist (Pose group) -- see wristClipPlane's own declaration
-    // comment for why this is a single shared Plane mutated per-hand,
-    // not a per-material array.
-    clippingPlanes: [wristClipPlane]
+    clippingPlanes: []
     // depthTest stays ON (the default) -- a single hand's own self-
     // occlusion (finger over palm, etc) needs a real depth test to render
     // correctly. Stacking between DIFFERENT hands (driven by renderOrder,
@@ -677,6 +697,7 @@ function createToonMaterial(map) {
     // hand" bug, root-caused by direct pixel-diff measurement, from an
     // earlier `depthTest:false` approach here).
   })
+  material.customProgramCacheKey = () => 'handToonMaterial'
   material.onBeforeCompile = (shader) => {
     shader.uniforms.rimColor = { value: new THREE.Color(cfg.rimColor) }
     shader.uniforms.rimIntensity = { value: cfg.rimIntensity }
@@ -733,16 +754,22 @@ function ensureOutlineMaterial() {
       vertexShader: outlineVertexShader,
       fragmentShader: outlineFragmentShader,
       side: THREE.BackSide,
-      clippingPlanes: [wristClipPlane]
+      clippingPlanes: []
       // depthTest stays ON -- see createToonMaterial()'s own note; matches
       // the fill material's depth-clear-per-hand approach.
     })
   }
   return outlineMaterial
 }
+// Every field hand gets its own `.clone()` of the outline material too
+// (own `clippingPlanes`, see updateWristClipPlaneForHand()'s own
+// corrected comment) -- a plain ShaderMaterial clone shares its compiled
+// WebGL program automatically (same shader source), no
+// `customProgramCacheKey` needed the way the toon material's
+// `onBeforeCompile` does.
 function buildOutlineMesh(sourceMesh) {
   const mesh = sourceMesh.clone()
-  mesh.material = ensureOutlineMaterial()
+  mesh.material = ensureOutlineMaterial().clone()
   return mesh
 }
 function updateOutlineVisibility() {
@@ -1463,19 +1490,37 @@ function applyHandArmLength(hand, hideT) {
 }
 
 // "Hide Wrist"/Arm Length clipping plane -- ported from HANDO's own
-// wristClipPlane, but PER-HAND rather than a single global plane: every
-// hand faces a different direction (pointing at the cursor) and (under
-// Reactive mode) has its OWN current arm-length value, so each needs its
-// own plane geometry, recomputed from that hand's own live wrist/forearm
-// bone world positions right before it draws (`onBeforeRender`, the same
+// wristClipPlane, but genuinely PER-HAND (own `THREE.Plane` instance per
+// hand, see rebuildField()'s own `hand.wristClipPlane`): every hand faces
+// a different direction (pointing at the cursor) and (under Reactive
+// mode) has its OWN current arm-length value, so each needs its own
+// plane geometry, recomputed from that hand's own live wrist/forearm bone
+// world positions right before it draws (`onBeforeRender`, the same
 // per-hand mechanism already used for the depth-clear technique -- see
-// rebuildField()). A single shared `THREE.Plane`, mutated in place
-// immediately before each hand's own draw call, works correctly even
-// though the fill/outline materials are shared across all 510 hands.
+// rebuildField()).
+//
+// CORRECTED 2026-09-13 (user-reported "arms disappearing completely,
+// even with Crop Wrist off"): this used to be ONE shared `THREE.Plane`,
+// mutated in place immediately before each hand's own draw call, on the
+// (wrong) assumption that mutating it per-`onBeforeRender` would apply
+// correctly per-draw-call even with `clippingPlanes` on a MATERIAL shared
+// by every hand. Confirmed live (debug hook) this does NOT hold: with a
+// shared material + shared plane, all but ~1-2 of 289 hands rendered
+// nothing at their own correct, verified screen position -- stripping
+// `clippingPlanes` off the shared material entirely restored 288/289.
+// Root cause: `clippingPlanes` lives on the MATERIAL, not the mesh, so a
+// shared material can only ever expose ONE clip-plane state per render
+// pass regardless of how many `onBeforeRender` hooks mutate it -- most
+// hands ended up clipped against a plane derived from some OTHER hand's
+// bone positions, discarding their entire mesh. Fixed by giving every
+// hand its own CLONED material (see rebuildField()) whose own
+// `clippingPlanes` array holds only that hand's own Plane instance --
+// `forEachToonMaterial()`/`forEachOutlineMaterial()` (see their own
+// comment) keep every existing "change a shared material setting"
+// control working across all the resulting per-hand clones.
 // `material.clippingPlanes` (not `renderer.clippingPlanes`) confines the
 // clip to hand geometry only, so the cursor target marker/grid helper are
 // never affected regardless of draw order.
-const wristClipPlane = new THREE.Plane()
 const _clipFarPos = new THREE.Vector3()
 const _clipNearPos = new THREE.Vector3()
 const _clipDir = new THREE.Vector3()
@@ -1496,7 +1541,7 @@ function updateWristClipPlaneForHand(hand) {
   // before the first animate() frame).
   const t = hand.currentArmLengthT !== undefined ? hand.currentArmLengthT : cfg.hideWrist / 100
   _clipPoint.copy(_clipFarPos).addScaledVector(_clipDir, armToWristDist * t)
-  wristClipPlane.setFromNormalAndCoplanarPoint(_clipDir, _clipPoint)
+  hand.wristClipPlane.setFromNormalAndCoplanarPoint(_clipDir, _clipPoint)
 }
 
 // -----------------------------------------------------------------------
@@ -1560,9 +1605,16 @@ function rebuildField() {
     const clone = cloneSkeletal(modelRoot)
     clone.quaternion.copy(alignQuat)
     const skinnedMesh = findSkinnedMesh(clone)
-    if (skinnedMesh && toonMaterial) skinnedMesh.material = toonMaterial
+    // Own Plane + own cloned material per hand -- see
+    // updateWristClipPlaneForHand()'s own corrected comment for why a
+    // shared material/plane silently discarded almost every hand's mesh.
+    const handWristClipPlane = new THREE.Plane()
+    if (skinnedMesh && toonMaterial) {
+      skinnedMesh.material = toonMaterial.clone()
+      skinnedMesh.material.clippingPlanes = [handWristClipPlane]
+    }
     const outlineMesh = skinnedMesh ? buildOutlineMesh(skinnedMesh) : null
-    if (outlineMesh) clone.add(outlineMesh)
+    if (outlineMesh) { outlineMesh.material.clippingPlanes = [handWristClipPlane]; clone.add(outlineMesh) }
     // Depth-buffer-per-hand technique: both materials keep depthTest ON
     // (see createToonMaterial()'s own note) so a hand's own geometry
     // self-occludes correctly, but the depth buffer is wiped immediately
@@ -1580,25 +1632,12 @@ function rebuildField() {
     const wrapper = new THREE.Group()
     wrapper.add(clone)
     scene.add(wrapper)
-    const hand = { wrapper, clone, skinnedMesh, outlineMesh, effectiveRenderOrder: 0, screenX: 0, screenY: 0, screenRadius: 0 }
-    // Depth-buffer-per-hand technique: both materials keep depthTest ON
-    // (see createToonMaterial()'s own note) so a hand's own geometry
-    // self-occludes correctly, but the depth buffer is wiped immediately
-    // before each hand's own draw call -- so cross-hand stacking is still
-    // decided purely by draw order (renderOrder, from cursor distance,
-    // see updateRenderOrder()) rather than real camera depth, same as
-    // before. Attached to BOTH meshes (not just one) because the outline
-    // mesh is sometimes invisible (`updateOutlineVisibility()`) and
-    // `onBeforeRender` never fires for an invisible object -- the fill
-    // mesh's own clear must not depend on the outline mesh having run.
-    // renderOrder ordering (outline drawn first, epsilon below fill, see
-    // updateRenderOrder()) means fill's clear simply re-clears again right
-    // after -- harmless, since the outline shell is deliberately expanded
-    // (`outlineThickness`) to sit entirely behind the fill surface anyway.
+    const hand = { wrapper, clone, skinnedMesh, outlineMesh, wristClipPlane: handWristClipPlane, effectiveRenderOrder: 0, screenX: 0, screenY: 0, screenRadius: 0 }
     // Also recomputes this hand's OWN Hide Wrist clip plane right before
     // it draws (see updateWristClipPlaneForHand()'s own comment) -- every
-    // hand faces a different direction, so this can't be done once for
-    // the whole shared material the way the fixed depth-clear can.
+    // hand faces a different direction and (own material/plane now, see
+    // above) can genuinely hold its own clip state independent of every
+    // other hand.
     if (skinnedMesh) skinnedMesh.onBeforeRender = (r) => { updateWristClipPlaneForHand(hand); r.clearDepth() }
     if (outlineMesh) outlineMesh.onBeforeRender = (r) => { updateWristClipPlaneForHand(hand); r.clearDepth() }
     hands.push(hand)
