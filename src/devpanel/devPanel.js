@@ -1713,6 +1713,18 @@ export function initDevPanel(groups, opts = {}) {
 
   buildDevPanel(groupsEl)
   organizeDevPanelSubgroups(groupsEl)
+  // Direct request ("move the Enable Label Rename Mode checkbox outside
+  // of any group. Place it above Add group") -- CORRECTED 2026-09-14:
+  // still a REGISTERED control (stays inside builtInGroup.controls, see
+  // its own comment, so cfg/store/Copy/Save/Reset all keep working with
+  // zero extra code), just relocated after buildDevPanel() renders it --
+  // its row is found inside the Dev Panel group (where it's built, since
+  // organizeDevPanelSubgroups() already deliberately leaves it as that
+  // group's one flat, non-subgrouped row) and moved to sit directly in
+  // `body`, above `addGroupRow`, a true panel-level standalone control
+  // matching the template's own placement for this same checkbox.
+  const textEditModeRow = groupsEl.querySelector('.dp-row[data-key="dp_textEditMode"]')
+  if (textEditModeRow) body.insertBefore(textEditModeRow, addGroupRow)
   // Generic hook for a PROJECT's own group (e.g. main.js's "Pose"), same
   // "flat rows -> named subgroups, once, before a real saved order takes
   // over" shape as organizeDevPanelSubgroups() above but not hardcoded to
