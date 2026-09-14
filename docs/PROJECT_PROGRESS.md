@@ -18,14 +18,12 @@ work seamlessly from there.
 
 ## Currently working on
 
-Nothing in progress. Pose's "Default" button was relocated into the
-Saved Poses list-picker's own button row and redefined (sets the
-selected saved pose as the startup/retransition-target default), and
-Click-Hold-Pose's Transition/Retransition Speed sliders' max bound was
-lowered to 700ms — both pushed without a live-verification pass this
-round, per the user's own explicit instruction to stop verifying and
-just push (`node --check` syntax validation was still done before every
-push). See "What's next" for open follow-ups this leaves.
+Nothing in progress. A real thumb-posing bug (wrist applied after
+fingers instead of before, found by direct comparison against HANDO —
+same rig, same already-fixed bug there) was just found and fixed, with
+a genuine quantitative before/after measurement (33.0deg error -> 0.0deg).
+The Pose "Default" button relocation and the 700ms speed-slider cap from
+the round before that are still unverified live — see "What's next".
 
 ## Recently completed
 
@@ -370,6 +368,24 @@ still relevant to understanding current state, per this doc's own
   independently live-verified this round, per direct instruction to stop
   verifying and just push — see "What's next" for the resulting
   follow-up.
+- **Fixed a real thumb-posing bug: wrist must be applied before fingers,
+  not after.** Direct user report ("the thumb pose doesnt seem
+  correct... has to do with the rotation that we had used. Double check
+  in reference to hando"). Root cause, found by direct comparison
+  against HANDO (same rig asset, already-fixed there): `rThumb1`'s own
+  parent bone is `rHand`, the exact bone the wrist rotates; every
+  finger's `rotateOnTrueWorldAxis()` reads the bone's CURRENT world
+  quaternion, so posing the thumb before the wrist reaches its new
+  target reads a stale rotation. The other 4 fingers aren't parented to
+  `rHand`, so only the thumb was ever visibly affected. Fixed at all 3
+  combined-call sites (`applyAllFingerPoses()`, `previewPosePreset()`,
+  `applyPoseValuesToHand()`) by swapping the order. Verified with a real
+  quantitative measurement (not just a look): 33.0-degree quaternion
+  error with the old order vs. an independent reference, 0.0-degree
+  error with the fix — confirmed the test itself was discriminating by
+  temporarily reverting and re-measuring the 33.0deg number before
+  restoring the fix. See CODE_SUMMARY.txt's GOTCHAS and CHANGELOG.txt
+  for the full account.
 
 ## What's next
 

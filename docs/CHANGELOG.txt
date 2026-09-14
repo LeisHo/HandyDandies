@@ -2639,6 +2639,60 @@ Cache-buster bumps: `index.html`'s own `main.js?v=58` -> `?v=59`;
 `main.js`'s own `devpanel.js?v=12` -> `?v=13` (via its import line).
 
 --------------------------------------------------------------------------------
+2026-09-14  -  07:59:12 AM - 08:07:37 AM EDT (measured, this entry's own start/finish)
+
+Direct user report: "Works overall. For poses, the thumb pose doesnt
+seem correct. I believe it has to do with the rotation that we had
+used. Double check in reference to hando to see what the issue is."
+
+**Root cause, found by direct comparison against HANDO (this project's
+own reference implementation, sharing the identical rig asset):** this
+project's own `applyAllFingerPoses()`, `previewPosePreset()`, and
+`applyPoseValuesToHand()` all posed FINGERS before the WRIST in a single
+combined call. `rThumb1`'s own PARENT bone is `rHand` -- the exact bone
+`applyWristPoseToSkeleton()` rotates. `rotateOnTrueWorldAxis()` (used by
+every finger's own Curl/Splay/Splay2) converts its world axis into the
+bone's CURRENT local space via the bone's FULL world quaternion, which
+depends on the ENTIRE parent chain's CURRENT `matrixWorld` -- so posing
+the thumb before the wrist reaches its own new target rotation reads
+whatever wrist rotation was left over from BEFORE that call, not the one
+about to be set. The other 4 fingers are unaffected (not parented
+directly to `rHand`), which is exactly why only the thumb looked wrong.
+
+**This is the identical bug HANDO already found, diagnosed, and fixed**
+(its own CHANGELOG.txt documents the same root cause, found via a direct
+user report there too: "From Scissor 1.5 to Scissor 1 - Wrong (thumb
+curled/splayed too much). On a second click, its even worse") -- it was
+simply never ported here when this project's own `applyCurlToSkeleton`/
+`applyWristPoseToSkeleton` were adapted from HANDO's code. Fixed at all
+3 combined-call sites by swapping the order (wrist first, fingers
+second): `applyAllFingerPoses()` (rebuild, Whole-Hand Rotation changes),
+`previewPosePreset()` (Pose Preview / "Use" on a saved pose), and
+`applyPoseValuesToHand()` (Click-Hold-Pose's own per-hand application).
+
+**Live-verified with a real, quantitative before/after measurement** (not
+just a visual check): with `wristBend=45`/`wristSplay=-20`/`thumbCurl=90`
+applied to a freshly-rebuilt (bind-pose) skeleton -- the exact scenario
+that triggers the bug, since a fresh skeleton's `rHand` starts untouched
+-- captured `rThumb1`'s quaternion right after the rebuild, then
+independently re-applied wrist bend/splay and thumb curl via their own
+SEPARATE, guaranteed-correct individual slider calls (each one only ever
+touches its own bone, no ordering ambiguity possible) to get a reference
+quaternion. With the OLD (fingers-then-wrist) order, the rebuild's own
+result differed from the reference by 33.0 degrees -- a real, large,
+measurable error. Restored to the OLD order specifically to CONFIRM this
+number (ruling out "the test just isn't sensitive enough to catch a
+real bug" as an explanation for why it might read 0), then re-applied
+the fix and re-ran the identical test: exactly 0.0 degrees of error.
+510/510 hands still rendering (varied intentionally to 180 via the
+Field Layout rebuild trigger used for this test, not a regression), zero
+new console errors.
+
+Cache-buster bump: `index.html`'s own `main.js?v=59` -> `?v=62` (2
+intermediate bumps during the before/after live-comparison test above;
+`?v=62` is the final, verified, pushed value).
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

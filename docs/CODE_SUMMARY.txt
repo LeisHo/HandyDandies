@@ -1666,3 +1666,44 @@ GOTCHAS
   statically against devPanel.js's own already-verified conventions
   rather than clicked in a real browser. See PROJECT_PROGRESS.md's own
   "What's next" for the specific follow-up checks this leaves open.
+- **FIXED: the thumb was the only finger visibly mis-posed whenever
+  wrist bend/splay and finger values changed together in one call --
+  wrist MUST be applied before fingers, not after.** Direct user report
+  ("the thumb pose doesnt seem correct... has to do with the rotation
+  that we had used"), root-caused by direct comparison against HANDO
+  (this project's own reference implementation, identical rig asset) --
+  HANDO had already found and fixed this exact bug, just never ported
+  here. `rThumb1`'s own PARENT bone is `rHand`, the exact bone
+  `applyWristPoseToSkeleton()` rotates. `rotateOnTrueWorldAxis()` (used
+  by every finger's own Curl/Splay/Splay2) converts its world axis into
+  the bone's CURRENT local space via the bone's FULL world quaternion,
+  which depends on the ENTIRE parent chain's CURRENT `matrixWorld` --
+  posing the thumb before the wrist reaches its own new target rotation
+  reads whatever wrist rotation was left over from BEFORE that call, not
+  the one about to be set. The other 4 fingers aren't parented directly
+  to `rHand`, so they were never affected -- exactly why only the thumb
+  looked wrong. Fixed by swapping the order (wrist first, fingers
+  second) at all 3 combined-call sites: `applyAllFingerPoses()`
+  (rebuild, Whole-Hand Rotation changes), `previewPosePreset()` (Pose
+  Preview / "Use" on a saved pose), and `applyPoseValuesToHand()`
+  (Click-Hold-Pose). A finger-only slider drag (e.g. dragging Thumb Curl
+  alone) was NEVER affected by this -- `applyCurl(fingerName)` on its
+  own doesn't touch the wrist, and `bone.updateMatrixWorld(true)` always
+  recomputes from the CURRENT (already-correct-by-then) parent chain
+  regardless of call order in that case; the bug only manifests when
+  wrist and finger values change TOGETHER in one combined call, starting
+  from a skeleton whose `rHand` hadn't yet been updated to match.
+
+  **Verified with a real quantitative measurement, not just a visual
+  check:** applied `wristBend=45`/`wristSplay=-20`/`thumbCurl=90` to a
+  freshly-rebuilt (bind-pose) skeleton -- the exact bug-triggering
+  scenario -- and captured `rThumb1`'s quaternion right after. Built an
+  independent reference by re-applying wrist bend/splay and thumb curl
+  via their own SEPARATE, single-purpose slider calls (each only ever
+  touches its own bone; no ordering ambiguity possible there). With the
+  OLD order, the rebuild's result differed from the reference by 33.0
+  degrees. Temporarily restored the old order specifically to CONFIRM
+  this number (ruling out "the test isn't sensitive enough" as an
+  explanation for a 0-degree result), then re-applied the fix and reran
+  the identical test: exactly 0.0 degrees. See CHANGELOG.txt's own entry
+  for the full before/after account.
