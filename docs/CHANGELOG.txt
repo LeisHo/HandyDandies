@@ -2141,6 +2141,68 @@ fix works correctly. Zero console errors.
 Cache-buster bump: index.html's own main.js?v=40 -> ?v=41.
 
 --------------------------------------------------------------------------------
+2026-09-14  -  ~05:00 AM - 05:23 AM EDT (bounded by checkpoints; see Verified note)
+
+Ported HANDO's Pose group subgroup structure -- direct request: "check
+the project Hando's git save in regards to its Dev Panel, Pose settings.
+I want you to port the subgroup names, nesting, setting groupings, and
+order." First re-verified the prior round's uncommitted-at-the-time work
+(a concurrent session had already committed it as 4b2281c/7538a1b while
+this was being investigated -- confirmed via git log/fetch, not
+re-committed) live: the roll-independent-of-checkbox math checked out
+exactly (quaternion dot 0.7071 between offset=0/90, the precise
+signature of a 90-degree difference) and the new Default pose button
+correctly reset 3 forced-off-default keys back to their code defaults.
+
+For the actual request: HANDO's own main.js Pose control array is flat,
+with zero subgroup/nesting information -- the real structure only ever
+existed in HANDO's own committed `data/processed/dev-panel-settings.json`
+(its `order` array's "Pose" entry), reflecting how a live session there
+had actually reorganized it via drag-and-drop. Read that directly: 6
+subgroups, in order -- one bundling Whole-Hand Rotation (X/Y/Z) together
+with the full Thumb slider set, then Wrist (hideWrist/wristBend/
+wristSplay), then one subgroup per remaining finger (Index/Middle/Ring/
+Pinky), each holding that finger's Curl/Splay/Splay2/Curl-Bias/Tip-Twist
+sliders. HANDO's own subgroup names were still the unrenamed drag-drop
+defaults ("New Group", "New Group (3)" through "(7)") -- disclosed this
+honestly rather than porting meaningless placeholder text, and used
+descriptive names instead (Whole-Hand Rotation & Thumb / Wrist / Index /
+Middle / Ring / Pinky) while porting the grouping/order exactly as
+found. Omitted HANDO's 5 `baseOnlyCurl*` sliders (don't exist as
+controls in this project) and `hideWrist` from the ported Wrist
+subgroup -- this project's own Hide Wrist is a separate, larger reactive
+Arm Length system (Crop Wrist master toggle, Reactive checkbox, Min/Max
+range, Length Scaling Curve), already deliberately excluded from what a
+saved Pose captures per this group's own existing top comment; left it
+exactly where it already sat.
+
+Architecture: this project's own `organizeDevPanelSubgroups()` (used for
+the built-in "Dev Panel" chrome group) is hardcoded to that one group's
+name/structure and lives in the shared `devpanel.js` engine, which this
+project's own file map says not to fork. Added a new, generic exported
+`organizeGroupSubgroups(groupsEl, groupTitle, subgroupSpecs)` instead --
+same "flat rows built by buildDevPanel(), organized into named
+subgroups, once, before a real saved order takes precedence" shape, but
+parameterized rather than hardcoded, plus a new optional
+`initDevPanel(groups, { organizeSubgroups })` hook so a project supplies
+its own spec without touching the shared engine's own internals. The
+existing Dev-Panel-specific function was left completely untouched.
+
+Verified live (fresh tab, cleared localStorage): the Pose group's direct
+(un-nested) rows are exactly `savedPoses`, `resetPoseToDefaultBtn`,
+`cropWristEnabled`, `hideWrist`, `reactiveArmLengthEnabled`,
+`armLengthRange`, `armLengthCurve` -- confirming the Arm Length family
+was correctly left untouched; all 6 subgroups nest exactly the expected
+keys, in order, all collapsed by default; a slider inside a newly-nested
+subgroup (Index's own Curl) still correctly commits to `cfg` and repose
+the field; collapse/expand toggle and the group's own drag-handle both
+work identically to any other group; zero console errors; 510/510 hands
+still rendering.
+
+Cache-buster bumps: `devpanel.js?v=9` -> `?v=10` (via main.js's own
+import line), `index.html`'s own `main.js?v=41` -> `?v=42`.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

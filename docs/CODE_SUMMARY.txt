@@ -1330,3 +1330,36 @@ GOTCHAS
   difference check 2 rounds earlier): the quaternion dot product between
   offset=0 and offset=90 came out to exactly 0.7071 = cos(45 degrees),
   the precise signature of a genuine 90-degree rotation difference.
+- **`organizeGroupSubgroups(groupsEl, groupTitle, subgroupSpecs)`** --
+  a NEW generic export in `devpanel.js`, added to port HANDO's own Pose
+  group subgroup structure without forking the shared engine. The
+  existing `organizeDevPanelSubgroups()` (used for the built-in "Dev
+  Panel" chrome group) is hardcoded to that one group's name and
+  structure and stays untouched -- this is a separate, parameterized
+  function reusing the exact same "flat rows into named subgroups, once,
+  right after `buildDevPanel()`, before a real saved order takes over"
+  shape. Wired in via a new optional `initDevPanel(groups, {
+  organizeSubgroups })` hook, called once inside `initDevPanel()` right
+  after `organizeDevPanelSubgroups(groupsEl)` -- a project passes its own
+  `(groupsEl) => organizeGroupSubgroups(groupsEl, 'GroupTitle', SPEC)`
+  callback rather than this file knowing any project-specific group or
+  control names. Any future project group needing this same "port a
+  reference project's own drag-organized subgroup structure" treatment
+  can reuse this directly, no engine change needed.
+- **HANDO's own Pose group control array has NO subgroup/nesting
+  information at all -- the real structure only ever existed in its own
+  committed `data/processed/dev-panel-settings.json` (the `order`
+  array's "Pose" entry).** Confirmed directly: HANDO's `main.js` Pose
+  `controls:` array is flat, and its subgroups were built entirely via
+  live drag-and-drop, captured only in that saved-settings JSON --
+  reading the CODE would have missed the entire structure. Ported from
+  HANDO's own subgroup order/grouping exactly (Whole-Hand Rotation +
+  Thumb, Wrist, Index, Middle, Ring, Pinky), but with descriptive names
+  instead of HANDO's own literal ones -- HANDO's 6 subgroups were still
+  named the unrenamed drag-drop defaults ("New Group", "New Group (3)"
+  through "(7)"), never actually renamed there. Omitted HANDO's 5
+  `baseOnlyCurl*` sliders (don't exist as controls in this project) and
+  `hideWrist` from the ported Wrist subgroup (this project's own Hide
+  Wrist belongs to a separate, larger reactive Arm Length system,
+  already deliberately excluded from Pose-preset capture -- see this
+  group's own `POSE_PRESET_KEYS`/`savedPoses` comment).

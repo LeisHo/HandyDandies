@@ -225,6 +225,20 @@ still relevant to understanding current state, per this doc's own
   had been asked before: yes, but the user had explicitly redirected
   that earlier request toward the preview-only Pose Preview viewer
   instead, so nothing applied a pose to the field until this button.
+- **Ported HANDO's own Pose group subgroup structure** (names, nesting,
+  groupings, order) — read directly from HANDO's own committed
+  `data/processed/dev-panel-settings.json`, since HANDO's `main.js`
+  control array has no nesting info at all (the real structure only
+  ever existed in HANDO's own saved/drag-organized state). 6 subgroups
+  in order: Whole-Hand Rotation & Thumb, Wrist, Index, Middle, Ring,
+  Pinky — named descriptively since HANDO's own were still unrenamed
+  drag-drop defaults ("New Group", "New Group (3)"–"(7)"). Omits
+  HANDO's `baseOnlyCurl*` sliders (don't exist here) and `hideWrist`
+  from Wrist (belongs to this project's own separate Arm Length system).
+  Added a new generic `organizeGroupSubgroups()` export to `devpanel.js`
+  (plus an `initDevPanel({ organizeSubgroups })` hook) so this port
+  didn't require forking the shared engine or touching the existing
+  Dev-Panel-specific version of this same mechanism.
 - **Ported the built-in "Dev Panel" chrome-styling group's expansion
   from `TEMPLATE_DEV_PANEL.html`, scoped to "just the chrome group"**
   (the user's own choice when asked how much of the template's growth to
