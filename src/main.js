@@ -1584,6 +1584,70 @@ function buildPoseDefaultButton() {
   else actionsRow.appendChild(btn)
 }
 buildPoseDefaultButton()
+// TEMPORARY diagnostic tool (direct request context: repeated user
+// reports of a thumb mismatch this session could never reproduce with
+// approximated test data -- every synthetic pose tested came back at
+// exactly 0.0 degrees of error). Rather than asking the user to keep
+// transcribing their own real slider values by hand, this runs the
+// EXACT SAME "Default path" vs. "transition path" comparison directly
+// on whichever Saved Pose is currently selected, using the user's own
+// REAL data, and reports the result via alert() so no DevTools/console
+// access is needed. "Default path": temporarily pushes the pose's own
+// values into cfg and calls onWholeHandRotationChange() (the same
+// re-pose call setSelectedPoseAsDefault() uses), then restores cfg
+// exactly as it was. "Transition path": calls applyPoseValuesToHand()
+// directly (the same function every Click-Hold-Pose/Click-Pose
+// transition uses at progress=1) with the SAME merged values. If this
+// reports 0 degrees for the user's own real pose, the posing math is
+// confirmed correct even for their exact data, and whatever they're
+// seeing is something else entireIy (a different hand, a rendering
+// issue, etc.) -- not a code path this project's own posing pipeline
+// controls. Checks all 5 finger base joints, not just the thumb, so a
+// mismatch anywhere is caught, not just where this session happened to
+// keep looking. Should be removed once the underlying mystery is
+// actually resolved -- this is a debugging aid, not a real feature.
+function diagnosePoseThumbMismatch() {
+  const item = getSelectedSavedPoseItem()
+  if (!item) { alert('Select a saved pose in the list first, then click Diagnose again.'); return }
+  const hand = hands[0]
+  if (!hand || !hand.skinnedMesh) { alert('No hand available to diagnose yet -- try again once the field has loaded.'); return }
+
+  const mergedValues = {}
+  POSE_PRESET_KEYS.forEach((key) => { mergedValues[key] = item[key] !== undefined ? item[key] : POSE_KEY_DEFAULTS[key] })
+
+  const savedCfgSnapshot = {}
+  POSE_PRESET_KEYS.forEach((key) => { savedCfgSnapshot[key] = cfg[key] })
+  POSE_PRESET_KEYS.forEach((key) => { cfg[key] = mergedValues[key] })
+  onWholeHandRotationChange()
+  const boneQuatsViaDefault = {}
+  FINGER_NAMES.forEach((name) => { boneQuatsViaDefault[name] = hand.skinnedMesh.skeleton.getBoneByName(FINGER_JOINTS[name][0]).quaternion.clone() })
+
+  applyPoseValuesToHand(hand, mergedValues, 0)
+  const boneQuatsViaTransition = {}
+  FINGER_NAMES.forEach((name) => { boneQuatsViaTransition[name] = hand.skinnedMesh.skeleton.getBoneByName(FINGER_JOINTS[name][0]).quaternion.clone() })
+
+  POSE_PRESET_KEYS.forEach((key) => { cfg[key] = savedCfgSnapshot[key] })
+  onWholeHandRotationChange()
+
+  const lines = [`Pose "${item.name}" -- Default path vs. Transition path (base joint of each finger):`]
+  FINGER_NAMES.forEach((name) => {
+    const a = boneQuatsViaDefault[name], b = boneQuatsViaTransition[name]
+    const d = a.clone().invert().multiply(b)
+    const deg = THREE.MathUtils.radToDeg(2 * Math.atan2(Math.sqrt(d.x * d.x + d.y * d.y + d.z * d.z), Math.abs(d.w)))
+    lines.push(`  ${name}: ${deg.toFixed(2)} degrees`)
+  })
+  alert(lines.join('\n'))
+}
+function buildDiagnosePoseButton() {
+  const actionsRow = document.querySelector('.dp-row[data-key="savedPoses"] .dp-list-picker-actions')
+  if (!actionsRow) return
+  const btn = document.createElement('button')
+  btn.type = 'button'
+  btn.textContent = 'Diagnose'
+  btn.addEventListener('click', () => diagnosePoseThumbMismatch())
+  actionsRow.appendChild(btn)
+}
+buildDiagnosePoseButton()
 
 // -----------------------------------------------------------------------
 // Pose Preview -- a small, independent Three.js viewport embedded in the
@@ -2733,6 +2797,21 @@ window.addEventListener('pointerup', (e) => {
   // (Click Hold-Pose section, above) for why this must never also count
   // toward Click Pose / Double-Click Pose's own click-count detection.
   if (lastPointerupWasHoldRelease) return
+  // CORRECTED 2026-09-14 (direct user report: "why is there a delay
+  // between the click and the triggered pose transition, even if the
+  // minimum transition time is set to 0"): every click used to wait the
+  // full MOUSE_LOG_MULTICLICK_MS window before triggerClickPose('click')
+  // fired, EVEN when Double-Click Pose wasn't enabled at all -- there was
+  // nothing to disambiguate FROM in that case, so the wait was pure,
+  // avoidable latency. If Double-Click Pose is off, fire 'click'
+  // immediately; the debounce is only genuinely needed when a 2nd click
+  // could arrive and change the outcome.
+  if (!cfg.dblclickEnabled) {
+    clickPoseClickCount = 0
+    clearTimeout(clickPoseClickTimer)
+    triggerClickPose('click')
+    return
+  }
   clickPoseClickCount++
   clearTimeout(clickPoseClickTimer)
   clickPoseClickTimer = setTimeout(() => {
