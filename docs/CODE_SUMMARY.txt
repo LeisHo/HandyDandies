@@ -1363,3 +1363,51 @@ GOTCHAS
   Wrist belongs to a separate, larger reactive Arm Length system,
   already deliberately excluded from Pose-preset capture -- see this
   group's own `POSE_PRESET_KEYS`/`savedPoses` comment).
+- **"Palm Faces Cursor" REDEFINED, same day, from a full 3D palm-normal-
+  aim to a 2D radial roll -- the 3-round-calibrated `palmNormalAligned`/
+  `computePalmFaceCorrectionQuat()` mechanism is gone, deleted outright,
+  not just superseded.** Direct correction after the user tested the old
+  mechanism against their own real settings and found it didn't do what
+  they wanted at all -- they described a completely different, much
+  simpler mental model: each hand should rotate like a compass needle,
+  in the field's own 2D XY plane, by the angle from that hand's own
+  position to the cursor. `computeRadialRollDeg(handPos, cursorPos) =
+  atan2(dx, -dy)` (dx/dy in world space, hand minus cursor) reuses the
+  SAME wrist-crop-plane roll axis (`wristCropNormalAligned`) the Palm
+  Face Rotation slider already established 2 rounds ago -- only the
+  ANGLE source changed (dynamic per-hand-per-frame instead of a single
+  slider value), not the axis or the composition mechanism. The slider
+  still adds onto whatever base angle is in effect (0 when Palm Faces
+  Cursor is off, the dynamic radial angle when it's on).
+
+  The formula was derived directly from the user's own 5 stated
+  reference points (hand below cursor -> 0 degrees, matching the
+  already-correct default "facing up" behavior; above -> 180; right ->
+  90; left -> -90; upper-right diagonal -> 135) BEFORE writing any code
+  -- confirmed by hand that `atan2(dx,-dy)` reproduces every one exactly,
+  then verified again programmatically against all 8 compass points
+  (including the 3 implied diagonals: 45/-45/-135) once implemented.
+
+  Verification methodology, disclosed same as the immediately preceding
+  round: a genuine live-render check is unreliable here (Browser-pane
+  rAF suspends while hidden), so verified the actual composition
+  mathematically instead, via 3 independent quaternion dot-product
+  checks against the EXTERNALLY reconstructed render-loop formula: hand
+  directly below cursor exactly reproduces the pre-existing default
+  lookAt (dot=1.0 -- the "nothing changes for this case" guarantee the
+  user explicitly asked for); hand to the right differs from default by
+  exactly cos(45 degrees)=0.7071 (the signature of a genuine 90-degree
+  difference); adding a 30-degree slider offset on top differs from the
+  base case by exactly cos(15 degrees)=0.9659 (a genuine 30-degree
+  difference). All 3 numbers are the PRECISE trigonometric signatures
+  expected, not approximations.
+
+  **Concurrent-session handling**: `devpanel.js` had a real in-progress
+  uncommitted change from a different session (their own Pose-subgroup
+  `organizeGroupSubgroups` work, landing as `cb11b3c`/`7fc8967` moments
+  before this round started) sitting in the same shared working tree.
+  Confirmed via `git diff src/main.js` before staging that this round's
+  own uncommitted diff contained ONLY this round's own changes (their
+  already-committed content was untouched baseline, not part of the
+  diff) -- staged and committed `index.html`/`main.js` only, left
+  `devpanel.js` completely alone.

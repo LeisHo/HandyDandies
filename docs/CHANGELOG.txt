@@ -2203,6 +2203,120 @@ Cache-buster bumps: `devpanel.js?v=9` -> `?v=10` (via main.js's own
 import line), `index.html`'s own `main.js?v=41` -> `?v=42`.
 
 --------------------------------------------------------------------------------
+2026-09-14  -  ~05:31 AM - 05:37 AM EDT (bounded by checkpoints; see Verified note)
+
+Redefined "Palm Faces Cursor" entirely -- direct correction after the
+user tested it against their own real settings: "palm faces cursor isnt
+working as i expect... every hand more or less faces Upwards [with the
+cursor centered]. what i want is - imagine 8 hands surrounding my
+cursor [at 45-degree increments]... The hand directly below would be
+facing up (as it is currently)... above the cursor... 180... directly
+to the right...90...the one to the left is -90. the one above and to
+the right would have rotation 135... My Palm Face rotation slider wil
+then just add onto that rotation number." This REPLACES the prior
+3-round "aim a calibrated palm-normal vector at the cursor in full 3D"
+mechanism entirely -- the real spec is a much simpler 2D "compass
+needle" roll, not a 3D vector-aim.
+
+Each hand now rotates, around the SAME wrist-crop-plane axis the Palm
+Face Rotation slider already used, by an angle computed fresh per hand
+per frame from THAT hand's own position relative to the live cursor
+target, in the field's own world XY plane: `computeRadialRollDeg(hand,
+cursor) = atan2(dx, -dy)` where `dx = hand.x - cursor.x, dy = hand.y -
+cursor.y`. This exact formula was derived directly from the user's own
+5 stated reference points before writing any code, then verified to
+reproduce every one of them precisely, plus the 3 implied diagonals
+(45/-45/-135 degrees) the user didn't state explicitly but which follow
+the same pattern. The Palm Face Rotation slider now adds directly onto
+this dynamic angle (still applies on its own, at 0 base, when Palm
+Faces Cursor is off -- unchanged from the immediately preceding round).
+
+Removed the now-dead `palmNormalAligned`/`computePalmFaceCorrectionQuat()`
+measurement (the index/pinky-bone cross-product calibration from the
+last 3 rounds) -- not just left unused, deleted outright, since it
+answered a different question ("which face of the mesh is the palm")
+that this simpler 2D-rotation spec doesn't need at all.
+
+Verified live in 2 layers, since the Browser pane's own hidden-pane
+rAF-suspension (documented 2 rounds ago) makes a real live-render check
+unreliable: (1) the bare formula against all 8 of the user's
+above/below/left/right/diagonal reference points, all exact; (2) the
+FULL render-loop composition, externally reconstructed and checked via
+quaternion dot products -- a hand directly below the cursor produces a
+rotation identical to the pre-existing default lookAt (dot=1.0,
+confirming "facing up, as it is currently" is preserved exactly); a
+hand to the right of the cursor differs from default by exactly the
+mathematical signature of a 90-degree rotation (dot=cos(45)=0.7071);
+adding a 30-degree slider offset on top differs from the base case by
+exactly the signature of a 30-degree rotation (dot=cos(15)=0.9659).
+Zero console errors; 510/510 hands.
+
+**Concurrent-session note**: `src/devpanel/devPanel.js` had a real
+in-progress uncommitted change from another session (their own
+`organizeGroupSubgroups` Pose-subgroup work, per their own `cb11b3c`/
+`7fc8967` commits landing moments before this round started) sitting in
+this same shared working tree throughout. Confirmed via `git diff`
+before staging that this round's own uncommitted diff to `main.js`
+contained ONLY this round's own intended changes (their already-committed
+Pose-subgroup content was untouched, already baseline) -- staged and
+committed `index.html`/`main.js` only, left `devpanel.js` completely
+alone for them to commit on their own schedule.
+
+Cache-buster bump: `index.html`'s own `main.js?v=42` -> `?v=43` (their
+own `devpanel.js?v=10` -> `?v=11` import-line bump, for their own
+pending devpanel.js work, was already present in the shared main.js
+file and left untouched).
+
+--------------------------------------------------------------------------------
+2026-09-14  -  ~05:31 AM - 05:38 AM EDT (bounded by checkpoints; see Verified note)
+
+Fixed the Pose subgroup port getting silently flattened on real page
+loads -- direct report: "bro yuo didnt move the settings into the
+groups which was half the point." Root cause: this project's own already
+-documented "stale localStorage" gotcha, hit earlier this session with
+the Dev Panel group's own subgroup port too (that time only ever worked
+around by manually clearing localStorage in a test tab -- never actually
+fixed in code, which is exactly why it resurfaced here). `resetSettings()`
+runs AFTER `organizeGroupSubgroups()`/`organizeDevPanelSubgroups()` build
+the fresh nested structure, and its own `applyOrder()` call -- restoring
+whatever order was ALREADY saved from before either subgroup port existed
+-- moves every listed row back out to a flat layout, since the stale
+saved order has no idea the new subgroups exist.
+
+Fixed both functions to be idempotent (reuse an existing same-titled
+subgroup by querying for it first, instead of always calling
+`createGroupElement()` unconditionally) and added a 2nd call to each,
+right after `resetSettings()` runs in `initDevPanel()` -- so whatever a
+stale order just flattened gets correctly re-nested immediately
+afterward. A genuinely current saved order (one that already reflects
+the nested structure, e.g. after the user drags a row elsewhere post-port
+and saves) is unaffected either way -- this only ever moves a spec'd key
+INTO its subgroup, never fights a real saved position.
+
+Verified by deliberately staging a stale, pre-port, fully-flat Pose
+order into `localStorage` (reconstructed to match exactly what a real
+user's browser would have saved before this session's port existed) and
+reloading: all 6 subgroups (Whole-Hand Rotation & Thumb / Wrist / Index /
+Middle / Ring / Pinky) correctly re-nested their rows, with zero
+duplicate/empty subgroup shells (confirmed via a duplicate-title check),
+and the unrelated Dev Panel group's own MECHANICS/PANEL UI/TEXT structure
+stayed correct throughout. 510/510 hands; zero new console errors (one
+stale, already-documented transient server-connection-reset error was
+present, unrelated).
+
+**Concurrent-session note**: a different session committed a substantial,
+unrelated redefinition of Palm Faces Cursor (a full 2D radial-angle
+redesign, `624f87e`) in this same shared `main.js` while this fix was in
+progress. Left it completely untouched -- confirmed via `git status`/
+`git log` that it had already been committed and pushed by the time this
+round was ready to commit, so no scoped-staging was even needed; this
+round's own commit touched only `devpanel.js`.
+
+Cache-buster bump: none needed this round -- the already-committed
+`devpanel.js?v=11` import-line bump (from the concurrent session's own
+`index.html`/`main.js` commit) already covers this fix's own file.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

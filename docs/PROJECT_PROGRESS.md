@@ -181,43 +181,26 @@ still relevant to understanding current state, per this doc's own
   frame budget regardless -- see CODE_SUMMARY.txt's GOTCHAS for the full
   account. Verified live: correct tab on a genuine fresh load; a manual
   tab switch afterward sticks (checked well past the heal window).
-- **Added "Palm Faces Cursor" (Cursor Tracking group, checkbox, default
-  off).** Direct request: an alternate rotation mode where each hand's
-  PALM (not the fingertip direction) is what's aimed at the cursor --
-  whole-object rotation only, explicitly NOT a pose/skeleton feature
-  (2 direct corrections mid-task confirmed the approach already in
-  progress). Measured the palm-plane normal the same way the existing
-  `alignQuat` is measured (bind-pose bone positions), with the cross-
-  product sign calibrated live against this project's own already-
-  confirmed reference behavior rather than assumed. Implemented as one
-  fixed correction quaternion composed onto the EXISTING per-frame
-  lookAt rotation, not a parallel system -- see CODE_SUMMARY.txt's
-  GOTCHAS for the full derivation. Verified live both mathematically
-  (palm-normal-to-cursor dot product = 0.999999995) and visually
-  (above/below/left hands show the expected ~180/~90-degree relationship
-  described in the request).
-  **CORRECTED 2026-09-14, same day:** the calibration was actually
-  backwards -- real usage showed the back of the hand facing the cursor
-  instead of the palm. Fixed by negating the palm-normal cross product
-  (exact 180-degree flip). Also found the original "verified
-  mathematically" dot-product check was tautological (self-confirms
-  regardless of which cross-product sign is used) -- see CODE_SUMMARY.txt's
-  GOTCHAS for the full account and what to do differently next time.
-  **Same-day follow-on: added a "Palm Face Rotation (Deg)" slider (-180
-  to 180, default 0)** so this correction can be tuned live from the
-  panel instead of needing another code fix if a future calibration is
-  off. Verified with a real independent cross-check (not a tautological
-  one) that the slider's 180-degree end reproduces the exact old
-  (pre-fix) rotation.
-  **Same-day 2nd follow-on: fixed the slider's own roll axis** -- it was
-  wrist-to-fingertip (a guess), but the real spec is the wrist crop
-  plane's normal (forearm-to-wrist, same direction the Arm Length crop
-  already uses). Confirmed a real fix (not a no-op): the two directions
-  differ by 28.35 degrees in this rig's bind pose.
-  **Same-day 3rd follow-on: the slider now works even with Palm Faces
-  Cursor off** (previously had zero effect in that state) -- factored
-  the roll out of the palm-facing correction so it applies on its own,
-  rolling every hand's default tracking orientation directly.
+- **"Palm Faces Cursor" (Cursor Tracking group, checkbox, default off) +
+  "Palm Face Rotation (Deg)" slider.** Went through several rounds the
+  same day before landing on its current, user-specified design (full
+  history in CHANGELOG.txt) -- current behavior: with the checkbox on,
+  each hand rotates, around the wrist-crop-plane's own normal axis, by
+  the angle from that hand's own position to the live cursor in the
+  field's world XY plane (`computeRadialRollDeg()` = `atan2(dx, -dy)`,
+  a "compass needle" 2D roll) -- a hand directly below the cursor faces
+  up (0 degrees, matching the default fingertip-tracking look), above
+  faces down (180), right is 90, left is -90, and so on around the
+  compass. With the checkbox off, this same mechanism still runs but at
+  a fixed 0-degree base. The Palm Face Rotation slider always adds
+  directly onto whatever base angle is in effect. Verified via
+  quaternion dot-product checks against the externally-reconstructed
+  render-loop math (a genuine live-render check is unreliable here --
+  the Browser pane's own rAF suspends while hidden) -- see
+  CODE_SUMMARY.txt's GOTCHAS for the full derivation and the earlier
+  rounds' own dead-end (a full 3D palm-normal-vector-aim mechanism,
+  calibrated across 3 rounds, ultimately replaced entirely once the
+  user's real intent turned out to be this simpler 2D rotation).
 - **"Default" pose button** (Pose group, next to Saved Poses) -- resets
   every pose slider to its code default and re-poses the whole field in
   one call, reusing existing `syncValue()`/`onWholeHandRotationChange()`
