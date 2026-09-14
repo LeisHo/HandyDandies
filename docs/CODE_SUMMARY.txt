@@ -1707,23 +1707,66 @@ GOTCHAS
   explanation for a 0-degree result), then re-applied the fix and reran
   the identical test: exactly 0.0 degrees. See CHANGELOG.txt's own entry
   for the full before/after account.
-- **UNRESOLVED, STILL OPEN (a real, unreproduced discrepancy):** despite
-  the wrist-before-fingers fix directly above measuring 0.0 degrees of
-  error in every test run so far -- including, in a later round, the
-  most realistic test constructed yet (the REAL `setSelectedPoseAsDefault()`
-  button logic, persisted through a genuine page reload, then a real
-  Click-Hold-Pose trigger/release cycle, varying all 5 thumb keys plus
-  wrist bend/splay together) -- the user reports the retransitioned pose
-  still shows the wrong thumb, and confirmed this persists after a hard
-  refresh (ruling out stale cache as the explanation). `window.__debug`
-  now exposes `poseDefaultValues`/`setSelectedPoseAsDefault`/
-  `getSelectedSavedPoseItem` (previously none were reachable from
-  outside the module) specifically to support further investigation.
-  Whatever is actually wrong in the user's own session has not yet been
-  reproduced in this environment -- see PROJECT_PROGRESS.md's "What's
-  next" for the open follow-up; do not assume the wrist-order fix itself
-  is defective without new evidence, since it has now been verified
-  correct across many independent, realistic trials.
+- **RESOLVED (was "UNRESOLVED, STILL OPEN" in this same section, an
+  earlier round): "thumb pose of all poses except startup still looks
+  wrong."** The wrist-before-fingers fix (above) was always correct --
+  every 0.0-degree test result was real. The REMAINING gap was a
+  SEPARATE issue, only reachable with poses that carry nonzero Whole-
+  Hand Rotation: the user's own key clarification ("i am using imported
+  poses from Hando") revealed that every synthetic test pose used in
+  this session's own prior investigation had modelRotX/Y/Z left at 0,
+  which never exercised it. Root cause: `lerpPoseValues()` (used by both
+  Click-Hold-Pose and Click-Pose) deliberately EXCLUDED modelRotX/Y/Z
+  from interpolation -- a disclosed scope decision from when Click-Hold-
+  Pose was first built, since those 3 keys drove a single SHARED
+  `cloneBaseQuat` used by every hand's own Arm Length position-
+  compensation math, and making them per-hand was flagged at the time as
+  a materially larger change than that feature's own original request.
+  HANDO-imported poses commonly bake nonzero Whole-Hand Rotation into
+  the gesture -- during a transition to such a pose, fingers/wrist
+  correctly animated to the target, but the finger CURL AXES stayed pre-
+  rotated by the OLD, unchanged shared basis throughout, anatomically
+  wrong the instant a pose implies a different whole-hand orientation
+  than the field's current shared sliders say. Confirmed directly:
+  mid-transition, `cfg.modelRotY` measured unchanged (still 0) while the
+  target pose's own modelRotY was 60.
+
+  **Fix (the user explicitly chose the full per-hand interpolation over
+  2 smaller alternatives when asked):** each hand now has its own
+  `currentBaseQuat` (added to the hand object in `rebuildField()`),
+  mirroring the single shared `cloneBaseQuat` every frame for any hand
+  NOT mid a pose-transition (verified: 0.0-degree error vs. an
+  independently-computed reference for ordinary, non-transition Whole-
+  Hand Rotation usage -- no regression). `lerpPoseValues()` now
+  genuinely interpolates modelRotX/Y/Z (the exclusion is gone). A new
+  `computeBaseQuatFromValues(values)` helper (module-level, near
+  `lerpPoseValues`) replicates `updateCloneBaseQuat()`'s own exact
+  formula (`alignQuat` premultiplied onto an Euler built from
+  `values.modelRotX/Y/Z`, in degrees) but reads a passed-in values
+  object instead of live `cfg` -- called from `applyPoseValuesToHand()`
+  every time it runs, writing the result into `hand.currentBaseQuat`
+  before posing that hand's own fingers with it (instead of the shared
+  `cloneBaseQuat`). `applyHandArmLength()` was changed to read
+  `hand.currentBaseQuat` instead of the shared value directly --
+  disclosed tradeoff: since `applyHandArmLength` runs BEFORE the pose-
+  override step in `updateRenderOrder()`'s own per-hand loop, it reads a
+  value that's ~1 frame behind for a hand that's actively transitioning
+  (the ARM-LENGTH POSITION only, never the fingers, which read the fresh
+  value the same frame) -- imperceptible at 60fps, and avoids
+  restructuring the loop's own established bone-posing order just to
+  eliminate a sub-16ms position lag.
+
+  Live-verified across the full lifecycle (not just one moment): a
+  60-degree target modelRotY rotates the hand's own actual rendered
+  orientation by exactly 60.0 degrees during the transition; the shared
+  field-wide `cfg.modelRotY` stays untouched throughout (no leakage to
+  other hands); a hand never touched by any trigger stays exactly synced
+  to the shared basis; after a full retransition cycle, a hand's own
+  basis correctly reverts to the shared/default orientation; ordinary
+  slider-driven Whole-Hand Rotation was re-verified afterward at exactly
+  0.0 degrees of error. See CHANGELOG.txt's own entry for the full
+  account, including the exact clarifying question that broke the case
+  open.
 - **New: "Click Pose" / "Double-Click Pose"** -- a fire-and-forget
   variant of Click Hold-Pose (direct follow-up request). Where Click
   Hold-Pose requires holding the mouse down (forward while held, retransition

@@ -2769,6 +2769,78 @@ was the debug-exposure-only intermediate step for the re-investigation
 above).
 
 --------------------------------------------------------------------------------
+2026-09-14  -  08:37:53 AM - 08:50:24 AM EDT (measured, this entry's own start/finish)
+
+**Finally root-caused the "thumb pose still looks wrong" saga** -- the
+user's own follow-up finally pinned it down: "thumb pose of all poses
+except startup still looks wrong," and, once asked, "i am using imported
+poses from Hando so i cant [re-save a fresh pose to test]." That single
+fact reframed the whole investigation: every prior test this session
+used SYNTHETIC test poses with modelRotX/Y/Z left at 0, which never
+exercised the actual gap.
+
+**Root cause:** Click-Hold-Pose and Click-Pose's own `lerpPoseValues()`
+deliberately EXCLUDED modelRotX/Y/Z from interpolation -- a disclosed
+scope decision from when Click-Hold-Pose was first built, since those 3
+keys drive a single SHARED `cloneBaseQuat` used by every hand's own Arm
+Length position-compensation math, and making them per-hand was flagged
+at the time as "a materially larger change than requested." A pose
+imported from HANDO commonly bakes nonzero Whole-Hand Rotation into the
+gesture itself (unlike the user's own native poses, previously checked
+and found to universally have modelRotX/Y/Z at 0 -- that check simply
+never covered imported poses). During a transition to such a pose, the
+finger/wrist articulation correctly animated to the target, but the
+finger CURL AXES stayed pre-rotated by the OLD, unchanged SHARED basis
+the whole time -- anatomically wrong the instant a pose implies a
+different whole-hand orientation than the field's current shared
+sliders say. "Startup" (nothing ever transitioning) never showed the
+gap since there was nothing for it to diverge from -- confirmed via
+direct test: mid-transition, `cfg.modelRotY` measured unchanged (still
+0) throughout, while the target pose's own modelRotY was 60.
+
+**User explicitly chose the full fix over 2 smaller alternatives**
+(asked directly, since properly fixing this means revisiting the
+original disclosed architectural tradeoff): "Make it interpolate
+per-hand like everything else," over "snap it instantly, no smooth
+transition" or "leave as-is, re-tune poses instead."
+
+**Implementation:** each hand now gets its own `currentBaseQuat` (set at
+creation in `rebuildField()`), kept identical to the single shared
+`cloneBaseQuat` every frame for any hand NOT currently mid a pose-
+transition -- zero behavior change for ordinary Whole-Hand Rotation
+usage, verified directly (0.0 degrees of error against an independently
+computed reference). `lerpPoseValues()` now genuinely interpolates
+modelRotX/Y/Z like every other key (the exclusion is gone); a new
+`computeBaseQuatFromValues()` helper (same formula as
+`updateCloneBaseQuat()`, just reading a passed-in values object instead
+of live `cfg`) computes a per-hand basis from a transition's own
+currently-interpolated modelRot, written into `hand.currentBaseQuat`
+inside `applyPoseValuesToHand()`. `applyHandArmLength()` now reads the
+per-hand basis instead of the shared one directly, accepting a
+disclosed ~1-frame lag on the ARM-LENGTH POSITION specifically during an
+active transition (it runs before this frame's own pose-override step
+updates `currentBaseQuat`) -- imperceptible at 60fps, and avoids
+restructuring the per-hand render-order loop's own established bone-
+posing sequence just to eliminate a sub-16ms lag on a position, never
+the fingers (which read the fresh value the same frame they're posed).
+
+**Live-verified across the full lifecycle:** a target pose with
+modelRotY=60 rotates the hand's own ACTUAL rendered orientation
+(`hand.clone.quaternion`) by exactly 60.0 degrees during the transition
+(previously 0), while the shared field-wide `cfg.modelRotY` stays
+untouched the entire time; a hand never touched by any trigger stays
+exactly synced to the shared basis (0.0 degrees delta); after a full
+retransition cycle completes, a hand's own basis correctly reverts to
+match the shared/default orientation again (0.0 degrees); ordinary,
+non-transition slider-driven Whole-Hand Rotation was independently
+re-verified afterward and measures exactly 0.0 degrees of error against
+a freshly, independently computed reference quaternion -- confirming no
+regression to the feature this change had to touch. Zero new console
+errors, 510/510 hands still rendering throughout.
+
+Cache-buster bump: `index.html`'s own `main.js?v=64` -> `?v=65`.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

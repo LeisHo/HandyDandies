@@ -18,16 +18,15 @@ work seamlessly from there.
 
 ## Currently working on
 
-Nothing actively in progress. Shipped "Click Pose"/"Double-Click Pose"
-(a fire-and-forget variant of Click Hold-Pose: click once, the whole
-transition-pause-retransition sequence runs per-hand on its own) and
-disabled camera pan during an active Click-Hold-Pose trigger. **Still
-open: the user reports the Click-Hold-Pose retransitioned thumb pose is
-wrong even after a hard refresh, but this has NOT been reproduced** —
-every test this session (including the most realistic one yet: the real
-Default-button flow, persisted through an actual page reload, varying
-all 5 thumb keys + wrist bend/splay) measures exactly 0.0deg error. See
-"What's next" for what a future session should try.
+Nothing in progress. The "thumb pose looks wrong" saga (spanning several
+rounds) is now genuinely resolved — the real remaining cause turned out
+to be that HANDO-imported poses commonly carry nonzero Whole-Hand
+Rotation, which Click-Hold-Pose/Click-Pose used to silently ignore
+during a transition. Whole-Hand Rotation now interpolates per-hand
+during a transition, live-verified across the full lifecycle (see
+"Recently completed"). Also shipped "Click Pose"/"Double-Click Pose"
+(fire-and-forget variant of Click Hold-Pose) and disabled camera pan
+during an active Click-Hold-Pose trigger.
 
 ## Recently completed
 
@@ -410,25 +409,35 @@ still relevant to understanding current state, per this doc's own
   target values applied at each stage, correct click/double-click
   disambiguation, pan correctly toggling. See CODE_SUMMARY.txt and
   CHANGELOG.txt for the full account.
+- **RESOLVED: "thumb pose of all poses except startup still looks
+  wrong."** The wrist-before-fingers fix from earlier was always
+  correct; the real remaining gap was that Click-Hold-Pose/Click-Pose
+  silently ignored Whole-Hand Rotation during a transition (a disclosed
+  scope decision from when Click-Hold-Pose was first built) — invisible
+  with the user's own native poses (all had modelRotX/Y/Z at 0) but
+  very visible with poses imported from HANDO, which commonly bake
+  nonzero Whole-Hand Rotation into the gesture itself. Asked the user
+  directly how to fix it; they chose full per-hand interpolation over 2
+  smaller alternatives (snap-instantly, or leave-as-is-and-retune-poses).
+  Each hand now gets its own `currentBaseQuat`, mirroring the shared
+  value when idle, computed fresh from the transition's own interpolated
+  Whole-Hand Rotation while transitioning. Live-verified across the full
+  lifecycle: a 60-degree target rotates the hand's actual rendered
+  orientation by exactly 60.0 degrees during transition, the shared
+  field-wide value stays untouched, a hand reverts correctly after
+  retransition, and ordinary non-transition Whole-Hand Rotation usage
+  measures exactly 0.0 degrees of error (no regression). See
+  CODE_SUMMARY.txt and CHANGELOG.txt for the full account.
 
 ## What's next
 
-**HIGH PRIORITY, UNRESOLVED — needs the user's own saved-pose data to
-make further progress:** the user reports the Click-Hold-Pose
-retransitioned thumb pose is still wrong, confirmed persisting after a
-hard refresh (ruling out stale cache). This session could NOT reproduce
-it despite the most realistic test constructed (the real
-`setSelectedPoseAsDefault()` button flow, persisted through a genuine
-page reload, then a real Click-Hold-Pose trigger/release cycle, varying
-all 5 thumb-specific keys plus wrist bend/splay together — every trial
-measured exactly 0.0 degrees of error). `window.__debug` now exposes
-`poseDefaultValues`/`setSelectedPoseAsDefault`/`getSelectedSavedPoseItem`
-to support this. Next step: get the user's own actual saved-pose JSON
-(via Copy Settings) and their exact repro steps (which saved pose, which
-trigger — chp/rchp/click/dblclick, whether Responsive Wrist Splay is
-also active) rather than guessing at more synthetic test scenarios —
-the discrepancy is real to them and not yet explained by anything this
-session could construct.
+**Per-hand Whole-Hand Rotation's own real visual feel with an actual
+HANDO-imported pose** — verified quantitatively (exact-degree quaternion
+checks against independently-computed references), not yet eyeballed
+against one of the user's own real imported poses in a live browser.
+Worth a direct visual confirmation now that the user has a way to test
+it (any HANDO-imported pose with nonzero Whole-Hand Rotation, used as a
+Click-Hold-Pose or Click-Pose target).
 
 **Click Pose / Double-Click Pose's own real mouse feel** — verified via
 synthetic `pointerup` event dispatch (correct phase sequence, correct
