@@ -301,7 +301,7 @@ const DEV_GROUPS = [
         // refreshSelectOptions() call, not automatically -- without this,
         // saving or deleting a pose here wouldn't show up there until the
         // page reloads.
-        onChange: () => { safeRefreshSelectOptions('chpTargetPose'); safeRefreshSelectOptions('rchpTargetPose') }
+        onChange: () => { safeRefreshSelectOptions('chpTargetPose'); safeRefreshSelectOptions('rchpTargetPose'); safeRefreshSelectOptions('clickTargetPose'); safeRefreshSelectOptions('dblclickTargetPose') }
       },
       // The "Default" button used to live here as its own DEV_GROUPS row
       // (reset every pose slider to its own CODE default). Direct
@@ -427,6 +427,21 @@ const DEV_GROUPS = [
   // machine and the disclosed Whole-Hand-Rotation scope decision.
   makeClickHoldPoseGroup('chp', 'Click Hold-Pose'),
   makeClickHoldPoseGroup('rchp', 'Right-Click Hold-Pose'),
+  // Direct follow-up request: a fire-and-forget variant of Click Hold-
+  // Pose -- no holding required. A single click (or double-click) starts
+  // the SAME transition-with-per-hand-distance-stagger mechanism, but
+  // once triggered, every hand runs its own full sequence to completion
+  // regardless of what the mouse does afterward: transition to target,
+  // PAUSE at the target for a configurable duration, then retransition
+  // back to default -- each phase change happens independently per hand
+  // (a hand that started later, or has a longer pause, does NOT wait for
+  // any other hand). "Click" and "Double-Click" are 2 separate, symmetric
+  // instances (both on the left button, distinguished by click count, not
+  // left/right button the way Click Hold-Pose's own 2 groups are) built
+  // by makeClickPoseGroup() below -- see updateClickPoseForHand()'s own
+  // comment for the full 3-phase state machine.
+  makeClickPoseGroup('click', 'Click Pose'),
+  makeClickPoseGroup('dblclick', 'Double-Click Pose'),
   {
     // Direct user request: "provide me a collapsible pose viewer within
     // the dev panel itself" -- deliberately 0 controls here. buildPosePreview()
@@ -1411,6 +1426,33 @@ function makeClickHoldPoseGroup(p, title) {
     ]
   }
 }
+// Builds ONE Click Pose group's control array -- same shape as
+// makeClickHoldPoseGroup() above (Enabled/TargetPose/TransitionSpeed/
+// StartTimeCurve+Range/RetransitionSpeed/RetransitionStartTimeCurve+Range),
+// plus ONE new control this fire-and-forget variant needs that
+// hold-based Click-Hold-Pose never did: Pause Duration (Ms) -- how long
+// a hand sits at the fully-reached target before its own retransition
+// begins. A single flat value, not a curve+range pair like the transition
+// timings -- the request's own "*D* pause duration*" was a single bare
+// setting, and per-hand independence here already comes from the
+// retransition's own existing distance-based stagger (below), not from
+// staggering the pause length itself.
+function makeClickPoseGroup(p, title) {
+  return {
+    title,
+    controls: [
+      { key: `${p}Enabled`, label: `${title} (Master On/Off)`, type: 'checkbox', def: false },
+      { key: `${p}TargetPose`, label: 'Target Pose', type: 'select', def: '', options: () => (cfg.savedPoses || []).map((sp) => sp.name) },
+      { key: `${p}TransitionSpeedMs`, label: 'Pose Transition Speed (Ms)', type: 'slider', min: 0, max: 700, step: 10, def: 400 },
+      { key: `${p}StartTimeCurve`, label: 'Pose Transition Start Time Curve (Distance -> Start Time)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickPoseConfig(p) },
+      { key: `${p}StartTimeRange`, label: 'Pose Transition Min / Max Start Time (Ms)', type: 'text', def: '{"min":0,"max":300}', onChange: () => parseClickPoseConfig(p) },
+      { key: `${p}PauseDurationMs`, label: 'Pause Duration At Target (Ms)', type: 'slider', min: 0, max: 5000, step: 10, def: 500 },
+      { key: `${p}RetransitionSpeedMs`, label: 'Pose Retransition Speed (Ms)', type: 'slider', min: 0, max: 700, step: 10, def: 400 },
+      { key: `${p}RetransitionStartTimeCurve`, label: 'Pose Retransition Start Time Curve (Distance -> Start Time)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickPoseConfig(p) },
+      { key: `${p}RetransitionStartTimeRange`, label: 'Pose Retransition Min / Max Start Time (Ms)', type: 'text', def: '{"min":0,"max":300}', onChange: () => parseClickPoseConfig(p) }
+    ]
+  }
+}
 // Reads whichever Saved Poses row currently carries devPanel.js's own
 // '.dp-list-picker-row-selected' class and returns its underlying item
 // object -- devPanel.js stores this directly on the row element itself
@@ -2339,6 +2381,18 @@ function startClickHoldPose(p) {
   trig.holdStartTime = performance.now()
   trig.forwardSnapshot = {}
   POSE_PRESET_KEYS.forEach((key) => { trig.forwardSnapshot[key] = cfg[key] })
+  // Direct request: "When a click and hold is occurring, during the
+  // hold, moving the cursor should not trigger any panning. Instead, it
+  // should continue holding the held state." This project's own
+  // OrbitControls config maps BOTH left and right mouse buttons to Pan
+  // (see its own setup comment) -- the exact same buttons Click Hold-
+  // Pose's own pointerdown/pointerup listeners already use, so a hold-
+  // and-drag was panning the camera underneath the pose transition.
+  // Cursor-tracking rotation (hand.wrapper.quaternion, animate()'s own
+  // separate per-frame step) is untouched by this -- it never went
+  // through OrbitControls to begin with, so it keeps following the
+  // cursor throughout, exactly as requested.
+  controls.enablePan = false
 }
 // Fresh min/max live-distance snapshot for the retransition stagger,
 // computed once right here (mirrors updateRenderOrder()'s own per-frame
@@ -2348,6 +2402,10 @@ function endClickHoldPose(p) {
   const trig = clickHoldPoseTriggers[p]
   if (!trig.active) return // guard against a stray release with no matching press
   trig.active = false
+  // Only restore panning once NEITHER trigger is still holding -- e.g.
+  // releasing the right button while the left is still held shouldn't
+  // re-enable panning mid-hold.
+  if (!clickHoldPoseTriggers.chp.active && !clickHoldPoseTriggers.rchp.active) controls.enablePan = true
   const now = performance.now()
   let minD = Infinity, maxD = -Infinity
   const dists = hands.map((hand) => {
@@ -2385,6 +2443,143 @@ window.addEventListener('pointerup', (e) => {
   else if (e.button === 2) endClickHoldPose('rchp')
 })
 window.addEventListener('blur', () => { endClickHoldPose('chp'); endClickHoldPose('rchp') })
+
+// -----------------------------------------------------------------------
+// Click Pose / Double-Click Pose -- fire-and-forget variant of Click
+// Hold-Pose (direct follow-up request): no holding required. A single
+// click (or double-click) starts every hand's own full sequence --
+// transition to target, PAUSE at the target for a configurable duration,
+// then retransition back to default -- which then runs to completion
+// entirely on its own, regardless of anything the mouse does afterward.
+// Both triggers live on the LEFT button, distinguished by click count
+// (not left/right button the way Click Hold-Pose's own 2 groups are),
+// since this is a genuinely different axis (count, not button) from
+// Click Hold-Pose's own hold/release axis.
+//
+// Each hand's own phase transitions happen independently, per the
+// request's own explicit requirement: "Retransition start time of a
+// single [hand] does not consider whether every hand has completed
+// their transition. It is independent to that hand specifically." A
+// hand that started later (via the forward stagger) reaches its own
+// target later, pauses starting from THAT moment, and begins ITS OWN
+// retransition once ITS OWN pause elapses -- never gated on any other
+// hand's progress. The retransition's own distance-based start-time
+// stagger (same curve+range mechanism as every other stagger in this
+// project) is computed fresh, per hand, at the exact moment THAT hand's
+// pause ends (using that frame's live distance), not from one shared
+// snapshot the way Click Hold-Pose's own endClickHoldPose() takes at a
+// single release instant -- there's no single "release" event here to
+// snapshot from, so per-hand-live is the natural equivalent.
+//
+// Reuses CLICK_HOLD_KEYS' own neighboring machinery directly:
+// computeStartDelayMs(), lerpPoseValues(), applyPoseValuesToHand(),
+// poseDefaultValues, POSE_PRESET_KEYS -- no new posing math, only a new
+// per-hand phase sequence (forward -> paused -> retransition -> idle,
+// one more phase than Click Hold-Pose's own forward/retransition pair).
+const CLICK_POSE_KEYS = ['click', 'dblclick']
+const clickPoseTriggers = {
+  click: { startCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], startRangeParsed: { min: 0, max: 300 }, retransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionRangeParsed: { min: 0, max: 300 } },
+  dblclick: { startCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], startRangeParsed: { min: 0, max: 300 }, retransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionRangeParsed: { min: 0, max: 300 } }
+}
+function parseClickPoseConfig(p) {
+  const t = clickPoseTriggers[p]
+  try { t.startCurveParsed = JSON.parse(cfg[`${p}StartTimeCurve`]).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
+  try { t.startRangeParsed = JSON.parse(cfg[`${p}StartTimeRange`]) } catch (e) { /* keep last-good value */ }
+  try { t.retransitionCurveParsed = JSON.parse(cfg[`${p}RetransitionStartTimeCurve`]).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
+  try { t.retransitionRangeParsed = JSON.parse(cfg[`${p}RetransitionStartTimeRange`]) } catch (e) { /* keep last-good value */ }
+}
+function getOrInitHandCP(hand) {
+  if (!hand._cp) {
+    hand._cp = {}
+    CLICK_POSE_KEYS.forEach((p) => { hand._cp[p] = { phase: 'idle', triggerTime: 0, forwardSnapshot: null, forwardDelay: 0, pauseStartTime: 0, retransitionStart: null, retransitionStartTime: 0, retransitionDelay: 0, lastAppliedValues: null } })
+  }
+  return hand._cp
+}
+function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) {
+  const cp = getOrInitHandCP(hand)[p]
+  if (cp.phase === 'forward') {
+    const targetPose = (cfg.savedPoses || []).find((sp) => sp.name === cfg[`${p}TargetPose`])
+    if (!targetPose || !cp.forwardSnapshot) { cp.phase = 'idle'; return } // nothing selected -- abandon this hand's sequence rather than get stuck
+    const elapsed = now - cp.triggerTime
+    const speedMs = Math.max(cfg[`${p}TransitionSpeedMs`], 1)
+    const progress = elapsed < cp.forwardDelay ? 0 : THREE.MathUtils.clamp((elapsed - cp.forwardDelay) / speedMs, 0, 1)
+    const values = lerpPoseValues(cp.forwardSnapshot, targetPose, progress)
+    cp.lastAppliedValues = values
+    applyPoseValuesToHand(hand, values, computeResponsiveWristSplayDeg(live, minLiveDist, liveDistRange))
+    if (progress >= 1) { cp.phase = 'paused'; cp.pauseStartTime = now }
+  } else if (cp.phase === 'paused') {
+    // Hold at the fully-reached target -- keep reapplying (not a no-op)
+    // so Responsive Wrist Splay's own live extraSplayDeg keeps tracking
+    // cursor distance throughout the pause, same as every other phase.
+    applyPoseValuesToHand(hand, cp.lastAppliedValues, computeResponsiveWristSplayDeg(live, minLiveDist, liveDistRange))
+    const pauseDurationMs = Math.max(cfg[`${p}PauseDurationMs`], 0)
+    if (now - cp.pauseStartTime >= pauseDurationMs) {
+      cp.phase = 'retransition'
+      cp.retransitionStart = cp.lastAppliedValues || { ...poseDefaultValues }
+      cp.retransitionStartTime = now
+      // Computed from THIS hand's own live distance right now, not a
+      // shared snapshot -- see this section's own top comment for why.
+      cp.retransitionDelay = computeStartDelayMs(live, minLiveDist, liveDistRange, clickPoseTriggers[p].retransitionCurveParsed, clickPoseTriggers[p].retransitionRangeParsed)
+    }
+  } else if (cp.phase === 'retransition') {
+    const elapsed = now - cp.retransitionStartTime
+    const speedMs = Math.max(cfg[`${p}RetransitionSpeedMs`], 1)
+    const progress = elapsed < cp.retransitionDelay ? 0 : THREE.MathUtils.clamp((elapsed - cp.retransitionDelay) / speedMs, 0, 1)
+    const values = lerpPoseValues(cp.retransitionStart, poseDefaultValues, progress)
+    applyPoseValuesToHand(hand, values, computeResponsiveWristSplayDeg(live, minLiveDist, liveDistRange))
+    if (progress >= 1) cp.phase = 'idle'
+  }
+}
+// Starts every hand's own full sequence at once -- unlike
+// startClickHoldPose() (which only marks a trigger "active" and lets
+// updateClickHoldPoseForHand() lazily enter 'forward' per hand next
+// frame), there's no later "release" event to wait for here, so each
+// hand's own forward delay is computed synchronously, right now, from a
+// single combined distance snapshot (same technique endClickHoldPose()
+// already uses for ITS OWN per-hand delays) -- a click should feel
+// immediate, not delayed by up to one frame.
+function triggerClickPose(p) {
+  if (!cfg[`${p}Enabled`]) return
+  const trig = clickPoseTriggers[p]
+  const now = performance.now()
+  const forwardSnapshot = {}
+  POSE_PRESET_KEYS.forEach((key) => { forwardSnapshot[key] = cfg[key] })
+  let minD = Infinity, maxD = -Infinity
+  const dists = hands.map((hand) => {
+    const d = hand.wrapper.position.distanceTo(cursorTarget)
+    if (d < minD) minD = d
+    if (d > maxD) maxD = d
+    return d
+  })
+  const range = Math.max(maxD - minD, 0.001)
+  hands.forEach((hand, i) => {
+    const cp = getOrInitHandCP(hand)[p]
+    cp.phase = 'forward'
+    cp.triggerTime = now
+    cp.forwardSnapshot = forwardSnapshot
+    cp.forwardDelay = computeStartDelayMs(dists[i], minD, range, trig.startCurveParsed, trig.startRangeParsed)
+  })
+}
+// Click vs. double-click disambiguation: a genuine double-click's 2
+// underlying 'click' events can't be told apart from 2 separate single
+// clicks without a short debounce window -- same problem, same fix, as
+// the Mouse Tracking Log's own multi-click classification just above in
+// this file, so this reuses that exact MOUSE_LOG_MULTICLICK_MS window
+// (not a fresh, differently-tuned constant) for consistency. Left button
+// only -- Click Hold-Pose's own right-click instance is unaffected.
+let clickPoseClickCount = 0
+let clickPoseClickTimer = null
+window.addEventListener('pointerup', (e) => {
+  if (e.target && e.target.closest && e.target.closest('.dp-panel')) return
+  if (e.button !== 0) return
+  clickPoseClickCount++
+  clearTimeout(clickPoseClickTimer)
+  clickPoseClickTimer = setTimeout(() => {
+    if (clickPoseClickCount === 1) triggerClickPose('click')
+    else if (clickPoseClickCount >= 2) triggerClickPose('dblclick')
+    clickPoseClickCount = 0
+  }, MOUSE_LOG_MULTICLICK_MS)
+})
 
 // Generic versions of Arm Length's own 2 custom widgets (see
 // buildArmLengthRangeWidget()/buildArmLengthCurveWidget() for the
@@ -2594,6 +2789,23 @@ function buildClickHoldPoseWidgets(p) {
 // clickHoldPoseTriggers (declared just above) to already exist, and that
 // const isn't hoisted the way a function declaration is.
 CLICK_HOLD_KEYS.forEach((p) => { parseClickHoldConfig(p); buildClickHoldPoseWidgets(p) })
+// Same 4-widget shape as buildClickHoldPoseWidgets() above (this feature
+// has no widgets of its own beyond the plain Pause Duration slider,
+// which needs no custom widget) -- reuses the SAME
+// CLICK_HOLD_START_TIME_TRACK_MAX ceiling too, since "start time" means
+// the identical thing in both features.
+function buildClickPoseWidgets(p) {
+  const startCurveRow = document.querySelector(`.dp-row[data-key="${p}StartTimeCurve"]`)
+  const startRangeRow = document.querySelector(`.dp-row[data-key="${p}StartTimeRange"]`)
+  const retransCurveRow = document.querySelector(`.dp-row[data-key="${p}RetransitionStartTimeCurve"]`)
+  const retransRangeRow = document.querySelector(`.dp-row[data-key="${p}RetransitionStartTimeRange"]`)
+  const curveCaption = 'X: Distance From Cursor (%, Nearest→Farthest Hand At Trigger Time)  ·  Y: Start Time Fraction (0=Min, 1=Max)'
+  if (startCurveRow) buildGenericCurveWidget(startCurveRow, { caption: curveCaption, defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
+  if (startRangeRow) buildGenericRangeBarWidget(startRangeRow, { trackMin: 0, trackMax: CLICK_HOLD_START_TIME_TRACK_MAX, unit: 'ms', defaultValue: { min: 0, max: 300 } })
+  if (retransCurveRow) buildGenericCurveWidget(retransCurveRow, { caption: curveCaption, defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
+  if (retransRangeRow) buildGenericRangeBarWidget(retransRangeRow, { trackMin: 0, trackMax: CLICK_HOLD_START_TIME_TRACK_MAX, unit: 'ms', defaultValue: { min: 0, max: 300 } })
+}
+CLICK_POSE_KEYS.forEach((p) => { parseClickPoseConfig(p); buildClickPoseWidgets(p) })
 // Bug fix (direct user report, "I dont see any of the saved poses in the
 // dropdown"): a `select` control's <option> list is populated by
 // `displayValue()` during the host's own restore-from-storage step
@@ -2615,6 +2827,8 @@ CLICK_HOLD_KEYS.forEach((p) => { parseClickHoldConfig(p); buildClickHoldPoseWidg
 // time, even called alone) -- this must never take down the whole page.
 safeRefreshSelectOptions('chpTargetPose')
 safeRefreshSelectOptions('rchpTargetPose')
+safeRefreshSelectOptions('clickTargetPose')
+safeRefreshSelectOptions('dblclickTargetPose')
 // Sets this ONE hand's `clone.quaternion`/`clone.position` for its
 // CURRENT arm-length value `hideT` -- called every frame, per hand, from
 // updateRenderOrder()'s own existing per-hand loop (which already
@@ -3157,6 +3371,20 @@ function updateRenderOrder() {
       CLICK_HOLD_KEYS.forEach((p) => {
         if (clickHoldPoseTriggers[p].active || chpAll[p].phase !== 'idle') {
           updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, nowMs)
+          overridden = true
+        }
+      })
+      // Click Pose / Double-Click Pose -- same "only touch this hand
+      // while it's genuinely mid-sequence" gating as Click Hold-Pose
+      // above, checked separately since these 2 features track separate
+      // per-hand state (hand._cp, not hand._chp) and can be enabled
+      // independently. If a hand is somehow mid-sequence in BOTH
+      // families at once, whichever runs last here wins that frame's
+      // write -- same disclosed simplification as the chp/rchp case.
+      const cpAll = getOrInitHandCP(hand)
+      CLICK_POSE_KEYS.forEach((p) => {
+        if (cpAll[p].phase !== 'idle') {
+          updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, nowMs)
           overridden = true
         }
       })
