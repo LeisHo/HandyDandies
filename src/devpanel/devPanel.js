@@ -1455,16 +1455,16 @@ export function initDevPanel(groups, opts = {}) {
   const builtInGroup = {
     title: 'Dev Panel',
     controls: [
-      { key: 'dp_titleFontSize', label: 'Dev Panel Title Font Size', type: 'slider', min: 8, max: 24, step: 1, def: 22, perDevice: true, onChange: setVar('--dp-title-font-size') },
+      { key: 'dp_titleFontSize', label: 'Dev Panel Title Font Size', type: 'slider', min: 8, max: 24, step: 1, def: 17, defMobile: 11, defLandscape: 22, perDevice: true, onChange: setVar('--dp-title-font-size') },
       { key: 'dp_tabFontSize', label: 'Tab Font Size', type: 'slider', min: 8, max: 24, step: 1, def: 12, perDevice: true, onChange: setVar('--dp-tab-font-size') },
-      { key: 'dp_groupTitleFontSize', label: 'Collapsible Group Title Font Size', type: 'slider', min: 8, max: 24, step: 1, def: 11, perDevice: true, onChange: setVar('--dp-group-title-font-size') },
+      { key: 'dp_groupTitleFontSize', label: 'Collapsible Group Title Font Size', type: 'slider', min: 8, max: 24, step: 1, def: 14, defMobile: 11, defLandscape: 11, perDevice: true, onChange: setVar('--dp-group-title-font-size') },
       // No separate "Body Text Font Size" control (CLAUDE.md §12i, corrected
       // 2026-09-08): it was a redundant duplicate of this one -- the 2 always
       // meant the same cascading base size. Merged into this control's own
       // onChange instead (sets BOTH CSS variables) so every existing CSS
       // rule referencing --dp-body-font-size still resolves correctly,
       // without reintroducing a 2nd slider for the same thing.
-      { key: 'dp_settingsTitleFontSize', label: 'Settings Title Font Size', type: 'slider', min: 8, max: 24, step: 1, def: 12, perDevice: true, onChange: (v) => { setVar('--dp-settings-title-font-size')(v); setVar('--dp-body-font-size')(v) } },
+      { key: 'dp_settingsTitleFontSize', label: 'Settings Title Font Size', type: 'slider', min: 8, max: 24, step: 1, def: 12, defMobile: 10, perDevice: true, onChange: (v) => { setVar('--dp-settings-title-font-size')(v); setVar('--dp-body-font-size')(v) } },
       { key: 'dp_opacity', label: 'Dev Panel Opacity', type: 'slider', min: 0.1, max: 1, step: 0.05, def: 1, onChange: setVar('--dp-opacity') },
       { key: 'dp_bgColor', label: 'Dev Panel Background Color', type: 'color', def: '#000000', onChange: setVar('--dp-bg-color') },
       { key: 'dp_titleColor', label: 'Dev Panel Title Text Color', type: 'color', def: '#ffffff', onChange: setVar('--dp-title-color') },
@@ -1474,8 +1474,13 @@ export function initDevPanel(groups, opts = {}) {
       { key: 'dp_groupLabelBgColor', label: 'Group Label Background Color', type: 'color', def: '#005f8f', onChange: setVar('--dp-group-label-bg-color') },
       {
         key: 'dp_fontFamily', label: 'Dev Panel Font', type: 'select',
-        def: 'Verdana, Geneva, sans-serif',
-        options: () => ['-apple-system, Segoe UI, Roboto, sans-serif', 'monospace', 'Verdana, Geneva, sans-serif', 'Arial, Helvetica, sans-serif', "'Trebuchet MS', Arial, sans-serif"],
+        def: 'Helvetica, Arial, sans-serif',
+        options: () => [
+          'Arial, Helvetica, sans-serif', 'Helvetica, Arial, sans-serif', "'Segoe UI', Arial, sans-serif",
+          'Verdana, Geneva, sans-serif', 'Tahoma, Geneva, sans-serif', "'Trebuchet MS', Arial, sans-serif",
+          "'Century Gothic', Arial, sans-serif", 'Calibri, Arial, sans-serif', "'Lucida Sans Unicode', Arial, sans-serif",
+          "'Open Sans', Arial, sans-serif", "Futura, 'Century Gothic', Arial, sans-serif",
+        ],
         onChange: setVar('--dp-font-family'),
       },
       // 4 independent toggles (CLAUDE.md §12i), not one shared "capitalize
@@ -1507,18 +1512,18 @@ export function initDevPanel(groups, opts = {}) {
       // DEV_PANEL_STYLE_SHARED_KEYS -- tab/group/settings/button letter-
       // spacing are all SHARED there (ported faithfully, not "fixed" to
       // be consistent with title's own perDevice choice).
-      { key: 'dp_titleLetterSpacing', label: 'Dev Panel Title Letter Spacing (Px)', type: 'slider', min: -2, max: 10, step: 0.1, def: 0, perDevice: true, onChange: setVar('--dp-title-letter-spacing') },
+      { key: 'dp_titleLetterSpacing', label: 'Dev Panel Title Letter Spacing (Px)', type: 'slider', min: -2, max: 10, step: 0.1, def: 2.3, defMobile: 0, defLandscape: 0, perDevice: true, onChange: setVar('--dp-title-letter-spacing') },
       { key: 'dp_titleLineHeight', label: 'Dev Panel Title Line Spacing (X)', type: 'slider', min: 0.8, max: 3, step: 0.05, def: 1.2, perDevice: true, onChange: (v) => panel.style.setProperty('--dp-title-line-height', v) },
       { key: 'dp_tabLetterSpacing', label: 'Tab Letter Spacing (Px)', type: 'slider', min: -2, max: 10, step: 0.1, def: 0, onChange: setVar('--dp-tab-letter-spacing') },
       { key: 'dp_tabLineHeight', label: 'Tab Line Spacing (X)', type: 'slider', min: 0.8, max: 3, step: 0.05, def: 1.2, perDevice: true, onChange: (v) => panel.style.setProperty('--dp-tab-line-height', v) },
-      { key: 'dp_groupLetterSpacing', label: 'Group Letter Spacing (Px)', type: 'slider', min: -2, max: 10, step: 0.1, def: 0, onChange: setVar('--dp-group-letter-spacing') },
+      { key: 'dp_groupLetterSpacing', label: 'Group Letter Spacing (Px)', type: 'slider', min: -2, max: 10, step: 0.1, def: 0.8, onChange: setVar('--dp-group-letter-spacing') },
       { key: 'dp_groupLineHeight', label: 'Group Line Spacing (X)', type: 'slider', min: 0.8, max: 3, step: 0.05, def: 1.2, perDevice: true, onChange: (v) => panel.style.setProperty('--dp-group-line-height', v) },
       { key: 'dp_settingsLetterSpacing', label: 'Settings Letter Spacing (Px)', type: 'slider', min: -2, max: 10, step: 0.1, def: 0, onChange: setVar('--dp-settings-letter-spacing') },
       { key: 'dp_settingsLineHeight', label: 'Settings Line Spacing (X)', type: 'slider', min: 0.8, max: 3, step: 0.05, def: 1.2, perDevice: true, onChange: (v) => panel.style.setProperty('--dp-settings-line-height', v) },
       { key: 'dp_buttonFontSize', label: 'Button Text Font Size', type: 'slider', min: 6, max: 30, step: 1, def: 10, perDevice: true, onChange: setVar('--dp-button-font-size') },
       { key: 'dp_buttonLetterSpacing', label: 'Button Letter Spacing (Px)', type: 'slider', min: -2, max: 10, step: 0.1, def: 0, onChange: setVar('--dp-button-letter-spacing') },
       { key: 'dp_buttonLineHeight', label: 'Button Line Spacing (X)', type: 'slider', min: 0.8, max: 3, step: 0.05, def: 1.2, perDevice: true, onChange: (v) => panel.style.setProperty('--dp-button-line-height', v) },
-      { key: 'dp_buttonHeight', label: 'Button Height (Px)', type: 'slider', min: 0, max: 60, step: 1, def: 21, perDevice: true, onChange: setVar('--dp-button-height') },
+      { key: 'dp_buttonHeight', label: 'Button Height (Px)', type: 'slider', min: 0, max: 60, step: 1, def: 21, defMobile: 24, perDevice: true, onChange: setVar('--dp-button-height') },
       { key: 'dp_buttonTextBorder', label: 'Button Text Border (Px)', type: 'slider', min: 0, max: 20, step: 1, def: 0, perDevice: true, onChange: setVar('--dp-button-text-border') },
       { key: 'dp_valueFontSize', label: 'Setting Number Font Size', type: 'slider', min: 6, max: 30, step: 1, def: 10, perDevice: true, onChange: setVar('--dp-value-font-size') },
       { key: 'dp_groupTextColor', label: 'Group Text Color', type: 'color', def: '#ffffff', onChange: setVar('--dp-group-text-color') },
@@ -1528,12 +1533,21 @@ export function initDevPanel(groups, opts = {}) {
       // Genuinely belongs here (see comment above) -- controls the
       // panel's own body-scroll wheel intensity, wired on `body` right
       // after its own creation, above.
-      { key: 'dp_scrollStrength', label: 'Scroll Strength (X)', type: 'slider', min: 0.2, max: 5, step: 0.1, def: 0.2 },
+      { key: 'dp_scrollStrength', label: 'Scroll Strength (X)', type: 'slider', min: 0.2, max: 5, step: 0.1, def: 0.2, defMobile: 1, perDevice: true },
     ]
   }
   devGroups = [builtInGroup, ...devGroups]
+  // `defMobile`/`defLandscape` are optional per-control overrides (added
+  // for template-parity, matching Clicko's own genuinely different tuned
+  // Mobile/Landscape defaults for some per-device fields, e.g. Title Font
+  // Size 17/11/22) -- a control with neither just uses `def` for all 3
+  // devices, same as before this existed.
   builtInGroup.controls.forEach((c) => {
-    DEVICES.forEach((d) => { store[d][c.key] = c.def })
+    DEVICES.forEach((d) => {
+      store[d][c.key] = d === 'mobile' && c.defMobile !== undefined ? c.defMobile
+        : d === 'landscape' && c.defLandscape !== undefined ? c.defLandscape
+        : c.def
+    })
     cfg[c.key] = c.def
   })
   const header = el('div', 'dp-header', { id: 'dpHeader' })
@@ -1766,20 +1780,18 @@ export function initDevPanel(groups, opts = {}) {
   // load restores. A plain <select>, not a custom scrollable list widget
   // (matching the template's own simpler choice here over HANDO's richer
   // per-control picker -- no Rename requested for this whole-panel case).
-  // Sits directly under the Copy/Save/Reset row, as its own standalone
-  // collapsible group OUTSIDE groupsEl -- deliberately not part of the
-  // per-tab reorderable group/drag-reorder system (a saved state covers
-  // the whole panel across all 3 tabs at once; there's only ever one of
-  // this group, unlike Dev Panel/Debug which repeat per tab).
-  const savedStatesGroup = el('div', 'dp-group dp-standalone-group')
-  savedStatesGroup.dataset.key = 'Saved Dev Settings'
-  const savedStatesHeader = el('div', 'dp-group-header')
-  savedStatesHeader.append(
-    el('span', 'arrow', { textContent: '▼' }),
-    el('span', 'dp-group-title-text', { textContent: 'Saved Dev Settings' })
-  )
-  savedStatesHeader.addEventListener('click', () => savedStatesGroup.classList.toggle('collapsed'))
-  const savedStatesBody = el('div', 'dp-group-body')
+  // Sits directly under the Copy/Save/Reset row by default (first group
+  // in groupsEl, above "Dev Panel") -- but IS a genuine member of
+  // groupsEl, built via the same createGroupElement() every other group
+  // uses, specifically so it gets a real drag-handle and participates in
+  // setupReorder()/getPanelOrder()/applyOrder() like any other group, per
+  // direct request ("Save Dev Settings should also be movable"). Its own
+  // select+button row isn't a registered dev-panel control (no data-key),
+  // so captureGroup() only ever captures/restores the GROUP's own
+  // position -- the select/buttons stay exactly where they already are in
+  // the DOM, never touched by applyOrder()'s row-placement logic.
+  const savedStatesGroup = createGroupElement('Saved Dev Settings')
+  const savedStatesBody = savedStatesGroup.querySelector(':scope > .dp-group-body')
   const savedStatesSelect = el('select', null, { style: 'width:100%; margin-bottom:5px;' })
   const savedStatesBtnRow = el('div', 'dp-actions')
   const saveStateBtn = el('button', null, { type: 'button', textContent: 'Save' })
@@ -1788,8 +1800,7 @@ export function initDevPanel(groups, opts = {}) {
   const setDefaultStateBtn = el('button', null, { type: 'button', textContent: 'Set Default' })
   savedStatesBtnRow.append(saveStateBtn, useStateBtn, deleteStateBtn, setDefaultStateBtn)
   savedStatesBody.append(savedStatesSelect, savedStatesBtnRow)
-  savedStatesGroup.append(savedStatesHeader, savedStatesBody)
-  body.appendChild(savedStatesGroup)
+  groupsEl.insertBefore(savedStatesGroup, groupsEl.firstChild)
 
   function getSavedStates() {
     try {

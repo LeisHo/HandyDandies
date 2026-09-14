@@ -232,7 +232,7 @@ html, body {
   border: 1px solid #3a3a4a; border-radius: 4px; padding: 3px 4px; font-size: var(--dp-body-font-size, 11px);
 }
 .dp-multi-select-row .dp-action-button { flex: 0 0 auto; }
-.dp-standalone-group select {
+.dp-group[data-key="Saved Dev Settings"] select {
   background: #0f0f18; color: var(--dp-text-color, #e8e8f0);
   border: 1px solid #3a3a4a; border-radius: 4px; padding: 3px 4px; font-size: var(--dp-body-font-size, 11px);
 }
