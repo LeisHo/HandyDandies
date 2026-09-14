@@ -1318,9 +1318,25 @@ function applyWristPose() {
 // changes (its own axes are re-expressed relative to cloneBaseQuat, so an
 // already-curled finger's pose goes stale the moment that composition
 // changes -- see onWholeHandRotationChange()).
+// Wrist MUST be posed BEFORE fingers, not after -- this ordering bug was
+// already found and fixed in HANDO (this project's own reference), never
+// ported here when this code was adapted: `rThumb1`'s own PARENT bone is
+// `rHand`, the exact bone applyWristPose() rotates.
+// rotateOnTrueWorldAxis() (used by every finger's own Curl/Splay/Splay2)
+// converts its world axis into the bone's CURRENT local space via the
+// bone's FULL world quaternion, which depends on the ENTIRE parent
+// chain's CURRENT matrixWorld -- so posing the thumb (and technically
+// every finger, though only the thumb is directly parented to `rHand`
+// and visibly affected) before the wrist reaches its own new target
+// rotation used whatever wrist rotation was left over from BEFORE this
+// call, not the one about to be set. Matches HANDO's own bug exactly
+// (direct user report there: "From Scissor 1.5 to Scissor 1 - Wrong
+// (thumb curled/splayed too much)") -- see its own CHANGELOG.txt entry
+// for the full empirical confirmation (2 identical "Use" clicks in a row
+// producing 2 different thumb quaternions).
 function applyAllFingerPoses() {
-  FINGER_NAMES.forEach((name) => applyCurl(name))
   applyWristPose()
+  FINGER_NAMES.forEach((name) => applyCurl(name))
 }
 
 // Saved-pose capture -- every key a saved pose stores, listed once here so
@@ -1566,8 +1582,12 @@ function previewPosePreset(item) {
   )
   previewBaseQuat.copy(alignQuat).multiply(new THREE.Quaternion().setFromEuler(_previewWholeHandRotEuler))
   previewHand.clone.quaternion.copy(previewBaseQuat)
-  FINGER_NAMES.forEach((name) => applyCurlToSkeleton(name, previewHand.skinnedMesh.skeleton, previewBaseQuat, null, values))
+  // Wrist BEFORE fingers -- see applyAllFingerPoses()'s own comment for
+  // why (rThumb1's parent is rHand, the same bone the wrist rotates;
+  // posing it first ensures the finger loop below reads the wrist's
+  // NEW target rotation, not whatever was left over from before).
   applyWristPoseToSkeleton(previewHand.skinnedMesh.skeleton, values)
+  FINGER_NAMES.forEach((name) => applyCurlToSkeleton(name, previewHand.skinnedMesh.skeleton, previewBaseQuat, null, values))
 }
 
 // Whole-Hand Rotation X/Y/Z -- changes `cloneBaseQuat` only (a single
@@ -2267,8 +2287,9 @@ function lerpPoseValues(a, b, t) {
 // "independent, stackable" effect in this project.
 function applyPoseValuesToHand(hand, poseValues, extraSplayDeg) {
   if (!hand.skinnedMesh) return
-  FINGER_NAMES.forEach((name) => applyCurlToSkeleton(name, hand.skinnedMesh.skeleton, cloneBaseQuat, hand.wrapper.quaternion, poseValues))
+  // Wrist BEFORE fingers -- see applyAllFingerPoses()'s own comment.
   applyWristPoseToSkeleton(hand.skinnedMesh.skeleton, poseValues, extraSplayDeg)
+  FINGER_NAMES.forEach((name) => applyCurlToSkeleton(name, hand.skinnedMesh.skeleton, cloneBaseQuat, hand.wrapper.quaternion, poseValues))
 }
 function computeStartDelayMs(distanceToCursor, minLiveDist, liveDistRange, curveParsed, rangeParsed) {
   const normDist = THREE.MathUtils.clamp((distanceToCursor - minLiveDist) / liveDistRange, 0, 1)
