@@ -181,6 +181,21 @@ still relevant to understanding current state, per this doc's own
   frame budget regardless -- see CODE_SUMMARY.txt's GOTCHAS for the full
   account. Verified live: correct tab on a genuine fresh load; a manual
   tab switch afterward sticks (checked well past the heal window).
+- **Added "Palm Faces Cursor" (Cursor Tracking group, checkbox, default
+  off).** Direct request: an alternate rotation mode where each hand's
+  PALM (not the fingertip direction) is what's aimed at the cursor --
+  whole-object rotation only, explicitly NOT a pose/skeleton feature
+  (2 direct corrections mid-task confirmed the approach already in
+  progress). Measured the palm-plane normal the same way the existing
+  `alignQuat` is measured (bind-pose bone positions), with the cross-
+  product sign calibrated live against this project's own already-
+  confirmed reference behavior rather than assumed. Implemented as one
+  fixed correction quaternion composed onto the EXISTING per-frame
+  lookAt rotation, not a parallel system -- see CODE_SUMMARY.txt's
+  GOTCHAS for the full derivation. Verified live both mathematically
+  (palm-normal-to-cursor dot product = 0.999999995) and visually
+  (above/below/left hands show the expected ~180/~90-degree relationship
+  described in the request).
 
 ## What's next
 

@@ -12,6 +12,13 @@ const MODEL_URL = '../data/processed/HAND3D/Hand2.glb'
 // Measured once after the first load -- the rig's own bind-pose "pointing"
 // axis (wrist -> middle fingertip), not assumed to be +Y/-Z.
 let alignQuat = new THREE.Quaternion()
+// "Palm Faces Cursor" (Cursor Tracking group) -- a FIXED, one-time-measured
+// correction, composed onto the per-frame lookAt quaternion (see the
+// tracking code below) only while that mode is enabled. Whole-object
+// rotation only -- never touches the skeleton/pose, per direct
+// correction ("you shouldnt be doing any posing work" / "when i say
+// rotate the hand... I just meant rotate the entire model").
+let palmFaceCorrectionQuat = new THREE.Quaternion()
 let handLengthRaw = 1
 // The actual rendered MESH's bounding sphere (center + radius), measured
 // once at load in the same local/bind-pose frame as alignQuat/
@@ -118,7 +125,12 @@ const DEV_GROUPS = [
       { key: 'trackingEnabled', label: 'Tracking Enabled', type: 'checkbox', def: true },
       { key: 'trackingDamping', label: 'Look-At Damping (x)', type: 'slider', min: 0.02, max: 1, step: 0.01, def: 0.07 },
       { key: 'targetDepthFactor', label: 'Cursor Target Depth (x Field Radius)', type: 'slider', min: -2, max: 2, step: 0.05, def: 0.6, onChange: updateTargetPlane },
-      { key: 'showTargetMarker', label: 'Show Target Marker', type: 'checkbox', def: true, onChange: (v) => { if (targetMarker) targetMarker.visible = v } }
+      { key: 'showTargetMarker', label: 'Show Target Marker', type: 'checkbox', def: true, onChange: (v) => { if (targetMarker) targetMarker.visible = v } },
+      // Direct request: aim each hand's PALM at the cursor instead of its
+      // fingertip direction -- whole-object rotation only (see
+      // palmFaceCorrectionQuat's own declaration comment), never the
+      // skeleton/pose. Default off so nothing changes until opted in.
+      { key: 'palmFacesCursor', label: 'Palm Faces Cursor', type: 'checkbox', def: false }
     ]
   },
   {
@@ -1729,6 +1741,37 @@ new GLTFLoader().load(
     pointDir.normalize()
     alignQuat = new THREE.Quaternion().setFromUnitVectors(pointDir, new THREE.Vector3(0, 0, -1))
 
+    // "Palm Faces Cursor" -- measured the same way as pointDir/alignQuat
+    // above (bind-pose bone positions, identity frame, before any
+    // per-instance clone/scale/rotate): the palm-plane normal is
+    // (pinky-base - wrist) x (index-base - wrist). Sign calibrated LIVE
+    // against this project's own already-confirmed default-mode behavior
+    // ("hands under the cursor show the back of their hand to the
+    // camera... this is correct" -- direct user report): for a hand
+    // below the cursor under the EXISTING pointDir-tracks-cursor
+    // behavior, this exact cross-product direction measured facing AWAY
+    // from the camera, matching "palm away / back toward camera" for
+    // that hand -- confirming this is really the outward palm normal,
+    // not the back-of-hand normal (the opposite cross-product order).
+    // `palmFaceCorrectionQuat` rotates this direction (in the SAME
+    // post-alignQuat local frame the live lookAt tracking already
+    // operates in) onto local -Z -- composed onto the per-frame lookAt
+    // quaternion below, it's what makes the palm (instead of the
+    // fingertip direction) the axis that ends up aimed at the cursor.
+    const indexBaseBone = skinned.skeleton.getBoneByName('rIndex1')
+    const pinkyBaseBone = skinned.skeleton.getBoneByName('rPinky1')
+    if (indexBaseBone && pinkyBaseBone) {
+      const indexBasePos = new THREE.Vector3()
+      const pinkyBasePos = new THREE.Vector3()
+      indexBaseBone.getWorldPosition(indexBasePos)
+      pinkyBaseBone.getWorldPosition(pinkyBasePos)
+      const indexVec = indexBasePos.clone().sub(wristPos)
+      const pinkyVec = pinkyBasePos.clone().sub(wristPos)
+      const palmNormalRaw = pinkyVec.clone().cross(indexVec).normalize()
+      const palmNormalAligned = palmNormalRaw.clone().applyQuaternion(alignQuat)
+      palmFaceCorrectionQuat = new THREE.Quaternion().setFromUnitVectors(palmNormalAligned, new THREE.Vector3(0, 0, -1))
+    }
+
     // Real mesh bounding sphere (see its own declaration comment) --
     // measured here, in the same identity-transform frame as the
     // measurements above, BEFORE any per-instance clone/scale/rotate.
@@ -1801,6 +1844,12 @@ function animate() {
     hands.forEach((hand) => {
       const m = new THREE.Matrix4().lookAt(hand.wrapper.position, cursorTarget, UP)
       const desired = new THREE.Quaternion().setFromRotationMatrix(m)
+      // "Palm Faces Cursor": composes a fixed correction (see its own
+      // declaration comment) onto the same lookAt quaternion above, so
+      // the palm -- not the fingertip direction -- ends up the axis
+      // aimed at the cursor. Whole-wrapper rotation only, same mechanism
+      // as the default mode; no skeleton/pose involvement either way.
+      if (cfg.palmFacesCursor) desired.multiply(palmFaceCorrectionQuat)
       hand.wrapper.quaternion.slerp(desired, cfg.trackingDamping)
     })
   }

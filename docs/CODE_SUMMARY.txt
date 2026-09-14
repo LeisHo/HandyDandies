@@ -88,15 +88,22 @@ Inside `main.js`, in roughly this order:
    replacing HANDO's own bounding-radius reference since each hand instance
    is its own separately-scaled object here). Also builds the ONE shared
    `toonMaterial` here (`createToonMaterial(skinned.material.map)`).
+   Same block also measures `palmFaceCorrectionQuat` (Cursor Tracking's
+   own "Palm Faces Cursor" checkbox, see GOTCHAS) -- the bind-pose palm-
+   plane normal (`(pinky-base - wrist) x (index-base - wrist)`, bones
+   `rPinky1`/`rIndex1`/`rHand`), rotated onto local -Z the same way
+   `pointDir` is, so it can be composed onto the live lookAt quaternion
+   as a fixed correction when that mode is on.
 6. **Field layout** (`rebuildField()`, `relayoutField()`,
    `computeBaseScale()`) -- `rebuildField()` clears and recreates every hand
    instance: `cloneSkeletal(modelRoot)` (three.js `SkeletonUtils.clone`,
    imported as `{ clone as cloneSkeletal }` -- see GOTCHAS), `clone`'s own
-   skinned mesh gets `.material = toonMaterial` (shared, not cloned -- see
-   DECISIONS), plus its own `outlineMesh` (`buildOutlineMesh()`, a
-   `sourceMesh.clone()` sharing that hand's own skeleton, using the ONE
-   shared `outlineMaterial`) parented under `clone` so it inherits the
-   bind-pose `alignQuat` automatically. `relayoutField()` (cheaper --
+   skinned mesh gets its own `.material = toonMaterial.clone()` (own
+   `clippingPlanes`/`onBeforeCompile`, corrected from an earlier shared-
+   material design -- see GOTCHAS), plus its own `outlineMesh`
+   (`buildOutlineMesh()`, a `sourceMesh.clone()` sharing that hand's own
+   skeleton, using its own cloned `outlineMaterial` too) parented under
+   `clone` so it inherits the bind-pose `alignQuat` automatically. `relayoutField()` (cheaper --
    repositions/rescales only) lays out a centered grid using INDEPENDENT
    `cfg.rowSpacing`/`cfg.columnSpacing`, applying a per-row X offset: in
    Alternate mode, odd rows shift by a fixed `cfg.alternateRowOffset`; in
@@ -920,3 +927,59 @@ GOTCHAS
   Desktop active; manually switching to Landscape afterward sticks
   (re-checked 600ms later, past the heal window). `devpanel.js`'s own
   cache-busting import bumped `?v=4` -> `?v=5`.
+- **"Palm Faces Cursor" (Cursor Tracking group, new checkbox) -- whole-
+  object rotation only, deliberately NOT a pose/skeleton feature.**
+  Direct request, with an explicit correction mid-task when an
+  investigation step looked pose-adjacent ("you shouldnt be doing any
+  posing work" / "when i say rotate the hand... I just meant rotate the
+  entire model"). Default (fingers point at cursor) already works by
+  rotating each hand's WRAPPER so its `alignQuat`-aligned local -Z (the
+  bind-pose wrist->middle-fingertip direction) faces the cursor via
+  `THREE.Matrix4.lookAt()`; this feature needed the PALM-NORMAL direction
+  to be the one aimed at the cursor instead, without touching that
+  existing per-frame lookAt code's own shape or any bone/curl value.
+
+  Measured the palm-plane normal the same way `pointDir`/`alignQuat`
+  already are (bind-pose bone world positions, identity-transform frame,
+  at model-load time): `(pinkyBase - wrist) x (indexBase - wrist)`,
+  bones `rHand`/`rIndex1`/`rPinky1`, normalized. Sign (which of the 2
+  possible cross-product orders points OUT of the palm vs. into the back
+  of the hand) was CALIBRATED LIVE rather than assumed: transformed each
+  candidate direction through `alignQuat` and a real hand's own current
+  `wrapper.quaternion` (a hand positioned below the cursor, under the
+  existing default mode), and checked which candidate's world-space
+  direction pointed AWAY from the camera -- matching this project's own
+  already-confirmed reference behavior ("hands under the cursor show the
+  back of their hand to the camera... this is correct," direct user
+  report from an earlier round). `pinky x index` (in that order) was the
+  one that measured facing away from camera for that below-cursor hand,
+  confirming it's the outward palm normal.
+
+  The actual live-tracking change is a single composed quaternion, not a
+  parallel code path: `palmFaceCorrectionQuat = Quaternion.setFromUnitVectors(
+  palmNormalRaw.applyQuaternion(alignQuat), (0,0,-1))` -- a FIXED, one-
+  time-computed correction (same block as `alignQuat` itself, at model
+  load). Given `Q_lookAt.apply((0,0,-1)) == dirToCursor` (lookAt's own
+  guarantee) and `R = Quaternion.setFromUnitVectors(v, (0,0,-1))` implies
+  `R.apply(v) == (0,0,-1)` by construction, composing `desired =
+  Q_lookAt.multiply(R)` (three.js quaternion-multiply order: apply `R`
+  first, then `Q_lookAt`) gives `desired.apply(v) == Q_lookAt.apply(
+  R.apply(v)) == Q_lookAt.apply((0,0,-1)) == dirToCursor` for `v` =
+  `palmNormalAligned` -- i.e. the SAME lookAt quaternion the default mode
+  already computes, with one extra `.multiply()` when the checkbox is on,
+  redirects the palm (not the fingertip axis) to the cursor. No new
+  per-frame cost of consequence, no skeleton/pose code touched at all.
+
+  Verified live, 2 ways: (1) mathematically -- recomputed the exact same
+  correction independently (bind-pose bone extraction via
+  `skeleton.boneInverses`, since a posed/live skeleton's own
+  `getWorldPosition()` no longer reflects bind pose) and confirmed
+  `worldPalmNormal.dot(dirToCursor) = 0.999999995` (correct to float
+  precision) for a hand below a centered cursor; (2) visually -- forced
+  every hand's `wrapper.quaternion` directly (no damping) with the
+  feature on and cursor centered, then compared cropped/upscaled regions
+  above/below/left of the cursor: above vs. below showed a clear
+  vertical-flip relationship, left showed the hand's own long axis
+  rotated to roughly horizontal -- matching the qualitative "rotated
+  ~180 above, ~90 to the side" pattern described in the request. Default
+  OFF (`def: false`) -- nothing changes until opted in.

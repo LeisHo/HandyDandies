@@ -1523,6 +1523,76 @@ Bumped `devpanel.js`'s own cache-busting import query in `main.js`
 (`?v=4` -> `?v=5`) and `index.html`'s (`?v=29` -> `?v=30`).
 
 --------------------------------------------------------------------------------
+2026-09-14 (continued)  -  ~1:55 AM - 2:07 AM EDT
+
+Direct new feature request: "Every hand is oriented the same way more or
+less (palm facing up)... I want to add a new checkbox. When Selected,
+Every hand will always rotate to have the palm facing the cursor." Mid-
+task, 2 direct corrections while investigating bone data: "when i say
+rotate the hand. I dont mean use any of the rigs, I just meant rotate
+the entire model" and "you shouldnt be doing any posing work" -- both
+confirmed the approach already in progress (measuring bind-pose bone
+POSITIONS only, as fixed reference vectors, exactly like the existing
+`alignQuat` setup already does, never touching a bone's own live
+rotation/curl) rather than requiring a course correction.
+
+Investigated the existing cursor-tracking mechanism first: each hand's
+WRAPPER (not the clone/skeleton) gets `lookAt()`-based rotation every
+frame, aiming the `alignQuat`-aligned local -Z axis (the bind-pose
+wrist-to-middle-fingertip direction) at the cursor. Needed an alternate
+mode where the PALM-NORMAL direction, not the fingertip direction, is
+what's aimed at the cursor -- without disturbing the existing lookAt
+code's own shape, since it already works correctly for the default mode.
+
+Measured the palm-plane normal the same way as `pointDir`/`alignQuat`
+(bind-pose bone world positions at model load, identity-transform
+frame): `(pinkyBase - wrist) x (indexBase - wrist)`, bones `rHand`/
+`rIndex1`/`rPinky1`. Calibrated the cross-product SIGN live rather than
+assuming it: transformed both candidate directions through `alignQuat`
+and a real hand's own current `wrapper.quaternion` (a hand below the
+cursor, default mode active) and checked which one measured facing AWAY
+from the camera, matching this project's own already-confirmed reference
+behavior from an earlier round ("hands under the cursor show the back of
+their hand to the camera... this is correct"). `pinky x index` (that
+exact order) was the outward palm normal.
+
+Implemented as a single fixed correction quaternion composed onto the
+EXISTING per-frame lookAt quaternion, not a parallel rotation system:
+`palmFaceCorrectionQuat = Quaternion.setFromUnitVectors(palmNormalRaw
+.applyQuaternion(alignQuat), (0,0,-1))`, computed once at model load
+(same block as `alignQuat`). Given lookAt's own guarantee that its
+quaternion maps local -Z to the cursor direction, and the correction
+quaternion by construction maps the palm-normal direction to local -Z,
+composing `desired.multiply(correctionQuat)` (three.js's own apply-
+right-side-first order) redirects the SAME lookAt result so the palm
+lands where the fingertip direction used to. Whole-wrapper rotation only
+-- zero skeleton/pose/curl code touched, per the mid-task corrections.
+
+Verified live, 2 ways before shipping: (1) mathematically --
+independently re-derived the same correction via `skeleton.boneInverses`
+(bind-pose extraction that works regardless of the skeleton's current
+LIVE pose, unlike `getWorldPosition()` on a posed hand) and confirmed
+`worldPalmNormal.dot(dirToCursor) = 0.999999995` for a hand below a
+centered cursor -- correct to floating-point precision; (2) visually --
+forced every hand's `wrapper.quaternion` directly (undamped) with the
+feature on, cursor centered, and compared cropped/upscaled screen
+regions above/below/left of the cursor: above vs. below hands showed a
+clear vertical-flip relationship, left showed the hand's long axis
+rotated to roughly horizontal -- matching the "roughly 180 above, roughly
+90 to the side" pattern described in the request. Confirmed zero new
+console errors in a fresh tab.
+
+Added as `palmFacesCursor` (Cursor Tracking group, default OFF -- see
+CODE_SUMMARY.txt's GOTCHAS for the full technical account, including the
+quaternion-composition derivation and both verification passes in full).
+Corrected 2 other CODE_SUMMARY.txt lines discovered stale while editing
+this same section (architecture item #5/#6 still described the toon/
+outline materials as "shared, not cloned," predating the wrist-clip-
+plane fix earlier this session -- unrelated to this feature, fixed in
+passing since directly adjacent). Cache-buster bumped `index.html`'s
+`src/main.js?v=30` -> `?v=31`.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================
