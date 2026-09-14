@@ -1131,6 +1131,60 @@ fix, and a 7th documenting the concurrent-session situation and how it
 was handled) and `PROJECT_PROGRESS.md`.
 
 --------------------------------------------------------------------------------
+2026-09-13  -  07:41 PM - 08:07 PM [local]
+
+Direct request (cross-project with HANDO): "I want to be able to set poses
+in our app, save them, then somehow export selected poses into Handy
+Dandies to use there... I don't want import to overwrite ALL poses saved
+in Handy Dandies... In Handy Dandies, also provide the poses list in the
+dev panel with the Save, Overwrite, Use and Delete function. But... when i
+click Use, it doesnt apply it to all the hands on screen. Instead, provide
+me a collapsible pose viewer within the dev panel itself."
+
+Added a Saved Poses list-picker to the Pose group (Save/Overwrite/Use/
+Delete/Rename/+Group, via the shared devpanel.js list-picker engine --
+already in sync with HANDO's own copy, including this session's earlier
+Overwrite/groups/nesting work, so no engine changes were needed on this
+side beyond the new `ctrl.importable` flag, added to BOTH projects'
+devpanel.js in the same pass). "Use" does NOT repose the field -- it
+previews the pose in a brand-new "Pose Preview" collapsible group: its
+own independent Three.js scene/camera/renderer/OrbitControls with one
+more clone of the already-loaded GLB (no extra fetch), posed from the
+saved item's own values via a `values` param added to
+applyCurlToSkeleton()/applyWristPoseToSkeleton() (defaults to `cfg`, so
+every existing call site is unaffected). Verified live via bone-quaternion
+comparison: Use changes ONLY the preview hand's skeleton -- the main
+field's own hands and `cfg` itself are provably untouched.
+
+Import (paste JSON from HANDO's own new "Export Selected" clipboard
+button, same devpanel.js change) merges by name -- overwrites an
+existing same-named pose, adds anything new, never wipes the rest.
+Deliberately excluded the Crop Wrist / Arm Length family from what a
+saved pose captures -- that system is reactive/cursor-driven staging, not
+finger/wrist articulation, and doesn't fit "a pose" the way HANDO's own
+static Hide Wrist crop does.
+
+Fixed 2 real issues found via live testing, not just code review: (1) the
+Pose Preview camera aimed at the raw origin instead of the mesh's own
+measured bounding-sphere center -- this asset's visible mesh includes a
+full forearm hanging below the wrist, so the origin sat well away from
+the actual hand, framing mostly empty space/forearm; (2) the preview's
+own from-scratch lights produced a flat, washed-out white silhouette with
+no visible toon-shading steps -- replaced with clones of the main scene's
+own already-tuned keyLight/hemiLight (a DirectionalLight's effect depends
+only on position-to-target DIRECTION, not magnitude, so their exact
+vectors transfer correctly despite being scaled for the much larger main
+scene). OrbitControls interaction on the preview canvas couldn't be
+verified end-to-end via this environment's synthetic pointer events --
+confirmed this is a sandbox limitation, not a bug, by finding the actual
+thrown error came from INSIDE OrbitControls' own pointerdown handler
+(`setPointerCapture` rejecting a synthetic, non-OS pointerId) -- proof its
+event listeners are correctly attached and firing; a real mouse/touch
+supplies a real pointerId and isn't affected.
+
+Actual: 26m7s (MEASURED: 2026-09-13 19:41:23-20:07:30 EDT).
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

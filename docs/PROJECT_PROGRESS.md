@@ -145,10 +145,17 @@ Other open items worth the user's own confirmation:
   user's own phrasing) — per-hand pose variation/randomization would be a
   new, separately-scoped feature if wanted later, not something this
   round attempted.
-- The Saved-Poses-import/Pose-Preview feature added by the concurrent
-  HANDO-side session (see above) hasn't been independently reviewed or
-  tested by this session — worth a real pass once that other session's
-  own work is confirmed finished.
+- ~~The Saved-Poses-import/Pose-Preview feature added by the concurrent
+  HANDO-side session hasn't been independently reviewed or tested~~ —
+  update from that session itself (2026-09-13 20:07 EDT): now verified
+  live (bone-quaternion comparison proving Use touches only the preview
+  hand, never the field/cfg; 2 real bugs found and fixed, preview camera
+  framing and preview lighting — see CHANGELOG.txt). OrbitControls on the
+  preview canvas couldn't be end-to-end verified via this environment's
+  synthetic pointer events (confirmed a sandbox limitation, not a bug —
+  the thrown error came from inside OrbitControls' own pointerdown
+  handler) — worth a real on-device drag check, same caveat as this
+  project's other OrbitControls/touch items above.
 - The 2 arm-length widgets' resync-from-Reset path (picking up a value
   devPanel.js's own Reset/Copy-restore writes directly into the hidden
   input without firing an event) is code-reviewed and pattern-matches the

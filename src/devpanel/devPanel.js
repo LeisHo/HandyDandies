@@ -234,6 +234,24 @@ function syncListPickerFromDom(entry) {
 function renderListPickerItemRow(entry, item) {
   const row = el('div', 'dp-list-picker-row' + (item === entry.selectedItem ? ' dp-list-picker-row-selected' : ''))
   row.appendChild(el('span', 'dp-lp-row-handle', { textContent: '⠿' }))
+  // Export checkbox -- opt-in per control (ctrl.exportable), so only a
+  // picker that actually wants cross-project export (HANDO's own
+  // savedPoses, for exporting into HANDY DANDIES) grows this UI; every
+  // other picker (Cameras/Lighting/Toon/Tween Sequences, and HANDY
+  // DANDIES' own savedPoses, which only ever IMPORTS) renders unchanged.
+  // Checked state lives in entry.exportChecked (a Set of item object
+  // references, like entry.selectedItem/collapsedGroups) rather than on
+  // the item itself -- it's transient UI state, not something that should
+  // ever get serialized into the saved/exported data.
+  if (entry.ctrl.exportable) {
+    const checkbox = el('input', 'dp-lp-export-checkbox', { type: 'checkbox', checked: entry.exportChecked.has(item) })
+    checkbox.addEventListener('click', (e) => e.stopPropagation())
+    checkbox.addEventListener('change', () => {
+      if (checkbox.checked) entry.exportChecked.add(item)
+      else entry.exportChecked.delete(item)
+    })
+    row.appendChild(checkbox)
+  }
   row.appendChild(el('span', 'dp-lp-row-label', { textContent: item.name }))
   row.__item = item
   // Direct user report, 2026-09-11: on mobile, tapping a name and hitting
@@ -628,11 +646,33 @@ function buildListPickerRow(ctrl, row) {
   const deleteBtn = el('button', null, { type: 'button', textContent: 'Delete' })
   const addGroupBtn = el('button', null, { type: 'button', textContent: '+ Group' })
   btnRow.append(saveBtn, overwriteBtn, useBtn, renameBtn, deleteBtn, addGroupBtn)
+  // Cross-project pose export/import (direct user request): export ships
+  // whatever's CHECKED (entry.exportChecked) as a plain JSON array to the
+  // clipboard -- the exact same navigator.clipboard pattern the panel's
+  // own "Copy Settings" button already uses, so no new transport/backend
+  // is needed. Import reads the clipboard back and MERGES by name (same-
+  // name item overwrites in place, everything else untouched) using the
+  // same "overwrite if the name already exists" rule Save's own button
+  // already applies -- never wipes the rest of the list. Both are opt-in
+  // per control (ctrl.exportable/ctrl.importable) since only HANDO's own
+  // savedPoses control exports and only HANDY DANDIES' own savedPoses
+  // control imports -- every other picker (Cameras/Lighting/Toon/Tween
+  // Sequences) is untouched.
+  let exportBtn = null
+  let importBtn = null
+  if (ctrl.exportable) {
+    exportBtn = el('button', null, { type: 'button', textContent: 'Export Selected' })
+    btnRow.appendChild(exportBtn)
+  }
+  if (ctrl.importable) {
+    importBtn = el('button', null, { type: 'button', textContent: 'Import' })
+    btnRow.appendChild(importBtn)
+  }
   row.appendChild(listEl)
   row.appendChild(btnRow)
   const entry = {
     type: 'list-picker', ctrl, listEl, items: (ctrl.def || []).slice(),
-    selectedItem: null, collapsedGroups: new Set(), pendingGroups: []
+    selectedItem: null, collapsedGroups: new Set(), pendingGroups: [], exportChecked: new Set()
   }
   numEls[ctrl.key] = entry
 
@@ -709,6 +749,54 @@ function buildListPickerRow(ctrl, row) {
     entry.pendingGroups = entry.pendingGroups.concat([name])
     renderListPickerRows(entry)
   })
+  const flashBtn = (btn, msg) => { const orig = btn.textContent; btn.textContent = msg; setTimeout(() => { btn.textContent = orig }, 1400) }
+  if (exportBtn) {
+    exportBtn.addEventListener('click', async () => {
+      const checked = entry.items.filter((it) => entry.exportChecked.has(it))
+      if (checked.length === 0) { flashBtn(exportBtn, 'Check items first'); return }
+      // Strips .group -- the exporting project's own group organization is
+      // meaningless (and could even collide) in whatever project imports
+      // this; the imported items land ungrouped there, same as any other
+      // freshly-Saved item.
+      const payload = checked.map(({ group, ...rest }) => rest)
+      try {
+        await navigator.clipboard.writeText(JSON.stringify(payload, null, 2))
+        flashBtn(exportBtn, `Copied ${checked.length}!`)
+      } catch (err) { flashBtn(exportBtn, 'Copy failed') }
+    })
+  }
+  if (importBtn) {
+    importBtn.addEventListener('click', async () => {
+      let text
+      try {
+        text = await navigator.clipboard.readText()
+      } catch (err) {
+        // Clipboard read can be blocked (permissions, insecure context) --
+        // prompt() as a manual-paste fallback rather than a dead end.
+        text = prompt('Paste exported poses JSON:', '')
+        if (!text) return
+      }
+      let incoming
+      try {
+        incoming = JSON.parse(text)
+        if (!Array.isArray(incoming)) throw new Error('not an array')
+      } catch (err) { flashBtn(importBtn, 'Invalid JSON'); return }
+      // Same "same-name overwrites, everything else untouched" rule as
+      // Save's own button -- an import never wipes the existing list, and
+      // never duplicates an already-present name.
+      let items = entry.items.slice()
+      incoming.forEach((incomingItem) => {
+        if (!incomingItem || typeof incomingItem.name !== 'string') return
+        const existingIndex = items.findIndex((it) => it.name === incomingItem.name)
+        if (existingIndex >= 0) items[existingIndex] = { ...incomingItem, ...(items[existingIndex].group ? { group: items[existingIndex].group } : {}) }
+        else items = items.concat([incomingItem])
+      })
+      entry.items = items
+      commit(ctrl, entry.items)
+      renderListPickerRows(entry)
+      flashBtn(importBtn, `Imported ${incoming.length}!`)
+    })
+  }
   renderListPickerRows(entry)
   // Direct user request: drag-and-drop reordering, and dragging items
   // between groups -- reuses the exact same generic pointer-drag engine
