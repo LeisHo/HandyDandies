@@ -18,15 +18,29 @@ work seamlessly from there.
 
 ## Currently working on
 
-Nothing in progress. The "thumb pose looks wrong" saga (spanning several
-rounds) is now genuinely resolved — the real remaining cause turned out
-to be that HANDO-imported poses commonly carry nonzero Whole-Hand
-Rotation, which Click-Hold-Pose/Click-Pose used to silently ignore
-during a transition. Whole-Hand Rotation now interpolates per-hand
-during a transition, live-verified across the full lifecycle (see
-"Recently completed"). Also shipped "Click Pose"/"Double-Click Pose"
-(fire-and-forget variant of Click Hold-Pose) and disabled camera pan
-during an active Click-Hold-Pose trigger.
+**BLOCKED, needs the user's own data — the "thumb pose looks wrong" saga
+is NOT actually resolved**, despite 4 rounds of real, verified fixes
+(wrist-before-fingers ordering; per-hand Whole-Hand Rotation during
+transitions; HANDO's own Base-Only Curl, previously missing entirely).
+Each fix was confirmed correct via rigorous quantitative testing (0.0
+degrees of error against a "Default"-button reference, every time) —
+but the user reports the thumb is STILL wrong for Click-Hold/Click-Pose
+transition targets and retransitions, even though "Default" applying
+the identical pose looks correct. This session could not reproduce it.
+See "What's next" for the explicit ask (Copy Settings JSON + a
+screenshot) needed to make further progress — continuing to guess at
+more hypotheses without evidence isn't working.
+
+Also fixed 2 real, smaller bugs this same round: releasing a genuine
+Click-Hold-Pose hold no longer also fires Click Pose's own sequence
+(and a regression that first fix itself introduced — instant clicks
+briefly stopped triggering Click Pose at all — is also fixed). Shipped
+"Click Pose"/"Double-Click Pose" (fire-and-forget variant of Click
+Hold-Pose) and disabled camera pan during an active Click-Hold-Pose
+trigger in an earlier round. Investigated a reported cursor-tracking
+edge-of-screen issue — the raw math measures correct and continuous to
+the true last pixel; likely a physical mouse/monitor limit or a dev-
+panel-position interaction, not yet pinned down further.
 
 ## Recently completed
 
@@ -409,8 +423,18 @@ still relevant to understanding current state, per this doc's own
   target values applied at each stage, correct click/double-click
   disambiguation, pan correctly toggling. See CODE_SUMMARY.txt and
   CHANGELOG.txt for the full account.
-- **RESOLVED: "thumb pose of all poses except startup still looks
-  wrong."** The wrist-before-fingers fix from earlier was always
+- **WAS BELIEVED RESOLVED, later found NOT to be — see "Currently working
+  on" above for the real, still-open state.** "thumb pose of all poses
+  except startup still looks wrong": at the time this fix shipped, it
+  was correctly diagnosed and verified for its OWN specific cause (below)
+  — but the user reported the thumb STILL wrong afterward, and 2 more
+  real causes (Base-Only Curl missing entirely; 2 rounds of a Click-Hold/
+  Click-Pose interference bug) were found and fixed after this entry,
+  and the thumb issue is STILL reported wrong even after those. Left in
+  place as an accurate record of what this specific fix actually did and
+  verified — it was a genuine, real bug, just not the ONLY one, and
+  possibly not the one still causing what the user sees now.
+  The wrist-before-fingers fix from earlier was always
   correct; the real remaining gap was that Click-Hold-Pose/Click-Pose
   silently ignored Whole-Hand Rotation during a transition (a disclosed
   scope decision from when Click-Hold-Pose was first built) — invisible
@@ -428,8 +452,54 @@ still relevant to understanding current state, per this doc's own
   retransition, and ordinary non-transition Whole-Hand Rotation usage
   measures exactly 0.0 degrees of error (no regression). See
   CODE_SUMMARY.txt and CHANGELOG.txt for the full account.
+- **Ported HANDO's own Base-Only Curl (5 sliders, one per finger) --
+  this project's own Pose group had omitted it entirely.** Direct user
+  suggestion broke this open: "maybe check hando for pose settings.
+  maybe there is an extra setting you dont have." A pose imported from
+  HANDO using Base-Only Curl on the thumb had that data silently
+  dropped -- no control/key existed here to store or apply it. Added
+  `baseOnlyCurl{Finger}` sliders matching HANDO's own placement/defaults,
+  the additive base-joint-only rotation mechanism, and the 5 new keys to
+  `POSE_PRESET_KEYS` + their per-finger Pose subgroups. Also found and
+  fixed (2 rounds -- the first fix introduced a real regression, caught
+  immediately by the user and corrected the same round) a genuine
+  Click-Hold-Pose/Click-Pose interference bug: releasing a hold was also
+  firing Click Pose's own sequence, then that fix briefly broke instant
+  clicks from triggering Click Pose at all. Both now verified correct
+  together (quick click triggers, genuine hold still suppresses the
+  extra trigger). See CHANGELOG.txt for the full account.
 
 ## What's next
+
+**BLOCKED on the user's own data — the actual, still-unresolved thumb
+issue.** 4 rounds of real, verified fixes (wrist-order; per-hand
+Whole-Hand Rotation; Base-Only Curl) have each independently measured
+0.0 degrees of error against a "Default"-button reference, yet the user
+reports the thumb is STILL wrong for Click-Hold/Click-Pose transition
+targets and retransitions. This session could not reproduce it despite
+exhaustive testing across every code path this session could think to
+check. Next session needs, before attempting another fix:
+1. The user's own actual saved-pose JSON (Copy Settings output) for the
+   specific pose(s) that show the problem.
+2. A screenshot of the wrong thumb (ideally alongside what "correct"
+   looks like, e.g. via "Default").
+3. The exact trigger being used (chp/rchp/click/dblclick) and whether
+   Responsive Wrist Splay is also active.
+Do not attempt another synthetic-test-and-fix round without this data
+-- 4 rounds of that approach have each found a REAL bug (not wasted
+effort) but have not yet found WHATEVER the user is actually seeing.
+
+**Cursor-tracking sticking near the browser edge** -- user-reported,
+not yet resolved. Direct measurement (`cursorTarget` sampled at
+increasing NDC.x toward the true screen edge) found the underlying
+raycast math moves smoothly and continuously all the way to NDC 0.9984
+(the true last pixel) -- no code-level threshold or clamp found. Likely
+either a physical mouse/monitor-edge limit (the OS cursor simply can't
+move further once it reaches the edge of the user's own monitor) or an
+interaction specific to the dev panel's screen position, not yet
+isolated. Worth asking the user: which screen edge, is the dev panel
+positioned near that edge, and does the issue persist with the panel
+hidden ('D' key)?
 
 **Per-hand Whole-Hand Rotation's own real visual feel with an actual
 HANDO-imported pose** — verified quantitatively (exact-degree quaternion

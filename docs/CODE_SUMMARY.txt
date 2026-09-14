@@ -1843,3 +1843,72 @@ GOTCHAS
   OrbitControls at all -- it already continues following the cursor
   through any pose-transition state, including mid-transition, with zero
   code change needed for that half of the request.
+- **Ported HANDO's own "Base-Only Curl" (5 sliders, `baseOnlyCurl{Finger}`,
+  `FINGER_BASE_ONLY_CURL_KEY` map) -- this project's Pose-group port had
+  omitted it entirely, disclosed at the time but never circled back to.**
+  Direct user suggestion found it: "maybe check hando for pose settings.
+  maybe there is an extra setting you dont have." Applied in
+  `applyCurlToSkeleton()` as a 2nd, purely additive `rotateOnTrueWorldAxis`
+  call on joint 0 ONLY (`if (i === 0)`), same curl axis as the regular
+  Curl rotation, positioned right after it -- composes naturally since
+  `rotateOnAxis` always adds onto whatever local rotation the bone
+  already has (same mechanism Splay/Splay2 already use to compose onto
+  Curl for their own joints). `baseOnlyCurlT` reads `values[...] || 0`
+  (not a bare `values[...] / 100`) so an older saved/imported pose
+  missing this key entirely is treated as 0, not `NaN`. Added all 5 new
+  keys to `POSE_PRESET_KEYS` (so capture/lerp/restore all pick them up
+  for free via the existing generic per-key iteration) and to their own
+  per-finger `POSE_SUBGROUP_SPECS` entries. Live-verified in isolation:
+  45 degrees of measured rotation on `rThumb1` (the base joint) between
+  `baseOnlyCurlThumb` 0 and 100, exactly 0 degrees on `rThumb2` (the mid
+  joint) once every other thumb slider was genuinely zeroed (a nonzero
+  reading on a first attempt was traced to leftover `thumbSplay` state
+  from earlier tests in the same persisted session, not a real bug --
+  thumb Splay's own pivot joint is index 1, and its axis conversion
+  correctly depends on the now-differently-rotated parent joint 0, per
+  `rotateOnTrueWorldAxis`'s own by-design behavior). Also re-verified,
+  end-to-end: a Click-Hold-Pose transition to a pose with nonzero
+  `baseOnlyCurlThumb` now measures 0.0 degrees of error against the
+  "Default" button applying the identical pose.
+- **Click-Hold-Pose / Click-Pose interference, 2 rounds (the 1st fix
+  introduced a real regression, caught and corrected the same round).**
+  Round 1, direct report: "for click hold, when i release, it seems to
+  trigger the correct release, but then it calls it again. I suspect it
+  is click hold interferring with click triggers" -- correct. Releasing
+  a Click-Hold-Pose hold fires the same native `pointerup` Click Pose's
+  own listener reacts to on the left button, with no way to distinguish
+  "this pointerup ends a hold" from "this pointerup is a genuine
+  standalone click" -- so every hold-release ALSO fired Click Pose's own
+  sequence. Fixed with `lastPointerupWasHoldRelease` (module-level `let`,
+  set by the Click-Hold-Pose pointerup listener -- registered EARLIER in
+  the file, so it runs first for the same event -- and read by the Click
+  Pose listener before counting a click).
+
+  Round 2, direct report on the SAME session: "i tested the new build and
+  now i cant trigger click nor double click. i thinkn the click hold
+  trigger probably overrides it" -- also correct: `clickHoldPoseTriggers.chp.active`
+  goes true the INSTANT a press starts (Click-Hold-Pose has no minimum
+  hold duration of its own), so with BOTH features enabled, even a
+  genuinely instant click left `.active` true right up until release,
+  making round 1's check suppress EVERY click, not just real holds.
+  Corrected by requiring the hold to have lasted at least
+  `MOUSE_LOG_HELD_DRAG_MS` (reusing the Mouse Tracking Log's own existing
+  "quick tap vs. real hold" threshold, not a new one) before treating a
+  release as suppressible. Live-verified both cases together: a ~50ms
+  click still enters Click Pose's own 'forward' phase; a ~700ms hold
+  still suppresses the extra trigger.
+- **UNRESOLVED, HIGH PRIORITY -- the "thumb pose looks wrong" report is
+  STILL open despite 4 rounds of real, independently-verified fixes**
+  (wrist-before-fingers ordering; per-hand Whole-Hand Rotation during
+  transitions; Base-Only Curl, directly above). Every fix in this
+  sequence was measured at exactly 0.0 degrees of error against a
+  "Default"-button reference for its own specific scenario -- yet the
+  user reports the thumb is STILL wrong for actual Click-Hold/Click-Pose
+  transition targets and retransitions. This session could not reproduce
+  it. Do NOT assume any of the 4 shipped fixes above are themselves
+  defective without new evidence -- each is real, verified, and still
+  correct for what it was tested against. The gap is something this
+  session's own synthetic test poses never happened to exercise. See
+  PROJECT_PROGRESS.md's "What's next" for the specific data needed
+  (the user's own actual saved-pose JSON via Copy Settings, a screenshot,
+  and exact repro steps) before attempting a 5th round.

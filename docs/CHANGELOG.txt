@@ -2841,6 +2841,81 @@ errors, 510/510 hands still rendering throughout.
 Cache-buster bump: `index.html`'s own `main.js?v=64` -> `?v=65`.
 
 --------------------------------------------------------------------------------
+2026-09-14  -  09:39:00 AM - 09:53:36 AM EDT (measured, this entry's own start/finish)
+
+Direct user suggestion broke the "thumb still wrong" case wide open:
+"maybe check hando for pose settings. maybe there is an extra setting
+you dont have." Direct comparison against HANDO's own Pose group found
+exactly that: HANDO has a per-finger "Base-Only Curl" slider (5, one per
+finger) that this project's own Pose-group port had deliberately omitted
+-- disclosed at the time ("don't exist as controls in this project
+yet") but never circled back to. A pose imported from HANDO using Base-
+Only Curl on the thumb had that data silently dropped -- this project
+had no control or key to store or apply it at all.
+
+**Ported Base-Only Curl from HANDO exactly.** Added `baseOnlyCurl{Finger}`
+sliders (5, matching HANDO's own `min:-200,max:200,def:0`) in the same
+position HANDO uses (right after Curl Bias, before Tip Twist); a new
+`FINGER_BASE_ONLY_CURL_KEY` map; the same additive, base-joint-only
+rotation in `applyCurlToSkeleton()` HANDO itself uses (a 2nd
+`rotateOnTrueWorldAxis` call on joint 0 only, same curl axis, composing
+on top of whatever regular Curl+Bias already did); added all 5 keys to
+`POSE_PRESET_KEYS` (so saved/imported poses capture and restore them)
+and to their own per-finger Pose subgroups. `values[key] || 0` guards
+against `NaN` for any older saved pose predating this key.
+
+**Separately, a genuine, correctly-diagnosed interference bug:** direct
+report, "for click hold, when i release, it seems to trigger the correct
+release, but then it calls it again. I suspect it is click hold
+interferring with click triggers." Releasing a Click-Hold-Pose hold
+fires the same native `pointerup` Click Pose/Double-Click Pose also
+listens for on the left button; that listener had no way to tell a
+hold-release apart from a genuine standalone click, so every release
+also fired Click Pose's own sequence on top. Fixed with a
+`lastPointerupWasHoldRelease` flag set by the (earlier-registered)
+Click-Hold-Pose pointerup listener and read by the Click Pose listener.
+
+**That first fix introduced a real regression, caught immediately by
+the user:** "i tested the new build and now i cant trigger click nor
+double click. i thinkn the click hold trigger probably overrides it" --
+correct again. Click-Hold-Pose has no minimum press duration of its own
+(`trig.active` goes true the instant the button goes down), so an
+instant click -- with both features enabled together -- ALSO left
+`.active` true right up until release, making the original fix suppress
+EVERY click, not just genuine holds. Corrected by requiring the hold to
+have actually lasted a perceptible duration (reusing
+`MOUSE_LOG_HELD_DRAG_MS`, the Mouse Tracking Log's own existing "quick
+tap vs. real hold" threshold) before treating a release as suppressible.
+
+Live-verified: Base-Only Curl produces a clean, isolated base-joint
+rotation (45deg on rThumb1, exactly 0deg on rThumb2, with every other
+thumb slider genuinely zeroed); a Click-Hold-Pose transition to a pose
+with `baseOnlyCurlThumb` set now measures 0.0 degrees of error against
+the "Default" button applying the identical pose; a quick (~50ms) click
+correctly enters Click Pose's own 'forward' phase; a genuine sustained
+(~700ms) hold still correctly suppresses the extra click. Also
+separately investigated a user report of cursor-tracking sticking near
+the browser edge -- direct measurement found `cursorTarget` continues
+moving smoothly and continuously all the way to the true last-pixel
+edge (NDC reaching 0.9984), no sign of a code-level threshold; flagged
+to the user as likely a physical mouse/monitor-edge limit or a dev-
+panel-position interaction, pending more specifics.
+
+**Despite all of the above, the user reports the thumb is STILL wrong**
+for Click-Hold/Click-Pose transition targets and for what a retransition
+lands on, even though the identical pose applied via "Default" looks
+correct. This is now the 4th round of exhaustive, verified-correct
+testing (wrist-order fix, per-hand Whole-Hand Rotation, Base-Only Curl,
+each independently measuring exactly 0.0 degrees of error against a
+"Default"-equivalent reference) without reproducing what the user is
+actually seeing. Genuinely blocked without the user's own actual saved-
+pose JSON (Copy Settings) and a screenshot -- see PROJECT_PROGRESS.md's
+"What's next" for the explicit ask.
+
+Cache-buster bumps: `index.html`'s own `main.js?v=65` -> `?v=68` (2
+intermediate debug-exposure bumps for live investigation).
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================
