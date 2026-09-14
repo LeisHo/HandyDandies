@@ -2563,6 +2563,82 @@ to stop verifying and just push; `node --check` syntax validation was
 still performed before every push).
 
 --------------------------------------------------------------------------------
+2026-09-14  -  Actual: NOT MEASURED (no start timestamp captured this round)
+
+Direct request: "In Pose, the Default button should be next to the Save
+overwrite etc etc. When i click it sets the selected pose as the default
+pose. So its the pose on startup, as well as the pose that retransitions
+default back to." Followed by 2 mid-turn clarifications: "and set
+transition speed maxes to 700" / "as in the avialble slider range" / "not
+the actual input setting" (confirms: the SLIDER's max bound, not its
+default value) and "dont verify just fix ad push."
+
+**Default button relocated + entirely redefined.** It used to be its own
+DEV_GROUPS row in the Pose group ("next to Saved Poses"), resetting every
+pose slider to its hardcoded code default. Now it's injected directly
+into the Saved Poses list-picker's own button row (`buildPoseDefaultButton()`,
+next to Save/Overwrite/Use/Rename/Delete) via plain DOM manipulation --
+devPanel.js's generic list-picker builder has no config hook for an extra
+button, and this project's own file-map convention says not to fork that
+shared engine, so this follows the SAME "find-and-augment an existing
+devPanel.js-built row" pattern the Arm Length/Wrist Splay/Click-Hold-Pose
+custom widgets already use, rather than adding devPanel.js UI surface.
+
+Clicking it now reads the currently-selected item via devPanel.js's own
+`row.__item`/`.dp-list-picker-row-selected` DOM convention
+(`getSelectedSavedPoseItem()` -- no devPanel.js change needed, that
+convention was already there for its own internal use, just not
+previously read externally), applies its values to every live Pose
+slider + re-poses the field (`setSelectedPoseAsDefault()`, same
+syncValue()+onWholeHandRotationChange() 2-step the old button used), and
+calls a NEW `saveCurrentSettings()` export from devPanel.js to trigger a
+real persisted save immediately (no separate manual Save/Sync click
+needed) -- satisfying "the pose on startup" via this project's own
+ALREADY-EXISTING restore-from-localStorage mechanism, no bespoke startup
+logic required. `saveCurrentSettings()` is a genuinely new devPanel.js
+export (not a UI change, one small addition to its host-hook surface,
+mirroring the existing `syncValue()`/`refreshSelectOptions()` pattern):
+`initDevPanel()`'s own internal `saveSettings()` closure now assigns
+itself to a module-level `saveSettingsRef` the moment it's defined, and
+the new export calls that reference if set.
+
+"The pose that retransitions default back to": replaced the FROZEN
+`POSE_KEY_DEFAULTS` constant (computed once from code `def` values, never
+changes) at both of Click-Hold-Pose's own retransition-target call sites
+with a new mutable `poseDefaultValues`, seeded from `cfg`'s OWN restored
+Pose values right after `initDevPanel()` runs (so it already matches
+"the pose on startup" the instant the page loads, by construction, no
+separate seeding logic) and updated live by `setSelectedPoseAsDefault()`
+so an in-progress or future retransition targets the new default
+immediately, without waiting for a reload. `POSE_KEY_DEFAULTS` itself is
+UNCHANGED and still used -- purely for its original, narrower job (the
+per-key fallback when a saved/partial pose object is missing a key, e.g.
+an older pose predating a newer slider), a genuinely different concept
+from "what pose does retransition/startup use" that this round
+deliberately did not conflate.
+
+**Transition speed max lowered to 700ms.** `chpTransitionSpeedMs`/
+`rchpTransitionSpeedMs`/`chpRetransitionSpeedMs`/`rchpRetransitionSpeedMs`
+sliders' own `max` bound (the available slider RANGE, confirmed via 2
+follow-up clarifications, not the default VALUE) lowered from 5000 to
+700; each slider's own `def: 400` is unchanged and already sits under the
+new ceiling, so no existing saved value gets silently clamped.
+
+Per direct instruction ("dont verify just fix ad push"), this round was
+NOT independently re-verified live in the browser -- `node --check`
+syntax validation was performed on both changed files before pushing,
+and the implementation was reasoned through statically against
+devPanel.js's own existing, already-verified conventions (`row.__item`,
+`.dp-list-picker-row-selected`, `syncValue()`'s documented semantics)
+rather than live-tested end-to-end. No start timestamp was captured for
+this round (see this entry's own header) -- logged to ETA History with
+`Actual: NOT MEASURED`, per this project's own "never fabricate a
+duration" rule.
+
+Cache-buster bumps: `index.html`'s own `main.js?v=58` -> `?v=59`;
+`main.js`'s own `devpanel.js?v=12` -> `?v=13` (via its import line).
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

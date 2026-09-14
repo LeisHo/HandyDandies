@@ -1604,3 +1604,65 @@ GOTCHAS
   burying the marker, not a sign the code never ran. Confirmed the fix
   by opening a brand-new tab instead of continuing to reload the
   already-degraded one.
+- **Pose's "Default" button lives outside DEV_GROUPS entirely now** --
+  direct request redefined it from "reset every pose slider to its code
+  default" to "set the currently-selected Saved Pose as the app's
+  default (startup + Click-Hold-Pose retransition target)," and to
+  physically sit inside the Saved Poses list-picker's own button row
+  (next to Save/Overwrite/Use/Rename/Delete). devPanel.js's generic
+  `type: 'list-picker'` builder has no config hook for an extra button,
+  and this project's own file-map convention is not to fork that shared
+  engine -- so `buildPoseDefaultButton()` (main.js) does plain DOM
+  injection into `.dp-row[data-key="savedPoses"] .dp-list-picker-actions`
+  after the panel is built, the SAME "find-and-augment an existing
+  devPanel.js-built row" pattern the Arm Length/Wrist Splay/Click-Hold-
+  Pose custom widgets already use for their own hidden-text-input rows.
+  `getSelectedSavedPoseItem()` reads devPanel.js's own internal selection
+  state externally via a DOM convention it ALREADY used for its own
+  purposes (`row.__item = item` set in `renderListPickerItemRow()`,
+  `.dp-list-picker-row-selected` toggled on click) -- no devPanel.js
+  change needed for this part, since that state was already exposed on
+  the DOM, just never previously read by a host app.
+- **`poseDefaultValues` (mutable, `let`) replaces `POSE_KEY_DEFAULTS`
+  (frozen, `const`) at BOTH of Click-Hold-Pose's own retransition-target
+  call sites** (`updateClickHoldPoseForHand()`'s retransition branch, and
+  `endClickHoldPose()`'s `chp.retransitionStart` fallback) -- direct
+  request: the pose Click-Hold-Pose retransitions back to should be
+  "the default pose" (settable via the button above), not the hardcoded
+  code default forever. Seeded once, right after `POSE_KEY_DEFAULTS`
+  itself is computed, from `cfg`'s OWN restored Pose values (whatever
+  `initDevPanel()` just loaded from localStorage, or code `def` if
+  nothing was ever saved) -- this already correctly represents "the pose
+  on startup" the instant that line runs, by the SAME persistence
+  mechanism every other panel setting already uses, so no bespoke
+  startup-specific logic was needed. `setSelectedPoseAsDefault()`
+  updates it live on click, so an in-progress retransition (or the next
+  one) targets the new default without needing a reload first.
+  `POSE_KEY_DEFAULTS` itself is UNCHANGED and still used exactly as
+  before, for its own narrower, genuinely different job: the per-key
+  fallback in `lerpPoseValues()`/`previewPosePreset()` for a saved/
+  partial pose object missing a key (e.g. an older saved pose predating
+  a newer slider) -- deliberately NOT conflated with "what pose is the
+  default," a different question this round's own comments are explicit
+  about keeping separate.
+- **New devPanel.js export: `saveCurrentSettings()`.** Triggers the
+  panel's own real persisted save (the same localStorage/remote write
+  its Save/Sync button performs) programmatically, for a host-app action
+  where waiting on a separate manual Save click would be the wrong UX
+  (here: "Default" should persist immediately, per the direct request's
+  own "so its the pose on startup" wording). Implemented via a new
+  module-level `let saveSettingsRef = null`, set the moment
+  `initDevPanel()`'s own internal `saveSettings()` closure is defined,
+  mirroring the existing `syncValue()`/`refreshSelectOptions()` host-hook
+  pattern rather than reaching for a hackier route (e.g. simulating a
+  click on the actual Save button DOM element, which would silently
+  break if that button's label/position ever changed). This is the one
+  genuine devPanel.js code change this round required -- everything else
+  (the button itself, its click handler, the selected-item read) lives
+  entirely in main.js.
+- **NOT independently live-verified this round** (Pose Default button
+  relocation/redefinition, the 700ms speed-slider cap) -- per direct
+  instruction ("dont verify just fix ad push"), reasoned through
+  statically against devPanel.js's own already-verified conventions
+  rather than clicked in a real browser. See PROJECT_PROGRESS.md's own
+  "What's next" for the specific follow-up checks this leaves open.

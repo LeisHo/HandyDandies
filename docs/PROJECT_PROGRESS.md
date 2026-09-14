@@ -18,12 +18,14 @@ work seamlessly from there.
 
 ## Currently working on
 
-Nothing in progress. 2 direct follow-ups on Click Hold-Pose just shipped
-(Target Pose dropdown fix, master on/off checkboxes) — pushed without a
-full live-verification pass this round per the user's own explicit
-instruction to stop verifying and just push (`node --check` syntax
-validation was still done before every push). See "What's next" for a
-real root-cause item this round left open.
+Nothing in progress. Pose's "Default" button was relocated into the
+Saved Poses list-picker's own button row and redefined (sets the
+selected saved pose as the startup/retransition-target default), and
+Click-Hold-Pose's Transition/Retransition Speed sliders' max bound was
+lowered to 700ms — both pushed without a live-verification pass this
+round, per the user's own explicit instruction to stop verifying and
+just push (`node --check` syntax validation was still done before every
+push). See "What's next" for open follow-ups this leaves.
 
 ## Recently completed
 
@@ -352,8 +354,38 @@ still relevant to understanding current state, per this doc's own
   try/catch wrapper rather than exhaustively debugged further, per
   direct user instruction mid-round to stop verifying and just push.
   See "What's next" below for the follow-up this leaves open.
+- **Pose's "Default" button relocated + redefined; transition speed
+  cap lowered.** The button moved out of its own Pose-group row into the
+  Saved Poses list-picker's own button row (plain DOM injection, no
+  devPanel.js UI change), and now applies the currently-SELECTED saved
+  pose as the app's default rather than resetting to code defaults —
+  both what a fresh page load restores (via a new `saveCurrentSettings()`
+  devPanel.js export, triggering a real persisted save immediately) and
+  what Click-Hold-Pose's own retransition animates toward (a new mutable
+  `poseDefaultValues`, replacing the frozen `POSE_KEY_DEFAULTS` constant
+  at both retransition call sites — `POSE_KEY_DEFAULTS` itself is
+  unchanged, still used for its original, narrower per-key-fallback job).
+  Also lowered the 4 Transition/Retransition Speed sliders' own max
+  bound from 5000ms to 700ms (default value unchanged at 400ms). Not
+  independently live-verified this round, per direct instruction to stop
+  verifying and just push — see "What's next" for the resulting
+  follow-up.
 
 ## What's next
+
+**Needs a real live check next time this file is touched (not flagged
+for the user's input — deferred, not decided, per "dont verify just fix
+ad push"):** the Pose "Default" button relocation/redefinition and the
+700ms speed-slider cap were implemented and reasoned through statically
+(matching devPanel.js's own already-verified `row.__item`/
+`.dp-list-picker-row-selected` conventions and `syncValue()`'s documented
+semantics) but never actually clicked in a browser. Specifically worth
+checking: does the button visually land in the right spot in the Saved
+Poses button row; does clicking it with a pose selected genuinely persist
+(reload the page and confirm the Pose sliders come back at the new
+values, not the old code defaults); does a Click-Hold-Pose retransition
+after clicking "Default" animate toward the newly-set pose rather than
+the old code default.
 
 **Unresolved (needs a real debugging pass, not flagged for the user's
 input — this one's on Claude):** `refreshSelectOptions('rchpTargetPose')`
