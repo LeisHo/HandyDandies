@@ -63,7 +63,11 @@ html, body {
   flex: 0 0 auto;
 }
 .dp-header:active { cursor: grabbing; }
-.dp-title { letter-spacing: .06em; color: var(--dp-title-color, #e8e8f0); }
+.dp-title {
+  letter-spacing: var(--dp-title-letter-spacing, 0px); color: var(--dp-title-color, #e8e8f0);
+  line-height: var(--dp-title-line-height, 1.2); font-weight: var(--dp-title-weight, 600);
+}
+.dp-panel.dp-caps-title-text .dp-title { text-transform: uppercase; }
 .dp-icon-btn {
   flex: 0 0 auto; width: 18px; height: 18px; line-height: 16px; text-align: center;
   background: #3a3a4a; color: var(--dp-text-color, #e8e8f0); border: none; border-radius: 3px;
@@ -88,22 +92,25 @@ html, body {
 }
 .dp-tabs { display: flex; gap: 4px; padding: 2px 2px 8px; }
 .dp-tabs .dp-tab {
-  flex: 1 1 auto; background: #25253a; color: var(--dp-text-color, #a9b4ff); border: none; border-radius: 4px;
+  flex: 1 1 auto; background: #25253a; color: var(--dp-tab-text-color, var(--dp-text-color, #a9b4ff)); border: none; border-radius: 4px;
   padding: 5px 4px; font-size: var(--dp-tab-font-size, 11px); cursor: pointer;
+  letter-spacing: var(--dp-tab-letter-spacing, 0px); line-height: var(--dp-tab-line-height, 1.4);
+  font-weight: var(--dp-tab-weight, 400);
 }
 .dp-tabs .dp-tab.dp-tab-active { background: var(--dp-accent-color, #7d8cff); color: #14142a; font-weight: 600; }
 .dp-actions { display: flex; gap: 6px; padding: 2px 2px 8px; }
 .dp-actions button {
-  flex: 1 1 auto; background: #3a3a4a; color: var(--dp-text-color, #e8e8f0); border: none; border-radius: 4px;
-  padding: 5px 4px; font-size: var(--dp-body-font-size, 11px); cursor: pointer;
+  flex: 1 1 auto; background: #3a3a4a; border: none; border-radius: 4px;
+  padding: 5px 4px; cursor: pointer;
 }
 .dp-actions button:active { background: #4a4a5e; }
 .dp-group { border-top: 1px solid #33333f; }
 .dp-group:first-child { border-top: none; }
 .dp-group.dp-dragging, .dp-row.dp-dragging { opacity: .4; }
 .dp-group-header {
-  padding: 7px 6px; font-weight: 600; font-size: var(--dp-group-title-font-size, 11px); letter-spacing: .04em;
-  color: var(--dp-text-color, #a9b4ff); cursor: pointer; display: flex; align-items: center; gap: 6px;
+  padding: 7px 6px; font-weight: var(--dp-group-weight, 600); font-size: var(--dp-group-title-font-size, 11px);
+  letter-spacing: var(--dp-group-letter-spacing, .04em); line-height: var(--dp-group-line-height, 1.4);
+  color: var(--dp-group-text-color, var(--dp-text-color, #a9b4ff)); cursor: pointer; display: flex; align-items: center; gap: 6px;
   /* Accent-tinted chip, matching TEMPLATE_DEV_PANEL.html's own
      ".dev-section-title { background: rgba(0,255,255,0.1) }". color-mix()
      degrades to a transparent (i.e. no-op) background on a browser that
@@ -140,12 +147,16 @@ html, body {
 }
 .dp-add-group-row button:active { background: #4a4a5e; }
 .dp-row { display: flex; align-items: center; gap: 6px; padding: 3px 2px; }
-.dp-row label { flex: 0 0 auto; width: 112px; font-size: var(--dp-settings-title-font-size, 11px); color: var(--dp-text-color, #c9c9d8); }
+.dp-row label {
+  flex: 0 0 auto; width: 112px; font-size: var(--dp-settings-title-font-size, 11px); color: var(--dp-text-color, #c9c9d8);
+  letter-spacing: var(--dp-settings-letter-spacing, 0px); line-height: var(--dp-settings-line-height, 1.4);
+  font-weight: var(--dp-settings-weight, 400);
+}
 .dp-row.dp-per-device label { color: #ffd27d; }
 .dp-row input[type=range] { flex: 1 1 auto; min-width: 0; accent-color: var(--dp-slider-color, #7d8cff); }
 .dp-num {
-  flex: 0 0 auto; width: 52px; text-align: right; font-size: var(--dp-body-font-size, 11px);
-  background: #0f0f18; color: var(--dp-text-color, #e8e8f0); border: 1px solid #3a3a4a; border-radius: 4px;
+  flex: 0 0 auto; width: 52px; text-align: right; font-size: var(--dp-value-font-size, var(--dp-body-font-size, 11px));
+  background: #0f0f18; color: var(--dp-value-text-color, var(--dp-text-color, #e8e8f0)); border: 1px solid #3a3a4a; border-radius: 4px;
   padding: 2px 4px;
 }
 .dp-row input[type=color] { width: 40px; height: 22px; border: 1px solid #3a3a4a; border-radius: 4px; background: none; padding: 0; }
@@ -266,4 +277,16 @@ html, body {
 }
 .dp-panel.dp-caps-tab-text .dp-tab { text-transform: uppercase; }
 .dp-panel.dp-caps-group-names .dp-group-title-text { text-transform: uppercase; }
+/* Button text battery (font size/color/spacing/line-height/weight, button
+   height, extra vertical text padding) -- one combined rule covering
+   every dev-panel button, so "Button" means the same thing everywhere
+   rather than only the top Copy/Save/Reset row. */
+.dp-actions button, .dp-add-group-row button, .dp-list-picker-actions button, .dp-action-button {
+  color: var(--dp-button-text-color, var(--dp-text-color, #e8e8f0));
+  font-size: var(--dp-button-font-size, var(--dp-body-font-size, 11px));
+  min-height: var(--dp-button-height, 0px);
+  padding-top: calc(5px + var(--dp-button-text-border, 0px)); padding-bottom: calc(5px + var(--dp-button-text-border, 0px));
+  letter-spacing: var(--dp-button-letter-spacing, 0px); line-height: var(--dp-button-line-height, 1.4);
+  font-weight: var(--dp-button-weight, 400);
+}
 .dp-panel.dp-caps-settings-text .dp-row label { text-transform: uppercase; }

@@ -983,3 +983,51 @@ GOTCHAS
   rotated to roughly horizontal -- matching the qualitative "rotated
   ~180 above, ~90 to the side" pattern described in the request. Default
   OFF (`def: false`) -- nothing changes until opted in.
+- **Ported the built-in "Dev Panel" chrome-styling group's expansion from
+  `TEMPLATE_DEV_PANEL.html`, scoped to "just the chrome group"** per
+  direct request when asked how much of the template's own growth (also:
+  a dynamic per-control Mobile/Landscape visibility system, whole-panel
+  Named Setting States, a Standard Text Settings battery -- all left for
+  a later round, not overlooked) to pull in. Added 24 controls to
+  `devpanel.js`'s own `builtInGroup` (16 -> 40 total): per-category
+  (Title/Tab/Group/Settings/Button) Bold toggles + Letter Spacing + Line
+  Spacing sliders, Capitalize Title, Button Font Size, Button Height,
+  Button Text Border (extra vertical button padding), Setting Number
+  Font Size, and 4 new color pickers (Group/Button/Setting-Number/Tab
+  Text Color) -- all wired to new `--dp-*` CSS custom properties in
+  `style.css`, each with a fallback matching this project's own CURRENT
+  hardcoded look (e.g. `font-weight: var(--dp-title-weight, 600)`) so
+  the port is a genuine no-op until a control is actually touched.
+  Renamed the existing `toggleCaps()` helper to `toggleClass()` (still
+  used for the original 4 caps toggles unchanged) since it's now also
+  used for the new Bold toggles -- a same-shape boolean-class-toggle
+  helper, not caps-specific despite the old name. Deliberately did NOT
+  port the template's own "Scroll Strength" control from that same
+  group: read its actual wiring there before assuming it belonged, and
+  found it's a different, unrelated project's own scrollable-game-
+  content wheel-speed multiplier that happened to live in the template's
+  "Dev Panel" bucket, not a genuine panel-chrome control -- this project
+  has no equivalent scrollable content for it to apply to.
+
+  **Found and fixed a real, independently significant bug while
+  verifying this port live:** the very first live check (setting a new
+  color, a new Bold toggle, and Capitalize Title) showed the CSS custom
+  property being set correctly on the panel element every time, but the
+  computed style on the actual descendant elements never changed --
+  confirmed via `document.styleSheets` that the browser was rendering
+  from a STALE CACHED copy of `style.css`, despite a fresh `fetch(...,
+  {cache:'no-store'})` against the same URL correctly showing the new
+  rules server-side. Root cause: `index.html`'s own
+  `<link rel="stylesheet" href="src/style.css">` has NEVER had a cache-
+  busting query string, unlike every other served file in this project
+  (`main.js?v=N`, `devpanel.js?v=N`) -- meaning ANY style.css edit in
+  this project's history could have silently failed to take effect in a
+  browser that had already cached an older copy, not just this round's
+  own change. Fixed by adding `?v=2` to that link tag; bump it on every
+  future style.css edit, the same convention already used for the 2 JS
+  files. Verified live (fresh tab, no prior cache) after the fix: new
+  color/bold/capitalize-title controls all correctly changed their
+  target elements' computed styles; default state (nothing touched)
+  produced the SAME computed styles as before this round's own change
+  (title/group weight 600, button weight 400, matching the pre-existing
+  hardcoded look) -- confirming the port really is a no-op by default.

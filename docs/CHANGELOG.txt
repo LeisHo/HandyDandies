@@ -1593,6 +1593,78 @@ passing since directly adjacent). Cache-buster bumped `index.html`'s
 `src/main.js?v=30` -> `?v=31`.
 
 --------------------------------------------------------------------------------
+2026-09-14 (continued)  -  ~2:17 AM - 2:34 AM EDT
+
+Direct request: "look at the Dev Panel Template and implement any new
+changes." Read `J:\CLAUDE\PROJECTS\.claude\TEMPLATE_DEV_PANEL.html`'s
+own MAINTENANCE note and recent-dated comments first rather than diffing
+the whole 3,654-line file against this project's 1,633-line
+`devpanel.js` blindly -- found the template has grown substantially
+since this project's own copy was made (structurally different too: the
+template is a single self-contained HTML file, `devpanel.js` here
+predates that consolidation as a standalone JS module). Checked the one
+most concretely-described recent template change first (2026-09-14's
+own "reordering starts only from the drag-handle icon" correction) --
+confirmed live in `devpanel.js`'s own `setupReorder()` calls that this
+project already does this correctly, nothing to port there.
+
+Given the remaining delta was large (built-in "Dev Panel" chrome group
+grown from ~16 to ~35+ controls; a new dynamic per-control Mobile/
+Landscape visibility system; a whole-panel Named Setting States upgrade;
+a Standard Text Settings battery), surfaced the scope to the user rather
+than guessing how much to port, per this workspace's own §0a material-
+change convention -- porting everything would mean a real re-
+architecture of `devpanel.js`, not a quick sync. **User chose "Just the
+Dev Panel chrome group."**
+
+Read the template's own expanded group definition in full (its
+`DEVPANEL_STYLE_CONTROLS`/`DEV_PANEL_STYLE_VAR_MAP` arrays) before
+porting anything, rather than assuming every listed control belonged --
+this caught that "Scroll Strength" is actually a DIFFERENT, unrelated
+project's own scrollable-game-content wheel-speed multiplier that just
+happened to live in the template's "Dev Panel" settings bucket, not a
+genuine panel-chrome control; correctly excluded it (this project has no
+equivalent scrollable content). Ported the other 24: per-category
+(Title/Tab/Group/Settings/Button) Bold + Letter Spacing + Line Spacing,
+Capitalize Title, Button Font Size/Height/Text Border, Setting Number
+Font Size, and 4 new colors (Group/Button/Setting-Number/Tab Text
+Color) -- added to `devpanel.js`'s own `builtInGroup` (16 -> 40
+controls total), each wired to a new `--dp-*` CSS custom property in
+`style.css` with a fallback matching this project's own current
+hardcoded look, so the port is a genuine no-op until a control is
+actually touched. Renamed the existing `toggleCaps()` helper to the
+more accurate `toggleClass()` since it's now shared by both the caps
+toggles and the new Bold toggles.
+
+**Live verification immediately surfaced a real, independently
+significant bug, unrelated to anything wrong in the port itself:** the
+first test (a new color, a new Bold toggle, Capitalize Title) showed
+every CSS custom property being set correctly, but the actual rendered
+elements never changed. Diagnosed via `document.styleSheets` rather
+than guessing: the browser was rendering a STALE CACHED `style.css`,
+even though a fresh `fetch(url, {cache:'no-store'})` against the exact
+same URL correctly returned the new rules -- `index.html`'s own
+`<link rel="stylesheet" href="src/style.css">` has NEVER had a cache-
+busting query string, unlike `main.js?v=N`/`devpanel.js?v=N`. This means
+ANY prior style.css edit in this project's history could have silently
+failed to take effect in an already-primed browser, not just this
+round's own change. Fixed by adding `?v=2`; will bump on every future
+style.css edit, matching the existing convention for the 2 JS files.
+
+Re-verified everything in a genuinely fresh tab after the fix: all 3
+sample controls (color, bold, capitalize) correctly changed their
+target elements' computed styles; the UNTOUCHED default state produced
+the exact same computed output as before this round (title/group font-
+weight 600, button font-weight 400, matching the pre-existing hardcoded
+look) -- confirming both correctness and the no-op-by-default guarantee.
+Also spot-checked a slider (Button Height -> 40px, confirmed via
+`getComputedStyle().minHeight`). Zero console errors in the final fresh-
+tab check. Corrected `CODE_SUMMARY.txt` (new GOTCHAS entry covering both
+the port and the cache-buster bug) and `PROJECT_PROGRESS.md`. Cache-
+buster bumps: `devpanel.js?v=5` -> `?v=6`, `style.css` (new) `?v=2`,
+`index.html`'s own `src/main.js?v=31` -> `?v=32`.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

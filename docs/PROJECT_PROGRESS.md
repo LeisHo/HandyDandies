@@ -196,6 +196,25 @@ still relevant to understanding current state, per this doc's own
   (palm-normal-to-cursor dot product = 0.999999995) and visually
   (above/below/left hands show the expected ~180/~90-degree relationship
   described in the request).
+- **Ported the built-in "Dev Panel" chrome-styling group's expansion
+  from `TEMPLATE_DEV_PANEL.html`, scoped to "just the chrome group"**
+  (the user's own choice when asked how much of the template's growth to
+  pull in -- a dynamic per-control Mobile/Landscape visibility system,
+  whole-panel Named Setting States, and a Standard Text Settings battery
+  were explicitly left for later). Added 24 controls (16 -> 40 total):
+  per-category Bold/Letter Spacing/Line Spacing, Capitalize Title,
+  Button Font Size/Height/Text Border, Setting Number Font Size, and 4
+  new text colors -- each a no-op until touched. Deliberately did NOT
+  port the template's own "Scroll Strength" control after checking its
+  real wiring: it's a different, unrelated project's own game-content
+  mechanic, not a genuine panel-chrome setting. **Found and fixed a
+  real, independently significant bug while verifying this live:**
+  `index.html`'s stylesheet link had never had a cache-busting query
+  string (unlike both JS files), so a browser that had already cached
+  `style.css` would silently keep rendering an old version after ANY
+  edit to it, not just this one -- fixed by adding `?v=2`, to be bumped
+  on every future style.css change same as the JS files already are.
+  See CODE_SUMMARY.txt's GOTCHAS for the full account.
 
 ## What's next
 

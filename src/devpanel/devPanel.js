@@ -1375,7 +1375,7 @@ export function initDevPanel(groups, opts = {}) {
   // §12f) since a dev session on an actual mobile screen often wants larger
   // panel text; opacity/colors are shared, no reason to differ by device.
   const setVar = (name) => (v) => panel.style.setProperty(name, typeof v === 'number' ? v + 'px' : v)
-  const toggleCaps = (className) => (v) => panel.classList.toggle(className, !!v)
+  const toggleClass = (className) => (v) => panel.classList.toggle(className, !!v)
   const builtInGroup = {
     title: 'Dev Panel',
     controls: [
@@ -1406,15 +1406,59 @@ export function initDevPanel(groups, opts = {}) {
       // capitalized on its own. Defaults false: HANDO's panel currently has
       // no uppercase text anywhere, so nothing looks different until the
       // user actually touches one.
-      { key: 'dp_capsButtonText', label: 'Capitalize Button Text', type: 'checkbox', def: false, onChange: toggleCaps('dp-caps-button-text') },
-      { key: 'dp_capsTabText', label: 'Capitalize Tab Text', type: 'checkbox', def: false, onChange: toggleCaps('dp-caps-tab-text') },
-      { key: 'dp_capsGroupNames', label: 'Capitalize Group Names', type: 'checkbox', def: false, onChange: toggleCaps('dp-caps-group-names') },
-      { key: 'dp_capsSettingsText', label: 'Capitalize Settings Text', type: 'checkbox', def: false, onChange: toggleCaps('dp-caps-settings-text') },
+      { key: 'dp_capsButtonText', label: 'Capitalize Button Text', type: 'checkbox', def: false, onChange: toggleClass('dp-caps-button-text') },
+      { key: 'dp_capsTabText', label: 'Capitalize Tab Text', type: 'checkbox', def: false, onChange: toggleClass('dp-caps-tab-text') },
+      { key: 'dp_capsGroupNames', label: 'Capitalize Group Names', type: 'checkbox', def: false, onChange: toggleClass('dp-caps-group-names') },
+      { key: 'dp_capsSettingsText', label: 'Capitalize Settings Text', type: 'checkbox', def: false, onChange: toggleClass('dp-caps-settings-text') },
       // Rides through the normal control pipeline (Copy/Save/Reset already
       // cover it via `store`/`cfg` with no extra code) -- only its onChange
       // needs to actually flip the module-level flag setupTextEditClicks()
       // and each group header's own click handler read from.
       { key: 'dp_textEditMode', label: 'Enable Label Rename Mode', type: 'checkbox', def: false, onChange: (v) => { textEditModeEnabled = v } },
+      // Ported from TEMPLATE_DEV_PANEL.html's own expanded "Dev Panel"
+      // group (2026-09-14, "Just the Dev Panel chrome group" per direct
+      // request when asked how much of the template's growth to pull in
+      // -- the dynamic Mobile/Landscape visibility system, whole-panel
+      // Named Setting States, and Standard Text Settings battery were
+      // explicitly left for later, not overlooked). The template's own
+      // "Scroll Strength" control was NOT ported -- confirmed by reading
+      // its actual wiring there that it's a project-specific (another
+      // project's own scrollable game-content list) mechanic that just
+      // happened to live in the template's "Dev Panel" bucket, not a
+      // genuine panel-chrome control; this project has no equivalent
+      // scrollable content for it to apply to. Every default below
+      // matches this project's own CURRENT hardcoded look (bold
+      // true/true/true/false/true for title/tab/button/settings/group,
+      // per the pre-existing hardcoded font-weight:600 on title/group/
+      // button and unweighted settings/tab) except letter-spacing
+      // (previously 2 small hardcoded em values on title/group,
+      // .06em/.04em -- reset to 0 here rather than reverse-converted to
+      // px, matching the template's OWN chosen defaults for these exact
+      // same controls; the visual difference is imperceptible).
+      { key: 'dp_capsTitleText', label: 'Capitalize Title', type: 'checkbox', def: false, onChange: toggleClass('dp-caps-title-text') },
+      { key: 'dp_boldTitle', label: 'Bold Title', type: 'checkbox', def: true, onChange: (v) => panel.style.setProperty('--dp-title-weight', v ? '600' : '400') },
+      { key: 'dp_boldTab', label: 'Bold Tab', type: 'checkbox', def: false, onChange: (v) => panel.style.setProperty('--dp-tab-weight', v ? '600' : '400') },
+      { key: 'dp_boldGroup', label: 'Bold Group Text', type: 'checkbox', def: true, onChange: (v) => panel.style.setProperty('--dp-group-weight', v ? '600' : '400') },
+      { key: 'dp_boldSettings', label: 'Bold Settings Text', type: 'checkbox', def: false, onChange: (v) => panel.style.setProperty('--dp-settings-weight', v ? '600' : '400') },
+      { key: 'dp_boldButton', label: 'Bold Button', type: 'checkbox', def: false, onChange: (v) => panel.style.setProperty('--dp-button-weight', v ? '600' : '400') },
+      { key: 'dp_titleLetterSpacing', label: 'Dev Panel Title Letter Spacing (Px)', type: 'slider', min: -2, max: 10, step: 0.1, def: 0, perDevice: true, onChange: setVar('--dp-title-letter-spacing') },
+      { key: 'dp_titleLineHeight', label: 'Dev Panel Title Line Spacing (X)', type: 'slider', min: 0.8, max: 3, step: 0.05, def: 1.2, perDevice: true, onChange: (v) => panel.style.setProperty('--dp-title-line-height', v) },
+      { key: 'dp_tabLetterSpacing', label: 'Tab Letter Spacing (Px)', type: 'slider', min: -2, max: 10, step: 0.1, def: 0, perDevice: true, onChange: setVar('--dp-tab-letter-spacing') },
+      { key: 'dp_tabLineHeight', label: 'Tab Line Spacing (X)', type: 'slider', min: 0.8, max: 3, step: 0.05, def: 1.4, perDevice: true, onChange: (v) => panel.style.setProperty('--dp-tab-line-height', v) },
+      { key: 'dp_groupLetterSpacing', label: 'Group Letter Spacing (Px)', type: 'slider', min: -2, max: 10, step: 0.1, def: 0, perDevice: true, onChange: setVar('--dp-group-letter-spacing') },
+      { key: 'dp_groupLineHeight', label: 'Group Line Spacing (X)', type: 'slider', min: 0.8, max: 3, step: 0.05, def: 1.4, perDevice: true, onChange: (v) => panel.style.setProperty('--dp-group-line-height', v) },
+      { key: 'dp_settingsLetterSpacing', label: 'Settings Letter Spacing (Px)', type: 'slider', min: -2, max: 10, step: 0.1, def: 0, perDevice: true, onChange: setVar('--dp-settings-letter-spacing') },
+      { key: 'dp_settingsLineHeight', label: 'Settings Line Spacing (X)', type: 'slider', min: 0.8, max: 3, step: 0.05, def: 1.4, perDevice: true, onChange: (v) => panel.style.setProperty('--dp-settings-line-height', v) },
+      { key: 'dp_buttonFontSize', label: 'Button Text Font Size', type: 'slider', min: 6, max: 30, step: 1, def: 11, perDevice: true, onChange: setVar('--dp-button-font-size') },
+      { key: 'dp_buttonLetterSpacing', label: 'Button Letter Spacing (Px)', type: 'slider', min: -2, max: 10, step: 0.1, def: 0, perDevice: true, onChange: setVar('--dp-button-letter-spacing') },
+      { key: 'dp_buttonLineHeight', label: 'Button Line Spacing (X)', type: 'slider', min: 0.8, max: 3, step: 0.05, def: 1.4, perDevice: true, onChange: (v) => panel.style.setProperty('--dp-button-line-height', v) },
+      { key: 'dp_buttonHeight', label: 'Button Height (Px)', type: 'slider', min: 0, max: 60, step: 1, def: 0, perDevice: true, onChange: setVar('--dp-button-height') },
+      { key: 'dp_buttonTextBorder', label: 'Button Text Border (Px)', type: 'slider', min: 0, max: 20, step: 1, def: 0, perDevice: true, onChange: setVar('--dp-button-text-border') },
+      { key: 'dp_valueFontSize', label: 'Setting Number Font Size', type: 'slider', min: 6, max: 30, step: 1, def: 11, perDevice: true, onChange: setVar('--dp-value-font-size') },
+      { key: 'dp_groupTextColor', label: 'Group Text Color', type: 'color', def: '#a9b4ff', onChange: setVar('--dp-group-text-color') },
+      { key: 'dp_buttonTextColor', label: 'Button Text Color', type: 'color', def: '#e8e8f0', onChange: setVar('--dp-button-text-color') },
+      { key: 'dp_valueTextColor', label: 'Setting Number Text Color', type: 'color', def: '#e8e8f0', onChange: setVar('--dp-value-text-color') },
+      { key: 'dp_tabTextColor', label: 'Tab Text Color', type: 'color', def: '#a9b4ff', onChange: setVar('--dp-tab-text-color') },
     ]
   }
   devGroups = [builtInGroup, ...devGroups]
