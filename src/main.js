@@ -249,26 +249,34 @@ const DEV_GROUPS = [
       { key: 'thumbSplay', label: 'Thumb Splay (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('thumb') },
       { key: 'thumbSplay2', label: 'Thumb Tip Splay (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('thumb') },
       { key: 'curlBiasThumb', label: 'Thumb Curl Bias (Base <-> Tip) (%)', type: 'slider', min: -100, max: 100, step: 1, def: 0, onChange: () => applyCurl('thumb') },
+      // Ported from HANDO (direct request: "maybe check hando for pose
+      // settings. maybe there is an extra setting you dont have" --
+      // this WAS it, see FINGER_BASE_ONLY_CURL_KEY's own comment).
+      { key: 'baseOnlyCurlThumb', label: 'Thumb Base-Only Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('thumb') },
       { key: 'tipTwistThumb', label: 'Thumb Tip Twist (%)', type: 'slider', min: -100, max: 100, step: 1, def: 0, onChange: () => applyCurl('thumb') },
       { key: 'curlIndex', label: 'Index Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 73, lockRange: true, onChange: () => applyCurl('index') },
       { key: 'splayIndex', label: 'Index Splay (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('index') },
       { key: 'splayIndex2', label: 'Index 2nd Segment Splay (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('index') },
       { key: 'curlBiasIndex', label: 'Index Curl Bias (Base <-> Tip) (%)', type: 'slider', min: -100, max: 100, step: 1, def: 0, onChange: () => applyCurl('index') },
+      { key: 'baseOnlyCurlIndex', label: 'Index Base-Only Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('index') },
       { key: 'tipTwistIndex', label: 'Index Tip Twist (%)', type: 'slider', min: -100, max: 100, step: 1, def: 0, onChange: () => applyCurl('index') },
       { key: 'curlMiddle', label: 'Middle Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: -100, lockRange: true, onChange: () => applyCurl('middle') },
       { key: 'splayMiddle', label: 'Middle Splay (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('middle') },
       { key: 'splayMiddle2', label: 'Middle 2nd Segment Splay (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('middle') },
       { key: 'curlBiasMiddle', label: 'Middle Curl Bias (Base <-> Tip) (%)', type: 'slider', min: -100, max: 100, step: 1, def: 0, onChange: () => applyCurl('middle') },
+      { key: 'baseOnlyCurlMiddle', label: 'Middle Base-Only Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('middle') },
       { key: 'tipTwistMiddle', label: 'Middle Tip Twist (%)', type: 'slider', min: -100, max: 100, step: 1, def: 0, onChange: () => applyCurl('middle') },
       { key: 'curlRing', label: 'Ring Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: -100, lockRange: true, onChange: () => applyCurl('ring') },
       { key: 'splayRing', label: 'Ring Splay (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('ring') },
       { key: 'splayRing2', label: 'Ring 2nd Segment Splay (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('ring') },
       { key: 'curlBiasRing', label: 'Ring Curl Bias (Base <-> Tip) (%)', type: 'slider', min: -100, max: 100, step: 1, def: 0, onChange: () => applyCurl('ring') },
+      { key: 'baseOnlyCurlRing', label: 'Ring Base-Only Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('ring') },
       { key: 'tipTwistRing', label: 'Ring Tip Twist (%)', type: 'slider', min: -100, max: 100, step: 1, def: 0, onChange: () => applyCurl('ring') },
       { key: 'curlPinky', label: 'Pinky Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 71, lockRange: true, onChange: () => applyCurl('pinky') },
       { key: 'splayPinky', label: 'Pinky Splay (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('pinky') },
       { key: 'splayPinky2', label: 'Pinky 2nd Segment Splay (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('pinky') },
       { key: 'curlBiasPinky', label: 'Pinky Curl Bias (Base <-> Tip) (%)', type: 'slider', min: -100, max: 100, step: 1, def: 0, onChange: () => applyCurl('pinky') },
+      { key: 'baseOnlyCurlPinky', label: 'Pinky Base-Only Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('pinky') },
       { key: 'tipTwistPinky', label: 'Pinky Tip Twist (%)', type: 'slider', min: -100, max: 100, step: 1, def: 0, onChange: () => applyCurl('pinky') },
       { key: 'wristBend', label: 'Wrist Bend (Deg)', type: 'slider', min: -90, max: 90, step: 1, def: 0, onChange: () => applyWristPose() },
       { key: 'wristSplay', label: 'Wrist Splay (Deg)', type: 'slider', min: -30, max: 30, step: 1, def: 0, onChange: () => applyWristPose() },
@@ -586,12 +594,12 @@ DEV_GROUPS.forEach((g) => g.controls.forEach((c) => {
 // whatever was last interacted with there, not a deliberate choice worth
 // preserving).
 const POSE_SUBGROUP_SPECS = [
-  { title: 'Whole-Hand Rotation & Thumb', collapsed: true, keys: ['modelRotX', 'modelRotY', 'modelRotZ', 'thumbCurl', 'thumbSplay', 'thumbSplay2', 'tipTwistThumb', 'curlBiasThumb'] },
+  { title: 'Whole-Hand Rotation & Thumb', collapsed: true, keys: ['modelRotX', 'modelRotY', 'modelRotZ', 'thumbCurl', 'thumbSplay', 'thumbSplay2', 'tipTwistThumb', 'curlBiasThumb', 'baseOnlyCurlThumb'] },
   { title: 'Wrist', collapsed: true, keys: ['wristBend', 'wristSplay'] },
-  { title: 'Index', collapsed: true, keys: ['curlIndex', 'tipTwistIndex', 'splayIndex', 'curlBiasIndex', 'splayIndex2'] },
-  { title: 'Middle', collapsed: true, keys: ['curlMiddle', 'tipTwistMiddle', 'splayMiddle', 'curlBiasMiddle', 'splayMiddle2'] },
-  { title: 'Ring', collapsed: true, keys: ['curlRing', 'tipTwistRing', 'splayRing', 'curlBiasRing', 'splayRing2'] },
-  { title: 'Pinky', collapsed: true, keys: ['curlPinky', 'tipTwistPinky', 'curlBiasPinky', 'splayPinky', 'splayPinky2'] },
+  { title: 'Index', collapsed: true, keys: ['curlIndex', 'tipTwistIndex', 'splayIndex', 'curlBiasIndex', 'splayIndex2', 'baseOnlyCurlIndex'] },
+  { title: 'Middle', collapsed: true, keys: ['curlMiddle', 'tipTwistMiddle', 'splayMiddle', 'curlBiasMiddle', 'splayMiddle2', 'baseOnlyCurlMiddle'] },
+  { title: 'Ring', collapsed: true, keys: ['curlRing', 'tipTwistRing', 'splayRing', 'curlBiasRing', 'splayRing2', 'baseOnlyCurlRing'] },
+  { title: 'Pinky', collapsed: true, keys: ['curlPinky', 'tipTwistPinky', 'curlBiasPinky', 'splayPinky', 'splayPinky2', 'baseOnlyCurlPinky'] },
 ]
 const cfg = initDevPanel(DEV_GROUPS, {
   storageKeyPrefix: 'handyDandies',
@@ -1183,7 +1191,21 @@ const FINGER_SPLAY2_KEY = { thumb: 'thumbSplay2', index: 'splayIndex2', middle: 
 const FINGER_CURL_KEY = { thumb: 'thumbCurl', index: 'curlIndex', middle: 'curlMiddle', ring: 'curlRing', pinky: 'curlPinky' }
 const FINGER_SPLAY_KEY = { thumb: 'thumbSplay', index: 'splayIndex', middle: 'splayMiddle', ring: 'splayRing', pinky: 'splayPinky' }
 const FINGER_CURL_BIAS_KEY = { thumb: 'curlBiasThumb', index: 'curlBiasIndex', middle: 'curlBiasMiddle', ring: 'curlBiasRing', pinky: 'curlBiasPinky' }
+// Ported from HANDO (direct user request, "maybe check hando for pose
+// settings. maybe there is an extra setting you dont have" -- this WAS
+// exactly that: this project's own Pose group port deliberately omitted
+// HANDO's `baseOnlyCurl*` sliders, disclosed at the time as "don't exist
+// as controls in this project yet" but never circled back to. A pose
+// imported from HANDO that uses Base-Only Curl on the thumb had that
+// part of its data silently dropped -- no control/key existed here to
+// store or apply it, explaining a thumb that looked wrong on EVERY
+// imported pose using it, regardless of how correct the rest of the
+// posing math was (already independently verified correct in 2 earlier
+// rounds this session). See FINGER_BASE_ONLY_CURL_KEY's own use in
+// applyCurlToSkeleton() below for the exact application (additive,
+// base-joint-only, same mechanism HANDO itself uses).
 const FINGER_TIP_TWIST_KEY = { thumb: 'tipTwistThumb', index: 'tipTwistIndex', middle: 'tipTwistMiddle', ring: 'tipTwistRing', pinky: 'tipTwistPinky' }
+const FINGER_BASE_ONLY_CURL_KEY = { thumb: 'baseOnlyCurlThumb', index: 'baseOnlyCurlIndex', middle: 'baseOnlyCurlMiddle', ring: 'baseOnlyCurlRing', pinky: 'baseOnlyCurlPinky' }
 const FINGER_TIP_TWIST_MAX_DEG = 90
 
 // Converts a rotation expressed around a WORLD axis into the correct LOCAL
@@ -1266,6 +1288,10 @@ function applyCurlToSkeleton(fingerName, skeleton, baseQuat, wrapperQuat, values
   const splayT = values[FINGER_SPLAY_KEY[fingerName]] / 100
   const curlBias = values[FINGER_CURL_BIAS_KEY[fingerName]] / 100
   const tipTwistT = values[FINGER_TIP_TWIST_KEY[fingerName]] / 100
+  // `|| 0` fallback: an older saved/imported pose predating this key
+  // (or one that simply never set it) has no baseOnlyCurl* entry at all
+  // -- treated as 0 (no additive base bend), not NaN.
+  const baseOnlyCurlT = (values[FINGER_BASE_ONLY_CURL_KEY[fingerName]] || 0) / 100
   const splayAngle = FINGER_SPLAY_SIGN[fingerName] * THREE.MathUtils.degToRad(FINGER_SPLAY_MAX_DEG[fingerName] * splayT)
   const splayJointIndex = FINGER_SPLAY_JOINT_INDEX[fingerName]
   const splay2JointIndex = FINGER_SPLAY2_JOINT_INDEX[fingerName]
@@ -1292,6 +1318,19 @@ function applyCurlToSkeleton(fingerName, skeleton, baseQuat, wrapperQuat, values
     const angle = sign * THREE.MathUtils.degToRad(maxDegs[i] * curlT * weight)
     rotateOnTrueWorldAxis(bone, curlAxis, angle, wrapperQuat)
     bone.updateMatrixWorld(true)
+    // Base-Only Curl (ported from HANDO -- see FINGER_BASE_ONLY_CURL_KEY's
+    // own comment for why) -- a 2nd, purely ADDITIVE rotation on top of
+    // whatever Curl (+ Bias) just did to the BASE joint only, same axis,
+    // same mechanism Splay/Splay2 already use to compose onto Curl for
+    // their own joints (rotateOnTrueWorldAxis always adds onto whatever
+    // local rotation the bone already has). Lets a finger bend purely
+    // from the knuckle while the rest of it stays relatively straight --
+    // set the regular Curl slider to 0 and use only this one for that.
+    if (i === 0) {
+      const baseOnlyAngle = sign * THREE.MathUtils.degToRad(maxDegs[0] * baseOnlyCurlT)
+      rotateOnTrueWorldAxis(bone, curlAxis, baseOnlyAngle, wrapperQuat)
+      bone.updateMatrixWorld(true)
+    }
     if (i === joints.length - 1 && i > 0) {
       // Tip Twist's own axis is already a true world-space direction,
       // measured live from this joint's own actual current position (see
@@ -1361,11 +1400,11 @@ function applyAllFingerPoses() {
 // deliberately left out -- see the 'savedPoses' control's own comment for
 // why.
 const POSE_PRESET_KEYS = [
-  'thumbCurl', 'thumbSplay', 'thumbSplay2', 'curlBiasThumb', 'tipTwistThumb',
-  'curlIndex', 'splayIndex', 'splayIndex2', 'curlBiasIndex', 'tipTwistIndex',
-  'curlMiddle', 'splayMiddle', 'splayMiddle2', 'curlBiasMiddle', 'tipTwistMiddle',
-  'curlRing', 'splayRing', 'splayRing2', 'curlBiasRing', 'tipTwistRing',
-  'curlPinky', 'splayPinky', 'splayPinky2', 'curlBiasPinky', 'tipTwistPinky',
+  'thumbCurl', 'thumbSplay', 'thumbSplay2', 'curlBiasThumb', 'baseOnlyCurlThumb', 'tipTwistThumb',
+  'curlIndex', 'splayIndex', 'splayIndex2', 'curlBiasIndex', 'baseOnlyCurlIndex', 'tipTwistIndex',
+  'curlMiddle', 'splayMiddle', 'splayMiddle2', 'curlBiasMiddle', 'baseOnlyCurlMiddle', 'tipTwistMiddle',
+  'curlRing', 'splayRing', 'splayRing2', 'curlBiasRing', 'baseOnlyCurlRing', 'tipTwistRing',
+  'curlPinky', 'splayPinky', 'splayPinky2', 'curlBiasPinky', 'baseOnlyCurlPinky', 'tipTwistPinky',
   'wristBend', 'wristSplay', 'modelRotX', 'modelRotY', 'modelRotZ'
 ]
 function capturePosePreset() {
@@ -2484,7 +2523,25 @@ window.addEventListener('pointerdown', (e) => {
   if (e.button === 0) startClickHoldPose('chp')
   else if (e.button === 2) startClickHoldPose('rchp')
 })
+// Direct user report ("for click hold, when i release, it seems to
+// trigger the correct release, but then it calls it again. I suspect it
+// is click hold interferring with click triggers" -- correct diagnosis):
+// releasing a Click-Hold-Pose hold fires the SAME native `pointerup` the
+// Click Pose / Double-Click Pose section (below) also listens for on the
+// same left button, and that listener had no way to tell "this pointerup
+// is ending a hold" apart from "this pointerup is a genuine standalone
+// click" -- so every hold-release ALSO registered as a click, firing
+// Click-Pose's own sequence on top of Click-Hold-Pose's own retransition.
+// `lastPointerupWasHoldRelease` records, for THIS event, whether a hold
+// was genuinely active on the SAME button being released -- checked here
+// (BEFORE endClickHoldPose() below flips `.active` to false) and read by
+// the Click Pose listener afterward, relying on this listener having been
+// registered FIRST (addEventListener on the same element+event type fires
+// in registration order) so the flag is already correct by the time that
+// listener's own check runs for the same event.
+let lastPointerupWasHoldRelease = false
 window.addEventListener('pointerup', (e) => {
+  lastPointerupWasHoldRelease = (e.button === 0 && clickHoldPoseTriggers.chp.active) || (e.button === 2 && clickHoldPoseTriggers.rchp.active)
   if (e.button === 0) endClickHoldPose('chp')
   else if (e.button === 2) endClickHoldPose('rchp')
 })
@@ -2618,6 +2675,11 @@ let clickPoseClickTimer = null
 window.addEventListener('pointerup', (e) => {
   if (e.target && e.target.closest && e.target.closest('.dp-panel')) return
   if (e.button !== 0) return
+  // This exact pointerup was releasing a Click-Hold-Pose hold, not a
+  // standalone click -- see lastPointerupWasHoldRelease's own comment
+  // (Click Hold-Pose section, above) for why this must never also count
+  // toward Click Pose / Double-Click Pose's own click-count detection.
+  if (lastPointerupWasHoldRelease) return
   clickPoseClickCount++
   clearTimeout(clickPoseClickTimer)
   clickPoseClickTimer = setTimeout(() => {
