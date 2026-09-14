@@ -1001,13 +1001,18 @@ GOTCHAS
   Renamed the existing `toggleCaps()` helper to `toggleClass()` (still
   used for the original 4 caps toggles unchanged) since it's now also
   used for the new Bold toggles -- a same-shape boolean-class-toggle
-  helper, not caps-specific despite the old name. Deliberately did NOT
-  port the template's own "Scroll Strength" control from that same
-  group: read its actual wiring there before assuming it belonged, and
-  found it's a different, unrelated project's own scrollable-game-
-  content wheel-speed multiplier that happened to live in the template's
-  "Dev Panel" bucket, not a genuine panel-chrome control -- this project
-  has no equivalent scrollable content for it to apply to.
+  helper, not caps-specific despite the old name.
+
+  **CORRECTED 2026-09-14, same day:** the "Scroll Strength" exclusion
+  above was WRONG. Direct user correction: "Scroll Strength is the
+  srolling intensity witin the dev panel. impelment that." Re-read the
+  template's actual wiring more carefully this time -- `.dev-panel-
+  scroll-content` (the element its wheel handler targets) is, in fact,
+  the template's OWN name for its panel body's scrollable area (its own
+  CSS literally styles `.dev-panel-scroll-content` as the panel's
+  scrollbar/overflow container), not some other project's game content
+  as first assumed from a shallower read. Implemented for real this
+  round -- see the later GOTCHAS entry below for the full account.
 
   **Found and fixed a real, independently significant bug while
   verifying this port live:** the very first live check (setting a new
@@ -1031,3 +1036,119 @@ GOTCHAS
   produced the SAME computed styles as before this round's own change
   (title/group weight 600, button weight 400, matching the pre-existing
   hardcoded look) -- confirming the port really is a no-op by default.
+- **Same-day follow-on round: Scroll Strength (real this time), unlimited
+  group nesting, full subgroup reorganization, and template-matching
+  actual values/colors -- 4 direct requests together.**
+
+  **Scroll Strength**: corrected from the wrong exclusion above --
+  confirmed live this IS the panel's own body-scroll wheel intensity.
+  Implemented on `body` (`.dp-body`) right after its own creation:
+  `body.addEventListener('wheel', (e) => { const strength =
+  cfg.dp_scrollStrength; if (strength === undefined || strength === 1)
+  return; e.preventDefault(); body.scrollTop += e.deltaY * strength },
+  { passive: false })` -- reads `cfg` live rather than a captured
+  closure value, so the control's own onChange needs no DOM work at
+  all. `strength === 1` is treated as "let native scroll happen," not a
+  no-op `* 1` multiply, since native deltaY scaling already varies by
+  browser/OS/input device. Verified live: dispatched a synthetic wheel
+  event (`deltaY: 100`) at the default strength (0.2) and at a changed
+  strength (3), confirming `body.scrollTop` moved by exactly `deltaY *
+  strength` in both cases (20px and 300px respectively).
+
+  **Unlimited group nesting**: direct report, "I currently cant nest
+  groups within each other." Read `setupReorder()`'s own `getTargets`
+  callback for the GROUP-level call in `buildDevPanel()` before touching
+  anything -- found the 1-level cap lived ONLY there (a
+  `:scope > .dp-group > .dp-group-body` selector that only ever matched
+  TOP-LEVEL group bodies, plus an explicit "if this group already has
+  its own nested children, only offer top-level" exclusion). Separately
+  confirmed `captureGroup()`/`applyOrder()` (the save/restore
+  round-trip) were ALREADY genuinely recursive (each calls itself on
+  every direct child group) despite comments nearby claiming "one level
+  deep only" -- those comments described the OBSERVED effect of the
+  drag-reorder's own cap, not an actual limitation in either function,
+  so neither needed a code change, only a corrected comment. Fixed by
+  changing the target-body query to `groupsEl.querySelectorAll('.dp-group
+  > .dp-group-body')` (no `:scope >`, matches every group's body at any
+  depth) filtered by `!item.contains(b.closest('.dp-group'))` (excludes
+  the dragged group's own body and every descendant's body, preventing a
+  circular drop). The row-level `setupReorder` call already had no depth
+  restriction at all (rows could already be dropped into a nested group)
+  -- only the group-into-group case needed this fix. Left the LIST-
+  PICKER's own separate 1-level group-nesting cap (`dp-lp-group`, the
+  Saved Poses feature) untouched -- confirmed via direct comment reading
+  that it's a genuinely different system, out of scope for a request
+  specifically about the main settings panel, though corrected that
+  system's own comment which had (now-inaccurately) claimed the 2
+  systems shared "the same cap." Verified live: a body already nested 2
+  levels deep (`Dev Panel > TEXT > Dev Panel Title`) is correctly
+  offered as a valid drop target by the fixed query, which would produce
+  a 3rd nesting level.
+
+  **Subgroup reorganization + actual values/colors**: 2 more direct
+  requests, "Port the template's Dev Panel Group settings names,
+  ordering, groups, sub groups, group nesting, and ordering" and "i also
+  wanted Dev panel colors to be ported too" (a walk-back of the FIRST
+  chrome-group port's own deliberate "match this project's current
+  look" choice -- now a genuine, disclosed visual change instead).
+  Transcribed the template's own `applyDefaultDevPanelSubgroupOrder()`
+  EXACTLY: `MECHANICS` (Scroll Strength), `PANEL UI` (background/accent/
+  slider color, opacity), and `TEXT` (font family only) as 3 top-level
+  subgroups inside "Dev Panel," with `TEXT` itself nesting 5 further
+  subgroups (`Dev Panel Title`, `Group Title`, `Setting Title`, `TABS`,
+  `BUTTONS`), each holding that category's own Bold/Capitalize/Font-
+  Size/Letter-Spacing/Line-Spacing/Color battery, same names/order/
+  membership as the template -- including porting `Button Text Border`
+  under `Dev Panel Title` even though that placement reads as a likely
+  copy-paste artifact in the SOURCE template, since the request was to
+  match the template as given, not to silently correct it. New
+  `organizeDevPanelSubgroups(groupsEl)` function (mirrors the template's
+  own `makeGroup()` helper) builds this structure once, right after
+  `buildDevPanel()` creates the initial flat rows, relying entirely on
+  the unlimited-nesting fix above (TEXT's own 5 children are a 2nd
+  nesting level) -- a genuine saved order (if any) is applied afterward
+  by the existing `resetSettings()` call and correctly takes precedence,
+  since `applyOrder()` repositions rows by key regardless of where this
+  function put them first.
+
+  Also added the one PRE-EXISTING template control the first chrome-
+  group port had simply missed (not part of the 2026-09-14 additions
+  that port was scoped to): `dp_groupLabelBgColor` ("Group Label
+  Background Color"), overriding `.dp-group-header`'s own default
+  accent-tinted background with a direct color once set (`background:
+  var(--dp-group-label-bg-color, color-mix(...))`).
+
+  Updated EVERY existing control's own `def` to the template's real
+  current value (accent `#7d8cff` -> `#005f8f`, font `-apple-system...`
+  -> `Verdana, Geneva, sans-serif`, `capsButtonText`/`capsTabText`/
+  `capsGroupNames` `false` -> `true`, `boldTab`/`boldButton` `false` ->
+  `true`, etc.) -- a deliberate, disclosed visual change this round, not
+  a no-op (unlike the first chrome-group port, which intentionally kept
+  every default at this project's OWN prior look).
+
+  **Also fixed the 4 letter-spacing controls (Tab/Group/Settings/Button)
+  that were wrongly marked `perDevice: true` in the first chrome-group
+  port** -- direct report, "we currently have some yellow text in our
+  Dev Panel group. fix that. Just match the template" (a `.dp-row.dp-
+  per-device label { color: #ffd27d }` rule already existed to visually
+  flag per-device-only controls; these 4 shouldn't have triggered it).
+  Cross-checked the template's own `DEV_PANEL_STYLE_SHARED_KEYS` array
+  directly rather than guessing: it lists `buttonTextLetterSpacing`/
+  `tabTextLetterSpacing`/`groupTextLetterSpacing`/
+  `settingsTextLetterSpacing` as SHARED (not per-tab) -- only Title's
+  own letter-spacing is per-tab there, an asymmetry ported faithfully
+  rather than "corrected" to be consistent with the other 4.
+
+  Verified live (after clearing a STALE `localStorage` blob left over
+  from much earlier in this same session's own testing, which was
+  silently overriding both the new default values and the new subgroup
+  structure via a genuine `applyOrder()`/`resetSettings()` restore --
+  confirmed via `cfg` readback that this was old saved state, not a bug,
+  before spending time debugging the wrong thing): the full nested
+  structure matches the transcribed template exactly (only "Enable
+  Label Rename Mode" stays flat, matching the template's own "standalone
+  panel-level control" placement); real values (`accentColor: '#005f8f'`,
+  `fontFamily: 'Verdana, Geneva, sans-serif'`, etc.) all resolve
+  correctly; the 4 corrected letter-spacing controls no longer appear in
+  `document.querySelectorAll('.dp-row.dp-per-device')`, while Title's
+  own still correctly does.

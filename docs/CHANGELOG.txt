@@ -1665,6 +1665,103 @@ buster bumps: `devpanel.js?v=5` -> `?v=6`, `style.css` (new) `?v=2`,
 `index.html`'s own `src/main.js?v=31` -> `?v=32`.
 
 --------------------------------------------------------------------------------
+2026-09-14 (continued once more)  -  ~2:41 AM - 3:01 AM EDT
+
+4 direct follow-on requests, fired in quick succession: "1. Scroll
+Strength is the srolling intensity witin the dev panel. impelment
+that." / "2. Implement anything in the dev paneltemplate that regards
+group and setting reordering, and nesting. I currently cant nest groups
+within each other." / "3. Port the template's Dev Panel Group settings
+names, ordering, groups, sub groups, group nesting, and ordering." / "4.
+[mouse log -- see the NEXT entry, handled as its own round]" -- plus 2
+more that landed mid-investigation: "and also port the Dev Panel
+Group's actual settings such as sizes, spacing, and color" and "we
+currently have some yellow text in our Dev Panel group. fix that. Just
+match the template."
+
+**Item 1 corrects a mistake from the round above:** that round excluded
+"Scroll Strength" as a different, unrelated project's own game-content
+mechanic, based on a shallow read of its wiring (`.dev-panel-scroll-
+content`, which LOOKS generic). Re-read it properly this time and
+confirmed it genuinely is the template's own name for its panel body's
+scrollable area. Implemented for real: a wheel listener on `.dp-body`
+reading `cfg.dp_scrollStrength` live, `e.preventDefault()` +
+`scrollTop += deltaY * strength`, with `strength === 1` treated as "let
+native scroll happen" rather than a no-op `* 1`. Verified live via
+synthetic wheel events at 2 different strengths, confirming exact
+`deltaY * strength` scroll deltas both times.
+
+**Item 2**: read `setupReorder()`'s own group-level `getTargets`
+callback in `buildDevPanel()` before touching anything, rather than
+assuming a rewrite was needed. Found the entire 1-level nesting cap
+lived in exactly one place: a `:scope >`-restricted target-body query
+plus an explicit "already has children -> top-level only" exclusion.
+Separately confirmed (by reading, not assuming) that `captureGroup()`/
+`applyOrder()` -- the save/restore round-trip -- were ALREADY genuinely
+recursive despite nearby comments claiming a matching "one level deep"
+limitation; those comments described the drag-reorder's own cap's
+downstream effect, not an actual limit in either function. Fixed by
+removing the `:scope >` restriction (now matches every group's body at
+any depth) and adding a `!item.contains(...)` filter to prevent a group
+being dropped into itself or its own descendant. Corrected 4 now-stale
+comments referencing "the same one-level cap" (2 in the outer panel's
+own now-fixed code, 1 in the unrelated list-picker system which keeps
+its own separate cap unchanged -- out of scope, confirmed via direct
+reading that it's a genuinely different feature -- with its own comment
+corrected since it used to claim the 2 systems shared one rule).
+Verified live: a body already nested 2 levels deep is correctly offered
+as a valid drop target by the fixed query.
+
+**Items 3 (as amended by the 2 follow-on messages) + the yellow-text
+report**: transcribed TEMPLATE_DEV_PANEL.html's own
+`applyDefaultDevPanelSubgroupOrder()` function EXACTLY -- group names,
+nesting (TEXT holds 5 further subgroups: Dev Panel Title/Group Title/
+Setting Title/TABS/BUTTONS), and per-group control membership/order,
+including porting "Button Text Border" under "Dev Panel Title" even
+though that specific placement reads as a likely copy-paste artifact in
+the template itself, since the request was to match the template as
+given. New `organizeDevPanelSubgroups()` builds this once, right after
+`buildDevPanel()`, relying on item 2's own unlimited-nesting fix for
+TEXT's own 2nd-level children; a genuine saved order still correctly
+takes precedence afterward via the existing `resetSettings()` call.
+Added the one pre-existing template control the FIRST chrome-group port
+round had simply missed: `dp_groupLabelBgColor`. Updated every existing
+control's own default to the template's real current value (a
+deliberate, disclosed visual change this round: accent `#7d8cff` ->
+`#005f8f`, font -> Verdana, several caps/bold toggles false -> true) --
+the opposite choice from the FIRST chrome-group port, which had
+deliberately kept every default at this project's own prior look.
+
+Cross-checking the template's own `DEV_PANEL_STYLE_SHARED_KEYS` array
+directly (rather than guessing) while doing this ALSO explained the
+"yellow text" report on its own: 4 letter-spacing controls (Tab/Group/
+Settings/Button) had been wrongly marked `perDevice: true` in the first
+port, incorrectly triggering this project's existing `.dp-row.dp-per-
+device` yellow-label styling -- the template treats only Title's own
+letter-spacing as per-tab, the other 4 as shared. Fixed by removing
+`perDevice` from those 4 (Title's stays, faithfully preserving the
+template's own asymmetry rather than "correcting" it to be consistent).
+
+Verified everything live, but only after diagnosing a genuine false
+alarm first: the very first test showed the new subgroup structure
+completely empty and several new default values not taking effect,
+which turned out to be a STALE `localStorage` blob left over from much
+earlier in this same session's own testing (a manually-injected Copy
+Settings dump from a prior investigation, still sitting in this
+browser's storage) -- `resetSettings()`'s own genuine restore-from-save
+behavior was correctly overriding this round's own fresh defaults and
+structure with that old saved state, exactly as designed; not a bug.
+Confirmed via direct `cfg` readback before spending time debugging the
+wrong thing, cleared it, and re-verified clean: full nested structure
+matches the template exactly; real values resolve correctly; the 4
+corrected controls no longer appear in `.dp-row.dp-per-device`, Title's
+still correctly does. Corrected `CODE_SUMMARY.txt` (new GOTCHAS entry,
+plus a correction to the prior round's own wrong Scroll Strength
+exclusion) and `PROJECT_PROGRESS.md`. Cache-buster bumps: `devpanel.js?v=6`
+-> `?v=7`, `style.css?v=2` -> `?v=3`, `index.html`'s own
+`src/main.js?v=32` -> `?v=33`.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

@@ -109,13 +109,15 @@ html, body {
 .dp-group.dp-dragging, .dp-row.dp-dragging { opacity: .4; }
 .dp-group-header {
   padding: 7px 6px; font-weight: var(--dp-group-weight, 600); font-size: var(--dp-group-title-font-size, 11px);
-  letter-spacing: var(--dp-group-letter-spacing, .04em); line-height: var(--dp-group-line-height, 1.4);
+  letter-spacing: var(--dp-group-letter-spacing, 0px); line-height: var(--dp-group-line-height, 1.4);
   color: var(--dp-group-text-color, var(--dp-text-color, #a9b4ff)); cursor: pointer; display: flex; align-items: center; gap: 6px;
-  /* Accent-tinted chip, matching TEMPLATE_DEV_PANEL.html's own
-     ".dev-section-title { background: rgba(0,255,255,0.1) }". color-mix()
-     degrades to a transparent (i.e. no-op) background on a browser that
-     doesn't support it, rather than breaking. */
-  background: color-mix(in srgb, var(--dp-accent-color, #7d8cff) 12%, transparent);
+  /* Accent-tinted chip by default (matching TEMPLATE_DEV_PANEL.html's own
+     ".dev-section-title { background: rgba(0,255,255,0.1) }"; color-mix()
+     degrades to a transparent, i.e. no-op, background on a browser that
+     doesn't support it) -- Group Label Background Color (new control)
+     overrides this with a direct color once set, same as the template's
+     own --dev-group-label-bg-color. */
+  background: var(--dp-group-label-bg-color, color-mix(in srgb, var(--dp-accent-color, #7d8cff) 12%, transparent));
   border-radius: 4px;
 }
 .dp-group-header .arrow { transition: transform .15s; font-size: 9px; }

@@ -808,11 +808,14 @@ function buildListPickerRow(ctrl, row) {
   // duplicates, since listEl itself survives innerHTML='' clears).
   // Groups reorder among top-level siblings by default (target: listEl
   // itself) and can ALSO be dragged into another TOP-LEVEL group's own
-  // body to nest one level deep -- mirrors buildDevPanel()'s own identical
-  // group-nesting rule for the outer settings panel exactly, including the
-  // same cap: a group that already contains its own subgroup(s) is offered
-  // ONLY listEl (dragging it into another group would bring its children
-  // along, producing 2 levels of nesting). Needs its own onDrop too (not
+  // body to nest one level deep -- this picker's OWN cap, kept as-is
+  // (out of scope for the 2026-09-14 unlimited-nesting change to the
+  // OUTER settings panel's own groups, see buildDevPanel()'s own comment
+  // -- the 2 group systems no longer share the same rule, corrected here
+  // since this comment used to claim they did): a group that already
+  // contains its own subgroup(s) is offered ONLY listEl (dragging it
+  // into another group would bring its children along, producing 2
+  // levels of nesting). Needs its own onDrop too (not
   // just the item-drag below) -- promoting/demoting a group changes every
   // one of its members' own .group PATH, which only syncListPickerFromDom
   // (reading the new DOM position) can resolve.
@@ -1002,19 +1005,27 @@ function buildDevPanel(groupsEl) {
     groupsEl.appendChild(g)
   })
   // Groups reorder among top-level siblings by default (target: groupsEl
-  // itself) and can ALSO be dragged into another TOP-LEVEL group's own body
-  // to nest one level deep -- `:scope > .dp-group > .dp-group-body` only
-  // ever matches a TOP-LEVEL group's body, never a nested one's, which is
-  // what caps this at one level (a nested group's own body is simply never
-  // offered as a target). A group that already contains nested subgroups of
-  // its own is excluded from nesting INTO another group (only offered
-  // groupsEl itself) -- dragging it in would bring its children along,
-  // producing 2 levels of nesting, which this cap is meant to prevent.
+  // itself) and can ALSO be dragged into ANY other group's own body, at
+  // ANY depth -- UNLIMITED nesting (corrected 2026-09-14, matching
+  // TEMPLATE_DEV_PANEL.html's own unlimited-depth engine, per direct
+  // request: "I currently cant nest groups within each other"). This used
+  // to cap at one level (`:scope > .dp-group > .dp-group-body` only ever
+  // matched a TOP-LEVEL group's body, and a group that already had its
+  // own nested children was excluded from nesting further, specifically
+  // to prevent a 2nd level from ever forming) -- that whole restriction
+  // is gone now. The only remaining constraint is a correctness one, not
+  // a depth cap: `item.contains(...)` excludes the dragged group's OWN
+  // body and every one of its own descendants' bodies, since dropping a
+  // group into itself (or into one of its own children) would create a
+  // circular structure. `captureGroup()`/`applyOrder()` (save/restore)
+  // were ALREADY genuinely recursive before this change -- the 1-level
+  // cap only ever lived here, in what the live drag was willing to
+  // offer as a target, confirmed by reading both functions before
+  // touching anything.
   setupReorder(groupsEl, 'dp-group', 'dp-drag-handle', (item) => {
-    if (item.querySelector('.dp-group-body .dp-group')) return [groupsEl]
-    const topLevelBodies = Array.from(groupsEl.querySelectorAll(':scope > .dp-group > .dp-group-body'))
-      .filter((b) => b.closest('.dp-group') !== item)
-    return [groupsEl, ...topLevelBodies]
+    const allBodies = Array.from(groupsEl.querySelectorAll('.dp-group > .dp-group-body'))
+      .filter((b) => !item.contains(b.closest('.dp-group')))
+    return [groupsEl, ...allBodies]
   })
   // Cross-group: recomputes the live list of every group's body (top-level
   // AND nested, since this selector isn't :scope-restricted) at the start
@@ -1022,6 +1033,45 @@ function buildDevPanel(groupsEl) {
   // drag (addCustomGroup(), or one recreated by applyOrder()) is always
   // current.
   setupReorder(groupsEl, 'dp-row', 'dp-row-handle', () => Array.from(groupsEl.querySelectorAll('.dp-group-body')))
+}
+
+// Organizes the built-in "Dev Panel" group's own (flat, just-built) rows
+// into nested subgroups, matching TEMPLATE_DEV_PANEL.html's own
+// `applyDefaultDevPanelSubgroupOrder()` EXACTLY -- same group names, same
+// nesting (TEXT holds 5 further subgroups), same per-group control
+// membership and order (2026-09-14 port round, direct request: "Port the
+// template's Dev Panel Group settings names, ordering, groups, sub
+// groups, group nesting, and ordering"). Relies on the unlimited-nesting
+// fix directly above this function existing -- TEXT's own 5 children are
+// a 2nd nesting level, which the drag-reorder engine only started
+// allowing this same round. Called once, right after buildDevPanel()
+// creates the flat structure, BEFORE resetSettings() runs -- a genuine
+// saved order (if any) is applied afterward and takes precedence over
+// this default organization, the same relationship the template's own
+// idempotent version has to a live user reorder, achieved here simply by
+// running before rather than needing a marker-group check of its own.
+function organizeDevPanelSubgroups(groupsEl) {
+  const devPanelGroup = groupsEl.querySelector(':scope > .dp-group[data-key="Dev Panel"]')
+  if (!devPanelGroup) return
+  const body = devPanelGroup.querySelector(':scope > .dp-group-body')
+  const rowsByKey = {}
+  body.querySelectorAll(':scope > .dp-row[data-key]').forEach((r) => { rowsByKey[r.dataset.key] = r })
+  function makeSub(title, keys, parentBody) {
+    const g = createGroupElement(title)
+    parentBody.appendChild(g)
+    const gb = g.querySelector(':scope > .dp-group-body')
+    keys.forEach((k) => { const row = rowsByKey[k]; if (row) gb.appendChild(row) })
+    return g
+  }
+  makeSub('MECHANICS', ['dp_scrollStrength'], body)
+  makeSub('PANEL UI', ['dp_bgColor', 'dp_accentColor', 'dp_sliderColor', 'dp_opacity'], body)
+  const text = makeSub('TEXT', ['dp_fontFamily'], body)
+  const textBody = text.querySelector(':scope > .dp-group-body')
+  makeSub('Dev Panel Title', ['dp_boldTitle', 'dp_capsTitleText', 'dp_titleFontSize', 'dp_titleLetterSpacing', 'dp_titleLineHeight', 'dp_buttonTextBorder', 'dp_titleColor'], textBody)
+  makeSub('Group Title', ['dp_boldGroup', 'dp_capsGroupNames', 'dp_groupTitleFontSize', 'dp_groupLetterSpacing', 'dp_groupLineHeight', 'dp_groupTextColor', 'dp_groupLabelBgColor'], textBody)
+  makeSub('Setting Title', ['dp_capsSettingsText', 'dp_boldSettings', 'dp_settingsTitleFontSize', 'dp_valueFontSize', 'dp_settingsLineHeight', 'dp_settingsLetterSpacing', 'dp_textColor', 'dp_valueTextColor'], textBody)
+  makeSub('TABS', ['dp_boldTab', 'dp_capsTabText', 'dp_tabFontSize', 'dp_tabLetterSpacing', 'dp_tabLineHeight', 'dp_tabTextColor'], textBody)
+  makeSub('BUTTONS', ['dp_boldButton', 'dp_capsButtonText', 'dp_buttonFontSize', 'dp_buttonLetterSpacing', 'dp_buttonLineHeight', 'dp_buttonTextColor', 'dp_buttonHeight'], textBody)
 }
 
 // Extra clamp margin from the left/right viewport edge, mobile only --
@@ -1158,12 +1208,16 @@ function initResizeHandles(panel) {
 // state of the dev panel settings groups"), matching DICKOCLICKO/
 // OKCILCOKCID's own already-shipped behavior (this shared engine, copied
 // from ADA BATHROOM, had never captured it).
-// Captures one group's own key/collapsed/settings, plus (one level deep
-// only -- see setupReorder's own nesting cap above) any subgroups nested
-// directly inside its body. Every query is :scope-scoped to this group's
-// OWN direct body -- an unscoped querySelectorAll('.dp-row') would also
-// reach a nested child's own rows, double-counting them under both the
-// parent and the child.
+// Captures one group's own key/collapsed/settings, plus any subgroups
+// nested directly inside its body -- genuinely recursive (calls itself
+// on each direct child group below), so this already correctly handles
+// UNLIMITED nesting depth despite the drag-reorder engine only recently
+// (2026-09-14) allowing more than 1 level to actually be built live --
+// this function itself never had a depth cap of its own to remove.
+// Every query is :scope-scoped to this group's OWN direct body -- an
+// unscoped querySelectorAll('.dp-row') would also reach a nested
+// child's own rows, double-counting them under both the parent and the
+// child.
 function captureGroup(g) {
   return {
     key: g.dataset.key,
@@ -1184,10 +1238,13 @@ function applyOrder(groupsEl, order) {
   // DOM, not just within the group it's about to be placed into.
   const rowsByKey = {}
   groupsEl.querySelectorAll('.dp-row[data-key]').forEach((r) => { rowsByKey[r.dataset.key] = r })
-  // Places one saved group (and, one level deep, its own saved subgroups)
-  // into parentContainer -- either groupsEl itself (top-level) or another
-  // group's own .dp-group-body (nested). Recursive, only ever called 2 deep
-  // given the same one-level nesting cap as setupReorder's own live drag.
+  // Places one saved group (and, recursively, every one of its own saved
+  // subgroups at any depth) into parentContainer -- either groupsEl
+  // itself (top-level) or another group's own .dp-group-body (nested).
+  // Like captureGroup() above, this was already genuinely recursive
+  // before the 2026-09-14 unlimited-nesting change -- nothing here
+  // needed to change for deeper saved structures to round-trip
+  // correctly.
   function placeGroup(savedGroup, parentContainer) {
     // Not scoped to parentContainer -- a group can be found wherever it
     // currently lives in the DOM (same "find it, don't assume where it is"
@@ -1376,11 +1433,29 @@ export function initDevPanel(groups, opts = {}) {
   // panel text; opacity/colors are shared, no reason to differ by device.
   const setVar = (name) => (v) => panel.style.setProperty(name, typeof v === 'number' ? v + 'px' : v)
   const toggleClass = (className) => (v) => panel.classList.toggle(className, !!v)
+  // CORRECTED 2026-09-14 (2nd pass, direct follow-up requests: "I also
+  // wanted Dev panel colors to be ported too" / "we currently have some
+  // yellow text in our Dev Panel group. fix that. Just match the
+  // template"): the FIRST port (below, same day) kept every default at
+  // this project's OWN pre-existing look and marked several controls
+  // perDevice that shouldn't have been -- this pass instead matches
+  // TEMPLATE_DEV_PANEL.html's own `devPanelStyle`/`DEV_PANEL_STYLE_SHARED_KEYS`
+  // EXACTLY: real default VALUES (Verdana font, #005f8f accent, etc, a
+  // deliberate, disclosed visual change, not a no-op) and the CORRECT
+  // shared-vs-perDevice split. `DEV_PANEL_STYLE_SHARED_KEYS` there lists
+  // font-size/line-height/button-height/button-text-border as per-tab
+  // and (surprisingly, but ported faithfully rather than "corrected")
+  // only TITLE's own letter-spacing as per-tab -- tab/group/settings/
+  // button letter-spacing are all SHARED there, which is what this
+  // project's own `dp_row.dp-per-device` yellow-label styling had been
+  // incorrectly firing on for those 4 (they were wrongly marked
+  // `perDevice: true` in the first pass): that yellow tint is gone now
+  // that they're shared, matching the template, not a separate CSS fix.
   const builtInGroup = {
     title: 'Dev Panel',
     controls: [
-      { key: 'dp_titleFontSize', label: 'Dev Panel Title Font Size', type: 'slider', min: 8, max: 24, step: 1, def: 13, perDevice: true, onChange: setVar('--dp-title-font-size') },
-      { key: 'dp_tabFontSize', label: 'Tab Font Size', type: 'slider', min: 8, max: 24, step: 1, def: 11, perDevice: true, onChange: setVar('--dp-tab-font-size') },
+      { key: 'dp_titleFontSize', label: 'Dev Panel Title Font Size', type: 'slider', min: 8, max: 24, step: 1, def: 22, perDevice: true, onChange: setVar('--dp-title-font-size') },
+      { key: 'dp_tabFontSize', label: 'Tab Font Size', type: 'slider', min: 8, max: 24, step: 1, def: 12, perDevice: true, onChange: setVar('--dp-tab-font-size') },
       { key: 'dp_groupTitleFontSize', label: 'Collapsible Group Title Font Size', type: 'slider', min: 8, max: 24, step: 1, def: 11, perDevice: true, onChange: setVar('--dp-group-title-font-size') },
       // No separate "Body Text Font Size" control (CLAUDE.md §12i, corrected
       // 2026-09-08): it was a redundant duplicate of this one -- the 2 always
@@ -1388,77 +1463,71 @@ export function initDevPanel(groups, opts = {}) {
       // onChange instead (sets BOTH CSS variables) so every existing CSS
       // rule referencing --dp-body-font-size still resolves correctly,
       // without reintroducing a 2nd slider for the same thing.
-      { key: 'dp_settingsTitleFontSize', label: 'Settings Title Font Size', type: 'slider', min: 8, max: 24, step: 1, def: 11, perDevice: true, onChange: (v) => { setVar('--dp-settings-title-font-size')(v); setVar('--dp-body-font-size')(v) } },
+      { key: 'dp_settingsTitleFontSize', label: 'Settings Title Font Size', type: 'slider', min: 8, max: 24, step: 1, def: 12, perDevice: true, onChange: (v) => { setVar('--dp-settings-title-font-size')(v); setVar('--dp-body-font-size')(v) } },
       { key: 'dp_opacity', label: 'Dev Panel Opacity', type: 'slider', min: 0.1, max: 1, step: 0.05, def: 1, onChange: setVar('--dp-opacity') },
-      { key: 'dp_bgColor', label: 'Dev Panel Background Color', type: 'color', def: '#12121a', onChange: setVar('--dp-bg-color') },
-      { key: 'dp_titleColor', label: 'Dev Panel Title Text Color', type: 'color', def: '#e8e8f0', onChange: setVar('--dp-title-color') },
-      { key: 'dp_textColor', label: 'Dev Panel Non-Title Text Color', type: 'color', def: '#a9b4ff', onChange: setVar('--dp-text-color') },
-      { key: 'dp_accentColor', label: 'Dev Panel Accent Color', type: 'color', def: '#7d8cff', onChange: setVar('--dp-accent-color') },
-      { key: 'dp_sliderColor', label: 'Dev Panel Slider Color', type: 'color', def: '#7d8cff', onChange: setVar('--dp-slider-color') },
+      { key: 'dp_bgColor', label: 'Dev Panel Background Color', type: 'color', def: '#000000', onChange: setVar('--dp-bg-color') },
+      { key: 'dp_titleColor', label: 'Dev Panel Title Text Color', type: 'color', def: '#ffffff', onChange: setVar('--dp-title-color') },
+      { key: 'dp_textColor', label: 'Dev Panel Non-Title Text Color', type: 'color', def: '#ffffff', onChange: setVar('--dp-text-color') },
+      { key: 'dp_accentColor', label: 'Dev Panel Accent Color', type: 'color', def: '#005f8f', onChange: setVar('--dp-accent-color') },
+      { key: 'dp_sliderColor', label: 'Dev Panel Slider Color', type: 'color', def: '#ffffff', onChange: setVar('--dp-slider-color') },
+      { key: 'dp_groupLabelBgColor', label: 'Group Label Background Color', type: 'color', def: '#005f8f', onChange: setVar('--dp-group-label-bg-color') },
       {
         key: 'dp_fontFamily', label: 'Dev Panel Font', type: 'select',
-        def: '-apple-system, Segoe UI, Roboto, sans-serif',
+        def: 'Verdana, Geneva, sans-serif',
         options: () => ['-apple-system, Segoe UI, Roboto, sans-serif', 'monospace', 'Verdana, Geneva, sans-serif', 'Arial, Helvetica, sans-serif', "'Trebuchet MS', Arial, sans-serif"],
         onChange: setVar('--dp-font-family'),
       },
       // 4 independent toggles (CLAUDE.md §12i), not one shared "capitalize
       // everything" checkbox -- per-category so each text kind can be
-      // capitalized on its own. Defaults false: HANDO's panel currently has
-      // no uppercase text anywhere, so nothing looks different until the
-      // user actually touches one.
-      { key: 'dp_capsButtonText', label: 'Capitalize Button Text', type: 'checkbox', def: false, onChange: toggleClass('dp-caps-button-text') },
-      { key: 'dp_capsTabText', label: 'Capitalize Tab Text', type: 'checkbox', def: false, onChange: toggleClass('dp-caps-tab-text') },
-      { key: 'dp_capsGroupNames', label: 'Capitalize Group Names', type: 'checkbox', def: false, onChange: toggleClass('dp-caps-group-names') },
+      // capitalized on its own. true/true/true/false, matching the
+      // template's own current defaults.
+      { key: 'dp_capsButtonText', label: 'Capitalize Button Text', type: 'checkbox', def: true, onChange: toggleClass('dp-caps-button-text') },
+      { key: 'dp_capsTabText', label: 'Capitalize Tab Text', type: 'checkbox', def: true, onChange: toggleClass('dp-caps-tab-text') },
+      { key: 'dp_capsGroupNames', label: 'Capitalize Group Names', type: 'checkbox', def: true, onChange: toggleClass('dp-caps-group-names') },
       { key: 'dp_capsSettingsText', label: 'Capitalize Settings Text', type: 'checkbox', def: false, onChange: toggleClass('dp-caps-settings-text') },
       // Rides through the normal control pipeline (Copy/Save/Reset already
       // cover it via `store`/`cfg` with no extra code) -- only its onChange
       // needs to actually flip the module-level flag setupTextEditClicks()
       // and each group header's own click handler read from.
       { key: 'dp_textEditMode', label: 'Enable Label Rename Mode', type: 'checkbox', def: false, onChange: (v) => { textEditModeEnabled = v } },
-      // Ported from TEMPLATE_DEV_PANEL.html's own expanded "Dev Panel"
-      // group (2026-09-14, "Just the Dev Panel chrome group" per direct
-      // request when asked how much of the template's growth to pull in
-      // -- the dynamic Mobile/Landscape visibility system, whole-panel
-      // Named Setting States, and Standard Text Settings battery were
-      // explicitly left for later, not overlooked). The template's own
-      // "Scroll Strength" control was NOT ported -- confirmed by reading
-      // its actual wiring there that it's a project-specific (another
-      // project's own scrollable game-content list) mechanic that just
-      // happened to live in the template's "Dev Panel" bucket, not a
-      // genuine panel-chrome control; this project has no equivalent
-      // scrollable content for it to apply to. Every default below
-      // matches this project's own CURRENT hardcoded look (bold
-      // true/true/true/false/true for title/tab/button/settings/group,
-      // per the pre-existing hardcoded font-weight:600 on title/group/
-      // button and unweighted settings/tab) except letter-spacing
-      // (previously 2 small hardcoded em values on title/group,
-      // .06em/.04em -- reset to 0 here rather than reverse-converted to
-      // px, matching the template's OWN chosen defaults for these exact
-      // same controls; the visual difference is imperceptible).
+      // Below: ported from TEMPLATE_DEV_PANEL.html's own expanded "Dev
+      // Panel" group. "Scroll Strength" (below, own control) turned out
+      // to genuinely belong here too -- an earlier pass wrongly excluded
+      // it as project-specific before actually reading its wiring; it
+      // controls THIS panel's own body-scroll intensity (see the wheel
+      // listener on `body` above), corrected once that was confirmed.
       { key: 'dp_capsTitleText', label: 'Capitalize Title', type: 'checkbox', def: false, onChange: toggleClass('dp-caps-title-text') },
       { key: 'dp_boldTitle', label: 'Bold Title', type: 'checkbox', def: true, onChange: (v) => panel.style.setProperty('--dp-title-weight', v ? '600' : '400') },
-      { key: 'dp_boldTab', label: 'Bold Tab', type: 'checkbox', def: false, onChange: (v) => panel.style.setProperty('--dp-tab-weight', v ? '600' : '400') },
+      { key: 'dp_boldTab', label: 'Bold Tab', type: 'checkbox', def: true, onChange: (v) => panel.style.setProperty('--dp-tab-weight', v ? '600' : '400') },
       { key: 'dp_boldGroup', label: 'Bold Group Text', type: 'checkbox', def: true, onChange: (v) => panel.style.setProperty('--dp-group-weight', v ? '600' : '400') },
       { key: 'dp_boldSettings', label: 'Bold Settings Text', type: 'checkbox', def: false, onChange: (v) => panel.style.setProperty('--dp-settings-weight', v ? '600' : '400') },
-      { key: 'dp_boldButton', label: 'Bold Button', type: 'checkbox', def: false, onChange: (v) => panel.style.setProperty('--dp-button-weight', v ? '600' : '400') },
+      { key: 'dp_boldButton', label: 'Bold Button', type: 'checkbox', def: true, onChange: (v) => panel.style.setProperty('--dp-button-weight', v ? '600' : '400') },
+      // Only Title's own letter spacing is perDevice, per
+      // DEV_PANEL_STYLE_SHARED_KEYS -- tab/group/settings/button letter-
+      // spacing are all SHARED there (ported faithfully, not "fixed" to
+      // be consistent with title's own perDevice choice).
       { key: 'dp_titleLetterSpacing', label: 'Dev Panel Title Letter Spacing (Px)', type: 'slider', min: -2, max: 10, step: 0.1, def: 0, perDevice: true, onChange: setVar('--dp-title-letter-spacing') },
       { key: 'dp_titleLineHeight', label: 'Dev Panel Title Line Spacing (X)', type: 'slider', min: 0.8, max: 3, step: 0.05, def: 1.2, perDevice: true, onChange: (v) => panel.style.setProperty('--dp-title-line-height', v) },
-      { key: 'dp_tabLetterSpacing', label: 'Tab Letter Spacing (Px)', type: 'slider', min: -2, max: 10, step: 0.1, def: 0, perDevice: true, onChange: setVar('--dp-tab-letter-spacing') },
-      { key: 'dp_tabLineHeight', label: 'Tab Line Spacing (X)', type: 'slider', min: 0.8, max: 3, step: 0.05, def: 1.4, perDevice: true, onChange: (v) => panel.style.setProperty('--dp-tab-line-height', v) },
-      { key: 'dp_groupLetterSpacing', label: 'Group Letter Spacing (Px)', type: 'slider', min: -2, max: 10, step: 0.1, def: 0, perDevice: true, onChange: setVar('--dp-group-letter-spacing') },
-      { key: 'dp_groupLineHeight', label: 'Group Line Spacing (X)', type: 'slider', min: 0.8, max: 3, step: 0.05, def: 1.4, perDevice: true, onChange: (v) => panel.style.setProperty('--dp-group-line-height', v) },
-      { key: 'dp_settingsLetterSpacing', label: 'Settings Letter Spacing (Px)', type: 'slider', min: -2, max: 10, step: 0.1, def: 0, perDevice: true, onChange: setVar('--dp-settings-letter-spacing') },
-      { key: 'dp_settingsLineHeight', label: 'Settings Line Spacing (X)', type: 'slider', min: 0.8, max: 3, step: 0.05, def: 1.4, perDevice: true, onChange: (v) => panel.style.setProperty('--dp-settings-line-height', v) },
-      { key: 'dp_buttonFontSize', label: 'Button Text Font Size', type: 'slider', min: 6, max: 30, step: 1, def: 11, perDevice: true, onChange: setVar('--dp-button-font-size') },
-      { key: 'dp_buttonLetterSpacing', label: 'Button Letter Spacing (Px)', type: 'slider', min: -2, max: 10, step: 0.1, def: 0, perDevice: true, onChange: setVar('--dp-button-letter-spacing') },
-      { key: 'dp_buttonLineHeight', label: 'Button Line Spacing (X)', type: 'slider', min: 0.8, max: 3, step: 0.05, def: 1.4, perDevice: true, onChange: (v) => panel.style.setProperty('--dp-button-line-height', v) },
-      { key: 'dp_buttonHeight', label: 'Button Height (Px)', type: 'slider', min: 0, max: 60, step: 1, def: 0, perDevice: true, onChange: setVar('--dp-button-height') },
+      { key: 'dp_tabLetterSpacing', label: 'Tab Letter Spacing (Px)', type: 'slider', min: -2, max: 10, step: 0.1, def: 0, onChange: setVar('--dp-tab-letter-spacing') },
+      { key: 'dp_tabLineHeight', label: 'Tab Line Spacing (X)', type: 'slider', min: 0.8, max: 3, step: 0.05, def: 1.2, perDevice: true, onChange: (v) => panel.style.setProperty('--dp-tab-line-height', v) },
+      { key: 'dp_groupLetterSpacing', label: 'Group Letter Spacing (Px)', type: 'slider', min: -2, max: 10, step: 0.1, def: 0, onChange: setVar('--dp-group-letter-spacing') },
+      { key: 'dp_groupLineHeight', label: 'Group Line Spacing (X)', type: 'slider', min: 0.8, max: 3, step: 0.05, def: 1.2, perDevice: true, onChange: (v) => panel.style.setProperty('--dp-group-line-height', v) },
+      { key: 'dp_settingsLetterSpacing', label: 'Settings Letter Spacing (Px)', type: 'slider', min: -2, max: 10, step: 0.1, def: 0, onChange: setVar('--dp-settings-letter-spacing') },
+      { key: 'dp_settingsLineHeight', label: 'Settings Line Spacing (X)', type: 'slider', min: 0.8, max: 3, step: 0.05, def: 1.2, perDevice: true, onChange: (v) => panel.style.setProperty('--dp-settings-line-height', v) },
+      { key: 'dp_buttonFontSize', label: 'Button Text Font Size', type: 'slider', min: 6, max: 30, step: 1, def: 10, perDevice: true, onChange: setVar('--dp-button-font-size') },
+      { key: 'dp_buttonLetterSpacing', label: 'Button Letter Spacing (Px)', type: 'slider', min: -2, max: 10, step: 0.1, def: 0, onChange: setVar('--dp-button-letter-spacing') },
+      { key: 'dp_buttonLineHeight', label: 'Button Line Spacing (X)', type: 'slider', min: 0.8, max: 3, step: 0.05, def: 1.2, perDevice: true, onChange: (v) => panel.style.setProperty('--dp-button-line-height', v) },
+      { key: 'dp_buttonHeight', label: 'Button Height (Px)', type: 'slider', min: 0, max: 60, step: 1, def: 21, perDevice: true, onChange: setVar('--dp-button-height') },
       { key: 'dp_buttonTextBorder', label: 'Button Text Border (Px)', type: 'slider', min: 0, max: 20, step: 1, def: 0, perDevice: true, onChange: setVar('--dp-button-text-border') },
-      { key: 'dp_valueFontSize', label: 'Setting Number Font Size', type: 'slider', min: 6, max: 30, step: 1, def: 11, perDevice: true, onChange: setVar('--dp-value-font-size') },
-      { key: 'dp_groupTextColor', label: 'Group Text Color', type: 'color', def: '#a9b4ff', onChange: setVar('--dp-group-text-color') },
-      { key: 'dp_buttonTextColor', label: 'Button Text Color', type: 'color', def: '#e8e8f0', onChange: setVar('--dp-button-text-color') },
-      { key: 'dp_valueTextColor', label: 'Setting Number Text Color', type: 'color', def: '#e8e8f0', onChange: setVar('--dp-value-text-color') },
-      { key: 'dp_tabTextColor', label: 'Tab Text Color', type: 'color', def: '#a9b4ff', onChange: setVar('--dp-tab-text-color') },
+      { key: 'dp_valueFontSize', label: 'Setting Number Font Size', type: 'slider', min: 6, max: 30, step: 1, def: 10, perDevice: true, onChange: setVar('--dp-value-font-size') },
+      { key: 'dp_groupTextColor', label: 'Group Text Color', type: 'color', def: '#ffffff', onChange: setVar('--dp-group-text-color') },
+      { key: 'dp_buttonTextColor', label: 'Button Text Color', type: 'color', def: '#ffffff', onChange: setVar('--dp-button-text-color') },
+      { key: 'dp_valueTextColor', label: 'Setting Number Text Color', type: 'color', def: '#5cc9ff', onChange: setVar('--dp-value-text-color') },
+      { key: 'dp_tabTextColor', label: 'Tab Text Color', type: 'color', def: '#ffffff', onChange: setVar('--dp-tab-text-color') },
+      // Genuinely belongs here (see comment above) -- controls the
+      // panel's own body-scroll wheel intensity, wired on `body` right
+      // after its own creation, above.
+      { key: 'dp_scrollStrength', label: 'Scroll Strength (X)', type: 'slider', min: 0.2, max: 5, step: 0.1, def: 0.2 },
     ]
   }
   devGroups = [builtInGroup, ...devGroups]
@@ -1473,6 +1542,22 @@ export function initDevPanel(groups, opts = {}) {
   panel.appendChild(header)
 
   const body = el('div', 'dp-body', { id: 'dpBody' })
+  // Ported from TEMPLATE_DEV_PANEL.html's own [JS-13c]-adjacent scroll-
+  // strength wheel handler (2026-09-14 port round) -- controls how far
+  // the panel's own body scrolls per wheel notch. `cfg.dp_scrollStrength`
+  // is read live (not captured into a closure) so the control's own
+  // onChange (a plain cfg/store write, no DOM work needed) is all that's
+  // required to wire it up. strength===1 is treated as "just let the
+  // browser's own native scroll happen" (matching the template), not a
+  // no-op multiply-by-1 -- deltaY's own native scaling already varies by
+  // browser/OS/input device, so replacing it with `deltaY * 1` would NOT
+  // reliably reproduce native scroll feel.
+  body.addEventListener('wheel', (e) => {
+    const strength = cfg.dp_scrollStrength
+    if (strength === undefined || strength === 1) return
+    e.preventDefault()
+    body.scrollTop += e.deltaY * strength
+  }, { passive: false })
 
   // Section 12f: Desktop / Mobile / Landscape tabs.
   const tabs = el('div', 'dp-tabs')
@@ -1549,6 +1634,7 @@ export function initDevPanel(groups, opts = {}) {
   document.body.appendChild(panel)
 
   buildDevPanel(groupsEl)
+  organizeDevPanelSubgroups(groupsEl)
   initPanelDrag(panel, header)
   initResizeHandles(panel)
 

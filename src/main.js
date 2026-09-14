@@ -6,7 +6,7 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js'
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js'
 import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js'
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js'
-import { initDevPanel, syncValue } from './devpanel/devPanel.js?v=6'
+import { initDevPanel, syncValue } from './devpanel/devPanel.js?v=7'
 
 const MODEL_URL = '../data/processed/HAND3D/Hand2.glb'
 // Measured once after the first load -- the rig's own bind-pose "pointing"
