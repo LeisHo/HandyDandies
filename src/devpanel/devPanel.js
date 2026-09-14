@@ -1075,6 +1075,35 @@ function organizeDevPanelSubgroups(groupsEl) {
   makeSub('BUTTONS', ['dp_boldButton', 'dp_capsButtonText', 'dp_buttonFontSize', 'dp_buttonLetterSpacing', 'dp_buttonLineHeight', 'dp_buttonTextColor', 'dp_buttonHeight'], textBody)
 }
 
+// Generic version of organizeDevPanelSubgroups() above, for a PROJECT's
+// own group instead of the built-in "Dev Panel" one -- same "flat rows,
+// just built by buildDevPanel(), into named subgroups, once, before a
+// real saved order takes precedence" shape, but parameterized by group
+// title + an ordered `[{title, keys}]` spec instead of a hardcoded
+// structure, so this file stays generic (a project supplies its own
+// spec via `initDevPanel(groups, { organizeSubgroups: (groupsEl) =>
+// organizeGroupSubgroups(groupsEl, 'GroupTitle', SPEC) })` rather than
+// this engine knowing any project-specific group/control names).
+// Nesting a spec's OWN subgroups further (matching TEXT's 2nd level
+// above) works the same way organizeDevPanelSubgroups() does it: call
+// this again, targeting the just-created subgroup's own body via a
+// second, deeper call -- not built in here, since no current caller
+// needs it.
+export function organizeGroupSubgroups(groupsEl, groupTitle, subgroupSpecs) {
+  const targetGroup = groupsEl.querySelector(`:scope > .dp-group[data-key="${CSS.escape(groupTitle)}"]`)
+  if (!targetGroup) return
+  const body = targetGroup.querySelector(':scope > .dp-group-body')
+  const rowsByKey = {}
+  body.querySelectorAll(':scope > .dp-row[data-key]').forEach((r) => { rowsByKey[r.dataset.key] = r })
+  subgroupSpecs.forEach((spec) => {
+    const g = createGroupElement(spec.title)
+    if (spec.collapsed) g.classList.add('collapsed')
+    body.appendChild(g)
+    const gb = g.querySelector(':scope > .dp-group-body')
+    spec.keys.forEach((k) => { const row = rowsByKey[k]; if (row) gb.appendChild(row) })
+  })
+}
+
 // Extra clamp margin from the left/right viewport edge, mobile only --
 // matches TEMPLATE_DEV_PANEL.html's DEV_PANEL_MOBILE_EDGE_GESTURE_MARGIN_PX:
 // keeps the panel's drag/resize hit-zones off the physical screen edge,
@@ -1650,6 +1679,13 @@ export function initDevPanel(groups, opts = {}) {
 
   buildDevPanel(groupsEl)
   organizeDevPanelSubgroups(groupsEl)
+  // Generic hook for a PROJECT's own group (e.g. main.js's "Pose"), same
+  // "flat rows -> named subgroups, once, before a real saved order takes
+  // over" shape as organizeDevPanelSubgroups() above but not hardcoded to
+  // any one group name -- kept out of THIS function (which stays
+  // Dev-Panel-specific) so a project supplies its own structure via
+  // organizeGroupSubgroups() (below) instead of forking this file.
+  if (opts.organizeSubgroups) opts.organizeSubgroups(groupsEl)
   initPanelDrag(panel, header)
   initResizeHandles(panel)
 

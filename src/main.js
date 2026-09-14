@@ -6,7 +6,7 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js'
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js'
 import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js'
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js'
-import { initDevPanel, syncValue } from './devpanel/devPanel.js?v=9'
+import { initDevPanel, syncValue, organizeGroupSubgroups } from './devpanel/devPanel.js?v=10'
 
 const MODEL_URL = '../data/processed/HAND3D/Hand2.glb'
 // Measured once after the first load -- the rig's own bind-pose "pointing"
@@ -448,7 +448,41 @@ const onChangeByCtrl = new Map()
 DEV_GROUPS.forEach((g) => g.controls.forEach((c) => {
   if (c.onChange) { onChangeByCtrl.set(c, c.onChange); c.onChange = null }
 }))
-const cfg = initDevPanel(DEV_GROUPS, { storageKeyPrefix: 'handyDandies' })
+// Ported from HANDO's own current, live-organized Pose group -- direct
+// request ("check the project Hando's git save in regards to its Dev
+// Panel, Pose settings. I want you to port the subgroup names, nesting,
+// setting groupings, and order"). Read directly from HANDO's own
+// committed `data/processed/dev-panel-settings.json` (its `order` array,
+// "Pose" entry) rather than its main.js control array (which is flat,
+// with no nesting info at all -- the real subgroup structure only ever
+// existed in HANDO's own saved/live-reorganized state). HANDO's own
+// subgroup names were still the unrenamed defaults ("New Group", "New
+// Group (3)"..."(7)") -- never actually renamed there -- so named these
+// descriptively here instead of porting meaningless placeholder text;
+// the GROUPING/ORDER itself (this part of the request) is ported
+// exactly. Omits HANDO's `baseOnlyCurl*` sliders (5, one per finger --
+// don't exist as controls in this project yet) and `hideWrist` from the
+// Wrist group (this project's own Hide Wrist is a separate, larger
+// reactive Arm Length system, not the single static slider HANDO's own
+// Wrist subgroup bundles in -- deliberately left where it already sits,
+// per this Pose group's own top comment on why Arm Length is excluded
+// from what a saved pose even captures). Collapsed by default (matches
+// HANDO's own majority state across its 6 subgroups -- one of HANDO's
+// six happened to be left expanded, evidently just incidental to
+// whatever was last interacted with there, not a deliberate choice worth
+// preserving).
+const POSE_SUBGROUP_SPECS = [
+  { title: 'Whole-Hand Rotation & Thumb', collapsed: true, keys: ['modelRotX', 'modelRotY', 'modelRotZ', 'thumbCurl', 'thumbSplay', 'thumbSplay2', 'tipTwistThumb', 'curlBiasThumb'] },
+  { title: 'Wrist', collapsed: true, keys: ['wristBend', 'wristSplay'] },
+  { title: 'Index', collapsed: true, keys: ['curlIndex', 'tipTwistIndex', 'splayIndex', 'curlBiasIndex', 'splayIndex2'] },
+  { title: 'Middle', collapsed: true, keys: ['curlMiddle', 'tipTwistMiddle', 'splayMiddle', 'curlBiasMiddle', 'splayMiddle2'] },
+  { title: 'Ring', collapsed: true, keys: ['curlRing', 'tipTwistRing', 'splayRing', 'curlBiasRing', 'splayRing2'] },
+  { title: 'Pinky', collapsed: true, keys: ['curlPinky', 'tipTwistPinky', 'curlBiasPinky', 'splayPinky', 'splayPinky2'] },
+]
+const cfg = initDevPanel(DEV_GROUPS, {
+  storageKeyPrefix: 'handyDandies',
+  organizeSubgroups: (groupsEl) => organizeGroupSubgroups(groupsEl, 'Pose', POSE_SUBGROUP_SPECS)
+})
 onChangeByCtrl.forEach((fn, c) => { c.onChange = fn })
 // Arm Length's 2 custom widgets (see their own declaration comments,
 // Pose section below) -- parse whatever initDevPanel() just restored
