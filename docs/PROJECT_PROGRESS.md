@@ -196,6 +196,13 @@ still relevant to understanding current state, per this doc's own
   (palm-normal-to-cursor dot product = 0.999999995) and visually
   (above/below/left hands show the expected ~180/~90-degree relationship
   described in the request).
+  **CORRECTED 2026-09-14, same day:** the calibration was actually
+  backwards -- real usage showed the back of the hand facing the cursor
+  instead of the palm. Fixed by negating the palm-normal cross product
+  (exact 180-degree flip). Also found the original "verified
+  mathematically" dot-product check was tautological (self-confirms
+  regardless of which cross-product sign is used) -- see CODE_SUMMARY.txt's
+  GOTCHAS for the full account and what to do differently next time.
 - **Ported the built-in "Dev Panel" chrome-styling group's expansion
   from `TEMPLATE_DEV_PANEL.html`, scoped to "just the chrome group"**
   (the user's own choice when asked how much of the template's growth to

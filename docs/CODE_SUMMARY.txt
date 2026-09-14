@@ -983,6 +983,33 @@ GOTCHAS
   rotated to roughly horizontal -- matching the qualitative "rotated
   ~180 above, ~90 to the side" pattern described in the request. Default
   OFF (`def: false`) -- nothing changes until opted in.
+
+  **CORRECTED 2026-09-14, same day:** the live calibration above was
+  WRONG in practice -- direct user report, "the palm face cursor is
+  doing the exact opposite. rotate them 180 degrees." `pinky x index`
+  was actually the BACK-of-hand normal, not the outward palm normal;
+  fixed by swapping the operand order to `index x pinky` (the exact
+  negation, per cross-product anticommutativity `a x b = -(b x a)`).
+  **Also found a real limitation in the "verified 2 ways" claim above:
+  the "(1) mathematically" dot-product check is TAUTOLOGICAL** -- it
+  re-measures the SAME formula used to build the correction, so it will
+  self-confirm to ~1.0 regardless of which cross-product order is fed
+  in (confirmed directly: re-ran that identical check with BOTH the old
+  and new operand order and got 1.0 both times). It can verify the
+  composition LOGIC (that the correction quaternion is being applied
+  correctly) but can never catch a wrong SIGN choice -- only a real
+  visual/anatomical check can do that, and this project's flat-shaded
+  toon mesh doesn't render a strongly distinct palm-vs-back texture,
+  making even the "(2) visually" check from the original round weaker
+  evidence than its own confident phrasing suggested (it could
+  distinguish rotation ANGLE/axis correctly, per the vertical-flip/
+  horizontal-rotation pattern, but not which FACE of the hand was
+  showing). Any future feature built the same way (calibrate a normal's
+  sign via a self-referential dot-product check) should get an
+  INDEPENDENT ground-truth check instead -- e.g. a known anatomical
+  landmark (thumb position relative to the palm plane) or an actual
+  side-by-side visual comparison against a reference pose, not a check
+  that re-derives its own answer.
 - **Ported the built-in "Dev Panel" chrome-styling group's expansion from
   `TEMPLATE_DEV_PANEL.html`, scoped to "just the chrome group"** per
   direct request when asked how much of the template's own growth (also:

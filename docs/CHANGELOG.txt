@@ -1966,6 +1966,46 @@ Cache-buster bumps: `devpanel.js?v=8` -> `?v=9`, `style.css?v=4` -> `?v=5`,
 `index.html`'s own `main.js?v=35` -> `?v=36`.
 
 --------------------------------------------------------------------------------
+2026-09-14  -  ~03:59 AM - 04:09 AM EDT (bounded by checkpoints; see Verified note)
+
+Fixed "Palm Faces Cursor" rotating 180 degrees backwards -- direct user
+report: "the palm face cursor is doing the exact opposite. rotate them
+180 degrees." The feature's own palm-plane-normal calibration (from an
+earlier round this same project) was `pinkyVec x indexVec` -- the exact
+OPPOSITE of the true outward palm normal, so the feature aimed the BACK
+of the hand at the cursor instead of the palm. Fixed by swapping the
+cross-product operand order to `indexVec x pinkyVec`: a well-known
+identity, a x b = -(b x a), makes this a clean, exact negation of the
+prior vector -- since the palm normal and the back-of-hand normal are
+themselves exact opposites on the same approximate hand-plane, negating
+which one feeds the correction is precisely the 180-degree flip asked
+for, with no other math touched (the lookAt/composition logic that maps
+this normal onto the cursor direction was already correct and unchanged).
+
+Verification note, disclosed honestly: this project's toon-shaded gray
+mesh has no strongly distinct palm-vs-back surface texture (no palm
+lines/creases rendered), so a literal "does this pixel-level render show
+palm or back" screenshot comparison wasn't reliably conclusive at this
+render fidelity -- attempted via a temporary close-up camera reposition
+(frozen OrbitControls, one hand's wrapper manually rotated to face the
+relocated camera) but the resulting silhouette was ambiguous either way.
+Also discovered and disclosed a real limitation in the ORIGINAL
+implementation's own dot-product self-check (the "confirmed... dot
+product = 0.999999995" verification from that earlier round): that check
+is mathematically tautological -- it always self-confirms regardless of
+which cross-product order is used, since it re-measures the SAME formula
+that built the correction in the first place, so it could never have
+caught this sign bug even though it "passed." Relied instead on the
+airtight mathematical guarantee (cross-product anticommutativity means
+this change is a true, exact negation, not an approximation) plus the
+user's own direct, specific report of the symptom and the exact fix
+needed. Confirmed a clean, isolated diff (git diff reviewed: only the
+comment and the one operand-order line changed) and a normal fresh-tab
+load afterward (510/510 hands, zero new console errors).
+
+Cache-buster bump: index.html's own main.js?v=36 -> ?v=37.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================
