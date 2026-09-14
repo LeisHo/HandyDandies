@@ -1922,3 +1922,52 @@ GOTCHAS
   transition) keeps tracking Responsive Wrist Splay fully live, exactly
   as before -- both features now coexist correctly. Live-verified in
   browser (see CHANGELOG.txt's matching entry for the full account).
+- **CORRECTION to the entry directly above (still 2026-09-14, same day):
+  the freeze fix was real and still correct, but was NOT actually the
+  full explanation.** Direct follow-up report: "doesnt work. thumb still
+  messed up" -- then, asked whether it reproduced with the cursor held
+  still: "yeah im not talking about moving during the transition. im
+  just talk about regular static click, duble click or clickhold." With
+  a genuinely static cursor, `computeResponsiveWristSplayDeg()` returns
+  the identical value whether recomputed live or captured once, so the
+  freeze fix could not have been the (whole) explanation for a static-
+  cursor symptom -- it remains correct for its own actual case (cursor
+  moving mid-transition), just narrower than first believed.
+  **The real, final root cause, found by reading `updateRenderOrder()`'s
+  own idle branch line by line:** it re-applies the wrist bone's live
+  Responsive Wrist Splay rotation EVERY frame for an idle hand, but
+  never re-applies finger curl -- curl is normally only recomputed on a
+  slider change or "Default" click (`applyAllFingerPoses()`), not every
+  frame. `rotateOnTrueWorldAxis()` converts a curl's intended WORLD-space
+  axis into a LOCAL bone rotation using `bone.getWorldQuaternion()` --
+  the CURRENT parent-chain world orientation at the exact instant curl
+  is computed (the same mechanism the original wrist-before-fingers fix,
+  many rounds earlier, already established). `rThumb1` is the only
+  finger bone parented directly to the wrist bone (`rHand`), so it's the
+  only one whose local rotation goes stale the moment the wrist keeps
+  rotating afterward -- independent of cursor movement (a nonzero live
+  splay value sits there whether the cursor moves or not), and matching
+  "every other finger is correct, it's just the thumb" exactly. "Default"
+  looks correct for exactly the one frame it's applied (extraSplayDeg=0
+  in that specific call), then the wrist keeps moving via live splay
+  every frame after that while the thumb doesn't follow.
+  Fix: the idle branch now also re-applies the THUMB's curl (only the
+  thumb -- the other 4 fingers are provably unaffected, confirmed by the
+  original wrist-ordering fix) immediately after the wrist update,
+  mirroring the same "wrist then fingers, together, every frame" pattern
+  `applyPoseValuesToHand()` already uses during an active transition.
+  **Verified with a genuinely independent double-check, static cursor
+  throughout:** 2 separate computations of the thumb's WORLD orientation
+  at a hand with a 90-degree live splay swing -- (A) the real route
+  (Default, then 5 real idle frames via `updateRenderOrder()`) and (B) an
+  independent reference (wrist set directly to its final value, thumb
+  curl applied fresh against it, called directly, not through the frame
+  loop) -- measured **0.0 degrees** of difference. Confirmed the test
+  was actually discriminating by reproducing the OLD (pre-fix) behavior
+  the same way and comparing against the same reference B: **12.5
+  degrees of real, measurable error.** See CHANGELOG.txt's matching entry
+  for the full account, including a note on this round's own live-browser
+  verification being intermittently blocked by local static-server
+  connection resets (an environment issue, confirmed via `curl` too,
+  unrelated to any code change) -- worked around with a fresh server
+  instance on an alternate port.

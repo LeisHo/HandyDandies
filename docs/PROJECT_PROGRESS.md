@@ -450,26 +450,34 @@ still relevant to understanding current state, per this doc's own
   clicks from triggering Click Pose at all. Both now verified correct
   together (quick click triggers, genuine hold still suppresses the
   extra trigger). See CHANGELOG.txt for the full account.
-- **The "thumb pose looks wrong" saga's actual root cause found and
-  fixed: Responsive Wrist Splay, not a code bug.** The 4 rounds of fixes
-  above (wrist-order; per-hand Whole-Hand Rotation; Base-Only Curl;
-  Click-Hold/Click-Pose interference) were all real and stayed correct
-  -- none of them were wrong. The user's own 2 decisive tests broke it
-  open: a Click Pose target set to the SAME pose as Default still shifted
-  the thumb on click (impossible if the cause were in pose data), and
-  only the thumb was ever affected (the one finger parented to the
-  wrist bone). Responsive Wrist Splay -- a live, cursor-distance-driven
-  feature the user had enabled -- recomputes an extra wrist rotation
-  every frame, independent of the target pose, so any cursor movement
-  during a transition shifted the thumb out from under it. Direct
-  follow-up ("is there a way around it such that i can have both
-  functioning correctly"): `extraSplayDeg` is now captured ONCE at
-  trigger time (`chp.frozenSplayDeg`/`cp.frozenSplayDeg`) and held fixed
-  through that hand's whole transition sequence, while idle hands keep
-  tracking Responsive Wrist Splay fully live -- both now coexist
-  correctly. Live-verified: frozen value stays identical across a big
-  mid-transition cursor jump; an idle hand's wrist bone still visibly
-  responds to the same jump. See CHANGELOG.txt for the full account.
+- **The "thumb pose looks wrong" saga is genuinely, finally resolved.**
+  4 earlier rounds of fixes (wrist-order; per-hand Whole-Hand Rotation;
+  Base-Only Curl; Click-Hold/Click-Pose interference) were all real and
+  stayed correct -- none of them were wrong, they just weren't the whole
+  story. 2 more rounds this same day:
+  (1) Responsive Wrist Splay recomputing live DURING a transition (fixed
+  by freezing `extraSplayDeg` once at trigger time,
+  `chp.frozenSplayDeg`/`cp.frozenSplayDeg`) -- real, but the user then
+  reported the thumb was still wrong even with a completely static
+  cursor, which this fix can't explain (a static cursor makes live vs.
+  frozen recompute produce the identical value either way).
+  (2) **The actual final root cause**, found by reading
+  `updateRenderOrder()`'s own idle branch: it re-applies the wrist's live
+  Responsive Wrist Splay rotation every frame, but never re-applies
+  finger curl (only recomputed on a slider change or "Default" click).
+  Since the thumb is the only finger parented to the wrist bone, and its
+  curl axis is computed relative to the wrist's world orientation *at the
+  instant curl is applied*, its rotation silently goes stale the moment
+  the wrist keeps moving afterward -- independent of cursor movement,
+  matching "every other finger is correct, it's just the thumb" exactly.
+  Fixed by re-applying just the thumb's curl every idle frame, right
+  after the wrist update (the other 4 fingers are provably unaffected).
+  Verified with a genuinely independent double-check, static cursor
+  throughout: two separately-computed references for the thumb's world
+  orientation agreed to 0.0 degrees; reproducing the pre-fix behavior the
+  same way against the same reference measured a real 12.5-degree error,
+  confirming the test actually discriminates. See CHANGELOG.txt for the
+  full account of both rounds.
 - **Decoupled cursor target X/Y from Cursor Target Depth**, after
   quantifying a real parallax gap (up to ~45 world units at the field
   edge) between the true screen cursor position and where hands actually

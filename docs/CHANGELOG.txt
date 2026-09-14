@@ -3047,6 +3047,91 @@ behaviors now coexist as intended.
 Cache-buster bump: `index.html`'s own `main.js?v=71` -> `?v=72`.
 
 --------------------------------------------------------------------------------
+2026-09-14  -  12:0x PM EDT (start not captured -- Actual: NOT MEASURED)
+
+**THE ACTUAL, FINAL ROOT CAUSE of the "thumb pose looks wrong" saga --
+found and fixed, independent of cursor movement.** Direct follow-up
+report after the previous entry's freeze fix: "doesnt work. thumb still
+messed up" -- then, when asked whether it happens with the cursor held
+still: "yeah im not talking about moving during the transition. im just
+talk about regular static click, duble click or clickhold." This ruled
+out the previous entry's own diagnosis (Responsive Wrist Splay
+recomputing live DURING a transition) as the explanation, since with a
+genuinely static cursor that recompute produces the identical value every
+time regardless of freezing -- the freeze fix was real and still correct
+for cursor-movement cases, but wasn't the (whole) story.
+
+Found by reading `updateRenderOrder()`'s own idle branch (the per-frame
+path for a hand NOT in any active pose transition) line by line: it
+re-applies the wrist bone's live Responsive Wrist Splay rotation EVERY
+SINGLE FRAME, but never re-applies finger curl -- curl is normally only
+recomputed on a slider change or "Default" click
+(`applyAllFingerPoses()`), not every frame. `rotateOnTrueWorldAxis()`
+converts a curl's intended WORLD-space axis into a LOCAL bone rotation
+using `bone.getWorldQuaternion()` -- the bone's CURRENT parent-chain
+world orientation at the exact instant curl is computed (same mechanism
+as the original wrist-before-fingers fix, many rounds ago). `rThumb1` is
+the only finger bone parented directly to the wrist bone (`rHand`), so
+it's the only one whose local rotation goes stale the moment the wrist
+keeps rotating afterward -- exactly matching "every other finger is
+correct, it's just the thumb," and exactly independent of cursor
+movement (a nonzero live Responsive Wrist Splay value sits there
+whether the cursor is moving or not). "Default" looks correct for
+exactly the one frame it's applied (extraSplayDeg=0 in
+`applyAllFingerPoses()`'s own call), then the wrist keeps moving via
+live splay every frame after that while the thumb doesn't follow -- and
+a hand returning to idle after any Click-Hold-Pose/Click-Pose sequence
+shows the identical desync immediately, for the same reason.
+
+Fix: the idle branch now also re-applies the THUMB's curl (only the
+thumb -- the other 4 fingers aren't parented to `rHand` and are provably
+unaffected, confirmed by the original wrist-ordering fix, so refreshing
+all 5 every frame for every hand isn't needed and would cost real
+performance at hundreds of hands for no benefit) immediately after the
+wrist update, mirroring the same "wrist then fingers, together, every
+frame" pattern `applyPoseValuesToHand()` already uses during an active
+transition.
+
+**Verified with a genuinely independent double-check, static cursor
+throughout (no pointer events at all), reproducing the user's own exact
+repro conditions:** built 2 separate reference computations for the
+thumb's WORLD-space orientation at a hand with a large (90-degree) live
+Responsive Wrist Splay swing -- (A) the real route: apply "Default", then
+run 5 real idle frames via `updateRenderOrder()`; (B) an independent
+reference: set the wrist directly to its final live value in one shot,
+then apply thumb curl fresh against THAT, via the same exposed functions
+called directly, not through the frame loop. Result: **0.0 degrees**
+of world-space difference between A and B. Confirmed the test was
+actually discriminating by reproducing the OLD (pre-fix) behavior the
+same way (wrist-only per-"frame" update, thumb curl never refreshed) and
+comparing against the same reference B: **12.5 degrees of real,
+measurable error** -- a genuine, visually-significant bug, not a
+rounding artifact, now fixed.
+
+Also exposed 3 more functions on `window.__debug`
+(`applyAllFingerPoses`, `applyPoseValuesToHand`, `cloneBaseQuat` getter,
+`triggerClickPose`, `startClickHoldPose`, `endClickHoldPose`,
+`updateClickPoseForHand`, `updateClickHoldPoseForHand`, `getOrInitHandCP`,
+`getOrInitHandCHP`, `computeResponsiveWristSplayDeg`,
+`applyWristPoseToSkeleton`, `applyCurlToSkeleton`, `FINGER_NAMES`,
+`FINGER_JOINTS`) to make this and future investigations directly
+testable without depending on real pointer-event timing or the Browser
+pane's own rAF-suspends-while-hidden limitation.
+
+**Environment note, not a code issue:** this round's own live-browser
+verification was repeatedly blocked by the local static file server
+(`python3 -m http.server`) intermittently truncating/resetting the
+connection for `main.js` and `devpanel.js` specifically (confirmed via
+direct `curl` retries outside the browser tool too -- same file,
+same intermittent truncation, unrelated to any code change) -- worked
+around by starting a completely fresh server instance on an alternate
+port (`static-alt2`, 8422) rather than continuing to retry the
+already-hammered one.
+
+Cache-buster bumps: `index.html`'s own `main.js?v=72` -> `?v=75` across
+this round (2 intermediate debug-exposure bumps).
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================
