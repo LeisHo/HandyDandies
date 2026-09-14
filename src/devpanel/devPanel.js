@@ -59,6 +59,7 @@ function round(v, d) {
 
 function settingsKey() { return `${storageKeyPrefix}.devSettings` }
 function geomKeyPrefix() { return `${storageKeyPrefix}.devPanelGeom.` }
+function savedStatesKey() { return `${storageKeyPrefix}.devSavedStates` }
 // Landscape vs. Mobile is an orientation call, not a separate breakpoint --
 // CLAUDE.md's own §12f text doesn't specify an exact rule, so this is a
 // disclosed judgment call (matching ADA BATHROOM/DICKOCLICKO's own same-
@@ -1695,19 +1696,50 @@ export function initDevPanel(groups, opts = {}) {
     try { geom = JSON.parse(localStorage.getItem(currentGeomKey())) } catch (err) { geom = null }
     applyPanelGeometry(panel, geom)
   }
-  function copySettings() {
+  // Shared by Copy Settings (clipboard export) and Named Setting States
+  // below ([JS-13b]-equivalent port) -- both need the exact same "entire
+  // panel" snapshot shape (values for all 3 devices + group/row order +
+  // text-rename overrides + per-device panel geometry, the last read from
+  // localStorage for whichever 2 devices aren't the current real one,
+  // since only one device can ever be "live" at a time).
+  function captureFullPanelState() {
     const real = realDeviceClass()
     const panelGeometry = { [real]: getPanelGeometry(panel) }
     DEVICES.filter((d) => d !== real).forEach((d) => {
       try { panelGeometry[d] = JSON.parse(localStorage.getItem(geomKeyPrefix() + d)) } catch (err) { panelGeometry[d] = null }
     })
-    const snapshot = {
+    return {
       values: Object.fromEntries(DEVICES.map((d) => [d, { ...store[d] }])),
       order: getPanelOrder(groupsEl),
       textOverrides: { ...textOverrides },
       panelGeometry
     }
-    const text = JSON.stringify(snapshot, null, 2)
+  }
+  // Applies a captureFullPanelState() snapshot live -- used by both "Use"
+  // (a reversible try, see below) and "Set as Default" (which additionally
+  // runs the result through saveSettings() right after). Writes the OTHER
+  // 2 devices' geometry straight to their own localStorage geom keys (never
+  // visually applied here, since only one device is ever live) so a later
+  // switch to that device/a resize picks up this state's geometry for it
+  // too, matching what Copy Settings' own multi-device capture already
+  // assumes is possible.
+  function applyFullPanelState(state) {
+    if (!state) return
+    applyOrder(groupsEl, state.order)
+    applyStoredValues(state.values)
+    textOverrides = { ...(state.textOverrides || {}) }
+    applyTextOverrides()
+    if (state.panelGeometry) {
+      const real = realDeviceClass()
+      if (state.panelGeometry[real]) applyPanelGeometry(panel, state.panelGeometry[real])
+      DEVICES.filter((d) => d !== real).forEach((d) => {
+        if (!state.panelGeometry[d]) return
+        try { localStorage.setItem(geomKeyPrefix() + d, JSON.stringify(state.panelGeometry[d])) } catch (err) { /* ignore */ }
+      })
+    }
+  }
+  function copySettings() {
+    const text = JSON.stringify(captureFullPanelState(), null, 2)
     const flash = (msg) => { const orig = copyBtn.textContent; copyBtn.textContent = msg; setTimeout(() => { copyBtn.textContent = orig }, 900) }
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(text).then(() => flash('Copied!')).catch(() => flash('Copy failed'))
@@ -1719,6 +1751,106 @@ export function initDevPanel(groups, opts = {}) {
   copyBtn.addEventListener('click', copySettings)
   saveBtn.addEventListener('click', saveSettings)
   resetBtn.addEventListener('click', resetSettings)
+
+  // ------------------------------------------------------------------
+  // Named Setting States (Save/Use/Delete/Set as Default) -- CLAUDE.md
+  // §12d's optional upgrade, ported from TEMPLATE_DEV_PANEL.html's own
+  // [JS-13b] (itself modeled on HANDO's buildListPickerRow(), generalized
+  // from one control's own saved presets to the WHOLE panel's state).
+  // Reuses captureFullPanelState()/applyFullPanelState() above -- the
+  // exact same snapshot Copy/Save/Reset already use -- so a saved state
+  // round-trips through the identical values/order/textOverrides/geometry
+  // shape. "Use" applies a state live without touching what Save/Reset
+  // would restore (a reversible "try it"); "Set as Default" applies it
+  // AND runs it through saveSettings(), so it becomes what Reset/a fresh
+  // load restores. A plain <select>, not a custom scrollable list widget
+  // (matching the template's own simpler choice here over HANDO's richer
+  // per-control picker -- no Rename requested for this whole-panel case).
+  // Sits directly under the Copy/Save/Reset row, as its own standalone
+  // collapsible group OUTSIDE groupsEl -- deliberately not part of the
+  // per-tab reorderable group/drag-reorder system (a saved state covers
+  // the whole panel across all 3 tabs at once; there's only ever one of
+  // this group, unlike Dev Panel/Debug which repeat per tab).
+  const savedStatesGroup = el('div', 'dp-group dp-standalone-group')
+  savedStatesGroup.dataset.key = 'Saved Dev Settings'
+  const savedStatesHeader = el('div', 'dp-group-header')
+  savedStatesHeader.append(
+    el('span', 'arrow', { textContent: '▼' }),
+    el('span', 'dp-group-title-text', { textContent: 'Saved Dev Settings' })
+  )
+  savedStatesHeader.addEventListener('click', () => savedStatesGroup.classList.toggle('collapsed'))
+  const savedStatesBody = el('div', 'dp-group-body')
+  const savedStatesSelect = el('select', null, { style: 'width:100%; margin-bottom:5px;' })
+  const savedStatesBtnRow = el('div', 'dp-actions')
+  const saveStateBtn = el('button', null, { type: 'button', textContent: 'Save' })
+  const useStateBtn = el('button', null, { type: 'button', textContent: 'Use' })
+  const deleteStateBtn = el('button', null, { type: 'button', textContent: 'Delete' })
+  const setDefaultStateBtn = el('button', null, { type: 'button', textContent: 'Set Default' })
+  savedStatesBtnRow.append(saveStateBtn, useStateBtn, deleteStateBtn, setDefaultStateBtn)
+  savedStatesBody.append(savedStatesSelect, savedStatesBtnRow)
+  savedStatesGroup.append(savedStatesHeader, savedStatesBody)
+  body.appendChild(savedStatesGroup)
+
+  function getSavedStates() {
+    try {
+      const raw = localStorage.getItem(savedStatesKey())
+      return raw ? JSON.parse(raw) : {}
+    } catch (err) { return {} }
+  }
+  function setSavedStates(states) {
+    try { localStorage.setItem(savedStatesKey(), JSON.stringify(states)) } catch (err) { /* ignore -- storage full/unavailable, same tolerance as saveSettings() */ }
+  }
+  function renderSavedStatesList() {
+    const states = getSavedStates()
+    const prevValue = savedStatesSelect.value
+    savedStatesSelect.innerHTML = ''
+    Object.keys(states).forEach((name) => {
+      const opt = document.createElement('option')
+      opt.value = name
+      opt.textContent = name
+      savedStatesSelect.appendChild(opt)
+    })
+    if (states[prevValue]) savedStatesSelect.value = prevValue
+  }
+  function saveNamedState() {
+    const name = window.prompt('Save current settings as:')
+    if (!name) return
+    const states = getSavedStates()
+    if (states[name] && !window.confirm(`"${name}" already exists. Overwrite it?`)) return
+    states[name] = captureFullPanelState()
+    setSavedStates(states)
+    renderSavedStatesList()
+    savedStatesSelect.value = name
+  }
+  function useNamedState() {
+    const name = savedStatesSelect.value
+    if (!name) return
+    const states = getSavedStates()
+    if (states[name]) applyFullPanelState(states[name])
+  }
+  function deleteNamedState() {
+    const name = savedStatesSelect.value
+    if (!name) return
+    if (!window.confirm(`Delete "${name}"?`)) return
+    const states = getSavedStates()
+    delete states[name]
+    setSavedStates(states)
+    renderSavedStatesList()
+  }
+  function setNamedStateAsDefault() {
+    const name = savedStatesSelect.value
+    if (!name) return
+    const states = getSavedStates()
+    const state = states[name]
+    if (!state) return
+    applyFullPanelState(state)
+    saveSettings()
+  }
+  saveStateBtn.addEventListener('click', saveNamedState)
+  useStateBtn.addEventListener('click', useNamedState)
+  deleteStateBtn.addEventListener('click', deleteNamedState)
+  setDefaultStateBtn.addEventListener('click', setNamedStateAsDefault)
+  renderSavedStatesList()
   // `.dp-collapsed`'s own CSS only hides `.dp-body`/`.dp-resize` -- it
   // can't also shrink the PANEL's own box, for 2 separate reasons that
   // BOTH had to be fixed: `panel.style.height` is set as an explicit

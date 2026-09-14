@@ -1173,3 +1173,18 @@ GOTCHAS
   bug in the listener itself -- don't conclude a resize listener is broken
   from this tool's own emulated-viewport behavior alone; dispatch a real
   `resize` event (or resize an actual window) to test it directly.
+- **Named Setting States ("Saved Dev Settings") is deliberately NOT part
+  of the per-tab reorderable group system.** It's built directly (plain
+  `el('div', 'dp-group dp-standalone-group')` + manual header/body, not
+  `createGroupElement()`) rather than appended into `groupsEl`, for 2
+  reasons: (1) `createGroupElement()` always includes a `.dp-drag-handle`
+  span, which would visually invite dragging a group that isn't actually
+  registered in `devGroups`/`getPanelOrder()`/`applyOrder()` and so can
+  never really be reordered or nested; (2) one saved-state snapshot covers
+  the whole panel across all 3 Desktop/Mobile/Landscape tabs at once, so
+  unlike Dev Panel/Debug it must exist exactly ONCE, never tripled per
+  tab. `captureFullPanelState()`/`applyFullPanelState()` (factored out of
+  the pre-existing `copySettings()`, which already built this exact
+  snapshot shape) are shared by Copy Settings and every Save/Use/Delete/
+  Set-Default button on this group -- a change to the snapshot shape only
+  ever needs to happen in one place.

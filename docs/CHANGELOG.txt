@@ -1824,6 +1824,67 @@ confirmed stale, not new, by re-checking hand count (510, unchanged).
 Cache-buster bump: `index.html`'s own `src/main.js?v=33` -> `?v=34`.
 
 --------------------------------------------------------------------------------
+2026-09-14  -  ~03:16 AM - 03:27 AM EDT (bounded by checkpoints; see Verified note)
+
+Named Setting States ("Saved Dev Settings") -- direct request: "double
+check the dev panel template in regards to Saved Dev Settings feature.
+Implement that." Read TEMPLATE_DEV_PANEL.html's own `[JS-13b]` section
+first: Save/Use/Delete/Set-as-Default for multiple named, full-panel-state
+snapshots (CLAUDE.md §12d's optional upgrade, modeled on HANDO's own
+per-control `buildListPickerRow()` generalized to the WHOLE panel's state).
+Confirmed this project's `devpanel.js` had no existing scaffolding for it
+(only the per-control list-picker, `dp-lp-group`, used elsewhere for
+Saved Poses-style presets -- a genuinely different, narrower mechanism).
+
+Added:
+- `captureFullPanelState()`/`applyFullPanelState()` -- factored out of the
+  existing `copySettings()` (which already built this exact snapshot
+  shape: per-device values, group/row order, text-rename overrides,
+  per-device panel geometry) so Copy Settings and the new feature share
+  one capture/apply path rather than duplicating it. `copySettings()`
+  itself now just calls `captureFullPanelState()` -- behavior-preserving,
+  verified identical output shape.
+- A new standalone collapsible "Saved Dev Settings" group, built directly
+  (not via `createGroupElement()`, to skip its always-present drag handle,
+  since this group is deliberately NOT part of the per-tab reorderable
+  group/drag-reorder system -- one state snapshot covers the whole panel
+  across all 3 device tabs at once). Sits directly under the Copy/Save/
+  Reset action row, outside `groupsEl` entirely, matching the template's
+  own placement exactly.
+- A plain `<select>` (not a custom list widget, matching the template's
+  own simpler choice here -- no Rename requested) + Save/Use/Delete/Set
+  Default buttons. Save prompts for a name (confirms before overwriting
+  an existing one); Use applies a state live without touching what Save/
+  Reset would restore (a reversible "try it"); Delete removes a saved
+  state only; Set Default applies the state AND runs it through the
+  existing `saveSettings()`, making it what Reset/a fresh load restores.
+  New localStorage key `handyDandies.devSavedStates` (via the existing
+  `storageKeyPrefix` convention, alongside `.devSettings`/`.devPanelGeom.`).
+- New `.dp-standalone-group select` CSS rule (style.css) -- the native
+  select had no existing style scope to inherit from (the one prior
+  `<select>` usage, the multi-value picker, is scoped to its own
+  `.dp-multi-select-row`), so it rendered as an unstyled browser default
+  without this.
+
+Verified live: changed Dev Panel Accent Color, saved it as a named state
+("Test1"), changed the color twice more, then (1) Use correctly restored
+the saved color without writing to the Save/Reset baseline (confirmed
+`handyDandies.devSettings` stayed empty/untouched through Use alone);
+(2) Set Default correctly applied AND persisted the color into that same
+baseline key; (3) Delete correctly removed the state from both the
+dropdown and localStorage. Collapse/expand toggle on the new group
+verified working independently of the per-tab group system. A completely
+fresh tab (cleared state from a prior round) loaded cleanly: panel built,
+510/510 hands, the new group present with a correctly-empty list (the
+just-deleted state didn't reappear), and zero console errors at all --
+confirming 2 console errors seen in an earlier same-session check
+(`net::ERR_CONNECTION_RESET`, "Failed to load hand model") were stale
+from an unrelated transient navigation failure, not caused by this round.
+Cache-buster bumps: `devpanel.js?v=7` -> `?v=8` (via main.js's own import
+line), `style.css?v=3` -> `?v=4`, `index.html`'s own `main.js?v=34` ->
+`?v=35`.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

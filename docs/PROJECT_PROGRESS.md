@@ -18,11 +18,7 @@ work seamlessly from there.
 
 ## Currently working on
 
-Investigating `TEMPLATE_DEV_PANEL.html`'s own `[JS-13b]` Named Setting
-States feature (Save/Use/Delete/Set-as-Default for whole-panel snapshots)
-for a port into this project's dev panel — direct request, "double check
-the dev panel template in regards to Saved Dev Settings feature. Implement
-that." Not yet scoped against the actual template code.
+Nothing in progress — see What's next.
 
 ## Recently completed
 
@@ -247,6 +243,18 @@ still relevant to understanding current state, per this doc's own
   Deliberately did not port touch-gesture classification — this project's
   cursor-tracking mechanic has no touch equivalent. Verified live via
   synthetic pointer/resize events; zero new console errors.
+- **Named Setting States ("Saved Dev Settings")** — CLAUDE.md §12d's
+  optional Save/Use/Delete/Set-as-Default-for-whole-panel-snapshots
+  upgrade, ported from the template's `[JS-13b]`. A new standalone
+  collapsible group (deliberately outside the per-tab reorderable group
+  system — one state covers all 3 device tabs at once) sits directly
+  under the Copy/Save/Reset row, with a plain `<select>` + 4 buttons.
+  Reuses the exact same full-panel snapshot shape Copy Settings already
+  produced (factored into `captureFullPanelState()`/`applyFullPanelState()`,
+  shared by both). Verified live: Use restores a saved state without
+  touching the Save/Reset baseline; Set Default applies AND persists it;
+  Delete removes it from both the dropdown and storage; a fresh tab loads
+  clean with zero console errors.
 
 ## What's next
 
