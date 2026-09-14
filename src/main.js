@@ -6,7 +6,7 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js'
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js'
 import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js'
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js'
-import { initDevPanel, syncValue, organizeGroupSubgroups } from './devpanel/devPanel.js?v=12'
+import { initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions } from './devpanel/devPanel.js?v=12'
 
 const MODEL_URL = '../data/processed/HAND3D/Hand2.glb'
 // Measured once after the first load -- the rig's own bind-pose "pointing"
@@ -281,7 +281,14 @@ const DEV_GROUPS = [
         itemLabel: 'Pose',
         importable: true,
         captureCurrent: () => capturePosePreset(),
-        onUse: (item) => previewPosePreset(item)
+        onUse: (item) => previewPosePreset(item),
+        // Click-Hold-Pose's own 2 Target Pose dropdowns (chpTargetPose/
+        // rchpTargetPose) read this same list via options(), but a
+        // 'select' control's <option> list is only rebuilt on an explicit
+        // refreshSelectOptions() call, not automatically -- without this,
+        // saving or deleting a pose here wouldn't show up there until the
+        // page reloads.
+        onChange: () => { refreshSelectOptions('chpTargetPose'); refreshSelectOptions('rchpTargetPose') }
       },
       // Direct follow-up ("add a buttton in the pose selector, 'Default',
       // that just sets the pose to all the hands"): unlike a Saved Poses
@@ -382,6 +389,27 @@ const DEV_GROUPS = [
       { key: 'wristSplayCurve', label: 'Splay Scaling Curve (Distance -> Splay)', type: 'text', def: '[{"x":0,"y":1},{"x":1,"y":0}]', onChange: () => parseWristSplayConfig() }
     ]
   },
+  // Click-Hold Pose -- direct request, then "the 2nd new clickhold pose
+  // sets should be their own setting groups": on mousedown+hold, every
+  // hand transitions from its CURRENT pose to a chosen Target Pose (one
+  // of `cfg.savedPoses`); on release, transitions back to the code-
+  // default pose. Each hand's own transition START TIME is staggered by
+  // its live distance from the cursor at the moment the button went
+  // down (curve + Min/Max range, same widget family as Arm Length/
+  // Responsive Wrist Splay) -- setting Min equal to Max collapses this
+  // to "every hand transitions together," satisfying the request's own
+  // "choose if they all transition together, or if... based on
+  // distance" without a separate toggle. Retransition (release) has its
+  // own fully independent speed/curve/range, using each hand's own
+  // CURRENT interpolated pose (not the target) as ITS retransition start
+  // -- correct even if release happens mid-transition, before every hand
+  // finished reaching the target. Left-click and right-click are 2
+  // separate, symmetric instances built by makeClickHoldPoseGroup()
+  // below (same control shape, different key prefix/mouse button) --
+  // see setupClickHoldPoseTrigger()'s own comment for the full state
+  // machine and the disclosed Whole-Hand-Rotation scope decision.
+  makeClickHoldPoseGroup('chp', 'Click Hold-Pose'),
+  makeClickHoldPoseGroup('rchp', 'Right-Click Hold-Pose'),
   {
     // Direct user request: "provide me a collapsible pose viewer within
     // the dev panel itself" -- deliberately 0 controls here. buildPosePreview()
@@ -547,6 +575,13 @@ parseArmLengthConfig()
 buildArmLengthWidgets()
 parseWristSplayConfig()
 buildWristSplayWidgets()
+// Click-Hold-Pose's own setup call (parseClickHoldConfig/
+// buildClickHoldPoseWidgets per trigger) is NOT made here like the other
+// widgets above -- clickHoldPoseTriggers (which parseClickHoldConfig
+// reads) is a `const` declared much later in the file, alongside the rest
+// of the Click-Hold-Pose state machine, so calling it this early would be
+// a TDZ ReferenceError. See the matching setup call placed right after
+// that const's own declaration instead.
 buildMouseTrackingLogWidget()
 restartCursorLogTimer()
 setupSettingsChangeLog()
@@ -1299,6 +1334,30 @@ const POSE_KEY_DEFAULTS = {}
 DEV_GROUPS.find((g) => g.title === 'Pose').controls.forEach((c) => {
   if (POSE_PRESET_KEYS.includes(c.key)) POSE_KEY_DEFAULTS[c.key] = c.def
 })
+// Builds ONE Click-Hold Pose group's control array -- called twice (see
+// DEV_GROUPS' own use of this, above), once per mouse button, so the 2
+// groups can never drift out of sync with each other. `p` is the short
+// key prefix ('chp'/'rchp') every one of this group's own cfg keys uses.
+// Default Start/Retransition curves ([{x:0,y:0},{x:1,y:1}]) make the
+// NEAREST hand (x=0) start first (shortest delay, Min) and the FARTHEST
+// (x=1) start last (Max) -- a "ripple outward from the cursor" feel,
+// the opposite curve direction from Arm Length's own default (which
+// makes the nearest hand crop MOST) since there's no equivalent real-
+// world convention to match here; a disclosed default, not a spec'd one.
+function makeClickHoldPoseGroup(p, title) {
+  return {
+    title,
+    controls: [
+      { key: `${p}TargetPose`, label: 'Target Pose', type: 'select', def: '', options: () => (cfg.savedPoses || []).map((sp) => sp.name) },
+      { key: `${p}TransitionSpeedMs`, label: 'Pose Transition Speed (Ms)', type: 'slider', min: 0, max: 5000, step: 10, def: 400 },
+      { key: `${p}StartTimeCurve`, label: 'Pose Transition Start Time Curve (Distance -> Start Time)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickHoldConfig(p) },
+      { key: `${p}StartTimeRange`, label: 'Pose Transition Min / Max Start Time (Ms)', type: 'text', def: '{"min":0,"max":300}', onChange: () => parseClickHoldConfig(p) },
+      { key: `${p}RetransitionSpeedMs`, label: 'Pose Retransition Speed (Ms)', type: 'slider', min: 0, max: 5000, step: 10, def: 400 },
+      { key: `${p}RetransitionStartTimeCurve`, label: 'Pose Retransition Start Time Curve (Distance -> Start Time)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickHoldConfig(p) },
+      { key: `${p}RetransitionStartTimeRange`, label: 'Pose Retransition Min / Max Start Time (Ms)', type: 'text', def: '{"min":0,"max":300}', onChange: () => parseClickHoldConfig(p) }
+    ]
+  }
+}
 // "Default" button (Pose group, next to Saved Poses) -- syncs every pose
 // slider's cfg/store/display back to POSE_KEY_DEFAULTS (syncValue() does
 // NOT call onChange, by design -- see its own devpanel.js comment, it's
@@ -2027,6 +2086,409 @@ function buildWristSplayCurveWidget(row) {
     } catch (e) { /* leave displayed state as-is */ }
   })
 }
+
+// -----------------------------------------------------------------------
+// Click-Hold Pose -- on mousedown+hold, every hand transitions from its
+// CURRENT pose to a chosen Target Pose; on release, transitions back to
+// the code-default pose. Left-click ('chp') and right-click ('rchp') are
+// 2 fully independent instances of the same mechanism, keyed by their
+// own control prefix throughout this section.
+//
+// STATE MACHINE, per hand per trigger (`hand._chp[p]`, lazily created by
+// getOrInitHandCHP() the first frame it's needed -- avoids touching
+// rebuildField()'s own hand-construction code): 'idle' (no override,
+// the hand's pose is driven entirely by the normal shared cfg/Pose-group
+// pipeline, completely unaffected by this feature) -> 'forward' (while
+// the button is held, or briefly after release if that hand's own
+// forward transition hadn't caught up to real time yet -- see below) ->
+// 'retransition' (after release, until this hand's OWN retransition
+// finishes) -> back to 'idle'.
+//
+// Per-hand START-TIME STAGGERING reuses the exact same distance-curve-
+// range pipeline Arm Length/Responsive Wrist Splay already use
+// (evaluateArmLengthCurve(), already fully generic) -- computed ONCE,
+// from a live distance snapshot taken at the exact moment the
+// button goes down (forward) or up (retransition), not continuously
+// re-evaluated during the hold/release, so a moving cursor mid-gesture
+// doesn't reshuffle which hand goes first partway through. Setting a
+// trigger's own Min Start Time equal to its Max collapses every hand to
+// the SAME delay, satisfying "choose if they all transition together,
+// or if... based on distance from cursor" directly through the existing
+// range control -- no separate toggle needed.
+//
+// RETRANSITION uses each hand's own CURRENT interpolated pose (captured
+// at the exact moment of release, not the target pose) as ITS OWN
+// retransition start -- correct even when release happens mid-
+// transition, before every hand reached the target: a hand only 40% of
+// the way there retransitions back to default FROM that 40% point, not
+// from the (never-reached) full target.
+//
+// DISCLOSED SCOPE DECISION: interpolation covers the 27 finger-curl +
+// wrist-bend/-splay keys only, EXCLUDING modelRotX/Y/Z (Whole-Hand
+// Rotation) from POSE_PRESET_KEYS. Those 3 drive `cloneBaseQuat`, a
+// SINGLE shared value computed once from `cfg` and used identically by
+// every hand's own Arm Length position-compensation math (see
+// updateCloneBaseQuat()) -- making them genuinely per-hand-
+// interpolatable would mean a per-hand cloneBaseQuat and touching that
+// compensation math too, a materially larger change than this feature
+// asked for. In practice this is a near-total non-issue: real saved
+// poses/targets essentially always carry modelRotX/Y/Z = 0 (confirmed
+// against the user's own pasted Copy Settings dump, every saved pose
+// listed there has all 3 at exactly 0), so the exclusion is invisible
+// for real-world use; only a saved pose that deliberately rotates the
+// whole hand model would notice its own Whole-Hand Rotation staying at
+// whatever the shared cfg sliders currently say throughout the hold.
+const CLICK_HOLD_KEYS = ['chp', 'rchp']
+const clickHoldPoseTriggers = {
+  chp: { active: false, holdStartTime: 0, forwardSnapshot: null, startCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], startRangeParsed: { min: 0, max: 300 }, retransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionRangeParsed: { min: 0, max: 300 } },
+  rchp: { active: false, holdStartTime: 0, forwardSnapshot: null, startCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], startRangeParsed: { min: 0, max: 300 }, retransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionRangeParsed: { min: 0, max: 300 } }
+}
+function parseClickHoldConfig(p) {
+  const t = clickHoldPoseTriggers[p]
+  try { t.startCurveParsed = JSON.parse(cfg[`${p}StartTimeCurve`]).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
+  try { t.startRangeParsed = JSON.parse(cfg[`${p}StartTimeRange`]) } catch (e) { /* keep last-good value */ }
+  try { t.retransitionCurveParsed = JSON.parse(cfg[`${p}RetransitionStartTimeCurve`]).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
+  try { t.retransitionRangeParsed = JSON.parse(cfg[`${p}RetransitionStartTimeRange`]) } catch (e) { /* keep last-good value */ }
+}
+function getOrInitHandCHP(hand) {
+  if (!hand._chp) {
+    hand._chp = {}
+    CLICK_HOLD_KEYS.forEach((p) => { hand._chp[p] = { phase: 'idle', forwardDelay: 0, retransitionDelay: 0, retransitionStart: null, retransitionStartTime: 0, lastAppliedValues: null } })
+  }
+  return hand._chp
+}
+// Linearly interpolates every POSE_PRESET_KEYS value between 2 pose-
+// shaped objects (a saved pose, POSE_KEY_DEFAULTS, or a live cfg
+// snapshot -- all 3 share the same key shape) EXCEPT modelRotX/Y/Z (see
+// this section's own top comment on why). Falls back to
+// POSE_KEY_DEFAULTS for any key missing from either side (matches
+// previewPosePreset()'s own established "a saved pose may predate a
+// newer key" tolerance).
+function lerpPoseValues(a, b, t) {
+  const result = {}
+  POSE_PRESET_KEYS.forEach((key) => {
+    if (key === 'modelRotX' || key === 'modelRotY' || key === 'modelRotZ') return
+    const av = a[key] !== undefined ? a[key] : POSE_KEY_DEFAULTS[key]
+    const bv = b[key] !== undefined ? b[key] : POSE_KEY_DEFAULTS[key]
+    result[key] = av + (bv - av) * t
+  })
+  return result
+}
+// Applies an interpolated pose to ONE hand's own skeleton -- reuses
+// applyCurlToSkeleton()/applyWristPoseToSkeleton()'s own existing
+// `values` override param (already proven by Pose Preview's own use of
+// it), so no new skeleton-posing code was needed for this feature at
+// all. `extraSplayDeg` is Responsive Wrist Splay's own per-hand
+// contribution, still composed on top during an active Click-Hold-Pose
+// override -- the 2 systems stack, consistent with every other
+// "independent, stackable" effect in this project.
+function applyPoseValuesToHand(hand, poseValues, extraSplayDeg) {
+  if (!hand.skinnedMesh) return
+  FINGER_NAMES.forEach((name) => applyCurlToSkeleton(name, hand.skinnedMesh.skeleton, cloneBaseQuat, hand.wrapper.quaternion, poseValues))
+  applyWristPoseToSkeleton(hand.skinnedMesh.skeleton, poseValues, extraSplayDeg)
+}
+function computeStartDelayMs(distanceToCursor, minLiveDist, liveDistRange, curveParsed, rangeParsed) {
+  const normDist = THREE.MathUtils.clamp((distanceToCursor - minLiveDist) / liveDistRange, 0, 1)
+  const curveY = THREE.MathUtils.clamp(evaluateArmLengthCurve(curveParsed, normDist), 0, 1)
+  return rangeParsed.min + (rangeParsed.max - rangeParsed.min) * curveY
+}
+// Called once per hand per trigger, per frame, from updateRenderOrder()'s
+// own existing per-hand loop -- reuses that loop's own `live`/
+// `minLiveDist`/`liveDistRange` (Arm Length/Wrist Splay's own live-
+// distance values), not a 3rd distance pass. A no-op (returns without
+// touching the hand's pose at all) whenever this hand's own phase is
+// 'idle' for this trigger, leaving the normal cfg-driven pose pipeline
+// completely in control, exactly as before this feature existed.
+function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) {
+  const trig = clickHoldPoseTriggers[p]
+  const chp = getOrInitHandCHP(hand)[p]
+  if (trig.active && chp.phase !== 'forward') {
+    // A fresh hold just started (or one started again before this
+    // hand's own prior retransition finished) -- (re)enter 'forward'
+    // and lock in this hand's own start delay from ITS distance right
+    // now, per this section's own "computed once, not live" design.
+    chp.phase = 'forward'
+    chp.forwardDelay = computeStartDelayMs(live, minLiveDist, liveDistRange, trig.startCurveParsed, trig.startRangeParsed)
+  }
+  if (chp.phase === 'forward') {
+    const targetPose = (cfg.savedPoses || []).find((sp) => sp.name === cfg[`${p}TargetPose`])
+    if (!targetPose || !trig.forwardSnapshot) return // nothing selected / nothing to transition FROM yet -- leave this hand's pose untouched
+    const elapsed = now - trig.holdStartTime
+    const speedMs = Math.max(cfg[`${p}TransitionSpeedMs`], 1)
+    const progress = elapsed < chp.forwardDelay ? 0 : THREE.MathUtils.clamp((elapsed - chp.forwardDelay) / speedMs, 0, 1)
+    const values = lerpPoseValues(trig.forwardSnapshot, targetPose, progress)
+    chp.lastAppliedValues = values
+    applyPoseValuesToHand(hand, values, computeResponsiveWristSplayDeg(live, minLiveDist, liveDistRange))
+  } else if (chp.phase === 'retransition') {
+    const elapsed = now - chp.retransitionStartTime
+    const speedMs = Math.max(cfg[`${p}RetransitionSpeedMs`], 1)
+    const progress = elapsed < chp.retransitionDelay ? 0 : THREE.MathUtils.clamp((elapsed - chp.retransitionDelay) / speedMs, 0, 1)
+    const values = lerpPoseValues(chp.retransitionStart, POSE_KEY_DEFAULTS, progress)
+    applyPoseValuesToHand(hand, values, computeResponsiveWristSplayDeg(live, minLiveDist, liveDistRange))
+    if (progress >= 1) chp.phase = 'idle' // fully settled at default -- stop overriding, normal cfg-driven posing (inert here since it only re-applies on slider change, not every frame) silently regains control
+  }
+}
+function startClickHoldPose(p) {
+  const trig = clickHoldPoseTriggers[p]
+  trig.active = true
+  trig.holdStartTime = performance.now()
+  trig.forwardSnapshot = {}
+  POSE_PRESET_KEYS.forEach((key) => { trig.forwardSnapshot[key] = cfg[key] })
+}
+// Fresh min/max live-distance snapshot for the retransition stagger,
+// computed once right here (mirrors updateRenderOrder()'s own per-frame
+// pass) rather than waiting for the next animation frame -- release
+// should feel immediate, not delayed by up to one frame.
+function endClickHoldPose(p) {
+  const trig = clickHoldPoseTriggers[p]
+  if (!trig.active) return // guard against a stray release with no matching press
+  trig.active = false
+  const now = performance.now()
+  let minD = Infinity, maxD = -Infinity
+  const dists = hands.map((hand) => {
+    const d = hand.wrapper.position.distanceTo(cursorTarget)
+    if (d < minD) minD = d
+    if (d > maxD) maxD = d
+    return d
+  })
+  const range = Math.max(maxD - minD, 0.001)
+  hands.forEach((hand, i) => {
+    const chp = getOrInitHandCHP(hand)[p]
+    chp.retransitionStart = chp.lastAppliedValues || { ...POSE_KEY_DEFAULTS }
+    chp.retransitionStartTime = now
+    chp.retransitionDelay = computeStartDelayMs(dists[i], minD, range, trig.retransitionCurveParsed, trig.retransitionRangeParsed)
+    chp.phase = 'retransition'
+  })
+}
+// Window-level pointerdown/pointerup (same convention as the Mouse
+// Tracking Log's own listeners) rather than canvas-only, so a hold that
+// started on the canvas and drifted over the dev panel mid-drag still
+// releases correctly -- only STARTING a hold is excluded while the
+// pointer is over the dev panel (same guard the Mouse Tracking Log's own
+// trigger-description logic uses), so clicking a slider/button doesn't
+// also trigger every hand posing up. `blur` (window losing focus, e.g.
+// alt-tabbing away mid-hold) is treated as an implicit release for both
+// triggers, so a hand can never get stuck mid-transition forever with no
+// way to reach it.
+window.addEventListener('pointerdown', (e) => {
+  if (e.target && e.target.closest && e.target.closest('.dp-panel')) return
+  if (e.button === 0) startClickHoldPose('chp')
+  else if (e.button === 2) startClickHoldPose('rchp')
+})
+window.addEventListener('pointerup', (e) => {
+  if (e.button === 0) endClickHoldPose('chp')
+  else if (e.button === 2) endClickHoldPose('rchp')
+})
+window.addEventListener('blur', () => { endClickHoldPose('chp'); endClickHoldPose('rchp') })
+
+// Generic versions of Arm Length's own 2 custom widgets (see
+// buildArmLengthRangeWidget()/buildArmLengthCurveWidget() for the
+// original, project-specific ones, deliberately left untouched) --
+// Click-Hold-Pose needs 4 MORE instances of this same pair (start/
+// retransition, x2 triggers), enough that hand-copying a 3rd/4th/5th/6th
+// time stopped being the safer choice; these take a small `opts` object
+// instead of hardcoding units/captions/defaults. Range bar handles do
+// NOT cross-clamp each other here either (same reasoning as Wrist
+// Splay's own range widget) -- kept flexible even though start-time
+// bounds don't strictly need it, for one less special case to maintain.
+function buildGenericRangeBarWidget(row, opts) {
+  const input = row.querySelector('.dp-text-input')
+  if (!input) return
+  input.style.display = 'none'
+  row.style.flexDirection = 'column'
+  row.style.alignItems = 'stretch'
+
+  const { trackMin, trackMax, unit, defaultValue } = opts
+  const toPct = (v) => THREE.MathUtils.clamp((v - trackMin) / (trackMax - trackMin) * 100, 0, 100)
+  const fromPct = (pct) => Math.round(trackMin + (pct / 100) * (trackMax - trackMin))
+
+  const wrap = elLocal('div', { flex: '1', padding: '6px 4px 2px' })
+  const track = elLocal('div', { position: 'relative', height: '18px', margin: '0 9px', background: 'rgba(255,255,255,0.12)', borderRadius: '9px' })
+  const fill = elLocal('div', { position: 'absolute', top: '0', bottom: '0', background: 'var(--dp-accent, #7d8cff)', opacity: '0.5', borderRadius: '9px' })
+  const minHandle = elLocal('div', { position: 'absolute', top: '-3px', width: '18px', height: '24px', marginLeft: '-9px', background: 'var(--dp-accent, #7d8cff)', borderRadius: '4px', cursor: 'ew-resize', touchAction: 'none' })
+  const maxHandle = elLocal('div', { position: 'absolute', top: '-3px', width: '18px', height: '24px', marginLeft: '-9px', background: 'var(--dp-accent, #7d8cff)', borderRadius: '4px', cursor: 'ew-resize', touchAction: 'none' })
+  const readout = elLocal('div', { fontSize: '11px', textAlign: 'center', marginTop: '4px', opacity: '0.85' })
+  track.appendChild(fill); track.appendChild(minHandle); track.appendChild(maxHandle)
+  wrap.appendChild(track); wrap.appendChild(readout)
+  row.appendChild(wrap)
+
+  let current = { ...defaultValue }
+  try { current = JSON.parse(input.value) } catch (e) { /* keep default */ }
+  let lastSeenValue = input.value
+
+  function redraw() {
+    const minPct = toPct(current.min), maxPct = toPct(current.max)
+    fill.style.left = Math.min(minPct, maxPct) + '%'
+    fill.style.right = (100 - Math.max(minPct, maxPct)) + '%'
+    minHandle.style.left = minPct + '%'
+    maxHandle.style.left = maxPct + '%'
+    readout.textContent = `Min: ${current.min}${unit}  Max: ${current.max}${unit}`
+  }
+  redraw()
+  armLengthWidgetResyncs.push(() => {
+    if (input.value === lastSeenValue) return
+    lastSeenValue = input.value
+    try { current = JSON.parse(input.value); redraw() } catch (e) { /* leave displayed state as-is */ }
+  })
+  function startDrag(handleKey) {
+    return (downEv) => {
+      downEv.preventDefault()
+      function onMove(moveEv) {
+        const rect = track.getBoundingClientRect()
+        if (rect.width <= 0) return
+        const pct = THREE.MathUtils.clamp((moveEv.clientX - rect.left) / rect.width, 0, 1) * 100
+        current[handleKey] = fromPct(pct)
+        redraw()
+      }
+      function onUp() {
+        window.removeEventListener('pointermove', onMove)
+        window.removeEventListener('pointerup', onUp)
+        commitTextControl(input, JSON.stringify(current))
+      }
+      window.addEventListener('pointermove', onMove)
+      window.addEventListener('pointerup', onUp)
+    }
+  }
+  minHandle.addEventListener('pointerdown', startDrag('min'))
+  maxHandle.addEventListener('pointerdown', startDrag('max'))
+}
+function buildGenericCurveWidget(row, opts) {
+  const input = row.querySelector('.dp-text-input')
+  if (!input) return
+  input.style.display = 'none'
+  row.style.flexDirection = 'column'
+  row.style.alignItems = 'stretch'
+
+  const W = 240, H = 120
+  const svgNS = 'http://www.w3.org/2000/svg'
+  const svg = document.createElementNS(svgNS, 'svg')
+  svg.setAttribute('width', W); svg.setAttribute('height', H)
+  Object.assign(svg.style, { background: 'rgba(255,255,255,0.06)', borderRadius: '4px', marginTop: '6px', touchAction: 'none', cursor: 'crosshair' })
+  const axisX = document.createElementNS(svgNS, 'line')
+  axisX.setAttribute('x1', 0); axisX.setAttribute('y1', H - 1); axisX.setAttribute('x2', W); axisX.setAttribute('y2', H - 1)
+  axisX.setAttribute('stroke', 'rgba(255,255,255,0.25)')
+  const axisY = document.createElementNS(svgNS, 'line')
+  axisY.setAttribute('x1', 1); axisY.setAttribute('y1', 0); axisY.setAttribute('x2', 1); axisY.setAttribute('y2', H)
+  axisY.setAttribute('stroke', 'rgba(255,255,255,0.25)')
+  const curvePath = document.createElementNS(svgNS, 'path')
+  curvePath.setAttribute('fill', 'none'); curvePath.setAttribute('stroke', 'var(--dp-accent, #7d8cff)'); curvePath.setAttribute('stroke-width', '2')
+  svg.appendChild(axisX); svg.appendChild(axisY); svg.appendChild(curvePath)
+  const caption = elLocal('div', { fontSize: '10px', opacity: '0.7', marginTop: '3px', textAlign: 'center' }, { text: opts.caption })
+  row.appendChild(svg)
+  row.appendChild(caption)
+
+  let points = opts.defaultPoints.map((p) => ({ ...p }))
+  try {
+    const parsed = JSON.parse(input.value)
+    if (Array.isArray(parsed) && parsed.length >= 2) points = parsed.sort((a, b) => a.x - b.x)
+  } catch (e) { /* keep default */ }
+
+  const toPx = (p) => ({ x: p.x * W, y: (1 - p.y) * H })
+  const fromPx = (px, py) => ({ x: THREE.MathUtils.clamp(px / W, 0, 1), y: THREE.MathUtils.clamp(1 - py / H, 0, 1) })
+  let circles = []
+
+  function commitPoints() {
+    points.sort((a, b) => a.x - b.x)
+    commitTextControl(input, JSON.stringify(points))
+  }
+  const CURVE_SAMPLES = 48
+  function redraw() {
+    let d = ''
+    for (let i = 0; i <= CURVE_SAMPLES; i++) {
+      const x = i / CURVE_SAMPLES
+      const y = THREE.MathUtils.clamp(evaluateArmLengthCurve(points, x), 0, 1)
+      const px = toPx({ x, y })
+      d += (i === 0 ? 'M' : 'L') + px.x.toFixed(2) + ',' + px.y.toFixed(2) + ' '
+    }
+    curvePath.setAttribute('d', d.trim())
+    circles.forEach((c) => svg.removeChild(c))
+    circles = points.map((p, i) => {
+      const px = toPx(p)
+      const c = document.createElementNS(svgNS, 'circle')
+      c.setAttribute('cx', px.x); c.setAttribute('cy', px.y); c.setAttribute('r', 5)
+      c.setAttribute('fill', 'var(--dp-accent, #7d8cff)')
+      Object.assign(c.style, { cursor: 'grab' })
+      let dragged = false
+      c.addEventListener('pointerdown', (downEv) => {
+        downEv.stopPropagation()
+        dragged = false
+        const isEndpoint = i === 0 || i === points.length - 1
+        function onMove(moveEv) {
+          const rect = svg.getBoundingClientRect()
+          if (rect.width <= 0 || rect.height <= 0) return
+          dragged = true
+          const np = fromPx(moveEv.clientX - rect.left, moveEv.clientY - rect.top)
+          if (isEndpoint) { p.y = np.y } else { p.x = np.x; p.y = np.y }
+          redraw()
+        }
+        function onUp() {
+          window.removeEventListener('pointermove', onMove)
+          window.removeEventListener('pointerup', onUp)
+          if (dragged) commitPoints()
+        }
+        window.addEventListener('pointermove', onMove)
+        window.addEventListener('pointerup', onUp)
+      })
+      function deletePointIfRemovable() {
+        if (points.length > 2 && i !== 0 && i !== points.length - 1) {
+          points.splice(points.indexOf(p), 1)
+          redraw()
+          commitPoints()
+        }
+      }
+      c.addEventListener('dblclick', (dblEv) => {
+        dblEv.stopPropagation()
+        deletePointIfRemovable()
+      })
+      c.addEventListener('contextmenu', (ctxEv) => {
+        ctxEv.preventDefault()
+        ctxEv.stopPropagation()
+        deletePointIfRemovable()
+      })
+      svg.appendChild(c)
+      return c
+    })
+  }
+  svg.addEventListener('click', (clickEv) => {
+    if (clickEv.target.tagName === 'circle') return
+    const rect = svg.getBoundingClientRect()
+    const np = fromPx(clickEv.clientX - rect.left, clickEv.clientY - rect.top)
+    if (np.x <= 0 || np.x >= 1) return
+    points.push(np)
+    redraw()
+    commitPoints()
+  })
+  redraw()
+  let lastSeenValue = input.value
+  armLengthWidgetResyncs.push(() => {
+    if (input.value === lastSeenValue) return
+    lastSeenValue = input.value
+    try {
+      const parsed = JSON.parse(input.value)
+      if (Array.isArray(parsed) && parsed.length >= 2) { points = parsed.sort((a, b) => a.x - b.x); redraw() }
+    } catch (e) { /* leave displayed state as-is */ }
+  })
+}
+// Locates and builds all 4 of one trigger's own custom widgets (2 curve,
+// 2 range) -- called once per trigger, right after initDevPanel(), same
+// timing as buildArmLengthWidgets()/buildWristSplayWidgets().
+const CLICK_HOLD_START_TIME_TRACK_MAX = 3000 // ms -- a deliberately smaller ceiling than the 5000ms Transition Speed sliders, since "start time" is meant to stagger WITHIN a transition, not span longer than one
+function buildClickHoldPoseWidgets(p) {
+  const startCurveRow = document.querySelector(`.dp-row[data-key="${p}StartTimeCurve"]`)
+  const startRangeRow = document.querySelector(`.dp-row[data-key="${p}StartTimeRange"]`)
+  const retransCurveRow = document.querySelector(`.dp-row[data-key="${p}RetransitionStartTimeCurve"]`)
+  const retransRangeRow = document.querySelector(`.dp-row[data-key="${p}RetransitionStartTimeRange"]`)
+  const curveCaption = 'X: Distance From Cursor (%, Nearest→Farthest Hand At Trigger Time)  ·  Y: Start Time Fraction (0=Min, 1=Max)'
+  if (startCurveRow) buildGenericCurveWidget(startCurveRow, { caption: curveCaption, defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
+  if (startRangeRow) buildGenericRangeBarWidget(startRangeRow, { trackMin: 0, trackMax: CLICK_HOLD_START_TIME_TRACK_MAX, unit: 'ms', defaultValue: { min: 0, max: 300 } })
+  if (retransCurveRow) buildGenericCurveWidget(retransCurveRow, { caption: curveCaption, defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
+  if (retransRangeRow) buildGenericRangeBarWidget(retransRangeRow, { trackMin: 0, trackMax: CLICK_HOLD_START_TIME_TRACK_MAX, unit: 'ms', defaultValue: { min: 0, max: 300 } })
+}
+// Runs now, not back up near the other widgets' own setup calls (parse-
+// ArmLengthConfig()/buildWristSplayWidgets() etc.) -- this needs
+// clickHoldPoseTriggers (declared just above) to already exist, and that
+// const isn't hoisted the way a function declaration is.
+CLICK_HOLD_KEYS.forEach((p) => { parseClickHoldConfig(p); buildClickHoldPoseWidgets(p) })
 // Sets this ONE hand's `clone.quaternion`/`clone.position` for its
 // CURRENT arm-length value `hideT` -- called every frame, per hand, from
 // updateRenderOrder()'s own existing per-hand loop (which already
@@ -2535,6 +2997,7 @@ function updateRenderOrder() {
     return d
   })
   const liveDistRange = Math.max(maxLiveDist - minLiveDist, 0.001)
+  const nowMs = performance.now() // one shared timestamp for every hand's own Click-Hold-Pose progress this frame, not a separate call per hand
   hands.forEach((hand, i) => {
     const live = liveDistances[i]
     hand.effectiveRenderOrder = (flashFixOn && hand.isOverlapping)
@@ -2550,16 +3013,31 @@ function updateRenderOrder() {
     // own comments for why this now runs every frame, per hand.
     hand.currentArmLengthT = computeArmLengthT(hand, live, minLiveDist, liveDistRange)
     if (hand.skinnedMesh) applyHandArmLength(hand, hand.currentArmLengthT)
-    // Responsive Wrist Splay -- reuses the SAME `live`/`minLiveDist`/
-    // `liveDistRange` values Arm Length just used above, not a 2nd
-    // distance pass. Runs every frame regardless of whether the feature
-    // is on (same simplicity-over-micro-optimization choice Arm Length's
-    // own T computation already makes, per its comment above) -- when
-    // off, computeResponsiveWristSplayDeg() returns 0, making this
-    // identical to the pre-existing wristBend/wristSplay-only pose.
+    // Click-Hold Pose takes over BOTH finger curls and wrist pose for
+    // this hand whenever either trigger is globally active OR this hand
+    // is still finishing its own retransition after release (checking
+    // `trig.active` here, not just this hand's own phase, is what
+    // correctly catches a hand entering 'forward' for the very first
+    // time THIS frame) -- falls through to the normal Responsive Wrist
+    // Splay + shared-cfg wrist pose (unchanged from before this feature
+    // existed) only when NEITHER trigger is touching this hand at all.
+    // If both triggers are simultaneously active for the same hand (an
+    // edge case -- holding both mouse buttons at once), 'rchp' is
+    // processed after 'chp' and so wins that frame's write -- a
+    // disclosed simplification, not a designed priority system.
     if (hand.skinnedMesh) {
-      const extraSplay = computeResponsiveWristSplayDeg(live, minLiveDist, liveDistRange)
-      applyWristPoseToSkeleton(hand.skinnedMesh.skeleton, cfg, extraSplay)
+      const chpAll = getOrInitHandCHP(hand)
+      let overridden = false
+      CLICK_HOLD_KEYS.forEach((p) => {
+        if (clickHoldPoseTriggers[p].active || chpAll[p].phase !== 'idle') {
+          updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, nowMs)
+          overridden = true
+        }
+      })
+      if (!overridden) {
+        const extraSplay = computeResponsiveWristSplayDeg(live, minLiveDist, liveDistRange)
+        applyWristPoseToSkeleton(hand.skinnedMesh.skeleton, cfg, extraSplay)
+      }
     }
   })
 }
