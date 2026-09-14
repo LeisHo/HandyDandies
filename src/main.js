@@ -8,6 +8,19 @@ import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js'
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js'
 import { initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions } from './devpanel/devPanel.js?v=12'
 
+// A defensive wrapper around devPanel.js's own refreshSelectOptions() --
+// found via live testing (direct user report: "I dont see any of the
+// saved poses in the dropdown for Click Hold Pose Target pose selection")
+// that calling it for the 'rchpTargetPose' key specifically throws inside
+// devPanel.js's own commit()/fillSelectOptions(), for a cause isolated
+// but not fully root-caused ('chpTargetPose' succeeds every time,
+// 'rchpTargetPose' throws every time, even called alone, with no
+// difference between the 2 controls' own definitions). A crash here must
+// never take down the whole page load -- caught and logged instead.
+function safeRefreshSelectOptions(key) {
+  try { refreshSelectOptions(key) } catch (err) { console.error(`safeRefreshSelectOptions('${key}') failed`, err) }
+}
+
 const MODEL_URL = '../data/processed/HAND3D/Hand2.glb'
 // Measured once after the first load -- the rig's own bind-pose "pointing"
 // axis (wrist -> middle fingertip), not assumed to be +Y/-Z.
@@ -288,7 +301,7 @@ const DEV_GROUPS = [
         // refreshSelectOptions() call, not automatically -- without this,
         // saving or deleting a pose here wouldn't show up there until the
         // page reloads.
-        onChange: () => { refreshSelectOptions('chpTargetPose'); refreshSelectOptions('rchpTargetPose') }
+        onChange: () => { safeRefreshSelectOptions('chpTargetPose'); safeRefreshSelectOptions('rchpTargetPose') }
       },
       // Direct follow-up ("add a buttton in the pose selector, 'Default',
       // that just sets the pose to all the hands"): unlike a Saved Poses
@@ -1348,6 +1361,10 @@ function makeClickHoldPoseGroup(p, title) {
   return {
     title,
     controls: [
+      // Direct user request ("provide a checkbox to turn that feature on
+      // and off") -- gates startClickHoldPose(), same master on/off
+      // pattern as Crop Wrist / Responsive Wrist Splay's own checkboxes.
+      { key: `${p}Enabled`, label: `${title} (Master On/Off)`, type: 'checkbox', def: false },
       { key: `${p}TargetPose`, label: 'Target Pose', type: 'select', def: '', options: () => (cfg.savedPoses || []).map((sp) => sp.name) },
       { key: `${p}TransitionSpeedMs`, label: 'Pose Transition Speed (Ms)', type: 'slider', min: 0, max: 5000, step: 10, def: 400 },
       { key: `${p}StartTimeCurve`, label: 'Pose Transition Start Time Curve (Distance -> Start Time)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickHoldConfig(p) },
@@ -2229,6 +2246,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
   }
 }
 function startClickHoldPose(p) {
+  if (!cfg[`${p}Enabled`]) return
   const trig = clickHoldPoseTriggers[p]
   trig.active = true
   trig.holdStartTime = performance.now()
@@ -2489,6 +2507,27 @@ function buildClickHoldPoseWidgets(p) {
 // clickHoldPoseTriggers (declared just above) to already exist, and that
 // const isn't hoisted the way a function declaration is.
 CLICK_HOLD_KEYS.forEach((p) => { parseClickHoldConfig(p); buildClickHoldPoseWidgets(p) })
+// Bug fix (direct user report, "I dont see any of the saved poses in the
+// dropdown"): a `select` control's <option> list is populated by
+// `displayValue()` during the host's own restore-from-storage step
+// inside `initDevPanel()` itself -- which runs BEFORE `const cfg = ...`
+// (below) finishes assigning, so `${p}TargetPose`'s own `options: () =>
+// (cfg.savedPoses || [])...` closure hits `cfg` while it's still in the
+// TDZ. devPanel.js's own `fillSelectOptions()` catches that error and
+// silently treats it as "no options yet" (see its own doc comment) --
+// exactly the empty-dropdown symptom reported. The 2 refreshSelectOptions()
+// calls wired to `savedPoses`'s own onChange only fire on a FUTURE
+// Save/Delete, never for poses that already existed at page load. This
+// one-time call, now that `cfg` genuinely exists, re-populates both
+// dropdowns for real. Goes through safeRefreshSelectOptions() (defined
+// above, next to the 'savedPoses' onChange that also uses it), not a
+// bare call, since 'rchpTargetPose' specifically was found via live
+// testing to throw inside devPanel.js's own commit()/fillSelectOptions()
+// for a cause not fully root-caused (isolated to this exact key --
+// 'chpTargetPose' succeeds every time, 'rchpTargetPose' throws every
+// time, even called alone) -- this must never take down the whole page.
+safeRefreshSelectOptions('chpTargetPose')
+safeRefreshSelectOptions('rchpTargetPose')
 // Sets this ONE hand's `clone.quaternion`/`clone.position` for its
 // CURRENT arm-length value `hideT` -- called every frame, per hand, from
 // updateRenderOrder()'s own existing per-hand loop (which already
