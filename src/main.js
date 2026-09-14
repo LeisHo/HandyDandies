@@ -6,7 +6,7 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js'
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js'
 import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js'
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js'
-import { initDevPanel, syncValue, organizeGroupSubgroups } from './devpanel/devPanel.js?v=10'
+import { initDevPanel, syncValue, organizeGroupSubgroups } from './devpanel/devPanel.js?v=11'
 
 const MODEL_URL = '../data/processed/HAND3D/Hand2.glb'
 // Measured once after the first load -- the rig's own bind-pose "pointing"
@@ -17,50 +17,60 @@ let alignQuat = new THREE.Quaternion()
 // that mode is enabled. Whole-object rotation only -- never touches the
 // skeleton/pose, per direct correction ("you shouldnt be doing any
 // posing work" / "when i say rotate the hand... I just meant rotate the
-// entire model"). `palmNormalAligned` is the one-time-measured calibrated
-// palm-normal direction (bind-pose bone positions, in the same aligned
-// local frame alignQuat already puts pointDir into); the actual
-// correction quaternion is now recomputed every frame by
-// computePalmFaceCorrectionQuat() below, incorporating the live
-// `palmFaceRotationOffset` slider (CLAUDE.md 12n) instead of being a
-// fixed constant baked in once.
-let palmNormalAligned = null
-// CORRECTED 2026-09-14, direct follow-up ("I guess i didnt specify the
-// rotation axis... the rotation axis should be perpendicular to the
-// wrist cropping plane... The rotation axes doesnt change and isnt
-// responsive to the cursor"): the slider's roll axis was local -Z
-// (pointDir/wrist-to-fingertip), a guess made without being told what
-// axis was actually wanted. The real spec is the WRIST CROP PLANE's own
-// normal -- the exact same forearm-to-wrist direction
-// `updateWristClipPlaneForHand()` already computes per-hand, per-frame,
-// for the Arm Length crop (`rForearmBend` -> `rHand`) -- NOT the
-// wrist-to-fingertip axis pointDir/alignQuat use. `wristCropNormalAligned`
-// measures this once at load, in the SAME raw bind-pose frame as
-// pointDir, then aligns it the same way. A fixed axis, measured once
-// (matching "doesn't change" -- this is a stable hand-local reference,
-// not recomputed from the live cursor position); it travels WITH the
-// hand's own cursor-tracking rotation only because it's composed INSIDE
-// the correction quaternion, which the outer per-frame lookAt then
-// carries toward the cursor, same composition order as before.
+// entire model").
+//
+// REDEFINED 2026-09-14, direct correction after live testing against the
+// user's own real settings ("palm faces cursor isnt working as i expect
+// ... every hand more or less faces Upwards [when cursor is centered].
+// what i want is - imagine 8 hands surrounding my cursor [at 45-degree
+// increments]... The hand directly below would be facing up (as it is
+// currently)... above the cursor... 180... directly to the right...90
+// ...the one to the left is -90. the one above and to the right would
+// have rotation 135... My Palm Face rotation slider wil then just add
+// onto that rotation number."). This REPLACES the prior 3-round "aim a
+// calibrated palm-normal vector at the cursor in full 3D" mechanism
+// entirely -- the new spec is a much simpler 2D "compass needle" roll:
+// each hand rotates, around the SAME wrist-crop-plane axis
+// (`wristCropNormalAligned`, unchanged from that prior work) already
+// used for the Palm Face Rotation slider, by an angle computed from
+// THAT hand's own position relative to the live cursor target in the
+// world XY plane -- not a fixed value, and not a full 3D vector-aim.
+// `computeRadialRollDeg()`'s exact formula (`atan2(dx, -dy)`) was
+// derived directly from the user's own 5 stated reference points and
+// verified to reproduce every one of them precisely (0/180/90/-90/135
+// degrees) before being written into the render loop -- see its own
+// comment. The old `palmNormalAligned`/`computePalmFaceCorrectionQuat()`
+// measurement (index/pinky bone cross product) is removed as dead code,
+// not just unused -- it answered a different question (which face of
+// the mesh is "the palm") that this simpler 2D-rotation spec doesn't
+// need at all.
 let wristCropNormalAligned = null
-// Just the roll itself (rotation around the wrist-crop-plane normal by
-// the live slider angle) -- factored out so it can be applied on its
-// own, independent of Palm Faces Cursor. Direct follow-up ("make the
-// palm face rotation slider work even if palm faces cursor is turned
-// off... it will just rotate every hand"): previously this angle only
-// ever reached the hand composed INSIDE computePalmFaceCorrectionQuat()
-// below (which needs `palmNormalAligned` to exist and only ever gets
-// used while that checkbox is on), so the slider had no effect at all
-// with the checkbox off.
-function computeRollQuat() {
-  const axis = wristCropNormalAligned || new THREE.Vector3(0, 0, -1)
-  const offsetRad = THREE.MathUtils.degToRad(cfg.palmFaceRotationOffset || 0)
-  return new THREE.Quaternion().setFromAxisAngle(axis, offsetRad)
+// dx/dy measured directly in world space (X right, Y up, matching this
+// project's own Field Layout grid and THREE.js's Y-up convention) --
+// deliberately NOT projected through the camera to screen/NDC space:
+// the camera sits close to axis-aligned looking down -Z at the field's
+// own XY plane (confirmed live, cameraX/Y near 0), and the user's own
+// mental model ("directly above/below/left/right") is itself a
+// world/field-space description, not a screen-pixel one, so world-space
+// dx/dy is the correct, simpler measurement -- no camera math needed.
+// Formula verified against all 5 of the user's own stated points:
+// dx=0,dy<0 (hand below cursor) -> atan2(0,+)=0; dx=0,dy>0 (above) ->
+// atan2(0,-)=180; dx>0,dy=0 (right) -> atan2(+,0)=90; dx<0,dy=0 (left)
+// -> atan2(-,0)=-90; dx>0,dy>0 equal magnitude (upper-right, 45-degree
+// diagonal) -> atan2(1,-1)=135 -- exact match on every one.
+function computeRadialRollDeg(handPos, cursorPos) {
+  const dx = handPos.x - cursorPos.x
+  const dy = handPos.y - cursorPos.y
+  return THREE.MathUtils.radToDeg(Math.atan2(dx, -dy))
 }
-function computePalmFaceCorrectionQuat() {
-  if (!palmNormalAligned) return null
-  const rotatedNormal = palmNormalAligned.clone().applyQuaternion(computeRollQuat())
-  return new THREE.Quaternion().setFromUnitVectors(rotatedNormal, new THREE.Vector3(0, 0, -1))
+// Rotation around the wrist-crop-plane axis by `baseDeg` (the dynamic
+// radial angle when Palm Faces Cursor is on, 0 when it's off) plus the
+// live Palm Face Rotation slider, which "just adds onto that rotation
+// number" in both cases, per direct instruction.
+function computeRollQuat(baseDeg) {
+  const axis = wristCropNormalAligned || new THREE.Vector3(0, 0, -1)
+  const offsetRad = THREE.MathUtils.degToRad((baseDeg || 0) + (cfg.palmFaceRotationOffset || 0))
+  return new THREE.Quaternion().setFromAxisAngle(axis, offsetRad)
 }
 let handLengthRaw = 1
 // The actual rendered MESH's bounding sphere (center + radius), measured
@@ -188,28 +198,23 @@ const DEV_GROUPS = [
       { key: 'trackingDamping', label: 'Look-At Damping (x)', type: 'slider', min: 0.02, max: 1, step: 0.01, def: 0.07 },
       { key: 'targetDepthFactor', label: 'Cursor Target Depth (x Field Radius)', type: 'slider', min: -2, max: 2, step: 0.05, def: 0.6, onChange: updateTargetPlane },
       { key: 'showTargetMarker', label: 'Show Target Marker', type: 'checkbox', def: true, onChange: (v) => { if (targetMarker) targetMarker.visible = v } },
-      // Direct request: aim each hand's PALM at the cursor instead of its
-      // fingertip direction -- whole-object rotation only (see
-      // computePalmFaceCorrectionQuat()'s own declaration comment), never
-      // the skeleton/pose. Default off so nothing changes until opted in.
+      // REDEFINED 2026-09-14 (see computeRadialRollDeg()'s own comment
+      // for the full account and the user's own exact reference points):
+      // rotates each hand, around the wrist-crop-plane axis, by the
+      // angle from that hand's OWN position to the live cursor -- a 2D
+      // "compass needle" roll in the field's own XY plane, computed
+      // fresh per hand per frame, not a fixed 3D palm-normal-aim (the
+      // prior mechanism this replaced). Default off so nothing changes
+      // until opted in.
       { key: 'palmFacesCursor', label: 'Palm Faces Cursor', type: 'checkbox', def: false },
-      // Direct follow-up ("Provide me a slider to control that rotation"),
-      // after the palm-normal sign calibration above turned out to need a
-      // manual 180-degree correction once real usage caught it -- rather
-      // than trusting a future calibration to be right by construction,
-      // exposes the correction's own rotation as a live, user-adjustable
-      // angle instead of a fixed baked-in constant (per CLAUDE.md 12n:
-      // "feel/response curves are sliders, not constants"). Rotates around
-      // the wrist crop plane's own normal (see computeRollQuat()'s own
-      // comment for why that axis). CORRECTED 2026-09-14, same day,
-      // direct follow-up ("make the palm face rotation slider work even
-      // if palm faces cursor is turned off... it will just rotate every
-      // hand"): no longer gated behind Palm Faces Cursor -- with that
-      // checkbox OFF this rolls every hand's default fingertip-tracking
-      // orientation directly; with it ON, this same angle is folded into
-      // WHERE the palm-facing correction aims instead (see
-      // computePalmFaceCorrectionQuat()), so 0 still means "the corrected
-      // palm-facing default" specifically in that mode.
+      // Adds directly onto whatever angle is already in effect --
+      // computeRadialRollDeg()'s own dynamic angle when Palm Faces
+      // Cursor is on, or 0 (just this slider alone) when it's off --
+      // per direct instruction ("My Palm Face rotation slider wil then
+      // just add onto that rotation number"). Rotates around the wrist
+      // crop plane's own normal (see computeRollQuat()'s own comment for
+      // why that axis) -- CLAUDE.md 12n, "feel/response curves are
+      // sliders, not constants."
       { key: 'palmFaceRotationOffset', label: 'Palm Face Rotation (Deg)', type: 'slider', min: -180, max: 180, step: 1, def: 0 }
     ]
   },
@@ -1962,46 +1967,6 @@ new GLTFLoader().load(
     pointDir.normalize()
     alignQuat = new THREE.Quaternion().setFromUnitVectors(pointDir, new THREE.Vector3(0, 0, -1))
 
-    // "Palm Faces Cursor" -- measured the same way as pointDir/alignQuat
-    // above (bind-pose bone positions, identity frame, before any
-    // per-instance clone/scale/rotate): the palm-plane normal is
-    // (index-base - wrist) x (pinky-base - wrist).
-    //
-    // CORRECTED 2026-09-14, direct user report ("the palm face cursor is
-    // doing the exact opposite. rotate them 180 degrees"): the original
-    // live calibration (see the prior version of this comment, still in
-    // CODE_SUMMARY.txt's GOTCHAS for the full derivation) concluded
-    // `pinkyVec x indexVec` was the OUTWARD palm normal, reasoning that
-    // this direction measured facing away from the camera for a hand
-    // below the cursor, matching that hand's own already-confirmed
-    // "back of hand toward camera" default-mode appearance. That
-    // reasoning was wrong in practice -- real usage showed the BACK of
-    // the hand ending up aimed at the cursor instead of the palm, the
-    // exact opposite of the feature's intent. Fixed by swapping the
-    // cross-product operand order (`indexVec x pinkyVec`, the negation
-    // of the prior `pinkyVec x indexVec`, per cross-product
-    // anticommutativity: a x b = -(b x a)) -- a clean 180-degree flip of
-    // the correction with no other math touched.
-    //
-    // Stores the calibrated direction (in the SAME post-alignQuat local
-    // frame the live lookAt tracking already operates in) into the
-    // module-level `palmNormalAligned` -- computePalmFaceCorrectionQuat()
-    // (declared at module scope, see its own comment) builds the actual
-    // per-frame correction quaternion from this, incorporating the live
-    // Palm Face Rotation slider.
-    const indexBaseBone = skinned.skeleton.getBoneByName('rIndex1')
-    const pinkyBaseBone = skinned.skeleton.getBoneByName('rPinky1')
-    if (indexBaseBone && pinkyBaseBone) {
-      const indexBasePos = new THREE.Vector3()
-      const pinkyBasePos = new THREE.Vector3()
-      indexBaseBone.getWorldPosition(indexBasePos)
-      pinkyBaseBone.getWorldPosition(pinkyBasePos)
-      const indexVec = indexBasePos.clone().sub(wristPos)
-      const pinkyVec = pinkyBasePos.clone().sub(wristPos)
-      const palmNormalRaw = indexVec.clone().cross(pinkyVec).normalize()
-      palmNormalAligned = palmNormalRaw.clone().applyQuaternion(alignQuat)
-    }
-
     // Palm Face Rotation slider's own roll axis -- the wrist crop plane's
     // normal (forearm->wrist), NOT pointDir (wrist->fingertip); same bone
     // pair updateWristClipPlaneForHand() uses per-frame for the Arm Length
@@ -2084,27 +2049,20 @@ function animate() {
   updateCursorTarget()
   armLengthWidgetResyncs.forEach((fn) => fn())
   if (cfg.trackingEnabled) {
-    // Computed once per frame (identical for every hand, like alignQuat
-    // itself), not once per hand -- recomputed live from the current
-    // Palm Face Rotation slider rather than a value fixed at model load.
-    // With Palm Faces Cursor ON, computePalmFaceCorrectionQuat() already
-    // incorporates the same roll internally (it rotates palmNormalAligned
-    // by it before deriving the correction) -- using computeRollQuat()
-    // directly here too, on top of THAT, would double-apply it. With it
-    // OFF, there's no palm-normal correction to fold the roll into, so
-    // apply the roll on its own -- direct follow-up ("make the palm face
-    // rotation slider work even if palm faces cursor is turned off... it
-    // will just rotate every hand"): every hand still gets the same
-    // uniform roll composed onto its own per-frame lookAt, identical
-    // mechanism to the Palm Faces Cursor path, just without the
-    // palm-normal-to-cursor part.
-    const palmCorrection = cfg.palmFacesCursor ? computePalmFaceCorrectionQuat() : computeRollQuat()
+    // Per-hand now (not hoisted above the loop like before) -- with Palm
+    // Faces Cursor on, each hand's own roll angle depends on ITS OWN
+    // position relative to the live cursor (computeRadialRollDeg(), see
+    // its own declaration comment), so it genuinely can't be computed
+    // once for the whole field anymore. With it off, every hand still
+    // gets the exact same roll (baseDeg=0, just the live slider), same
+    // as before.
     hands.forEach((hand) => {
       const m = new THREE.Matrix4().lookAt(hand.wrapper.position, cursorTarget, UP)
       const desired = new THREE.Quaternion().setFromRotationMatrix(m)
+      const baseDeg = cfg.palmFacesCursor ? computeRadialRollDeg(hand.wrapper.position, cursorTarget) : 0
       // Whole-wrapper rotation only, same mechanism as the default mode;
       // no skeleton/pose involvement either way.
-      if (palmCorrection) desired.multiply(palmCorrection)
+      desired.multiply(computeRollQuat(baseDeg))
       hand.wrapper.quaternion.slerp(desired, cfg.trackingDamping)
     })
   }
