@@ -81,6 +81,25 @@ const MOUSE_LOG_MAX_ENTRIES = 200
 const mouseTrackingLogEntries = []
 let mouseTrackingLogEl = null
 let cursorLogTimer = null
+// Ported from TEMPLATE_DEV_PANEL.html's own [JS-13c] Mouse Log (2026-09-14
+// port round, direct request: "I updated the Dev Panel Template to have a
+// mouse log system similar to ours. Update ours to match the template if
+// there are features missing.") -- multi-click detection, drag-release
+// classification, and viewport/device context entries. Deliberately did
+// NOT port the template's own touch-gesture classification (tap/double-
+// tap/long-press/swipe/pinch): this project's own CLAUDE.md already
+// documents that its core cursor-tracking mechanic has no touch-input
+// equivalent (only OrbitControls' camera pan/zoom is touch-enabled, a
+// pre-existing, separate interaction), so there's no genuine touch
+// gesture stream here worth classifying the way the template's own
+// touch-first reference project needed.
+const MOUSE_LOG_MULTICLICK_MS = 350
+const MOUSE_LOG_HELD_DRAG_MS = 500
+let mouseLogClickCount = 0
+let mouseLogClickTimer = null
+let mouseLogPendingClick = null
+let mouseLogDownInfo = null
+let mouseLogLastViewport = null
 
 let modelRoot = null
 let modelLoaded = false
@@ -505,21 +524,75 @@ window.addEventListener('pointermove', (e) => {
 // project's OrbitControls config (LEFT/RIGHT = pan, MIDDLE = dolly/zoom,
 // see its own setup comment) is what actually responds to it; there is no
 // OTHER click-triggered interaction in this app yet (no clickable hands).
+//
+// Extended 2026-09-14 (template-parity port, see this file's own module-
+// level Mouse Log state comment) to classify what the template's own
+// version distinguishes: multi-click (double/triple, same button, within
+// MOUSE_LOG_MULTICLICK_MS) and drag-release (held past
+// MOUSE_LOG_HELD_DRAG_MS, or moved past a small threshold, before
+// release) -- both computed at pointerUP now, since neither is knowable
+// at pointerdown time. `describeTrigger()` factored out unchanged from
+// the original single-listener version so pointerup can reuse the exact
+// same trigger logic pointerdown used to run inline.
+function describeMouseLogTrigger(e) {
+  const inPanel = !!e.target?.closest?.('.dp-panel')
+  if (inPanel) return 'Dev Panel interaction'
+  if (e.button === 1) return 'Camera Zoom/Dolly (OrbitControls, middle-drag)'
+  if (e.button === 0 || e.button === 2) return `Camera Pan (OrbitControls, ${e.button === 0 ? 'left' : 'right'}-drag)`
+  return `Unhandled button ${e.button}`
+}
+const MOUSE_LOG_MOVE_THRESHOLD_PX = 10
 window.addEventListener('pointerdown', (e) => {
+  mouseLogDownInfo = { time: performance.now(), x: e.clientX, y: e.clientY, button: e.button, target: e.target }
+})
+window.addEventListener('pointerup', (e) => {
+  const down = mouseLogDownInfo
+  mouseLogDownInfo = null
   // `e.target` isn't guaranteed to be an Element (e.g. `document` itself,
   // which has no `.closest()`) -- confirmed live as a real crash while
   // testing with a synthetic event dispatched directly on `document`; a
   // genuine user click always targets a real element in practice, but the
   // optional-chaining guard costs nothing and removes the failure mode
   // entirely rather than relying on that always being true.
-  const inPanel = !!e.target?.closest?.('.dp-panel')
-  let trigger
-  if (inPanel) trigger = 'Dev Panel interaction'
-  else if (e.button === 1) trigger = 'Camera Zoom/Dolly (OrbitControls, middle-drag)'
-  else if (e.button === 0 || e.button === 2) trigger = `Camera Pan (OrbitControls, ${e.button === 0 ? 'left' : 'right'}-drag)`
-  else trigger = `Unhandled button ${e.button}`
-  logMouseTrackingEvent(`Click at (${Math.round(e.clientX)}, ${Math.round(e.clientY)}) -> ${trigger}`)
+  const trigger = describeMouseLogTrigger(down ? { target: down.target, button: down.button } : e)
+  const x = Math.round(e.clientX), y = Math.round(e.clientY)
+  const heldMs = down ? Math.round(performance.now() - down.time) : 0
+  const moved = down ? Math.hypot(e.clientX - down.x, e.clientY - down.y) > MOUSE_LOG_MOVE_THRESHOLD_PX : false
+  if (down && down.button === 2) {
+    logMouseTrackingEvent(`Right-click at (${x}, ${y}) -> ${trigger}`)
+    return
+  }
+  if (down && (heldMs > MOUSE_LOG_HELD_DRAG_MS || moved)) {
+    logMouseTrackingEvent(`Drag-release at (${x}, ${y}) -> ${trigger} (heldMs:${heldMs})`)
+    return
+  }
+  // Quick click, left or middle button -- debounced into single/double/
+  // triple the same way the template's own version does, so a rapid
+  // double-click doesn't log as 2 separate unrelated clicks.
+  mouseLogClickCount++
+  mouseLogPendingClick = { x, y, trigger }
+  clearTimeout(mouseLogClickTimer)
+  mouseLogClickTimer = setTimeout(() => {
+    const kind = mouseLogClickCount >= 3 ? 'Triple-click' : mouseLogClickCount === 2 ? 'Double-click' : 'Click'
+    const p = mouseLogPendingClick
+    if (p) logMouseTrackingEvent(`${kind} at (${p.x}, ${p.y}) -> ${p.trigger}`)
+    mouseLogClickCount = 0
+    mouseLogPendingClick = null
+  }, MOUSE_LOG_MULTICLICK_MS)
 })
+// Viewport/device context entries -- ported from the template's own
+// logMouseLogContext()/isNarrowViewport() pattern: one entry when the
+// log widget is first built, and one more on any REAL resize (viewport
+// size actually different from the last-logged one, not just any
+// 'resize' event firing) -- gives the log a record of what device/
+// viewport shape the surrounding clicks/positions happened under.
+function logMouseLogViewportContext(reason) {
+  const w = window.innerWidth, h = window.innerHeight
+  if (reason === 'resize' && mouseLogLastViewport && mouseLogLastViewport.w === w && mouseLogLastViewport.h === h) return
+  mouseLogLastViewport = { w, h }
+  logMouseTrackingEvent(`Viewport (${reason}): ${w}x${h}`)
+}
+window.addEventListener('resize', () => logMouseLogViewportContext('resize'))
 // Session-only (never persisted through devPanel.js's Copy/Save -- there's
 // nothing meaningful to restore later), capped at MOUSE_LOG_MAX_ENTRIES so
 // a long session doesn't grow this without bound. `mouseTrackingLogEl` is
@@ -570,8 +643,25 @@ function buildMouseTrackingLogWidget() {
     fontSize: '10px', padding: '2px 8px', background: '#3a3a4a', color: 'inherit',
     border: 'none', borderRadius: '4px', cursor: 'pointer'
   }, { text: 'Copy', type: 'button' })
+  // Template-parity addition (2026-09-14 port round): a Save-to-file
+  // export alongside the existing clipboard-only Copy -- the template's
+  // own version writes a .md file via a throwaway <a download> link (a
+  // real client-side file save, not related to the artifact-viewer
+  // download restriction that applies only to Claude-authored sandboxed
+  // Artifact pages; this is a normal dev-tool feature running in the
+  // user's own browser). Kept the file format plain text here rather
+  // than the template's own headered .md structure -- this project's
+  // own log entries are already flat, timestamped lines with nothing
+  // resembling the template's separate context-vs-event sectioning.
+  const saveBtn = elLocal('button', {
+    fontSize: '10px', padding: '2px 8px', background: '#3a3a4a', color: 'inherit',
+    border: 'none', borderRadius: '4px', cursor: 'pointer'
+  }, { text: 'Save', type: 'button' })
   headerRow.appendChild(label)
-  headerRow.appendChild(copyBtn)
+  const btnRow = elLocal('div', { display: 'flex', gap: '4px' })
+  btnRow.appendChild(copyBtn)
+  btnRow.appendChild(saveBtn)
+  headerRow.appendChild(btnRow)
   mouseTrackingLogEl = elLocal('pre', {
     height: '110px', overflowY: 'auto', margin: '0', padding: '4px 6px',
     background: 'rgba(255,255,255,0.06)', borderRadius: '4px', fontSize: '10px',
@@ -585,9 +675,24 @@ function buildMouseTrackingLogWidget() {
       flash('Copy failed')
     }
   })
+  saveBtn.addEventListener('click', () => {
+    const flash = (msg) => { const orig = saveBtn.textContent; saveBtn.textContent = msg; setTimeout(() => { saveBtn.textContent = orig }, 900) }
+    const blob = new Blob([mouseTrackingLogEntries.join('\n')], { type: 'text/plain' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    const stamp = new Date().toISOString().replace(/[:.]/g, '-')
+    a.href = url
+    a.download = `mouse-tracking-log-${stamp}.txt`
+    document.body.appendChild(a)
+    a.click()
+    a.remove()
+    URL.revokeObjectURL(url)
+    flash('Saved!')
+  })
   wrap.appendChild(headerRow)
   wrap.appendChild(mouseTrackingLogEl)
   body.appendChild(wrap)
+  logMouseLogViewportContext('start')
 }
 // Logs every dev-panel setting change (which control, and the value it was
 // set to) -- direct follow-up request: "if i click a settings in the dev

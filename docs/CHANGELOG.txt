@@ -1762,6 +1762,68 @@ exclusion) and `PROJECT_PROGRESS.md`. Cache-buster bumps: `devpanel.js?v=6`
 `src/main.js?v=32` -> `?v=33`.
 
 --------------------------------------------------------------------------------
+2026-09-14  -  ~03:00 AM - 03:14 AM EDT (bounded by checkpoints; see Verified note)
+
+Mouse Tracking Log port -- direct request: "I updated the Dev Panel Template
+to have a mouse log system similar to ours. Update ours to match the
+template if there are features missing." Ported the template's click-
+classification layer onto this project's existing Mouse Tracking Log
+(which already had a click log + interval cursor-position log; the
+template's own log was a separate, newer system built to extend that same
+idea further) -- NOT a fork of devpanel.js's own generic engine, an
+extension of `main.js`'s own existing log, since this project's log is
+main.js-based by design.
+
+Added:
+- Replaced the single `pointerdown` click listener with a `pointerdown`/
+  `pointerup` pair: `pointerdown` just records time/position/button/target;
+  `pointerup` classifies what actually happened, since neither multi-click
+  nor drag-release is knowable until release. Right-click logs immediately
+  (`Right-click at (x,y) -> <trigger>`); a release held past
+  `MOUSE_LOG_HELD_DRAG_MS` or moved past `MOUSE_LOG_MOVE_THRESHOLD_PX`
+  (10px) logs as `Drag-release ... (heldMs:N)`; a quick left/middle click
+  is debounced (`MOUSE_LOG_MULTICLICK_MS`) into Click/Double-click/Triple-
+  click the same way the template's own version does, so a fast double-
+  click doesn't log as 2 unrelated single clicks.
+- `describeMouseLogTrigger(e)` -- the original inline trigger-description
+  logic (Dev Panel interaction / Camera Pan / Camera Zoom-Dolly, per this
+  project's own actual OrbitControls bindings) factored out unchanged so
+  both the right-click and drag-release paths can reuse it.
+- `logMouseLogViewportContext(reason)` -- ported from the template's own
+  viewport-context pattern: one `Viewport (start): WxH` entry when the log
+  widget is first built, and one more `Viewport (resize): WxH` entry only
+  on a REAL size change (guarded against firing on every 'resize' event
+  regardless of whether the size actually changed).
+- A "Save" button next to the existing "Copy" button on the Mouse Tracking
+  Log widget (`buildMouseTrackingLogWidget()`), same Blob+`<a download>`
+  client-side file-save pattern as the template's own Save (kept this
+  project's own flat-text log format rather than porting the template's
+  separate headered-.md structure, since this log has no such sectioning
+  to preserve).
+
+Deliberately NOT ported: the template's full touch-gesture classification
+(tap/double-tap/swipe/pinch) -- this project's CURSOR-TRACKING mechanic has
+no touch-input equivalent by design (see this project's own CLAUDE.md,
+same convention DOTFLICKO uses for its own mouse-only interaction), so
+there is nothing for a touch gesture to actually describe here. Disclosed
+as a judgment call, not silently dropped.
+
+Verified live (fresh server after an unrelated static-server connection
+reset, see GOTCHAS): single-click, double-click, and right-click all
+classified correctly via synthetic `PointerEvent`s; a held-600ms release
+logged as `Drag-release ... (heldMs:607)`; the widget's initial build
+logged `Viewport (start): 1024x768`; a genuine `resize` dispatch logged
+`Viewport (resize): 375x812` (the Browser pane's own viewport-emulation
+tool changes `window.innerWidth`/`innerHeight` without dispatching a real
+`resize` DOM event, confirmed separately -- not a bug in this project's
+listener, which fires correctly on an actual resize); the Save button
+fired its Blob/download code with no error (flashed "Saved!"). 2 stale
+console errors (`net::ERR_CONNECTION_RESET`, "Failed to load hand model")
+persisted from an earlier failed tab load this same session and were
+confirmed stale, not new, by re-checking hand count (510, unchanged).
+Cache-buster bump: `index.html`'s own `src/main.js?v=33` -> `?v=34`.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

@@ -1152,3 +1152,24 @@ GOTCHAS
   correctly; the 4 corrected letter-spacing controls no longer appear in
   `document.querySelectorAll('.dp-row.dp-per-device')`, while Title's
   own still correctly does.
+- **Mouse Tracking Log: click classification now resolves at pointerUP,
+  not pointerdown.** Neither multi-click (same-button clicks within
+  `MOUSE_LOG_MULTICLICK_MS`) nor drag-release (held past
+  `MOUSE_LOG_HELD_DRAG_MS` or moved past `MOUSE_LOG_MOVE_THRESHOLD_PX`) is
+  knowable until release, so `pointerdown` only records a snapshot
+  (time/position/button/target) and `pointerup` does all the
+  classification, reusing `describeMouseLogTrigger(e)` (factored out of
+  the original single-listener version) for both the drag-release and
+  right-click paths. `e.target` is not guaranteed to have `.closest()`
+  (e.g. a synthetic event dispatched directly on `document`) -- confirmed
+  live as a real crash during testing; guarded with optional chaining.
+- **A viewport-emulation tool changing `window.innerWidth`/`innerHeight`
+  does not necessarily dispatch a real `resize` DOM event.** Confirmed
+  live: the Browser pane's own `resize_window` tool correctly changed
+  `window.innerWidth`/`innerHeight` (verified via direct JS readback) but
+  did NOT fire the Mouse Tracking Log's `resize` listener; dispatching a
+  genuine `new Event('resize')` immediately after did fire it correctly.
+  This is a characteristic of that specific viewport-emulation path, not a
+  bug in the listener itself -- don't conclude a resize listener is broken
+  from this tool's own emulated-viewport behavior alone; dispatch a real
+  `resize` event (or resize an actual window) to test it directly.

@@ -18,7 +18,11 @@ work seamlessly from there.
 
 ## Currently working on
 
-Nothing in progress — see What's next.
+Investigating `TEMPLATE_DEV_PANEL.html`'s own `[JS-13b]` Named Setting
+States feature (Save/Use/Delete/Set-as-Default for whole-panel snapshots)
+for a port into this project's dev panel — direct request, "double check
+the dev panel template in regards to Saved Dev Settings feature. Implement
+that." Not yet scoped against the actual template code.
 
 ## Recently completed
 
@@ -215,6 +219,34 @@ still relevant to understanding current state, per this doc's own
   edit to it, not just this one -- fixed by adding `?v=2`, to be bumped
   on every future style.css change same as the JS files already are.
   See CODE_SUMMARY.txt's GOTCHAS for the full account.
+- **Same-day follow-on: Scroll Strength (corrected), unlimited group
+  nesting, full Dev Panel subgroup reorganization, template-matching
+  actual values/colors, and a yellow-text fix — 4 direct requests
+  together.** Scroll Strength (wrongly excluded above as unrelated — user
+  corrected this directly) is now real: a wheel listener on the panel's
+  own scrollable body reads `cfg.dp_scrollStrength` live. The group-level
+  drag-reorder's 1-level nesting cap (`setupReorder`'s own `getTargets`)
+  is removed — `captureGroup()`/`applyOrder()` were already genuinely
+  recursive, only the live-reorder query itself was capped. The built-in
+  "Dev Panel" group now matches the template's exact nested structure
+  (`MECHANICS`/`PANEL UI`/`TEXT`, with `TEXT` nesting 5 further subgroups)
+  via a new `organizeDevPanelSubgroups()`, and every control's default now
+  matches the template's real current values/colors (a deliberate visual
+  change — accent `#7d8cff` → `#005f8f`, font → Verdana, several
+  caps/bold toggles false → true). Also fixed 4 letter-spacing controls
+  wrongly marked `perDevice` (the actual cause of a reported "yellow text"
+  bug). Verified live after clearing a stale `localStorage` blob that was
+  masking the new structure/defaults (confirmed old saved state, not a
+  bug, via `cfg` readback first).
+- **Mouse Tracking Log port**, matching the template's newer click-
+  classification layer onto this project's existing log. `pointerdown`/
+  `pointerup` now classify Click/Double-click/Triple-click/Right-click/
+  Drag-release (previously just a single undifferentiated click log);
+  added viewport-context log entries (`Viewport (start)`/`(resize)`) and a
+  "Save" button (Blob + `<a download>`) beside the existing "Copy" button.
+  Deliberately did not port touch-gesture classification — this project's
+  cursor-tracking mechanic has no touch equivalent. Verified live via
+  synthetic pointer/resize events; zero new console errors.
 
 ## What's next
 
