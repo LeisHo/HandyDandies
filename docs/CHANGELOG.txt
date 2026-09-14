@@ -1288,6 +1288,11 @@ inherent vs. reduce camera perspective distortion, e.g. toward an
 orthographic projection -- a real architectural change needing the
 user's own approval per CLAUDE.md §0a) for the user to weigh in on.
 
+Presented the finding directly to the user with 3 options (leave as-is /
+move toward an orthographic camera / something else is still wrong).
+**User chose to leave it as-is.** Recorded the decision in
+`PROJECT_PROGRESS.md` -- no further action planned on this item.
+
 --------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
