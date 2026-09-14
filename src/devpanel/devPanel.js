@@ -1051,6 +1051,12 @@ function buildDevPanel(groupsEl) {
 // this default organization, the same relationship the template's own
 // idempotent version has to a live user reorder, achieved here simply by
 // running before rather than needing a marker-group check of its own.
+// CORRECTED 2026-09-14 (see organizeGroupSubgroups()'s own comment for
+// the full account): `makeSub()` now reuses an existing same-titled
+// subgroup instead of always creating a fresh one, and initDevPanel()
+// calls this function a 2nd time after resetSettings() -- a saved order
+// predating this structure used to flatten it right back out the moment
+// resetSettings()'s own applyOrder() ran, with nothing to undo that.
 function organizeDevPanelSubgroups(groupsEl) {
   const devPanelGroup = groupsEl.querySelector(':scope > .dp-group[data-key="Dev Panel"]')
   if (!devPanelGroup) return
@@ -1058,8 +1064,11 @@ function organizeDevPanelSubgroups(groupsEl) {
   const rowsByKey = {}
   body.querySelectorAll(':scope > .dp-row[data-key]').forEach((r) => { rowsByKey[r.dataset.key] = r })
   function makeSub(title, keys, parentBody) {
-    const g = createGroupElement(title)
-    parentBody.appendChild(g)
+    let g = parentBody.querySelector(`:scope > .dp-group[data-key="${CSS.escape(title)}"]`)
+    if (!g) {
+      g = createGroupElement(title)
+      parentBody.appendChild(g)
+    }
     const gb = g.querySelector(':scope > .dp-group-body')
     keys.forEach((k) => { const row = rowsByKey[k]; if (row) gb.appendChild(row) })
     return g
@@ -1077,18 +1086,40 @@ function organizeDevPanelSubgroups(groupsEl) {
 
 // Generic version of organizeDevPanelSubgroups() above, for a PROJECT's
 // own group instead of the built-in "Dev Panel" one -- same "flat rows,
-// just built by buildDevPanel(), into named subgroups, once, before a
-// real saved order takes precedence" shape, but parameterized by group
-// title + an ordered `[{title, keys}]` spec instead of a hardcoded
-// structure, so this file stays generic (a project supplies its own
-// spec via `initDevPanel(groups, { organizeSubgroups: (groupsEl) =>
-// organizeGroupSubgroups(groupsEl, 'GroupTitle', SPEC) })` rather than
-// this engine knowing any project-specific group/control names).
-// Nesting a spec's OWN subgroups further (matching TEXT's 2nd level
-// above) works the same way organizeDevPanelSubgroups() does it: call
-// this again, targeting the just-created subgroup's own body via a
-// second, deeper call -- not built in here, since no current caller
-// needs it.
+// just built by buildDevPanel(), into named subgroups" shape, but
+// parameterized by group title + an ordered `[{title, keys}]` spec
+// instead of a hardcoded structure, so this file stays generic (a
+// project supplies its own spec via `initDevPanel(groups, {
+// organizeSubgroups: (groupsEl) => organizeGroupSubgroups(groupsEl,
+// 'GroupTitle', SPEC) })` rather than this engine knowing any
+// project-specific group/control names).
+//
+// CORRECTED 2026-09-14, direct user report ("you didnt move the
+// settings into the groups"): a SAVED order predating this structure
+// (this project's own already-documented "stale localStorage" gotcha,
+// hit earlier this same session with organizeDevPanelSubgroups() too,
+// but only ever worked around by manually clearing localStorage in a
+// test tab, never actually fixed) flattens the freshly-built subgroups
+// right back out the moment `resetSettings()` runs its own
+// `applyOrder()` -- that function only runs ONCE, right after
+// `buildDevPanel()`, with nothing to re-apply it afterward. Fixed 2
+// ways: (1) idempotent now -- reuses an EXISTING subgroup element (found
+// by its own title, if `initDevPanel()` already called this once and a
+// stale order flattened its contents back out) instead of always
+// creating a fresh one, so calling this twice never produces duplicate
+// empty subgroup shells; (2) `initDevPanel()` now calls the
+// `organizeSubgroups` hook a 2nd time, right after `resetSettings()`,
+// so whatever a stale order just flattened gets correctly re-nested
+// immediately afterward. A GENUINE saved order that already reflects
+// the nested structure (e.g. after the user drags a row somewhere else
+// post-port and saves) is unaffected either way -- this only ever moves
+// a listed key INTO its spec'd subgroup, never out of wherever a real
+// saved order legitimately placed it.
+//
+// Nesting a spec's OWN subgroups further (matching TEXT's 2nd level in
+// organizeDevPanelSubgroups() above) works the same way: call this again,
+// targeting the just-created subgroup's own body via a second, deeper
+// call -- not built in here, since no current caller needs it.
 export function organizeGroupSubgroups(groupsEl, groupTitle, subgroupSpecs) {
   const targetGroup = groupsEl.querySelector(`:scope > .dp-group[data-key="${CSS.escape(groupTitle)}"]`)
   if (!targetGroup) return
@@ -1096,9 +1127,12 @@ export function organizeGroupSubgroups(groupsEl, groupTitle, subgroupSpecs) {
   const rowsByKey = {}
   body.querySelectorAll(':scope > .dp-row[data-key]').forEach((r) => { rowsByKey[r.dataset.key] = r })
   subgroupSpecs.forEach((spec) => {
-    const g = createGroupElement(spec.title)
-    if (spec.collapsed) g.classList.add('collapsed')
-    body.appendChild(g)
+    let g = body.querySelector(`:scope > .dp-group[data-key="${CSS.escape(spec.title)}"]`)
+    if (!g) {
+      g = createGroupElement(spec.title)
+      if (spec.collapsed) g.classList.add('collapsed')
+      body.appendChild(g)
+    }
     const gb = g.querySelector(':scope > .dp-group-body')
     spec.keys.forEach((k) => { const row = rowsByKey[k]; if (row) gb.appendChild(row) })
   })
@@ -1938,5 +1972,12 @@ export function initDevPanel(groups, opts = {}) {
   })
 
   resetSettings() // load last-saved values/order/geometry, if any (falls back to defaults otherwise)
+  // Re-apply both, in case a saved order predating either structure just
+  // flattened it back out via applyOrder() above -- see
+  // organizeDevPanelSubgroups()'s and organizeGroupSubgroups()'s own
+  // comments for the full account. Safe to call again even when nothing
+  // needed fixing (both are idempotent).
+  organizeDevPanelSubgroups(groupsEl)
+  if (opts.organizeSubgroups) opts.organizeSubgroups(groupsEl)
   return cfg
 }
