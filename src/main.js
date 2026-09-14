@@ -1849,15 +1849,24 @@ new GLTFLoader().load(
     // "Palm Faces Cursor" -- measured the same way as pointDir/alignQuat
     // above (bind-pose bone positions, identity frame, before any
     // per-instance clone/scale/rotate): the palm-plane normal is
-    // (pinky-base - wrist) x (index-base - wrist). Sign calibrated LIVE
-    // against this project's own already-confirmed default-mode behavior
-    // ("hands under the cursor show the back of their hand to the
-    // camera... this is correct" -- direct user report): for a hand
-    // below the cursor under the EXISTING pointDir-tracks-cursor
-    // behavior, this exact cross-product direction measured facing AWAY
-    // from the camera, matching "palm away / back toward camera" for
-    // that hand -- confirming this is really the outward palm normal,
-    // not the back-of-hand normal (the opposite cross-product order).
+    // (index-base - wrist) x (pinky-base - wrist).
+    //
+    // CORRECTED 2026-09-14, direct user report ("the palm face cursor is
+    // doing the exact opposite. rotate them 180 degrees"): the original
+    // live calibration (see the prior version of this comment, still in
+    // CODE_SUMMARY.txt's GOTCHAS for the full derivation) concluded
+    // `pinkyVec x indexVec` was the OUTWARD palm normal, reasoning that
+    // this direction measured facing away from the camera for a hand
+    // below the cursor, matching that hand's own already-confirmed
+    // "back of hand toward camera" default-mode appearance. That
+    // reasoning was wrong in practice -- real usage showed the BACK of
+    // the hand ending up aimed at the cursor instead of the palm, the
+    // exact opposite of the feature's intent. Fixed by swapping the
+    // cross-product operand order (`indexVec x pinkyVec`, the negation
+    // of the prior `pinkyVec x indexVec`, per cross-product
+    // anticommutativity: a x b = -(b x a)) -- a clean 180-degree flip of
+    // the correction with no other math touched.
+    //
     // `palmFaceCorrectionQuat` rotates this direction (in the SAME
     // post-alignQuat local frame the live lookAt tracking already
     // operates in) onto local -Z -- composed onto the per-frame lookAt
@@ -1872,7 +1881,7 @@ new GLTFLoader().load(
       pinkyBaseBone.getWorldPosition(pinkyBasePos)
       const indexVec = indexBasePos.clone().sub(wristPos)
       const pinkyVec = pinkyBasePos.clone().sub(wristPos)
-      const palmNormalRaw = pinkyVec.clone().cross(indexVec).normalize()
+      const palmNormalRaw = indexVec.clone().cross(pinkyVec).normalize()
       const palmNormalAligned = palmNormalRaw.clone().applyQuaternion(alignQuat)
       palmFaceCorrectionQuat = new THREE.Quaternion().setFromUnitVectors(palmNormalAligned, new THREE.Vector3(0, 0, -1))
     }
