@@ -130,7 +130,32 @@ still relevant to understanding current state, per this doc's own
 
 ## What's next
 
-Two open architecture/tuning decisions awaiting the user:
+Three open architecture/tuning decisions awaiting the user:
+- **Perspective foreshortening still reads as "cropping isn't fixed."**
+  User reported (2026-09-13, ~8:26-8:27 PM EDT, new screen recording +
+  click log) that wrist cropping "still isn't fixed." Investigated live
+  via the debug hook rather than guessing: with Crop Wrist OFF, every
+  hand measured `currentArmLengthT = 0` (confirmed, no cropping applied
+  at all) and an IDENTICAL true 3D forearm length (14.63 units, same
+  measurement as the original foreshortening finding) -- yet the SAME
+  segment's on-screen projected length still ranged ~11-27px across just
+  a 20-hand sample in the video's own visible column, purely from each
+  hand's own rotation angle toward the cursor combined with camera
+  perspective. Separately, with Crop ON + Reactive ON, direct measurement
+  confirmed the crop math itself IS monotonic and correct (nearest-to-
+  cursor hand T=0.9, farthest T=0.3, exactly per the curve/range design).
+  Conclusion: the Arm Length/Crop feature is verified working correctly
+  in both states; the recurring "still looks cropped/inconsistent"
+  perception is the SAME pure perspective/orientation foreshortening
+  effect already diagnosed and reported as not-a-bug earlier this
+  project, still present because it's inherent to any hand rotating to
+  face a moving cursor under a perspective camera -- it happens with or
+  without any cropping at all, and isn't something the Arm Length feature
+  itself can fix. Not yet resolved with the user which direction (if any)
+  to take: accept as inherent, reduce camera perspective distortion (e.g.
+  a partial/full move toward an orthographic projection -- a real
+  architectural change, needs approval per CLAUDE.md §0a), or something
+  else not yet correctly inferred from the report.
 - **Reordering-flash residual pop**: accept it as an inherent limitation
   of render-order-based stacking, tune the smoothing rate further as a
   partial mitigation, or invest in a real alpha cross-fade.

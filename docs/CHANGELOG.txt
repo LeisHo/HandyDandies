@@ -1232,6 +1232,63 @@ bumping it themselves.
 Corrected `CODE_SUMMARY.txt` and `PROJECT_PROGRESS.md`.
 
 --------------------------------------------------------------------------------
+2026-09-13 (continued once more)  -  ~8:27 PM - 8:38 PM EDT
+
+User reported, with a new screen recording (`Recording 2026-09-13
+202658.mp4`) and its own click/setting/cursor-position log: "the things
+you fixed didnt seem fixed in terms of the wrist cropping." Investigated
+live via the debug hook rather than re-guessing at another fix.
+
+Correlated the recording's own file timestamps (Modify 20:26:44.42,
+36.27s duration -> start ~20:26:08) against the click log's wall-clock
+timestamps to determine the recording's own timeline: Crop Wrist (Master
+On/Off) was ON for roughly the first 21s of the recording, then the user
+clicked it OFF (log: "Setting changed: Crop Wrist (Master On/Off) =
+false" at 8:26:29 PM) for the remainder.
+
+This environment's own documented `window.innerWidth`/`innerHeight === 0`
+quirk (CLAUDE.md GOTCHAS) blocked the first attempt at live cursor-target
+raycasting -- diagnosed directly (`rayDir` came back `[null,null,null]`
+because the NDC computation divided by 0) and worked around by using
+`resize_window` to set a real 1536x864 viewport, then manually replaying
+this project's own `applyRendererSize()` logic (camera aspect/projection,
+renderer/composer/outlinePass size) since the render loop's own self-heal
+for this never got a frame to run in this same environment.
+
+With that fixed, 2 direct measurements:
+1. Crop Wrist OFF: confirmed via `hand.currentArmLengthT` that EVERY one
+   of 510 hands reads exactly 0 (no crop applied, code path returns 0
+   immediately when `cfg.cropWristEnabled` is false, as designed).
+   Reproducing the video's own Crop-OFF cursor position (bottom-left,
+   `~(60,855)`) and measuring the exact same `rForearmBend`->`rHand` bone
+   segment used by the clip-plane math: every hand in the visible column
+   shares an IDENTICAL true 3D length (14.63 units -- the same figure
+   measured in the original foreshortening investigation), yet that
+   segment's own on-screen projected length still ranged ~11-27px within
+   just a 20-hand sample (and further down the same column in the full
+   video). Pure perspective/orientation foreshortening, not cropping --
+   confirmed with T=0 for every one of them.
+2. Crop Wrist ON + Reactive ON: cursor placed at a fixed screen position,
+   confirmed the crop math itself is correctly monotonic by live cursor
+   distance -- nearest-to-cursor hand measured T=0.9 (max crop, per the
+   default 30-90 range and default linear curve), farthest measured
+   T=0.3 (min crop), exactly as designed.
+
+Conclusion, reported to the user rather than guessing at another patch:
+the Arm Length/Crop feature's own logic is verified correct in both
+states. What's still visible in the recording as "cropping isn't fixed"
+is the SAME class of pure perspective/orientation foreshortening already
+diagnosed and reported as not-a-bug earlier this project (see the
+2026-09-13 03:43 AM entry) -- inherent to any hand rotating to face a
+moving cursor under a perspective camera, present with or without any
+cropping at all, and not something the Arm Length feature itself causes
+or can fix. No code changed this round. Corrected `PROJECT_PROGRESS.md`
+with the finding and the open architectural question (accept as
+inherent vs. reduce camera perspective distortion, e.g. toward an
+orthographic projection -- a real architectural change needing the
+user's own approval per CLAUDE.md §0a) for the user to weigh in on.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================
