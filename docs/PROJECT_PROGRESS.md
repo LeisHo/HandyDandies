@@ -244,17 +244,27 @@ still relevant to understanding current state, per this doc's own
   cursor-tracking mechanic has no touch equivalent. Verified live via
   synthetic pointer/resize events; zero new console errors.
 - **Named Setting States ("Saved Dev Settings")** — CLAUDE.md §12d's
-  optional Save/Use/Delete/Set-as-Default-for-whole-panel-snapshots
-  upgrade, ported from the template's `[JS-13b]`. A new standalone
-  collapsible group (deliberately outside the per-tab reorderable group
-  system — one state covers all 3 device tabs at once) sits directly
-  under the Copy/Save/Reset row, with a plain `<select>` + 4 buttons.
-  Reuses the exact same full-panel snapshot shape Copy Settings already
-  produced (factored into `captureFullPanelState()`/`applyFullPanelState()`,
-  shared by both). Verified live: Use restores a saved state without
-  touching the Save/Reset baseline; Set Default applies AND persists it;
-  Delete removes it from both the dropdown and storage; a fresh tab loads
-  clean with zero console errors.
+  Save/Use/Delete/Set-as-Default-for-whole-panel-snapshots feature, ported
+  from the template's `[JS-13b]`. Sits above "Dev Panel" as a real member
+  of the reorderable group system (its own drag handle, movable like any
+  other group — corrected same day from an earlier standalone-group
+  version, per direct follow-up). Reuses the exact same full-panel
+  snapshot shape Copy Settings already produced
+  (`captureFullPanelState()`/`applyFullPanelState()`, shared by both).
+- **Dev Panel group corrected to match Clicko (the gold standard) exactly**
+  — direct bug reports (yellow-text mismatch, floating Panel UI settings,
+  possible redundant fields, values not matching Clicko). Audited all 41
+  fields against Clicko's real source (not CLAUDE.md's own prose, which
+  disagreed with Clicko's code on one point). Found and fixed 1 real
+  perDevice bug (Scroll Strength) and 5 default-value mismatches; added
+  `defMobile`/`defLandscape` control overrides so 6 fields Clicko tunes
+  differently per device now seed their own real per-device defaults
+  instead of cloning Desktop's. No redundant fields or floating settings
+  found in the current code — likely a stale-cache artifact from before
+  this session's earlier fixes; cache-busters bumped again regardless.
+  Verified live (fresh tab, cleared storage): correct yellow/shared split,
+  correct PANEL UI membership, correct per-tab values across all 3 tabs,
+  510/510 hands still rendering, zero new console errors.
 
 ## What's next
 

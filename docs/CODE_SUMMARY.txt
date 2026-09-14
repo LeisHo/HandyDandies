@@ -1175,16 +1175,50 @@ GOTCHAS
   `resize` event (or resize an actual window) to test it directly.
 - **Named Setting States ("Saved Dev Settings") is deliberately NOT part
   of the per-tab reorderable group system.** It's built directly (plain
-  `el('div', 'dp-group dp-standalone-group')` + manual header/body, not
-  `createGroupElement()`) rather than appended into `groupsEl`, for 2
-  reasons: (1) `createGroupElement()` always includes a `.dp-drag-handle`
-  span, which would visually invite dragging a group that isn't actually
-  registered in `devGroups`/`getPanelOrder()`/`applyOrder()` and so can
-  never really be reordered or nested; (2) one saved-state snapshot covers
-  the whole panel across all 3 Desktop/Mobile/Landscape tabs at once, so
-  unlike Dev Panel/Debug it must exist exactly ONCE, never tripled per
-  tab. `captureFullPanelState()`/`applyFullPanelState()` (factored out of
-  the pre-existing `copySettings()`, which already built this exact
-  snapshot shape) are shared by Copy Settings and every Save/Use/Delete/
-  Set-Default button on this group -- a change to the snapshot shape only
-  ever needs to happen in one place.
+  `createGroupElement()`, inserted as `groupsEl`'s first child via
+  `groupsEl.insertBefore(savedStatesGroup, groupsEl.firstChild)` -- a
+  genuine member of the per-tab reorderable group/drag-reorder system,
+  same as Dev Panel/Debug/every project group, per direct follow-up
+  request ("Save Dev Settings should also be movable. It should be above
+  the Dev Panel group."). **CORRECTED 2026-09-14, same day**: this
+  entry originally described building it as a hand-built standalone group
+  OUTSIDE `groupsEl` specifically to avoid `createGroupElement()`'s own
+  drag-handle, reasoning that a saved-state snapshot covers the whole
+  panel across all 3 tabs at once so the group "can never really be
+  reordered" -- that reasoning no longer holds now that the group's
+  POSITION (not its per-tab-ness) is what's being made adjustable. Its
+  own select+button row still has no `data-key`, so `captureGroup()`'s
+  row-capture (`:scope > .dp-group-body > .dp-row`) still never touches
+  it -- only the group's own position/collapsed-state is captured/
+  restored by the normal Save/Reset order mechanism, never the select's
+  current selection or the buttons. `captureFullPanelState()`/
+  `applyFullPanelState()` (factored out of the pre-existing
+  `copySettings()`, which already built this exact snapshot shape) are
+  shared by Copy Settings and every Save/Use/Delete/Set-Default button on
+  this group -- a change to the snapshot shape only ever needs to happen
+  in one place.
+- **Clicko is the authoritative source for the Dev Panel group's exact
+  perDevice-vs-shared split, not CLAUDE.md's own prose summary of it.**
+  Confirmed via a real 2026-09-14 correction cycle: CLAUDE.md's §12i text
+  claims "only colors/Bold/Capitalize/Font select are shared, everything
+  else (font-size/letter-spacing/line-spacing) is per-tab" -- but Clicko's
+  own `DEV_PANEL_STYLE_SHARED_KEYS` array explicitly keeps
+  buttonTextLetterSpacing/tabTextLetterSpacing/groupTextLetterSpacing/
+  settingsTextLetterSpacing SHARED (not per-tab), with a dated comment in
+  Clicko's own source explaining this was itself a deliberate 2026-09-14
+  fix there. When the two disagree, read Clicko's actual code, not the
+  prose -- confirmed this project's own perDevice flags already matched
+  Clicko correctly everywhere except one real bug: `dp_scrollStrength`
+  was missing `perDevice: true` (Clicko's own `DEVPANEL_STYLE_CONTROLS`
+  registers a genuine per-tab Scroll Strength slider for all 3 tabs).
+- **`defMobile`/`defLandscape`** (optional per-control fields on a
+  `builtInGroup.controls` entry) let a perDevice control seed Mobile/
+  Landscape's own store slot with a DIFFERENT starting value than
+  Desktop's `def`, instead of every device silently cloning Desktop's
+  tuning -- needed because Clicko genuinely tunes 6 of its 15 per-tab
+  Dev Panel fields differently per device (e.g. Title Font Size
+  17/11/22), not just independently-editable from one shared starting
+  point. Read in the control-seeding loop
+  (`builtInGroup.controls.forEach` right after `devGroups = [builtInGroup,
+  ...]`) -- a control with neither field behaves exactly as before this
+  existed.

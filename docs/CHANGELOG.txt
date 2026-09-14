@@ -1885,6 +1885,87 @@ line), `style.css?v=3` -> `?v=4`, `index.html`'s own `main.js?v=34` ->
 `?v=35`.
 
 --------------------------------------------------------------------------------
+2026-09-14  -  ~03:35 AM - 03:48 AM EDT (bounded by checkpoints; see Verified note)
+
+Dev Panel group correction round -- direct bug reports: "I still see yellow
+text... I said match the Dev Panel group settings EXACTLY. I still see a
+lot of floating settings within the Dev Panel group... in the panel UI
+group. Remove any redundant settings... Match the exact settings for the
+dev panel group to the template. take a look at the project Clicko...
+match Clicko. this includes checkbox states, slider numbers, etc." Per
+CLAUDE.md's own freshly-corrected §12i, Clicko is the Gold Standard for
+this group's values/structure -- read Clicko's actual source directly
+(`DEV_PANEL_STYLE_SHARED_KEYS`, `DEVPANEL_STYLE_CONTROLS`,
+`DEVPANEL_MISC_CONTROLS` in its own index.html, plus its live
+`data/processed/dev-panel-settings.json`) rather than re-deriving from
+memory or CLAUDE.md's own prose summary, which turned out to disagree with
+Clicko's real code in one place (letter-spacing shared-vs-per-tab split).
+
+Audited all 41 real Dev Panel group fields 1:1 against Clicko's authoritative
+source. Findings:
+- **1 real perDevice bug**: `dp_scrollStrength` had no `perDevice` flag
+  (rendered shared/no-yellow), but Clicko's own `DEVPANEL_STYLE_CONTROLS`
+  registers a genuine per-tab Scroll Strength slider for all 3 tabs --
+  fixed by adding `perDevice: true`. Every other field's perDevice status
+  was already correct (cross-checked all 41 individually against Clicko's
+  own `DEV_PANEL_STYLE_SHARED_KEYS` array) -- the earlier "yellow text"
+  fix this same session was already accurate for those.
+- **"Floating settings in Panel UI"**: live DOM inspection (fresh tab,
+  cleared localStorage) found NO actual floating/orphaned rows -- PANEL UI
+  correctly holds exactly Clicko's 4 fields (Background/Accent/Slider
+  Color, Opacity), matching `organizeDevPanelSubgroups()`'s own
+  assignment. Only `dp_textEditMode` sits outside any subgroup, by design
+  (a standalone panel-level control, not a Clicko-ported field at all).
+  Likely a stale browser/server cache showing a pre-session-fix state,
+  not a current code defect -- cache-busters bumped again regardless.
+- **Redundant settings**: none found -- audited the full 41-field set
+  against Clicko's real 41 and confirmed exact 1:1 correspondence, no
+  extras, no duplicates (the one known-redundant "Body Text Font Size"
+  was already removed in an earlier round, confirmed still gone).
+- **5 shared-value mismatches** (didn't match Clicko's real desktop
+  values): Title Font Size 22->17, Group Title Font Size 11->14, Font
+  (All Text) 'Verdana...'->'Helvetica, Arial, sans-serif' (+ full
+  11-option list matching Clicko's own select exactly, was a 5-option
+  subset), Title Letter Spacing 0->2.3, Group Letter Spacing 0->0.8.
+- **New `defMobile`/`defLandscape` optional control-definition fields**
+  (additive, non-breaking -- a control with neither behaves exactly as
+  before): Clicko genuinely tunes 6 per-device fields differently per
+  tab, not just per-device-independent from a shared starting point --
+  Title Font Size (17/11/22), Group Title Font Size (14/11/11), Settings
+  Title Font Size (12/10/12), Title Letter Spacing (2.3/0/0), Button
+  Height (21/24/21), Scroll Strength (0.2/1/0.2). Previously every
+  perDevice control seeded all 3 device stores from the same single
+  `def`, so Mobile/Landscape silently cloned Desktop's tuning instead of
+  Clicko's own real per-device values.
+- **Named Setting States ("Saved Dev Settings") made movable + repositioned
+  above "Dev Panel"** -- direct mid-task follow-up ("Save Dev Settings
+  should also be movable. It should be above the Dev Panel group.").
+  Rebuilt via the same `createGroupElement()` every other group uses
+  (real drag-handle, real collapse/rename behavior) and inserted as
+  `groupsEl`'s first child, instead of the earlier standalone
+  hand-built group appended outside `groupsEl` entirely -- it's now a
+  genuine member of the per-tab reorderable group/drag-reorder system,
+  its position persisted through the normal Save/Reset order capture
+  (`captureGroup()`/`applyOrder()`) same as any other group. Its own
+  select+button row has no `data-key`, so only the GROUP's own position
+  is captured/restored, never the row contents -- verified no interference
+  with the Save/Use/Delete/Set Default mechanism itself.
+
+Verified live (fresh tab, cleared localStorage, both fixes together):
+topLevelGroups order is `["Saved Dev Settings", "Dev Panel", ...]`;
+the group has a real `.dp-drag-handle` (generic reorder mechanism reused
+unchanged from every other group, not independently re-tested via a full
+synthetic drag); all 15 genuinely-per-tab fields (now including Scroll
+Strength) show yellow, all 26 shared fields don't; PANEL UI holds exactly
+4 rows; desktop/mobile/landscape tab values read back exactly matching
+Clicko's real JSON (e.g. Title Font Size 17/11/22, Button Height 21/24/21,
+Scroll Strength 0.2/1/0.2); 510/510 hands still rendering; zero new
+console errors (2 stale ones persisted from an earlier unrelated
+navigation failure this session, confirmed via hand-count readback).
+Cache-buster bumps: `devpanel.js?v=8` -> `?v=9`, `style.css?v=4` -> `?v=5`,
+`index.html`'s own `main.js?v=35` -> `?v=36`.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================
