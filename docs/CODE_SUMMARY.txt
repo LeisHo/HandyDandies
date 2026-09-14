@@ -665,3 +665,107 @@ GOTCHAS
   within floating-point precision of exactly 0 distance from their own
   grid point despite having genuinely different, continuously-changing
   crop values.**
+- **The dev panel's own Collapse button (`–`/`+` in the header) hid the
+  settings but left the panel's own OUTER BOX at full height -- a real,
+  reported bug in `devpanel.js` itself, not this project's own code.**
+  `.dp-collapsed`'s CSS only hides `.dp-body`/`.dp-resize`; it can't also
+  shrink the panel, for 2 separate reasons that both had to be fixed:
+  `panel.style.height` is set as an explicit inline px value (for resize-
+  drag persistence) which always wins over a stylesheet rule, AND
+  `.dp-panel`'s own `min-height: 140px` (its floor for normal resizing)
+  applies unconditionally too -- overriding `height` alone still left the
+  box floored at 140px. Fixed in `devpanel.js`'s own collapse handler by
+  explicitly swapping BOTH `height` and `minHeight` to the header's own
+  natural height on collapse, restoring both real values on expand. Since
+  this lives in the shared, reused-verbatim engine, it likely belongs in
+  `.claude/TEMPLATE_DEV_PANEL.html` too (per CLAUDE.md §12's own
+  maintenance note) -- not back-ported there as part of this round, since
+  that's a deliberate, separate step per that same note, not an automatic
+  one.
+- **Reactive Arm Length's own dual-handle range widget and curve editor
+  both had a real, confirmed bug: dragging while the Pose group was
+  COLLAPSED corrupted the stored value to `{"min":null,"max":null}`.**
+  `getBoundingClientRect()` on a hidden (`display:none` ancestor) element
+  returns an all-zero rect, so the drag math divided by a 0-width track,
+  producing `NaN`, which `JSON.stringify` silently turns into `null`.
+  Fixed with a simple guard in both widgets' own drag handlers (bail out
+  of the frame's update entirely if the rect has 0 width/height) rather
+  than trying to prevent the drag from starting while collapsed (a widget
+  can't easily know when devPanel.js's OWN unrelated collapse toggle is
+  about to fire mid-drag).
+- **A real, confirmed unit-mismatch bug was the actual root cause of "I
+  set the default and max at .5 or less but i still see full arms."**
+  `hideWrist` ("Default Arm Length") is a plain 0-100 slider, matching
+  every other percent-like control in this project -- typing "0.5"
+  produces a genuinely valid but barely-there 0.5% crop, not the intended
+  50%, and looks indistinguishable from "no crop" by eye. Root-caused
+  directly: typed "0.5" into the live control and confirmed
+  `cfg.hideWrist` became exactly `0.5`, not `50`. Not a code bug in the
+  sense that 0.5 IS a valid point on that slider's own real scale -- but
+  the Length Scaling Curve widget's own axis captions read "(0-1)" at the
+  time, which is very likely what primed the "type a fraction" instinct
+  for the OTHER (0-100-scale) controls in this same feature. Fixed by
+  relabeling the curve's own captions to read in percent too, so every
+  control in this feature speaks the same units -- not by changing any
+  control's actual underlying scale.
+- **Reactive Arm Length's distance normalization used to divide by a
+  FIXED constant (`sceneState.fieldRadius * ARM_LENGTH_DISTANCE_NORM`) --
+  a real, reported bug ("why is it that sometimes when i place the cursor
+  far away, the hands furthest from the cursor start disappearing, even
+  though i have a min length of more than 0").** Root cause, confirmed by
+  direct measurement: once the cursor moves far enough from the WHOLE
+  field that every hand's distance exceeds that fixed reference, every
+  hand's normalized distance clamps to the same value (1.0), collapsing
+  ALL relative variation across the field -- measured directly, with the
+  cursor placed far outside the field, both the nearest and farthest hand
+  in the field landed on the identical crop value. Fixed by normalizing
+  against the CURRENT field's own live min/max distance-to-cursor instead
+  (a cheap pre-pass over all hands in `updateRenderOrder()`, before the
+  main per-hand loop) -- the curve's full domain is now always spread
+  across whatever hands are actually in the field, regardless of how far
+  the cursor wanders. Re-verified with the cursor placed extremely far
+  away (distance ~4000-4400 units, field radius ~185): the nearest hand
+  measured crop 0.9 (max bound) and the farthest measured 0.3 (min bound)
+  -- the full gradient held, where the old fixed-reference version would
+  have collapsed both to the same value.
+- **Length Scaling Curve is now a real smooth spline (Catmull-Rom,
+  C1-continuous, passes exactly through every control point), not
+  piecewise-linear** -- direct correction, with a Photoshop/Lightroom
+  tone-curve editor given as the visual reference ("it should not be
+  angled lines, it should be a smooth curve where ever i drag it").
+  Parameterized by X-position within each segment using the immediate
+  neighbor on each side (a common simplification vs. true arc-length
+  parameterization, visually indistinguishable for this kind of editor).
+  The SVG widget draws the SAME `evaluateArmLengthCurve()` function the
+  real per-hand math calls, fine-sampled at 48 points into a `<path>` --
+  not a separately-approximated visual, so the drawn curve is always
+  exactly what's actually applied.
+- **A defensive gap in the new Mouse Tracking Log's click handler --
+  caught live while testing, not shipped.** `e.target.closest('.dp-panel')`
+  throws if `e.target` isn't a real Element (confirmed via a synthetic
+  test event dispatched directly on `document`, which has no `.closest()`
+  method) -- a genuine user click always targets a real element in
+  practice, but the failure mode costs nothing to remove entirely via
+  optional chaining (`e.target?.closest?.(...)`) rather than relying on
+  that always being true.
+- **A concurrent session (working from the HANDO project, per direct
+  request: "I may want the possibility of saving poses in the Hando app,
+  then somehow importing those poses into this app") added a "Saved
+  Poses" import list-picker and a standalone "Pose Preview" mini-viewer
+  to this project's own `main.js`/`devpanel.js` WHILE this round's own 6
+  fixes were being implemented in the same working tree.** Confirmed via
+  direct diff inspection (not assumed) before touching anything further:
+  their changes reuse `applyCurlToSkeleton()`/`applyWristPoseToSkeleton()`
+  with a new, backward-compatible `values = cfg` parameter (defaulting to
+  this project's own existing behavior at every existing call site) to
+  pose a SEPARATE, standalone preview hand from a saved item's own values
+  without touching the live field. Given how deeply their changes and
+  this round's own changes ended up interleaved (even within shared
+  function signatures), a clean per-session hunk split -- the approach
+  successfully used for `devpanel.js`'s own isolated collapse-button fix,
+  see the ETA History/CHANGELOG entry for this round -- was judged NOT
+  safely possible for `main.js` without real risk of breaking their
+  feature; both sessions' changes were committed together, with honest,
+  explicit attribution in the commit message and here, rather than
+  either silently claimed as one session's own work or held back
+  entirely (which would have also withheld this round's own 6 fixes).

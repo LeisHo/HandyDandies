@@ -6,7 +6,7 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js'
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js'
 import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js'
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js'
-import { initDevPanel, syncValue } from './devpanel/devPanel.js'
+import { initDevPanel, syncValue } from './devpanel/devPanel.js?v=3'
 
 const MODEL_URL = '../data/processed/HAND3D/Hand2.glb'
 // Measured once after the first load -- the rig's own bind-pose "pointing"
@@ -64,6 +64,16 @@ const forearmPosRaw = new THREE.Vector3()
 let armLengthRangeParsed = { min: 30, max: 90 }
 let armLengthCurveParsed = [{ x: 0, y: 1 }, { x: 1, y: 0 }]
 const armLengthWidgetResyncs = []
+// Mouse Tracking Log's own state (see its own section further down) --
+// declared here for the same TDZ-avoidance reason as the arm-length vars
+// directly above: the `pointermove`/`pointerdown` listeners that write to
+// these are registered at module top level, early in the file.
+let lastPointerClientX = 0
+let lastPointerClientY = 0
+const MOUSE_LOG_MAX_ENTRIES = 200
+const mouseTrackingLogEntries = []
+let mouseTrackingLogEl = null
+let cursorLogTimer = null
 
 let modelRoot = null
 let modelLoaded = false
@@ -147,6 +157,34 @@ const DEV_GROUPS = [
       { key: 'modelRotX', label: 'Whole-Hand Rotation X (Deg)', type: 'slider', min: -200, max: 200, step: 1, def: 0, lockRange: true, onChange: () => onWholeHandRotationChange() },
       { key: 'modelRotY', label: 'Whole-Hand Rotation Y (Deg)', type: 'slider', min: -200, max: 200, step: 1, def: 0, lockRange: true, onChange: () => onWholeHandRotationChange() },
       { key: 'modelRotZ', label: 'Whole-Hand Rotation Z (Deg)', type: 'slider', min: -200, max: 200, step: 1, def: 0, lockRange: true, onChange: () => onWholeHandRotationChange() },
+      // Direct user request: import poses exported from HANDO (identical
+      // rig/bone names, same Pose-slider set) and preview them without
+      // reposing every hand in the field -- "Use" is wired to
+      // previewPosePreset() (below), which poses only the standalone
+      // preview hand in the "Pose Preview" group underneath this one.
+      // Deliberately does NOT include the Crop Wrist / Arm Length family
+      // (cropWristEnabled/hideWrist/reactiveArmLengthEnabled/
+      // armLengthRange/armLengthCurve) in what a saved pose captures --
+      // that system is reactive/cursor-driven staging, not finger/wrist
+      // articulation, and doesn't fit "a pose" the way it does in HANDO
+      // (where Hide Wrist is a plain static crop with no reactive mode).
+      {
+        key: 'savedPoses',
+        label: 'Saved Poses',
+        type: 'list-picker',
+        def: [],
+        itemLabel: 'Pose',
+        importable: true,
+        captureCurrent: () => capturePosePreset(),
+        onUse: (item) => previewPosePreset(item)
+      },
+      // Master on/off for the whole Arm Length / Hide Wrist system --
+      // direct request ("Crop Wrist Checkbox. To turn the cropping on and
+      // off"). Off means full arm, always, on every hand -- no clip plane,
+      // no position compensation needed (computeArmLengthT() returns 0
+      // directly, skipping Default/Reactive entirely). Placed above both,
+      // since it gates everything below it.
+      { key: 'cropWristEnabled', label: 'Crop Wrist (Master On/Off)', type: 'checkbox', def: true },
       // Cuts away the forearm from a percentage down from the wrist -- 0%
       // clips nothing, 100% cuts off exactly at the wrist joint (hiding
       // the entire forearm). The whole hand shifts to compensate (see
@@ -156,6 +194,17 @@ const DEV_GROUPS = [
       // Reactive Arm Length (below) is off; no onChange needed -- read
       // fresh every frame by computeArmLengthT(), same as the reactive
       // controls below.
+      //
+      // Uses the SAME 0-100 percent scale as every other percent-like
+      // slider in this project (toonShadowFloor, hullThickness, etc.) --
+      // confirmed live as a real, reported bug: typing "0.5" here (typing
+      // a fractional 0-1 value out of habit from the Length Scaling
+      // Curve's own 0-1-axis captions just below) silently sets a
+      // barely-there 0.5% crop, not the intended 50% -- indistinguishable
+      // from "no crop" by eye. Not a code bug (0.5 IS a valid point on a
+      // 0-100 scale) -- fixed by relabeling the curve's own axis captions
+      // to also read in percent (see buildArmLengthCurveWidget()), so
+      // every arm-length control in this feature speaks the same units.
       { key: 'hideWrist', label: 'Default Arm Length (Crop %, Reactive Off)', type: 'slider', min: 0, max: 100, step: 1, def: 0 },
       // Direct follow-up request: "make the crop or arm length dependent
       // on distance from the cursor, so the closer it is the shorter the
@@ -178,6 +227,18 @@ const DEV_GROUPS = [
       { key: 'armLengthRange', label: 'Min / Max Arm Length (Crop %)', type: 'text', def: '{"min":30,"max":90}', onChange: () => parseArmLengthConfig() },
       { key: 'armLengthCurve', label: 'Length Scaling Curve (Distance -> Crop)', type: 'text', def: '[{"x":0,"y":1},{"x":1,"y":0}]', onChange: () => parseArmLengthConfig() }
     ]
+  },
+  {
+    // Direct user request: "provide me a collapsible pose viewer within
+    // the dev panel itself" -- deliberately 0 controls here. buildPosePreview()
+    // (below, called once the model loads) injects its own <canvas> +
+    // independent Three.js scene/camera/renderer/OrbitControls directly
+    // into this group's OWN .dp-group-body DOM element, found by its
+    // data-key (== this title) -- collapsing/expanding it is then just
+    // the SAME existing generic group-collapse mechanism every other
+    // group already has, no new devPanel.js code needed for that part.
+    title: 'Pose Preview',
+    controls: []
   },
   {
     title: 'Camera',
@@ -262,7 +323,19 @@ const DEV_GROUPS = [
       // render ordering keep re-sorting it live -- direct request: 2
       // overlapping hands' stacking must not flash/flip while they're
       // still overlapping, only once they visibly clear each other.
-      { key: 'preventReorderFlash', label: 'Prevent Reordering Flash (Freeze Order While Overlapping)', type: 'checkbox', def: false }
+      { key: 'preventReorderFlash', label: 'Prevent Reordering Flash (Freeze Order While Overlapping)', type: 'checkbox', def: false },
+      // Direct request: a click log (location + what it triggered) and a
+      // regular cursor-position log, both feeding one shared scrollable
+      // display built by buildMouseTrackingLogWidget() (a plain, session-
+      // only log -- not persisted through devPanel.js's Copy/Save, since
+      // there's nothing meaningful to restore later). The click log itself
+      // always runs (a click is a discrete, rare-enough event that logging
+      // it unconditionally costs nothing); this checkbox/slider pair
+      // controls only the REGULAR, timer-driven position log, which
+      // otherwise would spam the display every frame.
+      { key: 'logCursorPositionEnabled', label: 'Log Regular Cursor Position', type: 'checkbox', def: false, onChange: () => restartCursorLogTimer() },
+      { key: 'cursorLogIntervalMs', label: 'Cursor Position Log Interval (Ms)', type: 'slider', min: 100, max: 5000, step: 50, def: 1000, onChange: () => restartCursorLogTimer() },
+      { key: 'clearMouseLogBtn', label: 'Clear Mouse Tracking Log', type: 'button', onClick: () => clearMouseTrackingLog() }
     ]
   }
 ]
@@ -284,6 +357,8 @@ onChangeByCtrl.forEach((fn, c) => { c.onChange = fn })
 // (now-hidden) generic text input.
 parseArmLengthConfig()
 buildArmLengthWidgets()
+buildMouseTrackingLogWidget()
+restartCursorLogTimer()
 
 // -----------------------------------------------------------------------
 // Scene setup
@@ -405,7 +480,84 @@ function updateTargetPlane() {
 // -----------------------------------------------------------------------
 window.addEventListener('pointermove', (e) => {
   cursorNDC.set((e.clientX / window.innerWidth) * 2 - 1, -(e.clientY / window.innerHeight) * 2 + 1)
+  lastPointerClientX = e.clientX
+  lastPointerClientY = e.clientY
 })
+// Mouse Tracking Log (Debug group) -- direct request: a click log (location
+// + what it triggered) plus a regular, interval-driven cursor-position
+// log. The click log runs unconditionally (a click is discrete/rare enough
+// that logging it costs nothing); "what it triggers" describes this app's
+// OWN actual click semantics honestly, not a placeholder -- a click lands
+// either inside the dev panel itself, or on the canvas, where this
+// project's OrbitControls config (LEFT/RIGHT = pan, MIDDLE = dolly/zoom,
+// see its own setup comment) is what actually responds to it; there is no
+// OTHER click-triggered interaction in this app yet (no clickable hands).
+window.addEventListener('pointerdown', (e) => {
+  // `e.target` isn't guaranteed to be an Element (e.g. `document` itself,
+  // which has no `.closest()`) -- confirmed live as a real crash while
+  // testing with a synthetic event dispatched directly on `document`; a
+  // genuine user click always targets a real element in practice, but the
+  // optional-chaining guard costs nothing and removes the failure mode
+  // entirely rather than relying on that always being true.
+  const inPanel = !!e.target?.closest?.('.dp-panel')
+  let trigger
+  if (inPanel) trigger = 'Dev Panel interaction'
+  else if (e.button === 1) trigger = 'Camera Zoom/Dolly (OrbitControls, middle-drag)'
+  else if (e.button === 0 || e.button === 2) trigger = `Camera Pan (OrbitControls, ${e.button === 0 ? 'left' : 'right'}-drag)`
+  else trigger = `Unhandled button ${e.button}`
+  logMouseTrackingEvent(`Click at (${Math.round(e.clientX)}, ${Math.round(e.clientY)}) -> ${trigger}`)
+})
+// Session-only (never persisted through devPanel.js's Copy/Save -- there's
+// nothing meaningful to restore later), capped at MOUSE_LOG_MAX_ENTRIES so
+// a long session doesn't grow this without bound. `mouseTrackingLogEl` is
+// set once buildMouseTrackingLogWidget() runs (right after initDevPanel());
+// logging before then (shouldn't normally happen, since no pointer event
+// can fire before the page itself has rendered) just skips the DOM update.
+function logMouseTrackingEvent(text) {
+  const line = `[${new Date().toLocaleTimeString()}] ${text}`
+  mouseTrackingLogEntries.push(line)
+  if (mouseTrackingLogEntries.length > MOUSE_LOG_MAX_ENTRIES) mouseTrackingLogEntries.shift()
+  if (mouseTrackingLogEl) {
+    mouseTrackingLogEl.textContent = mouseTrackingLogEntries.join('\n')
+    mouseTrackingLogEl.scrollTop = mouseTrackingLogEl.scrollHeight
+  }
+}
+function clearMouseTrackingLog() {
+  mouseTrackingLogEntries.length = 0
+  if (mouseTrackingLogEl) mouseTrackingLogEl.textContent = ''
+}
+// Re-armed whenever `logCursorPositionEnabled`/`cursorLogIntervalMs`
+// change (both call this directly as their onChange) -- a real
+// `setInterval`, not piggybacked on the render loop, since the requested
+// interval (as low as 100ms) is finer-grained than "once per rendered
+// frame" would guarantee under any frame-rate hiccup.
+function restartCursorLogTimer() {
+  if (cursorLogTimer) { clearInterval(cursorLogTimer); cursorLogTimer = null }
+  if (!cfg.logCursorPositionEnabled) return
+  cursorLogTimer = setInterval(() => {
+    logMouseTrackingEvent(`Cursor position: (${Math.round(lastPointerClientX)}, ${Math.round(lastPointerClientY)})`)
+  }, cfg.cursorLogIntervalMs)
+}
+// Appends a plain scrollable log display directly to the Debug group's own
+// body -- NOT tied to any devPanel.js control (a live log has nothing to
+// persist), so this bypasses the "custom widget over a hidden text input"
+// pattern the arm-length widgets use and just appends straight to the
+// group's DOM, found via its own `data-key` (see devPanel.js's
+// `createGroupElement()`).
+function buildMouseTrackingLogWidget() {
+  const body = document.querySelector('.dp-group[data-key="Debug"] .dp-group-body')
+  if (!body) return
+  const wrap = elLocal('div', { padding: '4px 6px' })
+  const label = elLocal('div', { fontSize: '11px', opacity: '0.85', marginBottom: '3px' }, { text: 'Mouse Tracking Log' })
+  mouseTrackingLogEl = elLocal('pre', {
+    height: '110px', overflowY: 'auto', margin: '0', padding: '4px 6px',
+    background: 'rgba(255,255,255,0.06)', borderRadius: '4px', fontSize: '10px',
+    whiteSpace: 'pre-wrap', wordBreak: 'break-word'
+  })
+  wrap.appendChild(label)
+  wrap.appendChild(mouseTrackingLogEl)
+  body.appendChild(wrap)
+}
 
 function updateCursorTarget() {
   raycaster.setFromCamera(cursorNDC, camera)
@@ -657,21 +809,28 @@ function curlBiasWeight(jointIndex, jointCount, bias) {
 const _curlAxisScratch = new THREE.Vector3()
 const _splayAxisScratch = new THREE.Vector3()
 const _splay2AxisScratch = new THREE.Vector3()
-function applyCurlToSkeleton(fingerName, skeleton, baseQuat, wrapperQuat) {
+// `values` (default `cfg`): lets a caller pose a DIFFERENT skeleton from a
+// plain values object instead of the live cfg -- added for the Pose
+// Preview mini-viewer (previewPosePreset(), below), which poses its own
+// standalone preview hand from a SAVED item's own values without touching
+// cfg or any hand in the main field. Every existing call site (the main
+// `hands` field, via applyCurl()) omits this arg and behaves exactly as
+// before.
+function applyCurlToSkeleton(fingerName, skeleton, baseQuat, wrapperQuat, values = cfg) {
   const joints = FINGER_JOINTS[fingerName]
   const maxDegs = FINGER_MAX_DEG[fingerName]
   const sign = FINGER_SIGN[fingerName]
   const curlAxis = _curlAxisScratch.copy(FINGER_CURL_AXIS[fingerName]).applyQuaternion(baseQuat)
   const splayAxis = _splayAxisScratch.copy(FINGER_SPLAY_AXIS[fingerName]).applyQuaternion(baseQuat)
-  const curlT = cfg[FINGER_CURL_KEY[fingerName]] / 100
-  const splayT = cfg[FINGER_SPLAY_KEY[fingerName]] / 100
-  const curlBias = cfg[FINGER_CURL_BIAS_KEY[fingerName]] / 100
-  const tipTwistT = cfg[FINGER_TIP_TWIST_KEY[fingerName]] / 100
+  const curlT = values[FINGER_CURL_KEY[fingerName]] / 100
+  const splayT = values[FINGER_SPLAY_KEY[fingerName]] / 100
+  const curlBias = values[FINGER_CURL_BIAS_KEY[fingerName]] / 100
+  const tipTwistT = values[FINGER_TIP_TWIST_KEY[fingerName]] / 100
   const splayAngle = FINGER_SPLAY_SIGN[fingerName] * THREE.MathUtils.degToRad(FINGER_SPLAY_MAX_DEG[fingerName] * splayT)
   const splayJointIndex = FINGER_SPLAY_JOINT_INDEX[fingerName]
   const splay2JointIndex = FINGER_SPLAY2_JOINT_INDEX[fingerName]
   const splay2Axis = _splay2AxisScratch.copy(FINGER_SPLAY2_AXIS[fingerName]).applyQuaternion(baseQuat)
-  const splay2T = cfg[FINGER_SPLAY2_KEY[fingerName]] / 100
+  const splay2T = values[FINGER_SPLAY2_KEY[fingerName]] / 100
   const splay2Angle = FINGER_SPLAY2_SIGN[fingerName] * THREE.MathUtils.degToRad(FINGER_SPLAY2_MAX_DEG[fingerName] * splay2T)
   const bones = []
   joints.forEach((boneName, i) => {
@@ -709,13 +868,13 @@ function applyCurl(fingerName) {
   scene.updateMatrixWorld(true)
   hands.forEach((hand) => { if (hand.skinnedMesh) applyCurlToSkeleton(fingerName, hand.skinnedMesh.skeleton, cloneBaseQuat, hand.wrapper.quaternion) })
 }
-function applyWristPoseToSkeleton(skeleton) {
+function applyWristPoseToSkeleton(skeleton, values = cfg) {
   const bone = skeleton.getBoneByName('rHand')
   const rest = boneRestQuat.rHand
   if (!bone || !rest) return
   bone.quaternion.copy(rest)
-  bone.rotateX(THREE.MathUtils.degToRad(cfg.wristBend))
-  bone.rotateZ(THREE.MathUtils.degToRad(cfg.wristSplay))
+  bone.rotateX(THREE.MathUtils.degToRad(values.wristBend))
+  bone.rotateZ(THREE.MathUtils.degToRad(values.wristSplay))
 }
 function applyWristPose() {
   if (!modelLoaded) return
@@ -729,6 +888,150 @@ function applyWristPose() {
 function applyAllFingerPoses() {
   FINGER_NAMES.forEach((name) => applyCurl(name))
   applyWristPose()
+}
+
+// Saved-pose capture -- every key a saved pose stores, listed once here so
+// capture and Pose Preview's own apply (previewPosePreset(), below) can
+// never drift apart. Ported from HANDO's own POSE_PRESET_KEYS/
+// capturePosePreset(), with the Crop Wrist / Arm Length family
+// deliberately left out -- see the 'savedPoses' control's own comment for
+// why.
+const POSE_PRESET_KEYS = [
+  'thumbCurl', 'thumbSplay', 'thumbSplay2', 'curlBiasThumb', 'tipTwistThumb',
+  'curlIndex', 'splayIndex', 'splayIndex2', 'curlBiasIndex', 'tipTwistIndex',
+  'curlMiddle', 'splayMiddle', 'splayMiddle2', 'curlBiasMiddle', 'tipTwistMiddle',
+  'curlRing', 'splayRing', 'splayRing2', 'curlBiasRing', 'tipTwistRing',
+  'curlPinky', 'splayPinky', 'splayPinky2', 'curlBiasPinky', 'tipTwistPinky',
+  'wristBend', 'wristSplay', 'modelRotX', 'modelRotY', 'modelRotZ'
+]
+function capturePosePreset() {
+  const item = {}
+  POSE_PRESET_KEYS.forEach((key) => { item[key] = cfg[key] })
+  return item
+}
+// Each POSE_PRESET_KEYS entry's own slider default -- the fallback for a
+// key a pose imported from HANDO might lack (e.g. HANDO's newer
+// Base-Only Curl sliders don't exist as controls here at all yet), same
+// "never leave cfg/the preview at some OTHER pose's stale value" reasoning
+// as HANDO's own POSE_KEY_DEFAULTS.
+const POSE_KEY_DEFAULTS = {}
+DEV_GROUPS.find((g) => g.title === 'Pose').controls.forEach((c) => {
+  if (POSE_PRESET_KEYS.includes(c.key)) POSE_KEY_DEFAULTS[c.key] = c.def
+})
+
+// -----------------------------------------------------------------------
+// Pose Preview -- a small, independent Three.js viewport embedded in the
+// dev panel's own collapsible "Pose Preview" group (direct user request:
+// "Use" should NOT repose every hand in the field). Its own scene/camera/
+// renderer/OrbitControls/hand clone, entirely separate from the main
+// field -- never touches `hands`, `cfg`, or `cloneBaseQuat`.
+// -----------------------------------------------------------------------
+let previewHand = null // { clone, skinnedMesh }
+let previewRenderer = null
+let previewScene = null
+let previewCamera = null
+let previewControls = null
+const previewBaseQuat = new THREE.Quaternion()
+const _previewWholeHandRotEuler = new THREE.Euler()
+
+// Called once, right after the main model loads (modelRoot/alignQuat/
+// boneRestQuat/toonMaterial all ready by then) -- clones the SAME already-
+// loaded GLB one more time (no extra network fetch), same as rebuildField()
+// clones it per field hand.
+function buildPosePreview() {
+  const body = document.querySelector('.dp-group[data-key="Pose Preview"] .dp-group-body')
+  if (!body) return
+  const canvas = document.createElement('canvas')
+  canvas.className = 'dp-pose-preview-canvas'
+  body.appendChild(canvas)
+
+  previewScene = new THREE.Scene()
+  previewCamera = new THREE.PerspectiveCamera(35, 1, 0.1, 2000)
+  previewRenderer = new THREE.WebGLRenderer({ canvas, antialias: true })
+  previewRenderer.outputColorSpace = THREE.SRGBColorSpace
+
+  // Clones of the MAIN scene's own already-tuned key/ambient lights rather
+  // than inventing fresh ones -- a from-scratch light produced a flat,
+  // washed-out white silhouette (confirmed live: no visible toon-shading
+  // steps at all), while the main field's own hands show clear shaded
+  // detail under their own tuned lighting. A DirectionalLight's actual
+  // effect only depends on the position-to-target DIRECTION, not
+  // magnitude, so reusing keyLight's exact position/target vectors is
+  // correct even though they're scaled for the much larger main scene
+  // (sceneState.fieldRadius * 3) -- only a one-time snapshot at build
+  // time, not live-synced to further Lighting-tab tweaks (a minor,
+  // acceptable gap for what's meant to be a quick pose check).
+  const previewKey = keyLight.clone()
+  previewKey.target = keyLight.target.clone()
+  previewScene.add(previewKey)
+  previewScene.add(previewKey.target)
+  previewScene.add(hemiLight.clone())
+
+  const clone = cloneSkeletal(modelRoot)
+  clone.quaternion.copy(alignQuat)
+  const skinnedMesh = findSkinnedMesh(clone)
+  if (skinnedMesh && toonMaterial) skinnedMesh.material = toonMaterial
+  previewScene.add(clone)
+  previewHand = { clone, skinnedMesh }
+
+  // Framed from the SAME bounding-sphere measurement taken once at load
+  // (handBoundsCenterLocal/handBoundsRadiusLocal) the main scene's own
+  // one-time auto-frame already uses -- no separate measurement needed.
+  // Aimed at the mesh's own measured center (rotated by alignQuat, the
+  // same transform the clone itself carries), NOT the raw origin -- this
+  // asset's visible mesh includes a full forearm hanging below the wrist
+  // (documented in handBoundsCenterLocal's own declaration comment), so
+  // the bounding sphere's center sits well away from the wrist/bone-
+  // origin point; aiming at (0,0,0) framed mostly forearm instead of the
+  // hand+fingers.
+  const previewTarget = handBoundsCenterLocal.clone().applyQuaternion(alignQuat)
+  previewCamera.position.copy(previewTarget).add(new THREE.Vector3(0, handBoundsRadiusLocal * 0.15, handBoundsRadiusLocal * 2.4))
+  previewControls = new OrbitControls(previewCamera, canvas)
+  previewControls.target.copy(previewTarget)
+  previewControls.enableDamping = true
+  previewControls.update()
+
+  resizePosePreview()
+  window.addEventListener('resize', resizePosePreview)
+}
+// canvas.clientWidth/Height (CSS layout size) drives the resize, same
+// self-heal reasoning as the main scene's own applyRendererSize() --
+// re-read on demand (called after building, on window resize, and every
+// frame's render call below is cheap to guard with this) rather than
+// assumed fixed, since the group's own resizable dev-panel width means
+// this canvas's real displayed size can change at any time.
+function resizePosePreview() {
+  if (!previewRenderer) return
+  const canvas = previewRenderer.domElement
+  const w = canvas.clientWidth || 200
+  const h = canvas.clientHeight || 200
+  if (previewCamera.aspect !== w / h) {
+    previewCamera.aspect = w / h
+    previewCamera.updateProjectionMatrix()
+  }
+  previewRenderer.setSize(w, h, false)
+}
+// Applies one saved pose's OWN values (not cfg) to ONLY the preview hand's
+// skeleton, via applyCurlToSkeleton()/applyWristPoseToSkeleton()'s own
+// `values` param -- reuses the exact same posing math the main field uses,
+// just pointed at different data and a different (single, untracked)
+// hand. No `wrapperQuat` (previewHand has no cursor-tracking wrapper
+// layer at all, unlike a field hand) -- omitted (null), matching how Tip
+// Twist's own axis conversion already omits it for the same "nothing to
+// exclude" reason.
+function previewPosePreset(item) {
+  if (!previewHand || !previewHand.skinnedMesh) return
+  const values = {}
+  POSE_PRESET_KEYS.forEach((k) => { values[k] = item[k] !== undefined ? item[k] : POSE_KEY_DEFAULTS[k] })
+  _previewWholeHandRotEuler.set(
+    THREE.MathUtils.degToRad(values.modelRotX),
+    THREE.MathUtils.degToRad(values.modelRotY),
+    THREE.MathUtils.degToRad(values.modelRotZ)
+  )
+  previewBaseQuat.copy(alignQuat).multiply(new THREE.Quaternion().setFromEuler(_previewWholeHandRotEuler))
+  previewHand.clone.quaternion.copy(previewBaseQuat)
+  FINGER_NAMES.forEach((name) => applyCurlToSkeleton(name, previewHand.skinnedMesh.skeleton, previewBaseQuat, null, values))
+  applyWristPoseToSkeleton(previewHand.skinnedMesh.skeleton, values)
 }
 
 // Whole-Hand Rotation X/Y/Z -- changes `cloneBaseQuat` only (a single
@@ -780,12 +1083,26 @@ function onWholeHandRotationChange() {
 // original single slider, relabeled "Default Arm Length") -- unchanged
 // behavior from before this round.
 //
-// Distance is normalized against `sceneState.fieldRadius` -- a judgment
-// call (no measurement dictates this specific reference), documented as
-// such rather than presented as a derived constant; ARM_LENGTH_DISTANCE_NORM
-// scales it, adjustable if the default range feels too compressed/spread
-// out at typical grid sizes.
-const ARM_LENGTH_DISTANCE_NORM = 1.5
+// Distance is normalized against the CURRENT field's own live min/max
+// distance-to-cursor (computed fresh each frame in updateRenderOrder(),
+// passed in here as `minDist`/`distRange`) rather than a fixed constant --
+// see updateRenderOrder()'s own comment for the real bug this fixes (far-
+// away hands all collapsing to the same curve value once the cursor left
+// a FIXED reference range entirely).
+//
+// Smooth spline (Catmull-Rom, C1-continuous, passes exactly through every
+// control point) -- direct correction: "the arm length curve input should
+// not be angled lines, it should be a smooth curve where ever i drag it,"
+// with a Photoshop/Lightroom-style tone-curve editor as the reference.
+// Parameterized by X-position within each segment (not true arc-length --
+// a common, visually-indistinguishable simplification for this kind of
+// monotonic-ish editor) using the immediate neighbor on each side (the
+// segment's own 2 endpoints double as their own missing neighbor at the
+// curve's first/last segment, the standard Catmull-Rom boundary handling).
+function catmullRomY(y0, y1, y2, y3, t) {
+  const t2 = t * t, t3 = t2 * t
+  return 0.5 * ((2 * y1) + (-y0 + y2) * t + (2 * y0 - 5 * y1 + 4 * y2 - y3) * t2 + (-y0 + 3 * y1 - 3 * y2 + y3) * t3)
+}
 function evaluateArmLengthCurve(points, x) {
   if (!points || points.length === 0) return 1
   if (points.length === 1) return points[0].y
@@ -793,10 +1110,12 @@ function evaluateArmLengthCurve(points, x) {
   if (x <= sorted[0].x) return sorted[0].y
   if (x >= sorted[sorted.length - 1].x) return sorted[sorted.length - 1].y
   for (let i = 0; i < sorted.length - 1; i++) {
-    const a = sorted[i], b = sorted[i + 1]
-    if (x >= a.x && x <= b.x) {
-      const segT = b.x === a.x ? 0 : (x - a.x) / (b.x - a.x)
-      return a.y + (b.y - a.y) * segT
+    const p1 = sorted[i], p2 = sorted[i + 1]
+    if (x >= p1.x && x <= p2.x) {
+      const p0 = sorted[i - 1] || p1
+      const p3 = sorted[i + 2] || p2
+      const segT = p2.x === p1.x ? 0 : (x - p1.x) / (p2.x - p1.x)
+      return catmullRomY(p0.y, p1.y, p2.y, p3.y, segT)
     }
   }
   return sorted[sorted.length - 1].y
@@ -815,9 +1134,10 @@ function parseArmLengthConfig() {
   try { armLengthRangeParsed = JSON.parse(cfg.armLengthRange) } catch (e) { /* keep last-good value */ }
   try { armLengthCurveParsed = JSON.parse(cfg.armLengthCurve).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
 }
-function computeArmLengthT(hand, distanceToCursor) {
+function computeArmLengthT(hand, distanceToCursor, minLiveDist, liveDistRange) {
+  if (!cfg.cropWristEnabled) return 0 // master off -- full arm, always
   if (!cfg.reactiveArmLengthEnabled) return cfg.hideWrist / 100
-  const normDist = THREE.MathUtils.clamp(distanceToCursor / (sceneState.fieldRadius * ARM_LENGTH_DISTANCE_NORM || 1), 0, 1)
+  const normDist = THREE.MathUtils.clamp((distanceToCursor - minLiveDist) / liveDistRange, 0, 1)
   const curveY = THREE.MathUtils.clamp(evaluateArmLengthCurve(armLengthCurveParsed, normDist), 0, 1)
   const minT = armLengthRangeParsed.min / 100, maxT = armLengthRangeParsed.max / 100
   return minT + (maxT - minT) * curveY
@@ -917,6 +1237,12 @@ function buildArmLengthRangeWidget(row) {
       downEv.preventDefault()
       function onMove(moveEv) {
         const rect = track.getBoundingClientRect()
+        // A zero-width rect (the row/group hidden or mid-collapse-
+        // transition when the drag starts) would divide by 0 -> NaN ->
+        // JSON.stringify silently turns it into `null`, corrupting the
+        // saved value -- confirmed live as a real bug this round. Bail
+        // out rather than commit a broken value.
+        if (rect.width <= 0) return
         let pct = Math.round(THREE.MathUtils.clamp((moveEv.clientX - rect.left) / rect.width, 0, 1) * 100)
         pct = isMin ? Math.min(pct, current[otherKey]) : Math.max(pct, current[otherKey])
         current[handleKey] = pct
@@ -953,10 +1279,21 @@ function buildArmLengthCurveWidget(row) {
   const axisY = document.createElementNS(svgNS, 'line')
   axisY.setAttribute('x1', 1); axisY.setAttribute('y1', 0); axisY.setAttribute('x2', 1); axisY.setAttribute('y2', H)
   axisY.setAttribute('stroke', 'rgba(255,255,255,0.25)')
-  const poly = document.createElementNS(svgNS, 'polyline')
-  poly.setAttribute('fill', 'none'); poly.setAttribute('stroke', 'var(--dp-accent, #7d8cff)'); poly.setAttribute('stroke-width', '2')
-  svg.appendChild(axisX); svg.appendChild(axisY); svg.appendChild(poly)
-  const caption = elLocal('div', { fontSize: '10px', opacity: '0.7', marginTop: '3px', textAlign: 'center' }, { text: 'X: Distance From Cursor (0-1)  ·  Y: Crop Fraction (0=None, 1=Full)' })
+  // A <path>, not a <polyline> -- direct correction: "the arm length curve
+  // input should not be angled lines, it should be a smooth curve where
+  // ever i drag it," with a Photoshop/Lightroom tone-curve editor as the
+  // reference. Fine-sampled from the SAME evaluateArmLengthCurve() the
+  // real per-hand math uses (not a separately-drawn approximation), so
+  // the visible curve is always exactly what's actually applied.
+  const curvePath = document.createElementNS(svgNS, 'path')
+  curvePath.setAttribute('fill', 'none'); curvePath.setAttribute('stroke', 'var(--dp-accent, #7d8cff)'); curvePath.setAttribute('stroke-width', '2')
+  svg.appendChild(axisX); svg.appendChild(axisY); svg.appendChild(curvePath)
+  // Percent (0-100), matching every other arm-length control in this
+  // feature -- direct correction after a real, reported bug: the previous
+  // "(0-1)" axis language here is what led to typing "0.5" into the
+  // (0-100-scale) Default Arm Length slider expecting "half," silently
+  // producing a barely-there 0.5% crop instead of the intended 50%.
+  const caption = elLocal('div', { fontSize: '10px', opacity: '0.7', marginTop: '3px', textAlign: 'center' }, { text: 'X: Distance From Cursor (%, Nearest→Farthest Hand This Frame)  ·  Y: Crop (0%=None, 100%=Full)' })
   row.appendChild(svg)
   row.appendChild(caption)
 
@@ -974,8 +1311,16 @@ function buildArmLengthCurveWidget(row) {
     points.sort((a, b) => a.x - b.x)
     commitTextControl(input, JSON.stringify(points))
   }
+  const CURVE_SAMPLES = 48
   function redraw() {
-    poly.setAttribute('points', points.map((p) => { const px = toPx(p); return `${px.x},${px.y}` }).join(' '))
+    let d = ''
+    for (let i = 0; i <= CURVE_SAMPLES; i++) {
+      const x = i / CURVE_SAMPLES
+      const y = THREE.MathUtils.clamp(evaluateArmLengthCurve(points, x), 0, 1)
+      const px = toPx({ x, y })
+      d += (i === 0 ? 'M' : 'L') + px.x.toFixed(2) + ',' + px.y.toFixed(2) + ' '
+    }
+    curvePath.setAttribute('d', d.trim())
     circles.forEach((c) => svg.removeChild(c))
     circles = points.map((p, i) => {
       const px = toPx(p)
@@ -989,8 +1334,9 @@ function buildArmLengthCurveWidget(row) {
         dragged = false
         const isEndpoint = i === 0 || i === points.length - 1
         function onMove(moveEv) {
-          dragged = true
           const rect = svg.getBoundingClientRect()
+          if (rect.width <= 0 || rect.height <= 0) return // hidden mid-drag -- see the range widget's own guard, same bug class
+          dragged = true
           const np = fromPx(moveEv.clientX - rect.left, moveEv.clientY - rect.top)
           if (isEndpoint) { p.y = np.y } else { p.x = np.x; p.y = np.y }
           redraw()
@@ -1286,7 +1632,8 @@ new GLTFLoader().load(
     modelRoot = root
     modelLoaded = true
     rebuildField()
-    window.__debug = { THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget }
+    buildPosePreview()
+    window.__debug = { THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls } }
     loadingEl.classList.add('hidden')
   },
   undefined,
@@ -1337,6 +1684,16 @@ function animate() {
   }
   updateRenderOrder()
   composer.render()
+  // Pose Preview's own tiny render pass -- guarded by offsetParent (null
+  // whenever an ancestor is display:none, i.e. the "Pose Preview" group
+  // is collapsed, or the whole dev panel is hidden/collapsed) so an
+  // orbit-controllable mini-viewport nobody can currently see doesn't
+  // still cost a render every frame.
+  if (previewRenderer && previewRenderer.domElement.offsetParent !== null) {
+    resizePosePreview()
+    previewControls.update()
+    previewRenderer.render(previewScene, previewCamera)
+  }
 }
 animate()
 
@@ -1459,8 +1816,32 @@ function updateRenderOrder() {
       }
     }
   }
-  hands.forEach((hand) => {
-    const live = hand.wrapper.position.distanceTo(cursorTarget)
+  // Reactive Arm Length's own distance normalization -- direct follow-up
+  // request/bug report: "why is it that sometimes when i place the cursor
+  // far away, the hands furthest from the cursor start disappearing, even
+  // though i have a min length of more than 0." Root cause: the ORIGINAL
+  // version normalized against a FIXED reference (`sceneState.fieldRadius
+  // * ARM_LENGTH_DISTANCE_NORM`) -- once the cursor moves far enough from
+  // the WHOLE field that every hand's distance exceeds that fixed value,
+  // every hand clamps to the exact same extreme curve output, collapsing
+  // all relative variation (confirmed directly: with the cursor placed
+  // far outside the field, both the nearest and farthest hand measured
+  // the identical value). Fixed by normalizing against the CURRENT
+  // field's own actual live distance range instead of a fixed constant --
+  // a quick pre-pass finds the min/max distance any hand ACTUALLY has to
+  // the cursor this frame, so the curve's full 0-1 domain is always
+  // spread across whatever hands are currently in the field, regardless
+  // of how far the cursor wanders from it.
+  let minLiveDist = Infinity, maxLiveDist = -Infinity
+  const liveDistances = hands.map((hand) => {
+    const d = hand.wrapper.position.distanceTo(cursorTarget)
+    if (d < minLiveDist) minLiveDist = d
+    if (d > maxLiveDist) maxLiveDist = d
+    return d
+  })
+  const liveDistRange = Math.max(maxLiveDist - minLiveDist, 0.001)
+  hands.forEach((hand, i) => {
+    const live = liveDistances[i]
     hand.effectiveRenderOrder = (flashFixOn && hand.isOverlapping)
       ? hand.effectiveRenderOrder + (live - hand.effectiveRenderOrder) * REORDER_SMOOTHING
       : live
@@ -1472,7 +1853,7 @@ function updateRenderOrder() {
     // smoothing, a different feature solving a different problem) rather
     // than recomputing it. See computeArmLengthT()/applyHandArmLength()'s
     // own comments for why this now runs every frame, per hand.
-    hand.currentArmLengthT = computeArmLengthT(hand, live)
+    hand.currentArmLengthT = computeArmLengthT(hand, live, minLiveDist, liveDistRange)
     if (hand.skinnedMesh) applyHandArmLength(hand, hand.currentArmLengthT)
   })
 }

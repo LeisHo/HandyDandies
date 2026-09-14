@@ -1468,9 +1468,37 @@ export function initDevPanel(groups, opts = {}) {
   copyBtn.addEventListener('click', copySettings)
   saveBtn.addEventListener('click', saveSettings)
   resetBtn.addEventListener('click', resetSettings)
+  // `.dp-collapsed`'s own CSS only hides `.dp-body`/`.dp-resize` -- it
+  // can't also shrink the PANEL's own box, for 2 separate reasons that
+  // BOTH had to be fixed: `panel.style.height` is set as an explicit
+  // inline px value (for resize-drag persistence, see geom restore below)
+  // which always wins over a stylesheet rule, AND `.dp-panel`'s own
+  // `min-height: 140px` (its floor for normal resizing) applies
+  // unconditionally too, so even overriding `height` alone left the box
+  // floored at 140px instead of shrinking to the header. Left unfixed,
+  // collapsing hid the settings but left the panel's own box at its full
+  // (or 140px-floored) pre-collapse height -- a real, reported bug ("the
+  // settings disappear but the full panel is still there"). Fixed by
+  // explicitly swapping BOTH `height` and `minHeight` to the header's own
+  // natural height on collapse, and restoring both real (resize-drag-set)
+  // values on expand.
+  let heightBeforeCollapse = null
+  let minHeightBeforeCollapse = null
   collapseBtn.addEventListener('click', () => {
+    const collapsing = !panel.classList.contains('dp-collapsed')
     panel.classList.toggle('dp-collapsed')
     collapseBtn.textContent = panel.classList.contains('dp-collapsed') ? '+' : '–'
+    if (collapsing) {
+      heightBeforeCollapse = panel.style.height
+      minHeightBeforeCollapse = panel.style.minHeight
+      panel.style.height = header.offsetHeight + 'px'
+      panel.style.minHeight = header.offsetHeight + 'px'
+    } else {
+      panel.style.height = heightBeforeCollapse
+      panel.style.minHeight = minHeightBeforeCollapse
+      heightBeforeCollapse = null
+      minHeightBeforeCollapse = null
+    }
   })
   window.addEventListener('keydown', (e) => {
     const tag = document.activeElement && document.activeElement.tagName

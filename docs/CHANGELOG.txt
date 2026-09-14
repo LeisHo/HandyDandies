@@ -970,7 +970,165 @@ Length, a correction to the prior entry's `updateClonePoseTransform()`
 references now that it's split into `updateCloneBaseQuat()` +
 `applyHandArmLength()`, and 3 new GOTCHAS entries: the foreshortening
 finding, the TDZ crash, and re-confirmation that grid-alignment survives
-the Reactive round) and `PROJECT_PROGRESS.md`. Not yet committed/pushed.
+the Reactive round) and `PROJECT_PROGRESS.md`.
+
+--------------------------------------------------------------------------------
+2026-09-13 (continued once more)  -  ~4:17 AM - 4:18 AM EDT
+
+"push always push" -- user made this a standing instruction for this
+project going forward (saved to memory) rather than a one-off answer.
+Committed and pushed the Reactive Arm Length round above as commit
+`6a468d0`. Deliberately left a new untracked `data/SCREENCAP/` directory
+(a 12.8MB user-provided debugging screen recording) OUT of the commit --
+not part of the feature, and a large binary video isn't something to
+commit without being asked.
+
+--------------------------------------------------------------------------------
+2026-09-13 (continued once more)  -  ~7:31 PM - 8:03 PM EDT
+
+4 bug reports plus 2 new feature requests, arriving together: "1. Dev
+Panel minimize doesnt work. The settings dissappear, but the full panel
+is still there. 2. *D* Crop Wrist Checkbox. To turn the cropping on and
+off. 3. Wrist cropping min max doesnt seem to work. I set the default
+and max at .5 or less but i still see full arms. 4. Why is it that
+sometimes when i place the cursor far away, the hands furthest from the
+cursor start dissappearing, even though i have a min length of more than
+0." Then, mid-turn: a mouse-tracking log request, and (from a reference
+image) a correction that the Length Scaling Curve should be a smooth
+curve, not angled line segments.
+
+Investigated items 3/4 first via 2 more user-provided screen recordings
+(`data/SCREENCAP/Recording 2026-09-13 193115.mp4` and
+`...193218.mp4`), extracted to frames directly via the same local OpenCV
+approach as the prior recording -- visually confirmed a real, dramatic
+disparity in visible arm length across the field at a single moment,
+worth root-causing rather than guessing at.
+
+1. **Dev Panel minimize bug** -- root-caused directly in `devpanel.js`
+   (the shared, reused-verbatim engine, not this project's own code):
+   `.dp-collapsed`'s CSS only hides `.dp-body`/`.dp-resize`; it can't
+   shrink the panel itself, because `panel.style.height` is an explicit
+   inline px value (for resize-drag persistence) that always wins over a
+   stylesheet rule, AND `.dp-panel`'s own `min-height: 140px` applies
+   unconditionally too -- confirmed live in 2 steps: fixing `height`
+   alone still left the box floored at 140px (measured
+   `getBoundingClientRect().height` directly), only overriding BOTH
+   `height` and `minHeight` on collapse (and restoring both on expand)
+   actually shrunk it to the header's own height (confirmed: 36px
+   collapsed vs. 677px expanded).
+2. **Crop Wrist checkbox** -- new `cropWristEnabled` master on/off,
+   gating the entire Arm Length system (`computeArmLengthT()` returns 0
+   directly when off, before even checking Reactive/Default). Verified
+   live: off + a high Default Arm Length value still produced crop 0.
+3. **The ".5 still shows full arms" report was a real, confirmed unit-
+   scale mismatch, not a code bug.** Typed "0.5" into the live Default
+   Arm Length control and confirmed directly: `cfg.hideWrist` became
+   exactly `0.5` (0.5% crop), not `50`. `hideWrist` is a plain 0-100
+   slider matching every other percent control in this project -- 0.5 IS
+   a valid point on that scale, just not the one the user meant. Root
+   cause of the CONFUSION (not the value itself): the Length Scaling
+   Curve widget's own axis captions read "(0-1)" at the time, which
+   likely primed the "type a fraction" instinct for this OTHER,
+   differently-scaled control. Fixed by relabeling the curve's own
+   captions to read in percent too ("Distance From Cursor (%)... Crop
+   (0%=None, 100%=Full)"), so every control in this feature speaks the
+   same units -- not by changing any control's actual scale.
+4. **The far-cursor "disappearing" report was a real, confirmed bug in
+   the Reactive normalization math.** `computeArmLengthT()` used to
+   normalize each hand's cursor distance against a FIXED reference
+   (`sceneState.fieldRadius * ARM_LENGTH_DISTANCE_NORM`) -- measured
+   directly: with the cursor placed far outside the whole field (2000,
+   2000), BOTH the nearest hand (distance 2654) and the farthest hand
+   (distance 3003) in the field landed on the IDENTICAL crop value
+   (0.2, the Min bound) -- once every hand's distance exceeds the fixed
+   reference, all relative variation collapses to the same extreme.
+   Fixed by adding a cheap pre-pass in `updateRenderOrder()` that finds
+   the CURRENT field's own live min/max distance-to-cursor each frame,
+   normalizing against THAT range instead of a fixed constant. Re-
+   verified with the cursor placed even farther away (3000, 3000,
+   distances ~4000-4400): nearest hand measured crop 0.9 (Max bound),
+   farthest measured 0.3 (Min bound) -- the full gradient held instead
+   of collapsing.
+
+Also shipped, from the mid-turn requests:
+- **Mouse Tracking Log** (Debug group): a click log describing what each
+  click actually triggers in this app (Dev Panel interaction, or Camera
+  Pan/Dolly via OrbitControls, based on `e.target`/button -- an honest
+  description of this app's real click semantics, not a placeholder),
+  a regular interval-driven cursor-position log, an interval slider
+  (100-5000ms), and an on/off checkbox for the regular log specifically
+  (the click log always runs). A plain scrollable `<pre>` appended
+  directly to the Debug group's own DOM, session-only (not persisted --
+  nothing meaningful to restore in a log). Verified live: dispatched
+  clicks with different buttons/targets and confirmed each produced the
+  correct trigger description; confirmed the interval timer fires
+  correctly at a shortened 100ms test interval.
+- **Length Scaling Curve is now a real smooth spline** (Catmull-Rom,
+  C1-continuous, passes exactly through every point), per direct
+  correction with a Photoshop/Lightroom tone-curve-editor reference
+  image ("ignore the colors in that image"). The SVG widget draws the
+  SAME `evaluateArmLengthCurve()` function the real per-hand math calls,
+  fine-sampled at 48 points -- not a separately-approximated visual.
+  Verified live: added a 3rd point and confirmed the sampled path's own
+  rate-of-change varied smoothly through it (no linear slope break),
+  confirming genuine curvature.
+
+2 more small bugs caught and fixed live before shipping, neither
+originally reported:
+- Dragging either new widget while its own Pose group was COLLAPSED
+  corrupted the stored value to `{"min":null,"max":null}` --
+  `getBoundingClientRect()` on a hidden element returns an all-zero
+  rect, dividing by 0 producing `NaN`, which `JSON.stringify` silently
+  turns into `null`. Fixed with a zero-rect guard in both widgets' own
+  drag handlers.
+- The new click handler's `e.target.closest('.dp-panel')` threw when
+  `e.target` wasn't a real Element (confirmed via a synthetic test event
+  dispatched directly on `document`) -- fixed with optional chaining.
+
+**A concurrent session was found actively editing this SAME project's
+`main.js`/`devpanel.js` while this round's own work was in progress --
+confirmed via direct diff inspection, not assumed, the moment an
+unexpected "Saved Poses"/"Pose Preview" UI showed up in a live test that
+this session never added.** This is the HANDO-side session the user
+separately asked to "deal with" cross-project pose import (see this
+project's own earlier mid-turn note: "actually forget about the pose
+import thing. the chat from Hando will deal with that"). Their changes
+add a Saved-Poses-import list-picker and a standalone Pose Preview
+mini-viewer, reusing this round's own `applyCurlToSkeleton()`/
+`applyWristPoseToSkeleton()` via a new, backward-compatible `values =
+cfg` parameter.
+
+`devpanel.js`'s own changes were cleanly separable: the collapse-button
+fix (item 1 above) touched one isolated location; their list-picker
+export/import UI touched 3 other, non-overlapping locations. Extracted
+the full diff, confirmed the collapse-fix hunk contained ONLY this
+session's own lines, and staged JUST that hunk via `git apply --cached`
+against a hand-constructed single-hunk patch file -- verified afterward
+that the remaining unstaged diff still contained exactly their 3
+untouched hunks.
+
+`main.js` was NOT safely separable the same way: their Pose Preview
+feature's own changes are interleaved with this round's own edits even
+WITHIN shared function signatures (e.g. `applyCurlToSkeleton(fingerName,
+skeleton, baseQuat, wrapperQuat, values = cfg)` -- their own addition,
+backward-compatible with every existing call site, needed to pose their
+separate preview hand from a saved item's own values without touching
+the live field or `cfg`). Attempting to rip out "their part" of these
+shared-signature hunks would have risked breaking their feature for a
+merge that the live, tested app didn't actually need (the combined file
+loaded and ran correctly, 510 hands, 0 console errors, every one of this
+round's own 6 items verified working, throughout testing). Committed
+`main.js` as one combined commit covering both sessions' work, with
+explicit, honest attribution in the commit message and in
+`CODE_SUMMARY.txt` -- not silently claimed as this session's own work,
+and not held back entirely (which would have also withheld this round's
+own fixes).
+
+Corrected `CODE_SUMMARY.txt` (6 new GOTCHAS entries: the devpanel.js
+collapse bug, the widget zero-rect bug, the unit-mismatch finding, the
+normalization bug, the smooth-curve change, the click-handler defensive
+fix, and a 7th documenting the concurrent-session situation and how it
+was handled) and `PROJECT_PROGRESS.md`.
 
 --------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
