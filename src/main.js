@@ -2539,9 +2539,29 @@ window.addEventListener('pointerdown', (e) => {
 // registered FIRST (addEventListener on the same element+event type fires
 // in registration order) so the flag is already correct by the time that
 // listener's own check runs for the same event.
+// CORRECTED 2026-09-14 (direct user report: "i tested the new build and
+// now i cant trigger click nor double click. i thinkn the click hold
+// trigger probably overrides it" -- correct diagnosis of a genuine
+// regression in this fix's own first version). Click-Hold-Pose has NO
+// minimum press duration of its own -- `trig.active` becomes true the
+// INSTANT the button goes down, so a plain, instant click (when both
+// Click-Hold-Pose and Click-Pose happen to be enabled together) ALSO
+// leaves `.active === true` right up until release, making the original
+// `lastPointerupWasHoldRelease` check suppress EVERY click, not just
+// genuine holds. Fixed by requiring the hold to have actually lasted a
+// perceptible amount of time (reusing MOUSE_LOG_HELD_DRAG_MS, the SAME
+// "was this a quick tap or a real hold" threshold the Mouse Tracking Log
+// already uses for its own click-vs-drag-release classification) before
+// treating a release as a hold-release worth suppressing -- a genuine
+// sustained hold (the ORIGINAL interference report's own scenario) still
+// correctly suppresses the extra click; a quick, instant click no longer
+// does, restoring Click Pose/Double-Click Pose's own normal triggering.
 let lastPointerupWasHoldRelease = false
 window.addEventListener('pointerup', (e) => {
-  lastPointerupWasHoldRelease = (e.button === 0 && clickHoldPoseTriggers.chp.active) || (e.button === 2 && clickHoldPoseTriggers.rchp.active)
+  const now = performance.now()
+  const chpHeldLongEnough = e.button === 0 && clickHoldPoseTriggers.chp.active && (now - clickHoldPoseTriggers.chp.holdStartTime) >= MOUSE_LOG_HELD_DRAG_MS
+  const rchpHeldLongEnough = e.button === 2 && clickHoldPoseTriggers.rchp.active && (now - clickHoldPoseTriggers.rchp.holdStartTime) >= MOUSE_LOG_HELD_DRAG_MS
+  lastPointerupWasHoldRelease = chpHeldLongEnough || rchpHeldLongEnough
   if (e.button === 0) endClickHoldPose('chp')
   else if (e.button === 2) endClickHoldPose('rchp')
 })
@@ -3248,7 +3268,7 @@ new GLTFLoader().load(
     modelLoaded = true
     rebuildField()
     buildPosePreview()
-    window.__debug = { THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem }
+    window.__debug = { THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC }
     loadingEl.classList.add('hidden')
   },
   undefined,
