@@ -673,12 +673,28 @@ function rebuildGradientMap() {
 // conflict), but every FIELD hand instead gets its own `.clone()` of this
 // template with its own `clippingPlanes` (see rebuildField() and
 // updateWristClipPlaneForHand()'s own corrected comment for why a shared
-// material can't support per-hand clip planes). `customProgramCacheKey`
-// keeps all those clones (plus this template) sharing ONE compiled WebGL
-// program, since only the clip-plane VALUES differ (a uniform), not the
-// plane COUNT or shader structure -- without it, three.js would otherwise
-// treat 289+ separately-cloned `onBeforeCompile` materials as needing
-// their own program, recompiling the same shader hundreds of times.
+// material can't support per-hand clip planes).
+//
+// CORRECTED 2026-09-14 (user-reported: "Keylight color no longer seems to
+// work... white still shows color, red does turn them red"): this used
+// to also set `material.customProgramCacheKey = () => 'handToonMaterial'`
+// on the theory that it would let all 289+ per-hand clones share ONE
+// compiled WebGL program despite each being its own `.clone()`. Confirmed
+// live this broke the ENTIRE onBeforeCompile customization below (rim
+// light + toon-tint/texture duotone blend) for every hand except
+// whichever one happened to compile the shared program first: direct
+// pixel-readback showed the real texture map's own skin-tone colors
+// rendering completely untouched (RGB ~93,78,63) even with
+// `textureInfluence:0`/`toonTint:#ffffff` set (which should force a flat
+// white blend, per the `<map_fragment>` replacement below) -- and every
+// hand's own `renderer.properties.get(material).uniforms` was missing
+// `toonTint`/`textureInfluence` entirely, confirming `onBeforeCompile`
+// silently never ran (and so never registered those per-material
+// uniforms) for materials that hit the forced cache key instead of
+// compiling their own program. Removed `customProgramCacheKey` entirely
+// -- correctness over the speculative compile-time saving; three.js now
+// compiles up to 289 separate (but small, cheap) programs once at
+// `rebuildField()` time, same as before this cache-key attempt existed.
 function createToonMaterial(map) {
   const material = new THREE.MeshToonMaterial({
     map,
@@ -697,7 +713,6 @@ function createToonMaterial(map) {
     // hand" bug, root-caused by direct pixel-diff measurement, from an
     // earlier `depthTest:false` approach here).
   })
-  material.customProgramCacheKey = () => 'handToonMaterial'
   material.onBeforeCompile = (shader) => {
     shader.uniforms.rimColor = { value: new THREE.Color(cfg.rimColor) }
     shader.uniforms.rimIntensity = { value: cfg.rimIntensity }
@@ -764,9 +779,10 @@ function ensureOutlineMaterial() {
 // Every field hand gets its own `.clone()` of the outline material too
 // (own `clippingPlanes`, see updateWristClipPlaneForHand()'s own
 // corrected comment) -- a plain ShaderMaterial clone shares its compiled
-// WebGL program automatically (same shader source), no
-// `customProgramCacheKey` needed the way the toon material's
-// `onBeforeCompile` does.
+// WebGL program automatically (same shader source, no onBeforeCompile
+// involved), so this one was never at risk of the toon material's own
+// `customProgramCacheKey` regression (see createToonMaterial()'s own
+// corrected comment) -- nothing to change here.
 function buildOutlineMesh(sourceMesh) {
   const mesh = sourceMesh.clone()
   mesh.material = ensureOutlineMaterial().clone()
@@ -1612,6 +1628,19 @@ function rebuildField() {
     if (skinnedMesh && toonMaterial) {
       skinnedMesh.material = toonMaterial.clone()
       skinnedMesh.material.clippingPlanes = [handWristClipPlane]
+      // `Material.clone()`/`.copy()` does NOT carry over a custom
+      // `onBeforeCompile` override -- it isn't part of the property list
+      // three.js's own `copy()` handles, so a clone silently reverts to
+      // the prototype's no-op default. CONFIRMED live (user-reported: Key
+      // Light color "no longer working" -- white showed real texture
+      // colors, red visibly tinted, meaning the rim-light/toon-tint
+      // duotone blend from createToonMaterial()'s own onBeforeCompile had
+      // gone missing): read back a field hand's own actual compiled
+      // fragment shader source post-fix-1 (the customProgramCacheKey
+      // removal, which did NOT fix this) and confirmed it contained none
+      // of the injected code at all. Re-assigning the function reference
+      // explicitly after cloning is the fix.
+      skinnedMesh.material.onBeforeCompile = toonMaterial.onBeforeCompile
     }
     const outlineMesh = skinnedMesh ? buildOutlineMesh(skinnedMesh) : null
     if (outlineMesh) { outlineMesh.material.clippingPlanes = [handWristClipPlane]; clone.add(outlineMesh) }

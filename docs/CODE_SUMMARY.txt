@@ -455,11 +455,11 @@ GOTCHAS
   toon material AND the outline material (see `rebuildField()`), each
   with its own `clippingPlanes: [hand.wristClipPlane]` -- a genuine
   per-hand `THREE.Plane` instance (`hand.wristClipPlane`), not a shared
-  one. `toonMaterial.customProgramCacheKey = () => 'handToonMaterial'`
-  keeps every clone (plus the template) sharing ONE compiled WebGL
-  program, since only the clip-plane uniform VALUES differ, not the plane
-  count or shader structure -- avoiding a 289-way shader recompile. Every
-  existing "change a shared material setting" control (Toon Base Tint,
+  one. (An initial `customProgramCacheKey` addition meant to let all the
+  clones share one compiled program was REMOVED the next day -- see the
+  entry below this one, it broke the toon material's own `onBeforeCompile`
+  customization entirely.) Every existing "change a shared material
+  setting" control (Toon Base Tint,
   Show Wireframe, Outline Color, Hull Outline Thickness, the toon gradient
   rebuild on Toon Steps/Threshold/Shadow Floor/Light Ceiling) now goes
   through 2 small helpers, `forEachToonMaterial()`/
@@ -480,6 +480,47 @@ GOTCHAS
   cursor hand T=0.9, farthest T=0.3, unchanged from before this fix) --
   the bug was in the SHARING of the clip state, not the per-hand T-value
   math itself, which was already correct.
+- **FIXED — the per-hand material cloning above (previous entry) broke
+  Key Light Color, Toon Base Tint, rim lighting, and the toon-tint/
+  texture duotone blend for every field hand, same day.** User-reported:
+  "Keylight color no longer seems to work. When I set it to white, I
+  still see color being rendered on the hands. Though when I set it to
+  red, they do turn red." First hypothesis (the `customProgramCacheKey`
+  hack added in the previous entry, meant to keep all 289 clones sharing
+  one compiled program) turned out to be a RED HERRING -- removing it
+  entirely made no difference, confirmed live by reading back a field
+  hand's own actual compiled fragment shader source
+  (`gl.getShaderSource()` on `renderer.properties.get(material)
+  .currentProgram.fragmentShader`) both before and after: neither
+  contained the `toonLuma`/duotone-blend code `createToonMaterial()`'s
+  own `onBeforeCompile` is supposed to inject, even with a forced
+  PER-MATERIAL-UNIQUE cache key (`material.uuid`) that should have ruled
+  out any cross-material sharing explanation entirely. Real root cause,
+  found by then inspecting the clone's own `onBeforeCompile` property
+  directly: it was three.js's stock `Material.prototype`
+  `onBeforeCompile(){}` no-op, not the custom function at all --
+  **`Material.clone()`/`.copy()` does not carry over a custom
+  `onBeforeCompile` override**, since it isn't part of the fixed property
+  list three.js's own `.copy()` implementation handles; every
+  `toonMaterial.clone()` in `rebuildField()` silently lost the
+  customization the moment it was cloned, reverting every field hand to
+  plain unmodified texture-mapped MeshToonMaterial rendering (rim light
+  and the tint/texture blend gone; direct lighting like Key Light Color
+  still worked normally, since that's a separate, standard three.js
+  mechanism untouched by any of this -- explains why red visibly tinted
+  the hands while white didn't neutralize them: white light doesn't hide
+  an already-colored texture, only the (broken) duotone override could).
+  Fixed by explicitly re-assigning `skinnedMesh.material.onBeforeCompile
+  = toonMaterial.onBeforeCompile` right after `.clone()` in
+  `rebuildField()`. Verified live: sampling the same hand's own rendered
+  pixel while toggling Key Light Color between white and red now gives
+  neutral gray `(132,132,132)` and red-tinted `(132,0,0)` respectively,
+  fully reversible; re-confirmed the wrist-clip-plane fix (previous
+  entry) still holds afterward (274/289 hands visible at the same test
+  cursor position, consistent with the prior 276/289 measurement). No
+  `customProgramCacheKey` in the fixed version -- three.js compiles one
+  program per hand's own material now, same cost as it would have without
+  ever attempting that optimization.
 - **The wrist-to-fingertip bone distance (`handLengthRaw`) badly undersells
   this asset's real rendered size -- `Hand2.glb`'s visible mesh includes a
   full forearm below the wrist, so the actual bounding-sphere radius

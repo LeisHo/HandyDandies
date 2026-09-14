@@ -1405,6 +1405,73 @@ resolution, replaced with this fix in Recently Completed). Cache-buster
 bumped `index.html`'s `src/main.js?v=26` -> `?v=27`.
 
 --------------------------------------------------------------------------------
+2026-09-14  -  ~12:06 AM - 12:35 AM EDT
+
+Direct user report, same day as the wrist-clip-plane fix: "Keylight color
+no longer seems to work. When I set it to white, I still see color being
+rendered on the hands. Though when I set it to red, they do turn red."
+Investigated as a likely regression from that same fix's own
+`customProgramCacheKey` addition, since it was the one change that
+specifically affects how the toon material's `onBeforeCompile`
+customization gets wired up across the newly-cloned per-hand materials.
+
+First fix attempt (remove `customProgramCacheKey` entirely) did NOT
+resolve it -- confirmed live by reading back a field hand's own actual
+compiled fragment shader source (`gl.getShaderSource()` via
+`renderer.properties.get(material).currentProgram.fragmentShader`)
+before and after: neither contained the `toonLuma`/duotone-blend code
+`createToonMaterial()`'s own `onBeforeCompile` is supposed to inject.
+Tried forcing a GENUINELY unique cache key per material
+(`material.uuid`) as a second attempt, specifically to rule out any
+cross-material program-sharing explanation entirely -- still no effect,
+proving the bug was never actually about program caching at all.
+
+Real root cause, found by inspecting the clone's own `onBeforeCompile`
+property directly: it read back as three.js's stock
+`Material.prototype` no-op (`onBeforeCompile(){}`), not the custom
+function assigned in `createToonMaterial()`. **`Material.clone()`/
+`.copy()` does not carry over a custom `onBeforeCompile` override** --
+it isn't part of the fixed property list three.js's own `.copy()`
+implementation handles. Every `toonMaterial.clone()` added in the
+previous round's wrist-clip-plane fix silently lost this customization
+the moment it was cloned, reverting every field hand to plain,
+unmodified texture-mapped `MeshToonMaterial` rendering: rim lighting and
+the toon-tint/texture duotone blend gone entirely, while direct lighting
+(Key Light Color) kept working normally since that's a separate,
+standard three.js mechanism the clone bug never touched -- exactly
+matching the reported symptom (white light doesn't neutralize an
+already-colored texture; only the broken duotone override could have,
+while red light still visibly tints whatever's there regardless).
+
+**Fix implemented:** explicitly re-assign
+`skinnedMesh.material.onBeforeCompile = toonMaterial.onBeforeCompile`
+immediately after `.clone()` in `rebuildField()`. Also removed
+`customProgramCacheKey` for good (confirmed not the cause, and not worth
+reintroducing) -- three.js now compiles one WebGL program per hand's own
+material, same cost it always would have without that speculative
+optimization.
+
+Verified live: sampling the same hand's own rendered pixel while
+toggling Key Light Color between white and red now gives neutral gray
+`(132,132,132)` and red-tinted `(132,0,0)` respectively, fully
+reversible in both directions. Re-confirmed the wrist-clip-plane fix
+from the round above still holds after this change: 274/289 hands
+visible at the same test cursor position used in that round's own
+verification (consistent with its 276/289 measurement, the small
+difference plausibly ordinary render-order/overlap variation between
+runs, not re-investigated separately). Confirmed via a genuinely fresh
+browser tab that no console errors remain (the errors seen during the
+investigation itself were from the 2 live, in-browser experimental
+attempts, not from the final committed code).
+
+Corrected `CODE_SUMMARY.txt` (new GOTCHAS entry immediately following
+the wrist-clip-plane one, plus a correction to that entry's own now-
+inaccurate `customProgramCacheKey` claim). Cache-buster bumped twice
+during the investigation (`?v=27` -> `?v=28` for the first, ultimately
+insufficient attempt; `?v=28` -> `?v=29` for the real fix) -- `?v=29` is
+the version actually deployed.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

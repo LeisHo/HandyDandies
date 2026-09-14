@@ -145,13 +145,30 @@ still relevant to understanding current state, per this doc's own
   reappeared. Happened regardless of Crop Wrist/Reactive state, since the
   clip-plane update runs unconditionally for every hand. Fixed by giving
   every hand its own cloned material + own `THREE.Plane` instance (see
-  `CODE_SUMMARY.txt`'s GOTCHAS for the full technical account, including
-  the `customProgramCacheKey` fix to avoid a 289-way shader recompile).
-  Verified live: 276/289 hands now render correctly at the exact cursor
-  position that previously showed only 2/289; the Arm Length feature's
-  own T-value math re-confirmed unchanged and correct (nearest T=0.9,
+  `CODE_SUMMARY.txt`'s GOTCHAS for the full technical account). Verified
+  live: 276/289 hands now render correctly at the exact cursor position
+  that previously showed only 2/289; the Arm Length feature's own
+  T-value math re-confirmed unchanged and correct (nearest T=0.9,
   farthest T=0.3) -- the bug was purely in the shared clip-plane
   mechanism, not the crop math itself.
+- **Fixed a same-day follow-on regression from the fix above: Key Light
+  Color (and rim lighting, toon-tint/texture blend) stopped working on
+  the per-hand material clones.** User-reported: white key light still
+  showed real texture colors, red visibly tinted -- `Material.clone()`
+  turns out to NOT carry over a custom `onBeforeCompile` override (not
+  part of three.js's own `.copy()` property list), so every cloned
+  material silently reverted to the stock no-op, losing the toon
+  material's rim-light/duotone customization entirely while normal
+  lighting (unaffected by this) kept working. 2 wrong hypotheses ruled
+  out live via direct compiled-shader inspection before finding this
+  (a speculative `customProgramCacheKey` optimization added in the fix
+  above, and program-cache sharing generally) -- see CODE_SUMMARY.txt's
+  GOTCHAS for the full account. Fixed by explicitly re-assigning
+  `onBeforeCompile` after `.clone()`; `customProgramCacheKey` removed for
+  good (confirmed not the cause). Verified live: Key Light Color white/
+  red now gives neutral gray / red-tinted output respectively, reversible;
+  the wrist-clip-plane fix re-confirmed still intact (274/289 visible at
+  the same test position).
 
 ## What's next
 
