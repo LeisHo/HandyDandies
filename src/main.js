@@ -2302,22 +2302,50 @@ function getOrInitHandCHP(hand) {
   }
   return hand._chp
 }
-// Linearly interpolates every POSE_PRESET_KEYS value between 2 pose-
-// shaped objects (a saved pose, POSE_KEY_DEFAULTS, or a live cfg
-// snapshot -- all 3 share the same key shape) EXCEPT modelRotX/Y/Z (see
-// this section's own top comment on why). Falls back to
-// POSE_KEY_DEFAULTS for any key missing from either side (matches
-// previewPosePreset()'s own established "a saved pose may predate a
-// newer key" tolerance).
+// Linearly interpolates every POSE_PRESET_KEYS value, INCLUDING
+// modelRotX/Y/Z, between 2 pose-shaped objects (a saved pose,
+// POSE_KEY_DEFAULTS, or a live cfg snapshot -- all 3 share the same key
+// shape). Falls back to POSE_KEY_DEFAULTS for any key missing from
+// either side (matches previewPosePreset()'s own established "a saved
+// pose may predate a newer key" tolerance).
+//
+// CORRECTED 2026-09-14 (direct user report: "thumb pose of all poses
+// except startup still looks wrong," root-caused to poses imported from
+// HANDO relying on nonzero Whole-Hand Rotation as part of the gesture --
+// see applyPoseValuesToHand()'s own comment for the full account):
+// modelRotX/Y/Z used to be EXCLUDED here on the reasoning that they
+// drive a single SHARED cloneBaseQuat, making them "genuinely per-hand-
+// interpolatable" a materially larger change than this feature's own
+// original scope. That tradeoff is now resolved differently -- see
+// hand.currentBaseQuat (rebuildField()) and applyHandArmLength()'s own
+// updated comment for how a per-hand basis was added without disturbing
+// Whole-Hand Rotation's existing single-shared-value behavior for every
+// hand that ISN'T mid a pose transition.
 function lerpPoseValues(a, b, t) {
   const result = {}
   POSE_PRESET_KEYS.forEach((key) => {
-    if (key === 'modelRotX' || key === 'modelRotY' || key === 'modelRotZ') return
     const av = a[key] !== undefined ? a[key] : POSE_KEY_DEFAULTS[key]
     const bv = b[key] !== undefined ? b[key] : POSE_KEY_DEFAULTS[key]
     result[key] = av + (bv - av) * t
   })
   return result
+}
+const _poseBaseQuatEuler = new THREE.Euler()
+const _poseBaseQuat = new THREE.Quaternion()
+// Same formula as updateCloneBaseQuat() (alignQuat * Euler(modelRotX/Y/Z
+// in degrees, converted to radians)), just reading a passed-in `values`
+// object instead of live `cfg` -- lets a per-hand, mid-transition
+// interpolated modelRot produce a per-hand basis without touching
+// updateCloneBaseQuat() itself (which still drives the single SHARED
+// cloneBaseQuat used by every hand that's currently idle, unchanged).
+function computeBaseQuatFromValues(values) {
+  _poseBaseQuatEuler.set(
+    THREE.MathUtils.degToRad(values.modelRotX),
+    THREE.MathUtils.degToRad(values.modelRotY),
+    THREE.MathUtils.degToRad(values.modelRotZ)
+  )
+  _poseBaseQuat.setFromEuler(_poseBaseQuatEuler)
+  return _poseBaseQuat.premultiply(alignQuat)
 }
 // Applies an interpolated pose to ONE hand's own skeleton -- reuses
 // applyCurlToSkeleton()/applyWristPoseToSkeleton()'s own existing
@@ -2327,11 +2355,29 @@ function lerpPoseValues(a, b, t) {
 // contribution, still composed on top during an active Click-Hold-Pose
 // override -- the 2 systems stack, consistent with every other
 // "independent, stackable" effect in this project.
+//
+// CORRECTED 2026-09-14: now also updates `hand.currentBaseQuat` from
+// THIS call's own `poseValues.modelRotX/Y/Z` (which lerpPoseValues()
+// now genuinely interpolates, see its own updated comment) and passes
+// THAT per-hand quaternion to applyCurlToSkeleton() as `baseQuat`,
+// instead of the single shared `cloneBaseQuat` every hand used to read
+// regardless of its own pose-transition state. Root cause of the
+// reported bug: a saved pose imported from HANDO can carry nonzero
+// Whole-Hand Rotation as an integral part of its own gesture design: the
+// fingers/wrist WERE already transitioning correctly, but the finger
+// CURL AXES were being pre-rotated by the OLD, unchanged shared
+// cloneBaseQuat throughout -- anatomically wrong the instant a pose
+// implies a different whole-hand orientation than whatever the field's
+// shared Whole-Hand Rotation sliders currently say. This is also why
+// only "startup" (no transition in progress, cloneBaseQuat and
+// currentBaseQuat trivially equal) looked correct while every actual
+// transition didn't.
 function applyPoseValuesToHand(hand, poseValues, extraSplayDeg) {
   if (!hand.skinnedMesh) return
+  hand.currentBaseQuat.copy(computeBaseQuatFromValues(poseValues))
   // Wrist BEFORE fingers -- see applyAllFingerPoses()'s own comment.
   applyWristPoseToSkeleton(hand.skinnedMesh.skeleton, poseValues, extraSplayDeg)
-  FINGER_NAMES.forEach((name) => applyCurlToSkeleton(name, hand.skinnedMesh.skeleton, cloneBaseQuat, hand.wrapper.quaternion, poseValues))
+  FINGER_NAMES.forEach((name) => applyCurlToSkeleton(name, hand.skinnedMesh.skeleton, hand.currentBaseQuat, hand.wrapper.quaternion, poseValues))
 }
 function computeStartDelayMs(distanceToCursor, minLiveDist, liveDistRange, curveParsed, rangeParsed) {
   const normDist = THREE.MathUtils.clamp((distanceToCursor - minLiveDist) / liveDistRange, 0, 1)
@@ -2849,11 +2895,24 @@ safeRefreshSelectOptions('dblclickTargetPose')
 // -- is solved to land exactly at this hand's own wrapper origin (its
 // Field Layout grid point) for the CURRENT cloneBaseQuat, for ANY hideT.
 const _cutPointRaw = new THREE.Vector3()
+// Reads THIS hand's own `currentBaseQuat`, not the shared `cloneBaseQuat`
+// directly -- for a hand that's never mid pose-transition, the 2 are kept
+// identical every frame (see updateRenderOrder()'s own per-hand loop), so
+// this is a no-op change for every use of Whole-Hand Rotation that
+// predates Click-Hold-Pose/Click-Pose's own per-hand rotation transition.
+// Reads 1 frame behind for a hand THAT IS mid-transition (this function
+// runs before this frame's own pose-override step updates currentBaseQuat
+// for the frame) -- a deliberate, disclosed simplification: at 60fps this
+// is a ~16ms lag on the ARM-LENGTH POSITION ONLY (never the fingers,
+// which read the fresh value the same frame), well below anything
+// visually perceptible, and avoids restructuring the per-hand loop's own
+// established bone-posing order.
 function applyHandArmLength(hand, hideT) {
   const scaleFactor = computeBaseScale()
+  const baseQuat = hand.currentBaseQuat
   _cutPointRaw.copy(forearmPosRaw).lerp(wristPosRaw, hideT)
-  hand.clone.quaternion.copy(cloneBaseQuat)
-  hand.clone.position.copy(_cutPointRaw).applyQuaternion(cloneBaseQuat).multiplyScalar(-scaleFactor)
+  hand.clone.quaternion.copy(baseQuat)
+  hand.clone.position.copy(_cutPointRaw).applyQuaternion(baseQuat).multiplyScalar(-scaleFactor)
 }
 
 // "Hide Wrist"/Arm Length clipping plane -- ported from HANDO's own
@@ -3012,7 +3071,15 @@ function rebuildField() {
     const wrapper = new THREE.Group()
     wrapper.add(clone)
     scene.add(wrapper)
-    const hand = { wrapper, clone, skinnedMesh, outlineMesh, wristClipPlane: handWristClipPlane, effectiveRenderOrder: 0, screenX: 0, screenY: 0, screenRadius: 0 }
+    // `currentBaseQuat`: this hand's OWN, per-hand current Whole-Hand-
+    // Rotation basis -- see the "per-hand Whole-Hand Rotation during
+    // pose transitions" section (near applyPoseValuesToHand()) for why
+    // this exists as a per-hand field at all, instead of every hand
+    // simply reading the single shared `cloneBaseQuat` the way this
+    // project did before that feature. Initialized to the current shared
+    // value; kept in sync with it every frame for any hand NOT actively
+    // mid pose-transition (see updateRenderOrder()'s own per-hand loop).
+    const hand = { wrapper, clone, skinnedMesh, outlineMesh, wristClipPlane: handWristClipPlane, effectiveRenderOrder: 0, screenX: 0, screenY: 0, screenRadius: 0, currentBaseQuat: cloneBaseQuat.clone() }
     // Also recomputes this hand's OWN Hide Wrist clip plane right before
     // it draws (see updateWristClipPlaneForHand()'s own comment) -- every
     // hand faces a different direction and (own material/plane now, see
@@ -3389,6 +3456,14 @@ function updateRenderOrder() {
         }
       })
       if (!overridden) {
+        // Not mid any pose-transition this frame -- keep this hand's own
+        // per-hand basis mirroring the single shared cloneBaseQuat every
+        // idle hand has always used, so Whole-Hand Rotation's existing
+        // (non-transition) behavior is completely unaffected by
+        // currentBaseQuat's own existence. A hand that just finished a
+        // transition syncs back to the shared value the very next frame,
+        // same as it would have before this per-hand basis existed.
+        hand.currentBaseQuat.copy(cloneBaseQuat)
         const extraSplay = computeResponsiveWristSplayDeg(live, minLiveDist, liveDistRange)
         applyWristPoseToSkeleton(hand.skinnedMesh.skeleton, cfg, extraSplay)
       }
