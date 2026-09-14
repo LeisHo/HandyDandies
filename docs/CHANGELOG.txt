@@ -1472,6 +1472,57 @@ insufficient attempt; `?v=28` -> `?v=29` for the real fix) -- `?v=29` is
 the version actually deployed.
 
 --------------------------------------------------------------------------------
+2026-09-14 (continued)  -  ~1:21 AM - 1:40 AM EDT
+
+Direct user report: "when i open the app on desktop, the dev panel seems
+to default to Landscape tab. It shouldnt." Root-caused in
+`src/devpanel/devPanel.js` (the generic dev-panel engine, "reused
+verbatim from HANDO" per this project's own CLAUDE.md file map -- see
+Open questions below for the cross-project implication).
+
+`realDeviceClass()` (the function that classifies the current viewport
+as desktop/mobile/landscape) is called exactly once, synchronously, at
+the very top of `initDevPanel()`, to set the panel's initially-active
+tab (`editingDevice`). This project already has a DOCUMENTED gotcha that
+`window.innerWidth`/`innerHeight` can read wrong at that exact early
+script-parse moment (main.js's own renderer has a frame-by-frame self-
+heal specifically because of this) -- but the dev panel's own tab-
+selection had no equivalent correction: if the viewport misread once at
+that moment, the wrong tab stayed "active" for the rest of the session,
+since the existing `resize` event listener only re-syncs per-device
+VALUES for a genuine later resize, never which tab is shown as active,
+and doesn't fire at all if the viewport was simply wrong once at load
+with no resize event following it.
+
+Reproduced the exact mechanism live: this environment's own browser-
+automation tool has its own separate, previously-documented quirk where
+`window.innerWidth`/`innerHeight` read as 0 via its JS-exec query path
+immediately after a fresh navigation (a tool characteristic, not a page
+bug) -- used this to confirm a fresh load's `dp-tab-active` class was
+briefly absent from every tab (consistent with `realDeviceClass()`
+having computed something unexpected from `w=0,h=0` at the moment
+`initDevPanel()` ran), before the page's own real dimensions became
+available a few seconds later.
+
+**Fix implemented:** added a short self-heal window (up to 30
+`requestAnimationFrame` ticks, ~0.5s) right after the panel is built --
+re-checks `realDeviceClass()` each frame and corrects `editingDevice`
+(plus the visible active-tab styling) once if it differs, but stops
+immediately the moment the user manually clicks a tab themselves (a new
+`userSwitchedTab` flag), and stops after the frame budget regardless --
+this is specifically a load-time correction, not a standing "tab always
+follows window resize" behavior (which would break a legitimate
+workflow: manually viewing Mobile settings, then resizing the desktop
+browser window while doing so, should NOT snap back to Desktop).
+
+Verified live: a fresh load on a genuine 1024x768 viewport correctly
+shows the Desktop tab active; manually clicking Landscape afterward
+switches and STAYS switched (checked again 600ms later, well past the
+self-heal window) -- the fix doesn't fight a real user selection.
+Bumped `devpanel.js`'s own cache-busting import query in `main.js`
+(`?v=4` -> `?v=5`) and `index.html`'s (`?v=29` -> `?v=30`).
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

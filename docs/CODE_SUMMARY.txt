@@ -888,3 +888,35 @@ GOTCHAS
   the real sequence, not just the final committed value. Works for every
   existing control (including this round's own new ones) and any FUTURE
   control added later, without either needing its own onChange touched.
+- **FIXED — dev panel opened on the wrong tab (Landscape) on an actual
+  desktop-sized window.** User-reported directly. Root cause in
+  `src/devpanel/devPanel.js` itself (this file is "reused verbatim from
+  HANDO" per this project's own file map -- see PROJECT_PROGRESS.md's
+  "What's next" for the cross-project implication, since HANDO's own
+  copy of this file likely has the identical bug): `realDeviceClass()`
+  (desktop/mobile/landscape classification from `window.innerWidth`/
+  `innerHeight`) is read exactly once, synchronously, at the very top of
+  `initDevPanel()`, to set the panel's initially-active tab
+  (`editingDevice`). This project already has a documented gotcha that
+  those 2 values can read wrong at that exact early moment (main.js's
+  own renderer has a frame-by-frame self-heal specifically because of
+  it) -- but the panel's own tab selection had no equivalent correction:
+  the existing `resize` listener only re-syncs per-device VALUES for a
+  genuine later resize, never which tab is shown active, and never fires
+  at all if the viewport was simply wrong once at load with no resize
+  event following it. Reproduced the mechanism live using this
+  environment's own separate, already-documented `window.innerWidth`-
+  reads-0-via-the-JS-exec-path tool quirk (not a page bug) as a stand-in
+  for a real-world bad initial read. Fixed with a short self-heal window
+  (up to 30 `requestAnimationFrame` ticks, ~0.5s, right after the panel
+  is built): re-checks `realDeviceClass()` each frame and corrects
+  `editingDevice` once if it differs, but stops immediately the moment
+  the user manually clicks a tab (a new `userSwitchedTab` flag) and stops
+  after the frame budget regardless -- a load-time correction only, not
+  a standing "tab always follows resize" behavior (which would wrongly
+  snap back to Desktop mid-session while someone's deliberately viewing
+  Mobile settings and happens to also resize their browser). Verified
+  live: a fresh load on a genuine 1024x768 viewport correctly shows
+  Desktop active; manually switching to Landscape afterward sticks
+  (re-checked 600ms later, past the heal window). `devpanel.js`'s own
+  cache-busting import bumped `?v=4` -> `?v=5`.

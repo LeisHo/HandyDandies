@@ -169,6 +169,18 @@ still relevant to understanding current state, per this doc's own
   red now gives neutral gray / red-tinted output respectively, reversible;
   the wrist-clip-plane fix re-confirmed still intact (274/289 visible at
   the same test position).
+- **Fixed the dev panel opening on the wrong tab (Landscape) on an
+  actual desktop-sized window.** User-reported directly. Root cause in
+  `devpanel.js` itself: the initially-active tab was set once,
+  synchronously, from a `window.innerWidth`/`innerHeight` read that (per
+  this project's own already-documented gotcha) can be wrong at that
+  exact early moment, with nothing to correct it afterward. Fixed with a
+  short self-heal window (up to 30 frames after the panel builds) that
+  corrects the active tab once if the real device class differs, but
+  stops the instant the user manually picks a tab and stops after the
+  frame budget regardless -- see CODE_SUMMARY.txt's GOTCHAS for the full
+  account. Verified live: correct tab on a genuine fresh load; a manual
+  tab switch afterward sticks (checked well past the heal window).
 
 ## What's next
 
@@ -212,6 +224,12 @@ Other open items worth the user's own confirmation:
   documented tool quirk suspends `requestAnimationFrame` entirely when the
   Browser pane isn't displayed) — worth a real on-device Reset-button
   check.
+- **The wrong-tab-on-load bug just fixed here (see Recently completed)
+  lives in `devpanel.js`, which this project's own file map describes as
+  "reused verbatim from HANDO."** The same bug almost certainly exists in
+  HANDO's own copy of this file (and any other project sharing it) —
+  hasn't been checked or ported back there; flag to the user or the
+  relevant HANDO-side session if a fix there is wanted too.
 
 ## Open questions / blockers
 

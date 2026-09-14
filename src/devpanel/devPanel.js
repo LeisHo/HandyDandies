@@ -1442,13 +1442,46 @@ export function initDevPanel(groups, opts = {}) {
   function updateTabButtonStyles() {
     DEVICES.forEach((d) => tabButtons[d].classList.toggle('dp-tab-active', editingDevice === d))
   }
+  let userSwitchedTab = false
   function switchTab(device) {
     editingDevice = device
+    userSwitchedTab = true
     updateTabButtonStyles()
     refreshRowDisplaysForEditingTab()
   }
   DEVICES.forEach((d) => tabButtons[d].addEventListener('click', () => switchTab(d)))
   updateTabButtonStyles()
+  // Self-heal the INITIAL active tab, same rationale/shape as this
+  // project's own documented `window.innerWidth`/`innerHeight`-can-read-
+  // wrong-at-script-parse-time gotcha (see main.js's own animate()
+  // renderer-size self-heal): `editingDevice` above was set once,
+  // synchronously, from `realDeviceClass()` at the very top of this
+  // function -- if the viewport read wrong at that exact early moment (a
+  // real user-reported case: the panel opened on the Landscape tab on an
+  // actual desktop-sized window), nothing ever corrected it afterward --
+  // the `resize` listener above only re-syncs per-device VALUES for a
+  // genuine later resize, never which tab is shown as active, and
+  // doesn't fire at all if the viewport was simply wrong once at load
+  // with no resize following it. Re-checks for a short window of frames
+  // after load and corrects once if the real device class differs --
+  // stops immediately the moment the user manually picks a tab
+  // themselves (never fights an intentional selection), and stops after
+  // ~0.5s regardless so a later real resize's own tab-follow story isn't
+  // silently changed by this -- this is specifically a load-time
+  // correction, not a standing "tab always follows resize" behavior.
+  let healFramesLeft = 30
+  function healActiveTabOnce() {
+    if (userSwitchedTab || healFramesLeft <= 0) return
+    healFramesLeft--
+    const real = realDeviceClass()
+    if (real !== editingDevice) {
+      editingDevice = real
+      updateTabButtonStyles()
+      refreshRowDisplaysForEditingTab()
+    }
+    requestAnimationFrame(healActiveTabOnce)
+  }
+  requestAnimationFrame(healActiveTabOnce)
 
   const actions = el('div', 'dp-actions')
   const copyBtn = el('button', null, { type: 'button', textContent: 'Copy' })
