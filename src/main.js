@@ -43,12 +43,23 @@ let palmNormalAligned = null
 // the correction quaternion, which the outer per-frame lookAt then
 // carries toward the cursor, same composition order as before.
 let wristCropNormalAligned = null
-function computePalmFaceCorrectionQuat() {
-  if (!palmNormalAligned) return null
+// Just the roll itself (rotation around the wrist-crop-plane normal by
+// the live slider angle) -- factored out so it can be applied on its
+// own, independent of Palm Faces Cursor. Direct follow-up ("make the
+// palm face rotation slider work even if palm faces cursor is turned
+// off... it will just rotate every hand"): previously this angle only
+// ever reached the hand composed INSIDE computePalmFaceCorrectionQuat()
+// below (which needs `palmNormalAligned` to exist and only ever gets
+// used while that checkbox is on), so the slider had no effect at all
+// with the checkbox off.
+function computeRollQuat() {
   const axis = wristCropNormalAligned || new THREE.Vector3(0, 0, -1)
   const offsetRad = THREE.MathUtils.degToRad(cfg.palmFaceRotationOffset || 0)
-  const rollQuat = new THREE.Quaternion().setFromAxisAngle(axis, offsetRad)
-  const rotatedNormal = palmNormalAligned.clone().applyQuaternion(rollQuat)
+  return new THREE.Quaternion().setFromAxisAngle(axis, offsetRad)
+}
+function computePalmFaceCorrectionQuat() {
+  if (!palmNormalAligned) return null
+  const rotatedNormal = palmNormalAligned.clone().applyQuaternion(computeRollQuat())
   return new THREE.Quaternion().setFromUnitVectors(rotatedNormal, new THREE.Vector3(0, 0, -1))
 }
 let handLengthRaw = 1
@@ -186,16 +197,19 @@ const DEV_GROUPS = [
       // after the palm-normal sign calibration above turned out to need a
       // manual 180-degree correction once real usage caught it -- rather
       // than trusting a future calibration to be right by construction,
-      // exposes the palm-facing correction's own rotation as a live,
-      // user-adjustable angle instead of a fixed baked-in constant (per
-      // CLAUDE.md 12n: "feel/response curves are sliders, not constants").
-      // Rotates the calibrated palm-normal direction around the hand's own
-      // pointing axis before aiming it at the cursor (see
-      // computePalmFaceCorrectionQuat()'s own comment for why that axis) --
-      // 0 = the corrected palm-facing default, +-180 sweeps continuously
-      // through edge-on to the exact opposite (back-of-hand) orientation,
-      // so a future bad calibration (on this rig or a new one) can be
-      // fixed live from the panel instead of needing a code change.
+      // exposes the correction's own rotation as a live, user-adjustable
+      // angle instead of a fixed baked-in constant (per CLAUDE.md 12n:
+      // "feel/response curves are sliders, not constants"). Rotates around
+      // the wrist crop plane's own normal (see computeRollQuat()'s own
+      // comment for why that axis). CORRECTED 2026-09-14, same day,
+      // direct follow-up ("make the palm face rotation slider work even
+      // if palm faces cursor is turned off... it will just rotate every
+      // hand"): no longer gated behind Palm Faces Cursor -- with that
+      // checkbox OFF this rolls every hand's default fingertip-tracking
+      // orientation directly; with it ON, this same angle is folded into
+      // WHERE the palm-facing correction aims instead (see
+      // computePalmFaceCorrectionQuat()), so 0 still means "the corrected
+      // palm-facing default" specifically in that mode.
       { key: 'palmFaceRotationOffset', label: 'Palm Face Rotation (Deg)', type: 'slider', min: -180, max: 180, step: 1, def: 0 }
     ]
   },
@@ -256,6 +270,14 @@ const DEV_GROUPS = [
         captureCurrent: () => capturePosePreset(),
         onUse: (item) => previewPosePreset(item)
       },
+      // Direct follow-up ("add a buttton in the pose selector, 'Default',
+      // that just sets the pose to all the hands"): unlike a Saved Poses
+      // entry's own "Use" (preview-only, see that control's comment),
+      // this resets every POSE_PRESET_KEYS slider straight to its own
+      // code default and re-applies immediately -- since Pose is shared
+      // across every hand (see this group's own top comment), that alone
+      // resets the whole field, no per-hand loop needed here.
+      { key: 'resetPoseToDefaultBtn', label: 'Default', type: 'button', onClick: () => resetPoseToDefault() },
       // Master on/off for the whole Arm Length / Hide Wrist system --
       // direct request ("Crop Wrist Checkbox. To turn the cropping on and
       // off"). Off means full arm, always, on every hand -- no clip plane,
@@ -1179,6 +1201,19 @@ const POSE_KEY_DEFAULTS = {}
 DEV_GROUPS.find((g) => g.title === 'Pose').controls.forEach((c) => {
   if (POSE_PRESET_KEYS.includes(c.key)) POSE_KEY_DEFAULTS[c.key] = c.def
 })
+// "Default" button (Pose group, next to Saved Poses) -- syncs every pose
+// slider's cfg/store/display back to POSE_KEY_DEFAULTS (syncValue() does
+// NOT call onChange, by design -- see its own devpanel.js comment, it's
+// meant for "panel follows an already-changed reality," the opposite
+// direction from what's needed here), then onWholeHandRotationChange()
+// re-derives cloneBaseQuat from the now-reset rotation sliders AND
+// re-applies every finger + the wrist (it already calls
+// applyAllFingerPoses() internally) -- one call covers the whole pose,
+// same as a real Whole-Hand Rotation edit already does today.
+function resetPoseToDefault() {
+  POSE_PRESET_KEYS.forEach((key) => { syncValue(key, POSE_KEY_DEFAULTS[key]) })
+  onWholeHandRotationChange()
+}
 
 // -----------------------------------------------------------------------
 // Pose Preview -- a small, independent Three.js viewport embedded in the
@@ -2018,15 +2053,23 @@ function animate() {
     // Computed once per frame (identical for every hand, like alignQuat
     // itself), not once per hand -- recomputed live from the current
     // Palm Face Rotation slider rather than a value fixed at model load.
-    const palmCorrection = cfg.palmFacesCursor ? computePalmFaceCorrectionQuat() : null
+    // With Palm Faces Cursor ON, computePalmFaceCorrectionQuat() already
+    // incorporates the same roll internally (it rotates palmNormalAligned
+    // by it before deriving the correction) -- using computeRollQuat()
+    // directly here too, on top of THAT, would double-apply it. With it
+    // OFF, there's no palm-normal correction to fold the roll into, so
+    // apply the roll on its own -- direct follow-up ("make the palm face
+    // rotation slider work even if palm faces cursor is turned off... it
+    // will just rotate every hand"): every hand still gets the same
+    // uniform roll composed onto its own per-frame lookAt, identical
+    // mechanism to the Palm Faces Cursor path, just without the
+    // palm-normal-to-cursor part.
+    const palmCorrection = cfg.palmFacesCursor ? computePalmFaceCorrectionQuat() : computeRollQuat()
     hands.forEach((hand) => {
       const m = new THREE.Matrix4().lookAt(hand.wrapper.position, cursorTarget, UP)
       const desired = new THREE.Quaternion().setFromRotationMatrix(m)
-      // "Palm Faces Cursor": composes the live correction above onto the
-      // same lookAt quaternion, so the palm -- not the fingertip
-      // direction -- ends up the axis aimed at the cursor. Whole-wrapper
-      // rotation only, same mechanism as the default mode; no
-      // skeleton/pose involvement either way.
+      // Whole-wrapper rotation only, same mechanism as the default mode;
+      // no skeleton/pose involvement either way.
       if (palmCorrection) desired.multiply(palmCorrection)
       hand.wrapper.quaternion.slerp(desired, cfg.trackingDamping)
     })
