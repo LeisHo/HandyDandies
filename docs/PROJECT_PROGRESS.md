@@ -18,7 +18,15 @@ work seamlessly from there.
 
 ## Currently working on
 
-Nothing in progress — see What's next.
+Starting a large new feature, direct request: click-and-hold (and,
+separately, right-click-and-hold) transitions every hand to a chosen
+saved pose, released back to default on mouse-up, with independently
+configurable transition/retransition speed and per-hand start-time
+staggering driven by distance from cursor (curve + min/max range, same
+family of widgets as Arm Length/Responsive Wrist Splay). Two full
+instances of this control set requested (one per mouse button). Not yet
+scoped against the existing pose-application/list-picker code — see
+CHANGELOG.txt for the exact request once implemented.
 
 ## Recently completed
 
@@ -300,6 +308,17 @@ still relevant to understanding current state, per this doc's own
   Verified live (fresh tab, cleared storage): correct yellow/shared split,
   correct PANEL UI membership, correct per-tab values across all 3 tabs,
   510/510 hands still rendering, zero new console errors.
+- **"Enable Label Rename Mode" moved to standalone panel chrome** (above
+  "+ Add Group", outside every group) + **right-click delete on Arm
+  Length curve dots** + **new "Responsive Wrist Splay" group**, mirroring
+  the Wrist Crop/Arm Length group's exact structure (master on/off,
+  Default/Reactive/Min-Max-range/Scaling-curve) but adding a per-hand
+  extra wrist-splay rotation instead of a crop/position transform.
+  Default range (min:0, max:-90) intentionally not numerically ordered —
+  min/max name curve endpoints (farthest/nearest hand), not an ordering
+  constraint. Verified end-to-end by calling `updateRenderOrder()`
+  directly (bypasses the Browser pane's rAF-while-hidden limitation):
+  nearest hand measures exactly -90.0 degrees, farthest exactly 0.
 
 ## What's next
 

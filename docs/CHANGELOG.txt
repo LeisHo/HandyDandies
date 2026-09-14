@@ -2317,6 +2317,84 @@ Cache-buster bump: none needed this round -- the already-committed
 `index.html`/`main.js` commit) already covers this fix's own file.
 
 --------------------------------------------------------------------------------
+2026-09-14  -  ~05:57 AM - 06:09 AM EDT (bounded by checkpoints; see Verified notes)
+
+3 direct requests bundled into one round:
+
+**1. Moved "Enable Label Rename Mode" to standalone panel chrome.**
+Relocated from inside the built-in "Dev Panel" group to sit directly in
+the panel body, above "+ Add Group" -- stays a fully registered control
+(cfg/store/Copy/Save/Reset unaffected, zero new persistence code), just
+physically moved via `body.insertBefore(row, addGroupRow)` right after
+`buildDevPanel()`/`organizeDevPanelSubgroups()` build/organize it inside
+Dev Panel first (where it's deliberately left as that group's one flat,
+non-subgrouped row). Matches the shared template's own placement for
+this exact checkbox. Verified live: confirmed its row is a direct
+`.dp-body` child positioned between Copy/Save/Reset and Add Group, no
+longer inside the Dev Panel group; toggling it still correctly flips
+`cfg.dp_textEditMode`.
+
+**2. Right-click to delete Arm Length curve dots.** Added a `contextmenu`
+listener alongside the existing double-click delete (same "keep the 2
+endpoints, only interior points removable" rule), `preventDefault()`ed
+to suppress the browser's own native right-click menu over a dot.
+
+**3. New "Responsive Wrist Splay" group** -- direct request: "Wrist will
+Splay in response to distance from cursor. Provide similar settings as
+the Wrist Crop/ arm Length group. call the new group 'Responsive Wrist
+Splay'. By default, set minimum to 0 and maximum to -90. The closest
+hands will be at -90 and furthest will be at 0." Mirrors Arm Length's
+exact structure (master on/off, a Default value for when Reactive is
+off, a Reactive-by-cursor-distance toggle, a Min/Max range widget, a
+Distance->Value scaling curve widget) as its own separate top-level
+group, per the request's own naming (not nested inside Pose the way Arm
+Length is). Adds a per-hand EXTRA wrist-splay rotation on top of the
+Pose group's own shared `wristSplay` slider (`applyWristPoseToSkeleton()`
+gained an `extraSplayDeg` param, default 0 so every existing call site
+is unaffected) -- reuses the exact same per-frame live cursor-distance
+values (`live`/`minLiveDist`/`liveDistRange`) Arm Length already
+computes in `updateRenderOrder()`, not a second distance pass, and
+reuses `evaluateArmLengthCurve()` directly (already fully generic
+despite the name -- distance in, curve value out, nothing Arm-Length-
+specific about it).
+
+The default range (min:0, max:-90) is deliberately NOT numerically
+ordered -- "min"/"max" name which END of the distance curve each value
+applies to (farthest/nearest, matching Arm Length's own min/max roles),
+not a numeric min<=max constraint -- the underlying lerp works correctly
+regardless of which endpoint is numerically larger. The new range
+widget's own 2 handles do NOT cross-clamp each other the way Arm
+Length's own range widget does (which assumes a numerically-ordered
+0-100% scale) -- each handle moves independently across a -180 to 180
+degree track, with a vertical tick marking 0 degrees since the track
+(unlike Arm Length's all-positive one) spans negative and positive
+values.
+
+Verified live via a proper end-to-end check: initially measured the
+nearest/farthest hands' `rHand` bone rotation via a raw Euler read and
+got a constant -22.6-degree offset on BOTH ends (-112.6 near, -22.6 far,
+instead of the expected -90/0) -- root-caused immediately (not assumed
+correct) to the measurement technique itself: the rig's own bind pose
+has a non-identity Z-component on this bone, so a raw Euler reading
+conflates the rest pose with the applied rotation. Redid the
+measurement correctly as a baseline-delta quaternion comparison
+(capture the bone's quaternion with the feature OFF as the true
+zero-reference, then compare against the feature-ON quaternion) and got
+the exact expected result: nearest hand -90.0 degrees, farthest hand
+exactly 0. Called `updateRenderOrder()` directly (exposed on
+`window.__debug`) rather than relying on `requestAnimationFrame`, which
+the Browser pane's own hidden-pane suspension (documented several
+rounds ago) makes unreliable for this kind of live check. Zero new
+console errors (one stale `net::ERR_CONNECTION_RESET` from an earlier
+failed navigation attempt, confirmed stale via unchanged 510/510 hand
+count on the successful reload).
+
+Cache-buster bumps: `devpanel.js?v=11` -> `?v=12` (via main.js's own
+import line), `index.html`'s own `main.js?v=43` -> `?v=45` (2 bumps
+folded into 1 final commit -- `?v=44` was an intermediate step verified
+mid-round, not separately pushed).
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

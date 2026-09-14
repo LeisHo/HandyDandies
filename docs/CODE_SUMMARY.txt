@@ -1436,3 +1436,34 @@ GOTCHAS
   already-committed content was untouched baseline, not part of the
   diff) -- staged and committed `index.html`/`main.js` only, left
   `devpanel.js` completely alone.
+- **A raw Euler read of a bone's `quaternion` does NOT isolate an
+  applied rotation from this rig's own bind pose -- measure a
+  baseline-delta instead.** Confirmed live while verifying Responsive
+  Wrist Splay: `new THREE.Euler().setFromQuaternion(bone.quaternion)`
+  read a constant -22.6-degree offset on EVERY hand regardless of the
+  actual applied `extraSplayDeg`, because `rHand`'s own `boneRestQuat`
+  (what `applyWristPoseToSkeleton()` starts from before `rotateX`/
+  `rotateZ`) already has a non-identity Z-component in this asset's bind
+  pose -- a raw Euler read conflates that rest orientation with whatever
+  was actually applied on top of it. Fix: capture the bone's quaternion
+  with the feature under test turned OFF as the true zero-reference,
+  then compute `delta = baseline.clone().invert().multiply(final)` and
+  read the signed angle via `2 * atan2(delta.z, delta.w)` (valid for a
+  known-single-axis rotation) -- this isolates exactly what was applied,
+  independent of whatever the rest pose itself already contains. Applies
+  to any future live-verification of a rotation applied to a bone that
+  isn't already known to be sitting at bind-pose identity.
+- **`window.__debug.updateRenderOrder` (and other exposed functions) can
+  be called directly from a test script to bypass the Browser pane's
+  own `requestAnimationFrame`-suspends-while-hidden limitation
+  entirely**, rather than working around it with external math
+  reconstruction (the technique used in the 2 preceding rounds). Calling
+  the REAL function synchronously runs the actual per-hand loop
+  (including whatever new logic was just added to it) with zero
+  reimplementation risk -- confirmed live for Responsive Wrist Splay's
+  own verification. Prefer this over reconstructing the formula
+  externally whenever the function in question is already exposed on
+  `window.__debug` (`updateRenderOrder` is; most of this project's other
+  internal functions aren't, per its own minimal-debug-surface
+  convention -- exposing more of them is a reasonable trade whenever a
+  future feature's own live verification would benefit the same way).
