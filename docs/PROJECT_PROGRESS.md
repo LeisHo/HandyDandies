@@ -18,9 +18,12 @@ work seamlessly from there.
 
 ## Currently working on
 
-Nothing in progress — the "Click Hold-Pose" feature below just shipped
-and was the only open item. See "What's next" for what's still awaiting
-the user's own input/confirmation.
+Nothing in progress. 2 direct follow-ups on Click Hold-Pose just shipped
+(Target Pose dropdown fix, master on/off checkboxes) — pushed without a
+full live-verification pass this round per the user's own explicit
+instruction to stop verifying and just push (`node --check` syntax
+validation was still done before every push). See "What's next" for a
+real root-cause item this round left open.
 
 ## Recently completed
 
@@ -328,16 +331,46 @@ still relevant to understanding current state, per this doc's own
   instances, alongside (not replacing) the existing dedicated Arm Length/
   Wrist Splay ones. 2 real TDZ bugs caught and fixed via live browser
   testing (a top-level setup call referenced a `const` declared later in
-  the file); a real dropdown-staleness bug also caught and fixed (the
-  Target Pose dropdowns didn't refresh when a pose was saved/deleted —
-  fixed via `refreshSelectOptions()`). Live-verified via
+  the file); a real dropdown-staleness bug also caught and partially
+  fixed (the Target Pose dropdowns didn't refresh when a pose was saved/
+  deleted — wired to `refreshSelectOptions()`, though this only covered
+  FUTURE saves/deletes, not poses that already existed at page load —
+  see the next entry for the real fix). Live-verified via
   `window.__debug.updateRenderOrder()` plus real `PointerEvent` dispatch:
   correct phase transitions, a genuine 81-degree quaternion delta between
   2 distinct target poses, and 6 distinct per-hand start delays from the
   stagger. See CODE_SUMMARY.txt's GOTCHAS and CHANGELOG.txt for full
   detail.
+- **Click Hold-Pose follow-ups**: fixed the Target Pose dropdowns not
+  showing existing saved poses on page load (the earlier fix above only
+  covered future saves/deletes), and added a master on/off checkbox to
+  both groups (default off), gating `startClickHoldPose()`. Also found,
+  during this round's own live debugging, that
+  `refreshSelectOptions('rchpTargetPose')` throws inside devPanel.js's
+  own `commit()`/`fillSelectOptions()` for a cause isolated but not
+  fully root-caused — mitigated with a `safeRefreshSelectOptions()`
+  try/catch wrapper rather than exhaustively debugged further, per
+  direct user instruction mid-round to stop verifying and just push.
+  See "What's next" below for the follow-up this leaves open.
 
 ## What's next
+
+**Unresolved (needs a real debugging pass, not flagged for the user's
+input — this one's on Claude):** `refreshSelectOptions('rchpTargetPose')`
+throws inside devPanel.js's own `commit()`/`fillSelectOptions()`, isolated
+via repeated single-key testing (calling it alone for `'chpTargetPose'`
+always succeeds; alone for `'rchpTargetPose'` always throws; both controls
+are structurally identical, same registration code path) but not actually
+root-caused to a specific statement — every static read of `commit()`/
+`fillSelectOptions()`/`findCtrl()`/`displayValue()` turned up nothing that
+should behave differently between the 2 keys. Currently caught and logged
+via a `safeRefreshSelectOptions()` wrapper rather than fixed at the root,
+per direct mid-round instruction to stop verifying and push. Worth a
+proper `debugger`-based investigation (not just `console.log` markers,
+which got lost once in this same round behind a WebGL error flood in a
+degraded tab) next time this file is touched — the underlying devPanel.js
+issue could affect some other `select` control the same way, not just
+this one.
 
 Two open architecture/tuning decisions awaiting the user:
 - **Reordering-flash residual pop**: accept it as an inherent limitation

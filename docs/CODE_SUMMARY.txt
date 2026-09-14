@@ -1561,3 +1561,46 @@ GOTCHAS
   mid-hold showing 6 distinct `forwardDelay` values (confirms the
   distance-based stagger computes a real per-hand number). See
   CHANGELOG.txt's own entry for the full verification account.
+- **UNRESOLVED: `refreshSelectOptions('rchpTargetPose')` throws inside
+  devPanel.js's own `commit()`/`fillSelectOptions()`, for a cause isolated
+  but not root-caused.** Found while fixing the Target Pose dropdowns'
+  own stale-on-load bug (they need an explicit one-time
+  `refreshSelectOptions()` call after page load, since devPanel.js's
+  `select` controls only rebuild their `<option>` list on that explicit
+  call -- see that same fix's own comment at the call site in `main.js`).
+  Repeated single-key isolation testing in a fresh browser tab (ruling
+  out a degraded/crashed tab as the cause -- see the next GOTCHAS entry)
+  showed: `refreshSelectOptions('chpTargetPose')` alone always succeeds;
+  `refreshSelectOptions('rchpTargetPose')` alone always throws
+  `TypeError: Cannot read properties of undefined (reading
+  'rchpTargetPose')`. The 2 controls are registered via the exact same
+  `makeClickHoldPoseGroup(p, title)` factory, byte-for-byte identical
+  shape, differing only in the `p`/`title` arguments -- a full static
+  read of `commit()`, `fillSelectOptions()`, `findCtrl()`, and
+  `displayValue()` in devPanel.js found no code path that should treat
+  the 2 keys differently. Mitigated, not fixed: added a
+  `safeRefreshSelectOptions(key)` wrapper (try/catch + `console.error`,
+  defined near the top of `main.js`) and routed every call site for
+  these 2 keys through it, so this can never again crash the whole page
+  load regardless of root cause. Left as an open item in
+  PROJECT_PROGRESS.txt's "What's next" for a real debugging pass (a
+  `debugger` breakpoint, not `console.log` markers -- see the next
+  GOTCHAS entry for why those failed here) next time this file is
+  touched, since the same devPanel.js code path could affect some other,
+  not-yet-discovered `select` control the same way.
+- **A browser tab that has crashed and reloaded many times in one
+  debugging session cannot be trusted for a "did my fix work" check --
+  open a fresh tab instead.** Found while root-causing the bug directly
+  above: a `console.log()`-based debug marker placed right before the
+  suspect code never appeared in that session's console output, even
+  though the exact same code (confirmed via the same marker) ran fine in
+  a freshly-opened tab moments later. Root cause: the crashing tab had
+  accumulated enough real WebGL errors
+  (`GL_INVALID_FRAMEBUFFER_OPERATION`, from the documented
+  `window.innerWidth`-reads-0 gotcha compounding across many failed
+  reloads) that Chrome's own console eventually stopped reporting
+  further messages for that context entirely ("WebGL: too many errors,
+  no more errors will be reported to the console for this context") --
+  burying the marker, not a sign the code never ran. Confirmed the fix
+  by opening a brand-new tab instead of continuing to reload the
+  already-degraded one.

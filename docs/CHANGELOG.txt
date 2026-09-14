@@ -2500,6 +2500,69 @@ intermediate bumps during the TDZ-bug live-debug loop above, `?v=48` is
 the final, verified, pushed value).
 
 --------------------------------------------------------------------------------
+2026-09-14  -  07:10:07 AM - 07:25:16 AM EDT (measured, this entry's own start/finish)
+
+2 direct user follow-ups on Click Hold-Pose (previous entry): "I dont see
+any of the saved poses in the dropdown for Click Hold Pose Target pose
+selection. fix that" and "also in both of the new groups, provide a
+checkbox to turn that feature on and off."
+
+**Target Pose dropdown fix.** Root cause: a devPanel.js `select` control's
+`<option>` list is only ever populated by an explicit `refreshSelectOptions()`
+call. The 2 Target Pose dropdowns (`chpTargetPose`/`rchpTargetPose`) were
+only wired to refresh reactively, on a FUTURE Save/Delete/Rename/Overwrite
+of a saved pose (via `savedPoses`'s own `onChange`) -- never for poses that
+already existed in `cfg.savedPoses` at page load. Fixed with a one-time
+refresh call placed right after the Click-Hold-Pose state machine's own
+`const` declarations (`clickHoldPoseTriggers` etc.) genuinely exist.
+
+**Master on/off checkboxes.** Added `chpEnabled`/`rchpEnabled` (label:
+"<Group Title> (Master On/Off)", default off) as the first control in each
+group, gating `startClickHoldPose(p)` with a single `if (!cfg[`${p}Enabled`])
+return` -- same master-toggle convention as Crop Wrist/Responsive Wrist
+Splay.
+
+**A real, only-partially-root-caused bug found during this round's own
+live testing:** calling devPanel.js's `refreshSelectOptions('rchpTargetPose')`
+throws inside its own `commit()`/`fillSelectOptions()` -- isolated via
+repeated single-key testing in a fresh browser tab (`refreshSelectOptions('chpTargetPose')`
+alone always succeeds; `refreshSelectOptions('rchpTargetPose')` alone
+always throws, both calls otherwise structurally identical, same control
+shape, same code path) but NOT fully root-caused to a specific line inside
+devPanel.js despite extensive isolation (disabling the call entirely
+fixes the load; the two controls' own definitions and registration are
+byte-for-byte parallel). Given the user's own explicit instruction mid-
+round ("dont verify, just fix and push") to stop the live-debugging loop,
+resolved pragmatically rather than exhaustively: added a
+`safeRefreshSelectOptions(key)` wrapper (try/catch + `console.error`) and
+routed every `refreshSelectOptions()` call for these 2 keys through it, so
+this mystery can never again take down the whole page load regardless of
+its true cause. Flagged in PROJECT_PROGRESS.md's "What's next" for a
+proper root-cause pass later, since a caught-and-logged crash is a
+mitigation, not a fix, and the underlying devPanel.js issue could affect
+some other, not-yet-discovered `select` control the same way.
+
+Also found and fixed, during the same live-debugging session, that a test
+tab can silently degrade after many repeated reloads under real crash
+conditions (WebGL context accumulating `GL_INVALID_FRAMEBUFFER_OPERATION`
+errors until Chrome stops reporting them entirely, "too many errors, no
+more errors will be reported to the console for this context") -- a
+console.log-based debug marker placed in the crashing tab never surfaced,
+even though the exact same code verifiably ran fine (confirmed via the
+same marker) in a freshly-opened tab. Not a code bug, but a new addition
+to this project's own environment-quirks list: a tab that has crashed
+and reloaded many times in one debugging session should not be trusted
+for a "did my fix work" check -- open a fresh tab instead once a session
+has accumulated many failed reloads.
+
+Cache-buster bump: `index.html`'s own `main.js?v=48` -> `?v=58` (multiple
+intermediate debug-marker/isolation-test bumps during the live-debugging
+loop above; `?v=58` is the final, pushed value -- NOT independently
+re-verified live in the browser per the user's own explicit instruction
+to stop verifying and just push; `node --check` syntax validation was
+still performed before every push).
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================
