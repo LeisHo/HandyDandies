@@ -769,3 +769,19 @@ GOTCHAS
   explicit attribution in the commit message and here, rather than
   either silently claimed as one session's own work or held back
   entirely (which would have also withheld this round's own 6 fixes).
+- **Mouse Tracking Log's own settings-change logging (`setupSettingsChangeLog()`)
+  is ONE delegated listener on `.dp-panel`, not per-control wiring.**
+  Direct follow-up request: "if i click a settings in the dev panel, it
+  logs what i clicked and what setingg i had set." Listens for 'input' AND
+  'change' bubbling up from WHATEVER native control the user touched
+  (range slider, checkbox, color picker, the Arm Length widgets' own
+  hidden text inputs, etc.), reads that row's `data-key` and looks up
+  `cfg[key]` -- always already current by the time this fires, since the
+  event target's own listener (devPanel.js's own `commit()`) runs before
+  an ancestor's during bubbling. `lastLoggedByKey` skips only an EXACT
+  duplicate (the same control firing 'input' then 'change' for the
+  identical value); a genuinely different value during a slow slider drag
+  still logs every distinct tick on purpose -- a debug log should show
+  the real sequence, not just the final committed value. Works for every
+  existing control (including this round's own new ones) and any FUTURE
+  control added later, without either needing its own onChange touched.

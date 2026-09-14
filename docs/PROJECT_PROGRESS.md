@@ -104,7 +104,13 @@ still relevant to understanding current state, per this doc's own
   direct correction with a tone-curve-editor reference image. Caught and
   fixed 2 more small bugs live before shipping: a `NaN`/`null`-corrupting
   drag bug when a widget's own group is collapsed mid-drag, and a
-  defensive gap in the new click handler.
+  defensive gap in the new click handler. Two direct same-day follow-ons
+  to the log itself: a **Copy** button (same clipboard pattern devPanel's
+  own "Copy Settings" button already uses), and a delegated 'input'/
+  'change' listener on the whole panel that logs every dev-panel setting
+  change (control label + new value) without touching any individual
+  control's own onChange -- works for every existing AND future control
+  automatically.
 
   **A concurrent session (working from HANDO, handling the user's own
   separate "import poses from HANDO" ask) was actively adding a Saved-

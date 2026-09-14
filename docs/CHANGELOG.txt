@@ -1185,6 +1185,53 @@ supplies a real pointerId and isn't affected.
 Actual: 26m7s (MEASURED: 2026-09-13 19:41:23-20:07:30 EDT).
 
 --------------------------------------------------------------------------------
+2026-09-13 (continued once more)  -  ~8:13 PM - 8:19 PM EDT
+
+2 direct follow-ons to the Mouse Tracking Log: "provide a copy button for
+the mouse log," then mid-turn, "add it so that if i click a settings in
+the dev panel, it logs what i clicked and what setingg i had set."
+
+Added a **Copy** button next to the log's own label, using the exact same
+`navigator.clipboard.writeText` + text-flash pattern devPanel.js's own
+"Copy Settings" button already uses -- no new transport needed. Verified
+live: click fires the handler and flashes "Copied!"/"Copy failed"
+correctly (this session's own automated click produced "Copy failed",
+almost certainly a sandboxed-testing limitation -- clipboard writes need
+a genuine user gesture -- not a bug in new code, since it's byte-identical
+to the already-proven native Copy Settings pattern).
+
+Added **settings-change logging** as ONE delegated 'input'/'change'
+listener on the whole `.dp-panel`, not per-control wiring -- works for
+every EXISTING control (including this round's own Arm Length widgets,
+whose custom drag handlers dispatch a synthetic 'input' on their own
+hidden text input, correctly caught by this same delegation) and any
+FUTURE control added later, without touching a single existing onChange.
+Reads `cfg[key]` from the row's own `data-key` -- confirmed this is
+always already current by the time the delegated listener fires, since
+event bubbling always runs the target's own listener (devPanel.js's own
+`commit()`) before an ancestor's. A same-key/same-value dedup
+(`lastLoggedByKey`) prevents a double-log when 'input' and 'change' both
+fire for the identical committed value, without suppressing genuinely
+different values during a slow slider drag (deliberate -- a debug log
+should show the real sequence).
+
+Verified live: dragging Default Arm Length to 42 then back to 0, and
+toggling Show Grid Helper on then off, produced exactly 4 correctly-
+labeled log entries with no duplicates
+(`Setting changed: Default Arm Length (Crop %, Reactive Off) = 42`, etc.).
+
+Before this round started, confirmed the concurrent HANDO-side session's
+own work (commit `0634947`, "Add pose import... to the shared list-picker
+engine") had already been committed and pushed, and this session's own
+`main` was already in sync with `origin/main` -- a clean base, no further
+concurrent-session coordination needed this round. Bumped the
+`devpanel.js` import's own cache-busting query (`?v=3` -> `?v=4`) since
+that file's content changed again (their own commit) without them
+bumping it themselves.
+
+Corrected `CODE_SUMMARY.txt` and `PROJECT_PROGRESS.md`.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

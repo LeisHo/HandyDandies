@@ -6,7 +6,7 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js'
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js'
 import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js'
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js'
-import { initDevPanel, syncValue } from './devpanel/devPanel.js?v=3'
+import { initDevPanel, syncValue } from './devpanel/devPanel.js?v=4'
 
 const MODEL_URL = '../data/processed/HAND3D/Hand2.glb'
 // Measured once after the first load -- the rig's own bind-pose "pointing"
@@ -359,6 +359,7 @@ parseArmLengthConfig()
 buildArmLengthWidgets()
 buildMouseTrackingLogWidget()
 restartCursorLogTimer()
+setupSettingsChangeLog()
 
 // -----------------------------------------------------------------------
 // Scene setup
@@ -548,15 +549,68 @@ function buildMouseTrackingLogWidget() {
   const body = document.querySelector('.dp-group[data-key="Debug"] .dp-group-body')
   if (!body) return
   const wrap = elLocal('div', { padding: '4px 6px' })
-  const label = elLocal('div', { fontSize: '11px', opacity: '0.85', marginBottom: '3px' }, { text: 'Mouse Tracking Log' })
+  const headerRow = elLocal('div', { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3px' })
+  const label = elLocal('div', { fontSize: '11px', opacity: '0.85' }, { text: 'Mouse Tracking Log' })
+  // Same copy pattern devPanel.js's own "Copy Settings" button already
+  // uses (navigator.clipboard.writeText + a text flash) -- no new
+  // transport needed.
+  const copyBtn = elLocal('button', {
+    fontSize: '10px', padding: '2px 8px', background: '#3a3a4a', color: 'inherit',
+    border: 'none', borderRadius: '4px', cursor: 'pointer'
+  }, { text: 'Copy', type: 'button' })
+  headerRow.appendChild(label)
+  headerRow.appendChild(copyBtn)
   mouseTrackingLogEl = elLocal('pre', {
     height: '110px', overflowY: 'auto', margin: '0', padding: '4px 6px',
     background: 'rgba(255,255,255,0.06)', borderRadius: '4px', fontSize: '10px',
     whiteSpace: 'pre-wrap', wordBreak: 'break-word'
   })
-  wrap.appendChild(label)
+  copyBtn.addEventListener('click', () => {
+    const flash = (msg) => { const orig = copyBtn.textContent; copyBtn.textContent = msg; setTimeout(() => { copyBtn.textContent = orig }, 900) }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(mouseTrackingLogEntries.join('\n')).then(() => flash('Copied!')).catch(() => flash('Copy failed'))
+    } else {
+      flash('Copy failed')
+    }
+  })
+  wrap.appendChild(headerRow)
   wrap.appendChild(mouseTrackingLogEl)
   body.appendChild(wrap)
+}
+// Logs every dev-panel setting change (which control, and the value it was
+// set to) -- direct follow-up request: "if i click a settings in the dev
+// panel, it logs what i clicked and what setingg i had set." Delegated
+// (ONE listener on the whole panel, not one per control) so it works for
+// every existing AND future control without touching any of their own
+// onChange handlers -- generic 'input'/'change' events bubble from
+// whichever native input the user actually interacted with (range slider,
+// checkbox, color picker, the Arm Length widgets' own hidden text inputs,
+// etc.) up to the panel; the listener just reads that row's own `data-key`
+// and looks up `cfg[key]`, which devPanel.js's own commit() has ALREADY
+// set by the time this fires (the target's own listener always runs
+// before an ancestor's during bubbling). `lastLoggedByKey` skips a
+// duplicate log when 'input' and 'change' both fire for the identical
+// value (e.g. a color picker firing both on the same close) -- a genuine
+// value change during a slow slider drag still logs every distinct tick,
+// which is deliberate: a debug log like this should show the real
+// sequence, not just the final committed value.
+const lastLoggedByKey = {}
+function setupSettingsChangeLog() {
+  const panel = document.querySelector('.dp-panel')
+  if (!panel) return
+  const handler = (e) => {
+    const row = e.target.closest ? e.target.closest('.dp-row[data-key]') : null
+    if (!row) return
+    const key = row.dataset.key
+    const value = cfg[key]
+    const serialized = JSON.stringify(value)
+    if (lastLoggedByKey[key] === serialized) return
+    lastLoggedByKey[key] = serialized
+    const label = row.querySelector('label')?.textContent || key
+    logMouseTrackingEvent(`Setting changed: ${label} = ${serialized}`)
+  }
+  panel.addEventListener('input', handler)
+  panel.addEventListener('change', handler)
 }
 
 function updateCursorTarget() {
