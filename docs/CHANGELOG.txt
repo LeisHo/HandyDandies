@@ -2395,6 +2395,111 @@ folded into 1 final commit -- `?v=44` was an intermediate step verified
 mid-round, not separately pushed).
 
 --------------------------------------------------------------------------------
+2026-09-14  -  06:15:07 AM - 06:31:19 AM EDT (measured, this entry's own start/finish)
+
+Added "Click Hold-Pose" and "Right-Click Hold-Pose" -- 2 new, fully
+independent top-level dev-panel groups (direct request, 2 bundled
+features: "when i click and hold, the hands will transition to one of my
+saved poses... on release, they transition back to default pose... I can
+choose if they all transition together, or if their transition time is
+based on distance from cursor," then "On 2nd thought, provide 2 of these.
+The 2nd will be right click and hold," then clarified further: "the 2nd
+new clickhold pose sets should be their own setting groups").
+
+Each group: a Target Pose dropdown (reads the existing "Saved Poses"
+list-picker), Pose Transition Speed (Ms), a Pose Transition Start Time
+curve (distance-from-cursor -> start time, 0-1 normalized) with its own
+Min/Max Start Time (Ms) range, and matching Retransition Speed/Curve/
+Range controls for the release-side animation back to default pose.
+Setting a trigger's Min and Max start time equal collapses the stagger to
+"every hand transitions together" -- satisfies the request's own
+either/or requirement without a separate toggle.
+
+Architecture: a small per-hand-per-trigger state machine (`hand._chp[p]`,
+phases idle -> forward -> retransition -> idle). On pointerdown, snapshots
+every hand's current Pose-group values (`trig.forwardSnapshot`) and each
+hand gets its own forward-phase start delay, computed ONCE from a live
+cursor-distance snapshot at that instant (not continuously re-evaluated,
+so a moving cursor mid-hold doesn't reshuffle stagger order). On
+pointerup, each hand's own last-applied interpolated pose becomes its own
+retransition start (correctly handles releasing mid-transition, not just
+after reaching the target). Reuses `applyCurlToSkeleton()`/
+`applyWristPoseToSkeleton()`'s existing `values` override param (already
+proven by Pose Preview) and `evaluateArmLengthCurve()` directly -- no new
+posing or curve-evaluation code. mousedown/mouseup listeners are added as
+parallel, non-blocking `window` listeners (never call preventDefault/
+stopPropagation), matching the Mouse Tracking Log's own established
+pattern -- OrbitControls' existing left/right-click-drag camera pan is
+completely unaffected and both behaviors work simultaneously by design.
+
+Scope decision (disclosed, not silent): per-hand pose interpolation
+excludes Whole-Hand Rotation (modelRotX/Y/Z) -- those 3 keys drive a
+single SHARED `cloneBaseQuat` (computed once from `cfg`) used by every
+hand's own Arm Length position-compensation math, so making them
+per-hand-interpolatable would need a materially larger change (a
+per-hand cloneBaseQuat plus touching that compensation math) than this
+feature asked for. Checked that every saved pose in the user's own
+previously-pasted Copy Settings dump has modelRotX/Y/Z at exactly 0,
+making this a low-impact exclusion in practice.
+
+New generic (parameterized) dev-panel widgets: `buildGenericRangeBarWidget()`
+and `buildGenericCurveWidget()`, added alongside (not replacing) the
+existing project-specific Arm Length/Wrist Splay widget builders -- this
+round needed 8 more widget instances (4 controls x 2 triggers), enough
+that hand-copying a 3rd/4th/5th/6th time was judged worse than
+parameterizing, unlike the single-instance Wrist Splay round 2 entries
+above, which deliberately kept its own dedicated (duplicated) widgets.
+The curve widget carries right-click-to-delete-point from the start (the
+2nd, separate part of this session's own opening request, applied to the
+original Arm Length curve widget too -- see that entry's own commit).
+
+2 real bugs caught via live testing (a `node --check` pass alone can't
+catch a temporal-dead-zone violation -- both were only visible once the
+page was actually loaded in the browser):
+- The very first module-load-time setup call (`CLICK_HOLD_KEYS.forEach(...)`,
+  positioned near the other widgets' own setup calls early in the file)
+  referenced `CLICK_HOLD_KEYS`, a `const` declared much later in the file
+  alongside the rest of the state machine -- a ReferenceError, since a
+  top-level `const` is not hoisted the way a `function` declaration is.
+  Fixed by moving the setup call itself down to right after
+  `clickHoldPoseTriggers`'s own declaration (where `buildClickHoldPoseWidgets`
+  is defined), rather than trying to hoist the const earlier.
+- The same call also invoked `parseClickHoldConfig()`, which reads
+  `clickHoldPoseTriggers` -- same TDZ problem, same fix (moving the call,
+  not the declaration).
+
+Live-verified via `window.__debug.updateRenderOrder()` (direct calls,
+bypassing the Browser pane's own rAF-suspends-while-hidden limitation)
+plus real `PointerEvent` dispatch on `window` (exercising the actual
+mousedown/mouseup listeners, not a hand-reconstructed simulation):
+- Correct idle -> forward -> retransition -> idle phase transitions per
+  hand, confirmed via `hand._chp.chp.phase` at each stage.
+- Real pose interpolation, not just a state-flag flip: injected 2
+  distinct test poses (curlIndex 0 vs. 90) via `cfg.savedPoses`, measured
+  the `rIndex1` bone's quaternion after each full transition, and found
+  an 81-degree delta between them -- confirms the target value genuinely
+  drives the bone, not a fixed animation.
+- Distinct per-hand start delays: sampled `forwardDelay` across 6 hands
+  mid-hold (299/289/276/262/246/229 ms) -- confirms the distance-based
+  stagger computes a real per-hand value, not one shared number.
+- The "Saved Poses" list-picker's own Save/Delete/Rename/Overwrite
+  actions didn't originally propagate to the 2 new Target Pose dropdowns
+  (a `select`-type control's `<option>` list is only rebuilt on an
+  explicit `refreshSelectOptions()` call, confirmed by reading
+  `devPanel.js`'s own doc comment for that exported function) -- fixed by
+  wiring `savedPoses`'s own `onChange` to call
+  `refreshSelectOptions('chpTargetPose')` / `refreshSelectOptions('rchpTargetPose')`.
+- Zero new console errors after all of the above (3 stale
+  `CLICK_HOLD_KEYS`/`clickHoldPoseTriggers`/`ERR_CONNECTION_RESET`
+  entries lingered from the 2 TDZ bugs above and an earlier failed
+  navigation, confirmed stale by the unchanged 510/510 hand count and a
+  fully clean reload afterward).
+
+Cache-buster bumps: `index.html`'s own `main.js?v=45` -> `?v=48` (3
+intermediate bumps during the TDZ-bug live-debug loop above, `?v=48` is
+the final, verified, pushed value).
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

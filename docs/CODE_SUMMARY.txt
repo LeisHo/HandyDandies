@@ -1467,3 +1467,97 @@ GOTCHAS
   internal functions aren't, per its own minimal-debug-surface
   convention -- exposing more of them is a reasonable trade whenever a
   future feature's own live verification would benefit the same way).
+- **"Click Hold-Pose" / "Right-Click Hold-Pose"** (2 independent top-level
+  dev-panel groups, `makeClickHoldPoseGroup('chp', ...)` /
+  `makeClickHoldPoseGroup('rchp', ...)`) -- on mousedown/right-mousedown,
+  every hand transitions to a chosen saved pose; on release, back to
+  default. Each trigger is its own small per-hand-per-trigger state
+  machine (`hand._chp[p]`, phases `idle -> forward -> retransition ->
+  idle`, `p` is `'chp'` or `'rchp'`), driven from `updateRenderOrder()`'s
+  own per-hand loop via `updateClickHoldPoseForHand()`. Reuses
+  `applyCurlToSkeleton()`/`applyWristPoseToSkeleton()`'s existing
+  `values` override param (already proven by Pose Preview) via
+  `applyPoseValuesToHand()`, and `evaluateArmLengthCurve()` directly
+  (fully generic despite the name) for both the curve-shaped start-time
+  stagger and the pose lerp's own progress curve.
+
+  Key design points: a hand's forward-phase start delay is computed ONCE
+  at `pointerdown` from a live cursor-distance SNAPSHOT (`startClickHoldPose()`),
+  not re-evaluated every frame, so a moving cursor mid-hold doesn't
+  reshuffle stagger order. On `pointerup` (`endClickHoldPose()`), each
+  hand's own LAST-APPLIED interpolated values (`chp.lastAppliedValues`,
+  updated every frame while in 'forward' phase) become that hand's own
+  retransition start -- correctly handles releasing mid-transition rather
+  than assuming every hand had already reached the target. Setting a
+  trigger's own Min/Max Start Time range to the same value collapses the
+  stagger to "every hand moves together," satisfying that part of the
+  request without a separate toggle. `lerpPoseValues()` deliberately
+  excludes `modelRotX/Y/Z` (Whole-Hand Rotation) from the keys it
+  interpolates -- those 3 drive a single SHARED `cloneBaseQuat` used by
+  every hand's own Arm Length position-compensation math, so making them
+  per-hand would need a materially larger change than this feature asked
+  for (see CHANGELOG.txt's own entry for the full disclosed reasoning).
+
+  The mousedown/mouseup listeners are added as parallel, non-blocking
+  `window`-level listeners (never call `preventDefault()`/
+  `stopPropagation()`), the same convention the Mouse Tracking Log
+  already established -- OrbitControls' own existing left/right-click-
+  drag camera pan is completely unaffected; both behaviors happen
+  simultaneously by design, not a conflict to resolve.
+
+  2 real bugs, both only visible once the page actually loaded in a
+  browser (a `node --check` syntax pass can't catch either):
+  - **A top-level `const` is not hoisted the way a `function` declaration
+    is -- a setup call positioned textually BEFORE that const's own
+    declaration throws a TDZ ReferenceError at module-evaluation time,**
+    even though the const is declared "further down in the same file."
+    `CLICK_HOLD_KEYS.forEach((p) => { parseClickHoldConfig(p);
+    buildClickHoldPoseWidgets(p) })` was originally placed near the other
+    widgets' own setup calls early in the file (`parseArmLengthConfig()`
+    etc.), but `CLICK_HOLD_KEYS` (and `clickHoldPoseTriggers`, which
+    `parseClickHoldConfig()` reads) are declared much later, alongside
+    the rest of the state machine. Fixed by moving the ONE setup-call
+    line down to immediately after `clickHoldPoseTriggers`'s own
+    declaration block (right after `buildClickHoldPoseWidgets` is
+    defined) -- not by hoisting the consts earlier, which would have
+    meant relocating the entire state-machine section instead of one
+    line. `parseArmLengthConfig`/`buildWristSplayWidgets`-style setup
+    calls never hit this because those functions don't read a
+    later-declared `const`; this is specific to any future control whose
+    parse/build step depends on module-level state declared further down
+    the file.
+  - **A `select`-type dev-panel control's `<option>` list is only
+    rebuilt on an explicit `refreshSelectOptions(key)` call -- it does
+    NOT automatically stay in sync with a `list-picker` control it reads
+    via `options()`.** The 2 Target Pose dropdowns
+    (`options: () => (cfg.savedPoses || []).map((sp) => sp.name)`) went
+    stale after Saving/Deleting/Renaming a pose in the existing "Saved
+    Poses" list-picker, until fixed by wiring that control's own
+    `onChange` to call `refreshSelectOptions('chpTargetPose')` /
+    `refreshSelectOptions('rchpTargetPose')` (confirmed via
+    `devPanel.js`'s own doc comment on `refreshSelectOptions`, which
+    names exactly this scenario -- "Call after the underlying option list
+    changes (e.g. a 'list-picker' control's own onChange...)" -- as its
+    intended use). Applies to any future `select` control whose options
+    are sourced from another control's own dynamically-changing value.
+
+  New generic (parameterized) widget builders, `buildGenericRangeBarWidget(row,
+  opts)` / `buildGenericCurveWidget(row, opts)`, added alongside (not
+  replacing) the existing project-specific Arm Length/Wrist Splay widget
+  builders -- this round needed 8 more widget instances (4 controls x 2
+  triggers), past the point where hand-copying was judged worth it (the
+  single-instance Wrist Splay round above deliberately kept its own
+  dedicated, non-generic widgets; this is the point that tradeoff
+  flipped). The curve widget includes right-click-to-delete-point from
+  its first version (the other half of this session's own opening
+  request, also retrofitted onto the original Arm Length curve widget).
+
+  Live-verified via `window.__debug.updateRenderOrder()` plus real
+  `PointerEvent` dispatch on `window` (exercising the actual listeners,
+  not a hand-reconstructed simulation of them): correct phase
+  transitions per hand; a genuine 81-degree quaternion delta on the
+  `rIndex1` bone between 2 distinct injected target poses (confirms the
+  target value drives the bone, not a fixed animation); 6 sampled hands
+  mid-hold showing 6 distinct `forwardDelay` values (confirms the
+  distance-based stagger computes a real per-hand number). See
+  CHANGELOG.txt's own entry for the full verification account.

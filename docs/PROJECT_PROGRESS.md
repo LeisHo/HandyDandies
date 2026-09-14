@@ -18,15 +18,9 @@ work seamlessly from there.
 
 ## Currently working on
 
-Starting a large new feature, direct request: click-and-hold (and,
-separately, right-click-and-hold) transitions every hand to a chosen
-saved pose, released back to default on mouse-up, with independently
-configurable transition/retransition speed and per-hand start-time
-staggering driven by distance from cursor (curve + min/max range, same
-family of widgets as Arm Length/Responsive Wrist Splay). Two full
-instances of this control set requested (one per mouse button). Not yet
-scoped against the existing pose-application/list-picker code — see
-CHANGELOG.txt for the exact request once implemented.
+Nothing in progress — the "Click Hold-Pose" feature below just shipped
+and was the only open item. See "What's next" for what's still awaiting
+the user's own input/confirmation.
 
 ## Recently completed
 
@@ -319,6 +313,29 @@ still relevant to understanding current state, per this doc's own
   constraint. Verified end-to-end by calling `updateRenderOrder()`
   directly (bypasses the Browser pane's rAF-while-hidden limitation):
   nearest hand measures exactly -90.0 degrees, farthest exactly 0.
+- **"Click Hold-Pose" / "Right-Click Hold-Pose"** — 2 independent
+  top-level dev-panel groups. On mousedown/right-mousedown, every hand
+  transitions to a chosen saved pose (own speed + a distance-from-cursor
+  start-time curve/range for per-hand staggering, same widget family as
+  Arm Length/Wrist Splay); on release, back to default the same way,
+  with its own independent retransition speed/curve/range. Setting a
+  trigger's Min/Max Start Time equal collapses the stagger to "every hand
+  moves together." Excludes Whole-Hand Rotation (modelRotX/Y/Z) from
+  per-hand interpolation by design — those drive a single shared
+  `cloneBaseQuat` used by every hand's Arm Length compensation math (see
+  CODE_SUMMARY.txt's GOTCHAS for the full reasoning). 2 new generic
+  (parameterized) widget builders added for this round's 8 widget
+  instances, alongside (not replacing) the existing dedicated Arm Length/
+  Wrist Splay ones. 2 real TDZ bugs caught and fixed via live browser
+  testing (a top-level setup call referenced a `const` declared later in
+  the file); a real dropdown-staleness bug also caught and fixed (the
+  Target Pose dropdowns didn't refresh when a pose was saved/deleted —
+  fixed via `refreshSelectOptions()`). Live-verified via
+  `window.__debug.updateRenderOrder()` plus real `PointerEvent` dispatch:
+  correct phase transitions, a genuine 81-degree quaternion delta between
+  2 distinct target poses, and 6 distinct per-hand start delays from the
+  stagger. See CODE_SUMMARY.txt's GOTCHAS and CHANGELOG.txt for full
+  detail.
 
 ## What's next
 
@@ -338,6 +355,15 @@ Other open items worth the user's own confirmation:
   actually meant instead (a 1-line change).
 - Real on-device mobile touch-drag/pinch feel, since this environment
   can't produce genuine touch events to verify against.
+- **Click Hold-Pose's real mouse feel** — this session verified the
+  underlying mechanism via `window.__debug` calls and synthetic
+  `PointerEvent` dispatch (a real state-machine/interpolation check, not
+  a UI-feel one); the actual click-and-hold experience (does the stagger
+  feel right, does the default Transition/Retransition Speed of 400ms
+  feel right, does a saved pose need to exist to even see it fire) hasn't
+  been eyeballed on a live page. A "Target Pose" left as its default
+  empty string does nothing when triggered (no matching saved pose) —
+  worth trying it with a real saved pose once one exists.
 - Default grid/spacing/toon/outline visual tuning, once seen at real size.
 - **Pose is currently shared across every hand** ("for now," per the
   user's own phrasing) — per-hand pose variation/randomization would be a
