@@ -1010,6 +1010,34 @@ GOTCHAS
   landmark (thumb position relative to the palm plane) or an actual
   side-by-side visual comparison against a reference pose, not a check
   that re-derives its own answer.
+
+  **Same-day follow-on: "Palm Face Rotation (Deg)" slider (-180 to 180,
+  default 0), direct request ("Provide me a slider to control that
+  rotation actually")** -- rather than trust a future calibration to be
+  right by construction (the exact assumption that just failed), the
+  correction is now computed LIVE every frame instead of once at model
+  load. `palmFaceCorrectionQuat` (the fixed module-level quaternion) was
+  replaced with `palmNormalAligned` (the raw calibrated direction, still
+  measured once) plus `computePalmFaceCorrectionQuat()`, called once per
+  frame in `animate()`'s tracking block (not once per hand -- the
+  correction is identical for every hand, same as `alignQuat`). The
+  slider rotates `palmNormalAligned` around the hand's own pointing axis
+  (local -Z in the aligned frame, i.e. the same axis `pointDir` sits on)
+  before building the correction -- chosen specifically because it's
+  perpendicular-ish to the palm normal for a roughly-flat hand, so the
+  slider sweeps the aimed direction continuously through the FULL range
+  (palm at 0, edge-on at +-90, exact opposite/back-of-hand at +-180)
+  rather than an axis that would leave the correction unchanged.
+
+  This time, verified with a genuinely INDEPENDENT check (not the
+  tautological kind flagged above): built the OLD (pre-fix) formula's
+  correction quaternion completely separately from the new
+  slider-based one, then compared it against the new formula's own
+  output at offset=180 -- confirmed the two are the same rotation
+  (quaternion dot ~0.999966) -- proving the roll-axis choice is
+  mathematically sound and that the slider's two extremes genuinely
+  correspond to "new/correct" (0) and "old/wrong" (+-180), not just
+  self-consistent nonsense.
 - **Ported the built-in "Dev Panel" chrome-styling group's expansion from
   `TEMPLATE_DEV_PANEL.html`, scoped to "just the chrome group"** per
   direct request when asked how much of the template's own growth (also:

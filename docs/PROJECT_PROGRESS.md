@@ -203,6 +203,12 @@ still relevant to understanding current state, per this doc's own
   mathematically" dot-product check was tautological (self-confirms
   regardless of which cross-product sign is used) -- see CODE_SUMMARY.txt's
   GOTCHAS for the full account and what to do differently next time.
+  **Same-day follow-on: added a "Palm Face Rotation (Deg)" slider (-180
+  to 180, default 0)** so this correction can be tuned live from the
+  panel instead of needing another code fix if a future calibration is
+  off. Verified with a real independent cross-check (not a tautological
+  one) that the slider's 180-degree end reproduces the exact old
+  (pre-fix) rotation.
 - **Ported the built-in "Dev Panel" chrome-styling group's expansion
   from `TEMPLATE_DEV_PANEL.html`, scoped to "just the chrome group"**
   (the user's own choice when asked how much of the template's growth to

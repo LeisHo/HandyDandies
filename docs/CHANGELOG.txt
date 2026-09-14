@@ -2006,6 +2006,46 @@ load afterward (510/510 hands, zero new console errors).
 Cache-buster bump: index.html's own main.js?v=36 -> ?v=37.
 
 --------------------------------------------------------------------------------
+2026-09-14  -  ~04:11 AM - 04:14 AM EDT (bounded by checkpoints; see Verified note)
+
+Added "Palm Face Rotation (Deg)" slider (Cursor Tracking group, -180 to
+180, default 0) -- direct follow-up to the 180-degree flip fix above:
+"Provide me a slider to control that rotation actually." Rather than
+trusting a fixed, code-baked calibration to be right (which just proved
+wrong once already), the palm-facing correction is now a LIVE, per-frame
+computation (`computePalmFaceCorrectionQuat()`) incorporating this
+slider, so a future bad calibration (on this rig or a different model)
+can be corrected from the panel instead of needing another code change.
+
+Rotates the calibrated palm-normal direction around the hand's own
+pointing axis (local -Z in the aligned frame, the same axis `pointDir`
+itself sits on) before aiming it at the cursor -- perpendicular-ish to
+the palm normal for a roughly-flat hand, so the slider sweeps the aimed
+direction continuously from the palm (0 degrees) through edge-on (+-90)
+to the exact opposite, the back of the hand (+-180), rather than an axis
+that would leave the correction unchanged. Refactored the module-level
+`palmFaceCorrectionQuat` (a fixed value computed once at model load) into
+`palmNormalAligned` (the raw calibrated direction, still computed once)
+plus a new `computePalmFaceCorrectionQuat()` function called once per
+frame (not once per hand -- identical for every hand, like `alignQuat`
+itself) inside the tracking block, only when Palm Faces Cursor is on.
+
+Verified live: slider row renders with the correct key/range/default;
+toggling the checkbox + slider through several values for ~100ms while
+tracking ran produced no errors, 510/510 hands still updating normally.
+Also ran a genuine INDEPENDENT cross-check (not the tautological kind
+flagged in the entry above) confirming the roll-axis choice is
+mathematically sound: built the OLD (pre-fix) formula's correction
+quaternion completely separately, then built the NEW formula's output at
+offset=180 degrees, and confirmed the two are the same rotation
+(quaternion dot ~0.999966, i.e. ~1.0) -- proving the slider's 180-degree
+end genuinely reproduces the exact old (wrong) behavior, and by
+extension that 0 degrees genuinely gives the new (correct) one. Zero new
+console errors in the final fresh-tab check.
+
+Cache-buster bump: index.html's own main.js?v=37 -> ?v=38.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================
