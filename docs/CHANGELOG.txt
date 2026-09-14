@@ -2916,6 +2916,137 @@ Cache-buster bumps: `index.html`'s own `main.js?v=65` -> `?v=68` (2
 intermediate debug-exposure bumps for live investigation).
 
 --------------------------------------------------------------------------------
+2026-09-14  -  10:03 AM - 10:54 AM EDT (approximate, spanning several interleaved user exchanges; not independently re-measured per sub-task)
+
+**THE "THUMB POSE LOOKS WRONG" SAGA IS FINALLY, GENUINELY RESOLVED --
+root cause found, and it was never a bug in any of the code this
+session touched.** Root cause: **Responsive Wrist Splay was enabled**
+in the user's own session. That feature adds a live, continuously-
+recalculated wrist rotation based on cursor distance, independent of
+whatever pose is active -- and since it recomputes every frame during
+an active Click-Hold-Pose/Click-Pose transition (while "Default"'s own
+one-time application doesn't include it at the instant it's clicked),
+any cursor movement between "when Default was set" and "when a
+transition runs" changes the live extra splay, producing a real,
+visible thumb shift completely independent of which pose was
+targeted. Confirmed decisively by the user's own 2 tests: (1) setting
+the Click Pose target to the SAME pose as Default still produced an
+immediate thumb shift on click -- impossible if the bug were in pose
+DATA, since interpolating between 2 identical states is a mathematical
+no-op; (2) "every other finger is in the correct pose, its just the
+thumb" -- the thumb is the ONLY finger parented to the wrist bone
+(`rHand`), so it's the ONLY finger any extra wrist rotation can ever
+visibly affect. Disabling Responsive Wrist Splay confirmed the fix
+("yeah thats it. good catch.").
+
+**This means every one of the real, verified fixes shipped across this
+entire investigation (wrist-before-fingers ordering; per-hand Whole-
+Hand Rotation during transitions; HANDO's own Base-Only Curl, ported
+after being found missing entirely; 2 rounds of Click-Hold/Click-Pose
+interference) were genuine, real bugs, independently confirmed correct,
+and NONE of them were the actual cause of what the user kept
+reporting.** All 4 remain correctly fixed and still matter for other
+scenarios (imported poses that DO use Whole-Hand Rotation or Base-Only
+Curl, for instance) -- this entry does not retract any of them, it
+closes out the ONE thread that kept resurfacing across all of them.
+
+Also shipped in this same stretch, before the root cause was found:
+
+**Decoupled cursor target X/Y from Cursor Target Depth** (direct
+request, after a live-quantified explanation of the old parallax
+behavior with real numbers: a corner hand needing to face rightward
+despite the cursor being unambiguously further left on screen). X/Y now
+always come from a raycast to a plane permanently fixed at z=0 (the
+hands' own depth -- "the true cursor xy"); Z is set directly from
+`targetDepthFactor * fieldRadius` as a plain scalar, fully decoupled.
+`targetPlane` no longer needs `updateTargetPlane()` to track the
+configured depth (removed entirely, 2 call sites cleaned up) since both
+axes are now computed fresh, independently, every frame. Live-verified:
+X/Y at a fixed screen position now exactly matches a raycast to z=0
+(previously scaled down by the depth-shift); Z still correctly reflects
+targetDepthFactor.
+
+**New, known, ACCEPTED side effect of that same fix (fix deferred,
+explicitly grouped with a future round per direct request, "dont do
+that right now. group it with the next changes i ask for"):** the
+Target Marker (the visual dot showing `cursorTarget`) no longer stays
+pixel-aligned with the true mouse position when Target Depth isn't 0 --
+because the marker's own position IS `cursorTarget`, and that point is
+no longer guaranteed to lie ON the original camera ray now that Z is
+set independently of X/Y (previously it always did, by construction,
+since every axis came from one single raycast hit). Planned fix
+(NOT YET IMPLEMENTED): give the Target Marker its own position, driven
+by the TRUE raycast-to-actual-depth hit (always pixel-perfect under the
+cursor), fully independent from `cursorTarget` (which keeps driving the
+hands with the new decoupled X/Y-depth behavior).
+
+**Click Pose's own 350ms debounce delay removed when Double-Click Pose
+is disabled** (direct report: "why is there a delay between the click
+and the triggered pose transition, even if the minimum transition time
+is set to 0"). Every click used to wait the full multi-click debounce
+window before triggering, even with no double-click feature enabled to
+disambiguate against -- pure, avoidable latency in that case. Now fires
+immediately when `cfg.dblclickEnabled` is false. (Separately explained,
+no code change: Click Hold-Pose's own delay source, when present, is
+"Pose Transition Min/Max Start Time" -- defaulting to up to 300ms --
+which is independent of "Transition Speed" and easy to conflate with
+it.)
+
+**Added a "Diagnose" button** (Saved Poses list-picker, next to
+"Default") -- a TEMPORARY debugging aid built specifically to get real
+data from the user's own actual saved poses rather than this session's
+own repeatedly-inconclusive synthetic approximations. Runs the "Default
+path" vs. "transition path" comparison directly on whichever pose is
+currently selected, reporting each finger's base-joint mismatch via
+`alert()`. Not actually needed in the end (the root cause was found
+through the user's own 2 decisive manual tests before the button was
+ever used) -- left in place for now since it may still be useful for a
+future investigation; consider removing it once confirmed unneeded long-
+term.
+
+Cache-buster bumps: `index.html`'s own `main.js?v=68` -> `?v=71` across
+this stretch.
+
+--------------------------------------------------------------------------------
+2026-09-14  -  11:2x AM EDT (start not captured -- Actual: NOT MEASURED)
+
+**Responsive Wrist Splay now freezes for the duration of an explicit pose
+transition, instead of fighting with it.** Direct follow-up question after
+the thumb saga's resolution above: "is there a way around it such that i
+can have both functioning correctly." Investigated the actual mechanism
+(not just the symptom) before proposing anything: `applyWristPoseToSkeleton()`
+already composes the pose's own `wristSplay` and Responsive Wrist Splay's
+`extraSplayDeg` into ONE `rotateZ()` call, fully resolved BEFORE any finger
+(including the thumb) is posed relative to the wrist -- so "pose the thumb
+first, then apply splay" was already mathematically true; reordering it
+further couldn't have changed anything. The real cause: `extraSplayDeg`
+was being recomputed **live, every single frame**, for the entire duration
+of a Click-Hold-Pose or Click-Pose/Double-Click-Pose transition -- so any
+cursor movement during the hold/transition kept shifting the wrist target
+out from under the pose's own interpolation, visibly as a moving thumb
+(the one finger parented to the wrist bone).
+
+Fix: capture `extraSplayDeg` ONCE, at the exact instant a transition
+triggers (`chp.frozenSplayDeg` for Click Hold-Pose, set alongside its
+existing `forwardDelay` capture in `updateClickHoldPoseForHand()`;
+`cp.frozenSplayDeg` for Click/Double-Click Pose, set alongside its existing
+per-hand `forwardDelay` in `triggerClickPose()`), then reuse that one
+frozen value through every phase of that hand's own sequence (forward,
+pause, retransition) instead of calling `computeResponsiveWristSplayDeg()`
+again each frame. The per-frame idle-loop path (`updateRenderOrder()`'s own
+un-overridden branch) is untouched -- an idle hand keeps tracking
+Responsive Wrist Splay fully live, exactly as before. Live-verified in
+browser: with Responsive Wrist Splay enabled and a Click Pose target equal
+to the current pose (the user's own diagnostic technique from the thumb
+saga above), `frozenSplayDeg` was confirmed nonzero and IDENTICAL before
+and after moving the cursor far away mid-'forward'-phase, while a
+different, untriggered ("idle") hand's own wrist bone quaternion was
+confirmed to still change in response to the same cursor move -- both
+behaviors now coexist as intended.
+
+Cache-buster bump: `index.html`'s own `main.js?v=71` -> `?v=72`.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

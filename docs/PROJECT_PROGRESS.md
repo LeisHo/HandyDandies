@@ -18,29 +18,11 @@ work seamlessly from there.
 
 ## Currently working on
 
-**BLOCKED, needs the user's own data — the "thumb pose looks wrong" saga
-is NOT actually resolved**, despite 4 rounds of real, verified fixes
-(wrist-before-fingers ordering; per-hand Whole-Hand Rotation during
-transitions; HANDO's own Base-Only Curl, previously missing entirely).
-Each fix was confirmed correct via rigorous quantitative testing (0.0
-degrees of error against a "Default"-button reference, every time) —
-but the user reports the thumb is STILL wrong for Click-Hold/Click-Pose
-transition targets and retransitions, even though "Default" applying
-the identical pose looks correct. This session could not reproduce it.
-See "What's next" for the explicit ask (Copy Settings JSON + a
-screenshot) needed to make further progress — continuing to guess at
-more hypotheses without evidence isn't working.
-
-Also fixed 2 real, smaller bugs this same round: releasing a genuine
-Click-Hold-Pose hold no longer also fires Click Pose's own sequence
-(and a regression that first fix itself introduced — instant clicks
-briefly stopped triggering Click Pose at all — is also fixed). Shipped
-"Click Pose"/"Double-Click Pose" (fire-and-forget variant of Click
-Hold-Pose) and disabled camera pan during an active Click-Hold-Pose
-trigger in an earlier round. Investigated a reported cursor-tracking
-edge-of-screen issue — the raw math measures correct and continuous to
-the true last pixel; likely a physical mouse/monitor limit or a dev-
-panel-position interaction, not yet pinned down further.
+Nothing blocked. The multi-round "thumb pose looks wrong" saga (5 rounds
+total) is now genuinely resolved — see "Recently completed" for the full
+account. Between rounds; see "What's next" for the one explicitly queued
+item (a Target Marker fix the user deliberately deferred, to be grouped
+with a future batch of changes rather than done in isolation).
 
 ## Recently completed
 
@@ -468,26 +450,52 @@ still relevant to understanding current state, per this doc's own
   clicks from triggering Click Pose at all. Both now verified correct
   together (quick click triggers, genuine hold still suppresses the
   extra trigger). See CHANGELOG.txt for the full account.
+- **The "thumb pose looks wrong" saga's actual root cause found and
+  fixed: Responsive Wrist Splay, not a code bug.** The 4 rounds of fixes
+  above (wrist-order; per-hand Whole-Hand Rotation; Base-Only Curl;
+  Click-Hold/Click-Pose interference) were all real and stayed correct
+  -- none of them were wrong. The user's own 2 decisive tests broke it
+  open: a Click Pose target set to the SAME pose as Default still shifted
+  the thumb on click (impossible if the cause were in pose data), and
+  only the thumb was ever affected (the one finger parented to the
+  wrist bone). Responsive Wrist Splay -- a live, cursor-distance-driven
+  feature the user had enabled -- recomputes an extra wrist rotation
+  every frame, independent of the target pose, so any cursor movement
+  during a transition shifted the thumb out from under it. Direct
+  follow-up ("is there a way around it such that i can have both
+  functioning correctly"): `extraSplayDeg` is now captured ONCE at
+  trigger time (`chp.frozenSplayDeg`/`cp.frozenSplayDeg`) and held fixed
+  through that hand's whole transition sequence, while idle hands keep
+  tracking Responsive Wrist Splay fully live -- both now coexist
+  correctly. Live-verified: frozen value stays identical across a big
+  mid-transition cursor jump; an idle hand's wrist bone still visibly
+  responds to the same jump. See CHANGELOG.txt for the full account.
+- **Decoupled cursor target X/Y from Cursor Target Depth**, after
+  quantifying a real parallax gap (up to ~45 world units at the field
+  edge) between the true screen cursor position and where hands actually
+  aimed. X/Y now always come from a raycast to a plane fixed at the
+  hands' own z=0 depth; Z is set directly from the configured depth as a
+  plain scalar. Known, accepted side effect: the Target Marker (a purely
+  visual dot) no longer stays pixel-aligned with the true mouse position
+  when Target Depth isn't 0 -- fix deferred, see "What's next".
+- **Click Pose's own 350ms debounce delay removed when Double-Click Pose
+  is disabled** -- every click used to wait the full disambiguation
+  window even with nothing to disambiguate against. Also added a
+  temporary "Diagnose" button (Saved Poses list-picker) for comparing a
+  saved pose's Default-path vs. transition-path bone quaternions --
+  turned out not to be needed for the thumb saga's resolution, left in
+  place as a still-possibly-useful debugging aid.
 
 ## What's next
 
-**BLOCKED on the user's own data — the actual, still-unresolved thumb
-issue.** 4 rounds of real, verified fixes (wrist-order; per-hand
-Whole-Hand Rotation; Base-Only Curl) have each independently measured
-0.0 degrees of error against a "Default"-button reference, yet the user
-reports the thumb is STILL wrong for Click-Hold/Click-Pose transition
-targets and retransitions. This session could not reproduce it despite
-exhaustive testing across every code path this session could think to
-check. Next session needs, before attempting another fix:
-1. The user's own actual saved-pose JSON (Copy Settings output) for the
-   specific pose(s) that show the problem.
-2. A screenshot of the wrong thumb (ideally alongside what "correct"
-   looks like, e.g. via "Default").
-3. The exact trigger being used (chp/rchp/click/dblclick) and whether
-   Responsive Wrist Splay is also active.
-Do not attempt another synthetic-test-and-fix round without this data
--- 4 rounds of that approach have each found a REAL bug (not wasted
-effort) but have not yet found WHATEVER the user is actually seeing.
+**Target Marker fix -- explicitly deferred by the user, do NOT implement
+in isolation.** Direct instruction: "yeah i want that. but dont do that
+right now. group it with the next changes i ask for." Give the Target
+Marker its own position, driven by the TRUE raycast-to-actual-depth hit
+(always pixel-perfect under the cursor), independent from `cursorTarget`
+(which keeps driving the hands with the decoupled X/Y-depth behavior
+noted in "Recently completed"). Only implement this once bundled with a
+future batch of user-requested changes.
 
 **Cursor-tracking sticking near the browser edge** -- user-reported,
 not yet resolved. Direct measurement (`cursorTarget` sampled at

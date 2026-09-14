@@ -1897,18 +1897,28 @@ GOTCHAS
   release as suppressible. Live-verified both cases together: a ~50ms
   click still enters Click Pose's own 'forward' phase; a ~700ms hold
   still suppresses the extra trigger.
-- **UNRESOLVED, HIGH PRIORITY -- the "thumb pose looks wrong" report is
-  STILL open despite 4 rounds of real, independently-verified fixes**
+- **RESOLVED (was "UNRESOLVED, HIGH PRIORITY" in this same section) --
+  the "thumb pose looks wrong" report's true root cause: not a code bug
+  at all, in any of the 4 real, independently-verified fixes below it
   (wrist-before-fingers ordering; per-hand Whole-Hand Rotation during
-  transitions; Base-Only Curl, directly above). Every fix in this
-  sequence was measured at exactly 0.0 degrees of error against a
-  "Default"-button reference for its own specific scenario -- yet the
-  user reports the thumb is STILL wrong for actual Click-Hold/Click-Pose
-  transition targets and retransitions. This session could not reproduce
-  it. Do NOT assume any of the 4 shipped fixes above are themselves
-  defective without new evidence -- each is real, verified, and still
-  correct for what it was tested against. The gap is something this
-  session's own synthetic test poses never happened to exercise. See
-  PROJECT_PROGRESS.md's "What's next" for the specific data needed
-  (the user's own actual saved-pose JSON via Copy Settings, a screenshot,
-  and exact repro steps) before attempting a 5th round.
+  transitions; Base-Only Curl) -- all 4 stay correct and shipped.** The
+  actual cause was **Responsive Wrist Splay**, a live, cursor-distance-
+  driven feature the user had enabled: it adds an extra wrist rotation
+  recomputed every frame, independent of whatever pose is targeted, and
+  since only the thumb is parented to the wrist bone (`rHand`), it's the
+  only finger any such extra rotation can ever visibly move. User-
+  confirmed via 2 decisive tests: (1) setting a Click Pose's target to
+  the SAME pose as Default still produced an instant thumb shift on
+  click -- impossible if the cause were in pose DATA, since interpolating
+  identical values is a no-op; (2) "every other finger is in the correct
+  pose, its just the thumb" -- the one structural asymmetry. Confirmed:
+  "yeah thats it. good catch."
+  Direct follow-up fix (2026-09-14): Responsive Wrist Splay's own
+  `extraSplayDeg` is now captured ONCE at the instant a Click-Hold-Pose
+  or Click/Double-Click-Pose transition triggers (`chp.frozenSplayDeg` /
+  `cp.frozenSplayDeg`) and held fixed through that hand's entire sequence
+  (forward/pause/retransition), instead of being recomputed live every
+  frame throughout the transition. An idle hand (not in any active
+  transition) keeps tracking Responsive Wrist Splay fully live, exactly
+  as before -- both features now coexist correctly. Live-verified in
+  browser (see CHANGELOG.txt's matching entry for the full account).

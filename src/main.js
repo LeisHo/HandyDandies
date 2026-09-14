@@ -2434,7 +2434,7 @@ function parseClickHoldConfig(p) {
 function getOrInitHandCHP(hand) {
   if (!hand._chp) {
     hand._chp = {}
-    CLICK_HOLD_KEYS.forEach((p) => { hand._chp[p] = { phase: 'idle', forwardDelay: 0, retransitionDelay: 0, retransitionStart: null, retransitionStartTime: 0, lastAppliedValues: null } })
+    CLICK_HOLD_KEYS.forEach((p) => { hand._chp[p] = { phase: 'idle', forwardDelay: 0, retransitionDelay: 0, retransitionStart: null, retransitionStartTime: 0, lastAppliedValues: null, frozenSplayDeg: 0 } })
   }
   return hand._chp
 }
@@ -2527,6 +2527,22 @@ function computeStartDelayMs(distanceToCursor, minLiveDist, liveDistRange, curve
 // touching the hand's pose at all) whenever this hand's own phase is
 // 'idle' for this trigger, leaving the normal cfg-driven pose pipeline
 // completely in control, exactly as before this feature existed.
+//
+// CORRECTED 2026-09-14: 'forward'/'retransition' now apply
+// `chp.frozenSplayDeg` (captured once, at the instant this hand's own
+// 'forward' phase begins) instead of recomputing
+// computeResponsiveWristSplayDeg() live every frame. Root cause of the
+// user-reported "thumb shifts on click" symptom: Responsive Wrist
+// Splay is a LIVE, cursor-distance-driven wrist rotation, and it used
+// to keep recalculating throughout an entire transition -- so any
+// cursor movement during the hold/transition made the thumb (the only
+// finger parented to the wrist bone) visibly chase a moving target
+// instead of following a clean pose interpolation. Freezing it at
+// trigger time makes a triggered transition deterministic and matches
+// whatever was already visible the instant before the trigger, while
+// idle hands (this function's own no-op branch, left untouched) keep
+// tracking Responsive Wrist Splay fully live exactly as before -- the
+// 2 features now both work, on their own terms, instead of fighting.
 function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) {
   const trig = clickHoldPoseTriggers[p]
   const chp = getOrInitHandCHP(hand)[p]
@@ -2535,8 +2551,12 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     // hand's own prior retransition finished) -- (re)enter 'forward'
     // and lock in this hand's own start delay from ITS distance right
     // now, per this section's own "computed once, not live" design.
+    // frozenSplayDeg is captured the same way, for the same reason --
+    // see this section's own top note on why Responsive Wrist Splay
+    // must NOT keep recomputing live throughout a pose transition.
     chp.phase = 'forward'
     chp.forwardDelay = computeStartDelayMs(live, minLiveDist, liveDistRange, trig.startCurveParsed, trig.startRangeParsed)
+    chp.frozenSplayDeg = computeResponsiveWristSplayDeg(live, minLiveDist, liveDistRange)
   }
   if (chp.phase === 'forward') {
     const targetPose = (cfg.savedPoses || []).find((sp) => sp.name === cfg[`${p}TargetPose`])
@@ -2546,13 +2566,13 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     const progress = elapsed < chp.forwardDelay ? 0 : THREE.MathUtils.clamp((elapsed - chp.forwardDelay) / speedMs, 0, 1)
     const values = lerpPoseValues(trig.forwardSnapshot, targetPose, progress)
     chp.lastAppliedValues = values
-    applyPoseValuesToHand(hand, values, computeResponsiveWristSplayDeg(live, minLiveDist, liveDistRange))
+    applyPoseValuesToHand(hand, values, chp.frozenSplayDeg)
   } else if (chp.phase === 'retransition') {
     const elapsed = now - chp.retransitionStartTime
     const speedMs = Math.max(cfg[`${p}RetransitionSpeedMs`], 1)
     const progress = elapsed < chp.retransitionDelay ? 0 : THREE.MathUtils.clamp((elapsed - chp.retransitionDelay) / speedMs, 0, 1)
     const values = lerpPoseValues(chp.retransitionStart, poseDefaultValues, progress)
-    applyPoseValuesToHand(hand, values, computeResponsiveWristSplayDeg(live, minLiveDist, liveDistRange))
+    applyPoseValuesToHand(hand, values, chp.frozenSplayDeg)
     if (progress >= 1) chp.phase = 'idle' // fully settled at default -- stop overriding, normal cfg-driven posing (inert here since it only re-applies on slider change, not every frame) silently regains control
   }
 }
@@ -2711,7 +2731,7 @@ function parseClickPoseConfig(p) {
 function getOrInitHandCP(hand) {
   if (!hand._cp) {
     hand._cp = {}
-    CLICK_POSE_KEYS.forEach((p) => { hand._cp[p] = { phase: 'idle', triggerTime: 0, forwardSnapshot: null, forwardDelay: 0, pauseStartTime: 0, retransitionStart: null, retransitionStartTime: 0, retransitionDelay: 0, lastAppliedValues: null } })
+    CLICK_POSE_KEYS.forEach((p) => { hand._cp[p] = { phase: 'idle', triggerTime: 0, forwardSnapshot: null, forwardDelay: 0, pauseStartTime: 0, retransitionStart: null, retransitionStartTime: 0, retransitionDelay: 0, lastAppliedValues: null, frozenSplayDeg: 0 } })
   }
   return hand._cp
 }
@@ -2725,13 +2745,16 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
     const progress = elapsed < cp.forwardDelay ? 0 : THREE.MathUtils.clamp((elapsed - cp.forwardDelay) / speedMs, 0, 1)
     const values = lerpPoseValues(cp.forwardSnapshot, targetPose, progress)
     cp.lastAppliedValues = values
-    applyPoseValuesToHand(hand, values, computeResponsiveWristSplayDeg(live, minLiveDist, liveDistRange))
+    applyPoseValuesToHand(hand, values, cp.frozenSplayDeg)
     if (progress >= 1) { cp.phase = 'paused'; cp.pauseStartTime = now }
   } else if (cp.phase === 'paused') {
-    // Hold at the fully-reached target -- keep reapplying (not a no-op)
-    // so Responsive Wrist Splay's own live extraSplayDeg keeps tracking
-    // cursor distance throughout the pause, same as every other phase.
-    applyPoseValuesToHand(hand, cp.lastAppliedValues, computeResponsiveWristSplayDeg(live, minLiveDist, liveDistRange))
+    // Hold at the fully-reached target -- keep reapplying (not a no-op,
+    // since other config-driven state can still change during a hold).
+    // CORRECTED 2026-09-14: now reapplies the frozen splay captured at
+    // trigger time, not a live recompute -- see updateClickHoldPoseForHand()'s
+    // own top comment for why Responsive Wrist Splay must not keep
+    // recalculating throughout an explicit pose transition.
+    applyPoseValuesToHand(hand, cp.lastAppliedValues, cp.frozenSplayDeg)
     const pauseDurationMs = Math.max(cfg[`${p}PauseDurationMs`], 0)
     if (now - cp.pauseStartTime >= pauseDurationMs) {
       cp.phase = 'retransition'
@@ -2746,7 +2769,7 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
     const speedMs = Math.max(cfg[`${p}RetransitionSpeedMs`], 1)
     const progress = elapsed < cp.retransitionDelay ? 0 : THREE.MathUtils.clamp((elapsed - cp.retransitionDelay) / speedMs, 0, 1)
     const values = lerpPoseValues(cp.retransitionStart, poseDefaultValues, progress)
-    applyPoseValuesToHand(hand, values, computeResponsiveWristSplayDeg(live, minLiveDist, liveDistRange))
+    applyPoseValuesToHand(hand, values, cp.frozenSplayDeg)
     if (progress >= 1) cp.phase = 'idle'
   }
 }
@@ -2778,6 +2801,11 @@ function triggerClickPose(p) {
     cp.triggerTime = now
     cp.forwardSnapshot = forwardSnapshot
     cp.forwardDelay = computeStartDelayMs(dists[i], minD, range, trig.startCurveParsed, trig.startRangeParsed)
+    // Frozen for this hand's entire sequence (forward/paused/
+    // retransition) -- see updateClickHoldPoseForHand()'s own top
+    // comment for why Responsive Wrist Splay must not keep recomputing
+    // live throughout an explicit pose transition.
+    cp.frozenSplayDeg = computeResponsiveWristSplayDeg(dists[i], minD, range)
   })
 }
 // Click vs. double-click disambiguation: a genuine double-click's 2
