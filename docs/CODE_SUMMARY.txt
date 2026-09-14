@@ -1038,6 +1038,28 @@ GOTCHAS
   mathematically sound and that the slider's two extremes genuinely
   correspond to "new/correct" (0) and "old/wrong" (+-180), not just
   self-consistent nonsense.
+
+  **CORRECTED 2026-09-14, same day: the roll AXIS itself was wrong.**
+  Direct follow-up ("The palm face thing isnt rotating correctly...
+  the rotation axis should be perpendicular to the wrist cropping
+  plane"). Local -Z (i.e. `pointDir`, wrist-to-fingertip) was a guess
+  made without an explicit axis spec at the time -- the real spec is
+  the WRIST CROP PLANE's own normal (forearm-to-wrist), the exact same
+  direction `updateWristClipPlaneForHand()` already computes per-hand
+  for the Arm Length crop, NOT the pointDir/alignQuat axis. Added
+  `wristCropNormalAligned` (measured once at load, `rForearmBend` ->
+  `rHand`, same raw bind-pose frame as `pointDir`), and
+  `computePalmFaceCorrectionQuat()` now rolls around this instead.
+  Confirmed this is a REAL fix, not a no-op: measured both directions
+  live and found they differ by 28.35 degrees in this rig's actual
+  bind pose (forearm-to-wrist isn't perfectly collinear with
+  wrist-to-fingertip -- a genuine rig quirk). Also confirmed the new
+  axis sits ~90.5 degrees from the palm normal (essentially
+  perpendicular), which is what makes the slider sweep through a
+  proper full range rather than a lopsided one. Offset=0 is unchanged
+  by construction (a zero-angle rotation is the identity regardless of
+  axis), so the prior round's already-fixed default orientation is
+  untouched by this change.
 - **Ported the built-in "Dev Panel" chrome-styling group's expansion from
   `TEMPLATE_DEV_PANEL.html`, scoped to "just the chrome group"** per
   direct request when asked how much of the template's own growth (also:

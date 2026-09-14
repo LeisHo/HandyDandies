@@ -2046,6 +2046,44 @@ console errors in the final fresh-tab check.
 Cache-buster bump: index.html's own main.js?v=37 -> ?v=38.
 
 --------------------------------------------------------------------------------
+2026-09-14  -  ~04:54 AM - 04:58 AM EDT (bounded by checkpoints; see Verified note)
+
+Fixed Palm Face Rotation slider's roll axis -- direct follow-up: "The
+palm face thing isnt rotating correctly. I guess i didnt specify th
+rotation axis. So The rotation axis should be perpendicular to the wrist
+cropping plane... So the rotation should be parallel to the crop plane."
+The slider's roll axis had been a guess (local -Z, i.e. `pointDir`/
+wrist-to-fingertip -- the same axis `alignQuat` itself is built from),
+made without an explicit spec at the time. The real spec is the WRIST
+CROP PLANE's own normal -- the exact forearm-to-wrist direction
+`updateWristClipPlaneForHand()` already computes per-hand, per-frame,
+for the Arm Length crop (`rForearmBend` -> `rHand`), NOT the
+wrist-to-fingertip axis. Added `wristCropNormalAligned`, measured once
+at model load in the same raw bind-pose frame as `pointDir`/
+`palmNormalAligned`, and `computePalmFaceCorrectionQuat()` now rolls
+around this axis instead.
+
+Confirmed this is a real, substantive fix and not a no-op: measured
+`pointDir` and the crop-plane normal directly on a live hand (in the
+same reconstructed raw frame used for the prior round's verification)
+and found they differ by 28.35 degrees in this rig's actual bind pose --
+a genuine rig quirk (the forearm-to-wrist segment isn't perfectly
+collinear with wrist-to-fingertip), not a rounding artifact. Also
+confirmed the new axis is ~90.5 degrees from the palm normal (i.e.
+essentially perpendicular), which is what makes the slider sweep the
+aimed direction through a proper, non-degenerate full range rather than
+a lopsided one. Offset=0 behavior is unchanged by construction (a
+zero-angle rotation is the identity regardless of which axis it's around),
+so the already-fixed default palm-facing orientation from the prior
+round is untouched.
+
+Verified live: fresh load, 510/510 hands, toggling the checkbox through
+several slider values (45, 180) for ~100ms each with tracking running
+produced no errors; zero console errors in the final check.
+
+Cache-buster bump: index.html's own main.js?v=38 -> ?v=39.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

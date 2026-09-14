@@ -209,6 +209,11 @@ still relevant to understanding current state, per this doc's own
   off. Verified with a real independent cross-check (not a tautological
   one) that the slider's 180-degree end reproduces the exact old
   (pre-fix) rotation.
+  **Same-day 2nd follow-on: fixed the slider's own roll axis** -- it was
+  wrist-to-fingertip (a guess), but the real spec is the wrist crop
+  plane's normal (forearm-to-wrist, same direction the Arm Length crop
+  already uses). Confirmed a real fix (not a no-op): the two directions
+  differ by 28.35 degrees in this rig's bind pose.
 - **Ported the built-in "Dev Panel" chrome-styling group's expansion
   from `TEMPLATE_DEV_PANEL.html`, scoped to "just the chrome group"**
   (the user's own choice when asked how much of the template's growth to
