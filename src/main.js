@@ -25,18 +25,29 @@ let alignQuat = new THREE.Quaternion()
 // `palmFaceRotationOffset` slider (CLAUDE.md 12n) instead of being a
 // fixed constant baked in once.
 let palmNormalAligned = null
+// CORRECTED 2026-09-14, direct follow-up ("I guess i didnt specify the
+// rotation axis... the rotation axis should be perpendicular to the
+// wrist cropping plane... The rotation axes doesnt change and isnt
+// responsive to the cursor"): the slider's roll axis was local -Z
+// (pointDir/wrist-to-fingertip), a guess made without being told what
+// axis was actually wanted. The real spec is the WRIST CROP PLANE's own
+// normal -- the exact same forearm-to-wrist direction
+// `updateWristClipPlaneForHand()` already computes per-hand, per-frame,
+// for the Arm Length crop (`rForearmBend` -> `rHand`) -- NOT the
+// wrist-to-fingertip axis pointDir/alignQuat use. `wristCropNormalAligned`
+// measures this once at load, in the SAME raw bind-pose frame as
+// pointDir, then aligns it the same way. A fixed axis, measured once
+// (matching "doesn't change" -- this is a stable hand-local reference,
+// not recomputed from the live cursor position); it travels WITH the
+// hand's own cursor-tracking rotation only because it's composed INSIDE
+// the correction quaternion, which the outer per-frame lookAt then
+// carries toward the cursor, same composition order as before.
+let wristCropNormalAligned = null
 function computePalmFaceCorrectionQuat() {
   if (!palmNormalAligned) return null
-  // Rotates the calibrated palm normal around the hand's OWN pointing
-  // axis (local -Z in this aligned frame, the same axis pointDir itself
-  // sits on) before aiming it at the cursor -- perpendicular-ish to the
-  // palm normal for a roughly-flat hand, so sweeping this angle moves the
-  // aimed direction continuously from the palm (0 degrees) through
-  // edge-on (+-90) to the exact opposite, the back of the hand (+-180),
-  // rather than an axis that would leave the normal (and so the visual
-  // result) unchanged.
+  const axis = wristCropNormalAligned || new THREE.Vector3(0, 0, -1)
   const offsetRad = THREE.MathUtils.degToRad(cfg.palmFaceRotationOffset || 0)
-  const rollQuat = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, -1), offsetRad)
+  const rollQuat = new THREE.Quaternion().setFromAxisAngle(axis, offsetRad)
   const rotatedNormal = palmNormalAligned.clone().applyQuaternion(rollQuat)
   return new THREE.Quaternion().setFromUnitVectors(rotatedNormal, new THREE.Vector3(0, 0, -1))
 }
@@ -1920,6 +1931,19 @@ new GLTFLoader().load(
       const pinkyVec = pinkyBasePos.clone().sub(wristPos)
       const palmNormalRaw = indexVec.clone().cross(pinkyVec).normalize()
       palmNormalAligned = palmNormalRaw.clone().applyQuaternion(alignQuat)
+    }
+
+    // Palm Face Rotation slider's own roll axis -- the wrist crop plane's
+    // normal (forearm->wrist), NOT pointDir (wrist->fingertip); same bone
+    // pair updateWristClipPlaneForHand() uses per-frame for the Arm Length
+    // crop, measured here once in the same raw bind-pose frame as
+    // pointDir/palmNormalRaw above.
+    const forearmBaseBone = skinned.skeleton.getBoneByName('rForearmBend')
+    if (forearmBaseBone) {
+      const forearmBasePos = new THREE.Vector3()
+      forearmBaseBone.getWorldPosition(forearmBasePos)
+      const wristCropNormalRaw = wristPos.clone().sub(forearmBasePos).normalize()
+      wristCropNormalAligned = wristCropNormalRaw.clone().applyQuaternion(alignQuat)
     }
 
     // Real mesh bounding sphere (see its own declaration comment) --
