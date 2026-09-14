@@ -2693,6 +2693,82 @@ intermediate bumps during the before/after live-comparison test above;
 `?v=62` is the final, verified, pushed value).
 
 --------------------------------------------------------------------------------
+2026-09-14  -  08:19:47 AM - 08:32:10 AM EDT (measured, this entry's own start/finish -- includes an interleaved re-investigation of a separate user bug report, logged as its own entry above)
+
+**Re-investigated the retransition-thumb bug report once more first** (a
+NEW, more specific report arrived mid-round: "the thumb error is still
+an issue... Startup pose is correct while the retransitioned pose is
+incorrect even though they should be exactly the same"). Added
+`poseDefaultValues`/`setSelectedPoseAsDefault`/`getSelectedSavedPoseItem`
+to `window.__debug` (none were exposed before) and ran the most
+realistic test possible: injected a fake selected list-picker row, called
+the REAL `setSelectedPoseAsDefault()` button logic, persisted it through
+a genuine page reload, then ran a real Click-Hold-Pose trigger/release
+cycle varying all 5 thumb-specific keys plus wrist bend/splay together --
+0.0 degree delta between true startup and post-retransition pose, same
+as every earlier test. User confirmed a hard refresh didn't change the
+symptom, ruling out stale cache; per the user's own choice, this was set
+aside (not resolved) to proceed with the new feature below -- still an
+open item, see PROJECT_PROGRESS.md's "What's next".
+
+**Added "Click Pose" / "Double-Click Pose"** -- 2 new dev-panel groups,
+a fire-and-forget variant of Click Hold-Pose (direct follow-up request).
+Unlike Click Hold-Pose (hold to transition, release to retransition), a
+single click or double-click starts every hand's own FULL sequence at
+once: transition to target, PAUSE at the target for a configurable
+duration (new "Pause Duration At Target (Ms)" slider -- a single flat
+value, not a curve+range pair, per the request's own "*D* pause
+duration*"), then retransition back to default -- the whole sequence
+then runs to completion per-hand regardless of what the mouse does
+afterward. Direct requirement, implemented literally: "Retransition
+start time of a single [hand] does not consider whether every hand has
+completed their transition. It is independent to that hand specifically"
+-- each hand's own pause-end and retransition-stagger are computed from
+THAT hand's own live cursor distance at the moment IT specifically
+finishes its own pause, never from a shared/global snapshot. Both
+triggers sit on the LEFT mouse button, distinguished from each other by
+click COUNT (not left/right button the way Click Hold-Pose's own 2
+groups are) -- reuses the Mouse Tracking Log's own existing
+`MOUSE_LOG_MULTICLICK_MS` (350ms) debounce window for click-vs-double-
+click disambiguation, rather than inventing a new threshold. Reuses
+every existing piece of Click-Hold-Pose's own machinery directly
+(`computeStartDelayMs`, `lerpPoseValues`, `applyPoseValuesToHand`,
+`poseDefaultValues`) -- the only genuinely new code is the 3-phase
+(forward -> paused -> retransition, one more phase than Click Hold-
+Pose's own forward/retransition pair) per-hand state machine and the
+click-count trigger detection.
+
+**Also disabled OrbitControls' own Pan while a Click-Hold-Pose trigger
+is active** (direct request: "moving the cursor should not trigger any
+panning [during a hold]... it should continue holding the held state").
+This project's OrbitControls config maps BOTH left and right mouse
+buttons to Pan -- the exact same buttons Click Hold-Pose's own
+pointerdown/pointerup listeners use, so a hold-and-drag was panning the
+camera underneath the pose transition. `controls.enablePan` now toggles
+false on `startClickHoldPose()`, restored true on `endClickHoldPose()`
+only once NEITHER trigger (chp/rchp) is still active. Confirmed, by
+reading `animate()`'s own code (not assumed), that cursor-tracking
+rotation (`hand.wrapper.quaternion`) is a fully separate per-frame step
+that never went through OrbitControls to begin with -- it already keeps
+following the cursor throughout ANY pose-transition state, including
+mid-transition, matching the request's own follow-up clarification
+("even a hand in mid transition should continue to rotate to follow the
+cursor") with zero code change needed for that specific part.
+
+Live-verified: the full forward->paused->retransition->idle phase
+sequence, with the target pose's own real values genuinely applied at
+each stage (not just a flag flip); click vs. double-click correctly
+disambiguated (2 rapid clicks enter only the dblclick phase, click stays
+idle); Pan correctly disabled during a hold and restored on release. All
+4 new curve/range widgets and the Pause Duration slider confirmed
+constructed (SVG/slider elements present in each row). Zero new console
+errors, 510/510 hands still rendering.
+
+Cache-buster bumps: `index.html`'s own `main.js?v=62` -> `?v=64` (`?v=63`
+was the debug-exposure-only intermediate step for the re-investigation
+above).
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

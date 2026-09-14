@@ -18,12 +18,16 @@ work seamlessly from there.
 
 ## Currently working on
 
-Nothing in progress. A real thumb-posing bug (wrist applied after
-fingers instead of before, found by direct comparison against HANDO —
-same rig, same already-fixed bug there) was just found and fixed, with
-a genuine quantitative before/after measurement (33.0deg error -> 0.0deg).
-The Pose "Default" button relocation and the 700ms speed-slider cap from
-the round before that are still unverified live — see "What's next".
+Nothing actively in progress. Shipped "Click Pose"/"Double-Click Pose"
+(a fire-and-forget variant of Click Hold-Pose: click once, the whole
+transition-pause-retransition sequence runs per-hand on its own) and
+disabled camera pan during an active Click-Hold-Pose trigger. **Still
+open: the user reports the Click-Hold-Pose retransitioned thumb pose is
+wrong even after a hard refresh, but this has NOT been reproduced** —
+every test this session (including the most realistic one yet: the real
+Default-button flow, persisted through an actual page reload, varying
+all 5 thumb keys + wrist bend/splay) measures exactly 0.0deg error. See
+"What's next" for what a future session should try.
 
 ## Recently completed
 
@@ -386,22 +390,52 @@ still relevant to understanding current state, per this doc's own
   temporarily reverting and re-measuring the 33.0deg number before
   restoring the fix. See CODE_SUMMARY.txt's GOTCHAS and CHANGELOG.txt
   for the full account.
+- **"Click Pose" / "Double-Click Pose"** — fire-and-forget variant of
+  Click Hold-Pose (direct follow-up request). A single click or double-
+  click (left button, disambiguated by click count via the Mouse
+  Tracking Log's own 350ms debounce window) starts every hand's own full
+  sequence at once: transition to target → pause at the target for a
+  configurable duration (new Pause Duration slider) → retransition back
+  to default — runs to completion per-hand with no further mouse
+  involvement needed. Each hand's own pause-end/retransition timing is
+  computed from THAT hand's own live cursor distance at the moment it
+  specifically finishes its pause, never gated on any other hand's
+  progress, per direct requirement. Reuses Click Hold-Pose's own
+  machinery directly (only new code: the 3-phase per-hand state machine
+  and click-count trigger detection). Also disabled OrbitControls' own
+  Pan while a Click-Hold-Pose trigger is active (direct request) —
+  confirmed cursor-tracking rotation was already unaffected by any
+  pose-transition state (a fully separate per-frame step), so nothing
+  needed to change there. Live-verified: full phase sequence with real
+  target values applied at each stage, correct click/double-click
+  disambiguation, pan correctly toggling. See CODE_SUMMARY.txt and
+  CHANGELOG.txt for the full account.
 
 ## What's next
 
-**Needs a real live check next time this file is touched (not flagged
-for the user's input — deferred, not decided, per "dont verify just fix
-ad push"):** the Pose "Default" button relocation/redefinition and the
-700ms speed-slider cap were implemented and reasoned through statically
-(matching devPanel.js's own already-verified `row.__item`/
-`.dp-list-picker-row-selected` conventions and `syncValue()`'s documented
-semantics) but never actually clicked in a browser. Specifically worth
-checking: does the button visually land in the right spot in the Saved
-Poses button row; does clicking it with a pose selected genuinely persist
-(reload the page and confirm the Pose sliders come back at the new
-values, not the old code defaults); does a Click-Hold-Pose retransition
-after clicking "Default" animate toward the newly-set pose rather than
-the old code default.
+**HIGH PRIORITY, UNRESOLVED — needs the user's own saved-pose data to
+make further progress:** the user reports the Click-Hold-Pose
+retransitioned thumb pose is still wrong, confirmed persisting after a
+hard refresh (ruling out stale cache). This session could NOT reproduce
+it despite the most realistic test constructed (the real
+`setSelectedPoseAsDefault()` button flow, persisted through a genuine
+page reload, then a real Click-Hold-Pose trigger/release cycle, varying
+all 5 thumb-specific keys plus wrist bend/splay together — every trial
+measured exactly 0.0 degrees of error). `window.__debug` now exposes
+`poseDefaultValues`/`setSelectedPoseAsDefault`/`getSelectedSavedPoseItem`
+to support this. Next step: get the user's own actual saved-pose JSON
+(via Copy Settings) and their exact repro steps (which saved pose, which
+trigger — chp/rchp/click/dblclick, whether Responsive Wrist Splay is
+also active) rather than guessing at more synthetic test scenarios —
+the discrepancy is real to them and not yet explained by anything this
+session could construct.
+
+**Click Pose / Double-Click Pose's own real mouse feel** — verified via
+synthetic `pointerup` event dispatch (correct phase sequence, correct
+click-count disambiguation, correct target values applied), not an
+actual mouse click in the browser. Worth a real click/double-click check
+on live hardware, same caveat as Click Hold-Pose's own equivalent item
+elsewhere in this file.
 
 **Unresolved (needs a real debugging pass, not flagged for the user's
 input — this one's on Claude):** `refreshSelectOptions('rchpTargetPose')`

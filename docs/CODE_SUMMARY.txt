@@ -1707,3 +1707,96 @@ GOTCHAS
   explanation for a 0-degree result), then re-applied the fix and reran
   the identical test: exactly 0.0 degrees. See CHANGELOG.txt's own entry
   for the full before/after account.
+- **UNRESOLVED, STILL OPEN (a real, unreproduced discrepancy):** despite
+  the wrist-before-fingers fix directly above measuring 0.0 degrees of
+  error in every test run so far -- including, in a later round, the
+  most realistic test constructed yet (the REAL `setSelectedPoseAsDefault()`
+  button logic, persisted through a genuine page reload, then a real
+  Click-Hold-Pose trigger/release cycle, varying all 5 thumb keys plus
+  wrist bend/splay together) -- the user reports the retransitioned pose
+  still shows the wrong thumb, and confirmed this persists after a hard
+  refresh (ruling out stale cache as the explanation). `window.__debug`
+  now exposes `poseDefaultValues`/`setSelectedPoseAsDefault`/
+  `getSelectedSavedPoseItem` (previously none were reachable from
+  outside the module) specifically to support further investigation.
+  Whatever is actually wrong in the user's own session has not yet been
+  reproduced in this environment -- see PROJECT_PROGRESS.md's "What's
+  next" for the open follow-up; do not assume the wrist-order fix itself
+  is defective without new evidence, since it has now been verified
+  correct across many independent, realistic trials.
+- **New: "Click Pose" / "Double-Click Pose"** -- a fire-and-forget
+  variant of Click Hold-Pose (direct follow-up request). Where Click
+  Hold-Pose requires holding the mouse down (forward while held, retransition
+  on release), this variant fires its ENTIRE sequence from a single
+  click/double-click: transition to target -> PAUSE at the target for a
+  configurable duration (`${p}PauseDurationMs`, a single flat slider, not
+  a curve+range pair) -> retransition back to default -- then runs to
+  completion per-hand with no further mouse involvement. Built via
+  `makeClickPoseGroup(p, title)` (near `makeClickHoldPoseGroup`, same
+  control shape plus the one new Pause Duration slider) and a parallel,
+  independent state machine: `CLICK_POSE_KEYS`, `clickPoseTriggers`,
+  `parseClickPoseConfig`, `getOrInitHandCP` (separate per-hand namespace,
+  `hand._cp`, NOT `hand._chp` -- the 2 feature families track fully
+  separate state and can be enabled independently without colliding),
+  `updateClickPoseForHand` (the 3-phase forward/paused/retransition
+  sequence, one more phase than Click Hold-Pose's own forward/
+  retransition pair), `triggerClickPose` (fires every hand's own full
+  sequence synchronously at click time, computing each hand's own
+  forward delay immediately from a single combined distance snapshot --
+  there's no later "release" event to wait for the way Click Hold-Pose
+  has, so nothing is deferred to next-frame the way its own lazy
+  per-hand forward-delay computation is).
+
+  **Direct, literal implementation of "Retransition start time of a
+  single [hand] does not consider whether every hand has completed their
+  transition. It is independent to that hand specifically":** each
+  hand's own pause-end -> retransition-delay computation
+  (`computeStartDelayMs(live, minLiveDist, liveDistRange, ...)` inside
+  `updateClickPoseForHand`'s own 'paused' branch) uses THAT frame's live
+  distance for THAT hand specifically, evaluated at the exact moment
+  THAT hand's own pause timer elapses -- never a shared snapshot taken
+  once for every hand (contrast with `endClickHoldPose()`, which takes
+  ONE combined min/max distance snapshot for all hands at a single
+  release instant, since Click Hold-Pose genuinely does have one shared
+  release event to anchor to; Click Pose has no equivalent moment per
+  hand, so per-hand-live is the correct analogue, not a shortcut).
+
+  **Click vs. double-click disambiguation** reuses the Mouse Tracking
+  Log's own existing `MOUSE_LOG_MULTICLICK_MS` (350ms) debounce constant
+  rather than inventing a new threshold -- a `pointerup` listener on the
+  LEFT button only (Click Hold-Pose's own right-click instance is
+  unaffected) increments a counter and resets a timer on every click;
+  when the timer finally fires with no further click having arrived, the
+  accumulated count decides `triggerClickPose('click')` vs. `('dblclick')`.
+  Both triggers deliberately share the LEFT button (not a left/right
+  split like Click Hold-Pose's own 2 groups) since click-count, not
+  button, is the axis this feature varies on.
+
+  Deliberately NOT engineered for mutual exclusivity with Click Hold-Pose
+  even though both can trigger from the same left-click gesture in
+  principle (a plain click also fires as a `pointerup` Click Hold-Pose
+  itself reacts to) -- each of the 4 groups (chp/rchp/click/dblclick) has
+  its own independent Enabled checkbox, default off, and the practical
+  expectation is the user enables only the ONE mechanism they want active
+  at a time; if 2 happen to be enabled simultaneously and both claim the
+  same hand's pose in the same frame, whichever runs later in
+  `updateRenderOrder()`'s own per-hand loop wins that frame's write --
+  the same disclosed simplification Click Hold-Pose's own chp/rchp
+  conflict case already uses.
+
+- **New: OrbitControls' own Pan disables during an active Click-Hold-Pose
+  trigger.** Direct request: dragging the mouse during a hold was also
+  panning the camera (this project's OrbitControls config maps BOTH
+  left and right buttons to Pan -- `controls.mouseButtons = { LEFT:
+  THREE.MOUSE.PAN, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.PAN }`,
+  the exact same buttons Click Hold-Pose's own pointerdown/pointerup
+  listeners already use). `controls.enablePan` is set `false` at the top
+  of `startClickHoldPose()`, restored `true` in `endClickHoldPose()` only
+  once NEITHER `chp` nor `rchp` is still active (so releasing one button
+  while the other is still held doesn't prematurely re-enable panning).
+  Confirmed by reading `animate()`'s own code that cursor-tracking
+  rotation (`hand.wrapper.quaternion.slerp(...)`, lines ~2950-2967) is
+  a fully separate, unconditional per-frame step that never went through
+  OrbitControls at all -- it already continues following the cursor
+  through any pose-transition state, including mid-transition, with zero
+  code change needed for that half of the request.
