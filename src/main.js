@@ -182,6 +182,12 @@ const hands = [] // { wrapper: Group, clone: Object3D, skinnedMesh: SkinnedMesh|
 const sceneState = { fieldRadius: 10 }
 
 const UP = new THREE.Vector3(0, 1, 0)
+// Permanently fixed at z=0 (the hands' own field-layout plane) -- used
+// ONLY to derive cursorTarget's X/Y ("the true cursor xy," direct user
+// request), never mutated again after construction. See
+// updateCursorTarget()'s own comment for why X/Y and Z (the latter
+// driven by targetDepthFactor) are computed independently now, and why
+// this no longer needs an updateTargetPlane()-style refresh function.
 const targetPlane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0)
 const cursorTarget = new THREE.Vector3(0, 0, 0)
 const rendererSizeCheck = new THREE.Vector2()
@@ -217,7 +223,11 @@ const DEV_GROUPS = [
     controls: [
       { key: 'trackingEnabled', label: 'Tracking Enabled', type: 'checkbox', def: true },
       { key: 'trackingDamping', label: 'Look-At Damping (x)', type: 'slider', min: 0.02, max: 1, step: 0.01, def: 0.07 },
-      { key: 'targetDepthFactor', label: 'Cursor Target Depth (x Field Radius)', type: 'slider', min: -2, max: 2, step: 0.05, def: 0.6, onChange: updateTargetPlane },
+      // No onChange needed -- updateCursorTarget() (called every frame)
+      // reads cfg.targetDepthFactor live when it sets cursorTarget.z, so
+      // there's no cached per-depth state to refresh on a slider change
+      // anymore (see that function's own 2026-09-14 correction comment).
+      { key: 'targetDepthFactor', label: 'Cursor Target Depth (x Field Radius)', type: 'slider', min: -2, max: 2, step: 0.05, def: 0.6 },
       { key: 'showTargetMarker', label: 'Show Target Marker', type: 'checkbox', def: true, onChange: (v) => { if (targetMarker) targetMarker.visible = v } },
       // REDEFINED 2026-09-14 (see computeRadialRollDeg()'s own comment
       // for the full account and the user's own exact reference points):
@@ -737,10 +747,6 @@ const targetMarker = new THREE.Mesh(new THREE.SphereGeometry(1, 12, 12), new THR
 targetMarker.visible = cfg.showTargetMarker
 scene.add(targetMarker)
 
-function updateTargetPlane() {
-  targetPlane.set(new THREE.Vector3(0, 0, 1), -sceneState.fieldRadius * cfg.targetDepthFactor)
-}
-
 // -----------------------------------------------------------------------
 // Cursor -> world target
 // -----------------------------------------------------------------------
@@ -964,10 +970,37 @@ function setupSettingsChangeLog() {
   panel.addEventListener('change', handler)
 }
 
+// CORRECTED 2026-09-14 (direct user request, after a live explanation of
+// the previous behavior with real numbers): "i want the xy position to
+// be set directly perpendicular to the camera plane, not some parallax
+// thing. The cursor target depth should still be what i set it as, but
+// the xy should match the true cursor xy." The OLD behavior raycast
+// straight to a plane already sitting AT the configured depth
+// (targetDepthFactor * fieldRadius) -- since that plane sits CLOSER to
+// the camera than the hands' own z=0 plane, the ray's own perspective
+// spread meant the hit point's X/Y came out SMALLER in magnitude than
+// "where the cursor really is" at the hands' own depth (confirmed live:
+// a corner hand at world x=-166.8 ended up needing to face RIGHTWARD
+// because the depth-shifted target's own x=-50.4 was numerically to its
+// right, even though the cursor was clearly further left on screen).
+// Fixed by decoupling the 2 axes entirely: X/Y now always come from
+// `targetPlane` fixed at z=0 (the hands' own plane, "perpendicular to
+// the camera" in the sense of matching the camera's own straight-on
+// projection with no depth-driven scaling) -- genuinely the "true
+// cursor xy," invariant to targetDepthFactor. Z is set directly from
+// the configured depth as a plain scalar, with no raycast/plane
+// intersection needed for it at all (a depth offset isn't a
+// geometrically "hit" point, just a chosen distance along the shared Z
+// axis) -- `targetDepthFactor` still fully controls the visual/pointing
+// depth exactly as before, just no longer entangled with X/Y.
 function updateCursorTarget() {
   raycaster.setFromCamera(cursorNDC, camera)
   const hit = new THREE.Vector3()
-  if (raycaster.ray.intersectPlane(targetPlane, hit)) cursorTarget.copy(hit)
+  if (raycaster.ray.intersectPlane(targetPlane, hit)) {
+    cursorTarget.x = hit.x
+    cursorTarget.y = hit.y
+  }
+  cursorTarget.z = sceneState.fieldRadius * cfg.targetDepthFactor
   targetMarker.position.copy(cursorTarget)
 }
 
@@ -3184,7 +3217,6 @@ function rebuildField() {
     const w = (cfg.fieldCols - 1) * cfg.columnSpacing
     const h = (cfg.fieldRows - 1) * cfg.rowSpacing
     sceneState.fieldRadius = Math.max(Math.sqrt(w * w + h * h) / 2, Math.min(cfg.rowSpacing, cfg.columnSpacing))
-    updateTargetPlane()
     updateKeyLightPosition()
   }
 }
