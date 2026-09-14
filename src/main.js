@@ -124,6 +124,14 @@ const forearmPosRaw = new THREE.Vector3()
 let armLengthRangeParsed = { min: 30, max: 90 }
 let armLengthCurveParsed = [{ x: 0, y: 1 }, { x: 1, y: 0 }]
 const armLengthWidgetResyncs = []
+// Responsive Wrist Splay's own cached/parsed state -- same TDZ reasoning
+// as armLengthRangeParsed/armLengthCurveParsed directly above (declared
+// here, read by parseWristSplayConfig()/computeResponsiveWristSplayDeg()
+// further down). Reuses `armLengthWidgetResyncs` (the SAME per-frame
+// resync-poll array, not a second one) since both widget pairs need the
+// identical "external change" detection.
+let wristSplayRangeParsed = { min: 0, max: -90 }
+let wristSplayCurveParsed = [{ x: 0, y: 1 }, { x: 1, y: 0 }]
 // Mouse Tracking Log's own state (see its own section further down) --
 // declared here for the same TDZ-avoidance reason as the arm-length vars
 // directly above: the `pointermove`/`pointerdown` listeners that write to
@@ -334,6 +342,47 @@ const DEV_GROUPS = [
     ]
   },
   {
+    // New feature, direct request: "Wrist will Splay in response to
+    // distance from cursor. Provide similar settings as the Wrist Crop/
+    // arm Length group." A SEPARATE, top-level group rather than nested
+    // inside Pose -- unlike Arm Length (which IS inside Pose, since it
+    // shares that group's own "reactive staging, not a saved-pose value"
+    // framing), this sits on its own per the request's own naming.
+    // Mirrors Arm Length's exact structure (master on/off, a Default
+    // value used when Reactive is off, a Reactive toggle, a Min/Max
+    // range widget, a Distance->Value scaling curve widget) -- same
+    // shape, different unit (degrees, not crop percent) and a DIFFERENT
+    // underlying application: this ADDS an extra per-hand rotateZ onto
+    // whatever the Pose group's own shared `wristSplay` slider already
+    // contributes (see applyWristPoseToSkeleton()'s own extraSplayDeg
+    // param), rather than driving a position/crop transform the way Arm
+    // Length does -- computeResponsiveWristSplayDeg()'s own comment has
+    // the full math, reusing evaluateArmLengthCurve() (already fully
+    // generic -- distance-in, curve-value-out, nothing Arm-Length-
+    // specific about it despite the name) and the SAME per-frame live
+    // cursor-distance values Arm Length already computes in
+    // updateRenderOrder(), not a second distance calculation.
+    //
+    // Default range (min:0, max:-90) is intentionally NOT numerically
+    // ordered (0 > -90) -- "min"/"max" here name which ENDPOINT applies
+    // at which end of the distance curve (min = farthest hand, max =
+    // nearest, matching Arm Length's own min/max roles exactly), not a
+    // numeric ordering constraint on the 2 values themselves; the
+    // underlying lerp (`min + (max-min)*curveY`) works correctly
+    // regardless of which endpoint is numerically larger. The range
+    // widget itself (buildWristSplayRangeWidget()) doesn't cross-clamp
+    // its 2 handles against each other the way Arm Length's own range
+    // widget does, for the same reason.
+    title: 'Responsive Wrist Splay',
+    controls: [
+      { key: 'wristSplayResponsiveEnabled', label: 'Responsive Wrist Splay (Master On/Off)', type: 'checkbox', def: false },
+      { key: 'wristSplayDefault', label: 'Default Wrist Splay (Deg, Reactive Off)', type: 'slider', min: -180, max: 180, step: 1, def: 0 },
+      { key: 'wristSplayReactiveEnabled', label: 'Reactive Wrist Splay (By Cursor Distance)', type: 'checkbox', def: false },
+      { key: 'wristSplayRange', label: 'Min / Max Wrist Splay (Deg)', type: 'text', def: '{"min":0,"max":-90}', onChange: () => parseWristSplayConfig() },
+      { key: 'wristSplayCurve', label: 'Splay Scaling Curve (Distance -> Splay)', type: 'text', def: '[{"x":0,"y":1},{"x":1,"y":0}]', onChange: () => parseWristSplayConfig() }
+    ]
+  },
+  {
     // Direct user request: "provide me a collapsible pose viewer within
     // the dev panel itself" -- deliberately 0 controls here. buildPosePreview()
     // (below, called once the model loads) injects its own <canvas> +
@@ -496,6 +545,8 @@ onChangeByCtrl.forEach((fn, c) => { c.onChange = fn })
 // (now-hidden) generic text input.
 parseArmLengthConfig()
 buildArmLengthWidgets()
+parseWristSplayConfig()
+buildWristSplayWidgets()
 buildMouseTrackingLogWidget()
 restartCursorLogTimer()
 setupSettingsChangeLog()
@@ -1190,13 +1241,21 @@ function applyCurl(fingerName) {
   scene.updateMatrixWorld(true)
   hands.forEach((hand) => { if (hand.skinnedMesh) applyCurlToSkeleton(fingerName, hand.skinnedMesh.skeleton, cloneBaseQuat, hand.wrapper.quaternion) })
 }
-function applyWristPoseToSkeleton(skeleton, values = cfg) {
+// `extraSplayDeg` (default 0, so every pre-existing call site is
+// unaffected) is Responsive Wrist Splay's own PER-HAND contribution,
+// added directly onto the shared `values.wristSplay` -- see
+// computeResponsiveWristSplayDeg()'s own comment. Kept as one combined
+// rotateZ() call, not 2 separate ones, so the 2 contributions compose as
+// a single rotation rather than 2 stacked ones (equivalent here since
+// both are Z-axis, but keeps the intent -- "one splay angle, from 2
+// sources" -- explicit in the math itself).
+function applyWristPoseToSkeleton(skeleton, values = cfg, extraSplayDeg = 0) {
   const bone = skeleton.getBoneByName('rHand')
   const rest = boneRestQuat.rHand
   if (!bone || !rest) return
   bone.quaternion.copy(rest)
   bone.rotateX(THREE.MathUtils.degToRad(values.wristBend))
-  bone.rotateZ(THREE.MathUtils.degToRad(values.wristSplay))
+  bone.rotateZ(THREE.MathUtils.degToRad(values.wristSplay + extraSplayDeg))
 }
 function applyWristPose() {
   if (!modelLoaded) return
@@ -1477,6 +1536,27 @@ function computeArmLengthT(hand, distanceToCursor, minLiveDist, liveDistRange) {
   const minT = armLengthRangeParsed.min / 100, maxT = armLengthRangeParsed.max / 100
   return minT + (maxT - minT) * curveY
 }
+function parseWristSplayConfig() {
+  try { wristSplayRangeParsed = JSON.parse(cfg.wristSplayRange) } catch (e) { /* keep last-good value */ }
+  try { wristSplayCurveParsed = JSON.parse(cfg.wristSplayCurve).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
+}
+// Returns the EXTRA wrist-splay rotation (degrees) this hand should get
+// on top of the Pose group's own shared `cfg.wristSplay` -- 0 when the
+// master switch is off, `wristSplayDefault` (a single shared value) when
+// Reactive is off, otherwise a live per-hand value from the same
+// distance-curve-range pipeline Arm Length uses (evaluateArmLengthCurve()
+// is fully generic despite its name -- reused directly, not duplicated).
+// `min`/`max` are lerp ENDPOINTS, not a numeric min<=max constraint (see
+// this group's own top comment) -- the lerp itself doesn't care which is
+// numerically larger.
+function computeResponsiveWristSplayDeg(distanceToCursor, minLiveDist, liveDistRange) {
+  if (!cfg.wristSplayResponsiveEnabled) return 0
+  if (!cfg.wristSplayReactiveEnabled) return cfg.wristSplayDefault
+  const normDist = THREE.MathUtils.clamp((distanceToCursor - minLiveDist) / liveDistRange, 0, 1)
+  const curveY = THREE.MathUtils.clamp(evaluateArmLengthCurve(wristSplayCurveParsed, normDist), 0, 1)
+  const { min, max } = wristSplayRangeParsed
+  return min + (max - min) * curveY
+}
 
 // Small local DOM helper -- devPanel.js's own `el()` isn't exported, and
 // pulling in a whole helper just for 2 one-off widgets isn't worth it.
@@ -1521,6 +1601,12 @@ function buildArmLengthWidgets() {
   const curveRow = document.querySelector('.dp-row[data-key="armLengthCurve"]')
   if (rangeRow) buildArmLengthRangeWidget(rangeRow)
   if (curveRow) buildArmLengthCurveWidget(curveRow)
+}
+function buildWristSplayWidgets() {
+  const rangeRow = document.querySelector('.dp-row[data-key="wristSplayRange"]')
+  const curveRow = document.querySelector('.dp-row[data-key="wristSplayCurve"]')
+  if (rangeRow) buildWristSplayRangeWidget(rangeRow)
+  if (curveRow) buildWristSplayCurveWidget(curveRow)
 }
 
 function buildArmLengthRangeWidget(row) {
@@ -1684,13 +1770,26 @@ function buildArmLengthCurveWidget(row) {
         window.addEventListener('pointermove', onMove)
         window.addEventListener('pointerup', onUp)
       })
-      c.addEventListener('dblclick', (dblEv) => {
-        dblEv.stopPropagation()
+      function deletePointIfRemovable() {
         if (points.length > 2 && i !== 0 && i !== points.length - 1) {
           points.splice(points.indexOf(p), 1)
           redraw()
           commitPoints()
         }
+      }
+      c.addEventListener('dblclick', (dblEv) => {
+        dblEv.stopPropagation()
+        deletePointIfRemovable()
+      })
+      // Direct request: "allow right click to delete curve dots" -- same
+      // delete logic as the existing double-click (endpoints stay, since
+      // the curve always needs a value at both x=0 and x=1), added
+      // alongside it rather than replacing it. preventDefault() suppresses
+      // the browser's own native right-click context menu over the dot.
+      c.addEventListener('contextmenu', (ctxEv) => {
+        ctxEv.preventDefault()
+        ctxEv.stopPropagation()
+        deletePointIfRemovable()
       })
       svg.appendChild(c)
       return c
@@ -1701,6 +1800,218 @@ function buildArmLengthCurveWidget(row) {
     const rect = svg.getBoundingClientRect()
     const np = fromPx(clickEv.clientX - rect.left, clickEv.clientY - rect.top)
     if (np.x <= 0 || np.x >= 1) return // keep the domain-spanning endpoints unique
+    points.push(np)
+    redraw()
+    commitPoints()
+  })
+  redraw()
+  let lastSeenValue = input.value
+  armLengthWidgetResyncs.push(() => {
+    if (input.value === lastSeenValue) return
+    lastSeenValue = input.value
+    try {
+      const parsed = JSON.parse(input.value)
+      if (Array.isArray(parsed) && parsed.length >= 2) { points = parsed.sort((a, b) => a.x - b.x); redraw() }
+    } catch (e) { /* leave displayed state as-is */ }
+  })
+}
+
+// Responsive Wrist Splay's own Min/Max range widget -- structurally the
+// same dual-handle bar as buildArmLengthRangeWidget() above, with 2
+// deliberate differences: (1) the track spans a DEGREE range (-180 to
+// 180), not a fixed 0-100 percent, so values are mapped through
+// toPct()/fromPct() instead of used directly as percents; (2) the 2
+// handles do NOT cross-clamp each other -- Arm Length's own widget keeps
+// minHandle <= maxHandle because its 2 bounds are always numerically
+// ordered (0-100%), but this group's default (min:0, max:-90) is
+// DELIBERATELY not numerically ordered (see this group's own top
+// comment on why) -- clamping min<=max here would make that default
+// impossible to represent. A vertical tick marks the 0-degree point on
+// the track, since (unlike Arm Length's all-positive scale) this one
+// spans negative and positive values and 0 isn't otherwise obvious.
+function buildWristSplayRangeWidget(row) {
+  const input = row.querySelector('.dp-text-input')
+  if (!input) return
+  input.style.display = 'none'
+  row.style.flexDirection = 'column'
+  row.style.alignItems = 'stretch'
+
+  const TRACK_MIN = -180, TRACK_MAX = 180
+  const toPct = (deg) => THREE.MathUtils.clamp((deg - TRACK_MIN) / (TRACK_MAX - TRACK_MIN) * 100, 0, 100)
+  const fromPct = (pct) => Math.round(TRACK_MIN + (pct / 100) * (TRACK_MAX - TRACK_MIN))
+
+  const wrap = elLocal('div', { flex: '1', padding: '6px 4px 2px' })
+  const track = elLocal('div', {
+    position: 'relative', height: '18px', margin: '0 9px',
+    background: 'rgba(255,255,255,0.12)', borderRadius: '9px'
+  })
+  const fill = elLocal('div', { position: 'absolute', top: '0', bottom: '0', background: 'var(--dp-accent, #7d8cff)', opacity: '0.5', borderRadius: '9px' })
+  const zeroTick = elLocal('div', { position: 'absolute', top: '-2px', bottom: '-2px', width: '1px', background: 'rgba(255,255,255,0.35)' })
+  const minHandle = elLocal('div', {
+    position: 'absolute', top: '-3px', width: '18px', height: '24px', marginLeft: '-9px',
+    background: 'var(--dp-accent, #7d8cff)', borderRadius: '4px', cursor: 'ew-resize', touchAction: 'none'
+  })
+  const maxHandle = elLocal('div', {
+    position: 'absolute', top: '-3px', width: '18px', height: '24px', marginLeft: '-9px',
+    background: 'var(--dp-accent, #7d8cff)', borderRadius: '4px', cursor: 'ew-resize', touchAction: 'none'
+  })
+  const readout = elLocal('div', { fontSize: '11px', textAlign: 'center', marginTop: '4px', opacity: '0.85' })
+  track.appendChild(fill); track.appendChild(zeroTick); track.appendChild(minHandle); track.appendChild(maxHandle)
+  wrap.appendChild(track); wrap.appendChild(readout)
+  row.appendChild(wrap)
+
+  let current = { min: 0, max: -90 }
+  try { current = JSON.parse(input.value) } catch (e) { /* keep default */ }
+  let lastSeenValue = input.value
+
+  function redraw() {
+    const minPct = toPct(current.min), maxPct = toPct(current.max)
+    const leftPct = Math.min(minPct, maxPct), rightPct = Math.max(minPct, maxPct)
+    fill.style.left = leftPct + '%'
+    fill.style.right = (100 - rightPct) + '%'
+    zeroTick.style.left = toPct(0) + '%'
+    minHandle.style.left = minPct + '%'
+    maxHandle.style.left = maxPct + '%'
+    readout.textContent = `Min (Farthest Hand): ${current.min}°  Max (Nearest Hand): ${current.max}°`
+  }
+  redraw()
+  armLengthWidgetResyncs.push(() => {
+    if (input.value === lastSeenValue) return
+    lastSeenValue = input.value
+    try { current = JSON.parse(input.value); redraw() } catch (e) { /* leave displayed state as-is */ }
+  })
+
+  function startDrag(handleKey) {
+    return (downEv) => {
+      downEv.preventDefault()
+      function onMove(moveEv) {
+        const rect = track.getBoundingClientRect()
+        if (rect.width <= 0) return // hidden/mid-collapse-transition -- see Arm Length's own range widget for the real bug this guard fixes
+        const pct = THREE.MathUtils.clamp((moveEv.clientX - rect.left) / rect.width, 0, 1) * 100
+        current[handleKey] = fromPct(pct)
+        redraw()
+      }
+      function onUp() {
+        window.removeEventListener('pointermove', onMove)
+        window.removeEventListener('pointerup', onUp)
+        commitTextControl(input, JSON.stringify(current))
+      }
+      window.addEventListener('pointermove', onMove)
+      window.addEventListener('pointerup', onUp)
+    }
+  }
+  minHandle.addEventListener('pointerdown', startDrag('min'))
+  maxHandle.addEventListener('pointerdown', startDrag('max'))
+}
+
+// Responsive Wrist Splay's own curve widget -- identical shape to
+// buildArmLengthCurveWidget() above (same 0-1 x 0-1 Catmull-Rom point
+// editor, reusing evaluateArmLengthCurve() directly since it's already
+// fully generic), only the caption text differs (splay, not crop) and
+// right-click-delete is included from the start (see the Arm Length
+// widget's own comment on why it was added there).
+function buildWristSplayCurveWidget(row) {
+  const input = row.querySelector('.dp-text-input')
+  if (!input) return
+  input.style.display = 'none'
+  row.style.flexDirection = 'column'
+  row.style.alignItems = 'stretch'
+
+  const W = 240, H = 120
+  const svgNS = 'http://www.w3.org/2000/svg'
+  const svg = document.createElementNS(svgNS, 'svg')
+  svg.setAttribute('width', W); svg.setAttribute('height', H)
+  Object.assign(svg.style, { background: 'rgba(255,255,255,0.06)', borderRadius: '4px', marginTop: '6px', touchAction: 'none', cursor: 'crosshair' })
+  const axisX = document.createElementNS(svgNS, 'line')
+  axisX.setAttribute('x1', 0); axisX.setAttribute('y1', H - 1); axisX.setAttribute('x2', W); axisX.setAttribute('y2', H - 1)
+  axisX.setAttribute('stroke', 'rgba(255,255,255,0.25)')
+  const axisY = document.createElementNS(svgNS, 'line')
+  axisY.setAttribute('x1', 1); axisY.setAttribute('y1', 0); axisY.setAttribute('x2', 1); axisY.setAttribute('y2', H)
+  axisY.setAttribute('stroke', 'rgba(255,255,255,0.25)')
+  const curvePath = document.createElementNS(svgNS, 'path')
+  curvePath.setAttribute('fill', 'none'); curvePath.setAttribute('stroke', 'var(--dp-accent, #7d8cff)'); curvePath.setAttribute('stroke-width', '2')
+  svg.appendChild(axisX); svg.appendChild(axisY); svg.appendChild(curvePath)
+  const caption = elLocal('div', { fontSize: '10px', opacity: '0.7', marginTop: '3px', textAlign: 'center' }, { text: 'X: Distance From Cursor (%, Nearest→Farthest Hand This Frame)  ·  Y: Splay Fraction (0=Min End, 1=Max End)' })
+  row.appendChild(svg)
+  row.appendChild(caption)
+
+  let points = [{ x: 0, y: 1 }, { x: 1, y: 0 }]
+  try {
+    const parsed = JSON.parse(input.value)
+    if (Array.isArray(parsed) && parsed.length >= 2) points = parsed.sort((a, b) => a.x - b.x)
+  } catch (e) { /* keep default */ }
+
+  const toPx = (p) => ({ x: p.x * W, y: (1 - p.y) * H })
+  const fromPx = (px, py) => ({ x: THREE.MathUtils.clamp(px / W, 0, 1), y: THREE.MathUtils.clamp(1 - py / H, 0, 1) })
+  let circles = []
+
+  function commitPoints() {
+    points.sort((a, b) => a.x - b.x)
+    commitTextControl(input, JSON.stringify(points))
+  }
+  const CURVE_SAMPLES = 48
+  function redraw() {
+    let d = ''
+    for (let i = 0; i <= CURVE_SAMPLES; i++) {
+      const x = i / CURVE_SAMPLES
+      const y = THREE.MathUtils.clamp(evaluateArmLengthCurve(points, x), 0, 1)
+      const px = toPx({ x, y })
+      d += (i === 0 ? 'M' : 'L') + px.x.toFixed(2) + ',' + px.y.toFixed(2) + ' '
+    }
+    curvePath.setAttribute('d', d.trim())
+    circles.forEach((c) => svg.removeChild(c))
+    circles = points.map((p, i) => {
+      const px = toPx(p)
+      const c = document.createElementNS(svgNS, 'circle')
+      c.setAttribute('cx', px.x); c.setAttribute('cy', px.y); c.setAttribute('r', 5)
+      c.setAttribute('fill', 'var(--dp-accent, #7d8cff)')
+      Object.assign(c.style, { cursor: 'grab' })
+      let dragged = false
+      c.addEventListener('pointerdown', (downEv) => {
+        downEv.stopPropagation()
+        dragged = false
+        const isEndpoint = i === 0 || i === points.length - 1
+        function onMove(moveEv) {
+          const rect = svg.getBoundingClientRect()
+          if (rect.width <= 0 || rect.height <= 0) return
+          dragged = true
+          const np = fromPx(moveEv.clientX - rect.left, moveEv.clientY - rect.top)
+          if (isEndpoint) { p.y = np.y } else { p.x = np.x; p.y = np.y }
+          redraw()
+        }
+        function onUp() {
+          window.removeEventListener('pointermove', onMove)
+          window.removeEventListener('pointerup', onUp)
+          if (dragged) commitPoints()
+        }
+        window.addEventListener('pointermove', onMove)
+        window.addEventListener('pointerup', onUp)
+      })
+      function deletePointIfRemovable() {
+        if (points.length > 2 && i !== 0 && i !== points.length - 1) {
+          points.splice(points.indexOf(p), 1)
+          redraw()
+          commitPoints()
+        }
+      }
+      c.addEventListener('dblclick', (dblEv) => {
+        dblEv.stopPropagation()
+        deletePointIfRemovable()
+      })
+      c.addEventListener('contextmenu', (ctxEv) => {
+        ctxEv.preventDefault()
+        ctxEv.stopPropagation()
+        deletePointIfRemovable()
+      })
+      svg.appendChild(c)
+      return c
+    })
+  }
+  svg.addEventListener('click', (clickEv) => {
+    if (clickEv.target.tagName === 'circle') return
+    const rect = svg.getBoundingClientRect()
+    const np = fromPx(clickEv.clientX - rect.left, clickEv.clientY - rect.top)
+    if (np.x <= 0 || np.x >= 1) return
     points.push(np)
     redraw()
     commitPoints()
@@ -2239,6 +2550,17 @@ function updateRenderOrder() {
     // own comments for why this now runs every frame, per hand.
     hand.currentArmLengthT = computeArmLengthT(hand, live, minLiveDist, liveDistRange)
     if (hand.skinnedMesh) applyHandArmLength(hand, hand.currentArmLengthT)
+    // Responsive Wrist Splay -- reuses the SAME `live`/`minLiveDist`/
+    // `liveDistRange` values Arm Length just used above, not a 2nd
+    // distance pass. Runs every frame regardless of whether the feature
+    // is on (same simplicity-over-micro-optimization choice Arm Length's
+    // own T computation already makes, per its comment above) -- when
+    // off, computeResponsiveWristSplayDeg() returns 0, making this
+    // identical to the pre-existing wristBend/wristSplay-only pose.
+    if (hand.skinnedMesh) {
+      const extraSplay = computeResponsiveWristSplayDeg(live, minLiveDist, liveDistRange)
+      applyWristPoseToSkeleton(hand.skinnedMesh.skeleton, cfg, extraSplay)
+    }
   })
 }
 animate()
