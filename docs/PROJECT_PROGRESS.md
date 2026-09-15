@@ -18,30 +18,23 @@ work seamlessly from there.
 
 ## Currently working on
 
-**The "thumb pose looks wrong" saga's real-world status is genuinely
-uncertain, despite exhaustive synthetic verification showing 0.0000
-degrees of error.** After the idle-loop thumb-curl fix (see "Recently
-completed"), the user reported it was still broken. Loaded their EXACT
-real Copy Settings data (all 11 poses, real Responsive Wrist Splay
-range/curve, real click/chp/rchp/dblclick configs) into a live test
-build and reproduced their EXACT described repro (Fist as default,
-trigger click to Open Palm, wait through retransition) -- measured all
-3 thumb joints (rThumb1/2/3), in both world and local space, before vs.
-after: 0.0000 degrees everywhere. Repeated across ~30 hands and all 4
-triggers (click/dblclick/chp/rchp): same result. The user was asked to
-retest in a guaranteed-fresh incognito window to rule out stale caching
-(this project's own long-documented recurring failure mode) -- **that
-retest has not yet happened/been reported back.** Do not assume this is
-resolved OR still broken until that incognito result comes back. If it's
-still broken there too, the next step is fundamentally different
-debugging (something this session's quaternion-based verification
-methodology isn't catching) rather than another synthetic-pose-value
-hypothesis.
-
-Separately, completed and pushed in the same session: the idle-loop
-thumb-curl-desync fix itself (a real, independently-verified bug, see
-below), and setting the user's own real settings as the project's code
-defaults (see "Recently completed").
+**The "thumb pose looks wrong" saga -- now fixed for all 5 fingers, not
+just the thumb; awaiting the user's next real-device confirmation.** The
+user tested the thumb-only fix on a phone for the first time (guaranteed
+clean cache) and reported the same problem, plus a new detail: "the
+other fingers are all also slightly uncurled" (which the user themself
+flagged as possibly-unreliable perception) and the decisive "if I turn
+off responsive wrist splay, then it's fine." Independent, direct skeleton
+inspection (not relying on the user's perception) confirmed the "other
+fingers" symptom had a real structural cause: every finger, not just the
+thumb, is a descendant of the wrist bone (via its own carpal bone), so
+the same idle-loop desync affects all 5. Extended the fix to refresh all
+5 fingers' curl every idle frame (see "Recently completed"). Verified
+live with the user's real settings loaded (all 4 triggers enabled
+simultaneously): 0.0000 degrees of error for all 5 fingers, both from
+idle drift and from a full click round-trip, across 11 hands. **Not yet
+confirmed on the user's own real device again** -- don't assume this is
+the final word until they retest.
 
 ## Recently completed
 
@@ -530,18 +523,27 @@ still relevant to understanding current state, per this doc's own
   top-level cache-bust served an old `index.html`), read every changed
   value back via `window.__debug` -- exact match, including the field
   correctly rebuilding to 255 hands (15x17).
+- **Extended the idle-loop finger-curl refresh (above) from thumb-only to
+  all 5 fingers**, after the user's phone retest showed the same problem
+  plus "the other fingers are all also slightly uncurled." Direct
+  skeleton inspection found every finger is a descendant of the wrist
+  bone through its own "carpal" bone (rCarpal1-4) -- the earlier belief
+  that only the thumb was parented to the wrist bone was wrong. See
+  CHANGELOG.txt for the full account and verification.
 
 ## What's next
 
-**Awaiting the incognito-window retest result for the thumb saga (see
-"Currently working on").** If it's STILL wrong there, this session's
-entire quaternion-comparison verification methodology needs
-reconsidering -- it may be catching everything the underlying bone math
-can produce wrong, while missing something else entirely (a skinning/
-mesh issue independent of bone rotation correctness, a feature
-interaction only present with ALL 4 triggers enabled simultaneously as
-in the user's real config, or something this session hasn't considered
-yet). Don't guess at a 6th fix without that data point first.
+**Awaiting the user's next real-device retest of the all-5-fingers fix
+(see "Currently working on").** The earlier incognito-window ask was
+superseded by a stronger test the user actually ran (a phone, first load
+ever, guaranteed clean cache) -- that's what surfaced the "other fingers"
+detail and led to the all-5-fingers fix above. If the SAME problem
+persists even after this fix, this session's entire quaternion-comparison
+verification methodology needs reconsidering -- it may be catching
+everything the underlying bone math can produce wrong, while missing
+something else entirely (a skinning/mesh issue independent of bone
+rotation correctness, or something this session hasn't considered yet).
+Don't guess at yet another fix without that data point first.
 
 **Target Marker fix -- explicitly deferred by the user, do NOT implement
 in isolation.** Direct instruction: "yeah i want that. but dont do that

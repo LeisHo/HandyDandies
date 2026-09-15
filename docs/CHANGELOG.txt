@@ -3180,6 +3180,49 @@ cursor).
 Cache-buster bump: `index.html`'s own `main.js?v=75` -> `?v=76`.
 
 --------------------------------------------------------------------------------
+2026-09-14  -  (start not captured -- Actual: NOT MEASURED)
+
+**The thumb-only idle-refresh fix from earlier this same day was real
+but too narrow -- fixed to cover all 5 fingers.** The user tested on a
+phone for the first time (guaranteed-clean cache, ruling out the
+staleness this project has repeatedly hit) and reported the same
+problem, "kind of slightly worse," with "the other fingers are all also
+slightly uncurled" and the decisive confirmation: "if I turn off the
+responsive wrist splay, then it's fine." The user immediately flagged
+their own "other fingers" observation as possibly unreliable perception
+-- but a direct, independent skeleton inspection (not the user's
+perception) settled it: every finger's base joint is parented to its own
+"carpal" bone (rCarpal1 for index, rCarpal2 for middle, rCarpal3 for
+ring, rCarpal4 for pinky), and every one of those carpal bones is itself
+a child of the wrist bone (rHand). The earlier round's belief that "only
+the thumb is parented to the wrist bone" (stated by an even earlier
+round of this saga and never re-verified) was wrong -- true only in the
+narrow sense that the thumb attaches DIRECTLY while the other 4 go
+through one intermediate carpal bone each, but every finger is still a
+structural descendant of the wrist and therefore depends on the wrist's
+current world orientation the same way `rotateOnTrueWorldAxis()` was
+already established to require.
+
+Fix: the idle branch's per-frame finger-curl refresh (added earlier
+today for the thumb only) now loops over all of `FINGER_NAMES`.
+
+**Verified live with the user's own real settings already loaded as the
+project's defaults** (all 4 triggers enabled simultaneously, matching
+their real config, not a simplified single-feature test): 0.0000 degrees
+of drift for all 5 fingers across a 60-frame idle "just sitting there"
+wait (confirms the idle-loop desync itself is now fully closed), and
+0.0000 degrees of round-trip error for all 5 fingers across 11 hands
+spread through the field after a real, full click-to-Open-Palm-and-back
+sequence.
+
+Performance note, not yet addressed: this refreshes 5 fingers' curl
+(instead of 1) per idle hand per frame -- a real cost increase at
+hundreds of hands, accepted for correctness; worth profiling later if
+frame rate becomes a concern, not attempted this round.
+
+Cache-buster bump: `index.html`'s own `main.js?v=76` -> `?v=77`.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================
