@@ -709,9 +709,9 @@
       "reactiveArmLengthEnabled": true,
       "armLengthRange": "{\"min\":0,\"max\":85}",
       "armLengthCurve": "[{\"x\":0,\"y\":1},{\"x\":0.148333740234375,\"y\":0.6613540649414062},{\"x\":0.4100001017252604,\"y\":0.31468760172526045},{\"x\":0.5316670735677084,\"y\":0.2680206298828125},{\"x\":0.748333740234375,\"y\":0.19468739827473958},{\"x\":1,\"y\":0}]",
-      "wristSplayResponsiveEnabled": true,
+      "wristSplayResponsiveEnabled": false,
       "wristSplayDefault": 10,
-      "wristSplayReactiveEnabled": true,
+      "wristSplayReactiveEnabled": false,
       "wristSplayRange": "{\"min\":74,\"max\":-22}",
       "wristSplayCurve": "[{\"x\":0,\"y\":1},{\"x\":0.31833343505859374,\"y\":0.6961458841959636},{\"x\":1,\"y\":0.042812347412109375}]",
       "chpEnabled": true,
@@ -753,7 +753,19 @@
       "cameraZ": 259.74194092345493,
       "cameraFov": 35,
       "cameraZoom": 260.17068872666084,
-      "savedCameras": [],
+      "savedCameras": [
+        {
+          "name": "Default",
+          "cameraX": 6.638529594915686,
+          "cameraY": 13.373156794075216,
+          "cameraZ": 259.74194092345493,
+          "cameraFov": 35,
+          "cameraZoom": 260.17068872666084,
+          "targetX": 0,
+          "targetY": 0,
+          "targetZ": 0
+        }
+      ],
       "lockCameraPan": false,
       "lockCameraZoom": false,
       "cameraMaxExtentsEnabled": false,
@@ -1540,9 +1552,9 @@
       "reactiveArmLengthEnabled": true,
       "armLengthRange": "{\"min\":0,\"max\":85}",
       "armLengthCurve": "[{\"x\":0,\"y\":1},{\"x\":0.148333740234375,\"y\":0.6613540649414062},{\"x\":0.4100001017252604,\"y\":0.31468760172526045},{\"x\":0.5316670735677084,\"y\":0.2680206298828125},{\"x\":0.748333740234375,\"y\":0.19468739827473958},{\"x\":1,\"y\":0}]",
-      "wristSplayResponsiveEnabled": true,
+      "wristSplayResponsiveEnabled": false,
       "wristSplayDefault": 10,
-      "wristSplayReactiveEnabled": true,
+      "wristSplayReactiveEnabled": false,
       "wristSplayRange": "{\"min\":74,\"max\":-22}",
       "wristSplayCurve": "[{\"x\":0,\"y\":1},{\"x\":0.31833343505859374,\"y\":0.6961458841959636},{\"x\":1,\"y\":0.042812347412109375}]",
       "chpEnabled": true,
@@ -1584,7 +1596,19 @@
       "cameraZ": 259.74194092345493,
       "cameraFov": 35,
       "cameraZoom": 260.17068872666084,
-      "savedCameras": [],
+      "savedCameras": [
+        {
+          "name": "Default",
+          "cameraX": 6.638529594915686,
+          "cameraY": 13.373156794075216,
+          "cameraZ": 259.74194092345493,
+          "cameraFov": 35,
+          "cameraZoom": 260.17068872666084,
+          "targetX": 0,
+          "targetY": 0,
+          "targetZ": 0
+        }
+      ],
       "lockCameraPan": false,
       "lockCameraZoom": false,
       "cameraMaxExtentsEnabled": false,
@@ -2371,9 +2395,9 @@
       "reactiveArmLengthEnabled": true,
       "armLengthRange": "{\"min\":0,\"max\":85}",
       "armLengthCurve": "[{\"x\":0,\"y\":1},{\"x\":0.148333740234375,\"y\":0.6613540649414062},{\"x\":0.4100001017252604,\"y\":0.31468760172526045},{\"x\":0.5316670735677084,\"y\":0.2680206298828125},{\"x\":0.748333740234375,\"y\":0.19468739827473958},{\"x\":1,\"y\":0}]",
-      "wristSplayResponsiveEnabled": true,
+      "wristSplayResponsiveEnabled": false,
       "wristSplayDefault": 10,
-      "wristSplayReactiveEnabled": true,
+      "wristSplayReactiveEnabled": false,
       "wristSplayRange": "{\"min\":74,\"max\":-22}",
       "wristSplayCurve": "[{\"x\":0,\"y\":1},{\"x\":0.31833343505859374,\"y\":0.6961458841959636},{\"x\":1,\"y\":0.042812347412109375}]",
       "chpEnabled": true,
@@ -2415,7 +2439,19 @@
       "cameraZ": 259.74194092345493,
       "cameraFov": 35,
       "cameraZoom": 260.17068872666084,
-      "savedCameras": [],
+      "savedCameras": [
+        {
+          "name": "Default",
+          "cameraX": 6.638529594915686,
+          "cameraY": 13.373156794075216,
+          "cameraZ": 259.74194092345493,
+          "cameraFov": 35,
+          "cameraZoom": 260.17068872666084,
+          "targetX": 0,
+          "targetY": 0,
+          "targetZ": 0
+        }
+      ],
       "lockCameraPan": false,
       "lockCameraZoom": false,
       "cameraMaxExtentsEnabled": false,
@@ -2703,7 +2739,7 @@
         },
         {
           "key": "Responsive Wrist Splay",
-          "collapsed": true,
+          "collapsed": false,
           "settings": [
             "wristSplayResponsiveEnabled",
             "wristSplayDefault",
@@ -2717,7 +2753,7 @@
     },
     {
       "key": "Pose",
-      "collapsed": false,
+      "collapsed": true,
       "settings": [
         "savedPoses"
       ],
@@ -2754,7 +2790,7 @@
         },
         {
           "key": "Wrist",
-          "collapsed": false,
+          "collapsed": true,
           "settings": [
             "wristBend",
             "wristSplay"
@@ -2831,7 +2867,7 @@
     },
     {
       "key": "Camera",
-      "collapsed": true,
+      "collapsed": false,
       "settings": [
         "savedCameras",
         "lockCameraPan",
