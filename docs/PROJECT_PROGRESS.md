@@ -18,23 +18,36 @@ work seamlessly from there.
 
 ## Currently working on
 
-**The "thumb pose looks wrong" saga -- now fixed for all 5 fingers, not
-just the thumb; awaiting the user's next real-device confirmation.** The
-user tested the thumb-only fix on a phone for the first time (guaranteed
-clean cache) and reported the same problem, plus a new detail: "the
-other fingers are all also slightly uncurled" (which the user themself
-flagged as possibly-unreliable perception) and the decisive "if I turn
-off responsive wrist splay, then it's fine." Independent, direct skeleton
-inspection (not relying on the user's perception) confirmed the "other
-fingers" symptom had a real structural cause: every finger, not just the
-thumb, is a descendant of the wrist bone (via its own carpal bone), so
-the same idle-loop desync affects all 5. Extended the fix to refresh all
-5 fingers' curl every idle frame (see "Recently completed"). Verified
-live with the user's real settings loaded (all 4 triggers enabled
-simultaneously): 0.0000 degrees of error for all 5 fingers, both from
-idle drift and from a full click round-trip, across 11 hands. **Not yet
-confirmed on the user's own real device again** -- don't assume this is
-the final word until they retest.
+**The "thumb/finger pose looks wrong" saga -- the actual root cause has
+been found and fixed; awaiting the user's next real-device confirmation
+before declaring this genuinely closed.** The all-5-fingers idle-refresh
+fix (extending the earlier thumb-only version) made things WORSE on
+desktop, not better -- then the decisive clue: **the user confirmed the
+identical problem reproduces in HANDO, a completely separate codebase**,
+which ruled out every fix attempted anywhere in this saga (all real,
+all correctly scoped to HANDY DANDIES-only code) and pointed at
+something the 2 projects structurally share. Found it:
+`applyCurlToSkeleton()`'s curl/splay axis conversion used `baseQuat`
+(the whole-hand's PRE-wrist orientation) as its reference frame --
+verbatim-ported from HANDO's own convention -- which never includes the
+wrist bone's own current bend/splay rotation. Since every finger is a
+descendant of the wrist bone, curl direction should anatomically rotate
+WITH the wrist (closing a fist still closes toward your own palm no
+matter how your wrist is bent); using a wrist-independent axis meant the
+same curl % increasingly missed the real palm the further the wrist
+rotated from wherever a pose was originally tuned by eye. Fixed by
+reading the wrist bone's own current world rotation as the axis
+reference instead. Verified with a genuinely independent, anatomically-
+meaningful test (not self-consistency): a curled finger's angle relative
+to the wrist's own reference axis stayed constant (78.006 degrees) at
+both wristSplay=0 and wristSplay=-70, even though the wrist itself
+rotated a real 70 degrees between the two -- proving curl now correctly
+tracks the wrist. Re-ran the full existing regression suite: still 0.0
+degrees. **Known, expected side effect:** any saved pose with nonzero
+wristBend/wristSplay will look visually different now (tuned by eye
+against the old, wrong behavior) -- not a new bug. **Not yet confirmed
+by the user on a real device** -- don't declare this saga closed until
+they do.
 
 ## Recently completed
 
@@ -530,11 +543,27 @@ still relevant to understanding current state, per this doc's own
   bone through its own "carpal" bone (rCarpal1-4) -- the earlier belief
   that only the thumb was parented to the wrist bone was wrong. See
   CHANGELOG.txt for the full account and verification.
+- **Found and fixed the actual, final root cause: curl direction never
+  rotated with the wrist.** The user confirmed the identical problem
+  reproduces in HANDO (a separate codebase) -- ruling out every fix
+  attempted so far and pointing at their shared curl-axis convention.
+  `applyCurlToSkeleton()` computed curl/splay direction relative to the
+  whole-hand's PRE-wrist orientation, never the wrist's own current
+  bend/splay -- anatomically backwards, since every finger is a wrist-
+  bone descendant. Fixed by reading the wrist bone's own current world
+  rotation as the axis reference. Verified with a genuinely independent
+  test: a curled finger's angle to the wrist stayed constant (78.006
+  degrees) across a real 70-degree wrist rotation. Full regression suite
+  still 0.0 degrees. See CHANGELOG.txt for the complete account.
 
 ## What's next
 
-**Awaiting the user's next real-device retest of the all-5-fingers fix
-(see "Currently working on").** The earlier incognito-window ask was
+**Awaiting the user's next real-device retest of the curl-axis fix (see
+"Currently working on") -- this is the one that matters most now.** The
+all-5-fingers idle-refresh fix above turned out to be real but
+insufficient on its own; the curl-axis fix is what actually addresses
+the mechanism the user described (Hando reproduces it too). The earlier
+incognito-window ask was
 superseded by a stronger test the user actually ran (a phone, first load
 ever, guaranteed clean cache) -- that's what surfaced the "other fingers"
 detail and led to the all-5-fingers fix above. If the SAME problem
