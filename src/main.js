@@ -657,9 +657,21 @@ const POSE_SUBGROUP_SPECS = [
   { title: 'Ring', collapsed: true, keys: ['curlRing', 'tipTwistRing', 'splayRing', 'curlBiasRing', 'splayRing2', 'baseOnlyCurlRing', 'tipOnlyCurlRing'] },
   { title: 'Pinky', collapsed: true, keys: ['curlPinky', 'tipTwistPinky', 'curlBiasPinky', 'splayPinky', 'splayPinky2', 'baseOnlyCurlPinky', 'tipOnlyCurlPinky'] },
 ]
+// Shared anti-abuse token for /api/save-settings (CLAUDE.md §12l) -- NOT a
+// real secret (it ships in this page's own source, same as every other
+// client-side value here); it exists only to keep a random visitor from
+// spamming commits to the repo. Must match the DEV_PANEL_SAVE_SECRET env
+// var set on this project's own Vercel project. Ported directly from
+// HANDO (same day, direct request: "look at hando and see how the save
+// button saves dev panel settings to git. Implement.") -- reuses the exact
+// same value HANDO/DICKOCLICKO/OKCILCOKCID already use, since this is one
+// workspace-wide shared secret, not a per-project one.
+const DEV_PANEL_SAVE_SECRET = 'PkrbMti03M6xm3FEThYXa8gGW_08BOGj'
+const SAVE_SETTINGS_ENDPOINT = '/api/save-settings'
 const cfg = initDevPanel(DEV_GROUPS, {
   storageKeyPrefix: 'handyDandies',
-  organizeSubgroups: (groupsEl) => organizeGroupSubgroups(groupsEl, 'Pose', POSE_SUBGROUP_SPECS)
+  organizeSubgroups: (groupsEl) => organizeGroupSubgroups(groupsEl, 'Pose', POSE_SUBGROUP_SPECS),
+  remoteSave: { endpoint: SAVE_SETTINGS_ENDPOINT, secret: DEV_PANEL_SAVE_SECRET }
 })
 onChangeByCtrl.forEach((fn, c) => { c.onChange = fn })
 // Arm Length's 2 custom widgets (see their own declaration comments,
