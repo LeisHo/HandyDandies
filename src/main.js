@@ -344,7 +344,7 @@ const DEV_GROUPS = [
         // refreshSelectOptions() call, not automatically -- without this,
         // saving or deleting a pose here wouldn't show up there until the
         // page reloads.
-        onChange: () => { safeRefreshSelectOptions('chpTargetPose'); safeRefreshSelectOptions('rchpTargetPose'); safeRefreshSelectOptions('clickTargetPose'); safeRefreshSelectOptions('dblclickTargetPose'); safeRefreshMultiSelectOptions('tweenPoses') }
+        onChange: () => { safeRefreshSelectOptions('chpTargetPose'); safeRefreshSelectOptions('rchpTargetPose'); safeRefreshSelectOptions('clickTargetPose'); safeRefreshSelectOptions('dblclickTargetPose'); safeRefreshSelectOptions('rcTargetPose'); safeRefreshMultiSelectOptions('tweenPoses') }
       },
       // The "Default" button used to live here as its own DEV_GROUPS row
       // (reset every pose slider to its own CODE default). Direct
@@ -515,6 +515,41 @@ const DEV_GROUPS = [
     retransitionStartTimeCurve: '[{"x":0,"y":0},{"x":1,"y":1}]',
     retransitionStartTimeRange: '{"min":0,"max":300}'
   }),
+  // Right Click -- direct follow-up request: "provide another CLick
+  // function, the same as the others - 'Right Click'. But this time,
+  // provide me a dropbox that allows me to select either a single target
+  // pose or a tween. The relevant setting ui only show when i select
+  // either." Same fire-and-forget, per-hand-distance-staggered 3-phase
+  // sequence as Click Pose/Double-Click Pose above (forward -> paused ->
+  // retransition -> idle), on the right button, one new capability: Mode
+  // chooses whether the "forward" phase's target is a single named Saved
+  // Pose (same as click/dblclick) or a Saved Tween Sequence played
+  // through in full (same sequences the Tween/Double Click Hold groups
+  // already build, via resolveTweenSequencePoses()/lerpTweenSequence()) --
+  // see updateClickPoseForHand()'s own comment for how the 2 modes share
+  // one phase machine. Only rcTargetPose/rcTweenSelector are mode-
+  // specific and toggled by updateRightClickModeVisibility() (below); the
+  // Enabled checkbox and every timing control apply to both modes the
+  // same way, so switching modes mid-session doesn't reset any tuning.
+  {
+    title: 'Right Click',
+    controls: [
+      { key: 'rcEnabled', label: 'Right Click (Master On/Off)', type: 'checkbox', def: false },
+      {
+        key: 'rcMode', label: 'Mode', type: 'select', def: 'Single Pose', options: () => ['Single Pose', 'Tween'],
+        onChange: () => updateRightClickModeVisibility()
+      },
+      { key: 'rcTargetPose', label: 'Target Pose', type: 'select', def: '', options: () => (cfg.savedPoses || []).map((sp) => sp.name) },
+      { key: 'rcTweenSelector', label: 'Tween Sequence', type: 'select', def: '', options: () => (cfg.savedTweenSequences || []).map((s) => s.name) },
+      { key: 'rcTransitionSpeedMs', label: 'Pose Transition Speed (Ms)', type: 'slider', min: 0, max: 700, step: 10, def: 400 },
+      { key: 'rcStartTimeCurve', label: 'Pose Transition Start Time Curve (Distance -> Start Time)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickPoseConfig('rc') },
+      { key: 'rcStartTimeRange', label: 'Pose Transition Min / Max Start Time (Ms)', type: 'text', def: '{"min":0,"max":300}', onChange: () => parseClickPoseConfig('rc') },
+      { key: 'rcPauseDurationMs', label: 'Pause Duration At Target (Ms)', type: 'slider', min: 0, max: 5000, step: 10, def: 500 },
+      { key: 'rcRetransitionSpeedMs', label: 'Pose Retransition Speed (Ms)', type: 'slider', min: 0, max: 700, step: 10, def: 400 },
+      { key: 'rcRetransitionStartTimeCurve', label: 'Pose Retransition Start Time Curve (Distance -> Start Time)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickPoseConfig('rc') },
+      { key: 'rcRetransitionStartTimeRange', label: 'Pose Retransition Min / Max Start Time (Ms)', type: 'text', def: '{"min":0,"max":300}', onChange: () => parseClickPoseConfig('rc') }
+    ]
+  },
   // Tween -- direct user request, modeled on HANDO's own "Tween / Export"
   // group (an ordered chain of saved poses, lerped through end-to-end) but
   // deliberately narrower: no manual preview slider, no camera/lighting/
@@ -544,7 +579,7 @@ const DEV_GROUPS = [
         // group's own Tween Selector dropdown reads this same list via
         // options(), which devPanel.js only rebuilds on an explicit
         // refreshSelectOptions() call.
-        onChange: () => safeRefreshSelectOptions('dcHoldTweenSelector')
+        onChange: () => { safeRefreshSelectOptions('dcHoldTweenSelector'); safeRefreshSelectOptions('rcTweenSelector') }
       }
     ]
   },
@@ -571,7 +606,13 @@ const DEV_GROUPS = [
     controls: [
       { key: 'dcHoldEnabled', label: 'Double Click Hold (Master On/Off)', type: 'checkbox', def: false },
       { key: 'dcHoldTweenSelector', label: 'Tween Selector', type: 'select', def: '', options: () => (cfg.savedTweenSequences || []).map((s) => s.name) },
-      { key: 'dcHoldTweenSpeedMs', label: 'Tween Speed (Ms)', type: 'slider', min: 50, max: 5000, step: 10, def: 800 }
+      { key: 'dcHoldTweenSpeedMs', label: 'Tween Speed (Ms)', type: 'slider', min: 50, max: 5000, step: 10, def: 800 },
+      // Direct follow-up request: "provide a checkbox to set if it
+      // continues to loop or not. As in if i keep the double click hold,
+      // it will continue looping through the tween, not including the
+      // initial default pose. If unchecked, it runs through the tween
+      // once." See updateDoubleClickHoldTween()'s own 'looping' phase.
+      { key: 'dcHoldLoop', label: 'Loop', type: 'checkbox', def: false }
     ]
   },
   {
@@ -3088,6 +3129,23 @@ function lerpTweenSequence(poses, t) {
   const localT = scaled - segIndex
   return lerpPoseValues(poses[segIndex], poses[segIndex + 1], localT)
 }
+// Double Click Hold Tween's own Loop mode (direct follow-up request):
+// once the initial default->pose1->...->poseN pass finishes, keep
+// cycling through JUST the named poses (poseN->pose1->pose2->...->poseN,
+// wrapping, NOT re-including the default pose each lap) for as long as
+// the hold continues. `tCyclic` is an unbounded, ever-increasing position
+// along the loop (not clamped to [0,1] like lerpTweenSequence's `t`) --
+// its integer part selects which segment, its fractional part is the
+// local lerp within that segment; wrapping is just `% poses.length`, so
+// the caller never needs to reset a counter or track lap count.
+function lerpLoopSequence(poses, tCyclic) {
+  if (!poses || poses.length === 0) return null
+  const segments = poses.length
+  const wrapped = ((tCyclic % segments) + segments) % segments // stays positive regardless of sign
+  const segIndex = Math.floor(wrapped)
+  const localT = wrapped - segIndex
+  return lerpPoseValues(poses[segIndex], poses[(segIndex + 1) % segments], localT)
+}
 function computeStartDelayMs(distanceToCursor, minLiveDist, liveDistRange, curveParsed, rangeParsed) {
   const normDist = THREE.MathUtils.clamp((distanceToCursor - minLiveDist) / liveDistRange, 0, 1)
   const curveY = THREE.MathUtils.clamp(evaluateArmLengthCurve(curveParsed, normDist), 0, 1)
@@ -3267,11 +3325,20 @@ window.addEventListener('pointerdown', (e) => {
 // correctly suppresses the extra click; a quick, instant click no longer
 // does, restoring Click Pose/Double-Click Pose's own normal triggering.
 let lastPointerupWasHoldRelease = false
+// Split out from the combined flag above specifically for Right Click's
+// own quick-tap listener (below) -- that listener only cares about the
+// RIGHT button's own hold state, and by the time it runs (registered
+// after this one, per addEventListener's same-event registration-order
+// guarantee), endClickHoldPose('rchp') has already flipped
+// clickHoldPoseTriggers.rchp.active back to false, so it can't recompute
+// this itself.
+let lastPointerupWasRchpHoldRelease = false
 window.addEventListener('pointerup', (e) => {
   const now = performance.now()
   const chpHeldLongEnough = e.button === 0 && clickHoldPoseTriggers.chp.active && (now - clickHoldPoseTriggers.chp.holdStartTime) >= MOUSE_LOG_HELD_DRAG_MS
   const rchpHeldLongEnough = e.button === 2 && clickHoldPoseTriggers.rchp.active && (now - clickHoldPoseTriggers.rchp.holdStartTime) >= MOUSE_LOG_HELD_DRAG_MS
   lastPointerupWasHoldRelease = chpHeldLongEnough || rchpHeldLongEnough
+  lastPointerupWasRchpHoldRelease = rchpHeldLongEnough
   if (e.button === 0) endClickHoldPose('chp')
   else if (e.button === 2) endClickHoldPose('rchp')
 })
@@ -3309,10 +3376,19 @@ window.addEventListener('blur', () => { endClickHoldPose('chp'); endClickHoldPos
 // poseDefaultValues, POSE_PRESET_KEYS -- no new posing math, only a new
 // per-hand phase sequence (forward -> paused -> retransition -> idle,
 // one more phase than Click Hold-Pose's own forward/retransition pair).
-const CLICK_POSE_KEYS = ['click', 'dblclick']
+// 'rc' (Right Click) added 2026-09-15 -- a 3rd instance of this same
+// fire-and-forget family, on the right button, distinguished from 'chp'/
+// 'rchp' (Click-Hold-Pose's own hold-based right-click instance) the same
+// way 'click'/'dblclick' are distinguished from 'chp': quick tap, not a
+// sustained hold -- see the right-button pointerup listener below. Unlike
+// click/dblclick, 'rc' also supports a Tween target (cfg.rcMode) as an
+// alternative to a single named Target Pose -- see updateClickPoseForHand()'s
+// own comment for how the 2 modes share this same phase machine.
+const CLICK_POSE_KEYS = ['click', 'dblclick', 'rc']
 const clickPoseTriggers = {
   click: { startCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], startRangeParsed: { min: 0, max: 300 }, retransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionRangeParsed: { min: 0, max: 300 } },
-  dblclick: { startCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], startRangeParsed: { min: 0, max: 300 }, retransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionRangeParsed: { min: 0, max: 300 } }
+  dblclick: { startCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], startRangeParsed: { min: 0, max: 300 }, retransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionRangeParsed: { min: 0, max: 300 } },
+  rc: { startCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], startRangeParsed: { min: 0, max: 300 }, retransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionRangeParsed: { min: 0, max: 300 } }
 }
 function parseClickPoseConfig(p) {
   const t = clickPoseTriggers[p]
@@ -3324,19 +3400,35 @@ function parseClickPoseConfig(p) {
 function getOrInitHandCP(hand) {
   if (!hand._cp) {
     hand._cp = {}
-    CLICK_POSE_KEYS.forEach((p) => { hand._cp[p] = { phase: 'idle', triggerTime: 0, forwardSnapshot: null, forwardDelay: 0, pauseStartTime: 0, retransitionStart: null, retransitionStartTime: 0, retransitionDelay: 0, lastAppliedValues: null, frozenSplayDeg: 0 } })
+    CLICK_POSE_KEYS.forEach((p) => { hand._cp[p] = { phase: 'idle', triggerTime: 0, forwardSnapshot: null, tweenPoses: null, forwardDelay: 0, pauseStartTime: 0, retransitionStart: null, retransitionStartTime: 0, retransitionDelay: 0, lastAppliedValues: null, frozenSplayDeg: 0 } })
   }
   return hand._cp
 }
+// Right Click's own Tween mode (cfg.rcMode === 'Tween') shares this exact
+// phase machine with the plain single-target-pose mode every other
+// CLICK_POSE_KEYS entry uses -- only the 'forward' phase's own source of
+// interpolation values differs (a resolved Tween Sequence, via
+// lerpTweenSequence(), instead of a single named Target Pose, via
+// lerpPoseValues()); pause/retransition are identical either way. 'click'/
+// 'dblclick' have no `${p}Mode` control at all, so `cfg[`${p}Mode`]` is
+// simply undefined for them and this always takes the single-pose branch,
+// completely unchanged from before Right Click existed.
 function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) {
   const cp = getOrInitHandCP(hand)[p]
+  const isTween = cfg[`${p}Mode`] === 'Tween'
   if (cp.phase === 'forward') {
-    const targetPose = (cfg.savedPoses || []).find((sp) => sp.name === cfg[`${p}TargetPose`])
-    if (!targetPose || !cp.forwardSnapshot) { cp.phase = 'idle'; return } // nothing selected -- abandon this hand's sequence rather than get stuck
     const elapsed = now - cp.triggerTime
     const speedMs = Math.max(cfg[`${p}TransitionSpeedMs`], 1)
     const progress = elapsed < cp.forwardDelay ? 0 : THREE.MathUtils.clamp((elapsed - cp.forwardDelay) / speedMs, 0, 1)
-    const values = lerpPoseValues(cp.forwardSnapshot, targetPose, progress)
+    let values
+    if (isTween) {
+      if (!cp.tweenPoses || cp.tweenPoses.length < 2) { cp.phase = 'idle'; return } // nothing selected -- abandon this hand's sequence rather than get stuck
+      values = lerpTweenSequence(cp.tweenPoses, progress)
+    } else {
+      const targetPose = (cfg.savedPoses || []).find((sp) => sp.name === cfg[`${p}TargetPose`])
+      if (!targetPose || !cp.forwardSnapshot) { cp.phase = 'idle'; return } // nothing selected -- abandon this hand's sequence rather than get stuck
+      values = lerpPoseValues(cp.forwardSnapshot, targetPose, progress)
+    }
     cp.lastAppliedValues = values
     applyPoseValuesToHand(hand, values, cp.frozenSplayDeg)
     if (progress >= 1) { cp.phase = 'paused'; cp.pauseStartTime = now }
@@ -3380,6 +3472,20 @@ function triggerClickPose(p) {
   const now = performance.now()
   const forwardSnapshot = {}
   POSE_PRESET_KEYS.forEach((key) => { forwardSnapshot[key] = cfg[key] })
+  // Tween mode (Right Click only -- see updateClickPoseForHand()'s own
+  // comment): resolved ONCE here, not per-hand, same as forwardSnapshot
+  // above -- every hand plays the identical sequence, just staggered in
+  // START time like everything else in this family. Prepending this
+  // click's own live forwardSnapshot (rather than poseDefaultValues, the
+  // way Double Click Hold Tween's own sequence always starts from
+  // default) keeps this consistent with Single Pose mode's own "transition
+  // from wherever the hand currently is," not a hardcoded default.
+  let tweenPoses = null
+  if (cfg[`${p}Mode`] === 'Tween') {
+    const seq = (cfg.savedTweenSequences || []).find((s) => s.name === cfg[`${p}TweenSelector`])
+    const namedPoses = seq ? resolveTweenSequencePoses(seq.tweenPoses) : []
+    if (namedPoses.length >= 1) tweenPoses = [forwardSnapshot, ...namedPoses]
+  }
   let minD = Infinity, maxD = -Infinity
   const dists = hands.map((hand) => {
     const d = hand.wrapper.position.distanceTo(cursorTarget)
@@ -3393,6 +3499,7 @@ function triggerClickPose(p) {
     cp.phase = 'forward'
     cp.triggerTime = now
     cp.forwardSnapshot = forwardSnapshot
+    cp.tweenPoses = tweenPoses
     cp.forwardDelay = computeStartDelayMs(dists[i], minD, range, trig.startCurveParsed, trig.startRangeParsed)
     // Frozen for this hand's entire sequence (forward/paused/
     // retransition) -- see updateClickHoldPoseForHand()'s own top
@@ -3441,6 +3548,21 @@ window.addEventListener('pointerup', (e) => {
     clickPoseClickCount = 0
   }, MOUSE_LOG_MULTICLICK_MS)
 })
+// Right Click -- direct request ("also provide another CLick function,
+// the same as the others - 'Right Click'"): the right-button equivalent
+// of the plain 'click' trigger above (quick tap, fire-and-forget, no
+// double-click counterpart requested), reusing triggerClickPose('rc')
+// unchanged -- the only new thing this feature needed at the trigger
+// level is telling a genuine Right-Click Hold-Pose (rchp) release apart
+// from a quick right-button tap, via `lastPointerupWasRchpHoldRelease`
+// (set just above, in the SAME pointerup listener endClickHoldPose('rchp')
+// already uses, so it's always current by the time this one runs).
+window.addEventListener('pointerup', (e) => {
+  if (e.target && e.target.closest && e.target.closest('.dp-panel')) return
+  if (e.button !== 2) return
+  if (lastPointerupWasRchpHoldRelease) return
+  triggerClickPose('rc')
+})
 
 // -----------------------------------------------------------------------
 // Double Click Hold Tween -- direct request ("*DC*Double Click Hold* This
@@ -3466,7 +3588,7 @@ window.addEventListener('pointerup', (e) => {
 // suppression) -- a disclosed simplification, same as the existing chp-
 // vs-rchp "whichever runs last this frame wins" note in animate()'s own
 // per-hand loop.
-const dcHoldTween = { phase: 'idle', holdStartTime: 0, poses: [], lastAppliedValues: null, retransitionStart: null, retransitionStartTime: 0 }
+const dcHoldTween = { phase: 'idle', holdStartTime: 0, poses: [], loopPoses: [], loopSegmentMs: 1, loopStartTime: 0, lastAppliedValues: null, retransitionStart: null, retransitionStartTime: 0 }
 function startDoubleClickHoldTween() {
   if (!cfg.dcHoldEnabled) return
   const seq = (cfg.savedTweenSequences || []).find((s) => s.name === cfg.dcHoldTweenSelector)
@@ -3476,6 +3598,14 @@ function startDoubleClickHoldTween() {
   // 1, then so on" -- the sequence played always starts at the field's
   // own default pose, never just the first selected pose.
   dcHoldTween.poses = [poseDefaultValues, ...namedPoses]
+  // Loop mode's own cyclic sequence -- named poses ONLY, never re-
+  // including default (direct follow-up request: "continue looping
+  // through the tween, not including the initial default pose"). Same
+  // per-segment pace as the initial pass (speedMs / namedPoses.length,
+  // the initial pass's own segment count) so looping doesn't visibly
+  // speed up or slow down relative to the first lap.
+  dcHoldTween.loopPoses = namedPoses
+  dcHoldTween.loopSegmentMs = Math.max(cfg.dcHoldTweenSpeedMs / namedPoses.length, 1)
   dcHoldTween.phase = 'forward'
   dcHoldTween.holdStartTime = performance.now()
   // Per-hand frozen Responsive Wrist Splay, same reasoning as Click-Hold-
@@ -3510,8 +3640,34 @@ function endDoubleClickHoldTween() {
 function updateDoubleClickHoldTween(now) {
   const speedMs = Math.max(cfg.dcHoldTweenSpeedMs, 1)
   if (dcHoldTween.phase === 'forward') {
-    const t = THREE.MathUtils.clamp((now - dcHoldTween.holdStartTime) / speedMs, 0, 1)
+    const elapsed = now - dcHoldTween.holdStartTime
+    const t = THREE.MathUtils.clamp(elapsed / speedMs, 0, 1)
     const values = lerpTweenSequence(dcHoldTween.poses, t)
+    dcHoldTween.lastAppliedValues = values
+    // Direct follow-up request: "provide a checkbox to set if it
+    // continues to loop or not... If unchecked, it runs through the
+    // tween once" -- unchecked (or fewer than 2 named poses, where a
+    // "loop" is undefined) leaves the hand held at the final pose,
+    // exactly the pre-existing behavior. Checked hands off to the
+    // 'looping' phase the instant the initial pass completes, starting
+    // its own cyclic clock fresh from right now (not from holdStartTime)
+    // so the loop's own first lap begins exactly where this pass ended.
+    if (t >= 1 && cfg.dcHoldLoop && dcHoldTween.loopPoses.length >= 2) {
+      dcHoldTween.phase = 'looping'
+      dcHoldTween.loopStartTime = now
+    }
+    return values
+  } else if (dcHoldTween.phase === 'looping') {
+    // The forward pass just ended exactly AT the last named pose --
+    // starting tCyclic at 0 here would jump backward to
+    // loopPoses[0]->loopPoses[1] instead of continuing on from where the
+    // hand actually is. Offsetting by (segments-1) starts the cyclic
+    // clock at the WRAP segment (last pose -> first pose) instead, so
+    // motion continues seamlessly with no pop, then wraps through
+    // 0->1->...->wrap->0->... forever while held.
+    const segments = dcHoldTween.loopPoses.length
+    const tCyclic = (segments - 1) + (now - dcHoldTween.loopStartTime) / dcHoldTween.loopSegmentMs
+    const values = lerpLoopSequence(dcHoldTween.loopPoses, tCyclic)
     dcHoldTween.lastAppliedValues = values
     return values
   } else if (dcHoldTween.phase === 'retransition') {
@@ -3776,7 +3932,29 @@ function buildClickPoseWidgets(p) {
   if (retransCurveRow) buildGenericCurveWidget(retransCurveRow, { caption: curveCaption, defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
   if (retransRangeRow) buildGenericRangeBarWidget(retransRangeRow, { trackMin: 0, trackMax: CLICK_HOLD_START_TIME_TRACK_MAX, unit: 'ms', defaultValue: { min: 0, max: 300 } })
 }
+// Right Click's own "the relevant setting ui only show when i select
+// either" -- no existing devPanel.js mechanism shows/hides a row by
+// another control's value, so this hand-toggles the 2 mode-specific rows
+// directly by their own data-key (same selector convention as
+// buildClickPoseWidgets() above). Everything else in the group (Enabled,
+// Mode, the shared timing controls) stays visible regardless of mode.
+function updateRightClickModeVisibility() {
+  // Inline style, not the `hidden` attribute -- devPanel.js's own
+  // `.dp-row { display: flex }` stylesheet rule (style.css) is an author
+  // rule, which wins the cascade over the UA stylesheet's `[hidden] {
+  // display: none }` at equal specificity regardless of source order, so
+  // setting `.hidden` alone would silently do nothing here.
+  const singlePoseRow = document.querySelector('.dp-row[data-key="rcTargetPose"]')
+  const tweenRow = document.querySelector('.dp-row[data-key="rcTweenSelector"]')
+  if (singlePoseRow) singlePoseRow.style.display = cfg.rcMode !== 'Single Pose' ? 'none' : ''
+  if (tweenRow) tweenRow.style.display = cfg.rcMode !== 'Tween' ? 'none' : ''
+}
 CLICK_POSE_KEYS.forEach((p) => { parseClickPoseConfig(p); buildClickPoseWidgets(p) })
+// Right Click's Mode dropdown (Single Pose vs. Tween) -- run once now that
+// its own rows definitely exist, same reasoning/timing as the widget
+// builders directly above; rcMode's own onChange (DEV_GROUPS, above) keeps
+// this current after that.
+updateRightClickModeVisibility()
 // Bug fix (direct user report, "I dont see any of the saved poses in the
 // dropdown"): a `select` control's <option> list is populated by
 // `displayValue()` during the host's own restore-from-storage step
@@ -4393,7 +4571,20 @@ function updateRenderOrder() {
         applyPoseValuesToHand(hand, dcHoldValues, hand._dcHoldFrozenSplay || 0)
         overridden = true
       }
-      if (!overridden) {
+      // PERFORMANCE (2026-09-15): this whole idle repose (wrist bone +
+      // all 5 fingers, via rotateOnTrueWorldAxis()-style world-axis-
+      // corrected bone math) is only actually necessary every frame when
+      // Responsive Wrist Splay is live-changing the wrist angle every
+      // frame -- with it off, nothing here changes frame-to-frame (a
+      // manual slider/Default-pose change already triggers its own
+      // repose via onChange, per the "CORRECTED AGAIN" comment below).
+      // Still forced for exactly one frame right after a transition ends
+      // (`hand._wasOverriddenLastFrame`), since retransition can leave
+      // curl stale and this is what re-syncs it -- see the comment below.
+      // Measured live: this block was ~38ms/frame at 255 hands, the
+      // actual lag bottleneck, not rendering itself (~11ms).
+      const needsIdleRepose = cfg.wristSplayResponsiveEnabled || hand._wasOverriddenLastFrame
+      if (needsIdleRepose) {
         // Not mid any pose-transition this frame -- keep this hand's own
         // per-hand basis mirroring the single shared cloneBaseQuat every
         // idle hand has always used, so Whole-Hand Rotation's existing
@@ -4437,6 +4628,7 @@ function updateRenderOrder() {
         // any Click-Hold/Click-Pose sequence shows the identical drift.
         FINGER_NAMES.forEach((name) => applyCurlToSkeleton(name, hand.skinnedMesh.skeleton, hand.currentBaseQuat, hand.wrapper.quaternion, cfg))
       }
+      hand._wasOverriddenLastFrame = overridden
     }
   })
 }

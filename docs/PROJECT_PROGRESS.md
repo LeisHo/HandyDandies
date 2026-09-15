@@ -48,6 +48,30 @@ pose across the whole field while held, confirmed via screenshot;
 correct retransition on release) all worked with no console errors. See
 CHANGELOG.txt's 3rd 2026-09-15 entry for the complete account.
 
+**Follow-up: Double Click Hold now has a Loop checkbox.** Unchecked
+(default) = pre-existing behavior (hold at the final pose). Checked =
+once the initial default->pose1->...->poseN pass finishes, keep cycling
+through just the named poses (never re-including default) for as long as
+the hold continues, at the same per-segment pace as the initial pass.
+Verified: 0 console errors through an extended hold well past the loop
+threshold plus a release; a real segment-continuity bug (a visible
+backward pop at the loop's own start) was caught and fixed via manual
+math trace BEFORE ever running it. **Not independently confirmed via a
+live frame capture** -- this session's browser-automation tool showed the
+same known "render loop appears paused during JS-exec polling" behavior
+this project's CLAUDE.md already documents; a real-device check is still
+worth doing. See CHANGELOG.txt's 4th 2026-09-15 entry for the complete
+account, including a caught-and-fixed continuity bug.
+
+**Note: a concurrent Claude session was found mid-task in this same
+working tree** while the Loop checkbox above was being built (a "Right
+Click" trigger group with a Single-Pose/Tween mode dropdown, plus an
+idle-repose performance fix -- ~38ms/frame measured at 255 hands). Both
+landed in the same uncommitted file with no overlap or conflict with the
+Loop work and were committed together since they couldn't be cleanly
+split; neither was authored or verified by this entry's own author. See
+CHANGELOG.txt's 4th 2026-09-15 entry for what's known about it.
+
 **The "thumb/finger pose looks wrong" saga -- 2 SEPARATE bugs found and
 fixed 2026-09-15, both verified live; awaiting the user's final
 confirmation before declaring this closed.** This turned out to be two

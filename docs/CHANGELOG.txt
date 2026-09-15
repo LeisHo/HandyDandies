@@ -3754,6 +3754,73 @@ Cache-buster bumps: `index.html`'s own `main.js?v=88` -> `?v=89`,
 `?v=14` import.
 
 --------------------------------------------------------------------------------
+2026-09-15  -  04:01:12 - 04:09:38 EDT (8m26s, measured)
+
+**Double Click Hold: added a Loop checkbox.** Direct follow-up request:
+"provide a checkbox to set if it continues to loop or not. As in if i
+keep the double click hold, it will continue looping through the tween,
+not including the initial default pose. If unchecked, it runs through
+the tween once." Unchecked (the pre-existing behavior, still the
+default): the hand holds at the final pose once reached. Checked: once
+the initial default->pose1->...->poseN pass completes,
+`updateDoubleClickHoldTween()` hands off to a new 'looping' phase that
+cycles through JUST the named poses (never re-including default) --
+poseN->pose1->pose2->...->poseN, wrapping, via a new `lerpLoopSequence()`
+helper -- for as long as the hold continues, at the SAME per-segment pace
+as the initial pass (`loopSegmentMs = speedMs / namedPoses.length`, so
+looping doesn't visibly speed up/slow down relative to lap 1).
+
+Caught and fixed one real bug before ever running it: the loop's own
+cyclic clock originally started at `tCyclic = 0`, which maps to
+loopPoses[0]->loopPoses[1] -- since the forward pass had JUST ended
+exactly at the last pose, this would have produced a visible backward
+jump/pop the instant looping began, instead of continuing smoothly.
+Fixed by offsetting the loop's start position to `segments - 1` (the WRAP
+segment, last pose -> first pose), so motion continues seamlessly with no
+pop, confirmed via manual trace of the segment-index math at the
+phase-transition boundary.
+
+**Live-verification limitation, disclosed:** confirmed the combined app
+loads and runs with 0 console errors through an extended hold (well past
+the loop threshold) and a release, and confirmed the Loop checkbox
+renders and is wired to `cfg.dcHoldLoop` correctly. Could NOT confirm
+frame-by-frame visual animation during the loop via this session's
+browser-automation tool -- repeated `canvas.toDataURL()` samples a full
+second apart, taken via `javascript_tool`, came back byte-identical even
+mid-hold, consistent with this project's own already-documented gotcha
+("this session's own browser-automation tool reports
+`document.hidden`/`innerWidth === 0`... a characteristic of that tool,
+not a page bug" -- and an earlier session's own note that the render
+loop can go genuinely paused during JS-exec-based polling specifically).
+Correctness here rests on the manually-traced segment math above and the
+error-free extended hold, not a confirmed live frame capture -- worth a
+real-device check.
+
+**Also present in this commit: a "Right Click" trigger group and an
+idle-repose performance fix, from a CONCURRENT session working in this
+same local working tree while this task was in progress** (detected via
+an on-disk file-change notice mid-edit; confirmed via `git diff` that
+both sets of changes are complete, non-overlapping, and coexist without
+conflict). Right Click (`rcEnabled`/`rcMode`/`rcTargetPose`/
+`rcTweenSelector`/timing controls) is a 3rd fire-and-forget Click-Pose-
+family instance on the right button, with a Mode dropdown choosing a
+single Target Pose or a full Tween Sequence as its target -- reuses
+`resolveTweenSequencePoses()`/`lerpTweenSequence()` from the Tween
+feature above. The performance fix replaces `updateRenderOrder()`'s own
+unconditional-every-frame idle repose with a `needsIdleRepose` gate
+(`cfg.wristSplayResponsiveEnabled || hand._wasOverriddenLastFrame`),
+noting a measured ~38ms/frame cost at 255 hands. Neither was authored or
+independently verified by this entry's own author -- documented here
+only because it landed in the same uncommitted working tree and commit;
+see whichever session did that work for its own fuller account if one
+gets written separately.
+
+Cache-buster bump: `index.html`'s own `main.js?v=91` -> the concurrent
+session's own `?v=92` (its bump superseded this entry's `?v=91` on the
+same line before either was committed -- harmless, since a cache-buster
+is just a monotonically-increasing key, not semantic content).
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================
