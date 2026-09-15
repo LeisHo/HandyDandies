@@ -3887,6 +3887,75 @@ this project's own documented single-tier Save Settings design).
 Cache-buster bump: `index.html`'s own `main.js?v=92` -> `?v=93`.
 
 --------------------------------------------------------------------------------
+2026-09-15  -  04:21:00 - 04:30:25 EDT (9m25s, measured)
+
+**Investigated direct user report: "all my click functions stopped
+working."** No single confirmed root cause on production, but found and
+closed one real, concrete crash path and added a general-purpose
+backstop against the whole class of failure this symptom best matches.
+
+**What was verified NOT broken**, directly on live production via the
+`window.__debug` hook (already exposed by an earlier commit): called
+`triggerClickPose('click')` and a real dispatched click both correctly
+advanced `hand._cp.click.phase` through forward -> paused -> retransition
+and wrote real, non-default rotation values onto the actual skeleton
+bones (confirmed on `rThumb1` directly) -- the entire trigger pipeline
+(gesture detection -> `triggerClickPose` -> `updateClickPoseForHand` ->
+`applyPoseValuesToHand` -> skeleton) is provably correct and unbroken.
+Zero console errors on a fresh production load.
+
+**What live-frame verification could NOT settle:** `renderer.info.render.frame`
+appeared stuck across repeated samples, and even an independent
+`requestAnimationFrame` probe (nothing to do with this app's own code)
+showed zero increments over 2 full seconds under this session's own
+browser-automation tool -- matching (and further confirming, via the
+generic probe) this project's own already-documented gotcha that this
+tool's rAF-based live capture goes unreliable under its own JS-exec
+polling. Manually stepping `updateRenderOrder()` directly (bypassing rAF
+entirely, via `window.__debug`) confirmed the update pipeline itself
+works regardless -- but this means the tool available in this session
+could not confirm or rule out a genuinely stalled render loop in the
+user's own real browser.
+
+**One real, concrete crash path found and fixed via code review:**
+`updateDoubleClickHoldTween()`'s own `speedMs`/`loopSegmentMs`
+(Double Click Hold's Loop mode, added 2 entries ago) divide directly by
+`cfg.dcHoldTweenSpeedMs` with no guard against it being `NaN`/undefined
+(e.g. a stale saved-settings value predating that control). A NaN here
+cascades: NaN `tCyclic` -> `poses[NaN]` -> `undefined` -> `lerpPoseValues()`
+throwing on `undefined[key]`. Because this throw happens INSIDE
+`animate()`'s per-frame body, and recurs on EVERY frame for as long as a
+hand keeps looping, `composer.render()` never gets reached again --
+the screen freezes at whatever last rendered while every click still
+correctly (but invisibly) updates state underneath, exactly matching
+"stopped working." Fixed with `Number.isFinite()` guards (fallback to
+the control's own 800ms default) at both division sites.
+
+**General-purpose backstop, not tied to the specific bug above:**
+wrapped `animate()`'s entire per-frame body in try/catch. Previously, ANY
+future per-frame exception (from this bug, a different one, or one not
+written yet) would have the same silent-freeze signature -- `console.error`
+never shown to a non-technical user, screen just stops updating, "click
+functions stopped working" with no visible cause. Now: whatever throws
+gets logged loudly and the loop keeps running -- the current frame's
+render is skipped, but the NEXT frame gets a clean chance rather than
+repeating the same throw forever (rAF was already re-scheduled at the
+very top of `animate()`, so this doesn't change WHETHER the loop
+survives a one-off throw, only whether a RECURRING one does, and whether
+either kind is now visible in the console instead of silent).
+
+**Disclosed limitation:** could not directly reproduce the user's exact
+reported freeze in this session's own environment (fresh production
+loads never exhibited a recurring per-frame exception). This fix closes
+a real, concrete gap consistent with the reported symptom rather than a
+confirmed-reproduced root cause -- ask the user to confirm whether this
+resolves it, and if it recurs, `console.error`'s own new "animate() frame
+threw" message plus its stack trace should now pinpoint the exact cause
+directly, rather than requiring another investigation like this one.
+
+Cache-buster bump: `index.html`'s own `main.js?v=93` -> `?v=94`.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

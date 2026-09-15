@@ -3605,7 +3605,16 @@ function startDoubleClickHoldTween() {
   // the initial pass's own segment count) so looping doesn't visibly
   // speed up or slow down relative to the first lap.
   dcHoldTween.loopPoses = namedPoses
-  dcHoldTween.loopSegmentMs = Math.max(cfg.dcHoldTweenSpeedMs / namedPoses.length, 1)
+  // NaN/undefined-safe: an invalid speed here (e.g. a stale saved-settings
+  // value predating this control) would divide down into a NaN
+  // `loopSegmentMs`, then NaN `tCyclic`, then `poses[NaN]` -> undefined
+  // -> lerpPoseValues() throwing on `undefined[key]` -- and since that
+  // throw happens INSIDE animate() every single frame this hand is still
+  // looping, it would silently kill rendering (composer.render() never
+  // reached) for as long as the hold continues, indistinguishable from
+  // "everything stopped working" to whoever's looking at the screen.
+  const safeSpeedMs = Number.isFinite(cfg.dcHoldTweenSpeedMs) ? cfg.dcHoldTweenSpeedMs : 800
+  dcHoldTween.loopSegmentMs = Math.max(safeSpeedMs / namedPoses.length, 1)
   dcHoldTween.phase = 'forward'
   dcHoldTween.holdStartTime = performance.now()
   // Per-hand frozen Responsive Wrist Splay, same reasoning as Click-Hold-
@@ -3638,7 +3647,7 @@ function endDoubleClickHoldTween() {
 // Returns the shared pose-values object to apply this frame, or null when
 // idle (nothing to override).
 function updateDoubleClickHoldTween(now) {
-  const speedMs = Math.max(cfg.dcHoldTweenSpeedMs, 1)
+  const speedMs = Math.max(Number.isFinite(cfg.dcHoldTweenSpeedMs) ? cfg.dcHoldTweenSpeedMs : 800, 1)
   if (dcHoldTween.phase === 'forward') {
     const elapsed = now - dcHoldTween.holdStartTime
     const t = THREE.MathUtils.clamp(elapsed / speedMs, 0, 1)
@@ -4329,46 +4338,68 @@ function applyRendererSize(w, h) {
 }
 window.addEventListener('resize', () => applyRendererSize(window.innerWidth, window.innerHeight))
 
+// Direct user report ("all my click functions stopped working"): every
+// trigger's own state-machine logic (triggerClickPose/updateClickPoseForHand/
+// applyPoseValuesToHand etc.) was confirmed correct by manually stepping it
+// outside the render loop -- state (phase, lastAppliedValues) and actual
+// skeleton bone rotations all updated exactly as expected. What ISN'T
+// defended against: `requestAnimationFrame(animate)` (below) reschedules
+// the NEXT frame before any of the rest of this function runs, so a single
+// frame throwing partway through doesn't normally kill the loop OUTRIGHT --
+// but if the SAME exception recurs every frame (e.g. a stray NaN that never
+// clears on its own), `composer.render()` never gets reached on ANY
+// subsequent frame, and the screen silently freezes at whatever was last
+// successfully rendered -- indistinguishable from "clicking does nothing"
+// to whoever's looking at it, even though every click is still correctly
+// updating state underneath. One real path into exactly that was found and
+// fixed directly (see updateDoubleClickHoldTween()'s/startDoubleClickHoldTween()'s
+// own NaN-guard comments) -- this try/catch is the general-purpose backstop
+// for that whole FAILURE MODE, not a fix for one specific bug: whatever
+// throws, log it loudly and keep the loop alive rather than freezing silently.
 function animate() {
   requestAnimationFrame(animate)
-  renderer.getSize(rendererSizeCheck)
-  if (window.innerWidth > 0 && window.innerHeight > 0 && (rendererSizeCheck.x !== window.innerWidth || rendererSizeCheck.y !== window.innerHeight)) {
-    applyRendererSize(window.innerWidth, window.innerHeight)
-  }
-  controls.update()
-  enforceCameraPanExtent()
-  syncCameraPanelFromLive()
-  updateCursorTarget()
-  armLengthWidgetResyncs.forEach((fn) => fn())
-  if (cfg.trackingEnabled) {
-    // Per-hand now (not hoisted above the loop like before) -- with Palm
-    // Faces Cursor on, each hand's own roll angle depends on ITS OWN
-    // position relative to the live cursor (computeRadialRollDeg(), see
-    // its own declaration comment), so it genuinely can't be computed
-    // once for the whole field anymore. With it off, every hand still
-    // gets the exact same roll (baseDeg=0, just the live slider), same
-    // as before.
-    hands.forEach((hand) => {
-      const m = new THREE.Matrix4().lookAt(hand.wrapper.position, cursorTarget, UP)
-      const desired = new THREE.Quaternion().setFromRotationMatrix(m)
-      const baseDeg = cfg.palmFacesCursor ? computeRadialRollDeg(hand.wrapper.position, cursorTarget) : 0
-      // Whole-wrapper rotation only, same mechanism as the default mode;
-      // no skeleton/pose involvement either way.
-      desired.multiply(computeRollQuat(baseDeg))
-      hand.wrapper.quaternion.slerp(desired, cfg.trackingDamping)
-    })
-  }
-  updateRenderOrder()
-  composer.render()
-  // Pose Preview's own tiny render pass -- guarded by offsetParent (null
-  // whenever an ancestor is display:none, i.e. the "Pose Preview" group
-  // is collapsed, or the whole dev panel is hidden/collapsed) so an
-  // orbit-controllable mini-viewport nobody can currently see doesn't
-  // still cost a render every frame.
-  if (previewRenderer && previewRenderer.domElement.offsetParent !== null) {
-    resizePosePreview()
-    previewControls.update()
-    previewRenderer.render(previewScene, previewCamera)
+  try {
+    renderer.getSize(rendererSizeCheck)
+    if (window.innerWidth > 0 && window.innerHeight > 0 && (rendererSizeCheck.x !== window.innerWidth || rendererSizeCheck.y !== window.innerHeight)) {
+      applyRendererSize(window.innerWidth, window.innerHeight)
+    }
+    controls.update()
+    enforceCameraPanExtent()
+    syncCameraPanelFromLive()
+    updateCursorTarget()
+    armLengthWidgetResyncs.forEach((fn) => fn())
+    if (cfg.trackingEnabled) {
+      // Per-hand now (not hoisted above the loop like before) -- with Palm
+      // Faces Cursor on, each hand's own roll angle depends on ITS OWN
+      // position relative to the live cursor (computeRadialRollDeg(), see
+      // its own declaration comment), so it genuinely can't be computed
+      // once for the whole field anymore. With it off, every hand still
+      // gets the exact same roll (baseDeg=0, just the live slider), same
+      // as before.
+      hands.forEach((hand) => {
+        const m = new THREE.Matrix4().lookAt(hand.wrapper.position, cursorTarget, UP)
+        const desired = new THREE.Quaternion().setFromRotationMatrix(m)
+        const baseDeg = cfg.palmFacesCursor ? computeRadialRollDeg(hand.wrapper.position, cursorTarget) : 0
+        // Whole-wrapper rotation only, same mechanism as the default mode;
+        // no skeleton/pose involvement either way.
+        desired.multiply(computeRollQuat(baseDeg))
+        hand.wrapper.quaternion.slerp(desired, cfg.trackingDamping)
+      })
+    }
+    updateRenderOrder()
+    composer.render()
+    // Pose Preview's own tiny render pass -- guarded by offsetParent (null
+    // whenever an ancestor is display:none, i.e. the "Pose Preview" group
+    // is collapsed, or the whole dev panel is hidden/collapsed) so an
+    // orbit-controllable mini-viewport nobody can currently see doesn't
+    // still cost a render every frame.
+    if (previewRenderer && previewRenderer.domElement.offsetParent !== null) {
+      resizePosePreview()
+      previewControls.update()
+      previewRenderer.render(previewScene, previewCamera)
+    }
+  } catch (err) {
+    console.error('animate() frame threw -- rendering skipped for this frame, loop continues:', err)
   }
 }
 animate()

@@ -103,6 +103,30 @@ to these 3 new ones) -- fixed by adding the same one-time
 
 See CHANGELOG.txt's 5th 2026-09-15 entry for the complete account.
 
+**Direct user report investigated: "all my click functions stopped
+working" -- fixed one confirmed crash path + added a general backstop,
+not a confirmed-reproduced root cause.** The entire trigger pipeline
+(gesture -> `triggerClickPose` -> phase machine -> actual skeleton bone
+writes) was verified correct and unbroken directly on production via
+`window.__debug`. Live-frame verification itself was inconclusive --
+this session's browser-automation tool showed the same already-
+documented rAF-polling unreliability (confirmed via an independent rAF
+probe, not just this app's own code), so a genuinely stalled render loop
+in the user's own browser could be neither confirmed nor ruled out.
+
+Found and fixed one real, concrete way this exact symptom COULD happen:
+Double Click Hold's Loop math divided by `cfg.dcHoldTweenSpeedMs` with no
+NaN/undefined guard -- a bad value there cascades into `animate()`
+throwing on EVERY frame for as long as a hand loops, permanently
+freezing the screen (state keeps updating invisibly underneath) with no
+visible error. Fixed with `Number.isFinite()` guards. Also wrapped
+`animate()`'s whole per-frame body in try/catch as a general backstop --
+this bug or a different one, present or future, can no longer freeze
+rendering silently; whatever throws is now logged loudly and the loop
+keeps running. **Ask the user to confirm this resolves it** -- if it
+recurs, the new console error should pinpoint the exact cause directly.
+See CHANGELOG.txt's 6th 2026-09-15 entry for the complete account.
+
 **The "thumb/finger pose looks wrong" saga -- 2 SEPARATE bugs found and
 fixed 2026-09-15, both verified live; awaiting the user's final
 confirmation before declaring this closed.** This turned out to be two
