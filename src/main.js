@@ -1303,7 +1303,25 @@ const FINGER_MAX_DEG = {
   ring: [90, 100, 70],
   pinky: [90, 100, 70]
 }
-const FINGER_SIGN = { thumb: -1, index: 1, middle: -1, ring: -1, pinky: 1 }
+// CORRECTED 2026-09-15 -- middle/ring flipped -1 -> 1, matching HANDO's own
+// 2026-09-14 fix ("for middle finger and ring finger curl, inverse the
+// number. right now, curling it is negative numbers"), never previously
+// ported here. This was the ACTUAL cause of "Point"/"MiddleFinger"/"Fist"
+// (and by extension any pose with nonzero curlMiddle/curlRing) rendering
+// as fragmented, chaotic geometry rather than a coherent hand shape --
+// confirmed both ways: (1) the SAME broken result reproduced identically
+// on the pre-delta=identity-fix code, ruling out the wrist-axis
+// conjugation as the cause; (2) patching just this one line in a scratch
+// copy turned "Point"'s chaotic mess into a correctly-formed pointing
+// hand (extended index, curled fist body, visible thumb). HANDO's own fix
+// shipped together with a one-time migration of ITS OWN existing saved
+// poses' curlMiddle/curlRing values (to preserve their visual meaning
+// under the new sign) -- NOT needed here, since every pose in this
+// project's own saved-pose list was captured/imported from HANDO AFTER
+// that migration already happened (all use positive curlMiddle/curlRing
+// for an actual curl, consistent with the new convention already) -- a
+// pure sign flip, no data migration, is the complete fix for this project.
+const FINGER_SIGN = { thumb: -1, index: 1, middle: 1, ring: 1, pinky: 1 }
 // Per-finger curl axis -- all 4 non-thumb fingers curl around WORLD_X, the
 // thumb around WORLD_Y (curls toward the palm center). Ported verbatim
 // from HANDO's own live-measured tables (same asset/rig) -- see its own
