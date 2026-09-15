@@ -481,6 +481,11 @@ function renderMultiSelectRows(entry) {
   listEl.innerHTML = ''
   values.forEach((val, i) => {
     const rowEl = el('div', 'dp-multi-select-row')
+    // Drag handle, own dedicated element (never the row/select itself) --
+    // same §12e convention as '.dp-lp-row-handle'/'.dp-row-handle':
+    // reordering starts only from this icon, so clicking the dropdown or
+    // Remove is never mistaken for a drag.
+    const handle = el('span', 'dp-ms-row-handle', { textContent: '⠿' })
     const select = el('select')
     values[i] = fillSelectOptions(ctrl, select, val)
     select.addEventListener('change', () => {
@@ -493,7 +498,7 @@ function renderMultiSelectRows(entry) {
       commit(ctrl, values.slice())
       renderMultiSelectRows(entry)
     })
-    rowEl.append(select, removeBtn)
+    rowEl.append(handle, select, removeBtn)
     listEl.appendChild(rowEl)
   })
 }
@@ -516,6 +521,18 @@ function buildMultiSelectRow(ctrl, row) {
   // render may show 0 options per row until the host's later explicit
   // `refreshMultiSelectOptions()` call, once its own init has finished.
   renderMultiSelectRows(entry)
+  // Drag-to-reorder -- reuses the SAME generic setupReorder() the list-
+  // picker's own rows/groups already use (§12e: reorder only from the
+  // handle icon). Only one container (this list is always flat, no
+  // nesting like list-picker groups), so getTargets is just [listEl].
+  // `entry.values` isn't DOM-order-derived during a render (it's the
+  // array renderMultiSelectRows() walks to BUILD the DOM), so once a drag
+  // genuinely drops, resync it from the now-reordered <select> elements'
+  // own current values rather than assuming index i still matches.
+  setupReorder(listEl, 'dp-multi-select-row', 'dp-ms-row-handle', () => [listEl], () => {
+    entry.values = Array.from(listEl.querySelectorAll('.dp-multi-select-row select')).map((s) => s.value)
+    commit(ctrl, entry.values.slice())
+  })
 }
 // Call after the underlying option list changes (mirrors
 // refreshSelectOptions() for the single-'select' case) -- re-resolves

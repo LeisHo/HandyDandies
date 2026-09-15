@@ -3682,6 +3682,78 @@ Camera Pan (OrbitControls, right-drag)". Verified live: a real click logs
 Cache-buster bump: `index.html`'s own `main.js?v=87` -> `?v=88`.
 
 --------------------------------------------------------------------------------
+2026-09-15  -  03:39:38 - 03:53:41 EDT (14m03s, measured)
+
+**New feature: Tween + Double Click Hold Tween.** Direct user request,
+modeled on HANDO's own "Tween / Export" dev-panel group but deliberately
+narrower ("We dont need that. we just need poses") and with a different
+trigger mechanic than HANDO's manual preview slider.
+
+**Tween group** (new DEV_GROUPS entry): `tweenPoses`, a 'multi-select'
+control (same generic devpanel/devPanel.js type HANDO's own tween group
+uses -- a growable list of dropdowns backed by one ordered array of saved-
+pose names) extended here with drag-to-reorder, direct request ("allow me
+to click and drag to reorder these"). devpanel/devPanel.js's own
+`renderMultiSelectRows()`/`buildMultiSelectRow()` gained a dedicated
+`.dp-ms-row-handle` drag icon per row (same §12e "handle icon only, never
+the row itself" convention as list-picker's own `.dp-lp-row-handle`) and
+now calls the SAME generic `setupReorder()` list-picker rows/groups
+already use, resyncing `entry.values` from the post-drop DOM order rather
+than assuming index `i` still matches. `savedTweenSequences` is a
+'list-picker' capturing ONLY `tweenPoses` (`captureTweenSequencePreset()`/
+`useTweenSequencePreset()`, main.js) -- no camera/lighting/toon fields at
+all, unlike HANDO's equivalent (this project has no per-pose camera/
+lighting capture to bundle in the first place).
+
+**Double Click Hold group** (new DEV_GROUPS entry): Master On/Off, a
+"Tween Selector" dropdown (options sourced from `savedTweenSequences`),
+and a single "Tween Speed (Ms)" slider. 2 rounds of direct clarification
+resolved the exact behavior: (1) the sequence always tweens FROM THE
+DEFAULT POSE through the selected sequence's own poses in order --
+`startDoubleClickHoldTween()` prepends `poseDefaultValues` to the
+resolved pose list, so even a 1-pose sequence tweens default->pose1; (2)
+on release, every hand retransitions back to default from WHATEVER pose
+it's currently in, at the SAME speed as the forward tween -- no separate
+retransition-speed control, unlike Click-Hold-Pose's own 2 groups.
+Applies IDENTICALLY to every hand at once (no per-hand distance stagger,
+unlike Click-Hold-Pose/Click-Pose) -- `updateDoubleClickHoldTween()` is
+computed ONCE per frame in `animate()`, not once per hand, and the result
+applied to every hand via the existing `applyPoseValuesToHand()`
+pipeline (same one Click-Hold-Pose/Click-Pose already use -- no new
+skeleton-posing math needed).
+
+**Gesture detection**: "double click hold" (click, release, click-and-
+HOLD -- distinct from Click-Pose's own fire-and-forget 'dblclick', which
+recognizes at the 2nd RELEASE, and from Click-Hold-Pose's single press-
+and-hold). Implemented as a self-contained window pointerdown/up pair:
+`dcHoldLastCleanUpTime` records the last left pointerup that was a clean,
+quick click (reusing the Mouse Tracking Log's own MOUSE_LOG_MULTICLICK_MS/
+MOUSE_LOG_HELD_DRAG_MS/MOUSE_LOG_MOVE_THRESHOLD_PX thresholds for
+consistency, not fresh constants); a left pointerdown arriving within
+that window starts the tween immediately -- deliberately independent of
+chp/click/dblclick's own state (a disclosed simplification, same
+"whichever runs last this frame wins" pattern already used for chp vs.
+rchp).
+
+Verified live on a local dev server via real dispatched PointerEvents
+(down, up, down-and-hold, up) rather than synthetic function calls: drag-
+reorder on `tweenPoses` correctly resynced `cfg.tweenPoses` from DOM
+order (confirmed via `commit()`'s own downstream state); saving a Tween
+Sequence correctly captured only `tweenPoses`; the Double Click Hold
+Tween Selector dropdown correctly picked up the newly-saved sequence
+name; performing the actual gesture visibly posed every hand in the
+field IDENTICALLY (confirmed via screenshot -- a uniform pose across the
+whole field, unlike Click-Hold-Pose's own per-hand staggered look) and
+releasing correctly retransitioned every hand back to its resting pose,
+with no console errors beyond the pre-existing, unrelated
+`api/save-settings` 404s (expected on a plain static server, no Vercel
+endpoint behind it).
+
+Cache-buster bumps: `index.html`'s own `main.js?v=88` -> `?v=89`,
+`style.css?v=5` -> `?v=6`; main.js's own `devpanel/devPanel.js?v=13` ->
+`?v=14` import.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

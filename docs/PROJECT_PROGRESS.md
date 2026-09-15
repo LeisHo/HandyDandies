@@ -18,6 +18,36 @@ work seamlessly from there.
 
 ## Currently working on
 
+**New feature: Tween + Double Click Hold Tween -- built 2026-09-15,
+verified live on a local dev server, awaiting the user's confirmation on
+production.** Modeled on HANDO's own "Tween / Export" dev-panel group,
+deliberately narrower ("We dont need that. we just need poses" -- no
+camera/lighting/toon capture, no PNG export UI) and with a different
+trigger mechanic (a gesture-driven playback, not a manual preview slider).
+
+**Tween group**: `tweenPoses`, an ordered, drag-to-reorder-capable list of
+saved-pose selections (devpanel/devPanel.js's 'multi-select' control type,
+extended with a drag handle + the same generic `setupReorder()` list-
+picker rows already use). `savedTweenSequences`, a list-picker capturing
+ONLY that ordered pose-name array, nothing else.
+
+**Double Click Hold group**: Master On/Off, a Tween Selector dropdown
+(reads `savedTweenSequences`), and one Tween Speed (Ms) slider. Gesture is
+a genuine double-click whose 2nd press is HELD (distinct from Click-Hold-
+Pose's single press-and-hold and Click-Pose's fire-and-forget double-
+click) -- while held, every hand tweens IDENTICALLY (no per-hand distance
+stagger, unlike every other trigger group in this project) from the
+DEFAULT pose through the selected sequence's poses in order; on release,
+every hand retransitions back to default from wherever it currently is,
+at the same speed as the forward tween (2 rounds of direct clarification
+nailed down both of these specifics).
+
+Verified via real dispatched PointerEvents on a local dev server: drag-
+reorder, sequence save, dropdown wiring, and the actual gesture (uniform
+pose across the whole field while held, confirmed via screenshot;
+correct retransition on release) all worked with no console errors. See
+CHANGELOG.txt's 3rd 2026-09-15 entry for the complete account.
+
 **The "thumb/finger pose looks wrong" saga -- 2 SEPARATE bugs found and
 fixed 2026-09-15, both verified live; awaiting the user's final
 confirmation before declaring this closed.** This turned out to be two

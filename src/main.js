@@ -6,7 +6,7 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js'
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js'
 import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js'
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js'
-import { initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, saveCurrentSettings } from './devpanel/devPanel.js?v=13'
+import { initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings } from './devpanel/devPanel.js?v=14'
 
 // A defensive wrapper around devPanel.js's own refreshSelectOptions() --
 // found via live testing (direct user report: "I dont see any of the
@@ -19,6 +19,9 @@ import { initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, 
 // never take down the whole page load -- caught and logged instead.
 function safeRefreshSelectOptions(key) {
   try { refreshSelectOptions(key) } catch (err) { console.error(`safeRefreshSelectOptions('${key}') failed`, err) }
+}
+function safeRefreshMultiSelectOptions(key) {
+  try { refreshMultiSelectOptions(key) } catch (err) { console.error(`safeRefreshMultiSelectOptions('${key}') failed`, err) }
 }
 
 const MODEL_URL = '../data/processed/HAND3D/Hand2.glb'
@@ -341,7 +344,7 @@ const DEV_GROUPS = [
         // refreshSelectOptions() call, not automatically -- without this,
         // saving or deleting a pose here wouldn't show up there until the
         // page reloads.
-        onChange: () => { safeRefreshSelectOptions('chpTargetPose'); safeRefreshSelectOptions('rchpTargetPose'); safeRefreshSelectOptions('clickTargetPose'); safeRefreshSelectOptions('dblclickTargetPose') }
+        onChange: () => { safeRefreshSelectOptions('chpTargetPose'); safeRefreshSelectOptions('rchpTargetPose'); safeRefreshSelectOptions('clickTargetPose'); safeRefreshSelectOptions('dblclickTargetPose'); safeRefreshMultiSelectOptions('tweenPoses') }
       },
       // The "Default" button used to live here as its own DEV_GROUPS row
       // (reset every pose slider to its own CODE default). Direct
@@ -512,6 +515,65 @@ const DEV_GROUPS = [
     retransitionStartTimeCurve: '[{"x":0,"y":0},{"x":1,"y":1}]',
     retransitionStartTimeRange: '{"min":0,"max":300}'
   }),
+  // Tween -- direct user request, modeled on HANDO's own "Tween / Export"
+  // group (an ordered chain of saved poses, lerped through end-to-end) but
+  // deliberately narrower: no manual preview slider, no camera/lighting/
+  // toon capture, no PNG export UI -- "We dont need that. we just need
+  // poses." `tweenPoses` is the SAME generic 'multi-select' control type
+  // HANDO's own tween group uses (a growable list of dropdowns backed by
+  // one ordered array), extended here with drag-to-reorder (direct
+  // request: "allow me to click and drag to reorder these") -- see
+  // devpanel/devPanel.js's own renderMultiSelectRows()/buildMultiSelectRow()
+  // comments for that addition. `savedTweenSequences` is a 'list-picker'
+  // capturing ONLY `tweenPoses`, via captureTweenSequencePreset()/
+  // useTweenSequencePreset() below -- no camera/lighting/toon fields at
+  // all, unlike HANDO's own equivalent.
+  {
+    title: 'Tween',
+    controls: [
+      { key: 'tweenPoses', label: 'Tween Poses (In Order)', type: 'multi-select', def: [], options: () => (cfg.savedPoses || []).map((p) => p.name) },
+      {
+        key: 'savedTweenSequences',
+        label: 'Saved Tween Sequences',
+        type: 'list-picker',
+        def: [],
+        itemLabel: 'Sequence',
+        captureCurrent: () => captureTweenSequencePreset(),
+        onUse: (item) => useTweenSequencePreset(item),
+        // Mirrors 'savedPoses'' own onChange: the Double Click Hold
+        // group's own Tween Selector dropdown reads this same list via
+        // options(), which devPanel.js only rebuilds on an explicit
+        // refreshSelectOptions() call.
+        onChange: () => safeRefreshSelectOptions('dcHoldTweenSelector')
+      }
+    ]
+  },
+  // Double Click Hold -- direct user request ("*DC*Double Click Hold*
+  // This will allow me to set a saved tween as the resulting animation/
+  // transition on double click hold. The tween will apply to all hands
+  // simultaneously and stop when i release"), clarified twice: the
+  // sequence always tweens from the DEFAULT pose (poseDefaultValues)
+  // through the selected Saved Tween Sequence's own poses in order ("it
+  // will tween from the default pose, to pose 1, then so on"), and on
+  // release every hand retransitions back to default starting from
+  // WHATEVER pose it's currently in, at the SAME speed as the forward
+  // tween ("whatever pose the hand is in, it will transition at the same
+  // speed back to default") -- so there's deliberately no separate
+  // retransition-speed control, unlike Click-Hold-Pose's own 2 groups.
+  // Applies identically to every hand at once (no per-hand distance
+  // stagger, unlike Click-Hold-Pose/Click-Pose) -- see
+  // updateDoubleClickHoldTween()'s own comment for the shared (not
+  // per-hand) phase state this implies, and the window pointerdown/up
+  // listeners just above it for how the double-click-then-hold gesture
+  // itself is detected.
+  {
+    title: 'Double Click Hold',
+    controls: [
+      { key: 'dcHoldEnabled', label: 'Double Click Hold (Master On/Off)', type: 'checkbox', def: false },
+      { key: 'dcHoldTweenSelector', label: 'Tween Selector', type: 'select', def: '', options: () => (cfg.savedTweenSequences || []).map((s) => s.name) },
+      { key: 'dcHoldTweenSpeedMs', label: 'Tween Speed (Ms)', type: 'slider', min: 50, max: 5000, step: 10, def: 800 }
+    ]
+  },
   {
     // Direct user request: "provide me a collapsible pose viewer within
     // the dev panel itself" -- deliberately 0 controls here. buildPosePreview()
@@ -2983,6 +3045,49 @@ function applyPoseValuesToHand(hand, poseValues, extraSplayDeg) {
   applyWristPoseToSkeleton(hand.skinnedMesh.skeleton, poseValues, extraSplayDeg)
   FINGER_NAMES.forEach((name) => applyCurlToSkeleton(name, hand.skinnedMesh.skeleton, hand.currentBaseQuat, hand.wrapper.quaternion, poseValues))
 }
+// Tween group's own preset capture/apply -- ONLY `tweenPoses` (the ordered
+// array of saved-pose NAMES, same shape 'multi-select' always stores),
+// unlike HANDO's equivalent which also bundles camera/lighting ("We dont
+// need that. we just need poses" -- direct user request).
+function captureTweenSequencePreset() {
+  return { tweenPoses: (cfg.tweenPoses || []).slice() }
+}
+function useTweenSequencePreset(item) {
+  if (item.tweenPoses !== undefined) {
+    cfg.tweenPoses = item.tweenPoses.slice()
+    syncValue('tweenPoses', cfg.tweenPoses)
+    safeRefreshMultiSelectOptions('tweenPoses')
+  }
+}
+// Resolves an ordered array of saved-pose NAMES into the actual pose
+// objects from `cfg.savedPoses`, dropping any name that's empty (an
+// unfilled row) or no longer exists (deleted since) -- same logic and
+// same "last match wins" duplicate-name tie-break as HANDO's own
+// resolveTweenPoses(), ported here rather than re-derived.
+function resolveTweenSequencePoses(names) {
+  return (names || [])
+    .map((name) => {
+      const matches = (cfg.savedPoses || []).filter((p) => p.name === name)
+      return matches[matches.length - 1]
+    })
+    .filter(Boolean)
+}
+// Interpolates across a WHOLE ordered sequence of pose-shaped objects at
+// fraction `t` (0 = poses[0], 1 = poses[last]) -- same segment-finding
+// math as HANDO's own applyPoseTween(), generalized to return a values
+// object (for applyPoseValuesToHand()) instead of writing straight to
+// cfg/sliders, since Double Click Hold Tween (below) never previews on
+// the Pose group's own sliders, exactly like Click-Hold-Pose/Click-Pose
+// don't either.
+function lerpTweenSequence(poses, t) {
+  if (!poses || poses.length === 0) return null
+  if (poses.length === 1) return lerpPoseValues(poses[0], poses[0], 0)
+  const segments = poses.length - 1
+  const scaled = THREE.MathUtils.clamp(t, 0, 1) * segments
+  const segIndex = Math.min(Math.floor(scaled), segments - 1)
+  const localT = scaled - segIndex
+  return lerpPoseValues(poses[segIndex], poses[segIndex + 1], localT)
+}
 function computeStartDelayMs(distanceToCursor, minLiveDist, liveDistRange, curveParsed, rangeParsed) {
   const normDist = THREE.MathUtils.clamp((distanceToCursor - minLiveDist) / liveDistRange, 0, 1)
   const curveY = THREE.MathUtils.clamp(evaluateArmLengthCurve(curveParsed, normDist), 0, 1)
@@ -3336,6 +3441,116 @@ window.addEventListener('pointerup', (e) => {
     clickPoseClickCount = 0
   }, MOUSE_LOG_MULTICLICK_MS)
 })
+
+// -----------------------------------------------------------------------
+// Double Click Hold Tween -- direct request ("*DC*Double Click Hold* This
+// will allow me to set a saved tween as the resulting animation/
+// transition on double click hold. The tween will apply to all hands
+// simultaneously and stop when i release"). Unlike Click-Hold-Pose/Click-
+// Pose (both per-hand, distance-staggered), this is ONE shared phase
+// state for the whole field -- "apply to all hands simultaneously" is the
+// point of this feature, not an incidental simplification.
+//
+// Gesture: a genuine double-click whose 2nd press is HELD (not released
+// quickly) -- distinct from Click-Pose's own 'dblclick' (fire-and-forget,
+// recognized at the 2nd RELEASE) and from Click-Hold-Pose's 'chp' (a
+// single press-and-hold, no double-click required). Detected with its own
+// self-contained pointerdown/up pair: `dcHoldLastCleanUpTime` records the
+// last left pointerup that was a clean, quick click (not a drag) outside
+// the dev panel; a LEFT pointerdown arriving within MOUSE_LOG_MULTICLICK_MS
+// of that is the 2nd press of a double-click, so the tween starts
+// immediately (no separate "was this held long enough" gate -- the
+// double-click itself is already the disambiguating signal, unlike a
+// single click+hold which needs Click-Hold-Pose's own Hold Confirm Delay).
+// Deliberately independent of chp/click/dblclick's own state (no cross-
+// suppression) -- a disclosed simplification, same as the existing chp-
+// vs-rchp "whichever runs last this frame wins" note in animate()'s own
+// per-hand loop.
+const dcHoldTween = { phase: 'idle', holdStartTime: 0, poses: [], lastAppliedValues: null, retransitionStart: null, retransitionStartTime: 0 }
+function startDoubleClickHoldTween() {
+  if (!cfg.dcHoldEnabled) return
+  const seq = (cfg.savedTweenSequences || []).find((s) => s.name === cfg.dcHoldTweenSelector)
+  const namedPoses = seq ? resolveTweenSequencePoses(seq.tweenPoses) : []
+  if (namedPoses.length < 1) return
+  // Direct clarification: "it will tween from the default pose, to pose
+  // 1, then so on" -- the sequence played always starts at the field's
+  // own default pose, never just the first selected pose.
+  dcHoldTween.poses = [poseDefaultValues, ...namedPoses]
+  dcHoldTween.phase = 'forward'
+  dcHoldTween.holdStartTime = performance.now()
+  // Per-hand frozen Responsive Wrist Splay, same reasoning as Click-Hold-
+  // Pose/Click-Pose's own frozenSplayDeg (see updateClickHoldPoseForHand()'s
+  // own top comment) -- captured once per hand right here, not per-hand-
+  // staggered start times (there are none for this feature).
+  let minD = Infinity, maxD = -Infinity
+  const dists = hands.map((hand) => {
+    const d = hand.wrapper.position.distanceTo(cursorTarget)
+    if (d < minD) minD = d
+    if (d > maxD) maxD = d
+    return d
+  })
+  const range = Math.max(maxD - minD, 0.001)
+  hands.forEach((hand, i) => { hand._dcHoldFrozenSplay = computeResponsiveWristSplayDeg(dists[i], minD, range) })
+}
+// Direct clarification: "On release, whatever pose the hand is in, it
+// will transition at the same speed back to default" -- retransition
+// reuses `dcHoldTweenSpeedMs` itself (no separate retransition-speed
+// control), starting from whatever values were last applied (wherever
+// `t` happened to be when released), not from the sequence's own end.
+function endDoubleClickHoldTween() {
+  if (dcHoldTween.phase === 'idle') return
+  dcHoldTween.retransitionStart = dcHoldTween.lastAppliedValues || { ...poseDefaultValues }
+  dcHoldTween.retransitionStartTime = performance.now()
+  dcHoldTween.phase = 'retransition'
+}
+// Called once per frame (not once per hand -- the result is identical
+// for every hand), from animate()'s own per-hand loop just before it.
+// Returns the shared pose-values object to apply this frame, or null when
+// idle (nothing to override).
+function updateDoubleClickHoldTween(now) {
+  const speedMs = Math.max(cfg.dcHoldTweenSpeedMs, 1)
+  if (dcHoldTween.phase === 'forward') {
+    const t = THREE.MathUtils.clamp((now - dcHoldTween.holdStartTime) / speedMs, 0, 1)
+    const values = lerpTweenSequence(dcHoldTween.poses, t)
+    dcHoldTween.lastAppliedValues = values
+    return values
+  } else if (dcHoldTween.phase === 'retransition') {
+    const elapsed = now - dcHoldTween.retransitionStartTime
+    const progress = THREE.MathUtils.clamp(elapsed / speedMs, 0, 1)
+    const values = lerpPoseValues(dcHoldTween.retransitionStart, poseDefaultValues, progress)
+    if (progress >= 1) dcHoldTween.phase = 'idle'
+    return values
+  }
+  return null
+}
+let dcHoldDownInfo = null
+let dcHoldLastCleanUpTime = -Infinity
+window.addEventListener('pointerdown', (e) => {
+  if (e.target && e.target.closest && e.target.closest('.dp-panel')) return
+  if (e.button !== 0) return
+  const now = performance.now()
+  if (now - dcHoldLastCleanUpTime <= MOUSE_LOG_MULTICLICK_MS) startDoubleClickHoldTween()
+  dcHoldDownInfo = { time: now, x: e.clientX, y: e.clientY }
+})
+window.addEventListener('pointerup', (e) => {
+  if (e.button !== 0) return
+  if (dcHoldTween.phase !== 'idle') {
+    endDoubleClickHoldTween()
+    dcHoldDownInfo = null
+    return
+  }
+  // Only a clean (not dragged) click starts the double-click window --
+  // same heldMs/moved classification as the Mouse Tracking Log's own
+  // wasDrag check, independent constants/state so this feature never
+  // depends on that log existing or being enabled.
+  if (dcHoldDownInfo) {
+    const heldMs = performance.now() - dcHoldDownInfo.time
+    const moved = Math.hypot(e.clientX - dcHoldDownInfo.x, e.clientY - dcHoldDownInfo.y) > MOUSE_LOG_MOVE_THRESHOLD_PX
+    dcHoldLastCleanUpTime = (heldMs <= MOUSE_LOG_HELD_DRAG_MS && !moved) ? performance.now() : -Infinity
+  }
+  dcHoldDownInfo = null
+})
+window.addEventListener('blur', () => endDoubleClickHoldTween())
 
 // Generic versions of Arm Length's own 2 custom widgets (see
 // buildArmLengthRangeWidget()/buildArmLengthCurveWidget() for the
@@ -4115,6 +4330,10 @@ function updateRenderOrder() {
   })
   const liveDistRange = Math.max(maxLiveDist - minLiveDist, 0.001)
   const nowMs = performance.now() // one shared timestamp for every hand's own Click-Hold-Pose progress this frame, not a separate call per hand
+  // Double Click Hold Tween applies IDENTICALLY to every hand (no per-hand
+  // stagger), so it's computed ONCE here rather than once per hand inside
+  // the loop below -- see updateDoubleClickHoldTween()'s own comment.
+  const dcHoldValues = dcHoldTween.phase !== 'idle' ? updateDoubleClickHoldTween(nowMs) : null
   hands.forEach((hand, i) => {
     const live = liveDistances[i]
     hand.effectiveRenderOrder = (flashFixOn && hand.isOverlapping)
@@ -4165,6 +4384,15 @@ function updateRenderOrder() {
           overridden = true
         }
       })
+      // Double Click Hold Tween -- checked last, so it wins this frame's
+      // write over chp/rchp/click/dblclick if more than one happens to be
+      // touching a hand at once (same disclosed "last one wins" pattern
+      // as above), since it's the most recently added and most explicitly
+      // user-invoked of the 4.
+      if (dcHoldValues) {
+        applyPoseValuesToHand(hand, dcHoldValues, hand._dcHoldFrozenSplay || 0)
+        overridden = true
+      }
       if (!overridden) {
         // Not mid any pose-transition this frame -- keep this hand's own
         // per-hand basis mirroring the single shared cloneBaseQuat every

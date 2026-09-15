@@ -12,9 +12,17 @@ restatement of §12 itself.
 
 Multi-file structure (not a single-file exception): `index.html` (entry
 point, import map) + `src/main.js` (all real logic) + `src/style.css` +
-`src/devpanel/devPanel.js` (generic dev-panel engine, reused verbatim from
-HANDO — do not fork it; add controls via `main.js`'s own `DEV_GROUPS`
-instead). The rigged hand asset lives at
+`src/devpanel/devPanel.js` (generic dev-panel engine, reused near-verbatim
+from HANDO — add controls via `main.js`'s own `DEV_GROUPS` first; only
+extend devPanel.js itself for a genuinely generic, reusable control-level
+capability that engine doesn't have yet, the same way HANDO added its own
+'multi-select' type when IT needed ordered pose chaining. As of 2026-09-15
+this copy has ONE real divergence from HANDO's: `multi-select` rows here
+also support drag-to-reorder (a `.dp-ms-row-handle` icon + the same
+`setupReorder()` list-picker rows/groups already use) — see the Tween
+group's own CHANGELOG.txt entry for why, and diff against HANDO's copy
+before assuming the 2 engines are still byte-identical). The rigged hand
+asset lives at
 `data/processed/HAND3D/Hand2.glb`, copied from HANDO's own
 `data/HAND3D/HAND-021/Hand2.glb`. `data/raw/`, `scripts/{active,archive}/`,
 `logs/`, `results/`, `tests/` are empty standard-skeleton folders, not yet
@@ -58,6 +66,15 @@ size exactly ONCE (the first hand build) and frozen after that — direct
 request that Field Layout changes never affect camera view scale. Don't
 reintroduce a live recompute of camera position from field size without
 re-confirming that's actually wanted.
+
+**Double Click Hold Tween (added 2026-09-15) is the one trigger group in
+this project that applies IDENTICALLY to every hand at once, with no
+per-hand distance stagger** — a deliberate exception to Click-Hold-Pose/
+Click-Pose's own established per-hand phase-machine pattern, per direct
+request ("The tween will apply to all hands simultaneously"). Computed
+ONCE per frame in `animate()` (`dcHoldValues`), not once per hand — don't
+copy Click-Hold-Pose's own per-hand `getOrInitHandCHP()`/stagger pattern
+onto this feature without re-confirming that's actually wanted.
 
 ## Gotchas
 
