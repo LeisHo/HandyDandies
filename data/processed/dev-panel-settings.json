@@ -2842,10 +2842,10 @@
       "rchpEnabled": true,
       "rchpMode": "Tween",
       "rchpTargetPose": "MiddleFinger",
-      "rchpTweenSelector": "Clockwise Fan",
-      "rchpTweenSpeedMs": 2620,
+      "rchpTweenSelector": "Fist Rotate",
+      "rchpTweenSpeedMs": 3320,
       "rchpTweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.2483332316080729,\"y\":0.37677078247070317},{\"x\":0.6366663614908854,\"y\":0.8434374491373697},{\"x\":1,\"y\":1}]",
-      "rchpTweenStartTimeRange": "{\"min\":0,\"max\":677}",
+      "rchpTweenStartTimeRange": "{\"min\":0,\"max\":1398}",
       "rchpLoopMode": "Loop",
       "rchpLoopHoldMs": 0,
       "rchpHoldConfirmMs": 0,
@@ -2904,8 +2904,8 @@
         "Fist Rotate - 1",
         "Fist Rotate - 2",
         "Fist Rotate - 3",
-        "Fist Rotate - 4",
-        "Fist Rotate - 5",
+        "Clockwise Fan - 5",
+        "Clockwise Fan - 6",
         "Fist Rotate - 6",
         "Fist Rotate - 7"
       ],
@@ -3004,10 +3004,25 @@
             "Fist Rotate - 6",
             "Fist Rotate - 7"
           ]
+        },
+        {
+          "name": "Fist Rotate To Open",
+          "tweenPoses": [
+            "Fist Rotate - 8",
+            "Fist Rotate - 9",
+            "Fist Rotate - 0",
+            "Fist Rotate - 1",
+            "Fist Rotate - 2",
+            "Fist Rotate - 3",
+            "Clockwise Fan - 5",
+            "Clockwise Fan - 6",
+            "Fist Rotate - 6",
+            "Fist Rotate - 7"
+          ]
         }
       ],
       "dcHoldEnabled": true,
-      "dcHoldTweenSelector": "WAVE - NS",
+      "dcHoldTweenSelector": "Wave",
       "dcHoldTweenSpeedMs": 1770,
       "dcHoldLoop": true,
       "cameraX": 6.638529594915686,
@@ -5947,10 +5962,10 @@
       "rchpEnabled": true,
       "rchpMode": "Tween",
       "rchpTargetPose": "MiddleFinger",
-      "rchpTweenSelector": "Clockwise Fan",
-      "rchpTweenSpeedMs": 2620,
+      "rchpTweenSelector": "Fist Rotate",
+      "rchpTweenSpeedMs": 3320,
       "rchpTweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.2483332316080729,\"y\":0.37677078247070317},{\"x\":0.6366663614908854,\"y\":0.8434374491373697},{\"x\":1,\"y\":1}]",
-      "rchpTweenStartTimeRange": "{\"min\":0,\"max\":677}",
+      "rchpTweenStartTimeRange": "{\"min\":0,\"max\":1398}",
       "rchpLoopMode": "Loop",
       "rchpLoopHoldMs": 0,
       "rchpHoldConfirmMs": 0,
@@ -6009,8 +6024,8 @@
         "Fist Rotate - 1",
         "Fist Rotate - 2",
         "Fist Rotate - 3",
-        "Fist Rotate - 4",
-        "Fist Rotate - 5",
+        "Clockwise Fan - 5",
+        "Clockwise Fan - 6",
         "Fist Rotate - 6",
         "Fist Rotate - 7"
       ],
@@ -6109,10 +6124,25 @@
             "Fist Rotate - 6",
             "Fist Rotate - 7"
           ]
+        },
+        {
+          "name": "Fist Rotate To Open",
+          "tweenPoses": [
+            "Fist Rotate - 8",
+            "Fist Rotate - 9",
+            "Fist Rotate - 0",
+            "Fist Rotate - 1",
+            "Fist Rotate - 2",
+            "Fist Rotate - 3",
+            "Clockwise Fan - 5",
+            "Clockwise Fan - 6",
+            "Fist Rotate - 6",
+            "Fist Rotate - 7"
+          ]
         }
       ],
       "dcHoldEnabled": true,
-      "dcHoldTweenSelector": "WAVE - NS",
+      "dcHoldTweenSelector": "Wave",
       "dcHoldTweenSpeedMs": 1770,
       "dcHoldLoop": true,
       "cameraX": 6.638529594915686,
@@ -9052,10 +9082,10 @@
       "rchpEnabled": true,
       "rchpMode": "Tween",
       "rchpTargetPose": "MiddleFinger",
-      "rchpTweenSelector": "Clockwise Fan",
-      "rchpTweenSpeedMs": 2620,
+      "rchpTweenSelector": "Fist Rotate",
+      "rchpTweenSpeedMs": 3320,
       "rchpTweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.2483332316080729,\"y\":0.37677078247070317},{\"x\":0.6366663614908854,\"y\":0.8434374491373697},{\"x\":1,\"y\":1}]",
-      "rchpTweenStartTimeRange": "{\"min\":0,\"max\":677}",
+      "rchpTweenStartTimeRange": "{\"min\":0,\"max\":1398}",
       "rchpLoopMode": "Loop",
       "rchpLoopHoldMs": 0,
       "rchpHoldConfirmMs": 0,
@@ -9114,8 +9144,8 @@
         "Fist Rotate - 1",
         "Fist Rotate - 2",
         "Fist Rotate - 3",
-        "Fist Rotate - 4",
-        "Fist Rotate - 5",
+        "Clockwise Fan - 5",
+        "Clockwise Fan - 6",
         "Fist Rotate - 6",
         "Fist Rotate - 7"
       ],
@@ -9214,10 +9244,25 @@
             "Fist Rotate - 6",
             "Fist Rotate - 7"
           ]
+        },
+        {
+          "name": "Fist Rotate To Open",
+          "tweenPoses": [
+            "Fist Rotate - 8",
+            "Fist Rotate - 9",
+            "Fist Rotate - 0",
+            "Fist Rotate - 1",
+            "Fist Rotate - 2",
+            "Fist Rotate - 3",
+            "Clockwise Fan - 5",
+            "Clockwise Fan - 6",
+            "Fist Rotate - 6",
+            "Fist Rotate - 7"
+          ]
         }
       ],
       "dcHoldEnabled": true,
-      "dcHoldTweenSelector": "WAVE - NS",
+      "dcHoldTweenSelector": "Wave",
       "dcHoldTweenSpeedMs": 1770,
       "dcHoldLoop": true,
       "cameraX": 6.638529594915686,
@@ -9319,7 +9364,7 @@
   "order": [
     {
       "key": "Tween",
-      "collapsed": true,
+      "collapsed": false,
       "settings": [
         "tweenPoses",
         "savedTweenSequences"
@@ -9467,7 +9512,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": true,
+      "collapsed": false,
       "settings": [
         "rcTweenStartTimeCurve"
       ],
@@ -9570,7 +9615,7 @@
         },
         {
           "key": "Right-Click Hold-Pose",
-          "collapsed": true,
+          "collapsed": false,
           "settings": [
             "rchpLoopMode",
             "rchpLoopHoldMs",
@@ -9607,7 +9652,7 @@
     },
     {
       "key": "Pose",
-      "collapsed": false,
+      "collapsed": true,
       "settings": [
         "savedPoses"
       ],
