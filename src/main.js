@@ -203,11 +203,11 @@ const DEV_GROUPS = [
   {
     title: 'Field Layout',
     controls: [
-      { key: 'fieldRows', label: 'Rows (Count)', type: 'slider', min: 1, max: 40, step: 1, def: 17, onChange: () => rebuildField() },
-      { key: 'fieldCols', label: 'Columns (Count)', type: 'slider', min: 1, max: 40, step: 1, def: 30, onChange: () => rebuildField() },
-      { key: 'rowSpacing', label: 'Row Spacing (World Units)', type: 'slider', min: 2, max: 40, step: 0.5, def: 10, onChange: () => relayoutField() },
-      { key: 'columnSpacing', label: 'Column Spacing (World Units)', type: 'slider', min: 2, max: 40, step: 0.5, def: 11.5, onChange: () => relayoutField() },
-      { key: 'handScale', label: 'Hand Scale (x)', type: 'slider', min: 0.1, max: 3, step: 0.05, def: 1.2, onChange: () => relayoutField() },
+      { key: 'fieldRows', label: 'Rows (Count)', type: 'slider', min: 1, max: 40, step: 1, def: 15, onChange: () => rebuildField() },
+      { key: 'fieldCols', label: 'Columns (Count)', type: 'slider', min: 1, max: 40, step: 1, def: 17, onChange: () => rebuildField() },
+      { key: 'rowSpacing', label: 'Row Spacing (World Units)', type: 'slider', min: 2, max: 40, step: 0.5, def: 9.5, onChange: () => relayoutField() },
+      { key: 'columnSpacing', label: 'Column Spacing (World Units)', type: 'slider', min: 2, max: 40, step: 0.5, def: 14, onChange: () => relayoutField() },
+      { key: 'handScale', label: 'Hand Scale (x)', type: 'slider', min: 0.1, max: 3, step: 0.05, def: 1.55, onChange: () => relayoutField() },
       // Classic brick/hex stagger: shifts every OTHER row sideways (along
       // the column axis, i.e. perpendicular to how rows themselves stack
       // in the row direction) by a fixed amount -- the standard reading of
@@ -222,13 +222,13 @@ const DEV_GROUPS = [
     title: 'Cursor Tracking',
     controls: [
       { key: 'trackingEnabled', label: 'Tracking Enabled', type: 'checkbox', def: true },
-      { key: 'trackingDamping', label: 'Look-At Damping (x)', type: 'slider', min: 0.02, max: 1, step: 0.01, def: 0.07 },
+      { key: 'trackingDamping', label: 'Look-At Damping (x)', type: 'slider', min: 0.02, max: 1, step: 0.01, def: 1 },
       // No onChange needed -- updateCursorTarget() (called every frame)
       // reads cfg.targetDepthFactor live when it sets cursorTarget.z, so
       // there's no cached per-depth state to refresh on a slider change
       // anymore (see that function's own 2026-09-14 correction comment).
       { key: 'targetDepthFactor', label: 'Cursor Target Depth (x Field Radius)', type: 'slider', min: -2, max: 2, step: 0.05, def: 0.6 },
-      { key: 'showTargetMarker', label: 'Show Target Marker', type: 'checkbox', def: true, onChange: (v) => { if (targetMarker) targetMarker.visible = v } },
+      { key: 'showTargetMarker', label: 'Show Target Marker', type: 'checkbox', def: false, onChange: (v) => { if (targetMarker) targetMarker.visible = v } },
       // REDEFINED 2026-09-14 (see computeRadialRollDeg()'s own comment
       // for the full account and the user's own exact reference points):
       // rotates each hand, around the wrist-crop-plane axis, by the
@@ -237,7 +237,7 @@ const DEV_GROUPS = [
       // fresh per hand per frame, not a fixed 3D palm-normal-aim (the
       // prior mechanism this replaced). Default off so nothing changes
       // until opted in.
-      { key: 'palmFacesCursor', label: 'Palm Faces Cursor', type: 'checkbox', def: false },
+      { key: 'palmFacesCursor', label: 'Palm Faces Cursor', type: 'checkbox', def: true },
       // Adds directly onto whatever angle is already in effect --
       // computeRadialRollDeg()'s own dynamic angle when Palm Faces
       // Cursor is on, or 0 (just this slider alone) when it's off --
@@ -255,41 +255,41 @@ const DEV_GROUPS = [
       // Ported from HANDO's own Pose group (identical rig/bone names, same
       // Hand2.glb asset) -- applies identically to every hand for now, per
       // direct request ("For now, the pose settings apply to every hand").
-      { key: 'thumbCurl', label: 'Thumb Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 7, lockRange: true, onChange: () => applyCurl('thumb') },
-      { key: 'thumbSplay', label: 'Thumb Splay (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('thumb') },
-      { key: 'thumbSplay2', label: 'Thumb Tip Splay (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('thumb') },
-      { key: 'curlBiasThumb', label: 'Thumb Curl Bias (Base <-> Tip) (%)', type: 'slider', min: -100, max: 100, step: 1, def: 0, onChange: () => applyCurl('thumb') },
+      { key: 'thumbCurl', label: 'Thumb Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 79, lockRange: true, onChange: () => applyCurl('thumb') },
+      { key: 'thumbSplay', label: 'Thumb Splay (%)', type: 'slider', min: -200, max: 200, step: 1, def: 54, onChange: () => applyCurl('thumb') },
+      { key: 'thumbSplay2', label: 'Thumb Tip Splay (%)', type: 'slider', min: -200, max: 200, step: 1, def: 32, onChange: () => applyCurl('thumb') },
+      { key: 'curlBiasThumb', label: 'Thumb Curl Bias (Base <-> Tip) (%)', type: 'slider', min: -100, max: 100, step: 1, def: 18, onChange: () => applyCurl('thumb') },
       // Ported from HANDO (direct request: "maybe check hando for pose
       // settings. maybe there is an extra setting you dont have" --
       // this WAS it, see FINGER_BASE_ONLY_CURL_KEY's own comment).
       { key: 'baseOnlyCurlThumb', label: 'Thumb Base-Only Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('thumb') },
-      { key: 'tipTwistThumb', label: 'Thumb Tip Twist (%)', type: 'slider', min: -100, max: 100, step: 1, def: 0, onChange: () => applyCurl('thumb') },
-      { key: 'curlIndex', label: 'Index Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 73, lockRange: true, onChange: () => applyCurl('index') },
-      { key: 'splayIndex', label: 'Index Splay (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('index') },
-      { key: 'splayIndex2', label: 'Index 2nd Segment Splay (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('index') },
-      { key: 'curlBiasIndex', label: 'Index Curl Bias (Base <-> Tip) (%)', type: 'slider', min: -100, max: 100, step: 1, def: 0, onChange: () => applyCurl('index') },
+      { key: 'tipTwistThumb', label: 'Thumb Tip Twist (%)', type: 'slider', min: -100, max: 100, step: 1, def: 4, onChange: () => applyCurl('thumb') },
+      { key: 'curlIndex', label: 'Index Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 96, lockRange: true, onChange: () => applyCurl('index') },
+      { key: 'splayIndex', label: 'Index Splay (%)', type: 'slider', min: -200, max: 200, step: 1, def: 15, onChange: () => applyCurl('index') },
+      { key: 'splayIndex2', label: 'Index 2nd Segment Splay (%)', type: 'slider', min: -200, max: 200, step: 1, def: 72, onChange: () => applyCurl('index') },
+      { key: 'curlBiasIndex', label: 'Index Curl Bias (Base <-> Tip) (%)', type: 'slider', min: -100, max: 100, step: 1, def: -7, onChange: () => applyCurl('index') },
       { key: 'baseOnlyCurlIndex', label: 'Index Base-Only Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('index') },
-      { key: 'tipTwistIndex', label: 'Index Tip Twist (%)', type: 'slider', min: -100, max: 100, step: 1, def: 0, onChange: () => applyCurl('index') },
-      { key: 'curlMiddle', label: 'Middle Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: -100, lockRange: true, onChange: () => applyCurl('middle') },
-      { key: 'splayMiddle', label: 'Middle Splay (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('middle') },
-      { key: 'splayMiddle2', label: 'Middle 2nd Segment Splay (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('middle') },
-      { key: 'curlBiasMiddle', label: 'Middle Curl Bias (Base <-> Tip) (%)', type: 'slider', min: -100, max: 100, step: 1, def: 0, onChange: () => applyCurl('middle') },
+      { key: 'tipTwistIndex', label: 'Index Tip Twist (%)', type: 'slider', min: -100, max: 100, step: 1, def: 1, onChange: () => applyCurl('index') },
+      { key: 'curlMiddle', label: 'Middle Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: -89, lockRange: true, onChange: () => applyCurl('middle') },
+      { key: 'splayMiddle', label: 'Middle Splay (%)', type: 'slider', min: -200, max: 200, step: 1, def: -14, onChange: () => applyCurl('middle') },
+      { key: 'splayMiddle2', label: 'Middle 2nd Segment Splay (%)', type: 'slider', min: -200, max: 200, step: 1, def: -13, onChange: () => applyCurl('middle') },
+      { key: 'curlBiasMiddle', label: 'Middle Curl Bias (Base <-> Tip) (%)', type: 'slider', min: -100, max: 100, step: 1, def: 10, onChange: () => applyCurl('middle') },
       { key: 'baseOnlyCurlMiddle', label: 'Middle Base-Only Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('middle') },
-      { key: 'tipTwistMiddle', label: 'Middle Tip Twist (%)', type: 'slider', min: -100, max: 100, step: 1, def: 0, onChange: () => applyCurl('middle') },
-      { key: 'curlRing', label: 'Ring Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: -100, lockRange: true, onChange: () => applyCurl('ring') },
-      { key: 'splayRing', label: 'Ring Splay (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('ring') },
-      { key: 'splayRing2', label: 'Ring 2nd Segment Splay (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('ring') },
-      { key: 'curlBiasRing', label: 'Ring Curl Bias (Base <-> Tip) (%)', type: 'slider', min: -100, max: 100, step: 1, def: 0, onChange: () => applyCurl('ring') },
+      { key: 'tipTwistMiddle', label: 'Middle Tip Twist (%)', type: 'slider', min: -100, max: 100, step: 1, def: -5, onChange: () => applyCurl('middle') },
+      { key: 'curlRing', label: 'Ring Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: -95, lockRange: true, onChange: () => applyCurl('ring') },
+      { key: 'splayRing', label: 'Ring Splay (%)', type: 'slider', min: -200, max: 200, step: 1, def: 37, onChange: () => applyCurl('ring') },
+      { key: 'splayRing2', label: 'Ring 2nd Segment Splay (%)', type: 'slider', min: -200, max: 200, step: 1, def: -32, onChange: () => applyCurl('ring') },
+      { key: 'curlBiasRing', label: 'Ring Curl Bias (Base <-> Tip) (%)', type: 'slider', min: -100, max: 100, step: 1, def: -3, onChange: () => applyCurl('ring') },
       { key: 'baseOnlyCurlRing', label: 'Ring Base-Only Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('ring') },
-      { key: 'tipTwistRing', label: 'Ring Tip Twist (%)', type: 'slider', min: -100, max: 100, step: 1, def: 0, onChange: () => applyCurl('ring') },
-      { key: 'curlPinky', label: 'Pinky Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 71, lockRange: true, onChange: () => applyCurl('pinky') },
-      { key: 'splayPinky', label: 'Pinky Splay (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('pinky') },
-      { key: 'splayPinky2', label: 'Pinky 2nd Segment Splay (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('pinky') },
-      { key: 'curlBiasPinky', label: 'Pinky Curl Bias (Base <-> Tip) (%)', type: 'slider', min: -100, max: 100, step: 1, def: 0, onChange: () => applyCurl('pinky') },
+      { key: 'tipTwistRing', label: 'Ring Tip Twist (%)', type: 'slider', min: -100, max: 100, step: 1, def: -5, onChange: () => applyCurl('ring') },
+      { key: 'curlPinky', label: 'Pinky Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 89, lockRange: true, onChange: () => applyCurl('pinky') },
+      { key: 'splayPinky', label: 'Pinky Splay (%)', type: 'slider', min: -200, max: 200, step: 1, def: -82, onChange: () => applyCurl('pinky') },
+      { key: 'splayPinky2', label: 'Pinky 2nd Segment Splay (%)', type: 'slider', min: -200, max: 200, step: 1, def: 33, onChange: () => applyCurl('pinky') },
+      { key: 'curlBiasPinky', label: 'Pinky Curl Bias (Base <-> Tip) (%)', type: 'slider', min: -100, max: 100, step: 1, def: 6, onChange: () => applyCurl('pinky') },
       { key: 'baseOnlyCurlPinky', label: 'Pinky Base-Only Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('pinky') },
-      { key: 'tipTwistPinky', label: 'Pinky Tip Twist (%)', type: 'slider', min: -100, max: 100, step: 1, def: 0, onChange: () => applyCurl('pinky') },
+      { key: 'tipTwistPinky', label: 'Pinky Tip Twist (%)', type: 'slider', min: -100, max: 100, step: 1, def: -3, onChange: () => applyCurl('pinky') },
       { key: 'wristBend', label: 'Wrist Bend (Deg)', type: 'slider', min: -90, max: 90, step: 1, def: 0, onChange: () => applyWristPose() },
-      { key: 'wristSplay', label: 'Wrist Splay (Deg)', type: 'slider', min: -30, max: 30, step: 1, def: 0, onChange: () => applyWristPose() },
+      { key: 'wristSplay', label: 'Wrist Splay (Deg)', type: 'slider', min: -30, max: 30, step: 1, def: -1, onChange: () => applyWristPose() },
       { key: 'modelRotX', label: 'Whole-Hand Rotation X (Deg)', type: 'slider', min: -200, max: 200, step: 1, def: 0, lockRange: true, onChange: () => onWholeHandRotationChange() },
       { key: 'modelRotY', label: 'Whole-Hand Rotation Y (Deg)', type: 'slider', min: -200, max: 200, step: 1, def: 0, lockRange: true, onChange: () => onWholeHandRotationChange() },
       { key: 'modelRotZ', label: 'Whole-Hand Rotation Z (Deg)', type: 'slider', min: -200, max: 200, step: 1, def: 0, lockRange: true, onChange: () => onWholeHandRotationChange() },
@@ -308,7 +308,19 @@ const DEV_GROUPS = [
         key: 'savedPoses',
         label: 'Saved Poses',
         type: 'list-picker',
-        def: [],
+        def: [
+          { name: 'Point', thumbCurl: 79, thumbSplay: 54, thumbSplay2: 32, curlBiasThumb: 18, tipTwistThumb: 4, curlIndex: 0, splayIndex: 0, splayIndex2: 0, curlBiasIndex: 0, tipTwistIndex: 0, curlMiddle: -89, splayMiddle: -14, splayMiddle2: -13, curlBiasMiddle: 10, tipTwistMiddle: -5, curlRing: -95, splayRing: 37, splayRing2: -32, curlBiasRing: -3, tipTwistRing: -5, curlPinky: 89, splayPinky: -82, splayPinky2: 33, curlBiasPinky: 6, tipTwistPinky: -3, wristBend: 0, wristSplay: -1, modelRotX: 0, modelRotY: 0, modelRotZ: 0, hideWrist: 78 },
+          { name: 'ThumbsUp', thumbCurl: -37, thumbSplay: -60, thumbSplay2: 32, curlBiasThumb: -24, tipTwistThumb: -90, curlIndex: 89, splayIndex: 15, splayIndex2: 72, curlBiasIndex: -1, tipTwistIndex: -4, curlMiddle: -89, splayMiddle: -14, splayMiddle2: -13, curlBiasMiddle: 10, tipTwistMiddle: -5, curlRing: -95, splayRing: 37, splayRing2: -32, curlBiasRing: -3, tipTwistRing: -5, curlPinky: 89, splayPinky: -82, splayPinky2: 33, curlBiasPinky: 6, tipTwistPinky: -3, wristBend: 0, wristSplay: -1, modelRotX: 0, modelRotY: 0, modelRotZ: 0, hideWrist: 78 },
+          { name: 'MiddleFinger', thumbCurl: 79, thumbSplay: 54, thumbSplay2: 32, curlBiasThumb: -15, tipTwistThumb: 4, curlIndex: 96, splayIndex: 34, splayIndex2: -107, curlBiasIndex: -7, tipTwistIndex: -1, curlMiddle: -1, splayMiddle: 0, splayMiddle2: 0, curlBiasMiddle: -32, tipTwistMiddle: -5, curlRing: -92, splayRing: 58, splayRing2: -32, curlBiasRing: -3, tipTwistRing: -5, curlPinky: 89, splayPinky: -101, splayPinky2: 33, curlBiasPinky: 6, tipTwistPinky: -3, wristBend: 0, wristSplay: -1, modelRotX: 0, modelRotY: 0, modelRotZ: 0, hideWrist: 78 },
+          { name: 'Fist', thumbCurl: 79, thumbSplay: 54, thumbSplay2: 32, curlBiasThumb: 18, tipTwistThumb: 4, curlIndex: 96, splayIndex: 15, splayIndex2: 72, curlBiasIndex: -7, tipTwistIndex: 1, curlMiddle: -89, splayMiddle: -14, splayMiddle2: -13, curlBiasMiddle: 10, tipTwistMiddle: -5, curlRing: -95, splayRing: 37, splayRing2: -32, curlBiasRing: -3, tipTwistRing: -5, curlPinky: 89, splayPinky: -82, splayPinky2: 33, curlBiasPinky: 6, tipTwistPinky: -3, wristBend: 0, wristSplay: -1, modelRotX: 0, modelRotY: 0, modelRotZ: 0, hideWrist: 78 },
+          { name: 'Neutral', thumbCurl: 0, thumbSplay: 0, thumbSplay2: 0, curlBiasThumb: 0, tipTwistThumb: 0, curlIndex: 0, splayIndex: 0, splayIndex2: 0, curlBiasIndex: 0, tipTwistIndex: 0, curlMiddle: 0, splayMiddle: 0, splayMiddle2: 0, curlBiasMiddle: 0, tipTwistMiddle: 0, curlRing: 0, splayRing: 0, splayRing2: 0, curlBiasRing: 0, tipTwistRing: 0, curlPinky: 0, splayPinky: 0, splayPinky2: 0, curlBiasPinky: 0, tipTwistPinky: 0, wristBend: 0, wristSplay: 0, modelRotX: 0, modelRotY: 0, modelRotZ: 0, hideWrist: 78 },
+          { name: 'Neutral - Bent Back', thumbCurl: 0, thumbSplay: 0, thumbSplay2: 0, curlBiasThumb: 0, tipTwistThumb: 0, curlIndex: 0, splayIndex: 0, splayIndex2: 0, curlBiasIndex: 0, tipTwistIndex: 0, curlMiddle: 0, splayMiddle: 0, splayMiddle2: 0, curlBiasMiddle: 0, tipTwistMiddle: 0, curlRing: 0, splayRing: 0, splayRing2: 0, curlBiasRing: 0, tipTwistRing: 0, curlPinky: 0, splayPinky: 0, splayPinky2: 0, curlBiasPinky: 0, tipTwistPinky: 0, wristBend: 7, wristSplay: -50, modelRotX: 0, modelRotY: 0, modelRotZ: 0, hideWrist: 78 },
+          { name: 'Open Palm', thumbCurl: 0, thumbSplay: 0, thumbSplay2: 0, curlBiasThumb: 0, tipTwistThumb: 0, curlIndex: 0, splayIndex: -56, splayIndex2: 0, curlBiasIndex: 0, tipTwistIndex: 0, curlMiddle: 0, splayMiddle: -20, splayMiddle2: 0, curlBiasMiddle: 0, tipTwistMiddle: 0, curlRing: 0, splayRing: 0, splayRing2: 0, curlBiasRing: 0, tipTwistRing: 0, curlPinky: 0, splayPinky: 7, splayPinky2: 0, curlBiasPinky: 0, tipTwistPinky: 0, wristBend: 0, wristSplay: 0, modelRotX: 0, modelRotY: 0, modelRotZ: 0 },
+          { name: 'Preflick3', thumbCurl: 104, thumbSplay: 46, thumbSplay2: 29, curlBiasThumb: -82, tipTwistThumb: 58, curlIndex: 20, splayIndex: 7, splayIndex2: 0, curlBiasIndex: -79, tipTwistIndex: 5, curlMiddle: -88, splayMiddle: -10, splayMiddle2: 0, curlBiasMiddle: -32, tipTwistMiddle: 0, curlRing: -22, splayRing: -2, splayRing2: 0, curlBiasRing: -26, tipTwistRing: 30, curlPinky: 20, splayPinky: -2, splayPinky2: 0, curlBiasPinky: -100, tipTwistPinky: 30, wristBend: 0, wristSplay: -14, modelRotX: 0, modelRotY: 0, modelRotZ: 0, hideWrist: 78 },
+          { name: 'SCISSOR 1', thumbCurl: 102, thumbSplay: 35, thumbSplay2: 38, curlBiasThumb: -23, tipTwistThumb: 34, curlIndex: 0, splayIndex: -39, splayIndex2: -3, curlBiasIndex: -79, tipTwistIndex: 5, curlMiddle: -3, splayMiddle: 43, splayMiddle2: -13, curlBiasMiddle: -32, tipTwistMiddle: -27, curlRing: -80, splayRing: 58, splayRing2: -13, curlBiasRing: 37, tipTwistRing: 2, curlPinky: 74, splayPinky: -106, splayPinky2: 43, curlBiasPinky: 57, tipTwistPinky: -6, wristBend: 0, wristSplay: -3, modelRotX: 0, modelRotY: 0, modelRotZ: 0, hideWrist: 78 },
+          { name: 'Drag1', thumbCurl: 69, thumbSplay: -20, thumbSplay2: -10, curlBiasThumb: 0, tipTwistThumb: 0, curlIndex: 17, splayIndex: 0, splayIndex2: 0, curlBiasIndex: 100, tipTwistIndex: 0, curlMiddle: 6, splayMiddle: 0, splayMiddle2: 0, curlBiasMiddle: 0, tipTwistMiddle: 0, curlRing: 10, splayRing: 0, splayRing2: 0, curlBiasRing: 28, tipTwistRing: 0, curlPinky: -11, splayPinky: 0, splayPinky2: 0, curlBiasPinky: 100, tipTwistPinky: 0, wristBend: 0, wristSplay: 3, modelRotX: 0, modelRotY: 0, modelRotZ: 0, hideWrist: 78 },
+          { name: 'Fist - Bent Back', thumbCurl: 29, thumbSplay: 154, thumbSplay2: 52, curlBiasThumb: 100, baseOnlyCurlThumb: -51, tipTwistThumb: -31, curlIndex: 96, splayIndex: 15, splayIndex2: 72, curlBiasIndex: -7, baseOnlyCurlIndex: 0, tipTwistIndex: 1, curlMiddle: -89, splayMiddle: -14, splayMiddle2: -13, curlBiasMiddle: 10, baseOnlyCurlMiddle: 0, tipTwistMiddle: -5, curlRing: -95, splayRing: 37, splayRing2: -32, curlBiasRing: -3, baseOnlyCurlRing: 0, tipTwistRing: -5, curlPinky: 89, splayPinky: -82, splayPinky2: 33, curlBiasPinky: 6, baseOnlyCurlPinky: 0, tipTwistPinky: -3, wristBend: 0, wristSplay: -50, modelRotX: 0, modelRotY: 0, modelRotZ: 0, hideWrist: 78, shoulderRaise: 0, shoulderSwing: 0, shoulderRotation: 0, elbowBend: 0, elbowSideBend: 0, forearmTwist: 0 }
+        ],
         itemLabel: 'Pose',
         importable: true,
         captureCurrent: () => capturePosePreset(),
@@ -360,14 +372,14 @@ const DEV_GROUPS = [
       // 0-100 scale) -- fixed by relabeling the curve's own axis captions
       // to also read in percent (see buildArmLengthCurveWidget()), so
       // every arm-length control in this feature speaks the same units.
-      { key: 'hideWrist', label: 'Default Arm Length (Crop %, Reactive Off)', type: 'slider', min: 0, max: 100, step: 1, def: 0 },
+      { key: 'hideWrist', label: 'Default Arm Length (Crop %, Reactive Off)', type: 'slider', min: 0, max: 100, step: 1, def: 100 },
       // Direct follow-up request: "make the crop or arm length dependent
       // on distance from the cursor, so the closer it is the shorter the
       // arm length." When on, computeArmLengthT() drives the crop % from
       // this hand's own live cursor distance through Length Scaling
       // Curve, remapped into the Min/Max Arm Length bounds below, instead
       // of the fixed Default Arm Length above.
-      { key: 'reactiveArmLengthEnabled', label: 'Reactive Arm Length (By Cursor Distance)', type: 'checkbox', def: false },
+      { key: 'reactiveArmLengthEnabled', label: 'Reactive Arm Length (By Cursor Distance)', type: 'checkbox', def: true },
       // Custom widgets (dual-handle range bar; a 2D curve editor), NOT
       // devPanel.js control types -- that engine is reused verbatim from
       // HANDO per this project's own convention ("do not fork it, add
@@ -379,8 +391,8 @@ const DEV_GROUPS = [
       // input by buildArmLengthWidgets(), called once right after
       // initDevPanel() -- see that function's own comment for the full
       // mechanism.
-      { key: 'armLengthRange', label: 'Min / Max Arm Length (Crop %)', type: 'text', def: '{"min":30,"max":90}', onChange: () => parseArmLengthConfig() },
-      { key: 'armLengthCurve', label: 'Length Scaling Curve (Distance -> Crop)', type: 'text', def: '[{"x":0,"y":1},{"x":1,"y":0}]', onChange: () => parseArmLengthConfig() }
+      { key: 'armLengthRange', label: 'Min / Max Arm Length (Crop %)', type: 'text', def: '{"min":0,"max":85}', onChange: () => parseArmLengthConfig() },
+      { key: 'armLengthCurve', label: 'Length Scaling Curve (Distance -> Crop)', type: 'text', def: '[{"x":0,"y":1},{"x":0.148333740234375,"y":0.6613540649414062},{"x":0.4100001017252604,"y":0.31468760172526045},{"x":0.5316670735677084,"y":0.2680206298828125},{"x":0.748333740234375,"y":0.19468739827473958},{"x":1,"y":0}]', onChange: () => parseArmLengthConfig() }
     ]
   },
   {
@@ -417,11 +429,11 @@ const DEV_GROUPS = [
     // widget does, for the same reason.
     title: 'Responsive Wrist Splay',
     controls: [
-      { key: 'wristSplayResponsiveEnabled', label: 'Responsive Wrist Splay (Master On/Off)', type: 'checkbox', def: false },
-      { key: 'wristSplayDefault', label: 'Default Wrist Splay (Deg, Reactive Off)', type: 'slider', min: -180, max: 180, step: 1, def: 0 },
-      { key: 'wristSplayReactiveEnabled', label: 'Reactive Wrist Splay (By Cursor Distance)', type: 'checkbox', def: false },
-      { key: 'wristSplayRange', label: 'Min / Max Wrist Splay (Deg)', type: 'text', def: '{"min":0,"max":-90}', onChange: () => parseWristSplayConfig() },
-      { key: 'wristSplayCurve', label: 'Splay Scaling Curve (Distance -> Splay)', type: 'text', def: '[{"x":0,"y":1},{"x":1,"y":0}]', onChange: () => parseWristSplayConfig() }
+      { key: 'wristSplayResponsiveEnabled', label: 'Responsive Wrist Splay (Master On/Off)', type: 'checkbox', def: true },
+      { key: 'wristSplayDefault', label: 'Default Wrist Splay (Deg, Reactive Off)', type: 'slider', min: -180, max: 180, step: 1, def: 7 },
+      { key: 'wristSplayReactiveEnabled', label: 'Reactive Wrist Splay (By Cursor Distance)', type: 'checkbox', def: true },
+      { key: 'wristSplayRange', label: 'Min / Max Wrist Splay (Deg)', type: 'text', def: '{"min":5,"max":-71}', onChange: () => parseWristSplayConfig() },
+      { key: 'wristSplayCurve', label: 'Splay Scaling Curve (Distance -> Splay)', type: 'text', def: '[{"x":0,"y":1},{"x":0.31833343505859374,"y":0.6961458841959636},{"x":1,"y":0.042812347412109375}]', onChange: () => parseWristSplayConfig() }
     ]
   },
   // Click-Hold Pose -- direct request, then "the 2nd new clickhold pose
@@ -443,8 +455,22 @@ const DEV_GROUPS = [
   // below (same control shape, different key prefix/mouse button) --
   // see setupClickHoldPoseTrigger()'s own comment for the full state
   // machine and the disclosed Whole-Hand-Rotation scope decision.
-  makeClickHoldPoseGroup('chp', 'Click Hold-Pose'),
-  makeClickHoldPoseGroup('rchp', 'Right-Click Hold-Pose'),
+  makeClickHoldPoseGroup('chp', 'Click Hold-Pose', {
+    enabled: true, targetPose: 'Point', transitionSpeedMs: 230,
+    startTimeCurve: '[{"x":0,"y":0},{"x":0.4483332316080729,"y":0.7186457951863607},{"x":1,"y":1}]',
+    startTimeRange: '{"min":0,"max":3000}',
+    retransitionSpeedMs: 180,
+    retransitionStartTimeCurve: '[{"x":0,"y":0},{"x":0.475,"y":0.7653123219807942},{"x":1,"y":1}]',
+    retransitionStartTimeRange: '{"min":431,"max":3000}'
+  }),
+  makeClickHoldPoseGroup('rchp', 'Right-Click Hold-Pose', {
+    enabled: true, targetPose: 'Neutral - Bent Back', transitionSpeedMs: 410,
+    startTimeCurve: '[{"x":0,"y":0.02093760172526038},{"x":0.4366663614908854,"y":0.8109375},{"x":1,"y":1}]',
+    startTimeRange: '{"min":0,"max":3000}',
+    retransitionSpeedMs: 320,
+    retransitionStartTimeCurve: '[{"x":0,"y":0},{"x":0.4683329264322917,"y":0.6742708841959635},{"x":1,"y":1}]',
+    retransitionStartTimeRange: '{"min":0,"max":3000}'
+  }),
   // Direct follow-up request: a fire-and-forget variant of Click Hold-
   // Pose -- no holding required. A single click (or double-click) starts
   // the SAME transition-with-per-hand-distance-stagger mechanism, but
@@ -458,8 +484,24 @@ const DEV_GROUPS = [
   // left/right button the way Click Hold-Pose's own 2 groups are) built
   // by makeClickPoseGroup() below -- see updateClickPoseForHand()'s own
   // comment for the full 3-phase state machine.
-  makeClickPoseGroup('click', 'Click Pose'),
-  makeClickPoseGroup('dblclick', 'Double-Click Pose'),
+  makeClickPoseGroup('click', 'Click Pose', {
+    enabled: true, targetPose: 'Open Palm', transitionSpeedMs: 700,
+    startTimeCurve: '[{"x":0,"y":0},{"x":0.21833292643229166,"y":0},{"x":0.6616663614908854,"y":0.7919792175292969},{"x":1,"y":1}]',
+    startTimeRange: '{"min":0,"max":2078}',
+    pauseDurationMs: 0,
+    retransitionSpeedMs: 700,
+    retransitionStartTimeCurve: '[{"x":0,"y":0},{"x":1,"y":1}]',
+    retransitionStartTimeRange: '{"min":0,"max":300}'
+  }),
+  makeClickPoseGroup('dblclick', 'Double-Click Pose', {
+    enabled: true, targetPose: 'ThumbsUp', transitionSpeedMs: 400,
+    startTimeCurve: '[{"x":0,"y":0},{"x":1,"y":1}]',
+    startTimeRange: '{"min":0,"max":3000}',
+    pauseDurationMs: 500,
+    retransitionSpeedMs: 400,
+    retransitionStartTimeCurve: '[{"x":0,"y":0},{"x":1,"y":1}]',
+    retransitionStartTimeRange: '{"min":0,"max":300}'
+  }),
   {
     // Direct user request: "provide me a collapsible pose viewer within
     // the dev panel itself" -- deliberately 0 controls here. buildPosePreview()
@@ -482,9 +524,9 @@ const DEV_GROUPS = [
       // orbiting camera. Defaults are static (NOT derived from field size,
       // per the "field layout shouldn't affect view scale" request) --
       // frame the view by dragging (pan) / scrolling (zoom) instead.
-      { key: 'cameraX', label: 'Camera X Position (x)', type: 'slider', min: -300, max: 300, step: 0.5, def: -1.7981492385140072, onChange: (v) => applyCameraControl('cameraX', v) },
-      { key: 'cameraY', label: 'Camera Y Position (x)', type: 'slider', min: -300, max: 300, step: 0.5, def: -1.3026242754855961, onChange: (v) => applyCameraControl('cameraY', v) },
-      { key: 'cameraZ', label: 'Camera Z Position (x)', type: 'slider', min: 1, max: 500, step: 0.5, def: 259.0864928710401, onChange: (v) => applyCameraControl('cameraZ', v) },
+      { key: 'cameraX', label: 'Camera X Position (x)', type: 'slider', min: -300, max: 300, step: 0.5, def: 6.638529594915686, onChange: (v) => applyCameraControl('cameraX', v) },
+      { key: 'cameraY', label: 'Camera Y Position (x)', type: 'slider', min: -300, max: 300, step: 0.5, def: 13.373156794075216, onChange: (v) => applyCameraControl('cameraY', v) },
+      { key: 'cameraZ', label: 'Camera Z Position (x)', type: 'slider', min: 1, max: 500, step: 0.5, def: 259.74194092345493, onChange: (v) => applyCameraControl('cameraZ', v) },
       { key: 'cameraFov', label: 'Field Of View (Deg)', type: 'slider', min: 15, max: 90, step: 1, def: 35, onChange: (v) => applyCameraControl('cameraFov', v) },
       // Direct 2-way binding with scroll/pinch zoom, same pattern as the
       // X/Y/Z sliders above: this slider both SETS the camera's distance
@@ -492,15 +534,15 @@ const DEV_GROUPS = [
       // sync FROM the live distance every frame (syncCameraPanelFromLive())
       // -- scrolling moves the slider, moving the slider zooms, per direct
       // request ("responsive to my wheel scroll and vice versa").
-      { key: 'cameraZoom', label: 'Zoom (Distance To Pan Target) (x)', type: 'slider', min: 1, max: 800, step: 0.5, def: 259.1, onChange: (v) => applyCameraControl('cameraZoom', v) }
+      { key: 'cameraZoom', label: 'Zoom (Distance To Pan Target) (x)', type: 'slider', min: 1, max: 800, step: 0.5, def: 260.17068872666084, onChange: (v) => applyCameraControl('cameraZoom', v) }
     ]
   },
   {
     title: 'Lighting',
     controls: [
-      { key: 'keyAzimuth', label: 'Key Light Azimuth (Deg)', type: 'slider', min: 0, max: 360, step: 1, def: 231, onChange: updateKeyLightPosition },
-      { key: 'keyElevation', label: 'Key Light Elevation (Deg)', type: 'slider', min: -89, max: 89, step: 1, def: 28, onChange: updateKeyLightPosition },
-      { key: 'keyTargetHeight', label: 'Key Light Aim Height (%)', type: 'slider', min: -100, max: 100, step: 1, def: -100, onChange: updateKeyLightPosition },
+      { key: 'keyAzimuth', label: 'Key Light Azimuth (Deg)', type: 'slider', min: 0, max: 360, step: 1, def: 209, onChange: updateKeyLightPosition },
+      { key: 'keyElevation', label: 'Key Light Elevation (Deg)', type: 'slider', min: -89, max: 89, step: 1, def: 56, onChange: updateKeyLightPosition },
+      { key: 'keyTargetHeight', label: 'Key Light Aim Height (%)', type: 'slider', min: -100, max: 100, step: 1, def: 2, onChange: updateKeyLightPosition },
       { key: 'keyIntensity', label: 'Key Light Intensity (x)', type: 'slider', min: 0, max: 6, step: 0.1, def: 6, onChange: (v) => { keyLight.intensity = v } },
       { key: 'keyColor', label: 'Key Light Color', type: 'color', def: '#ffffff', onChange: (v) => { keyLight.color.set(v) } },
       { key: 'ambientIntensity', label: 'Ambient Intensity (x)', type: 'slider', min: 0, max: 3, step: 0.05, def: 0, onChange: (v) => { hemiLight.intensity = v } },
@@ -512,8 +554,8 @@ const DEV_GROUPS = [
     title: 'Toon Shading',
     controls: [
       { key: 'toonSteps', label: 'Toon Steps (Count)', type: 'slider', min: 2, max: 8, step: 1, def: 2, onChange: () => rebuildGradientMap() },
-      { key: 'toonStepThreshold', label: 'Toon Step Threshold (Bias)', type: 'slider', min: 0.2, max: 5, step: 0.05, def: 2.1, onChange: () => rebuildGradientMap() },
-      { key: 'toonShadowFloor', label: 'Toon Shadow Floor (%)', type: 'slider', min: 0, max: 90, step: 1, def: 12, onChange: () => rebuildGradientMap() },
+      { key: 'toonStepThreshold', label: 'Toon Step Threshold (Bias)', type: 'slider', min: 0.2, max: 5, step: 0.05, def: 2.7, onChange: () => rebuildGradientMap() },
+      { key: 'toonShadowFloor', label: 'Toon Shadow Floor (%)', type: 'slider', min: 0, max: 90, step: 1, def: 7, onChange: () => rebuildGradientMap() },
       { key: 'toonLightCeiling', label: 'Toon Light Ceiling (%)', type: 'slider', min: 10, max: 100, step: 1, def: 100, onChange: () => rebuildGradientMap() },
       { key: 'toonBaseTint', label: 'Toon Base Tint', type: 'color', def: '#ffffff', onChange: (v) => forEachToonMaterial((m) => m.color.set(v)) },
       { key: 'textureInfluence', label: 'Texture Influence (%)', type: 'slider', min: 0, max: 100, step: 1, def: 0, onChange: (v) => setToonUniform('textureInfluence', v / 100) },
@@ -1480,21 +1522,21 @@ POSE_PRESET_KEYS.forEach((key) => { poseDefaultValues[key] = cfg[key] !== undefi
 // the opposite curve direction from Arm Length's own default (which
 // makes the nearest hand crop MOST) since there's no equivalent real-
 // world convention to match here; a disclosed default, not a spec'd one.
-function makeClickHoldPoseGroup(p, title) {
+function makeClickHoldPoseGroup(p, title, defaults = {}) {
   return {
     title,
     controls: [
       // Direct user request ("provide a checkbox to turn that feature on
       // and off") -- gates startClickHoldPose(), same master on/off
       // pattern as Crop Wrist / Responsive Wrist Splay's own checkboxes.
-      { key: `${p}Enabled`, label: `${title} (Master On/Off)`, type: 'checkbox', def: false },
-      { key: `${p}TargetPose`, label: 'Target Pose', type: 'select', def: '', options: () => (cfg.savedPoses || []).map((sp) => sp.name) },
-      { key: `${p}TransitionSpeedMs`, label: 'Pose Transition Speed (Ms)', type: 'slider', min: 0, max: 700, step: 10, def: 400 },
-      { key: `${p}StartTimeCurve`, label: 'Pose Transition Start Time Curve (Distance -> Start Time)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickHoldConfig(p) },
-      { key: `${p}StartTimeRange`, label: 'Pose Transition Min / Max Start Time (Ms)', type: 'text', def: '{"min":0,"max":300}', onChange: () => parseClickHoldConfig(p) },
-      { key: `${p}RetransitionSpeedMs`, label: 'Pose Retransition Speed (Ms)', type: 'slider', min: 0, max: 700, step: 10, def: 400 },
-      { key: `${p}RetransitionStartTimeCurve`, label: 'Pose Retransition Start Time Curve (Distance -> Start Time)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickHoldConfig(p) },
-      { key: `${p}RetransitionStartTimeRange`, label: 'Pose Retransition Min / Max Start Time (Ms)', type: 'text', def: '{"min":0,"max":300}', onChange: () => parseClickHoldConfig(p) }
+      { key: `${p}Enabled`, label: `${title} (Master On/Off)`, type: 'checkbox', def: defaults.enabled ?? false },
+      { key: `${p}TargetPose`, label: 'Target Pose', type: 'select', def: defaults.targetPose ?? '', options: () => (cfg.savedPoses || []).map((sp) => sp.name) },
+      { key: `${p}TransitionSpeedMs`, label: 'Pose Transition Speed (Ms)', type: 'slider', min: 0, max: 700, step: 10, def: defaults.transitionSpeedMs ?? 400 },
+      { key: `${p}StartTimeCurve`, label: 'Pose Transition Start Time Curve (Distance -> Start Time)', type: 'text', def: defaults.startTimeCurve ?? '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickHoldConfig(p) },
+      { key: `${p}StartTimeRange`, label: 'Pose Transition Min / Max Start Time (Ms)', type: 'text', def: defaults.startTimeRange ?? '{"min":0,"max":300}', onChange: () => parseClickHoldConfig(p) },
+      { key: `${p}RetransitionSpeedMs`, label: 'Pose Retransition Speed (Ms)', type: 'slider', min: 0, max: 700, step: 10, def: defaults.retransitionSpeedMs ?? 400 },
+      { key: `${p}RetransitionStartTimeCurve`, label: 'Pose Retransition Start Time Curve (Distance -> Start Time)', type: 'text', def: defaults.retransitionStartTimeCurve ?? '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickHoldConfig(p) },
+      { key: `${p}RetransitionStartTimeRange`, label: 'Pose Retransition Min / Max Start Time (Ms)', type: 'text', def: defaults.retransitionStartTimeRange ?? '{"min":0,"max":300}', onChange: () => parseClickHoldConfig(p) }
     ]
   }
 }
@@ -1509,19 +1551,19 @@ function makeClickHoldPoseGroup(p, title) {
 // setting, and per-hand independence here already comes from the
 // retransition's own existing distance-based stagger (below), not from
 // staggering the pause length itself.
-function makeClickPoseGroup(p, title) {
+function makeClickPoseGroup(p, title, defaults = {}) {
   return {
     title,
     controls: [
-      { key: `${p}Enabled`, label: `${title} (Master On/Off)`, type: 'checkbox', def: false },
-      { key: `${p}TargetPose`, label: 'Target Pose', type: 'select', def: '', options: () => (cfg.savedPoses || []).map((sp) => sp.name) },
-      { key: `${p}TransitionSpeedMs`, label: 'Pose Transition Speed (Ms)', type: 'slider', min: 0, max: 700, step: 10, def: 400 },
-      { key: `${p}StartTimeCurve`, label: 'Pose Transition Start Time Curve (Distance -> Start Time)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickPoseConfig(p) },
-      { key: `${p}StartTimeRange`, label: 'Pose Transition Min / Max Start Time (Ms)', type: 'text', def: '{"min":0,"max":300}', onChange: () => parseClickPoseConfig(p) },
-      { key: `${p}PauseDurationMs`, label: 'Pause Duration At Target (Ms)', type: 'slider', min: 0, max: 5000, step: 10, def: 500 },
-      { key: `${p}RetransitionSpeedMs`, label: 'Pose Retransition Speed (Ms)', type: 'slider', min: 0, max: 700, step: 10, def: 400 },
-      { key: `${p}RetransitionStartTimeCurve`, label: 'Pose Retransition Start Time Curve (Distance -> Start Time)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickPoseConfig(p) },
-      { key: `${p}RetransitionStartTimeRange`, label: 'Pose Retransition Min / Max Start Time (Ms)', type: 'text', def: '{"min":0,"max":300}', onChange: () => parseClickPoseConfig(p) }
+      { key: `${p}Enabled`, label: `${title} (Master On/Off)`, type: 'checkbox', def: defaults.enabled ?? false },
+      { key: `${p}TargetPose`, label: 'Target Pose', type: 'select', def: defaults.targetPose ?? '', options: () => (cfg.savedPoses || []).map((sp) => sp.name) },
+      { key: `${p}TransitionSpeedMs`, label: 'Pose Transition Speed (Ms)', type: 'slider', min: 0, max: 700, step: 10, def: defaults.transitionSpeedMs ?? 400 },
+      { key: `${p}StartTimeCurve`, label: 'Pose Transition Start Time Curve (Distance -> Start Time)', type: 'text', def: defaults.startTimeCurve ?? '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickPoseConfig(p) },
+      { key: `${p}StartTimeRange`, label: 'Pose Transition Min / Max Start Time (Ms)', type: 'text', def: defaults.startTimeRange ?? '{"min":0,"max":300}', onChange: () => parseClickPoseConfig(p) },
+      { key: `${p}PauseDurationMs`, label: 'Pause Duration At Target (Ms)', type: 'slider', min: 0, max: 5000, step: 10, def: defaults.pauseDurationMs ?? 500 },
+      { key: `${p}RetransitionSpeedMs`, label: 'Pose Retransition Speed (Ms)', type: 'slider', min: 0, max: 700, step: 10, def: defaults.retransitionSpeedMs ?? 400 },
+      { key: `${p}RetransitionStartTimeCurve`, label: 'Pose Retransition Start Time Curve (Distance -> Start Time)', type: 'text', def: defaults.retransitionStartTimeCurve ?? '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickPoseConfig(p) },
+      { key: `${p}RetransitionStartTimeRange`, label: 'Pose Retransition Min / Max Start Time (Ms)', type: 'text', def: defaults.retransitionStartTimeRange ?? '{"min":0,"max":300}', onChange: () => parseClickPoseConfig(p) }
     ]
   }
 }
