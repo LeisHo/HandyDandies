@@ -3157,7 +3157,7 @@
       "chpMode": "Tween",
       "chpTargetPose": "Neutral - Bent Back",
       "chpTweenSelector": "FLOWER 2",
-      "chpTweenSpeedMs": 3990,
+      "chpTweenSpeedMs": 1470,
       "chpTweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.36014382044474286,\"y\":0.17431488037109377},{\"x\":0.5599857648213704,\"y\":0.5520927429199218},{\"x\":0.6809369087219238,\"y\":0.7619359334309896},{\"x\":0.7349051475524903,\"y\":0.8041575113932291},{\"x\":1,\"y\":1}]",
       "chpTweenStartTimeRange": "{\"min\":0,\"max\":1038}",
       "chpLoopMode": "Loop",
@@ -6642,7 +6642,7 @@
       "chpMode": "Tween",
       "chpTargetPose": "Neutral - Bent Back",
       "chpTweenSelector": "FLOWER 2",
-      "chpTweenSpeedMs": 3990,
+      "chpTweenSpeedMs": 1470,
       "chpTweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.36014382044474286,\"y\":0.17431488037109377},{\"x\":0.5599857648213704,\"y\":0.5520927429199218},{\"x\":0.6809369087219238,\"y\":0.7619359334309896},{\"x\":0.7349051475524903,\"y\":0.8041575113932291},{\"x\":1,\"y\":1}]",
       "chpTweenStartTimeRange": "{\"min\":0,\"max\":1038}",
       "chpLoopMode": "Loop",
@@ -10127,7 +10127,7 @@
       "chpMode": "Tween",
       "chpTargetPose": "Neutral - Bent Back",
       "chpTweenSelector": "FLOWER 2",
-      "chpTweenSpeedMs": 3990,
+      "chpTweenSpeedMs": 1470,
       "chpTweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.36014382044474286,\"y\":0.17431488037109377},{\"x\":0.5599857648213704,\"y\":0.5520927429199218},{\"x\":0.6809369087219238,\"y\":0.7619359334309896},{\"x\":0.7349051475524903,\"y\":0.8041575113932291},{\"x\":1,\"y\":1}]",
       "chpTweenStartTimeRange": "{\"min\":0,\"max\":1038}",
       "chpLoopMode": "Loop",
@@ -10635,7 +10635,7 @@
         },
         {
           "key": "Click Hold-Pose",
-          "collapsed": true,
+          "collapsed": false,
           "settings": [
             "chpLoopMode",
             "chpLoopHoldMs",
@@ -10710,7 +10710,7 @@
         },
         {
           "key": "Right-Click Hold-Pose",
-          "collapsed": false,
+          "collapsed": true,
           "settings": [
             "rchpLoopMode",
             "rchpLoopHoldMs",
