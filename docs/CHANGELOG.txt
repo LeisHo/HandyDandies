@@ -3292,6 +3292,68 @@ the user on a real device/browser at the time of this entry.
 Cache-buster bump: `index.html`'s own `main.js?v=77` -> `?v=78`.
 
 --------------------------------------------------------------------------------
+2026-09-14  -  (start not captured -- Actual: NOT MEASURED)
+
+**Cross-checked HANDO's own recent changes for pose-export
+compatibility, per direct request ("can you look into hando's new
+changes to make sure you two are matching since i will be exporting
+poses from hando"), and found 2 real things to fix.**
+
+**(1) The curl-axis fix from the previous entry used a DIFFERENT formula
+than HANDO's own concurrent fix for the identical bug.** HANDO was
+independently fixed the same day (its own commit `3262675`) for the
+exact same root cause found here -- but via a different technique:
+HANDO computes the wrist's LOCAL delta-from-its-own-rest rotation
+(`wristRestQuat^-1 * wristBone.quaternion`) and composes it with
+`modelRoot.quaternion` (delta applied first), instead of reading the
+wrist bone's full WORLD quaternion the way this project's own fix just
+had. Directly measured whether these 2 independently-derived
+"wrist-relative" fixes actually agree: **they don't** -- `rHand`'s own
+rest quaternion is far from identity
+(`[-0.078, 0.688, -0.086, 0.716]`), so the 2 formulas diverge by a
+measured 88.5 degrees for the same wrist state. Since the actual goal
+here is pose-export PARITY with HANDO, not an independently-"correct"
+convention, switched to HANDO's exact formula. Verified against 2
+independent reconstructions of HANDO's own math (not by calling this
+project's own code as its own reference): a direct formula comparison
+and a full end-to-end bone-rotation reconstruction both measured exactly
+0.0 degrees of difference from the real production output. Re-ran the
+existing idle-drift + click-round-trip regression suite: still 0.0
+degrees.
+
+**(2) HANDO has a real feature this project had no concept of at all:
+"Tip-Only Curl"** (4 sliders -- Index/Middle/Ring/Pinky, no thumb), the
+mirror of Base-Only Curl (additive rotation on the LAST joint instead of
+the first). Same failure mode as the earlier-this-saga Base-Only Curl
+gap: a pose exported from HANDO using this slider would have had that
+data silently dropped on import here. Ported: `FINGER_TIP_ONLY_CURL_KEY`
+map, 4 new sliders (placed between Base-Only Curl and Tip Twist in each
+finger's own subgroup, matching HANDO's own ordering), the additive
+`rotateOnTrueWorldAxis()` call on the last joint, and the 4 new keys
+added to `POSE_PRESET_KEYS` and each finger's subgroup. Verified in
+isolation: setting only `tipOnlyCurlIndex` to 60% rotated ONLY the last
+joint (`rIndex3`) by exactly 42.0 degrees (70-degree max * 0.6, matching
+`FINGER_MAX_DEG.index[2]`) while joints 0 and 1 measured exactly 0.0
+degrees of change. Regression suite re-run again: still 0.0 degrees.
+
+**Also checked and confirmed NO mismatch (informational, no code
+change needed):** HANDO's own wrist-before-fingers ordering matches this
+project's own convention exactly (both apply wrist pose before finger
+curl in their live pose-application pass); HANDO has no equivalent of
+Responsive Wrist Splay (its own wrist splay is purely static/slider-set
+-- its own bug report that triggered its fix was a static
+`wristSplay=-50` + a tween, not anything "reactive," consistent with
+this project's own finding that ANY nonzero wrist rotation triggers the
+mismatch, not specifically a LIVE one); HANDO's own saved-pose format
+additionally carries `hideWrist` and 6 arm/shoulder/elbow keys this
+project has no rigging for at all -- these are harmless extra fields on
+an imported pose (silently ignored, not applied), not a compatibility
+problem.
+
+Cache-buster bumps: `index.html`'s own `main.js?v=78` -> `?v=81` across
+this round (one intermediate debug-exposure bump).
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

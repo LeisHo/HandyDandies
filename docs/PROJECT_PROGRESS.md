@@ -18,32 +18,41 @@ work seamlessly from there.
 
 ## Currently working on
 
-**The "thumb/finger pose looks wrong" saga -- the actual root cause has
-been found and fixed; awaiting the user's next real-device confirmation
-before declaring this genuinely closed.** The all-5-fingers idle-refresh
-fix (extending the earlier thumb-only version) made things WORSE on
-desktop, not better -- then the decisive clue: **the user confirmed the
-identical problem reproduces in HANDO, a completely separate codebase**,
-which ruled out every fix attempted anywhere in this saga (all real,
-all correctly scoped to HANDY DANDIES-only code) and pointed at
-something the 2 projects structurally share. Found it:
-`applyCurlToSkeleton()`'s curl/splay axis conversion used `baseQuat`
-(the whole-hand's PRE-wrist orientation) as its reference frame --
-verbatim-ported from HANDO's own convention -- which never includes the
-wrist bone's own current bend/splay rotation. Since every finger is a
-descendant of the wrist bone, curl direction should anatomically rotate
-WITH the wrist (closing a fist still closes toward your own palm no
-matter how your wrist is bent); using a wrist-independent axis meant the
-same curl % increasingly missed the real palm the further the wrist
-rotated from wherever a pose was originally tuned by eye. Fixed by
-reading the wrist bone's own current world rotation as the axis
-reference instead. Verified with a genuinely independent, anatomically-
-meaningful test (not self-consistency): a curled finger's angle relative
-to the wrist's own reference axis stayed constant (78.006 degrees) at
-both wristSplay=0 and wristSplay=-70, even though the wrist itself
-rotated a real 70 degrees between the two -- proving curl now correctly
-tracks the wrist. Re-ran the full existing regression suite: still 0.0
-degrees. **Known, expected side effect:** any saved pose with nonzero
+**The "thumb/finger pose looks wrong" saga -- root cause found and
+fixed, now also verified to match HANDO's own fix exactly; awaiting the
+user's next real-device confirmation before declaring this genuinely
+closed.** The decisive clue: **the user confirmed the identical problem
+reproduces in HANDO, a completely separate codebase**, ruling out every
+HANDY-DANDIES-only fix attempted in this saga and pointing at their
+shared curl-axis convention. `applyCurlToSkeleton()`'s curl/splay axis
+was computed relative to the whole-hand's PRE-wrist orientation,
+verbatim-ported from HANDO's own convention -- never including the
+wrist bone's own current bend/splay rotation, even though every finger
+is a descendant of the wrist bone (curl should rotate WITH the wrist,
+the way closing a fist still closes toward your own palm regardless of
+wrist angle).
+
+First fix (same day, since superseded) computed the wrist-relative axis
+from the wrist bone's full WORLD quaternion. Direct request afterward:
+check HANDO's own concurrent fix (independently applied there the same
+day) to make sure the 2 projects actually match, since poses will be
+exported from HANDO. They didn't -- HANDO uses a different formula (a
+LOCAL delta-from-the-wrist-bone's-own-rest, composed with modelRoot),
+and since `rHand`'s rest quaternion is far from identity, the 2 formulas
+measured an 88.5-degree divergence for the same wrist state. Switched to
+HANDO's exact formula for true pose-export parity -- verified via 2
+independent reconstructions of HANDO's own math (0.0 degrees difference
+from the real production output) and the existing regression suite
+(still 0.0 degrees).
+
+Also found and ported a second real HANDO gap while checking
+compatibility: HANDO has a "Tip-Only Curl" feature (4 sliders, mirror of
+Base-Only Curl, targeting the last joint) this project had no concept of
+at all -- same failure mode as the earlier Base-Only Curl gap (silently
+dropped on import). Ported and verified in isolation (exactly the
+expected 42.0-degree rotation, isolated to the tip joint only).
+
+**Known, expected side effect:** any saved pose with nonzero
 wristBend/wristSplay will look visually different now (tuned by eye
 against the old, wrong behavior) -- not a new bug. **Not yet confirmed
 by the user on a real device** -- don't declare this saga closed until
@@ -555,6 +564,22 @@ still relevant to understanding current state, per this doc's own
   test: a curled finger's angle to the wrist stayed constant (78.006
   degrees) across a real 70-degree wrist rotation. Full regression suite
   still 0.0 degrees. See CHANGELOG.txt for the complete account.
+- **CORRECTION, same day: switched the fix above to HANDO's own exact
+  formula, after checking HANDO's concurrent fix for pose-export
+  compatibility (direct request, since poses will be exported from
+  HANDO).** The world-quaternion approach above and HANDO's own
+  (independently-applied, same day) delta-from-rest approach measured an
+  88.5-degree divergence for the same wrist state -- not equivalent, since
+  `rHand`'s rest quaternion is far from identity. Switched to HANDO's
+  exact technique; verified 0.0 degrees against 2 independent
+  reconstructions of HANDO's own math, and the existing regression suite
+  still 0.0 degrees.
+- **Ported HANDO's "Tip-Only Curl"** (4 sliders, Index/Middle/Ring/Pinky,
+  mirror of Base-Only Curl targeting the last joint) -- found missing
+  entirely while checking HANDO compatibility, same failure mode as the
+  earlier Base-Only Curl gap (would silently drop pose data on import).
+  Verified in isolation: exactly 42.0 degrees on the tip joint only, 0.0
+  on the other joints. See CHANGELOG.txt for the complete account of both.
 
 ## What's next
 
