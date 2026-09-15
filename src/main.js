@@ -3729,31 +3729,38 @@ function updateRenderOrder() {
         hand.currentBaseQuat.copy(cloneBaseQuat)
         const extraSplay = computeResponsiveWristSplayDeg(live, minLiveDist, liveDistRange)
         applyWristPoseToSkeleton(hand.skinnedMesh.skeleton, cfg, extraSplay)
-        // CORRECTED 2026-09-14 -- this is the actual root cause behind
-        // the long-running "thumb pose looks wrong" reports, independent
-        // of cursor movement and never touched by any of the 4 earlier
-        // fixes (all real, all correct, all elsewhere). The wrist bone
-        // gets re-posed with LIVE Responsive Wrist Splay every single
-        // frame right above, but finger curl is normally only recomputed
-        // on a slider change or "Default" click (applyAllFingerPoses),
-        // NOT every frame. `rotateOnTrueWorldAxis()` converts a curl's
-        // intended WORLD-space axis into a LOCAL bone rotation using the
-        // parent chain's CURRENT world orientation at the instant curl is
-        // computed (see the wrist-before-fingers fix's own comment) --
-        // the thumb (`rThumb1`) is the only finger parented directly to
-        // the wrist bone (`rHand`), so it's the only one whose local
-        // rotation goes stale the moment the wrist keeps moving
-        // afterward. "Default" is correct for exactly the one frame it's
-        // applied, then Responsive Wrist Splay keeps rotating the wrist
-        // every frame after that while the thumb doesn't follow -- same
-        // reason a hand returning to idle after any Click-Hold/Click-Pose
-        // sequence shows the identical drift immediately. Only the thumb
-        // needs this -- the other 4 fingers aren't parented to `rHand`
-        // and are unaffected by the wrist's own rotation (confirmed by
-        // the original wrist-ordering fix), so refreshing all 5 every
-        // frame for every hand isn't needed and would cost real
-        // performance at hundreds of hands for no benefit.
-        applyCurlToSkeleton('thumb', hand.skinnedMesh.skeleton, hand.currentBaseQuat, hand.wrapper.quaternion, cfg)
+        // CORRECTED 2026-09-14, root cause behind the long-running "thumb
+        // pose looks wrong" reports, independent of cursor movement. The
+        // wrist bone gets re-posed with LIVE Responsive Wrist Splay every
+        // single frame right above, but finger curl is normally only
+        // recomputed on a slider change or "Default" click
+        // (applyAllFingerPoses()), NOT every frame. `rotateOnTrueWorldAxis()`
+        // converts a curl's intended WORLD-space axis into a LOCAL bone
+        // rotation using the parent chain's CURRENT world orientation at
+        // the instant curl is computed (see the wrist-before-fingers
+        // fix's own comment) -- so ANY finger whose base joint is a
+        // descendant of the wrist bone goes stale the moment the wrist
+        // keeps moving afterward.
+        //
+        // CORRECTED AGAIN, same day -- the original version of this fix
+        // only refreshed the thumb, on the belief (stated by an earlier
+        // round of this saga, never re-verified) that the thumb is the
+        // ONLY finger parented to the wrist bone (`rHand`). Direct
+        // skeleton inspection proved that wrong: every finger's base
+        // joint is parented to its own "carpal" bone (rCarpal1-4), and
+        // EVERY one of those carpal bones is itself a child of `rHand` --
+        // so all 5 fingers, not just the thumb, depend on the wrist's
+        // current world orientation and all 5 need this same per-frame
+        // refresh. Confirmed by the user's own real-device report after
+        // the thumb-only fix: "the other fingers are all also slightly
+        // uncurled" on mobile, and "if I turn off responsive wrist splay,
+        // it's fine" -- exactly the signature of this mechanism, just
+        // wider than first scoped. "Default" is correct for exactly the
+        // one frame it's applied, then Responsive Wrist Splay keeps
+        // rotating the wrist every frame after that while every finger's
+        // curl stays stale -- same reason a hand returning to idle after
+        // any Click-Hold/Click-Pose sequence shows the identical drift.
+        FINGER_NAMES.forEach((name) => applyCurlToSkeleton(name, hand.skinnedMesh.skeleton, hand.currentBaseQuat, hand.wrapper.quaternion, cfg))
       }
     }
   })
