@@ -1281,7 +1281,7 @@
       "wristSplayResponsiveEnabled": false,
       "wristSplayDefault": 0,
       "wristSplayReactiveEnabled": false,
-      "wristSplayRange": "{\"min\":74,\"max\":-22}",
+      "wristSplayRange": "{\"min\":74,\"max\":-73}",
       "wristSplayCurve": "[{\"x\":0,\"y\":1},{\"x\":0.31833343505859374,\"y\":0.6961458841959636},{\"x\":1,\"y\":0.042812347412109375}]",
       "chpEnabled": true,
       "chpTargetPose": "Fist - Bent Back",
@@ -2731,7 +2731,7 @@
       "wristSplayResponsiveEnabled": false,
       "wristSplayDefault": 0,
       "wristSplayReactiveEnabled": false,
-      "wristSplayRange": "{\"min\":74,\"max\":-22}",
+      "wristSplayRange": "{\"min\":74,\"max\":-73}",
       "wristSplayCurve": "[{\"x\":0,\"y\":1},{\"x\":0.31833343505859374,\"y\":0.6961458841959636},{\"x\":1,\"y\":0.042812347412109375}]",
       "chpEnabled": true,
       "chpTargetPose": "Fist - Bent Back",
@@ -4181,7 +4181,7 @@
       "wristSplayResponsiveEnabled": false,
       "wristSplayDefault": 0,
       "wristSplayReactiveEnabled": false,
-      "wristSplayRange": "{\"min\":74,\"max\":-22}",
+      "wristSplayRange": "{\"min\":74,\"max\":-73}",
       "wristSplayCurve": "[{\"x\":0,\"y\":1},{\"x\":0.31833343505859374,\"y\":0.6961458841959636},{\"x\":1,\"y\":0.042812347412109375}]",
       "chpEnabled": true,
       "chpTargetPose": "Fist - Bent Back",
@@ -4555,7 +4555,7 @@
         },
         {
           "key": "Double Click Hold",
-          "collapsed": true,
+          "collapsed": false,
           "settings": [
             "dcHoldLoop",
             "dcHoldEnabled",
@@ -4566,7 +4566,7 @@
         },
         {
           "key": "Right Click",
-          "collapsed": true,
+          "collapsed": false,
           "settings": [
             "rcEnabled",
             "rcMode",
@@ -4600,7 +4600,7 @@
         },
         {
           "key": "Responsive Wrist Splay",
-          "collapsed": true,
+          "collapsed": false,
           "settings": [
             "wristSplayResponsiveEnabled",
             "wristSplayDefault",
