@@ -18,11 +18,30 @@ work seamlessly from there.
 
 ## Currently working on
 
-Nothing blocked. The multi-round "thumb pose looks wrong" saga (5 rounds
-total) is now genuinely resolved — see "Recently completed" for the full
-account. Between rounds; see "What's next" for the one explicitly queued
-item (a Target Marker fix the user deliberately deferred, to be grouped
-with a future batch of changes rather than done in isolation).
+**The "thumb pose looks wrong" saga's real-world status is genuinely
+uncertain, despite exhaustive synthetic verification showing 0.0000
+degrees of error.** After the idle-loop thumb-curl fix (see "Recently
+completed"), the user reported it was still broken. Loaded their EXACT
+real Copy Settings data (all 11 poses, real Responsive Wrist Splay
+range/curve, real click/chp/rchp/dblclick configs) into a live test
+build and reproduced their EXACT described repro (Fist as default,
+trigger click to Open Palm, wait through retransition) -- measured all
+3 thumb joints (rThumb1/2/3), in both world and local space, before vs.
+after: 0.0000 degrees everywhere. Repeated across ~30 hands and all 4
+triggers (click/dblclick/chp/rchp): same result. The user was asked to
+retest in a guaranteed-fresh incognito window to rule out stale caching
+(this project's own long-documented recurring failure mode) -- **that
+retest has not yet happened/been reported back.** Do not assume this is
+resolved OR still broken until that incognito result comes back. If it's
+still broken there too, the next step is fundamentally different
+debugging (something this session's quaternion-based verification
+methodology isn't catching) rather than another synthetic-pose-value
+hypothesis.
+
+Separately, completed and pushed in the same session: the idle-loop
+thumb-curl-desync fix itself (a real, independently-verified bug, see
+below), and setting the user's own real settings as the project's code
+defaults (see "Recently completed").
 
 ## Recently completed
 
@@ -493,8 +512,36 @@ still relevant to understanding current state, per this doc's own
   saved pose's Default-path vs. transition-path bone quaternions --
   turned out not to be needed for the thumb saga's resolution, left in
   place as a still-possibly-useful debugging aid.
+- **Set the user's own real Copy Settings dump as the project's code
+  defaults.** All 11 saved poses, Field Layout, Responsive Wrist Splay's
+  real range/curve, Camera/Lighting, and all 4 click/hold trigger
+  configs (chp->Point, rchp->Neutral - Bent Back, click->Open Palm,
+  dblclick->ThumbsUp) now ship as the code default -- a fresh page load
+  with no localStorage starts in exactly the configuration the user has
+  actually been using. Required a real code change, not just data:
+  `makeClickHoldPoseGroup()`/`makeClickPoseGroup()` previously shared ONE
+  hardcoded default per field across both their instances (chp/rchp;
+  click/dblclick) -- added an optional, backward-compatible `defaults`
+  param so each of the 4 real instances can specify its own target
+  pose/speed. `dp_*` Dev Panel chrome cosmetics deliberately left alone
+  (live in the shared, do-not-fork `devpanel.js` engine). Verified live:
+  cleared `localStorage`, hard-reloaded (caught and fixed a real stale-
+  cache miss mid-verification -- a bare `/` navigation without a fresh
+  top-level cache-bust served an old `index.html`), read every changed
+  value back via `window.__debug` -- exact match, including the field
+  correctly rebuilding to 255 hands (15x17).
 
 ## What's next
+
+**Awaiting the incognito-window retest result for the thumb saga (see
+"Currently working on").** If it's STILL wrong there, this session's
+entire quaternion-comparison verification methodology needs
+reconsidering -- it may be catching everything the underlying bone math
+can produce wrong, while missing something else entirely (a skinning/
+mesh issue independent of bone rotation correctness, a feature
+interaction only present with ALL 4 triggers enabled simultaneously as
+in the user's real config, or something this session hasn't considered
+yet). Don't guess at a 6th fix without that data point first.
 
 **Target Marker fix -- explicitly deferred by the user, do NOT implement
 in isolation.** Direct instruction: "yeah i want that. but dont do that

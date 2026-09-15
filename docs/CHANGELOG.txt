@@ -3132,6 +3132,54 @@ Cache-buster bumps: `index.html`'s own `main.js?v=72` -> `?v=75` across
 this round (2 intermediate debug-exposure bumps).
 
 --------------------------------------------------------------------------------
+2026-09-14  -  21:03:32 - 21:14:39 EDT (11m07s)
+
+**Set the user's own real Copy Settings dump as the project's code
+defaults.** Direct request after the user pasted their full settings
+JSON and asked to make it the default, then push. Translated every
+listed value into `main.js`'s `DEV_GROUPS` `def:` fields: Field Layout,
+Cursor Tracking, all 5 finger Pose subgroups + Wrist, Responsive Wrist
+Splay's real range/curve, all 11 saved poses (Point/ThumbsUp/
+MiddleFinger/Fist/Neutral/Neutral - Bent Back/Open Palm/Preflick3/
+SCISSOR 1/Drag1/Fist - Bent Back), Camera, Lighting (Toon Shading/
+Outline/Background/Debug already matched, no change needed there).
+
+`makeClickHoldPoseGroup()`/`makeClickPoseGroup()` needed a real code
+change, not just data: both factories previously had ONE shared
+hardcoded `def:` per field, used identically for chp/rchp (one factory)
+and click/dblclick (the other) -- fine when every instance wanted the
+same generic default, but the user's real config needs 4 genuinely
+different target poses and speeds (chp->Point, rchp->Neutral - Bent
+Back, click->Open Palm, dblclick->ThumbsUp). Added an optional
+`defaults = {}` parameter to each factory (backward compatible --
+every field falls back to its old generic default via `??` when a key
+isn't provided) and passed each of the 4 real call sites its own
+`defaults` object.
+
+Deliberately left `dp_*` Dev Panel chrome cosmetics (fonts/colors/
+spacing) untouched -- they live in the shared `devpanel.js` engine this
+project's own convention says never to fork, and changing that code
+default wouldn't even affect the user's own browser anyway (their
+localStorage already overrides it).
+
+**Verified live, not just written:** cleared `localStorage` on a test
+port, hard-reloaded with a corrected top-level cache-bust (caught a
+real miss mid-verification -- a bare `/` navigation served a STALE
+`index.html` still pointing at `main.js?v=75`, exactly the kind of
+staleness this project's own CLAUDE.md has warned about repeatedly;
+fixed by navigating to the `?t=` cache-busted URL instead), then read
+back every changed `cfg` value directly via `window.__debug` --
+`fieldRows`/`fieldCols` (255-hand field, 15x17, confirmed by actual
+hand count), all 4 click/hold trigger configs, Responsive Wrist Splay's
+range, all 11 saved pose names, camera/lighting values, and
+`poseDefaultValues.thumbCurl` correctly deriving 79 (Fist) -- every
+single one matched the pasted dump exactly. A screenshot confirmed the
+field renders as expected (a fist-shaped field fanning toward the
+cursor).
+
+Cache-buster bump: `index.html`'s own `main.js?v=75` -> `?v=76`.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================
