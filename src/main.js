@@ -263,12 +263,15 @@ const DEV_GROUPS = [
       // settings. maybe there is an extra setting you dont have" --
       // this WAS it, see FINGER_BASE_ONLY_CURL_KEY's own comment).
       { key: 'baseOnlyCurlThumb', label: 'Thumb Base-Only Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('thumb') },
+      { key: 'midOnlyCurlThumb', label: 'Thumb 2nd Segment Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('thumb') },
+      { key: 'tipOnlyCurlThumb', label: 'Thumb Tip-Only Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('thumb') },
       { key: 'tipTwistThumb', label: 'Thumb Tip Twist (%)', type: 'slider', min: -100, max: 100, step: 1, def: 4, onChange: () => applyCurl('thumb') },
       { key: 'curlIndex', label: 'Index Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 96, lockRange: true, onChange: () => applyCurl('index') },
       { key: 'splayIndex', label: 'Index Splay (%)', type: 'slider', min: -200, max: 200, step: 1, def: 15, onChange: () => applyCurl('index') },
       { key: 'splayIndex2', label: 'Index 2nd Segment Splay (%)', type: 'slider', min: -200, max: 200, step: 1, def: 72, onChange: () => applyCurl('index') },
       { key: 'curlBiasIndex', label: 'Index Curl Bias (Base <-> Tip) (%)', type: 'slider', min: -100, max: 100, step: 1, def: -7, onChange: () => applyCurl('index') },
       { key: 'baseOnlyCurlIndex', label: 'Index Base-Only Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('index') },
+      { key: 'midOnlyCurlIndex', label: 'Index Mid-Only Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('index') },
       { key: 'tipOnlyCurlIndex', label: 'Index Tip-Only Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('index') },
       { key: 'tipTwistIndex', label: 'Index Tip Twist (%)', type: 'slider', min: -100, max: 100, step: 1, def: 1, onChange: () => applyCurl('index') },
       { key: 'curlMiddle', label: 'Middle Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: -89, lockRange: true, onChange: () => applyCurl('middle') },
@@ -276,6 +279,7 @@ const DEV_GROUPS = [
       { key: 'splayMiddle2', label: 'Middle 2nd Segment Splay (%)', type: 'slider', min: -200, max: 200, step: 1, def: -13, onChange: () => applyCurl('middle') },
       { key: 'curlBiasMiddle', label: 'Middle Curl Bias (Base <-> Tip) (%)', type: 'slider', min: -100, max: 100, step: 1, def: 10, onChange: () => applyCurl('middle') },
       { key: 'baseOnlyCurlMiddle', label: 'Middle Base-Only Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('middle') },
+      { key: 'midOnlyCurlMiddle', label: 'Middle Mid-Only Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('middle') },
       { key: 'tipOnlyCurlMiddle', label: 'Middle Tip-Only Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('middle') },
       { key: 'tipTwistMiddle', label: 'Middle Tip Twist (%)', type: 'slider', min: -100, max: 100, step: 1, def: -5, onChange: () => applyCurl('middle') },
       { key: 'curlRing', label: 'Ring Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: -95, lockRange: true, onChange: () => applyCurl('ring') },
@@ -283,6 +287,7 @@ const DEV_GROUPS = [
       { key: 'splayRing2', label: 'Ring 2nd Segment Splay (%)', type: 'slider', min: -200, max: 200, step: 1, def: -32, onChange: () => applyCurl('ring') },
       { key: 'curlBiasRing', label: 'Ring Curl Bias (Base <-> Tip) (%)', type: 'slider', min: -100, max: 100, step: 1, def: -3, onChange: () => applyCurl('ring') },
       { key: 'baseOnlyCurlRing', label: 'Ring Base-Only Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('ring') },
+      { key: 'midOnlyCurlRing', label: 'Ring Mid-Only Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('ring') },
       { key: 'tipOnlyCurlRing', label: 'Ring Tip-Only Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('ring') },
       { key: 'tipTwistRing', label: 'Ring Tip Twist (%)', type: 'slider', min: -100, max: 100, step: 1, def: -5, onChange: () => applyCurl('ring') },
       { key: 'curlPinky', label: 'Pinky Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 89, lockRange: true, onChange: () => applyCurl('pinky') },
@@ -290,6 +295,7 @@ const DEV_GROUPS = [
       { key: 'splayPinky2', label: 'Pinky 2nd Segment Splay (%)', type: 'slider', min: -200, max: 200, step: 1, def: 33, onChange: () => applyCurl('pinky') },
       { key: 'curlBiasPinky', label: 'Pinky Curl Bias (Base <-> Tip) (%)', type: 'slider', min: -100, max: 100, step: 1, def: 6, onChange: () => applyCurl('pinky') },
       { key: 'baseOnlyCurlPinky', label: 'Pinky Base-Only Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('pinky') },
+      { key: 'midOnlyCurlPinky', label: 'Pinky Mid-Only Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('pinky') },
       { key: 'tipOnlyCurlPinky', label: 'Pinky Tip-Only Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('pinky') },
       { key: 'tipTwistPinky', label: 'Pinky Tip Twist (%)', type: 'slider', min: -100, max: 100, step: 1, def: -3, onChange: () => applyCurl('pinky') },
       { key: 'wristBend', label: 'Wrist Bend (Deg)', type: 'slider', min: -90, max: 90, step: 1, def: 0, onChange: () => applyWristPose() },
@@ -538,7 +544,36 @@ const DEV_GROUPS = [
       // sync FROM the live distance every frame (syncCameraPanelFromLive())
       // -- scrolling moves the slider, moving the slider zooms, per direct
       // request ("responsive to my wheel scroll and vice versa").
-      { key: 'cameraZoom', label: 'Zoom (Distance To Pan Target) (x)', type: 'slider', min: 1, max: 800, step: 0.5, def: 260.17068872666084, onChange: (v) => applyCameraControl('cameraZoom', v) }
+      { key: 'cameraZoom', label: 'Zoom (Distance To Pan Target) (x)', type: 'slider', min: 1, max: 800, step: 0.5, def: 260.17068872666084, onChange: (v) => applyCameraControl('cameraZoom', v) },
+      // Direct request: "Similar to the pose selector, allow me to save,
+      // use, overwrite, etc for camera settings" -- mirrors savedPoses'
+      // own list-picker shape exactly (captureCurrent/onUse), except
+      // "Use" applies directly to the LIVE camera (captureCameraPreset()/
+      // applyCameraPreset(), below) rather than a preview-only model,
+      // since there's no separate "camera preview" concept the way
+      // Pose Preview exists for hand poses.
+      {
+        key: 'savedCameras',
+        label: 'Saved Cameras',
+        type: 'list-picker',
+        def: [],
+        itemLabel: 'Camera',
+        importable: true,
+        captureCurrent: () => captureCameraPreset(),
+        onUse: (item) => applyCameraPreset(item)
+      },
+      // 3 more direct requests, same message: lock pan/zoom independently,
+      // and an optional bounded-camera mode built on top of the "Default"
+      // button above (mirroring setSelectedPoseAsDefault()'s own pattern,
+      // see setSelectedCameraAsDefault() below) -- see
+      // enforceCameraMaxExtents()'s own comment for the exact bound
+      // semantics and the worked example the user gave ("if camera pan is
+      // locked, but zoom is not... i am able to zoom into the image, but
+      // when i zoom out beyond the extents, it will just default me to
+      // the default camera").
+      { key: 'lockCameraPan', label: 'Lock Camera Pan', type: 'checkbox', def: false, onChange: () => applyCameraLockState() },
+      { key: 'lockCameraZoom', label: 'Lock Camera Zoom', type: 'checkbox', def: false, onChange: () => applyCameraLockState() },
+      { key: 'cameraMaxExtentsEnabled', label: 'Set Default Camera As Max Extents', type: 'checkbox', def: false, onChange: () => updateCameraMaxExtentsBound() }
     ]
   },
   {
@@ -650,12 +685,12 @@ DEV_GROUPS.forEach((g) => g.controls.forEach((c) => {
 // whatever was last interacted with there, not a deliberate choice worth
 // preserving).
 const POSE_SUBGROUP_SPECS = [
-  { title: 'Whole-Hand Rotation & Thumb', collapsed: true, keys: ['modelRotX', 'modelRotY', 'modelRotZ', 'thumbCurl', 'thumbSplay', 'thumbSplay2', 'tipTwistThumb', 'curlBiasThumb', 'baseOnlyCurlThumb'] },
+  { title: 'Whole-Hand Rotation & Thumb', collapsed: true, keys: ['modelRotX', 'modelRotY', 'modelRotZ', 'thumbCurl', 'thumbSplay', 'thumbSplay2', 'tipTwistThumb', 'curlBiasThumb', 'baseOnlyCurlThumb', 'midOnlyCurlThumb', 'tipOnlyCurlThumb'] },
   { title: 'Wrist', collapsed: true, keys: ['wristBend', 'wristSplay'] },
-  { title: 'Index', collapsed: true, keys: ['curlIndex', 'tipTwistIndex', 'splayIndex', 'curlBiasIndex', 'splayIndex2', 'baseOnlyCurlIndex', 'tipOnlyCurlIndex'] },
-  { title: 'Middle', collapsed: true, keys: ['curlMiddle', 'tipTwistMiddle', 'splayMiddle', 'curlBiasMiddle', 'splayMiddle2', 'baseOnlyCurlMiddle', 'tipOnlyCurlMiddle'] },
-  { title: 'Ring', collapsed: true, keys: ['curlRing', 'tipTwistRing', 'splayRing', 'curlBiasRing', 'splayRing2', 'baseOnlyCurlRing', 'tipOnlyCurlRing'] },
-  { title: 'Pinky', collapsed: true, keys: ['curlPinky', 'tipTwistPinky', 'curlBiasPinky', 'splayPinky', 'splayPinky2', 'baseOnlyCurlPinky', 'tipOnlyCurlPinky'] },
+  { title: 'Index', collapsed: true, keys: ['curlIndex', 'tipTwistIndex', 'splayIndex', 'curlBiasIndex', 'splayIndex2', 'baseOnlyCurlIndex', 'midOnlyCurlIndex', 'tipOnlyCurlIndex'] },
+  { title: 'Middle', collapsed: true, keys: ['curlMiddle', 'tipTwistMiddle', 'splayMiddle', 'curlBiasMiddle', 'splayMiddle2', 'baseOnlyCurlMiddle', 'midOnlyCurlMiddle', 'tipOnlyCurlMiddle'] },
+  { title: 'Ring', collapsed: true, keys: ['curlRing', 'tipTwistRing', 'splayRing', 'curlBiasRing', 'splayRing2', 'baseOnlyCurlRing', 'midOnlyCurlRing', 'tipOnlyCurlRing'] },
+  { title: 'Pinky', collapsed: true, keys: ['curlPinky', 'tipTwistPinky', 'curlBiasPinky', 'splayPinky', 'splayPinky2', 'baseOnlyCurlPinky', 'midOnlyCurlPinky', 'tipOnlyCurlPinky'] },
 ]
 // Shared anti-abuse token for /api/save-settings (CLAUDE.md §12l) -- NOT a
 // real secret (it ships in this page's own source, same as every other
@@ -722,8 +757,12 @@ camera.position.set(cfg.cameraX, cfg.cameraY, cfg.cameraZ)
 // equivalent" convention -- no separate touch-handling code needed.
 const controls = new OrbitControls(camera, renderer.domElement)
 controls.enableRotate = false
-controls.enablePan = true
-controls.enableZoom = true
+// Direct, no `clickHoldPoseTriggers` reference here -- nothing is holding
+// at page load, and that object is declared much later in the file (see
+// applyCameraLockState(), below, for the version that also composes with
+// an active Click-Hold-Pose hold, used everywhere else after init).
+controls.enablePan = !cfg.lockCameraPan
+controls.enableZoom = !cfg.lockCameraZoom
 controls.screenSpacePanning = true
 controls.mouseButtons = { LEFT: THREE.MOUSE.PAN, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.PAN }
 controls.touches = { ONE: THREE.TOUCH.PAN, TWO: THREE.TOUCH.DOLLY_PAN }
@@ -1303,7 +1342,19 @@ const FINGER_BASE_ONLY_CURL_KEY = { thumb: 'baseOnlyCurlThumb', index: 'baseOnly
 // Base-Only Curl above, targeting the LAST joint instead of joint 0. No
 // thumb entry, matching HANDO's own scope exactly (HANDO's own comment:
 // "tipOnlyCurlT is 0 for the thumb (no key defined)").
-const FINGER_TIP_ONLY_CURL_KEY = { index: 'tipOnlyCurlIndex', middle: 'tipOnlyCurlMiddle', ring: 'tipOnlyCurlRing', pinky: 'tipOnlyCurlPinky' }
+// CORRECTED 2026-09-15 -- HANDO has since added `tipOnlyCurlThumb` too
+// (this project's own port, earlier this session, excluded the thumb to
+// match HANDO's THEN-current scope). Re-checked HANDO's live Pose group
+// per direct request ("look into the Hando project to see the pose
+// settings since we added more sliders. Port those") and found this plus
+// an entirely new Mid-Only Curl slider set (below) -- porting both now.
+const FINGER_TIP_ONLY_CURL_KEY = { thumb: 'tipOnlyCurlThumb', index: 'tipOnlyCurlIndex', middle: 'tipOnlyCurlMiddle', ring: 'tipOnlyCurlRing', pinky: 'tipOnlyCurlPinky' }
+// Mid-Only Curl -- the 3rd and final joint-isolation slider (joint 1,
+// the middle segment), completing the Base-Only/Mid-Only/Tip-Only set
+// HANDO now has for all 5 fingers including the thumb (ported from
+// HANDO's own FINGER_MID_ONLY_CURL_KEY -- same mechanism as Base-Only/
+// Tip-Only, additive rotateOnTrueWorldAxis() call, joint 1 only).
+const FINGER_MID_ONLY_CURL_KEY = { thumb: 'midOnlyCurlThumb', index: 'midOnlyCurlIndex', middle: 'midOnlyCurlMiddle', ring: 'midOnlyCurlRing', pinky: 'midOnlyCurlPinky' }
 const FINGER_TIP_TWIST_MAX_DEG = 90
 
 // Converts a rotation expressed around a WORLD axis into the correct LOCAL
@@ -1384,22 +1435,46 @@ const _splay2AxisScratch = new THREE.Vector3()
 // FIRST attempt at a fix (superseded, same day) read the wrist bone's
 // full WORLD quaternion and excluded `wrapperQuat` -- structurally sound
 // on its own, but the user's very next message asked to check HANDO's
-// own concurrent fix to the identical bug (found there via the same
-// cross-project clue that broke this whole saga open), for pose-export
-// compatibility. HANDO's fix (`applyCurlToSkeleton()`, HANDO's own
-// main.js) does NOT read a world quaternion -- it computes the wrist's
-// LOCAL delta-from-ITS-OWN-rest (`wristRestQuat^-1 * wristBone.quaternion`)
-// and composes that delta with `modelRoot.quaternion` (this project's
-// `baseQuat`), delta applied FIRST (wrist is the inner ancestor,
-// modelRoot the outer one). Directly measured: the 2 techniques are NOT
-// equivalent here -- `rHand`'s own rest quaternion is far from identity
-// ([-0.078, 0.688, -0.086, 0.716]), so the full-world-quaternion approach
-// and the delta-from-rest approach diverge by a measured 88.5 degrees for
-// the same wrist state. Switched to HANDO's exact technique so a pose
-// exported from HANDO and imported here poses identically, rather than
-// trusting 2 independently-derived "wrist-relative" fixes to coincide.
+// own concurrent fix to the identical bug, for pose-export compatibility.
+// HANDO's fix at the time computed the wrist's LOCAL delta-from-ITS-OWN-
+// rest (`wristRestQuat^-1 * wristBone.quaternion`) and composed that
+// delta with `modelRoot.quaternion` directly -- switched to match.
+//
+// CORRECTED AGAIN 2026-09-15 -- HANDO's OWN team found that 2nd fix was
+// itself still wrong, via a handoff doc from a concurrent session working
+// on HANDO ("our fix wasnt complete in regards to the wrist splay"). The
+// bug: `baseQuat * delta` treats `delta` (a rotation expressed in the
+// wrist bone's own LOCAL/body frame) as if it were already a WORLD-frame
+// rotation operator -- those 2 only agree when the wrist's REST pose is
+// the identity quaternion, which it is not here (confirmed directly:
+// `rHand`'s own rest quaternion is `[-0.078, 0.688, -0.086, 0.716]`, far
+// from identity) -- explaining why this stayed invisible near
+// wristBend=wristSplay=0 (nearly every pose) and only produced real
+// errors (35-100+ degrees per joint, per HANDO's own measurement) at a
+// genuinely bent/splayed wrist. The actual fix requires a CONJUGATION,
+// not a plain multiply: a local rotation delta is converted to its
+// equivalent WORLD-frame operator via `W1 * delta * W1^-1`, where W1 is
+// the wrist bone's own CURRENT WORLD quaternion (read live, full
+// ancestor chain) -- not by simply premultiplying `baseQuat` onto the
+// raw local delta.
+//
+// Adapted (not copied verbatim) for this project's own extra layer HANDO
+// doesn't have: every hand here sits under `wrapperQuat` (the per-hand,
+// per-frame cursor-tracking rotation) as W1's own outermost ancestor,
+// which HANDO's single modelRoot never had -- conjugating by the FULL
+// W1 (wrapperQuat included) would make the resulting world-frame curl
+// axis drift with wherever the hand currently happens to be FACING the
+// cursor, the exact problem `rotateOnTrueWorldAxis()`'s own `excludeQuat`
+// parameter (above) already exists to prevent. So W1 is read, then
+// wrapperQuat is factored back OUT of it first (`wrapperQuat^-1 * W1`,
+// the same technique `rotateOnTrueWorldAxis()` already uses), before
+// conjugating -- keeping the whole computation in the same wrapper-
+// independent frame `baseQuat` itself already lives in.
 const _curlAxisRefQuat = new THREE.Quaternion()
 const _curlWristDeltaScratch = new THREE.Quaternion()
+const _curlWristWorldQuatScratch = new THREE.Quaternion()
+const _curlWristWorldQuatInvScratch = new THREE.Quaternion()
+const _curlWrapperInvScratch = new THREE.Quaternion()
 // `values` (default `cfg`): lets a caller pose a DIFFERENT skeleton from a
 // plain values object instead of the live cfg -- added for the Pose
 // Preview mini-viewer (previewPosePreset(), below), which poses its own
@@ -1413,9 +1488,25 @@ function applyCurlToSkeleton(fingerName, skeleton, baseQuat, wrapperQuat, values
   const sign = FINGER_SIGN[fingerName]
   const wristBoneForAxis = skeleton.getBoneByName('rHand')
   const wristRestForAxis = boneRestQuat.rHand
-  const axisRefQuat = (wristBoneForAxis && wristRestForAxis)
-    ? _curlAxisRefQuat.copy(baseQuat).multiply(_curlWristDeltaScratch.copy(wristRestForAxis).invert().multiply(wristBoneForAxis.quaternion))
-    : baseQuat
+  let axisRefQuat
+  if (wristBoneForAxis && wristRestForAxis) {
+    // delta = wristRest^-1 * wristBone.currentLocalQuat (body-frame delta)
+    const delta = _curlWristDeltaScratch.copy(wristRestForAxis).invert().multiply(wristBoneForAxis.quaternion)
+    // W1 = wristBone's current world quat, wrapperQuat excluded
+    const W1 = wristBoneForAxis.getWorldQuaternion(_curlWristWorldQuatScratch).premultiply(_curlWrapperInvScratch.copy(wrapperQuat).invert())
+    const W1inv = _curlWristWorldQuatInvScratch.copy(W1).invert()
+    // worldDelta = W1 * delta * W1^-1 (conjugation -- the corrected math)
+    // CORRECTED again, same pass -- W1 already includes `baseQuat` as its
+    // own ancestor (the wrist bone is a descendant of the mesh clone that
+    // `baseQuat` orients), so premultiplying `baseQuat` onto worldDelta
+    // AGAIN here double-applied it (empirically confirmed: the extra
+    // multiply produced a real 1-6 degree relative-to-wrist error across
+    // joints; removing it dropped that to exactly 0.0000 degrees on the
+    // same test). `worldDelta` IS the axis reference on its own.
+    axisRefQuat = _curlAxisRefQuat.copy(W1).multiply(delta).multiply(W1inv)
+  } else {
+    axisRefQuat = baseQuat
+  }
   const curlAxis = _curlAxisScratch.copy(FINGER_CURL_AXIS[fingerName]).applyQuaternion(axisRefQuat)
   const splayAxis = _splayAxisScratch.copy(FINGER_SPLAY_AXIS[fingerName]).applyQuaternion(axisRefQuat)
   const curlT = values[FINGER_CURL_KEY[fingerName]] / 100
@@ -1426,12 +1517,15 @@ function applyCurlToSkeleton(fingerName, skeleton, baseQuat, wrapperQuat, values
   // (or one that simply never set it) has no baseOnlyCurl* entry at all
   // -- treated as 0 (no additive base bend), not NaN.
   const baseOnlyCurlT = (values[FINGER_BASE_ONLY_CURL_KEY[fingerName]] || 0) / 100
-  // `|| 0` fallback, same reasoning as baseOnlyCurlT above. `tipOnlyCurlKey`
-  // is undefined for the thumb (no entry in FINGER_TIP_ONLY_CURL_KEY),
-  // matching HANDO's own scope -- `values[undefined]` is safely undefined,
-  // falling back to 0 the same way.
+  // `|| 0` fallback, same reasoning as baseOnlyCurlT above -- also covers
+  // an older saved pose predating the thumb's own tipOnlyCurlThumb key
+  // (added to HANDO, and ported here, after this project's own thumb
+  // Tip-Only Curl gap was found and closed).
   const tipOnlyCurlKey = FINGER_TIP_ONLY_CURL_KEY[fingerName]
   const tipOnlyCurlT = ((tipOnlyCurlKey && values[tipOnlyCurlKey]) || 0) / 100
+  // Mid-Only Curl -- same `|| 0` fallback reasoning, all 5 fingers now.
+  const midOnlyCurlKey = FINGER_MID_ONLY_CURL_KEY[fingerName]
+  const midOnlyCurlT = ((midOnlyCurlKey && values[midOnlyCurlKey]) || 0) / 100
   const splayAngle = FINGER_SPLAY_SIGN[fingerName] * THREE.MathUtils.degToRad(FINGER_SPLAY_MAX_DEG[fingerName] * splayT)
   const splayJointIndex = FINGER_SPLAY_JOINT_INDEX[fingerName]
   const splay2JointIndex = FINGER_SPLAY2_JOINT_INDEX[fingerName]
@@ -1471,11 +1565,20 @@ function applyCurlToSkeleton(fingerName, skeleton, baseQuat, wrapperQuat, values
       rotateOnTrueWorldAxis(bone, curlAxis, baseOnlyAngle, wrapperQuat)
       bone.updateMatrixWorld(true)
     }
+    // Mid-Only Curl (ported from HANDO -- see FINGER_MID_ONLY_CURL_KEY's
+    // own comment) -- the 3rd joint-isolation slider, joint 1 (the middle
+    // segment) specifically, same mechanism as Base-Only/Tip-Only.
+    if (i === 1) {
+      const midOnlyAngle = sign * THREE.MathUtils.degToRad(maxDegs[1] * midOnlyCurlT)
+      rotateOnTrueWorldAxis(bone, curlAxis, midOnlyAngle, wrapperQuat)
+      bone.updateMatrixWorld(true)
+    }
     // Tip-Only Curl (ported from HANDO, same day as Base-Only Curl's own
     // port -- see FINGER_TIP_ONLY_CURL_KEY's own comment) -- the mirror
     // of Base-Only Curl above, targeting the LAST joint instead of joint
-    // 0, same axis/mechanism. `tipOnlyCurlT` is 0 for the thumb (no key
-    // defined), matching HANDO's own scope exactly.
+    // 0, same axis/mechanism. Now covers all 5 fingers including the
+    // thumb, matching HANDO's own current scope (this project's earlier
+    // port excluded the thumb, matching HANDO's THEN-current scope).
     if (i === joints.length - 1) {
       const tipOnlyAngle = sign * THREE.MathUtils.degToRad(maxDegs[i] * tipOnlyCurlT)
       rotateOnTrueWorldAxis(bone, curlAxis, tipOnlyAngle, wrapperQuat)
@@ -1550,11 +1653,11 @@ function applyAllFingerPoses() {
 // deliberately left out -- see the 'savedPoses' control's own comment for
 // why.
 const POSE_PRESET_KEYS = [
-  'thumbCurl', 'thumbSplay', 'thumbSplay2', 'curlBiasThumb', 'baseOnlyCurlThumb', 'tipTwistThumb',
-  'curlIndex', 'splayIndex', 'splayIndex2', 'curlBiasIndex', 'baseOnlyCurlIndex', 'tipOnlyCurlIndex', 'tipTwistIndex',
-  'curlMiddle', 'splayMiddle', 'splayMiddle2', 'curlBiasMiddle', 'baseOnlyCurlMiddle', 'tipOnlyCurlMiddle', 'tipTwistMiddle',
-  'curlRing', 'splayRing', 'splayRing2', 'curlBiasRing', 'baseOnlyCurlRing', 'tipOnlyCurlRing', 'tipTwistRing',
-  'curlPinky', 'splayPinky', 'splayPinky2', 'curlBiasPinky', 'baseOnlyCurlPinky', 'tipOnlyCurlPinky', 'tipTwistPinky',
+  'thumbCurl', 'thumbSplay', 'thumbSplay2', 'curlBiasThumb', 'baseOnlyCurlThumb', 'midOnlyCurlThumb', 'tipOnlyCurlThumb', 'tipTwistThumb',
+  'curlIndex', 'splayIndex', 'splayIndex2', 'curlBiasIndex', 'baseOnlyCurlIndex', 'midOnlyCurlIndex', 'tipOnlyCurlIndex', 'tipTwistIndex',
+  'curlMiddle', 'splayMiddle', 'splayMiddle2', 'curlBiasMiddle', 'baseOnlyCurlMiddle', 'midOnlyCurlMiddle', 'tipOnlyCurlMiddle', 'tipTwistMiddle',
+  'curlRing', 'splayRing', 'splayRing2', 'curlBiasRing', 'baseOnlyCurlRing', 'midOnlyCurlRing', 'tipOnlyCurlRing', 'tipTwistRing',
+  'curlPinky', 'splayPinky', 'splayPinky2', 'curlBiasPinky', 'baseOnlyCurlPinky', 'midOnlyCurlPinky', 'tipOnlyCurlPinky', 'tipTwistPinky',
   'wristBend', 'wristSplay', 'modelRotX', 'modelRotY', 'modelRotZ'
 ]
 function capturePosePreset() {
@@ -1701,6 +1804,158 @@ function buildPoseDefaultButton() {
   else actionsRow.appendChild(btn)
 }
 buildPoseDefaultButton()
+// Camera's own Saved-Cameras/Default mechanism -- same shape as Pose's
+// own above (capture/apply/getSelected/setAsDefault/inject-button), but
+// applied directly to the live camera (no preview concept for Camera).
+// `camera`/`controls` are declared later in the file (Camera group's own
+// runtime setup) -- fine, since none of these functions actually RUN
+// until a user interacts with the panel, well after full module init.
+const CAMERA_PRESET_KEYS = ['cameraX', 'cameraY', 'cameraZ', 'cameraFov', 'cameraZoom']
+const CAMERA_KEY_DEFAULTS = {}
+DEV_GROUPS.find((g) => g.title === 'Camera').controls.forEach((c) => {
+  if (CAMERA_PRESET_KEYS.includes(c.key)) CAMERA_KEY_DEFAULTS[c.key] = c.def
+})
+// The camera Max Extents (below) bounds against, and what a fresh page
+// load's own Camera sliders already reflect -- seeded from cfg the same
+// way poseDefaultValues is. `targetX/Y/Z` default to (0,0,0), matching
+// `controls.target`'s own initial value (set once, below, before any
+// panning has ever occurred) -- correct for a fresh load; overwritten by
+// setSelectedCameraAsDefault() the moment the user actually sets one.
+let cameraDefaultValues = {}
+CAMERA_PRESET_KEYS.forEach((key) => { cameraDefaultValues[key] = cfg[key] !== undefined ? cfg[key] : CAMERA_KEY_DEFAULTS[key] })
+cameraDefaultValues.targetX = 0
+cameraDefaultValues.targetY = 0
+cameraDefaultValues.targetZ = 0
+// Captures the pan TARGET too (not just the 5 slider-driven fields) --
+// needed to fully reproduce this exact view on "Use"/Default/Max-Extents-
+// snap (a saved camera with only position+FOV+zoom, applied via the same
+// delta-preserving math the position sliders use, would inherit whatever
+// pan offset happens to already be live rather than the view actually
+// captured).
+function captureCameraPreset() {
+  const item = {}
+  CAMERA_PRESET_KEYS.forEach((key) => { item[key] = cfg[key] })
+  item.targetX = controls.target.x
+  item.targetY = controls.target.y
+  item.targetZ = controls.target.z
+  return item
+}
+// Applies a camera preset (a Saved Camera item OR cameraDefaultValues
+// itself, both the same shape) directly to the live camera + pan target,
+// then syncs the panel's own sliders to match -- deliberately sets
+// camera.position/controls.target directly rather than going through
+// applyCameraControl()'s own delta-preserving math, so this is fully
+// deterministic regardless of whatever view was live beforehand.
+function applyCameraPreset(item) {
+  const targetX = item.targetX !== undefined ? item.targetX : 0
+  const targetY = item.targetY !== undefined ? item.targetY : 0
+  const targetZ = item.targetZ !== undefined ? item.targetZ : 0
+  controls.target.set(targetX, targetY, targetZ)
+  camera.position.set(
+    item.cameraX !== undefined ? item.cameraX : CAMERA_KEY_DEFAULTS.cameraX,
+    item.cameraY !== undefined ? item.cameraY : CAMERA_KEY_DEFAULTS.cameraY,
+    item.cameraZ !== undefined ? item.cameraZ : CAMERA_KEY_DEFAULTS.cameraZ
+  )
+  camera.fov = item.cameraFov !== undefined ? item.cameraFov : CAMERA_KEY_DEFAULTS.cameraFov
+  camera.updateProjectionMatrix()
+  controls.update()
+  syncValue('cameraX', camera.position.x)
+  syncValue('cameraY', camera.position.y)
+  syncValue('cameraZ', camera.position.z)
+  syncValue('cameraFov', camera.fov)
+  syncValue('cameraZoom', camera.position.distanceTo(controls.target))
+}
+function getSelectedSavedCameraItem() {
+  const selectedRow = document.querySelector('.dp-row[data-key="savedCameras"] .dp-list-picker-row-selected')
+  return selectedRow ? selectedRow.__item : null
+}
+function setSelectedCameraAsDefault() {
+  const item = getSelectedSavedCameraItem()
+  if (!item) return
+  applyCameraPreset(item)
+  CAMERA_PRESET_KEYS.forEach((key) => { cameraDefaultValues[key] = item[key] !== undefined ? item[key] : CAMERA_KEY_DEFAULTS[key] })
+  cameraDefaultValues.targetX = item.targetX !== undefined ? item.targetX : 0
+  cameraDefaultValues.targetY = item.targetY !== undefined ? item.targetY : 0
+  cameraDefaultValues.targetZ = item.targetZ !== undefined ? item.targetZ : 0
+  updateCameraMaxExtentsBound()
+  saveCurrentSettings()
+}
+// Max Extents (direct request, refined over several corrections in the
+// same message thread down to this exact model): a standard bounding
+// clamp using Default Camera's own zoom distance as the ONE shared
+// "extent radius" -- free movement INWARD (zoom in, pan back toward the
+// default's own target) always stays completely free; only the OUTWARD
+// direction (zoom out past the default's distance, pan away from the
+// default's own target past that same radius) hits a hard wall. "hits a
+// wall" specifically means a CLAMP, not a snap/reset -- confirmed
+// directly ("I dont get snapped back. that only applies to zoom" was
+// itself later corrected to "the max i can zoom out is the extents", a
+// cap, not a teleport-to-default).
+//
+// Zoom's own cap is handled by OrbitControls' own native `maxDistance`
+// property -- no custom code needed, it already enforces "can zoom in
+// freely, capped zooming out" on every drag/scroll/pinch internally.
+// Pan has no native OrbitControls equivalent (there's no built-in
+// "bound controls.target to a sphere" option), so panning's own cap is
+// enforced by hand, once per frame (see enforceCameraPanExtent(), called
+// from animate()) -- reusing the exact same radius so both axes are
+// bounded by the one single "Default Camera" concept the user asked for,
+// not 2 separately-tuned numbers.
+function updateCameraMaxExtentsBound() {
+  controls.maxDistance = cfg.cameraMaxExtentsEnabled ? cameraDefaultValues.cameraZoom : Infinity
+}
+// Composes the new Lock Camera Pan/Zoom checkboxes with the EXISTING
+// Click-Hold-Pose pan-disable (startClickHoldPose()/endClickHoldPose(),
+// below) -- a hold must always disable pan regardless of the lock
+// setting (unchanged), but RESTORING pan once a hold ends must now also
+// respect a genuine permanent lock rather than unconditionally
+// re-enabling it. `clickHoldPoseTriggers` is declared later in the file
+// (Click-Hold-Pose section) -- safe, since this function only ever RUNS
+// at runtime (checkbox onChange, or endClickHoldPose()'s own call),
+// never during module init.
+function applyCameraLockState() {
+  const anyHoldActive = clickHoldPoseTriggers.chp.active || clickHoldPoseTriggers.rchp.active
+  controls.enablePan = !cfg.lockCameraPan && !anyHoldActive
+  controls.enableZoom = !cfg.lockCameraZoom
+}
+const _cameraExtentTargetScratch = new THREE.Vector3()
+const _cameraExtentOffsetScratch = new THREE.Vector3()
+function enforceCameraPanExtent() {
+  if (!cfg.cameraMaxExtentsEnabled) return
+  _cameraExtentTargetScratch.set(cameraDefaultValues.targetX, cameraDefaultValues.targetY, cameraDefaultValues.targetZ)
+  _cameraExtentOffsetScratch.copy(controls.target).sub(_cameraExtentTargetScratch)
+  const panDistance = _cameraExtentOffsetScratch.length()
+  const maxPanDistance = cameraDefaultValues.cameraZoom
+  if (panDistance <= maxPanDistance) return
+  // Clamp controls.target back onto the boundary sphere's surface, and
+  // shift camera.position by the SAME delta so the current zoom distance
+  // is preserved -- panning "into the wall" stops advancing further
+  // rather than the pan target alone snapping while the camera itself
+  // stays disconnected from it.
+  _cameraExtentOffsetScratch.multiplyScalar(maxPanDistance / panDistance)
+  const clampedTarget = _cameraExtentTargetScratch.clone().add(_cameraExtentOffsetScratch)
+  const delta = clampedTarget.clone().sub(controls.target)
+  controls.target.copy(clampedTarget)
+  camera.position.add(delta)
+  controls.update()
+}
+function buildCameraDefaultButton() {
+  const actionsRow = document.querySelector('.dp-row[data-key="savedCameras"] .dp-list-picker-actions')
+  if (!actionsRow) return
+  const btn = document.createElement('button')
+  btn.type = 'button'
+  btn.textContent = 'Default'
+  btn.addEventListener('click', () => setSelectedCameraAsDefault())
+  const useBtn = Array.from(actionsRow.querySelectorAll('button')).find((b) => b.textContent === 'Use')
+  if (useBtn && useBtn.nextSibling) actionsRow.insertBefore(btn, useBtn.nextSibling)
+  else actionsRow.appendChild(btn)
+}
+buildCameraDefaultButton()
+// Sets the initial maxDistance bound on page load -- restored-from-
+// localStorage `cameraMaxExtentsEnabled: true` doesn't fire its own
+// onChange during initDevPanel() (see this project's own established
+// TDZ/reattach-after-init pattern), so this needs one explicit call here.
+updateCameraMaxExtentsBound()
 // TEMPORARY diagnostic tool (direct request context: repeated user
 // reports of a thumb mismatch this session could never reproduce with
 // approximated test data -- every synthetic pose tested came back at
@@ -2724,7 +2979,7 @@ function endClickHoldPose(p) {
   // Only restore panning once NEITHER trigger is still holding -- e.g.
   // releasing the right button while the left is still held shouldn't
   // re-enable panning mid-hold.
-  if (!clickHoldPoseTriggers.chp.active && !clickHoldPoseTriggers.rchp.active) controls.enablePan = true
+  if (!clickHoldPoseTriggers.chp.active && !clickHoldPoseTriggers.rchp.active) applyCameraLockState()
   const now = performance.now()
   let minD = Infinity, maxD = -Infinity
   const dists = hands.map((hand) => {
@@ -3524,7 +3779,7 @@ new GLTFLoader().load(
     modelLoaded = true
     rebuildField()
     buildPosePreview()
-    window.__debug = { THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS }
+    window.__debug = { THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState }
     loadingEl.classList.add('hidden')
   },
   undefined,
@@ -3563,6 +3818,7 @@ function animate() {
     applyRendererSize(window.innerWidth, window.innerHeight)
   }
   controls.update()
+  enforceCameraPanExtent()
   syncCameraPanelFromLive()
   updateCursorTarget()
   armLengthWidgetResyncs.forEach((fn) => fn())
