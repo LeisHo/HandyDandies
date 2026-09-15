@@ -3417,6 +3417,90 @@ been observed by this session; worth a real Save-button click on the
 live deployed URL to confirm.
 
 --------------------------------------------------------------------------------
+2026-09-15  -  (start not captured -- Actual: NOT MEASURED)
+
+**Confirmed live: git-tracked Save Settings (previous entry) is genuinely
+working in production.** Pushing this round's own commit was rejected
+(non-fast-forward) because 3 real auto-commits ("Update dev-panel-
+settings.json via Save Settings") had already landed on the remote from
+actual production traffic -- exactly HANDO's own documented pattern.
+Merged cleanly (the auto-commits only touch the settings JSON, this
+round's own commit didn't) and pushed. No longer an open question.
+
+**Fixed a critical correctness bug in the curl-axis math shipped earlier
+today, via a direct handoff from a concurrent session working on HANDO.**
+That earlier fix computed `axisRefQuat = baseQuat * (wristRest^-1 *
+wristBone.quaternion)` -- treating a LOCAL (body-frame) rotation delta as
+if it were already a WORLD-frame operator. Those only agree when the
+wrist's own rest pose is the identity quaternion, which it isn't here
+(confirmed earlier: `rHand`'s rest quaternion is `[-0.078, 0.688, -0.086,
+0.716]`). HANDO's own team found and fixed the identical bug in HANDO
+itself the same day and handed off the corrected math: a genuine
+conjugation, `worldDelta = W1 * delta * W1^-1`, where W1 is the wrist
+bone's own CURRENT WORLD quaternion. Adapted (not copied verbatim) for
+this project's own extra `wrapperQuat` layer (HANDO has none) by
+factoring wrapperQuat back out of W1 before conjugating -- the same
+technique `rotateOnTrueWorldAxis()` already uses.
+
+While implementing this, live testing caught a 2ND, self-introduced bug:
+since W1 already includes `baseQuat` as its own ancestor, premultiplying
+`baseQuat` onto `worldDelta` again double-applied it -- confirmed both
+algebraically and empirically (a real 1-6 degree relative-to-wrist error
+across joints with the double-apply; exactly 0.0 degrees once removed).
+
+**Verified with the exact methodology the handoff itself described:**
+compared every finger joint's orientation RELATIVE TO THE WRIST at
+wristSplay=0 vs. wristSplay=-50 (identical finger values held constant
+across the comparison, multiple fingers, every curl/splay/bias/base-
+only/mid-only/tip-only/tip-twist slider simultaneously nonzero) -- 0.0000
+degrees of difference on every joint tested (thumb, index, pinky, all 3
+segments each). Re-ran the existing idle-drift + click-round-trip
+regression suite: still 0.0 degrees, confirming this didn't regress
+anything from earlier today.
+
+**Re-checked HANDO's own Pose group for new sliders** (direct request)
+and found HANDO completed its Base-Only/Mid-Only/Tip-Only joint-isolation
+set for all 5 fingers including the thumb (this project only had Base-
+Only for all 5, and Tip-Only excluding the thumb -- ported earlier today
+matching HANDO's THEN-current scope). Ported the 2 gaps: `tipOnlyCurlThumb`
+and `midOnlyCurl{Thumb,Index,Middle,Ring,Pinky}` (5 new sliders, joint-1
+targeting, identical mechanism to Base-Only/Tip-Only). Added to
+`POSE_PRESET_KEYS` and each finger's own Pose subgroup.
+
+**Added Camera presets (Save/Use/Overwrite/Rename/Delete/Default) + Lock
+Camera Pan + Lock Camera Zoom + Set Default Camera As Max Extents**,
+direct request. Saved Cameras list-picker mirrors Saved Poses' exact UI
+shape (`captureCameraPreset()`/`applyCameraPreset()`), applied directly
+to the live camera+pan-target rather than a preview model. Lock Pan/Zoom
+compose correctly with the pre-existing Click-Hold-Pose pan-disable (a
+hold still always disables pan; releasing it now respects a genuine
+permanent lock instead of unconditionally restoring pan).
+
+Max Extents went through several rounds of direct correction before
+landing on its final model: zoom-out is capped via OrbitControls' own
+native `maxDistance` (zooming in stays completely free -- no snap, no
+reset, just a standard max-distance clamp); pan is capped via a custom
+per-frame clamp using that SAME radius, since OrbitControls has no
+native pan-bounding option (free movement back toward the default
+target always stays free; only moving further OUTWARD than the radius
+hits a hard wall -- clamped in place, not reset/snapped, per direct
+correction: "I dont get snapped back. that only applies to zoom" was
+itself further corrected to "the max i can zoom out is the extents", a
+plain cap, not a teleport).
+
+Verified live: capture/apply preset round-trip lands exactly back at the
+captured camera position AND pan target; Lock Pan/Zoom checkboxes clicked
+through the real UI correctly toggle `controls.enablePan`/`enableZoom`;
+Max Extents zoom clamps exactly to the default's own distance (260.171)
+while zooming in to 0.3x that distance stays completely unclamped; Max
+Extents pan clamps a target set to 3x the allowed radius down to exactly
+the boundary, while a target already within bounds (0.5x radius) is left
+completely untouched.
+
+Cache-buster bumps: `index.html`'s own `main.js?v=82` -> `?v=85` across
+this round.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

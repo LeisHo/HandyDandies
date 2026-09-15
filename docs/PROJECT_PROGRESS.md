@@ -18,54 +18,36 @@ work seamlessly from there.
 
 ## Currently working on
 
-**Git-tracked Save Settings just added, not yet confirmed against the
-real live Vercel deployment.** Ported HANDO's own `api/save-settings.js`
-(Vercel serverless function, GitHub Contents API) + wired `src/main.js`
-into `devPanel.js`'s already-existing generic `remoteSave` engine
-(shared workspace-wide, no engine changes needed) + seeded
-`data/processed/dev-panel-settings.json` with the user's own real
-settings dump. The user has already configured the Vercel environment
-variables (`GITHUB_TOKEN`, `DEV_PANEL_SAVE_SECRET`). Verified the full
-client-side mechanism end-to-end against a local mock of the endpoint
-(GET-restore, real Save-button POST correctly preserving untouched
-device fields, graceful no-`/api/`-route boot) -- but the actual
-production round-trip (a real commit landing in the GitHub repo via the
-live deployed site) has not been observed yet. See CHANGELOG.txt for
-the full account.
+**The "thumb/finger pose looks wrong" saga -- now fixed with a
+mathematically-verified-correct formula, matching HANDO's own
+independently-derived fix exactly; awaiting the user's real-device
+confirmation before finally declaring this saga closed.** After 2 same-
+day rounds that each turned out incomplete (a world-quaternion approach,
+then HANDO's own then-current delta-from-rest approach), a concurrent
+session working on HANDO found the delta-from-rest approach was ALSO
+still wrong -- it conflated a LOCAL (body-frame) rotation delta with a
+WORLD-frame operator, which only agree when the wrist's rest pose is the
+identity quaternion (it isn't, here). The real fix needs a conjugation:
+`worldDelta = W1 * delta * W1^-1`, adapted for this project's own extra
+`wrapperQuat` layer (HANDO has none) by factoring wrapperQuat back out of
+W1 first. A 2nd, self-introduced bug (double-applying `baseQuat`, since
+W1 already includes it as an ancestor) was caught via live testing before
+this was called done. Verified with the exact test methodology the
+HANDO handoff itself specified: every finger joint's orientation relative
+to the wrist, compared at wristSplay=0 vs. wristSplay=-50 with every
+other finger value held constant -- 0.0000 degrees of difference, not
+just "close." See CHANGELOG.txt for the complete account.
 
-**The "thumb/finger pose looks wrong" saga -- root cause found and
-fixed, now also verified to match HANDO's own fix exactly; awaiting the
-user's next real-device confirmation before declaring this genuinely
-closed.** The decisive clue: **the user confirmed the identical problem
-reproduces in HANDO, a completely separate codebase**, ruling out every
-HANDY-DANDIES-only fix attempted in this saga and pointing at their
-shared curl-axis convention. `applyCurlToSkeleton()`'s curl/splay axis
-was computed relative to the whole-hand's PRE-wrist orientation,
-verbatim-ported from HANDO's own convention -- never including the
-wrist bone's own current bend/splay rotation, even though every finger
-is a descendant of the wrist bone (curl should rotate WITH the wrist,
-the way closing a fist still closes toward your own palm regardless of
-wrist angle).
-
-First fix (same day, since superseded) computed the wrist-relative axis
-from the wrist bone's full WORLD quaternion. Direct request afterward:
-check HANDO's own concurrent fix (independently applied there the same
-day) to make sure the 2 projects actually match, since poses will be
-exported from HANDO. They didn't -- HANDO uses a different formula (a
-LOCAL delta-from-the-wrist-bone's-own-rest, composed with modelRoot),
-and since `rHand`'s rest quaternion is far from identity, the 2 formulas
-measured an 88.5-degree divergence for the same wrist state. Switched to
-HANDO's exact formula for true pose-export parity -- verified via 2
-independent reconstructions of HANDO's own math (0.0 degrees difference
-from the real production output) and the existing regression suite
-(still 0.0 degrees).
-
-Also found and ported a second real HANDO gap while checking
-compatibility: HANDO has a "Tip-Only Curl" feature (4 sliders, mirror of
-Base-Only Curl, targeting the last joint) this project had no concept of
-at all -- same failure mode as the earlier Base-Only Curl gap (silently
-dropped on import). Ported and verified in isolation (exactly the
-expected 42.0-degree rotation, isolated to the tip joint only).
+**Camera presets (Save/Use/Overwrite/Delete/Default) + Lock Pan/Zoom +
+Set Default Camera As Max Extents -- just added, verified live, not yet
+seen by the user.** Mirrors Saved Poses' own UI pattern but applies
+directly to the live camera. Max Extents took several rounds of direct
+correction to land on its final model: zoom-out capped via OrbitControls'
+own native `maxDistance` (zoom-in always free, no snap/reset -- just a
+plain cap); pan capped via a custom per-frame clamp using that same
+radius (free movement back toward the default target always stays free;
+only moving further outward hits a hard wall). See CHANGELOG.txt for
+the complete account and verification.
 
 **Known, expected side effect:** any saved pose with nonzero
 wristBend/wristSplay will look visually different now (tuned by eye
@@ -595,24 +577,49 @@ still relevant to understanding current state, per this doc's own
   earlier Base-Only Curl gap (would silently drop pose data on import).
   Verified in isolation: exactly 42.0 degrees on the tip joint only, 0.0
   on the other joints. See CHANGELOG.txt for the complete account of both.
+- **Added git-tracked Save Settings** (`api/save-settings.js`, a Vercel
+  serverless function ported from HANDO's own, writing through to
+  `data/processed/dev-panel-settings.json` via GitHub's Contents API).
+  `devPanel.js` already had the generic client engine shared workspace-
+  wide, so only the serverless function + `main.js` wiring + a seeded
+  settings file were needed. **Confirmed genuinely working in
+  production**: a later push was rejected (non-fast-forward) because 3
+  real auto-commits from actual live Save-button use had already landed
+  on the remote -- merged cleanly. See CHANGELOG.txt for the full
+  verification account.
+- **Fixed the curl-axis math for real** (superseding the 2 same-day
+  attempts above) via a direct handoff from a concurrent HANDO session --
+  a conjugation, not a plain multiply, adapted for this project's own
+  extra `wrapperQuat` layer; also caught and fixed a 2nd, self-introduced
+  double-`baseQuat` bug along the way. Verified 0.0000 degrees using the
+  handoff's own exact test methodology (finger-relative-to-wrist,
+  wristSplay=0 vs. -50, every other value held constant). Also ported 2
+  more real HANDO gaps found while re-checking for new sliders:
+  `tipOnlyCurlThumb` and a full `midOnlyCurl{Thumb,Index,Middle,Ring,
+  Pinky}` set (the 3rd and final joint-isolation slider). See
+  CHANGELOG.txt for the complete account.
+- **Added Camera presets + Lock Pan/Zoom + Max Extents** -- see
+  "Currently working on" above and CHANGELOG.txt for the full account.
 
 ## What's next
 
-**Awaiting the user's next real-device retest of the curl-axis fix (see
-"Currently working on") -- this is the one that matters most now.** The
-all-5-fingers idle-refresh fix above turned out to be real but
-insufficient on its own; the curl-axis fix is what actually addresses
-the mechanism the user described (Hando reproduces it too). The earlier
-incognito-window ask was
-superseded by a stronger test the user actually ran (a phone, first load
-ever, guaranteed clean cache) -- that's what surfaced the "other fingers"
-detail and led to the all-5-fingers fix above. If the SAME problem
-persists even after this fix, this session's entire quaternion-comparison
-verification methodology needs reconsidering -- it may be catching
-everything the underlying bone math can produce wrong, while missing
-something else entirely (a skinning/mesh issue independent of bone
-rotation correctness, or something this session hasn't considered yet).
-Don't guess at yet another fix without that data point first.
+**Awaiting the user's real-device confirmation of the corrected curl-axis
+math (see "Currently working on") -- the strongest evidence yet that this
+saga is actually closed, but still not user-confirmed.** Every prior
+"fix" in this saga was independently real and independently verified,
+yet the reported symptom kept persisting -- so don't treat this entry as
+settled just because the math now checks out against a trusted external
+methodology (the HANDO handoff's own exact test). If the SAME problem
+somehow persists even after this, the quaternion-comparison verification
+approach itself needs reconsidering (a skinning/mesh issue independent
+of bone rotation correctness, or something not yet considered) rather
+than attempting a 4th formula.
+
+**Camera presets/Lock Pan-Zoom/Max Extents not yet seen by the user** --
+verified live by this session, but the Max Extents interaction model
+was refined through several rounds of correction from worked examples,
+not a spec the user reviewed directly; worth confirming it feels right
+in actual use.
 
 **Target Marker fix -- explicitly deferred by the user, do NOT implement
 in isolation.** Direct instruction: "yeah i want that. but dont do that
