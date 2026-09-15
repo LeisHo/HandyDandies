@@ -3503,6 +3503,77 @@ this round.
 --------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
+--------------------------------------------------------------------------------
+2026-09-15  -  01:54:19 - 02:11:58 EDT (17m39s, measured; spans investigation,
+root-cause discovery, fix, and verification)
+
+**Found and fixed the ACTUAL wrist-splay/curl bug this whole saga was
+chasing -- previous "corrected" conjugation formula collapsed to identity
+at wristBend=wristSplay=0 exactly, silently discarding `baseQuat`
+(alignQuat) from every finger's curl axis.** User reports of "still have
+wrist splay issues" persisted even after the prior round's conjugation
+fix (`W1 * delta * W1^-1`) passed every relative-to-wrist invariance test
+run against it, including live production tests with real saved poses.
+Direct user reports narrowed it down over several exchanges: "even fist
+doesnt look right... with no responsive wrist splay turned on" and "the
+ones with 0 [wristSplay] as the input seem to look fine" turned out to
+have it backwards in direction but right in spirit -- poses with
+wristSplay=0 (e.g. "Fist") were the ones rendering broken (flat, wing-
+like wedge shapes instead of a closed fist), while nonzero-wristSplay
+poses ("Neutral - Bent Back", "Fist - Bent Back") rendered correctly.
+
+Root cause: at delta = identity (wristBend = wristSplay = 0 exactly), the
+conjugation `W1 * delta * W1^-1` collapses to IDENTITY for ANY W1 at all
+-- confirmed live via direct computation (axisRefQuat read back as
+[0,0,0,1] instead of baseQuat's actual [-0.712,0.021,0,0.702]). The
+relative-to-wrist invariance test used throughout this whole saga only
+checks that a finger's orientation relative to the wrist stays constant
+as wristSplay CHANGES -- a systematically biased but internally self-
+consistent formula can satisfy that test while still being wrong in
+absolute terms, which is exactly what happened: every test case run this
+entire session (Fist - Bent Back, Neutral - Bent Back, the Click-Hold-
+Pose round trip) happened to use a nonzero wristSplay, so the delta=I
+degenerate case was never exercised until a real saved pose ("Fist")
+finally hit it.
+
+Fix (`applyCurlToSkeleton()`, `src/main.js`): conjugate `delta` by
+`wristRestForAxis` (R) alone instead of by the wrist bone's full world
+quat (W1) -- `baseQuat * R * delta * R^-1` -- which correctly reduces to
+exactly `baseQuat` when delta = I (matching the pre-existing no-wrist-
+bone fallback branch, which has always used `baseQuat` directly for that
+case) while still rotating the curl axis to track the wrist's actual
+bend/splay when delta != I. No longer needs the wrist bone's world
+quaternion or `wrapperQuat` for this computation at all.
+
+Verified 3 ways: (1) direct computation -- axisRefQuat now matches
+baseQuat exactly at delta=I, <1e-6 per component, both live-production-
+read and the new formula computed side by side; (2) visual -- "Fist"
+applied via direct cfg values on a fresh local dev-server load now
+renders as an actual compact closed fist across the whole field, versus
+flat wedge/wing shapes before the fix (screenshot comparison); (3) the
+PRE-EXISTING relative-to-wrist invariance check (comparing a finger's
+orientation relative to the wrist between wristSplay=0 and wristSplay=-50
+with every other slider held identical) still holds at 0.0000 degrees
+under the new formula -- the fix does not regress the previously-verified
+nonzero-delta case.
+
+Also confirmed, this round: the `wristSplayResponsiveEnabled` /
+`wristSplayReactiveEnabled` true-vs-false discrepancy noted at the top of
+this investigation was a timing artifact (read moments before vs. after a
+real user Save), not a real bug -- resolved once the user's own save
+landed and a fresh page load matched. Ruled out as contributing factors,
+per direct user correction: the "shoulder/elbow/forearm" and "Hide Wrist"
+slider families HANDO has that this project doesn't port 1:1 (`hideWrist`
+here is a structurally different, live-reactive-by-cursor-distance Arm
+Length feature, not a static per-pose value like HANDO's) -- "shoulder
+elbow and forearm isnt relevatn... mostly its the wrist and finger
+settings that matter."
+
+Cache-buster bump: `index.html`'s own `main.js?v=85` -> `?v=86`.
+
+--------------------------------------------------------------------------------
+<next entry follows the same divider + dated-header pattern>
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

@@ -101,3 +101,20 @@ re-confirming that's actually wanted.
   while a screenshot on the same tab at the same moment renders correctly
   — a characteristic of that tool, not a page bug. See
   `docs/CODE_SUMMARY.txt`'s own GOTCHAS for the full detail on both.
+- A quaternion conjugation of the form `W * delta * W^-1` (used in
+  `applyCurlToSkeleton()`'s curl-axis math) is ALWAYS identity when
+  `delta` is exactly identity, regardless of `W` — silently discarding
+  whatever `W` was meant to contribute. Any test methodology that only
+  checks self-consistency across a range of `delta` values (e.g.
+  comparing a finger's orientation relative to the wrist at 2 different
+  wristSplay values) can pass at 0.0000° even when the formula is
+  absolutely wrong, because a systematically-biased-but-self-consistent
+  formula satisfies that kind of test too. Confirmed live 2026-09-15: the
+  prior "corrected" formula passed every relative-to-wrist invariance
+  test run against it this whole session, yet was still wrong — it just
+  happened that every test case used a nonzero wristSplay, so the
+  delta=identity degenerate case (e.g. the "Fist" pose, wristSplay=0)
+  was never exercised until a real saved pose hit it in production. When
+  verifying a conjugation-based fix, always test the degenerate case
+  (delta=identity) explicitly, not just a range of nonzero deltas — see
+  CHANGELOG.txt's 2026-09-15 entry for the full fix.

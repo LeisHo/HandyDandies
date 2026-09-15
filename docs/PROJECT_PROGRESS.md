@@ -18,42 +18,56 @@ work seamlessly from there.
 
 ## Currently working on
 
-**The "thumb/finger pose looks wrong" saga -- now fixed with a
-mathematically-verified-correct formula, matching HANDO's own
-independently-derived fix exactly; awaiting the user's real-device
-confirmation before finally declaring this saga closed.** After 2 same-
-day rounds that each turned out incomplete (a world-quaternion approach,
-then HANDO's own then-current delta-from-rest approach), a concurrent
-session working on HANDO found the delta-from-rest approach was ALSO
-still wrong -- it conflated a LOCAL (body-frame) rotation delta with a
-WORLD-frame operator, which only agree when the wrist's rest pose is the
-identity quaternion (it isn't, here). The real fix needs a conjugation:
-`worldDelta = W1 * delta * W1^-1`, adapted for this project's own extra
-`wrapperQuat` layer (HANDO has none) by factoring wrapperQuat back out of
-W1 first. A 2nd, self-introduced bug (double-applying `baseQuat`, since
-W1 already includes it as an ancestor) was caught via live testing before
-this was called done. Verified with the exact test methodology the
-HANDO handoff itself specified: every finger joint's orientation relative
-to the wrist, compared at wristSplay=0 vs. wristSplay=-50 with every
-other finger value held constant -- 0.0000 degrees of difference, not
-just "close." See CHANGELOG.txt for the complete account.
+**The "thumb/finger pose looks wrong" saga -- the ACTUAL bug found and
+fixed 2026-09-15, verified live; awaiting the user's real-device
+confirmation before finally declaring this closed.** The prior round's
+conjugation fix (`worldDelta = W1 * delta * W1^-1`) passed every
+relative-to-wrist invariance test run against it, including live-
+production tests with real saved poses -- but the user kept reporting
+"still have wrist splay issues" anyway. Root cause, found only once a
+real saved pose ("Fist") finally exercised the untested case: at
+delta = identity (wristBend = wristSplay = 0 exactly), that formula
+collapses to IDENTITY for any W1 at all, silently discarding `baseQuat`
+(alignQuat) from every finger's curl axis. Every prior test case this
+whole saga ran happened to use a nonzero wristSplay, so this degenerate
+case went unexercised. The relative-to-wrist invariance test itself is
+methodologically blind to this class of bug -- it only checks that a
+formula behaves CONSISTENTLY across wristSplay values, which a
+systematically biased but self-consistent formula can satisfy while
+still being wrong in absolute terms.
+
+Fix: conjugate `delta` by `wristRestForAxis` (R) alone instead of by the
+wrist bone's full world quat -- `baseQuat * R * delta * R^-1` -- which
+correctly reduces to exactly `baseQuat` at delta=I (matching the
+project's own pre-existing no-wrist-bone fallback) while still tracking
+real wrist bend/splay for delta != I. Verified 3 ways: direct computation
+(axisRefQuat now matches baseQuat exactly at delta=I), visual (a fresh
+local dev-server load renders "Fist" as an actual closed fist instead of
+flat wedge shapes), and the pre-existing relative-to-wrist invariance
+check still holds at 0.0000 degrees for nonzero delta -- no regression.
+See CHANGELOG.txt (2026-09-15 entry) for the complete account.
+
+**Open question, not yet investigated:** whether this same class of bug
+(conjugating by the wrist bone's full world quat instead of by its rest
+quat alone) also affects HANDO, which uses a structurally similar
+`W1 * delta * W1^-1` formula of its own -- HANDO's default `modelRoot`
+orientation (identity) happens to make it immune to the specific
+degenerate case that broke this project, but HANDO's own formula still
+double-applies `modelRoot.quaternion` for nonzero delta the same way this
+project's did before an earlier fix this session removed it here (see
+CHANGELOG.txt's "double-apply baseQuat" entries). Not yet raised with
+HANDO's own session/maintainers.
 
 **Camera presets (Save/Use/Overwrite/Delete/Default) + Lock Pan/Zoom +
-Set Default Camera As Max Extents -- just added, verified live, not yet
-seen by the user.** Mirrors Saved Poses' own UI pattern but applies
-directly to the live camera. Max Extents took several rounds of direct
-correction to land on its final model: zoom-out capped via OrbitControls'
-own native `maxDistance` (zoom-in always free, no snap/reset -- just a
-plain cap); pan capped via a custom per-frame clamp using that same
-radius (free movement back toward the default target always stays free;
-only moving further outward hits a hard wall). See CHANGELOG.txt for
-the complete account and verification.
+Set Default Camera As Max Extents.** Mirrors Saved Poses' own UI pattern
+but applies directly to the live camera. Verified live; not yet
+explicitly confirmed by the user as working the way they want on a real
+device. See CHANGELOG.txt for the complete account and verification.
 
-**Known, expected side effect:** any saved pose with nonzero
-wristBend/wristSplay will look visually different now (tuned by eye
-against the old, wrong behavior) -- not a new bug. **Not yet confirmed
-by the user on a real device** -- don't declare this saga closed until
-they do.
+**Known, expected side effect:** any saved pose will look visually
+different now than under either of the 2 earlier (wrong) formulas this
+session tried -- not a new bug. **Not yet confirmed by the user on a
+real device** -- don't declare this saga closed until they do.
 
 ## Recently completed
 
