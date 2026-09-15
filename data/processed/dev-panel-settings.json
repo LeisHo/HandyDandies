@@ -1,8 +1,8 @@
 {
   "values": {
     "desktop": {
-      "fieldRows": 19,
-      "fieldCols": 16,
+      "fieldRows": 18,
+      "fieldCols": 12,
       "rowSpacing": 9.5,
       "columnSpacing": 10.5,
       "handScale": 1.35,
@@ -2086,8 +2086,8 @@
       "dp_scrollStrength": 0.2
     },
     "mobile": {
-      "fieldRows": 19,
-      "fieldCols": 16,
+      "fieldRows": 18,
+      "fieldCols": 12,
       "rowSpacing": 9.5,
       "columnSpacing": 10.5,
       "handScale": 1.35,
@@ -4171,8 +4171,8 @@
       "dp_scrollStrength": 1
     },
     "landscape": {
-      "fieldRows": 19,
-      "fieldCols": 16,
+      "fieldRows": 18,
+      "fieldCols": 12,
       "rowSpacing": 9.5,
       "columnSpacing": 10.5,
       "handScale": 1.35,
