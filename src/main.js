@@ -4200,7 +4200,22 @@ function rebuildField() {
     // project did before that feature. Initialized to the current shared
     // value; kept in sync with it every frame for any hand NOT actively
     // mid pose-transition (see updateRenderOrder()'s own per-hand loop).
-    const hand = { wrapper, clone, skinnedMesh, outlineMesh, wristClipPlane: handWristClipPlane, effectiveRenderOrder: 0, screenX: 0, screenY: 0, screenRadius: 0, currentBaseQuat: cloneBaseQuat.clone() }
+    // `everReposed`: see updateRenderOrder()'s own `needsIdleRepose` gate
+    // comment -- ROOT CAUSE of a real production bug (direct user report,
+    // 2026-09-15: "weird surface texture... rotation looks off" on
+    // startup, fixed by any 1 click). `currentBaseQuat` right above is
+    // seeded from `cloneBaseQuat` at THIS exact moment -- if that's still
+    // its own module-load-time identity default (cfg not fully restored
+    // yet when the field first builds), every hand's own `currentBaseQuat`
+    // freezes on that stale identity forever, UNLESS something re-syncs
+    // it. Before the idle-repose performance gate existed, that re-sync
+    // ran unconditionally every single frame, so a stale snapshot self-
+    // corrected within 1 frame, invisibly. The gate broke that guarantee
+    // for anyone with Responsive Wrist Splay off -- `everReposed` restores
+    // it explicitly: false until a hand's first REAL repose, forcing
+    // exactly one guaranteed full sync regardless of the gate's other
+    // conditions, then never forced again.
+    const hand = { wrapper, clone, skinnedMesh, outlineMesh, wristClipPlane: handWristClipPlane, effectiveRenderOrder: 0, screenX: 0, screenY: 0, screenRadius: 0, currentBaseQuat: cloneBaseQuat.clone(), everReposed: false }
     // Also recomputes this hand's OWN Hide Wrist clip plane right before
     // it draws (see updateWristClipPlaneForHand()'s own comment) -- every
     // hand faces a different direction and (own material/plane now, see
@@ -4623,8 +4638,35 @@ function updateRenderOrder() {
       // curl stale and this is what re-syncs it -- see the comment below.
       // Measured live: this block was ~38ms/frame at 255 hands, the
       // actual lag bottleneck, not rendering itself (~11ms).
-      const needsIdleRepose = cfg.wristSplayResponsiveEnabled || hand._wasOverriddenLastFrame
+      //
+      // CORRECTED 2026-09-15 -- `!hand.everReposed` added, direct user
+      // report ("weird surface texture as if overlapping 3d models...
+      // rotation looks off" on a fresh hard refresh, fixed by any 1
+      // click). Root cause: `hand.currentBaseQuat` is seeded from
+      // `cloneBaseQuat` at hand-creation time (rebuildField()), which can
+      // still be its own module-load-time identity default if cfg hasn't
+      // finished restoring yet when the field first builds -- a hand born
+      // this way renders with an IDENTITY base quaternion (raw GLB bind
+      // pose: straight, uncurled fingers/forearm) until something
+      // resyncs it. Before this performance gate existed, that resync
+      // ran unconditionally every frame, so a stale snapshot self-
+      // corrected within 1 frame, invisibly -- this gate broke that
+      // guarantee for anyone with Responsive Wrist Splay off (confirmed
+      // live: `hands[0].currentBaseQuat` read exactly `[0,0,0,1]`,
+      // identity, on a fresh load with `wristSplayResponsiveEnabled:
+      // false`, while `cloneBaseQuat` itself already held the correct
+      // computed value). A click "fixing" it was `_wasOverriddenLastFrame`
+      // incidentally forcing 1 catch-up frame, or the click's own
+      // `applyPoseValuesToHand` independently recomputing a correct
+      // `currentBaseQuat` from its target pose -- neither is a real fix,
+      // both are lucky side effects. `everReposed` (false until this
+      // branch runs for this hand at least once, see rebuildField()'s
+      // own comment) forces exactly 1 guaranteed full repose regardless
+      // of the other 2 conditions, closing the gap without reintroducing
+      // the per-frame cost for every idle frame after that.
+      const needsIdleRepose = cfg.wristSplayResponsiveEnabled || hand._wasOverriddenLastFrame || !hand.everReposed
       if (needsIdleRepose) {
+        hand.everReposed = true
         // Not mid any pose-transition this frame -- keep this hand's own
         // per-hand basis mirroring the single shared cloneBaseQuat every
         // idle hand has always used, so Whole-Hand Rotation's existing

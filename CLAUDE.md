@@ -149,3 +149,38 @@ onto this feature without re-confirming that's actually wanted.
   "FINGER_SIGN\|FINGER_MAX_DEG\|FINGER_CURL_AXIS" src/main.js` in both
   projects) rather than assuming a one-time port stayed in sync — see
   CHANGELOG.txt's 2nd 2026-09-15 entry for the full account.
+- **Any per-hand "current state" field seeded from a shared value at hand-
+  creation time (e.g. `hand.currentBaseQuat: cloneBaseQuat.clone()` in
+  `rebuildField()`) captures whatever that shared value IS AT THAT EXACT
+  MOMENT — including a stale module-load-time default if cfg hasn't
+  finished restoring yet when the field first builds.** A per-frame
+  unconditional resync silently self-heals this within 1 frame; GATING
+  that resync behind a condition that isn't unconditionally true on a
+  hand's very first frame (e.g. `updateRenderOrder()`'s own
+  `needsIdleRepose` performance gate, added 2026-09-15) can leave a hand
+  frozen on the stale value indefinitely — confirmed live 2026-09-15: a
+  real user's `hands[0].currentBaseQuat` read literal identity
+  (`[0,0,0,1]`) on a fresh hard refresh, rendering every hand as its raw,
+  un-posed GLB bind pose ("weird surface texture... rotation looks off"),
+  while `cloneBaseQuat` itself already held the correct value — any click
+  "fixed" it only as a lucky side effect (of `_wasOverriddenLastFrame` or
+  the click's own independent repose), not a real fix. Any future
+  performance gate added to a per-frame idle-state sync needs its own
+  "has this ever actually run once for this instance" escape hatch (see
+  `hand.everReposed`) — see CHANGELOG.txt's 7th 2026-09-15 entry for the
+  full account.
+- **This session's browser-automation tool (`mcp__Claude_Browser__*`) can
+  misreport `document.hidden: true` / `window.innerWidth: 0` /
+  `renderer.info.render.frame` stuck / `requestAnimationFrame` never
+  firing to a page's OWN JS, even on a tab that was just explicitly
+  fronted and is genuinely interactive** — confirmed live 2026-09-15 with
+  an INDEPENDENT `requestAnimationFrame` probe (nothing to do with this
+  app's own code) that also showed 0 increments over 2 real seconds,
+  ruling out an app-level cause. `computer{action:"screenshot"}` still
+  renders correctly in this same state and is what actually surfaced the
+  real bug above — when investigating anything live-rendering-related,
+  don't trust a JS-exec-based query (`window.innerWidth`, a manual rAF
+  probe, `renderer.info`) as proof the page itself is broken; cross-check
+  with a real screenshot, or bypass the render loop entirely by calling
+  the relevant update function directly (e.g. `window.__debug.updateRenderOrder()`)
+  and inspecting the resulting state.

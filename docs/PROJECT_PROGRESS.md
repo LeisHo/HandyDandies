@@ -103,29 +103,49 @@ to these 3 new ones) -- fixed by adding the same one-time
 
 See CHANGELOG.txt's 5th 2026-09-15 entry for the complete account.
 
-**Direct user report investigated: "all my click functions stopped
-working" -- fixed one confirmed crash path + added a general backstop,
-not a confirmed-reproduced root cause.** The entire trigger pipeline
-(gesture -> `triggerClickPose` -> phase machine -> actual skeleton bone
-writes) was verified correct and unbroken directly on production via
-`window.__debug`. Live-frame verification itself was inconclusive --
-this session's browser-automation tool showed the same already-
-documented rAF-polling unreliability (confirmed via an independent rAF
-probe, not just this app's own code), so a genuinely stalled render loop
-in the user's own browser could be neither confirmed nor ruled out.
+**"All my click functions stopped working" -- ROOT-CAUSED AND FIXED
+2026-09-15, verified directly (not yet reconfirmed live by the user).**
+A first investigation pass fixed a real-but-secondary crash path (Double
+Click Hold Loop's NaN-unsafe speed math) and added a general try/catch
+backstop around `animate()`'s per-frame body -- both good fixes, but
+neither was the actual bug. The user's own, much more specific follow-up
+report pinpointed it: hard refresh shows hands with "weird surface
+texture as if there is overlapping 3d models... rotation etc looks
+off," ANY click instantly fixes it, then further clicks appear to do
+nothing.
 
-Found and fixed one real, concrete way this exact symptom COULD happen:
-Double Click Hold's Loop math divided by `cfg.dcHoldTweenSpeedMs` with no
-NaN/undefined guard -- a bad value there cascades into `animate()`
-throwing on EVERY frame for as long as a hand loops, permanently
-freezing the screen (state keeps updating invisibly underneath) with no
-visible error. Fixed with `Number.isFinite()` guards. Also wrapped
-`animate()`'s whole per-frame body in try/catch as a general backstop --
-this bug or a different one, present or future, can no longer freeze
-rendering silently; whatever throws is now logged loudly and the loop
-keeps running. **Ask the user to confirm this resolves it** -- if it
-recurs, the new console error should pinpoint the exact cause directly.
-See CHANGELOG.txt's 6th 2026-09-15 entry for the complete account.
+Reproduced directly via a real screenshot on a fresh production load:
+every hand rendered as long, spike-like shapes -- the raw, un-posed GLB
+bind pose. Root cause: `hand.currentBaseQuat` is seeded from
+`cloneBaseQuat` at hand-creation time; if `cloneBaseQuat` is still its
+own module-load-time identity default at that exact moment (cfg not yet
+finished restoring), every hand's own snapshot freezes on that stale
+identity forever. Before the earlier idle-repose performance gate
+existed, an unconditional per-frame resync caught this invisibly within
+1 frame -- the gate broke that guarantee specifically for users with
+Responsive Wrist Splay off (confirmed: `wristSplayResponsiveEnabled:
+false` in this real user's own saved settings), so nothing ever resynced
+it until a click incidentally forced one catch-up frame as a lucky side
+effect.
+
+Fixed with `hand.everReposed` (false until a hand's first real repose),
+folded into the gate as a 3rd OR-condition -- forces exactly one
+guaranteed correct repose per hand, then never forces it again. Verified
+directly: simulated the exact broken state on a real hand and called
+`updateRenderOrder()` once with no click involved -- self-healed
+correctly. Getting to this root cause took much longer than its own
+opening ETA (54m36s against ~15-25min) mostly due to this session's
+browser-automation tool repeatedly misreporting `document.hidden`/
+`window.innerWidth` on tabs that were genuinely fronted (the same
+already-documented gotcha) -- a plain screenshot call, not a JS-exec
+query, is what finally surfaced the real bug.
+
+**Not yet independently investigated:** a `GL_INVALID_FRAMEBUFFER_OPERATION`
+WebGL warning also appeared on that same fresh load -- real, but not
+followed up since the screenshot + `currentBaseQuat` evidence already
+fully explained the reported symptom on its own. Worth a look if a
+startup-sizing issue is ever reported separately. See CHANGELOG.txt's
+7th 2026-09-15 entry for the complete account.
 
 **The "thumb/finger pose looks wrong" saga -- 2 SEPARATE bugs found and
 fixed 2026-09-15, both verified live; awaiting the user's final

@@ -3956,6 +3956,84 @@ directly, rather than requiring another investigation like this one.
 Cache-buster bump: `index.html`'s own `main.js?v=93` -> `?v=94`.
 
 --------------------------------------------------------------------------------
+2026-09-15  -  06:09:41 - 07:04:17 EDT (54m36s, measured -- ran well over
+its own ~15-25min opening ETA; see this entry's own closing note for why)
+
+**Root-caused and fixed the ACTUAL "all my click functions stopped
+working" bug**, following a much more specific direct user report this
+time: "1. Startup (hard refresh) 2. I see the hands but with a weird
+surface texture as if there is overlapping 3d models... rotation etc
+looks off. 3. I click, then suddenly it looks correct... Palm following
+cursor works. 4. I click or click hold to test click function. Nothing
+happens."
+
+**Reproduced directly on a fresh production load, visually** (a real
+screenshot, not a JS-exec query -- see this entry's own "tool
+limitation" note below for why that distinction mattered): every hand
+rendered as long, straight, spike-like shapes radiating outward -- the
+raw, un-posed GLB bind pose (straight fingers/forearm), not this
+project's actual default pose. Confirmed via `window.__debug`:
+`hands[0].currentBaseQuat` read exactly `[0,0,0,1]` (IDENTITY) on this
+fresh load, while `cloneBaseQuat` (the correct, already-computed shared
+value) read `[-0.712, 0.021, 0, 0.702]` -- and `cfg.wristSplayResponsiveEnabled`
+was `false` for this real user's actual saved settings.
+
+**Root cause:** `hand.currentBaseQuat` is seeded from `cloneBaseQuat` at
+hand-creation time (`rebuildField()`) -- if `cloneBaseQuat` is STILL its
+own module-load-time identity default at that exact moment (cfg hasn't
+finished restoring from the git-tracked settings log yet when the field
+first builds -- a real, plausible race, not a hypothetical), every
+hand's own snapshot freezes on that stale identity FOREVER, unless
+something re-syncs it. Before the previous entry's idle-repose
+performance gate existed, that re-sync ran UNCONDITIONALLY every single
+frame, so a stale snapshot self-corrected within 1 frame, invisibly --
+nobody had ever seen this bug because it never survived long enough to
+be visible. That gate's `needsIdleRepose = cfg.wristSplayResponsiveEnabled
+|| hand._wasOverriddenLastFrame` broke this guarantee for anyone with
+Responsive Wrist Splay off: neither condition is true on a hand's very
+first real frame, so the resync never runs at all until SOMETHING ELSE
+incidentally triggers it -- exactly what a click does (either
+`_wasOverriddenLastFrame` forcing 1 catch-up frame after the click ends,
+or the click's own `applyPoseValuesToHand` independently recomputing a
+correct `currentBaseQuat` from its own target pose). Neither is a real
+fix; both are lucky side effects that happen to look like "the first
+click fixes it."
+
+**Fix:** added `hand.everReposed` (false at creation, see
+`rebuildField()`'s own comment on the `hand` object literal) and folded
+it into the gate: `needsIdleRepose = cfg.wristSplayResponsiveEnabled ||
+hand._wasOverriddenLastFrame || !hand.everReposed`. Forces exactly ONE
+guaranteed full repose per hand regardless of the other 2 conditions,
+then never forces it again -- restores the original per-hand correctness
+guarantee without reintroducing the ~38ms/frame cost the performance fix
+was written to eliminate.
+
+**Verified directly** (bypassing the render loop entirely, per this
+project's own established "manually step the update function instead of
+trusting live rAF" methodology): simulated the exact broken state on a
+real hand (`currentBaseQuat` forced to identity, `everReposed`/
+`_wasOverriddenLastFrame` both false, `wristSplayResponsiveEnabled`
+false) and called `updateRenderOrder()` ONCE, with no click involved --
+`currentBaseQuat` correctly self-healed to match `cloneBaseQuat`, and
+`everReposed` flipped true.
+
+**Tool limitation, disclosed (why this took as long as it did):** this
+session's own browser-automation tool repeatedly reported
+`document.hidden: true` / `window.innerWidth: 0` on tabs that were
+genuinely fronted and interactive -- the SAME already-documented gotcha
+from earlier this project, re-confirmed multiple times before a plain
+`computer{screenshot}` call (which this project's own CLAUDE.md already
+notes works correctly even when the JS-exec path doesn't) finally showed
+the real, reproducible visual bug directly. A `GL_INVALID_FRAMEBUFFER_OPERATION:
+... Attachment has zero size` WebGL warning also appeared on that same
+fresh load -- real (browser/GPU-level, not JS-exec-spoofable) but NOT
+investigated further this round, since the screenshot + `currentBaseQuat`
+evidence already fully explained the reported symptom on its own; worth
+a separate look if a startup sizing issue is ever reported on its own.
+
+Cache-buster bump: `index.html`'s own `main.js?v=94` -> `?v=95`.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================
