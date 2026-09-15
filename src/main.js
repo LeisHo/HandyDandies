@@ -205,20 +205,34 @@ const boundsCenterScratch = new THREE.Vector3()
 const DEV_GROUPS = [
   {
     title: 'Field Layout',
+    // Every control below is perDevice (added 2026-09-15, direct request:
+    // "Allow for separate field layout settings and camera settings for
+    // Desktop and Mobile") -- Desktop and Mobile (and Landscape, via the
+    // same standard §12f 3-tab mechanism) can each hold their own,
+    // genuinely independent grid/spacing/scale tuning from now on. No
+    // `defMobile`/`defLandscape` overrides are set here -- all 3 devices
+    // start out identical (cloned from `def`, the existing established
+    // fallback per §12f), since this project has no design brief for what
+    // Mobile's own layout SHOULD look like; that's a live tuning decision
+    // for whoever opens the panel's own Mobile tab, not something to
+    // invent numbers for here. `commit()`/`syncValue()` in devPanel.js
+    // already gate live onChange firing behind `editingDevice ===
+    // realDeviceClass()` generically -- no devPanel.js changes were
+    // needed to support this, just the `perDevice: true` flag per control.
     controls: [
-      { key: 'fieldRows', label: 'Rows (Count)', type: 'slider', min: 1, max: 40, step: 1, def: 15, onChange: () => rebuildField() },
-      { key: 'fieldCols', label: 'Columns (Count)', type: 'slider', min: 1, max: 40, step: 1, def: 17, onChange: () => rebuildField() },
-      { key: 'rowSpacing', label: 'Row Spacing (World Units)', type: 'slider', min: 2, max: 40, step: 0.5, def: 9.5, onChange: () => relayoutField() },
-      { key: 'columnSpacing', label: 'Column Spacing (World Units)', type: 'slider', min: 2, max: 40, step: 0.5, def: 14, onChange: () => relayoutField() },
-      { key: 'handScale', label: 'Hand Scale (x)', type: 'slider', min: 0.1, max: 3, step: 0.05, def: 1.55, onChange: () => relayoutField() },
+      { key: 'fieldRows', label: 'Rows (Count)', type: 'slider', min: 1, max: 40, step: 1, def: 15, perDevice: true, onChange: () => rebuildField() },
+      { key: 'fieldCols', label: 'Columns (Count)', type: 'slider', min: 1, max: 40, step: 1, def: 17, perDevice: true, onChange: () => rebuildField() },
+      { key: 'rowSpacing', label: 'Row Spacing (World Units)', type: 'slider', min: 2, max: 40, step: 0.5, def: 9.5, perDevice: true, onChange: () => relayoutField() },
+      { key: 'columnSpacing', label: 'Column Spacing (World Units)', type: 'slider', min: 2, max: 40, step: 0.5, def: 14, perDevice: true, onChange: () => relayoutField() },
+      { key: 'handScale', label: 'Hand Scale (x)', type: 'slider', min: 0.1, max: 3, step: 0.05, def: 1.55, perDevice: true, onChange: () => relayoutField() },
       // Classic brick/hex stagger: shifts every OTHER row sideways (along
       // the column axis, i.e. perpendicular to how rows themselves stack
       // in the row direction) by a fixed amount -- the standard reading of
       // "alternate row offset." If a Z-depth stagger was actually meant
       // instead, this is a 1-line change (see relayoutField()).
-      { key: 'alternateRowOffset', label: 'Alternate Row Offset (World Units)', type: 'slider', min: -20, max: 20, step: 0.5, def: -5.5, onChange: () => relayoutField() },
-      { key: 'progressiveRowOffset', label: 'Progressive Row Offset (World Units / Row)', type: 'slider', min: -20, max: 20, step: 0.5, def: 0, onChange: () => relayoutField() },
-      { key: 'useProgressiveOffset', label: 'Use Progressive Offset (Off = Alternate)', type: 'checkbox', def: false, onChange: () => relayoutField() }
+      { key: 'alternateRowOffset', label: 'Alternate Row Offset (World Units)', type: 'slider', min: -20, max: 20, step: 0.5, def: -5.5, perDevice: true, onChange: () => relayoutField() },
+      { key: 'progressiveRowOffset', label: 'Progressive Row Offset (World Units / Row)', type: 'slider', min: -20, max: 20, step: 0.5, def: 0, perDevice: true, onChange: () => relayoutField() },
+      { key: 'useProgressiveOffset', label: 'Use Progressive Offset (Off = Alternate)', type: 'checkbox', def: false, perDevice: true, onChange: () => relayoutField() }
     ]
   },
   {
@@ -647,6 +661,15 @@ const DEV_GROUPS = [
   },
   {
     title: 'Camera',
+    // Live position/behavior controls below are perDevice (added
+    // 2026-09-15, same direct request as Field Layout's own matching
+    // comment -- see there for the full "no invented defMobile/
+    // defLandscape numbers, no devPanel.js changes needed" reasoning,
+    // which applies identically here). `savedCameras` (the named-preset
+    // list-picker, below) deliberately stays SHARED, not perDevice -- a
+    // saved preset is a reusable recipe either device's own tab can
+    // "Use," not itself a spatial setting; making the LIST per-device
+    // would just fragment one preset library into 3 for no benefit.
     controls: [
       // Position sliders only (no Yaw/Pitch/Zoom-as-distance like HANDO's
       // own Camera group) -- this camera never rotates (see OrbitControls
@@ -655,17 +678,20 @@ const DEV_GROUPS = [
       // orbiting camera. Defaults are static (NOT derived from field size,
       // per the "field layout shouldn't affect view scale" request) --
       // frame the view by dragging (pan) / scrolling (zoom) instead.
-      { key: 'cameraX', label: 'Camera X Position (x)', type: 'slider', min: -300, max: 300, step: 0.5, def: 6.638529594915686, onChange: (v) => applyCameraControl('cameraX', v) },
-      { key: 'cameraY', label: 'Camera Y Position (x)', type: 'slider', min: -300, max: 300, step: 0.5, def: 13.373156794075216, onChange: (v) => applyCameraControl('cameraY', v) },
-      { key: 'cameraZ', label: 'Camera Z Position (x)', type: 'slider', min: 1, max: 500, step: 0.5, def: 259.74194092345493, onChange: (v) => applyCameraControl('cameraZ', v) },
-      { key: 'cameraFov', label: 'Field Of View (Deg)', type: 'slider', min: 15, max: 90, step: 1, def: 35, onChange: (v) => applyCameraControl('cameraFov', v) },
+      { key: 'cameraX', label: 'Camera X Position (x)', type: 'slider', min: -300, max: 300, step: 0.5, def: 6.638529594915686, perDevice: true, onChange: (v) => applyCameraControl('cameraX', v) },
+      { key: 'cameraY', label: 'Camera Y Position (x)', type: 'slider', min: -300, max: 300, step: 0.5, def: 13.373156794075216, perDevice: true, onChange: (v) => applyCameraControl('cameraY', v) },
+      { key: 'cameraZ', label: 'Camera Z Position (x)', type: 'slider', min: 1, max: 500, step: 0.5, def: 259.74194092345493, perDevice: true, onChange: (v) => applyCameraControl('cameraZ', v) },
+      { key: 'cameraFov', label: 'Field Of View (Deg)', type: 'slider', min: 15, max: 90, step: 1, def: 35, perDevice: true, onChange: (v) => applyCameraControl('cameraFov', v) },
       // Direct 2-way binding with scroll/pinch zoom, same pattern as the
       // X/Y/Z sliders above: this slider both SETS the camera's distance
       // to its own pan target (setCameraDistance(), below) and is kept in
       // sync FROM the live distance every frame (syncCameraPanelFromLive())
       // -- scrolling moves the slider, moving the slider zooms, per direct
-      // request ("responsive to my wheel scroll and vice versa").
-      { key: 'cameraZoom', label: 'Zoom (Distance To Pan Target) (x)', type: 'slider', min: 1, max: 800, step: 0.5, def: 260.17068872666084, onChange: (v) => applyCameraControl('cameraZoom', v) },
+      // request ("responsive to my wheel scroll and vice versa"). Its own
+      // 2-way `syncValue()` binding is already perDevice-aware generically
+      // (guards against writing into a non-matching device's own stored
+      // value) -- no changes needed there for this to work correctly.
+      { key: 'cameraZoom', label: 'Zoom (Distance To Pan Target) (x)', type: 'slider', min: 1, max: 800, step: 0.5, def: 260.17068872666084, perDevice: true, onChange: (v) => applyCameraControl('cameraZoom', v) },
       // Direct request: "Similar to the pose selector, allow me to save,
       // use, overwrite, etc for camera settings" -- mirrors savedPoses'
       // own list-picker shape exactly (captureCurrent/onUse), except
@@ -692,9 +718,9 @@ const DEV_GROUPS = [
       // locked, but zoom is not... i am able to zoom into the image, but
       // when i zoom out beyond the extents, it will just default me to
       // the default camera").
-      { key: 'lockCameraPan', label: 'Lock Camera Pan', type: 'checkbox', def: false, onChange: () => applyCameraLockState() },
-      { key: 'lockCameraZoom', label: 'Lock Camera Zoom', type: 'checkbox', def: false, onChange: () => applyCameraLockState() },
-      { key: 'cameraMaxExtentsEnabled', label: 'Set Default Camera As Max Extents', type: 'checkbox', def: false, onChange: () => updateCameraMaxExtentsBound() }
+      { key: 'lockCameraPan', label: 'Lock Camera Pan', type: 'checkbox', def: false, perDevice: true, onChange: () => applyCameraLockState() },
+      { key: 'lockCameraZoom', label: 'Lock Camera Zoom', type: 'checkbox', def: false, perDevice: true, onChange: () => applyCameraLockState() },
+      { key: 'cameraMaxExtentsEnabled', label: 'Set Default Camera As Max Extents', type: 'checkbox', def: false, perDevice: true, onChange: () => updateCameraMaxExtentsBound() }
     ]
   },
   {
@@ -1988,7 +2014,31 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       // engages immediately on pointerdown, per the direct request that
       // moving the cursor during a hold must never pan, even before the
       // hold is confirmed.
-      { key: `${p}HoldConfirmMs`, label: 'Hold Confirm Delay (Ms)', type: 'slider', min: 0, max: 500, step: 10, def: defaults.holdConfirmMs ?? 150 },
+      //
+      // CORRECTED 2026-09-15 -- default raised 150 -> 500 (max 500 -> 1000
+      // for tuning headroom above that), direct follow-up report ("Double
+      // click is still acting weird. I think its registering a single
+      // click first, then when it realizes its double, it causes an
+      // issue"). Root cause: this delay (was 150ms) and
+      // `MOUSE_LOG_HELD_DRAG_MS` (500ms -- the SEPARATE threshold deciding
+      // whether a release counts as a genuine hold, suppressing Click
+      // Pose/Double-Click Pose's own trigger) were 2 different numbers
+      // serving what should be the SAME purpose. Any press lasting between
+      // 150-500ms -- a perfectly normal, not-especially-slow speed for a
+      // double-click's own first tap -- crossed the 150ms "become visible"
+      // threshold WITHOUT crossing the 500ms "count as a genuine hold"
+      // threshold, so this group's own target pose visibly flashed on,
+      // then reversed, entirely independent of whatever Click Pose/
+      // Double-Click Pose went on to do afterward -- confirmed live via a
+      // real simulated 200ms-press double-click (chp's own phase measured
+      // entering 'forward' mid-press, well before either click resolved).
+      // Matching this delay to `MOUSE_LOG_HELD_DRAG_MS` exactly closes the
+      // gap: nothing can become visible without ALSO being long enough to
+      // count as a genuine hold, eliminating the inconsistency rather than
+      // just narrowing its window. Confirmed live: the same 200ms-press
+      // double-click no longer moves chp's own phase out of 'idle' at all
+      // with this delay raised to 500ms.
+      { key: `${p}HoldConfirmMs`, label: 'Hold Confirm Delay (Ms)', type: 'slider', min: 0, max: 1000, step: 10, def: defaults.holdConfirmMs ?? 500 },
       { key: `${p}TransitionSpeedMs`, label: 'Pose Transition Speed (Ms)', type: 'slider', min: 0, max: 700, step: 10, def: defaults.transitionSpeedMs ?? 400 },
       { key: `${p}StartTimeCurve`, label: 'Pose Transition Start Time Curve (Distance -> Start Time)', type: 'text', def: defaults.startTimeCurve ?? '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickHoldConfig(p) },
       { key: `${p}StartTimeRange`, label: 'Pose Transition Min / Max Start Time (Ms)', type: 'text', def: defaults.startTimeRange ?? '{"min":0,"max":300}', onChange: () => parseClickHoldConfig(p) },
