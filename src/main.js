@@ -1346,6 +1346,35 @@ function curlBiasWeight(jointIndex, jointCount, bias) {
 const _curlAxisScratch = new THREE.Vector3()
 const _splayAxisScratch = new THREE.Vector3()
 const _splay2AxisScratch = new THREE.Vector3()
+// CORRECTED 2026-09-14 -- the comment above this block (kept for its own
+// historical account) documents that using `baseQuat` alone was a
+// DELIBERATE port of HANDO's own convention -- and that convention turns
+// out to be anatomically wrong, not just here: the user independently
+// confirmed the identical symptom reproduces in HANDO itself. `baseQuat`
+// is the whole-hand's PRE-wrist orientation (alignQuat + Whole-Hand
+// Rotation only) -- it never includes the wrist bone's own current
+// bend/splay rotation. Every finger (not just the thumb -- see this same
+// day's earlier correction) is a descendant of the wrist bone (`rHand`,
+// via its own "carpal" bone), so a real hand's curl direction should
+// rotate WITH the wrist/palm, the same way closing your fist still closes
+// toward your OWN palm no matter how your wrist is bent. Using a
+// wrist-independent axis instead means the SAME curl % increasingly
+// "misses" the actual (bent/splayed) palm the further the wrist rotates
+// away from whatever it was at when a pose's curl values were originally
+// tuned by eye -- exactly matching "if I turn off responsive wrist splay,
+// it's fine" (extraSplay is always 0 there) and "every finger [is] less
+// curled" (every finger inherits this same axis convention, not just the
+// thumb). Fixed by reading the WRIST BONE's own current world rotation
+// (excluding `wrapperQuat`, same technique `rotateOnTrueWorldAxis()`
+// already uses) as the axis reference instead of the static `baseQuat` --
+// this already incorporates `baseQuat` as its own prefix (the wrist bone
+// is a descendant of the mesh clone that `baseQuat` orients), so nothing
+// about Whole-Hand Rotation's existing behavior is lost, only wrist
+// bend/splay awareness is added on top. Falls back to `baseQuat` alone if
+// the skeleton has no `rHand` bone (shouldn't happen on this rig, kept
+// only as a defensive no-op-change fallback).
+const _curlAxisRefQuat = new THREE.Quaternion()
+const _curlAxisRefWrapperInv = new THREE.Quaternion()
 // `values` (default `cfg`): lets a caller pose a DIFFERENT skeleton from a
 // plain values object instead of the live cfg -- added for the Pose
 // Preview mini-viewer (previewPosePreset(), below), which poses its own
@@ -1357,8 +1386,12 @@ function applyCurlToSkeleton(fingerName, skeleton, baseQuat, wrapperQuat, values
   const joints = FINGER_JOINTS[fingerName]
   const maxDegs = FINGER_MAX_DEG[fingerName]
   const sign = FINGER_SIGN[fingerName]
-  const curlAxis = _curlAxisScratch.copy(FINGER_CURL_AXIS[fingerName]).applyQuaternion(baseQuat)
-  const splayAxis = _splayAxisScratch.copy(FINGER_SPLAY_AXIS[fingerName]).applyQuaternion(baseQuat)
+  const wristBoneForAxis = skeleton.getBoneByName('rHand')
+  const axisRefQuat = wristBoneForAxis
+    ? wristBoneForAxis.getWorldQuaternion(_curlAxisRefQuat).premultiply(_curlAxisRefWrapperInv.copy(wrapperQuat).invert())
+    : baseQuat
+  const curlAxis = _curlAxisScratch.copy(FINGER_CURL_AXIS[fingerName]).applyQuaternion(axisRefQuat)
+  const splayAxis = _splayAxisScratch.copy(FINGER_SPLAY_AXIS[fingerName]).applyQuaternion(axisRefQuat)
   const curlT = values[FINGER_CURL_KEY[fingerName]] / 100
   const splayT = values[FINGER_SPLAY_KEY[fingerName]] / 100
   const curlBias = values[FINGER_CURL_BIAS_KEY[fingerName]] / 100
@@ -1370,7 +1403,7 @@ function applyCurlToSkeleton(fingerName, skeleton, baseQuat, wrapperQuat, values
   const splayAngle = FINGER_SPLAY_SIGN[fingerName] * THREE.MathUtils.degToRad(FINGER_SPLAY_MAX_DEG[fingerName] * splayT)
   const splayJointIndex = FINGER_SPLAY_JOINT_INDEX[fingerName]
   const splay2JointIndex = FINGER_SPLAY2_JOINT_INDEX[fingerName]
-  const splay2Axis = _splay2AxisScratch.copy(FINGER_SPLAY2_AXIS[fingerName]).applyQuaternion(baseQuat)
+  const splay2Axis = _splay2AxisScratch.copy(FINGER_SPLAY2_AXIS[fingerName]).applyQuaternion(axisRefQuat)
   const splay2T = values[FINGER_SPLAY2_KEY[fingerName]] / 100
   const splay2Angle = FINGER_SPLAY2_SIGN[fingerName] * THREE.MathUtils.degToRad(FINGER_SPLAY2_MAX_DEG[fingerName] * splay2T)
   const bones = []
