@@ -3767,7 +3767,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": false,
+      "collapsed": true,
       "settings": [],
       "subgroups": [
         {
@@ -3857,31 +3857,11 @@
       "subgroups": [
         {
           "key": "Whole-Hand Rotation & Thumb",
-          "collapsed": false,
+          "collapsed": true,
           "settings": [
-            "midOnlyCurlThumb",
-            "tipOnlyCurlThumb",
-            "baseOnlyCurlThumb",
             "modelRotX",
             "modelRotY",
             "modelRotZ"
-          ],
-          "subgroups": []
-        },
-        {
-          "key": "New Group",
-          "collapsed": true,
-          "settings": [
-            "cropWristEnabled",
-            "hideWrist",
-            "reactiveArmLengthEnabled",
-            "armLengthRange",
-            "armLengthCurve",
-            "thumbCurl",
-            "thumbSplay",
-            "thumbSplay2",
-            "tipTwistThumb",
-            "curlBiasThumb"
           ],
           "subgroups": []
         },
@@ -3891,6 +3871,34 @@
           "settings": [
             "wristBend",
             "wristSplay"
+          ],
+          "subgroups": [
+            {
+              "key": "New Group",
+              "collapsed": false,
+              "settings": [
+                "cropWristEnabled",
+                "hideWrist",
+                "reactiveArmLengthEnabled",
+                "armLengthRange",
+                "armLengthCurve"
+              ],
+              "subgroups": []
+            }
+          ]
+        },
+        {
+          "key": "New Group",
+          "collapsed": true,
+          "settings": [
+            "thumbCurl",
+            "tipOnlyCurlThumb",
+            "midOnlyCurlThumb",
+            "baseOnlyCurlThumb",
+            "tipTwistThumb",
+            "thumbSplay",
+            "thumbSplay2",
+            "curlBiasThumb"
           ],
           "subgroups": []
         },
@@ -4034,7 +4042,7 @@
     },
     {
       "key": "Debug",
-      "collapsed": true,
+      "collapsed": false,
       "settings": [
         "showGridHelper",
         "showWireframe",
@@ -4047,7 +4055,7 @@
     }
   ],
   "textOverrides": {
-    "New Group": "Thumb",
+    "New Group": "THUMB",
     "New Group (2)": "CLICK FUNCTIONS"
   }
 }
