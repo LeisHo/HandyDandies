@@ -1113,6 +1113,17 @@
       "dblclickRetransitionSpeedMs": 410,
       "dblclickRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "dblclickRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
+      "rcEnabled": true,
+      "rcMode": "Tween",
+      "rcTargetPose": "Point",
+      "rcTweenSelector": "Wave",
+      "rcTransitionSpeedMs": 400,
+      "rcStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "rcStartTimeRange": "{\"min\":0,\"max\":300}",
+      "rcPauseDurationMs": 500,
+      "rcRetransitionSpeedMs": 400,
+      "rcRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "rcRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "tweenPoses": [
         "Wave 1",
         "Wave 2",
@@ -1137,6 +1148,7 @@
       "dcHoldEnabled": true,
       "dcHoldTweenSelector": "Wave",
       "dcHoldTweenSpeedMs": 320,
+      "dcHoldLoop": false,
       "cameraX": 6.638529594915686,
       "cameraY": 13.373156794075216,
       "cameraZ": 259.74194092345493,
@@ -2345,6 +2357,17 @@
       "dblclickRetransitionSpeedMs": 410,
       "dblclickRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "dblclickRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
+      "rcEnabled": true,
+      "rcMode": "Tween",
+      "rcTargetPose": "Point",
+      "rcTweenSelector": "Wave",
+      "rcTransitionSpeedMs": 400,
+      "rcStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "rcStartTimeRange": "{\"min\":0,\"max\":300}",
+      "rcPauseDurationMs": 500,
+      "rcRetransitionSpeedMs": 400,
+      "rcRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "rcRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "tweenPoses": [
         "Wave 1",
         "Wave 2",
@@ -2369,6 +2392,7 @@
       "dcHoldEnabled": true,
       "dcHoldTweenSelector": "Wave",
       "dcHoldTweenSpeedMs": 320,
+      "dcHoldLoop": false,
       "cameraX": 6.638529594915686,
       "cameraY": 13.373156794075216,
       "cameraZ": 259.74194092345493,
@@ -3577,6 +3601,17 @@
       "dblclickRetransitionSpeedMs": 410,
       "dblclickRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "dblclickRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
+      "rcEnabled": true,
+      "rcMode": "Tween",
+      "rcTargetPose": "Point",
+      "rcTweenSelector": "Wave",
+      "rcTransitionSpeedMs": 400,
+      "rcStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "rcStartTimeRange": "{\"min\":0,\"max\":300}",
+      "rcPauseDurationMs": 500,
+      "rcRetransitionSpeedMs": 400,
+      "rcRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "rcRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "tweenPoses": [
         "Wave 1",
         "Wave 2",
@@ -3601,6 +3636,7 @@
       "dcHoldEnabled": true,
       "dcHoldTweenSelector": "Wave",
       "dcHoldTweenSpeedMs": 320,
+      "dcHoldLoop": false,
       "cameraX": 6.638529594915686,
       "cameraY": 13.373156794075216,
       "cameraZ": 259.74194092345493,
@@ -3700,20 +3736,10 @@
   "order": [
     {
       "key": "Tween",
-      "collapsed": false,
+      "collapsed": true,
       "settings": [
         "tweenPoses",
         "savedTweenSequences"
-      ],
-      "subgroups": []
-    },
-    {
-      "key": "Double Click Hold",
-      "collapsed": false,
-      "settings": [
-        "dcHoldEnabled",
-        "dcHoldTweenSelector",
-        "dcHoldTweenSpeedMs"
       ],
       "subgroups": []
     },
@@ -3858,7 +3884,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": true,
+      "collapsed": false,
       "settings": [],
       "subgroups": [
         {
@@ -3874,6 +3900,22 @@
             "clickRetransitionSpeedMs",
             "clickRetransitionStartTimeCurve",
             "clickRetransitionStartTimeRange"
+          ],
+          "subgroups": []
+        },
+        {
+          "key": "Click Hold-Pose",
+          "collapsed": true,
+          "settings": [
+            "chpHoldConfirmMs",
+            "chpEnabled",
+            "chpTargetPose",
+            "chpTransitionSpeedMs",
+            "chpStartTimeCurve",
+            "chpStartTimeRange",
+            "chpRetransitionSpeedMs",
+            "chpRetransitionStartTimeCurve",
+            "chpRetransitionStartTimeRange"
           ],
           "subgroups": []
         },
@@ -3894,18 +3936,31 @@
           "subgroups": []
         },
         {
-          "key": "Click Hold-Pose",
+          "key": "Double Click Hold",
           "collapsed": true,
           "settings": [
-            "chpHoldConfirmMs",
-            "chpEnabled",
-            "chpTargetPose",
-            "chpTransitionSpeedMs",
-            "chpStartTimeCurve",
-            "chpStartTimeRange",
-            "chpRetransitionSpeedMs",
-            "chpRetransitionStartTimeCurve",
-            "chpRetransitionStartTimeRange"
+            "dcHoldLoop",
+            "dcHoldEnabled",
+            "dcHoldTweenSelector",
+            "dcHoldTweenSpeedMs"
+          ],
+          "subgroups": []
+        },
+        {
+          "key": "Right Click",
+          "collapsed": true,
+          "settings": [
+            "rcEnabled",
+            "rcMode",
+            "rcTargetPose",
+            "rcTweenSelector",
+            "rcTransitionSpeedMs",
+            "rcStartTimeCurve",
+            "rcStartTimeRange",
+            "rcPauseDurationMs",
+            "rcRetransitionSpeedMs",
+            "rcRetransitionStartTimeCurve",
+            "rcRetransitionStartTimeRange"
           ],
           "subgroups": []
         },
@@ -3941,7 +3996,7 @@
     },
     {
       "key": "Pose",
-      "collapsed": false,
+      "collapsed": true,
       "settings": [
         "savedPoses"
       ],
