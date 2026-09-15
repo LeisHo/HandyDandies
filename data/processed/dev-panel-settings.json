@@ -2672,7 +2672,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": true,
+      "collapsed": false,
       "settings": [],
       "subgroups": [
         {
@@ -2753,7 +2753,7 @@
     },
     {
       "key": "Pose",
-      "collapsed": false,
+      "collapsed": true,
       "settings": [
         "savedPoses"
       ],
