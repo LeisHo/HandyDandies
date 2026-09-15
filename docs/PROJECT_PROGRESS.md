@@ -205,6 +205,27 @@ retransitions to idle); Click Pose's own Single Pose mode re-confirmed
 unaffected. 0 new console errors. See CHANGELOG.txt's 9th 2026-09-15
 entry for the complete account.
 
+**Follow-up, same day: dedicated Tween Speed/Curve/Range trio + a Loop
+checkbox (chp/rchp only).** Direct correction: Tween mode had no visible
+speed control at all (it silently reused the hidden Pose Transition
+fields) -- "tween speed is different from pose transition speed,"
+confirmed via a clarifying question. Added `${p}TweenSpeedMs`/
+`TweenStartTimeCurve`/`TweenStartTimeRange` to all 5 groups as genuinely
+separate cfg keys (50-5000ms range, matching Double Click Hold Tween's
+own Tween Speed slider), and a Loop checkbox to Click Hold-Pose/Right-
+Click Hold-Pose only (ported Double Click Hold Tween's cyclic
+`lerpLoopSequence()` math via a new 'looping' phase) -- the other 3
+groups are fire-and-forget, no "held" state for a loop to run during.
+Caught a real bug before it ever ran live: the existing "still holding,
+re-enter forward" guard would have restarted a looping hand from scratch
+every frame; fixed by excluding 'looping' from it too.
+
+Verified live: Tween Speed genuinely decouples from Transition Speed
+(set Transition Speed to an absurd 999999ms, tween still progressed at
+the real Tween Speed pace); Loop cycles correctly for BOTH chp and rchp
+and releases cleanly to idle. See CHANGELOG.txt's 10th 2026-09-15 entry
+for the complete account.
+
 **The "thumb/finger pose looks wrong" saga -- 2 SEPARATE bugs found and
 fixed 2026-09-15, both verified live; awaiting the user's final
 confirmation before declaring this closed.** This turned out to be two

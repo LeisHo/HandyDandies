@@ -4171,6 +4171,72 @@ mid-transition). 0 console errors beyond the pre-existing, unrelated
 Cache-buster bump: `index.html`'s own `main.js?v=97` -> `?v=98`.
 
 --------------------------------------------------------------------------------
+2026-09-15  -  07:24:47 - 07:34:51 EDT (10m04s, measured)
+
+**Dedicated Tween Speed/Curve/Range trio + a Loop checkbox added to the
+Click-family groups.** Direct follow-up correction: "whenever tween is
+selected, provide tween speed. double check that loop works for each."
+Clarified via 2 questions before implementing: (1) "tween speed is
+different from pose transition speed. For tween, also provide a set of
+the curve graph, min max, pos transition speed settings" -- confirming
+Tween needed its OWN separate speed/curve/range trio, not just unhiding
+the existing Pose Transition one; (2) "Add a Loop checkbox to chp/rchp
+only" -- Click Hold-Pose/Right-Click Hold-Pose (hold-based) get Loop,
+Click Pose/Double-Click Pose/Right Click (fire-and-forget) don't, since
+there's no "held" state for a loop to run during.
+
+**The gap this closes:** the earlier "hold, retransition UI should only
+show when Single Pose is selected" correction hid Pose Transition Speed/
+Curve/Range under Tween mode -- but nothing replaced it, so Tween mode
+had NO visible way to control its own playback pace at all; it silently
+kept using whatever those hidden fields happened to be set to.
+
+Added `${p}TweenSpeedMs`/`${p}TweenStartTimeCurve`/`${p}TweenStartTimeRange`
+to all 5 groups (chp/rchp/click/dblclick/rc) -- genuinely separate cfg
+keys and parsed state (`trig.tweenStartCurveParsed`/`tweenStartRangeParsed`,
+alongside the existing `startCurveParsed`/`startRangeParsed`), not an
+aliased view of the Single Pose trio. Range/step (50-5000ms) matches
+Double Click Hold Tween's own "Tween Speed (Ms)" slider, not the 0-700ms
+Pose Transition range, since a tween plays through multiple poses end to
+end and routinely needs more time than a single-pose transition.
+`updateClickHoldPoseForHand()`/`updateClickPoseForHand()`/
+`triggerClickPose()`/`startClickHoldPose()` all branch on `isTween` to
+pick the right speed/curve/range pair.
+
+**Loop**, ported from Double Click Hold Tween's own cyclic
+`lerpLoopSequence()` math (same "start the cycle at the WRAP segment,
+not segment 0" reasoning, so motion continues seamlessly with no pop) --
+`startClickHoldPose()` now also resolves `trig.loopPoses`/
+`trig.loopSegmentMs` (named poses only, paced by `${p}TweenSpeedMs`
+divided across them) whenever Mode is Tween; `updateClickHoldPoseForHand()`
+gained a new 'looping' phase, entered once the initial forward pass
+completes if Loop is checked and >=2 named poses exist.
+
+**Real bug caught and fixed during implementation, before it ever ran
+live:** the existing "hold still active, re-enter forward" guard
+(`if (trig.active && chp.phase !== 'forward')`) would have caught a
+still-held, already-`looping` hand on every subsequent frame too (phase
+isn't 'forward', trig.active is still true) and yanked it straight back
+to a fresh forward start -- restarting the tween from scratch every
+frame instead of actually looping. Fixed by also excluding `'looping'`
+from that condition.
+
+**Verified live via `window.__debug`:** confirmed Tween Speed genuinely
+decouples from Transition Speed by setting `chpTransitionSpeedMs` to an
+absurd 999999 and `chpTweenSpeedMs` to 60 -- the tween still progressed
+at the real 60ms pace (curlIndex 96.0 -> 89.0 over ~150ms), proving the
+code isn't secretly still reading the old field. Loop confirmed cycling
+for BOTH `chp` and `rchp` (curlIndex oscillating between the sequence's
+2 poses across 8 sampled frames) and releasing cleanly through
+`retransition` to `idle` for both (rchp took longer to settle,
+consistent with its own much larger 3000ms-max retransition-delay range,
+not a bug). Click Pose's own Tween mode (no Loop) re-confirmed still
+completing its full forward/paused/retransition/idle cycle. 0 console
+errors beyond the pre-existing, unrelated `api/save-settings` 404s.
+
+Cache-buster bump: `index.html`'s own `main.js?v=98` -> `?v=99`.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================
