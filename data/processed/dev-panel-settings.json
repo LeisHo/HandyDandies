@@ -6394,7 +6394,7 @@
     },
     {
       "key": "Cursor Tracking",
-      "collapsed": false,
+      "collapsed": true,
       "settings": [
         "palmFaceRotationOffset",
         "trackingEnabled",
