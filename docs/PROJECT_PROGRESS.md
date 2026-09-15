@@ -374,6 +374,22 @@ default). Verified live on a fresh page load (cleared localStorage,
 picking up the new code default with no manual override) that the exact
 same 200ms-press double-click no longer produces the flash.
 
+**Shift-click multi-select + auto-group "+Group" in every devPanel.js
+list-picker -- built and verified live 2026-09-15.** Direct request:
+shift-click to select a range in Saved Poses/Saved Tween Sequences,
+then have "+Group" auto-place the selection into the new group instead
+of creating an empty one. Implemented as a genuine `devPanel.js` engine
+capability (shared by every list-picker, not a main.js patch) --
+`entry.selectedItem` keeps its existing single-item meaning for Use/
+Rename/Overwrite/Delete; a new, separate `entry.multiSelected` Set
+(read only by `+Group`) tracks the shift-click range, computed from
+rendered DOM order so it correctly spans group boundaries. Verified
+live: a 4-item shift-click range moved exactly those items into a new
+group on `+Group`, leaving the rest untouched; the original empty-group
+behavior (nothing selected) still works; plain-click single-selection
+regression-checked clean. See CHANGELOG.txt's latest 2026-09-15 entry
+for the complete account.
+
 ## Recently completed
 
 (Consolidated 2026-09-12 -- the full blow-by-blow of every round below

@@ -2028,3 +2028,32 @@ GOTCHAS
   browser tool has its own known rAF-timing unreliability, so real
   frames were driven directly rather than waited on). See CHANGELOG.txt's
   5th 2026-09-15 entry for the complete account.
+- **devPanel.js's `list-picker` control gained shift-click multi-select,
+  feeding a new auto-group behavior on `+Group`** (direct request,
+  2026-09-15) -- a real engine change (not a main.js patch), since
+  `buildListPickerRow()`/`renderListPickerItemRow()` are shared verbatim
+  by every list-picker in this file (Saved Poses, Saved Tween Sequences,
+  Saved Cameras). `entry.selectedItem` (the pre-existing single-item
+  state `getSelectedSavedPoseItem()` above already reads externally via
+  `.dp-list-picker-row-selected`) is UNCHANGED in meaning -- still one
+  item, still what Use/Rename/Overwrite/Delete act on. A new, separate
+  `entry.multiSelected` `Set` (plus `entry.selectAnchor`, the last plain-
+  clicked row) tracks a shift-click range, computed from CURRENT RENDERED
+  `.dp-list-picker-row` DOM order rather than `entry.items` directly, so
+  the range correctly spans group boundaries the way a user visually
+  sees the flattened list. Only `+Group`'s own handler reads
+  `multiSelected`: non-empty means "create the new group already
+  populated with these items" (re-parenting any that were in a different
+  group), empty falls back to the original "create an empty group"
+  behavior unchanged. A 2nd new CSS class (`dp-list-picker-row-multi-
+  selected`, style.css) gives the range an accent-colored outline,
+  deliberately distinct from `-selected`'s own solid fill, so it stays
+  visually clear which single row Delete/Rename/Use/Overwrite would act
+  on vs. which rows `+Group` would sweep up. Verified live via dispatched
+  `MouseEvent('click', {shiftKey})` (a faithful simulation -- the
+  listener only ever reads `e.shiftKey`, so this exercises the identical
+  code path a real shift-click would): a 4-item range moved correctly
+  into a new group on `+Group`, the other items untouched; the original
+  no-selection empty-group path re-confirmed unchanged; plain-click
+  single-selection regression-checked clean. See CHANGELOG.txt's latest
+  2026-09-15 entry for the complete account.

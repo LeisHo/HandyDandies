@@ -4464,6 +4464,79 @@ pre-existing, unrelated `api/save-settings` 404s.
 Cache-buster bump: `index.html`'s own `main.js?v=103` -> `?v=104`.
 
 --------------------------------------------------------------------------------
+2026-09-15  -  18:23:50 - 18:29:29 EDT (5m39s, measured; excludes doc/ETA
+follow-up)
+
+**Shift-click multi-select in devPanel.js's list-pickers, feeding an
+auto-group "+Group."** Direct request: "within my Tween and Pose
+selector, allow me to shift click to select multiple selections. When
+one or multiple selections are made, and if i click the +group button,
+It will automatically place the selected items in the new group."
+
+Implemented as a genuine `devPanel.js` engine capability, not a
+main.js-only patch -- `buildListPickerRow()`/`renderListPickerItemRow()`
+are shared verbatim by EVERY list-picker in this file (Saved Poses,
+Saved Tween Sequences, Saved Cameras, and any future one), so this
+applies uniformly without per-control wiring, matching CLAUDE.md's own
+file-map guidance on when a devPanel.js-level change (vs. main.js-only)
+is the right call.
+
+`entry.selectedItem` keeps its existing, unchanged single-item meaning
+-- Use/Rename/Overwrite/Delete still only ever act on ONE item, since
+nothing asked for those 4 to become batch operations (a destructive
+action like Delete silently going multi-target was a real risk worth
+avoiding without being asked). A new, separate `entry.multiSelected`
+(a `Set`) tracks the shift-click range; only `+Group`'s own handler
+reads it. Shift-click reads the CURRENT RENDERED `.dp-list-picker-row`
+DOM order (not `entry.items` directly), so the range correctly spans
+group boundaries the same way a user visually sees the flattened list --
+no separate tree-flattening logic needed. `entry.selectAnchor` records
+the last PLAIN (non-shift) click; a further shift-click always extends/
+shrinks from that SAME anchor, not the most recent shift-click endpoint
+-- standard file-manager convention. A plain click resets to a single
+selection and moves the anchor. Visual state: the single active item
+keeps its existing solid-fill highlight; the rest of a multi-selected
+range gets a NEW, visually distinct accent-colored outline (added to
+style.css) -- deliberately not identical styling, so it stays clear
+which one row Delete/Rename/Use/Overwrite would act on vs. which rows
++Group would sweep up.
+
+`+Group`'s own handler now checks `entry.multiSelected.size > 0`: with
+a selection, the new group is created ALREADY populated with those
+items (`.group` reassigned on each, re-parenting anything that was
+previously in a different group -- "place" reads as move, not copy);
+with nothing selected, falls back to the ORIGINAL behavior unchanged
+(an empty group to drag items into later). Multi-select state is
+invalidated the same way `selectedItem` already was: on an external
+value refresh (Reset/tab-switch/remote restore, in `displayValue()`)
+and on Delete (a stale reference to the just-deleted item is harmless
+on its own, but OTHER items left over in a leftover `multiSelected`
+could otherwise get silently auto-grouped by a LATER `+Group` click
+with nothing visibly re-selected in between).
+
+Verified live via dispatched `MouseEvent('click', {shiftKey})` on the
+real row elements (a faithful simulation -- the listener reads
+`e.shiftKey` off whatever Event it receives, so this exercises the
+identical code path a real shift-click would): clicking Saved Poses row
+0 then shift-clicking row 3 ("Point" -> "Fist") selected exactly the 4
+rows in between; the single active item stayed "Fist" only; clicking
+`+Group` moved exactly those 4 into a new group, leaving the other 7
+poses completely untouched; a 2nd `+Group` click with nothing selected
+still created a genuinely empty group ("New Group (2)", correctly
+avoiding the name collision), confirming the original no-selection path
+is unchanged; a subsequent plain click correctly collapsed back to
+single-item selection with no lingering multi-highlight. Did NOT
+separately re-verify Saved Tween Sequences -- it's the exact same
+shared code path (not a per-control reimplementation), so a 2nd live
+pass would have been redundant confirmation, not new information, per
+this project's own usage-efficiency convention. 0 console errors beyond
+the pre-existing, unrelated `api/save-settings` 404s.
+
+Cache-buster bumps: `index.html`'s own `style.css?v=6` -> `?v=7`,
+`main.js`'s own `devpanel/devPanel.js?v=14` -> `?v=15` import,
+`index.html`'s own `main.js?v=104` -> `?v=105`.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================
