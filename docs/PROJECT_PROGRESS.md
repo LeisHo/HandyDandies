@@ -18,45 +18,55 @@ work seamlessly from there.
 
 ## Currently working on
 
-**The "thumb/finger pose looks wrong" saga -- the ACTUAL bug found and
-fixed 2026-09-15, verified live; awaiting the user's real-device
-confirmation before finally declaring this closed.** The prior round's
-conjugation fix (`worldDelta = W1 * delta * W1^-1`) passed every
-relative-to-wrist invariance test run against it, including live-
+**The "thumb/finger pose looks wrong" saga -- 2 SEPARATE bugs found and
+fixed 2026-09-15, both verified live; awaiting the user's final
+confirmation before declaring this closed.** This turned out to be two
+unrelated bugs compounding each other, found in 2 rounds the same day.
+
+**Bug 1 -- curl-axis conjugation collapsing to identity at delta=0.** The
+prior round's conjugation fix (`worldDelta = W1 * delta * W1^-1`) passed
+every relative-to-wrist invariance test run against it, including live-
 production tests with real saved poses -- but the user kept reporting
 "still have wrist splay issues" anyway. Root cause, found only once a
 real saved pose ("Fist") finally exercised the untested case: at
 delta = identity (wristBend = wristSplay = 0 exactly), that formula
 collapses to IDENTITY for any W1 at all, silently discarding `baseQuat`
-(alignQuat) from every finger's curl axis. Every prior test case this
-whole saga ran happened to use a nonzero wristSplay, so this degenerate
-case went unexercised. The relative-to-wrist invariance test itself is
-methodologically blind to this class of bug -- it only checks that a
-formula behaves CONSISTENTLY across wristSplay values, which a
-systematically biased but self-consistent formula can satisfy while
-still being wrong in absolute terms.
+(alignQuat) from every finger's curl axis. Fixed by conjugating `delta`
+by `wristRestForAxis` (R) alone instead of by the full world quat --
+`baseQuat * R * delta * R^-1` -- which correctly reduces to `baseQuat` at
+delta=I.
 
-Fix: conjugate `delta` by `wristRestForAxis` (R) alone instead of by the
-wrist bone's full world quat -- `baseQuat * R * delta * R^-1` -- which
-correctly reduces to exactly `baseQuat` at delta=I (matching the
-project's own pre-existing no-wrist-bone fallback) while still tracking
-real wrist bend/splay for delta != I. Verified 3 ways: direct computation
-(axisRefQuat now matches baseQuat exactly at delta=I), visual (a fresh
-local dev-server load renders "Fist" as an actual closed fist instead of
-flat wedge shapes), and the pre-existing relative-to-wrist invariance
-check still holds at 0.0000 degrees for nonzero delta -- no regression.
-See CHANGELOG.txt (2026-09-15 entry) for the complete account.
+**Bug 2 -- `FINGER_SIGN.middle`/`.ring` never synced with HANDO's own
+2026-09-14 sign flip.** After Bug 1 shipped, the user reported poses
+STILL looked wrong -- and, critically, that "Point and MiddleFinger also
+look wrong" (both have wristSplay=0, ruling out anything wrist-splay-
+related) and that "Fist (0 splay) and Fist-Bent Back (-50) look messed
+up" -- both, not just the nonzero one. A direct A/B test (a scratch git
+worktree checked out at the commit BEFORE Bug 1's fix) reproduced the
+identical broken "Point" geometry on the OLD formula too, proving Bug 1
+was not the cause of this. Diffing HANDY DANDIES's finger-curl constants
+against HANDO's own found it: HANDO flipped `FINGER_SIGN.middle`/`.ring`
+from `-1` to `1` on 2026-09-14, migrating its own saved poses to match --
+this project's `FINGER_SIGN` was never updated, but every pose in this
+project's own saved-pose list was imported from HANDO AFTER that
+migration (already assumes the new convention), so middle/ring curled
+BACKWARD on nearly every real pose. "Neutral"/"Neutral - Bent Back" (all
+curl values 0) were the only poses unaffected -- coincidentally the same
+2 poses the whole wrist-splay investigation had been testing against,
+which is why this went unnoticed for so long. Fixed with a pure sign
+flip, no data migration needed here.
 
-**Open question, not yet investigated:** whether this same class of bug
-(conjugating by the wrist bone's full world quat instead of by its rest
-quat alone) also affects HANDO, which uses a structurally similar
-`W1 * delta * W1^-1` formula of its own -- HANDO's default `modelRoot`
-orientation (identity) happens to make it immune to the specific
-degenerate case that broke this project, but HANDO's own formula still
-double-applies `modelRoot.quaternion` for nonzero delta the same way this
-project's did before an earlier fix this session removed it here (see
-CHANGELOG.txt's "double-apply baseQuat" entries). Not yet raised with
-HANDO's own session/maintainers.
+Verified: "Point" and "Fist - Bent Back" both render as correctly-formed
+hands on live production after both fixes; the relative-to-wrist
+invariance check still holds at 0.0000 degrees (Bug 2's fix doesn't touch
+the wrist-axis math at all). See CHANGELOG.txt's 2 2026-09-15 entries for
+the complete account of each.
+
+**HANDO's own team was given a handoff** explaining Bug 1's math and
+recommending the same fix for HANDO's structurally similar (but
+currently latent, not visibly broken there) version of it -- not yet
+confirmed whether they've acted on it. Bug 2 is HANDY-DANDIES-specific
+(a sync gap, not a shared math bug) and doesn't need a HANDO-side fix.
 
 **Camera presets (Save/Use/Overwrite/Delete/Default) + Lock Pan/Zoom +
 Set Default Camera As Max Extents.** Mirrors Saved Poses' own UI pattern

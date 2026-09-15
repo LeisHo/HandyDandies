@@ -3572,6 +3572,62 @@ settings that matter."
 Cache-buster bump: `index.html`'s own `main.js?v=85` -> `?v=86`.
 
 --------------------------------------------------------------------------------
+2026-09-15  -  02:45:28 - 02:58:49 EDT (13m21s, measured)
+
+**Found and fixed a 2nd, unrelated bug that had been masquerading as the
+wrist-splay issue this whole time: `FINGER_SIGN.middle`/`.ring` were
+still `-1`, never synced with HANDO's own 2026-09-14 sign flip.** User
+report after implementing the delta=identity fix (previous entry): "Poses
+still look good in Hando after implementation, while mine still look bad.
+anything with a wrist splay still looks fucked" -- then, once "Neutral"
+was set as Default and "Fist" tested via Click-Pose specifically: "even
+fist doesnt look right... with no responsive wrist splay turned on" --
+then, decisively, "Point and MiddleFinger also look wrong" (both have
+wristSplay=0, ruling out anything wrist-splay-specific) and finally
+"anything with a wrist splay still looks fucked" was narrowed further:
+"Fist (0 splay) and Fist-Bent Back (-50) look messed up" -- both, not
+just the nonzero one.
+
+Direct A/B test settled it: checked out a scratch git worktree at the
+commit BEFORE the delta=identity conjugation fix, applied the exact same
+"Point" pose data there, and got the SAME fragmented, self-intersecting
+geometry as on current production -- proving the conjugation fix (this
+file's previous entry) was NOT the cause of this specific breakage, and
+something else, present in BOTH the old and new formula, was responsible.
+
+Root cause, found by diffing HANDY DANDIES's `applyCurlToSkeleton()`
+constants against HANDO's own: HANDO flipped `FINGER_SIGN.middle`/`.ring`
+from `-1` to `1` on 2026-09-14 (direct HANDO user request: "for middle
+finger and ring finger curl, inverse the number. right now, curling it is
+negative numbers") and migrated its own existing saved poses' curlMiddle/
+curlRing values to preserve their visual meaning under the new sign. This
+project's own `FINGER_SIGN` was never updated to match -- but every pose
+in this project's own saved-pose list was captured/imported from HANDO
+AFTER that migration, so all of them (Point, MiddleFinger, Fist, Fist -
+Bent Back, ThumbsUp, Wave 1-6...) already use positive curlMiddle/
+curlRing for an actual curl, consistent with HANDO's NEW convention --
+meaning middle/ring curled BACKWARD on every one of them here, on top of
+whatever curl the other correctly-signed fingers were doing, producing
+exactly the chaotic, fragmented look reported. "Neutral"/"Neutral - Bent
+Back" (all curl values 0, sign irrelevant at 0) were the only 2 poses
+unaffected -- coincidentally the same 2 poses this whole wrist-splay
+investigation had been testing against, which is why this went unnoticed
+until poses with real curl values (Point, Fist) were finally checked.
+
+Fixed with a pure sign flip (`FINGER_SIGN.middle`/`.ring`: `-1` -> `1`),
+no data migration needed here (per the above -- this project's own saved
+poses already assume the new convention). Verified: "Point" applied via
+the real saved-pose data now renders as a correctly-formed pointing hand
+(extended index, curled fist body, visible thumb) both in a scratch
+worktree test and on live production; "Fist - Bent Back" (wristSplay=-50)
+renders as a proper closed fist with fingertips visibly curling toward
+the palm; the pre-existing relative-to-wrist invariance check (from the
+delta=identity fix) still holds at 0.0000 degrees -- this fix doesn't
+touch the wrist-axis math at all, only the finger-curl sign table.
+
+Cache-buster bump: `index.html`'s own `main.js?v=86` -> `?v=87`.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

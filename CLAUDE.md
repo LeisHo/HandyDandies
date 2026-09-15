@@ -118,3 +118,17 @@ re-confirming that's actually wanted.
   verifying a conjugation-based fix, always test the degenerate case
   (delta=identity) explicitly, not just a range of nonzero deltas — see
   CHANGELOG.txt's 2026-09-15 entry for the full fix.
+- **Pose-tuning constants shared with HANDO (`FINGER_SIGN`, `FINGER_MAX_DEG`,
+  `FINGER_CURL_AXIS`, etc.) can silently drift out of sync.** HANDO
+  changed `FINGER_SIGN.middle`/`.ring` from `-1` to `1` on 2026-09-14 (and
+  migrated its own saved poses to match), but that change was never
+  ported here, causing every real pose with nonzero curlMiddle/curlRing
+  to curl those 2 fingers backward — confirmed live 2026-09-15, mistaken
+  for a wrist-splay bug for a while since "Neutral"/"Neutral - Bent Back"
+  (the poses used to verify the actual wrist-splay fix above) happen to
+  be the only 2 saved poses with every curl value at 0, where a sign
+  error is invisible. Before trusting any of this project's own finger-
+  tuning constants, diff them against HANDO's current values (`grep -n
+  "FINGER_SIGN\|FINGER_MAX_DEG\|FINGER_CURL_AXIS" src/main.js` in both
+  projects) rather than assuming a one-time port stayed in sync — see
+  CHANGELOG.txt's 2nd 2026-09-15 entry for the full account.
