@@ -1113,6 +1113,30 @@
       "dblclickRetransitionSpeedMs": 410,
       "dblclickRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "dblclickRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
+      "tweenPoses": [
+        "Wave 1",
+        "Wave 2",
+        "Wave 3",
+        "Wave 4",
+        "Wave 5",
+        "Wave 6"
+      ],
+      "savedTweenSequences": [
+        {
+          "name": "Wave",
+          "tweenPoses": [
+            "Wave 1",
+            "Wave 2",
+            "Wave 3",
+            "Wave 4",
+            "Wave 5",
+            "Wave 6"
+          ]
+        }
+      ],
+      "dcHoldEnabled": true,
+      "dcHoldTweenSelector": "Wave",
+      "dcHoldTweenSpeedMs": 320,
       "cameraX": 6.638529594915686,
       "cameraY": 13.373156794075216,
       "cameraZ": 259.74194092345493,
@@ -2321,6 +2345,30 @@
       "dblclickRetransitionSpeedMs": 410,
       "dblclickRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "dblclickRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
+      "tweenPoses": [
+        "Wave 1",
+        "Wave 2",
+        "Wave 3",
+        "Wave 4",
+        "Wave 5",
+        "Wave 6"
+      ],
+      "savedTweenSequences": [
+        {
+          "name": "Wave",
+          "tweenPoses": [
+            "Wave 1",
+            "Wave 2",
+            "Wave 3",
+            "Wave 4",
+            "Wave 5",
+            "Wave 6"
+          ]
+        }
+      ],
+      "dcHoldEnabled": true,
+      "dcHoldTweenSelector": "Wave",
+      "dcHoldTweenSpeedMs": 320,
       "cameraX": 6.638529594915686,
       "cameraY": 13.373156794075216,
       "cameraZ": 259.74194092345493,
@@ -3529,6 +3577,30 @@
       "dblclickRetransitionSpeedMs": 410,
       "dblclickRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "dblclickRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
+      "tweenPoses": [
+        "Wave 1",
+        "Wave 2",
+        "Wave 3",
+        "Wave 4",
+        "Wave 5",
+        "Wave 6"
+      ],
+      "savedTweenSequences": [
+        {
+          "name": "Wave",
+          "tweenPoses": [
+            "Wave 1",
+            "Wave 2",
+            "Wave 3",
+            "Wave 4",
+            "Wave 5",
+            "Wave 6"
+          ]
+        }
+      ],
+      "dcHoldEnabled": true,
+      "dcHoldTweenSelector": "Wave",
+      "dcHoldTweenSpeedMs": 320,
       "cameraX": 6.638529594915686,
       "cameraY": 13.373156794075216,
       "cameraZ": 259.74194092345493,
@@ -3626,6 +3698,25 @@
     }
   },
   "order": [
+    {
+      "key": "Tween",
+      "collapsed": false,
+      "settings": [
+        "tweenPoses",
+        "savedTweenSequences"
+      ],
+      "subgroups": []
+    },
+    {
+      "key": "Double Click Hold",
+      "collapsed": false,
+      "settings": [
+        "dcHoldEnabled",
+        "dcHoldTweenSelector",
+        "dcHoldTweenSpeedMs"
+      ],
+      "subgroups": []
+    },
     {
       "key": "Saved Dev Settings",
       "collapsed": true,
@@ -3872,25 +3963,17 @@
             "wristBend",
             "wristSplay"
           ],
-          "subgroups": [
-            {
-              "key": "New Group",
-              "collapsed": false,
-              "settings": [
-                "cropWristEnabled",
-                "hideWrist",
-                "reactiveArmLengthEnabled",
-                "armLengthRange",
-                "armLengthCurve"
-              ],
-              "subgroups": []
-            }
-          ]
+          "subgroups": []
         },
         {
           "key": "New Group",
           "collapsed": true,
           "settings": [
+            "cropWristEnabled",
+            "hideWrist",
+            "reactiveArmLengthEnabled",
+            "armLengthRange",
+            "armLengthCurve",
             "thumbCurl",
             "tipOnlyCurlThumb",
             "midOnlyCurlThumb",
