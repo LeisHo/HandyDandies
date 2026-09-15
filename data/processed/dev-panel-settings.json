@@ -1284,7 +1284,9 @@
       "wristSplayRange": "{\"min\":74,\"max\":-73}",
       "wristSplayCurve": "[{\"x\":0,\"y\":1},{\"x\":0.31833343505859374,\"y\":0.6961458841959636},{\"x\":1,\"y\":0.042812347412109375}]",
       "chpEnabled": true,
-      "chpTargetPose": "Fist - Bent Back",
+      "chpMode": "Single Pose",
+      "chpTargetPose": "Neutral - Bent Back",
+      "chpTweenSelector": "FLOWER 2",
       "chpHoldConfirmMs": 150,
       "chpTransitionSpeedMs": 230,
       "chpStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.4483332316080729,\"y\":0.7186457951863607},{\"x\":1,\"y\":1}]",
@@ -1293,8 +1295,10 @@
       "chpRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.475,\"y\":0.7653123219807942},{\"x\":1,\"y\":1}]",
       "chpRetransitionStartTimeRange": "{\"min\":431,\"max\":3000}",
       "rchpEnabled": true,
+      "rchpMode": "Tween",
       "rchpTargetPose": "MiddleFinger",
-      "rchpHoldConfirmMs": 150,
+      "rchpTweenSelector": "FLOWER 2",
+      "rchpHoldConfirmMs": 380,
       "rchpTransitionSpeedMs": 410,
       "rchpStartTimeCurve": "[{\"x\":0,\"y\":0.02093760172526038},{\"x\":0.4366663614908854,\"y\":0.8109375},{\"x\":1,\"y\":1}]",
       "rchpStartTimeRange": "{\"min\":0,\"max\":3000}",
@@ -1302,7 +1306,9 @@
       "rchpRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.4683329264322917,\"y\":0.6742708841959635},{\"x\":1,\"y\":1}]",
       "rchpRetransitionStartTimeRange": "{\"min\":0,\"max\":3000}",
       "clickEnabled": true,
+      "clickMode": "Single Pose",
       "clickTargetPose": "Neutral - Bent Back",
+      "clickTweenSelector": "Wave",
       "clickTransitionSpeedMs": 340,
       "clickStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.21833292643229166,\"y\":0},{\"x\":0.6616663614908854,\"y\":0.7919792175292969},{\"x\":1,\"y\":1}]",
       "clickStartTimeRange": "{\"min\":0,\"max\":1111}",
@@ -1311,7 +1317,9 @@
       "clickRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "clickRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "dblclickEnabled": true,
+      "dblclickMode": "Single Pose",
       "dblclickTargetPose": "ThumbsUp",
+      "dblclickTweenSelector": "Wave",
       "dblclickTransitionSpeedMs": 400,
       "dblclickStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "dblclickStartTimeRange": "{\"min\":0,\"max\":3000}",
@@ -1331,12 +1339,11 @@
       "rcRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "rcRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "tweenPoses": [
-        "Wave 1",
-        "Wave 2",
-        "Wave 3",
-        "Wave 4",
-        "Wave 5",
-        "Wave 6"
+        "Closed Flower",
+        "Closed Flower (S)",
+        "Big Open Palm (S)",
+        "Big Open Palm",
+        "Closed Flower"
       ],
       "savedTweenSequences": [
         {
@@ -1349,12 +1356,29 @@
             "Wave 5",
             "Wave 6"
           ]
+        },
+        {
+          "name": "FLOWER",
+          "tweenPoses": [
+            "Closed Flower (S)",
+            "Big Open Palm (S)"
+          ]
+        },
+        {
+          "name": "FLOWER 2",
+          "tweenPoses": [
+            "Closed Flower",
+            "Closed Flower (S)",
+            "Big Open Palm (S)",
+            "Big Open Palm",
+            "Closed Flower"
+          ]
         }
       ],
       "dcHoldEnabled": true,
       "dcHoldTweenSelector": "Wave",
-      "dcHoldTweenSpeedMs": 320,
-      "dcHoldLoop": false,
+      "dcHoldTweenSpeedMs": 2410,
+      "dcHoldLoop": true,
       "cameraX": 6.638529594915686,
       "cameraY": 13.373156794075216,
       "cameraZ": 259.74194092345493,
@@ -2734,7 +2758,9 @@
       "wristSplayRange": "{\"min\":74,\"max\":-73}",
       "wristSplayCurve": "[{\"x\":0,\"y\":1},{\"x\":0.31833343505859374,\"y\":0.6961458841959636},{\"x\":1,\"y\":0.042812347412109375}]",
       "chpEnabled": true,
-      "chpTargetPose": "Fist - Bent Back",
+      "chpMode": "Single Pose",
+      "chpTargetPose": "Neutral - Bent Back",
+      "chpTweenSelector": "FLOWER 2",
       "chpHoldConfirmMs": 150,
       "chpTransitionSpeedMs": 230,
       "chpStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.4483332316080729,\"y\":0.7186457951863607},{\"x\":1,\"y\":1}]",
@@ -2743,8 +2769,10 @@
       "chpRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.475,\"y\":0.7653123219807942},{\"x\":1,\"y\":1}]",
       "chpRetransitionStartTimeRange": "{\"min\":431,\"max\":3000}",
       "rchpEnabled": true,
+      "rchpMode": "Tween",
       "rchpTargetPose": "MiddleFinger",
-      "rchpHoldConfirmMs": 150,
+      "rchpTweenSelector": "FLOWER 2",
+      "rchpHoldConfirmMs": 380,
       "rchpTransitionSpeedMs": 410,
       "rchpStartTimeCurve": "[{\"x\":0,\"y\":0.02093760172526038},{\"x\":0.4366663614908854,\"y\":0.8109375},{\"x\":1,\"y\":1}]",
       "rchpStartTimeRange": "{\"min\":0,\"max\":3000}",
@@ -2752,7 +2780,9 @@
       "rchpRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.4683329264322917,\"y\":0.6742708841959635},{\"x\":1,\"y\":1}]",
       "rchpRetransitionStartTimeRange": "{\"min\":0,\"max\":3000}",
       "clickEnabled": true,
+      "clickMode": "Single Pose",
       "clickTargetPose": "Neutral - Bent Back",
+      "clickTweenSelector": "Wave",
       "clickTransitionSpeedMs": 340,
       "clickStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.21833292643229166,\"y\":0},{\"x\":0.6616663614908854,\"y\":0.7919792175292969},{\"x\":1,\"y\":1}]",
       "clickStartTimeRange": "{\"min\":0,\"max\":1111}",
@@ -2761,7 +2791,9 @@
       "clickRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "clickRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "dblclickEnabled": true,
+      "dblclickMode": "Single Pose",
       "dblclickTargetPose": "ThumbsUp",
+      "dblclickTweenSelector": "Wave",
       "dblclickTransitionSpeedMs": 400,
       "dblclickStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "dblclickStartTimeRange": "{\"min\":0,\"max\":3000}",
@@ -2781,12 +2813,11 @@
       "rcRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "rcRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "tweenPoses": [
-        "Wave 1",
-        "Wave 2",
-        "Wave 3",
-        "Wave 4",
-        "Wave 5",
-        "Wave 6"
+        "Closed Flower",
+        "Closed Flower (S)",
+        "Big Open Palm (S)",
+        "Big Open Palm",
+        "Closed Flower"
       ],
       "savedTweenSequences": [
         {
@@ -2799,12 +2830,29 @@
             "Wave 5",
             "Wave 6"
           ]
+        },
+        {
+          "name": "FLOWER",
+          "tweenPoses": [
+            "Closed Flower (S)",
+            "Big Open Palm (S)"
+          ]
+        },
+        {
+          "name": "FLOWER 2",
+          "tweenPoses": [
+            "Closed Flower",
+            "Closed Flower (S)",
+            "Big Open Palm (S)",
+            "Big Open Palm",
+            "Closed Flower"
+          ]
         }
       ],
       "dcHoldEnabled": true,
       "dcHoldTweenSelector": "Wave",
-      "dcHoldTweenSpeedMs": 320,
-      "dcHoldLoop": false,
+      "dcHoldTweenSpeedMs": 2410,
+      "dcHoldLoop": true,
       "cameraX": 6.638529594915686,
       "cameraY": 13.373156794075216,
       "cameraZ": 259.74194092345493,
@@ -4184,7 +4232,9 @@
       "wristSplayRange": "{\"min\":74,\"max\":-73}",
       "wristSplayCurve": "[{\"x\":0,\"y\":1},{\"x\":0.31833343505859374,\"y\":0.6961458841959636},{\"x\":1,\"y\":0.042812347412109375}]",
       "chpEnabled": true,
-      "chpTargetPose": "Fist - Bent Back",
+      "chpMode": "Single Pose",
+      "chpTargetPose": "Neutral - Bent Back",
+      "chpTweenSelector": "FLOWER 2",
       "chpHoldConfirmMs": 150,
       "chpTransitionSpeedMs": 230,
       "chpStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.4483332316080729,\"y\":0.7186457951863607},{\"x\":1,\"y\":1}]",
@@ -4193,8 +4243,10 @@
       "chpRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.475,\"y\":0.7653123219807942},{\"x\":1,\"y\":1}]",
       "chpRetransitionStartTimeRange": "{\"min\":431,\"max\":3000}",
       "rchpEnabled": true,
+      "rchpMode": "Tween",
       "rchpTargetPose": "MiddleFinger",
-      "rchpHoldConfirmMs": 150,
+      "rchpTweenSelector": "FLOWER 2",
+      "rchpHoldConfirmMs": 380,
       "rchpTransitionSpeedMs": 410,
       "rchpStartTimeCurve": "[{\"x\":0,\"y\":0.02093760172526038},{\"x\":0.4366663614908854,\"y\":0.8109375},{\"x\":1,\"y\":1}]",
       "rchpStartTimeRange": "{\"min\":0,\"max\":3000}",
@@ -4202,7 +4254,9 @@
       "rchpRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.4683329264322917,\"y\":0.6742708841959635},{\"x\":1,\"y\":1}]",
       "rchpRetransitionStartTimeRange": "{\"min\":0,\"max\":3000}",
       "clickEnabled": true,
+      "clickMode": "Single Pose",
       "clickTargetPose": "Neutral - Bent Back",
+      "clickTweenSelector": "Wave",
       "clickTransitionSpeedMs": 340,
       "clickStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.21833292643229166,\"y\":0},{\"x\":0.6616663614908854,\"y\":0.7919792175292969},{\"x\":1,\"y\":1}]",
       "clickStartTimeRange": "{\"min\":0,\"max\":1111}",
@@ -4211,7 +4265,9 @@
       "clickRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "clickRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "dblclickEnabled": true,
+      "dblclickMode": "Single Pose",
       "dblclickTargetPose": "ThumbsUp",
+      "dblclickTweenSelector": "Wave",
       "dblclickTransitionSpeedMs": 400,
       "dblclickStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "dblclickStartTimeRange": "{\"min\":0,\"max\":3000}",
@@ -4231,12 +4287,11 @@
       "rcRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "rcRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "tweenPoses": [
-        "Wave 1",
-        "Wave 2",
-        "Wave 3",
-        "Wave 4",
-        "Wave 5",
-        "Wave 6"
+        "Closed Flower",
+        "Closed Flower (S)",
+        "Big Open Palm (S)",
+        "Big Open Palm",
+        "Closed Flower"
       ],
       "savedTweenSequences": [
         {
@@ -4249,12 +4304,29 @@
             "Wave 5",
             "Wave 6"
           ]
+        },
+        {
+          "name": "FLOWER",
+          "tweenPoses": [
+            "Closed Flower (S)",
+            "Big Open Palm (S)"
+          ]
+        },
+        {
+          "name": "FLOWER 2",
+          "tweenPoses": [
+            "Closed Flower",
+            "Closed Flower (S)",
+            "Big Open Palm (S)",
+            "Big Open Palm",
+            "Closed Flower"
+          ]
         }
       ],
       "dcHoldEnabled": true,
       "dcHoldTweenSelector": "Wave",
-      "dcHoldTweenSpeedMs": 320,
-      "dcHoldLoop": false,
+      "dcHoldTweenSpeedMs": 2410,
+      "dcHoldLoop": true,
       "cameraX": 6.638529594915686,
       "cameraY": 13.373156794075216,
       "cameraZ": 259.74194092345493,
@@ -4354,7 +4426,7 @@
   "order": [
     {
       "key": "Tween",
-      "collapsed": true,
+      "collapsed": false,
       "settings": [
         "tweenPoses",
         "savedTweenSequences"
@@ -4509,6 +4581,8 @@
           "key": "Click Pose",
           "collapsed": true,
           "settings": [
+            "clickMode",
+            "clickTweenSelector",
             "clickEnabled",
             "clickTargetPose",
             "clickTransitionSpeedMs",
@@ -4525,6 +4599,8 @@
           "key": "Click Hold-Pose",
           "collapsed": true,
           "settings": [
+            "chpMode",
+            "chpTweenSelector",
             "chpHoldConfirmMs",
             "chpEnabled",
             "chpTargetPose",
@@ -4541,6 +4617,8 @@
           "key": "Double-Click Pose",
           "collapsed": true,
           "settings": [
+            "dblclickMode",
+            "dblclickTweenSelector",
             "dblclickEnabled",
             "dblclickTargetPose",
             "dblclickTransitionSpeedMs",
@@ -4555,7 +4633,7 @@
         },
         {
           "key": "Double Click Hold",
-          "collapsed": false,
+          "collapsed": true,
           "settings": [
             "dcHoldLoop",
             "dcHoldEnabled",
@@ -4584,8 +4662,10 @@
         },
         {
           "key": "Right-Click Hold-Pose",
-          "collapsed": true,
+          "collapsed": false,
           "settings": [
+            "rchpMode",
+            "rchpTweenSelector",
             "rchpHoldConfirmMs",
             "rchpEnabled",
             "rchpTargetPose",
