@@ -1458,23 +1458,34 @@ const _splay2AxisScratch = new THREE.Vector3()
 // ancestor chain) -- not by simply premultiplying `baseQuat` onto the
 // raw local delta.
 //
-// Adapted (not copied verbatim) for this project's own extra layer HANDO
-// doesn't have: every hand here sits under `wrapperQuat` (the per-hand,
-// per-frame cursor-tracking rotation) as W1's own outermost ancestor,
-// which HANDO's single modelRoot never had -- conjugating by the FULL
-// W1 (wrapperQuat included) would make the resulting world-frame curl
-// axis drift with wherever the hand currently happens to be FACING the
-// cursor, the exact problem `rotateOnTrueWorldAxis()`'s own `excludeQuat`
-// parameter (above) already exists to prevent. So W1 is read, then
-// wrapperQuat is factored back OUT of it first (`wrapperQuat^-1 * W1`,
-// the same technique `rotateOnTrueWorldAxis()` already uses), before
-// conjugating -- keeping the whole computation in the same wrapper-
-// independent frame `baseQuat` itself already lives in.
+// FURTHER CORRECTED, same day (2026-09-15) -- the `W1 * delta * W1^-1`
+// formula above (W1 = the wrist bone's own current world quat, wrapperQuat
+// excluded) turned out to have the EXACT MIRROR-IMAGE flaw of the bug it
+// replaced: that bug was invisible near wristBend=wristSplay=0 and wrong
+// once genuinely bent/splayed; THIS formula is correct for any genuinely
+// nonzero wristBend/wristSplay (confirmed repeatedly, 0.0000 degrees) but
+// silently collapses to IDENTITY -- discarding `baseQuat` entirely -- the
+// moment delta is EXACTLY identity (wristBend = wristSplay = 0, e.g. the
+// "Fist" pose), since `W1 * I * W1^-1 = I` for any W1 at all. Confirmed
+// live: axisRefQuat read back as [0,0,0,1] instead of baseQuat's actual
+// value, and "Fist" rendered as flat wedge shapes instead of a closed
+// fist. Caught only because a real saved pose finally exercised the
+// exact-zero case -- every test this whole saga had run up to that point
+// happened to use a nonzero wristSplay.
+//
+// Fixed by conjugating `delta` by `wristRestForAxis` (R) alone, instead of
+// by the full world quat W1: `baseQuat * R * delta * R^-1`. This reduces
+// to exactly `baseQuat` when delta = I (verified live, <1e-6 per
+// component) -- matching the `else` branch below, which has always used
+// `baseQuat` directly for the "no wrist rotation" case -- while still
+// rotating the curl axis to track the wrist's actual bend/splay when
+// delta != I. `wrapperQuat` and the wrist bone's world quaternion are no
+// longer needed for this at all -- R and delta alone fully determine it,
+// so this project no longer needs its own wrapperQuat-exclusion adaptation
+// HANDO's version never required.
 const _curlAxisRefQuat = new THREE.Quaternion()
 const _curlWristDeltaScratch = new THREE.Quaternion()
-const _curlWristWorldQuatScratch = new THREE.Quaternion()
-const _curlWristWorldQuatInvScratch = new THREE.Quaternion()
-const _curlWrapperInvScratch = new THREE.Quaternion()
+const _curlWristRestInvScratch = new THREE.Quaternion()
 // `values` (default `cfg`): lets a caller pose a DIFFERENT skeleton from a
 // plain values object instead of the live cfg -- added for the Pose
 // Preview mini-viewer (previewPosePreset(), below), which poses its own
@@ -1490,20 +1501,40 @@ function applyCurlToSkeleton(fingerName, skeleton, baseQuat, wrapperQuat, values
   const wristRestForAxis = boneRestQuat.rHand
   let axisRefQuat
   if (wristBoneForAxis && wristRestForAxis) {
-    // delta = wristRest^-1 * wristBone.currentLocalQuat (body-frame delta)
+    // delta = wristRest^-1 * wristBone.currentLocalQuat (body-frame delta,
+    // i.e. the wrist's rotation AWAY FROM REST, expressed in the wrist
+    // bone's own local/parent frame -- identity whenever wristBend and
+    // wristSplay are both exactly 0).
     const delta = _curlWristDeltaScratch.copy(wristRestForAxis).invert().multiply(wristBoneForAxis.quaternion)
-    // W1 = wristBone's current world quat, wrapperQuat excluded
-    const W1 = wristBoneForAxis.getWorldQuaternion(_curlWristWorldQuatScratch).premultiply(_curlWrapperInvScratch.copy(wrapperQuat).invert())
-    const W1inv = _curlWristWorldQuatInvScratch.copy(W1).invert()
-    // worldDelta = W1 * delta * W1^-1 (conjugation -- the corrected math)
-    // CORRECTED again, same pass -- W1 already includes `baseQuat` as its
-    // own ancestor (the wrist bone is a descendant of the mesh clone that
-    // `baseQuat` orients), so premultiplying `baseQuat` onto worldDelta
-    // AGAIN here double-applied it (empirically confirmed: the extra
-    // multiply produced a real 1-6 degree relative-to-wrist error across
-    // joints; removing it dropped that to exactly 0.0000 degrees on the
-    // same test). `worldDelta` IS the axis reference on its own.
-    axisRefQuat = _curlAxisRefQuat.copy(W1).multiply(delta).multiply(W1inv)
+    // CORRECTED 2026-09-15 -- the previous formula (`W1 * delta * W1^-1`,
+    // W1 = the wrist bone's own current world quat with wrapperQuat
+    // excluded) passed every relative-to-wrist consistency test run
+    // against it (0.0000 degrees, repeatedly, including on live
+    // production with real saved poses) because that test only checks
+    // INVARIANCE -- that a finger's orientation relative to the wrist
+    // stays constant as wristSplay changes -- which a systematically
+    // biased but internally self-consistent formula can also satisfy.
+    // It missed a real bug: at delta = identity (wristBend = wristSplay =
+    // 0 exactly -- e.g. the "Fist" pose), `W1 * I * W1^-1` collapses to
+    // IDENTITY for any W1 at all, silently discarding `baseQuat` (this
+    // hand's own always-present alignQuat) from the curl axis entirely --
+    // confirmed live: axisRefQuat read back as [0,0,0,1] instead of
+    // baseQuat's actual [-0.712,0.021,0,0.702], and the pose rendered as
+    // flat, wing-like wedges instead of a closed fist. The `else` branch
+    // 2 lines below (no wrist bone at all) has always used `baseQuat`
+    // directly for this exact "no extra wrist rotation" case, so that's
+    // the ground truth the conjugation needs to reduce to at delta = I,
+    // not identity.
+    //
+    // Fix: conjugate `delta` by `wristRestForAxis` alone (not by the full
+    // world quat W1) before composing with `baseQuat` --
+    // `baseQuat * R * delta * R^-1` -- which correctly reduces to
+    // `baseQuat` when delta = I (verified live: exact match, both
+    // directions, <1e-6 per component) while still rotating the curl
+    // axis to follow the wrist's actual bend/splay for delta != I, same
+    // as intended. No longer needs the wrist bone's world quat or
+    // wrapperQuat at all -- R and delta alone fully determine it.
+    axisRefQuat = _curlAxisRefQuat.copy(baseQuat).multiply(wristRestForAxis).multiply(delta).multiply(_curlWristRestInvScratch.copy(wristRestForAxis).invert())
   } else {
     axisRefQuat = baseQuat
   }
