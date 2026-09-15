@@ -177,6 +177,34 @@ smoothly and monotonically end to end, no snap-back at any intermediate
 frame. See CHANGELOG.txt's 8th 2026-09-15 entry for the complete
 account.
 
+**Mode dropdown (Single Pose / Tween) now ported to all 5 Click-family
+groups -- built 2026-09-15, verified live.** Direct follow-up: "implement
+it to all click functions in the dev panel," referencing Right Click's
+own Mode selector as the model. Click Pose/Double-Click Pose reused the
+already-generalized phase machine for free; Click Hold-Pose/Right-Click
+Hold-Pose (a separate 2-phase hold-based machine) got their own Tween-
+mode generalization (`startClickHoldPose()` resolves the sequence once
+per hold-start, `updateClickHoldPoseForHand()` plays it via
+`lerpTweenSequence()` for as long as the button stays held). Double
+Click Hold Tween is NOT part of this -- already Tween-only by design.
+
+**Mid-task correction, applied to all 5 groups:** "the pose transition,
+hold, retransition UI should only show when Single Pose is selected" --
+widened from Right Click's original "just Target Pose vs. Tween
+Sequence" to the WHOLE transition/pause/retransition block via a
+generalized `updateClickTriggerModeVisibility(p, extraSinglePoseKeys)`.
+A hidden control's own cfg value isn't reset -- Tween mode just runs at
+whatever it was last set to.
+
+Verified via `window.__debug`: all 8 new selects populate with real
+options; Mode-toggling hides/reveals the correct rows for both a Hold-
+Pose-family group (chp) and a Click-Pose-family group (click); Click
+Hold-Pose's new Tween mechanism confirmed end to end (forward plays
+through a 2-pose test sequence to the final pose and holds; release
+retransitions to idle); Click Pose's own Single Pose mode re-confirmed
+unaffected. 0 new console errors. See CHANGELOG.txt's 9th 2026-09-15
+entry for the complete account.
+
 **The "thumb/finger pose looks wrong" saga -- 2 SEPARATE bugs found and
 fixed 2026-09-15, both verified live; awaiting the user's final
 confirmation before declaring this closed.** This turned out to be two

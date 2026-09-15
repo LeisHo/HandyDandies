@@ -4096,6 +4096,81 @@ intermediate `?v=96` was superseded mid-fix by this entry's own 2nd
 change, same as the earlier `?v=91`/`?v=92` concurrent-bump note).
 
 --------------------------------------------------------------------------------
+2026-09-15  -  07:04:45 - 07:16:14 EDT (11m29s, measured)
+
+**Mode dropdown (Single Pose / Tween) ported to all 4 remaining Click-
+family groups: Click Hold-Pose, Right-Click Hold-Pose, Click Pose,
+Double-Click Pose.** Direct follow-up request: "reference the right
+click pose Mode selector. i want you to implement it to all click
+functions in the dev panel." (Double Click Hold Tween is NOT part of
+this -- it's already Tween-only/shared-across-hands by design, no Single
+Pose concept to toggle.)
+
+`makeClickPoseGroup()` (click/dblclick) and `makeClickHoldPoseGroup()`
+(chp/rchp) both gained a `${p}Mode` select + `${p}TweenSelector` select,
+identical in shape to Right Click's own. Click Pose/Double-Click Pose
+reused the phase machine `updateClickPoseForHand()`/`triggerClickPose()`
+already generalized for Right Click (`cfg[${p}Mode] === 'Tween'` branches
+to `lerpTweenSequence()` instead of a single named Target Pose) --
+genuinely free for those 2. Click Hold-Pose/Right-Click Hold-Pose needed
+their OWN generalization, a separate 2-phase (forward/retransition, no
+pause) hold-based machine: `startClickHoldPose()` now resolves
+`trig.tweenPoses` once per hold-start (`[liveSnapshot, ...namedPoses]`,
+same "start from wherever the hand currently is" convention as Single
+Pose mode, not Double Click Hold Tween's always-from-default one), and
+`updateClickHoldPoseForHand()`'s own 'forward' branch plays through it
+via `lerpTweenSequence()` for as long as the button stays held, exactly
+mirroring how it already played toward a single target.
+
+**Mid-task correction, applied to ALL 5 groups (chp/rchp/click/dblclick/
+rc) including retrofitting Right Click's own earlier version:** "the pose
+transition, hold, retransition UI should only show when Single Pose is
+selected." Originally (Right Click's first version) only Target Pose vs.
+Tween Sequence toggled; this widened it to the WHOLE block -- Pose
+Transition Speed/Curve/Range, Pause Duration (Click Pose family only),
+Pose Retransition Speed/Curve/Range -- none of which describes playing
+through a Tween Sequence either. Generalized the old, Right-Click-only
+`updateRightClickModeVisibility()` into `updateClickTriggerModeVisibility(p,
+extraSinglePoseKeys)`, called by all 5 groups' own Mode `onChange` plus a
+one-time init pass; `extraSinglePoseKeys` is the one shape difference
+(`['PauseDurationMs']` for the 3-phase Click Pose family, `[]` for the
+2-phase Hold-Pose family). The underlying cfg values for a hidden control
+aren't reset or disabled -- Tween mode still runs at whatever
+Transition/Retransition Speed was last set, just without a visible
+control while Tween is selected, so switching modes back and forth loses
+no tuning.
+
+Also added the same 8 new selects' worth of TDZ-empty-dropdown calls
+(`chpMode`/`chpTweenSelector`/`rchpMode`/`rchpTweenSelector`/`clickMode`/
+`clickTweenSelector`/`dblclickMode`/`dblclickTweenSelector`) to the
+existing one-time post-`cfg` refresh list and the `savedTweenSequences`
+onChange refresh list -- same pre-`cfg`-exists timing gap already fixed
+for Right Click's own 3 selects earlier the same day.
+
+**Landed via a concurrent session's commit (`241eae8`) alongside its own
+unrelated `!overridden` bug fix** (see that entry, directly above --
+found and fixed while this feature was mid-edit in the same working
+tree; confirmed via that entry's own note that the two never conflicted).
+**Verified live by this feature's own author, after the fact, via
+`window.__debug`:** all 8 new selects populate with real options on page
+load (`chpMode`/`rchpMode`/`clickMode`/`dblclickMode`: `['Single Pose',
+'Tween']`; `chpTargetPose`: the 11 real saved-pose names; the 4
+TweenSelectors legitimately empty, no Tween Sequences saved yet).
+Switching `chp`'s and `click`'s own Mode selects to 'Tween' via a real
+`change` event correctly hid all 7-8 single-pose-only rows and revealed
+Tween Sequence for both. Click Hold-Pose's own new Tween mechanism
+verified end to end with a fabricated 2-pose test sequence: holding
+(`startClickHoldPose('chp')`) played `forward` through to the final
+pose's own curl value (89, "ThumbsUp") and held there (no pause phase, as
+designed); releasing (`endClickHoldPose('chp')`) correctly entered
+`retransition` and settled to `idle`. Click Pose's own Single Pose mode
+re-confirmed unaffected (curlIndex progressing toward "Fist"'s value, 96,
+mid-transition). 0 console errors beyond the pre-existing, unrelated
+`api/save-settings` 404s.
+
+Cache-buster bump: `index.html`'s own `main.js?v=97` -> `?v=98`.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================
