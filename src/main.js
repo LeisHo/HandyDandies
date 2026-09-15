@@ -528,16 +528,28 @@ const DEV_GROUPS = [
   // already build, via resolveTweenSequencePoses()/lerpTweenSequence()) --
   // see updateClickPoseForHand()'s own comment for how the 2 modes share
   // one phase machine. Only rcTargetPose/rcTweenSelector are mode-
-  // specific and toggled by updateRightClickModeVisibility() (below); the
-  // Enabled checkbox and every timing control apply to both modes the
-  // same way, so switching modes mid-session doesn't reset any tuning.
+  // specific and toggled by updateClickTriggerModeVisibility() (below,
+  // generalized to every Click-family group with a Mode dropdown -- see
+  // its own comment); the Enabled checkbox and every timing control apply
+  // to both modes the same way, so switching modes mid-session doesn't
+  // reset any tuning.
   {
     title: 'Right Click',
     controls: [
       { key: 'rcEnabled', label: 'Right Click (Master On/Off)', type: 'checkbox', def: false },
       {
         key: 'rcMode', label: 'Mode', type: 'select', def: 'Single Pose', options: () => ['Single Pose', 'Tween'],
-        onChange: () => updateRightClickModeVisibility()
+        // BUG FIX 2026-09-15: this still called the OLD, pre-rename
+        // `updateRightClickModeVisibility()` (confirmed live: threw
+        // "updateRightClickModeVisibility is not defined" the instant
+        // Mode changed, caught only by safeRefreshSelectOptions()'s own
+        // try/catch -- contained, but Right Click's own mode-specific
+        // rows silently stopped toggling). The function itself was
+        // generalized/renamed to `updateClickTriggerModeVisibility(p,
+        // extraSinglePoseKeys)` when Mode was ported to every other
+        // Click-family group; this ONE call site (the original, from
+        // before that generalization) was missed.
+        onChange: () => updateClickTriggerModeVisibility('rc', ['PauseDurationMs'])
       },
       { key: 'rcTargetPose', label: 'Target Pose', type: 'select', def: '', options: () => (cfg.savedPoses || []).map((sp) => sp.name) },
       { key: 'rcTweenSelector', label: 'Tween Sequence', type: 'select', def: '', options: () => (cfg.savedTweenSequences || []).map((s) => s.name) },
@@ -579,7 +591,7 @@ const DEV_GROUPS = [
         // group's own Tween Selector dropdown reads this same list via
         // options(), which devPanel.js only rebuilds on an explicit
         // refreshSelectOptions() call.
-        onChange: () => { safeRefreshSelectOptions('dcHoldTweenSelector'); safeRefreshSelectOptions('rcTweenSelector') }
+        onChange: () => { safeRefreshSelectOptions('dcHoldTweenSelector'); safeRefreshSelectOptions('rcTweenSelector'); safeRefreshSelectOptions('chpTweenSelector'); safeRefreshSelectOptions('rchpTweenSelector'); safeRefreshSelectOptions('clickTweenSelector'); safeRefreshSelectOptions('dblclickTweenSelector') }
       }
     ]
   },
@@ -1887,7 +1899,23 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       // and off") -- gates startClickHoldPose(), same master on/off
       // pattern as Crop Wrist / Responsive Wrist Splay's own checkboxes.
       { key: `${p}Enabled`, label: `${title} (Master On/Off)`, type: 'checkbox', def: defaults.enabled ?? false },
+      // Mode + the Tween Sequence select right below it, added 2026-09-15
+      // (direct follow-up request, "implement it to all click functions
+      // in the dev panel," porting Right Click's own Mode dropdown here)
+      // -- see updateClickHoldPoseForHand()/startClickHoldPose()'s own
+      // comments for how Tween mode shares this exact 2-phase forward/
+      // retransition machine, just swapping what "forward" interpolates
+      // toward. `updateClickTriggerModeVisibility()` hides the WHOLE
+      // transition/retransition block below whenever Tween is selected
+      // (direct correction: "the pose transition, hold, retransition UI
+      // should only show when Single Pose is selected") -- Enabled, Mode,
+      // and Hold Confirm Delay stay visible regardless of mode.
+      {
+        key: `${p}Mode`, label: 'Mode', type: 'select', def: 'Single Pose', options: () => ['Single Pose', 'Tween'],
+        onChange: () => updateClickTriggerModeVisibility(p, [])
+      },
       { key: `${p}TargetPose`, label: 'Target Pose', type: 'select', def: defaults.targetPose ?? '', options: () => (cfg.savedPoses || []).map((sp) => sp.name) },
+      { key: `${p}TweenSelector`, label: 'Tween Sequence', type: 'select', def: '', options: () => (cfg.savedTweenSequences || []).map((s) => s.name) },
       // Direct user report, 2026-09-15: "right after te click, the closest
       // hand seems to start some sort of animation transition, but stops
       // after a split second, then the click-pose function runs smoothly."
@@ -1933,7 +1961,18 @@ function makeClickPoseGroup(p, title, defaults = {}) {
     title,
     controls: [
       { key: `${p}Enabled`, label: `${title} (Master On/Off)`, type: 'checkbox', def: defaults.enabled ?? false },
+      // Mode + Tween Sequence -- added 2026-09-15, originally built only
+      // for Right Click, then generalized here so Click Pose/Double-Click
+      // Pose get it "the same as the others" (direct follow-up request).
+      // See makeClickHoldPoseGroup()'s own matching comment for the full
+      // reasoning (shared word-for-word, since both factories added this
+      // the same way).
+      {
+        key: `${p}Mode`, label: 'Mode', type: 'select', def: 'Single Pose', options: () => ['Single Pose', 'Tween'],
+        onChange: () => updateClickTriggerModeVisibility(p, ['PauseDurationMs'])
+      },
       { key: `${p}TargetPose`, label: 'Target Pose', type: 'select', def: defaults.targetPose ?? '', options: () => (cfg.savedPoses || []).map((sp) => sp.name) },
+      { key: `${p}TweenSelector`, label: 'Tween Sequence', type: 'select', def: '', options: () => (cfg.savedTweenSequences || []).map((s) => s.name) },
       { key: `${p}TransitionSpeedMs`, label: 'Pose Transition Speed (Ms)', type: 'slider', min: 0, max: 700, step: 10, def: defaults.transitionSpeedMs ?? 400 },
       { key: `${p}StartTimeCurve`, label: 'Pose Transition Start Time Curve (Distance -> Start Time)', type: 'text', def: defaults.startTimeCurve ?? '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickPoseConfig(p) },
       { key: `${p}StartTimeRange`, label: 'Pose Transition Min / Max Start Time (Ms)', type: 'text', def: defaults.startTimeRange ?? '{"min":0,"max":300}', onChange: () => parseClickPoseConfig(p) },
@@ -2992,8 +3031,8 @@ function buildWristSplayCurveWidget(row) {
 // whatever the shared cfg sliders currently say throughout the hold.
 const CLICK_HOLD_KEYS = ['chp', 'rchp']
 const clickHoldPoseTriggers = {
-  chp: { active: false, holdStartTime: 0, forwardSnapshot: null, startCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], startRangeParsed: { min: 0, max: 300 }, retransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionRangeParsed: { min: 0, max: 300 } },
-  rchp: { active: false, holdStartTime: 0, forwardSnapshot: null, startCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], startRangeParsed: { min: 0, max: 300 }, retransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionRangeParsed: { min: 0, max: 300 } }
+  chp: { active: false, holdStartTime: 0, forwardSnapshot: null, tweenPoses: null, startCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], startRangeParsed: { min: 0, max: 300 }, retransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionRangeParsed: { min: 0, max: 300 } },
+  rchp: { active: false, holdStartTime: 0, forwardSnapshot: null, tweenPoses: null, startCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], startRangeParsed: { min: 0, max: 300 }, retransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionRangeParsed: { min: 0, max: 300 } }
 }
 function parseClickHoldConfig(p) {
   const t = clickHoldPoseTriggers[p]
@@ -3203,12 +3242,25 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     chp.frozenSplayDeg = computeResponsiveWristSplayDeg(live, minLiveDist, liveDistRange)
   }
   if (chp.phase === 'forward') {
-    const targetPose = (cfg.savedPoses || []).find((sp) => sp.name === cfg[`${p}TargetPose`])
-    if (!targetPose || !trig.forwardSnapshot) return // nothing selected / nothing to transition FROM yet -- leave this hand's pose untouched
+    // Tween mode (added 2026-09-15, see makeClickHoldPoseGroup()'s own
+    // comment) -- `trig.tweenPoses` is resolved ONCE per hold-start (see
+    // startClickHoldPose()), shared by every hand exactly like
+    // `trig.forwardSnapshot` already was; only each hand's own forward
+    // delay/frozen splay stay per-hand-staggered, unchanged from Single
+    // Pose mode.
+    const isTween = cfg[`${p}Mode`] === 'Tween'
     const elapsed = now - trig.holdStartTime
     const speedMs = Math.max(cfg[`${p}TransitionSpeedMs`], 1)
     const progress = elapsed < chp.forwardDelay ? 0 : THREE.MathUtils.clamp((elapsed - chp.forwardDelay) / speedMs, 0, 1)
-    const values = lerpPoseValues(trig.forwardSnapshot, targetPose, progress)
+    let values
+    if (isTween) {
+      if (!trig.tweenPoses || trig.tweenPoses.length < 2) return // nothing selected -- leave this hand's pose untouched
+      values = lerpTweenSequence(trig.tweenPoses, progress)
+    } else {
+      const targetPose = (cfg.savedPoses || []).find((sp) => sp.name === cfg[`${p}TargetPose`])
+      if (!targetPose || !trig.forwardSnapshot) return // nothing selected / nothing to transition FROM yet -- leave this hand's pose untouched
+      values = lerpPoseValues(trig.forwardSnapshot, targetPose, progress)
+    }
     chp.lastAppliedValues = values
     applyPoseValuesToHand(hand, values, chp.frozenSplayDeg)
   } else if (chp.phase === 'retransition') {
@@ -3227,6 +3279,21 @@ function startClickHoldPose(p) {
   trig.holdStartTime = performance.now()
   trig.forwardSnapshot = {}
   POSE_PRESET_KEYS.forEach((key) => { trig.forwardSnapshot[key] = cfg[key] })
+  // Tween mode (see updateClickHoldPoseForHand()'s own comment) --
+  // resolved once per hold-start, same timing as forwardSnapshot above;
+  // every hand shares this identical sequence (only each hand's own
+  // forward delay is staggered, same as Single Pose mode). Starts from
+  // this hold's own live snapshot, not `poseDefaultValues`, keeping it
+  // consistent with Single Pose mode's own "transition from wherever the
+  // hand currently is" -- unlike Double Click Hold Tween's own always-
+  // from-default convention (a deliberately different feature).
+  if (cfg[`${p}Mode`] === 'Tween') {
+    const seq = (cfg.savedTweenSequences || []).find((s) => s.name === cfg[`${p}TweenSelector`])
+    const namedPoses = seq ? resolveTweenSequencePoses(seq.tweenPoses) : []
+    trig.tweenPoses = namedPoses.length >= 1 ? [trig.forwardSnapshot, ...namedPoses] : null
+  } else {
+    trig.tweenPoses = null
+  }
   // Direct request: "When a click and hold is occurring, during the
   // hold, moving the cursor should not trigger any panning. Instead, it
   // should continue holding the held state." This project's own
@@ -3941,29 +4008,50 @@ function buildClickPoseWidgets(p) {
   if (retransCurveRow) buildGenericCurveWidget(retransCurveRow, { caption: curveCaption, defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
   if (retransRangeRow) buildGenericRangeBarWidget(retransRangeRow, { trackMin: 0, trackMax: CLICK_HOLD_START_TIME_TRACK_MAX, unit: 'ms', defaultValue: { min: 0, max: 300 } })
 }
-// Right Click's own "the relevant setting ui only show when i select
-// either" -- no existing devPanel.js mechanism shows/hides a row by
-// another control's value, so this hand-toggles the 2 mode-specific rows
-// directly by their own data-key (same selector convention as
-// buildClickPoseWidgets() above). Everything else in the group (Enabled,
-// Mode, the shared timing controls) stays visible regardless of mode.
-function updateRightClickModeVisibility() {
+// Shared by every Click-family trigger group with a Mode dropdown
+// (originally Right Click's own "the relevant setting ui only show when
+// i select either," then generalized to Click Hold-Pose/Right-Click
+// Hold-Pose/Click Pose/Double-Click Pose per direct follow-up request --
+// no existing devPanel.js mechanism shows/hides a row by another
+// control's value, so this hand-toggles rows directly by their own
+// data-key, same selector convention as buildClickPoseWidgets() above).
+// CORRECTED, same day: originally only Target Pose vs. Tween Sequence
+// toggled -- direct follow-up correction ("the pose transition, hold,
+// retransition UI should only show when Single Pose is selected") widened
+// this to the WHOLE transition/pause/retransition block, since none of
+// that language describes playing through a Tween Sequence either.
+// `extraSinglePoseKeys` covers the one shape difference between the 2
+// families this is shared across: Click Pose/Double-Click Pose/Right
+// Click have a Pause Duration slider (the 3-phase forward/paused/
+// retransition machine); Click Hold-Pose/Right-Click Hold-Pose don't (a
+// 2-phase forward/retransition machine, paced by how long the button is
+// actually held) -- pass `[]` for those. Enabled, Mode, and (for the
+// Hold-Pose family) Hold Confirm Delay stay visible regardless of mode --
+// none of those describe posing TO a specific target, single or tweened.
+function updateClickTriggerModeVisibility(p, extraSinglePoseKeys) {
+  const mode = cfg[`${p}Mode`]
+  const singlePoseKeys = ['TargetPose', 'TransitionSpeedMs', 'StartTimeCurve', 'StartTimeRange', ...extraSinglePoseKeys, 'RetransitionSpeedMs', 'RetransitionStartTimeCurve', 'RetransitionStartTimeRange']
   // Inline style, not the `hidden` attribute -- devPanel.js's own
   // `.dp-row { display: flex }` stylesheet rule (style.css) is an author
   // rule, which wins the cascade over the UA stylesheet's `[hidden] {
   // display: none }` at equal specificity regardless of source order, so
   // setting `.hidden` alone would silently do nothing here.
-  const singlePoseRow = document.querySelector('.dp-row[data-key="rcTargetPose"]')
-  const tweenRow = document.querySelector('.dp-row[data-key="rcTweenSelector"]')
-  if (singlePoseRow) singlePoseRow.style.display = cfg.rcMode !== 'Single Pose' ? 'none' : ''
-  if (tweenRow) tweenRow.style.display = cfg.rcMode !== 'Tween' ? 'none' : ''
+  singlePoseKeys.forEach((suffix) => {
+    const row = document.querySelector(`.dp-row[data-key="${p}${suffix}"]`)
+    if (row) row.style.display = mode !== 'Single Pose' ? 'none' : ''
+  })
+  const tweenRow = document.querySelector(`.dp-row[data-key="${p}TweenSelector"]`)
+  if (tweenRow) tweenRow.style.display = mode !== 'Tween' ? 'none' : ''
 }
 CLICK_POSE_KEYS.forEach((p) => { parseClickPoseConfig(p); buildClickPoseWidgets(p) })
-// Right Click's Mode dropdown (Single Pose vs. Tween) -- run once now that
-// its own rows definitely exist, same reasoning/timing as the widget
-// builders directly above; rcMode's own onChange (DEV_GROUPS, above) keeps
-// this current after that.
-updateRightClickModeVisibility()
+// Every Click-family group's own Mode dropdown (Single Pose vs. Tween) --
+// run once now that all of these rows definitely exist, same reasoning/
+// timing as the widget builders directly above; each group's own Mode
+// control's own onChange (DEV_GROUPS, above) keeps this current after
+// that. Click Pose/Double-Click Pose/Right Click share CLICK_POSE_KEYS'
+// own Pause Duration slider; Click Hold-Pose/Right-Click Hold-Pose don't.
+CLICK_POSE_KEYS.forEach((p) => updateClickTriggerModeVisibility(p, ['PauseDurationMs']))
+CLICK_HOLD_KEYS.forEach((p) => updateClickTriggerModeVisibility(p, []))
 // Bug fix (direct user report, "I dont see any of the saved poses in the
 // dropdown"): a `select` control's <option> list is populated by
 // `displayValue()` during the host's own restore-from-storage step
@@ -3996,6 +4084,18 @@ safeRefreshSelectOptions('dblclickTargetPose')
 safeRefreshSelectOptions('rcTargetPose')
 safeRefreshSelectOptions('rcMode')
 safeRefreshSelectOptions('rcTweenSelector')
+// Same TDZ-populated-empty symptom, now that Mode + Tween Sequence were
+// added to the other 4 Click-family groups too (2026-09-15) -- their own
+// TargetPose selects were already covered by the 4 calls above, but
+// Mode/TweenSelector are new keys needing their own first-time populate.
+safeRefreshSelectOptions('chpMode')
+safeRefreshSelectOptions('chpTweenSelector')
+safeRefreshSelectOptions('rchpMode')
+safeRefreshSelectOptions('rchpTweenSelector')
+safeRefreshSelectOptions('clickMode')
+safeRefreshSelectOptions('clickTweenSelector')
+safeRefreshSelectOptions('dblclickMode')
+safeRefreshSelectOptions('dblclickTweenSelector')
 // Sets this ONE hand's `clone.quaternion`/`clone.position` for its
 // CURRENT arm-length value `hideT` -- called every frame, per hand, from
 // updateRenderOrder()'s own existing per-hand loop (which already
@@ -4664,7 +4764,29 @@ function updateRenderOrder() {
       // own comment) forces exactly 1 guaranteed full repose regardless
       // of the other 2 conditions, closing the gap without reintroducing
       // the per-frame cost for every idle frame after that.
-      const needsIdleRepose = cfg.wristSplayResponsiveEnabled || hand._wasOverriddenLastFrame || !hand.everReposed
+      //
+      // CORRECTED AGAIN 2026-09-15, direct user report ("click functinos
+      // still not working"): `!overridden` was MISSING from this
+      // condition entirely -- the original code this performance fix
+      // replaced was `if (!overridden) { ...idle repose... }`, and the
+      // rewrite dropped that check, keeping only the 3 conditions above.
+      // Concretely: `hand._wasOverriddenLastFrame` is true starting the
+      // 2nd frame of ANY active trigger sequence (chp/rchp/click/
+      // dblclick/rc/dcHold) and stays true every frame the sequence keeps
+      // running -- so `needsIdleRepose` was ALSO true on every one of
+      // those frames, meaning the idle branch ran RIGHT AFTER
+      // `applyPoseValuesToHand()` had just written the transition's own
+      // in-progress pose 20 lines up, and immediately overwrote it with
+      // `cfg`'s plain DEFAULT/idle values instead. Net effect: every
+      // trigger's pose only ever stuck for a single frame before being
+      // stomped back to default, frame after frame -- at normal framerate,
+      // visually indistinguishable from "the click did nothing at all."
+      // `!overridden` restores the original mutual-exclusion (a hand is
+      // EITHER actively driven by a trigger this frame, via the checks
+      // above, OR eligible for idle repose -- never both in the same
+      // frame) without touching any of the 3 legitimate optimization
+      // conditions this fix already added.
+      const needsIdleRepose = !overridden && (cfg.wristSplayResponsiveEnabled || hand._wasOverriddenLastFrame || !hand.everReposed)
       if (needsIdleRepose) {
         hand.everReposed = true
         // Not mid any pose-transition this frame -- keep this hand's own

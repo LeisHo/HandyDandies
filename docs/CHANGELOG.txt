@@ -4034,6 +4034,68 @@ a separate look if a startup sizing issue is ever reported on its own.
 Cache-buster bump: `index.html`'s own `main.js?v=94` -> `?v=95`.
 
 --------------------------------------------------------------------------------
+2026-09-15  -  07:08:20 - 07:12:46 EDT (4m26s, measured)
+
+**Found and fixed the REAL "click functinos still not working" bug --
+distinct from both prior rounds' fixes.** Direct user report with a fresh
+mouse log showing repeated genuine clicks/holds producing no visible
+effect. The previous entry's `currentBaseQuat`/`everReposed` fix was real
+and correct (confirmed fixing the startup appearance) but didn't touch
+this: the idle-repose performance gate (landed via a concurrent session's
+commit, `4d25b9a`) replaced the original `if (!overridden) { ...idle
+repose... }` with `if (needsIdleRepose)`, where `needsIdleRepose` never
+actually included `!overridden` as a condition.
+
+Concretely: `hand._wasOverriddenLastFrame` is true starting the 2nd frame
+of ANY active trigger sequence (chp/rchp/click/dblclick/rc/dcHold) and
+stays true for every frame the sequence keeps running. Since
+`needsIdleRepose = cfg.wristSplayResponsiveEnabled || hand._wasOverriddenLastFrame
+|| !hand.everReposed` doesn't check `overridden` for the CURRENT frame,
+it was ALSO true on every one of those frames -- so the idle-repose
+branch ran immediately after `applyPoseValuesToHand()` had just written
+that frame's own in-progress transition pose, and overwrote it right
+back to `cfg`'s plain default values. Net effect: every trigger's pose
+only ever stuck for a single frame before being stomped back to default,
+frame after frame, at normal framerate indistinguishable from "the click
+did nothing at all."
+
+Fixed with one added condition: `const needsIdleRepose = !overridden &&
+(cfg.wristSplayResponsiveEnabled || hand._wasOverriddenLastFrame ||
+!hand.everReposed)` -- restores the original mutual exclusion (a hand is
+EITHER actively driven by a trigger this frame OR eligible for idle
+repose, never both) without touching any of the earlier fix's 3
+legitimate conditions.
+
+**Also fixed, found in passing while verifying the above:** a concurrent
+session's own rename (`updateRightClickModeVisibility()` ->
+`updateClickTriggerModeVisibility(p, extraSinglePoseKeys)`, generalizing
+Right Click's Mode dropdown to every Click-family trigger group) missed
+1 call site -- the ORIGINAL `rcMode` control's own `onChange`, still
+calling the old, now-undefined function name. Threw a live
+`ReferenceError` (caught by `safeRefreshSelectOptions()`'s own try/catch,
+so contained -- but Right Click's own mode-specific rows silently stopped
+toggling). Fixed by updating that one call site to the new signature.
+
+**Verified directly** (bypassing the render loop, same "manually step
+the update function" methodology as the previous 2 entries): triggered a
+real Click Pose transition toward "ThumbsUp" and stepped `updateRenderOrder()`
+with REAL elapsed time between calls (not a tight synchronous loop, which
+would never show meaningful `progress` advancement) -- `thumbCurl`
+progressed smoothly and monotonically (78.95 -> 54.69 -> 34.27 -> 11.37
+-> -9.19 -> -26.86 -> -37, reaching the target and pausing), with no
+snap-back to the idle default value at any intermediate frame.
+
+Note: a concurrent session was actively committing to this same file
+throughout this investigation (generalizing Mode/Tween-sequence support
+from Right Click to every other Click-family trigger group) -- confirmed
+via repeated `git diff` checks that its changes and this fix's own
+changes never overlapped or conflicted.
+
+Cache-buster bump: `index.html`'s own `main.js?v=95` -> `?v=97` (an
+intermediate `?v=96` was superseded mid-fix by this entry's own 2nd
+change, same as the earlier `?v=91`/`?v=92` concurrent-bump note).
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

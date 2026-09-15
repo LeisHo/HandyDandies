@@ -103,16 +103,18 @@ to these 3 new ones) -- fixed by adding the same one-time
 
 See CHANGELOG.txt's 5th 2026-09-15 entry for the complete account.
 
-**"All my click functions stopped working" -- ROOT-CAUSED AND FIXED
-2026-09-15, verified directly (not yet reconfirmed live by the user).**
-A first investigation pass fixed a real-but-secondary crash path (Double
-Click Hold Loop's NaN-unsafe speed math) and added a general try/catch
-backstop around `animate()`'s per-frame body -- both good fixes, but
-neither was the actual bug. The user's own, much more specific follow-up
-report pinpointed it: hard refresh shows hands with "weird surface
-texture as if there is overlapping 3d models... rotation etc looks
-off," ANY click instantly fixes it, then further clicks appear to do
-nothing.
+**"All my click functions stopped working" / "click functinos still not
+working" -- TWO SEPARATE bugs, BOTH now fixed 2026-09-15, verified
+directly (not yet reconfirmed live by the user).** A first investigation
+pass fixed a real-but-secondary crash path (Double Click Hold Loop's
+NaN-unsafe speed math) and added a general try/catch backstop around
+`animate()`'s per-frame body -- both good fixes, but neither was the
+actual bug. Two further rounds, each following a more specific user
+report, found the 2 real causes:
+
+**Bug 1 -- startup pose (fixed round 2).** Hard refresh shows hands with
+"weird surface texture as if there is overlapping 3d models... rotation
+etc looks off," ANY click instantly fixes it.
 
 Reproduced directly via a real screenshot on a fresh production load:
 every hand rendered as long, spike-like shapes -- the raw, un-posed GLB
@@ -146,6 +148,34 @@ followed up since the screenshot + `currentBaseQuat` evidence already
 fully explained the reported symptom on its own. Worth a look if a
 startup-sizing issue is ever reported separately. See CHANGELOG.txt's
 7th 2026-09-15 entry for the complete account.
+
+**Bug 2 -- click transitions get stomped every frame (fixed round 3, the
+ACTUAL "click functions don't work" bug).** Bug 1's fix resolved the
+startup appearance but a fresh, more detailed report ("click functinos
+still not working," with a mouse log showing real clicks/holds producing
+no visible effect) showed the underlying trigger problem was still
+there. Root cause: the idle-repose performance gate's `needsIdleRepose`
+condition never actually checked `!overridden` -- so on every frame
+after the FIRST frame of any click/hold transition,
+`hand._wasOverriddenLastFrame` (true) made the idle-repose branch ALSO
+run, immediately overwriting that same frame's own in-progress
+transition pose with `cfg`'s plain default values. Every trigger's pose
+only ever stuck for a single frame before being stomped back to default
+-- at normal framerate, indistinguishable from "the click did nothing at
+all." Fixed with one added condition (`!overridden &&`), restoring the
+original mutual exclusion between "actively driven by a trigger this
+frame" and "eligible for idle repose."
+
+Also fixed in passing: a concurrent session's own function rename
+(`updateRightClickModeVisibility` -> `updateClickTriggerModeVisibility`)
+missed 1 call site, throwing a caught-but-real `ReferenceError` whenever
+Right Click's Mode dropdown changed.
+
+Verified directly: stepped a real Click Pose transition toward
+"ThumbsUp" with real elapsed time between frames -- thumbCurl progressed
+smoothly and monotonically end to end, no snap-back at any intermediate
+frame. See CHANGELOG.txt's 8th 2026-09-15 entry for the complete
+account.
 
 **The "thumb/finger pose looks wrong" saga -- 2 SEPARATE bugs found and
 fixed 2026-09-15, both verified live; awaiting the user's final

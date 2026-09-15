@@ -184,3 +184,24 @@ onto this feature without re-confirming that's actually wanted.
   with a real screenshot, or bypass the render loop entirely by calling
   the relevant update function directly (e.g. `window.__debug.updateRenderOrder()`)
   and inspecting the resulting state.
+- **A "skip this expensive block when nothing needs it" performance gate
+  MUST preserve the original code's own mutual-exclusion invariants, not
+  just its literal condition.** `updateRenderOrder()`'s idle-repose block
+  used to be `if (!overridden) { ... }` -- when a 2026-09-15 performance
+  fix rewrote this into `needsIdleRepose = cfg.wristSplayResponsiveEnabled
+  || hand._wasOverriddenLastFrame`, it dropped `!overridden` entirely.
+  `hand._wasOverriddenLastFrame` is true for every frame AFTER the first
+  of any active trigger sequence, so the "only reachable when idle" gate
+  became reachable DURING an active transition too -- running right after
+  that frame's own `applyPoseValuesToHand()` call and immediately
+  overwriting its result with `cfg`'s plain default values. Confirmed
+  live: this stomped every Click-Pose/Click-Hold-Pose/Right-Click/Double-
+  Click-Hold transition back to default every single frame, indistin-
+  guishable from "clicking does nothing" at normal framerate -- a real
+  production bug reported by the user directly, that survived 2 earlier
+  rounds of investigation into a DIFFERENT real bug (the startup pose
+  issue below) before being found. When rewriting a per-frame gate for
+  performance, explicitly re-derive which ORIGINAL conditions it must
+  still preserve, don't just wrap the new optimization's own condition in
+  isolation — see CHANGELOG.txt's 8th 2026-09-15 entry for the full
+  account.
