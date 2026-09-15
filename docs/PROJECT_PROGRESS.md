@@ -387,8 +387,44 @@ rendered DOM order so it correctly spans group boundaries. Verified
 live: a 4-item shift-click range moved exactly those items into a new
 group on `+Group`, leaving the rest untouched; the original empty-group
 behavior (nothing selected) still works; plain-click single-selection
-regression-checked clean. See CHANGELOG.txt's latest 2026-09-15 entry
-for the complete account.
+regression-checked clean. See CHANGELOG.txt's own matching 2026-09-15
+entry for the complete account.
+
+**Double Click Hold rebuilt as a literal 3rd Click Hold-Pose instance --
+built and verified live 2026-09-15.** Direct request to match its
+settings to Click Hold-Pose's own (it was "lacking a lot of the
+options") plus Single Pose/Tween mode support -- this directly touched a
+standing architectural decision (CLAUDE.md's own note that Double Click
+Hold applied identically to every hand, no per-hand stagger, as a
+deliberate exception), so 2 clarifying questions were asked before
+implementing: confirmed (1) genuinely add per-hand stagger, reversing
+that original design, and (2) Single Pose mode mirrors Click Hold-Pose
+exactly. `dcHold` is now a 3rd entry in `CLICK_HOLD_KEYS`, sharing
+chp/rchp's own machinery wholesale (a net REDUCTION in code despite
+gaining every one of their settings) -- retired the old bespoke
+`dcHoldTween` mechanism entirely. One exception preserved from dcHold's
+own original requirement: Tween mode still always starts from the
+default pose specifically, not the live snapshot chp/rchp's own Tween
+mode uses. Caught and fixed a real regression along the way: retiring
+the old functions also deleted the project's only NaN-safety guard for
+`TweenSpeedMs` (a real, previously-fixed bug class) -- restored as a
+shared helper now protecting all 3 Tween-capable triggers instead of
+just the one that hit it first. `CLAUDE.md`'s own now-outdated note was
+corrected in place rather than left to mislead a future session.
+
+**Same day, separate request: new list-picker groups now sort to the
+top.** "When I add a new group in any of the selector uis, place the
+new group at the top of the list instead of the bottom." A first version
+(prepend to whichever array the new group touches) worked for repeated
+empty groups but a live test exposed a real gap when mixing an empty
+group with a later auto-assigned one (the auto-assigned one still sorted
+to the bottom, since array position within one queue says nothing about
+recency relative to the OTHER queue) -- fixed with an explicit
+`entry.groupOrder` priority list, consulted as a final re-sort pass and
+cleared entirely the instant the user manually drags a group (past that
+point their own arrangement is the real source of truth). See
+CHANGELOG.txt's own latest 2026-09-15 entry for the complete account of
+both.
 
 ## Recently completed
 

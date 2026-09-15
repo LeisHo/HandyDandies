@@ -67,14 +67,33 @@ request that Field Layout changes never affect camera view scale. Don't
 reintroduce a live recompute of camera position from field size without
 re-confirming that's actually wanted.
 
-**Double Click Hold Tween (added 2026-09-15) is the one trigger group in
-this project that applies IDENTICALLY to every hand at once, with no
-per-hand distance stagger** — a deliberate exception to Click-Hold-Pose/
-Click-Pose's own established per-hand phase-machine pattern, per direct
-request ("The tween will apply to all hands simultaneously"). Computed
-ONCE per frame in `animate()` (`dcHoldValues`), not once per hand — don't
-copy Click-Hold-Pose's own per-hand `getOrInitHandCHP()`/stagger pattern
-onto this feature without re-confirming that's actually wanted.
+**CORRECTED 2026-09-15 — the note that used to live here is now wrong,
+left as a cautionary record rather than deleted outright.** Double Click
+Hold Tween originally applied IDENTICALLY to every hand at once (no
+per-hand stagger), a deliberate exception per direct request ("The tween
+will apply to all hands simultaneously"), computed once per frame
+(`dcHoldValues`) rather than per hand. That request was then directly
+REVERSED the same day ("make the available settings of double click and
+hold to match click hold... I want to also be able to select single
+pose/ tween for double click hold," confirmed via 2 clarifying questions
+before implementing): `dcHold` is now a literal 3rd entry in
+`CLICK_HOLD_KEYS`, sharing chp/rchp's own per-hand
+`startClickHoldPose()`/`updateClickHoldPoseForHand()`/`endClickHoldPose()`
+machinery wholesale — genuine per-hand distance stagger, Single Pose/
+Tween Mode, Loop Mode/Oscillate, all of it. The bespoke
+`dcHoldTween`/`startDoubleClickHoldTween`/`endDoubleClickHoldTween`/
+`updateDoubleClickHoldTween` functions this note used to point at are
+retired and no longer exist. One narrow exception survived the rewrite:
+Tween mode's own sequence still always starts from the default pose
+specifically (not this hold's own live snapshot, unlike chp/rchp's own
+Tween mode) — see `startClickHoldPose()`'s own `tweenAnchor` comment.
+**Why this note is kept, not deleted:** it's the exact scenario the
+GLOBAL `CLAUDE.md`'s own "don't silently execute a material architectural
+change" guidance (§0a) exists for — a standing, explicitly-documented
+design decision got reversed by direct request, and the reversal only
+happened SAFELY because this note was here to surface it for
+re-confirmation first rather than being silently copied over. See
+CHANGELOG.txt's matching 2026-09-15 entry for the full account.
 
 ## Gotchas
 
@@ -205,3 +224,22 @@ onto this feature without re-confirming that's actually wanted.
   still preserve, don't just wrap the new optimization's own condition in
   isolation — see CHANGELOG.txt's 8th 2026-09-15 entry for the full
   account.
+- **A devPanel.js list-picker's own top-level group render order used to
+  be inferred purely from array position (whichever group name is
+  encountered FIRST while walking `entry.items` then `entry.pendingGroups`)
+  -- fixing "put a new group at the top" by simply prepending to ONE of
+  those 2 arrays only worked when EVERY group in play came from that same
+  array.** Confirmed live 2026-09-15: with 2 pre-existing EMPTY groups (in
+  `entry.pendingGroups`) already on screen, creating a 3rd group WITH
+  items via the shift-click-multi-select-then-+Group auto-assign flow
+  (which touches `entry.items`, a DIFFERENT array) still rendered at the
+  BOTTOM, because `entry.pendingGroups` is unconditionally processed
+  before/after `entry.items` regardless of which group was actually
+  created most recently -- array position within one queue says nothing
+  about recency relative to the OTHER queue. Fixed with an explicit
+  `entry.groupOrder` priority list (prepended on every group creation,
+  either kind, consulted as a final re-sort pass over BOTH queues'
+  combined output) instead of relying on natural iteration order. When
+  "newest X goes first" needs to hold across 2+ structurally different
+  ways X can be created, a shared explicit order list beats trying to
+  keep 2 separate arrays' own insertion order in sync.

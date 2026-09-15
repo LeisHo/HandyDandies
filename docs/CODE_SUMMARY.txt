@@ -2057,3 +2057,50 @@ GOTCHAS
   no-selection empty-group path re-confirmed unchanged; plain-click
   single-selection regression-checked clean. See CHANGELOG.txt's latest
   2026-09-15 entry for the complete account.
+- **Double Click Hold rebuilt as a literal 3rd `CLICK_HOLD_KEYS` entry,
+  retiring its own bespoke `dcHoldTween` mechanism entirely** (direct
+  request, 2026-09-15, to match its settings to Click Hold-Pose's own +
+  add Single Pose/Tween mode -- confirmed via 2 clarifying questions
+  first, since this directly reversed a standing architectural decision
+  CLAUDE.md itself had documented; see that file's own corrected note).
+  `dcHold` now shares `startClickHoldPose()`/`updateClickHoldPoseForHand()`/
+  `endClickHoldPose()` wholesale with chp/rchp -- genuine per-hand
+  distance stagger (confirmed live: 0ms vs. 300ms `forwardDelay` for the
+  nearest vs. farthest hand from the cursor), Single Pose/Tween Mode,
+  Loop Mode/Oscillate/Hold Duration, Hold Confirm Delay, all of it, for
+  free. Only the double-click-then-hold GESTURE DETECTION
+  (`dcHoldLastCleanUpTime` etc.) is still unique to dcHold, now just
+  calling the shared functions instead of its own retired ones. One
+  exception survives from dcHold's own ORIGINAL requirement: Tween
+  mode's sequence still always anchors to `poseDefaultValues`, not this
+  hold's own live snapshot the way chp/rchp's own Tween mode does -- a
+  `p === 'dcHold'` branch inside `startClickHoldPose()`. Disclosed new
+  side effect: dcHold now also locks camera pan during its hold (the
+  same fix chp/rchp's own pan-lock provides) -- `endClickHoldPose()`'s
+  own pan-restore condition now checks all 3 triggers.
+  **Real regression caught mid-refactor:** retiring the old functions
+  also deleted the project's ONLY `Number.isFinite` NaN-safety guard
+  (originally built for `dcHoldTweenSpeedMs` specifically, protecting
+  against a stale saved-settings value dividing down into a NaN `t` ->
+  `poses[NaN]` -> undefined -> `lerpPoseValues()` throwing INSIDE
+  `animate()` every frame, silently freezing the screen). chp/rchp's own
+  Tween mode (added earlier the same day) had NEVER had this protection
+  either -- restored as a new shared `safeTweenSpeedMs()` helper used at
+  all 3 `${p}TweenSpeedMs` read sites, closing the gap for all 3 Tween-
+  capable triggers instead of just the one that hit it first.
+- **devPanel.js list-pickers gained `entry.groupOrder`** (direct request,
+  "place the new group at the top of the list instead of the bottom") --
+  an explicit creation-order priority list, prepended on every group
+  creation (empty or auto-assigned via the shift-click multi-select
+  feature above) and consulted as a FINAL re-sort pass in
+  `renderListPickerRows()`, rather than relying on the natural first-
+  occurrence order `topOrder` is built from. Needed because that natural
+  order alone couldn't rank a newly-created group above an OLDER
+  pre-existing one of the OTHER kind (empty vs. auto-assigned) --
+  confirmed live as a real gap in an earlier version of this fix that
+  only prepended within one of `entry.items`/`entry.pendingGroups`.
+  Cleared entirely on a manual group drag (`syncListPickerFromDom()`) --
+  past that point the user's own new arrangement is the real source of
+  truth, and re-imposing a stale priority on top of it would silently
+  undo their drag on the next unrelated re-render. Kept in sync on group
+  rename/remove, same pattern `pendingGroups` already used.

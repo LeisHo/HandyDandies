@@ -4537,6 +4537,126 @@ Cache-buster bumps: `index.html`'s own `style.css?v=6` -> `?v=7`,
 `index.html`'s own `main.js?v=104` -> `?v=105`.
 
 --------------------------------------------------------------------------------
+2026-09-15  -  18:33:42 - 18:50:56 EDT (17m14s, measured; excludes doc/ETA
+follow-up)
+
+**Double Click Hold rebuilt as a literal 3rd Click Hold-Pose instance;
+new list-picker groups now sort to the top.** Two requests, the 2nd
+arriving mid-task on the same turn.
+
+**1. "make the available settings of double click and hold to match
+click hold. Double click hold currently is lacking a lot of the options.
+I want to also be able to select single pose/ tween for double click
+hold."** This directly touched a standing, explicitly-documented
+architectural decision (CLAUDE.md: "Double Click Hold Tween... applies
+IDENTICALLY to every hand at once, with no per-hand distance stagger...
+don't copy Click-Hold-Pose's own per-hand stagger pattern onto this
+feature without re-confirming that's actually wanted") -- surfaced this
+rather than silently either reversing it or half-implementing settings
+that wouldn't do anything, and asked 2 clarifying questions before
+touching any code: (1) genuinely add per-hand stagger (confirmed,
+reversing the original "all hands simultaneously" design) vs. keep
+simultaneous and skip the stagger-only settings; (2) Single Pose mode
+mirrors Click Hold-Pose exactly (confirmed) vs. something else.
+
+Retired `dcHoldTween`/`startDoubleClickHoldTween`/`endDoubleClickHoldTween`/
+`updateDoubleClickHoldTween` entirely -- `dcHold` is now a 3rd entry in
+`CLICK_HOLD_KEYS`, sharing `startClickHoldPose()`/`updateClickHoldPoseForHand()`/
+`endClickHoldPose()` wholesale with chp/rchp. This is a NET REDUCTION in
+code (340 lines changed, net -14 in main.js) despite gaining every one
+of chp/rchp's own settings for free: Mode (Single Pose/Tween), Target
+Pose, Tween Selector + its own separate Tween Speed/Curve/Range, Hold
+Confirm Delay, Pose Transition Speed/Curve/Range, Loop Mode (Off/Loop/
+Oscillate) + Hold Duration, and a genuinely separate Pose Retransition
+Speed/Curve/Range (dcHold previously reused its own Tween Speed for
+retransition too, per an EARLIER direct clarification -- superseded by
+this request's own explicit ask, since Retransition Speed IS one of
+chp's own settings). Only the double-click-then-hold GESTURE DETECTION
+(`dcHoldLastCleanUpTime` etc.) stayed unique to dcHold, unchanged except
+for which functions it now calls.
+
+**One deliberate exception preserved from the ORIGINAL, twice-clarified
+requirement, not superseded by this request:** Tween mode's own sequence
+still always starts from the default pose specifically ("it will tween
+from the default pose, to pose 1, then so on"), not this hold's own live
+snapshot the way chp/rchp's own Tween mode does -- a small,
+`p === 'dcHold'` branch inside the now-shared `startClickHoldPose()`.
+Single Pose mode has NO such exception -- it mirrors chp/rchp exactly
+(live snapshot), per this request's own direct confirmation.
+
+**Real regression caught and fixed before considering this done:**
+retiring dcHold's own bespoke functions also deleted the ONLY
+`Number.isFinite` NaN-safety guard that existed anywhere in this file
+(`dcHoldTweenSpeedMs`'s own, protecting against a stale saved-settings
+value predating the Tween control's own existence, dividing down into a
+NaN `t`/`tCyclic`, then `poses[NaN]` -> undefined ->
+`lerpPoseValues()` throwing on `undefined[key]` INSIDE `animate()` every
+frame -- silently freezing the screen, indistinguishable from "clicking
+does nothing"). This protection had ALSO never existed for chp/rchp's
+own Tween mode (added earlier the same day) -- a pre-existing gap this
+rebuild happened to surface. Restored as a new shared `safeTweenSpeedMs()`
+helper used at all 3 `${p}TweenSpeedMs` read sites, now protecting all 3
+Tween-capable Click-Hold-family triggers instead of just the one that
+happened to hit the bug first.
+
+**Disclosed new side effect:** dcHold now locks camera pan during its
+hold too (the same fix chp/rchp's own pan-lock already provides --
+moving the cursor during a hold used to pan the camera underneath the
+tween). `endClickHoldPose()`'s own pan-restore condition updated to
+check all 3 triggers, not just chp/rchp, so releasing dcHold while chp
+or rchp is ALSO still held correctly keeps panning locked until the last
+one releases.
+
+Verified live via real dispatched PointerEvents simulating the double-
+click-then-hold gesture: Single Pose mode showed genuinely different
+`forwardDelay` per hand (0ms nearest, 300ms farthest -- real per-hand
+stagger, the core confirmed behavioral change) and completed the full
+forward -> retransition -> idle cycle; Tween mode + Loop Mode both
+entered `'looping'` correctly and released cleanly; camera pan
+confirmed locked during the hold and restored after release. 0 console
+errors beyond the pre-existing, unrelated `api/save-settings` 404s.
+
+**2. Separate direct request, arriving mid-task: "When I add a new
+group in any of the selector uis, place the new group at the top of the
+list instead of the bottom."** First version simply prepended the new
+group's name to whichever of `entry.items`/`entry.pendingGroups` it
+touched -- worked for 2 EMPTY groups created in sequence, but a real
+live test (2 pre-existing empty groups, then a 3rd group created WITH
+items via the shift-click-multi-select-then-+Group auto-assign flow)
+exposed a real gap: the auto-assigned group still rendered at the
+BOTTOM, since `entry.pendingGroups` is unconditionally processed before/
+after `entry.items` regardless of which group was actually newest --
+array position within one queue says nothing about recency relative to
+the OTHER queue. Fixed properly with a new `entry.groupOrder` (an
+explicit creation-order priority list, prepended on EVERY group
+creation regardless of which underlying array it touches, consulted as
+a final re-sort pass in `renderListPickerRows()` over both queues'
+combined output) -- kept in sync on rename/remove (same pattern
+`pendingGroups` already uses) and cleared ENTIRELY the instant the user
+manually drags any group (`syncListPickerFromDom()`), since past that
+point the user's own new arrangement is the real source of truth and
+re-imposing a stale creation-order priority on top of it would silently
+undo their drag on the next unrelated re-render.
+
+Verified live: re-ran the exact sequence that exposed the bug (2 empty
+groups, then an auto-assigned 3rd) -- all 3 now render newest-first
+regardless of kind; a 4th, genuinely empty group (nothing selected)
+confirmed still lands at the very top too, with the originally-reported
+symptom (new groups landing at the bottom) fully resolved for every
+creation path. 0 console errors beyond the pre-existing, unrelated
+`api/save-settings` 404s.
+
+Also corrected a now-outdated standing note in `CLAUDE.md` itself
+(the "Double Click Hold Tween applies identically to every hand" note)
+rather than leaving it to silently mislead a future session -- kept as
+a cautionary record of the reversal, not deleted outright, per that same
+file's own "surface a material architectural change" discipline this
+exact situation exercised.
+
+Cache-buster bumps: `main.js`'s own `devpanel/devPanel.js?v=16` -> `?v=17`
+import, `index.html`'s own `main.js?v=106` -> `?v=107`.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================
