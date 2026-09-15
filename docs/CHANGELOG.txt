@@ -4237,6 +4237,66 @@ errors beyond the pre-existing, unrelated `api/save-settings` 404s.
 Cache-buster bump: `index.html`'s own `main.js?v=98` -> `?v=99`.
 
 --------------------------------------------------------------------------------
+2026-09-15  -  07:43:37 - 07:51:09 EDT (7m32s, measured)
+
+**Fixed: looping was disregarding the default pose. Added: a Loop Mode
+dropdown (Off/Loop/Oscillate) replacing chp/rchp's plain Loop
+checkbox.** Direct clarification of an earlier report: "when i said the
+looping disregards the first pose, i meant the default pose. All poses
+saved in tweens should be looped."
+
+**Root cause:** both Double Click Hold Tween's original Loop checkbox
+and chp/rchp's new one deliberately built their own cyclic sequence from
+`namedPoses` ONLY, excluding the default/anchor pose -- correct per an
+EARLIER request ("continue looping through the tween, not including the
+initial default pose"), but exactly backwards from what's now being
+asked. Fixed by pointing `loopPoses` at the SAME full sequence
+(`dcHoldTween.poses` / `trig.tweenPoses`, anchor included) the forward
+pass already plays, instead of a named-poses-only subset -- `lerpLoopSequence()`
+itself needed no change at all, since it was always generic over
+whatever array it's handed. Per-segment pacing (`loopSegmentMs`) is
+UNCHANGED on purpose: still divides by `namedPoses.length`, not the new
+one-longer `loopPoses.length`, since the forward pass's own segment
+count never changed -- keeping the same divisor keeps the loop's pace
+matching lap 1.
+
+**Direct follow-up, same conversation: "provide a checkbox under loop
+that is 'oscillate'... Instead of checkboxes actually, make it a drop
+down."** Replaced `${p}Loop` (checkbox) with `${p}LoopMode` (select:
+Off/Loop/Oscillate) on chp/rchp only -- Double Click Hold Tween's own
+separate Loop checkbox is unchanged, out of scope for this pass (not
+mentioned, and this whole exchange was specifically about the newer
+per-group Tween settings). New `lerpOscillateSequence()` plays a ping-
+pong/triangle wave through the same pose sequence Loop wraps through --
+bounces at each end instead of wrapping, delegating the actual pose lerp
+back to `lerpTweenSequence()` (position/segments is always a valid `t`
+in [0,1]) rather than duplicating its segment-index math. Its own
+`+ segments` phase shift is baked in, so the caller's raw elapsed-
+segments count (no `segments - 1` offset, unlike Loop) already starts
+exactly where the forward pass ended and immediately reverses.
+`updateClickHoldPoseForHand()`'s existing 'looping' phase now branches
+on `cfg[${p}LoopMode]` to pick which lerp function to call, rather than
+adding a whole separate phase.
+
+**Verified live via `window.__debug`,** using poses with genuinely
+different values to get a real discriminating signal (an earlier attempt
+using "Fist" as the test pose was a false negative -- this project's own
+current default pose happens to already equal "Fist" almost exactly, so
+nothing appeared to change; switched to "ThumbsUp", whose `curlIndex`
+(89) genuinely differs from default's (96)): Loop mode's `curlIndex` now
+oscillates between 89 and 96 across the sampled frames, confirming the
+default pose is genuinely part of the cycle. A 3-pose sequence
+(default -> ThumbsUp -> MiddleFinger) traced through `curlMiddle`
+(default/ThumbsUp both -89, MiddleFinger -1, a value that cleanly
+separates all 3) showed Oscillate's own signature ping-pong shape --
+dipping toward -1 then returning to -89 without ever jumping straight
+back from -1 to -89 the way a wrap would. "Off" mode re-confirmed
+unaffected (holds at final pose, releases cleanly to idle). 0 console
+errors beyond the pre-existing, unrelated `api/save-settings` 404s.
+
+Cache-buster bump: `index.html`'s own `main.js?v=99` -> `?v=100`.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

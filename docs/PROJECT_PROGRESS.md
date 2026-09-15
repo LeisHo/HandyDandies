@@ -206,25 +206,42 @@ unaffected. 0 new console errors. See CHANGELOG.txt's 9th 2026-09-15
 entry for the complete account.
 
 **Follow-up, same day: dedicated Tween Speed/Curve/Range trio + a Loop
-checkbox (chp/rchp only).** Direct correction: Tween mode had no visible
-speed control at all (it silently reused the hidden Pose Transition
-fields) -- "tween speed is different from pose transition speed,"
-confirmed via a clarifying question. Added `${p}TweenSpeedMs`/
-`TweenStartTimeCurve`/`TweenStartTimeRange` to all 5 groups as genuinely
-separate cfg keys (50-5000ms range, matching Double Click Hold Tween's
-own Tween Speed slider), and a Loop checkbox to Click Hold-Pose/Right-
-Click Hold-Pose only (ported Double Click Hold Tween's cyclic
-`lerpLoopSequence()` math via a new 'looping' phase) -- the other 3
-groups are fire-and-forget, no "held" state for a loop to run during.
-Caught a real bug before it ever ran live: the existing "still holding,
+Mode dropdown (Off/Loop/Oscillate, chp/rchp only).** Direct correction:
+Tween mode had no visible speed control at all (it silently reused the
+hidden Pose Transition fields) -- "tween speed is different from pose
+transition speed," confirmed via a clarifying question. Added
+`${p}TweenSpeedMs`/`TweenStartTimeCurve`/`TweenStartTimeRange` to all 5
+groups as genuinely separate cfg keys (50-5000ms range, matching Double
+Click Hold Tween's own Tween Speed slider).
+
+Loop went through 2 more rounds the same day. First, a plain Loop
+checkbox (Click Hold-Pose/Right-Click Hold-Pose only -- the other 3
+groups are fire-and-forget, no "held" state for a loop to run during),
+caught a real bug before it ever ran live (the existing "still holding,
 re-enter forward" guard would have restarted a looping hand from scratch
-every frame; fixed by excluding 'looping' from it too.
+every frame; fixed by excluding 'looping' from it too).
+
+**Then, direct clarification: "when i said the looping disregards the
+first pose, i meant the default pose. All poses saved in tweens should
+be looped."** Both Double Click Hold Tween's own original Loop and the
+new chp/rchp one had deliberately excluded the default/anchor pose from
+the cycle (correct per an EARLIER request, now reversed) -- fixed by
+reusing the SAME full sequence the forward pass already plays as the
+loop's own pose list. **Direct follow-up in the same exchange:** "provide
+a checkbox under loop that is 'oscillate'... make it a drop down" --
+replaced the checkbox with a `${p}LoopMode` select (Off/Loop/Oscillate);
+Oscillate is a new ping-pong/triangle-wave cycle (`lerpOscillateSequence()`)
+through the same sequence, bouncing at each end instead of wrapping.
 
 Verified live: Tween Speed genuinely decouples from Transition Speed
 (set Transition Speed to an absurd 999999ms, tween still progressed at
-the real Tween Speed pace); Loop cycles correctly for BOTH chp and rchp
-and releases cleanly to idle. See CHANGELOG.txt's 10th 2026-09-15 entry
-for the complete account.
+the real Tween Speed pace); using poses with genuinely different values
+(an earlier attempt was a false negative -- this project's own default
+pose happens to already equal "Fist" almost exactly), Loop's curlIndex
+now oscillates between the default and named pose's own real values,
+and a 3-pose Oscillate trace showed a clean ping-pong shape, distinct
+from Loop's wrap. "Off" mode re-confirmed unaffected. See CHANGELOG.txt's
+10th and 11th 2026-09-15 entries for the complete account.
 
 **The "thumb/finger pose looks wrong" saga -- 2 SEPARATE bugs found and
 fixed 2026-09-15, both verified live; awaiting the user's final
