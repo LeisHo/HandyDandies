@@ -1346,35 +1346,37 @@ function curlBiasWeight(jointIndex, jointCount, bias) {
 const _curlAxisScratch = new THREE.Vector3()
 const _splayAxisScratch = new THREE.Vector3()
 const _splay2AxisScratch = new THREE.Vector3()
-// CORRECTED 2026-09-14 -- the comment above this block (kept for its own
-// historical account) documents that using `baseQuat` alone was a
-// DELIBERATE port of HANDO's own convention -- and that convention turns
-// out to be anatomically wrong, not just here: the user independently
-// confirmed the identical symptom reproduces in HANDO itself. `baseQuat`
-// is the whole-hand's PRE-wrist orientation (alignQuat + Whole-Hand
-// Rotation only) -- it never includes the wrist bone's own current
-// bend/splay rotation. Every finger (not just the thumb -- see this same
-// day's earlier correction) is a descendant of the wrist bone (`rHand`,
-// via its own "carpal" bone), so a real hand's curl direction should
-// rotate WITH the wrist/palm, the same way closing your fist still closes
-// toward your OWN palm no matter how your wrist is bent. Using a
-// wrist-independent axis instead means the SAME curl % increasingly
-// "misses" the actual (bent/splayed) palm the further the wrist rotates
-// away from whatever it was at when a pose's curl values were originally
-// tuned by eye -- exactly matching "if I turn off responsive wrist splay,
-// it's fine" (extraSplay is always 0 there) and "every finger [is] less
-// curled" (every finger inherits this same axis convention, not just the
-// thumb). Fixed by reading the WRIST BONE's own current world rotation
-// (excluding `wrapperQuat`, same technique `rotateOnTrueWorldAxis()`
-// already uses) as the axis reference instead of the static `baseQuat` --
-// this already incorporates `baseQuat` as its own prefix (the wrist bone
-// is a descendant of the mesh clone that `baseQuat` orients), so nothing
-// about Whole-Hand Rotation's existing behavior is lost, only wrist
-// bend/splay awareness is added on top. Falls back to `baseQuat` alone if
-// the skeleton has no `rHand` bone (shouldn't happen on this rig, kept
-// only as a defensive no-op-change fallback).
+// CORRECTED 2026-09-14 (twice) -- the comment above this block (kept for
+// its own historical account) documents that using `baseQuat` alone was
+// a DELIBERATE port of HANDO's own convention -- and that convention
+// turned out to be anatomically wrong, not just here: the user
+// independently confirmed the identical symptom reproduces in HANDO
+// itself. `baseQuat` is the whole-hand's PRE-wrist orientation (alignQuat
+// + Whole-Hand Rotation only) -- it never includes the wrist bone's own
+// current bend/splay rotation. Every finger (not just the thumb -- see
+// this same day's earlier correction) is a descendant of the wrist bone
+// (`rHand`, via its own "carpal" bone), so a real hand's curl direction
+// should rotate WITH the wrist/palm.
+//
+// FIRST attempt at a fix (superseded, same day) read the wrist bone's
+// full WORLD quaternion and excluded `wrapperQuat` -- structurally sound
+// on its own, but the user's very next message asked to check HANDO's
+// own concurrent fix to the identical bug (found there via the same
+// cross-project clue that broke this whole saga open), for pose-export
+// compatibility. HANDO's fix (`applyCurlToSkeleton()`, HANDO's own
+// main.js) does NOT read a world quaternion -- it computes the wrist's
+// LOCAL delta-from-ITS-OWN-rest (`wristRestQuat^-1 * wristBone.quaternion`)
+// and composes that delta with `modelRoot.quaternion` (this project's
+// `baseQuat`), delta applied FIRST (wrist is the inner ancestor,
+// modelRoot the outer one). Directly measured: the 2 techniques are NOT
+// equivalent here -- `rHand`'s own rest quaternion is far from identity
+// ([-0.078, 0.688, -0.086, 0.716]), so the full-world-quaternion approach
+// and the delta-from-rest approach diverge by a measured 88.5 degrees for
+// the same wrist state. Switched to HANDO's exact technique so a pose
+// exported from HANDO and imported here poses identically, rather than
+// trusting 2 independently-derived "wrist-relative" fixes to coincide.
 const _curlAxisRefQuat = new THREE.Quaternion()
-const _curlAxisRefWrapperInv = new THREE.Quaternion()
+const _curlWristDeltaScratch = new THREE.Quaternion()
 // `values` (default `cfg`): lets a caller pose a DIFFERENT skeleton from a
 // plain values object instead of the live cfg -- added for the Pose
 // Preview mini-viewer (previewPosePreset(), below), which poses its own
@@ -1387,8 +1389,9 @@ function applyCurlToSkeleton(fingerName, skeleton, baseQuat, wrapperQuat, values
   const maxDegs = FINGER_MAX_DEG[fingerName]
   const sign = FINGER_SIGN[fingerName]
   const wristBoneForAxis = skeleton.getBoneByName('rHand')
-  const axisRefQuat = wristBoneForAxis
-    ? wristBoneForAxis.getWorldQuaternion(_curlAxisRefQuat).premultiply(_curlAxisRefWrapperInv.copy(wrapperQuat).invert())
+  const wristRestForAxis = boneRestQuat.rHand
+  const axisRefQuat = (wristBoneForAxis && wristRestForAxis)
+    ? _curlAxisRefQuat.copy(baseQuat).multiply(_curlWristDeltaScratch.copy(wristRestForAxis).invert().multiply(wristBoneForAxis.quaternion))
     : baseQuat
   const curlAxis = _curlAxisScratch.copy(FINGER_CURL_AXIS[fingerName]).applyQuaternion(axisRefQuat)
   const splayAxis = _splayAxisScratch.copy(FINGER_SPLAY_AXIS[fingerName]).applyQuaternion(axisRefQuat)
@@ -3482,7 +3485,7 @@ new GLTFLoader().load(
     modelLoaded = true
     rebuildField()
     buildPosePreview()
-    window.__debug = { THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS }
+    window.__debug = { THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS }
     loadingEl.classList.add('hidden')
   },
   undefined,
