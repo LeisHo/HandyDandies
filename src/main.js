@@ -553,6 +553,12 @@ const DEV_GROUPS = [
       },
       { key: 'rcTargetPose', label: 'Target Pose', type: 'select', def: '', options: () => (cfg.savedPoses || []).map((sp) => sp.name) },
       { key: 'rcTweenSelector', label: 'Tween Sequence', type: 'select', def: '', options: () => (cfg.savedTweenSequences || []).map((s) => s.name) },
+      // Tween's own SEPARATE speed/curve/range trio, added 2026-09-15 --
+      // see makeClickHoldPoseGroup()'s own matching comment for the full
+      // reasoning. No Loop checkbox -- Right Click is fire-and-forget.
+      { key: 'rcTweenSpeedMs', label: 'Tween Speed (Ms)', type: 'slider', min: 50, max: 5000, step: 10, def: 800 },
+      { key: 'rcTweenStartTimeCurve', label: 'Tween Start Time Curve (Distance -> Start Time)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickPoseConfig('rc') },
+      { key: 'rcTweenStartTimeRange', label: 'Tween Min / Max Start Time (Ms)', type: 'text', def: '{"min":0,"max":300}', onChange: () => parseClickPoseConfig('rc') },
       { key: 'rcTransitionSpeedMs', label: 'Pose Transition Speed (Ms)', type: 'slider', min: 0, max: 700, step: 10, def: 400 },
       { key: 'rcStartTimeCurve', label: 'Pose Transition Start Time Curve (Distance -> Start Time)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickPoseConfig('rc') },
       { key: 'rcStartTimeRange', label: 'Pose Transition Min / Max Start Time (Ms)', type: 'text', def: '{"min":0,"max":300}', onChange: () => parseClickPoseConfig('rc') },
@@ -1912,10 +1918,37 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       // and Hold Confirm Delay stay visible regardless of mode.
       {
         key: `${p}Mode`, label: 'Mode', type: 'select', def: 'Single Pose', options: () => ['Single Pose', 'Tween'],
-        onChange: () => updateClickTriggerModeVisibility(p, [])
+        onChange: () => updateClickTriggerModeVisibility(p, [], ['Loop'])
       },
       { key: `${p}TargetPose`, label: 'Target Pose', type: 'select', def: defaults.targetPose ?? '', options: () => (cfg.savedPoses || []).map((sp) => sp.name) },
       { key: `${p}TweenSelector`, label: 'Tween Sequence', type: 'select', def: '', options: () => (cfg.savedTweenSequences || []).map((s) => s.name) },
+      // Tween's own SEPARATE speed/curve/range trio -- direct correction
+      // ("tween speed is different from pose transition speed. For tween,
+      // also provide a set of the curve graph, min max, pos transition
+      // speed settings"): the Pose Transition trio below is Single-Pose-
+      // only (hidden under Tween, see updateClickTriggerModeVisibility()),
+      // so without this, Tween mode had no visible way to control its own
+      // playback pace at all -- it was silently reusing whatever
+      // TransitionSpeedMs/StartTimeCurve/StartTimeRange happened to be set
+      // to, invisibly. These are genuinely separate cfg keys/values, not
+      // an aliased view of the same 3 fields -- switching modes back and
+      // forth no longer means the 2 paces fight over one shared setting.
+      // Range/step/def match Double Click Hold Tween's own "Tween Speed
+      // (Ms)" slider (min 50, max 5000), not the 0-700 Pose Transition
+      // range -- a tween plays through MULTIPLE poses end to end, so it
+      // routinely needs more time than a single-pose transition does.
+      { key: `${p}TweenSpeedMs`, label: 'Tween Speed (Ms)', type: 'slider', min: 50, max: 5000, step: 10, def: 800 },
+      { key: `${p}TweenStartTimeCurve`, label: 'Tween Start Time Curve (Distance -> Start Time)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickHoldConfig(p) },
+      { key: `${p}TweenStartTimeRange`, label: 'Tween Min / Max Start Time (Ms)', type: 'text', def: '{"min":0,"max":300}', onChange: () => parseClickHoldConfig(p) },
+      // Loop -- direct follow-up request ("Add a Loop checkbox to
+      // chp/rchp only"), porting Double Click Hold Tween's own Loop
+      // checkbox to the 2 OTHER hold-based groups (Click Pose/Double-
+      // Click Pose/Right Click are fire-and-forget -- no "held" state for
+      // a loop to run during, so they don't get this). See
+      // updateClickHoldPoseForHand()'s own 'looping' phase for the
+      // mechanism (reuses lerpLoopSequence(), unchanged from Double Click
+      // Hold Tween's own).
+      { key: `${p}Loop`, label: 'Loop', type: 'checkbox', def: false },
       // Direct user report, 2026-09-15: "right after te click, the closest
       // hand seems to start some sort of animation transition, but stops
       // after a split second, then the click-pose function runs smoothly."
@@ -1973,6 +2006,16 @@ function makeClickPoseGroup(p, title, defaults = {}) {
       },
       { key: `${p}TargetPose`, label: 'Target Pose', type: 'select', def: defaults.targetPose ?? '', options: () => (cfg.savedPoses || []).map((sp) => sp.name) },
       { key: `${p}TweenSelector`, label: 'Tween Sequence', type: 'select', def: '', options: () => (cfg.savedTweenSequences || []).map((s) => s.name) },
+      // Tween's own SEPARATE speed/curve/range trio -- see
+      // makeClickHoldPoseGroup()'s own matching comment for the full
+      // reasoning (shared word-for-word). No Loop checkbox here -- Click
+      // Pose/Double-Click Pose/Right Click are fire-and-forget, not
+      // hold-based, so there's no "held" state for a loop to run during
+      // (direct clarification: Loop only ported to Click Hold-Pose/
+      // Right-Click Hold-Pose).
+      { key: `${p}TweenSpeedMs`, label: 'Tween Speed (Ms)', type: 'slider', min: 50, max: 5000, step: 10, def: 800 },
+      { key: `${p}TweenStartTimeCurve`, label: 'Tween Start Time Curve (Distance -> Start Time)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickPoseConfig(p) },
+      { key: `${p}TweenStartTimeRange`, label: 'Tween Min / Max Start Time (Ms)', type: 'text', def: '{"min":0,"max":300}', onChange: () => parseClickPoseConfig(p) },
       { key: `${p}TransitionSpeedMs`, label: 'Pose Transition Speed (Ms)', type: 'slider', min: 0, max: 700, step: 10, def: defaults.transitionSpeedMs ?? 400 },
       { key: `${p}StartTimeCurve`, label: 'Pose Transition Start Time Curve (Distance -> Start Time)', type: 'text', def: defaults.startTimeCurve ?? '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickPoseConfig(p) },
       { key: `${p}StartTimeRange`, label: 'Pose Transition Min / Max Start Time (Ms)', type: 'text', def: defaults.startTimeRange ?? '{"min":0,"max":300}', onChange: () => parseClickPoseConfig(p) },
@@ -3031,20 +3074,25 @@ function buildWristSplayCurveWidget(row) {
 // whatever the shared cfg sliders currently say throughout the hold.
 const CLICK_HOLD_KEYS = ['chp', 'rchp']
 const clickHoldPoseTriggers = {
-  chp: { active: false, holdStartTime: 0, forwardSnapshot: null, tweenPoses: null, startCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], startRangeParsed: { min: 0, max: 300 }, retransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionRangeParsed: { min: 0, max: 300 } },
-  rchp: { active: false, holdStartTime: 0, forwardSnapshot: null, tweenPoses: null, startCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], startRangeParsed: { min: 0, max: 300 }, retransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionRangeParsed: { min: 0, max: 300 } }
+  chp: { active: false, holdStartTime: 0, forwardSnapshot: null, tweenPoses: null, loopPoses: null, loopSegmentMs: 1, startCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], startRangeParsed: { min: 0, max: 300 }, tweenStartCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStartRangeParsed: { min: 0, max: 300 }, retransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionRangeParsed: { min: 0, max: 300 } },
+  rchp: { active: false, holdStartTime: 0, forwardSnapshot: null, tweenPoses: null, loopPoses: null, loopSegmentMs: 1, startCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], startRangeParsed: { min: 0, max: 300 }, tweenStartCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStartRangeParsed: { min: 0, max: 300 }, retransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionRangeParsed: { min: 0, max: 300 } }
 }
 function parseClickHoldConfig(p) {
   const t = clickHoldPoseTriggers[p]
   try { t.startCurveParsed = JSON.parse(cfg[`${p}StartTimeCurve`]).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
   try { t.startRangeParsed = JSON.parse(cfg[`${p}StartTimeRange`]) } catch (e) { /* keep last-good value */ }
+  // Tween's own separate start-time curve/range -- see
+  // makeClickHoldPoseGroup()'s own comment for why this is a genuinely
+  // distinct pair, not an alias of the 2 lines above.
+  try { t.tweenStartCurveParsed = JSON.parse(cfg[`${p}TweenStartTimeCurve`]).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
+  try { t.tweenStartRangeParsed = JSON.parse(cfg[`${p}TweenStartTimeRange`]) } catch (e) { /* keep last-good value */ }
   try { t.retransitionCurveParsed = JSON.parse(cfg[`${p}RetransitionStartTimeCurve`]).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
   try { t.retransitionRangeParsed = JSON.parse(cfg[`${p}RetransitionStartTimeRange`]) } catch (e) { /* keep last-good value */ }
 }
 function getOrInitHandCHP(hand) {
   if (!hand._chp) {
     hand._chp = {}
-    CLICK_HOLD_KEYS.forEach((p) => { hand._chp[p] = { phase: 'idle', forwardDelay: 0, retransitionDelay: 0, retransitionStart: null, retransitionStartTime: 0, lastAppliedValues: null, frozenSplayDeg: 0 } })
+    CLICK_HOLD_KEYS.forEach((p) => { hand._chp[p] = { phase: 'idle', forwardDelay: 0, loopStartTime: 0, retransitionDelay: 0, retransitionStart: null, retransitionStartTime: 0, lastAppliedValues: null, frozenSplayDeg: 0 } })
   }
   return hand._chp
 }
@@ -3216,7 +3264,12 @@ function computeStartDelayMs(distanceToCursor, minLiveDist, liveDistRange, curve
 function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) {
   const trig = clickHoldPoseTriggers[p]
   const chp = getOrInitHandCHP(hand)[p]
-  if (trig.active && chp.phase !== 'forward') {
+  // `chp.phase !== 'looping'` added alongside Loop above -- without it,
+  // a still-held hand that already advanced into 'looping' would hit
+  // this branch every subsequent frame (phase isn't 'forward', and
+  // trig.active is still true) and get yanked straight back to a fresh
+  // 'forward' start, restarting the tween from scratch on a loop.
+  if (trig.active && chp.phase !== 'forward' && chp.phase !== 'looping') {
     // Refuse to leave 'idle' until the hold has genuinely been sustained
     // past HoldConfirmMs -- see this group's own control comment
     // (makeClickHoldPoseGroup()) for the full "quick click flashed the
@@ -3237,8 +3290,14 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     // frozenSplayDeg is captured the same way, for the same reason --
     // see this section's own top note on why Responsive Wrist Splay
     // must NOT keep recomputing live throughout a pose transition.
+    // Tween mode's own start-time curve/range (see makeClickHoldPoseGroup()'s
+    // comment) is a SEPARATE pair from Single Pose's -- picked here,
+    // once, same as everything else this block locks in at hold-start.
+    const isTweenStart = cfg[`${p}Mode`] === 'Tween'
     chp.phase = 'forward'
-    chp.forwardDelay = computeStartDelayMs(live, minLiveDist, liveDistRange, trig.startCurveParsed, trig.startRangeParsed)
+    chp.forwardDelay = isTweenStart
+      ? computeStartDelayMs(live, minLiveDist, liveDistRange, trig.tweenStartCurveParsed, trig.tweenStartRangeParsed)
+      : computeStartDelayMs(live, minLiveDist, liveDistRange, trig.startCurveParsed, trig.startRangeParsed)
     chp.frozenSplayDeg = computeResponsiveWristSplayDeg(live, minLiveDist, liveDistRange)
   }
   if (chp.phase === 'forward') {
@@ -3247,20 +3306,45 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     // startClickHoldPose()), shared by every hand exactly like
     // `trig.forwardSnapshot` already was; only each hand's own forward
     // delay/frozen splay stay per-hand-staggered, unchanged from Single
-    // Pose mode.
+    // Pose mode. Uses its own separate `${p}TweenSpeedMs`, not
+    // `${p}TransitionSpeedMs` -- see makeClickHoldPoseGroup()'s comment.
     const isTween = cfg[`${p}Mode`] === 'Tween'
     const elapsed = now - trig.holdStartTime
-    const speedMs = Math.max(cfg[`${p}TransitionSpeedMs`], 1)
+    const speedMs = Math.max(cfg[isTween ? `${p}TweenSpeedMs` : `${p}TransitionSpeedMs`], 1)
     const progress = elapsed < chp.forwardDelay ? 0 : THREE.MathUtils.clamp((elapsed - chp.forwardDelay) / speedMs, 0, 1)
     let values
     if (isTween) {
       if (!trig.tweenPoses || trig.tweenPoses.length < 2) return // nothing selected -- leave this hand's pose untouched
       values = lerpTweenSequence(trig.tweenPoses, progress)
+      // Loop -- direct follow-up request, ported from Double Click Hold
+      // Tween's own Loop checkbox (see lerpLoopSequence()'s own comment
+      // for the segment-offset math). Only engages once the initial
+      // forward pass genuinely completes AND there are >=2 named poses
+      // to cycle through (a 1-pose "sequence" has no meaningful loop).
+      if (progress >= 1 && cfg[`${p}Loop`] && trig.loopPoses && trig.loopPoses.length >= 2) {
+        chp.phase = 'looping'
+        chp.loopStartTime = now
+      }
     } else {
       const targetPose = (cfg.savedPoses || []).find((sp) => sp.name === cfg[`${p}TargetPose`])
       if (!targetPose || !trig.forwardSnapshot) return // nothing selected / nothing to transition FROM yet -- leave this hand's pose untouched
       values = lerpPoseValues(trig.forwardSnapshot, targetPose, progress)
     }
+    chp.lastAppliedValues = values
+    applyPoseValuesToHand(hand, values, chp.frozenSplayDeg)
+  } else if (chp.phase === 'looping') {
+    // Continues for as long as the hold lasts -- same cyclic math and
+    // same "start at the WRAP segment, not segment 0" reasoning as
+    // Double Click Hold Tween's own 'looping' phase (see
+    // updateDoubleClickHoldTween()'s own comment): the forward pass just
+    // ended exactly at the last named pose, so starting the cycle at
+    // `loopPoses[0]` would jump backward. `endClickHoldPose()` reads
+    // `chp.lastAppliedValues` the same way regardless of whether release
+    // happens during 'forward' or 'looping' -- no separate release
+    // handling needed for this phase.
+    const segments = trig.loopPoses.length
+    const tCyclic = (segments - 1) + (now - chp.loopStartTime) / trig.loopSegmentMs
+    const values = lerpLoopSequence(trig.loopPoses, tCyclic)
     chp.lastAppliedValues = values
     applyPoseValuesToHand(hand, values, chp.frozenSplayDeg)
   } else if (chp.phase === 'retransition') {
@@ -3291,8 +3375,19 @@ function startClickHoldPose(p) {
     const seq = (cfg.savedTweenSequences || []).find((s) => s.name === cfg[`${p}TweenSelector`])
     const namedPoses = seq ? resolveTweenSequencePoses(seq.tweenPoses) : []
     trig.tweenPoses = namedPoses.length >= 1 ? [trig.forwardSnapshot, ...namedPoses] : null
+    // Loop's own cyclic sequence -- named poses ONLY (never re-including
+    // the live snapshot the forward pass started from), same convention
+    // as Double Click Hold Tween's own `loopPoses`/`loopSegmentMs` (see
+    // startDoubleClickHoldTween()'s own comment) -- paced by this SAME
+    // hold's `${p}TweenSpeedMs`, divided across the named poses, so
+    // looping doesn't visibly speed up/slow down relative to lap 1.
+    // Computed regardless of whether Loop is actually checked (harmless)
+    // -- only consulted from updateClickHoldPoseForHand() when it is.
+    trig.loopPoses = namedPoses
+    trig.loopSegmentMs = Math.max(cfg[`${p}TweenSpeedMs`] / Math.max(namedPoses.length, 1), 1)
   } else {
     trig.tweenPoses = null
+    trig.loopPoses = null
   }
   // Direct request: "When a click and hold is occurring, during the
   // hold, moving the cursor should not trigger any panning. Instead, it
@@ -3453,14 +3548,19 @@ window.addEventListener('blur', () => { endClickHoldPose('chp'); endClickHoldPos
 // own comment for how the 2 modes share this same phase machine.
 const CLICK_POSE_KEYS = ['click', 'dblclick', 'rc']
 const clickPoseTriggers = {
-  click: { startCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], startRangeParsed: { min: 0, max: 300 }, retransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionRangeParsed: { min: 0, max: 300 } },
-  dblclick: { startCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], startRangeParsed: { min: 0, max: 300 }, retransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionRangeParsed: { min: 0, max: 300 } },
-  rc: { startCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], startRangeParsed: { min: 0, max: 300 }, retransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionRangeParsed: { min: 0, max: 300 } }
+  click: { startCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], startRangeParsed: { min: 0, max: 300 }, tweenStartCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStartRangeParsed: { min: 0, max: 300 }, retransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionRangeParsed: { min: 0, max: 300 } },
+  dblclick: { startCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], startRangeParsed: { min: 0, max: 300 }, tweenStartCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStartRangeParsed: { min: 0, max: 300 }, retransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionRangeParsed: { min: 0, max: 300 } },
+  rc: { startCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], startRangeParsed: { min: 0, max: 300 }, tweenStartCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStartRangeParsed: { min: 0, max: 300 }, retransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionRangeParsed: { min: 0, max: 300 } }
 }
 function parseClickPoseConfig(p) {
   const t = clickPoseTriggers[p]
   try { t.startCurveParsed = JSON.parse(cfg[`${p}StartTimeCurve`]).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
   try { t.startRangeParsed = JSON.parse(cfg[`${p}StartTimeRange`]) } catch (e) { /* keep last-good value */ }
+  // Tween's own separate start-time curve/range -- see
+  // makeClickHoldPoseGroup()'s own comment for why this is a genuinely
+  // distinct pair, not an alias of the 2 lines above.
+  try { t.tweenStartCurveParsed = JSON.parse(cfg[`${p}TweenStartTimeCurve`]).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
+  try { t.tweenStartRangeParsed = JSON.parse(cfg[`${p}TweenStartTimeRange`]) } catch (e) { /* keep last-good value */ }
   try { t.retransitionCurveParsed = JSON.parse(cfg[`${p}RetransitionStartTimeCurve`]).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
   try { t.retransitionRangeParsed = JSON.parse(cfg[`${p}RetransitionStartTimeRange`]) } catch (e) { /* keep last-good value */ }
 }
@@ -3485,7 +3585,10 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
   const isTween = cfg[`${p}Mode`] === 'Tween'
   if (cp.phase === 'forward') {
     const elapsed = now - cp.triggerTime
-    const speedMs = Math.max(cfg[`${p}TransitionSpeedMs`], 1)
+    // Tween's own separate `${p}TweenSpeedMs`, not `${p}TransitionSpeedMs`
+    // -- see makeClickHoldPoseGroup()'s own comment for why these are 2
+    // genuinely distinct values, not an aliased view of one field.
+    const speedMs = Math.max(cfg[isTween ? `${p}TweenSpeedMs` : `${p}TransitionSpeedMs`], 1)
     const progress = elapsed < cp.forwardDelay ? 0 : THREE.MathUtils.clamp((elapsed - cp.forwardDelay) / speedMs, 0, 1)
     let values
     if (isTween) {
@@ -3547,8 +3650,9 @@ function triggerClickPose(p) {
   // way Double Click Hold Tween's own sequence always starts from
   // default) keeps this consistent with Single Pose mode's own "transition
   // from wherever the hand currently is," not a hardcoded default.
+  const isTween = cfg[`${p}Mode`] === 'Tween'
   let tweenPoses = null
-  if (cfg[`${p}Mode`] === 'Tween') {
+  if (isTween) {
     const seq = (cfg.savedTweenSequences || []).find((s) => s.name === cfg[`${p}TweenSelector`])
     const namedPoses = seq ? resolveTweenSequencePoses(seq.tweenPoses) : []
     if (namedPoses.length >= 1) tweenPoses = [forwardSnapshot, ...namedPoses]
@@ -3567,7 +3671,12 @@ function triggerClickPose(p) {
     cp.triggerTime = now
     cp.forwardSnapshot = forwardSnapshot
     cp.tweenPoses = tweenPoses
-    cp.forwardDelay = computeStartDelayMs(dists[i], minD, range, trig.startCurveParsed, trig.startRangeParsed)
+    // Tween's own separate start-time curve/range (see
+    // makeClickHoldPoseGroup()'s own comment) -- picked once here, same
+    // timing as forwardSnapshot/tweenPoses above.
+    cp.forwardDelay = isTween
+      ? computeStartDelayMs(dists[i], minD, range, trig.tweenStartCurveParsed, trig.tweenStartRangeParsed)
+      : computeStartDelayMs(dists[i], minD, range, trig.startCurveParsed, trig.startRangeParsed)
     // Frozen for this hand's entire sequence (forward/paused/
     // retransition) -- see updateClickHoldPoseForHand()'s own top
     // comment for why Responsive Wrist Splay must not keep recomputing
@@ -3979,11 +4088,18 @@ const CLICK_HOLD_START_TIME_TRACK_MAX = 3000 // ms -- a deliberately smaller cei
 function buildClickHoldPoseWidgets(p) {
   const startCurveRow = document.querySelector(`.dp-row[data-key="${p}StartTimeCurve"]`)
   const startRangeRow = document.querySelector(`.dp-row[data-key="${p}StartTimeRange"]`)
+  const tweenStartCurveRow = document.querySelector(`.dp-row[data-key="${p}TweenStartTimeCurve"]`)
+  const tweenStartRangeRow = document.querySelector(`.dp-row[data-key="${p}TweenStartTimeRange"]`)
   const retransCurveRow = document.querySelector(`.dp-row[data-key="${p}RetransitionStartTimeCurve"]`)
   const retransRangeRow = document.querySelector(`.dp-row[data-key="${p}RetransitionStartTimeRange"]`)
   const curveCaption = 'X: Distance From Cursor (%, Nearest→Farthest Hand At Trigger Time)  ·  Y: Start Time Fraction (0=Min, 1=Max)'
   if (startCurveRow) buildGenericCurveWidget(startCurveRow, { caption: curveCaption, defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
   if (startRangeRow) buildGenericRangeBarWidget(startRangeRow, { trackMin: 0, trackMax: CLICK_HOLD_START_TIME_TRACK_MAX, unit: 'ms', defaultValue: { min: 0, max: 300 } })
+  // Tween's own separate curve/range widgets -- same shape/caption/track
+  // ceiling as Single Pose's, just a genuinely distinct control (see
+  // makeClickHoldPoseGroup()'s own comment).
+  if (tweenStartCurveRow) buildGenericCurveWidget(tweenStartCurveRow, { caption: curveCaption, defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
+  if (tweenStartRangeRow) buildGenericRangeBarWidget(tweenStartRangeRow, { trackMin: 0, trackMax: CLICK_HOLD_START_TIME_TRACK_MAX, unit: 'ms', defaultValue: { min: 0, max: 300 } })
   if (retransCurveRow) buildGenericCurveWidget(retransCurveRow, { caption: curveCaption, defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
   if (retransRangeRow) buildGenericRangeBarWidget(retransRangeRow, { trackMin: 0, trackMax: CLICK_HOLD_START_TIME_TRACK_MAX, unit: 'ms', defaultValue: { min: 0, max: 300 } })
 }
@@ -3992,19 +4108,23 @@ function buildClickHoldPoseWidgets(p) {
 // clickHoldPoseTriggers (declared just above) to already exist, and that
 // const isn't hoisted the way a function declaration is.
 CLICK_HOLD_KEYS.forEach((p) => { parseClickHoldConfig(p); buildClickHoldPoseWidgets(p) })
-// Same 4-widget shape as buildClickHoldPoseWidgets() above (this feature
-// has no widgets of its own beyond the plain Pause Duration slider,
-// which needs no custom widget) -- reuses the SAME
+// Same widget shape as buildClickHoldPoseWidgets() above (this feature
+// has no widgets of its own beyond the plain Pause Duration/Tween Speed/
+// Loop controls, which need no custom widget) -- reuses the SAME
 // CLICK_HOLD_START_TIME_TRACK_MAX ceiling too, since "start time" means
 // the identical thing in both features.
 function buildClickPoseWidgets(p) {
   const startCurveRow = document.querySelector(`.dp-row[data-key="${p}StartTimeCurve"]`)
   const startRangeRow = document.querySelector(`.dp-row[data-key="${p}StartTimeRange"]`)
+  const tweenStartCurveRow = document.querySelector(`.dp-row[data-key="${p}TweenStartTimeCurve"]`)
+  const tweenStartRangeRow = document.querySelector(`.dp-row[data-key="${p}TweenStartTimeRange"]`)
   const retransCurveRow = document.querySelector(`.dp-row[data-key="${p}RetransitionStartTimeCurve"]`)
   const retransRangeRow = document.querySelector(`.dp-row[data-key="${p}RetransitionStartTimeRange"]`)
   const curveCaption = 'X: Distance From Cursor (%, Nearest→Farthest Hand At Trigger Time)  ·  Y: Start Time Fraction (0=Min, 1=Max)'
   if (startCurveRow) buildGenericCurveWidget(startCurveRow, { caption: curveCaption, defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
   if (startRangeRow) buildGenericRangeBarWidget(startRangeRow, { trackMin: 0, trackMax: CLICK_HOLD_START_TIME_TRACK_MAX, unit: 'ms', defaultValue: { min: 0, max: 300 } })
+  if (tweenStartCurveRow) buildGenericCurveWidget(tweenStartCurveRow, { caption: curveCaption, defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
+  if (tweenStartRangeRow) buildGenericRangeBarWidget(tweenStartRangeRow, { trackMin: 0, trackMax: CLICK_HOLD_START_TIME_TRACK_MAX, unit: 'ms', defaultValue: { min: 0, max: 300 } })
   if (retransCurveRow) buildGenericCurveWidget(retransCurveRow, { caption: curveCaption, defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
   if (retransRangeRow) buildGenericRangeBarWidget(retransRangeRow, { trackMin: 0, trackMax: CLICK_HOLD_START_TIME_TRACK_MAX, unit: 'ms', defaultValue: { min: 0, max: 300 } })
 }
@@ -4028,9 +4148,17 @@ function buildClickPoseWidgets(p) {
 // actually held) -- pass `[]` for those. Enabled, Mode, and (for the
 // Hold-Pose family) Hold Confirm Delay stay visible regardless of mode --
 // none of those describe posing TO a specific target, single or tweened.
-function updateClickTriggerModeVisibility(p, extraSinglePoseKeys) {
+// `extraTweenKeys` is the Tween-side mirror, currently only Loop (Click
+// Hold-Pose/Right-Click Hold-Pose only -- Click Pose/Double-Click Pose/
+// Right Click are fire-and-forget, no "held" state for a loop to run
+// during, so they're always called with `[]` here).
+function updateClickTriggerModeVisibility(p, extraSinglePoseKeys, extraTweenKeys = []) {
   const mode = cfg[`${p}Mode`]
   const singlePoseKeys = ['TargetPose', 'TransitionSpeedMs', 'StartTimeCurve', 'StartTimeRange', ...extraSinglePoseKeys, 'RetransitionSpeedMs', 'RetransitionStartTimeCurve', 'RetransitionStartTimeRange']
+  // Tween's own dedicated speed/curve/range trio (see
+  // makeClickHoldPoseGroup()'s own comment for why these are separate
+  // fields from the Single Pose trio above, not just hidden duplicates).
+  const tweenKeys = ['TweenSelector', 'TweenSpeedMs', 'TweenStartTimeCurve', 'TweenStartTimeRange', ...extraTweenKeys]
   // Inline style, not the `hidden` attribute -- devPanel.js's own
   // `.dp-row { display: flex }` stylesheet rule (style.css) is an author
   // rule, which wins the cascade over the UA stylesheet's `[hidden] {
@@ -4040,8 +4168,10 @@ function updateClickTriggerModeVisibility(p, extraSinglePoseKeys) {
     const row = document.querySelector(`.dp-row[data-key="${p}${suffix}"]`)
     if (row) row.style.display = mode !== 'Single Pose' ? 'none' : ''
   })
-  const tweenRow = document.querySelector(`.dp-row[data-key="${p}TweenSelector"]`)
-  if (tweenRow) tweenRow.style.display = mode !== 'Tween' ? 'none' : ''
+  tweenKeys.forEach((suffix) => {
+    const row = document.querySelector(`.dp-row[data-key="${p}${suffix}"]`)
+    if (row) row.style.display = mode !== 'Tween' ? 'none' : ''
+  })
 }
 CLICK_POSE_KEYS.forEach((p) => { parseClickPoseConfig(p); buildClickPoseWidgets(p) })
 // Every Click-family group's own Mode dropdown (Single Pose vs. Tween) --
@@ -4051,7 +4181,7 @@ CLICK_POSE_KEYS.forEach((p) => { parseClickPoseConfig(p); buildClickPoseWidgets(
 // that. Click Pose/Double-Click Pose/Right Click share CLICK_POSE_KEYS'
 // own Pause Duration slider; Click Hold-Pose/Right-Click Hold-Pose don't.
 CLICK_POSE_KEYS.forEach((p) => updateClickTriggerModeVisibility(p, ['PauseDurationMs']))
-CLICK_HOLD_KEYS.forEach((p) => updateClickTriggerModeVisibility(p, []))
+CLICK_HOLD_KEYS.forEach((p) => updateClickTriggerModeVisibility(p, [], ['Loop']))
 // Bug fix (direct user report, "I dont see any of the saved poses in the
 // dropdown"): a `select` control's <option> list is populated by
 // `displayValue()` during the host's own restore-from-storage step
