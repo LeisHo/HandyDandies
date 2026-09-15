@@ -269,24 +269,28 @@ const DEV_GROUPS = [
       { key: 'splayIndex2', label: 'Index 2nd Segment Splay (%)', type: 'slider', min: -200, max: 200, step: 1, def: 72, onChange: () => applyCurl('index') },
       { key: 'curlBiasIndex', label: 'Index Curl Bias (Base <-> Tip) (%)', type: 'slider', min: -100, max: 100, step: 1, def: -7, onChange: () => applyCurl('index') },
       { key: 'baseOnlyCurlIndex', label: 'Index Base-Only Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('index') },
+      { key: 'tipOnlyCurlIndex', label: 'Index Tip-Only Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('index') },
       { key: 'tipTwistIndex', label: 'Index Tip Twist (%)', type: 'slider', min: -100, max: 100, step: 1, def: 1, onChange: () => applyCurl('index') },
       { key: 'curlMiddle', label: 'Middle Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: -89, lockRange: true, onChange: () => applyCurl('middle') },
       { key: 'splayMiddle', label: 'Middle Splay (%)', type: 'slider', min: -200, max: 200, step: 1, def: -14, onChange: () => applyCurl('middle') },
       { key: 'splayMiddle2', label: 'Middle 2nd Segment Splay (%)', type: 'slider', min: -200, max: 200, step: 1, def: -13, onChange: () => applyCurl('middle') },
       { key: 'curlBiasMiddle', label: 'Middle Curl Bias (Base <-> Tip) (%)', type: 'slider', min: -100, max: 100, step: 1, def: 10, onChange: () => applyCurl('middle') },
       { key: 'baseOnlyCurlMiddle', label: 'Middle Base-Only Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('middle') },
+      { key: 'tipOnlyCurlMiddle', label: 'Middle Tip-Only Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('middle') },
       { key: 'tipTwistMiddle', label: 'Middle Tip Twist (%)', type: 'slider', min: -100, max: 100, step: 1, def: -5, onChange: () => applyCurl('middle') },
       { key: 'curlRing', label: 'Ring Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: -95, lockRange: true, onChange: () => applyCurl('ring') },
       { key: 'splayRing', label: 'Ring Splay (%)', type: 'slider', min: -200, max: 200, step: 1, def: 37, onChange: () => applyCurl('ring') },
       { key: 'splayRing2', label: 'Ring 2nd Segment Splay (%)', type: 'slider', min: -200, max: 200, step: 1, def: -32, onChange: () => applyCurl('ring') },
       { key: 'curlBiasRing', label: 'Ring Curl Bias (Base <-> Tip) (%)', type: 'slider', min: -100, max: 100, step: 1, def: -3, onChange: () => applyCurl('ring') },
       { key: 'baseOnlyCurlRing', label: 'Ring Base-Only Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('ring') },
+      { key: 'tipOnlyCurlRing', label: 'Ring Tip-Only Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('ring') },
       { key: 'tipTwistRing', label: 'Ring Tip Twist (%)', type: 'slider', min: -100, max: 100, step: 1, def: -5, onChange: () => applyCurl('ring') },
       { key: 'curlPinky', label: 'Pinky Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 89, lockRange: true, onChange: () => applyCurl('pinky') },
       { key: 'splayPinky', label: 'Pinky Splay (%)', type: 'slider', min: -200, max: 200, step: 1, def: -82, onChange: () => applyCurl('pinky') },
       { key: 'splayPinky2', label: 'Pinky 2nd Segment Splay (%)', type: 'slider', min: -200, max: 200, step: 1, def: 33, onChange: () => applyCurl('pinky') },
       { key: 'curlBiasPinky', label: 'Pinky Curl Bias (Base <-> Tip) (%)', type: 'slider', min: -100, max: 100, step: 1, def: 6, onChange: () => applyCurl('pinky') },
       { key: 'baseOnlyCurlPinky', label: 'Pinky Base-Only Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('pinky') },
+      { key: 'tipOnlyCurlPinky', label: 'Pinky Tip-Only Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('pinky') },
       { key: 'tipTwistPinky', label: 'Pinky Tip Twist (%)', type: 'slider', min: -100, max: 100, step: 1, def: -3, onChange: () => applyCurl('pinky') },
       { key: 'wristBend', label: 'Wrist Bend (Deg)', type: 'slider', min: -90, max: 90, step: 1, def: 0, onChange: () => applyWristPose() },
       { key: 'wristSplay', label: 'Wrist Splay (Deg)', type: 'slider', min: -30, max: 30, step: 1, def: -1, onChange: () => applyWristPose() },
@@ -648,10 +652,10 @@ DEV_GROUPS.forEach((g) => g.controls.forEach((c) => {
 const POSE_SUBGROUP_SPECS = [
   { title: 'Whole-Hand Rotation & Thumb', collapsed: true, keys: ['modelRotX', 'modelRotY', 'modelRotZ', 'thumbCurl', 'thumbSplay', 'thumbSplay2', 'tipTwistThumb', 'curlBiasThumb', 'baseOnlyCurlThumb'] },
   { title: 'Wrist', collapsed: true, keys: ['wristBend', 'wristSplay'] },
-  { title: 'Index', collapsed: true, keys: ['curlIndex', 'tipTwistIndex', 'splayIndex', 'curlBiasIndex', 'splayIndex2', 'baseOnlyCurlIndex'] },
-  { title: 'Middle', collapsed: true, keys: ['curlMiddle', 'tipTwistMiddle', 'splayMiddle', 'curlBiasMiddle', 'splayMiddle2', 'baseOnlyCurlMiddle'] },
-  { title: 'Ring', collapsed: true, keys: ['curlRing', 'tipTwistRing', 'splayRing', 'curlBiasRing', 'splayRing2', 'baseOnlyCurlRing'] },
-  { title: 'Pinky', collapsed: true, keys: ['curlPinky', 'tipTwistPinky', 'curlBiasPinky', 'splayPinky', 'splayPinky2', 'baseOnlyCurlPinky'] },
+  { title: 'Index', collapsed: true, keys: ['curlIndex', 'tipTwistIndex', 'splayIndex', 'curlBiasIndex', 'splayIndex2', 'baseOnlyCurlIndex', 'tipOnlyCurlIndex'] },
+  { title: 'Middle', collapsed: true, keys: ['curlMiddle', 'tipTwistMiddle', 'splayMiddle', 'curlBiasMiddle', 'splayMiddle2', 'baseOnlyCurlMiddle', 'tipOnlyCurlMiddle'] },
+  { title: 'Ring', collapsed: true, keys: ['curlRing', 'tipTwistRing', 'splayRing', 'curlBiasRing', 'splayRing2', 'baseOnlyCurlRing', 'tipOnlyCurlRing'] },
+  { title: 'Pinky', collapsed: true, keys: ['curlPinky', 'tipTwistPinky', 'curlBiasPinky', 'splayPinky', 'splayPinky2', 'baseOnlyCurlPinky', 'tipOnlyCurlPinky'] },
 ]
 const cfg = initDevPanel(DEV_GROUPS, {
   storageKeyPrefix: 'handyDandies',
@@ -1281,6 +1285,13 @@ const FINGER_CURL_BIAS_KEY = { thumb: 'curlBiasThumb', index: 'curlBiasIndex', m
 // base-joint-only, same mechanism HANDO itself uses).
 const FINGER_TIP_TWIST_KEY = { thumb: 'tipTwistThumb', index: 'tipTwistIndex', middle: 'tipTwistMiddle', ring: 'tipTwistRing', pinky: 'tipTwistPinky' }
 const FINGER_BASE_ONLY_CURL_KEY = { thumb: 'baseOnlyCurlThumb', index: 'baseOnlyCurlIndex', middle: 'baseOnlyCurlMiddle', ring: 'baseOnlyCurlRing', pinky: 'baseOnlyCurlPinky' }
+// Ported from HANDO (found while checking HANDO's own recent changes for
+// pose-export compatibility, direct request: "make sure you two are
+// matching since i will be exporting poses from hando") -- the mirror of
+// Base-Only Curl above, targeting the LAST joint instead of joint 0. No
+// thumb entry, matching HANDO's own scope exactly (HANDO's own comment:
+// "tipOnlyCurlT is 0 for the thumb (no key defined)").
+const FINGER_TIP_ONLY_CURL_KEY = { index: 'tipOnlyCurlIndex', middle: 'tipOnlyCurlMiddle', ring: 'tipOnlyCurlRing', pinky: 'tipOnlyCurlPinky' }
 const FINGER_TIP_TWIST_MAX_DEG = 90
 
 // Converts a rotation expressed around a WORLD axis into the correct LOCAL
@@ -1403,6 +1414,12 @@ function applyCurlToSkeleton(fingerName, skeleton, baseQuat, wrapperQuat, values
   // (or one that simply never set it) has no baseOnlyCurl* entry at all
   // -- treated as 0 (no additive base bend), not NaN.
   const baseOnlyCurlT = (values[FINGER_BASE_ONLY_CURL_KEY[fingerName]] || 0) / 100
+  // `|| 0` fallback, same reasoning as baseOnlyCurlT above. `tipOnlyCurlKey`
+  // is undefined for the thumb (no entry in FINGER_TIP_ONLY_CURL_KEY),
+  // matching HANDO's own scope -- `values[undefined]` is safely undefined,
+  // falling back to 0 the same way.
+  const tipOnlyCurlKey = FINGER_TIP_ONLY_CURL_KEY[fingerName]
+  const tipOnlyCurlT = ((tipOnlyCurlKey && values[tipOnlyCurlKey]) || 0) / 100
   const splayAngle = FINGER_SPLAY_SIGN[fingerName] * THREE.MathUtils.degToRad(FINGER_SPLAY_MAX_DEG[fingerName] * splayT)
   const splayJointIndex = FINGER_SPLAY_JOINT_INDEX[fingerName]
   const splay2JointIndex = FINGER_SPLAY2_JOINT_INDEX[fingerName]
@@ -1440,6 +1457,16 @@ function applyCurlToSkeleton(fingerName, skeleton, baseQuat, wrapperQuat, values
     if (i === 0) {
       const baseOnlyAngle = sign * THREE.MathUtils.degToRad(maxDegs[0] * baseOnlyCurlT)
       rotateOnTrueWorldAxis(bone, curlAxis, baseOnlyAngle, wrapperQuat)
+      bone.updateMatrixWorld(true)
+    }
+    // Tip-Only Curl (ported from HANDO, same day as Base-Only Curl's own
+    // port -- see FINGER_TIP_ONLY_CURL_KEY's own comment) -- the mirror
+    // of Base-Only Curl above, targeting the LAST joint instead of joint
+    // 0, same axis/mechanism. `tipOnlyCurlT` is 0 for the thumb (no key
+    // defined), matching HANDO's own scope exactly.
+    if (i === joints.length - 1) {
+      const tipOnlyAngle = sign * THREE.MathUtils.degToRad(maxDegs[i] * tipOnlyCurlT)
+      rotateOnTrueWorldAxis(bone, curlAxis, tipOnlyAngle, wrapperQuat)
       bone.updateMatrixWorld(true)
     }
     if (i === joints.length - 1 && i > 0) {
@@ -1512,10 +1539,10 @@ function applyAllFingerPoses() {
 // why.
 const POSE_PRESET_KEYS = [
   'thumbCurl', 'thumbSplay', 'thumbSplay2', 'curlBiasThumb', 'baseOnlyCurlThumb', 'tipTwistThumb',
-  'curlIndex', 'splayIndex', 'splayIndex2', 'curlBiasIndex', 'baseOnlyCurlIndex', 'tipTwistIndex',
-  'curlMiddle', 'splayMiddle', 'splayMiddle2', 'curlBiasMiddle', 'baseOnlyCurlMiddle', 'tipTwistMiddle',
-  'curlRing', 'splayRing', 'splayRing2', 'curlBiasRing', 'baseOnlyCurlRing', 'tipTwistRing',
-  'curlPinky', 'splayPinky', 'splayPinky2', 'curlBiasPinky', 'baseOnlyCurlPinky', 'tipTwistPinky',
+  'curlIndex', 'splayIndex', 'splayIndex2', 'curlBiasIndex', 'baseOnlyCurlIndex', 'tipOnlyCurlIndex', 'tipTwistIndex',
+  'curlMiddle', 'splayMiddle', 'splayMiddle2', 'curlBiasMiddle', 'baseOnlyCurlMiddle', 'tipOnlyCurlMiddle', 'tipTwistMiddle',
+  'curlRing', 'splayRing', 'splayRing2', 'curlBiasRing', 'baseOnlyCurlRing', 'tipOnlyCurlRing', 'tipTwistRing',
+  'curlPinky', 'splayPinky', 'splayPinky2', 'curlBiasPinky', 'baseOnlyCurlPinky', 'tipOnlyCurlPinky', 'tipTwistPinky',
   'wristBend', 'wristSplay', 'modelRotX', 'modelRotY', 'modelRotZ'
 ]
 function capturePosePreset() {
