@@ -18,6 +18,21 @@ work seamlessly from there.
 
 ## Currently working on
 
+**Git-tracked Save Settings just added, not yet confirmed against the
+real live Vercel deployment.** Ported HANDO's own `api/save-settings.js`
+(Vercel serverless function, GitHub Contents API) + wired `src/main.js`
+into `devPanel.js`'s already-existing generic `remoteSave` engine
+(shared workspace-wide, no engine changes needed) + seeded
+`data/processed/dev-panel-settings.json` with the user's own real
+settings dump. The user has already configured the Vercel environment
+variables (`GITHUB_TOKEN`, `DEV_PANEL_SAVE_SECRET`). Verified the full
+client-side mechanism end-to-end against a local mock of the endpoint
+(GET-restore, real Save-button POST correctly preserving untouched
+device fields, graceful no-`/api/`-route boot) -- but the actual
+production round-trip (a real commit landing in the GitHub repo via the
+live deployed site) has not been observed yet. See CHANGELOG.txt for
+the full account.
+
 **The "thumb/finger pose looks wrong" saga -- root cause found and
 fixed, now also verified to match HANDO's own fix exactly; awaiting the
 user's next real-device confirmation before declaring this genuinely

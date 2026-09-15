@@ -42,9 +42,16 @@ via OrbitControls — that's just not exposed as dev-panel settings, it's
 built into the interaction itself. Position/size sliders (spacing, camera
 position, target depth) use plain world units or a "x Field Radius"
 multiplier, not %vmin — this is a three.js world-space scene, not a 2D CSS
-layout, so §12a's %/vmin-vs-px guidance doesn't directly apply. Save
-Settings uses the localStorage baseline (§12l) — no git-tracked settings
-log set up.
+layout, so §12a's %/vmin-vs-px guidance doesn't directly apply. **Save
+Settings now uses the git-tracked settings log (§12l upgrade), added
+2026-09-15** — `api/save-settings.js` (a Vercel serverless function,
+ported near-verbatim from HANDO's own) writes through to
+`data/processed/dev-panel-settings.json`. Requires `GITHUB_TOKEN` and
+`DEV_PANEL_SAVE_SECRET` set on this project's own Vercel project (see
+README.md's own setup section for exact values/steps) — without both
+set, Save/Reset surface a clear "Server not configured" error rather
+than silently falling back to localStorage (this is `devPanel.js`'s own
+documented single-tier design, not a bug).
 
 Camera/lighting/target-plane framing is derived from the field's bounding
 size exactly ONCE (the first hand build) and frozen after that — direct

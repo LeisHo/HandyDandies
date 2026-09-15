@@ -3354,6 +3354,69 @@ Cache-buster bumps: `index.html`'s own `main.js?v=78` -> `?v=81` across
 this round (one intermediate debug-exposure bump).
 
 --------------------------------------------------------------------------------
+2026-09-15  -  (start not captured -- Actual: NOT MEASURED)
+
+**Added git-tracked Save Settings, ported from HANDO's own Vercel
+serverless setup.** Direct request: "Look at hando and see how the save
+button saves dev panel settings to git. Implement. I have given vercel
+the tokens." Until now this project used localStorage-only persistence
+(CLAUDE.md §12l's baseline) -- a Save from one device/browser was never
+visible on any other.
+
+Investigated HANDO's actual implementation via a dedicated research pass
+before writing anything: `api/save-settings.js` (a Vercel serverless
+function using GitHub's Contents API -- GET reads the settings file live
+from GitHub, not the deployed static snapshot, specifically so a Save
+right after a deploy isn't invisible until the next redeploy; POST does
+a GET-for-sha then a PUT to commit), gated by `GITHUB_TOKEN` (repo
+write access) and `DEV_PANEL_SAVE_SECRET` (anti-spam, sent as an
+`X-Dev-Panel-Secret` header, checked against the same literal value
+baked into the client). Confirmed this project's own `devPanel.js`
+ALREADY carries the exact same generic `remoteSave` client engine
+(`remoteSaveSnapshot()`, `fetchRemoteSettingsUntilSuccess()`) --
+shared workspace-wide, so no engine changes were needed at all, only:
+(1) `api/save-settings.js`, ported near-verbatim with only
+`DEFAULT_REPO`/`DEFAULT_BRANCH` changed to `LeisHo/HandyDandies`/`main`;
+(2) `src/main.js` -- added the same `DEV_PANEL_SAVE_SECRET`/
+`SAVE_SETTINGS_ENDPOINT` constants HANDO/DICKOCLICKO/OKCILCOKCID already
+share (one workspace-wide secret, not per-project) and passed
+`remoteSave: { endpoint, secret }` into `initDevPanel()`; (3) a seeded
+`data/processed/dev-panel-settings.json`, populated with the user's own
+real Copy Settings dump (pasted earlier this session) rather than an
+empty object -- so the very first Save/Reset restores their actual
+tuned state instead of looking wiped.
+
+**Verified the full client-side mechanism end-to-end** -- the real
+GitHub write can't be tested without an actual Vercel deployment, so
+built a local mock of `/api/save-settings` (in-memory, same response
+shapes as the real function) and drove the REAL production code through
+it: GET-on-load correctly restored every seeded value (thumbCurl=79,
+chpTargetPose="Point", 11 saved poses) through the real boot path;
+changed a real slider (not by poking `cfg` directly -- confirmed that
+approach doesn't reach `devPanel.js`'s own internal store at all, a
+genuine test-methodology trap caught mid-verification) and clicked the
+real Save button, which correctly flashed "Saved!" and POSTed a payload
+where ONLY the changed device's field changed (desktop's `thumbCurl`
+went 79->42, mobile/landscape stayed untouched at 79) -- proving the
+GET-merge-POST logic actually preserves other fields rather than blind-
+overwriting. Separately confirmed the app still boots cleanly with no
+`/api/` route present at all (the plain local static server used
+throughout this session) -- background retries 404 silently forever
+without blocking the page, matching HANDO's own documented behavior for
+this exact case.
+
+Documented setup in README.md (new "Dev panel Save button setup"
+section: exact `GITHUB_TOKEN`/`DEV_PANEL_SAVE_SECRET` env var names and
+the shared secret value, noted no `vercel.json` is needed here since
+this project's entry point is already at repo root, unlike HANDO's own
+`src/index.html`). **Not yet confirmed working against the REAL live
+Vercel deployment** -- the user has already configured the Vercel
+environment variables ("I have given vercel the tokens") but the actual
+production round-trip (real GitHub commit landing in the repo) hasn't
+been observed by this session; worth a real Save-button click on the
+live deployed URL to confirm.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================
