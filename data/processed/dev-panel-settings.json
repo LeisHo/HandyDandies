@@ -1,10 +1,10 @@
 {
   "values": {
     "desktop": {
-      "fieldRows": 13,
-      "fieldCols": 15,
-      "rowSpacing": 13,
-      "columnSpacing": 16.5,
+      "fieldRows": 11,
+      "fieldCols": 17,
+      "rowSpacing": 16,
+      "columnSpacing": 20,
       "handScale": 1.75,
       "alternateRowOffset": -5.5,
       "progressiveRowOffset": 0,
@@ -766,9 +766,9 @@
           "targetZ": 0
         }
       ],
-      "lockCameraPan": false,
+      "lockCameraPan": true,
       "lockCameraZoom": false,
-      "cameraMaxExtentsEnabled": false,
+      "cameraMaxExtentsEnabled": true,
       "keyAzimuth": 209,
       "keyElevation": 56,
       "keyTargetHeight": 2,
@@ -844,10 +844,10 @@
       "dp_scrollStrength": 0.2
     },
     "mobile": {
-      "fieldRows": 13,
-      "fieldCols": 15,
-      "rowSpacing": 13,
-      "columnSpacing": 16.5,
+      "fieldRows": 11,
+      "fieldCols": 17,
+      "rowSpacing": 16,
+      "columnSpacing": 20,
       "handScale": 1.75,
       "alternateRowOffset": -5.5,
       "progressiveRowOffset": 0,
@@ -1609,9 +1609,9 @@
           "targetZ": 0
         }
       ],
-      "lockCameraPan": false,
+      "lockCameraPan": true,
       "lockCameraZoom": false,
-      "cameraMaxExtentsEnabled": false,
+      "cameraMaxExtentsEnabled": true,
       "keyAzimuth": 209,
       "keyElevation": 56,
       "keyTargetHeight": 2,
@@ -1687,10 +1687,10 @@
       "dp_scrollStrength": 1
     },
     "landscape": {
-      "fieldRows": 13,
-      "fieldCols": 15,
-      "rowSpacing": 13,
-      "columnSpacing": 16.5,
+      "fieldRows": 11,
+      "fieldCols": 17,
+      "rowSpacing": 16,
+      "columnSpacing": 20,
       "handScale": 1.75,
       "alternateRowOffset": -5.5,
       "progressiveRowOffset": 0,
@@ -2452,9 +2452,9 @@
           "targetZ": 0
         }
       ],
-      "lockCameraPan": false,
+      "lockCameraPan": true,
       "lockCameraZoom": false,
-      "cameraMaxExtentsEnabled": false,
+      "cameraMaxExtentsEnabled": true,
       "keyAzimuth": 209,
       "keyElevation": 56,
       "keyTargetHeight": 2,
@@ -2644,7 +2644,7 @@
     },
     {
       "key": "Field Layout",
-      "collapsed": true,
+      "collapsed": false,
       "settings": [
         "fieldRows",
         "fieldCols",
@@ -2753,7 +2753,7 @@
     },
     {
       "key": "Pose",
-      "collapsed": true,
+      "collapsed": false,
       "settings": [
         "savedPoses"
       ],
