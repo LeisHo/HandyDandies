@@ -3837,7 +3837,7 @@
         },
         {
           "key": "Wrist",
-          "collapsed": true,
+          "collapsed": false,
           "settings": [
             "wristBend",
             "wristSplay"
@@ -3846,7 +3846,7 @@
         },
         {
           "key": "Index",
-          "collapsed": true,
+          "collapsed": false,
           "settings": [
             "midOnlyCurlIndex",
             "tipOnlyCurlIndex",
