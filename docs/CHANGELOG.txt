@@ -4297,6 +4297,73 @@ errors beyond the pre-existing, unrelated `api/save-settings` 404s.
 Cache-buster bump: `index.html`'s own `main.js?v=99` -> `?v=100`.
 
 --------------------------------------------------------------------------------
+2026-09-15  -  08:32:03 - 08:41:30 EDT (9m27s, measured; scope grew
+mid-task -- see below)
+
+**Reverted the immediately-prior entry's own default-pose-inclusion
+change; added a Hold Duration slider for Loop/Oscillate instead.** Direct
+correction: "no you're not meant to include the default pose... i guess
+we had it correct previously." The prior entry's own clarification had
+been misread -- "the looping disregards the first pose, i meant the
+default pose" was confirming terminology (which pose "first pose" refers
+to), not reporting a bug to fix. Reverted `dcHoldTween.loopPoses` and
+chp/rchp's own `trig.loopPoses` back to `namedPoses` only, exactly as
+they were before that change -- `lerpLoopSequence()` itself needed no
+further change (it was always generic over whatever array it's handed).
+A real, disclosed side effect of the revert: a 1-named-pose Tween
+Sequence again can't meaningfully loop at all (needs `namedPoses.length
+>= 2`), same as before that change and same as Double Click Hold Tween's
+own original design.
+
+**Direct follow-up in the same exchange, before the revert was even
+finished: "i guess for tweens, provide a slider to set a hold duration
+at the end of a single sequence. as in - sequence, hold, repeat, hold
+etc, OR. sequence, hold, reverse sequence, hold, etc."** Added
+`${p}LoopHoldMs` (chp/rchp only, def 0 = no pause, the original always-
+continuous behavior) and restructured `updateClickHoldPoseForHand()`'s
+'looping' phase from one continuous, never-restarting formula into
+discrete LAPS, each ending in an optional pause via new
+`chp.loopHoldEndTime`/`chp.loopStartTime` per-hand state: Loop repeats
+the same wrap direction every lap ("repeat"); Oscillate flips
+`chp.loopDirection` each lap ("reverse sequence"). The now-unused
+continuous-formula `lerpOscillateSequence()` helper (added, then never
+needed once the per-lap restructure landed) was removed -- Oscillate's
+own ping-pong is computed directly via `lerpTweenSequence()` with a
+clamped one-way `lapT` per lap instead. `${p}LoopHoldMs`'s own visibility
+needed a NEW nested function (`updateLoopHoldVisibility()`), separate
+from the existing `updateClickTriggerModeVisibility()`, since it depends
+on 2 conditions (Tween mode selected AND Loop Mode != Off) rather than
+just the one Mode dropdown the existing function already handles.
+
+**Real bug caught and fixed before considering this done:** on a frame
+where `elapsedSegments` overshoots past the true lap boundary before the
+"lap complete" check runs (inherent to frame-rate-dependent stepping --
+confirmed live, not hypothetical), Loop mode's hold froze at whatever
+slightly-past-boundary INTERPOLATED value happened to be computed that
+frame (observed: -64 instead of the intended exact boundary pose's -1),
+not the clean boundary pose. Fixed by clamping the elapsed-segments count
+used for the applied VALUE to exactly one lap (`Math.min(elapsedSegments,
+segments)`), while still using the unclamped count to detect "lap
+complete" -- so an overshoot is still detected correctly, it just no
+longer bleeds into which pose gets frozen.
+
+**Verified live via `window.__debug`:** confirmed the revert (a 1-named-
+pose sequence no longer loops at all); confirmed Loop's hold now freezes
+at the EXACT boundary curl value for the configured duration (~5-6
+consecutive identical samples at 25ms spacing for a 300ms hold) before
+resuming, both before and after the boundary-clamp fix -- the fix itself
+was confirmed by reproducing the wrong frozen value first, then
+verifying it disappeared after the fix; Oscillate's own hold traced out
+exactly "hold at end A -> flip -> play to end B -> hold at end B -> flip
+-> play back to end A -> hold," direction flipping correctly every lap.
+0 console errors beyond the pre-existing, unrelated `api/save-settings`
+404s.
+
+Cache-buster bump: `index.html`'s own `main.js?v=100` -> `?v=102` (an
+intermediate `?v=101` was superseded by the boundary-clamp fix's own
+bump before either was committed).
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

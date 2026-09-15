@@ -214,34 +214,42 @@ transition speed," confirmed via a clarifying question. Added
 groups as genuinely separate cfg keys (50-5000ms range, matching Double
 Click Hold Tween's own Tween Speed slider).
 
-Loop went through 2 more rounds the same day. First, a plain Loop
+Loop went through several more rounds the same day. First, a plain Loop
 checkbox (Click Hold-Pose/Right-Click Hold-Pose only -- the other 3
 groups are fire-and-forget, no "held" state for a loop to run during),
 caught a real bug before it ever ran live (the existing "still holding,
 re-enter forward" guard would have restarted a looping hand from scratch
-every frame; fixed by excluding 'looping' from it too).
+every frame; fixed by excluding 'looping' from it too). A clarification
+that was briefly (and incorrectly) read as "make the loop include the
+default pose" turned out, on direct correction, to mean the opposite --
+"no you're not meant to include the default pose... i guess we had it
+correct previously." **Current, settled behavior: Loop/Oscillate cycle
+through the tween's own NAMED poses only, same as always** -- a
+1-named-pose sequence still can't meaningfully loop (needs >=2).
 
-**Then, direct clarification: "when i said the looping disregards the
-first pose, i meant the default pose. All poses saved in tweens should
-be looped."** Both Double Click Hold Tween's own original Loop and the
-new chp/rchp one had deliberately excluded the default/anchor pose from
-the cycle (correct per an EARLIER request, now reversed) -- fixed by
-reusing the SAME full sequence the forward pass already plays as the
-loop's own pose list. **Direct follow-up in the same exchange:** "provide
-a checkbox under loop that is 'oscillate'... make it a drop down" --
-replaced the checkbox with a `${p}LoopMode` select (Off/Loop/Oscillate);
-Oscillate is a new ping-pong/triangle-wave cycle (`lerpOscillateSequence()`)
-through the same sequence, bouncing at each end instead of wrapping.
+**Settled feature set:** `${p}LoopMode` (Off/Loop/Oscillate, replacing
+the original plain checkbox per a direct follow-up: "provide a checkbox
+under loop that is 'oscillate'... make it a drop down") plus `${p}LoopHoldMs`
+(a Hold Duration slider, visible only when Tween mode + Loop Mode !=
+Off, via a new nested `updateLoopHoldVisibility()`) -- direct follow-up
+request: "provide a slider to set a hold duration at the end of a single
+sequence... sequence, hold, repeat, hold etc, OR sequence, hold, reverse
+sequence, hold, etc." Loop repeats the same wrap direction each lap;
+Oscillate flips direction each lap (the literal "reverse sequence").
+Caught and fixed a real bug before calling this done: an overshoot frame
+could freeze a hold at a slightly-past-boundary interpolated value
+instead of the clean boundary pose -- fixed by clamping the value
+computation (not the completion check) to exactly one lap.
 
 Verified live: Tween Speed genuinely decouples from Transition Speed
 (set Transition Speed to an absurd 999999ms, tween still progressed at
-the real Tween Speed pace); using poses with genuinely different values
-(an earlier attempt was a false negative -- this project's own default
-pose happens to already equal "Fist" almost exactly), Loop's curlIndex
-now oscillates between the default and named pose's own real values,
-and a 3-pose Oscillate trace showed a clean ping-pong shape, distinct
-from Loop's wrap. "Off" mode re-confirmed unaffected. See CHANGELOG.txt's
-10th and 11th 2026-09-15 entries for the complete account.
+the real Tween Speed pace); Loop/Oscillate confirmed excluding the
+default pose again; Loop's hold freezes at the exact boundary pose for
+the configured duration; Oscillate's hold produces the exact "hold,
+reverse, hold" pattern requested. "Off" mode re-confirmed unaffected.
+See CHANGELOG.txt's 10th-12th 2026-09-15 entries for the complete
+account, including the exact misreading that triggered the brief
+default-pose detour.
 
 **The "thumb/finger pose looks wrong" saga -- 2 SEPARATE bugs found and
 fixed 2026-09-15, both verified live; awaiting the user's final
