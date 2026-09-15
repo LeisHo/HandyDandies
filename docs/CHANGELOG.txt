@@ -3628,6 +3628,60 @@ touch the wrist-axis math at all, only the finger-curl sign table.
 Cache-buster bump: `index.html`'s own `main.js?v=86` -> `?v=87`.
 
 --------------------------------------------------------------------------------
+2026-09-15  -  03:09:52 - 03:21:56 EDT (12m04s, measured)
+
+**Fixed Click-Pose's start-of-transition stutter and a mouse-log click/
+drag mislabeling bug, both from a direct user report with a screen
+recording and mouse log attached.**
+
+**Click-Pose stutter.** User: "Default pose is Neutral-BentBack. Target
+pose is Fist. The fist looks good, But i noticed that right after te
+click, the closest hand seems to start some sort of animation
+transition, but stops after a split second, then the click-pose function
+runs smoothly." Root cause: `startClickHoldPose()` fires unconditionally
+on EVERY left `pointerdown` (needed so a genuine hold-and-drag disables
+camera pan immediately) -- with no way to tell a plain click apart from
+the start of a real hold at press time. The closest hand's own distance-
+based start delay can be exactly 0ms, so it began visibly transitioning
+toward Click Hold-Pose's own target pose ("Fist - Bent Back" -- a
+DIFFERENT pose than Click Pose's own "Fist") on the very next frame, then
+reversed the instant the real, brief click released (`endClickHoldPose()`
+on `pointerup`) -- all before Click Pose's own (correctly debounced,
+per the 2026-09-14 entry) transition even began. Fixed by adding a new
+"Hold Confirm Delay (Ms)" slider per trigger (chp/rchp, default 150ms):
+`updateClickHoldPoseForHand()` now refuses to leave 'idle' until the hold
+has genuinely been sustained past it, and `endClickHoldPose()` skips
+starting a retransition for a hand that never left 'idle' (avoiding a
+pointless lerp-to-itself using stale/undefined `lastAppliedValues`). The
+camera-pan lock -- `startClickHoldPose()`'s OTHER job -- still engages
+immediately on pointerdown, unaffected, per the original direct request
+that moving the cursor during a hold must never pan even before the hold
+is confirmed. Verified live: a real fast click via the actual DOM
+pointerdown/pointerup path leaves the closest hand's CHP phase at 'idle'
+throughout (confirmed by direct inspection, not just visual judgment).
+
+**Mouse log click/drag mislabeling**, same report: "how come clicks are
+logging as Pans even though its just a click, not even a click hold
+drag." Root cause: `describeMouseLogTrigger()` was called once per
+`pointerup`, BEFORE click-vs-drag was even classified, and always
+described button 0/1/2 as "Camera Pan"/"Camera Zoom-Dolly (OrbitControls,
+X-drag)" regardless of whether anything was actually dragged -- every
+call site, including the genuine "Click at"/"Double-click at" lines,
+reused that same drag-worded string. Fixed by passing a `wasDrag` flag
+(the caller already computes heldMs/moved) so a plain click is described
+by button alone ("Canvas (Left Click)") and the Camera Pan/Zoom-Dolly
+wording is reserved for genuine drags. Side effect, also correct: a quick
+right-click still gets its own immediate "Right-click at" line, but a
+GENUINE right-drag (previously always mislabeled as a plain right-click,
+regardless of heldMs) now correctly falls through to "Drag-release ...
+Camera Pan (OrbitControls, right-drag)". Verified live: a real click logs
+"Click at (x, y) -> Canvas (Left Click)"; a real drag still logs
+"Drag-release at (x, y) -> Camera Pan (OrbitControls, left-drag)
+(heldMs:2014)".
+
+Cache-buster bump: `index.html`'s own `main.js?v=87` -> `?v=88`.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

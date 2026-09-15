@@ -68,6 +68,23 @@ currently latent, not visibly broken there) version of it -- not yet
 confirmed whether they've acted on it. Bug 2 is HANDY-DANDIES-specific
 (a sync gap, not a shared math bug) and doesn't need a HANDO-side fix.
 
+**Click-Pose start-of-transition stutter + mouse log click/drag
+mislabeling -- both fixed 2026-09-15, verified live; awaiting the user's
+confirmation.** User report with a screen recording and mouse log
+attached: right after a plain click (target "Fist"), the closest hand
+briefly flashed toward a DIFFERENT pose before the real transition took
+over smoothly. Root cause: `startClickHoldPose()` fires on every
+pointerdown unconditionally (needed for the camera-pan-lock side effect),
+so a genuine hold and the start of a plain click were indistinguishable,
+and the closest hand's own 0ms start delay let it begin visibly moving
+toward Click Hold-Pose's own target before the click released. Fixed
+with a new "Hold Confirm Delay (Ms)" control (default 150ms) gating when
+a hold is allowed to actually start moving a hand. Separately, the mouse
+log was mislabeling every plain click as "Camera Pan (OrbitControls,
+X-drag)" regardless of whether anything was dragged -- fixed by only
+using drag wording when a drag genuinely happened. See CHANGELOG.txt's
+2nd 2026-09-15 entry for the complete account.
+
 **Camera presets (Save/Use/Overwrite/Delete/Default) + Lock Pan/Zoom +
 Set Default Camera As Max Extents.** Mirrors Saved Poses' own UI pattern
 but applies directly to the live camera. Verified live; not yet
