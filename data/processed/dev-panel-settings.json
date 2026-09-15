@@ -1,8 +1,8 @@
 {
   "values": {
     "desktop": {
-      "fieldRows": 5,
-      "fieldCols": 5,
+      "fieldRows": 9,
+      "fieldCols": 15,
       "rowSpacing": 16,
       "columnSpacing": 20,
       "handScale": 1.75,
@@ -1079,6 +1079,7 @@
       "wristSplayCurve": "[{\"x\":0,\"y\":1},{\"x\":0.31833343505859374,\"y\":0.6961458841959636},{\"x\":1,\"y\":0.042812347412109375}]",
       "chpEnabled": true,
       "chpTargetPose": "Fist - Bent Back",
+      "chpHoldConfirmMs": 150,
       "chpTransitionSpeedMs": 230,
       "chpStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.4483332316080729,\"y\":0.7186457951863607},{\"x\":1,\"y\":1}]",
       "chpStartTimeRange": "{\"min\":0,\"max\":3000}",
@@ -1087,6 +1088,7 @@
       "chpRetransitionStartTimeRange": "{\"min\":431,\"max\":3000}",
       "rchpEnabled": true,
       "rchpTargetPose": "MiddleFinger",
+      "rchpHoldConfirmMs": 150,
       "rchpTransitionSpeedMs": 410,
       "rchpStartTimeCurve": "[{\"x\":0,\"y\":0.02093760172526038},{\"x\":0.4366663614908854,\"y\":0.8109375},{\"x\":1,\"y\":1}]",
       "rchpStartTimeRange": "{\"min\":0,\"max\":3000}",
@@ -1207,8 +1209,8 @@
       "dp_scrollStrength": 0.2
     },
     "mobile": {
-      "fieldRows": 5,
-      "fieldCols": 5,
+      "fieldRows": 9,
+      "fieldCols": 15,
       "rowSpacing": 16,
       "columnSpacing": 20,
       "handScale": 1.75,
@@ -2285,6 +2287,7 @@
       "wristSplayCurve": "[{\"x\":0,\"y\":1},{\"x\":0.31833343505859374,\"y\":0.6961458841959636},{\"x\":1,\"y\":0.042812347412109375}]",
       "chpEnabled": true,
       "chpTargetPose": "Fist - Bent Back",
+      "chpHoldConfirmMs": 150,
       "chpTransitionSpeedMs": 230,
       "chpStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.4483332316080729,\"y\":0.7186457951863607},{\"x\":1,\"y\":1}]",
       "chpStartTimeRange": "{\"min\":0,\"max\":3000}",
@@ -2293,6 +2296,7 @@
       "chpRetransitionStartTimeRange": "{\"min\":431,\"max\":3000}",
       "rchpEnabled": true,
       "rchpTargetPose": "MiddleFinger",
+      "rchpHoldConfirmMs": 150,
       "rchpTransitionSpeedMs": 410,
       "rchpStartTimeCurve": "[{\"x\":0,\"y\":0.02093760172526038},{\"x\":0.4366663614908854,\"y\":0.8109375},{\"x\":1,\"y\":1}]",
       "rchpStartTimeRange": "{\"min\":0,\"max\":3000}",
@@ -2413,8 +2417,8 @@
       "dp_scrollStrength": 1
     },
     "landscape": {
-      "fieldRows": 5,
-      "fieldCols": 5,
+      "fieldRows": 9,
+      "fieldCols": 15,
       "rowSpacing": 16,
       "columnSpacing": 20,
       "handScale": 1.75,
@@ -3491,6 +3495,7 @@
       "wristSplayCurve": "[{\"x\":0,\"y\":1},{\"x\":0.31833343505859374,\"y\":0.6961458841959636},{\"x\":1,\"y\":0.042812347412109375}]",
       "chpEnabled": true,
       "chpTargetPose": "Fist - Bent Back",
+      "chpHoldConfirmMs": 150,
       "chpTransitionSpeedMs": 230,
       "chpStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.4483332316080729,\"y\":0.7186457951863607},{\"x\":1,\"y\":1}]",
       "chpStartTimeRange": "{\"min\":0,\"max\":3000}",
@@ -3499,6 +3504,7 @@
       "chpRetransitionStartTimeRange": "{\"min\":431,\"max\":3000}",
       "rchpEnabled": true,
       "rchpTargetPose": "MiddleFinger",
+      "rchpHoldConfirmMs": 150,
       "rchpTransitionSpeedMs": 410,
       "rchpStartTimeCurve": "[{\"x\":0,\"y\":0.02093760172526038},{\"x\":0.4366663614908854,\"y\":0.8109375},{\"x\":1,\"y\":1}]",
       "rchpStartTimeRange": "{\"min\":0,\"max\":3000}",
@@ -3733,7 +3739,7 @@
     },
     {
       "key": "Field Layout",
-      "collapsed": true,
+      "collapsed": false,
       "settings": [
         "fieldRows",
         "fieldCols",
@@ -3800,6 +3806,7 @@
           "key": "Click Hold-Pose",
           "collapsed": false,
           "settings": [
+            "chpHoldConfirmMs",
             "chpEnabled",
             "chpTargetPose",
             "chpTransitionSpeedMs",
@@ -3815,6 +3822,7 @@
           "key": "Right-Click Hold-Pose",
           "collapsed": true,
           "settings": [
+            "rchpHoldConfirmMs",
             "rchpEnabled",
             "rchpTargetPose",
             "rchpTransitionSpeedMs",
