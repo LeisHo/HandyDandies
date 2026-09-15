@@ -55,8 +55,8 @@
       "midOnlyCurlPinky": 0,
       "tipOnlyCurlPinky": 0,
       "tipTwistPinky": 0,
-      "wristBend": 7,
-      "wristSplay": -50,
+      "wristBend": 0,
+      "wristSplay": 0,
       "modelRotX": 0,
       "modelRotY": 0,
       "modelRotZ": 0,
@@ -898,8 +898,8 @@
       "midOnlyCurlPinky": 0,
       "tipOnlyCurlPinky": 0,
       "tipTwistPinky": 0,
-      "wristBend": 7,
-      "wristSplay": -50,
+      "wristBend": 0,
+      "wristSplay": 0,
       "modelRotX": 0,
       "modelRotY": 0,
       "modelRotZ": 0,
@@ -1741,8 +1741,8 @@
       "midOnlyCurlPinky": 0,
       "tipOnlyCurlPinky": 0,
       "tipTwistPinky": 0,
-      "wristBend": 7,
-      "wristSplay": -50,
+      "wristBend": 0,
+      "wristSplay": 0,
       "modelRotX": 0,
       "modelRotY": 0,
       "modelRotZ": 0,
@@ -2672,7 +2672,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": false,
+      "collapsed": true,
       "settings": [],
       "subgroups": [
         {
@@ -2753,7 +2753,7 @@
     },
     {
       "key": "Pose",
-      "collapsed": true,
+      "collapsed": false,
       "settings": [
         "savedPoses"
       ],
