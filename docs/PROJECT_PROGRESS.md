@@ -329,6 +329,51 @@ different now than under either of the 2 earlier (wrong) formulas this
 session tried -- not a new bug. **Not yet confirmed by the user on a
 real device** -- don't declare this saga closed until they do.
 
+**Field Layout + Camera are now per-device (Desktop/Mobile/Landscape) --
+built and verified live 2026-09-15.** Direct request: "Allow for
+separate field layout settings and camera settings for Desktop and
+Mobile." Every Field Layout control and every live Camera control
+(position/FOV/zoom/lock-pan/lock-zoom/max-extents) is now `perDevice:
+true` -- confirmed via source inspection that devPanel.js's own
+`commit()`/`syncValue()` already gate live effects behind `editingDevice
+=== realDeviceClass()` generically, so no engine changes were needed.
+All 3 devices start identical (no invented `defMobile`/`defLandscape`
+numbers -- there's no design brief for what Mobile should look like);
+`savedCameras` (the preset list) stays shared on purpose. **Noticed but
+NOT fixed (out of scope for this request):** devPanel.js's generic
+per-group seeding only ever reads plain `def`, never `defMobile`/
+`defLandscape`, for any PROJECT-supplied group -- those overrides
+currently only work for the built-in Dev Panel chrome group's own
+separate seeding code. Worth knowing if a future project-supplied
+control ever needs a genuinely different Mobile default via
+`defMobile`. Verified live: editing Mobile's own Rows slider left the
+live (desktop) scene completely untouched, and the edited value
+persisted independently across tab switches in both directions.
+
+**The real "double click acting weird" bug -- root-caused and fixed
+2026-09-15, verified live twice; not yet reconfirmed by the user.**
+Direct follow-up report: "I think its registering a single click first,
+then when it realizes its double, it causes an issue." Root cause: Click
+Hold-Pose's own Hold Confirm Delay (150ms -- how long before its target
+pose becomes visible) and `MOUSE_LOG_HELD_DRAG_MS` (500ms -- the
+separate threshold deciding whether a release counts as a genuine hold,
+suppressing Click Pose/Double-Click Pose's own trigger) were 2 different
+numbers serving what should've been the same purpose -- any press
+landing in the 150-500ms gap (an entirely ordinary speed for a double-
+click's own first tap) made chp's own target pose visibly flash on and
+reverse, independent of whatever Click Pose/Double-Click Pose did once
+the debounce resolved. Confirmed live via simulated realistic double-
+clicks (real dispatched PointerEvents): clean with chp disabled, clean
+at normal click speed, reproduced cleanly at a 200ms press (chp's own
+phase measured entering 'forward' mid-press). Fixed by raising Hold
+Confirm Delay's default to 500ms (matching `MOUSE_LOG_HELD_DRAG_MS`
+exactly) and its slider max to 1000 for headroom -- also corrected the
+same value directly in the live git-tracked settings (the user's own
+real saved value was `0`ms, even more exposed than the old code
+default). Verified live on a fresh page load (cleared localStorage,
+picking up the new code default with no manual override) that the exact
+same 200ms-press double-click no longer produces the flash.
+
 ## Recently completed
 
 (Consolidated 2026-09-12 -- the full blow-by-blow of every round below
