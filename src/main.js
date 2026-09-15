@@ -871,9 +871,29 @@ window.addEventListener('pointermove', (e) => {
 // at pointerdown time. `describeTrigger()` factored out unchanged from
 // the original single-listener version so pointerup can reuse the exact
 // same trigger logic pointerdown used to run inline.
-function describeMouseLogTrigger(e) {
+//
+// CORRECTED 2026-09-15, direct user report ("how come clicks are logging
+// as Pans even though its just a click, not even a click hold drag") --
+// this always described button 0/1/2 as "Camera Pan"/"Camera Zoom/Dolly
+// (OrbitControls, X-drag)" regardless of whether a drag actually
+// happened, because it was called ONCE per pointerup, before click-vs-
+// drag was even classified, and every call site (including the genuine
+// "Click at"/"Double-click at" ones) reused that same drag-worded
+// string. A plain click that never moved and wasn't held never actually
+// panned/zoomed anything -- OrbitControls only acts on continued
+// pointermove while a button is down. Now takes `wasDrag` (computed by
+// the caller, which already knows heldMs/moved by the time it calls
+// this) and only uses the Camera Pan/Zoom-Dolly wording when a drag
+// genuinely occurred; a plain click is described by button alone.
+function describeMouseLogTrigger(e, wasDrag) {
   const inPanel = !!e.target?.closest?.('.dp-panel')
   if (inPanel) return 'Dev Panel interaction'
+  if (!wasDrag) {
+    if (e.button === 0) return 'Canvas (Left Click)'
+    if (e.button === 1) return 'Canvas (Middle Click)'
+    if (e.button === 2) return 'Canvas (Right Click)'
+    return `Unhandled button ${e.button}`
+  }
   if (e.button === 1) return 'Camera Zoom/Dolly (OrbitControls, middle-drag)'
   if (e.button === 0 || e.button === 2) return `Camera Pan (OrbitControls, ${e.button === 0 ? 'left' : 'right'}-drag)`
   return `Unhandled button ${e.button}`
@@ -885,21 +905,28 @@ window.addEventListener('pointerdown', (e) => {
 window.addEventListener('pointerup', (e) => {
   const down = mouseLogDownInfo
   mouseLogDownInfo = null
+  const x = Math.round(e.clientX), y = Math.round(e.clientY)
+  const heldMs = down ? Math.round(performance.now() - down.time) : 0
+  const moved = down ? Math.hypot(e.clientX - down.x, e.clientY - down.y) > MOUSE_LOG_MOVE_THRESHOLD_PX : false
+  const wasDrag = !!(down && (heldMs > MOUSE_LOG_HELD_DRAG_MS || moved))
   // `e.target` isn't guaranteed to be an Element (e.g. `document` itself,
   // which has no `.closest()`) -- confirmed live as a real crash while
   // testing with a synthetic event dispatched directly on `document`; a
   // genuine user click always targets a real element in practice, but the
   // optional-chaining guard costs nothing and removes the failure mode
   // entirely rather than relying on that always being true.
-  const trigger = describeMouseLogTrigger(down ? { target: down.target, button: down.button } : e)
-  const x = Math.round(e.clientX), y = Math.round(e.clientY)
-  const heldMs = down ? Math.round(performance.now() - down.time) : 0
-  const moved = down ? Math.hypot(e.clientX - down.x, e.clientY - down.y) > MOUSE_LOG_MOVE_THRESHOLD_PX : false
-  if (down && down.button === 2) {
+  const trigger = describeMouseLogTrigger(down ? { target: down.target, button: down.button } : e, wasDrag)
+  // A quick right-click (not dragged) still gets its own distinct,
+  // immediate "Right-click at" line, same as before -- only a GENUINE
+  // right-drag now falls through to the shared Drag-release branch below
+  // (previously every right button release said "-drag" even when
+  // nothing was dragged, and a real right-drag was mislabeled the other
+  // way, as a plain "Right-click").
+  if (down && down.button === 2 && !wasDrag) {
     logMouseTrackingEvent(`Right-click at (${x}, ${y}) -> ${trigger}`)
     return
   }
-  if (down && (heldMs > MOUSE_LOG_HELD_DRAG_MS || moved)) {
+  if (wasDrag) {
     logMouseTrackingEvent(`Drag-release at (${x}, ${y}) -> ${trigger} (heldMs:${heldMs})`)
     return
   }
@@ -1758,6 +1785,26 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       // pattern as Crop Wrist / Responsive Wrist Splay's own checkboxes.
       { key: `${p}Enabled`, label: `${title} (Master On/Off)`, type: 'checkbox', def: defaults.enabled ?? false },
       { key: `${p}TargetPose`, label: 'Target Pose', type: 'select', def: defaults.targetPose ?? '', options: () => (cfg.savedPoses || []).map((sp) => sp.name) },
+      // Direct user report, 2026-09-15: "right after te click, the closest
+      // hand seems to start some sort of animation transition, but stops
+      // after a split second, then the click-pose function runs smoothly."
+      // Root cause: `startClickHoldPose()` fires on EVERY pointerdown,
+      // unconditionally -- a plain quick click is indistinguishable from
+      // the start of a genuine hold at press time, so the closest hand
+      // (whose own distance-based Start Time delay can be as low as 0ms)
+      // began visibly transitioning toward THIS group's own Target Pose
+      // (a DIFFERENT pose than Click Pose's own target) on the very next
+      // frame, then reversed the instant the real, brief click released --
+      // all before Click Pose's own (correctly debounced) transition even
+      // began. Fix: `updateClickHoldPoseForHand()` now refuses to leave
+      // 'idle' until the hold has genuinely been sustained past this
+      // delay, so a normal click's press-to-release window never gets far
+      // enough to become visible at all. The camera-pan lock (the OTHER
+      // thing `startClickHoldPose()` does) is untouched -- it still
+      // engages immediately on pointerdown, per the direct request that
+      // moving the cursor during a hold must never pan, even before the
+      // hold is confirmed.
+      { key: `${p}HoldConfirmMs`, label: 'Hold Confirm Delay (Ms)', type: 'slider', min: 0, max: 500, step: 10, def: defaults.holdConfirmMs ?? 150 },
       { key: `${p}TransitionSpeedMs`, label: 'Pose Transition Speed (Ms)', type: 'slider', min: 0, max: 700, step: 10, def: defaults.transitionSpeedMs ?? 400 },
       { key: `${p}StartTimeCurve`, label: 'Pose Transition Start Time Curve (Distance -> Start Time)', type: 'text', def: defaults.startTimeCurve ?? '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickHoldConfig(p) },
       { key: `${p}StartTimeRange`, label: 'Pose Transition Min / Max Start Time (Ms)', type: 'text', def: defaults.startTimeRange ?? '{"min":0,"max":300}', onChange: () => parseClickHoldConfig(p) },
@@ -2968,6 +3015,19 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
   const trig = clickHoldPoseTriggers[p]
   const chp = getOrInitHandCHP(hand)[p]
   if (trig.active && chp.phase !== 'forward') {
+    // Refuse to leave 'idle' until the hold has genuinely been sustained
+    // past HoldConfirmMs -- see this group's own control comment
+    // (makeClickHoldPoseGroup()) for the full "quick click flashed the
+    // wrong pose" bug this guards against. Returning here (rather than
+    // falling through) leaves this hand's pose completely untouched for
+    // these first few frames -- animate()'s own caller has already
+    // decided `overridden = true` for this frame purely from
+    // `trig.active`, so the idle-path (cfg-driven) posing is skipped
+    // too, and the hand simply stays frozen at whatever it already was
+    // -- imperceptible over a ~150ms window, and correct either way,
+    // since NOTHING about its pose needs to be reasserted mid-frame-
+    // freeze.
+    if (now - trig.holdStartTime < (cfg[`${p}HoldConfirmMs`] ?? 0)) return
     // A fresh hold just started (or one started again before this
     // hand's own prior retransition finished) -- (re)enter 'forward'
     // and lock in this hand's own start delay from ITS distance right
@@ -3040,6 +3100,13 @@ function endClickHoldPose(p) {
   const range = Math.max(maxD - minD, 0.001)
   hands.forEach((hand, i) => {
     const chp = getOrInitHandCHP(hand)[p]
+    // A hand still 'idle' here never actually left it -- HoldConfirmMs
+    // (see makeClickHoldPoseGroup()'s own control comment) never let it
+    // enter 'forward' before this release arrived, so it was never
+    // visibly touched and has nothing to retransition FROM. Skipping it
+    // avoids kicking off a pointless (if harmless) retransition using a
+    // stale/undefined `lastAppliedValues`.
+    if (chp.phase === 'idle') return
     chp.retransitionStart = chp.lastAppliedValues || { ...poseDefaultValues }
     chp.retransitionStartTime = now
     chp.retransitionDelay = computeStartDelayMs(dists[i], minD, range, trig.retransitionCurveParsed, trig.retransitionRangeParsed)
