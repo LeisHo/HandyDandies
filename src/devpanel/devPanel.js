@@ -126,6 +126,11 @@ function displayValue(ctrl, v) {
   } else if (ctrl.type === 'list-picker') {
     entry.items = (v || []).slice()
     entry.selectedItem = null
+    // Multi-select is equally invalidated by an externally-driven refresh
+    // -- same reasoning as selectedItem directly above (added 2026-09-15
+    // alongside shift-click multi-select).
+    entry.multiSelected = new Set()
+    entry.selectAnchor = null
     // A pending (still-empty) group only exists in this render's own
     // in-memory state -- an externally-driven value refresh (Reset, tab
     // switch, remote restore) is a new source of truth, so anything not
@@ -236,7 +241,9 @@ function syncListPickerFromDom(entry) {
 // of the row (setupReorder only starts a drag from '.dp-lp-row-handle'),
 // so tapping the row body still just selects it.
 function renderListPickerItemRow(entry, item) {
-  const row = el('div', 'dp-list-picker-row' + (item === entry.selectedItem ? ' dp-list-picker-row-selected' : ''))
+  const row = el('div', 'dp-list-picker-row'
+    + (item === entry.selectedItem ? ' dp-list-picker-row-selected' : '')
+    + (entry.multiSelected.has(item) ? ' dp-list-picker-row-multi-selected' : ''))
   row.appendChild(el('span', 'dp-lp-row-handle', { textContent: '⠿' }))
   // Export checkbox -- opt-in per control (ctrl.exportable), so only a
   // picker that actually wants cross-project export (HANDO's own
@@ -271,10 +278,44 @@ function renderListPickerItemRow(entry, item) {
   // item while the just-tapped name sat correctly on screen). Fixed by
   // never destroying rows for a plain selection change -- only toggling
   // the highlight class on the existing, already-touched elements.
-  row.addEventListener('click', () => {
-    entry.selectedItem = item
+  // Shift-click range multi-select, added 2026-09-15 (direct request --
+  // see the `entry` object literal's own comment above for the full
+  // selectedItem-vs-multiSelected split). Standard file-manager
+  // convention: shift-click selects every row from `entry.selectAnchor`
+  // (the last PLAIN click) through the just-clicked row, inclusive, in
+  // current RENDERED (top-to-bottom, depth-first) order -- reading
+  // `.dp-list-picker-row` elements directly rather than `entry.items`
+  // means the range correctly spans group boundaries (ungrouped items,
+  // then each group's own members) the same way a user visually sees
+  // them, without needing to separately flatten the grouped tree. A
+  // plain click (no shift) resets the range to just that one row and
+  // moves the anchor there, same as clicking away from a multi-selection
+  // in any standard list UI.
+  row.addEventListener('click', (e) => {
+    if (e.shiftKey && entry.selectAnchor) {
+      const rows = Array.from(entry.listEl.querySelectorAll('.dp-list-picker-row'))
+      const anchorIdx = rows.findIndex((r) => r.__item === entry.selectAnchor)
+      const clickedIdx = rows.findIndex((r) => r.__item === item)
+      if (anchorIdx !== -1 && clickedIdx !== -1) {
+        const [lo, hi] = anchorIdx < clickedIdx ? [anchorIdx, clickedIdx] : [clickedIdx, anchorIdx]
+        entry.multiSelected = new Set(rows.slice(lo, hi + 1).map((r) => r.__item))
+      } else {
+        entry.multiSelected = new Set([item])
+      }
+      // The shift-clicked row becomes the new active single-item target
+      // for Use/Rename/Overwrite/Delete, same as it would in a normal
+      // file manager -- the anchor itself is deliberately NOT moved, so a
+      // further shift-click keeps extending/shrinking from the SAME
+      // original anchor rather than the most recent endpoint.
+      entry.selectedItem = item
+    } else {
+      entry.selectedItem = item
+      entry.selectAnchor = item
+      entry.multiSelected = new Set([item])
+    }
     entry.listEl.querySelectorAll('.dp-list-picker-row').forEach((r) => {
-      r.classList.toggle('dp-list-picker-row-selected', r.__item === item)
+      r.classList.toggle('dp-list-picker-row-selected', r.__item === entry.selectedItem)
+      r.classList.toggle('dp-list-picker-row-multi-selected', entry.multiSelected.has(r.__item))
     })
   })
   return row
@@ -702,7 +743,20 @@ function buildListPickerRow(ctrl, row) {
   row.appendChild(btnRow)
   const entry = {
     type: 'list-picker', ctrl, listEl, items: (ctrl.def || []).slice(),
-    selectedItem: null, collapsedGroups: new Set(), pendingGroups: [], exportChecked: new Set()
+    // multiSelected/selectAnchor added 2026-09-15 (direct request: "allow
+    // me to shift click to select multiple selections... if i click the
+    // +group button, It will automatically place the selected items in
+    // the new group") -- selectedItem stays the SINGLE, existing "active"
+    // item Use/Rename/Overwrite/Delete already act on, unchanged; those 4
+    // buttons deliberately still only ever touch one item, since nothing
+    // asked for them to become batch operations. multiSelected (a Set,
+    // always a superset containing at least selectedItem whenever
+    // anything is selected) is the NEW, separate concept +Group reads to
+    // decide what to auto-assign into the group it creates -- see
+    // renderListPickerItemRow()'s own click handler and addGroupBtn's own
+    // handler, below.
+    selectedItem: null, multiSelected: new Set(), selectAnchor: null,
+    collapsedGroups: new Set(), pendingGroups: [], exportChecked: new Set()
   }
   numEls[ctrl.key] = entry
 
@@ -764,19 +818,44 @@ function buildListPickerRow(ctrl, row) {
     if (!entry.selectedItem) return
     entry.items = entry.items.filter((it) => it !== entry.selectedItem)
     entry.selectedItem = null
+    // Multi-select cleared too (added 2026-09-15) -- a stale reference to
+    // the just-deleted item is harmless on its own (it's simply no longer
+    // in entry.items for +Group's own .map() to find), but OTHER items
+    // still sitting in a leftover multiSelected from before this delete
+    // could otherwise get silently auto-grouped by a later +Group click
+    // with nothing visibly re-selected in between.
+    entry.multiSelected = new Set()
+    entry.selectAnchor = null
     commit(ctrl, entry.items)
     renderListPickerRows(entry)
   })
   // Direct user request: let a picker's own items be organized into groups.
-  // Just adds an empty group header to drag items into -- see
+  // Adds an empty group header to drag items into -- see
   // renderListPickerRows()'s own comment for why an empty group doesn't
-  // survive a reload until it actually has a member.
+  // survive a reload until it actually has a member. CORRECTED 2026-09-15
+  // (direct follow-up, alongside shift-click multi-select above): "When
+  // one or multiple selections are made, and if i click the +group
+  // button, It will automatically place the selected items in the new
+  // group." If anything is currently selected (entry.multiSelected is
+  // never empty once a row's been clicked at least once), the new group
+  // is created ALREADY populated with those items (re-parenting any that
+  // were previously in a different group -- "place" reads as move, not
+  // copy) instead of landing empty -- the plain-empty-group path below is
+  // now only reached with nothing selected yet, unchanged from before.
   addGroupBtn.addEventListener('click', () => {
     const existingNames = new Set([...entry.items.map((it) => it.group).filter(Boolean), ...entry.pendingGroups])
     let name = 'New Group'
     let n = 2
     while (existingNames.has(name)) { name = 'New Group (' + n + ')'; n++ }
-    entry.pendingGroups = entry.pendingGroups.concat([name])
+    if (entry.multiSelected.size > 0) {
+      entry.items = entry.items.map((it) => (entry.multiSelected.has(it) ? { ...it, group: name } : it))
+      entry.multiSelected = new Set()
+      entry.selectedItem = null
+      entry.selectAnchor = null
+      commit(ctrl, entry.items)
+    } else {
+      entry.pendingGroups = entry.pendingGroups.concat([name])
+    }
     renderListPickerRows(entry)
   })
   const flashBtn = (btn, msg) => { const orig = btn.textContent; btn.textContent = msg; setTimeout(() => { btn.textContent = orig }, 1400) }

@@ -178,6 +178,12 @@ html, body {
   font-size: var(--dp-body-font-size, 11px); color: var(--dp-text-color, #c9c9d8);
 }
 .dp-list-picker-row-selected { background: #3a3a4a; color: var(--dp-title-color, #e8e8f0); }
+/* Shift-click multi-select (added 2026-09-15) -- a distinct outline, not
+   the same solid fill as -selected above, so the single "active" item
+   (what Use/Rename/Overwrite/Delete act on) stays visually distinguishable
+   from the rest of the range (what +Group auto-assigns) rather than every
+   selected row looking identically selected. */
+.dp-list-picker-row-multi-selected { outline: 1px solid var(--dp-accent-color, #7d8cff); outline-offset: -1px; }
 .dp-lp-row-label { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .dp-lp-export-checkbox { flex: 0 0 auto; width: 13px; height: 13px; margin: 0; }
 .dp-list-picker-actions { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
