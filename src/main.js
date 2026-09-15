@@ -6,7 +6,7 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js'
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js'
 import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js'
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js'
-import { initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings } from './devpanel/devPanel.js?v=15'
+import { initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings } from './devpanel/devPanel.js?v=17'
 
 // A defensive wrapper around devPanel.js's own refreshSelectOptions() --
 // found via live testing (direct user report: "I dont see any of the
@@ -358,7 +358,7 @@ const DEV_GROUPS = [
         // refreshSelectOptions() call, not automatically -- without this,
         // saving or deleting a pose here wouldn't show up there until the
         // page reloads.
-        onChange: () => { safeRefreshSelectOptions('chpTargetPose'); safeRefreshSelectOptions('rchpTargetPose'); safeRefreshSelectOptions('clickTargetPose'); safeRefreshSelectOptions('dblclickTargetPose'); safeRefreshSelectOptions('rcTargetPose'); safeRefreshMultiSelectOptions('tweenPoses') }
+        onChange: () => { safeRefreshSelectOptions('chpTargetPose'); safeRefreshSelectOptions('rchpTargetPose'); safeRefreshSelectOptions('clickTargetPose'); safeRefreshSelectOptions('dblclickTargetPose'); safeRefreshSelectOptions('rcTargetPose'); safeRefreshSelectOptions('dcHoldTargetPose'); safeRefreshMultiSelectOptions('tweenPoses') }
       },
       // The "Default" button used to live here as its own DEV_GROUPS row
       // (reset every pose slider to its own CODE default). Direct
@@ -615,38 +615,47 @@ const DEV_GROUPS = [
       }
     ]
   },
-  // Double Click Hold -- direct user request ("*DC*Double Click Hold*
-  // This will allow me to set a saved tween as the resulting animation/
-  // transition on double click hold. The tween will apply to all hands
-  // simultaneously and stop when i release"), clarified twice: the
-  // sequence always tweens from the DEFAULT pose (poseDefaultValues)
-  // through the selected Saved Tween Sequence's own poses in order ("it
-  // will tween from the default pose, to pose 1, then so on"), and on
-  // release every hand retransitions back to default starting from
-  // WHATEVER pose it's currently in, at the SAME speed as the forward
-  // tween ("whatever pose the hand is in, it will transition at the same
-  // speed back to default") -- so there's deliberately no separate
-  // retransition-speed control, unlike Click-Hold-Pose's own 2 groups.
-  // Applies identically to every hand at once (no per-hand distance
-  // stagger, unlike Click-Hold-Pose/Click-Pose) -- see
-  // updateDoubleClickHoldTween()'s own comment for the shared (not
-  // per-hand) phase state this implies, and the window pointerdown/up
-  // listeners just above it for how the double-click-then-hold gesture
-  // itself is detected.
-  {
-    title: 'Double Click Hold',
-    controls: [
-      { key: 'dcHoldEnabled', label: 'Double Click Hold (Master On/Off)', type: 'checkbox', def: false },
-      { key: 'dcHoldTweenSelector', label: 'Tween Selector', type: 'select', def: '', options: () => (cfg.savedTweenSequences || []).map((s) => s.name) },
-      { key: 'dcHoldTweenSpeedMs', label: 'Tween Speed (Ms)', type: 'slider', min: 50, max: 5000, step: 10, def: 800 },
-      // Direct follow-up request: "provide a checkbox to set if it
-      // continues to loop or not. As in if i keep the double click hold,
-      // it will continue looping through the tween, not including the
-      // initial default pose. If unchecked, it runs through the tween
-      // once." See updateDoubleClickHoldTween()'s own 'looping' phase.
-      { key: 'dcHoldLoop', label: 'Loop', type: 'checkbox', def: false }
-    ]
-  },
+  // Double Click Hold -- ORIGINALLY a bespoke, shared-not-per-hand
+  // mechanism (direct request: "The tween will apply to all hands
+  // simultaneously and stop when i release"). CORRECTED/REBUILT
+  // 2026-09-15, direct follow-up: "make the available settings of double
+  // click and hold to match click hold. Double click hold currently is
+  // lacking a lot of the options. I want to also be able to select
+  // single pose/ tween for double click hold" -- confirmed via 2
+  // clarifying questions that this means (1) genuinely adding per-hand
+  // distance stagger (reversing the "all hands simultaneously" design,
+  // not just adding stagger-shaped settings that would've done nothing),
+  // and (2) Single Pose mode mirroring Click Hold-Pose exactly. Given
+  // that, this is now built via makeClickHoldPoseGroup() -- a literal 3rd
+  // instance of Click Hold-Pose's own machinery (`dcHold` joins
+  // CLICK_HOLD_KEYS below), not a parallel reimplementation -- gaining
+  // every one of chp/rchp's own settings for free: Mode (Single Pose/
+  // Tween), Target Pose, Tween Selector + its own separate Tween Speed/
+  // Curve/Range, Hold Confirm Delay, Pose Transition Speed/Curve/Range,
+  // Loop Mode (Off/Loop/Oscillate) + Hold Duration, and a genuinely
+  // separate Pose Retransition Speed/Curve/Range (previously dcHold
+  // reused its own Tween Speed for retransition too, per an EARLIER
+  // direct clarification -- superseded by this request's own explicit
+  // ask for Click Hold-Pose's full settings, retransition speed
+  // included). The double-click-then-hold gesture DETECTION itself
+  // (`dcHoldLastCleanUpTime` etc., below) is UNCHANGED -- only which
+  // functions it calls (startClickHoldPose('dcHold')/endClickHoldPose('dcHold')
+  // now, instead of this feature's own retired start/end functions).
+  // ONE deliberate exception preserved from the ORIGINAL, twice-clarified
+  // requirement, NOT superseded by this request: Tween mode's own
+  // sequence still always starts from the DEFAULT pose specifically (not
+  // this hold's own live snapshot, unlike chp/rchp's own Tween mode) --
+  // see startClickHoldPose()'s own `tweenAnchor` comment. Single Pose
+  // mode has no such exception -- it mirrors chp/rchp exactly, per this
+  // request's own direct confirmation.
+  makeClickHoldPoseGroup('dcHold', 'Double Click Hold', {
+    enabled: false, targetPose: '',
+    startTimeCurve: '[{"x":0,"y":0},{"x":1,"y":1}]',
+    startTimeRange: '{"min":0,"max":300}',
+    retransitionSpeedMs: 400,
+    retransitionStartTimeCurve: '[{"x":0,"y":0},{"x":1,"y":1}]',
+    retransitionStartTimeRange: '{"min":0,"max":300}'
+  }),
   {
     // Direct user request: "provide me a collapsible pose viewer within
     // the dev panel itself" -- deliberately 0 controls here. buildPosePreview()
@@ -3142,10 +3151,18 @@ function buildWristSplayCurveWidget(row) {
 // for real-world use; only a saved pose that deliberately rotates the
 // whole hand model would notice its own Whole-Hand Rotation staying at
 // whatever the shared cfg sliders currently say throughout the hold.
-const CLICK_HOLD_KEYS = ['chp', 'rchp']
+// 'dcHold' added 2026-09-15 -- Double Click Hold rebuilt as a literal 3rd
+// instance of this same machinery (see its own DEV_GROUPS comment for the
+// full account). Placed LAST so it still wins the "whichever runs last
+// this frame wins" tie-break over chp/rchp if somehow simultaneously
+// active on the same hand, matching its own former priority as the
+// explicitly-checked-last trigger in animate()'s per-hand loop (now
+// folded into this same array/forEach instead of a separate check).
+const CLICK_HOLD_KEYS = ['chp', 'rchp', 'dcHold']
 const clickHoldPoseTriggers = {
   chp: { active: false, holdStartTime: 0, forwardSnapshot: null, tweenPoses: null, loopPoses: null, loopSegmentMs: 1, startCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], startRangeParsed: { min: 0, max: 300 }, tweenStartCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStartRangeParsed: { min: 0, max: 300 }, retransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionRangeParsed: { min: 0, max: 300 } },
-  rchp: { active: false, holdStartTime: 0, forwardSnapshot: null, tweenPoses: null, loopPoses: null, loopSegmentMs: 1, startCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], startRangeParsed: { min: 0, max: 300 }, tweenStartCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStartRangeParsed: { min: 0, max: 300 }, retransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionRangeParsed: { min: 0, max: 300 } }
+  rchp: { active: false, holdStartTime: 0, forwardSnapshot: null, tweenPoses: null, loopPoses: null, loopSegmentMs: 1, startCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], startRangeParsed: { min: 0, max: 300 }, tweenStartCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStartRangeParsed: { min: 0, max: 300 }, retransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionRangeParsed: { min: 0, max: 300 } },
+  dcHold: { active: false, holdStartTime: 0, forwardSnapshot: null, tweenPoses: null, loopPoses: null, loopSegmentMs: 1, startCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], startRangeParsed: { min: 0, max: 300 }, tweenStartCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStartRangeParsed: { min: 0, max: 300 }, retransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionRangeParsed: { min: 0, max: 300 } }
 }
 function parseClickHoldConfig(p) {
   const t = clickHoldPoseTriggers[p]
@@ -3316,6 +3333,20 @@ function computeStartDelayMs(distanceToCursor, minLiveDist, liveDistRange, curve
   const curveY = THREE.MathUtils.clamp(evaluateArmLengthCurve(curveParsed, normDist), 0, 1)
   return rangeParsed.min + (rangeParsed.max - rangeParsed.min) * curveY
 }
+// NaN/undefined-safe read for `${p}TweenSpeedMs` -- a real, previously-
+// fixed bug class (a stale saved-settings value predating this control,
+// e.g. from before Tween mode existed for a given trigger, dividing down
+// into a NaN `t`/`tCyclic`, then `poses[NaN]` -> undefined ->
+// lerpPoseValues() throwing on `undefined[key]` INSIDE animate() every
+// single frame -- silently freezing the screen at whatever was last
+// rendered, indistinguishable from "nothing responds to clicks anymore").
+// Originally fixed only for Double Click Hold's own bespoke tween speed
+// read; ported here so all 5 Click-family Tween-mode triggers (chp/rchp/
+// click/dblclick/rc, now including dcHold once it shares this exact
+// machinery -- see makeClickHoldPoseGroup()'s own DEV_GROUPS comment)
+// share the same protection instead of just the one trigger that
+// happened to hit it first.
+function safeTweenSpeedMs(v) { return Number.isFinite(v) ? v : 800 }
 // Called once per hand per trigger, per frame, from updateRenderOrder()'s
 // own existing per-hand loop -- reuses that loop's own `live`/
 // `minLiveDist`/`liveDistRange` (Arm Length/Wrist Splay's own live-
@@ -3388,7 +3419,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     // `${p}TransitionSpeedMs` -- see makeClickHoldPoseGroup()'s comment.
     const isTween = cfg[`${p}Mode`] === 'Tween'
     const elapsed = now - trig.holdStartTime
-    const speedMs = Math.max(cfg[isTween ? `${p}TweenSpeedMs` : `${p}TransitionSpeedMs`], 1)
+    const speedMs = Math.max(isTween ? safeTweenSpeedMs(cfg[`${p}TweenSpeedMs`]) : cfg[`${p}TransitionSpeedMs`], 1)
     const progress = elapsed < chp.forwardDelay ? 0 : THREE.MathUtils.clamp((elapsed - chp.forwardDelay) / speedMs, 0, 1)
     let values
     if (isTween) {
@@ -3462,9 +3493,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
       const position = startPos + (endPos - startPos) * lapT
       values = lerpTweenSequence(trig.loopPoses, position / segments)
     } else {
-      // Same "start at the WRAP segment, not segment 0" reasoning as
-      // Double Click Hold Tween's own 'looping' phase (see
-      // updateDoubleClickHoldTween()'s own comment): the forward pass
+      // "Start at the WRAP segment, not segment 0" -- the forward pass
       // just ended exactly at the last pose, so starting the cycle at
       // `loopPoses[0]` would jump backward. One full lap = advancing by
       // exactly `segments` (a complete wrap back to the same relative
@@ -3511,24 +3540,30 @@ function startClickHoldPose(p) {
   // forward delay is staggered, same as Single Pose mode). Starts from
   // this hold's own live snapshot, not `poseDefaultValues`, keeping it
   // consistent with Single Pose mode's own "transition from wherever the
-  // hand currently is" -- unlike Double Click Hold Tween's own always-
-  // from-default convention (a deliberately different feature).
+  // hand currently is" -- EXCEPT for `dcHold` specifically, which keeps
+  // its own original, twice-clarified requirement ("it will tween from
+  // the default pose, to pose 1, then so on") even now that it shares
+  // this generalized machinery with chp/rchp -- see this group's own
+  // DEV_GROUPS comment for the full account of what carried over from
+  // Double Click Hold's original design vs. what didn't. Single Pose
+  // mode has NO such exception for dcHold -- it mirrors chp/rchp exactly
+  // (live snapshot), per direct confirmation when this was rebuilt.
   if (cfg[`${p}Mode`] === 'Tween') {
     const seq = (cfg.savedTweenSequences || []).find((s) => s.name === cfg[`${p}TweenSelector`])
     const namedPoses = seq ? resolveTweenSequencePoses(seq.tweenPoses) : []
-    trig.tweenPoses = namedPoses.length >= 1 ? [trig.forwardSnapshot, ...namedPoses] : null
-    // Loop/Oscillate's own cyclic sequence -- named poses ONLY, same
-    // exclude-the-anchor convention as Double Click Hold Tween's own
-    // `loopPoses` (see startDoubleClickHoldTween()'s own comment for the
-    // full back-and-forth on this: briefly changed to include the anchor,
-    // then reverted same day -- "no you're not meant to include the
-    // default pose... i guess we had it correct previously"). Paced by
+    const tweenAnchor = p === 'dcHold' ? poseDefaultValues : trig.forwardSnapshot
+    trig.tweenPoses = namedPoses.length >= 1 ? [tweenAnchor, ...namedPoses] : null
+    // Loop/Oscillate's own cyclic sequence -- named poses ONLY, excluding
+    // the anchor (briefly changed to include it, reverted same day -- "no
+    // you're not meant to include the default pose... i guess we had it
+    // correct previously," see this same function's own git history).
+    // Paced by
     // this SAME hold's `${p}TweenSpeedMs`, divided across the named
     // poses. Computed regardless of whether Loop Mode is actually Off
     // (harmless) -- only consulted from updateClickHoldPoseForHand()
     // when it isn't.
     trig.loopPoses = namedPoses
-    trig.loopSegmentMs = Math.max(cfg[`${p}TweenSpeedMs`] / Math.max(namedPoses.length, 1), 1)
+    trig.loopSegmentMs = Math.max(safeTweenSpeedMs(cfg[`${p}TweenSpeedMs`]) / Math.max(namedPoses.length, 1), 1)
   } else {
     trig.tweenPoses = null
     trig.loopPoses = null
@@ -3554,10 +3589,15 @@ function endClickHoldPose(p) {
   const trig = clickHoldPoseTriggers[p]
   if (!trig.active) return // guard against a stray release with no matching press
   trig.active = false
-  // Only restore panning once NEITHER trigger is still holding -- e.g.
-  // releasing the right button while the left is still held shouldn't
-  // re-enable panning mid-hold.
-  if (!clickHoldPoseTriggers.chp.active && !clickHoldPoseTriggers.rchp.active) applyCameraLockState()
+  // Only restore panning once NONE of the 3 triggers are still holding --
+  // e.g. releasing the right button while the left is still held
+  // shouldn't re-enable panning mid-hold. `dcHold` added 2026-09-15 (see
+  // its own DEV_GROUPS comment) -- it now goes through this exact same
+  // startClickHoldPose()/endClickHoldPose() pan-lock, a disclosed side
+  // effect of the shared machinery it never had before (moving the
+  // cursor during a double-click-hold used to pan the camera underneath
+  // the tween, the same bug chp/rchp's own pan-lock was built to fix).
+  if (!clickHoldPoseTriggers.chp.active && !clickHoldPoseTriggers.rchp.active && !clickHoldPoseTriggers.dcHold.active) applyCameraLockState()
   const now = performance.now()
   let minD = Infinity, maxD = -Infinity
   const dists = hands.map((hand) => {
@@ -3648,7 +3688,7 @@ window.addEventListener('pointerup', (e) => {
   if (e.button === 0) endClickHoldPose('chp')
   else if (e.button === 2) endClickHoldPose('rchp')
 })
-window.addEventListener('blur', () => { endClickHoldPose('chp'); endClickHoldPose('rchp') })
+window.addEventListener('blur', () => { endClickHoldPose('chp'); endClickHoldPose('rchp'); endClickHoldPose('dcHold') })
 
 // -----------------------------------------------------------------------
 // Click Pose / Double-Click Pose -- fire-and-forget variant of Click
@@ -3732,7 +3772,7 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
     // Tween's own separate `${p}TweenSpeedMs`, not `${p}TransitionSpeedMs`
     // -- see makeClickHoldPoseGroup()'s own comment for why these are 2
     // genuinely distinct values, not an aliased view of one field.
-    const speedMs = Math.max(cfg[isTween ? `${p}TweenSpeedMs` : `${p}TransitionSpeedMs`], 1)
+    const speedMs = Math.max(isTween ? safeTweenSpeedMs(cfg[`${p}TweenSpeedMs`]) : cfg[`${p}TransitionSpeedMs`], 1)
     const progress = elapsed < cp.forwardDelay ? 0 : THREE.MathUtils.clamp((elapsed - cp.forwardDelay) / speedMs, 0, 1)
     let values
     if (isTween) {
@@ -3885,147 +3925,45 @@ window.addEventListener('pointerup', (e) => {
 })
 
 // -----------------------------------------------------------------------
-// Double Click Hold Tween -- direct request ("*DC*Double Click Hold* This
-// will allow me to set a saved tween as the resulting animation/
-// transition on double click hold. The tween will apply to all hands
-// simultaneously and stop when i release"). Unlike Click-Hold-Pose/Click-
-// Pose (both per-hand, distance-staggered), this is ONE shared phase
-// state for the whole field -- "apply to all hands simultaneously" is the
-// point of this feature, not an incidental simplification.
-//
-// Gesture: a genuine double-click whose 2nd press is HELD (not released
-// quickly) -- distinct from Click-Pose's own 'dblclick' (fire-and-forget,
-// recognized at the 2nd RELEASE) and from Click-Hold-Pose's 'chp' (a
-// single press-and-hold, no double-click required). Detected with its own
-// self-contained pointerdown/up pair: `dcHoldLastCleanUpTime` records the
-// last left pointerup that was a clean, quick click (not a drag) outside
-// the dev panel; a LEFT pointerdown arriving within MOUSE_LOG_MULTICLICK_MS
-// of that is the 2nd press of a double-click, so the tween starts
-// immediately (no separate "was this held long enough" gate -- the
-// double-click itself is already the disambiguating signal, unlike a
-// single click+hold which needs Click-Hold-Pose's own Hold Confirm Delay).
-// Deliberately independent of chp/click/dblclick's own state (no cross-
-// suppression) -- a disclosed simplification, same as the existing chp-
-// vs-rchp "whichever runs last this frame wins" note in animate()'s own
-// per-hand loop.
-const dcHoldTween = { phase: 'idle', holdStartTime: 0, poses: [], loopPoses: [], loopSegmentMs: 1, loopStartTime: 0, lastAppliedValues: null, retransitionStart: null, retransitionStartTime: 0 }
-function startDoubleClickHoldTween() {
-  if (!cfg.dcHoldEnabled) return
-  const seq = (cfg.savedTweenSequences || []).find((s) => s.name === cfg.dcHoldTweenSelector)
-  const namedPoses = seq ? resolveTweenSequencePoses(seq.tweenPoses) : []
-  if (namedPoses.length < 1) return
-  // Direct clarification: "it will tween from the default pose, to pose
-  // 1, then so on" -- the sequence played always starts at the field's
-  // own default pose, never just the first selected pose.
-  dcHoldTween.poses = [poseDefaultValues, ...namedPoses]
-  // Loop mode's own cyclic sequence -- named poses ONLY, never re-
-  // including default (direct request: "continue looping through the
-  // tween, not including the initial default pose"). CORRECTED
-  // 2026-09-15: briefly changed to include the default pose after a
-  // clarification was misread as reversing this; a same-day follow-up
-  // ("no you're not meant to include the default pose... i guess we had
-  // it correct previously") confirmed the ORIGINAL exclude-default
-  // behavior was right all along -- reverted back to `namedPoses`. Same
-  // per-segment pace as the initial pass (speedMs / namedPoses.length,
-  // the initial pass's own segment count) so looping doesn't visibly
-  // speed up or slow down relative to the first lap.
-  dcHoldTween.loopPoses = namedPoses
-  // NaN/undefined-safe: an invalid speed here (e.g. a stale saved-settings
-  // value predating this control) would divide down into a NaN
-  // `loopSegmentMs`, then NaN `tCyclic`, then `poses[NaN]` -> undefined
-  // -> lerpPoseValues() throwing on `undefined[key]` -- and since that
-  // throw happens INSIDE animate() every single frame this hand is still
-  // looping, it would silently kill rendering (composer.render() never
-  // reached) for as long as the hold continues, indistinguishable from
-  // "everything stopped working" to whoever's looking at the screen.
-  const safeSpeedMs = Number.isFinite(cfg.dcHoldTweenSpeedMs) ? cfg.dcHoldTweenSpeedMs : 800
-  dcHoldTween.loopSegmentMs = Math.max(safeSpeedMs / namedPoses.length, 1)
-  dcHoldTween.phase = 'forward'
-  dcHoldTween.holdStartTime = performance.now()
-  // Per-hand frozen Responsive Wrist Splay, same reasoning as Click-Hold-
-  // Pose/Click-Pose's own frozenSplayDeg (see updateClickHoldPoseForHand()'s
-  // own top comment) -- captured once per hand right here, not per-hand-
-  // staggered start times (there are none for this feature).
-  let minD = Infinity, maxD = -Infinity
-  const dists = hands.map((hand) => {
-    const d = hand.wrapper.position.distanceTo(cursorTarget)
-    if (d < minD) minD = d
-    if (d > maxD) maxD = d
-    return d
-  })
-  const range = Math.max(maxD - minD, 0.001)
-  hands.forEach((hand, i) => { hand._dcHoldFrozenSplay = computeResponsiveWristSplayDeg(dists[i], minD, range) })
-}
-// Direct clarification: "On release, whatever pose the hand is in, it
-// will transition at the same speed back to default" -- retransition
-// reuses `dcHoldTweenSpeedMs` itself (no separate retransition-speed
-// control), starting from whatever values were last applied (wherever
-// `t` happened to be when released), not from the sequence's own end.
-function endDoubleClickHoldTween() {
-  if (dcHoldTween.phase === 'idle') return
-  dcHoldTween.retransitionStart = dcHoldTween.lastAppliedValues || { ...poseDefaultValues }
-  dcHoldTween.retransitionStartTime = performance.now()
-  dcHoldTween.phase = 'retransition'
-}
-// Called once per frame (not once per hand -- the result is identical
-// for every hand), from animate()'s own per-hand loop just before it.
-// Returns the shared pose-values object to apply this frame, or null when
-// idle (nothing to override).
-function updateDoubleClickHoldTween(now) {
-  const speedMs = Math.max(Number.isFinite(cfg.dcHoldTweenSpeedMs) ? cfg.dcHoldTweenSpeedMs : 800, 1)
-  if (dcHoldTween.phase === 'forward') {
-    const elapsed = now - dcHoldTween.holdStartTime
-    const t = THREE.MathUtils.clamp(elapsed / speedMs, 0, 1)
-    const values = lerpTweenSequence(dcHoldTween.poses, t)
-    dcHoldTween.lastAppliedValues = values
-    // Direct follow-up request: "provide a checkbox to set if it
-    // continues to loop or not... If unchecked, it runs through the
-    // tween once" -- unchecked (or fewer than 2 named poses, where a
-    // "loop" is undefined) leaves the hand held at the final pose,
-    // exactly the pre-existing behavior. Checked hands off to the
-    // 'looping' phase the instant the initial pass completes, starting
-    // its own cyclic clock fresh from right now (not from holdStartTime)
-    // so the loop's own first lap begins exactly where this pass ended.
-    if (t >= 1 && cfg.dcHoldLoop && dcHoldTween.loopPoses.length >= 2) {
-      dcHoldTween.phase = 'looping'
-      dcHoldTween.loopStartTime = now
-    }
-    return values
-  } else if (dcHoldTween.phase === 'looping') {
-    // The forward pass just ended exactly AT the last named pose --
-    // starting tCyclic at 0 here would jump backward to
-    // loopPoses[0]->loopPoses[1] instead of continuing on from where the
-    // hand actually is. Offsetting by (segments-1) starts the cyclic
-    // clock at the WRAP segment (last pose -> first pose) instead, so
-    // motion continues seamlessly with no pop, then wraps through
-    // 0->1->...->wrap->0->... forever while held.
-    const segments = dcHoldTween.loopPoses.length
-    const tCyclic = (segments - 1) + (now - dcHoldTween.loopStartTime) / dcHoldTween.loopSegmentMs
-    const values = lerpLoopSequence(dcHoldTween.loopPoses, tCyclic)
-    dcHoldTween.lastAppliedValues = values
-    return values
-  } else if (dcHoldTween.phase === 'retransition') {
-    const elapsed = now - dcHoldTween.retransitionStartTime
-    const progress = THREE.MathUtils.clamp(elapsed / speedMs, 0, 1)
-    const values = lerpPoseValues(dcHoldTween.retransitionStart, poseDefaultValues, progress)
-    if (progress >= 1) dcHoldTween.phase = 'idle'
-    return values
-  }
-  return null
-}
+// Double Click Hold -- gesture DETECTION only. REBUILT 2026-09-15 (direct
+// request, "make the available settings of double click and hold to
+// match click hold... I want to also be able to select single pose/
+// tween for double click hold" -- see this group's own DEV_GROUPS comment
+// for the full account): the actual pose machinery is no longer a
+// bespoke, shared-across-all-hands mechanism -- `dcHold` is now a literal
+// 3rd entry in CLICK_HOLD_KEYS, going through the exact same
+// startClickHoldPose()/updateClickHoldPoseForHand()/endClickHoldPose()
+// every hand-family trigger already uses (per-hand distance stagger,
+// Single Pose/Tween Mode, Loop Mode/Oscillate, everything). Only this
+// gesture-recognition layer is unique to Double Click Hold: a genuine
+// double-click whose 2nd press is HELD (not released quickly) -- distinct
+// from Click-Pose's own 'dblclick' (fire-and-forget, recognized at the
+// 2nd RELEASE) and from Click-Hold-Pose's 'chp' (a single press-and-hold,
+// no double-click required). `dcHoldLastCleanUpTime` records the last
+// left pointerup that was a clean, quick click (not a drag) outside the
+// dev panel; a LEFT pointerdown arriving within MOUSE_LOG_MULTICLICK_MS
+// of that is the 2nd press of a double-click, so the hold starts
+// immediately (no separate "was this held long enough" gate needed here
+// -- the double-click itself is already the disambiguating signal, which
+// is also why `dcHold` doesn't strictly NEED its own Hold Confirm Delay
+// the way chp/rchp do, even though it now has that control available too
+// as part of full settings parity). Deliberately independent of chp's own
+// state otherwise (no cross-suppression) -- a disclosed simplification,
+// same as the existing chp-vs-rchp "whichever runs last this frame wins"
+// note.
 let dcHoldDownInfo = null
 let dcHoldLastCleanUpTime = -Infinity
 window.addEventListener('pointerdown', (e) => {
   if (e.target && e.target.closest && e.target.closest('.dp-panel')) return
   if (e.button !== 0) return
   const now = performance.now()
-  if (now - dcHoldLastCleanUpTime <= MOUSE_LOG_MULTICLICK_MS) startDoubleClickHoldTween()
+  if (now - dcHoldLastCleanUpTime <= MOUSE_LOG_MULTICLICK_MS) startClickHoldPose('dcHold')
   dcHoldDownInfo = { time: now, x: e.clientX, y: e.clientY }
 })
 window.addEventListener('pointerup', (e) => {
   if (e.button !== 0) return
-  if (dcHoldTween.phase !== 'idle') {
-    endDoubleClickHoldTween()
+  if (clickHoldPoseTriggers.dcHold.active) {
+    endClickHoldPose('dcHold')
     dcHoldDownInfo = null
     return
   }
@@ -4040,7 +3978,6 @@ window.addEventListener('pointerup', (e) => {
   }
   dcHoldDownInfo = null
 })
-window.addEventListener('blur', () => endDoubleClickHoldTween())
 
 // Generic versions of Arm Length's own 2 custom widgets (see
 // buildArmLengthRangeWidget()/buildArmLengthCurveWidget() for the
@@ -4391,6 +4328,16 @@ safeRefreshSelectOptions('clickMode')
 safeRefreshSelectOptions('clickTweenSelector')
 safeRefreshSelectOptions('dblclickMode')
 safeRefreshSelectOptions('dblclickTweenSelector')
+// dcHold added 2026-09-15 (rebuilt as a 3rd makeClickHoldPoseGroup()
+// instance -- see its own DEV_GROUPS comment) -- needs the same one-time
+// populate as chp/rchp above, plus TargetPose specifically (a genuinely
+// NEW control for this trigger; its own Tween Selector already existed
+// before this rebuild but was NEVER added to this list, an existing gap
+// this happens to also close).
+safeRefreshSelectOptions('dcHoldMode')
+safeRefreshSelectOptions('dcHoldTargetPose')
+safeRefreshSelectOptions('dcHoldTweenSelector')
+safeRefreshSelectOptions('dcHoldLoopMode')
 // Sets this ONE hand's `clone.quaternion`/`clone.position` for its
 // CURRENT arm-length value `hideT` -- called every frame, per hand, from
 // updateRenderOrder()'s own existing per-hand loop (which already
@@ -4762,8 +4709,8 @@ window.addEventListener('resize', () => applyRendererSize(window.innerWidth, win
 // successfully rendered -- indistinguishable from "clicking does nothing"
 // to whoever's looking at it, even though every click is still correctly
 // updating state underneath. One real path into exactly that was found and
-// fixed directly (see updateDoubleClickHoldTween()'s/startDoubleClickHoldTween()'s
-// own NaN-guard comments) -- this try/catch is the general-purpose backstop
+// fixed directly (see safeTweenSpeedMs()'s own comment) -- this try/catch
+// is the general-purpose backstop
 // for that whole FAILURE MODE, not a fix for one specific bug: whatever
 // throws, log it loudly and keep the loop alive rather than freezing silently.
 function animate() {
@@ -4958,10 +4905,6 @@ function updateRenderOrder() {
   })
   const liveDistRange = Math.max(maxLiveDist - minLiveDist, 0.001)
   const nowMs = performance.now() // one shared timestamp for every hand's own Click-Hold-Pose progress this frame, not a separate call per hand
-  // Double Click Hold Tween applies IDENTICALLY to every hand (no per-hand
-  // stagger), so it's computed ONCE here rather than once per hand inside
-  // the loop below -- see updateDoubleClickHoldTween()'s own comment.
-  const dcHoldValues = dcHoldTween.phase !== 'idle' ? updateDoubleClickHoldTween(nowMs) : null
   hands.forEach((hand, i) => {
     const live = liveDistances[i]
     hand.effectiveRenderOrder = (flashFixOn && hand.isOverlapping)
@@ -5012,15 +4955,6 @@ function updateRenderOrder() {
           overridden = true
         }
       })
-      // Double Click Hold Tween -- checked last, so it wins this frame's
-      // write over chp/rchp/click/dblclick if more than one happens to be
-      // touching a hand at once (same disclosed "last one wins" pattern
-      // as above), since it's the most recently added and most explicitly
-      // user-invoked of the 4.
-      if (dcHoldValues) {
-        applyPoseValuesToHand(hand, dcHoldValues, hand._dcHoldFrozenSplay || 0)
-        overridden = true
-      }
       // PERFORMANCE (2026-09-15): this whole idle repose (wrist bone +
       // all 5 fingers, via rotateOnTrueWorldAxis()-style world-axis-
       // corrected bone math) is only actually necessary every frame when

@@ -131,6 +131,10 @@ function displayValue(ctrl, v) {
     // alongside shift-click multi-select).
     entry.multiSelected = new Set()
     entry.selectAnchor = null
+    // Same reasoning again for groupOrder (the "new group goes to the
+    // top" priority list) -- a fresh external value has no meaningful
+    // creation-order history to preserve.
+    entry.groupOrder = []
     // A pending (still-empty) group only exists in this render's own
     // in-memory state -- an externally-driven value refresh (Reset, tab
     // switch, remote restore) is a new source of truth, so anything not
@@ -231,6 +235,15 @@ function syncListPickerFromDom(entry) {
   })
   entry.items = items
   entry.pendingGroups = pending
+  // entry.groupOrder (the "place a new group at the top" priority list,
+  // added 2026-09-15) is cleared entirely here -- the user just manually
+  // dragged a group to a new position, so THIS DOM order (now baked into
+  // items'/pending's own array order above) is the new source of truth;
+  // leaving any stale creation-order priority in place would silently
+  // re-impose it on top of the user's own drag the next time this picker
+  // re-renders for any unrelated reason (a Save/Delete elsewhere, a tab
+  // switch, etc).
+  entry.groupOrder = []
   commit(entry.ctrl, entry.items)
 }
 
@@ -348,6 +361,7 @@ function buildGroupHeader(entry, path) {
     const rename = (p) => (p === path ? newPath : (p.startsWith(prefix) ? newPath + LP_GROUP_PATH_SEP + p.slice(prefix.length) : p))
     entry.items.forEach((it) => { if (it.group) it.group = rename(it.group) })
     entry.pendingGroups = (entry.pendingGroups || []).map(rename)
+    entry.groupOrder = (entry.groupOrder || []).map(rename)
     if (entry.collapsedGroups.has(path)) { entry.collapsedGroups.delete(path); entry.collapsedGroups.add(newPath) }
     commit(entry.ctrl, entry.items)
     renderListPickerRows(entry)
@@ -367,6 +381,7 @@ function buildGroupHeader(entry, path) {
     // cascades into a "Parent/Child" subgroup's own members.
     entry.items.forEach((it) => { if (it.group === path) delete it.group })
     entry.pendingGroups = (entry.pendingGroups || []).filter((p) => p !== path)
+    entry.groupOrder = (entry.groupOrder || []).filter((p) => p !== path)
     entry.collapsedGroups.delete(path)
     commit(entry.ctrl, entry.items)
     renderListPickerRows(entry)
@@ -432,13 +447,30 @@ function renderListPickerRows(entry) {
       if (!t.subs[subName]) { t.subs[subName] = { items: [] }; t.subOrder.push(subName) }
     }
   })
+  // Re-sort top-level order by entry.groupOrder (added 2026-09-15, direct
+  // request: "place the new group at the top of the list instead of the
+  // bottom") -- `topOrder` above is built purely by first-occurrence
+  // while walking items-then-pendingGroups, which can't by itself rank a
+  // brand-new group above an OLDER pre-existing one of the other kind
+  // (e.g. a new auto-assigned group vs. an older still-empty one) since
+  // the 2 loops run unconditionally in a fixed order regardless of actual
+  // creation recency. `entry.groupOrder` (maintained by addGroupBtn's own
+  // handler, below, and cleared entirely on a manual drag -- see
+  // syncListPickerFromDom()) is the real creation-order priority signal;
+  // any name it lists sorts by ITS position there, newest first, ahead of
+  // every name it doesn't know about (which keep their natural relative
+  // order, appended after).
+  const orderedTopOrder = [
+    ...entry.groupOrder.filter((n) => topOrder.includes(n)),
+    ...topOrder.filter((n) => !entry.groupOrder.includes(n))
+  ]
 
   const ungroupedBody = el('div', 'dp-lp-ungrouped-body')
   ungrouped.forEach((item) => ungroupedBody.appendChild(renderListPickerItemRow(entry, item)))
   entry.listEl.appendChild(ungroupedBody)
   entry.ungroupedBody = ungroupedBody
 
-  topOrder.forEach((name) => {
+  orderedTopOrder.forEach((name) => {
     const t = top[name]
     const g = el('div', 'dp-lp-group' + (entry.collapsedGroups.has(name) ? ' collapsed' : ''))
     g.__groupName = name
@@ -756,6 +788,19 @@ function buildListPickerRow(ctrl, row) {
     // renderListPickerItemRow()'s own click handler and addGroupBtn's own
     // handler, below.
     selectedItem: null, multiSelected: new Set(), selectAnchor: null,
+    // groupOrder added 2026-09-15 (direct request: "place the new group at
+    // the top of the list instead of the bottom") -- an explicit top-level
+    // GROUP NAME priority list (newest-created first), separate from
+    // pendingGroups (which only tracks EMPTY groups) since a "new group"
+    // can be either empty or auto-assigned-with-items, and the render
+    // order needs to correctly rank a brand-new group above EVERY existing
+    // group regardless of which of those 2 kinds either one is. Cleared
+    // entirely the instant the user manually drags any group (see
+    // syncListPickerFromDom()) -- past that point the DOM/array order IS
+    // the source of truth the user just set by hand, and re-imposing a
+    // stale creation-order priority on top of it would silently undo
+    // their own drag on the next re-render.
+    groupOrder: [],
     collapsedGroups: new Set(), pendingGroups: [], exportChecked: new Set()
   }
   numEls[ctrl.key] = entry
@@ -842,11 +887,18 @@ function buildListPickerRow(ctrl, row) {
   // were previously in a different group -- "place" reads as move, not
   // copy) instead of landing empty -- the plain-empty-group path below is
   // now only reached with nothing selected yet, unchanged from before.
+  // CORRECTED AGAIN 2026-09-15, same day: "place the new group at the top
+  // of the list instead of the bottom" -- prepending the new name to
+  // entry.groupOrder (for EITHER case) is what actually achieves this;
+  // see renderListPickerRows()'s own comment for why array position alone
+  // (an earlier version of this fix) wasn't enough once an empty AND an
+  // auto-assigned group could both be in play at once.
   addGroupBtn.addEventListener('click', () => {
     const existingNames = new Set([...entry.items.map((it) => it.group).filter(Boolean), ...entry.pendingGroups])
     let name = 'New Group'
     let n = 2
     while (existingNames.has(name)) { name = 'New Group (' + n + ')'; n++ }
+    entry.groupOrder = [name, ...entry.groupOrder]
     if (entry.multiSelected.size > 0) {
       entry.items = entry.items.map((it) => (entry.multiSelected.has(it) ? { ...it, group: name } : it))
       entry.multiSelected = new Set()
