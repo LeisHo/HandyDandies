@@ -1113,6 +1113,30 @@
       "dblclickRetransitionSpeedMs": 410,
       "dblclickRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "dblclickRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
+      "tweenPoses": [
+        "Wave 1",
+        "Wave 2",
+        "Wave 3",
+        "Wave 4",
+        "Wave 5",
+        "Wave 6"
+      ],
+      "savedTweenSequences": [
+        {
+          "name": "Wave",
+          "tweenPoses": [
+            "Wave 1",
+            "Wave 2",
+            "Wave 3",
+            "Wave 4",
+            "Wave 5",
+            "Wave 6"
+          ]
+        }
+      ],
+      "dcHoldEnabled": true,
+      "dcHoldTweenSelector": "Wave",
+      "dcHoldTweenSpeedMs": 320,
       "cameraX": 6.638529594915686,
       "cameraY": 13.373156794075216,
       "cameraZ": 259.74194092345493,
@@ -2321,6 +2345,30 @@
       "dblclickRetransitionSpeedMs": 410,
       "dblclickRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "dblclickRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
+      "tweenPoses": [
+        "Wave 1",
+        "Wave 2",
+        "Wave 3",
+        "Wave 4",
+        "Wave 5",
+        "Wave 6"
+      ],
+      "savedTweenSequences": [
+        {
+          "name": "Wave",
+          "tweenPoses": [
+            "Wave 1",
+            "Wave 2",
+            "Wave 3",
+            "Wave 4",
+            "Wave 5",
+            "Wave 6"
+          ]
+        }
+      ],
+      "dcHoldEnabled": true,
+      "dcHoldTweenSelector": "Wave",
+      "dcHoldTweenSpeedMs": 320,
       "cameraX": 6.638529594915686,
       "cameraY": 13.373156794075216,
       "cameraZ": 259.74194092345493,
@@ -3529,6 +3577,30 @@
       "dblclickRetransitionSpeedMs": 410,
       "dblclickRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "dblclickRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
+      "tweenPoses": [
+        "Wave 1",
+        "Wave 2",
+        "Wave 3",
+        "Wave 4",
+        "Wave 5",
+        "Wave 6"
+      ],
+      "savedTweenSequences": [
+        {
+          "name": "Wave",
+          "tweenPoses": [
+            "Wave 1",
+            "Wave 2",
+            "Wave 3",
+            "Wave 4",
+            "Wave 5",
+            "Wave 6"
+          ]
+        }
+      ],
+      "dcHoldEnabled": true,
+      "dcHoldTweenSelector": "Wave",
+      "dcHoldTweenSpeedMs": 320,
       "cameraX": 6.638529594915686,
       "cameraY": 13.373156794075216,
       "cameraZ": 259.74194092345493,
@@ -3626,6 +3698,25 @@
     }
   },
   "order": [
+    {
+      "key": "Tween",
+      "collapsed": false,
+      "settings": [
+        "tweenPoses",
+        "savedTweenSequences"
+      ],
+      "subgroups": []
+    },
+    {
+      "key": "Double Click Hold",
+      "collapsed": false,
+      "settings": [
+        "dcHoldEnabled",
+        "dcHoldTweenSelector",
+        "dcHoldTweenSpeedMs"
+      ],
+      "subgroups": []
+    },
     {
       "key": "Saved Dev Settings",
       "collapsed": true,
@@ -3767,7 +3858,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": false,
+      "collapsed": true,
       "settings": [],
       "subgroups": [
         {
@@ -3857,14 +3948,20 @@
       "subgroups": [
         {
           "key": "Whole-Hand Rotation & Thumb",
-          "collapsed": false,
+          "collapsed": true,
           "settings": [
-            "midOnlyCurlThumb",
-            "tipOnlyCurlThumb",
-            "baseOnlyCurlThumb",
             "modelRotX",
             "modelRotY",
             "modelRotZ"
+          ],
+          "subgroups": []
+        },
+        {
+          "key": "Wrist",
+          "collapsed": true,
+          "settings": [
+            "wristBend",
+            "wristSplay"
           ],
           "subgroups": []
         },
@@ -3878,19 +3975,13 @@
             "armLengthRange",
             "armLengthCurve",
             "thumbCurl",
+            "tipOnlyCurlThumb",
+            "midOnlyCurlThumb",
+            "baseOnlyCurlThumb",
+            "tipTwistThumb",
             "thumbSplay",
             "thumbSplay2",
-            "tipTwistThumb",
             "curlBiasThumb"
-          ],
-          "subgroups": []
-        },
-        {
-          "key": "Wrist",
-          "collapsed": true,
-          "settings": [
-            "wristBend",
-            "wristSplay"
           ],
           "subgroups": []
         },
@@ -4034,7 +4125,7 @@
     },
     {
       "key": "Debug",
-      "collapsed": true,
+      "collapsed": false,
       "settings": [
         "showGridHelper",
         "showWireframe",
@@ -4047,7 +4138,7 @@
     }
   ],
   "textOverrides": {
-    "New Group": "Thumb",
+    "New Group": "THUMB",
     "New Group (2)": "CLICK FUNCTIONS"
   }
 }
