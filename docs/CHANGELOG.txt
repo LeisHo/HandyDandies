@@ -3821,6 +3821,72 @@ same line before either was committed -- harmless, since a cache-buster
 is just a monotonically-increasing key, not semantic content).
 
 --------------------------------------------------------------------------------
+2026-09-15  -  (start not captured -- session resumed from a compacted
+summary; Actual: NOT MEASURED)
+
+**Fuller account of the Right Click + idle-repose performance fix**
+(originally landed via a concurrent session's commit, disclosed above as
+unauthored/unverified by that entry's own author) -- this entry is that
+work's own author, verifying it live after the fact.
+
+**Performance fix, confirmed with real measurements (`performance.now()`
+around direct `updateRenderOrder()` calls, 255 hands, 50ms gaps between
+calls -- same isolated-timing method this project's own earlier lag
+investigation established as reliable):** with Responsive Wrist Splay ON,
+~30-44ms/call (matches the ~38ms/frame figure already on record); with it
+OFF, ~0.2-0.7ms/call -- the idle repose gate (`needsIdleRepose =
+cfg.wristSplayResponsiveEnabled || hand._wasOverriddenLastFrame`)
+eliminates essentially the entire cost when the feature is off, confirmed
+directly rather than assumed from the code alone. `hand._wasOverriddenLastFrame`
+forces exactly one repose the frame after a Click-Hold/Click-Pose
+transition ends, so a hand returning to idle still re-syncs its
+(possibly stale) finger curl before the gate can skip it again.
+
+**Right Click, verified live via `window.__debug`:** `triggerClickPose('rc')`
+in Single Pose mode correctly entered 'forward' with a real
+`forwardSnapshot` and no `tweenPoses`; manually stepping
+`updateRenderOrder()` (this session's browser-automation tool has its own
+already-documented rAF-timing unreliability, so real frames were driven
+directly rather than waited on) carried the phase through
+forward->paused->retransition, with `lastAppliedValues.curlIndex`
+reaching the target pose's own value (96, "Fist") then back down through
+retransition. Tween mode (a fabricated 2-pose test sequence via
+`cfg.savedTweenSequences`) resolved `cp.tweenPoses` to length 3
+([forwardSnapshot, pose1, pose2]) as designed, and the same phase
+machine played it through to 'idle' with a plausible final
+`lastAppliedValues.curlIndex` (89) on the way back to default. The Mode
+dropdown's conditional UI (Target Pose visible only in Single Pose mode,
+Tween Sequence only in Tween mode) was confirmed toggling live via a
+direct `change` event, using an inline `style.display` toggle rather than
+the `hidden` attribute -- `.dp-row { display: flex }` in style.css is an
+author rule that silently wins the cascade over the UA stylesheet's
+`[hidden] { display: none }` at equal specificity regardless of source
+order, so `.hidden = true` alone would have done nothing.
+
+**Bug found and fixed post-hoc: 3 empty dropdowns.** `rcMode`,
+`rcTargetPose`, and `rcTweenSelector` all rendered with zero `<option>`s
+on page load (confirmed via direct DOM inspection, not assumed) -- the
+same TDZ-timing issue already worked around for `chpTargetPose`/
+`rchpTargetPose`/`clickTargetPose`/`dblclickTargetPose` (a `select`
+control's initial `<option>` list is populated during `initDevPanel()`'s
+own restore-from-storage step, which runs before `const cfg = ...`
+finishes assigning, so any closure reading `cfg` -- or, it turns out,
+ANY select built this early, even `rcMode`'s own plain literal array with
+no `cfg` dependency at all -- ends up empty and never gets a 2nd chance
+outside an explicit one-time re-populate). Fixed by adding the same 3
+missing `safeRefreshSelectOptions()` calls to the existing one-time
+list right after `cfg` is real. Committed separately (`5daac10`) since
+the feature commit itself had already been pushed by the other session
+before this fix was found.
+
+Live-tested end to end on the local static dev server (`?dev=1`); 0
+console errors beyond the pre-existing, unrelated `api/save-settings`
+404s (expected -- no Vercel endpoint behind this local server, matches
+this project's own documented single-tier Save Settings design).
+
+Cache-buster bump: `index.html`'s own `main.js?v=92` -> `?v=93`.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

@@ -63,14 +63,45 @@ this project's CLAUDE.md already documents; a real-device check is still
 worth doing. See CHANGELOG.txt's 4th 2026-09-15 entry for the complete
 account, including a caught-and-fixed continuity bug.
 
-**Note: a concurrent Claude session was found mid-task in this same
-working tree** while the Loop checkbox above was being built (a "Right
-Click" trigger group with a Single-Pose/Tween mode dropdown, plus an
-idle-repose performance fix -- ~38ms/frame measured at 255 hands). Both
-landed in the same uncommitted file with no overlap or conflict with the
-Loop work and were committed together since they couldn't be cleanly
-split; neither was authored or verified by this entry's own author. See
-CHANGELOG.txt's 4th 2026-09-15 entry for what's known about it.
+**"Right Click" trigger group + idle-repose performance fix -- built
+2026-09-15, now verified live by this feature's own author (landed via a
+concurrent session's commit alongside the Loop checkbox above; see that
+entry's own note for how the 2 unrelated changes ended up in one
+commit).** Direct request: gate the known ~38ms/frame idle-repose cost
+(measured earlier the same day) behind whether it can actually change
+anything, and add a 3rd Click-Pose-family trigger on the right button
+with a new capability none of the others have -- a Mode dropdown
+choosing a single Target Pose or a full Tween Sequence, with only the
+relevant one of those 2 rows shown at a time.
+
+**Performance fix, re-measured directly:** `needsIdleRepose =
+cfg.wristSplayResponsiveEnabled || hand._wasOverriddenLastFrame` around
+`updateRenderOrder()`'s per-hand wrist+finger repose. Confirmed via
+isolated `performance.now()` timing at 255 hands: ~30-44ms/call with
+Responsive Wrist Splay on (matches the ~38ms figure already on record),
+~0.2-0.7ms/call with it off -- essentially the full cost eliminated when
+the feature isn't in live use. The one-frame-after-a-transition forced
+repose (`hand._wasOverriddenLastFrame`) keeps a hand's finger curl from
+going stale the instant it returns to idle.
+
+**Right Click, verified via `window.__debug`:** both modes' phase
+machines (forward -> paused -> retransition -> idle) confirmed correct
+by manually stepping `updateRenderOrder()` (this session's browser tool
+has its own known rAF-timing unreliability, so real frames were driven
+directly) and reading back `lastAppliedValues` at each phase -- Single
+Pose reached the target pose's own curl value then returned to default;
+Tween mode resolved a 2-pose test sequence to `[liveSnapshot, pose1,
+pose2]` and played through it the same way. The Mode-dependent row
+visibility was confirmed toggling live.
+
+**One real bug found and fixed post-hoc:** `rcMode`/`rcTargetPose`/
+`rcTweenSelector` all rendered with 0 options on page load (the same
+pre-`cfg`-exists TDZ timing gap already worked around for
+chp/rchp/click/dblclick's own Target Pose dropdowns, just never extended
+to these 3 new ones) -- fixed by adding the same one-time
+`safeRefreshSelectOptions()` calls, pushed separately (`5daac10`).
+
+See CHANGELOG.txt's 5th 2026-09-15 entry for the complete account.
 
 **The "thumb/finger pose looks wrong" saga -- 2 SEPARATE bugs found and
 fixed 2026-09-15, both verified live; awaiting the user's final

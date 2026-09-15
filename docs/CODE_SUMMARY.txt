@@ -1971,3 +1971,60 @@ GOTCHAS
   connection resets (an environment issue, confirmed via `curl` too,
   unrelated to any code change) -- worked around with a fresh server
   instance on an alternate port.
+- **`updateRenderOrder()`'s idle branch now gates its own per-hand
+  wrist+finger repose behind `needsIdleRepose = cfg.wristSplayResponsiveEnabled
+  || hand._wasOverriddenLastFrame`**, instead of running unconditionally
+  every frame. Direct live measurement (255 hands, `performance.now()`
+  around isolated `updateRenderOrder()` calls, 50ms gaps to avoid a GPU-
+  queue-backlog measurement artifact this same investigation had to rule
+  out first) found the repose itself -- not rendering -- was the real
+  cursor-lag bottleneck: ~30-44ms/call with Responsive Wrist Splay on,
+  ~0.2-0.7ms/call with it off. Safe to skip when Splay is off because
+  nothing else re-triggers a change frame-to-frame while idle (a manual
+  slider/Default-pose edit already goes through its own onChange-driven
+  repose). `hand._wasOverriddenLastFrame` (set at the end of each hand's
+  own block in the per-hand loop) forces exactly one repose the frame
+  after a Click-Hold-Pose/Click-Pose/Double-Click-Hold-Tween transition
+  ends, so a hand returning to idle still re-syncs whatever curl the
+  transition left it holding before the gate can start skipping again.
+- **New: "Right Click"** -- a 3rd instance of the Click-Pose family
+  (`CLICK_POSE_KEYS = ['click', 'dblclick', 'rc']`), on the right mouse
+  button via its own quick-tap `pointerup` listener (guarded against
+  double-firing with a genuine Right-Click Hold-Pose release by
+  `lastPointerupWasRchpHoldRelease`, split out from the combined
+  `lastPointerupWasHoldRelease` flag specifically for this). Adds one
+  capability none of the other 3 Click-family triggers have: a `rcMode`
+  select ('Single Pose' / 'Tween') choosing whether the shared forward/
+  paused/retransition phase machine (`updateClickPoseForHand()`,
+  unchanged for `click`/`dblclick`) interpolates toward a single named
+  Target Pose (the pre-existing behavior) or plays through a resolved
+  Tween Sequence via `lerpTweenSequence()` (`cp.tweenPoses`, set once in
+  `triggerClickPose()` as `[liveSnapshot, ...resolveTweenSequencePoses(...)]`
+  -- starts from the hand's own current live pose, not
+  `poseDefaultValues`, keeping it consistent with Single Pose mode's own
+  "transition from wherever it currently is," unlike Double Click Hold
+  Tween's always-from-default convention). Only `rcTargetPose`/
+  `rcTweenSelector` are mode-specific; every other control (Enabled, the
+  4 timing/stagger fields, Pause Duration) applies to both modes
+  unchanged, so switching modes mid-session doesn't reset any tuning.
+  Mode-dependent row visibility (`updateRightClickModeVisibility()`) uses
+  `row.style.display`, not the `hidden` attribute -- `.dp-row { display:
+  flex }` in style.css is an author-stylesheet rule that wins the cascade
+  over the UA stylesheet's `[hidden] { display: none }` at equal
+  specificity regardless of source order, so toggling `.hidden` alone
+  would have silently done nothing (confirmed live before shipping the
+  inline-style version). `rcMode`/`rcTargetPose`/`rcTweenSelector` also
+  hit the same pre-`cfg`-exists TDZ timing gap already on record for
+  `chpTargetPose` etc. (see the "New: 'Click Pose'" entry above) --
+  needed their own 3 `safeRefreshSelectOptions()` calls added to that
+  same one-time post-`cfg` list, not automatically covered by the
+  existing 4. Landed via a concurrent session's commit alongside an
+  unrelated Double Click Hold Loop checkbox change (both unauthored by
+  that commit's own author, found mid-task in the same uncommitted
+  working tree, non-overlapping, committed together since they couldn't
+  be cleanly split) -- this entry is that work's own author, verifying
+  it live after the fact via `window.__debug.triggerClickPose('rc')`
+  plus manually-stepped `updateRenderOrder()` calls (this session's
+  browser tool has its own known rAF-timing unreliability, so real
+  frames were driven directly rather than waited on). See CHANGELOG.txt's
+  5th 2026-09-15 entry for the complete account.
