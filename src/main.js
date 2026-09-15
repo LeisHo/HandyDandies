@@ -1918,7 +1918,7 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       // and Hold Confirm Delay stay visible regardless of mode.
       {
         key: `${p}Mode`, label: 'Mode', type: 'select', def: 'Single Pose', options: () => ['Single Pose', 'Tween'],
-        onChange: () => updateClickTriggerModeVisibility(p, [], ['LoopMode'])
+        onChange: () => { updateClickTriggerModeVisibility(p, [], ['LoopMode']); updateLoopHoldVisibility(p) }
       },
       { key: `${p}TargetPose`, label: 'Target Pose', type: 'select', def: defaults.targetPose ?? '', options: () => (cfg.savedPoses || []).map((sp) => sp.name) },
       { key: `${p}TweenSelector`, label: 'Tween Sequence', type: 'select', def: '', options: () => (cfg.savedTweenSequences || []).map((s) => s.name) },
@@ -1945,20 +1945,30 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       // checkbox to the 2 OTHER hold-based groups (Click Pose/Double-
       // Click Pose/Right Click are fire-and-forget -- no "held" state for
       // a loop to run during, so they don't get this). CORRECTED, same
-      // day: a plain boolean checkbox, then a direct follow-up request
-      // for a 2nd cycling style ("provide a checkbox under loop that is
-      // 'oscillate'... Instead of checkboxes actually, make it a
-      // dropdown") turned this into a single 3-way select instead of 2
-      // separate checkboxes. 'Off' = the original non-looping behavior
-      // (hold at the final pose once reached); 'Loop' = wrap forward
-      // (poseN -> default -> p1 -> ... -> poseN, repeat -- see
+      // day, twice: (1) a plain boolean checkbox, then a direct follow-up
+      // request for a 2nd cycling style ("provide a checkbox under loop
+      // that is 'oscillate'... make it a dropdown") turned this into a
+      // single 3-way select instead of 2 separate checkboxes; (2) briefly
+      // made the cycle include the default pose, reverted the same day
+      // ("no you're not meant to include the default pose... i guess we
+      // had it correct previously") -- see startClickHoldPose()'s own
+      // comment. 'Off' = the original non-looping behavior (hold at the
+      // final pose once reached); 'Loop' = wrap forward through the named
+      // poses only (poseN -> p1 -> p2 -> ... -> poseN, repeat -- see
       // lerpLoopSequence()'s own comment); 'Oscillate' = ping-pong back
-      // and forth through the same sequence instead of wrapping (see
-      // lerpOscillateSequence()'s own comment). See
-      // updateClickHoldPoseForHand()'s own 'looping' phase for how the 2
-      // modes share one phase, branching only on which lerp function to
-      // call.
-      { key: `${p}LoopMode`, label: 'Loop Mode', type: 'select', def: 'Off', options: () => ['Off', 'Loop', 'Oscillate'] },
+      // and forth through the same named poses instead of wrapping,
+      // reversing direction each lap. See updateClickHoldPoseForHand()'s
+      // own 'looping' phase for how the 2 modes share one phase and how
+      // the Hold Duration slider below splits each into discrete laps.
+      { key: `${p}LoopMode`, label: 'Loop Mode', type: 'select', def: 'Off', options: () => ['Off', 'Loop', 'Oscillate'], onChange: () => updateLoopHoldVisibility(p) },
+      // Hold Duration -- direct follow-up request ("provide a slider to
+      // set a hold duration at the end of a single sequence. as in -
+      // sequence, hold, repeat, hold etc, OR. sequence, hold, reverse
+      // sequence, hold, etc"): pauses at the end of each lap (Loop:
+      // after one full wrap; Oscillate: at each end, right before
+      // reversing) before starting the next one. 0 (default) = no pause,
+      // the original always-continuous cycling.
+      { key: `${p}LoopHoldMs`, label: 'Loop Hold Duration (Ms)', type: 'slider', min: 0, max: 5000, step: 10, def: 0 },
       // Direct user report, 2026-09-15: "right after te click, the closest
       // hand seems to start some sort of animation transition, but stops
       // after a split second, then the click-pose function runs smoothly."
@@ -3102,7 +3112,7 @@ function parseClickHoldConfig(p) {
 function getOrInitHandCHP(hand) {
   if (!hand._chp) {
     hand._chp = {}
-    CLICK_HOLD_KEYS.forEach((p) => { hand._chp[p] = { phase: 'idle', forwardDelay: 0, loopStartTime: 0, retransitionDelay: 0, retransitionStart: null, retransitionStartTime: 0, lastAppliedValues: null, frozenSplayDeg: 0 } })
+    CLICK_HOLD_KEYS.forEach((p) => { hand._chp[p] = { phase: 'idle', forwardDelay: 0, loopStartTime: 0, loopHoldEndTime: 0, loopDirection: 1, retransitionDelay: 0, retransitionStart: null, retransitionStartTime: 0, lastAppliedValues: null, frozenSplayDeg: 0 } })
   }
   return hand._chp
 }
@@ -3251,30 +3261,6 @@ function lerpLoopSequence(poses, tCyclic) {
   const localT = wrapped - segIndex
   return lerpPoseValues(poses[segIndex], poses[(segIndex + 1) % segments], localT)
 }
-// Oscillate mode (direct follow-up request, "instead of loop, the poses
-// run from 0 to 100%, then from 100% back to 0% then so on") -- a
-// ping-pong/triangle wave through the SAME sequence `lerpTweenSequence()`
-// plays forward, bouncing at each end instead of wrapping. `segments =
-// poses.length - 1` (the number of forward-pass transitions, same
-// meaning as lerpTweenSequence()'s own local `segments`); a full back-
-// and-forth cycle is `2 * segments` long. `tRaw` starts at 0 the instant
-// oscillation begins (unlike lerpLoopSequence()'s `tCyclic`, which needs
-// a `segments - 1` caller-side offset to continue smoothly from the
-// forward pass's own end point) -- the `+ segments` phase shift below is
-// baked in here instead, so `tRaw = elapsed / segmentMs` alone already
-// starts EXACTLY at the last pose and immediately reverses, continuing
-// seamlessly from wherever the forward pass left off, then bounces
-// 0<->segments forever while held. Delegates the actual pose lerp back
-// to lerpTweenSequence() (position/segments is always a valid t in
-// [0,1]) rather than duplicating its segment-index math.
-function lerpOscillateSequence(poses, tRaw) {
-  if (!poses || poses.length < 2) return null
-  const segments = poses.length - 1
-  const period = 2 * segments
-  const u = (((tRaw + segments) % period) + period) % period // stays positive regardless of sign
-  const position = segments - Math.abs(u - segments)
-  return lerpTweenSequence(poses, position / segments)
-}
 function computeStartDelayMs(distanceToCursor, minLiveDist, liveDistRange, curveParsed, rangeParsed) {
   const normDist = THREE.MathUtils.clamp((distanceToCursor - minLiveDist) / liveDistRange, 0, 1)
   const curveY = THREE.MathUtils.clamp(evaluateArmLengthCurve(curveParsed, normDist), 0, 1)
@@ -3368,6 +3354,13 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
       if (progress >= 1 && loopMode !== 'Off' && trig.loopPoses && trig.loopPoses.length >= 2) {
         chp.phase = 'looping'
         chp.loopStartTime = now
+        chp.loopHoldEndTime = 0
+        // Oscillate's first lap plays BACKWARD (last named pose -> first),
+        // continuing seamlessly from where forward just ended -- direction
+        // -1 means "start at the end (`segments`), head toward 0," see
+        // the 'looping' phase's own comment. Loop mode ignores this
+        // (always the same wrap direction).
+        chp.loopDirection = -1
       }
     } else {
       const targetPose = (cfg.savedPoses || []).find((sp) => sp.name === cfg[`${p}TargetPose`])
@@ -3382,28 +3375,70 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     // `trig.loopPoses`/`trig.loopSegmentMs` (set once at hold-start,
     // shared by every hand) mean the same thing either way. `endClickHoldPose()`
     // reads `chp.lastAppliedValues` the same way regardless of whether
-    // release happens during 'forward' or 'looping' -- no separate
-    // release handling needed for this phase.
+    // release happens during 'forward'/'looping' or mid-hold -- no
+    // separate release handling needed for any of those.
+    //
+    // Hold Duration (direct follow-up request: "provide a slider to set
+    // a hold duration at the end of a single sequence... sequence, hold,
+    // repeat, hold, etc, OR sequence, hold, reverse sequence, hold,
+    // etc") -- splits what used to be one continuous, never-restarting
+    // cyclic formula into discrete LAPS, each ending in an optional
+    // pause before the next one starts. A "lap" is one full wrap
+    // (Loop) or one one-way traversal (Oscillate, reversing direction
+    // each lap -- "reverse sequence" is literally alternating
+    // `chp.loopDirection`).
+    if (chp.loopHoldEndTime && now < chp.loopHoldEndTime) {
+      // Mid-hold -- reapply the frozen end-of-lap pose (not a no-op:
+      // other config-driven state can still change during a hold, same
+      // convention as the 'paused' phase elsewhere in this file).
+      applyPoseValuesToHand(hand, chp.lastAppliedValues, chp.frozenSplayDeg)
+      return
+    }
+    if (chp.loopHoldEndTime && now >= chp.loopHoldEndTime) {
+      // Hold just ended -- start the next lap fresh from right now (not
+      // from when the hold began), and flip direction for Oscillate so
+      // "repeat" alternates forward/backward each lap.
+      chp.loopHoldEndTime = 0
+      chp.loopStartTime = now
+      if (cfg[`${p}LoopMode`] === 'Oscillate') chp.loopDirection *= -1
+    }
     const elapsedSegments = (now - chp.loopStartTime) / trig.loopSegmentMs
-    let values
+    let values, lapT
     if (cfg[`${p}LoopMode`] === 'Oscillate') {
-      // lerpOscillateSequence()'s own `+ segments` phase shift is baked
-      // in, so the raw elapsed-segments count (no caller-side offset) is
-      // exactly what continues seamlessly from where forward ended -- see
-      // its own comment.
-      values = lerpOscillateSequence(trig.loopPoses, elapsedSegments)
+      const segments = trig.loopPoses.length - 1
+      const startPos = chp.loopDirection === 1 ? 0 : segments
+      const endPos = chp.loopDirection === 1 ? segments : 0
+      lapT = THREE.MathUtils.clamp(elapsedSegments / segments, 0, 1)
+      const position = startPos + (endPos - startPos) * lapT
+      values = lerpTweenSequence(trig.loopPoses, position / segments)
     } else {
       // Same "start at the WRAP segment, not segment 0" reasoning as
       // Double Click Hold Tween's own 'looping' phase (see
       // updateDoubleClickHoldTween()'s own comment): the forward pass
       // just ended exactly at the last pose, so starting the cycle at
-      // `loopPoses[0]` would jump backward.
+      // `loopPoses[0]` would jump backward. One full lap = advancing by
+      // exactly `segments` (a complete wrap back to the same relative
+      // position). `lapT` itself stays UNCLAMPED (so an overshoot frame
+      // still gets detected as "past the boundary" below), but the value
+      // actually applied uses a clamped elapsed count -- otherwise a slow
+      // frame that overshoots past the true boundary before this check
+      // ever runs would freeze the hold at that overshot, slightly-past-
+      // the-pose interpolated value instead of the clean boundary pose
+      // (confirmed live: without the clamp, a hold sometimes froze at an
+      // arbitrary mid-transition value like -64 instead of the intended
+      // -1).
       const segments = trig.loopPoses.length
-      const tCyclic = (segments - 1) + elapsedSegments
+      lapT = elapsedSegments / segments
+      const tCyclic = (segments - 1) + Math.min(elapsedSegments, segments)
       values = lerpLoopSequence(trig.loopPoses, tCyclic)
     }
     chp.lastAppliedValues = values
     applyPoseValuesToHand(hand, values, chp.frozenSplayDeg)
+    if (lapT >= 1) {
+      const holdMs = Math.max(cfg[`${p}LoopHoldMs`] ?? 0, 0)
+      if (holdMs > 0) chp.loopHoldEndTime = now + holdMs
+      else chp.loopStartTime = now // no hold configured -- restart the lap clock seamlessly, same as the old always-continuous behavior
+    }
   } else if (chp.phase === 'retransition') {
     const elapsed = now - chp.retransitionStartTime
     const speedMs = Math.max(cfg[`${p}RetransitionSpeedMs`], 1)
@@ -3432,20 +3467,17 @@ function startClickHoldPose(p) {
     const seq = (cfg.savedTweenSequences || []).find((s) => s.name === cfg[`${p}TweenSelector`])
     const namedPoses = seq ? resolveTweenSequencePoses(seq.tweenPoses) : []
     trig.tweenPoses = namedPoses.length >= 1 ? [trig.forwardSnapshot, ...namedPoses] : null
-    // Loop/Oscillate's own cyclic sequence -- CORRECTED 2026-09-15, same
-    // reasoning as startDoubleClickHoldTween()'s own matching correction
-    // (direct clarification: "when i said the looping disregards the
-    // first pose, i meant the default pose. All poses saved in tweens
-    // should be looped"): reuses the exact SAME sequence the forward
-    // pass already plays (`trig.tweenPoses`, anchor pose included) --
-    // used to be `namedPoses` only, deliberately excluding the anchor.
-    // Paced by this SAME hold's `${p}TweenSpeedMs`, divided across the
-    // named poses (not `loopPoses.length`, one longer now) -- see
-    // startDoubleClickHoldTween()'s own comment for why that keeps the
-    // same per-segment pace as lap 1. Computed regardless of whether
-    // Loop Mode is actually Off (harmless) -- only consulted from
-    // updateClickHoldPoseForHand() when it isn't.
-    trig.loopPoses = trig.tweenPoses
+    // Loop/Oscillate's own cyclic sequence -- named poses ONLY, same
+    // exclude-the-anchor convention as Double Click Hold Tween's own
+    // `loopPoses` (see startDoubleClickHoldTween()'s own comment for the
+    // full back-and-forth on this: briefly changed to include the anchor,
+    // then reverted same day -- "no you're not meant to include the
+    // default pose... i guess we had it correct previously"). Paced by
+    // this SAME hold's `${p}TweenSpeedMs`, divided across the named
+    // poses. Computed regardless of whether Loop Mode is actually Off
+    // (harmless) -- only consulted from updateClickHoldPoseForHand()
+    // when it isn't.
+    trig.loopPoses = namedPoses
     trig.loopSegmentMs = Math.max(cfg[`${p}TweenSpeedMs`] / Math.max(namedPoses.length, 1), 1)
   } else {
     trig.tweenPoses = null
@@ -3836,20 +3868,18 @@ function startDoubleClickHoldTween() {
   // 1, then so on" -- the sequence played always starts at the field's
   // own default pose, never just the first selected pose.
   dcHoldTween.poses = [poseDefaultValues, ...namedPoses]
-  // Loop mode's own cyclic sequence -- CORRECTED 2026-09-15, direct
-  // follow-up clarification ("when i said the looping disregards the
-  // first pose, i meant the default pose. All poses saved in tweens
-  // should be looped"): this used to be `namedPoses` only, deliberately
-  // excluding the default pose per an earlier request ("not including
-  // the initial default pose") -- that excluded exactly the pose the
-  // user is now saying should be included. `dcHoldTween.poses` (set
-  // just above) is the SAME full sequence the forward pass already
-  // plays (`[poseDefaultValues, ...namedPoses]`); reusing it here means
-  // looping now cycles through every pose, default included. Per-segment
-  // pace (below) is UNCHANGED on purpose -- see its own comment for why
-  // dividing by `namedPoses.length` (not the new, one-longer
-  // `loopPoses.length`) still keeps the same pace as the initial pass.
-  dcHoldTween.loopPoses = dcHoldTween.poses
+  // Loop mode's own cyclic sequence -- named poses ONLY, never re-
+  // including default (direct request: "continue looping through the
+  // tween, not including the initial default pose"). CORRECTED
+  // 2026-09-15: briefly changed to include the default pose after a
+  // clarification was misread as reversing this; a same-day follow-up
+  // ("no you're not meant to include the default pose... i guess we had
+  // it correct previously") confirmed the ORIGINAL exclude-default
+  // behavior was right all along -- reverted back to `namedPoses`. Same
+  // per-segment pace as the initial pass (speedMs / namedPoses.length,
+  // the initial pass's own segment count) so looping doesn't visibly
+  // speed up or slow down relative to the first lap.
+  dcHoldTween.loopPoses = namedPoses
   // NaN/undefined-safe: an invalid speed here (e.g. a stale saved-settings
   // value predating this control) would divide down into a NaN
   // `loopSegmentMs`, then NaN `tCyclic`, then `poses[NaN]` -> undefined
@@ -3859,13 +3889,6 @@ function startDoubleClickHoldTween() {
   // reached) for as long as the hold continues, indistinguishable from
   // "everything stopped working" to whoever's looking at the screen.
   const safeSpeedMs = Number.isFinite(cfg.dcHoldTweenSpeedMs) ? cfg.dcHoldTweenSpeedMs : 800
-  // Still `namedPoses.length`, not `dcHoldTween.loopPoses.length` (one
-  // longer now that default is included) -- the initial forward pass
-  // covers `namedPoses.length` segments (default->p1->...->pN) over
-  // `speedMs` total, i.e. speedMs/namedPoses.length per segment; keeping
-  // that SAME per-segment divisor here is what makes the loop's pace
-  // match lap 1 exactly, regardless of how many points the loop itself
-  // visits per full cycle.
   dcHoldTween.loopSegmentMs = Math.max(safeSpeedMs / namedPoses.length, 1)
   dcHoldTween.phase = 'forward'
   dcHoldTween.holdStartTime = performance.now()
@@ -4249,6 +4272,18 @@ function updateClickTriggerModeVisibility(p, extraSinglePoseKeys, extraTweenKeys
     if (row) row.style.display = mode !== 'Tween' ? 'none' : ''
   })
 }
+// Loop Hold Duration's own NESTED visibility (chp/rchp only) -- deliberately
+// separate from updateClickTriggerModeVisibility() above: it needs a 2nd
+// condition beyond "is Tween mode selected," namely "is Loop Mode
+// anything other than Off" (a hold duration is meaningless with no
+// looping happening at all). Called from BOTH Mode's own onChange (so
+// switching away from Tween re-hides it regardless of LoopMode) and
+// LoopMode's own onChange (so picking 'Off' hides it even while still in
+// Tween mode) -- see both controls' own onChange in makeClickHoldPoseGroup().
+function updateLoopHoldVisibility(p) {
+  const row = document.querySelector(`.dp-row[data-key="${p}LoopHoldMs"]`)
+  if (row) row.style.display = (cfg[`${p}Mode`] === 'Tween' && cfg[`${p}LoopMode`] !== 'Off') ? '' : 'none'
+}
 CLICK_POSE_KEYS.forEach((p) => { parseClickPoseConfig(p); buildClickPoseWidgets(p) })
 // Every Click-family group's own Mode dropdown (Single Pose vs. Tween) --
 // run once now that all of these rows definitely exist, same reasoning/
@@ -4257,7 +4292,7 @@ CLICK_POSE_KEYS.forEach((p) => { parseClickPoseConfig(p); buildClickPoseWidgets(
 // that. Click Pose/Double-Click Pose/Right Click share CLICK_POSE_KEYS'
 // own Pause Duration slider; Click Hold-Pose/Right-Click Hold-Pose don't.
 CLICK_POSE_KEYS.forEach((p) => updateClickTriggerModeVisibility(p, ['PauseDurationMs']))
-CLICK_HOLD_KEYS.forEach((p) => updateClickTriggerModeVisibility(p, [], ['LoopMode']))
+CLICK_HOLD_KEYS.forEach((p) => { updateClickTriggerModeVisibility(p, [], ['LoopMode']); updateLoopHoldVisibility(p) })
 // Bug fix (direct user report, "I dont see any of the saved poses in the
 // dropdown"): a `select` control's <option> list is populated by
 // `displayValue()` during the host's own restore-from-storage step
