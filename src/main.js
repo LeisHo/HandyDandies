@@ -3978,6 +3978,15 @@ safeRefreshSelectOptions('chpTargetPose')
 safeRefreshSelectOptions('rchpTargetPose')
 safeRefreshSelectOptions('clickTargetPose')
 safeRefreshSelectOptions('dblclickTargetPose')
+// Right Click's own 3 selects hit this same one-time TDZ-populated-empty
+// symptom -- rcTargetPose for the same cfg.savedPoses reason as the 4
+// calls above; rcMode (a plain literal array, no cfg dependency at all)
+// and rcTweenSelector (cfg.savedTweenSequences) empty too, confirming
+// this is a general "any `select` built before this point needs a
+// one-time re-populate" issue, not specific to a cfg-reading closure.
+safeRefreshSelectOptions('rcTargetPose')
+safeRefreshSelectOptions('rcMode')
+safeRefreshSelectOptions('rcTweenSelector')
 // Sets this ONE hand's `clone.quaternion`/`clone.position` for its
 // CURRENT arm-length value `hideT` -- called every frame, per hand, from
 // updateRenderOrder()'s own existing per-hand loop (which already
