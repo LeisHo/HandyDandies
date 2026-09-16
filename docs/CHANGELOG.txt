@@ -5290,6 +5290,58 @@ removed before this final version); `main.js`'s own import of
 `devpanel/devPanel.js?v=20` -> `?v=21`.
 
 --------------------------------------------------------------------------------
+2026-09-16  -  04:08:49 - 04:14:09 EDT (5m20s, measured)
+
+**The settings-restore-race fix (2 entries above) was NOT the real
+startup-lag cause -- direct user report after that deploy: "nope same
+issue. i still see the load screen and its still slow," then the actual
+disambiguating clue: "on mobile it doesnt lag, but the startup animation
+thing is still happening... its smooth though."** That means the
+visible "hands getting into position" IS the expected, correct cursor-
+tracking damping animation (`hand.wrapper.quaternion.slerp` toward the
+cursor, `cfg.trackingDamping`) -- it happens on BOTH platforms, and
+isn't itself a bug. The real bug: desktop drops frames specifically
+WHILE that normal animation is playing; mobile doesn't.
+
+**Root cause: lazy WebGL shader compilation, spread across the first
+few visible/animating frames instead of happening once, upfront.**
+Every field hand gets its own CLONED material (`createToonMaterial()`'s
+own comment: required for per-hand wrist-clip planes; a shared
+`customProgramCacheKey` was tried and reverted for a real, unrelated
+correctness bug on 2026-09-14) -- and WebGL only compiles a material's
+shader program the first time it's actually DRAWN, not when it's
+created. With up to ~240+ separate per-hand materials, that means up to
+~240+ separate GPU program compiles were silently happening across
+whichever frames first drew each hand -- exactly the visible "settling"
+window, since that's also when cursor-tracking is still converging.
+Raw shader-compile speed is genuinely GPU/driver-dependent and known to
+vary far more between a desktop's own GPU/driver and a modern phone's
+than the actual CPU/JS work does, plausibly explaining the platform
+split on its own.
+
+**Fixed with `renderer.compile(scene, camera)`** (three.js's own
+standard fix for exactly this class of stutter), called inside
+`tryStartField()` right after `rebuildField()`, forcing every material
+to compile HERE, synchronously, behind the loading screen -- moving the
+entire compile cost to one controlled point instead of smearing it
+across the first several visible, actively-animating frames. Not
+claimed as a guaranteed full fix for the platform gap itself (raw GPU
+compile speed isn't something this app can change), but it directly
+addresses the actual mechanism (compiling during the visible animation)
+regardless of how slow compiling turns out to be on any given machine.
+
+A temporary timing log (`console.log('[startup] renderer.compile()...')`)
+was added and DELIBERATELY LEFT IN this deploy -- measured 34.3ms for
+255 hands in this session's own test environment (not representative of
+the user's own reported hardware, which is the whole point of shipping
+it: the user checking their own browser console gives a REAL number for
+their actual GPU/driver, the only way to confirm or refute the
+hypothesis for their specific case). Plan to remove it in a follow-up
+once confirmed either way.
+
+Cache-buster bump: `index.html`'s own `main.js?v=118` -> `?v=119`.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

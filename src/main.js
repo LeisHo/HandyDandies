@@ -219,6 +219,39 @@ function tryStartField() {
   fieldStarted = true
   rebuildField()
   buildPosePreview()
+  // ROOT CAUSE of the REAL startup jank, found 2026-09-16 after the
+  // settings-restore-race fix above turned out NOT to be it (direct user
+  // report: same issue persisted after that fix; further direct report --
+  // "on mobile it doesnt lag, but the startup animation thing is still
+  // happening... its smooth though" -- proved the visible "hands settling
+  // into position" is the EXPECTED cursor-tracking damping animation
+  // (hand.wrapper.quaternion.slerp toward the cursor, cfg.trackingDamping),
+  // not a bug, since it happens on BOTH platforms; the bug is specifically
+  // that DESKTOP drops frames WHILE that normal animation plays, and
+  // mobile doesn't). Every field hand gets its OWN CLONED material (see
+  // createToonMaterial()'s own comment -- required for per-hand wrist-
+  // clip planes, `customProgramCacheKey` sharing was tried and reverted
+  // for a real, different correctness bug), and WebGL shader compilation
+  // is LAZY -- deferred to the first frame each material is actually
+  // DRAWN, not when it's created. That means up to ~240+ separate GPU
+  // shader-program compiles were silently happening spread across the
+  // FIRST FEW RENDERED FRAMES (exactly the visible "settling" window,
+  // since that's also when cursor-tracking is still converging) rather
+  // than in one controlled spot -- and raw shader-compile speed is a
+  // genuinely GPU-driver-dependent cost that varies far more between a
+  // desktop's own GPU/driver and a modern phone's than between the 2
+  // platforms' actual JS/CPU work, plausibly explaining the platform
+  // split on its own. `renderer.compile()` (three.js's own standard fix
+  // for exactly this class of stutter) forces every material in the
+  // scene to compile its program HERE, synchronously, behind the loading
+  // screen -- not a guess this fully eliminates the platform gap (GPU
+  // compile speed itself isn't something this app can change), but it
+  // moves the ENTIRE compile cost to a single controlled point instead of
+  // smearing it across the first several visible, actively-animating
+  // frames, which is what actually produced the visible jank.
+  const __compileStart = performance.now()
+  renderer.compile(scene, camera)
+  console.log(`[startup] renderer.compile() took ${(performance.now() - __compileStart).toFixed(1)}ms for ${hands.length} hands`)
   window.__debug = { THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState }
   loadingEl.classList.add('hidden')
 }
