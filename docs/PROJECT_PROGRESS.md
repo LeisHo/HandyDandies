@@ -18,6 +18,26 @@ work seamlessly from there.
 
 ## Currently working on
 
+**MAJOR devPanel.js bug fixed 2026-09-16: real (non-`?dev=1`) visitors
+of the production site never received anything saved via the dev
+panel's own Save/Sync button.** Direct user report ("`?dev=1` looks
+fine, the bare URL shows old settings, incognito rules out cache").
+`initDevPanel()` had a hard `if (!DEV_MODE) return cfg` immediately
+after seeding `cfg` with pure code defaults -- the actual settings
+restore (`resetSettings()`, fetching real saved/remote values) only ever
+ran later, inside the DEV_MODE-only panel-building path this early
+return skipped past entirely. Since DEV_MODE requires `?dev=1`/
+`localhost`/`127.0.0.1`/`file:`, a normal production visitor has NEVER
+seen anything tuned/saved via the dev panel, on this or any other
+project sharing this engine. Fixed with a new `restoreValuesForEveryVisitor()`
+call, unconditional, before the DEV_MODE check. Verified the restore
+mechanism itself works correctly from its new call site (mocked a
+delayed remote-settings fetch, confirmed `cfg`/`poseDefaultValues` both
+update correctly, panel/field still render fine afterward) -- the actual
+"does a non-dev visitor now get real settings" behavior still needs
+confirming on the live production URL once this deploys, since
+`localhost` is unconditionally DEV_MODE and can't exercise that branch.
+
 **Middle/ring finger "outstretched for a split second" during
 retransition -- ACTUALLY ROOT-CAUSED AND FIXED 2026-09-16 (the earlier
 "re-exporting the Fist pose fixed it" report turned out to be

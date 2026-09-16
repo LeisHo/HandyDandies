@@ -5099,6 +5099,51 @@ correction; `index.html`'s own `main.js?v=111` -> `?v=112` for the
 of `devpanel/devPanel.js?v=18` -> `?v=19`.
 
 --------------------------------------------------------------------------------
+2026-09-16  -  02:37:36 - 02:39:20 EDT (1m44s, measured)
+
+**ROOT-CAUSED AND FIXED a MAJOR pre-existing devPanel.js bug: real
+visitors of the live production URL (no `?dev=1`) have NEVER actually
+seen anything saved via the dev panel's own Save/Sync button --
+ever.** Direct user report: "How come when I open .../?dev=1 on mobile
+it looks fine. But on .../ it's still old settings. I used incognito so
+it's not cache." Confirmed by direct code read: `initDevPanel()` had a
+hard `if (!DEV_MODE) return cfg` immediately after seeding `cfg` with
+pure per-control code `def:` values -- the ONLY code path that ever
+restores REAL saved/remote values (`resetSettings()`) lives much later,
+entirely inside the DEV_MODE-only panel-building branch this early
+return skips past. `DEV_MODE` itself requires `?dev=1`, `localhost`,
+`127.0.0.1`, or `file:` -- a normal visitor on the bare production URL
+satisfies none of these, so `resetSettings()` (and therefore the whole
+Save/Sync feature's own real purpose) has NEVER actually run for them,
+on any project ever built on this shared engine, not just this one.
+Fixed with a new `restoreValuesForEveryVisitor()`, called unconditionally
+BEFORE the `DEV_MODE` check -- reuses `applyStoredValues()` directly
+(confirmed safe to call with no panel DOM built yet: every DOM-touching
+step inside it already no-ops gracefully on a control with no
+corresponding row, same tolerance `buildRow()`'s own 'select' branch
+already documents), restoring cfg/store and firing the new `onRestore`
+hook (see this file's own earlier entry) for every visitor. Deliberately
+skips row order and panel geometry (both meaningless without a panel) --
+a DEV_MODE visitor still separately gets those, plus a harmless,
+accepted-as-a-tradeoff redundant 2nd value-restore fetch, via the
+existing `resetSettings()` later in the normal panel-setup path.
+Live-verified (localhost is unconditionally DEV_MODE per its own
+definition, so the `!DEV_MODE` branch itself can't be exercised locally
+without a non-localhost/non-file test domain -- verified the RESTORE
+MECHANISM itself instead, from its new earlier call site): mocked a
+delayed remote-settings response exactly as the prior entry's own test
+did -- `cfg`/`poseDefaultValues` both correctly went from stale code
+defaults to the real mocked values once the fetch resolved, and the
+panel + field still rendered correctly afterward (screenshot-confirmed:
+hands showing the correct curled/posed default, panel fully functional).
+The actual "does a non-dev visitor now get real settings" behavior still
+needs confirming on the real production URL once this deploys, since
+that specific code path can't be reached on `localhost`.
+
+Cache-buster bumps: `index.html`'s own `main.js?v=112` -> `?v=113`;
+`main.js`'s own import of `devpanel/devPanel.js?v=19` -> `?v=20`.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

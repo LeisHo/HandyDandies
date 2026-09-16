@@ -1690,6 +1690,47 @@ export function initDevPanel(groups, opts = {}) {
       }
     }))
   })
+  // Restores real saved/remote values into cfg/store for EVERY visitor,
+  // not just a DEV_MODE (`?dev=1`) one. Previously this didn't happen at
+  // all for a normal visitor: the ONLY place that ever restored real
+  // values was `resetSettings()`, called much later, deep inside the
+  // DEV_MODE-only panel-building path below -- a normal visitor hit
+  // `if (!DEV_MODE) return cfg` (right below) and left with `cfg` still
+  // holding nothing but each control's own hardcoded code `def:`.
+  // Confirmed as the exact cause of a real user report: the live
+  // production URL WITHOUT `?dev=1` kept showing "old settings" while
+  // `?dev=1` correctly showed the real, tuned/saved ones -- every real
+  // visitor of a project using this engine has never actually seen
+  // anything saved via the dev panel's own Save/Sync button. Calls
+  // `applyStoredValues()` directly (safe with no panel DOM built yet --
+  // every DOM-touching step inside it, `ctrl.onChange`/`displayValue()`/
+  // `refreshRowDisplaysForEditingTab()`, already no-ops gracefully on a
+  // control with no corresponding row, the same TDZ-safe tolerance
+  // `buildRow()`'s own 'select' branch documents). Deliberately skips
+  // group/row ORDER and panel GEOMETRY (both meaningless without a
+  // panel) -- just the plain value restore every visitor actually needs.
+  // A DEV_MODE visitor still separately gets the full `resetSettings()`
+  // (order + geometry too) via the normal panel-setup path below; a
+  // second, redundant value-restore fetch for that minority of visitors
+  // is an acceptable one-time page-load cost, not worth the complexity
+  // of suppressing it.
+  function restoreValuesForEveryVisitor() {
+    if (opts.remoteSave) {
+      fetchRemoteSettingsUntilSuccess(opts.remoteSave, (settings) => {
+        applyStoredValues(settings.values)
+        if (opts.onRestore) opts.onRestore()
+      })
+      return
+    }
+    let saved = null
+    try { saved = JSON.parse(localStorage.getItem(settingsKey())) } catch (err) { saved = null }
+    if (saved) {
+      applyStoredValues(saved.values)
+      if (opts.onRestore) opts.onRestore()
+    }
+  }
+  restoreValuesForEveryVisitor()
+
   if (!DEV_MODE) return cfg
 
   const panel = el('div', 'dp-panel', { id: 'devPanel' })
