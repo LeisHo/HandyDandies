@@ -5342,6 +5342,51 @@ once confirmed either way.
 Cache-buster bump: `index.html`'s own `main.js?v=118` -> `?v=119`.
 
 --------------------------------------------------------------------------------
+2026-09-16  -  04:24:18 - 04:28:13 EDT (3m55s, measured)
+
+**The `renderer.compile()` shader-compile hypothesis is REFUTED by the
+user's own real measurement: 49.8ms for 240 hands on their reported-
+laggy desktop** -- nowhere near enough to explain "very very laggy."
+Corrected that comment in place (not deleted -- left as a record of a
+wrong-but-reasoned hypothesis, per this project's own convention) rather
+than silently rewriting history. `renderer.compile()` itself stays (it's
+still a cheap, harmless best practice), but the temporary diagnostic
+`console.log` that measured it is removed.
+
+**2 more clarifying details from the user, both directly checked:**
+"in dev console, even when using a mobile sized display browser, its
+still lagging so its not a scale or browser size issue" -- rules out
+viewport/resolution-driven theories conclusively (a desktop browser
+resized to mobile dimensions still uses the SAME desktop GPU/CPU, so
+this isolates the cause to the machine/browser itself, not screen size).
+"i really think it might be the last couple of changes i requested...
+triple click and quad click" -- checked directly against the live
+settings data: `tripleClickEnabled`/`quadClickEnabled`/
+`tripleClickHoldEnabled`/`quadClickHoldEnabled` are all `false` on both
+desktop and mobile, meaning `triggerClickPose()`/`startClickHoldPose()`'s
+own `if (!cfg[...Enabled]) return` guards mean none of that feature's
+actual per-hand logic ever runs -- a disabled trigger is very unlikely
+to be the cause, though not proof positive on its own.
+
+**Rather than propose a 3rd guess, added a real frame-cost profiler**
+(`__frameProfiler`, inside `animate()`) -- breaks down where per-frame
+time is ACTUALLY going: `updateRenderOrder()` (per-hand trigger/idle-
+repose logic) vs. `composer.render()` (GPU draw submission) vs.
+everything else, logged once per second as a rolling-window average +
+instantaneous FPS to the console (`[frame-profile] fps=... avgUpdateRenderOrder=...ms
+avgComposerRender=...ms hands=N over F frames`). Verified live (local):
+correctly logs sane numbers (~100+fps, sub-ms costs, matching the local
+test's empty/default settings). Meant to be temporary -- removed once
+the real bottleneck is identified from the user's own reported numbers,
+which will directly show whether the cost is in this app's own JS
+(updateRenderOrder), the GPU submission call itself (composer.render,
+in which case it's likely hardware/driver-bound, not something this
+codebase can fix), or neither (pointing further afield, e.g. a genuine
+dropped-frame/GC-pause pattern this profiler wouldn't directly capture).
+
+Cache-buster bump: `index.html`'s own `main.js?v=119` -> `?v=120`.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

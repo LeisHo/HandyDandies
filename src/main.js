@@ -244,14 +244,21 @@ function tryStartField() {
   // split on its own. `renderer.compile()` (three.js's own standard fix
   // for exactly this class of stutter) forces every material in the
   // scene to compile its program HERE, synchronously, behind the loading
-  // screen -- not a guess this fully eliminates the platform gap (GPU
-  // compile speed itself isn't something this app can change), but it
-  // moves the ENTIRE compile cost to a single controlled point instead of
+  // screen, moving the compile cost to one controlled spot instead of
   // smearing it across the first several visible, actively-animating
-  // frames, which is what actually produced the visible jank.
-  const __compileStart = performance.now()
+  // frames.
+  //
+  // CORRECTED 2026-09-16, same day, via the user's own real measurement:
+  // this hypothesis is WRONG, or at best a minor contributor -- the
+  // temporary diagnostic this call briefly shipped with measured
+  // `renderer.compile()` itself at only 49.8ms for 240 hands on the
+  // user's OWN reported-laggy desktop, nowhere near enough to explain
+  // "very very laggy." Left in place anyway (cheap, harmless, a
+  // legitimate best practice regardless), but the REAL cause is still
+  // open -- see the next investigation entry in CHANGELOG.txt for
+  // whatever comes next; don't treat this comment's own reasoning above
+  // as the settled explanation.
   renderer.compile(scene, camera)
-  console.log(`[startup] renderer.compile() took ${(performance.now() - __compileStart).toFixed(1)}ms for ${hands.length} hands`)
   window.__debug = { THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState }
   loadingEl.classList.add('hidden')
 }
@@ -5539,6 +5546,21 @@ function flashImportButton(btn, text) {
 // is the general-purpose backstop
 // for that whole FAILURE MODE, not a fix for one specific bug: whatever
 // throws, log it loudly and keep the loop alive rather than freezing silently.
+//
+// TEMPORARY live frame-cost profiler, 2026-09-16 -- direct follow-up
+// after the renderer.compile() theory was directly measured and refuted
+// (49.8ms for 240 hands on the user's OWN reported-laggy desktop,
+// nowhere near enough). Rather than guess a 3rd time, this breaks down
+// where REAL per-frame time is actually going -- updateRenderOrder()
+// (per-hand trigger/idle-repose logic) vs. composer.render() (actual
+// GPU draw submission) vs. everything else in animate() -- logged as a
+// rolling 1-second-window average + instantaneous FPS, so a real
+// before/after comparison across the "laggy startup" and "smooth
+// afterward" periods the user described is possible from their own
+// console, on their own hardware. Meant to be removed once the real
+// bottleneck is identified from this data -- do not treat this as
+// permanent instrumentation.
+let __frameProfiler = { frames: 0, updateRenderOrderMs: 0, composerRenderMs: 0, windowStart: performance.now() }
 function animate() {
   requestAnimationFrame(animate)
   try {
@@ -5580,9 +5602,22 @@ function animate() {
           hand.wrapper.quaternion.slerp(desired, cfg.trackingDamping)
         })
       }
+      const __uroStart = performance.now()
       updateRenderOrder()
+      __frameProfiler.updateRenderOrderMs += performance.now() - __uroStart
     }
+    const __renderStart = performance.now()
     composer.render()
+    __frameProfiler.composerRenderMs += performance.now() - __renderStart
+    __frameProfiler.frames++
+    {
+      const elapsed = performance.now() - __frameProfiler.windowStart
+      if (elapsed >= 1000) {
+        const f = __frameProfiler.frames
+        console.log(`[frame-profile] fps=${(f / (elapsed / 1000)).toFixed(1)} avgUpdateRenderOrder=${(__frameProfiler.updateRenderOrderMs / f).toFixed(2)}ms avgComposerRender=${(__frameProfiler.composerRenderMs / f).toFixed(2)}ms hands=${hands.length} over ${f} frames`)
+        __frameProfiler = { frames: 0, updateRenderOrderMs: 0, composerRenderMs: 0, windowStart: performance.now() }
+      }
+    }
     // Pose Preview's own tiny render pass -- guarded by offsetParent (null
     // whenever the floating panel is hidden via display:none, i.e. the
     // "Show Pose Preview" checkbox is off) so an orbit-controllable mini-
