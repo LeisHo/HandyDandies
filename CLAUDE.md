@@ -40,11 +40,25 @@ group fits best (per §12g); create a new group only if none fit.
 
 ## Dev-panel behavior (project-specific judgment calls under §12)
 
-All project-specific settings (Field Layout, Cursor Tracking, Camera,
-Lighting, Toon Shading, Outline, Background, Debug) are shared across
-Desktop/Mobile/Landscape — none are per-device yet, since the CURSOR-
-TRACKING mechanic itself has no touch-input equivalent (same convention
-DOTFLICKO used for its own mouse-only interaction). Note this is separate
+**CORRECTED 2026-09-16 — Cursor Tracking is no longer part of this
+"shared" list; left here as a cautionary record rather than silently
+rewritten, per this file's own convention (see the dcHold correction
+below).** Direct request ("for cursor tracking settings, let mobile and
+desktop have different settings") reversed the original reasoning below
+for that one group specifically: every Cursor Tracking control
+(`trackingEnabled`, `trackingDamping`, `targetDepthFactor`,
+`showTargetMarker`, `palmFacesCursor`, `palmFaceRotationOffset`) is now
+`perDevice: true`. The original reasoning — the mechanic itself has no
+touch-input equivalent — was true and is still true, but conflated "the
+INTERACTION has no touch counterpart" with "its TUNING should be shared
+across devices," which don't actually imply each other; a mouse-only
+mechanic can still want a different damping/depth/rotation feel on a
+small mobile viewport vs. a large desktop one, the same way this file
+already drew that exact distinction for the camera's own pan/zoom below.
+
+The remaining project-specific settings (Field Layout, Camera, Lighting,
+Toon Shading, Outline, Background, Debug) are still shared across
+Desktop/Mobile/Landscape — none are per-device yet. Note this is separate
 from the CAMERA's own pan/zoom, which DOES have full mobile touch support
 via OrbitControls — that's just not exposed as dev-panel settings, it's
 built into the interaction itself. Position/size sliders (spacing, camera

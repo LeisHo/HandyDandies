@@ -5515,6 +5515,86 @@ after this deploys.
 Cache-buster bump: `index.html`'s own `main.js?v=121` -> `?v=122`.
 
 --------------------------------------------------------------------------------
+2026-09-16  -  04:53:48 - 05:09:55 EDT (16m7s, measured)
+
+**Triple/quad-click "registers as double-click first, no confirm delay"
+-- root-caused via direct settings inspection, 2 fixes shipped, both
+confirmed by the user's own answers before implementing.** Direct report
+("when i do triple or quad click. it registers and trigges double click
+first. I dont see a doubel clcik confirm delay").
+
+Found via `data/processed/dev-panel-settings.json`: `tripleClickEnabled`/
+`quadClickEnabled` (the fire-and-forget click-pose tiers) were BOTH
+`false` on all 3 devices, while `tripleClickHoldEnabled`/
+`quadClickHoldEnabled` (the separate HOLD-based tiers) were `true` --
+these are 2 independent toggles per tier, not one. `triggerClickPose()`
+(`main.js` ~4408) does `if (!cfg[`${p}Enabled`]) return` -- with the
+plain tier off, a genuine triple-click there was a silent no-op
+regardless of timing. Separately, the shared `MOUSE_LOG_MULTICLICK_MS`
+debounce window (350ms) governs how long the fire-and-forget click
+counter waits for another click before locking in whatever count it has
+so far; a real 3-click gesture has more gaps that can exceed a short
+window than a 2-click one does, so a slightly slow gap between click 2
+and 3 gets read as "sequence over," visibly firing `dblclick`'s own pose
+(enabled) with no distinguishable "confirming..." UI -- then the 3rd
+click starts a brand-new, separate sequence on its own. Both mechanisms
+plausibly combine to produce exactly the reported symptom.
+
+Confirmed with the user via 2 direct questions before touching anything:
+(1) enable `tripleClickEnabled`/`quadClickEnabled` -- yes; (2) widen the
+debounce window -- yes. Fixed: flipped `tripleClickEnabled`/
+`quadClickEnabled` to `true` across all 3 device blocks directly in
+`dev-panel-settings.json` (same precedent as the earlier
+`chpHoldConfirmMs`/`rchpHoldConfirmMs` correction), minimal diff
+verified via `git diff` (exactly the 6 intended lines, nothing else
+touched). `MOUSE_LOG_MULTICLICK_MS` widened 350ms -> 450ms (`main.js`
+~173) -- a disclosed judgment call, not a measured value (CLAUDE.md
+§0c), since no click-timing telemetry exists to derive an exact number
+from; a modest, reversible increase. This constant is shared by 3
+systems (the fire-and-forget click-pose debounce, the click-hold chain
+continuation window, and the Mouse Tracking Log's own multi-click
+classification) by original design, so all 3 get slightly more forgiving
+timing from this one change.
+
+**Cursor Tracking settings: made independently adjustable per Desktop/
+Mobile/Landscape.** Direct request ("for cursor tracking settings, let
+mobile and desktop have different settings"). Added `perDevice: true` to
+all 6 Cursor Tracking controls (`trackingEnabled`, `trackingDamping`,
+`targetDepthFactor`, `showTargetMarker`, `palmFacesCursor`,
+`palmFaceRotationOffset`) -- the same devPanel.js mechanism (§12f)
+already used throughout this file (Field Layout's spacing/offset
+controls, every Dev Panel chrome control) for exactly this purpose;
+verified live settings hold IDENTICAL values across all 3 device blocks
+already (no divergence to reconcile), so this is a safe, non-disruptive
+transition -- each tab keeps showing its current value, now independently
+editable going forward. Reverses this project's own standing CLAUDE.md
+note that Cursor Tracking was deliberately shared since the mechanic has
+no touch-input equivalent -- corrected that note in place (not deleted)
+per this project's own established convention, distinguishing "the
+interaction has no touch counterpart" (still true) from "its tuning
+should be shared across devices" (no longer what's wanted).
+
+**Verification: environmentally limited across this entire round, same
+recurring local-test-server issue as the prior entry -- disclosed
+honestly, not glossed over.** `node --check` passes for every edit in
+this entry; the settings-JSON edit's diff was directly inspected and
+confirmed minimal/correct; the `perDevice` mechanism itself is not new
+code, just applying an existing, already-proven-correct flag (dozens of
+working precedents already in this same file) to 6 more controls. But
+repeated live full-app load attempts (multiple server restarts, 2 ports,
+fresh tabs) all hit the same `net::ERR_CONNECTION_RESET` specifically on
+`main.js` when loaded as part of the full page that blocked the prior
+entry's own verification too. Did not keep escalating this (CLAUDE.md
+§0b). Recommend the user confirm all 3 changes (triple/quad-click now
+firing, the wider multi-click window feeling more forgiving, and Cursor
+Tracking's Mobile/Landscape tabs now independently editable) on their
+own device after this deploys.
+
+Cache-buster bump: `index.html`'s own `main.js?v=122` -> `?v=124` (3
+edits this entry, `?v=123` was an intermediate step, superseded before
+a live check was ever attempted against it).
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

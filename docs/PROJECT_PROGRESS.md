@@ -18,20 +18,35 @@ work seamlessly from there.
 
 ## Currently working on
 
-**NEW, not yet started: triple/quad-click reportedly firing double-click
-first, with no visible double-click confirm delay.** Direct user report,
-2026-09-16 ("when i do triple or quad click. it registers and trigges
-double click first. I dont see a double click confirm delay or
-whatever"). Not yet investigated.
+**SHIPPED 2026-09-16: triple/quad-click "registers as double-click
+first" -- root cause found (tripleClickEnabled/quadClickEnabled were
+off in live settings; a 350ms debounce window also too tight for a real
+3-click gesture), both fixes confirmed with the user before
+implementing.** `tripleClickEnabled`/`quadClickEnabled` flipped to
+`true` across all 3 device blocks in `dev-panel-settings.json`;
+`MOUSE_LOG_MULTICLICK_MS` widened 350ms -> 450ms (a disclosed judgment
+call, not measured). Verification environmentally limited (see below) --
+**awaiting the user's own confirmation** that triple/quad-click now
+fires correctly.
 
-**NEW, not yet started: Cursor Tracking settings should be independently
-adjustable per Desktop/Mobile/Landscape.** Direct user request,
-2026-09-16. Reverses this project's own standing design note (below,
-under "Dev-panel behavior") that Cursor Tracking is deliberately shared
-across all 3 tabs since the mechanic has no touch equivalent -- the user
-is asking for the per-device split anyway; implement per §12f's normal
-pattern and correct that CLAUDE.md note in place once done (don't delete
-it silently -- see CLAUDE.md's own note on the dcHold precedent for why).
+**SHIPPED 2026-09-16: Cursor Tracking settings are now independently
+adjustable per Desktop/Mobile/Landscape** (`perDevice: true` on all 6
+controls) -- direct request. Reverses this project's own prior standing
+design note (below, under "Dev-panel behavior") that Cursor Tracking was
+deliberately shared since the mechanic has no touch equivalent; that
+note is corrected in place in `CLAUDE.md`, not deleted, per this
+project's own established convention. Live settings already held
+identical values across all 3 device blocks, so this is a safe,
+non-disruptive transition.
+
+**Verification gap (applies to all 3 shipped items above, and to the
+Responsive Wrist Splay stagger fix further below):** repeated live
+full-app load attempts this whole round hit the same recurring local
+test-server issue (`net::ERR_CONNECTION_RESET` on `main.js` specifically
+when loaded as part of the full page) -- `node --check` passes and each
+change was reviewed directly, but none of these 3 items have been
+re-verified live this session. Recommend the user confirm all 3 on their
+own device once this deploys.
 
 **Desktop lag investigation, 2026-09-16 -- COMPLETE, root cause fixed,
 verification PARTIAL (environmentally limited, disclosed).** ("why is

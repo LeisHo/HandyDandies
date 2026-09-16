@@ -170,7 +170,23 @@ let cursorLogTimer = null
 // pre-existing, separate interaction), so there's no genuine touch
 // gesture stream here worth classifying the way the template's own
 // touch-first reference project needed.
-const MOUSE_LOG_MULTICLICK_MS = 350
+// WIDENED 2026-09-16, direct user report ("when i do triple or quad
+// click. it registers and trigges double click first. I dont see a
+// double click confirm delay") -- a real-world triple/quad-click attempt
+// has more gaps that can exceed this window than a 2-click double-click
+// does, so a slightly-too-slow gap between click 2 and click 3 gets read
+// as "sequence over" early, visibly firing dblclick's own pose (enabled)
+// before the 3rd click ever arrives as its own separate, later sequence.
+// 350ms -> 450ms is a judgment call, not a measured value -- no click-
+// timing telemetry exists to derive an exact number from (CLAUDE.md
+// §0c); picked as a modest, reversible increase that should meaningfully
+// help without turning 2 genuinely separate quick clicks into an
+// accidental chain. Shared by 3 systems (this comment's own siblings
+// below): the fire-and-forget click-pose debounce, the click-hold chain
+// continuation window, and the Mouse Tracking Log's own multi-click
+// classification -- deliberately still ONE constant, not 3 separately-
+// tuned ones, per this constant's own original "for consistency" intent.
+const MOUSE_LOG_MULTICLICK_MS = 450
 const MOUSE_LOG_HELD_DRAG_MS = 500
 let mouseLogClickCount = 0
 let mouseLogClickTimer = null
@@ -332,15 +348,27 @@ const DEV_GROUPS = [
   },
   {
     title: 'Cursor Tracking',
+    // CORRECTED 2026-09-16, direct request ("for cursor tracking
+    // settings, let mobile and desktop have different settings") --
+    // every control below is now `perDevice: true`, reversing this
+    // group's own prior standing note (see CLAUDE.md's "Dev-panel
+    // behavior" section, corrected in place there too, not deleted) that
+    // Cursor Tracking was deliberately SHARED across Desktop/Mobile/
+    // Landscape since the mechanic has no touch-input equivalent. That
+    // reasoning was about the INTERACTION having no touch counterpart,
+    // not about whether its own tuning should differ per device -- the
+    // user is asking for the latter regardless of the former, same
+    // distinction already drawn for the CAMERA's own pan/zoom in that
+    // same note.
     controls: [
-      { key: 'trackingEnabled', label: 'Tracking Enabled', type: 'checkbox', def: true },
-      { key: 'trackingDamping', label: 'Look-At Damping (x)', type: 'slider', min: 0.02, max: 1, step: 0.01, def: 1 },
+      { key: 'trackingEnabled', label: 'Tracking Enabled', type: 'checkbox', def: true, perDevice: true },
+      { key: 'trackingDamping', label: 'Look-At Damping (x)', type: 'slider', min: 0.02, max: 1, step: 0.01, def: 1, perDevice: true },
       // No onChange needed -- updateCursorTarget() (called every frame)
       // reads cfg.targetDepthFactor live when it sets cursorTarget.z, so
       // there's no cached per-depth state to refresh on a slider change
       // anymore (see that function's own 2026-09-14 correction comment).
-      { key: 'targetDepthFactor', label: 'Cursor Target Depth (x Field Radius)', type: 'slider', min: -2, max: 2, step: 0.05, def: 0.6 },
-      { key: 'showTargetMarker', label: 'Show Target Marker', type: 'checkbox', def: false, onChange: (v) => { if (targetMarker) targetMarker.visible = v } },
+      { key: 'targetDepthFactor', label: 'Cursor Target Depth (x Field Radius)', type: 'slider', min: -2, max: 2, step: 0.05, def: 0.6, perDevice: true },
+      { key: 'showTargetMarker', label: 'Show Target Marker', type: 'checkbox', def: false, perDevice: true, onChange: (v) => { if (targetMarker) targetMarker.visible = v } },
       // REDEFINED 2026-09-14 (see computeRadialRollDeg()'s own comment
       // for the full account and the user's own exact reference points):
       // rotates each hand, around the wrist-crop-plane axis, by the
@@ -349,7 +377,7 @@ const DEV_GROUPS = [
       // fresh per hand per frame, not a fixed 3D palm-normal-aim (the
       // prior mechanism this replaced). Default off so nothing changes
       // until opted in.
-      { key: 'palmFacesCursor', label: 'Palm Faces Cursor', type: 'checkbox', def: true },
+      { key: 'palmFacesCursor', label: 'Palm Faces Cursor', type: 'checkbox', def: true, perDevice: true },
       // Adds directly onto whatever angle is already in effect --
       // computeRadialRollDeg()'s own dynamic angle when Palm Faces
       // Cursor is on, or 0 (just this slider alone) when it's off --
@@ -358,7 +386,7 @@ const DEV_GROUPS = [
       // crop plane's own normal (see computeRollQuat()'s own comment for
       // why that axis) -- CLAUDE.md 12n, "feel/response curves are
       // sliders, not constants."
-      { key: 'palmFaceRotationOffset', label: 'Palm Face Rotation (Deg)', type: 'slider', min: -180, max: 180, step: 1, def: 0 }
+      { key: 'palmFaceRotationOffset', label: 'Palm Face Rotation (Deg)', type: 'slider', min: -180, max: 180, step: 1, def: 0, perDevice: true }
     ]
   },
   {
