@@ -5443,6 +5443,78 @@ already-conservative allocation pattern found above). Awaiting the
 user's choice.
 
 --------------------------------------------------------------------------------
+2026-09-16  -  04:37:07 - 04:52:22 EDT (15m15s, measured)
+
+**Responsive Wrist Splay: "something in between" fix -- staggers the
+confirmed per-frame repose cost across N frames instead of disabling
+the feature or leaving it at full per-frame cost.** Direct follow-up to
+the prior entry's DIAGNOSIS COMPLETE finding; the user was asked to
+choose between disabling the feature, optimizing the math, or "something
+in between -- you tell me." Implemented: a new dev-panel slider,
+`wristSplayReposeStagger` ("Reactive Splay Update Stagger (Frames,
+1=Off)", Responsive Wrist Splay group, min 1, max 8, def 4). Every hand
+still reacts to the cursor; each hand's own reactive-splay repose now
+only runs on 1 of every N frames (round-robin by field index) instead of
+every hand every frame -- spreading the SAME total work across more
+frames rather than doing all of it every frame, cutting the per-frame
+cost by roughly the stagger factor. A new module-level frame counter
+(`idleReposeFrameCounter`, incremented once per `updateRenderOrder()`
+call) plus each hand's own array index (`i`) determine whose "turn" it
+is this frame: `(idleReposeFrameCounter % staggerCount) === (i %
+staggerCount)`.
+
+Deliberately preserves the 2 OTHER reasons `needsIdleRepose` can fire --
+`hand._wasOverriddenLastFrame` (post-transition resync) and
+`!hand.everReposed` (first-ever repose) -- as unconditional/immediate,
+NOT staggered. Both are exactly the 2 conditions the prior 2026-09-15
+"CORRECTED"/"CORRECTED AGAIN" entries fixed real production bugs around
+(stale bind-pose on fresh load; click poses stomped back to default) --
+staggering either of them would risk reintroducing one of those same
+bugs. New gate: `needsIdleRepose = !overridden &&
+((cfg.wristSplayResponsiveEnabled && isThisHandsStaggerTurn) ||
+hand._wasOverriddenLastFrame || !hand.everReposed)`.
+
+**Bug found and fixed during this same pass (via live testing):** the
+new `idleReposeFrameCounter` was originally declared with `let` directly
+above `updateRenderOrder()`'s own definition, far down the file. But
+`animate()` -- defined and called earlier in the file, at its own `animate()`
+kickoff line -- calls `updateRenderOrder()` synchronously on that very
+first call, before the file's own top-to-bottom evaluation ever reaches
+the `let` declaration further down -- a textbook temporal-dead-zone
+crash (`Cannot access 'idleReposeFrameCounter' before initialization`),
+confirmed live via a real browser console error on first test load.
+Fixed by moving the declaration up to the top of the file, alongside the
+other early module-level state (`let modelRoot = null` / `modelLoaded`,
+~line 194) -- well before `animate()`'s own first synchronous call, so
+the binding is long past its TDZ by the time `updateRenderOrder()` is
+ever reached.
+
+**Verification: PARTIAL, environmentally limited -- disclosed
+honestly, not glossed over.** One full live load (dev panel + field)
+completed successfully BEFORE the TDZ bug was introduced/fixed,
+confirming `wristSplayReposeStagger` seeds correctly to its def (4) via
+`cfg` and the field still builds normally (hands=255). After the TDZ
+fix, `node --check` confirms valid syntax, and a direct fetch of
+`src/main.js` standalone (bypassing the full app) loads completely and
+correctly -- ruling out any transfer/syntax corruption in the fixed
+file. However, every subsequent FULL-APP load attempt (3 different
+server processes, 2 different ports, both fresh tabs and reused ones)
+hit `net::ERR_CONNECTION_RESET` specifically on `main.js` when loaded as
+part of the full page (never when fetched standalone) -- consistent
+with this project's own previously-documented local-test-server flakiness
+(a single-threaded Python `http.server`, choked by this exact session's
+own accumulated settings-fetch retry loops from repeated navigations),
+not a symptom of the code change itself. Did not keep escalating this
+(per CLAUDE.md §0b -- diminishing-return environmental debugging); the
+TDZ fix itself is a minimal, well-understood JS ordering change (move a
+`let` declaration earlier in the same module, zero logic change), and
+the feature logic it doesn't touch was already confirmed working in the
+one clean load obtained. Recommend the user confirm on their own device
+after this deploys.
+
+Cache-buster bump: `index.html`'s own `main.js?v=121` -> `?v=122`.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

@@ -18,33 +18,54 @@ work seamlessly from there.
 
 ## Currently working on
 
-**Startup-lag investigation, 2026-09-16 -- 2 real, separate issues found
-and fixed; SECOND ONE IS THE ACTUAL ROOT CAUSE, per direct user
-confirmation, and is not yet independently re-confirmed as fully
-resolved.** ("way way way worse than ever before... hands getting into
-position... then settles" / "nope same issue" after the first fix /
-"on mobile it doesnt lag, but the startup animation thing is still
-happening... its smooth though" -- the clue that cracked it.)
+**NEW, not yet started: triple/quad-click reportedly firing double-click
+first, with no visible double-click confirm delay.** Direct user report,
+2026-09-16 ("when i do triple or quad click. it registers and trigges
+double click first. I dont see a double click confirm delay or
+whatever"). Not yet investigated.
 
-1. A genuine settings-restore-race bug WAS found and fixed first
-   (self-inflicted by this same session's own earlier devPanel.js fix:
-   the field built once with code defaults, then again, visibly, once
-   real settings arrived over the network) -- but the user confirmed
-   this did NOT fix their actual reported symptom.
-2. **The real cause:** the visible "hands settling into position" IS the
-   expected cursor-tracking damping animation (happens correctly on
-   both platforms, confirmed smooth on mobile) -- desktop specifically
-   drops frames WHILE that normal animation plays. Root cause: every
-   field hand has its own cloned material (required for per-hand wrist-
-   clip planes), and WebGL only compiles a material's shader the first
-   time it's actually drawn -- so up to ~240+ separate GPU compiles were
-   silently smeared across the first few visible/animating frames
-   instead of happening once. Fixed with `renderer.compile(scene, camera)`,
-   three.js's own standard fix, called behind the loading screen before
-   reveal. A temporary diagnostic (`console.log` timing the compile
-   call) was deliberately left in this deploy so the user can check
-   their own browser console for the real number on their own hardware
-   -- **awaiting that confirmation** before considering this closed.
+**NEW, not yet started: Cursor Tracking settings should be independently
+adjustable per Desktop/Mobile/Landscape.** Direct user request,
+2026-09-16. Reverses this project's own standing design note (below,
+under "Dev-panel behavior") that Cursor Tracking is deliberately shared
+across all 3 tabs since the mechanic has no touch equivalent -- the user
+is asking for the per-device split anyway; implement per §12f's normal
+pattern and correct that CLAUDE.md note in place once done (don't delete
+it silently -- see CLAUDE.md's own note on the dcHold precedent for why).
+
+**Desktop lag investigation, 2026-09-16 -- COMPLETE, root cause fixed,
+verification PARTIAL (environmentally limited, disclosed).** ("why is
+the app so laggy on desktop but very smooth on mobile" -> traced through
+3 wrong/refuted hypotheses -- a settings-restore race real but not the
+cause; a shader-compile cost real (49.8ms/240 hands) but trivial; the
+user's own triple/quad-click-feature hypothesis checked and ruled out
+(disabled on both devices) -- to the real, confirmed cause via the
+user's own real frame-profiler console output: "Responsive Wrist Splay"
+forcing a full per-hand repose (wrist + all 5 fingers) EVERY frame for
+EVERY hand whenever its master toggle is on, ~25-42ms/frame at 240
+hands, matching an already-documented 2026-09-15 measurement (not a new
+regression).** Fixed with a new tunable stagger (`wristSplayReposeStagger`
+dev-panel slider, def 4) that spreads each hand's own reactive-splay
+repose across N frames (round-robin by field index) instead of doing
+every hand's repose every single frame -- the "something in between"
+option the user asked for over disabling the feature outright or a
+from-scratch math optimization. A real TDZ crash introduced while
+building this (a `let` declared too late in the file, below where
+`animate()` already calls into it on its first synchronous invocation)
+was caught via live testing and fixed by moving the declaration to the
+top of the file. **Verification gap, disclosed honestly:** repeated live
+full-app reloads hit this project's own previously-documented local
+test-server flakiness (`net::ERR_CONNECTION_RESET` specifically on
+`main.js` when loaded as part of the full page, never when fetched
+standalone) across 3 different server processes/ports; one clean load
+DID confirm the new setting seeds correctly and the field still builds,
+and `node --check` + a standalone fetch confirm the file itself is
+syntactically sound post-fix -- but the stagger's actual runtime
+frame-cost reduction has NOT been directly re-measured live this
+session. Recommend the user confirm the fix (and check the new
+"Reactive Splay Update Stagger" slider works as expected) on their own
+device once this deploys. See CHANGELOG.txt's matching entry for the
+full account.
 
 **SHIPPED 2026-09-16: Triple-Click / Triple-Click Hold / Quadruple-Click
 / Quadruple-Click Hold -- 4 new trigger groups, direct request.** Extends

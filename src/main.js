@@ -180,6 +180,18 @@ let mouseLogLastViewport = null
 
 let modelRoot = null
 let modelLoaded = false
+// Frame counter for updateRenderOrder()'s idle-repose stagger
+// (wristSplayReposeStagger) -- incremented once per updateRenderOrder()
+// call, never per-hand, so every hand's turn this frame is computed
+// against the same frame number. Declared here (near the top of the
+// module) rather than next to updateRenderOrder() itself: animate() is
+// called synchronously immediately after its own definition (see its
+// `animate()` call right below the function), well before this file
+// reaches updateRenderOrder()'s own definition further down -- a `let`
+// declared down there would still be in its temporal dead zone on that
+// first synchronous call, throwing "Cannot access before initialization"
+// (confirmed live, 2026-09-16, before moving it here).
+let idleReposeFrameCounter = 0
 // ROOT CAUSE of a real, severe startup-lag regression, 2026-09-16 (direct
 // user report: "way way way worse than ever before... its mainly laggy
 // on startup... the hands are getting into position and setting their
@@ -548,6 +560,21 @@ const DEV_GROUPS = [
     title: 'Responsive Wrist Splay',
     controls: [
       { key: 'wristSplayResponsiveEnabled', label: 'Responsive Wrist Splay (Master On/Off)', type: 'checkbox', def: true },
+      // PERFORMANCE (2026-09-16): the idle-repose block this gates is the
+      // confirmed sustained frame-cost bottleneck (see updateRenderOrder()'s
+      // own comment) -- measured 25-42ms/frame at 240 hands, dominating the
+      // frame budget. Staggering spreads that SAME per-hand work across N
+      // frames instead of doing all of it every frame: with this at 4, each
+      // hand's reactive wrist splay still refreshes every 4th frame (not
+      // every hand every frame), cutting the per-frame cost by roughly this
+      // factor while every hand keeps reacting to the cursor, just at a
+      // slightly lower refresh rate -- imperceptible for a gentle reactive
+      // splay effect. 1 = old behavior (every hand, every frame, no stagger).
+      // Deliberately does NOT affect hand._wasOverriddenLastFrame/!everReposed's
+      // own guaranteed-resync frames (see updateRenderOrder()) -- those must
+      // stay immediate to avoid reintroducing the 2026-09-15 "click does
+      // nothing"/stale-bind-pose bugs this stagger must not interact with.
+      { key: 'wristSplayReposeStagger', label: 'Reactive Splay Update Stagger (Frames, 1=Off)', type: 'slider', min: 1, max: 8, step: 1, def: 4 },
       { key: 'wristSplayDefault', label: 'Default Wrist Splay (Deg, Reactive Off)', type: 'slider', min: -180, max: 180, step: 1, def: 7 },
       { key: 'wristSplayReactiveEnabled', label: 'Reactive Wrist Splay (By Cursor Distance)', type: 'checkbox', def: true },
       { key: 'wristSplayRange', label: 'Min / Max Wrist Splay (Deg)', type: 'text', def: '{"min":5,"max":-71}', onChange: () => parseWristSplayConfig() },
@@ -5716,6 +5743,7 @@ animate()
 // compared to no smoothing at all, at fast/erratic cursor movement.
 const REORDER_SMOOTHING = 0.15
 function updateRenderOrder() {
+  idleReposeFrameCounter++
   const flashFixOn = cfg.preventReorderFlash
   if (flashFixOn) {
     const vFov = THREE.MathUtils.degToRad(camera.fov)
@@ -5910,7 +5938,16 @@ function updateRenderOrder() {
       // above, OR eligible for idle repose -- never both in the same
       // frame) without touching any of the 3 legitimate optimization
       // conditions this fix already added.
-      const needsIdleRepose = !overridden && (cfg.wristSplayResponsiveEnabled || hand._wasOverriddenLastFrame || !hand.everReposed)
+      // STAGGER (2026-09-16): only the "master toggle is on, refresh this
+      // hand's reactive splay" reason is spread across N frames via
+      // wristSplayReposeStagger -- hand._wasOverriddenLastFrame and
+      // !hand.everReposed stay unconditional/immediate, exactly as before
+      // this stagger existed (see the field's own dev-panel comment and
+      // this file's 2026-09-15 "CORRECTED AGAIN" gotcha above for why those
+      // 2 must never be delayed).
+      const staggerCount = Math.max(1, Math.round(cfg.wristSplayReposeStagger))
+      const isThisHandsStaggerTurn = (idleReposeFrameCounter % staggerCount) === (i % staggerCount)
+      const needsIdleRepose = !overridden && ((cfg.wristSplayResponsiveEnabled && isThisHandsStaggerTurn) || hand._wasOverriddenLastFrame || !hand.everReposed)
       if (needsIdleRepose) {
         hand.everReposed = true
         // Not mid any pose-transition this frame -- keep this hand's own
