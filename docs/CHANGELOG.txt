@@ -5387,6 +5387,62 @@ dropped-frame/GC-pause pattern this profiler wouldn't directly capture).
 Cache-buster bump: `index.html`'s own `main.js?v=119` -> `?v=120`.
 
 --------------------------------------------------------------------------------
+2026-09-16  -  04:32:19 - 04:33:47 EDT (1m28s, measured)
+
+**DIAGNOSIS COMPLETE (no code change this entry -- read-only analysis
+of the user's own real profiler output, decision on how to fix pending
+their own choice).** The user's own production console output, 240
+hands: a 1-frame transitional spike (`avgComposerRender=79.87ms`, the
+very first real draw call -- consistent with SOME residual first-frame
+GPU cost even after `renderer.compile()`, though small next to what
+follows) then a SUSTAINED, CONTINUOUS steady state across 15+ one-
+second windows: `fps≈4.5-4.9`, `avgUpdateRenderOrder≈25-42ms`,
+`avgComposerRender≈8-16ms` -- i.e. this app's own per-hand JavaScript
+logic (NOT the GPU draw call) is the dominant, ONGOING cost, roughly
+2-4x larger than rendering itself, every single frame, not just at
+startup.
+
+Traced to "Responsive Wrist Splay" (`cfg.wristSplayResponsiveEnabled`,
+confirmed `true` on both desktop AND mobile in the live settings data):
+`updateRenderOrder()`'s own `needsIdleRepose` gate
+(`!overridden && (cfg.wristSplayResponsiveEnabled || ...)`) means the
+FULL per-hand repose (wrist bone + all 5 fingers, world-axis-corrected
+bone math via `rotateOnTrueWorldAxis()`) runs EVERY FRAME, for EVERY
+hand, whenever this master toggle is on -- REGARDLESS of whether
+"Reactive" mode is actually active. This is NOT a new regression from
+this session's own work: it's the SAME cost already measured and
+documented on 2026-09-15 ("~38ms/frame at 255 hands, the actual lag
+bottleneck, not rendering itself (~11ms)") -- the user's own new
+numbers (25-42ms at 240 hands) land squarely in that same range,
+confirming it's the identical, pre-existing, already-known-expensive
+code path, not something freshly broken.
+
+Investigated whether the per-hand math itself has an easy win: the hot
+functions (`rotateOnTrueWorldAxis()`, `applyCurlToSkeleton()`,
+`applyWristPoseToSkeleton()`) already reuse module-level scratch
+Vector3/Quaternion objects throughout (no obvious per-call allocation
+churn) and `computeResponsiveWristSplayDeg()`'s own curve evaluation
+reads an already-parsed, cached curve (no JSON.parse in the hot path) --
+this is already a reasonably allocation-conscious implementation, not
+an obvious quick fix. The likely remaining cost is the sheer volume of
+world-space quaternion math itself (`getWorldQuaternion()`/
+`getWorldPosition()` walk each bone's own ancestor chain) x 5 fingers x
+several joints x every hand, every frame -- genuinely CPU-bound work
+that scales with hand count, not a wasteful pattern to trivially strip
+out.
+
+**Presented to the user as a real tradeoff decision (per this project's
+own §0a -- not unilaterally disabled):** turning off "Responsive Wrist
+Splay" should immediately and dramatically cut `avgUpdateRenderOrder`
+back toward ~0 (idle-repose would then only run on the rare "just
+finished a transition" frame, not continuously), at the cost of losing
+the live cursor-distance-reactive wrist splay effect. Alternative: keep
+the feature and pursue a deeper optimization pass on the per-hand repose
+math itself (uncertain how much headroom actually exists, given the
+already-conservative allocation pattern found above). Awaiting the
+user's choice.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================
