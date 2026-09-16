@@ -1,8 +1,8 @@
 {
   "values": {
     "desktop": {
-      "fieldRows": 20,
-      "fieldCols": 12,
+      "fieldRows": 27,
+      "fieldCols": 3,
       "rowSpacing": 9.5,
       "columnSpacing": 10.5,
       "handScale": 1.35,
@@ -8397,10 +8397,10 @@
       "dp_scrollStrength": 1
     },
     "landscape": {
-      "fieldRows": 20,
-      "fieldCols": 12,
-      "rowSpacing": 9.5,
-      "columnSpacing": 10.5,
+      "fieldRows": 1,
+      "fieldCols": 1,
+      "rowSpacing": 3.5,
+      "columnSpacing": 2.5,
       "handScale": 1.35,
       "alternateRowOffset": 5,
       "progressiveRowOffset": 1,
@@ -12499,11 +12499,11 @@
       "dcHoldRetransitionSpeedMs": 400,
       "dcHoldRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "dcHoldRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
-      "cameraX": 6.638529594915686,
-      "cameraY": 13.373156794075216,
-      "cameraZ": 259.74194092345493,
+      "cameraX": 3.5871964338596483,
+      "cameraY": 7.22632017757267,
+      "cameraZ": 140.35417796706153,
       "cameraFov": 35,
-      "cameraZoom": 260.17068872666084,
+      "cameraZoom": 140.58585616758702,
       "savedCameras": [
         {
           "name": "Default",
@@ -12718,7 +12718,7 @@
     },
     {
       "key": "Field Layout",
-      "collapsed": true,
+      "collapsed": false,
       "settings": [
         "fieldRows",
         "fieldCols",
@@ -13027,7 +13027,7 @@
     },
     {
       "key": "Lighting",
-      "collapsed": false,
+      "collapsed": true,
       "settings": [
         "keyAzimuth",
         "keyElevation",
@@ -13042,7 +13042,7 @@
     },
     {
       "key": "Toon Shading",
-      "collapsed": false,
+      "collapsed": true,
       "settings": [
         "toonSteps",
         "toonStepThreshold",
@@ -13081,7 +13081,7 @@
     },
     {
       "key": "Debug",
-      "collapsed": true,
+      "collapsed": false,
       "settings": [
         "showGridHelper",
         "showWireframe",
