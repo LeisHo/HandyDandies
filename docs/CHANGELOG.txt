@@ -4764,6 +4764,105 @@ every project sharing this engine, not just this one.
 Cache-buster bumps: `index.html`'s own `main.js?v=107` -> `?v=108`.
 
 --------------------------------------------------------------------------------
+2026-09-16  -  00:39:40 - 00:55:00 EDT (15m20s, measured)
+
+**5 direct-request features added to the Pose/Tween/Debug workflow,
+gated behind first re-investigating the middle/ring finger-lag bug via
+the user's own screen recording (frame-extracted with Python/cv2, since
+this environment has no ffmpeg) -- investigation reconfirmed the bug is
+real (clear visual evidence at multiple timestamps) but, after numeric
+bone-rotation tracing, world-space fingertip-distance tracing, and
+per-parameter isolation testing all failed to reproduce any anomaly at a
+static synthetic `t`, concluded it's most likely a live/timing-dependent
+artifact needing runtime instrumentation in the real animate() loop, not
+more snapshot testing -- reported to the user as still OPEN, proceeding
+to the 5 gated features per their own explicit "after we fix that...
+will you then" structure and this project's own usage-efficiency
+guidance (diminishing returns on more snapshot-based investigation).**
+
+**1. Pose Preview is now an opt-in FLOATING panel, not an always-embedded
+dev-group.** A new `posePreviewEnabled` checkbox (top of the Pose group,
+default OFF) toggles a hand-built, resizable-from-all-4-edges/corners,
+title-bar-draggable, viewport-clamped `<div>` panel appended directly to
+`document.body` (parent CLAUDE.md §12c's geometry conventions, applied
+by hand rather than forking `devPanel.js`, same established convention
+this project already uses for the Saved-Poses "Default" button etc.).
+`buildPosePreview()`/`resizePosePreview()` rewritten to build/size this
+new panel instead of querying the old (now-removed) "Pose Preview"
+DEV_GROUPS group's `.dp-group-body`. Verified live: checkbox opens/closes
+the panel and syncs; drag (via dispatched pointer events, since this
+session's own browser tool's `computer` click coordinates were found to
+be unreliable here -- confirmed by comparing an automation-reported
+ref coordinate against a direct DOM click, which worked) moved the panel
+by the exact delta dragged; a bottom-right-corner resize grew it by the
+exact delta dragged.
+
+**2. "Set Default Camera" button**, in the floating panel's own title
+bar -- captures the preview camera's live position/orbit-target into
+`localStorage` (`hd-pose-preview-camera-default`), consulted by
+`buildPosePreview()` on the next open in place of the generic bounding-
+sphere auto-frame. Verified live: click writes the key, confirmed via
+`localStorage.getItem()`.
+
+**3. "Run" button on the Saved Tween Sequences list-picker** (+
+`tweenPreviewSpeedMs` slider, Tween group) -- plays the sequence
+(anchored from `poseDefaultValues`, since the preview hand has no
+tracked "current pose values" object to transition from) on the Pose
+Preview model only, via the exact same `resolveTweenSequencePoses`/
+`lerpTweenSequence`/`previewPosePreset` functions already used elsewhere
+in this file. Paced through the new Global Pause's own virtual clock
+(see #5) for consistency with every other animation. Verified live (DOM-
+injected fake list-picker row, since driving the real list-picker's
+own Save-with-a-name flow depends on a native `prompt()` this session's
+browser tool doesn't reliably drive): button click ran with no console
+errors.
+
+**4. "Edit" button on the same list-picker** -- functionally identical to
+that list-picker's own built-in "Use" button (both call
+`useTweenSequencePreset()`), given its own dedicated button per the
+direct request rather than relying on "Use" already covering this.
+Verified live: clicking it with a fake selected row set `cfg.tweenPoses`
+to that row's own `tweenPoses` array exactly.
+
+**5. Global "PAUSE" button, Debug group.** Freezes every hand-pose/tween
+state machine (Click Pose, Click-Hold-Pose, Right Click, Double Click,
+Double Click Hold, the new Pose Preview "Run") exactly where it is,
+resuming from there rather than jumping forward by the paused duration.
+Mechanism: a `nowVirtual()` "virtual clock" (`performance.now() -
+pauseOffsetMs`) that every ANIMATION-timing call site in this file now
+reads instead of raw `performance.now()` (trigger start-times AND the
+per-frame elapsed-time comparisons against them) -- `animate()` itself
+skips `updateCursorTarget()`/the cursor-tracking rotation step/
+`updateRenderOrder()` entirely while paused (freezing the visual result),
+and `pauseOffsetMs` absorbs the real paused duration on resume so the
+very next elapsed-time calculation is unaffected by the gap. Deliberately
+left UNTOUCHED (still raw `performance.now()`): the Mouse Tracking Log's
+own timestamps and the click-vs-hold/double-click gesture-detection
+debounce windows -- gesture detection isn't animation state and should
+keep reflecting real wall-clock time regardless of pause. Camera
+navigation (OrbitControls damping/pan-extent enforcement) deliberately
+keeps running while paused, so the user can still look around.
+Verified live via `window.__debug.updateRenderOrder()` called directly
+(bypassing `requestAnimationFrame`, which this session's own browser
+tool's JS-exec path does not reliably fire -- a known, already-documented
+gotcha in this project's own CLAUDE.md): triggered a Click-Hold-Pose with
+a 5000ms transition speed, sampled `curlIndex` mid-transition (96),
+clicked PAUSE, waited a REAL 1500ms, clicked RESUME, sampled again
+immediately -- `curlIndex` was still exactly 96 (delta 0), confirming the
+1500ms real gap was correctly absorbed rather than counted toward the
+transition's own elapsed time. A separate control run (no pause) over an
+equivalent real interval showed the value actually progressing (96 -> 0
+on a different field, confirming the state machine isn't simply stuck).
+
+`.dp-pose-preview-canvas`'s own CSS (`style.css`) also updated -- dropped
+its old fixed `aspect-ratio: 1/1` (a leftover from the always-square
+embedded-canvas era), since the floating panel is now independently
+resizable in both dimensions.
+
+Cache-buster bumps: `index.html`'s own `main.js?v=108` -> `?v=109`,
+`style.css?v=7` -> `?v=8`.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

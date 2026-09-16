@@ -269,6 +269,14 @@ const DEV_GROUPS = [
   {
     title: 'Pose',
     controls: [
+      // Direct request 2026-09-16: "I now want a checkbox in the Pose
+      // group. It allows me to turn on the Pose Preview, which will no
+      // longer show by default in the dev panel. When turned on, the
+      // pose preview will be its own separate panel that can be resized
+      // and moved around." Replaces the old always-embedded "Pose
+      // Preview" dev-group entirely -- see `buildPosePreview()`'s own
+      // comment for the floating-panel chrome this now drives.
+      { key: 'posePreviewEnabled', label: 'Show Pose Preview (Floating Panel)', type: 'checkbox', def: false, onChange: (v) => setPosePreviewVisible(v) },
       // Ported from HANDO's own Pose group (identical rig/bone names, same
       // Hand2.glb asset) -- applies identically to every hand for now, per
       // direct request ("For now, the pose settings apply to every hand").
@@ -599,6 +607,14 @@ const DEV_GROUPS = [
     title: 'Tween',
     controls: [
       { key: 'tweenPoses', label: 'Tween Poses (In Order)', type: 'multi-select', def: [], options: () => (cfg.savedPoses || []).map((p) => p.name) },
+      // Paces the Saved Tween Sequences list-picker's own "Run" button
+      // (direct request) -- the FULL sequence's own total duration, spread
+      // evenly across however many named poses it has, same convention
+      // `${p}TweenSpeedMs` already uses for the field hands' own Tween
+      // mode. Deliberately its own separate control, not reused from any
+      // single trigger's own TweenSpeedMs -- Run plays on the Pose Preview
+      // model, independent of any live field trigger.
+      { key: 'tweenPreviewSpeedMs', label: 'Tween Speed (Preview Run) (Ms)', type: 'slider', def: 2000, min: 100, max: 10000 },
       {
         key: 'savedTweenSequences',
         label: 'Saved Tween Sequences',
@@ -656,18 +672,12 @@ const DEV_GROUPS = [
     retransitionStartTimeCurve: '[{"x":0,"y":0},{"x":1,"y":1}]',
     retransitionStartTimeRange: '{"min":0,"max":300}'
   }),
-  {
-    // Direct user request: "provide me a collapsible pose viewer within
-    // the dev panel itself" -- deliberately 0 controls here. buildPosePreview()
-    // (below, called once the model loads) injects its own <canvas> +
-    // independent Three.js scene/camera/renderer/OrbitControls directly
-    // into this group's OWN .dp-group-body DOM element, found by its
-    // data-key (== this title) -- collapsing/expanding it is then just
-    // the SAME existing generic group-collapse mechanism every other
-    // group already has, no new devPanel.js code needed for that part.
-    title: 'Pose Preview',
-    controls: []
-  },
+  // "Pose Preview" used to be its own always-embedded, 0-control dev-
+  // group here (a <canvas> injected directly into its .dp-group-body).
+  // REMOVED 2026-09-16, direct request: it's now an opt-in FLOATING
+  // panel instead, toggled by the Pose group's own `posePreviewEnabled`
+  // checkbox -- see `buildPosePreview()`'s own comment for the new
+  // resizable/movable chrome this drives.
   {
     title: 'Camera',
     // Live position/behavior controls below are perDevice (added
@@ -793,6 +803,16 @@ const DEV_GROUPS = [
       // overlapping hands' stacking must not flash/flip while they're
       // still overlapping, only once they visibly clear each other.
       { key: 'preventReorderFlash', label: 'Prevent Reordering Flash (Freeze Order While Overlapping)', type: 'checkbox', def: false },
+      // Direct request: "Provide a 'PAUSE' button in debug group. When I
+      // hit pause, all animations will pause where they are. Animations
+      // will not run until i hit the button again." Toggles the module-
+      // level `isPaused` flag (see its own declaration, right before
+      // animate(), for the full "virtual clock" mechanism that makes a
+      // resume continue exactly where it left off instead of jumping
+      // forward by the paused duration). Not persisted through Copy/Save
+      // -- a session-only runtime toggle, same reasoning as Mouse Log's
+      // own session-only state.
+      { key: 'pauseAnimations', label: 'PAUSE', type: 'button', onClick: (btn) => { setPaused(!isPaused); btn.textContent = isPaused ? 'RESUME' : 'PAUSE' } },
       // Direct request: a click log (location + what it triggered) and a
       // regular cursor-position log, both feeding one shared scrollable
       // display built by buildMouseTrackingLogWidget() (a plain, session-
@@ -2405,19 +2425,209 @@ let previewRenderer = null
 let previewScene = null
 let previewCamera = null
 let previewControls = null
+let posePreviewPanel = null // the floating panel element itself, once built
 const previewBaseQuat = new THREE.Quaternion()
 const _previewWholeHandRotEuler = new THREE.Euler()
+const POSE_PREVIEW_CAMERA_KEY = 'hd-pose-preview-camera-default'
+const POSE_PREVIEW_MIN_W = 220
+const POSE_PREVIEW_MIN_H = 200
 
-// Called once, right after the main model loads (modelRoot/alignQuat/
-// boneRestQuat/toonMaterial all ready by then) -- clones the SAME already-
-// loaded GLB one more time (no extra network fetch), same as rebuildField()
-// clones it per field hand.
-function buildPosePreview() {
-  const body = document.querySelector('.dp-group[data-key="Pose Preview"] .dp-group-body')
-  if (!body) return
+// Restores this hand's default framing (the same one-time bounding-sphere
+// auto-frame buildPosePreview() always falls back to) -- shared by both
+// the initial build and a future "reset" if ever needed.
+function defaultPosePreviewCamera() {
+  const target = handBoundsCenterLocal.clone().applyQuaternion(alignQuat)
+  const pos = target.clone().add(new THREE.Vector3(0, handBoundsRadiusLocal * 0.15, handBoundsRadiusLocal * 2.4))
+  return { pos, target }
+}
+// "Set Default Camera" (direct request) -- captures the preview's OWN
+// current camera position/orbit-target and persists it (localStorage,
+// this panel has no devPanel.js-tracked control of its own) so a later
+// panel rebuild (page reload, or toggling the checkbox off/on) restores
+// THIS framing instead of the generic auto-frame.
+function setPosePreviewDefaultCamera() {
+  if (!previewCamera || !previewControls) return
+  const data = { pos: previewCamera.position.toArray(), target: previewControls.target.toArray() }
+  try { localStorage.setItem(POSE_PREVIEW_CAMERA_KEY, JSON.stringify(data)) } catch (err) { /* best-effort only */ }
+}
+function loadPosePreviewDefaultCamera() {
+  try {
+    const raw = localStorage.getItem(POSE_PREVIEW_CAMERA_KEY)
+    if (!raw) return null
+    const data = JSON.parse(raw)
+    return { pos: new THREE.Vector3().fromArray(data.pos), target: new THREE.Vector3().fromArray(data.target) }
+  } catch (err) { return null }
+}
+// Pose Preview -- REBUILT 2026-09-16 as an opt-in FLOATING panel (direct
+// request: "the pose preview will be its own separate panel that can be
+// resized and moved around"), toggled by the Pose group's own
+// `posePreviewEnabled` checkbox rather than always-embedded in the dev
+// panel body. Appended directly to `document.body` (a sibling of the dev
+// panel itself, NOT inside it) so it can be dragged/resized independently
+// and stay visible even if the dev panel is hidden/collapsed. Chrome is a
+// deliberately minimal version of the main dev panel's own §12c geometry
+// (resizable from all 4 edges + 4 corners, movable by dragging the title
+// bar, clamped to the viewport, a close button) -- hand-built here rather
+// than reusing devPanel.js internals, since this project's own convention
+// is not to fork that shared engine and its resize/drag helpers aren't
+// exported for reuse anyway.
+let posePreviewCanvas = null
+function ensurePosePreviewPanel() {
+  if (posePreviewPanel) return
+  const panel = document.createElement('div')
+  panel.id = 'posePreviewPanel'
+  Object.assign(panel.style, {
+    position: 'fixed', left: '20px', top: '80px', width: '280px', height: '260px',
+    background: '#0f0f18', border: '1px solid #3a3a4a', borderRadius: '6px',
+    display: 'none', flexDirection: 'column', overflow: 'hidden', zIndex: 9998,
+    boxShadow: '0 4px 16px rgba(0,0,0,0.5)', fontFamily: 'inherit'
+  })
+  const titlebar = document.createElement('div')
+  titlebar.className = 'pp-titlebar'
+  Object.assign(titlebar.style, {
+    display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '6px',
+    padding: '4px 6px', background: '#1a1a26', color: '#e8e8f0', fontSize: '11px',
+    cursor: 'move', userSelect: 'none', touchAction: 'none', flex: '0 0 auto'
+  })
+  const title = document.createElement('div')
+  title.textContent = 'POSE PREVIEW'
+  title.style.fontWeight = 'bold'
+  const btnRow = document.createElement('div')
+  btnRow.style.display = 'flex'
+  btnRow.style.gap = '4px'
+  const camBtn = document.createElement('button')
+  camBtn.type = 'button'
+  camBtn.textContent = 'Set Default Camera'
+  Object.assign(camBtn.style, { fontSize: '10px', padding: '2px 6px', background: '#3a3a4a', color: 'inherit', border: 'none', borderRadius: '4px', cursor: 'pointer' })
+  camBtn.addEventListener('click', () => {
+    setPosePreviewDefaultCamera()
+    const orig = camBtn.textContent
+    camBtn.textContent = 'Saved!'
+    setTimeout(() => { camBtn.textContent = orig }, 900)
+  })
+  const closeBtn = document.createElement('button')
+  closeBtn.type = 'button'
+  closeBtn.textContent = '✕'
+  Object.assign(closeBtn.style, { fontSize: '11px', padding: '2px 6px', background: '#3a3a4a', color: 'inherit', border: 'none', borderRadius: '4px', cursor: 'pointer' })
+  closeBtn.addEventListener('click', () => { cfg.posePreviewEnabled = false; syncValue('posePreviewEnabled', false); setPosePreviewVisible(false) })
+  btnRow.append(camBtn, closeBtn)
+  titlebar.append(title, btnRow)
+
   const canvas = document.createElement('canvas')
   canvas.className = 'dp-pose-preview-canvas'
-  body.appendChild(canvas)
+  Object.assign(canvas.style, { flex: '1 1 auto', minHeight: '0', display: 'block', width: '100%', height: '100%' })
+  posePreviewCanvas = canvas
+
+  panel.append(titlebar, canvas)
+  document.body.appendChild(panel)
+  posePreviewPanel = panel
+
+  initPosePreviewDrag(panel, titlebar)
+  initPosePreviewResize(panel)
+}
+// Movable by dragging the title bar, clamped to the viewport (§12c) --
+// same "stop at the window edge, never let it go offscreen" rule the main
+// dev panel itself follows, so all 4 resize corners stay reachable.
+function initPosePreviewDrag(panel, handle) {
+  handle.addEventListener('pointerdown', (e) => {
+    if (e.target !== handle && e.target.tagName === 'BUTTON') return
+    e.preventDefault()
+    const startX = e.clientX, startY = e.clientY
+    const startLeft = panel.offsetLeft, startTop = panel.offsetTop
+    try { handle.setPointerCapture(e.pointerId) } catch (err) { /* best-effort */ }
+    function move(ev) {
+      const w = panel.offsetWidth, h = panel.offsetHeight
+      let left = startLeft + (ev.clientX - startX)
+      let top = startTop + (ev.clientY - startY)
+      left = Math.max(0, Math.min(left, window.innerWidth - w))
+      top = Math.max(0, Math.min(top, window.innerHeight - h))
+      panel.style.left = left + 'px'
+      panel.style.top = top + 'px'
+    }
+    function up(ev) {
+      try { handle.releasePointerCapture(ev.pointerId) } catch (err) { /* best-effort */ }
+      window.removeEventListener('pointermove', move)
+      window.removeEventListener('pointerup', up)
+    }
+    window.addEventListener('pointermove', move)
+    window.addEventListener('pointerup', up)
+  })
+}
+// Resizable from all 4 edges + all 4 corners (§12c), floored at a size
+// that still keeps the title bar and its 2 buttons usable.
+function initPosePreviewResize(panel) {
+  const EDGE_PX = 7
+  const edges = [
+    { cursor: 'nwse-resize', x: -1, y: -1 }, { cursor: 'ns-resize', x: 0, y: -1 }, { cursor: 'nesw-resize', x: 1, y: -1 },
+    { cursor: 'ew-resize', x: -1, y: 0 }, { cursor: 'ew-resize', x: 1, y: 0 },
+    { cursor: 'nesw-resize', x: -1, y: 1 }, { cursor: 'ns-resize', x: 0, y: 1 }, { cursor: 'nwse-resize', x: 1, y: 1 }
+  ]
+  edges.forEach(({ cursor, x, y }) => {
+    const h = document.createElement('div')
+    Object.assign(h.style, {
+      position: 'absolute', cursor, zIndex: 1, touchAction: 'none',
+      left: x === -1 ? '0' : x === 1 ? 'auto' : EDGE_PX + 'px',
+      right: x === 1 ? '0' : 'auto',
+      top: y === -1 ? '0' : y === 1 ? 'auto' : EDGE_PX + 'px',
+      bottom: y === 1 ? '0' : 'auto',
+      width: x === 0 ? `calc(100% - ${EDGE_PX * 2}px)` : EDGE_PX * 2 + 'px',
+      height: y === 0 ? `calc(100% - ${EDGE_PX * 2}px)` : EDGE_PX * 2 + 'px'
+    })
+    h.addEventListener('pointerdown', (e) => {
+      e.preventDefault()
+      e.stopPropagation()
+      const startX = e.clientX, startY = e.clientY
+      const startW = panel.offsetWidth, startH = panel.offsetHeight
+      const startLeft = panel.offsetLeft, startTop = panel.offsetTop
+      try { h.setPointerCapture(e.pointerId) } catch (err) { /* best-effort */ }
+      function move(ev) {
+        const dx = ev.clientX - startX, dy = ev.clientY - startY
+        if (x !== 0) {
+          let newW = x === 1 ? startW + dx : startW - dx
+          newW = Math.max(POSE_PREVIEW_MIN_W, newW)
+          if (x === -1) panel.style.left = (startLeft + startW - newW) + 'px'
+          panel.style.width = newW + 'px'
+        }
+        if (y !== 0) {
+          let newH = y === 1 ? startH + dy : startH - dy
+          newH = Math.max(POSE_PREVIEW_MIN_H, newH)
+          if (y === -1) panel.style.top = (startTop + startH - newH) + 'px'
+          panel.style.height = newH + 'px'
+        }
+        resizePosePreview()
+      }
+      function up(ev) {
+        try { h.releasePointerCapture(ev.pointerId) } catch (err) { /* best-effort */ }
+        window.removeEventListener('pointermove', move)
+        window.removeEventListener('pointerup', up)
+      }
+      window.addEventListener('pointermove', move)
+      window.addEventListener('pointerup', up)
+    })
+    panel.appendChild(h)
+  })
+}
+// Show/hide -- called directly by `posePreviewEnabled`'s own onChange.
+// Builds the panel (and its scene/camera/hand clone) lazily, the first
+// time it's ever shown, rather than at page load -- most sessions never
+// turn this on at all.
+function setPosePreviewVisible(visible) {
+  if (visible) {
+    if (!posePreviewPanel) buildPosePreview()
+    posePreviewPanel.style.display = 'flex'
+    resizePosePreview()
+  } else if (posePreviewPanel) {
+    posePreviewPanel.style.display = 'none'
+  }
+}
+// Called once, the first time the panel is ever shown (modelRoot/
+// alignQuat/boneRestQuat/toonMaterial all ready well before then, since
+// this only runs on a user's own explicit checkbox click) -- clones the
+// SAME already-loaded GLB one more time (no extra network fetch), same as
+// rebuildField() clones it per field hand.
+function buildPosePreview() {
+  ensurePosePreviewPanel()
+  const canvas = posePreviewCanvas
 
   previewScene = new THREE.Scene()
   previewCamera = new THREE.PerspectiveCamera(35, 1, 0.1, 2000)
@@ -2457,11 +2667,14 @@ function buildPosePreview() {
   // (documented in handBoundsCenterLocal's own declaration comment), so
   // the bounding sphere's center sits well away from the wrist/bone-
   // origin point; aiming at (0,0,0) framed mostly forearm instead of the
-  // hand+fingers.
-  const previewTarget = handBoundsCenterLocal.clone().applyQuaternion(alignQuat)
-  previewCamera.position.copy(previewTarget).add(new THREE.Vector3(0, handBoundsRadiusLocal * 0.15, handBoundsRadiusLocal * 2.4))
+  // hand+fingers. A saved "Set Default Camera" (direct request) overrides
+  // this auto-frame when present.
+  const saved = loadPosePreviewDefaultCamera()
+  const fallback = defaultPosePreviewCamera()
+  const framing = saved || fallback
+  previewCamera.position.copy(framing.pos)
   previewControls = new OrbitControls(previewCamera, canvas)
-  previewControls.target.copy(previewTarget)
+  previewControls.target.copy(framing.target)
   previewControls.enableDamping = true
   previewControls.update()
 
@@ -2470,10 +2683,10 @@ function buildPosePreview() {
 }
 // canvas.clientWidth/Height (CSS layout size) drives the resize, same
 // self-heal reasoning as the main scene's own applyRendererSize() --
-// re-read on demand (called after building, on window resize, and every
-// frame's render call below is cheap to guard with this) rather than
-// assumed fixed, since the group's own resizable dev-panel width means
-// this canvas's real displayed size can change at any time.
+// re-read on demand (called after building, on window resize, after every
+// manual panel resize-drag above, and cheap to guard in the per-frame
+// render call below) rather than assumed fixed, since the panel is now
+// user-resizable at any time.
 function resizePosePreview() {
   if (!previewRenderer) return
   const canvas = previewRenderer.domElement
@@ -3543,7 +3756,7 @@ function startClickHoldPose(p) {
   if (!cfg[`${p}Enabled`]) return
   const trig = clickHoldPoseTriggers[p]
   trig.active = true
-  trig.holdStartTime = performance.now()
+  trig.holdStartTime = nowVirtual() // virtual clock (see its own declaration) so Global Pause doesn't shift this trigger's forward-phase elapsed time
   trig.forwardSnapshot = {}
   POSE_PRESET_KEYS.forEach((key) => { trig.forwardSnapshot[key] = cfg[key] })
   // Tween mode (see updateClickHoldPoseForHand()'s own comment) --
@@ -3610,7 +3823,7 @@ function endClickHoldPose(p) {
   // cursor during a double-click-hold used to pan the camera underneath
   // the tween, the same bug chp/rchp's own pan-lock was built to fix).
   if (!clickHoldPoseTriggers.chp.active && !clickHoldPoseTriggers.rchp.active && !clickHoldPoseTriggers.dcHold.active) applyCameraLockState()
-  const now = performance.now()
+  const now = nowVirtual() // virtual clock -- feeds chp.retransitionStartTime below, an animation-timing field
   let minD = Infinity, maxD = -Infinity
   const dists = hands.map((hand) => {
     const d = hand.wrapper.position.distanceTo(cursorTarget)
@@ -3692,7 +3905,11 @@ let lastPointerupWasHoldRelease = false
 // this itself.
 let lastPointerupWasRchpHoldRelease = false
 window.addEventListener('pointerup', (e) => {
-  const now = performance.now()
+  // Virtual clock -- holdStartTime (set in startClickHoldPose()) is now
+  // ALSO in virtual-clock units, so this comparison must read the same
+  // clock to stay in the same units; real wall-clock `performance.now()`
+  // here would drift if a pause happened mid-hold.
+  const now = nowVirtual()
   const chpHeldLongEnough = e.button === 0 && clickHoldPoseTriggers.chp.active && (now - clickHoldPoseTriggers.chp.holdStartTime) >= MOUSE_LOG_HELD_DRAG_MS
   const rchpHeldLongEnough = e.button === 2 && clickHoldPoseTriggers.rchp.active && (now - clickHoldPoseTriggers.rchp.holdStartTime) >= MOUSE_LOG_HELD_DRAG_MS
   lastPointerupWasHoldRelease = chpHeldLongEnough || rchpHeldLongEnough
@@ -3835,7 +4052,7 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
 function triggerClickPose(p) {
   if (!cfg[`${p}Enabled`]) return
   const trig = clickPoseTriggers[p]
-  const now = performance.now()
+  const now = nowVirtual() // virtual clock -- feeds cp.triggerTime below, an animation-timing field
   const forwardSnapshot = {}
   POSE_PRESET_KEYS.forEach((key) => { forwardSnapshot[key] = cfg[key] })
   // Tween mode (Right Click only -- see updateClickPoseForHand()'s own
@@ -4707,6 +4924,104 @@ function applyRendererSize(w, h) {
 }
 window.addEventListener('resize', () => applyRendererSize(window.innerWidth, window.innerHeight))
 
+// Global Pause (Debug group's own PAUSE button, direct request) -- every
+// hand-pose/tween state machine in this file (Click Pose, Click-Hold-
+// Pose, Right Click, Double Click, Double Click Hold, the Pose Preview's
+// own "Run" tween) is driven entirely by comparing `performance.now()`
+// against a stored start-time, per updateClickHoldPoseForHand()/
+// updateClickPoseForHand()'s own `now` parameter. Simply skipping those
+// update calls while paused freezes the VISUAL result correctly (nothing
+// re-applies, so the skeleton stays exactly as last posed) -- but the
+// stored start-times are still fixed points in real wall-clock time, so
+// resuming and reading raw `performance.now()` again would make every
+// elapsed-time calculation suddenly include the entire paused duration,
+// jumping every in-flight transition forward (or straight to completion)
+// instead of continuing smoothly from where it was.
+// `nowVirtual()` fixes this: every animation-timing call site in this
+// file (trigger start-times AND the per-frame "now" used to compute
+// elapsed time against them) reads this instead of raw
+// `performance.now()`. `pauseOffsetMs` accumulates exactly the real time
+// spent paused, so `nowVirtual()` is continuous THROUGH a pause (frozen
+// while paused, since nothing calls it during that window; picks up
+// again post-resume having silently absorbed the gap). Deliberately NOT
+// used for pure gesture-detection timing (mouse-log timestamps, click-
+// vs-hold and double-click debounce windows) -- those aren't animation
+// state and should keep reflecting real wall-clock time regardless of
+// pause.
+let isPaused = false
+let pauseOffsetMs = 0
+let pausedAtMs = 0
+function nowVirtual() { return performance.now() - pauseOffsetMs }
+function setPaused(v) {
+  if (v === isPaused) return
+  if (v) { isPaused = true; pausedAtMs = performance.now() }
+  else { pauseOffsetMs += performance.now() - pausedAtMs; isPaused = false }
+}
+// The Pose Preview panel's own "Run" button (Saved Tween Sequences list-
+// picker, direct request) -- plays the resolved named-pose sequence on
+// the PREVIEW hand only (never the field), paced by the Tween group's own
+// `tweenPreviewSpeedMs` slider. Always anchored from `poseDefaultValues`
+// (there's no tracked "current pose values" for the preview hand to
+// transition FROM -- its skeleton only ever gets posed via direct slider
+// application, not a value object kept in sync -- so a deterministic
+// anchor is the only feasible choice, same tradeoff already accepted
+// elsewhere in this file). Advances/freezes through the SAME global Pause
+// as every other animation (see animate()'s own preview-render block).
+let previewTweenPlay = null // { poses, startMs, speedMs }
+function runTweenSequenceOnPreview(item) {
+  if (!previewHand || !item) return
+  const namedPoses = resolveTweenSequencePoses(item.tweenPoses)
+  if (namedPoses.length < 1) return
+  previewTweenPlay = { poses: [poseDefaultValues, ...namedPoses], startMs: nowVirtual(), speedMs: Math.max(safeTweenSpeedMs(cfg.tweenPreviewSpeedMs), 1) }
+}
+// Both Saved Tween Sequences' new "Edit"/"Run" buttons act on the list-
+// picker's own currently-SELECTED row -- same convention as Saved Poses'
+// own "Default" button (getSelectedSavedPoseItem()), just scoped to this
+// different list-picker's own data-key.
+function getSelectedTweenSequenceItem() {
+  const selectedRow = document.querySelector('.dp-row[data-key="savedTweenSequences"] .dp-list-picker-row-selected')
+  return selectedRow ? selectedRow.__item : null
+}
+// "Edit" (direct request: "This immediately sets the active Tween Poses
+// (in order) data to that of the saved Tween i want to Edit. Thus i can
+// easily edit and overwrite saved tweens") -- functionally identical to
+// this same list-picker's built-in "Use" button (both ultimately call
+// useTweenSequencePreset()), but given its own dedicated, clearly-labeled
+// button per the direct request rather than relying on "Use" already
+// covering this.
+function editSelectedTweenSequence() {
+  const item = getSelectedTweenSequenceItem()
+  if (!item) return
+  useTweenSequencePreset(item)
+}
+function runSelectedTweenSequenceOnPreview() {
+  const item = getSelectedTweenSequenceItem()
+  if (!item) return
+  runTweenSequenceOnPreview(item)
+}
+// Injected into the Saved Tween Sequences list-picker's own button row,
+// same DOM-injection pattern as buildPoseDefaultButton()/
+// buildCameraDefaultButton() (devPanel.js's generic list-picker has no
+// config hook for extra buttons; this project's convention is not to fork
+// that shared engine).
+function buildTweenSequenceButtons() {
+  const actionsRow = document.querySelector('.dp-row[data-key="savedTweenSequences"] .dp-list-picker-actions')
+  if (!actionsRow) return
+  const useBtn = Array.from(actionsRow.querySelectorAll('button')).find((b) => b.textContent === 'Use')
+  const editBtn = document.createElement('button')
+  editBtn.type = 'button'
+  editBtn.textContent = 'Edit'
+  editBtn.addEventListener('click', () => editSelectedTweenSequence())
+  if (useBtn && useBtn.nextSibling) actionsRow.insertBefore(editBtn, useBtn.nextSibling)
+  else actionsRow.appendChild(editBtn)
+  const runBtn = document.createElement('button')
+  runBtn.type = 'button'
+  runBtn.textContent = 'Run'
+  runBtn.addEventListener('click', () => runSelectedTweenSequenceOnPreview())
+  actionsRow.insertBefore(runBtn, editBtn.nextSibling)
+}
+buildTweenSequenceButtons()
+
 // Direct user report ("all my click functions stopped working"): every
 // trigger's own state-machine logic (triggerClickPose/updateClickPoseForHand/
 // applyPoseValuesToHand etc.) was confirmed correct by manually stepping it
@@ -4732,39 +5047,59 @@ function animate() {
     if (window.innerWidth > 0 && window.innerHeight > 0 && (rendererSizeCheck.x !== window.innerWidth || rendererSizeCheck.y !== window.innerHeight)) {
       applyRendererSize(window.innerWidth, window.innerHeight)
     }
+    // Camera navigation is a user-driven interaction, not "animation" --
+    // OrbitControls damping/pan-extent/panel-sync keep running unchanged
+    // regardless of Global Pause, so the user can still look around while
+    // paused.
     controls.update()
     enforceCameraPanExtent()
     syncCameraPanelFromLive()
-    updateCursorTarget()
     armLengthWidgetResyncs.forEach((fn) => fn())
-    if (cfg.trackingEnabled) {
-      // Per-hand now (not hoisted above the loop like before) -- with Palm
-      // Faces Cursor on, each hand's own roll angle depends on ITS OWN
-      // position relative to the live cursor (computeRadialRollDeg(), see
-      // its own declaration comment), so it genuinely can't be computed
-      // once for the whole field anymore. With it off, every hand still
-      // gets the exact same roll (baseDeg=0, just the live slider), same
-      // as before.
-      hands.forEach((hand) => {
-        const m = new THREE.Matrix4().lookAt(hand.wrapper.position, cursorTarget, UP)
-        const desired = new THREE.Quaternion().setFromRotationMatrix(m)
-        const baseDeg = cfg.palmFacesCursor ? computeRadialRollDeg(hand.wrapper.position, cursorTarget) : 0
-        // Whole-wrapper rotation only, same mechanism as the default mode;
-        // no skeleton/pose involvement either way.
-        desired.multiply(computeRollQuat(baseDeg))
-        hand.wrapper.quaternion.slerp(desired, cfg.trackingDamping)
-      })
+    // Global Pause (Debug group, see setPaused()'s own declaration) --
+    // skipping cursor-target tracking, the cursor-follow rotation step,
+    // and updateRenderOrder() (which drives every Click Pose/Click-Hold-
+    // Pose/tween state machine, per hand) is what actually freezes every
+    // animation exactly where it is; nothing here re-applies a pose or
+    // advances a phase while `isPaused` is true.
+    if (!isPaused) {
+      updateCursorTarget()
+      if (cfg.trackingEnabled) {
+        // Per-hand now (not hoisted above the loop like before) -- with Palm
+        // Faces Cursor on, each hand's own roll angle depends on ITS OWN
+        // position relative to the live cursor (computeRadialRollDeg(), see
+        // its own declaration comment), so it genuinely can't be computed
+        // once for the whole field anymore. With it off, every hand still
+        // gets the exact same roll (baseDeg=0, just the live slider), same
+        // as before.
+        hands.forEach((hand) => {
+          const m = new THREE.Matrix4().lookAt(hand.wrapper.position, cursorTarget, UP)
+          const desired = new THREE.Quaternion().setFromRotationMatrix(m)
+          const baseDeg = cfg.palmFacesCursor ? computeRadialRollDeg(hand.wrapper.position, cursorTarget) : 0
+          // Whole-wrapper rotation only, same mechanism as the default mode;
+          // no skeleton/pose involvement either way.
+          desired.multiply(computeRollQuat(baseDeg))
+          hand.wrapper.quaternion.slerp(desired, cfg.trackingDamping)
+        })
+      }
+      updateRenderOrder()
     }
-    updateRenderOrder()
     composer.render()
     // Pose Preview's own tiny render pass -- guarded by offsetParent (null
-    // whenever an ancestor is display:none, i.e. the "Pose Preview" group
-    // is collapsed, or the whole dev panel is hidden/collapsed) so an
-    // orbit-controllable mini-viewport nobody can currently see doesn't
-    // still cost a render every frame.
+    // whenever the floating panel is hidden via display:none, i.e. the
+    // "Show Pose Preview" checkbox is off) so an orbit-controllable mini-
+    // viewport nobody can currently see doesn't still cost a render every
+    // frame. The "Run" tween playback (see runTweenSequenceOnPreview()'s
+    // own comment) is gated by the SAME Global Pause as the field's own
+    // animations, for consistency.
     if (previewRenderer && previewRenderer.domElement.offsetParent !== null) {
       resizePosePreview()
       previewControls.update()
+      if (!isPaused && previewTweenPlay) {
+        const elapsed = nowVirtual() - previewTweenPlay.startMs
+        const progress = THREE.MathUtils.clamp(elapsed / previewTweenPlay.speedMs, 0, 1)
+        previewPosePreset(lerpTweenSequence(previewTweenPlay.poses, progress))
+        if (progress >= 1) previewTweenPlay = null
+      }
       previewRenderer.render(previewScene, previewCamera)
     }
   } catch (err) {
@@ -4916,7 +5251,7 @@ function updateRenderOrder() {
     return d
   })
   const liveDistRange = Math.max(maxLiveDist - minLiveDist, 0.001)
-  const nowMs = performance.now() // one shared timestamp for every hand's own Click-Hold-Pose progress this frame, not a separate call per hand
+  const nowMs = nowVirtual() // virtual clock (see its own declaration) -- one shared timestamp for every hand's own Click-Hold-Pose/Click-Pose progress this frame, not a separate call per hand; only reached at all while !isPaused (animate()'s own gate), so this line simply never runs during a pause
   hands.forEach((hand, i) => {
     const live = liveDistances[i]
     hand.effectiveRenderOrder = (flashFixOn && hand.isOverlapping)

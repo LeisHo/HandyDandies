@@ -138,9 +138,12 @@ html, body {
 }
 .dp-group-body > .dp-group > .dp-group-header { font-size: calc(var(--dp-group-title-font-size, 11px) * 0.9); }
 /* Pose Preview's own mini Three.js viewport (see buildPosePreview() in
-   main.js) -- a fixed square, orbit-controllable, independent of the
-   panel's own resizable width. */
-.dp-pose-preview-canvas { display: block; width: 100%; aspect-ratio: 1 / 1; border-radius: 4px; touch-action: none; cursor: grab; }
+   main.js) -- REBUILT 2026-09-16 into its own floating, independently
+   resizable panel (no longer embedded in the dev panel body), so this no
+   longer forces a fixed 1:1 aspect ratio; its actual size now tracks
+   whatever the floating panel's own body is sized to (inline styles set
+   by ensurePosePreviewPanel(), which win over width/border-radius here). */
+.dp-pose-preview-canvas { display: block; border-radius: 4px; touch-action: none; cursor: grab; }
 .dp-pose-preview-canvas:active { cursor: grabbing; }
 .dp-add-group-row { margin: 0 2px 8px; }
 .dp-add-group-row button {

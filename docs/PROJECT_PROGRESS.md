@@ -18,29 +18,48 @@ work seamlessly from there.
 
 ## Currently working on
 
-**3 direct user items (2026-09-15/16): 1 open investigation, 1 shipped,
-1 answered awaiting a decision.**
+**Middle/ring finger "outstretched for a split second" during
+retransition -- STILL OPEN, re-investigated 2026-09-16 with the user's
+own screen recording (frame-extracted via Python/cv2, since this
+environment has no ffmpeg) -- bug is DEFINITELY REAL, root cause still
+NOT found.** The recording gave unambiguous visual confirmation (thumb/
+index/pinky curl toward the fist quickly while middle+ring stay fully
+extended for ~0.2-0.3s before catching up) across all 4 tested triggers
+(click x2, click-hold, right-click). This round's investigation went
+further than the previous one: besides re-confirming raw bone-rotation
+tracing shows nothing (a KNOWN methodological trap -- Euler angles on
+different bones aren't directly comparable), also traced WORLD-SPACE
+fingertip-to-wrist distance (a genuinely comparable metric) across the
+full retransition range and STILL found smooth, monotonic convergence
+for every finger, no anomaly. Static single-`t` synthetic snapshots
+(via `window.__debug.applyPoseValuesToHand`) cannot reproduce it either
+way. **Current best assessment: a live/timing-dependent artifact of the
+real per-frame animate() loop (staggering, real elapsed time, or some
+other runtime-only factor) that can't be caught by jumping to one
+interpolated pose value -- next step needs runtime diagnostic logging
+inserted into the live per-frame code path, not more snapshot testing.**
+Per direct instruction, proceeded to the 5 gated features below rather
+than continuing an investigation method already shown to have
+diminishing returns; still owed a return pass with the new approach.
 
-**OPEN: middle/ring finger "outstretched for a split second" during
-retransition** (reproduces on click, click-hold, AND right-click, per
-the user's own screen recording). Investigated at length -- every finger-
-curl lookup table is confirmed symmetric across fingers, the actual bone
-rotations were traced frame-by-frame across a full retransition and come
-back smooth/monotonic with no reversal, and the idle-repose gate fix
-from the previous round is confirmed still correctly excluding
-retransition frames. No code bug found. Leading (unverified) theory:
-composing several sequential, non-commuting axis rotations (splay +
-splay2 + curl + base/mid/tip-only + tip-twist) can look visually "off"
-mid-blend even when every individual value itself moves smoothly --
-possibly most visible on ring specifically, whose splay swings through a
-full sign crossing in the traced case. Live visual confirmation wasn't
-obtained (a new instance of this session's own browser-tool rendering-
-pipeline unreliability). **Needs either the user's own review of their
-saved recording, or a fresh investigation angle** -- not yet resolved.
+**SHIPPED 2026-09-16, 5 direct-request features (Pose Preview
+floating panel + camera default, Tween Run/Edit + speed slider, global
+Pause) -- all verified live, see CHANGELOG.txt's matching entry for full
+verification detail:**
+- Pose Preview is now an opt-in floating, resizable, movable panel
+  (`posePreviewEnabled` checkbox, Pose group, default OFF) instead of an
+  always-embedded dev-group.
+- "Set Default Camera" button in that panel's own title bar.
+- "Run" button on Saved Tween Sequences (plays the sequence on the Pose
+  Preview model), paced by a new Tween Speed (Preview Run) slider.
+- "Edit" button on Saved Tween Sequences (loads that sequence's poses
+  back into the live Tween Poses list for editing/overwriting).
+- Global "PAUSE" button (Debug group) -- freezes every pose/tween
+  animation exactly where it is; resuming continues from there instead
+  of jumping forward, via a virtual-clock mechanism (`nowVirtual()`).
 
-**SHIPPED: "Clear" button added to the Mouse Tracking Log widget**
-itself, next to Copy/Save (a separate DEV_GROUPS button already did this
-elsewhere in the panel; this one's just where it's actually convenient).
+**SHIPPED 2026-09-15: "Clear" button added to the Mouse Tracking Log
+widget** itself, next to Copy/Save.
 
 **AWAITING A DECISION: why the dev panel shows Landscape instead of
 Desktop.** Answered, not fixed -- `devPanel.js`'s `realDeviceClass()`
@@ -52,7 +71,7 @@ touchscreen device. The real fix (checking touch capability) touches
 `devPanel.js`, the shared cross-project engine this project's own
 CLAUDE.md says not to fork -- surfaced for the user's decision rather
 than changed unilaterally, since it affects every project sharing this
-engine. See CHANGELOG.txt's latest entry for the full account of all 3.
+engine.
 
 **New feature: Tween + Double Click Hold Tween -- built 2026-09-15,
 verified live on a local dev server, awaiting the user's confirmation on
