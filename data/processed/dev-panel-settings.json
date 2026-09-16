@@ -4805,9 +4805,9 @@
       "reactiveArmLengthEnabled": true,
       "armLengthRange": "{\"min\":0,\"max\":49}",
       "armLengthCurve": "[{\"x\":0,\"y\":1},{\"x\":0.46583302815755206,\"y\":0.6392707824707031},{\"x\":1,\"y\":0}]",
-      "wristSplayResponsiveEnabled": true,
+      "wristSplayResponsiveEnabled": false,
       "wristSplayDefault": 0,
-      "wristSplayReactiveEnabled": true,
+      "wristSplayReactiveEnabled": false,
       "wristSplayRange": "{\"min\":39,\"max\":-40}",
       "wristSplayCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0.042812347412109375}]",
       "chpEnabled": true,
@@ -10123,9 +10123,9 @@
       "reactiveArmLengthEnabled": true,
       "armLengthRange": "{\"min\":0,\"max\":49}",
       "armLengthCurve": "[{\"x\":0,\"y\":1},{\"x\":0.46583302815755206,\"y\":0.6392707824707031},{\"x\":1,\"y\":0}]",
-      "wristSplayResponsiveEnabled": true,
+      "wristSplayResponsiveEnabled": false,
       "wristSplayDefault": 0,
-      "wristSplayReactiveEnabled": true,
+      "wristSplayReactiveEnabled": false,
       "wristSplayRange": "{\"min\":39,\"max\":-40}",
       "wristSplayCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0.042812347412109375}]",
       "chpEnabled": true,
@@ -15441,9 +15441,9 @@
       "reactiveArmLengthEnabled": true,
       "armLengthRange": "{\"min\":0,\"max\":49}",
       "armLengthCurve": "[{\"x\":0,\"y\":1},{\"x\":0.46583302815755206,\"y\":0.6392707824707031},{\"x\":1,\"y\":0}]",
-      "wristSplayResponsiveEnabled": true,
+      "wristSplayResponsiveEnabled": false,
       "wristSplayDefault": 0,
-      "wristSplayReactiveEnabled": true,
+      "wristSplayReactiveEnabled": false,
       "wristSplayRange": "{\"min\":39,\"max\":-40}",
       "wristSplayCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0.042812347412109375}]",
       "chpEnabled": true,
@@ -16188,7 +16188,7 @@
     },
     {
       "key": "Cursor Tracking",
-      "collapsed": false,
+      "collapsed": true,
       "settings": [
         "palmFaceRotationOffset",
         "trackingEnabled",
@@ -16201,7 +16201,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": true,
+      "collapsed": false,
       "settings": [],
       "subgroups": [
         {
