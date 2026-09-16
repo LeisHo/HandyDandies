@@ -5173,9 +5173,11 @@ buildTweenSequenceButtons()
 // Same-name-overwrites-in-place merge rule as devPanel.js's own existing
 // savedPoses Import button (see its own comment) -- applied here to
 // BOTH `cfg.savedPoses` and `cfg.savedTweenSequences` from one shared
-// clipboard payload, expected shaped `{ savedPoses: [...], savedTweenSequences:
-// [...] }` (either key optional -- a payload with only one list still
-// imports that one). `syncValue()` (not `commit()`) is used, same as
+// clipboard payload, expected shaped `{ poses: [...], tweenSequences:
+// [...] }` (the real HANDO-family export format this is meant to
+// consume -- see importPosesAndTweenSequences()'s own comment for the
+// exact accepted key names and why extra per-pose fields are tolerated).
+// `syncValue()` (not `commit()`) is used, same as
 // useTweenSequencePreset()'s own convention for an externally-driven
 // update -- these values didn't come from the list-picker's own Save/
 // Rename UI, so there's no live DOM edit to commit FROM; `syncValue`
@@ -5214,16 +5216,32 @@ async function importPosesAndTweenSequences(btn) {
   let incoming
   try { incoming = JSON.parse(text) } catch (err) { flashImportButton(btn, 'Invalid JSON'); return }
   if (!incoming || typeof incoming !== 'object' || Array.isArray(incoming)) { flashImportButton(btn, 'Expected an object'); return }
+  // CORRECTED 2026-09-16 (direct correction): the real export format this
+  // is meant to consume -- a HANDO-family "poses" + "tweenSequences" dump
+  // (`{ tweenSequences: [{name, tweenPoses}], poses: [{name, ...pose
+  // fields...}] }`) -- uses different top-level key names than this
+  // project's own internal `cfg.savedPoses`/`cfg.savedTweenSequences`.
+  // Accepts EITHER naming (the real "poses"/"tweenSequences" shape, or
+  // this project's own "savedPoses"/"savedTweenSequences" shape, in case
+  // a future export ever uses that instead) rather than assuming one.
+  // Each imported pose object can carry extra fields this project's own
+  // POSE_PRESET_KEYS doesn't define (HANDO's own richer rig has
+  // hideWrist/shoulder*/elbow*/forearmTwist, none of which exist here) --
+  // harmless to import as-is and simply never read, same "extra keys are
+  // tolerated" convention lerpPoseValues()/previewPosePreset() already
+  // use for a saved pose that predates a newer key, just in reverse.
+  const incomingPoses = incoming.poses || incoming.savedPoses
+  const incomingTweenSequences = incoming.tweenSequences || incoming.savedTweenSequences
   let posesCount = 0, tweensCount = 0
-  if (Array.isArray(incoming.savedPoses)) {
-    const { items, count } = mergeImportedListByName(cfg.savedPoses, incoming.savedPoses)
+  if (Array.isArray(incomingPoses)) {
+    const { items, count } = mergeImportedListByName(cfg.savedPoses, incomingPoses)
     cfg.savedPoses = items
     syncValue('savedPoses', items)
     posesCount = count
     safeRefreshSelectOptions('chpTargetPose'); safeRefreshSelectOptions('rchpTargetPose'); safeRefreshSelectOptions('clickTargetPose'); safeRefreshSelectOptions('dblclickTargetPose'); safeRefreshSelectOptions('rcTargetPose'); safeRefreshSelectOptions('dcHoldTargetPose'); safeRefreshMultiSelectOptions('tweenPoses')
   }
-  if (Array.isArray(incoming.savedTweenSequences)) {
-    const { items, count } = mergeImportedListByName(cfg.savedTweenSequences, incoming.savedTweenSequences)
+  if (Array.isArray(incomingTweenSequences)) {
+    const { items, count } = mergeImportedListByName(cfg.savedTweenSequences, incomingTweenSequences)
     cfg.savedTweenSequences = items
     syncValue('savedTweenSequences', items)
     tweensCount = count

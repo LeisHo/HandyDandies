@@ -47,7 +47,12 @@ CHANGELOG.txt's matching entry for full verification detail:**
   select) now renders `<optgroup>` sections matching whatever groups the
   underlying saved poses/sequences were organized into.
 - A combined "Import" button (Tween group) imports both pose data AND
-  tween sequence data from one clipboard paste in a single action.
+  tween sequence data from one clipboard paste in a single action --
+  corrected same day to accept the REAL export key names
+  (`poses`/`tweenSequences`, a HANDO-family format) after the user
+  pasted their own actual payload; extra HANDO-only pose fields (wrist/
+  shoulder/elbow/forearm rig fields this project doesn't have) import
+  harmlessly as unread extras.
 - The Pose Preview's own "Run" tween is no longer affected by Global
   Pause (that's field-only), and the preview now opens already showing
   the configured default pose instead of the raw GLB bind pose.

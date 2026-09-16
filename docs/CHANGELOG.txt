@@ -4996,6 +4996,32 @@ Cache-buster bumps: `index.html`'s own `main.js?v=109` -> `?v=110`;
 `main.js`'s own import of `devpanel/devPanel.js?v=17` -> `?v=18`.
 
 --------------------------------------------------------------------------------
+2026-09-16  -  01:54:57 - 01:56:23 EDT (1m26s, measured)
+
+**CORRECTED the new "Import" button's expected clipboard format (direct
+correction, with the user's own real export payload pasted in) --
+`importPosesAndTweenSequences()` was built expecting this project's own
+internal key names (`savedPoses`/`savedTweenSequences`), but the real
+data it's meant to import (a HANDO-family export) uses different
+top-level keys: `{ tweenSequences: [{name, tweenPoses}], poses: [{name,
+...pose fields...}] }`.** Fixed by accepting EITHER naming
+(`incoming.poses || incoming.savedPoses`, same for tweenSequences)
+rather than assuming one. Also confirmed (via the real payload, which
+includes them) that a pose object's own EXTRA fields beyond this
+project's `POSE_PRESET_KEYS` -- `hideWrist`, `shoulderRaise`/`Swing`/
+`Rotation`, `elbowBend`/`SideBend`, `forearmTwist` (all from HANDO's own
+richer rig, none of which exist here) -- import harmlessly as inert
+extra properties, never read, same "extra keys tolerated" convention
+`lerpPoseValues()`/`previewPosePreset()` already use in the opposite
+direction (a saved pose predating a newer key). Verified live with the
+user's own real payload (2 tween sequences, 13 poses, one of which --
+"Neutral" -- already existed and correctly overwrote in place rather
+than duplicating): 23 total poses (11 + 13 - 1 overwrite), 2 tween
+sequences, correct field values on both, 0 console errors.
+
+Cache-buster bump: `index.html`'s own `main.js?v=110` -> `?v=111`.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================
