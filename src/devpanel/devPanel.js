@@ -1724,10 +1724,17 @@ export function initDevPanel(groups, opts = {}) {
     }
     let saved = null
     try { saved = JSON.parse(localStorage.getItem(settingsKey())) } catch (err) { saved = null }
-    if (saved) {
-      applyStoredValues(saved.values)
-      if (opts.onRestore) opts.onRestore()
-    }
+    if (saved) applyStoredValues(saved.values)
+    // `onRestore` fires here regardless of whether anything was actually
+    // FOUND to restore -- it signals "the restore attempt has concluded"
+    // (there was genuinely nothing saved yet for a brand-new visitor is a
+    // valid, final outcome too), not "real data was found." A host using
+    // this hook to gate showing its own UI until real values are settled
+    // (e.g. a startup field-build gate) would otherwise wait forever for
+    // a fresh visitor with empty localStorage -- confirmed as a real gap
+    // while building exactly that gate for `poseDefaultValues`'s own
+    // resync (see this project's own onRestore usage, main.js).
+    if (opts.onRestore) opts.onRestore()
   }
   restoreValuesForEveryVisitor()
 

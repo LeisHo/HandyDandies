@@ -5224,6 +5224,72 @@ intermediate `?v=114` was cut mid-testing, after the chain-count bug
 above was caught and fixed before ever being shipped).
 
 --------------------------------------------------------------------------------
+2026-09-16  -  03:53:31 - 04:04:27 EDT (10m56s, measured)
+
+**ROOT-CAUSED AND FIXED a severe startup-lag regression, direct user
+report: "way way way worse than ever before... its mainly laggy on
+startup... the hands are getting into position and setting their
+crops... then once it reaches some equilibrium state then the app is
+fine" (and interacting DURING that settle makes it worse still).**
+Self-inflicted by this SAME session's own earlier fix (2 entries above):
+`restoreValuesForEveryVisitor()` now correctly fetches real saved
+settings for EVERY visitor, not just `?dev=1` ones -- but that fetch is
+a real network round-trip, while the GLTFLoader callback (`rebuildField()`,
+building every hand from whatever `cfg` currently holds) only needs a
+local static asset and almost always finishes first. Net effect: the
+field built and revealed ONCE with CODE DEFAULTS, then a moment later
+the real settings landed and every affected control's own onChange
+fired (`rebuildField()` again for fieldRows/fieldCols, plus every other
+Pose/Camera/Lighting control's own reflow) -- visibly rebuilding/
+repositioning/recropping the entire field in front of the user, and
+genuinely doing the expensive field-build work twice.
+
+Fixed with a startup gate (`tryStartField()`): the loading screen now
+stays up until BOTH the model has loaded (`modelMeasurementsReady`) AND
+settings restore has actually landed (`startupSettingsReady`, set from
+`onRestore`), so the field builds exactly once, using the real settings.
+A bounded 6000ms fallback timeout still starts the field on whatever
+`cfg` currently holds if restore is taking unreasonably long, so a
+visitor on a genuinely broken connection is never left staring at
+"Loading hands..." forever. 6000ms is a judgment call, but sized against
+a real measurement: a live production fetch to `/api/save-settings`
+(warm, ~297KB response) measured 332.6ms total (291.4ms fetch + 41.2ms
+JSON parse) -- roughly 18x headroom over that.
+
+**Also fixed a related gap in devPanel.js's own `onRestore` hook**
+(added earlier this session): the localStorage-restore branch only
+called `onRestore` when something was actually FOUND to restore --
+meaning a brand-new visitor with empty localStorage (no remoteSave
+configured) would never fire it at all, and a host using it to gate
+startup (like the fix above) would hang until its own fallback timeout,
+every single time, for every first-time visitor. Now fires regardless,
+since "the restore attempt concluded" (including "there was genuinely
+nothing to restore") is the correct signal, not "real data was found."
+
+**A real testing pitfall hit and resolved while verifying this:**
+navigating and then checking state via 2 SEPARATE tool calls
+(`navigate` then `javascript_exec`) can have enough real wall-clock gap
+between them to itself exceed the 6000ms fallback timeout, making a
+correctly-gated startup look broken (revealing with defaults immediately,
+then visibly rebuilding once a slow test mock finally resolved) --
+purely a test-harness artifact, not a real bug, confirmed by re-running
+the same test via `browser_batch` (bundling navigate + the check script
+into one round-trip, eliminating the gap): the loading screen correctly
+stayed up through 6 consecutive 100ms polls while `modelMeasurementsReady`
+was already true but `startupSettingsReady` wasn't yet, then revealed
+in one shot with the correct hand count (75, matching the mocked
+settings) the instant both flags flipped, and never changed again over
+a further 1.5s observation window. The timeout-fallback path was also
+verified independently (no mock at all -- real local 404s): the field
+correctly revealed with code-default values once the 6s timeout elapsed,
+rather than hanging forever.
+
+Cache-buster bumps: `index.html`'s own `main.js?v=116` -> `?v=118` (an
+intermediate `?v=117` added a temporary diagnostic, `window.__startupDebug()`,
+removed before this final version); `main.js`'s own import of
+`devpanel/devPanel.js?v=20` -> `?v=21`.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

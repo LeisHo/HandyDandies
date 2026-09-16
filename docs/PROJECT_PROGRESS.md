@@ -18,6 +18,26 @@ work seamlessly from there.
 
 ## Currently working on
 
+**FIXED 2026-09-16: severe startup-lag regression ("way way way worse
+than ever before... hands getting into position... then settles").**
+Self-inflicted by this same session's own earlier devPanel.js fix (real
+settings now correctly load for every visitor, not just `?dev=1`) -- the
+field was building and revealing ONCE with code defaults (fast, local
+asset) and then AGAIN, visibly, once the real settings arrived moments
+later over the network (rebuilding/repositioning/recropping the entire
+field in front of the user). Fixed with a startup gate: the loading
+screen now stays up until BOTH the model AND real settings have landed,
+so the field builds exactly once. A bounded 6s fallback timeout still
+prevents a visitor on a broken connection from being stuck forever
+(sized against a measured real fetch of 332.6ms, ~18x headroom). Also
+fixed a related devPanel.js gap where its `onRestore` hook never fired
+for a brand-new visitor with nothing saved yet. Verified live (via
+`browser_batch` to avoid a real test-harness pitfall -- see CHANGELOG.txt
+for the full account of a false-positive this caused mid-investigation):
+loading screen correctly holds until both conditions are met, reveals
+once with the correct data, never rebuilds afterward; timeout fallback
+also verified independently.
+
 **SHIPPED 2026-09-16: Triple-Click / Triple-Click Hold / Quadruple-Click
 / Quadruple-Click Hold -- 4 new trigger groups, direct request.** Extends
 both trigger families (fire-and-forget Click Pose, hold-based Click-

@@ -6,7 +6,7 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js'
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js'
 import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js'
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js'
-import { initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings } from './devpanel/devPanel.js?v=20'
+import { initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings } from './devpanel/devPanel.js?v=21'
 
 // A defensive wrapper around devPanel.js's own refreshSelectOptions() --
 // found via live testing (direct user report: "I dont see any of the
@@ -180,6 +180,49 @@ let mouseLogLastViewport = null
 
 let modelRoot = null
 let modelLoaded = false
+// ROOT CAUSE of a real, severe startup-lag regression, 2026-09-16 (direct
+// user report: "way way way worse than ever before... its mainly laggy
+// on startup... the hands are getting into position and setting their
+// crops... then once it reaches some equilibrium state then the app is
+// fine" -- and interacting DURING that settle makes it worse still).
+// Caused by this SAME session's own earlier fix: `restoreValuesForEveryVisitor()`
+// (devPanel.js, see its own comment) now correctly fetches real saved
+// settings for EVERY visitor, not just `?dev=1` ones -- but that fetch
+// is a real network round-trip, and the GLTFLoader callback below
+// (`rebuildField()`, building every hand from whatever `cfg` currently
+// holds) almost always finishes FIRST, since it only needs to load a
+// local static asset. Net effect: the field built and revealed once
+// with CODE DEFAULTS, then a moment later the real settings landed and
+// every affected control's own onChange fired (`rebuildField()` again
+// for fieldRows/fieldCols, plus every other Pose/Camera/Lighting
+// control's own reflow) -- visibly rebuilding/repositioning/recropping
+// the ENTIRE field in front of the user, and genuinely doing the
+// (expensive) field-build work TWICE. This gate makes the field build
+// exactly ONCE, using the REAL settings, by holding the loading screen
+// up until BOTH the model has loaded AND settings restore has actually
+// landed (`tryStartField()`, called from both the GLTFLoader callback
+// below and `onRestore`, above). A bounded fallback timeout still starts
+// the field on whatever `cfg` currently holds if settings restore is
+// taking unreasonably long, so a visitor on a genuinely broken/
+// unreachable connection is never left staring at "Loading hands..."
+// forever -- same risk profile as before this whole feature existed.
+// 6000ms itself is a judgment call, not derived from a strict formula,
+// but sized against a real measurement: a live production fetch to
+// `/api/save-settings` (warm, ~297KB response) measured 332.6ms total
+// (291.4ms fetch + 41.2ms JSON parse) -- 6000ms leaves roughly 18x
+// headroom over that measured figure for a slower/cold-start request.
+let modelMeasurementsReady = false
+let startupSettingsReady = false
+let fieldStarted = false
+function tryStartField() {
+  if (fieldStarted || !modelMeasurementsReady || !startupSettingsReady) return
+  fieldStarted = true
+  rebuildField()
+  buildPosePreview()
+  window.__debug = { THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState }
+  loadingEl.classList.add('hidden')
+}
+setTimeout(() => { startupSettingsReady = true; tryStartField() }, 6000)
 let framedOnce = false // camera/lighting/target-plane are framed ONCE, on first build -- Field Layout changes must never re-trigger this (direct request)
 const hands = [] // { wrapper: Group, clone: Object3D, skinnedMesh: SkinnedMesh|null, outlineMesh: Mesh|null }
 const sceneState = { fieldRadius: 10 }
@@ -960,8 +1003,12 @@ const cfg = initDevPanel(DEV_GROUPS, {
   // next phase, one frame past where that tracing stopped looking.
   // `onRestore` (new, generic devPanel.js hook -- see its own comment)
   // fires once real values actually land in `cfg`, letting
-  // resyncPoseDefaultValues() re-seed for real.
-  onRestore: () => resyncPoseDefaultValues()
+  // resyncPoseDefaultValues() re-seed for real. Also unblocks the
+  // startup field-build gate (see `modelMeasurementsReady`'s own
+  // declaration comment) -- the field now only ever builds once, using
+  // these real values, instead of building once with code defaults and
+  // visibly rebuilding again the moment this fires.
+  onRestore: () => { resyncPoseDefaultValues(); startupSettingsReady = true; tryStartField() }
 })
 onChangeByCtrl.forEach((fn, c) => { c.onChange = fn })
 // Arm Length's 2 custom widgets (see their own declaration comments,
@@ -5198,10 +5245,15 @@ new GLTFLoader().load(
 
     modelRoot = root
     modelLoaded = true
-    rebuildField()
-    buildPosePreview()
-    window.__debug = { THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState }
-    loadingEl.classList.add('hidden')
+    // Was: rebuildField()/buildPosePreview()/window.__debug/hide-loading,
+    // all directly here. Now deferred behind tryStartField()'s own gate
+    // (see modelMeasurementsReady's declaration comment) -- these one-
+    // time MODEL measurements above (alignQuat, handBoundsCenterLocal,
+    // boneRestQuat, etc.) don't depend on settings and stay here
+    // unchanged; only the settings-DEPENDENT build (rebuildField() reads
+    // cfg.fieldRows/fieldCols/etc.) needed to wait.
+    modelMeasurementsReady = true
+    tryStartField()
   },
   undefined,
   (err) => {
