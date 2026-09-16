@@ -4806,6 +4806,7 @@
       "armLengthRange": "{\"min\":0,\"max\":49}",
       "armLengthCurve": "[{\"x\":0,\"y\":1},{\"x\":0.46583302815755206,\"y\":0.6392707824707031},{\"x\":1,\"y\":0}]",
       "wristSplayResponsiveEnabled": false,
+      "wristSplayReposeStagger": 4,
       "wristSplayDefault": 0,
       "wristSplayReactiveEnabled": false,
       "wristSplayRange": "{\"min\":39,\"max\":-40}",
@@ -4852,7 +4853,7 @@
       "clickMode": "Tween",
       "clickTargetPose": "Big Open Palm (S)",
       "clickTweenSelector": "Clockwise Fan",
-      "clickTweenSpeedMs": 3740,
+      "clickTweenSpeedMs": 2030,
       "clickTweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.4318902651468913,\"y\":0.7275792439778646},{\"x\":1,\"y\":1}]",
       "clickTweenStartTimeRange": "{\"min\":0,\"max\":1741}",
       "clickTransitionSpeedMs": 460,
@@ -10124,6 +10125,7 @@
       "armLengthRange": "{\"min\":0,\"max\":49}",
       "armLengthCurve": "[{\"x\":0,\"y\":1},{\"x\":0.46583302815755206,\"y\":0.6392707824707031},{\"x\":1,\"y\":0}]",
       "wristSplayResponsiveEnabled": false,
+      "wristSplayReposeStagger": 4,
       "wristSplayDefault": 0,
       "wristSplayReactiveEnabled": false,
       "wristSplayRange": "{\"min\":39,\"max\":-40}",
@@ -10170,7 +10172,7 @@
       "clickMode": "Tween",
       "clickTargetPose": "Big Open Palm (S)",
       "clickTweenSelector": "Clockwise Fan",
-      "clickTweenSpeedMs": 3740,
+      "clickTweenSpeedMs": 2030,
       "clickTweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.4318902651468913,\"y\":0.7275792439778646},{\"x\":1,\"y\":1}]",
       "clickTweenStartTimeRange": "{\"min\":0,\"max\":1741}",
       "clickTransitionSpeedMs": 460,
@@ -15442,6 +15444,7 @@
       "armLengthRange": "{\"min\":0,\"max\":49}",
       "armLengthCurve": "[{\"x\":0,\"y\":1},{\"x\":0.46583302815755206,\"y\":0.6392707824707031},{\"x\":1,\"y\":0}]",
       "wristSplayResponsiveEnabled": false,
+      "wristSplayReposeStagger": 4,
       "wristSplayDefault": 0,
       "wristSplayReactiveEnabled": false,
       "wristSplayRange": "{\"min\":39,\"max\":-40}",
@@ -15488,7 +15491,7 @@
       "clickMode": "Tween",
       "clickTargetPose": "Big Open Palm (S)",
       "clickTweenSelector": "Clockwise Fan",
-      "clickTweenSpeedMs": 3740,
+      "clickTweenSpeedMs": 2030,
       "clickTweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.4318902651468913,\"y\":0.7275792439778646},{\"x\":1,\"y\":1}]",
       "clickTweenStartTimeRange": "{\"min\":0,\"max\":1741}",
       "clickTransitionSpeedMs": 460,
@@ -16136,11 +16139,11 @@
           "collapsed": true,
           "settings": [
             "chpTweenRetransitionSpeedMs",
+            "chpTweenSpeedMs",
             "chpTweenRetransitionStartTimeCurve",
             "chpTweenRetransitionStartTimeRange",
             "chpLoopMode",
             "chpLoopHoldMs",
-            "chpTweenSpeedMs",
             "chpTweenStartTimeCurve",
             "chpTweenStartTimeRange",
             "chpMode",
@@ -16206,7 +16209,7 @@
         },
         {
           "key": "Triple-Click Pose",
-          "collapsed": true,
+          "collapsed": false,
           "settings": [
             "tripleClickEnabled",
             "tripleClickMode",
@@ -16227,7 +16230,7 @@
         },
         {
           "key": "Triple-Click Hold",
-          "collapsed": true,
+          "collapsed": false,
           "settings": [
             "tripleClickHoldEnabled",
             "tripleClickHoldMode",
@@ -16253,7 +16256,7 @@
         },
         {
           "key": "Quadruple-Click Pose",
-          "collapsed": true,
+          "collapsed": false,
           "settings": [
             "quadClickEnabled",
             "quadClickMode",
@@ -16349,6 +16352,7 @@
           "key": "Responsive Wrist Splay",
           "collapsed": false,
           "settings": [
+            "wristSplayReposeStagger",
             "wristSplayResponsiveEnabled",
             "wristSplayDefault",
             "wristSplayReactiveEnabled",
