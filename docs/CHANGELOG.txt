@@ -4696,6 +4696,74 @@ device) -- a settings-data correction, not a source-code change.
 Cache-buster bump: none (no `src/` file changed).
 
 --------------------------------------------------------------------------------
+2026-09-15/16  -  23:50:21 - 00:05:30 EDT (15m09s, measured)
+
+**3 direct user items: 1 investigated without a confirmed fix, 1 added,
+1 answered.**
+
+**1. Middle/ring finger "outstretched for a split second" during
+retransition (click x2, click-hold, right-click all reproduce it, per
+the user's own screen recording + 4 still frames) -- INVESTIGATED,
+NO CODE BUG FOUND.** Checked and ruled out: `FINGER_SIGN`/`FINGER_MAX_DEG`/
+`FINGER_CURL_AXIS`/`FINGER_SPLAY_JOINT_INDEX`/`FINGER_SPLAY2_JOINT_INDEX`
+are all fully symmetric across index/middle/ring/pinky (no per-finger
+special-casing exists in `applyCurlToSkeleton()` that could single out
+middle/ring); the `!overridden` idle-repose gate fix from 2 entries ago
+is still intact and correctly excludes retransition frames; wrist/whole-
+hand rotation barely changes during the reproduced transition (negligible
+factor). Directly traced `rMid1/2/3` and `rRing1/2/3`'s own actual bone
+Euler rotations frame-by-frame across the full retransition range (11
+samples, t=0 to t=1, using the user's own real Right-Click Tween
+sequence data) via `window.__debug` -- every single component
+interpolates smoothly and monotonically, no reversal, no discontinuity,
+confirmed analytically too (`curlBiasWeight()`'s quadratic interaction
+with a linearly-changing curlBias does not introduce a sign reversal for
+this specific pose pair). Leading hypothesis, NOT verified: an inherent
+property of this project's linear-per-slider interpolation approach --
+composing multiple SEQUENTIAL, non-commuting axis rotations (splay,
+splay2, curl, base/mid/tip-only curl, tip-twist) can produce a visually
+"off" intermediate 3D orientation even when every individual contributing
+value moves smoothly, most likely to be visible on ring specifically
+since `splayRing` swings the most dramatically of any single value in
+the traced case (-34 -> 37, a full sign crossing). Live visual
+confirmation was NOT obtained this round -- this session's own browser
+tool's screenshot-after-JS-mutation path showed a stale/unchanged frame
+despite a real `composer.render()` call, a NEW variant of this project's
+own already-documented rendering-pipeline unreliability gotcha, not
+chased further given time already spent. Left open -- see
+PROJECT_PROGRESS.md for the standing status.
+
+**2. Added a "Clear" button to the Mouse Tracking Log widget itself**
+(`buildMouseTrackingLogWidget()`), next to its existing Copy/Save
+buttons -- direct request. A separate `clearMouseLogBtn` DEV_GROUPS
+control already existed elsewhere in the panel calling the same
+`clearMouseTrackingLog()`, but not here, where it's actually convenient;
+left that one in place (not asked to remove it) rather than touching
+unrelated UI. Matches this workspace's own standard Debug-group button
+set (parent CLAUDE.md §12i-1: "Copy / Save / Clear buttons"). Verified
+live: log had content, Clear emptied it correctly.
+
+**3. "Why does the dev panel use the Landscape tab for desktop, instead
+of the desktop tab?" -- ANSWERED, no fix applied (a shared cross-project
+engine file, needs approval first).** `devPanel.js`'s own `realDeviceClass()`
+classifies purely by viewport size: Desktop only when BOTH
+`window.innerWidth` and `innerHeight` are >=768px; below that, Landscape
+if wider than tall, else Mobile -- no touch-capability check at all. The
+user's own most recent Mouse Tracking Log showed "Viewport (start):
+1536x730" -- 730 < 768, so a real desktop browser window that simply
+isn't tall enough (an unmaximized window, limited screen real estate,
+browser chrome eating into the viewport) gets misclassified as a
+landscape-orientation touchscreen device. A real fix (checking
+`navigator.maxTouchPoints`/`'ontouchstart' in window` to tell a genuine
+touchscreen apart from a short non-touch desktop window) would change
+`devPanel.js`, the generic engine reused near-verbatim across projects
+per this project's own CLAUDE.md file-map note ("do not fork it") --
+surfaced to the user rather than silently changed, since it affects
+every project sharing this engine, not just this one.
+
+Cache-buster bumps: `index.html`'s own `main.js?v=107` -> `?v=108`.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

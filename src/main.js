@@ -1177,10 +1177,21 @@ function buildMouseTrackingLogWidget() {
     fontSize: '10px', padding: '2px 8px', background: '#3a3a4a', color: 'inherit',
     border: 'none', borderRadius: '4px', cursor: 'pointer'
   }, { text: 'Save', type: 'button' })
+  // Direct follow-up request ("Add a 'Clear' button to the click log so i
+  // can clear the log") -- reuses clearMouseTrackingLog() unchanged
+  // (already existed as a standalone DEV_GROUPS button control elsewhere
+  // in the panel, but not here, next to Copy/Save, where it's actually
+  // convenient -- matches this workspace's own standard Debug-group
+  // button set, parent CLAUDE.md §12i-1: "Copy / Save / Clear buttons").
+  const clearBtn = elLocal('button', {
+    fontSize: '10px', padding: '2px 8px', background: '#3a3a4a', color: 'inherit',
+    border: 'none', borderRadius: '4px', cursor: 'pointer'
+  }, { text: 'Clear', type: 'button' })
   headerRow.appendChild(label)
   const btnRow = elLocal('div', { display: 'flex', gap: '4px' })
   btnRow.appendChild(copyBtn)
   btnRow.appendChild(saveBtn)
+  btnRow.appendChild(clearBtn)
   headerRow.appendChild(btnRow)
   mouseTrackingLogEl = elLocal('pre', {
     height: '110px', overflowY: 'auto', margin: '0', padding: '4px 6px',
@@ -1209,6 +1220,7 @@ function buildMouseTrackingLogWidget() {
     URL.revokeObjectURL(url)
     flash('Saved!')
   })
+  clearBtn.addEventListener('click', () => clearMouseTrackingLog())
   wrap.appendChild(headerRow)
   wrap.appendChild(mouseTrackingLogEl)
   body.appendChild(wrap)

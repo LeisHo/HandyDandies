@@ -18,6 +18,42 @@ work seamlessly from there.
 
 ## Currently working on
 
+**3 direct user items (2026-09-15/16): 1 open investigation, 1 shipped,
+1 answered awaiting a decision.**
+
+**OPEN: middle/ring finger "outstretched for a split second" during
+retransition** (reproduces on click, click-hold, AND right-click, per
+the user's own screen recording). Investigated at length -- every finger-
+curl lookup table is confirmed symmetric across fingers, the actual bone
+rotations were traced frame-by-frame across a full retransition and come
+back smooth/monotonic with no reversal, and the idle-repose gate fix
+from the previous round is confirmed still correctly excluding
+retransition frames. No code bug found. Leading (unverified) theory:
+composing several sequential, non-commuting axis rotations (splay +
+splay2 + curl + base/mid/tip-only + tip-twist) can look visually "off"
+mid-blend even when every individual value itself moves smoothly --
+possibly most visible on ring specifically, whose splay swings through a
+full sign crossing in the traced case. Live visual confirmation wasn't
+obtained (a new instance of this session's own browser-tool rendering-
+pipeline unreliability). **Needs either the user's own review of their
+saved recording, or a fresh investigation angle** -- not yet resolved.
+
+**SHIPPED: "Clear" button added to the Mouse Tracking Log widget**
+itself, next to Copy/Save (a separate DEV_GROUPS button already did this
+elsewhere in the panel; this one's just where it's actually convenient).
+
+**AWAITING A DECISION: why the dev panel shows Landscape instead of
+Desktop.** Answered, not fixed -- `devPanel.js`'s `realDeviceClass()`
+classifies as Desktop only when BOTH viewport dimensions are >=768px;
+below that it's Landscape (wider than tall) or Mobile, with NO touch-
+capability check. A real desktop window shorter than 768px (confirmed:
+the user's own recent log showed 1536x730) gets misread as a landscape
+touchscreen device. The real fix (checking touch capability) touches
+`devPanel.js`, the shared cross-project engine this project's own
+CLAUDE.md says not to fork -- surfaced for the user's decision rather
+than changed unilaterally, since it affects every project sharing this
+engine. See CHANGELOG.txt's latest entry for the full account of all 3.
+
 **New feature: Tween + Double Click Hold Tween -- built 2026-09-15,
 verified live on a local dev server, awaiting the user's confirmation on
 production.** Modeled on HANDO's own "Tween / Export" dev-panel group,
