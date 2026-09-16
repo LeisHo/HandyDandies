@@ -15,7 +15,7 @@
       "showTargetMarker": false,
       "palmFacesCursor": true,
       "palmFaceRotationOffset": 0,
-      "posePreviewEnabled": false,
+      "posePreviewEnabled": true,
       "thumbCurl": 75,
       "thumbSplay": 42,
       "thumbSplay2": 13,
@@ -4230,7 +4230,7 @@
         "Clockwise Fan - 7",
         "Clockwise Fan - 8"
       ],
-      "tweenPreviewSpeedMs": 2000,
+      "tweenPreviewSpeedMs": 4734,
       "savedTweenSequences": [
         {
           "name": "Birdie",
@@ -4567,7 +4567,7 @@
       "showTargetMarker": false,
       "palmFacesCursor": true,
       "palmFaceRotationOffset": 0,
-      "posePreviewEnabled": false,
+      "posePreviewEnabled": true,
       "thumbCurl": 75,
       "thumbSplay": 42,
       "thumbSplay2": 13,
@@ -8782,7 +8782,7 @@
         "Clockwise Fan - 7",
         "Clockwise Fan - 8"
       ],
-      "tweenPreviewSpeedMs": 2000,
+      "tweenPreviewSpeedMs": 4734,
       "savedTweenSequences": [
         {
           "name": "Birdie",
@@ -9119,7 +9119,7 @@
       "showTargetMarker": false,
       "palmFacesCursor": true,
       "palmFaceRotationOffset": 0,
-      "posePreviewEnabled": false,
+      "posePreviewEnabled": true,
       "thumbCurl": 75,
       "thumbSplay": 42,
       "thumbSplay2": 13,
@@ -13334,7 +13334,7 @@
         "Clockwise Fan - 7",
         "Clockwise Fan - 8"
       ],
-      "tweenPreviewSpeedMs": 2000,
+      "tweenPreviewSpeedMs": 4734,
       "savedTweenSequences": [
         {
           "name": "Birdie",
@@ -13660,7 +13660,7 @@
   "order": [
     {
       "key": "Tween",
-      "collapsed": true,
+      "collapsed": false,
       "settings": [
         "tweenPreviewSpeedMs",
         "tweenPoses",
@@ -13960,7 +13960,7 @@
     },
     {
       "key": "Pose",
-      "collapsed": false,
+      "collapsed": true,
       "settings": [
         "posePreviewEnabled",
         "savedPoses"
