@@ -19,15 +19,44 @@ work seamlessly from there.
 ## Currently working on
 
 **Middle/ring finger "outstretched for a split second" during
-retransition -- RESOLVED, per direct user report 2026-09-16: "It was
-something wrong with the Fist pose itself. I reexported and imported it
-and the issue is no longer present."** Confirms this project's own
-extensive code-level investigation (raw bone-rotation tracing, then
-world-space fingertip-distance tracing, then static single-`t` synthetic
-snapshots -- see CHANGELOG.txt's earlier entries) was correctly
-concluding "no code bug" all along; the cause was bad data in one saved
-pose, not the animation/retransition machinery itself. No further action
-needed.
+retransition -- ACTUALLY ROOT-CAUSED AND FIXED 2026-09-16 (the earlier
+"re-exporting the Fist pose fixed it" report turned out to be
+coincidental, not the real fix -- corrected here in place rather than
+left as a stale record).** Real cause: `poseDefaultValues` (what every
+retransition-to-default targets) was captured from `cfg` exactly ONCE,
+synchronously, right after `initDevPanel()` returns -- but that
+function's own remote-settings restore is ASYNCHRONOUS, so `cfg` still
+held pure code defaults at that exact moment; the real saved values only
+land moments later. Confirmed directly on production:
+`poseDefaultValues.curlMiddle`/`curlRing` exactly matched their own code
+defaults (-89/-95) while the REAL restored `cfg` values (92/98,
+matching the user's actual Fist pose) were ~180-190 points apart -- a
+genuine 2-frame jump between "retransition finishes at the wrong
+default" and "idle repose snaps to the real one," invisible to the
+original investigation's own single-retransition bone-tracing (which
+never looked at the frame AFTER a retransition completes). Fixed with a
+new `opts.onRestore` hook in devPanel.js's own `initDevPanel()`, firing
+once real values actually land in `cfg`; verified live via a mocked
+delayed remote-settings response. See CHANGELOG.txt's matching entry for
+the full account, including why the original "Fist pose" theory was a
+plausible-but-wrong read of a symptom that was actually about the
+DEFAULT pose object, not any one saved pose's own data.
+
+**Also investigated same day: "double click still not acting right,
+something triggered before the double click or click hold sequence."**
+Found and fixed one real data issue (the live `chpHoldConfirmMs`/
+`rchpHoldConfirmMs` had drifted back to a stale 150ms, the same bug
+class already fixed once before) but could NOT independently reproduce
+a separate code-level cause beyond the `poseDefaultValues` fix above --
+live-testing showed the current architecture already gates a hold's
+visible commit behind both HoldConfirmMs AND a much longer distance-
+based delay, so 150ms alone couldn't explain a visible flash. The
+`poseDefaultValues` fix is the strongest evidence-backed candidate for
+what's actually being seen (every double-click/click-hold ends in a
+retransition-to-default, the exact phase that bug corrupted) -- **not
+yet independently confirmed by the user for this specific symptom.**
+If it persists after this deploy, a fresh screen recording of the exact
+sequence is the fastest next step.
 
 **SHIPPED 2026-09-16, 6 more direct-request items (interruption
 continuity, Tween Retransition settings, grouped dropdowns, combined

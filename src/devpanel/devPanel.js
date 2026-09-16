@@ -1987,6 +1987,22 @@ export function initDevPanel(groups, opts = {}) {
         applyStoredValues(settings.values)
         textOverrides = settings.textOverrides || {}
         applyTextOverrides()
+        // `opts.onRestore` -- called once real stored values have just
+        // been written into `cfg` (BOTH here, the async boot-time path,
+        // and the localStorage branch below), for a host that captured
+        // its own ONE-TIME snapshot of `cfg` synchronously right after
+        // `initDevPanel()` returns (a common pattern for e.g. a "default
+        // pose to retransition back to" cache) -- that snapshot is
+        // captured before this async remote fetch has any chance to
+        // resolve, so it silently freezes on whatever `cfg` held at that
+        // early moment (this control's own code-level `def`, not the
+        // real restored value) unless the host re-derives it again here.
+        // Confirmed as a real, 100%-reproducible bug in a host project
+        // (HANDY DANDIES' own `poseDefaultValues`, silently stuck on
+        // code defaults on every single page load, never the real
+        // saved/remote default) -- this hook is the generic fix, not
+        // specific to that one host's own field name.
+        if (opts.onRestore) opts.onRestore()
       })
       let remoteGeom = null
       try { remoteGeom = JSON.parse(localStorage.getItem(currentGeomKey())) } catch (err) { remoteGeom = null }
@@ -2000,6 +2016,7 @@ export function initDevPanel(groups, opts = {}) {
       applyStoredValues(saved.values)
       textOverrides = saved.textOverrides || {}
       applyTextOverrides()
+      if (opts.onRestore) opts.onRestore()
     }
     let geom = null
     try { geom = JSON.parse(localStorage.getItem(currentGeomKey())) } catch (err) { geom = null }

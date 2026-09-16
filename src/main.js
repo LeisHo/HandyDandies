@@ -6,7 +6,7 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js'
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js'
 import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js'
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js'
-import { initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings } from './devpanel/devPanel.js?v=18'
+import { initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings } from './devpanel/devPanel.js?v=19'
 
 // A defensive wrapper around devPanel.js's own refreshSelectOptions() --
 // found via live testing (direct user report: "I dont see any of the
@@ -882,7 +882,35 @@ const SAVE_SETTINGS_ENDPOINT = '/api/save-settings'
 const cfg = initDevPanel(DEV_GROUPS, {
   storageKeyPrefix: 'handyDandies',
   organizeSubgroups: (groupsEl) => organizeGroupSubgroups(groupsEl, 'Pose', POSE_SUBGROUP_SPECS),
-  remoteSave: { endpoint: SAVE_SETTINGS_ENDPOINT, secret: DEV_PANEL_SAVE_SECRET }
+  remoteSave: { endpoint: SAVE_SETTINGS_ENDPOINT, secret: DEV_PANEL_SAVE_SECRET },
+  // ROOT CAUSE of the middle/ring finger "outstretched" bug's REAL
+  // return, 2026-09-16 (direct user report, correctly suspecting "the
+  // default position") -- `poseDefaultValues` (declared below) used to
+  // be seeded from `cfg` exactly ONCE, synchronously, immediately after
+  // this very call returns. But `initDevPanel()`'s own remote-settings
+  // restore (`resetSettings()`'s boot-time fetch, devPanel.js) is
+  // ASYNCHRONOUS and NOT awaited here -- this call returns with `cfg`
+  // still holding pure CODE DEFAULTS (every control's own `def:`), and
+  // the REAL saved values only land in `cfg` moments later, once that
+  // fetch resolves. `poseDefaultValues`'s one-time seed always ran
+  // BEFORE that -- confirmed live on production: `poseDefaultValues.
+  // curlMiddle`/`curlRing` exactly matched their own CODE `def:` (-89/
+  // -95) while the REAL, restored `cfg.curlMiddle`/`curlRing` (92/98,
+  // matching the user's actual "Fist" pose) were completely different --
+  // a ~180-190-point gap, vs. a much smaller coincidental gap on
+  // thumb/index/pinky, exactly matching which fingers were reported as
+  // visibly "lagging." Every retransition correctly interpolated TOWARD
+  // this silently-wrong `poseDefaultValues`, then the very next idle-cfg-
+  // driven repose frame snapped to the REAL cfg values -- a real 2-frame
+  // jump, not a rendering-pipeline artifact, which is exactly why the
+  // original deep investigation (bone-rotation tracing, world-space
+  // distance tracing, all confined to a single retransition's own t=0..1
+  // range) never found it: the discontinuity lives at the HANDOFF to the
+  // next phase, one frame past where that tracing stopped looking.
+  // `onRestore` (new, generic devPanel.js hook -- see its own comment)
+  // fires once real values actually land in `cfg`, letting
+  // resyncPoseDefaultValues() re-seed for real.
+  onRestore: () => resyncPoseDefaultValues()
 })
 onChangeByCtrl.forEach((fn, c) => { c.onChange = fn })
 // Arm Length's 2 custom widgets (see their own declaration comments,
@@ -1953,7 +1981,17 @@ DEV_GROUPS.find((g) => g.title === 'Pose').controls.forEach((c) => {
 // mid-session immediately targets the new default without needing a
 // page reload first.
 let poseDefaultValues = {}
-POSE_PRESET_KEYS.forEach((key) => { poseDefaultValues[key] = cfg[key] !== undefined ? cfg[key] : POSE_KEY_DEFAULTS[key] })
+// Re-seeds poseDefaultValues from cfg's CURRENT values -- called once
+// here (synchronously, the same instant `cfg` exists, matching this
+// variable's original single-seed behavior for the plain-localStorage/
+// no-remote-save case) AND again from `onRestore` (initDevPanel()'s own
+// opts, above) once the async remote-settings fetch actually resolves --
+// see that call site's own comment for the full root-cause account of
+// why a single synchronous seed here was never enough on its own.
+function resyncPoseDefaultValues() {
+  POSE_PRESET_KEYS.forEach((key) => { poseDefaultValues[key] = cfg[key] !== undefined ? cfg[key] : POSE_KEY_DEFAULTS[key] })
+}
+resyncPoseDefaultValues()
 // Builds ONE Click-Hold Pose group's control array -- called twice (see
 // DEV_GROUPS' own use of this, above), once per mouse button, so the 2
 // groups can never drift out of sync with each other. `p` is the short

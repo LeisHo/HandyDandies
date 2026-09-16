@@ -5022,6 +5022,83 @@ sequences, correct field values on both, 0 console errors.
 Cache-buster bump: `index.html`'s own `main.js?v=110` -> `?v=111`.
 
 --------------------------------------------------------------------------------
+2026-09-16  -  02:08:21 - 02:20:17 EDT (11m56s, measured)
+
+**ROOT-CAUSED AND FIXED: the middle/ring finger "outstretched" bug's
+real return (direct report: "the middle and ring finger issue is back...
+it has definitely got something to do with the default position or the
+fist/fist bent back poses" -- correct diagnosis).** `poseDefaultValues`
+(the object every retransition-to-default interpolates TOWARD, and the
+same one the idle-cfg-driven repose path is SUPPOSED to match) was being
+seeded from `cfg` exactly ONCE, synchronously, immediately after
+`initDevPanel()` returns -- but `initDevPanel()`'s own remote-settings
+restore (`resetSettings()`'s boot-time fetch, devPanel.js) is
+ASYNCHRONOUS and not awaited, so that call returns with `cfg` still
+holding pure CODE DEFAULTS; the REAL saved values only land in `cfg`
+moments later once the fetch resolves. Confirmed directly on production
+via `window.__debug`: `poseDefaultValues.curlMiddle`/`curlRing` exactly
+matched their own CODE `def:` (-89/-95) while the REAL, restored
+`cfg.curlMiddle`/`curlRing` (92/98, matching the user's actual "Fist"
+pose) were ~180-190 points apart -- vs. a much smaller COINCIDENTAL gap
+on thumb/index/pinky, exactly matching which fingers were reported as
+visibly lagging. Every retransition correctly interpolated toward this
+silently-wrong `poseDefaultValues`, then the very next idle-cfg-driven-
+repose frame snapped to the REAL values -- a genuine 2-frame jump, not a
+rendering-pipeline artifact, which is exactly why the original deep
+investigation (bone-rotation tracing, world-space distance tracing, both
+confined to one retransition's own t=0..1 range) never found it: the
+discontinuity lives at the HANDOFF to the next phase, one frame past
+where that tracing stopped looking. Fixed with a new, generically-useful
+`opts.onRestore` hook added to devPanel.js's own `initDevPanel()`
+(fired once real values actually land in `cfg`, in both the remote-fetch
+and plain-localStorage restore paths) -- main.js's own `resyncPoseDefaultValues()`
+re-seeds `poseDefaultValues` for real when it fires. A matching comment
+already existed in devPanel.js referencing a `loadDefaultPoseIfSaved()`-
+style fix supposedly already used elsewhere in main.js -- confirmed that
+function doesn't actually exist in this project, so the fix was never
+actually ported here. Verified live: mocked the remote-settings fetch to
+resolve ~2s after page load with realistic "Fist"-matching values (92/
+98) -- before the mock resolved, `cfg`/`poseDefaultValues` both correctly
+showed the stale code-default state; after, both updated to 92/98 in
+lockstep, confirming the hook fires and resyncs correctly.
+
+**INVESTIGATED: "double click still not acting right. something is
+triggered before the double click or click hold sequence."** Found and
+fixed one real, concrete data issue: the live git-tracked settings had
+`chpHoldConfirmMs`/`rchpHoldConfirmMs` at 150ms on all 3 device tabs --
+NOT the 500ms this exact field was already corrected to on 2026-09-15
+(same bug class: "the user's own real saved value was 0ms" then; 150ms
+now -- a different browser/session's own stale local state overwriting
+the git-tracked correction on a later Save, the inherent risk of this
+project's own "whatever this browser currently has" Save model).
+Corrected back to 500 across all 3 devices. However, live-testing this
+project's own 2026-09-16 interruption-continuity rearchitecture (see
+this file's own earlier entry) directly via `window.__debug` showed
+`chp`'s own visible commit is ALREADY gated behind BOTH HoldConfirmMs
+AND the full per-hand distance-based start delay (0-3000ms by this
+project's own default, confirmed live: `chp.phase` stayed 'idle' through
+an entire simulated 240ms press regardless of the 150ms-vs-500ms
+HoldConfirmMs value) -- meaning the stale 150ms value, while genuinely
+wrong and now corrected, could NOT by itself have caused a visible
+flash within any realistic click/double-click timeframe under the
+CURRENT (post-rearchitecture) code. **Could not independently reproduce
+a code-level "something fires early" bug for double-click/click-hold
+specifically beyond the `poseDefaultValues` fix above** -- given every
+double-click/click-hold sequence ALSO ends in a retransition-to-default,
+the SAME 2-frame default-pose snap this entry's own first fix addresses
+is a strong, evidence-supported candidate for what the user is actually
+seeing/describing as "something triggered." Reported honestly as
+unconfirmed for this specific symptom rather than claimed as fixed --
+if it persists after this deploy, a fresh screen recording of the exact
+double-click/hold sequence would be the fastest way to pin down
+whatever's left.
+
+Data-only fix, no cache-buster bump needed for the HoldConfirmMs
+correction; `index.html`'s own `main.js?v=111` -> `?v=112` for the
+`onRestore`/`resyncPoseDefaultValues()` code fix; `main.js`'s own import
+of `devpanel/devPanel.js?v=18` -> `?v=19`.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================
