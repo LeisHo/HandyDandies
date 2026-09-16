@@ -15,13 +15,14 @@
       "showTargetMarker": false,
       "palmFacesCursor": true,
       "palmFaceRotationOffset": 0,
+      "posePreviewEnabled": false,
       "thumbCurl": 75,
       "thumbSplay": 42,
       "thumbSplay2": 13,
       "curlBiasThumb": 32,
       "baseOnlyCurlThumb": -23,
-      "midOnlyCurlThumb": -8,
-      "tipOnlyCurlThumb": 20,
+      "midOnlyCurlThumb": 0,
+      "tipOnlyCurlThumb": 0,
       "tipTwistThumb": 46,
       "curlIndex": 90,
       "splayIndex": 18,
@@ -56,7 +57,7 @@
       "tipOnlyCurlPinky": 15,
       "tipTwistPinky": 0,
       "wristBend": 0,
-      "wristSplay": 0,
+      "wristSplay": -50,
       "modelRotX": 0,
       "modelRotY": 0,
       "modelRotZ": 0,
@@ -4176,9 +4177,9 @@
       "rchpRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.4683329264322917,\"y\":0.6742708841959635},{\"x\":1,\"y\":1}]",
       "rchpRetransitionStartTimeRange": "{\"min\":0,\"max\":3000}",
       "clickEnabled": true,
-      "clickMode": "Single Pose",
+      "clickMode": "Tween",
       "clickTargetPose": "Big Open Palm (S)",
-      "clickTweenSelector": "Wave",
+      "clickTweenSelector": "Clockwise Fan",
       "clickTweenSpeedMs": 800,
       "clickTweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "clickTweenStartTimeRange": "{\"min\":0,\"max\":300}",
@@ -4218,12 +4219,18 @@
       "rcRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "rcRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "tweenPoses": [
-        "Twist 3",
-        "Twist Up -",
-        "Twist 4",
-        "Twist Up",
-        "Twist 5"
+        "Fist",
+        "Clockwise Fan - 0",
+        "Clockwise Fan - 1",
+        "Clockwise Fan - 2",
+        "Clockwise Fan - 3",
+        "Clockwise Fan - 4",
+        "Clockwise Fan - 5",
+        "Clockwise Fan - 6",
+        "Clockwise Fan - 7",
+        "Clockwise Fan - 8"
       ],
+      "tweenPreviewSpeedMs": 2000,
       "savedTweenSequences": [
         {
           "name": "Birdie",
@@ -4262,7 +4269,8 @@
             "Clockwise Fan - 4",
             "Clockwise Fan - 5",
             "Clockwise Fan - 6",
-            "Clockwise Fan - 7"
+            "Clockwise Fan - 7",
+            "Clockwise Fan - 8"
           ],
           "group": "CLOCKWISE FAN"
         },
@@ -4559,13 +4567,14 @@
       "showTargetMarker": false,
       "palmFacesCursor": true,
       "palmFaceRotationOffset": 0,
+      "posePreviewEnabled": false,
       "thumbCurl": 75,
       "thumbSplay": 42,
       "thumbSplay2": 13,
       "curlBiasThumb": 32,
       "baseOnlyCurlThumb": -23,
-      "midOnlyCurlThumb": -8,
-      "tipOnlyCurlThumb": 20,
+      "midOnlyCurlThumb": 0,
+      "tipOnlyCurlThumb": 0,
       "tipTwistThumb": 46,
       "curlIndex": 90,
       "splayIndex": 18,
@@ -4600,7 +4609,7 @@
       "tipOnlyCurlPinky": 15,
       "tipTwistPinky": 0,
       "wristBend": 0,
-      "wristSplay": 0,
+      "wristSplay": -50,
       "modelRotX": 0,
       "modelRotY": 0,
       "modelRotZ": 0,
@@ -8720,9 +8729,9 @@
       "rchpRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.4683329264322917,\"y\":0.6742708841959635},{\"x\":1,\"y\":1}]",
       "rchpRetransitionStartTimeRange": "{\"min\":0,\"max\":3000}",
       "clickEnabled": true,
-      "clickMode": "Single Pose",
+      "clickMode": "Tween",
       "clickTargetPose": "Big Open Palm (S)",
-      "clickTweenSelector": "Wave",
+      "clickTweenSelector": "Clockwise Fan",
       "clickTweenSpeedMs": 800,
       "clickTweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "clickTweenStartTimeRange": "{\"min\":0,\"max\":300}",
@@ -8762,12 +8771,18 @@
       "rcRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "rcRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "tweenPoses": [
-        "Twist 3",
-        "Twist Up -",
-        "Twist 4",
-        "Twist Up",
-        "Twist 5"
+        "Fist",
+        "Clockwise Fan - 0",
+        "Clockwise Fan - 1",
+        "Clockwise Fan - 2",
+        "Clockwise Fan - 3",
+        "Clockwise Fan - 4",
+        "Clockwise Fan - 5",
+        "Clockwise Fan - 6",
+        "Clockwise Fan - 7",
+        "Clockwise Fan - 8"
       ],
+      "tweenPreviewSpeedMs": 2000,
       "savedTweenSequences": [
         {
           "name": "Birdie",
@@ -8806,7 +8821,8 @@
             "Clockwise Fan - 4",
             "Clockwise Fan - 5",
             "Clockwise Fan - 6",
-            "Clockwise Fan - 7"
+            "Clockwise Fan - 7",
+            "Clockwise Fan - 8"
           ],
           "group": "CLOCKWISE FAN"
         },
@@ -9103,13 +9119,14 @@
       "showTargetMarker": false,
       "palmFacesCursor": true,
       "palmFaceRotationOffset": 0,
+      "posePreviewEnabled": false,
       "thumbCurl": 75,
       "thumbSplay": 42,
       "thumbSplay2": 13,
       "curlBiasThumb": 32,
       "baseOnlyCurlThumb": -23,
-      "midOnlyCurlThumb": -8,
-      "tipOnlyCurlThumb": 20,
+      "midOnlyCurlThumb": 0,
+      "tipOnlyCurlThumb": 0,
       "tipTwistThumb": 46,
       "curlIndex": 90,
       "splayIndex": 18,
@@ -9144,7 +9161,7 @@
       "tipOnlyCurlPinky": 15,
       "tipTwistPinky": 0,
       "wristBend": 0,
-      "wristSplay": 0,
+      "wristSplay": -50,
       "modelRotX": 0,
       "modelRotY": 0,
       "modelRotZ": 0,
@@ -13264,9 +13281,9 @@
       "rchpRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.4683329264322917,\"y\":0.6742708841959635},{\"x\":1,\"y\":1}]",
       "rchpRetransitionStartTimeRange": "{\"min\":0,\"max\":3000}",
       "clickEnabled": true,
-      "clickMode": "Single Pose",
+      "clickMode": "Tween",
       "clickTargetPose": "Big Open Palm (S)",
-      "clickTweenSelector": "Wave",
+      "clickTweenSelector": "Clockwise Fan",
       "clickTweenSpeedMs": 800,
       "clickTweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "clickTweenStartTimeRange": "{\"min\":0,\"max\":300}",
@@ -13306,12 +13323,18 @@
       "rcRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "rcRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "tweenPoses": [
-        "Twist 3",
-        "Twist Up -",
-        "Twist 4",
-        "Twist Up",
-        "Twist 5"
+        "Fist",
+        "Clockwise Fan - 0",
+        "Clockwise Fan - 1",
+        "Clockwise Fan - 2",
+        "Clockwise Fan - 3",
+        "Clockwise Fan - 4",
+        "Clockwise Fan - 5",
+        "Clockwise Fan - 6",
+        "Clockwise Fan - 7",
+        "Clockwise Fan - 8"
       ],
+      "tweenPreviewSpeedMs": 2000,
       "savedTweenSequences": [
         {
           "name": "Birdie",
@@ -13350,7 +13373,8 @@
             "Clockwise Fan - 4",
             "Clockwise Fan - 5",
             "Clockwise Fan - 6",
-            "Clockwise Fan - 7"
+            "Clockwise Fan - 7",
+            "Clockwise Fan - 8"
           ],
           "group": "CLOCKWISE FAN"
         },
@@ -13636,8 +13660,9 @@
   "order": [
     {
       "key": "Tween",
-      "collapsed": false,
+      "collapsed": true,
       "settings": [
+        "tweenPreviewSpeedMs",
         "tweenPoses",
         "savedTweenSequences"
       ],
@@ -13789,7 +13814,7 @@
       "subgroups": [
         {
           "key": "Click Pose",
-          "collapsed": true,
+          "collapsed": false,
           "settings": [
             "clickTweenSpeedMs",
             "clickTweenStartTimeCurve",
@@ -13935,8 +13960,9 @@
     },
     {
       "key": "Pose",
-      "collapsed": true,
+      "collapsed": false,
       "settings": [
+        "posePreviewEnabled",
         "savedPoses"
       ],
       "subgroups": [
@@ -14121,6 +14147,7 @@
       "key": "Debug",
       "collapsed": false,
       "settings": [
+        "pauseAnimations",
         "showGridHelper",
         "showWireframe",
         "preventReorderFlash",
