@@ -242,8 +242,28 @@ let idleReposeFrameCounter = 0
 let modelMeasurementsReady = false
 let startupSettingsReady = false
 let fieldStarted = false
+// Loading Preview's own "Min Loading Time" (direct request) -- captured
+// here, at the earliest point this module runs, so the min-time window
+// starts from the true page-load moment, not from whenever tryStartField()
+// first happens to be called.
+const pageLoadStartMs = performance.now()
+let minLoadingTimeTimerSet = false
 function tryStartField() {
   if (fieldStarted || !modelMeasurementsReady || !startupSettingsReady) return
+  // Only actually holds the reveal back when the loading preview itself
+  // is on -- see the control's own DEV_GROUPS comment for why an
+  // artificial delay with nothing to show isn't what was asked for.
+  if (cfg.loadingPreviewEnabled) {
+    const minMs = Math.max(0, cfg.loadingMinTimeMs || 0)
+    const elapsed = performance.now() - pageLoadStartMs
+    if (elapsed < minMs) {
+      if (!minLoadingTimeTimerSet) {
+        minLoadingTimeTimerSet = true
+        setTimeout(tryStartField, minMs - elapsed)
+      }
+      return
+    }
+  }
   fieldStarted = true
   rebuildField()
   buildPosePreview()
@@ -387,6 +407,26 @@ const DEV_GROUPS = [
       // why that axis) -- CLAUDE.md 12n, "feel/response curves are
       // sliders, not constants."
       { key: 'palmFaceRotationOffset', label: 'Palm Face Rotation (Deg)', type: 'slider', min: -180, max: 180, step: 1, def: 0, perDevice: true }
+    ]
+  },
+  {
+    // Direct request 2026-09-16: "is it possible to have 1 hand running
+    // through a loading sequence, like a loading animation?" then "build
+    // it... provide me a checkbox to turn it on and off... appropriate
+    // settings in the dev panel... allow me to set a min loading time."
+    // A 3rd, independent hand-preview instance (alongside the main field
+    // and the Pose Preview panel) -- see `buildLoadingPreview()`'s own
+    // comment for why it can't just reuse Pose Preview's.
+    title: 'Loading Preview',
+    controls: [
+      { key: 'loadingPreviewEnabled', label: 'Show Hand Loading Animation', type: 'checkbox', def: true },
+      // Only actually delays the reveal while the preview above is ALSO
+      // on (see tryStartField()'s own gate) -- an artificial delay with
+      // nothing to show for it isn't what was asked for.
+      { key: 'loadingMinTimeMs', label: 'Min Loading Time (Ms)', type: 'slider', min: 0, max: 5000, step: 100, def: 1200 },
+      { key: 'loadingPreviewTweenSelector', label: 'Loading Tween Sequence', type: 'select', def: '', options: () => (cfg.savedTweenSequences || []).map((s) => ({ value: s.name, group: s.group || null })) },
+      { key: 'loadingPreviewSpeedMs', label: 'Loading Preview Speed (Ms / Cycle)', type: 'slider', min: 200, max: 5000, step: 50, def: 900 },
+      { key: 'loadingPreviewSize', label: 'Loading Preview Size (Px)', type: 'slider', min: 80, max: 400, step: 10, def: 160, onChange: () => resizeLoadingPreview() }
     ]
   },
   {
@@ -2659,6 +2699,118 @@ function buildDiagnosePoseButton() {
   actionsRow.appendChild(btn)
 }
 buildDiagnosePoseButton()
+
+// -----------------------------------------------------------------------
+// Loading Preview -- a 3rd, independent hand instance (alongside the main
+// field and Pose Preview's own) shown inside `#loading` while the field
+// itself is still building. Can't just reuse Pose Preview's scene/camera/
+// hand: Pose Preview is lazily built on its own opt-in checkbox and isn't
+// guaranteed to exist this early, and this preview specifically needs to
+// exist and start animating the INSTANT the base model finishes loading
+// (buildLoadingPreview() is called from the GLTFLoader callback itself,
+// before tryStartField()'s own settings-restore gate has necessarily
+// resolved) -- see this project's own README... no, see `tryStartField()`'s
+// own comment for the full startup-race context this sits inside.
+// -----------------------------------------------------------------------
+let loadingPreviewHand = null // { clone, skinnedMesh }
+let loadingPreviewRenderer = null
+let loadingPreviewScene = null
+let loadingPreviewCamera = null
+let loadingPreviewCanvas = null
+let loadingPreviewAnimStartMs = 0
+const loadingPreviewBaseQuat = new THREE.Quaternion()
+// Called once, from the GLTFLoader callback, right after modelRoot/
+// alignQuat/toonMaterial/handBoundsCenterLocal/handBoundsRadiusLocal are
+// all measured -- same one-time-measurement dependencies buildPosePreview()
+// has, just reached earlier in the startup sequence. Gated on
+// `loadingPreviewEnabled` so a session with it off skips this entirely
+// (cfg already holds at least its own def by now, seeded synchronously
+// well before this async callback ever fires -- see initDevPanel()'s own
+// documented seed-then-async-restore behavior).
+function buildLoadingPreview() {
+  if (!cfg.loadingPreviewEnabled) return
+  loadingPreviewCanvas = document.getElementById('loadingPreviewCanvas')
+  if (!loadingPreviewCanvas) return
+  loadingPreviewCanvas.style.display = 'block'
+  loadingPreviewScene = new THREE.Scene()
+  loadingPreviewCamera = new THREE.PerspectiveCamera(35, 1, 0.1, 2000)
+  loadingPreviewRenderer = new THREE.WebGLRenderer({ canvas: loadingPreviewCanvas, antialias: true, alpha: true })
+  loadingPreviewRenderer.outputColorSpace = THREE.SRGBColorSpace
+  loadingPreviewRenderer.setClearColor(0x000000, 0)
+
+  // Clones of the main scene's own already-tuned lights -- same reasoning
+  // as buildPosePreview()'s own identical comment (a from-scratch light
+  // produced a flat, washed-out silhouette with no visible toon-shading
+  // steps).
+  const key = keyLight.clone()
+  key.target = keyLight.target.clone()
+  loadingPreviewScene.add(key, key.target, hemiLight.clone())
+
+  const clone = cloneSkeletal(modelRoot)
+  clone.quaternion.copy(alignQuat)
+  const skinnedMesh = findSkinnedMesh(clone)
+  if (skinnedMesh && toonMaterial) skinnedMesh.material = toonMaterial
+  loadingPreviewScene.add(clone)
+  loadingPreviewHand = { clone, skinnedMesh }
+
+  const target = handBoundsCenterLocal.clone().applyQuaternion(alignQuat)
+  const pos = target.clone().add(new THREE.Vector3(0, handBoundsRadiusLocal * 0.15, handBoundsRadiusLocal * 2.4))
+  loadingPreviewCamera.position.copy(pos)
+  loadingPreviewCamera.lookAt(target)
+
+  applyLoadingPreviewPose(poseDefaultValues)
+  loadingPreviewAnimStartMs = performance.now()
+  resizeLoadingPreview()
+}
+// Sized directly off the Loading Preview Size (Px) slider (an inline
+// style, not CSS-var-driven like the main dev panel's own chrome, since
+// this canvas only exists during a narrow startup window) -- called once
+// at build time and again on that slider's own onChange (live-resizable
+// isn't strictly needed since it can't be touched before the model loads,
+// but this keeps it consistent with the size actually configured, since a
+// value restored async, after the loading screen already opened, would
+// otherwise never take effect until next reload).
+function resizeLoadingPreview() {
+  if (!loadingPreviewCanvas || !loadingPreviewRenderer) return
+  const size = Math.max(20, cfg.loadingPreviewSize || 160)
+  loadingPreviewCanvas.style.width = size + 'px'
+  loadingPreviewCanvas.style.height = size + 'px'
+  loadingPreviewCamera.aspect = 1
+  loadingPreviewCamera.updateProjectionMatrix()
+  loadingPreviewRenderer.setSize(size, size, false)
+}
+// Applies one pose-shaped values object to ONLY the loading-preview hand's
+// skeleton -- deliberately a 3rd near-duplicate of previewPosePreset()
+// (Pose Preview's own version) rather than a shared helper, matching this
+// codebase's own existing precedent of a bespoke apply-to-isolated-hand
+// function per independent preview instance instead of a new abstraction
+// both would route through.
+function applyLoadingPreviewPose(item) {
+  if (!loadingPreviewHand || !loadingPreviewHand.skinnedMesh) return
+  const values = {}
+  POSE_PRESET_KEYS.forEach((k) => { values[k] = item[k] !== undefined ? item[k] : POSE_KEY_DEFAULTS[k] })
+  loadingPreviewBaseQuat.copy(alignQuat)
+  loadingPreviewHand.clone.quaternion.copy(loadingPreviewBaseQuat)
+  applyWristPoseToSkeleton(loadingPreviewHand.skinnedMesh.skeleton, values)
+  FINGER_NAMES.forEach((name) => applyCurlToSkeleton(name, loadingPreviewHand.skinnedMesh.skeleton, loadingPreviewBaseQuat, null, values))
+}
+// Continuously loops the selected Tween Sequence (default pose + every
+// named pose in it) for as long as the loading screen stays up -- reuses
+// lerpLoopSequence()'s own unbounded cyclic `tCyclic` position (see its
+// declaration comment) rather than a one-shot [0,1] progress, since this
+// preview's own duration is whatever the real load actually takes, not a
+// fixed length. Falls back to just holding the default pose (no visible
+// motion, but still a rendered hand) when no sequence is selected or it
+// resolves to zero poses.
+function updateLoadingPreviewAnimation() {
+  const seq = (cfg.savedTweenSequences || []).find((s) => s.name === cfg.loadingPreviewTweenSelector)
+  const namedPoses = seq ? resolveTweenSequencePoses(seq.tweenPoses) : []
+  if (namedPoses.length < 1) { applyLoadingPreviewPose(poseDefaultValues); return }
+  const poses = [poseDefaultValues, ...namedPoses]
+  const segmentMs = Math.max(safeTweenSpeedMs(cfg.loadingPreviewSpeedMs) / poses.length, 1)
+  const tCyclic = (performance.now() - loadingPreviewAnimStartMs) / segmentMs
+  applyLoadingPreviewPose(lerpLoopSequence(poses, tCyclic))
+}
 
 // -----------------------------------------------------------------------
 // Pose Preview -- a small, independent Three.js viewport embedded in the
@@ -5348,6 +5500,12 @@ new GLTFLoader().load(
     // unchanged; only the settings-DEPENDENT build (rebuildField() reads
     // cfg.fieldRows/fieldCols/etc.) needed to wait.
     modelMeasurementsReady = true
+    // Loading Preview -- built here, not from tryStartField(), so it can
+    // start animating the instant the base model itself is ready, well
+    // before the (usually slower) settings-restore half of the gate below
+    // resolves. Same already-loaded GLB, no extra network fetch, same as
+    // every other clone this file makes of it.
+    buildLoadingPreview()
     tryStartField()
   },
   undefined,
@@ -5693,6 +5851,22 @@ function animate() {
         if (progress >= 1) previewTweenPlay = null
       }
       previewRenderer.render(previewScene, previewCamera)
+    }
+    // Loading Preview's own tiny render pass -- only while the loading
+    // screen is actually still up (`!fieldStarted`); once the real field
+    // reveals, this renderer is never touched again for the rest of the
+    // session (no teardown needed -- it just stops being called). Its own
+    // try/catch, separate from this function's outer one, so a bug in this
+    // narrow, brand-new code path can never take down the main field's own
+    // per-frame loop with it.
+    if (!fieldStarted && loadingPreviewRenderer) {
+      try {
+        updateLoadingPreviewAnimation()
+        loadingPreviewRenderer.render(loadingPreviewScene, loadingPreviewCamera)
+      } catch (lpErr) {
+        console.error('Loading Preview frame threw -- disabling it for this session:', lpErr)
+        loadingPreviewRenderer = null
+      }
     }
   } catch (err) {
     console.error('animate() frame threw -- rendering skipped for this frame, loop continues:', err)

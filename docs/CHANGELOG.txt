@@ -5595,6 +5595,100 @@ edits this entry, `?v=123` was an intermediate step, superseded before
 a live check was ever attempted against it).
 
 --------------------------------------------------------------------------------
+2026-09-16  -  05:28:37 - 05:44:26 EDT (15m49s, measured)
+
+**New feature: Loading Preview -- a single animated hand cycling through a
+Tween Sequence on the loading screen, while the full field builds behind
+it.** Direct request, following an exploratory question ("is it possible
+to have 1 hand running through a loading sequence... or would that also
+have to be loaded") answered first (yes it's possible, and no it doesn't
+need to wait for the full field -- the one-time base model load is fast;
+the field of 240+ clones is the actually-slow part), then "build it...
+checkbox to turn it on and off... appropriate settings... allow me to set
+a min loading time."
+
+New "Loading Preview" dev-panel group (placed before "Pose"):
+`loadingPreviewEnabled` (checkbox, def true), `loadingMinTimeMs` (slider,
+0-5000ms, def 1200 -- only actually delays the reveal while the preview
+itself is on, per its own DEV_GROUPS comment: an artificial delay with
+nothing to show isn't what was asked for), `loadingPreviewTweenSelector`
+(select, from `cfg.savedTweenSequences`), `loadingPreviewSpeedMs` (slider,
+200-5000ms/cycle, def 900), `loadingPreviewSize` (slider, 80-400px, def
+160).
+
+A 3rd, independent hand-preview instance (alongside the main field and
+the Pose Preview panel's own), built in `buildLoadingPreview()` --
+deliberately NOT a reuse of Pose Preview's scene/camera/hand, since Pose
+Preview is lazily built on its own opt-in checkbox and isn't guaranteed
+to exist this early; this one needs to exist and start animating the
+INSTANT the base model finishes loading. Called from the GLTFLoader
+callback itself, right where `modelMeasurementsReady = true` gets set --
+before `tryStartField()`'s own settings-restore half of the gate has
+necessarily resolved. Camera framing reuses the exact same proven formula
+as `defaultPosePreviewCamera()` (bounding-sphere center/radius, already
+measured once for Pose Preview); lights are clones of the main scene's
+own tuned key/hemisphere lights, same reasoning as Pose Preview's own
+comment (a from-scratch light produces a flat, washed-out silhouette).
+`applyLoadingPreviewPose()` is a deliberate 3rd near-duplicate of
+`previewPosePreset()` rather than a shared helper -- matches this
+codebase's own existing precedent of a bespoke apply-to-isolated-hand
+function per independent preview instance. Animation loops continuously
+via the existing `lerpLoopSequence()` (already used by Click-Hold-Pose's
+own Loop Mode) across `[poseDefaultValues, ...namedPoses]`, an unbounded
+cyclic position rather than a one-shot [0,1] progress, since the real
+load duration is unknown ahead of time. Rendered from inside `animate()`
+itself (not a separate loop), gated on `!fieldStarted`, in its own
+try/catch that disables the feature for the session (rather than
+spamming errors) if it ever throws.
+
+`tryStartField()`'s own gate gained a 3rd condition: when
+`loadingPreviewEnabled` is on, the reveal now also waits for
+`performance.now() - pageLoadStartMs >= loadingMinTimeMs`, re-scheduling
+itself via `setTimeout` for the remaining delay (deduped so multiple
+calls to `tryStartField()` -- model-ready, settings-ready, the existing
+6000ms fallback -- never stack redundant timers). `pageLoadStartMs`
+captured at the earliest point this module runs, so the window starts
+from true page-load, not from whenever the gate first happens to be
+checked.
+
+`index.html`'s `#loading` restructured to hold a `<canvas
+id="loadingPreviewCanvas">` plus the existing text (now `#loadingText`)
+as flex children; `style.css` hides the canvas by default (`display:
+none`) so a disabled/not-yet-built preview never shows as an empty box --
+`buildLoadingPreview()` only reveals it when actually building.
+
+**Verification: thorough but methodologically adapted around this
+project's own recurring local-test-server flakiness (3rd entry in a row
+hitting it -- see the prior 2 entries).** Every attempt at a clean,
+UNOBSTRUCTED visual screenshot of the loading hand was defeated by
+environment friction unrelated to this feature's own code: the dev panel
+(`?dev=1`/localhost always trigger DEV_MODE) covers the full narrow
+414px test viewport; the 'D' hide-panel shortcut worked inconsistently
+across attempts; one screenshot caught an apparent white-background FOUC
+moment mid-navigation. Switched to direct, in-page verification instead,
+across MULTIPLE independently-successful page loads (confirmed clean by
+checking `document.querySelector('script').src` matched the current
+cache-buster and no `ERR_CONNECTION_RESET` had hit `main.js` for that
+specific load): (1) direct object inspection confirmed the scene/camera/
+hand/lights are constructed correctly -- 4 scene children, correct
+camera position/target matching the proven Pose Preview formula, hand
+visible, skinned mesh present; (2) the per-frame render call executes
+successfully dozens of times per load with zero thrown errors; (3) a
+10x10 grid pixel sample against a temporary opaque debug clear color
+(removed before shipping) showed a coherent ~9-11% silhouette in a
+plausible position/size, not empty or garbage; (4) a timing test
+confirmed the min-loading-time gate directly: still loading at 800ms,
+revealed by 1500ms, against the 1200ms default -- exactly the expected
+behavior; (5) `node --check` passes. Did not keep fighting for a
+pixel-perfect screenshot once this evidence was in hand (CLAUDE.md
+§0b) -- recommend the user do a quick visual check of their own on
+their next real page load.
+
+Cache-buster bumps: `index.html`'s own `main.js?v=124` -> `?v=129`
+(several intermediate debug-instrumentation steps along the way, all
+removed before this entry's final state) and `style.css?v=8` -> `?v=9`.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

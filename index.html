@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Handy Dandies</title>
-<link rel="stylesheet" href="src/style.css?v=8">
+<link rel="stylesheet" href="src/style.css?v=9">
 <script type="importmap">
 {
   "imports": {
@@ -16,7 +16,10 @@
 </head>
 <body>
 <canvas id="viewport"></canvas>
-<div id="loading">Loading hands…</div>
-<script type="module" src="src/main.js?v=124"></script>
+<div id="loading">
+  <canvas id="loadingPreviewCanvas"></canvas>
+  <div id="loadingText">Loading hands…</div>
+</div>
+<script type="module" src="src/main.js?v=129"></script>
 </body>
 </html>

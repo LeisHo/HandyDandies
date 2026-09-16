@@ -18,6 +18,23 @@ work seamlessly from there.
 
 ## Currently working on
 
+**SHIPPED 2026-09-16: Loading Preview -- a single animated hand cycles
+through a Tween Sequence on the loading screen while the full field
+builds behind it.** New "Loading Preview" dev-panel group:
+`loadingPreviewEnabled` (checkbox), `loadingMinTimeMs` (min loading
+time, ms), `loadingPreviewTweenSelector`, `loadingPreviewSpeedMs`,
+`loadingPreviewSize`. A 3rd independent hand-preview instance (alongside
+the main field and Pose Preview), built the instant the base model
+finishes loading rather than waiting on the full field. Verified via
+direct in-page inspection across multiple successful loads (scene/
+camera/hand construction, error-free render loop, a pixel-grid sample
+confirming a correctly-positioned silhouette, and a timing test
+confirming the min-loading-time gate) after a clean visual screenshot
+proved unobtainable due to unrelated test-environment friction (the dev
+panel covering the narrow test viewport) -- see CHANGELOG.txt's matching
+entry for the full verification account. **Worth a quick visual check on
+the user's own next real page load.**
+
 **SHIPPED 2026-09-16: triple/quad-click "registers as double-click
 first" -- root cause found (tripleClickEnabled/quadClickEnabled were
 off in live settings; a 350ms debounce window also too tight for a real

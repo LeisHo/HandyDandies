@@ -22,12 +22,24 @@ html, body {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  color: #cfd3dc;
-  font-size: 14px;
-  letter-spacing: 0.04em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
   pointer-events: none;
 }
 #loading.hidden { display: none; }
+#loadingText {
+  color: #cfd3dc;
+  font-size: 14px;
+  letter-spacing: 0.04em;
+}
+/* Loading Preview (dev-panel "Loading Preview" group) -- hidden by
+   default; buildLoadingPreview() (main.js) only reveals this when
+   loadingPreviewEnabled is on, so an unused canvas never shows as an
+   empty box. Sized in JS (resizeLoadingPreview()) off the Loading
+   Preview Size (Px) slider, not fixed here. */
+#loadingPreviewCanvas { display: none; }
 
 /* ---------------------------------------------------------------------
    Dev panel (CLAUDE.md Section 12) -- reused verbatim from ADA BATHROOM's
