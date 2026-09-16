@@ -5188,7 +5188,7 @@
       "tripleClickHoldEnabled": true,
       "tripleClickHoldMode": "Tween",
       "tripleClickHoldTargetPose": "",
-      "tripleClickHoldTweenSelector": "WAVE - NS",
+      "tripleClickHoldTweenSelector": "Twist 2",
       "tripleClickHoldTweenSpeedMs": 2420,
       "tripleClickHoldTweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "tripleClickHoldTweenStartTimeRange": "{\"min\":0,\"max\":300}",
@@ -10506,7 +10506,7 @@
       "tripleClickHoldEnabled": true,
       "tripleClickHoldMode": "Tween",
       "tripleClickHoldTargetPose": "",
-      "tripleClickHoldTweenSelector": "WAVE - NS",
+      "tripleClickHoldTweenSelector": "Twist 2",
       "tripleClickHoldTweenSpeedMs": 2420,
       "tripleClickHoldTweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "tripleClickHoldTweenStartTimeRange": "{\"min\":0,\"max\":300}",
@@ -15824,7 +15824,7 @@
       "tripleClickHoldEnabled": true,
       "tripleClickHoldMode": "Tween",
       "tripleClickHoldTargetPose": "",
-      "tripleClickHoldTweenSelector": "WAVE - NS",
+      "tripleClickHoldTweenSelector": "Twist 2",
       "tripleClickHoldTweenSpeedMs": 2420,
       "tripleClickHoldTweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "tripleClickHoldTweenStartTimeRange": "{\"min\":0,\"max\":300}",
@@ -15958,7 +15958,7 @@
   "order": [
     {
       "key": "Tween",
-      "collapsed": true,
+      "collapsed": false,
       "settings": [
         "tweenPreviewSpeedMs",
         "tweenPoses",
@@ -16133,7 +16133,7 @@
         },
         {
           "key": "Click Hold-Pose",
-          "collapsed": false,
+          "collapsed": true,
           "settings": [
             "chpTweenRetransitionSpeedMs",
             "chpTweenRetransitionStartTimeCurve",
@@ -16159,7 +16159,7 @@
         },
         {
           "key": "Double-Click Pose",
-          "collapsed": false,
+          "collapsed": true,
           "settings": [
             "dblclickTweenSpeedMs",
             "dblclickTweenStartTimeCurve",
@@ -16180,7 +16180,7 @@
         },
         {
           "key": "Double Click Hold",
-          "collapsed": false,
+          "collapsed": true,
           "settings": [
             "dcHoldTweenRetransitionSpeedMs",
             "dcHoldTweenSelector",
