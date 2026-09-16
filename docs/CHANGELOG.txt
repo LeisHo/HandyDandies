@@ -5689,6 +5689,70 @@ Cache-buster bumps: `index.html`'s own `main.js?v=124` -> `?v=129`
 removed before this entry's final state) and `style.css?v=8` -> `?v=9`.
 
 --------------------------------------------------------------------------------
+2026-09-16  -  05:48:42 - 05:59:42 EDT (11m, measured)
+
+**Follow-up 1 of 2 for the same "triple/quad-click doesn't work" thread
+this session: "quad click functions dont work even when turned on."**
+Root cause was NOT the enable toggles this time (those were already
+fixed and confirmed `true`) -- it was that `tripleClickTweenSelector`
+and `quadClickTargetPose` were both empty strings in the live settings.
+`updateClickPoseForHand()`'s own commit step ([main.js:4543] Tween mode,
+[main.js:4546-4547] Single Pose mode) deliberately abandons a hand's
+sequence back to idle when nothing is selected ("nothing selected --
+abandon this hand's sequence rather than get stuck") -- both triggers
+were firing and running their whole state machine every time, just with
+nothing to transition to, indistinguishable from "not working." This is
+a live-settings/configuration gap, not a code bug -- reported the finding
+and left the actual pose/sequence choice to the user rather than
+guessing a value for their own creative setup. No code change this
+sub-entry.
+
+**Follow-up 2 of 2, same day: "when i try quad click. it triggers triple
+click first."** Investigated whether the click-hold-chain's own
+`lastPointerupWasHoldRelease` flag (used to suppress a click firing on
+top of a chp/rchp hold-release) could be cross-suppressing a click in
+the SEPARATE fire-and-forget count -- ruled out directly: that flag only
+ever reads `clickHoldPoseTriggers.chp`/`.rchp`, never dcHold/
+tripleClickHold/quadClickHold, and neither pointerdown/pointerup
+listener in the click-hold-chain family calls preventDefault/
+stopPropagation, so it can't be silently eating an event meant for the
+fire-and-forget listener either. That leaves the ALREADY-SUSPECTED
+timing explanation from the prior round's own entry, now confirmed by
+this new report: the shared multi-click debounce window (widened
+350ms -> 450ms that round) still isn't forgiving enough for a genuine
+4-click attempt specifically -- a 4-click gesture has 3 separate gaps
+that can each exceed the window (vs. a double-click's 1), and a 4th
+click is inherently a less-practiced human gesture than a 2nd, more
+likely to run long. Since this SAME constant has now needed re-tuning
+twice in one day, converted it from a hardcoded value
+(`MOUSE_LOG_MULTICLICK_MS`) into an actual dev-panel slider
+(`cfg.multiClickWindowMs`, Debug group, "Multi-Click Window (Ms) --
+Click/Hold Chains + Mouse Log," min 200/max 1200/def 600) instead of
+bumping the literal a 3rd time -- per CLAUDE.md §12n ("feel/response
+curves are sliders, not constants"), so any further tuning is a live
+slider drag, not another code round-trip. 600ms default is this round's
+own judgment call (§0c -- no real click-timing telemetry exists), a
+further modest increase over 450ms. All 3 real usage sites (Click Pose's
+own debounce, the Click-Hold chain's continuation window, the Mouse
+Tracking Log's own multi-click classification) now read the same live
+`cfg.multiClickWindowMs` instead of the removed constant -- deliberately
+still ONE shared setting, not 3 separately-tuned ones, matching this
+value's own original "for consistency" intent. New key, no existing
+live-settings value to migrate -- `def: 600` applies automatically on
+next restore for anyone who hasn't already saved a value for it.
+
+Verified live: the new slider appears in the Debug group with the
+correct label; `cfg.multiClickWindowMs` seeds to `600` on a fresh load;
+`node --check` passes; no new console errors. Did not independently
+re-verify the actual multi-click TIMING behavior live this round (the
+underlying debounce logic itself is unchanged, only its source value
+moved from a constant to a cfg read) -- recommend the user try a genuine
+quad-click again after this deploys, and adjust the new slider directly
+if 600ms still isn't quite enough.
+
+Cache-buster bump: `index.html`'s own `main.js?v=129` -> `?v=130`.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

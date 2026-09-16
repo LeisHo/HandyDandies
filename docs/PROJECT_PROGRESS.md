@@ -35,16 +35,22 @@ panel covering the narrow test viewport) -- see CHANGELOG.txt's matching
 entry for the full verification account. **Worth a quick visual check on
 the user's own next real page load.**
 
-**SHIPPED 2026-09-16: triple/quad-click "registers as double-click
-first" -- root cause found (tripleClickEnabled/quadClickEnabled were
-off in live settings; a 350ms debounce window also too tight for a real
-3-click gesture), both fixes confirmed with the user before
-implementing.** `tripleClickEnabled`/`quadClickEnabled` flipped to
-`true` across all 3 device blocks in `dev-panel-settings.json`;
-`MOUSE_LOG_MULTICLICK_MS` widened 350ms -> 450ms (a disclosed judgment
-call, not measured). Verification environmentally limited (see below) --
-**awaiting the user's own confirmation** that triple/quad-click now
-fires correctly.
+**Triple/quad-click -- multi-round thread, 2026-09-16, now converged on a
+tunable setting instead of repeated hardcoded re-tuning.** 1st report
+("registers as double-click first") -> `tripleClickEnabled`/
+`quadClickEnabled` were off + 350ms window too tight -> flipped both to
+`true`, widened to 450ms. 2nd report ("dont work even when turned on")
+-> enabled but `tripleClickTweenSelector`/`quadClickTargetPose` were
+both empty, a live-settings config gap (not a bug) -- left for the user
+to pick, per their own creative choice. 3rd report ("quad click triggers
+triple click first") -> 450ms still too tight for a genuine 4-click
+attempt (3 gaps, each a chance to run long) -- converted the whole thing
+from a hardcoded constant into a dev-panel slider,
+`cfg.multiClickWindowMs` (Debug group, def 600ms), so further tuning
+doesn't need another code change. **Awaiting the user's own confirmation**
+that a real quad-click now fires correctly, and that they've picked a
+target pose/tween for triple/quad-click if they want to see them
+actually pose the hands.
 
 **SHIPPED 2026-09-16: Cursor Tracking settings are now independently
 adjustable per Desktop/Mobile/Landscape** (`perDevice: true` on all 6

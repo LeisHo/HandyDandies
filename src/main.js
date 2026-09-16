@@ -177,16 +177,24 @@ let cursorLogTimer = null
 // does, so a slightly-too-slow gap between click 2 and click 3 gets read
 // as "sequence over" early, visibly firing dblclick's own pose (enabled)
 // before the 3rd click ever arrives as its own separate, later sequence.
-// 350ms -> 450ms is a judgment call, not a measured value -- no click-
-// timing telemetry exists to derive an exact number from (CLAUDE.md
-// §0c); picked as a modest, reversible increase that should meaningfully
-// help without turning 2 genuinely separate quick clicks into an
-// accidental chain. Shared by 3 systems (this comment's own siblings
-// below): the fire-and-forget click-pose debounce, the click-hold chain
-// continuation window, and the Mouse Tracking Log's own multi-click
-// classification -- deliberately still ONE constant, not 3 separately-
-// tuned ones, per this constant's own original "for consistency" intent.
-const MOUSE_LOG_MULTICLICK_MS = 450
+// 350ms -> 450ms was a first, judgment-call increase -- NOT a measured
+// value (CLAUDE.md §0c). Same-day follow-up report ("when i try quad
+// click. it triggers triple click first") shows 450ms still isn't
+// forgiving enough for a real 4-click attempt, whose 3 individual gaps
+// are each a chance to exceed the window -- a 4th click is also simply a
+// less-practiced human gesture than a 2nd, so its own gap is more likely
+// to run long. Since this same constant has now needed re-tuning twice in
+// one day, it's converted from a hardcoded value into an actual dev-panel
+// slider (`cfg.multiClickWindowMs`, Debug group) instead of bumping the
+// literal again -- per CLAUDE.md §12n ("feel/response curves are sliders,
+// not constants"), so any further tuning doesn't need another code
+// round-trip. Default raised to 600ms as this round's own judgment call,
+// same "no real telemetry, modest reversible increase" reasoning as
+// before. Shared by 3 systems (this comment's own siblings below): the
+// fire-and-forget click-pose debounce, the click-hold chain continuation
+// window, and the Mouse Tracking Log's own multi-click classification --
+// deliberately still ONE setting, not 3 separately-tuned ones, per this
+// value's own original "for consistency" intent.
 const MOUSE_LOG_HELD_DRAG_MS = 500
 let mouseLogClickCount = 0
 let mouseLogClickTimer = null
@@ -1053,7 +1061,15 @@ const DEV_GROUPS = [
       // otherwise would spam the display every frame.
       { key: 'logCursorPositionEnabled', label: 'Log Regular Cursor Position', type: 'checkbox', def: false, onChange: () => restartCursorLogTimer() },
       { key: 'cursorLogIntervalMs', label: 'Cursor Position Log Interval (Ms)', type: 'slider', min: 100, max: 5000, step: 50, def: 1000, onChange: () => restartCursorLogTimer() },
-      { key: 'clearMouseLogBtn', label: 'Clear Mouse Tracking Log', type: 'button', onClick: () => clearMouseTrackingLog() }
+      { key: 'clearMouseLogBtn', label: 'Clear Mouse Tracking Log', type: 'button', onClick: () => clearMouseTrackingLog() },
+      // See MOUSE_LOG_MULTICLICK_MS's own declaration comment for why this
+      // is now a slider instead of a hardcoded constant -- governs how
+      // long a gap between consecutive clicks is still read as "the same
+      // multi-click sequence continuing" for Click Pose's 2/3/4-click
+      // chain, the Click-Hold chain (dcHold/tripleClickHold/
+      // quadClickHold), and this Mouse Tracking Log's own click
+      // classification, all 3 at once.
+      { key: 'multiClickWindowMs', label: 'Multi-Click Window (Ms) -- Click/Hold Chains + Mouse Log', type: 'slider', min: 200, max: 1200, step: 25, def: 600 }
     ]
   }
 ]
@@ -1379,7 +1395,7 @@ window.addEventListener('pointerup', (e) => {
     if (p) logMouseTrackingEvent(`${kind} at (${p.x}, ${p.y}) -> ${p.trigger}`)
     mouseLogClickCount = 0
     mouseLogPendingClick = null
-  }, MOUSE_LOG_MULTICLICK_MS)
+  }, cfg.multiClickWindowMs)
 })
 // Viewport/device context entries -- ported from the template's own
 // logMouseLogContext()/isNarrowViewport() pattern: one entry when the
@@ -4676,7 +4692,7 @@ window.addEventListener('pointerup', (e) => {
     const idx = Math.min(clickPoseClickCount, CLICK_COUNT_CHAIN_KEYS.length) - 1
     triggerClickPose(CLICK_COUNT_CHAIN_KEYS[idx])
     clickPoseClickCount = 0
-  }, MOUSE_LOG_MULTICLICK_MS)
+  }, cfg.multiClickWindowMs)
 })
 // Right Click -- direct request ("also provide another CLick function,
 // the same as the others - 'Right Click'"): the right-button equivalent
@@ -4747,7 +4763,7 @@ window.addEventListener('pointerdown', (e) => {
   if (e.target && e.target.closest && e.target.closest('.dp-panel')) return
   if (e.button !== 0) return
   const now = performance.now()
-  if (now - clickHoldChainLastCleanUpTime <= MOUSE_LOG_MULTICLICK_MS) {
+  if (now - clickHoldChainLastCleanUpTime <= cfg.multiClickWindowMs) {
     const key = CLICK_HOLD_CHAIN_KEYS[Math.min(clickHoldChainCount, CLICK_HOLD_CHAIN_KEYS.length - 1)]
     if (key) { clickHoldChainActiveKey = key; startClickHoldPose(key) }
   } else {
