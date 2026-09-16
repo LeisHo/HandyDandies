@@ -4657,6 +4657,45 @@ Cache-buster bumps: `main.js`'s own `devpanel/devPanel.js?v=16` -> `?v=17`
 import, `index.html`'s own `main.js?v=106` -> `?v=107`.
 
 --------------------------------------------------------------------------------
+2026-09-15  -  20:56:43 - 21:08:22 EDT (11m39s, measured)
+
+**Direct user report: "on double click, it triggers click first, then
+after a short bit then triggers double click" -- a settings
+misconfiguration, not a code bug.** Investigated the Click Pose/Double-
+Click Pose disambiguation code (`clickPoseClickCount`/`clickPoseClickTimer`)
+directly and confirmed it's correct: a genuine double-click's 2 raw
+clicks are still correctly debounced into a SINGLE `triggerClickPose('dblclick')`
+call, `'click'` never fires alongside it. Found the real cause instead in
+`data/processed/dev-panel-settings.json`: `chpHoldConfirmMs` (Click
+Hold-Pose's own "Hold Confirm Delay," added earlier this session
+specifically to stop a quick click from visibly flashing toward a
+DIFFERENT trigger's target pose before its own real transition begins)
+was set to `0` on all 3 tabs -- completely defeating that protection.
+`chp` fires unconditionally on EVERY left pointerdown (including both
+halves of an intended double-click); with the confirm delay at 0, it
+immediately began playing its own Tween sequence ("FLOWER 2") on the
+FIRST click, visible before the real `dblclick` Tween ("ThumbsUp") fired
+~350ms later on the second -- exactly the reported "click first, then
+double click." `rchpHoldConfirmMs` (Right-Click Hold-Pose's own
+equivalent) was also found at `0` and fixed for the same reason, though
+not implicated in this specific left-click report.
+
+Confirmed the actual mechanism directly (bypassing this session's own
+already-documented rAF-unreliability limitation -- see CLAUDE.md's own
+Gotchas): calling `window.__debug.startClickHoldPose('chp')` then
+`window.__debug.updateRenderOrder()` showed `chp`'s phase flip to
+'forward' on the very next call with `chpHoldConfirmMs=0`, confirming
+zero delay provides zero protection, exactly as the code implies.
+
+Fixed by editing `chpHoldConfirmMs`/`rchpHoldConfirmMs` from `0` back to
+`150` (matching `makeClickHoldPoseGroup()`'s own code default, the value
+originally chosen for this exact purpose) directly in the git-tracked
+settings file, all 3 device tabs (this setting is shared, not per-
+device) -- a settings-data correction, not a source-code change.
+
+Cache-buster bump: none (no `src/` file changed).
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================
