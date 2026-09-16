@@ -57,7 +57,7 @@
       "tipOnlyCurlPinky": 15,
       "tipTwistPinky": 0,
       "wristBend": 0,
-      "wristSplay": -50,
+      "wristSplay": 0,
       "modelRotX": 0,
       "modelRotY": 0,
       "modelRotZ": 0,
@@ -5257,8 +5257,8 @@
       "fieldCols": 12,
       "rowSpacing": 9.5,
       "columnSpacing": 10.5,
-      "handScale": 1.35,
-      "alternateRowOffset": -20,
+      "handScale": 1.4,
+      "alternateRowOffset": -6.5,
       "progressiveRowOffset": 1,
       "useProgressiveOffset": false,
       "trackingEnabled": true,
@@ -5309,7 +5309,7 @@
       "tipOnlyCurlPinky": 15,
       "tipTwistPinky": 0,
       "wristBend": 0,
-      "wristSplay": -50,
+      "wristSplay": 0,
       "modelRotX": 0,
       "modelRotY": 0,
       "modelRotZ": 0,
@@ -10561,7 +10561,7 @@
       "tipOnlyCurlPinky": 15,
       "tipTwistPinky": 0,
       "wristBend": 0,
-      "wristSplay": -50,
+      "wristSplay": 0,
       "modelRotX": 0,
       "modelRotY": 0,
       "modelRotZ": 0,
@@ -15881,7 +15881,7 @@
     },
     {
       "key": "Field Layout",
-      "collapsed": false,
+      "collapsed": true,
       "settings": [
         "fieldRows",
         "fieldCols",
@@ -15896,7 +15896,7 @@
     },
     {
       "key": "Cursor Tracking",
-      "collapsed": false,
+      "collapsed": true,
       "settings": [
         "palmFaceRotationOffset",
         "trackingEnabled",
@@ -16069,7 +16069,7 @@
     },
     {
       "key": "Pose",
-      "collapsed": true,
+      "collapsed": false,
       "settings": [
         "posePreviewEnabled",
         "savedPoses"
