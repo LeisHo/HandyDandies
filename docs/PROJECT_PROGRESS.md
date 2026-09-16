@@ -19,28 +19,38 @@ work seamlessly from there.
 ## Currently working on
 
 **Middle/ring finger "outstretched for a split second" during
-retransition -- STILL OPEN, re-investigated 2026-09-16 with the user's
-own screen recording (frame-extracted via Python/cv2, since this
-environment has no ffmpeg) -- bug is DEFINITELY REAL, root cause still
-NOT found.** The recording gave unambiguous visual confirmation (thumb/
-index/pinky curl toward the fist quickly while middle+ring stay fully
-extended for ~0.2-0.3s before catching up) across all 4 tested triggers
-(click x2, click-hold, right-click). This round's investigation went
-further than the previous one: besides re-confirming raw bone-rotation
-tracing shows nothing (a KNOWN methodological trap -- Euler angles on
-different bones aren't directly comparable), also traced WORLD-SPACE
-fingertip-to-wrist distance (a genuinely comparable metric) across the
-full retransition range and STILL found smooth, monotonic convergence
-for every finger, no anomaly. Static single-`t` synthetic snapshots
-(via `window.__debug.applyPoseValuesToHand`) cannot reproduce it either
-way. **Current best assessment: a live/timing-dependent artifact of the
-real per-frame animate() loop (staggering, real elapsed time, or some
-other runtime-only factor) that can't be caught by jumping to one
-interpolated pose value -- next step needs runtime diagnostic logging
-inserted into the live per-frame code path, not more snapshot testing.**
-Per direct instruction, proceeded to the 5 gated features below rather
-than continuing an investigation method already shown to have
-diminishing returns; still owed a return pass with the new approach.
+retransition -- RESOLVED, per direct user report 2026-09-16: "It was
+something wrong with the Fist pose itself. I reexported and imported it
+and the issue is no longer present."** Confirms this project's own
+extensive code-level investigation (raw bone-rotation tracing, then
+world-space fingertip-distance tracing, then static single-`t` synthetic
+snapshots -- see CHANGELOG.txt's earlier entries) was correctly
+concluding "no code bug" all along; the cause was bad data in one saved
+pose, not the animation/retransition machinery itself. No further action
+needed.
+
+**SHIPPED 2026-09-16, 6 more direct-request items (interruption
+continuity, Tween Retransition settings, grouped dropdowns, combined
+Import button, 2 Pose Preview corrections) -- all verified live, see
+CHANGELOG.txt's matching entry for full verification detail:**
+- A hand interrupted mid-transition by a NEW trigger (any of chp/rchp/
+  dcHold/click/dblclick/rc) no longer snaps to a stale default/trigger-
+  time snapshot -- it continues its EXISTING transition, uninterrupted,
+  until its own distance-based delay for the new trigger elapses, THEN
+  smoothly continues from wherever it actually is. Rebuilt via a genuine
+  2-stage deferred claim (arm the delay, commit later, reading the FROM
+  value fresh at commit time from a new `hand._lastPoseValues`).
+- Click-Hold-Pose's Tween mode now has its own dedicated Retransition
+  Speed/Curve/Range (previously silently shared -- and hidden from view
+  -- with Single Pose mode's own).
+- Every Target-Pose/Tween-Sequence dropdown (and the Tween Poses multi-
+  select) now renders `<optgroup>` sections matching whatever groups the
+  underlying saved poses/sequences were organized into.
+- A combined "Import" button (Tween group) imports both pose data AND
+  tween sequence data from one clipboard paste in a single action.
+- The Pose Preview's own "Run" tween is no longer affected by Global
+  Pause (that's field-only), and the preview now opens already showing
+  the configured default pose instead of the raw GLB bind pose.
 
 **SHIPPED 2026-09-16, 5 direct-request features (Pose Preview
 floating panel + camera default, Tween Run/Edit + speed slider, global

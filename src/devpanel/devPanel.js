@@ -501,6 +501,34 @@ function renderListPickerRows(entry) {
 // it's still a valid option; falls back to the first option otherwise
 // (or '' if the list is empty) rather than silently keeping a now-stale
 // value selected.
+// Normalizes a select-like control's ctrl.options() return value into a
+// flat list of selectable VALUES plus an optional per-value group label.
+// `ctrl.options()` returning plain strings (the original, still-supported
+// shape) means no grouping, exactly as before this existed; returning
+// `{value, group}` objects (direct request: "in all dropdowns (pose,
+// tweens etc), if i have placed those in groups within their own
+// selectors, show those groups as ... within the drop downs too" --
+// mirroring whatever group a list-picker item was organized into, e.g. a
+// saved pose's own `.group` field) opts a control into grouped rendering.
+// `ctrl.options()` can throw/be unsafe to call this early -- see this
+// function's own callers for the TDZ note; both callers already wrap
+// their own read in try/catch, so this one does too rather than assuming
+// every future caller remembers to.
+function normalizeOptions(ctrl) {
+  let raw = []
+  try { raw = (ctrl.options ? ctrl.options() : []) || [] } catch (err) { raw = [] }
+  const values = []
+  const groupOf = new Map()
+  raw.forEach((opt) => {
+    if (opt && typeof opt === 'object') {
+      values.push(opt.value)
+      if (opt.group) groupOf.set(opt.value, opt.group)
+    } else {
+      values.push(opt)
+    }
+  })
+  return { values, groupOf }
+}
 function fillSelectOptions(ctrl, select, preferredValue) {
   // `ctrl.options()` can be called from `displayValue()` during the
   // host's own restore-from-storage step, which (per the TDZ note on the
@@ -509,11 +537,30 @@ function fillSelectOptions(ctrl, select, preferredValue) {
   // options yet" rather than letting it propagate -- the host's own
   // later explicit `refreshSelectOptions()` call re-populates for real
   // once its own init has genuinely finished.
-  let options = []
-  try { options = (ctrl.options ? ctrl.options() : []) || [] } catch (err) { options = [] }
+  const { values, groupOf } = normalizeOptions(ctrl)
   select.innerHTML = ''
-  options.forEach((opt) => select.appendChild(el('option', null, { value: opt, textContent: opt })))
-  const next = options.includes(preferredValue) ? preferredValue : (options[0] || '')
+  // Grouped values render under a labeled <optgroup> -- a native <select>
+  // has no interactive/collapsible grouping the way the list-picker's own
+  // groups do, so this is the closest faithful equivalent (a labeled,
+  // visually indented cluster). Ungrouped values render as plain top-
+  // level <option>s, in original order, exactly as before this feature
+  // existed -- a control whose ctrl.options() never supplies group info
+  // is completely unaffected.
+  const groupEls = new Map()
+  values.forEach((opt) => {
+    const group = groupOf.get(opt)
+    let parent = select
+    if (group) {
+      if (!groupEls.has(group)) {
+        const og = el('optgroup', null, { label: group })
+        select.appendChild(og)
+        groupEls.set(group, og)
+      }
+      parent = groupEls.get(group)
+    }
+    parent.appendChild(el('option', null, { value: opt, textContent: opt }))
+  })
+  const next = values.includes(preferredValue) ? preferredValue : (values[0] || '')
   select.value = next
   return next
 }
@@ -583,9 +630,8 @@ function buildMultiSelectRow(ctrl, row) {
   const entry = { type: 'multi-select', ctrl, listEl, values: (ctrl.def || []).slice() }
   numEls[ctrl.key] = entry
   addBtn.addEventListener('click', () => {
-    let options = []
-    try { options = (ctrl.options ? ctrl.options() : []) || [] } catch (err) { options = [] }
-    entry.values.push(options[0] || '')
+    const { values } = normalizeOptions(ctrl)
+    entry.values.push(values[0] || '')
     commit(ctrl, entry.values.slice())
     renderMultiSelectRows(entry)
   })

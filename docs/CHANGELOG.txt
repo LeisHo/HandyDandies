@@ -4863,6 +4863,139 @@ Cache-buster bumps: `index.html`'s own `main.js?v=108` -> `?v=109`,
 `style.css?v=7` -> `?v=8`.
 
 --------------------------------------------------------------------------------
+2026-09-16  -  01:09:23 - 01:36:15 EDT (26m52s, measured)
+
+**RESOLVED (user-reported, no code change): the middle/ring finger-lag
+bug from the previous entry was bad data in the "Fist" saved pose
+itself, not a code bug** -- the user re-exported/re-imported it and the
+issue stopped reproducing. Confirms this session's own earlier
+conclusion ("no code bug found" after exhaustive bone-rotation and
+world-space-distance tracing) was correct -- there genuinely was no
+code-level cause to find.
+
+**6 direct-request items, all verified live via `window.__debug` (this
+session's own browser-automation tool still doesn't reliably fire
+`requestAnimationFrame`, the same already-documented gotcha -- every
+test below drives `updateRenderOrder()` manually instead of trusting
+live rendering):**
+
+**1. Interrupting a mid-transition hand with a NEW trigger no longer
+snaps it to a stale default/trigger-time snapshot.** Direct request:
+"I want them to continue their existing transition until it gets
+interrupted by the new one... the ones that arent triggered yet will
+continue their first tween. When they do get interrupted... they will
+smoothly begin transitioning from their current position instead of the
+default position." Root cause (both Click-Hold-Pose and Click-Pose
+families): a hand's own distance-based delay only ever delayed when its
+NEW transition started visibly MOVING -- the actual claim (overwriting
+whatever phase/values it was already running) happened immediately,
+synchronously, for every hand at once, using one SHARED trigger-time
+snapshot (effectively "the default pose"). Rebuilt into a genuine
+2-stage DEFERRED claim: `startClickHoldPose()`/`triggerClickPose()` now
+only ARM a per-hand pending claim (computed once, per-hand, from the
+same existing distance curve); a separate COMMIT step inside
+`updateClickHoldPoseForHand()`/`updateClickPoseForHand()` only takes
+over once THAT hand's own delay has genuinely elapsed, reading its FROM
+value fresh, right then, from `hand._lastPoseValues` (a new field,
+stashed by `applyPoseValuesToHand()` -- the ONE place every trigger
+family funnels through -- whenever `hand._wasOverriddenLastFrame`, an
+already-existing field, confirms the hand was genuinely active as of
+last frame). Until commit, `chp.phase`/`cp.phase` is untouched, so
+whatever WAS running keeps running, completely unaffected -- literally
+"continue their first tween." dcHold's own twice-confirmed "always
+starts from default" exception is preserved, but now only for a
+genuinely-idle hand -- an interrupted dcHold also continues smoothly
+like every other trigger, since that's what this new request asks for.
+Live-verified end to end (self-contained polling script, avoiding the
+cross-call tool-latency confound a multi-call test hit first): chp
+triggered toward "Fist" (curlIndex 0->96) with a forced idle-hand
+FROM=0; mid-flight (curlIndex=17) interrupted with rchp -- chp's own
+phase stayed 'forward' and its curlIndex kept climbing (34->39->58->75->
+92->96) entirely on its own while rchp's own claim was still pending;
+once rchp's own delay elapsed, its anchor was exactly 96 (chp's own
+fully-settled value), not a default/zero jump. Click-Pose family
+(click/dblclick) confirmed structurally identical (deferred pendingClaimAt,
+phase preserved through an interrupt), reusing the exact same proven
+mechanism.
+
+**2. Click-Hold-Pose's Tween mode now has its OWN dedicated Retransition
+Speed/Curve/Range, visible only in Tween mode.** Direct request: "for
+all click hold functions, when i select to tween a sequence... on
+release... provide me 'Retransitioning' settings just like the single
+poses." Root cause of the "no visible/tunable release behavior in Tween
+mode" gap: `${p}RetransitionSpeedMs`/Curve/Range were classified as
+Single-Pose-only in `updateClickTriggerModeVisibility()` (hidden via
+`display:none` under Tween mode) even though the underlying retransition
+CODE PATH kept silently reading them regardless of mode -- Tween mode's
+release was tunable, just invisibly, via a row the user could never see
+or edit. Added `${p}TweenRetransitionSpeedMs`/`TweenRetransitionStartTimeCurve`/
+`TweenRetransitionStartTimeRange` (same 50-5000ms range as the existing
+Tween Start trio, not the 0-700ms Single-Pose range) to `chp`/`rchp`/
+`dcHold`; `endClickHoldPose()` now captures `chp.retransitionIsTween`
+once, at the moment release actually happens (so a live Mode change
+mid-retransition can't yank it between the 2 pairs), and the retransition
+phase picks the matching settings pair. Live-verified: the new row
+correctly shows/hides opposite the old one across a real Mode toggle
+(dispatched `change` event); triggering a Tween-mode hold and releasing
+it set `chp.retransitionIsTween: true` and transitioned to 'retransition'
+correctly.
+
+**3. Grouped dropdowns -- "in all dropdowns (pose, tweens etc), if i
+have placed those in groups within their own selectors, show those
+groups as collapsible groups within the drop downs too."** A native
+`<select>` has no interactive/collapsible grouping (that's specific to
+the list-picker's own custom UI) -- implemented the closest faithful
+equivalent, `<optgroup>` (a labeled, visually-indented cluster), as a
+new opt-in capability in devPanel.js's shared `fillSelectOptions()`
+(new `normalizeOptions()` helper: a control's `ctrl.options()` can now
+return `{value, group}` objects instead of plain strings, entirely
+backward-compatible -- every other project's dev panel, and every
+control here that never opts in, is completely unaffected). Wired up
+for every Target-Pose/Tween-Sequence `<select>` and the Tween Poses
+multi-select, reading each saved item's own `.group` field (the same
+field the list-picker's own shift-click-+Group feature already writes).
+Live-verified: assigned 2 saved poses to `.group: "MyTestGroup"`,
+refreshed a Target Pose dropdown via a fresh dynamic `import()` of the
+already-loaded devPanel.js module (calling its real exported
+`refreshSelectOptions()` against live state) -- rendered a genuine
+`<optgroup label="MyTestGroup">` containing exactly those 2 options,
+all 11 total options still present.
+
+**4. "Import" button, Tween group -- imports BOTH pose data and tween
+sequence data from one clipboard paste, same-name-overwrites-in-place.**
+Direct request. A combined-payload sibling of the pre-existing
+`savedPoses`-only Import button (devPanel.js's `ctrl.importable`,
+discovered already wired up from HANDO's own cross-project import
+feature) -- same clipboard-JSON + merge-by-name rule, extended to cover
+BOTH `cfg.savedPoses` and `cfg.savedTweenSequences` from one pasted
+object (`{ savedPoses: [...], savedTweenSequences: [...] }`, either key
+optional) in a single action, DOM-injected into the Saved Tween
+Sequences list-picker's own action row (devPanel.js's generic engine has
+no 2-list-import concept; this project's convention is not to fork it
+for a one-off need). An overwritten item's own local `.group` is
+preserved, not wiped by the import (same rule the existing single-list
+Import already uses). Live-verified: a synthetic clipboard payload (stubbing
+`navigator.clipboard.readText`) added 1 new pose + overwrote an existing
+one (confirming its `.group` survived) + added 1 new tween sequence, in
+one click, with correct button feedback text.
+
+**5-6. 2 small Pose Preview corrections, both direct requests mid-task:**
+"Pause button should not pause the pose preview hand" -- removed the
+`!isPaused` gate from the preview's own "Run" tween playback in
+`animate()`; Global Pause now only ever affects the live field.
+"the pose preview hand should have the same default pose as i have set"
+-- `buildPosePreview()` now calls `previewPosePreset(poseDefaultValues)`
+once, right after creating `previewHand`, instead of leaving it at the
+raw un-posed GLB bind pose until something else happens to pose it.
+Live-verified (screenshot): the preview opens showing a properly curled/
+posed hand instead of the old straight-fingered bind pose.
+
+Every item requested this round shipped -- nothing left open.
+
+Cache-buster bumps: `index.html`'s own `main.js?v=109` -> `?v=110`;
+`main.js`'s own import of `devpanel/devPanel.js?v=17` -> `?v=18`.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================
