@@ -57,7 +57,7 @@
       "tipOnlyCurlPinky": 15,
       "tipTwistPinky": 0,
       "wristBend": 0,
-      "wristSplay": 0,
+      "wristSplay": -50,
       "modelRotX": 0,
       "modelRotY": 0,
       "modelRotZ": 0,
@@ -4191,10 +4191,10 @@
       "clickEnabled": true,
       "clickMode": "Tween",
       "clickTargetPose": "Big Open Palm (S)",
-      "clickTweenSelector": "Fist Rotate To Open",
+      "clickTweenSelector": "Clockwise Fan",
       "clickTweenSpeedMs": 800,
       "clickTweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "clickTweenStartTimeRange": "{\"min\":0,\"max\":300}",
+      "clickTweenStartTimeRange": "{\"min\":0,\"max\":1241}",
       "clickTransitionSpeedMs": 460,
       "clickStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.1875,\"y\":0.14479166666666665},{\"x\":0.6616663614908854,\"y\":0.7919792175292969},{\"x\":1,\"y\":1}]",
       "clickStartTimeRange": "{\"min\":0,\"max\":916}",
@@ -4231,7 +4231,7 @@
       "rcRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "rcRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "tweenPoses": [
-        "Fist",
+        "Fist - Bent Back",
         "Clockwise Fan - 0",
         "Clockwise Fan - 1",
         "Clockwise Fan - 2",
@@ -4242,7 +4242,7 @@
         "Clockwise Fan - 7",
         "Clockwise Fan - 8"
       ],
-      "tweenPreviewSpeedMs": 4734,
+      "tweenPreviewSpeedMs": 7784,
       "savedTweenSequences": [
         {
           "name": "Birdie",
@@ -4273,7 +4273,7 @@
         {
           "name": "Clockwise Fan",
           "tweenPoses": [
-            "Fist",
+            "Fist - Bent Back",
             "Clockwise Fan - 0",
             "Clockwise Fan - 1",
             "Clockwise Fan - 2",
@@ -4624,7 +4624,7 @@
       "tipOnlyCurlPinky": 15,
       "tipTwistPinky": 0,
       "wristBend": 0,
-      "wristSplay": 0,
+      "wristSplay": -50,
       "modelRotX": 0,
       "modelRotY": 0,
       "modelRotZ": 0,
@@ -8758,10 +8758,10 @@
       "clickEnabled": true,
       "clickMode": "Tween",
       "clickTargetPose": "Big Open Palm (S)",
-      "clickTweenSelector": "Fist Rotate To Open",
+      "clickTweenSelector": "Clockwise Fan",
       "clickTweenSpeedMs": 800,
       "clickTweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "clickTweenStartTimeRange": "{\"min\":0,\"max\":300}",
+      "clickTweenStartTimeRange": "{\"min\":0,\"max\":1241}",
       "clickTransitionSpeedMs": 460,
       "clickStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.1875,\"y\":0.14479166666666665},{\"x\":0.6616663614908854,\"y\":0.7919792175292969},{\"x\":1,\"y\":1}]",
       "clickStartTimeRange": "{\"min\":0,\"max\":916}",
@@ -8798,7 +8798,7 @@
       "rcRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "rcRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "tweenPoses": [
-        "Fist",
+        "Fist - Bent Back",
         "Clockwise Fan - 0",
         "Clockwise Fan - 1",
         "Clockwise Fan - 2",
@@ -8809,7 +8809,7 @@
         "Clockwise Fan - 7",
         "Clockwise Fan - 8"
       ],
-      "tweenPreviewSpeedMs": 4734,
+      "tweenPreviewSpeedMs": 7784,
       "savedTweenSequences": [
         {
           "name": "Birdie",
@@ -8840,7 +8840,7 @@
         {
           "name": "Clockwise Fan",
           "tweenPoses": [
-            "Fist",
+            "Fist - Bent Back",
             "Clockwise Fan - 0",
             "Clockwise Fan - 1",
             "Clockwise Fan - 2",
@@ -9191,7 +9191,7 @@
       "tipOnlyCurlPinky": 15,
       "tipTwistPinky": 0,
       "wristBend": 0,
-      "wristSplay": 0,
+      "wristSplay": -50,
       "modelRotX": 0,
       "modelRotY": 0,
       "modelRotZ": 0,
@@ -13325,10 +13325,10 @@
       "clickEnabled": true,
       "clickMode": "Tween",
       "clickTargetPose": "Big Open Palm (S)",
-      "clickTweenSelector": "Fist Rotate To Open",
+      "clickTweenSelector": "Clockwise Fan",
       "clickTweenSpeedMs": 800,
       "clickTweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "clickTweenStartTimeRange": "{\"min\":0,\"max\":300}",
+      "clickTweenStartTimeRange": "{\"min\":0,\"max\":1241}",
       "clickTransitionSpeedMs": 460,
       "clickStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.1875,\"y\":0.14479166666666665},{\"x\":0.6616663614908854,\"y\":0.7919792175292969},{\"x\":1,\"y\":1}]",
       "clickStartTimeRange": "{\"min\":0,\"max\":916}",
@@ -13365,7 +13365,7 @@
       "rcRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "rcRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "tweenPoses": [
-        "Fist",
+        "Fist - Bent Back",
         "Clockwise Fan - 0",
         "Clockwise Fan - 1",
         "Clockwise Fan - 2",
@@ -13376,7 +13376,7 @@
         "Clockwise Fan - 7",
         "Clockwise Fan - 8"
       ],
-      "tweenPreviewSpeedMs": 4734,
+      "tweenPreviewSpeedMs": 7784,
       "savedTweenSequences": [
         {
           "name": "Birdie",
@@ -13407,7 +13407,7 @@
         {
           "name": "Clockwise Fan",
           "tweenPoses": [
-            "Fist",
+            "Fist - Bent Back",
             "Clockwise Fan - 0",
             "Clockwise Fan - 1",
             "Clockwise Fan - 2",
@@ -13854,7 +13854,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": false,
+      "collapsed": true,
       "settings": [],
       "subgroups": [
         {
@@ -14014,7 +14014,7 @@
     },
     {
       "key": "Pose",
-      "collapsed": true,
+      "collapsed": false,
       "settings": [
         "posePreviewEnabled",
         "savedPoses"
