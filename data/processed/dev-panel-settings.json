@@ -11,7 +11,7 @@
       "useProgressiveOffset": false,
       "trackingEnabled": true,
       "trackingDamping": 1,
-      "targetDepthFactor": 0.65,
+      "targetDepthFactor": 0.45,
       "showTargetMarker": false,
       "palmFacesCursor": true,
       "palmFaceRotationOffset": 0,
@@ -3811,8 +3811,8 @@
       "wristSplayResponsiveEnabled": true,
       "wristSplayDefault": 0,
       "wristSplayReactiveEnabled": true,
-      "wristSplayRange": "{\"min\":23,\"max\":-49}",
-      "wristSplayCurve": "[{\"x\":0,\"y\":1},{\"x\":0.31833343505859374,\"y\":0.6961458841959636},{\"x\":1,\"y\":0.042812347412109375}]",
+      "wristSplayRange": "{\"min\":77,\"max\":-79}",
+      "wristSplayCurve": "[{\"x\":0,\"y\":1},{\"x\":0.44499969482421875,\"y\":0.4873959859212239},{\"x\":1,\"y\":0.042812347412109375}]",
       "chpEnabled": true,
       "chpMode": "Tween",
       "chpTargetPose": "Neutral - Bent Back",
@@ -4209,7 +4209,7 @@
       "useProgressiveOffset": false,
       "trackingEnabled": true,
       "trackingDamping": 1,
-      "targetDepthFactor": 0.65,
+      "targetDepthFactor": 0.45,
       "showTargetMarker": false,
       "palmFacesCursor": true,
       "palmFaceRotationOffset": 0,
@@ -8009,8 +8009,8 @@
       "wristSplayResponsiveEnabled": true,
       "wristSplayDefault": 0,
       "wristSplayReactiveEnabled": true,
-      "wristSplayRange": "{\"min\":23,\"max\":-49}",
-      "wristSplayCurve": "[{\"x\":0,\"y\":1},{\"x\":0.31833343505859374,\"y\":0.6961458841959636},{\"x\":1,\"y\":0.042812347412109375}]",
+      "wristSplayRange": "{\"min\":77,\"max\":-79}",
+      "wristSplayCurve": "[{\"x\":0,\"y\":1},{\"x\":0.44499969482421875,\"y\":0.4873959859212239},{\"x\":1,\"y\":0.042812347412109375}]",
       "chpEnabled": true,
       "chpMode": "Tween",
       "chpTargetPose": "Neutral - Bent Back",
@@ -8407,7 +8407,7 @@
       "useProgressiveOffset": false,
       "trackingEnabled": true,
       "trackingDamping": 1,
-      "targetDepthFactor": 0.65,
+      "targetDepthFactor": 0.45,
       "showTargetMarker": false,
       "palmFacesCursor": true,
       "palmFaceRotationOffset": 0,
@@ -12207,8 +12207,8 @@
       "wristSplayResponsiveEnabled": true,
       "wristSplayDefault": 0,
       "wristSplayReactiveEnabled": true,
-      "wristSplayRange": "{\"min\":23,\"max\":-49}",
-      "wristSplayCurve": "[{\"x\":0,\"y\":1},{\"x\":0.31833343505859374,\"y\":0.6961458841959636},{\"x\":1,\"y\":0.042812347412109375}]",
+      "wristSplayRange": "{\"min\":77,\"max\":-79}",
+      "wristSplayCurve": "[{\"x\":0,\"y\":1},{\"x\":0.44499969482421875,\"y\":0.4873959859212239},{\"x\":1,\"y\":0.042812347412109375}]",
       "chpEnabled": true,
       "chpMode": "Tween",
       "chpTargetPose": "Neutral - Bent Back",
@@ -12598,7 +12598,7 @@
   "order": [
     {
       "key": "Tween",
-      "collapsed": false,
+      "collapsed": true,
       "settings": [
         "tweenPoses",
         "savedTweenSequences"
@@ -12733,7 +12733,7 @@
     },
     {
       "key": "Cursor Tracking",
-      "collapsed": true,
+      "collapsed": false,
       "settings": [
         "palmFaceRotationOffset",
         "trackingEnabled",
@@ -12860,7 +12860,7 @@
         },
         {
           "key": "Right-Click Hold-Pose",
-          "collapsed": false,
+          "collapsed": true,
           "settings": [
             "rchpLoopMode",
             "rchpLoopHoldMs",
@@ -12883,7 +12883,7 @@
         },
         {
           "key": "Responsive Wrist Splay",
-          "collapsed": true,
+          "collapsed": false,
           "settings": [
             "wristSplayResponsiveEnabled",
             "wristSplayDefault",
