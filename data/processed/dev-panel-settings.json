@@ -1,8 +1,8 @@
 {
   "values": {
     "desktop": {
-      "fieldRows": 20,
-      "fieldCols": 12,
+      "fieldRows": 27,
+      "fieldCols": 3,
       "rowSpacing": 9.5,
       "columnSpacing": 10.5,
       "handScale": 1.35,
@@ -3896,116 +3896,6 @@
       ],
       "savedTweenSequences": [
         {
-          "name": "Wave",
-          "tweenPoses": [
-            "Wave 1",
-            "Wave 2",
-            "Wave 3",
-            "Wave 4",
-            "Wave 5",
-            "Wave 6"
-          ]
-        },
-        {
-          "name": "FLOWER",
-          "tweenPoses": [
-            "Closed Flower (S)",
-            "Big Open Palm (S)"
-          ]
-        },
-        {
-          "name": "FLOWER 2",
-          "tweenPoses": [
-            "Closed Flower",
-            "Closed Flower (S)",
-            "Big Open Palm (S)",
-            "Big Open Palm",
-            "Closed Flower"
-          ]
-        },
-        {
-          "name": "WAVE - NS",
-          "tweenPoses": [
-            "Wave 1 (NS)",
-            "WAVE 2 (NS)",
-            "WAVE 3 (NS)",
-            "WAVE 5 (NS)",
-            "WAVE 6 (NS)"
-          ]
-        },
-        {
-          "name": "COUNT R",
-          "tweenPoses": [
-            "Count R - Pinky",
-            "Count R - Ring",
-            "Count R - Middle",
-            "Count R - Index",
-            "Count R - Thumb",
-            "Count R - Index",
-            "Count R - Middle",
-            "Count R - Ring",
-            "Count R - Pinky"
-          ]
-        },
-        {
-          "name": "COUNT",
-          "tweenPoses": [
-            "Count - Thumb",
-            "Count - Index",
-            "Count - Middle",
-            "Count - Ring",
-            "Count - Pinky",
-            "Count - Ring",
-            "Count - Middle",
-            "Count - Index",
-            "Count - Thumb"
-          ]
-        },
-        {
-          "name": "Clockwise Fan",
-          "tweenPoses": [
-            "Fist",
-            "Clockwise Fan - 0",
-            "Clockwise Fan - 1",
-            "Clockwise Fan - 2",
-            "Clockwise Fan - 3",
-            "Clockwise Fan - 4",
-            "Clockwise Fan - 5",
-            "Clockwise Fan - 6",
-            "Clockwise Fan - 7"
-          ]
-        },
-        {
-          "name": "Fist Rotate",
-          "tweenPoses": [
-            "Fist Rotate - 8",
-            "Fist Rotate - 9",
-            "Fist Rotate - 0",
-            "Fist Rotate - 1",
-            "Fist Rotate - 2",
-            "Fist Rotate - 3",
-            "Fist Rotate - 4",
-            "Fist Rotate - 5",
-            "Fist Rotate - 6",
-            "Fist Rotate - 7"
-          ]
-        },
-        {
-          "name": "Fist Rotate To Open",
-          "tweenPoses": [
-            "Fist Rotate - 8",
-            "Fist Rotate - 9",
-            "Fist Rotate - 0",
-            "Fist Rotate - 1",
-            "Fist Rotate - 2",
-            "Fist Rotate - 3",
-            "Clockwise Fan - 5",
-            "Clockwise Fan - 6",
-            "Fist Rotate - 6",
-            "Fist Rotate - 7"
-          ]
-        },
-        {
           "name": "Birdie",
           "tweenPoses": [
             "Birdie (S) - 0",
@@ -4028,7 +3918,95 @@
             "Birdie (S) - 2",
             "Birdie (S) - 1",
             "Birdie (S) - 0"
-          ]
+          ],
+          "group": "BIRDIE"
+        },
+        {
+          "name": "Clockwise Fan",
+          "tweenPoses": [
+            "Fist",
+            "Clockwise Fan - 0",
+            "Clockwise Fan - 1",
+            "Clockwise Fan - 2",
+            "Clockwise Fan - 3",
+            "Clockwise Fan - 4",
+            "Clockwise Fan - 5",
+            "Clockwise Fan - 6",
+            "Clockwise Fan - 7"
+          ],
+          "group": "CLOCKWISE FAN"
+        },
+        {
+          "name": "Wave",
+          "tweenPoses": [
+            "Wave 1",
+            "Wave 2",
+            "Wave 3",
+            "Wave 4",
+            "Wave 5",
+            "Wave 6"
+          ],
+          "group": "WAVE"
+        },
+        {
+          "name": "WAVE - NS",
+          "tweenPoses": [
+            "Wave 1 (NS)",
+            "WAVE 2 (NS)",
+            "WAVE 3 (NS)",
+            "WAVE 5 (NS)",
+            "WAVE 6 (NS)"
+          ],
+          "group": "WAVE"
+        },
+        {
+          "name": "COUNT R",
+          "tweenPoses": [
+            "Count R - Pinky",
+            "Count R - Ring",
+            "Count R - Middle",
+            "Count R - Index",
+            "Count R - Thumb",
+            "Count R - Index",
+            "Count R - Middle",
+            "Count R - Ring",
+            "Count R - Pinky"
+          ],
+          "group": "COUNT"
+        },
+        {
+          "name": "COUNT",
+          "tweenPoses": [
+            "Count - Thumb",
+            "Count - Index",
+            "Count - Middle",
+            "Count - Ring",
+            "Count - Pinky",
+            "Count - Ring",
+            "Count - Middle",
+            "Count - Index",
+            "Count - Thumb"
+          ],
+          "group": "COUNT"
+        },
+        {
+          "name": "FLOWER",
+          "tweenPoses": [
+            "Closed Flower (S)",
+            "Big Open Palm (S)"
+          ],
+          "group": "FLOWER"
+        },
+        {
+          "name": "FLOWER 2",
+          "tweenPoses": [
+            "Closed Flower",
+            "Closed Flower (S)",
+            "Big Open Palm (S)",
+            "Big Open Palm",
+            "Closed Flower"
+          ],
+          "group": "FLOWER"
         },
         {
           "name": "FLOWER 3",
@@ -4036,14 +4014,16 @@
             "Closed Flower (DS)",
             "Big Open Palm (S)",
             "Big Open Palm"
-          ]
+          ],
+          "group": "FLOWER"
         },
         {
           "name": "Twist",
           "tweenPoses": [
             "Twist 1",
             "Twist 2"
-          ]
+          ],
+          "group": "TWIST"
         },
         {
           "name": "Twist 2",
@@ -4052,7 +4032,8 @@
             "Twist 5",
             "Twist 6",
             "Twist 2"
-          ]
+          ],
+          "group": "TWIST"
         },
         {
           "name": "Twist 3",
@@ -4063,7 +4044,8 @@
             "Twist 4",
             "Twist 5",
             "Twist 6"
-          ]
+          ],
+          "group": "TWIST"
         },
         {
           "name": "Twist 4",
@@ -4074,7 +4056,8 @@
             "Twist N S",
             "Twist 6",
             "Twist 2"
-          ]
+          ],
+          "group": "TWIST"
         },
         {
           "name": "Twist 5",
@@ -4084,7 +4067,40 @@
             "Twist 4",
             "Twist Up",
             "Twist 5"
-          ]
+          ],
+          "group": "TWIST"
+        },
+        {
+          "name": "Fist Rotate",
+          "tweenPoses": [
+            "Fist Rotate - 8",
+            "Fist Rotate - 9",
+            "Fist Rotate - 0",
+            "Fist Rotate - 1",
+            "Fist Rotate - 2",
+            "Fist Rotate - 3",
+            "Fist Rotate - 4",
+            "Fist Rotate - 5",
+            "Fist Rotate - 6",
+            "Fist Rotate - 7"
+          ],
+          "group": "FIST ROTATE"
+        },
+        {
+          "name": "Fist Rotate To Open",
+          "tweenPoses": [
+            "Fist Rotate - 8",
+            "Fist Rotate - 9",
+            "Fist Rotate - 0",
+            "Fist Rotate - 1",
+            "Fist Rotate - 2",
+            "Fist Rotate - 3",
+            "Clockwise Fan - 5",
+            "Clockwise Fan - 6",
+            "Fist Rotate - 6",
+            "Fist Rotate - 7"
+          ],
+          "group": "FIST ROTATE"
         }
       ],
       "dcHoldEnabled": true,
@@ -8094,116 +8110,6 @@
       ],
       "savedTweenSequences": [
         {
-          "name": "Wave",
-          "tweenPoses": [
-            "Wave 1",
-            "Wave 2",
-            "Wave 3",
-            "Wave 4",
-            "Wave 5",
-            "Wave 6"
-          ]
-        },
-        {
-          "name": "FLOWER",
-          "tweenPoses": [
-            "Closed Flower (S)",
-            "Big Open Palm (S)"
-          ]
-        },
-        {
-          "name": "FLOWER 2",
-          "tweenPoses": [
-            "Closed Flower",
-            "Closed Flower (S)",
-            "Big Open Palm (S)",
-            "Big Open Palm",
-            "Closed Flower"
-          ]
-        },
-        {
-          "name": "WAVE - NS",
-          "tweenPoses": [
-            "Wave 1 (NS)",
-            "WAVE 2 (NS)",
-            "WAVE 3 (NS)",
-            "WAVE 5 (NS)",
-            "WAVE 6 (NS)"
-          ]
-        },
-        {
-          "name": "COUNT R",
-          "tweenPoses": [
-            "Count R - Pinky",
-            "Count R - Ring",
-            "Count R - Middle",
-            "Count R - Index",
-            "Count R - Thumb",
-            "Count R - Index",
-            "Count R - Middle",
-            "Count R - Ring",
-            "Count R - Pinky"
-          ]
-        },
-        {
-          "name": "COUNT",
-          "tweenPoses": [
-            "Count - Thumb",
-            "Count - Index",
-            "Count - Middle",
-            "Count - Ring",
-            "Count - Pinky",
-            "Count - Ring",
-            "Count - Middle",
-            "Count - Index",
-            "Count - Thumb"
-          ]
-        },
-        {
-          "name": "Clockwise Fan",
-          "tweenPoses": [
-            "Fist",
-            "Clockwise Fan - 0",
-            "Clockwise Fan - 1",
-            "Clockwise Fan - 2",
-            "Clockwise Fan - 3",
-            "Clockwise Fan - 4",
-            "Clockwise Fan - 5",
-            "Clockwise Fan - 6",
-            "Clockwise Fan - 7"
-          ]
-        },
-        {
-          "name": "Fist Rotate",
-          "tweenPoses": [
-            "Fist Rotate - 8",
-            "Fist Rotate - 9",
-            "Fist Rotate - 0",
-            "Fist Rotate - 1",
-            "Fist Rotate - 2",
-            "Fist Rotate - 3",
-            "Fist Rotate - 4",
-            "Fist Rotate - 5",
-            "Fist Rotate - 6",
-            "Fist Rotate - 7"
-          ]
-        },
-        {
-          "name": "Fist Rotate To Open",
-          "tweenPoses": [
-            "Fist Rotate - 8",
-            "Fist Rotate - 9",
-            "Fist Rotate - 0",
-            "Fist Rotate - 1",
-            "Fist Rotate - 2",
-            "Fist Rotate - 3",
-            "Clockwise Fan - 5",
-            "Clockwise Fan - 6",
-            "Fist Rotate - 6",
-            "Fist Rotate - 7"
-          ]
-        },
-        {
           "name": "Birdie",
           "tweenPoses": [
             "Birdie (S) - 0",
@@ -8226,7 +8132,95 @@
             "Birdie (S) - 2",
             "Birdie (S) - 1",
             "Birdie (S) - 0"
-          ]
+          ],
+          "group": "BIRDIE"
+        },
+        {
+          "name": "Clockwise Fan",
+          "tweenPoses": [
+            "Fist",
+            "Clockwise Fan - 0",
+            "Clockwise Fan - 1",
+            "Clockwise Fan - 2",
+            "Clockwise Fan - 3",
+            "Clockwise Fan - 4",
+            "Clockwise Fan - 5",
+            "Clockwise Fan - 6",
+            "Clockwise Fan - 7"
+          ],
+          "group": "CLOCKWISE FAN"
+        },
+        {
+          "name": "Wave",
+          "tweenPoses": [
+            "Wave 1",
+            "Wave 2",
+            "Wave 3",
+            "Wave 4",
+            "Wave 5",
+            "Wave 6"
+          ],
+          "group": "WAVE"
+        },
+        {
+          "name": "WAVE - NS",
+          "tweenPoses": [
+            "Wave 1 (NS)",
+            "WAVE 2 (NS)",
+            "WAVE 3 (NS)",
+            "WAVE 5 (NS)",
+            "WAVE 6 (NS)"
+          ],
+          "group": "WAVE"
+        },
+        {
+          "name": "COUNT R",
+          "tweenPoses": [
+            "Count R - Pinky",
+            "Count R - Ring",
+            "Count R - Middle",
+            "Count R - Index",
+            "Count R - Thumb",
+            "Count R - Index",
+            "Count R - Middle",
+            "Count R - Ring",
+            "Count R - Pinky"
+          ],
+          "group": "COUNT"
+        },
+        {
+          "name": "COUNT",
+          "tweenPoses": [
+            "Count - Thumb",
+            "Count - Index",
+            "Count - Middle",
+            "Count - Ring",
+            "Count - Pinky",
+            "Count - Ring",
+            "Count - Middle",
+            "Count - Index",
+            "Count - Thumb"
+          ],
+          "group": "COUNT"
+        },
+        {
+          "name": "FLOWER",
+          "tweenPoses": [
+            "Closed Flower (S)",
+            "Big Open Palm (S)"
+          ],
+          "group": "FLOWER"
+        },
+        {
+          "name": "FLOWER 2",
+          "tweenPoses": [
+            "Closed Flower",
+            "Closed Flower (S)",
+            "Big Open Palm (S)",
+            "Big Open Palm",
+            "Closed Flower"
+          ],
+          "group": "FLOWER"
         },
         {
           "name": "FLOWER 3",
@@ -8234,14 +8228,16 @@
             "Closed Flower (DS)",
             "Big Open Palm (S)",
             "Big Open Palm"
-          ]
+          ],
+          "group": "FLOWER"
         },
         {
           "name": "Twist",
           "tweenPoses": [
             "Twist 1",
             "Twist 2"
-          ]
+          ],
+          "group": "TWIST"
         },
         {
           "name": "Twist 2",
@@ -8250,7 +8246,8 @@
             "Twist 5",
             "Twist 6",
             "Twist 2"
-          ]
+          ],
+          "group": "TWIST"
         },
         {
           "name": "Twist 3",
@@ -8261,7 +8258,8 @@
             "Twist 4",
             "Twist 5",
             "Twist 6"
-          ]
+          ],
+          "group": "TWIST"
         },
         {
           "name": "Twist 4",
@@ -8272,7 +8270,8 @@
             "Twist N S",
             "Twist 6",
             "Twist 2"
-          ]
+          ],
+          "group": "TWIST"
         },
         {
           "name": "Twist 5",
@@ -8282,7 +8281,40 @@
             "Twist 4",
             "Twist Up",
             "Twist 5"
-          ]
+          ],
+          "group": "TWIST"
+        },
+        {
+          "name": "Fist Rotate",
+          "tweenPoses": [
+            "Fist Rotate - 8",
+            "Fist Rotate - 9",
+            "Fist Rotate - 0",
+            "Fist Rotate - 1",
+            "Fist Rotate - 2",
+            "Fist Rotate - 3",
+            "Fist Rotate - 4",
+            "Fist Rotate - 5",
+            "Fist Rotate - 6",
+            "Fist Rotate - 7"
+          ],
+          "group": "FIST ROTATE"
+        },
+        {
+          "name": "Fist Rotate To Open",
+          "tweenPoses": [
+            "Fist Rotate - 8",
+            "Fist Rotate - 9",
+            "Fist Rotate - 0",
+            "Fist Rotate - 1",
+            "Fist Rotate - 2",
+            "Fist Rotate - 3",
+            "Clockwise Fan - 5",
+            "Clockwise Fan - 6",
+            "Fist Rotate - 6",
+            "Fist Rotate - 7"
+          ],
+          "group": "FIST ROTATE"
         }
       ],
       "dcHoldEnabled": true,
@@ -8397,10 +8429,10 @@
       "dp_scrollStrength": 1
     },
     "landscape": {
-      "fieldRows": 20,
-      "fieldCols": 12,
-      "rowSpacing": 9.5,
-      "columnSpacing": 10.5,
+      "fieldRows": 1,
+      "fieldCols": 1,
+      "rowSpacing": 3.5,
+      "columnSpacing": 2.5,
       "handScale": 1.35,
       "alternateRowOffset": 5,
       "progressiveRowOffset": 1,
@@ -12292,116 +12324,6 @@
       ],
       "savedTweenSequences": [
         {
-          "name": "Wave",
-          "tweenPoses": [
-            "Wave 1",
-            "Wave 2",
-            "Wave 3",
-            "Wave 4",
-            "Wave 5",
-            "Wave 6"
-          ]
-        },
-        {
-          "name": "FLOWER",
-          "tweenPoses": [
-            "Closed Flower (S)",
-            "Big Open Palm (S)"
-          ]
-        },
-        {
-          "name": "FLOWER 2",
-          "tweenPoses": [
-            "Closed Flower",
-            "Closed Flower (S)",
-            "Big Open Palm (S)",
-            "Big Open Palm",
-            "Closed Flower"
-          ]
-        },
-        {
-          "name": "WAVE - NS",
-          "tweenPoses": [
-            "Wave 1 (NS)",
-            "WAVE 2 (NS)",
-            "WAVE 3 (NS)",
-            "WAVE 5 (NS)",
-            "WAVE 6 (NS)"
-          ]
-        },
-        {
-          "name": "COUNT R",
-          "tweenPoses": [
-            "Count R - Pinky",
-            "Count R - Ring",
-            "Count R - Middle",
-            "Count R - Index",
-            "Count R - Thumb",
-            "Count R - Index",
-            "Count R - Middle",
-            "Count R - Ring",
-            "Count R - Pinky"
-          ]
-        },
-        {
-          "name": "COUNT",
-          "tweenPoses": [
-            "Count - Thumb",
-            "Count - Index",
-            "Count - Middle",
-            "Count - Ring",
-            "Count - Pinky",
-            "Count - Ring",
-            "Count - Middle",
-            "Count - Index",
-            "Count - Thumb"
-          ]
-        },
-        {
-          "name": "Clockwise Fan",
-          "tweenPoses": [
-            "Fist",
-            "Clockwise Fan - 0",
-            "Clockwise Fan - 1",
-            "Clockwise Fan - 2",
-            "Clockwise Fan - 3",
-            "Clockwise Fan - 4",
-            "Clockwise Fan - 5",
-            "Clockwise Fan - 6",
-            "Clockwise Fan - 7"
-          ]
-        },
-        {
-          "name": "Fist Rotate",
-          "tweenPoses": [
-            "Fist Rotate - 8",
-            "Fist Rotate - 9",
-            "Fist Rotate - 0",
-            "Fist Rotate - 1",
-            "Fist Rotate - 2",
-            "Fist Rotate - 3",
-            "Fist Rotate - 4",
-            "Fist Rotate - 5",
-            "Fist Rotate - 6",
-            "Fist Rotate - 7"
-          ]
-        },
-        {
-          "name": "Fist Rotate To Open",
-          "tweenPoses": [
-            "Fist Rotate - 8",
-            "Fist Rotate - 9",
-            "Fist Rotate - 0",
-            "Fist Rotate - 1",
-            "Fist Rotate - 2",
-            "Fist Rotate - 3",
-            "Clockwise Fan - 5",
-            "Clockwise Fan - 6",
-            "Fist Rotate - 6",
-            "Fist Rotate - 7"
-          ]
-        },
-        {
           "name": "Birdie",
           "tweenPoses": [
             "Birdie (S) - 0",
@@ -12424,7 +12346,95 @@
             "Birdie (S) - 2",
             "Birdie (S) - 1",
             "Birdie (S) - 0"
-          ]
+          ],
+          "group": "BIRDIE"
+        },
+        {
+          "name": "Clockwise Fan",
+          "tweenPoses": [
+            "Fist",
+            "Clockwise Fan - 0",
+            "Clockwise Fan - 1",
+            "Clockwise Fan - 2",
+            "Clockwise Fan - 3",
+            "Clockwise Fan - 4",
+            "Clockwise Fan - 5",
+            "Clockwise Fan - 6",
+            "Clockwise Fan - 7"
+          ],
+          "group": "CLOCKWISE FAN"
+        },
+        {
+          "name": "Wave",
+          "tweenPoses": [
+            "Wave 1",
+            "Wave 2",
+            "Wave 3",
+            "Wave 4",
+            "Wave 5",
+            "Wave 6"
+          ],
+          "group": "WAVE"
+        },
+        {
+          "name": "WAVE - NS",
+          "tweenPoses": [
+            "Wave 1 (NS)",
+            "WAVE 2 (NS)",
+            "WAVE 3 (NS)",
+            "WAVE 5 (NS)",
+            "WAVE 6 (NS)"
+          ],
+          "group": "WAVE"
+        },
+        {
+          "name": "COUNT R",
+          "tweenPoses": [
+            "Count R - Pinky",
+            "Count R - Ring",
+            "Count R - Middle",
+            "Count R - Index",
+            "Count R - Thumb",
+            "Count R - Index",
+            "Count R - Middle",
+            "Count R - Ring",
+            "Count R - Pinky"
+          ],
+          "group": "COUNT"
+        },
+        {
+          "name": "COUNT",
+          "tweenPoses": [
+            "Count - Thumb",
+            "Count - Index",
+            "Count - Middle",
+            "Count - Ring",
+            "Count - Pinky",
+            "Count - Ring",
+            "Count - Middle",
+            "Count - Index",
+            "Count - Thumb"
+          ],
+          "group": "COUNT"
+        },
+        {
+          "name": "FLOWER",
+          "tweenPoses": [
+            "Closed Flower (S)",
+            "Big Open Palm (S)"
+          ],
+          "group": "FLOWER"
+        },
+        {
+          "name": "FLOWER 2",
+          "tweenPoses": [
+            "Closed Flower",
+            "Closed Flower (S)",
+            "Big Open Palm (S)",
+            "Big Open Palm",
+            "Closed Flower"
+          ],
+          "group": "FLOWER"
         },
         {
           "name": "FLOWER 3",
@@ -12432,14 +12442,16 @@
             "Closed Flower (DS)",
             "Big Open Palm (S)",
             "Big Open Palm"
-          ]
+          ],
+          "group": "FLOWER"
         },
         {
           "name": "Twist",
           "tweenPoses": [
             "Twist 1",
             "Twist 2"
-          ]
+          ],
+          "group": "TWIST"
         },
         {
           "name": "Twist 2",
@@ -12448,7 +12460,8 @@
             "Twist 5",
             "Twist 6",
             "Twist 2"
-          ]
+          ],
+          "group": "TWIST"
         },
         {
           "name": "Twist 3",
@@ -12459,7 +12472,8 @@
             "Twist 4",
             "Twist 5",
             "Twist 6"
-          ]
+          ],
+          "group": "TWIST"
         },
         {
           "name": "Twist 4",
@@ -12470,7 +12484,8 @@
             "Twist N S",
             "Twist 6",
             "Twist 2"
-          ]
+          ],
+          "group": "TWIST"
         },
         {
           "name": "Twist 5",
@@ -12480,7 +12495,40 @@
             "Twist 4",
             "Twist Up",
             "Twist 5"
-          ]
+          ],
+          "group": "TWIST"
+        },
+        {
+          "name": "Fist Rotate",
+          "tweenPoses": [
+            "Fist Rotate - 8",
+            "Fist Rotate - 9",
+            "Fist Rotate - 0",
+            "Fist Rotate - 1",
+            "Fist Rotate - 2",
+            "Fist Rotate - 3",
+            "Fist Rotate - 4",
+            "Fist Rotate - 5",
+            "Fist Rotate - 6",
+            "Fist Rotate - 7"
+          ],
+          "group": "FIST ROTATE"
+        },
+        {
+          "name": "Fist Rotate To Open",
+          "tweenPoses": [
+            "Fist Rotate - 8",
+            "Fist Rotate - 9",
+            "Fist Rotate - 0",
+            "Fist Rotate - 1",
+            "Fist Rotate - 2",
+            "Fist Rotate - 3",
+            "Clockwise Fan - 5",
+            "Clockwise Fan - 6",
+            "Fist Rotate - 6",
+            "Fist Rotate - 7"
+          ],
+          "group": "FIST ROTATE"
         }
       ],
       "dcHoldEnabled": true,
@@ -12499,11 +12547,11 @@
       "dcHoldRetransitionSpeedMs": 400,
       "dcHoldRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "dcHoldRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
-      "cameraX": 6.638529594915686,
-      "cameraY": 13.373156794075216,
-      "cameraZ": 259.74194092345493,
+      "cameraX": 1.8285961098405483,
+      "cameraY": 3.6836624948787664,
+      "cameraZ": 71.54643147163608,
       "cameraFov": 35,
-      "cameraZoom": 260.17068872666084,
+      "cameraZoom": 191.24936346128945,
       "savedCameras": [
         {
           "name": "Default",
@@ -12598,7 +12646,7 @@
   "order": [
     {
       "key": "Tween",
-      "collapsed": true,
+      "collapsed": false,
       "settings": [
         "tweenPoses",
         "savedTweenSequences"
@@ -13027,7 +13075,7 @@
     },
     {
       "key": "Lighting",
-      "collapsed": false,
+      "collapsed": true,
       "settings": [
         "keyAzimuth",
         "keyElevation",
@@ -13042,7 +13090,7 @@
     },
     {
       "key": "Toon Shading",
-      "collapsed": false,
+      "collapsed": true,
       "settings": [
         "toonSteps",
         "toonStepThreshold",
@@ -13081,7 +13129,7 @@
     },
     {
       "key": "Debug",
-      "collapsed": true,
+      "collapsed": false,
       "settings": [
         "showGridHelper",
         "showWireframe",
