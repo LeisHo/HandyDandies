@@ -537,6 +537,34 @@ const DEV_GROUPS = [
     retransitionStartTimeCurve: '[{"x":0,"y":0},{"x":1,"y":1}]',
     retransitionStartTimeRange: '{"min":0,"max":300}'
   }),
+  // Triple-Click / Quadruple-Click Pose -- direct request ("provide me
+  // um, setting groups for triple click... and quadruple click"), same
+  // fire-and-forget family as Click/Double-Click Pose, distinguished
+  // purely by consecutive left-click COUNT (see the click-count
+  // disambiguation listener's own comment, below, for how a 3rd/4th
+  // click is told apart from a 1st/2nd). Defaults left OFF (unlike
+  // click/dblclick, which ship enabled) -- a brand-new, not-yet-tuned
+  // trigger shouldn't start firing on every visitor's 3rd/4th click the
+  // instant this ships; the user turns it on once a target pose/tween is
+  // actually configured, same convention chp/rchp/dcHold already use.
+  makeClickPoseGroup('tripleClick', 'Triple-Click Pose', {
+    enabled: false, targetPose: '', transitionSpeedMs: 400,
+    startTimeCurve: '[{"x":0,"y":0},{"x":1,"y":1}]',
+    startTimeRange: '{"min":0,"max":3000}',
+    pauseDurationMs: 500,
+    retransitionSpeedMs: 400,
+    retransitionStartTimeCurve: '[{"x":0,"y":0},{"x":1,"y":1}]',
+    retransitionStartTimeRange: '{"min":0,"max":300}'
+  }),
+  makeClickPoseGroup('quadClick', 'Quadruple-Click Pose', {
+    enabled: false, targetPose: '', transitionSpeedMs: 400,
+    startTimeCurve: '[{"x":0,"y":0},{"x":1,"y":1}]',
+    startTimeRange: '{"min":0,"max":3000}',
+    pauseDurationMs: 500,
+    retransitionSpeedMs: 400,
+    retransitionStartTimeCurve: '[{"x":0,"y":0},{"x":1,"y":1}]',
+    retransitionStartTimeRange: '{"min":0,"max":300}'
+  }),
   // Right Click -- direct follow-up request: "provide another CLick
   // function, the same as the others - 'Right Click'. But this time,
   // provide me a dropbox that allows me to select either a single target
@@ -654,7 +682,8 @@ const DEV_GROUPS = [
   // direct clarification -- superseded by this request's own explicit
   // ask for Click Hold-Pose's full settings, retransition speed
   // included). The double-click-then-hold gesture DETECTION itself
-  // (`dcHoldLastCleanUpTime` etc., below) is UNCHANGED -- only which
+  // (generalized 2026-09-16 into a chain count -- see
+  // CLICK_HOLD_CHAIN_KEYS's own comment, below) is UNCHANGED here -- only which
   // functions it calls (startClickHoldPose('dcHold')/endClickHoldPose('dcHold')
   // now, instead of this feature's own retired start/end functions).
   // ONE deliberate exception preserved from the ORIGINAL, twice-clarified
@@ -665,6 +694,28 @@ const DEV_GROUPS = [
   // mode has no such exception -- it mirrors chp/rchp exactly, per this
   // request's own direct confirmation.
   makeClickHoldPoseGroup('dcHold', 'Double Click Hold', {
+    enabled: false, targetPose: '',
+    startTimeCurve: '[{"x":0,"y":0},{"x":1,"y":1}]',
+    startTimeRange: '{"min":0,"max":300}',
+    retransitionSpeedMs: 400,
+    retransitionStartTimeCurve: '[{"x":0,"y":0},{"x":1,"y":1}]',
+    retransitionStartTimeRange: '{"min":0,"max":300}'
+  }),
+  // Triple-Click Hold / Quadruple-Click Hold -- direct request, same
+  // family as Double Click Hold: the Nth press of a still-building
+  // consecutive-click chain, HELD instead of released quickly (see the
+  // gesture-detection listener's own comment, below, for how the chain
+  // count is tracked). Shares chp/rchp/dcHold's own exact machinery via
+  // CLICK_HOLD_KEYS, same as dcHold already does.
+  makeClickHoldPoseGroup('tripleClickHold', 'Triple-Click Hold', {
+    enabled: false, targetPose: '',
+    startTimeCurve: '[{"x":0,"y":0},{"x":1,"y":1}]',
+    startTimeRange: '{"min":0,"max":300}',
+    retransitionSpeedMs: 400,
+    retransitionStartTimeCurve: '[{"x":0,"y":0},{"x":1,"y":1}]',
+    retransitionStartTimeRange: '{"min":0,"max":300}'
+  }),
+  makeClickHoldPoseGroup('quadClickHold', 'Quadruple-Click Hold', {
     enabled: false, targetPose: '',
     startTimeCurve: '[{"x":0,"y":0},{"x":1,"y":1}]',
     startTimeRange: '{"min":0,"max":300}',
@@ -3442,12 +3493,19 @@ function buildWristSplayCurveWidget(row) {
 // active on the same hand, matching its own former priority as the
 // explicitly-checked-last trigger in animate()'s per-hand loop (now
 // folded into this same array/forEach instead of a separate check).
-const CLICK_HOLD_KEYS = ['chp', 'rchp', 'dcHold']
-const clickHoldPoseTriggers = {
-  chp: { active: false, holdStartTime: 0, forwardSnapshot: null, loopPoses: null, loopSegmentMs: 1, startCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], startRangeParsed: { min: 0, max: 300 }, tweenStartCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStartRangeParsed: { min: 0, max: 300 }, retransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionRangeParsed: { min: 0, max: 300 }, tweenRetransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenRetransitionRangeParsed: { min: 0, max: 300 } },
-  rchp: { active: false, holdStartTime: 0, forwardSnapshot: null, loopPoses: null, loopSegmentMs: 1, startCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], startRangeParsed: { min: 0, max: 300 }, tweenStartCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStartRangeParsed: { min: 0, max: 300 }, retransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionRangeParsed: { min: 0, max: 300 }, tweenRetransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenRetransitionRangeParsed: { min: 0, max: 300 } },
-  dcHold: { active: false, holdStartTime: 0, forwardSnapshot: null, loopPoses: null, loopSegmentMs: 1, startCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], startRangeParsed: { min: 0, max: 300 }, tweenStartCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStartRangeParsed: { min: 0, max: 300 }, retransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionRangeParsed: { min: 0, max: 300 }, tweenRetransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenRetransitionRangeParsed: { min: 0, max: 300 } }
-}
+// `tripleClickHold`/`quadClickHold` added 2026-09-16 (direct request) --
+// generalized from a 3-entry hand-written literal (chp/rchp/dcHold) into
+// one generated from CLICK_HOLD_KEYS, since all 5 entries share the
+// exact same shape; keeps a 6th/7th future trigger a one-line array add
+// instead of a 4th near-duplicate literal to keep in sync by hand.
+const CLICK_HOLD_KEYS = ['chp', 'rchp', 'dcHold', 'tripleClickHold', 'quadClickHold']
+const clickHoldPoseTriggers = Object.fromEntries(CLICK_HOLD_KEYS.map((p) => [p, {
+  active: false, holdStartTime: 0, forwardSnapshot: null, loopPoses: null, loopSegmentMs: 1,
+  startCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], startRangeParsed: { min: 0, max: 300 },
+  tweenStartCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStartRangeParsed: { min: 0, max: 300 },
+  retransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionRangeParsed: { min: 0, max: 300 },
+  tweenRetransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenRetransitionRangeParsed: { min: 0, max: 300 }
+}]))
 function parseClickHoldConfig(p) {
   const t = clickHoldPoseTriggers[p]
   try { t.startCurveParsed = JSON.parse(cfg[`${p}StartTimeCurve`]).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
@@ -3738,9 +3796,14 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     // "always starts from default" exception (see startClickHoldPose()'s
     // own comment), which only still applies to the genuinely-idle case;
     // an interrupted dcHold now also continues smoothly like every other
-    // trigger, since that's what this new request asks for.
+    // trigger, since that's what this new request asks for. Extended
+    // 2026-09-16 to tripleClickHold/quadClickHold too -- both are the
+    // same multi-click-hold gesture family as dcHold, just a longer
+    // chain, so they inherit dcHold's own exception rather than chp/
+    // rchp's plain-single-press-hold behavior.
     const wasActive = hand._wasOverriddenLastFrame && hand._lastPoseValues
-    chp.forwardSnapshot = wasActive ? hand._lastPoseValues : (p === 'dcHold' ? poseDefaultValues : trig.forwardSnapshot)
+    const isMultiClickHoldFamily = p === 'dcHold' || p === 'tripleClickHold' || p === 'quadClickHold'
+    chp.forwardSnapshot = wasActive ? hand._lastPoseValues : (isMultiClickHoldFamily ? poseDefaultValues : trig.forwardSnapshot)
     chp.tweenPosesResolved = (trig.loopPoses && trig.loopPoses.length >= 1) ? [chp.forwardSnapshot, ...trig.loopPoses] : null
     chp.phase = 'forward'
     chp.forwardStartTime = now
@@ -3926,15 +3989,20 @@ function endClickHoldPose(p) {
   const trig = clickHoldPoseTriggers[p]
   if (!trig.active) return // guard against a stray release with no matching press
   trig.active = false
-  // Only restore panning once NONE of the 3 triggers are still holding --
-  // e.g. releasing the right button while the left is still held
-  // shouldn't re-enable panning mid-hold. `dcHold` added 2026-09-15 (see
-  // its own DEV_GROUPS comment) -- it now goes through this exact same
-  // startClickHoldPose()/endClickHoldPose() pan-lock, a disclosed side
-  // effect of the shared machinery it never had before (moving the
-  // cursor during a double-click-hold used to pan the camera underneath
-  // the tween, the same bug chp/rchp's own pan-lock was built to fix).
-  if (!clickHoldPoseTriggers.chp.active && !clickHoldPoseTriggers.rchp.active && !clickHoldPoseTriggers.dcHold.active) applyCameraLockState()
+  // Only restore panning once NONE of CLICK_HOLD_KEYS' own triggers are
+  // still holding -- e.g. releasing the right button while the left is
+  // still held shouldn't re-enable panning mid-hold. `dcHold` added
+  // 2026-09-15 (see its own DEV_GROUPS comment) -- it now goes through
+  // this exact same startClickHoldPose()/endClickHoldPose() pan-lock, a
+  // disclosed side effect of the shared machinery it never had before
+  // (moving the cursor during a double-click-hold used to pan the camera
+  // underneath the tween, the same bug chp/rchp's own pan-lock was built
+  // to fix). Generalized 2026-09-16 from 3 hardcoded names to iterating
+  // CLICK_HOLD_KEYS -- tripleClickHold/quadClickHold need this exact same
+  // check (a real gap otherwise: releasing chp while a still-active
+  // quadClickHold hold was ongoing would have incorrectly re-enabled
+  // panning out from under it, since neither new key was ever checked).
+  if (CLICK_HOLD_KEYS.every((key) => !clickHoldPoseTriggers[key].active)) applyCameraLockState()
   const now = nowVirtual() // virtual clock -- feeds chp.retransitionStartTime below, an animation-timing field
   let minD = Infinity, maxD = -Infinity
   const dists = hands.map((hand) => {
@@ -4041,7 +4109,20 @@ window.addEventListener('pointerup', (e) => {
   if (e.button === 0) endClickHoldPose('chp')
   else if (e.button === 2) endClickHoldPose('rchp')
 })
-window.addEventListener('blur', () => { endClickHoldPose('chp'); endClickHoldPose('rchp'); endClickHoldPose('dcHold') })
+// Generalized 2026-09-16 from 3 hardcoded names to iterating
+// CLICK_HOLD_KEYS -- tripleClickHold/quadClickHold need this exact same
+// "never stuck active forever" safety net (a real gap otherwise: alt-
+// tabbing away mid-quadClickHold would have left it permanently active,
+// since neither new key was ever released here). Also resets the click-
+// hold chain's own tracking state -- an in-progress chain has no
+// meaning across a focus loss.
+window.addEventListener('blur', () => {
+  CLICK_HOLD_KEYS.forEach((key) => endClickHoldPose(key))
+  clickHoldChainCount = 0
+  clickHoldChainActiveKey = null
+  clickHoldChainDownInfo = null
+  clickHoldChainLastCleanUpTime = -Infinity
+})
 
 // -----------------------------------------------------------------------
 // Click Pose / Double-Click Pose -- fire-and-forget variant of Click
@@ -4083,12 +4164,15 @@ window.addEventListener('blur', () => { endClickHoldPose('chp'); endClickHoldPos
 // click/dblclick, 'rc' also supports a Tween target (cfg.rcMode) as an
 // alternative to a single named Target Pose -- see updateClickPoseForHand()'s
 // own comment for how the 2 modes share this same phase machine.
-const CLICK_POSE_KEYS = ['click', 'dblclick', 'rc']
-const clickPoseTriggers = {
-  click: { startCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], startRangeParsed: { min: 0, max: 300 }, tweenStartCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStartRangeParsed: { min: 0, max: 300 }, retransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionRangeParsed: { min: 0, max: 300 } },
-  dblclick: { startCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], startRangeParsed: { min: 0, max: 300 }, tweenStartCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStartRangeParsed: { min: 0, max: 300 }, retransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionRangeParsed: { min: 0, max: 300 } },
-  rc: { startCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], startRangeParsed: { min: 0, max: 300 }, tweenStartCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStartRangeParsed: { min: 0, max: 300 }, retransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionRangeParsed: { min: 0, max: 300 } }
-}
+// `tripleClick`/`quadClick` added 2026-09-16 (direct request) --
+// generalized the same way as CLICK_HOLD_KEYS/clickHoldPoseTriggers
+// just above (see its own comment).
+const CLICK_POSE_KEYS = ['click', 'dblclick', 'rc', 'tripleClick', 'quadClick']
+const clickPoseTriggers = Object.fromEntries(CLICK_POSE_KEYS.map((p) => [p, {
+  startCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], startRangeParsed: { min: 0, max: 300 },
+  tweenStartCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStartRangeParsed: { min: 0, max: 300 },
+  retransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionRangeParsed: { min: 0, max: 300 }
+}]))
 function parseClickPoseConfig(p) {
   const t = clickPoseTriggers[p]
   try { t.startCurveParsed = JSON.parse(cfg[`${p}StartTimeCurve`]).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
@@ -4253,13 +4337,18 @@ function triggerClickPose(p) {
     cp.pendingFrozenSplayDeg = computeResponsiveWristSplayDeg(dists[i], minD, range)
   })
 }
-// Click vs. double-click disambiguation: a genuine double-click's 2
-// underlying 'click' events can't be told apart from 2 separate single
-// clicks without a short debounce window -- same problem, same fix, as
-// the Mouse Tracking Log's own multi-click classification just above in
-// this file, so this reuses that exact MOUSE_LOG_MULTICLICK_MS window
-// (not a fresh, differently-tuned constant) for consistency. Left button
-// only -- Click Hold-Pose's own right-click instance is unaffected.
+// Click / Double / Triple / Quadruple-Click Pose disambiguation: N
+// underlying 'click' events can't be told apart from N-1 separate clicks
+// (or N+1, etc.) without a short debounce window -- same problem, same
+// fix, as the Mouse Tracking Log's own multi-click classification just
+// above in this file, so this reuses that exact MOUSE_LOG_MULTICLICK_MS
+// window (not a fresh, differently-tuned constant) for consistency. Left
+// button only -- Click Hold-Pose's own right-click instance is
+// unaffected. `CLICK_COUNT_CHAIN_KEYS[i]` is the trigger for `i+1`
+// consecutive clicks; the LAST entry absorbs any count beyond its own
+// (a 5th+ click still just re-fires quadClick, rather than needing a
+// 5th tier no one asked for).
+const CLICK_COUNT_CHAIN_KEYS = ['click', 'dblclick', 'tripleClick', 'quadClick']
 let clickPoseClickCount = 0
 let clickPoseClickTimer = null
 window.addEventListener('pointerup', (e) => {
@@ -4276,10 +4365,12 @@ window.addEventListener('pointerup', (e) => {
   // full MOUSE_LOG_MULTICLICK_MS window before triggerClickPose('click')
   // fired, EVEN when Double-Click Pose wasn't enabled at all -- there was
   // nothing to disambiguate FROM in that case, so the wait was pure,
-  // avoidable latency. If Double-Click Pose is off, fire 'click'
-  // immediately; the debounce is only genuinely needed when a 2nd click
-  // could arrive and change the outcome.
-  if (!cfg.dblclickEnabled) {
+  // avoidable latency. If NOTHING beyond a plain click is enabled, fire
+  // 'click' immediately; the debounce is only genuinely needed when a
+  // 2nd/3rd/4th click could still arrive and change the outcome.
+  // Generalized 2026-09-16 from a dblclick-only check to "is anything
+  // past plain click enabled" for the new triple/quad tiers.
+  if (!cfg.dblclickEnabled && !cfg.tripleClickEnabled && !cfg.quadClickEnabled) {
     clickPoseClickCount = 0
     clearTimeout(clickPoseClickTimer)
     triggerClickPose('click')
@@ -4288,8 +4379,8 @@ window.addEventListener('pointerup', (e) => {
   clickPoseClickCount++
   clearTimeout(clickPoseClickTimer)
   clickPoseClickTimer = setTimeout(() => {
-    if (clickPoseClickCount === 1) triggerClickPose('click')
-    else if (clickPoseClickCount >= 2) triggerClickPose('dblclick')
+    const idx = Math.min(clickPoseClickCount, CLICK_COUNT_CHAIN_KEYS.length) - 1
+    triggerClickPose(CLICK_COUNT_CHAIN_KEYS[idx])
     clickPoseClickCount = 0
   }, MOUSE_LOG_MULTICLICK_MS)
 })
@@ -4310,58 +4401,109 @@ window.addEventListener('pointerup', (e) => {
 })
 
 // -----------------------------------------------------------------------
-// Double Click Hold -- gesture DETECTION only. REBUILT 2026-09-15 (direct
-// request, "make the available settings of double click and hold to
-// match click hold... I want to also be able to select single pose/
-// tween for double click hold" -- see this group's own DEV_GROUPS comment
-// for the full account): the actual pose machinery is no longer a
-// bespoke, shared-across-all-hands mechanism -- `dcHold` is now a literal
-// 3rd entry in CLICK_HOLD_KEYS, going through the exact same
+// Double / Triple / Quadruple Click Hold -- gesture DETECTION only.
+// REBUILT 2026-09-15 for Double Click Hold (direct request, "make the
+// available settings of double click and hold to match click hold... I
+// want to also be able to select single pose/tween for double click
+// hold" -- see this group's own DEV_GROUPS comment for the full
+// account): the actual pose machinery is no longer a bespoke, shared-
+// across-all-hands mechanism -- `dcHold`/`tripleClickHold`/`quadClickHold`
+// are literal entries in CLICK_HOLD_KEYS, going through the exact same
 // startClickHoldPose()/updateClickHoldPoseForHand()/endClickHoldPose()
 // every hand-family trigger already uses (per-hand distance stagger,
 // Single Pose/Tween Mode, Loop Mode/Oscillate, everything). Only this
-// gesture-recognition layer is unique to Double Click Hold: a genuine
-// double-click whose 2nd press is HELD (not released quickly) -- distinct
-// from Click-Pose's own 'dblclick' (fire-and-forget, recognized at the
-// 2nd RELEASE) and from Click-Hold-Pose's 'chp' (a single press-and-hold,
-// no double-click required). `dcHoldLastCleanUpTime` records the last
-// left pointerup that was a clean, quick click (not a drag) outside the
-// dev panel; a LEFT pointerdown arriving within MOUSE_LOG_MULTICLICK_MS
-// of that is the 2nd press of a double-click, so the hold starts
-// immediately (no separate "was this held long enough" gate needed here
-// -- the double-click itself is already the disambiguating signal, which
-// is also why `dcHold` doesn't strictly NEED its own Hold Confirm Delay
-// the way chp/rchp do, even though it now has that control available too
-// as part of full settings parity). Deliberately independent of chp's own
-// state otherwise (no cross-suppression) -- a disclosed simplification,
-// same as the existing chp-vs-rchp "whichever runs last this frame wins"
-// note.
-let dcHoldDownInfo = null
-let dcHoldLastCleanUpTime = -Infinity
+// gesture-recognition layer is unique to this family: a genuine Nth
+// consecutive click whose OWN press is HELD (not released quickly) --
+// distinct from Click-Pose's own fire-and-forget tiers (recognized at
+// the FINAL release, after the whole debounce window) and from Click-
+// Hold-Pose's 'chp' (a single press-and-hold, no prior clicks required).
+//
+// GENERALIZED 2026-09-16 (direct request: "triple click hold, and
+// quadruple click hold") from dcHold's own binary "was the immediately
+// preceding release clean" flag into a running CHAIN COUNT
+// (`clickHoldChainCount`), so a 3rd or 4th press -- each preceded by its
+// own unbroken run of quick, clean prior releases -- can also become a
+// hold. `CLICK_HOLD_CHAIN_KEYS[i]` is the trigger for the press that
+// follows `i` consecutive clean releases (index 0 has no trigger -- a
+// fresh, non-chained press is just chp/rchp's own plain press-and-hold,
+// unrelated to this chain); the last real entry absorbs any longer chain
+// the same way CLICK_COUNT_CHAIN_KEYS does for the fire-and-forget
+// family, so a 5th+ press still just re-triggers quadClickHold rather
+// than needing a tier no one asked for. A LEFT pointerdown arriving
+// within MOUSE_LOG_MULTICLICK_MS of the last clean release is the NEXT
+// press in the chain, so its corresponding hold starts immediately (no
+// separate "was this held long enough" gate needed here -- the click
+// chain itself is already the disambiguating signal, which is also why
+// none of these strictly NEED their own Hold Confirm Delay the way
+// chp/rchp do, even though each has that control available too as part
+// of full settings parity). Deliberately independent of chp's own state
+// otherwise (no cross-suppression) -- a disclosed simplification, same
+// as the existing chp-vs-rchp "whichever runs last this frame wins"
+// note. Also deliberately independent of the fire-and-forget click-count
+// chain above (a quick release at any chain depth feeds BOTH mechanisms
+// -- a disclosed, pre-existing overlap already true of dcHold-vs-dblclick
+// before this round, just now extended symmetrically to 3/4 clicks
+// rather than newly introduced by it).
+const CLICK_HOLD_CHAIN_KEYS = [null, 'dcHold', 'tripleClickHold', 'quadClickHold']
+let clickHoldChainCount = 0
+let clickHoldChainDownInfo = null
+let clickHoldChainLastCleanUpTime = -Infinity
+let clickHoldChainActiveKey = null
 window.addEventListener('pointerdown', (e) => {
   if (e.target && e.target.closest && e.target.closest('.dp-panel')) return
   if (e.button !== 0) return
   const now = performance.now()
-  if (now - dcHoldLastCleanUpTime <= MOUSE_LOG_MULTICLICK_MS) startClickHoldPose('dcHold')
-  dcHoldDownInfo = { time: now, x: e.clientX, y: e.clientY }
+  if (now - clickHoldChainLastCleanUpTime <= MOUSE_LOG_MULTICLICK_MS) {
+    const key = CLICK_HOLD_CHAIN_KEYS[Math.min(clickHoldChainCount, CLICK_HOLD_CHAIN_KEYS.length - 1)]
+    if (key) { clickHoldChainActiveKey = key; startClickHoldPose(key) }
+  } else {
+    clickHoldChainCount = 0 // too long since the last clean release -- this is a fresh chain, not a continuation
+  }
+  clickHoldChainDownInfo = { time: now, x: e.clientX, y: e.clientY }
 })
+// CORRECTED 2026-09-16, caught before shipping via live testing (not a
+// user report): a chain-triggered hold starts IMMEDIATELY on press (see
+// this section's own top comment -- "the hold starts immediately... the
+// double-click itself is already the disambiguating signal"), so the
+// 2nd press of a still-building TRIPLE/quad-click chain ALSO briefly
+// pulses dcHold the instant it's pressed, same as a genuine double-
+// click-then-hold would. The first version of this release handler
+// treated "a chain hold was active" as proof the chain was OVER
+// (`clickHoldChainCount = 0`), which incorrectly reset the chain on
+// EVERY intermediate click of a longer chain -- confirmed live: a
+// click-click-HOLD sequence (meant to become tripleClickHold) never
+// committed even after 40 polling ticks, because the 2nd click's own
+// brief dcHold pulse reset the count back to 0 before the 3rd press
+// could ever see chainCount===2. Fixed by deciding "does the chain
+// continue" purely from THIS release's own heldMs/moved classification
+// (same as a normal click), independent of whether a hold happened to
+// be pulsing on this exact press -- ending that pulse (`endClickHoldPose`)
+// and continuing the chain are no longer coupled.
 window.addEventListener('pointerup', (e) => {
   if (e.button !== 0) return
-  if (clickHoldPoseTriggers.dcHold.active) {
-    endClickHoldPose('dcHold')
-    dcHoldDownInfo = null
-    return
+  if (clickHoldChainActiveKey && clickHoldPoseTriggers[clickHoldChainActiveKey].active) {
+    endClickHoldPose(clickHoldChainActiveKey)
   }
-  // Only a clean (not dragged) click starts the double-click window --
-  // same heldMs/moved classification as the Mouse Tracking Log's own
-  // wasDrag check, independent constants/state so this feature never
-  // depends on that log existing or being enabled.
-  if (dcHoldDownInfo) {
-    const heldMs = performance.now() - dcHoldDownInfo.time
-    const moved = Math.hypot(e.clientX - dcHoldDownInfo.x, e.clientY - dcHoldDownInfo.y) > MOUSE_LOG_MOVE_THRESHOLD_PX
-    dcHoldLastCleanUpTime = (heldMs <= MOUSE_LOG_HELD_DRAG_MS && !moved) ? performance.now() : -Infinity
+  clickHoldChainActiveKey = null
+  // Only a clean (not dragged) release extends the chain -- same
+  // heldMs/moved classification as the Mouse Tracking Log's own wasDrag
+  // check, independent constants/state so this feature never depends on
+  // that log existing or being enabled.
+  if (clickHoldChainDownInfo) {
+    const heldMs = performance.now() - clickHoldChainDownInfo.time
+    const moved = Math.hypot(e.clientX - clickHoldChainDownInfo.x, e.clientY - clickHoldChainDownInfo.y) > MOUSE_LOG_MOVE_THRESHOLD_PX
+    if (heldMs <= MOUSE_LOG_HELD_DRAG_MS && !moved) {
+      clickHoldChainCount++
+      clickHoldChainLastCleanUpTime = performance.now()
+    } else {
+      // A genuine sustained hold (heldMs beyond the threshold) or a drag
+      // -- either way the chain is over: a real hold consumed it, and a
+      // drag was never a click at all.
+      clickHoldChainCount = 0
+      clickHoldChainLastCleanUpTime = -Infinity
+    }
   }
-  dcHoldDownInfo = null
+  clickHoldChainDownInfo = null
 })
 
 // Generic versions of Arm Length's own 2 custom widgets (see

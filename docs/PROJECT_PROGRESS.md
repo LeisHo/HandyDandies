@@ -18,6 +18,26 @@ work seamlessly from there.
 
 ## Currently working on
 
+**SHIPPED 2026-09-16: Triple-Click / Triple-Click Hold / Quadruple-Click
+/ Quadruple-Click Hold -- 4 new trigger groups, direct request.** Extends
+both trigger families (fire-and-forget Click Pose, hold-based Click-
+Hold-Pose) from 2-deep to 4-deep, reusing their existing generic
+per-key architecture almost entirely for free. Real work was in the 2
+gesture-detection layers: the click-count debounce (hardcoded 1-vs-2+ ->
+a lookup table) and dcHold's own binary "was the last release clean"
+flag (generalized into a running chain count so a 3rd/4th press can also
+become a hold). **A real bug was caught and fixed BEFORE shipping, via
+live testing, not a user report:** the chain-count rewrite's first
+version treated a chain-triggered hold's own brief "starts immediately
+on press" pulse as proof the chain was over, resetting it on every
+intermediate click of a longer chain -- a click-click-HOLD sequence
+meant to become tripleClickHold never committed. Fixed by decoupling
+"does the chain continue" from "did a hold happen to pulse on this
+press." Verified live: 1/2/3/4-click dispatch, dcHold regression,
+tripleClickHold/quadClickHold both committing correctly, and a plain
+3-click sequence firing only `tripleClick` with no stuck hold state. See
+CHANGELOG.txt's matching entry for full detail.
+
 **MAJOR devPanel.js bug fixed 2026-09-16: real (non-`?dev=1`) visitors
 of the production site never received anything saved via the dev
 panel's own Save/Sync button.** Direct user report ("`?dev=1` looks

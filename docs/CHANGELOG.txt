@@ -5144,6 +5144,86 @@ Cache-buster bumps: `index.html`'s own `main.js?v=112` -> `?v=113`;
 `main.js`'s own import of `devpanel/devPanel.js?v=19` -> `?v=20`.
 
 --------------------------------------------------------------------------------
+2026-09-16  -  02:42:59 - 02:56:55 EDT (13m56s, measured)
+
+**Added Triple-Click / Triple-Click Hold / Quadruple-Click / Quadruple-
+Click Hold -- 4 new trigger groups, direct request.** Extends both of
+this project's already-generalized trigger families (the fire-and-
+forget Click Pose family and the hold-based Click-Hold-Pose family,
+both driven by a shared, per-key-generic `makeClickPoseGroup()`/
+`makeClickHoldPoseGroup()` + `CLICK_POSE_KEYS`/`CLICK_HOLD_KEYS` array
+architecture) from 2-deep (click/dblclick, dcHold) to 4-deep. Most of
+the actual state-machine work (deferred-claim interruption continuity,
+Tween mode, Retransition settings, everything from this file's earlier
+2026-09-16 entries) came for free from that existing genericity -- the
+real work was in the 2 gesture-DETECTION layers:
+
+**1. `clickHoldPoseTriggers`/`clickPoseTriggers`** (previously 3- and
+3-entry hand-written object literals) **converted to `Object.fromEntries()`
+generated from their own KEYS array** -- both now automatically cover
+any future addition, not just this one.
+
+**2. Click-count debounce dispatcher** generalized from a hardcoded
+"1 -> click, 2+ -> dblclick" `if`/`else if` into a `CLICK_COUNT_CHAIN_KEYS`
+lookup table (`['click','dblclick','tripleClick','quadClick']`), the
+last entry absorbing any count beyond its own (a 5th+ click still just
+re-fires quadClick).
+
+**3. dcHold's own gesture-detection (a binary "was the last release
+clean" flag) generalized into a running chain count** (`clickHoldChainCount`)
+via a parallel `CLICK_HOLD_CHAIN_KEYS` lookup, so a 3rd or 4th press --
+each preceded by its own unbroken run of quick clean releases -- can
+also become a hold (tripleClickHold/quadClickHold respectively). **A
+real bug was caught here BEFORE shipping, via live testing (not a user
+report):** dcHold's own design starts a hold IMMEDIATELY on the
+qualifying press (an already-established, deliberate behavior, not
+something this round changed), so the 2nd press of a still-building
+3-or-4-click chain ALSO briefly pulses dcHold the instant it's pressed.
+The first version of the release handler treated "a chain hold was
+active" as proof the chain was OVER, resetting the chain count on every
+intermediate click -- confirmed live: a click-click-HOLD sequence meant
+to become tripleClickHold never committed even after 40 polling ticks
+(~2.4s), because the 2nd click's own brief dcHold pulse reset the count
+to 0 before the 3rd press could ever see chainCount===2. Fixed by
+deciding "does the chain continue" purely from that release's own
+heldMs/moved classification (same as a normal click), decoupled from
+whether a hold happened to be pulsing on that exact press.
+
+Also generalized 2 other dcHold-specific hardcodes that would otherwise
+have silently missed the 2 new triggers: `endClickHoldPose()`'s own
+camera-pan-lock restore condition (used to check only chp/rchp/dcHold's
+own `.active`, now iterates all of `CLICK_HOLD_KEYS`) and the `blur`
+handler's own "release everything, never get stuck" safety net (same
+generalization, plus now also resets the click-hold chain's own
+tracking state). `tripleClickHold`/`quadClickHold` inherit dcHold's own
+twice-confirmed "Tween mode always starts from default" exception
+(extended from a single `p === 'dcHold'` check to all 3 multi-click-
+hold-family keys) rather than chp/rchp's plain-single-press behavior,
+since they're the same gesture family, just a longer chain.
+
+New groups ship with `enabled: false` by default (unlike click/dblclick,
+which ship enabled) -- a not-yet-tuned trigger shouldn't start firing on
+every visitor's 3rd/4th click the instant this ships; same convention
+chp/rchp/dcHold already established.
+
+Verified live via dispatched PointerEvents (confirmed reaching real
+window-level listeners correctly, via a working chp sanity check, after
+an initial false negative traced to under-waiting for a hold's own
+distance-based commit delay, not a real bug): 1/2/3/4 quick clicks each
+fired exactly their own trigger (click/dblclick/tripleClick/quadClick),
+no cross-contamination; dcHold (regression) still commits correctly
+after the chain-detection rewrite; tripleClickHold/quadClickHold both
+commit correctly on their own qualifying held press, with the correct
+target-pose anchor; a plain (no-hold) 3-click sequence correctly fires
+only `tripleClick`, with the hold family's own brief pulses on clicks 2
+and 3 settling cleanly back to idle rather than getting stuck. 0 console
+errors throughout.
+
+Cache-buster bumps: `index.html`'s own `main.js?v=114` -> `?v=115` (an
+intermediate `?v=114` was cut mid-testing, after the chain-count bug
+above was caught and fixed before ever being shipped).
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================
