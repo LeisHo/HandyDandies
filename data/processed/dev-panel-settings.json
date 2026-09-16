@@ -13636,7 +13636,7 @@
   "order": [
     {
       "key": "Tween",
-      "collapsed": true,
+      "collapsed": false,
       "settings": [
         "tweenPoses",
         "savedTweenSequences"
@@ -13935,7 +13935,7 @@
     },
     {
       "key": "Pose",
-      "collapsed": false,
+      "collapsed": true,
       "settings": [
         "savedPoses"
       ],
