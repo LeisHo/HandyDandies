@@ -4852,7 +4852,7 @@
       "clickMode": "Tween",
       "clickTargetPose": "Big Open Palm (S)",
       "clickTweenSelector": "Clockwise Fan",
-      "clickTweenSpeedMs": 800,
+      "clickTweenSpeedMs": 3070,
       "clickTweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "clickTweenStartTimeRange": "{\"min\":0,\"max\":1241}",
       "clickTransitionSpeedMs": 460,
@@ -10104,7 +10104,7 @@
       "clickMode": "Tween",
       "clickTargetPose": "Big Open Palm (S)",
       "clickTweenSelector": "Clockwise Fan",
-      "clickTweenSpeedMs": 800,
+      "clickTweenSpeedMs": 3070,
       "clickTweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "clickTweenStartTimeRange": "{\"min\":0,\"max\":1241}",
       "clickTransitionSpeedMs": 460,
@@ -15356,7 +15356,7 @@
       "clickMode": "Tween",
       "clickTargetPose": "Big Open Palm (S)",
       "clickTweenSelector": "Clockwise Fan",
-      "clickTweenSpeedMs": 800,
+      "clickTweenSpeedMs": 3070,
       "clickTweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "clickTweenStartTimeRange": "{\"min\":0,\"max\":1241}",
       "clickTransitionSpeedMs": 460,
@@ -15914,7 +15914,7 @@
       "subgroups": [
         {
           "key": "Click Pose",
-          "collapsed": true,
+          "collapsed": false,
           "settings": [
             "clickTweenSpeedMs",
             "clickTweenStartTimeCurve",
