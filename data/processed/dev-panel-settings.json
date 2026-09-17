@@ -18019,6 +18019,7 @@
       "locked": false,
       "settings": [
         "loadingPreviewShowLive",
+        "loadingPreviewEnabled",
         "loadingPreviewOffsetX",
         "loadingPreviewOffsetY",
         "loadingPreviewCameraSelector",
@@ -18028,7 +18029,6 @@
         "loadingPreviewSequenceCountMode",
         "loadingPreviewSequenceLoopTransition",
         "loadingPreviewSequenceHoldMs",
-        "loadingPreviewEnabled",
         "loadingMinTimeMs",
         "loadingPreviewTweenSelector",
         "loadingPreviewSpeedMs",
