@@ -801,6 +801,17 @@ const DEV_GROUPS = [
         // before that generalization) was missed.
         onChange: () => updateClickTriggerModeVisibility('rc', ['PauseDurationMs'])
       },
+      // Offset/Rotation -- see makeClickHoldPoseGroup()'s own matching
+      // comment for the full reasoning. Right Click is a hand-written
+      // group (predates the 2 shared factories), not built via either
+      // one -- added here directly rather than forking a factory for it.
+      { key: 'rcOffsetEnabled', label: 'Offset On/Off', type: 'checkbox', def: false, onChange: () => updateOffsetRotationVisibility('rc') },
+      { key: 'rcOffsetX', label: 'Offset X (World Units)', type: 'slider', min: -50, max: 50, step: 0.5, def: 0 },
+      { key: 'rcOffsetY', label: 'Offset Y (World Units)', type: 'slider', min: -50, max: 50, step: 0.5, def: 0 },
+      { key: 'rcRotationEnabled', label: 'Rotation On/Off', type: 'checkbox', def: false, onChange: () => updateOffsetRotationVisibility('rc') },
+      { key: 'rcRotationX', label: 'Rotation X (Deg)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
+      { key: 'rcRotationY', label: 'Rotation Y (Deg)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
+      { key: 'rcRotationZ', label: 'Rotation Z (Deg)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
       { key: 'rcTargetPose', label: 'Target Pose', type: 'select', def: '', options: () => (cfg.savedPoses || []).map((sp) => ({ value: sp.name, group: sp.group || null })) },
       { key: 'rcTweenSelector', label: 'Sequence', type: 'select', def: '', options: () => (cfg.savedTweenSequences || []).map((s) => ({ value: s.name, group: s.group || null })) },
       // Tween's own SEPARATE speed/curve/range trio, added 2026-09-15 --
@@ -2304,6 +2315,29 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
         key: `${p}Mode`, label: 'Mode', type: 'select', def: 'Single Pose', options: () => ['Single Pose', 'Sequence'],
         onChange: () => { updateClickTriggerModeVisibility(p, [], ['LoopMode']); updateLoopHoldVisibility(p) }
       },
+      // Offset/Rotation -- direct request 2026-09-17 ("Offset On and Off,
+      // to set if the hand itself will be physically offset in the x and
+      // y axes... This offset will occur with the tween" / "Rotation On
+      // and Off... its rotation will be added ontop of the selected
+      // tween's own rotation. they wont overwrite each other nor fight
+      // against each other"). Both ramp from 0 at the tween/sequence's
+      // own start to their full target value at its end (direct
+      // confirmation: "Ramps like Rotation" for Offset too), reusing
+      // whatever per-hand `progress` (0-1) the pose-application code
+      // already computes each frame -- see applyTriggerOffsetRotation()'s
+      // own comment for the actual runtime math. World units for Offset
+      // (this is a three.js world-space scene, not 2D CSS, per this
+      // project's own CLAUDE.md -- matches Field Layout's own spacing
+      // sliders' unit choice); degrees per axis for Rotation, composed
+      // ON TOP of cursor-tracking's own wrapper rotation (added, never
+      // replacing it) so it can never fight the tween's own posing.
+      { key: `${p}OffsetEnabled`, label: 'Offset On/Off', type: 'checkbox', def: false, onChange: () => updateOffsetRotationVisibility(p) },
+      { key: `${p}OffsetX`, label: 'Offset X (World Units)', type: 'slider', min: -50, max: 50, step: 0.5, def: 0 },
+      { key: `${p}OffsetY`, label: 'Offset Y (World Units)', type: 'slider', min: -50, max: 50, step: 0.5, def: 0 },
+      { key: `${p}RotationEnabled`, label: 'Rotation On/Off', type: 'checkbox', def: false, onChange: () => updateOffsetRotationVisibility(p) },
+      { key: `${p}RotationX`, label: 'Rotation X (Deg)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
+      { key: `${p}RotationY`, label: 'Rotation Y (Deg)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
+      { key: `${p}RotationZ`, label: 'Rotation Z (Deg)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
       { key: `${p}TargetPose`, label: 'Target Pose', type: 'select', def: defaults.targetPose ?? '', options: () => (cfg.savedPoses || []).map((sp) => ({ value: sp.name, group: sp.group || null })) },
       { key: `${p}TweenSelector`, label: 'Sequence', type: 'select', def: '', options: () => (cfg.savedTweenSequences || []).map((s) => ({ value: s.name, group: s.group || null })) },
       // Tween's own SEPARATE speed/curve/range trio -- direct correction
@@ -2448,6 +2482,16 @@ function makeClickPoseGroup(p, title, defaults = {}) {
         key: `${p}Mode`, label: 'Mode', type: 'select', def: 'Single Pose', options: () => ['Single Pose', 'Sequence'],
         onChange: () => updateClickTriggerModeVisibility(p, ['PauseDurationMs'])
       },
+      // Offset/Rotation -- see makeClickHoldPoseGroup()'s own matching
+      // comment for the full reasoning (shared word-for-word, both
+      // factories added this the same way).
+      { key: `${p}OffsetEnabled`, label: 'Offset On/Off', type: 'checkbox', def: false, onChange: () => updateOffsetRotationVisibility(p) },
+      { key: `${p}OffsetX`, label: 'Offset X (World Units)', type: 'slider', min: -50, max: 50, step: 0.5, def: 0 },
+      { key: `${p}OffsetY`, label: 'Offset Y (World Units)', type: 'slider', min: -50, max: 50, step: 0.5, def: 0 },
+      { key: `${p}RotationEnabled`, label: 'Rotation On/Off', type: 'checkbox', def: false, onChange: () => updateOffsetRotationVisibility(p) },
+      { key: `${p}RotationX`, label: 'Rotation X (Deg)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
+      { key: `${p}RotationY`, label: 'Rotation Y (Deg)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
+      { key: `${p}RotationZ`, label: 'Rotation Z (Deg)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
       { key: `${p}TargetPose`, label: 'Target Pose', type: 'select', def: defaults.targetPose ?? '', options: () => (cfg.savedPoses || []).map((sp) => ({ value: sp.name, group: sp.group || null })) },
       { key: `${p}TweenSelector`, label: 'Sequence', type: 'select', def: '', options: () => (cfg.savedTweenSequences || []).map((s) => ({ value: s.name, group: s.group || null })) },
       // Tween's own SEPARATE speed/curve/range trio -- see
@@ -4007,6 +4051,49 @@ function applyPoseValuesToHand(hand, poseValues, extraSplayDeg) {
   // hand's stale old values are never mistaken for "currently active."
   hand._lastPoseValues = poseValues
 }
+const _offsetRightVec = new THREE.Vector3()
+const _offsetUpVec = new THREE.Vector3()
+const _offsetEuler = new THREE.Euler()
+const _offsetQuat = new THREE.Quaternion()
+// Click Function Offset/Rotation (Phase 1) -- composes ADDITIVELY on top
+// of whatever cursor-tracking + arm-length already set on hand.wrapper
+// this frame. animate()'s own per-frame loop runs tracking rotation
+// (quaternion.slerp) and applyHandArmLength() BEFORE calling
+// updateRenderOrder() -> updateClickHoldPoseForHand()/
+// updateClickPoseForHand(), so hand.wrapper.position/.quaternion already
+// hold this frame's base transform by the time this runs -- adding to
+// position and right-multiplying the rotation means Offset/Rotation
+// layer on top instead of fighting tracking, exactly as required.
+// `progress` is the SAME per-hand-staggered forward-phase progress the
+// pose-lerp itself uses, so Offset ramps 0->target across the tween
+// exactly like Rotation does (direct user choice: "Ramps like Rotation").
+function applyOffsetRotationToHand(hand, p, progress) {
+  if (cfg[`${p}OffsetEnabled`]) {
+    const ox = (cfg[`${p}OffsetX`] || 0) * progress
+    const oy = (cfg[`${p}OffsetY`] || 0) * progress
+    if (ox !== 0 || oy !== 0) {
+      // Camera-relative right/up, not world/local axes -- this project's
+      // camera only pans/zooms, never rotates, so these stay a stable
+      // "up down left right in browser terms" regardless of framing.
+      _offsetRightVec.setFromMatrixColumn(camera.matrixWorld, 0)
+      _offsetUpVec.setFromMatrixColumn(camera.matrixWorld, 1)
+      hand.wrapper.position.addScaledVector(_offsetRightVec, ox)
+      hand.wrapper.position.addScaledVector(_offsetUpVec, oy)
+    }
+  }
+  if (cfg[`${p}RotationEnabled`]) {
+    const rx = (cfg[`${p}RotationX`] || 0) * progress
+    const ry = (cfg[`${p}RotationY`] || 0) * progress
+    const rz = (cfg[`${p}RotationZ`] || 0) * progress
+    if (rx !== 0 || ry !== 0 || rz !== 0) {
+      _offsetEuler.set(THREE.MathUtils.degToRad(rx), THREE.MathUtils.degToRad(ry), THREE.MathUtils.degToRad(rz), 'XYZ')
+      _offsetQuat.setFromEuler(_offsetEuler)
+      // Composes on top of the pose's OWN wrist rotation, never overwrites
+      // it -- right-multiply, not assignment.
+      hand.wrapper.quaternion.multiply(_offsetQuat)
+    }
+  }
+}
 // Tween group's own preset capture/apply -- ONLY `tweenPoses` (the ordered
 // array of saved-pose NAMES, same shape 'multi-select' always stores),
 // unlike HANDO's equivalent which also bundles camera/lighting ("We dont
@@ -4230,6 +4317,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     }
     chp.lastAppliedValues = values
     applyPoseValuesToHand(hand, values, chp.frozenSplayDeg)
+    applyOffsetRotationToHand(hand, p, progress)
   } else if (chp.phase === 'looping') {
     // Continues for as long as the hold lasts. Both cycling styles share
     // this one phase, branching only on which lerp function to call --
@@ -4253,6 +4341,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
       // other config-driven state can still change during a hold, same
       // convention as the 'paused' phase elsewhere in this file).
       applyPoseValuesToHand(hand, chp.lastAppliedValues, chp.frozenSplayDeg)
+      applyOffsetRotationToHand(hand, p, 1) // looping only starts once the forward ramp is fully complete
       return
     }
     if (chp.loopHoldEndTime && now >= chp.loopHoldEndTime) {
@@ -4293,6 +4382,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     }
     chp.lastAppliedValues = values
     applyPoseValuesToHand(hand, values, chp.frozenSplayDeg)
+    applyOffsetRotationToHand(hand, p, 1) // looping only starts once the forward ramp is fully complete
     if (lapT >= 1) {
       const holdMs = Math.max(cfg[`${p}LoopHoldMs`] ?? 0, 0)
       if (holdMs > 0) chp.loopHoldEndTime = now + holdMs
@@ -4309,6 +4399,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     const progress = elapsed < chp.retransitionDelay ? 0 : THREE.MathUtils.clamp((elapsed - chp.retransitionDelay) / speedMs, 0, 1)
     const values = lerpPoseValues(chp.retransitionStart, poseDefaultValues, progress)
     applyPoseValuesToHand(hand, values, chp.frozenSplayDeg)
+    applyOffsetRotationToHand(hand, p, 1 - progress) // ramps back down to 0 as the hand returns to default, inverse of the forward ramp
     if (progress >= 1) chp.phase = 'idle' // fully settled at default -- stop overriding, normal cfg-driven posing (inert here since it only re-applies on slider change, not every frame) silently regains control
   }
 }
@@ -4662,6 +4753,7 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
     }
     cp.lastAppliedValues = values
     applyPoseValuesToHand(hand, values, cp.frozenSplayDeg)
+    applyOffsetRotationToHand(hand, p, progress)
     if (progress >= 1) { cp.phase = 'paused'; cp.pauseStartTime = now }
   } else if (cp.phase === 'paused') {
     // Hold at the fully-reached target -- keep reapplying (not a no-op,
@@ -4671,6 +4763,7 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
     // own top comment for why Responsive Wrist Splay must not keep
     // recalculating throughout an explicit pose transition.
     applyPoseValuesToHand(hand, cp.lastAppliedValues, cp.frozenSplayDeg)
+    applyOffsetRotationToHand(hand, p, 1) // paused only reached once the forward ramp is fully complete
     const pauseDurationMs = Math.max(cfg[`${p}PauseDurationMs`], 0)
     if (now - cp.pauseStartTime >= pauseDurationMs) {
       cp.phase = 'retransition'
@@ -4686,6 +4779,7 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
     const progress = elapsed < cp.retransitionDelay ? 0 : THREE.MathUtils.clamp((elapsed - cp.retransitionDelay) / speedMs, 0, 1)
     const values = lerpPoseValues(cp.retransitionStart, poseDefaultValues, progress)
     applyPoseValuesToHand(hand, values, cp.frozenSplayDeg)
+    applyOffsetRotationToHand(hand, p, 1 - progress) // ramps back down to 0 as the hand returns to default, inverse of the forward ramp
     if (progress >= 1) cp.phase = 'idle'
   }
 }
@@ -5215,6 +5309,22 @@ function updateLoopHoldVisibility(p) {
   const row = document.querySelector(`.dp-row[data-key="${p}LoopHoldMs"]`)
   if (row) row.style.display = (cfg[`${p}Mode`] === 'Sequence' && cfg[`${p}LoopMode`] !== 'Off') ? '' : 'none'
 }
+// Offset/Rotation rows are each gated by their own On/Off checkbox,
+// independent of Mode -- unlike updateClickTriggerModeVisibility() above,
+// these apply the same in Single Pose and Sequence mode alike, so Mode
+// switching never touches this function.
+function updateOffsetRotationVisibility(p) {
+  const offsetOn = !!cfg[`${p}OffsetEnabled`]
+  ;['OffsetX', 'OffsetY'].forEach((suffix) => {
+    const row = document.querySelector(`.dp-row[data-key="${p}${suffix}"]`)
+    if (row) row.style.display = offsetOn ? '' : 'none'
+  })
+  const rotationOn = !!cfg[`${p}RotationEnabled`]
+  ;['RotationX', 'RotationY', 'RotationZ'].forEach((suffix) => {
+    const row = document.querySelector(`.dp-row[data-key="${p}${suffix}"]`)
+    if (row) row.style.display = rotationOn ? '' : 'none'
+  })
+}
 CLICK_POSE_KEYS.forEach((p) => { parseClickPoseConfig(p); buildClickPoseWidgets(p) })
 // Every Click-family group's own Mode dropdown (Single Pose vs. Tween) --
 // run once now that all of these rows definitely exist, same reasoning/
@@ -5222,8 +5332,8 @@ CLICK_POSE_KEYS.forEach((p) => { parseClickPoseConfig(p); buildClickPoseWidgets(
 // control's own onChange (DEV_GROUPS, above) keeps this current after
 // that. Click Pose/Double-Click Pose/Right Click share CLICK_POSE_KEYS'
 // own Pause Duration slider; Click Hold-Pose/Right-Click Hold-Pose don't.
-CLICK_POSE_KEYS.forEach((p) => updateClickTriggerModeVisibility(p, ['PauseDurationMs']))
-CLICK_HOLD_KEYS.forEach((p) => { updateClickTriggerModeVisibility(p, [], ['LoopMode']); updateLoopHoldVisibility(p) })
+CLICK_POSE_KEYS.forEach((p) => { updateClickTriggerModeVisibility(p, ['PauseDurationMs']); updateOffsetRotationVisibility(p) })
+CLICK_HOLD_KEYS.forEach((p) => { updateClickTriggerModeVisibility(p, [], ['LoopMode']); updateLoopHoldVisibility(p); updateOffsetRotationVisibility(p) })
 // Bug fix (direct user report, "I dont see any of the saved poses in the
 // dropdown"): a `select` control's <option> list is populated by
 // `displayValue()` during the host's own restore-from-storage step
