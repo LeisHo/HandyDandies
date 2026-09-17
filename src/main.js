@@ -6,7 +6,7 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js'
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js'
 import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js'
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js'
-import { initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings } from './devpanel/devPanel.js?v=24'
+import { initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings } from './devpanel/devPanel.js?v=25'
 
 // A defensive wrapper around devPanel.js's own refreshSelectOptions() --
 // found via live testing (direct user report: "I dont see any of the
@@ -329,7 +329,7 @@ function tryStartField() {
   // whatever comes next; don't treat this comment's own reasoning above
   // as the settled explanation.
   renderer.compile(scene, camera)
-  window.__debug = { THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset }
+  window.__debug = { THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection } }
   loadingEl.classList.add('hidden')
 }
 setTimeout(() => { startupSettingsReady = true; tryStartField() }, 6000)
@@ -373,7 +373,7 @@ const DEV_GROUPS = [
     // realDeviceClass()` generically -- no devPanel.js changes were
     // needed to support this, just the `perDevice: true` flag per control.
     controls: [
-      { key: 'fieldRows', label: 'Rows (Count)', type: 'slider', min: 1, max: 40, step: 1, def: 15, perDevice: true, onChange: () => rebuildField() },
+      { key: 'fieldRows', label: 'Rows (Count)', type: 'slider', min: 1, max: 40, step: 1, def: 15, perDevice: true, dynamicDevice: true, onChange: () => rebuildField() },
       { key: 'fieldCols', label: 'Columns (Count)', type: 'slider', min: 1, max: 40, step: 1, def: 17, perDevice: true, onChange: () => rebuildField() },
       { key: 'rowSpacing', label: 'Row Spacing (World Units)', type: 'slider', min: 2, max: 40, step: 0.5, def: 9.5, perDevice: true, onChange: () => relayoutField() },
       { key: 'columnSpacing', label: 'Column Spacing (World Units)', type: 'slider', min: 2, max: 40, step: 0.5, def: 14, perDevice: true, onChange: () => relayoutField() },
@@ -447,7 +447,31 @@ const DEV_GROUPS = [
       // nothing to show for it isn't what was asked for.
       { key: 'loadingMinTimeMs', label: 'Min Loading Time (Ms)', type: 'slider', min: 0, max: 5000, step: 100, def: 1200 },
       { key: 'loadingPreviewTweenSelector', label: 'Loading Tween Sequence', type: 'select', def: '', options: () => (cfg.savedTweenSequences || []).map((s) => ({ value: s.name, group: s.group || null })) },
+      // Camera/Lighting selection for the loading preview's own SEPARATE
+      // scene -- direct follow-up request ("allow selecting a Camera
+      // setting and a Lighting setting for the chosen loading-preview
+      // tween sequence"). Empty selection (default) preserves the
+      // EXISTING auto-framed camera / cloned-live-lighting behavior
+      // exactly -- see buildLoadingPreview()'s own comment for where
+      // these are actually applied.
+      { key: 'loadingPreviewCameraSelector', label: 'Loading Preview Camera', type: 'select', def: '', options: () => (cfg.savedCameras || []).map((c) => ({ value: c.name, group: c.group || null })) },
+      { key: 'loadingPreviewLightingSelector', label: 'Loading Preview Lighting', type: 'select', def: '', options: () => (cfg.savedLighting || []).map((l) => ({ value: l.name, group: l.group || null })) },
       { key: 'loadingPreviewSpeedMs', label: 'Loading Preview Speed (Ms / Cycle)', type: 'slider', min: 200, max: 5000, step: 50, def: 900 },
+      // Sequence Mode - Count/Loop/Oscillate -- direct spec item, the
+      // SAME control shape just added to every click function (see
+      // makeClickPoseGroup()'s own matching comment for the full
+      // reasoning), reused here almost verbatim. ONE real difference:
+      // default 'Loop' (unbounded), not 'Count' -- this preserves the
+      // loading preview's own EXISTING always-loop-forever behavior as
+      // the default, rather than silently changing it to stop after 3
+      // laps for every current user. A click trigger's natural default
+      // is a bounded action; a loading animation's natural default is
+      // "keep playing for as long as the page is still loading."
+      { key: 'loadingPreviewSequenceMode', label: 'Sequence Mode - Count, Loop, Oscillate', type: 'select', def: 'Loop', options: () => ['Count', 'Loop', 'Oscillate'], onChange: () => updateLoadingPreviewSequenceVisibility() },
+      { key: 'loadingPreviewSequenceCount', label: 'Sequence Count', type: 'slider', min: 1, max: 50, step: 1, def: 3 },
+      { key: 'loadingPreviewSequenceCountMode', label: 'Sequence Count Mode - Loop, Oscillate', type: 'select', def: 'Loop', options: () => ['Loop', 'Oscillate'], onChange: () => updateLoadingPreviewSequenceVisibility() },
+      { key: 'loadingPreviewSequenceLoopTransition', label: 'Loop Transition On/Off', type: 'checkbox', def: true },
+      { key: 'loadingPreviewSequenceHoldMs', label: 'Sequence Hold Duration (Ms)', type: 'slider', min: 0, max: 5000, step: 10, def: 0 },
       { key: 'loadingPreviewSize', label: 'Loading Preview Size (Px)', type: 'slider', min: 80, max: 400, step: 10, def: 160, onChange: () => resizeLoadingPreview() }
     ]
   },
@@ -2966,6 +2990,14 @@ let loadingPreviewCamera = null
 let loadingPreviewCanvas = null
 let loadingPreviewAnimStartMs = 0
 const loadingPreviewBaseQuat = new THREE.Quaternion()
+// Sequence Mode (Count/Loop/Oscillate) state -- module-level, not per-
+// hand, since there's exactly ONE loading-preview instance. Reset in
+// buildLoadingPreview() (see its own call site below).
+let loadingPreviewLapIndex = 1
+let loadingPreviewLapStartMs = 0
+let loadingPreviewHoldEndMs = 0
+let loadingPreviewDirection = 1
+let loadingPreviewSequenceDone = false
 // Called once, from the GLTFLoader callback, right after modelRoot/
 // alignQuat/toonMaterial/handBoundsCenterLocal/handBoundsRadiusLocal are
 // all measured -- same one-time-measurement dependencies buildPosePreview()
@@ -2988,10 +3020,15 @@ function buildLoadingPreview() {
   // Clones of the main scene's own already-tuned lights -- same reasoning
   // as buildPosePreview()'s own identical comment (a from-scratch light
   // produced a flat, washed-out silhouette with no visible toon-shading
-  // steps).
+  // steps). A selected Lighting preset (direct follow-up request) then
+  // overrides these cloned starting values -- see
+  // applyLoadingPreviewLighting()'s own comment.
   const key = keyLight.clone()
   key.target = keyLight.target.clone()
-  loadingPreviewScene.add(key, key.target, hemiLight.clone())
+  const hemi = hemiLight.clone()
+  loadingPreviewScene.add(key, key.target, hemi)
+  const lightingPreset = (cfg.savedLighting || []).find((l) => l.name === cfg.loadingPreviewLightingSelector)
+  if (lightingPreset) applyLoadingPreviewLighting(key, hemi, lightingPreset)
 
   const clone = cloneSkeletal(modelRoot)
   clone.quaternion.copy(alignQuat)
@@ -3000,14 +3037,60 @@ function buildLoadingPreview() {
   loadingPreviewScene.add(clone)
   loadingPreviewHand = { clone, skinnedMesh }
 
-  const target = handBoundsCenterLocal.clone().applyQuaternion(alignQuat)
-  const pos = target.clone().add(new THREE.Vector3(0, handBoundsRadiusLocal * 0.15, handBoundsRadiusLocal * 2.4))
-  loadingPreviewCamera.position.copy(pos)
-  loadingPreviewCamera.lookAt(target)
+  // A selected Camera preset (direct follow-up request) overrides the
+  // existing auto-framed default -- reuses the same CAMERA_PRESET_KEYS
+  // shape Camera's own Saved Cameras list-picker already stores, applied
+  // to this preview's own SEPARATE camera object (not the main scene's),
+  // same reasoning as the lighting override above. Empty selection keeps
+  // the existing auto-framed behavior exactly as it was.
+  const cameraPreset = (cfg.savedCameras || []).find((c) => c.name === cfg.loadingPreviewCameraSelector)
+  if (cameraPreset) {
+    loadingPreviewCamera.position.set(
+      cameraPreset.cameraX ?? CAMERA_KEY_DEFAULTS.cameraX,
+      cameraPreset.cameraY ?? CAMERA_KEY_DEFAULTS.cameraY,
+      cameraPreset.cameraZ ?? CAMERA_KEY_DEFAULTS.cameraZ
+    )
+    loadingPreviewCamera.fov = cameraPreset.cameraFov ?? CAMERA_KEY_DEFAULTS.cameraFov
+    loadingPreviewCamera.updateProjectionMatrix()
+    loadingPreviewCamera.lookAt(cameraPreset.targetX ?? 0, cameraPreset.targetY ?? 0, cameraPreset.targetZ ?? 0)
+  } else {
+    const target = handBoundsCenterLocal.clone().applyQuaternion(alignQuat)
+    const pos = target.clone().add(new THREE.Vector3(0, handBoundsRadiusLocal * 0.15, handBoundsRadiusLocal * 2.4))
+    loadingPreviewCamera.position.copy(pos)
+    loadingPreviewCamera.lookAt(target)
+  }
 
   applyLoadingPreviewPose(poseDefaultValues)
   loadingPreviewAnimStartMs = performance.now()
+  // Sequence Mode state -- fresh for every build (a page-load-lifetime
+  // instance, but reset defensively rather than assuming this only ever
+  // runs once).
+  loadingPreviewLapIndex = 1
+  loadingPreviewLapStartMs = loadingPreviewAnimStartMs
+  loadingPreviewHoldEndMs = 0
+  loadingPreviewDirection = 1
+  loadingPreviewSequenceDone = false
   resizeLoadingPreview()
+}
+// Applies a Lighting preset's own values to the loading preview's own
+// cloned key/hemi lights -- a bespoke version of the main scene's
+// updateKeyLightPosition() (which is hardcoded to the global `keyLight`/
+// `sceneState.fieldRadius`, neither of which apply to this isolated
+// single-hand preview), scaled off `handBoundsRadiusLocal` instead of
+// the field's own radius -- the natural "scale of the visible thing" for
+// this preview, mirroring updateKeyLightPosition()'s own x3 factor.
+function applyLoadingPreviewLighting(key, hemi, preset) {
+  const az = THREE.MathUtils.degToRad(preset.keyAzimuth ?? LIGHTING_KEY_DEFAULTS.keyAzimuth)
+  const el = THREE.MathUtils.degToRad(preset.keyElevation ?? LIGHTING_KEY_DEFAULTS.keyElevation)
+  const r = handBoundsRadiusLocal * 3
+  key.position.set(r * Math.cos(el) * Math.cos(az), r * Math.sin(el), r * Math.cos(el) * Math.sin(az))
+  key.target.position.set(0, ((preset.keyTargetHeight ?? LIGHTING_KEY_DEFAULTS.keyTargetHeight) / 100) * handBoundsRadiusLocal, 0)
+  key.target.updateMatrixWorld()
+  key.intensity = preset.keyIntensity ?? LIGHTING_KEY_DEFAULTS.keyIntensity
+  key.color.set(preset.keyColor ?? LIGHTING_KEY_DEFAULTS.keyColor)
+  hemi.intensity = preset.ambientIntensity ?? LIGHTING_KEY_DEFAULTS.ambientIntensity
+  hemi.color.set(preset.ambientSkyColor ?? LIGHTING_KEY_DEFAULTS.ambientSkyColor)
+  hemi.groundColor.set(preset.ambientGroundColor ?? LIGHTING_KEY_DEFAULTS.ambientGroundColor)
 }
 // Sized directly off the Loading Preview Size (Px) slider (an inline
 // style, not CSS-var-driven like the main dev panel's own chrome, since
@@ -3041,22 +3124,79 @@ function applyLoadingPreviewPose(item) {
   applyWristPoseToSkeleton(loadingPreviewHand.skinnedMesh.skeleton, values)
   FINGER_NAMES.forEach((name) => applyCurlToSkeleton(name, loadingPreviewHand.skinnedMesh.skeleton, loadingPreviewBaseQuat, null, values))
 }
-// Continuously loops the selected Tween Sequence (default pose + every
-// named pose in it) for as long as the loading screen stays up -- reuses
-// lerpLoopSequence()'s own unbounded cyclic `tCyclic` position (see its
-// declaration comment) rather than a one-shot [0,1] progress, since this
-// preview's own duration is whatever the real load actually takes, not a
-// fixed length. Falls back to just holding the default pose (no visible
-// motion, but still a rendered hand) when no sequence is selected or it
-// resolves to zero poses.
+// Row visibility for the Loading Preview's own Sequence Mode controls --
+// same 2-level gating as updateSequencePlayModeVisibility() (Count's own
+// Sequence Count/Count Mode; Loop Transition only for a Loop-style
+// repeat), minus the Mode check that function also does (there's no
+// Single-Pose-vs-Sequence distinction here -- the Loading Preview group
+// is ALWAYS about sequence playback).
+function updateLoadingPreviewSequenceVisibility() {
+  const setRow = (suffix, visible) => {
+    const row = document.querySelector(`.dp-row[data-key="loadingPreviewSequence${suffix}"]`)
+    if (row) row.style.display = visible ? '' : 'none'
+  }
+  const playMode = cfg.loadingPreviewSequenceMode
+  const isCount = playMode === 'Count'
+  setRow('Count', isCount)
+  setRow('CountMode', isCount)
+  setRow('LoopTransition', playMode === 'Loop' || (playMode === 'Count' && cfg.loadingPreviewSequenceCountMode === 'Loop'))
+}
+// Plays the selected Tween Sequence (default pose + every named pose in
+// it) for as long as the loading screen stays up, per the Sequence Mode
+// (Count/Loop/Oscillate) settings -- same lap-based mechanism as
+// updateClickPoseForHand()'s own 'sequencePlaying' phase (see
+// makeClickPoseGroup()'s own control comment for the full reasoning),
+// generalized to module-level state (a single instance, not per-hand)
+// instead of per-hand `cp` state, and with no "release" concept at all
+// (this preview just plays until the page itself finishes loading).
+// 'Count' mode freezes at the last pose reached once its laps are used
+// up (`loadingPreviewSequenceDone`) rather than doing anything further --
+// there's no pause/retransition concept for a loading animation. Falls
+// back to just holding the default pose (no visible motion, but still a
+// rendered hand) when no sequence is selected or it resolves to zero
+// poses.
 function updateLoadingPreviewAnimation() {
   const seq = (cfg.savedTweenSequences || []).find((s) => s.name === cfg.loadingPreviewTweenSelector)
   const namedPoses = seq ? resolveTweenSequencePoses(seq.tweenPoses) : []
   if (namedPoses.length < 1) { applyLoadingPreviewPose(poseDefaultValues); return }
+  if (loadingPreviewSequenceDone) return // frozen at whatever was last applied
   const poses = [poseDefaultValues, ...namedPoses]
-  const segmentMs = Math.max(safeTweenSpeedMs(cfg.loadingPreviewSpeedMs) / poses.length, 1)
-  const tCyclic = (performance.now() - loadingPreviewAnimStartMs) / segmentMs
-  applyLoadingPreviewPose(lerpLoopSequence(poses, tCyclic))
+  const playMode = cfg.loadingPreviewSequenceMode
+  const lapStyle = playMode === 'Count' ? cfg.loadingPreviewSequenceCountMode : playMode
+  const totalLaps = playMode === 'Count' ? Math.max(cfg.loadingPreviewSequenceCount || 1, 1) : Infinity
+  const holdMs = Math.max(cfg.loadingPreviewSequenceHoldMs || 0, 0)
+  const now = performance.now()
+  if (loadingPreviewHoldEndMs && now < loadingPreviewHoldEndMs) return // mid-hold -- last applied pose stays, nothing to reapply (no other config drives this preview's own idle state)
+  if (loadingPreviewHoldEndMs && now >= loadingPreviewHoldEndMs) {
+    loadingPreviewHoldEndMs = 0
+    loadingPreviewLapStartMs = now
+    if (lapStyle === 'Oscillate') loadingPreviewDirection *= -1
+  }
+  const speedMs = Math.max(safeTweenSpeedMs(cfg.loadingPreviewSpeedMs), 1)
+  const lapT = THREE.MathUtils.clamp((now - loadingPreviewLapStartMs) / speedMs, 0, 1)
+  let values
+  if (lapStyle === 'Oscillate') {
+    const t = loadingPreviewDirection === 1 ? lapT : 1 - lapT
+    values = lerpTweenSequence(poses, t)
+  } else if (cfg.loadingPreviewSequenceLoopTransition === false) {
+    values = lerpTweenSequence(poses, lapT) // instant jump back to frame 1 between laps -- same forward pass every time, no wrap interpolation
+  } else {
+    const segments = poses.length
+    const tCyclic = (loadingPreviewLapIndex - 1) * segments + lapT * segments
+    values = lerpLoopSequence(poses, tCyclic) // smooth wrap-back -- same cyclic segment math Click Hold-Pose's own Loop Mode already uses
+  }
+  applyLoadingPreviewPose(values)
+  if (lapT >= 1) {
+    loadingPreviewLapIndex++
+    if (loadingPreviewLapIndex > totalLaps) {
+      loadingPreviewSequenceDone = true
+    } else if (holdMs > 0) {
+      loadingPreviewHoldEndMs = now + holdMs
+    } else {
+      loadingPreviewLapStartMs = now
+      if (lapStyle === 'Oscillate') loadingPreviewDirection *= -1
+    }
+  }
 }
 
 // -----------------------------------------------------------------------
@@ -5702,6 +5842,7 @@ CLICK_POSE_KEYS.forEach((p) => { parseClickPoseConfig(p); buildClickPoseWidgets(
 // own Pause Duration slider; Click Hold-Pose/Right-Click Hold-Pose don't.
 CLICK_POSE_KEYS.forEach((p) => { updateClickTriggerModeVisibility(p, ['PauseDurationMs']); updateOffsetRotationVisibility(p); updateSingleTimingGateVisibility(p); updateSequencePlayModeVisibility(p) })
 CLICK_HOLD_KEYS.forEach((p) => { updateClickTriggerModeVisibility(p, [], ['LoopMode', 'OnReleaseMode', 'TriggerAllHands']); updateLoopHoldVisibility(p); updateOffsetRotationVisibility(p); updateSingleTimingGateVisibility(p) })
+updateLoadingPreviewSequenceVisibility()
 // Bug fix (direct user report, "I dont see any of the saved poses in the
 // dropdown"): a `select` control's <option> list is populated by
 // `displayValue()` during the host's own restore-from-storage step
