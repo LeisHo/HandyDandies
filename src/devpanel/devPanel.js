@@ -712,7 +712,7 @@ export function refreshMultiSelectOptions(key) {
   commit(entry.ctrl, entry.values.slice())
 }
 
-function buildRow(ctrl) {
+export function buildRow(ctrl) {
   // Section 12j: no descriptive text/tooltips beyond the label itself --
   // dp-per-device is a plain CSS class (a color cue, not added text) so a
   // per-device setting is still visually distinguishable without prose.
@@ -1196,7 +1196,7 @@ function syncGroupLockIcon(g, icon) {
   icon.textContent = locked ? '🔒' : '🔓'
   icon.title = locked ? 'Locked -- click to unlock' : 'Unlocked -- click to lock'
 }
-function createGroupElement(title) {
+export function createGroupElement(title) {
   const g = el('div', 'dp-group')
   g.dataset.key = title
   const h = el('div', 'dp-group-header')
@@ -1313,6 +1313,43 @@ function addCustomGroup(groupsEl) {
   // current selection into it -- see setupDevGroupSelection()'s own
   // comment there for the full account (ported from
   // TEMPLATE_DEV_PANEL.html's 2026-09-16 addDevGroup()).
+  return g
+}
+// Lets a HOST (main.js) call this any time after initDevPanel() has run
+// to append ONE brand-new, fully-live group built from a caller-supplied
+// {title, controls} spec -- direct need: HANDY DANDIES' own dynamic "Add
+// Click Function" architecture, which creates a genuinely new group of
+// real, interactive controls (checkboxes/sliders/dropdowns bound to cfg)
+// at runtime, not just an empty group the user drags existing settings
+// into (addCustomGroup(), above, already covers that case). Reuses
+// createGroupElement()/buildRow() verbatim -- same drag handles,
+// collapse, click-to-edit, dynamicDevice chrome, curve widgets, etc. as
+// any static DEV_GROUPS entry.
+//
+// Pushes `groupSpec` into `devGroups` (the SAME array `initDevPanel()`
+// was originally given) so `findCtrl()`, `applyStoredValues()`,
+// `refreshRowDisplaysForEditingTab()`, and the dynamicDevice cascade
+// helpers all treat these new rows identically to a static group's own
+// -- confirmed via direct investigation that all 4 iterate `devGroups`
+// itself, not a separately-registered key list, so nothing else needs
+// updating for the new keys to be genuinely first-class. Seeds
+// cfg/store from each control's own `def` for any key not already
+// present (a previously-restored/saved value is never clobbered),
+// mirroring initDevPanel()'s own bootstrap loop.
+export function renderDynamicGroup(groupSpec) {
+  devGroups.push(groupSpec)
+  groupSpec.controls.forEach((c) => {
+    if (cfg[c.key] !== undefined) return
+    DEVICES.forEach((d) => { store[d][c.key] = c.def })
+    cfg[c.key] = c.def
+  })
+  const groupsEl = document.getElementById('dpGroups')
+  if (!groupsEl) return null // DEV_MODE off / panel never built -- nothing to render into
+  const g = createGroupElement(groupSpec.title)
+  const gb = g.querySelector('.dp-group-body')
+  groupSpec.controls.forEach((ctrl) => gb.appendChild(buildRow(ctrl)))
+  groupsEl.appendChild(g)
+  refreshRowDisplaysForEditingTab() // picks up any already-saved/restored values for the new keys
   return g
 }
 
@@ -2340,6 +2377,20 @@ export function initDevPanel(groups, opts = {}) {
       textOverrides = saved.textOverrides || {}
       applyTextOverrides()
       if (opts.onRestore) opts.onRestore()
+    } else {
+      // A brand-new visitor with nothing saved yet still needs an initial
+      // chrome paint for dynamicDevice rows (§12f-1) -- checkbox checked
+      // state + which one is shown for the current tab + row hide/show
+      // -- none of which buildRow() itself sets correctly at construction
+      // time (unlike every OTHER control type, which reads its own
+      // ctrl.def directly). Confirmed missing live via a from-scratch,
+      // isolated-storage test harness (2026-09-17): "Show in Mobile/
+      // Landscape" rendered unchecked instead of its documented true
+      // default, and BOTH checkboxes showed simultaneously instead of
+      // only the one relevant to the current tab -- applyStoredValues()
+      // (which normally calls this) never runs at all when there's
+      // nothing saved yet, so nothing else in this function did either.
+      refreshRowDisplaysForEditingTab()
     }
     let geom = null
     try { geom = JSON.parse(localStorage.getItem(currentGeomKey())) } catch (err) { geom = null }

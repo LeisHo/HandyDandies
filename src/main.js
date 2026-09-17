@@ -6,7 +6,7 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js'
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js'
 import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js'
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js'
-import { initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings } from './devpanel/devPanel.js?v=25'
+import { initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup } from './devpanel/devPanel.js?v=26'
 
 // A defensive wrapper around devPanel.js's own refreshSelectOptions() --
 // found via live testing (direct user report: "I dont see any of the
@@ -473,6 +473,64 @@ const DEV_GROUPS = [
       { key: 'loadingPreviewSequenceLoopTransition', label: 'Loop Transition On/Off', type: 'checkbox', def: true },
       { key: 'loadingPreviewSequenceHoldMs', label: 'Sequence Hold Duration (Ms)', type: 'slider', min: 0, max: 5000, step: 10, def: 0 },
       { key: 'loadingPreviewSize', label: 'Loading Preview Size (Px)', type: 'slider', min: 80, max: 400, step: 10, def: 160, onChange: () => resizeLoadingPreview() }
+    ]
+  },
+  {
+    // Phase 4, first slice, of the Click Function overhaul (direct
+    // request, "the other session is done. fix everything" -- confirmed
+    // via AskUserQuestion to proceed with a scoped-down first slice
+    // rather than the full spec at once). A genuinely NEW capability:
+    // custom click-triggered pose functions, created at runtime rather
+    // than hardcoded like the existing 10 (chp/rchp/dcHold/
+    // tripleClickHold/quadClickHold/click/dblclick/rc/tripleClick/
+    // quadClick). Required extending devPanel.js itself with a new
+    // exported `renderDynamicGroup()` (the engine had no way to inject a
+    // brand-new, LIVE, interactive control group at runtime before this
+    // -- only an EMPTY group the user drags existing settings into, see
+    // devPanel.js's own addCustomGroup()/its matching comment) --
+    // confirmed safe to do now (the concurrent session actively editing
+    // that file finished and pushed its own work first, direct
+    // confirmation).
+    //
+    // Deliberately scoped DOWN from the full original spec for this
+    // first slice, each a disclosed simplification, not an oversight:
+    // - Fire-and-forget (Click Pose family) only -- no Click+Hold/Right-
+    //   Click+Hold custom functions yet (a hold-based custom function
+    //   would need its own "+Add Click+Hold Function" entry point, since
+    //   the hold and fire-and-forget families are 2 architecturally
+    //   distinct state machines that can't share one control's worth of
+    //   "Type" switching -- see addCustomClickFunction()'s own comment).
+    // - Type is Click/Right Click only -- no Scroll (a genuinely new
+    //   trigger-detection subsystem this project has none of today),
+    //   no mobile multi-touch/zoom.
+    // - No click-count selector -- every custom function fires on a
+    //   plain single click/right-click only, same as this project's own
+    //   existing 'click'/'rc' triggers (not 'dblclick'/'tripleClick'/
+    //   'quadClick', which stay exclusive to their own hardcoded keys).
+    // - No delete-function button yet -- the dev panel's own existing
+    //   Delete Group/Setting (🗑) icon can remove a custom function's
+    //   GROUP from view, but won't clean up this feature's own
+    //   `customClickFunctionIds` bookkeeping or `CLICK_POSE_KEYS`/
+    //   `clickPoseTriggers` entries, so a "deleted" function would still
+    //   silently keep firing. Flagging rather than building a redundant
+    //   or incomplete delete mechanism this slice.
+    // - No duplicate-setting validation, no automatic hold-timing
+    //   conflict resolution (moot for this slice anyway -- fire-and-
+    //   forget functions don't have the hold-timing collision problem
+    //   hold-based ones do).
+    //
+    // `customClickFunctionIds` is the ONLY control in this static group
+    // -- a plain internal-bookkeeping text field (JSON array of
+    // `{id, title}`), never meant for direct editing, restored through
+    // the normal cfg pipeline like any other control (see
+    // restoreCustomClickFunctions()'s own comment for how it drives
+    // re-creating every custom function's LIVE group fresh on each page
+    // load, since `renderDynamicGroup()`'s own DOM rows don't persist
+    // across a reload on their own).
+    title: 'Custom Click Functions',
+    controls: [
+      { key: 'customClickFunctionIds', label: 'Custom Function IDs (Internal, Auto-Managed)', type: 'text', def: '[]' },
+      { key: 'addCustomClickFunctionBtn', label: '+ Add Click Function', type: 'button', onClick: () => addCustomClickFunction() }
     ]
   },
   {
@@ -1238,7 +1296,7 @@ const cfg = initDevPanel(DEV_GROUPS, {
   // declaration comment) -- the field now only ever builds once, using
   // these real values, instead of building once with code defaults and
   // visibly rebuilding again the moment this fires.
-  onRestore: () => { migrateModeTweenToSequence(); resyncPoseDefaultValues(); startupSettingsReady = true; tryStartField() }
+  onRestore: () => { migrateModeTweenToSequence(); resyncPoseDefaultValues(); restoreCustomClickFunctions(); startupSettingsReady = true; tryStartField() }
 })
 onChangeByCtrl.forEach((fn, c) => { c.onChange = fn })
 // Arm Length's 2 custom widgets (see their own declaration comments,
@@ -5038,14 +5096,24 @@ function parseClickPoseConfig(p) {
   try { t.retransitionRangeParsed = JSON.parse(cfg[`${p}RetransitionStartTimeRange`]) } catch (e) { /* keep last-good value */ }
 }
 function getOrInitHandCP(hand) {
-  if (!hand._cp) {
-    hand._cp = {}
-    // `pendingClaimAt`/`pendingForwardSnapshot`/`pendingNamedPoses`/
-    // `pendingFrozenSplayDeg`: the deferred-claim mechanism (direct
-    // request -- see updateClickPoseForHand()'s own top comment for the
-    // full account, mirroring Click-Hold-Pose's own).
-    CLICK_POSE_KEYS.forEach((p) => { hand._cp[p] = { phase: 'idle', triggerTime: 0, forwardSnapshot: null, tweenPoses: null, pauseStartTime: 0, retransitionStart: null, retransitionStartTime: 0, retransitionDelay: 0, lastAppliedValues: null, frozenSplayDeg: 0, pendingClaimAt: 0, pendingForwardSnapshot: null, pendingNamedPoses: null, pendingFrozenSplayDeg: 0, frozenSpeedMs: 0, pendingFrozenSpeedMs: 0, sequenceLapIndex: 1, sequenceLapStartTime: 0, sequenceHoldEndTime: 0, sequenceDirection: 1 } })
-  }
+  if (!hand._cp) hand._cp = {}
+  // `pendingClaimAt`/`pendingForwardSnapshot`/`pendingNamedPoses`/
+  // `pendingFrozenSplayDeg`: the deferred-claim mechanism (direct
+  // request -- see updateClickPoseForHand()'s own top comment for the
+  // full account, mirroring Click-Hold-Pose's own). Per-key backfill
+  // (not just a first-touch init) -- CORRECTED for Custom Click
+  // Functions (Phase 4): CLICK_POSE_KEYS can now grow at RUNTIME
+  // (addCustomClickFunction()), well after some hands' `_cp` was already
+  // built for the original static keys -- an unconditional `if
+  // (!hand._cp)` guard would leave a new custom id's own state slot
+  // permanently missing on every already-touched hand, crashing the
+  // very next frame this trigger fires for one of them. `if (!hand._cp[p])`
+  // per key is cheap (a handful of keys) and makes this safe to call
+  // again any time the key list changes.
+  CLICK_POSE_KEYS.forEach((p) => {
+    if (hand._cp[p]) return
+    hand._cp[p] = { phase: 'idle', triggerTime: 0, forwardSnapshot: null, tweenPoses: null, pauseStartTime: 0, retransitionStart: null, retransitionStartTime: 0, retransitionDelay: 0, lastAppliedValues: null, frozenSplayDeg: 0, pendingClaimAt: 0, pendingForwardSnapshot: null, pendingNamedPoses: null, pendingFrozenSplayDeg: 0, frozenSpeedMs: 0, pendingFrozenSpeedMs: 0, sequenceLapIndex: 1, sequenceLapStartTime: 0, sequenceHoldEndTime: 0, sequenceDirection: 1 }
+  })
   return hand._cp
 }
 // Right Click's own Sequence mode (cfg.rcMode === 'Sequence') shares this exact
@@ -5321,6 +5389,7 @@ window.addEventListener('pointerup', (e) => {
     clickPoseClickCount = 0
     clearTimeout(clickPoseClickTimer)
     triggerClickPose('click')
+    triggerCustomPoseFunctions('Click')
     return
   }
   clickPoseClickCount++
@@ -5328,6 +5397,11 @@ window.addEventListener('pointerup', (e) => {
   clickPoseClickTimer = setTimeout(() => {
     const idx = Math.min(clickPoseClickCount, CLICK_COUNT_CHAIN_KEYS.length) - 1
     triggerClickPose(CLICK_COUNT_CHAIN_KEYS[idx])
+    // Custom "Click" functions fire on a PLAIN single click only (no
+    // click-count selector yet -- see this feature's own DEV_GROUPS
+    // comment), so only when this resolved to exactly 1 click, never a
+    // double/triple/quad.
+    if (idx === 0) triggerCustomPoseFunctions('Click')
     clickPoseClickCount = 0
   }, cfg.multiClickWindowMs)
 })
@@ -5345,6 +5419,7 @@ window.addEventListener('pointerup', (e) => {
   if (e.button !== 2) return
   if (lastPointerupWasRchpHoldRelease) return
   triggerClickPose('rc')
+  triggerCustomPoseFunctions('Right Click')
 })
 
 // -----------------------------------------------------------------------
@@ -5646,6 +5721,19 @@ function buildGenericCurveWidget(row, opts) {
 // timing as buildArmLengthWidgets()/buildWristSplayWidgets().
 const CLICK_HOLD_START_TIME_TRACK_MAX = 3000 // ms -- a deliberately smaller ceiling than the 5000ms Transition Speed sliders, since "start time" is meant to stagger WITHIN a transition, not span longer than one
 function buildClickHoldPoseWidgets(p) {
+  // Animation Speed Curve's own curve/range widgets -- a real gap left
+  // over from when this control was first added (SpeedCurve/
+  // SpeedCurveRange rendered as plain raw-JSON text boxes instead of the
+  // interactive curve-graph widget every OTHER curve field gets), caught
+  // and fixed while building this generalized widget-builder for custom
+  // click functions. Distance->Speed, not distance->start-time, hence
+  // its own caption/track ceiling (matches the control's own 50-2000ms
+  // slider range, not the 0-3000ms start-time ceiling below).
+  const speedCurveRow = document.querySelector(`.dp-row[data-key="${p}SpeedCurve"]`)
+  const speedRangeRow = document.querySelector(`.dp-row[data-key="${p}SpeedCurveRange"]`)
+  const speedCurveCaption = 'X: Distance From Cursor (%, Nearest→Farthest Hand At Trigger Time)  ·  Y: Speed Fraction (0=Min, 1=Max)'
+  if (speedCurveRow) buildGenericCurveWidget(speedCurveRow, { caption: speedCurveCaption, defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
+  if (speedRangeRow) buildGenericRangeBarWidget(speedRangeRow, { trackMin: 50, trackMax: 2000, unit: 'ms', defaultValue: { min: 50, max: 2000 } })
   const startCurveRow = document.querySelector(`.dp-row[data-key="${p}StartTimeCurve"]`)
   const startRangeRow = document.querySelector(`.dp-row[data-key="${p}StartTimeRange"]`)
   const tweenStartCurveRow = document.querySelector(`.dp-row[data-key="${p}TweenStartTimeCurve"]`)
@@ -5680,6 +5768,14 @@ CLICK_HOLD_KEYS.forEach((p) => { parseClickHoldConfig(p); buildClickHoldPoseWidg
 // CLICK_HOLD_START_TIME_TRACK_MAX ceiling too, since "start time" means
 // the identical thing in both features.
 function buildClickPoseWidgets(p) {
+  // Animation Speed Curve's own curve/range widgets -- see
+  // buildClickHoldPoseWidgets()'s own matching comment for the full
+  // reasoning (a real gap fixed alongside it, shared word-for-word).
+  const speedCurveRow = document.querySelector(`.dp-row[data-key="${p}SpeedCurve"]`)
+  const speedRangeRow = document.querySelector(`.dp-row[data-key="${p}SpeedCurveRange"]`)
+  const speedCurveCaption = 'X: Distance From Cursor (%, Nearest→Farthest Hand At Trigger Time)  ·  Y: Speed Fraction (0=Min, 1=Max)'
+  if (speedCurveRow) buildGenericCurveWidget(speedCurveRow, { caption: speedCurveCaption, defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
+  if (speedRangeRow) buildGenericRangeBarWidget(speedRangeRow, { trackMin: 50, trackMax: 2000, unit: 'ms', defaultValue: { min: 50, max: 2000 } })
   const startCurveRow = document.querySelector(`.dp-row[data-key="${p}StartTimeCurve"]`)
   const startRangeRow = document.querySelector(`.dp-row[data-key="${p}StartTimeRange"]`)
   const tweenStartCurveRow = document.querySelector(`.dp-row[data-key="${p}TweenStartTimeCurve"]`)
@@ -5693,6 +5789,101 @@ function buildClickPoseWidgets(p) {
   if (tweenStartRangeRow) buildGenericRangeBarWidget(tweenStartRangeRow, { trackMin: 0, trackMax: CLICK_HOLD_START_TIME_TRACK_MAX, unit: 'ms', defaultValue: { min: 0, max: 300 } })
   if (retransCurveRow) buildGenericCurveWidget(retransCurveRow, { caption: curveCaption, defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
   if (retransRangeRow) buildGenericRangeBarWidget(retransRangeRow, { trackMin: 0, trackMax: CLICK_HOLD_START_TIME_TRACK_MAX, unit: 'ms', defaultValue: { min: 0, max: 300 } })
+}
+// -----------------------------------------------------------------------
+// Custom Click Functions (Phase 4, first slice) -- runtime-created
+// fire-and-forget pose triggers, see the "Custom Click Functions"
+// DEV_GROUPS entry's own comment for the full scoping account. Each
+// custom function joins CLICK_POSE_KEYS/clickPoseTriggers exactly like
+// one of the 10 hardcoded triggers -- updateClickPoseForHand(),
+// triggerClickPose(), getOrInitHandCP(), parseClickPoseConfig(), every
+// visibility function, ALL already generic over `p` and already proven
+// correct on 5 existing IDs, so a 6th+ ID needs ZERO changes there.
+// -----------------------------------------------------------------------
+let customClickFunctionIds = [] // [{id, title}] -- mirrors cfg.customClickFunctionIds (JSON), kept in sync by persistCustomClickFunctionIds()
+let nextCustomFunctionN = 1
+function persistCustomClickFunctionIds() {
+  const json = JSON.stringify(customClickFunctionIds)
+  cfg.customClickFunctionIds = json
+  syncValue('customClickFunctionIds', json)
+}
+// Builds and renders ONE custom function's live group -- reuses
+// makeClickPoseGroup() verbatim (the SAME factory click/dblclick/rc/
+// tripleClick/quadClick already use) for every control except Type,
+// which is spliced in right after Enabled (Type has no onChange of its
+// own -- the event-wiring below reads `cfg[`${id}Type`]` live at
+// trigger time, not through a visibility/state side effect).
+function renderCustomClickFunctionGroup(id, title) {
+  const base = makeClickPoseGroup(id, title, {})
+  const controls = base.controls.slice()
+  controls.splice(1, 0, { key: `${id}Type`, label: 'Type', type: 'select', def: 'Click', options: () => ['Click', 'Right Click'] })
+  renderDynamicGroup({ title, controls })
+  parseClickPoseConfig(id)
+  buildClickPoseWidgets(id)
+  updateClickTriggerModeVisibility(id, ['PauseDurationMs'])
+  updateOffsetRotationVisibility(id)
+  updateSingleTimingGateVisibility(id)
+  updateSequencePlayModeVisibility(id)
+}
+// Registers a new (or, on restore, a previously-saved) custom function
+// into every generic pipeline this project's existing 10 triggers
+// already run through -- pushing into CLICK_POSE_KEYS means the
+// render-order loop's own `CLICK_POSE_KEYS.forEach(...)` dispatch (see
+// its own comment further down) picks this id up automatically, no
+// separate dispatch code needed. `clickPoseTriggers[id]` mirrors the
+// exact shape every other entry in that object already has (see its own
+// declaration).
+function registerCustomClickFunction(id, title) {
+  CLICK_POSE_KEYS.push(id)
+  clickPoseTriggers[id] = {
+    startCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], startRangeParsed: { min: 0, max: 300 },
+    speedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], speedRangeParsed: { min: 50, max: 2000 },
+    tweenStartCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStartRangeParsed: { min: 0, max: 300 },
+    retransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionRangeParsed: { min: 0, max: 300 }
+  }
+  renderCustomClickFunctionGroup(id, title)
+}
+// "+ Add Click Function" button's own onClick.
+function addCustomClickFunction() {
+  const id = `custom${nextCustomFunctionN}`
+  const title = `Custom Function ${nextCustomFunctionN}`
+  nextCustomFunctionN++
+  customClickFunctionIds.push({ id, title })
+  registerCustomClickFunction(id, title)
+  persistCustomClickFunctionIds()
+}
+// Called once from onRestore (see initDevPanel()'s own opts, above) --
+// `renderDynamicGroup()`'s own DOM rows are pure runtime state, gone on
+// every fresh page load, so every previously-created custom function
+// needs re-registering (NOT re-adding to `customClickFunctionIds`
+// itself, which already came back correctly through the normal cfg
+// restore pipeline -- see the DEV_GROUPS control's own comment) from
+// scratch each load, same as `buildDevPanel()` itself does for the
+// static 10.
+function restoreCustomClickFunctions() {
+  let saved = []
+  try { saved = JSON.parse(cfg.customClickFunctionIds || '[]') } catch (e) { /* leave empty -- malformed value, nothing to restore */ }
+  if (!Array.isArray(saved)) saved = []
+  customClickFunctionIds = saved
+  let maxN = 0
+  saved.forEach((entry) => {
+    if (!entry || !entry.id) return
+    registerCustomClickFunction(entry.id, entry.title || entry.id)
+    const m = /^custom(\d+)$/.exec(entry.id)
+    if (m) maxN = Math.max(maxN, parseInt(m[1], 10))
+  })
+  nextCustomFunctionN = maxN + 1
+}
+// Piggybacks every enabled custom function of the matching Type onto
+// this project's EXISTING plain-single-click/-right-click detection
+// (see the 2 `pointerup` listeners below) -- deliberately not a
+// separate click-count/timing stream of its own (no click-count
+// selector yet, disclosed simplification -- see the DEV_GROUPS group's
+// own comment).
+function triggerCustomPoseFunctions(type) {
+  customClickFunctionIds.forEach(({ id }) => {
+    if (cfg[`${id}Type`] === type) triggerClickPose(id)
+  })
 }
 // Shared by every Click-family trigger group with a Mode dropdown
 // (originally Right Click's own "the relevant setting ui only show when
