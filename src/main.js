@@ -195,6 +195,20 @@ let cursorLogTimer = null
 // window, and the Mouse Tracking Log's own multi-click classification --
 // deliberately still ONE setting, not 3 separately-tuned ones, per this
 // value's own original "for consistency" intent.
+// INVARIANT (see makeClickHoldPoseGroup()'s own `${p}HoldConfirmMs` control
+// comment, 2026-09-15, for the full original account): every CLICK_HOLD_KEYS
+// member's own HoldConfirmMs should be >= this value. If it's lower, a press
+// held just long enough to make its pose VISIBLE isn't necessarily held long
+// enough to be CLASSIFIED as a genuine hold on release (vs. "just another
+// clean click continuing a multi-click chain") -- the pose flashes on then
+// immediately reverses, and/or the click-hold chain misreads a real hold as
+// a clean click. Confirmed live 2026-09-16 as the actual cause of "triple-
+// click-hold works, quad-click-hold doesn't": `quadClickHoldHoldConfirmMs`
+// had drifted to 310ms (below this 500ms threshold) while
+// `tripleClickHoldHoldConfirmMs` correctly sat at 500 -- corrected in the
+// live settings, not by raising this constant. This is a real recurring
+// footgun (the SAME bug class already hit chp/rchp once before) -- when
+// tuning any `${p}HoldConfirmMs` slider, check it against this value.
 const MOUSE_LOG_HELD_DRAG_MS = 500
 let mouseLogClickCount = 0
 let mouseLogClickTimer = null
@@ -315,7 +329,7 @@ function tryStartField() {
   // whatever comes next; don't treat this comment's own reasoning above
   // as the settled explanation.
   renderer.compile(scene, camera)
-  window.__debug = { THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState }
+  window.__debug = { THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset }
   loadingEl.classList.add('hidden')
 }
 setTimeout(() => { startupSettingsReady = true; tryStartField() }, 6000)
@@ -989,7 +1003,23 @@ const DEV_GROUPS = [
       { key: 'keyColor', label: 'Key Light Color', type: 'color', def: '#ffffff', onChange: (v) => { keyLight.color.set(v) } },
       { key: 'ambientIntensity', label: 'Ambient Intensity (x)', type: 'slider', min: 0, max: 3, step: 0.05, def: 0, onChange: (v) => { hemiLight.intensity = v } },
       { key: 'ambientSkyColor', label: 'Ambient Sky Color', type: 'color', def: '#cfe8ff', onChange: (v) => { hemiLight.color.set(v) } },
-      { key: 'ambientGroundColor', label: 'Ambient Ground Color', type: 'color', def: '#000000', onChange: (v) => { hemiLight.groundColor.set(v) } }
+      { key: 'ambientGroundColor', label: 'Ambient Ground Color', type: 'color', def: '#000000', onChange: (v) => { hemiLight.groundColor.set(v) } },
+      // Direct request ("also make it so i can save seaparet light
+      // setttings" / "save, use, delete etc") -- mirrors Camera's own
+      // `savedCameras` list-picker exactly (captureCurrent/onUse), applied
+      // directly to the live keyLight/hemiLight the same way Camera's own
+      // applies directly to the live camera (no preview concept here
+      // either). See captureLightingPreset()/applyLightingPreset() below.
+      {
+        key: 'savedLighting',
+        label: 'Saved Lighting',
+        type: 'list-picker',
+        def: [],
+        itemLabel: 'Lighting',
+        importable: true,
+        captureCurrent: () => captureLightingPreset(),
+        onUse: (item) => applyLightingPreset(item)
+      }
     ]
   },
   {
@@ -2646,6 +2676,43 @@ function buildCameraDefaultButton() {
   else actionsRow.appendChild(btn)
 }
 buildCameraDefaultButton()
+// Lighting's own Saved-Lighting mechanism -- same shape as Camera's own
+// above (capture/apply directly to the live scene, no preview concept),
+// minus a "Default" button: unlike Pose's poseDefaultValues (what a
+// retransition falls back to) or Camera's cameraDefaultValues (what Max
+// Extents bounds against), no other system in this project reads a
+// tracked "lighting default" -- a saved lighting preset only ever needs
+// Save/Use/Rename/Delete, all already provided by the generic list-picker
+// control itself, so there's nothing extra to inject here.
+const LIGHTING_PRESET_KEYS = ['keyAzimuth', 'keyElevation', 'keyTargetHeight', 'keyIntensity', 'keyColor', 'ambientIntensity', 'ambientSkyColor', 'ambientGroundColor']
+const LIGHTING_KEY_DEFAULTS = {}
+DEV_GROUPS.find((g) => g.title === 'Lighting').controls.forEach((c) => {
+  if (LIGHTING_PRESET_KEYS.includes(c.key)) LIGHTING_KEY_DEFAULTS[c.key] = c.def
+})
+function captureLightingPreset() {
+  const item = {}
+  LIGHTING_PRESET_KEYS.forEach((key) => { item[key] = cfg[key] })
+  return item
+}
+// Applies a lighting preset (a Saved Lighting item OR any pose-shaped
+// fallback) directly to the live keyLight/hemiLight, writing through to
+// cfg first so updateKeyLightPosition() (which reads cfg live, not a
+// passed value) picks up the new azimuth/elevation/aim-height -- then
+// syncs the panel's own sliders/color-pickers to match, same reasoning
+// as applyCameraPreset()'s own final syncValue() calls.
+function applyLightingPreset(item) {
+  LIGHTING_PRESET_KEYS.forEach((key) => {
+    const value = item[key] !== undefined ? item[key] : LIGHTING_KEY_DEFAULTS[key]
+    cfg[key] = value
+    syncValue(key, value)
+  })
+  updateKeyLightPosition()
+  keyLight.intensity = cfg.keyIntensity
+  keyLight.color.set(cfg.keyColor)
+  hemiLight.intensity = cfg.ambientIntensity
+  hemiLight.color.set(cfg.ambientSkyColor)
+  hemiLight.groundColor.set(cfg.ambientGroundColor)
+}
 // Sets the initial maxDistance bound on page load -- restored-from-
 // localStorage `cameraMaxExtentsEnabled: true` doesn't fire its own
 // onChange during initDevPanel() (see this project's own established

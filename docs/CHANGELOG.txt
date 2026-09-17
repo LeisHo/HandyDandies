@@ -5753,6 +5753,81 @@ if 600ms still isn't quite enough.
 Cache-buster bump: `index.html`'s own `main.js?v=129` -> `?v=130`.
 
 --------------------------------------------------------------------------------
+2026-09-17  -  03:05:44 - 03:18:22 EDT (12m38s, measured)
+
+**"Triple-click-hold works, quad-click-hold doesn't" -- root cause found
+via direct settings inspection, not live reproduction.** Direct report.
+Read every place `tripleClickHold`/`quadClickHold` are handled
+(initialization, the per-frame update loop, trigger registration, the
+`CLICK_HOLD_CHAIN_KEYS` indexing) and confirmed both are byte-for-byte
+symmetric in code -- no special-casing explains an asymmetry there.
+Attempted live reproduction via synthetic `PointerEvent` dispatch in a
+test page; this hit an unexplained wall (even the simplest case,
+double-click-hold, never armed via synthetic events, while calling the
+same internal functions directly worked fine every time) -- synthetic
+`dispatchEvent()` apparently doesn't drive this code path the way a real
+mouse does in this environment. Abandoned that approach rather than keep
+spending time on an unreliable test method (CLAUDE.md §0b).
+
+Found the real cause instead by comparing live settings directly:
+`tripleClickHoldHoldConfirmMs = 500` (correct) vs.
+`quadClickHoldHoldConfirmMs = 310` (WRONG) -- violating a documented
+invariant from this project's own 2026-09-15 fix for the identical bug
+class on chp/rchp (`makeClickHoldPoseGroup()`'s own `${p}HoldConfirmMs`
+control comment): a hold's own confirm delay must be >=
+`MOUSE_LOG_HELD_DRAG_MS` (500ms, the threshold deciding whether a
+release counts as a genuine hold vs. a clean click continuing the
+multi-click chain). Below that, a press long enough to make the pose
+BECOME VISIBLE isn't necessarily long enough to be CLASSIFIED as a hold
+on release -- the pose can flash on then immediately reverse, and/or the
+click-hold chain can misread a real hold as "just another click,
+continue the chain," never actually committing quadClickHold. Fixed:
+`quadClickHoldHoldConfirmMs` corrected to `500` across all 3 device
+blocks in `dev-panel-settings.json` (matching tripleClickHold's own
+already-correct value), minimal diff confirmed via `git diff` (exactly
+3 lines). Added a documenting comment at `MOUSE_LOG_HELD_DRAG_MS`'s own
+declaration (`main.js` ~198) explaining this invariant explicitly, since
+it isn't visually obvious from the dev panel UI and has now caused the
+same bug class twice -- a future re-tuning of any `${p}HoldConfirmMs`
+slider should check it against this value.
+
+**New feature: saveable/named Lighting presets ("also make it so i can
+save separate light setttings" / "save, use, delete etc").** Mirrors
+Camera's own `savedCameras` list-picker exactly -- same shape
+(captureCurrent/onUse, applied directly to the live scene, no preview
+concept), same generic devPanel.js list-picker machinery already proven
+by 3+ other controls in this file (savedPoses/savedCameras/
+savedTweenSequences). New `savedLighting` control (Lighting group, after
+the 8 existing light sliders/colors); `LIGHTING_PRESET_KEYS` (all 8:
+keyAzimuth/keyElevation/keyTargetHeight/keyIntensity/keyColor/
+ambientIntensity/ambientSkyColor/ambientGroundColor);
+`captureLightingPreset()`/`applyLightingPreset()` (placed right after
+the Camera preset block, same file location pattern). No "Default"
+button injected (unlike Pose's/Camera's own) -- deliberately, since
+nothing else in this project reads a tracked "lighting default" the way
+`poseDefaultValues`/`cameraDefaultValues` are read elsewhere; Save/Use/
+Rename/Delete (the generic list-picker's own built-ins) are the whole
+ask. `applyLightingPreset()` writes through to `cfg` first (so
+`updateKeyLightPosition()`, which reads `cfg` live rather than a passed
+value, picks up the change), then sets `keyLight`/`hemiLight` directly,
+then syncs the panel's own sliders/color-pickers via `syncValue()`.
+
+Verified live: the "Saved Lighting" list-picker renders correctly with
+the full standard action row (Save/Overwrite/Use/Rename/Delete/+Group/
+Import). The UI's own Save flow (a native name prompt) wasn't directly
+exercisable through the browser-automation tool, but that's unmodified,
+already-proven devPanel.js chrome, not new code -- instead verified the
+actually-new logic directly: exposed `captureLightingPreset`/
+`applyLightingPreset` on `window.__debug` (matching the existing
+Camera-function exposure convention there) and ran a full capture ->
+mutate -> re-apply round trip, confirming both `cfg` AND the real
+`THREE.DirectionalLight`/`HemisphereLight` objects (intensity, color,
+recalculated position) end up correctly restored, not just the config
+values. `node --check` passes; no console errors on load.
+
+Cache-buster bump: `index.html`'s own `main.js?v=130` -> `?v=132`.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

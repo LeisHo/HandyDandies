@@ -18,6 +18,28 @@ work seamlessly from there.
 
 ## Currently working on
 
+**SHIPPED 2026-09-17: quad-click-hold root cause fixed (a live-settings
+value, not a code bug), plus new saveable Lighting presets.**
+`quadClickHoldHoldConfirmMs` was `310ms`, below the documented `500ms`
+invariant (`MOUSE_LOG_HELD_DRAG_MS`) every `CLICK_HOLD_KEYS` member's
+own confirm delay must meet -- corrected to `500` (matching
+tripleClickHold's own already-correct value) across all 3 device
+blocks. Separately, a new `savedLighting` list-picker (Lighting group)
+mirrors Camera's own `savedCameras` exactly -- Save/Use/Rename/Delete
+for the 8 light sliders/colors, applied directly to the live scene.
+Verified via direct capture->mutate->reapply round trip against both
+`cfg` and the real THREE.js light objects. See CHANGELOG.txt's matching
+entry for the full account, including why live event-dispatch testing
+of the click-hold gesture itself was abandoned as unreliable in this
+environment.
+
+**Housekeeping flag, not yet acted on:** this doc has drifted well past
+its own "live picture, not a log" rule (CLAUDE.md §4c) -- most of what
+follows below is fully-resolved 2026-09-15/16 history that CHANGELOG.txt
+already preserves permanently. Worth a dedicated pruning pass; not done
+as a side effect of this entry since evaluating each item's continued
+relevance is its own real task, not a 2-minute cleanup.
+
 **SHIPPED 2026-09-16: Loading Preview -- a single animated hand cycles
 through a Tween Sequence on the loading screen while the full field
 builds behind it.** New "Loading Preview" dev-panel group:
