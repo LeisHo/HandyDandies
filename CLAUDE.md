@@ -257,3 +257,22 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   "newest X goes first" needs to hold across 2+ structurally different
   ways X can be created, a shared explicit order list beats trying to
   keep 2 separate arrays' own insertion order in sync.
+- **This project's `devPanel.js` top-level group system is NOT built from
+  `.claude/TEMPLATE_DEV_PANEL.html` and never fully matches its class
+  names or DOM shape.** Confirmed 2026-09-17 while porting the template's
+  own 2026-09-16/17 changes (header icon buttons, right-click-arm +
+  shift-click fold-into-group, Ctrl+F search): this file uses
+  `.dp-group`/`.dp-group-header`/`.dp-drag-handle`/`.dp-row`/`.dp-row-
+  handle` (plain flexbox layout, handle centered via `align-items:
+  center`, never absolutely positioned) where the template uses
+  `.dev-section`/`.dev-section-title`/`.dev-group-drag-handle`/`.dev-
+  row`/`.dev-row-drag-handle` (absolutely-positioned handle needing its
+  own height-matching-formula fix, which this project never needed). It
+  also has NO per-tab DOM duplication (one shared `groupsEl` for
+  Desktop/Mobile/Landscape -- `switchTab()` only swaps displayed VALUES,
+  never which rows/groups exist) and no built-in "Debug" group concept
+  with its own anchor-ordering logic. Before porting a future template
+  change here, re-verify class names and DOM shape rather than assuming
+  a 1:1 port — 2 of the 4 changes reviewed this round turned out not to
+  apply at all for exactly this reason. See CHANGELOG.txt's matching
+  2026-09-17 entry for the full account of what was and wasn't ported.

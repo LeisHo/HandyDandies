@@ -85,6 +85,10 @@ html, body {
   background: #3a3a4a; color: var(--dp-text-color, #e8e8f0); border: none; border-radius: 3px;
   cursor: pointer; font-size: 12px; padding: 0;
 }
+.dp-header-buttons { display: flex; gap: 4px; }
+/* Pressed-look for a toggled-on header icon button (Text Edit Mode while
+   active) and for Add Group while right-click-armed for selection. */
+.dp-icon-btn.active, .dp-icon-btn.armed { background: var(--dp-accent-color, #7d8cff); color: #14142a; }
 .dp-body {
   padding: 4px 8px 10px; overflow-y: auto; flex: 1 1 auto; min-height: 0;
   /* Thin scrollbar (previously the browser default, ~15-17px) so its own
@@ -177,12 +181,22 @@ html, body {
    by ensurePosePreviewPanel(), which win over width/border-radius here). */
 .dp-pose-preview-canvas { display: block; border-radius: 4px; touch-action: none; cursor: grab; }
 .dp-pose-preview-canvas:active { cursor: grabbing; }
-.dp-add-group-row { margin: 0 2px 8px; }
-.dp-add-group-row button {
-  width: 100%; background: #3a3a4a; color: var(--dp-text-color, #e8e8f0); border: none; border-radius: 4px;
-  padding: 5px 4px; font-size: var(--dp-body-font-size, 11px); cursor: pointer;
+/* Add Group moved to a header icon button (2026-09-17, matching
+   TEMPLATE_DEV_PANEL.html's own 2026-09-16 restructure) -- .dp-add-group-row
+   no longer exists in the DOM; see .dp-header-buttons/.dp-icon-btn below. */
+/* Shift+click (or a right-click-armed plain click) selection outline for
+   folding a group/setting into a newly-created group -- see
+   setupDevGroupSelection() in devPanel.js. Outline (not border) so it
+   never shifts layout. */
+.dp-selected { outline: 1px solid var(--dp-accent-color, #7d8cff); outline-offset: -1px; }
+/* Ctrl+F-style search row (devPanel.js's searchInput/searchCount). */
+.dp-search-row { display: flex; align-items: center; gap: 6px; padding: 2px 2px 8px; }
+.dp-search-input {
+  flex: 1 1 auto; background: #0f0f18; color: var(--dp-text-color, #e8e8f0);
+  border: 1px solid #33333f; border-radius: 4px; padding: 4px 6px; font: inherit;
 }
-.dp-add-group-row button:active { background: #4a4a5e; }
+.dp-search-count { flex: 0 0 auto; font-size: 10px; color: #888; white-space: nowrap; }
+.dp-search-highlight-active { outline: 1px solid #ffcc00; outline-offset: -1px; }
 .dp-row { display: flex; align-items: center; gap: 6px; padding: 3px 2px; }
 .dp-row label {
   flex: 0 0 auto; width: 112px; font-size: var(--dp-settings-title-font-size, 11px); color: var(--dp-text-color, #c9c9d8);
@@ -320,7 +334,6 @@ html, body {
    category) rather than a single shared toggle, matching this project
    family's own "decompose, don't bundle" dev-panel convention. */
 .dp-panel.dp-caps-button-text .dp-actions button,
-.dp-panel.dp-caps-button-text .dp-add-group-row button,
 .dp-panel.dp-caps-button-text .dp-list-picker-actions button,
 .dp-panel.dp-caps-button-text .dp-action-button {
   text-transform: uppercase;
@@ -331,7 +344,7 @@ html, body {
    height, extra vertical text padding) -- one combined rule covering
    every dev-panel button, so "Button" means the same thing everywhere
    rather than only the top Copy/Save/Reset row. */
-.dp-actions button, .dp-add-group-row button, .dp-list-picker-actions button, .dp-action-button {
+.dp-actions button, .dp-list-picker-actions button, .dp-action-button {
   color: var(--dp-button-text-color, var(--dp-text-color, #e8e8f0));
   font-size: var(--dp-button-font-size, var(--dp-body-font-size, 11px));
   min-height: var(--dp-button-height, 0px);

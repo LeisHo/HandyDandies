@@ -1157,6 +1157,11 @@ function addCustomGroup(groupsEl) {
   const g = createGroupElement(name)
   groupsEl.appendChild(g)
   g.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  // Returned so the header's Add Group button (initDevPanel) can fold a
+  // current selection into it -- see setupDevGroupSelection()'s own
+  // comment there for the full account (ported from
+  // TEMPLATE_DEV_PANEL.html's 2026-09-16 addDevGroup()).
+  return g
 }
 
 // Generic pointer-based drag-to-reorder. Used both for groups (single
@@ -1907,8 +1912,23 @@ export function initDevPanel(groups, opts = {}) {
   })
   const header = el('div', 'dp-header', { id: 'dpHeader' })
   header.appendChild(el('span', 'dp-title', { textContent: 'DEV' }))
+  // Text Edit Mode / Add Group / Collapse All -- header icon buttons,
+  // ported from TEMPLATE_DEV_PANEL.html's own 2026-09-16 restructure
+  // (previously a standalone checkbox row above "+ Add Group", and a
+  // separate per-tab text button -- see the removed textEditModeRow-
+  // relocation and addGroupRow code further down for what this
+  // replaces). Wired near the end of this function, once groupsEl/
+  // addCustomGroup/commit/findCtrl are all in scope -- safe: these are
+  // plain closures over initDevPanel()'s own function scope, only ever
+  // actually invoked on a real click, well after every one of those is
+  // assigned.
+  const headerButtons = el('div', 'dp-header-buttons')
+  const textEditBtn = el('button', 'dp-icon-btn', { type: 'button', textContent: '✎', title: 'Toggle Label Rename Mode' })
+  const addGroupBtn = el('button', 'dp-icon-btn', { type: 'button', textContent: '+', title: 'Add Group (right-click: select settings/groups to fold in)' })
+  const collapseAllBtn = el('button', 'dp-icon-btn', { type: 'button', textContent: '⊟', title: 'Collapse All Groups' })
   const collapseBtn = el('button', 'dp-icon-btn', { type: 'button', textContent: '–', title: 'Collapse' })
-  header.appendChild(collapseBtn)
+  headerButtons.append(textEditBtn, addGroupBtn, collapseAllBtn, collapseBtn)
+  header.appendChild(headerButtons)
   panel.appendChild(header)
 
   const body = el('div', 'dp-body', { id: 'dpBody' })
@@ -1988,12 +2008,20 @@ export function initDevPanel(groups, opts = {}) {
   const resetBtn = el('button', null, { type: 'button', textContent: 'Reset' })
   actions.append(copyBtn, saveBtn, resetBtn)
   body.appendChild(actions)
+  // Ctrl+F-style search for group/setting names, ported from
+  // TEMPLATE_DEV_PANEL.html's own 2026-09-17 addition (itself ported
+  // from DickoClicko). This project has no per-tab DOM duplication --
+  // one shared groupsEl for all 3 devices, switchTab() only swaps which
+  // VALUES are shown, not which rows exist -- so this is simpler than
+  // the template's own tab-scoped version: no getActiveDevPanelTab()
+  // needed, it just searches groupsEl directly. See the wiring near the
+  // end of this function (devSearch*).
+  const searchRow = el('div', 'dp-search-row')
+  const searchInput = el('input', 'dp-search-input', { type: 'text', placeholder: 'Search...', autocomplete: 'off' })
+  const searchCount = el('span', 'dp-search-count')
+  searchRow.append(searchInput, searchCount)
+  body.appendChild(searchRow)
   const groupsEl = el('div', 'dp-groups', { id: 'dpGroups' })
-  const addGroupRow = el('div', 'dp-add-group-row')
-  const addGroupBtn = el('button', null, { type: 'button', textContent: '+ Add Group' })
-  addGroupBtn.addEventListener('click', () => addCustomGroup(groupsEl))
-  addGroupRow.appendChild(addGroupBtn)
-  body.appendChild(addGroupRow)
   body.appendChild(groupsEl)
   panel.appendChild(body)
   ;['n', 's', 'e', 'w', 'ne', 'nw', 'se', 'sw'].forEach((dir) => {
@@ -2015,8 +2043,16 @@ export function initDevPanel(groups, opts = {}) {
   // group's one flat, non-subgrouped row) and moved to sit directly in
   // `body`, above `addGroupRow`, a true panel-level standalone control
   // matching the template's own placement for this same checkbox.
+  // Text Edit Mode moved to the header icon button (textEditBtn, above) --
+  // no longer a standalone checkbox row (CORRECTED 2026-09-17, matching
+  // TEMPLATE_DEV_PANEL.html's own 2026-09-16 change; this project's own
+  // 2026-09-14 request had it as a standalone row above Add Group, which
+  // is what's being superseded here). Still a registered control -- cfg/
+  // store/Copy/Save/Reset all keep working with zero extra code, same
+  // key, same commit() pipeline -- just detached from the visible DOM
+  // entirely rather than relocated into a visible row.
   const textEditModeRow = groupsEl.querySelector('.dp-row[data-key="dp_textEditMode"]')
-  if (textEditModeRow) body.insertBefore(textEditModeRow, addGroupRow)
+  if (textEditModeRow) textEditModeRow.remove()
   // Generic hook for a PROJECT's own group (e.g. main.js's "Pose"), same
   // "flat rows -> named subgroups, once, before a real saved order takes
   // over" shape as organizeDevPanelSubgroups() above but not hardcoded to
@@ -2299,6 +2335,188 @@ export function initDevPanel(groups, opts = {}) {
     else if (e.key === 'r' || e.key === 'R') resetSettings()
   })
 
+  // Shift+click (or a right-click-armed plain click) selects one or more
+  // top-level groups/settings; the header's Add Group button then folds
+  // the selection into the group it creates instead of leaving it empty
+  // -- ported from TEMPLATE_DEV_PANEL.html's own 2026-09-16 addition
+  // (setupDevGroupSelection()/addDevGroup()/setupDevHeaderIconButtons()).
+  // Deliberately excludes anything inside a list-picker control
+  // (.dp-list-picker-row-container) -- that control already has its OWN
+  // shift-click multi-select (buildListPickerRow(), added 2026-09-15 for
+  // the Tween/Pose selector) with different semantics (it range-selects
+  // list ITEMS for that one control's own "+Group", not top-level dev-
+  // panel groups/settings); without this exclusion, this new capturing
+  // listener would stopPropagation() before the picker's own bubble-
+  // phase click handler ever ran, silently breaking that pre-existing
+  // feature.
+  const devPanelSelectedItems = new Set()
+  let devGroupSelectionArmed = false
+  function toggleDevSelection(target) {
+    if (devPanelSelectedItems.has(target)) {
+      devPanelSelectedItems.delete(target)
+      target.classList.remove('dp-selected')
+    } else {
+      devPanelSelectedItems.add(target)
+      target.classList.add('dp-selected')
+    }
+  }
+  function clearDevSelection() {
+    devPanelSelectedItems.forEach((t) => t.classList.remove('dp-selected'))
+    devPanelSelectedItems.clear()
+  }
+  function disarmDevGroupSelection() {
+    devGroupSelectionArmed = false
+    addGroupBtn.classList.remove('armed')
+  }
+  panel.addEventListener('click', (e) => {
+    if (!e.shiftKey && !devGroupSelectionArmed) return
+    if (e.target.closest('.dp-list-picker-row-container')) return
+    const headerEl = e.target.closest('.dp-group-header')
+    const target = headerEl ? headerEl.closest('.dp-group') : e.target.closest('.dp-row')
+    if (!target) return
+    e.preventDefault()
+    e.stopPropagation()
+    toggleDevSelection(target)
+  }, true)
+  // Per the template's own explicit clear condition -- only a click
+  // OUTSIDE the panel clears the selection; normal clicks/drags inside
+  // the panel (adjusting a slider, collapsing a group, switching tabs)
+  // leave it alone. Also disarms right-click select-mode, same reasoning.
+  document.addEventListener('click', (e) => {
+    if (panel.contains(e.target)) return
+    if (devPanelSelectedItems.size) clearDevSelection()
+    if (devGroupSelectionArmed) disarmDevGroupSelection()
+  }, true)
+
+  textEditBtn.addEventListener('click', () => {
+    commit(findCtrl('dp_textEditMode'), !textEditModeEnabled)
+    textEditBtn.classList.toggle('active', textEditModeEnabled)
+  })
+  // A plain left click: if armed (a right-click already started a
+  // selection), this still just creates the group and folds the
+  // selection in -- addCustomGroup() always does that when a selection
+  // exists, regardless of how it got armed. If NOT armed, unchanged
+  // original behavior (create an empty group immediately).
+  addGroupBtn.addEventListener('click', () => {
+    const g = addCustomGroup(groupsEl)
+    if (devPanelSelectedItems.size) {
+      const gb = g.querySelector(':scope > .dp-group-body')
+      devPanelSelectedItems.forEach((t) => gb.appendChild(t))
+      clearDevSelection()
+    }
+    disarmDevGroupSelection()
+  })
+  // Right click: arms select mode on the FIRST right-click (no group
+  // created yet -- just starts letting plain left-clicks select). A
+  // SECOND right-click, while already armed, finalizes instead --
+  // matches the template's own "when i left click or right click Add
+  // Group again" wording (either button, once armed, does the same
+  // finalize action).
+  addGroupBtn.addEventListener('contextmenu', (e) => {
+    e.preventDefault()
+    if (devGroupSelectionArmed) addGroupBtn.click()
+    else { devGroupSelectionArmed = true; addGroupBtn.classList.add('armed') }
+  })
+  // Collapses every group (any nesting depth) that isn't already
+  // collapsed. No per-tab scoping needed (unlike the template's own
+  // getActiveDevPanelTab()-scoped version) -- this project has a single
+  // shared groupsEl for all 3 devices, not separate per-tab DOM trees.
+  collapseAllBtn.addEventListener('click', () => {
+    groupsEl.querySelectorAll('.dp-group-header').forEach((h) => {
+      const g = h.closest('.dp-group')
+      if (g && !g.classList.contains('collapsed')) g.classList.add('collapsed')
+    })
+  })
+
+  // Ctrl+F-style search wiring (searchInput/searchCount created above,
+  // near groupsEl). See collectDevSearchMatches()'s own comment there
+  // for why this doesn't need tab-scoping the way the template's own
+  // version does.
+  let devSearchMatches = []
+  let devSearchActiveIndex = -1
+  let devSearchActiveEl = null
+  let devSearchExpandedGroups = []
+  function collectDevSearchMatches(query) {
+    const q = query.trim().toLowerCase()
+    if (!q) return []
+    const matches = []
+    groupsEl.querySelectorAll('.dp-group-header, .dp-row').forEach((node) => {
+      if (node.classList.contains('dp-group-header')) {
+        const titleEl = node.querySelector('.dp-group-title-text')
+        const text = titleEl ? titleEl.textContent.toLowerCase() : ''
+        if (text.includes(q)) matches.push({ type: 'group', targetEl: titleEl, sectionEl: node.closest('.dp-group') })
+      } else {
+        const label = node.querySelector('label')
+        if (label && label.textContent.toLowerCase().includes(q)) matches.push({ type: 'row', targetEl: label, rowEl: node })
+      }
+    })
+    return matches
+  }
+  function devSearchCollapseExpanded() {
+    devSearchExpandedGroups.forEach((g) => g.classList.add('collapsed'))
+    devSearchExpandedGroups = []
+  }
+  function devSearchClearActiveHighlight() {
+    if (devSearchActiveEl) devSearchActiveEl.classList.remove('dp-search-highlight-active')
+    devSearchActiveEl = null
+  }
+  function devSearchUndoCurrentMatch() {
+    devSearchClearActiveHighlight()
+    devSearchCollapseExpanded()
+  }
+  // Walks up from the matched element's own PARENT (skipping the matched
+  // group itself, matching the template's own reasoning: a group's own
+  // title stays visible regardless of its own collapsed state, only
+  // genuine ancestors need expanding).
+  function devSearchExpandAncestors(startEl) {
+    let g = startEl.parentElement ? startEl.parentElement.closest('.dp-group') : null
+    while (g) {
+      if (g.classList.contains('collapsed')) {
+        g.classList.remove('collapsed')
+        devSearchExpandedGroups.push(g)
+      }
+      g = g.parentElement ? g.parentElement.closest('.dp-group') : null
+    }
+  }
+  function devSearchUpdateCount() {
+    const total = devSearchMatches.length
+    if (!searchInput.value.trim()) searchCount.textContent = ''
+    else if (!total) searchCount.textContent = '0 found'
+    else if (devSearchActiveIndex === -1) searchCount.textContent = total + ' found'
+    else searchCount.textContent = (devSearchActiveIndex + 1) + '/' + total
+  }
+  function devSearchGoTo(index) {
+    if (!devSearchMatches.length) return
+    devSearchUndoCurrentMatch()
+    const n = devSearchMatches.length
+    devSearchActiveIndex = ((index % n) + n) % n
+    const m = devSearchMatches[devSearchActiveIndex]
+    devSearchExpandAncestors(m.type === 'row' ? m.rowEl : m.sectionEl)
+    m.targetEl.classList.add('dp-search-highlight-active')
+    devSearchActiveEl = m.targetEl
+    m.targetEl.scrollIntoView({ block: 'center', behavior: 'smooth' })
+    devSearchUpdateCount()
+  }
+  searchInput.addEventListener('input', () => {
+    devSearchUndoCurrentMatch()
+    devSearchActiveIndex = -1
+    devSearchMatches = collectDevSearchMatches(searchInput.value)
+    devSearchUpdateCount()
+  })
+  searchInput.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter') return
+    e.preventDefault()
+    if (e.shiftKey) devSearchGoTo(devSearchActiveIndex - 1)
+    else devSearchGoTo(devSearchActiveIndex + 1)
+  })
+  document.addEventListener('click', (e) => {
+    if (e.target === searchInput) return
+    if (devSearchActiveIndex === -1) return
+    devSearchUndoCurrentMatch()
+    devSearchActiveIndex = -1
+    devSearchUpdateCount()
+  }, true)
+
   resetSettings() // load last-saved values/order/geometry, if any (falls back to defaults otherwise)
   // Re-apply both, in case a saved order predating either structure just
   // flattened it back out via applyOrder() above -- see
@@ -2307,5 +2525,11 @@ export function initDevPanel(groups, opts = {}) {
   // needed fixing (both are idempotent).
   organizeDevPanelSubgroups(groupsEl)
   if (opts.organizeSubgroups) opts.organizeSubgroups(groupsEl)
+  // Sync the header button's pressed-look to whatever resetSettings()
+  // actually loaded (a saved value, if any, can differ from the def used
+  // to build the button initially) -- textEditModeEnabled is set by
+  // commit()'s own onChange call inside resetSettings()'s value-restore
+  // pass, but nothing there touches the button's own DOM class.
+  textEditBtn.classList.toggle('active', textEditModeEnabled)
   return cfg
 }

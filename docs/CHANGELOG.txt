@@ -6007,6 +6007,21 @@ Cache-buster bumps (this task's own): `index.html`'s own
 by the concurrent session noted above, not reverted), `style.css?v=11`
 -> `?v=12`; `main.js`'s own `devPanel.js?v=22` -> `?v=23`.
 
+**Follow-up, same session, ~1 minute later:** the concurrent session's
+own commit (`0df1236`, "Click Function settings: rename Tween->
+Sequence...") landed WHILE this entry was being written, and (since it
+ran a plain `git add`/`commit` against the then-current working tree)
+absorbed this task's own uncommitted 1-line `main.js` import-bump and
+`index.html` cache-bust changes along with its own -- harmlessly
+(confirmed: the committed `main.js` correctly still imports
+`devpanel/devPanel.js?v=23`, and `index.html` still has
+`style.css?v=12`, both matching what this task set). This resolves the
+earlier "not committed this round" concern -- that concurrent work is
+now safely committed on its own, and the remaining working-tree diff
+(`devPanel.js`, `style.css`, `CLAUDE.md`, this file, `PROJECT_PROGRESS.md`)
+is a clean, isolated, one-more-file-pending diff scoped entirely to
+this task. Committed and pushed separately right after this entry.
+
 --------------------------------------------------------------------------------
 2026-09-17  -  06:16:03 - 06:17:54 EDT (1m51s, measured)
 

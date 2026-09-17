@@ -32,15 +32,15 @@ direct confirmation); and a Ctrl+F-style group/setting search box. All
 verified live in a fresh `?dev=1` load. See CHANGELOG.txt's matching
 entry for full detail.
 
-**Not committed/pushed this round, deliberately.** A routine pre-finish
-check found `src/main.js` already carrying a large, unrelated,
-in-progress "Tween" -> "Sequence" rename, and `index.html`'s own cache-
-buster changed on disk mid-task -- real evidence of a separate,
-currently-active session on this same project (CLAUDE.md §5/§9). This
-round's changes (`devPanel.js`, `style.css`, the 1-line `main.js` import-
-version bump, `index.html`'s own bumps) are sitting uncommitted in the
-working tree, ready to fold in once that other session's work is at a
-committable point too.
+**Committed and pushed separately from the concurrent session's own
+work.** A routine pre-finish check found `src/main.js` already carrying
+a large, unrelated, in-progress "Tween" -> "Sequence" rename from a
+separate, currently-active session (CLAUDE.md §5/§9) -- that work
+landed as its own commit (`0df1236`) moments later, harmlessly absorbing
+this task's 1-line `main.js`/`index.html` cache-bust bumps along with
+it. The remaining diff (`devPanel.js`, `style.css`, docs) was then a
+clean, isolated diff scoped entirely to this task, committed and pushed
+on its own right after.
 
 **IN PROGRESS, large multi-slice undertaking: a full rebuild of the
 Click Function settings system** (direct request, spec A-L, since grown
