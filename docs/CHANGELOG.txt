@@ -6146,6 +6146,93 @@ not reverted) -> `?v=135` (this task's own, to guarantee a fresh fetch
 for live verification).
 
 --------------------------------------------------------------------------------
+2026-09-17  -  06:50:32 - 06:57:46 EDT (~7m14s, measured)
+
+**Phase 1, part 2 of the Click Function overhaul: Offset On/Off (X/Y)
+and Rotation On/Off (X/Y/Z) added to all 10 triggers, both DEV_GROUPS
+controls and real runtime application.** Continues directly from the
+previous entry's own "not yet done" list. Added the same 7-control block
+(`${p}OffsetEnabled`/`OffsetX`/`OffsetY`, `${p}RotationEnabled`/
+`RotationX`/`RotationY`/`RotationZ`) to `makeClickHoldPoseGroup()`,
+`makeClickPoseGroup()`, and Right Click's own hand-written block, right
+after each group's `${p}Mode` control. New `updateOffsetRotationVisibility(p)`
+shows/hides each row from its own Enabled checkbox (independent of
+Mode -- Offset/Rotation apply the same in Single Pose and Sequence
+mode alike), wired into the same initial-sync `CLICK_POSE_KEYS.forEach`/
+`CLICK_HOLD_KEYS.forEach` lines `updateClickTriggerModeVisibility()`
+already used -- `rc` needed no separate wiring since it's already a
+`CLICK_POSE_KEYS` member.
+
+New `applyOffsetRotationToHand(hand, p, progress)` (module-level scratch
+Vector3/Euler/Quaternion, no per-frame allocation) composes both
+ADDITIVELY onto `hand.wrapper.position`/`.quaternion` -- `addScaledVector`
+for Offset, `quaternion.multiply()` (never assignment) for Rotation, so
+neither overwrites whatever cursor-tracking/arm-length already set this
+frame or the pose's own wrist rotation, exactly the "wont overwrite each
+other nor fight against each other" requirement from the original spec.
+Offset moves along the CAMERA's own fixed right/up vectors
+(`camera.matrixWorld` columns 0/1), not world/local axes -- this
+project's camera only pans/zooms, never rotates (CLAUDE.md), so this
+stays a stable "up down left right in browser terms" regardless of
+framing. Called immediately after `applyPoseValuesToHand()` in every
+phase of `updateClickHoldPoseForHand()`/`updateClickPoseForHand()`:
+forward/paused (progress = the same per-hand forward-phase progress the
+pose-lerp itself uses, so Offset ramps 0->target exactly like Rotation,
+per direct user choice "Ramps like Rotation"), looping (progress = 1,
+since looping only starts once forward is fully complete), retransition
+(progress = `1 - progress`, ramping back down to 0 as the hand returns
+to default -- the inverse of the forward ramp).
+
+**Verified live:** `node --check` passes after both the DEV_GROUPS
+insertion and the runtime wiring. Live in the browser via
+`window.__debug`: confirmed all 10 "Offset On/Off" rows exist in the
+dev panel. This session's browser-automation tool showed its own
+previously-documented rAF-not-firing behavior (CLAUDE.md's own Gotchas
+entry) -- `triggerClickPose()` armed a pending claim but `animate()`
+never advanced it, so the normal click-and-wait test showed no visible
+movement. Worked around exactly as that Gotchas entry recommends:
+called `updateClickPoseForHand()`
+directly (exposed on `window.__debug`) with a manufactured `now`,
+bypassing the render loop entirely. With Offset (10, 5) and
+RotationZ=45 on the `click` trigger: at progress=1.0 the hand's
+position moved by almost exactly (+10, +5) (a small Z component from
+the camera's own non-axis-aligned right/up, as expected) and its
+quaternion became exactly the 45 degree Z-axis quaternion
+(sin(22.5 deg)=0.3827, cos(22.5 deg)=0.9239, confirmed exactly); a
+follow-up progress=0.5 test (run without resetting the hand's transform
+from the first test) showed the quaternion compose to 67.5 degrees
+total (45 from the leftover first test + 22.5 = half of 45 for this
+one), directly confirming both the 0->target ramp AND additive
+composition on top of a prior transform, not overwrite. No runtime
+errors in either test.
+
+**Also confirmed (early investigation before finding the real cause):**
+mid-verification, the dev server briefly returned a genuine
+`net::ERR_CONNECTION_RESET` when fetching `src/main.js` itself, which
+looked identical to a startup hang until caught via
+`read_network_requests` -- a transient static-server issue on the
+`static-alt` preview server, unrelated to any code change here.
+Re-navigating resolved it. Noting this since it cost real verification
+time and could otherwise be mistaken for a real bug in a future session
+if this same symptom (page stuck on "Loading hands...", zero JS errors,
+`window.__debug` never appears) shows up again -- check the network log
+for a failed `main.js` fetch before assuming the application code itself
+is broken.
+
+**Not yet done:** Animation Speed Curve on/off gate (new curve+range
+field pair), Start Time Curve on/off gate (wrapping the existing
+always-visible controls), Retransition on/off gate (+ its behavioral
+change: Off = hand stays at end pose forever), Sequence-mode's own On
+Release Mode/Trigger All Hands/Tween Stop Curve+Delay, Count/Loop/
+Oscillate Sequence Mode for the 5 fire-and-forget triggers, the Loading
+Preview's own Camera/Lighting selectors + Sequence Mode, and Phases 2-8
+of the original 8-phase plan. Continuing in slices per the previous
+entry's own note.
+
+Cache-buster: `index.html`'s own `main.js?v=135` -> `?v=136` (this
+slice's own, to guarantee a fresh fetch for live verification).
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

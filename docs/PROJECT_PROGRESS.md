@@ -49,22 +49,29 @@ further mid-implementation). Renamed Mode's own 'Tween' option to
 production settings had 10 different triggers saved as `Mode: "Tween"`)
 plus unified several labels (Animation Speed, Pause Duration At Tween
 End, Start Time Curve, Retransition Speed/Min-Max, Sequence) across all
-10 existing triggers -- the first verified slice of an 8-phase plan
-(settings schema -> Sequence-mode release behavior -> type/click-count/
-scroll -> a dynamic "Add Click Function" architecture generalizing
-click/hold detection to any number of functions with no manual tuning
--> a multi-sequence-plus-hold chain builder -> bezier curve handles ->
-mobile multi-touch/zoom/scroll -> duplicate-setting validation). Still
-ahead within Phase 1 alone: reordering the 10 groups, Offset/Rotation
-on/off (ramping 0 -> target across the tween, composed not overwritten),
-gating Animation Speed Curve/Start Time Curve/Retransition each behind
-their own on/off, and a newly-added Count/Loop/Oscillate "Sequence
-Mode" concept that needs to reach the 5 fire-and-forget triggers (none
-of which have any loop capability today) -- plus a separately-requested
-Loading Preview upgrade (Camera/Lighting selection + this same Sequence
-Mode system) that hasn't been started. See CHANGELOG.txt's matching
-entries for full detail; this is genuinely large and will keep spanning
-multiple rounds.
+10 existing triggers. **Offset On/Off (X/Y) and Rotation On/Off (X/Y/Z)
+now shipped for all 10 triggers too** -- both the DEV_GROUPS controls
+and the real runtime application (`applyOffsetRotationToHand()`,
+composes additively onto `hand.wrapper.position`/`.quaternion` right
+after each trigger's own pose application, camera-relative Offset,
+ramps 0->target via the same per-hand `progress` the pose-lerp itself
+uses, verified live via `window.__debug` since this session's browser
+tool hit its own documented rAF-not-firing issue). This is the first 2
+verified slices of an 8-phase plan (settings schema -> Sequence-mode
+release behavior -> type/click-count/scroll -> a dynamic "Add Click
+Function" architecture generalizing click/hold detection to any number
+of functions with no manual tuning -> a multi-sequence-plus-hold chain
+builder -> bezier curve handles -> mobile multi-touch/zoom/scroll ->
+duplicate-setting validation). Still ahead within Phase 1 alone:
+reordering the 10 groups, gating Animation Speed Curve/Start Time
+Curve/Retransition each behind their own on/off (currently always-
+visible once Mode is selected), and a newly-added Count/Loop/Oscillate
+"Sequence Mode" concept that needs to reach the 5 fire-and-forget
+triggers (none of which have any loop capability today) -- plus a
+separately-requested Loading Preview upgrade (Camera/Lighting selection
++ this same Sequence Mode system) that hasn't been started. See
+CHANGELOG.txt's matching entries for full detail; this is genuinely
+large and will keep spanning multiple rounds.
 
 **SHIPPED 2026-09-17: dev-panel groups can now be individually locked
 against reordering** (`.dp-group-lock-icon`, 🔒/🔓, in each group's title
