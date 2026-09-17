@@ -309,7 +309,27 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   and no separate "retained value while hidden" cache either (unlike the
   template's own `devDeviceValues` map), since a non-independent
   device's own store slot is already kept live-current by that same
-  mirroring. Written and `node --check`-clean, but NOT yet live-
-  verified in a real browser — see the gotcha directly above for why,
-  and CHANGELOG.txt's matching entry for the full design account before
-  trusting or extending this feature.
+  mirroring. **Corrected 2026-09-17, same day:** now fully live-verified
+  (via an isolated standalone test harness, never committed, that
+  imports the real devPanel.js with its own storage key — confirmed
+  zero impact on any real project setting throughout). One real bug
+  was found and fixed in the process — see the new gotcha directly
+  below, and CHANGELOG.txt's matching entry, for the full verification
+  trail before extending this feature further.
+- **A UI-chrome refresh that only ever runs inside `if (saved) {...}`
+  never runs at all for a brand-new visitor with nothing saved yet.**
+  `resetSettings()`'s localStorage branch only called
+  `applyStoredValues()` (the function that actually runs
+  `refreshRowDisplaysForEditingTab()`) inside that conditional — every
+  ORDINARY control type was unaffected since `buildRow()` already sets
+  their initial DOM state directly from `ctrl.def` at construction
+  time, but the 2 new dynamicDevice checkboxes (§12f-1, added earlier
+  the same day) relied entirely on that later refresh call, which
+  silently never ran on a fresh install. Confirmed live 2026-09-17 via
+  an isolated-storage test harness (a real project's own already-saved
+  localStorage masks this completely, which is exactly why the
+  original same-day pass never caught it). Fixed with a plain `else`
+  branch calling `refreshRowDisplaysForEditingTab()` when there's
+  nothing saved yet. When adding new UI chrome whose correctness
+  depends on a refresh function, verify it against a genuinely EMPTY
+  storage state, not just the project's own already-populated one.

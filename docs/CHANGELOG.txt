@@ -6691,6 +6691,95 @@ any, should opt into `dynamicDevice: true` -- that's a separate content
 decision from today's engine-capability work.
 
 --------------------------------------------------------------------------------
+2026-09-17  -  07:46:23 - 07:53:13 EDT (6m50s, measured)
+
+**Verified the dynamicDevice mobile/desktop "Independent" checkbox
+system live, found and fixed one real bug in the process, without
+touching any of the real project's own saved settings.** Direct
+request ("I dont want any of my currently set settings to change. just
+port the checkbox system so it all works as requested"). Reloading the
+full app (main.js) is what hit the previous entry's environment
+truncation issue AND would have read/written the real, git-tracked
+`dev-panel-settings.json`/localStorage -- so instead of retrying that,
+built a small standalone test harness
+(`src/__dynamic_device_test.html`, never committed, deleted at the end
+of this task) that imports the real, unmodified `devPanel.js` directly
+with an isolated `storageKeyPrefix` ('dynamicDeviceHarnessTest') and no
+`remoteSave` -- exercises the actual shipped code, tiny enough to dodge
+the truncation issue entirely, and structurally incapable of touching
+any `devPanel.*`-prefixed real-project key.
+
+**Real bug found and fixed:** `resetSettings()`'s localStorage branch
+only ever called `applyStoredValues()` (which is what actually runs
+`refreshRowDisplaysForEditingTab()`) inside `if (saved) {...}` -- on a
+BRAND-NEW visitor with nothing saved yet (exactly what the isolated test
+harness's fresh storage key produced), that whole branch was skipped,
+so the dynamicDevice row/checkbox chrome never got its initial paint at
+all: "Show in Mobile/Landscape" rendered unchecked instead of its
+documented true default, and both checkboxes showed simultaneously
+instead of only the one relevant to the current tab. Every OTHER
+control type was unaffected by this same gap because `buildRow()`
+already sets their initial DOM state directly from `ctrl.def` at
+construction time -- only the 2 NEW dynamicDevice checkboxes relied
+entirely on a later refresh call that, it turned out, doesn't
+unconditionally run. Fixed with a plain `else` branch calling
+`refreshRowDisplaysForEditingTab()` when there's nothing saved yet.
+This would NOT have been caught by yesterday's testing, which only ever
+ran against the real project's own already-saved localStorage (where
+`saved` is always truthy) -- exactly why an isolated-storage harness
+was the right tool here, not an accident of avoiding the truncation bug.
+
+**Verified live, end to end, via a real 3-tab, 2-control, cascade-
+capable test group:**
+- Editing a dynamicDevice slider on Desktop live-mirrors into both
+  Mobile and Landscape (confirmed: 77 -> both tabs show 77).
+- Checking "Independent from Desktop" on Mobile and editing it there
+  (30) leaves Desktop (77) and the still-non-independent Landscape
+  slot completely unaffected; a later Desktop edit (55) then correctly
+  mirrors into Landscape only, Mobile staying independent at 30.
+- Unchecking "Independent" on Mobile snaps it straight back to
+  Desktop's CURRENT value (55), not a stale cached one.
+- Unchecking "Show in Mobile/Landscape" on Desktop hides the row
+  entirely on both Mobile AND Landscape (confirmed `display:'none'` on
+  each, checked via a fresh, isolated read per tab after an earlier
+  combined-read version of this same check gave a false-alarm "still
+  visible" result -- caused by reading `.style.display` off the SAME
+  single shared row element multiple times AFTER later mutations had
+  already overwritten it, a test-script mistake, not a real bug;
+  re-checking each tab's state immediately after switching to it
+  resolved the false alarm).
+- The group-level cascade checkboxes (one visibility, one
+  independence, on "Test Group"'s own header) correctly show/hide per
+  tab and correctly write through to BOTH child controls' own
+  checkboxes when toggled, cascading their real hide/mirror effects too.
+- Save -> real page reload -> Mobile's independent value (55) and its
+  own "Independent" checkbox state both restored correctly -- the full
+  persistence round-trip works.
+- `Object.keys(localStorage)` filtered for the real project's own
+  `devPanel.` prefix returned 0 matches after every single step above,
+  including after a real Save click -- confirmed the isolation held
+  completely; nothing about the user's actual settings was ever at
+  risk.
+
+**Not committed this round, same reason as the prior entry, now for a
+2nd time on the SAME file:** `src/devpanel/devPanel.js` and
+`src/main.js` are being actively, substantively edited by the
+concurrent session right now (their own new `renderDynamicGroup()`
+engine addition + a new DEV_GROUPS entry, mid-"Phase 4" of their Click
+Function overhaul) -- both this fix and their in-progress work coexist
+in the current working tree with no actual conflict (`node --check`
+passes on both files' combined current state), but forcing a commit
+now would bundle their still-in-progress feature under an unrelated
+commit message. Left uncommitted for either session to commit
+naturally once ready, same as the earlier precedent this same day.
+
+Next: once committed (by either session), this feature is genuinely
+done -- built, live-verified, bug found and fixed, zero risk to real
+settings confirmed. Still open: deciding which real HANDY DANDIES
+controls, if any, should actually opt into `dynamicDevice: true` -- a
+separate content decision, not part of the engine-capability work.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

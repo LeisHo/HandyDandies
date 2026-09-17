@@ -32,21 +32,33 @@ that exact bug). See CHANGELOG.txt's matching 2026-09-17 entries for the
 full account, including which 2 of the original 4 template changes
 turned out architecturally inapplicable here.
 
-**WRITTEN, NOT YET LIVE-VERIFIED: the "Independent from Desktop" per-
-control mobile/landscape checkbox system (§12f-1), redesigned (not
-ported 1:1) for this project's one-row-per-control architecture** --
-`dynamicDevice: true` opt-in flag, `commit()`'s own new mirroring
-branch, row + group-level checkboxes, persistence wired into BOTH real
-snapshot shapes (`saveSettings()`/`resetSettings()` AND
-`captureFullPanelState()`/`applyFullPanelState()`). `node --check`
-passes; live browser verification was blocked this round by a
-reproducible environment issue (`main.js` truncates at a fixed byte
-count under this sandbox's own network layer, confirmed via `curl`
-outside the browser tool too -- not a code problem). **Next session:
-re-attempt live verification first** (temporarily opt one real control
-into `dynamicDevice: true`, exercise Show-in-Mobile/Independent
-checkboxes + group cascade + Undo/Save round-trip, then revert the test
-flag), before trusting this feature in front of the user.
+**SHIPPED 2026-09-17 (uncommitted -- see below): the "Independent from
+Desktop" per-control mobile/landscape checkbox system (§12f-1),
+redesigned (not ported 1:1) for this project's one-row-per-control
+architecture -- now fully live-verified, including one real bug found
+and fixed along the way.** Verified via an isolated standalone test
+harness (never committed, deleted after use) importing the real
+devPanel.js with its own storage key -- confirmed zero impact on any
+real project settings throughout (0 `devPanel.*` localStorage keys
+touched). The bug: `resetSettings()` never painted the new checkbox
+chrome for a brand-new visitor with nothing saved yet (only affected a
+fresh install, which is exactly why the earlier same-day pass never
+caught it against the real, already-saved project settings) -- fixed.
+Mirroring, independence toggling both directions, row hide/show,
+group-level cascade (both kinds), and full Save-then-reload persistence
+all confirmed working. See CHANGELOG.txt's matching entry for the full
+verification trail.
+
+**Not committed yet.** `src/devpanel/devPanel.js` and `src/main.js` are
+being actively, substantively edited right now by the concurrent
+session (their own new `renderDynamicGroup()` engine addition, mid-
+"Phase 4" of their Click Function overhaul) -- both sets of changes
+coexist with no actual conflict (`node --check` clean on the combined
+current state), but this fix is left uncommitted rather than bundled
+under an unrelated commit; either session can commit once ready.
+**Still open, separate from the engine work above:** deciding which
+real HANDY DANDIES controls, if any, should actually opt into
+`dynamicDevice: true`.
 
 **IN PROGRESS, large multi-slice undertaking: a full rebuild of the
 Click Function settings system** (direct request, spec A-L, since grown
