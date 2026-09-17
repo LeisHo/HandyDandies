@@ -1,8 +1,8 @@
 {
   "values": {
     "desktop": {
-      "fieldRows": 25,
-      "fieldCols": 3,
+      "fieldRows": 12,
+      "fieldCols": 12,
       "rowSpacing": 9.5,
       "columnSpacing": 10.5,
       "handScale": 1.35,
@@ -18006,7 +18006,7 @@
     },
     {
       "key": "Loading Preview",
-      "collapsed": false,
+      "collapsed": true,
       "locked": false,
       "settings": [
         "loadingPreviewCameraSelector",
@@ -18037,7 +18037,7 @@
     },
     {
       "key": "Field Layout",
-      "collapsed": true,
+      "collapsed": false,
       "locked": false,
       "settings": [
         "fieldRows",
