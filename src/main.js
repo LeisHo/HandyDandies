@@ -6,7 +6,7 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js'
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js'
 import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js'
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js'
-import { initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings } from './devpanel/devPanel.js?v=22'
+import { initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings } from './devpanel/devPanel.js?v=23'
 
 // A defensive wrapper around devPanel.js's own refreshSelectOptions() --
 // found via live testing (direct user report: "I dont see any of the
@@ -788,7 +788,7 @@ const DEV_GROUPS = [
     controls: [
       { key: 'rcEnabled', label: 'Right Click (Master On/Off)', type: 'checkbox', def: false },
       {
-        key: 'rcMode', label: 'Mode', type: 'select', def: 'Single Pose', options: () => ['Single Pose', 'Tween'],
+        key: 'rcMode', label: 'Mode', type: 'select', def: 'Single Pose', options: () => ['Single Pose', 'Sequence'],
         // BUG FIX 2026-09-15: this still called the OLD, pre-rename
         // `updateRightClickModeVisibility()` (confirmed live: threw
         // "updateRightClickModeVisibility is not defined" the instant
@@ -802,20 +802,20 @@ const DEV_GROUPS = [
         onChange: () => updateClickTriggerModeVisibility('rc', ['PauseDurationMs'])
       },
       { key: 'rcTargetPose', label: 'Target Pose', type: 'select', def: '', options: () => (cfg.savedPoses || []).map((sp) => ({ value: sp.name, group: sp.group || null })) },
-      { key: 'rcTweenSelector', label: 'Tween Sequence', type: 'select', def: '', options: () => (cfg.savedTweenSequences || []).map((s) => ({ value: s.name, group: s.group || null })) },
+      { key: 'rcTweenSelector', label: 'Sequence', type: 'select', def: '', options: () => (cfg.savedTweenSequences || []).map((s) => ({ value: s.name, group: s.group || null })) },
       // Tween's own SEPARATE speed/curve/range trio, added 2026-09-15 --
       // see makeClickHoldPoseGroup()'s own matching comment for the full
       // reasoning. No Loop checkbox -- Right Click is fire-and-forget.
-      { key: 'rcTweenSpeedMs', label: 'Tween Speed (Ms)', type: 'slider', min: 50, max: 5000, step: 10, def: 800 },
-      { key: 'rcTweenStartTimeCurve', label: 'Tween Start Time Curve (Distance -> Start Time)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickPoseConfig('rc') },
-      { key: 'rcTweenStartTimeRange', label: 'Tween Min / Max Start Time (Ms)', type: 'text', def: '{"min":0,"max":300}', onChange: () => parseClickPoseConfig('rc') },
-      { key: 'rcTransitionSpeedMs', label: 'Pose Transition Speed (Ms)', type: 'slider', min: 0, max: 700, step: 10, def: 400 },
-      { key: 'rcStartTimeCurve', label: 'Pose Transition Start Time Curve (Distance -> Start Time)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickPoseConfig('rc') },
-      { key: 'rcStartTimeRange', label: 'Pose Transition Min / Max Start Time (Ms)', type: 'text', def: '{"min":0,"max":300}', onChange: () => parseClickPoseConfig('rc') },
-      { key: 'rcPauseDurationMs', label: 'Pause Duration At Target (Ms)', type: 'slider', min: 0, max: 5000, step: 10, def: 500 },
-      { key: 'rcRetransitionSpeedMs', label: 'Pose Retransition Speed (Ms)', type: 'slider', min: 0, max: 700, step: 10, def: 400 },
-      { key: 'rcRetransitionStartTimeCurve', label: 'Pose Retransition Start Time Curve (Distance -> Start Time)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickPoseConfig('rc') },
-      { key: 'rcRetransitionStartTimeRange', label: 'Pose Retransition Min / Max Start Time (Ms)', type: 'text', def: '{"min":0,"max":300}', onChange: () => parseClickPoseConfig('rc') }
+      { key: 'rcTweenSpeedMs', label: 'Animation Speed (Ms)', type: 'slider', min: 50, max: 5000, step: 10, def: 800 },
+      { key: 'rcTweenStartTimeCurve', label: 'Start Time Curve (Distance -> Start Time)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickPoseConfig('rc') },
+      { key: 'rcTweenStartTimeRange', label: 'Min / Max Start Time (Ms)', type: 'text', def: '{"min":0,"max":300}', onChange: () => parseClickPoseConfig('rc') },
+      { key: 'rcTransitionSpeedMs', label: 'Animation Speed (Ms)', type: 'slider', min: 0, max: 700, step: 10, def: 400 },
+      { key: 'rcStartTimeCurve', label: 'Start Time Curve (Distance -> Start Time)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickPoseConfig('rc') },
+      { key: 'rcStartTimeRange', label: 'Min / Max Start Time (Ms)', type: 'text', def: '{"min":0,"max":300}', onChange: () => parseClickPoseConfig('rc') },
+      { key: 'rcPauseDurationMs', label: 'Pause Duration At Tween End (Ms)', type: 'slider', min: 0, max: 5000, step: 10, def: 500 },
+      { key: 'rcRetransitionSpeedMs', label: 'Retransition Speed (Ms)', type: 'slider', min: 0, max: 700, step: 10, def: 400 },
+      { key: 'rcRetransitionStartTimeCurve', label: 'Retransition Start Time Curve (Distance -> Start Time)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickPoseConfig('rc') },
+      { key: 'rcRetransitionStartTimeRange', label: 'Retransition Min / Max Start Time (Ms)', type: 'text', def: '{"min":0,"max":300}', onChange: () => parseClickPoseConfig('rc') }
     ]
   },
   // Tween -- direct user request, modeled on HANDO's own "Tween / Export"
@@ -1189,7 +1189,7 @@ const cfg = initDevPanel(DEV_GROUPS, {
   // declaration comment) -- the field now only ever builds once, using
   // these real values, instead of building once with code defaults and
   // visibly rebuilding again the moment this fires.
-  onRestore: () => { resyncPoseDefaultValues(); startupSettingsReady = true; tryStartField() }
+  onRestore: () => { migrateModeTweenToSequence(); resyncPoseDefaultValues(); startupSettingsReady = true; tryStartField() }
 })
 onChangeByCtrl.forEach((fn, c) => { c.onChange = fn })
 // Arm Length's 2 custom widgets (see their own declaration comments,
@@ -2301,11 +2301,11 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       // should only show when Single Pose is selected") -- Enabled, Mode,
       // and Hold Confirm Delay stay visible regardless of mode.
       {
-        key: `${p}Mode`, label: 'Mode', type: 'select', def: 'Single Pose', options: () => ['Single Pose', 'Tween'],
+        key: `${p}Mode`, label: 'Mode', type: 'select', def: 'Single Pose', options: () => ['Single Pose', 'Sequence'],
         onChange: () => { updateClickTriggerModeVisibility(p, [], ['LoopMode']); updateLoopHoldVisibility(p) }
       },
       { key: `${p}TargetPose`, label: 'Target Pose', type: 'select', def: defaults.targetPose ?? '', options: () => (cfg.savedPoses || []).map((sp) => ({ value: sp.name, group: sp.group || null })) },
-      { key: `${p}TweenSelector`, label: 'Tween Sequence', type: 'select', def: '', options: () => (cfg.savedTweenSequences || []).map((s) => ({ value: s.name, group: s.group || null })) },
+      { key: `${p}TweenSelector`, label: 'Sequence', type: 'select', def: '', options: () => (cfg.savedTweenSequences || []).map((s) => ({ value: s.name, group: s.group || null })) },
       // Tween's own SEPARATE speed/curve/range trio -- direct correction
       // ("tween speed is different from pose transition speed. For tween,
       // also provide a set of the curve graph, min max, pos transition
@@ -2321,9 +2321,9 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       // (Ms)" slider (min 50, max 5000), not the 0-700 Pose Transition
       // range -- a tween plays through MULTIPLE poses end to end, so it
       // routinely needs more time than a single-pose transition does.
-      { key: `${p}TweenSpeedMs`, label: 'Tween Speed (Ms)', type: 'slider', min: 50, max: 5000, step: 10, def: 800 },
-      { key: `${p}TweenStartTimeCurve`, label: 'Tween Start Time Curve (Distance -> Start Time)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickHoldConfig(p) },
-      { key: `${p}TweenStartTimeRange`, label: 'Tween Min / Max Start Time (Ms)', type: 'text', def: '{"min":0,"max":300}', onChange: () => parseClickHoldConfig(p) },
+      { key: `${p}TweenSpeedMs`, label: 'Animation Speed (Ms)', type: 'slider', min: 50, max: 5000, step: 10, def: 800 },
+      { key: `${p}TweenStartTimeCurve`, label: 'Start Time Curve (Distance -> Start Time)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickHoldConfig(p) },
+      { key: `${p}TweenStartTimeRange`, label: 'Min / Max Start Time (Ms)', type: 'text', def: '{"min":0,"max":300}', onChange: () => parseClickHoldConfig(p) },
       // Loop Mode -- direct follow-up request ("Add a Loop checkbox to
       // chp/rchp only"), porting Double Click Hold Tween's own Loop
       // checkbox to the 2 OTHER hold-based groups (Click Pose/Double-
@@ -2397,12 +2397,12 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       // double-click no longer moves chp's own phase out of 'idle' at all
       // with this delay raised to 500ms.
       { key: `${p}HoldConfirmMs`, label: 'Hold Confirm Delay (Ms)', type: 'slider', min: 0, max: 1000, step: 10, def: defaults.holdConfirmMs ?? 500 },
-      { key: `${p}TransitionSpeedMs`, label: 'Pose Transition Speed (Ms)', type: 'slider', min: 0, max: 700, step: 10, def: defaults.transitionSpeedMs ?? 400 },
-      { key: `${p}StartTimeCurve`, label: 'Pose Transition Start Time Curve (Distance -> Start Time)', type: 'text', def: defaults.startTimeCurve ?? '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickHoldConfig(p) },
-      { key: `${p}StartTimeRange`, label: 'Pose Transition Min / Max Start Time (Ms)', type: 'text', def: defaults.startTimeRange ?? '{"min":0,"max":300}', onChange: () => parseClickHoldConfig(p) },
-      { key: `${p}RetransitionSpeedMs`, label: 'Pose Retransition Speed (Ms)', type: 'slider', min: 0, max: 700, step: 10, def: defaults.retransitionSpeedMs ?? 400 },
-      { key: `${p}RetransitionStartTimeCurve`, label: 'Pose Retransition Start Time Curve (Distance -> Start Time)', type: 'text', def: defaults.retransitionStartTimeCurve ?? '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickHoldConfig(p) },
-      { key: `${p}RetransitionStartTimeRange`, label: 'Pose Retransition Min / Max Start Time (Ms)', type: 'text', def: defaults.retransitionStartTimeRange ?? '{"min":0,"max":300}', onChange: () => parseClickHoldConfig(p) },
+      { key: `${p}TransitionSpeedMs`, label: 'Animation Speed (Ms)', type: 'slider', min: 0, max: 700, step: 10, def: defaults.transitionSpeedMs ?? 400 },
+      { key: `${p}StartTimeCurve`, label: 'Start Time Curve (Distance -> Start Time)', type: 'text', def: defaults.startTimeCurve ?? '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickHoldConfig(p) },
+      { key: `${p}StartTimeRange`, label: 'Min / Max Start Time (Ms)', type: 'text', def: defaults.startTimeRange ?? '{"min":0,"max":300}', onChange: () => parseClickHoldConfig(p) },
+      { key: `${p}RetransitionSpeedMs`, label: 'Retransition Speed (Ms)', type: 'slider', min: 0, max: 700, step: 10, def: defaults.retransitionSpeedMs ?? 400 },
+      { key: `${p}RetransitionStartTimeCurve`, label: 'Retransition Start Time Curve (Distance -> Start Time)', type: 'text', def: defaults.retransitionStartTimeCurve ?? '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickHoldConfig(p) },
+      { key: `${p}RetransitionStartTimeRange`, label: 'Retransition Min / Max Start Time (Ms)', type: 'text', def: defaults.retransitionStartTimeRange ?? '{"min":0,"max":300}', onChange: () => parseClickHoldConfig(p) },
       // Tween mode's own dedicated retransition trio -- direct request
       // ("for all click hold functions, when i select to tween a
       // sequence... on release of the click, i dont want the hands to
@@ -2416,9 +2416,9 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       // FORWARD direction. Same range/step/default as the Tween Start
       // trio, not the 0-700 Pose Retransition range -- a tween's own
       // release can reasonably want more time than a single pose's.
-      { key: `${p}TweenRetransitionSpeedMs`, label: 'Tween Retransition Speed (Ms)', type: 'slider', min: 50, max: 5000, step: 10, def: 800 },
-      { key: `${p}TweenRetransitionStartTimeCurve`, label: 'Tween Retransition Start Time Curve (Distance -> Start Time)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickHoldConfig(p) },
-      { key: `${p}TweenRetransitionStartTimeRange`, label: 'Tween Retransition Min / Max Start Time (Ms)', type: 'text', def: '{"min":0,"max":300}', onChange: () => parseClickHoldConfig(p) }
+      { key: `${p}TweenRetransitionSpeedMs`, label: 'Retransition Speed (Ms)', type: 'slider', min: 50, max: 5000, step: 10, def: 800 },
+      { key: `${p}TweenRetransitionStartTimeCurve`, label: 'Retransition Start Time Curve (Distance -> Start Time)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickHoldConfig(p) },
+      { key: `${p}TweenRetransitionStartTimeRange`, label: 'Retransition Min / Max Start Time (Ms)', type: 'text', def: '{"min":0,"max":300}', onChange: () => parseClickHoldConfig(p) }
     ]
   }
 }
@@ -2445,11 +2445,11 @@ function makeClickPoseGroup(p, title, defaults = {}) {
       // reasoning (shared word-for-word, since both factories added this
       // the same way).
       {
-        key: `${p}Mode`, label: 'Mode', type: 'select', def: 'Single Pose', options: () => ['Single Pose', 'Tween'],
+        key: `${p}Mode`, label: 'Mode', type: 'select', def: 'Single Pose', options: () => ['Single Pose', 'Sequence'],
         onChange: () => updateClickTriggerModeVisibility(p, ['PauseDurationMs'])
       },
       { key: `${p}TargetPose`, label: 'Target Pose', type: 'select', def: defaults.targetPose ?? '', options: () => (cfg.savedPoses || []).map((sp) => ({ value: sp.name, group: sp.group || null })) },
-      { key: `${p}TweenSelector`, label: 'Tween Sequence', type: 'select', def: '', options: () => (cfg.savedTweenSequences || []).map((s) => ({ value: s.name, group: s.group || null })) },
+      { key: `${p}TweenSelector`, label: 'Sequence', type: 'select', def: '', options: () => (cfg.savedTweenSequences || []).map((s) => ({ value: s.name, group: s.group || null })) },
       // Tween's own SEPARATE speed/curve/range trio -- see
       // makeClickHoldPoseGroup()'s own matching comment for the full
       // reasoning (shared word-for-word). No Loop checkbox here -- Click
@@ -2457,16 +2457,16 @@ function makeClickPoseGroup(p, title, defaults = {}) {
       // hold-based, so there's no "held" state for a loop to run during
       // (direct clarification: Loop only ported to Click Hold-Pose/
       // Right-Click Hold-Pose).
-      { key: `${p}TweenSpeedMs`, label: 'Tween Speed (Ms)', type: 'slider', min: 50, max: 5000, step: 10, def: 800 },
-      { key: `${p}TweenStartTimeCurve`, label: 'Tween Start Time Curve (Distance -> Start Time)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickPoseConfig(p) },
-      { key: `${p}TweenStartTimeRange`, label: 'Tween Min / Max Start Time (Ms)', type: 'text', def: '{"min":0,"max":300}', onChange: () => parseClickPoseConfig(p) },
-      { key: `${p}TransitionSpeedMs`, label: 'Pose Transition Speed (Ms)', type: 'slider', min: 0, max: 700, step: 10, def: defaults.transitionSpeedMs ?? 400 },
-      { key: `${p}StartTimeCurve`, label: 'Pose Transition Start Time Curve (Distance -> Start Time)', type: 'text', def: defaults.startTimeCurve ?? '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickPoseConfig(p) },
-      { key: `${p}StartTimeRange`, label: 'Pose Transition Min / Max Start Time (Ms)', type: 'text', def: defaults.startTimeRange ?? '{"min":0,"max":300}', onChange: () => parseClickPoseConfig(p) },
-      { key: `${p}PauseDurationMs`, label: 'Pause Duration At Target (Ms)', type: 'slider', min: 0, max: 5000, step: 10, def: defaults.pauseDurationMs ?? 500 },
-      { key: `${p}RetransitionSpeedMs`, label: 'Pose Retransition Speed (Ms)', type: 'slider', min: 0, max: 700, step: 10, def: defaults.retransitionSpeedMs ?? 400 },
-      { key: `${p}RetransitionStartTimeCurve`, label: 'Pose Retransition Start Time Curve (Distance -> Start Time)', type: 'text', def: defaults.retransitionStartTimeCurve ?? '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickPoseConfig(p) },
-      { key: `${p}RetransitionStartTimeRange`, label: 'Pose Retransition Min / Max Start Time (Ms)', type: 'text', def: defaults.retransitionStartTimeRange ?? '{"min":0,"max":300}', onChange: () => parseClickPoseConfig(p) }
+      { key: `${p}TweenSpeedMs`, label: 'Animation Speed (Ms)', type: 'slider', min: 50, max: 5000, step: 10, def: 800 },
+      { key: `${p}TweenStartTimeCurve`, label: 'Start Time Curve (Distance -> Start Time)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickPoseConfig(p) },
+      { key: `${p}TweenStartTimeRange`, label: 'Min / Max Start Time (Ms)', type: 'text', def: '{"min":0,"max":300}', onChange: () => parseClickPoseConfig(p) },
+      { key: `${p}TransitionSpeedMs`, label: 'Animation Speed (Ms)', type: 'slider', min: 0, max: 700, step: 10, def: defaults.transitionSpeedMs ?? 400 },
+      { key: `${p}StartTimeCurve`, label: 'Start Time Curve (Distance -> Start Time)', type: 'text', def: defaults.startTimeCurve ?? '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickPoseConfig(p) },
+      { key: `${p}StartTimeRange`, label: 'Min / Max Start Time (Ms)', type: 'text', def: defaults.startTimeRange ?? '{"min":0,"max":300}', onChange: () => parseClickPoseConfig(p) },
+      { key: `${p}PauseDurationMs`, label: 'Pause Duration At Tween End (Ms)', type: 'slider', min: 0, max: 5000, step: 10, def: defaults.pauseDurationMs ?? 500 },
+      { key: `${p}RetransitionSpeedMs`, label: 'Retransition Speed (Ms)', type: 'slider', min: 0, max: 700, step: 10, def: defaults.retransitionSpeedMs ?? 400 },
+      { key: `${p}RetransitionStartTimeCurve`, label: 'Retransition Start Time Curve (Distance -> Start Time)', type: 'text', def: defaults.retransitionStartTimeCurve ?? '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickPoseConfig(p) },
+      { key: `${p}RetransitionStartTimeRange`, label: 'Retransition Min / Max Start Time (Ms)', type: 'text', def: defaults.retransitionStartTimeRange ?? '{"min":0,"max":300}', onChange: () => parseClickPoseConfig(p) }
     ]
   }
 }
@@ -4152,7 +4152,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
   const chp = getOrInitHandCHP(hand)[p]
   if (trig.active && chp.armedForHoldStartTime !== trig.holdStartTime && now - trig.holdStartTime >= (cfg[`${p}HoldConfirmMs`] ?? 0)) {
     chp.armedForHoldStartTime = trig.holdStartTime // dedupe -- arm exactly once per hold-start, not every frame spent waiting
-    const isTweenStart = cfg[`${p}Mode`] === 'Tween'
+    const isTweenStart = cfg[`${p}Mode`] === 'Sequence'
     const delay = isTweenStart
       ? computeStartDelayMs(live, minLiveDist, liveDistRange, trig.tweenStartCurveParsed, trig.tweenStartRangeParsed)
       : computeStartDelayMs(live, minLiveDist, liveDistRange, trig.startCurveParsed, trig.startRangeParsed)
@@ -4197,7 +4197,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     // No `forwardDelay` subtraction needed anymore -- that delay is now
     // fully spent BEFORE commit (see the pending-claim block above), so
     // visible movement starts immediately at `chp.forwardStartTime`.
-    const isTween = cfg[`${p}Mode`] === 'Tween'
+    const isTween = cfg[`${p}Mode`] === 'Sequence'
     const elapsed = now - chp.forwardStartTime
     const speedMs = Math.max(isTween ? safeTweenSpeedMs(cfg[`${p}TweenSpeedMs`]) : cfg[`${p}TransitionSpeedMs`], 1)
     const progress = THREE.MathUtils.clamp(elapsed / speedMs, 0, 1)
@@ -4328,7 +4328,7 @@ function startClickHoldPose(p) {
   // then (see updateClickHoldPoseForHand()'s own pending-claim comment
   // for the full account, including dcHold's own preserved "always
   // starts from default when genuinely idle" exception).
-  if (cfg[`${p}Mode`] === 'Tween') {
+  if (cfg[`${p}Mode`] === 'Sequence') {
     const seq = (cfg.savedTweenSequences || []).find((s) => s.name === cfg[`${p}TweenSelector`])
     const namedPoses = seq ? resolveTweenSequencePoses(seq.tweenPoses) : []
     // Loop/Oscillate's own cyclic sequence -- named poses ONLY, excluding
@@ -4407,7 +4407,7 @@ function endClickHoldPose(p) {
     // request) -- captured once, right now, rather than read live inside
     // the retransition phase itself, so a Mode change mid-retransition
     // can't yank an in-flight retransition between the 2 settings pairs.
-    chp.retransitionIsTween = cfg[`${p}Mode`] === 'Tween'
+    chp.retransitionIsTween = cfg[`${p}Mode`] === 'Sequence'
     chp.retransitionStart = chp.lastAppliedValues || { ...poseDefaultValues }
     chp.retransitionStartTime = now
     chp.retransitionDelay = chp.retransitionIsTween
@@ -4550,6 +4550,36 @@ const clickPoseTriggers = Object.fromEntries(CLICK_POSE_KEYS.map((p) => [p, {
   tweenStartCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStartRangeParsed: { min: 0, max: 300 },
   retransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionRangeParsed: { min: 0, max: 300 }
 }]))
+// Direct request 2026-09-17 ("rename the word Tween to Sequence") --
+// every `${p}Mode` select's own OPTION VALUE (not just its label) is
+// 'Single Pose'/'Sequence' now, not 'Single Pose'/'Tween'. Renaming the
+// stored ENUM VALUE (not just where it's displayed) means any live
+// production settings already saved with `chpMode: "Tween"` etc. would
+// silently stop matching every `cfg[...] === 'Sequence'` check in this
+// file the instant this ships -- devPanel.js's own 'select' control
+// doesn't support a separate display-label-vs-stored-value split (only
+// `{value, group}`, confirmed by reading normalizeOptions() before
+// choosing this approach over forking that shared engine), so a real
+// migration is the only option that doesn't need touching devPanel.js at
+// all. Runs once, from `onRestore` (after real cfg values have actually
+// landed, not the synchronous code defaults) -- normalizes every
+// CLICK_HOLD_KEYS/CLICK_POSE_KEYS trigger's own `${p}Mode`, and pushes
+// the fixed value through `syncValue()` so the dev panel's own dropdown
+// (if already built) shows the corrected selection instead of a stale
+// 'Tween' that no longer exists as an option.
+function migrateModeTweenToSequence() {
+  // 'rc' (Right Click) is already a CLICK_POSE_KEYS member -- its own
+  // `rcMode` control (a hand-written group, not built via
+  // makeClickPoseGroup()) still shares the exact same `${p}Mode` key
+  // shape, so no separate entry is needed here.
+  new Set([...CLICK_HOLD_KEYS, ...CLICK_POSE_KEYS]).forEach((p) => {
+    const key = `${p}Mode`
+    if (cfg[key] === 'Tween') {
+      cfg[key] = 'Sequence'
+      syncValue(key, 'Sequence')
+    }
+  })
+}
 function parseClickPoseConfig(p) {
   const t = clickPoseTriggers[p]
   try { t.startCurveParsed = JSON.parse(cfg[`${p}StartTimeCurve`]).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
@@ -4573,7 +4603,7 @@ function getOrInitHandCP(hand) {
   }
   return hand._cp
 }
-// Right Click's own Tween mode (cfg.rcMode === 'Tween') shares this exact
+// Right Click's own Sequence mode (cfg.rcMode === 'Sequence') shares this exact
 // phase machine with the plain single-target-pose mode every other
 // CLICK_POSE_KEYS entry uses -- only the 'forward' phase's own source of
 // interpolation values differs (a resolved Tween Sequence, via
@@ -4595,7 +4625,7 @@ function getOrInitHandCP(hand) {
 // for this hand (forward/paused/retransition) keeps running untouched.
 function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) {
   const cp = getOrInitHandCP(hand)[p]
-  const isTween = cfg[`${p}Mode`] === 'Tween'
+  const isTween = cfg[`${p}Mode`] === 'Sequence'
   if (cp.pendingClaimAt && now >= cp.pendingClaimAt) {
     // COMMIT -- FROM value is this hand's own live current pose
     // (`hand._lastPoseValues`) whenever `hand._wasOverriddenLastFrame`
@@ -4680,7 +4710,7 @@ function triggerClickPose(p) {
   // comment for the full account).
   const forwardSnapshot = {}
   POSE_PRESET_KEYS.forEach((key) => { forwardSnapshot[key] = cfg[key] })
-  const isTween = cfg[`${p}Mode`] === 'Tween'
+  const isTween = cfg[`${p}Mode`] === 'Sequence'
   let namedPoses = null
   if (isTween) {
     const seq = (cfg.savedTweenSequences || []).find((s) => s.name === cfg[`${p}TweenSelector`])
@@ -5170,7 +5200,7 @@ function updateClickTriggerModeVisibility(p, extraSinglePoseKeys, extraTweenKeys
   })
   tweenKeys.forEach((suffix) => {
     const row = document.querySelector(`.dp-row[data-key="${p}${suffix}"]`)
-    if (row) row.style.display = mode !== 'Tween' ? 'none' : ''
+    if (row) row.style.display = mode !== 'Sequence' ? 'none' : ''
   })
 }
 // Loop Hold Duration's own NESTED visibility (chp/rchp only) -- deliberately
@@ -5183,7 +5213,7 @@ function updateClickTriggerModeVisibility(p, extraSinglePoseKeys, extraTweenKeys
 // Tween mode) -- see both controls' own onChange in makeClickHoldPoseGroup().
 function updateLoopHoldVisibility(p) {
   const row = document.querySelector(`.dp-row[data-key="${p}LoopHoldMs"]`)
-  if (row) row.style.display = (cfg[`${p}Mode`] === 'Tween' && cfg[`${p}LoopMode`] !== 'Off') ? '' : 'none'
+  if (row) row.style.display = (cfg[`${p}Mode`] === 'Sequence' && cfg[`${p}LoopMode`] !== 'Off') ? '' : 'none'
 }
 CLICK_POSE_KEYS.forEach((p) => { parseClickPoseConfig(p); buildClickPoseWidgets(p) })
 // Every Click-family group's own Mode dropdown (Single Pose vs. Tween) --
