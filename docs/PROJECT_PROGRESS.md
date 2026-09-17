@@ -49,13 +49,6 @@ group-level cascade (both kinds), and full Save-then-reload persistence
 all confirmed working. See CHANGELOG.txt's matching entry for the full
 verification trail.
 
-**Not committed yet.** `src/devpanel/devPanel.js` and `src/main.js` are
-being actively, substantively edited right now by the concurrent
-session (their own new `renderDynamicGroup()` engine addition, mid-
-"Phase 4" of their Click Function overhaul) -- both sets of changes
-coexist with no actual conflict (`node --check` clean on the combined
-current state), but this fix is left uncommitted rather than bundled
-under an unrelated commit; either session can commit once ready.
 **Still open, separate from the engine work above:** deciding which
 real HANDY DANDIES controls, if any, should actually opt into
 `dynamicDevice: true`.
@@ -92,16 +85,46 @@ manufactured `now` for the per-hand trigger functions or real elapsed
 wall-clock time for the Loading Preview's own `performance.now()`-based
 one).
 
-**Still ahead** (5 of the original 8 phases, all Click-Function-
-specific -- Loading Preview is fully done): reordering the 10 groups'
+**Phase 4 (dynamic "Add Click Function" architecture), first slice, is
+also DONE**: users can now create an unbounded number of custom fire-
+and-forget click-triggered pose functions at runtime via "+ Add Click
+Function" (Custom Click Functions group), not just the 10 hardcoded
+ones. Required extending devPanel.js itself with a genuinely new
+capability (`renderDynamicGroup()` -- the engine previously had no way
+to inject a live, interactive control group after `initDevPanel()` had
+already run) -- confirmed safe to build once the concurrent session
+editing that file finished and pushed. Reuses the existing
+`makeClickPoseGroup()` factory verbatim plus a spliced-in Type
+(Click/Right Click) control; every existing generic pipeline
+(`updateClickPoseForHand`, `triggerClickPose`, every visibility
+function) needed zero changes to support new IDs. Found and fixed 2
+real bugs along the way: `getOrInitHandCP()` didn't backfill missing
+per-trigger state for an already-touched hand when the trigger list
+grows at runtime (would have crashed the next frame a new custom
+function fired for that hand); Animation Speed Curve's own fields never
+got their interactive curve-graph widget (now fixed for all 10 existing
+triggers too, not just custom ones).
+
+**Deliberately scoped down** from the full Phase 4 spec (each disclosed,
+not an oversight): fire-and-forget only (no custom Click+Hold functions
+-- a separate, architecturally distinct state machine); Type is Click/
+Right Click only (no Scroll/mobile/zoom); no click-count selector; no
+delete-function button; no duplicate-setting validation; no automatic
+hold-timing conflict resolution. Verified live via real UI clicks
+(`computer{left_click}` on the actual "+ Add Click Function" button,
+twice) plus a direct simulation of the backfill bug's exact failure
+scenario.
+
+**Still ahead** (Click-Function-specific -- Loading Preview and Phase
+4's first slice are both fully done): reordering the 10 fixed groups'
 own settings to match the spec's B ordering; the deferred "Tween Stop"
 curve question (Phase 2, likely duplicates the existing Tween
-Retransition Start Time Curve/Range); Type/click-count/scroll
-dropdowns; a dynamic "Add Click Function" architecture generalizing
-click/hold detection to any number of functions with no manual tuning;
-a multi-sequence-plus-hold chain builder; bezier curve handles; mobile
-multi-touch/zoom/scroll; duplicate-setting validation. See
-CHANGELOG.txt's matching entries for full slice-by-slice detail; this
+Retransition Start Time Curve/Range); custom Click+Hold functions,
+Scroll/mobile/zoom Types, click-count selection, and function deletion
+for Custom Click Functions; Type/click-count/scroll dropdowns for the
+10 fixed triggers; a multi-sequence-plus-hold chain builder; bezier
+curve handles; duplicate-setting validation. See CHANGELOG.txt's
+matching entries for full slice-by-slice detail; this
 is genuinely large and will keep spanning multiple rounds.
 
 **SHIPPED 2026-09-17: dev-panel groups can now be individually locked

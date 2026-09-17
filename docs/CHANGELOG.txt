@@ -6780,6 +6780,135 @@ controls, if any, should actually opt into `dynamicDevice: true` -- a
 separate content decision, not part of the engine-capability work.
 
 --------------------------------------------------------------------------------
+2026-09-17  -  07:39:32 - 07:58:29 EDT (~18m57s, measured)
+
+**Click Function Phase 4, first slice: dynamic "Custom Click Functions."**
+The user's own instruction after the concurrent session (referenced in
+the entry directly above) finished and pushed: "the other session is
+done. fix everything." Confirmed via 2 rounds of AskUserQuestion first
+-- this is a genuine architectural refactor (CLAUDE.md §0a), not a
+routine extension, so it was proposed and scoped before any code was
+written, not silently executed.
+
+**Real architectural discovery before writing any code:** devPanel.js
+had NO way to inject a brand-new, LIVE, interactive control group at
+runtime -- only `addCustomGroup()`, an EMPTY group the user drags
+existing settings into. Confirmed via a dedicated Explore-agent
+investigation (6 targeted questions, not a guess) rather than assuming:
+`buildRow()`/`createGroupElement()` are ordinary module-level functions
+with no hidden one-time-init dependency, safe to export and call again
+later; `cfg`/`store` don't require a key to pre-exist before a row is
+built; group/row ORDER already persists generically (reads
+`dataset.key` straight off the live DOM), but VALUES only *restore*
+correctly if the new group's descriptor is pushed into the module-level
+`devGroups` array `applyStoredValues()`/`refreshRowDisplaysForEditingTab()`/
+`findCtrl()`/the dynamicDevice cascade helpers all iterate. This
+produced a minimal, precise diff instead of a guessed one.
+
+**devPanel.js:** exports `buildRow`/`createGroupElement` (2 one-word
+changes) + one new exported function, `renderDynamicGroup(groupSpec)`
+-- pushes the spec into `devGroups`, seeds `cfg`/`store` from each
+control's own `def` (never clobbering an already-restored value),
+renders via the exact same `createGroupElement`/`buildRow` calls
+`buildDevPanel()` itself uses, appends to the single shared `#dpGroups`
+container (confirmed this project has ONE shared container for all 3
+device tabs, not per-tab DOM), then calls
+`refreshRowDisplaysForEditingTab()` so any already-restored values for
+the new keys display correctly immediately.
+
+**main.js:** new "Custom Click Functions" DEV_GROUPS group with an
+internal-bookkeeping `customClickFunctionIds` field (JSON array of
+`{id, title}`, restored through the normal cfg pipeline like any other
+control) and the "+ Add Click Function" button.
+`addCustomClickFunction()`/`registerCustomClickFunction()` reuse
+`makeClickPoseGroup()` VERBATIM -- the exact same factory
+click/dblclick/rc/tripleClick/quadClick already use -- plus one spliced-
+in `Type` control (Click/Right Click, no onChange needed since the
+event-wiring reads it live at trigger time). The new id is pushed into
+`CLICK_POSE_KEYS` and `clickPoseTriggers`; every existing GENERIC
+pipeline (`updateClickPoseForHand`, `triggerClickPose`,
+`parseClickPoseConfig`, every visibility function -- all already
+parametrized over `p`, already proven correct on 5 IDs) needed ZERO
+changes to pick up a 6th+. `restoreCustomClickFunctions()` (called from
+`onRestore`) re-creates every saved custom function's live group fresh
+on each page load, since `renderDynamicGroup()`'s own DOM rows are pure
+runtime state that doesn't survive a reload on its own.
+
+**Real bug fixed, found by reasoning through the architecture, not by
+accident:** `getOrInitHandCP()` used to build a hand's entire `_cp`
+state object ONCE, on first touch, from whatever `CLICK_POSE_KEYS` held
+AT THAT MOMENT. Since custom functions get added well after hands are
+already built (and possibly already touched by other triggers), an
+already-initialized hand's `_cp` would permanently lack a newly-added
+custom id's own state slot -- the very next frame that id fired for
+that hand would crash (`chp.armedForHoldStartTime` etc. on `undefined`).
+Fixed by making the per-trigger state backfill PER-KEY on every call
+(`if (!hand._cp[p])`, not `if (!hand._cp)`), cheap given the small
+trigger count.
+
+**Also fixed a real pre-existing gap, caught while building the
+generalized widget-builder this needed:** Animation Speed Curve's own
+`SpeedCurve`/`SpeedCurveRange` fields (added earlier this session, Phase
+1 part 3) never got the interactive curve-graph widget every OTHER
+curve field gets -- they rendered as plain raw-JSON text boxes.
+`buildClickHoldPoseWidgets()`/`buildClickPoseWidgets()` now build these
+too, which retroactively fixes this for all 10 existing triggers, not
+just future custom ones.
+
+**Deliberately scoped DOWN from the full original Phase 4 spec**, each
+a disclosed simplification, not an oversight (see the DEV_GROUPS
+group's own comment for the full account): fire-and-forget only (no
+custom Click+Hold functions yet -- architecturally distinct state
+machine, would need its own "+Add Click+Hold Function" entry point);
+Type is Click/Right Click only (no Scroll -- a genuinely new trigger-
+detection subsystem this project has none of today -- no mobile multi-
+touch/zoom); no click-count selector (every custom function fires on a
+plain single click only); no delete-function button (the dev panel's
+own existing 🗑 Delete Group/Setting can remove the GROUP but won't
+clean up this feature's own bookkeeping, so deletion is left out rather
+than shipped half-working); no duplicate-setting validation; no
+automatic hold-timing conflict resolution (moot for fire-and-forget
+functions, which don't have hold-timing collisions to begin with).
+
+**Verified live via the REAL UI**, not just direct function calls:
+clicked the actual "+ Add Click Function" button twice via
+`computer{left_click}` on its real DOM ref -- confirmed `custom1`/
+`custom2` both created with correct sequential IDs (no collision from 2
+rapid adds), the full control battery rendered as real DOM rows
+(Enabled/Type/Mode/Offset/Rotation/TargetPose/SpeedCurveEnabled/
+SequencePlayMode all confirmed present via `data-key` queries), and the
+full runtime pipeline works end to end
+(`triggerClickPose('custom1')` -> `updateClickPoseForHand('custom1',
+...)` -> phase forward -> paused, no errors, same rAF-bypass method as
+every other slice this session). Separately, directly confirmed the
+`getOrInitHandCP()` backfill fix: manually simulated a hand whose `_cp`
+was built with only the ORIGINAL 5 fire-and-forget keys (missing
+`custom1` entirely, replicating "touched before this custom function
+existed"), confirmed a fresh call backfills `custom1` while leaving the
+other 5 keys' own state completely untouched. `node --check` passes on
+both files.
+
+**Git note:** origin/main moved twice more during this slice (the
+concurrent session's own `1bdf04a`/`1e283c2`, both touching
+`devPanel.js`) -- confirmed via `git diff` that my own uncommitted
+devPanel.js changes were EXACTLY my 3 additions (2 export keywords +
+`renderDynamicGroup`) both before and after `git pull`, with zero
+overlap or conflict; their own CHANGELOG entry (directly above this
+one) independently confirms they saw and deliberately left my
+in-progress work untouched too.
+
+**Not yet done:** custom Click+Hold functions, Scroll/mobile/zoom
+Types, click-count selection, function deletion, duplicate-setting
+validation, automatic hold-timing conflict resolution, reordering the
+10 fixed triggers' own settings to match the spec's B ordering, the
+deferred "Tween Stop" curve question (Phase 2), and the remaining
+original-plan phases (sequence-chain builder, bezier curve handles).
+
+Cache-buster: `index.html`'s own `main.js?v=142` -> `?v=143`;
+`devpanel/devPanel.js?v=25` -> `?v=26` (both this slice's own, to
+guarantee a fresh fetch for live verification).
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================
