@@ -18,6 +18,54 @@ work seamlessly from there.
 
 ## Currently working on
 
+**SHIPPED 2026-09-17: ported the applicable parts of TEMPLATE_DEV_PANEL.html's
+newest changes into this project's own devPanel.js copy** (direct request:
+"look at the new dev panel template and implement all new changes"). Of 4
+template changes reviewed, 2 didn't apply (this project's drag-handle CSS
+and group-creation anchor logic are architecturally different from the
+template's own -- see CLAUDE.md's own gotchas for the full account). The
+other 2, plus a 3rd newly-discovered one, are live: right-click-armed
+"+ Add Group" + shift-click fold-select for top-level groups/settings;
+Text Edit Mode/Add Group/Collapse All moved into 3 new header icon
+buttons (reversing the 2026-09-14 standalone-checkbox placement, per
+direct confirmation); and a Ctrl+F-style group/setting search box. All
+verified live in a fresh `?dev=1` load. See CHANGELOG.txt's matching
+entry for full detail.
+
+**Not committed/pushed this round, deliberately.** A routine pre-finish
+check found `src/main.js` already carrying a large, unrelated,
+in-progress "Tween" -> "Sequence" rename, and `index.html`'s own cache-
+buster changed on disk mid-task -- real evidence of a separate,
+currently-active session on this same project (CLAUDE.md §5/§9). This
+round's changes (`devPanel.js`, `style.css`, the 1-line `main.js` import-
+version bump, `index.html`'s own bumps) are sitting uncommitted in the
+working tree, ready to fold in once that other session's work is at a
+committable point too.
+
+**IN PROGRESS, large multi-slice undertaking: a full rebuild of the
+Click Function settings system** (direct request, spec A-L, since grown
+further mid-implementation). Renamed Mode's own 'Tween' option to
+'Sequence' (a real stored-value change, with a live-data migration --
+production settings had 10 different triggers saved as `Mode: "Tween"`)
+plus unified several labels (Animation Speed, Pause Duration At Tween
+End, Start Time Curve, Retransition Speed/Min-Max, Sequence) across all
+10 existing triggers -- the first verified slice of an 8-phase plan
+(settings schema -> Sequence-mode release behavior -> type/click-count/
+scroll -> a dynamic "Add Click Function" architecture generalizing
+click/hold detection to any number of functions with no manual tuning
+-> a multi-sequence-plus-hold chain builder -> bezier curve handles ->
+mobile multi-touch/zoom/scroll -> duplicate-setting validation). Still
+ahead within Phase 1 alone: reordering the 10 groups, Offset/Rotation
+on/off (ramping 0 -> target across the tween, composed not overwritten),
+gating Animation Speed Curve/Start Time Curve/Retransition each behind
+their own on/off, and a newly-added Count/Loop/Oscillate "Sequence
+Mode" concept that needs to reach the 5 fire-and-forget triggers (none
+of which have any loop capability today) -- plus a separately-requested
+Loading Preview upgrade (Camera/Lighting selection + this same Sequence
+Mode system) that hasn't been started. See CHANGELOG.txt's matching
+entries for full detail; this is genuinely large and will keep spanning
+multiple rounds.
+
 **SHIPPED 2026-09-17: dev-panel groups can now be individually locked
 against reordering** (`.dp-group-lock-icon`, 🔒/🔓, in each group's title
 bar) -- ported from Clicko's own dev panel, direct request. A locked
@@ -26,10 +74,11 @@ another group), but the group itself can still be freely dragged/
 reordered among other groups. Persisted through the existing
 `captureGroup()`/`applyOrder()` pipeline (same as `collapsed` state) --
 automatically covered by Copy/Save/Reset/Saved-Dev-Settings, no separate
-wiring needed. See CHANGELOG.txt's matching entry for full verification
-detail. **Same feature still needs porting into HANDO's own copy of this
-shared engine** (the other half of the original request) -- not yet
-done.
+wiring needed. **Now ported to HANDO too** (the other half of the
+original request), including a same-day follow-up inverting the lock
+icon's own opacity behavior (locked = full opacity by default, dims on
+hover -- the exact inverse of unlocked) in both projects. See
+CHANGELOG.txt's matching entries for full verification detail.
 
 **SHIPPED 2026-09-17: quad-click-hold root cause fixed (a live-settings
 value, not a code bug), plus new saveable Lighting presets.**
