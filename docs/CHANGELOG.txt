@@ -6233,6 +6233,93 @@ Cache-buster: `index.html`'s own `main.js?v=135` -> `?v=136` (this
 slice's own, to guarantee a fresh fetch for live verification).
 
 --------------------------------------------------------------------------------
+2026-09-17  -  06:57:46 - 07:10:29 EDT (~12m43s, measured)
+
+**Phase 1, part 3 of the Click Function overhaul: Animation Speed Curve
+On/Off, Start Time Curve On/Off, and Retransition On/Off added to all
+10 triggers.** Continues directly from the previous 2 entries. All 3
+are Single-Pose-mode-only gates, per the original spec's own grouping
+("Single-Pose-mode settings: ... Animation Speed Curve on/off [NEW],
+Start Time Curve on/off [wraps existing], ... Retransition on/off [NEW
+behavioral gate]") -- Sequence/Tween mode's own separate Tween-prefixed
+timing trio is deliberately untouched, a disclosed scoping choice.
+
+Animation Speed Curve is a genuinely NEW distance->speed curve/range
+pair (reuses `computeStartDelayMs()`'s already-generic curve-eval math
+rather than writing a 2nd copy of it), overriding the flat Animation
+Speed slider when enabled. Computed once per hand at trigger/arm time
+(`pendingFrozenSpeedMs` -> `frozenSpeedMs`), same "frozen at trigger
+time" treatment `chp.frozenSplayDeg`/the Start Time delay already get.
+Start Time Curve On/Off wraps the EXISTING StartTimeCurve/StartTimeRange
+controls (default true, preserving current behavior) -- off means every
+hand starts its forward transition immediately, no distance-based
+stagger. Retransition On/Off (default true) is the new "behavioral
+gate": off means the hand never enters the 'retransition' phase at all
+and stays at its end pose forever. For hold-based triggers,
+`endClickHoldPose()` simply `return`s before touching `chp.phase` when
+this gate is off -- whatever phase the hand was already in
+(forward/looping) keeps running untouched, which naturally settles at
+the target pose once forward's own progress clamps at 1 (no extra
+"frozen" phase needed). For fire-and-forget triggers, the existing
+'paused' phase's own pause-duration check is simply skipped when the
+gate is off, so it never transitions to 'retransition'.
+
+Refactored `updateClickTriggerModeVisibility()`: StartTimeCurve/
+StartTimeRange and the whole Retransition trio moved OUT of its
+hardcoded `singlePoseKeys` list -- new `updateSingleTimingGateVisibility(p)`
+now owns those rows' visibility entirely (mode check AND each control's
+own on/off state combined in one place), so 2 different functions never
+race to set the same row's `display` value.
+
+**Verified live** via `window.__debug`, bypassing this session's own
+documented rAF-not-firing browser-tool issue (CLAUDE.md's own Gotchas)
+the same way the previous entry did -- calling `updateClickPoseForHand()`
+directly with a manufactured `now`: Retransition On/Off confirmed BOTH
+directions (off -> hand phase stuck at 'paused' even 5000ms past its
+own pause duration; on -> normal paused->retransition->idle sequence,
+unaffected regression-checked). Start Time Curve On/Off confirmed both
+directions by comparing `cp.pendingClaimAt` against `performance.now()`
+at trigger time (disabled -> delay exactly 0; enabled with a real
+curve/range -> a large nonzero curve-driven delay). Speed Curve's
+DISABLED branch confirmed (`frozenSpeedMs` stays 0, forward phase falls
+back to the flat `TransitionSpeedMs` slider) -- the ENABLED/curve-
+computation branch is structurally identical to Start Time Curve's
+already-proven `computeStartDelayMs()` call (same function, different
+cfg keys) and was verified by direct source re-reading (grepped every
+`speedCurveParsed`/`speedRangeParsed`/`SpeedCurve`/`SpeedCurveRange`
+reference, confirmed no typos against the already-working Start Time
+Curve pattern it was copied from) rather than independently live-
+exercised with a real distance-driven value -- raw `window.__debug`
+cfg mutation bypasses the `onChange` that would normally reparse the
+curve JSON into `trig.speedCurveParsed`/`speedRangeParsed`, and this
+session declined to add a temporary debug-only parse hook to work
+around that rather than risk leaving debug-only scope creep behind.
+All 10 triggers' new dev-panel rows (`find()`-confirmed) present. No
+console errors (only the expected `/api/save-settings` 404s from this
+API-less static dev server, unrelated). `node --check` passes.
+
+Also hit persistent `net::ERR_CONNECTION_RESET` on `src/main.js` during
+this slice's own verification -- worse than the previous entry's single
+transient occurrence, this time needing a full server stop/restart plus
+6 navigation attempts before one finally landed, despite the static
+server's own log confirming a clean `200` response every time (a
+client-side reset mid-transfer on this specific ~large file, in this
+specific browser-automation tool, not a server or code issue). Noting
+the repeat occurrence in case a future session needs to recognize this
+pattern faster.
+
+**Not yet done:** Sequence-mode's own On Release Mode/Trigger All
+Hands/Tween Stop Curve+Delay, Count/Loop/Oscillate Sequence Mode for
+the 5 fire-and-forget triggers, reordering the 10 groups' own settings
+to match the spec's B ordering, the Loading Preview's own Camera/
+Lighting selectors + Sequence Mode, and Phases 2-8 of the original
+8-phase plan. This closes out the bulk of Phase 1's per-trigger
+settings-schema work; continuing in slices.
+
+Cache-buster: `index.html`'s own `main.js?v=136` -> `?v=137` (this
+slice's own, to guarantee a fresh fetch for live verification).
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================
