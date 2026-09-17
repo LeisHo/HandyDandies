@@ -17,9 +17,9 @@
       "palmFaceRotationOffset": 0,
       "loadingPreviewEnabled": true,
       "loadingMinTimeMs": 4200,
-      "loadingPreviewTweenSelector": "",
+      "loadingPreviewTweenSelector": "COUNT R",
       "loadingPreviewSpeedMs": 1600,
-      "loadingPreviewSize": 220,
+      "loadingPreviewSize": 340,
       "posePreviewEnabled": false,
       "thumbCurl": 75,
       "thumbSplay": 42,
@@ -4938,7 +4938,7 @@
       "dblclickRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "dblclickRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "tripleClickEnabled": true,
-      "tripleClickMode": "Tween",
+      "tripleClickMode": "Single Pose",
       "tripleClickTargetPose": "",
       "tripleClickTweenSelector": "Wave",
       "tripleClickTweenSpeedMs": 3580,
@@ -5401,9 +5401,9 @@
       "palmFaceRotationOffset": 0,
       "loadingPreviewEnabled": true,
       "loadingMinTimeMs": 4200,
-      "loadingPreviewTweenSelector": "",
+      "loadingPreviewTweenSelector": "COUNT R",
       "loadingPreviewSpeedMs": 1600,
-      "loadingPreviewSize": 220,
+      "loadingPreviewSize": 340,
       "posePreviewEnabled": false,
       "thumbCurl": 75,
       "thumbSplay": 42,
@@ -10322,7 +10322,7 @@
       "dblclickRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "dblclickRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "tripleClickEnabled": true,
-      "tripleClickMode": "Tween",
+      "tripleClickMode": "Single Pose",
       "tripleClickTargetPose": "",
       "tripleClickTweenSelector": "Wave",
       "tripleClickTweenSpeedMs": 3580,
@@ -10785,9 +10785,9 @@
       "palmFaceRotationOffset": 0,
       "loadingPreviewEnabled": true,
       "loadingMinTimeMs": 4200,
-      "loadingPreviewTweenSelector": "",
+      "loadingPreviewTweenSelector": "COUNT R",
       "loadingPreviewSpeedMs": 1600,
-      "loadingPreviewSize": 220,
+      "loadingPreviewSize": 340,
       "posePreviewEnabled": false,
       "thumbCurl": 75,
       "thumbSplay": 42,
@@ -15706,7 +15706,7 @@
       "dblclickRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "dblclickRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "tripleClickEnabled": true,
-      "tripleClickMode": "Tween",
+      "tripleClickMode": "Single Pose",
       "tripleClickTargetPose": "",
       "tripleClickTweenSelector": "Wave",
       "tripleClickTweenSpeedMs": 3580,
@@ -16157,17 +16157,20 @@
     {
       "key": "Saved Dev Settings",
       "collapsed": true,
+      "locked": false,
       "settings": [],
       "subgroups": []
     },
     {
       "key": "Dev Panel",
       "collapsed": true,
+      "locked": false,
       "settings": [],
       "subgroups": [
         {
           "key": "MECHANICS",
           "collapsed": true,
+          "locked": false,
           "settings": [
             "dp_scrollStrength"
           ],
@@ -16176,6 +16179,7 @@
         {
           "key": "PANEL UI",
           "collapsed": true,
+          "locked": false,
           "settings": [
             "dp_bgColor",
             "dp_accentColor",
@@ -16187,6 +16191,7 @@
         {
           "key": "TEXT",
           "collapsed": true,
+          "locked": false,
           "settings": [
             "dp_fontFamily"
           ],
@@ -16194,6 +16199,7 @@
             {
               "key": "Dev Panel Title",
               "collapsed": false,
+              "locked": false,
               "settings": [
                 "dp_boldTitle",
                 "dp_capsTitleText",
@@ -16208,6 +16214,7 @@
             {
               "key": "Group Title",
               "collapsed": false,
+              "locked": false,
               "settings": [
                 "dp_boldGroup",
                 "dp_capsGroupNames",
@@ -16222,6 +16229,7 @@
             {
               "key": "Setting Title",
               "collapsed": false,
+              "locked": false,
               "settings": [
                 "dp_capsSettingsText",
                 "dp_boldSettings",
@@ -16237,6 +16245,7 @@
             {
               "key": "TABS",
               "collapsed": false,
+              "locked": false,
               "settings": [
                 "dp_boldTab",
                 "dp_capsTabText",
@@ -16250,6 +16259,7 @@
             {
               "key": "BUTTONS",
               "collapsed": false,
+              "locked": false,
               "settings": [
                 "dp_boldButton",
                 "dp_capsButtonText",
@@ -16267,7 +16277,8 @@
     },
     {
       "key": "Loading Preview",
-      "collapsed": true,
+      "collapsed": false,
+      "locked": false,
       "settings": [
         "loadingPreviewEnabled",
         "loadingMinTimeMs",
@@ -16280,6 +16291,7 @@
     {
       "key": "Tween",
       "collapsed": true,
+      "locked": false,
       "settings": [
         "tweenPreviewSpeedMs",
         "tweenPoses",
@@ -16290,6 +16302,7 @@
     {
       "key": "Field Layout",
       "collapsed": true,
+      "locked": false,
       "settings": [
         "fieldRows",
         "fieldCols",
@@ -16304,7 +16317,8 @@
     },
     {
       "key": "Cursor Tracking",
-      "collapsed": false,
+      "collapsed": true,
+      "locked": false,
       "settings": [
         "palmFaceRotationOffset",
         "trackingEnabled",
@@ -16317,12 +16331,14 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": false,
+      "collapsed": true,
+      "locked": false,
       "settings": [],
       "subgroups": [
         {
           "key": "Click Pose",
           "collapsed": true,
+          "locked": false,
           "settings": [
             "clickTweenSpeedMs",
             "clickTweenStartTimeCurve",
@@ -16344,6 +16360,7 @@
         {
           "key": "Click Hold-Pose",
           "collapsed": true,
+          "locked": false,
           "settings": [
             "chpTweenRetransitionSpeedMs",
             "chpTweenSpeedMs",
@@ -16370,6 +16387,7 @@
         {
           "key": "Double-Click Pose",
           "collapsed": true,
+          "locked": false,
           "settings": [
             "dblclickTweenSpeedMs",
             "dblclickTweenStartTimeCurve",
@@ -16390,7 +16408,8 @@
         },
         {
           "key": "Double Click Hold",
-          "collapsed": true,
+          "collapsed": false,
+          "locked": false,
           "settings": [
             "dcHoldTweenRetransitionSpeedMs",
             "dcHoldTweenSelector",
@@ -16416,7 +16435,8 @@
         },
         {
           "key": "Triple-Click Pose",
-          "collapsed": false,
+          "collapsed": true,
+          "locked": false,
           "settings": [
             "tripleClickEnabled",
             "tripleClickMode",
@@ -16438,6 +16458,7 @@
         {
           "key": "Triple-Click Hold",
           "collapsed": true,
+          "locked": false,
           "settings": [
             "tripleClickHoldEnabled",
             "tripleClickHoldMode",
@@ -16464,6 +16485,7 @@
         {
           "key": "Quadruple-Click Pose",
           "collapsed": false,
+          "locked": false,
           "settings": [
             "quadClickEnabled",
             "quadClickMode",
@@ -16485,6 +16507,7 @@
         {
           "key": "Quadruple-Click Hold",
           "collapsed": false,
+          "locked": false,
           "settings": [
             "quadClickHoldEnabled",
             "quadClickHoldMode",
@@ -16511,6 +16534,7 @@
         {
           "key": "Right Click",
           "collapsed": true,
+          "locked": false,
           "settings": [
             "rcTweenSpeedMs",
             "rcTweenStartTimeRange",
@@ -16532,6 +16556,7 @@
         {
           "key": "Right-Click Hold-Pose",
           "collapsed": true,
+          "locked": false,
           "settings": [
             "rchpTweenRetransitionSpeedMs",
             "rchpTweenRetransitionStartTimeCurve",
@@ -16558,6 +16583,7 @@
         {
           "key": "Responsive Wrist Splay",
           "collapsed": false,
+          "locked": false,
           "settings": [
             "wristSplayReposeStagger",
             "wristSplayResponsiveEnabled",
@@ -16573,6 +16599,7 @@
     {
       "key": "Pose",
       "collapsed": true,
+      "locked": false,
       "settings": [
         "posePreviewEnabled",
         "savedPoses"
@@ -16581,6 +16608,7 @@
         {
           "key": "Whole-Hand Rotation & Thumb",
           "collapsed": true,
+          "locked": false,
           "settings": [
             "modelRotX",
             "modelRotY",
@@ -16591,6 +16619,7 @@
         {
           "key": "Wrist",
           "collapsed": true,
+          "locked": false,
           "settings": [
             "cropWristEnabled",
             "reactiveArmLengthEnabled",
@@ -16605,6 +16634,7 @@
         {
           "key": "New Group",
           "collapsed": true,
+          "locked": false,
           "settings": [
             "thumbCurl",
             "tipOnlyCurlThumb",
@@ -16620,6 +16650,7 @@
         {
           "key": "Index",
           "collapsed": true,
+          "locked": false,
           "settings": [
             "midOnlyCurlIndex",
             "tipOnlyCurlIndex",
@@ -16635,6 +16666,7 @@
         {
           "key": "Middle",
           "collapsed": true,
+          "locked": false,
           "settings": [
             "midOnlyCurlMiddle",
             "tipOnlyCurlMiddle",
@@ -16650,6 +16682,7 @@
         {
           "key": "Ring",
           "collapsed": true,
+          "locked": false,
           "settings": [
             "midOnlyCurlRing",
             "tipOnlyCurlRing",
@@ -16665,6 +16698,7 @@
         {
           "key": "Pinky",
           "collapsed": true,
+          "locked": false,
           "settings": [
             "midOnlyCurlPinky",
             "tipOnlyCurlPinky",
@@ -16682,12 +16716,14 @@
     {
       "key": "Pose Preview",
       "collapsed": true,
+      "locked": false,
       "settings": [],
       "subgroups": []
     },
     {
       "key": "Camera",
-      "collapsed": true,
+      "collapsed": false,
+      "locked": false,
       "settings": [
         "savedCameras",
         "lockCameraPan",
@@ -16704,6 +16740,7 @@
     {
       "key": "Lighting",
       "collapsed": true,
+      "locked": false,
       "settings": [
         "savedLighting",
         "keyAzimuth",
@@ -16720,6 +16757,7 @@
     {
       "key": "Toon Shading",
       "collapsed": true,
+      "locked": false,
       "settings": [
         "toonSteps",
         "toonStepThreshold",
@@ -16737,6 +16775,7 @@
     {
       "key": "Outline",
       "collapsed": true,
+      "locked": false,
       "settings": [
         "outlineEnabled",
         "useOutlinePass",
@@ -16751,6 +16790,7 @@
     {
       "key": "Background",
       "collapsed": true,
+      "locked": false,
       "settings": [
         "bgColor"
       ],
@@ -16759,6 +16799,7 @@
     {
       "key": "Debug",
       "collapsed": false,
+      "locked": false,
       "settings": [
         "multiClickWindowMs",
         "pauseAnimations",
