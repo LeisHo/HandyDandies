@@ -6,7 +6,7 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js'
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js'
 import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js'
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js'
-import { initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings } from './devpanel/devPanel.js?v=23'
+import { initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings } from './devpanel/devPanel.js?v=24'
 
 // A defensive wrapper around devPanel.js's own refreshSelectOptions() --
 // found via live testing (direct user report: "I dont see any of the
@@ -2327,7 +2327,7 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       // and Hold Confirm Delay stay visible regardless of mode.
       {
         key: `${p}Mode`, label: 'Mode', type: 'select', def: 'Single Pose', options: () => ['Single Pose', 'Sequence'],
-        onChange: () => { updateClickTriggerModeVisibility(p, [], ['LoopMode']); updateLoopHoldVisibility(p); updateSingleTimingGateVisibility(p) }
+        onChange: () => { updateClickTriggerModeVisibility(p, [], ['LoopMode', 'OnReleaseMode', 'TriggerAllHands']); updateLoopHoldVisibility(p); updateSingleTimingGateVisibility(p) }
       },
       // Offset/Rotation -- direct request 2026-09-17 ("Offset On and Off,
       // to set if the hand itself will be physically offset in the x and
@@ -2499,7 +2499,30 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       // release can reasonably want more time than a single pose's.
       { key: `${p}TweenRetransitionSpeedMs`, label: 'Retransition Speed (Ms)', type: 'slider', min: 50, max: 5000, step: 10, def: 800 },
       { key: `${p}TweenRetransitionStartTimeCurve`, label: 'Retransition Start Time Curve (Distance -> Start Time)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickHoldConfig(p) },
-      { key: `${p}TweenRetransitionStartTimeRange`, label: 'Retransition Min / Max Start Time (Ms)', type: 'text', def: '{"min":0,"max":300}', onChange: () => parseClickHoldConfig(p) }
+      { key: `${p}TweenRetransitionStartTimeRange`, label: 'Retransition Min / Max Start Time (Ms)', type: 'text', def: '{"min":0,"max":300}', onChange: () => parseClickHoldConfig(p) },
+      // Sequence-mode release behavior -- direct spec item ("Sequence-
+      // mode adds its own On Release Mode (Complete Sequence/Stop) with
+      // Trigger All Hands"). Only meaningful for HOLD-based triggers
+      // (chp/rchp/dcHold/tripleClickHold/quadClickHold) -- these are the
+      // only ones with a genuine "release" event mid-tween; the fire-
+      // and-forget family (click/dblclick/rc/tripleClick/quadClick) has
+      // no hold to release, so this doesn't apply there.
+      // 'Stop' (default) = CURRENT/existing behavior, unchanged: release
+      // immediately begins retransition from wherever the hand is right
+      // now, staggered per hand via the existing Retransition Start Time
+      // Curve/Range above. 'Complete Sequence' = the hand keeps playing
+      // (forward pass, or the CURRENT lap if already looping) instead of
+      // stopping immediately on release -- see updateClickHoldPoseForHand()'s
+      // own `chp.releasePending` handling in the forward/looping phases
+      // for exactly where it checks in.
+      { key: `${p}OnReleaseMode`, label: 'On Release Mode - Complete Sequence, Stop', type: 'select', def: 'Stop', options: () => ['Stop', 'Complete Sequence'] },
+      // Trigger All Hands -- direct clarification (AskUserQuestion,
+      // 2026-09-17): "force simultaneous release... ALL hands immediately
+      // begin their stop/retransition together, overriding each hand's
+      // own normal distance-based stagger delay." Off (default) = every
+      // hand still staggers via the existing Retransition Start Time
+      // Curve/Range, exactly as before this feature existed.
+      { key: `${p}TriggerAllHands`, label: 'Trigger All Hands', type: 'checkbox', def: false }
     ]
   }
 }
@@ -4061,7 +4084,7 @@ function getOrInitHandCHP(hand) {
     // are now genuinely PER-HAND (captured at each hand's own claim
     // moment), replacing the old shared `trig.forwardSnapshot`/
     // `trig.tweenPoses` this hand used to read directly.
-    CLICK_HOLD_KEYS.forEach((p) => { hand._chp[p] = { phase: 'idle', forwardStartTime: 0, forwardSnapshot: null, tweenPosesResolved: null, loopStartTime: 0, loopHoldEndTime: 0, loopDirection: 1, retransitionDelay: 0, retransitionStart: null, retransitionStartTime: 0, retransitionIsTween: false, lastAppliedValues: null, frozenSplayDeg: 0, pendingClaimAt: 0, armedForHoldStartTime: -1, pendingFrozenSplayDeg: 0, frozenSpeedMs: 0, pendingFrozenSpeedMs: 0 } })
+    CLICK_HOLD_KEYS.forEach((p) => { hand._chp[p] = { phase: 'idle', forwardStartTime: 0, forwardSnapshot: null, tweenPosesResolved: null, loopStartTime: 0, loopHoldEndTime: 0, loopDirection: 1, retransitionDelay: 0, retransitionStart: null, retransitionStartTime: 0, retransitionIsTween: false, lastAppliedValues: null, frozenSplayDeg: 0, pendingClaimAt: 0, armedForHoldStartTime: -1, pendingFrozenSplayDeg: 0, frozenSpeedMs: 0, pendingFrozenSpeedMs: 0, releasePending: false } })
   }
   return hand._chp
 }
@@ -4337,6 +4360,22 @@ function safeTweenSpeedMs(v) { return Number.isFinite(v) ? v : 800 }
 // already running for this hand keeps running completely unaffected --
 // literally "continue their first tween" for as long as the 2nd
 // trigger's own per-hand delay hasn't elapsed yet.
+// Shared by updateClickHoldPoseForHand()'s own forward/looping phases
+// (Complete-Sequence mode's own natural-completion stop) -- begins this
+// hand's retransition using the SAME Tween Retransition Start Time
+// Curve/Range every OTHER tween-retransition path already uses, except
+// when Trigger All Hands is on, which bypasses that per-hand stagger
+// entirely (delay 0, every hand starts together) per the direct
+// clarification (AskUserQuestion, 2026-09-17).
+function beginTweenReleaseStop(chp, trig, p, values, live, minLiveDist, liveDistRange, now) {
+  chp.retransitionStart = values
+  chp.retransitionStartTime = now
+  const triggerAllHands = !!cfg[`${p}TriggerAllHands`]
+  chp.retransitionDelay = triggerAllHands ? 0 : computeStartDelayMs(live, minLiveDist, liveDistRange, trig.tweenRetransitionCurveParsed, trig.tweenRetransitionRangeParsed)
+  chp.retransitionIsTween = true
+  chp.phase = 'retransition'
+  chp.releasePending = false
+}
 function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) {
   const trig = clickHoldPoseTriggers[p]
   const chp = getOrInitHandCHP(hand)[p]
@@ -4387,6 +4426,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     chp.frozenSplayDeg = chp.pendingFrozenSplayDeg
     chp.frozenSpeedMs = chp.pendingFrozenSpeedMs
     chp.pendingClaimAt = 0
+    chp.releasePending = false // a NEW hold-claim always starts fresh, regardless of a stale flag from a previous release
   }
   if (chp.phase === 'forward') {
     // Tween mode (added 2026-09-15, see makeClickHoldPoseGroup()'s own
@@ -4409,6 +4449,20 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     if (isTween) {
       if (!chp.tweenPosesResolved || chp.tweenPosesResolved.length < 2) return // nothing selected -- leave this hand's pose untouched
       values = lerpTweenSequence(chp.tweenPosesResolved, progress)
+      // On Release Mode = 'Complete Sequence' (direct spec item) -- a
+      // release happened WHILE this forward pass was still playing
+      // (endClickHoldPose() left `chp.phase` untouched and only set
+      // `chp.releasePending` in that case, see its own comment). Now
+      // that this pass has genuinely finished naturally, stop right
+      // here -- even if Loop Mode is active, "complete sequence" means
+      // finish the ONE pass in progress, not start a brand new loop.
+      if (progress >= 1 && chp.releasePending) {
+        chp.lastAppliedValues = values
+        applyPoseValuesToHand(hand, values, chp.frozenSplayDeg)
+        applyOffsetRotationToHand(hand, p, progress)
+        beginTweenReleaseStop(chp, trig, p, values, live, minLiveDist, liveDistRange, now)
+        return
+      }
       // Loop Mode -- direct follow-up request, ported from Double Click
       // Hold Tween's own Loop checkbox, then extended with an Oscillate
       // option (see makeClickHoldPoseGroup()'s own comment). Only
@@ -4501,9 +4555,17 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     applyPoseValuesToHand(hand, values, chp.frozenSplayDeg)
     applyOffsetRotationToHand(hand, p, 1) // looping only starts once the forward ramp is fully complete
     if (lapT >= 1) {
-      const holdMs = Math.max(cfg[`${p}LoopHoldMs`] ?? 0, 0)
-      if (holdMs > 0) chp.loopHoldEndTime = now + holdMs
-      else chp.loopStartTime = now // no hold configured -- restart the lap clock seamlessly, same as the old always-continuous behavior
+      // On Release Mode = 'Complete Sequence' -- a release happened
+      // while this lap was already looping (see the forward phase's own
+      // matching comment). Finish the CURRENT lap (just completed, right
+      // above), then stop -- don't start another lap.
+      if (chp.releasePending) {
+        beginTweenReleaseStop(chp, trig, p, values, live, minLiveDist, liveDistRange, now)
+      } else {
+        const holdMs = Math.max(cfg[`${p}LoopHoldMs`] ?? 0, 0)
+        if (holdMs > 0) chp.loopHoldEndTime = now + holdMs
+        else chp.loopStartTime = now // no hold configured -- restart the lap clock seamlessly, same as the old always-continuous behavior
+      }
     }
   } else if (chp.phase === 'retransition') {
     // Tween mode's own dedicated Retransition Speed (direct request --
@@ -4628,11 +4690,28 @@ function endClickHoldPose(p) {
     // Sequence/Tween mode's own release always retransitions (disclosed
     // scoping choice, see the control's own comment).
     if (!chp.retransitionIsTween && cfg[`${p}RetransitionEnabled`] === false) return
+    // On Release Mode = 'Complete Sequence' (Sequence mode only, direct
+    // spec item) -- don't stop now; leave `chp.phase` exactly as it is
+    // (still 'forward' or 'looping', genuinely mid-playback) and just
+    // flag it. updateClickHoldPoseForHand()'s own forward/looping phases
+    // check this flag at their own natural completion point (end of the
+    // current pass/lap) and call beginTweenReleaseStop() from there --
+    // see their own matching comments for the full account.
+    if (chp.retransitionIsTween && cfg[`${p}OnReleaseMode`] === 'Complete Sequence') {
+      chp.releasePending = true
+      return
+    }
     chp.retransitionStart = chp.lastAppliedValues || { ...poseDefaultValues }
     chp.retransitionStartTime = now
-    chp.retransitionDelay = chp.retransitionIsTween
+    // Trigger All Hands (Sequence mode only, direct clarification --
+    // AskUserQuestion, 2026-09-17) -- bypasses the normal per-hand
+    // Tween Retransition stagger entirely (delay 0, every hand starts
+    // together) instead of each hand computing its own distance-based
+    // delay. Single Pose's own Retransition stagger is unaffected.
+    const triggerAllHands = chp.retransitionIsTween && !!cfg[`${p}TriggerAllHands`]
+    chp.retransitionDelay = triggerAllHands ? 0 : (chp.retransitionIsTween
       ? computeStartDelayMs(dists[i], minD, range, trig.tweenRetransitionCurveParsed, trig.tweenRetransitionRangeParsed)
-      : computeStartDelayMs(dists[i], minD, range, trig.retransitionCurveParsed, trig.retransitionRangeParsed)
+      : computeStartDelayMs(dists[i], minD, range, trig.retransitionCurveParsed, trig.retransitionRangeParsed))
     chp.phase = 'retransition'
   })
 }
@@ -5622,7 +5701,7 @@ CLICK_POSE_KEYS.forEach((p) => { parseClickPoseConfig(p); buildClickPoseWidgets(
 // that. Click Pose/Double-Click Pose/Right Click share CLICK_POSE_KEYS'
 // own Pause Duration slider; Click Hold-Pose/Right-Click Hold-Pose don't.
 CLICK_POSE_KEYS.forEach((p) => { updateClickTriggerModeVisibility(p, ['PauseDurationMs']); updateOffsetRotationVisibility(p); updateSingleTimingGateVisibility(p); updateSequencePlayModeVisibility(p) })
-CLICK_HOLD_KEYS.forEach((p) => { updateClickTriggerModeVisibility(p, [], ['LoopMode']); updateLoopHoldVisibility(p); updateOffsetRotationVisibility(p); updateSingleTimingGateVisibility(p) })
+CLICK_HOLD_KEYS.forEach((p) => { updateClickTriggerModeVisibility(p, [], ['LoopMode', 'OnReleaseMode', 'TriggerAllHands']); updateLoopHoldVisibility(p); updateOffsetRotationVisibility(p); updateSingleTimingGateVisibility(p) })
 // Bug fix (direct user report, "I dont see any of the saved poses in the
 // dropdown"): a `select` control's <option> list is populated by
 // `displayValue()` during the host's own restore-from-storage step
