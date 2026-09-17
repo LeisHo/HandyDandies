@@ -18,29 +18,35 @@ work seamlessly from there.
 
 ## Currently working on
 
-**SHIPPED 2026-09-17: ported the applicable parts of TEMPLATE_DEV_PANEL.html's
-newest changes into this project's own devPanel.js copy** (direct request:
-"look at the new dev panel template and implement all new changes"). Of 4
-template changes reviewed, 2 didn't apply (this project's drag-handle CSS
-and group-creation anchor logic are architecturally different from the
-template's own -- see CLAUDE.md's own gotchas for the full account). The
-other 2, plus a 3rd newly-discovered one, are live: right-click-armed
-"+ Add Group" + shift-click fold-select for top-level groups/settings;
-Text Edit Mode/Add Group/Collapse All moved into 3 new header icon
-buttons (reversing the 2026-09-14 standalone-checkbox placement, per
-direct confirmation); and a Ctrl+F-style group/setting search box. All
-verified live in a fresh `?dev=1` load. See CHANGELOG.txt's matching
-entry for full detail.
+**SHIPPED 2026-09-17: ported the dev-panel template's Add Group/fold-
+select/header-icon-buttons/search, PLUS Delete Group/Setting + Undo,
+into this project's own devPanel.js copy.** Header now has 6 icon
+buttons total (Text Edit Mode, Add Group, Collapse All, Delete Group/
+Setting, Undo, Collapse); Delete refuses only the "Dev Panel" built-in
+group (walking the full ancestor chain); Undo is a real infinite,
+session-scoped stack (value snapshots + a separate delete-restore entry
+kind), cleared on Save/Sync, with the template's own documented self-
+reference-bug guard ported verbatim. All verified live with real
+`pointerdown`+`click` event sequences (not `.click()`, which would hide
+that exact bug). See CHANGELOG.txt's matching 2026-09-17 entries for the
+full account, including which 2 of the original 4 template changes
+turned out architecturally inapplicable here.
 
-**Committed and pushed separately from the concurrent session's own
-work.** A routine pre-finish check found `src/main.js` already carrying
-a large, unrelated, in-progress "Tween" -> "Sequence" rename from a
-separate, currently-active session (CLAUDE.md §5/§9) -- that work
-landed as its own commit (`0df1236`) moments later, harmlessly absorbing
-this task's 1-line `main.js`/`index.html` cache-bust bumps along with
-it. The remaining diff (`devPanel.js`, `style.css`, docs) was then a
-clean, isolated diff scoped entirely to this task, committed and pushed
-on its own right after.
+**WRITTEN, NOT YET LIVE-VERIFIED: the "Independent from Desktop" per-
+control mobile/landscape checkbox system (§12f-1), redesigned (not
+ported 1:1) for this project's one-row-per-control architecture** --
+`dynamicDevice: true` opt-in flag, `commit()`'s own new mirroring
+branch, row + group-level checkboxes, persistence wired into BOTH real
+snapshot shapes (`saveSettings()`/`resetSettings()` AND
+`captureFullPanelState()`/`applyFullPanelState()`). `node --check`
+passes; live browser verification was blocked this round by a
+reproducible environment issue (`main.js` truncates at a fixed byte
+count under this sandbox's own network layer, confirmed via `curl`
+outside the browser tool too -- not a code problem). **Next session:
+re-attempt live verification first** (temporarily opt one real control
+into `dynamicDevice: true`, exercise Show-in-Mobile/Independent
+checkboxes + group cascade + Undo/Save round-trip, then revert the test
+flag), before trusting this feature in front of the user.
 
 **IN PROGRESS, large multi-slice undertaking: a full rebuild of the
 Click Function settings system** (direct request, spec A-L, since grown

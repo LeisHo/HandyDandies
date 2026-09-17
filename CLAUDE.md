@@ -276,3 +276,40 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   a 1:1 port — 2 of the 4 changes reviewed this round turned out not to
   apply at all for exactly this reason. See CHANGELOG.txt's matching
   2026-09-17 entry for the full account of what was and wasn't ported.
+- **`src/main.js` (441,597 bytes as of 2026-09-17) truncates at a fixed
+  391,680-byte cutoff when served by a plain static server in this
+  environment — and the connection resets, aborting the load.**
+  Reproduced identically across 4 different static-server processes
+  (different ports, `localhost` and an explicit `127.0.0.1` bind) AND
+  via a plain `curl` request that never touches the browser-automation
+  tool at all (`curl` exit 56, "failure receiving network data") — this
+  rules out the browser tool itself as the cause; it's this sandbox's
+  own network layer. Genuinely intermittent, not 100% reproducible: 1 of
+  4 back-to-back `curl` retries against the exact same file succeeded
+  with the correct full byte count. Only `main.js` hit this — `devPanel.js`/
+  `style.css` (much smaller) never did. If a browser-preview load of
+  this project silently never gets past "Loading hands…" with no JS
+  error in the console (just `net::ERR_CONNECTION_RESET` on `main.js`
+  itself in `read_network_requests`), this is almost certainly it, not
+  a real code regression — retry the navigation a few times (or via
+  `curl` first, to confirm cheaply before re-testing in the browser)
+  rather than assuming the just-made change broke something. See
+  CHANGELOG.txt's 2026-09-17 Delete/Undo/dynamicDevice entry for the
+  full diagnostic trail (this is what blocked live-verifying that
+  entry's own dynamicDevice work).
+- **The "Independent from Desktop" mobile/landscape checkbox system
+  (§12f-1) was deliberately NOT ported 1:1 from the template — it's a
+  from-scratch redesign for this project's real architecture, confirmed
+  with the user via AskUserQuestion before building (2026-09-17).** The
+  template creates 3 SEPARATE DOM rows per device per control and wires
+  cross-element mirroring between them; this project has exactly ONE row
+  per control and 3 store slots already (`store.desktop`/`.mobile`/
+  `.landscape`), so the mirroring instead lives inside `commit()`'s own
+  new `ctrl.dynamicDevice` branch — no DOM-to-DOM syncing needed at all,
+  and no separate "retained value while hidden" cache either (unlike the
+  template's own `devDeviceValues` map), since a non-independent
+  device's own store slot is already kept live-current by that same
+  mirroring. Written and `node --check`-clean, but NOT yet live-
+  verified in a real browser — see the gotcha directly above for why,
+  and CHANGELOG.txt's matching entry for the full design account before
+  trusting or extending this feature.

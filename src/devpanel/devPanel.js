@@ -42,6 +42,20 @@ let storageKeyPrefix = 'devPanel'
 // were for its static-HTML structure.
 let textEditModeEnabled = false
 let textOverrides = {}
+// §12f-1: opt-in per control (`dynamicDevice: true` on its registration)
+// live runtime toggles -- ported from TEMPLATE_DEV_PANEL.html's own
+// [JS-4b0], adapted to this project's single-row-per-control shape (the
+// template creates 3 SEPARATE DOM rows per device and mirrors between
+// them; this project has exactly one row and 3 store slots already,
+// per §12f, so "independent" here just means "this control's mobile/
+// landscape store slot stops being overwritten by commit()'s own
+// desktop-mirror branch," and "hidden" means the row's own DOM element
+// is display:none while editingDevice !== 'desktop' -- see commit()'s
+// dynamicDevice branch and refreshRowDisplaysForEditingTab()'s own
+// visibility loop). Keyed by ctrl.key, same identity every other per-
+// control map (numEls, textOverrides) already uses.
+let devVisibility = {} // { [key]: boolean } -- default true (shown) when absent
+let devIndependence = { mobile: {}, landscape: {} } // { [key]: boolean } -- default false (mirrors desktop) when absent
 const numEls = {} // key -> { slider, numInput } | { type: 'color' } | { type: 'checkbox' }
 // Set by initDevPanel()'s own saveSettings() closure (see its own comment) so
 // the exported saveCurrentSettings() below can trigger a real persisted save.
@@ -93,10 +107,44 @@ function findCtrl(key) {
   return null
 }
 
+function isDevRowVisible(key) { return devVisibility[key] !== false }
+function isDevRowIndependent(tab, key) { return !!(devIndependence[tab] && devIndependence[tab][key]) }
+const otherDynamicDeviceTab = (tab) => (tab === 'mobile' ? 'landscape' : 'mobile')
+
 // Writes a value into the store (both device slots if the control is
 // shared) and, only when the change is actually visible on the CURRENT real
 // device, updates the live `cfg` and fires the control's onChange.
 function commit(ctrl, v) {
+  if (ctrl.dynamicDevice) {
+    // §12f-1: no separate per-device DOM rows to mirror between (unlike
+    // the template) -- store[d][key] IS the single source of truth for
+    // device `d`, so "mirror" here just means writing the SAME value
+    // into every non-independent device's own slot directly, and "a
+    // mobile/landscape edit while non-independent" is redirected to
+    // desktop's own slot (which then re-mirrors to the OTHER device,
+    // matching the template's "editing a non-independent row edits
+    // Desktop" semantics) rather than left to silently diverge.
+    if (editingDevice === 'desktop') {
+      store.desktop[ctrl.key] = v
+      ;['mobile', 'landscape'].forEach((d) => { if (!isDevRowIndependent(d, ctrl.key)) store[d][ctrl.key] = v })
+    } else if (isDevRowIndependent(editingDevice, ctrl.key)) {
+      store[editingDevice][ctrl.key] = v
+    } else {
+      store.desktop[ctrl.key] = v
+      store[editingDevice][ctrl.key] = v
+      const other = otherDynamicDeviceTab(editingDevice)
+      if (!isDevRowIndependent(other, ctrl.key)) store[other][ctrl.key] = v
+    }
+    // The value that just genuinely changed lives on 'desktop' unless
+    // this edit was independent -- onChange/cfg should only fire when
+    // THAT device is the one actually running live right now.
+    const changedOn = (editingDevice !== 'desktop' && isDevRowIndependent(editingDevice, ctrl.key)) ? editingDevice : 'desktop'
+    if (changedOn === realDeviceClass()) {
+      cfg[ctrl.key] = v
+      if (ctrl.onChange) ctrl.onChange(v)
+    }
+    return
+  }
   if (ctrl.perDevice) {
     store[editingDevice][ctrl.key] = v
   } else {
@@ -767,6 +815,40 @@ function buildRow(ctrl) {
     row.appendChild(numInput)
     numEls[ctrl.key] = { slider, numInput }
   }
+  // §12f-1: dynamicDevice opt-in -- "Show in Mobile/Landscape" (Desktop-
+  // only relevance) + "Independent from Desktop" (Mobile/Landscape-only
+  // relevance) checkboxes, for the 4 uniform control types this covers
+  // (matching TEMPLATE_DEV_PANEL.html's own stated scope -- NOT text/
+  // list-picker/multi-select/button rows). Which one is actually
+  // interactable/visible is decided by refreshDynamicDeviceRowChrome(),
+  // called from refreshRowDisplaysForEditingTab() -- both checkboxes
+  // always exist in this row's DOM regardless of tab, since this project
+  // has one row per control, not 3.
+  if (ctrl.dynamicDevice && !['text', 'list-picker', 'multi-select', 'button'].includes(ctrl.type)) {
+    const visCheckbox = el('input', 'dp-dynamic-device-checkbox', { type: 'checkbox', title: 'Show in Mobile/Landscape' })
+    visCheckbox.addEventListener('click', (e) => e.stopPropagation())
+    visCheckbox.addEventListener('change', () => {
+      devVisibility[ctrl.key] = visCheckbox.checked
+      refreshRowDisplaysForEditingTab()
+    })
+    const indepCheckbox = el('input', 'dp-dynamic-device-checkbox', { type: 'checkbox', title: 'Independent from Desktop' })
+    indepCheckbox.addEventListener('click', (e) => e.stopPropagation())
+    indepCheckbox.addEventListener('change', () => {
+      if (editingDevice === 'desktop') return // defensive -- hidden on this tab, never real-clickable
+      devIndependence[editingDevice][ctrl.key] = indepCheckbox.checked
+      // Unchecking immediately snaps this row back to Desktop's current
+      // value (matching the template's own identical behavior) -- while
+      // CHECKED, store[editingDevice][ctrl.key] already holds whatever
+      // it last mirrored from Desktop, which is exactly the right
+      // starting point (no separate "retained value" store needed, per
+      // this project's own §12f-1 comment above).
+      if (!indepCheckbox.checked) store[editingDevice][ctrl.key] = store.desktop[ctrl.key]
+      refreshRowDisplaysForEditingTab()
+    })
+    row.appendChild(visCheckbox)
+    row.appendChild(indepCheckbox)
+    if (numEls[ctrl.key]) { numEls[ctrl.key].visCheckbox = visCheckbox; numEls[ctrl.key].indepCheckbox = indepCheckbox }
+  }
   return row
 }
 
@@ -1131,17 +1213,87 @@ function createGroupElement(title) {
   // the same header row; stopping propagation here just keeps a click on
   // the icon from ever being misread as the start of anything else.
   lockIcon.addEventListener('pointerdown', (e) => e.stopPropagation())
-  h.append(el('span', 'dp-drag-handle', { textContent: '⠿' }), el('span', 'arrow', { textContent: '▼' }), titleText, lockIcon)
+  // §12f-1 group-level cascade checkboxes -- a pure write-through
+  // convenience with NO persisted state of its own (matching the
+  // template's own design decision), so it works correctly for a
+  // custom "+ Add Group" group and survives drag-reordering for free.
+  // Hidden by default; shown/hidden and checked/unchecked purely by
+  // refreshGroupCascadeChrome() below, called from
+  // refreshRowDisplaysForEditingTab() alongside every row's own chrome.
+  const visCascadeCheckbox = el('input', 'dp-group-cascade-checkbox', { type: 'checkbox', title: 'Show in Mobile/Landscape (whole group)' })
+  visCascadeCheckbox.style.display = 'none'
+  visCascadeCheckbox.addEventListener('click', (e) => e.stopPropagation())
+  visCascadeCheckbox.addEventListener('change', () => {
+    forEachDynamicDeviceDescendant(g, (ctrl) => { devVisibility[ctrl.key] = visCascadeCheckbox.checked })
+    refreshRowDisplaysForEditingTab()
+  })
+  const indepCascadeCheckbox = el('input', 'dp-group-cascade-checkbox', { type: 'checkbox', title: 'Independent from Desktop (whole group)' })
+  indepCascadeCheckbox.style.display = 'none'
+  indepCascadeCheckbox.addEventListener('click', (e) => e.stopPropagation())
+  indepCascadeCheckbox.addEventListener('change', () => {
+    if (editingDevice === 'desktop') return // defensive -- hidden on this tab
+    forEachDynamicDeviceDescendant(g, (ctrl) => {
+      devIndependence[editingDevice][ctrl.key] = indepCascadeCheckbox.checked
+      if (!indepCascadeCheckbox.checked) store[editingDevice][ctrl.key] = store.desktop[ctrl.key]
+    })
+    refreshRowDisplaysForEditingTab()
+  })
+  h.append(
+    el('span', 'dp-drag-handle', { textContent: '⠿' }), el('span', 'arrow', { textContent: '▼' }), titleText,
+    visCascadeCheckbox, indepCascadeCheckbox, lockIcon
+  )
   const gb = el('div', 'dp-group-body')
   h.addEventListener('click', (e) => {
     if (e.target.closest('.dp-drag-handle')) return
     if (e.target.closest('.dp-group-lock-icon')) return
+    if (e.target.closest('.dp-group-cascade-checkbox')) return
     if (textEditModeEnabled) { openTextEditFor(titleText, title, title); return }
     g.classList.toggle('collapsed')
   })
   g.appendChild(h)
   g.appendChild(gb)
+  g._visCascadeCheckbox = visCascadeCheckbox
+  g._indepCascadeCheckbox = indepCascadeCheckbox
   return g
+}
+
+// Walks every dynamicDevice-opted control living inside group element `g`
+// (any nesting depth) and calls `fn(ctrl)` for each -- shared by both
+// cascade checkboxes above and refreshGroupCascadeChrome() below.
+function forEachDynamicDeviceDescendant(g, fn) {
+  g.querySelectorAll(':scope .dp-row[data-key]').forEach((row) => {
+    const ctrl = findCtrl(row.dataset.key)
+    if (ctrl && ctrl.dynamicDevice) fn(ctrl)
+  })
+}
+// Recomputes one group's own 2 cascade checkboxes: visible only if it has
+// at least one dynamicDevice descendant AND the relevant tab is active
+// (visibility cascade on Desktop, independence cascade on Mobile/
+// Landscape); checked/unchecked/indeterminate always COMPUTED from
+// current children, never read back from storage, same as each cascade
+// checkbox's own row-level counterpart.
+function refreshGroupCascadeChrome(g) {
+  const onDesktop = editingDevice === 'desktop'
+  const keys = []
+  forEachDynamicDeviceDescendant(g, (ctrl) => keys.push(ctrl.key))
+  const vis = g._visCascadeCheckbox
+  const indep = g._indepCascadeCheckbox
+  if (vis) {
+    vis.style.display = (onDesktop && keys.length) ? '' : 'none'
+    if (keys.length) {
+      const states = keys.map((k) => isDevRowVisible(k))
+      vis.indeterminate = states.some((s) => s) && states.some((s) => !s)
+      vis.checked = !vis.indeterminate && states[0]
+    }
+  }
+  if (indep) {
+    indep.style.display = (!onDesktop && keys.length) ? '' : 'none'
+    if (!onDesktop && keys.length) {
+      const states = keys.map((k) => isDevRowIndependent(editingDevice, k))
+      indep.indeterminate = states.some((s) => s) && states.some((s) => !s)
+      indep.checked = !indep.indeterminate && states[0]
+    }
+  }
 }
 
 // "+ Add Group" -- lets the user organize existing settings into their own
@@ -1607,9 +1759,42 @@ function applyStoredValues(values) {
 
 function refreshRowDisplaysForEditingTab() {
   devGroups.forEach((group) => group.controls.forEach((ctrl) => {
+    if (ctrl.dynamicDevice) {
+      const showing = editingDevice === 'desktop' || isDevRowIndependent(editingDevice, ctrl.key)
+      const v = showing ? store[editingDevice][ctrl.key] : store.desktop[ctrl.key]
+      if (v !== undefined) displayValue(ctrl, v)
+      refreshDynamicDeviceRowChrome(ctrl)
+      return
+    }
     const v = store[ctrl.perDevice ? editingDevice : 'desktop'][ctrl.key]
     if (v !== undefined) displayValue(ctrl, v)
   }))
+  document.querySelectorAll('.dp-group').forEach(refreshGroupCascadeChrome)
+}
+
+// Shows/hides a dynamicDevice row entirely (Mobile/Landscape only, when
+// its own "Show in Mobile/Landscape" checkbox is off) and swaps which of
+// its 2 checkboxes is visible for the current tab -- "Show in Mobile/
+// Landscape" only makes sense while looking at Desktop (it's a Desktop-
+// side decision about the OTHER 2 tabs); "Independent from Desktop" only
+// makes sense while looking at Mobile/Landscape (it's that tab's own
+// property). Both checkboxes always exist in the DOM regardless of tab
+// (this project has one row per control, not 3) -- only their `checked`
+// state differs per device, read fresh from devIndependence[editingDevice].
+function refreshDynamicDeviceRowChrome(ctrl) {
+  const row = document.querySelector(`.dp-row[data-key="${CSS.escape(ctrl.key)}"]`)
+  if (!row) return
+  const entry = numEls[ctrl.key]
+  const onDesktop = editingDevice === 'desktop'
+  row.style.display = (!onDesktop && !isDevRowVisible(ctrl.key)) ? 'none' : ''
+  if (entry && entry.visCheckbox) {
+    entry.visCheckbox.style.display = onDesktop ? '' : 'none'
+    entry.visCheckbox.checked = isDevRowVisible(ctrl.key)
+  }
+  if (entry && entry.indepCheckbox) {
+    entry.indepCheckbox.style.display = onDesktop ? 'none' : ''
+    if (!onDesktop) entry.indepCheckbox.checked = isDevRowIndependent(editingDevice, ctrl.key)
+  }
 }
 
 // Optional generic remote-save tier (CLAUDE.md §12l): pass
@@ -1926,8 +2111,14 @@ export function initDevPanel(groups, opts = {}) {
   const textEditBtn = el('button', 'dp-icon-btn', { type: 'button', textContent: '✎', title: 'Toggle Label Rename Mode' })
   const addGroupBtn = el('button', 'dp-icon-btn', { type: 'button', textContent: '+', title: 'Add Group (right-click: select settings/groups to fold in)' })
   const collapseAllBtn = el('button', 'dp-icon-btn', { type: 'button', textContent: '⊟', title: 'Collapse All Groups' })
+  // Delete Group/Setting + Undo -- ported from TEMPLATE_DEV_PANEL.html's
+  // own 2026-09-17 addition (itself ported from Clicko). Wired near the
+  // end of this function alongside the other header buttons, same
+  // forward-reference-safety reasoning as those.
+  const deleteGroupBtn = el('button', 'dp-icon-btn', { type: 'button', textContent: '🗑', title: 'Delete Group/Setting (click, then click a group or setting to delete it)' })
+  const undoBtn = el('button', 'dp-icon-btn', { type: 'button', textContent: '↶', title: 'Undo (Ctrl+Z) -- undoes any dev panel change back to the last Save' })
   const collapseBtn = el('button', 'dp-icon-btn', { type: 'button', textContent: '–', title: 'Collapse' })
-  headerButtons.append(textEditBtn, addGroupBtn, collapseAllBtn, collapseBtn)
+  headerButtons.append(textEditBtn, addGroupBtn, collapseAllBtn, deleteGroupBtn, undoBtn, collapseBtn)
   header.appendChild(headerButtons)
   panel.appendChild(header)
 
@@ -2082,7 +2273,13 @@ export function initDevPanel(groups, opts = {}) {
 
   function saveSettings() {
     const flash = (msg) => { const orig = saveBtn.textContent; saveBtn.textContent = msg; setTimeout(() => { saveBtn.textContent = orig }, 900) }
-    const snapshot = { values: Object.fromEntries(DEVICES.map((d) => [d, { ...store[d] }])), order: getPanelOrder(groupsEl), textOverrides: { ...textOverrides } }
+    const snapshot = {
+      values: Object.fromEntries(DEVICES.map((d) => [d, { ...store[d] }])),
+      order: getPanelOrder(groupsEl),
+      textOverrides: { ...textOverrides },
+      devVisibility: { ...devVisibility },
+      devIndependence: { mobile: { ...devIndependence.mobile }, landscape: { ...devIndependence.landscape } }
+    }
     if (opts.remoteSave) {
       remoteSaveSnapshot(opts.remoteSave, snapshot).then((result) => {
         flash(result.ok ? 'Saved!' : ('Save failed: ' + result.error))
@@ -2106,6 +2303,8 @@ export function initDevPanel(groups, opts = {}) {
     if (opts.remoteSave) {
       fetchRemoteSettingsUntilSuccess(opts.remoteSave, (settings) => {
         applyOrder(groupsEl, settings.order)
+        devVisibility = settings.devVisibility || {}
+        devIndependence = settings.devIndependence || { mobile: {}, landscape: {} }
         applyStoredValues(settings.values)
         textOverrides = settings.textOverrides || {}
         applyTextOverrides()
@@ -2135,6 +2334,8 @@ export function initDevPanel(groups, opts = {}) {
     try { saved = JSON.parse(localStorage.getItem(settingsKey())) } catch (err) { saved = null }
     if (saved) {
       applyOrder(groupsEl, saved.order)
+      devVisibility = saved.devVisibility || {}
+      devIndependence = saved.devIndependence || { mobile: {}, landscape: {} }
       applyStoredValues(saved.values)
       textOverrides = saved.textOverrides || {}
       applyTextOverrides()
@@ -2160,6 +2361,8 @@ export function initDevPanel(groups, opts = {}) {
       values: Object.fromEntries(DEVICES.map((d) => [d, { ...store[d] }])),
       order: getPanelOrder(groupsEl),
       textOverrides: { ...textOverrides },
+      devVisibility: { ...devVisibility },
+      devIndependence: { mobile: { ...devIndependence.mobile }, landscape: { ...devIndependence.landscape } },
       panelGeometry
     }
   }
@@ -2174,6 +2377,8 @@ export function initDevPanel(groups, opts = {}) {
   function applyFullPanelState(state) {
     if (!state) return
     applyOrder(groupsEl, state.order)
+    devVisibility = state.devVisibility || {}
+    devIndependence = state.devIndependence || { mobile: {}, landscape: {} }
     applyStoredValues(state.values)
     textOverrides = { ...(state.textOverrides || {}) }
     applyTextOverrides()
@@ -2197,7 +2402,11 @@ export function initDevPanel(groups, opts = {}) {
   }
 
   copyBtn.addEventListener('click', copySettings)
-  saveBtn.addEventListener('click', saveSettings)
+  // clearDevPanelUndoStack() is a hoisted function declaration defined
+  // further down this same function -- safe to reference here since
+  // it's only ever actually called on a real click, well after
+  // everything in this file is defined.
+  saveBtn.addEventListener('click', () => { saveSettings(); clearDevPanelUndoStack() })
   resetBtn.addEventListener('click', resetSettings)
 
   // ------------------------------------------------------------------
@@ -2415,7 +2624,7 @@ export function initDevPanel(groups, opts = {}) {
   addGroupBtn.addEventListener('contextmenu', (e) => {
     e.preventDefault()
     if (devGroupSelectionArmed) addGroupBtn.click()
-    else { devGroupSelectionArmed = true; addGroupBtn.classList.add('armed') }
+    else { disarmDevDeleteGroup(); devGroupSelectionArmed = true; addGroupBtn.classList.add('armed') }
   })
   // Collapses every group (any nesting depth) that isn't already
   // collapsed. No per-tab scoping needed (unlike the template's own
@@ -2427,6 +2636,167 @@ export function initDevPanel(groups, opts = {}) {
       if (g && !g.classList.contains('collapsed')) g.classList.add('collapsed')
     })
   })
+
+  // Delete Group/Setting -- ported from TEMPLATE_DEV_PANEL.html's own
+  // 2026-09-17 addition. A plain click arms/disarms (toggle) -- unlike
+  // Add Group, Delete has no other click behavior to stay compatible
+  // with. Arming this disarms Add Group's own selection-arm mode and
+  // vice versa (that button's own contextmenu handler above), since both
+  // armed at once would make a group-title click ambiguous between
+  // "select it" and "delete it".
+  let devDeleteGroupArmed = false
+  function disarmDevDeleteGroup() {
+    devDeleteGroupArmed = false
+    deleteGroupBtn.classList.remove('armed')
+  }
+  deleteGroupBtn.addEventListener('click', () => {
+    if (devDeleteGroupArmed) {
+      disarmDevDeleteGroup()
+    } else {
+      disarmDevGroupSelection()
+      devDeleteGroupArmed = true
+      deleteGroupBtn.classList.add('armed')
+    }
+  })
+  // Walks the target's own .dp-group AND every ancestor .dp-group,
+  // refusing deletion if any of them is "Dev Panel" -- the only
+  // mandatory built-in scaffolding this project's own panel actually has
+  // (unlike the template, this project's "Debug" is a plain project-
+  // specific group like any other, not standing scaffolding, so it's
+  // deletable). Checking the WHOLE ancestor chain means a setting living
+  // inside Dev Panel is refused the same way the group itself already
+  // is.
+  function findDevDeleteProtectionReason(el) {
+    let g = el.closest('.dp-group')
+    while (g) {
+      if (g.dataset.key === 'Dev Panel') return 'the mandatory "Dev Panel" group'
+      g = g.parentElement ? g.parentElement.closest('.dp-group') : null
+    }
+    return null
+  }
+  panel.addEventListener('click', (e) => {
+    if (!devDeleteGroupArmed) return
+    if (e.target.closest('.dp-header-buttons')) return
+    const headerEl = e.target.closest('.dp-group-header')
+    const target = headerEl ? headerEl.closest('.dp-group') : e.target.closest('.dp-row')
+    if (!target) return
+    e.preventDefault()
+    e.stopPropagation()
+    const reason = findDevDeleteProtectionReason(target)
+    if (reason) {
+      console.warn('Delete refused -- ' + reason)
+      disarmDevDeleteGroup()
+      return
+    }
+    // pushDevDeleteUndoEntry(), not the generic pointerdown-based
+    // snapshot -- see that function's own comment for why a plain value
+    // snapshot can't actually undo a deletion. parent/nextSibling
+    // captured BEFORE remove() so undo can put the node back in its
+    // exact original spot.
+    const parent = target.parentElement
+    const nextSibling = target.nextElementSibling
+    target.remove()
+    pushDevDeleteUndoEntry(target, parent, nextSibling)
+    disarmDevDeleteGroup()
+  }, true)
+  document.addEventListener('click', (e) => {
+    if (panel.contains(e.target)) return
+    if (devDeleteGroupArmed) disarmDevDeleteGroup()
+  }, true)
+
+  // Infinite undo -- ported from TEMPLATE_DEV_PANEL.html's own
+  // 2026-09-17 addition (itself ported from Clicko). A plain in-memory
+  // stack of FULL PANEL SNAPSHOTS (captureFullPanelState(), the exact
+  // same object Copy/Save/Named-Setting-States already build) for
+  // ordinary value/order/rename/nesting changes, plus a separate entry
+  // kind for deletions (see pushDevDeleteUndoEntry() above/below -- a
+  // value snapshot alone can only recreate a deleted GROUP as an empty
+  // shell, and can't recreate a deleted SETTING's control markup at all).
+  let devUndoStack = []
+  let devUndoGestureActive = false
+  function pushDevPanelUndoSnapshot() {
+    // Deep-cloned (JSON round-trip) -- REQUIRED, not defensive:
+    // captureFullPanelState()'s own `values` field is built as
+    // `{ ...store[d] }`, a SHALLOW copy -- any array/object VALUE within
+    // it (a list-picker's items, a multi-select's values) is still the
+    // SAME live reference a later edit can mutate in place, which would
+    // silently change an already-pushed snapshot underneath Undo.
+    devUndoStack.push({ kind: 'snapshot', data: JSON.parse(JSON.stringify(captureFullPanelState())) })
+  }
+  function pushDevDeleteUndoEntry(node, parent, nextSibling) {
+    devUndoStack.push({ kind: 'delete', node, parent, nextSibling })
+  }
+  function undoDevPanelChange() {
+    if (!devUndoStack.length) return
+    const entry = devUndoStack.pop()
+    if (entry.kind === 'delete') {
+      if (entry.nextSibling && entry.nextSibling.parentNode === entry.parent) {
+        entry.parent.insertBefore(entry.node, entry.nextSibling)
+      } else {
+        entry.parent.appendChild(entry.node)
+      }
+    } else {
+      applyFullPanelState(entry.data)
+    }
+  }
+  // How long a "gesture" may hold the undo-push gate open with no
+  // matching pointerup -- opening a NATIVE color picker (this panel's
+  // own `<input type="color">` controls) never delivers a pointerup back
+  // to the page at all, which would otherwise permanently stick the gate
+  // open and silently break every undo push for the rest of the session.
+  const DEV_UNDO_GESTURE_TIMEOUT_MS = 2000
+  let devUndoGestureTimer = null
+  function resetDevUndoGesture() {
+    devUndoGestureActive = false
+    if (devUndoGestureTimer) { clearTimeout(devUndoGestureTimer); devUndoGestureTimer = null }
+  }
+  panel.addEventListener('pointerdown', (e) => {
+    if (devUndoGestureActive) return
+    // While Delete is armed, the very next click either deletes
+    // something (which pushes its own precise pushDevDeleteUndoEntry()
+    // instead) or is refused/disarms with no mutation at all -- a plain
+    // value snapshot here would be a dead entry either way.
+    if (devDeleteGroupArmed) return
+    // THE root cause of a real bug on Clicko/the template, ported here
+    // as a fix, not just a feature: the Undo button is itself inside
+    // `panel`, so clicking it also fires this same capturing pointerdown
+    // listener -- without this guard, a click on Undo would push a
+    // snapshot of the CURRENT (already-changed) state, then its own
+    // click handler immediately pops that SAME just-pushed entry,
+    // restoring the current state onto itself (a silent no-op, leaving
+    // the real prior change buried one slot deeper). Only a real mouse
+    // click (or a synthetic pointerdown+click pair) exposes this --
+    // `undoBtn.click()` alone does NOT fire pointerdown at all.
+    if (e.target.closest('.dp-header-buttons')) return
+    devUndoGestureActive = true
+    pushDevPanelUndoSnapshot()
+    devUndoGestureTimer = setTimeout(resetDevUndoGesture, DEV_UNDO_GESTURE_TIMEOUT_MS)
+  }, true)
+  document.addEventListener('pointerup', resetDevUndoGesture, true)
+  document.addEventListener('pointercancel', resetDevUndoGesture, true)
+  // Catches the native-picker-eats-pointerup case directly -- the window
+  // reliably regains focus the instant a native color/file/date picker
+  // closes, even though the page itself never saw a pointerup.
+  window.addEventListener('focus', resetDevUndoGesture)
+  undoBtn.addEventListener('click', undoDevPanelChange)
+  // Ctrl+Z -- ignored while focus is in a genuine text-input context (a
+  // rename textarea, a text-type control, the search box) so it doesn't
+  // fight the browser/OS's own native text-field undo. Separate listener
+  // from the existing D/R panel-shortcut one below (that one already
+  // explicitly excludes INPUT/TEXTAREA/SELECT focus wholesale).
+  document.addEventListener('keydown', (e) => {
+    if (!(e.key === 'z' || e.key === 'Z') || !(e.ctrlKey || e.metaKey)) return
+    const tag = document.activeElement ? document.activeElement.tagName : ''
+    if (tag === 'TEXTAREA' || (tag === 'INPUT' && document.activeElement.type === 'text')) return
+    e.preventDefault()
+    undoDevPanelChange()
+  })
+  // Clears the undo stack on Save/Sync -- per the feature's own "until i
+  // click save, then it starts new again" requirement; wired into
+  // saveBtn's existing click listener just below, not saveSettings()
+  // itself, since this is a panel-UI concern, not a settings-persistence
+  // one.
+  function clearDevPanelUndoStack() { devUndoStack = [] }
 
   // Ctrl+F-style search wiring (searchInput/searchCount created above,
   // near groupsEl). See collectDevSearchMatches()'s own comment there

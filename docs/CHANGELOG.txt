@@ -6547,6 +6547,150 @@ devPanel.js-driven bump, not reverted, then superseded by this slice's
 own `v=142` for a guaranteed fresh fetch).
 
 --------------------------------------------------------------------------------
+2026-09-17  -  ~07:12 - 07:39:33 EDT (~25-30m, imprecise -- start not
+cleanly captured via `date`; measuring from the mid-task checkpoint at
+07:19:10 to finish gives 20m23s for the build+verification phase alone)
+
+**Ported Delete Group/Setting + Undo from TEMPLATE_DEV_PANEL.html's own
+2026-09-17 addition; designed and built a NEW adaptation of its
+per-control "Independent from Desktop" mobile/landscape checkbox system
+(§12f-1) for this project's genuinely different architecture.** Direct
+request, following up on the earlier same-day template-port task:
+"where is the checkbox system function for the mobile desktop thing?
+and where is my undo and delete button?" -- both were genuinely missing
+(never looked at in the earlier port), confirmed via grep before doing
+anything.
+
+**Delete Group/Setting + Undo** -- a close, verified port:
+- `#devDeleteGroupBtn`-equivalent (🗑) added to the header alongside the
+  4 existing icon buttons. Plain click arms/disarms; a capturing click
+  listener on `panel` then deletes whatever `.dp-group`/`.dp-row` is
+  clicked next, at any nesting depth, cross-disarming Add Group's own
+  selection-arm mode (and vice versa).
+- `findDevDeleteProtectionReason()` walks the full ancestor chain,
+  refusing deletion only inside "Dev Panel" -- this project's ONE actual
+  mandatory built-in group (unlike the template, this project's "Debug"
+  is a plain project-specific group like any other, not standing
+  scaffolding, so it's correctly left deletable).
+- Undo (`#devUndoBtn`, ↶, + Ctrl+Z): a plain in-memory stack of
+  `captureFullPanelState()` snapshots (JSON-deep-cloned -- REQUIRED, not
+  defensive, since that function's own `values` field is a shallow copy
+  and a later in-place mutation of a nested array/object would
+  otherwise silently corrupt an already-pushed snapshot) plus a
+  separate `{kind:'delete', node, parent, nextSibling}` entry for
+  deletions specifically (a value snapshot alone can't recreate a
+  deleted setting's actual control markup). Snapshot-push is gated to
+  once per pointerdown-to-pointerup "gesture" via a single capturing
+  panel-wide `pointerdown` listener, with 3 independent reset paths
+  (pointerup, pointercancel, window focus) plus a 2000ms safety timeout
+  -- ported directly from the template's own documented lesson: a
+  native `<input type=color>` picker never delivers a pointerup back to
+  the page at all, which would otherwise permanently stick the gate
+  open. Also ported the template's OWN documented self-reference bug
+  fix verbatim: the Undo button is itself inside `panel`, so without an
+  explicit exclusion, clicking it would push a snapshot of the ALREADY-
+  changed state and then immediately pop that same entry back onto
+  itself -- a silent no-op. Save/Sync clears the stack
+  (`clearDevPanelUndoStack()`, wired into `saveBtn`'s existing handler).
+- Verified live (`?dev=1`, real `pointerdown`+`click`+`pointerup`
+  dispatches -- NEVER `.click()`, per the template's own explicit
+  warning that `.click()` alone doesn't fire `pointerdown` and would
+  silently hide the self-reference bug): a value change + Undo restored
+  the exact prior value; deleting "Dev Panel" was refused; deleting a
+  real setting (`fieldRows`) then Undo restored it in its exact original
+  DOM position with its value intact; Save then Undo was correctly a
+  no-op (stack cleared). `node --check` clean.
+
+**The "Independent from Desktop" mobile/landscape checkbox system --
+NOT a 1:1 port, a redesign for this project's real architecture (flagged
+to the user via AskUserQuestion before building; "build the live
+checkbox system" was the explicit answer over "rely on existing
+perDevice").** The template's own version creates 3 SEPARATE DOM rows
+per control (`sliderFoo`/`sliderMobileFoo`/`sliderLandscapeFoo`) and
+live-mirrors between them via cross-element wiring
+(`wireDesktopMirrorSource()`/`applyDesktopMirror()`). This project has
+exactly ONE row per control and 3 store slots already (`store.desktop`/
+`.mobile`/`.landscape`, per §12f) -- so the adapted design folds the
+mirroring directly into the existing single write-path, `commit()`,
+rather than needing any DOM-to-DOM syncing at all:
+- New opt-in flag, `dynamicDevice: true`, on a control's registration
+  (`main.js`'s `DEV_GROUPS`) -- covers the same 4 uniform types the
+  template itself scopes to (slider/color/select/checkbox), not text/
+  list-picker/multi-select/button.
+- `commit()` grew a `ctrl.dynamicDevice` branch: editing from Desktop
+  writes `store.desktop` AND mirrors into every non-independent Mobile/
+  Landscape slot directly; editing a non-independent Mobile/Landscape
+  row redirects to `store.desktop` (then re-mirrors to the OTHER
+  device); editing an INDEPENDENT row writes only its own slot. Because
+  `store.mobile[key]`/`store.landscape[key]` are ALREADY always kept
+  current by this mirroring while non-independent, there's no separate
+  "retained value" cache needed (unlike the template's own
+  `devDeviceValues` map) -- toggling independence back on just starts
+  from whatever's already sitting there, which is exactly desktop's
+  current value.
+- `refreshRowDisplaysForEditingTab()` (the existing tab-switch hook)
+  grew a `dynamicDevice`-aware value-resolution branch, plus a new
+  `refreshDynamicDeviceRowChrome()` call per control: hides the whole
+  row when not independent-shown on Mobile/Landscape (`row.style.display`
+  -- there's no separate DOM row to simply not create, unlike the
+  template), and swaps which of the 2 checkboxes is interactable
+  ("Show in Mobile/Landscape" only meaningful on Desktop, "Independent
+  from Desktop" only meaningful on Mobile/Landscape).
+- `buildRow()` appends both checkboxes (native title tooltips, no extra
+  markup) for an opted-in control; `createGroupElement()` grew a
+  matching pair of GROUP-level cascade checkboxes (hidden unless the
+  group has at least one dynamicDevice descendant at any depth), same
+  "no persisted state, walks live DOM, checked/indeterminate always
+  computed from children" design as the template's own version.
+- Persistence: `devVisibility`/`devIndependence` added to BOTH snapshot
+  shapes that actually exist here -- `saveSettings()`/`resetSettings()`'s
+  own narrower `{values, order, textOverrides}` object (the REAL
+  Save/Sync/Reset path) AND `captureFullPanelState()`/
+  `applyFullPanelState()` (Copy/Named-States/Undo) -- a real gap caught
+  before shipping: the 2 snapshot shapes are genuinely separate in this
+  file (unlike the template, which only ever had one), and adding the
+  new fields to just one would have silently dropped the other on a
+  real page reload.
+
+**Verification gap, disclosed rather than glossed over: this feature's
+own live browser test could NOT be completed this round.** A temporary
+`dynamicDevice: true` was added to `fieldRows` to exercise the real
+pipeline end-to-end, but every attempt to actually load the app (4
+different static-server processes across 3 ports, both `localhost` and
+an explicit `127.0.0.1` bind, both this session's own browser tool AND
+a plain `curl` completely outside it) hit the exact same failure:
+`main.js` (441,597 bytes as of this task) truncates at exactly 391,680
+bytes and the connection resets -- reproduced identically via `curl`
+(exit 56, "failure receiving network data"), which rules out the
+browser-automation tool itself as the cause (it reproduces even for a
+request that never touches a browser). 1 of 4 `curl` retries against
+the SAME file did succeed with the correct full byte count, so this is
+a real, environment-level intermittent large-response limit (most
+likely something in this sandbox's own network layer, given the
+identical exact truncation point across independently-bound server
+processes), not a bug in this session's code -- `devPanel.js`/`style.css`
+never hit it, only the much larger `main.js`. Several further browser
+retries after that one successful `curl` still failed. Given `node
+--check` passes on both files, and every function this new code path
+touches (`commit`/`displayValue`/`refreshRowDisplaysForEditingTab`/
+`buildRow`/`createGroupElement`/`saveSettings`/`resetSettings`/
+`captureFullPanelState`/`applyFullPanelState`) was read in full before
+being modified rather than guessed at, this is reported as **written
+and syntax-valid, NOT live-verified** -- the temporary test flag was
+reverted (not left in `fieldRows`) rather than shipped unverified as if
+it were a real, considered content decision for that control. A 4th
+static-server port (`static-alt3`, 8423) was added to
+`.claude/launch.json` while chasing this, kept since it's a low-risk,
+same-pattern addition a future session may also need with 2 concurrent
+sessions already active.
+
+Next: get this feature actually exercised live once the environment
+issue clears (or `main.js` next drops back under whatever the real
+truncation threshold is), then decide which real project controls, if
+any, should opt into `dynamicDevice: true` -- that's a separate content
+decision from today's engine-capability work.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================
