@@ -395,3 +395,32 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   container it currently sits inside, check the container's own
   hide/show lifecycle before assuming the element's own flag is the only
   thing controlling it.
+- **This project bumps `main.js?v=NNN` religiously but had never once
+  bumped `style.css?v=NN` -- it stayed at `?v=12` through 2 real content
+  changes this session before the gap was caught.** The static server
+  serving this project always returns current disk content regardless
+  of query string, but the BROWSER's own HTTP cache does not -- a tab
+  that already fetched `style.css?v=12` once keeps reusing that stale
+  cached response across reloads/navigations, silently masking a real
+  CSS fix (confirmed live 2026-09-17: a z-index fix appeared not to be
+  applied at all, `getComputedStyle().zIndex` reading `auto`, purely
+  because the browser was still serving its OLD cached copy of
+  `style.css?v=12` -- bumping to `?v=13` immediately fixed it). Bump
+  `style.css`'s own `?v=` in `index.html` any time its actual content
+  changes, the same discipline already applied to `main.js`.
+- **This session's browser-automation tool can misreport
+  `document.documentElement.clientWidth`/`clientHeight` as `0`, and a
+  `position:fixed` element's own computed `top`/`left` as `0px`, via
+  its JS-exec query path, even on a freshly-loaded, visibly-rendering
+  page.** Confirmed live 2026-09-17 while debugging the Loading Preview
+  z-index fix above: a brand-new, freshly-appended test `<div>` with
+  plain `position:fixed;top:50%;left:50%` ALSO computed `top:0px` in
+  the exact same page context, ruling out anything specific to
+  `#loadingPreviewCanvas` -- yet a real screenshot taken moments later
+  showed the actual preview hand correctly centered on screen. This is
+  the same general class of tool quirk already documented elsewhere in
+  this file (`document.hidden`/`window.innerWidth === 0` misreported the
+  same way) extended to a 3rd concrete symptom (`clientWidth`/`clientHeight`
+  /computed `top`/`left`) -- don't trust a JS-exec-based layout/dimension
+  query as proof of a real positioning bug; cross-check with an actual
+  screenshot before concluding the page itself is broken.

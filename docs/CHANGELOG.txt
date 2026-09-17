@@ -7136,6 +7136,74 @@ affected the original behavior. `node --check` passes on `main.js`.
 Cache-buster: `index.html`'s own `main.js?v=145` -> `?v=146`.
 
 --------------------------------------------------------------------------------
+
+2026-09-17 10:49:32-11:04:02 EDT (14m30s)
+
+**Fixed: "Show Loading Preview (Live)" checkbox reported as not
+working.** Direct bug report ("the Show Loading Preview checkbox
+doesnt work. What i wanted was that when i selected it, I get to
+prview the loading animatin hand. It should just show ontop of
+everything in browser"). Found and fixed 2 real issues via direct code
+inspection (live browser reproduction was blocked for a long stretch by
+this project's own documented environment network-truncation gotcha --
+7+ consecutive navigation attempts across 3 static-server ports and 2
+tabs each hit `net::ERR_CONNECTION_RESET` on `main.js`, `devPanel.js`,
+or the `.glb` model in turn, while `curl` against the exact same files
+succeeded every single time -- eventually got a clean load and could
+verify live for real, see below):
+
+1. **A real race: checking the box before the model finishes loading
+   silently stranded it forever (or until the real field happened to
+   start).** `setLoadingPreviewLiveVisible()` returns early with no
+   effect while `modelMeasurementsReady` is still false, and nothing
+   previously re-checked the checkbox's own state once that flipped
+   true -- only `tryStartField()` did, which ALSO waits on the settings-
+   restore/min-time gates, not just the model. Fixed by calling
+   `setLoadingPreviewLiveVisible(true)` right where
+   `modelMeasurementsReady = true` is set (immediately after
+   `buildLoadingPreview()`'s own unconditional call there), closing the
+   window instead of leaving the checkbox checked but inert.
+2. **`#loadingPreviewCanvas` had no explicit `z-index`.** It likely
+   already painted above `#viewport` under default CSS stacking rules
+   (a `position:fixed` element paints after a non-positioned one
+   regardless of DOM order), but nothing guaranteed it stayed above the
+   dev panel (`.dp-panel`, z-index 9999) or anything else -- added an
+   explicit `z-index: 100000`, directly matching the literal request
+   ("it should just show ontop of everything in browser").
+
+**Verified live** (after eventually getting a clean load): screenshot
+confirmed the preview hand renders centered on screen, clearly visible
+on top of the main hand field, the instant the checkbox is checked;
+`getComputedStyle().zIndex` read `100000` as expected; unchecking
+hides it again (`display: none`); a 2nd on/off/on cycle (dispose-and-
+rebuild path) worked cleanly with no console errors. One verification
+false alarm caught and correctly dismissed along the way: a JS-exec
+query reported `document.documentElement.clientWidth/clientHeight` as
+`0` and the canvas's own computed `top`/`left` as `0px` even on a
+freshly-loaded, visibly-rendering page -- this project's own already-
+documented browser-tool gotcha (the JS-exec path can misreport
+layout/dimension queries even while a screenshot on the same tab
+renders correctly) rather than a real positioning bug; the actual
+screenshot showed the preview correctly centered, confirming the CSS
+`top:50%;left:50%` rule was working fine all along.
+
+**A separate cache-invalidation gap found and fixed along the way:**
+`index.html`'s `style.css` link was still pinned at `?v=12` even though
+`style.css`'s content had changed twice this session (the canvas
+`position`/`display` rule 2 entries ago, and this entry's `z-index`
+addition) -- the static server always serves current disk content
+regardless of query string, but the BROWSER's own HTTP cache does not,
+so a tab that had already fetched `style.css?v=12` once kept reusing
+that stale cached response across reloads, silently masking the
+z-index fix during verification until this was caught and the query
+bumped to `?v=13`. Bump this any time `style.css`'s actual content
+changes, the same discipline this project already applies to
+`main.js?v=NNN`.
+
+Cache-busters: `index.html`'s own `main.js?v=146` -> `?v=147`;
+`style.css?v=12` -> `?v=13` (first bump of this file all session).
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

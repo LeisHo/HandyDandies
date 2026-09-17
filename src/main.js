@@ -6619,6 +6619,18 @@ new GLTFLoader().load(
     // resolves. Same already-loaded GLB, no extra network fetch, same as
     // every other clone this file makes of it.
     buildLoadingPreview()
+    // Real gap fixed 2026-09-17, direct report ("the Show Loading Preview
+    // checkbox doesnt work"): if the "Show Loading Preview (Live)"
+    // checkbox was already checked (restored from a saved setting, or
+    // clicked while still on the "Loading hands..." screen) at the exact
+    // moment setLoadingPreviewLiveVisible() ran, `modelMeasurementsReady`
+    // was still false back then, so it silently no-op'd -- and nothing
+    // re-checked it until tryStartField() eventually fired (which ALSO
+    // waits on the settings-restore/min-time gates below, not just the
+    // model). Re-running it here, the instant the model itself becomes
+    // ready, closes that window instead of leaving the checkbox looking
+    // checked but doing nothing until the real field happens to start.
+    if (cfg.loadingPreviewShowLive) setLoadingPreviewLiveVisible(true)
     tryStartField()
   },
   undefined,

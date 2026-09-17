@@ -18,6 +18,22 @@ work seamlessly from there.
 
 ## Currently working on
 
+**SHIPPED 2026-09-17: fixed "Show Loading Preview (Live)" checkbox
+reported as not working.** 2 real fixes: (1) checking the box before
+the model finished loading silently stranded it forever (nothing
+re-checked its state once the model became ready except the much-
+later `tryStartField()`) -- fixed by re-checking it the instant
+`modelMeasurementsReady` flips true; (2) `#loadingPreviewCanvas` had
+no explicit `z-index` -- added `z-index: 100000` per the direct
+request ("it should just show ontop of everything in browser"). Fully
+live-verified via screenshot (preview hand renders centered, visible
+on top of the main field) after live reproduction was blocked for a
+long stretch by this project's own documented environment network-
+truncation gotcha. Also found and fixed a real gap in this project's
+OWN cache-busting discipline: `style.css` had never had its own `?v=`
+bumped despite 2 real content changes this session -- now at `?v=13`.
+See CHANGELOG.txt's matching 2026-09-17 entry for the full account.
+
 **SHIPPED 2026-09-17: on-demand live Loading Preview toggle + X/Y
 position offset sliders, on top of the pre-existing `loadingPreviewEnabled`
 (shown only during the real page-load screen).** Scoped via an

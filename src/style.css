@@ -47,8 +47,17 @@ html, body {
    the same way #loading centers itself; the -50%/-50% recentering plus
    the Offset X/Y sliders' own additional translate() are both applied
    together in one `transform` value, set entirely in JS
-   (repositionLoadingPreview()), since it has to be recomputed live. */
-#loadingPreviewCanvas { display: none; position: fixed; top: 50%; left: 50%; pointer-events: none; }
+   (repositionLoadingPreview()), since it has to be recomputed live.
+   z-index: an explicit, very high value -- direct report 2026-09-17
+   ("It should just show ontop of everything in browser") plus a real,
+   confirmed gap: with no z-index at all this WAS relying on default CSS
+   stacking rules (a `position:fixed` element paints after a non-
+   positioned one regardless of DOM order, so it happened to land above
+   #viewport already) but had nothing guaranteeing it stays above the
+   dev panel (.dp-panel, z-index 9999) or any other positioned element
+   added later. 100000 is comfortably above every other z-index in this
+   file. */
+#loadingPreviewCanvas { display: none; position: fixed; top: 50%; left: 50%; z-index: 100000; pointer-events: none; }
 
 /* ---------------------------------------------------------------------
    Dev panel (CLAUDE.md Section 12) -- reused verbatim from ADA BATHROOM's
