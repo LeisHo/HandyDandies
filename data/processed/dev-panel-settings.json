@@ -5751,6 +5751,16 @@
           "targetX": 0,
           "targetY": 0,
           "targetZ": 0
+        },
+        {
+          "name": "Front",
+          "x": 3.5526427374650176,
+          "y": 36.76541698494362,
+          "z": 62.37681969375567,
+          "tx": 2.307708223589727,
+          "ty": 33.57715598945507,
+          "tz": -1.7891143893104762,
+          "fov": 32
         }
       ],
       "lockCameraPan": true,
@@ -11647,6 +11657,16 @@
           "targetX": 0,
           "targetY": 0,
           "targetZ": 0
+        },
+        {
+          "name": "Front",
+          "x": 3.5526427374650176,
+          "y": 36.76541698494362,
+          "z": 62.37681969375567,
+          "tx": 2.307708223589727,
+          "ty": 33.57715598945507,
+          "tz": -1.7891143893104762,
+          "fov": 32
         }
       ],
       "lockCameraPan": true,
@@ -17543,6 +17563,16 @@
           "targetX": 0,
           "targetY": 0,
           "targetZ": 0
+        },
+        {
+          "name": "Front",
+          "x": 3.5526427374650176,
+          "y": 36.76541698494362,
+          "z": 62.37681969375567,
+          "tx": 2.307708223589727,
+          "ty": 33.57715598945507,
+          "tz": -1.7891143893104762,
+          "fov": 32
         }
       ],
       "lockCameraPan": true,
@@ -17843,7 +17873,7 @@
     },
     {
       "key": "Tween",
-      "collapsed": false,
+      "collapsed": true,
       "locked": false,
       "settings": [
         "tweenPreviewSpeedMs",
@@ -17929,7 +17959,7 @@
         },
         {
           "key": "Click Hold-Pose",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "settings": [
             "chpOffsetEnabled",
