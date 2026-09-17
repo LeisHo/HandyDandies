@@ -371,3 +371,27 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   control's `captureCurrent()` function produces, rather than assuming
   the bug is in the apply logic itself or the import/selection
   mechanism.
+- **The main `animate()` render loop's `if (!fieldStarted &&
+  loadingPreviewRenderer)` gate is a deliberate ONE-TIME-PER-SESSION
+  optimization, not a bug** -- it permanently stops calling
+  `updateLoadingPreviewAnimation()`/rendering the Loading Preview the
+  instant the real hand field starts (`fieldStarted = true`), and never
+  resumes for the rest of that page load even if something re-enables
+  the preview later. Any future feature that needs the preview to
+  animate again AFTER that point (e.g. `loadingPreviewShowLive`, added
+  2026-09-17) needs its OWN separate `requestAnimationFrame` loop
+  (`startLoadingPreviewLiveLoop()`) rather than trying to make the main
+  loop resume driving it -- don't "fix" the main loop's gate to solve
+  this; it's working as designed.
+- **A DOM element's visibility can be silently inherited from a parent's
+  own lifecycle, even when nothing in that element's own code touches
+  `display`.** `#loadingPreviewCanvas` originally lived INSIDE `#loading`
+  in `index.html`, so it was hidden the instant `tryStartField()` called
+  `loadingEl.classList.add('hidden')` on the real field start --
+  regardless of the preview's own `loadingPreviewEnabled`/
+  `loadingPreviewShowLive` flags. Fixed by moving the canvas to a
+  top-level sibling immediately before `#loading` rather than a child of
+  it. When a feature's visibility needs to outlive or diverge from a
+  container it currently sits inside, check the container's own
+  hide/show lifecycle before assuming the element's own flag is the only
+  thing controlling it.

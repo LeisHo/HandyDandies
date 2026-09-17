@@ -18,6 +18,25 @@ work seamlessly from there.
 
 ## Currently working on
 
+**SHIPPED 2026-09-17: on-demand live Loading Preview toggle + X/Y
+position offset sliders, on top of the pre-existing `loadingPreviewEnabled`
+(shown only during the real page-load screen).** Scoped via an
+AskUserQuestion exchange -- user chose the bigger option: a toggle that
+also works AFTER the real hand field has already started rendering, not
+just during the original load screen. Required a 2nd, fully independent
+`requestAnimationFrame` loop (`startLoadingPreviewLiveLoop()`) since the
+main `animate()` loop permanently stops driving the preview once the
+real field starts, by original design -- toggling safely repeatable
+(disposes the prior `WebGLRenderer` before rebuilding). New
+`loadingPreviewOffsetX`/`Y` sliders position it via `translate(-50%,
+-50%) translate(Xpx, Ypx)`; `#loadingPreviewCanvas` moved out from
+inside `#loading` in `index.html` so its visibility no longer inherits
+`#loading`'s own hidden-on-field-start state. Fully live-verified
+(toggle on/off/on cycles, offset transform math checked against 2
+different values, no console errors, and a regression check confirming
+the original load-screen preview still works after the markup move).
+See CHANGELOG.txt's matching 2026-09-17 entry for the full account.
+
 **SHIPPED 2026-09-17: fixed Saved Camera presets silently no-op'ing on
 "Use" when authored/imported with a shorter x/y/z/tx/ty/tz/fov field
 naming instead of this app's own internal cameraX/targetX/cameraFov

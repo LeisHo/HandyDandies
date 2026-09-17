@@ -331,6 +331,22 @@ function tryStartField() {
   renderer.compile(scene, camera)
   window.__debug = { THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection } }
   loadingEl.classList.add('hidden')
+  // The loading-preview canvas is a top-level sibling of #loading now
+  // (2026-09-17, decoupled specifically so this moment doesn't force it
+  // to disappear too) -- hide it UNLESS the live-preview toggle wants it
+  // kept visible (a session that had it on going into this transition
+  // keeps seeing it seamlessly, rather than blinking off and needing a
+  // 2nd click to bring it back). Reuses setLoadingPreviewLiveVisible()'s
+  // own full rebuild-then-animate path rather than just starting the
+  // loop directly -- covers the real edge case where the checkbox was
+  // checked before the model even finished loading while
+  // loadingPreviewEnabled was off, in which case NOTHING was ever built
+  // yet for the loop to animate.
+  if (cfg.loadingPreviewShowLive) {
+    setLoadingPreviewLiveVisible(true)
+  } else if (loadingPreviewCanvas) {
+    loadingPreviewCanvas.style.display = 'none'
+  }
 }
 setTimeout(() => { startupSettingsReady = true; tryStartField() }, 6000)
 let framedOnce = false // camera/lighting/target-plane are framed ONCE, on first build -- Field Layout changes must never re-trigger this (direct request)
@@ -442,6 +458,19 @@ const DEV_GROUPS = [
     title: 'Loading Preview',
     controls: [
       { key: 'loadingPreviewEnabled', label: 'Show Hand Loading Animation', type: 'checkbox', def: true },
+      // Direct request, following up on the Offset X/Y sliders below
+      // ("so i can position the loading hand preview" implies actually
+      // being able to SEE it while tuning, not just during the real
+      // startup screen's own narrow window) -- confirmed via
+      // AskUserQuestion this means a genuine on-demand live preview,
+      // not just the checkbox directly above. Independent on/off switch
+      // from loadingPreviewEnabled -- can preview it live even with
+      // that one off. See setLoadingPreviewLiveVisible()'s own comment
+      // for the render-loop mechanics this needs (the real startup
+      // sequence's own animation loop permanently stops once the real
+      // hand field starts, by design -- this reopens it on demand
+      // through a separate loop, rather than reversing that).
+      { key: 'loadingPreviewShowLive', label: 'Show Loading Preview (Live, No Reload Needed)', type: 'checkbox', def: false, onChange: (v) => setLoadingPreviewLiveVisible(v) },
       // Only actually delays the reveal while the preview above is ALSO
       // on (see tryStartField()'s own gate) -- an artificial delay with
       // nothing to show for it isn't what was asked for.
@@ -472,7 +501,19 @@ const DEV_GROUPS = [
       { key: 'loadingPreviewSequenceCountMode', label: 'Sequence Count Mode - Loop, Oscillate', type: 'select', def: 'Loop', options: () => ['Loop', 'Oscillate'], onChange: () => updateLoadingPreviewSequenceVisibility() },
       { key: 'loadingPreviewSequenceLoopTransition', label: 'Loop Transition On/Off', type: 'checkbox', def: true },
       { key: 'loadingPreviewSequenceHoldMs', label: 'Sequence Hold Duration (Ms)', type: 'slider', min: 0, max: 5000, step: 10, def: 0 },
-      { key: 'loadingPreviewSize', label: 'Loading Preview Size (Px)', type: 'slider', min: 80, max: 400, step: 10, def: 160, onChange: () => resizeLoadingPreview() }
+      { key: 'loadingPreviewSize', label: 'Loading Preview Size (Px)', type: 'slider', min: 80, max: 400, step: 10, def: 160, onChange: () => resizeLoadingPreview() },
+      // Direct request ("an X offset slider and Y offset slider so i can
+      // position the loading hand preview") -- the canvas itself sits
+      // inside #loading (a fixed, screen-centered flex column, see
+      // style.css), stacked above #loadingText; these apply a plain CSS
+      // transform directly to the CANVAS only, so it can be nudged
+      // independently without moving the loading text below it or
+      // touching #loading's own centering. Range +/-300px is a judgment
+      // call (no measured basis), sized against the viewport rather than
+      // the preview's own Size slider, since a real user likely wants to
+      // push it well outside the text's own footprint, not just nudge it.
+      { key: 'loadingPreviewOffsetX', label: 'Loading Preview Offset X (Px)', type: 'slider', min: -300, max: 300, step: 5, def: 0, onChange: () => repositionLoadingPreview() },
+      { key: 'loadingPreviewOffsetY', label: 'Loading Preview Offset Y (Px)', type: 'slider', min: -300, max: 300, step: 5, def: 0, onChange: () => repositionLoadingPreview() }
     ]
   },
   {
@@ -3125,10 +3166,22 @@ let loadingPreviewSequenceDone = false
 // (cfg already holds at least its own def by now, seeded synchronously
 // well before this async callback ever fires -- see initDevPanel()'s own
 // documented seed-then-async-restore behavior).
-function buildLoadingPreview() {
-  if (!cfg.loadingPreviewEnabled) return
+// `bypassEnabledGate` (2026-09-17, direct request) -- lets the new
+// "Show Loading Preview (Live)" checkbox build/show this on demand even
+// when `loadingPreviewEnabled` (the SEPARATE "show it during the real
+// startup screen" toggle) is off; the original call site below (the
+// GLTFLoader callback) is unchanged, still gated normally.
+function buildLoadingPreview(bypassEnabledGate) {
+  if (!bypassEnabledGate && !cfg.loadingPreviewEnabled) return
   loadingPreviewCanvas = document.getElementById('loadingPreviewCanvas')
   if (!loadingPreviewCanvas) return
+  // Disposes any previously-built renderer/GL context before creating a
+  // new one -- required now that this function can genuinely run more
+  // than once per session (the live-preview toggle can rebuild it
+  // repeatedly); a 2nd WebGLRenderer bound to the SAME canvas without
+  // disposing the first would otherwise leak a GL context on every
+  // toggle.
+  if (loadingPreviewRenderer) { loadingPreviewRenderer.dispose(); loadingPreviewRenderer = null }
   loadingPreviewCanvas.style.display = 'block'
   loadingPreviewScene = new THREE.Scene()
   loadingPreviewCamera = new THREE.PerspectiveCamera(35, 1, 0.1, 2000)
@@ -3194,6 +3247,59 @@ function buildLoadingPreview() {
   loadingPreviewDirection = 1
   loadingPreviewSequenceDone = false
   resizeLoadingPreview()
+  repositionLoadingPreview()
+}
+// Independent render loop for the on-demand "live" preview
+// (loadingPreviewShowLive) -- the main animate() loop's own loading-
+// preview branch (see its own comment, near `if (!fieldStarted &&
+// loadingPreviewRenderer)`) permanently stops calling this once
+// `fieldStarted` flips true, by design (a deliberate one-time-per-
+// session optimization for the REAL startup sequence, not something
+// this feature should reverse). This is a SEPARATE loop specifically so
+// a post-load, on-demand preview can still animate -- self-terminates
+// the moment `loadingPreviewShowLive` goes false again (checked at the
+// top of every tick, no separate cancelAnimationFrame bookkeeping
+// needed) or if the renderer it's driving disappears out from under it.
+let loadingPreviewLiveRafId = null
+function startLoadingPreviewLiveLoop() {
+  if (loadingPreviewLiveRafId !== null) return // already running
+  const tick = () => {
+    if (!cfg.loadingPreviewShowLive || !loadingPreviewRenderer) { loadingPreviewLiveRafId = null; return }
+    try {
+      updateLoadingPreviewAnimation()
+      loadingPreviewRenderer.render(loadingPreviewScene, loadingPreviewCamera)
+    } catch (err) {
+      console.error('Loading Preview (live) frame threw -- disabling for this session:', err)
+      cfg.loadingPreviewShowLive = false
+      syncValue('loadingPreviewShowLive', false)
+      if (loadingPreviewCanvas) loadingPreviewCanvas.style.display = 'none'
+      loadingPreviewLiveRafId = null
+      return
+    }
+    loadingPreviewLiveRafId = requestAnimationFrame(tick)
+  }
+  loadingPreviewLiveRafId = requestAnimationFrame(tick)
+}
+// loadingPreviewShowLive's own onChange. Rebuilds from scratch on every
+// "on" (buildLoadingPreview() itself now disposes any previous renderer
+// first, see its own comment, so repeated toggling can't leak GL
+// contexts) rather than trying to resume a possibly-stale previous
+// instance. Guarded on `modelMeasurementsReady` -- the dev panel itself
+// is visible from page load, well before the hand model has actually
+// finished loading, so this checkbox IS reachable before there's
+// anything real to preview yet; silently does nothing in that case
+// rather than throwing on an undefined `modelRoot`.
+function setLoadingPreviewLiveVisible(show) {
+  if (!show) {
+    if (loadingPreviewCanvas) loadingPreviewCanvas.style.display = 'none'
+    return
+  }
+  if (!modelMeasurementsReady) return
+  buildLoadingPreview(true)
+  // Pre-fieldStarted, the main animate() loop's own existing branch is
+  // already animating this renderer every frame -- only start the
+  // separate loop once that branch has permanently stopped.
+  if (fieldStarted) startLoadingPreviewLiveLoop()
 }
 // Applies a Lighting preset's own values to the loading preview's own
 // cloned key/hemi lights -- a bespoke version of the main scene's
@@ -3231,6 +3337,25 @@ function resizeLoadingPreview() {
   loadingPreviewCamera.aspect = 1
   loadingPreviewCamera.updateProjectionMatrix()
   loadingPreviewRenderer.setSize(size, size, false)
+}
+// Loading Preview Offset X/Y (Px) -- same "called once at build time and
+// again on the slider's own onChange" pattern as resizeLoadingPreview()
+// directly above (see its own comment for why live-resizable/
+// repositionable isn't strictly needed but costs nothing to keep
+// consistent with the configured value). The canvas is a top-level
+// element positioned via `top:50%;left:50%` (style.css) -- exactly like
+// #loading centers ITSELF -- so this transform has to do BOTH jobs in
+// one value: `translate(-50%,-50%)` recenters the canvas on its own
+// size (matching #loading's own base centering exactly), THEN an
+// additional `translate(offsetXpx, offsetYpx)` nudges it per the 2
+// sliders. Completely independent of #loadingText's own layout (a
+// separate element, #loading's own child) since this only ever touches
+// the canvas's own inline style.
+function repositionLoadingPreview() {
+  if (!loadingPreviewCanvas) return
+  const offsetX = cfg.loadingPreviewOffsetX || 0
+  const offsetY = cfg.loadingPreviewOffsetY || 0
+  loadingPreviewCanvas.style.transform = `translate(-50%, -50%) translate(${offsetX}px, ${offsetY}px)`
 }
 // Applies one pose-shaped values object to ONLY the loading-preview hand's
 // skeleton -- deliberately a 3rd near-duplicate of previewPosePreset()

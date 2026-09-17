@@ -36,10 +36,19 @@ html, body {
 }
 /* Loading Preview (dev-panel "Loading Preview" group) -- hidden by
    default; buildLoadingPreview() (main.js) only reveals this when
-   loadingPreviewEnabled is on, so an unused canvas never shows as an
-   empty box. Sized in JS (resizeLoadingPreview()) off the Loading
-   Preview Size (Px) slider, not fixed here. */
-#loadingPreviewCanvas { display: none; }
+   loadingPreviewEnabled/loadingPreviewShowLive is on, so an unused
+   canvas never shows as an empty box. Sized in JS (resizeLoadingPreview())
+   off the Loading Preview Size (Px) slider, not fixed here. A top-level
+   sibling of #loading (NOT a child, as of 2026-09-17) -- deliberately
+   decoupled from #loading's own hidden-once-the-real-field-starts
+   lifecycle, so the new "Show Loading Preview (Live)" checkbox can
+   reveal it again after that point without also re-showing the
+   "Loading hands…" text. `top:50%;left:50%` centers it on the viewport
+   the same way #loading centers itself; the -50%/-50% recentering plus
+   the Offset X/Y sliders' own additional translate() are both applied
+   together in one `transform` value, set entirely in JS
+   (repositionLoadingPreview()), since it has to be recomputed live. */
+#loadingPreviewCanvas { display: none; position: fixed; top: 50%; left: 50%; pointer-events: none; }
 
 /* ---------------------------------------------------------------------
    Dev panel (CLAUDE.md Section 12) -- reused verbatim from ADA BATHROOM's

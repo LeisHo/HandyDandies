@@ -7057,6 +7057,85 @@ camera. `node --check` passes on `main.js`.
 Cache-buster: `index.html`'s own `main.js?v=144` -> `?v=145`.
 
 --------------------------------------------------------------------------------
+
+2026-09-17 08:56:51-09:16:55 EDT (20m04s)
+
+**Added: on-demand live Loading Preview toggle + X/Y position offset
+sliders, on top of the pre-existing `loadingPreviewEnabled` (shown only
+during the real page-load screen).** Direct request ("Provide a
+checkbox to show the loading hand preview. Provide an X offset slider
+and Y offset slider so i can position the loading hand preview"),
+scoped via an AskUserQuestion exchange -- the pre-existing checkbox
+already showed the preview during real page load, so the open question
+was whether the user wanted that alone, or a genuinely new toggle that
+also works AFTER the real hand field has already started rendering.
+User's answer: "Build an on-demand live preview toggle" -- the bigger
+of the 2 options.
+
+**Why this needed real architectural work, not just a checkbox:**
+`animate()`'s own `if (!fieldStarted && loadingPreviewRenderer)` branch
+permanently stops calling `updateLoadingPreviewAnimation()`/rendering
+the preview once the real hand field starts (`fieldStarted = true`) --
+a deliberate one-time-per-session optimization, not a bug. Making the
+preview controllable AFTER that point needed a second, independent
+render loop.
+
+**Implementation:**
+- 2 new `DEV_GROUPS` controls: `loadingPreviewShowLive` (checkbox,
+  "Show Loading Preview (Live, No Reload Needed)") and
+  `loadingPreviewOffsetX`/`loadingPreviewOffsetY` (sliders, -300 to
+  300px).
+- `buildLoadingPreview()` gained a `bypassEnabledGate` parameter so the
+  live toggle can force-build the preview scene even when
+  `loadingPreviewEnabled` is off.
+- New `repositionLoadingPreview()` applies the offset sliders via
+  `translate(-50%, -50%) translate(Xpx, Ypx)` -- base self-centering
+  composed with an additional pixel offset in one `transform` string.
+- New, fully independent `startLoadingPreviewLiveLoop()` (its own
+  `requestAnimationFrame` loop, gated on `cfg.loadingPreviewShowLive`
+  and self-terminating when that flag goes false) plus
+  `setLoadingPreviewLiveVisible(show)`, which always does a fresh
+  `buildLoadingPreview(true)` before starting the loop rather than
+  assuming a previous build is still valid -- disposing the prior
+  `WebGLRenderer` first, so the toggle is safely repeatable across many
+  on/off cycles.
+- `tryStartField()` (the point the real field becomes ready and the
+  original loading screen hides) now checks
+  `cfg.loadingPreviewShowLive` and either starts the live loop (via
+  `setLoadingPreviewLiveVisible(true)`, not a direct
+  `startLoadingPreviewLiveLoop()` call -- self-caught during review:
+  calling the loop directly would silently do nothing if the checkbox
+  had been pre-checked before the model even finished loading while
+  `loadingPreviewEnabled` was off, since nothing would have been built
+  yet) or hides the canvas.
+- `index.html`: `#loadingPreviewCanvas` moved from inside `#loading` to
+  a top-level sibling immediately before it, so its visibility no
+  longer inherits `#loading`'s own real-field-start hidden state.
+  `style.css`: the canvas rule changed from `display: none` to
+  `display: none; position: fixed; top: 50%; left: 50%; pointer-events:
+  none;` to support the new offset-based positioning independent of
+  its old flex-child-of-`#loading` layout.
+
+**Verified live** (after retrying past this project's own documented
+environment network-truncation issue on `main.js` -- port 8423 failed
+repeatedly, a fresh port 8425 succeeded): controls render with correct
+labels/defaults; canvas stays hidden by default; first toggle-on shows
+it at the correct base-centered position (`getComputedStyle().transform`
+matrix checked against the hand-derived expected matrix for 2 different
+X/Y offset combinations); toggle-off hides it again; a 2nd toggle-on
+cycle (exercising the dispose-and-rebuild path for real) rendered
+correctly with no console errors; `read_console_messages` filtered for
+`context|WebGL|dispose` after that 2nd cycle came back clean (no
+logs). Also re-confirmed, on a fresh full page load, that the
+PRE-EXISTING `loadingPreviewEnabled` real-load-screen preview still
+displays correctly (canvas `display: block` while `fieldStarted` is
+still `false`) -- a regression check on the `index.html`/`style.css`
+restructuring above, since that markup move could plausibly have
+affected the original behavior. `node --check` passes on `main.js`.
+
+Cache-buster: `index.html`'s own `main.js?v=145` -> `?v=146`.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================
