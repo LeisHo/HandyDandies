@@ -5316,6 +5316,7 @@
       "ambientIntensity": 3,
       "ambientSkyColor": "#000000",
       "ambientGroundColor": "#000000",
+      "savedLighting": [],
       "toonSteps": 2,
       "toonStepThreshold": 0.2,
       "toonShadowFloor": 0,
@@ -10670,9 +10671,9 @@
       "quadClickHoldTweenRetransitionSpeedMs": 1730,
       "quadClickHoldTweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "quadClickHoldTweenRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
-      "cameraX": 6.571911976418974,
-      "cameraY": 13.238957217999447,
-      "cameraZ": 257.1354315631169,
+      "cameraX": 6.505294357922283,
+      "cameraY": 13.104757641923678,
+      "cameraZ": 254.52892220277892,
       "cameraFov": 35,
       "cameraZoom": 257.5598768837961,
       "savedCameras": [
@@ -10699,6 +10700,7 @@
       "ambientIntensity": 3,
       "ambientSkyColor": "#000000",
       "ambientGroundColor": "#000000",
+      "savedLighting": [],
       "toonSteps": 2,
       "toonStepThreshold": 0.2,
       "toonShadowFloor": 0,
@@ -16082,6 +16084,7 @@
       "ambientIntensity": 3,
       "ambientSkyColor": "#000000",
       "ambientGroundColor": "#000000",
+      "savedLighting": [],
       "toonSteps": 2,
       "toonStepThreshold": 0.2,
       "toonShadowFloor": 0,
@@ -16152,28 +16155,6 @@
   },
   "order": [
     {
-      "key": "Loading Preview",
-      "collapsed": true,
-      "settings": [
-        "loadingPreviewEnabled",
-        "loadingMinTimeMs",
-        "loadingPreviewTweenSelector",
-        "loadingPreviewSpeedMs",
-        "loadingPreviewSize"
-      ],
-      "subgroups": []
-    },
-    {
-      "key": "Tween",
-      "collapsed": false,
-      "settings": [
-        "tweenPreviewSpeedMs",
-        "tweenPoses",
-        "savedTweenSequences"
-      ],
-      "subgroups": []
-    },
-    {
       "key": "Saved Dev Settings",
       "collapsed": true,
       "settings": [],
@@ -16194,7 +16175,7 @@
         },
         {
           "key": "PANEL UI",
-          "collapsed": false,
+          "collapsed": true,
           "settings": [
             "dp_bgColor",
             "dp_accentColor",
@@ -16205,7 +16186,7 @@
         },
         {
           "key": "TEXT",
-          "collapsed": false,
+          "collapsed": true,
           "settings": [
             "dp_fontFamily"
           ],
@@ -16285,6 +16266,28 @@
       ]
     },
     {
+      "key": "Loading Preview",
+      "collapsed": true,
+      "settings": [
+        "loadingPreviewEnabled",
+        "loadingMinTimeMs",
+        "loadingPreviewTweenSelector",
+        "loadingPreviewSpeedMs",
+        "loadingPreviewSize"
+      ],
+      "subgroups": []
+    },
+    {
+      "key": "Tween",
+      "collapsed": true,
+      "settings": [
+        "tweenPreviewSpeedMs",
+        "tweenPoses",
+        "savedTweenSequences"
+      ],
+      "subgroups": []
+    },
+    {
       "key": "Field Layout",
       "collapsed": true,
       "settings": [
@@ -16301,7 +16304,7 @@
     },
     {
       "key": "Cursor Tracking",
-      "collapsed": true,
+      "collapsed": false,
       "settings": [
         "palmFaceRotationOffset",
         "trackingEnabled",
@@ -16702,6 +16705,7 @@
       "key": "Lighting",
       "collapsed": true,
       "settings": [
+        "savedLighting",
         "keyAzimuth",
         "keyElevation",
         "keyTargetHeight",
