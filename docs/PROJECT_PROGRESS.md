@@ -44,42 +44,39 @@ on its own right after.
 
 **IN PROGRESS, large multi-slice undertaking: a full rebuild of the
 Click Function settings system** (direct request, spec A-L, since grown
-further mid-implementation). Renamed Mode's own 'Tween' option to
-'Sequence' (a real stored-value change, with a live-data migration --
-production settings had 10 different triggers saved as `Mode: "Tween"`)
-plus unified several labels (Animation Speed, Pause Duration At Tween
-End, Start Time Curve, Retransition Speed/Min-Max, Sequence) across all
-10 existing triggers. **Offset On/Off (X/Y) and Rotation On/Off (X/Y/Z)
-now shipped for all 10 triggers too** -- both the DEV_GROUPS controls
-and the real runtime application (`applyOffsetRotationToHand()`,
-composes additively onto `hand.wrapper.position`/`.quaternion` right
-after each trigger's own pose application, camera-relative Offset,
-ramps 0->target via the same per-hand `progress` the pose-lerp itself
-uses, verified live via `window.__debug` since this session's browser
-tool hit its own documented rAF-not-firing issue). **Animation Speed
-Curve On/Off (new distance->speed curve), Start Time Curve On/Off
-(wraps the existing stagger), and Retransition On/Off (new behavioral
-gate -- off means the hand stays at its end pose forever) also now
-shipped for all 10 triggers**, all scoped to Single Pose mode only per
-the spec's own grouping. **Sequence Mode (Count/Loop/Oscillate) also now shipped for the 5
-fire-and-forget triggers** (click/dblclick/rc/tripleClick/quadClick) --
-a single click's own Sequence-mode playback can now run a bounded
-number of laps (e.g. "run 3 times, then stop") or loop/oscillate
-unbounded, reusing Click Hold-Pose's own proven Loop-wrap math. This
-closes out Phase 1's per-trigger settings-schema work in full -- 4
-verified slices of an 8-phase plan (settings schema -> Sequence-mode
-release behavior -> type/click-count/scroll -> a dynamic "Add Click
-Function" architecture generalizing click/hold detection to any number
-of functions with no manual tuning -> a multi-sequence-plus-hold chain
-builder -> bezier curve handles -> mobile multi-touch/zoom/scroll ->
-duplicate-setting validation). Still ahead: reordering the 10 groups'
-own settings to match the spec's B ordering, Sequence-mode's own
-release behavior (On Release Mode/Trigger All Hands/Tween Stop
-Curve+Delay), and a separately-requested Loading Preview upgrade
+further mid-implementation). **Phase 1 (per-trigger settings schema,
+all 10 triggers) is DONE**: Mode 'Tween'->'Sequence' rename + label
+unification (with a live-data migration), Offset/Rotation (camera-
+relative, ramping, composes additively via `applyOffsetRotationToHand()`),
+Animation Speed Curve/Start Time Curve/Retransition on-off gates
+(Single Pose mode), and Sequence Mode (Count/Loop/Oscillate) for the 5
+fire-and-forget triggers (e.g. "run 3 times, then stop"). **Phase 2
+(Sequence-mode release behavior, hold-based triggers only) is also
+DONE**: On Release Mode (Stop/Complete Sequence -- a released hold can
+now finish its current tween pass/lap instead of aborting immediately)
++ Trigger All Hands (forces every hand to release simultaneously,
+bypassing the normal per-hand stagger). The spec's own "Tween Stop
+Start Time Curve/Delay" was deliberately deferred, flagged to the user
+as likely duplicating the already-existing Tween Retransition Start
+Time Curve/Range rather than silently built or silently dropped.
+
+All of the above verified live via `window.__debug` (this session's
+browser-automation tool has a documented rAF-not-firing issue for this
+project -- see CLAUDE.md's own Gotchas -- so verification bypasses the
+render loop and drives the update functions directly with a
+manufactured `now`).
+
+**Still ahead** (6 of the original 8 phases): reordering the 10
+groups' own settings to match the spec's B ordering; the "Tween Stop"
+curve question above; a separately-requested Loading Preview upgrade
 (Camera/Lighting selection + its own, not-yet-built Sequence Mode
-system) -- neither started yet. See CHANGELOG.txt's matching entries
-for full detail; this is genuinely large and will keep spanning
-multiple rounds.
+system); Type/click-count/scroll dropdowns; a dynamic "Add Click
+Function" architecture generalizing click/hold detection to any number
+of functions with no manual tuning; a multi-sequence-plus-hold chain
+builder; bezier curve handles; mobile multi-touch/zoom/scroll;
+duplicate-setting validation. See CHANGELOG.txt's matching entries for
+full slice-by-slice detail; this is genuinely large and will keep
+spanning multiple rounds.
 
 **SHIPPED 2026-09-17: dev-panel groups can now be individually locked
 against reordering** (`.dp-group-lock-icon`, 🔒/🔓, in each group's title

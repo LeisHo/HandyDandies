@@ -6387,6 +6387,83 @@ Cache-buster: `index.html`'s own `main.js?v=137` -> `?v=138` (this
 slice's own, to guarantee a fresh fetch for live verification).
 
 --------------------------------------------------------------------------------
+2026-09-17  -  finished 07:26:14 EDT (Actual: NOT MEASURED precisely --
+no fresh start timestamp was captured after the AskUserQuestion
+round-trip that preceded this slice's implementation work, and that
+gap includes real user-response wait time that shouldn't be counted as
+work time anyway; per CLAUDE.md's own "never fabricate timing" rule,
+not reporting a duration here rather than estimating one)
+
+**Phase 2 of the Click Function overhaul: Sequence-mode On Release Mode
+(Stop/Complete Sequence) + Trigger All Hands, for the 5 hold-based
+triggers.** Only chp/rchp/dcHold/tripleClickHold/quadClickHold get
+this -- they're the only triggers with a genuine "release" event mid-
+tween; the fire-and-forget family has nothing to release.
+
+'On Release Mode' (default 'Stop', preserves exact existing behavior --
+release immediately begins retransition) vs 'Complete Sequence' (new:
+the hand keeps playing -- finishes the current forward pass, or the
+current lap if already looping -- instead of stopping immediately on
+release). Implemented via a `chp.releasePending` flag:
+`endClickHoldPose()` leaves `chp.phase` completely untouched when
+Complete Sequence is selected (just sets the flag and returns);
+`updateClickHoldPoseForHand()`'s own forward and looping phases check
+the flag at their own natural completion point (end of the current
+pass or lap) and call a new shared `beginTweenReleaseStop()` helper
+from there once it's genuinely time to stop.
+
+'Trigger All Hands' (checkbox, default off) -- direct clarification via
+AskUserQuestion this session ("force simultaneous release... ALL hands
+immediately begin their stop/retransition together, overriding each
+hand's own normal distance-based stagger delay"). When on, bypasses the
+existing Tween Retransition Start Time Curve/Range stagger entirely
+(delay forced to 0 for every hand) instead of each hand computing its
+own distance-based delay -- applies in both Stop and Complete Sequence
+modes.
+
+**Deliberately NOT implemented this slice, flagged rather than
+guessed:** the original spec text's "Tween Stop Start Time Curve"/
+"Tween Stop Delay". On close inspection these appear to substantially
+duplicate the ALREADY-EXISTING Tween Retransition Start Time Curve/
+Range (which already staggers exactly "when does this hand's
+retransition begin" for Tween mode) -- building a 2nd curve/range pair
+for the identical purpose would be unnecessary duplication (CLAUDE.md
+§0a's own architecture-judgment guidance). Surfaced this to the user
+rather than silently building a redundant control or silently dropping
+the spec item.
+
+**Verified live** via `window.__debug` (rAF-bypass, same method as
+every slice this session -- CLAUDE.md's own Gotchas): Complete Sequence
+mode -- released mid-forward-pass at progress 0.4, confirmed phase
+stayed 'forward' with `releasePending=true` (tween kept playing,
+completely unaffected); released again at progress 0.8, same result;
+confirmed the transition to 'retransition' happened the EXACT instant
+progress naturally reached 1, not before. Trigger All Hands confirmed
+both directions in 'Stop' mode: off produced a real nonzero stagger
+(299.58ms, within the default 0-300ms range), on produced exactly 0.
+No runtime errors in any test. `node --check` passes.
+
+**Concurrent-session note:** `src/devpanel/devPanel.js` was actively
+being edited, uncommitted, by another session throughout this slice
+(CLAUDE.md §5/§9) -- left entirely untouched and unstaged; this
+commit's diff is scoped to `index.html`/`src/main.js` only (confirmed
+via `git status`/`git diff` before staging, per the established
+protocol).
+
+**Not yet done:** the deferred Tween Stop curve/delay question above,
+reordering the 10 groups' own settings to match the spec's B ordering,
+the Loading Preview's own Camera/Lighting selectors + Sequence Mode,
+and Phases 3-8 of the original 8-phase plan (Type/click-count/scroll,
+the dynamic Add-Click-Function architecture, the sequence-chain
+builder, bezier curve handles, mobile multi-touch/zoom/scroll,
+duplicate-setting validation).
+
+Cache-buster: `index.html`'s own `main.js?v=139` (picked up mid-slice
+from the concurrent session's own unrelated devPanel.js-driven bump,
+not reverted) -> `?v=140` (this slice's own, to guarantee a fresh
+fetch for live verification).
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================
