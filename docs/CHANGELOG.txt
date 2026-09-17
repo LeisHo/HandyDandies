@@ -7003,6 +7003,60 @@ these specific, real controls, not just the synthetic test group from
 the prior entry.
 
 --------------------------------------------------------------------------------
+2026-09-17  -  08:42:43 - 08:47:40 EDT (4m57s, measured)
+
+**Fixed: a Saved Camera preset authored/imported with a shorter x/y/z/
+tx/ty/tz/fov field naming silently fell back to every default value on
+"Use," instead of moving the camera to that preset's own view.** Direct
+bug report, with the user's own exact JSON shape pasted in for both
+Camera and Lighting. Root cause, found by direct comparison against
+`captureCameraPreset()`'s own output shape rather than by live
+debugging: every read site for a camera preset item
+(`applyCameraPreset()`, `setSelectedCameraAsDefault()`, and the Loading
+Preview's own camera-preset override block) only ever looked for this
+app's own internal field names -- `cameraX`/`cameraY`/`cameraZ`/
+`cameraFov`/`targetX`/`targetY`/`targetZ` -- never the shorter `x`/`y`/
+`z`/`fov`/`tx`/`ty`/`tz` naming the user's own JSON used. Since none of
+those internal keys existed on an item in that shape, every single
+field fell through to its own hardcoded default every time, regardless
+of which preset was selected -- indistinguishable from "it doesn't
+work" (always snapping to one identical default view). Lighting's own
+preset needed no equivalent fix -- the user's own lighting JSON already
+matched `LIGHTING_PRESET_KEYS` exactly (`keyAzimuth`/`keyElevation`/
+etc.), confirmed by direct comparison against both read sites
+(`applyLightingPreset()`, `applyLoadingPreviewLighting()`), both of
+which already read the correct names.
+
+**Fix:** a new `normalizeCameraPresetItem(item)` helper accepts EITHER
+naming (the internal one wins if somehow both are present on the same
+item) and returns a NEW object in the internal shape -- never mutating
+the original saved/imported item, so a later re-export/re-save isn't
+silently reformatted underneath the user. Applied at all 3 real read
+sites: `applyCameraPreset()` (normalizes its own incoming argument),
+`setSelectedCameraAsDefault()` (normalizes its own separate direct
+`item[key]` reads independently, since `applyCameraPreset()`'s own
+internal normalized copy isn't exposed back to its caller), and the
+Loading Preview's camera-override block.
+
+**Verified without a full live app load** (the same environment
+truncation issue documented in the 2 prior entries struck again this
+round -- `window.__debug` never became available after a 13-second
+wait, the model/settings-restore fetch itself apparently stalling, not
+just the initial script-load truncation seen before; not re-litigated
+further, per this project's own §0b usage-efficiency guidance, given
+the fix was already well-verified another way): an isolated `node -e`
+snippet ran the ACTUAL `normalizeCameraPresetItem()` source against
+the user's own exact pasted "Top" camera JSON and confirmed every
+field maps correctly (`x:2.669.. -> cameraX:2.669..`, `tx:2.307.. ->
+targetX:2.307..`, `fov:32 -> cameraFov:32`, etc. -- exact values, not
+approximations); a 2nd `node -e` check confirmed an ALREADY-internal-
+format preset (what a real Save via the UI actually produces) passes
+through completely unchanged -- no regression for any existing saved
+camera. `node --check` passes on `main.js`.
+
+Cache-buster: `index.html`'s own `main.js?v=144` -> `?v=145`.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

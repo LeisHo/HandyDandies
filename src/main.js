@@ -2839,13 +2839,41 @@ function captureCameraPreset() {
   item.targetZ = controls.target.z
   return item
 }
+// Direct bug report, 2026-09-17: a camera preset authored/imported using
+// a shorter x/y/z/tx/ty/tz/fov naming (the user's own external format)
+// silently fell back to EVERY default value on "Use" -- every read site
+// below only ever looked for this app's own internal names (cameraX/
+// cameraY/cameraZ/targetX/targetY/targetZ/cameraFov, exactly what
+// captureCameraPreset() itself produces), so a short-name item matched
+// nothing and looked completely broken (always snapping to the same
+// default view regardless of which preset was selected). Accepts EITHER
+// naming -- the internal one always wins when both happen to be present
+// -- and returns a NEW object in the internal shape, never mutating the
+// original saved/imported item (so a later re-export/re-save isn't
+// silently reformatted underneath the user). `name`/`group` pass through
+// unchanged via the spread. Lighting's own equivalent (LIGHTING_PRESET_KEYS)
+// needed no such fix -- the user's own lighting JSON already used this
+// app's exact internal field names.
+function normalizeCameraPresetItem(item) {
+  return {
+    ...item,
+    cameraX: item.cameraX !== undefined ? item.cameraX : item.x,
+    cameraY: item.cameraY !== undefined ? item.cameraY : item.y,
+    cameraZ: item.cameraZ !== undefined ? item.cameraZ : item.z,
+    cameraFov: item.cameraFov !== undefined ? item.cameraFov : item.fov,
+    targetX: item.targetX !== undefined ? item.targetX : item.tx,
+    targetY: item.targetY !== undefined ? item.targetY : item.ty,
+    targetZ: item.targetZ !== undefined ? item.targetZ : item.tz
+  }
+}
 // Applies a camera preset (a Saved Camera item OR cameraDefaultValues
 // itself, both the same shape) directly to the live camera + pan target,
 // then syncs the panel's own sliders to match -- deliberately sets
 // camera.position/controls.target directly rather than going through
 // applyCameraControl()'s own delta-preserving math, so this is fully
 // deterministic regardless of whatever view was live beforehand.
-function applyCameraPreset(item) {
+function applyCameraPreset(rawItem) {
+  const item = normalizeCameraPresetItem(rawItem)
   const targetX = item.targetX !== undefined ? item.targetX : 0
   const targetY = item.targetY !== undefined ? item.targetY : 0
   const targetZ = item.targetZ !== undefined ? item.targetZ : 0
@@ -2869,9 +2897,14 @@ function getSelectedSavedCameraItem() {
   return selectedRow ? selectedRow.__item : null
 }
 function setSelectedCameraAsDefault() {
-  const item = getSelectedSavedCameraItem()
-  if (!item) return
-  applyCameraPreset(item)
+  const rawItem = getSelectedSavedCameraItem()
+  if (!rawItem) return
+  applyCameraPreset(rawItem)
+  // Normalized independently here too -- applyCameraPreset() above
+  // normalizes its OWN internal copy, but never exposes it, and this
+  // function's own direct item[key]/item.targetX reads below need the
+  // same short-name fallback to correctly seed cameraDefaultValues.
+  const item = normalizeCameraPresetItem(rawItem)
   CAMERA_PRESET_KEYS.forEach((key) => { cameraDefaultValues[key] = item[key] !== undefined ? item[key] : CAMERA_KEY_DEFAULTS[key] })
   cameraDefaultValues.targetX = item.targetX !== undefined ? item.targetX : 0
   cameraDefaultValues.targetY = item.targetY !== undefined ? item.targetY : 0
@@ -3129,7 +3162,11 @@ function buildLoadingPreview() {
   // to this preview's own SEPARATE camera object (not the main scene's),
   // same reasoning as the lighting override above. Empty selection keeps
   // the existing auto-framed behavior exactly as it was.
-  const cameraPreset = (cfg.savedCameras || []).find((c) => c.name === cfg.loadingPreviewCameraSelector)
+  // normalizeCameraPresetItem() -- see its own comment above -- the SAME
+  // short-x/y/z/tx/ty/tz/fov-vs-internal-name fix Camera's own "Use"
+  // button needed applies identically here.
+  const rawCameraPreset = (cfg.savedCameras || []).find((c) => c.name === cfg.loadingPreviewCameraSelector)
+  const cameraPreset = rawCameraPreset ? normalizeCameraPresetItem(rawCameraPreset) : null
   if (cameraPreset) {
     loadingPreviewCamera.position.set(
       cameraPreset.cameraX ?? CAMERA_KEY_DEFAULTS.cameraX,

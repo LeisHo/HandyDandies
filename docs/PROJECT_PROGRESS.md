@@ -18,6 +18,18 @@ work seamlessly from there.
 
 ## Currently working on
 
+**SHIPPED 2026-09-17: fixed Saved Camera presets silently no-op'ing on
+"Use" when authored/imported with a shorter x/y/z/tx/ty/tz/fov field
+naming instead of this app's own internal cameraX/targetX/cameraFov
+names.** A new `normalizeCameraPresetItem()` helper (main.js) accepts
+either naming at all 3 real read sites (the main "Use" button, "Set as
+Default," and the Loading Preview's own camera override) without
+mutating the original saved item. Lighting needed no equivalent fix --
+its own preset field names already matched. Verified via an isolated
+`node -e` check against the user's own exact pasted JSON (not a full
+live app load -- blocked again by the environment issue below). See
+CHANGELOG.txt's matching entry for the full account.
+
 **SHIPPED 2026-09-17: ported the dev-panel template's Add Group/fold-
 select/header-icon-buttons/search, PLUS Delete Group/Setting + Undo,
 into this project's own devPanel.js copy.** Header now has 6 icon

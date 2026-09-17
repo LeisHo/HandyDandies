@@ -348,3 +348,26 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   per control -- see CHANGELOG.txt's 2026-09-17 "Click Function" entry
   for why it exists and its own isolated `node -e` unit check before
   trusting it against a new batch.
+- **A list-picker item (Saved Camera/Lighting/Pose/etc.) that doesn't
+  use EXACTLY the field names its own `captureCurrent()` function
+  produces fails completely silently -- every mismatched field just
+  falls through to its own hardcoded default, with no error, no
+  console warning, nothing.** Confirmed live 2026-09-17: a Saved Camera
+  authored/imported with a shorter `x`/`y`/`z`/`tx`/`ty`/`tz`/`fov`
+  naming (a reasonable, natural-looking format) always snapped to the
+  exact same default view on "Use," regardless of which preset was
+  selected -- indistinguishable from "nothing happens" since NONE of
+  `applyCameraPreset()`'s own expected keys (`cameraX`/`cameraY`/
+  `cameraZ`/`cameraFov`/`targetX`/`targetY`/`targetZ`) existed on the
+  item, so every single one fell back to its default simultaneously.
+  Fixed for Camera specifically via `normalizeCameraPresetItem()` (an
+  either-naming-accepted normalizer applied at all 3 real read sites --
+  see CHANGELOG.txt's matching entry). Lighting's own preset shape
+  already matched exactly, confirmed by direct comparison, so it needed
+  no fix -- but the underlying risk is generic to EVERY list-picker
+  control in this file (savedPoses, savedTweenSequences, etc.): before
+  trusting a bug report that a saved/imported item's "Use" isn't
+  working, diff the item's own field names against exactly what that
+  control's `captureCurrent()` function produces, rather than assuming
+  the bug is in the apply logic itself or the import/selection
+  mechanism.
