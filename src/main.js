@@ -799,7 +799,7 @@ const DEV_GROUPS = [
         // extraSinglePoseKeys)` when Mode was ported to every other
         // Click-family group; this ONE call site (the original, from
         // before that generalization) was missed.
-        onChange: () => { updateClickTriggerModeVisibility('rc', ['PauseDurationMs']); updateSingleTimingGateVisibility('rc') }
+        onChange: () => { updateClickTriggerModeVisibility('rc', ['PauseDurationMs']); updateSingleTimingGateVisibility('rc'); updateSequencePlayModeVisibility('rc') }
       },
       // Offset/Rotation -- see makeClickHoldPoseGroup()'s own matching
       // comment for the full reasoning. Right Click is a hand-written
@@ -820,6 +820,13 @@ const DEV_GROUPS = [
       { key: 'rcTweenSpeedMs', label: 'Animation Speed (Ms)', type: 'slider', min: 50, max: 5000, step: 10, def: 800 },
       { key: 'rcTweenStartTimeCurve', label: 'Start Time Curve (Distance -> Start Time)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickPoseConfig('rc') },
       { key: 'rcTweenStartTimeRange', label: 'Min / Max Start Time (Ms)', type: 'text', def: '{"min":0,"max":300}', onChange: () => parseClickPoseConfig('rc') },
+      // Sequence Mode - Count/Loop/Oscillate -- see makeClickPoseGroup()'s
+      // own matching comment for the full reasoning.
+      { key: 'rcSequencePlayMode', label: 'Sequence Mode - Count, Loop, Oscillate', type: 'select', def: 'Count', options: () => ['Count', 'Loop', 'Oscillate'], onChange: () => updateSequencePlayModeVisibility('rc') },
+      { key: 'rcSequenceCount', label: 'Sequence Count', type: 'slider', min: 1, max: 50, step: 1, def: 3 },
+      { key: 'rcSequenceCountMode', label: 'Sequence Count Mode - Loop, Oscillate', type: 'select', def: 'Loop', options: () => ['Loop', 'Oscillate'], onChange: () => updateSequencePlayModeVisibility('rc') },
+      { key: 'rcSequenceLoopTransition', label: 'Loop Transition On/Off', type: 'checkbox', def: true },
+      { key: 'rcSequenceHoldMs', label: 'Sequence Hold Duration (Ms)', type: 'slider', min: 0, max: 5000, step: 10, def: 0 },
       { key: 'rcTransitionSpeedMs', label: 'Animation Speed (Ms)', type: 'slider', min: 0, max: 700, step: 10, def: 400 },
       // Animation Speed Curve / Start Time Curve / Retransition on-off
       // gates -- see makeClickHoldPoseGroup()'s own matching comments.
@@ -2520,7 +2527,7 @@ function makeClickPoseGroup(p, title, defaults = {}) {
       // the same way).
       {
         key: `${p}Mode`, label: 'Mode', type: 'select', def: 'Single Pose', options: () => ['Single Pose', 'Sequence'],
-        onChange: () => { updateClickTriggerModeVisibility(p, ['PauseDurationMs']); updateSingleTimingGateVisibility(p) }
+        onChange: () => { updateClickTriggerModeVisibility(p, ['PauseDurationMs']); updateSingleTimingGateVisibility(p); updateSequencePlayModeVisibility(p) }
       },
       // Offset/Rotation -- see makeClickHoldPoseGroup()'s own matching
       // comment for the full reasoning (shared word-for-word, both
@@ -2544,6 +2551,47 @@ function makeClickPoseGroup(p, title, defaults = {}) {
       { key: `${p}TweenSpeedMs`, label: 'Animation Speed (Ms)', type: 'slider', min: 50, max: 5000, step: 10, def: 800 },
       { key: `${p}TweenStartTimeCurve`, label: 'Start Time Curve (Distance -> Start Time)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickPoseConfig(p) },
       { key: `${p}TweenStartTimeRange`, label: 'Min / Max Start Time (Ms)', type: 'text', def: '{"min":0,"max":300}', onChange: () => parseClickPoseConfig(p) },
+      // Sequence Mode - Count/Loop/Oscillate -- direct follow-up request,
+      // retrofitting the same "Sequence Mode - Count, Loop, Oscillate"
+      // concept originally specced for the Loading Preview onto every
+      // non-hold click function's own Sequence mode playback ("provide
+      // me settings similar to above where a single click function will
+      // provide the Sequence Mode - Count, Loop, Oscillate setting
+      // availability. So a single click can trigger a sequence to run 3
+      // times, then stop"). Click Hold-Pose/Right-Click Hold-Pose already
+      // have their own LoopMode (Off/Loop/Oscillate, runs for as long as
+      // the hold lasts) -- this is a SEPARATE, new mechanism for the
+      // fire-and-forget family, bounded by a COUNT rather than a release
+      // event (there is no "release" here to stop an infinite loop on).
+      // 'Count' (default) is the fully-specified, primary validated case:
+      // play `${p}SequenceCount` total one-way traversals, patterned by
+      // `${p}SequenceCountMode` (Loop = every traversal repeats forward,
+      // jumping back to the start between each per Loop Transition below;
+      // Oscillate = ping-pong direction each traversal, no jump-back
+      // needed), THEN fall through into the existing Pause/Retransition
+      // flow unchanged -- exactly "run 3 times, then stop." 'Loop'/
+      // 'Oscillate' at this TOP level (matching the spec's own literal 3
+      // peer options) run the same pattern CONTINUOUSLY/unbounded instead
+      // -- a disclosed simplification, since a fire-and-forget trigger
+      // has no natural release event to stop an infinite loop on; it
+      // keeps cycling until interrupted by a new trigger. Disclosed
+      // simplification #2: the spec's own "a single run is 1 count, an
+      // oscillate/loop pass is 2 counts" arithmetic isn't implemented
+      // literally -- `${p}SequenceCount` here counts PHYSICAL one-way
+      // traversals directly (the simplest reading that still satisfies
+      // "run 3 times"), not a weighted count.
+      { key: `${p}SequencePlayMode`, label: 'Sequence Mode - Count, Loop, Oscillate', type: 'select', def: 'Count', options: () => ['Count', 'Loop', 'Oscillate'], onChange: () => updateSequencePlayModeVisibility(p) },
+      { key: `${p}SequenceCount`, label: 'Sequence Count', type: 'slider', min: 1, max: 50, step: 1, def: 3 },
+      { key: `${p}SequenceCountMode`, label: 'Sequence Count Mode - Loop, Oscillate', type: 'select', def: 'Loop', options: () => ['Loop', 'Oscillate'], onChange: () => updateSequencePlayModeVisibility(p) },
+      // Loop Transition On/Off -- direct spec wording ("Off = instant
+      // jump back to frame 1, On = smooth tween back"). Only meaningful
+      // for a Loop-style repeat (top-level Loop, or Count mode with
+      // Sequence Count Mode = Loop) -- an Oscillate-style repeat reverses
+      // in place and never needs to "jump back" anywhere.
+      { key: `${p}SequenceLoopTransition`, label: 'Loop Transition On/Off', type: 'checkbox', def: true },
+      // Hold Duration -- direct spec wording ("a Hold Duration slider for
+      // the pause between loops/oscillations").
+      { key: `${p}SequenceHoldMs`, label: 'Sequence Hold Duration (Ms)', type: 'slider', min: 0, max: 5000, step: 10, def: 0 },
       { key: `${p}TransitionSpeedMs`, label: 'Animation Speed (Ms)', type: 'slider', min: 0, max: 700, step: 10, def: defaults.transitionSpeedMs ?? 400 },
       // Animation Speed Curve / Start Time Curve / Retransition on-off
       // gates -- see makeClickHoldPoseGroup()'s own matching comments
@@ -4777,7 +4825,7 @@ function getOrInitHandCP(hand) {
     // `pendingFrozenSplayDeg`: the deferred-claim mechanism (direct
     // request -- see updateClickPoseForHand()'s own top comment for the
     // full account, mirroring Click-Hold-Pose's own).
-    CLICK_POSE_KEYS.forEach((p) => { hand._cp[p] = { phase: 'idle', triggerTime: 0, forwardSnapshot: null, tweenPoses: null, pauseStartTime: 0, retransitionStart: null, retransitionStartTime: 0, retransitionDelay: 0, lastAppliedValues: null, frozenSplayDeg: 0, pendingClaimAt: 0, pendingForwardSnapshot: null, pendingNamedPoses: null, pendingFrozenSplayDeg: 0, frozenSpeedMs: 0, pendingFrozenSpeedMs: 0 } })
+    CLICK_POSE_KEYS.forEach((p) => { hand._cp[p] = { phase: 'idle', triggerTime: 0, forwardSnapshot: null, tweenPoses: null, pauseStartTime: 0, retransitionStart: null, retransitionStartTime: 0, retransitionDelay: 0, lastAppliedValues: null, frozenSplayDeg: 0, pendingClaimAt: 0, pendingForwardSnapshot: null, pendingNamedPoses: null, pendingFrozenSplayDeg: 0, frozenSpeedMs: 0, pendingFrozenSpeedMs: 0, sequenceLapIndex: 1, sequenceLapStartTime: 0, sequenceHoldEndTime: 0, sequenceDirection: 1 } })
   }
   return hand._cp
 }
@@ -4846,7 +4894,82 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
     cp.lastAppliedValues = values
     applyPoseValuesToHand(hand, values, cp.frozenSplayDeg)
     applyOffsetRotationToHand(hand, p, progress)
-    if (progress >= 1) { cp.phase = 'paused'; cp.pauseStartTime = now }
+    if (progress >= 1) {
+      // Sequence Mode - Count/Loop/Oscillate (Sequence mode only) -- see
+      // makeClickPoseGroup()'s own control comment for the full
+      // reasoning. This initial forward pass IS lap 1; a plain 'Count'
+      // sequence with Count===1 (or Single Pose mode, which never
+      // reaches this branch) behaves exactly as before, falling straight
+      // into 'paused'.
+      const playMode = isTween ? cfg[`${p}SequencePlayMode`] : null
+      const totalLaps = playMode === 'Count' ? Math.max(cfg[`${p}SequenceCount`] || 1, 1) : Infinity
+      if (isTween && (playMode === 'Loop' || playMode === 'Oscillate' || (playMode === 'Count' && totalLaps > 1))) {
+        cp.sequenceLapIndex = 1
+        cp.sequenceLapStartTime = now
+        cp.sequenceHoldEndTime = 0
+        cp.sequenceDirection = 1
+        cp.phase = 'sequencePlaying'
+      } else {
+        cp.phase = 'paused'; cp.pauseStartTime = now
+      }
+    }
+  } else if (cp.phase === 'sequencePlaying') {
+    // Extra laps beyond the initial forward pass above, bounded by a
+    // count (Count mode) or unbounded (top-level Loop/Oscillate -- runs
+    // until a new trigger interrupts it, since a fire-and-forget click
+    // has no release event to stop an infinite loop on). `lapStyle`
+    // resolves Count mode's own nested Sequence Count Mode down to the
+    // same 'Loop'/'Oscillate' vocabulary the top-level dropdown uses, so
+    // the rest of this block doesn't need to branch 3 ways.
+    const playMode = cfg[`${p}SequencePlayMode`]
+    const lapStyle = playMode === 'Count' ? cfg[`${p}SequenceCountMode`] : playMode
+    const totalLaps = playMode === 'Count' ? Math.max(cfg[`${p}SequenceCount`] || 1, 1) : Infinity
+    const holdMs = Math.max(cfg[`${p}SequenceHoldMs`] || 0, 0)
+    if (cp.sequenceHoldEndTime && now < cp.sequenceHoldEndTime) {
+      applyPoseValuesToHand(hand, cp.lastAppliedValues, cp.frozenSplayDeg)
+      applyOffsetRotationToHand(hand, p, 1)
+      return
+    }
+    if (cp.sequenceHoldEndTime && now >= cp.sequenceHoldEndTime) {
+      cp.sequenceHoldEndTime = 0
+      cp.sequenceLapStartTime = now
+      if (lapStyle === 'Oscillate') cp.sequenceDirection *= -1
+    }
+    const speedMs = Math.max(safeTweenSpeedMs(cfg[`${p}TweenSpeedMs`]), 1)
+    const lapT = THREE.MathUtils.clamp((now - cp.sequenceLapStartTime) / speedMs, 0, 1)
+    let values
+    if (lapStyle === 'Oscillate') {
+      const t = cp.sequenceDirection === 1 ? lapT : 1 - lapT
+      values = lerpTweenSequence(cp.tweenPoses, t)
+    } else if (cfg[`${p}SequenceLoopTransition`] === false) {
+      // Instant jump back to frame 1 between laps -- each lap plays the
+      // SAME forward pass (no smooth wrap segment), matching the
+      // control's own "Off = instant jump back to frame 1" wording.
+      values = lerpTweenSequence(cp.tweenPoses, lapT)
+    } else {
+      // Smooth wrap-back -- reuses lerpLoopSequence()'s own cyclic
+      // segment math (same as Click Hold-Pose's own Loop Mode), an
+      // unbroken interpolation across the poseN->pose1 wrap instead of a
+      // teleport.
+      const segments = cp.tweenPoses.length
+      const tCyclic = (cp.sequenceLapIndex - 1) * segments + lapT * segments
+      values = lerpLoopSequence(cp.tweenPoses, tCyclic)
+    }
+    cp.lastAppliedValues = values
+    applyPoseValuesToHand(hand, values, cp.frozenSplayDeg)
+    applyOffsetRotationToHand(hand, p, 1)
+    if (lapT >= 1) {
+      cp.sequenceLapIndex++
+      if (cp.sequenceLapIndex > totalLaps) {
+        cp.phase = 'paused'
+        cp.pauseStartTime = now
+      } else if (holdMs > 0) {
+        cp.sequenceHoldEndTime = now + holdMs
+      } else {
+        cp.sequenceLapStartTime = now
+        if (lapStyle === 'Oscillate') cp.sequenceDirection *= -1
+      }
+    }
   } else if (cp.phase === 'paused') {
     // Hold at the fully-reached target -- keep reapplying (not a no-op,
     // since other config-driven state can still change during a hold).
@@ -5453,6 +5576,28 @@ function updateSingleTimingGateVisibility(p) {
   setRow('RetransitionStartTimeCurve', retransitionOn)
   setRow('RetransitionStartTimeRange', retransitionOn)
 }
+// Sequence Mode - Count/Loop/Oscillate's own visibility, for the 5
+// fire-and-forget triggers only (click/dblclick/rc/tripleClick/
+// quadClick) -- see makeClickPoseGroup()'s own control comment for the
+// full reasoning. Mode-gated (Sequence only, mirrors the Tween trio's
+// own tweenKeys visibility), PLUS 2 further sub-gates: Sequence Count/
+// Sequence Count Mode only under 'Count'; Loop Transition only under a
+// Loop-style repeat (top-level 'Loop', or 'Count' + Count Mode 'Loop').
+function updateSequencePlayModeVisibility(p) {
+  const showBase = cfg[`${p}Mode`] === 'Sequence'
+  const setRow = (suffix, visible) => {
+    const row = document.querySelector(`.dp-row[data-key="${p}${suffix}"]`)
+    if (row) row.style.display = visible ? '' : 'none'
+  }
+  setRow('SequencePlayMode', showBase)
+  const playMode = cfg[`${p}SequencePlayMode`]
+  const isCount = showBase && playMode === 'Count'
+  setRow('SequenceCount', isCount)
+  setRow('SequenceCountMode', isCount)
+  const isLoopStyle = showBase && (playMode === 'Loop' || (playMode === 'Count' && cfg[`${p}SequenceCountMode`] === 'Loop'))
+  setRow('SequenceLoopTransition', isLoopStyle)
+  setRow('SequenceHoldMs', showBase)
+}
 // Offset/Rotation rows are each gated by their own On/Off checkbox,
 // independent of Mode -- unlike updateClickTriggerModeVisibility() above,
 // these apply the same in Single Pose and Sequence mode alike, so Mode
@@ -5476,7 +5621,7 @@ CLICK_POSE_KEYS.forEach((p) => { parseClickPoseConfig(p); buildClickPoseWidgets(
 // control's own onChange (DEV_GROUPS, above) keeps this current after
 // that. Click Pose/Double-Click Pose/Right Click share CLICK_POSE_KEYS'
 // own Pause Duration slider; Click Hold-Pose/Right-Click Hold-Pose don't.
-CLICK_POSE_KEYS.forEach((p) => { updateClickTriggerModeVisibility(p, ['PauseDurationMs']); updateOffsetRotationVisibility(p); updateSingleTimingGateVisibility(p) })
+CLICK_POSE_KEYS.forEach((p) => { updateClickTriggerModeVisibility(p, ['PauseDurationMs']); updateOffsetRotationVisibility(p); updateSingleTimingGateVisibility(p); updateSequencePlayModeVisibility(p) })
 CLICK_HOLD_KEYS.forEach((p) => { updateClickTriggerModeVisibility(p, [], ['LoopMode']); updateLoopHoldVisibility(p); updateOffsetRotationVisibility(p); updateSingleTimingGateVisibility(p) })
 // Bug fix (direct user report, "I dont see any of the saved poses in the
 // dropdown"): a `select` control's <option> list is populated by
