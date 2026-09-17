@@ -18,7 +18,7 @@
       "loadingPreviewEnabled": true,
       "loadingMinTimeMs": 4200,
       "loadingPreviewTweenSelector": "Waiting Horizontal Tap",
-      "loadingPreviewCameraSelector": "",
+      "loadingPreviewCameraSelector": "Front",
       "loadingPreviewLightingSelector": "",
       "loadingPreviewSpeedMs": 1600,
       "loadingPreviewSequenceMode": "Loop",
@@ -5924,7 +5924,7 @@
       "loadingPreviewEnabled": true,
       "loadingMinTimeMs": 4200,
       "loadingPreviewTweenSelector": "Waiting Horizontal Tap",
-      "loadingPreviewCameraSelector": "",
+      "loadingPreviewCameraSelector": "Front",
       "loadingPreviewLightingSelector": "",
       "loadingPreviewSpeedMs": 1600,
       "loadingPreviewSequenceMode": "Loop",
@@ -11830,7 +11830,7 @@
       "loadingPreviewEnabled": true,
       "loadingMinTimeMs": 4200,
       "loadingPreviewTweenSelector": "Waiting Horizontal Tap",
-      "loadingPreviewCameraSelector": "",
+      "loadingPreviewCameraSelector": "Front",
       "loadingPreviewLightingSelector": "",
       "loadingPreviewSpeedMs": 1600,
       "loadingPreviewSequenceMode": "Loop",
@@ -18552,7 +18552,21 @@
     },
     {
       "key": "Custom Function 1",
-      "collapsed": true,
+      "collapsed": false,
+      "locked": false,
+      "settings": [],
+      "subgroups": []
+    },
+    {
+      "key": "Custom Function 2",
+      "collapsed": false,
+      "locked": false,
+      "settings": [],
+      "subgroups": []
+    },
+    {
+      "key": "Custom Function 1",
+      "collapsed": false,
       "locked": false,
       "settings": [
         "custom1Enabled",
