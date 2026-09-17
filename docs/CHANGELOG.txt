@@ -6464,6 +6464,89 @@ not reverted) -> `?v=140` (this slice's own, to guarantee a fresh
 fetch for live verification).
 
 --------------------------------------------------------------------------------
+2026-09-17  -  07:30:19 - 07:37:18 EDT (~6m59s, measured)
+
+**Loading Preview upgrade: Camera/Lighting selectors + Sequence Mode
+(Count/Loop/Oscillate).** The separately-requested slice, now shipped:
+"allow selecting a Camera setting and a Lighting setting for the chosen
+loading-preview tween sequence" plus the same Sequence Mode concept
+just built for click functions.
+
+Camera/Lighting dropdowns (reusing `cfg.savedCameras`/`cfg.savedLighting`,
+the same presets the main scene's own Camera/Lighting groups already
+save) apply to the loading preview's own SEPARATE camera/light objects
+in `buildLoadingPreview()` -- NOT the live main-scene ones, since this
+preview is an isolated single-hand scene. A selected camera preset
+overrides the existing auto-framed default; a selected lighting preset
+overrides the existing cloned-live-lighting default via new
+`applyLoadingPreviewLighting()` (mirrors the main scene's own
+`updateKeyLightPosition()` azimuth/elevation math, scaled by
+`handBoundsRadiusLocal` instead of `fieldRadius` -- the natural "scale
+of the visible thing" for an isolated hand rather than a whole field).
+Empty selection (the default) preserves the exact existing behavior
+in both cases -- no visual change for anyone who doesn't touch these
+new dropdowns.
+
+Sequence Mode reuses the exact lap-based mechanism from
+`updateClickPoseForHand()`'s own 'sequencePlaying' phase (module-level
+state instead of per-hand `cp` state, no release concept -- this just
+plays for as long as the page is still loading). One deliberate
+difference from the click-trigger version: defaults to 'Loop'
+(unbounded), not 'Count' -- preserves the loading preview's own
+existing always-loop-forever behavior for every current user, rather
+than silently making it stop after 3 laps. 'Count' mode freezes at the
+last pose reached once its laps are used up (no pause/retransition
+concept applies to a loading animation, unlike a click trigger).
+
+Added `updateLoadingPreviewAnimation` + read-only getters for
+`loadingPreviewLapIndex`/`loadingPreviewSequenceDone`/
+`loadingPreviewDirection` to `window.__debug`, matching this file's own
+established debug-exposure convention (`triggerClickPose`,
+`updateClickPoseForHand`, etc. are already exposed the same way for
+exactly this kind of live testing) -- needed since this session's
+browser-automation tool has its own documented rAF-not-firing issue
+(CLAUDE.md's own Gotchas).
+
+**Verified live:** the default empty Camera/Lighting selectors were
+exercised for real -- the page loaded and built successfully through
+the new conditional code's fallback branches with zero errors. Sequence
+Mode Count+Loop with Count=2, confirmed via `window.__debug` (real
+elapsed wall-clock time this time, not a manufactured `now` -- this
+function reads `performance.now()` internally, unlike the per-hand
+trigger functions which take `now` as a parameter): 2 laps played
+(`loadingPreviewLapIndex` 1->2->3), froze exactly on schedule
+(`loadingPreviewSequenceDone` became `true`), and a further call
+confirmed it stayed frozen with no further increment. The camera/
+lighting PRESET-SELECTED branches (as opposed to the empty-selector
+fallback) were NOT independently live-exercised -- no saved camera/
+lighting presets existed in this test session to select from, and
+creating one purely to exercise this branch wasn't judged worth the
+added session scope. Reviewed instead by direct source re-read
+(grepped every new reference, confirmed no typos against the already-
+proven `applyCameraPreset()`/`applyLightingPreset()` property-reading
+pattern this mirrors). No runtime errors. `node --check` passes.
+
+**Concurrent-session note:** `src/devpanel/devPanel.js`, `src/style.css`,
+and `.claude/launch.json` were all being edited, uncommitted, by
+another session throughout this slice (CLAUDE.md §5/§9) -- left
+entirely untouched and unstaged; this commit's diff is scoped to
+`index.html`/`src/main.js` only.
+
+**This closes out both Loading Preview items from the original
+mid-session request.** Still ahead: reordering the 10 Click Function
+groups' own settings to match the spec's B ordering, the deferred
+"Tween Stop" curve question from the Phase 2 entry above, and Phases
+3-8 of the original 8-phase Click Function plan (Type/click-count/
+scroll, the dynamic Add-Click-Function architecture, the sequence-chain
+builder, bezier curve handles, mobile multi-touch/zoom/scroll,
+duplicate-setting validation).
+
+Cache-buster: `index.html`'s own `main.js?v=140` -> `?v=142` (`v=141`
+was picked up mid-slice from the concurrent session's own unrelated
+devPanel.js-driven bump, not reverted, then superseded by this slice's
+own `v=142` for a guaranteed fresh fetch).
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

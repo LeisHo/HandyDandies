@@ -60,23 +60,31 @@ Start Time Curve/Delay" was deliberately deferred, flagged to the user
 as likely duplicating the already-existing Tween Retransition Start
 Time Curve/Range rather than silently built or silently dropped.
 
+**The separately-requested Loading Preview upgrade is also DONE**:
+Camera/Lighting selectors (own separate scene, its own camera/lights --
+not the live main-scene ones) + the same Sequence Mode (Count/Loop/
+Oscillate) system, defaulting to 'Loop' (unbounded) rather than 'Count'
+to preserve the existing always-loop-forever behavior for current users.
+
 All of the above verified live via `window.__debug` (this session's
 browser-automation tool has a documented rAF-not-firing issue for this
 project -- see CLAUDE.md's own Gotchas -- so verification bypasses the
-render loop and drives the update functions directly with a
-manufactured `now`).
+render loop and drives the update functions directly, either with a
+manufactured `now` for the per-hand trigger functions or real elapsed
+wall-clock time for the Loading Preview's own `performance.now()`-based
+one).
 
-**Still ahead** (6 of the original 8 phases): reordering the 10
-groups' own settings to match the spec's B ordering; the "Tween Stop"
-curve question above; a separately-requested Loading Preview upgrade
-(Camera/Lighting selection + its own, not-yet-built Sequence Mode
-system); Type/click-count/scroll dropdowns; a dynamic "Add Click
-Function" architecture generalizing click/hold detection to any number
-of functions with no manual tuning; a multi-sequence-plus-hold chain
-builder; bezier curve handles; mobile multi-touch/zoom/scroll;
-duplicate-setting validation. See CHANGELOG.txt's matching entries for
-full slice-by-slice detail; this is genuinely large and will keep
-spanning multiple rounds.
+**Still ahead** (5 of the original 8 phases, all Click-Function-
+specific -- Loading Preview is fully done): reordering the 10 groups'
+own settings to match the spec's B ordering; the deferred "Tween Stop"
+curve question (Phase 2, likely duplicates the existing Tween
+Retransition Start Time Curve/Range); Type/click-count/scroll
+dropdowns; a dynamic "Add Click Function" architecture generalizing
+click/hold detection to any number of functions with no manual tuning;
+a multi-sequence-plus-hold chain builder; bezier curve handles; mobile
+multi-touch/zoom/scroll; duplicate-setting validation. See
+CHANGELOG.txt's matching entries for full slice-by-slice detail; this
+is genuinely large and will keep spanning multiple rounds.
 
 **SHIPPED 2026-09-17: dev-panel groups can now be individually locked
 against reordering** (`.dp-group-lock-icon`, 🔒/🔓, in each group's title
