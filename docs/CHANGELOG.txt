@@ -6320,6 +6320,73 @@ Cache-buster: `index.html`'s own `main.js?v=136` -> `?v=137` (this
 slice's own, to guarantee a fresh fetch for live verification).
 
 --------------------------------------------------------------------------------
+2026-09-17  -  07:13:50 - 07:16:52 EDT (~3m2s, measured)
+
+**Phase 1, part 4 of the Click Function overhaul: Sequence Mode
+(Count/Loop/Oscillate) for the 5 fire-and-forget triggers.** Direct
+follow-up request retrofitting the same "Sequence Mode - Count, Loop,
+Oscillate" concept originally specced for the not-yet-built Loading
+Preview onto click/dblclick/rc/tripleClick/quadClick's own Sequence-mode
+playback: "provide me settings similar to above where a single click
+function will provide the Sequence Mode - Count, Loop, Oscillate
+setting availability. So a single click can trigger a sequence to run 3
+times, then stop." New controls, Sequence mode only: Sequence Mode
+(top-level Count/Loop/Oscillate), Sequence Count + Sequence Count Mode
+(Loop/Oscillate) nested under Count, Loop Transition On/Off (instant
+jump to frame 1 vs smooth tween back, shown only for a Loop-style
+repeat), Sequence Hold Duration (Ms) between laps. New
+`updateSequencePlayModeVisibility(p)` governs their rows.
+
+New 'sequencePlaying' phase in `updateClickPoseForHand()`, entered right
+after the initial forward pass (lap 1) whenever a repeating PlayMode
+applies. Reuses existing machinery rather than writing new
+interpolation math: `lerpTweenSequence()` for Oscillate (direction-
+flipped `t`) and for the "instant jump back" Loop-Transition-off case;
+`lerpLoopSequence()` (the exact same cyclic wrap math Click Hold-Pose's
+own Loop Mode already uses) for the smooth-transition Loop case. Count
+mode stops once `sequenceLapIndex` exceeds `SequenceCount`, falling
+into the existing Pause/Retransition flow completely unchanged --
+literally "run 3 times, then stop." Top-level Loop/Oscillate PlayMode
+runs unbounded (a disclosed simplification: a fire-and-forget click has
+no release event to bound an infinite loop on, unlike Click Hold-Pose's
+own hold-bounded Loop Mode).
+
+**2 disclosed simplifications vs. the original spec text** (both
+judgment calls, not literal instructions either way): (1) the spec's
+own "a single run is 1 count, an oscillate/loop pass is 2 counts"
+weighted-counting arithmetic was NOT implemented literally --
+`SequenceCount` counts physical one-way traversals directly, the
+simplest reading that still fully satisfies the user's own stated
+validation case ("run 3 times, then stop"); (2) top-level Loop/
+Oscillate PlayMode run unbounded rather than any implied count.
+
+**Verified live** via `window.__debug`, same rAF-bypass method as the
+previous 2 slices (CLAUDE.md's own Gotchas): created a real 3-pose test
+sequence (`savedTweenSequences`), set Count+Loop with Count=3, drove
+`updateClickPoseForHand()` through 5 manufactured `now` steps -- traced
+`sequenceLapIndex` 1->2->3 across exactly 3 laps, then correctly
+transitioned to 'paused' the instant lap 4 would have started. Repeated
+with Count+Oscillate, Count=4 -- 4 laps played with direction correctly
+alternating each lap (dir: 1,-1,1,-1), then stopped exactly on
+schedule. No runtime errors in either test. `node --check` passes. The
+top-level unbounded Loop/Oscillate PlayMode and the "instant jump back"
+Loop-Transition-off branch were NOT independently live-exercised
+(structurally identical code paths to what was tested -- same lap
+machinery, just an `Infinity` bound or a different interpolation-source
+function -- reviewed by direct source re-read instead, per the same
+proportionality judgment as the previous entry's Speed Curve note).
+
+**Not yet done:** Sequence-mode's own On Release Mode/Trigger All
+Hands/Tween Stop Curve+Delay, reordering the 10 groups' own settings to
+match the spec's B ordering, the Loading Preview's own Camera/Lighting
+selectors + its own (not-yet-built) Sequence Mode system, and Phases
+2-8 of the original 8-phase plan. This closes out Phase 1's per-trigger
+settings-schema work in full; continuing in slices.
+
+Cache-buster: `index.html`'s own `main.js?v=137` -> `?v=138` (this
+slice's own, to guarantee a fresh fetch for live verification).
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================
