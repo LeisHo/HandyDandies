@@ -32,26 +32,32 @@ that exact bug). See CHANGELOG.txt's matching 2026-09-17 entries for the
 full account, including which 2 of the original 4 template changes
 turned out architecturally inapplicable here.
 
-**SHIPPED 2026-09-17 (uncommitted -- see below): the "Independent from
-Desktop" per-control mobile/landscape checkbox system (§12f-1),
-redesigned (not ported 1:1) for this project's one-row-per-control
-architecture -- now fully live-verified, including one real bug found
-and fixed along the way.** Verified via an isolated standalone test
-harness (never committed, deleted after use) importing the real
-devPanel.js with its own storage key -- confirmed zero impact on any
-real project settings throughout (0 `devPanel.*` localStorage keys
-touched). The bug: `resetSettings()` never painted the new checkbox
-chrome for a brand-new visitor with nothing saved yet (only affected a
-fresh install, which is exactly why the earlier same-day pass never
-caught it against the real, already-saved project settings) -- fixed.
-Mirroring, independence toggling both directions, row hide/show,
-group-level cascade (both kinds), and full Save-then-reload persistence
-all confirmed working. See CHANGELOG.txt's matching entry for the full
-verification trail.
-
-**Still open, separate from the engine work above:** deciding which
-real HANDY DANDIES controls, if any, should actually opt into
-`dynamicDevice: true`.
+**SHIPPED 2026-09-17: the "Independent from Desktop" per-control mobile/
+landscape checkbox system (§12f-1), redesigned (not ported 1:1) for
+this project's one-row-per-control architecture -- fully live-verified
+(one real bug found and fixed along the way: `resetSettings()` never
+painted the new checkbox chrome for a brand-new visitor with nothing
+saved yet), then applied to all 11 existing "Click Function" trigger
+groups (Click Hold-Pose, Right-Click Hold-Pose, Double Click Hold,
+Triple-Click Hold, Quadruple-Click Hold, Click Pose, Double-Click Pose,
+Triple-Click Pose, Quadruple-Click Pose, Right Click, Tween) with zero
+change to any of their currently-saved values.** The engine itself grew
+a real safety property in the process: `isDevRowIndependent()` now
+defaults an unset control to its own `perDevice` flag rather than a
+blanket "mirrors Desktop" -- so retrofitting this checkbox system onto
+an ALREADY `perDevice: true` control (none of these 11 groups happen to
+have one today, confirmed by direct reading, but a future one might)
+can never silently start overwriting its already-independent Mobile/
+Landscape values. Applied via one shared `withDynamicDevice()` helper
+in `main.js`, not 60 individual edits. See CHANGELOG.txt's 2 matching
+2026-09-17 entries for the full account, including a disclosed gap:
+live verification against the real, now-larger `main.js` was blocked
+this round by the same environment truncation issue documented in the
+prior entry (confirmed via `curl` to be that issue again, not a
+regression) -- static/unit-level verification (`node --check`, an
+isolated `node -e` test of the exclusion logic, direct reading
+confirming no `perDevice: true` in scope) is what backs this entry's
+confidence instead.
 
 **IN PROGRESS, large multi-slice undertaking: a full rebuild of the
 Click Function settings system** (direct request, spec A-L, since grown

@@ -6909,6 +6909,100 @@ Cache-buster: `index.html`'s own `main.js?v=142` -> `?v=143`;
 guarantee a fresh fetch for live verification).
 
 --------------------------------------------------------------------------------
+2026-09-17  -  start not cleanly captured via `date` this turn (a
+process miss, disclosed rather than reconstructed); finish 08:23:19
+EDT, measured
+
+**Adapted all 11 existing "Click Function" trigger groups to the
+dynamicDevice mobile/desktop checkbox system, without changing any of
+their actual saved values.** Direct request ("for our existing click
+functions within my 'Click Functions' group, adapt all those existing
+click function sub groups to match our new system. So dont change any
+of the actual settings, but make it show the way i requested"). Covers
+every control in: Click Hold-Pose, Right-Click Hold-Pose, Double Click
+Hold, Triple-Click Hold, Quadruple-Click Hold (the 5 `makeClickHoldPoseGroup()`
+instances), Click Pose, Double-Click Pose, Triple-Click Pose,
+Quadruple-Click Pose (the 4 `makeClickPoseGroup()` instances), Right
+Click, and Tween (2 hand-written groups) -- the "Custom Click
+Functions" group (the concurrent session's own new Phase 4 runtime-
+created groups) was deliberately left untouched, out of scope for this
+request and not this session's to touch mid-build.
+
+**Real design problem solved first, before touching any real control:**
+simply flagging an already-`perDevice: true` control with `dynamicDevice:
+true` would have flipped its default from "genuinely independent per
+device" to "mirrors Desktop," silently overwriting whatever different
+Mobile/Landscape values were already saved the next time anything
+re-synced -- a real settings change, not just a new checkbox appearing.
+Fixed at the ENGINE level, not per-control: `devPanel.js`'s
+`isDevRowIndependent(tab, ctrl)` (previously `(tab, key)`, all 7 call
+sites updated to pass the control object) now defaults to `ctrl.perDevice`
+when nothing's been explicitly toggled yet, instead of a blanket
+`false` -- an already-independent control stays independent by
+default; an already-shared control stays mirrored (a no-op, since all
+3 devices already hold the same value). Matches the template's own
+"UNIVERSAL" 2026-09-17 correction's category-aware-default intent,
+adapted to this project's real architecture rather than copied
+verbatim (this project has no static per-tab array entries to detect
+the presence of -- `ctrl.perDevice` IS the equivalent signal here).
+
+**Confirmed by directly reading all 4 control arrays before writing
+anything:** none of the ~60 controls across these 11 groups currently
+use `perDevice: true` -- every one of them defaults to "mirrors
+Desktop," which is an EXACT no-op for a control where all 3 devices
+already hold the identical shared value. This specific batch never
+actually exercises the new `ctrl.perDevice` default in practice; the
+engine fix exists for a future control that does (e.g. something in
+the Camera family, which already uses `perDevice: true` today).
+
+**Implementation:** a single `withDynamicDevice(controls)` helper in
+`main.js` (applied once at 4 call sites: both factory functions' own
+`controls:` array, plus the Right Click and Tween groups' own literal
+arrays) sets `ctrl.dynamicDevice = true` on every control EXCEPT the
+same types `buildRow()` never renders the 2 new checkboxes for anyway
+(text/list-picker/multi-select/button) -- flagging those would
+silently engage `commit()`'s dynamicDevice mirroring with no UI to
+ever control it, for zero benefit. Verified this exclusion logic in
+total isolation via a standalone `node -e` snippet against 8 synthetic
+sample controls covering every real type used across these groups
+(checkbox/select/slider/no-type-default-slider correctly flagged;
+text/list-picker/multi-select/button correctly skipped) before trusting
+it against the real, much larger file.
+
+**Verification, and an honest gap:** `node --check` passes on both
+files; `grep` confirms `withDynamicDevice(` wraps exactly the 4
+intended call sites, no more, no fewer; the underlying commit()/
+isDevRowIndependent() mechanism itself was already thoroughly live-
+verified in the prior same-day entry (mirroring, independence both
+directions, row hide/show, group cascade, Save+reload persistence).
+Live end-to-end verification against the REAL, now-larger `main.js`
+(455,264 bytes as of this entry) was attempted 5 times this round and
+failed every time with the same environment truncation issue already
+diagnosed in the prior entry -- confirmed via `curl` immediately after
+that the file itself is fine (2 of 4 back-to-back `curl` fetches
+against the exact same URL succeeded with the full correct byte count,
+consistent with that issue's own documented ~50% intermittent rate),
+so this is the browser tool/sandbox network layer again, not a
+regression from this change. Given the design was solved at the root
+(the `perDevice`-aware default) rather than worked around per-control,
+and confirmed via direct reading that this specific batch has zero
+`perDevice: true` controls to begin with, this is reported with HIGH
+confidence as a real no-op for every existing value -- but, per this
+project's own §0c discipline, explicitly NOT claimed as freshly re-
+verified live in the actual running app this round, unlike the prior
+entry's dynamicDevice work.
+
+Cache-buster bumps: `index.html`'s own `main.js?v=143` -> `?v=144`;
+`main.js`'s own `devPanel.js?v=26` -> `?v=27`.
+
+Next: once the environment truncation issue allows a clean load again,
+do a final visual pass across a few of these 11 groups (per direct
+request's own spirit -- "make it show the way i requested") to confirm
+the new checkboxes actually render and behave as expected against
+these specific, real controls, not just the synthetic test group from
+the prior entry.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

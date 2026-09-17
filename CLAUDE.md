@@ -333,3 +333,18 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   nothing saved yet. When adding new UI chrome whose correctness
   depends on a refresh function, verify it against a genuinely EMPTY
   storage state, not just the project's own already-populated one.
+- **`devPanel.js`'s `isDevRowIndependent(tab, ctrl)` takes the CONTROL
+  OBJECT as its 2nd argument, not a bare key string** (changed
+  2026-09-17, same day it was added -- every one of its own 7 call
+  sites was updated together). It needs `ctrl.perDevice` to compute its
+  own default (an unset control defaults to independent when the
+  control was already `perDevice: true`, mirrored otherwise) --
+  extending or calling this function with just a key string will throw
+  or silently misbehave. Retrofitting `dynamicDevice: true` onto a
+  batch of existing controls (as opposed to authoring a brand-new one)
+  should go through `main.js`'s own `withDynamicDevice(controls)`
+  helper (wraps a `controls:` array, skips text/list-picker/multi-
+  select/button types automatically) rather than hand-adding the flag
+  per control -- see CHANGELOG.txt's 2026-09-17 "Click Function" entry
+  for why it exists and its own isolated `node -e` unit check before
+  trusting it against a new batch.

@@ -6,7 +6,7 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js'
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js'
 import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js'
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js'
-import { initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup } from './devpanel/devPanel.js?v=26'
+import { initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup } from './devpanel/devPanel.js?v=27'
 
 // A defensive wrapper around devPanel.js's own refreshSelectOptions() --
 // found via live testing (direct user report: "I dont see any of the
@@ -867,7 +867,7 @@ const DEV_GROUPS = [
   // reset any tuning.
   {
     title: 'Right Click',
-    controls: [
+    controls: withDynamicDevice([
       { key: 'rcEnabled', label: 'Right Click (Master On/Off)', type: 'checkbox', def: false },
       {
         key: 'rcMode', label: 'Mode', type: 'select', def: 'Single Pose', options: () => ['Single Pose', 'Sequence'],
@@ -923,7 +923,7 @@ const DEV_GROUPS = [
       { key: 'rcRetransitionSpeedMs', label: 'Retransition Speed (Ms)', type: 'slider', min: 0, max: 700, step: 10, def: 400 },
       { key: 'rcRetransitionStartTimeCurve', label: 'Retransition Start Time Curve (Distance -> Start Time)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickPoseConfig('rc') },
       { key: 'rcRetransitionStartTimeRange', label: 'Retransition Min / Max Start Time (Ms)', type: 'text', def: '{"min":0,"max":300}', onChange: () => parseClickPoseConfig('rc') }
-    ]
+    ])
   },
   // Tween -- direct user request, modeled on HANDO's own "Tween / Export"
   // group (an ordered chain of saved poses, lerped through end-to-end) but
@@ -940,7 +940,7 @@ const DEV_GROUPS = [
   // all, unlike HANDO's own equivalent.
   {
     title: 'Tween',
-    controls: [
+    controls: withDynamicDevice([
       { key: 'tweenPoses', label: 'Tween Poses (In Order)', type: 'multi-select', def: [], options: () => (cfg.savedPoses || []).map((p) => ({ value: p.name, group: p.group || null })) },
       // Paces the Saved Tween Sequences list-picker's own "Run" button
       // (direct request) -- the FULL sequence's own total duration, spread
@@ -964,7 +964,7 @@ const DEV_GROUPS = [
         // refreshSelectOptions() call.
         onChange: () => { safeRefreshSelectOptions('dcHoldTweenSelector'); safeRefreshSelectOptions('rcTweenSelector'); safeRefreshSelectOptions('chpTweenSelector'); safeRefreshSelectOptions('rchpTweenSelector'); safeRefreshSelectOptions('clickTweenSelector'); safeRefreshSelectOptions('dblclickTweenSelector') }
       }
-    ]
+    ])
   },
   // Double Click Hold -- ORIGINALLY a bespoke, shared-not-per-hand
   // mechanism (direct request: "The tween will apply to all hands
@@ -2388,10 +2388,38 @@ resyncPoseDefaultValues()
 // the opposite curve direction from Arm Length's own default (which
 // makes the nearest hand crop MOST) since there's no equivalent real-
 // world convention to match here; a disclosed default, not a spec'd one.
+// Applied to every "Click Function" trigger group's own control array --
+// the 9 Click Hold-Pose/Click Pose factory instances below plus Right
+// Click and Tween -- direct request ("adapt all those existing click
+// function sub groups to match our new system... dont change any of the
+// actual settings, but make it show the way i requested"), i.e. give
+// every one of them the Show-in-Mobile/Landscape + Independent-from-
+// Desktop checkboxes (devPanel.js §12f-1) without altering any current
+// value or behavior. Opts every ELIGIBLE control in -- skips the same
+// types buildRow() never renders these checkboxes for anyway (text/
+// list-picker/multi-select/button; a curve/range text field, a saved-
+// sequence list, a fire button), since flagging those would silently
+// engage devPanel.js's own dynamicDevice mirroring in commit() with no
+// UI to ever control it, for zero benefit. Confirmed by reading every
+// one of these 4 control arrays directly before writing this: NONE of
+// them currently use `perDevice: true` anywhere, so devPanel.js's own
+// category-aware independence default (added the same day --
+// isDevRowIndependent()'s own `ctrl.perDevice` fallback) resolves to
+// "mirrors Desktop" for every single control here -- an exact no-op,
+// since all 3 devices already hold the identical shared value for all
+// of them. That default exists specifically so this same helper stays
+// safe to reuse later on a control that DOES already have `perDevice:
+// true` (e.g. a future Camera-family control) without this comment
+// needing revisiting.
+function withDynamicDevice(controls) {
+  const NO_CHECKBOX_TYPES = ['text', 'list-picker', 'multi-select', 'button']
+  controls.forEach((c) => { if (!NO_CHECKBOX_TYPES.includes(c.type)) c.dynamicDevice = true })
+  return controls
+}
 function makeClickHoldPoseGroup(p, title, defaults = {}) {
   return {
     title,
-    controls: [
+    controls: withDynamicDevice([
       // Direct user request ("provide a checkbox to turn that feature on
       // and off") -- gates startClickHoldPose(), same master on/off
       // pattern as Crop Wrist / Responsive Wrist Splay's own checkboxes.
@@ -2605,7 +2633,7 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       // hand still staggers via the existing Retransition Start Time
       // Curve/Range, exactly as before this feature existed.
       { key: `${p}TriggerAllHands`, label: 'Trigger All Hands', type: 'checkbox', def: false }
-    ]
+    ])
   }
 }
 // Builds ONE Click Pose group's control array -- same shape as
@@ -2622,7 +2650,7 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
 function makeClickPoseGroup(p, title, defaults = {}) {
   return {
     title,
-    controls: [
+    controls: withDynamicDevice([
       { key: `${p}Enabled`, label: `${title} (Master On/Off)`, type: 'checkbox', def: defaults.enabled ?? false },
       // Mode + Tween Sequence -- added 2026-09-15, originally built only
       // for Right Click, then generalized here so Click Pose/Double-Click
@@ -2713,7 +2741,7 @@ function makeClickPoseGroup(p, title, defaults = {}) {
       { key: `${p}RetransitionSpeedMs`, label: 'Retransition Speed (Ms)', type: 'slider', min: 0, max: 700, step: 10, def: defaults.retransitionSpeedMs ?? 400 },
       { key: `${p}RetransitionStartTimeCurve`, label: 'Retransition Start Time Curve (Distance -> Start Time)', type: 'text', def: defaults.retransitionStartTimeCurve ?? '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickPoseConfig(p) },
       { key: `${p}RetransitionStartTimeRange`, label: 'Retransition Min / Max Start Time (Ms)', type: 'text', def: defaults.retransitionStartTimeRange ?? '{"min":0,"max":300}', onChange: () => parseClickPoseConfig(p) }
-    ]
+    ])
   }
 }
 // Reads whichever Saved Poses row currently carries devPanel.js's own

@@ -108,7 +108,22 @@ function findCtrl(key) {
 }
 
 function isDevRowVisible(key) { return devVisibility[key] !== false }
-function isDevRowIndependent(tab, key) { return !!(devIndependence[tab] && devIndependence[tab][key]) }
+// Category-aware default (added 2026-09-17, matching the template's own
+// "UNIVERSAL" correction the same day): when nothing's been explicitly
+// toggled yet for this tab/control, default to the control's OWN
+// pre-existing `perDevice` flag rather than a blanket `false` -- a
+// control that was already `perDevice: true` (genuinely independent per
+// device already) stays independent by default, so opting an EXISTING
+// control into dynamicDevice never silently starts mirroring Desktop
+// over its already-saved, already-different Mobile/Landscape values. A
+// control that was already shared (`perDevice` falsy) defaults to
+// mirrored, which is a no-op for it (all 3 devices already hold the
+// same value). Takes `ctrl` (not a bare key) specifically so this
+// default has the control's own `perDevice` flag to read.
+function isDevRowIndependent(tab, ctrl) {
+  const explicit = devIndependence[tab] && devIndependence[tab][ctrl.key]
+  return explicit !== undefined ? !!explicit : !!ctrl.perDevice
+}
 const otherDynamicDeviceTab = (tab) => (tab === 'mobile' ? 'landscape' : 'mobile')
 
 // Writes a value into the store (both device slots if the control is
@@ -126,19 +141,19 @@ function commit(ctrl, v) {
     // Desktop" semantics) rather than left to silently diverge.
     if (editingDevice === 'desktop') {
       store.desktop[ctrl.key] = v
-      ;['mobile', 'landscape'].forEach((d) => { if (!isDevRowIndependent(d, ctrl.key)) store[d][ctrl.key] = v })
-    } else if (isDevRowIndependent(editingDevice, ctrl.key)) {
+      ;['mobile', 'landscape'].forEach((d) => { if (!isDevRowIndependent(d, ctrl)) store[d][ctrl.key] = v })
+    } else if (isDevRowIndependent(editingDevice, ctrl)) {
       store[editingDevice][ctrl.key] = v
     } else {
       store.desktop[ctrl.key] = v
       store[editingDevice][ctrl.key] = v
       const other = otherDynamicDeviceTab(editingDevice)
-      if (!isDevRowIndependent(other, ctrl.key)) store[other][ctrl.key] = v
+      if (!isDevRowIndependent(other, ctrl)) store[other][ctrl.key] = v
     }
     // The value that just genuinely changed lives on 'desktop' unless
     // this edit was independent -- onChange/cfg should only fire when
     // THAT device is the one actually running live right now.
-    const changedOn = (editingDevice !== 'desktop' && isDevRowIndependent(editingDevice, ctrl.key)) ? editingDevice : 'desktop'
+    const changedOn = (editingDevice !== 'desktop' && isDevRowIndependent(editingDevice, ctrl)) ? editingDevice : 'desktop'
     if (changedOn === realDeviceClass()) {
       cfg[ctrl.key] = v
       if (ctrl.onChange) ctrl.onChange(v)
@@ -1274,22 +1289,22 @@ function forEachDynamicDeviceDescendant(g, fn) {
 // checkbox's own row-level counterpart.
 function refreshGroupCascadeChrome(g) {
   const onDesktop = editingDevice === 'desktop'
-  const keys = []
-  forEachDynamicDeviceDescendant(g, (ctrl) => keys.push(ctrl.key))
+  const ctrls = []
+  forEachDynamicDeviceDescendant(g, (ctrl) => ctrls.push(ctrl))
   const vis = g._visCascadeCheckbox
   const indep = g._indepCascadeCheckbox
   if (vis) {
-    vis.style.display = (onDesktop && keys.length) ? '' : 'none'
-    if (keys.length) {
-      const states = keys.map((k) => isDevRowVisible(k))
+    vis.style.display = (onDesktop && ctrls.length) ? '' : 'none'
+    if (ctrls.length) {
+      const states = ctrls.map((c) => isDevRowVisible(c.key))
       vis.indeterminate = states.some((s) => s) && states.some((s) => !s)
       vis.checked = !vis.indeterminate && states[0]
     }
   }
   if (indep) {
-    indep.style.display = (!onDesktop && keys.length) ? '' : 'none'
-    if (!onDesktop && keys.length) {
-      const states = keys.map((k) => isDevRowIndependent(editingDevice, k))
+    indep.style.display = (!onDesktop && ctrls.length) ? '' : 'none'
+    if (!onDesktop && ctrls.length) {
+      const states = ctrls.map((c) => isDevRowIndependent(editingDevice, c))
       indep.indeterminate = states.some((s) => s) && states.some((s) => !s)
       indep.checked = !indep.indeterminate && states[0]
     }
@@ -1797,7 +1812,7 @@ function applyStoredValues(values) {
 function refreshRowDisplaysForEditingTab() {
   devGroups.forEach((group) => group.controls.forEach((ctrl) => {
     if (ctrl.dynamicDevice) {
-      const showing = editingDevice === 'desktop' || isDevRowIndependent(editingDevice, ctrl.key)
+      const showing = editingDevice === 'desktop' || isDevRowIndependent(editingDevice, ctrl)
       const v = showing ? store[editingDevice][ctrl.key] : store.desktop[ctrl.key]
       if (v !== undefined) displayValue(ctrl, v)
       refreshDynamicDeviceRowChrome(ctrl)
@@ -1830,7 +1845,7 @@ function refreshDynamicDeviceRowChrome(ctrl) {
   }
   if (entry && entry.indepCheckbox) {
     entry.indepCheckbox.style.display = onDesktop ? 'none' : ''
-    if (!onDesktop) entry.indepCheckbox.checked = isDevRowIndependent(editingDevice, ctrl.key)
+    if (!onDesktop) entry.indepCheckbox.checked = isDevRowIndependent(editingDevice, ctrl)
   }
 }
 
