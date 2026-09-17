@@ -7204,6 +7204,79 @@ Cache-busters: `index.html`'s own `main.js?v=146` -> `?v=147`;
 `style.css?v=12` -> `?v=13` (first bump of this file all session).
 
 --------------------------------------------------------------------------------
+
+2026-09-17 11:28:48-11:31:21 EDT (2m33s)
+
+**CORRECTED -- the previous entry's live-verification screenshot was
+almost certainly a false positive; the real bug was neither of the 2
+things fixed there.** Direct follow-up report immediately after the
+previous entry shipped: "1. I dont see the loading hand on actual
+startup. 2. I dont see the loading hand when i ahve Show Loading
+Preview is checked." -- both modes broken, on the user's own real
+session, right after the previous entry claimed both were fixed and
+live-verified.
+
+**Root cause: a leftover bad DATA value, not a code bug.** Checked the
+real, git-tracked settings log
+(`data/processed/dev-panel-settings.json`, the actual source of truth
+every visitor's page load restores from) directly rather than re-
+trusting the previous entry's sandbox screenshot -- found
+`loadingPreviewSize: 2000` persisted across all 3 device scopes
+(desktop/mobile/landscape), against this control's own coded range
+(`min: 80, max: 400, def: 160` -- main.js:504). 2000px is 5x past the
+slider's own designed max, almost certainly typed in via this dev
+panel's own "click-to-type, auto-expanding range" feature (CLAUDE.md
+§12h -- typing any value works and silently expands the slider's
+bounds to accommodate it), whether by an earlier test pass or the
+user's own exploration. Since `resizeLoadingPreview()` reads this one
+shared value regardless of which mode (`loadingPreviewEnabled` or
+`loadingPreviewShowLive`) triggered the build, a single bad persisted
+number explains BOTH reported symptoms at once -- a canvas rendered at
+2000x2000px is either wildly oversized/unrecognizable on a normal
+viewport or (plausibly) exceeds a GPU/driver limit and renders nothing
+visible at all; either way, not "a hand."
+
+**This also means the previous entry's "confirmed via screenshot"
+claim needs re-reading with real skepticism.** That screenshot showed
+a round gray blob roughly at the center of the frame, interpreted at
+the time as the correctly-centered preview hand -- but with
+`loadingPreviewSize` already at 2000 in the real settings this whole
+time, what was actually on screen was almost certainly either a hugely
+zoomed, unrecognizable fragment of the SAME preview hand (consistent
+with "gray blob," inconsistent with "confirmed working"), or one of
+the regular field hands the radial layout naturally clusters near
+screen center. The z-index and modelMeasurementsReady-race fixes from
+that entry are still believed correct on their own merits (independent
+code-level reasoning, not retracted) -- but the CONCLUSION that the
+feature was confirmed working end-to-end was not actually supported by
+what that screenshot showed, once this real data problem is accounted
+for. Recorded here as a correction rather than editing that entry, per
+this file's own append-only rule.
+
+**Fix:** `loadingPreviewSize` reset to `160` (the coded default) for
+all 3 scopes directly in `data/processed/dev-panel-settings.json` --
+a data correction, not a code change. Deliberately did NOT add a
+code-level clamp/cap on this value in `resizeLoadingPreview()` -- CLAUDE.md
+§12h's auto-expanding-range behavior is a deliberate, established design
+decision (letting a power user type any value they want), and a hard
+clamp would fight that design rather than fix the actual problem, which
+was bad persisted data, not the mechanism that allowed it to be entered.
+`loadingMinTimeMs` was also found sitting at its own max (5000ms, valid
+range 0-5000) -- left untouched since it's within bounds and not
+demonstrably a mistake (just a long loading-screen hold if
+`loadingPreviewEnabled` is on).
+
+**Verification:** Confirmed via direct JSON parse that the fix landed
+correctly on all 3 scopes and the file remains valid JSON. Did NOT
+attempt another live browser screenshot this round, given the above
+finding calls the previous round's own visual verification into
+question -- the next real confirmation should come from the user's own
+report after this data fix reaches production, not another sandbox
+screenshot claimed as proof.
+
+No code files changed this entry -- only the settings data file.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

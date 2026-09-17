@@ -18,21 +18,38 @@ work seamlessly from there.
 
 ## Currently working on
 
-**SHIPPED 2026-09-17: fixed "Show Loading Preview (Live)" checkbox
-reported as not working.** 2 real fixes: (1) checking the box before
-the model finished loading silently stranded it forever (nothing
-re-checked its state once the model became ready except the much-
-later `tryStartField()`) -- fixed by re-checking it the instant
+**SHIPPED 2026-09-17: fixed the loading hand preview not being visible
+in either mode (real root cause, superseding the entry below).** The
+previous entry's z-index/race fixes and "confirmed via screenshot"
+claim were incomplete/likely mistaken -- direct user follow-up
+("I dont see the loading hand" in both the real-startup screen and the
+live-toggle checkbox) led to checking the real, git-tracked settings
+log directly: `loadingPreviewSize` was persisted at `2000` (5x past
+its own coded max of 400, default 160) across all 3 device scopes,
+almost certainly typed in via the dev panel's own auto-expanding-range
+feature (§12h) at some earlier point. Since both modes share the same
+`resizeLoadingPreview()` call, one bad data value explains both
+reports at once. Fixed by resetting `loadingPreviewSize` to `160` in
+`data/processed/dev-panel-settings.json` -- a data correction, not a
+code change; deliberately did not add a code-level clamp, since §12h's
+type-any-value behavior is a deliberate design choice. See
+CHANGELOG.txt's matching 2026-09-17 correction entry for the full
+account, including an honest re-read of why the prior screenshot
+verification was likely a false positive.
+
+**SHIPPED 2026-09-17 (prior entry, fixes believed still valid on their
+own merits): fixed "Show Loading Preview (Live)" checkbox reported as
+not working.** 2 real fixes: (1) checking the box before the model
+finished loading silently stranded it forever (nothing re-checked its
+state once the model became ready except the much-later
+`tryStartField()`) -- fixed by re-checking it the instant
 `modelMeasurementsReady` flips true; (2) `#loadingPreviewCanvas` had
 no explicit `z-index` -- added `z-index: 100000` per the direct
-request ("it should just show ontop of everything in browser"). Fully
-live-verified via screenshot (preview hand renders centered, visible
-on top of the main field) after live reproduction was blocked for a
-long stretch by this project's own documented environment network-
-truncation gotcha. Also found and fixed a real gap in this project's
-OWN cache-busting discipline: `style.css` had never had its own `?v=`
-bumped despite 2 real content changes this session -- now at `?v=13`.
-See CHANGELOG.txt's matching 2026-09-17 entry for the full account.
+request ("it should just show ontop of everything in browser"). Also
+found and fixed a real gap in this project's OWN cache-busting
+discipline: `style.css` had never had its own `?v=` bumped despite 2
+real content changes this session -- now at `?v=13`. See
+CHANGELOG.txt's matching 2026-09-17 entry for the full account.
 
 **SHIPPED 2026-09-17: on-demand live Loading Preview toggle + X/Y
 position offset sliders, on top of the pre-existing `loadingPreviewEnabled`
