@@ -1098,15 +1098,44 @@ function applyTextOverrides() {
 // own code-defined groups), addCustomGroup() (a group the user creates via
 // "+ Add Group"), and applyOrder() (recreating a user-created group that
 // doesn't exist in DEV_GROUPS at all -- the only way one survives a reload).
+// Group lock icon -- ported from Clicko's own dev panel ("add a lock icon
+// that i can select. If selected, the settings within that group cannot
+// be reordered or moved into another group"). Lock state lives on the
+// group element itself (a `dp-group-locked` class), same idiom this file
+// already uses for collapsed state (`.collapsed`), rather than a separate
+// tracked Set the way Clicko's own port needed -- captureGroup()/
+// applyOrder() below persist it the exact same way they already persist
+// `collapsed`. Only gates .dp-row reordering (setupReorder's own
+// row-handle call, below) -- a locked group can still be dragged/
+// reordered/nested as a whole among other groups, same as Clicko's own
+// semantics ("never gates the group itself, only its rows").
+function syncGroupLockIcon(g, icon) {
+  const locked = g.classList.contains('dp-group-locked')
+  icon.textContent = locked ? '🔒' : '🔓'
+  icon.title = locked ? 'Locked -- click to unlock' : 'Unlocked -- click to lock'
+}
 function createGroupElement(title) {
   const g = el('div', 'dp-group')
   g.dataset.key = title
   const h = el('div', 'dp-group-header')
   const titleText = el('span', 'dp-group-title-text', { textContent: title })
-  h.append(el('span', 'dp-drag-handle', { textContent: '⠿' }), el('span', 'arrow', { textContent: '▼' }), titleText)
+  const lockIcon = el('span', 'dp-group-lock-icon')
+  syncGroupLockIcon(g, lockIcon)
+  lockIcon.addEventListener('click', (e) => {
+    e.stopPropagation()
+    g.classList.toggle('dp-group-locked')
+    syncGroupLockIcon(g, lockIcon)
+  })
+  // Also stops pointerdown -- setupReorder()'s own group-drag listener is
+  // armed by .dp-drag-handle, not this icon, but the icon visually sits in
+  // the same header row; stopping propagation here just keeps a click on
+  // the icon from ever being misread as the start of anything else.
+  lockIcon.addEventListener('pointerdown', (e) => e.stopPropagation())
+  h.append(el('span', 'dp-drag-handle', { textContent: '⠿' }), el('span', 'arrow', { textContent: '▼' }), titleText, lockIcon)
   const gb = el('div', 'dp-group-body')
   h.addEventListener('click', (e) => {
     if (e.target.closest('.dp-drag-handle')) return
+    if (e.target.closest('.dp-group-lock-icon')) return
     if (textEditModeEnabled) { openTextEditFor(titleText, title, title); return }
     g.classList.toggle('collapsed')
   })
@@ -1138,13 +1167,17 @@ function addCustomGroup(groupsEl) {
 // (not cached across drags) so a group created mid-session via
 // addCustomGroup(), or restored via applyOrder(), is immediately a valid
 // drop target with no extra wiring.
-function setupReorder(container, itemClass, handleClass, getTargets, onDrop) {
+function setupReorder(container, itemClass, handleClass, getTargets, onDrop, isLocked) {
   let dragEl = null
   container.addEventListener('pointerdown', (e) => {
     const handle = e.target.closest('.' + handleClass)
     if (!handle) return
     const item = handle.closest('.' + itemClass)
     if (!item) return
+    // Refuses to even START a drag on an item whose own lock predicate
+    // says no (see createGroupElement()'s own `dp-group-locked` comment) --
+    // ported from Clicko's identical "refuse to even START a drag" gate.
+    if (isLocked && isLocked(item)) return
     e.preventDefault()
     dragEl = item
     dragEl.classList.add('dp-dragging')
@@ -1239,7 +1272,8 @@ function buildDevPanel(groupsEl) {
   // of each individual drag, so a group added/removed/nested since the last
   // drag (addCustomGroup(), or one recreated by applyOrder()) is always
   // current.
-  setupReorder(groupsEl, 'dp-row', 'dp-row-handle', () => Array.from(groupsEl.querySelectorAll('.dp-group-body')))
+  setupReorder(groupsEl, 'dp-row', 'dp-row-handle', () => Array.from(groupsEl.querySelectorAll('.dp-group-body')), null,
+    (item) => { const grp = item.closest('.dp-group'); return !!(grp && grp.classList.contains('dp-group-locked')) })
 }
 
 // Organizes the built-in "Dev Panel" group's own (flat, just-built) rows
@@ -1492,6 +1526,7 @@ function captureGroup(g) {
   return {
     key: g.dataset.key,
     collapsed: g.classList.contains('collapsed'),
+    locked: g.classList.contains('dp-group-locked'),
     settings: Array.from(g.querySelectorAll(':scope > .dp-group-body > .dp-row')).map((r) => r.dataset.key),
     subgroups: Array.from(g.querySelectorAll(':scope > .dp-group-body > .dp-group')).map((sub) => captureGroup(sub)),
   }
@@ -1529,6 +1564,9 @@ function applyOrder(groupsEl, order) {
     }
     parentContainer.appendChild(groupEl)
     groupEl.classList.toggle('collapsed', !!savedGroup.collapsed)
+    groupEl.classList.toggle('dp-group-locked', !!savedGroup.locked)
+    const lockIcon = groupEl.querySelector(':scope > .dp-group-header > .dp-group-lock-icon')
+    if (lockIcon) syncGroupLockIcon(groupEl, lockIcon)
     const groupBody = groupEl.querySelector('.dp-group-body')
     ;(savedGroup.settings || []).forEach((k) => {
       const rowEl = rowsByKey[k]

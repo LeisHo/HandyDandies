@@ -18,6 +18,19 @@ work seamlessly from there.
 
 ## Currently working on
 
+**SHIPPED 2026-09-17: dev-panel groups can now be individually locked
+against reordering** (`.dp-group-lock-icon`, 🔒/🔓, in each group's title
+bar) -- ported from Clicko's own dev panel, direct request. A locked
+group's own settings can't be dragged/reordered within it (or moved into
+another group), but the group itself can still be freely dragged/
+reordered among other groups. Persisted through the existing
+`captureGroup()`/`applyOrder()` pipeline (same as `collapsed` state) --
+automatically covered by Copy/Save/Reset/Saved-Dev-Settings, no separate
+wiring needed. See CHANGELOG.txt's matching entry for full verification
+detail. **Same feature still needs porting into HANDO's own copy of this
+shared engine** (the other half of the original request) -- not yet
+done.
+
 **SHIPPED 2026-09-17: quad-click-hold root cause fixed (a live-settings
 value, not a code bug), plus new saveable Lighting presets.**
 `quadClickHoldHoldConfirmMs` was `310ms`, below the documented `500ms`

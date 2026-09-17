@@ -5828,6 +5828,74 @@ values. `node --check` passes; no console errors on load.
 Cache-buster bump: `index.html`'s own `main.js?v=130` -> `?v=132`.
 
 --------------------------------------------------------------------------------
+2026-09-17  -  03:38:18 - 03:43:38 EDT (5m20s, measured)
+
+**New feature: lock a dev-panel group so its own settings can't be
+reordered/moved -- ported from Clicko's own dev panel.** Direct request
+("Look into Clicko... how the dev panel in Clicko, I have the ability to
+lock a group so that group can no longer be reordered within the
+group.").
+
+Investigated Clicko's implementation first (`CLICKO/index.html`):
+a `lockedGroups` Set (keyed per-tab, since Clicko builds 3 SEPARATE DOM
+trees for Desktop/Mobile/Landscape) with a 🔒/🔓 toggle icon absolutely
+positioned over each group's title-bar corner (needed there since the
+icon has to be a sibling, not a child, of the rename-target title
+element, and Clicko's title bar has no natural flex-end slot); the
+generic drag-reorder handler refuses to even start a drag on a `.dev-row`
+whose own parent group is locked, but a locked group itself can still be
+dragged/reordered as a whole among other groups -- only its own
+row-order is frozen.
+
+Ported the same SEMANTIC into this project's own shared
+`src/devpanel/devPanel.js` engine, adapted to its own architecture
+rather than copied verbatim (this engine builds ONE set of `.dp-group`
+elements, not 3 per-tab trees, so no tab-scoped key was needed; its
+`.dp-group-header` is already a flex row, so `margin-left:auto` on the
+icon places it at the far right with no absolute-positioning workaround
+needed; lock state lives on the group element itself as a
+`dp-group-locked` class, the SAME idiom this file already uses for
+`collapsed` state, rather than introducing a separate tracked Set).
+
+`createGroupElement()` now builds and appends a `.dp-group-lock-icon`
+(🔒/🔓) as a 4th child of the group header, alongside the existing
+drag-handle/arrow/title-text -- covers every group-creation path for
+free (buildDevPanel()'s own code-defined groups, addCustomGroup(),
+applyOrder()'s recreation of a user-created group) since all 3 already
+funnel through this one function. `setupReorder()` gained an optional
+6th `isLocked(item)` parameter, checked right after resolving the
+dragged item and before arming the drag -- only the row-reorder call
+site passes one (`item.closest('.dp-group')`'s own `dp-group-locked`
+class); the group-reorder call site, the list-picker's own internal
+reorder, and the multi-select reorder are all untouched, matching
+Clicko's own scoping exactly. `captureGroup()`/`applyOrder()` persist
+`locked` the same way they already persist `collapsed` -- automatically
+covered by every existing persistence path (Copy, Save/Sync, Reset, and
+the "Saved Dev Settings" full-panel snapshot), since all 4 already
+funnel through these same 2 functions; no separate save/restore wiring
+needed anywhere.
+
+Verified live end to end: locking the Camera group via its own icon
+click correctly flips `dp-group-locked` + updates the icon/title;
+attempting to drag a row inside the now-locked group correctly refuses
+to even arm (`dp-dragging` never added, row never moves); the SAME
+locked group's own drag-handle still successfully arms a drag (the
+group itself remains freely reorderable); an unlocked group's own row
+drag is confirmed unaffected (still arms normally); Copy Settings'
+clipboard output directly inspected and confirmed `"locked":true`
+correctly appears in the Camera group's own captured order entry,
+alongside its existing `collapsed`/`settings`/`subgroups` fields.
+`node --check` passes on both `main.js` and `devPanel.js`; no new
+console errors.
+
+Cache-buster bumps: `index.html`'s own `main.js?v=132` -> `?v=133`,
+`style.css?v=9` -> `?v=10`; `main.js`'s own `devPanel.js?v=21` ->
+`?v=22`.
+
+Next: port the identical feature into HANDO's own copy of this shared
+engine, per the same request.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

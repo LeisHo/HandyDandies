@@ -137,6 +137,18 @@ html, body {
 .dp-group.collapsed .dp-group-body { display: none; }
 .dp-drag-handle, .dp-row-handle { flex: 0 0 auto; cursor: grab; color: #666; touch-action: none; padding: 0 2px; }
 .dp-drag-handle:active, .dp-row-handle:active { cursor: grabbing; }
+/* Group lock icon -- ported from Clicko's own dev panel ("add a lock icon
+   that i can select. If selected, the settings within that group cannot
+   be reordered or moved into another group"). A sibling of
+   .dp-group-title-text inside .dp-group-header (NOT a child of the title
+   text itself -- openTextEditFor() only rewrites displayEl's own
+   textContent, so a sibling is safe from a rename wiping it out the way
+   Clicko's own version had to specifically guard against via absolute
+   positioning; this engine's flex header lets margin-left:auto just push
+   it to the far right instead). See createGroupElement()/setupReorder()
+   for the actual lock state + reorder-refusal logic. */
+.dp-group-lock-icon { flex: 0 0 auto; margin-left: auto; cursor: pointer; opacity: 0.6; padding: 0 2px; }
+.dp-group-lock-icon:hover { opacity: 1; }
 /* A freshly-created empty group (see addCustomGroup()) needs a visible,
    hittable drop target even with 0 settings rows in it. */
 .dp-group-body:empty { min-height: 24px; border: 1px dashed #3a3a4a; border-radius: 4px; opacity: 0.6; }
