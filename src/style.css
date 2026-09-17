@@ -149,6 +149,14 @@ html, body {
    for the actual lock state + reorder-refusal logic. */
 .dp-group-lock-icon { flex: 0 0 auto; margin-left: auto; cursor: pointer; opacity: 0.6; padding: 0 2px; }
 .dp-group-lock-icon:hover { opacity: 1; }
+/* Locked is the visual INVERSE of unlocked (direct request, 2026-09-17):
+   unlocked stays low-opacity until hovered (rule above); a LOCKED icon
+   is instead full-opacity by default, dropping to the same low opacity
+   on hover -- makes "this group is locked" visible at a glance without
+   needing to hover, while still giving a clear hover affordance either
+   way. */
+.dp-group.dp-group-locked > .dp-group-header > .dp-group-lock-icon { opacity: 1; }
+.dp-group.dp-group-locked > .dp-group-header > .dp-group-lock-icon:hover { opacity: 0.6; }
 /* A freshly-created empty group (see addCustomGroup()) needs a visible,
    hittable drop target even with 0 settings rows in it. */
 .dp-group-body:empty { min-height: 24px; border: 1px dashed #3a3a4a; border-radius: 4px; opacity: 0.6; }
