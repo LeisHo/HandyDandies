@@ -5,7 +5,7 @@
       "fieldCols": 12,
       "rowSpacing": 9.5,
       "columnSpacing": 10.5,
-      "handScale": 1.35,
+      "handScale": 1.2,
       "alternateRowOffset": 5,
       "progressiveRowOffset": 1,
       "useProgressiveOffset": false,
@@ -5965,7 +5965,7 @@
       "fieldCols": 12,
       "rowSpacing": 9.5,
       "columnSpacing": 10.5,
-      "handScale": 1.4,
+      "handScale": 1.2,
       "alternateRowOffset": -6.5,
       "progressiveRowOffset": 1,
       "useProgressiveOffset": false,
@@ -18049,7 +18049,7 @@
     },
     {
       "key": "Field Layout",
-      "collapsed": true,
+      "collapsed": false,
       "locked": false,
       "settings": [
         "fieldRows",
