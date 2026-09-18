@@ -15,8 +15,8 @@
       "showTargetMarker": false,
       "palmFacesCursor": true,
       "palmFaceRotationOffset": 0,
-      "loadingPreviewEnabled": true,
-      "loadingPreviewShowLive": true,
+      "loadingPreviewEnabled": false,
+      "loadingPreviewShowLive": false,
       "loadingMinTimeMs": 5000,
       "loadingPreviewTweenSelector": "Waiting Horizontal Tap",
       "loadingPreviewCameraSelector": "Left",
@@ -5975,8 +5975,8 @@
       "showTargetMarker": false,
       "palmFacesCursor": true,
       "palmFaceRotationOffset": 0,
-      "loadingPreviewEnabled": true,
-      "loadingPreviewShowLive": true,
+      "loadingPreviewEnabled": false,
+      "loadingPreviewShowLive": false,
       "loadingMinTimeMs": 5000,
       "loadingPreviewTweenSelector": "Waiting Horizontal Tap",
       "loadingPreviewCameraSelector": "Left",
@@ -11935,8 +11935,8 @@
       "showTargetMarker": false,
       "palmFacesCursor": true,
       "palmFaceRotationOffset": 0,
-      "loadingPreviewEnabled": true,
-      "loadingPreviewShowLive": true,
+      "loadingPreviewEnabled": false,
+      "loadingPreviewShowLive": false,
       "loadingMinTimeMs": 5000,
       "loadingPreviewTweenSelector": "Waiting Horizontal Tap",
       "loadingPreviewCameraSelector": "Left",
@@ -18015,7 +18015,7 @@
     },
     {
       "key": "Loading Preview",
-      "collapsed": false,
+      "collapsed": true,
       "locked": false,
       "settings": [
         "loadingPreviewShowLive",
@@ -18713,20 +18713,6 @@
         "cursorLogIntervalMs",
         "clearMouseLogBtn"
       ],
-      "subgroups": []
-    },
-    {
-      "key": "Custom Function 1",
-      "collapsed": false,
-      "locked": false,
-      "settings": [],
-      "subgroups": []
-    },
-    {
-      "key": "Custom Function 2",
-      "collapsed": false,
-      "locked": false,
-      "settings": [],
       "subgroups": []
     },
     {
