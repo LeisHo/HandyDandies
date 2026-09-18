@@ -5970,7 +5970,7 @@
       "progressiveRowOffset": 1,
       "useProgressiveOffset": false,
       "trackingEnabled": true,
-      "trackingDamping": 0.6,
+      "trackingDamping": 0.34,
       "targetDepthFactor": 0.8,
       "showTargetMarker": false,
       "palmFacesCursor": true,
@@ -18065,7 +18065,7 @@
     },
     {
       "key": "Cursor Tracking",
-      "collapsed": true,
+      "collapsed": false,
       "locked": false,
       "settings": [
         "palmFaceRotationOffset",
@@ -18364,7 +18364,7 @@
         },
         {
           "key": "Quadruple-Click Hold",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "settings": [
             "quadClickHoldOffsetEnabled",
