@@ -18049,7 +18049,7 @@
     },
     {
       "key": "Field Layout",
-      "collapsed": false,
+      "collapsed": true,
       "locked": false,
       "settings": [
         "fieldRows",
@@ -18625,7 +18625,7 @@
     },
     {
       "key": "Camera",
-      "collapsed": false,
+      "collapsed": true,
       "locked": false,
       "settings": [
         "savedCameras",
@@ -18642,7 +18642,7 @@
     },
     {
       "key": "Lighting",
-      "collapsed": true,
+      "collapsed": false,
       "locked": false,
       "settings": [
         "savedLighting",
