@@ -846,7 +846,7 @@ export function buildRow(ctrl) {
       devVisibility[ctrl.key] = visCheckbox.checked
       refreshRowDisplaysForEditingTab()
     })
-    const indepCheckbox = el('input', 'dp-dynamic-device-checkbox', { type: 'checkbox', title: 'Independent from Desktop' })
+    const indepCheckbox = el('input', 'dp-dynamic-device-checkbox dp-dynamic-device-checkbox-2nd', { type: 'checkbox', title: 'Independent from Desktop' })
     indepCheckbox.addEventListener('click', (e) => e.stopPropagation())
     indepCheckbox.addEventListener('change', () => {
       if (editingDevice === 'desktop') return // defensive -- hidden on this tab, never real-clickable
@@ -1242,7 +1242,7 @@ export function createGroupElement(title) {
     forEachDynamicDeviceDescendant(g, (ctrl) => { devVisibility[ctrl.key] = visCascadeCheckbox.checked })
     refreshRowDisplaysForEditingTab()
   })
-  const indepCascadeCheckbox = el('input', 'dp-group-cascade-checkbox', { type: 'checkbox', title: 'Independent from Desktop (whole group)' })
+  const indepCascadeCheckbox = el('input', 'dp-group-cascade-checkbox dp-dynamic-device-checkbox-2nd', { type: 'checkbox', title: 'Independent from Desktop (whole group)' })
   indepCascadeCheckbox.style.display = 'none'
   indepCascadeCheckbox.addEventListener('click', (e) => e.stopPropagation())
   indepCascadeCheckbox.addEventListener('change', () => {
@@ -1262,6 +1262,13 @@ export function createGroupElement(title) {
     if (e.target.closest('.dp-drag-handle')) return
     if (e.target.closest('.dp-group-lock-icon')) return
     if (e.target.closest('.dp-group-cascade-checkbox')) return
+    // A "mandatory gated subgroup" (Offset/Rotation/Animation Speed
+    // Curve/Start Time Curve/Retransition -- direct request, "checkbox
+    // within its label") moves its own On/Off row bodily into this
+    // header (see main.js's own wrapGatedSubgroup()) -- without this
+    // guard, clicking that checkbox would ALSO toggle collapse on the
+    // exact same click, since the row's own click bubbles up to here.
+    if (e.target.closest('.dp-group-gate-row')) return
     if (textEditModeEnabled) { openTextEditFor(titleText, title, title); return }
     g.classList.toggle('collapsed')
   })

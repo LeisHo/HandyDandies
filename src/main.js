@@ -6,7 +6,7 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js'
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js'
 import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js'
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js'
-import { initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup } from './devpanel/devPanel.js?v=27'
+import { initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement } from './devpanel/devPanel.js?v=29'
 
 // A defensive wrapper around devPanel.js's own refreshSelectOptions() --
 // found via live testing (direct user report: "I dont see any of the
@@ -489,7 +489,32 @@ const DEV_GROUPS = [
       // EXISTING auto-framed camera / cloned-live-lighting behavior
       // exactly -- see buildLoadingPreview()'s own comment for where
       // these are actually applied.
-      { key: 'loadingPreviewCameraSelector', label: 'Loading Preview Camera', type: 'select', def: '', options: () => (cfg.savedCameras || []).map((c) => ({ value: c.name, group: c.group || null })) },
+      //
+      // Direct request 2026-09-19 ("so the camera settings for the
+      // loading preview should be local to that only"): this list-picker
+      // is this preview's own LOCAL saved-cameras list, separate from the
+      // main field's own `savedCameras` (which `loadingPreviewCameraSelector`
+      // used to read from -- see applyLoadingPreviewCameraPreset()'s own
+      // comment for why that was wrong: the main field's saved views are
+      // tuned for a far-away whole-field shot, not a single close-up
+      // hand). `importable: true` lets a HANDO-authored camera JSON be
+      // pasted in directly (normalizeCameraPresetItem() accepts its
+      // shorter x/y/z/tx/ty/tz/fov naming too), and Save/Use/Delete work
+      // the same as the main Saved Cameras list -- `captureCurrent`
+      // grabs wherever this preview's own camera currently is,
+      // `onUse` re-applies a saved item to it live for an immediate
+      // preview.
+      {
+        key: 'loadingPreviewSavedCameras',
+        label: 'Loading Preview Saved Cameras',
+        type: 'list-picker',
+        def: [],
+        itemLabel: 'Loading Preview Camera',
+        importable: true,
+        captureCurrent: () => captureLoadingPreviewCameraPreset(),
+        onUse: (item) => applyLoadingPreviewCameraPreset(item)
+      },
+      { key: 'loadingPreviewCameraSelector', label: 'Loading Preview Camera', type: 'select', def: '', options: () => (cfg.loadingPreviewSavedCameras || []).map((c) => ({ value: c.name, group: c.group || null })) },
       { key: 'loadingPreviewLightingSelector', label: 'Loading Preview Lighting', type: 'select', def: '', options: () => (cfg.savedLighting || []).map((l) => ({ value: l.name, group: l.group || null })) },
       { key: 'loadingPreviewSpeedMs', label: 'Loading Preview Speed (Ms / Cycle)', type: 'slider', min: 200, max: 5000, step: 50, def: 900 },
       // Sequence Mode - Count/Loop/Oscillate -- direct spec item, the
@@ -3200,6 +3225,14 @@ let loadingPreviewCamera = null
 let loadingPreviewCanvas = null
 let loadingPreviewAnimStartMs = 0
 const loadingPreviewBaseQuat = new THREE.Quaternion()
+// Loading Preview's own camera has no interactive OrbitControls (it's a
+// fixed, auto-computed or preset-driven shot, never orbited by mouse) --
+// so there's no `controls.target`-equivalent to read back when capturing
+// a "current" camera preset. This tracks whatever the last-applied
+// target actually was (set by both applyLoadingPreviewCameraPreset() and
+// applyLoadingPreviewCameraAutoFrame() below), purely so
+// captureLoadingPreviewCameraPreset() has something real to save.
+const loadingPreviewCameraTarget = new THREE.Vector3()
 // Sequence Mode (Count/Loop/Oscillate) state -- module-level, not per-
 // hand, since there's exactly ONE loading-preview instance. Reset in
 // buildLoadingPreview() (see its own call site below).
@@ -3260,31 +3293,29 @@ function buildLoadingPreview(bypassEnabledGate) {
   loadingPreviewHand = { clone, skinnedMesh }
 
   // A selected Camera preset (direct follow-up request) overrides the
-  // existing auto-framed default -- reuses the same CAMERA_PRESET_KEYS
-  // shape Camera's own Saved Cameras list-picker already stores, applied
-  // to this preview's own SEPARATE camera object (not the main scene's),
-  // same reasoning as the lighting override above. Empty selection keeps
-  // the existing auto-framed behavior exactly as it was.
-  // normalizeCameraPresetItem() -- see its own comment above -- the SAME
-  // short-x/y/z/tx/ty/tz/fov-vs-internal-name fix Camera's own "Use"
-  // button needed applies identically here.
-  const rawCameraPreset = (cfg.savedCameras || []).find((c) => c.name === cfg.loadingPreviewCameraSelector)
-  const cameraPreset = rawCameraPreset ? normalizeCameraPresetItem(rawCameraPreset) : null
-  if (cameraPreset) {
-    loadingPreviewCamera.position.set(
-      cameraPreset.cameraX ?? CAMERA_KEY_DEFAULTS.cameraX,
-      cameraPreset.cameraY ?? CAMERA_KEY_DEFAULTS.cameraY,
-      cameraPreset.cameraZ ?? CAMERA_KEY_DEFAULTS.cameraZ
-    )
-    loadingPreviewCamera.fov = cameraPreset.cameraFov ?? CAMERA_KEY_DEFAULTS.cameraFov
-    loadingPreviewCamera.updateProjectionMatrix()
-    loadingPreviewCamera.lookAt(cameraPreset.targetX ?? 0, cameraPreset.targetY ?? 0, cameraPreset.targetZ ?? 0)
-  } else {
-    const target = handBoundsCenterLocal.clone().applyQuaternion(alignQuat)
-    const pos = target.clone().add(new THREE.Vector3(0, handBoundsRadiusLocal * 0.15, handBoundsRadiusLocal * 2.4))
-    loadingPreviewCamera.position.copy(pos)
-    loadingPreviewCamera.lookAt(target)
-  }
+  // existing auto-framed default, applied to this preview's own SEPARATE
+  // camera object (not the main scene's), same reasoning as the lighting
+  // override above. Empty selection keeps the existing auto-framed
+  // behavior exactly as it was.
+  //
+  // CORRECTED 2026-09-19, direct report ("I dont see the loading preview
+  // even if its turned on" -> "the camera settings for the loading
+  // preview should be local to that only"): this used to read from
+  // `cfg.savedCameras` -- the SAME shared list the MAIN multi-hand
+  // field's own Camera group uses for ITS saved views, which are tuned
+  // for viewing the whole field from far away (this project's own
+  // default main camera sits at cameraZ ~260 world units out). Applying
+  // one of those to this preview's single, close-up hand (auto-framed at
+  // only `handBoundsRadiusLocal * 2.4` away, typically single digits)
+  // shrank the hand down to an invisible speck -- the preview WAS
+  // rendering, just nothing recognizable was in frame. Now reads its own
+  // separate, local `cfg.loadingPreviewSavedCameras` list instead (see
+  // that control's own comment) so importing/saving a close-up-scaled
+  // camera (e.g. from HANDO) can never collide with the field's own
+  // far-away views.
+  const rawCameraPreset = (cfg.loadingPreviewSavedCameras || []).find((c) => c.name === cfg.loadingPreviewCameraSelector)
+  if (rawCameraPreset) applyLoadingPreviewCameraPreset(rawCameraPreset)
+  else applyLoadingPreviewCameraAutoFrame()
 
   applyLoadingPreviewPose(poseDefaultValues)
   loadingPreviewAnimStartMs = performance.now()
@@ -3298,6 +3329,63 @@ function buildLoadingPreview(bypassEnabledGate) {
   loadingPreviewSequenceDone = false
   resizeLoadingPreview()
   repositionLoadingPreview()
+}
+// Applies one saved item from the Loading Preview's own local
+// `loadingPreviewSavedCameras` list directly to `loadingPreviewCamera` --
+// the preview's equivalent of the main scene's `applyCameraPreset()`, but
+// with no OrbitControls target to update (see `loadingPreviewCameraTarget`'s
+// own declaration comment for why). normalizeCameraPresetItem() (shared
+// with the main camera's own preset handling) accepts either this app's
+// internal cameraX/targetX/etc. naming or a shorter x/y/z/tx/ty/tz/fov
+// naming, so a preset imported/pasted straight from HANDO's own export
+// format works without hand-renaming every field first.
+function applyLoadingPreviewCameraPreset(rawItem) {
+  if (!loadingPreviewCamera) return
+  const item = normalizeCameraPresetItem(rawItem)
+  loadingPreviewCamera.position.set(
+    item.cameraX ?? CAMERA_KEY_DEFAULTS.cameraX,
+    item.cameraY ?? CAMERA_KEY_DEFAULTS.cameraY,
+    item.cameraZ ?? CAMERA_KEY_DEFAULTS.cameraZ
+  )
+  loadingPreviewCamera.fov = item.cameraFov ?? CAMERA_KEY_DEFAULTS.cameraFov
+  loadingPreviewCamera.updateProjectionMatrix()
+  const tx = item.targetX ?? 0
+  const ty = item.targetY ?? 0
+  const tz = item.targetZ ?? 0
+  loadingPreviewCamera.lookAt(tx, ty, tz)
+  loadingPreviewCameraTarget.set(tx, ty, tz)
+}
+// The pre-existing auto-framed default (unchanged math, just pulled out
+// of buildLoadingPreview() into its own function so both the "no preset
+// selected" build-time path and a future reset-to-default action can
+// call it identically) -- frames the hand using its own LOCAL bounds
+// (handBoundsCenterLocal/handBoundsRadiusLocal), correctly scaled for a
+// single close-up hand regardless of the main field's own camera scale.
+function applyLoadingPreviewCameraAutoFrame() {
+  if (!loadingPreviewCamera) return
+  const target = handBoundsCenterLocal.clone().applyQuaternion(alignQuat)
+  const pos = target.clone().add(new THREE.Vector3(0, handBoundsRadiusLocal * 0.15, handBoundsRadiusLocal * 2.4))
+  loadingPreviewCamera.position.copy(pos)
+  loadingPreviewCamera.lookAt(target)
+  loadingPreviewCameraTarget.copy(target)
+}
+// `captureCurrent` for the `loadingPreviewSavedCameras` list-picker --
+// captures wherever `loadingPreviewCamera` actually is RIGHT NOW (either
+// the auto-framed default or whatever preset was last applied), the same
+// "Save" semantics as the main camera's own captureCameraPreset(), just
+// reading this preview's own camera/target instead of the live
+// interactive one.
+function captureLoadingPreviewCameraPreset() {
+  if (!loadingPreviewCamera) return {}
+  return {
+    cameraX: loadingPreviewCamera.position.x,
+    cameraY: loadingPreviewCamera.position.y,
+    cameraZ: loadingPreviewCamera.position.z,
+    cameraFov: loadingPreviewCamera.fov,
+    targetX: loadingPreviewCameraTarget.x,
+    targetY: loadingPreviewCameraTarget.y,
+    targetZ: loadingPreviewCameraTarget.z
+  }
 }
 // Independent render loop for the on-demand "live" preview
 // (loadingPreviewShowLive) -- the main animate() loop's own loading-
@@ -5230,12 +5318,16 @@ window.addEventListener('pointerup', (e) => {
   // clock to stay in the same units; real wall-clock `performance.now()`
   // here would drift if a pause happened mid-hold.
   const now = nowVirtual()
-  const chpHeldLongEnough = e.button === 0 && clickHoldPoseTriggers.chp.active && (now - clickHoldPoseTriggers.chp.holdStartTime) >= MOUSE_LOG_HELD_DRAG_MS
-  const rchpHeldLongEnough = e.button === 2 && clickHoldPoseTriggers.rchp.active && (now - clickHoldPoseTriggers.rchp.holdStartTime) >= MOUSE_LOG_HELD_DRAG_MS
+  // Custom Click+Hold/Right-Click+Hold functions feed into this exact
+  // same suppression check -- see isCustomHoldHeldLongEnough()'s own
+  // comment for why (otherwise a custom hold function's own release
+  // would ALSO fire the plain click/right-click triggers underneath it).
+  const chpHeldLongEnough = e.button === 0 && ((clickHoldPoseTriggers.chp.active && (now - clickHoldPoseTriggers.chp.holdStartTime) >= MOUSE_LOG_HELD_DRAG_MS) || isCustomHoldHeldLongEnough('Click+Hold', now))
+  const rchpHeldLongEnough = e.button === 2 && ((clickHoldPoseTriggers.rchp.active && (now - clickHoldPoseTriggers.rchp.holdStartTime) >= MOUSE_LOG_HELD_DRAG_MS) || isCustomHoldHeldLongEnough('Right Click+Hold', now))
   lastPointerupWasHoldRelease = chpHeldLongEnough || rchpHeldLongEnough
   lastPointerupWasRchpHoldRelease = rchpHeldLongEnough
-  if (e.button === 0) endClickHoldPose('chp')
-  else if (e.button === 2) endClickHoldPose('rchp')
+  if (e.button === 0) { endClickHoldPose('chp'); endCustomHoldFunctions('Click+Hold') }
+  else if (e.button === 2) { endClickHoldPose('rchp'); endCustomHoldFunctions('Right Click+Hold') }
 })
 // Generalized 2026-09-16 from 3 hardcoded names to iterating
 // CLICK_HOLD_KEYS -- tripleClickHold/quadClickHold need this exact same
@@ -6164,6 +6256,10 @@ function renderCustomClickFunctionGroup(id, title, kind, family) {
     updateSingleTimingGateVisibility(id)
     updateSequencePlayModeVisibility(id)
   }
+  // Same mandatory Offset/Rotation/Animation Speed Curve/Start Time
+  // Curve/Retransition gated-subgroup wrapping the 10 static triggers
+  // get -- see wrapClickFunctionGatedSubgroups()'s own comment.
+  wrapClickFunctionGatedSubgroups(id)
 }
 // Registers a new (or, on restore, a previously-saved) custom function
 // into every generic pipeline this project's existing 10 triggers
@@ -6430,6 +6526,63 @@ CLICK_POSE_KEYS.forEach((p) => { parseClickPoseConfig(p); buildClickPoseWidgets(
 // own Pause Duration slider; Click Hold-Pose/Right-Click Hold-Pose don't.
 CLICK_POSE_KEYS.forEach((p) => { updateClickTriggerModeVisibility(p, ['PauseDurationMs']); updateOffsetRotationVisibility(p); updateSingleTimingGateVisibility(p); updateSequencePlayModeVisibility(p) })
 CLICK_HOLD_KEYS.forEach((p) => { updateClickTriggerModeVisibility(p, [], ['LoopMode', 'OnReleaseMode', 'TriggerAllHands']); updateLoopHoldVisibility(p); updateOffsetRotationVisibility(p); updateSingleTimingGateVisibility(p) })
+// Offset/Rotation/Animation Speed Curve/Start Time Curve/Retransition as
+// "mandatory gated subgroups" -- direct request ("Offset, Rotation,
+// Animaiton Speed Curve, Start Time Curve, Retransition will all be
+// manditory subgroups within the click function. They will all have a
+// checkbox within their labels that is the on off checkbox. If all are
+// turned off, they will just show as empty setting groups"). Wraps each
+// cluster's already-built flat rows (unchanged -- same buildRow()/
+// commit()/data-key wiring every other control already has) into a real
+// nested collapsible group, moving the "Enabled" row's own checkbox
+// bodily into that group's own header (see wrapGatedSubgroup()'s own
+// comment for exactly how, and devPanel.js's own matching
+// `.dp-group-gate-row` click-guard for why the header doesn't ALSO
+// toggle collapse on the same click). The existing visibility functions
+// (updateOffsetRotationVisibility()/updateSingleTimingGateVisibility(),
+// both unchanged) keep working with zero changes -- they select rows by
+// `data-key` alone, which still resolves correctly no matter where in
+// the tree a row currently lives.
+function wrapGatedSubgroup(enabledKey, memberKeys, subgroupTitle) {
+  const enabledRow = document.querySelector(`.dp-row[data-key="${enabledKey}"]`)
+  if (!enabledRow) return null
+  const parentBody = enabledRow.parentElement
+  const g = createGroupElement(subgroupTitle)
+  parentBody.insertBefore(g, enabledRow)
+  const gb = g.querySelector(':scope > .dp-group-body')
+  memberKeys.forEach((k) => {
+    const row = parentBody.querySelector(`:scope > .dp-row[data-key="${k}"]`)
+    if (row) gb.appendChild(row)
+  })
+  enabledRow.classList.add('dp-group-gate-row')
+  g.querySelector(':scope > .dp-group-header').appendChild(enabledRow)
+  return g
+}
+// Applies all 5 gated-subgroup wraps to ONE trigger `p` -- identical
+// member-key lists for both the hold-based and fire-and-forget families
+// (the Sequence-mode-only Tween Retransition trio is deliberately NOT
+// part of the Retransition cluster -- it's ungated, always visible in
+// Sequence mode, a separate concept from Single Pose's own Retransition
+// on/off).
+function wrapClickFunctionGatedSubgroups(p) {
+  wrapGatedSubgroup(`${p}OffsetEnabled`, [`${p}OffsetX`, `${p}OffsetY`], 'Offset')
+  wrapGatedSubgroup(`${p}RotationEnabled`, [`${p}RotationX`, `${p}RotationY`, `${p}RotationZ`], 'Rotation')
+  wrapGatedSubgroup(`${p}SpeedCurveEnabled`, [`${p}SpeedCurve`, `${p}SpeedCurveRange`], 'Animation Speed Curve')
+  wrapGatedSubgroup(`${p}StartTimeCurveEnabled`, [`${p}StartTimeCurve`, `${p}StartTimeRange`], 'Start Time Curve')
+  wrapGatedSubgroup(`${p}RetransitionEnabled`, [`${p}RetransitionSpeedMs`, `${p}RetransitionStartTimeCurve`, `${p}RetransitionStartTimeRange`], 'Retransition')
+}
+// Called once for all 10 static triggers, right here (module init, after
+// every one of their rows definitely exists AND after the widget-
+// builders/visibility-sync calls directly above -- moving a row preserves
+// its already-attached curve-widget children and already-set
+// `style.display`, so order relative to those doesn't matter, but rows
+// have to actually exist first). Custom Click Functions get the same
+// treatment from their own renderCustomClickFunctionGroup(), right after
+// creation.
+function wrapAllClickFunctionGatedSubgroups() {
+  ;[...CLICK_HOLD_KEYS, ...CLICK_POSE_KEYS].forEach(wrapClickFunctionGatedSubgroups)
+}
+wrapAllClickFunctionGatedSubgroups()
 updateLoadingPreviewSequenceVisibility()
 // Bug fix (direct user report, "I dont see any of the saved poses in the
 // dropdown"): a `select` control's <option> list is populated by
