@@ -168,9 +168,11 @@ DONE**: On Release Mode (Stop/Complete Sequence -- a released hold can
 now finish its current tween pass/lap instead of aborting immediately)
 + Trigger All Hands (forces every hand to release simultaneously,
 bypassing the normal per-hand stagger). The spec's own "Tween Stop
-Start Time Curve/Delay" was deliberately deferred, flagged to the user
-as likely duplicating the already-existing Tween Retransition Start
-Time Curve/Range rather than silently built or silently dropped.
+Start Time Curve/Delay" -- ONCE wrongly deferred as "likely duplicates
+Tween Retransition Start Time Curve/Range" -- was corrected on
+re-reading the verbatim spec (it's a genuinely distinct slowdown-to-a-
+stop deceleration for Sequence mode's Stop path, not a stagger reuse)
+and is now DONE, verified 2026-09-19 (see below and CHANGELOG.txt).
 
 **The separately-requested Loading Preview upgrade is also DONE**:
 Camera/Lighting selectors (own separate scene, its own camera/lights --
@@ -234,13 +236,30 @@ feature's own bookkeeping).
 
 **Still ahead**: the 2 gaps above (Scroll, Multi-Point); reordering the
 10 fixed groups' own settings to match the original spec's B ordering;
-the deferred "Tween Stop" curve question (Phase 2, likely duplicates
-the existing Tween Retransition Start Time Curve/Range); click-count
-selection and function deletion for Custom Click Functions; a multi-
-sequence-plus-hold chain builder; bezier curve handles; duplicate-
-setting validation. See CHANGELOG.txt's matching entries for full
-slice-by-slice detail; this is genuinely large and will keep spanning
-multiple rounds.
+click-count selection and function deletion for Custom Click Functions;
+a multi-sequence-plus-hold chain builder; bezier curve handles;
+duplicate-setting validation. See CHANGELOG.txt's matching entries for
+full slice-by-slice detail; this is genuinely large and will keep
+spanning multiple rounds.
+
+**SHIPPED 2026-09-19: the 2 gaps the user asked to fix first out of the
+full A-L gap report -- Master On/Off (hide all settings when off) and
+Tween Stop Delay (slowdown-to-a-stop for Sequence mode's Stop path).**
+Both verified live via `window.__debug` this same day: Master On/Off
+correctly hides every other row/subgroup in the group (and restores
+fine-grained Mode-based visibility on re-enable, not a blanket show-
+all); Tween Stop Delay's virtual-elapsed accumulator visibly decays to
+zero over the configured window (confirmed via 8 consecutive samples),
+correctly landing in `'retransition'` when `RetransitionEnabled` is on
+or `'idle'` (frozen in place) when it's off. This slice's own code was
+actually written in the prior session, before a context-summary cutoff
+-- this round was verification + documentation only, no further code
+changes. See CHANGELOG.txt's matching 2026-09-19 entry for full detail,
+including a disclosed test-harness limitation (visible interpolation
+during the decay window wasn't independently exercised this run) and a
+note on how this slice's own source changes ended up committed inside
+a concurrent session's unrelated commit (`c13f371`) rather than their
+own.
 
 **SHIPPED 2026-09-17: dev-panel groups can now be individually locked
 against reordering** (`.dp-group-lock-icon`, 🔒/🔓, in each group's title

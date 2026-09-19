@@ -7563,6 +7563,93 @@ Cache-busters: `index.html`'s own `main.js?v=152` -> `?v=153`;
 `devpanel/devPanel.js?v=29` -> `?v=30`.
 
 --------------------------------------------------------------------------------
+2026-09-19  19:24:45-19:34:06 EDT (9m21s; this session's own resumed slice --
+verification + documentation only; the 2 fixes below were written in the
+immediately preceding session, before a context-summary cutoff, and never
+live-verified or committed until now)
+
+**Verified and shipped the 2 gaps the user asked to fix first out of the
+full A-L Custom Click Functions gap report: "Click Function On/Off
+Checkbox -- if Off, hide all settings for this function" and the "Tween
+Stop Delay" slowdown-to-a-stop mechanic for Sequence mode's Stop release
+path.** Both were already code-complete (`node --check` clean) coming into
+this slice; this slice's own work was exclusively live verification (via
+direct `window.__debug` function calls, this project's own established
+rAF-bypass method -- see CLAUDE.md's Gotchas) plus documentation/commit,
+no further code changes.
+
+**Master On/Off (`updateClickFunctionEnabledVisibility(p)`)** -- verified
+live on `chp`: with `chpEnabled` toggled off, all 28 other rows/nested
+subgroups inside the group's body hid (0 visible, only the Enabled row
+itself remained); re-enabling correctly restored FINE-GRAINED visibility
+(19 of 28 stayed hidden, matching Single Pose mode's own pre-existing
+Sequence-only field set) rather than unconditionally showing everything --
+confirming the fix composes with the existing Mode-based visibility
+functions instead of fighting them.
+
+Testing this exposed (but did not require fixing) a pre-existing, already-
+documented environment characteristic (this session's browser-automation
+tool has a fixed 336px-wide viewport, permanently reporting
+`realDeviceClass() === 'mobile'`): a real click on `chpEnabled`'s own
+checkbox silently failed to update `cfg` at all, because `commit()`'s own
+dynamicDevice mirroring (devPanel.js) only fires `cfg`/`onChange` when
+`changedOn === realDeviceClass()`, and a non-independent control's
+`changedOn` is always `'desktop'` regardless of which panel tab is
+active -- which this fixed-viewport browser can never match. Worked
+around by marking the row "Independent from Desktop" on the Mobile tab
+before toggling (a legitimate use of the SAME production code path, not a
+bypass of it), then unmarking it afterward so nothing was left in a test-
+only state.
+
+**Tween Stop Delay (new `'stopping'` phase in `updateClickHoldPoseForHand()`,
+`endClickHoldPose()`'s rewritten Stop-branch)** -- verified live on `chp`
+in Sequence mode (a throwaway 2-pose test tween, `Fist`->`Open Palm`,
+added to `cfg.savedTweenSequences` for the duration of the test, removed
+after): releasing mid-forward-pass correctly entered `'stopping'` (not
+directly `'retransition'`); the per-frame virtual-elapsed accumulator grew
+at a visibly DECREASING rate across 8 consecutive 50ms samples (+43.75,
++37.5, +31.25, +25, +18.75, +12.5, +6.25, +0 -- a clean linear ramp-down
+to zero, matching the intended "visibly slows to a stop" behavior rather
+than an abrupt cutoff); `chp.phase` correctly advanced to `'retransition'`
+the instant `tDecay` reached 1, with `chpRetransitionEnabled` still on. A
+2nd run with `chpRetransitionEnabled` off confirmed the opposite branch:
+`stoppingFreezeAtEnd` came back `true`, and the hand correctly landed in
+`'idle'` (frozen in place, no retransition) once decay completed, matching
+the spec's "If Retransition is turned off, the hand will just stop where
+it is." Also re-confirmed `RetransitionEnabled`'s scope now genuinely
+covers Sequence mode's Stop path (not just Single Pose, the corrected
+scoping from the preceding session) -- both live runs used Sequence mode.
+
+One test-harness limitation, disclosed rather than silently glossed over:
+visible pose INTERPOLATION during the decay window was not independently
+confirmed in this run, because the test drove the forward phase on a
+synthetic small `now` clock (to sidestep `chpHoldConfirmMs`'s real-time
+gate) but `endClickHoldPose()` itself timestamps via the real
+`nowVirtual()` (`performance.now()`-based) -- the mismatch left
+`stoppingBaseElapsedMs` already far past `chpTweenSpeedMs`, so `progress`
+was saturated at 1.0 throughout the decay window in this specific test
+run. The phase-transition and decay-accumulator math -- the actual new
+logic this fix adds -- were fully exercised and correct; only the
+already-existing `lerpTweenSequence()` call downstream of them went
+untested for visible movement this time.
+
+No code changed this slice -- verification only. Both fixes' own source
+changes (8 new `DEV_GROUPS` controls, the `'stopping'` phase, the
+`endClickHoldPose()` Stop-branch rewrite, `updateClickFunctionEnabledVisibility()`)
+were already committed by the time this slice started, swept into a
+concurrent session's own commit (`c13f371`, "Add HANDO camera/lighting
+import pipeline for the Loading Preview") that landed on `main` and was
+pushed to origin while this slice's own verification was in progress --
+confirmed via `git show c13f371 -- src/main.js` that every one of this
+fix's own added lines appears there as new (`+`) content, not already
+present in its parent commit. Per CLAUDE.md §9 (preserve concurrent
+sessions' work, never rewrite a commit), that commit was left exactly as-
+is rather than split or amended -- this entry documents the 2 fixes' own
+verification and design for the record, separately from that commit's own
+message, which (correctly, for its own scope) only describes the HANDO
+import feature it was actually about.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================
