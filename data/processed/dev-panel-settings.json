@@ -11923,7 +11923,7 @@
     "landscape": {
       "fieldRows": 17,
       "fieldCols": 22,
-      "rowSpacing": 6,
+      "rowSpacing": 5.5,
       "columnSpacing": 9.5,
       "handScale": 0.85,
       "alternateRowOffset": 5,
