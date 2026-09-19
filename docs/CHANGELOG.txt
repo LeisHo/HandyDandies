@@ -7277,6 +7277,63 @@ screenshot claimed as proof.
 No code files changed this entry -- only the settings data file.
 
 --------------------------------------------------------------------------------
+
+2026-09-19 18:47:04-18:52:19 EDT (5m15s)
+
+**Added: 3 rotation sliders (X/Y/Z, degrees) for the Loading Preview,
+and a "Hide Hands" checkbox in Field Layout.** 2 direct requests in one
+prompt.
+
+**Loading Preview Rotation X/Y/Z (Deg):** 3 new `DEV_GROUPS` sliders
+(min -180 to 180, def 0), added right before the existing Offset X/Y
+sliders. No `onChange` needed -- matches this file's own established
+"reads cfg live every frame" pattern (same as Cursor Tracking's damping/
+depth sliders): `applyLoadingPreviewPose()` runs every frame the preview
+is actively animating (both the pre-fieldStarted path and the separate
+live-toggle loop), so a value change takes effect on the very next
+frame with no extra wiring. The rotation is folded directly into
+`loadingPreviewBaseQuat` (`alignQuat` composed with a
+`THREE.Quaternion().setFromEuler()` offset via `.multiply()`) rather
+than tweaking `clone.quaternion` separately after the fact -- this
+exact base-quat-then-clone-quaternion-copy pattern already exists
+verbatim for Pose Preview's own "Whole Hand Rotation" feature (line
+3814), and doing it any other way would have been silently overwritten
+every frame by `applyLoadingPreviewPose()`'s own unconditional reset of
+`clone.quaternion`, AND would have left `applyCurlToSkeleton()`'s own
+finger-pose math (which reads `loadingPreviewBaseQuat` as its base)
+out of sync with what's actually rendered.
+
+**Hide Hands (Field Layout):** new `perDevice: true` checkbox (matching
+every other control in this group), default off. New
+`updateHandsVisibility()` toggles each hand's whole `wrapper` Group
+(not just the fill mesh) so the outline mesh hides along with it too --
+called from the checkbox's own `onChange` for instant live toggling,
+and from `rebuildField()` (right after the existing
+`updateOutlineVisibility()` call) so a fresh field build respects
+whatever the checkbox is currently set to, matching that same function's
+own established pattern.
+
+**Verified live**, via a clean load (no environment-truncation issues
+this round) at `http://localhost:8600`: all 4 new controls render with
+correct labels/defaults. Hide Hands: checking it correctly set every
+`hand.wrapper.visible` to `false` (screenshot confirmed the whole field
+disappears), unchecking restored it. Rotation sliders: used Hide Hands
+itself to isolate the Loading Preview canvas from the main field first
+(avoiding this project's own recently-documented false-positive
+mistake, where a round shape near screen-center was wrongly assumed to
+be the preview when it might have been a regular field hand) -- with
+the field hidden, the preview canvas's silhouette visibly and
+distinctly changed shape for both Y=90 (a small finger protrusion
+visible at Y=0 disappeared, consistent with viewing the same curled
+hand from a rotated angle) and X=90 (a completely different tall
+trapezoid silhouette, consistent with an edge-on wrist/forearm view) --
+real 3D rotation confirmed on 2 of the 3 axes directly; Z uses the
+identical code path so not independently re-verified. No console
+errors introduced. `node --check` passes on `main.js`.
+
+Cache-buster: `index.html`'s own `main.js?v=147` -> `?v=148`.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

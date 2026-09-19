@@ -18,6 +18,17 @@ work seamlessly from there.
 
 ## Currently working on
 
+**SHIPPED 2026-09-19: 3 rotation sliders (X/Y/Z, Deg) for the Loading
+Preview + a "Hide Hands" checkbox in Field Layout.** Rotation folds
+directly into `loadingPreviewBaseQuat` (same pattern Pose Preview's own
+Whole Hand Rotation already uses) so it survives every frame's pose
+reapplication and stays in sync with finger-pose math. Hide Hands
+toggles each hand's whole wrapper Group, wired into both the checkbox's
+own onChange and `rebuildField()`. Live-verified with the field hidden
+first (to avoid a repeat of the earlier false-positive mistake below) --
+the preview's own silhouette visibly changed shape for both X=90 and
+Y=90. See CHANGELOG.txt's matching 2026-09-19 entry.
+
 **SHIPPED 2026-09-17: fixed the loading hand preview not being visible
 in either mode (real root cause, superseding the entry below).** The
 previous entry's z-index/race fixes and "confirmed via screenshot"

@@ -401,7 +401,13 @@ const DEV_GROUPS = [
       // instead, this is a 1-line change (see relayoutField()).
       { key: 'alternateRowOffset', label: 'Alternate Row Offset (World Units)', type: 'slider', min: -20, max: 20, step: 0.5, def: -5.5, perDevice: true, onChange: () => relayoutField() },
       { key: 'progressiveRowOffset', label: 'Progressive Row Offset (World Units / Row)', type: 'slider', min: -20, max: 20, step: 0.5, def: 0, perDevice: true, onChange: () => relayoutField() },
-      { key: 'useProgressiveOffset', label: 'Use Progressive Offset (Off = Alternate)', type: 'checkbox', def: false, perDevice: true, onChange: () => relayoutField() }
+      { key: 'useProgressiveOffset', label: 'Use Progressive Offset (Off = Alternate)', type: 'checkbox', def: false, perDevice: true, onChange: () => relayoutField() },
+      // Direct request ("Provide a Hide Hands checkbox in the Field
+      // Layout settings group"). perDevice, matching every other control
+      // in this group. Toggles each hand's own wrapper Group directly
+      // (cheap, no rebuild) rather than removing/re-adding hands from the
+      // scene -- see updateHandsVisibility()'s own comment.
+      { key: 'hideHands', label: 'Hide Hands', type: 'checkbox', def: false, perDevice: true, onChange: () => updateHandsVisibility() }
     ]
   },
   {
@@ -502,6 +508,16 @@ const DEV_GROUPS = [
       { key: 'loadingPreviewSequenceLoopTransition', label: 'Loop Transition On/Off', type: 'checkbox', def: true },
       { key: 'loadingPreviewSequenceHoldMs', label: 'Sequence Hold Duration (Ms)', type: 'slider', min: 0, max: 5000, step: 10, def: 0 },
       { key: 'loadingPreviewSize', label: 'Loading Preview Size (Px)', type: 'slider', min: 80, max: 400, step: 10, def: 160, onChange: () => resizeLoadingPreview() },
+      // Direct request ("Provide the 3 rotation sliders for the loading
+      // preview"). No onChange needed -- `applyLoadingPreviewPose()`
+      // (called every frame while the preview is actively animating, both
+      // pre-fieldStarted and via the separate live loop) reads these live
+      // and rebuilds `loadingPreviewBaseQuat` from them each time, same
+      // "no onChange needed" pattern as Cursor Tracking's own damping/
+      // depth sliders above.
+      { key: 'loadingPreviewRotationX', label: 'Loading Preview Rotation X (Deg)', type: 'slider', min: -180, max: 180, step: 1, def: 0 },
+      { key: 'loadingPreviewRotationY', label: 'Loading Preview Rotation Y (Deg)', type: 'slider', min: -180, max: 180, step: 1, def: 0 },
+      { key: 'loadingPreviewRotationZ', label: 'Loading Preview Rotation Z (Deg)', type: 'slider', min: -180, max: 180, step: 1, def: 0 },
       // Direct request ("an X offset slider and Y offset slider so i can
       // position the loading hand preview") -- the canvas itself sits
       // inside #loading (a fixed, screen-centered flex column, see
@@ -533,45 +549,70 @@ const DEV_GROUPS = [
     // that file finished and pushed its own work first, direct
     // confirmation).
     //
-    // Deliberately scoped DOWN from the full original spec for this
-    // first slice, each a disclosed simplification, not an oversight:
-    // - Fire-and-forget (Click Pose family) only -- no Click+Hold/Right-
-    //   Click+Hold custom functions yet (a hold-based custom function
-    //   would need its own "+Add Click+Hold Function" entry point, since
-    //   the hold and fire-and-forget families are 2 architecturally
-    //   distinct state machines that can't share one control's worth of
-    //   "Type" switching -- see addCustomClickFunction()'s own comment).
-    // - Type is Click/Right Click only -- no Scroll (a genuinely new
-    //   trigger-detection subsystem this project has none of today),
-    //   no mobile multi-touch/zoom.
+    // CORRECTED 2026-09-19 (direct follow-up requests, 2 rounds): now 2
+    // entry points, not 1 -- "+ Add Click Function" (fire-and-forget,
+    // reuses makeClickPoseGroup()) and "+ Add Click+Hold Function"
+    // (hold-based, reuses makeClickHoldPoseGroup()) -- exactly the split
+    // this section's own original comment already anticipated ("a hold-
+    // based custom function would need its own '+Add Click+Hold
+    // Function' entry point, since the hold and fire-and-forget families
+    // are 2 architecturally distinct state machines that can't share one
+    // control's worth of Type switching"). Each new function is also now
+    // tagged with a `family` ('desktop' or 'mobile') read from whichever
+    // dev-panel TAB is active at the moment the button is clicked (direct
+    // request: "If I add a click function in the mobile tab, that click
+    // function will only be available to mobile and landscape tab, not
+    // desktop") -- see addCustomClickFunction()'s own comment for exactly
+    // how the tab is read and how the resulting group is hidden outside
+    // its own family.
+    //
+    // Type's own option list is now real (Click/Right Click via the pose
+    // button, Click+Hold/Right Click+Hold via the hold button -- 4 of
+    // the 5 desktop options from the original spec's own list), narrowed
+    // further by family (mobile drops Right Click/Right Click+Hold
+    // entirely, matching "Dont show scroll or right click functions" on
+    // Mobile from the original spec's own item H).
+    //
+    // Still deliberately scoped DOWN, each a disclosed gap, not an
+    // oversight:
+    // - Scroll (desktop) and Multi-Point Touch (mobile) are NOT offered
+    //   as Type options -- both are genuinely new trigger-detection
+    //   subsystems (wheel-based pose triggers, multi-touch-point
+    //   detection) this project has none of today for ANY trigger, not
+    //   just custom ones. Offering them as selectable-but-inert dropdown
+    //   options would be worse than omitting them -- flagged to the user
+    //   as its own follow-up rather than shipped half-working.
     // - No click-count selector -- every custom function fires on a
-    //   plain single click/right-click only, same as this project's own
-    //   existing 'click'/'rc' triggers (not 'dblclick'/'tripleClick'/
-    //   'quadClick', which stay exclusive to their own hardcoded keys).
+    //   plain single click/right-click/hold only, same as this project's
+    //   own existing 'click'/'rc'/'chp'/'rchp' triggers (not
+    //   'dblclick'/'tripleClick'/'quadClick'/'dcHold'/etc., which stay
+    //   exclusive to their own hardcoded keys).
     // - No delete-function button yet -- the dev panel's own existing
     //   Delete Group/Setting (🗑) icon can remove a custom function's
     //   GROUP from view, but won't clean up this feature's own
     //   `customClickFunctionIds` bookkeeping or `CLICK_POSE_KEYS`/
-    //   `clickPoseTriggers` entries, so a "deleted" function would still
-    //   silently keep firing. Flagging rather than building a redundant
-    //   or incomplete delete mechanism this slice.
+    //   `CLICK_HOLD_KEYS`/trigger-state entries, so a "deleted" function
+    //   would still silently keep firing. Flagging rather than building
+    //   a redundant or incomplete delete mechanism this slice.
     // - No duplicate-setting validation, no automatic hold-timing
-    //   conflict resolution (moot for this slice anyway -- fire-and-
-    //   forget functions don't have the hold-timing collision problem
-    //   hold-based ones do).
+    //   conflict resolution across an arbitrary number of custom
+    //   Click+Hold functions (each one's own HoldConfirmMs/timing
+    //   sliders still need manual tuning against each other, same as the
+    //   5 existing hold triggers already require).
     //
     // `customClickFunctionIds` is the ONLY control in this static group
     // -- a plain internal-bookkeeping text field (JSON array of
-    // `{id, title}`), never meant for direct editing, restored through
-    // the normal cfg pipeline like any other control (see
-    // restoreCustomClickFunctions()'s own comment for how it drives
+    // `{id, title, kind, family}`), never meant for direct editing,
+    // restored through the normal cfg pipeline like any other control
+    // (see restoreCustomClickFunctions()'s own comment for how it drives
     // re-creating every custom function's LIVE group fresh on each page
     // load, since `renderDynamicGroup()`'s own DOM rows don't persist
     // across a reload on their own).
     title: 'Custom Click Functions',
     controls: [
       { key: 'customClickFunctionIds', label: 'Custom Function IDs (Internal, Auto-Managed)', type: 'text', def: '[]' },
-      { key: 'addCustomClickFunctionBtn', label: '+ Add Click Function', type: 'button', onClick: () => addCustomClickFunction() }
+      { key: 'addCustomClickFunctionBtn', label: '+ Add Click Function', type: 'button', onClick: () => addCustomClickFunction('pose') },
+      { key: 'addCustomClickHoldFunctionBtn', label: '+ Add Click+Hold Function', type: 'button', onClick: () => addCustomClickFunction('hold') }
     ]
   },
   {
@@ -1340,6 +1381,7 @@ const cfg = initDevPanel(DEV_GROUPS, {
   onRestore: () => { migrateModeTweenToSequence(); resyncPoseDefaultValues(); restoreCustomClickFunctions(); startupSettingsReady = true; tryStartField() }
 })
 onChangeByCtrl.forEach((fn, c) => { c.onChange = fn })
+setupCustomFunctionTabVisibilitySync()
 // Arm Length's 2 custom widgets (see their own declaration comments,
 // Pose section below) -- parse whatever initDevPanel() just restored
 // (saved or default) into the cached vars computeArmLengthT() reads every
@@ -1945,6 +1987,14 @@ function updateOutlineVisibility() {
   hands.forEach((h) => { if (h.outlineMesh) h.outlineMesh.visible = hullVisible })
   outlinePass.enabled = passOn
   outlinePass.selectedObjects = passOn ? hands.map((h) => h.skinnedMesh).filter(Boolean) : []
+}
+// Field Layout's own "Hide Hands" checkbox -- toggles each hand's whole
+// wrapper Group (fill mesh + outline mesh + everything else parented to
+// it) in one shot, rather than removing/re-adding hands from the scene or
+// hiding the fill/outline meshes separately (which would leave the
+// outline visible on its own if `outlineEnabled` happens to be on).
+function updateHandsVisibility() {
+  hands.forEach((h) => { h.wrapper.visible = !cfg.hideHands })
 }
 
 // -----------------------------------------------------------------------
@@ -3367,7 +3417,15 @@ function applyLoadingPreviewPose(item) {
   if (!loadingPreviewHand || !loadingPreviewHand.skinnedMesh) return
   const values = {}
   POSE_PRESET_KEYS.forEach((k) => { values[k] = item[k] !== undefined ? item[k] : POSE_KEY_DEFAULTS[k] })
-  loadingPreviewBaseQuat.copy(alignQuat)
+  // Rotation X/Y/Z sliders applied ON TOP of the base alignment, folded
+  // directly into loadingPreviewBaseQuat (not a separate post-hoc
+  // clone.quaternion tweak) -- applyCurlToSkeleton() below reads this SAME
+  // quaternion as the finger-pose base, so the rotation has to be baked in
+  // here or wrist/finger posing would silently ignore it every frame.
+  const rotX = THREE.MathUtils.degToRad(cfg.loadingPreviewRotationX || 0)
+  const rotY = THREE.MathUtils.degToRad(cfg.loadingPreviewRotationY || 0)
+  const rotZ = THREE.MathUtils.degToRad(cfg.loadingPreviewRotationZ || 0)
+  loadingPreviewBaseQuat.copy(alignQuat).multiply(new THREE.Quaternion().setFromEuler(new THREE.Euler(rotX, rotY, rotZ, 'XYZ')))
   loadingPreviewHand.clone.quaternion.copy(loadingPreviewBaseQuat)
   applyWristPoseToSkeleton(loadingPreviewHand.skinnedMesh.skeleton, values)
   FINGER_NAMES.forEach((name) => applyCurlToSkeleton(name, loadingPreviewHand.skinnedMesh.skeleton, loadingPreviewBaseQuat, null, values))
@@ -4463,17 +4521,23 @@ function parseClickHoldConfig(p) {
   try { t.tweenRetransitionRangeParsed = JSON.parse(cfg[`${p}TweenRetransitionStartTimeRange`]) } catch (e) { /* keep last-good value */ }
 }
 function getOrInitHandCHP(hand) {
-  if (!hand._chp) {
-    hand._chp = {}
-    // `pendingClaimAt`/`armedForHoldStartTime`/`pendingFrozenSplayDeg`:
-    // the deferred-claim mechanism (direct request -- see
-    // updateClickHoldPoseForHand()'s own top comment for the full
-    // account). `forwardStartTime`/`forwardSnapshot`/`tweenPosesResolved`
-    // are now genuinely PER-HAND (captured at each hand's own claim
-    // moment), replacing the old shared `trig.forwardSnapshot`/
-    // `trig.tweenPoses` this hand used to read directly.
-    CLICK_HOLD_KEYS.forEach((p) => { hand._chp[p] = { phase: 'idle', forwardStartTime: 0, forwardSnapshot: null, tweenPosesResolved: null, loopStartTime: 0, loopHoldEndTime: 0, loopDirection: 1, retransitionDelay: 0, retransitionStart: null, retransitionStartTime: 0, retransitionIsTween: false, lastAppliedValues: null, frozenSplayDeg: 0, pendingClaimAt: 0, armedForHoldStartTime: -1, pendingFrozenSplayDeg: 0, frozenSpeedMs: 0, pendingFrozenSpeedMs: 0, releasePending: false } })
-  }
+  if (!hand._chp) hand._chp = {}
+  // `pendingClaimAt`/`armedForHoldStartTime`/`pendingFrozenSplayDeg`:
+  // the deferred-claim mechanism (direct request -- see
+  // updateClickHoldPoseForHand()'s own top comment for the full
+  // account). `forwardStartTime`/`forwardSnapshot`/`tweenPosesResolved`
+  // are now genuinely PER-HAND (captured at each hand's own claim
+  // moment), replacing the old shared `trig.forwardSnapshot`/
+  // `trig.tweenPoses` this hand used to read directly. Per-key backfill
+  // (not just a first-touch init), same fix/reasoning as
+  // getOrInitHandCP()'s own matching comment -- Custom Click+Hold
+  // Functions (Phase 4) can grow CLICK_HOLD_KEYS at runtime too, well
+  // after some hands' `_chp` was already built for the original static
+  // keys.
+  CLICK_HOLD_KEYS.forEach((p) => {
+    if (hand._chp[p]) return
+    hand._chp[p] = { phase: 'idle', forwardStartTime: 0, forwardSnapshot: null, tweenPosesResolved: null, loopStartTime: 0, loopHoldEndTime: 0, loopDirection: 1, retransitionDelay: 0, retransitionStart: null, retransitionStartTime: 0, retransitionIsTween: false, lastAppliedValues: null, frozenSplayDeg: 0, pendingClaimAt: 0, armedForHoldStartTime: -1, pendingFrozenSplayDeg: 0, frozenSpeedMs: 0, pendingFrozenSpeedMs: 0, releasePending: false }
+  })
   return hand._chp
 }
 // Linearly interpolates every POSE_PRESET_KEYS value, INCLUDING
@@ -5115,8 +5179,8 @@ function endClickHoldPose(p) {
 // way to reach it.
 window.addEventListener('pointerdown', (e) => {
   if (e.target && e.target.closest && e.target.closest('.dp-panel')) return
-  if (e.button === 0) startClickHoldPose('chp')
-  else if (e.button === 2) startClickHoldPose('rchp')
+  if (e.button === 0) { startClickHoldPose('chp'); startCustomHoldFunctions('Click+Hold') }
+  else if (e.button === 2) { startClickHoldPose('rchp'); startCustomHoldFunctions('Right Click+Hold') }
 })
 // Direct user report ("for click hold, when i release, it seems to
 // trigger the correct release, but then it calls it again. I suspect it
@@ -5981,65 +6045,170 @@ function buildClickPoseWidgets(p) {
   if (retransRangeRow) buildGenericRangeBarWidget(retransRangeRow, { trackMin: 0, trackMax: CLICK_HOLD_START_TIME_TRACK_MAX, unit: 'ms', defaultValue: { min: 0, max: 300 } })
 }
 // -----------------------------------------------------------------------
-// Custom Click Functions (Phase 4, first slice) -- runtime-created
-// fire-and-forget pose triggers, see the "Custom Click Functions"
-// DEV_GROUPS entry's own comment for the full scoping account. Each
-// custom function joins CLICK_POSE_KEYS/clickPoseTriggers exactly like
-// one of the 10 hardcoded triggers -- updateClickPoseForHand(),
-// triggerClickPose(), getOrInitHandCP(), parseClickPoseConfig(), every
-// visibility function, ALL already generic over `p` and already proven
-// correct on 5 existing IDs, so a 6th+ ID needs ZERO changes there.
+// Custom Click Functions (Phase 4) -- runtime-created pose triggers, both
+// fire-and-forget ('pose' kind, reuses makeClickPoseGroup()) and hold-
+// based ('hold' kind, reuses makeClickHoldPoseGroup()). See the "Custom
+// Click Functions" DEV_GROUPS entry's own comment for the full scoping
+// account. Each custom function joins CLICK_POSE_KEYS/clickPoseTriggers
+// or CLICK_HOLD_KEYS/clickHoldPoseTriggers exactly like one of the 10
+// hardcoded triggers -- updateClickPoseForHand()/updateClickHoldPoseForHand(),
+// triggerClickPose()/startClickHoldPose()/endClickHoldPose(),
+// getOrInitHandCP()/getOrInitHandCHP(), parseClickPoseConfig()/
+// parseClickHoldConfig(), every visibility function, ALL already generic
+// over `p` and already proven correct on the existing IDs, so a new ID
+// needs ZERO changes there.
 // -----------------------------------------------------------------------
-let customClickFunctionIds = [] // [{id, title}] -- mirrors cfg.customClickFunctionIds (JSON), kept in sync by persistCustomClickFunctionIds()
+let customClickFunctionIds = [] // [{id, title, kind, family}] -- kind: 'pose'|'hold'; family: 'desktop'|'mobile'. Mirrors cfg.customClickFunctionIds (JSON), kept in sync by persistCustomClickFunctionIds()
 let nextCustomFunctionN = 1
 function persistCustomClickFunctionIds() {
   const json = JSON.stringify(customClickFunctionIds)
   cfg.customClickFunctionIds = json
   syncValue('customClickFunctionIds', json)
 }
+// Reads which dev-panel tab is currently showing, straight from the DOM
+// (`.dp-tab-active`, devPanel.js's own class for the highlighted tab
+// button) -- devPanel.js keeps `editingDevice` as a private closure
+// variable with no exported getter, and adding one just for this would be
+// a bigger devPanel.js change than reading the same state its own CSS
+// class already exposes. Landscape counts as 'mobile' family -- it's a
+// mobile-form-factor variant, not a 3rd device class, matching the
+// original spec's own framing ("that click function will only be
+// available to mobile and landscape tab, not desktop").
+function getActiveDevPanelTab() {
+  const activeBtn = document.querySelector('.dp-tab.dp-tab-active')
+  const label = activeBtn ? activeBtn.textContent.trim() : 'Desktop'
+  return (label === 'Mobile' || label === 'Landscape') ? 'mobile' : 'desktop'
+}
+// Type's own option list -- direct spec item ("Click Function Type
+// should always include - Click, Click+Hold, Scroll, Right Click, Right
+// Click+Hold for Desktop Mode... will always include - Click, Click+Hold,
+// Multi-Point [for Mobile]"). Scroll/Multi-Point are deliberately NOT
+// included -- see the DEV_GROUPS group's own comment for why (genuinely
+// new trigger-detection subsystems, not yet built for any trigger).
+// `kind` already fixes Click-vs-Click+Hold (2 different control
+// batteries/state machines, decided at creation time via which button was
+// pressed); `family` then narrows further (mobile drops the Right-Click
+// variants entirely, matching "Dont show scroll or right click functions"
+// on Mobile).
+function customFunctionTypeOptions(kind, family) {
+  if (kind === 'hold') return family === 'mobile' ? ['Click+Hold'] : ['Click+Hold', 'Right Click+Hold']
+  return family === 'mobile' ? ['Click'] : ['Click', 'Right Click']
+}
+// Shows/hides ONE custom function's group based on its own `family` vs.
+// whichever tab is currently active -- devPanel.js has no per-tab DOM
+// duplication (one shared groupsEl for all 3 devices) and no existing
+// "hide on Desktop only" primitive (its own dynamicDevice checkboxes only
+// ever hide FROM Mobile/Landscape, assuming Desktop is always the
+// baseline), so this is a small, dedicated main.js-side mechanism rather
+// than forcing an ill-fitting reuse of that one.
+function updateCustomFunctionGroupVisibility(g, family) {
+  if (!g) return
+  const activeTab = getActiveDevPanelTab()
+  g.style.display = (family === activeTab) ? '' : 'none'
+}
+// Refreshes every custom function's own group visibility -- called once
+// right after a new one is created, and wired to fire again on every tab
+// switch (see setupCustomFunctionTabVisibilitySync(), below).
+function refreshAllCustomFunctionGroupVisibility() {
+  document.querySelectorAll('.dp-group[data-custom-function-family]').forEach((g) => {
+    updateCustomFunctionGroupVisibility(g, g.dataset.customFunctionFamily)
+  })
+}
+// Wired once, right after initDevPanel() builds the panel's own tab
+// buttons (see its own call site, above) -- registered AFTER devPanel.js's
+// own tab-click listeners (same buttons, `addEventListener` fires
+// same-event listeners in registration order), so `.dp-tab-active` has
+// already been updated by the time this runs. A no-op (nothing to wire)
+// on a non-DEV_MODE visitor, where the panel/tabs were never built.
+function setupCustomFunctionTabVisibilitySync() {
+  document.querySelectorAll('.dp-tab').forEach((btn) => {
+    btn.addEventListener('click', () => refreshAllCustomFunctionGroupVisibility())
+  })
+}
 // Builds and renders ONE custom function's live group -- reuses
-// makeClickPoseGroup() verbatim (the SAME factory click/dblclick/rc/
-// tripleClick/quadClick already use) for every control except Type,
-// which is spliced in right after Enabled (Type has no onChange of its
-// own -- the event-wiring below reads `cfg[`${id}Type`]` live at
-// trigger time, not through a visibility/state side effect).
-function renderCustomClickFunctionGroup(id, title) {
-  const base = makeClickPoseGroup(id, title, {})
+// makeClickPoseGroup()/makeClickHoldPoseGroup() verbatim (the SAME
+// factories every hardcoded trigger already uses) for every control
+// except Type, which is spliced in right after Enabled (Type has no
+// onChange of its own -- the event-wiring below reads `cfg[`${id}Type`]`
+// live at trigger time, not through a visibility/state side effect).
+// Newly-created groups are inserted right after the "Custom Click
+// Functions" anchor group (direct request: "the new click function
+// should be added right under that settings group, so it should be first
+// in line") -- every new insert lands in that exact spot, so the newest
+// custom function is always closest to the anchor, pushing earlier ones
+// down one slot each time.
+function renderCustomClickFunctionGroup(id, title, kind, family) {
+  const base = kind === 'hold' ? makeClickHoldPoseGroup(id, title, {}) : makeClickPoseGroup(id, title, {})
   const controls = base.controls.slice()
-  controls.splice(1, 0, { key: `${id}Type`, label: 'Type', type: 'select', def: 'Click', options: () => ['Click', 'Right Click'] })
-  renderDynamicGroup({ title, controls })
-  parseClickPoseConfig(id)
-  buildClickPoseWidgets(id)
-  updateClickTriggerModeVisibility(id, ['PauseDurationMs'])
-  updateOffsetRotationVisibility(id)
-  updateSingleTimingGateVisibility(id)
-  updateSequencePlayModeVisibility(id)
+  const typeOptions = customFunctionTypeOptions(kind, family)
+  controls.splice(1, 0, { key: `${id}Type`, label: 'Type', type: 'select', def: typeOptions[0], options: () => typeOptions })
+  const g = renderDynamicGroup({ title, controls })
+  if (g) {
+    const anchor = document.querySelector('.dp-group[data-key="Custom Click Functions"]')
+    if (anchor && anchor.parentElement) anchor.parentElement.insertBefore(g, anchor.nextSibling)
+    g.dataset.customFunctionFamily = family
+    updateCustomFunctionGroupVisibility(g, family)
+  }
+  if (kind === 'hold') {
+    parseClickHoldConfig(id)
+    buildClickHoldPoseWidgets(id)
+    updateClickTriggerModeVisibility(id, [], ['LoopMode', 'OnReleaseMode', 'TriggerAllHands'])
+    updateLoopHoldVisibility(id)
+    updateOffsetRotationVisibility(id)
+    updateSingleTimingGateVisibility(id)
+  } else {
+    parseClickPoseConfig(id)
+    buildClickPoseWidgets(id)
+    updateClickTriggerModeVisibility(id, ['PauseDurationMs'])
+    updateOffsetRotationVisibility(id)
+    updateSingleTimingGateVisibility(id)
+    updateSequencePlayModeVisibility(id)
+  }
 }
 // Registers a new (or, on restore, a previously-saved) custom function
 // into every generic pipeline this project's existing 10 triggers
-// already run through -- pushing into CLICK_POSE_KEYS means the
-// render-order loop's own `CLICK_POSE_KEYS.forEach(...)` dispatch (see
-// its own comment further down) picks this id up automatically, no
-// separate dispatch code needed. `clickPoseTriggers[id]` mirrors the
-// exact shape every other entry in that object already has (see its own
-// declaration).
-function registerCustomClickFunction(id, title) {
-  CLICK_POSE_KEYS.push(id)
-  clickPoseTriggers[id] = {
-    startCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], startRangeParsed: { min: 0, max: 300 },
-    speedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], speedRangeParsed: { min: 50, max: 2000 },
-    tweenStartCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStartRangeParsed: { min: 0, max: 300 },
-    retransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionRangeParsed: { min: 0, max: 300 }
+// already run through -- pushing into CLICK_POSE_KEYS/CLICK_HOLD_KEYS
+// means the render-order loop's own dispatch (see its own comment
+// further down) picks this id up automatically, no separate dispatch
+// code needed. The trigger-state object mirrors the exact shape every
+// other entry of its own kind already has (see clickPoseTriggers'/
+// clickHoldPoseTriggers' own declarations).
+function registerCustomClickFunction(id, title, kind, family) {
+  if (kind === 'hold') {
+    CLICK_HOLD_KEYS.push(id)
+    clickHoldPoseTriggers[id] = {
+      active: false, holdStartTime: 0, forwardSnapshot: null, loopPoses: null, loopSegmentMs: 1,
+      startCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], startRangeParsed: { min: 0, max: 300 },
+      speedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], speedRangeParsed: { min: 50, max: 2000 },
+      tweenStartCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStartRangeParsed: { min: 0, max: 300 },
+      retransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionRangeParsed: { min: 0, max: 300 },
+      tweenRetransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenRetransitionRangeParsed: { min: 0, max: 300 }
+    }
+  } else {
+    CLICK_POSE_KEYS.push(id)
+    clickPoseTriggers[id] = {
+      startCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], startRangeParsed: { min: 0, max: 300 },
+      speedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], speedRangeParsed: { min: 50, max: 2000 },
+      tweenStartCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStartRangeParsed: { min: 0, max: 300 },
+      retransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionRangeParsed: { min: 0, max: 300 }
+    }
   }
-  renderCustomClickFunctionGroup(id, title)
+  renderCustomClickFunctionGroup(id, title, kind, family)
 }
-// "+ Add Click Function" button's own onClick.
-function addCustomClickFunction() {
+// "+ Add Click Function"/"+ Add Click+Hold Function" buttons' own
+// onClick -- `family` is read from whichever tab is active the MOMENT
+// the button is clicked (direct request: "If I add a click function in
+// the mobile tab, that click function will only be available to mobile
+// and landscape tab, not desktop"), then frozen into the function's own
+// bookkeeping permanently -- it does not follow the panel if the user
+// later switches tabs again.
+function addCustomClickFunction(kind) {
+  const family = getActiveDevPanelTab()
   const id = `custom${nextCustomFunctionN}`
-  const title = `Custom Function ${nextCustomFunctionN}`
+  const title = `Custom ${kind === 'hold' ? 'Click+Hold' : 'Click'} Function ${nextCustomFunctionN}`
   nextCustomFunctionN++
-  customClickFunctionIds.push({ id, title })
-  registerCustomClickFunction(id, title)
+  customClickFunctionIds.push({ id, title, kind, family })
+  registerCustomClickFunction(id, title, kind, family)
   persistCustomClickFunctionIds()
 }
 // Called once from onRestore (see initDevPanel()'s own opts, above) --
@@ -6049,7 +6218,13 @@ function addCustomClickFunction() {
 // itself, which already came back correctly through the normal cfg
 // restore pipeline -- see the DEV_GROUPS control's own comment) from
 // scratch each load, same as `buildDevPanel()` itself does for the
-// static 10.
+// static 10. Iterates `saved` in its own stored (creation) order and
+// inserts each one right after the anchor group, same as live creation
+// -- the LAST one processed this way ends up closest to the anchor,
+// exactly reproducing live creation's own newest-closest-to-anchor
+// ordering (confirmed by tracing through: inserting A then B right after
+// the anchor each time leaves the order anchor->B->A, matching what live
+// creation of A-then-B would have produced).
 function restoreCustomClickFunctions() {
   let saved = []
   try { saved = JSON.parse(cfg.customClickFunctionIds || '[]') } catch (e) { /* leave empty -- malformed value, nothing to restore */ }
@@ -6058,21 +6233,53 @@ function restoreCustomClickFunctions() {
   let maxN = 0
   saved.forEach((entry) => {
     if (!entry || !entry.id) return
-    registerCustomClickFunction(entry.id, entry.title || entry.id)
+    registerCustomClickFunction(entry.id, entry.title || entry.id, entry.kind || 'pose', entry.family || 'desktop')
     const m = /^custom(\d+)$/.exec(entry.id)
     if (m) maxN = Math.max(maxN, parseInt(m[1], 10))
   })
   nextCustomFunctionN = maxN + 1
+  refreshAllCustomFunctionGroupVisibility()
 }
-// Piggybacks every enabled custom function of the matching Type onto
-// this project's EXISTING plain-single-click/-right-click detection
-// (see the 2 `pointerup` listeners below) -- deliberately not a
-// separate click-count/timing stream of its own (no click-count
-// selector yet, disclosed simplification -- see the DEV_GROUPS group's
-// own comment).
+// Piggybacks every enabled 'pose'-kind custom function of the matching
+// Type onto this project's EXISTING plain-single-click/-right-click
+// detection (see the 2 `pointerup` listeners below) -- deliberately not a
+// separate click-count/timing stream of its own (no click-count selector
+// yet, disclosed simplification -- see the DEV_GROUPS group's own
+// comment).
 function triggerCustomPoseFunctions(type) {
-  customClickFunctionIds.forEach(({ id }) => {
-    if (cfg[`${id}Type`] === type) triggerClickPose(id)
+  customClickFunctionIds.forEach(({ id, kind }) => {
+    if (kind !== 'hold' && cfg[`${id}Type`] === type) triggerClickPose(id)
+  })
+}
+// Piggybacks every enabled 'hold'-kind custom function of the matching
+// Type onto this project's EXISTING chp/rchp pointerdown/pointerup
+// hold-detection (see the 2 listeners below) -- reuses
+// startClickHoldPose()/endClickHoldPose() unchanged, so a custom hold
+// function gets the exact same per-hand distance stagger, Single Pose/
+// Sequence mode, Loop Mode, Offset/Rotation, On Release Mode, everything
+// chp/rchp already have, for free.
+function startCustomHoldFunctions(type) {
+  customClickFunctionIds.forEach(({ id, kind }) => {
+    if (kind === 'hold' && cfg[`${id}Type`] === type) startClickHoldPose(id)
+  })
+}
+function endCustomHoldFunctions(type) {
+  customClickFunctionIds.forEach(({ id, kind }) => {
+    if (kind === 'hold' && cfg[`${id}Type`] === type) endClickHoldPose(id)
+  })
+}
+// Whether ANY custom hold function of the given Type has been held long
+// enough to count as a genuine hold-release, not a quick tap -- feeds the
+// SAME `lastPointerupWasHoldRelease`/`lastPointerupWasRchpHoldRelease`
+// suppression chp/rchp already use (see that flag's own top comment),
+// generalized so a custom Click+Hold/Right-Click+Hold function doesn't
+// ALSO fire the plain click/right-click triggers on release, the exact
+// bug class that suppression was originally built to prevent.
+function isCustomHoldHeldLongEnough(type, now) {
+  return customClickFunctionIds.some(({ id, kind }) => {
+    if (kind !== 'hold' || cfg[`${id}Type`] !== type) return false
+    const trig = clickHoldPoseTriggers[id]
+    return trig && trig.active && (now - trig.holdStartTime) >= MOUSE_LOG_HELD_DRAG_MS
   })
 }
 // Shared by every Click-family trigger group with a Mode dropdown
@@ -6519,6 +6726,7 @@ function rebuildField() {
   // its bind pose.
   applyAllFingerPoses()
   updateOutlineVisibility()
+  updateHandsVisibility()
   if (!framedOnce) {
     framedOnce = true
     const w = (cfg.fieldCols - 1) * cfg.columnSpacing
