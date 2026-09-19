@@ -18,6 +18,26 @@ work seamlessly from there.
 
 ## Currently working on
 
+**SHIPPED 2026-09-19: fixed 4 real bugs in the Loading Preview's new
+Camera/Lighting local-list architecture (previous entry).** Both
+selector dropdowns had NO `onChange` -- picking a different camera/
+lighting item updated `cfg` but never actually re-applied it to the
+already-built preview, plausibly explaining most of the "wrong angle"/
+"180 flip" confusion reported right after. Fixed, plus: both new list-
+pickers now refresh their paired dropdown's own options after Save/
+Import/Delete/Rename (same fix `savedPoses` already has); removed the
+now-redundant "Use" button from both (new `ctrl.hideUseButton` devPanel.js
+flag). Also found a real, concrete DATA issue on HANDO's own side (not
+fixable here): HANDO's "Left" and "Right" saved cameras have IDENTICAL
+coordinates in its own settings file. The reported "loading preview
+doesn't start from default pose" was investigated but not independently
+confirmed live (persistent environment truncation this round) -- the
+math checks out (default pose IS poses[0], a fresh lap does start near
+t=0), and the current production tween's own 11-segment cycle means the
+default pose is only ~9% of one loop, likely explaining the perception
+without any code being wrong. See CHANGELOG.txt's matching 2026-09-19
+entry for the full account.
+
 **SHIPPED 2026-09-19: HANDO camera/lighting import pipeline for the
 Loading Preview + its own local saved-camera/lighting lists.** Found
 the REAL reason "Left" (a HANDO-imported camera) made the Loading

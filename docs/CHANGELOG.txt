@@ -7650,6 +7650,87 @@ message, which (correctly, for its own scope) only describes the HANDO
 import feature it was actually about.
 
 --------------------------------------------------------------------------------
+
+2026-09-19 19:39:00-19:49:18 EDT (10m18s)
+
+**Fixed 4 real, concrete bugs in the Loading Preview's new Camera/
+Lighting local-list architecture (previous entry), found via a rapid
+sequence of direct reports: "the camera settings arent loading from
+Hando properly, wrong angle" / "loading preview doesnt use the default
+position, begins with the first pose" / "camera and lighting mismatch
+seems like a 180 flip" / "the dropdown also doesnt seem to work, I
+change them and nothing actually changes."**
+
+1. **`loadingPreviewCameraSelector`/`loadingPreviewLightingSelector`
+   had NO `onChange` at all** -- `buildLoadingPreview()` only reads
+   these 2 selectors ONCE, at build time; changing the dropdown updated
+   `cfg` but nothing ever re-applied it to the already-built preview.
+   This alone plausibly explains most of the "wrong angle"/"180 flip"
+   confusion -- whatever was actually on screen may have been stale,
+   unrelated to whichever camera was actually selected at the time.
+   Fixed by wiring both selectors' `onChange` to reuse the exact same
+   apply functions `buildLoadingPreview()` itself calls
+   (`applyLoadingPreviewCameraPreset()`/`applyLoadingPreviewCameraAutoFrame()`/
+   `applyLoadingPreviewLighting()`), gated on the preview actually
+   being built (`loadingPreviewRenderer` exists) so it never force-
+   shows the canvas. Added `applyLoadingPreviewLightingDefault()` (re-
+   clones the MAIN scene's current key/hemi lights) for the "cleared
+   back to no selection" case on the lighting side.
+2. **A real, concrete cross-project DATA finding, not a code bug:**
+   HANDO's own "Left" and "Right" saved cameras (`data/processed/
+   dev-panel-settings.json`, BASE group) have IDENTICAL x/y/z/tx/ty/tz/
+   fov values in HANDO's own settings file -- confirmed by direct
+   inspection. HANDO's own source has no model-mirroring mechanism tied
+   to these names either (grepped for scale.x=-1/mirror/handSide
+   concepts, found none relevant). Nothing on the HANDY DANDIES side
+   can reconstruct a Left/Right distinction that doesn't exist in the
+   source data -- flagged to the user rather than "fixed," since this
+   isn't something `convertHandoCameraPreset()` can meaningfully
+   correct.
+3. **`loadingPreviewSavedCameras`/`loadingPreviewSavedLighting` never
+   refreshed their paired select dropdown's own `<option>` list after
+   Save/Import/Delete/Rename** -- direct report ("those options arent
+   immediatly available in the drop downs"). Same exact fix
+   `savedPoses` already has for ITS OWN dependent selects (see that
+   control's own DEV_GROUPS comment): a `select` control's options only
+   rebuild on an explicit `refreshSelectOptions()` call, never
+   automatically. Added a matching `onChange: () =>
+   safeRefreshSelectOptions(...)` to both new list-pickers.
+4. **Removed the "Use" button from both new list-pickers** (direct
+   request, "Remove the Use button in both the camera and lighting
+   settings in the loading preview") -- redundant once the dropdown
+   itself applies a picked item live (fix #1 above); using it also
+   never updated the dropdown's own persisted selection, an inconsistent
+   2nd way to "select" something. `devPanel.js` gained one new small,
+   additive, backward-compatible control flag for this:
+   `ctrl.hideUseButton` -- a control without it keeps the Use button
+   exactly as before (every other list-picker in this project
+   unaffected).
+
+**Also investigated, not yet independently confirmed live (environment
+network-truncation issue -- see this file's own matching CLAUDE.md
+gotcha -- hit ~15 consecutive failures this round across main.js AND
+devpanel/devPanel.js on 4 different ports, well beyond its usually-
+documented ~25% failure rate; stopped retrying per this project's own
+§0b usage-efficiency guidance rather than continuing indefinitely):**
+re-read `updateLoadingPreviewAnimation()`'s own math by hand -- the
+default pose genuinely IS `poses[0]` and a fresh lap genuinely does
+start at `lapT≈0` (mathematically confirmed, not just assumed). The
+real, current production tween ("Clockwise Fan") has 10 named poses,
+making the FULL cyclic sequence (default + 10 named = 11 segments)
+divide `loadingPreviewSpeedMs` (2750ms) into ~250ms-per-segment slices
+-- the default pose's own moment is genuinely only ~9% of one repeating
+2.75s loop. This may fully explain the "doesn't use default" report
+(a casual glance is far more likely to land mid-tween than in that
+narrow ~250ms window) without any code being wrong -- flagged to the
+user as the likely explanation, pending their own re-observation now
+that the dropdown fixes (which may have been confusing what was
+actually being looked at) are in place.
+
+Cache-busters: `index.html`'s own `main.js?v=153` -> `?v=154`;
+`devpanel/devPanel.js?v=30` -> `?v=31`.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

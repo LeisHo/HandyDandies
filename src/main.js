@@ -6,7 +6,7 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js'
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js'
 import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js'
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js'
-import { initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement } from './devpanel/devPanel.js?v=30'
+import { initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement } from './devpanel/devPanel.js?v=31'
 
 // A defensive wrapper around devPanel.js's own refreshSelectOptions() --
 // found via live testing (direct user report: "I dont see any of the
@@ -515,6 +515,11 @@ const DEV_GROUPS = [
       // FIELD at field-radius scale, a fundamentally different context
       // HANDO (a single-hand-only app) has no equivalent of, so the same
       // conversion wouldn't be meaningful there.
+      // `hideUseButton` (direct request 2026-09-19: "Remove the Use
+      // button in both the camera and lighting settings in the loading
+      // preview") -- redundant now that the paired select dropdown
+      // below applies a picked item live on its own (`onUse` removed
+      // too, nothing calls it anymore).
       {
         key: 'loadingPreviewSavedCameras',
         label: 'Loading Preview Saved Cameras',
@@ -522,11 +527,27 @@ const DEV_GROUPS = [
         def: [],
         itemLabel: 'Loading Preview Camera',
         importable: true,
+        hideUseButton: true,
         importTransform: (item) => convertHandoCameraPreset(item),
         captureCurrent: () => captureLoadingPreviewCameraPreset(),
-        onUse: (item) => applyLoadingPreviewCameraPreset(item)
+        // Direct report 2026-09-19 ("those options arent immediatly
+        // available in the drop downs") -- same fix savedPoses' own
+        // onChange already applies to ITS dependent selects (see that
+        // control's own comment): a `select` control's <option> list is
+        // only rebuilt on an explicit refreshSelectOptions() call, never
+        // automatically.
+        onChange: () => safeRefreshSelectOptions('loadingPreviewCameraSelector')
       },
-      { key: 'loadingPreviewCameraSelector', label: 'Loading Preview Camera', type: 'select', def: '', options: () => (cfg.loadingPreviewSavedCameras || []).map((c) => ({ value: c.name, group: c.group || null })) },
+      // CORRECTED 2026-09-19, direct report ("I change them and nothing
+      // atually changes in the preview") -- this select had NO onChange
+      // at all. buildLoadingPreview() only reads this selector ONCE, at
+      // build time -- changing the dropdown updated `cfg` but nothing
+      // ever re-applied it to the already-built preview. Reuses the
+      // exact same apply functions buildLoadingPreview() itself calls,
+      // gated on `loadingPreviewRenderer` existing (only takes effect
+      // live if the preview is currently built/visible; never force-
+      // shows it).
+      { key: 'loadingPreviewCameraSelector', label: 'Loading Preview Camera', type: 'select', def: '', options: () => (cfg.loadingPreviewSavedCameras || []).map((c) => ({ value: c.name, group: c.group || null })), onChange: () => { if (!loadingPreviewRenderer) return; const item = (cfg.loadingPreviewSavedCameras || []).find((c) => c.name === cfg.loadingPreviewCameraSelector); if (item) applyLoadingPreviewCameraPreset(item); else applyLoadingPreviewCameraAutoFrame() } },
       // Direct request 2026-09-19 ("so lighitng settings for the loading
       // preview will also be local to that, and the hand field itself
       // wil have its own") -- same local-list split as Camera above,
@@ -540,11 +561,18 @@ const DEV_GROUPS = [
         def: [],
         itemLabel: 'Loading Preview Lighting',
         importable: true,
+        hideUseButton: true,
         importTransform: (item) => convertHandoLightingPreset(item),
         captureCurrent: () => captureLoadingPreviewLightingPreset(),
-        onUse: (item) => { if (loadingPreviewKeyLightRef && loadingPreviewHemiLightRef) applyLoadingPreviewLighting(loadingPreviewKeyLightRef, loadingPreviewHemiLightRef, item) }
+        onChange: () => safeRefreshSelectOptions('loadingPreviewLightingSelector')
       },
-      { key: 'loadingPreviewLightingSelector', label: 'Loading Preview Lighting', type: 'select', def: '', options: () => (cfg.loadingPreviewSavedLighting || []).map((l) => ({ value: l.name, group: l.group || null })) },
+      // Same fix as loadingPreviewCameraSelector above -- was missing an
+      // onChange entirely. `applyLoadingPreviewLightingDefault()` (see
+      // its own comment) re-clones the main scene's CURRENT key/hemi
+      // lights when the selection is cleared, matching what
+      // buildLoadingPreview() itself does at build time for "no preset
+      // selected."
+      { key: 'loadingPreviewLightingSelector', label: 'Loading Preview Lighting', type: 'select', def: '', options: () => (cfg.loadingPreviewSavedLighting || []).map((l) => ({ value: l.name, group: l.group || null })), onChange: () => { if (!loadingPreviewKeyLightRef || !loadingPreviewHemiLightRef) return; const item = (cfg.loadingPreviewSavedLighting || []).find((l) => l.name === cfg.loadingPreviewLightingSelector); if (item) applyLoadingPreviewLighting(loadingPreviewKeyLightRef, loadingPreviewHemiLightRef, item); else applyLoadingPreviewLightingDefault() } },
       { key: 'loadingPreviewSpeedMs', label: 'Loading Preview Speed (Ms / Cycle)', type: 'slider', min: 200, max: 5000, step: 50, def: 900 },
       // Sequence Mode - Count/Loop/Oscillate -- direct spec item, the
       // SAME control shape just added to every click function (see
@@ -3642,6 +3670,22 @@ function applyLoadingPreviewLighting(key, hemi, preset) {
   hemi.intensity = preset.ambientIntensity ?? LIGHTING_KEY_DEFAULTS.ambientIntensity
   hemi.color.set(preset.ambientSkyColor ?? LIGHTING_KEY_DEFAULTS.ambientSkyColor)
   hemi.groundColor.set(preset.ambientGroundColor ?? LIGHTING_KEY_DEFAULTS.ambientGroundColor)
+}
+// `loadingPreviewLightingSelector`'s own onChange, for the "cleared back
+// to no selection" case -- re-clones the MAIN scene's own CURRENT
+// key/hemi lights (position/target/intensity/color), matching exactly
+// what buildLoadingPreview() itself does at build time before any
+// preset override is applied.
+function applyLoadingPreviewLightingDefault() {
+  if (!loadingPreviewKeyLightRef || !loadingPreviewHemiLightRef) return
+  loadingPreviewKeyLightRef.position.copy(keyLight.position)
+  loadingPreviewKeyLightRef.target.position.copy(keyLight.target.position)
+  loadingPreviewKeyLightRef.target.updateMatrixWorld()
+  loadingPreviewKeyLightRef.intensity = keyLight.intensity
+  loadingPreviewKeyLightRef.color.copy(keyLight.color)
+  loadingPreviewHemiLightRef.intensity = hemiLight.intensity
+  loadingPreviewHemiLightRef.color.copy(hemiLight.color)
+  loadingPreviewHemiLightRef.groundColor.copy(hemiLight.groundColor)
 }
 // Sized directly off the Loading Preview Size (Px) slider (an inline
 // style, not CSS-var-driven like the main dev panel's own chrome, since

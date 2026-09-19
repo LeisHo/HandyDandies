@@ -461,3 +461,42 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   now: retry the navigation a few times (or cross-check via `curl`
   first), don't assume a just-made change broke something just because
   either file fails to load this way.
+- **A `select` control whose `options()` reads a list-picker's own array
+  needs TWO SEPARATE, easy-to-forget wiring points -- missing either one
+  looks identical from the outside ("changing it does nothing").**
+  (1) The list-picker itself needs its own `onChange` calling
+  `safeRefreshSelectOptions('theSelectKey')`, or the `<select>`'s own
+  `<option>` list never picks up a newly Saved/Imported/Deleted/Renamed
+  item -- `savedPoses` has had this since early in the project (see its
+  own DEV_GROUPS comment); `loadingPreviewSavedCameras`/
+  `loadingPreviewSavedLighting` were missing it when first built
+  (2026-09-19), confirmed live via direct report ("those options arent
+  immediatly available in the drop downs"). (2) The `select` control
+  ITSELF needs its own `onChange` to actually DO something with the
+  newly-picked value -- `loadingPreviewCameraSelector`/
+  `loadingPreviewLightingSelector` had NEITHER of these 2 things
+  initially: `buildLoadingPreview()` only ever reads these selectors
+  ONCE, at build time, so picking a different item from the dropdown
+  updated `cfg` but never re-applied anything to the already-built
+  preview -- confirmed live via direct report ("I change them and
+  nothing actually changes in the preview"), and this alone plausibly
+  explained an earlier, separate "wrong angle"/"180 flip" report too
+  (whatever was on screen may have been stale, unrelated to whichever
+  camera was actually selected at the time it was observed). When
+  adding a NEW select-driven-by-a-list-picker pair, wire both directly
+  by analogy to an existing working pair (`savedPoses` for #1,
+  `loadingPreviewCameraSelector` itself for #2 as of this fix) rather
+  than assuming either comes for free from the control types alone.
+- **HANDO's own "Left" and "Right" saved cameras (`data/processed/
+  dev-panel-settings.json`, BASE group) have IDENTICAL x/y/z/tx/ty/tz/
+  fov coordinates in HANDO's OWN settings file -- confirmed by direct
+  inspection 2026-09-19.** Not a HANDY DANDIES bug, and not something
+  `convertHandoCameraPreset()` can fix -- grepped HANDO's own source for
+  a model-mirroring mechanism (`scale.x=-1`/mirror/handSide concepts)
+  tied to these names and found none relevant, so there's no missing
+  transform step to reconstruct a Left/Right distinction that doesn't
+  exist in the source data at all. If "Left" and "Right" still look
+  identical after importing/converting both into
+  `loadingPreviewSavedCameras`, this is almost certainly why -- check
+  HANDO's own data first before assuming the conversion math is at
+  fault.

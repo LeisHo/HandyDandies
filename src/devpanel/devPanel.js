@@ -891,7 +891,17 @@ function buildListPickerRow(ctrl, row) {
   const renameBtn = el('button', null, { type: 'button', textContent: 'Rename' })
   const deleteBtn = el('button', null, { type: 'button', textContent: 'Delete' })
   const addGroupBtn = el('button', null, { type: 'button', textContent: '+ Group' })
-  btnRow.append(saveBtn, overwriteBtn, useBtn, renameBtn, deleteBtn, addGroupBtn)
+  // `ctrl.hideUseButton` (optional, additive) -- direct request 2026-09-19
+  // ("Remove the Use button in both the camera and lighting settings in
+  // the loading preview") for a control whose own paired `select`
+  // dropdown already applies a picked item live via its own onChange
+  // (see loadingPreviewCameraSelector/loadingPreviewLightingSelector in
+  // main.js) -- a separate Use button became redundant/confusing there,
+  // since using it doesn't update that dropdown's own persisted
+  // selection. A control without this flag keeps the button exactly as
+  // before.
+  if (ctrl.hideUseButton) btnRow.append(saveBtn, overwriteBtn, renameBtn, deleteBtn, addGroupBtn)
+  else btnRow.append(saveBtn, overwriteBtn, useBtn, renameBtn, deleteBtn, addGroupBtn)
   // Cross-project pose export/import (direct user request): export ships
   // whatever's CHECKED (entry.exportChecked) as a plain JSON array to the
   // clipboard -- the exact same navigator.clipboard pattern the panel's
