@@ -166,47 +166,61 @@ manufactured `now` for the per-hand trigger functions or real elapsed
 wall-clock time for the Loading Preview's own `performance.now()`-based
 one).
 
-**Phase 4 (dynamic "Add Click Function" architecture), first slice, is
-also DONE**: users can now create an unbounded number of custom fire-
-and-forget click-triggered pose functions at runtime via "+ Add Click
-Function" (Custom Click Functions group), not just the 10 hardcoded
-ones. Required extending devPanel.js itself with a genuinely new
-capability (`renderDynamicGroup()` -- the engine previously had no way
-to inject a live, interactive control group after `initDevPanel()` had
-already run) -- confirmed safe to build once the concurrent session
-editing that file finished and pushed. Reuses the existing
-`makeClickPoseGroup()` factory verbatim plus a spliced-in Type
-(Click/Right Click) control; every existing generic pipeline
-(`updateClickPoseForHand`, `triggerClickPose`, every visibility
-function) needed zero changes to support new IDs. Found and fixed 2
-real bugs along the way: `getOrInitHandCP()` didn't backfill missing
-per-trigger state for an already-touched hand when the trigger list
-grows at runtime (would have crashed the next frame a new custom
-function fired for that hand); Animation Speed Curve's own fields never
-got their interactive curve-graph widget (now fixed for all 10 existing
-triggers too, not just custom ones).
+**Phase 4 (dynamic "Add Click Function" architecture) has now shipped 2
+slices.** Users can create an unbounded number of custom click functions
+at runtime, both fire-and-forget ("+ Add Click Function") AND hold-based
+("+ Add Click+Hold Function", added in slice 2 -- reuses
+`makeClickHoldPoseGroup()`, the same factory chp/rchp/etc. use). Each
+custom function is tagged with a `family` ('desktop'/'mobile', read from
+whichever dev-panel tab is active when the button is clicked) that
+hides its group outside that family and narrows its own Type options
+(desktop: Click/Right Click/Click+Hold/Right Click+Hold; mobile: Click/
+Click+Hold -- no right-click on touch). Custom hold functions piggyback
+on chp/rchp's own existing pointerdown/pointerup machinery, getting
+per-hand stagger/Sequence mode/Loop Mode/Offset/Rotation/On Release Mode
+for free. New custom functions insert right under the "Custom Click
+Functions" anchor group (newest closest to it), not at the panel's
+bottom.
 
-**Deliberately scoped down** from the full Phase 4 spec (each disclosed,
-not an oversight): fire-and-forget only (no custom Click+Hold functions
--- a separate, architecturally distinct state machine); Type is Click/
-Right Click only (no Scroll/mobile/zoom); no click-count selector; no
-delete-function button; no duplicate-setting validation; no automatic
-hold-timing conflict resolution. Verified live via real UI clicks
-(`computer{left_click}` on the actual "+ Add Click Function" button,
-twice) plus a direct simulation of the backfill bug's exact failure
-scenario.
+**NEW this round: Offset/Rotation/Animation Speed Curve/Start Time
+Curve/Retransition are now "mandatory gated subgroups"** across ALL 10
+static triggers and every custom function -- each cluster is a real
+nested collapsible group with its own On/Off checkbox living in the
+GROUP'S OWN HEADER/LABEL (not a separate settings row); when off, the
+group shows as empty. Required one small devPanel.js addition (a
+click-guard so the relocated checkbox doesn't also toggle group
+collapse) plus exporting `createGroupElement()` -- otherwise pure reuse
+of already-proven wiring (the checkbox keeps its own `data-key`, so
+Save/Reset/restore needed zero changes). Also fixed panel-wide: the 2nd
+dynamicDevice checkbox ("Independent from Desktop") is now right-
+aligned to the row/header's own right edge everywhere, not just
+wherever its row's own control happened to end.
 
-**Still ahead** (Click-Function-specific -- Loading Preview and Phase
-4's first slice are both fully done): reordering the 10 fixed groups'
-own settings to match the spec's B ordering; the deferred "Tween Stop"
-curve question (Phase 2, likely duplicates the existing Tween
-Retransition Start Time Curve/Range); custom Click+Hold functions,
-Scroll/mobile/zoom Types, click-count selection, and function deletion
-for Custom Click Functions; Type/click-count/scroll dropdowns for the
-10 fixed triggers; a multi-sequence-plus-hold chain builder; bezier
-curve handles; duplicate-setting validation. See CHANGELOG.txt's
-matching entries for full slice-by-slice detail; this
-is genuinely large and will keep spanning multiple rounds.
+Found and fixed 3 real bugs across these 2 slices: `getOrInitHandCP()`/
+`getOrInitHandCHP()` didn't backfill missing per-trigger state for an
+already-touched hand when their trigger-key arrays grow at runtime
+(would have crashed the next frame a new custom function fired for that
+hand); Animation Speed Curve's own fields never got their interactive
+curve-graph widget (now fixed for all 10 existing triggers too).
+
+**Deliberately scoped down**, each disclosed rather than silently
+skipped: Scroll (desktop) and Multi-Point Touch (mobile) Types --
+genuinely new trigger-detection subsystems, not built for ANY trigger
+yet; click-count selector; duplicate-setting validation; automatic
+hold-timing conflict resolution for an arbitrary number of custom
+Click+Hold functions; a delete-function button (the dev panel's own
+Delete Group/Setting icon removes the DOM group but won't clean up this
+feature's own bookkeeping).
+
+**Still ahead**: the 2 gaps above (Scroll, Multi-Point); reordering the
+10 fixed groups' own settings to match the original spec's B ordering;
+the deferred "Tween Stop" curve question (Phase 2, likely duplicates
+the existing Tween Retransition Start Time Curve/Range); click-count
+selection and function deletion for Custom Click Functions; a multi-
+sequence-plus-hold chain builder; bezier curve handles; duplicate-
+setting validation. See CHANGELOG.txt's matching entries for full
+slice-by-slice detail; this is genuinely large and will keep spanning
+multiple rounds.
 
 **SHIPPED 2026-09-17: dev-panel groups can now be individually locked
 against reordering** (`.dp-group-lock-icon`, 🔒/🔓, in each group's title

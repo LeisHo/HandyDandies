@@ -7334,6 +7334,141 @@ errors introduced. `node --check` passes on `main.js`.
 Cache-buster: `index.html`'s own `main.js?v=147` -> `?v=148`.
 
 --------------------------------------------------------------------------------
+2026-09-19  -  18:43:59 - 19:08:39 EDT (24m40s, measured -- scope grew
+substantially mid-task via 3 follow-up messages arriving while the
+original 4-item request was still being worked; the original ETA given
+at 18:43:59 was scoped to the narrower original ask, not this final
+larger deliverable)
+
+**Custom Click Functions: 4 direct follow-up fixes, plus a 5th request
+(mandatory gated subgroups) that arrived mid-implementation.** Full
+account:
+
+1. **Insert order** -- new custom functions now land right under the
+"Custom Click Functions" anchor group (newest closest to it), not
+appended to the bottom of the whole panel. Confirmed live: creating
+custom2 after custom1 produced the DOM order anchor -> custom2 ->
+custom1 -> Pose, exactly matching the request.
+
+2. **2nd dynamicDevice checkbox right-aligned, panel-wide** -- "the 2nd
+checkbox (the one which regards mobile desktop sync) should be right
+aligned... on the right edge." A new `.dp-dynamic-device-checkbox-2nd`
+class (added to BOTH the row-level "Independent from Desktop" checkbox
+and its group-level cascade counterpart) + `margin-left:auto` fixes
+this project-wide, not just for custom functions -- every row's control
+width varies, so the 2 checkboxes previously landed at a different
+horizontal position per row.
+
+3. **Click+Hold custom functions + device family.** "+ Add Click
+Function" now has a sibling "+ Add Click+Hold Function" (reuses
+makeClickHoldPoseGroup() verbatim, same factory chp/rchp/etc. already
+use) -- Type's own option list is real: Click/Right Click via the pose
+button, Click+Hold/Right Click+Hold via the hold button (4 of the
+original spec's 5 desktop options; Scroll stays deliberately unbuilt --
+a genuinely new trigger-detection subsystem, not shipped as a dead
+dropdown entry). Each function is also tagged `family` ('desktop'/
+'mobile'), read from whichever dev-panel tab is active the moment the
+button is clicked (getActiveDevPanelTab(), a DOM read of `.dp-tab-
+active` -- devPanel.js keeps `editingDevice` as a private closure
+variable with no exported getter) -- a mobile-family function's group
+hides on Desktop and vice versa, and its Type list drops the Right-
+Click variants (no right-click on touch, matching the original spec's
+own item H: "Dont show scroll or right click functions" on Mobile).
+Custom hold-family functions piggyback on the EXISTING chp/rchp
+pointerdown/pointerup listeners AND their existing hold-vs-click
+suppression check (isCustomHoldHeldLongEnough(), generalizing the
+existing chpHeldLongEnough/rchpHeldLongEnough logic) -- reusing
+startClickHoldPose()/endClickHoldPose() unchanged gives a custom
+Click+Hold function chp/rchp's full machinery (per-hand stagger,
+Sequence mode, Loop Mode, Offset/Rotation, On Release Mode) for free.
+getOrInitHandCHP() got the same per-key state-backfill fix
+getOrInitHandCP() already had (Phase 4's first slice) -- CLICK_HOLD_KEYS
+can now also grow at runtime, so an already-touched hand's `_chp` needs
+the same defensive backfill CLICK_POSE_KEYS already required.
+
+4. **Mandatory gated subgroups (new capability, 3 rounds of direct
+clarification mid-task).** Offset/Rotation/Animation Speed Curve/Start
+Time Curve/Retransition are now real nested collapsible groups, each
+with its own On/Off checkbox moved bodily into the GROUP'S OWN
+HEADER/LABEL rather than living as a plain settings row ("checkbox
+within its label... when off, they will just show as empty setting
+groups"). New `wrapGatedSubgroup(enabledKey, memberKeys, subgroupTitle)`
+does this generically: finds the existing "Enabled" row by its
+`data-key` (unchanged -- same buildRow()/commit() wiring every other
+control already has), creates a new nested group via devPanel.js's own
+`createGroupElement()` (now exported), relocates the member rows
+(OffsetX/Y etc.) into the new group's body, and moves the Enabled row
+itself (whole row, not just its checkbox -- preserves the `data-key`
+so displayValue()'s own restore-sync selector still finds it with zero
+devPanel.js changes there) into the new group's header. CSS
+(`.dp-group-header .dp-row.dp-group-gate-row { display: contents }`
++ hiding the row's own label) makes it render as a plain inline
+checkbox next to the group's title instead of a nested block. One new
+devPanel.js guard was needed: the group header's own click-to-collapse
+listener now ignores clicks on `.dp-group-gate-row`, so toggling the
+relocated checkbox doesn't ALSO collapse the group on the same click.
+Applied once for all 10 static triggers (`wrapAllClickFunctionGatedSubgroups()`,
+module init) and per custom function (`wrapClickFunctionGatedSubgroups()`,
+called from `renderCustomClickFunctionGroup()`) -- the SAME already-
+proven `updateOffsetRotationVisibility()`/`updateSingleTimingGateVisibility()`
+functions need zero changes, since they select rows by `data-key` alone,
+which still resolves correctly regardless of where in the tree a row
+now lives.
+
+**Verified live**, real UI clicks via `computer{left_click}` on the
+actual buttons (not just direct function calls): confirmed all 5 gated
+subgroups render correctly for `chp` (Enabled row lives inside its own
+group's header, member rows correctly relocated into that group's
+body, label hidden via CSS, checkbox visible); confirmed clicking the
+relocated checkbox toggles `.checked` and does NOT also collapse the
+group (the new devPanel.js click-guard works). One real finding during
+verification: clicking the checkbox didn't update `cfg` in THIS
+session's own browser tool -- traced this to a PRE-EXISTING environment
+characteristic, not a bug in this change: the tool's own browser pane
+renders at a fixed 336px-wide (mobile-sized) viewport, so
+`realDeviceClass()` genuinely reports 'mobile', and devPanel.js's own
+UNMODIFIED dynamicDevice `commit()` logic correctly withholds the
+`cfg`/`onChange` update in that case (by design -- it only applies a
+live edit when the device that's actually live matches). Confirmed this
+is pre-existing and unrelated to this change by reproducing the
+IDENTICAL symptom on `chpEnabled`, an untouched, unrelated control.
+Confirmed via real button clicks: `custom1` (pose, family=mobile,
+Type=Click, correctly narrowed since 'mobile' family drops Right Click)
+and `custom2` (hold, family=mobile, Type=Click+Hold) both created
+correctly, with the right DOM insert order (anchor -> custom2 ->
+custom1 -> Pose, exactly matching live creation order) and correct
+gated-subgroup wrapping for both. No console errors beyond the expected
+`/api/save-settings` 404s (this static dev server has no API route).
+`node --check` passes on both files.
+
+**Concurrent-session note:** another session was actively, repeatedly
+bumping `index.html`'s own `main.js?v=` throughout this slice (its own
+unrelated Loading Preview rotation / Field Layout Hide Hands work,
+committed separately as `897edbf` partway through) -- confirmed via
+`git diff` before staging that `src/devpanel/devPanel.js` contained
+EXACTLY this task's own 3 edits (2 checkbox-class additions + 1
+click-guard) with zero unexpected content, and `index.html`'s own
+version-bump race was harmless (their higher `?v=` number still
+correctly forces a fresh fetch of this session's own main.js content).
+
+**Not yet done, honestly disclosed rather than silently skipped or
+half-built:** Scroll Type (desktop) and Multi-Point Touch Type
+(mobile) -- both genuinely new trigger-detection subsystems, not built
+for ANY trigger yet, custom or static; click-count selector for
+click-including Types; duplicate-setting validation; automatic hold-
+timing conflict resolution for an arbitrary number of custom Click+Hold
+functions; a delete-function button (the dev panel's own existing
+Delete Group/Setting icon removes the DOM group but won't clean up
+this feature's own bookkeeping/CLICK_HOLD_KEYS/CLICK_POSE_KEYS/trigger-
+state entries).
+
+Cache-buster: `index.html`'s own `main.js?v=148` -> `?v=151` (the final
+value landed via the concurrent session's own later bump, still
+guaranteeing a fresh fetch of this slice's content); `devpanel/devPanel.js?v=28`
+-> `?v=29` (this slice's own, for the createGroupElement export +
+click-guard addition).
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================
