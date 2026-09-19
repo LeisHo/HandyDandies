@@ -6,7 +6,7 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js'
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js'
 import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js'
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js'
-import { initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement } from './devpanel/devPanel.js?v=29'
+import { initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement } from './devpanel/devPanel.js?v=30'
 
 // A defensive wrapper around devPanel.js's own refreshSelectOptions() --
 // found via live testing (direct user report: "I dont see any of the
@@ -504,6 +504,17 @@ const DEV_GROUPS = [
       // grabs wherever this preview's own camera currently is,
       // `onUse` re-applies a saved item to it live for an immediate
       // preview.
+      // `importTransform` (direct follow-up, 2026-09-19: "so being able to
+      // port and read Hando's exported data is very important") --
+      // converts a pasted HANDO camera export through
+      // convertHandoCameraPreset() (see its own comment for the full
+      // derivation) BEFORE it's merged into this list, so pasting HANDO's
+      // own "Left"/"Right"/etc. export just works instead of landing
+      // pointed at empty space. Only wired on THIS local list, not the
+      // main field's own `savedCameras` -- that one frames the WHOLE
+      // FIELD at field-radius scale, a fundamentally different context
+      // HANDO (a single-hand-only app) has no equivalent of, so the same
+      // conversion wouldn't be meaningful there.
       {
         key: 'loadingPreviewSavedCameras',
         label: 'Loading Preview Saved Cameras',
@@ -511,11 +522,29 @@ const DEV_GROUPS = [
         def: [],
         itemLabel: 'Loading Preview Camera',
         importable: true,
+        importTransform: (item) => convertHandoCameraPreset(item),
         captureCurrent: () => captureLoadingPreviewCameraPreset(),
         onUse: (item) => applyLoadingPreviewCameraPreset(item)
       },
       { key: 'loadingPreviewCameraSelector', label: 'Loading Preview Camera', type: 'select', def: '', options: () => (cfg.loadingPreviewSavedCameras || []).map((c) => ({ value: c.name, group: c.group || null })) },
-      { key: 'loadingPreviewLightingSelector', label: 'Loading Preview Lighting', type: 'select', def: '', options: () => (cfg.savedLighting || []).map((l) => ({ value: l.name, group: l.group || null })) },
+      // Direct request 2026-09-19 ("so lighitng settings for the loading
+      // preview will also be local to that, and the hand field itself
+      // wil have its own") -- same local-list split as Camera above,
+      // same reasoning: the main field's own `savedLighting` lights the
+      // WHOLE FIELD at field-radius scale (also not something HANDO has
+      // an equivalent of), so it stays separate and untouched.
+      {
+        key: 'loadingPreviewSavedLighting',
+        label: 'Loading Preview Saved Lighting',
+        type: 'list-picker',
+        def: [],
+        itemLabel: 'Loading Preview Lighting',
+        importable: true,
+        importTransform: (item) => convertHandoLightingPreset(item),
+        captureCurrent: () => captureLoadingPreviewLightingPreset(),
+        onUse: (item) => { if (loadingPreviewKeyLightRef && loadingPreviewHemiLightRef) applyLoadingPreviewLighting(loadingPreviewKeyLightRef, loadingPreviewHemiLightRef, item) }
+      },
+      { key: 'loadingPreviewLightingSelector', label: 'Loading Preview Lighting', type: 'select', def: '', options: () => (cfg.loadingPreviewSavedLighting || []).map((l) => ({ value: l.name, group: l.group || null })) },
       { key: 'loadingPreviewSpeedMs', label: 'Loading Preview Speed (Ms / Cycle)', type: 'slider', min: 200, max: 5000, step: 50, def: 900 },
       // Sequence Mode - Count/Loop/Oscillate -- direct spec item, the
       // SAME control shape just added to every click function (see
@@ -975,7 +1004,9 @@ const DEV_GROUPS = [
   {
     title: 'Right Click',
     controls: withDynamicDevice([
-      { key: 'rcEnabled', label: 'Right Click (Master On/Off)', type: 'checkbox', def: false },
+      // "If Off, hide all settings for this function" -- see
+      // makeClickHoldPoseGroup()'s own matching comment.
+      { key: 'rcEnabled', label: 'Right Click (Master On/Off)', type: 'checkbox', def: false, onChange: () => updateClickFunctionEnabledVisibility('rc') },
       {
         key: 'rcMode', label: 'Mode', type: 'select', def: 'Single Pose', options: () => ['Single Pose', 'Sequence'],
         // BUG FIX 2026-09-15: this still called the OLD, pre-rename
@@ -2539,7 +2570,11 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       // Direct user request ("provide a checkbox to turn that feature on
       // and off") -- gates startClickHoldPose(), same master on/off
       // pattern as Crop Wrist / Responsive Wrist Splay's own checkboxes.
-      { key: `${p}Enabled`, label: `${title} (Master On/Off)`, type: 'checkbox', def: defaults.enabled ?? false },
+      // "If Off, hide all settings for this function" (direct spec item,
+      // corrected 2026-09-19 after re-reading the verbatim spec text --
+      // this was previously unbuilt) -- see updateClickFunctionEnabledVisibility()'s
+      // own comment.
+      { key: `${p}Enabled`, label: `${title} (Master On/Off)`, type: 'checkbox', def: defaults.enabled ?? false, onChange: () => updateClickFunctionEnabledVisibility(p) },
       // Mode + the Tween Sequence select right below it, added 2026-09-15
       // (direct follow-up request, "implement it to all click functions
       // in the dev panel," porting Right Click's own Mode dropdown here)
@@ -2553,7 +2588,7 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       // and Hold Confirm Delay stay visible regardless of mode.
       {
         key: `${p}Mode`, label: 'Mode', type: 'select', def: 'Single Pose', options: () => ['Single Pose', 'Sequence'],
-        onChange: () => { updateClickTriggerModeVisibility(p, [], ['LoopMode', 'OnReleaseMode', 'TriggerAllHands']); updateLoopHoldVisibility(p); updateSingleTimingGateVisibility(p) }
+        onChange: () => { updateClickTriggerModeVisibility(p, [], ['LoopMode', 'OnReleaseMode', 'TriggerAllHands', 'TweenStopStartTimeCurveEnabled', 'TweenStopDelayEnabled']); updateLoopHoldVisibility(p); updateSingleTimingGateVisibility(p); updateTweenStopGateVisibility(p) }
       },
       // Offset/Rotation -- direct request 2026-09-17 ("Offset On and Off,
       // to set if the hand itself will be physically offset in the x and
@@ -2748,7 +2783,33 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       // own normal distance-based stagger delay." Off (default) = every
       // hand still staggers via the existing Retransition Start Time
       // Curve/Range, exactly as before this feature existed.
-      { key: `${p}TriggerAllHands`, label: 'Trigger All Hands', type: 'checkbox', def: false }
+      { key: `${p}TriggerAllHands`, label: 'Trigger All Hands', type: 'checkbox', def: false },
+      // Tween Stop (Sequence mode's own "Stop" release path) -- direct
+      // spec item, corrected 2026-09-19 after re-reading the verbatim
+      // spec text (an earlier pass wrongly deferred this as "likely
+      // duplicates Retransition Start Time Curve" -- it's genuinely
+      // different: on release, the sequence keeps PLAYING instead of
+      // jumping to retransition, its own tween speed progressively
+      // decaying to zero over Tween Stop Delay ("so the pose does not
+      // abruptly stop but instead slows down to a stop... if the Tween
+      // Stop Delay is 0, then the hands will just stop abruptly"). Off
+      // by default (def: false) -- preserves this project's own
+      // existing immediate-retransition 'Stop' behavior exactly, unless
+      // explicitly turned on. See updateClickHoldPoseForHand()'s own
+      // 'stopping' phase for the actual per-frame deceleration math, and
+      // endClickHoldPose()'s own comment for how RetransitionEnabled now
+      // ALSO governs Sequence mode's own post-decay behavior (a 2nd
+      // verbatim-text correction -- "whether or not they retransition...
+      // will depend on the settings i already described in Click mode,"
+      // previously scoped to Single Pose only).
+      { key: `${p}TweenStopStartTimeCurveEnabled`, label: 'Tween Stop Start Time Curve On/Off', type: 'checkbox', def: false, onChange: () => updateTweenStopGateVisibility(p) },
+      { key: `${p}TweenStopStartTimeCurve`, label: 'Tween Stop Start Time Curve (Distance -> Start Time)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickHoldConfig(p) },
+      { key: `${p}TweenStopStartTimeRange`, label: 'Tween Stop Min / Max Start Time (Ms)', type: 'text', def: '{"min":0,"max":300}', onChange: () => parseClickHoldConfig(p) },
+      { key: `${p}TweenStopDelayEnabled`, label: 'Tween Stop Delay On/Off', type: 'checkbox', def: false, onChange: () => updateTweenStopGateVisibility(p) },
+      { key: `${p}TweenStopDelayMs`, label: 'Tween Stop Delay (Ms)', type: 'slider', min: 0, max: 5000, step: 10, def: 0 },
+      { key: `${p}TweenStopDelayCurveEnabled`, label: 'Tween Stop Delay Curve On/Off', type: 'checkbox', def: false, onChange: () => updateTweenStopGateVisibility(p) },
+      { key: `${p}TweenStopDelayCurve`, label: 'Tween Stop Delay Curve (Distance -> Delay)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickHoldConfig(p) },
+      { key: `${p}TweenStopDelayRange`, label: 'Tween Stop Min / Max Delay (Ms)', type: 'text', def: '{"min":0,"max":2000}', onChange: () => parseClickHoldConfig(p) }
     ])
   }
 }
@@ -2767,7 +2828,9 @@ function makeClickPoseGroup(p, title, defaults = {}) {
   return {
     title,
     controls: withDynamicDevice([
-      { key: `${p}Enabled`, label: `${title} (Master On/Off)`, type: 'checkbox', def: defaults.enabled ?? false },
+      // "If Off, hide all settings for this function" -- see
+      // makeClickHoldPoseGroup()'s own matching comment.
+      { key: `${p}Enabled`, label: `${title} (Master On/Off)`, type: 'checkbox', def: defaults.enabled ?? false, onChange: () => updateClickFunctionEnabledVisibility(p) },
       // Mode + Tween Sequence -- added 2026-09-15, originally built only
       // for Right Click, then generalized here so Click Pose/Double-Click
       // Pose get it "the same as the others" (direct follow-up request).
@@ -3233,6 +3296,11 @@ const loadingPreviewBaseQuat = new THREE.Quaternion()
 // applyLoadingPreviewCameraAutoFrame() below), purely so
 // captureLoadingPreviewCameraPreset() has something real to save.
 const loadingPreviewCameraTarget = new THREE.Vector3()
+// See loadingPreviewSavedLighting's own DEV_GROUPS comment -- module-level
+// so its list-picker's "Use" button can live-apply a saved lighting item
+// without needing a full buildLoadingPreview() rebuild.
+let loadingPreviewKeyLightRef = null
+let loadingPreviewHemiLightRef = null
 // Sequence Mode (Count/Loop/Oscillate) state -- module-level, not per-
 // hand, since there's exactly ONE loading-preview instance. Reset in
 // buildLoadingPreview() (see its own call site below).
@@ -3278,11 +3346,20 @@ function buildLoadingPreview(bypassEnabledGate) {
   // steps). A selected Lighting preset (direct follow-up request) then
   // overrides these cloned starting values -- see
   // applyLoadingPreviewLighting()'s own comment.
+  //
+  // CORRECTED 2026-09-19 (own local `loadingPreviewSavedLighting` list,
+  // same reasoning as the camera split above): stored at module level
+  // (loadingPreviewKeyLightRef/loadingPreviewHemiLightRef) so the new
+  // list-picker's own "Use" button (a live preview independent of a full
+  // rebuild) can reach these lights without needing buildLoadingPreview()
+  // to run again.
   const key = keyLight.clone()
   key.target = keyLight.target.clone()
   const hemi = hemiLight.clone()
   loadingPreviewScene.add(key, key.target, hemi)
-  const lightingPreset = (cfg.savedLighting || []).find((l) => l.name === cfg.loadingPreviewLightingSelector)
+  loadingPreviewKeyLightRef = key
+  loadingPreviewHemiLightRef = hemi
+  const lightingPreset = (cfg.loadingPreviewSavedLighting || []).find((l) => l.name === cfg.loadingPreviewLightingSelector)
   if (lightingPreset) applyLoadingPreviewLighting(key, hemi, lightingPreset)
 
   const clone = cloneSkeletal(modelRoot)
@@ -3385,6 +3462,113 @@ function captureLoadingPreviewCameraPreset() {
     targetX: loadingPreviewCameraTarget.x,
     targetY: loadingPreviewCameraTarget.y,
     targetZ: loadingPreviewCameraTarget.z
+  }
+}
+// `captureCurrent` for the `loadingPreviewSavedLighting` list-picker --
+// captures the loading preview's OWN key/hemi lights (not the main
+// scene's), same shape as the main Lighting group's own
+// captureLightingPreset(), reused via LIGHTING_PRESET_KEYS.
+function captureLoadingPreviewLightingPreset() {
+  if (!loadingPreviewKeyLightRef || !loadingPreviewHemiLightRef) return {}
+  // Re-derive azimuth/elevation from the live light position -- the
+  // inverse of applyLoadingPreviewLighting()'s own forward formula
+  // (r*cos(el)*cos(az), r*sin(el), r*cos(el)*sin(az)).
+  const p = loadingPreviewKeyLightRef.position
+  const r = p.length() || 1
+  const elevation = THREE.MathUtils.radToDeg(Math.asin(THREE.MathUtils.clamp(p.y / r, -1, 1)))
+  const azimuth = ((THREE.MathUtils.radToDeg(Math.atan2(p.z, p.x)) % 360) + 360) % 360
+  return {
+    keyAzimuth: azimuth,
+    keyElevation: elevation,
+    keyTargetHeight: LIGHTING_KEY_DEFAULTS.keyTargetHeight,
+    keyIntensity: loadingPreviewKeyLightRef.intensity,
+    keyColor: '#' + loadingPreviewKeyLightRef.color.getHexString(),
+    ambientIntensity: loadingPreviewHemiLightRef.intensity,
+    ambientSkyColor: '#' + loadingPreviewHemiLightRef.color.getHexString(),
+    ambientGroundColor: '#' + loadingPreviewHemiLightRef.groundColor.getHexString()
+  }
+}
+// -----------------------------------------------------------------------
+// HANDO coordinate-frame converters (direct request, 2026-09-19: "so
+// being able to port and read Hando's exported data is very important").
+// HANDY DANDIES rotates every hand clone by `alignQuat` (measured once
+// from this model's own bind pose -- see alignQuat's own declaration
+// comment); HANDO has no equivalent correction (its own modelRoot uses
+// the raw GLTF orientation plus its own separate, independently-tuned
+// Whole-Hand Rotation sliders). A camera/light captured in HANDO is
+// therefore in a DIFFERENT coordinate frame than this project's own
+// alignQuat-rotated one -- pasting HANDO's raw numbers in directly
+// points the camera at empty space (confirmed live, 2026-09-19: HANDO's
+// own "Left" preset applied unconverted made the Loading Preview hand
+// disappear entirely).
+//
+// VALIDATED via a standalone measurement script (this GLB's own bind-
+// pose bones, outside the running app, not committed): rotating HANDO's
+// "Left" preset's target by this exact `alignQuat` lands it ~3 world
+// units from the wrist-to-fingertip midline (handLengthRaw ~16 units
+// total) -- essentially on the hand's own central axis, confirming
+// HANDO's saved cameras were captured at the model's raw/un-rotated
+// bind pose (Whole-Hand Rotation at 0), not whatever HANDO's OWN
+// Whole-Hand Rotation sliders currently happen to read.
+//
+// Deliberately only wired onto the Loading Preview's own local
+// `loadingPreviewSavedCameras`/`loadingPreviewSavedLighting` lists (see
+// each control's own DEV_GROUPS comment) -- the main field's own
+// `savedCameras`/`savedLighting` frame the WHOLE FIELD at a completely
+// different (field-radius) scale HANDO has no equivalent of, so this
+// same conversion wouldn't be meaningful there.
+function convertHandoCameraPreset(rawItem) {
+  const item = normalizeCameraPresetItem(rawItem)
+  const pos = new THREE.Vector3(
+    item.cameraX ?? CAMERA_KEY_DEFAULTS.cameraX,
+    item.cameraY ?? CAMERA_KEY_DEFAULTS.cameraY,
+    item.cameraZ ?? CAMERA_KEY_DEFAULTS.cameraZ
+  ).applyQuaternion(alignQuat)
+  const target = new THREE.Vector3(
+    item.targetX ?? 0,
+    item.targetY ?? 0,
+    item.targetZ ?? 0
+  ).applyQuaternion(alignQuat)
+  return {
+    name: rawItem.name,
+    ...(rawItem.group ? { group: rawItem.group } : {}),
+    cameraX: pos.x, cameraY: pos.y, cameraZ: pos.z,
+    cameraFov: item.cameraFov ?? CAMERA_KEY_DEFAULTS.cameraFov,
+    targetX: target.x, targetY: target.y, targetZ: target.z
+  }
+}
+// Converts a HANDO-authored keyAzimuth/keyElevation pair into this
+// project's own convention. Not a simple rotation-of-the-angle-numbers --
+// the 2 apps' own azimuth/elevation formulas assign X/Z differently
+// (HANDO: x=cos(el)*sin(az), z=cos(el)*cos(az); HANDY DANDIES here:
+// x=cos(el)*cos(az), z=cos(el)*sin(az) -- see updateKeyLightPosition()'s
+// own comment), so this reconstructs HANDO's own direction VECTOR first
+// (using HANDO's formula), rotates that vector by `alignQuat` (same
+// reasoning as the camera converter above), then re-derives azimuth/
+// elevation from the rotated vector using THIS project's own formula.
+// keyTargetHeight/intensity/colors pass through unconverted -- height is
+// a plain percentage of the hand's own radius (frame-independent), and
+// intensity/color have no coordinate-frame component at all.
+function convertHandoLightingPreset(rawItem) {
+  const az = THREE.MathUtils.degToRad(rawItem.keyAzimuth ?? LIGHTING_KEY_DEFAULTS.keyAzimuth)
+  const el = THREE.MathUtils.degToRad(rawItem.keyElevation ?? LIGHTING_KEY_DEFAULTS.keyElevation)
+  // HANDO's own spherical convention (see its updateKeyLightPosition()).
+  const dir = new THREE.Vector3(Math.cos(el) * Math.sin(az), Math.sin(el), Math.cos(el) * Math.cos(az))
+  dir.applyQuaternion(alignQuat)
+  // This project's own spherical convention, inverted.
+  const elevation = THREE.MathUtils.radToDeg(Math.asin(THREE.MathUtils.clamp(dir.y, -1, 1)))
+  const azimuth = ((THREE.MathUtils.radToDeg(Math.atan2(dir.z, dir.x)) % 360) + 360) % 360
+  return {
+    name: rawItem.name,
+    ...(rawItem.group ? { group: rawItem.group } : {}),
+    keyAzimuth: azimuth,
+    keyElevation: elevation,
+    keyTargetHeight: rawItem.keyTargetHeight ?? LIGHTING_KEY_DEFAULTS.keyTargetHeight,
+    keyIntensity: rawItem.keyIntensity ?? LIGHTING_KEY_DEFAULTS.keyIntensity,
+    keyColor: rawItem.keyColor ?? LIGHTING_KEY_DEFAULTS.keyColor,
+    ambientIntensity: rawItem.ambientIntensity ?? LIGHTING_KEY_DEFAULTS.ambientIntensity,
+    ambientSkyColor: rawItem.ambientSkyColor ?? LIGHTING_KEY_DEFAULTS.ambientSkyColor,
+    ambientGroundColor: rawItem.ambientGroundColor ?? LIGHTING_KEY_DEFAULTS.ambientGroundColor
   }
 }
 // Independent render loop for the on-demand "live" preview
@@ -4580,7 +4764,9 @@ const clickHoldPoseTriggers = Object.fromEntries(CLICK_HOLD_KEYS.map((p) => [p, 
   speedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], speedRangeParsed: { min: 50, max: 2000 },
   tweenStartCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStartRangeParsed: { min: 0, max: 300 },
   retransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionRangeParsed: { min: 0, max: 300 },
-  tweenRetransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenRetransitionRangeParsed: { min: 0, max: 300 }
+  tweenRetransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenRetransitionRangeParsed: { min: 0, max: 300 },
+  tweenStopStartCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStopStartRangeParsed: { min: 0, max: 300 },
+  tweenStopDelayCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStopDelayRangeParsed: { min: 0, max: 2000 }
 }]))
 function parseClickHoldConfig(p) {
   const t = clickHoldPoseTriggers[p]
@@ -4607,6 +4793,12 @@ function parseClickHoldConfig(p) {
   // release behavior of its own at all.
   try { t.tweenRetransitionCurveParsed = JSON.parse(cfg[`${p}TweenRetransitionStartTimeCurve`]).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
   try { t.tweenRetransitionRangeParsed = JSON.parse(cfg[`${p}TweenRetransitionStartTimeRange`]) } catch (e) { /* keep last-good value */ }
+  // Tween Stop's own 2 curve/range pairs -- see the control's own
+  // DEV_GROUPS comment for the full reasoning.
+  try { t.tweenStopStartCurveParsed = JSON.parse(cfg[`${p}TweenStopStartTimeCurve`]).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
+  try { t.tweenStopStartRangeParsed = JSON.parse(cfg[`${p}TweenStopStartTimeRange`]) } catch (e) { /* keep last-good value */ }
+  try { t.tweenStopDelayCurveParsed = JSON.parse(cfg[`${p}TweenStopDelayCurve`]).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
+  try { t.tweenStopDelayRangeParsed = JSON.parse(cfg[`${p}TweenStopDelayRange`]) } catch (e) { /* keep last-good value */ }
 }
 function getOrInitHandCHP(hand) {
   if (!hand._chp) hand._chp = {}
@@ -4624,7 +4816,7 @@ function getOrInitHandCHP(hand) {
   // keys.
   CLICK_HOLD_KEYS.forEach((p) => {
     if (hand._chp[p]) return
-    hand._chp[p] = { phase: 'idle', forwardStartTime: 0, forwardSnapshot: null, tweenPosesResolved: null, loopStartTime: 0, loopHoldEndTime: 0, loopDirection: 1, retransitionDelay: 0, retransitionStart: null, retransitionStartTime: 0, retransitionIsTween: false, lastAppliedValues: null, frozenSplayDeg: 0, pendingClaimAt: 0, armedForHoldStartTime: -1, pendingFrozenSplayDeg: 0, frozenSpeedMs: 0, pendingFrozenSpeedMs: 0, releasePending: false }
+    hand._chp[p] = { phase: 'idle', forwardStartTime: 0, forwardSnapshot: null, tweenPosesResolved: null, loopStartTime: 0, loopHoldEndTime: 0, loopDirection: 1, retransitionDelay: 0, retransitionStart: null, retransitionStartTime: 0, retransitionIsTween: false, lastAppliedValues: null, frozenSplayDeg: 0, pendingClaimAt: 0, armedForHoldStartTime: -1, pendingFrozenSplayDeg: 0, frozenSpeedMs: 0, pendingFrozenSpeedMs: 0, releasePending: false, stoppingStartTime: 0, stoppingStartDelay: 0, stoppingDelayMs: 1, stoppingLastFrameTime: 0, stoppingBaseElapsedMs: 0, stoppingVirtualElapsedMs: 0, stoppingWasLooping: false, stoppingFreezeAtEnd: false }
   })
   return hand._chp
 }
@@ -5107,6 +5299,51 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
         else chp.loopStartTime = now // no hold configured -- restart the lap clock seamlessly, same as the old always-continuous behavior
       }
     }
+  } else if (chp.phase === 'stopping') {
+    // Tween Stop Delay's own deceleration -- direct spec item, see
+    // endClickHoldPose()'s own comment for the full reasoning and the
+    // disclosed looping-vs-forward simplification. All per-hand staggers
+    // (stoppingStartDelay/stoppingDelayMs) were already resolved once, at
+    // release time, in endClickHoldPose() -- this phase just advances a
+    // virtual elapsed-time accumulator at a linearly-decaying rate (1 ->
+    // 0 over `chp.stoppingDelayMs`) instead of real wall-clock time, so
+    // the tween's own effective playback speed visibly slows to a stop
+    // rather than continuing at full speed until it's abruptly cut off.
+    const dt = Math.max(0, now - chp.stoppingLastFrameTime)
+    chp.stoppingLastFrameTime = now
+    const elapsedSinceRelease = now - chp.stoppingStartTime
+    if (elapsedSinceRelease < chp.stoppingStartDelay) {
+      // Still waiting for this hand's own Tween Stop Start Time stagger
+      // to begin -- completely frozen at whatever was already showing,
+      // same convention as every other phase's own pre-stagger hold.
+      applyPoseValuesToHand(hand, chp.lastAppliedValues, chp.frozenSplayDeg)
+      applyOffsetRotationToHand(hand, p, 1)
+      return
+    }
+    const tDecay = THREE.MathUtils.clamp((elapsedSinceRelease - chp.stoppingStartDelay) / chp.stoppingDelayMs, 0, 1)
+    const decayFactor = 1 - tDecay // linear ease-out to 0 -- "progressively slowdown to a stop"
+    let values
+    if (chp.stoppingWasLooping) {
+      // Disclosed simplification (see endClickHoldPose()'s own comment)
+      // -- an already-cycling hand just holds its release-moment pose
+      // for the whole delay rather than continuing to visibly animate.
+      values = chp.lastAppliedValues
+    } else {
+      const speedMs = Math.max(safeTweenSpeedMs(cfg[`${p}TweenSpeedMs`]), 1)
+      chp.stoppingVirtualElapsedMs += dt * decayFactor
+      const progress = THREE.MathUtils.clamp((chp.stoppingBaseElapsedMs + chp.stoppingVirtualElapsedMs) / speedMs, 0, 1)
+      values = (chp.tweenPosesResolved && chp.tweenPosesResolved.length >= 2) ? lerpTweenSequence(chp.tweenPosesResolved, progress) : chp.lastAppliedValues
+    }
+    chp.lastAppliedValues = values
+    applyPoseValuesToHand(hand, values, chp.frozenSplayDeg)
+    applyOffsetRotationToHand(hand, p, 1)
+    if (tDecay >= 1) {
+      if (chp.stoppingFreezeAtEnd) { chp.phase = 'idle'; return } // "the hand will just stop where it is"
+      chp.retransitionStart = values
+      chp.retransitionStartTime = now
+      chp.retransitionDelay = 0 // the deceleration itself already served as this hand's own stop stagger
+      chp.phase = 'retransition'
+    }
   } else if (chp.phase === 'retransition') {
     // Tween mode's own dedicated Retransition Speed (direct request --
     // see makeClickHoldPoseGroup()'s own comment) -- `chp.retransitionIsTween`
@@ -5229,7 +5466,20 @@ function endClickHoldPose(p) {
     // staying there forever -- "the hand stays at end pose forever."
     // Sequence/Tween mode's own release always retransitions (disclosed
     // scoping choice, see the control's own comment).
-    if (!chp.retransitionIsTween && cfg[`${p}RetransitionEnabled`] === false) return
+    // CORRECTED 2026-09-19: RetransitionEnabled now ALSO governs Sequence
+    // mode's own 'Stop' path, not just Single Pose -- re-read the
+    // verbatim spec text ("whether or not they retransition to the
+    // default pose will depend on the settings i already described in
+    // Click mode. If Retransition is turned off, the hand will just stop
+    // where it is"), which directly contradicts this file's own earlier
+    // "Sequence mode's own release always retransitions" scoping note.
+    // Still early-returns immediately (freeze forever, same as Single
+    // Pose) UNLESS Tween Stop Delay is also on, in which case the
+    // deceleration below still needs to run before freezing -- see the
+    // `tweenStopDelayOn` branch just below.
+    const retransitionOff = cfg[`${p}RetransitionEnabled`] === false
+    const tweenStopDelayOn = chp.retransitionIsTween && !!cfg[`${p}TweenStopDelayEnabled`]
+    if (retransitionOff && !tweenStopDelayOn) return
     // On Release Mode = 'Complete Sequence' (Sequence mode only, direct
     // spec item) -- don't stop now; leave `chp.phase` exactly as it is
     // (still 'forward' or 'looping', genuinely mid-playback) and just
@@ -5239,6 +5489,37 @@ function endClickHoldPose(p) {
     // see their own matching comments for the full account.
     if (chp.retransitionIsTween && cfg[`${p}OnReleaseMode`] === 'Complete Sequence') {
       chp.releasePending = true
+      return
+    }
+    // Tween Stop Delay (Sequence mode's own 'Stop' path, direct spec
+    // item, corrected 2026-09-19) -- instead of jumping straight to
+    // retransition, the sequence keeps playing while its own tween speed
+    // decays to zero over `${p}TweenStopDelayMs` ("so the pose does not
+    // abruptly stop but instead slows down to a stop"). See
+    // updateClickHoldPoseForHand()'s own 'stopping' phase for the actual
+    // per-frame deceleration math. Simplification, disclosed: a hand
+    // already in 'looping' (Loop Mode engaged) at release just HOLDS its
+    // current pose for the delay's own duration rather than continuing
+    // to visibly animate through it -- correctly decelerating an
+    // in-progress FORWARD pass (the common case: releasing during the
+    // initial tween-in) is fully implemented; decelerating an
+    // already-cycling loop's own continued motion is not, since that
+    // needs tracking which lap/direction/oscillate-state it was in, a
+    // meaningfully bigger undertaking deferred for now.
+    if (tweenStopDelayOn) {
+      chp.stoppingStartTime = now
+      chp.stoppingStartDelay = cfg[`${p}TweenStopStartTimeCurveEnabled`]
+        ? computeStartDelayMs(dists[i], minD, range, trig.tweenStopStartCurveParsed, trig.tweenStopStartRangeParsed)
+        : 0
+      chp.stoppingDelayMs = Math.max(cfg[`${p}TweenStopDelayCurveEnabled`]
+        ? computeStartDelayMs(dists[i], minD, range, trig.tweenStopDelayCurveParsed, trig.tweenStopDelayRangeParsed)
+        : (cfg[`${p}TweenStopDelayMs`] || 0), 1)
+      chp.stoppingLastFrameTime = now
+      chp.stoppingWasLooping = chp.phase === 'looping'
+      chp.stoppingBaseElapsedMs = chp.stoppingWasLooping ? 0 : Math.max(now - chp.forwardStartTime, 0)
+      chp.stoppingVirtualElapsedMs = 0
+      chp.stoppingFreezeAtEnd = retransitionOff
+      chp.phase = 'stopping'
       return
     }
     chp.retransitionStart = chp.lastAppliedValues || { ...poseDefaultValues }
@@ -6102,6 +6383,17 @@ function buildClickHoldPoseWidgets(p) {
   // same shape as the pair immediately above, just Tween-mode's own.
   if (tweenRetransCurveRow) buildGenericCurveWidget(tweenRetransCurveRow, { caption: curveCaption, defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
   if (tweenRetransRangeRow) buildGenericRangeBarWidget(tweenRetransRangeRow, { trackMin: 0, trackMax: CLICK_HOLD_START_TIME_TRACK_MAX, unit: 'ms', defaultValue: { min: 0, max: 300 } })
+  // Tween Stop's own 2 curve/range widgets -- same interactive-widget
+  // treatment as every other curve field in this function.
+  const tweenStopStartCurveRow = document.querySelector(`.dp-row[data-key="${p}TweenStopStartTimeCurve"]`)
+  const tweenStopStartRangeRow = document.querySelector(`.dp-row[data-key="${p}TweenStopStartTimeRange"]`)
+  if (tweenStopStartCurveRow) buildGenericCurveWidget(tweenStopStartCurveRow, { caption: curveCaption, defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
+  if (tweenStopStartRangeRow) buildGenericRangeBarWidget(tweenStopStartRangeRow, { trackMin: 0, trackMax: CLICK_HOLD_START_TIME_TRACK_MAX, unit: 'ms', defaultValue: { min: 0, max: 300 } })
+  const tweenStopDelayCurveRow = document.querySelector(`.dp-row[data-key="${p}TweenStopDelayCurve"]`)
+  const tweenStopDelayRangeRow = document.querySelector(`.dp-row[data-key="${p}TweenStopDelayRange"]`)
+  const tweenStopDelayCurveCaption = 'X: Distance From Cursor (%, Nearest→Farthest Hand At Trigger Time)  ·  Y: Delay Fraction (0=Min, 1=Max)'
+  if (tweenStopDelayCurveRow) buildGenericCurveWidget(tweenStopDelayCurveRow, { caption: tweenStopDelayCurveCaption, defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
+  if (tweenStopDelayRangeRow) buildGenericRangeBarWidget(tweenStopDelayRangeRow, { trackMin: 0, trackMax: 5000, unit: 'ms', defaultValue: { min: 0, max: 2000 } })
 }
 // Runs now, not back up near the other widgets' own setup calls (parse-
 // ArmLengthConfig()/buildWristSplayWidgets() etc.) -- this needs
@@ -6244,10 +6536,11 @@ function renderCustomClickFunctionGroup(id, title, kind, family) {
   if (kind === 'hold') {
     parseClickHoldConfig(id)
     buildClickHoldPoseWidgets(id)
-    updateClickTriggerModeVisibility(id, [], ['LoopMode', 'OnReleaseMode', 'TriggerAllHands'])
+    updateClickTriggerModeVisibility(id, [], ['LoopMode', 'OnReleaseMode', 'TriggerAllHands', 'TweenStopStartTimeCurveEnabled', 'TweenStopDelayEnabled'])
     updateLoopHoldVisibility(id)
     updateOffsetRotationVisibility(id)
     updateSingleTimingGateVisibility(id)
+    updateTweenStopGateVisibility(id)
   } else {
     parseClickPoseConfig(id)
     buildClickPoseWidgets(id)
@@ -6260,6 +6553,11 @@ function renderCustomClickFunctionGroup(id, title, kind, family) {
   // Curve/Retransition gated-subgroup wrapping the 10 static triggers
   // get -- see wrapClickFunctionGatedSubgroups()'s own comment.
   wrapClickFunctionGatedSubgroups(id)
+  // Same Master On/Off "hide all settings when off" behavior the 10
+  // static triggers get -- see updateClickFunctionEnabledVisibility()'s
+  // own comment. Must run AFTER the wrapping above (it iterates the
+  // group body's CURRENT direct children).
+  updateClickFunctionEnabledVisibility(id)
 }
 // Registers a new (or, on restore, a previously-saved) custom function
 // into every generic pipeline this project's existing 10 triggers
@@ -6278,7 +6576,9 @@ function registerCustomClickFunction(id, title, kind, family) {
       speedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], speedRangeParsed: { min: 50, max: 2000 },
       tweenStartCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStartRangeParsed: { min: 0, max: 300 },
       retransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionRangeParsed: { min: 0, max: 300 },
-      tweenRetransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenRetransitionRangeParsed: { min: 0, max: 300 }
+      tweenRetransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenRetransitionRangeParsed: { min: 0, max: 300 },
+      tweenStopStartCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStopStartRangeParsed: { min: 0, max: 300 },
+      tweenStopDelayCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStopDelayRangeParsed: { min: 0, max: 2000 }
     }
   } else {
     CLICK_POSE_KEYS.push(id)
@@ -6465,19 +6765,62 @@ function updateSingleTimingGateVisibility(p) {
     const row = document.querySelector(`.dp-row[data-key="${p}${suffix}"]`)
     if (row) row.style.display = visible ? '' : 'none'
   }
-  setRow('SpeedCurveEnabled', showBase)
+  // CORRECTED 2026-09-19: the 3 "Enabled" gate rows now live inside their
+  // own nested group's HEADER (wrapGatedSubgroup(), see its own comment)
+  // -- hiding just the row when `showBase` is false used to leave an
+  // orphaned, empty-looking group behind (a title with no checkbox, no
+  // visible members) whenever Mode isn't Single Pose. `setGateRow` also
+  // hides the row's own closest `.dp-group` container in that case, so
+  // the whole "Animation Speed Curve"/"Start Time Curve"/"Retransition"
+  // group disappears entirely outside Single Pose mode instead of
+  // leaving a hollow shell.
+  const setGateRow = (suffix, visible) => {
+    const row = document.querySelector(`.dp-row[data-key="${p}${suffix}"]`)
+    if (!row) return
+    row.style.display = visible ? '' : 'none'
+    const grp = row.closest('.dp-group')
+    if (grp) grp.style.display = visible ? '' : 'none'
+  }
+  setGateRow('SpeedCurveEnabled', showBase)
   const speedOn = showBase && !!cfg[`${p}SpeedCurveEnabled`]
   setRow('SpeedCurve', speedOn)
   setRow('SpeedCurveRange', speedOn)
-  setRow('StartTimeCurveEnabled', showBase)
+  setGateRow('StartTimeCurveEnabled', showBase)
   const startOn = showBase && cfg[`${p}StartTimeCurveEnabled`] !== false
   setRow('StartTimeCurve', startOn)
   setRow('StartTimeRange', startOn)
-  setRow('RetransitionEnabled', showBase)
+  setGateRow('RetransitionEnabled', showBase)
   const retransitionOn = showBase && cfg[`${p}RetransitionEnabled`] !== false
   setRow('RetransitionSpeedMs', retransitionOn)
   setRow('RetransitionStartTimeCurve', retransitionOn)
   setRow('RetransitionStartTimeRange', retransitionOn)
+}
+// Tween Stop's own sub-gating (Sequence mode only, hold-based triggers
+// only) -- see the control's own DEV_GROUPS comment for the full
+// reasoning. `TweenStopStartTimeCurveEnabled`/`TweenStopDelayEnabled`
+// themselves are Mode-gated by updateClickTriggerModeVisibility()'s own
+// extraTweenKeys list (called alongside this function everywhere it's
+// called); this function owns the finer sub-visibility one level down
+// (the curve/range pair under each Enabled checkbox, and
+// TweenStopDelayCurveEnabled's own row, which only makes sense once
+// TweenStopDelayEnabled is on). Re-checks `isSequence` itself too, so
+// it stays correct even if called on its own outside the Mode-change
+// handler.
+function updateTweenStopGateVisibility(p) {
+  const isSequence = cfg[`${p}Mode`] === 'Sequence'
+  const setRow = (suffix, visible) => {
+    const row = document.querySelector(`.dp-row[data-key="${p}${suffix}"]`)
+    if (row) row.style.display = visible ? '' : 'none'
+  }
+  const startCurveOn = isSequence && !!cfg[`${p}TweenStopStartTimeCurveEnabled`]
+  setRow('TweenStopStartTimeCurve', startCurveOn)
+  setRow('TweenStopStartTimeRange', startCurveOn)
+  const delayOn = isSequence && !!cfg[`${p}TweenStopDelayEnabled`]
+  setRow('TweenStopDelayMs', delayOn)
+  setRow('TweenStopDelayCurveEnabled', delayOn)
+  const delayCurveOn = delayOn && !!cfg[`${p}TweenStopDelayCurveEnabled`]
+  setRow('TweenStopDelayCurve', delayCurveOn)
+  setRow('TweenStopDelayRange', delayCurveOn)
 }
 // Sequence Mode - Count/Loop/Oscillate's own visibility, for the 5
 // fire-and-forget triggers only (click/dblclick/rc/tripleClick/
@@ -6525,7 +6868,7 @@ CLICK_POSE_KEYS.forEach((p) => { parseClickPoseConfig(p); buildClickPoseWidgets(
 // that. Click Pose/Double-Click Pose/Right Click share CLICK_POSE_KEYS'
 // own Pause Duration slider; Click Hold-Pose/Right-Click Hold-Pose don't.
 CLICK_POSE_KEYS.forEach((p) => { updateClickTriggerModeVisibility(p, ['PauseDurationMs']); updateOffsetRotationVisibility(p); updateSingleTimingGateVisibility(p); updateSequencePlayModeVisibility(p) })
-CLICK_HOLD_KEYS.forEach((p) => { updateClickTriggerModeVisibility(p, [], ['LoopMode', 'OnReleaseMode', 'TriggerAllHands']); updateLoopHoldVisibility(p); updateOffsetRotationVisibility(p); updateSingleTimingGateVisibility(p) })
+CLICK_HOLD_KEYS.forEach((p) => { updateClickTriggerModeVisibility(p, [], ['LoopMode', 'OnReleaseMode', 'TriggerAllHands', 'TweenStopStartTimeCurveEnabled', 'TweenStopDelayEnabled']); updateLoopHoldVisibility(p); updateOffsetRotationVisibility(p); updateSingleTimingGateVisibility(p); updateTweenStopGateVisibility(p) })
 // Offset/Rotation/Animation Speed Curve/Start Time Curve/Retransition as
 // "mandatory gated subgroups" -- direct request ("Offset, Rotation,
 // Animaiton Speed Curve, Start Time Curve, Retransition will all be
@@ -6583,6 +6926,48 @@ function wrapAllClickFunctionGatedSubgroups() {
   ;[...CLICK_HOLD_KEYS, ...CLICK_POSE_KEYS].forEach(wrapClickFunctionGatedSubgroups)
 }
 wrapAllClickFunctionGatedSubgroups()
+// "Click Function On/Off Checkbox. If Off, hide all settings for this
+// function" -- direct spec item, corrected 2026-09-19 after re-reading
+// the verbatim original spec text (previously unbuilt -- an earlier
+// pass had only gated the trigger LOGIC on this checkbox, never the
+// dev-panel VISIBILITY of its other settings). Blanket-hides every
+// OTHER direct child of the trigger's own group body (every plain row
+// -- Type/Mode/TargetPose/etc. -- AND every nested gated-subgroup
+// container -- Offset/Rotation/Animation Speed Curve/Start Time Curve/
+// Retransition, all now direct children after wrapGatedSubgroup()
+// relocated their own member rows one level deeper) when Enabled is
+// off, leaving only the Enabled checkbox itself visible. When turning
+// back on, re-invokes the trigger's own finer-grained visibility
+// functions afterward -- the blanket "show everything" sweep would
+// otherwise incorrectly un-hide something those functions had already
+// correctly hidden for an unrelated reason (e.g. a Sequence-mode
+// trigger's own Single-Pose-only gated subgroups).
+function updateClickFunctionEnabledVisibility(p) {
+  const enabledRow = document.querySelector(`.dp-row[data-key="${p}Enabled"]`)
+  if (!enabledRow) return
+  const group = enabledRow.closest('.dp-group')
+  if (!group) return
+  const body = group.querySelector(':scope > .dp-group-body')
+  if (!body) return
+  const enabled = !!cfg[`${p}Enabled`]
+  Array.from(body.children).forEach((child) => {
+    if (child === enabledRow) return
+    child.style.display = enabled ? '' : 'none'
+  })
+  if (!enabled) return // fully hidden -- nothing further to reconcile
+  const isHoldKind = CLICK_HOLD_KEYS.includes(p)
+  if (isHoldKind) {
+    updateClickTriggerModeVisibility(p, [], ['LoopMode', 'OnReleaseMode', 'TriggerAllHands', 'TweenStopStartTimeCurveEnabled', 'TweenStopDelayEnabled'])
+    updateLoopHoldVisibility(p)
+    updateTweenStopGateVisibility(p)
+  } else {
+    updateClickTriggerModeVisibility(p, ['PauseDurationMs'])
+    updateSequencePlayModeVisibility(p)
+  }
+  updateOffsetRotationVisibility(p)
+  updateSingleTimingGateVisibility(p)
+}
+;[...CLICK_HOLD_KEYS, ...CLICK_POSE_KEYS].forEach(updateClickFunctionEnabledVisibility)
 updateLoadingPreviewSequenceVisibility()
 // Bug fix (direct user report, "I dont see any of the saved poses in the
 // dropdown"): a `select` control's <option> list is populated by

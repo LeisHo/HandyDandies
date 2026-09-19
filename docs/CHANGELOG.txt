@@ -7469,6 +7469,100 @@ guaranteeing a fresh fetch of this slice's content); `devpanel/devPanel.js?v=28`
 click-guard addition).
 
 --------------------------------------------------------------------------------
+
+2026-09-19 19:15:02-19:28:58 EDT (13m56s)
+
+**Fixed the REAL root cause of "I dont see the loading hand" (2
+sessions back) and added a proper HANDO camera/lighting import
+pipeline for the Loading Preview.** Direct follow-up after the
+`loadingPreviewCameraSelector` architecture change (previous
+Loading-Preview-scoped entries): pointing it at "Left" (a real HANDO-
+imported camera, same numeric values in both projects' own settings
+files) made the preview hand disappear ENTIRELY. Root-caused via a
+standalone measurement script (three.js in a scratchpad Node
+environment, loading this GLB directly, outside the running app,
+never committed): HANDY DANDIES rotates every hand clone by
+`alignQuat` (measured once from this model's own bind pose, aligning
+wrist->fingertip to -Z); HANDO has no equivalent correction (its own
+`modelRoot` uses the raw GLTF orientation plus its own separate,
+independently-tuned Whole-Hand Rotation sliders). A camera captured in
+HANDO is therefore in a DIFFERENT coordinate frame -- its raw numbers
+point at empty space once HDD's own alignQuat rotation is applied.
+
+**Validated the fix mathematically before writing any UI around it**
+(direct user follow-up, "2" -- build the converter, not just point at
+empty by default): rotating HANDO's "Left" target by this exact
+`alignQuat` lands it ~3 world units from the wrist-to-fingertip
+midline (handLengthRaw ~16 units total) -- essentially on the hand's
+own central axis, confirming HANDO's saved cameras were captured at
+the model's raw bind pose (Whole-Hand Rotation at 0), not whatever
+HANDO's own sliders currently happen to read (85 deg/20 deg at the
+time this was checked -- unrelated leftover state, not what "Left"
+etc. were captured under).
+
+**New architecture, all direct follow-up requests in the same
+exchange:**
+- `loadingPreviewSavedCameras` and (new) `loadingPreviewSavedLighting`
+  -- 2 local list-pickers, own to the Loading Preview only, separate
+  from the main field's own `savedCameras`/`savedLighting` ("so the
+  camera settings for the loading preview should be local to that
+  only" / "lighitng settings for the loading preview will also be
+  local to that, and the hand field itself wil have its own").
+  Deliberately NOT extended to the main field's own lists -- those
+  frame the WHOLE FIELD at field-radius scale, a fundamentally
+  different context HANDO (single-hand-only) has no equivalent of, so
+  the same conversion wouldn't be physically meaningful there.
+- `convertHandoCameraPreset(item)` -- rotates a HANDO camera's
+  position+target by `alignQuat` (`normalizeCameraPresetItem()`'s own
+  either-naming acceptance reused, so HANDO's raw x/y/z/tx/ty/tz/fov
+  export works directly).
+- `convertHandoLightingPreset(item)` -- NOT a simple angle rotation:
+  HANDO's own `updateKeyLightPosition()` and HDD's own assign X/Z to
+  sin(az)/cos(az) OPPOSITELY (confirmed by direct comparison of both
+  projects' source). Reconstructs HANDO's own direction vector from
+  its azimuth/elevation (using HANDO's own formula), rotates that
+  vector by `alignQuat`, then re-derives azimuth/elevation using HDD's
+  own formula, inverted (verified via a round-trip self-consistency
+  check: HDD's own forward+inverse formula reproduces the exact input
+  angle for 5 test cases, confirming the inverse formula itself is
+  correct before trusting it on rotated HANDO data).
+- `devPanel.js` gained one small, additive, backward-compatible hook:
+  `ctrl.importTransform`, called on each incoming item during the
+  existing clipboard-based `importable: true` Import flow, right
+  before the existing merge-by-name logic -- a control without this
+  property behaves exactly as before. Wired to the 2 converters above
+  on the Loading Preview's own 2 new lists only.
+- `captureLoadingPreviewCameraPreset()`/`captureLoadingPreviewLightingPreset()`
+  -- `captureCurrent` for the 2 new list-pickers' own Save button,
+  reading wherever the Loading Preview's own camera/lights currently
+  are (module-level `loadingPreviewCameraTarget`/
+  `loadingPreviewKeyLightRef`/`loadingPreviewHemiLightRef`, since this
+  preview has no interactive OrbitControls of its own to read a live
+  target from, unlike the main camera).
+
+**Verified live, end-to-end** (after several environment-truncation
+retries on `main.js`/`devpanel/devPanel.js` -- this project's own
+already-documented sandbox gotcha, not a code issue): applied the
+EXACT converted values my standalone Node script computed directly to
+the running app's `loadingPreviewSavedCameras`, selected it, and
+screenshotted -- a clearly recognizable, well-framed hand (knuckles,
+fingers, thumb all visible) appeared, confirming the live app's own
+real `alignQuat` matches the standalone script's independently-
+measured one. Same live test for lighting (HANDO's own default
+az=40/el=55 converted and applied) -- clean shading with a visible,
+correctly-directed highlight, no degenerate/black result. The
+Import-button's own clipboard-paste UI path itself was NOT re-tested
+live (this automation environment's Document isn't focused, so
+`navigator.clipboard.writeText()` throws `NotAllowedError` even after
+an explicit `window.focus()`) -- its own merge-by-name/commit logic is
+pre-existing, unchanged code already exercised by the pose
+import/export feature; only the new `importTransform` call itself is
+new, and it's a single, directly-tested function call.
+
+Cache-busters: `index.html`'s own `main.js?v=152` -> `?v=153`;
+`devpanel/devPanel.js?v=29` -> `?v=30`.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

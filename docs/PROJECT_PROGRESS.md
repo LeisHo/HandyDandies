@@ -18,6 +18,26 @@ work seamlessly from there.
 
 ## Currently working on
 
+**SHIPPED 2026-09-19: HANDO camera/lighting import pipeline for the
+Loading Preview + its own local saved-camera/lighting lists.** Found
+the REAL reason "Left" (a HANDO-imported camera) made the Loading
+Preview hand disappear: HANDY DANDIES rotates every hand clone by
+`alignQuat` (a per-model bind-pose alignment HANDO has no equivalent
+of), so HANDO's own camera/lighting coordinates are in a different
+frame. Validated the fix mathematically (a standalone, never-committed
+Node script measuring this GLB's own bind pose independently) before
+building any UI, then built `convertHandoCameraPreset()`/
+`convertHandoLightingPreset()`, a new small `ctrl.importTransform`
+hook in devPanel.js's existing clipboard-import flow, and 2 new local
+list-pickers (`loadingPreviewSavedCameras`,
+`loadingPreviewSavedLighting`) separate from the main field's own
+(which stay untouched -- a different, field-radius-scale context
+HANDO has no equivalent of). Live-verified end-to-end: applying the
+converted "Left" camera produced a clearly recognizable, well-framed
+hand; converted default HANDO lighting produced clean, correctly-
+directed shading. See CHANGELOG.txt's matching 2026-09-19 entry for
+the full derivation and verification trail.
+
 **SHIPPED 2026-09-19: 3 rotation sliders (X/Y/Z, Deg) for the Loading
 Preview + a "Hide Hands" checkbox in Field Layout.** Rotation folds
 directly into `loadingPreviewBaseQuat` (same pattern Pose Preview's own

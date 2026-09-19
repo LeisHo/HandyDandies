@@ -424,3 +424,40 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   /computed `top`/`left`) -- don't trust a JS-exec-based layout/dimension
   query as proof of a real positioning bug; cross-check with an actual
   screenshot before concluding the page itself is broken.
+- **HANDO's saved camera/lighting presets are in a DIFFERENT coordinate
+  frame than this project's own -- never paste one in raw.** HANDY
+  DANDIES rotates every hand clone by `alignQuat` (measured once from
+  this model's own bind pose, aligning wrist->fingertip to world -Z --
+  see `alignQuat`'s own declaration comment); HANDO has no equivalent
+  correction (its own `modelRoot` sits at the raw GLTF orientation plus
+  its own separate, independently-tuned Whole-Hand Rotation sliders).
+  Confirmed live 2026-09-19: applying HANDO's own "Left" camera preset
+  (identical numeric values in both projects' own saved-camera lists)
+  made the Loading Preview hand disappear entirely -- the camera was
+  aimed at empty space, not a rendering bug. Lighting has a SECOND,
+  independent mismatch on top of the rotation: HANDO's own
+  `updateKeyLightPosition()` and this project's own assign X/Z to
+  sin(azimuth)/cos(azimuth) OPPOSITELY (confirmed by direct source
+  comparison), so a HANDO azimuth/elevation pair means a different
+  actual direction here even before any rotation is applied. Use
+  `convertHandoCameraPreset()`/`convertHandoLightingPreset()` (main.js)
+  for any HANDO-sourced camera/lighting data -- wired automatically via
+  `loadingPreviewSavedCameras`/`loadingPreviewSavedLighting`'s own
+  `importTransform` hook when pasted through those 2 list-pickers'
+  Import button, but do the conversion by hand (call the same 2
+  functions) before using HANDO data anywhere else. Validated via a
+  standalone, never-committed Node script that measures this GLB's own
+  bind-pose bones directly (outside the running app) before any UI was
+  built around the fix -- see CHANGELOG.txt's matching 2026-09-19 entry
+  for the full derivation, including the wrist-to-fingertip-midline
+  distance check that confirmed the transform.
+- **This project's own `main.js`/`devpanel/devPanel.js` are large enough
+  now (main.js ~500KB as of 2026-09-19) that BOTH files -- not just
+  main.js -- hit this sandbox's own documented network-truncation
+  gotcha on a plain static server.** Confirmed live: `devpanel/devPanel.js`
+  (165KB) failed with `net::ERR_CONNECTION_RESET` 3 times in a row on
+  one port before succeeding, the same failure pattern previously only
+  ever seen on `main.js`. Same standing practice applies to both files
+  now: retry the navigation a few times (or cross-check via `curl`
+  first), don't assume a just-made change broke something just because
+  either file fails to load this way.

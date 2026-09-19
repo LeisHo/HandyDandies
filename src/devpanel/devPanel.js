@@ -1088,12 +1088,18 @@ function buildListPickerRow(ctrl, row) {
       // Same "same-name overwrites, everything else untouched" rule as
       // Save's own button -- an import never wipes the existing list, and
       // never duplicates an already-present name.
+      // ctrl.importTransform (optional, additive) -- lets a specific
+      // list-picker convert an incoming item before it's merged in, e.g.
+      // HANDY DANDIES' own HANDO camera/lighting coordinate-frame
+      // converter (main.js). A control without this property behaves
+      // exactly as before -- untouched raw passthrough.
       let items = entry.items.slice()
       incoming.forEach((incomingItem) => {
         if (!incomingItem || typeof incomingItem.name !== 'string') return
-        const existingIndex = items.findIndex((it) => it.name === incomingItem.name)
-        if (existingIndex >= 0) items[existingIndex] = { ...incomingItem, ...(items[existingIndex].group ? { group: items[existingIndex].group } : {}) }
-        else items = items.concat([incomingItem])
+        const item = ctrl.importTransform ? ctrl.importTransform(incomingItem) : incomingItem
+        const existingIndex = items.findIndex((it) => it.name === item.name)
+        if (existingIndex >= 0) items[existingIndex] = { ...item, ...(items[existingIndex].group ? { group: items[existingIndex].group } : {}) }
+        else items = items.concat([item])
       })
       entry.items = items
       commit(ctrl, entry.items)
