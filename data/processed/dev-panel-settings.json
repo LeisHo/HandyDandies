@@ -1,8 +1,8 @@
 {
   "values": {
     "desktop": {
-      "fieldRows": 12,
-      "fieldCols": 12,
+      "fieldRows": 13,
+      "fieldCols": 10,
       "rowSpacing": 9.5,
       "columnSpacing": 10.5,
       "handScale": 1.2,
@@ -11922,9 +11922,9 @@
     },
     "landscape": {
       "fieldRows": 17,
-      "fieldCols": 24,
+      "fieldCols": 22,
       "rowSpacing": 6,
-      "columnSpacing": 9,
+      "columnSpacing": 9.5,
       "handScale": 0.85,
       "alternateRowOffset": 5,
       "progressiveRowOffset": 1,
