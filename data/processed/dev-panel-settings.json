@@ -19,7 +19,7 @@
       "loadingPreviewEnabled": true,
       "loadingPreviewShowLive": true,
       "loadingMinTimeMs": 5000,
-      "loadingPreviewTweenSelector": "Fist Rotate To Open",
+      "loadingPreviewTweenSelector": "Waiting Horizontal Tap",
       "loadingPreviewSavedCameras": [
         {
           "name": "Camera 20",
@@ -6204,7 +6204,7 @@
       "loadingPreviewEnabled": true,
       "loadingPreviewShowLive": true,
       "loadingMinTimeMs": 5000,
-      "loadingPreviewTweenSelector": "Fist Rotate To Open",
+      "loadingPreviewTweenSelector": "Waiting Horizontal Tap",
       "loadingPreviewSavedCameras": [
         {
           "name": "Camera 20",
@@ -12389,7 +12389,7 @@
       "loadingPreviewEnabled": true,
       "loadingPreviewShowLive": true,
       "loadingMinTimeMs": 5000,
-      "loadingPreviewTweenSelector": "Fist Rotate To Open",
+      "loadingPreviewTweenSelector": "Waiting Horizontal Tap",
       "loadingPreviewSavedCameras": [
         {
           "name": "Camera 20",
