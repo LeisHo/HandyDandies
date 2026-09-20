@@ -6455,47 +6455,47 @@
             "COUNTDOWN (VERT) - 1",
             {
               "type": "hold",
-              "percent": 50
+              "percent": 100
             },
             "COUNTDOWN (VERT) - 2",
             {
               "type": "hold",
-              "percent": 50
+              "percent": 100
             },
             "COUNTDOWN (VERT) - 3",
             {
               "type": "hold",
-              "percent": 50
+              "percent": 100
             },
             "COUNTDOWN (VERT) - 4",
             {
               "type": "hold",
-              "percent": 50
+              "percent": 100
             },
             "COUNTDOWN (VERT) - 5",
             {
               "type": "hold",
-              "percent": 50
+              "percent": 100
             },
             "COUNTDOWN (VERT) - 6",
             {
               "type": "hold",
-              "percent": 50
+              "percent": 100
             },
             "COUNTDOWN (VERT) - 7",
             {
               "type": "hold",
-              "percent": 50
+              "percent": 100
             },
             "COUNTDOWN (VERT) - 8",
             {
               "type": "hold",
-              "percent": 50
+              "percent": 100
             },
             "COUNTDOWN (VERT) - 9",
             {
               "type": "hold",
-              "percent": 50
+              "percent": 100
             },
             "COUNTDOWN  (VERT) - 10"
           ]
@@ -13240,47 +13240,47 @@
             "COUNTDOWN (VERT) - 1",
             {
               "type": "hold",
-              "percent": 50
+              "percent": 100
             },
             "COUNTDOWN (VERT) - 2",
             {
               "type": "hold",
-              "percent": 50
+              "percent": 100
             },
             "COUNTDOWN (VERT) - 3",
             {
               "type": "hold",
-              "percent": 50
+              "percent": 100
             },
             "COUNTDOWN (VERT) - 4",
             {
               "type": "hold",
-              "percent": 50
+              "percent": 100
             },
             "COUNTDOWN (VERT) - 5",
             {
               "type": "hold",
-              "percent": 50
+              "percent": 100
             },
             "COUNTDOWN (VERT) - 6",
             {
               "type": "hold",
-              "percent": 50
+              "percent": 100
             },
             "COUNTDOWN (VERT) - 7",
             {
               "type": "hold",
-              "percent": 50
+              "percent": 100
             },
             "COUNTDOWN (VERT) - 8",
             {
               "type": "hold",
-              "percent": 50
+              "percent": 100
             },
             "COUNTDOWN (VERT) - 9",
             {
               "type": "hold",
-              "percent": 50
+              "percent": 100
             },
             "COUNTDOWN  (VERT) - 10"
           ]
@@ -20025,47 +20025,47 @@
             "COUNTDOWN (VERT) - 1",
             {
               "type": "hold",
-              "percent": 50
+              "percent": 100
             },
             "COUNTDOWN (VERT) - 2",
             {
               "type": "hold",
-              "percent": 50
+              "percent": 100
             },
             "COUNTDOWN (VERT) - 3",
             {
               "type": "hold",
-              "percent": 50
+              "percent": 100
             },
             "COUNTDOWN (VERT) - 4",
             {
               "type": "hold",
-              "percent": 50
+              "percent": 100
             },
             "COUNTDOWN (VERT) - 5",
             {
               "type": "hold",
-              "percent": 50
+              "percent": 100
             },
             "COUNTDOWN (VERT) - 6",
             {
               "type": "hold",
-              "percent": 50
+              "percent": 100
             },
             "COUNTDOWN (VERT) - 7",
             {
               "type": "hold",
-              "percent": 50
+              "percent": 100
             },
             "COUNTDOWN (VERT) - 8",
             {
               "type": "hold",
-              "percent": 50
+              "percent": 100
             },
             "COUNTDOWN (VERT) - 9",
             {
               "type": "hold",
-              "percent": 50
+              "percent": 100
             },
             "COUNTDOWN  (VERT) - 10"
           ]
@@ -21471,7 +21471,7 @@
     },
     {
       "key": "Loading Preview",
-      "collapsed": false,
+      "collapsed": true,
       "locked": false,
       "items": [
         {
@@ -21761,7 +21761,7 @@
     },
     {
       "key": "Tween",
-      "collapsed": true,
+      "collapsed": false,
       "locked": false,
       "items": [
         {
