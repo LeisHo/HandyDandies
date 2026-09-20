@@ -6580,9 +6580,9 @@
       "quadClickHoldTweenStopDelayCurveEnabled": false,
       "quadClickHoldTweenStopDelayCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "quadClickHoldTweenStopDelayRange": "{\"min\":0,\"max\":2000}",
-      "cameraX": 6.705147213412396,
-      "cameraY": 13.507356370150985,
-      "cameraZ": 262.34845028379294,
+      "cameraX": 6.771764831909087,
+      "cameraY": 13.641555946226754,
+      "cameraZ": 264.95495964413095,
       "cameraFov": 35,
       "cameraZoom": 260.17068872666084,
       "savedCameras": [
