@@ -5875,7 +5875,11 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "poseOffsetX": 0,
+          "poseOffsetY": 0,
+          "poseOffsetZ": 0,
+          "poseScale": 1
         },
         {
           "name": "COUNTDOWN (VERT) - 9",
@@ -5930,7 +5934,11 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "poseOffsetX": 0,
+          "poseOffsetY": 0,
+          "poseOffsetZ": 0,
+          "poseScale": 1
         },
         {
           "name": "COUNTDOWN  (VERT) - 10",
@@ -5985,7 +5993,11 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "poseOffsetX": 0,
+          "poseOffsetY": 0,
+          "poseOffsetZ": 0,
+          "poseScale": 1
         },
         {
           "name": "COUNTDOWN (VERT) - LENS COVER",
@@ -6383,52 +6395,52 @@
             "COUNTDOWN (VERT) - 1",
             {
               "type": "hold",
-              "percent": 100
+              "percent": 50
             },
             "COUNTDOWN (VERT) - 2",
             {
               "type": "hold",
-              "percent": 100
+              "percent": 50
             },
             "COUNTDOWN (VERT) - 3",
             {
               "type": "hold",
-              "percent": 100
+              "percent": 50
             },
             "COUNTDOWN (VERT) - 4",
             {
               "type": "hold",
-              "percent": 100
+              "percent": 50
             },
             "COUNTDOWN (VERT) - 5",
             {
               "type": "hold",
-              "percent": 100
+              "percent": 50
             },
             "COUNTDOWN (VERT) - 6",
             {
               "type": "hold",
-              "percent": 100
+              "percent": 50
             },
             "COUNTDOWN (VERT) - 7",
             {
               "type": "hold",
-              "percent": 100
+              "percent": 50
             },
             "COUNTDOWN (VERT) - 8",
             {
               "type": "hold",
-              "percent": 100
+              "percent": 50
             },
             "COUNTDOWN (VERT) - 9",
             {
               "type": "hold",
-              "percent": 100
+              "percent": 50
             },
             "COUNTDOWN  (VERT) - 10",
             {
               "type": "hold",
-              "percent": 100
+              "percent": 50
             },
             "COUNTDOWN (VERT) - LENS COVER"
           ],
@@ -12866,7 +12878,11 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "poseOffsetX": 0,
+          "poseOffsetY": 0,
+          "poseOffsetZ": 0,
+          "poseScale": 1
         },
         {
           "name": "COUNTDOWN (VERT) - 9",
@@ -12921,7 +12937,11 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "poseOffsetX": 0,
+          "poseOffsetY": 0,
+          "poseOffsetZ": 0,
+          "poseScale": 1
         },
         {
           "name": "COUNTDOWN  (VERT) - 10",
@@ -12976,7 +12996,11 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "poseOffsetX": 0,
+          "poseOffsetY": 0,
+          "poseOffsetZ": 0,
+          "poseScale": 1
         },
         {
           "name": "COUNTDOWN (VERT) - LENS COVER",
@@ -13374,52 +13398,52 @@
             "COUNTDOWN (VERT) - 1",
             {
               "type": "hold",
-              "percent": 100
+              "percent": 50
             },
             "COUNTDOWN (VERT) - 2",
             {
               "type": "hold",
-              "percent": 100
+              "percent": 50
             },
             "COUNTDOWN (VERT) - 3",
             {
               "type": "hold",
-              "percent": 100
+              "percent": 50
             },
             "COUNTDOWN (VERT) - 4",
             {
               "type": "hold",
-              "percent": 100
+              "percent": 50
             },
             "COUNTDOWN (VERT) - 5",
             {
               "type": "hold",
-              "percent": 100
+              "percent": 50
             },
             "COUNTDOWN (VERT) - 6",
             {
               "type": "hold",
-              "percent": 100
+              "percent": 50
             },
             "COUNTDOWN (VERT) - 7",
             {
               "type": "hold",
-              "percent": 100
+              "percent": 50
             },
             "COUNTDOWN (VERT) - 8",
             {
               "type": "hold",
-              "percent": 100
+              "percent": 50
             },
             "COUNTDOWN (VERT) - 9",
             {
               "type": "hold",
-              "percent": 100
+              "percent": 50
             },
             "COUNTDOWN  (VERT) - 10",
             {
               "type": "hold",
-              "percent": 100
+              "percent": 50
             },
             "COUNTDOWN (VERT) - LENS COVER"
           ],
@@ -19857,7 +19881,11 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "poseOffsetX": 0,
+          "poseOffsetY": 0,
+          "poseOffsetZ": 0,
+          "poseScale": 1
         },
         {
           "name": "COUNTDOWN (VERT) - 9",
@@ -19912,7 +19940,11 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "poseOffsetX": 0,
+          "poseOffsetY": 0,
+          "poseOffsetZ": 0,
+          "poseScale": 1
         },
         {
           "name": "COUNTDOWN  (VERT) - 10",
@@ -19967,7 +19999,11 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "poseOffsetX": 0,
+          "poseOffsetY": 0,
+          "poseOffsetZ": 0,
+          "poseScale": 1
         },
         {
           "name": "COUNTDOWN (VERT) - LENS COVER",
@@ -20365,52 +20401,52 @@
             "COUNTDOWN (VERT) - 1",
             {
               "type": "hold",
-              "percent": 100
+              "percent": 50
             },
             "COUNTDOWN (VERT) - 2",
             {
               "type": "hold",
-              "percent": 100
+              "percent": 50
             },
             "COUNTDOWN (VERT) - 3",
             {
               "type": "hold",
-              "percent": 100
+              "percent": 50
             },
             "COUNTDOWN (VERT) - 4",
             {
               "type": "hold",
-              "percent": 100
+              "percent": 50
             },
             "COUNTDOWN (VERT) - 5",
             {
               "type": "hold",
-              "percent": 100
+              "percent": 50
             },
             "COUNTDOWN (VERT) - 6",
             {
               "type": "hold",
-              "percent": 100
+              "percent": 50
             },
             "COUNTDOWN (VERT) - 7",
             {
               "type": "hold",
-              "percent": 100
+              "percent": 50
             },
             "COUNTDOWN (VERT) - 8",
             {
               "type": "hold",
-              "percent": 100
+              "percent": 50
             },
             "COUNTDOWN (VERT) - 9",
             {
               "type": "hold",
-              "percent": 100
+              "percent": 50
             },
             "COUNTDOWN  (VERT) - 10",
             {
               "type": "hold",
-              "percent": 100
+              "percent": 50
             },
             "COUNTDOWN (VERT) - LENS COVER"
           ],
@@ -28506,7 +28542,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 1",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -28852,7 +28888,7 @@
       "subgroups": [
         {
           "key": "Custom Click Function 1",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
