@@ -299,6 +299,20 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   (`siblingSelector.split(',').map(s => ':scope > ' + s.trim()).join(', ')`).
   See CHANGELOG.txt's matching 2026-09-19 entry for the full account,
   including live verification of the fix.
+- **2nd follow-up port, 2026-09-20: the template's own Add-Group
+  common-ancestor-nesting change.** When "+ Add Group" is used with an
+  active selection, the new group now nests inside the selection's own
+  deepest common containing group instead of always landing at the top
+  level. Same "re-verify, don't 1:1 port" discipline as the 2026-09-19
+  entry above — ported `devSelectionAncestorGroupChain()`/
+  `findDevSelectionCommonAncestorGroup()` with this project's own
+  `.dp-group`/`.dp-group-body` class names substituted for the
+  template's `.dev-section`/`.dev-section-content`. The no-selection
+  fallback (this project's own bottom-of-list placement, already a
+  pre-existing divergence from the template's own top-of-list
+  convention) was deliberately left untouched. See CHANGELOG.txt's
+  matching 2026-09-20 (3rd follow-up round) entry for full detail and
+  live verification.
 - **Renaming a devPanel.js group is PURELY COSMETIC — it never changes
   the group's own internal identity, which is exactly what caused a
   real data-loss incident 2026-09-19.** `openTextEditFor()` (the rename

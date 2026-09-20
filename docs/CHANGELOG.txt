@@ -9592,6 +9592,47 @@ purely the known environment issue, not a code regression, before
 continuing to retry rather than assuming the fix was broken.
 
 --------------------------------------------------------------------------------
+2026-09-20 (later same day, 3rd follow-up round)
+
+Checked `.claude/TEMPLATE_DEV_PANEL.html` for new changes since the last
+documented port (2026-09-19, see CLAUDE.md's own gotcha), per direct
+request ("after fixing and pushing, check dev template and implement
+new changes"). Found one new dated addition, 2026-09-20 in the
+template: when "+ Add Group" is used with an active selection, the new
+group now nests inside the selection's own DEEPEST COMMON CONTAINING
+GROUP instead of always landing at the top level -- selecting 2 settings
+both already nested inside e.g. "PANEL UI" and clicking Add Group used
+to create a brand-new TOP-LEVEL group and pull them out of PANEL UI
+entirely; it now nests the new group inside PANEL UI itself.
+
+Ported `devSelectionAncestorGroupChain()`/`findDevSelectionCommonAncestorGroup()`
+from the template, adapted to this project's own `.dp-group`/
+`.dp-group-body` class names (not `.dev-section`/`.dev-section-content`
+-- this project's devPanel.js is a genuinely different implementation
+from the template, per its own already-documented gotcha, so every port
+needs re-verification, never a straight copy-paste). Wired into the
+header Add Group button's click handler: the common ancestor is computed
+BEFORE `addCustomGroup()` runs (moving the selected items afterward
+would change their own ancestor chain), and only repositions the new
+group when a common ancestor is actually found -- the no-selection/no-
+common-ancestor case is untouched, still using this project's own
+existing bottom-of-list placement (a pre-existing divergence from the
+template's own top-of-list convention, deliberately left as-is since it
+wasn't part of the new delta being ported).
+
+Checked the rest of the template for other undated/newer changes -- this
+was the only new one found; everything else carried a 2026-09-19 date,
+already covered by the prior documented port.
+
+Verified live: selecting 2 rows inside "PANEL UI" via a real shift-click
+dispatch, then clicking Add Group, produced a new group correctly
+nested inside PANEL UI containing both rows; a subsequent no-selection
+Add Group click still created a new group at the bottom of the top-
+level list, unchanged (25->26 top-level groups, correctly named "New
+Group (2)" avoiding the collision with the first test group). `node
+--check` clean on both `main.js` and `devPanel.js`.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

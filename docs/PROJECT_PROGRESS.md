@@ -18,6 +18,21 @@ work seamlessly from there.
 
 ## Currently working on
 
+**SHIPPED 2026-09-20 (later same day, 3rd follow-up round): ported the
+one genuinely new change from `.claude/TEMPLATE_DEV_PANEL.html` since
+the last documented port (2026-09-19).** "+ Add Group" with an active
+selection now nests the new group inside the selection's own deepest
+common containing group (e.g. 2 settings both already nested in "PANEL
+UI") instead of always creating a new top-level group and pulling them
+out of their original context. Ported `devSelectionAncestorGroupChain()`/
+`findDevSelectionCommonAncestorGroup()`, adapted to this project's own
+`.dp-group`/`.dp-group-body` class names (this project's devPanel.js is
+a genuinely different implementation from the template, not a byte-for-
+byte copy). The no-selection case is untouched (still this project's own
+pre-existing bottom-of-list placement). Live-verified both the nested
+and no-selection cases. See CHANGELOG.txt's matching 2026-09-20 (3rd
+follow-up round) entry for full detail.
+
 **SHIPPED 2026-09-20 (later same day, 2nd follow-up round): 2 more
 Loading Preview gaps fixed -- Hold entries in an imported tween were
 silently dropped, and wrist cropping was never applied at all.** (1)
