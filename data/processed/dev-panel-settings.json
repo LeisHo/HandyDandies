@@ -6728,8 +6728,8 @@
           "fov": 32
         }
       ],
-      "toonSteps": 2,
-      "toonStepThreshold": 0.2,
+      "toonSteps": 5,
+      "toonStepThreshold": 1.65,
       "toonShadowFloor": 0,
       "toonLightCeiling": 82,
       "toonBaseTint": "#0091ff",
@@ -13523,8 +13523,8 @@
           "fov": 32
         }
       ],
-      "toonSteps": 2,
-      "toonStepThreshold": 0.2,
+      "toonSteps": 5,
+      "toonStepThreshold": 1.65,
       "toonShadowFloor": 0,
       "toonLightCeiling": 82,
       "toonBaseTint": "#0091ff",
@@ -20318,8 +20318,8 @@
           "fov": 32
         }
       ],
-      "toonSteps": 2,
-      "toonStepThreshold": 0.2,
+      "toonSteps": 5,
+      "toonStepThreshold": 1.65,
       "toonShadowFloor": 0,
       "toonLightCeiling": 82,
       "toonBaseTint": "#0091ff",
@@ -28659,7 +28659,7 @@
     },
     {
       "key": "Toon Shading",
-      "collapsed": true,
+      "collapsed": false,
       "locked": false,
       "items": [
         {
