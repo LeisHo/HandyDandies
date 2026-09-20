@@ -9681,6 +9681,53 @@ the overlap case only. No console errors beyond expected local
 `/api/save-settings` 404s.
 
 --------------------------------------------------------------------------------
+2026-09-20 (later same day, 5th follow-up round)
+
+Applied a saved pose's own Whole Hand Rotation (modelRotX/Y/Z) in the
+Loading Preview, direct request: "when i import poses, i want the Whole
+Hand Rotation data to be imported as well. So any other rotation I set
+on top of that, for example in Loading Preview, it will simply add
+ontop of that. Pose specific rotation and Loading Preview rotation
+should add ontop of each other."
+
+`modelRotX/Y/Z` was already part of `POSE_PRESET_KEYS` and already
+correctly captured/imported/interpolated -- the gap was entirely on the
+APPLY side. `applyLoadingPreviewPose()` explicitly discarded it, setting
+`loadingPreviewBaseQuat` to plain `alignQuat` with no extra rotation.
+Traced this to the 2026-09-19 fix going further than the bug it was
+actually fixing required: that fix retired the OLD
+`loadingPreviewRotationX/Y/Z` dev-panel SLIDER (repurposed to drive the
+orbit camera instead, after a real bug where a stale slider value
+rotated the hand out from under the camera's own framing), but it also
+stopped applying `values.modelRotX/Y/Z` -- a POSE's own intentional
+field, not the slider it was meant to retire -- leaving Loading Preview
+inconsistent with Pose Preview's own `previewPosePreset()`, which
+already applies this exact field via `alignQuat*Euler(modelRot)`.
+
+Fixed by porting that identical, already-proven pattern into
+`applyLoadingPreviewPose()`. Confirmed camera auto-frame/preset/orbit
+math is unaffected either way -- it derives from the hand's own
+bounding-sphere radius (rotation-invariant under any quaternion) and a
+fixed `alignQuat`-based `camera.up`, never the hand's live quaternion,
+so this doesn't reintroduce the 2026-09-19 bug (which was specifically
+about the stale, easy-to-forget SLIDER value, not a pose's own field).
+
+**Verification gap, disclosed honestly:** this round hit an extreme,
+sustained run of this sandbox's own known network-truncation issue --
+18+ consecutive `net::ERR_CONNECTION_RESET` failures on `main.js` across
+4 different server processes/ports over an extended retry window (well
+beyond any previously documented severity for this issue in this
+project's own history, including the "unusually severe" runs logged
+earlier this same day), confirmed not a code issue via `curl` retries
+matching the file's own real byte size. Did not get a single clean live
+page load this round despite the extended retry effort. Confidence in
+correctness rests on `node --check` passing cleanly and this being a
+structural port of an already-proven-correct, currently-shipping
+pattern in this same file (`previewPosePreset()`'s own identical
+handling), not new/novel math. Worth a live confirm once this sandbox's
+networking cooperates, or directly by the user.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

@@ -18,6 +18,27 @@ work seamlessly from there.
 
 ## Currently working on
 
+**SHIPPED 2026-09-20 (later same day, 5th follow-up round, verification
+gap disclosed): a saved pose's own Whole Hand Rotation (modelRotX/Y/Z)
+now applies in the Loading Preview (direct request: "when i import
+poses, i want the Whole Hand Rotation data to be imported as well...
+Pose specific rotation and Loading Preview rotation should add ontop of
+each other").** This field was already captured/imported correctly
+(part of `POSE_PRESET_KEYS`) -- the gap was that `applyLoadingPreviewPose()`
+explicitly discarded it, a side effect of the 2026-09-19 fix that
+retired the OLD `loadingPreviewRotationX/Y/Z` SLIDER (repurposed to
+drive the orbit camera) going further than that fix actually needed to.
+Ported the identical, already-proven `alignQuat*Euler(modelRot)` pattern
+Pose Preview's own `previewPosePreset()` already uses. **Could not get a
+clean live page load this round** -- this sandbox's own network-
+truncation issue hit an extreme, sustained run (18+ consecutive resets
+across 4 server processes/ports), well beyond anything previously seen
+in this project. Confidence rests on `node --check` passing and this
+being a structural port of an already-shipping pattern, not new math --
+**worth a live confirm on the user's own next real page load.** See
+CHANGELOG.txt's matching 2026-09-20 (5th follow-up round) entry for full
+detail.
+
 **SHIPPED 2026-09-20 (later same day, 4th follow-up round): fixed the
 dev panel losing clicks to the Loading Preview canvas whenever Camera
 Edit Mode was on (direct report: "i cant unclick the checkbox. I want
