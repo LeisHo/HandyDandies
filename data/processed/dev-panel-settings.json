@@ -17,9 +17,9 @@
       "palmFacesCursor": true,
       "palmFaceRotationOffset": 0,
       "loadingPreviewEnabled": true,
-      "loadingPreviewShowLive": false,
+      "loadingPreviewShowLive": true,
       "loadingMinTimeMs": 5000,
-      "loadingPreviewTweenSelector": "COUNTDOWN - VERTICAL",
+      "loadingPreviewTweenSelector": "Waiting Horizontal Tap",
       "loadingPreviewSavedCameras": [
         {
           "name": "Camera 20",
@@ -150,7 +150,7 @@
         }
       ],
       "loadingPreviewLightingSelector": "LOADING",
-      "loadingPreviewSpeedMs": 5000,
+      "loadingPreviewSpeedMs": 1200,
       "loadingPreviewSequenceMode": "Loop",
       "loadingPreviewSequenceCount": 1,
       "loadingPreviewSequenceCountMode": "Loop",
@@ -6802,9 +6802,9 @@
       "palmFacesCursor": true,
       "palmFaceRotationOffset": 0,
       "loadingPreviewEnabled": true,
-      "loadingPreviewShowLive": false,
+      "loadingPreviewShowLive": true,
       "loadingMinTimeMs": 5000,
-      "loadingPreviewTweenSelector": "COUNTDOWN - VERTICAL",
+      "loadingPreviewTweenSelector": "Waiting Horizontal Tap",
       "loadingPreviewSavedCameras": [
         {
           "name": "Camera 20",
@@ -6935,7 +6935,7 @@
         }
       ],
       "loadingPreviewLightingSelector": "LOADING",
-      "loadingPreviewSpeedMs": 5000,
+      "loadingPreviewSpeedMs": 1200,
       "loadingPreviewSequenceMode": "Loop",
       "loadingPreviewSequenceCount": 1,
       "loadingPreviewSequenceCountMode": "Loop",
@@ -13587,9 +13587,9 @@
       "palmFacesCursor": true,
       "palmFaceRotationOffset": 0,
       "loadingPreviewEnabled": true,
-      "loadingPreviewShowLive": false,
+      "loadingPreviewShowLive": true,
       "loadingMinTimeMs": 5000,
-      "loadingPreviewTweenSelector": "COUNTDOWN - VERTICAL",
+      "loadingPreviewTweenSelector": "Waiting Horizontal Tap",
       "loadingPreviewSavedCameras": [
         {
           "name": "Camera 20",
@@ -13720,7 +13720,7 @@
         }
       ],
       "loadingPreviewLightingSelector": "LOADING",
-      "loadingPreviewSpeedMs": 5000,
+      "loadingPreviewSpeedMs": 1200,
       "loadingPreviewSequenceMode": "Loop",
       "loadingPreviewSequenceCount": 1,
       "loadingPreviewSequenceCountMode": "Loop",
