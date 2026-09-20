@@ -18,6 +18,29 @@ work seamlessly from there.
 
 ## Currently working on
 
+**SHIPPED 2026-09-20 (later same day): Pose Offset X/Y/Z + Pose Scale
+now actually visible in the Loading Preview and Pose Preview (direct
+report, following up on the same day's earlier main-field integration).**
+Both `applyLoadingPreviewPose()` and `previewPosePreset()` already read
+`poseOffsetX/Y/Z`/`poseScale` correctly (via `POSE_PRESET_KEYS`) but
+never applied them to anything -- these 2 standalone single-hand
+previews have no field-grid `basePosition`/`computeBaseScale()` to
+offset from like the main field does, so the fix applies directly
+against each preview's own fixed `(0,0,0)`/scale-1 base. Also confirmed
+(code reading, not a fix -- nothing was broken here) that both pose-
+import paths already preserve these fields correctly on import via raw
+passthrough with no field whitelist; the gap was purely on the apply
+side of the 2 previews. Live-verified via `window.__debug.applyLoadingPreviewPose()`
+with the user's own exact pasted pose data: exact position/scale match,
+a scaled variant applied correctly, and a pose missing these fields
+resets cleanly with no compounding. Added `loadingPreviewHand`/
+`applyLoadingPreviewPose` to `window.__debug` (matching the existing
+debug-surface pattern) -- kept permanently, not just for this test. See
+CHANGELOG.txt's matching 2026-09-20 (later same day) entry for full
+verification detail, including why a clean visual screenshot wasn't
+pursued (the numeric checks are stronger evidence for a transform-value
+fix like this one).
+
 **SHIPPED 2026-09-20: custom click function groups now nest inside their
 parent; Type dropdown unified back to one entry point.** Direct report:
 new functions rendered as a top-level sibling right after "Custom Click

@@ -9387,6 +9387,72 @@ the deleted-static-Click-Function-group fix`.
 Verified: `node --check src/main.js` passes.
 
 --------------------------------------------------------------------------------
+2026-09-20 (later same day)
+
+Fixed a real gap in Pose Offset X/Y/Z + Pose Scale (integrated earlier
+today, commit `3a325f3`): applied to the main field's hands via
+`applyPoseValuesToHand()`, but the 2 standalone single-hand previews
+(Loading Preview, Pose Preview) never got the same treatment. Direct
+report: importing a HANDO pose whose last pose in a tween sequence
+carried a non-zero Pose Offset/Scale showed no visible difference in
+the Loading Preview. Root cause: `applyLoadingPreviewPose()` and
+`previewPosePreset()` both already read `poseOffsetX/Y/Z`/`poseScale`
+correctly into their own local `values` object (via `POSE_PRESET_KEYS`,
+already updated this session) -- but neither function ever went on to
+apply those values to anything. Unlike the main field (where each hand
+has its own `basePosition` to offset from, and `computeBaseScale()` for
+scale), these 2 previews are single, standalone hands with no field-grid
+concept at all -- their clones sit at a fixed `(0,0,0)`/scale-1 base by
+construction (`buildLoadingPreview()`/`buildPosePreview()` never set
+either). Fixed by applying directly against that fixed base in both
+functions, same "absolute `.set()` every call, never compounds" pattern
+the field's own version already uses.
+
+Also confirmed via code reading that BOTH of this project's pose-import
+paths (`savedPoses`'s own generic devPanel.js Import button, and the
+Tween group's combined `importPosesAndTweenSequences()`) already
+preserve these fields correctly on import -- neither filters incoming
+pose fields to a whitelist, both do a raw passthrough, so once
+`POSE_PRESET_KEYS`/`POSE_KEY_DEFAULTS` include a field (as they already
+did before this round), every import path picks it up with zero
+additional code. The actual missing piece was purely on the APPLY side
+of the 2 previews, not the import side, which is why the earlier
+integration's own live verification (main field only) didn't catch it.
+
+Also added `loadingPreviewHand` and `applyLoadingPreviewPose` to
+`window.__debug` (matching the existing pattern for other loading-
+preview-related debug state) -- used to verify this fix directly, kept
+as a permanent small addition to the debug surface rather than reverted
+after use.
+
+Verified live via `window.__debug.applyLoadingPreviewPose()`, using the
+user's own exact pasted "COUNTDOWN (VERT) - LENS COVER" pose data
+(`poseOffsetX/Y/Z: -0.5/-8/55`, `poseScale: 1`): produced
+`loadingPreviewHand.clone.position` of exactly `[-0.5, -8, 55]`; a
+scaled variant (`2, 3, 4, 1.5`) applied correctly (`[2, 3, 4]`/scale
+`1.5`); a pose object missing these fields entirely reset cleanly to
+`[0, 0, 0]`/scale `1` with no compounding across repeated calls. Did not
+get a clean visual screenshot confirming the rendered hand's on-screen
+position shift (the small preview hand visually blends into the busy
+main-field render behind it at this viewport size, and a pixel-level
+distinction wasn't worth chasing given the numeric verification above
+is already exact and directly exercises the fixed function) -- the
+precise position/scale assertions are the stronger evidence for this
+kind of transform-value fix regardless.
+
+Concurrent-session note: isolated this fix's own 2 hunks (main.js) plus
+the `index.html` cache-buster bump out of a shared working tree that
+also had a 2nd session's substantial uncommitted "Custom Click
+Functions" Type-unification rework sitting in the same file -- confirmed
+via `git fetch`/`git log` that the 2nd session had already committed and
+pushed that work (`a30c3a9`, `94708f3`) by the time this round finished,
+so `git diff` against the fresh HEAD cleanly isolated only this round's
+own changes with no manual patch surgery needed. `CLAUDE.md`/
+`CHANGELOG.txt`/`PROJECT_PROGRESS.md` had a 3rd round of the other
+session's own uncommitted doc edits in progress at commit time --left
+untouched, per the same "never blanket `git add`" discipline.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================
