@@ -9884,6 +9884,52 @@ preference going forward: cap live-verification retries at 5 attempts,
 not 10-20+, before falling back to disclosed static verification.
 
 --------------------------------------------------------------------------------
+2026-09-20 (later same day, 9th follow-up round -- investigation only,
+no code change)
+
+Investigated a direct report: "make sure the click function group
+checkboxes work on desktop. Mobile looks good but desktop doesn't,"
+later clarified as being about "the settings group checkbox placement
+and alignment functionality, as well as the duplication issue we
+previously had where two checkboxes did the same thing." That exact
+duplication bug (a gated subgroup's welded-in "Enabled" row showing 3
+checkboxes instead of 1 -- its own row-level Show-in-Mobile/Landscape +
+Independent-from-Desktop pair riding along on top of the group's own
+cascade checkboxes) was already fixed earlier the same day in commit
+971462b ("Fix gated-subgroup checkbox duplication; add group
+Undock/Dock," 2026-09-20 01:19:12 -0400) -- roughly 5.5 hours before
+this report arrived.
+
+Verified the fix live in a fresh browser-preview load (not a stale
+tab): inspected the "Offset"/"Rotation" gated-subgroup headers inside
+every one of the 10 static Click Function groups (Click Hold-Pose,
+Right-Click Hold-Pose, Click/Double/Triple/Quadruple-Click Pose, Right
+Click, Double/Triple/Quadruple-Click Hold) via direct DOM query
+(`_visCascadeCheckbox`/`_indepCascadeCheckbox`, `.dp-group-gate-row`
+computed display) rather than screenshot-only inspection, on BOTH the
+Desktop and Mobile dev-panel tabs. Confirmed symmetric, by-design
+behavior on both tabs: exactly 2 checkboxes per gated-subgroup header
+(the real on/off value + whichever ONE cascade checkbox is relevant to
+the active tab -- "Show in Mobile/Landscape" on Desktop, "Independent
+from Desktop" on Mobile/Landscape, the other always `display:none`),
+never 3. Also functionally exercised the Desktop-tab cascade checkbox
+directly (`.click()` on `Offset`'s own `_visCascadeCheckbox` inside
+Click Hold-Pose): correctly left the row visible on Desktop's own tab,
+then correctly hid it after switching to the Mobile tab -- the
+intended cross-tab behavior, no JS errors, no stuck/duplicate state.
+
+Could not reproduce any Desktop-specific breakage in rendering or
+functionality. Working theory, not confirmed: the user's own open
+browser tab predates the 01:19:12 fix and is running a stale in-memory
+bundle -- this project has repeated, already-documented history of
+exactly this failure mode (see CLAUDE.md's own main.js/devPanel.js
+stale-tab gotchas). Recommended a hard refresh; no code change made
+this round since nothing reproducibly wrong was found. If it persists
+after a hard refresh, need a fresh screenshot or more specific repro
+steps (which control, which exact checkbox, what it looks like) to
+continue.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================
