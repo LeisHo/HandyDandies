@@ -1578,7 +1578,24 @@ const cfg = initDevPanel(DEV_GROUPS, {
   // no-op for anything else (a plain user-created group, a single deleted
   // settings row, one of the 10 static triggers -- none of those carry
   // `dataset.customFunctionFamily`).
-  onGroupDeleted: (target) => cleanupDeletedCustomClickFunction(target)
+  //
+  // CORRECTED 2026-09-20 -- direct bug report ("i want to clarify that if
+  // i dellete click function groups, those click functions should no
+  // longer apply. Currently, i have deleted all previous click functions,
+  // but when i click or click and hold etc, the previously saved
+  // functions are sitll being triggered"). The gap above's own closing
+  // parenthetical ("one of the 10 static triggers") was exactly this --
+  // deleting one of chp/rchp/click/dblclick/tripleClick/quadClick/rc/
+  // dcHold/tripleClickHold/quadClickHold's own DEV_GROUPS group removes
+  // ONLY its dev-panel UI (these are hardcoded DEV_GROUPS entries, never
+  // dynamically created, so cleanupDeletedCustomClickFunction() is
+  // correctly a no-op for them) -- cfg's own `<p>Enabled` flag and any
+  // in-flight per-hand trigger state were left completely untouched, so
+  // the trigger kept firing using whatever pose/tween was last
+  // configured. disableDeletedStaticClickTrigger() (below) closes this
+  // specific gap; both cleanup functions run for every deletion and are
+  // each a no-op for the case the other one handles.
+  onGroupDeleted: (target) => { cleanupDeletedCustomClickFunction(target); disableDeletedStaticClickTrigger(target) }
 })
 onChangeByCtrl.forEach((fn, c) => { c.onChange = fn })
 setupCustomFunctionTabVisibilitySync()
@@ -7248,6 +7265,59 @@ function cleanupDeletedCustomClickFunction(target) {
   hands.forEach((hand) => {
     const perHand = kind === 'hold' ? hand._chp : hand._cp
     if (perHand) delete perHand[id]
+  })
+  refreshCustomFunctionConflictWarnings()
+}
+// Maps each of the 10 STATIC (hardcoded DEV_GROUPS, not dynamically
+// created) Click Function groups' own literal `title` -- which is what
+// devPanel.js sets as that group's `dataset.key` (createGroupElement()'s
+// own `g.dataset.key = title`), still readable off a deleted group's
+// element after `.remove()` -- to its own key-prefix `p`, exactly as
+// passed to makeClickHoldPoseGroup()/makeClickPoseGroup() (or the
+// literal 'rc' for the hand-written Right Click group). See
+// disableDeletedStaticClickTrigger() below for why this map exists.
+const STATIC_CLICK_TRIGGER_GROUP_PREFIXES = {
+  'Click Hold-Pose': 'chp',
+  'Right-Click Hold-Pose': 'rchp',
+  'Click Pose': 'click',
+  'Double-Click Pose': 'dblclick',
+  'Triple-Click Pose': 'tripleClick',
+  'Quadruple-Click Pose': 'quadClick',
+  'Right Click': 'rc',
+  'Double Click Hold': 'dcHold',
+  'Triple-Click Hold': 'tripleClickHold',
+  'Quadruple-Click Hold': 'quadClickHold'
+}
+// Closes the gap cleanupDeletedCustomClickFunction() above deliberately
+// doesn't cover (see its own comment: "a plain user-created group... or
+// one of the 10 static triggers -- none of those carry
+// dataset.customFunctionFamily"). Unlike a Custom Click Function, one of
+// these 10 groups is a hardcoded DEV_GROUPS entry -- it reappears in the
+// panel on every reload regardless of deletion, so there's no
+// `customClickFunctionIds`-style persisted "this no longer exists" list
+// to remove it from. What deleting it CAN and should do, matching the
+// user's own direct clarification ("if i dellete click function groups,
+// those click functions should no longer apply"), is stop the trigger
+// from firing for the rest of THIS session: `cfg[p+'Enabled']` is the
+// exact same master gate startClickHoldPose()/startClickPoseForHand()
+// themselves check (`if (!cfg[\`${p}Enabled\`]) return`), so setting it
+// false here has the identical effect as the user unchecking that row's
+// own checkbox -- just done programmatically since the row (and its
+// whole group) is now gone from the DOM. Also clears any trigger already
+// mid-transition, same shape as the custom-function cleanup above, so a
+// hand caught mid-hold when its group is deleted doesn't stay stuck
+// holding a pose forever with no UI left to release it from.
+function disableDeletedStaticClickTrigger(target) {
+  if (!target || !target.classList || !target.classList.contains('dp-group')) return
+  const p = STATIC_CLICK_TRIGGER_GROUP_PREFIXES[target.dataset.key]
+  if (!p) return
+  cfg[`${p}Enabled`] = false
+  const isHoldKind = CLICK_HOLD_KEYS.includes(p)
+  const triggers = isHoldKind ? clickHoldPoseTriggers : clickPoseTriggers
+  delete triggers[p]
+  hands.forEach((hand) => {
+    const perHand = isHoldKind ? hand._chp : hand._cp
+    if (perHand) delete perHand[p]
   })
   refreshCustomFunctionConflictWarnings()
 }

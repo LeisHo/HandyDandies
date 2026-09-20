@@ -18,6 +18,26 @@ work seamlessly from there.
 
 ## Currently working on
 
+**SHIPPED 2026-09-20: fixed deleted static Click Function groups still
+firing after deletion (direct bug report).** The 10 hardcoded Click
+Function triggers (Click Hold-Pose, Right-Click Hold-Pose, Click/Double/
+Triple/Quadruple-Click Pose, Right Click, Double/Triple/Quadruple-Click
+Hold) aren't Custom Click Functions, so deleting one of their dev-panel
+groups only removed its UI — `cfg`'s own `<p>Enabled` flag and any
+in-flight per-hand trigger state were left untouched, so a "deleted"
+trigger kept firing the last-configured pose. New
+`disableDeletedStaticClickTrigger()` (main.js), wired into the existing
+`onGroupDeleted` hook alongside the pre-existing Custom-Click-Function
+cleanup, sets the deleted group's `<p>Enabled` flag false and clears any
+in-flight state — same functional effect as unchecking that row, applied
+programmatically since the row is now gone. **Scope note:** these 10
+groups are hardcoded DEV_GROUPS entries (unlike real Custom Click
+Functions), so the deleted group's UI still reappears on the next page
+reload — this stops the trigger from firing for the rest of the CURRENT
+session, matching the literal reported symptom, not a permanent removal.
+Not yet live-verified in a browser this round. See CHANGELOG.txt's
+matching 2026-09-20 entry for the full investigation trail.
+
 **SHIPPED 2026-09-20: ported HANDO's new Pose Offset X/Y/Z + Pose Scale
 sliders (direct follow-up request).** HANDO's own version is a single
 GLOBAL modelRoot transform (it only has one hand); generalized here to

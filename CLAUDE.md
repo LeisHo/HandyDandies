@@ -675,3 +675,37 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   CHANGELOG.txt's matching 2026-09-20 entry for the full derivation and
   live verification (a screenshot confirming a properly upright,
   recognizable fist instead of a twisted shape).
+- **Deleting a dev-panel group via the 🗑 Delete button only removes its
+  UI -- it does NOT automatically disable whatever functionality that
+  group controlled, unless a host `onGroupDeleted` cleanup explicitly
+  handles that specific group.** `cleanupDeletedCustomClickFunction()`
+  only recognizes a group created by `registerCustomClickFunction()`
+  (marked via `dataset.customFunctionFamily`); it was always a
+  documented no-op for "a plain user-created group... or one of the 10
+  static [Click Function] triggers." Confirmed live as a real bug
+  2026-09-20 (direct report: "i have deleted all previous click
+  functions, but when i click or click and hold etc, the previously
+  saved functions are sitll being triggered") -- deleting one of the 10
+  hardcoded Click Function groups (Click Hold-Pose, Right-Click
+  Hold-Pose, Click/Double/Triple/Quadruple-Click Pose, Right Click,
+  Double/Triple/Quadruple-Click Hold) left `cfg`'s own `<p>Enabled` flag
+  and any in-flight per-hand trigger state completely untouched, so the
+  trigger kept firing the last-configured pose with no UI left to turn
+  it off. Fixed via `disableDeletedStaticClickTrigger()` (main.js),
+  which maps the deleted group's own `dataset.key` (= its literal
+  `title`, per devPanel.js's `createGroupElement()`) to its key-prefix
+  and sets `cfg[\`${p}Enabled\`] = false` directly -- the same gate the
+  trigger's own start function checks. Also: `findDevDeleteProtectionReason()`
+  (devPanel.js) only protects the mandatory "Dev Panel" group by name --
+  nothing stops any OTHER group, static or custom, from being deleted.
+  Before assuming a devPanel.js group's deletion is functionally
+  complete, check whether `onGroupDeleted`/an equivalent host hook
+  actually covers that specific group's own underlying state, not just
+  its DOM. See CHANGELOG.txt's matching 2026-09-20 entry for the full
+  investigation (including why Custom Click Functions themselves were
+  ruled out first, via the real saved `customClickFunctionIds: []`).
+  **Scope note, not yet closed:** these 10 groups are hardcoded
+  DEV_GROUPS entries, unlike real Custom Click Functions -- the deleted
+  group's UI reappears on the next page reload regardless, so this fix
+  only stops the trigger from firing for the rest of the CURRENT
+  session, not a permanent removal. Not yet live-verified in a browser.

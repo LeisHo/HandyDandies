@@ -9014,6 +9014,85 @@ compounding); a pose with NEITHER field present at all (exercising the
 original base position/scale. No console errors.
 
 --------------------------------------------------------------------------------
+2026-09-20  -  01:10 AM - NOT MEASURED (see this entry's own note)
+
+Fixed: a deleted static Click Function group kept firing after deletion.
+
+Direct bug report: "i want to clarify that if i dellete click function
+groups, those click functions should no longer apply. Currently, i have
+deleted all previous click functions, but when i click or click and hold
+etc, the previously saved functions are sitll being triggered. fix that."
+
+Investigation ruled out Custom Click Functions first: the real saved
+production data (`data/processed/dev-panel-settings.json`) already showed
+`customClickFunctionIds: []` (genuinely empty), and
+`cleanupDeletedCustomClickFunction()` / `restoreCustomClickFunctions()` /
+`triggerCustomPoseFunctions()` all read correctly against that empty
+state -- that whole path was already working, confirming the bug lived
+elsewhere.
+
+Root cause: the 10 STATIC, hardcoded-in-DEV_GROUPS Click Function
+triggers (Click Hold-Pose, Right-Click Hold-Pose, Click Pose,
+Double-Click Pose, Triple-Click Pose, Quadruple-Click Pose, Right Click,
+Double Click Hold, Triple-Click Hold, Quadruple-Click Hold) are NOT
+Custom Click Functions -- they're created unconditionally every page
+load, never carry `dataset.customFunctionFamily`, and
+`cleanupDeletedCustomClickFunction()` already explicitly documented (in
+its own pre-existing comment) that it's a no-op for them. Deleting one of
+these 10 groups via the dev panel's own Delete Group/Setting (🗑) button
+removed only its dev-panel UI -- `cfg`'s own `<p>Enabled` flag and any
+in-flight per-hand trigger state were left completely untouched, so the
+trigger kept firing using whatever pose/tween was last configured.
+Separately confirmed `findDevDeleteProtectionReason()` (devPanel.js) only
+protects the mandatory "Dev Panel" group by name, so nothing stopped one
+of these 10 groups from being deleted in the first place.
+
+Fix: new `STATIC_CLICK_TRIGGER_GROUP_PREFIXES` map (main.js) resolves a
+deleted group's own `dataset.key` -- devPanel.js's `createGroupElement()`
+sets this to the group's literal `title`, still readable off the element
+after `.remove()` -- back to its key-prefix `p` (e.g. "Click Hold-Pose"
+-> 'chp'). New `disableDeletedStaticClickTrigger(target)` uses that map
+to set `cfg[\`${p}Enabled\`] = false` -- the exact same master gate
+`startClickHoldPose()`/`startClickPoseForHand()` themselves check
+(`if (!cfg[\`${p}Enabled\`]) return`), so this has the identical
+functional effect as the user unchecking that row's own checkbox, just
+applied programmatically since the row (and its whole group) is now gone
+from the DOM -- plus clears any in-flight trigger state
+(`clickHoldPoseTriggers`/`clickPoseTriggers`, each hand's own
+`_chp`/`_cp`), mirroring `cleanupDeletedCustomClickFunction()`'s own
+cleanup shape, so a hand caught mid-hold when its group is deleted
+doesn't stay stuck holding a pose with no UI left to release it from.
+Wired into the SAME `onGroupDeleted` hook alongside the existing
+custom-function cleanup -- both run on every deletion, each a no-op for
+the case the other handles.
+
+Scope note (disclosed, not fixed): since these 10 groups are hardcoded
+DEV_GROUPS entries (not tracked via a persisted "this no longer exists"
+list the way `customClickFunctionIds` tracks real Custom Click
+Functions), the deleted group's UI reappears on the next page reload --
+this fix stops the trigger from firing for the rest of the CURRENT
+session, matching the literal reported symptom (clicking right now still
+applying an old pose), not a permanent removal of the trigger type
+itself. If persisting the disabled state across reload turns out to
+matter, that's a separate, larger follow-up (would need a way to write
+into devPanel.js's own private `store`/persisted-settings object from
+outside its module, which nothing in this codebase currently exposes).
+
+Concurrent-session note: `src/main.js` had a 2nd session's own unrelated
+uncommitted work mixed in at diff time (a devPanel.js cache-buster bump,
+and a `wrapGatedSubgroup()` fix for a duplicate Mobile/Landscape
+checkbox) -- isolated via the established git-patch-staging technique
+(`git diff -U3` -> hand-extracted only this fix's own 2 hunks -> `git
+apply --check --cached` -> `git apply --cached` -> verified via `git
+diff --cached --stat` and `git status` that the concurrent hunks stayed
+unstaged in the working tree) rather than a blanket `git add`.
+
+Verified: `node --check src/main.js` passes. Not yet live-verified in a
+browser (no dev-server reload/click-delete/click-repro cycle run this
+round) -- if a live repro still shows the old pose firing after this fix,
+re-open this investigation rather than assuming a different cause.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================
