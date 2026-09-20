@@ -6,7 +6,7 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js'
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js'
 import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js'
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js'
-import { initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement } from './devpanel/devPanel.js?v=31'
+import { initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement } from './devpanel/devPanel.js?v=32'
 
 // A defensive wrapper around devPanel.js's own refreshSelectOptions() --
 // found via live testing (direct user report: "I dont see any of the
@@ -515,11 +515,9 @@ const DEV_GROUPS = [
       // FIELD at field-radius scale, a fundamentally different context
       // HANDO (a single-hand-only app) has no equivalent of, so the same
       // conversion wouldn't be meaningful there.
-      // `hideUseButton` (direct request 2026-09-19: "Remove the Use
-      // button in both the camera and lighting settings in the loading
-      // preview") -- redundant now that the paired select dropdown
-      // below applies a picked item live on its own (`onUse` removed
-      // too, nothing calls it anymore).
+      // CORRECTED 2026-09-19, direct follow-up request -- restored (was
+      // briefly hidden via `hideUseButton` on the theory that the paired
+      // select dropdown's own live-apply made it redundant; asked back).
       {
         key: 'loadingPreviewSavedCameras',
         label: 'Loading Preview Saved Cameras',
@@ -527,9 +525,9 @@ const DEV_GROUPS = [
         def: [],
         itemLabel: 'Loading Preview Camera',
         importable: true,
-        hideUseButton: true,
         importTransform: (item) => convertHandoCameraPreset(item),
         captureCurrent: () => captureLoadingPreviewCameraPreset(),
+        onUse: (item) => applyLoadingPreviewCameraPreset(item),
         // Direct report 2026-09-19 ("those options arent immediatly
         // available in the drop downs") -- same fix savedPoses' own
         // onChange already applies to ITS dependent selects (see that
@@ -561,9 +559,9 @@ const DEV_GROUPS = [
         def: [],
         itemLabel: 'Loading Preview Lighting',
         importable: true,
-        hideUseButton: true,
         importTransform: (item) => convertHandoLightingPreset(item),
         captureCurrent: () => captureLoadingPreviewLightingPreset(),
+        onUse: (item) => { if (loadingPreviewKeyLightRef && loadingPreviewHemiLightRef) applyLoadingPreviewLighting(loadingPreviewKeyLightRef, loadingPreviewHemiLightRef, item) },
         onChange: () => safeRefreshSelectOptions('loadingPreviewLightingSelector')
       },
       // Same fix as loadingPreviewCameraSelector above -- was missing an
@@ -703,20 +701,22 @@ const DEV_GROUPS = [
     // touch gesture in this app today, so there's no position to select
     // within for those).
     //
-    // Still deliberately scoped DOWN, each a disclosed gap, not an
-    // oversight:
-    // - No delete-function button yet -- the dev panel's own existing
-    //   Delete Group/Setting (🗑) icon can remove a custom function's
-    //   GROUP from view, but won't clean up this feature's own
-    //   `customClickFunctionIds` bookkeeping or `CLICK_POSE_KEYS`/
-    //   `CLICK_HOLD_KEYS`/trigger-state entries, so a "deleted" function
-    //   would still silently keep firing. Flagging rather than building
-    //   a redundant or incomplete delete mechanism this slice.
-    // - No duplicate-setting validation, no automatic hold-timing
-    //   conflict resolution across an arbitrary number of custom
-    //   Click+Hold functions yet -- both underway the same round as this
-    //   correction (see this file's own CHANGELOG.txt for whether they
-    //   landed in this same pass or a following one).
+    // CORRECTED 2026-09-19: deleting a custom function via the dev
+    // panel's own existing Delete Group/Setting (🗑) icon now genuinely
+    // cleans up -- devPanel.js's own new `opts.onGroupDeleted` host hook
+    // (initDevPanel()'s own call site) calls
+    // cleanupDeletedCustomClickFunction(), which removes this function
+    // from `customClickFunctionIds`, its `CLICK_POSE_KEYS`/
+    // `CLICK_HOLD_KEYS` slot, its own trigger-state object, and every
+    // hand's own per-function state. Reuses the existing icon rather than
+    // a separate dedicated delete button, per this comment's own earlier
+    // reasoning (a redundant 2nd delete mechanism was never actually
+    // needed -- the gap was the missing cleanup hook, not the UI).
+    //
+    // Duplicate-setting validation and automatic hold-timing conflict
+    // resolution across custom Click+Hold functions also shipped this
+    // round -- see CHANGELOG.txt's own 2026-09-19 entries for the full
+    // account of both.
     //
     // `customClickFunctionIds` is the ONLY control in this static group
     // -- a plain internal-bookkeeping text field (JSON array of
@@ -1498,7 +1498,21 @@ const cfg = initDevPanel(DEV_GROUPS, {
   // declaration comment) -- the field now only ever builds once, using
   // these real values, instead of building once with code defaults and
   // visibly rebuilding again the moment this fires.
-  onRestore: () => { migrateModeTweenToSequence(); resyncPoseDefaultValues(); restoreCustomClickFunctions(); startupSettingsReady = true; tryStartField() }
+  onRestore: () => { migrateModeTweenToSequence(); resyncPoseDefaultValues(); restoreCustomClickFunctions(); startupSettingsReady = true; tryStartField() },
+  // Delete-function button (direct spec item) -- devPanel.js's own
+  // existing Delete Group/Setting (🗑) icon already lets a real user
+  // remove a Custom Click Function's whole group from the panel; the
+  // disclosed gap was never the UI, it was that doing so left this
+  // feature's OWN bookkeeping (`customClickFunctionIds`/`CLICK_POSE_KEYS`/
+  // `CLICK_HOLD_KEYS`/trigger-state) untouched, so a "deleted" function
+  // kept silently firing. `onGroupDeleted` (new, generic devPanel.js hook,
+  // same pattern as `onRestore` above) fires for ANY deleted group/row,
+  // host-side -- cleanupDeletedCustomClickFunction() itself filters down
+  // to "was this actually a Custom Click Function's own group" and is a
+  // no-op for anything else (a plain user-created group, a single deleted
+  // settings row, one of the 10 static triggers -- none of those carry
+  // `dataset.customFunctionFamily`).
+  onGroupDeleted: (target) => cleanupDeletedCustomClickFunction(target)
 })
 onChangeByCtrl.forEach((fn, c) => { c.onChange = fn })
 setupCustomFunctionTabVisibilitySync()
@@ -6817,6 +6831,39 @@ function persistCustomClickFunctionIds() {
   const json = JSON.stringify(customClickFunctionIds)
   cfg.customClickFunctionIds = json
   syncValue('customClickFunctionIds', json)
+}
+// Delete-function button (direct spec item) -- see initDevPanel()'s own
+// `onGroupDeleted` comment for why this piggybacks on devPanel.js's
+// EXISTING Delete Group/Setting icon rather than a separate one. Removes
+// this function from every generic pipeline registerCustomClickFunction()
+// originally added it to: `customClickFunctionIds` (+ persisted), its
+// `CLICK_POSE_KEYS`/`CLICK_HOLD_KEYS` slot, its own trigger-state object
+// (clickPoseTriggers/clickHoldPoseTriggers), and every hand's own per-
+// function state (`hand._cp`/`hand._chp`) -- a stale entry there would be
+// harmless (never read again once the id is gone from CLICK_POSE_KEYS/
+// CLICK_HOLD_KEYS, which is what the render-order loop's own dispatch
+// actually iterates), but removing it fully still avoids leaking memory
+// across many create/delete cycles in one long session. Deliberately NOT
+// undo-aware -- see devPanel.js's own onGroupDeleted comment for why.
+function cleanupDeletedCustomClickFunction(target) {
+  if (!target || !target.classList || !target.classList.contains('dp-group')) return
+  if (!target.dataset.customFunctionFamily) return // not a Custom Click Function's own group (a plain user-created group, or one of the 10 static triggers)
+  const title = target.dataset.key
+  const idx = customClickFunctionIds.findIndex((e) => e.title === title)
+  if (idx === -1) return
+  const { id, kind } = customClickFunctionIds[idx]
+  customClickFunctionIds.splice(idx, 1)
+  persistCustomClickFunctionIds()
+  const keys = kind === 'hold' ? CLICK_HOLD_KEYS : CLICK_POSE_KEYS
+  const triggers = kind === 'hold' ? clickHoldPoseTriggers : clickPoseTriggers
+  const ki = keys.indexOf(id)
+  if (ki !== -1) keys.splice(ki, 1)
+  delete triggers[id]
+  hands.forEach((hand) => {
+    const perHand = kind === 'hold' ? hand._chp : hand._cp
+    if (perHand) delete perHand[id]
+  })
+  refreshCustomFunctionConflictWarnings()
 }
 // Reads which dev-panel tab is currently showing, straight from the DOM
 // (`.dp-tab-active`, devPanel.js's own class for the highlighted tab

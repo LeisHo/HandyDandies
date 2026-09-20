@@ -2785,6 +2785,17 @@ export function initDevPanel(groups, opts = {}) {
     const parent = target.parentElement
     const nextSibling = target.nextElementSibling
     target.remove()
+    // `opts.onGroupDeleted` -- a host hook, same pattern as `opts.onRestore`
+    // (main.js's own DEV_MODE-agnostic restore callback), letting the host
+    // clean up ITS OWN bookkeeping for a deleted group/row that lives
+    // outside this engine entirely (e.g. main.js's `customClickFunctionIds`/
+    // trigger-state for a deleted Custom Click Function). Only fired for a
+    // real DOM element, and deliberately NOT undo-aware -- hitting Undo
+    // right after restores the DOM node, but this hook already ran and the
+    // host's own external bookkeeping stays cleaned up; re-registering that
+    // external state on an undo is a materially bigger feature this hook
+    // doesn't attempt.
+    if (opts.onGroupDeleted) opts.onGroupDeleted(target)
     pushDevDeleteUndoEntry(target, parent, nextSibling)
     disarmDevDeleteGroup()
   }, true)
