@@ -6011,7 +6011,7 @@
         }
       ],
       "cropWristEnabled": true,
-      "hideWrist": 0,
+      "hideWrist": 46,
       "reactiveArmLengthEnabled": true,
       "armLengthRange": "{\"min\":19,\"max\":90}",
       "armLengthCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
@@ -12931,7 +12931,7 @@
         }
       ],
       "cropWristEnabled": true,
-      "hideWrist": 0,
+      "hideWrist": 46,
       "reactiveArmLengthEnabled": true,
       "armLengthRange": "{\"min\":19,\"max\":90}",
       "armLengthCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
@@ -19851,7 +19851,7 @@
         }
       ],
       "cropWristEnabled": true,
-      "hideWrist": 0,
+      "hideWrist": 46,
       "reactiveArmLengthEnabled": true,
       "armLengthRange": "{\"min\":19,\"max\":90}",
       "armLengthCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
@@ -22335,7 +22335,7 @@
           "type": "group",
           "group": {
             "key": "New Group (4)",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -22439,7 +22439,7 @@
         },
         {
           "key": "New Group (4)",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
