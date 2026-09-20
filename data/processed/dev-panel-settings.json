@@ -1,8 +1,8 @@
 {
   "values": {
     "desktop": {
-      "fieldRows": 13,
-      "fieldCols": 12,
+      "fieldRows": 5,
+      "fieldCols": 5,
       "rowSpacing": 14,
       "columnSpacing": 15,
       "handScale": 1.2,
@@ -6580,9 +6580,9 @@
       "quadClickHoldTweenStopDelayCurveEnabled": false,
       "quadClickHoldTweenStopDelayCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "quadClickHoldTweenStopDelayRange": "{\"min\":0,\"max\":2000}",
-      "cameraX": 6.638529594915706,
-      "cameraY": 13.373156794075216,
-      "cameraZ": 259.74194092345493,
+      "cameraX": 6.705147213412396,
+      "cameraY": 13.507356370150985,
+      "cameraZ": 262.34845028379294,
       "cameraFov": 35,
       "cameraZoom": 260.17068872666084,
       "savedCameras": [
@@ -21669,7 +21669,7 @@
     },
     {
       "key": "Field Layout",
-      "collapsed": true,
+      "collapsed": false,
       "locked": false,
       "items": [
         {
