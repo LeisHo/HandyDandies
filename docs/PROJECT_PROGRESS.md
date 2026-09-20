@@ -18,6 +18,26 @@ work seamlessly from there.
 
 ## Currently working on
 
+**SHIPPED 2026-09-20 (later same day, 11th follow-up round, verification
+gap disclosed) -- new custom click functions now default from Custom
+Click Function 3's own saved settings ("Keep those settings as default
+for any new custom click function. also use the settings and group
+order saved as well").** New `NEW_CUSTOM_FUNCTION_TEMPLATE`/
+`applyNewCustomFunctionTemplate()` (`src/main.js`) snapshot Custom Click
+Function 3's saved field values (excluding ClickCount, which stays on
+its own collision-avoidance logic) and its Animation Speed Curve/Start
+Time Curve/Retransition collapsed state, applied right after a brand-new
+function is registered. **Could not get a clean live page load this
+round** (main.js hit this sandbox's own network-truncation issue again,
+this time at a different, larger cutoff -- 587,520 of 613,028 bytes,
+confirmed via both browser-preview and `curl` retries, 5 combined
+attempts). Confidence rests on `node --check` passing and this reusing
+the exact `syncValue()` pattern already live-verified in this same file.
+**Worth a live confirm on your own next reload:** "+ Add Click
+Function" should start checked/enabled, with Animation Speed Curve/
+Start Time Curve/Retransition collapsed and Animation Speed at 700ms.
+See CHANGELOG.txt's matching entry for full detail.
+
 **SHIPPED 2026-09-20 (later same day, 10th follow-up round) -- fixed
 group-level device-checkbox right-alignment ("the Show in Mobile
 checkbox shoud be right aligned. It is in Mobile but not in Desktop").**

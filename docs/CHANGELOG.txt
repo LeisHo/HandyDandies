@@ -9979,6 +9979,68 @@ still reading naturally as part of the title). `style.css` cache-buster
 bumped `?v=17` -> `?v=18` in `index.html`.
 
 --------------------------------------------------------------------------------
+2026-09-20 (later same day, 11th follow-up round -- verification gap
+disclosed)
+
+New custom click functions now start pre-filled from Custom Click
+Function 3's own current saved settings, instead of the shared
+factories' generic hardcoded defaults. Direct request: "in the group
+Custom Click Functions, I have 1 group - Custom Click Function 3. Keep
+those settings as default for any new custom click function. also use
+the settings and group order saved as well."
+
+Read Custom Click Function 3's full field set directly from
+`data/processed/dev-panel-settings.json` (desktop store's `custom3*`
+keys -- these fields are `dynamicDevice`-opted, not `perDevice`, so all
+3 device blocks already held the identical shared value; confirmed by
+direct inspection). Added `NEW_CUSTOM_FUNCTION_TEMPLATE` (`src/main.js`)
+-- a plain snapshot object, prefix stripped, covering every pose-kind
+field EXCEPT `ClickCount` (deliberately left alone so
+`nextFreeCustomFunctionClickCountOrdinal()`'s own collision-avoidance
+logic, which picks a free ordinal per Type+family, still works -- always
+hardcoding a fixed ClickCount from the template would silently reproduce
+the exact class of click-count collision that logic exists to prevent).
+Only covers pose-kind fields since a brand-new function always starts
+`kind:'pose'` regardless of what it's later switched to (matches Custom
+Click Function 3's own kind exactly, so no hold-kind template was
+needed). `applyNewCustomFunctionTemplate(id)` writes each field via
+`cfg[key] = value` + `syncValue(key, value)` -- the same external-update
+convention already proven this session in `syncCfgAndSlidersFromPose()`
+-- then re-runs `updateClickFunctionEnabledVisibility(id)` (needed since
+`syncValue()` deliberately doesn't fire `onChange`, so Enabled's own
+show/hide-everything-else behavior needs an explicit nudge). Also
+applies Custom Click Function 3's own saved group-collapse state to the
+new function's "Animation Speed Curve"/"Start Time Curve"/"Retransition"
+gated subgroups (collapsed, matching the saved data) -- "Offset"/
+"Rotation" needed no change since `createGroupElement()`'s own default
+(expanded) already matches. Wired into `addCustomClickFunction()`, right
+after `registerCustomClickFunction()` builds the group with its normal
+defaults. `main.js` cache-buster bumped `?v=191` -> `?v=192`.
+
+**Verification gap, disclosed honestly, per the standing 5-retry cap
+(direct feedback, prior round: "next time just try 5 times and if it
+fails then move on"):** hit this sandbox's own documented main.js
+network-truncation issue again, this time with a DIFFERENT fixed cutoff
+than previously logged (587,520 bytes this round, vs. the
+previously-documented 391,680-byte cutoff -- the file has grown since
+that was last measured, consistent with this being a size-scaling
+sandbox limitation rather than a fixed byte offset). Confirmed via 2
+browser-preview navigation retries AND 3 separate `curl` retries (all 5,
+combined, hitting the same 587,520-byte truncation on `main.js?v=192`,
+byte-count mismatch against the real 613,028-byte file on disk -- not a
+JS error) that this is the sandbox's own network layer, not a code
+regression. Did not get a clean live page load or a live "create a new
+custom function and inspect its values" check this round. Confidence
+rests on `node --check` passing cleanly and this being a direct
+application of the exact `syncValue()`-based external-update pattern
+already live-verified working in this same file (`syncCfgAndSlidersFromPose()`,
+10th-prior-round entry) -- not new/novel mechanics. **Worth a live
+confirm on your own next reload:** click "+ Add Click Function" and
+check the new group's Master On/Off (should start checked), Animation
+Speed Curve/Start Time Curve/Retransition (should start collapsed), and
+Animation Speed (Ms) (should start at 700, not 400).
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

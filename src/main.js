@@ -8037,6 +8037,64 @@ function registerCustomClickFunction(id, title, kind, family) {
 // user picks a "+Hold"-suffixed Type. Title is now fixed regardless of
 // kind (no more "Custom Click+Hold Function N" variant) since kind is no
 // longer decided at creation time.
+// Template for a brand-new custom click function's initial field values,
+// direct request 2026-09-20 ("in the group Custom Click Functions, I have
+// 1 group - Custom Click Function 3. Keep those settings as default for
+// any new custom click function. also use the settings and group order
+// saved as well") -- a snapshot of Custom Click Function 3's own saved
+// values (`data/processed/dev-panel-settings.json`, desktop store,
+// `custom3*` keys) at the time of the request, prefix stripped. Only
+// covers POSE-kind fields since every brand-new function starts as
+// kind:'pose' regardless of what it's later switched to (see
+// addCustomClickFunction()'s own comment) -- matches Custom Click
+// Function 3's own kind ('pose', Type "Click") exactly, so no hold-kind
+// fields are needed here. `ClickCount` is deliberately excluded --
+// overwriting it would defeat nextFreeCustomFunctionClickCountOrdinal()'s
+// own collision-avoidance logic (see its call site below), which already
+// picks a free ordinal for the new function's Type+family. Applying the
+// group order/collapse state alongside is handled separately, right
+// after this template is applied -- see the 3 named subgroup keys at the
+// bottom of applyNewCustomFunctionTemplate().
+const NEW_CUSTOM_FUNCTION_TEMPLATE = {
+  Enabled: true, Type: 'Click', TouchPointCount: 2, Mode: 'Single Pose',
+  OffsetEnabled: false, OffsetX: 0, OffsetY: 0,
+  RotationEnabled: false, RotationX: 0, RotationY: 0, RotationZ: 0,
+  TargetPose: '', TweenSelector: '', TweenSpeedMs: 800,
+  TweenStartTimeCurve: '[{"x":0,"y":0},{"x":1,"y":1}]', TweenStartTimeRange: '{"min":0,"max":300}',
+  SequencePlayMode: 'Count', SequenceCount: 3, SequenceCountMode: 'Loop',
+  SequenceLoopTransition: true, SequenceHoldMs: 0, TransitionSpeedMs: 700,
+  SpeedCurveEnabled: false, SpeedCurve: '[{"x":0,"y":0},{"x":1,"y":1}]', SpeedCurveRange: '{"min":50,"max":2000}',
+  StartTimeCurveEnabled: false, StartTimeCurve: '[{"x":0,"y":0},{"x":1,"y":1}]', StartTimeRange: '{"min":0,"max":300}',
+  PauseDurationMs: 0,
+  RetransitionEnabled: false, RetransitionSpeedMs: 400,
+  RetransitionStartTimeCurve: '[{"x":0,"y":0},{"x":1,"y":1}]', RetransitionStartTimeRange: '{"min":0,"max":300}'
+}
+// Collapsed state of the 5 mandatory gated subgroups (§ CLAUDE.md
+// wrapClickFunctionGatedSubgroups()) matching Custom Click Function 3's
+// own saved order data -- Offset/Rotation left expanded (already
+// createGroupElement()'s own default, so nothing to do for those 2),
+// Animation Speed Curve/Start Time Curve/Retransition collapsed.
+const NEW_CUSTOM_FUNCTION_COLLAPSED_SUBGROUPS = ['Animation Speed Curve', 'Start Time Curve', 'Retransition']
+function applyNewCustomFunctionTemplate(id) {
+  Object.keys(NEW_CUSTOM_FUNCTION_TEMPLATE).forEach((suffix) => {
+    const key = `${id}${suffix}`
+    const value = NEW_CUSTOM_FUNCTION_TEMPLATE[suffix]
+    cfg[key] = value
+    syncValue(key, value)
+  })
+  const enabledRow = document.querySelector(`.dp-row[data-key="${id}Enabled"]`)
+  const group = enabledRow ? enabledRow.closest('.dp-group') : null
+  if (group) {
+    group.querySelectorAll(':scope .dp-group').forEach((sub) => {
+      if (NEW_CUSTOM_FUNCTION_COLLAPSED_SUBGROUPS.includes(sub.dataset.key)) sub.classList.add('collapsed')
+    })
+  }
+  // Enabled's own value just changed via syncValue() (which deliberately
+  // doesn't fire onChange -- see syncCfgAndSlidersFromPose()'s own
+  // comment for why), so the Master On/Off show/hide-everything-else
+  // behavior needs an explicit re-run, same as a real click would trigger.
+  updateClickFunctionEnabledVisibility(id)
+}
 function addCustomClickFunction() {
   const family = getActiveDevPanelTab()
   const id = `custom${nextCustomFunctionN}`
@@ -8045,6 +8103,7 @@ function addCustomClickFunction() {
   nextCustomFunctionN++
   customClickFunctionIds.push({ id, title, kind, family })
   registerCustomClickFunction(id, title, kind, family)
+  applyNewCustomFunctionTemplate(id)
   persistCustomClickFunctionIds()
 }
 // Called once from onRestore (see initDevPanel()'s own opts, above) --
