@@ -1,8 +1,8 @@
 {
   "values": {
     "desktop": {
-      "fieldRows": 5,
-      "fieldCols": 5,
+      "fieldRows": 10,
+      "fieldCols": 10,
       "rowSpacing": 14,
       "columnSpacing": 15,
       "handScale": 1.2,
