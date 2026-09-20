@@ -1532,6 +1532,45 @@ function refreshGroupCascadeChrome(g) {
 // a name already in use ANYWHERE (nested or not) is unavailable for a
 // new group, so this exact duplicate can no longer be created going
 // forward.
+// Deepest ancestor `.dp-group` chain for a selected element (row or
+// group), nearest-first -- ported from TEMPLATE_DEV_PANEL.html's own
+// devSelectionAncestorGroupChain() (2026-09-20), adapted to this
+// project's own `.dp-group`/`.dp-group-body` class names (the template
+// uses `.dev-section`/`.dev-section-content` -- see this project's own
+// CLAUDE.md gotcha on why a template port is never a straight copy-
+// paste). Relies on the same fixed DOM shape every group already has:
+// `.dp-group > .dp-group-body` (rows and/or subgroups) -- so "el's
+// parent is a `.dp-group-body`" is exactly "el sits directly inside some
+// group." A top-level item (direct child of `groupsEl`) naturally
+// produces an empty chain.
+function devSelectionAncestorGroupChain(el) {
+  const chain = []
+  let node = el
+  while (node.parentElement && node.parentElement.classList.contains('dp-group-body')) {
+    const g = node.parentElement.parentElement
+    if (!g || !g.classList.contains('dp-group')) break
+    chain.push(g)
+    node = g
+  }
+  return chain
+}
+// The DEEPEST group that contains every one of the given selected
+// elements, or null if they share no common containing group (all
+// top-level, or spanning two subtrees with nothing in common) -- ported
+// from the template's own findDevSelectionCommonAncestorGroup()
+// (2026-09-20, direct request: "the added group should be within the
+// same settings group that the selected settings were in. If selected
+// settings...are within different setting groups, place the new group
+// in the first layer of nest groups that both settings are within").
+function findDevSelectionCommonAncestorGroup(elements) {
+  if (!elements.length) return null
+  const chains = elements.map(devSelectionAncestorGroupChain)
+  const [first, ...rest] = chains
+  for (const candidate of first) {
+    if (rest.every((chain) => chain.includes(candidate))) return candidate
+  }
+  return null
+}
 function addCustomGroup(groupsEl) {
   const existing = new Set(Array.from(groupsEl.querySelectorAll('.dp-group')).map((g) => g.dataset.key))
   let name = 'New Group'
@@ -3024,7 +3063,27 @@ export function initDevPanel(groups, opts = {}) {
   // exists, regardless of how it got armed. If NOT armed, unchanged
   // original behavior (create an empty group immediately).
   addGroupBtn.addEventListener('click', () => {
+    // Placement -- ported from TEMPLATE_DEV_PANEL.html's 2026-09-20
+    // addDevGroup() rework (direct request: "the added group should be
+    // within the same settings group that the selected settings were
+    // in. If selected settings...are within different setting groups,
+    // place the new group in the first layer of nest groups that both
+    // settings are within"). Computed BEFORE addCustomGroup() runs,
+    // since moving the selected items would change their own ancestor
+    // chain. Only the has-a-selection-with-a-common-ancestor case is
+    // affected -- addCustomGroup()'s own existing placement (this
+    // project's bottom-of-list convention, a pre-existing divergence
+    // from the template's own top-of-list one) is untouched for every
+    // other case (no selection, or an all-top-level/no-common-ancestor
+    // selection).
+    const selected = Array.from(devPanelSelectedItems)
+    const commonAncestor = selected.length ? findDevSelectionCommonAncestorGroup(selected) : null
     const g = addCustomGroup(groupsEl)
+    if (commonAncestor) {
+      const targetBody = commonAncestor.querySelector(':scope > .dp-group-body')
+      targetBody.insertBefore(g, targetBody.firstChild)
+      g.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
     if (devPanelSelectedItems.size) {
       const gb = g.querySelector(':scope > .dp-group-body')
       devPanelSelectedItems.forEach((t) => gb.appendChild(t))
