@@ -892,6 +892,22 @@ const DEV_GROUPS = [
       { key: 'tipTwistPinky', label: 'Pinky Tip Twist (%)', type: 'slider', min: -100, max: 100, step: 1, def: -3, onChange: () => applyCurl('pinky') },
       { key: 'wristBend', label: 'Wrist Bend (Deg)', type: 'slider', min: -90, max: 90, step: 1, def: 0, onChange: () => applyWristPose() },
       { key: 'wristSplay', label: 'Wrist Splay (Deg)', type: 'slider', min: -30, max: 30, step: 1, def: -1, onChange: () => applyWristPose() },
+      // Ported from HANDO (direct request: "check Hando. I added a wrist
+      // rotation slider... make sure we can take those imports etc"). Same
+      // local-Y rotation on the shared `rHand` bone HANDO's own comment
+      // describes (rotates along the wrist-to-elbow bone direction) --
+      // Bend/Splay already claim X/Z on this bone (see
+      // applyWristPoseToSkeleton() below), so Y is the same remaining axis
+      // HANDO used. In POSE_PRESET_KEYS so it's captured/restored/tweened/
+      // exported/imported alongside wristBend/wristSplay -- this is what
+      // makes a pasted HANDO pose (Import button, savedPoses list-picker)
+      // that includes wristRotation actually carry the value over instead
+      // of silently dropping it. Range/lockRange match HANDO's own slider
+      // exactly (same shared rig, no coordinate-frame conversion needed --
+      // unlike the camera/lighting HANDO-import path, this bone-local
+      // rotation isn't affected by the alignQuat difference between the 2
+      // projects).
+      { key: 'wristRotation', label: 'Wrist Rotation (Deg)', type: 'slider', min: -360, max: 360, step: 1, def: 0, lockRange: true, onChange: () => applyWristPose() },
       { key: 'modelRotX', label: 'Whole-Hand Rotation X (Deg)', type: 'slider', min: -200, max: 200, step: 1, def: 0, lockRange: true, onChange: () => onWholeHandRotationChange() },
       { key: 'modelRotY', label: 'Whole-Hand Rotation Y (Deg)', type: 'slider', min: -200, max: 200, step: 1, def: 0, lockRange: true, onChange: () => onWholeHandRotationChange() },
       { key: 'modelRotZ', label: 'Whole-Hand Rotation Z (Deg)', type: 'slider', min: -200, max: 200, step: 1, def: 0, lockRange: true, onChange: () => onWholeHandRotationChange() },
@@ -1564,7 +1580,7 @@ DEV_GROUPS.forEach((g) => g.controls.forEach((c) => {
 // preserving).
 const POSE_SUBGROUP_SPECS = [
   { title: 'Whole-Hand Rotation & Thumb', collapsed: true, keys: ['modelRotX', 'modelRotY', 'modelRotZ', 'thumbCurl', 'thumbSplay', 'thumbSplay2', 'tipTwistThumb', 'curlBiasThumb', 'baseOnlyCurlThumb', 'midOnlyCurlThumb', 'tipOnlyCurlThumb'] },
-  { title: 'Wrist', collapsed: true, keys: ['wristBend', 'wristSplay'] },
+  { title: 'Wrist', collapsed: true, keys: ['wristBend', 'wristSplay', 'wristRotation'] },
   { title: 'Index', collapsed: true, keys: ['curlIndex', 'tipTwistIndex', 'splayIndex', 'curlBiasIndex', 'splayIndex2', 'baseOnlyCurlIndex', 'midOnlyCurlIndex', 'tipOnlyCurlIndex'] },
   { title: 'Middle', collapsed: true, keys: ['curlMiddle', 'tipTwistMiddle', 'splayMiddle', 'curlBiasMiddle', 'splayMiddle2', 'baseOnlyCurlMiddle', 'midOnlyCurlMiddle', 'tipOnlyCurlMiddle'] },
   { title: 'Ring', collapsed: true, keys: ['curlRing', 'tipTwistRing', 'splayRing', 'curlBiasRing', 'splayRing2', 'baseOnlyCurlRing', 'midOnlyCurlRing', 'tipOnlyCurlRing'] },
@@ -2675,6 +2691,7 @@ function applyWristPoseToSkeleton(skeleton, values = cfg, extraSplayDeg = 0) {
   bone.quaternion.copy(rest)
   bone.rotateX(THREE.MathUtils.degToRad(values.wristBend))
   bone.rotateZ(THREE.MathUtils.degToRad(values.wristSplay + extraSplayDeg))
+  bone.rotateY(THREE.MathUtils.degToRad(values.wristRotation || 0))
 }
 function applyWristPose() {
   if (!modelLoaded) return
@@ -2718,7 +2735,7 @@ const POSE_PRESET_KEYS = [
   'curlMiddle', 'splayMiddle', 'splayMiddle2', 'curlBiasMiddle', 'baseOnlyCurlMiddle', 'midOnlyCurlMiddle', 'tipOnlyCurlMiddle', 'tipTwistMiddle',
   'curlRing', 'splayRing', 'splayRing2', 'curlBiasRing', 'baseOnlyCurlRing', 'midOnlyCurlRing', 'tipOnlyCurlRing', 'tipTwistRing',
   'curlPinky', 'splayPinky', 'splayPinky2', 'curlBiasPinky', 'baseOnlyCurlPinky', 'midOnlyCurlPinky', 'tipOnlyCurlPinky', 'tipTwistPinky',
-  'wristBend', 'wristSplay', 'modelRotX', 'modelRotY', 'modelRotZ',
+  'wristBend', 'wristSplay', 'wristRotation', 'modelRotX', 'modelRotY', 'modelRotZ',
   // Ported from HANDO (direct request: "i integrated XYZ offset and scale
   // sliders to Pose in Hando. Integrate those so exports load correctly.")
   // -- HANDO's own version is a single GLOBAL modelRoot-level transform
