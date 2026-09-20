@@ -167,17 +167,17 @@
       "loadingPreviewSequenceLoopTransition": true,
       "loadingPreviewSequenceHoldMs": 0,
       "loadingPreviewSize": 1000,
-      "loadingPreviewRotationX": -79.52141477498436,
-      "loadingPreviewRotationY": -3.450536658585675,
+      "loadingPreviewRotationX": -79.52141477498444,
+      "loadingPreviewRotationY": -3.4505366585857034,
       "loadingPreviewRotationZ": 0,
-      "loadingPreviewOffsetX": -0.7597115124975212,
-      "loadingPreviewOffsetY": -8.402931074256246,
-      "loadingPreviewOffsetZ": -2.5000000000000036,
+      "loadingPreviewOffsetX": 0.27796090493479864,
+      "loadingPreviewOffsetY": -2.310339603408437,
+      "loadingPreviewOffsetZ": -12.038474877346157,
       "loadingPreviewCameraFov": 32,
-      "loadingPreviewCameraZoom": 220.06702180444464,
+      "loadingPreviewCameraZoom": 64.25715498581916,
       "loadingPreviewCameraEditMode": false,
       "customClickFunctionIds": "[{\"id\":\"custom1\",\"title\":\"Custom Click Function 1\",\"kind\":\"pose\",\"family\":\"desktop\"}]",
-      "posePreviewEnabled": false,
+      "posePreviewEnabled": true,
       "thumbCurl": 75,
       "thumbSplay": 42,
       "thumbSplay2": 13,
@@ -6383,52 +6383,52 @@
             "COUNTDOWN (VERT) - 1",
             {
               "type": "hold",
-              "percent": 50
+              "percent": 100
             },
             "COUNTDOWN (VERT) - 2",
             {
               "type": "hold",
-              "percent": 50
+              "percent": 100
             },
             "COUNTDOWN (VERT) - 3",
             {
               "type": "hold",
-              "percent": 50
+              "percent": 100
             },
             "COUNTDOWN (VERT) - 4",
             {
               "type": "hold",
-              "percent": 50
+              "percent": 100
             },
             "COUNTDOWN (VERT) - 5",
             {
               "type": "hold",
-              "percent": 50
+              "percent": 100
             },
             "COUNTDOWN (VERT) - 6",
             {
               "type": "hold",
-              "percent": 50
+              "percent": 100
             },
             "COUNTDOWN (VERT) - 7",
             {
               "type": "hold",
-              "percent": 50
+              "percent": 100
             },
             "COUNTDOWN (VERT) - 8",
             {
               "type": "hold",
-              "percent": 50
+              "percent": 100
             },
             "COUNTDOWN (VERT) - 9",
             {
               "type": "hold",
-              "percent": 50
+              "percent": 100
             },
             "COUNTDOWN  (VERT) - 10",
             {
               "type": "hold",
-              "percent": 50
+              "percent": 100
             },
             "COUNTDOWN (VERT) - LENS COVER"
           ],
@@ -7158,17 +7158,17 @@
       "loadingPreviewSequenceLoopTransition": true,
       "loadingPreviewSequenceHoldMs": 0,
       "loadingPreviewSize": 1000,
-      "loadingPreviewRotationX": -79.52141477498436,
-      "loadingPreviewRotationY": -3.450536658585675,
+      "loadingPreviewRotationX": -79.52141477498444,
+      "loadingPreviewRotationY": -3.4505366585857034,
       "loadingPreviewRotationZ": 0,
-      "loadingPreviewOffsetX": -0.7597115124975212,
-      "loadingPreviewOffsetY": -8.402931074256246,
-      "loadingPreviewOffsetZ": -2.5000000000000036,
+      "loadingPreviewOffsetX": 0.27796090493479864,
+      "loadingPreviewOffsetY": -2.310339603408437,
+      "loadingPreviewOffsetZ": -12.038474877346157,
       "loadingPreviewCameraFov": 32,
-      "loadingPreviewCameraZoom": 220.06702180444464,
+      "loadingPreviewCameraZoom": 64.25715498581916,
       "loadingPreviewCameraEditMode": false,
       "customClickFunctionIds": "[{\"id\":\"custom1\",\"title\":\"Custom Click Function 1\",\"kind\":\"pose\",\"family\":\"desktop\"}]",
-      "posePreviewEnabled": false,
+      "posePreviewEnabled": true,
       "thumbCurl": 75,
       "thumbSplay": 42,
       "thumbSplay2": 13,
@@ -13374,52 +13374,52 @@
             "COUNTDOWN (VERT) - 1",
             {
               "type": "hold",
-              "percent": 50
+              "percent": 100
             },
             "COUNTDOWN (VERT) - 2",
             {
               "type": "hold",
-              "percent": 50
+              "percent": 100
             },
             "COUNTDOWN (VERT) - 3",
             {
               "type": "hold",
-              "percent": 50
+              "percent": 100
             },
             "COUNTDOWN (VERT) - 4",
             {
               "type": "hold",
-              "percent": 50
+              "percent": 100
             },
             "COUNTDOWN (VERT) - 5",
             {
               "type": "hold",
-              "percent": 50
+              "percent": 100
             },
             "COUNTDOWN (VERT) - 6",
             {
               "type": "hold",
-              "percent": 50
+              "percent": 100
             },
             "COUNTDOWN (VERT) - 7",
             {
               "type": "hold",
-              "percent": 50
+              "percent": 100
             },
             "COUNTDOWN (VERT) - 8",
             {
               "type": "hold",
-              "percent": 50
+              "percent": 100
             },
             "COUNTDOWN (VERT) - 9",
             {
               "type": "hold",
-              "percent": 50
+              "percent": 100
             },
             "COUNTDOWN  (VERT) - 10",
             {
               "type": "hold",
-              "percent": 50
+              "percent": 100
             },
             "COUNTDOWN (VERT) - LENS COVER"
           ],
@@ -14149,17 +14149,17 @@
       "loadingPreviewSequenceLoopTransition": true,
       "loadingPreviewSequenceHoldMs": 0,
       "loadingPreviewSize": 1000,
-      "loadingPreviewRotationX": -79.52141477498436,
-      "loadingPreviewRotationY": -3.450536658585675,
+      "loadingPreviewRotationX": -79.52141477498444,
+      "loadingPreviewRotationY": -3.4505366585857034,
       "loadingPreviewRotationZ": 0,
-      "loadingPreviewOffsetX": -0.7597115124975212,
-      "loadingPreviewOffsetY": -8.402931074256246,
-      "loadingPreviewOffsetZ": -2.5000000000000036,
+      "loadingPreviewOffsetX": 0.27796090493479864,
+      "loadingPreviewOffsetY": -2.310339603408437,
+      "loadingPreviewOffsetZ": -12.038474877346157,
       "loadingPreviewCameraFov": 32,
-      "loadingPreviewCameraZoom": 220.06702180444464,
+      "loadingPreviewCameraZoom": 64.25715498581916,
       "loadingPreviewCameraEditMode": false,
       "customClickFunctionIds": "[{\"id\":\"custom1\",\"title\":\"Custom Click Function 1\",\"kind\":\"pose\",\"family\":\"desktop\"}]",
-      "posePreviewEnabled": false,
+      "posePreviewEnabled": true,
       "thumbCurl": 75,
       "thumbSplay": 42,
       "thumbSplay2": 13,
@@ -20365,52 +20365,52 @@
             "COUNTDOWN (VERT) - 1",
             {
               "type": "hold",
-              "percent": 50
+              "percent": 100
             },
             "COUNTDOWN (VERT) - 2",
             {
               "type": "hold",
-              "percent": 50
+              "percent": 100
             },
             "COUNTDOWN (VERT) - 3",
             {
               "type": "hold",
-              "percent": 50
+              "percent": 100
             },
             "COUNTDOWN (VERT) - 4",
             {
               "type": "hold",
-              "percent": 50
+              "percent": 100
             },
             "COUNTDOWN (VERT) - 5",
             {
               "type": "hold",
-              "percent": 50
+              "percent": 100
             },
             "COUNTDOWN (VERT) - 6",
             {
               "type": "hold",
-              "percent": 50
+              "percent": 100
             },
             "COUNTDOWN (VERT) - 7",
             {
               "type": "hold",
-              "percent": 50
+              "percent": 100
             },
             "COUNTDOWN (VERT) - 8",
             {
               "type": "hold",
-              "percent": 50
+              "percent": 100
             },
             "COUNTDOWN (VERT) - 9",
             {
               "type": "hold",
-              "percent": 50
+              "percent": 100
             },
             "COUNTDOWN  (VERT) - 10",
             {
               "type": "hold",
-              "percent": 50
+              "percent": 100
             },
             "COUNTDOWN (VERT) - LENS COVER"
           ],
@@ -22136,7 +22136,7 @@
     },
     {
       "key": "Loading Preview",
-      "collapsed": true,
+      "collapsed": false,
       "locked": false,
       "items": [
         {
@@ -28506,7 +28506,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 1",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -28852,7 +28852,7 @@
       "subgroups": [
         {
           "key": "Custom Click Function 1",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
