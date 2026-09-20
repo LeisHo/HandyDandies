@@ -7037,7 +7037,7 @@
       "dp_valueTextColor": "#5cc9ff",
       "dp_tabTextColor": "#ffffff",
       "dp_scrollStrength": 0.2,
-      "custom1Enabled": false,
+      "custom1Enabled": true,
       "custom1Type": "Click",
       "custom1TouchPointCount": 2,
       "custom1ClickCount": "1st",
@@ -14109,7 +14109,7 @@
       "dp_valueTextColor": "#5cc9ff",
       "dp_tabTextColor": "#ffffff",
       "dp_scrollStrength": 1,
-      "custom1Enabled": false,
+      "custom1Enabled": true,
       "custom1Type": "Click",
       "custom1TouchPointCount": 2,
       "custom1ClickCount": "1st",
@@ -21181,7 +21181,7 @@
       "dp_valueTextColor": "#5cc9ff",
       "dp_tabTextColor": "#ffffff",
       "dp_scrollStrength": 0.2,
-      "custom1Enabled": false,
+      "custom1Enabled": true,
       "custom1Type": "Click",
       "custom1TouchPointCount": 2,
       "custom1ClickCount": "1st",
@@ -28669,7 +28669,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 1",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -28864,7 +28864,7 @@
       "subgroups": [
         {
           "key": "Custom Click Function 1",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
