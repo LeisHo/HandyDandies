@@ -7962,6 +7962,89 @@ committed the same round -- see this file's own immediately-preceding
 entry -- still guaranteeing a fresh fetch of this slice's content).
 
 --------------------------------------------------------------------------------
+2026-09-19  20:30:07-20:48:18 EDT (18m11s; "do the rest" against the
+Custom Click Functions backlog -- 2 of the last 3 items)
+
+**Delete-function button, DONE and verified.** Direct spec item, the
+last remaining disclosed gap from an earlier slice: the dev panel's own
+existing Delete Group/Setting (🗑) icon could already remove a custom
+function's group from view, but left `customClickFunctionIds`/
+`CLICK_POSE_KEYS`/`CLICK_HOLD_KEYS`/trigger-state completely untouched,
+so a "deleted" function kept silently firing. Fixed with a new,
+generic `opts.onGroupDeleted` host hook in devPanel.js's own delete
+click-handler (same pattern as the existing `opts.onRestore`) --
+`cleanupDeletedCustomClickFunction()` (main.js) filters for the deleted
+target actually being a Custom Click Function's own group (via its
+`dataset.customFunctionFamily` marker) and removes it from every place
+`registerCustomClickFunction()` originally added it. Reuses the
+existing delete UI rather than building a 2nd, redundant one -- the
+disclosed gap was always the missing cleanup, never the UI itself.
+Deliberately NOT undo-aware (hitting Undo restores the DOM group, but
+the external bookkeeping this hook cleaned up stays cleaned up -- re-
+registering it on an undo is a materially bigger feature this hook
+doesn't attempt).
+
+Verified live: deleting a custom pose function's group correctly
+emptied `customClickFunctionIds` (confirmed via its own JSON cfg key),
+and a fresh `getOrInitHandCP()` call on a real hand no longer carried
+any entry for the deleted id (only the 5 static keys remained). No
+console errors.
+
+**Multi-sequence-plus-hold chain builder, DONE and verified -- the
+vaguest, least-specified item in the entire original A-L spec (one
+line, no chaining-semantics detail at all), so this is a disclosed
+DEFAULT DESIGN CHOICE, not a reproduction of any specific original
+wording.** Scoped to hold-based triggers only (chp/rchp/dcHold/
+tripleClickHold/quadClickHold + custom Click+Hold functions) --
+"plus-hold" reads most naturally as "the chain plays for as long as the
+gesture is held," which only a hold-based trigger family can express.
+Adds a 3rd `${p}Mode` value ("Chain," alongside Single Pose/Sequence)
+and a new `${p}TweenChain` ordered multi-select (a sequence OF saved
+Tween Sequences, reusing the exact same drag-to-reorder control type
+`tweenPoses` already uses) -- `startClickHoldPose()`'s own Chain branch
+concatenates every listed sequence's own resolved named poses, in
+order, into ONE longer effective sequence. Every downstream consumer
+(forward/looping/retransition, Loop Mode, On Release Mode) needed ZERO
+further changes -- they already only ever look at the flat resolved
+pose list, never at how many sequences it came from.
+
+New `isSequenceOrChainMode(p)` helper replaces all 9 existing
+`cfg[\`${p}Mode\`] === 'Sequence'` checks across the file (a clean
+`sed` substitution, one shared helper instead of hand-editing 9 sites) --
+Chain behaves identically to Sequence for every visibility/gating
+purpose; the ONLY place it actually differs is the concatenation logic
+itself. `TweenSelector` (Sequence-only) and `TweenChain` (Chain-only)
+are the one pair of controls that DON'T share visibility between the 2
+modes -- owned by a new small `updateChainModeVisibility(p)`.
+
+Verified live via real dropdown/checkbox interaction (not just direct
+`cfg` writes, after an initial test methodology mistake caught and
+corrected mid-verification): switching `chp`'s Mode to "Chain" via the
+real `<select>` correctly hid `chpTweenSelector` and showed
+`chpTweenChain`; the new multi-select's "+ Add" row populated real
+saved-sequence names ("ChainA"/"ChainB," 2 throwaway test sequences);
+driving `startClickHoldPose('chp')` + `updateClickHoldPoseForHand()`
+with 2 sequences (2 named poses each) in the chain produced a 5-entry
+`chp.tweenPosesResolved` (1 FROM-anchor + all 4 named poses, in order) --
+confirming the concatenation. Switching back to Sequence mode correctly
+reverted both rows' visibility (regression-checked). No console errors
+throughout.
+
+**Still blocked, not attempted this round:** reordering the 10 fixed
+triggers' own settings to match the original spec's item B field order.
+The verbatim spec text was pasted earlier in this conversation but is no
+longer in this session's available context (a context-summary cutoff
+happened in between), and the exact field order was never recorded
+verbatim in this project's own docs -- only ever referenced as an open
+TODO ("reordering... to match the spec's B ordering"). Flagged to the
+user rather than guessed at and called done; fabricating an order and
+claiming it matches their original spec would be worse than leaving
+this open.
+
+Cache-buster: `index.html`'s own `main.js?v=161` (start of this slice)
+-> `?v=163`.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

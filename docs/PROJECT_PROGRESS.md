@@ -306,22 +306,42 @@ hand); Animation Speed Curve's own fields never got their interactive
 curve-graph widget (now fixed for all 10 existing triggers too).
 
 **CORRECTED 2026-09-19 -- Scroll/Multi-Point Types, click-count
-selector, duplicate-setting validation, and automatic hold-timing
-conflict resolution are now all DONE** (see this doc's own newer entry
-above, and CHANGELOG.txt's matching 2026-09-19 entry) -- left here as a
+selector, duplicate-setting validation, automatic hold-timing conflict
+resolution, delete-function button, and the multi-sequence-plus-hold
+chain builder are now ALL DONE** (see this doc's own newer entry above,
+and CHANGELOG.txt's matching 2026-09-19 entries) -- left here as a
 cautionary record of the original scoping decision rather than silently
-rewritten, per this project's own convention. Only a delete-function
-button (the dev panel's own Delete Group/Setting icon removes the DOM
-group but won't clean up this feature's own bookkeeping) remains
-genuinely deliberately scoped down.
+rewritten, per this project's own convention. Nothing from the original
+"deliberately scoped down" list remains scoped down.
 
-**Still ahead**: a delete-function button for Custom Click Functions;
-reordering the 10 fixed groups' own settings to match the original
-spec's B ordering; a multi-sequence-plus-hold chain builder. Bezier
-curve handles are also now DONE (see above) -- this list is shorter than
-it used to be. See CHANGELOG.txt's matching entries for full slice-by-
-slice detail; this is genuinely large and will keep spanning multiple
-rounds.
+**SHIPPED 2026-09-19: delete-function button (real cleanup, not just a
+2nd delete UI) + the multi-sequence-plus-hold chain builder.** Deleting
+a custom function via the dev panel's own existing Delete Group/Setting
+icon now genuinely removes it from `customClickFunctionIds`/
+`CLICK_POSE_KEYS`/`CLICK_HOLD_KEYS`/trigger-state (a new generic
+`opts.onGroupDeleted` devPanel.js host hook, same pattern as the
+existing `opts.onRestore`) -- verified live (emptied
+`customClickFunctionIds`, no lingering per-hand state for the deleted
+id). Chain builder adds a 3rd Mode value ("Chain," hold-based triggers
+only) that concatenates multiple saved Tween Sequences into one longer
+effective sequence, reusing every existing Sequence-mode mechanism
+(Loop Mode, On Release Mode, Retransition) for free -- this was the
+vaguest, least-specified item in the whole original spec, so it's a
+disclosed default design choice, not a reproduction of specific
+original wording. Verified live via real dropdown interaction (2 test
+sequences concatenated into a 5-entry resolved pose list; visibility
+toggling and a Sequence-mode regression check both confirmed clean).
+
+**Still ahead**: reordering the 10 fixed groups' own settings to match
+the original spec's B ordering -- BLOCKED, not merely unstarted. The
+verbatim spec text was pasted earlier in this same conversation but
+fell out of this session's available context after a context-summary
+cutoff, and the exact field order was never recorded verbatim in this
+project's own docs (only ever referenced as an open TODO). Needs the
+user to re-paste the original spec's item B text before this can be
+done faithfully rather than guessed at. See CHANGELOG.txt's matching
+2026-09-19 entries for full slice-by-slice detail on everything else
+that shipped this round.
 
 **SHIPPED 2026-09-19: the 2 gaps the user asked to fix first out of the
 full A-L gap report -- Master On/Off (hide all settings when off) and
