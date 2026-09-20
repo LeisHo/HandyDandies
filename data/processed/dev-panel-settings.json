@@ -186,7 +186,7 @@
       "loadingPreviewCameraFov": 32,
       "loadingPreviewCameraZoom": 64.25715498581914,
       "loadingPreviewCameraEditMode": true,
-      "customClickFunctionIds": "[{\"id\":\"custom2\",\"title\":\"Custom Click Function 2\",\"kind\":\"pose\",\"family\":\"mobile\"},{\"id\":\"custom3\",\"title\":\"Custom Click Function 3\",\"kind\":\"pose\",\"family\":\"desktop\"}]",
+      "customClickFunctionIds": "[{\"id\":\"custom2\",\"title\":\"Custom Click Function 2\",\"kind\":\"pose\",\"family\":\"mobile\"},{\"id\":\"custom3\",\"title\":\"Custom Click Function 3\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom4\",\"title\":\"Custom Click Function 4\",\"kind\":\"pose\",\"family\":\"desktop\"}]",
       "posePreviewEnabled": false,
       "thumbCurl": 75,
       "thumbSplay": 42,
@@ -7105,7 +7105,58 @@
       "custom3RetransitionEnabled": false,
       "custom3RetransitionSpeedMs": 400,
       "custom3RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom3RetransitionStartTimeRange": "{\"min\":0,\"max\":300}"
+      "custom3RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom4Enabled": true,
+      "custom4Type": "Click",
+      "custom4TouchPointCount": 2,
+      "custom4ClickCount": "1st",
+      "custom4Mode": "Sequence",
+      "custom4OffsetEnabled": false,
+      "custom4OffsetX": 0,
+      "custom4OffsetY": 0,
+      "custom4RotationEnabled": false,
+      "custom4RotationX": 0,
+      "custom4RotationY": 0,
+      "custom4RotationZ": 0,
+      "custom4TargetPose": "Clockwise Fan - 1",
+      "custom4TweenSelector": "",
+      "custom4TweenSpeedMs": 800,
+      "custom4TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom4TweenStartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom4SequencePlayMode": "Count",
+      "custom4SequenceCount": 3,
+      "custom4SequenceCountMode": "Loop",
+      "custom4SequenceLoopTransition": true,
+      "custom4SequenceHoldMs": 0,
+      "custom4TransitionSpeedMs": 700,
+      "custom4SpeedCurveEnabled": false,
+      "custom4SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom4SpeedCurveRange": "{\"min\":50,\"max\":2000}",
+      "custom4StartTimeCurveEnabled": false,
+      "custom4StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom4StartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom4PauseDurationMs": 0,
+      "custom4RetransitionEnabled": false,
+      "custom4RetransitionSpeedMs": 400,
+      "custom4RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom4RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom4TweenChain": [],
+      "custom4LoopMode": "Off",
+      "custom4LoopHoldMs": 0,
+      "custom4HoldConfirmMs": 500,
+      "custom4TweenRetransitionSpeedMs": 800,
+      "custom4TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom4TweenRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom4OnReleaseMode": "Stop",
+      "custom4TriggerAllHands": false,
+      "custom4TweenStopStartTimeCurveEnabled": false,
+      "custom4TweenStopStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom4TweenStopStartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom4TweenStopDelayEnabled": false,
+      "custom4TweenStopDelayMs": 0,
+      "custom4TweenStopDelayCurveEnabled": false,
+      "custom4TweenStopDelayCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom4TweenStopDelayRange": "{\"min\":0,\"max\":2000}"
     },
     "mobile": {
       "fieldRows": 20,
@@ -7293,7 +7344,7 @@
       "loadingPreviewCameraFov": 32,
       "loadingPreviewCameraZoom": 64.25715498581914,
       "loadingPreviewCameraEditMode": true,
-      "customClickFunctionIds": "[{\"id\":\"custom2\",\"title\":\"Custom Click Function 2\",\"kind\":\"pose\",\"family\":\"mobile\"},{\"id\":\"custom3\",\"title\":\"Custom Click Function 3\",\"kind\":\"pose\",\"family\":\"desktop\"}]",
+      "customClickFunctionIds": "[{\"id\":\"custom2\",\"title\":\"Custom Click Function 2\",\"kind\":\"pose\",\"family\":\"mobile\"},{\"id\":\"custom3\",\"title\":\"Custom Click Function 3\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom4\",\"title\":\"Custom Click Function 4\",\"kind\":\"pose\",\"family\":\"desktop\"}]",
       "posePreviewEnabled": false,
       "thumbCurl": 75,
       "thumbSplay": 42,
@@ -14212,7 +14263,58 @@
       "custom3RetransitionEnabled": false,
       "custom3RetransitionSpeedMs": 400,
       "custom3RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom3RetransitionStartTimeRange": "{\"min\":0,\"max\":300}"
+      "custom3RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom4Enabled": true,
+      "custom4Type": "Click",
+      "custom4TouchPointCount": 2,
+      "custom4ClickCount": "1st",
+      "custom4Mode": "Sequence",
+      "custom4OffsetEnabled": false,
+      "custom4OffsetX": 0,
+      "custom4OffsetY": 0,
+      "custom4RotationEnabled": false,
+      "custom4RotationX": 0,
+      "custom4RotationY": 0,
+      "custom4RotationZ": 0,
+      "custom4TargetPose": "Clockwise Fan - 1",
+      "custom4TweenSelector": "",
+      "custom4TweenSpeedMs": 800,
+      "custom4TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom4TweenStartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom4SequencePlayMode": "Count",
+      "custom4SequenceCount": 3,
+      "custom4SequenceCountMode": "Loop",
+      "custom4SequenceLoopTransition": true,
+      "custom4SequenceHoldMs": 0,
+      "custom4TransitionSpeedMs": 700,
+      "custom4SpeedCurveEnabled": false,
+      "custom4SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom4SpeedCurveRange": "{\"min\":50,\"max\":2000}",
+      "custom4StartTimeCurveEnabled": false,
+      "custom4StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom4StartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom4PauseDurationMs": 0,
+      "custom4RetransitionEnabled": false,
+      "custom4RetransitionSpeedMs": 400,
+      "custom4RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom4RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom4TweenChain": [],
+      "custom4LoopMode": "Off",
+      "custom4LoopHoldMs": 0,
+      "custom4HoldConfirmMs": 500,
+      "custom4TweenRetransitionSpeedMs": 800,
+      "custom4TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom4TweenRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom4OnReleaseMode": "Stop",
+      "custom4TriggerAllHands": false,
+      "custom4TweenStopStartTimeCurveEnabled": false,
+      "custom4TweenStopStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom4TweenStopStartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom4TweenStopDelayEnabled": false,
+      "custom4TweenStopDelayMs": 0,
+      "custom4TweenStopDelayCurveEnabled": false,
+      "custom4TweenStopDelayCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom4TweenStopDelayRange": "{\"min\":0,\"max\":2000}"
     },
     "landscape": {
       "fieldRows": 17,
@@ -14400,7 +14502,7 @@
       "loadingPreviewCameraFov": 32,
       "loadingPreviewCameraZoom": 64.25715498581914,
       "loadingPreviewCameraEditMode": true,
-      "customClickFunctionIds": "[{\"id\":\"custom2\",\"title\":\"Custom Click Function 2\",\"kind\":\"pose\",\"family\":\"mobile\"},{\"id\":\"custom3\",\"title\":\"Custom Click Function 3\",\"kind\":\"pose\",\"family\":\"desktop\"}]",
+      "customClickFunctionIds": "[{\"id\":\"custom2\",\"title\":\"Custom Click Function 2\",\"kind\":\"pose\",\"family\":\"mobile\"},{\"id\":\"custom3\",\"title\":\"Custom Click Function 3\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom4\",\"title\":\"Custom Click Function 4\",\"kind\":\"pose\",\"family\":\"desktop\"}]",
       "posePreviewEnabled": false,
       "thumbCurl": 75,
       "thumbSplay": 42,
@@ -21319,7 +21421,58 @@
       "custom3RetransitionEnabled": false,
       "custom3RetransitionSpeedMs": 400,
       "custom3RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom3RetransitionStartTimeRange": "{\"min\":0,\"max\":300}"
+      "custom3RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom4Enabled": true,
+      "custom4Type": "Click",
+      "custom4TouchPointCount": 2,
+      "custom4ClickCount": "1st",
+      "custom4Mode": "Sequence",
+      "custom4OffsetEnabled": false,
+      "custom4OffsetX": 0,
+      "custom4OffsetY": 0,
+      "custom4RotationEnabled": false,
+      "custom4RotationX": 0,
+      "custom4RotationY": 0,
+      "custom4RotationZ": 0,
+      "custom4TargetPose": "Clockwise Fan - 1",
+      "custom4TweenSelector": "",
+      "custom4TweenSpeedMs": 800,
+      "custom4TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom4TweenStartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom4SequencePlayMode": "Count",
+      "custom4SequenceCount": 3,
+      "custom4SequenceCountMode": "Loop",
+      "custom4SequenceLoopTransition": true,
+      "custom4SequenceHoldMs": 0,
+      "custom4TransitionSpeedMs": 700,
+      "custom4SpeedCurveEnabled": false,
+      "custom4SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom4SpeedCurveRange": "{\"min\":50,\"max\":2000}",
+      "custom4StartTimeCurveEnabled": false,
+      "custom4StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom4StartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom4PauseDurationMs": 0,
+      "custom4RetransitionEnabled": false,
+      "custom4RetransitionSpeedMs": 400,
+      "custom4RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom4RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom4TweenChain": [],
+      "custom4LoopMode": "Off",
+      "custom4LoopHoldMs": 0,
+      "custom4HoldConfirmMs": 500,
+      "custom4TweenRetransitionSpeedMs": 800,
+      "custom4TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom4TweenRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom4OnReleaseMode": "Stop",
+      "custom4TriggerAllHands": false,
+      "custom4TweenStopStartTimeCurveEnabled": false,
+      "custom4TweenStopStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom4TweenStopStartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom4TweenStopDelayEnabled": false,
+      "custom4TweenStopDelayMs": 0,
+      "custom4TweenStopDelayCurveEnabled": false,
+      "custom4TweenStopDelayCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom4TweenStopDelayRange": "{\"min\":0,\"max\":2000}"
     }
   },
   "order": [
@@ -29233,8 +29386,342 @@
         {
           "type": "group",
           "group": {
-            "key": "Custom Click Function 3",
+            "key": "Custom Click Function 4",
             "collapsed": false,
+            "locked": false,
+            "items": [
+              {
+                "type": "row",
+                "key": "custom4Enabled"
+              },
+              {
+                "type": "row",
+                "key": "custom4Type"
+              },
+              {
+                "type": "row",
+                "key": "custom4TouchPointCount"
+              },
+              {
+                "type": "row",
+                "key": "custom4ClickCount"
+              },
+              {
+                "type": "row",
+                "key": "custom4Mode"
+              },
+              {
+                "type": "group",
+                "group": {
+                  "key": "Offset",
+                  "collapsed": false,
+                  "locked": false,
+                  "items": [
+                    {
+                      "type": "row",
+                      "key": "custom4OffsetX"
+                    },
+                    {
+                      "type": "row",
+                      "key": "custom4OffsetY"
+                    }
+                  ],
+                  "settings": [
+                    "custom4OffsetX",
+                    "custom4OffsetY"
+                  ],
+                  "subgroups": []
+                }
+              },
+              {
+                "type": "group",
+                "group": {
+                  "key": "Rotation",
+                  "collapsed": false,
+                  "locked": false,
+                  "items": [
+                    {
+                      "type": "row",
+                      "key": "custom4RotationX"
+                    },
+                    {
+                      "type": "row",
+                      "key": "custom4RotationY"
+                    },
+                    {
+                      "type": "row",
+                      "key": "custom4RotationZ"
+                    }
+                  ],
+                  "settings": [
+                    "custom4RotationX",
+                    "custom4RotationY",
+                    "custom4RotationZ"
+                  ],
+                  "subgroups": []
+                }
+              },
+              {
+                "type": "row",
+                "key": "custom4TargetPose"
+              },
+              {
+                "type": "row",
+                "key": "custom4TweenSelector"
+              },
+              {
+                "type": "row",
+                "key": "custom4TweenSpeedMs"
+              },
+              {
+                "type": "row",
+                "key": "custom4TweenStartTimeCurve"
+              },
+              {
+                "type": "row",
+                "key": "custom4TweenStartTimeRange"
+              },
+              {
+                "type": "row",
+                "key": "custom4SequencePlayMode"
+              },
+              {
+                "type": "row",
+                "key": "custom4SequenceCount"
+              },
+              {
+                "type": "row",
+                "key": "custom4SequenceCountMode"
+              },
+              {
+                "type": "row",
+                "key": "custom4SequenceLoopTransition"
+              },
+              {
+                "type": "row",
+                "key": "custom4SequenceHoldMs"
+              },
+              {
+                "type": "row",
+                "key": "custom4TransitionSpeedMs"
+              },
+              {
+                "type": "group",
+                "group": {
+                  "key": "Animation Speed Curve",
+                  "collapsed": false,
+                  "locked": false,
+                  "items": [
+                    {
+                      "type": "row",
+                      "key": "custom4SpeedCurve"
+                    },
+                    {
+                      "type": "row",
+                      "key": "custom4SpeedCurveRange"
+                    }
+                  ],
+                  "settings": [
+                    "custom4SpeedCurve",
+                    "custom4SpeedCurveRange"
+                  ],
+                  "subgroups": []
+                }
+              },
+              {
+                "type": "group",
+                "group": {
+                  "key": "Start Time Curve",
+                  "collapsed": false,
+                  "locked": false,
+                  "items": [
+                    {
+                      "type": "row",
+                      "key": "custom4StartTimeCurve"
+                    },
+                    {
+                      "type": "row",
+                      "key": "custom4StartTimeRange"
+                    }
+                  ],
+                  "settings": [
+                    "custom4StartTimeCurve",
+                    "custom4StartTimeRange"
+                  ],
+                  "subgroups": []
+                }
+              },
+              {
+                "type": "row",
+                "key": "custom4PauseDurationMs"
+              },
+              {
+                "type": "group",
+                "group": {
+                  "key": "Retransition",
+                  "collapsed": false,
+                  "locked": false,
+                  "items": [
+                    {
+                      "type": "row",
+                      "key": "custom4RetransitionSpeedMs"
+                    },
+                    {
+                      "type": "row",
+                      "key": "custom4RetransitionStartTimeCurve"
+                    },
+                    {
+                      "type": "row",
+                      "key": "custom4RetransitionStartTimeRange"
+                    }
+                  ],
+                  "settings": [
+                    "custom4RetransitionSpeedMs",
+                    "custom4RetransitionStartTimeCurve",
+                    "custom4RetransitionStartTimeRange"
+                  ],
+                  "subgroups": []
+                }
+              }
+            ],
+            "settings": [
+              "custom4Enabled",
+              "custom4Type",
+              "custom4TouchPointCount",
+              "custom4ClickCount",
+              "custom4Mode",
+              "custom4TargetPose",
+              "custom4TweenSelector",
+              "custom4TweenSpeedMs",
+              "custom4TweenStartTimeCurve",
+              "custom4TweenStartTimeRange",
+              "custom4SequencePlayMode",
+              "custom4SequenceCount",
+              "custom4SequenceCountMode",
+              "custom4SequenceLoopTransition",
+              "custom4SequenceHoldMs",
+              "custom4TransitionSpeedMs",
+              "custom4PauseDurationMs"
+            ],
+            "subgroups": [
+              {
+                "key": "Offset",
+                "collapsed": false,
+                "locked": false,
+                "items": [
+                  {
+                    "type": "row",
+                    "key": "custom4OffsetX"
+                  },
+                  {
+                    "type": "row",
+                    "key": "custom4OffsetY"
+                  }
+                ],
+                "settings": [
+                  "custom4OffsetX",
+                  "custom4OffsetY"
+                ],
+                "subgroups": []
+              },
+              {
+                "key": "Rotation",
+                "collapsed": false,
+                "locked": false,
+                "items": [
+                  {
+                    "type": "row",
+                    "key": "custom4RotationX"
+                  },
+                  {
+                    "type": "row",
+                    "key": "custom4RotationY"
+                  },
+                  {
+                    "type": "row",
+                    "key": "custom4RotationZ"
+                  }
+                ],
+                "settings": [
+                  "custom4RotationX",
+                  "custom4RotationY",
+                  "custom4RotationZ"
+                ],
+                "subgroups": []
+              },
+              {
+                "key": "Animation Speed Curve",
+                "collapsed": false,
+                "locked": false,
+                "items": [
+                  {
+                    "type": "row",
+                    "key": "custom4SpeedCurve"
+                  },
+                  {
+                    "type": "row",
+                    "key": "custom4SpeedCurveRange"
+                  }
+                ],
+                "settings": [
+                  "custom4SpeedCurve",
+                  "custom4SpeedCurveRange"
+                ],
+                "subgroups": []
+              },
+              {
+                "key": "Start Time Curve",
+                "collapsed": false,
+                "locked": false,
+                "items": [
+                  {
+                    "type": "row",
+                    "key": "custom4StartTimeCurve"
+                  },
+                  {
+                    "type": "row",
+                    "key": "custom4StartTimeRange"
+                  }
+                ],
+                "settings": [
+                  "custom4StartTimeCurve",
+                  "custom4StartTimeRange"
+                ],
+                "subgroups": []
+              },
+              {
+                "key": "Retransition",
+                "collapsed": false,
+                "locked": false,
+                "items": [
+                  {
+                    "type": "row",
+                    "key": "custom4RetransitionSpeedMs"
+                  },
+                  {
+                    "type": "row",
+                    "key": "custom4RetransitionStartTimeCurve"
+                  },
+                  {
+                    "type": "row",
+                    "key": "custom4RetransitionStartTimeRange"
+                  }
+                ],
+                "settings": [
+                  "custom4RetransitionSpeedMs",
+                  "custom4RetransitionStartTimeCurve",
+                  "custom4RetransitionStartTimeRange"
+                ],
+                "subgroups": []
+              }
+            ]
+          }
+        },
+        {
+          "type": "group",
+          "group": {
+            "key": "Custom Click Function 3",
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -29568,7 +30055,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 2",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -29913,8 +30400,339 @@
       ],
       "subgroups": [
         {
-          "key": "Custom Click Function 3",
+          "key": "Custom Click Function 4",
           "collapsed": false,
+          "locked": false,
+          "items": [
+            {
+              "type": "row",
+              "key": "custom4Enabled"
+            },
+            {
+              "type": "row",
+              "key": "custom4Type"
+            },
+            {
+              "type": "row",
+              "key": "custom4TouchPointCount"
+            },
+            {
+              "type": "row",
+              "key": "custom4ClickCount"
+            },
+            {
+              "type": "row",
+              "key": "custom4Mode"
+            },
+            {
+              "type": "group",
+              "group": {
+                "key": "Offset",
+                "collapsed": false,
+                "locked": false,
+                "items": [
+                  {
+                    "type": "row",
+                    "key": "custom4OffsetX"
+                  },
+                  {
+                    "type": "row",
+                    "key": "custom4OffsetY"
+                  }
+                ],
+                "settings": [
+                  "custom4OffsetX",
+                  "custom4OffsetY"
+                ],
+                "subgroups": []
+              }
+            },
+            {
+              "type": "group",
+              "group": {
+                "key": "Rotation",
+                "collapsed": false,
+                "locked": false,
+                "items": [
+                  {
+                    "type": "row",
+                    "key": "custom4RotationX"
+                  },
+                  {
+                    "type": "row",
+                    "key": "custom4RotationY"
+                  },
+                  {
+                    "type": "row",
+                    "key": "custom4RotationZ"
+                  }
+                ],
+                "settings": [
+                  "custom4RotationX",
+                  "custom4RotationY",
+                  "custom4RotationZ"
+                ],
+                "subgroups": []
+              }
+            },
+            {
+              "type": "row",
+              "key": "custom4TargetPose"
+            },
+            {
+              "type": "row",
+              "key": "custom4TweenSelector"
+            },
+            {
+              "type": "row",
+              "key": "custom4TweenSpeedMs"
+            },
+            {
+              "type": "row",
+              "key": "custom4TweenStartTimeCurve"
+            },
+            {
+              "type": "row",
+              "key": "custom4TweenStartTimeRange"
+            },
+            {
+              "type": "row",
+              "key": "custom4SequencePlayMode"
+            },
+            {
+              "type": "row",
+              "key": "custom4SequenceCount"
+            },
+            {
+              "type": "row",
+              "key": "custom4SequenceCountMode"
+            },
+            {
+              "type": "row",
+              "key": "custom4SequenceLoopTransition"
+            },
+            {
+              "type": "row",
+              "key": "custom4SequenceHoldMs"
+            },
+            {
+              "type": "row",
+              "key": "custom4TransitionSpeedMs"
+            },
+            {
+              "type": "group",
+              "group": {
+                "key": "Animation Speed Curve",
+                "collapsed": false,
+                "locked": false,
+                "items": [
+                  {
+                    "type": "row",
+                    "key": "custom4SpeedCurve"
+                  },
+                  {
+                    "type": "row",
+                    "key": "custom4SpeedCurveRange"
+                  }
+                ],
+                "settings": [
+                  "custom4SpeedCurve",
+                  "custom4SpeedCurveRange"
+                ],
+                "subgroups": []
+              }
+            },
+            {
+              "type": "group",
+              "group": {
+                "key": "Start Time Curve",
+                "collapsed": false,
+                "locked": false,
+                "items": [
+                  {
+                    "type": "row",
+                    "key": "custom4StartTimeCurve"
+                  },
+                  {
+                    "type": "row",
+                    "key": "custom4StartTimeRange"
+                  }
+                ],
+                "settings": [
+                  "custom4StartTimeCurve",
+                  "custom4StartTimeRange"
+                ],
+                "subgroups": []
+              }
+            },
+            {
+              "type": "row",
+              "key": "custom4PauseDurationMs"
+            },
+            {
+              "type": "group",
+              "group": {
+                "key": "Retransition",
+                "collapsed": false,
+                "locked": false,
+                "items": [
+                  {
+                    "type": "row",
+                    "key": "custom4RetransitionSpeedMs"
+                  },
+                  {
+                    "type": "row",
+                    "key": "custom4RetransitionStartTimeCurve"
+                  },
+                  {
+                    "type": "row",
+                    "key": "custom4RetransitionStartTimeRange"
+                  }
+                ],
+                "settings": [
+                  "custom4RetransitionSpeedMs",
+                  "custom4RetransitionStartTimeCurve",
+                  "custom4RetransitionStartTimeRange"
+                ],
+                "subgroups": []
+              }
+            }
+          ],
+          "settings": [
+            "custom4Enabled",
+            "custom4Type",
+            "custom4TouchPointCount",
+            "custom4ClickCount",
+            "custom4Mode",
+            "custom4TargetPose",
+            "custom4TweenSelector",
+            "custom4TweenSpeedMs",
+            "custom4TweenStartTimeCurve",
+            "custom4TweenStartTimeRange",
+            "custom4SequencePlayMode",
+            "custom4SequenceCount",
+            "custom4SequenceCountMode",
+            "custom4SequenceLoopTransition",
+            "custom4SequenceHoldMs",
+            "custom4TransitionSpeedMs",
+            "custom4PauseDurationMs"
+          ],
+          "subgroups": [
+            {
+              "key": "Offset",
+              "collapsed": false,
+              "locked": false,
+              "items": [
+                {
+                  "type": "row",
+                  "key": "custom4OffsetX"
+                },
+                {
+                  "type": "row",
+                  "key": "custom4OffsetY"
+                }
+              ],
+              "settings": [
+                "custom4OffsetX",
+                "custom4OffsetY"
+              ],
+              "subgroups": []
+            },
+            {
+              "key": "Rotation",
+              "collapsed": false,
+              "locked": false,
+              "items": [
+                {
+                  "type": "row",
+                  "key": "custom4RotationX"
+                },
+                {
+                  "type": "row",
+                  "key": "custom4RotationY"
+                },
+                {
+                  "type": "row",
+                  "key": "custom4RotationZ"
+                }
+              ],
+              "settings": [
+                "custom4RotationX",
+                "custom4RotationY",
+                "custom4RotationZ"
+              ],
+              "subgroups": []
+            },
+            {
+              "key": "Animation Speed Curve",
+              "collapsed": false,
+              "locked": false,
+              "items": [
+                {
+                  "type": "row",
+                  "key": "custom4SpeedCurve"
+                },
+                {
+                  "type": "row",
+                  "key": "custom4SpeedCurveRange"
+                }
+              ],
+              "settings": [
+                "custom4SpeedCurve",
+                "custom4SpeedCurveRange"
+              ],
+              "subgroups": []
+            },
+            {
+              "key": "Start Time Curve",
+              "collapsed": false,
+              "locked": false,
+              "items": [
+                {
+                  "type": "row",
+                  "key": "custom4StartTimeCurve"
+                },
+                {
+                  "type": "row",
+                  "key": "custom4StartTimeRange"
+                }
+              ],
+              "settings": [
+                "custom4StartTimeCurve",
+                "custom4StartTimeRange"
+              ],
+              "subgroups": []
+            },
+            {
+              "key": "Retransition",
+              "collapsed": false,
+              "locked": false,
+              "items": [
+                {
+                  "type": "row",
+                  "key": "custom4RetransitionSpeedMs"
+                },
+                {
+                  "type": "row",
+                  "key": "custom4RetransitionStartTimeCurve"
+                },
+                {
+                  "type": "row",
+                  "key": "custom4RetransitionStartTimeRange"
+                }
+              ],
+              "settings": [
+                "custom4RetransitionSpeedMs",
+                "custom4RetransitionStartTimeCurve",
+                "custom4RetransitionStartTimeRange"
+              ],
+              "subgroups": []
+            }
+          ]
+        },
+        {
+          "key": "Custom Click Function 3",
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -30245,7 +31063,7 @@
         },
         {
           "key": "Custom Click Function 2",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
