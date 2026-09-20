@@ -9292,6 +9292,101 @@ field's continuous render load this round -- worked around via
 documented practice for that tool limitation).
 
 --------------------------------------------------------------------------------
+2026-09-20  -  01:15 AM - 01:32 AM EDT
+
+Fixed: new custom click functions rendered outside their own parent
+group; unified the Type dropdown back to one entry point.
+
+Direct bug report: "when i click +Add Click Function, the created
+function settings group should be within the Custom Click Functions
+group, not outside. Furthermore, within the Type dropdown, I dont see
+Click+Hold, nor Right Click+hold."
+
+Two separate issues:
+
+1. Placement -- `renderCustomClickFunctionGroup()` inserted every new
+custom function's group as a top-level SIBLING right after the "Custom
+Click Functions" anchor group (`anchor.parentElement.insertBefore(g,
+anchor.nextSibling)`), not nested inside it. Fixed by inserting into the
+anchor's own `.dp-group-body` instead (`anchorBody.insertBefore(g,
+anchorBody.firstChild)`) -- new functions are now real subgroups,
+newest closest to the top.
+
+That nesting change carried a real risk, caught before shipping by
+reading devPanel.js's own restore-order code rather than by a live bug:
+`applyOrder()` (the generic group-order/collapse-state restore) runs
+BEFORE this file's own `onRestore` hook (which is what rebuilds custom
+function groups from `customClickFunctionIds`). If a previous Save had
+captured a custom function nested under the anchor, `applyOrder()`
+would find no live DOM element for that key yet and create an empty
+GHOST placeholder group in its place -- then `restoreCustomClickFunctions()`
+would create the REAL one on top, a genuine duplicate-keyed pair (the
+same class of bug as this project's own "renaming a devPanel.js group
+is purely cosmetic" gotcha, different cause). Guarded by having
+`restoreCustomClickFunctions()` clear any pre-existing nested groups
+under the anchor before rebuilding fresh from `customClickFunctionIds`
+itself.
+
+2. Type dropdown -- confirmed live (in-browser, both buttons present)
+that the "2 entry points" design from 2026-09-19 ("+ Add Click
+Function" for Click/Right Click/Scroll, "+ Add Click+Hold Function" for
+Click+Hold/Right Click+Hold) was working exactly as built; the user had
+simply not noticed the 2nd button. Asked via AskUserQuestion whether to
+just make the 2nd button more discoverable, or revert to ONE unified
+Type dropdown with all 5/3 options and a live control-battery swap --
+user chose the bigger option.
+
+Implemented: `customFunctionTypeOptions(family)` now returns the full
+original list per family (no `kind` param). `kindForCustomFunctionType(type)`
+derives which control battery (`makeClickPoseGroup()` vs.
+`makeClickHoldPoseGroup()`) a Type needs -- any "+Hold"-suffixed Type is
+'hold', everything else (including Multi-Point) is 'pose'. The Type
+select's own onChange now calls `handleCustomFunctionTypeChange()`,
+which no-ops for a same-kind Type change and, for a kind-changing one,
+unregisters the function from its OLD kind's CLICK_POSE_KEYS/
+CLICK_HOLD_KEYS slot + trigger-state + every hand's own per-function
+state (the same cleanup `cleanupDeletedCustomClickFunction()` already
+does for a real deletion, minus removing the `customClickFunctionIds`
+entry itself), removes the stale DOM group, then re-registers/re-renders
+fresh under the new kind via `registerCustomClickFunction()` -- the
+exact same path a brand-new function's initial creation already uses.
+`addCustomClickFunction()` is back to one entry point (no `kind` param,
+always starts 'pose', matching the Type list's own first option).
+
+Live-verified in-browser (this sandbox's static-server main.js
+truncation gotcha required several navigation retries before a full
+load succeeded): a new function landed nested inside "Custom Click
+Functions" with 5 Type options; switching Type to Click+Hold rebuilt it
+live (LoopMode row appeared, row count 34 -> 45, exactly one nested
+group the whole time, no ghost/duplicate); switching back to Click
+rebuilt it back to the pose battery (LoopMode gone, 34 rows) with the
+same single-group invariant holding both directions. The ghost-
+prevention code itself could not be end-to-end verified through a real
+Save/reload cycle -- this project's Save write-through requires the
+Vercel-hosted `/api/save-settings` endpoint, unavailable against the
+local static server (confirmed: clicking Save left `localStorage`
+empty, matching this project's own documented single-tier "no
+localStorage fallback" Save design, not a bug) -- verified by direct
+code inspection instead (the 3-line clear operation is simple and
+directly reviewable).
+
+Concurrent-session note: `src/main.js` had a 2nd session's own unrelated
+uncommitted work (a `window.__debug` addition, plus a genuine fix
+wiring Pose Offset/Scale into the Loading Preview's and Pose Preview's
+own WYSIWYG clones) mixed in at diff time -- isolated via the
+established git-patch-staging technique (`git diff` -> identified 3
+unrelated hunks by content -> hand-stripped them from a copied patch ->
+`git apply --check --cached` -> `git apply --cached` -> verified via
+`git diff --cached --stat` and `git status` that the concurrent hunks
+stayed unstaged) rather than a blanket `git add`. Also discovered mid-
+task: that same concurrent session had already independently fixed a
+DIFFERENT bug reported earlier this session (deleted click function
+groups still triggering) -- see its own commit `075e377 Live-verify
+the deleted-static-Click-Function-group fix`.
+
+Verified: `node --check src/main.js` passes.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

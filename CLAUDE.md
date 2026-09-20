@@ -749,3 +749,30 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   does not apply to them; if a report is ever about THOSE specific
   widgets instead, that's a real "not implemented," not a
   discoverability gap.
+- **Nesting a dynamically-created (`renderDynamicGroup()`) group INSIDE
+  another group's own `.dp-group-body` puts it under devPanel.js's
+  generic `captureGroup()`/`applyOrder()` order-persistence system --
+  which runs BEFORE any host file's own `onRestore` hook (see
+  `initDevPanel()`'s own call order). If the dynamic group doesn't exist
+  in the DOM yet at that point (true of every custom click function's
+  own group, which `restoreCustomClickFunctions()` only rebuilds INSIDE
+  `onRestore`), `applyOrder()` has no way to know that and creates an
+  empty GHOST placeholder for whatever key it doesn't find live --
+  producing a genuine duplicate-keyed pair once the real group renders
+  moments later (same class of bug as this file's own "renaming a
+  devPanel.js group is purely cosmetic" gotcha, different cause).**
+  Caught by reading the restore-order code before shipping a 2026-09-20
+  fix that nested custom click function groups inside "Custom Click
+  Functions" (direct report: "the created function settings group
+  should be within the Custom Click Functions group, not outside"), not
+  by a live bug report -- guarded by having `restoreCustomClickFunctions()`
+  clear any pre-existing nested groups under that anchor before
+  rebuilding fresh from `customClickFunctionIds` itself (the true source
+  of truth for which functions actually exist). **Any FUTURE feature
+  that nests a `renderDynamicGroup()`-created group inside a static
+  DEV_GROUPS group needs this same pre-clear in its own restore path --
+  the risk isn't specific to Custom Click Functions, it's inherent to
+  nesting a dynamically-rebuilt-on-load group into the generically-
+  captured tree at all.** See CHANGELOG.txt's matching 2026-09-20 entry
+  for the full account, including the separate (already-working, just
+  under-discovered) Type-dropdown fix shipped the same round.

@@ -18,6 +18,37 @@ work seamlessly from there.
 
 ## Currently working on
 
+**SHIPPED 2026-09-20: custom click function groups now nest inside their
+parent; Type dropdown unified back to one entry point.** Direct report:
+new functions rendered as a top-level sibling right after "Custom Click
+Functions" instead of nested inside it, and the Type dropdown (via
+"+ Add Click Function") only showed 3 of 5 options -- Click+Hold/Right
+Click+Hold required a 2nd button ("+ Add Click+Hold Function") added
+2026-09-19. Fixed the nesting by inserting into the anchor's own
+`.dp-group-body`; caught and guarded a real ghost-duplicate risk this
+created (devPanel.js's generic `applyOrder()` runs BEFORE this file's
+own restore hook and would otherwise create an empty placeholder for a
+not-yet-rebuilt custom function group on reload) by having
+`restoreCustomClickFunctions()` clear stale nested groups before
+rebuilding. For the Type dropdown: confirmed live both buttons already
+worked correctly (user just hadn't noticed the 2nd one); asked via
+AskUserQuestion whether to just make it discoverable or merge into one
+unified dropdown with a live control-battery swap -- user chose the
+merge. `kindForCustomFunctionType()` now derives which control battery
+(pose vs. hold) a Type needs; `handleCustomFunctionTypeChange()`
+rebuilds a function's group live when its Type crosses that boundary,
+reusing the same cleanup path a real deletion already uses. Live-
+verified both directions of the kind-swap (Click+Hold rebuild showed
+LoopMode, 45 rows; back to Click removed it, 34 rows; exactly one
+nested group throughout, no duplicates). The ghost-prevention code
+itself couldn't be verified through a real Save/reload cycle locally
+(this project's Save needs the Vercel-hosted API, unavailable against
+the local static server) -- verified by direct code review instead.
+Also discovered mid-task: a concurrent session had already fixed a
+different, earlier-reported bug (deleted click function groups still
+triggering) in commit `075e377`. See CHANGELOG.txt's matching
+2026-09-20 entry for the full account.
+
 **SHIPPED 2026-09-20: fixed bezier curve handles being undiscoverable
 (direct bug report).** The Alt+drag (Out Handle) / Shift+drag (In
 Handle) mechanism in `buildGenericCurveWidget()` — shared by every Start
