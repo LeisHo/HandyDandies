@@ -9,7 +9,7 @@
       "alternateRowOffset": 5,
       "progressiveRowOffset": 1,
       "useProgressiveOffset": false,
-      "hideHands": false,
+      "hideHands": true,
       "trackingEnabled": true,
       "trackingDamping": 0.6,
       "targetDepthFactor": 0.8,
@@ -17,7 +17,7 @@
       "palmFacesCursor": true,
       "palmFaceRotationOffset": 0,
       "loadingPreviewEnabled": true,
-      "loadingPreviewShowLive": false,
+      "loadingPreviewShowLive": true,
       "loadingMinTimeMs": 5000,
       "loadingPreviewTweenSelector": "Waiting Horizontal Tap",
       "loadingPreviewSavedCameras": [
@@ -100,9 +100,19 @@
           "targetX": 1.2343194780671631,
           "targetY": -2.336339362970378,
           "targetZ": -21.561671337969035
+        },
+        {
+          "name": "Front-Straightened",
+          "cameraX": 0.5309568688333194,
+          "cameraY": 60.84919589607597,
+          "cameraZ": -21.935010899369335,
+          "cameraFov": 32,
+          "targetX": 1.2343194780671631,
+          "targetY": -2.336339362970378,
+          "targetZ": -33.60014621531519
         }
       ],
-      "loadingPreviewCameraSelector": "Front",
+      "loadingPreviewCameraSelector": "Front-Straightened",
       "loadingPreviewSavedLighting": [
         {
           "name": "3 Tone - SideFront",
@@ -157,13 +167,13 @@
       "loadingPreviewSequenceLoopTransition": true,
       "loadingPreviewSequenceHoldMs": 0,
       "loadingPreviewSize": 1000,
-      "loadingPreviewRotationX": -85.36240971271977,
-      "loadingPreviewRotationY": 143.8619340559313,
+      "loadingPreviewRotationX": -79.52141477498436,
+      "loadingPreviewRotationY": -3.450536658585705,
       "loadingPreviewRotationZ": -180,
       "loadingPreviewOffsetX": 0.27796090493479864,
       "loadingPreviewOffsetY": -2.310339603408437,
       "loadingPreviewCameraFov": 32,
-      "loadingPreviewCameraZoom": 64.25715498581913,
+      "loadingPreviewCameraZoom": 64.25715498581914,
       "loadingPreviewCameraEditMode": false,
       "customClickFunctionIds": "[]",
       "posePreviewEnabled": false,
@@ -6802,7 +6812,7 @@
       "palmFacesCursor": true,
       "palmFaceRotationOffset": 0,
       "loadingPreviewEnabled": true,
-      "loadingPreviewShowLive": false,
+      "loadingPreviewShowLive": true,
       "loadingMinTimeMs": 5000,
       "loadingPreviewTweenSelector": "Waiting Horizontal Tap",
       "loadingPreviewSavedCameras": [
@@ -6885,9 +6895,19 @@
           "targetX": 1.2343194780671631,
           "targetY": -2.336339362970378,
           "targetZ": -21.561671337969035
+        },
+        {
+          "name": "Front-Straightened",
+          "cameraX": 0.5309568688333194,
+          "cameraY": 60.84919589607597,
+          "cameraZ": -21.935010899369335,
+          "cameraFov": 32,
+          "targetX": 1.2343194780671631,
+          "targetY": -2.336339362970378,
+          "targetZ": -33.60014621531519
         }
       ],
-      "loadingPreviewCameraSelector": "Front",
+      "loadingPreviewCameraSelector": "Front-Straightened",
       "loadingPreviewSavedLighting": [
         {
           "name": "3 Tone - SideFront",
@@ -6942,13 +6962,13 @@
       "loadingPreviewSequenceLoopTransition": true,
       "loadingPreviewSequenceHoldMs": 0,
       "loadingPreviewSize": 1000,
-      "loadingPreviewRotationX": -85.36240971271977,
-      "loadingPreviewRotationY": 143.8619340559313,
+      "loadingPreviewRotationX": -79.52141477498436,
+      "loadingPreviewRotationY": -3.450536658585705,
       "loadingPreviewRotationZ": -180,
       "loadingPreviewOffsetX": 0.27796090493479864,
       "loadingPreviewOffsetY": -2.310339603408437,
       "loadingPreviewCameraFov": 32,
-      "loadingPreviewCameraZoom": 64.25715498581913,
+      "loadingPreviewCameraZoom": 64.25715498581914,
       "loadingPreviewCameraEditMode": false,
       "customClickFunctionIds": "[]",
       "posePreviewEnabled": false,
@@ -13587,7 +13607,7 @@
       "palmFacesCursor": true,
       "palmFaceRotationOffset": 0,
       "loadingPreviewEnabled": true,
-      "loadingPreviewShowLive": false,
+      "loadingPreviewShowLive": true,
       "loadingMinTimeMs": 5000,
       "loadingPreviewTweenSelector": "Waiting Horizontal Tap",
       "loadingPreviewSavedCameras": [
@@ -13670,9 +13690,19 @@
           "targetX": 1.2343194780671631,
           "targetY": -2.336339362970378,
           "targetZ": -21.561671337969035
+        },
+        {
+          "name": "Front-Straightened",
+          "cameraX": 0.5309568688333194,
+          "cameraY": 60.84919589607597,
+          "cameraZ": -21.935010899369335,
+          "cameraFov": 32,
+          "targetX": 1.2343194780671631,
+          "targetY": -2.336339362970378,
+          "targetZ": -33.60014621531519
         }
       ],
-      "loadingPreviewCameraSelector": "Front",
+      "loadingPreviewCameraSelector": "Front-Straightened",
       "loadingPreviewSavedLighting": [
         {
           "name": "3 Tone - SideFront",
@@ -13727,13 +13757,13 @@
       "loadingPreviewSequenceLoopTransition": true,
       "loadingPreviewSequenceHoldMs": 0,
       "loadingPreviewSize": 1000,
-      "loadingPreviewRotationX": -85.36240971271977,
-      "loadingPreviewRotationY": 143.8619340559313,
+      "loadingPreviewRotationX": -79.52141477498436,
+      "loadingPreviewRotationY": -3.450536658585705,
       "loadingPreviewRotationZ": -180,
       "loadingPreviewOffsetX": 0.27796090493479864,
       "loadingPreviewOffsetY": -2.310339603408437,
       "loadingPreviewCameraFov": 32,
-      "loadingPreviewCameraZoom": 64.25715498581913,
+      "loadingPreviewCameraZoom": 64.25715498581914,
       "loadingPreviewCameraEditMode": false,
       "customClickFunctionIds": "[]",
       "posePreviewEnabled": false,
@@ -21471,7 +21501,7 @@
     },
     {
       "key": "Loading Preview",
-      "collapsed": true,
+      "collapsed": false,
       "locked": false,
       "items": [
         {
