@@ -21360,8 +21360,8 @@
         {
           "type": "group",
           "group": {
-            "key": "New Group",
-            "collapsed": false,
+            "key": "Loading Preview Camera",
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -21395,11 +21395,46 @@
               {
                 "type": "row",
                 "key": "loadingPreviewSavedCameras"
-              },
+              }
+            ],
+            "settings": [
+              "loadingPreviewRotationX",
+              "loadingPreviewRotationY",
+              "loadingPreviewRotationZ",
+              "loadingPreviewOffsetX",
+              "loadingPreviewOffsetY",
+              "loadingPreviewCameraFov",
+              "loadingPreviewCameraZoom",
+              "loadingPreviewSavedCameras"
+            ],
+            "subgroups": []
+          }
+        },
+        {
+          "type": "group",
+          "group": {
+            "key": "Loading Preview Lighting",
+            "collapsed": true,
+            "locked": false,
+            "items": [
               {
                 "type": "row",
                 "key": "loadingPreviewSavedLighting"
-              },
+              }
+            ],
+            "settings": [
+              "loadingPreviewSavedLighting"
+            ],
+            "subgroups": []
+          }
+        },
+        {
+          "type": "group",
+          "group": {
+            "key": "Loading Preview Pose",
+            "collapsed": true,
+            "locked": false,
+            "items": [
               {
                 "type": "row",
                 "key": "loadingPreviewTweenSelector"
@@ -21431,50 +21466,9 @@
               {
                 "type": "row",
                 "key": "loadingPreviewSequenceLoopTransition"
-              },
-              {
-                "type": "row",
-                "key": "thumbCurl"
-              },
-              {
-                "type": "row",
-                "key": "tipOnlyCurlThumb"
-              },
-              {
-                "type": "row",
-                "key": "midOnlyCurlThumb"
-              },
-              {
-                "type": "row",
-                "key": "baseOnlyCurlThumb"
-              },
-              {
-                "type": "row",
-                "key": "tipTwistThumb"
-              },
-              {
-                "type": "row",
-                "key": "thumbSplay"
-              },
-              {
-                "type": "row",
-                "key": "thumbSplay2"
-              },
-              {
-                "type": "row",
-                "key": "curlBiasThumb"
               }
             ],
             "settings": [
-              "loadingPreviewRotationX",
-              "loadingPreviewRotationY",
-              "loadingPreviewRotationZ",
-              "loadingPreviewOffsetX",
-              "loadingPreviewOffsetY",
-              "loadingPreviewCameraFov",
-              "loadingPreviewCameraZoom",
-              "loadingPreviewSavedCameras",
-              "loadingPreviewSavedLighting",
               "loadingPreviewTweenSelector",
               "loadingPreviewCameraSelector",
               "loadingPreviewLightingSelector",
@@ -21482,15 +21476,7 @@
               "loadingPreviewSpeedMs",
               "loadingPreviewSize",
               "loadingPreviewSequenceHoldMs",
-              "loadingPreviewSequenceLoopTransition",
-              "thumbCurl",
-              "tipOnlyCurlThumb",
-              "midOnlyCurlThumb",
-              "baseOnlyCurlThumb",
-              "tipTwistThumb",
-              "thumbSplay",
-              "thumbSplay2",
-              "curlBiasThumb"
+              "loadingPreviewSequenceLoopTransition"
             ],
             "subgroups": []
           }
@@ -21506,8 +21492,8 @@
       ],
       "subgroups": [
         {
-          "key": "New Group",
-          "collapsed": false,
+          "key": "Loading Preview Camera",
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -21541,11 +21527,40 @@
             {
               "type": "row",
               "key": "loadingPreviewSavedCameras"
-            },
+            }
+          ],
+          "settings": [
+            "loadingPreviewRotationX",
+            "loadingPreviewRotationY",
+            "loadingPreviewRotationZ",
+            "loadingPreviewOffsetX",
+            "loadingPreviewOffsetY",
+            "loadingPreviewCameraFov",
+            "loadingPreviewCameraZoom",
+            "loadingPreviewSavedCameras"
+          ],
+          "subgroups": []
+        },
+        {
+          "key": "Loading Preview Lighting",
+          "collapsed": true,
+          "locked": false,
+          "items": [
             {
               "type": "row",
               "key": "loadingPreviewSavedLighting"
-            },
+            }
+          ],
+          "settings": [
+            "loadingPreviewSavedLighting"
+          ],
+          "subgroups": []
+        },
+        {
+          "key": "Loading Preview Pose",
+          "collapsed": true,
+          "locked": false,
+          "items": [
             {
               "type": "row",
               "key": "loadingPreviewTweenSelector"
@@ -21577,50 +21592,9 @@
             {
               "type": "row",
               "key": "loadingPreviewSequenceLoopTransition"
-            },
-            {
-              "type": "row",
-              "key": "thumbCurl"
-            },
-            {
-              "type": "row",
-              "key": "tipOnlyCurlThumb"
-            },
-            {
-              "type": "row",
-              "key": "midOnlyCurlThumb"
-            },
-            {
-              "type": "row",
-              "key": "baseOnlyCurlThumb"
-            },
-            {
-              "type": "row",
-              "key": "tipTwistThumb"
-            },
-            {
-              "type": "row",
-              "key": "thumbSplay"
-            },
-            {
-              "type": "row",
-              "key": "thumbSplay2"
-            },
-            {
-              "type": "row",
-              "key": "curlBiasThumb"
             }
           ],
           "settings": [
-            "loadingPreviewRotationX",
-            "loadingPreviewRotationY",
-            "loadingPreviewRotationZ",
-            "loadingPreviewOffsetX",
-            "loadingPreviewOffsetY",
-            "loadingPreviewCameraFov",
-            "loadingPreviewCameraZoom",
-            "loadingPreviewSavedCameras",
-            "loadingPreviewSavedLighting",
             "loadingPreviewTweenSelector",
             "loadingPreviewCameraSelector",
             "loadingPreviewLightingSelector",
@@ -21628,15 +21602,7 @@
             "loadingPreviewSpeedMs",
             "loadingPreviewSize",
             "loadingPreviewSequenceHoldMs",
-            "loadingPreviewSequenceLoopTransition",
-            "thumbCurl",
-            "tipOnlyCurlThumb",
-            "midOnlyCurlThumb",
-            "baseOnlyCurlThumb",
-            "tipTwistThumb",
-            "thumbSplay",
-            "thumbSplay2",
-            "curlBiasThumb"
+            "loadingPreviewSequenceLoopTransition"
           ],
           "subgroups": []
         }
@@ -27827,6 +27793,59 @@
         {
           "type": "group",
           "group": {
+            "key": "Thumb",
+            "collapsed": true,
+            "locked": false,
+            "items": [
+              {
+                "type": "row",
+                "key": "thumbCurl"
+              },
+              {
+                "type": "row",
+                "key": "tipOnlyCurlThumb"
+              },
+              {
+                "type": "row",
+                "key": "midOnlyCurlThumb"
+              },
+              {
+                "type": "row",
+                "key": "baseOnlyCurlThumb"
+              },
+              {
+                "type": "row",
+                "key": "tipTwistThumb"
+              },
+              {
+                "type": "row",
+                "key": "thumbSplay"
+              },
+              {
+                "type": "row",
+                "key": "thumbSplay2"
+              },
+              {
+                "type": "row",
+                "key": "curlBiasThumb"
+              }
+            ],
+            "settings": [
+              "thumbCurl",
+              "tipOnlyCurlThumb",
+              "midOnlyCurlThumb",
+              "baseOnlyCurlThumb",
+              "tipTwistThumb",
+              "thumbSplay",
+              "thumbSplay2",
+              "curlBiasThumb"
+            ],
+            "subgroups": []
+          }
+        },
+        {
+          "type": "group",
+          "group": {
             "key": "Index",
             "collapsed": true,
             "locked": false,
@@ -28084,6 +28103,56 @@
           "settings": [
             "wristBend",
             "wristSplay"
+          ],
+          "subgroups": []
+        },
+        {
+          "key": "Thumb",
+          "collapsed": true,
+          "locked": false,
+          "items": [
+            {
+              "type": "row",
+              "key": "thumbCurl"
+            },
+            {
+              "type": "row",
+              "key": "tipOnlyCurlThumb"
+            },
+            {
+              "type": "row",
+              "key": "midOnlyCurlThumb"
+            },
+            {
+              "type": "row",
+              "key": "baseOnlyCurlThumb"
+            },
+            {
+              "type": "row",
+              "key": "tipTwistThumb"
+            },
+            {
+              "type": "row",
+              "key": "thumbSplay"
+            },
+            {
+              "type": "row",
+              "key": "thumbSplay2"
+            },
+            {
+              "type": "row",
+              "key": "curlBiasThumb"
+            }
+          ],
+          "settings": [
+            "thumbCurl",
+            "tipOnlyCurlThumb",
+            "midOnlyCurlThumb",
+            "baseOnlyCurlThumb",
+            "tipTwistThumb",
+            "thumbSplay",
+            "thumbSplay2",
+            "curlBiasThumb"
           ],
           "subgroups": []
         },
@@ -28595,7 +28664,6 @@
     }
   ],
   "textOverrides": {
-    "New Group": "LOADING PREVIEW LIGHTING",
     "New Group (2)": "CLICK FUNCTIONS",
     "Whole-Hand Rotation & Thumb": "ROTATION",
     "New Group (3)": "RESPONSIVE PALM ROTATION",

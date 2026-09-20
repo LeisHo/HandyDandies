@@ -259,7 +259,14 @@ html, body {
   letter-spacing: var(--dp-settings-letter-spacing, 0px); line-height: var(--dp-settings-line-height, 1.4);
   font-weight: var(--dp-settings-weight, 400);
 }
-.dp-row.dp-per-device label { color: #ffd27d; }
+/* Per-device (perDevice: true) rows used to get a hardcoded yellow label
+   color (#ffd27d) as a visual cue distinguishing them from shared
+   settings -- removed per direct request ("I still see yellow text in
+   my setting titles. Fix that. It should all be the same text color as
+   sset i the dev panel group"). `.dp-per-device` itself is left on the
+   row (buildRow() in devPanel.js) since nothing else currently reads it,
+   but it no longer changes anything visually -- label color now falls
+   through to the normal `.dp-row label` rule above (var(--dp-text-color)). */
 .dp-row input[type=range] { flex: 1 1 auto; min-width: 0; accent-color: var(--dp-slider-color, #7d8cff); }
 .dp-num {
   flex: 0 0 auto; width: 52px; text-align: right; font-size: var(--dp-value-font-size, var(--dp-body-font-size, 11px));
