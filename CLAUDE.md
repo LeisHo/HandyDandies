@@ -647,3 +647,31 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   (not just that a canvas/renderer object exists), don't rely on a
   buffer read alone if `document.hidden` reads true or rAF ticks measure
   0 in the same session -- that result is inconclusive, not negative.
+- **Any `camera.lookAt(target)` call on the Loading Preview's own camera
+  MUST set `camera.up` to `new THREE.Vector3(0,1,0).applyQuaternion(alignQuat)`
+  first -- three.js's own default world `(0,1,0)` is WRONG here and was
+  the real root cause of "the camera doesn't match HANDO... i need to
+  set it to -90 for x y z rotation to make it match."** Confirmed live
+  2026-09-20: `alignQuat` applied to world-up lands ~90.8 deg away from
+  plain world-up. `lookAt()` resolves the camera's final orientation
+  (including roll) from whatever `camera.up` currently is at call time
+  -- since EVERY position/target in this preview lives in the
+  `alignQuat`-rotated frame, `camera.up` needs the same rotation to stay
+  consistent, and nothing does this automatically. This bit 3 separate
+  functions (`applyLoadingPreviewCameraPreset()`, `applyLoadingPreviewCameraAutoFrame()`,
+  `applyLoadingPreviewRoll()`), not just the HANDO-conversion path --
+  the auto-frame default only "looked okay" because its own camera
+  offset happens to sit nearly along the hand's own pointing axis, where
+  a wrong roll is least visually obvious; a saved preset viewed from a
+  more oblique angle showed it clearly. If a FUTURE function ever
+  repositions this camera via `lookAt()` (a new preset type, a new
+  auto-frame variant, etc.), it needs this same `camera.up` line or it
+  will reintroduce the exact same ~90 deg-ish twist. Lighting has NO
+  equivalent gap -- a directional light has no "roll" degree of freedom
+  to get wrong, confirmed by re-deriving `applyLoadingPreviewLighting()`/
+  `captureLoadingPreviewLightingPreset()`'s own round-trip math (proper
+  inverses of each other, `alignQuat` already correctly baked in at
+  HANDO-conversion time via `convertHandoLightingPreset()`). See
+  CHANGELOG.txt's matching 2026-09-20 entry for the full derivation and
+  live verification (a screenshot confirming a properly upright,
+  recognizable fist instead of a twisted shape).

@@ -17,9 +17,11 @@
 <body>
 <canvas id="viewport"></canvas>
 <canvas id="loadingPreviewCanvas"></canvas>
-<div id="loading">
-  <div id="loadingText">Loading hands…</div>
-</div>
-<script type="module" src="src/main.js?v=171"></script>
+<!-- "Loading hands…" text removed per direct request (2026-09-20) --
+     #loading itself is kept (tryStartField() still toggles its own
+     .hidden class on it) since the Loading Preview hand animation is
+     now the sole loading indicator; an empty #loading is harmless. -->
+<div id="loading"></div>
+<script type="module" src="src/main.js?v=172"></script>
 </body>
 </html>

@@ -3603,6 +3603,23 @@ function applyLoadingPreviewCameraPreset(rawItem) {
   const tx = item.targetX ?? 0
   const ty = item.targetY ?? 0
   const tz = item.targetZ ?? 0
+  // CORRECTED 2026-09-20, direct report ("the loaidng preview camera
+  // still doesnt match Hando. i currently need to set it to -90 for x y
+  // z rotation to make it match somewhat"). `lookAt()` resolves the
+  // camera's final orientation using whatever `camera.up` currently is
+  // -- this was NEVER set here, so it stayed at three.js's own default
+  // world (0,1,0) (or whatever a previous roll left it at) regardless of
+  // the fact that EVERY position/target in this preview is defined in
+  // the `alignQuat`-rotated frame, not the raw world frame. Measured
+  // live: `alignQuat` applied to world-up lands ~90.8 deg away from
+  // plain world-up -- almost exactly the ~90 deg the user found they
+  // had to dial back in by hand on every axis. Setting `camera.up` to
+  // the ALIGNED up vector before `lookAt()` makes "roll 0" mean the
+  // same thing here as it does for the auto-frame default and the
+  // orbit-slider path (`applyLoadingPreviewRoll()`, same fix applied
+  // there) -- a preset (HANDO-converted or native) now reproduces its
+  // own captured roll instead of an arbitrary world-up-relative one.
+  loadingPreviewCamera.up.set(0, 1, 0).applyQuaternion(alignQuat)
   loadingPreviewCamera.lookAt(tx, ty, tz)
   loadingPreviewCameraTarget.set(tx, ty, tz)
   syncLoadingPreviewOrbitControlsTarget()
@@ -3631,6 +3648,9 @@ function applyLoadingPreviewCameraAutoFrame() {
   // together, same root cause.
   const pos = target.clone().add(new THREE.Vector3(0, handBoundsRadiusLocal * 0.15, handBoundsRadiusLocal * 3.6))
   loadingPreviewCamera.position.copy(pos)
+  // Same `camera.up` fix as applyLoadingPreviewCameraPreset()'s own
+  // 2026-09-20 correction -- see its comment for the full account.
+  loadingPreviewCamera.up.set(0, 1, 0).applyQuaternion(alignQuat)
   loadingPreviewCamera.lookAt(target)
   loadingPreviewCameraTarget.copy(target)
   syncLoadingPreviewOrbitControlsTarget()
@@ -3736,7 +3756,13 @@ function applyLoadingPreviewRoll(target) {
   if (!loadingPreviewCamera) return
   const rollRad = THREE.MathUtils.degToRad(cfg.loadingPreviewRotationZ || 0)
   const viewDir = target.clone().sub(loadingPreviewCamera.position).normalize()
-  loadingPreviewCamera.up.set(0, 1, 0).applyAxisAngle(viewDir, rollRad)
+  // CORRECTED 2026-09-20, same root cause/fix as applyLoadingPreviewCameraPreset()'s
+  // own correction -- "roll 0" used to mean "world up," not "up in this
+  // preview's own alignQuat-rotated frame," a ~90.8 deg discrepancy
+  // (measured live). Rotating the ALIGNED up vector by roll (instead of
+  // plain world up) makes Rotation Z's own "0" match the hand's actual
+  // natural orientation.
+  loadingPreviewCamera.up.set(0, 1, 0).applyQuaternion(alignQuat).applyAxisAngle(viewDir, rollRad)
   loadingPreviewCamera.lookAt(target)
 }
 // The REVERSE direction (camera -> sliders) -- reads wherever the camera
@@ -4068,6 +4094,12 @@ function updateLoadingPreviewSequenceVisibility() {
   setRow('Count', isCount)
   setRow('CountMode', isCount)
   setRow('LoopTransition', playMode === 'Loop' || (playMode === 'Count' && cfg.loadingPreviewSequenceCountMode === 'Loop'))
+  // Direct request 2026-09-20: in Count mode, per-lap speed is now
+  // DERIVED from Min Loading Time / Count (see updateLoadingPreviewAnimation()'s
+  // own comment) -- hide the manual Speed slider then, since setting it
+  // would silently do nothing.
+  const speedRow = document.querySelector('.dp-row[data-key="loadingPreviewSpeedMs"]')
+  if (speedRow) speedRow.style.display = isCount ? 'none' : ''
 }
 // Plays the selected Tween Sequence (every named pose in it) for as
 // long as the loading screen stays up, per the Sequence Mode
@@ -4110,7 +4142,19 @@ function updateLoadingPreviewAnimation() {
     loadingPreviewLapStartMs = now
     if (lapStyle === 'Oscillate') loadingPreviewDirection *= -1
   }
-  const speedMs = Math.max(safeTweenSpeedMs(cfg.loadingPreviewSpeedMs), 1)
+  // Direct request 2026-09-20: "if i set the loading preview to Count...
+  // The duration of this entire tween should be whatever is set the
+  // Minimum loading duration to be. If i set the count to 2, it will
+  // run through the sequeunce twice [in that same total time]." In
+  // Count mode, each lap's own speed is DERIVED from
+  // `loadingMinTimeMs / totalLaps` instead of the manually-set
+  // `loadingPreviewSpeedMs` slider, so `totalLaps` laps together take
+  // exactly `loadingMinTimeMs` regardless of count -- Loop/Oscillate
+  // keep using the slider as-is, since they have no natural "total
+  // duration" (they just play until the real field starts).
+  const speedMs = playMode === 'Count'
+    ? Math.max((cfg.loadingMinTimeMs || 0) / totalLaps, 1)
+    : Math.max(safeTweenSpeedMs(cfg.loadingPreviewSpeedMs), 1)
   const lapT = THREE.MathUtils.clamp((now - loadingPreviewLapStartMs) / speedMs, 0, 1)
   let values
   if (lapStyle === 'Oscillate') {

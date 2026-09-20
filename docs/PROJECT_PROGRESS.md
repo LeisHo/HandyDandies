@@ -18,6 +18,32 @@ work seamlessly from there.
 
 ## Currently working on
 
+**SHIPPED 2026-09-20: fixed the real root cause of the Loading Preview
+camera not matching HANDO — a missing `camera.up` rotation, affecting
+EVERY saved camera preset, not just HANDO imports.** `applyLoadingPreviewCameraPreset()`/
+`applyLoadingPreviewCameraAutoFrame()`/`applyLoadingPreviewRoll()` all
+called `camera.lookAt()` without ever rotating `camera.up` into this
+preview's own `alignQuat`-rotated frame — it stayed at plain world-up,
+~90.8 deg away from the correct aligned up (measured live), matching
+almost exactly the ~90 deg the user had to dial back in by hand on
+every axis. Fixed in all 3 functions; verified live via the real
+"dfdsf" camera (camera.up now matches the independently-computed
+aligned vector, and a screenshot shows a properly upright, recognizable
+fist instead of a twisted shape). Investigated whether Lighting needs
+the same fix — it doesn't, and confirmed why: a light has no "roll"
+degree of freedom the way a camera does, and its own HANDO conversion
+was already verified correct via round-trip math. Also this round:
+removed the "Loading hands…" text (the Loading Preview hand is now the
+sole loading indicator), and Sequence Mode "Count" now derives each
+lap's speed from `loadingMinTimeMs / count` instead of a manual Speed
+slider (which is now hidden in Count mode, since it would otherwise do
+nothing) — so Count N always finishes in exactly the configured Min
+Loading Time regardless of N. **The Count-mode timing change wasn't
+live-verified this round** — this sandbox's own network was unusually
+degraded (confirmed independently of the browser tool), so this one
+rests on direct code reading + a clean syntax check, not a live test.
+See CHANGELOG.txt's matching 2026-09-20 entry for the full account.
+
 **SHIPPED 2026-09-20: root-caused and fixed the desktop-vs-mobile pose-
 transition slowdown (direct report).** Diagnosed via the app's own
 existing `[frame-profile]` console logger with real user-supplied data

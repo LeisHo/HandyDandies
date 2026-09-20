@@ -8764,6 +8764,83 @@ silently skip.
 Cache-buster: `index.html`'s own `main.js?v=170` -> `?v=171`.
 
 --------------------------------------------------------------------------------
+2026-09-20  00:02:10-00:20:05 EDT (17m55s, measured)
+
+**Fixed the real root cause of "the Loading Preview camera still
+doesn't match HANDO. i currently need to set it to -90 for x y z
+rotation to make it match somewhat."** `applyLoadingPreviewCameraPreset()`,
+`applyLoadingPreviewCameraAutoFrame()`, and `applyLoadingPreviewRoll()`
+all called `camera.lookAt(target)` without ever setting `camera.up`
+first -- `lookAt()` resolves the camera's final orientation using
+whatever `camera.up` currently is, which stayed at three.js's own
+default world `(0,1,0)` (or whatever a previous roll left it at)
+regardless of the fact that EVERY position/target in this preview is
+defined in the `alignQuat`-rotated frame, not the raw world frame.
+Measured live: `alignQuat` applied to world-up lands ~90.8 deg away
+from plain world-up -- essentially exactly the ~90 deg the user found
+they had to dial back in by hand on every axis. This wasn't specific to
+HANDO imports -- it affected EVERY saved-camera-preset application and
+the auto-frame default alike (the auto-frame default happened to look
+"close enough" most of the time only because its own camera offset
+sits nearly along the hand's own pointing axis, where a wrong roll is
+least visually obvious).
+
+**Fixed** by setting `camera.up.set(0,1,0).applyQuaternion(alignQuat)`
+before every `lookAt()` call in all 3 functions (the roll function
+additionally applies the roll rotation on top of this aligned base,
+instead of on top of plain world-up). Verified live: applied the real
+"dfdsf" saved camera, confirmed `camera.up` now reads
+`[-0.030, -0.014, -0.999]` (exactly matching the independently-computed
+`alignQuat`-rotated up vector), and a screenshot showed the preview
+hand as a clearly recognizable, upright fist -- not the twisted/
+unrecognizable shape the bug produced.
+
+**Investigated whether Lighting needs an equivalent fix (direct
+request) -- it does NOT, and this is a real structural difference, not
+an oversight.** A camera has a "roll" degree of freedom (which way is
+"up" on screen) that a directional light simply doesn't have -- a
+light's illumination is fully determined by its position + direction,
+with no third orientation axis to get wrong. `convertHandoLightingPreset()`
+already correctly incorporates `alignQuat` at conversion time (verified
+by re-deriving its own round-trip math: `applyLoadingPreviewLighting()`'s
+forward azimuth/elevation-to-position formula and
+`captureLoadingPreviewLightingPreset()`'s own inverse are confirmed
+proper inverses of each other). Nothing to fix here.
+
+**Also this round, all direct requests:**
+- Removed the "Loading hands…" text (`#loadingText`) from `index.html`
+  entirely -- `#loading` itself is kept (still toggled by
+  `tryStartField()`) since the Loading Preview hand animation is now
+  the sole loading indicator. Verified live: `document.getElementById('loadingText')`
+  confirmed gone.
+- Sequence Mode "Count": each lap's own speed is now DERIVED from
+  `loadingMinTimeMs / totalLaps` instead of the manually-set
+  `loadingPreviewSpeedMs` slider, so Count N laps together always take
+  exactly the configured Min Loading Time regardless of N ("If i set
+  the Count to 1, it should run through the sequence once... duration
+  of this entire tween should be whatever is set the Minimum loading
+  duration to be. If i set the count to 2, it will run through the
+  sequeunce twice [in the same total time]"). The Speed slider is now
+  hidden in Count mode (a direct follow-up: "the Loading Preview Speed
+  should technically do nothing since the speed is determined by the
+  Min Loading Time") since it would otherwise silently do nothing.
+  Loop/Oscillate modes are unaffected -- they have no natural "total
+  duration" (they just play until the real field starts), so they keep
+  using the manual Speed slider as before.
+
+**Verification note:** the camera-up fix and text removal were
+confirmed live; the Count-mode speed-derivation change was NOT --
+this sandbox's own network layer was unusually degraded this round
+(confirmed independently of the browser tool: 4 of 5 direct PowerShell
+requests to the local test server failed outright, and 10+ consecutive
+browser-tool page loads never got the panel to build at all). Relying
+on direct code reading (a single, simple arithmetic substitution,
+`node --check`-clean) rather than a live confirmation this round --
+worth a live check next time this sandbox cooperates.
+
+Cache-buster: `index.html`'s `main.js?v=171` -> `?v=172`.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================
