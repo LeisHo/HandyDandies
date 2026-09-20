@@ -2475,25 +2475,50 @@ function applyCurlToSkeleton(fingerName, skeleton, baseQuat, wrapperQuat, values
   const splay2T = values[FINGER_SPLAY2_KEY[fingerName]] / 100
   const splay2Angle = FINGER_SPLAY2_SIGN[fingerName] * THREE.MathUtils.degToRad(FINGER_SPLAY2_MAX_DEG[fingerName] * splay2T)
   const bones = []
+  // PERFORMANCE (2026-09-19, direct user report: "pose transitions and
+  // animations are so much slower on desktop than on mobile") -- this
+  // loop used to call `bone.updateMatrixWorld(true)` after EVERY
+  // individual rotation step (reset/splay/splay2/curl/base-only/mid-only/
+  // tip-only/tip-twist), up to ~5 times for a single joint. `force: true`
+  // recomputes that bone's matrixWorld AND every descendant's, so each of
+  // those calls redundantly recomputed whatever joints come AFTER this
+  // one in the chain too, over and over, before they'd even been touched
+  // this frame. Root-caused via a live frame-profiler comparison (25 ->
+  // 100 -> 400 hands): `avgUpdateRenderOrder` spiked disproportionately
+  // and unevenly whenever multiple hands were simultaneously mid-
+  // transition, while `avgComposerRender` (actual GPU render cost) stayed
+  // flat and proportional -- pointing squarely at this CPU-side per-hand
+  // repose cost, not rendering.
+  //
+  // Safe to consolidate down to ONE `updateMatrixWorld(true)` per joint,
+  // at the end, instead of one per operation: every READ that happens
+  // mid-loop already self-updates the exact chain it needs --
+  // `rotateOnTrueWorldAxis()`'s own `bone.getWorldQuaternion()` and
+  // `segmentDirection()`'s own `getWorldPosition()` calls both walk their
+  // OWN parent chain fresh via three.js's `updateWorldMatrix(true, false)`
+  // (which also refreshes the bone's own local `matrix` from its current
+  // `quaternion` before composing) -- confirmed against three.js's own
+  // Object3D source, not assumed. The single call kept at the end of each
+  // joint's own processing preserves the exact same guarantee the old
+  // per-operation calls provided for code OUTSIDE this loop (this joint's
+  // matrixWorld is correct and stable by the time the loop moves on) --
+  // nothing downstream of this function depends on an intermediate state
+  // mid-joint.
   joints.forEach((boneName, i) => {
     const bone = skeleton.getBoneByName(boneName)
     const rest = boneRestQuat[boneName]
     if (!bone || !rest) return
     bones[i] = bone
     bone.quaternion.copy(rest)
-    bone.updateMatrixWorld(true)
     if (i === splayJointIndex) {
       rotateOnTrueWorldAxis(bone, splayAxis, splayAngle, wrapperQuat)
-      bone.updateMatrixWorld(true)
     }
     if (i === splay2JointIndex) {
       rotateOnTrueWorldAxis(bone, splay2Axis, splay2Angle, wrapperQuat)
-      bone.updateMatrixWorld(true)
     }
     const weight = curlBiasWeight(i, joints.length, curlBias)
     const angle = sign * THREE.MathUtils.degToRad(maxDegs[i] * curlT * weight)
     rotateOnTrueWorldAxis(bone, curlAxis, angle, wrapperQuat)
-    bone.updateMatrixWorld(true)
     // Base-Only Curl (ported from HANDO -- see FINGER_BASE_ONLY_CURL_KEY's
     // own comment for why) -- a 2nd, purely ADDITIVE rotation on top of
     // whatever Curl (+ Bias) just did to the BASE joint only, same axis,
@@ -2505,7 +2530,6 @@ function applyCurlToSkeleton(fingerName, skeleton, baseQuat, wrapperQuat, values
     if (i === 0) {
       const baseOnlyAngle = sign * THREE.MathUtils.degToRad(maxDegs[0] * baseOnlyCurlT)
       rotateOnTrueWorldAxis(bone, curlAxis, baseOnlyAngle, wrapperQuat)
-      bone.updateMatrixWorld(true)
     }
     // Mid-Only Curl (ported from HANDO -- see FINGER_MID_ONLY_CURL_KEY's
     // own comment) -- the 3rd joint-isolation slider, joint 1 (the middle
@@ -2513,7 +2537,6 @@ function applyCurlToSkeleton(fingerName, skeleton, baseQuat, wrapperQuat, values
     if (i === 1) {
       const midOnlyAngle = sign * THREE.MathUtils.degToRad(maxDegs[1] * midOnlyCurlT)
       rotateOnTrueWorldAxis(bone, curlAxis, midOnlyAngle, wrapperQuat)
-      bone.updateMatrixWorld(true)
     }
     // Tip-Only Curl (ported from HANDO, same day as Base-Only Curl's own
     // port -- see FINGER_TIP_ONLY_CURL_KEY's own comment) -- the mirror
@@ -2524,7 +2547,6 @@ function applyCurlToSkeleton(fingerName, skeleton, baseQuat, wrapperQuat, values
     if (i === joints.length - 1) {
       const tipOnlyAngle = sign * THREE.MathUtils.degToRad(maxDegs[i] * tipOnlyCurlT)
       rotateOnTrueWorldAxis(bone, curlAxis, tipOnlyAngle, wrapperQuat)
-      bone.updateMatrixWorld(true)
     }
     if (i === joints.length - 1 && i > 0) {
       // Tip Twist's own axis is already a true world-space direction,
@@ -2533,8 +2555,8 @@ function applyCurlToSkeleton(fingerName, skeleton, baseQuat, wrapperQuat, values
       // fixed WORLD_X/Y/Z-based axes above.
       const twistAxis = segmentDirection(bones[i - 1], bone)
       rotateOnTrueWorldAxis(bone, twistAxis, THREE.MathUtils.degToRad(FINGER_TIP_TWIST_MAX_DEG * tipTwistT))
-      bone.updateMatrixWorld(true)
     }
+    bone.updateMatrixWorld(true)
   })
 }
 function applyCurl(fingerName) {
