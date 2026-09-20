@@ -18,6 +18,28 @@ work seamlessly from there.
 
 ## Currently working on
 
+**SHIPPED 2026-09-19: interactive Camera Edit Mode for the Loading
+Preview (orbit/pan/zoom via real OrbitControls, orbiting around the
+hand's own center, matching HANDO) + repurposed Rotation X/Y/Z/Offset
+X/Y to reflect this camera + fixed a real, measured cropping bug
+shared with Pose Preview.** Math confirmed the pre-existing auto-frame
+distance (2.4x the hand's bounding-sphere radius) was ~40% too close
+for the camera's own 35 deg FOV -- fixed to 3.6x, in both Loading
+Preview and Pose Preview (identical formula, same bug). The 5 sliders
+are now a live/session-only reflection of the orbit camera (two-way:
+orbiting updates them, typing into them moves the camera) -- NOT what
+persists; a rebuild always reverts to whatever
+`loadingPreviewCameraSelector` points at, per direct clarification.
+Reverting the hand-rotation fold-in these sliders used to drive also
+root-caused the "camera is off, rotated at some angle" report: a
+leftover non-zero rotation value had been rotating the hand out from
+under the camera's own framing. Live-verified end-to-end (camera
+position change, a fresh screenshot, and the slider's own real DOM
+value all confirmed a genuine orbit-driven azimuth change; one
+`window.__debug.cfg` JS-exec-staleness false alarm correctly
+dismissed). See CHANGELOG.txt's matching 2026-09-19 entry for the full
+account.
+
 **SHIPPED 2026-09-19: fixed 4 real bugs in the Loading Preview's new
 Camera/Lighting local-list architecture (previous entry).** Both
 selector dropdowns had NO `onChange` -- picking a different camera/

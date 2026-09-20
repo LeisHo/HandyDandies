@@ -500,3 +500,54 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   `loadingPreviewSavedCameras`, this is almost certainly why -- check
   HANDO's own data first before assuming the conversion math is at
   fault.
+- **A camera positioned at `radius * 2.4` from a hand's own bounding-
+  sphere center does NOT reliably fit the whole hand inside a 35 deg-FOV
+  camera -- it needs `radius * 3.326` minimum.** For a sphere of radius
+  R to fully fit inside a camera's FOV at distance D: `D >= R /
+  sin(FOV/2)`. At 35 deg FOV (half-FOV 17.5 deg), that's `D >=
+  R*3.326`. Confirmed by direct calculation 2026-09-19 (R=22.97,
+  measured earlier the same session): the OLD `R*2.4` distance made the
+  hand's own bounding sphere subtend a 24.6 deg half-angle from the
+  camera -- well past the 17.5 deg half-FOV, guaranteed to clip the
+  outer edges (fingertips/forearm) regardless of any other framing
+  detail. Both `applyLoadingPreviewCameraAutoFrame()` (Loading Preview)
+  and `defaultPosePreviewCamera()` (Pose Preview) had this IDENTICAL
+  formula/bug -- fixed together to `R*3.6` (~8% margin over the exact
+  minimum). If a future single-hand auto-frame camera anywhere in this
+  file looks cropped, check its own distance multiplier against this
+  formula before assuming the bug is somewhere else (lighting, material,
+  clipping planes, etc. were all considered and ruled out first this
+  round).
+- **`pointer-events: none` on an element silently defeats ANY
+  OrbitControls (or other mouse-driven) interaction bound to it, even
+  with `.enabled = true` on the controls object itself -- the DOM
+  element never receives the mouse events at all, so there's nothing
+  for OrbitControls to even ignore-or-not.** `#loadingPreviewCanvas` is
+  `pointer-events: none` in style.css by design (so the always-on-top,
+  z-index:100000 preview never steals clicks meant for the real page
+  underneath it -- see that rule's own 2026-09-17 comment). Adding
+  interactive Camera Edit Mode (2026-09-19) required its own onChange to
+  ALSO flip `loadingPreviewCanvas.style.pointerEvents` between
+  `'auto'`/`'none'` live, not just toggle `OrbitControls.enabled` --
+  caught before shipping, not from a live bug report, by re-reading the
+  existing CSS rule while building this feature. Any FUTURE interactive
+  (click/drag/scroll) feature added to this specific canvas needs the
+  same 2-part toggle, not just one or the other.
+- **This session's `window.__debug.cfg` (and any other property read
+  off `window.__debug`) can report STALE values for several real
+  seconds after a genuine, already-rendered state change, via this
+  sandbox's own JS-exec query path -- a 4th concrete symptom of the
+  same tool quirk already documented elsewhere in this file
+  (`document.hidden`/`window.innerWidth===0`/`clientWidth===0`/
+  computed `top`/`left`===0).** Confirmed live 2026-09-19: after a real
+  orbit-drag that visibly moved the Loading Preview's camera (confirmed
+  via `loadingPreviewCamera.position` reading a genuinely different
+  value AND a fresh screenshot showing a different hand angle),
+  `window.__debug.cfg.loadingPreviewRotationY` kept reading `0` for 6+
+  seconds across repeated JS-exec queries -- while the SLIDER's own
+  actual DOM value (`row.querySelector('input[type=range]').value`)
+  already correctly showed `23` the whole time. Don't trust a
+  `window.__debug.cfg.*` read (or bare rAF/lapIndex-style counters
+  exposed there) as proof a live-sync mechanism is broken; cross-check
+  against the real DOM (an input's own `.value`) or a screenshot before
+  concluding the underlying code is at fault.

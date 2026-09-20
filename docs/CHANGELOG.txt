@@ -7731,6 +7731,120 @@ Cache-busters: `index.html`'s own `main.js?v=153` -> `?v=154`;
 `devpanel/devPanel.js?v=30` -> `?v=31`.
 
 --------------------------------------------------------------------------------
+
+2026-09-19 20:06:51-20:22:08 EDT (15m17s)
+
+**Added interactive Camera Edit Mode (orbit/pan/zoom, orbiting around
+the hand's own center) to the Loading Preview, repurposed the Rotation
+X/Y/Z + Offset X/Y sliders to reflect this camera instead of rotating
+the hand/nudging the canvas's own on-screen CSS position, and fixed a
+real, measured math bug that was cropping BOTH the Loading Preview and
+Pose Preview.** 4 direct requests in one exchange, plus a real root-
+cause finding.
+
+**1. "Why is the Loading Preview Cropped? it shouldnt be" -- a real,
+measured bug, not user error.** For a sphere of radius R to fully fit
+inside a camera's FOV at distance D, D must be >= R / sin(FOV/2); at
+this camera's 35 deg FOV (half-FOV 17.5 deg) that's D >= R * 3.326. The
+existing auto-frame math used `R * 2.4` -- confirmed via direct
+calculation (R=22.97, measured earlier this session): the hand's own
+bounding sphere subtended a 24.6 deg half-angle at that distance,
+guaranteed to overflow the camera's 17.5 deg half-FOV and clip the
+outer edges (fingertips/forearm) regardless of framing offset. Fixed
+to `R * 3.6` (~8% margin over the exact minimum). Pose Preview's own
+`defaultPosePreviewCamera()` had the IDENTICAL formula/bug -- fixed
+together, same root cause, not separately requested but directly in
+scope (same formula, same file, same measured defect).
+
+**2 & 4. Camera Edit Mode checkbox + orbit-around-hand-center (direct
+requests, "click and drag to orbit... right click to pan... scroll to
+zoom" / "In Hando... it orbits around the center of the hand as an
+orbit origin point. Do the same for our loading preview").** New
+`loadingPreviewCameraEditMode` checkbox creates/enables a real
+`OrbitControls` instance bound to `loadingPreviewCamera`/
+`loadingPreviewCanvas`. OrbitControls' own STOCK default mouse mapping
+(LEFT: ROTATE, RIGHT: PAN, wheel: DOLLY) already matched the request
+exactly -- unlike the main scene's own `controls` (which deliberately
+disables rotate for its fixed-facing field), no custom `mouseButtons`
+override was needed. Orbit target is always
+`handBoundsCenterLocal.clone().applyQuaternion(alignQuat)` -- the SAME
+point the auto-frame already targets, matching HANDO's own convention.
+A real blocker found and fixed along the way: `#loadingPreviewCanvas`
+is `pointer-events: none` in style.css by design (so the preview never
+steals clicks from the real page) -- Edit Mode's own onChange now also
+flips this to `auto`/`none` live, or OrbitControls would silently never
+receive any mouse events at all regardless of its own `.enabled` state.
+
+**3. "Rotation X Y Z and XY offset should reflect the camera settings"
+-- confirmed via AskUserQuestion to fully repurpose, not add
+alongside.** Rotation X/Y/Z used to fold into `loadingPreviewBaseQuat`
+(rotating the HAND itself); Offset X/Y used to nudge the canvas's own
+on-screen CSS `transform`. Now: X/Y are the orbit camera's own
+elevation/azimuth (THREE.Spherical math, around the hand-center
+origin), Z is camera roll (rotates `camera.up` around the view
+direction then re-`lookAt()`s -- no native OrbitControls gesture drives
+roll, but it's still a real, settable slider like every other one in
+this panel), Offset X/Y is the orbit target's own world-space X/Y
+displacement from the hand's center (pan). Two-way:
+`applyLoadingPreviewOrbitFromSliders()` (each slider's own onChange)
+drives the camera FROM the sliders when Edit Mode is off or a value is
+typed directly (distance is preserved from whatever it currently is,
+not reset -- not one of the 5 sliders, not asked for);
+`deriveLoadingPreviewOrbitSliders()` reads the camera back INTO the
+sliders, called after every preset/auto-frame apply and continuously
+(every frame) while Edit Mode is on, mirroring the main scene's own
+`syncCameraPanelFromLive()` pattern (called from `animate()`, not
+event-based) rather than wiring OrbitControls' own 'change' event by
+hand. `applyLoadingPreviewPose()`'s own hand-rotation fold-in was
+reverted (`loadingPreviewBaseQuat` back to plain `alignQuat`) -- ROOT-
+CAUSED a real production bug in the process: a leftover non-zero
+`loadingPreviewRotationX` (6 deg, from before this repurposing) had
+been rotating the hand out from under wherever the camera was actually
+framed for, exactly matching the direct report "the camera is off, now
+rotated at some angle." Per direct clarification ("the ultimate
+Loading Preview camera should just be whatever is selected in the
+dropdown... If i orbit and zoom and i like what i set, i will hit Save
+in the Loading Preview Saved Cameras UI"), these 5 sliders are a live/
+session-only reflection, NOT what persists -- `buildLoadingPreview()`
+still resolves the real camera purely from
+`loadingPreviewCameraSelector`/`loadingPreviewSavedCameras`, so a
+rebuild always snaps back to the dropdown's own camera regardless of
+how much orbiting happened first; Saving a new state still goes
+through the pre-existing `loadingPreviewSavedCameras` list-picker's own
+Save button (`captureLoadingPreviewCameraPreset()`, unchanged), which
+already reads the live camera directly.
+
+**Verified live, end-to-end** (after the now-standard several retries
+past this project's own documented environment-truncation gotcha,
+which hit BOTH main.js and the GLB model this round): cropping fix
+confirmed visually (the hand now shows real margin inside the preview
+circle, not edge-to-edge); a REAL synthetic pointer-drag (pointerdown/
+move/up with `pointerType:'mouse'`, dispatched directly on the canvas)
+confirmed via 3 independent signals -- `loadingPreviewCamera.position`
+changed to a genuinely different value, a fresh screenshot showed a
+visibly different hand angle, and the SLIDER's own actual DOM value
+(not a `cfg` JS-exec read) showed the correct derived azimuth (23 deg).
+One false alarm caught and correctly dismissed: `window.__debug.cfg`
+JS-exec reads kept reporting stale/zero values for several seconds
+after the drag, initially read as a real sync bug -- but the DOM
+slider's own value was already correct the whole time, and the
+rendered screenshot already reflected the new angle, confirming this
+was this project's own already-documented JS-exec query-staleness tool
+quirk (extended here to a 4th concrete symptom: `window.__debug`
+property reads), not a real bug. Also confirmed the "dropdown wins on
+rebuild" contract directly: after orbiting to a real 23 deg azimuth,
+toggling `loadingPreviewShowLive` off then on again correctly reset
+the Rotation Y slider back to 0 (the auto-frame default), not the
+orbited value. Right-click-pan and scroll-zoom were NOT independently
+live-tested this round (time/budget) -- they're stock OrbitControls
+behavior, same mechanism already proven working for orbit.
+
+New debug export: `window.__debug.loadingPreviewCamera`/
+`loadingPreviewOrbitControls`/`loadingPreviewCameraTarget` (used for
+this round's own diagnosis, kept as a permanent addition matching
+every other internal object already exposed there).
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

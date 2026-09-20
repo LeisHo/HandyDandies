@@ -329,7 +329,7 @@ function tryStartField() {
   // whatever comes next; don't treat this comment's own reasoning above
   // as the settled explanation.
   renderer.compile(scene, camera)
-  window.__debug = { THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection } }
+  window.__debug = { THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget } }
   loadingEl.classList.add('hidden')
   // The loading-preview canvas is a top-level sibling of #loading now
   // (2026-09-17, decoupled specifically so this moment doesn't force it
@@ -4396,6 +4396,41 @@ function catmullRomY(y0, y1, y2, y3, t) {
   const t2 = t * t, t3 = t2 * t
   return 0.5 * ((2 * y1) + (-y0 + y2) * t + (2 * y0 - 5 * y1 + 4 * y2 - y3) * t2 + (-y0 + 3 * y1 - 3 * y2 + y3) * t3)
 }
+// Bezier curve handles (direct spec item) -- a per-point OPTIONAL manual
+// tangent, additive to the smooth Catmull-Rom spline above rather than a
+// replacement for it. A point's own `h1` ({x,y} offset, absolute -- added
+// directly to the point) shapes the curve LEAVING it toward the next
+// point; `h2` shapes the curve ARRIVING at it FROM the previous point.
+// Only a segment where at least one endpoint actually defines the
+// relevant handle switches to an explicit cubic bezier (see
+// evaluateArmLengthCurve()'s own call site) -- every segment with no
+// handles keeps the exact same Catmull-Rom shape it always had, so no
+// existing saved curve changes at all just because this capability now
+// exists.
+function cubicBezier1D(p0, p1, p2, p3, t) {
+  const u = 1 - t
+  return u * u * u * p0 + 3 * u * u * t * p1 + 3 * u * t * t * p2 + t * t * t * p3
+}
+// A cubic bezier isn't naturally parameterized by X, so this solves for
+// the parameter `t` whose X(t) matches the requested `x` via binary
+// search (24 iterations -- plenty for this widget's own display/eval
+// precision), then reads Y(t) off that same `t`. Assumes X(t) is
+// monotonic across the segment, true for any handle configuration that
+// doesn't double back on itself horizontally -- a well-formed use of a
+// tone-curve-style handle in practice, not enforced here (an S-shaped X
+// would just evaluate to whichever of the (possibly multiple) matching
+// t's this search happens to land on, a disclosed edge case rather than a
+// hard block on dragging a handle past its neighbor).
+function bezierSegmentY(P0, C1, C2, P3, x) {
+  let lo = 0, hi = 1
+  for (let iter = 0; iter < 24; iter++) {
+    const mid = (lo + hi) / 2
+    const xm = cubicBezier1D(P0.x, C1.x, C2.x, P3.x, mid)
+    if (xm < x) lo = mid; else hi = mid
+  }
+  const t = (lo + hi) / 2
+  return cubicBezier1D(P0.y, C1.y, C2.y, P3.y, t)
+}
 function evaluateArmLengthCurve(points, x) {
   if (!points || points.length === 0) return 1
   if (points.length === 1) return points[0].y
@@ -4405,6 +4440,15 @@ function evaluateArmLengthCurve(points, x) {
   for (let i = 0; i < sorted.length - 1; i++) {
     const p1 = sorted[i], p2 = sorted[i + 1]
     if (x >= p1.x && x <= p2.x) {
+      // Bezier curve handles override -- see cubicBezier1D()'s own
+      // comment. p1.h1/p2.h2 undefined (the overwhelmingly common case,
+      // and every pre-existing saved curve) falls straight through to the
+      // original Catmull-Rom line below, unchanged.
+      if (p1.h1 || p2.h2) {
+        const C1 = p1.h1 ? { x: p1.x + p1.h1.x, y: p1.y + p1.h1.y } : p1
+        const C2 = p2.h2 ? { x: p2.x + p2.h2.x, y: p2.y + p2.h2.y } : p2
+        return bezierSegmentY(p1, C1, C2, p2, x)
+      }
       const p0 = sorted[i - 1] || p1
       const p3 = sorted[i + 2] || p2
       const segT = p2.x === p1.x ? 0 : (x - p1.x) / (p2.x - p1.x)
@@ -6525,6 +6569,48 @@ function buildGenericCurveWidget(row, opts) {
     commitTextControl(input, JSON.stringify(points))
   }
   const CURVE_SAMPLES = 48
+  let handleEls = []
+  // Bezier curve handles (direct spec item, this widget only -- the
+  // project-specific Arm Length/Wrist Splay curve widgets are deliberately
+  // separate copies, per their own comments, and are NOT extended here).
+  // Alt+drag a point creates/drags its OUT handle (`h1`, shapes the
+  // segment leaving it toward the NEXT point, never offered on the last
+  // point); Shift+drag creates/drags its IN handle (`h2`, shapes the
+  // segment arriving FROM the PREVIOUS point, never offered on the first
+  // point). Dragging a handle back within a small pixel threshold of its
+  // own point removes it on release, reverting that segment to the plain
+  // Catmull-Rom spline -- the only way to remove one, deliberately
+  // mirroring how a point itself only deletes via dblclick/right-click,
+  // not a separate dedicated button. See evaluateArmLengthCurve()'s own
+  // comment for the data format (`h1`/`h2` are optional {x,y} offsets,
+  // absolute -- added directly to the point) and why every existing saved
+  // curve (no handles) renders identically to before.
+  const HANDLE_REMOVE_THRESHOLD_PX = 6
+  function startHandleDrag(p, i, kind, downEv) {
+    downEv.stopPropagation()
+    downEv.preventDefault()
+    const canHave = kind === 'h1' ? i < points.length - 1 : i > 0
+    if (!canHave) return
+    if (!p[kind]) p[kind] = { x: kind === 'h1' ? 0.08 : -0.08, y: 0 } // a small default offset, immediately visible/draggable rather than starting at zero-length
+    function onMove(moveEv) {
+      const rect = svg.getBoundingClientRect()
+      if (rect.width <= 0 || rect.height <= 0) return
+      const np = fromPx(moveEv.clientX - rect.left, moveEv.clientY - rect.top)
+      p[kind] = { x: np.x - p.x, y: np.y - p.y }
+      redraw()
+    }
+    function onUp() {
+      window.removeEventListener('pointermove', onMove)
+      window.removeEventListener('pointerup', onUp)
+      const handlePx = toPx({ x: p.x + p[kind].x, y: p.y + p[kind].y })
+      const pointPx = toPx(p)
+      if (Math.hypot(handlePx.x - pointPx.x, handlePx.y - pointPx.y) <= HANDLE_REMOVE_THRESHOLD_PX) delete p[kind]
+      redraw()
+      commitPoints()
+    }
+    window.addEventListener('pointermove', onMove)
+    window.addEventListener('pointerup', onUp)
+  }
   function redraw() {
     let d = ''
     for (let i = 0; i <= CURVE_SAMPLES; i++) {
@@ -6534,8 +6620,30 @@ function buildGenericCurveWidget(row, opts) {
       d += (i === 0 ? 'M' : 'L') + px.x.toFixed(2) + ',' + px.y.toFixed(2) + ' '
     }
     curvePath.setAttribute('d', d.trim())
+    handleEls.forEach((el) => svg.removeChild(el))
+    handleEls = []
     circles.forEach((c) => svg.removeChild(c))
     circles = points.map((p, i) => {
+      // Handle line + marker (added to the DOM BEFORE the point's own
+      // circle, so the circle renders on top) -- one per side, only when
+      // that side's handle actually exists.
+      ;['h1', 'h2'].forEach((kind) => {
+        if (!p[kind]) return
+        const px = toPx(p)
+        const hx = toPx({ x: p.x + p[kind].x, y: p.y + p[kind].y })
+        const line = document.createElementNS(svgNS, 'line')
+        line.setAttribute('x1', px.x); line.setAttribute('y1', px.y); line.setAttribute('x2', hx.x); line.setAttribute('y2', hx.y)
+        line.setAttribute('stroke', 'rgba(255,255,255,0.4)'); line.setAttribute('stroke-width', '1')
+        svg.appendChild(line)
+        handleEls.push(line)
+        const marker = document.createElementNS(svgNS, 'rect')
+        marker.setAttribute('x', hx.x - 3.5); marker.setAttribute('y', hx.y - 3.5); marker.setAttribute('width', 7); marker.setAttribute('height', 7)
+        marker.setAttribute('fill', '#e0a030')
+        Object.assign(marker.style, { cursor: 'grab' })
+        marker.addEventListener('pointerdown', (downEv) => startHandleDrag(p, i, kind, downEv))
+        svg.appendChild(marker)
+        handleEls.push(marker)
+      })
       const px = toPx(p)
       const c = document.createElementNS(svgNS, 'circle')
       c.setAttribute('cx', px.x); c.setAttribute('cy', px.y); c.setAttribute('r', 5)
@@ -6543,6 +6651,8 @@ function buildGenericCurveWidget(row, opts) {
       Object.assign(c.style, { cursor: 'grab' })
       let dragged = false
       c.addEventListener('pointerdown', (downEv) => {
+        if (downEv.altKey) { startHandleDrag(p, i, 'h1', downEv); return }
+        if (downEv.shiftKey) { startHandleDrag(p, i, 'h2', downEv); return }
         downEv.stopPropagation()
         dragged = false
         const isEndpoint = i === 0 || i === points.length - 1
