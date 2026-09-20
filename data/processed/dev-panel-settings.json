@@ -1,10 +1,10 @@
 {
   "values": {
     "desktop": {
-      "fieldRows": 5,
-      "fieldCols": 2,
-      "rowSpacing": 9.5,
-      "columnSpacing": 10.5,
+      "fieldRows": 13,
+      "fieldCols": 12,
+      "rowSpacing": 14,
+      "columnSpacing": 15,
       "handScale": 1.2,
       "alternateRowOffset": 5,
       "progressiveRowOffset": 1,
@@ -21724,7 +21724,7 @@
     },
     {
       "key": "Cursor Tracking",
-      "collapsed": false,
+      "collapsed": true,
       "locked": false,
       "items": [
         {
