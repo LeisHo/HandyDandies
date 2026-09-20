@@ -18,6 +18,22 @@ work seamlessly from there.
 
 ## Currently working on
 
+**SHIPPED 2026-09-20: ported HANDO's new Pose Offset X/Y/Z + Pose Scale
+sliders (direct follow-up request).** HANDO's own version is a single
+GLOBAL modelRoot transform (it only has one hand); generalized here to
+genuinely PER-HAND instead, the same way `modelRotX/Y/Z` already was --
+applied inside `applyPoseValuesToHand()` during an active pose
+transition only, via a new `hand.basePosition` (the field-grid position
+with no pose offset baked in). Added to `POSE_PRESET_KEYS` + 4 matching
+Pose-group sliders, so a HANDO-exported pose using these fields now
+actually applies correctly here on import, not just without crashing.
+**Deliberately scoped to active transitions, not idle hands** (a global
+offset/scale on every idle hand at once would shift/resize the whole
+field) and not yet wired into Pose Preview's own WYSIWYG view. Verified
+live: exact offset/scale match, no compounding across repeated calls, a
+pose missing these fields entirely falls back to 0/1 cleanly. See
+CHANGELOG.txt's matching 2026-09-20 entry for full verification detail.
+
 **SHIPPED 2026-09-20: fixed the real root cause of the Loading Preview
 camera not matching HANDO — a missing `camera.up` rotation, affecting
 EVERY saved camera preset, not just HANDO imports.** `applyLoadingPreviewCameraPreset()`/

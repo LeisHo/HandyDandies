@@ -8949,6 +8949,71 @@ Cache-buster: `index.html`'s `main.js?v=175` -> `?v=177` (`?v=176` was
 the concurrent session's own intermediate bump).
 
 --------------------------------------------------------------------------------
+2026-09-20  00:43:36-00:51:25 EDT (7m49s; direct follow-up: "i integrated
+XYZ offset and scale sliders to Pose in Hando. Integrate those so
+exports load correctly.")
+
+**Ported HANDO's new Pose Offset X/Y/Z + Pose Scale sliders.** HANDO's
+own version (see that project's own 2026-09-20 00:18-00:24 entry) is a
+single GLOBAL `modelRoot`-level transform -- it only has one posable
+hand, so "global" and "per-hand" are the same thing there. This project
+has hundreds of hand instances in a field, so a literal port (shifting/
+resizing the WHOLE FIELD by one shared amount) would have been a
+materially different, almost certainly unwanted effect from "this saved
+pose looks bigger/shifted." Generalized instead the same way
+`modelRotX/Y/Z` already was in this project (a precedent, not a new
+pattern): genuinely PER-HAND, applied inside `applyPoseValuesToHand()`
+during an active pose transition only.
+
+New `hand.basePosition` (stored once per hand in `relayoutField()`,
+alongside the existing `hand.clone.scale.setScalar(scaleFactor)` line)
+holds the field-grid position with no pose offset baked in.
+`applyPoseValuesToHand()` sets `hand.wrapper.position` as an ABSOLUTE
+`basePosition + poseOffsetX/Y/Z` every call (not additive), so it can
+never compound across the many frames one active transition spans;
+scale similarly recomputes `computeBaseScale() * poseScale` fresh each
+call rather than multiplying onto whatever `hand.clone.scale` currently
+holds. Runs BEFORE the existing, separate per-trigger Offset X/Y
+(`applyOffsetRotationToHand()`, camera-relative, ADDITIVE, called right
+after at every real call site) -- confirmed by reading that function
+that the 2 stack correctly rather than fighting, since one sets and the
+other adds.
+
+Added `poseOffsetX/Y/Z`/`poseScale` to `POSE_PRESET_KEYS` (captured/
+restored for free via the existing generic pose mechanism -- the same
+list `capturePosePreset()`/`previewPosePreset()`/every trigger's own
+pose-resolution already walks) plus 4 matching sliders on the Pose
+group, right after Whole-Hand Rotation Z. `POSE_KEY_DEFAULTS` (already
+built by scanning the Pose group's own controls for any key also in
+POSE_PRESET_KEYS) picks up their `def` (0/0/0/1) automatically -- the
+SAME fallback mechanism this file's own comment already documents as
+"the fallback for a key a pose imported from HANDO might lack," so an
+older saved pose or one imported from a HANDO version that predates
+these 4 fields needs no migration at all.
+
+**Deliberately scoped down, disclosed rather than silently built**:
+applied to hold-based AND fire-and-forget triggers alike (both funnel
+through the same `applyPoseValuesToHand()`), but NOT to idle/default
+hands -- matching HANDO's own precedent that these fields are
+"functionally INERT" for its own secondary consumer (hand2). A hand
+sitting idle at its own default pose won't reflect a nonzero
+poseOffset/poseScale on that default pose; only an ACTIVE transition
+(any trigger, any mode) does. Also not wired into Pose Preview (the
+standalone single-hand authoring view) -- it reads the new fields via
+POSE_PRESET_KEYS already (so nothing breaks), but doesn't yet visually
+apply them, a smaller follow-up if WYSIWYG preview of these 2 sliders
+turns out to matter in practice.
+
+**Verified live** via `window.__debug`: applying a test pose with
+`poseOffsetX/Y/Z: 5/-3/1, poseScale: 2` to a real hand produced
+`wrapper.position` exactly equal to `basePosition + (5,-3,1)` and
+`clone.scale` exactly `2x` the pre-existing base scale; 3 repeated calls
+with the identical pose produced byte-identical results (no
+compounding); a pose with NEITHER field present at all (exercising the
+`|| 0`/`?? 1` fallback path) correctly restored the hand to its exact
+original base position/scale. No console errors.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================
