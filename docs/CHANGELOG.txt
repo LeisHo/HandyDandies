@@ -10041,6 +10041,68 @@ Speed Curve/Start Time Curve/Retransition (should start collapsed), and
 Animation Speed (Ms) (should start at 700, not 400).
 
 --------------------------------------------------------------------------------
+2026-09-20 (later same day, 12th follow-up round)
+
+Added a "Wrist Rotation (Deg)" slider (Pose group, Wrist subgroup),
+ported directly from HANDO. Direct request: "check Hando. I added a
+wrist rotation slider. make sure we can take those imports etc."
+Checked HANDO's own `src/main.js` (`wristRotation` control, added
+2026-09-19/20 there) -- a plain local-Y rotation on the shared `rHand`
+bone, rotating along the wrist-to-elbow bone axis; Bend/Splay already
+claim X/Z on that same bone (`applyWristPoseToSkeleton()`), so Y was the
+one remaining axis HANDO used, matched here identically (range/step/
+lockRange all copied from HANDO's own slider). Wired into 3 places:
+`applyWristPoseToSkeleton()` gained a `bone.rotateY(degToRad(values.wristRotation
+|| 0))` call alongside the existing rotateX/rotateZ; `POSE_PRESET_KEYS`
+gained the key so it's captured/restored/tweened/exported the same way
+as every other pose value (this is the actual "make sure we can take
+those imports" part -- `savedPoses`'s Import button and every apply
+path already merge generically over `POSE_PRESET_KEYS` with a
+`POSE_KEY_DEFAULTS` fallback for missing keys, so adding the key here is
+what makes a pasted HANDO pose JSON containing `wristRotation` actually
+carry the value over instead of silently dropping it); and
+`POSE_SUBGROUP_SPECS`'s `Wrist` entry gained the key so the new slider
+groups with Wrist Bend/Splay in the Pose Preview UI, not off on its own.
+No coordinate-frame conversion needed (unlike the HANDO camera/lighting
+import path's `alignQuat` correction) -- this is a bone-local rotation
+on the same shared rig (`Hand2.glb`, copied from HANDO's own HAND-021),
+and Bend/Splay already prove that convention carries over unmodified
+between the 2 projects. `main.js` cache-buster bumped `?v=192` ->
+`?v=193` was NOT needed this round -- checked and the project doesn't
+bump per-commit, only when observed stale (see the `style.css` gotcha);
+left at `?v=192` since a fresh navigation already picked up the change
+live (confirmed below).
+
+**Live-verified in the browser** (own preview server on port 8423,
+avoiding a concurrent session's server on 8420-8422; hit this
+sandbox's own documented `devPanel.js` network-truncation issue once on
+the first navigation attempt -- `net::ERR_CONNECTION_RESET`, 0
+`.dp-group` elements -- a 2nd navigation with a fresh cache-busting `?t=`
+loaded cleanly, 89 groups): confirmed the new row renders inside the
+"Wrist" subgroup alongside Wrist Bend/Splay (not a bare top-level row);
+confirmed `window.__debug.cfg.wristRotation` starts at its `def: 0`;
+dispatched a real `input`+`change` event on the slider (set to 45) and
+confirmed both `cfg.wristRotation` updated to 45 AND `hands[0]`'s own
+`rHand` bone quaternion changed (before/after values differ), proving
+`applyWristPose()`'s new `rotateY` call actually re-poses the live
+field, not just the config value; reset the slider back to 0 and
+confirmed the bone/cfg followed. Did not separately live-test the
+Import-button paste path itself (a pasted-JSON UI interaction) --
+confidence there rests on direct source inspection of the 5 existing
+`POSE_PRESET_KEYS.forEach` call sites (capture, restore, tween, Pose
+Preview, Loading Preview) all already being fully generic over whatever
+keys the array contains, the same mechanism that already carries
+`poseOffsetX/Y/Z`/`poseScale` through the identical Import path with no
+per-key wiring of its own.
+
+`git diff --stat` before commit: `src/main.js` only, 19 insertions/2
+deletions -- no concurrent-session hunks present this round (clean
+working tree otherwise: `git status` showed only 2 untracked dirs,
+`data/SCREENCAP/`and `datalog/`, unrelated and left untouched). Pushed
+directly to `origin/main` (`c98d0e8..c277c8f`) after a `git fetch`
+confirmed no concurrent commits had landed.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

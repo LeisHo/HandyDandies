@@ -18,6 +18,26 @@ work seamlessly from there.
 
 ## Currently working on
 
+**SHIPPED 2026-09-20 (later same day, 12th follow-up round) -- added a
+"Wrist Rotation (Deg)" slider, ported from HANDO ("check Hando. I added
+a wrist rotation slider. make sure we can take those imports etc").**
+Local-Y rotation on the shared `rHand` bone (Bend/Splay already claim
+X/Z), wired into `applyWristPoseToSkeleton()`, `POSE_PRESET_KEYS`
+(capture/restore/tween/export), and `POSE_SUBGROUP_SPECS`'s Wrist
+subgroup -- adding the key to `POSE_PRESET_KEYS` is what actually makes
+a pasted HANDO pose containing `wristRotation` carry the value over via
+the `savedPoses` Import button, since every apply path already merges
+generically over that key list with a defaults fallback. No coordinate-
+frame conversion needed (unlike HANDO camera/lighting imports) -- same
+shared rig, same convention Bend/Splay already prove works unmodified.
+Live-verified: renders nested in the Wrist subgroup, slider drag updates
+`cfg.wristRotation` and visibly re-poses the live hand's `rHand` bone
+(quaternion confirmed changed), reset cleanly back to 0. Import-button
+paste path itself not separately live-tested -- confidence rests on
+direct source inspection of the shared `POSE_PRESET_KEYS`-driven merge
+logic. Committed and pushed (`c277c8f`). See CHANGELOG.txt's matching
+entry for the full account.
+
 **SHIPPED 2026-09-20 (later same day, 11th follow-up round, verification
 gap disclosed) -- new custom click functions now default from Custom
 Click Function 3's own saved settings ("Keep those settings as default
