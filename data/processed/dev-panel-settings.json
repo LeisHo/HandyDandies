@@ -9,7 +9,7 @@
       "alternateRowOffset": 5,
       "progressiveRowOffset": 1,
       "useProgressiveOffset": false,
-      "hideHands": true,
+      "hideHands": false,
       "trackingEnabled": true,
       "trackingDamping": 0.6,
       "targetDepthFactor": 0.8,
@@ -17,7 +17,7 @@
       "palmFacesCursor": true,
       "palmFaceRotationOffset": 0,
       "loadingPreviewEnabled": true,
-      "loadingPreviewShowLive": true,
+      "loadingPreviewShowLive": false,
       "loadingMinTimeMs": 6700,
       "loadingPreviewTweenSelector": "COUNTDOWN - VERTICAL + LENS COVER",
       "loadingPreviewSavedCameras": [
@@ -7089,7 +7089,7 @@
       "palmFacesCursor": true,
       "palmFaceRotationOffset": 0,
       "loadingPreviewEnabled": true,
-      "loadingPreviewShowLive": true,
+      "loadingPreviewShowLive": false,
       "loadingMinTimeMs": 6700,
       "loadingPreviewTweenSelector": "COUNTDOWN - VERTICAL + LENS COVER",
       "loadingPreviewSavedCameras": [
@@ -14161,7 +14161,7 @@
       "palmFacesCursor": true,
       "palmFaceRotationOffset": 0,
       "loadingPreviewEnabled": true,
-      "loadingPreviewShowLive": true,
+      "loadingPreviewShowLive": false,
       "loadingMinTimeMs": 6700,
       "loadingPreviewTweenSelector": "COUNTDOWN - VERTICAL + LENS COVER",
       "loadingPreviewSavedCameras": [
