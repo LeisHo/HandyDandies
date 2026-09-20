@@ -21458,10 +21458,6 @@
           "key": "loadingMinTimeMs"
         },
         {
-          "type": "row",
-          "key": "loadingPreviewSequenceCountMode"
-        },
-        {
           "type": "group",
           "group": {
             "key": "New Group (5)",
@@ -21539,6 +21535,10 @@
               },
               {
                 "type": "row",
+                "key": "loadingPreviewSequenceCountMode"
+              },
+              {
+                "type": "row",
                 "key": "loadingPreviewSequenceCount"
               },
               {
@@ -21563,6 +21563,7 @@
               "loadingPreviewCameraSelector",
               "loadingPreviewLightingSelector",
               "loadingPreviewSequenceMode",
+              "loadingPreviewSequenceCountMode",
               "loadingPreviewSequenceCount",
               "loadingPreviewSpeedMs",
               "loadingPreviewSize",
@@ -21595,8 +21596,7 @@
         "loadingPreviewShowLive",
         "loadingPreviewEnabled",
         "loadingPreviewCameraEditMode",
-        "loadingMinTimeMs",
-        "loadingPreviewSequenceCountMode"
+        "loadingMinTimeMs"
       ],
       "subgroups": [
         {
@@ -21672,6 +21672,10 @@
             },
             {
               "type": "row",
+              "key": "loadingPreviewSequenceCountMode"
+            },
+            {
+              "type": "row",
               "key": "loadingPreviewSequenceCount"
             },
             {
@@ -21696,6 +21700,7 @@
             "loadingPreviewCameraSelector",
             "loadingPreviewLightingSelector",
             "loadingPreviewSequenceMode",
+            "loadingPreviewSequenceCountMode",
             "loadingPreviewSequenceCount",
             "loadingPreviewSpeedMs",
             "loadingPreviewSize",
