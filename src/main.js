@@ -843,6 +843,24 @@ const DEV_GROUPS = [
       { key: 'modelRotX', label: 'Whole-Hand Rotation X (Deg)', type: 'slider', min: -200, max: 200, step: 1, def: 0, lockRange: true, onChange: () => onWholeHandRotationChange() },
       { key: 'modelRotY', label: 'Whole-Hand Rotation Y (Deg)', type: 'slider', min: -200, max: 200, step: 1, def: 0, lockRange: true, onChange: () => onWholeHandRotationChange() },
       { key: 'modelRotZ', label: 'Whole-Hand Rotation Z (Deg)', type: 'slider', min: -200, max: 200, step: 1, def: 0, lockRange: true, onChange: () => onWholeHandRotationChange() },
+      // Ported from HANDO's own "Pose Offset X/Y/Z" + "Pose Scale" sliders
+      // (direct request -- see POSE_PRESET_KEYS's own comment for the full
+      // account). Deliberately scoped to ACTIVE pose transitions only
+      // (applyPoseValuesToHand(), called every frame a trigger is driving
+      // a hand) -- NOT wired to a live onChange the way modelRotX/Y/Z's
+      // idle-repose path is, since offsetting/scaling every idle hand in
+      // the field simultaneously by one shared global amount would just
+      // shift/resize the WHOLE FIELD, a materially different (and almost
+      // certainly unwanted) effect from "this saved pose looks bigger/
+      // shifted." A pose retransitioning back to a default with these at
+      // 0/1 (the normal case) already self-corrects back to the field's
+      // own normal per-hand position/scale with zero extra code, the same
+      // way modelRotX/Y/Z's own per-hand rotation already does during an
+      // active transition -- see that mechanism's own precedent.
+      { key: 'poseOffsetX', label: 'Pose Offset X (World Units)', type: 'slider', min: -20, max: 20, step: 0.1, def: 0 },
+      { key: 'poseOffsetY', label: 'Pose Offset Y (World Units)', type: 'slider', min: -20, max: 20, step: 0.1, def: 0 },
+      { key: 'poseOffsetZ', label: 'Pose Offset Z (World Units)', type: 'slider', min: -20, max: 20, step: 0.1, def: 0 },
+      { key: 'poseScale', label: 'Pose Scale (x)', type: 'slider', min: 0.1, max: 3, step: 0.05, def: 1 },
       // Direct user request: import poses exported from HANDO (identical
       // rig/bone names, same Pose-slider set) and preview them without
       // reposing every hand in the field -- "Use" is wired to
@@ -2631,7 +2649,17 @@ const POSE_PRESET_KEYS = [
   'curlMiddle', 'splayMiddle', 'splayMiddle2', 'curlBiasMiddle', 'baseOnlyCurlMiddle', 'midOnlyCurlMiddle', 'tipOnlyCurlMiddle', 'tipTwistMiddle',
   'curlRing', 'splayRing', 'splayRing2', 'curlBiasRing', 'baseOnlyCurlRing', 'midOnlyCurlRing', 'tipOnlyCurlRing', 'tipTwistRing',
   'curlPinky', 'splayPinky', 'splayPinky2', 'curlBiasPinky', 'baseOnlyCurlPinky', 'midOnlyCurlPinky', 'tipOnlyCurlPinky', 'tipTwistPinky',
-  'wristBend', 'wristSplay', 'modelRotX', 'modelRotY', 'modelRotZ'
+  'wristBend', 'wristSplay', 'modelRotX', 'modelRotY', 'modelRotZ',
+  // Ported from HANDO (direct request: "i integrated XYZ offset and scale
+  // sliders to Pose in Hando. Integrate those so exports load correctly.")
+  // -- HANDO's own version is a single GLOBAL modelRoot-level transform
+  // (it only has one posable hand); generalized here the same way
+  // modelRotX/Y/Z already was, to a genuinely PER-HAND, per-pose value
+  // (see applyPoseValuesToHand()'s own comment for where it's actually
+  // applied). `|| 0`/`?? 1` fallbacks throughout cover a pose saved
+  // before these keys existed, or imported from a HANDO version that
+  // predates them -- same convention as baseOnlyCurl*'s own comment.
+  'poseOffsetX', 'poseOffsetY', 'poseOffsetZ', 'poseScale'
 ]
 function capturePosePreset() {
   const item = {}
@@ -5379,6 +5407,28 @@ function applyPoseValuesToHand(hand, poseValues, extraSplayDeg) {
   // Wrist BEFORE fingers -- see applyAllFingerPoses()'s own comment.
   applyWristPoseToSkeleton(hand.skinnedMesh.skeleton, poseValues, extraSplayDeg)
   FINGER_NAMES.forEach((name) => applyCurlToSkeleton(name, hand.skinnedMesh.skeleton, hand.currentBaseQuat, hand.wrapper.quaternion, poseValues))
+  // Pose Offset X/Y/Z + Pose Scale (ported from HANDO -- see
+  // POSE_PRESET_KEYS's own comment for the full account). An ABSOLUTE
+  // `.set()` from this hand's own stored grid `basePosition`, not an
+  // additive nudge -- recomputed fresh from `poseValues` every call, so it
+  // can never compound across frames the way repeatedly adding an offset
+  // to the same vector would. Runs BEFORE applyOffsetRotationToHand()'s
+  // own separate, ADDITIVE per-trigger Offset X/Y (camera-relative,
+  // progress-scaled) -- that function always runs right after this one at
+  // every real call site, so its own `.addScaledVector()` correctly
+  // stacks on top of this pose-level offset rather than fighting it.
+  // `hand.basePosition` is only absent before the very first
+  // relayoutField() call -- guarded rather than assumed, since a pose
+  // could theoretically be applied a single frame before the initial
+  // layout runs.
+  if (hand.basePosition) {
+    hand.wrapper.position.set(
+      hand.basePosition.x + (poseValues.poseOffsetX || 0),
+      hand.basePosition.y + (poseValues.poseOffsetY || 0),
+      hand.basePosition.z + (poseValues.poseOffsetZ || 0)
+    )
+  }
+  hand.clone.scale.setScalar(computeBaseScale() * (poseValues.poseScale ?? 1))
   // The ONE place every trigger family (chp/rchp/dcHold/click/dblclick/rc)
   // funnels its own per-frame pose application through, regardless of
   // which phase/mode is driving it -- stashing the values here gives every
@@ -8135,7 +8185,16 @@ function relayoutField() {
     for (let c = 0; c < cols; c++) {
       const hand = hands[i++]
       if (!hand) continue
-      hand.wrapper.position.set(c * colSpacing - w / 2 + rowOffsetX, r * rowSpacing - h / 2, 0)
+      // `basePosition` is this hand's own field-grid position with NO
+      // pose-driven offset baked in -- Pose Offset X/Y/Z (see
+      // applyPoseValuesToHand()'s own comment) is applied ON TOP of this
+      // every frame during an active transition, recomputed fresh each
+      // time rather than accumulated onto `wrapper.position` directly, so
+      // it can never compound across frames or drift once a relayout
+      // changes the grid underneath an in-progress transition.
+      if (!hand.basePosition) hand.basePosition = new THREE.Vector3()
+      hand.basePosition.set(c * colSpacing - w / 2 + rowOffsetX, r * rowSpacing - h / 2, 0)
+      hand.wrapper.position.copy(hand.basePosition)
       hand.clone.scale.setScalar(scaleFactor)
     }
   }
