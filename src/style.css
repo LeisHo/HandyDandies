@@ -182,6 +182,13 @@ html, body {
 /* A freshly-created empty group (see addCustomGroup()) needs a visible,
    hittable drop target even with 0 settings rows in it. */
 .dp-group-body:empty { min-height: 24px; border: 1px dashed #3a3a4a; border-radius: 4px; opacity: 0.6; }
+/* Duplicate-setting validation (Custom Click Functions, see
+   refreshCustomFunctionConflictWarnings()) -- a thin warning-colored left
+   border on the whole group, non-blocking (the group still works exactly
+   as configured; this only flags that it shares a gesture with another
+   enabled custom function). The header's own `title` attribute carries
+   the actual explanation as a native tooltip. */
+.dp-group.dp-group-conflict-warning { box-shadow: inset 3px 0 0 0 #e0a030; }
 /* A group nested one level inside another (see setupReorder's own nesting
    cap) gets an indent + accent border instead of its own top-level
    top-border, so nesting is visually obvious without needing extra text. */

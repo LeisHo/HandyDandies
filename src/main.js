@@ -590,28 +590,59 @@ const DEV_GROUPS = [
       { key: 'loadingPreviewSequenceLoopTransition', label: 'Loop Transition On/Off', type: 'checkbox', def: true },
       { key: 'loadingPreviewSequenceHoldMs', label: 'Sequence Hold Duration (Ms)', type: 'slider', min: 0, max: 5000, step: 10, def: 0 },
       { key: 'loadingPreviewSize', label: 'Loading Preview Size (Px)', type: 'slider', min: 80, max: 400, step: 10, def: 160, onChange: () => resizeLoadingPreview() },
-      // Direct request ("Provide the 3 rotation sliders for the loading
-      // preview"). No onChange needed -- `applyLoadingPreviewPose()`
-      // (called every frame while the preview is actively animating, both
-      // pre-fieldStarted and via the separate live loop) reads these live
-      // and rebuilds `loadingPreviewBaseQuat` from them each time, same
-      // "no onChange needed" pattern as Cursor Tracking's own damping/
-      // depth sliders above.
-      { key: 'loadingPreviewRotationX', label: 'Loading Preview Rotation X (Deg)', type: 'slider', min: -180, max: 180, step: 1, def: 0 },
-      { key: 'loadingPreviewRotationY', label: 'Loading Preview Rotation Y (Deg)', type: 'slider', min: -180, max: 180, step: 1, def: 0 },
-      { key: 'loadingPreviewRotationZ', label: 'Loading Preview Rotation Z (Deg)', type: 'slider', min: -180, max: 180, step: 1, def: 0 },
-      // Direct request ("an X offset slider and Y offset slider so i can
-      // position the loading hand preview") -- the canvas itself sits
-      // inside #loading (a fixed, screen-centered flex column, see
-      // style.css), stacked above #loadingText; these apply a plain CSS
-      // transform directly to the CANVAS only, so it can be nudged
-      // independently without moving the loading text below it or
-      // touching #loading's own centering. Range +/-300px is a judgment
-      // call (no measured basis), sized against the viewport rather than
-      // the preview's own Size slider, since a real user likely wants to
-      // push it well outside the text's own footprint, not just nudge it.
-      { key: 'loadingPreviewOffsetX', label: 'Loading Preview Offset X (Px)', type: 'slider', min: -300, max: 300, step: 5, def: 0, onChange: () => repositionLoadingPreview() },
-      { key: 'loadingPreviewOffsetY', label: 'Loading Preview Offset Y (Px)', type: 'slider', min: -300, max: 300, step: 5, def: 0, onChange: () => repositionLoadingPreview() }
+      // CORRECTED 2026-09-19, direct request+follow-up ("Loading Preview
+      // Rotation X Y Z and XY offset should reflect the camera settings"
+      // -> confirmed via AskUserQuestion: repurpose, don't keep the old
+      // hand-rotation/canvas-CSS-position meaning) -- these 5 controls
+      // used to rotate the loading-preview HAND itself (folded into
+      // loadingPreviewBaseQuat) and nudge the CANVAS's own on-screen CSS
+      // position, respectively. Now they're a live readout/driver of the
+      // Loading Preview's own ORBIT CAMERA (see loadingPreviewCameraEditMode
+      // just below): X/Y are the camera's elevation/azimuth around the
+      // hand's own center (loadingPreviewOrbitOrigin()), Z is camera roll
+      // (no live mouse gesture drives this -- there's no natural
+      // "roll" orbit-control binding -- but it's still settable by hand,
+      // matching every other slider in this panel's own click-to-type
+      // convention), Offset X/Y is the orbit TARGET's own world-space X/Y
+      // displacement from the hand's center (i.e. pan). Continuously
+      // synced FROM the live camera every frame while Edit Mode is on
+      // (syncLoadingPreviewOrbitSlidersFromLive(), called from both
+      // render loops) and drive the camera FORWARD via their own onChange
+      // (applyLoadingPreviewOrbitFromSliders()) so they stay usable even
+      // with Edit Mode off, consistent with every other slider here. Per
+      // direct clarification ("the ultimate Loading Preview camera should
+      // just be whatever is selected in the dropdown... If i orbit and
+      // zoom and i like what i set, i will hit Save"), these 5 are a
+      // live/session-only view -- NOT what persists. buildLoadingPreview()
+      // still resolves the real camera purely from
+      // loadingPreviewCameraSelector/loadingPreviewSavedCameras, then
+      // derives these 5 values FROM that result (deriveLoadingPreviewOrbitSliders())
+      // so a rebuild always snaps back to the dropdown's own camera,
+      // exactly as before -- orbiting never overrides it unless the user
+      // explicitly re-Saves via the list-picker's own Save button.
+      { key: 'loadingPreviewRotationX', label: 'Loading Preview Rotation X (Deg)', type: 'slider', min: -89, max: 89, step: 1, def: 0, onChange: (v) => applyLoadingPreviewOrbitFromSliders() },
+      { key: 'loadingPreviewRotationY', label: 'Loading Preview Rotation Y (Deg)', type: 'slider', min: -180, max: 180, step: 1, def: 0, onChange: (v) => applyLoadingPreviewOrbitFromSliders() },
+      { key: 'loadingPreviewRotationZ', label: 'Loading Preview Rotation Z (Deg)', type: 'slider', min: -180, max: 180, step: 1, def: 0, onChange: (v) => applyLoadingPreviewOrbitFromSliders() },
+      { key: 'loadingPreviewOffsetX', label: 'Loading Preview Offset X (World Units)', type: 'slider', min: -30, max: 30, step: 0.5, def: 0, onChange: (v) => applyLoadingPreviewOrbitFromSliders() },
+      { key: 'loadingPreviewOffsetY', label: 'Loading Preview Offset Y (World Units)', type: 'slider', min: -30, max: 30, step: 0.5, def: 0, onChange: (v) => applyLoadingPreviewOrbitFromSliders() },
+      // Direct request ("Provide a Loading Preview Camera Edit Mode
+      // checkbox. When Turned on, I can use my mouse's click and drag to
+      // orbit the camera, and right click to pan the camera, as well as
+      // scroll to zoom the camera... it orbits around the center of the
+      // hand as an orbit origin point, [like HANDO]"). Reuses three.js's
+      // own OrbitControls (already imported, same as the main scene's
+      // and Pose Preview's own cameras) -- its stock default MOUSE
+      // mapping is ALREADY exactly this (LEFT: ROTATE, RIGHT: PAN, wheel:
+      // DOLLY/zoom), so no custom button remapping is needed, unlike the
+      // main scene's own controls (which deliberately disables rotate).
+      // `#loadingPreviewCanvas` is `pointer-events: none` in style.css by
+      // design (so the preview never steals clicks meant for the real
+      // page underneath it) -- OrbitControls needs real mouse events to
+      // orbit/pan/zoom, so Edit Mode also flips this on/off live, not
+      // just `.enabled` on the controls object itself (which alone would
+      // silently do nothing -- the canvas would never even receive the
+      // events for OrbitControls to ignore-or-not).
+      { key: 'loadingPreviewCameraEditMode', label: 'Loading Preview Camera Edit Mode', type: 'checkbox', def: false, onChange: (v) => { if (loadingPreviewOrbitControls) loadingPreviewOrbitControls.enabled = v; if (loadingPreviewCanvas) loadingPreviewCanvas.style.pointerEvents = v ? 'auto' : 'none' } }
     ]
   },
   {
@@ -655,20 +686,25 @@ const DEV_GROUPS = [
     // entirely, matching "Dont show scroll or right click functions" on
     // Mobile from the original spec's own item H).
     //
+    // CORRECTED 2026-09-19 (direct follow-up, "do 1,2,3,4 and 8" against
+    // the gap report this section used to list below): Scroll (desktop,
+    // 'pose' kind only -- no hold analog for a wheel gesture) and Multi-
+    // Point Touch (mobile, both kinds) are now real Type options, each
+    // with their own new detection subsystem (see triggerCustomPoseFunctions()'s
+    // own `wheel` listener and the `touchstart`/`touchend`/`touchcancel`
+    // trio right after it). A Click Count selector ("Triggers On (Nth
+    // Click)"/"...(Nth Press-And-Hold)", spliced in next to Type, hidden
+    // for Types with no real chain of their own) now lets a custom Click/
+    // Click+Hold function pick which press in this app's own EXISTING
+    // left-button multi-click/hold chains fires it (1st through 4th) --
+    // Right Click/Right Click+Hold/Scroll/Multi-Point still always fire
+    // on their own single press/tap/scroll-tick (disclosed simplification:
+    // no multi-click chain exists for the right button or for a wheel/
+    // touch gesture in this app today, so there's no position to select
+    // within for those).
+    //
     // Still deliberately scoped DOWN, each a disclosed gap, not an
     // oversight:
-    // - Scroll (desktop) and Multi-Point Touch (mobile) are NOT offered
-    //   as Type options -- both are genuinely new trigger-detection
-    //   subsystems (wheel-based pose triggers, multi-touch-point
-    //   detection) this project has none of today for ANY trigger, not
-    //   just custom ones. Offering them as selectable-but-inert dropdown
-    //   options would be worse than omitting them -- flagged to the user
-    //   as its own follow-up rather than shipped half-working.
-    // - No click-count selector -- every custom function fires on a
-    //   plain single click/right-click/hold only, same as this project's
-    //   own existing 'click'/'rc'/'chp'/'rchp' triggers (not
-    //   'dblclick'/'tripleClick'/'quadClick'/'dcHold'/etc., which stay
-    //   exclusive to their own hardcoded keys).
     // - No delete-function button yet -- the dev panel's own existing
     //   Delete Group/Setting (🗑) icon can remove a custom function's
     //   GROUP from view, but won't clean up this feature's own
@@ -678,9 +714,9 @@ const DEV_GROUPS = [
     //   a redundant or incomplete delete mechanism this slice.
     // - No duplicate-setting validation, no automatic hold-timing
     //   conflict resolution across an arbitrary number of custom
-    //   Click+Hold functions (each one's own HoldConfirmMs/timing
-    //   sliders still need manual tuning against each other, same as the
-    //   5 existing hold triggers already require).
+    //   Click+Hold functions yet -- both underway the same round as this
+    //   correction (see this file's own CHANGELOG.txt for whether they
+    //   landed in this same pass or a following one).
     //
     // `customClickFunctionIds` is the ONLY control in this static group
     // -- a plain internal-bookkeeping text field (JSON array of
@@ -3316,19 +3352,28 @@ let loadingPreviewCamera = null
 let loadingPreviewCanvas = null
 let loadingPreviewAnimStartMs = 0
 const loadingPreviewBaseQuat = new THREE.Quaternion()
-// Loading Preview's own camera has no interactive OrbitControls (it's a
-// fixed, auto-computed or preset-driven shot, never orbited by mouse) --
-// so there's no `controls.target`-equivalent to read back when capturing
-// a "current" camera preset. This tracks whatever the last-applied
-// target actually was (set by both applyLoadingPreviewCameraPreset() and
-// applyLoadingPreviewCameraAutoFrame() below), purely so
-// captureLoadingPreviewCameraPreset() has something real to save.
+// CORRECTED 2026-09-19 -- the Loading Preview's own camera DOES have
+// interactive OrbitControls now (loadingPreviewCameraEditMode, below),
+// but this tracker is still needed: it's the single source of truth
+// this file's own code reads/writes directly (applyLoadingPreviewCameraPreset()/
+// applyLoadingPreviewCameraAutoFrame()/applyLoadingPreviewOrbitFromSliders()),
+// kept in sync WITH `loadingPreviewOrbitControls.target` (not replaced by
+// it) so captureLoadingPreviewCameraPreset() and the orbit-derived
+// sliders always have a real value even before OrbitControls has been
+// built for the very first time.
 const loadingPreviewCameraTarget = new THREE.Vector3()
 // See loadingPreviewSavedLighting's own DEV_GROUPS comment -- module-level
 // so its list-picker's "Use" button can live-apply a saved lighting item
 // without needing a full buildLoadingPreview() rebuild.
 let loadingPreviewKeyLightRef = null
 let loadingPreviewHemiLightRef = null
+// See loadingPreviewCameraEditMode's own DEV_GROUPS comment -- the
+// Loading Preview's own interactive orbit/pan/zoom camera, built once
+// per buildLoadingPreview() call (setupLoadingPreviewOrbitControls()),
+// enabled/disabled live by the Edit Mode checkbox without needing a
+// rebuild.
+let loadingPreviewOrbitControls = null
+const _loadingPreviewSpherical = new THREE.Spherical()
 // Sequence Mode (Count/Loop/Oscillate) state -- module-level, not per-
 // hand, since there's exactly ONE loading-preview instance. Reset in
 // buildLoadingPreview() (see its own call site below).
@@ -3434,16 +3479,20 @@ function buildLoadingPreview(bypassEnabledGate) {
   loadingPreviewSequenceDone = false
   resizeLoadingPreview()
   repositionLoadingPreview()
+  setupLoadingPreviewOrbitControls()
 }
 // Applies one saved item from the Loading Preview's own local
 // `loadingPreviewSavedCameras` list directly to `loadingPreviewCamera` --
-// the preview's equivalent of the main scene's `applyCameraPreset()`, but
-// with no OrbitControls target to update (see `loadingPreviewCameraTarget`'s
-// own declaration comment for why). normalizeCameraPresetItem() (shared
-// with the main camera's own preset handling) accepts either this app's
-// internal cameraX/targetX/etc. naming or a shorter x/y/z/tx/ty/tz/fov
-// naming, so a preset imported/pasted straight from HANDO's own export
-// format works without hand-renaming every field first.
+// the preview's equivalent of the main scene's `applyCameraPreset()`.
+// normalizeCameraPresetItem() (shared with the main camera's own preset
+// handling) accepts either this app's internal cameraX/targetX/etc.
+// naming or a shorter x/y/z/tx/ty/tz/fov naming, so a preset imported/
+// pasted straight from HANDO's own export format works without hand-
+// renaming every field first. Also re-syncs the orbit camera (target +
+// the 5 read-back sliders) so this remains the actual source of truth
+// after any live orbiting -- see loadingPreviewCameraEditMode's own
+// DEV_GROUPS comment for the full "dropdown wins on every rebuild"
+// contract.
 function applyLoadingPreviewCameraPreset(rawItem) {
   if (!loadingPreviewCamera) return
   const item = normalizeCameraPresetItem(rawItem)
@@ -3459,6 +3508,8 @@ function applyLoadingPreviewCameraPreset(rawItem) {
   const tz = item.targetZ ?? 0
   loadingPreviewCamera.lookAt(tx, ty, tz)
   loadingPreviewCameraTarget.set(tx, ty, tz)
+  syncLoadingPreviewOrbitControlsTarget()
+  deriveLoadingPreviewOrbitSliders()
 }
 // The pre-existing auto-framed default (unchanged math, just pulled out
 // of buildLoadingPreview() into its own function so both the "no preset
@@ -3469,10 +3520,137 @@ function applyLoadingPreviewCameraPreset(rawItem) {
 function applyLoadingPreviewCameraAutoFrame() {
   if (!loadingPreviewCamera) return
   const target = handBoundsCenterLocal.clone().applyQuaternion(alignQuat)
-  const pos = target.clone().add(new THREE.Vector3(0, handBoundsRadiusLocal * 0.15, handBoundsRadiusLocal * 2.4))
+  // CORRECTED 2026-09-19, direct report ("why is the loading preview
+  // cropped? it shouldnt be"). A real, measured math bug: for the hand's
+  // own bounding sphere (radius R) to fully fit inside a camera's FOV at
+  // distance D, D must be >= R / sin(FOV/2) -- at this camera's FOV (35
+  // deg, so half-FOV 17.5 deg) that's D >= R * 3.326. The old `R * 2.4`
+  // distance put the camera almost 40% too close: the sphere's own
+  // subtended half-angle at that distance was ~24.6 deg, well past the
+  // 17.5 deg half-FOV, guaranteed to clip the hand's outer edges
+  // (fingertips/forearm) regardless of framing offset. 3.6 gives ~8%
+  // margin over the exact 3.326 minimum. Pose Preview's own
+  // defaultPosePreviewCamera() had this identical formula/bug -- fixed
+  // together, same root cause.
+  const pos = target.clone().add(new THREE.Vector3(0, handBoundsRadiusLocal * 0.15, handBoundsRadiusLocal * 3.6))
   loadingPreviewCamera.position.copy(pos)
   loadingPreviewCamera.lookAt(target)
   loadingPreviewCameraTarget.copy(target)
+  syncLoadingPreviewOrbitControlsTarget()
+  deriveLoadingPreviewOrbitSliders()
+}
+// -----------------------------------------------------------------------
+// Loading Preview Camera Edit Mode -- interactive orbit/pan/zoom (direct
+// request 2026-09-19). Orbit ORIGIN is always the hand's own center
+// (`loadingPreviewOrbitOrigin()`, the SAME point the auto-frame already
+// targets), matching HANDO's own orbit-around-hand-center convention
+// (direct request: "In Hando, when i Click and Drag to orbit, it orbits
+// around the center of the hand... Do the same for our loading preview").
+// -----------------------------------------------------------------------
+// Hand-center orbit origin, in world space -- identical to the point
+// applyLoadingPreviewCameraAutoFrame() already targets. A plain function
+// (not cached) since handBoundsCenterLocal/alignQuat are each only ever
+// measured once at model load and never change afterward -- cheap to
+// recompute on demand, no staleness risk either way.
+function loadingPreviewOrbitOrigin() {
+  return handBoundsCenterLocal.clone().applyQuaternion(alignQuat)
+}
+// Built once per buildLoadingPreview() call (mirrors buildPosePreview()'s
+// own previewControls setup) -- OrbitControls' own STOCK default mouse
+// mapping is already exactly what was asked for (LEFT: ROTATE, RIGHT:
+// PAN, wheel: DOLLY/zoom), unlike the main scene's own `controls` (which
+// deliberately disables rotate for its fixed-facing field), so no custom
+// `mouseButtons` override is needed here. Starts disabled -- the Edit
+// Mode checkbox's own onChange is what actually turns it on.
+function setupLoadingPreviewOrbitControls() {
+  if (!loadingPreviewCamera || !loadingPreviewCanvas) return
+  if (loadingPreviewOrbitControls) { loadingPreviewOrbitControls.dispose(); loadingPreviewOrbitControls = null }
+  loadingPreviewOrbitControls = new OrbitControls(loadingPreviewCamera, loadingPreviewCanvas)
+  loadingPreviewOrbitControls.target.copy(loadingPreviewCameraTarget)
+  loadingPreviewOrbitControls.update()
+  loadingPreviewOrbitControls.enabled = !!cfg.loadingPreviewCameraEditMode
+  // A fresh build's own getElementById() re-fetches the SAME persistent
+  // DOM element, not a new one -- its inline pointer-events style
+  // normally already matches, but set it explicitly here too so a
+  // rebuild can never leave it stuck on the wrong value regardless of
+  // whatever else touched it in between.
+  loadingPreviewCanvas.style.pointerEvents = cfg.loadingPreviewCameraEditMode ? 'auto' : 'none'
+}
+// Keeps the orbit controls' own target in sync whenever the camera is
+// repositioned some OTHER way (a saved preset, auto-frame) -- otherwise
+// the NEXT orbit-drag would suddenly re-center on a stale target and the
+// camera would visibly jump.
+function syncLoadingPreviewOrbitControlsTarget() {
+  if (!loadingPreviewOrbitControls) return
+  loadingPreviewOrbitControls.target.copy(loadingPreviewCameraTarget)
+  loadingPreviewOrbitControls.update()
+}
+// Reads the 5 sliders (elevation/azimuth/roll/pan-X/pan-Y) and positions
+// the camera to match -- the FORWARD direction (sliders -> camera),
+// wired as each slider's own onChange so they stay usable with Edit Mode
+// off, same click-to-type convention every other slider in this panel
+// has. Distance is deliberately NOT one of the 5 sliders (not asked
+// for) -- preserved from whatever it currently is (live scroll-zoom, a
+// loaded preset, or the auto-frame default) rather than reset every
+// time one slider changes.
+function applyLoadingPreviewOrbitFromSliders() {
+  if (!loadingPreviewCamera) return
+  const origin = loadingPreviewOrbitOrigin()
+  const target = origin.clone().add(new THREE.Vector3(cfg.loadingPreviewOffsetX || 0, cfg.loadingPreviewOffsetY || 0, 0))
+  const priorDistance = loadingPreviewCamera.position.distanceTo(loadingPreviewCameraTarget)
+  const distance = priorDistance > 1e-6 ? priorDistance : handBoundsRadiusLocal * 3.6 // matches applyLoadingPreviewCameraAutoFrame()'s own corrected distance
+  const phi = THREE.MathUtils.degToRad((cfg.loadingPreviewRotationX || 0) + 90) // elevation-from-horizon -> THREE.Spherical's own polar-from-+Y
+  const theta = THREE.MathUtils.degToRad(cfg.loadingPreviewRotationY || 0)
+  const offset = new THREE.Vector3().setFromSpherical(new THREE.Spherical(distance, phi, theta))
+  loadingPreviewCamera.position.copy(target).add(offset)
+  applyLoadingPreviewRoll(target)
+  loadingPreviewCameraTarget.copy(target)
+  syncLoadingPreviewOrbitControlsTarget()
+}
+// Camera roll (Rotation Z) -- no native OrbitControls mouse gesture
+// drives this (there's no standard "roll" drag binding), but it's still
+// a real, settable slider like every other one in this panel. Rotating
+// `camera.up` around the current view direction, THEN re-calling
+// lookAt() (which uses `camera.up` to resolve the final orientation),
+// achieves a pure image roll without disturbing the elevation/azimuth
+// math above, which never reads `camera.up` at all.
+function applyLoadingPreviewRoll(target) {
+  if (!loadingPreviewCamera) return
+  const rollRad = THREE.MathUtils.degToRad(cfg.loadingPreviewRotationZ || 0)
+  const viewDir = target.clone().sub(loadingPreviewCamera.position).normalize()
+  loadingPreviewCamera.up.set(0, 1, 0).applyAxisAngle(viewDir, rollRad)
+  loadingPreviewCamera.lookAt(target)
+}
+// The REVERSE direction (camera -> sliders) -- reads wherever the camera
+// actually ended up (a just-applied preset, the auto-frame default, or
+// live orbiting) and writes it back into the 5 sliders via syncValue()
+// (which itself skips whichever row currently has focus, so this never
+// fights a live edit -- same established pattern as the main scene's own
+// syncCameraPanelFromLive()). THREE.Spherical's own convention: phi is
+// the polar angle measured from +Y (0=straight up, PI=straight down);
+// subtracting 90 deg converts that into "elevation from the horizon"
+// (0=level), matching how Rotation X is labeled/ranged (-89..89).
+function deriveLoadingPreviewOrbitSliders() {
+  if (!loadingPreviewCamera) return
+  const offset = loadingPreviewCamera.position.clone().sub(loadingPreviewCameraTarget)
+  _loadingPreviewSpherical.setFromVector3(offset)
+  const origin = loadingPreviewOrbitOrigin()
+  syncValue('loadingPreviewRotationX', THREE.MathUtils.radToDeg(_loadingPreviewSpherical.phi) - 90)
+  syncValue('loadingPreviewRotationY', THREE.MathUtils.radToDeg(_loadingPreviewSpherical.theta))
+  syncValue('loadingPreviewOffsetX', loadingPreviewCameraTarget.x - origin.x)
+  syncValue('loadingPreviewOffsetY', loadingPreviewCameraTarget.y - origin.y)
+}
+// Continuous per-frame sync while Edit Mode is actually on -- mirrors the
+// main scene's own syncCameraPanelFromLive() (called every animate()
+// frame, not event-based), the simplest reliable way to reflect live
+// mouse-driven orbit/pan/zoom without wiring OrbitControls' own 'change'
+// event by hand. Called from both Loading Preview render paths (the
+// pre-fieldStarted branch in animate() and the separate live loop) --
+// see each call site's own comment.
+function syncLoadingPreviewCameraFromOrbit() {
+  if (!cfg.loadingPreviewCameraEditMode || !loadingPreviewOrbitControls || !loadingPreviewCamera) return
+  loadingPreviewCameraTarget.copy(loadingPreviewOrbitControls.target)
+  deriveLoadingPreviewOrbitSliders()
 }
 // `captureCurrent` for the `loadingPreviewSavedCameras` list-picker --
 // captures wherever `loadingPreviewCamera` actually is RIGHT NOW (either
@@ -3617,6 +3795,7 @@ function startLoadingPreviewLiveLoop() {
     if (!cfg.loadingPreviewShowLive || !loadingPreviewRenderer) { loadingPreviewLiveRafId = null; return }
     try {
       updateLoadingPreviewAnimation()
+      syncLoadingPreviewCameraFromOrbit()
       loadingPreviewRenderer.render(loadingPreviewScene, loadingPreviewCamera)
     } catch (err) {
       console.error('Loading Preview (live) frame threw -- disabling for this session:', err)
@@ -3717,11 +3896,16 @@ function resizeLoadingPreview() {
 // sliders. Completely independent of #loadingText's own layout (a
 // separate element, #loading's own child) since this only ever touches
 // the canvas's own inline style.
+// CORRECTED 2026-09-19 -- loadingPreviewOffsetX/Y no longer nudge the
+// canvas's own on-screen CSS position (they're the orbit camera's own
+// world-space pan target now, see that control's own DEV_GROUPS
+// comment); this just keeps the canvas centered on the viewport, same
+// base transform #loading itself uses. Kept as its own function (not
+// inlined at the 2 call sites) since the canvas's own CSS position may
+// grow independent options again later.
 function repositionLoadingPreview() {
   if (!loadingPreviewCanvas) return
-  const offsetX = cfg.loadingPreviewOffsetX || 0
-  const offsetY = cfg.loadingPreviewOffsetY || 0
-  loadingPreviewCanvas.style.transform = `translate(-50%, -50%) translate(${offsetX}px, ${offsetY}px)`
+  loadingPreviewCanvas.style.transform = 'translate(-50%, -50%)'
 }
 // Applies one pose-shaped values object to ONLY the loading-preview hand's
 // skeleton -- deliberately a 3rd near-duplicate of previewPosePreset()
@@ -3733,15 +3917,17 @@ function applyLoadingPreviewPose(item) {
   if (!loadingPreviewHand || !loadingPreviewHand.skinnedMesh) return
   const values = {}
   POSE_PRESET_KEYS.forEach((k) => { values[k] = item[k] !== undefined ? item[k] : POSE_KEY_DEFAULTS[k] })
-  // Rotation X/Y/Z sliders applied ON TOP of the base alignment, folded
-  // directly into loadingPreviewBaseQuat (not a separate post-hoc
-  // clone.quaternion tweak) -- applyCurlToSkeleton() below reads this SAME
-  // quaternion as the finger-pose base, so the rotation has to be baked in
-  // here or wrist/finger posing would silently ignore it every frame.
-  const rotX = THREE.MathUtils.degToRad(cfg.loadingPreviewRotationX || 0)
-  const rotY = THREE.MathUtils.degToRad(cfg.loadingPreviewRotationY || 0)
-  const rotZ = THREE.MathUtils.degToRad(cfg.loadingPreviewRotationZ || 0)
-  loadingPreviewBaseQuat.copy(alignQuat).multiply(new THREE.Quaternion().setFromEuler(new THREE.Euler(rotX, rotY, rotZ, 'XYZ')))
+  // CORRECTED 2026-09-19 -- loadingPreviewRotationX/Y/Z used to be folded
+  // in here (rotating the hand itself); they're now the ORBIT CAMERA's
+  // own elevation/azimuth/roll instead (see that control's own DEV_GROUPS
+  // comment), so the hand goes back to plain `alignQuat`, matching every
+  // camera computation in this file (auto-frame, saved presets, orbit
+  // math), which all assume the hand sits at exactly alignQuat with no
+  // extra rotation. A real production bug traced to the OLD behavior:
+  // a leftover non-zero loadingPreviewRotationX (6 deg) rotated the hand
+  // out from under whatever the camera was actually framed for, reported
+  // as "the camera is off, now rotated at some angle."
+  loadingPreviewBaseQuat.copy(alignQuat)
   loadingPreviewHand.clone.quaternion.copy(loadingPreviewBaseQuat)
   applyWristPoseToSkeleton(loadingPreviewHand.skinnedMesh.skeleton, values)
   FINGER_NAMES.forEach((name) => applyCurlToSkeleton(name, loadingPreviewHand.skinnedMesh.skeleton, loadingPreviewBaseQuat, null, values))
@@ -3845,7 +4031,10 @@ const POSE_PREVIEW_MIN_H = 200
 // the initial build and a future "reset" if ever needed.
 function defaultPosePreviewCamera() {
   const target = handBoundsCenterLocal.clone().applyQuaternion(alignQuat)
-  const pos = target.clone().add(new THREE.Vector3(0, handBoundsRadiusLocal * 0.15, handBoundsRadiusLocal * 2.4))
+  // CORRECTED 2026-09-19 -- same distance-too-close bug as
+  // applyLoadingPreviewCameraAutoFrame()'s own identical formula, fixed
+  // together; see that function's own comment for the full math.
+  const pos = target.clone().add(new THREE.Vector3(0, handBoundsRadiusLocal * 0.15, handBoundsRadiusLocal * 3.6))
   return { pos, target }
 }
 // "Set Default Camera" (direct request) -- captures the preview's OWN
@@ -6035,6 +6224,13 @@ function triggerClickPose(p) {
 // (a 5th+ click still just re-fires quadClick, rather than needing a
 // 5th tier no one asked for).
 const CLICK_COUNT_CHAIN_KEYS = ['click', 'dblclick', 'tripleClick', 'quadClick']
+// Whether any enabled custom 'Click' function's own Click Count selector
+// asks for a 2nd/3rd/4th click -- see this section's own pointerup
+// listener for why this needs checking alongside the hardcoded
+// dblclick/tripleClick/quadClick Enabled flags.
+function customFunctionsNeedClickChain() {
+  return customClickFunctionIds.some(({ id, kind }) => kind !== 'hold' && cfg[`${id}Type`] === 'Click' && customFunctionClickCountOrdinal(id) > 1)
+}
 let clickPoseClickCount = 0
 let clickPoseClickTimer = null
 window.addEventListener('pointerup', (e) => {
@@ -6055,12 +6251,18 @@ window.addEventListener('pointerup', (e) => {
   // 'click' immediately; the debounce is only genuinely needed when a
   // 2nd/3rd/4th click could still arrive and change the outcome.
   // Generalized 2026-09-16 from a dblclick-only check to "is anything
-  // past plain click enabled" for the new triple/quad tiers.
-  if (!cfg.dblclickEnabled && !cfg.tripleClickEnabled && !cfg.quadClickEnabled) {
+  // past plain click enabled" for the new triple/quad tiers. Extended
+  // 2026-09-19 to ALSO check whether any custom 'Click' function wants a
+  // 2nd/3rd/4th click (its own Click Count selector) -- without this, a
+  // custom function set to "Triggers On (Nth Click): 2nd" would never see
+  // anything but idx-0/ordinal-1 while every hardcoded multi-click tier
+  // stayed disabled, since this early-fire branch skips the debounce/chain
+  // entirely.
+  if (!cfg.dblclickEnabled && !cfg.tripleClickEnabled && !cfg.quadClickEnabled && !customFunctionsNeedClickChain()) {
     clickPoseClickCount = 0
     clearTimeout(clickPoseClickTimer)
     triggerClickPose('click')
-    triggerCustomPoseFunctions('Click')
+    triggerCustomPoseFunctions('Click', 1)
     return
   }
   clickPoseClickCount++
@@ -6068,11 +6270,11 @@ window.addEventListener('pointerup', (e) => {
   clickPoseClickTimer = setTimeout(() => {
     const idx = Math.min(clickPoseClickCount, CLICK_COUNT_CHAIN_KEYS.length) - 1
     triggerClickPose(CLICK_COUNT_CHAIN_KEYS[idx])
-    // Custom "Click" functions fire on a PLAIN single click only (no
-    // click-count selector yet -- see this feature's own DEV_GROUPS
-    // comment), so only when this resolved to exactly 1 click, never a
-    // double/triple/quad.
-    if (idx === 0) triggerCustomPoseFunctions('Click')
+    // Custom "Click" functions now DO have a click-count selector (Triggers
+    // On (Nth Click)) -- triggerCustomPoseFunctions() itself does the
+    // per-function ordinal match, so every resolved click count is passed
+    // through, not just a plain single click.
+    triggerCustomPoseFunctions('Click', idx + 1)
     clickPoseClickCount = 0
   }, cfg.multiClickWindowMs)
 })
@@ -6142,13 +6344,24 @@ let clickHoldChainCount = 0
 let clickHoldChainDownInfo = null
 let clickHoldChainLastCleanUpTime = -Infinity
 let clickHoldChainActiveKey = null
+// Custom Click+Hold functions with Click Count 2nd/3rd/4th (see
+// customFunctionsNeedClickChain()'s own comment for the fire-and-forget
+// mirror of this) piggyback on this SAME chain -- `clickHoldChainActiveOrdinal`
+// records which chain position (2/3/4) was actually started this press, so
+// the matching pointerup below ends exactly those, not the "1st" ones
+// (those are chp's own separate always-fires-on-every-press listener,
+// unaffected by this chain).
+let clickHoldChainActiveOrdinal = 0
 window.addEventListener('pointerdown', (e) => {
   if (e.target && e.target.closest && e.target.closest('.dp-panel')) return
   if (e.button !== 0) return
   const now = performance.now()
   if (now - clickHoldChainLastCleanUpTime <= cfg.multiClickWindowMs) {
-    const key = CLICK_HOLD_CHAIN_KEYS[Math.min(clickHoldChainCount, CLICK_HOLD_CHAIN_KEYS.length - 1)]
+    const chainIdx = Math.min(clickHoldChainCount, CLICK_HOLD_CHAIN_KEYS.length - 1)
+    const key = CLICK_HOLD_CHAIN_KEYS[chainIdx]
     if (key) { clickHoldChainActiveKey = key; startClickHoldPose(key) }
+    clickHoldChainActiveOrdinal = chainIdx + 1 // chainIdx is only ever reached here at >=1 (see this block's own history above), so this is always 2, 3, or 4
+    startCustomHoldFunctions('Click+Hold', clickHoldChainActiveOrdinal)
   } else {
     clickHoldChainCount = 0 // too long since the last clean release -- this is a fresh chain, not a continuation
   }
@@ -6177,7 +6390,9 @@ window.addEventListener('pointerup', (e) => {
   if (clickHoldChainActiveKey && clickHoldPoseTriggers[clickHoldChainActiveKey].active) {
     endClickHoldPose(clickHoldChainActiveKey)
   }
+  if (clickHoldChainActiveOrdinal) endCustomHoldFunctions('Click+Hold', clickHoldChainActiveOrdinal)
   clickHoldChainActiveKey = null
+  clickHoldChainActiveOrdinal = 0
   // Only a clean (not dragged) release extends the chain -- same
   // heldMs/moved classification as the Mouse Tracking Log's own wasDrag
   // check, independent constants/state so this feature never depends on
@@ -6510,17 +6725,20 @@ function getActiveDevPanelTab() {
 // Type's own option list -- direct spec item ("Click Function Type
 // should always include - Click, Click+Hold, Scroll, Right Click, Right
 // Click+Hold for Desktop Mode... will always include - Click, Click+Hold,
-// Multi-Point [for Mobile]"). Scroll/Multi-Point are deliberately NOT
-// included -- see the DEV_GROUPS group's own comment for why (genuinely
-// new trigger-detection subsystems, not yet built for any trigger).
-// `kind` already fixes Click-vs-Click+Hold (2 different control
-// batteries/state machines, decided at creation time via which button was
-// pressed); `family` then narrows further (mobile drops the Right-Click
-// variants entirely, matching "Dont show scroll or right click functions"
-// on Mobile).
+// Multi-Point [for Mobile]"). `kind` already fixes Click-vs-Click+Hold (2
+// different control batteries/state machines, decided at creation time via
+// which button was pressed); `family` then narrows further (mobile drops
+// the Right-Click variants entirely, matching "Dont show scroll or right
+// click functions" on Mobile). Scroll is 'pose'-kind only -- there's no
+// natural "hold" analog for a wheel gesture the way a mouse/touch button
+// can be held, so it's grouped with Click/Right Click, not the +Hold
+// pair, matching how the spec's own flat list lists it next to those.
+// Multi-Point (a simultaneous-touch-point gesture, see
+// multiPointRequiredTouches()'s own comment) genuinely CAN be either
+// fire-and-forget or held, so it's offered for both kinds on mobile.
 function customFunctionTypeOptions(kind, family) {
-  if (kind === 'hold') return family === 'mobile' ? ['Click+Hold'] : ['Click+Hold', 'Right Click+Hold']
-  return family === 'mobile' ? ['Click'] : ['Click', 'Right Click']
+  if (kind === 'hold') return family === 'mobile' ? ['Click+Hold', 'Multi-Point'] : ['Click+Hold', 'Right Click+Hold']
+  return family === 'mobile' ? ['Click', 'Multi-Point'] : ['Click', 'Right Click', 'Scroll']
 }
 // Shows/hides ONE custom function's group based on its own `family` vs.
 // whichever tab is currently active -- devPanel.js has no per-tab DOM
@@ -6553,14 +6771,112 @@ function setupCustomFunctionTabVisibilitySync() {
     btn.addEventListener('click', () => refreshAllCustomFunctionGroupVisibility())
   })
 }
+// Type/Touch-Point-Count/Click-Count row visibility -- Type itself has no
+// onChange elsewhere (the event-wiring further down reads
+// `cfg[`${id}Type`]` live at trigger time, not through a visibility side
+// effect), but the 2 rows spliced in right next to it DO need to show/hide
+// as Type changes. Touch Point Count only means anything for Multi-Point;
+// Click Count (which numbered click/press in this app's own existing
+// left-button click/hold chains should fire this function) only has real
+// chain infrastructure behind 'Click' and 'Click+Hold' -- Right Click/
+// Right Click+Hold/Scroll/Multi-Point have no such chain to select a
+// position within (disclosed simplification: those always fire on
+// whichever single press/tap/scroll-tick actually happens, matching this
+// app's own pre-existing "Right Click has no multi-click counterpart"
+// behavior) -- see triggerCustomPoseFunctions()'s/startCustomHoldFunctions()'s
+// own comments for where that's actually enforced.
+function updateCustomFunctionTypeVisibility(id) {
+  const type = cfg[`${id}Type`]
+  const touchRow = document.querySelector(`.dp-row[data-key="${id}TouchPointCount"]`)
+  if (touchRow) touchRow.style.display = type === 'Multi-Point' ? '' : 'none'
+  const clickCountRow = document.querySelector(`.dp-row[data-key="${id}ClickCount"]`)
+  if (clickCountRow) clickCountRow.style.display = (type === 'Click' || type === 'Click+Hold') ? '' : 'none'
+}
+// This function's own "collision bucket" -- every enabled custom function
+// with the SAME (family, Type, selector) fires on the exact same real
+// gesture. `selector` is Click Count for Click/Click+Hold (the only 2
+// Types with a real chain position to pick), Touch Point Count for
+// Multi-Point, and a constant for Right Click/Right Click+Hold/Scroll
+// (no selector of their own -- ANY 2 enabled functions of one of those 3
+// Types, same family, always collide). Returns `null` for a disabled
+// function (nothing to collide with -- it never fires at all).
+function customFunctionConflictBucketKey(id) {
+  if (!cfg[`${id}Enabled`]) return null
+  const entry = customClickFunctionIds.find((e) => e.id === id)
+  if (!entry) return null
+  const type = cfg[`${id}Type`]
+  let selector
+  if (type === 'Click' || type === 'Click+Hold') selector = cfg[`${id}ClickCount`] || '1st'
+  else if (type === 'Multi-Point') selector = cfg[`${id}TouchPointCount`] || 2
+  else selector = 'single'
+  return `${entry.family}|${type}|${selector}`
+}
+// Automatic hold-timing conflict resolution (direct spec item) -- when a
+// brand-new custom Click/Click+Hold function is created, default its own
+// Click Count to the LOWEST ordinal (1st-4th) not already used by another
+// currently-ENABLED custom function of the same Type+family, instead of
+// always defaulting to '1st' (which would silently collide with whichever
+// function already claimed it, both firing off the exact same press). Only
+// meaningful for Click/Click+Hold -- Right Click/Right Click+Hold/Scroll/
+// Multi-Point have no ordinal of their own (Multi-Point's equivalent,
+// Touch Point Count, keeps its own plain numeric default -- 2 -- since
+// there's no small fixed set of "positions" to auto-spread across the way
+// there is for a 1st-4th click chain). Falls back to '1st' if all 4 slots
+// are already taken -- a genuine collision at that point, which
+// refreshCustomFunctionConflictWarnings() below will flag rather than
+// silently hide.
+function nextFreeCustomFunctionClickCountOrdinal(type, family) {
+  if (type !== 'Click' && type !== 'Click+Hold') return 1
+  const used = new Set()
+  // Deliberately NOT gated on `${id}Enabled` -- a real bug caught live
+  // 2026-09-19: every new custom function starts disabled by default
+  // (Master On/Off), so checking Enabled here meant 2 functions created
+  // back to back both saw an "empty" used-set and both defaulted to
+  // '1st', the exact collision this helper exists to avoid the moment the
+  // user turns them both on. The whole point is spreading NEW functions
+  // across free slots regardless of whether earlier ones are turned on
+  // yet -- refreshCustomFunctionConflictWarnings() is the one that
+  // correctly cares about CURRENTLY-enabled state, for a real runtime
+  // conflict; this is about not handing out the same slot twice.
+  customClickFunctionIds.forEach(({ id, family: f }) => {
+    if (f !== family || cfg[`${id}Type`] !== type) return
+    used.add(customFunctionClickCountOrdinal(id))
+  })
+  for (let n = 1; n <= 4; n++) { if (!used.has(n)) return n }
+  return 1
+}
+// Duplicate-setting validation (direct spec item) -- visually flags every
+// custom function that shares its own collision bucket (see
+// customFunctionConflictBucketKey()'s own comment) with at least one other
+// ENABLED custom function, via a `.dp-group-conflict-warning` CSS class
+// (thin warning-colored left border, see style.css) plus a tooltip on the
+// group's own header explaining why. Non-blocking by design -- 2 functions
+// sharing a gesture both simply fire together (same "whichever runs last
+// this frame wins" disclosed pattern already true of chp-vs-rchp
+// elsewhere in this file), so this is a heads-up, not a hard stop.
+function refreshCustomFunctionConflictWarnings() {
+  const bucketCounts = new Map()
+  customClickFunctionIds.forEach(({ id }) => {
+    const key = customFunctionConflictBucketKey(id)
+    if (key) bucketCounts.set(key, (bucketCounts.get(key) || 0) + 1)
+  })
+  customClickFunctionIds.forEach(({ id }) => {
+    const key = customFunctionConflictBucketKey(id)
+    const conflicted = !!key && bucketCounts.get(key) > 1
+    const row = document.querySelector(`.dp-row[data-key="${id}Enabled"]`)
+    const g = row ? row.closest('.dp-group') : null
+    if (!g) return
+    g.classList.toggle('dp-group-conflict-warning', conflicted)
+    const header = g.querySelector(':scope > .dp-group-header')
+    if (header) header.title = conflicted ? 'Conflicts with another enabled custom function using the same Type + Click/Touch selector -- both will fire together on the same gesture.' : ''
+  })
+}
 // Builds and renders ONE custom function's live group -- reuses
 // makeClickPoseGroup()/makeClickHoldPoseGroup() verbatim (the SAME
 // factories every hardcoded trigger already uses) for every control
-// except Type, which is spliced in right after Enabled (Type has no
-// onChange of its own -- the event-wiring below reads `cfg[`${id}Type`]`
-// live at trigger time, not through a visibility/state side effect).
-// Newly-created groups are inserted right after the "Custom Click
-// Functions" anchor group (direct request: "the new click function
+// except Type/Touch Point Count/Click Count, spliced in right after
+// Enabled. Newly-created groups are inserted right after the "Custom
+// Click Functions" anchor group (direct request: "the new click function
 // should be added right under that settings group, so it should be first
 // in line") -- every new insert lands in that exact spot, so the newest
 // custom function is always closest to the anchor, pushing earlier ones
@@ -6569,7 +6885,30 @@ function renderCustomClickFunctionGroup(id, title, kind, family) {
   const base = kind === 'hold' ? makeClickHoldPoseGroup(id, title, {}) : makeClickPoseGroup(id, title, {})
   const controls = base.controls.slice()
   const typeOptions = customFunctionTypeOptions(kind, family)
-  controls.splice(1, 0, { key: `${id}Type`, label: 'Type', type: 'select', def: typeOptions[0], options: () => typeOptions })
+  const defaultType = typeOptions[0]
+  // Automatic hold-timing conflict resolution -- see
+  // nextFreeCustomFunctionClickCountOrdinal()'s own comment. Only computed
+  // from OTHER already-registered functions at this exact moment; this
+  // function's own id isn't in `customClickFunctionIds` with `Enabled`
+  // seeded yet either way, so it can't collide with itself here.
+  const defaultClickCountOrdinal = nextFreeCustomFunctionClickCountOrdinal(defaultType, family)
+  controls.splice(1, 0,
+    { key: `${id}Type`, label: 'Type', type: 'select', def: defaultType, options: () => typeOptions, onChange: () => { updateCustomFunctionTypeVisibility(id); refreshCustomFunctionConflictWarnings() } },
+    { key: `${id}TouchPointCount`, label: 'Touch Point Count', type: 'slider', min: 2, max: 10, step: 1, def: 2, onChange: () => refreshCustomFunctionConflictWarnings() },
+    { key: `${id}ClickCount`, label: kind === 'hold' ? 'Triggers On (Nth Press-And-Hold)' : 'Triggers On (Nth Click)', type: 'select', def: ['1st', '2nd', '3rd', '4th'][defaultClickCountOrdinal - 1], options: () => ['1st', '2nd', '3rd', '4th'], onChange: () => refreshCustomFunctionConflictWarnings() }
+  )
+  // updateClickFunctionEnabledVisibility() (shared with the 10 static
+  // triggers, which have no Type/Touch-Point/Click-Count concept at all)
+  // unconditionally shows EVERY row in the body when re-enabled -- it has
+  // no idea some of those rows are Type-gated. Wrap Enabled's own onChange
+  // (real bug, caught live 2026-09-19: re-enabling a custom function
+  // always re-showed Touch Point Count even for a plain 'Click' function)
+  // so Type-specific visibility is re-applied right after.
+  const enabledCtrl = controls.find((c) => c.key === `${id}Enabled`)
+  if (enabledCtrl) {
+    const baseOnChange = enabledCtrl.onChange
+    enabledCtrl.onChange = () => { if (baseOnChange) baseOnChange(); updateCustomFunctionTypeVisibility(id) }
+  }
   const g = renderDynamicGroup({ title, controls })
   if (g) {
     const anchor = document.querySelector('.dp-group[data-key="Custom Click Functions"]')
@@ -6577,6 +6916,8 @@ function renderCustomClickFunctionGroup(id, title, kind, family) {
     g.dataset.customFunctionFamily = family
     updateCustomFunctionGroupVisibility(g, family)
   }
+  updateCustomFunctionTypeVisibility(id)
+  refreshCustomFunctionConflictWarnings()
   if (kind === 'hold') {
     parseClickHoldConfig(id)
     buildClickHoldPoseWidgets(id)
@@ -6680,34 +7021,104 @@ function restoreCustomClickFunctions() {
   nextCustomFunctionN = maxN + 1
   refreshAllCustomFunctionGroupVisibility()
 }
+// Maps a Click-Count select value ('1st'/'2nd'/'3rd'/'4th') to its plain
+// ordinal number, defaulting an unset/unrecognized value to 1 -- shared by
+// every call site below that needs to compare a custom function's own
+// setting against the ordinal a real gesture just resolved to.
+function customFunctionClickCountOrdinal(id) {
+  return { '1st': 1, '2nd': 2, '3rd': 3, '4th': 4 }[cfg[`${id}ClickCount`]] || 1
+}
 // Piggybacks every enabled 'pose'-kind custom function of the matching
-// Type onto this project's EXISTING plain-single-click/-right-click
-// detection (see the 2 `pointerup` listeners below) -- deliberately not a
-// separate click-count/timing stream of its own (no click-count selector
-// yet, disclosed simplification -- see the DEV_GROUPS group's own
-// comment).
-function triggerCustomPoseFunctions(type) {
+// Type onto this project's EXISTING click/right-click/scroll detection
+// (see the `pointerup`/`wheel` listeners below). `clickCount` is the
+// ordinal this gesture just resolved to (1-4, defaulting to 1 for Types
+// with no chain of their own -- Right Click/Scroll always pass the
+// default) -- only 'Click' actually gates on it, since it's the only pose
+// Type with a real multi-click CHAIN behind it in this app (see
+// updateCustomFunctionTypeVisibility()'s own comment for why Right
+// Click/Scroll/Multi-Point don't).
+function triggerCustomPoseFunctions(type, clickCount = 1) {
   customClickFunctionIds.forEach(({ id, kind }) => {
-    if (kind !== 'hold' && cfg[`${id}Type`] === type) triggerClickPose(id)
+    if (kind === 'hold' || cfg[`${id}Type`] !== type) return
+    if (type === 'Click' && customFunctionClickCountOrdinal(id) !== clickCount) return
+    triggerClickPose(id)
   })
 }
 // Piggybacks every enabled 'hold'-kind custom function of the matching
-// Type onto this project's EXISTING chp/rchp pointerdown/pointerup
-// hold-detection (see the 2 listeners below) -- reuses
+// Type onto this project's EXISTING chp/rchp/click-hold-chain pointerdown/
+// pointerup hold-detection (see the listeners below) -- reuses
 // startClickHoldPose()/endClickHoldPose() unchanged, so a custom hold
 // function gets the exact same per-hand distance stagger, Single Pose/
 // Sequence mode, Loop Mode, Offset/Rotation, On Release Mode, everything
-// chp/rchp already have, for free.
-function startCustomHoldFunctions(type) {
+// chp/rchp already have, for free. `ordinal` mirrors triggerCustomPoseFunctions()'s
+// own `clickCount` param -- only 'Click+Hold' gates on it (the only hold
+// Type with a real press-chain, chp/dcHold/tripleClickHold/quadClickHold,
+// behind it); Right Click+Hold/Multi-Point always fire regardless (Right
+// Click+Hold has no chain to begin with; Multi-Point is gated by its own
+// separate Touch Point Count mechanism instead, see the touch listeners
+// below).
+function startCustomHoldFunctions(type, ordinal = 1) {
   customClickFunctionIds.forEach(({ id, kind }) => {
-    if (kind === 'hold' && cfg[`${id}Type`] === type) startClickHoldPose(id)
+    if (kind !== 'hold' || cfg[`${id}Type`] !== type) return
+    if (type === 'Click+Hold' && customFunctionClickCountOrdinal(id) !== ordinal) return
+    startClickHoldPose(id)
   })
 }
-function endCustomHoldFunctions(type) {
+function endCustomHoldFunctions(type, ordinal = 1) {
   customClickFunctionIds.forEach(({ id, kind }) => {
-    if (kind === 'hold' && cfg[`${id}Type`] === type) endClickHoldPose(id)
+    if (kind !== 'hold' || cfg[`${id}Type`] !== type) return
+    if (type === 'Click+Hold' && customFunctionClickCountOrdinal(id) !== ordinal) return
+    endClickHoldPose(id)
   })
 }
+// Scroll -- direct spec item ("Click Function Type should always include
+// -- Click, Click+Hold, Scroll, Right Click, Right Click+Hold for Desktop
+// Mode"). No existing gesture family to reuse: a real wheel gesture fires
+// many `wheel` events per second, so this can't just call triggerCustomPoseFunctions
+// on every one of them the way a plain click can -- debounced via the SAME
+// `cfg.multiClickWindowMs` slider every other click/hold chain in this file
+// already uses, so one real scroll swipe fires once, not dozens of times.
+// Fires again after the window elapses if the user keeps scrolling
+// (a deliberate "repeat rate," not a one-shot-per-page-load limit).
+let scrollTriggerTimer = null
+window.addEventListener('wheel', (e) => {
+  if (e.target && e.target.closest && e.target.closest('.dp-panel')) return
+  if (scrollTriggerTimer) return
+  triggerCustomPoseFunctions('Scroll')
+  scrollTriggerTimer = setTimeout(() => { scrollTriggerTimer = null }, cfg.multiClickWindowMs)
+}, { passive: true })
+// Multi-Point -- direct spec item ("That Click Function group for Type,
+// will always include -- Click, Click+Hold, Multi-Point [for Mobile]").
+// Tracks the live simultaneous touch-point count; a 'pose'-kind function
+// fires once the INSTANT its own Touch Point Count is first reached (not
+// repeated while those fingers stay down); a 'hold'-kind function starts
+// at that same instant and ends the instant the count drops back below its
+// own threshold -- independent per function, since 2 Multi-Point functions
+// can have different Touch Point Count settings active at once.
+let multiPointActiveTouchCount = 0
+window.addEventListener('touchstart', (e) => {
+  const prevCount = multiPointActiveTouchCount
+  multiPointActiveTouchCount = e.touches.length
+  customClickFunctionIds.forEach(({ id, kind }) => {
+    if (cfg[`${id}Type`] !== 'Multi-Point') return
+    const need = cfg[`${id}TouchPointCount`] || 2
+    if (prevCount < need && multiPointActiveTouchCount >= need) {
+      if (kind === 'hold') startClickHoldPose(id)
+      else triggerClickPose(id)
+    }
+  })
+}, { passive: true })
+function multiPointHandleTouchEnd(e) {
+  const prevCount = multiPointActiveTouchCount
+  multiPointActiveTouchCount = e.touches.length
+  customClickFunctionIds.forEach(({ id, kind }) => {
+    if (kind !== 'hold' || cfg[`${id}Type`] !== 'Multi-Point') return
+    const need = cfg[`${id}TouchPointCount`] || 2
+    if (prevCount >= need && multiPointActiveTouchCount < need) endClickHoldPose(id)
+  })
+}
+window.addEventListener('touchend', multiPointHandleTouchEnd, { passive: true })
+window.addEventListener('touchcancel', multiPointHandleTouchEnd, { passive: true })
 // Whether ANY custom hold function of the given Type has been held long
 // enough to count as a genuine hold-release, not a quick tap -- feeds the
 // SAME `lastPointerupWasHoldRelease`/`lastPointerupWasRchpHoldRelease`
@@ -6998,6 +7409,11 @@ function updateClickFunctionEnabledVisibility(p) {
     if (child === enabledRow) return
     child.style.display = enabled ? '' : 'none'
   })
+  // Cheap no-op for the 10 static triggers (only ever iterates
+  // customClickFunctionIds); for a custom function, an Enabled toggle
+  // changes whether it's even in the collision-bucket count at all -- see
+  // refreshCustomFunctionConflictWarnings()'s own comment.
+  refreshCustomFunctionConflictWarnings()
   if (!enabled) return // fully hidden -- nothing further to reconcile
   const isHoldKind = CLICK_HOLD_KEYS.includes(p)
   if (isHoldKind) {
@@ -7777,6 +8193,7 @@ function animate() {
     if (!fieldStarted && loadingPreviewRenderer) {
       try {
         updateLoadingPreviewAnimation()
+        syncLoadingPreviewCameraFromOrbit()
         loadingPreviewRenderer.render(loadingPreviewScene, loadingPreviewCamera)
       } catch (lpErr) {
         console.error('Loading Preview frame threw -- disabling it for this session:', lpErr)
