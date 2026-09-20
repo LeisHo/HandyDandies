@@ -56,19 +56,51 @@ finger's chain. Consolidated to one call per joint -- verified via an
 instrumented call-counter (30 real invocations per hand now, was up to
 90+) and a direct bone-quaternion correctness check (a real saved pose
 still renders correctly). No same-hardware before/after ms comparison
-this round (would need reverting to re-measure) -- **awaiting the
-user's own re-run of the same frame-profiler test on their real desktop
-to confirm the real-world improvement.**
+this round (would need reverting to re-measure) -- **user confirmed
+qualitatively on their real desktop ("it does look smoother") --
+no exact before/after numbers, but the real-world improvement this
+fix set out to produce is confirmed, not just theorized.**
 
-**Also checked, same round: HANDO's new Tween Sequence "+Hold" export
-feature's import compatibility.** No crash risk -- every consumer of an
-imported sequence degrades gracefully (holds get silently filtered out
-at playback, or silently default to the first real pose in the Edit
-UI) -- but a real, disclosed fidelity gap: this project has no concept
-of a hold step, so an imported HANDO sequence using +Hold will silently
-lose its weighted pacing and just play the real poses back-to-back,
-evenly spaced. **Awaiting the user's decision** on whether to port hold
-support here (a real feature addition) or leave it as a known gap.
+**SHIPPED 2026-09-20: real Hold support, ported from HANDO's own Tween
+Sequence "+Hold" feature (direct request: "i want the hold to be
+integrated"), for hold-based triggers' one-time forward-pass timeline
+(chp/rchp/dcHold/tripleClickHold/quadClickHold + custom Click+Hold
+functions).** A saved sequence's `tweenPoses` can now mix in
+`{type:'hold', percent:N}` entries (same shape HANDO's own devPanel.js
+produces, so an imported HANDO sequence with holds now behaves
+correctly here too, not just imports without crashing). New "+Hold"
+button next to "+Add" on the Tween Poses list; a hold row renders its
+own percent slider instead of a pose dropdown. Playback ported HANDO's
+own weighted-segment approach (`resolveTweenSegmentsWithAnchor()`/
+`lerpTweenSegments()`, replacing the old flat-array/equal-N-1-segments
+`chp.tweenPosesResolved`/`lerpTweenSequence()` pairing for this one
+consumer) -- a hold's own percent is its weight relative to one normal
+pose-to-pose transition, so it scales automatically with however long
+the tween actually takes rather than a fixed duration. **Deliberately
+scoped to hold-based triggers only** -- the fire-and-forget Click Pose
+family's own Sequence/Loop/Oscillate/Count system (`cp.tweenPoses`,
+`updateClickPoseForHand()`) was NOT extended to segments this round;
+a saved sequence with holds will still play evenly-spaced there,
+same fidelity gap as before, now narrowed rather than eliminated --
+flagged, not silently left as a surprise. Loop Mode's own cyclic replay
+(`trig.loopPoses`) also deliberately excludes holds, matching HANDO's
+own "Loop/Oscillate cycle through the tween's own NAMED poses only"
+design.
+
+Verified live via `window.__debug`, after 2 rounds of test-harness
+confusion (a concurrent session's own diagnostic script triggered a
+real settings restore mid-test, and re-triggering a hold on the same
+hand without a full page reload left stale phase/segment state from
+the previous test) both correctly diagnosed as test-methodology
+artifacts, not code bugs, via a from-scratch page reload each time:
+a 2-real-pose-plus-one-200%-hold sequence produced the expected 3
+segments with weights `[1, 2, 1]` (total weight 4), and driving the
+timeline through 11 sample points showed the pose value transition
+normally from 0-25% of progress, then hold PERFECTLY CONSTANT across
+exactly the 25%-75% window (matching the hold's own 2-out-of-4 weight
+share), then transition again from 75-100%. A no-hold 2-pose sequence
+regression-checked to the original `[1, 1]` equal weights, unchanged.
+No console errors.
 
 **PARTIALLY FIXED 2026-09-19 (latest round): Loading Preview invisible
 on Mobile — fixed one real, confirmed bug (missing pixel-ratio on the

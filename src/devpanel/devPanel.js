@@ -659,6 +659,19 @@ export function refreshSelectOptions(key) {
 // Save/Use step. Shares `fillSelectOptions()` with plain 'select' so
 // both stay consistent (same TDZ-safe try/catch, same "preserve current
 // value if still valid, else fall back to the first option" behavior).
+// A Hold entry (ported from HANDO's own Tween Sequence "+Hold" feature,
+// direct request: "make sure importing that wont cause an issue" ->
+// "i want the hold to be integrated") -- `{ type: 'hold', percent }`,
+// distinguishable from a plain pose-name string. `percent` is relative
+// to ONE normal pose-to-pose transition's own duration (HANDO's own
+// clarification: "25% hold will be [25%] of the duration to transition
+// between each pose" -- scales automatically with however long a
+// transition actually ends up taking, not a fixed absolute time). See
+// resolveTweenSegments()/resolveTweenSegmentsWithAnchor() in main.js for
+// how this weight is actually consumed during playback.
+function isHoldEntry(val) {
+  return !!(val && typeof val === 'object' && val.type === 'hold')
+}
 function renderMultiSelectRows(entry) {
   const { ctrl, listEl, values } = entry
   listEl.innerHTML = ''
@@ -669,6 +682,41 @@ function renderMultiSelectRows(entry) {
     // reordering starts only from this icon, so clicking the dropdown or
     // Remove is never mistaken for a drag.
     const handle = el('span', 'dp-ms-row-handle', { textContent: '⠿' })
+    if (isHoldEntry(val)) {
+      rowEl.classList.add('dp-multi-select-hold-row')
+      const label = el('span', 'dp-multi-select-hold-label', { textContent: 'Hold' })
+      const percent = typeof val.percent === 'number' && isFinite(val.percent) ? val.percent : 25
+      const slider = el('input', null, { type: 'range', min: 0, max: 100, step: 1, value: percent })
+      const numInput = el('input', 'dp-num', { type: 'text', value: percent })
+      // Same click-to-type auto-expanding pattern every slider in this
+      // panel uses (§12h) -- typing beyond the current bound widens it by
+      // +/-20% of the typed value instead of just clamping the handle.
+      function apply(v) {
+        v = parseFloat(v)
+        if (isNaN(v)) return
+        v = Math.max(0, v)
+        const mn = parseFloat(slider.min), mx = parseFloat(slider.max)
+        if (v > mx) slider.max = v + Math.max(Math.abs(v), Math.abs(mx - mn), 1) * 0.2
+        if (v < mn) slider.min = Math.max(0, v - Math.max(Math.abs(v), Math.abs(mx - mn), 1) * 0.2)
+        slider.value = v
+        numInput.value = round(v, 3)
+        values[i] = { type: 'hold', percent: v }
+        commit(ctrl, values.slice())
+      }
+      slider.addEventListener('input', () => apply(slider.value))
+      numInput.addEventListener('change', () => apply(numInput.value))
+      numInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') numInput.blur() })
+      values[i] = { type: 'hold', percent }
+      const removeBtn = el('button', 'dp-action-button', { type: 'button', textContent: 'Remove' })
+      removeBtn.addEventListener('click', () => {
+        values.splice(i, 1)
+        commit(ctrl, values.slice())
+        renderMultiSelectRows(entry)
+      })
+      rowEl.append(handle, label, slider, numInput, removeBtn)
+      listEl.appendChild(rowEl)
+      return
+    }
     const select = el('select')
     values[i] = fillSelectOptions(ctrl, select, val)
     select.addEventListener('change', () => {
@@ -688,13 +736,29 @@ function renderMultiSelectRows(entry) {
 function buildMultiSelectRow(ctrl, row) {
   const listEl = el('div', 'dp-multi-select-list')
   const addBtn = el('button', 'dp-action-button', { type: 'button', textContent: '+ Add' })
+  // "+ Hold" sits beside "+ Add" -- ported from HANDO verbatim, including
+  // its own "default to the last Hold's own percent" convention.
+  const holdBtn = el('button', 'dp-action-button', { type: 'button', textContent: '+ Hold' })
+  const addBtnRow = el('div', 'dp-multi-select-add-row')
+  addBtnRow.append(addBtn, holdBtn)
+  row.appendChild(addBtnRow)
   row.appendChild(listEl)
-  row.appendChild(addBtn)
   const entry = { type: 'multi-select', ctrl, listEl, values: (ctrl.def || []).slice() }
   numEls[ctrl.key] = entry
   addBtn.addEventListener('click', () => {
     const { values } = normalizeOptions(ctrl)
     entry.values.push(values[0] || '')
+    commit(ctrl, entry.values.slice())
+    renderMultiSelectRows(entry)
+  })
+  holdBtn.addEventListener('click', () => {
+    // Direct HANDO parity: a new Hold defaults to whatever the MOST
+    // RECENT Hold in this same list was last set to (not always back to
+    // 25), falling back to 25 only for the very first Hold in a fresh
+    // list.
+    const lastHold = entry.values.slice().reverse().find(isHoldEntry)
+    const percent = lastHold ? lastHold.percent : 25
+    entry.values.push({ type: 'hold', percent })
     commit(ctrl, entry.values.slice())
     renderMultiSelectRows(entry)
   })
@@ -709,10 +773,19 @@ function buildMultiSelectRow(ctrl, row) {
   // nesting like list-picker groups), so getTargets is just [listEl].
   // `entry.values` isn't DOM-order-derived during a render (it's the
   // array renderMultiSelectRows() walks to BUILD the DOM), so once a drag
-  // genuinely drops, resync it from the now-reordered <select> elements'
-  // own current values rather than assuming index i still matches.
+  // genuinely drops, resync it from the now-reordered rows' own current
+  // values rather than assuming index i still matches. A hold row has no
+  // `<select>` at all -- read its own `.dp-num` percent instead.
   setupReorder(listEl, 'dp-multi-select-row', 'dp-ms-row-handle', () => [listEl], () => {
-    entry.values = Array.from(listEl.querySelectorAll('.dp-multi-select-row select')).map((s) => s.value)
+    entry.values = Array.from(listEl.querySelectorAll(':scope > .dp-multi-select-row')).map((rowEl) => {
+      if (rowEl.classList.contains('dp-multi-select-hold-row')) {
+        const num = rowEl.querySelector('.dp-num')
+        const v = num ? parseFloat(num.value) : NaN
+        return { type: 'hold', percent: isFinite(v) ? v : 25 }
+      }
+      const select = rowEl.querySelector('select')
+      return select ? select.value : ''
+    })
     commit(ctrl, entry.values.slice())
   })
 }

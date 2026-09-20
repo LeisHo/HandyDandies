@@ -6,7 +6,7 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js'
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js'
 import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js'
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js'
-import { initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement } from './devpanel/devPanel.js?v=34'
+import { initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement } from './devpanel/devPanel.js?v=35'
 
 // A defensive wrapper around devPanel.js's own refreshSelectOptions() --
 // found via live testing (direct user report: "I dont see any of the
@@ -5242,7 +5242,7 @@ function buildWristSplayCurveWidget(row) {
 // instead of a 4th near-duplicate literal to keep in sync by hand.
 const CLICK_HOLD_KEYS = ['chp', 'rchp', 'dcHold', 'tripleClickHold', 'quadClickHold']
 const clickHoldPoseTriggers = Object.fromEntries(CLICK_HOLD_KEYS.map((p) => [p, {
-  active: false, holdStartTime: 0, forwardSnapshot: null, loopPoses: null, loopSegmentMs: 1,
+  active: false, holdStartTime: 0, forwardSnapshot: null, loopPoses: null, rawChainEntries: null, loopSegmentMs: 1,
   startCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], startRangeParsed: { min: 0, max: 300 },
   speedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], speedRangeParsed: { min: 50, max: 2000 },
   tweenStartCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStartRangeParsed: { min: 0, max: 300 },
@@ -5288,7 +5288,7 @@ function getOrInitHandCHP(hand) {
   // `pendingClaimAt`/`armedForHoldStartTime`/`pendingFrozenSplayDeg`:
   // the deferred-claim mechanism (direct request -- see
   // updateClickHoldPoseForHand()'s own top comment for the full
-  // account). `forwardStartTime`/`forwardSnapshot`/`tweenPosesResolved`
+  // account). `forwardStartTime`/`forwardSnapshot`/`tweenSegments`
   // are now genuinely PER-HAND (captured at each hand's own claim
   // moment), replacing the old shared `trig.forwardSnapshot`/
   // `trig.tweenPoses` this hand used to read directly. Per-key backfill
@@ -5299,7 +5299,7 @@ function getOrInitHandCHP(hand) {
   // keys.
   CLICK_HOLD_KEYS.forEach((p) => {
     if (hand._chp[p]) return
-    hand._chp[p] = { phase: 'idle', forwardStartTime: 0, forwardSnapshot: null, tweenPosesResolved: null, loopStartTime: 0, loopHoldEndTime: 0, loopDirection: 1, retransitionDelay: 0, retransitionStart: null, retransitionStartTime: 0, retransitionIsTween: false, lastAppliedValues: null, frozenSplayDeg: 0, pendingClaimAt: 0, armedForHoldStartTime: -1, pendingFrozenSplayDeg: 0, frozenSpeedMs: 0, pendingFrozenSpeedMs: 0, releasePending: false, stoppingStartTime: 0, stoppingStartDelay: 0, stoppingDelayMs: 1, stoppingLastFrameTime: 0, stoppingBaseElapsedMs: 0, stoppingVirtualElapsedMs: 0, stoppingWasLooping: false, stoppingFreezeAtEnd: false }
+    hand._chp[p] = { phase: 'idle', forwardStartTime: 0, forwardSnapshot: null, tweenSegments: null, loopStartTime: 0, loopHoldEndTime: 0, loopDirection: 1, retransitionDelay: 0, retransitionStart: null, retransitionStartTime: 0, retransitionIsTween: false, lastAppliedValues: null, frozenSplayDeg: 0, pendingClaimAt: 0, armedForHoldStartTime: -1, pendingFrozenSplayDeg: 0, frozenSpeedMs: 0, pendingFrozenSpeedMs: 0, releasePending: false, stoppingStartTime: 0, stoppingStartDelay: 0, stoppingDelayMs: 1, stoppingLastFrameTime: 0, stoppingBaseElapsedMs: 0, stoppingVirtualElapsedMs: 0, stoppingWasLooping: false, stoppingFreezeAtEnd: false }
   })
   return hand._chp
 }
@@ -5478,6 +5478,78 @@ function lerpTweenSequence(poses, t) {
   const localT = scaled - segIndex
   return lerpPoseValues(poses[segIndex], poses[segIndex + 1], localT)
 }
+// Hold entries (direct request: "i want the hold to be integrated," a
+// saved Tween Sequence imported from HANDO's own "+Hold" export feature)
+// -- `{ type: 'hold', percent }`, mixed into a sequence's own `tweenPoses`
+// array alongside plain pose-name strings (devPanel.js's own
+// isHoldEntry()/renderMultiSelectRows() build/edit this same shape).
+// Ported from HANDO's own resolveTweenSegments()/resolveTweenSegmentAt() --
+// see that project's main.js for the original.
+function isHoldEntry(val) {
+  return !!(val && typeof val === 'object' && val.type === 'hold')
+}
+// Resolves a raw tweenPoses-shaped array into a WEIGHTED SEGMENT
+// timeline, starting from `anchorPose` (this hand's own current pose --
+// per-hand, since every hold-based trigger resolves its own FROM value at
+// its own commit moment, see updateClickHoldPoseForHand()'s own pending-
+// claim comment) rather than from the first real pose in the list. Each
+// real pose-to-pose transition is weight 1; each Hold entry is its own
+// zero-motion "stay at whatever pose came before it" segment, weight =
+// percent/100 (HANDO's own clarification: "25% hold will be of the
+// duration to transition between each pose" -- scales with however long
+// a transition actually takes, not a fixed absolute time). A Hold with
+// nothing before it yet (including one immediately after the anchor,
+// which IS "something before it") is only a no-op if the list is
+// genuinely empty -- `anchorPose` always seeds `lastPose`, so this never
+// silently drops a leading Hold the way HANDO's own version (no anchor
+// concept) would. With no Hold entries at all, every segment is weight 1
+// -- identical to the plain N-1-equal-segments behavior every existing
+// saved sequence already has, so nothing changes for a sequence that
+// never used Hold.
+function resolveTweenSegmentsWithAnchor(anchorPose, rawEntries) {
+  const segments = []
+  let lastPose = anchorPose
+  ;(rawEntries || []).forEach((entry) => {
+    if (isHoldEntry(entry)) {
+      if (!lastPose) return
+      const percent = typeof entry.percent === 'number' && entry.percent >= 0 ? entry.percent : 25
+      segments.push({ poseA: lastPose, poseB: lastPose, weight: percent / 100 })
+      return
+    }
+    if (typeof entry !== 'string' || !entry) return
+    const matches = (cfg.savedPoses || []).filter((p) => p.name === entry)
+    const pose = matches[matches.length - 1]
+    if (!pose || !lastPose) return
+    segments.push({ poseA: lastPose, poseB: pose, weight: 1 })
+    lastPose = pose
+  })
+  return segments
+}
+// Given a resolveTweenSegmentsWithAnchor() timeline and a 0-1 fraction
+// `t`, finds which segment `t` falls in BY CUMULATIVE WEIGHT (not by
+// plain index -- a Hold's own weight can be less or more than 1) and
+// lerps that segment's own 2 poses at the segment-LOCAL fraction. Same
+// role as lerpTweenSequence() above, for a weighted timeline instead of
+// an equal-N-1-segments one.
+function lerpTweenSegments(segments, t) {
+  if (!segments || segments.length === 0) return null
+  const totalWeight = segments.reduce((sum, seg) => sum + seg.weight, 0)
+  const scaledT = THREE.MathUtils.clamp(t, 0, 1) * totalWeight
+  let acc = 0
+  for (let i = 0; i < segments.length; i++) {
+    const segWeight = segments[i].weight
+    if (scaledT < acc + segWeight || i === segments.length - 1) {
+      const localT = segWeight > 0 ? THREE.MathUtils.clamp((scaledT - acc) / segWeight, 0, 1) : 1
+      return lerpPoseValues(segments[i].poseA, segments[i].poseB, localT)
+    }
+    acc += segWeight
+  }
+  // Unreachable given a non-empty `segments` (the loop's own last-index
+  // check always matches by then) -- kept only so this never returns
+  // undefined if that invariant is ever violated by a future edit.
+  const last = segments[segments.length - 1]
+  return lerpPoseValues(last.poseA, last.poseB, 1)
+}
 // Double Click Hold Tween's own Loop mode, and now also Click Hold-Pose/
 // Right-Click Hold-Pose's own Loop Mode dropdown (direct follow-up
 // request): once the initial forward pass finishes, keep cycling
@@ -5607,7 +5679,7 @@ function beginTweenReleaseStop(chp, trig, p, values, live, minLiveDist, liveDist
 // CLICK_HOLD_KEYS.includes(p). Chain behaves EXACTLY like Sequence mode
 // for every visibility/gating purpose in this file (hence this one shared
 // helper, used everywhere the old `=== 'Sequence'` check used to be) --
-// the ONLY difference is how `trig.loopPoses`/`chp.tweenPosesResolved`
+// the ONLY difference is how `trig.loopPoses`/`chp.tweenSegments`
 // get resolved at hold-start (see startClickHoldPose()'s own Chain
 // branch): Sequence resolves ONE saved tween sequence's named poses;
 // Chain resolves and CONCATENATES every sequence listed in the new
@@ -5664,7 +5736,14 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     const wasActive = hand._wasOverriddenLastFrame && hand._lastPoseValues
     const isMultiClickHoldFamily = p === 'dcHold' || p === 'tripleClickHold' || p === 'quadClickHold'
     chp.forwardSnapshot = wasActive ? hand._lastPoseValues : (isMultiClickHoldFamily ? poseDefaultValues : trig.forwardSnapshot)
-    chp.tweenPosesResolved = (trig.loopPoses && trig.loopPoses.length >= 1) ? [chp.forwardSnapshot, ...trig.loopPoses] : null
+    // Weighted-segment timeline (Hold support) -- built fresh per hand,
+    // right here, from THIS hand's own just-resolved anchor + the RAW
+    // (Hold-entries-intact) sequence/chain shared by every hand. Replaces
+    // the old flat `[chp.forwardSnapshot, ...trig.loopPoses]` array +
+    // lerpTweenSequence() pairing -- see resolveTweenSegmentsWithAnchor()'s
+    // own comment for why a sequence with no Hold entries behaves
+    // identically either way.
+    chp.tweenSegments = trig.rawChainEntries ? resolveTweenSegmentsWithAnchor(chp.forwardSnapshot, trig.rawChainEntries) : null
     chp.phase = 'forward'
     chp.forwardStartTime = now
     chp.frozenSplayDeg = chp.pendingFrozenSplayDeg
@@ -5674,9 +5753,9 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
   }
   if (chp.phase === 'forward') {
     // Tween mode (added 2026-09-15, see makeClickHoldPoseGroup()'s own
-    // comment) -- `chp.tweenPosesResolved` is built once at THIS hand's
-    // own commit above (its own FROM snapshot + the hold's shared named
-    // poses); only the named poses themselves are shared across hands,
+    // comment) -- `chp.tweenSegments` is built once at THIS hand's own
+    // commit above (its own FROM snapshot + the hold's shared raw chain
+    // entries); only the raw entries themselves are shared across hands,
     // same as before. Uses its own separate `${p}TweenSpeedMs`, not
     // `${p}TransitionSpeedMs` -- see makeClickHoldPoseGroup()'s comment.
     // No `forwardDelay` subtraction needed anymore -- that delay is now
@@ -5691,8 +5770,8 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     const progress = THREE.MathUtils.clamp(elapsed / speedMs, 0, 1)
     let values
     if (isTween) {
-      if (!chp.tweenPosesResolved || chp.tweenPosesResolved.length < 2) return // nothing selected -- leave this hand's pose untouched
-      values = lerpTweenSequence(chp.tweenPosesResolved, progress)
+      if (!chp.tweenSegments || chp.tweenSegments.length === 0) return // nothing selected -- leave this hand's pose untouched
+      values = lerpTweenSegments(chp.tweenSegments, progress)
       // On Release Mode = 'Complete Sequence' (direct spec item) -- a
       // release happened WHILE this forward pass was still playing
       // (endClickHoldPose() left `chp.phase` untouched and only set
@@ -5844,7 +5923,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
       const speedMs = Math.max(safeTweenSpeedMs(cfg[`${p}TweenSpeedMs`]), 1)
       chp.stoppingVirtualElapsedMs += dt * decayFactor
       const progress = THREE.MathUtils.clamp((chp.stoppingBaseElapsedMs + chp.stoppingVirtualElapsedMs) / speedMs, 0, 1)
-      values = (chp.tweenPosesResolved && chp.tweenPosesResolved.length >= 2) ? lerpTweenSequence(chp.tweenPosesResolved, progress) : chp.lastAppliedValues
+      values = (chp.tweenSegments && chp.tweenSegments.length > 0) ? lerpTweenSegments(chp.tweenSegments, progress) : chp.lastAppliedValues
     }
     chp.lastAppliedValues = values
     applyPoseValuesToHand(hand, values, chp.frozenSplayDeg)
@@ -5895,7 +5974,7 @@ function startClickHoldPose(p) {
     // flat named-pose list, so every consumer downstream (forward/
     // looping/retransition, Loop Mode, On Release Mode) needs zero
     // further changes -- they already only ever look at `trig.loopPoses`/
-    // `chp.tweenPosesResolved`, never at how many sequences it came from.
+    // `chp.tweenSegments`, never at how many sequences it came from.
     const namedPoses = cfg[`${p}Mode`] === 'Chain'
       ? (cfg[`${p}TweenChain`] || []).flatMap((seqName) => {
           const seq = (cfg.savedTweenSequences || []).find((s) => s.name === seqName)
@@ -5913,11 +5992,32 @@ function startClickHoldPose(p) {
     // this SAME hold's `${p}TweenSpeedMs`, divided across the named
     // poses. Computed regardless of whether Loop Mode is actually Off
     // (harmless) -- only consulted from updateClickHoldPoseForHand()
-    // when it isn't.
+    // when it isn't. Deliberately excludes Hold entries too (same
+    // reasoning as excluding the anchor -- a hold is meaningless as one
+    // of Loop's own discrete cycle stops), via resolveTweenSequencePoses()'s
+    // own existing string-only mapping, unchanged.
     trig.loopPoses = namedPoses
     trig.loopSegmentMs = Math.max(safeTweenSpeedMs(cfg[`${p}TweenSpeedMs`]) / Math.max(namedPoses.length, 1), 1)
+    // RAW entries (Hold objects intact, NOT run through
+    // resolveTweenSequencePoses) -- feeds the one-time forward-pass
+    // timeline's own Hold support (direct request: "i want the hold to be
+    // integrated," porting HANDO's own Tween Sequence "+Hold" feature).
+    // Kept as a SEPARATE field from `loopPoses` above rather than
+    // reusing/deriving one from the other -- Loop Mode's own named-poses
+    // cycle and the one-time forward pass are 2 different consumers with
+    // 2 different rules about what a Hold entry means to them.
+    trig.rawChainEntries = cfg[`${p}Mode`] === 'Chain'
+      ? (cfg[`${p}TweenChain`] || []).flatMap((seqName) => {
+          const seq = (cfg.savedTweenSequences || []).find((s) => s.name === seqName)
+          return seq ? (seq.tweenPoses || []) : []
+        })
+      : (() => {
+          const seq = (cfg.savedTweenSequences || []).find((s) => s.name === cfg[`${p}TweenSelector`])
+          return seq ? (seq.tweenPoses || []) : []
+        })()
   } else {
     trig.loopPoses = null
+    trig.rawChainEntries = null
   }
   // Direct request: "When a click and hold is occurring, during the
   // hold, moving the cursor should not trigger any panning. Instead, it
@@ -7349,7 +7449,7 @@ function registerCustomClickFunction(id, title, kind, family) {
   if (kind === 'hold') {
     CLICK_HOLD_KEYS.push(id)
     clickHoldPoseTriggers[id] = {
-      active: false, holdStartTime: 0, forwardSnapshot: null, loopPoses: null, loopSegmentMs: 1,
+      active: false, holdStartTime: 0, forwardSnapshot: null, loopPoses: null, rawChainEntries: null, loopSegmentMs: 1,
       startCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], startRangeParsed: { min: 0, max: 300 },
       speedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], speedRangeParsed: { min: 50, max: 2000 },
       tweenStartCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStartRangeParsed: { min: 0, max: 300 },

@@ -353,6 +353,15 @@ html, body {
 .dp-ms-row-handle { flex: 0 0 auto; cursor: grab; color: #666; touch-action: none; padding: 0 2px; }
 .dp-ms-row-handle:active { cursor: grabbing; }
 .dp-multi-select-row.dp-dragging { opacity: .4; }
+/* +Hold row (ported from HANDO, direct request: "i want the hold to be
+   integrated") -- the slider needs its own scoped rule since the
+   existing `.dp-row input[type=range]` rule doesn't reach a
+   `.dp-multi-select-row` (a sibling class, not a `.dp-row`). The label
+   shares the row's own flex layout, styled distinctly from a dropdown. */
+.dp-multi-select-row input[type=range] { flex: 1 1 auto; min-width: 0; accent-color: var(--dp-slider-color, #7d8cff); }
+.dp-multi-select-hold-label { flex: 0 0 auto; color: var(--dp-text-color, #e8e8f0); font-size: var(--dp-body-font-size, 11px); padding: 3px 2px; opacity: 0.85; }
+.dp-multi-select-add-row { display: flex; gap: 4px; margin-bottom: 2px; }
+.dp-multi-select-add-row .dp-action-button { flex: 1 1 auto; }
 .dp-group[data-key="Saved Dev Settings"] select {
   background: #0f0f18; color: var(--dp-text-color, #e8e8f0);
   border: 1px solid #3a3a4a; border-radius: 4px; padding: 3px 4px; font-size: var(--dp-body-font-size, 11px);
