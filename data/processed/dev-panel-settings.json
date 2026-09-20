@@ -122,7 +122,7 @@
           "targetZ": -41.06167133796903
         }
       ],
-      "loadingPreviewCameraSelector": "Loading Preview Camera 10",
+      "loadingPreviewCameraSelector": "Front-Straightened",
       "loadingPreviewSavedLighting": [
         {
           "name": "3 Tone - SideFront",
@@ -176,18 +176,18 @@
       "loadingPreviewSequenceCountMode": "Loop",
       "loadingPreviewSequenceLoopTransition": true,
       "loadingPreviewSequenceHoldMs": 0,
-      "loadingPreviewSize": 2000,
-      "loadingPreviewRotationX": -78.34444672927697,
-      "loadingPreviewRotationY": 162.59742425625876,
+      "loadingPreviewSize": 1390,
+      "loadingPreviewRotationX": -79.5214147749844,
+      "loadingPreviewRotationY": -3.4505366585856985,
       "loadingPreviewRotationZ": 0,
-      "loadingPreviewOffsetX": -1.5,
-      "loadingPreviewOffsetY": -0.4999999999999998,
-      "loadingPreviewOffsetZ": -19.499999999999996,
+      "loadingPreviewOffsetX": 0.27796090493479864,
+      "loadingPreviewOffsetY": -2.3103396034084374,
+      "loadingPreviewOffsetZ": -12.038474877346157,
       "loadingPreviewCameraFov": 32,
-      "loadingPreviewCameraZoom": 161.76948312244124,
+      "loadingPreviewCameraZoom": 64.25715498581914,
       "loadingPreviewCameraEditMode": true,
       "customClickFunctionIds": "[{\"id\":\"custom1\",\"title\":\"Custom Click Function 1\",\"kind\":\"pose\",\"family\":\"desktop\"}]",
-      "posePreviewEnabled": true,
+      "posePreviewEnabled": false,
       "thumbCurl": 75,
       "thumbSplay": 42,
       "thumbSplay2": 13,
@@ -6057,8 +6057,8 @@
           "modelRotY": 0,
           "modelRotZ": 0,
           "poseOffsetX": -0.5,
-          "poseOffsetY": -90.3,
-          "poseOffsetZ": 3.1,
+          "poseOffsetY": -18.5,
+          "poseOffsetZ": 24.6,
           "poseScale": 6,
           "hideWrist": 78,
           "shoulderRaise": 0,
@@ -6455,7 +6455,7 @@
             "COUNTDOWN (VERT) - LENS COVER",
             {
               "type": "hold",
-              "percent": 100
+              "percent": 300
             }
           ],
           "group": "LOADING/COUNTDOWN VERTICAL"
@@ -7139,7 +7139,7 @@
           "targetZ": -41.06167133796903
         }
       ],
-      "loadingPreviewCameraSelector": "Loading Preview Camera 10",
+      "loadingPreviewCameraSelector": "Front-Straightened",
       "loadingPreviewSavedLighting": [
         {
           "name": "3 Tone - SideFront",
@@ -7193,18 +7193,18 @@
       "loadingPreviewSequenceCountMode": "Loop",
       "loadingPreviewSequenceLoopTransition": true,
       "loadingPreviewSequenceHoldMs": 0,
-      "loadingPreviewSize": 2000,
-      "loadingPreviewRotationX": -78.34444672927697,
-      "loadingPreviewRotationY": 162.59742425625876,
+      "loadingPreviewSize": 1390,
+      "loadingPreviewRotationX": -79.5214147749844,
+      "loadingPreviewRotationY": -3.4505366585856985,
       "loadingPreviewRotationZ": 0,
-      "loadingPreviewOffsetX": -1.5,
-      "loadingPreviewOffsetY": -0.4999999999999998,
-      "loadingPreviewOffsetZ": -19.499999999999996,
+      "loadingPreviewOffsetX": 0.27796090493479864,
+      "loadingPreviewOffsetY": -2.3103396034084374,
+      "loadingPreviewOffsetZ": -12.038474877346157,
       "loadingPreviewCameraFov": 32,
-      "loadingPreviewCameraZoom": 161.76948312244124,
+      "loadingPreviewCameraZoom": 64.25715498581914,
       "loadingPreviewCameraEditMode": true,
       "customClickFunctionIds": "[{\"id\":\"custom1\",\"title\":\"Custom Click Function 1\",\"kind\":\"pose\",\"family\":\"desktop\"}]",
-      "posePreviewEnabled": true,
+      "posePreviewEnabled": false,
       "thumbCurl": 75,
       "thumbSplay": 42,
       "thumbSplay2": 13,
@@ -13074,8 +13074,8 @@
           "modelRotY": 0,
           "modelRotZ": 0,
           "poseOffsetX": -0.5,
-          "poseOffsetY": -90.3,
-          "poseOffsetZ": 3.1,
+          "poseOffsetY": -18.5,
+          "poseOffsetZ": 24.6,
           "poseScale": 6,
           "hideWrist": 78,
           "shoulderRaise": 0,
@@ -13472,7 +13472,7 @@
             "COUNTDOWN (VERT) - LENS COVER",
             {
               "type": "hold",
-              "percent": 100
+              "percent": 300
             }
           ],
           "group": "LOADING/COUNTDOWN VERTICAL"
@@ -14156,7 +14156,7 @@
           "targetZ": -41.06167133796903
         }
       ],
-      "loadingPreviewCameraSelector": "Loading Preview Camera 10",
+      "loadingPreviewCameraSelector": "Front-Straightened",
       "loadingPreviewSavedLighting": [
         {
           "name": "3 Tone - SideFront",
@@ -14210,18 +14210,18 @@
       "loadingPreviewSequenceCountMode": "Loop",
       "loadingPreviewSequenceLoopTransition": true,
       "loadingPreviewSequenceHoldMs": 0,
-      "loadingPreviewSize": 2000,
-      "loadingPreviewRotationX": -78.34444672927697,
-      "loadingPreviewRotationY": 162.59742425625876,
+      "loadingPreviewSize": 1390,
+      "loadingPreviewRotationX": -79.5214147749844,
+      "loadingPreviewRotationY": -3.4505366585856985,
       "loadingPreviewRotationZ": 0,
-      "loadingPreviewOffsetX": -1.5,
-      "loadingPreviewOffsetY": -0.4999999999999998,
-      "loadingPreviewOffsetZ": -19.499999999999996,
+      "loadingPreviewOffsetX": 0.27796090493479864,
+      "loadingPreviewOffsetY": -2.3103396034084374,
+      "loadingPreviewOffsetZ": -12.038474877346157,
       "loadingPreviewCameraFov": 32,
-      "loadingPreviewCameraZoom": 161.76948312244124,
+      "loadingPreviewCameraZoom": 64.25715498581914,
       "loadingPreviewCameraEditMode": true,
       "customClickFunctionIds": "[{\"id\":\"custom1\",\"title\":\"Custom Click Function 1\",\"kind\":\"pose\",\"family\":\"desktop\"}]",
-      "posePreviewEnabled": true,
+      "posePreviewEnabled": false,
       "thumbCurl": 75,
       "thumbSplay": 42,
       "thumbSplay2": 13,
@@ -20091,8 +20091,8 @@
           "modelRotY": 0,
           "modelRotZ": 0,
           "poseOffsetX": -0.5,
-          "poseOffsetY": -90.3,
-          "poseOffsetZ": 3.1,
+          "poseOffsetY": -18.5,
+          "poseOffsetZ": 24.6,
           "poseScale": 6,
           "hideWrist": 78,
           "shoulderRaise": 0,
@@ -20489,7 +20489,7 @@
             "COUNTDOWN (VERT) - LENS COVER",
             {
               "type": "hold",
-              "percent": 100
+              "percent": 300
             }
           ],
           "group": "LOADING/COUNTDOWN VERTICAL"
