@@ -20788,14 +20788,6 @@
       "subgroups": []
     },
     {
-      "key": "Custom Click Function 3",
-      "collapsed": true,
-      "locked": false,
-      "items": [],
-      "settings": [],
-      "subgroups": []
-    },
-    {
       "key": "Saved Dev Settings",
       "collapsed": true,
       "locked": false,
@@ -22191,7 +22183,7 @@
     },
     {
       "key": "Field Layout",
-      "collapsed": false,
+      "collapsed": true,
       "locked": false,
       "items": [
         {
@@ -22246,7 +22238,7 @@
     },
     {
       "key": "Cursor Tracking",
-      "collapsed": false,
+      "collapsed": true,
       "locked": false,
       "items": [
         {
@@ -22476,7 +22468,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": false,
       "items": [
         {
@@ -29203,16 +29195,8 @@
       "subgroups": []
     },
     {
-      "key": "Custom Function 1",
-      "collapsed": true,
-      "locked": false,
-      "items": [],
-      "settings": [],
-      "subgroups": []
-    },
-    {
       "key": "Custom Function 2",
-      "collapsed": false,
+      "collapsed": true,
       "locked": false,
       "items": [],
       "settings": [],
