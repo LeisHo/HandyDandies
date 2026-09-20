@@ -154,7 +154,7 @@
       "loadingPreviewCameraFov": 32,
       "loadingPreviewCameraZoom": 64.25715498581914,
       "loadingPreviewCameraEditMode": false,
-      "customClickFunctionIds": "[{\"id\":\"custom1\",\"title\":\"Custom Function 1\"},{\"id\":\"custom2\",\"title\":\"Custom Function 2\"},{\"id\":\"custom3\",\"title\":\"Custom Click Function 3\",\"kind\":\"pose\",\"family\":\"desktop\"}]",
+      "customClickFunctionIds": "[]",
       "posePreviewEnabled": true,
       "thumbCurl": 75,
       "thumbSplay": 42,
@@ -6373,7 +6373,7 @@
       "loadingPreviewCameraFov": 32,
       "loadingPreviewCameraZoom": 64.25715498581914,
       "loadingPreviewCameraEditMode": false,
-      "customClickFunctionIds": "[{\"id\":\"custom1\",\"title\":\"Custom Function 1\"},{\"id\":\"custom2\",\"title\":\"Custom Function 2\"},{\"id\":\"custom3\",\"title\":\"Custom Click Function 3\",\"kind\":\"pose\",\"family\":\"desktop\"}]",
+      "customClickFunctionIds": "[]",
       "posePreviewEnabled": true,
       "thumbCurl": 75,
       "thumbSplay": 42,
@@ -12592,7 +12592,7 @@
       "loadingPreviewCameraFov": 32,
       "loadingPreviewCameraZoom": 64.25715498581914,
       "loadingPreviewCameraEditMode": false,
-      "customClickFunctionIds": "[{\"id\":\"custom1\",\"title\":\"Custom Function 1\"},{\"id\":\"custom2\",\"title\":\"Custom Function 2\"},{\"id\":\"custom3\",\"title\":\"Custom Click Function 3\",\"kind\":\"pose\",\"family\":\"desktop\"}]",
+      "customClickFunctionIds": "[]",
       "posePreviewEnabled": true,
       "thumbCurl": 75,
       "thumbSplay": 42,
@@ -18908,240 +18908,6 @@
       "key": "Custom Click Function 3",
       "collapsed": true,
       "locked": false,
-      "settings": [
-        "custom3Enabled",
-        "custom3Type",
-        "custom3TouchPointCount",
-        "custom3ClickCount",
-        "custom3Mode",
-        "custom3TargetPose",
-        "custom3TweenSelector",
-        "custom3TweenSpeedMs",
-        "custom3TweenStartTimeCurve",
-        "custom3TweenStartTimeRange",
-        "custom3SequencePlayMode",
-        "custom3SequenceCount",
-        "custom3SequenceCountMode",
-        "custom3SequenceLoopTransition",
-        "custom3SequenceHoldMs",
-        "custom3TransitionSpeedMs",
-        "custom3PauseDurationMs"
-      ],
-      "subgroups": [
-        {
-          "key": "Offset",
-          "collapsed": false,
-          "locked": false,
-          "settings": [
-            "custom3OffsetX",
-            "custom3OffsetY"
-          ],
-          "subgroups": []
-        },
-        {
-          "key": "Rotation",
-          "collapsed": false,
-          "locked": false,
-          "settings": [
-            "custom3RotationX",
-            "custom3RotationY",
-            "custom3RotationZ"
-          ],
-          "subgroups": []
-        },
-        {
-          "key": "Animation Speed Curve",
-          "collapsed": false,
-          "locked": false,
-          "settings": [
-            "custom3SpeedCurve",
-            "custom3SpeedCurveRange"
-          ],
-          "subgroups": []
-        },
-        {
-          "key": "Start Time Curve",
-          "collapsed": false,
-          "locked": false,
-          "settings": [
-            "custom3StartTimeCurve",
-            "custom3StartTimeRange"
-          ],
-          "subgroups": []
-        },
-        {
-          "key": "Retransition",
-          "collapsed": false,
-          "locked": false,
-          "settings": [
-            "custom3RetransitionSpeedMs",
-            "custom3RetransitionStartTimeCurve",
-            "custom3RetransitionStartTimeRange"
-          ],
-          "subgroups": []
-        }
-      ]
-    },
-    {
-      "key": "Custom Function 2",
-      "collapsed": true,
-      "locked": false,
-      "settings": [
-        "custom2Enabled",
-        "custom2Type",
-        "custom2TouchPointCount",
-        "custom2ClickCount",
-        "custom2Mode",
-        "custom2TargetPose",
-        "custom2TweenSelector",
-        "custom2TweenSpeedMs",
-        "custom2TweenStartTimeCurve",
-        "custom2TweenStartTimeRange",
-        "custom2SequencePlayMode",
-        "custom2SequenceCount",
-        "custom2SequenceCountMode",
-        "custom2SequenceLoopTransition",
-        "custom2SequenceHoldMs",
-        "custom2TransitionSpeedMs",
-        "custom2PauseDurationMs"
-      ],
-      "subgroups": [
-        {
-          "key": "Offset",
-          "collapsed": false,
-          "locked": false,
-          "settings": [
-            "custom2OffsetX",
-            "custom2OffsetY"
-          ],
-          "subgroups": []
-        },
-        {
-          "key": "Rotation",
-          "collapsed": false,
-          "locked": false,
-          "settings": [
-            "custom2RotationX",
-            "custom2RotationY",
-            "custom2RotationZ"
-          ],
-          "subgroups": []
-        },
-        {
-          "key": "Animation Speed Curve",
-          "collapsed": false,
-          "locked": false,
-          "settings": [
-            "custom2SpeedCurve",
-            "custom2SpeedCurveRange"
-          ],
-          "subgroups": []
-        },
-        {
-          "key": "Start Time Curve",
-          "collapsed": false,
-          "locked": false,
-          "settings": [
-            "custom2StartTimeCurve",
-            "custom2StartTimeRange"
-          ],
-          "subgroups": []
-        },
-        {
-          "key": "Retransition",
-          "collapsed": false,
-          "locked": false,
-          "settings": [
-            "custom2RetransitionSpeedMs",
-            "custom2RetransitionStartTimeCurve",
-            "custom2RetransitionStartTimeRange"
-          ],
-          "subgroups": []
-        }
-      ]
-    },
-    {
-      "key": "Custom Function 1",
-      "collapsed": true,
-      "locked": false,
-      "settings": [
-        "custom1Enabled",
-        "custom1Type",
-        "custom1TouchPointCount",
-        "custom1ClickCount",
-        "custom1Mode",
-        "custom1TargetPose",
-        "custom1TweenSelector",
-        "custom1TweenSpeedMs",
-        "custom1TweenStartTimeCurve",
-        "custom1TweenStartTimeRange",
-        "custom1SequencePlayMode",
-        "custom1SequenceCount",
-        "custom1SequenceCountMode",
-        "custom1SequenceLoopTransition",
-        "custom1SequenceHoldMs",
-        "custom1TransitionSpeedMs",
-        "custom1PauseDurationMs"
-      ],
-      "subgroups": [
-        {
-          "key": "Offset",
-          "collapsed": false,
-          "locked": false,
-          "settings": [
-            "custom1OffsetX",
-            "custom1OffsetY"
-          ],
-          "subgroups": []
-        },
-        {
-          "key": "Rotation",
-          "collapsed": false,
-          "locked": false,
-          "settings": [
-            "custom1RotationX",
-            "custom1RotationY",
-            "custom1RotationZ"
-          ],
-          "subgroups": []
-        },
-        {
-          "key": "Animation Speed Curve",
-          "collapsed": false,
-          "locked": false,
-          "settings": [
-            "custom1SpeedCurve",
-            "custom1SpeedCurveRange"
-          ],
-          "subgroups": []
-        },
-        {
-          "key": "Start Time Curve",
-          "collapsed": false,
-          "locked": false,
-          "settings": [
-            "custom1StartTimeCurve",
-            "custom1StartTimeRange"
-          ],
-          "subgroups": []
-        },
-        {
-          "key": "Retransition",
-          "collapsed": false,
-          "locked": false,
-          "settings": [
-            "custom1RetransitionSpeedMs",
-            "custom1RetransitionStartTimeCurve",
-            "custom1RetransitionStartTimeRange"
-          ],
-          "subgroups": []
-        }
-      ]
-    },
-    {
-      "key": "Custom Click Function 3",
-      "collapsed": true,
-      "locked": false,
       "settings": [],
       "subgroups": []
     },
@@ -19271,31 +19037,56 @@
       "collapsed": false,
       "locked": false,
       "settings": [
-        "loadingPreviewCameraFov",
-        "loadingPreviewCameraZoom",
-        "loadingPreviewCameraEditMode",
-        "loadingPreviewSavedCameras",
-        "loadingPreviewSavedLighting",
-        "loadingPreviewRotationX",
-        "loadingPreviewRotationY",
-        "loadingPreviewRotationZ",
         "loadingPreviewShowLive",
         "loadingPreviewEnabled",
-        "loadingPreviewOffsetX",
-        "loadingPreviewOffsetY",
-        "loadingPreviewCameraSelector",
-        "loadingPreviewLightingSelector",
-        "loadingPreviewSequenceMode",
-        "loadingPreviewSequenceCount",
-        "loadingPreviewSequenceCountMode",
-        "loadingPreviewSequenceLoopTransition",
-        "loadingPreviewSequenceHoldMs",
+        "loadingPreviewCameraEditMode",
         "loadingMinTimeMs",
-        "loadingPreviewTweenSelector",
-        "loadingPreviewSpeedMs",
-        "loadingPreviewSize"
+        "loadingPreviewSequenceCount",
+        "loadingPreviewSequenceCountMode"
       ],
-      "subgroups": []
+      "subgroups": [
+        {
+          "key": "New Group",
+          "collapsed": true,
+          "locked": false,
+          "settings": [
+            "loadingPreviewRotationX",
+            "loadingPreviewRotationY",
+            "loadingPreviewRotationZ",
+            "loadingPreviewOffsetX",
+            "loadingPreviewOffsetY",
+            "loadingPreviewCameraFov",
+            "loadingPreviewCameraZoom",
+            "loadingPreviewSavedCameras"
+          ],
+          "subgroups": []
+        },
+        {
+          "key": "New Group",
+          "collapsed": true,
+          "locked": false,
+          "settings": [
+            "loadingPreviewSavedLighting"
+          ],
+          "subgroups": []
+        },
+        {
+          "key": "New Group",
+          "collapsed": true,
+          "locked": false,
+          "settings": [
+            "loadingPreviewTweenSelector",
+            "loadingPreviewCameraSelector",
+            "loadingPreviewLightingSelector",
+            "loadingPreviewSequenceMode",
+            "loadingPreviewSpeedMs",
+            "loadingPreviewSize",
+            "loadingPreviewSequenceHoldMs",
+            "loadingPreviewSequenceLoopTransition"
+          ],
+          "subgroups": []
+        }
+      ]
     },
     {
       "key": "Tween",
@@ -20292,7 +20083,7 @@
     },
     {
       "key": "Camera",
-      "collapsed": false,
+      "collapsed": true,
       "locked": false,
       "settings": [
         "savedCameras",
@@ -20398,7 +20189,7 @@
     }
   ],
   "textOverrides": {
-    "New Group": "THUMB",
+    "New Group": "LOADING PREVIEW LIGHTING",
     "New Group (2)": "CLICK FUNCTIONS",
     "Whole-Hand Rotation & Thumb": "ROTATION"
   }
