@@ -1382,7 +1382,7 @@ const DEV_GROUPS = [
   {
     title: 'Toon Shading',
     controls: [
-      { key: 'toonSteps', label: 'Toon Steps (Count)', type: 'slider', min: 2, max: 8, step: 1, def: 2, onChange: () => rebuildGradientMap() },
+      { key: 'toonSteps', label: 'Toon Steps (Count)', type: 'slider', min: 2, max: 6, step: 1, def: 2, onChange: () => rebuildGradientMap() },
       { key: 'toonStepThreshold', label: 'Toon Step Threshold (Bias)', type: 'slider', min: 0.2, max: 5, step: 0.05, def: 2.7, onChange: () => rebuildGradientMap() },
       { key: 'toonShadowFloor', label: 'Toon Shadow Floor (%)', type: 'slider', min: 0, max: 90, step: 1, def: 7, onChange: () => rebuildGradientMap() },
       { key: 'toonLightCeiling', label: 'Toon Light Ceiling (%)', type: 'slider', min: 10, max: 100, step: 1, def: 100, onChange: () => rebuildGradientMap() },
