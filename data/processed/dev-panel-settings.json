@@ -140,7 +140,7 @@
       ],
       "loadingPreviewLightingSelector": "",
       "loadingPreviewSpeedMs": 5000,
-      "loadingPreviewSequenceMode": "Loop",
+      "loadingPreviewSequenceMode": "Count",
       "loadingPreviewSequenceCount": 3,
       "loadingPreviewSequenceCountMode": "Loop",
       "loadingPreviewSequenceLoopTransition": true,
@@ -6914,7 +6914,7 @@
       ],
       "loadingPreviewLightingSelector": "",
       "loadingPreviewSpeedMs": 5000,
-      "loadingPreviewSequenceMode": "Loop",
+      "loadingPreviewSequenceMode": "Count",
       "loadingPreviewSequenceCount": 3,
       "loadingPreviewSequenceCountMode": "Loop",
       "loadingPreviewSequenceLoopTransition": true,
@@ -13688,7 +13688,7 @@
       ],
       "loadingPreviewLightingSelector": "",
       "loadingPreviewSpeedMs": 5000,
-      "loadingPreviewSequenceMode": "Loop",
+      "loadingPreviewSequenceMode": "Count",
       "loadingPreviewSequenceCount": 3,
       "loadingPreviewSequenceCountMode": "Loop",
       "loadingPreviewSequenceLoopTransition": true,
@@ -21459,10 +21459,6 @@
         },
         {
           "type": "row",
-          "key": "loadingPreviewSequenceCount"
-        },
-        {
-          "type": "row",
           "key": "loadingPreviewSequenceCountMode"
         },
         {
@@ -21522,7 +21518,7 @@
           "type": "group",
           "group": {
             "key": "New Group (7)",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -21540,6 +21536,10 @@
               {
                 "type": "row",
                 "key": "loadingPreviewSequenceMode"
+              },
+              {
+                "type": "row",
+                "key": "loadingPreviewSequenceCount"
               },
               {
                 "type": "row",
@@ -21563,6 +21563,7 @@
               "loadingPreviewCameraSelector",
               "loadingPreviewLightingSelector",
               "loadingPreviewSequenceMode",
+              "loadingPreviewSequenceCount",
               "loadingPreviewSpeedMs",
               "loadingPreviewSize",
               "loadingPreviewSequenceHoldMs",
@@ -21595,7 +21596,6 @@
         "loadingPreviewEnabled",
         "loadingPreviewCameraEditMode",
         "loadingMinTimeMs",
-        "loadingPreviewSequenceCount",
         "loadingPreviewSequenceCountMode"
       ],
       "subgroups": [
@@ -21651,7 +21651,7 @@
         },
         {
           "key": "New Group (7)",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
@@ -21669,6 +21669,10 @@
             {
               "type": "row",
               "key": "loadingPreviewSequenceMode"
+            },
+            {
+              "type": "row",
+              "key": "loadingPreviewSequenceCount"
             },
             {
               "type": "row",
@@ -21692,6 +21696,7 @@
             "loadingPreviewCameraSelector",
             "loadingPreviewLightingSelector",
             "loadingPreviewSequenceMode",
+            "loadingPreviewSequenceCount",
             "loadingPreviewSpeedMs",
             "loadingPreviewSize",
             "loadingPreviewSequenceHoldMs",
