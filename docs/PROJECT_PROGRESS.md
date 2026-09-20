@@ -18,6 +18,26 @@ work seamlessly from there.
 
 ## Currently working on
 
+**SHIPPED 2026-09-20 (later same day, 7th follow-up round): every Pose-
+group slider now live-updates the Pose Preview panel (direct report:
+"the Offset and Scale sliders dont seem to do anything. They should be
+reflected in the pose preview").** Investigated and found this applied
+to the WHOLE Pose group, not just Offset/Scale -- no slider (curl/
+splay/wrist/rotation/offset/scale) had ever touched the Pose Preview's
+own hand; each one's existing `onChange` only reposed the live field's
+hands, and `previewPosePreset()` was only ever called from "Use"/"Run"/
+the initial default-pose load. Asked via `AskUserQuestion` whether to
+fix narrowly (Offset/Scale only) or make the whole group consistent --
+chose the latter. New `wirePoseGroupLivePreviewSync()` wraps every
+Pose-group control's own `onChange` (preserving the existing field-
+repose behavior, never replacing it) with an additional live
+`previewPosePreset(cfg)` call, scoped to `POSE_PRESET_KEYS` members
+only. Live-verified: Offset/Scale sliders now move/scale the preview
+hand correctly; a curl slider was confirmed to update BOTH the live
+field (existing behavior, unbroken) AND the preview hand (new
+behavior) at once. See CHANGELOG.txt's matching 2026-09-20 (7th follow-
+up round) entry for full detail.
+
 **SHIPPED 2026-09-20 (later same day, 6th follow-up round): computed
 the correct Pose Offset X/Y/Z for "COUNTDOWN (VERT) - LENS COVER"
 directly, ending the trial-and-error loop from the prior round's

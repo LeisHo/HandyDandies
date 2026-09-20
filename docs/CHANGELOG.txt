@@ -9791,6 +9791,51 @@ Added `handBoundsRadiusLocal`/`handBoundsCenterLocal` to
 matching the existing convention for this debug object.
 
 --------------------------------------------------------------------------------
+2026-09-20 (later same day, 7th follow-up round)
+
+Made every Pose-group slider live-update the Pose Preview panel, direct
+report: "in my pose settings group, the Offset and Scale sliders dont
+seem to do anything. They should be reflected in the pose preview."
+
+Investigated and found the scope was broader than the report: EVERY
+Pose-group slider (curl/splay/wristBend/Whole-Hand Rotation, not just
+Offset/Scale) had this same gap -- none of them ever touched
+`previewHand` at all. Each one's own existing `onChange`
+(`applyCurl()`/`applyWristPose()`/`onWholeHandRotationChange()`) only
+reposes the live FIELD's hands (`hands.forEach(...)`); `previewPosePreset()`
+(the function that actually poses the Pose Preview's own standalone
+hand) was only ever called from the savedPoses list-picker's "Use"
+button, the Tween group's "Run" button, and the initial default-pose
+load at startup -- never from a live slider drag. Asked the user via
+`AskUserQuestion` whether to fix this narrowly (Offset/Scale only) or
+make the whole Pose group consistent -- chose the latter.
+
+New `wirePoseGroupLivePreviewSync()` (an IIFE placed right after
+`POSE_PRESET_KEYS`'s own declaration -- referencing that array any
+earlier in the file would hit its own temporal dead zone, even though
+`previewPosePreset` itself is a hoisted function declaration and safe
+to reference from anywhere) wraps every Pose-group control's own
+`onChange` -- preserving whatever it already does, never replacing the
+existing field-repose behavior -- with an additional live re-apply of
+the CURRENT `cfg` state to the Pose Preview via `previewPosePreset(cfg)`.
+This works directly because `cfg` already carries every
+`POSE_PRESET_KEYS` field live, the exact same shape a saved pose object
+has -- no separate "current slider snapshot" object was needed. Scoped
+to `POSE_PRESET_KEYS` members only via `ctrl.key` lookup, so non-pose-
+data controls in the same group (`posePreviewEnabled`, `savedPoses`
+itself, action buttons) are untouched.
+
+Verified live: dragging `poseOffsetX` correctly moved
+`previewHand.clone.position` (camera-relative, matching the slider
+value exactly); `poseScale` correctly updated
+`previewHand.clone.scale`; dragging `thumbCurl` was checked both ways
+at once -- confirmed the live field's hand[0] thumb bone quaternion
+still changed (existing behavior preserved, via a real before/after
+diff, not assumed) AND the preview hand's own thumb bone reflected a
+real, non-default value too (the new behavior). No console errors
+beyond expected local `/api/save-settings` 404s. `node --check` clean.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================
