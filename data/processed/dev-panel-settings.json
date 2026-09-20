@@ -19,7 +19,7 @@
       "loadingPreviewEnabled": true,
       "loadingPreviewShowLive": true,
       "loadingMinTimeMs": 10000,
-      "loadingPreviewTweenSelector": "COUNTDOWN - VERTICAL + LENS COVER",
+      "loadingPreviewTweenSelector": "COUNTDOWN - VERTICAL",
       "loadingPreviewSavedCameras": [
         {
           "name": "Camera 20",
@@ -83,13 +83,13 @@
         },
         {
           "name": "Loading Preview Camera 7",
-          "cameraX": 1.2343194780671554,
-          "cameraY": 4.380298393657271,
-          "cameraZ": -85.46682562240704,
+          "cameraX": 0.12651138603122303,
+          "cameraY": 114.28329833534508,
+          "cameraZ": -10.307306344422209,
           "cameraFov": 32,
-          "targetX": 1.2343194780671631,
-          "targetY": -2.336339362970378,
-          "targetZ": -21.561671337969035
+          "targetX": 1.4281667549099366,
+          "targetY": -2.6489783106957527,
+          "targetZ": -31.895013472097368
         },
         {
           "name": "dfdsf",
@@ -110,9 +110,19 @@
           "targetX": 1.2343194780671631,
           "targetY": -2.336339362970378,
           "targetZ": -33.60014621531519
+        },
+        {
+          "name": "Loading Preview Camera 10",
+          "cameraX": -0.5861635138036829,
+          "cameraY": 156.4985416265008,
+          "cameraZ": -2.953325025676108,
+          "cameraFov": 32,
+          "targetX": 1.184574791814134,
+          "targetY": -2.5731038879410333,
+          "targetZ": -32.32068358723028
         }
       ],
-      "loadingPreviewCameraSelector": "Front-Straightened",
+      "loadingPreviewCameraSelector": "Loading Preview Camera 10",
       "loadingPreviewSavedLighting": [
         {
           "name": "3 Tone - SideFront",
@@ -161,21 +171,21 @@
       ],
       "loadingPreviewLightingSelector": "LOADING",
       "loadingPreviewSpeedMs": 10000,
-      "loadingPreviewSequenceMode": "Loop",
+      "loadingPreviewSequenceMode": "Count",
       "loadingPreviewSequenceCount": 1,
       "loadingPreviewSequenceCountMode": "Loop",
       "loadingPreviewSequenceLoopTransition": true,
       "loadingPreviewSequenceHoldMs": 0,
-      "loadingPreviewSize": 1000,
+      "loadingPreviewSize": 2000,
       "loadingPreviewRotationX": -79.52141477498444,
-      "loadingPreviewRotationY": -3.4505366585857034,
+      "loadingPreviewRotationY": -3.4505366585856976,
       "loadingPreviewRotationZ": 0,
-      "loadingPreviewOffsetX": 0.27796090493479864,
-      "loadingPreviewOffsetY": -2.310339603408437,
-      "loadingPreviewOffsetZ": -12.038474877346157,
+      "loadingPreviewOffsetX": 0.22821621868176956,
+      "loadingPreviewOffsetY": -2.5471041283790927,
+      "loadingPreviewOffsetZ": -10.759012249261243,
       "loadingPreviewCameraFov": 32,
-      "loadingPreviewCameraZoom": 64.25715498581916,
-      "loadingPreviewCameraEditMode": false,
+      "loadingPreviewCameraZoom": 161.7694831224421,
+      "loadingPreviewCameraEditMode": true,
       "customClickFunctionIds": "[{\"id\":\"custom1\",\"title\":\"Custom Click Function 1\",\"kind\":\"pose\",\"family\":\"desktop\"}]",
       "posePreviewEnabled": true,
       "thumbCurl": 75,
@@ -6047,9 +6057,9 @@
           "modelRotY": 0,
           "modelRotZ": 0,
           "poseOffsetX": -0.5,
-          "poseOffsetY": -8,
-          "poseOffsetZ": 55,
-          "poseScale": 1,
+          "poseOffsetY": -4.1,
+          "poseOffsetZ": 42.6,
+          "poseScale": 3,
           "hideWrist": 78,
           "shoulderRaise": 0,
           "shoulderSwing": 0,
@@ -7022,7 +7032,7 @@
       "loadingPreviewEnabled": true,
       "loadingPreviewShowLive": true,
       "loadingMinTimeMs": 10000,
-      "loadingPreviewTweenSelector": "COUNTDOWN - VERTICAL + LENS COVER",
+      "loadingPreviewTweenSelector": "COUNTDOWN - VERTICAL",
       "loadingPreviewSavedCameras": [
         {
           "name": "Camera 20",
@@ -7086,13 +7096,13 @@
         },
         {
           "name": "Loading Preview Camera 7",
-          "cameraX": 1.2343194780671554,
-          "cameraY": 4.380298393657271,
-          "cameraZ": -85.46682562240704,
+          "cameraX": 0.12651138603122303,
+          "cameraY": 114.28329833534508,
+          "cameraZ": -10.307306344422209,
           "cameraFov": 32,
-          "targetX": 1.2343194780671631,
-          "targetY": -2.336339362970378,
-          "targetZ": -21.561671337969035
+          "targetX": 1.4281667549099366,
+          "targetY": -2.6489783106957527,
+          "targetZ": -31.895013472097368
         },
         {
           "name": "dfdsf",
@@ -7113,9 +7123,19 @@
           "targetX": 1.2343194780671631,
           "targetY": -2.336339362970378,
           "targetZ": -33.60014621531519
+        },
+        {
+          "name": "Loading Preview Camera 10",
+          "cameraX": -0.5861635138036829,
+          "cameraY": 156.4985416265008,
+          "cameraZ": -2.953325025676108,
+          "cameraFov": 32,
+          "targetX": 1.184574791814134,
+          "targetY": -2.5731038879410333,
+          "targetZ": -32.32068358723028
         }
       ],
-      "loadingPreviewCameraSelector": "Front-Straightened",
+      "loadingPreviewCameraSelector": "Loading Preview Camera 10",
       "loadingPreviewSavedLighting": [
         {
           "name": "3 Tone - SideFront",
@@ -7164,21 +7184,21 @@
       ],
       "loadingPreviewLightingSelector": "LOADING",
       "loadingPreviewSpeedMs": 10000,
-      "loadingPreviewSequenceMode": "Loop",
+      "loadingPreviewSequenceMode": "Count",
       "loadingPreviewSequenceCount": 1,
       "loadingPreviewSequenceCountMode": "Loop",
       "loadingPreviewSequenceLoopTransition": true,
       "loadingPreviewSequenceHoldMs": 0,
-      "loadingPreviewSize": 1000,
+      "loadingPreviewSize": 2000,
       "loadingPreviewRotationX": -79.52141477498444,
-      "loadingPreviewRotationY": -3.4505366585857034,
+      "loadingPreviewRotationY": -3.4505366585856976,
       "loadingPreviewRotationZ": 0,
-      "loadingPreviewOffsetX": 0.27796090493479864,
-      "loadingPreviewOffsetY": -2.310339603408437,
-      "loadingPreviewOffsetZ": -12.038474877346157,
+      "loadingPreviewOffsetX": 0.22821621868176956,
+      "loadingPreviewOffsetY": -2.5471041283790927,
+      "loadingPreviewOffsetZ": -10.759012249261243,
       "loadingPreviewCameraFov": 32,
-      "loadingPreviewCameraZoom": 64.25715498581916,
-      "loadingPreviewCameraEditMode": false,
+      "loadingPreviewCameraZoom": 161.7694831224421,
+      "loadingPreviewCameraEditMode": true,
       "customClickFunctionIds": "[{\"id\":\"custom1\",\"title\":\"Custom Click Function 1\",\"kind\":\"pose\",\"family\":\"desktop\"}]",
       "posePreviewEnabled": true,
       "thumbCurl": 75,
@@ -13050,9 +13070,9 @@
           "modelRotY": 0,
           "modelRotZ": 0,
           "poseOffsetX": -0.5,
-          "poseOffsetY": -8,
-          "poseOffsetZ": 55,
-          "poseScale": 1,
+          "poseOffsetY": -4.1,
+          "poseOffsetZ": 42.6,
+          "poseScale": 3,
           "hideWrist": 78,
           "shoulderRaise": 0,
           "shoulderSwing": 0,
@@ -14025,7 +14045,7 @@
       "loadingPreviewEnabled": true,
       "loadingPreviewShowLive": true,
       "loadingMinTimeMs": 10000,
-      "loadingPreviewTweenSelector": "COUNTDOWN - VERTICAL + LENS COVER",
+      "loadingPreviewTweenSelector": "COUNTDOWN - VERTICAL",
       "loadingPreviewSavedCameras": [
         {
           "name": "Camera 20",
@@ -14089,13 +14109,13 @@
         },
         {
           "name": "Loading Preview Camera 7",
-          "cameraX": 1.2343194780671554,
-          "cameraY": 4.380298393657271,
-          "cameraZ": -85.46682562240704,
+          "cameraX": 0.12651138603122303,
+          "cameraY": 114.28329833534508,
+          "cameraZ": -10.307306344422209,
           "cameraFov": 32,
-          "targetX": 1.2343194780671631,
-          "targetY": -2.336339362970378,
-          "targetZ": -21.561671337969035
+          "targetX": 1.4281667549099366,
+          "targetY": -2.6489783106957527,
+          "targetZ": -31.895013472097368
         },
         {
           "name": "dfdsf",
@@ -14116,9 +14136,19 @@
           "targetX": 1.2343194780671631,
           "targetY": -2.336339362970378,
           "targetZ": -33.60014621531519
+        },
+        {
+          "name": "Loading Preview Camera 10",
+          "cameraX": -0.5861635138036829,
+          "cameraY": 156.4985416265008,
+          "cameraZ": -2.953325025676108,
+          "cameraFov": 32,
+          "targetX": 1.184574791814134,
+          "targetY": -2.5731038879410333,
+          "targetZ": -32.32068358723028
         }
       ],
-      "loadingPreviewCameraSelector": "Front-Straightened",
+      "loadingPreviewCameraSelector": "Loading Preview Camera 10",
       "loadingPreviewSavedLighting": [
         {
           "name": "3 Tone - SideFront",
@@ -14167,21 +14197,21 @@
       ],
       "loadingPreviewLightingSelector": "LOADING",
       "loadingPreviewSpeedMs": 10000,
-      "loadingPreviewSequenceMode": "Loop",
+      "loadingPreviewSequenceMode": "Count",
       "loadingPreviewSequenceCount": 1,
       "loadingPreviewSequenceCountMode": "Loop",
       "loadingPreviewSequenceLoopTransition": true,
       "loadingPreviewSequenceHoldMs": 0,
-      "loadingPreviewSize": 1000,
+      "loadingPreviewSize": 2000,
       "loadingPreviewRotationX": -79.52141477498444,
-      "loadingPreviewRotationY": -3.4505366585857034,
+      "loadingPreviewRotationY": -3.4505366585856976,
       "loadingPreviewRotationZ": 0,
-      "loadingPreviewOffsetX": 0.27796090493479864,
-      "loadingPreviewOffsetY": -2.310339603408437,
-      "loadingPreviewOffsetZ": -12.038474877346157,
+      "loadingPreviewOffsetX": 0.22821621868176956,
+      "loadingPreviewOffsetY": -2.5471041283790927,
+      "loadingPreviewOffsetZ": -10.759012249261243,
       "loadingPreviewCameraFov": 32,
-      "loadingPreviewCameraZoom": 64.25715498581916,
-      "loadingPreviewCameraEditMode": false,
+      "loadingPreviewCameraZoom": 161.7694831224421,
+      "loadingPreviewCameraEditMode": true,
       "customClickFunctionIds": "[{\"id\":\"custom1\",\"title\":\"Custom Click Function 1\",\"kind\":\"pose\",\"family\":\"desktop\"}]",
       "posePreviewEnabled": true,
       "thumbCurl": 75,
@@ -20053,9 +20083,9 @@
           "modelRotY": 0,
           "modelRotZ": 0,
           "poseOffsetX": -0.5,
-          "poseOffsetY": -8,
-          "poseOffsetZ": 55,
-          "poseScale": 1,
+          "poseOffsetY": -4.1,
+          "poseOffsetZ": 42.6,
+          "poseScale": 3,
           "hideWrist": 78,
           "shoulderRaise": 0,
           "shoulderSwing": 0,
@@ -22195,7 +22225,7 @@
           "type": "group",
           "group": {
             "key": "New Group (5)",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -22253,7 +22283,7 @@
           "type": "group",
           "group": {
             "key": "New Group (7)",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -22340,7 +22370,7 @@
       "subgroups": [
         {
           "key": "New Group (5)",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
@@ -22395,7 +22425,7 @@
         },
         {
           "key": "New Group (7)",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
@@ -22472,7 +22502,7 @@
     },
     {
       "key": "Tween",
-      "collapsed": false,
+      "collapsed": true,
       "locked": false,
       "items": [
         {
