@@ -187,7 +187,7 @@
       "loadingPreviewCameraZoom": 64.25715498581914,
       "loadingPreviewCameraEditMode": true,
       "customClickFunctionIds": "[{\"id\":\"custom1\",\"title\":\"Custom Click Function 1\",\"kind\":\"pose\",\"family\":\"desktop\"}]",
-      "posePreviewEnabled": true,
+      "posePreviewEnabled": false,
       "thumbCurl": 0,
       "thumbSplay": -48,
       "thumbSplay2": -8,
@@ -7259,7 +7259,7 @@
       "loadingPreviewCameraZoom": 64.25715498581914,
       "loadingPreviewCameraEditMode": true,
       "customClickFunctionIds": "[{\"id\":\"custom1\",\"title\":\"Custom Click Function 1\",\"kind\":\"pose\",\"family\":\"desktop\"}]",
-      "posePreviewEnabled": true,
+      "posePreviewEnabled": false,
       "thumbCurl": 0,
       "thumbSplay": -48,
       "thumbSplay2": -8,
@@ -14331,7 +14331,7 @@
       "loadingPreviewCameraZoom": 64.25715498581914,
       "loadingPreviewCameraEditMode": true,
       "customClickFunctionIds": "[{\"id\":\"custom1\",\"title\":\"Custom Click Function 1\",\"kind\":\"pose\",\"family\":\"desktop\"}]",
-      "posePreviewEnabled": true,
+      "posePreviewEnabled": false,
       "thumbCurl": 0,
       "thumbSplay": -48,
       "thumbSplay2": -8,
@@ -22679,7 +22679,7 @@
     },
     {
       "key": "Tween",
-      "collapsed": false,
+      "collapsed": true,
       "locked": false,
       "items": [
         {
