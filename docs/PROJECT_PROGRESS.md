@@ -18,6 +18,28 @@ work seamlessly from there.
 
 ## Currently working on
 
+**SHIPPED 2026-09-20 (later same day, 4th follow-up round): fixed the
+dev panel losing clicks to the Loading Preview canvas whenever Camera
+Edit Mode was on (direct report: "i cant unclick the checkbox. I want
+the dev panel to be fully functional even in that mode").** Root cause:
+`#loadingPreviewCanvas` (z-index 100000, set for its own valid "always
+visible" reason) becomes `pointer-events:auto` while Camera Edit Mode is
+active (so its own OrbitControls can receive drag input); since that
+z-index was HIGHER than the dev panel's own (9999), a click anywhere the
+fully-draggable/resizable panel visually overlapped the canvas (which
+can grow to 400px) hit the canvas instead of the panel control
+underneath it. Fixed by raising `.dp-panel`'s own z-index to 200000 --
+the panel must always win over any other feature's overlay, on the
+general principle the user stated directly, not just for this one
+checkbox. Live-verified via `document.elementFromPoint()` plus a real
+coordinate-based click sequence (not `.click()`, which would falsely
+pass this exact bug): forced the canvas to cover the checkbox's own
+screen point, confirmed the checkbox -- not the canvas -- is now the hit
+target, and a real click there correctly toggled it off. Regression-
+checked the canvas still receives clicks outside the panel's own bounds.
+See CHANGELOG.txt's matching 2026-09-20 (4th follow-up round) entry for
+full detail.
+
 **SHIPPED 2026-09-20 (later same day, 3rd follow-up round): ported the
 one genuinely new change from `.claude/TEMPLATE_DEV_PANEL.html` since
 the last documented port (2026-09-19).** "+ Add Group" with an active

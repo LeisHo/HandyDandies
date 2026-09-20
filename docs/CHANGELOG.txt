@@ -9633,6 +9633,54 @@ Group (2)" avoiding the collision with the first test group). `node
 --check` clean on both `main.js` and `devPanel.js`.
 
 --------------------------------------------------------------------------------
+2026-09-20 (later same day, 4th follow-up round)
+
+Fixed the dev panel losing clicks to the Loading Preview canvas whenever
+Camera Edit Mode was on, direct report: "when im in Loading Preview
+Camera Edit Mode, i cant unclick the checkbox. I want the dev panel to
+be fully functional even in that mode."
+
+Root cause: `#loadingPreviewCanvas` has `z-index:100000` (set 2026-09-17
+for its own valid reason -- "it should just show ontop of everything in
+browser" -- back when its `pointer-events` was permanently `none`, so
+the high z-index only ever affected paint order). `loadingPreviewCameraEditMode`'s
+own `onChange` (added later, for the orbit-camera feature) flips that
+canvas to `pointer-events:auto` while active, so its own OrbitControls
+instance (whose DOM element IS this canvas) can receive drag input --
+but since the canvas's z-index was HIGHER than the dev panel's
+(`.dp-panel`, 9999), a click landing anywhere the panel visually
+overlapped that canvas hit the canvas instead of whatever panel control
+was underneath it. The panel is fully draggable/resizable (§12c) and the
+canvas can grow up to 400px via its own Size slider, so overlap is easy
+to hit in ordinary use, not an edge case.
+
+Fixed by raising `.dp-panel`'s own z-index to 200000, above the canvas
+-- the dev panel (including an Undock floating panel, which also
+carries the `.dp-panel` class) must always win pointer hit-testing over
+any other feature's own overlay, on the general principle stated
+directly by the user ("I want the dev panel to be fully functional even
+in that mode"), not just for this one specific checkbox. The canvas's
+own z-index was left unchanged -- it's still correctly above the main
+scene/`#viewport`, which is the actual thing it needed to stay visible
+over; only its ranking relative to the PANEL needed to change.
+
+Verified live via `document.elementFromPoint()` plus a real coordinate-
+based `pointerdown`/`mousedown`/`pointerup`/`mouseup`/`click` event
+sequence (not `.click()`, which bypasses real hit-testing entirely and
+would falsely pass this exact bug -- this project's own established
+testing-methodology lesson from a prior Undo-button self-reference bug,
+applied here again): forced the canvas to directly cover the Camera
+Edit Mode checkbox's own screen point via inline style overrides,
+confirmed `elementFromPoint()` now returns the checkbox itself (not the
+canvas), then dispatched a real click there and confirmed it correctly
+toggled off (`before: true -> after: false`, both `cfg` and the canvas's
+own `pointer-events` updating correctly as a result). Regression-checked
+that the canvas still correctly receives clicks (for orbiting) at a
+point outside the panel's own bounds, confirming the fix is scoped to
+the overlap case only. No console errors beyond expected local
+`/api/save-settings` 404s.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================
