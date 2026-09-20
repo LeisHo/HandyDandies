@@ -944,7 +944,7 @@ const DEV_GROUPS = [
         itemLabel: 'Pose',
         importable: true,
         captureCurrent: () => capturePosePreset(),
-        onUse: (item) => previewPosePreset(item),
+        onUse: (item) => syncCfgAndSlidersFromPose(item),
         // Click-Hold-Pose's own 2 Target Pose dropdowns (chpTargetPose/
         // rchpTargetPose) read this same list via options(), but a
         // 'select' control's <option> list is only rebuilt on an explicit
@@ -2767,6 +2767,37 @@ const POSE_PRESET_KEYS = [
     }
   })
 })()
+// savedPoses' own "Use" button -- direct follow-up report ("when i
+// select a pose and hit Use, the pose preview changes accordingly, but
+// i want the Offset and scale slides and all the other pose sliders to
+// adjust accordingly"). The reverse direction of
+// wirePoseGroupLivePreviewSync() above: that made every slider push
+// INTO the preview; this makes "Use" pull the selected pose's own
+// values back OUT into `cfg` and the slider UI, so the panel always
+// shows what's actually being previewed instead of staying at whatever
+// it was left at before Use was clicked.
+//
+// Writes `cfg[key]` directly (not `commit()`) and uses `syncValue()` --
+// same "externally-driven update" convention already established for
+// useTweenSequencePreset() -- so the main FIELD's own hands are never
+// touched (`cfg[key] = ...` alone doesn't trigger any repose; only an
+// explicit applyCurl()/applyWristPose()/onWholeHandRotationChange()
+// call would, none of which run here), preserving the original,
+// already-established "Use should NOT repose every hand in the field"
+// design. `syncValue()` itself doesn't fire a control's own `onChange`
+// (a deliberate devPanel.js behavior, avoiding exactly the kind of
+// feedback loop that would otherwise re-trigger here), so the explicit
+// `previewPosePreset(cfg)` call at the end is still needed to actually
+// update the preview's own render -- this fully replaces the old
+// `onUse: (item) => previewPosePreset(item)`, not just adds to it.
+function syncCfgAndSlidersFromPose(item) {
+  POSE_PRESET_KEYS.forEach((key) => {
+    const value = item[key] !== undefined ? item[key] : POSE_KEY_DEFAULTS[key]
+    cfg[key] = value
+    syncValue(key, value)
+  })
+  previewPosePreset(cfg)
+}
 function capturePosePreset() {
   const item = {}
   POSE_PRESET_KEYS.forEach((key) => { item[key] = cfg[key] })
