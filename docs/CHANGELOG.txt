@@ -8506,6 +8506,110 @@ Cache-buster: `index.html`'s `main.js?v=166` -> `?v=167`; `main.js`'s
 own `devPanel.js?v=33` import -> `?v=34`.
 
 --------------------------------------------------------------------------------
+2026-09-19  23:05:27-23:28:07 EDT (22m40s, measured)
+
+**Real data-loss incident, root-caused and repaired: Loading Preview's
+3 renamed subgroups (Camera/Lighting/Pose) and Pose's own "Thumb"
+subgroup were flattened into a single generic "New Group" -- twice,
+including once WHILE this investigation was in progress.** Direct
+reports: "I still cant find my Loading Preview setting groups and
+settings that have been lost" -> "I do not see 3 subgroup within
+Loading Preview. I only see 1 called Loading Preview Lighting, and all
+my settings are within that one group... the Thumb posing settings
+ahve also been moved into the Laoidng Preview Lighitng Group... Restore
+all that."
+
+**Root cause, deeper than the group-merge bug fixed earlier today
+(commit 58bec38): renaming a group is PURELY COSMETIC.**
+`openTextEditFor()` (the group-title rename handler) only ever writes
+to `textOverrides[key]` and the visible `.dp-group-title-text`; it
+NEVER touches the group's own `dataset.key` (set once, at creation, in
+`createGroupElement()`). This project's 3 Loading Preview subgroups and
+Pose's own "Thumb" subgroup were ALL originally created via generic
+"+ Add Group" (before today's earlier `addCustomGroup()` de-dup fix
+existed) and so ALL still carried the literal internal key "New
+Group" -- their custom display names ("Loading Preview Camera",
+"Loading Preview Lighting", "Loading Preview Pose", "Thumb") were
+never anything more than 4 different values fighting over the SAME
+`textOverrides["New Group"]` string, and `applyTextOverrides()` gives
+EVERY group sharing that key the exact same displayed title. Confirmed
+directly: `data/processed/dev-panel-settings.json` had
+`textOverrides["New Group"] === "LOADING PREVIEW LIGHTING"` and all 4
+groups' own saved `key` was literally `"New Group"`.
+
+**This explains why "restore all that" needed a genuine DATA repair,
+not just a code fix.** Today's earlier `applyOrder()` fix
+(`usedGroupEls`) already stops these 4 from re-merging in the DOM on
+restore -- but with the OLD, not-yet-repaired settings JSON, restoring
+still produced 4 SEPARATE elements that all DISPLAYED the identical
+title "Loading Preview Lighting" (the title collision, not a content
+merge). A first repair pass (verified live: `getPanelOrder()`
+correctly re-split it into 4 distinct, correctly-labeled, correctly-
+populated groups) was committed -- but a real, live user Save happened
+DURING that verification window, from a browser tab that had NOT yet
+reloaded past the earlier `58bec38`/`6d51002` deploy. That stale tab's
+own in-memory DOM still reflected the pre-fix state; hitting Save
+re-captured and re-persisted a merged "New Group" (25 settings: the
+original 8 Camera + 1 Lighting + 8 Pose + 8 Thumb, in that exact
+order) and stomped the first repair before it was even confirmed live.
+Caught by re-fetching `origin/main` before finishing this round and
+finding 4 NEW commits that hadn't been there minutes earlier.
+
+**Second, final repair:** re-derived the exact 4-way key split from the
+known settings lists (Camera: `loadingPreviewRotationX/Y/Z`,
+`loadingPreviewOffsetX/Y`, `loadingPreviewCameraFov/Zoom`,
+`loadingPreviewSavedCameras`; Lighting: `loadingPreviewSavedLighting`;
+Pose: `loadingPreviewTweenSelector`, `loadingPreviewCameraSelector`,
+`loadingPreviewLightingSelector`, `loadingPreviewSequenceMode`,
+`loadingPreviewSpeedMs`, `loadingPreviewSize`,
+`loadingPreviewSequenceHoldMs`, `loadingPreviewSequenceLoopTransition`;
+Thumb: `thumbCurl`, `tipOnlyCurlThumb`, `midOnlyCurlThumb`,
+`baseOnlyCurlThumb`, `tipTwistThumb`, `thumbSplay`, `thumbSplay2`,
+`curlBiasThumb`), asserted the merged group's own 25-key `settings`
+array matched this split EXACTLY before writing anything (a hard
+`throw` on mismatch, not a silent best-effort guess), then rebuilt
+`Loading Preview`'s own `subgroups`/`items` as 3 correctly-keyed groups
+and reinserted `Thumb` into `Pose`'s own `subgroups`/`items` between
+`Wrist` and `Index` (its original position). Removed the now-stale
+`textOverrides["New Group"]` entry -- no group carries that key
+anymore, so nothing needs the override. Diffed the final change against
+its own known field list before committing (confirmed the diff touches
+ONLY the 4 group keys + the 8 Thumb setting keys + the 4 structural
+fields, nothing in `values` or any other group).
+
+**Also fixed, same round, direct request ("I still see yellow text in
+my setting titles... It should all be the same text color as sset i
+the dev panel group"):** `.dp-row.dp-per-device label { color:
+#ffd27d; }` (style.css) -- a deliberate visual cue added earlier this
+project's history to distinguish `perDevice: true` controls (Cursor
+Tracking's own settings, all `perDevice: true` per this file's own
+"Dev-panel behavior" section) -- removed per this direct request; falls
+through to the normal configured `--dp-text-color` now.
+
+**IMPORTANT — told the user directly:** any browser tab that has been
+open since before this session's `58bec38`/`6d51002` commits is still
+running the OLD, pre-fix JS in memory and will re-corrupt this exact
+data the next time it Saves, regardless of what's now committed. A
+hard refresh (or closing and reopening the tab) is required before
+touching Save again.
+
+Verified (this round): the FIRST repair pass live, via the same
+disclosed/reverted `window.fetch` intercept technique as earlier
+today's entries -- confirmed 3 correctly-named, correctly-populated
+Loading Preview subgroups and a correctly-restored Thumb subgroup under
+Pose, plus the yellow-label fix (`getComputedStyle` confirmed
+`.dp-per-device label` and a normal `.dp-row label` now compute to the
+identical color). The SECOND (final, currently-committed) repair was
+verified via the exact-match assertion at write time and a structural
+post-write dump (shown above) rather than a fresh live reload, given
+the time-sensitive race with the user's own live session -- worth a
+final live confirm once the user has hard-refreshed.
+
+Cache-buster: `index.html`'s `style.css?v=14` -> `?v=15` (this
+project's own standing style.css-cache-buster discipline, per an
+earlier 2026-09-17 gotcha in CLAUDE.md).
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

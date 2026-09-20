@@ -18,7 +18,36 @@ work seamlessly from there.
 
 ## Currently working on
 
-**SHIPPED 2026-09-19 (latest round): ported 3 applicable changes from
+**RESOLVED 2026-09-19 (latest, urgent round): real data-loss incident —
+Loading Preview's 3 renamed subgroups (Camera/Lighting/Pose) and Pose's
+own "Thumb" subgroup had been flattened into one generic "New Group",
+TWICE, including once while this was actively being investigated.**
+Root cause was deeper than the group-merge bug fixed earlier the same
+day: renaming a group in this dev panel is PURELY COSMETIC — the
+rename handler only ever writes a display override, never the group's
+own internal identity key (set once, at creation). All 4 of these
+groups were originally created via generic "+ Add Group" before this
+project had any de-dup protection, so all 4 silently shared the exact
+same internal key "New Group" — their custom names were really just 4
+values fighting over one shared override string, which is why every
+one of them displayed as whichever name was applied most recently. Data
+was hand-repaired by re-deriving the exact 4-way settings split from
+known key lists, with a hard assertion against the actual merged data
+before writing anything (never a guess). **A live user Save happened
+mid-investigation from a browser tab that hadn't reloaded past this
+session's own fix commits — that stale tab re-corrupted the data a
+2nd time before the first repair could even be confirmed**, caught by
+re-fetching `origin/main` and finding new commits that weren't there
+minutes earlier; repaired again and pushed. **The user needs to hard-
+refresh (or close/reopen) any dev-panel browser tab that's been open
+since before today's fixes, before touching Save again** — an already-
+open tab is still running old code in memory regardless of what's
+committed. Also removed a hardcoded yellow label color for per-device
+settings, per direct request. See CHANGELOG.txt's matching 2026-09-19
+entry for the full account, including the exact key lists used for the
+repair.
+
+**SHIPPED 2026-09-19 (earlier same day): ported 3 applicable changes from
 `.claude/TEMPLATE_DEV_PANEL.html`'s own 2026-09-19 updates.** Direct
 request ("look at the dev panel template and implement new changes").
 (1) Sticky header — confirmed already unnecessary here (this project's

@@ -299,6 +299,55 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   (`siblingSelector.split(',').map(s => ':scope > ' + s.trim()).join(', ')`).
   See CHANGELOG.txt's matching 2026-09-19 entry for the full account,
   including live verification of the fix.
+- **Renaming a devPanel.js group is PURELY COSMETIC — it never changes
+  the group's own internal identity, which is exactly what caused a
+  real data-loss incident 2026-09-19.** `openTextEditFor()` (the rename
+  handler) only ever writes `textOverrides[key]` (a display-only
+  override) and the visible title text; it NEVER touches
+  `g.dataset.key`, which is set ONCE, at creation
+  (`createGroupElement()`), and used as the group's real identity by
+  `captureGroup()`/`applyOrder()` everywhere else. Any 2+ groups
+  created via generic "+ Add Group" and left un-renamed at that exact
+  moment all start with the literal key "New Group" — renaming them
+  to different DISPLAY names afterward does nothing to separate their
+  real identities, so they keep sharing ONE `textOverrides["New
+  Group"]` slot (whichever rename happened most recently wins for ALL
+  of them) and, before today's earlier `usedGroupEls` restore fix
+  existed, would also merge their actual CONTENT together on reload.
+  Confirmed as the real mechanism behind "I only see 1 called Loading
+  Preview Lighting, and all my settings are within that one group" —
+  3 renamed Loading Preview subgroups (Camera/Lighting/Pose) plus
+  Pose's own "Thumb" subgroup all still carried key "New Group"
+  underneath their custom names. Today's `addCustomGroup()` fix (whole-
+  panel de-dup check, same day) prevents a NEW collision like this from
+  being created going forward, but does nothing to un-collide groups
+  that already collided before that fix existed — those need a real
+  data repair (see CHANGELOG.txt's matching entry for exactly how this
+  one was done: re-deriving the split from known settings-key lists,
+  asserted against the actual merged data before writing). If a report
+  ever again describes multiple distinctly-organized groups all
+  showing the same name, or a group's settings looking mixed with an
+  unrelated group's, check `dataset.key` collisions first — the
+  DISPLAYED name is never proof of a group's real identity in this
+  file.
+- **A browser tab that's been open since before a devPanel.js/main.js
+  fix was deployed is still running the OLD code in memory — closing
+  the gap on GitHub/Vercel does not hot-reload an already-open tab.**
+  Confirmed live 2026-09-19: after committing the group-merge restore
+  fix (`58bec38`) and starting to verify a hand-written data repair for
+  it, a NEW commit appeared on `origin/main` mid-verification — a real,
+  live Save from the user's own browser tab, which had not reloaded
+  since before the fix shipped. That stale tab's still-buggy in-memory
+  `captureGroup()` re-merged the just-repaired groups right back
+  together and overwrote the repair before it was even confirmed live.
+  Caught only by re-fetching `origin/main` before finishing and noticing
+  commits that weren't there minutes earlier. When a fix depends on the
+  USER's own browser picking up new code (any devPanel.js/main.js
+  change, not just this one), say so explicitly and tell them to hard-
+  refresh BEFORE they next hit Save/Sync — don't assume a push alone is
+  enough, and re-check `origin/main` immediately before finishing any
+  session that hand-edits `data/processed/dev-panel-settings.json`, in
+  case a concurrent live save landed while working.
 - **`src/main.js` (441,597 bytes as of 2026-09-17) truncates at a fixed
   391,680-byte cutoff when served by a plain static server in this
   environment — and the connection resets, aborting the load.**
