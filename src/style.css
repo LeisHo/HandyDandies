@@ -202,23 +202,40 @@ html, body {
    positioning; this engine's flex header lets margin-left:auto just push
    it to the far right instead). See createGroupElement()/setupReorder()
    for the actual lock state + reorder-refusal logic. */
-.dp-group-lock-icon { flex: 0 0 auto; margin-left: auto; cursor: pointer; opacity: 0.6; padding: 0 2px; }
+.dp-group-lock-icon { flex: 0 0 auto; cursor: pointer; opacity: 0.6; padding: 0 2px; }
 .dp-group-lock-icon:hover { opacity: 1; }
 /* Undock/Dock button (ported from TEMPLATE_DEV_PANEL.html) -- sits
    between the group's own device checkbox and the lock icon in DOM
    order (createGroupElement()), deliberately WITHOUT its own
-   margin-left:auto so it flows normally right up against the lock
-   icon's own auto-margin push, rather than claiming a separate share of
-   the flex row's free space (2 auto-margins in one row split the space
-   between them, which visually separated the undock button from the
-   lock icon instead of the "always adjacent, lock rightmost" layout
-   requested). The header's own indepCascadeCheckbox is overridden the
-   same way, right below, for the same reason -- the group-level cascade
-   checkbox specifically, not the global per-row `.dp-dynamic-device-
-   checkbox-2nd` rule other rows still rely on. */
+   margin-left:auto so it flows normally right up against whichever
+   element ahead of it is doing the actual right-push, rather than
+   claiming a separate share of the flex row's free space (2+ auto
+   margins in one row split the space between them, separating the
+   undock button/lock icon from the pushed checkbox instead of the
+   "always adjacent, right edge" layout requested).
+   CORRECTED 2026-09-20 (direct report: "the Show in Mobile checkbox
+   should be right aligned. It is in Mobile but not in Desktop") -- the
+   original version of this comment put the single auto-margin on the
+   LOCK icon itself, assuming zero-margin siblings before it would get
+   "dragged" along. Measured live: they don't -- margin-left:auto only
+   pushes the element it's on (consuming free space immediately before
+   that element), so the checkbox+undock button stayed clustered near
+   the title while only the lock icon reached the true right edge,
+   leaving a real gap (confirmed ~110-128px live). Moved the single
+   auto-margin onto the group's own cascade checkbox instead (below --
+   now UNSCOPED from `.dp-dynamic-device-checkbox-2nd`, since both the
+   Desktop-tab "Show in Mobile/Landscape" and the Mobile/Landscape-tab
+   "Independent from Desktop" checkbox need the identical push, and only
+   one of the two is ever actually rendered at a time per
+   refreshGroupCascadeChrome()) -- undock/lock keep zero margin and now
+   genuinely ride flush against it, live-verified (checkbox/undock/lock
+   ending within ~6px of the header's own right edge on both tabs,
+   matching the row-level `.dp-dynamic-device-checkbox-2nd` rule below
+   that already worked correctly by relying on incidental row-content
+   width rather than a real auto-margin push). */
 .dp-group-undock-btn { flex: 0 0 auto; cursor: pointer; opacity: 0.6; padding: 0 2px; }
 .dp-group-undock-btn:hover { opacity: 1; }
-.dp-group-header > .dp-group-cascade-checkbox.dp-dynamic-device-checkbox-2nd { margin-left: 0; }
+.dp-group-header > .dp-group-cascade-checkbox { margin-left: auto; }
 /* Locked is the visual INVERSE of unlocked (direct request, 2026-09-17):
    unlocked stays low-opacity until hovered (rule above); a LOCKED icon
    is instead full-opacity by default, dropping to the same low opacity

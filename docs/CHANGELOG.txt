@@ -9930,6 +9930,55 @@ steps (which control, which exact checkbox, what it looks like) to
 continue.
 
 --------------------------------------------------------------------------------
+2026-09-20 (later same day, 10th follow-up round)
+
+Fixed a real bug the prior round's investigation missed: the group-level
+"Show in Mobile/Landscape" (Desktop tab) and "Independent from Desktop"
+(Mobile/Landscape tab) cascade checkboxes were NEVER actually
+right-aligned against the lock icon at any group-header nesting depth,
+despite CSS comments claiming they were. Direct report: "the Show in
+Mobile checkbox shoud be right aligned. It is in Mobile but not in
+Desktop."
+
+Root cause, confirmed via live `getBoundingClientRect()` measurement,
+not just visual inspection: the original CSS put the single
+`margin-left: auto` on the LOCK ICON itself (assuming zero-margin
+siblings before it, like the checkbox and undock button, would get
+"dragged" along to the right edge). They don't -- `margin-left: auto`
+only pushes the element it's applied to, consuming free space
+immediately before THAT element; siblings before it stay in normal
+flow. Measured live: checkbox+undock clustered right after the title
+(~140px from the header's left edge), with a genuine ~110-128px gap
+before the lock icon, which alone reached the right edge. This also
+explains why "Independent from Desktop" looked right when tested
+per-row inline: the ROW-level version of this checkbox (a different,
+already-correct rule, `.dp-dynamic-device-checkbox-2nd { margin-left:
+auto }`, unmodified by the group-header-specific override) worked as
+intended; only the GROUP-header-level version was broken, and only the
+group-header case was tested visually in the prior round -- confirmed
+directly this round via before/after position measurements at both the
+row and group-header level on the "Offset" subgroup and "Click
+Hold-Pose" top-level group.
+
+Fix (`src/style.css`): moved the single `margin-left: auto` from
+`.dp-group-lock-icon` onto `.dp-group-header > .dp-group-cascade-
+checkbox` itself, UNSCOPED from `.dp-dynamic-device-checkbox-2nd` (so
+it applies to whichever of the two group-level cascade checkboxes is
+actually rendered -- only one is ever visible at a time per
+`refreshGroupCascadeChrome()`), and removed the checkbox's own
+`-2nd`-scoped override that had reset it back to 0. Live-verified
+before shipping (a temporary injected `<style>` override tested the
+exact fix first, then applied to the real file and re-verified after a
+cache-bust reload): checkbox+undock+lock now cluster within ~6px of the
+header's own right edge, confirmed identically on the Desktop tab's
+"Show in Mobile/Landscape" and the Mobile tab's "Independent from
+Desktop," at both the top-level group and a nested gated-subgroup
+("Offset," which also confirmed its own real on/off "gate row" checkbox
+--the actual value, not device chrome -- correctly stayed unaffected,
+still reading naturally as part of the title). `style.css` cache-buster
+bumped `?v=17` -> `?v=18` in `index.html`.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

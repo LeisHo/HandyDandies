@@ -18,6 +18,20 @@ work seamlessly from there.
 
 ## Currently working on
 
+**SHIPPED 2026-09-20 (later same day, 10th follow-up round) -- fixed
+group-level device-checkbox right-alignment ("the Show in Mobile
+checkbox shoud be right aligned. It is in Mobile but not in Desktop").**
+The 9th round's investigation found no bug because it only checked
+ROW-level checkboxes (already correct); the GROUP-header-level cascade
+checkboxes were genuinely never right-aligned, confirmed via live
+position measurement -- the original CSS put the auto-margin on the
+lock icon itself instead of the checkbox, which doesn't drag preceding
+siblings along. Moved the auto-margin onto the group's own cascade
+checkbox (`src/style.css`), live-verified flush against the lock icon
+on both Desktop and Mobile tabs, top-level and nested. `style.css`
+cache-buster bumped to `?v=18`. See CHANGELOG.txt's matching entry for
+the full before/after measurements.
+
 **INVESTIGATED 2026-09-20 (later same day, 9th follow-up round) --
 Click Function group checkbox report, no code change: "make sure the
 click function group checkboxes work on desktop. Mobile looks good but
