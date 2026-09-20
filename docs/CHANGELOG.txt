@@ -8681,6 +8681,89 @@ across the diagnostic bump/revert cycle, same as prior sessions'
 established pattern).
 
 --------------------------------------------------------------------------------
+2026-09-19 23:48:54 - 2026-09-20 00:00:29 EDT (11m35s; direct report
+"pose transitions and animations are so much slower on desktop than on
+mobile," root-caused and fixed, plus a follow-up cross-project
+compatibility check)
+
+**Root-caused and fixed the desktop-vs-mobile pose-transition slowdown.**
+Diagnosed via the app's own existing `[frame-profile]` console logger
+(fps/avgUpdateRenderOrder/avgComposerRender/hands, already present at
+main.js:8467) -- the user supplied real data at 3 field sizes (5x5/25
+hands, 10x10/100 hands, 20x20/400 hands) on their own desktop.
+`avgComposerRender` (GPU render cost) stayed flat and proportional to
+hand count throughout (0.7-1ms -> 3.5-4.5ms -> 9-12ms) -- ruling out
+resolution/GPU as the cause, correcting an earlier same-conversation
+hypothesis. `avgUpdateRenderOrder` (CPU-side per-hand pose math)
+instead spiked wildly and unevenly at every field size (25 hands: 0.05
+-> 8.38ms; 100 hands: 0.35 -> 28.96ms; 400 hands: swinging between ~1ms
+and ~50ms) -- bursty, not a flat per-hand baseline, correlated with how
+many hands are simultaneously mid-transition (confirmed by the user's
+own description: clicking triggers a sequence, then "rotate and adjust
+the hands to react to that one click spot").
+
+Root cause found by reading `applyCurlToSkeleton()` (main.js:2407,
+called 5x per hand per frame for any hand mid-transition): it called
+`bone.updateMatrixWorld(true)` after EVERY individual rotation step for
+a joint (reset/splay/splay2/curl/base-only/mid-only/tip-only/tip-twist)
+-- up to ~5 times per joint. `force: true` recomputes that bone's
+matrix AND every descendant's, so each of those calls redundantly
+recomputed joints further down the same finger's chain before they'd
+even been touched yet that frame -- a real, measured 3-8x overhead
+factor depending on which optional curl variants are active for a given
+pose.
+
+**Fix**: consolidated to exactly ONE `updateMatrixWorld(true)` call per
+joint, at the end of that joint's own processing, instead of one per
+operation. Safe because every READ that happens mid-loop already self-
+updates its own parent chain: `rotateOnTrueWorldAxis()`'s own
+`bone.getWorldQuaternion()` and `segmentDirection()`'s own
+`getWorldPosition()` both call three.js's `updateWorldMatrix(true,
+false)` internally, which refreshes the bone's own local matrix from
+its current quaternion AND walks up the full parent chain fresh --
+confirmed against three.js's own `Object3D` source, not assumed.
+
+**Verified**: instrumented `THREE.Object3D.prototype.updateMatrixWorld`
+with a call counter -- one full 5-finger `applyPoseValuesToHand()` call
+now makes 30 real invocations (previously up to 90+, by the code's own
+structure, before this fix). Applied the "Fist" saved pose to a real
+hand post-fix and read back bone quaternions directly -- distinct,
+correctly curled, non-degenerate values consistent with expected fist
+geometry (confirming the consolidation didn't break correctness).
+Searched the rest of the file for any other direct `.matrixWorld` read
+on a finger/wrist bone outside the 2 self-updating getters already
+accounted for -- none found. **Honest limitation**: no same-hardware
+before/after wall-clock comparison this round (would require reverting
+the live fix to re-measure) -- the user will re-run their own
+frame-profiler test (same 3 field sizes) on their real desktop to
+confirm the actual real-world improvement; this entry can only vouch
+for the call-count reduction and correctness, not a measured speedup
+percentage.
+
+**Separate follow-up: checked whether HANDO's new Tween Sequence
+"+Hold" export feature (a `{type:'hold', percent:N}` entry mixed into
+`tweenPoses`, alongside plain pose-name strings) would cause a problem
+if imported into this project.** Traced every consumer of an imported
+sequence's `tweenPoses` array: `mergeImportedListByName()` stores it
+verbatim (holds survive import intact); `resolveTweenSequencePoses()`
+(the actual playback path) does `savedPoses.find(p => p.name ===
+entry)`, which never matches a hold object and gets silently dropped by
+`.filter(Boolean)`; devPanel.js's own multi-select "Edit" reload
+(`fillSelectOptions()`) checks `values.includes(preferredValue)`, which
+also never matches, silently falling back to the first real pose option
+in that row. **No crash anywhere** -- but a real, disclosed fidelity
+gap: this project has no concept of a hold step at all, so an imported
+HANDO sequence using +Hold will silently play back-to-back through only
+the real poses, evenly spaced, with HANDO's own weighted pacing
+completely and silently lost. Flagged to the user rather than treated
+as either "broken" or "fine" -- porting hold support here is a real
+feature addition (`resolveTweenSequencePoses`/`lerpTweenSequence`/the
+multi-select UI would all need it), not something to silently build or
+silently skip.
+
+Cache-buster: `index.html`'s own `main.js?v=170` -> `?v=171`.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

@@ -18,6 +18,32 @@ work seamlessly from there.
 
 ## Currently working on
 
+**SHIPPED 2026-09-20: root-caused and fixed the desktop-vs-mobile pose-
+transition slowdown (direct report).** Diagnosed via the app's own
+existing `[frame-profile]` console logger with real user-supplied data
+at 3 field sizes -- ruled out GPU/resolution (composer render cost
+stayed flat and proportional to hand count) and pinned it on
+`applyCurlToSkeleton()` calling `bone.updateMatrixWorld(true)` after
+EVERY individual rotation step per joint (up to ~5x) instead of once,
+each call redundantly recomputing every bone further down that same
+finger's chain. Consolidated to one call per joint -- verified via an
+instrumented call-counter (30 real invocations per hand now, was up to
+90+) and a direct bone-quaternion correctness check (a real saved pose
+still renders correctly). No same-hardware before/after ms comparison
+this round (would need reverting to re-measure) -- **awaiting the
+user's own re-run of the same frame-profiler test on their real desktop
+to confirm the real-world improvement.**
+
+**Also checked, same round: HANDO's new Tween Sequence "+Hold" export
+feature's import compatibility.** No crash risk -- every consumer of an
+imported sequence degrades gracefully (holds get silently filtered out
+at playback, or silently default to the first real pose in the Edit
+UI) -- but a real, disclosed fidelity gap: this project has no concept
+of a hold step, so an imported HANDO sequence using +Hold will silently
+lose its weighted pacing and just play the real poses back-to-back,
+evenly spaced. **Awaiting the user's decision** on whether to port hold
+support here (a real feature addition) or leave it as a known gap.
+
 **PARTIALLY FIXED 2026-09-19 (latest round): Loading Preview invisible
 on Mobile — fixed one real, confirmed bug (missing pixel-ratio on the
 preview's own renderer), but couldn't fully confirm it's the whole
