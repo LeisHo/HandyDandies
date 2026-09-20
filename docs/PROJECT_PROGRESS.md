@@ -18,6 +18,40 @@ work seamlessly from there.
 
 ## Currently working on
 
+**SHIPPED 2026-09-20 (later same day, 13th follow-up round) -- 4 real
+bugs fixed in the custom click function panel, one systemic.** (1) Touch
+Point Count minimum 2->1. (2) Sequence selector (TweenSelector row) was
+never shown for pose-kind triggers on Mode=Sequence -- the one function
+that shows it (`updateChainModeVisibility()`) was only ever wired for
+hold-kind; added to all 3 missing pose-kind call sites. (3) Touch Point
+Count now hidden entirely on the Desktop tab (no desktop equivalent),
+re-evaluated on tab switch. (4) Root-caused and fixed a real,
+**systemic devPanel.js engine bug** (direct report, correctly diagnosed
+by the user themselves: "I think the other checkbox (show on mobile/
+landscape) may be interfering"): `refreshDynamicDeviceRowChrome()` wrote
+device-visibility straight to `row.style.display`, the SAME property
+every one of this project's own conditional-visibility functions
+(Offset/Rotation, Sequence, Mode gates, Master On/Off) also write --
+whichever ran last won, so a tab switch or clicking ANY "Show in Mobile/
+Landscape" checkbox anywhere in the whole panel could silently re-show a
+row this project had deliberately hidden. Fixed with a dedicated
+`.dp-row-device-hidden` CSS class instead of shared inline style, so the
+two hiding mechanisms now stack independently. **Verification gap
+disclosed** -- hit this sandbox's own main.js network-truncation issue
+across 5 combined attempts (same fixed 587,520-byte cutoff as 2 rounds
+ago, now confirmed at 2 different real file sizes -- a fixed sandbox
+limit, not size-scaling); `devPanel.js` itself loads completely
+(confirmed via `curl`), only `main.js` doesn't. `node --check` passes on
+both. Worth a live confirm on your next reload. See CHANGELOG.txt's
+matching entry for the full account.
+
+**Item 3 of this same request thread ("make it so that any new custom
+click functions will override the existing hard coded click functions")
+is NOT yet started** -- a genuinely large feature (needs a real conflict-
+resolution mechanism between a custom function and a static trigger
+sharing the same gesture), deferred this round in favor of the 4 smaller,
+already-confirmed bugs above. Pick this up next if still wanted.
+
 **PAUSED 2026-09-20 -- mobile "Loading Preview shows with ?dev=1 but not
 bare URL" investigation, deprioritized by direct request ("Okay nevermind
 about that for now").** Added a temporary on-screen startup-timing

@@ -10155,6 +10155,80 @@ mobile investigation concludes either way.
 --------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
+--------------------------------------------------------------------------------
+2026-09-20 (later same day, 13th follow-up round)
+
+Fixed 4 real, direct-reported bugs in the custom click function panel,
+one of them a systemic engine-level issue:
+
+1. Touch Point Count's minimum lowered from 2 to 1 (direct request).
+
+2. "when I select sequence, I don't see the sequence selector and it's
+relevant settings" -- `updateChainModeVisibility(p)` (the ONLY function
+that shows/hides the actual TweenSelector row -- `updateSequencePlayModeVisibility()`
+only covers the Count/Loop/Oscillate sub-settings once a sequence is
+already selectable) was wired into makeClickHoldPoseGroup()'s own Mode
+onChange but never into makeClickPoseGroup()'s, nor into either kind's
+initial-setup calls (module init for the 10 static triggers, or
+renderCustomClickFunctionGroup()'s pose-kind branch for custom ones). A
+real, universal gap for every pose-kind trigger (Click/Double-Click/
+Triple-Click/Quadruple-Click Pose, Right Click, every custom pose-kind
+function) -- added to all 3 missing call sites.
+
+3. "on desktop, there shouldn't be any touch point controls or
+settings" -- Touch Point Count now hidden entirely on the Desktop tab
+regardless of Type, on top of the existing Multi-Point-only gate. New
+`refreshAllCustomFunctionTypeVisibility()` re-applies this on every tab
+switch (wired the same way `refreshAllCustomFunctionGroupVisibility()`
+already is), since Type alone no longer decides this row's visibility.
+
+4. "even if offset or rotation isn't turned on by the checkbox, I can
+still see the settings and sliders... I think the other checkbox (show
+on mobile/landscape) may be interfering with that" -- confirmed and
+root-caused exactly as the user suspected. `refreshDynamicDeviceRowChrome()`
+(devPanel.js) wrote device-visibility directly to `row.style.display`
+-- the SAME property this project's own conditional-visibility
+functions (`updateOffsetRotationVisibility()`, `updateSingleTimingGateVisibility()`,
+`updateChainModeVisibility()`, `updateClickFunctionEnabledVisibility()`'s
+bulk hide, etc.) also write on the exact same row elements, for a
+completely unrelated reason. Whichever wrote most recently won: any
+later call to `refreshRowDisplaysForEditingTab()` -- a tab switch, Save/
+Reset/Undo, or clicking ANY "Show in Mobile/Landscape" checkbox
+ANYWHERE in the whole panel, not just on the affected row -- walked
+every dynamicDevice row and unconditionally reset `display` to `''` on
+Desktop, silently re-showing a row this project had deliberately hidden
+moments (or tab-switches) earlier, with no way for either side to know
+the other had just undone its own hide. This is a devPanel.js engine-
+level bug, not specific to Offset/Rotation -- every one of this
+project's own row-hiding functions listed above was equally exposed to
+it. Fixed by moving device-hiding to a dedicated `.dp-row-device-hidden`
+CSS class (`display: none !important`) instead of the shared inline
+style, so devPanel.js's own device-hide and this project's own inline-
+style hide now stack independently -- either one hiding is enough,
+neither can silently erase the other. `src/devpanel/devPanel.js`
+(v=37->38) and `src/style.css` both touched; `src/main.js` bumped
+`?v=194`->`?v=195`.
+
+**Verification gap, disclosed honestly (standing 5-retry cap):** hit
+this sandbox's own main.js network-truncation issue again -- 5 combined
+attempts (2 browser-preview navigation retries, 1 server-process
+restart, 2 `curl` cross-checks) all truncated at the SAME fixed
+587,520-byte cutoff regardless of the file's real size (628,457 bytes
+this round vs. 613,028 bytes measured 2 rounds ago -- the cutoff itself
+is apparently a fixed sandbox limit, not something that scales with
+file size, now confirmed across 2 separate measurements at different
+real sizes). `devPanel.js` itself was confirmed to load COMPLETELY via
+`curl` (190,633 of 190,633 bytes, exact match) -- only `main.js` hits
+this. `node --check` passes cleanly on both files. Confidence rests on
+direct code-path tracing (confirmed `updateChainModeVisibility()` was
+genuinely never called for pose-kind, confirmed `refreshDynamicDeviceRowChrome()`'s
+literal `row.style.display = ...` write via direct source read) rather
+than live interaction -- worth a live confirm on your own next reload
+for all 4 items above.
+
+--------------------------------------------------------------------------------
+<next entry follows the same divider + dated-header pattern>
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a
