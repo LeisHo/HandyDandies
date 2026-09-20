@@ -17,7 +17,7 @@
       "palmFacesCursor": true,
       "palmFaceRotationOffset": 0,
       "loadingPreviewEnabled": true,
-      "loadingPreviewShowLive": true,
+      "loadingPreviewShowLive": false,
       "loadingMinTimeMs": 5000,
       "loadingPreviewTweenSelector": "Waiting Horizontal Tap",
       "loadingPreviewSavedCameras": [
@@ -6802,7 +6802,7 @@
       "palmFacesCursor": true,
       "palmFaceRotationOffset": 0,
       "loadingPreviewEnabled": true,
-      "loadingPreviewShowLive": true,
+      "loadingPreviewShowLive": false,
       "loadingMinTimeMs": 5000,
       "loadingPreviewTweenSelector": "Waiting Horizontal Tap",
       "loadingPreviewSavedCameras": [
@@ -13587,7 +13587,7 @@
       "palmFacesCursor": true,
       "palmFaceRotationOffset": 0,
       "loadingPreviewEnabled": true,
-      "loadingPreviewShowLive": true,
+      "loadingPreviewShowLive": false,
       "loadingMinTimeMs": 5000,
       "loadingPreviewTweenSelector": "Waiting Horizontal Tap",
       "loadingPreviewSavedCameras": [
