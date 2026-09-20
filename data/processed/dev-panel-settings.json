@@ -1,15 +1,15 @@
 {
   "values": {
     "desktop": {
-      "fieldRows": 13,
-      "fieldCols": 10,
+      "fieldRows": 5,
+      "fieldCols": 2,
       "rowSpacing": 9.5,
       "columnSpacing": 10.5,
       "handScale": 1.2,
       "alternateRowOffset": 5,
       "progressiveRowOffset": 1,
       "useProgressiveOffset": false,
-      "hideHands": true,
+      "hideHands": false,
       "trackingEnabled": true,
       "trackingDamping": 0.6,
       "targetDepthFactor": 0.8,
@@ -17,7 +17,7 @@
       "palmFacesCursor": true,
       "palmFaceRotationOffset": 0,
       "loadingPreviewEnabled": true,
-      "loadingPreviewShowLive": true,
+      "loadingPreviewShowLive": false,
       "loadingMinTimeMs": 5000,
       "loadingPreviewTweenSelector": "Waiting Horizontal Tap",
       "loadingPreviewSavedCameras": [
@@ -6229,7 +6229,7 @@
       "palmFacesCursor": true,
       "palmFaceRotationOffset": 0,
       "loadingPreviewEnabled": true,
-      "loadingPreviewShowLive": true,
+      "loadingPreviewShowLive": false,
       "loadingMinTimeMs": 5000,
       "loadingPreviewTweenSelector": "Waiting Horizontal Tap",
       "loadingPreviewSavedCameras": [
@@ -12441,7 +12441,7 @@
       "palmFacesCursor": true,
       "palmFaceRotationOffset": 0,
       "loadingPreviewEnabled": true,
-      "loadingPreviewShowLive": true,
+      "loadingPreviewShowLive": false,
       "loadingMinTimeMs": 5000,
       "loadingPreviewTweenSelector": "Waiting Horizontal Tap",
       "loadingPreviewSavedCameras": [
@@ -19276,7 +19276,7 @@
     },
     {
       "key": "Tween",
-      "collapsed": false,
+      "collapsed": true,
       "locked": false,
       "settings": [
         "tweenPreviewSpeedMs",
@@ -19287,7 +19287,7 @@
     },
     {
       "key": "Field Layout",
-      "collapsed": true,
+      "collapsed": false,
       "locked": false,
       "settings": [
         "hideHands",
