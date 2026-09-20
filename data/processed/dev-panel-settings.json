@@ -236,7 +236,7 @@
       "poseOffsetX": 2.22,
       "poseOffsetY": -300,
       "poseOffsetZ": -0.3,
-      "poseScale": 6.3,
+      "poseScale": 6.45,
       "savedPoses": [
         {
           "name": "FistBent-Rotation-0",
@@ -6870,11 +6870,11 @@
       "quadClickHoldTweenStopDelayCurveEnabled": false,
       "quadClickHoldTweenStopDelayCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "quadClickHoldTweenStopDelayRange": "{\"min\":0,\"max\":2000}",
-      "cameraX": -0.6588710648813572,
-      "cameraY": 21.039872250852625,
-      "cameraZ": 61.163231799331086,
-      "cameraFov": 32,
-      "cameraZoom": 64.25715498581914,
+      "cameraX": 6.638529594915686,
+      "cameraY": 13.373156794075216,
+      "cameraZ": 259.74194092345493,
+      "cameraFov": 35,
+      "cameraZoom": 260.17068872666084,
       "savedCameras": [
         {
           "name": "Default",
@@ -7308,7 +7308,7 @@
       "poseOffsetX": 2.22,
       "poseOffsetY": -300,
       "poseOffsetZ": -0.3,
-      "poseScale": 6.3,
+      "poseScale": 6.45,
       "savedPoses": [
         {
           "name": "FistBent-Rotation-0",
@@ -14380,7 +14380,7 @@
       "poseOffsetX": 2.22,
       "poseOffsetY": -300,
       "poseOffsetZ": -0.3,
-      "poseScale": 6.3,
+      "poseScale": 6.45,
       "savedPoses": [
         {
           "name": "FistBent-Rotation-0",
@@ -22379,7 +22379,7 @@
     },
     {
       "key": "Loading Preview",
-      "collapsed": false,
+      "collapsed": true,
       "locked": false,
       "items": [
         {
