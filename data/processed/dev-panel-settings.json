@@ -1,8 +1,8 @@
 {
   "values": {
     "desktop": {
-      "fieldRows": 10,
-      "fieldCols": 10,
+      "fieldRows": 12,
+      "fieldCols": 15,
       "rowSpacing": 14,
       "columnSpacing": 15,
       "handScale": 1.2,
@@ -6441,15 +6441,55 @@
           "name": "COUNTDOWN - VERTICAL",
           "tweenPoses": [
             "COUNTDOWN (VERT) - 0",
+            {
+              "type": "hold",
+              "percent": 20
+            },
             "COUNTDOWN (VERT) - 1",
+            {
+              "type": "hold",
+              "percent": 20
+            },
             "COUNTDOWN (VERT) - 2",
+            {
+              "type": "hold",
+              "percent": 20
+            },
             "COUNTDOWN (VERT) - 3",
+            {
+              "type": "hold",
+              "percent": 20
+            },
             "COUNTDOWN (VERT) - 4",
+            {
+              "type": "hold",
+              "percent": 20
+            },
             "COUNTDOWN (VERT) - 5",
+            {
+              "type": "hold",
+              "percent": 20
+            },
             "COUNTDOWN (VERT) - 6",
+            {
+              "type": "hold",
+              "percent": 20
+            },
             "COUNTDOWN (VERT) - 7",
+            {
+              "type": "hold",
+              "percent": 20
+            },
             "COUNTDOWN (VERT) - 8",
+            {
+              "type": "hold",
+              "percent": 20
+            },
             "COUNTDOWN (VERT) - 9",
+            {
+              "type": "hold",
+              "percent": 20
+            },
             "COUNTDOWN  (VERT) - 10"
           ]
         }
@@ -13179,15 +13219,55 @@
           "name": "COUNTDOWN - VERTICAL",
           "tweenPoses": [
             "COUNTDOWN (VERT) - 0",
+            {
+              "type": "hold",
+              "percent": 20
+            },
             "COUNTDOWN (VERT) - 1",
+            {
+              "type": "hold",
+              "percent": 20
+            },
             "COUNTDOWN (VERT) - 2",
+            {
+              "type": "hold",
+              "percent": 20
+            },
             "COUNTDOWN (VERT) - 3",
+            {
+              "type": "hold",
+              "percent": 20
+            },
             "COUNTDOWN (VERT) - 4",
+            {
+              "type": "hold",
+              "percent": 20
+            },
             "COUNTDOWN (VERT) - 5",
+            {
+              "type": "hold",
+              "percent": 20
+            },
             "COUNTDOWN (VERT) - 6",
+            {
+              "type": "hold",
+              "percent": 20
+            },
             "COUNTDOWN (VERT) - 7",
+            {
+              "type": "hold",
+              "percent": 20
+            },
             "COUNTDOWN (VERT) - 8",
+            {
+              "type": "hold",
+              "percent": 20
+            },
             "COUNTDOWN (VERT) - 9",
+            {
+              "type": "hold",
+              "percent": 20
+            },
             "COUNTDOWN  (VERT) - 10"
           ]
         }
@@ -19917,15 +19997,55 @@
           "name": "COUNTDOWN - VERTICAL",
           "tweenPoses": [
             "COUNTDOWN (VERT) - 0",
+            {
+              "type": "hold",
+              "percent": 20
+            },
             "COUNTDOWN (VERT) - 1",
+            {
+              "type": "hold",
+              "percent": 20
+            },
             "COUNTDOWN (VERT) - 2",
+            {
+              "type": "hold",
+              "percent": 20
+            },
             "COUNTDOWN (VERT) - 3",
+            {
+              "type": "hold",
+              "percent": 20
+            },
             "COUNTDOWN (VERT) - 4",
+            {
+              "type": "hold",
+              "percent": 20
+            },
             "COUNTDOWN (VERT) - 5",
+            {
+              "type": "hold",
+              "percent": 20
+            },
             "COUNTDOWN (VERT) - 6",
+            {
+              "type": "hold",
+              "percent": 20
+            },
             "COUNTDOWN (VERT) - 7",
+            {
+              "type": "hold",
+              "percent": 20
+            },
             "COUNTDOWN (VERT) - 8",
+            {
+              "type": "hold",
+              "percent": 20
+            },
             "COUNTDOWN (VERT) - 9",
+            {
+              "type": "hold",
+              "percent": 20
+            },
             "COUNTDOWN  (VERT) - 10"
           ]
         }
@@ -21644,7 +21764,7 @@
     },
     {
       "key": "Tween",
-      "collapsed": true,
+      "collapsed": false,
       "locked": false,
       "items": [
         {
