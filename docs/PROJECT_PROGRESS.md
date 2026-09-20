@@ -18,7 +18,41 @@ work seamlessly from there.
 
 ## Currently working on
 
-**SHIPPED 2026-09-19 (latest round): fixed 2 real Loading Preview bugs
+**SHIPPED 2026-09-19 (latest round): fixed a genuine dev-panel bug —
+grouped/nested/reordered settings could silently merge or leave a
+confusing empty duplicate on reload.** Direct report ("i had grouped
+and reordered and nested Loading Preview setting inputs. Now i cant see
+them") plus a related follow-up ("Custom Click Functions 1, 2, 3 are
+empty"). Root cause, 2 bugs in `devPanel.js`: (1) `addCustomGroup()`'s
+own name-uniqueness check only looked at top-level groups, so a "New
+Group" that's been dragged into a nested position drops out of the
+check, letting a 2nd/3rd same-named group get created and nested
+alongside it uncaught; (2) `applyOrder()` (Save/boot-time restore)
+looked up a saved group's DOM element with a plain, unscoped
+`querySelector` — always the first match — so restoring 2+ saved groups
+sharing an identical key silently merged all of them into whichever one
+was created first. Confirmed directly against the real production
+settings file: 3 subgroups all literally named "New Group" nested under
+"Loading Preview" (matching a user who organized it by topic — camera/
+rotation/FOV/zoom in one, lighting in another, selectors/timing in a
+third), and "Custom Function 1/2/3" each appearing twice at the top
+level — once fully populated, once completely empty. Fixed by tracking
+which DOM elements a restore pass has already claimed (a duplicate key
+now gets its own new element instead of merging) and by scanning the
+whole panel, any depth, for name collisions when creating a new group
+(not just top-level siblings) — both together mean every saved group
+round-trips as its own distinct group, and a future "+ Add Group" can't
+reproduce this exact collision. **Verification note:** this sandbox's
+settings-restore endpoint doesn't exist locally and hit an unusually
+severe bout of this environment's own known network-truncation issue
+this round (repeated failures across 3 fresh ports, even an 8-attempt
+in-page retry loop timed out) — verified via direct code tracing
+against the real duplicate-key data plus `node --check`, not a clean
+live before/after restore. Worth a live confirm once this sandbox's
+networking cooperates, or directly on production. See CHANGELOG.txt's
+matching 2026-09-19 entry for the full account.
+
+**SHIPPED 2026-09-19 (earlier same day): fixed 2 real Loading Preview bugs
 — the preview hand could render for 0 visible ms on a real cold start,
 and every lap used to visibly pass through the default pose.** (1) A
 genuine race: `buildLoadingPreview()` and `tryStartField()` run

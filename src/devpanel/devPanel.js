@@ -1339,8 +1339,26 @@ function refreshGroupCascadeChrome(g) {
 // below) without a code change. Checked against every group currently in
 // the DOM (code-defined and user-created alike) so a default name can't
 // collide with one already there.
+// CORRECTED 2026-09-19, direct report ("i had grouped and reordered and
+// nested Loading Preview setting inputs. Now i cant see them. Where did
+// they go"). This used to scope the uniqueness check to `:scope >
+// .dp-group` -- TOP-LEVEL groups only, since a brand-new group always
+// starts there. That check IS correct at the instant of creation, but a
+// new group is routinely dragged into a nested position right after
+// (e.g. into "Loading Preview") -- and once nested, its name is no
+// longer a `:scope > .dp-group` child of `groupsEl` at all, so it
+// silently drops out of this check. A 2nd "+ Add Group" click then
+// creates ANOTHER plain "New Group" (genuinely unique among CURRENT
+// top-level groups) which, once ALSO dragged into the same nested
+// parent, collides with the first one's name -- 2+ real sibling groups
+// sharing one literal key, which applyOrder()'s own restore logic can't
+// tell apart on the next reload (see its own matching fix/comment).
+// Checking every group in the whole panel, any depth, closes this gap:
+// a name already in use ANYWHERE (nested or not) is unavailable for a
+// new group, so this exact duplicate can no longer be created going
+// forward.
 function addCustomGroup(groupsEl) {
-  const existing = new Set(Array.from(groupsEl.querySelectorAll(':scope > .dp-group')).map((g) => g.dataset.key))
+  const existing = new Set(Array.from(groupsEl.querySelectorAll('.dp-group')).map((g) => g.dataset.key))
   let name = 'New Group'
   let n = 2
   while (existing.has(name)) { name = 'New Group (' + n + ')'; n++ }
@@ -1775,6 +1793,31 @@ function applyOrder(groupsEl, order) {
   // DOM, not just within the group it's about to be placed into.
   const rowsByKey = {}
   groupsEl.querySelectorAll('.dp-row[data-key]').forEach((r) => { rowsByKey[r.dataset.key] = r })
+  // CORRECTED 2026-09-19, direct report ("i had grouped and reordered and
+  // nested Loading Preview setting inputs. Now i cant see them. Where did
+  // they go"). Root cause: addCustomGroup()'s own name-uniqueness check
+  // only looks at TOP-LEVEL groups (see its own comment), so once a
+  // "New Group" has been dragged into a nested position, its name becomes
+  // invisible to that check -- letting a 2nd, 3rd, etc. group under the
+  // SAME parent get created with the exact same literal key, uncaught.
+  // `placeGroup()` below used to look up a saved group's DOM element with
+  // a plain, unscoped `querySelector` -- always the FIRST match in the
+  // whole document -- so restoring 2+ saved groups that share an
+  // identical key found and reused the SAME element every time, silently
+  // merging every duplicate's own settings/subgroups into just the one
+  // that happened to be created first. A real, confirmed case: 3 saved
+  // subgroups all named "New Group" under "Loading Preview" (rotation/
+  // camera/FOV/zoom/saved-cameras in one; saved lighting in another;
+  // selectors/timing in the third) collapsed into a single merged "New
+  // Group" on restore -- the user's own 3-way organization effectively
+  // disappeared, even though no data was actually deleted.
+  // `usedGroupEls` tracks which DOM elements this restore pass has
+  // already claimed for an earlier saved-group entry; a later entry
+  // whose only candidate element is already claimed gets a genuinely NEW
+  // element instead of reusing/merging into that one -- preserving every
+  // saved group as its own distinct, correctly-populated group, matching
+  // this file's own duplicate-key data exactly instead of collapsing it.
+  const usedGroupEls = new Set()
   // Places one saved group (and, recursively, every one of its own saved
   // subgroups at any depth) into parentContainer -- either groupsEl
   // itself (top-level) or another group's own .dp-group-body (nested).
@@ -1786,14 +1829,21 @@ function applyOrder(groupsEl, order) {
     // Not scoped to parentContainer -- a group can be found wherever it
     // currently lives in the DOM (same "find it, don't assume where it is"
     // pattern as rowsByKey above), since it may have moved top-level<->nested
-    // since the last save.
-    let groupEl = groupsEl.querySelector(`.dp-group[data-key="${CSS.escape(savedGroup.key)}"]`)
+    // since the last save. Excludes any element `usedGroupEls` already
+    // claimed this pass (see that Set's own declaration comment) -- a
+    // duplicate-keyed saved group gets its OWN new element instead of
+    // merging into whichever same-keyed group was already placed.
+    let groupEl = Array.from(groupsEl.querySelectorAll(`.dp-group[data-key="${CSS.escape(savedGroup.key)}"]`)).find((el) => !usedGroupEls.has(el))
     if (!groupEl) {
-      // Not a mistake -- this is how a user-created group (see
-      // addCustomGroup()) survives a reload: it doesn't exist in the
+      // Either no element with this key exists yet, or every one that
+      // does was already claimed by an earlier duplicate-keyed entry this
+      // same pass -- both cases mean a fresh element is needed. This is
+      // also how a user-created group (see addCustomGroup()) survives a
+      // reload in the common, non-duplicate case: it doesn't exist in the
       // code-defined `devGroups` at all, only in this saved order.
       groupEl = createGroupElement(savedGroup.key)
     }
+    usedGroupEls.add(groupEl)
     parentContainer.appendChild(groupEl)
     groupEl.classList.toggle('collapsed', !!savedGroup.collapsed)
     groupEl.classList.toggle('dp-group-locked', !!savedGroup.locked)

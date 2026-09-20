@@ -8315,6 +8315,107 @@ rests on, not the screenshots.
 `node --check src/main.js` passed.
 
 --------------------------------------------------------------------------------
+2026-09-19  21:38:38-21:55:04 EDT (16m26s, measured)
+
+**Fixed a genuine dev-panel bug: nested/grouped/reordered settings could
+silently merge together (or leave a confusing empty duplicate) on
+reload.** Direct report ("i had grouped and reordered and nested
+Loading Preview setting inputs. Now i cant see them. Where did they
+go"), then a related follow-up mid-investigation ("the groups called
+Custom Click Functions 1, 2, 3 are empty. what happened").
+
+**Root cause, 2 bugs working together, both in `devPanel.js`:**
+
+1. `addCustomGroup()` ("+ Add Group")'s own name-uniqueness check only
+   looked at TOP-LEVEL groups (`:scope > .dp-group`). A brand-new group
+   always starts top-level, so the check is correct at the instant of
+   creation -- but the very next thing a user typically does is drag it
+   into a nested position (e.g. into "Loading Preview"). Once nested,
+   its name silently drops out of that check entirely. A 2nd "+ Add
+   Group" click then creates another literal "New Group" (genuinely
+   unique among CURRENT top-level groups at that moment), which, once
+   ALSO dragged into the same nested parent, collides with the first
+   one's name -- 2 (here, 3) real sibling groups sharing one identical
+   key, with nothing to stop it.
+
+2. `applyOrder()` (the boot-time/Save restore logic) looked up a saved
+   group's DOM element with a plain, unscoped `querySelector` -- always
+   the FIRST match in the whole document. Restoring 2+ saved groups
+   that share an identical key found and reused the SAME element every
+   time: the 2nd and 3rd saved "New Group" entries didn't create their
+   own groups, they silently appended their own settings into whichever
+   element the 1st entry already created. All 3 of the user's own
+   organized subgroups collapsed into a single merged "New Group" on
+   every reload -- no data was actually deleted, but the user's own
+   3-way organization was gone, indistinguishable from data loss.
+
+**Confirmed against the real production data**
+(`data/processed/dev-panel-settings.json`), not just reasoned in the
+abstract: its own `order` array has 3 separate saved subgroups, all
+literally named "New Group", nested under "Loading Preview" -- one
+holding `loadingPreviewRotationX/Y/Z`, `loadingPreviewOffsetX/Y`,
+`loadingPreviewCameraFov/Zoom`, and `loadingPreviewSavedCameras`; one
+holding just `loadingPreviewSavedLighting`; one holding the selector/
+timing settings -- exactly matching a user who organized Loading
+Preview by topic. Separately, the SAME file has "Custom Click Function
+3" / "Custom Function 2" / "Custom Function 1" each appearing TWICE at
+the top level -- once fully populated (17 settings across 5 subgroups
+each), once completely empty (`settings: [], subgroups: []`) -- the
+exact same duplicate-key shape, explaining the 2nd report directly:
+`applyOrder()`'s old merge behavior meant only ONE of each pair's own
+DOM group ever existed, and depending on processing order/collapse
+state, what the user actually saw could read as "empty."
+
+**Fixed:**
+- `applyOrder()` now tracks which DOM elements it has already claimed
+  during the current restore pass (`usedGroupEls`, a `Set`). A saved
+  group whose only matching element is already claimed by an earlier
+  duplicate-keyed entry gets its OWN new element instead of merging
+  into that one -- every saved group, even a duplicate-named one,
+  round-trips as its own distinct, correctly-populated group.
+- `addCustomGroup()`'s uniqueness check now scans every group in the
+  whole panel (any depth), not just top-level siblings -- a name
+  already in use ANYWHERE, nested or not, is unavailable for a new
+  group, closing the gap that let this exact duplicate get created in
+  the first place. Going forward, "+ Add Group" can no longer produce 2
+  groups sharing an identical name, wherever they end up nested.
+
+Together: the 3 "New Group" subgroups under Loading Preview will now
+restore as 3 separate, correctly-populated groups (their default,
+unrenamed "New Group" name -- the user may want to rename them for
+clarity, a separate/optional follow-up, not required for the fix). The
+"Custom Function 1/2/3" pairs will now restore as 2 visibly separate
+groups each -- the real, populated one and a genuinely empty stub the
+user can identify and remove via the existing Delete Group button if
+they don't want it kept around; this fix makes that possible without
+guessing which of a merged pair actually held the real data.
+
+**Verification note -- honestly labeled, not a full live round trip.**
+This sandbox's own settings-restore endpoint doesn't exist locally
+(needs `GITHUB_TOKEN`/`DEV_PANEL_SAVE_SECRET` on a real deployed
+server), so a live repro/fix-confirmation needed the same disclosed,
+temporary `window.fetch` intercept (serving the real committed
+`dev-panel-settings.json` for `/api/save-settings` GETs) used in this
+file's earlier entries today. This round hit an UNUSUALLY severe bout
+of this sandbox's own known network-truncation issue -- repeated
+`net::ERR_CONNECTION_RESET` on `main.js`/`devPanel.js`/the settings
+JSON across 3 separate fresh ports, and even an 8-attempt retry loop
+inside the page itself timed out without a single successful fetch on
+the final attempt. Given that, this fix is verified via direct code
+tracing (the exact `querySelector`-first-match mechanism, confirmed
+line-by-line) cross-referenced against the real duplicate-key data
+already confirmed present in the committed settings file, plus
+`node --check` on both changed files -- NOT via a clean live
+before/after restore observed in the browser, which this sandbox
+didn't allow this round. Worth a live confirm on production (or a
+future session where this sandbox's networking cooperates) once real
+Loading Preview / Custom Click Function data goes through a fresh
+Save+reload cycle.
+
+Cache-buster: `index.html`'s `main.js?v=165` -> `?v=166`; `main.js`'s
+own `devPanel.js?v=32` import -> `?v=33`.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================
