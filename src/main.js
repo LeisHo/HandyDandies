@@ -766,6 +766,59 @@ const DEV_GROUPS = [
     // round -- see CHANGELOG.txt's own 2026-09-19 entries for the full
     // account of both.
     //
+    // CORRECTED 2026-09-20 (direct request, after confirming via
+    // AskUserQuestion that the bigger option was actually wanted): back
+    // to ONE entry point -- "+ Add Click Function" -- with Type's own
+    // dropdown now offering the full original 5/3-item list again (Click,
+    // Click+Hold, Scroll, Right Click, Right Click+Hold for desktop;
+    // Click, Click+Hold, Multi-Point for mobile), matching the original
+    // spec's own flat list exactly. `kind` (which control battery/state
+    // machine -- makeClickPoseGroup() vs makeClickHoldPoseGroup() -- a
+    // function actually runs under) is now DERIVED from Type rather than
+    // fixed by which button was pressed: a "+Hold"-suffixed Type
+    // (Click+Hold, Right Click+Hold) means 'hold', everything else means
+    // 'pose' -- see kindForCustomFunctionType()'s own comment. Selecting a
+    // Type whose kind differs from the function's CURRENT kind now
+    // rebuilds that one function's group live, under the new kind's
+    // control battery, via handleCustomFunctionTypeChange() -- unregisters
+    // it from the old kind's CLICK_POSE_KEYS/CLICK_HOLD_KEYS slot/trigger-
+    // state/per-hand state (same cleanup cleanupDeletedCustomClickFunction()
+    // already does for a real deletion), removes the old DOM group, then
+    // re-registers/re-renders under the new kind -- reusing
+    // registerCustomClickFunction() itself, the exact same path a brand-
+    // new function's own initial creation already goes through. Settings
+    // sharing the same cfg key across both kinds (Enabled, StartCurve,
+    // SpeedCurve, TweenStartCurve, RetransitionCurve -- confirmed by
+    // direct inspection of makeClickPoseGroup()/makeClickHoldPoseGroup()'s
+    // own shared key-naming convention) survive the swap for free; a
+    // hold-only setting (LoopMode/OnReleaseMode/TriggerAllHands/TweenStop*)
+    // simply re-defaults if the function is later switched back to
+    // 'hold' -- a disclosed simplification, not a full state-preserving
+    // migration, matching this feature's own existing proportionality
+    // (e.g. nextFreeCustomFunctionClickCountOrdinal()'s similar "good
+    // enough, not exhaustive" scope).
+    //
+    // Also fixed same round: a newly-created (or kind-switched) custom
+    // function's own group now nests INSIDE "Custom Click Functions" (a
+    // real subgroup of its `.dp-group-body`) instead of rendering as a
+    // top-level sibling positioned right after it -- direct report ("the
+    // created function settings group should be within the Custom Click
+    // Functions group, not outside"). Nesting it into the generic group-
+    // order/capture system (captureGroup()/applyOrder(), which runs
+    // BEFORE this file's own onRestore hook -- see initDevPanel()'s own
+    // call order) creates a real risk this project has hit before (see
+    // CLAUDE.md's own "renaming a devPanel.js group is purely cosmetic"
+    // gotcha): applyOrder() has no idea these subgroups are dynamically
+    // managed here, so on a page load where a PREVIOUS save captured one
+    // nested under this anchor, it creates an empty GHOST placeholder
+    // group for whatever key it doesn't find live yet -- then
+    // restoreCustomClickFunctions() creates the REAL one on top, a
+    // duplicate-keyed pair. Guarded against by having
+    // restoreCustomClickFunctions() clear out any pre-existing nested
+    // groups under this anchor before rebuilding fresh from
+    // `customClickFunctionIds` itself (the true source of truth for which
+    // functions exist) -- see that function's own comment.
+    //
     // `customClickFunctionIds` is the ONLY control in this static group
     // -- a plain internal-bookkeeping text field (JSON array of
     // `{id, title, kind, family}`), never meant for direct editing,
@@ -777,8 +830,7 @@ const DEV_GROUPS = [
     title: 'Custom Click Functions',
     controls: [
       { key: 'customClickFunctionIds', label: 'Custom Function IDs (Internal, Auto-Managed)', type: 'text', def: '[]' },
-      { key: 'addCustomClickFunctionBtn', label: '+ Add Click Function', type: 'button', onClick: () => addCustomClickFunction('pose') },
-      { key: 'addCustomClickHoldFunctionBtn', label: '+ Add Click+Hold Function', type: 'button', onClick: () => addCustomClickFunction('hold') }
+      { key: 'addCustomClickFunctionBtn', label: '+ Add Click Function', type: 'button', onClick: () => addCustomClickFunction() }
     ]
   },
   {
@@ -7353,20 +7405,27 @@ function getActiveDevPanelTab() {
 // Type's own option list -- direct spec item ("Click Function Type
 // should always include - Click, Click+Hold, Scroll, Right Click, Right
 // Click+Hold for Desktop Mode... will always include - Click, Click+Hold,
-// Multi-Point [for Mobile]"). `kind` already fixes Click-vs-Click+Hold (2
-// different control batteries/state machines, decided at creation time via
-// which button was pressed); `family` then narrows further (mobile drops
-// the Right-Click variants entirely, matching "Dont show scroll or right
-// click functions" on Mobile). Scroll is 'pose'-kind only -- there's no
-// natural "hold" analog for a wheel gesture the way a mouse/touch button
-// can be held, so it's grouped with Click/Right Click, not the +Hold
-// pair, matching how the spec's own flat list lists it next to those.
-// Multi-Point (a simultaneous-touch-point gesture, see
-// multiPointRequiredTouches()'s own comment) genuinely CAN be either
-// fire-and-forget or held, so it's offered for both kinds on mobile.
-function customFunctionTypeOptions(kind, family) {
-  if (kind === 'hold') return family === 'mobile' ? ['Click+Hold', 'Multi-Point'] : ['Click+Hold', 'Right Click+Hold']
-  return family === 'mobile' ? ['Click', 'Multi-Point'] : ['Click', 'Right Click', 'Scroll']
+// Multi-Point [for Mobile]"), restored to ONE unified list per Type
+// (CORRECTED 2026-09-20, see the "Custom Click Functions" group's own
+// comment for the full account of why this reverted the brief 2-button
+// split) -- `family` narrows it (mobile drops the Right-Click variants
+// entirely, matching "Dont show scroll or right click functions" on
+// Mobile). Which control battery/state machine a given Type actually
+// runs under (kind) is now a SEPARATE derived question, answered by
+// kindForCustomFunctionType() below, not baked into this list.
+function customFunctionTypeOptions(family) {
+  return family === 'mobile' ? ['Click', 'Click+Hold', 'Multi-Point'] : ['Click', 'Click+Hold', 'Scroll', 'Right Click', 'Right Click+Hold']
+}
+// Which control battery (kind) a Type value runs under -- a "+Hold"-
+// suffixed Type (Click+Hold, Right Click+Hold) needs
+// makeClickHoldPoseGroup()'s battery; every other Type (Click, Right
+// Click, Scroll, Multi-Point) needs makeClickPoseGroup()'s. Multi-Point
+// deliberately maps to 'pose', not a 3rd hold variant -- the original
+// spec's own flat Type list never distinguished a held vs. fire-and-
+// forget Multi-Point, only naming it once per family (see
+// customFunctionTypeOptions()'s own comment).
+function kindForCustomFunctionType(type) {
+  return (type === 'Click+Hold' || type === 'Right Click+Hold') ? 'hold' : 'pose'
 }
 // Shows/hides ONE custom function's group based on its own `family` vs.
 // whichever tab is currently active -- devPanel.js has no per-tab DOM
@@ -7512,16 +7571,23 @@ function refreshCustomFunctionConflictWarnings() {
 function renderCustomClickFunctionGroup(id, title, kind, family) {
   const base = kind === 'hold' ? makeClickHoldPoseGroup(id, title, {}) : makeClickPoseGroup(id, title, {})
   const controls = base.controls.slice()
-  const typeOptions = customFunctionTypeOptions(kind, family)
-  const defaultType = typeOptions[0]
+  const typeOptions = customFunctionTypeOptions(family)
+  // On a brand-new function, `${id}Type` isn't in cfg yet, so this falls
+  // back to the list's own first option (`typeOptions[0]`, always 'Click'
+  // for both families) -- matching this function's own initial `kind`
+  // ('pose'). On a kind-switch rebuild (see handleCustomFunctionTypeChange()),
+  // `${id}Type` was already set to whatever the user just picked BEFORE
+  // this rebuild ran, so this preserves it exactly rather than resetting
+  // back to the list's first option.
+  const currentType = cfg[`${id}Type`] || typeOptions[0]
   // Automatic hold-timing conflict resolution -- see
   // nextFreeCustomFunctionClickCountOrdinal()'s own comment. Only computed
   // from OTHER already-registered functions at this exact moment; this
   // function's own id isn't in `customClickFunctionIds` with `Enabled`
   // seeded yet either way, so it can't collide with itself here.
-  const defaultClickCountOrdinal = nextFreeCustomFunctionClickCountOrdinal(defaultType, family)
+  const defaultClickCountOrdinal = nextFreeCustomFunctionClickCountOrdinal(currentType, family)
   controls.splice(1, 0,
-    { key: `${id}Type`, label: 'Type', type: 'select', def: defaultType, options: () => typeOptions, onChange: () => { updateCustomFunctionTypeVisibility(id); refreshCustomFunctionConflictWarnings() } },
+    { key: `${id}Type`, label: 'Type', type: 'select', def: currentType, options: () => typeOptions, onChange: () => handleCustomFunctionTypeChange(id, title, family) },
     { key: `${id}TouchPointCount`, label: 'Touch Point Count', type: 'slider', min: 2, max: 10, step: 1, def: 2, onChange: () => refreshCustomFunctionConflictWarnings() },
     { key: `${id}ClickCount`, label: kind === 'hold' ? 'Triggers On (Nth Press-And-Hold)' : 'Triggers On (Nth Click)', type: 'select', def: ['1st', '2nd', '3rd', '4th'][defaultClickCountOrdinal - 1], options: () => ['1st', '2nd', '3rd', '4th'], onChange: () => refreshCustomFunctionConflictWarnings() }
   )
@@ -7539,8 +7605,17 @@ function renderCustomClickFunctionGroup(id, title, kind, family) {
   }
   const g = renderDynamicGroup({ title, controls })
   if (g) {
+    // Nested INSIDE the "Custom Click Functions" anchor's own body (a real
+    // subgroup), not positioned as a top-level sibling after it -- direct
+    // report ("the created function settings group should be within the
+    // Custom Click Functions group, not outside"). Newest-closest-to-top
+    // ordering preserved by inserting at the front of that body each time,
+    // same relative effect the old sibling-insert had. See this group's
+    // own DEV_GROUPS comment for why restoreCustomClickFunctions() has to
+    // pre-clear this same body before rebuilding on page load.
     const anchor = document.querySelector('.dp-group[data-key="Custom Click Functions"]')
-    if (anchor && anchor.parentElement) anchor.parentElement.insertBefore(g, anchor.nextSibling)
+    const anchorBody = anchor ? anchor.querySelector(':scope > .dp-group-body') : null
+    if (anchorBody) anchorBody.insertBefore(g, anchorBody.firstChild)
     g.dataset.customFunctionFamily = family
     updateCustomFunctionGroupVisibility(g, family)
   }
@@ -7571,6 +7646,49 @@ function renderCustomClickFunctionGroup(id, title, kind, family) {
   // own comment. Must run AFTER the wrapping above (it iterates the
   // group body's CURRENT direct children).
   updateClickFunctionEnabledVisibility(id)
+}
+// Type select's own onChange for a custom function (CORRECTED 2026-09-20,
+// see "Custom Click Functions"'s own DEV_GROUPS comment for the full
+// account) -- Type alone now decides which control battery/state machine
+// (kind) the function runs under, so switching between a hold-style and
+// fire-style Type has to swap the ENTIRE underlying state machine live,
+// not just relabel a dropdown. A same-kind Type change (e.g. Click ->
+// Scroll, both 'pose') is cheap -- just the existing visibility/conflict
+// refresh, no rebuild. A kind-changing Type change unregisters this
+// function from its OLD kind's CLICK_POSE_KEYS/CLICK_HOLD_KEYS slot,
+// trigger-state object, and every hand's own per-function state (the
+// exact same cleanup cleanupDeletedCustomClickFunction() does for a real
+// deletion, minus removing the entry from customClickFunctionIds itself
+// -- this function keeps existing, just under a different kind), removes
+// the now-stale DOM group, then re-registers/re-renders fresh under the
+// new kind via registerCustomClickFunction() -- the exact same path a
+// brand-new function's own initial creation already goes through, so
+// there's only ONE place that builds a custom function's live group.
+function handleCustomFunctionTypeChange(id, title, family) {
+  const newType = cfg[`${id}Type`]
+  const newKind = kindForCustomFunctionType(newType)
+  const entry = customClickFunctionIds.find((e) => e.id === id)
+  const oldKind = entry ? entry.kind : 'pose'
+  if (newKind === oldKind) {
+    updateCustomFunctionTypeVisibility(id)
+    refreshCustomFunctionConflictWarnings()
+    return
+  }
+  const oldKeys = oldKind === 'hold' ? CLICK_HOLD_KEYS : CLICK_POSE_KEYS
+  const oldTriggers = oldKind === 'hold' ? clickHoldPoseTriggers : clickPoseTriggers
+  const oki = oldKeys.indexOf(id)
+  if (oki !== -1) oldKeys.splice(oki, 1)
+  delete oldTriggers[id]
+  hands.forEach((hand) => {
+    const perHand = oldKind === 'hold' ? hand._chp : hand._cp
+    if (perHand) delete perHand[id]
+  })
+  const oldRow = document.querySelector(`.dp-row[data-key="${id}Enabled"]`)
+  const oldGroup = oldRow ? oldRow.closest('.dp-group') : null
+  if (oldGroup) oldGroup.remove()
+  if (entry) entry.kind = newKind
+  persistCustomClickFunctionIds()
+  registerCustomClickFunction(id, title, newKind, family)
 }
 // Registers a new (or, on restore, a previously-saved) custom function
 // into every generic pipeline this project's existing 10 triggers
@@ -7604,17 +7722,25 @@ function registerCustomClickFunction(id, title, kind, family) {
   }
   renderCustomClickFunctionGroup(id, title, kind, family)
 }
-// "+ Add Click Function"/"+ Add Click+Hold Function" buttons' own
-// onClick -- `family` is read from whichever tab is active the MOMENT
-// the button is clicked (direct request: "If I add a click function in
-// the mobile tab, that click function will only be available to mobile
-// and landscape tab, not desktop"), then frozen into the function's own
-// bookkeeping permanently -- it does not follow the panel if the user
-// later switches tabs again.
-function addCustomClickFunction(kind) {
+// "+ Add Click Function" button's own onClick (CORRECTED 2026-09-20, back
+// to a single entry point -- see "Custom Click Functions"'s own
+// DEV_GROUPS comment) -- `family` is read from whichever tab is active
+// the MOMENT the button is clicked (direct request: "If I add a click
+// function in the mobile tab, that click function will only be available
+// to mobile and landscape tab, not desktop"), then frozen into the
+// function's own bookkeeping permanently -- it does not follow the panel
+// if the user later switches tabs again. `kind` always starts as 'pose'
+// -- it matches the Type dropdown's own default first option ('Click',
+// see customFunctionTypeOptions()), and can change live afterward via the
+// Type select's own onChange (handleCustomFunctionTypeChange()) if the
+// user picks a "+Hold"-suffixed Type. Title is now fixed regardless of
+// kind (no more "Custom Click+Hold Function N" variant) since kind is no
+// longer decided at creation time.
+function addCustomClickFunction() {
   const family = getActiveDevPanelTab()
   const id = `custom${nextCustomFunctionN}`
-  const title = `Custom ${kind === 'hold' ? 'Click+Hold' : 'Click'} Function ${nextCustomFunctionN}`
+  const kind = 'pose'
+  const title = `Custom Click Function ${nextCustomFunctionN}`
   nextCustomFunctionN++
   customClickFunctionIds.push({ id, title, kind, family })
   registerCustomClickFunction(id, title, kind, family)
@@ -7628,17 +7754,36 @@ function addCustomClickFunction(kind) {
 // restore pipeline -- see the DEV_GROUPS control's own comment) from
 // scratch each load, same as `buildDevPanel()` itself does for the
 // static 10. Iterates `saved` in its own stored (creation) order and
-// inserts each one right after the anchor group, same as live creation
-// -- the LAST one processed this way ends up closest to the anchor,
-// exactly reproducing live creation's own newest-closest-to-anchor
-// ordering (confirmed by tracing through: inserting A then B right after
-// the anchor each time leaves the order anchor->B->A, matching what live
+// inserts each one at the front of the "Custom Click Functions" anchor's
+// own body, same as live creation -- the LAST one processed this way ends
+// up closest to the top, exactly reproducing live creation's own newest-
+// closest-to-top ordering (confirmed by tracing through: inserting A then
+// B at the front each time leaves the order B, A, matching what live
 // creation of A-then-B would have produced).
 function restoreCustomClickFunctions() {
   let saved = []
   try { saved = JSON.parse(cfg.customClickFunctionIds || '[]') } catch (e) { /* leave empty -- malformed value, nothing to restore */ }
   if (!Array.isArray(saved)) saved = []
   customClickFunctionIds = saved
+  // Clears any stale/ghost nested groups devPanel.js's own generic
+  // applyOrder() may have already created under the "Custom Click
+  // Functions" anchor -- applyOrder() runs BEFORE this restore hook (see
+  // initDevPanel()'s own call order) and has no idea these subgroups are
+  // dynamically managed here, so on a page load where a previous save
+  // captured one nested under this anchor, it creates an empty ghost
+  // placeholder for whatever key it doesn't find live yet (this file's
+  // own custom function groups don't exist in the DOM until the forEach
+  // below runs). Every real custom function group is about to be rebuilt
+  // fresh from `customClickFunctionIds` itself (the true source of truth
+  // for which ones exist), so anything already sitting in the anchor's
+  // body at this point is a leftover ghost, never real data -- removing
+  // it can't lose anything, and leaving it in place would otherwise
+  // produce a genuine duplicate-keyed pair once the real group renders
+  // (the exact class of bug this project's own "renaming a devPanel.js
+  // group is purely cosmetic" gotcha documents for a different cause).
+  const anchor = document.querySelector('.dp-group[data-key="Custom Click Functions"]')
+  const anchorBody = anchor ? anchor.querySelector(':scope > .dp-group-body') : null
+  if (anchorBody) anchorBody.querySelectorAll(':scope > .dp-group').forEach((g) => g.remove())
   let maxN = 0
   saved.forEach((entry) => {
     if (!entry || !entry.id) return
