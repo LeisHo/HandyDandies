@@ -9181,6 +9181,56 @@ round that it was still sitting uncommitted exactly as left, with no
 conflicting changes from any other session in between.
 
 --------------------------------------------------------------------------------
+2026-09-20  -  01:18 AM - 01:30 AM EDT (approximate; see this entry's own note)
+
+Live-verified the "Fix deleted static Click Function groups still firing"
+entry (this file, above) -- that entry's own fix was committed with
+"Not yet live-verified in a browser" disclosed; this closes that gap.
+
+Started this project's own isolated dev server (static-alt3, port 8423 --
+8420-8422/8421 were already occupied by other concurrent chats' own
+servers) rather than reusing another session's server, per this
+project's own multi-session convention. Hit this sandbox's own
+documented network-truncation gotcha repeatedly (6 straight
+`net::ERR_CONNECTION_RESET` failures loading `main.js` through the
+browser tool specifically, despite a parallel `curl` check against the
+same URL succeeding on roughly half of 4 attempts -- consistent with the
+gotcha's own "genuinely intermittent" description); resolved by
+restarting the server fresh and retrying the navigation, matching the
+CLAUDE.md gotcha's own documented workaround.
+
+Once loaded: opened the dev panel, confirmed `cfg.clickEnabled: true` /
+`cfg.chpEnabled: true` via `window.__debug.cfg`, used the panel's own
+Delete Group/Setting (🗑) button to delete the real "Click Pose" group
+(search -> scroll into view -> arm delete -> click the group's own
+title). Confirmed via `window.__debug`:
+- `cfg.clickEnabled` flipped `true` -> `false` immediately.
+- `cfg.chpEnabled` (a sibling, undeleted group) stayed `true` --
+  confirms the fix is scoped to only the deleted group, not a blanket
+  disable.
+- The group's own "Click Pose (Master On/Off)" row genuinely vanished
+  from the panel (Double/Triple/Quadruple-Click Pose rows remained) --
+  confirms a real deletion happened, not just a cfg side effect without
+  one.
+- Every hand's `hand._cp['click']` in-flight state was already cleared
+  immediately after deletion (before any further click).
+- A real `left_click` dispatched on the canvas afterward triggered the
+  pose on 0 of 255 hands (`hands.map(h => !!(h._cp && h._cp['click']))`
+  all false) -- the exact reported symptom (clicking still applying the
+  old pose after deletion) no longer reproduces.
+
+No console errors traceable to the fix itself (only the pre-existing
+network-truncation ERR_CONNECTION_RESETs from the retry cycle above, and
+unrelated 404s from optional endpoints this static preview server
+doesn't serve).
+
+Not exercised this round: a HOLD-kind static trigger (e.g. deleting
+"Click Hold-Pose" mid-hold) and whether the disabled state survives a
+Save/Sync + reload (the fix's own disclosed scope note already states it
+does not persist across reload by design -- this round only confirms the
+CURRENT-session behavior the bug report was actually about).
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

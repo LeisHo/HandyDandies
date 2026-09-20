@@ -64,7 +64,11 @@ groups are hardcoded DEV_GROUPS entries (unlike real Custom Click
 Functions), so the deleted group's UI still reappears on the next page
 reload — this stops the trigger from firing for the rest of the CURRENT
 session, matching the literal reported symptom, not a permanent removal.
-Not yet live-verified in a browser this round. See CHANGELOG.txt's
+**Live-verified** via `window.__debug`: deleted the real "Click Pose"
+group through the panel's own Delete flow — `cfg.clickEnabled` flipped
+true→false, a sibling group's `chpEnabled` stayed true (correct scoping),
+`hand._cp['click']` cleared on every hand, and a real click on the canvas
+afterward triggered the pose on 0 of 255 hands. See CHANGELOG.txt's
 matching 2026-09-20 entry for the full investigation trail.
 
 **SHIPPED 2026-09-20: ported HANDO's new Pose Offset X/Y/Z + Pose Scale

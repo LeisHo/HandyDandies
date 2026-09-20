@@ -708,4 +708,12 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   DEV_GROUPS entries, unlike real Custom Click Functions -- the deleted
   group's UI reappears on the next page reload regardless, so this fix
   only stops the trigger from firing for the rest of the CURRENT
-  session, not a permanent removal. Not yet live-verified in a browser.
+  session, not a permanent removal. **Live-verified 2026-09-20** via
+  `window.__debug`: deleted the real "Click Pose" group through the dev
+  panel's own Delete Group/Setting flow -- `cfg.clickEnabled` flipped
+  true->false, the group's row genuinely vanished from the panel (a
+  sibling group, `chpEnabled`, stayed `true`, confirming correct
+  scoping), `hand._cp['click']` was cleared on every hand, and a real
+  click on the canvas afterward left EVERY hand's `_cp['click']` state
+  empty (0 of 255 hands) -- the pose no longer fires, matching the
+  reported bug's exact repro.
