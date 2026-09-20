@@ -356,7 +356,7 @@ function tryStartField() {
   // whatever comes next; don't treat this comment's own reasoning above
   // as the settled explanation.
   renderer.compile(scene, camera)
-  window.__debug = { THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose }
+  window.__debug = { THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose, resolveTweenSegmentsWithAnchor, lerpTweenSegments, lerpLoopSegments, isHoldEntry, updateLoadingPreviewWristClip, lerpPoseValues }
   loadingEl.classList.add('hidden')
   // The loading-preview canvas is a top-level sibling of #loading now
   // (2026-09-17, decoupled specifically so this moment doesn't force it
@@ -3641,9 +3641,27 @@ function buildLoadingPreview(bypassEnabledGate) {
   const clone = cloneSkeletal(modelRoot)
   clone.quaternion.copy(alignQuat)
   const skinnedMesh = findSkinnedMesh(clone)
-  if (skinnedMesh && toonMaterial) skinnedMesh.material = toonMaterial
+  // Own cloned material + own Plane, mirroring rebuildField()'s per-field-
+  // hand pattern (see updateWristClipPlaneForHand()'s own comment for why
+  // a SHARED material/plane silently discards geometry) -- added
+  // 2026-09-20 so this preview's own wrist crop can be driven by the
+  // CURRENTLY PLAYING pose's own `hideWrist` value (see
+  // updateLoadingPreviewWristClip()'s own comment) instead of not
+  // clipping at all, which is what plainly reusing the shared
+  // `toonMaterial` (clippingPlanes: [], never populated) did before this
+  // fix -- direct report ("the imported tweens and poses dont seem to
+  // read the wrist cropping data for load preview").
+  const loadingPreviewWristClipPlane = new THREE.Plane()
+  if (skinnedMesh && toonMaterial) {
+    skinnedMesh.material = toonMaterial.clone()
+    skinnedMesh.material.clippingPlanes = [loadingPreviewWristClipPlane]
+    // Material.clone() doesn't carry over onBeforeCompile -- see
+    // rebuildField()'s own matching comment for the real bug this once
+    // caused (toon rim-light/tint shading silently reverting to default).
+    skinnedMesh.material.onBeforeCompile = toonMaterial.onBeforeCompile
+  }
   loadingPreviewScene.add(clone)
-  loadingPreviewHand = { clone, skinnedMesh }
+  loadingPreviewHand = { clone, skinnedMesh, wristClipPlane: loadingPreviewWristClipPlane }
 
   // A selected Camera preset (direct follow-up request) overrides the
   // existing auto-framed default, applied to this preview's own SEPARATE
@@ -4225,6 +4243,57 @@ function applyLoadingPreviewPose(item) {
   // to the camera" once the camera isn't aligned with world Z.
   applyPoseOffsetToPosition(loadingPreviewHand.clone, _poseOffsetZeroVec, loadingPreviewCamera, values)
   loadingPreviewHand.clone.scale.setScalar(values.poseScale ?? 1)
+  // `item` (NOT `values` -- see this function's own top comment, `values`
+  // is rebuilt fresh from ONLY POSE_PRESET_KEYS, which `hideWrist`
+  // deliberately isn't a member of) carries `hideWrist` whenever it came
+  // from lerpTweenSegments()/lerpLoopSegments() (both now interpolate it
+  // too, see lerpPoseValues()'s own comment) or is a raw saved-pose
+  // object passed straight through (the `segments.length === 0` /
+  // single-pose case in updateLoadingPreviewAnimation(), or a direct
+  // "Use" of one saved pose). `?? 100` matches cfg.hideWrist's own
+  // default (100 = fully cropped/hand-only, this project's actual
+  // default aesthetic -- see that control's own def) for whatever has no
+  // wrist-crop data at all (poseDefaultValues, which -- like `values` --
+  // is also built from POSE_PRESET_KEYS only).
+  updateLoadingPreviewWristClip(item.hideWrist ?? 100)
+}
+// Loading Preview's own per-pose wrist crop -- direct report ("the
+// imported tweens and poses dont seem to read the wrist cropping data
+// for load preview. Its probably being overwridden by the default wrist
+// length. But the default wrist length should not apply to loading
+// preview"). Confirmed: this preview never had ANY wrist-crop clip-plane
+// wiring at all before this fix (it just reused the shared `toonMaterial`
+// directly, whose own `clippingPlanes` array is permanently empty -- see
+// createToonMaterial()'s own comment) -- not "overridden by the default,"
+// simply never clipped, full arm always shown regardless of what any
+// pose said. Now has its own cloned material + own Plane (see
+// buildLoadingPreview()'s own comment), and this function drives that
+// plane from a directly-passed crop percent -- deliberately NOT reading
+// `cfg.hideWrist`/`cfg.reactiveArmLengthEnabled` the way
+// updateWristClipPlaneForHand() does for the main field (this preview
+// has no cursor to be reactive to, and the user's own explicit request
+// is that the GLOBAL default should never apply here at all -- only the
+// currently-playing pose's own value, or the 100%-crop fallback when a
+// pose has none). Same bone-position/clip-plane math as
+// updateWristClipPlaneForHand(), just against `loadingPreviewHand`'s own
+// skeleton/plane and a caller-supplied percent instead of a live
+// reactive/global one.
+const _loadingPreviewClipFarPos = new THREE.Vector3()
+const _loadingPreviewClipNearPos = new THREE.Vector3()
+const _loadingPreviewClipDir = new THREE.Vector3()
+const _loadingPreviewClipPoint = new THREE.Vector3()
+function updateLoadingPreviewWristClip(hideWristPercent) {
+  if (!loadingPreviewHand || !loadingPreviewHand.skinnedMesh || !loadingPreviewHand.wristClipPlane) return
+  const farBone = loadingPreviewHand.skinnedMesh.skeleton.getBoneByName('rForearmBend')
+  const nearBone = loadingPreviewHand.skinnedMesh.skeleton.getBoneByName('rHand')
+  if (!farBone || !nearBone) return
+  farBone.getWorldPosition(_loadingPreviewClipFarPos)
+  nearBone.getWorldPosition(_loadingPreviewClipNearPos)
+  _loadingPreviewClipDir.subVectors(_loadingPreviewClipNearPos, _loadingPreviewClipFarPos).normalize()
+  const armToWristDist = _loadingPreviewClipFarPos.distanceTo(_loadingPreviewClipNearPos)
+  const t = (typeof hideWristPercent === 'number' ? hideWristPercent : 100) / 100
+  _loadingPreviewClipPoint.copy(_loadingPreviewClipFarPos).addScaledVector(_loadingPreviewClipDir, armToWristDist * t)
+  loadingPreviewHand.wristClipPlane.setFromNormalAndCoplanarPoint(_loadingPreviewClipDir, _loadingPreviewClipPoint)
 }
 // Row visibility for the Loading Preview's own Sequence Mode controls --
 // same 2-level gating as updateSequencePlayModeVisibility() (Count's own
@@ -4275,10 +4344,30 @@ function updateLoadingPreviewSequenceVisibility() {
 // anchor at either end.
 function updateLoadingPreviewAnimation() {
   const seq = (cfg.savedTweenSequences || []).find((s) => s.name === cfg.loadingPreviewTweenSelector)
-  const namedPoses = seq ? resolveTweenSequencePoses(seq.tweenPoses) : []
-  if (namedPoses.length < 1) { applyLoadingPreviewPose(poseDefaultValues); return }
+  const rawEntries = seq ? (seq.tweenPoses || []) : []
+  // CORRECTED 2026-09-20, direct report ("the imported tweens still dont
+  // seem to read the Hold data") -- this used to call
+  // resolveTweenSequencePoses(seq.tweenPoses), which maps EVERY entry
+  // through `.filter((p) => p.name === name)` assuming it's a pose-name
+  // STRING; a Hold entry (`{type:'hold', percent}`, isHoldEntry()'s own
+  // shape) silently never matches anything there and gets dropped
+  // entirely -- exactly the reported symptom, for the SAME underlying
+  // reason resolveTweenSegmentsWithAnchor()/lerpTweenSegments() (the
+  // Hold-aware pathway chp/rchp/etc. already use) were built in the
+  // first place; this consumer just never got switched onto it. `anchor`
+  // is the first REAL pose-name entry (skipping any leading Hold, which
+  // has "nothing before it" and would be a no-op per
+  // resolveTweenSegmentsWithAnchor()'s own comment) -- this preserves
+  // the EXISTING "plays from the sequence's own first named pose, no
+  // default-pose anchor at either end" convention (see the comment above
+  // this function) rather than introducing a new one.
+  const anchorIdx = rawEntries.findIndex((e) => typeof e === 'string' && e)
+  const anchorMatches = anchorIdx >= 0 ? (cfg.savedPoses || []).filter((p) => p.name === rawEntries[anchorIdx]) : []
+  const anchorPose = anchorMatches[anchorMatches.length - 1]
+  if (!anchorPose) { applyLoadingPreviewPose(poseDefaultValues); return }
   if (loadingPreviewSequenceDone) return // frozen at whatever was last applied
-  const poses = namedPoses
+  const segments = resolveTweenSegmentsWithAnchor(anchorPose, rawEntries.slice(anchorIdx + 1))
+  const lastPose = segments.length > 0 ? segments[segments.length - 1].poseB : anchorPose
   const playMode = cfg.loadingPreviewSequenceMode
   const lapStyle = playMode === 'Count' ? cfg.loadingPreviewSequenceCountMode : playMode
   const totalLaps = playMode === 'Count' ? Math.max(cfg.loadingPreviewSequenceCount || 1, 1) : Infinity
@@ -4305,15 +4394,30 @@ function updateLoadingPreviewAnimation() {
     : Math.max(safeTweenSpeedMs(cfg.loadingPreviewSpeedMs), 1)
   const lapT = THREE.MathUtils.clamp((now - loadingPreviewLapStartMs) / speedMs, 0, 1)
   let values
-  if (lapStyle === 'Oscillate') {
+  if (segments.length === 0) {
+    // Only the anchor pose itself, nothing after it (a single-pose
+    // sequence, or every entry after the anchor was empty) -- same
+    // degenerate case the old lerpTweenSequence([onePose], t) handled by
+    // just returning that one pose's own values, static.
+    values = anchorPose
+  } else if (lapStyle === 'Oscillate') {
     const t = loadingPreviewDirection === 1 ? lapT : 1 - lapT
-    values = lerpTweenSequence(poses, t)
+    values = lerpTweenSegments(segments, t)
   } else if (cfg.loadingPreviewSequenceLoopTransition === false) {
-    values = lerpTweenSequence(poses, lapT) // instant jump back to frame 1 between laps -- same forward pass every time, no wrap interpolation
+    values = lerpTweenSegments(segments, lapT) // instant jump back to frame 1 between laps -- same forward pass every time, no wrap interpolation
   } else {
-    const segments = poses.length
-    const tCyclic = (loadingPreviewLapIndex - 1) * segments + lapT * segments
-    values = lerpLoopSequence(poses, tCyclic) // smooth wrap-back -- same cyclic segment math Click Hold-Pose's own Loop Mode already uses
+    // Smooth wrap-back -- same cyclic-ring approach lerpLoopSequence()
+    // used before this fix, generalized to WEIGHTED segments (a Hold's
+    // own weight can differ from a real pose-to-pose transition's weight
+    // of 1): the ring is this lap's own forward segments plus one
+    // CLOSING segment back from the last pose to the anchor, so the
+    // wrap-back point is included in the same weighted timeline instead
+    // of being a separate equal-weight step the way it implicitly was
+    // when every segment had weight 1.
+    const ringSegments = segments.concat([{ poseA: lastPose, poseB: anchorPose, weight: 1 }])
+    const totalRingWeight = ringSegments.reduce((sum, seg) => sum + seg.weight, 0)
+    const tCyclic = (loadingPreviewLapIndex - 1 + lapT) * totalRingWeight
+    values = lerpLoopSegments(ringSegments, tCyclic)
   }
   applyLoadingPreviewPose(values)
   if (lapT >= 1) {
@@ -5453,6 +5557,20 @@ function lerpPoseValues(a, b, t) {
     const bv = b[key] !== undefined ? b[key] : POSE_KEY_DEFAULTS[key]
     result[key] = av + (bv - av) * t
   })
+  // `hideWrist` deliberately isn't a POSE_PRESET_KEYS member (see that
+  // array's own comment -- the main field's own saved poses intentionally
+  // exclude the Crop Wrist/Arm Length family, a reactive/cursor-driven
+  // system, not pose articulation). Interpolated here anyway, alongside
+  // everything else, purely as a convenience for a caller that DOES want
+  // it (the Loading Preview's own per-pose wrist crop, added 2026-09-20 --
+  // see updateLoadingPreviewWristClip()'s own comment) -- every existing
+  // caller that only ever reads POSE_PRESET_KEYS-listed fields off this
+  // return value is completely unaffected by one extra, otherwise-unused
+  // key. `?? 100` matches cfg.hideWrist's own default (100 = fully
+  // cropped/hand-only).
+  const aw = a.hideWrist !== undefined ? a.hideWrist : 100
+  const bw = b.hideWrist !== undefined ? b.hideWrist : 100
+  result.hideWrist = aw + (bw - aw) * t
   return result
 }
 const _poseBaseQuatEuler = new THREE.Euler()
@@ -5732,6 +5850,32 @@ function lerpTweenSegments(segments, t) {
   // check always matches by then) -- kept only so this never returns
   // undefined if that invariant is ever violated by a future edit.
   const last = segments[segments.length - 1]
+  return lerpPoseValues(last.poseA, last.poseB, 1)
+}
+// Weighted-cyclic counterpart to lerpLoopSequence() below -- same
+// unbounded `tCyclic` (its integer part selects a lap, its fractional
+// part the local position within the ring), but scaled by TOTAL RING
+// WEIGHT instead of a plain segment count, so a Hold's own weight is
+// respected on every lap, not just the first forward pass. `ringSegments`
+// is expected to already include its own CLOSING segment (last pose back
+// to the anchor/first pose) -- built by the caller, since only the
+// caller knows what "closes the loop" means for its own sequence (see
+// updateLoadingPreviewAnimation()'s own comment).
+function lerpLoopSegments(ringSegments, tCyclic) {
+  if (!ringSegments || ringSegments.length === 0) return null
+  const totalWeight = ringSegments.reduce((sum, seg) => sum + seg.weight, 0)
+  if (totalWeight <= 0) return lerpPoseValues(ringSegments[0].poseA, ringSegments[0].poseA, 0)
+  const wrapped = ((tCyclic % totalWeight) + totalWeight) % totalWeight
+  let acc = 0
+  for (let i = 0; i < ringSegments.length; i++) {
+    const segWeight = ringSegments[i].weight
+    if (wrapped < acc + segWeight || i === ringSegments.length - 1) {
+      const localT = segWeight > 0 ? THREE.MathUtils.clamp((wrapped - acc) / segWeight, 0, 1) : 1
+      return lerpPoseValues(ringSegments[i].poseA, ringSegments[i].poseB, localT)
+    }
+    acc += segWeight
+  }
+  const last = ringSegments[ringSegments.length - 1]
   return lerpPoseValues(last.poseA, last.poseB, 1)
 }
 // Double Click Hold Tween's own Loop mode, and now also Click Hold-Pose/
