@@ -2184,12 +2184,30 @@ function refreshRowDisplaysForEditingTab() {
 // property). Both checkboxes always exist in the DOM regardless of tab
 // (this project has one row per control, not 3) -- only their `checked`
 // state differs per device, read fresh from devIndependence[editingDevice].
+// CORRECTED 2026-09-20 (direct report: "even if offset or rotation
+// isn't turned on by the checkbox, I can still see the settings and
+// sliders... I think the other checkbox (show on mobile/landscape) may
+// be interfering with that"). This used to write `row.style.display`
+// directly -- the SAME property a host app's own conditional-visibility
+// logic (e.g. HANDY DANDIES' updateOffsetRotationVisibility(), gated on
+// a completely different concept, an "Offset On/Off" checkbox) also
+// writes on the exact same row elements. Whichever wrote last won: any
+// later call to refreshRowDisplaysForEditingTab() -- a tab switch, Save/
+// Reset/Undo, or clicking ANY "Show in Mobile/Landscape" checkbox
+// anywhere in the whole panel -- walked every dynamicDevice row and
+// unconditionally reset display to '' on Desktop, silently re-showing a
+// row the host had deliberately hidden for its own unrelated reason,
+// with no way for the host to know its own hide had just been undone.
+// Fixed by moving device-visibility to its OWN CSS class instead of the
+// shared inline style -- this engine's own device-hide and a host's own
+// inline-style hide now stack independently (either one hiding is
+// enough to hide), rather than the more-recent write erasing the other.
 function refreshDynamicDeviceRowChrome(ctrl) {
   const row = document.querySelector(`.dp-row[data-key="${CSS.escape(ctrl.key)}"]`)
   if (!row) return
   const entry = numEls[ctrl.key]
   const onDesktop = editingDevice === 'desktop'
-  row.style.display = (!onDesktop && !isDevRowVisible(ctrl.key)) ? 'none' : ''
+  row.classList.toggle('dp-row-device-hidden', !onDesktop && !isDevRowVisible(ctrl.key))
   if (entry && entry.visCheckbox) {
     entry.visCheckbox.style.display = onDesktop ? '' : 'none'
     entry.visCheckbox.checked = isDevRowVisible(ctrl.key)

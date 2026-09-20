@@ -293,6 +293,15 @@ html, body {
    a native `title` attribute already supplies the tooltip, no extra CSS
    needed for that. */
 .dp-dynamic-device-checkbox, .dp-group-cascade-checkbox { flex: 0 0 auto; width: 14px; height: 14px; margin: 0; }
+/* CORRECTED 2026-09-20 -- refreshDynamicDeviceRowChrome() (devPanel.js)
+   used to hide a device-restricted row via inline `row.style.display`,
+   the same property a host app's own conditional-visibility logic (e.g.
+   this project's updateOffsetRotationVisibility()) also writes on the
+   same elements -- whichever ran most recently silently undid the
+   other's hide. Moved device-hiding to this dedicated class instead, so
+   it stacks independently with any host-applied inline `display:none`
+   rather than overwriting it either way. */
+.dp-row-device-hidden { display: none !important; }
 /* Direct request: "the 2nd checkbox (the one which regards mobile desktop
    sync) should be right aligned within the dev panel so they are always on
    the right edge." Every row's control width varies (a slider vs. a select

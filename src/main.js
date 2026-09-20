@@ -6,7 +6,7 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js'
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js'
 import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js'
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js'
-import { initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement } from './devpanel/devPanel.js?v=37'
+import { initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement } from './devpanel/devPanel.js?v=38'
 
 // A defensive wrapper around devPanel.js's own refreshSelectOptions() --
 // found via live testing (direct user report: "I dont see any of the
@@ -3200,9 +3200,24 @@ function makeClickPoseGroup(p, title, defaults = {}) {
       // See makeClickHoldPoseGroup()'s own matching comment for the full
       // reasoning (shared word-for-word, since both factories added this
       // the same way).
+      // CORRECTED 2026-09-20 (direct report: "when I select sequence, I
+      // don't see the sequence selector and it's relevant settings") --
+      // this onChange never called updateChainModeVisibility(), the ONLY
+      // function that shows/hides the actual "which sequence" TweenSelector
+      // row itself (updateSequencePlayModeVisibility() only covers the
+      // Count/Loop/Oscillate sub-settings once a sequence is already
+      // selectable). A real, universal gap for every pose-kind trigger
+      // (static Click/Double-Click/Triple-Click/Quadruple-Click/Right
+      // Click and every custom pose-kind function) -- makeClickHoldPoseGroup()'s
+      // own Mode onChange already had this call, so hold-kind triggers
+      // (Click Hold-Pose etc.) were never affected. Also added to both
+      // CLICK_POSE_KEYS/CLICK_HOLD_KEYS' own initial-setup calls and
+      // renderCustomClickFunctionGroup()'s pose-kind branch, so a saved
+      // Mode of "Sequence" shows the selector correctly on first load too,
+      // not just after manually re-touching the dropdown.
       {
         key: `${p}Mode`, label: 'Mode', type: 'select', def: 'Single Pose', options: () => ['Single Pose', 'Sequence'],
-        onChange: () => { updateClickTriggerModeVisibility(p, ['PauseDurationMs']); updateSingleTimingGateVisibility(p); updateSequencePlayModeVisibility(p) }
+        onChange: () => { updateClickTriggerModeVisibility(p, ['PauseDurationMs']); updateSingleTimingGateVisibility(p); updateSequencePlayModeVisibility(p); updateChainModeVisibility(p) }
       },
       // Offset/Rotation -- see makeClickHoldPoseGroup()'s own matching
       // comment for the full reasoning (shared word-for-word, both
@@ -7800,7 +7815,7 @@ function refreshAllCustomFunctionGroupVisibility() {
 // on a non-DEV_MODE visitor, where the panel/tabs were never built.
 function setupCustomFunctionTabVisibilitySync() {
   document.querySelectorAll('.dp-tab').forEach((btn) => {
-    btn.addEventListener('click', () => refreshAllCustomFunctionGroupVisibility())
+    btn.addEventListener('click', () => { refreshAllCustomFunctionGroupVisibility(); refreshAllCustomFunctionTypeVisibility() })
   })
 }
 // Type/Touch-Point-Count/Click-Count row visibility -- Type itself has no
@@ -7820,9 +7835,26 @@ function setupCustomFunctionTabVisibilitySync() {
 function updateCustomFunctionTypeVisibility(id) {
   const type = cfg[`${id}Type`]
   const touchRow = document.querySelector(`.dp-row[data-key="${id}TouchPointCount"]`)
-  if (touchRow) touchRow.style.display = type === 'Multi-Point' ? '' : 'none'
+  // Direct report 2026-09-20: "on desktop, there shouldn't be any touch
+  // point controls or settings" -- touch points are a mobile/touch-input
+  // concept with no desktop equivalent, so this row never shows on the
+  // Desktop tab regardless of Type, on top of the existing Multi-Point-
+  // only gate. Re-evaluated on every tab switch (see
+  // refreshAllCustomFunctionTypeVisibility(), wired the same way
+  // refreshAllCustomFunctionGroupVisibility() already is) so switching
+  // to/from Desktop shows or hides it immediately, not just on the next
+  // Type change.
+  if (touchRow) touchRow.style.display = (type === 'Multi-Point' && getActiveDevPanelTab() !== 'desktop') ? '' : 'none'
   const clickCountRow = document.querySelector(`.dp-row[data-key="${id}ClickCount"]`)
   if (clickCountRow) clickCountRow.style.display = (type === 'Click' || type === 'Click+Hold') ? '' : 'none'
+}
+// Re-applies updateCustomFunctionTypeVisibility() for every registered
+// custom function -- needed because that function's own Touch Point
+// Count visibility now depends on the ACTIVE TAB, not just Type, and
+// nothing else re-evaluates it on a tab switch. Wired the same way
+// refreshAllCustomFunctionGroupVisibility() already is.
+function refreshAllCustomFunctionTypeVisibility() {
+  customClickFunctionIds.forEach(({ id }) => updateCustomFunctionTypeVisibility(id))
 }
 // This function's own "collision bucket" -- every enabled custom function
 // with the SAME (family, Type, selector) fires on the exact same real
@@ -7933,7 +7965,7 @@ function renderCustomClickFunctionGroup(id, title, kind, family) {
   const defaultClickCountOrdinal = nextFreeCustomFunctionClickCountOrdinal(currentType, family)
   controls.splice(1, 0,
     { key: `${id}Type`, label: 'Type', type: 'select', def: currentType, options: () => typeOptions, onChange: () => handleCustomFunctionTypeChange(id, title, family) },
-    { key: `${id}TouchPointCount`, label: 'Touch Point Count', type: 'slider', min: 2, max: 10, step: 1, def: 2, onChange: () => refreshCustomFunctionConflictWarnings() },
+    { key: `${id}TouchPointCount`, label: 'Touch Point Count', type: 'slider', min: 1, max: 10, step: 1, def: 2, onChange: () => refreshCustomFunctionConflictWarnings() },
     { key: `${id}ClickCount`, label: kind === 'hold' ? 'Triggers On (Nth Press-And-Hold)' : 'Triggers On (Nth Click)', type: 'select', def: ['1st', '2nd', '3rd', '4th'][defaultClickCountOrdinal - 1], options: () => ['1st', '2nd', '3rd', '4th'], onChange: () => refreshCustomFunctionConflictWarnings() }
   )
   // updateClickFunctionEnabledVisibility() (shared with the 10 static
@@ -7981,6 +8013,7 @@ function renderCustomClickFunctionGroup(id, title, kind, family) {
     updateOffsetRotationVisibility(id)
     updateSingleTimingGateVisibility(id)
     updateSequencePlayModeVisibility(id)
+    updateChainModeVisibility(id)
   }
   // Same mandatory Offset/Rotation/Animation Speed Curve/Start Time
   // Curve/Retransition gated-subgroup wrapping the 10 static triggers
@@ -8520,8 +8553,8 @@ CLICK_POSE_KEYS.forEach((p) => { parseClickPoseConfig(p); buildClickPoseWidgets(
 // control's own onChange (DEV_GROUPS, above) keeps this current after
 // that. Click Pose/Double-Click Pose/Right Click share CLICK_POSE_KEYS'
 // own Pause Duration slider; Click Hold-Pose/Right-Click Hold-Pose don't.
-CLICK_POSE_KEYS.forEach((p) => { updateClickTriggerModeVisibility(p, ['PauseDurationMs']); updateOffsetRotationVisibility(p); updateSingleTimingGateVisibility(p); updateSequencePlayModeVisibility(p) })
-CLICK_HOLD_KEYS.forEach((p) => { updateClickTriggerModeVisibility(p, [], ['LoopMode', 'OnReleaseMode', 'TriggerAllHands', 'TweenStopStartTimeCurveEnabled', 'TweenStopDelayEnabled']); updateLoopHoldVisibility(p); updateOffsetRotationVisibility(p); updateSingleTimingGateVisibility(p); updateTweenStopGateVisibility(p) })
+CLICK_POSE_KEYS.forEach((p) => { updateClickTriggerModeVisibility(p, ['PauseDurationMs']); updateOffsetRotationVisibility(p); updateSingleTimingGateVisibility(p); updateSequencePlayModeVisibility(p); updateChainModeVisibility(p) })
+CLICK_HOLD_KEYS.forEach((p) => { updateClickTriggerModeVisibility(p, [], ['LoopMode', 'OnReleaseMode', 'TriggerAllHands', 'TweenStopStartTimeCurveEnabled', 'TweenStopDelayEnabled']); updateLoopHoldVisibility(p); updateOffsetRotationVisibility(p); updateSingleTimingGateVisibility(p); updateTweenStopGateVisibility(p); updateChainModeVisibility(p) })
 // Offset/Rotation/Animation Speed Curve/Start Time Curve/Retransition as
 // "mandatory gated subgroups" -- direct request ("Offset, Rotation,
 // Animaiton Speed Curve, Start Time Curve, Retransition will all be
