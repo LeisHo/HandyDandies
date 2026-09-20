@@ -10105,6 +10105,56 @@ confirmed no concurrent commits had landed.
 --------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
+--------------------------------------------------------------------------------
+2026-09-20 (later same day, 12th follow-up round)
+
+Continued investigating "Loading Preview shows on mobile with ?dev=1 but
+not on the bare production URL" (real device, real production domain --
+this rules out any localhost/backend-availability explanation). Live-
+checked the real production URL with mobile-viewport emulation: the
+`GL_INVALID_FRAMEBUFFER_OPERATION: Attachment has zero size` WebGL
+warning appears identically with and without `?dev=1` -- not a
+differentiator. Read `tryStartField()`'s own gating chain
+(`modelMeasurementsReady` + `startupSettingsReady`, the latter set by
+`onRestore` firing from the SAME remote-settings fetch for both dev and
+normal visitors, using a fixed endpoint URL with no dependency on
+`?dev=1`): found no code-level reason dev mode should get more time
+before the real hand field replaces the Loading Preview -- the panel-
+building work only happens AFTER the settings fetch is already kicked
+off asynchronously, so it shouldn't delay `onRestore`'s own firing.
+Confirmed this session's own browser-automation tool doesn't reliably
+tick `requestAnimationFrame` under mobile-viewport emulation (an
+already-documented limitation), making further screenshot-based timing
+observation from this end unreliable for this specific question.
+
+Added a small on-screen (not console.log) startup-timing diagnostic
+since there's no easy console access on a real phone without a
+USB-tethered remote-debugging session. Gated on its own `&debugTiming=1`
+query param, deliberately independent of `DEV_MODE`, so it can be
+toggled on EITHER URL variant (`?debugTiming=1` or
+`?dev=1&debugTiming=1`) to compare directly. `logStartupTiming(label)`
+(near `pageLoadStartMs`'s own declaration) lazily creates a small fixed-
+position text overlay and appends one line per call with elapsed ms
+since page load; wired at all 3 flag-flip sites
+(`modelMeasurementsReady`, both `startupSettingsReady` sites -- the
+`onRestore` path and the 6000ms fallback timeout -- and `fieldStarted`)
+plus `tryStartField()`'s own entry/gate-pass points. Pure logging, no
+behavior change. Live-verified the overlay itself works correctly
+(creates, accumulates multiple lines, real elapsed-ms values) in the
+local preview -- the model itself never finished loading there (an
+unrelated local-sandbox asset-serving issue, not something this
+diagnostic could fix), so the FULL timing sequence couldn't be captured
+locally; needs a real run on the production URL (either variant) to
+actually answer the mobile question. `main.js` cache-buster bumped
+`?v=192` -> `?v=193`.
+
+This is a temporary diagnostic aid, not a permanent feature -- safe to
+remove (`DEBUG_TIMING`/`logStartupTiming`/its 5 call sites) once the
+mobile investigation concludes either way.
+
+--------------------------------------------------------------------------------
+<next entry follows the same divider + dated-header pattern>
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

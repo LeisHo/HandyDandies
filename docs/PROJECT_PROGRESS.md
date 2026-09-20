@@ -18,8 +18,26 @@ work seamlessly from there.
 
 ## Currently working on
 
-**SHIPPED 2026-09-20 (later same day, 12th follow-up round) -- added a
-"Wrist Rotation (Deg)" slider, ported from HANDO ("check Hando. I added
+**PAUSED 2026-09-20 -- mobile "Loading Preview shows with ?dev=1 but not
+bare URL" investigation, deprioritized by direct request ("Okay nevermind
+about that for now").** Added a temporary on-screen startup-timing
+diagnostic (`&debugTiming=1` query param, independent of DEV_MODE) since
+there's no easy console access on a real phone -- logs
+modelMeasurementsReady/startupSettingsReady/fieldStarted timing to a
+small on-page overlay. Ruled out: the WebGL "Attachment has zero size"
+warning (identical in both modes); a code-level timing-race explanation
+(the settings-fetch that gates `startupSettingsReady` doesn't depend on
+`?dev=1` or on dev-panel-build work). Not yet resolved -- needs a real
+run on the production URL to actually capture the numbers. Safe to
+remove (`DEBUG_TIMING`/`logStartupTiming`, 5 call sites in `main.js`)
+whenever this gets picked back up or abandoned. See CHANGELOG.txt's
+matching 12th-round entry (note: a concurrent session used the same
+round number for an unrelated Wrist Rotation feature the same day --
+harmless numbering overlap, not a data conflict).
+
+**SHIPPED 2026-09-20 (later same day, 12th follow-up round, different
+session) -- added a "Wrist Rotation (Deg)" slider, ported from HANDO
+("check Hando. I added
 a wrist rotation slider. make sure we can take those imports etc").**
 Local-Y rotation on the shared `rHand` bone (Bend/Splay already claim
 X/Z), wired into `applyWristPoseToSkeleton()`, `POSE_PRESET_KEYS`
