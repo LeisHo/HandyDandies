@@ -18,6 +18,34 @@ work seamlessly from there.
 
 ## Currently working on
 
+**SHIPPED 2026-09-19 (latest round): fixed 2 real Loading Preview bugs
+— the preview hand could render for 0 visible ms on a real cold start,
+and every lap used to visibly pass through the default pose.** (1) A
+genuine race: `buildLoadingPreview()` and `tryStartField()` run
+synchronously in the same GLTFLoader callback, so if the model/settings
+took longer to arrive than `loadingMinTimeMs`, the loading screen could
+get hidden on the exact same tick the preview canvas became visible —
+the browser never painted the intermediate frame, so the preview was
+technically shown for 0ms ("I only see the text, never the hand," direct
+report). This CORRECTS an earlier diagnostic in this same session that
+wrongly concluded it wasn't a bug (that test happened to avoid the race
+entirely — see CHANGELOG.txt for the full account). Fixed by flooring
+the wait at preview-ready-time + a fixed 400ms visible-time margin,
+never affecting the common fast-load case. (2) `updateLoadingPreviewAnimation()`
+used to prepend `poseDefaultValues` as every lap's own lead-in anchor
+(`[poseDefaultValues, ...namedPoses]`) — every Loop/Oscillate/instant-
+jump lap visibly touched default pose somewhere in the cycle regardless
+of the selected sequence's own poses (direct follow-up report: "the
+loading preview is still starting and ending with the default pose. I
+dont want that"). Now plays exactly `namedPoses`, nothing prepended.
+Verified live: item 1 via a temporary disclosed fetch-intercept +
+MutationObserver diagnostic harness (confirmed a multi-second real
+visible window, not an instant flash) plus direct calculation of the
+fix's own race-scenario arithmetic; item 2 via 16 consecutive real
+lap-boundary wraps with zero errors, confirming the cyclic segment math
+stays correct with one fewer array element. See CHANGELOG.txt's matching
+2026-09-19 entries for the full account of both.
+
 **SHIPPED 2026-09-19: interactive Camera Edit Mode for the Loading
 Preview (orbit/pan/zoom via real OrbitControls, orbiting around the
 hand's own center, matching HANDO) + repurposed Rotation X/Y/Z/Offset

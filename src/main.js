@@ -4031,8 +4031,8 @@ function updateLoadingPreviewSequenceVisibility() {
   setRow('CountMode', isCount)
   setRow('LoopTransition', playMode === 'Loop' || (playMode === 'Count' && cfg.loadingPreviewSequenceCountMode === 'Loop'))
 }
-// Plays the selected Tween Sequence (default pose + every named pose in
-// it) for as long as the loading screen stays up, per the Sequence Mode
+// Plays the selected Tween Sequence (every named pose in it) for as
+// long as the loading screen stays up, per the Sequence Mode
 // (Count/Loop/Oscillate) settings -- same lap-based mechanism as
 // updateClickPoseForHand()'s own 'sequencePlaying' phase (see
 // makeClickPoseGroup()'s own control comment for the full reasoning),
@@ -4045,12 +4045,22 @@ function updateLoadingPreviewSequenceVisibility() {
 // back to just holding the default pose (no visible motion, but still a
 // rendered hand) when no sequence is selected or it resolves to zero
 // poses.
+// CORRECTED 2026-09-19, direct report ("the loading preview is still
+// starting and ending with the default pose. I dont want that") -- this
+// used to prepend `poseDefaultValues` as the sequence's own lead-in
+// anchor (`[poseDefaultValues, ...namedPoses]`), the same convention
+// chp/rchp's own Tween Mode uses for ITS sequences. That's wrong for
+// this preview specifically: every lap (and every oscillation swing)
+// tweened INTO and back OUT OF the default pose regardless of what the
+// selected sequence's own named poses actually were. Now plays exactly
+// the selected sequence's own poses, nothing else -- no default-pose
+// anchor at either end.
 function updateLoadingPreviewAnimation() {
   const seq = (cfg.savedTweenSequences || []).find((s) => s.name === cfg.loadingPreviewTweenSelector)
   const namedPoses = seq ? resolveTweenSequencePoses(seq.tweenPoses) : []
   if (namedPoses.length < 1) { applyLoadingPreviewPose(poseDefaultValues); return }
   if (loadingPreviewSequenceDone) return // frozen at whatever was last applied
-  const poses = [poseDefaultValues, ...namedPoses]
+  const poses = namedPoses
   const playMode = cfg.loadingPreviewSequenceMode
   const lapStyle = playMode === 'Count' ? cfg.loadingPreviewSequenceCountMode : playMode
   const totalLaps = playMode === 'Count' ? Math.max(cfg.loadingPreviewSequenceCount || 1, 1) : Infinity

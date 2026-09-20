@@ -8276,6 +8276,45 @@ harness: field still started normally, no new console errors).
 Cache-buster: `index.html`'s `main.js?v=164` -> `?v=165`.
 
 --------------------------------------------------------------------------------
+2026-09-19  21:13:37-21:20:13 EDT (6m36s, measured)
+
+**Loading Preview no longer starts/ends each lap on the default pose.**
+Direct follow-up report, same session ("also, the loading preview is
+still starting and ending with the default pose. I dont want that").
+
+`updateLoadingPreviewAnimation()` used to build its own per-lap pose
+list as `[poseDefaultValues, ...namedPoses]` -- the same "default pose
+as the sequence's own lead-in anchor" convention chp/rchp's own Tween
+Mode uses for THEIR sequences (see `startClickHoldPose()`'s own
+`tweenAnchor` comment). That convention doesn't fit this preview: with
+`lerpLoopSequence()` (the default Loop-transition-on path), every lap
+wrap cyclically re-passed through default at the segment boundary; with
+Oscillate, every swing tweened out to default and back; with Loop
+Transition off, every lap literally started from default. All 3 modes
+visibly touched the default pose somewhere in the cycle regardless of
+what the selected Tween Sequence's own poses actually were. Fixed by
+dropping the prepend -- `const poses = namedPoses` -- so the preview
+now plays exactly the selected sequence's own poses, nothing else, at
+both ends of every lap/swing.
+
+Verified live: injected the real `savedPoses`/`savedTweenSequences`
+data (via the same settings-JSON-fetch technique as the entry above) and
+the real "Waiting Horizontal Tap" sequence, forced a rebuild via the
+"Show Loading Preview (Live)" toggle, and let it run -- confirmed 16
+consecutive lap-boundary wraps (`loadingPreviewLapIndex` reached 16)
+completed with `loadingPreviewSequenceDone` still `false` and zero
+console errors, proving the cyclic segment math (`segments =
+poses.length`, `tCyclic = (lapIndex-1)*segments + lapT*segments`) stays
+correct with one fewer array element. A direct visual A/B diff across 2
+screenshots ~1s apart wasn't conclusive on its own (this particular
+sequence's motion was too subtle at the auto-framed camera angle/zoom
+used for this quick check to read from a static screenshot) -- the lap-
+count + no-error evidence above is what this verification actually
+rests on, not the screenshots.
+
+`node --check src/main.js` passed.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================
