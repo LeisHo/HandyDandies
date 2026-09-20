@@ -8928,6 +8928,27 @@ Cache-buster: `index.html`'s `main.js?v=172` -> `?v=174` (2 bumps this
 round, `?v=173` was the concurrent session's own intermediate bump).
 
 --------------------------------------------------------------------------------
+2026-09-20  00:47:54-00:49:56 EDT (2m02s, measured)
+
+**Direct request: lowered the Toon Steps slider's own max from 8 to 6**
+(`toonSteps`, Toon Shading group) -- current saved value (5) was
+already within the new range, so no data follow-up needed.
+
+Same concurrent-session staging discipline as this file's own
+immediately preceding entry: a 2nd, NEWER unrelated feature (Pose
+Offset X/Y/Z + Pose Scale, ported from HANDO) had landed uncommitted
+in `src/main.js` since that session's own last commit
+(`7834fa8`) by the time this 1-line change was ready -- isolated this
+round's own single hunk via a hand-built patch (`git apply --cached`)
+rather than a blanket add, confirmed via `git diff --cached` it staged
+only the intended line, and confirmed via `git status` afterward that
+the concurrent session's own Pose Offset/Scale work remained exactly
+as it was, untouched and still uncommitted.
+
+Cache-buster: `index.html`'s `main.js?v=175` -> `?v=177` (`?v=176` was
+the concurrent session's own intermediate bump).
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================
