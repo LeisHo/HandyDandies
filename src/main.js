@@ -3539,6 +3539,10 @@ let loadingPreviewCamera = null
 let loadingPreviewCanvas = null
 let loadingPreviewAnimStartMs = 0
 const loadingPreviewBaseQuat = new THREE.Quaternion()
+// Scratch Euler for a saved pose's own Whole Hand Rotation
+// (modelRotX/Y/Z), applied in applyLoadingPreviewPose() -- same role as
+// Pose Preview's own `_previewWholeHandRotEuler`.
+const _loadingPreviewWholeHandRotEuler = new THREE.Euler()
 // CORRECTED 2026-09-19 -- the Loading Preview's own camera DOES have
 // interactive OrbitControls now (loadingPreviewCameraEditMode, below),
 // but this tracker is still needed: it's the single source of truth
@@ -4210,17 +4214,37 @@ function applyLoadingPreviewPose(item) {
   if (!loadingPreviewHand || !loadingPreviewHand.skinnedMesh) return
   const values = {}
   POSE_PRESET_KEYS.forEach((k) => { values[k] = item[k] !== undefined ? item[k] : POSE_KEY_DEFAULTS[k] })
-  // CORRECTED 2026-09-19 -- loadingPreviewRotationX/Y/Z used to be folded
-  // in here (rotating the hand itself); they're now the ORBIT CAMERA's
-  // own elevation/azimuth/roll instead (see that control's own DEV_GROUPS
-  // comment), so the hand goes back to plain `alignQuat`, matching every
-  // camera computation in this file (auto-frame, saved presets, orbit
-  // math), which all assume the hand sits at exactly alignQuat with no
-  // extra rotation. A real production bug traced to the OLD behavior:
-  // a leftover non-zero loadingPreviewRotationX (6 deg) rotated the hand
-  // out from under whatever the camera was actually framed for, reported
-  // as "the camera is off, now rotated at some angle."
-  loadingPreviewBaseQuat.copy(alignQuat)
+  // CORRECTED 2026-09-19 -- loadingPreviewRotationX/Y/Z (the dev-panel
+  // SLIDER) used to be folded in here (rotating the hand itself);
+  // they're now the ORBIT CAMERA's own elevation/azimuth/roll instead
+  // (see that control's own DEV_GROUPS comment). A real production bug
+  // traced to the OLD slider-driven behavior: a leftover non-zero
+  // loadingPreviewRotationX (6 deg) rotated the hand out from under
+  // whatever the camera was actually framed for, reported as "the
+  // camera is off, now rotated at some angle."
+  // CORRECTED AGAIN 2026-09-20, direct request ("when i import poses, i
+  // want the Whole Hand Rotation data to be imported as well. So any
+  // other rotation I set on top of that, for example in Loading Preview,
+  // it will simply add ontop of that") -- that 2026-09-19 fix went
+  // further than the bug it was fixing required: it also stopped
+  // applying `values.modelRotX/Y/Z` -- a POSE's OWN whole-hand rotation
+  // (already correctly captured via POSE_PRESET_KEYS, ported from HANDO
+  // the same day Pose Offset/Scale was), not the old slider it was
+  // actually meant to retire -- leaving Loading Preview inconsistent
+  // with Pose Preview's own previewPosePreset(), which already applies
+  // this exact field via the identical alignQuat*Euler(modelRot) pattern
+  // below. Camera auto-frame/preset/orbit math is unaffected either way
+  // -- it derives from the hand's own bounding-SPHERE radius (rotation-
+  // invariant) and a fixed alignQuat-based camera.up, never the hand's
+  // live quaternion, so this doesn't reintroduce the 2026-09-19 bug --
+  // that bug was specifically the STALE, easy-to-forget-about SLIDER
+  // value, not a pose's own intentional field.
+  _loadingPreviewWholeHandRotEuler.set(
+    THREE.MathUtils.degToRad(values.modelRotX),
+    THREE.MathUtils.degToRad(values.modelRotY),
+    THREE.MathUtils.degToRad(values.modelRotZ)
+  )
+  loadingPreviewBaseQuat.copy(alignQuat).multiply(new THREE.Quaternion().setFromEuler(_loadingPreviewWholeHandRotEuler))
   loadingPreviewHand.clone.quaternion.copy(loadingPreviewBaseQuat)
   applyWristPoseToSkeleton(loadingPreviewHand.skinnedMesh.skeleton, values)
   FINGER_NAMES.forEach((name) => applyCurlToSkeleton(name, loadingPreviewHand.skinnedMesh.skeleton, loadingPreviewBaseQuat, null, values))
