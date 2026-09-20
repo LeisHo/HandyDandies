@@ -18,6 +18,35 @@ work seamlessly from there.
 
 ## Currently working on
 
+**SHIPPED 2026-09-20: fixed gated-subgroup checkbox duplication (direct
+bug report) + added per-group Undock/Dock (ported from the shared
+`.claude/TEMPLATE_DEV_PANEL.html`).** The Offset/Rotation/Animation Speed
+Curve/etc. group headers (built by `wrapGatedSubgroup()`, which moves the
+whole "Enabled" row bodily into the header) showed 3 checkboxes instead
+of 1 -- the row's own Show-in-Mobile/Landscape + Independent-from-Desktop
+pair duplicated the group's own cascade checkboxes, which already cover
+every descendant. Fixed by stripping the row's own device checkboxes/
+drag handle on wrap and inserting it right after the title text. New "↗"
+button per group pops its content into its own floating, draggable,
+8-direction-resizable panel (reusing this project's existing generic
+`initPanelDrag`/`initResizeHandles`, not a from-scratch reimplementation
+like the template's own); "⇱" docks it back to its exact original DOM
+position (same parent/nextSibling). Session-only, no persistence.
+`dockAllUndockedGroups()` runs before Save/Copy/Named-State/Undo so an
+undocked group's settings are never silently dropped. Header icon order,
+left to right after title: on/off checkbox -> Mobile/Landscape device
+checkboxes -> undock button -> lock icon (always pinned far right via
+its own pre-existing `margin-left:auto`; the indep-device checkbox's own
+auto-margin is overridden specifically in this header context so the 2
+no longer compete for the row's free space). Live-verified: checkbox
+count/order via `getBoundingClientRect`, undock/dock DOM restoration,
+resize (8 handles, SE tested: 285x162 -> 294x203), drag (vertical delta
+exact; horizontal correctly clamped near this test environment's narrow
+viewport), and Copy Settings force-docking an undocked group before
+capture. `node --check` clean, no console errors beyond expected local
+`/api/save-settings` 404s. See CHANGELOG.txt's matching 2026-09-20 entry
+for the full account.
+
 **SHIPPED 2026-09-20: fixed deleted static Click Function groups still
 firing after deletion (direct bug report).** The 10 hardcoded Click
 Function triggers (Click Hold-Pose, Right-Click Hold-Pose, Click/Double/

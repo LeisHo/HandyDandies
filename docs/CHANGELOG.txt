@@ -9093,6 +9093,94 @@ round) -- if a live repro still shows the old pose firing after this fix,
 re-open this investigation rather than assuming a different cause.
 
 --------------------------------------------------------------------------------
+2026-09-20
+
+Fixed a gated-subgroup checkbox duplication direct bug report: the
+Offset/Rotation/Animation Speed Curve/Start Time Curve/Retransition group
+headers (built by `wrapGatedSubgroup()` in main.js, which moves the
+whole withDynamicDevice()-wrapped "<X> Enabled" row bodily into the
+group's own header) showed 3 checkboxes where only 1 (the real on/off
+value) belonged -- the row brought its own Show-in-Mobile/Landscape +
+Independent-from-Desktop checkbox pair and drag handle along with it,
+duplicating the GROUP's own cascade checkboxes (createGroupElement(),
+devPanel.js), which already cover device-scoping for every descendant
+inside the group via `forEachDynamicDeviceDescendant()` (header included).
+Fix: strip `.dp-dynamic-device-checkbox`/`.dp-row-handle` off the row
+once it's inside the header, and insert it right after the title text
+(not appended at the end, past the lock icon) so the on/off checkbox
+reads as part of the title the way a plain "<Title> On/Off" label used
+to.
+
+Added per-group Undock/Dock, ported from the shared cross-project
+template (`.claude/TEMPLATE_DEV_PANEL.html`) per direct request ("the
+setting group docking function in the dev panel template. check that and
+implement"). A new "↗" button in the group header pops that ONE group's
+content into its own floating panel -- draggable by its header, resizable
+from all 8 edges/corners -- and a "⇱" button in the floating panel docks
+it back to its EXACT original DOM position (same parent, same
+`nextSibling`, the same real-DOM-node-preservation technique this file's
+own Undo/Delete mechanisms already use, not a rebuild from captured
+data). Session-only, no persistence across reload, matching the
+template's own design intent (a live viewing convenience, not a saved
+layout choice). Simplification vs. the template's own from-scratch drag/
+resize implementation: this project already had fully generic
+`initPanelDrag(panel, header)`/`initResizeHandles(panel)` functions
+(built for the one main dev panel, but never hardcoded to it) --
+reused verbatim for the new floating group panels instead of
+reimplementing drag/resize a second time. `dockAllUndockedGroups()` is
+called at the top of `saveSettings()` and `captureFullPanelState()`
+(shared by Copy Settings, Named Setting States, and Undo snapshots) --
+an undocked group's `.dp-group` is no longer a descendant of `groupsEl`
+at all once it's living inside its own floating panel appended to
+`document.body`, so any of those operations would otherwise silently
+drop its settings from what gets read/saved.
+
+Header icon order, left to right after the title (direct request: "the
+lock icon should always be on the far right. Then left of that is the
+undocking icon, then left of that will be the Mobile/Landscape
+checkbox"): on/off checkbox (gated subgroups only) -> Mobile/Landscape
+device checkboxes -> undock button -> lock icon. The lock icon's own
+pre-existing `margin-left: auto` is what pushes it to the far right
+regardless of what precedes it; the indep-device checkbox's own
+(otherwise global) auto-margin is overridden specifically in this
+header context (`.dp-group-header > .dp-group-cascade-checkbox.dp-
+dynamic-device-checkbox-2nd { margin-left: 0; }`) so the 2 auto-margins
+in the same row stop competing for the row's free space, which had been
+visually separating the undock button from the lock icon instead of
+sitting adjacent to it.
+
+Verified live (browser, `?dev=1`, via getBoundingClientRect/computed
+style + real PointerEvent sequences, not `.click()` -- see this file's
+own standing testing-methodology note from 2026-09-17 for why that
+distinction matters for pointerdown-gated interactions): checkbox count
+dropped from 3 to 1 in the gate row; final left-to-right pixel order
+matched the requested layout both with the device checkboxes hidden
+(their normal default state -- no group in this project currently has
+dynamicDevice descendants wired through the group-cascade path) and
+temporarily forced visible; undock moved a scrolled-into-view group into
+a `position:fixed` floating panel at its correct on-screen coordinates;
+dock restored the exact original parent/nextSibling; resize (SE handle)
+grew the panel by the dragged delta (285x162 -> 294x203); drag moved the
+panel by the exact vertical delta (top 288 -> 318, dy=30) with the
+horizontal delta correctly clamped near this test environment's ~336px
+viewport edge (a known, previously-documented quirk of this browser
+tool, not a real bug); Copy Settings correctly force-docked an
+undocked group (via `dockAllUndockedGroups()`) before capturing panel
+state. `node --check` passed on both `src/main.js` and
+`src/devpanel/devPanel.js`. No console errors beyond the expected
+`/api/save-settings` 404s (no local API endpoint on this static preview
+server).
+
+Concurrent-session note: a separate session's own diff-staging note
+(this file's prior entry, "Fix deleted static Click Function groups
+still firing") had already flagged this exact `wrapGatedSubgroup()` fix
+as present-but-uncommitted working-tree state at that time and
+deliberately isolated it out of its own commit rather than including or
+discarding it -- confirmed via `git log`/`git diff` before staging this
+round that it was still sitting uncommitted exactly as left, with no
+conflicting changes from any other session in between.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================
