@@ -2730,6 +2730,43 @@ const POSE_PRESET_KEYS = [
   // predates them -- same convention as baseOnlyCurl*'s own comment.
   'poseOffsetX', 'poseOffsetY', 'poseOffsetZ', 'poseScale'
 ]
+// Pose Preview live-sync -- direct follow-up report ("in my pose
+// settings group, the Offset and Scale sliders dont seem to do
+// anything. They should be reflected in the pose preview"). Investigated
+// and found this applied to EVERY Pose-group slider, not just Offset/
+// Scale -- none of them ever touched `previewHand` at all. Each one's
+// own `onChange` (applyCurl()/applyWristPose()/onWholeHandRotationChange())
+// only reposes the live FIELD's hands; `previewPosePreset()` was only
+// ever called from "Use"/"Run"/the initial default-pose load, never from
+// a live slider drag. Confirmed via AskUserQuestion this should apply to
+// the WHOLE Pose group for consistency, not just Offset/Scale narrowly.
+//
+// Wraps every Pose-group control's own `onChange` (preserving whatever
+// it already does -- this never replaces the existing field-repose
+// behavior, only adds to it) with an additional live re-apply of the
+// CURRENT `cfg` state to the Pose Preview. `previewPosePreset(cfg)`
+// works directly here since `cfg` itself already carries every
+// POSE_PRESET_KEYS field live (the exact same shape a saved pose object
+// has) -- no separate "current slider snapshot" object needed. Scoped to
+// POSE_PRESET_KEYS members only, so non-pose-data controls in this same
+// group (posePreviewEnabled, savedPoses itself, action buttons) are
+// left untouched. Placed here (after POSE_PRESET_KEYS's own
+// declaration, not immediately after DEV_GROUPS closes) since
+// referencing POSE_PRESET_KEYS any earlier would hit its own temporal
+// dead zone -- `previewPosePreset` itself is a hoisted function
+// declaration, safe to reference from anywhere, but this array isn't.
+;(function wirePoseGroupLivePreviewSync() {
+  const poseGroup = DEV_GROUPS.find((g) => g.title === 'Pose')
+  if (!poseGroup) return
+  poseGroup.controls.forEach((ctrl) => {
+    if (!POSE_PRESET_KEYS.includes(ctrl.key)) return
+    const original = ctrl.onChange
+    ctrl.onChange = (v) => {
+      if (original) original(v)
+      previewPosePreset(cfg)
+    }
+  })
+})()
 function capturePosePreset() {
   const item = {}
   POSE_PRESET_KEYS.forEach((key) => { item[key] = cfg[key] })
