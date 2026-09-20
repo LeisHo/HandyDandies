@@ -7110,8 +7110,8 @@
     "mobile": {
       "fieldRows": 20,
       "fieldCols": 12,
-      "rowSpacing": 9.5,
-      "columnSpacing": 10.5,
+      "rowSpacing": 8,
+      "columnSpacing": 10,
       "handScale": 1.2,
       "alternateRowOffset": -6.5,
       "progressiveRowOffset": 1,
@@ -22809,7 +22809,7 @@
     },
     {
       "key": "Field Layout",
-      "collapsed": true,
+      "collapsed": false,
       "locked": false,
       "items": [
         {
@@ -22864,7 +22864,7 @@
     },
     {
       "key": "Cursor Tracking",
-      "collapsed": false,
+      "collapsed": true,
       "locked": false,
       "items": [
         {
