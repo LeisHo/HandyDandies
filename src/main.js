@@ -356,7 +356,7 @@ function tryStartField() {
   // whatever comes next; don't treat this comment's own reasoning above
   // as the settled explanation.
   renderer.compile(scene, camera)
-  window.__debug = { THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget } }
+  window.__debug = { THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose }
   loadingEl.classList.add('hidden')
   // The loading-preview canvas is a top-level sibling of #loading now
   // (2026-09-17, decoupled specifically so this moment doesn't force it
@@ -4206,6 +4206,21 @@ function applyLoadingPreviewPose(item) {
   loadingPreviewHand.clone.quaternion.copy(loadingPreviewBaseQuat)
   applyWristPoseToSkeleton(loadingPreviewHand.skinnedMesh.skeleton, values)
   FINGER_NAMES.forEach((name) => applyCurlToSkeleton(name, loadingPreviewHand.skinnedMesh.skeleton, loadingPreviewBaseQuat, null, values))
+  // CORRECTED 2026-09-20, direct report ("I dont see the difference in
+  // the loading preview" for a tween sequence whose last pose carries a
+  // non-zero Pose Offset/Scale) -- `values` above already correctly
+  // reads poseOffsetX/Y/Z/poseScale via POSE_PRESET_KEYS (that part was
+  // already wired), but nothing ever applied them to this preview's own
+  // clone -- unlike applyPoseValuesToHand() (the main field's equivalent,
+  // which offsets from each hand's own `basePosition` and scales from
+  // `computeBaseScale()`), this standalone single-hand preview has no
+  // field-grid position/scale to offset from at all -- its clone sits at
+  // a fixed (0,0,0)/scale-1 base by construction (buildLoadingPreview()
+  // never sets either). Applying directly against that fixed base, same
+  // "absolute .set() every call, never compounds" pattern as the field's
+  // own version.
+  loadingPreviewHand.clone.position.set(values.poseOffsetX || 0, values.poseOffsetY || 0, values.poseOffsetZ || 0)
+  loadingPreviewHand.clone.scale.setScalar(values.poseScale ?? 1)
 }
 // Row visibility for the Loading Preview's own Sequence Mode controls --
 // same 2-level gating as updateSequencePlayModeVisibility() (Count's own
@@ -4628,6 +4643,15 @@ function previewPosePreset(item) {
   // NEW target rotation, not whatever was left over from before).
   applyWristPoseToSkeleton(previewHand.skinnedMesh.skeleton, values)
   FINGER_NAMES.forEach((name) => applyCurlToSkeleton(name, previewHand.skinnedMesh.skeleton, previewBaseQuat, null, values))
+  // Same fix as applyLoadingPreviewPose()'s own matching comment
+  // (2026-09-20) -- `values` already reads poseOffsetX/Y/Z/poseScale via
+  // POSE_PRESET_KEYS, but this standalone preview hand's clone (fixed at
+  // (0,0,0)/scale-1 by buildPosePreview(), never otherwise touched) never
+  // had them applied. Closes the same disclosed gap noted when Pose
+  // Offset/Scale first shipped ("not yet wired into Pose Preview's own
+  // WYSIWYG view").
+  previewHand.clone.position.set(values.poseOffsetX || 0, values.poseOffsetY || 0, values.poseOffsetZ || 0)
+  previewHand.clone.scale.setScalar(values.poseScale ?? 1)
 }
 
 // Whole-Hand Rotation X/Y/Z -- changes `cloneBaseQuat` only (a single
