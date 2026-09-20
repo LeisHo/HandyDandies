@@ -17,7 +17,7 @@
       "palmFacesCursor": true,
       "palmFaceRotationOffset": 0,
       "loadingPreviewEnabled": true,
-      "loadingPreviewShowLive": true,
+      "loadingPreviewShowLive": false,
       "loadingMinTimeMs": 6700,
       "loadingPreviewTweenSelector": "COUNTDOWN - VERTICAL + LENS COVER",
       "loadingPreviewSavedCameras": [
@@ -234,9 +234,9 @@
       "modelRotY": 0,
       "modelRotZ": 0,
       "poseOffsetX": 2.22,
-      "poseOffsetY": 32.56,
-      "poseOffsetZ": 0.85,
-      "poseScale": 6,
+      "poseOffsetY": -300,
+      "poseOffsetZ": -0.3,
+      "poseScale": 12,
       "savedPoses": [
         {
           "name": "FistBent-Rotation-0",
@@ -6057,16 +6057,9 @@
           "modelRotY": 0,
           "modelRotZ": 0,
           "poseOffsetX": 2.22,
-          "poseOffsetY": 32.56,
-          "poseOffsetZ": 0.85,
-          "poseScale": 6,
-          "hideWrist": 78,
-          "shoulderRaise": 0,
-          "shoulderSwing": 0,
-          "shoulderRotation": 0,
-          "elbowBend": 0,
-          "elbowSideBend": 0,
-          "forearmTwist": 0
+          "poseOffsetY": -300,
+          "poseOffsetZ": -0.3,
+          "poseScale": 12
         }
       ],
       "cropWristEnabled": false,
@@ -6320,12 +6313,63 @@
       "rcRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "rcRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "tweenPoses": [
-        "Waiting Horizontal Tap - 0",
-        "Waiting Horizontal Tap - 1",
-        "Waiting Hoirzontal Tap - 2",
-        "Waiting Horizontal Tap - 3",
-        "Waiting Horizontal Tap - 4",
-        "Waiting Horizontal Tap - 5"
+        "COUNTDOWN (VERT) - 0",
+        "COUNTDOWN (VERT) - 1",
+        {
+          "type": "hold",
+          "percent": 50
+        },
+        "COUNTDOWN (VERT) - 2",
+        {
+          "type": "hold",
+          "percent": 50
+        },
+        "COUNTDOWN (VERT) - 3",
+        {
+          "type": "hold",
+          "percent": 50
+        },
+        "COUNTDOWN (VERT) - 4",
+        {
+          "type": "hold",
+          "percent": 50
+        },
+        "COUNTDOWN (VERT) - 5",
+        {
+          "type": "hold",
+          "percent": 50
+        },
+        "COUNTDOWN (VERT) - 6",
+        {
+          "type": "hold",
+          "percent": 50
+        },
+        "COUNTDOWN (VERT) - 7",
+        {
+          "type": "hold",
+          "percent": 50
+        },
+        "COUNTDOWN (VERT) - 8",
+        {
+          "type": "hold",
+          "percent": 50
+        },
+        "COUNTDOWN (VERT) - 9",
+        {
+          "type": "hold",
+          "percent": 50
+        },
+        "COUNTDOWN  (VERT) - 10",
+        {
+          "type": "hold",
+          "percent": 50
+        },
+        "Big Open Palm",
+        "COUNTDOWN (VERT) - LENS COVER",
+        {
+          "type": "hold",
+          "percent": 300
+        }
       ],
       "tweenPreviewSpeedMs": 602,
       "savedTweenSequences": [
@@ -6452,6 +6496,7 @@
               "type": "hold",
               "percent": 50
             },
+            "Big Open Palm",
             "COUNTDOWN (VERT) - LENS COVER",
             {
               "type": "hold",
@@ -7044,7 +7089,7 @@
       "palmFacesCursor": true,
       "palmFaceRotationOffset": 0,
       "loadingPreviewEnabled": true,
-      "loadingPreviewShowLive": true,
+      "loadingPreviewShowLive": false,
       "loadingMinTimeMs": 6700,
       "loadingPreviewTweenSelector": "COUNTDOWN - VERTICAL + LENS COVER",
       "loadingPreviewSavedCameras": [
@@ -7261,9 +7306,9 @@
       "modelRotY": 0,
       "modelRotZ": 0,
       "poseOffsetX": 2.22,
-      "poseOffsetY": 32.56,
-      "poseOffsetZ": 0.85,
-      "poseScale": 6,
+      "poseOffsetY": -300,
+      "poseOffsetZ": -0.3,
+      "poseScale": 12,
       "savedPoses": [
         {
           "name": "FistBent-Rotation-0",
@@ -13084,16 +13129,9 @@
           "modelRotY": 0,
           "modelRotZ": 0,
           "poseOffsetX": 2.22,
-          "poseOffsetY": 32.56,
-          "poseOffsetZ": 0.85,
-          "poseScale": 6,
-          "hideWrist": 78,
-          "shoulderRaise": 0,
-          "shoulderSwing": 0,
-          "shoulderRotation": 0,
-          "elbowBend": 0,
-          "elbowSideBend": 0,
-          "forearmTwist": 0
+          "poseOffsetY": -300,
+          "poseOffsetZ": -0.3,
+          "poseScale": 12
         }
       ],
       "cropWristEnabled": false,
@@ -13347,12 +13385,63 @@
       "rcRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "rcRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "tweenPoses": [
-        "Waiting Horizontal Tap - 0",
-        "Waiting Horizontal Tap - 1",
-        "Waiting Hoirzontal Tap - 2",
-        "Waiting Horizontal Tap - 3",
-        "Waiting Horizontal Tap - 4",
-        "Waiting Horizontal Tap - 5"
+        "COUNTDOWN (VERT) - 0",
+        "COUNTDOWN (VERT) - 1",
+        {
+          "type": "hold",
+          "percent": 50
+        },
+        "COUNTDOWN (VERT) - 2",
+        {
+          "type": "hold",
+          "percent": 50
+        },
+        "COUNTDOWN (VERT) - 3",
+        {
+          "type": "hold",
+          "percent": 50
+        },
+        "COUNTDOWN (VERT) - 4",
+        {
+          "type": "hold",
+          "percent": 50
+        },
+        "COUNTDOWN (VERT) - 5",
+        {
+          "type": "hold",
+          "percent": 50
+        },
+        "COUNTDOWN (VERT) - 6",
+        {
+          "type": "hold",
+          "percent": 50
+        },
+        "COUNTDOWN (VERT) - 7",
+        {
+          "type": "hold",
+          "percent": 50
+        },
+        "COUNTDOWN (VERT) - 8",
+        {
+          "type": "hold",
+          "percent": 50
+        },
+        "COUNTDOWN (VERT) - 9",
+        {
+          "type": "hold",
+          "percent": 50
+        },
+        "COUNTDOWN  (VERT) - 10",
+        {
+          "type": "hold",
+          "percent": 50
+        },
+        "Big Open Palm",
+        "COUNTDOWN (VERT) - LENS COVER",
+        {
+          "type": "hold",
+          "percent": 300
+        }
       ],
       "tweenPreviewSpeedMs": 602,
       "savedTweenSequences": [
@@ -13479,6 +13568,7 @@
               "type": "hold",
               "percent": 50
             },
+            "Big Open Palm",
             "COUNTDOWN (VERT) - LENS COVER",
             {
               "type": "hold",
@@ -14071,7 +14161,7 @@
       "palmFacesCursor": true,
       "palmFaceRotationOffset": 0,
       "loadingPreviewEnabled": true,
-      "loadingPreviewShowLive": true,
+      "loadingPreviewShowLive": false,
       "loadingMinTimeMs": 6700,
       "loadingPreviewTweenSelector": "COUNTDOWN - VERTICAL + LENS COVER",
       "loadingPreviewSavedCameras": [
@@ -14288,9 +14378,9 @@
       "modelRotY": 0,
       "modelRotZ": 0,
       "poseOffsetX": 2.22,
-      "poseOffsetY": 32.56,
-      "poseOffsetZ": 0.85,
-      "poseScale": 6,
+      "poseOffsetY": -300,
+      "poseOffsetZ": -0.3,
+      "poseScale": 12,
       "savedPoses": [
         {
           "name": "FistBent-Rotation-0",
@@ -20111,16 +20201,9 @@
           "modelRotY": 0,
           "modelRotZ": 0,
           "poseOffsetX": 2.22,
-          "poseOffsetY": 32.56,
-          "poseOffsetZ": 0.85,
-          "poseScale": 6,
-          "hideWrist": 78,
-          "shoulderRaise": 0,
-          "shoulderSwing": 0,
-          "shoulderRotation": 0,
-          "elbowBend": 0,
-          "elbowSideBend": 0,
-          "forearmTwist": 0
+          "poseOffsetY": -300,
+          "poseOffsetZ": -0.3,
+          "poseScale": 12
         }
       ],
       "cropWristEnabled": false,
@@ -20374,12 +20457,63 @@
       "rcRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "rcRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "tweenPoses": [
-        "Waiting Horizontal Tap - 0",
-        "Waiting Horizontal Tap - 1",
-        "Waiting Hoirzontal Tap - 2",
-        "Waiting Horizontal Tap - 3",
-        "Waiting Horizontal Tap - 4",
-        "Waiting Horizontal Tap - 5"
+        "COUNTDOWN (VERT) - 0",
+        "COUNTDOWN (VERT) - 1",
+        {
+          "type": "hold",
+          "percent": 50
+        },
+        "COUNTDOWN (VERT) - 2",
+        {
+          "type": "hold",
+          "percent": 50
+        },
+        "COUNTDOWN (VERT) - 3",
+        {
+          "type": "hold",
+          "percent": 50
+        },
+        "COUNTDOWN (VERT) - 4",
+        {
+          "type": "hold",
+          "percent": 50
+        },
+        "COUNTDOWN (VERT) - 5",
+        {
+          "type": "hold",
+          "percent": 50
+        },
+        "COUNTDOWN (VERT) - 6",
+        {
+          "type": "hold",
+          "percent": 50
+        },
+        "COUNTDOWN (VERT) - 7",
+        {
+          "type": "hold",
+          "percent": 50
+        },
+        "COUNTDOWN (VERT) - 8",
+        {
+          "type": "hold",
+          "percent": 50
+        },
+        "COUNTDOWN (VERT) - 9",
+        {
+          "type": "hold",
+          "percent": 50
+        },
+        "COUNTDOWN  (VERT) - 10",
+        {
+          "type": "hold",
+          "percent": 50
+        },
+        "Big Open Palm",
+        "COUNTDOWN (VERT) - LENS COVER",
+        {
+          "type": "hold",
+          "percent": 300
+        }
       ],
       "tweenPreviewSpeedMs": 602,
       "savedTweenSequences": [
@@ -20506,6 +20640,7 @@
               "type": "hold",
               "percent": 50
             },
+            "Big Open Palm",
             "COUNTDOWN (VERT) - LENS COVER",
             {
               "type": "hold",
@@ -22544,7 +22679,7 @@
     },
     {
       "key": "Tween",
-      "collapsed": true,
+      "collapsed": false,
       "locked": false,
       "items": [
         {
