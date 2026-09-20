@@ -4211,15 +4211,19 @@ function applyLoadingPreviewPose(item) {
   // non-zero Pose Offset/Scale) -- `values` above already correctly
   // reads poseOffsetX/Y/Z/poseScale via POSE_PRESET_KEYS (that part was
   // already wired), but nothing ever applied them to this preview's own
-  // clone -- unlike applyPoseValuesToHand() (the main field's equivalent,
-  // which offsets from each hand's own `basePosition` and scales from
-  // `computeBaseScale()`), this standalone single-hand preview has no
-  // field-grid position/scale to offset from at all -- its clone sits at
-  // a fixed (0,0,0)/scale-1 base by construction (buildLoadingPreview()
-  // never sets either). Applying directly against that fixed base, same
-  // "absolute .set() every call, never compounds" pattern as the field's
-  // own version.
-  loadingPreviewHand.clone.position.set(values.poseOffsetX || 0, values.poseOffsetY || 0, values.poseOffsetZ || 0)
+  // clone -- unlike applyPoseValuesToHand() (the main field's equivalent),
+  // this standalone single-hand preview has no field-grid position/scale
+  // to offset from at all -- its clone sits at a fixed (0,0,0)/scale-1
+  // base by construction (buildLoadingPreview() never sets either).
+  // CORRECTED AGAIN, same day (direct follow-up: "the offset should be in
+  // relation to the active camera... for loading preview, in relation to
+  // the loading preview camera") -- applyPoseOffsetToPosition() resolves
+  // X/Y/Z against `loadingPreviewCamera`'s own right/up/toward-camera
+  // basis rather than world axes; see that function's own comment for the
+  // full account of why a flat world-space offset (this preview's OWN
+  // first attempt, and HANDO's own convention) doesn't reproduce "close
+  // to the camera" once the camera isn't aligned with world Z.
+  applyPoseOffsetToPosition(loadingPreviewHand.clone, _poseOffsetZeroVec, loadingPreviewCamera, values)
   loadingPreviewHand.clone.scale.setScalar(values.poseScale ?? 1)
 }
 // Row visibility for the Loading Preview's own Sequence Mode controls --
@@ -4644,13 +4648,12 @@ function previewPosePreset(item) {
   applyWristPoseToSkeleton(previewHand.skinnedMesh.skeleton, values)
   FINGER_NAMES.forEach((name) => applyCurlToSkeleton(name, previewHand.skinnedMesh.skeleton, previewBaseQuat, null, values))
   // Same fix as applyLoadingPreviewPose()'s own matching comment
-  // (2026-09-20) -- `values` already reads poseOffsetX/Y/Z/poseScale via
-  // POSE_PRESET_KEYS, but this standalone preview hand's clone (fixed at
-  // (0,0,0)/scale-1 by buildPosePreview(), never otherwise touched) never
-  // had them applied. Closes the same disclosed gap noted when Pose
-  // Offset/Scale first shipped ("not yet wired into Pose Preview's own
-  // WYSIWYG view").
-  previewHand.clone.position.set(values.poseOffsetX || 0, values.poseOffsetY || 0, values.poseOffsetZ || 0)
+  // (2026-09-20, corrected same day to be camera-relative via
+  // applyPoseOffsetToPosition() -- see that function's own comment) --
+  // this standalone preview hand's clone (fixed at (0,0,0)/scale-1 by
+  // buildPosePreview(), never otherwise touched) needs Pose Offset/Scale
+  // applied against `previewCamera`'s own basis, not world axes.
+  applyPoseOffsetToPosition(previewHand.clone, _poseOffsetZeroVec, previewCamera, values)
   previewHand.clone.scale.setScalar(values.poseScale ?? 1)
 }
 
@@ -5494,33 +5497,71 @@ function computeBaseQuatFromValues(values) {
 // only "startup" (no transition in progress, cloneBaseQuat and
 // currentBaseQuat trivially equal) looked correct while every actual
 // transition didn't.
+// Pose Offset X/Y/Z + Pose Scale (ported from HANDO -- see
+// POSE_PRESET_KEYS's own comment for the full account), CAMERA-RELATIVE
+// rather than world-space -- direct follow-up request ("the offset
+// should be in relation to the active camera"). HANDO's own Pose Offset
+// Z is a flat world-space translate (`modelRoot.position.z +=
+// cfg.poseOffsetZ`), which only reads as "toward the camera" there
+// because HANDO's own camera happens to look straight down world Z --
+// this project's Loading Preview/Pose Preview cameras are positioned via
+// auto-frame/orbit math (and the main field's hands live inside an
+// `alignQuat`-rotated frame), so a raw world-Z offset tuned by eye in
+// HANDO doesn't translate into "close to the camera" here once the
+// active camera isn't aligned with world Z -- confirmed as the real
+// cause of a reported HANDO tween (its last pose pulls the hand right up
+// to HANDO's own camera) showing no such effect in the Loading Preview.
+// Resolves X/Y/Z against `cam`'s own right/up/toward-camera basis
+// instead: `cam.matrixWorld` column 0/1 are the camera's local right/up
+// (same convention applyOffsetRotationToHand() already uses for its own
+// separate Offset X/Y feature, below); column 2 is the camera's local
+// +Z, which points from the view target BACK TOWARD the camera (a
+// camera's local -Z is its forward/look direction) -- exactly "toward
+// the camera" for a positive Z value, matching HANDO's own increasing-Z-
+// is-closer convention. `cam.updateMatrixWorld()` first, defensively --
+// an orbit-dragged camera's matrixWorld is otherwise only guaranteed
+// fresh as of the LAST render call, one frame stale relative to a
+// same-tick pose application.
+const _poseOffsetRightVec = new THREE.Vector3()
+const _poseOffsetUpVec = new THREE.Vector3()
+const _poseOffsetTowardCameraVec = new THREE.Vector3()
+const _poseOffsetZeroVec = new THREE.Vector3()
+// Position only -- kept separate from scale (below) so a caller that
+// doesn't yet have a valid base position (see applyPoseValuesToHand()'s
+// own `hand.basePosition` guard) can skip JUST the position write
+// without also skipping its own unconditional scale update.
+function applyPoseOffsetToPosition(positionTarget, basePosition, cam, values) {
+  positionTarget.position.copy(basePosition)
+  const ox = values.poseOffsetX || 0, oy = values.poseOffsetY || 0, oz = values.poseOffsetZ || 0
+  if ((ox || oy || oz) && cam) {
+    cam.updateMatrixWorld()
+    _poseOffsetRightVec.setFromMatrixColumn(cam.matrixWorld, 0)
+    _poseOffsetUpVec.setFromMatrixColumn(cam.matrixWorld, 1)
+    _poseOffsetTowardCameraVec.setFromMatrixColumn(cam.matrixWorld, 2)
+    positionTarget.position.addScaledVector(_poseOffsetRightVec, ox)
+    positionTarget.position.addScaledVector(_poseOffsetUpVec, oy)
+    positionTarget.position.addScaledVector(_poseOffsetTowardCameraVec, oz)
+  }
+}
 function applyPoseValuesToHand(hand, poseValues, extraSplayDeg) {
   if (!hand.skinnedMesh) return
   hand.currentBaseQuat.copy(computeBaseQuatFromValues(poseValues))
   // Wrist BEFORE fingers -- see applyAllFingerPoses()'s own comment.
   applyWristPoseToSkeleton(hand.skinnedMesh.skeleton, poseValues, extraSplayDeg)
   FINGER_NAMES.forEach((name) => applyCurlToSkeleton(name, hand.skinnedMesh.skeleton, hand.currentBaseQuat, hand.wrapper.quaternion, poseValues))
-  // Pose Offset X/Y/Z + Pose Scale (ported from HANDO -- see
-  // POSE_PRESET_KEYS's own comment for the full account). An ABSOLUTE
-  // `.set()` from this hand's own stored grid `basePosition`, not an
-  // additive nudge -- recomputed fresh from `poseValues` every call, so it
-  // can never compound across frames the way repeatedly adding an offset
-  // to the same vector would. Runs BEFORE applyOffsetRotationToHand()'s
-  // own separate, ADDITIVE per-trigger Offset X/Y (camera-relative,
-  // progress-scaled) -- that function always runs right after this one at
-  // every real call site, so its own `.addScaledVector()` correctly
-  // stacks on top of this pose-level offset rather than fighting it.
-  // `hand.basePosition` is only absent before the very first
-  // relayoutField() call -- guarded rather than assumed, since a pose
-  // could theoretically be applied a single frame before the initial
-  // layout runs.
-  if (hand.basePosition) {
-    hand.wrapper.position.set(
-      hand.basePosition.x + (poseValues.poseOffsetX || 0),
-      hand.basePosition.y + (poseValues.poseOffsetY || 0),
-      hand.basePosition.z + (poseValues.poseOffsetZ || 0)
-    )
-  }
+  // An ABSOLUTE position/scale set from this hand's own stored grid
+  // `basePosition`, not an additive nudge -- recomputed fresh from
+  // `poseValues` every call, so it can never compound across frames the
+  // way repeatedly adding an offset to the same vector would. Runs
+  // BEFORE applyOffsetRotationToHand()'s own separate, ADDITIVE
+  // per-trigger Offset X/Y (also camera-relative, progress-scaled) --
+  // that function always runs right after this one at every real call
+  // site, so its own `.addScaledVector()` correctly stacks on top of
+  // this pose-level offset rather than fighting it. `hand.basePosition`
+  // is only absent before the very first relayoutField() call -- guarded
+  // rather than assumed, since a pose could theoretically be applied a
+  // single frame before the initial layout runs.
+  if (hand.basePosition) applyPoseOffsetToPosition(hand.wrapper, hand.basePosition, camera, poseValues)
   hand.clone.scale.setScalar(computeBaseScale() * (poseValues.poseScale ?? 1))
   // The ONE place every trigger family (chp/rchp/dcHold/click/dblclick/rc)
   // funnels its own per-frame pose application through, regardless of
