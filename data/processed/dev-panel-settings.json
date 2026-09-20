@@ -18,7 +18,7 @@
       "palmFaceRotationOffset": 0,
       "loadingPreviewEnabled": true,
       "loadingPreviewShowLive": false,
-      "loadingMinTimeMs": 10000,
+      "loadingMinTimeMs": 5000,
       "loadingPreviewTweenSelector": "COUNTDOWN - VERTICAL",
       "loadingPreviewSavedCameras": [
         {
@@ -6803,7 +6803,7 @@
       "palmFaceRotationOffset": 0,
       "loadingPreviewEnabled": true,
       "loadingPreviewShowLive": false,
-      "loadingMinTimeMs": 10000,
+      "loadingMinTimeMs": 5000,
       "loadingPreviewTweenSelector": "COUNTDOWN - VERTICAL",
       "loadingPreviewSavedCameras": [
         {
@@ -13588,7 +13588,7 @@
       "palmFaceRotationOffset": 0,
       "loadingPreviewEnabled": true,
       "loadingPreviewShowLive": false,
-      "loadingMinTimeMs": 10000,
+      "loadingMinTimeMs": 5000,
       "loadingPreviewTweenSelector": "COUNTDOWN - VERTICAL",
       "loadingPreviewSavedCameras": [
         {
@@ -21471,7 +21471,7 @@
     },
     {
       "key": "Loading Preview",
-      "collapsed": true,
+      "collapsed": false,
       "locked": false,
       "items": [
         {
