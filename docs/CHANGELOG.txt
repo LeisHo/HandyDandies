@@ -9728,6 +9728,69 @@ handling), not new/novel math. Worth a live confirm once this sandbox's
 networking cooperates, or directly by the user.
 
 --------------------------------------------------------------------------------
+2026-09-20 (later same day, 6th follow-up round)
+
+Computed the correct Pose Offset X/Y/Z for the "COUNTDOWN (VERT) - LENS
+COVER" pose, direct follow-up to the same day's earlier axis-confusion
+investigation ("yeah do that please" -- offering to compute exact values
+instead of continued trial-and-error).
+
+Method: read the ACTUAL currently-active camera ("Front-Straightened")
+and pose data (poseScale: 6) from the live-updating settings file
+(re-fetched from `origin/main` twice during this round, since the user
+was actively re-tuning the same values live in their own browser tab
+while this was being worked on -- confirmed the pose's own values hadn't
+moved again immediately before writing the final result). Built the
+camera's own right/up/toward-camera basis vectors
+(`camera.matrixWorld` columns 0/1/2, replicating
+`applyLoadingPreviewCameraPreset()`'s own `camera.up` + `lookAt()` setup
+exactly), picked a target world position ON the camera's own view axis
+at a chosen distance, then solved for the offset via dot-product
+decomposition against those same basis vectors -- the exact inverse of
+what `applyPoseOffsetToPosition()` itself does forward.
+
+Chose the target distance empirically by reading the Loading Preview
+canvas's own rendered PIXEL DATA (`canvas.getImageData()`, counting non-
+transparent pixels) across a range of distances -- NOT by eyeballing
+screenshots, which this round confirmed can be unreliable for catching
+a manually-triggered render() at the right moment (a first attempt,
+judged purely by `computer{screenshot}`, wrongly looked completely
+blank at 2 different distances; the pixel-data read revealed the hand
+was actually rendering correctly the whole time -- see the disclosed
+false-alarm note below). Landed on a distance giving ~59% frame
+coverage -- a strong, dramatic close-up without the camera ending up
+inside the hand's own bounding geometry (confirmed via
+`handBoundsRadiusLocal`, a new debug exposure: at `poseScale: 6` the
+hand's own scaled bounding radius is ~137.8 units, versus the chosen
+~55-unit target distance).
+
+New values: `poseOffsetX: 2.22, poseOffsetY: 32.56, poseOffsetZ: 0.85`
+(previously `-0.5/-18.5/24.6`, the user's own hand-tuned trial-and-error
+value from mid-investigation). Updated identically across all 3 device
+blocks (Desktop/Mobile/Landscape), which already carried identical
+values for this pose. Verified via `Vector3.project(camera)`: this
+position resolves to NDC `(0, 0)` -- dead center of the camera's own
+view -- confirming the hand's bounding-sphere center lands exactly on
+the camera's view axis at the intended distance.
+
+**Disclosed false alarm, corrected within this same round:** an early
+pass concluded `hideWrist: 100` (the fallback default) was clipping the
+ENTIRE mesh away, based on 2 consecutive blank-looking screenshots at
+extreme offset values. Direct pixel-data verification (`getImageData()`
+non-transparent-pixel count) at the SAME distance/scale immediately
+after showed substantial rendered content regardless of `hideWrist`
+value (0 through 100 all produced identical pixel counts) -- the wrist-
+crop feature added earlier today has NO bug; the blank screenshots were
+a capture-timing artifact of the `computer{screenshot}` tool specifically,
+not a rendering problem. Recorded here so a future session doesn't
+waste time re-investigating a `hideWrist`-clips-everything theory that
+was already tested and ruled out.
+
+Added `handBoundsRadiusLocal`/`handBoundsCenterLocal` to
+`window.__debug` (used for this calculation) -- kept permanently,
+matching the existing convention for this debug object.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

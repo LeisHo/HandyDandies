@@ -18,6 +18,24 @@ work seamlessly from there.
 
 ## Currently working on
 
+**SHIPPED 2026-09-20 (later same day, 6th follow-up round): computed
+the correct Pose Offset X/Y/Z for "COUNTDOWN (VERT) - LENS COVER"
+directly, ending the trial-and-error loop from the prior round's
+investigation.** Used the camera's own right/up/toward-camera basis
+vectors (same math `applyPoseOffsetToPosition()` uses, solved in
+reverse) to place the hand exactly on the active camera's own view
+axis, at a distance chosen by reading actual rendered pixel coverage
+(~59% of frame) rather than guessing. New values `poseOffsetX: 2.22,
+poseOffsetY: 32.56, poseOffsetZ: 0.85` (previously the user's own hand-
+tuned `-0.5/-18.5/24.6`), written into all 3 device blocks. **Along the
+way, ruled out a false alarm**: an early pass suspected the wrist-crop
+feature (shipped earlier today) was clipping the whole mesh at
+`hideWrist: 100` -- direct pixel-data verification (not screenshots,
+which proved unreliable for catching a manual render at the right
+moment this round) showed no such bug; recorded so it isn't
+re-investigated later. See CHANGELOG.txt's matching 2026-09-20 (6th
+follow-up round) entry for the full method and verification detail.
+
 **SHIPPED 2026-09-20 (later same day, 5th follow-up round, verification
 gap disclosed): a saved pose's own Whole Hand Rotation (modelRotX/Y/Z)
 now applies in the Loading Preview (direct request: "when i import
