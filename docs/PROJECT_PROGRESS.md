@@ -18,6 +18,24 @@ work seamlessly from there.
 
 ## Currently working on
 
+**INVESTIGATED 2026-09-20 (later same day, 9th follow-up round) --
+Click Function group checkbox report, no code change: "make sure the
+click function group checkboxes work on desktop. Mobile looks good but
+desktop doesn't," clarified as being about the group-header checkbox
+placement/duplication.** That exact duplication bug (a gated subgroup's
+welded-in Enabled row showing 3 checkboxes instead of 1) was already
+fixed earlier the same day in commit 971462b, ~5.5h before this report.
+Live-verified in a fresh browser-preview load (not a stale tab): all 10
+static Click Function groups' Offset/Rotation subgroup headers show
+exactly 2 checkboxes on both Desktop and Mobile tabs (the real on/off
+value + one cascade checkbox, symmetric and by-design), and the
+Desktop-tab cascade checkbox correctly hides its row on Mobile when
+unchecked, with no errors. Could not reproduce any Desktop-specific
+breakage. Leading theory: the user's own browser tab is stale (this
+project's own well-documented recurring failure mode) -- recommended a
+hard refresh. See CHANGELOG.txt's matching entry for the full
+verification trail.
+
 **SHIPPED 2026-09-20 (later same day, 8th follow-up round, verification
 gap disclosed): "Use" on a saved pose now syncs `cfg` + the Pose-group
 slider UI too, not just the preview's render (direct follow-up: "the
@@ -2299,4 +2317,15 @@ Other open items worth the user's own confirmation:
 
 ## Open questions / blockers
 
-None currently open.
+**Loading Preview: shows on mobile in Dev mode (`?dev=1`/localhost) but
+not in normal mode (bare production URL) -- unresolved, 2026-09-20.**
+Leading hypothesis ("`loadingPreviewEnabled` differs between default
+and saved") was directly checked and refuted -- both are `true` in
+`main.js`'s own `def:` and in all 3 device blocks of
+`dev-panel-settings.json`. No explicit `DEV_MODE` check gates the
+Loading Preview build path in `main.js`; `restoreValuesForEveryVisitor()`
+already runs identically for dev and normal visitors (a previously-
+fixed, confirmed-correct historical bug). No replacement hypothesis has
+been tested yet -- needs either a real mobile device/browser console
+during an actual failure, or a narrower repro (exactly which URL form
+was tested) to continue.
