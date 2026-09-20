@@ -9836,6 +9836,54 @@ real, non-default value too (the new behavior). No console errors
 beyond expected local `/api/save-settings` 404s. `node --check` clean.
 
 --------------------------------------------------------------------------------
+2026-09-20 (later same day, 8th follow-up round)
+
+Made the savedPoses control's own "Use" button sync `cfg` and the Pose-
+group slider UI from the selected pose, not just the preview's render.
+Direct follow-up: "when i select a pose and hit Use, the pose preview
+changes accordingly, but i want the Offset and scale slides and all the
+other pose sliders to adjust accordingly." The reverse direction of the
+prior (7th) round's live-preview-sync work: that made every Pose-group
+slider push its value INTO the preview; this makes "Use" pull the
+selected pose's own values back OUT into `cfg` and the slider UI, so
+the panel's own displayed numbers always match what's actually being
+previewed instead of staying at whatever they were left at before Use
+was clicked.
+
+New `syncCfgAndSlidersFromPose(item)` writes each `POSE_PRESET_KEYS`
+field from the selected pose directly into `cfg[key]` (not `commit()`)
+and calls `syncValue(key, value)` for each -- the exact same
+"externally-driven update" convention already established and
+currently shipping for `useTweenSequencePreset()`. Writing `cfg[key]`
+directly, bypassing `commit()`, means the main FIELD's own hands are
+never touched by this (only an explicit
+`applyCurl()`/`applyWristPose()`/`onWholeHandRotationChange()` call
+would repose them, none of which run here), preserving the original,
+already-established "Use should NOT repose every hand in the field"
+design intent. `syncValue()` itself deliberately doesn't fire a
+control's own `onChange` (existing devPanel.js behavior) -- which also
+conveniently avoids feeding back into the prior round's own `onChange`
+wrapping -- so an explicit `previewPosePreset(cfg)` call at the end is
+still what actually updates the preview's own render. This fully
+replaces the `savedPoses` control's previous `onUse: (item) =>
+previewPosePreset(item)`.
+
+**Verification gap, disclosed honestly, per direct user feedback this
+same round ("next time just try 5 times and if it fails then move
+on"):** hit another extreme, sustained run of this sandbox's own known
+network-truncation issue -- 13 consecutive `net::ERR_CONNECTION_RESET`
+failures on `main.js` across 2 different server processes/ports before
+stopping (confirmed via `curl` not to be a code issue, byte-identical
+to the real file). Did not get a clean live page load this round.
+Confidence rests on `node --check` passing cleanly and this being a
+direct, minimal application of an already-proven-correct pattern
+already shipping elsewhere in this same file
+(`useTweenSequencePreset()`'s own `syncValue()`-based external-update
+convention), not new/novel mechanics. Saved as a standing session
+preference going forward: cap live-verification retries at 5 attempts,
+not 10-20+, before falling back to disclosed static verification.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

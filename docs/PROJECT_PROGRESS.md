@@ -18,6 +18,29 @@ work seamlessly from there.
 
 ## Currently working on
 
+**SHIPPED 2026-09-20 (later same day, 8th follow-up round, verification
+gap disclosed): "Use" on a saved pose now syncs `cfg` + the Pose-group
+slider UI too, not just the preview's render (direct follow-up: "the
+pose preview changes accordingly, but i want the Offset and scale
+slides and all the other pose sliders to adjust accordingly").** The
+reverse direction of the 7th round's live-preview-sync work. New
+`syncCfgAndSlidersFromPose(item)` writes every `POSE_PRESET_KEYS` field
+from the selected pose into `cfg` + the slider UI via `syncValue()` --
+the same external-update convention already proven in
+`useTweenSequencePreset()` -- then calls `previewPosePreset(cfg)` to
+update the render. Bypasses `commit()` so the main field's own hands
+stay untouched, preserving the original "Use shouldn't repose the
+field" design. **Could not get a clean live page load this round**
+(another severe run of this sandbox's own network-truncation issue, 13
+resets across 2 server processes) -- confidence rests on `node --check`
+passing and this being a minimal application of an already-shipping
+pattern, not new mechanics. **Worth a live confirm on your own next
+reload.** Also: per direct feedback this round, live-verification
+retries are now capped at 5 attempts before falling back to disclosed
+static verification, rather than continuing well past 10. See
+CHANGELOG.txt's matching 2026-09-20 (8th follow-up round) entry for
+full detail.
+
 **SHIPPED 2026-09-20 (later same day, 7th follow-up round): every Pose-
 group slider now live-updates the Pose Preview panel (direct report:
 "the Offset and Scale sliders dont seem to do anything. They should be
