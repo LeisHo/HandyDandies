@@ -8610,6 +8610,77 @@ project's own standing style.css-cache-buster discipline, per an
 earlier 2026-09-17 gotcha in CLAUDE.md).
 
 --------------------------------------------------------------------------------
+2026-09-19  23:31:03-23:44:24 EDT (13m21s, measured)
+
+**Investigated "Loading Preview doesnt work for Mobile... i just see
+Loading Hands... then the hand field shows" -- found and fixed one
+real, concrete bug, but could NOT confirm it's the complete story.**
+
+**Fixed:** `loadingPreviewRenderer` (the Loading Preview's own
+dedicated WebGLRenderer) never called `setPixelRatio()` -- unlike the
+main field's own renderer, which does
+(`renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))`).
+three.js defaults an un-set pixel ratio to 1, so on any HiDPI device
+(devicePixelRatio 2-3 -- virtually every real phone; confirmed live via
+mobile-viewport emulation here reading `devicePixelRatio: 2`) the
+actual WebGL drawing buffer ends up at HALF (or a THIRD) the resolution
+the CSS box displays it at. At this preview's own small ~160px default
+size, that's enough to collapse the hand's fine detail into something
+unrecognizable rather than just "a bit soft." Added the same
+`setPixelRatio()` call `loadingPreviewRenderer` was missing, matching
+the main renderer's own established convention -- confirmed live that
+the drawing buffer now correctly comes out at CSS-size x pixel-ratio
+(160 CSS px x 2 = 320px buffer, verified via `canvas.width`/`.height`
+directly) where it used to just be 160x160 regardless of device.
+
+**Investigated further, could not conclusively confirm or rule out a
+2nd contributing cause.** Attempted to directly verify whether the
+preview hand actually renders during the pre-field-start window on a
+mobile viewport by reading the canvas's own WebGL buffer pixels
+(`gl.readPixels()`, bypassing CSS/screenshot layers entirely, given
+this session's own browser tool has several ALREADY-documented
+instances of misreporting layout/dimension values in this exact
+project -- see CLAUDE.md's own `window.innerWidth`/`document.hidden`/
+`getBoundingClientRect` gotchas). Every clean read (confirmed via
+`hasField: false`, i.e. genuinely still in the pre-field-start window)
+showed the buffer 100% transparent -- but also found `requestAnimationFrame`
+genuinely not ticking at all (0 ticks in 300ms) on the SAME tab at the
+SAME time, despite the tab being explicitly fronted -- a live,
+measured instance of this session's own already-documented "rAF never
+firing" sandbox quirk, not just the `document.hidden`-misreport variant
+already on file. Since the animate() loop that would draw INTO that
+buffer runs off the same rAF loop, a real, measured rAF stall fully
+explains an empty buffer on its own, independent of whatever a real
+phone's browser does -- meaning this specific empty-buffer finding
+could not be trusted as evidence of a real mobile rendering bug beyond
+the pixel-ratio fix already made. Did not find a 2nd genuine device-
+conditional code path anywhere in `buildLoadingPreview()`/`animate()`'s
+own pre-field-start branch -- camera framing math was independently
+confirmed IDENTICAL on the emulated mobile viewport (distance 82.76 =~
+handBoundsRadiusLocal * 3.6, matching desktop exactly), and
+`loadingPreviewEnabled`/`loadingPreviewSize`/`loadingMinTimeMs` all
+read identical values across desktop/mobile in the real saved settings
+(no devVisibility/devIndependence overrides on any Loading Preview
+control).
+
+**Recommendation to the user, stated honestly:** the pixel-ratio fix is
+real and worth having regardless, but re-check on an actual mobile
+device after this ships -- if the preview is still invisible/blank
+there (not just soft/blurry), this needs either a real device's own
+console error log or a different verification approach, since this
+sandbox's own rAF-when-backgrounded limitation ruled out a clean
+reproduction here.
+
+2 temporary diagnostic changes (`loadingMinTimeMs`'s own DEV_GROUPS
+`def` bumped to 15000, then 60000, to widen the otherwise-too-narrow
+local testing window) were made and fully reverted -- confirmed back to
+`def: 1200`, `node --check` passed.
+
+Cache-buster: `index.html`'s `main.js?v=167` -> `?v=170` (3 bumps
+across the diagnostic bump/revert cycle, same as prior sessions'
+established pattern).
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

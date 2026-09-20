@@ -18,7 +18,33 @@ work seamlessly from there.
 
 ## Currently working on
 
-**RESOLVED 2026-09-19 (latest, urgent round): real data-loss incident —
+**PARTIALLY FIXED 2026-09-19 (latest round): Loading Preview invisible
+on Mobile — fixed one real, confirmed bug (missing pixel-ratio on the
+preview's own renderer), but couldn't fully confirm it's the whole
+story.** Direct report ("Loading Preview doesnt work for Mobile. It
+works for Desktop, but on mobile i just see Loading Hands..."). Found
+`loadingPreviewRenderer` never called `setPixelRatio()`, unlike the
+main field's own renderer — on any HiDPI device (virtually every real
+phone) the WebGL drawing buffer was rendering at half or a third the
+resolution the CSS box displayed it at, enough to collapse a small
+~160px preview's fine detail into a smudge. Fixed to match the main
+renderer's own convention. Investigated further via direct pixel-buffer
+reads (`gl.readPixels()`, bypassing CSS/screenshot layers this session's
+own browser tool has repeatedly misreported before) on an emulated
+mobile viewport — found the buffer consistently empty, but ALSO found
+`requestAnimationFrame` genuinely not ticking on the same tab at the
+same time (a live instance of this session's own already-documented
+rAF-when-backgrounded sandbox quirk) — since the render loop that
+would draw into that buffer runs off rAF, this makes the empty-buffer
+finding untrustworthy as evidence of a real device bug. Camera framing
+math and all relevant settings confirmed IDENTICAL between desktop and
+mobile. **Told the user directly: re-check on an actual phone after
+this fix — if still blank (not just blurry), this needs a real
+device's console log or a different verification approach**, since
+this sandbox couldn't produce a clean reproduction. See CHANGELOG.txt's
+matching 2026-09-19 entry for the full account.
+
+**RESOLVED 2026-09-19 (earlier same day, urgent round): real data-loss incident —
 Loading Preview's 3 renamed subgroups (Camera/Lighting/Pose) and Pose's
 own "Thumb" subgroup had been flattened into one generic "New Group",
 TWICE, including once while this was actively being investigated.**

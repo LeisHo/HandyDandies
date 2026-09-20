@@ -3469,6 +3469,22 @@ function buildLoadingPreview(bypassEnabledGate) {
   loadingPreviewScene = new THREE.Scene()
   loadingPreviewCamera = new THREE.PerspectiveCamera(35, 1, 0.1, 2000)
   loadingPreviewRenderer = new THREE.WebGLRenderer({ canvas: loadingPreviewCanvas, antialias: true, alpha: true })
+  // CORRECTED 2026-09-19, direct report ("Loading Preview doesnt work
+  // for Mobile. It works for Desktop, but on mobile i just see Loading
+  // Hands..."). Unlike the main field's own renderer (which calls
+  // `renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))`),
+  // this renderer never set a pixel ratio at all -- three.js defaults
+  // to 1, so on any HiDPI device (devicePixelRatio 2-3, i.e. virtually
+  // every real phone, confirmed live via a mobile-viewport emulation
+  // here reading devicePixelRatio: 2) the actual drawing buffer ends up
+  // at HALF (or a third) the resolution the CSS box displays it at --
+  // at this preview's own small ~160px default size, that's enough to
+  // make the hand's fine detail collapse into an unrecognizable smudge
+  // rather than just "a bit soft," which is exactly what a live mobile-
+  // viewport screenshot showed. `resizeLoadingPreview()`'s own
+  // `setSize()` call (below) already runs AFTER this, so the drawing
+  // buffer it computes now correctly accounts for pixel ratio.
+  loadingPreviewRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
   loadingPreviewRenderer.outputColorSpace = THREE.SRGBColorSpace
   loadingPreviewRenderer.setClearColor(0x000000, 0)
 

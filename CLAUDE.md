@@ -623,3 +623,27 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   exposed there) as proof a live-sync mechanism is broken; cross-check
   against the real DOM (an input's own `.value`) or a screenshot before
   concluding the underlying code is at fault.
+- **`requestAnimationFrame` genuinely does not tick (not just a
+  misreported flag -- 0 real ticks measured) on a mobile-viewport-
+  emulated tab in this sandbox, even when explicitly fronted right
+  before the check.** Confirmed live 2026-09-19 while investigating "the
+  Loading Preview doesn't work on Mobile": a direct `requestAnimationFrame`
+  counter probe (5 chained calls, checked after a real 300ms wait) came
+  back at 0 ticks, on the SAME tab, at the SAME moment `document.hidden`
+  also read `true` despite `tabs_select` having just fronted it -- this
+  is a 5th concrete symptom of the same general tool-quirk family
+  already documented elsewhere in this file, but this one is worse than
+  the others: since the app's own `animate()` render loop runs off rAF,
+  a genuine rAF stall means NOTHING renders for real, not just a stale
+  debug READ -- so a "the canvas buffer is 100% empty" finding gathered
+  under these conditions (e.g. via `gl.readPixels()`) is NOT trustworthy
+  evidence of a real device bug; it may just be this sandbox's own rAF
+  suspension. This specifically undermined an attempt to verify whether
+  the Loading Preview genuinely fails to render on mobile -- a real,
+  independently-justified bug (missing `setPixelRatio()`, see
+  CHANGELOG.txt's matching entry) was found and fixed, but whether that
+  was the COMPLETE explanation could not be confirmed this way. When a
+  mobile-viewport test needs proof that real frames are being drawn
+  (not just that a canvas/renderer object exists), don't rely on a
+  buffer read alone if `document.hidden` reads true or rAF ticks measure
+  0 in the same session -- that result is inconclusive, not negative.
