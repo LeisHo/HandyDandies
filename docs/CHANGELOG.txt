@@ -9231,6 +9231,67 @@ does not persist across reload by design -- this round only confirms the
 CURRENT-session behavior the bug report was actually about).
 
 --------------------------------------------------------------------------------
+2026-09-20  -  01:26 AM - 01:38 AM EDT
+
+Fixed: bezier curve handles were undiscoverable in the dev panel.
+
+Direct bug report: "i currently dont see bezier handles for the curve
+graphs i thought we implemented that."
+
+Investigated whether this was a regression before touching anything.
+`buildGenericCurveWidget()` (main.js) -- the shared widget behind every
+Start Time Curve / Speed Curve / Retransition Curve / Tween-Stop
+Delay Curve across the whole Click Hold-Pose/Click Pose family (8 call
+sites) -- already has a full bezier-handle mechanism
+(`startHandleDrag()`): Alt+drag a point to create/drag its OUT handle,
+Shift+drag for its IN handle, drag a handle back onto its own point to
+remove it. Confirmed live via a synthetic Alt+drag (a real
+`PointerEvent('pointerdown', {altKey:true})` dispatched directly on a
+curve point's own `<circle>`, followed by a `pointermove`/`pointerup`
+on `window`, matching this project's own established rule for testing
+pointerdown-gated interactions -- a `.click()` call would NOT have
+exercised this path): the handle marker (`<rect>`) and connector line
+appeared, and the underlying `<curveKey>` control's own JSON value
+correctly gained a persisted `h1` field. The mechanism was never broken.
+
+Root cause was pure discoverability: a handle is 100% invisible until
+one is actually created (deliberate, per `startHandleDrag()`'s own
+comment -- every pre-existing saved curve with no handles must render
+identically to before), and none of the 3 caption strings used across
+every call site (`speedCurveCaption`/`curveCaption`/
+`tweenStopDelayCurveCaption`) ever mentioned the Alt/Shift+drag gesture
+anywhere. The ONLY place this was ever documented was a source code
+comment -- invisible to an actual user, indistinguishable from "never
+implemented."
+
+Fix: a 2nd caption line, added once inside `buildGenericCurveWidget()`
+itself (not per call site, so it can never drift out of sync across the
+8 places this widget is used) -- "Alt+Drag a point: Out Handle ·
+Shift+Drag a point: In Handle · Drag a handle back onto its point:
+Remove" -- rendered dimmer/italic under the existing axis-label caption.
+Purely additive: no interaction/math touched, so every existing saved
+curve (with or without handles) behaves exactly as before.
+
+Concurrent-session note: `src/main.js` again had a 2nd session's own
+substantial unrelated uncommitted work (~195 lines across several
+unrelated functions) mixed in at diff time -- isolated via the
+established git-patch-staging technique (`git diff -U3` -> confirmed
+this fix's own single hunk, at `buildGenericCurveWidget()`, was cleanly
+self-contained with no overlap -> hand-extracted just that hunk ->
+`git apply --check --cached` -> `git apply --cached` -> verified via
+`git diff --cached --stat` and `git status` that the concurrent lines
+stayed unstaged in the working tree) rather than a blanket `git add`.
+
+Verified: `node --check src/main.js` passes; the same live Alt+drag
+repro used to rule out a regression also serves as this fix's own
+functional verification (the mechanism the new hint text describes is
+exactly the one already confirmed working). Not separately screenshotted
+(this sandbox's screenshot tool timed out repeatedly against the live
+field's continuous render load this round -- worked around via
+`window.__debug`/direct DOM inspection instead, per this file's own
+documented practice for that tool limitation).
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

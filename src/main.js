@@ -6968,8 +6968,23 @@ function buildGenericCurveWidget(row, opts) {
   curvePath.setAttribute('fill', 'none'); curvePath.setAttribute('stroke', 'var(--dp-accent, #7d8cff)'); curvePath.setAttribute('stroke-width', '2')
   svg.appendChild(axisX); svg.appendChild(axisY); svg.appendChild(curvePath)
   const caption = elLocal('div', { fontSize: '10px', opacity: '0.7', marginTop: '3px', textAlign: 'center' }, { text: opts.caption })
+  // Direct bug report 2026-09-20 ("i currently dont see bezier handles
+  // for the curve graphs i thought we implemented that"). The bezier
+  // handle mechanism (startHandleDrag()'s own Alt/Shift+drag, below) was
+  // never actually broken -- confirmed live via a synthetic Alt+drag
+  // that correctly created and persisted a real `h1` handle -- but
+  // nothing in the visible UI ever said this gesture existed. A handle
+  // is 100% invisible until one is created (by design -- every existing
+  // saved curve with no handles must render identically to before, per
+  // startHandleDrag()'s own comment), so a user who'd never read the
+  // source comment had no way to discover it: indistinguishable from
+  // "not implemented" from the UI alone. This 2nd caption line is the
+  // fix -- purely a discoverability addition, no interaction/math
+  // changed.
+  const handleHint = elLocal('div', { fontSize: '9px', opacity: '0.5', marginTop: '2px', textAlign: 'center', fontStyle: 'italic' }, { text: 'Alt+Drag a point: Out Handle  ·  Shift+Drag a point: In Handle  ·  Drag a handle back onto its point: Remove' })
   row.appendChild(svg)
   row.appendChild(caption)
+  row.appendChild(handleHint)
 
   let points = opts.defaultPoints.map((p) => ({ ...p }))
   try {

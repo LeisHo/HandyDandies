@@ -717,3 +717,35 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   click on the canvas afterward left EVERY hand's `_cp['click']` state
   empty (0 of 255 hands) -- the pose no longer fires, matching the
   reported bug's exact repro.
+- **A curve widget's bezier handles (`buildGenericCurveWidget()`'s own
+  `startHandleDrag()`) are Alt+drag (Out Handle) / Shift+drag (In
+  Handle) on a curve point -- and are 100% invisible in the UI until one
+  is actually created, by deliberate design (every pre-existing saved
+  curve with no handles must render identically to before).** Confirmed
+  live 2026-09-20 this was NEVER broken (direct bug report: "i currently
+  dont see bezier handles for the curve graphs i thought we implemented
+  that") -- a synthetic Alt+drag `PointerEvent` dispatched on a real
+  curve point correctly created a handle marker and persisted a real
+  `h1` value. The actual gap was that the gesture was documented ONLY in
+  a source comment, never in any on-screen caption across any of the 8
+  call sites that share this widget -- indistinguishable from "not
+  implemented" to an actual user. Fixed by adding a 2nd caption line
+  once inside `buildGenericCurveWidget()` itself spelling out the
+  gesture (not per call site -- so it can't drift out of sync the way
+  duplicated logic has bitten this project before, e.g. the
+  `FINGER_SIGN`/HANDO-drift gotcha above). **If a future report says a
+  documented-in-code-only interaction "isn't there," check whether it's
+  actually working but just never surfaced anywhere the user can see --
+  the same class of gap, not necessarily a regression.** See
+  CHANGELOG.txt's matching 2026-09-20 entry for the full investigation,
+  including the exact synthetic-event technique used to test a
+  pointerdown-gated modifier-key gesture (a plain `.click()` would NOT
+  have exercised this path -- same testing rule as the Undo-button
+  gotcha in the parent workspace `.claude/TEMPLATE_DEV_PANEL.html`
+  history, generalized here). This project's project-specific Arm
+  Length/Wrist Splay curve widgets (`buildArmLengthCurveWidget()`/
+  `buildWristSplayCurveWidget()`) are deliberately SEPARATE code and do
+  NOT have bezier handles at all (per their own comments) -- this fix
+  does not apply to them; if a report is ever about THOSE specific
+  widgets instead, that's a real "not implemented," not a
+  discoverability gap.

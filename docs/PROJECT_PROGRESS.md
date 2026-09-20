@@ -18,6 +18,18 @@ work seamlessly from there.
 
 ## Currently working on
 
+**SHIPPED 2026-09-20: fixed bezier curve handles being undiscoverable
+(direct bug report).** The Alt+drag (Out Handle) / Shift+drag (In
+Handle) mechanism in `buildGenericCurveWidget()` — shared by every Start
+Time/Speed/Retransition/Tween-Stop-Delay curve across the whole Click
+Hold-Pose/Click Pose family — was never broken (confirmed live via a
+synthetic Alt+drag PointerEvent that correctly created and persisted a
+real `h1` handle); it was just never documented anywhere a user could
+see, only in a source comment. Added a 2nd caption line, once inside the
+shared widget function, spelling out the gesture. Purely additive — no
+interaction/math changed, every existing saved curve renders identically
+to before. See CHANGELOG.txt's matching 2026-09-20 entry.
+
 **SHIPPED 2026-09-20: fixed gated-subgroup checkbox duplication (direct
 bug report) + added per-group Undock/Dock (ported from the shared
 `.claude/TEMPLATE_DEV_PANEL.html`).** The Offset/Rotation/Animation Speed
