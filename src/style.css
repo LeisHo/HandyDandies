@@ -54,9 +54,20 @@ html, body {
    stacking rules (a `position:fixed` element paints after a non-
    positioned one regardless of DOM order, so it happened to land above
    #viewport already) but had nothing guaranteeing it stays above the
-   dev panel (.dp-panel, z-index 9999) or any other positioned element
-   added later. 100000 is comfortably above every other z-index in this
-   file. */
+   dev panel or any other positioned element added later.
+   CORRECTED 2026-09-20: this canvas is now deliberately BELOW .dp-panel's
+   own z-index (200000, see that rule's own comment) -- the earlier
+   "100000 is comfortably above every other z-index" claim stopped being
+   true the moment Camera Edit Mode started flipping this canvas's
+   `pointer-events` to `auto` (loadingPreviewCameraEditMode, main.js): a
+   higher z-index than the panel meant this canvas also WON pointer hit-
+   testing wherever it visually overlapped the panel (the panel is fully
+   draggable/resizable and this canvas can grow up to 400px via its own
+   Size slider), silently swallowing clicks meant for panel controls
+   underneath it -- confirmed as a real, reported bug ("i cant unclick
+   the checkbox"). The dev panel must always win that comparison, so it
+   was the one moved, not this canvas's own already-correct-for-its-own-
+   purpose value. */
 #loadingPreviewCanvas { display: none; position: fixed; top: 50%; left: 50%; z-index: 100000; pointer-events: none; }
 
 /* ---------------------------------------------------------------------
@@ -78,7 +89,29 @@ html, body {
      "border-left: 2px solid var(--dev-accent-color)" visual identity mark. */
   border-left: 3px solid var(--dp-accent-color, #7d8cff);
   border-radius: 8px;
-  z-index: 9999; user-select: none;
+  /* Direct report 2026-09-20 ("when im in Loading Preview Camera Edit
+     Mode, i cant unclick the checkbox. I want the dev panel to be fully
+     functional even in that mode"). Root cause: #loadingPreviewCanvas
+     (style.css) sits at z-index:100000 -- set there per an earlier
+     direct request ("it should just show ontop of everything in
+     browser") from back when its own `pointer-events` was always
+     `none`, so the high z-index only ever affected paint order, never
+     hit-testing. Camera Edit Mode's own onChange (main.js,
+     loadingPreviewCameraEditMode) later flips that canvas to
+     `pointer-events: auto` while active, so a click landing anywhere
+     the panel visually overlaps that canvas (the panel is fully
+     draggable/resizable, §12c, and the canvas is centered and can be
+     resized up to 400px via its own Size slider -- easy to overlap in
+     practice) now hits the canvas -- and therefore OrbitControls, whose
+     own dom element IS that canvas -- instead of the panel underneath
+     it, since a higher z-index wins BOTH paint order and pointer hit-
+     testing. This project's dev panel (including an Undock panel,
+     which also carries the `.dp-panel` class) must always stay
+     genuinely interactive regardless of any other feature's own
+     z-index, so it's raised above the loading-preview canvas's 100000
+     rather than lowering that canvas's (which was deliberately set high
+     for its own, still-valid, "always visible" reason). */
+  z-index: 200000; user-select: none;
   box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5);
   display: flex; flex-direction: column;
 }
