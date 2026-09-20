@@ -1342,14 +1342,29 @@ export function createGroupElement(title) {
     })
     refreshRowDisplaysForEditingTab()
   })
+  // Undock/Dock (ported from TEMPLATE_DEV_PANEL.html, direct request:
+  // "the setting group docking function in the dev panel template" --
+  // pops this ONE group's content into its own floating panel, resizable/
+  // movable the same way the main panel is, then docks back into its
+  // exact original position on a 2nd click. Session-only, no persistence
+  // across reload -- same as the template's own design, a live viewing
+  // convenience, not a saved layout choice. Positioned in the header
+  // between the device checkbox and the lock icon, per direct layout
+  // request ("the lock icon should always be on the far right... left of
+  // that is the undocking icon... left of that will be the Mobile/
+  // Landscape checkbox").
+  const undockBtn = el('span', 'dp-group-undock-btn', { textContent: '↗', title: 'Undock this group into its own floating panel' })
+  undockBtn.addEventListener('click', (e) => { e.stopPropagation(); toggleGroupUndock(g, undockBtn) })
+  undockBtn.addEventListener('pointerdown', (e) => e.stopPropagation())
   h.append(
     el('span', 'dp-drag-handle', { textContent: '⠿' }), el('span', 'arrow', { textContent: '▼' }), titleText,
-    visCascadeCheckbox, indepCascadeCheckbox, lockIcon
+    visCascadeCheckbox, indepCascadeCheckbox, undockBtn, lockIcon
   )
   const gb = el('div', 'dp-group-body')
   h.addEventListener('click', (e) => {
     if (e.target.closest('.dp-drag-handle')) return
     if (e.target.closest('.dp-group-lock-icon')) return
+    if (e.target.closest('.dp-group-undock-btn')) return
     if (e.target.closest('.dp-group-cascade-checkbox')) return
     // A "mandatory gated subgroup" (Offset/Rotation/Animation Speed
     // Curve/Start Time Curve/Retransition -- direct request, "checkbox
@@ -1366,6 +1381,93 @@ export function createGroupElement(title) {
   g._visCascadeCheckbox = visCascadeCheckbox
   g._indepCascadeCheckbox = indepCascadeCheckbox
   return g
+}
+// Undock/Dock mechanism (ported from TEMPLATE_DEV_PANEL.html -- see
+// createGroupElement()'s own undockBtn comment for the full request).
+// `undockedGroups` maps the group element -> {panel, parent, nextSibling,
+// btn}, the same real-DOM-node-preservation technique this file's own
+// Undo/Delete already use for byte-identical restoration (not a rebuild
+// from captured data, which could drift) -- docking back always restores
+// the EXACT original position, even after other groups above/below it
+// have been reordered while this one was floating.
+const undockedGroups = new Map()
+// Builds the floating panel one group's content moves into while
+// undocked -- reuses this file's own initPanelDrag()/initResizeHandles()
+// verbatim (both are already fully generic over any panel/header pair,
+// not hardcoded to the ONE main panel), plus the main panel's own
+// `.dp-panel`/`.dp-header`/`.dp-title`/`.dp-body` classes for matching
+// chrome, so this needed zero new CSS beyond the button/undocked-state
+// markers below.
+function createUndockPanel(g, titleText) {
+  const rect = g.getBoundingClientRect()
+  const panel = el('div', 'dp-panel dp-undock-panel')
+  panel.style.position = 'fixed'
+  panel.style.left = Math.round(rect.left) + 'px'
+  panel.style.top = Math.round(rect.top) + 'px'
+  panel.style.width = Math.max(240, Math.round(rect.width)) + 'px'
+  panel.style.height = Math.min(window.innerHeight - Math.round(rect.top) - 20, Math.max(160, Math.round(rect.height) + 60)) + 'px'
+  panel.style.right = 'auto'
+  const header = el('div', 'dp-header')
+  const titleSpan = el('span', 'dp-title', { textContent: titleText })
+  const dockBtn = el('button', 'dp-icon-btn', { textContent: '⇱', title: 'Dock this group back into the dev panel' })
+  dockBtn.addEventListener('click', (e) => {
+    e.stopPropagation()
+    const entry = undockedGroups.get(g)
+    if (entry) toggleGroupUndock(g, entry.btn)
+  })
+  header.append(titleSpan, dockBtn)
+  panel.appendChild(header)
+  const body = el('div', 'dp-body')
+  body.appendChild(g)
+  panel.appendChild(body)
+  ;['n', 's', 'e', 'w', 'ne', 'nw', 'se', 'sw'].forEach((dir) => {
+    const handle = el('div', `dp-resize dp-resize-${dir}`)
+    handle.dataset.dir = dir
+    panel.appendChild(handle)
+  })
+  document.body.appendChild(panel)
+  initPanelDrag(panel, header)
+  initResizeHandles(panel)
+  return panel
+}
+// Toggles ONE group between docked (living in its normal place inside the
+// main dev panel) and undocked (living in its own floating panel).
+function toggleGroupUndock(g, btn) {
+  const entry = undockedGroups.get(g)
+  if (entry) {
+    if (entry.nextSibling && entry.nextSibling.parentElement === entry.parent) {
+      entry.parent.insertBefore(g, entry.nextSibling)
+    } else {
+      entry.parent.appendChild(g)
+    }
+    entry.panel.remove()
+    undockedGroups.delete(g)
+    btn.textContent = '↗'
+    btn.title = 'Undock this group into its own floating panel'
+    g.classList.remove('dp-group-undocked')
+  } else {
+    const parent = g.parentElement
+    const nextSibling = g.nextSibling
+    const titleText = g.dataset.key || 'Group'
+    const panel = createUndockPanel(g, titleText)
+    undockedGroups.set(g, { panel, parent, nextSibling, btn })
+    btn.textContent = '↙'
+    btn.title = 'Dock this group back into the dev panel'
+    g.classList.add('dp-group-undocked')
+  }
+}
+// Docks every currently-undocked group back into place -- called before
+// any operation that captures/reads the panel's structure from its normal
+// DOM location (Copy/Save/Named Setting States/Undo snapshot), since an
+// undocked group is no longer a descendant of `#dpGroups` at all (it's
+// inside a floating panel, appended to `document.body`) and would
+// otherwise be silently invisible to getPanelOrder(). Keeps undocking a
+// purely live/transient state, never a saved one.
+function dockAllUndockedGroups() {
+  Array.from(undockedGroups.keys()).forEach((g) => {
+    const entry = undockedGroups.get(g)
+    if (entry) toggleGroupUndock(g, entry.btn)
+  })
 }
 
 // Walks every dynamicDevice-opted control living inside group element `g`
@@ -2547,6 +2649,12 @@ export function initDevPanel(groups, opts = {}) {
   }, true)
 
   function saveSettings() {
+    // Undock/Dock (§12f-1-adjacent, ported from TEMPLATE_DEV_PANEL.html) --
+    // an undocked group's own .dp-group is no longer a descendant of
+    // `groupsEl` at all (it's living inside its own floating panel,
+    // appended to document.body), so getPanelOrder(groupsEl) below would
+    // silently drop it from what gets saved. Must run BEFORE that read.
+    dockAllUndockedGroups()
     // Also flashes the HEADER save button (saveHeaderBtn) with a
     // checkmark/X + tooltip -- ported from TEMPLATE_DEV_PANEL.html's own
     // flashDevHeaderSyncStatus() (2026-09-19). The bottom Save button
@@ -2656,6 +2764,10 @@ export function initDevPanel(groups, opts = {}) {
   // localStorage for whichever 2 devices aren't the current real one,
   // since only one device can ever be "live" at a time).
   function captureFullPanelState() {
+    // See saveSettings()'s own matching call/comment -- shared by Copy
+    // Settings, Named Setting States, and Undo snapshots, all of which
+    // read group order/structure from `groupsEl` the same way.
+    dockAllUndockedGroups()
     const real = realDeviceClass()
     const panelGeometry = { [real]: getPanelGeometry(panel) }
     DEVICES.filter((d) => d !== real).forEach((d) => {

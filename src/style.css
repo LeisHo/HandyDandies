@@ -171,6 +171,21 @@ html, body {
    for the actual lock state + reorder-refusal logic. */
 .dp-group-lock-icon { flex: 0 0 auto; margin-left: auto; cursor: pointer; opacity: 0.6; padding: 0 2px; }
 .dp-group-lock-icon:hover { opacity: 1; }
+/* Undock/Dock button (ported from TEMPLATE_DEV_PANEL.html) -- sits
+   between the group's own device checkbox and the lock icon in DOM
+   order (createGroupElement()), deliberately WITHOUT its own
+   margin-left:auto so it flows normally right up against the lock
+   icon's own auto-margin push, rather than claiming a separate share of
+   the flex row's free space (2 auto-margins in one row split the space
+   between them, which visually separated the undock button from the
+   lock icon instead of the "always adjacent, lock rightmost" layout
+   requested). The header's own indepCascadeCheckbox is overridden the
+   same way, right below, for the same reason -- the group-level cascade
+   checkbox specifically, not the global per-row `.dp-dynamic-device-
+   checkbox-2nd` rule other rows still rely on. */
+.dp-group-undock-btn { flex: 0 0 auto; cursor: pointer; opacity: 0.6; padding: 0 2px; }
+.dp-group-undock-btn:hover { opacity: 1; }
+.dp-group-header > .dp-group-cascade-checkbox.dp-dynamic-device-checkbox-2nd { margin-left: 0; }
 /* Locked is the visual INVERSE of unlocked (direct request, 2026-09-17):
    unlocked stays low-opacity until hovered (rule above); a LOCKED icon
    is instead full-opacity by default, dropping to the same low opacity

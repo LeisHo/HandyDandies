@@ -6,7 +6,7 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js'
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js'
 import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js'
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js'
-import { initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement } from './devpanel/devPanel.js?v=35'
+import { initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement } from './devpanel/devPanel.js?v=36'
 
 // A defensive wrapper around devPanel.js's own refreshSelectOptions() --
 // found via live testing (direct user report: "I dont see any of the
@@ -7987,7 +7987,27 @@ function wrapGatedSubgroup(enabledKey, memberKeys, subgroupTitle) {
     if (row) gb.appendChild(row)
   })
   enabledRow.classList.add('dp-group-gate-row')
-  g.querySelector(':scope > .dp-group-header').appendChild(enabledRow)
+  // CORRECTED 2026-09-20 (direct bug report: "this checkbox is in fact a
+  // duplicate of the Mobile/Landscape checkbox at the far right"). Moving
+  // the WHOLE row bodily into the header used to bring its own row-level
+  // `.dp-dynamic-device-checkbox` pair (Show in Mobile/Landscape +
+  // Independent from Desktop) and drag handle along with it -- both are
+  // genuine duplicates once here: the GROUP's own visCascadeCheckbox/
+  // indepCascadeCheckbox (createGroupElement(), above) already cover
+  // device-scoping for everything living inside `g`
+  // (forEachDynamicDeviceDescendant() walks every `.dp-row` inside it,
+  // header included, so the now-embedded Enabled control was ALREADY
+  // covered), and the row's own drag handle has nothing left to drag once
+  // welded into the header. Stripped here so the ONLY checkbox this row
+  // contributes is the real on/off value itself.
+  enabledRow.querySelectorAll('.dp-dynamic-device-checkbox, .dp-row-handle').forEach((el) => el.remove())
+  const header = g.querySelector(':scope > .dp-group-header')
+  // Inserted right after the title text (NOT appended at the end, past
+  // the lock icon and the group's own device checkbox) -- direct bug
+  // report: the on/off checkbox was landing at the very end of the
+  // header, past everything else, instead of reading naturally as part
+  // of the title the way "<Title> On/Off" used to as a plain label.
+  header.querySelector(':scope > .dp-group-title-text').insertAdjacentElement('afterend', enabledRow)
   return g
 }
 // Applies all 5 gated-subgroup wraps to ONE trigger `p` -- identical
