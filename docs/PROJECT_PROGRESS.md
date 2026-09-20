@@ -18,6 +18,31 @@ work seamlessly from there.
 
 ## Currently working on
 
+**SHIPPED 2026-09-20 (later same day, follow-up round): Pose Offset X/Y/Z
+is now camera-relative, not world-space (direct follow-up: "the offset
+should be in relation to the active camera").** HANDO applies it as a
+flat world-space translate, which only reads as "toward the camera"
+there because HANDO's own camera happens to look straight down world Z
+-- this project's Loading Preview/Pose Preview cameras are positioned
+via auto-frame/orbit math, so a raw world-Z offset from HANDO didn't
+translate into "close to the camera" here (confirmed as the real cause
+of "COUNTDOWN (VERT) - LENS COVER"'s last pose -- which pulls the hand
+right up to HANDO's own camera -- showing no such effect after the
+earlier same-day fix that made the offset apply at all). New shared
+`applyPoseOffsetToPosition()` resolves X/Y/Z against the active camera's
+own right/up/toward-camera basis (same right/up convention the existing
+Click Function Offset feature already uses); wired into all 3 consumers
+(main field, Loading Preview, Pose Preview), each with its own camera.
+The main field's own camera never rotates, so this is behavior-
+preserving there -- only the 2 orbit-camera previews get a visible
+change. Live-verified: distance from the Loading Preview camera to the
+hand dropped from ~61.2 to ~10.2 after applying the user's own exact
+pose data, confirming the hand is now genuinely pulled close to the
+camera. See CHANGELOG.txt's matching 2026-09-20 (later same day,
+follow-up round) entry for full detail, including a regression caught
+and fixed before shipping (an early refactor draft would have silently
+skipped the main field's own scale update on one rare startup frame).
+
 **SHIPPED 2026-09-20 (later same day): Pose Offset X/Y/Z + Pose Scale
 now actually visible in the Loading Preview and Pose Preview (direct
 report, following up on the same day's earlier main-field integration).**

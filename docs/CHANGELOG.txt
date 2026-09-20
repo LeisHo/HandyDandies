@@ -9453,6 +9453,75 @@ session's own uncommitted doc edits in progress at commit time --left
 untouched, per the same "never blanket `git add`" discipline.
 
 --------------------------------------------------------------------------------
+2026-09-20 (later same day, follow-up round)
+
+Made Pose Offset X/Y/Z camera-relative instead of world-space, direct
+follow-up on the same day's earlier fix: "the offset and scale data for
+imported poses and tweens... should be in relation to the active
+camera... for loading preview, [it] should be in relation to the loading
+preview camera." HANDO applies Pose Offset Z as a flat world-space
+translate (`modelRoot.position.z += cfg.poseOffsetZ`), which only reads
+as "toward the camera" there because HANDO's own camera happens to look
+straight down world Z. This project's Loading Preview/Pose Preview
+cameras are positioned via auto-frame/orbit math (and the main field's
+hands live inside an `alignQuat`-rotated frame), so a raw world-Z offset
+tuned by eye in HANDO doesn't translate into "close to the camera" once
+the active camera isn't aligned with world Z -- confirmed as the real
+cause of the reported symptom: the earlier same-day fix made
+"COUNTDOWN (VERT) - LENS COVER"'s Pose Offset apply at all, but its
+last pose (which in HANDO pulls the hand right up to HANDO's own camera)
+still showed no such "very close" effect in the Loading Preview.
+
+New shared `applyPoseOffsetToPosition(positionTarget, basePosition, cam,
+values)` resolves X/Y/Z against the active camera's own right/up/
+toward-camera basis instead of world axes: `cam.matrixWorld` columns
+0/1 are the camera's local right/up (same convention
+`applyOffsetRotationToHand()` already uses for its own separate,
+additive per-trigger Offset X/Y feature); column 2 is the camera's local
++Z, which points from the view target back TOWARD the camera (a
+camera's local -Z is its forward/look direction) -- exactly "toward the
+camera" for a positive Z value, matching HANDO's own increasing-Z-is-
+closer convention. `cam.updateMatrixWorld()` called first, defensively,
+since an orbit-dragged camera's matrixWorld is otherwise only guaranteed
+fresh as of the last render call.
+
+Wired into all 3 consumers, each passing its own active camera:
+`applyPoseValuesToHand()` (main field, `camera`), `applyLoadingPreviewPose()`
+(`loadingPreviewCamera`), `previewPosePreset()` (`previewCamera`). The
+main field's own camera only pans/zooms and never rotates (confirmed
+live: its `matrixWorld` basis columns are within ~3 deg of pure world
+X/Y/Z), so this is a behavior-preserving refactor there, not a visible
+change -- the 2 orbit-camera previews get the actual fix. Split the
+shared helper into position-only (`applyPoseOffsetToPosition`) with
+scale left as a separate, still-unconditional call at each site --
+caught before shipping that folding scale into the same conditional-on-
+basePosition helper would have silently skipped the main field's own
+scale update on the one frame `hand.basePosition` doesn't exist yet
+(before the very first `relayoutField()`), a regression the ORIGINAL
+code never had (scale always ran, only position was guarded).
+
+Verified live via `window.__debug.applyLoadingPreviewPose()` with the
+user's own exact pasted pose data (`poseOffsetZ: 55`): distance from
+camera to hand dropped from ~61.2 (camera-to-origin, the base position)
+to ~10.2 after the offset -- the hand is now genuinely pulled close to
+the camera, matching HANDO's own visual intent, not just moved by 55
+world units in a direction that happened not to matter. Also
+re-confirmed scale still applies correctly and a pose missing these
+fields resets cleanly to the origin with no compounding (same checks as
+the earlier same-day round, re-run against the new camera-relative
+code path). `node --check` clean.
+
+Concurrent-session note: origin/main had moved 2 commits ahead
+(`05b8d33`/`f2b9e1d`, both "Update dev-panel-settings.json via Save
+Settings" -- a live user Save from a real browser tab, not another
+session's code work) between this round's start and its own commit --
+confirmed via `git diff --stat HEAD..origin/main` that both only
+touched `data/processed/dev-panel-settings.json`, no overlap with this
+round's own `src/main.js`/`index.html` changes, so a plain `git merge
+--ff-only origin/main` safely caught the working tree up before staging,
+no patch isolation needed this time.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================
