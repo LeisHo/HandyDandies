@@ -650,6 +650,15 @@ const DEV_GROUPS = [
       { key: 'loadingPreviewRotationZ', label: 'Loading Preview Rotation Z (Deg)', type: 'slider', min: -180, max: 180, step: 1, def: 0, onChange: (v) => applyLoadingPreviewOrbitFromSliders() },
       { key: 'loadingPreviewOffsetX', label: 'Loading Preview Offset X (World Units)', type: 'slider', min: -30, max: 30, step: 0.5, def: 0, onChange: (v) => applyLoadingPreviewOrbitFromSliders() },
       { key: 'loadingPreviewOffsetY', label: 'Loading Preview Offset Y (World Units)', type: 'slider', min: -30, max: 30, step: 0.5, def: 0, onChange: (v) => applyLoadingPreviewOrbitFromSliders() },
+      // Direct request 2026-09-20 ("provide Loading Preview Offset Z...
+      // when i change the camera/sliders, they should reflect each
+      // other") -- the orbit target used to only ever be offset in X/Y
+      // (`origin + Vector3(offsetX, offsetY, 0)`), a leftover from
+      // before this preview had full 3-axis orbit/pan; Z was always
+      // pinned at the origin's own Z. Same 2-way-bound shape as every
+      // other orbit slider here (drives AND reflects the camera -- see
+      // applyLoadingPreviewOrbitFromSliders()/deriveLoadingPreviewOrbitSliders()).
+      { key: 'loadingPreviewOffsetZ', label: 'Loading Preview Offset Z (World Units)', type: 'slider', min: -30, max: 30, step: 0.5, def: 0, onChange: (v) => applyLoadingPreviewOrbitFromSliders() },
       // Direct request ("Provide sliders for Camera FOV and Zoom for the
       // Loading Preview Camera") -- same 2-way-bound shape as the main
       // scene's own `cameraFov`/`cameraZoom` (drives AND reflects the
@@ -3735,7 +3744,7 @@ function syncLoadingPreviewOrbitControlsTarget() {
 function applyLoadingPreviewOrbitFromSliders() {
   if (!loadingPreviewCamera) return
   const origin = loadingPreviewOrbitOrigin()
-  const target = origin.clone().add(new THREE.Vector3(cfg.loadingPreviewOffsetX || 0, cfg.loadingPreviewOffsetY || 0, 0))
+  const target = origin.clone().add(new THREE.Vector3(cfg.loadingPreviewOffsetX || 0, cfg.loadingPreviewOffsetY || 0, cfg.loadingPreviewOffsetZ || 0))
   const distance = Math.max(cfg.loadingPreviewCameraZoom || 0, 1)
   const phi = THREE.MathUtils.degToRad((cfg.loadingPreviewRotationX || 0) + 90) // elevation-from-horizon -> THREE.Spherical's own polar-from-+Y
   const theta = THREE.MathUtils.degToRad(cfg.loadingPreviewRotationY || 0)
@@ -3783,8 +3792,31 @@ function deriveLoadingPreviewOrbitSliders() {
   syncValue('loadingPreviewRotationY', THREE.MathUtils.radToDeg(_loadingPreviewSpherical.theta))
   syncValue('loadingPreviewOffsetX', loadingPreviewCameraTarget.x - origin.x)
   syncValue('loadingPreviewOffsetY', loadingPreviewCameraTarget.y - origin.y)
+  syncValue('loadingPreviewOffsetZ', loadingPreviewCameraTarget.z - origin.z)
   syncValue('loadingPreviewCameraZoom', _loadingPreviewSpherical.radius)
   syncValue('loadingPreviewCameraFov', loadingPreviewCamera.fov)
+  // CORRECTED 2026-09-20, direct request ("when i change the camera/
+  // sliders, they should reflect each other... the camera angles still
+  // dont look exactly correct"). Rotation Z (roll) used to be a WRITE-
+  // ONLY slider -- applyLoadingPreviewCameraPreset()/AutoFrame() never
+  // called applyLoadingPreviewRoll() at all (they set camera.up
+  // directly to the zero-roll aligned vector), so after loading ANY
+  // preset the Rotation Z slider kept showing whatever stale value it
+  // had before, not the camera's real (now zero) roll -- exactly the
+  // "sliders don't reflect the camera" gap being reported. Recovers the
+  // TRUE current roll by projecting both the current `camera.up` and
+  // the zero-roll baseline (alignQuat-rotated world-up) onto the plane
+  // perpendicular to the view direction, then measuring the signed
+  // angle between those 2 projections -- the exact inverse of
+  // applyLoadingPreviewRoll()'s own forward math
+  // (`alignedUp.applyAxisAngle(viewDir, rollRad)`).
+  const viewDir = loadingPreviewCameraTarget.clone().sub(loadingPreviewCamera.position).normalize()
+  const alignedUp = new THREE.Vector3(0, 1, 0).applyQuaternion(alignQuat)
+  const projAligned = alignedUp.clone().sub(viewDir.clone().multiplyScalar(alignedUp.dot(viewDir))).normalize()
+  const projCurrent = loadingPreviewCamera.up.clone().sub(viewDir.clone().multiplyScalar(loadingPreviewCamera.up.dot(viewDir))).normalize()
+  let rollDeg = THREE.MathUtils.radToDeg(projAligned.angleTo(projCurrent))
+  if (new THREE.Vector3().crossVectors(projAligned, projCurrent).dot(viewDir) < 0) rollDeg = -rollDeg
+  syncValue('loadingPreviewRotationZ', rollDeg)
 }
 // Continuous per-frame sync while Edit Mode is actually on -- mirrors the
 // main scene's own syncCameraPanelFromLive() (called every animate()
