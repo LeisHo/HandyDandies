@@ -270,11 +270,37 @@ let fieldStarted = false
 // first happens to be called.
 const pageLoadStartMs = performance.now()
 let minLoadingTimeTimerSet = false
+// Temporary, on-screen-only startup-timing diagnostic -- direct need:
+// investigating "Loading Preview shows on mobile with ?dev=1 but not on
+// the bare production URL" (real device, no easy console access on
+// mobile without a USB-tethered remote-debugging session). Gated on its
+// OWN separate query param (`&debugTiming=1`), independent of DEV_MODE,
+// so it can be toggled on for EITHER URL variant to compare -- the whole
+// point is comparing dev vs normal mode, so tying this to DEV_MODE itself
+// would defeat it. A small fixed-position text overlay, not console.log,
+// since the normal path to a phone's console (a cable + a desktop's
+// remote-debugging UI) is exactly the friction this exists to avoid.
+// Safe to remove once the mobile investigation concludes -- this is a
+// diagnostic aid, not a permanent feature.
+const DEBUG_TIMING = new URLSearchParams(location.search).get('debugTiming') === '1'
+let debugTimingEl = null
+function logStartupTiming(label) {
+  if (!DEBUG_TIMING) return
+  if (!debugTimingEl) {
+    debugTimingEl = document.createElement('div')
+    debugTimingEl.style.cssText = 'position:fixed;top:0;left:0;z-index:999999;background:rgba(0,0,0,0.85);color:#0f0;font:11px monospace;padding:6px;white-space:pre;pointer-events:none;max-width:100vw;'
+    document.body.appendChild(debugTimingEl)
+  }
+  const elapsed = Math.round(performance.now() - pageLoadStartMs)
+  debugTimingEl.textContent += `${label}: ${elapsed}ms\n`
+}
 function tryStartField() {
+  logStartupTiming(`tryStartField() called (fieldStarted=${fieldStarted} modelReady=${modelMeasurementsReady} settingsReady=${startupSettingsReady})`)
   if (fieldStarted || !modelMeasurementsReady || !startupSettingsReady) return
   // Only actually holds the reveal back when the loading preview itself
   // is on -- see the control's own DEV_GROUPS comment for why an
   // artificial delay with nothing to show isn't what was asked for.
+  logStartupTiming(`tryStartField() gates passed, loadingPreviewEnabled=${cfg.loadingPreviewEnabled}`)
   if (cfg.loadingPreviewEnabled) {
     const minMs = Math.max(0, cfg.loadingMinTimeMs || 0)
     const elapsed = performance.now() - pageLoadStartMs
@@ -314,6 +340,7 @@ function tryStartField() {
     }
   }
   fieldStarted = true
+  logStartupTiming('fieldStarted = true')
   rebuildField()
   buildPosePreview()
   // ROOT CAUSE of the REAL startup jank, found 2026-09-16 after the
@@ -375,7 +402,7 @@ function tryStartField() {
     loadingPreviewCanvas.style.display = 'none'
   }
 }
-setTimeout(() => { startupSettingsReady = true; tryStartField() }, 6000)
+setTimeout(() => { logStartupTiming('startupSettingsReady = true (6000ms fallback timeout)'); startupSettingsReady = true; tryStartField() }, 6000)
 let framedOnce = false // camera/lighting/target-plane are framed ONCE, on first build -- Field Layout changes must never re-trigger this (direct request)
 const hands = [] // { wrapper: Group, clone: Object3D, skinnedMesh: SkinnedMesh|null, outlineMesh: Mesh|null }
 const sceneState = { fieldRadius: 10 }
@@ -1632,7 +1659,7 @@ const cfg = initDevPanel(DEV_GROUPS, {
   // declaration comment) -- the field now only ever builds once, using
   // these real values, instead of building once with code defaults and
   // visibly rebuilding again the moment this fires.
-  onRestore: () => { migrateModeTweenToSequence(); resyncPoseDefaultValues(); restoreCustomClickFunctions(); startupSettingsReady = true; tryStartField() },
+  onRestore: () => { logStartupTiming('onRestore fired -> startupSettingsReady = true'); migrateModeTweenToSequence(); resyncPoseDefaultValues(); restoreCustomClickFunctions(); startupSettingsReady = true; tryStartField() },
   // Delete-function button (direct spec item) -- devPanel.js's own
   // existing Delete Group/Setting (🗑) icon already lets a real user
   // remove a Custom Click Function's whole group from the panel; the
@@ -9024,6 +9051,7 @@ new GLTFLoader().load(
     // unchanged; only the settings-DEPENDENT build (rebuildField() reads
     // cfg.fieldRows/fieldCols/etc.) needed to wait.
     modelMeasurementsReady = true
+    logStartupTiming('modelMeasurementsReady = true (GLB loaded)')
     // Loading Preview -- built here, not from tryStartField(), so it can
     // start animating the instant the base model itself is ready, well
     // before the (usually slower) settings-restore half of the gate below
