@@ -136,9 +136,20 @@
           "ambientIntensity": 0,
           "ambientSkyColor": "#ffffff",
           "ambientGroundColor": "#3a2f2a"
+        },
+        {
+          "name": "LOADING",
+          "keyAzimuth": 356.21319163101424,
+          "keyElevation": 3.2318502030355973,
+          "keyTargetHeight": 106,
+          "keyIntensity": 6,
+          "keyColor": "#ffffff",
+          "ambientIntensity": 0,
+          "ambientSkyColor": "#ffffff",
+          "ambientGroundColor": "#3a2f2a"
         }
       ],
-      "loadingPreviewLightingSelector": "",
+      "loadingPreviewLightingSelector": "LOADING",
       "loadingPreviewSpeedMs": 5000,
       "loadingPreviewSequenceMode": "Count",
       "loadingPreviewSequenceCount": 1,
@@ -6910,9 +6921,20 @@
           "ambientIntensity": 0,
           "ambientSkyColor": "#ffffff",
           "ambientGroundColor": "#3a2f2a"
+        },
+        {
+          "name": "LOADING",
+          "keyAzimuth": 356.21319163101424,
+          "keyElevation": 3.2318502030355973,
+          "keyTargetHeight": 106,
+          "keyIntensity": 6,
+          "keyColor": "#ffffff",
+          "ambientIntensity": 0,
+          "ambientSkyColor": "#ffffff",
+          "ambientGroundColor": "#3a2f2a"
         }
       ],
-      "loadingPreviewLightingSelector": "",
+      "loadingPreviewLightingSelector": "LOADING",
       "loadingPreviewSpeedMs": 5000,
       "loadingPreviewSequenceMode": "Count",
       "loadingPreviewSequenceCount": 1,
@@ -13684,9 +13706,20 @@
           "ambientIntensity": 0,
           "ambientSkyColor": "#ffffff",
           "ambientGroundColor": "#3a2f2a"
+        },
+        {
+          "name": "LOADING",
+          "keyAzimuth": 356.21319163101424,
+          "keyElevation": 3.2318502030355973,
+          "keyTargetHeight": 106,
+          "keyIntensity": 6,
+          "keyColor": "#ffffff",
+          "ambientIntensity": 0,
+          "ambientSkyColor": "#ffffff",
+          "ambientGroundColor": "#3a2f2a"
         }
       ],
-      "loadingPreviewLightingSelector": "",
+      "loadingPreviewLightingSelector": "LOADING",
       "loadingPreviewSpeedMs": 5000,
       "loadingPreviewSequenceMode": "Count",
       "loadingPreviewSequenceCount": 1,
