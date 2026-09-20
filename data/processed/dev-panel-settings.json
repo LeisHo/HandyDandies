@@ -19,7 +19,7 @@
       "loadingPreviewEnabled": true,
       "loadingPreviewShowLive": true,
       "loadingMinTimeMs": 10000,
-      "loadingPreviewTweenSelector": "COUNTDOWN - VERTICAL",
+      "loadingPreviewTweenSelector": "COUNTDOWN - VERTICAL + LENS COVER",
       "loadingPreviewSavedCameras": [
         {
           "name": "Camera 20",
@@ -7032,7 +7032,7 @@
       "loadingPreviewEnabled": true,
       "loadingPreviewShowLive": true,
       "loadingMinTimeMs": 10000,
-      "loadingPreviewTweenSelector": "COUNTDOWN - VERTICAL",
+      "loadingPreviewTweenSelector": "COUNTDOWN - VERTICAL + LENS COVER",
       "loadingPreviewSavedCameras": [
         {
           "name": "Camera 20",
@@ -14045,7 +14045,7 @@
       "loadingPreviewEnabled": true,
       "loadingPreviewShowLive": true,
       "loadingMinTimeMs": 10000,
-      "loadingPreviewTweenSelector": "COUNTDOWN - VERTICAL",
+      "loadingPreviewTweenSelector": "COUNTDOWN - VERTICAL + LENS COVER",
       "loadingPreviewSavedCameras": [
         {
           "name": "Camera 20",
