@@ -79,12 +79,21 @@ possible in this sandbox since this project's Save write-through needs
 localStorage fallback by this project's own design — confirmed no
 matching keys exist after Save), so if broken in production the bug is
 most likely in that server round trip, not the capture logic itself; (2)
-"Show Hand Loading Animation, don't see it on startup" — confirmed NOT a
-code bug via a temporary, disclosed, reverted diagnostic (widening
-`loadingMinTimeMs`'s default to see the preview mid-load) — the
-mechanism works; the original report was very likely just this
-sandbox's own narrow local timing window, not a real defect. See
-CHANGELOG.txt's matching 2026-09-19 entry for the full account.
+"Show Hand Loading Animation, don't see it on startup" — **initially
+misdiagnosed as NOT a code bug** (a diagnostic that widened
+`loadingMinTimeMs` to test it happened to avoid the actual race
+entirely); a direct follow-up report ("I still only see the words
+Loading Hands. I dont see the loading hand") prompted a real
+re-investigation that found and fixed a genuine race condition —
+`buildLoadingPreview()` and `tryStartField()` run synchronously,
+back-to-back, in the same GLTFLoader callback, so if the model/settings
+took longer to arrive than `loadingMinTimeMs`, the loading screen could
+get hidden on the exact same tick the preview canvas became visible,
+before the browser ever painted a frame of it. Fixed by flooring the
+wait at when the preview actually became ready plus a fixed 400ms
+visible-time margin, never reducing the existing wait in the common
+fast-load case. See CHANGELOG.txt's matching 2026-09-19 entries (both
+the original misdiagnosis and its correction) for the full account.
 
 **SHIPPED 2026-09-19: the remaining 5 items of the Custom Click Functions
 A-L gap report ("do 1,2,3,4 and 8") -- Scroll/Multi-Point Types, a click-

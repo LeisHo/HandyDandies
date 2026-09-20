@@ -8185,6 +8185,97 @@ the concurrent session's own bump) -> `?v=164` (this segment's own
 `loadingMinTimeMs`-revert confirmation bump).
 
 --------------------------------------------------------------------------------
+2026-09-19  21:03:37-21:13:37 EDT (10m00s, measured)
+
+**CORRECTION to this file's own immediately preceding entry, item 2
+("Even with Show Hand Loading Animation selected, I don't see it on
+startup... Confirmed NOT a code bug").** That conclusion was wrong --
+the diagnostic methodology used to reach it (temporarily widening
+`loadingMinTimeMs` to 15000ms) specifically AVOIDED the real bug rather
+than testing for it. Direct follow-up report from the user ("The Main
+Field Layout Hands shouldnt be shown until the loading preview is
+over... I still only see the words Loading Hands. I dont see the
+loading hand") prompted a real re-investigation and found a genuine,
+previously-undiagnosed race condition.
+
+**Root cause:** `buildLoadingPreview()` and `tryStartField()` both run
+synchronously, back-to-back, in the same GLTFLoader callback (once the
+GLB model finishes loading). If the model -- or the settings-restore
+fetch `tryStartField()` also waits on -- takes LONGER to arrive than
+`cfg.loadingMinTimeMs`, then by the moment `tryStartField()` runs,
+`elapsed` (time since page load) is already past that threshold, so the
+OLD code fell straight through to `fieldStarted = true` and hid the
+loading screen (`loadingEl.classList.add('hidden')`) on the EXACT SAME
+synchronous tick that `buildLoadingPreview()` had just set
+`loadingPreviewCanvas.style.display = 'block'` on. JavaScript is
+single-threaded and the browser only paints between task boundaries --
+with both the show and the hide happening inside one synchronous call
+stack, the browser never got a chance to paint the intermediate
+"preview visible" frame at all. The preview was technically built and
+technically shown, for literally 0ms of real screen time -- exactly
+"I only see the text, never the hand."
+
+The EARLIER diagnostic (temporarily setting `loadingMinTimeMs` to
+15000ms, previous entry) never exercised this path: with min-time
+forced far above any realistic model-load time, `tryStartField()`
+always took the OTHER branch (`elapsed < minMs`, a real `setTimeout`
+wait), which behaves correctly and always has. That test proved the
+underlying render mechanism works: it never proved the race-free
+ordering the production report actually depends on.
+
+**Confirmed via direct code tracing** (not initially via live
+reproduction -- this sandbox's own settings-restore endpoint doesn't
+exist locally, so the exact real-data race needed reasoning through
+rather than a first clean repro): read `tryStartField()`, the
+GLTFLoader callback's own call order (`modelMeasurementsReady = true`;
+`buildLoadingPreview()`; `tryStartField()`, all synchronous), and
+`animate()`'s own `if (!fieldStarted && loadingPreviewRenderer)` gate
+(the pre-field-start render branch, permanently stops the moment
+`fieldStarted` flips true) together to establish the exact mechanism.
+
+**Fixed** in `tryStartField()`: the wait threshold now also floors at
+`loadingPreviewAnimStartMs` (already tracked, set at the end of
+`buildLoadingPreview()`, when the preview actually became ready) plus a
+fixed 400ms visible-time margin -- a judgment call, not a measured
+value, chosen to survive several real animation frames regardless of
+`loadingMinTimeMs`'s own configured value. Only applies when a preview
+actually exists to be seen (`loadingPreviewRenderer` truthy); never
+REDUCES the pre-existing `minMs`-from-page-load wait, so the common
+fast-load case (model+settings well under `loadingMinTimeMs`) is
+unaffected -- confirmed via direct calculation: when `elapsed <<
+minMs`, `previewReadyMs` (elapsed + 400) is also `<< minMs`, so
+`effectiveMinMs = Math.max(minMs, previewReadyMs)` still just equals
+`minMs`.
+
+**Verified live** (after building a temporary, disclosed, fully-
+reverted diagnostic harness): a `<script>` in `index.html`, before
+`main.js`, that (1) monkey-patched `window.fetch` to serve the real
+committed `data/processed/dev-panel-settings.json` for
+`/api/save-settings` GETs -- this sandbox has no working serverless
+function, so without this the settings-restore path can't be exercised
+with real production data at all -- and (2) a `MutationObserver`
+recording exactly when the preview canvas's own `display` style and
+`#loading`'s own `hidden` class actually changed, in real
+`performance.now()` milliseconds, onto `window.__diag`. Confirmed the
+preview canvas was on-screen (`display:block`) from t=941ms to
+t=6404ms -- a genuine, multi-second real visible window, not an
+instant flash. (This particular run's ~6.4s total was mostly this
+sandbox's own settings-fetch retry loop rather than the new 400ms floor
+specifically -- the fix's own logic was verified directly via
+calculation for the exact race scenario, per above, since reliably
+forcing model-load-time > `loadingMinTimeMs` inside THIS sandbox on
+demand wasn't practical in the time available.) Both the fetch-patch
+and the `MutationObserver` diagnostic were removed from `index.html`
+before this entry was written -- `index.html`'s only surviving change
+is the real cache-buster bump.
+
+`node --check src/main.js` passed. No regression in the default/fast-
+load case (confirmed via a fresh reload after reverting the diagnostic
+harness: field still started normally, no new console errors).
+
+Cache-buster: `index.html`'s `main.js?v=164` -> `?v=165`.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

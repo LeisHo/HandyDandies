@@ -278,10 +278,37 @@ function tryStartField() {
   if (cfg.loadingPreviewEnabled) {
     const minMs = Math.max(0, cfg.loadingMinTimeMs || 0)
     const elapsed = performance.now() - pageLoadStartMs
-    if (elapsed < minMs) {
+    // ROOT CAUSE of "I only see the words Loading Hands... I dont see
+    // the loading hand" (direct report 2026-09-19). buildLoadingPreview()
+    // and this function both run synchronously in the same GLTFLoader
+    // callback -- if the model/settings genuinely took LONGER to arrive
+    // than `minMs` (a real production possibility: a multi-MB GLB on a
+    // cold CDN, a slow settings fetch), `elapsed` is already past `minMs`
+    // the FIRST time this runs, so the OLD code fell straight through to
+    // `fieldStarted = true` and hid the loading screen on the exact same
+    // synchronous tick that just made the preview canvas visible -- the
+    // browser never got a chance to paint that intermediate frame, so
+    // the preview was on-screen for 0ms. A prior diagnostic test
+    // (temporarily bumping `loadingMinTimeMs` to 15000 to verify this
+    // mechanism) never hit this race, since with min-time forced far
+    // above real load time, the OTHER branch (a real setTimeout wait)
+    // always ran instead -- which is why that test looked fine while
+    // production wasn't. Floors the wait at when the preview itself
+    // actually became ready (`loadingPreviewAnimStartMs`, set at the end
+    // of buildLoadingPreview()) plus a small fixed visible-time margin --
+    // 400ms is a judgment call, not a measured value, chosen to survive
+    // several real animation frames regardless of `loadingMinTimeMs`'s
+    // own configured value. Only applies extra wait when a preview
+    // actually exists to be seen (`loadingPreviewRenderer` truthy);
+    // never REDUCES the existing `minMs`-from-page-load wait.
+    const previewReadyMs = (loadingPreviewRenderer && loadingPreviewAnimStartMs)
+      ? (loadingPreviewAnimStartMs - pageLoadStartMs) + 400
+      : 0
+    const effectiveMinMs = Math.max(minMs, previewReadyMs)
+    if (elapsed < effectiveMinMs) {
       if (!minLoadingTimeTimerSet) {
         minLoadingTimeTimerSet = true
-        setTimeout(tryStartField, minMs - elapsed)
+        setTimeout(tryStartField, effectiveMinMs - elapsed)
       }
       return
     }
