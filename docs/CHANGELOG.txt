@@ -7845,6 +7845,123 @@ this round's own diagnosis, kept as a permanent addition matching
 every other internal object already exposed there).
 
 --------------------------------------------------------------------------------
+2026-09-19  19:54:07-20:23:05 EDT (28m58s)
+
+**Shipped the remaining 5 items of the Custom Click Functions A-L gap
+report the user asked to prioritize ("do 1,2,3,4 and 8"): Scroll/Multi-
+Point Types, a click-count selector, duplicate-setting validation,
+automatic hold-timing conflict resolution, and bezier curve handles for
+the shared curve-graph widget.** All 5 code-complete AND live-verified
+this same round via direct DOM/event dispatch (`window.__debug` +
+dispatched wheel/touch/pointer events, this project's own established
+rAF-bypass method).
+
+**Scroll (desktop, pose-kind only) + Multi-Point (mobile, both kinds)**
+are now real Type options on Custom Click Functions. Scroll gets a
+debounced `window` `wheel` listener (`cfg.multiClickWindowMs`-paced, so
+one real scroll gesture fires once, not dozens of times) -- verified
+live: a real dispatched `WheelEvent` correctly claimed a Scroll-type
+custom pose function (`pendingClaimAt`/`pendingForwardSnapshot` set),
+and 2 more wheel events dispatched in the SAME tick were correctly
+debounced (no further change) while a 3rd dispatched ~700ms later (past
+the window) fired again. Multi-Point tracks live simultaneous touch
+count via `touchstart`/`touchend`/`touchcancel`, each custom function
+gated by its own `TouchPointCount` slider -- verified live: a synthetic
+2-touch `touchstart` correctly started a Multi-Point hold-kind function
+(`phase` reached `'forward'` after driving `updateClickHoldPoseForHand`
+with real elapsed time), and a `touchend` dropping back to 1 touch
+correctly ended it (`phase` -> `'retransition'`).
+
+**"Triggers On (Nth Click/Press-And-Hold)" selector** lets a custom
+Click/Click+Hold function pick which press in this app's EXISTING left-
+button multi-click/hold chains fires it (1st-4th) -- piggybacks on the
+already-existing `CLICK_COUNT_CHAIN_KEYS`/`CLICK_HOLD_CHAIN_KEYS`
+mechanisms (`click`/`dblclick`/`tripleClick`/`quadClick` and their hold
+counterparts) rather than building a parallel detection stream. Right
+Click/Right Click+Hold/Scroll/Multi-Point always fire on their own
+single press/tap/tick -- no chain exists for those in this app today
+(disclosed simplification, not a gap in THIS feature). Required one
+small correction to the plain-click pointerup's own latency-avoidance
+early-fire branch (`customFunctionsNeedClickChain()`) so a custom
+function set to "2nd click" isn't silently starved when every hardcoded
+multi-click tier stays disabled. Verified live: a custom function set to
+"2nd Click" correctly did NOT fire on the first of 2 dispatched
+pointerdown/pointerup pairs, and DID fire (its `pendingClaimAt` changed)
+only after the 2nd, resolved past `multiClickWindowMs`.
+
+**Automatic hold-timing conflict resolution**: a newly-created custom
+Click/Click+Hold function now defaults its own Click Count to the
+LOWEST ordinal not already claimed by another REGISTERED function of
+the same Type+family, instead of always defaulting to "1st" (which would
+silently collide with whichever function claimed it first the moment
+both are enabled). Verified live: 2 custom Click+Hold functions created
+back to back on Desktop auto-resolved to "1st"/"2nd" respectively.
+
+**Duplicate-setting validation**: any 2+ currently-ENABLED custom
+functions sharing the same (family, Type, Click-Count-or-Touch-Point-
+Count) bucket get a visible warning -- a thin warning-colored left
+border (`.dp-group-conflict-warning`, style.css) plus a tooltip on the
+group's own header, non-blocking (2 functions sharing a gesture just
+both fire, same "whichever runs last wins" disclosed pattern already
+true of chp-vs-rchp elsewhere in this file). Verified live: 2 enabled
+functions with matching Type+Click-Count both got flagged (and the
+tooltip text confirmed); forcing them to different Click Counts cleared
+both flags.
+
+**2 real bugs found and fixed via live verification, neither reported by
+the user -- caught before this entry was written:**
+1. `updateClickFunctionEnabledVisibility()` (shared with the 10 static
+   triggers, which have no Type/Touch-Point/Click-Count concept at all)
+   unconditionally re-shows EVERY row when a function is re-enabled --
+   it has no idea some of those rows are Type-gated. Re-enabling a
+   plain 'Click' function always re-showed its (irrelevant) Touch Point
+   Count row. Fixed by wrapping the Enabled control's own `onChange`
+   for custom functions specifically (`renderCustomClickFunctionGroup()`),
+   re-applying `updateCustomFunctionTypeVisibility()` right after --
+   confirmed the static 10 triggers are unaffected (they have no Type-
+   gated rows to begin with).
+2. The auto-resolve helper originally checked `Enabled` when computing
+   "already-claimed" ordinals -- but every new custom function starts
+   DISABLED by default (Master On/Off), so 2 functions created back to
+   back both saw an empty used-set and both defaulted to "1st," the
+   exact collision the feature exists to prevent. Fixed by checking
+   plain registration (Type+family match) instead of Enabled state.
+
+**Bezier curve handles (`buildGenericCurveWidget()` only -- the Arm
+Length/Wrist Splay curve widgets are deliberately separate copies per
+their own comments, and are NOT extended)**: a new `bezierSegmentY()`/
+`cubicBezier1D()` pair (added next to `catmullRomY()`) lets
+`evaluateArmLengthCurve()` render a SEGMENT as an explicit cubic bezier
+whenever either endpoint defines a handle (`h1`/`h2`, optional {x,y}
+offsets, absolute -- added directly to the point); every segment with no
+handles keeps the exact same Catmull-Rom shape it always had, so no
+existing saved curve changes at all just because this capability now
+exists. UI: Alt+drag a point creates/drags its OUT handle, Shift+drag
+its IN handle (a small orange square marker + connecting line, drawn
+behind the point's own circle); dragging a handle back within 6px of its
+own point removes it on release. Verified live on a real
+`chpStartTimeCurve` widget: an Alt+drag on the first point created a
+real `h1` offset, committed to the underlying JSON (confirmed via the
+hidden text input's own value), visibly reshaped the rendered path, and
+rendered exactly 1 marker + 1 handle line; dragging that marker back
+near the point removed the `h1` field entirely and the marker/line
+disappeared. A full-page regression sweep (57 existing curve widgets on
+the page, all built without exception) plus a console-error check
+(`Uncaught` pattern, 0 matches) confirmed no existing curve broke.
+
+No code changed for the Arm Length/Wrist Splay curve widgets or any
+other part of the app -- this slice only touched `evaluateArmLengthCurve()`
+(additive branch, no-op when `h1`/`h2` are absent, which is every pre-
+existing curve everywhere in the app) and `buildGenericCurveWidget()`
+itself.
+
+Cache-buster: `index.html`'s own `main.js?v=157` (start of this slice) ->
+`?v=160` (the final value landed via the concurrent session's own later
+bumps for its own unrelated Loading Preview Orbit Controls work,
+committed the same round -- see this file's own immediately-preceding
+entry -- still guaranteeing a fresh fetch of this slice's content).
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

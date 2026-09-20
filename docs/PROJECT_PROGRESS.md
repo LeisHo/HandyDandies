@@ -40,6 +40,44 @@ value all confirmed a genuine orbit-driven azimuth change; one
 dismissed). See CHANGELOG.txt's matching 2026-09-19 entry for the full
 account.
 
+**SHIPPED 2026-09-19: the remaining 5 items of the Custom Click Functions
+A-L gap report ("do 1,2,3,4 and 8") -- Scroll/Multi-Point Types, a click-
+count selector, duplicate-setting validation, automatic hold-timing
+conflict resolution, and bezier curve handles for the shared curve-graph
+widget.** All 5 code-complete and live-verified the same round via
+`window.__debug` + dispatched wheel/touch/pointer events. Scroll (desktop,
+fire-and-forget only) and Multi-Point (mobile, both fire-and-forget and
+hold) are now real Type options with their own new detection (a debounced
+`wheel` listener; a live simultaneous-touch-count tracker gated by a new
+per-function Touch Point Count setting). A "Triggers On (Nth Click/Press-
+And-Hold)" selector lets a custom Click/Click+Hold function pick which
+press in this app's existing multi-click/hold chains fires it -- Right
+Click/Right Click+Hold/Scroll/Multi-Point still always fire on their own
+single press/tap/tick (no chain exists for those). New functions now auto-
+spread across free Click Count slots instead of colliding on "1st" by
+default; enabled functions sharing the same Type+family+selector get a
+visible warning border + tooltip (non-blocking).
+
+**Bezier curve handles** extend the shared curve-graph widget
+(`buildGenericCurveWidget()`, used by Start Time Curve/Speed Curve/Tween
+Stop curves/etc. -- NOT the separate, deliberately-independent Arm
+Length/Wrist Splay curve widgets) with an optional per-point manual
+tangent: Alt-drag a point creates/drags its outgoing handle, Shift-drag
+its incoming handle, dragging either back near the point removes it.
+Purely additive to the existing Catmull-Rom spline -- a segment with no
+handles renders exactly as it always did, so no existing saved curve's
+shape changed.
+
+**2 real bugs found and fixed via live verification before this was
+called done** (neither ever reported by the user): the shared Master
+On/Off visibility handler was unconditionally re-showing Type-gated
+rows (Touch Point Count/Click Count) on re-enable, regardless of the
+function's actual Type; the auto-resolve helper checked `Enabled` when
+deciding which Click Count slots were taken, but new functions start
+disabled by default, so it never actually prevented the collision it
+was built for. See CHANGELOG.txt's matching 2026-09-19 entry for the
+full account, including the exact verification steps for each item.
+
 **SHIPPED 2026-09-19: fixed 4 real bugs in the Loading Preview's new
 Camera/Lighting local-list architecture (previous entry).** Both
 selector dropdowns had NO `onChange` -- picking a different camera/
@@ -267,22 +305,23 @@ already-touched hand when their trigger-key arrays grow at runtime
 hand); Animation Speed Curve's own fields never got their interactive
 curve-graph widget (now fixed for all 10 existing triggers too).
 
-**Deliberately scoped down**, each disclosed rather than silently
-skipped: Scroll (desktop) and Multi-Point Touch (mobile) Types --
-genuinely new trigger-detection subsystems, not built for ANY trigger
-yet; click-count selector; duplicate-setting validation; automatic
-hold-timing conflict resolution for an arbitrary number of custom
-Click+Hold functions; a delete-function button (the dev panel's own
-Delete Group/Setting icon removes the DOM group but won't clean up this
-feature's own bookkeeping).
+**CORRECTED 2026-09-19 -- Scroll/Multi-Point Types, click-count
+selector, duplicate-setting validation, and automatic hold-timing
+conflict resolution are now all DONE** (see this doc's own newer entry
+above, and CHANGELOG.txt's matching 2026-09-19 entry) -- left here as a
+cautionary record of the original scoping decision rather than silently
+rewritten, per this project's own convention. Only a delete-function
+button (the dev panel's own Delete Group/Setting icon removes the DOM
+group but won't clean up this feature's own bookkeeping) remains
+genuinely deliberately scoped down.
 
-**Still ahead**: the 2 gaps above (Scroll, Multi-Point); reordering the
-10 fixed groups' own settings to match the original spec's B ordering;
-click-count selection and function deletion for Custom Click Functions;
-a multi-sequence-plus-hold chain builder; bezier curve handles;
-duplicate-setting validation. See CHANGELOG.txt's matching entries for
-full slice-by-slice detail; this is genuinely large and will keep
-spanning multiple rounds.
+**Still ahead**: a delete-function button for Custom Click Functions;
+reordering the 10 fixed groups' own settings to match the original
+spec's B ordering; a multi-sequence-plus-hold chain builder. Bezier
+curve handles are also now DONE (see above) -- this list is shorter than
+it used to be. See CHANGELOG.txt's matching entries for full slice-by-
+slice detail; this is genuinely large and will keep spanning multiple
+rounds.
 
 **SHIPPED 2026-09-19: the 2 gaps the user asked to fix first out of the
 full A-L gap report -- Master On/Off (hide all settings when off) and
