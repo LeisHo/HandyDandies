@@ -18,7 +18,33 @@ work seamlessly from there.
 
 ## Currently working on
 
-**SHIPPED 2026-09-19 (latest round): fixed a genuine dev-panel bug —
+**SHIPPED 2026-09-19 (latest round): ported 3 applicable changes from
+`.claude/TEMPLATE_DEV_PANEL.html`'s own 2026-09-19 updates.** Direct
+request ("look at the dev panel template and implement new changes").
+(1) Sticky header — confirmed already unnecessary here (this project's
+`.dp-header` is already a separate, non-scrolling flex sibling of
+`.dp-body`, unlike the template's own header which lives inside the
+scrollable area). (2) New 💾 Save button in the header itself, reachable
+without scrolling back down through a long group list — calls the same
+save path the bottom Save button does, with its own "Saved!"/"Save
+failed" flash. (3) Interleaved group/row order, both for persistence
+and the live drag gesture — directly extends this same day's earlier
+duplicate-group restore fix (immediately below): `captureGroup()` now
+records a single ordered `items` list instead of separate settings/
+subgroups arrays, so a row placed above a subgroup round-trips in that
+same order instead of "all rows first"; the drag-reorder engine
+(`setupReorder()`) gained an optional sibling-selector so a dragged
+group can be positioned relative to rows too, not just other groups.
+**Deliberately left out:** the template's new Undock/Dock-group-as-
+floating-panel feature — a genuinely new, larger-scoped feature not
+tied to anything reported, kept out to stay focused this round.
+Verified live: the header Save button's flash; `captureGroup()`'s own
+interleaved capture, by building a real row→group→row sequence in a
+test group and confirming the Copy Settings payload matched exactly.
+See CHANGELOG.txt's matching 2026-09-19 entry for the full account,
+including a real selector bug caught and fixed before it shipped.
+
+**SHIPPED 2026-09-19 (earlier same day): fixed a genuine dev-panel bug —
 grouped/nested/reordered settings could silently merge or leave a
 confusing empty duplicate on reload.** Direct report ("i had grouped
 and reordered and nested Loading Preview setting inputs. Now i cant see

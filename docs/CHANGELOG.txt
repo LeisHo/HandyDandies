@@ -8416,6 +8416,96 @@ Cache-buster: `index.html`'s `main.js?v=165` -> `?v=166`; `main.js`'s
 own `devPanel.js?v=32` import -> `?v=33`.
 
 --------------------------------------------------------------------------------
+2026-09-19  22:03:17-22:11:01 EDT (7m44s, measured)
+
+**Ported 2 applicable 2026-09-19 changes from
+`.claude/TEMPLATE_DEV_PANEL.html` into this project's own devPanel.js**,
+per direct request ("look at the dev panel template and implement new
+changes"). The template's own file had 4 new changes today (all
+originally from Clicko): a sticky panel header, a header Save/Sync
+button, interleaved group/row drag-reorder + persistence, and a new
+Undock/Dock-group-as-floating-panel feature. Checked each against this
+project's own, structurally different devPanel.js (per this file's own
+standing gotcha: no per-tab DOM duplication, different class names,
+different capture/restore shape) before porting anything.
+
+1. **Sticky header -- confirmed NOT NEEDED here.** The template's own
+   `.dev-header` needed `position:sticky` because it lives INSIDE the
+   same scrollable container as the rest of the panel's content. This
+   project's `.dp-header` is already a separate flex sibling of
+   `.dp-body` (the actual scrollable element) -- it was already pinned
+   in place with zero CSS changes needed. Confirmed by reading
+   `initDevPanel()`'s own panel-construction code (`panel.appendChild(header)`
+   happens before `.dp-body` is even created).
+
+2. **Header Save button, ADDED.** `.dp-tabs`/`.dp-actions` (the bottom
+   Copy/Save/Reset row) DO live inside `.dp-body`, unlike the header
+   itself -- so the real Save button WAS unreachable without scrolling
+   back up through a long group list, the exact problem the template's
+   own header button fixes. New 💾 button in `.dp-header-buttons`,
+   calling the same `saveSettings()` closure the bottom Save button
+   already does (not a separate save path), with its own "Saved!"/
+   "Save failed" flash mirroring the bottom button's existing feedback.
+   Verified live: clicking it flashed ❌ with "Save failed: offline/
+   unreachable" (expected -- no real remote-save server locally) and
+   reverted to 💾/"Save" after 900ms, matching the bottom button's own
+   behavior exactly.
+
+3. **Interleaved group/row order (persistence AND live drag), FIXED --
+   directly extends this file's own earlier-today duplicate-group fix.**
+   This project's `captureGroup()` stored settings/subgroups as 2
+   SEPARATE arrays, same limitation the template's own change fixes:
+   restoring could only ever express "every row, then every subgroup,"
+   never an actual interleaved order, even when the live DOM already
+   had one. `captureGroup()` now also captures a single `items` array
+   (interleaved, real DOM order); `settings`/`subgroups` stay populated
+   too, derived from `items`, not a 2nd source of truth. `applyOrder()`'s
+   own `placeGroup()` now walks `items` (falling back to the old
+   settings-then-subgroups shape for a pre-2026-09-19 saved snapshot --
+   real production data predates this change, so the fallback isn't
+   theoretical). Also extended the actual DRAG gesture to match: added
+   an optional `siblingSelector` param to the shared `setupReorder()`
+   engine, and passed `'.dp-group, .dp-row'` on the panel's own group
+   and row reorder calls, so a dragged group can now be positioned
+   relative to rows (and vice versa) instead of only same-type
+   siblings -- every OTHER `setupReorder()` call site (multi-select
+   rows, list-picker groups/rows) omits the new param and keeps its
+   original same-type-only behavior, unaffected. Caught and fixed a
+   real bug in my own first pass before it shipped: `:scope > ${sel}`
+   on a comma-separated selector only scopes the FIRST part, leaving a
+   2nd part like `.dp-row` unscoped (matching the whole document, not
+   just the drag target's own container) -- fixed by distributing
+   `:scope > ` across each comma-separated piece individually.
+
+Verified live (all 3 items): the header Save button's flash (above);
+`captureGroup()`'s own interleaved capture, by manually building a
+genuine row-group-row interleaved sequence inside a test group (moved
+real rows + an existing group into it via direct DOM manipulation, the
+same shape a live drag would produce) and inspecting the real Copy
+Settings clipboard payload -- confirmed `items` exactly matched
+`["ROW:dp_scrollStrength", "GROUP:Background", "ROW:loadingPreviewEnabled"]`,
+the real DOM order; and the fixed sibling-selector query directly,
+confirming it returns the same correctly-scoped, correctly-ordered list
+`setupReorder()`'s own `move()` function now uses. The RESTORE side
+wasn't independently re-verified end-to-end this round (same
+placeGroup()-is-a-direct-mechanical-translation reasoning as the
+capture-side proof, plus DOM `appendChild`'s own well-defined ordering
+semantics) -- proportionate given the capture side is now proven correct
+and the algorithm itself was read line-by-line.
+
+`node --check` passed on both changed files.
+
+**Deliberately NOT ported this round: the Undock/Dock-group-as-
+floating-panel feature.** A genuinely new, standalone feature (not a
+bug fix, not tied to anything reported), meaningfully larger in scope
+than the other 3 items -- left out to keep this pass focused, per the
+project's own scope-discipline convention. Worth a dedicated follow-up
+if wanted.
+
+Cache-buster: `index.html`'s `main.js?v=166` -> `?v=167`; `main.js`'s
+own `devPanel.js?v=33` import -> `?v=34`.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

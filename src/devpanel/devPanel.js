@@ -1417,7 +1417,20 @@ export function renderDynamicGroup(groupSpec) {
 // (not cached across drags) so a group created mid-session via
 // addCustomGroup(), or restored via applyOrder(), is immediately a valid
 // drop target with no extra wiring.
-function setupReorder(container, itemClass, handleClass, getTargets, onDrop, isLocked) {
+// `siblingSelector` (optional) -- ported from TEMPLATE_DEV_PANEL.html's
+// own 2026-09-19 REORDERABLE_SIBLING_SELECTOR change (direct request: "I
+// want to be able to reorder nested groups and settings such that Nested
+// groups can be placed above settings. there should be no prioritization
+// in terms of settings area lways above groups or anyting liek that").
+// When provided, sibling-position comparison during a drag uses this
+// selector instead of `.itemClass` alone, so a dragged group can be
+// positioned relative to ROWS too (and vice versa), not just same-type
+// siblings -- the panel's own group/row reorder calls below pass a
+// combined selector for exactly this; every OTHER call site (multi-
+// select rows, list-picker groups/rows, which have no analogous "other
+// type" to interleave with) omits it and keeps the original same-type-
+// only behavior, completely unaffected.
+function setupReorder(container, itemClass, handleClass, getTargets, onDrop, isLocked, siblingSelector) {
   let dragEl = null
   container.addEventListener('pointerdown', (e) => {
     const handle = e.target.closest('.' + handleClass)
@@ -1461,7 +1474,14 @@ function setupReorder(container, itemClass, handleClass, getTargets, onDrop, isL
         })
       }
       if (!targetContainer) return
-      const siblings = Array.from(targetContainer.children).filter((c) => c.classList.contains(itemClass) && c !== dragEl)
+      // A comma-separated `siblingSelector` (e.g. '.dp-group, .dp-row')
+      // needs `:scope > ` distributed across EACH part -- `:scope >
+      // ${siblingSelector}` alone would only scope the FIRST part,
+      // leaving the 2nd an unscoped `.dp-row` that matches anywhere in
+      // the whole document, not just this container's direct children.
+      const siblings = siblingSelector
+        ? Array.from(targetContainer.querySelectorAll(siblingSelector.split(',').map((s) => ':scope > ' + s.trim()).join(', '))).filter((c) => c !== dragEl)
+        : Array.from(targetContainer.children).filter((c) => c.classList.contains(itemClass) && c !== dragEl)
       let placed = false
       for (const sib of siblings) {
         const r = sib.getBoundingClientRect()
@@ -1512,18 +1532,28 @@ function buildDevPanel(groupsEl) {
   // cap only ever lived here, in what the live drag was willing to
   // offer as a target, confirmed by reading both functions before
   // touching anything.
+  // `siblingSelector: '.dp-group, .dp-row'` on both calls below (ported
+  // from TEMPLATE_DEV_PANEL.html's own 2026-09-19 REORDERABLE_SIBLING_SELECTOR
+  // change, see setupReorder()'s own comment) -- lets a dragged group be
+  // positioned relative to ROWS too, and a dragged row relative to
+  // GROUPS too, instead of each only ever comparing against same-type
+  // siblings. Matches captureGroup()/applyOrder()'s own interleaved-order
+  // fix (same round): the drag gesture and what actually gets saved/
+  // restored now agree on the same "no type gets forced to the top or
+  // bottom" model.
   setupReorder(groupsEl, 'dp-group', 'dp-drag-handle', (item) => {
     const allBodies = Array.from(groupsEl.querySelectorAll('.dp-group > .dp-group-body'))
       .filter((b) => !item.contains(b.closest('.dp-group')))
     return [groupsEl, ...allBodies]
-  })
+  }, undefined, undefined, '.dp-group, .dp-row')
   // Cross-group: recomputes the live list of every group's body (top-level
   // AND nested, since this selector isn't :scope-restricted) at the start
   // of each individual drag, so a group added/removed/nested since the last
   // drag (addCustomGroup(), or one recreated by applyOrder()) is always
   // current.
   setupReorder(groupsEl, 'dp-row', 'dp-row-handle', () => Array.from(groupsEl.querySelectorAll('.dp-group-body')), null,
-    (item) => { const grp = item.closest('.dp-group'); return !!(grp && grp.classList.contains('dp-group-locked')) })
+    (item) => { const grp = item.closest('.dp-group'); return !!(grp && grp.classList.contains('dp-group-locked')) },
+    '.dp-group, .dp-row')
 }
 
 // Organizes the built-in "Dev Panel" group's own (flat, just-built) rows
@@ -1772,13 +1802,34 @@ function initResizeHandles(panel) {
 // unscoped querySelectorAll('.dp-row') would also reach a nested
 // child's own rows, double-counting them under both the parent and the
 // child.
+// `items`: a SINGLE ordered list interleaving rows and subgroups in real
+// DOM order -- ported from TEMPLATE_DEV_PANEL.html's own 2026-09-19
+// change (itself from Clicko, direct request: "I want to be able to
+// reorder nested groups and settings such that Nested groups can be
+// placed above settings. there should be no prioritization in terms of
+// settings area lways above groups or anyting liek that"). Replaces the
+// old separate `settings`/`subgroups` arrays, which could only ever
+// express "every row, then every subgroup" (or vice versa on restore) --
+// never an actual interleaved order, even when the live DOM already had
+// one (e.g. from a drag that happened to land a row between 2
+// subgroups). `settings`/`subgroups` are still populated too, DERIVED
+// from `items` rather than a 2nd source of truth -- purely so anything
+// that might still read them directly (there's nothing in this file as
+// of this change, but it's cheap insurance) sees a sane, consistent
+// value.
 function captureGroup(g) {
+  const items = Array.from(g.querySelectorAll(':scope > .dp-group-body > .dp-row, :scope > .dp-group-body > .dp-group')).map((el) => {
+    return el.classList.contains('dp-row')
+      ? { type: 'row', key: el.dataset.key }
+      : { type: 'group', group: captureGroup(el) }
+  })
   return {
     key: g.dataset.key,
     collapsed: g.classList.contains('collapsed'),
     locked: g.classList.contains('dp-group-locked'),
-    settings: Array.from(g.querySelectorAll(':scope > .dp-group-body > .dp-row')).map((r) => r.dataset.key),
-    subgroups: Array.from(g.querySelectorAll(':scope > .dp-group-body > .dp-group')).map((sub) => captureGroup(sub)),
+    items,
+    settings: items.filter((it) => it.type === 'row').map((it) => it.key),
+    subgroups: items.filter((it) => it.type === 'group').map((it) => it.group),
   }
 }
 function getPanelOrder(groupsEl) {
@@ -1850,11 +1901,24 @@ function applyOrder(groupsEl, order) {
     const lockIcon = groupEl.querySelector(':scope > .dp-group-header > .dp-group-lock-icon')
     if (lockIcon) syncGroupLockIcon(groupEl, lockIcon)
     const groupBody = groupEl.querySelector('.dp-group-body')
-    ;(savedGroup.settings || []).forEach((k) => {
-      const rowEl = rowsByKey[k]
-      if (rowEl) groupBody.appendChild(rowEl)
+    // Walks `savedGroup.items` (the interleaved row/subgroup order -- see
+    // captureGroup()'s own comment) so a row placed ABOVE a subgroup
+    // restores in that same interleaved order, not "every row first."
+    // Falls back to the pre-2026-09-19 settings-then-subgroups shape for
+    // a savedGroup captured before this change -- real production data
+    // predates it, so this fallback isn't just theoretical.
+    const items = savedGroup.items || [
+      ...(savedGroup.settings || []).map((key) => ({ type: 'row', key })),
+      ...(savedGroup.subgroups || []).map((group) => ({ type: 'group', group })),
+    ]
+    items.forEach((item) => {
+      if (item.type === 'row') {
+        const rowEl = rowsByKey[item.key]
+        if (rowEl) groupBody.appendChild(rowEl)
+      } else {
+        placeGroup(item.group, groupBody)
+      }
     })
-    ;(savedGroup.subgroups || []).forEach((sub) => placeGroup(sub, groupBody))
   }
   order.forEach((g) => placeGroup(g, groupsEl))
 }
@@ -2242,8 +2306,21 @@ export function initDevPanel(groups, opts = {}) {
   // forward-reference-safety reasoning as those.
   const deleteGroupBtn = el('button', 'dp-icon-btn', { type: 'button', textContent: '🗑', title: 'Delete Group/Setting (click, then click a group or setting to delete it)' })
   const undoBtn = el('button', 'dp-icon-btn', { type: 'button', textContent: '↶', title: 'Undo (Ctrl+Z) -- undoes any dev panel change back to the last Save' })
+  // Header Save button -- ported from TEMPLATE_DEV_PANEL.html's own
+  // 2026-09-19 addition (itself ported from Clicko, "add a Sync (save)
+  // button on the dev panel top label as well. Both buttns will exist").
+  // `.dp-tabs`/`.dp-actions` (the bottom Copy/Save/Reset row) live INSIDE
+  // `.dp-body`, the scrollable container -- unlike `.dp-header` itself,
+  // which is a separate, always-visible flex sibling of `.dp-panel` (see
+  // that element's own construction above) and never needed the
+  // template's own `position:sticky` fix. Scrolled down into a long
+  // group list, the actual Save button was unreachable without scrolling
+  // back up -- this button fixes exactly that, calling the SAME
+  // saveSettings() closure the bottom Save button already does (wired
+  // below, once that function is in scope), not a separate save path.
+  const saveHeaderBtn = el('button', 'dp-icon-btn', { type: 'button', textContent: '💾', title: 'Save' })
   const collapseBtn = el('button', 'dp-icon-btn', { type: 'button', textContent: '–', title: 'Collapse' })
-  headerButtons.append(textEditBtn, addGroupBtn, collapseAllBtn, deleteGroupBtn, undoBtn, collapseBtn)
+  headerButtons.append(textEditBtn, addGroupBtn, collapseAllBtn, deleteGroupBtn, undoBtn, saveHeaderBtn, collapseBtn)
   header.appendChild(headerButtons)
   panel.appendChild(header)
 
@@ -2397,7 +2474,22 @@ export function initDevPanel(groups, opts = {}) {
   }, true)
 
   function saveSettings() {
-    const flash = (msg) => { const orig = saveBtn.textContent; saveBtn.textContent = msg; setTimeout(() => { saveBtn.textContent = orig }, 900) }
+    // Also flashes the HEADER save button (saveHeaderBtn) with a
+    // checkmark/X + tooltip -- ported from TEMPLATE_DEV_PANEL.html's own
+    // flashDevHeaderSyncStatus() (2026-09-19). The bottom Save button
+    // already had feedback via its own text-swap; this just mirrors it
+    // onto the header button too, since that's the one actually visible
+    // without scrolling back down to the bottom row.
+    const flash = (msg) => {
+      const orig = saveBtn.textContent
+      saveBtn.textContent = msg
+      setTimeout(() => { saveBtn.textContent = orig }, 900)
+      const success = msg === 'Saved!'
+      const origIcon = '💾'
+      saveHeaderBtn.textContent = success ? '✅' : '❌'
+      saveHeaderBtn.title = msg
+      setTimeout(() => { saveHeaderBtn.textContent = origIcon; saveHeaderBtn.title = 'Save' }, 900)
+    }
     const snapshot = {
       values: Object.fromEntries(DEVICES.map((d) => [d, { ...store[d] }])),
       order: getPanelOrder(groupsEl),
@@ -2546,6 +2638,7 @@ export function initDevPanel(groups, opts = {}) {
   // it's only ever actually called on a real click, well after
   // everything in this file is defined.
   saveBtn.addEventListener('click', () => { saveSettings(); clearDevPanelUndoStack() })
+  saveHeaderBtn.addEventListener('click', () => { saveSettings(); clearDevPanelUndoStack() })
   resetBtn.addEventListener('click', resetSettings)
 
   // ------------------------------------------------------------------

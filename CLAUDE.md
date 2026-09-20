@@ -276,6 +276,29 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   a 1:1 port — 2 of the 4 changes reviewed this round turned out not to
   apply at all for exactly this reason. See CHANGELOG.txt's matching
   2026-09-17 entry for the full account of what was and wasn't ported.
+- **Follow-up port, 2026-09-19: 3 of the template's own same-day changes
+  (sticky header, header Save button, interleaved group/row order) were
+  reviewed and adapted -- confirms the same "re-verify, don't 1:1 port"
+  discipline above still holds.** The sticky-header fix turned out to be
+  unnecessary here (this project's `.dp-header` is already a separate,
+  non-scrolling flex sibling of `.dp-body`, unlike the template's own
+  header, which lives INSIDE its scrollable container). The interleaved-
+  order fix required real adaptation, not a copy-paste: this project's
+  `captureGroup()`/`applyOrder()` use `settings`/`subgroups` field names
+  (not the template's `rowKeys`/`subgroups`), and its `setupReorder()` is
+  a single generic engine shared by 5 different call sites (multi-select
+  rows, list-picker groups/rows, panel groups/rows) — the new
+  `siblingSelector` param had to be opt-in (only the panel's own 2 calls
+  pass it) so the other 3, same-type-only contexts stayed unaffected. A
+  real bug was caught and fixed in this port before it shipped:
+  `` `:scope > ${siblingSelector}` `` on a comma-separated selector
+  (`'.dp-group, .dp-row'`) only scopes the FIRST comma-branch — the 2nd
+  becomes an unscoped `.dp-row` matching the whole document, not just
+  the drag target's own container. `:scope > ` has to be distributed
+  across each comma-separated piece individually
+  (`siblingSelector.split(',').map(s => ':scope > ' + s.trim()).join(', ')`).
+  See CHANGELOG.txt's matching 2026-09-19 entry for the full account,
+  including live verification of the fix.
 - **`src/main.js` (441,597 bytes as of 2026-09-17) truncates at a fixed
   391,680-byte cutoff when served by a plain static server in this
   environment — and the connection resets, aborting the load.**
