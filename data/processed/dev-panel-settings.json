@@ -9,7 +9,7 @@
       "alternateRowOffset": 5,
       "progressiveRowOffset": 1,
       "useProgressiveOffset": false,
-      "hideHands": false,
+      "hideHands": true,
       "trackingEnabled": true,
       "trackingDamping": 0.6,
       "targetDepthFactor": 0.8,
@@ -21438,7 +21438,7 @@
     },
     {
       "key": "Loading Preview",
-      "collapsed": true,
+      "collapsed": false,
       "locked": false,
       "items": [
         {
@@ -21468,7 +21468,7 @@
         {
           "type": "group",
           "group": {
-            "key": "New Group",
+            "key": "New Group (5)",
             "collapsed": true,
             "locked": false,
             "items": [
@@ -21503,11 +21503,28 @@
               {
                 "type": "row",
                 "key": "loadingPreviewSavedCameras"
-              },
-              {
-                "type": "row",
-                "key": "loadingPreviewSavedLighting"
-              },
+              }
+            ],
+            "settings": [
+              "loadingPreviewRotationX",
+              "loadingPreviewRotationY",
+              "loadingPreviewRotationZ",
+              "loadingPreviewOffsetX",
+              "loadingPreviewOffsetY",
+              "loadingPreviewCameraFov",
+              "loadingPreviewCameraZoom",
+              "loadingPreviewSavedCameras"
+            ],
+            "subgroups": []
+          }
+        },
+        {
+          "type": "group",
+          "group": {
+            "key": "New Group (7)",
+            "collapsed": true,
+            "locked": false,
+            "items": [
               {
                 "type": "row",
                 "key": "loadingPreviewTweenSelector"
@@ -21539,50 +21556,9 @@
               {
                 "type": "row",
                 "key": "loadingPreviewSequenceLoopTransition"
-              },
-              {
-                "type": "row",
-                "key": "thumbCurl"
-              },
-              {
-                "type": "row",
-                "key": "tipOnlyCurlThumb"
-              },
-              {
-                "type": "row",
-                "key": "midOnlyCurlThumb"
-              },
-              {
-                "type": "row",
-                "key": "baseOnlyCurlThumb"
-              },
-              {
-                "type": "row",
-                "key": "tipTwistThumb"
-              },
-              {
-                "type": "row",
-                "key": "thumbSplay"
-              },
-              {
-                "type": "row",
-                "key": "thumbSplay2"
-              },
-              {
-                "type": "row",
-                "key": "curlBiasThumb"
               }
             ],
             "settings": [
-              "loadingPreviewRotationX",
-              "loadingPreviewRotationY",
-              "loadingPreviewRotationZ",
-              "loadingPreviewOffsetX",
-              "loadingPreviewOffsetY",
-              "loadingPreviewCameraFov",
-              "loadingPreviewCameraZoom",
-              "loadingPreviewSavedCameras",
-              "loadingPreviewSavedLighting",
               "loadingPreviewTweenSelector",
               "loadingPreviewCameraSelector",
               "loadingPreviewLightingSelector",
@@ -21590,15 +21566,25 @@
               "loadingPreviewSpeedMs",
               "loadingPreviewSize",
               "loadingPreviewSequenceHoldMs",
-              "loadingPreviewSequenceLoopTransition",
-              "thumbCurl",
-              "tipOnlyCurlThumb",
-              "midOnlyCurlThumb",
-              "baseOnlyCurlThumb",
-              "tipTwistThumb",
-              "thumbSplay",
-              "thumbSplay2",
-              "curlBiasThumb"
+              "loadingPreviewSequenceLoopTransition"
+            ],
+            "subgroups": []
+          }
+        },
+        {
+          "type": "group",
+          "group": {
+            "key": "New Group",
+            "collapsed": true,
+            "locked": false,
+            "items": [
+              {
+                "type": "row",
+                "key": "loadingPreviewSavedLighting"
+              }
+            ],
+            "settings": [
+              "loadingPreviewSavedLighting"
             ],
             "subgroups": []
           }
@@ -21614,7 +21600,7 @@
       ],
       "subgroups": [
         {
-          "key": "New Group",
+          "key": "New Group (5)",
           "collapsed": true,
           "locked": false,
           "items": [
@@ -21649,11 +21635,25 @@
             {
               "type": "row",
               "key": "loadingPreviewSavedCameras"
-            },
-            {
-              "type": "row",
-              "key": "loadingPreviewSavedLighting"
-            },
+            }
+          ],
+          "settings": [
+            "loadingPreviewRotationX",
+            "loadingPreviewRotationY",
+            "loadingPreviewRotationZ",
+            "loadingPreviewOffsetX",
+            "loadingPreviewOffsetY",
+            "loadingPreviewCameraFov",
+            "loadingPreviewCameraZoom",
+            "loadingPreviewSavedCameras"
+          ],
+          "subgroups": []
+        },
+        {
+          "key": "New Group (7)",
+          "collapsed": true,
+          "locked": false,
+          "items": [
             {
               "type": "row",
               "key": "loadingPreviewTweenSelector"
@@ -21685,50 +21685,9 @@
             {
               "type": "row",
               "key": "loadingPreviewSequenceLoopTransition"
-            },
-            {
-              "type": "row",
-              "key": "thumbCurl"
-            },
-            {
-              "type": "row",
-              "key": "tipOnlyCurlThumb"
-            },
-            {
-              "type": "row",
-              "key": "midOnlyCurlThumb"
-            },
-            {
-              "type": "row",
-              "key": "baseOnlyCurlThumb"
-            },
-            {
-              "type": "row",
-              "key": "tipTwistThumb"
-            },
-            {
-              "type": "row",
-              "key": "thumbSplay"
-            },
-            {
-              "type": "row",
-              "key": "thumbSplay2"
-            },
-            {
-              "type": "row",
-              "key": "curlBiasThumb"
             }
           ],
           "settings": [
-            "loadingPreviewRotationX",
-            "loadingPreviewRotationY",
-            "loadingPreviewRotationZ",
-            "loadingPreviewOffsetX",
-            "loadingPreviewOffsetY",
-            "loadingPreviewCameraFov",
-            "loadingPreviewCameraZoom",
-            "loadingPreviewSavedCameras",
-            "loadingPreviewSavedLighting",
             "loadingPreviewTweenSelector",
             "loadingPreviewCameraSelector",
             "loadingPreviewLightingSelector",
@@ -21736,15 +21695,22 @@
             "loadingPreviewSpeedMs",
             "loadingPreviewSize",
             "loadingPreviewSequenceHoldMs",
-            "loadingPreviewSequenceLoopTransition",
-            "thumbCurl",
-            "tipOnlyCurlThumb",
-            "midOnlyCurlThumb",
-            "baseOnlyCurlThumb",
-            "tipTwistThumb",
-            "thumbSplay",
-            "thumbSplay2",
-            "curlBiasThumb"
+            "loadingPreviewSequenceLoopTransition"
+          ],
+          "subgroups": []
+        },
+        {
+          "key": "New Group",
+          "collapsed": true,
+          "locked": false,
+          "items": [
+            {
+              "type": "row",
+              "key": "loadingPreviewSavedLighting"
+            }
+          ],
+          "settings": [
+            "loadingPreviewSavedLighting"
           ],
           "subgroups": []
         }
@@ -21777,7 +21743,7 @@
     },
     {
       "key": "Field Layout",
-      "collapsed": false,
+      "collapsed": true,
       "locked": false,
       "items": [
         {
@@ -27870,7 +27836,7 @@
     },
     {
       "key": "Pose",
-      "collapsed": true,
+      "collapsed": false,
       "locked": false,
       "items": [
         {
@@ -27913,7 +27879,7 @@
           "type": "group",
           "group": {
             "key": "Wrist",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -27928,6 +27894,59 @@
             "settings": [
               "wristBend",
               "wristSplay"
+            ],
+            "subgroups": []
+          }
+        },
+        {
+          "type": "group",
+          "group": {
+            "key": "New Group (6)",
+            "collapsed": true,
+            "locked": false,
+            "items": [
+              {
+                "type": "row",
+                "key": "thumbCurl"
+              },
+              {
+                "type": "row",
+                "key": "tipOnlyCurlThumb"
+              },
+              {
+                "type": "row",
+                "key": "midOnlyCurlThumb"
+              },
+              {
+                "type": "row",
+                "key": "baseOnlyCurlThumb"
+              },
+              {
+                "type": "row",
+                "key": "tipTwistThumb"
+              },
+              {
+                "type": "row",
+                "key": "thumbSplay"
+              },
+              {
+                "type": "row",
+                "key": "thumbSplay2"
+              },
+              {
+                "type": "row",
+                "key": "curlBiasThumb"
+              }
+            ],
+            "settings": [
+              "thumbCurl",
+              "tipOnlyCurlThumb",
+              "midOnlyCurlThumb",
+              "baseOnlyCurlThumb",
+              "tipTwistThumb",
+              "thumbSplay",
+              "thumbSplay2",
+              "curlBiasThumb"
             ],
             "subgroups": []
           }
@@ -28177,7 +28196,7 @@
         },
         {
           "key": "Wrist",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -28192,6 +28211,56 @@
           "settings": [
             "wristBend",
             "wristSplay"
+          ],
+          "subgroups": []
+        },
+        {
+          "key": "New Group (6)",
+          "collapsed": true,
+          "locked": false,
+          "items": [
+            {
+              "type": "row",
+              "key": "thumbCurl"
+            },
+            {
+              "type": "row",
+              "key": "tipOnlyCurlThumb"
+            },
+            {
+              "type": "row",
+              "key": "midOnlyCurlThumb"
+            },
+            {
+              "type": "row",
+              "key": "baseOnlyCurlThumb"
+            },
+            {
+              "type": "row",
+              "key": "tipTwistThumb"
+            },
+            {
+              "type": "row",
+              "key": "thumbSplay"
+            },
+            {
+              "type": "row",
+              "key": "thumbSplay2"
+            },
+            {
+              "type": "row",
+              "key": "curlBiasThumb"
+            }
+          ],
+          "settings": [
+            "thumbCurl",
+            "tipOnlyCurlThumb",
+            "midOnlyCurlThumb",
+            "baseOnlyCurlThumb",
+            "tipTwistThumb",
+            "thumbSplay",
+            "thumbSplay2",
+            "curlBiasThumb"
           ],
           "subgroups": []
         },
@@ -28517,7 +28586,7 @@
     },
     {
       "key": "Toon Shading",
-      "collapsed": false,
+      "collapsed": true,
       "locked": false,
       "items": [
         {
@@ -28707,6 +28776,9 @@
     "New Group (2)": "CLICK FUNCTIONS",
     "Whole-Hand Rotation & Thumb": "ROTATION",
     "New Group (3)": "RESPONSIVE PALM ROTATION",
-    "New Group (4)": "RESPONSIVE WRIST CROPPING"
+    "New Group (4)": "RESPONSIVE WRIST CROPPING",
+    "New Group (5)": "LOADING PREVIEW CAMERA",
+    "New Group (6)": "THUMB",
+    "New Group (7)": "LOADING PREVIEW ANIMATION"
   }
 }
