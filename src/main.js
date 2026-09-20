@@ -623,6 +623,18 @@ const DEV_GROUPS = [
       { key: 'loadingPreviewRotationZ', label: 'Loading Preview Rotation Z (Deg)', type: 'slider', min: -180, max: 180, step: 1, def: 0, onChange: (v) => applyLoadingPreviewOrbitFromSliders() },
       { key: 'loadingPreviewOffsetX', label: 'Loading Preview Offset X (World Units)', type: 'slider', min: -30, max: 30, step: 0.5, def: 0, onChange: (v) => applyLoadingPreviewOrbitFromSliders() },
       { key: 'loadingPreviewOffsetY', label: 'Loading Preview Offset Y (World Units)', type: 'slider', min: -30, max: 30, step: 0.5, def: 0, onChange: (v) => applyLoadingPreviewOrbitFromSliders() },
+      // Direct request ("Provide sliders for Camera FOV and Zoom for the
+      // Loading Preview Camera") -- same 2-way-bound shape as the main
+      // scene's own `cameraFov`/`cameraZoom` (drives AND reflects the
+      // camera, see applyCameraControl()/syncCameraPanelFromLive() for
+      // that precedent). Zoom is DISTANCE to the orbit target (matching
+      // the main scene's own "Zoom (Distance To Pan Target) (x)"
+      // labeling exactly) -- previously tracked only internally
+      // (preserved-but-not-exposed) by applyLoadingPreviewOrbitFromSliders();
+      // now a real, visible, directly-settable slider like the main
+      // scene's own.
+      { key: 'loadingPreviewCameraFov', label: 'Loading Preview Camera FOV (Deg)', type: 'slider', min: 15, max: 90, step: 1, def: 35, onChange: (v) => { if (!loadingPreviewCamera) return; loadingPreviewCamera.fov = v; loadingPreviewCamera.updateProjectionMatrix() } },
+      { key: 'loadingPreviewCameraZoom', label: 'Loading Preview Camera Zoom (Distance To Target) (x)', type: 'slider', min: 1, max: 300, step: 0.5, def: 55, onChange: (v) => applyLoadingPreviewOrbitFromSliders() },
       // Direct request ("Provide a Loading Preview Camera Edit Mode
       // checkbox. When Turned on, I can use my mouse's click and drag to
       // orbit the camera, and right click to pan the camera, as well as
@@ -1164,7 +1176,7 @@ const DEV_GROUPS = [
         // group's own Tween Selector dropdown reads this same list via
         // options(), which devPanel.js only rebuilds on an explicit
         // refreshSelectOptions() call.
-        onChange: () => { safeRefreshSelectOptions('dcHoldTweenSelector'); safeRefreshSelectOptions('rcTweenSelector'); safeRefreshSelectOptions('chpTweenSelector'); safeRefreshSelectOptions('rchpTweenSelector'); safeRefreshSelectOptions('clickTweenSelector'); safeRefreshSelectOptions('dblclickTweenSelector') }
+        onChange: () => { safeRefreshSelectOptions('dcHoldTweenSelector'); safeRefreshSelectOptions('rcTweenSelector'); safeRefreshSelectOptions('chpTweenSelector'); safeRefreshSelectOptions('rchpTweenSelector'); safeRefreshSelectOptions('clickTweenSelector'); safeRefreshSelectOptions('dblclickTweenSelector'); CLICK_HOLD_KEYS.forEach((p) => safeRefreshMultiSelectOptions(`${p}TweenChain`)) }
       }
     ])
   },
@@ -2665,8 +2677,8 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       // should only show when Single Pose is selected") -- Enabled, Mode,
       // and Hold Confirm Delay stay visible regardless of mode.
       {
-        key: `${p}Mode`, label: 'Mode', type: 'select', def: 'Single Pose', options: () => ['Single Pose', 'Sequence'],
-        onChange: () => { updateClickTriggerModeVisibility(p, [], ['LoopMode', 'OnReleaseMode', 'TriggerAllHands', 'TweenStopStartTimeCurveEnabled', 'TweenStopDelayEnabled']); updateLoopHoldVisibility(p); updateSingleTimingGateVisibility(p); updateTweenStopGateVisibility(p) }
+        key: `${p}Mode`, label: 'Mode', type: 'select', def: 'Single Pose', options: () => ['Single Pose', 'Sequence', 'Chain'],
+        onChange: () => { updateClickTriggerModeVisibility(p, [], ['LoopMode', 'OnReleaseMode', 'TriggerAllHands', 'TweenStopStartTimeCurveEnabled', 'TweenStopDelayEnabled']); updateLoopHoldVisibility(p); updateSingleTimingGateVisibility(p); updateTweenStopGateVisibility(p); updateChainModeVisibility(p) }
       },
       // Offset/Rotation -- direct request 2026-09-17 ("Offset On and Off,
       // to set if the hand itself will be physically offset in the x and
@@ -2693,6 +2705,12 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       { key: `${p}RotationZ`, label: 'Rotation Z (Deg)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
       { key: `${p}TargetPose`, label: 'Target Pose', type: 'select', def: defaults.targetPose ?? '', options: () => (cfg.savedPoses || []).map((sp) => ({ value: sp.name, group: sp.group || null })) },
       { key: `${p}TweenSelector`, label: 'Sequence', type: 'select', def: '', options: () => (cfg.savedTweenSequences || []).map((s) => ({ value: s.name, group: s.group || null })) },
+      // Chain mode's own ordered list of saved Tween Sequences (NOT
+      // individual poses -- a sequence OF sequences), reusing the exact
+      // same drag-to-reorder multi-select control type `tweenPoses`
+      // already uses. See startClickHoldPose()'s own Chain branch for how
+      // this gets resolved+concatenated into one effective sequence.
+      { key: `${p}TweenChain`, label: 'Chain (Sequences, In Order)', type: 'multi-select', def: [], options: () => (cfg.savedTweenSequences || []).map((s) => ({ value: s.name, group: s.group || null })) },
       // Tween's own SEPARATE speed/curve/range trio -- direct correction
       // ("tween speed is different from pose transition speed. For tween,
       // also provide a set of the curve graph, min max, pos transition
@@ -3589,6 +3607,30 @@ function setupLoadingPreviewOrbitControls() {
   // rebuild can never leave it stuck on the wrong value regardless of
   // whatever else touched it in between.
   loadingPreviewCanvas.style.pointerEvents = cfg.loadingPreviewCameraEditMode ? 'auto' : 'none'
+  // CORRECTED 2026-09-19, direct report ("I used the Loading Preview
+  // camera Edit mode to set a camera i like. I click Save... the camera
+  // rotations suddnely change"). Root cause: devPanel.js's own numeric
+  // text input commits its value on the DOM 'change' event, which fires
+  // on BLUR -- if one of these 7 orbit-reflecting inputs had ever been
+  // clicked/focused earlier (even without confirming a new value),
+  // `syncValue()`'s own "skip whichever row is focused" guard (by
+  // design, so live sync never fights an in-progress edit) means that
+  // ONE input's own displayed value silently stops tracking the live
+  // orbit from that moment on. Clicking Save (or literally any other
+  // button in the panel) shifts focus away, firing that stale input's
+  // own 'change' handler -- which re-applies its now-outdated value,
+  // snapping the camera back to it right before Save's own
+  // captureCurrent() reads the (just-corrupted) camera. Fixed by
+  // blurring the currently-focused element the INSTANT an orbit/pan/
+  // zoom drag begins (OrbitControls' own 'start' event) -- any stale
+  // focus is cleared before it can survive into a later blur-driven
+  // stale-value commit, and a genuinely mid-typed value (never blurred
+  // this way) is unaffected since typing doesn't touch the canvas at
+  // all.
+  loadingPreviewOrbitControls.addEventListener('start', () => {
+    const active = document.activeElement
+    if (active && active.tagName === 'INPUT' && active !== document.body) active.blur()
+  })
 }
 // Keeps the orbit controls' own target in sync whenever the camera is
 // repositioned some OTHER way (a saved preset, auto-frame) -- otherwise
@@ -3599,20 +3641,17 @@ function syncLoadingPreviewOrbitControlsTarget() {
   loadingPreviewOrbitControls.target.copy(loadingPreviewCameraTarget)
   loadingPreviewOrbitControls.update()
 }
-// Reads the 5 sliders (elevation/azimuth/roll/pan-X/pan-Y) and positions
-// the camera to match -- the FORWARD direction (sliders -> camera),
-// wired as each slider's own onChange so they stay usable with Edit Mode
-// off, same click-to-type convention every other slider in this panel
-// has. Distance is deliberately NOT one of the 5 sliders (not asked
-// for) -- preserved from whatever it currently is (live scroll-zoom, a
-// loaded preset, or the auto-frame default) rather than reset every
-// time one slider changes.
+// Reads the 5 orbit sliders (elevation/azimuth/roll/pan-X/pan-Y) PLUS
+// Zoom (distance) and positions the camera to match -- the FORWARD
+// direction (sliders -> camera), wired as each slider's own onChange so
+// they stay usable with Edit Mode off, same click-to-type convention
+// every other slider in this panel has. FOV is separate (a direct
+// camera.fov set, no orbit math involved -- see its own onChange).
 function applyLoadingPreviewOrbitFromSliders() {
   if (!loadingPreviewCamera) return
   const origin = loadingPreviewOrbitOrigin()
   const target = origin.clone().add(new THREE.Vector3(cfg.loadingPreviewOffsetX || 0, cfg.loadingPreviewOffsetY || 0, 0))
-  const priorDistance = loadingPreviewCamera.position.distanceTo(loadingPreviewCameraTarget)
-  const distance = priorDistance > 1e-6 ? priorDistance : handBoundsRadiusLocal * 3.6 // matches applyLoadingPreviewCameraAutoFrame()'s own corrected distance
+  const distance = Math.max(cfg.loadingPreviewCameraZoom || 0, 1)
   const phi = THREE.MathUtils.degToRad((cfg.loadingPreviewRotationX || 0) + 90) // elevation-from-horizon -> THREE.Spherical's own polar-from-+Y
   const theta = THREE.MathUtils.degToRad(cfg.loadingPreviewRotationY || 0)
   const offset = new THREE.Vector3().setFromSpherical(new THREE.Spherical(distance, phi, theta))
@@ -3653,6 +3692,8 @@ function deriveLoadingPreviewOrbitSliders() {
   syncValue('loadingPreviewRotationY', THREE.MathUtils.radToDeg(_loadingPreviewSpherical.theta))
   syncValue('loadingPreviewOffsetX', loadingPreviewCameraTarget.x - origin.x)
   syncValue('loadingPreviewOffsetY', loadingPreviewCameraTarget.y - origin.y)
+  syncValue('loadingPreviewCameraZoom', _loadingPreviewSpherical.radius)
+  syncValue('loadingPreviewCameraFov', loadingPreviewCamera.fov)
 }
 // Continuous per-frame sync while Edit Mode is actually on -- mirrors the
 // main scene's own syncCameraPanelFromLive() (called every animate()
@@ -5399,12 +5440,41 @@ function beginTweenReleaseStop(chp, trig, p, values, live, minLiveDist, liveDist
   chp.phase = 'retransition'
   chp.releasePending = false
 }
+// Multi-sequence-plus-hold chain builder (direct spec item, the vaguest
+// one-line entry in the original A-L spec -- no detail on exact chaining
+// semantics, so this is a disclosed default design choice, not a
+// reproduction of any specific wording). Scoped to hold-based triggers
+// only (chp/rchp/dcHold/tripleClickHold/quadClickHold + custom Click+Hold
+// functions) -- "plus-hold" reads most naturally as "the chain plays for
+// as long as the gesture is held," which only a hold-based trigger family
+// can express at all; a fire-and-forget trigger has no "held" duration to
+// extend across multiple sequences. 'Chain' is a 3rd `${p}Mode` value
+// (Single Pose / Sequence / Chain) offered ONLY by makeClickHoldPoseGroup()'s
+// own Mode select -- CLICK_POSE_KEYS/rc's Mode select never offers it, so
+// `cfg[p+'Mode']` can never actually BE 'Chain' for a fire-and-forget
+// trigger; this helper's bare value check is safe without also checking
+// CLICK_HOLD_KEYS.includes(p). Chain behaves EXACTLY like Sequence mode
+// for every visibility/gating purpose in this file (hence this one shared
+// helper, used everywhere the old `=== 'Sequence'` check used to be) --
+// the ONLY difference is how `trig.loopPoses`/`chp.tweenPosesResolved`
+// get resolved at hold-start (see startClickHoldPose()'s own Chain
+// branch): Sequence resolves ONE saved tween sequence's named poses;
+// Chain resolves and CONCATENATES every sequence listed in the new
+// `${p}TweenChain` multi-select, in order, into one longer effective
+// sequence -- Loop Mode/On Release Mode/everything downstream then just
+// treats that concatenated list as "the sequence," with zero further
+// code changes needed anywhere else in the forward/looping/retransition
+// machinery.
+function isSequenceOrChainMode(p) {
+  const m = cfg[`${p}Mode`]
+  return m === 'Sequence' || m === 'Chain'
+}
 function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) {
   const trig = clickHoldPoseTriggers[p]
   const chp = getOrInitHandCHP(hand)[p]
   if (trig.active && chp.armedForHoldStartTime !== trig.holdStartTime && now - trig.holdStartTime >= (cfg[`${p}HoldConfirmMs`] ?? 0)) {
     chp.armedForHoldStartTime = trig.holdStartTime // dedupe -- arm exactly once per hold-start, not every frame spent waiting
-    const isTweenStart = cfg[`${p}Mode`] === 'Sequence'
+    const isTweenStart = isSequenceOrChainMode(p)
     // Start Time Curve on/off (Single Pose only, direct spec item) --
     // Off means no distance-based stagger at all, every hand starts
     // immediately. Sequence/Tween mode's own start stagger is unaffected
@@ -5461,7 +5531,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     // No `forwardDelay` subtraction needed anymore -- that delay is now
     // fully spent BEFORE commit (see the pending-claim block above), so
     // visible movement starts immediately at `chp.forwardStartTime`.
-    const isTween = cfg[`${p}Mode`] === 'Sequence'
+    const isTween = isSequenceOrChainMode(p)
     const elapsed = now - chp.forwardStartTime
     // Animation Speed Curve (Single Pose only) overrides the flat
     // TransitionSpeedMs slider when enabled -- `chp.frozenSpeedMs` was
@@ -5666,9 +5736,24 @@ function startClickHoldPose(p) {
   // then (see updateClickHoldPoseForHand()'s own pending-claim comment
   // for the full account, including dcHold's own preserved "always
   // starts from default when genuinely idle" exception).
-  if (cfg[`${p}Mode`] === 'Sequence') {
-    const seq = (cfg.savedTweenSequences || []).find((s) => s.name === cfg[`${p}TweenSelector`])
-    const namedPoses = seq ? resolveTweenSequencePoses(seq.tweenPoses) : []
+  if (isSequenceOrChainMode(p)) {
+    // Chain mode (multi-sequence-plus-hold chain builder, direct spec
+    // item) -- concatenates EVERY sequence listed in `${p}TweenChain`, in
+    // order, into one longer effective sequence; Sequence mode keeps the
+    // original single-sequence lookup. Either way the result is just a
+    // flat named-pose list, so every consumer downstream (forward/
+    // looping/retransition, Loop Mode, On Release Mode) needs zero
+    // further changes -- they already only ever look at `trig.loopPoses`/
+    // `chp.tweenPosesResolved`, never at how many sequences it came from.
+    const namedPoses = cfg[`${p}Mode`] === 'Chain'
+      ? (cfg[`${p}TweenChain`] || []).flatMap((seqName) => {
+          const seq = (cfg.savedTweenSequences || []).find((s) => s.name === seqName)
+          return seq ? resolveTweenSequencePoses(seq.tweenPoses) : []
+        })
+      : (() => {
+          const seq = (cfg.savedTweenSequences || []).find((s) => s.name === cfg[`${p}TweenSelector`])
+          return seq ? resolveTweenSequencePoses(seq.tweenPoses) : []
+        })()
     // Loop/Oscillate's own cyclic sequence -- named poses ONLY, excluding
     // the anchor (briefly changed to include it, reverted same day -- "no
     // you're not meant to include the default pose... i guess we had it
@@ -5745,7 +5830,7 @@ function endClickHoldPose(p) {
     // request) -- captured once, right now, rather than read live inside
     // the retransition phase itself, so a Mode change mid-retransition
     // can't yank an in-flight retransition between the 2 settings pairs.
-    chp.retransitionIsTween = cfg[`${p}Mode`] === 'Sequence'
+    chp.retransitionIsTween = isSequenceOrChainMode(p)
     // Retransition on/off (Single Pose only, direct spec item -- "NEW
     // behavioral gate"). Off = leave `chp.phase` at whatever it already
     // is ('forward'/'looping', i.e. genuinely mid-transition) WITHOUT
@@ -6056,7 +6141,7 @@ function getOrInitHandCP(hand) {
 // for this hand (forward/paused/retransition) keeps running untouched.
 function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) {
   const cp = getOrInitHandCP(hand)[p]
-  const isTween = cfg[`${p}Mode`] === 'Sequence'
+  const isTween = isSequenceOrChainMode(p)
   if (cp.pendingClaimAt && now >= cp.pendingClaimAt) {
     // COMMIT -- FROM value is this hand's own live current pose
     // (`hand._lastPoseValues`) whenever `hand._wasOverriddenLastFrame`
@@ -6231,7 +6316,7 @@ function triggerClickPose(p) {
   // comment for the full account).
   const forwardSnapshot = {}
   POSE_PRESET_KEYS.forEach((key) => { forwardSnapshot[key] = cfg[key] })
-  const isTween = cfg[`${p}Mode`] === 'Sequence'
+  const isTween = isSequenceOrChainMode(p)
   let namedPoses = null
   if (isTween) {
     const seq = (cfg.savedTweenSequences || []).find((s) => s.name === cfg[`${p}TweenSelector`])
@@ -7331,7 +7416,11 @@ function updateClickTriggerModeVisibility(p, extraSinglePoseKeys, extraTweenKeys
   // rchp/dcHold) -- harmless no-op here for CLICK_POSE_KEYS callers
   // (click/dblclick/rc), whose own rows with these suffixes simply don't
   // exist, so the `document.querySelector` below just finds nothing.
-  const tweenKeys = ['TweenSelector', 'TweenSpeedMs', 'TweenStartTimeCurve', 'TweenStartTimeRange', 'TweenRetransitionSpeedMs', 'TweenRetransitionStartTimeCurve', 'TweenRetransitionStartTimeRange', ...extraTweenKeys]
+  // 'TweenSelector' deliberately NOT in this list -- it's Sequence-mode-
+  // only now that Chain mode exists (its own TweenChain multi-select
+  // replaces it for that mode); see updateChainModeVisibility() below,
+  // which owns both.
+  const tweenKeys = ['TweenSpeedMs', 'TweenStartTimeCurve', 'TweenStartTimeRange', 'TweenRetransitionSpeedMs', 'TweenRetransitionStartTimeCurve', 'TweenRetransitionStartTimeRange', ...extraTweenKeys]
   // Inline style, not the `hidden` attribute -- devPanel.js's own
   // `.dp-row { display: flex }` stylesheet rule (style.css) is an author
   // rule, which wins the cascade over the UA stylesheet's `[hidden] {
@@ -7341,10 +7430,27 @@ function updateClickTriggerModeVisibility(p, extraSinglePoseKeys, extraTweenKeys
     const row = document.querySelector(`.dp-row[data-key="${p}${suffix}"]`)
     if (row) row.style.display = mode !== 'Single Pose' ? 'none' : ''
   })
+  // Every other Tween-shared control (speed, curves, loop, retransition)
+  // applies to BOTH Sequence and Chain mode alike -- Chain just resolves a
+  // longer effective sequence for the exact same playback machinery.
   tweenKeys.forEach((suffix) => {
     const row = document.querySelector(`.dp-row[data-key="${p}${suffix}"]`)
-    if (row) row.style.display = mode !== 'Sequence' ? 'none' : ''
+    if (row) row.style.display = !isSequenceOrChainMode(p) ? 'none' : ''
   })
+  updateChainModeVisibility(p)
+}
+// Owns TweenSelector (Sequence mode only) vs TweenChain (Chain mode only)
+// -- the one pair of controls that DON'T share visibility between the 2
+// modes, since each mode reads a different one of them. A no-op for
+// CLICK_POSE_KEYS/rc callers (no `${p}TweenChain` row exists there at
+// all, since makeClickPoseGroup() never offers Chain as a Mode option --
+// the `document.querySelector` below just finds nothing).
+function updateChainModeVisibility(p) {
+  const mode = cfg[`${p}Mode`]
+  const selectorRow = document.querySelector(`.dp-row[data-key="${p}TweenSelector"]`)
+  if (selectorRow) selectorRow.style.display = mode === 'Sequence' ? '' : 'none'
+  const chainRow = document.querySelector(`.dp-row[data-key="${p}TweenChain"]`)
+  if (chainRow) chainRow.style.display = mode === 'Chain' ? '' : 'none'
 }
 // Loop Hold Duration's own NESTED visibility (chp/rchp only) -- deliberately
 // separate from updateClickTriggerModeVisibility() above: it needs a 2nd
@@ -7356,7 +7462,7 @@ function updateClickTriggerModeVisibility(p, extraSinglePoseKeys, extraTweenKeys
 // Tween mode) -- see both controls' own onChange in makeClickHoldPoseGroup().
 function updateLoopHoldVisibility(p) {
   const row = document.querySelector(`.dp-row[data-key="${p}LoopHoldMs"]`)
-  if (row) row.style.display = (cfg[`${p}Mode`] === 'Sequence' && cfg[`${p}LoopMode`] !== 'Off') ? '' : 'none'
+  if (row) row.style.display = (isSequenceOrChainMode(p) && cfg[`${p}LoopMode`] !== 'Off') ? '' : 'none'
 }
 // Owns StartTimeCurveEnabled/SpeedCurveEnabled/RetransitionEnabled's own
 // rows (mode-gated only, always visible in Single Pose regardless of
@@ -7419,7 +7525,7 @@ function updateSingleTimingGateVisibility(p) {
 // it stays correct even if called on its own outside the Mode-change
 // handler.
 function updateTweenStopGateVisibility(p) {
-  const isSequence = cfg[`${p}Mode`] === 'Sequence'
+  const isSequence = isSequenceOrChainMode(p)
   const setRow = (suffix, visible) => {
     const row = document.querySelector(`.dp-row[data-key="${p}${suffix}"]`)
     if (row) row.style.display = visible ? '' : 'none'
@@ -7442,7 +7548,7 @@ function updateTweenStopGateVisibility(p) {
 // Sequence Count Mode only under 'Count'; Loop Transition only under a
 // Loop-style repeat (top-level 'Loop', or 'Count' + Count Mode 'Loop').
 function updateSequencePlayModeVisibility(p) {
-  const showBase = cfg[`${p}Mode`] === 'Sequence'
+  const showBase = isSequenceOrChainMode(p)
   const setRow = (suffix, visible) => {
     const row = document.querySelector(`.dp-row[data-key="${p}${suffix}"]`)
     if (row) row.style.display = visible ? '' : 'none'
@@ -7644,6 +7750,11 @@ safeRefreshSelectOptions('dcHoldMode')
 safeRefreshSelectOptions('dcHoldTargetPose')
 safeRefreshSelectOptions('dcHoldTweenSelector')
 safeRefreshSelectOptions('dcHoldLoopMode')
+// Chain mode's own TweenChain multi-select (all 5 CLICK_HOLD_KEYS, added
+// 2026-09-19) -- same TDZ-populated-empty symptom as every select above,
+// generalized over the array instead of one hardcoded call per key since
+// this control didn't exist yet when those were each added by hand.
+CLICK_HOLD_KEYS.forEach((p) => safeRefreshMultiSelectOptions(`${p}TweenChain`))
 // Sets this ONE hand's `clone.quaternion`/`clone.position` for its
 // CURRENT arm-length value `hideT` -- called every frame, per hand, from
 // updateRenderOrder()'s own existing per-hand loop (which already
@@ -8219,6 +8330,7 @@ async function importPosesAndTweenSequences(btn) {
     syncValue('savedTweenSequences', items)
     tweensCount = count
     safeRefreshSelectOptions('dcHoldTweenSelector'); safeRefreshSelectOptions('rcTweenSelector'); safeRefreshSelectOptions('chpTweenSelector'); safeRefreshSelectOptions('rchpTweenSelector'); safeRefreshSelectOptions('clickTweenSelector'); safeRefreshSelectOptions('dblclickTweenSelector')
+    CLICK_HOLD_KEYS.forEach((p) => safeRefreshMultiSelectOptions(`${p}TweenChain`))
   }
   if (posesCount === 0 && tweensCount === 0) { flashImportButton(btn, 'Nothing to import'); return }
   flashImportButton(btn, `Imported ${posesCount} pose(s), ${tweensCount} tween(s)!`)
