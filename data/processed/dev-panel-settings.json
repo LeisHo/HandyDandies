@@ -80,9 +80,29 @@
           "targetX": 1.2343194780671631,
           "targetY": -2.336339362970378,
           "targetZ": -33.60014621531519
+        },
+        {
+          "name": "Loading Preview Camera 7",
+          "cameraX": 1.2343194780671554,
+          "cameraY": 4.380298393657271,
+          "cameraZ": -85.46682562240704,
+          "cameraFov": 32,
+          "targetX": 1.2343194780671631,
+          "targetY": -2.336339362970378,
+          "targetZ": -21.561671337969035
+        },
+        {
+          "name": "dfdsf",
+          "cameraX": 1.2343194780671554,
+          "cameraY": -4.57894595237465,
+          "cameraZ": -85.77968035846688,
+          "cameraFov": 32,
+          "targetX": 1.2343194780671631,
+          "targetY": -2.336339362970378,
+          "targetZ": -21.561671337969035
         }
       ],
-      "loadingPreviewCameraSelector": "Front",
+      "loadingPreviewCameraSelector": "dfdsf",
       "loadingPreviewSavedLighting": [
         {
           "name": "3 Tone - SideFront",
@@ -125,8 +145,8 @@
       "loadingPreviewSequenceCountMode": "Loop",
       "loadingPreviewSequenceLoopTransition": true,
       "loadingPreviewSequenceHoldMs": 1920,
-      "loadingPreviewSize": 230,
-      "loadingPreviewRotationX": -1.99994270167373,
+      "loadingPreviewSize": 1000,
+      "loadingPreviewRotationX": 2.0000572983262686,
       "loadingPreviewRotationY": -180,
       "loadingPreviewRotationZ": -180,
       "loadingPreviewOffsetX": 0.27796090493479864,
@@ -6272,9 +6292,29 @@
           "targetX": 1.2343194780671631,
           "targetY": -2.336339362970378,
           "targetZ": -33.60014621531519
+        },
+        {
+          "name": "Loading Preview Camera 7",
+          "cameraX": 1.2343194780671554,
+          "cameraY": 4.380298393657271,
+          "cameraZ": -85.46682562240704,
+          "cameraFov": 32,
+          "targetX": 1.2343194780671631,
+          "targetY": -2.336339362970378,
+          "targetZ": -21.561671337969035
+        },
+        {
+          "name": "dfdsf",
+          "cameraX": 1.2343194780671554,
+          "cameraY": -4.57894595237465,
+          "cameraZ": -85.77968035846688,
+          "cameraFov": 32,
+          "targetX": 1.2343194780671631,
+          "targetY": -2.336339362970378,
+          "targetZ": -21.561671337969035
         }
       ],
-      "loadingPreviewCameraSelector": "Front",
+      "loadingPreviewCameraSelector": "dfdsf",
       "loadingPreviewSavedLighting": [
         {
           "name": "3 Tone - SideFront",
@@ -6317,8 +6357,8 @@
       "loadingPreviewSequenceCountMode": "Loop",
       "loadingPreviewSequenceLoopTransition": true,
       "loadingPreviewSequenceHoldMs": 1920,
-      "loadingPreviewSize": 230,
-      "loadingPreviewRotationX": -1.99994270167373,
+      "loadingPreviewSize": 1000,
+      "loadingPreviewRotationX": 2.0000572983262686,
       "loadingPreviewRotationY": -180,
       "loadingPreviewRotationZ": -180,
       "loadingPreviewOffsetX": 0.27796090493479864,
@@ -12464,9 +12504,29 @@
           "targetX": 1.2343194780671631,
           "targetY": -2.336339362970378,
           "targetZ": -33.60014621531519
+        },
+        {
+          "name": "Loading Preview Camera 7",
+          "cameraX": 1.2343194780671554,
+          "cameraY": 4.380298393657271,
+          "cameraZ": -85.46682562240704,
+          "cameraFov": 32,
+          "targetX": 1.2343194780671631,
+          "targetY": -2.336339362970378,
+          "targetZ": -21.561671337969035
+        },
+        {
+          "name": "dfdsf",
+          "cameraX": 1.2343194780671554,
+          "cameraY": -4.57894595237465,
+          "cameraZ": -85.77968035846688,
+          "cameraFov": 32,
+          "targetX": 1.2343194780671631,
+          "targetY": -2.336339362970378,
+          "targetZ": -21.561671337969035
         }
       ],
-      "loadingPreviewCameraSelector": "Front",
+      "loadingPreviewCameraSelector": "dfdsf",
       "loadingPreviewSavedLighting": [
         {
           "name": "3 Tone - SideFront",
@@ -12509,8 +12569,8 @@
       "loadingPreviewSequenceCountMode": "Loop",
       "loadingPreviewSequenceLoopTransition": true,
       "loadingPreviewSequenceHoldMs": 1920,
-      "loadingPreviewSize": 230,
-      "loadingPreviewRotationX": -1.99994270167373,
+      "loadingPreviewSize": 1000,
+      "loadingPreviewRotationX": 2.0000572983262686,
       "loadingPreviewRotationY": -180,
       "loadingPreviewRotationZ": -180,
       "loadingPreviewOffsetX": 0.27796090493479864,
