@@ -1,8 +1,8 @@
 {
   "values": {
     "desktop": {
-      "fieldRows": 8,
-      "fieldCols": 8,
+      "fieldRows": 12,
+      "fieldCols": 12,
       "rowSpacing": 14,
       "columnSpacing": 15,
       "handScale": 1.2,
@@ -21761,7 +21761,7 @@
     },
     {
       "key": "Tween",
-      "collapsed": false,
+      "collapsed": true,
       "locked": false,
       "items": [
         {
@@ -21786,7 +21786,7 @@
     },
     {
       "key": "Field Layout",
-      "collapsed": true,
+      "collapsed": false,
       "locked": false,
       "items": [
         {
