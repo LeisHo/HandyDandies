@@ -9,7 +9,7 @@
       "alternateRowOffset": 5,
       "progressiveRowOffset": 1,
       "useProgressiveOffset": false,
-      "hideHands": true,
+      "hideHands": false,
       "trackingEnabled": true,
       "trackingDamping": 0.6,
       "targetDepthFactor": 0.8,
@@ -21471,7 +21471,7 @@
     },
     {
       "key": "Loading Preview",
-      "collapsed": false,
+      "collapsed": true,
       "locked": false,
       "items": [
         {
