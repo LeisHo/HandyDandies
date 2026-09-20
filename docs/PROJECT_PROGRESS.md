@@ -40,6 +40,52 @@ value all confirmed a genuine orbit-driven azimuth change; one
 dismissed). See CHANGELOG.txt's matching 2026-09-19 entry for the full
 account.
 
+**Same feature area, SHIPPED 2026-09-19 (follow-up round): Loading
+Preview Camera FOV/Zoom sliders, a real Save-corrupts-camera bug fixed,
+and the Use buttons restored on both Loading Preview saved-camera/
+lighting pickers (reversing the "removed the now-redundant Use button"
+note further down this doc).** New `loadingPreviewCameraFov` (15-90 deg)
+and `loadingPreviewCameraZoom` (distance-to-target) sliders give direct
+manual control over cropping/framing instead of relying solely on the
+auto-frame formula. Root-caused and fixed a genuine bug: clicking Save
+right after orbiting could silently snap the camera's rotation back to a
+stale value, because devPanel.js's own numeric text input only commits
+on native `change` (blur), and `syncValue()`'s focus-guard means a
+still-focused slider's input stops tracking live camera state — Save
+shifting focus away fired that stale input's commit at the worst
+possible moment. Fixed by blurring `document.activeElement` the instant
+`OrbitControls` fires its own `'start'` event, so a stale focus can't
+survive into a later Save. Restored the "Use" button on
+`loadingPreviewSavedCameras`/`loadingPreviewSavedLighting` per direct
+request (a reversal of an earlier, also-direct removal).
+
+All 3 fixes live-verified this round: FOV/Zoom sliders confirmed driving
+`loadingPreviewCamera.fov`/distance-to-target directly; the stale-focus
+fix confirmed via a real repro (focused Rotation X's own text input,
+typed an uncommitted stale value, then drove a real mouse-drag orbit on
+the canvas with Camera Edit Mode + the live-preview toggle on) —
+confirmed the stale input auto-blurred the instant the drag started and
+the panel's own Save button left the post-drag rotation value unchanged;
+both saved-camera/lighting list-pickers' action rows confirmed showing
+Use again. Also investigated 2 further reports this round: (1) "Save
+doesn't save collapsed/expanded group state" — confirmed, by
+intercepting the Copy-Settings clipboard payload (same `getPanelOrder()`/
+`captureGroup()` code path Save uses), that a manually-collapsed group
+DOES come back with `collapsed:true` in the captured data; the restore
+side (`applyOrder()`) was read directly in source and matches this
+shape — genuine end-to-end (reload-after-Save) verification wasn't
+possible in this sandbox since this project's Save write-through needs
+`GITHUB_TOKEN`/`DEV_PANEL_SAVE_SECRET` on a real deployed server (no
+localStorage fallback by this project's own design — confirmed no
+matching keys exist after Save), so if broken in production the bug is
+most likely in that server round trip, not the capture logic itself; (2)
+"Show Hand Loading Animation, don't see it on startup" — confirmed NOT a
+code bug via a temporary, disclosed, reverted diagnostic (widening
+`loadingMinTimeMs`'s default to see the preview mid-load) — the
+mechanism works; the original report was very likely just this
+sandbox's own narrow local timing window, not a real defect. See
+CHANGELOG.txt's matching 2026-09-19 entry for the full account.
+
 **SHIPPED 2026-09-19: the remaining 5 items of the Custom Click Functions
 A-L gap report ("do 1,2,3,4 and 8") -- Scroll/Multi-Point Types, a click-
 count selector, duplicate-setting validation, automatic hold-timing
@@ -87,7 +133,9 @@ already-built preview, plausibly explaining most of the "wrong angle"/
 pickers now refresh their paired dropdown's own options after Save/
 Import/Delete/Rename (same fix `savedPoses` already has); removed the
 now-redundant "Use" button from both (new `ctrl.hideUseButton` devPanel.js
-flag). Also found a real, concrete DATA issue on HANDO's own side (not
+flag) — **reversed by later direct request; see the top "Currently
+working on" entry above — both list-pickers show Use again.** Also
+found a real, concrete DATA issue on HANDO's own side (not
 fixable here): HANDO's "Left" and "Right" saved cameras have IDENTICAL
 coordinates in its own settings file. The reported "loading preview
 doesn't start from default pose" was investigated but not independently

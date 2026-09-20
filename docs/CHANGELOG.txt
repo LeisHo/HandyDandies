@@ -8045,6 +8045,146 @@ Cache-buster: `index.html`'s own `main.js?v=161` (start of this slice)
 -> `?v=163`.
 
 --------------------------------------------------------------------------------
+2026-09-19  ~20:23:48-20:58:42 EDT (bounded by commit timestamps
+c4cf232 -> 817865f -> a live-verification pass just now; this segment's
+own start timestamp wasn't captured -- a context-compaction happened
+mid-task, so only commit-timestamp evidence and this pass's own real
+`date` calls are available, not a true measured start-to-finish)
+
+**Loading Preview Camera FOV + Zoom sliders, a real Save-corrupts-
+camera bug found and fixed, and the Use buttons restored on both
+Loading Preview saved-camera/lighting pickers.** Direct follow-up
+requests against the Camera Edit Mode work from the immediately
+preceding entry (c4cf232).
+
+New `loadingPreviewCameraFov` (slider, 15-90 deg, def 35) and
+`loadingPreviewCameraZoom` (slider, distance-to-target, def 55)
+controls, wired into `applyLoadingPreviewOrbitFromSliders()`/
+`deriveLoadingPreviewOrbitSliders()` alongside the existing Rotation/
+Offset sliders -- gives direct manual control over Loading Preview
+framing/cropping (the user's own stated way of handling the cropping
+report from earlier this round, after retracting a request to "fix" it
+via the auto-frame formula).
+
+**Root-caused and fixed: "I click Save to save the camera setting, but
+the camera rotations suddenly change."** devPanel.js's numeric text
+input only commits its value on the native `change` event (fires on
+blur), while its paired slider commits live on `input`; separately,
+`syncValue()` explicitly skips updating a row whose own slider/numInput
+currently has focus (by design, so a live edit isn't fought). Combined:
+orbiting the camera, then clicking into one of the 5 orbit-sliders' own
+numeric box without confirming it, left that box's stale text sitting
+there while `deriveLoadingPreviewOrbitSliders()` kept silently failing
+to sync it on every subsequent frame; clicking Save (or any other
+button) shifted focus away, firing that stale box's own `change`
+handler right before Save's `captureCurrent()` read the panel, snapping
+the camera back to the old value at the worst possible moment. Fixed
+with a new `OrbitControls` `'start'` event listener in
+`setupLoadingPreviewOrbitControls()` that blurs `document.activeElement`
+(if it's an `INPUT`) the instant a new orbit-drag begins -- no stale
+focus can survive into a later Save.
+
+**Restored the "Use" button on `loadingPreviewSavedCameras` and
+`loadingPreviewSavedLighting`**, per direct request -- a reversal of an
+earlier, also-direct removal (`ctrl.hideUseButton`, logged in this
+file's own preceding "fixed 4 real bugs" entry). Both list-pickers'
+`onUse` handlers restored (`applyLoadingPreviewCameraPreset`/
+`applyLoadingPreviewLighting`), `hideUseButton` removed from both.
+
+Verified live this round (after the sandbox's own long-documented
+network-truncation issue -- see CLAUDE.md's own gotcha entries --
+repeatedly blocked the browser from loading `devPanel.js`/`main.js` on
+2 separate ports before finally succeeding):
+- FOV slider: typing 50 into its own numeric box updated
+  `window.__debug.loadingPreviewCamera.fov` to 50 live.
+- Zoom slider: typing 100 updated the real camera-to-target distance
+  (`camera.position.distanceTo(target)`) to exactly 100.
+- Camera Edit Mode checkbox: toggling it flipped
+  `loadingPreviewOrbitControls.enabled` to `true` live.
+- Stale-focus fix: focused the Rotation X numeric box, typed an
+  uncommitted "999" (confirmed `cfg.loadingPreviewRotationX` stayed at
+  its real -2.386, proving the stale value hadn't committed yet), then
+  drove a REAL mouse `left_click_drag` across the loading-preview canvas
+  (Camera Edit Mode + a new "Show Loading Preview (Live)" toggle both
+  on) -- confirmed `document.activeElement` was auto-blurred to `BODY`
+  the instant the drag started, and `cfg.loadingPreviewRotationX` read
+  the real orbit-derived value (-81), never "999"; clicking the panel's
+  own global Save button immediately afterward left the value bit-for-
+  bit unchanged (before/after both -80.99999999999997) -- Save no
+  longer corrupts the camera.
+- Both saved-camera/lighting list-pickers' own action rows confirmed
+  showing `Save / Overwrite / Use / Rename / Delete / + Group / Import`
+  again (Use present).
+
+**2 further reports investigated this round, not new code changes:**
+
+1. "The Save button doesn't seem to save the settings groups collapse
+   and expanded states." Confirmed the CAPTURE side works: manually
+   collapsed a group ("Custom Click Functions"), then intercepted
+   `navigator.clipboard.writeText` and clicked Copy Settings (which
+   uses the exact same `getPanelOrder()`/`captureGroup()` code path
+   `saveSettings()` does) -- the captured payload's own `order` array
+   correctly showed `{key: "Custom Click Functions", collapsed: true}`.
+   The restore side (`applyOrder()`) was already read directly in
+   source in this same round and matches this shape
+   (`groupEl.classList.toggle('collapsed', !!savedGroup.collapsed)`).
+   A genuine end-to-end round trip (Save -> reload -> confirm restored)
+   was NOT live-tested: this project's own Save write-through requires
+   `GITHUB_TOKEN`/`DEV_PANEL_SAVE_SECRET` configured on a real deployed
+   server (see CLAUDE.md's own Dev-panel-behavior note), unavailable in
+   this local sandbox, and there is deliberately no `localStorage`
+   fallback by this project's own single-tier design -- confirmed live
+   (`Object.keys(localStorage)` held no dev-panel keys after clicking
+   Save). If collapse-state persistence is still genuinely broken in
+   production, the likely fault is in that server round trip, not the
+   capture/restore logic itself, which checks out on both ends.
+
+2. "Even with Show Hand Loading Animation selected, I don't see it on
+   startup." Confirmed NOT a code bug. Local testing was blocked by a
+   too-narrow window: this sandbox's local GLB load is fast and
+   `loadingMinTimeMs` defaults to 1200ms, so the "model ready but field
+   not yet started" window is close to zero here (vs. production's real
+   5000ms default). Temporarily widened `loadingMinTimeMs`'s own
+   DEV_GROUPS default to 15000ms, reloaded, and directly confirmed via
+   `window.__debug` (`canvasDisplay: "block"`) plus a screenshot that
+   the preview hand renders correctly during the loading screen when
+   the window is wide enough to observe it. Reverted the default back
+   to `1200` afterward (`node --check` passed; this round's own fresh
+   reload confirmed `window.__debug.cfg.loadingMinTimeMs === 1200`) --
+   the diagnostic change never shipped. Conclusion: the mechanism
+   works; the original report was very likely a timing/visibility-
+   window artifact of fast local loads, not a real defect.
+
+**Not resolved, not acted on further:** the "Front" saved camera's own
+mislabeled ~85 deg elevation and its independently-cropped saved
+distance/FOV combination (both investigated earlier this round via
+direct trig on the real settings data) were never cleaned up in
+`data/processed/dev-panel-settings.json` -- most likely explained by the
+now-fixed stale-focus Save bug, but the user retracted the request to
+chase this further ("actually ignore the cropping thing, i can just
+increase the Preview Size and change the camera zoom") once the new FOV/
+Zoom sliders gave direct manual control instead. The user can now
+re-capture these cameras correctly using Camera Edit Mode + the fixed
+Save mechanism.
+
+**No dedicated commit for this entry's own code changes** -- both this
+segment and a concurrent session were editing `src/main.js` at the same
+time; the concurrent session's own commit (817865f, "Custom Click
+Functions: multi-sequence-plus-hold chain builder") captured the full
+on-disk file state at commit time, which included this round's FOV/Zoom
+sliders and stale-focus fix already written to disk (confirmed via
+`git log -S loadingPreviewCameraFov` naming 817865f as the introducing
+commit) -- the exact "a concurrent `git add` sweeps in another session's
+uncommitted work" risk this project's own CLAUDE.md §9 already
+documents, here harmless since the swept-in code was already correct
+and complete. `git rev-parse HEAD` already matched `origin/main` by the
+time this entry was written -- nothing left to push.
+
+Cache-buster: `index.html`'s `main.js?v=163` (start of this slice, per
+the concurrent session's own bump) -> `?v=164` (this segment's own
+`loadingMinTimeMs`-revert confirmation bump).
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================
