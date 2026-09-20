@@ -20371,7 +20371,7 @@
     },
     {
       "key": "Tween",
-      "collapsed": false,
+      "collapsed": true,
       "locked": false,
       "settings": [
         "tweenPreviewSpeedMs",
@@ -20382,7 +20382,7 @@
     },
     {
       "key": "Field Layout",
-      "collapsed": false,
+      "collapsed": true,
       "locked": false,
       "settings": [
         "hideHands",
