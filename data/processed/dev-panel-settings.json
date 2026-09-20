@@ -7131,11 +7131,11 @@
       "custom3SpeedCurveEnabled": false,
       "custom3SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom3SpeedCurveRange": "{\"min\":50,\"max\":2000}",
-      "custom3StartTimeCurveEnabled": true,
+      "custom3StartTimeCurveEnabled": false,
       "custom3StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom3StartTimeRange": "{\"min\":0,\"max\":300}",
       "custom3PauseDurationMs": 500,
-      "custom3RetransitionEnabled": true,
+      "custom3RetransitionEnabled": false,
       "custom3RetransitionSpeedMs": 400,
       "custom3RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom3RetransitionStartTimeRange": "{\"min\":0,\"max\":300}"
@@ -14271,11 +14271,11 @@
       "custom3SpeedCurveEnabled": false,
       "custom3SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom3SpeedCurveRange": "{\"min\":50,\"max\":2000}",
-      "custom3StartTimeCurveEnabled": true,
+      "custom3StartTimeCurveEnabled": false,
       "custom3StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom3StartTimeRange": "{\"min\":0,\"max\":300}",
       "custom3PauseDurationMs": 500,
-      "custom3RetransitionEnabled": true,
+      "custom3RetransitionEnabled": false,
       "custom3RetransitionSpeedMs": 400,
       "custom3RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom3RetransitionStartTimeRange": "{\"min\":0,\"max\":300}"
@@ -21411,11 +21411,11 @@
       "custom3SpeedCurveEnabled": false,
       "custom3SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom3SpeedCurveRange": "{\"min\":50,\"max\":2000}",
-      "custom3StartTimeCurveEnabled": true,
+      "custom3StartTimeCurveEnabled": false,
       "custom3StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom3StartTimeRange": "{\"min\":0,\"max\":300}",
       "custom3PauseDurationMs": 500,
-      "custom3RetransitionEnabled": true,
+      "custom3RetransitionEnabled": false,
       "custom3RetransitionSpeedMs": 400,
       "custom3RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom3RetransitionStartTimeRange": "{\"min\":0,\"max\":300}"
@@ -28897,6 +28897,18 @@
                 "key": "custom3Mode"
               },
               {
+                "type": "row",
+                "key": "custom3TargetPose"
+              },
+              {
+                "type": "row",
+                "key": "custom3TransitionSpeedMs"
+              },
+              {
+                "type": "row",
+                "key": "custom3PauseDurationMs"
+              },
+              {
                 "type": "group",
                 "group": {
                   "key": "Offset",
@@ -28949,10 +28961,6 @@
               },
               {
                 "type": "row",
-                "key": "custom3TargetPose"
-              },
-              {
-                "type": "row",
                 "key": "custom3TweenSelector"
               },
               {
@@ -28988,14 +28996,10 @@
                 "key": "custom3SequenceHoldMs"
               },
               {
-                "type": "row",
-                "key": "custom3TransitionSpeedMs"
-              },
-              {
                 "type": "group",
                 "group": {
                   "key": "Animation Speed Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -29018,7 +29022,7 @@
                 "type": "group",
                 "group": {
                   "key": "Start Time Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -29038,14 +29042,10 @@
                 }
               },
               {
-                "type": "row",
-                "key": "custom3PauseDurationMs"
-              },
-              {
                 "type": "group",
                 "group": {
                   "key": "Retransition",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -29077,6 +29077,8 @@
               "custom3ClickCount",
               "custom3Mode",
               "custom3TargetPose",
+              "custom3TransitionSpeedMs",
+              "custom3PauseDurationMs",
               "custom3TweenSelector",
               "custom3TweenSpeedMs",
               "custom3TweenStartTimeCurve",
@@ -29085,9 +29087,7 @@
               "custom3SequenceCount",
               "custom3SequenceCountMode",
               "custom3SequenceLoopTransition",
-              "custom3SequenceHoldMs",
-              "custom3TransitionSpeedMs",
-              "custom3PauseDurationMs"
+              "custom3SequenceHoldMs"
             ],
             "subgroups": [
               {
@@ -29137,7 +29137,7 @@
               },
               {
                 "key": "Animation Speed Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -29157,7 +29157,7 @@
               },
               {
                 "key": "Start Time Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -29177,7 +29177,7 @@
               },
               {
                 "key": "Retransition",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -29577,6 +29577,18 @@
               "key": "custom3Mode"
             },
             {
+              "type": "row",
+              "key": "custom3TargetPose"
+            },
+            {
+              "type": "row",
+              "key": "custom3TransitionSpeedMs"
+            },
+            {
+              "type": "row",
+              "key": "custom3PauseDurationMs"
+            },
+            {
               "type": "group",
               "group": {
                 "key": "Offset",
@@ -29629,10 +29641,6 @@
             },
             {
               "type": "row",
-              "key": "custom3TargetPose"
-            },
-            {
-              "type": "row",
               "key": "custom3TweenSelector"
             },
             {
@@ -29668,14 +29676,10 @@
               "key": "custom3SequenceHoldMs"
             },
             {
-              "type": "row",
-              "key": "custom3TransitionSpeedMs"
-            },
-            {
               "type": "group",
               "group": {
                 "key": "Animation Speed Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -29698,7 +29702,7 @@
               "type": "group",
               "group": {
                 "key": "Start Time Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -29718,14 +29722,10 @@
               }
             },
             {
-              "type": "row",
-              "key": "custom3PauseDurationMs"
-            },
-            {
               "type": "group",
               "group": {
                 "key": "Retransition",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -29757,6 +29757,8 @@
             "custom3ClickCount",
             "custom3Mode",
             "custom3TargetPose",
+            "custom3TransitionSpeedMs",
+            "custom3PauseDurationMs",
             "custom3TweenSelector",
             "custom3TweenSpeedMs",
             "custom3TweenStartTimeCurve",
@@ -29765,9 +29767,7 @@
             "custom3SequenceCount",
             "custom3SequenceCountMode",
             "custom3SequenceLoopTransition",
-            "custom3SequenceHoldMs",
-            "custom3TransitionSpeedMs",
-            "custom3PauseDurationMs"
+            "custom3SequenceHoldMs"
           ],
           "subgroups": [
             {
@@ -29817,7 +29817,7 @@
             },
             {
               "key": "Animation Speed Curve",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -29837,7 +29837,7 @@
             },
             {
               "key": "Start Time Curve",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -29857,7 +29857,7 @@
             },
             {
               "key": "Retransition",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
