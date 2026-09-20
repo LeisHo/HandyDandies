@@ -8841,6 +8841,93 @@ worth a live check next time this sandbox cooperates.
 Cache-buster: `index.html`'s `main.js?v=171` -> `?v=172`.
 
 --------------------------------------------------------------------------------
+2026-09-20  00:29:51-00:37:51 EDT (8m00s, measured)
+
+**Added Loading Preview Offset Z, closed a related "sliders don't
+reflect the camera" gap (Rotation Z/roll was write-only), and
+confirmed the previous round's camera.up fix already fully resolves
+HANDO matching -- including for "Front" specifically.**
+
+**Offset Z:** direct request ("provide Loading Preivew Offset Z...
+when i change the camera/sliders, they should reflect each other").
+The orbit target used to only ever be offset in X/Y
+(`origin + Vector3(offsetX, offsetY, 0)`) -- a leftover from before
+this preview had full 3-axis pan. New `loadingPreviewOffsetZ` slider,
+same 2-way-bound shape as every other orbit control here. Verified
+live: setting it to 10 moved the target's own Z by exactly (10 minus
+whatever it started at), confirming `target.z = origin.z + offsetZ`
+holds precisely.
+
+**Rotation Z (roll) was write-only -- fixed.** `applyLoadingPreviewCameraPreset()`/
+`applyLoadingPreviewCameraAutoFrame()` never called `applyLoadingPreviewRoll()`
+at all (they set `camera.up` straight to the zero-roll aligned vector),
+so after loading ANY preset the Rotation Z slider kept showing
+whatever stale value it had before -- not the camera's real (now
+zero) roll. This is exactly the "sliders don't reflect the camera"
+gap the user's own stated principle called out. `deriveLoadingPreviewOrbitSliders()`
+now recovers the TRUE current roll by projecting both `camera.up` and
+the zero-roll baseline (`alignQuat`-rotated world-up) onto the plane
+perpendicular to the view direction, then measuring the signed angle
+between those 2 projections -- the exact inverse of
+`applyLoadingPreviewRoll()`'s own forward math. Verified live: after
+applying a preset, `cfg.loadingPreviewRotationZ` now reads `0`
+(matching the real zero-roll state) instead of a stale leftover value.
+
+**Investigated "the camera angles still don't look exactly correct" /
+"camera Front in HANDO... should directly translate" -- confirmed
+ALREADY FIXED by last round's camera.up correction; no further code
+change needed.** Checked HANDO's own `captureCameraPreset()`/
+`useCameraPreset()` directly (`J:\CLAUDE\PROJECTS\HANDO\src\main.js`):
+HANDO stores/uses ONLY `{x,y,z,tx,ty,tz,fov}` -- no separate rotation/
+up-vector field exists in HANDO's own data at all, and `camera.up` is
+never touched anywhere in HANDO's own source (stays at three.js's
+plain default). So HANDO's own camera IS fully defined by
+position+target+fov, exactly what `convertHandoCameraPreset()` already
+converts -- there was never a missing "rotation" field to port.
+
+Directly recomputed HANDO's real "Front" preset
+(`J:\CLAUDE\PROJECTS\HANDO\data\processed\dev-panel-settings.json`)
+through the exact `alignQuat` rotation this project's own conversion
+uses (independently, via a manual quaternion-rotation Node script, not
+the app itself) -- the result matched HANDY DANDIES's OWN currently-
+saved "Front" entry BYTE FOR BYTE
+(`cameraX:4.298203911670702, cameraY:61.710440748677335,
+cameraZ:-37.79592223166187`, etc.). This means the position/target
+DATA for "Front" was never corrupted or wrong -- earlier-session
+suspicion that "Front" had bad data (from its own ~85 deg "world-
+relative elevation" looking odd) was a red herring caused entirely by
+the SAME missing-camera.up bug fixed last round; the underlying
+capture was correct all along.
+
+**Verified live** with the real "Front" data (position/target
+unchanged) and this session's own camera.up fix active: screenshot
+showed a properly upright, clearly recognizable fist -- not the
+twisted/unrecognizable shape the old bug produced. HANDO-matching for
+"Front" (and by the same logic, every other already-saved preset) is
+confirmed working with zero further data changes needed.
+
+**Note on this commit's own scope:** `src/main.js` had substantial,
+unrelated in-progress work from a concurrent session (Hold-entry
+support for tween sequences, plus its own `devPanel.js?v=35` cache-
+buster bump) sitting uncommitted in the same file when this round's
+own changes were ready to commit. Rather than a blanket `git add`
+(which would have swept the concurrent session's own unfinished work
+into this commit under this session's name), built a hand-isolated
+patch of just this round's own 3 diff hunks and staged it via
+`git apply --cached` -- confirmed via `git diff --cached` that only
+those 3 hunks were staged, committed that alone, and confirmed via
+`git status` afterward that the concurrent session's own changes
+remained exactly as they were, untouched and still uncommitted.
+`docs/PROJECT_PROGRESS.md` was ALSO mid-edit by that same concurrent
+session at commit time -- skipped updating it this round for the same
+reason (no comparably safe way to hand-isolate a prose edit the way a
+code diff can be patched); worth a follow-up pass once that session's
+own edits land.
+
+Cache-buster: `index.html`'s `main.js?v=172` -> `?v=174` (2 bumps this
+round, `?v=173` was the concurrent session's own intermediate bump).
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================
