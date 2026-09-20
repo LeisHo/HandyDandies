@@ -2,14 +2,14 @@
   "values": {
     "desktop": {
       "fieldRows": 12,
-      "fieldCols": 18,
+      "fieldCols": 8,
       "rowSpacing": 14,
       "columnSpacing": 15,
       "handScale": 1.2,
       "alternateRowOffset": 5,
       "progressiveRowOffset": 1,
       "useProgressiveOffset": false,
-      "hideHands": false,
+      "hideHands": true,
       "trackingEnabled": true,
       "trackingDamping": 0.6,
       "targetDepthFactor": 0.8,
@@ -17,7 +17,7 @@
       "palmFacesCursor": true,
       "palmFaceRotationOffset": 0,
       "loadingPreviewEnabled": true,
-      "loadingPreviewShowLive": false,
+      "loadingPreviewShowLive": true,
       "loadingMinTimeMs": 5000,
       "loadingPreviewTweenSelector": "Waiting Horizontal Tap",
       "loadingPreviewSavedCameras": [
@@ -100,9 +100,19 @@
           "targetX": 1.2343194780671631,
           "targetY": -2.336339362970378,
           "targetZ": -21.561671337969035
+        },
+        {
+          "name": "Front-Straightened",
+          "cameraX": 0.5309568688333194,
+          "cameraY": 60.84919589607597,
+          "cameraZ": -21.935010899369335,
+          "cameraFov": 32,
+          "targetX": 1.2343194780671631,
+          "targetY": -2.336339362970378,
+          "targetZ": -33.60014621531519
         }
       ],
-      "loadingPreviewCameraSelector": "Front",
+      "loadingPreviewCameraSelector": "Front-Straightened",
       "loadingPreviewSavedLighting": [
         {
           "name": "3 Tone - SideFront",
@@ -157,13 +167,13 @@
       "loadingPreviewSequenceLoopTransition": true,
       "loadingPreviewSequenceHoldMs": 0,
       "loadingPreviewSize": 1000,
-      "loadingPreviewRotationX": -85.36240971271977,
-      "loadingPreviewRotationY": 143.8619340559313,
-      "loadingPreviewRotationZ": -180,
+      "loadingPreviewRotationX": -79.52141477498436,
+      "loadingPreviewRotationY": -3.450536658585705,
+      "loadingPreviewRotationZ": 180,
       "loadingPreviewOffsetX": 0.27796090493479864,
       "loadingPreviewOffsetY": -2.310339603408437,
       "loadingPreviewCameraFov": 32,
-      "loadingPreviewCameraZoom": 64.25715498581913,
+      "loadingPreviewCameraZoom": 64.25715498581914,
       "loadingPreviewCameraEditMode": false,
       "customClickFunctionIds": "[]",
       "posePreviewEnabled": false,
@@ -5939,6 +5949,65 @@
           "elbowBend": 0,
           "elbowSideBend": 0,
           "forearmTwist": 0
+        },
+        {
+          "name": "COUNTDOWN (VERT) - LENS COVER",
+          "thumbCurl": 0,
+          "thumbSplay": -48,
+          "thumbSplay2": -8,
+          "curlBiasThumb": 0,
+          "baseOnlyCurlThumb": -61,
+          "midOnlyCurlThumb": 0,
+          "tipOnlyCurlThumb": 0,
+          "tipTwistThumb": 0,
+          "curlIndex": 0,
+          "splayIndex": -68,
+          "splayIndex2": 0,
+          "curlBiasIndex": 0,
+          "baseOnlyCurlIndex": 0,
+          "midOnlyCurlIndex": -5,
+          "tipOnlyCurlIndex": 0,
+          "tipTwistIndex": 0,
+          "curlMiddle": 0,
+          "splayMiddle": -6,
+          "splayMiddle2": 0,
+          "curlBiasMiddle": 0,
+          "baseOnlyCurlMiddle": 0,
+          "midOnlyCurlMiddle": -5,
+          "tipOnlyCurlMiddle": 0,
+          "tipTwistMiddle": 0,
+          "curlRing": 0,
+          "splayRing": -34,
+          "splayRing2": 0,
+          "curlBiasRing": 0,
+          "baseOnlyCurlRing": 0,
+          "midOnlyCurlRing": -5,
+          "tipOnlyCurlRing": 0,
+          "tipTwistRing": 0,
+          "curlPinky": 0,
+          "splayPinky": 86,
+          "splayPinky2": 0,
+          "curlBiasPinky": 0,
+          "baseOnlyCurlPinky": 0,
+          "midOnlyCurlPinky": -5,
+          "tipOnlyCurlPinky": 0,
+          "tipTwistPinky": 0,
+          "wristBend": 0,
+          "wristSplay": 15,
+          "modelRotX": 0,
+          "modelRotY": 0,
+          "modelRotZ": 0,
+          "poseOffsetX": -0.5,
+          "poseOffsetY": -8,
+          "poseOffsetZ": 55,
+          "poseScale": 1,
+          "hideWrist": 78,
+          "shoulderRaise": 0,
+          "shoulderSwing": 0,
+          "shoulderRotation": 0,
+          "elbowBend": 0,
+          "elbowSideBend": 0,
+          "forearmTwist": 0
         }
       ],
       "cropWristEnabled": true,
@@ -6202,6 +6271,160 @@
       "tweenPreviewSpeedMs": 602,
       "savedTweenSequences": [
         {
+          "name": "Waiting Horizontal Tap",
+          "tweenPoses": [
+            "Waiting Horizontal Tap - 0",
+            "Waiting Horizontal Tap - 1",
+            "Waiting Hoirzontal Tap - 2",
+            "Waiting Horizontal Tap - 3",
+            "Waiting Horizontal Tap - 4",
+            "Waiting Horizontal Tap - 5"
+          ],
+          "group": "LOADING"
+        },
+        {
+          "name": "COUNTDOWN - VERTICAL",
+          "tweenPoses": [
+            "COUNTDOWN (VERT) - 0",
+            "COUNTDOWN (VERT) - 1",
+            {
+              "type": "hold",
+              "percent": 50
+            },
+            "COUNTDOWN (VERT) - 2",
+            {
+              "type": "hold",
+              "percent": 50
+            },
+            "COUNTDOWN (VERT) - 3",
+            {
+              "type": "hold",
+              "percent": 50
+            },
+            "COUNTDOWN (VERT) - 4",
+            {
+              "type": "hold",
+              "percent": 50
+            },
+            "COUNTDOWN (VERT) - 5",
+            {
+              "type": "hold",
+              "percent": 50
+            },
+            "COUNTDOWN (VERT) - 6",
+            {
+              "type": "hold",
+              "percent": 50
+            },
+            "COUNTDOWN (VERT) - 7",
+            {
+              "type": "hold",
+              "percent": 50
+            },
+            "COUNTDOWN (VERT) - 8",
+            {
+              "type": "hold",
+              "percent": 50
+            },
+            "COUNTDOWN (VERT) - 9",
+            {
+              "type": "hold",
+              "percent": 50
+            },
+            "COUNTDOWN  (VERT) - 10",
+            {
+              "type": "hold",
+              "percent": 50
+            }
+          ],
+          "group": "LOADING/COUNTDOWN VERTICAL"
+        },
+        {
+          "name": "COUNTDOWN - VERTICAL + LENS COVER",
+          "tweenPoses": [
+            "COUNTDOWN (VERT) - 0",
+            "COUNTDOWN (VERT) - 1",
+            {
+              "type": "hold",
+              "percent": 50
+            },
+            "COUNTDOWN (VERT) - 2",
+            {
+              "type": "hold",
+              "percent": 50
+            },
+            "COUNTDOWN (VERT) - 3",
+            {
+              "type": "hold",
+              "percent": 50
+            },
+            "COUNTDOWN (VERT) - 4",
+            {
+              "type": "hold",
+              "percent": 50
+            },
+            "COUNTDOWN (VERT) - 5",
+            {
+              "type": "hold",
+              "percent": 50
+            },
+            "COUNTDOWN (VERT) - 6",
+            {
+              "type": "hold",
+              "percent": 50
+            },
+            "COUNTDOWN (VERT) - 7",
+            {
+              "type": "hold",
+              "percent": 50
+            },
+            "COUNTDOWN (VERT) - 8",
+            {
+              "type": "hold",
+              "percent": 50
+            },
+            "COUNTDOWN (VERT) - 9",
+            {
+              "type": "hold",
+              "percent": 50
+            },
+            "COUNTDOWN  (VERT) - 10",
+            {
+              "type": "hold",
+              "percent": 50
+            },
+            "COUNTDOWN (VERT) - LENS COVER"
+          ],
+          "group": "LOADING/COUNTDOWN VERTICAL"
+        },
+        {
+          "name": "Neutral - Horizontal Fanning",
+          "tweenPoses": [
+            "Neutral - Horizontal Fanning - 0",
+            "Neutral - Horizontal Fanning - 1",
+            "Neutral - Horizontal Fanning - 2",
+            "Neutral - Horizontal Fanning - 3",
+            "Neutral - Horizontal Fanning - 4",
+            "Neutral - Horizontal Fanning - 3",
+            "Neutral - Horizontal Fanning - 2",
+            "Neutral - Horizontal Fanning - 5",
+            "Neutral - Horizontal Fanning - 6",
+            "Neutral - Horizontal Fanning - 7"
+          ],
+          "group": "NEUTRAL FANNING"
+        },
+        {
+          "name": "Neutral - Vertical Fanning",
+          "tweenPoses": [
+            "Neutral",
+            "Neutral - Vertical Fanning - 0",
+            "Neutral - Vertical Fanning - 1",
+            "Neutral - Vertical Fanning - 2",
+            "Neutral - Vertical Fanning - 3"
+          ],
+          "group": "NEUTRAL FANNING"
+        },
+        {
           "name": "Birdie",
           "tweenPoses": [
             "Birdie (S) - 0",
@@ -6411,94 +6634,6 @@
             "Fist Rotate - 7"
           ],
           "group": "FIST ROTATE"
-        },
-        {
-          "name": "Neutral - Horizontal Fanning",
-          "tweenPoses": [
-            "Neutral - Horizontal Fanning - 0",
-            "Neutral - Horizontal Fanning - 1",
-            "Neutral - Horizontal Fanning - 2",
-            "Neutral - Horizontal Fanning - 3",
-            "Neutral - Horizontal Fanning - 4",
-            "Neutral - Horizontal Fanning - 3",
-            "Neutral - Horizontal Fanning - 2",
-            "Neutral - Horizontal Fanning - 5",
-            "Neutral - Horizontal Fanning - 6",
-            "Neutral - Horizontal Fanning - 7"
-          ]
-        },
-        {
-          "name": "Neutral - Vertical Fanning",
-          "tweenPoses": [
-            "Neutral",
-            "Neutral - Vertical Fanning - 0",
-            "Neutral - Vertical Fanning - 1",
-            "Neutral - Vertical Fanning - 2",
-            "Neutral - Vertical Fanning - 3"
-          ]
-        },
-        {
-          "name": "Waiting Horizontal Tap",
-          "tweenPoses": [
-            "Waiting Horizontal Tap - 0",
-            "Waiting Horizontal Tap - 1",
-            "Waiting Hoirzontal Tap - 2",
-            "Waiting Horizontal Tap - 3",
-            "Waiting Horizontal Tap - 4",
-            "Waiting Horizontal Tap - 5"
-          ]
-        },
-        {
-          "name": "COUNTDOWN - VERTICAL",
-          "tweenPoses": [
-            "COUNTDOWN (VERT) - 0",
-            "COUNTDOWN (VERT) - 1",
-            {
-              "type": "hold",
-              "percent": 100
-            },
-            "COUNTDOWN (VERT) - 2",
-            {
-              "type": "hold",
-              "percent": 100
-            },
-            "COUNTDOWN (VERT) - 3",
-            {
-              "type": "hold",
-              "percent": 100
-            },
-            "COUNTDOWN (VERT) - 4",
-            {
-              "type": "hold",
-              "percent": 100
-            },
-            "COUNTDOWN (VERT) - 5",
-            {
-              "type": "hold",
-              "percent": 100
-            },
-            "COUNTDOWN (VERT) - 6",
-            {
-              "type": "hold",
-              "percent": 100
-            },
-            "COUNTDOWN (VERT) - 7",
-            {
-              "type": "hold",
-              "percent": 100
-            },
-            "COUNTDOWN (VERT) - 8",
-            {
-              "type": "hold",
-              "percent": 100
-            },
-            "COUNTDOWN (VERT) - 9",
-            {
-              "type": "hold",
-              "percent": 100
-            },
-            "COUNTDOWN  (VERT) - 10"
-          ]
         }
       ],
       "dcHoldEnabled": true,
@@ -6718,8 +6853,8 @@
           "fov": 32
         }
       ],
-      "toonSteps": 2,
-      "toonStepThreshold": 0.2,
+      "toonSteps": 5,
+      "toonStepThreshold": 1.65,
       "toonShadowFloor": 0,
       "toonLightCeiling": 82,
       "toonBaseTint": "#0091ff",
@@ -6802,7 +6937,7 @@
       "palmFacesCursor": true,
       "palmFaceRotationOffset": 0,
       "loadingPreviewEnabled": true,
-      "loadingPreviewShowLive": false,
+      "loadingPreviewShowLive": true,
       "loadingMinTimeMs": 5000,
       "loadingPreviewTweenSelector": "Waiting Horizontal Tap",
       "loadingPreviewSavedCameras": [
@@ -6885,9 +7020,19 @@
           "targetX": 1.2343194780671631,
           "targetY": -2.336339362970378,
           "targetZ": -21.561671337969035
+        },
+        {
+          "name": "Front-Straightened",
+          "cameraX": 0.5309568688333194,
+          "cameraY": 60.84919589607597,
+          "cameraZ": -21.935010899369335,
+          "cameraFov": 32,
+          "targetX": 1.2343194780671631,
+          "targetY": -2.336339362970378,
+          "targetZ": -33.60014621531519
         }
       ],
-      "loadingPreviewCameraSelector": "Front",
+      "loadingPreviewCameraSelector": "Front-Straightened",
       "loadingPreviewSavedLighting": [
         {
           "name": "3 Tone - SideFront",
@@ -6942,13 +7087,13 @@
       "loadingPreviewSequenceLoopTransition": true,
       "loadingPreviewSequenceHoldMs": 0,
       "loadingPreviewSize": 1000,
-      "loadingPreviewRotationX": -85.36240971271977,
-      "loadingPreviewRotationY": 143.8619340559313,
-      "loadingPreviewRotationZ": -180,
+      "loadingPreviewRotationX": -79.52141477498436,
+      "loadingPreviewRotationY": -3.450536658585705,
+      "loadingPreviewRotationZ": 180,
       "loadingPreviewOffsetX": 0.27796090493479864,
       "loadingPreviewOffsetY": -2.310339603408437,
       "loadingPreviewCameraFov": 32,
-      "loadingPreviewCameraZoom": 64.25715498581913,
+      "loadingPreviewCameraZoom": 64.25715498581914,
       "loadingPreviewCameraEditMode": false,
       "customClickFunctionIds": "[]",
       "posePreviewEnabled": false,
@@ -12724,6 +12869,65 @@
           "elbowBend": 0,
           "elbowSideBend": 0,
           "forearmTwist": 0
+        },
+        {
+          "name": "COUNTDOWN (VERT) - LENS COVER",
+          "thumbCurl": 0,
+          "thumbSplay": -48,
+          "thumbSplay2": -8,
+          "curlBiasThumb": 0,
+          "baseOnlyCurlThumb": -61,
+          "midOnlyCurlThumb": 0,
+          "tipOnlyCurlThumb": 0,
+          "tipTwistThumb": 0,
+          "curlIndex": 0,
+          "splayIndex": -68,
+          "splayIndex2": 0,
+          "curlBiasIndex": 0,
+          "baseOnlyCurlIndex": 0,
+          "midOnlyCurlIndex": -5,
+          "tipOnlyCurlIndex": 0,
+          "tipTwistIndex": 0,
+          "curlMiddle": 0,
+          "splayMiddle": -6,
+          "splayMiddle2": 0,
+          "curlBiasMiddle": 0,
+          "baseOnlyCurlMiddle": 0,
+          "midOnlyCurlMiddle": -5,
+          "tipOnlyCurlMiddle": 0,
+          "tipTwistMiddle": 0,
+          "curlRing": 0,
+          "splayRing": -34,
+          "splayRing2": 0,
+          "curlBiasRing": 0,
+          "baseOnlyCurlRing": 0,
+          "midOnlyCurlRing": -5,
+          "tipOnlyCurlRing": 0,
+          "tipTwistRing": 0,
+          "curlPinky": 0,
+          "splayPinky": 86,
+          "splayPinky2": 0,
+          "curlBiasPinky": 0,
+          "baseOnlyCurlPinky": 0,
+          "midOnlyCurlPinky": -5,
+          "tipOnlyCurlPinky": 0,
+          "tipTwistPinky": 0,
+          "wristBend": 0,
+          "wristSplay": 15,
+          "modelRotX": 0,
+          "modelRotY": 0,
+          "modelRotZ": 0,
+          "poseOffsetX": -0.5,
+          "poseOffsetY": -8,
+          "poseOffsetZ": 55,
+          "poseScale": 1,
+          "hideWrist": 78,
+          "shoulderRaise": 0,
+          "shoulderSwing": 0,
+          "shoulderRotation": 0,
+          "elbowBend": 0,
+          "elbowSideBend": 0,
+          "forearmTwist": 0
         }
       ],
       "cropWristEnabled": true,
@@ -12987,6 +13191,160 @@
       "tweenPreviewSpeedMs": 602,
       "savedTweenSequences": [
         {
+          "name": "Waiting Horizontal Tap",
+          "tweenPoses": [
+            "Waiting Horizontal Tap - 0",
+            "Waiting Horizontal Tap - 1",
+            "Waiting Hoirzontal Tap - 2",
+            "Waiting Horizontal Tap - 3",
+            "Waiting Horizontal Tap - 4",
+            "Waiting Horizontal Tap - 5"
+          ],
+          "group": "LOADING"
+        },
+        {
+          "name": "COUNTDOWN - VERTICAL",
+          "tweenPoses": [
+            "COUNTDOWN (VERT) - 0",
+            "COUNTDOWN (VERT) - 1",
+            {
+              "type": "hold",
+              "percent": 50
+            },
+            "COUNTDOWN (VERT) - 2",
+            {
+              "type": "hold",
+              "percent": 50
+            },
+            "COUNTDOWN (VERT) - 3",
+            {
+              "type": "hold",
+              "percent": 50
+            },
+            "COUNTDOWN (VERT) - 4",
+            {
+              "type": "hold",
+              "percent": 50
+            },
+            "COUNTDOWN (VERT) - 5",
+            {
+              "type": "hold",
+              "percent": 50
+            },
+            "COUNTDOWN (VERT) - 6",
+            {
+              "type": "hold",
+              "percent": 50
+            },
+            "COUNTDOWN (VERT) - 7",
+            {
+              "type": "hold",
+              "percent": 50
+            },
+            "COUNTDOWN (VERT) - 8",
+            {
+              "type": "hold",
+              "percent": 50
+            },
+            "COUNTDOWN (VERT) - 9",
+            {
+              "type": "hold",
+              "percent": 50
+            },
+            "COUNTDOWN  (VERT) - 10",
+            {
+              "type": "hold",
+              "percent": 50
+            }
+          ],
+          "group": "LOADING/COUNTDOWN VERTICAL"
+        },
+        {
+          "name": "COUNTDOWN - VERTICAL + LENS COVER",
+          "tweenPoses": [
+            "COUNTDOWN (VERT) - 0",
+            "COUNTDOWN (VERT) - 1",
+            {
+              "type": "hold",
+              "percent": 50
+            },
+            "COUNTDOWN (VERT) - 2",
+            {
+              "type": "hold",
+              "percent": 50
+            },
+            "COUNTDOWN (VERT) - 3",
+            {
+              "type": "hold",
+              "percent": 50
+            },
+            "COUNTDOWN (VERT) - 4",
+            {
+              "type": "hold",
+              "percent": 50
+            },
+            "COUNTDOWN (VERT) - 5",
+            {
+              "type": "hold",
+              "percent": 50
+            },
+            "COUNTDOWN (VERT) - 6",
+            {
+              "type": "hold",
+              "percent": 50
+            },
+            "COUNTDOWN (VERT) - 7",
+            {
+              "type": "hold",
+              "percent": 50
+            },
+            "COUNTDOWN (VERT) - 8",
+            {
+              "type": "hold",
+              "percent": 50
+            },
+            "COUNTDOWN (VERT) - 9",
+            {
+              "type": "hold",
+              "percent": 50
+            },
+            "COUNTDOWN  (VERT) - 10",
+            {
+              "type": "hold",
+              "percent": 50
+            },
+            "COUNTDOWN (VERT) - LENS COVER"
+          ],
+          "group": "LOADING/COUNTDOWN VERTICAL"
+        },
+        {
+          "name": "Neutral - Horizontal Fanning",
+          "tweenPoses": [
+            "Neutral - Horizontal Fanning - 0",
+            "Neutral - Horizontal Fanning - 1",
+            "Neutral - Horizontal Fanning - 2",
+            "Neutral - Horizontal Fanning - 3",
+            "Neutral - Horizontal Fanning - 4",
+            "Neutral - Horizontal Fanning - 3",
+            "Neutral - Horizontal Fanning - 2",
+            "Neutral - Horizontal Fanning - 5",
+            "Neutral - Horizontal Fanning - 6",
+            "Neutral - Horizontal Fanning - 7"
+          ],
+          "group": "NEUTRAL FANNING"
+        },
+        {
+          "name": "Neutral - Vertical Fanning",
+          "tweenPoses": [
+            "Neutral",
+            "Neutral - Vertical Fanning - 0",
+            "Neutral - Vertical Fanning - 1",
+            "Neutral - Vertical Fanning - 2",
+            "Neutral - Vertical Fanning - 3"
+          ],
+          "group": "NEUTRAL FANNING"
+        },
+        {
           "name": "Birdie",
           "tweenPoses": [
             "Birdie (S) - 0",
@@ -13196,94 +13554,6 @@
             "Fist Rotate - 7"
           ],
           "group": "FIST ROTATE"
-        },
-        {
-          "name": "Neutral - Horizontal Fanning",
-          "tweenPoses": [
-            "Neutral - Horizontal Fanning - 0",
-            "Neutral - Horizontal Fanning - 1",
-            "Neutral - Horizontal Fanning - 2",
-            "Neutral - Horizontal Fanning - 3",
-            "Neutral - Horizontal Fanning - 4",
-            "Neutral - Horizontal Fanning - 3",
-            "Neutral - Horizontal Fanning - 2",
-            "Neutral - Horizontal Fanning - 5",
-            "Neutral - Horizontal Fanning - 6",
-            "Neutral - Horizontal Fanning - 7"
-          ]
-        },
-        {
-          "name": "Neutral - Vertical Fanning",
-          "tweenPoses": [
-            "Neutral",
-            "Neutral - Vertical Fanning - 0",
-            "Neutral - Vertical Fanning - 1",
-            "Neutral - Vertical Fanning - 2",
-            "Neutral - Vertical Fanning - 3"
-          ]
-        },
-        {
-          "name": "Waiting Horizontal Tap",
-          "tweenPoses": [
-            "Waiting Horizontal Tap - 0",
-            "Waiting Horizontal Tap - 1",
-            "Waiting Hoirzontal Tap - 2",
-            "Waiting Horizontal Tap - 3",
-            "Waiting Horizontal Tap - 4",
-            "Waiting Horizontal Tap - 5"
-          ]
-        },
-        {
-          "name": "COUNTDOWN - VERTICAL",
-          "tweenPoses": [
-            "COUNTDOWN (VERT) - 0",
-            "COUNTDOWN (VERT) - 1",
-            {
-              "type": "hold",
-              "percent": 100
-            },
-            "COUNTDOWN (VERT) - 2",
-            {
-              "type": "hold",
-              "percent": 100
-            },
-            "COUNTDOWN (VERT) - 3",
-            {
-              "type": "hold",
-              "percent": 100
-            },
-            "COUNTDOWN (VERT) - 4",
-            {
-              "type": "hold",
-              "percent": 100
-            },
-            "COUNTDOWN (VERT) - 5",
-            {
-              "type": "hold",
-              "percent": 100
-            },
-            "COUNTDOWN (VERT) - 6",
-            {
-              "type": "hold",
-              "percent": 100
-            },
-            "COUNTDOWN (VERT) - 7",
-            {
-              "type": "hold",
-              "percent": 100
-            },
-            "COUNTDOWN (VERT) - 8",
-            {
-              "type": "hold",
-              "percent": 100
-            },
-            "COUNTDOWN (VERT) - 9",
-            {
-              "type": "hold",
-              "percent": 100
-            },
-            "COUNTDOWN  (VERT) - 10"
-          ]
         }
       ],
       "dcHoldEnabled": true,
@@ -13503,8 +13773,8 @@
           "fov": 32
         }
       ],
-      "toonSteps": 2,
-      "toonStepThreshold": 0.2,
+      "toonSteps": 5,
+      "toonStepThreshold": 1.65,
       "toonShadowFloor": 0,
       "toonLightCeiling": 82,
       "toonBaseTint": "#0091ff",
@@ -13587,7 +13857,7 @@
       "palmFacesCursor": true,
       "palmFaceRotationOffset": 0,
       "loadingPreviewEnabled": true,
-      "loadingPreviewShowLive": false,
+      "loadingPreviewShowLive": true,
       "loadingMinTimeMs": 5000,
       "loadingPreviewTweenSelector": "Waiting Horizontal Tap",
       "loadingPreviewSavedCameras": [
@@ -13670,9 +13940,19 @@
           "targetX": 1.2343194780671631,
           "targetY": -2.336339362970378,
           "targetZ": -21.561671337969035
+        },
+        {
+          "name": "Front-Straightened",
+          "cameraX": 0.5309568688333194,
+          "cameraY": 60.84919589607597,
+          "cameraZ": -21.935010899369335,
+          "cameraFov": 32,
+          "targetX": 1.2343194780671631,
+          "targetY": -2.336339362970378,
+          "targetZ": -33.60014621531519
         }
       ],
-      "loadingPreviewCameraSelector": "Front",
+      "loadingPreviewCameraSelector": "Front-Straightened",
       "loadingPreviewSavedLighting": [
         {
           "name": "3 Tone - SideFront",
@@ -13727,13 +14007,13 @@
       "loadingPreviewSequenceLoopTransition": true,
       "loadingPreviewSequenceHoldMs": 0,
       "loadingPreviewSize": 1000,
-      "loadingPreviewRotationX": -85.36240971271977,
-      "loadingPreviewRotationY": 143.8619340559313,
-      "loadingPreviewRotationZ": -180,
+      "loadingPreviewRotationX": -79.52141477498436,
+      "loadingPreviewRotationY": -3.450536658585705,
+      "loadingPreviewRotationZ": 180,
       "loadingPreviewOffsetX": 0.27796090493479864,
       "loadingPreviewOffsetY": -2.310339603408437,
       "loadingPreviewCameraFov": 32,
-      "loadingPreviewCameraZoom": 64.25715498581913,
+      "loadingPreviewCameraZoom": 64.25715498581914,
       "loadingPreviewCameraEditMode": false,
       "customClickFunctionIds": "[]",
       "posePreviewEnabled": false,
@@ -19509,6 +19789,65 @@
           "elbowBend": 0,
           "elbowSideBend": 0,
           "forearmTwist": 0
+        },
+        {
+          "name": "COUNTDOWN (VERT) - LENS COVER",
+          "thumbCurl": 0,
+          "thumbSplay": -48,
+          "thumbSplay2": -8,
+          "curlBiasThumb": 0,
+          "baseOnlyCurlThumb": -61,
+          "midOnlyCurlThumb": 0,
+          "tipOnlyCurlThumb": 0,
+          "tipTwistThumb": 0,
+          "curlIndex": 0,
+          "splayIndex": -68,
+          "splayIndex2": 0,
+          "curlBiasIndex": 0,
+          "baseOnlyCurlIndex": 0,
+          "midOnlyCurlIndex": -5,
+          "tipOnlyCurlIndex": 0,
+          "tipTwistIndex": 0,
+          "curlMiddle": 0,
+          "splayMiddle": -6,
+          "splayMiddle2": 0,
+          "curlBiasMiddle": 0,
+          "baseOnlyCurlMiddle": 0,
+          "midOnlyCurlMiddle": -5,
+          "tipOnlyCurlMiddle": 0,
+          "tipTwistMiddle": 0,
+          "curlRing": 0,
+          "splayRing": -34,
+          "splayRing2": 0,
+          "curlBiasRing": 0,
+          "baseOnlyCurlRing": 0,
+          "midOnlyCurlRing": -5,
+          "tipOnlyCurlRing": 0,
+          "tipTwistRing": 0,
+          "curlPinky": 0,
+          "splayPinky": 86,
+          "splayPinky2": 0,
+          "curlBiasPinky": 0,
+          "baseOnlyCurlPinky": 0,
+          "midOnlyCurlPinky": -5,
+          "tipOnlyCurlPinky": 0,
+          "tipTwistPinky": 0,
+          "wristBend": 0,
+          "wristSplay": 15,
+          "modelRotX": 0,
+          "modelRotY": 0,
+          "modelRotZ": 0,
+          "poseOffsetX": -0.5,
+          "poseOffsetY": -8,
+          "poseOffsetZ": 55,
+          "poseScale": 1,
+          "hideWrist": 78,
+          "shoulderRaise": 0,
+          "shoulderSwing": 0,
+          "shoulderRotation": 0,
+          "elbowBend": 0,
+          "elbowSideBend": 0,
+          "forearmTwist": 0
         }
       ],
       "cropWristEnabled": true,
@@ -19772,6 +20111,160 @@
       "tweenPreviewSpeedMs": 602,
       "savedTweenSequences": [
         {
+          "name": "Waiting Horizontal Tap",
+          "tweenPoses": [
+            "Waiting Horizontal Tap - 0",
+            "Waiting Horizontal Tap - 1",
+            "Waiting Hoirzontal Tap - 2",
+            "Waiting Horizontal Tap - 3",
+            "Waiting Horizontal Tap - 4",
+            "Waiting Horizontal Tap - 5"
+          ],
+          "group": "LOADING"
+        },
+        {
+          "name": "COUNTDOWN - VERTICAL",
+          "tweenPoses": [
+            "COUNTDOWN (VERT) - 0",
+            "COUNTDOWN (VERT) - 1",
+            {
+              "type": "hold",
+              "percent": 50
+            },
+            "COUNTDOWN (VERT) - 2",
+            {
+              "type": "hold",
+              "percent": 50
+            },
+            "COUNTDOWN (VERT) - 3",
+            {
+              "type": "hold",
+              "percent": 50
+            },
+            "COUNTDOWN (VERT) - 4",
+            {
+              "type": "hold",
+              "percent": 50
+            },
+            "COUNTDOWN (VERT) - 5",
+            {
+              "type": "hold",
+              "percent": 50
+            },
+            "COUNTDOWN (VERT) - 6",
+            {
+              "type": "hold",
+              "percent": 50
+            },
+            "COUNTDOWN (VERT) - 7",
+            {
+              "type": "hold",
+              "percent": 50
+            },
+            "COUNTDOWN (VERT) - 8",
+            {
+              "type": "hold",
+              "percent": 50
+            },
+            "COUNTDOWN (VERT) - 9",
+            {
+              "type": "hold",
+              "percent": 50
+            },
+            "COUNTDOWN  (VERT) - 10",
+            {
+              "type": "hold",
+              "percent": 50
+            }
+          ],
+          "group": "LOADING/COUNTDOWN VERTICAL"
+        },
+        {
+          "name": "COUNTDOWN - VERTICAL + LENS COVER",
+          "tweenPoses": [
+            "COUNTDOWN (VERT) - 0",
+            "COUNTDOWN (VERT) - 1",
+            {
+              "type": "hold",
+              "percent": 50
+            },
+            "COUNTDOWN (VERT) - 2",
+            {
+              "type": "hold",
+              "percent": 50
+            },
+            "COUNTDOWN (VERT) - 3",
+            {
+              "type": "hold",
+              "percent": 50
+            },
+            "COUNTDOWN (VERT) - 4",
+            {
+              "type": "hold",
+              "percent": 50
+            },
+            "COUNTDOWN (VERT) - 5",
+            {
+              "type": "hold",
+              "percent": 50
+            },
+            "COUNTDOWN (VERT) - 6",
+            {
+              "type": "hold",
+              "percent": 50
+            },
+            "COUNTDOWN (VERT) - 7",
+            {
+              "type": "hold",
+              "percent": 50
+            },
+            "COUNTDOWN (VERT) - 8",
+            {
+              "type": "hold",
+              "percent": 50
+            },
+            "COUNTDOWN (VERT) - 9",
+            {
+              "type": "hold",
+              "percent": 50
+            },
+            "COUNTDOWN  (VERT) - 10",
+            {
+              "type": "hold",
+              "percent": 50
+            },
+            "COUNTDOWN (VERT) - LENS COVER"
+          ],
+          "group": "LOADING/COUNTDOWN VERTICAL"
+        },
+        {
+          "name": "Neutral - Horizontal Fanning",
+          "tweenPoses": [
+            "Neutral - Horizontal Fanning - 0",
+            "Neutral - Horizontal Fanning - 1",
+            "Neutral - Horizontal Fanning - 2",
+            "Neutral - Horizontal Fanning - 3",
+            "Neutral - Horizontal Fanning - 4",
+            "Neutral - Horizontal Fanning - 3",
+            "Neutral - Horizontal Fanning - 2",
+            "Neutral - Horizontal Fanning - 5",
+            "Neutral - Horizontal Fanning - 6",
+            "Neutral - Horizontal Fanning - 7"
+          ],
+          "group": "NEUTRAL FANNING"
+        },
+        {
+          "name": "Neutral - Vertical Fanning",
+          "tweenPoses": [
+            "Neutral",
+            "Neutral - Vertical Fanning - 0",
+            "Neutral - Vertical Fanning - 1",
+            "Neutral - Vertical Fanning - 2",
+            "Neutral - Vertical Fanning - 3"
+          ],
+          "group": "NEUTRAL FANNING"
+        },
+        {
           "name": "Birdie",
           "tweenPoses": [
             "Birdie (S) - 0",
@@ -19981,94 +20474,6 @@
             "Fist Rotate - 7"
           ],
           "group": "FIST ROTATE"
-        },
-        {
-          "name": "Neutral - Horizontal Fanning",
-          "tweenPoses": [
-            "Neutral - Horizontal Fanning - 0",
-            "Neutral - Horizontal Fanning - 1",
-            "Neutral - Horizontal Fanning - 2",
-            "Neutral - Horizontal Fanning - 3",
-            "Neutral - Horizontal Fanning - 4",
-            "Neutral - Horizontal Fanning - 3",
-            "Neutral - Horizontal Fanning - 2",
-            "Neutral - Horizontal Fanning - 5",
-            "Neutral - Horizontal Fanning - 6",
-            "Neutral - Horizontal Fanning - 7"
-          ]
-        },
-        {
-          "name": "Neutral - Vertical Fanning",
-          "tweenPoses": [
-            "Neutral",
-            "Neutral - Vertical Fanning - 0",
-            "Neutral - Vertical Fanning - 1",
-            "Neutral - Vertical Fanning - 2",
-            "Neutral - Vertical Fanning - 3"
-          ]
-        },
-        {
-          "name": "Waiting Horizontal Tap",
-          "tweenPoses": [
-            "Waiting Horizontal Tap - 0",
-            "Waiting Horizontal Tap - 1",
-            "Waiting Hoirzontal Tap - 2",
-            "Waiting Horizontal Tap - 3",
-            "Waiting Horizontal Tap - 4",
-            "Waiting Horizontal Tap - 5"
-          ]
-        },
-        {
-          "name": "COUNTDOWN - VERTICAL",
-          "tweenPoses": [
-            "COUNTDOWN (VERT) - 0",
-            "COUNTDOWN (VERT) - 1",
-            {
-              "type": "hold",
-              "percent": 100
-            },
-            "COUNTDOWN (VERT) - 2",
-            {
-              "type": "hold",
-              "percent": 100
-            },
-            "COUNTDOWN (VERT) - 3",
-            {
-              "type": "hold",
-              "percent": 100
-            },
-            "COUNTDOWN (VERT) - 4",
-            {
-              "type": "hold",
-              "percent": 100
-            },
-            "COUNTDOWN (VERT) - 5",
-            {
-              "type": "hold",
-              "percent": 100
-            },
-            "COUNTDOWN (VERT) - 6",
-            {
-              "type": "hold",
-              "percent": 100
-            },
-            "COUNTDOWN (VERT) - 7",
-            {
-              "type": "hold",
-              "percent": 100
-            },
-            "COUNTDOWN (VERT) - 8",
-            {
-              "type": "hold",
-              "percent": 100
-            },
-            "COUNTDOWN (VERT) - 9",
-            {
-              "type": "hold",
-              "percent": 100
-            },
-            "COUNTDOWN  (VERT) - 10"
-          ]
         }
       ],
       "dcHoldEnabled": true,
@@ -20288,8 +20693,8 @@
           "fov": 32
         }
       ],
-      "toonSteps": 2,
-      "toonStepThreshold": 0.2,
+      "toonSteps": 5,
+      "toonStepThreshold": 1.65,
       "toonShadowFloor": 0,
       "toonLightCeiling": 82,
       "toonBaseTint": "#0091ff",
@@ -21471,7 +21876,7 @@
     },
     {
       "key": "Loading Preview",
-      "collapsed": true,
+      "collapsed": false,
       "locked": false,
       "items": [
         {
@@ -21786,7 +22191,7 @@
     },
     {
       "key": "Field Layout",
-      "collapsed": false,
+      "collapsed": true,
       "locked": false,
       "items": [
         {
@@ -27879,7 +28284,7 @@
     },
     {
       "key": "Pose",
-      "collapsed": false,
+      "collapsed": true,
       "locked": false,
       "items": [
         {
@@ -28629,7 +29034,7 @@
     },
     {
       "key": "Toon Shading",
-      "collapsed": true,
+      "collapsed": false,
       "locked": false,
       "items": [
         {
