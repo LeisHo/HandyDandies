@@ -21899,7 +21899,7 @@
           "type": "group",
           "group": {
             "key": "New Group (5)",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -21952,7 +21952,7 @@
           "type": "group",
           "group": {
             "key": "New Group (7)",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -22039,7 +22039,7 @@
       "subgroups": [
         {
           "key": "New Group (5)",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -22089,7 +22089,7 @@
         },
         {
           "key": "New Group (7)",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
