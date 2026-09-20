@@ -18,6 +18,33 @@ work seamlessly from there.
 
 ## Currently working on
 
+**SHIPPED 2026-09-20 (later same day, 2nd follow-up round): 2 more
+Loading Preview gaps fixed -- Hold entries in an imported tween were
+silently dropped, and wrist cropping was never applied at all.** (1)
+`updateLoadingPreviewAnimation()` used the older, non-Hold-aware
+`resolveTweenSequencePoses()`/`lerpTweenSequence()` pathway, which
+silently drops any `{type:'hold', percent}` entry (assumes every entry
+is a pose-name string); rewired onto the same Hold-aware weighted-
+segment pathway chp/rchp already use, adding a new `lerpLoopSegments()`
+for the smooth cyclic Loop-transition case (`lerpTweenSegments()` alone
+only covers one forward pass). (2) This preview never had ANY wrist-
+crop clip-plane wiring -- confirmed it just reused the shared
+`toonMaterial`, whose `clippingPlanes` is permanently empty, so the arm
+was always shown in full regardless of any pose's own `hideWrist` value
+or the global default. Gave it its own cloned material + Plane (same
+pattern the main field's `rebuildField()` already uses per hand), driven
+by the CURRENTLY PLAYING pose's own `hideWrist` (not the reactive/global
+system, which has no cursor to react to here and per direct request
+should never apply to this preview). Live-verified: Hold segments hold
+constant for exactly their own weighted share of progress (both pose
+values and `hideWrist`, which `lerpPoseValues()` now also interpolates
+as a convenience extra field); cyclic wrap-around matches expected
+values at every sampled point; wrist-clip plane scales exactly linearly
+with `hideWrist` (0.78 ratio, exact). See CHANGELOG.txt's matching
+2026-09-20 (2nd follow-up round) entry for full verification detail,
+including an unusually severe run of this sandbox's own known network-
+truncation issue that needed several retries before a clean load.
+
 **SHIPPED 2026-09-20 (later same day, follow-up round): Pose Offset X/Y/Z
 is now camera-relative, not world-space (direct follow-up: "the offset
 should be in relation to the active camera").** HANDO applies it as a

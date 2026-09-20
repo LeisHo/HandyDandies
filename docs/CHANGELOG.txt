@@ -9522,6 +9522,76 @@ round's own `src/main.js`/`index.html` changes, so a plain `git merge
 no patch isolation needed this time.
 
 --------------------------------------------------------------------------------
+2026-09-20 (later same day, 2nd follow-up round)
+
+Fixed 2 more Loading Preview gaps, both direct reports: (1) "the
+imported tweens still dont seem to read the Hold data"; (2) "the
+imported tweens and poses dont seem to read the wrist cropping data for
+load preview... the default wrist length should not apply to loading
+preview."
+
+Hold entries: `updateLoadingPreviewAnimation()` used
+`resolveTweenSequencePoses()`, which maps every `tweenPoses` entry
+through `.filter(p => p.name === name)` assuming a pose-name STRING -- a
+Hold entry (`{type:'hold', percent}`) never matches anything there and
+was silently dropped, same class of bug the Hold-aware
+`resolveTweenSegmentsWithAnchor()`/`lerpTweenSegments()` pathway
+(already used by chp/rchp/etc.) was built to fix in the first place;
+this consumer just never got switched onto it. Rewired onto that same
+pathway for all 3 play styles -- Oscillate and instant-jump use
+`lerpTweenSegments()` directly; the smooth cyclic Loop-transition path
+needed a new `lerpLoopSegments()` (weighted counterpart to
+`lerpLoopSequence()`, scaled by total ring weight instead of a plain
+segment count, with the ring closed by an extra segment back to the
+anchor pose).
+
+Wrist crop: this preview never had ANY wrist-crop clip-plane wiring at
+all -- it reused the shared `toonMaterial` directly, whose own
+`clippingPlanes` is permanently empty by construction
+(`createToonMaterial()`'s own def) -- not "overridden by the default,"
+simply never clipped, full arm always shown regardless of what any pose
+said. Gave it its own cloned material + own `THREE.Plane` (mirroring
+`rebuildField()`'s per-field-hand pattern, including the same
+`Material.clone()`-doesn't-carry-`onBeforeCompile` fix that pattern's
+own comment documents), and a new `updateLoadingPreviewWristClip(percent)`
+driven by the CURRENTLY PLAYING pose's own `hideWrist` value --
+deliberately not `cfg.hideWrist`/the reactive arm-length system (no
+cursor to react to in this preview, and the global default should never
+apply here per direct request). Since `hideWrist` is intentionally
+excluded from `POSE_PRESET_KEYS` (a main-field design decision, left
+unchanged), `lerpPoseValues()` now also interpolates it as one
+additional convenience field on its returned object -- every existing
+caller that only reads `POSE_PRESET_KEYS`-listed fields is unaffected.
+
+Verified live (fresh page load, isolated `__Test*`-prefixed poses/
+sequences added directly to the live in-browser `cfg` object, never
+Saved/Synced -- so they never reached the persisted settings file and
+needed no explicit cleanup): `resolveTweenSegmentsWithAnchor()`
+correctly builds `[Start->End weight 1, hold weight 2]` from raw
+`['End', {type:'hold', percent:200}]` entries; `lerpTweenSegments()`
+interpolates normally through the first third of progress then holds
+BOTH `curlMiddle` and `hideWrist` exactly constant for the remaining
+two-thirds; `lerpLoopSegments()` wraps smoothly across lap boundaries,
+correctly including the closing segment (sampled at `tCyclic` 0/1/2/3/
+3.5/4/4.5/8, all matching the expected weighted-ring position exactly).
+Wrist-clip plane scales EXACTLY linearly with `hideWrist` (ratio check:
+`(c78-c0)/(c100-c0) = 0.78` precisely) and is repeatable across
+identical calls. Full pipeline
+(`updateLoadingPreviewAnimation`->`applyLoadingPreviewPose`->
+`updateLoadingPreviewWristClip`) run end-to-end via a real tween
+sequence with a Hold entry, no console errors beyond expected local
+`/api/save-settings` 404s. `node --check` clean.
+
+Verification environment note: this round's local static-server
+preview hit an unusually severe run of this sandbox's own network-
+truncation issue (main.js reset 6+ times in a row across 2 different
+server processes/ports, and once even the GLB model fetch itself
+failed) before a clean load finally landed -- confirmed via `curl`
+retries matching the file's own real 603,839-byte size that this was
+purely the known environment issue, not a code regression, before
+continuing to retry rather than assuming the fix was broken.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================
