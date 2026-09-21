@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Handy Dandies</title>
-<link rel="stylesheet" href="src/style.css?v=20">
+<link rel="stylesheet" href="src/style.css?v=21">
 <script type="importmap">
 {
   "imports": {
@@ -17,11 +17,21 @@
 <body>
 <canvas id="viewport"></canvas>
 <canvas id="loadingPreviewCanvas"></canvas>
+<!-- Global Pause button (direct request) -- always visible, not gated by
+     DEV_MODE, since any visitor can pause/resume at any time. Position/
+     size/colors driven entirely by main.js's own applyPauseButtonStyle()
+     from the "Pause Button" dev-panel group (cfg.pauseBtn*); this markup
+     only supplies the fixed id/class/type main.js and style.css both key
+     off. Excluded from every click-hold-pose/click-pose/click-count-chain
+     gesture listener via `.closest('.dp-panel, #pauseButton')` (see those
+     listeners' own comments) -- clicking it never triggers cursor-
+     tracking-driven pose/tween functions, only setPaused() itself. -->
+<button id="pauseButton" type="button" aria-label="Pause"></button>
 <!-- "Loading hands…" text removed per direct request (2026-09-20) --
      #loading itself is kept (tryStartField() still toggles its own
      .hidden class on it) since the Loading Preview hand animation is
      now the sole loading indicator; an empty #loading is harmless. -->
 <div id="loading"></div>
-<script type="module" src="src/main.js?v=197"></script>
+<script type="module" src="src/main.js?v=198"></script>
 </body>
 </html>

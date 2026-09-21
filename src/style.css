@@ -69,6 +69,26 @@ html, body {
    was the one moved, not this canvas's own already-correct-for-its-own-
    purpose value. */
 #loadingPreviewCanvas { display: none; position: fixed; top: 50%; left: 50%; z-index: 100000; pointer-events: none; }
+/* Global Pause button (direct request, always visible, not DEV_MODE-
+   gated) -- position/size/colors below are just SANE STARTING DEFAULTS;
+   every one of these is overridden live by main.js's own
+   applyPauseButtonStyle() from the "Pause Button" dev-panel group
+   (perDevice X/Y/size, shared colors/border/opacity), so this rule only
+   needs to keep the button from flashing unstyled for the one frame
+   before that JS runs. z-index sits above the Loading Preview canvas
+   (100000) but below the dev panel itself (200000) -- if the panel is
+   ever dragged over this corner, the panel wins, matching how every
+   other on-screen chrome in this file already layers. */
+#pauseButton {
+  position: fixed; top: 12px; left: 12px; z-index: 100001;
+  width: 40px; height: 40px; padding: 0; margin: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(0, 0, 0, 0.55); color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.4); border-radius: 6px;
+  cursor: pointer; font-size: 18px; line-height: 1; user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+#pauseButton:hover { background: rgba(0, 0, 0, 0.75); }
 
 /* ---------------------------------------------------------------------
    Dev panel (CLAUDE.md Section 12) -- reused verbatim from ADA BATHROOM's

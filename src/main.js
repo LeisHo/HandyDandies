@@ -426,6 +426,36 @@ const boundsCenterScratch = new THREE.Vector3()
 // Dev panel groups (CLAUDE.md Section 12)
 // -----------------------------------------------------------------------
 const DEV_GROUPS = [
+  // Global Pause button (direct request: "add a small pause button icon.
+  // Users can click it at any time to pause the entire animation and
+  // tweens... Make sure that clicking the pause button does not trigger
+  // any cursor tracking or tweening functions. Provide the necessary
+  // settings in *DC*Pause Button*"). The pause/resume MECHANISM itself
+  // (isPaused/pauseOffsetMs/nowVirtual()/setPaused()) already existed --
+  // built earlier as a Debug-group-only dev button (see setPaused()'s
+  // own declaration comment for the full "virtual clock" reasoning) --
+  // this group is purely the VISUAL customization for the new always-
+  // visible on-screen button (#pauseButton in index.html), applied live
+  // by applyPauseButtonStyle() (near setPaused()'s own declaration).
+  // Position/size are perDevice (§12f: a fixed px position/size tuned
+  // for desktop rarely translates directly to mobile, same reasoning
+  // already applied to Camera/Field Layout); colors/border/opacity stay
+  // shared, matching every other color/style control in this file.
+  {
+    title: 'Pause Button',
+    controls: [
+      { key: 'pauseBtnXOffset', label: 'X Offset (Px)', type: 'slider', min: 0, max: 200, step: 1, def: 12, perDevice: true, onChange: () => applyPauseButtonStyle() },
+      { key: 'pauseBtnYOffset', label: 'Y Offset (Px)', type: 'slider', min: 0, max: 200, step: 1, def: 12, perDevice: true, onChange: () => applyPauseButtonStyle() },
+      { key: 'pauseBtnSize', label: 'Button Size (Px)', type: 'slider', min: 20, max: 120, step: 1, def: 40, perDevice: true, onChange: () => applyPauseButtonStyle() },
+      { key: 'pauseBtnIconSize', label: 'Icon Size (Px)', type: 'slider', min: 8, max: 60, step: 1, def: 18, perDevice: true, onChange: () => applyPauseButtonStyle() },
+      { key: 'pauseBtnCornerRadius', label: 'Corner Radius (Px)', type: 'slider', min: 0, max: 60, step: 1, def: 6, onChange: () => applyPauseButtonStyle() },
+      { key: 'pauseBtnBorderThickness', label: 'Border Thickness (Px)', type: 'slider', min: 0, max: 10, step: 1, def: 1, onChange: () => applyPauseButtonStyle() },
+      { key: 'pauseBtnOpacity', label: 'Opacity (%)', type: 'slider', min: 10, max: 100, step: 1, def: 100, onChange: () => applyPauseButtonStyle() },
+      { key: 'pauseBtnBgColor', label: 'Background Color', type: 'color', def: '#000000', onChange: () => applyPauseButtonStyle() },
+      { key: 'pauseBtnIconColor', label: 'Icon Color', type: 'color', def: '#ffffff', onChange: () => applyPauseButtonStyle() },
+      { key: 'pauseBtnBorderColor', label: 'Border Color', type: 'color', def: '#ffffff', onChange: () => applyPauseButtonStyle() }
+    ]
+  },
   {
     title: 'Field Layout',
     // Every control below is perDevice (added 2026-09-15, direct request:
@@ -6445,7 +6475,7 @@ function endClickHoldPose(p) {
 // triggers, so a hand can never get stuck mid-transition forever with no
 // way to reach it.
 window.addEventListener('pointerdown', (e) => {
-  if (e.target && e.target.closest && e.target.closest('.dp-panel')) return
+  if (e.target && e.target.closest && e.target.closest('.dp-panel, #pauseButton')) return
   if (e.button === 0) { startClickHoldPose('chp'); startCustomHoldFunctions('Click+Hold') }
   else if (e.button === 2) { startClickHoldPose('rchp'); startCustomHoldFunctions('Right Click+Hold') }
 })
@@ -6902,7 +6932,7 @@ function customFunctionsNeedClickChain() {
 let clickPoseClickCount = 0
 let clickPoseClickTimer = null
 window.addEventListener('pointerup', (e) => {
-  if (e.target && e.target.closest && e.target.closest('.dp-panel')) return
+  if (e.target && e.target.closest && e.target.closest('.dp-panel, #pauseButton')) return
   if (e.button !== 0) return
   // This exact pointerup was releasing a Click-Hold-Pose hold, not a
   // standalone click -- see lastPointerupWasHoldRelease's own comment
@@ -6956,7 +6986,7 @@ window.addEventListener('pointerup', (e) => {
 // (set just above, in the SAME pointerup listener endClickHoldPose('rchp')
 // already uses, so it's always current by the time this one runs).
 window.addEventListener('pointerup', (e) => {
-  if (e.target && e.target.closest && e.target.closest('.dp-panel')) return
+  if (e.target && e.target.closest && e.target.closest('.dp-panel, #pauseButton')) return
   if (e.button !== 2) return
   if (lastPointerupWasRchpHoldRelease) return
   triggerClickPose('rc')
@@ -7021,7 +7051,7 @@ let clickHoldChainActiveKey = null
 // unaffected by this chain).
 let clickHoldChainActiveOrdinal = 0
 window.addEventListener('pointerdown', (e) => {
-  if (e.target && e.target.closest && e.target.closest('.dp-panel')) return
+  if (e.target && e.target.closest && e.target.closest('.dp-panel, #pauseButton')) return
   if (e.button !== 0) return
   const now = performance.now()
   if (now - clickHoldChainLastCleanUpTime <= cfg.multiClickWindowMs) {
@@ -8087,7 +8117,7 @@ function endCustomHoldFunctions(type, ordinal = 1) {
 // (a deliberate "repeat rate," not a one-shot-per-page-load limit).
 let scrollTriggerTimer = null
 window.addEventListener('wheel', (e) => {
-  if (e.target && e.target.closest && e.target.closest('.dp-panel')) return
+  if (e.target && e.target.closest && e.target.closest('.dp-panel, #pauseButton')) return
   if (scrollTriggerTimer) return
   triggerCustomPoseFunctions('Scroll')
   scrollTriggerTimer = setTimeout(() => { scrollTriggerTimer = null }, cfg.multiClickWindowMs)
@@ -8961,7 +8991,65 @@ function setPaused(v) {
   if (v === isPaused) return
   if (v) { isPaused = true; pausedAtMs = performance.now() }
   else { pauseOffsetMs += performance.now() - pausedAtMs; isPaused = false }
+  // Keeps BOTH triggers of this same state in sync regardless of which
+  // one was clicked -- the dev panel's own pre-existing PAUSE/RESUME
+  // button (Debug group) and the new always-visible #pauseButton
+  // (direct request, "*DC*Pause Button*") share this one setPaused()
+  // call, so either one's own click correctly updates the other's
+  // displayed icon/label too.
+  updatePauseButtonIcon()
 }
+// Always-visible Global Pause button (direct request -- "add a small
+// pause button icon... at any time... does not trigger any cursor
+// tracking or tweening functions"). The button itself is plain static
+// markup in index.html (#pauseButton), NOT built through the DEV_MODE-
+// gated devPanel.js panel, since every visitor needs it, not just a
+// `?dev=1` one -- this is why its own click handler is wired here,
+// unconditionally, rather than via a DEV_GROUPS onClick. Excluded from
+// every click-hold-pose/click-pose/click-count-chain gesture listener
+// via `.closest('.dp-panel, #pauseButton')` (see those listeners' own
+// guard, main.js) -- clicking it only ever calls setPaused(), never a
+// cursor-tracking-driven pose/tween trigger.
+function updatePauseButtonIcon() {
+  const btn = document.getElementById('pauseButton')
+  if (!btn) return
+  btn.textContent = isPaused ? '▶' : '⏸' // ▶ (resume) / ⏸ (pause)
+  const label = isPaused ? 'Resume' : 'Pause'
+  btn.title = label
+  btn.setAttribute('aria-label', label)
+}
+// Applies the "Pause Button" dev-panel group's own position/size/color
+// settings to the real #pauseButton element -- called once at startup
+// (for EVERY visitor, not just DEV_MODE, since cfg is already restored
+// by then regardless -- see its own call site right after onRestore)
+// and again on every one of that group's own control onChange calls.
+function applyPauseButtonStyle() {
+  const btn = document.getElementById('pauseButton')
+  if (!btn) return
+  btn.style.left = (cfg.pauseBtnXOffset ?? 12) + 'px'
+  btn.style.top = (cfg.pauseBtnYOffset ?? 12) + 'px'
+  btn.style.width = (cfg.pauseBtnSize ?? 40) + 'px'
+  btn.style.height = (cfg.pauseBtnSize ?? 40) + 'px'
+  btn.style.fontSize = (cfg.pauseBtnIconSize ?? 18) + 'px'
+  btn.style.borderRadius = (cfg.pauseBtnCornerRadius ?? 6) + 'px'
+  btn.style.borderWidth = (cfg.pauseBtnBorderThickness ?? 1) + 'px'
+  btn.style.borderStyle = 'solid'
+  btn.style.borderColor = cfg.pauseBtnBorderColor || '#ffffff'
+  btn.style.background = cfg.pauseBtnBgColor || '#000000'
+  btn.style.color = cfg.pauseBtnIconColor || '#ffffff'
+  btn.style.opacity = (cfg.pauseBtnOpacity ?? 100) / 100
+}
+function setupPauseButton() {
+  const btn = document.getElementById('pauseButton')
+  if (!btn) return
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation()
+    setPaused(!isPaused)
+  })
+  applyPauseButtonStyle()
+  updatePauseButtonIcon()
+}
+setupPauseButton()
 // The Pose Preview panel's own "Run" button (Saved Tween Sequences list-
 // picker, direct request) -- plays the resolved named-pose sequence on
 // the PREVIEW hand only (never the field), paced by the Tween group's own
