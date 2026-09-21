@@ -302,6 +302,13 @@ html, body {
    it stacks independently with any host-applied inline `display:none`
    rather than overwriting it either way. */
 .dp-row-device-hidden { display: none !important; }
+/* Direct request 2026-09-20 ("every settings group... to have their own
+   checkbox... Only when this checkbox is checked, will that setting
+   group or setting be visible") -- matching CLICKO's own
+   refreshEmptyGroupVisibility(). Toggled by devPanel.js's own
+   refreshEmptyGroupVisibility() the instant a group has no visible rows
+   or subgroups left on Mobile/Landscape; never touched directly. */
+.dp-group-hidden-empty { display: none !important; }
 /* Direct request: "the 2nd checkbox (the one which regards mobile desktop
    sync) should be right aligned within the dev panel so they are always on
    the right edge." Every row's control width varies (a slider vs. a select

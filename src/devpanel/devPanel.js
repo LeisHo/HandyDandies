@@ -107,6 +107,36 @@ function findCtrl(key) {
   return null
 }
 
+// Direct request 2026-09-20 ("I want every settings group (and
+// independent settings) to have their own checkbox... Look at
+// ClickoDicko/Clicko - they do it right"). CLICKO's own dev panel makes
+// its "Show in Mobile/Landscape" system UNIVERSAL -- every row gets it
+// automatically, not opt-in per control (see its own
+// injectRowDeviceCheckboxes()). This project's `dynamicDevice` used to
+// be a plain opt-in flag (`c.dynamicDevice = true`, set by
+// withDynamicDevice() only on the control arrays that asked for it --
+// Field Layout/Camera/Lighting/etc. never got it at all, which is
+// exactly the gap the user reported: "If i uncheck a box in desktop
+// tab, the settings group is still visible... in the mobile and
+// landscape tab" for groups this checkbox never existed on in the
+// first place). `isDynamicDeviceCtrl()` flips this to a DEFAULT: any
+// control is dynamicDevice-eligible UNLESS it's `perDevice` (a
+// genuinely different, pre-existing, incompatible concept -- fully
+// independent per-device values, no "mirror unless independent"
+// semantics) or one of the 4 types that never rendered this checkbox
+// (text/list-picker/multi-select/button, same exclusion buildRow()
+// already applied) or explicitly opted out via `dynamicDevice: false`
+// (an escape hatch, not currently used by any control, kept for a
+// future one that genuinely needs to be exempt). Every one of this
+// function's 4 call sites (commit(), buildRow(), the group-cascade
+// descendant walk, refreshRowDisplaysForEditingTab()) reads this
+// instead of the raw `ctrl.dynamicDevice` flag now.
+const NO_DYNAMIC_DEVICE_TYPES = ['text', 'list-picker', 'multi-select', 'button']
+function isDynamicDeviceCtrl(ctrl) {
+  if (ctrl.perDevice) return false
+  if (NO_DYNAMIC_DEVICE_TYPES.includes(ctrl.type)) return false
+  return ctrl.dynamicDevice !== false
+}
 function isDevRowVisible(key) { return devVisibility[key] !== false }
 // Category-aware default (added 2026-09-17, matching the template's own
 // "UNIVERSAL" correction the same day): when nothing's been explicitly
@@ -130,7 +160,7 @@ const otherDynamicDeviceTab = (tab) => (tab === 'mobile' ? 'landscape' : 'mobile
 // shared) and, only when the change is actually visible on the CURRENT real
 // device, updates the live `cfg` and fires the control's onChange.
 function commit(ctrl, v) {
-  if (ctrl.dynamicDevice) {
+  if (isDynamicDeviceCtrl(ctrl)) {
     // §12f-1: no separate per-device DOM rows to mirror between (unlike
     // the template) -- store[d][key] IS the single source of truth for
     // device `d`, so "mirror" here just means writing the SAME value
@@ -912,7 +942,7 @@ export function buildRow(ctrl) {
   // called from refreshRowDisplaysForEditingTab() -- both checkboxes
   // always exist in this row's DOM regardless of tab, since this project
   // has one row per control, not 3.
-  if (ctrl.dynamicDevice && !['text', 'list-picker', 'multi-select', 'button'].includes(ctrl.type)) {
+  if (isDynamicDeviceCtrl(ctrl)) {
     const visCheckbox = el('input', 'dp-dynamic-device-checkbox', { type: 'checkbox', title: 'Show in Mobile/Landscape' })
     visCheckbox.addEventListener('click', (e) => e.stopPropagation())
     visCheckbox.addEventListener('change', () => {
@@ -1476,7 +1506,7 @@ function dockAllUndockedGroups() {
 function forEachDynamicDeviceDescendant(g, fn) {
   g.querySelectorAll(':scope .dp-row[data-key]').forEach((row) => {
     const ctrl = findCtrl(row.dataset.key)
-    if (ctrl && ctrl.dynamicDevice) fn(ctrl)
+    if (ctrl && isDynamicDeviceCtrl(ctrl)) fn(ctrl)
   })
 }
 // Recomputes one group's own 2 cascade checkboxes: visible only if it has
@@ -2162,7 +2192,7 @@ function applyStoredValues(values) {
 
 function refreshRowDisplaysForEditingTab() {
   devGroups.forEach((group) => group.controls.forEach((ctrl) => {
-    if (ctrl.dynamicDevice) {
+    if (isDynamicDeviceCtrl(ctrl)) {
       const showing = editingDevice === 'desktop' || isDevRowIndependent(editingDevice, ctrl)
       const v = showing ? store[editingDevice][ctrl.key] : store.desktop[ctrl.key]
       if (v !== undefined) displayValue(ctrl, v)
@@ -2173,6 +2203,46 @@ function refreshRowDisplaysForEditingTab() {
     if (v !== undefined) displayValue(ctrl, v)
   }))
   document.querySelectorAll('.dp-group').forEach(refreshGroupCascadeChrome)
+  refreshEmptyGroupVisibility()
+}
+// Direct request 2026-09-20, matching CLICKO's own refreshEmptyGroupVisibility()
+// ("for Plan 1... reference ClickoDicko/Clicko. they do it right") --
+// auto-hides an ENTIRE group (any nesting depth) the instant none of its
+// own rows or subgroups are visible on Mobile/Landscape any more, so
+// unchecking every setting in a group (individually, or in one shot via
+// the group's own "Show in Mobile/Landscape (whole group)" cascade
+// checkbox) genuinely removes the group itself -- not just leaves an
+// empty, still-visible shell. No separate persisted per-group flag
+// needed: visibility is COMPUTED fresh from the live DOM every refresh,
+// same as CLICKO's own version, so it stays correct through drag-
+// reordering/renaming without any extra bookkeeping. Depth-sorted
+// deepest-first (same technique refreshAllGroupCascadeCheckboxes()-
+// equivalents use elsewhere in this file) so a parent's own "any visible
+// child" check always sees its children's ALREADY-current hidden state,
+// never a stale one from earlier in the same pass. Toggles a CSS class
+// (`.dp-group-hidden-empty`), never `style.display` directly -- the
+// exact clobbering bug already fixed once this same day for rows
+// (`.dp-row-device-hidden`) would reproduce identically at the group
+// level if this used inline styles instead.
+function refreshEmptyGroupVisibility() {
+  if (editingDevice === 'desktop') {
+    document.querySelectorAll('.dp-group.dp-group-hidden-empty').forEach((g) => g.classList.remove('dp-group-hidden-empty'))
+    return
+  }
+  const groupDepth = (g) => {
+    let d = 0; let cur = g.parentElement
+    while (cur) { if (cur.classList && cur.classList.contains('dp-group')) d++; cur = cur.parentElement }
+    return d
+  }
+  Array.from(document.querySelectorAll('.dp-group'))
+    .sort((a, b) => groupDepth(b) - groupDepth(a))
+    .forEach((g) => {
+      const body = g.querySelector(':scope > .dp-group-body')
+      if (!body) return
+      const hasVisibleRow = !!Array.from(body.children).find((child) => child.classList.contains('dp-row') && !child.classList.contains('dp-row-device-hidden'))
+      const hasVisibleSubgroup = !!Array.from(body.children).find((child) => child.classList.contains('dp-group') && !child.classList.contains('dp-group-hidden-empty'))
+      g.classList.toggle('dp-group-hidden-empty', !hasVisibleRow && !hasVisibleSubgroup)
+    })
 }
 
 // Shows/hides a dynamicDevice row entirely (Mobile/Landscape only, when
