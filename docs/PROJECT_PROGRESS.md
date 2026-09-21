@@ -18,6 +18,21 @@ work seamlessly from there.
 
 ## Currently working on
 
+**SHIPPED 2026-09-21 (18th follow-up round) -- always-visible Global
+Pause button, top-left corner.** The pause/resume mechanism itself
+already existed (built earlier as a Debug-group dev-only button) --
+this added the real, permanent `#pauseButton` trigger (static
+index.html markup, not DEV_MODE-gated) wired to that same `setPaused()`
+call, excluded from every gesture-detection listener so clicking it
+never triggers a pose/tween. New "Pause Button" dev-panel group
+(position/size perDevice, colors/border/opacity shared) via
+`*DC*Pause Button*`. **Live-verified end-to-end on the real production
+URL** (this sandbox's local server couldn't serve main.js at all this
+round -- 5/5 attempts failed, file now consistently exceeds the
+sandbox's fixed truncation cutoff): correct position/size/colors, icon
+toggles ⏸/▶ correctly in both directions on real clicks, zero console
+errors. See CHANGELOG.txt's matching entry for the full account.
+
 **SHIPPED 2026-09-20 (later same day, 16th follow-up round) -- fixed
 the row-level "Show in Mobile/Landscape" checkbox alignment** (same bug
 class as the earlier group-header fix, just the per-setting-row

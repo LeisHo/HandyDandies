@@ -10460,6 +10460,67 @@ visible.
 --------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
+--------------------------------------------------------------------------------
+2026-09-21 (18th follow-up round)
+
+Added an always-visible Global Pause button (top-left corner, direct
+request: "add a small pause button icon. Users can click it at any time
+to pause the entire animation and tweens... make sure clicking it does
+not trigger any cursor tracking or tweening functions. Provide the
+necessary settings in *DC*Pause Button*"), confirmed mid-implementation
+it must render outside DEV_MODE too ("the pause button should show in
+non dev mode as well" -- already the plan, since it's static index.html
+markup, not built through the DEV_MODE-gated devPanel.js panel).
+
+The pause/resume MECHANISM already existed in full -- `isPaused`/
+`pauseOffsetMs`/`pausedAtMs`/`nowVirtual()`/`setPaused()`, built earlier
+this same day as a Debug-group-only dev button (see `setPaused()`'s own
+declaration comment for the "virtual clock" reasoning that makes a
+resume continue exactly where it left off). This round only added the
+real, permanent trigger: `#pauseButton` (index.html, static markup, not
+gated by DEV_MODE at all) wired via `setupPauseButton()` (main.js) to
+the SAME `setPaused()` call the existing dev-only button already used.
+`setPaused()` itself now also calls the new `updatePauseButtonIcon()`,
+so both triggers of this one shared state stay in sync regardless of
+which is clicked.
+
+Excluded from every click-hold-pose/click-pose/click-count-chain
+gesture listener (all 5 occurrences of the `.closest('.dp-panel')`
+guard, now `.closest('.dp-panel, #pauseButton')`) so clicking it can
+never register as a cursor-tracking-driven pose/tween trigger -- the
+exact requirement ("does not trigger any cursor tracking or tweening
+functions").
+
+New "Pause Button" dev-panel group per `*DC*Pause Button*`: X/Y Offset,
+Button Size, Icon Size (all `perDevice: true` -- a fixed px position/
+size rarely translates directly between desktop and mobile, same
+reasoning already applied to Camera/Field Layout), plus Corner Radius,
+Border Thickness, Opacity, and 3 colors (Background/Icon/Border, all
+shared). `applyPauseButtonStyle()` applies these live to the real
+element -- called once at startup (default values, every visitor) and
+again once real restored values arrive via each control's own
+`onChange` (confirmed by direct source read: `applyStoredValues()`
+already fires `onChange` per control with a real value, unlike
+`syncValue()`).
+
+**Verification gap during local testing, fully resolved via production
+instead:** this sandbox's local static server could not serve
+`main.js` AT ALL this round (5/5 attempts failed) -- the real file
+(619,013 bytes) now consistently exceeds the sandbox's own fixed
+587,520-byte truncation cutoff on every single attempt, not just
+intermittently as in earlier rounds; confirmed via `curl`, not a code
+error. Rather than ship on `node --check` alone, pushed and verified
+directly against the real production URL instead (already established
+this session as unaffected by this specific sandbox limitation): button
+renders at the correct position/size/colors, icon reads "⏸"/title
+"Pause" initially, a real click toggles to "▶"/"Resume" with zero
+console errors, a second click toggles back -- confirmed in both
+directions. `index.html`, `src/style.css` (`?v=20`->`?v=21`), and
+`src/main.js` (`?v=197`->`?v=198`) all touched.
+
+--------------------------------------------------------------------------------
+<next entry follows the same divider + dated-header pattern>
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a
