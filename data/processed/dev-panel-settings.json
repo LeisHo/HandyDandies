@@ -13605,7 +13605,7 @@
       "pauseBtnBorderColor": "#ffffff",
       "pausedRenderFps": 15,
       "fieldRows": 15,
-      "fieldCols": 17,
+      "fieldCols": 3,
       "rowSpacing": 9.5,
       "columnSpacing": 14,
       "handScale": 1.55,
@@ -20117,9 +20117,9 @@
           "group": "FIST ROTATE"
         }
       ],
-      "cameraX": 6.638529594915686,
-      "cameraY": 13.373156794075216,
-      "cameraZ": 259.74194092345493,
+      "cameraX": 6.6385295949156875,
+      "cameraY": 13.37315679407522,
+      "cameraZ": 259.741940923455,
       "cameraFov": 35,
       "cameraZoom": 260.17068872666084,
       "savedCameras": [
@@ -20465,7 +20465,7 @@
     },
     {
       "key": "Dev Panel",
-      "collapsed": false,
+      "collapsed": true,
       "locked": false,
       "items": [
         {
@@ -21861,7 +21861,7 @@
     },
     {
       "key": "Field Layout",
-      "collapsed": false,
+      "collapsed": true,
       "locked": false,
       "items": [
         {
@@ -21916,7 +21916,7 @@
     },
     {
       "key": "Cursor Tracking",
-      "collapsed": true,
+      "collapsed": false,
       "locked": false,
       "items": [
         {
