@@ -85,9 +85,29 @@ function savedStatesKey() { return `${storageKeyPrefix}.devSavedStates` }
 // if it's currently taller than wide (portrait), Landscape if wider than
 // tall. A screen where even the shorter dimension is >=768px is Desktop
 // regardless of aspect ratio.
+//
+// CORRECTED 2026-09-21 -- the pure-dimension version above misclassified a
+// perfectly ordinary desktop browser window as Landscape the instant its
+// height dropped under 768px (a non-maximized window, a laptop screen with
+// browser chrome eating vertical space, a 1280x720-class viewport -- all
+// completely normal on a mouse-driven desktop, none of them a phone/tablet).
+// Confirmed live on the real Vercel deployment at a plain 1280x720 desktop
+// viewport: `document.documentElement.clientWidth/clientHeight` read a
+// correct, real 1280x720 (not a misread), yet the Landscape tab showed
+// active -- because 720 < 768 tripped the old threshold on a real desktop.
+// Mobile/Landscape should mean an actual touch-oriented device, not merely
+// "a window that happens to be short" -- gate on touch/coarse-pointer
+// capability first, and only fall through to the dimension-based
+// orientation call for a device that's actually touch-capable. A mouse-
+// driven desktop now stays 'desktop' regardless of window height; a real
+// phone/tablet (touch-capable, under the breakpoint) still gets Mobile vs.
+// Landscape exactly as before.
+function isTouchCapableDevice() {
+  return (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) || navigator.maxTouchPoints > 0
+}
 function realDeviceClass() {
   const w = window.innerWidth, h = window.innerHeight
-  if (Math.min(w, h) >= 768) return 'desktop'
+  if (!isTouchCapableDevice() || Math.min(w, h) >= 768) return 'desktop'
   return w > h ? 'landscape' : 'mobile'
 }
 function currentGeomKey() { return geomKeyPrefix() + realDeviceClass() }

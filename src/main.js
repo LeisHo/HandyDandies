@@ -6,7 +6,7 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js'
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js'
 import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js'
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js'
-import { initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement } from './devpanel/devPanel.js?v=39'
+import { initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement } from './devpanel/devPanel.js?v=40'
 
 // A defensive wrapper around devPanel.js's own refreshSelectOptions() --
 // found via live testing (direct user report: "I dont see any of the
@@ -453,7 +453,14 @@ const DEV_GROUPS = [
       { key: 'pauseBtnOpacity', label: 'Opacity (%)', type: 'slider', min: 10, max: 100, step: 1, def: 100, onChange: () => applyPauseButtonStyle() },
       { key: 'pauseBtnBgColor', label: 'Background Color', type: 'color', def: '#000000', onChange: () => applyPauseButtonStyle() },
       { key: 'pauseBtnIconColor', label: 'Icon Color', type: 'color', def: '#ffffff', onChange: () => applyPauseButtonStyle() },
-      { key: 'pauseBtnBorderColor', label: 'Border Color', type: 'color', def: '#ffffff', onChange: () => applyPauseButtonStyle() }
+      { key: 'pauseBtnBorderColor', label: 'Border Color', type: 'color', def: '#ffffff', onChange: () => applyPauseButtonStyle() },
+      // PERFORMANCE (2026-09-21) -- see animate()'s own composer.render()
+      // gate for the full account: while paused, nothing is animating, so
+      // redrawing at full display refresh rate is pure wasted GPU/main-
+      // thread cost that was making the dev panel feel slow. This throttles
+      // the render rate while paused instead of skipping it outright, so a
+      // dev-panel-driven visual change still appears within one interval.
+      { key: 'pausedRenderFps', label: 'Paused Render Rate (Fps)', type: 'slider', min: 1, max: 60, step: 1, def: 15 }
     ]
   },
   {
@@ -9043,11 +9050,15 @@ window.addEventListener('resize', () => applyRendererSize(window.innerWidth, win
 let isPaused = false
 let pauseOffsetMs = 0
 let pausedAtMs = 0
+// Paused-render throttle's own "last actually rendered" timestamp -- see
+// animate()'s own composer.render() gate, right after updateRenderOrder().
+let lastPausedRenderMs = 0
 function nowVirtual() { return performance.now() - pauseOffsetMs }
 function setPaused(v) {
   if (v === isPaused) return
   if (v) { isPaused = true; pausedAtMs = performance.now() }
   else { pauseOffsetMs += performance.now() - pausedAtMs; isPaused = false }
+  lastPausedRenderMs = 0 // force an immediate render on the very next frame after any pause/resume toggle
   // Keeps BOTH triggers of this same state in sync regardless of which
   // one was clicked -- the dev panel's own pre-existing PAUSE/RESUME
   // button (Debug group) and the new always-visible #pauseButton
@@ -9357,10 +9368,37 @@ function animate() {
       updateRenderOrder()
       __frameProfiler.updateRenderOrderMs += performance.now() - __uroStart
     }
-    const __renderStart = performance.now()
-    composer.render()
-    __frameProfiler.composerRenderMs += performance.now() - __renderStart
-    __frameProfiler.frames++
+    // PERFORMANCE (2026-09-21, direct report: "even when i ahve the
+    // animtion/3js poses paused... it is still very slow when i try to
+    // use the dev panel"): Global Pause already skips updateRenderOrder()
+    // above, but composer.render() itself -- the actual GPU draw call for
+    // every hand mesh plus the OutlinePass -- ran completely unthrottled,
+    // every single requestAnimationFrame tick, regardless of pause. With a
+    // large field this is the dominant per-frame cost (confirmed by the
+    // frame-profiler log just below, which already measures
+    // avgComposerRender specifically), and since JS is single-threaded, a
+    // slow render() call competes directly with dev-panel input handling
+    // for main-thread time -- matches the user's own observation exactly
+    // (zooming in, which frustum-culls hands out of view and renders
+    // fewer of them, measurably speeds the panel back up). While paused,
+    // nothing is animating, so there is no need to redraw at full display
+    // refresh rate -- throttled to `cfg.pausedRenderFps` (Pause Button
+    // group) instead of skipped outright, so any dev-panel-driven visual
+    // change (a color/lighting/material slider) still appears within one
+    // throttle interval (default 1000/15 ~= 67ms -- imperceptible lag for
+    // a value a human is dragging, nowhere close to "stale forever").
+    // controls.update()/panel-sync above are NOT throttled -- camera
+    // orbit/pan/zoom stays responsive even while paused.
+    const __nowForRender = performance.now()
+    const __pausedRenderIntervalMs = 1000 / Math.max(1, cfg.pausedRenderFps ?? 15)
+    const __shouldRenderThisFrame = !isPaused || (__nowForRender - lastPausedRenderMs) >= __pausedRenderIntervalMs
+    if (__shouldRenderThisFrame) {
+      if (isPaused) lastPausedRenderMs = __nowForRender
+      const __renderStart = performance.now()
+      composer.render()
+      __frameProfiler.composerRenderMs += performance.now() - __renderStart
+      __frameProfiler.frames++
+    }
     {
       const elapsed = performance.now() - __frameProfiler.windowStart
       if (elapsed >= 1000) {
