@@ -306,14 +306,23 @@ html, body {
    sync) should be right aligned within the dev panel so they are always on
    the right edge." Every row's control width varies (a slider vs. a select
    vs. a checkbox), so the 2 dynamicDevice checkboxes previously landed at a
-   different horizontal position on every row -- margin-left:auto on just
-   the 2ND checkbox (Independent from Desktop) consumes the row's own
-   leftover flex space, pinning it (and the group-header's lock icon, which
-   sits right after its own group-level counterpart) to the row/header's
-   right edge consistently, while the 1st checkbox (Show in Mobile/
-   Landscape) stays in its natural position right after the row's own
-   control. */
-.dp-dynamic-device-checkbox-2nd { margin-left: auto; }
+   different horizontal position on every row.
+   CORRECTED 2026-09-20 (direct report: "the 'Show in Mobile/Landscape'
+   checkbox for settings still isnt aligned to the right edge... like it
+   is in Mobile tab") -- this rule originally only gave the auto-margin to
+   the 2ND checkbox (Independent from Desktop), leaving the 1ST (Show in
+   Mobile/Landscape, the one actually visible on Desktop) to sit in its
+   natural position right after the row's own control -- which happened
+   to LOOK right-aligned on a wide row (a slider/select whose own content
+   fills most of the row) purely by coincidence of leftover space, but
+   sat nowhere near the edge on a narrow row (a plain checkbox control).
+   Same class of bug as the group-header cascade checkbox fix earlier
+   this same day (CLAUDE.md's own matching CHANGELOG entry) -- unscoped
+   from `-2nd` so BOTH checkboxes get the real auto-margin push; only one
+   is ever actually rendered per row (the other is `display:none`), so
+   whichever is showing gets pushed flush to the row's own right edge
+   reliably, not just by accident of content width. */
+.dp-dynamic-device-checkbox { margin-left: auto; }
 /* "Mandatory gated subgroup" (Offset/Rotation/Animation Speed Curve/Start
    Time Curve/Retransition) -- direct request: "checkbox within its
    label." main.js's own wrapGatedSubgroup() moves the cluster's own
