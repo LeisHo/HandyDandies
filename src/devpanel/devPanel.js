@@ -200,11 +200,28 @@ function commit(ctrl, v) {
       const other = otherDynamicDeviceTab(editingDevice)
       if (!isDevRowIndependent(other, ctrl)) store[other][ctrl.key] = v
     }
-    // The value that just genuinely changed lives on 'desktop' unless
-    // this edit was independent -- onChange/cfg should only fire when
-    // THAT device is the one actually running live right now.
-    const changedOn = (editingDevice !== 'desktop' && isDevRowIndependent(editingDevice, ctrl)) ? editingDevice : 'desktop'
-    if (changedOn === realDeviceClass()) {
+    // onChange/cfg should only fire when the write above actually landed
+    // in the REAL device's own store slot -- checked directly (did
+    // store[realDeviceClass()] end up holding the value we just wrote),
+    // not via a hardcoded "'desktop' unless independent" guess. CORRECTED
+    // 2026-09-21 (direct report: "when I open the app in a mobile phone
+    // ... change the mode to sequence, the [Sequence] drop down ... is
+    // not available" -- the target device really was mobile, editing its
+    // OWN Mode select on its OWN Mobile tab). The old `changedOn` guess
+    // only ever resolved to 'desktop' for a non-independent control
+    // (matching realDeviceClass() only on an actual desktop machine) or
+    // to `editingDevice` for an independent one -- so a REAL mobile
+    // phone, sitting on its own native Mobile tab, editing a MIRRORED
+    // (non-independent) control, always failed this check (`'desktop' ===
+    // 'mobile'` is false) even though `store.mobile[key]` was correctly
+    // written to `v` two lines above -- silently skipping `cfg`/onChange`
+    // (e.g. Mode's own onChange, which is what actually toggles Target
+    // Pose vs. Sequence-selector row visibility) despite the value being
+    // saved correctly. The direct check below is correct for every branch
+    // above by construction: it doesn't matter WHICH branch ran, only
+    // whether the real device's own slot ended up holding `v`.
+    const real = realDeviceClass()
+    if (store[real][ctrl.key] === v) {
       cfg[ctrl.key] = v
       if (ctrl.onChange) ctrl.onChange(v)
     }
