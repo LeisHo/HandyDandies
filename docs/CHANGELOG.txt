@@ -10521,6 +10521,55 @@ directions. `index.html`, `src/style.css` (`?v=20`->`?v=21`), and
 --------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
+--------------------------------------------------------------------------------
+2026-09-21 (19th follow-up round)
+
+Added Toon Shading Save/Import/Export, matching HANDO's own newly-added
+feature ("We have added a save and export function to the Toon Shading
+[in HANDO]. Add an import and export function to ours to accept that
+data"). Confirmed the exact export shape via a directly pasted sample
+(name + 10 fields) -- a 1:1 match with this project's own existing
+Toon Shading cfg keys, so unlike the Camera/Lighting HANDO imports
+already in this file, NO coordinate-frame conversion was needed at all.
+
+New `savedToon` list-picker (Toon Shading group) with BOTH `exportable`
+and `importable` set -- the request explicitly asked for both
+directions, unlike every other picker in this file (which only ever
+imports FROM Hando, never exports back). New `TOON_PRESET_KEYS`/
+`captureToonPreset()`/`useToonPreset()`, ported directly from HANDO's
+own identically-named/identically-reasoned functions: `useToonPreset()`
+applies via cfg + `syncValue()` (onChange deliberately skipped, same
+external-update convention as `syncCfgAndSlidersFromPose()`) then
+manually re-runs the same real visual side effects each slider's own
+onChange would have (`forEachToonMaterial()`/`setToonUniform()` x4/
+`rebuildGradientMap()`), since Toon Shading has no single shared
+"apply" function to reuse -- matching HANDO's own stated reasoning for
+doing the same.
+
+**Live-verified end-to-end on production with real interaction**, not
+just `node --check` -- this sandbox's local server is now unable to
+serve `main.js` at all (confirmed the established pattern from the
+prior round), so verification went straight to the deployed site.
+Worked around 2 real sandbox limitations rather than skipping
+verification: `navigator.clipboard.writeText/readText` are both
+permission-denied in this automated browser context, and the Save
+button's native `prompt()` dialog doesn't get a real answer here
+either. Monkey-patched `navigator.clipboard.writeText` (to capture what
+Export would have copied) and `window.prompt` (to feed Import its
+fallback-path text, the same fallback the real code already takes on a
+clipboard-read failure -- not a test-only code path) directly in the
+live page's own console context. Confirmed: Import correctly parsed
+the user's own exact pasted JSON and added "2 TONE " to the list;
+selecting it and clicking Use correctly set `cfg.toonSteps/
+toonStepThreshold/toonShadowFloor/toonLightCeiling/rimPower` etc. to
+the imported values exactly; Export (with that item checked) produced
+JSON byte-for-byte identical in shape to the original pasted sample --
+confirming genuine round-trip compatibility with HANDO's own format in
+both directions. `main.js` bumped `?v=198`->`?v=199`.
+
+--------------------------------------------------------------------------------
+<next entry follows the same divider + dated-header pattern>
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

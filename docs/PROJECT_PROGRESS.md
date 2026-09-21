@@ -18,6 +18,25 @@ work seamlessly from there.
 
 ## Currently working on
 
+**SHIPPED 2026-09-21 (19th follow-up round) -- Toon Shading Save/
+Import/Export, matching HANDO's own newly-added feature.** New
+`savedToon` list-picker (Toon Shading group), both `exportable` and
+`importable` (the request asked for both directions). Field-for-field
+identical to HANDO's own export shape (confirmed via a pasted sample)
+-- no coordinate-frame conversion needed, unlike Camera/Lighting.
+`useToonPreset()` applies via cfg+syncValue() then re-runs the same
+real visual effects each slider's own onChange already calls.
+**Live-verified end-to-end on production with real clicks** (this
+sandbox's local server still can't serve main.js at all): imported the
+user's own exact sample, selected + Used it (cfg values matched
+exactly), exported it back out (byte-for-byte identical shape to the
+original) -- confirmed genuine round-trip compatibility with HANDO in
+both directions. Worked around 2 sandbox limitations (clipboard
+permission denied, native prompt() unanswerable) by monkey-patching
+both in the live page itself, using the SAME fallback code path the
+real app already has for a clipboard-read failure, not a test-only
+shortcut. See CHANGELOG.txt's matching entry for the full account.
+
 **SHIPPED 2026-09-21 (18th follow-up round) -- always-visible Global
 Pause button, top-left corner.** The pause/resume mechanism itself
 already existed (built earlier as a Debug-group dev-only button) --
