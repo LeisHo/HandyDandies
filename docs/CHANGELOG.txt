@@ -10568,6 +10568,75 @@ confirming genuine round-trip compatibility with HANDO's own format in
 both directions. `main.js` bumped `?v=198`->`?v=199`.
 
 --------------------------------------------------------------------------------
+
+2026-09-21 (20th follow-up round)
+
+Three direct bug reports, investigated and fixed/resolved in one round:
+
+1. "Click functions don't trigger" -- investigated via the actual saved
+   settings (`data/processed/dev-panel-settings.json`), not just the
+   code: all 3 real custom functions had no pose/sequence actually
+   selected -- `custom3`/`custom6` are Mode="Single Pose" with
+   `TargetPose: ""`, `custom4` is Mode="Sequence" with
+   `TweenSelector: ""` (it has `TargetPose: "Clockwise Fan - 1"` set,
+   but that field is unused in Sequence mode -- likely set before
+   switching Mode, then never filled in on the Sequence dropdown
+   afterward). The trigger/dispatch code (`triggerCustomPoseFunctions`,
+   `getOrInitHandCP`, the `CLICK_POSE_KEYS.forEach` consumer in
+   `updateRenderOrder()`) traced out clean end-to-end -- not a code
+   bug, reported back to the user as a configuration gap to fill in via
+   the dev panel.
+
+2. Desktop defaulting to the Landscape tab in dev mode on Vercel --
+   `realDeviceClass()` (devPanel.js) only counted a viewport as Desktop
+   when `Math.min(w,h) >= 768`; a perfectly ordinary non-maximized
+   desktop browser window (or a laptop screen with browser chrome
+   eating vertical space) routinely has height under 768px, so it fell
+   through to the orientation check and picked Landscape. Reproduced
+   live on the real Vercel deployment at a plain 1280x720 viewport
+   before touching any code. Fixed by gating Mobile/Landscape
+   classification on actual touch capability (`matchMedia('(pointer:
+   coarse)')` / `navigator.maxTouchPoints`) first -- a mouse-driven
+   desktop now always classifies as Desktop regardless of window
+   height; a real touch device is unaffected. Live-verified on
+   production at 2 different viewports (a narrow non-touch width, and
+   the exact 1280x720 repro) -- Desktop tab active both times.
+
+3. "Desktop is very slow, even with animation/poses paused" --
+   Global Pause already correctly skips `updateRenderOrder()` (the
+   per-hand pose/tween state machine), but `composer.render()` itself
+   -- the actual GPU draw call for every hand mesh plus the OutlinePass
+   -- ran completely unthrottled every requestAnimationFrame tick
+   regardless of pause state. Confirmed via this file's own existing
+   `[frame-profile]` console logging that composer.render() cost scales
+   directly with hand count (avgComposerRender ~12ms at 240 hands vs.
+   ~4-5ms at 48), matching the user's own observation exactly (zooming
+   in, which frustum-culls hands out of view, measurably sped the panel
+   back up). Fixed by throttling composer.render() while paused to a
+   new "Paused Render Rate (Fps)" slider (Pause Button group, default
+   15fps) instead of skipping it outright -- any dev-panel-driven
+   visual change (a color/lighting/material slider) still appears
+   within one throttle interval (~67ms at the default, imperceptible
+   lag), so there's no "stale forever" risk the way a full dirty-flag
+   render-on-demand system would have carried. `controls.update()`
+   stays unthrottled so camera orbit/pan/zoom stays responsive while
+   paused. `setPaused()` resets the throttle's own timestamp on every
+   toggle for a crisp instant response rather than up to one interval
+   of lag on the pause/resume transition itself.
+
+   Live-verified on production via the existing frame-profile log:
+   paused, `avgUpdateRenderOrder` dropped to 0.00ms (correctly gated)
+   and real render calls landed at exactly `fps=15.0`/14.9/14.0 --
+   matching the new slider's default precisely; unpaused, rate ramped
+   back to 68.3fps (this sandbox's own natural ceiling) with
+   `avgUpdateRenderOrder` non-zero again, confirming the throttle only
+   applies while genuinely paused.
+
+`src/devpanel/devPanel.js` bumped `?v=39`->`?v=40`; `src/main.js`
+bumped `?v=199`->`?v=200` (also updates its own import of devPanel.js
+to match).
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

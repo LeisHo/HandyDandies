@@ -18,6 +18,34 @@ work seamlessly from there.
 
 ## Currently working on
 
+**SHIPPED 2026-09-21 (20th follow-up round) -- 3 direct bug reports
+fixed/resolved: click functions not triggering, Desktop defaulting to
+Landscape tab, and desktop dev-panel slowness even while paused.**
+(1) Click functions: root-caused via the actual saved settings, not
+just the code -- all 3 real custom functions have no pose/sequence
+actually selected (empty `TargetPose`/`TweenSelector`); the trigger
+code itself traced out clean, so this is a configuration gap for the
+user to fill in via the dev panel, not a code bug. (2) Desktop/
+Landscape tab: `realDeviceClass()` (devPanel.js) only counted a
+viewport as Desktop when its shorter dimension was >=768px -- an
+ordinary non-maximized desktop window commonly has height under that,
+so it fell through to Landscape. Reproduced live on production at a
+plain 1280x720 viewport before fixing; now gates Mobile/Landscape on
+actual touch capability first, so a mouse-driven desktop always stays
+Desktop regardless of window height. (3) Performance while paused:
+Global Pause already skipped the per-hand pose/tween state machine, but
+`composer.render()` -- the real GPU draw call, confirmed via this
+file's own `[frame-profile]` logging to scale directly with hand count
+-- ran unthrottled every frame regardless of pause. Now throttled to a
+new "Paused Render Rate (Fps)" slider (Pause Button group, default
+15fps) while paused, instead of skipped outright, so a dev-panel-driven
+visual change still appears within ~67ms. All 3 fixes live-verified on
+production (2 tab-default viewports incl. the exact 1280x720 repro;
+the frame-profile log confirmed exactly 15fps + 0ms updateRenderOrder
+while paused, full rate on resume). `devPanel.js` bumped `?v=39`->
+`?v=40`; `main.js` bumped `?v=199`->`?v=200`. See CHANGELOG.txt's
+matching 20th-round entry for the full account.
+
 **SHIPPED 2026-09-21 (19th follow-up round) -- Toon Shading Save/
 Import/Export, matching HANDO's own newly-added feature.** New
 `savedToon` list-picker (Toon Shading group), both `exportable` and

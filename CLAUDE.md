@@ -828,3 +828,69 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   rests on `node --check` plus direct source-tracing of every hardcoded
   reference to the 10 prefixes, not live interaction. See CHANGELOG.txt's
   matching 2026-09-20 (14th round) entry for the full account.
+- **A custom click function with `Enabled: true` and a correct Type/
+  ClickCount still fires nothing if its own `TargetPose` (Single Pose
+  mode) or `TweenSelector` (Sequence mode) is left blank** -- the whole
+  trigger/dispatch chain (`triggerCustomPoseFunctions()` ->
+  `triggerClickPose()` -> the deferred-claim consumer in
+  `updateRenderOrder()`'s `CLICK_POSE_KEYS.forEach`) runs correctly end
+  to end with nothing to actually resolve into a pose, which is
+  indistinguishable from "clicking does nothing" to the user. Confirmed
+  2026-09-21 directly against real saved data (`data/processed/
+  dev-panel-settings.json`): all 3 of a real user's custom functions had
+  this gap -- 2 Single-Pose-mode functions with `TargetPose: ""`, and
+  1 Sequence-mode function with `TweenSelector: ""` (it DID have a
+  `TargetPose` value set, but that field is Single-Pose-only and
+  unused in Sequence mode -- almost certainly set before the Mode was
+  switched, then never filled in on the Sequence dropdown afterward).
+  Before assuming a "click function doesn't trigger" report is a code
+  bug, check the actual saved `${id}TargetPose`/`${id}TweenSelector`
+  values for that exact function first -- it's a much more common and
+  much cheaper explanation than a dispatch-chain regression, and this
+  round's trace confirmed the dispatch chain itself has no issue.
+- **`composer.render()` (the real GPU draw call for every hand mesh)
+  ran completely unthrottled every `requestAnimationFrame` tick
+  regardless of Global Pause -- only `updateRenderOrder()` (the per-hand
+  pose/tween state machine) was ever gated by `isPaused`.** With a large
+  field this is the dominant per-frame cost (confirmed via this file's
+  own existing `[frame-profile]` console log: avgComposerRender scales
+  directly with hand count, ~12ms at 240 hands vs. ~4-5ms at 48), and
+  since JS is single-threaded, that cost directly competes with dev-
+  panel input handling for main-thread time -- explains a real
+  2026-09-21 report ("even when i have the animation/3js poses paused,
+  it is still very slow when i try to use the dev panel... its much
+  faster when i zoom in (showing less hands)"). Fixed by throttling
+  (not skipping) `composer.render()` while paused, to a new
+  `cfg.pausedRenderFps` slider ("Paused Render Rate (Fps)", Pause
+  Button group, default 15) -- `setPaused()` resets the throttle's own
+  timestamp on every toggle so there's no lag on the pause/resume
+  transition itself. Live-verified via the same frame-profile log:
+  paused, `avgUpdateRenderOrder` dropped to 0.00ms and real renders
+  landed at exactly `fps=15.0`/14.9/14.0; unpaused, ramped back to
+  68.3fps with `avgUpdateRenderOrder` non-zero again. If a future
+  feature adds another expensive per-frame call to `animate()`, check
+  whether it's actually gated by `isPaused` (or by this same throttle)
+  before assuming Global Pause covers it -- the render call itself is
+  the one thing in that function that visibly must keep running
+  regardless of pause (so the frozen scene stays visible at all), which
+  is exactly why it was never gated in the first place and needed a
+  throttle instead of a skip.
+- **`realDeviceClass()` (devPanel.js) used to classify Mobile/Landscape
+  purely from viewport dimensions (`Math.min(w,h) >= 768` => Desktop) --
+  a real, ordinary desktop browser window with height under 768px
+  (non-maximized, a laptop screen with browser chrome eating vertical
+  space, or simply a 1280x720-class window) was misclassified as
+  Landscape.** Confirmed live on the real Vercel deployment at a plain
+  1280x720 viewport, `?dev=1`: `document.documentElement.clientWidth/
+  clientHeight` read a correct, real 1280x720 (not a misread), yet the
+  Landscape tab showed active, purely because 720 < 768. Fixed
+  2026-09-21 by gating Mobile/Landscape on actual touch capability
+  (`matchMedia('(pointer: coarse)')` / `navigator.maxTouchPoints > 0`)
+  first -- a mouse-driven desktop now always classifies Desktop
+  regardless of window height; a real touch device under the breakpoint
+  still gets Mobile vs. Landscape exactly as before. If a future device-
+  classification bug report describes a real desktop showing Mobile/
+  Landscape content, check the ACTUAL viewport height first (not just
+  width) before assuming it's a touch-detection issue -- this exact
+  class of bug is easy to reproduce at any ordinary non-maximized
+  browser window.

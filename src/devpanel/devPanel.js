@@ -2394,14 +2394,39 @@ function getPanelGeometry(panel) {
   return { left: r.left, top: r.top, width: r.width, height: r.height }
 }
 
+// Defensive clamp (2026-09-21, real production incident: "the dev panel
+// isnt shwoing when in dev mode now"). Root cause: a saved geometry is
+// keyed per device class (currentGeomKey() -> realDeviceClass()) and was
+// applied completely unchecked -- a value saved under a key that hadn't
+// been genuinely exercised in a long time (e.g. from an old monitor/
+// resolution, or simply because realDeviceClass()'s own classification
+// bug fix -- see its own comment -- means "desktop" now resolves for a
+// real desktop browser for the first time in a long time, reading a
+// long-stale "desktop"-keyed geometry that was never touched while every
+// real desktop was misclassified as landscape) can position the panel
+// fully off the CURRENT viewport or give it a degenerate size -- both
+// indistinguishable from "the dev panel isn't showing" to a real user,
+// and this exact incident had zero console errors (the field/animate()
+// loop ran completely normally) since nothing here ever throws. Never
+// trust a stored geometry blindly: clamp width/height to sane bounds and
+// left/top so at least a real, grabbable strip of the panel's own title
+// bar always stays on screen, regardless of what viewport the value was
+// originally saved from.
 function applyPanelGeometry(panel, geom) {
   if (!geom) return
+  const vw = window.innerWidth || document.documentElement.clientWidth || 1024
+  const vh = window.innerHeight || document.documentElement.clientHeight || 768
+  const minW = 220, minH = 140, visibleStripPx = 60
+  const width = Math.min(Math.max(geom.width || minW, minW), Math.max(vw - 20, minW))
+  const height = Math.min(Math.max(geom.height || minH, minH), Math.max(vh - 20, minH))
+  const left = Math.min(Math.max(geom.left ?? 0, visibleStripPx - width), vw - visibleStripPx)
+  const top = Math.min(Math.max(geom.top ?? 0, 0), Math.max(vh - visibleStripPx, 0))
   panel.style.right = 'auto'
-  panel.style.left = geom.left + 'px'
-  panel.style.top = geom.top + 'px'
-  panel.style.width = geom.width + 'px'
+  panel.style.left = left + 'px'
+  panel.style.top = top + 'px'
+  panel.style.width = width + 'px'
   panel.style.maxHeight = 'none' // see initResizeHandles' pointerdown for why
-  panel.style.height = geom.height + 'px'
+  panel.style.height = height + 'px'
 }
 
 export function initDevPanel(groups, opts = {}) {
