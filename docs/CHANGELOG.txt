@@ -10637,6 +10637,81 @@ bumped `?v=199`->`?v=200` (also updates its own import of devPanel.js
 to match).
 
 --------------------------------------------------------------------------------
+2026-09-21
+
+Fixed a real engine bug in `devpanel/devPanel.js`'s own `commit()`: a
+`dynamicDevice`-flagged, non-independent (mirrored) control edited from
+its own native tab on a REAL device that isn't literally 'desktop'
+never applied live -- `cfg` never updated and `onChange` never fired,
+even though the value was correctly written into the store. Direct
+report: "when I open the app in a mobile phone... click on the mobile
+tab and... add custom click functions... select a single target pose,
+which is fine. But when I change the mode to sequence, the drop down
+selector for the target sequence is not available or visible and the
+target pose drop down for a single pose still stays," with a mid-turn
+follow-up clarifying it worked correctly from an actual desktop machine
+("the sequence selector is available on the desktop tab, but it needs
+to be also available in the mobile tab").
+
+Root cause: `commit()` computed a hardcoded `changedOn` guess ('desktop'
+unless the edit was on an independent control) and only fired
+`cfg`/`onChange` `if (changedOn === realDeviceClass())`. For a
+non-independent control edited from the Mobile tab, `changedOn` always
+resolved to `'desktop'` regardless of what device you're actually on --
+so a REAL mobile phone (where `editingDevice` defaults to `'mobile'`,
+matching `realDeviceClass()`, on page load) editing a shared/mirrored
+control on its own native Mobile tab always failed `'desktop' ===
+'mobile'`, silently skipping the Mode select's own `onChange`
+(`updateClickTriggerModeVisibility()`/`updateChainModeVisibility()`,
+the functions that actually toggle Target Pose vs. the Sequence
+selector row). Every static AND custom Click Function's own Mode/
+TargetPose/TweenSelector control goes through this exact same path
+(`makeClickPoseGroup()`/`makeClickHoldPoseGroup()` both wrap their
+`controls` array in `withDynamicDevice()`, and `select` isn't one of
+the 4 excluded types), so this wasn't specific to Custom Click
+Functions -- it silently broke EVERY non-independent dynamicDevice
+control's live application on a real (non-desktop) device, project-
+wide.
+
+Fix: replaced the `changedOn` guess with a direct post-write check --
+`if (store[realDeviceClass()][ctrl.key] === v) { cfg[...]=v;
+onChange(v) }`. Correct for every one of `commit()`'s 3 write branches
+by construction (does the real device's own slot end up holding what
+was just written, regardless of which branch wrote it) -- and simpler
+than the logic it replaces.
+
+**Live-verified via a REAL-device simulation, not viewport emulation**
+(this sandbox's own mobile-viewport-emulation tool has a documented
+history of unreliable rAF/dimension reporting on this project -- see
+CLAUDE.md's own gotcha -- so this round used
+`Object.defineProperty(navigator, 'maxTouchPoints', {value:5})` +
+`window.innerWidth/innerHeight` overrides instead, which drive
+`realDeviceClass()`'s own real logic directly rather than fighting the
+emulation layer): reproduced the bug BEFORE the fix on `tweenPreviewSpeedMs`
+(a `dynamicDevice` slider, chosen because it's part of the base DEV_GROUPS
+set and doesn't require `customClickFunctionIds` to have loaded) --
+dragged the Mobile-tab slider to 5000 under simulated real-mobile
+conditions, `cfg.tweenPreviewSpeedMs` stayed at its old value (2000);
+confirmed AFTER the fix, the identical drag correctly updated
+`cfg.tweenPreviewSpeedMs` to 5000. Could not reproduce with an actual
+Click Function group directly -- `customClickFunctionIds` never loads
+in this local sandbox at all (no live Vercel backend behind
+`/api/save-settings`, confirmed via `read_network_requests` showing
+repeated 404s and zero requests to `dev-panel-settings.json` as a plain
+static asset -- an already-disclosed, pre-existing local-only
+limitation, not new). Cross-checked the actual git-tracked settings
+(`data/processed/dev-panel-settings.json`) per the user's own follow-up
+request ("check my latest git save for group and setting names") --
+confirmed `custom6` (`family: "mobile"`) is exactly the affected
+function, still saved at `Mode: "Single Pose"` since the Sequence
+selector never appeared for them to pick one; no data repair needed,
+it resolves itself once Mode is changed again post-fix.
+
+`index.html`'s own `main.js` cache-buster bumped `?v=201` -> `?v=202`
+(content change: its own `devpanel/devPanel.js?v=41` import bumped to
+`?v=42` to match the fix).
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

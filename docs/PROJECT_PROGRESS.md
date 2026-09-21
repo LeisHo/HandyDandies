@@ -18,6 +18,30 @@ work seamlessly from there.
 
 ## Currently working on
 
+**SHIPPED 2026-09-21 -- fixed dynamicDevice controls never applying
+live on a real Mobile/Landscape device ("when I open the app in a
+mobile phone... change the mode to sequence, the [Sequence] drop down
+selector... is not available or visible").** Root cause in
+`devpanel/devPanel.js`'s own `commit()`: a hardcoded `changedOn` guess
+('desktop' unless the edit was independent) gated whether `cfg`/
+`onChange` fired, which only matched `realDeviceClass()` when the real
+device was literally desktop -- so a real phone editing a shared/
+mirrored control (Mode/TargetPose/TweenSelector, etc.) on its own
+native Mobile tab always silently skipped applying the change live,
+project-wide, not just for Custom Click Functions. Replaced with a
+direct post-write check (`store[realDeviceClass()][key] === v`),
+correct for every `commit()` branch by construction. Live-verified via
+real-device-property simulation (not viewport emulation, which has a
+documented reliability history on this project) on a base dynamicDevice
+control (`tweenPreviewSpeedMs`) before/after -- confirmed broken then
+fixed; could not reproduce directly on an actual Click Function group
+since `customClickFunctionIds` never loads in this local sandbox (no
+live backend). Cross-checked the real git-tracked settings per the
+user's own follow-up ("check my latest git save") -- confirmed
+`custom6` (`family: "mobile"`) is exactly the affected function, no
+data repair needed. Committed and pushed (`a8904c9`). See CHANGELOG.txt's
+matching entry for the full account.
+
 **SHIPPED 2026-09-21 (20th follow-up round) -- 3 direct bug reports
 fixed/resolved: click functions not triggering, Desktop defaulting to
 Landscape tab, and desktop dev-panel slowness even while paused.**

@@ -894,3 +894,42 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   width) before assuming it's a touch-detection issue -- this exact
   class of bug is easy to reproduce at any ordinary non-maximized
   browser window.
+- **`devpanel/devPanel.js`'s own `commit()` used to gate whether a
+  `dynamicDevice` (§12f-1) control's live `cfg`/`onChange` fired behind
+  a hardcoded `changedOn` guess ('desktop' unless the edit was on an
+  already-independent control) compared against `realDeviceClass()` --
+  which only ever matched on an actual desktop machine, so a REAL
+  mobile/landscape device editing a shared/mirrored control on its OWN
+  native tab never applied the change live, even though the value was
+  correctly written into the store.** Confirmed live 2026-09-21 (direct
+  report: a phone's own Custom Click Function Mode select, switched
+  Single Pose -> Sequence on the Mobile tab, never toggled Target Pose
+  vs. the Sequence-selector row -- `updateClickTriggerModeVisibility()`/
+  `updateChainModeVisibility()`, Mode's own `onChange`, simply never
+  ran). This wasn't specific to Custom Click Functions or Mode --
+  `makeClickPoseGroup()`/`makeClickHoldPoseGroup()` wrap their WHOLE
+  controls array in `withDynamicDevice()`, and `select` isn't one of the
+  4 excluded types (`NO_DYNAMIC_DEVICE_TYPES`), so this silently broke
+  live application of EVERY non-independent dynamicDevice control on a
+  real (non-desktop) device, project-wide, for as long as the universal
+  dynamicDevice system has existed. Fixed by replacing the guess with a
+  direct post-write check: `if (store[realDeviceClass()][ctrl.key] ===
+  v) { cfg[...] = v; onChange(v) }` -- correct for every one of
+  `commit()`'s 3 write branches by construction, since it checks whether
+  the real device's own slot actually ended up holding the new value,
+  rather than guessing which branch "should" have been the live one.
+  Verified via REAL-device-property simulation rather than the Browser
+  tool's viewport emulation (`Object.defineProperty(navigator,
+  'maxTouchPoints', {value:5})` + `window.innerWidth/innerHeight`
+  overrides on an already-loaded page, driving `realDeviceClass()`'s own
+  real logic directly) -- this project's mobile-viewport-emulation tool
+  already has a documented history of unreliable rAF/dimension
+  reporting here (see the earlier `requestAnimationFrame` gotcha), so
+  faking the underlying signals `realDeviceClass()` actually reads
+  proved far more reliable than fighting that emulation layer again. If
+  a future report describes ANY dynamicDevice control (not just a Click
+  Function) "not doing anything" specifically when edited from a real
+  Mobile/Landscape device on its own matching tab, re-check this exact
+  mechanism before assuming the control's own `onChange` logic is at
+  fault -- the value was very likely saved correctly the whole time,
+  just never applied live.
