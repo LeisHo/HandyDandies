@@ -10296,6 +10296,45 @@ crash risk this round specifically found and fixed.
 --------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
+--------------------------------------------------------------------------------
+2026-09-20 (later same day, 15th follow-up round)
+
+Fixed the direct follow-up to the 14th round's deletion: "i still see
+all the groups" (confirmed by the user in a fresh incognito window,
+ruling out browser cache). Root cause: the saved settings' own `order`
+tree still listed all 10 deleted groups (9 nested inside "New Group
+(2)"/"CLICK FUNCTIONS", "Triple-Click Pose" at the top level) -- since
+their real DEV_GROUPS declarations no longer exist, `applyOrder()`'s
+own restore logic (see its own `placeGroup()`) fell into its
+"create a fresh element" fallback for each one (the SAME mechanism that
+correctly lets a genuine user-created custom group survive a reload),
+producing empty GHOST placeholder groups with the old titles instead of
+the real, now-deleted content. Confirmed live by fetching the deployed
+`main.js` directly via `curl` (zero remaining `makeClickHoldPoseGroup('chp'`/
+`makeClickPoseGroup('click'`-style calls -- ruling out a stale
+deployment) before looking at the data side.
+
+Repaired `data/processed/dev-panel-settings.json` directly (a small,
+verified Node script, tested against a backup copy first, with an
+explicit post-repair walk confirming zero remaining references to any
+of the 10 keys before writing) -- removed all 10 stale entries from the
+`order` tree. Only order/placement metadata touched; the `values`
+object (691 keys) and every other group's own data verified intact
+before and after. "New Group (2)" ("CLICK FUNCTIONS") is now a
+genuinely empty wrapper (ready for the user's planned custom-function
+replacements), not a ghost-filled one.
+
+**Live-verified end-to-end**, not just via `node --check`: fetched the
+production `/api/save-settings` endpoint directly after pushing and
+confirmed the deployed data itself now shows 0 items in "New Group
+(2)" and no "Triple-Click Pose" at the top level -- this is a DATA fix
+(read live from GitHub via the API on every page load), so it took
+effect immediately with no Vercel redeploy needed, unlike the prior
+round's CODE fix.
+
+--------------------------------------------------------------------------------
+<next entry follows the same divider + dated-header pattern>
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

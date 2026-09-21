@@ -18,6 +18,21 @@ work seamlessly from there.
 
 ## Currently working on
 
+**SHIPPED 2026-09-20 (later same day, 15th follow-up round) -- fixed
+"i still see all the groups" (direct follow-up, confirmed in a fresh
+incognito window) after the 14th round's deletion.** Root cause: the
+saved settings' own `order` data still listed all 10 deleted groups;
+`applyOrder()`'s restore logic was creating empty GHOST placeholders
+with the old titles for each one it couldn't find live anymore. Fixed
+by repairing `data/processed/dev-panel-settings.json` directly (tested
+against a backup first, verified zero stale references before writing)
+-- "New Group (2)"/"CLICK FUNCTIONS" is now genuinely empty, ready for
+custom functions. **Live-verified end-to-end** via the production
+`/api/save-settings` endpoint directly (not just `node --check`) --
+confirmed the deployed data itself is fixed, no Vercel redeploy needed
+since this was a data fix, not a code fix. See CHANGELOG.txt's matching
+entry for the full account.
+
 **SHIPPED 2026-09-20 (later same day, 14th follow-up round, major
 deletion, verification gap disclosed) -- all 10 hardcoded static click-
 trigger groups deleted** (Click Hold-Pose, Right-Click Hold-Pose, Click
