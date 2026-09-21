@@ -11,8 +11,9 @@
       "pauseBtnBgColor": "#000000",
       "pauseBtnIconColor": "#ffffff",
       "pauseBtnBorderColor": "#ffffff",
-      "fieldRows": 17,
-      "fieldCols": 22,
+      "pausedRenderFps": 15,
+      "fieldRows": 7,
+      "fieldCols": 8,
       "rowSpacing": 5.5,
       "columnSpacing": 9.5,
       "handScale": 0.85,
@@ -6528,7 +6529,7 @@
       "cameraY": 7.22632017757267,
       "cameraZ": 140.35417796706153,
       "cameraFov": 35,
-      "cameraZoom": 260.17068872666084,
+      "cameraZoom": 260.1706887266608,
       "savedCameras": [
         {
           "name": "Default",
@@ -6806,6 +6807,7 @@
       "pauseBtnBgColor": "#000000",
       "pauseBtnIconColor": "#ffffff",
       "pauseBtnBorderColor": "#ffffff",
+      "pausedRenderFps": 15,
       "fieldRows": 20,
       "fieldCols": 12,
       "rowSpacing": 8,
@@ -13601,6 +13603,7 @@
       "pauseBtnBgColor": "#000000",
       "pauseBtnIconColor": "#ffffff",
       "pauseBtnBorderColor": "#ffffff",
+      "pausedRenderFps": 15,
       "fieldRows": 15,
       "fieldCols": 17,
       "rowSpacing": 9.5,
@@ -20394,6 +20397,10 @@
       "items": [
         {
           "type": "row",
+          "key": "pausedRenderFps"
+        },
+        {
+          "type": "row",
           "key": "pauseBtnXOffset"
         },
         {
@@ -20434,6 +20441,7 @@
         }
       ],
       "settings": [
+        "pausedRenderFps",
         "pauseBtnXOffset",
         "pauseBtnYOffset",
         "pauseBtnSize",
@@ -20457,7 +20465,7 @@
     },
     {
       "key": "Dev Panel",
-      "collapsed": true,
+      "collapsed": false,
       "locked": false,
       "items": [
         {
@@ -21853,7 +21861,7 @@
     },
     {
       "key": "Field Layout",
-      "collapsed": true,
+      "collapsed": false,
       "locked": false,
       "items": [
         {
@@ -22298,7 +22306,7 @@
                 "type": "group",
                 "group": {
                   "key": "Start Time Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -22437,7 +22445,7 @@
               },
               {
                 "key": "Start Time Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -23312,7 +23320,7 @@
               "type": "group",
               "group": {
                 "key": "Start Time Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -23451,7 +23459,7 @@
             },
             {
               "key": "Start Time Curve",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
