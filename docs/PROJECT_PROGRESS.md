@@ -18,6 +18,32 @@ work seamlessly from there.
 
 ## Currently working on
 
+**SHIPPED 2026-09-20 (later same day, 14th follow-up round, major
+deletion, verification gap disclosed) -- all 10 hardcoded static click-
+trigger groups deleted** (Click Hold-Pose, Right-Click Hold-Pose, Click
+Pose, Double-Click Pose, Triple-Click Pose, Quadruple-Click Pose, Right
+Click, Double Click Hold, Triple-Click Hold, Quadruple-Click Hold),
+direct request -- the user intends to replace all of them with custom
+click functions instead. Removed the 10 DEV_GROUPS declarations and
+emptied `CLICK_HOLD_KEYS`/`CLICK_POSE_KEYS` (custom functions still
+register into these fine). **Found and fixed 4 real crash risks**
+before shipping: several mouse event handlers read
+`clickHoldPoseTriggers.chp.active`/`.rchp.active` directly, bypassing
+the `cfg[Enabled]` guard every other access path has -- with the arrays
+emptied, this would have thrown on the very next real mouse click.
+Fixed with inert placeholder trigger-state objects for the 10 removed
+prefixes, kept separate from the (now-empty) registration arrays.
+**Verification gap:** could not get a clean live load in this sandbox
+across 5 combined attempts (main.js still exceeds the sandbox's own
+fixed truncation cutoff even after shrinking); `node --check` passes,
+and every direct hardcoded reference to the 10 prefixes was traced by
+hand and confirmed either already-guarded or covered by the new
+placeholders. **This genuinely needs a real click-through test on your
+next reload** -- panel loads without the 10 groups AND clicking/holding
+the mouse anywhere doesn't throw a console error -- given this round
+specifically found and fixed a real crash risk. See CHANGELOG.txt's
+matching entry for the full account.
+
 **SHIPPED 2026-09-20 (later same day, 13th follow-up round) -- 4 real
 bugs fixed in the custom click function panel, one systemic.** (1) Touch
 Point Count minimum 2->1. (2) Sequence selector (TweenSelector row) was
@@ -44,13 +70,6 @@ limit, not size-scaling); `devPanel.js` itself loads completely
 (confirmed via `curl`), only `main.js` doesn't. `node --check` passes on
 both. Worth a live confirm on your next reload. See CHANGELOG.txt's
 matching entry for the full account.
-
-**Item 3 of this same request thread ("make it so that any new custom
-click functions will override the existing hard coded click functions")
-is NOT yet started** -- a genuinely large feature (needs a real conflict-
-resolution mechanism between a custom function and a static trigger
-sharing the same gesture), deferred this round in favor of the 4 smaller,
-already-confirmed bugs above. Pick this up next if still wanted.
 
 **PAUSED 2026-09-20 -- mobile "Loading Preview shows with ?dev=1 but not
 bare URL" investigation, deprioritized by direct request ("Okay nevermind

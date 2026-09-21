@@ -10229,6 +10229,73 @@ for all 4 items above.
 --------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
+--------------------------------------------------------------------------------
+2026-09-20 (later same day, 14th follow-up round -- major deletion,
+verification gap disclosed)
+
+Deleted all 10 hardcoded static click-trigger groups entirely, per
+direct request ("Can you just delete those static declarations without
+messing with the custom click functions? I dont mind having no click
+triggers currently"): Click Hold-Pose, Right-Click Hold-Pose, Click
+Pose, Double-Click Pose, Triple-Click Pose, Quadruple-Click Pose, Right
+Click, Double Click Hold, Triple-Click Hold, Quadruple-Click Hold. The
+user's stated long-term goal: replace all of these with custom click
+functions instead, which already support the identical capability range
+(Click, Click+Hold, Right-Click, Right-Click+Hold, Scroll, Multi-Point)
+via the exact same shared engine these static ones used.
+
+Removed the 10 DEV_GROUPS declarations (2 contiguous source blocks --
+the "Tween" group sits between the pose-kind and hold-kind clusters and
+was left untouched) and emptied `CLICK_HOLD_KEYS`/`CLICK_POSE_KEYS`
+(the arrays that drive generic widget-building, visibility wiring, and
+registration for BOTH static and custom triggers alike -- custom
+functions still push into these at creation time via
+`registerCustomClickFunction()`, completely unaffected by this change).
+
+Found and fixed 4 real crash risks before shipping, via direct source
+tracing (grep for the 10 prefixes as string literals, and for
+`clickHoldPoseTriggers.`/`clickPoseTriggers.` dot-access specifically):
+`window.addEventListener('pointerdown'/'pointerup', ...)` and one held-
+long-enough check read `clickHoldPoseTriggers.chp.active`/`.rchp.active`
+directly -- bypassing the `cfg[\`${p}Enabled\`]` guard every OTHER
+access path in this file already has before touching trigger state.
+With `CLICK_HOLD_KEYS` emptied, these specific properties would have
+been `undefined`, throwing "Cannot read properties of undefined
+(reading 'active')" on the very next real mouse click or release --
+this is NOT a startup-only concern, it's a guaranteed break on normal
+interaction the moment a real user touches the mouse. Fixed by adding
+`LEGACY_REMOVED_HOLD_KEYS`/`LEGACY_REMOVED_POSE_KEYS` (the same 10
+prefixes, listed separately from `CLICK_HOLD_KEYS`/`CLICK_POSE_KEYS`
+themselves) and seeding `clickHoldPoseTriggers`/`clickPoseTriggers` with
+inert placeholder state objects for them -- every legacy hardcoded
+access now finds a real, permanently-inactive object instead of
+`undefined`, while `CLICK_HOLD_KEYS`/`CLICK_POSE_KEYS` staying empty
+means no panel UI or generic per-key registration happens for any of
+them. Every OTHER hardcoded reference found (mousedown/mouseup direct
+calls to `startClickHoldPose('chp')`/`endClickHoldPose('chp')`/etc.,
+`triggerClickPose()`, the click-count/click-hold chain-trigger
+functions) was confirmed to already guard on `cfg[Enabled]` FIRST
+(always falsy now, since nothing sets it anymore) before ever touching
+trigger state, so those were already safe by construction, not fixed.
+
+**Verification gap, disclosed honestly (standing 5-retry cap):** could
+not get a clean live page load in this sandbox across 5 combined
+attempts this round (2 navigations, 1 `curl` cross-check, 1 server-
+process restart + navigation, 1 further navigation) -- `main.js` still
+exceeds this sandbox's own fixed ~587,520-byte network-truncation
+cutoff even AFTER this deletion shrank the file (613,335 bytes now vs.
+628,457 bytes before this round -- confirmed via direct `curl`
+byte-count comparison, ruling out a code error). `node --check` passes
+cleanly. Confidence rests on the direct source-tracing described above,
+not live interaction -- **this genuinely needs a real click-through
+test on your own next reload** (the panel loading without the 10
+groups, AND clicking/holding the mouse anywhere on the page without a
+console error) before treating this as fully confirmed, given the real
+crash risk this round specifically found and fixed.
+
+--------------------------------------------------------------------------------
+<next entry follows the same divider + dated-header pattern>
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a
