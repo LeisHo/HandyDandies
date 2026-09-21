@@ -3103,6 +3103,10 @@
           "elbowBend": 0,
           "elbowSideBend": 0,
           "forearmTwist": 0,
+          "poseOffsetX": 0,
+          "poseOffsetY": 0,
+          "poseOffsetZ": 0,
+          "poseScale": 1,
           "group": "Big Open Palm"
         },
         {
@@ -3159,6 +3163,10 @@
           "elbowBend": 0,
           "elbowSideBend": 0,
           "forearmTwist": 0,
+          "poseOffsetX": 0,
+          "poseOffsetY": 0,
+          "poseOffsetZ": 0,
+          "poseScale": 1,
           "group": "Big Open Palm"
         },
         {
@@ -6754,7 +6762,7 @@
       "custom4RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "custom6Enabled": true,
       "custom6Type": "Click",
-      "custom6TouchPointCount": 2,
+      "custom6TouchPointCount": 1,
       "custom6ClickCount": "1st",
       "custom6Mode": "Single Pose",
       "custom6OffsetEnabled": false,
@@ -6764,7 +6772,7 @@
       "custom6RotationX": 0,
       "custom6RotationY": 0,
       "custom6RotationZ": 0,
-      "custom6TargetPose": "",
+      "custom6TargetPose": "Big Open Palm",
       "custom6TweenSelector": "",
       "custom6TweenSpeedMs": 800,
       "custom6TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -9890,6 +9898,10 @@
           "elbowBend": 0,
           "elbowSideBend": 0,
           "forearmTwist": 0,
+          "poseOffsetX": 0,
+          "poseOffsetY": 0,
+          "poseOffsetZ": 0,
+          "poseScale": 1,
           "group": "Big Open Palm"
         },
         {
@@ -9946,6 +9958,10 @@
           "elbowBend": 0,
           "elbowSideBend": 0,
           "forearmTwist": 0,
+          "poseOffsetX": 0,
+          "poseOffsetY": 0,
+          "poseOffsetZ": 0,
+          "poseScale": 1,
           "group": "Big Open Palm"
         },
         {
@@ -13541,7 +13557,7 @@
       "custom4RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "custom6Enabled": true,
       "custom6Type": "Click",
-      "custom6TouchPointCount": 2,
+      "custom6TouchPointCount": 1,
       "custom6ClickCount": "1st",
       "custom6Mode": "Single Pose",
       "custom6OffsetEnabled": false,
@@ -13551,7 +13567,7 @@
       "custom6RotationX": 0,
       "custom6RotationY": 0,
       "custom6RotationZ": 0,
-      "custom6TargetPose": "",
+      "custom6TargetPose": "Big Open Palm",
       "custom6TweenSelector": "",
       "custom6TweenSpeedMs": 800,
       "custom6TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -16677,6 +16693,10 @@
           "elbowBend": 0,
           "elbowSideBend": 0,
           "forearmTwist": 0,
+          "poseOffsetX": 0,
+          "poseOffsetY": 0,
+          "poseOffsetZ": 0,
+          "poseScale": 1,
           "group": "Big Open Palm"
         },
         {
@@ -16733,6 +16753,10 @@
           "elbowBend": 0,
           "elbowSideBend": 0,
           "forearmTwist": 0,
+          "poseOffsetX": 0,
+          "poseOffsetY": 0,
+          "poseOffsetZ": 0,
+          "poseScale": 1,
           "group": "Big Open Palm"
         },
         {
@@ -20328,7 +20352,7 @@
       "custom4RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "custom6Enabled": true,
       "custom6Type": "Click",
-      "custom6TouchPointCount": 2,
+      "custom6TouchPointCount": 1,
       "custom6ClickCount": "1st",
       "custom6Mode": "Single Pose",
       "custom6OffsetEnabled": false,
@@ -20338,7 +20362,7 @@
       "custom6RotationX": 0,
       "custom6RotationY": 0,
       "custom6RotationZ": 0,
-      "custom6TargetPose": "",
+      "custom6TargetPose": "Big Open Palm",
       "custom6TweenSelector": "",
       "custom6TweenSpeedMs": 800,
       "custom6TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -21884,7 +21908,7 @@
     },
     {
       "key": "Cursor Tracking",
-      "collapsed": false,
+      "collapsed": true,
       "locked": false,
       "items": [
         {
@@ -22122,7 +22146,7 @@
     },
     {
       "key": "Custom Click Functions",
-      "collapsed": true,
+      "collapsed": false,
       "locked": false,
       "items": [
         {
@@ -22274,7 +22298,7 @@
                 "type": "group",
                 "group": {
                   "key": "Start Time Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -22413,7 +22437,7 @@
               },
               {
                 "key": "Start Time Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -23288,7 +23312,7 @@
               "type": "group",
               "group": {
                 "key": "Start Time Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -23427,7 +23451,7 @@
             },
             {
               "key": "Start Time Curve",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -24138,7 +24162,7 @@
     },
     {
       "key": "Pose",
-      "collapsed": true,
+      "collapsed": false,
       "locked": false,
       "items": [
         {
