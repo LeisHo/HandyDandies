@@ -790,3 +790,41 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   captured tree at all.** See CHANGELOG.txt's matching 2026-09-20 entry
   for the full account, including the separate (already-working, just
   under-discovered) Type-dropdown fix shipped the same round.
+- **All 10 hardcoded static click-trigger groups (Click Hold-Pose,
+  Right-Click Hold-Pose, Click Pose, Double-Click Pose, Triple-Click
+  Pose, Quadruple-Click Pose, Right Click, Double Click Hold, Triple-
+  Click Hold, Quadruple-Click Hold) were DELETED 2026-09-20**, direct
+  request ("delete those static declarations... I dont mind having no
+  click triggers currently" -- intent: replace them with custom click
+  functions instead). `CLICK_HOLD_KEYS`/`CLICK_POSE_KEYS` are now empty
+  arrays -- custom functions still register into them fine at creation
+  time via `registerCustomClickFunction()`, completely independent of
+  this. **A real crash risk was found and fixed in the same round**:
+  several mouse event handlers (`pointerdown`/`pointerup` on `window`)
+  read `clickHoldPoseTriggers.chp.active`/`.rchp.active` DIRECTLY,
+  bypassing the `cfg[\`${p}Enabled\`]` guard every OTHER access path in
+  this file has before touching trigger state -- with the arrays
+  emptied, these specific properties would have been `undefined`,
+  throwing on the very next real mouse click. Fixed with
+  `LEGACY_REMOVED_HOLD_KEYS`/`LEGACY_REMOVED_POSE_KEYS` (the same 10
+  prefixes, kept deliberately SEPARATE from `CLICK_HOLD_KEYS`/
+  `CLICK_POSE_KEYS`) seeding inert placeholder trigger-state objects in
+  `clickHoldPoseTriggers`/`clickPoseTriggers` for these prefixes only --
+  legacy hardcoded access now finds a real, permanently-inactive object
+  instead of `undefined`, while the actual registration arrays staying
+  empty means no panel UI/generic per-key wiring happens for any of
+  them. **If a future session ever needs to ALSO remove a custom
+  function's own key** (or otherwise shrinks `CLICK_HOLD_KEYS`/
+  `CLICK_POSE_KEYS` further), grep for `clickHoldPoseTriggers\.` /
+  `clickPoseTriggers\.` DOT-notation access (not bracket/variable
+  access) first -- that's specifically the pattern that bypasses the
+  `Enabled` guard and can throw; a handful of comments/dead
+  `safeRefreshSelectOptions('chpMode')`-style one-time calls referencing
+  the 10 removed prefixes were deliberately left in place (harmless,
+  try/catch-safe per that function's own design) rather than hunted down
+  individually. **Not yet live-verified** -- this sandbox's own
+  main.js network-truncation issue blocked a clean page load across 5
+  retries even after the file shrank from this deletion; confidence
+  rests on `node --check` plus direct source-tracing of every hardcoded
+  reference to the 10 prefixes, not live interaction. See CHANGELOG.txt's
+  matching 2026-09-20 (14th round) entry for the full account.
