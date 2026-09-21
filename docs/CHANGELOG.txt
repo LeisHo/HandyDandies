@@ -10368,6 +10368,98 @@ this fix.
 --------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
+--------------------------------------------------------------------------------
+2026-09-20 (later same day, 17th follow-up round)
+
+Made the "Show in Mobile/Landscape" device-visibility checkbox
+universal (every control on every group gets it now, not just the ones
+previously opted in via withDynamicDevice()) and added group-level
+auto-hide, per direct request: "I want every settings group (and
+independent settings) to have their own checkbox... Only when this
+checkbox is checked, will that setting group or setting be visible and
+available in the Mobile and Landscape Tab... Right now, If i uncheck a
+box in desktop tab, the settings group is still visible and available
+in the mobile and landscape tab." Referenced project name went through
+2 corrections mid-conversation ("DickoClicko" -> "ClickoDicko" ->
+finally "J:\CLAUDE\PROJECTS\CLICKO") before landing on the actual
+project meant.
+
+Read CLICKO's own dev panel implementation directly (its own
+`injectRowDeviceCheckboxes()`/`refreshVisibilityUI()`/
+`refreshEmptyGroupVisibility()`) rather than guessing at a new design:
+it makes the per-row checkbox UNIVERSAL (no opt-in flag at all -- every
+row gets one via generic code, not per control-array registration) and,
+critically, does NOT use a separate persisted per-GROUP flag -- a
+group's own visibility is COMPUTED from whether it currently has any
+visible child (row or subgroup), refreshed on every pass, depth-sorted
+deepest-first so a parent always sees its children's already-current
+state. This directly explains the reported gap: this project's existing
+`dynamicDevice` system only ever hid individual CONTROLS; nothing ever
+hid the GROUP HEADER itself once every child was hidden, and several
+whole top-level groups (Field Layout, Camera, Lighting, Toon Shading,
+Outline, Background, Debug, Pose, etc.) never had ANY device-visibility
+mechanism at all, opt-in or otherwise.
+
+Implementation (`src/devpanel/devPanel.js`): new `isDynamicDeviceCtrl(ctrl)`
+-- a control is dynamicDevice-ELIGIBLE BY DEFAULT now unless `perDevice`
+(a different, incompatible, pre-existing concept), one of the 4
+excluded types (text/list-picker/multi-select/button, same exclusion
+`buildRow()` already applied), or explicitly opted out via
+`dynamicDevice: false` (an escape hatch, unused so far). Replaces the
+bare `ctrl.dynamicDevice` truthy check at all 4 existing call sites
+(`commit()`, `buildRow()`, the group-cascade descendant walk,
+`refreshRowDisplaysForEditingTab()`) -- behavior-preserving by
+construction for any control that already had `dynamicDevice: true`
+explicitly (`ctrl.dynamicDevice !== false` evaluates identically to the
+old bare-truthy check when the value is literally `true`), and now
+additionally covers every group that never had it. Default state is
+checked/visible everywhere for every control, matching current behavior
+exactly until someone actively unchecks something -- satisfies the
+user's own explicit requirement that groups like Field Layout "keep
+working" without needing anyone to manually re-check anything.
+
+New `refreshEmptyGroupVisibility()`: depth-sorted deepest-first walk of
+every `.dp-group`, toggling a `.dp-group-hidden-empty` CSS class
+(never inline `style.display` -- the exact clobbering bug already fixed
+once this same day for rows, `.dp-row-device-hidden`, would reproduce
+identically at the group level otherwise) the instant a group has no
+visible rows or subgroups left on Mobile/Landscape; clears the class
+outright on Desktop (always show everything there). Wired into
+`refreshRowDisplaysForEditingTab()` itself, so every existing call site
+(tab switches, any row/group checkbox's own change handler, Save/
+Reset/Undo restore paths) picks it up automatically -- no new call
+sites needed anywhere else. `src/style.css` gained the matching
+`.dp-group-hidden-empty { display: none !important; }` rule.
+`devpanel/devPanel.js?v=38->39`, `style.css?v=19->20`, `main.js`'s own
+import of it bumped to match, plus its own `?v=196->197`.
+
+**Verification gap, disclosed honestly (standing 5-retry cap):** hit
+this sandbox's own browser-preview tooling flakiness
+(`ERR_CONNECTION_RESET`/`ERR_CONNECTION_REFUSED`) across 5+ combined
+attempts (multiple navigations, 1 full server restart) -- but this
+round specifically confirmed via 2 SEPARATE direct `curl` checks that
+BOTH `main.js` (613,335/613,335 bytes, exact match) and `devPanel.js`
+(194,915/194,915 bytes, exact match) deliver completely and correctly
+outside the browser tool entirely, ruling out the usual network-
+truncation explanation -- this was the browser tool's own connection
+handling, not a file-size or code problem. `node --check` passes on
+both files. Confidence rests on: the core refactor being behavior-
+preserving by construction (explained above), the new logic being
+purely additive and gated behind a CSS class that starts absent on
+every element, and directly porting CLICKO's own already-working
+implementation rather than a novel design. **Genuinely needs a live
+check on your next reload**, given the scale of this change (every
+control in the panel is now affected, not just Click Function ones) --
+specifically: (1) every row/group still shows correctly on Desktop by
+default, (2) unchecking a group's own "Show in Mobile/Landscape (whole
+group)" cascade checkbox now hides the WHOLE group (not just an empty
+shell) on Mobile/Landscape, (3) Field Layout and other previously-
+unprotected groups now have the checkbox and default to checked/
+visible.
+
+--------------------------------------------------------------------------------
+<next entry follows the same divider + dated-header pattern>
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a
