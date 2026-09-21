@@ -1296,7 +1296,25 @@ const DEV_GROUPS = [
       { key: 'toonTint', label: 'Toon Texture Tint', type: 'color', def: '#ffffff', onChange: (v) => setToonUniform('toonTint', new THREE.Color(v)) },
       { key: 'rimIntensity', label: 'Rim Light Intensity (x)', type: 'slider', min: 0, max: 3, step: 0.05, def: 0, onChange: (v) => setToonUniform('rimIntensity', v) },
       { key: 'rimPower', label: 'Rim Light Power (x)', type: 'slider', min: 0.5, max: 8, step: 0.1, def: 0.5, onChange: (v) => setToonUniform('rimPower', v) },
-      { key: 'rimColor', label: 'Rim Light Color', type: 'color', def: '#ffffff', onChange: (v) => setToonUniform('rimColor', new THREE.Color(v)) }
+      { key: 'rimColor', label: 'Rim Light Color', type: 'color', def: '#ffffff', onChange: (v) => setToonUniform('rimColor', new THREE.Color(v)) },
+      // Direct request: "We have added a save and export function to the
+      // Toon Shading [in HANDO]. Add an import and export function to
+      // ours to accept that data." Both flags (not just importable, the
+      // usual HANDO-exports/HANDY-DANDIES-imports direction every other
+      // picker in this file uses) since the request explicitly asked for
+      // both directions -- see captureToonPreset()/useToonPreset()'s own
+      // comment for the full field-mapping account.
+      {
+        key: 'savedToon',
+        label: 'Saved Toon Shading',
+        type: 'list-picker',
+        def: [],
+        itemLabel: 'Toon',
+        exportable: true,
+        importable: true,
+        captureCurrent: () => captureToonPreset(),
+        onUse: (item) => useToonPreset(item)
+      }
     ]
   },
   {
@@ -1961,6 +1979,45 @@ function rebuildGradientMap() {
   if (toonMaterial.gradientMap) toonMaterial.gradientMap.dispose()
   const gradientTex = makeGradientTexture(cfg.toonSteps, cfg.toonShadowFloor, cfg.toonLightCeiling, cfg.toonStepThreshold)
   forEachToonMaterial((m) => { m.gradientMap = gradientTex; m.needsUpdate = true })
+}
+// Saved Toon Shading presets (direct request: "We have added a save and
+// export function to the Toon Shading [in HANDO]. Add an import and
+// export function to ours to accept that data") -- ported directly from
+// HANDO's own TOON_PRESET_KEYS/captureToonPreset()/useToonPreset(), field-
+// for-field identical (confirmed against the user's own pasted export
+// sample: toonSteps/toonStepThreshold/toonShadowFloor/toonLightCeiling/
+// toonBaseTint/textureInfluence/toonTint/rimIntensity/rimPower/rimColor,
+// same keys HANDY DANDIES' own Toon Shading sliders already use) -- no
+// coordinate-frame conversion needed at all, unlike the Camera/Lighting
+// HANDO imports (Toon Shading has no spatial component). Toon Shading
+// isn't driven through one shared "apply" function -- each control's own
+// onChange calls one of rebuildGradientMap()/setToonUniform()/a direct
+// forEachToonMaterial() -- so useToonPreset() re-runs those same effects
+// itself after the usual syncValue()-based external-update (cfg + UI,
+// onChange deliberately skipped, same convention as syncCfgAndSlidersFromPose()),
+// same as HANDO's own version does.
+const TOON_PRESET_KEYS = [
+  'toonSteps', 'toonStepThreshold', 'toonShadowFloor', 'toonLightCeiling',
+  'toonBaseTint', 'textureInfluence', 'toonTint', 'rimIntensity', 'rimPower', 'rimColor'
+]
+function captureToonPreset() {
+  const item = {}
+  TOON_PRESET_KEYS.forEach((key) => { item[key] = cfg[key] })
+  return item
+}
+function useToonPreset(item) {
+  TOON_PRESET_KEYS.forEach((key) => {
+    if (item[key] === undefined) return
+    cfg[key] = item[key]
+    syncValue(key, item[key])
+  })
+  forEachToonMaterial((m) => m.color.set(cfg.toonBaseTint))
+  setToonUniform('textureInfluence', cfg.textureInfluence / 100)
+  setToonUniform('toonTint', new THREE.Color(cfg.toonTint))
+  setToonUniform('rimIntensity', cfg.rimIntensity)
+  setToonUniform('rimPower', cfg.rimPower)
+  setToonUniform('rimColor', new THREE.Color(cfg.rimColor))
+  rebuildGradientMap()
 }
 // Ported from HANDO's own createToonMaterial() -- a MeshToonMaterial with
 // an onBeforeCompile injecting rim lighting + a duotone texture-tint blend
