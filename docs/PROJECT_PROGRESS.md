@@ -18,6 +18,25 @@ work seamlessly from there.
 
 ## Currently working on
 
+**SHIPPED 2026-09-20 (later same day, 16th follow-up round) -- fixed
+the row-level "Show in Mobile/Landscape" checkbox alignment** (same bug
+class as the earlier group-header fix, just the per-setting-row
+version -- `margin-left:auto` was only ever applied to the 2nd
+checkbox, so the 1st only looked aligned on wide rows by coincidence).
+Live-verified flush against the row's own right edge after the panel's
+normal refresh cycle. See CHANGELOG.txt's matching entry.
+
+**IN PROGRESS -- whole-group/setting "hide from Mobile/Landscape"
+checkboxes, referencing DICKOCLICKO's own pattern (direct request).**
+The existing "Show in Mobile/Landscape" system only cascades a hide
+onto individual dynamicDevice CONTROLS -- a whole top-level GROUP has
+no such property of its own, so unchecking every child in a group still
+leaves the group's own header/title visible (empty) on Mobile/
+Landscape, not genuinely hidden. User confirmed this gap directly:
+"Right now, If i uncheck a box in desktop tab, the settings group is
+still visible and available in the mobile and landscape tab." Research
+into DICKOCLICKO's own implementation not yet done.
+
 **SHIPPED 2026-09-20 (later same day, 15th follow-up round) -- fixed
 "i still see all the groups" (direct follow-up, confirmed in a fresh
 incognito window) after the 14th round's deletion.** Root cause: the

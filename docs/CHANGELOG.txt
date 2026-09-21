@@ -10335,6 +10335,39 @@ round's CODE fix.
 --------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
+--------------------------------------------------------------------------------
+2026-09-20 (later same day, 16th follow-up round)
+
+Fixed the row-level counterpart of the group-header cascade checkbox
+alignment fix from earlier this same day (direct report: "the 'Show in
+Mobile/Landscape' checkbox for settings still isnt aligned to the right
+edge... like it is in Mobile tab"). `.dp-dynamic-device-checkbox-2nd
+{ margin-left: auto }` only ever gave the real auto-margin push to the
+2nd (Independent from Desktop) checkbox -- the 1st (Show in Mobile/
+Landscape, the one actually visible on Desktop) had no such rule and
+only LOOKED right-aligned on a wide row (a slider/select whose own
+content happens to fill most of the row's width), never on a narrow
+one (a plain checkbox control). Unscoped from `-2nd` so both get the
+push; only one is ever rendered per row (the other `display:none`), so
+whichever is showing lands flush against the row's own right edge
+regardless of the row's own content width. `src/style.css`
+(`?v=18`->`?v=19`).
+
+Live-verified: initially measured `margin-left: 0px` via a JS-exec
+computed-style query despite the correct rule being present and later
+in source order (confirmed via a direct stylesheet dump) -- a
+screenshot showed the checkbox visually correct, and a follow-up direct
+`getBoundingClientRect()` check after triggering the panel's own normal
+tab-click refresh cycle confirmed it: checkbox right edge within 2px of
+the row's own right edge. The earlier readings were this sandbox's own
+already-documented JS-exec query-reliability quirk (window.innerWidth
+etc.) plus a separate, pre-existing "both dynamicDevice checkboxes
+visible before the first tab-refresh" timing gap -- neither caused by
+this fix.
+
+--------------------------------------------------------------------------------
+<next entry follows the same divider + dated-header pattern>
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a
