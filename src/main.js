@@ -1114,180 +1114,6 @@ const DEV_GROUPS = [
       { key: 'wristSplayCurve', label: 'Splay Scaling Curve (Distance -> Splay)', type: 'text', def: '[{"x":0,"y":1},{"x":0.31833343505859374,"y":0.6961458841959636},{"x":1,"y":0.042812347412109375}]', onChange: () => parseWristSplayConfig() }
     ]
   },
-  // Click-Hold Pose -- direct request, then "the 2nd new clickhold pose
-  // sets should be their own setting groups": on mousedown+hold, every
-  // hand transitions from its CURRENT pose to a chosen Target Pose (one
-  // of `cfg.savedPoses`); on release, transitions back to the code-
-  // default pose. Each hand's own transition START TIME is staggered by
-  // its live distance from the cursor at the moment the button went
-  // down (curve + Min/Max range, same widget family as Arm Length/
-  // Responsive Wrist Splay) -- setting Min equal to Max collapses this
-  // to "every hand transitions together," satisfying the request's own
-  // "choose if they all transition together, or if... based on
-  // distance" without a separate toggle. Retransition (release) has its
-  // own fully independent speed/curve/range, using each hand's own
-  // CURRENT interpolated pose (not the target) as ITS retransition start
-  // -- correct even if release happens mid-transition, before every hand
-  // finished reaching the target. Left-click and right-click are 2
-  // separate, symmetric instances built by makeClickHoldPoseGroup()
-  // below (same control shape, different key prefix/mouse button) --
-  // see setupClickHoldPoseTrigger()'s own comment for the full state
-  // machine and the disclosed Whole-Hand-Rotation scope decision.
-  makeClickHoldPoseGroup('chp', 'Click Hold-Pose', {
-    enabled: true, targetPose: 'Point', transitionSpeedMs: 230,
-    startTimeCurve: '[{"x":0,"y":0},{"x":0.4483332316080729,"y":0.7186457951863607},{"x":1,"y":1}]',
-    startTimeRange: '{"min":0,"max":3000}',
-    retransitionSpeedMs: 180,
-    retransitionStartTimeCurve: '[{"x":0,"y":0},{"x":0.475,"y":0.7653123219807942},{"x":1,"y":1}]',
-    retransitionStartTimeRange: '{"min":431,"max":3000}'
-  }),
-  makeClickHoldPoseGroup('rchp', 'Right-Click Hold-Pose', {
-    enabled: true, targetPose: 'Neutral - Bent Back', transitionSpeedMs: 410,
-    startTimeCurve: '[{"x":0,"y":0.02093760172526038},{"x":0.4366663614908854,"y":0.8109375},{"x":1,"y":1}]',
-    startTimeRange: '{"min":0,"max":3000}',
-    retransitionSpeedMs: 320,
-    retransitionStartTimeCurve: '[{"x":0,"y":0},{"x":0.4683329264322917,"y":0.6742708841959635},{"x":1,"y":1}]',
-    retransitionStartTimeRange: '{"min":0,"max":3000}'
-  }),
-  // Direct follow-up request: a fire-and-forget variant of Click Hold-
-  // Pose -- no holding required. A single click (or double-click) starts
-  // the SAME transition-with-per-hand-distance-stagger mechanism, but
-  // once triggered, every hand runs its own full sequence to completion
-  // regardless of what the mouse does afterward: transition to target,
-  // PAUSE at the target for a configurable duration, then retransition
-  // back to default -- each phase change happens independently per hand
-  // (a hand that started later, or has a longer pause, does NOT wait for
-  // any other hand). "Click" and "Double-Click" are 2 separate, symmetric
-  // instances (both on the left button, distinguished by click count, not
-  // left/right button the way Click Hold-Pose's own 2 groups are) built
-  // by makeClickPoseGroup() below -- see updateClickPoseForHand()'s own
-  // comment for the full 3-phase state machine.
-  makeClickPoseGroup('click', 'Click Pose', {
-    enabled: true, targetPose: 'Open Palm', transitionSpeedMs: 700,
-    startTimeCurve: '[{"x":0,"y":0},{"x":0.21833292643229166,"y":0},{"x":0.6616663614908854,"y":0.7919792175292969},{"x":1,"y":1}]',
-    startTimeRange: '{"min":0,"max":2078}',
-    pauseDurationMs: 0,
-    retransitionSpeedMs: 700,
-    retransitionStartTimeCurve: '[{"x":0,"y":0},{"x":1,"y":1}]',
-    retransitionStartTimeRange: '{"min":0,"max":300}'
-  }),
-  makeClickPoseGroup('dblclick', 'Double-Click Pose', {
-    enabled: true, targetPose: 'ThumbsUp', transitionSpeedMs: 400,
-    startTimeCurve: '[{"x":0,"y":0},{"x":1,"y":1}]',
-    startTimeRange: '{"min":0,"max":3000}',
-    pauseDurationMs: 500,
-    retransitionSpeedMs: 400,
-    retransitionStartTimeCurve: '[{"x":0,"y":0},{"x":1,"y":1}]',
-    retransitionStartTimeRange: '{"min":0,"max":300}'
-  }),
-  // Triple-Click / Quadruple-Click Pose -- direct request ("provide me
-  // um, setting groups for triple click... and quadruple click"), same
-  // fire-and-forget family as Click/Double-Click Pose, distinguished
-  // purely by consecutive left-click COUNT (see the click-count
-  // disambiguation listener's own comment, below, for how a 3rd/4th
-  // click is told apart from a 1st/2nd). Defaults left OFF (unlike
-  // click/dblclick, which ship enabled) -- a brand-new, not-yet-tuned
-  // trigger shouldn't start firing on every visitor's 3rd/4th click the
-  // instant this ships; the user turns it on once a target pose/tween is
-  // actually configured, same convention chp/rchp/dcHold already use.
-  makeClickPoseGroup('tripleClick', 'Triple-Click Pose', {
-    enabled: false, targetPose: '', transitionSpeedMs: 400,
-    startTimeCurve: '[{"x":0,"y":0},{"x":1,"y":1}]',
-    startTimeRange: '{"min":0,"max":3000}',
-    pauseDurationMs: 500,
-    retransitionSpeedMs: 400,
-    retransitionStartTimeCurve: '[{"x":0,"y":0},{"x":1,"y":1}]',
-    retransitionStartTimeRange: '{"min":0,"max":300}'
-  }),
-  makeClickPoseGroup('quadClick', 'Quadruple-Click Pose', {
-    enabled: false, targetPose: '', transitionSpeedMs: 400,
-    startTimeCurve: '[{"x":0,"y":0},{"x":1,"y":1}]',
-    startTimeRange: '{"min":0,"max":3000}',
-    pauseDurationMs: 500,
-    retransitionSpeedMs: 400,
-    retransitionStartTimeCurve: '[{"x":0,"y":0},{"x":1,"y":1}]',
-    retransitionStartTimeRange: '{"min":0,"max":300}'
-  }),
-  // Right Click -- direct follow-up request: "provide another CLick
-  // function, the same as the others - 'Right Click'. But this time,
-  // provide me a dropbox that allows me to select either a single target
-  // pose or a tween. The relevant setting ui only show when i select
-  // either." Same fire-and-forget, per-hand-distance-staggered 3-phase
-  // sequence as Click Pose/Double-Click Pose above (forward -> paused ->
-  // retransition -> idle), on the right button, one new capability: Mode
-  // chooses whether the "forward" phase's target is a single named Saved
-  // Pose (same as click/dblclick) or a Saved Tween Sequence played
-  // through in full (same sequences the Tween/Double Click Hold groups
-  // already build, via resolveTweenSequencePoses()/lerpTweenSequence()) --
-  // see updateClickPoseForHand()'s own comment for how the 2 modes share
-  // one phase machine. Only rcTargetPose/rcTweenSelector are mode-
-  // specific and toggled by updateClickTriggerModeVisibility() (below,
-  // generalized to every Click-family group with a Mode dropdown -- see
-  // its own comment); the Enabled checkbox and every timing control apply
-  // to both modes the same way, so switching modes mid-session doesn't
-  // reset any tuning.
-  {
-    title: 'Right Click',
-    controls: withDynamicDevice([
-      // "If Off, hide all settings for this function" -- see
-      // makeClickHoldPoseGroup()'s own matching comment.
-      { key: 'rcEnabled', label: 'Right Click (Master On/Off)', type: 'checkbox', def: false, onChange: () => updateClickFunctionEnabledVisibility('rc') },
-      {
-        key: 'rcMode', label: 'Mode', type: 'select', def: 'Single Pose', options: () => ['Single Pose', 'Sequence'],
-        // BUG FIX 2026-09-15: this still called the OLD, pre-rename
-        // `updateRightClickModeVisibility()` (confirmed live: threw
-        // "updateRightClickModeVisibility is not defined" the instant
-        // Mode changed, caught only by safeRefreshSelectOptions()'s own
-        // try/catch -- contained, but Right Click's own mode-specific
-        // rows silently stopped toggling). The function itself was
-        // generalized/renamed to `updateClickTriggerModeVisibility(p,
-        // extraSinglePoseKeys)` when Mode was ported to every other
-        // Click-family group; this ONE call site (the original, from
-        // before that generalization) was missed.
-        onChange: () => { updateClickTriggerModeVisibility('rc', ['PauseDurationMs']); updateSingleTimingGateVisibility('rc'); updateSequencePlayModeVisibility('rc') }
-      },
-      // Offset/Rotation -- see makeClickHoldPoseGroup()'s own matching
-      // comment for the full reasoning. Right Click is a hand-written
-      // group (predates the 2 shared factories), not built via either
-      // one -- added here directly rather than forking a factory for it.
-      { key: 'rcOffsetEnabled', label: 'Offset On/Off', type: 'checkbox', def: false, onChange: () => updateOffsetRotationVisibility('rc') },
-      { key: 'rcOffsetX', label: 'Offset X (World Units)', type: 'slider', min: -50, max: 50, step: 0.5, def: 0 },
-      { key: 'rcOffsetY', label: 'Offset Y (World Units)', type: 'slider', min: -50, max: 50, step: 0.5, def: 0 },
-      { key: 'rcRotationEnabled', label: 'Rotation On/Off', type: 'checkbox', def: false, onChange: () => updateOffsetRotationVisibility('rc') },
-      { key: 'rcRotationX', label: 'Rotation X (Deg)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
-      { key: 'rcRotationY', label: 'Rotation Y (Deg)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
-      { key: 'rcRotationZ', label: 'Rotation Z (Deg)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
-      { key: 'rcTargetPose', label: 'Target Pose', type: 'select', def: '', options: () => (cfg.savedPoses || []).map((sp) => ({ value: sp.name, group: sp.group || null })) },
-      { key: 'rcTweenSelector', label: 'Sequence', type: 'select', def: '', options: () => (cfg.savedTweenSequences || []).map((s) => ({ value: s.name, group: s.group || null })) },
-      // Tween's own SEPARATE speed/curve/range trio, added 2026-09-15 --
-      // see makeClickHoldPoseGroup()'s own matching comment for the full
-      // reasoning. No Loop checkbox -- Right Click is fire-and-forget.
-      { key: 'rcTweenSpeedMs', label: 'Animation Speed (Ms)', type: 'slider', min: 50, max: 5000, step: 10, def: 800 },
-      { key: 'rcTweenStartTimeCurve', label: 'Start Time Curve (Distance -> Start Time)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickPoseConfig('rc') },
-      { key: 'rcTweenStartTimeRange', label: 'Min / Max Start Time (Ms)', type: 'text', def: '{"min":0,"max":300}', onChange: () => parseClickPoseConfig('rc') },
-      // Sequence Mode - Count/Loop/Oscillate -- see makeClickPoseGroup()'s
-      // own matching comment for the full reasoning.
-      { key: 'rcSequencePlayMode', label: 'Sequence Mode - Count, Loop, Oscillate', type: 'select', def: 'Count', options: () => ['Count', 'Loop', 'Oscillate'], onChange: () => updateSequencePlayModeVisibility('rc') },
-      { key: 'rcSequenceCount', label: 'Sequence Count', type: 'slider', min: 1, max: 50, step: 1, def: 3 },
-      { key: 'rcSequenceCountMode', label: 'Sequence Count Mode - Loop, Oscillate', type: 'select', def: 'Loop', options: () => ['Loop', 'Oscillate'], onChange: () => updateSequencePlayModeVisibility('rc') },
-      { key: 'rcSequenceLoopTransition', label: 'Loop Transition On/Off', type: 'checkbox', def: true },
-      { key: 'rcSequenceHoldMs', label: 'Sequence Hold Duration (Ms)', type: 'slider', min: 0, max: 5000, step: 10, def: 0 },
-      { key: 'rcTransitionSpeedMs', label: 'Animation Speed (Ms)', type: 'slider', min: 0, max: 700, step: 10, def: 400 },
-      // Animation Speed Curve / Start Time Curve / Retransition on-off
-      // gates -- see makeClickHoldPoseGroup()'s own matching comments.
-      { key: 'rcSpeedCurveEnabled', label: 'Animation Speed Curve On/Off', type: 'checkbox', def: false, onChange: () => updateSingleTimingGateVisibility('rc') },
-      { key: 'rcSpeedCurve', label: 'Animation Speed Curve (Distance -> Speed)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickPoseConfig('rc') },
-      { key: 'rcSpeedCurveRange', label: 'Min / Max Speed (Ms)', type: 'text', def: '{"min":50,"max":2000}', onChange: () => parseClickPoseConfig('rc') },
-      { key: 'rcStartTimeCurveEnabled', label: 'Start Time Curve On/Off', type: 'checkbox', def: true, onChange: () => updateSingleTimingGateVisibility('rc') },
-      { key: 'rcStartTimeCurve', label: 'Start Time Curve (Distance -> Start Time)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickPoseConfig('rc') },
-      { key: 'rcStartTimeRange', label: 'Min / Max Start Time (Ms)', type: 'text', def: '{"min":0,"max":300}', onChange: () => parseClickPoseConfig('rc') },
-      { key: 'rcPauseDurationMs', label: 'Pause Duration At Tween End (Ms)', type: 'slider', min: 0, max: 5000, step: 10, def: 500 },
-      { key: 'rcRetransitionEnabled', label: 'Retransition On/Off', type: 'checkbox', def: true, onChange: () => updateSingleTimingGateVisibility('rc') },
-      { key: 'rcRetransitionSpeedMs', label: 'Retransition Speed (Ms)', type: 'slider', min: 0, max: 700, step: 10, def: 400 },
-      { key: 'rcRetransitionStartTimeCurve', label: 'Retransition Start Time Curve (Distance -> Start Time)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickPoseConfig('rc') },
-      { key: 'rcRetransitionStartTimeRange', label: 'Retransition Min / Max Start Time (Ms)', type: 'text', def: '{"min":0,"max":300}', onChange: () => parseClickPoseConfig('rc') }
-    ])
-  },
   // Tween -- direct user request, modeled on HANDO's own "Tween / Export"
   // group (an ordered chain of saved poses, lerped through end-to-end) but
   // deliberately narrower: no manual preview slider, no camera/lighting/
@@ -1329,70 +1155,6 @@ const DEV_GROUPS = [
       }
     ])
   },
-  // Double Click Hold -- ORIGINALLY a bespoke, shared-not-per-hand
-  // mechanism (direct request: "The tween will apply to all hands
-  // simultaneously and stop when i release"). CORRECTED/REBUILT
-  // 2026-09-15, direct follow-up: "make the available settings of double
-  // click and hold to match click hold. Double click hold currently is
-  // lacking a lot of the options. I want to also be able to select
-  // single pose/ tween for double click hold" -- confirmed via 2
-  // clarifying questions that this means (1) genuinely adding per-hand
-  // distance stagger (reversing the "all hands simultaneously" design,
-  // not just adding stagger-shaped settings that would've done nothing),
-  // and (2) Single Pose mode mirroring Click Hold-Pose exactly. Given
-  // that, this is now built via makeClickHoldPoseGroup() -- a literal 3rd
-  // instance of Click Hold-Pose's own machinery (`dcHold` joins
-  // CLICK_HOLD_KEYS below), not a parallel reimplementation -- gaining
-  // every one of chp/rchp's own settings for free: Mode (Single Pose/
-  // Tween), Target Pose, Tween Selector + its own separate Tween Speed/
-  // Curve/Range, Hold Confirm Delay, Pose Transition Speed/Curve/Range,
-  // Loop Mode (Off/Loop/Oscillate) + Hold Duration, and a genuinely
-  // separate Pose Retransition Speed/Curve/Range (previously dcHold
-  // reused its own Tween Speed for retransition too, per an EARLIER
-  // direct clarification -- superseded by this request's own explicit
-  // ask for Click Hold-Pose's full settings, retransition speed
-  // included). The double-click-then-hold gesture DETECTION itself
-  // (generalized 2026-09-16 into a chain count -- see
-  // CLICK_HOLD_CHAIN_KEYS's own comment, below) is UNCHANGED here -- only which
-  // functions it calls (startClickHoldPose('dcHold')/endClickHoldPose('dcHold')
-  // now, instead of this feature's own retired start/end functions).
-  // ONE deliberate exception preserved from the ORIGINAL, twice-clarified
-  // requirement, NOT superseded by this request: Tween mode's own
-  // sequence still always starts from the DEFAULT pose specifically (not
-  // this hold's own live snapshot, unlike chp/rchp's own Tween mode) --
-  // see startClickHoldPose()'s own `tweenAnchor` comment. Single Pose
-  // mode has no such exception -- it mirrors chp/rchp exactly, per this
-  // request's own direct confirmation.
-  makeClickHoldPoseGroup('dcHold', 'Double Click Hold', {
-    enabled: false, targetPose: '',
-    startTimeCurve: '[{"x":0,"y":0},{"x":1,"y":1}]',
-    startTimeRange: '{"min":0,"max":300}',
-    retransitionSpeedMs: 400,
-    retransitionStartTimeCurve: '[{"x":0,"y":0},{"x":1,"y":1}]',
-    retransitionStartTimeRange: '{"min":0,"max":300}'
-  }),
-  // Triple-Click Hold / Quadruple-Click Hold -- direct request, same
-  // family as Double Click Hold: the Nth press of a still-building
-  // consecutive-click chain, HELD instead of released quickly (see the
-  // gesture-detection listener's own comment, below, for how the chain
-  // count is tracked). Shares chp/rchp/dcHold's own exact machinery via
-  // CLICK_HOLD_KEYS, same as dcHold already does.
-  makeClickHoldPoseGroup('tripleClickHold', 'Triple-Click Hold', {
-    enabled: false, targetPose: '',
-    startTimeCurve: '[{"x":0,"y":0},{"x":1,"y":1}]',
-    startTimeRange: '{"min":0,"max":300}',
-    retransitionSpeedMs: 400,
-    retransitionStartTimeCurve: '[{"x":0,"y":0},{"x":1,"y":1}]',
-    retransitionStartTimeRange: '{"min":0,"max":300}'
-  }),
-  makeClickHoldPoseGroup('quadClickHold', 'Quadruple-Click Hold', {
-    enabled: false, targetPose: '',
-    startTimeCurve: '[{"x":0,"y":0},{"x":1,"y":1}]',
-    startTimeRange: '{"min":0,"max":300}',
-    retransitionSpeedMs: 400,
-    retransitionStartTimeCurve: '[{"x":0,"y":0},{"x":1,"y":1}]',
-    retransitionStartTimeRange: '{"min":0,"max":300}'
-  }),
   // "Pose Preview" used to be its own always-embedded, 0-control dev-
   // group here (a <canvas> injected directly into its .dp-group-body).
   // REMOVED 2026-09-16, direct request: it's now an opt-in FLOATING
@@ -5619,8 +5381,38 @@ function buildWristSplayCurveWidget(row) {
 // one generated from CLICK_HOLD_KEYS, since all 5 entries share the
 // exact same shape; keeps a 6th/7th future trigger a one-line array add
 // instead of a 4th near-duplicate literal to keep in sync by hand.
-const CLICK_HOLD_KEYS = ['chp', 'rchp', 'dcHold', 'tripleClickHold', 'quadClickHold']
-const clickHoldPoseTriggers = Object.fromEntries(CLICK_HOLD_KEYS.map((p) => [p, {
+// All 5 static entries (chp/rchp/dcHold/tripleClickHold/quadClickHold)
+// removed 2026-09-20 per direct request ("Can you just delete those
+// static declarations... I dont mind having no click triggers
+// currently" -- replacing all hardcoded triggers with custom click
+// functions instead). Left as an empty array, not deleted outright --
+// every downstream consumer (widget builders, visibility wiring, the
+// mouse/hold event-firing code, registerCustomClickFunction()'s own
+// CLICK_HOLD_KEYS.push()) already iterates this array generically, so
+// custom hold-kind functions keep working unmodified; this array simply
+// starts with nothing pre-registered.
+const CLICK_HOLD_KEYS = []
+// The 10 removed static triggers' own key prefixes are still referenced
+// directly (not through CLICK_HOLD_KEYS/CLICK_POSE_KEYS's own generic
+// iteration) in several places this deletion didn't touch -- the mouse
+// event handlers below (startClickHoldPose('chp')/clickHoldPoseTriggers.chp.active/
+// etc.), CLICK_COUNT_CHAIN_KEYS/CLICK_HOLD_CHAIN_KEYS (click-count-chain
+// detection). Every one of those call sites already guards on
+// `cfg[\`${p}Enabled\`]` before doing anything real (always falsy now,
+// since the controls that used to set it no longer exist), so nothing
+// actually FIRES -- but several read `clickHoldPoseTriggers[p].active`
+// or similar BEFORE that guard, which throws on a genuinely missing key
+// rather than just being inert. Rather than hunting down and rewriting
+// every one of those legacy call sites individually (real risk of
+// missing one), these 2 constants seed INERT placeholder trigger-state
+// objects for the 10 old prefixes -- separate from CLICK_HOLD_KEYS/
+// CLICK_POSE_KEYS themselves (which stay empty, so no panel UI/generic
+// registration happens for them) -- so every legacy hardcoded access
+// keeps finding a real (harmless, never-active) object instead of
+// undefined.
+const LEGACY_REMOVED_HOLD_KEYS = ['chp', 'rchp', 'dcHold', 'tripleClickHold', 'quadClickHold']
+const LEGACY_REMOVED_POSE_KEYS = ['click', 'dblclick', 'rc', 'tripleClick', 'quadClick']
+const clickHoldPoseTriggers = Object.fromEntries([...CLICK_HOLD_KEYS, ...LEGACY_REMOVED_HOLD_KEYS].map((p) => [p, {
   active: false, holdStartTime: 0, forwardSnapshot: null, loopPoses: null, rawChainEntries: null, loopSegmentMs: 1,
   startCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], startRangeParsed: { min: 0, max: 300 },
   speedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], speedRangeParsed: { min: 50, max: 2000 },
@@ -6774,8 +6566,11 @@ window.addEventListener('blur', () => {
 // `tripleClick`/`quadClick` added 2026-09-16 (direct request) --
 // generalized the same way as CLICK_HOLD_KEYS/clickHoldPoseTriggers
 // just above (see its own comment).
-const CLICK_POSE_KEYS = ['click', 'dblclick', 'rc', 'tripleClick', 'quadClick']
-const clickPoseTriggers = Object.fromEntries(CLICK_POSE_KEYS.map((p) => [p, {
+// All 5 static entries (click/dblclick/rc/tripleClick/quadClick) removed
+// 2026-09-20 -- see CLICK_HOLD_KEYS's own matching comment for the full
+// reasoning (identical, just the pose-kind sibling array).
+const CLICK_POSE_KEYS = []
+const clickPoseTriggers = Object.fromEntries([...CLICK_POSE_KEYS, ...LEGACY_REMOVED_POSE_KEYS].map((p) => [p, {
   startCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], startRangeParsed: { min: 0, max: 300 },
   speedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], speedRangeParsed: { min: 50, max: 2000 },
   tweenStartCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStartRangeParsed: { min: 0, max: 300 },
