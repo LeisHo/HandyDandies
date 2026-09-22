@@ -546,7 +546,15 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   ever seen on `main.js`. Same standing practice applies to both files
   now: retry the navigation a few times (or cross-check via `curl`
   first), don't assume a just-made change broke something just because
-  either file fails to load this way.
+  either file fails to load this way. **Extended 2026-09-22: the SAME
+  truncation hits the `Hand2.glb` model asset too, not just JS files.**
+  Confirmed live -- `net::ERR_CONNECTION_RESET` on
+  `data/processed/HAND3D/Hand2.glb` itself, resolved on a 2nd
+  navigation. Nothing about this gotcha is actually JS-file-specific --
+  it's this sandbox's own static-server/network layer, so ANY
+  sufficiently large asset this project serves (GLB, JS, or otherwise)
+  can hit it; retry the navigation the same way regardless of which
+  file failed.
 - **A `select` control whose `options()` reads a list-picker's own array
   needs TWO SEPARATE, easy-to-forget wiring points -- missing either one
   looks identical from the outside ("changing it does nothing").**

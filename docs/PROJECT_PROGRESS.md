@@ -18,6 +18,31 @@ work seamlessly from there.
 
 ## Currently working on
 
+**SHIPPED 2026-09-22 (2nd round) -- debounced Multi-Point touch-
+threshold detection, so a lower Touch Point Count function no longer
+fires prematurely while fingers are still landing toward a higher one.**
+Direct question ("how does a phone know if I'm tapping with one finger,
+two, or three... people don't tap perfectly") led to a design
+discussion; recommended and built the fix to mirror this file's own
+existing click-count-chain disambiguation (reuses `cfg.multiClickWindowMs`)
+rather than a new graduated-per-tier timing model. `multiPointCommit()`
+now waits for the live touch count to hold still (skipped entirely when
+only one Touch-Point-Count function is enabled -- no added latency for
+the common case), then fires/starts only the HIGHEST eligible threshold
+actually reached. Release stays instant/un-debounced -- only landing
+fingers is ambiguous. Confirmed via discussion that this is unrelated
+to, and doesn't replace, Hold Confirm Delay (`${id}HoldConfirmMs`) --
+that answers "held long enough to count as a hold," this answers "which
+threshold did the count reach," and the two compose rather than
+overlap. Live-verified via synthetic `TouchEvent` dispatch against 2
+real custom functions created live in the dev panel (2-finger and
+3-finger, both pose-kind): a staggered 1->2->3-finger landing correctly
+fired neither immediately, then resolved to the 3-finger function only
+once settled; full release correctly reset the session; disabling the
+2-finger function confirmed the single-function case still fires
+instantly, no regression. Committed and pushed (`a7d2bd8`). See
+CHANGELOG.txt's matching entry for the full account.
+
 **SHIPPED 2026-09-22 -- 3 Custom Click Function reports fixed, plus 2
 follow-up defaults corrected during live verification.** (1) "Click+Hold
 doesn't work on desktop" -- not a code bug; live-traced a real function

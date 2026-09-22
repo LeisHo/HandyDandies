@@ -10794,6 +10794,91 @@ Three direct reports on Custom Click Functions, investigated and fixed:
 across the round's 2 commits (no devPanel.js changes this round).
 
 --------------------------------------------------------------------------------
+2026-09-22 (2nd round)
+
+Debounced Multi-Point touch-threshold detection, direct question that
+led to a design discussion: "how does a phone know if I'm tapping with
+one finger, or two fingers, or three fingers... people don't tap
+perfectly." Investigated the existing mechanism (touchstart/touchend
+listeners tracking live `e.touches.length`) and confirmed the real gap:
+a custom function's Touch Point Count threshold fired the INSTANT the
+live count first crossed it, so a lower-threshold function (e.g. 1
+finger) would fire while the user's fingers were still landing toward a
+higher one (e.g. 3), since the count necessarily passes through 1 and 2
+on the way to 3.
+
+Discussed 2 possible fixes with the user -- a graduated per-tier wait
+(only the current top tier fires instantly, everything below it waits
+to see if it gets preempted) vs. mirroring this file's OWN EXISTING
+click-count-chain disambiguation (`clickPoseClickCount`/
+`clickPoseClickTimer`, the single/double/triple/quad-click mechanism) --
+recommended the latter: reuse `cfg.multiClickWindowMs` (already exists,
+already user-tunable) instead of inventing a new timing model, and
+pointed out the graduated version's main selling point (snappier top
+tier) buys less than it sounds like, since a hold-kind function's own
+Hold Confirm Delay (`${id}HoldConfirmMs`) already gates the visible
+commit regardless. User agreed, also asked directly whether this
+overlaps with Hold Confirm Delay at all -- confirmed it doesn't: Hold
+Confirm Delay answers "was this held long enough to count as a
+deliberate hold," the touch-count mechanism answers "which function's
+threshold did the live count actually reach" -- orthogonal questions,
+composed together, neither replaces the other.
+
+Implemented via `multiPointEligibleFunctions()` (every currently
+Enabled, Click/Click+Hold-Type, Touch-Point-Count>1 custom function,
+sorted ascending by threshold) and `multiPointCommit()` (resolves and
+fires/starts the HIGHEST eligible threshold the live count actually
+reaches -- not every threshold at or below it, the same "only the
+final resolved count fires" semantics the click-count chain already
+uses). `touchstart` skips the wait entirely when only one eligible
+function exists (mirrors `customFunctionsNeedClickChain()`'s own "skip
+debounce when nothing to disambiguate" shortcut) -- otherwise it clears/
+resets a shared `multiPointDebounceTimer` to `cfg.multiClickWindowMs` on
+every touchstart AND every non-zero touchend (a finger lifting
+mid-gesture also extends the wait, so a stray lift-then-reland inside
+the window can't commit against a momentarily-lower count). A
+`multiPointSessionFiredPoseId` flag (cleared the instant every finger
+lifts) prevents a pose-kind function from re-firing on a later
+touchstart while still above its own threshold, and is what lets
+`multiPointCommit()` safely serve both the instant and debounced paths
+without double-firing. Release (`multiPointHandleTouchEnd()`) stays
+completely un-debounced, per the design discussion above -- only
+landing fingers is ambiguous, a finger lifting isn't. Relabeled the
+shared slider ("Multi-Click Window (Ms) -- Click/Hold Chains + Mouse
+Log" -> "...+ Multi-Point Touch + Mouse Log") since it now drives a 3rd
+mechanism. Exposed `multiPointCommit`/`multiPointEligibleFunctions`/
+`multiPointActiveTouchCount`/`multiPointSessionFiredPoseId` on
+`window.__debug`, matching this file's own standing convention of
+exposing internal mechanisms there for live testability.
+
+**Live-verified via synthetic `TouchEvent` dispatch** (own preview
+server; hit this sandbox's own documented network-truncation gotcha
+once on the GLB asset itself this round -- `net::ERR_CONNECTION_RESET`
+on `Hand2.glb`, not just main.js/devPanel.js as previously documented --
+retried the navigation once, loaded clean): created 2 real custom
+functions live via the dev panel's own "+ Add Click Function" button
+(`customClickFunctionIds` never loads in this local sandbox at all, so
+this was the only way to get real functions to test against), enabled
+both, set one to Touch Point Count 2 and the other to 3, both
+pose-kind. A staggered synthetic 1->2->3-finger `touchstart` sequence
+correctly fired NEITHER function immediately (`multiPointSessionFiredPoseId`
+stayed `null` right after the 3rd finger landed); after waiting past
+the 600ms default window with the count held at 3, `multiPointSessionFiredPoseId`
+resolved to the 3-finger function only, confirming the 2-finger one was
+correctly suppressed. A synthetic full release (`touchend` with 0
+touches) correctly reset the session flag to `null`. Disabling the
+2-finger function (leaving only the 3-finger one eligible) and
+re-landing 3 fingers fired it INSTANTLY, with no wait -- confirming the
+single-function shortcut still matches the pre-existing snappy
+behavior. Did not separately live-test the hold-kind start/release path
+or the mid-gesture-lift-extends-the-window branch -- both reuse the
+exact same `multiPointCommit()`/timer-reset mechanism already verified
+above, and the touchend logic for ending a hold was left structurally
+unchanged from the pre-existing (already-working) version.
+
+`index.html`'s own `main.js` cache-buster bumped `?v=205` -> `?v=206`.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================
