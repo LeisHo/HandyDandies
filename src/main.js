@@ -7901,7 +7901,15 @@ function renderCustomClickFunctionGroup(id, title, kind, family) {
   const defaultClickCountOrdinal = nextFreeCustomFunctionClickCountOrdinal(currentType, family)
   controls.splice(1, 0,
     { key: `${id}Type`, label: 'Type', type: 'select', def: currentType, options: () => typeOptions, onChange: () => handleCustomFunctionTypeChange(id, title, family) },
-    { key: `${id}TouchPointCount`, label: 'Touch Point Count', type: 'slider', min: 1, max: 10, step: 1, def: 2, onChange: () => refreshCustomFunctionConflictWarnings() },
+    // CORRECTED 2026-09-22: default dropped from 2 to 1. Under the new
+    // Touch Point Count semantics (>1 = opt into the multi-finger
+    // threshold mechanism for Click/Click+Hold; see
+    // customFunctionWantsMultiTouch()'s own comment), a default of 2
+    // would make every brand-new mobile function silently require 2
+    // simultaneous fingers just to fire a normal Click -- 1 is the
+    // correct "ordinary single-finger tap/hold" default, matching how
+    // Click/Click+Hold already behave on Desktop.
+    { key: `${id}TouchPointCount`, label: 'Touch Point Count', type: 'slider', min: 1, max: 10, step: 1, def: 1, onChange: () => refreshCustomFunctionConflictWarnings() },
     { key: `${id}ClickCount`, label: kind === 'hold' ? 'Triggers On (Nth Press-And-Hold)' : 'Triggers On (Nth Click)', type: 'select', def: ['1st', '2nd', '3rd', '4th'][defaultClickCountOrdinal - 1], options: () => ['1st', '2nd', '3rd', '4th'], onChange: () => refreshCustomFunctionConflictWarnings() }
   )
   // updateClickFunctionEnabledVisibility() (shared with the 10 static
@@ -8069,7 +8077,11 @@ function registerCustomClickFunction(id, title, kind, family) {
 // after this template is applied -- see the 3 named subgroup keys at the
 // bottom of applyNewCustomFunctionTemplate().
 const NEW_CUSTOM_FUNCTION_TEMPLATE = {
-  Enabled: true, Type: 'Click', TouchPointCount: 2, Mode: 'Single Pose',
+  // TouchPointCount corrected 2026-09-22 from 2 to 1 -- see the control's
+  // own DEV_GROUPS comment for why 2 is no longer the right default now
+  // that Touch Point Count doubles as Click/Click+Hold's own multi-touch
+  // opt-in.
+  Enabled: true, Type: 'Click', TouchPointCount: 1, Mode: 'Single Pose',
   OffsetEnabled: false, OffsetX: 0, OffsetY: 0,
   RotationEnabled: false, RotationX: 0, RotationY: 0, RotationZ: 0,
   TargetPose: '', TweenSelector: '', TweenSpeedMs: 800,
