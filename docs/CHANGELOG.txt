@@ -10712,6 +10712,88 @@ it resolves itself once Mode is changed again post-fix.
 `?v=42` to match the fix).
 
 --------------------------------------------------------------------------------
+
+2026-09-22
+
+Three direct reports on Custom Click Functions, investigated and fixed:
+
+1. "Click+Hold doesn't seem to work on desktop" -- investigated live
+   against a real saved Click+Hold function (`custom8`) via direct
+   `window.__debug` calls (`startClickHoldPose`/`updateClickHoldPoseForHand`),
+   not just code reading. Not a code defect: the hold genuinely does
+   commit and transition, confirmed by directly stepping through arm ->
+   commit -> forward. The trigger just takes far longer than a normal
+   test press -- 500ms Hold Confirm Delay plus up to 1500ms more from
+   that function's own Start Time Curve range (`TweenStartTimeRange`
+   max), close to 2 real seconds combined. Reported back rather than
+   silently changing the user's own tuned values.
+
+2. "The Retransition settings group should be available to turn on and
+   off regardless of mobile or desktop, or single pose or sequence" --
+   found and fixed a genuine asymmetry: a 2026-09-19 fix already made
+   `RetransitionEnabled` govern Sequence mode's own release behavior for
+   the HOLD-kind trigger family (`updateClickHoldPoseForHand()`), but
+   the fire-and-forget POSE-kind family's own matching check
+   (`updateClickPoseForHand()`) never got the same update -- its comment
+   was stale, still describing "Sequence mode always retransitions."
+   Fixed the logic gap (both families now respect the setting in both
+   modes) and the dev-panel row/group visibility (`updateSingleTimingGateVisibility()`
+   -- Retransition's own gate row no longer depends on Mode, unlike
+   Speed Curve/Start Time Curve, which stay Single-Pose-only per the
+   original spec and were left untouched, not part of this request).
+
+3. Mobile's own Type dropdown restructured per spec: Click, Click+Hold,
+   Zoom, Scroll -- Multi-Point removed as its own Type. Its N-finger-
+   threshold mechanism now lives inside Click/Click+Hold via Touch
+   Point Count > 1 instead ("Multipoint is available through click and
+   click and hold") -- a function left at the default (now 1, was 2 --
+   see below) uses the existing ordinary pointer-based click/hold
+   detection exclusively; raising it above 1 switches that specific
+   function onto the touch-count mechanism and suppresses its own
+   single-pointer dispatch (`customFunctionWantsMultiTouch()`), so it
+   never double-fires. Touch Point Count's own row visibility is now
+   gated on Type === Click/Click+Hold (was Type === Multi-Point), still
+   never shown on Desktop.
+
+   Zoom ("2 fingers click and hold, then separating while held") and
+   Scroll ("2 fingers click and held then dragged together") are 2
+   brand-new mobile-only gesture types, both fire-and-forget. A new
+   shared 2-finger tracker (`twoFingerGestureState`, touchstart/
+   touchmove/touchend) classifies a gesture as Zoom (inter-finger
+   distance growing past `cfg.zoomGestureThresholdPx`) or Scroll
+   (centroid pans past `cfg.scrollGestureThresholdPx` while distance
+   stays roughly constant) from the SAME tracked state, so one real
+   gesture only ever resolves to one or the other. Both thresholds are
+   new perDevice dev-panel sliders (Custom Click Functions group, 40px
+   default each) rather than hardcoded -- UNVERIFIED starting values,
+   no real-device measurement behind them yet.
+
+   Live-verified on production via synthetic `Touch`/`TouchEvent`
+   dispatches (not `.click()` -- these are pointerdown/touchmove-gated
+   paths, same testing discipline this project's own gotchas already
+   establish): confirmed the Mobile Type dropdown shows exactly
+   [Click, Click+Hold, Zoom, Scroll]; Touch Point Count row shows for
+   Click, hides for Zoom, hides entirely on Desktop regardless of Type;
+   a real 2-finger spread gesture set `pendingClaimAt` to a fresh
+   timestamp for a Zoom-type function (confirming `triggerClickPose()`
+   fired) and the hand completed a full forward/retransition cycle back
+   to idle; a real 2-finger pan gesture did the same for a Scroll-type
+   function; Retransition's own group is now visible and functional on
+   a real Sequence-mode function (`custom8`, `groupDisplay: "block"`).
+
+   Follow-up fix found DURING this live verification, not from a
+   separate report: `custom11` (an existing function) still had
+   `TouchPointCount: 2` -- both the control's own `def` and
+   `NEW_CUSTOM_FUNCTION_TEMPLATE` were leftover from before this round,
+   when 2 was a reasonable Multi-Point-style default. Under the new
+   semantics that would have made every brand-new mobile function
+   silently require 2 simultaneous fingers just for a normal Click.
+   Corrected both to default to 1.
+
+`index.html`'s own `main.js` cache-buster bumped `?v=202` -> `?v=204`
+across the round's 2 commits (no devPanel.js changes this round).
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

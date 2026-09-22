@@ -933,3 +933,67 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   mechanism before assuming the control's own `onChange` logic is at
   fault -- the value was very likely saved correctly the whole time,
   just never applied live.
+- **A fix applied to the hold-kind trigger family (`updateClickHoldPoseForHand()`)
+  does NOT automatically apply to its fire-and-forget pose-kind sibling
+  (`updateClickPoseForHand()`), even for logic that reads as obviously
+  symmetric -- these are 2 separate functions with their own separately-
+  maintained comments, and one CAN drift stale while the other gets
+  fixed.** Confirmed live 2026-09-22: a 2026-09-19 fix made
+  `RetransitionEnabled` govern Sequence mode's own release behavior for
+  hold-kind triggers (chp/rchp/dcHold/custom Click+Hold functions) --
+  its own comment says so explicitly ("RetransitionEnabled now ALSO
+  governs Sequence mode's own 'Stop' path, not just Single Pose"). The
+  pose-kind family's own matching check (`if (!isTween && cfg[...RetransitionEnabled]
+  === false) return`) was never touched by that fix -- its comment still
+  read "Sequence/Tween mode's own release always retransitions
+  (disclosed scoping choice)," a description that stopped being true for
+  the sibling family 3 days earlier but was never corrected here. Fixed
+  by removing the `!isTween &&` so both families now agree. **When
+  fixing a behavior described as applying to "this trigger family," grep
+  for the SAME concept's other implementation (hold vs. pose have almost
+  always duplicated logic in this file, never shared) before assuming a
+  fix is complete** -- this is the same class of drift as the
+  `FINGER_SIGN`/HANDO gotcha above, just within one file instead of
+  across two projects.
+- **Touch Point Count's meaning changed 2026-09-22 -- it's no longer
+  exclusive to a now-removed "Multi-Point" Type. It's now a live
+  behavioral switch on Click/Click+Hold themselves: left at 1 (the
+  default), a function uses the ordinary single-finger pointer-based
+  click/hold detection (this project's existing, mouse-and-touch-agnostic
+  pointerdown/pointerup listeners); raised above 1, that SPECIFIC
+  function's regular single-pointer dispatch is suppressed
+  (`customFunctionWantsMultiTouch()`) and it switches onto the
+  touchstart/touchend N-finger-threshold mechanism instead** (the exact
+  mechanism "Multi-Point" used to be, just reached differently now). Any
+  future code that reads `${id}TouchPointCount` needs to know this is a
+  per-function OPT-IN, not a fixed property of the Type -- checking
+  `cfg[...Type] === 'Click'` alone is no longer enough to know which
+  detection path a given function actually uses. A real, connected bug
+  was caught live the same round: the control's own `def` and
+  `NEW_CUSTOM_FUNCTION_TEMPLATE` were BOTH still `2` (a leftover from
+  when 2 was Multi-Point's own reasonable default) -- left uncorrected,
+  every brand-new mobile function would have silently required 2
+  simultaneous fingers just to fire a normal Click. Both now default to
+  `1`. If a future custom function "doesn't respond to a normal tap,"
+  check its own `TouchPointCount` value before assuming the click/hold
+  detection itself is broken.
+- **Mobile's own "Scroll" Type (a 2-finger pan gesture, added 2026-09-22)
+  shares a Type NAME with Desktop's own "Scroll" (a real mouse-wheel
+  tick) but is a completely different gesture with its own separate
+  detection code (`twoFingerGestureState`, touchstart/touchmove/touchend)
+  -- each family's own `customFunctionTypeOptions()` list only ever
+  offers one of the two, so a given function is never ambiguous about
+  which it means, but don't assume "Scroll" behavior transfers between
+  the 2 families if this ever gets refactored.** Its sibling gesture,
+  Zoom (2-finger spread), and Scroll are classified from ONE shared
+  2-touch tracking state (`twoFingerGestureState`) so a single real
+  gesture can only ever resolve to one or the other -- if a future
+  gesture type needs adding to this same family (e.g. a 2-finger
+  rotate), extend that shared classifier rather than adding a 3rd
+  independent touchmove listener, or multiple listeners will race to
+  interpret the same touch sequence differently. The 2 thresholds
+  (`zoomGestureThresholdPx`/`scrollGestureThresholdPx`, Custom Click
+  Functions group, 40px default each) are UNVERIFIED starting values
+  with no real-device measurement behind them -- if Zoom/Scroll fire too
+  eagerly or too reluctantly on a real report, tune these first before
+  suspecting the classification logic itself.

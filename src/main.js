@@ -3137,7 +3137,10 @@ function makeClickPoseGroup(p, title, defaults = {}) {
       // traversals directly (the simplest reading that still satisfies
       // "run 3 times"), not a weighted count.
       { key: `${p}SequencePlayMode`, label: 'Sequence Mode - Count, Loop, Oscillate', type: 'select', def: 'Count', options: () => ['Count', 'Loop', 'Oscillate'], onChange: () => updateSequencePlayModeVisibility(p) },
-      { key: `${p}SequenceCount`, label: 'Sequence Count', type: 'slider', min: 1, max: 50, step: 1, def: 3 },
+      // def corrected 2026-09-22 from 3 to 1, direct request ("when I do
+      // a single pose custom click function, the pose count defaults to
+      // three. Just set that to one as default").
+      { key: `${p}SequenceCount`, label: 'Sequence Count', type: 'slider', min: 1, max: 50, step: 1, def: 1 },
       { key: `${p}SequenceCountMode`, label: 'Sequence Count Mode - Loop, Oscillate', type: 'select', def: 'Loop', options: () => ['Loop', 'Oscillate'], onChange: () => updateSequencePlayModeVisibility(p) },
       // Loop Transition On/Off -- direct spec wording ("Off = instant
       // jump back to frame 1, On = smooth tween back"). Only meaningful
@@ -8086,7 +8089,7 @@ const NEW_CUSTOM_FUNCTION_TEMPLATE = {
   RotationEnabled: false, RotationX: 0, RotationY: 0, RotationZ: 0,
   TargetPose: '', TweenSelector: '', TweenSpeedMs: 800,
   TweenStartTimeCurve: '[{"x":0,"y":0},{"x":1,"y":1}]', TweenStartTimeRange: '{"min":0,"max":300}',
-  SequencePlayMode: 'Count', SequenceCount: 3, SequenceCountMode: 'Loop',
+  SequencePlayMode: 'Count', SequenceCount: 1, SequenceCountMode: 'Loop',
   SequenceLoopTransition: true, SequenceHoldMs: 0, TransitionSpeedMs: 700,
   SpeedCurveEnabled: false, SpeedCurve: '[{"x":0,"y":0},{"x":1,"y":1}]', SpeedCurveRange: '{"min":50,"max":2000}',
   StartTimeCurveEnabled: false, StartTimeCurve: '[{"x":0,"y":0},{"x":1,"y":1}]', StartTimeRange: '{"min":0,"max":300}',

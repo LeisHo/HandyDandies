@@ -18,6 +18,32 @@ work seamlessly from there.
 
 ## Currently working on
 
+**SHIPPED 2026-09-22 -- 3 Custom Click Function reports fixed, plus 2
+follow-up defaults corrected during live verification.** (1) "Click+Hold
+doesn't work on desktop" -- not a code bug; live-traced a real function
+(`custom8`) through arm/commit/forward and confirmed it genuinely works,
+just takes close to 2 real seconds (500ms Hold Confirm Delay + up to
+1500ms of that function's own Start Time Curve stagger) before anything
+visibly moves. (2) Retransition is no longer Single-Pose-only -- found a
+real asymmetry (a 2026-09-19 fix already made this mode-independent for
+hold-kind triggers, but the pose-kind family's matching check was never
+updated) and fixed both the trigger logic and the dev-panel visibility.
+(3) Mobile's Type dropdown is now Click/Click+Hold/Zoom/Scroll --
+Multi-Point removed as its own Type, its N-finger mechanism now reached
+through Click/Click+Hold's own Touch Point Count (>1 opts in); Zoom
+(2-finger spread) and Scroll (2-finger pan) are 2 brand-new gesture
+types with their own shared touch tracker and 2 new tunable thresholds
+(Custom Click Functions group). Live-verified all of this on production
+via synthetic Touch/TouchEvent dispatches -- confirmed the dropdown
+options, Touch Point Count visibility rules, a real Zoom gesture firing
+a pose end-to-end, a real Scroll gesture doing the same, and Retransition
+now working in Sequence mode. Caught 2 more defaults during that
+verification and this session's own following report, not separate bug
+reports: Touch Point Count's default (2->1, or every new mobile function
+would've silently required 2 fingers) and Sequence Count's default
+(3->1, direct request). See CHANGELOG.txt's matching 2026-09-22 entry
+for the full account.
+
 **SHIPPED 2026-09-21 -- fixed dynamicDevice controls never applying
 live on a real Mobile/Landscape device ("when I open the app in a
 mobile phone... change the mode to sequence, the [Sequence] drop down
