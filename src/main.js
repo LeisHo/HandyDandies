@@ -383,7 +383,7 @@ function tryStartField() {
   // whatever comes next; don't treat this comment's own reasoning above
   // as the settled explanation.
   renderer.compile(scene, camera)
-  window.__debug = { THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose, resolveTweenSegmentsWithAnchor, lerpTweenSegments, lerpLoopSegments, isHoldEntry, updateLoadingPreviewWristClip, lerpPoseValues, get loadingPreviewRenderer() { return loadingPreviewRenderer }, get loadingPreviewScene() { return loadingPreviewScene }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, get handBoundsCenterLocal() { return handBoundsCenterLocal } }
+  window.__debug = { THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose, resolveTweenSegmentsWithAnchor, lerpTweenSegments, lerpLoopSegments, isHoldEntry, updateLoadingPreviewWristClip, lerpPoseValues, get loadingPreviewRenderer() { return loadingPreviewRenderer }, get loadingPreviewScene() { return loadingPreviewScene }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, get handBoundsCenterLocal() { return handBoundsCenterLocal }, multiPointCommit, multiPointEligibleFunctions, get multiPointActiveTouchCount() { return multiPointActiveTouchCount }, get multiPointSessionFiredPoseId() { return multiPointSessionFiredPoseId } }
   loadingEl.classList.add('hidden')
   // The loading-preview canvas is a top-level sibling of #loading now
   // (2026-09-17, decoupled specifically so this moment doesn't force it
@@ -1396,7 +1396,7 @@ const DEV_GROUPS = [
       // chain, the Click-Hold chain (dcHold/tripleClickHold/
       // quadClickHold), and this Mouse Tracking Log's own click
       // classification, all 3 at once.
-      { key: 'multiClickWindowMs', label: 'Multi-Click Window (Ms) -- Click/Hold Chains + Mouse Log', type: 'slider', min: 200, max: 1200, step: 25, def: 600 }
+      { key: 'multiClickWindowMs', label: 'Multi-Click Window (Ms) -- Click/Hold Chains + Multi-Point Touch + Mouse Log', type: 'slider', min: 200, max: 1200, step: 25, def: 600 }
     ]
   }
 ]
@@ -8273,35 +8273,109 @@ window.addEventListener('wheel', (e) => {
 // participates here at all -- one left at the default of 1 finger keeps
 // using the ordinary pointerdown/pointerup-based click/hold detection
 // exclusively (see that mechanism's own exclusion of multi-touch
-// functions, customFunctionWantsMultiTouch()'s call sites). Tracks the
-// live simultaneous touch-point count; a 'pose'-kind function fires once
-// the INSTANT its own Touch Point Count is first reached (not repeated
-// while those fingers stay down); a 'hold'-kind function starts at that
-// same instant and ends the instant the count drops back below its own
-// threshold -- independent per function, since 2 such functions can have
-// different Touch Point Count settings active at once.
+// functions, customFunctionWantsMultiTouch()'s call sites).
+//
+// CORRECTED 2026-09-22 (2nd round, direct request -- "people don't tap
+// perfectly... how does a phone know if I'm tapping with one finger, or
+// two, or three"): the original version fired the INSTANT the live touch
+// count first crossed a function's own threshold, so a 1-finger function
+// would ALSO fire the moment the first of 3 fingers landed, before the
+// other 2 even touched down -- real ambiguity whenever 2+ Touch-Point-
+// Count-eligible functions are enabled at once. Now mirrors this file's
+// OWN EXISTING click-count-chain disambiguation pattern (see the
+// `pointerup` listener above, `clickPoseClickCount`/`clickPoseClickTimer`)
+// rather than inventing a new timing model: reuses the same
+// `cfg.multiClickWindowMs` slider, waits for the live touch count to
+// hold still for that whole window before committing, and -- same
+// "nothing to disambiguate FROM" shortcut `customFunctionsNeedClickChain()`'s
+// own pointerup branch already uses -- skips the wait entirely when only
+// one eligible function is currently enabled, so the common single-
+// function case stays exactly as instant as before. Once settled, only
+// the HIGHEST eligible threshold the count actually reaches fires/starts
+// -- not every threshold at or below it (landing 3 fingers resolves to
+// the 3-finger function only, the same way a settled 3rd click fires
+// Triple-Click Pose only, not also Click and Double-Click Pose).
+//
+// Deliberately asymmetric: only LANDING fingers goes through this wait.
+// A finger LIFTING (multiPointHandleTouchEnd(), below) stays instant/
+// un-debounced -- ending a hold the moment its own threshold is no
+// longer met isn't ambiguous the way landing fingers is, and Hold
+// Confirm Delay (`${id}HoldConfirmMs`, makeClickHoldPoseGroup()) already
+// separately owns "was this actually a deliberate hold" for hold-kind
+// functions -- this mechanism only ever resolves WHICH function's
+// threshold was reached, never click-vs-hold.
 let multiPointActiveTouchCount = 0
+let multiPointDebounceTimer = null
+// The pose-kind function id (if any) already fired for the CURRENT
+// continuous multi-touch session -- cleared the instant every finger
+// lifts (multiPointActiveTouchCount reaches 0), so a fresh touch-down
+// can fire again. Prevents both a naive re-fire on every subsequent
+// touchstart while still above threshold (e.g. a 4th finger landing
+// after a 2-finger function already fired) and a double-fire across the
+// debounced/instant paths sharing multiPointCommit() below.
+let multiPointSessionFiredPoseId = null
+// Every currently Enabled custom function whose Type is Click/Click+Hold
+// and whose own Touch Point Count is >1 -- sorted ascending by threshold
+// so "pick the highest one the live count actually reaches" (below) is a
+// simple linear scan. Recomputed fresh on every touch event rather than
+// cached, since Enabled/Type/Touch Point Count can all change live from
+// the dev panel mid-gesture. `cfg[id+'Enabled']` is checked here (unlike
+// the original version, which relied on triggerClickPose()/
+// startClickHoldPose()'s own internal Enabled guard) specifically
+// because a disabled function isn't a REAL competing candidate for the
+// "is there more than one to disambiguate between" question below.
+function multiPointEligibleFunctions() {
+  return customClickFunctionIds
+    .filter(({ id }) => {
+      const type = cfg[`${id}Type`]
+      return cfg[`${id}Enabled`] && (type === 'Click' || type === 'Click+Hold') && customFunctionWantsMultiTouch(id)
+    })
+    .map(({ id, kind }) => ({ id, kind, need: cfg[`${id}TouchPointCount`] }))
+    .sort((a, b) => a.need - b.need)
+}
+function multiPointCommit() {
+  const eligible = multiPointEligibleFunctions()
+  let winner = null
+  eligible.forEach((fn) => { if (fn.need <= multiPointActiveTouchCount) winner = fn })
+  if (!winner) return
+  if (winner.kind === 'hold') {
+    const trig = clickHoldPoseTriggers[winner.id]
+    if (trig && !trig.active) startClickHoldPose(winner.id)
+  } else if (multiPointSessionFiredPoseId !== winner.id) {
+    triggerClickPose(winner.id)
+    multiPointSessionFiredPoseId = winner.id
+  }
+}
 window.addEventListener('touchstart', (e) => {
-  const prevCount = multiPointActiveTouchCount
   multiPointActiveTouchCount = e.touches.length
-  customClickFunctionIds.forEach(({ id, kind }) => {
-    const type = cfg[`${id}Type`]
-    if ((type !== 'Click' && type !== 'Click+Hold') || !customFunctionWantsMultiTouch(id)) return
-    const need = cfg[`${id}TouchPointCount`]
-    if (prevCount < need && multiPointActiveTouchCount >= need) {
-      if (kind === 'hold') startClickHoldPose(id)
-      else triggerClickPose(id)
-    }
-  })
+  clearTimeout(multiPointDebounceTimer)
+  if (multiPointEligibleFunctions().length <= 1) { multiPointCommit(); return }
+  multiPointDebounceTimer = setTimeout(multiPointCommit, cfg.multiClickWindowMs)
 }, { passive: true })
 function multiPointHandleTouchEnd(e) {
-  const prevCount = multiPointActiveTouchCount
   multiPointActiveTouchCount = e.touches.length
+  // Ending a held function stays instant/un-debounced -- see this
+  // block's own top comment for why.
   customClickFunctionIds.forEach(({ id, kind }) => {
     if (kind !== 'hold' || cfg[`${id}Type`] !== 'Click+Hold' || !customFunctionWantsMultiTouch(id)) return
     const need = cfg[`${id}TouchPointCount`]
-    if (prevCount >= need && multiPointActiveTouchCount < need) endClickHoldPose(id)
+    const trig = clickHoldPoseTriggers[id]
+    if (trig && trig.active && multiPointActiveTouchCount < need) endClickHoldPose(id)
   })
+  if (multiPointActiveTouchCount === 0) {
+    clearTimeout(multiPointDebounceTimer)
+    multiPointSessionFiredPoseId = null
+    return
+  }
+  // A finger lifting mid-gesture (without releasing entirely) also
+  // extends the "wait for the count to hold still" window -- otherwise a
+  // stray lift-then-reland inside the original window could commit
+  // against a momentarily-lower count than what the user actually settles
+  // on.
+  if (multiPointEligibleFunctions().length > 1) {
+    clearTimeout(multiPointDebounceTimer)
+    multiPointDebounceTimer = setTimeout(multiPointCommit, cfg.multiClickWindowMs)
+  }
 }
 window.addEventListener('touchend', multiPointHandleTouchEnd, { passive: true })
 window.addEventListener('touchcancel', multiPointHandleTouchEnd, { passive: true })
