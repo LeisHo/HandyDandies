@@ -894,7 +894,17 @@ const DEV_GROUPS = [
     title: 'Custom Click Functions',
     controls: [
       { key: 'customClickFunctionIds', label: 'Custom Function IDs (Internal, Auto-Managed)', type: 'text', def: '[]' },
-      { key: 'addCustomClickFunctionBtn', label: '+ Add Click Function', type: 'button', onClick: () => addCustomClickFunction() }
+      { key: 'addCustomClickFunctionBtn', label: '+ Add Click Function', type: 'button', onClick: () => addCustomClickFunction() },
+      // Mobile-only Zoom/Scroll gesture types (direct request 2026-09-22)
+      // -- shared detection thresholds, not per-function, since the raw
+      // gesture (a 2-finger spread vs. pan) is the same real-world motion
+      // regardless of which custom function ends up responding to it. See
+      // the touchmove handler's own "CORRECTED 2026-09-22" comment for
+      // where these are actually read. Both perDevice: true since a
+      // touch-target-size-appropriate threshold plausibly differs between
+      // Mobile and Landscape's own differently-shaped viewports.
+      { key: 'zoomGestureThresholdPx', label: 'Zoom Gesture Spread Threshold (Px)', type: 'slider', min: 5, max: 150, step: 5, def: 40, perDevice: true },
+      { key: 'scrollGestureThresholdPx', label: 'Scroll Gesture Pan Threshold (Px)', type: 'slider', min: 5, max: 150, step: 5, def: 40, perDevice: true }
     ]
   },
   {
@@ -6888,13 +6898,21 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
     // recalculating throughout an explicit pose transition.
     applyPoseValuesToHand(hand, cp.lastAppliedValues, cp.frozenSplayDeg)
     applyOffsetRotationToHand(hand, p, 1) // paused only reached once the forward ramp is fully complete
-    // Retransition on/off (Single Pose only, direct spec item -- "NEW
-    // behavioral gate"). Off = never leave 'paused' -- the hand keeps
-    // reapplying its target pose forever, i.e. "stays at end pose
-    // forever." Sequence/Tween mode's own release always retransitions
-    // (disclosed scoping choice, see the control's own comment in
-    // makeClickHoldPoseGroup()).
-    if (!isTween && cfg[`${p}RetransitionEnabled`] === false) return
+    // Retransition on/off -- available regardless of Single Pose vs.
+    // Sequence/Chain mode (direct request 2026-09-22: "The Retransition
+    // settings group should be available to turn on and off regardless
+    // of... single pose or sequence"). Off = never leave 'paused' -- the
+    // hand keeps reapplying its target pose forever, i.e. "stays at end
+    // pose forever." CORRECTED 2026-09-22: this used to be `!isTween &&
+    // cfg[...RetransitionEnabled] === false`, so Sequence/Chain mode
+    // ALWAYS retransitioned regardless of the setting -- a stale
+    // "disclosed scoping choice" that the hold-kind family's own
+    // matching check (updateClickHoldPoseForHand(), see its own
+    // "CORRECTED 2026-09-19" comment) had already dropped, but this
+    // fire-and-forget pose-kind family never got the same update. Now
+    // symmetric with the hold family: RetransitionEnabled governs both
+    // modes here too.
+    if (cfg[`${p}RetransitionEnabled`] === false) return
     const pauseDurationMs = Math.max(cfg[`${p}PauseDurationMs`], 0)
     if (now - cp.pauseStartTime >= pauseDurationMs) {
       cp.phase = 'retransition'
@@ -6989,9 +7007,13 @@ const CLICK_COUNT_CHAIN_KEYS = ['click', 'dblclick', 'tripleClick', 'quadClick']
 // Whether any enabled custom 'Click' function's own Click Count selector
 // asks for a 2nd/3rd/4th click -- see this section's own pointerup
 // listener for why this needs checking alongside the hardcoded
-// dblclick/tripleClick/quadClick Enabled flags.
+// dblclick/tripleClick/quadClick Enabled flags. Excludes a multi-touch
+// Click function (Touch Point Count > 1, 2026-09-22) -- its own Click
+// Count value is never actually consulted (see triggerCustomPoseFunctions()'s
+// own exclusion), so it shouldn't force the click-chain debounce on for
+// every plain click just because a stale/irrelevant selector says '2nd'.
 function customFunctionsNeedClickChain() {
-  return customClickFunctionIds.some(({ id, kind }) => kind !== 'hold' && cfg[`${id}Type`] === 'Click' && customFunctionClickCountOrdinal(id) > 1)
+  return customClickFunctionIds.some(({ id, kind }) => kind !== 'hold' && cfg[`${id}Type`] === 'Click' && !customFunctionWantsMultiTouch(id) && customFunctionClickCountOrdinal(id) > 1)
 }
 let clickPoseClickCount = 0
 let clickPoseClickTimer = null
@@ -7662,17 +7684,33 @@ function getActiveDevPanelTab() {
 // Mobile). Which control battery/state machine a given Type actually
 // runs under (kind) is now a SEPARATE derived question, answered by
 // kindForCustomFunctionType() below, not baked into this list.
+// CORRECTED 2026-09-22, direct request: Mobile's own list is now Click/
+// Click+Hold/Zoom/Scroll -- Multi-Point is REMOVED as a distinct Type;
+// its own N-finger-threshold mechanism is now reached through Click/
+// Click+Hold's own Touch Point Count setting instead (>1 finger =
+// multi-point behavior, exactly what Multi-Point used to do as a
+// separate Type) -- see the touchstart/touchend handlers' own
+// "CORRECTED 2026-09-22" comment for where this actually happens. Zoom
+// ("2 fingers click and hold, then separating while held" -- a pinch-
+// OUT/spread gesture) and Scroll ("2 fingers click and held then
+// dragged together" -- a 2-finger pan, roughly constant inter-finger
+// distance) are 2 BRAND NEW mobile-only gesture types, both fire-and-
+// forget ('pose' kind, matching the family's own existing Scroll on
+// Desktop) -- see the 2-finger gesture recognizer below
+// (twoFingerGestureState) for the detection itself. Mobile's own
+// "Scroll" is a genuinely different gesture from Desktop's own "Scroll"
+// (a real mouse-wheel tick) despite sharing a Type name -- each family's
+// own option list only ever offers one of the two, so there's no
+// ambiguity for a given function.
 function customFunctionTypeOptions(family) {
-  return family === 'mobile' ? ['Click', 'Click+Hold', 'Multi-Point'] : ['Click', 'Click+Hold', 'Scroll', 'Right Click', 'Right Click+Hold']
+  return family === 'mobile' ? ['Click', 'Click+Hold', 'Zoom', 'Scroll'] : ['Click', 'Click+Hold', 'Scroll', 'Right Click', 'Right Click+Hold']
 }
 // Which control battery (kind) a Type value runs under -- a "+Hold"-
 // suffixed Type (Click+Hold, Right Click+Hold) needs
 // makeClickHoldPoseGroup()'s battery; every other Type (Click, Right
-// Click, Scroll, Multi-Point) needs makeClickPoseGroup()'s. Multi-Point
-// deliberately maps to 'pose', not a 3rd hold variant -- the original
-// spec's own flat Type list never distinguished a held vs. fire-and-
-// forget Multi-Point, only naming it once per family (see
-// customFunctionTypeOptions()'s own comment).
+// Click, Scroll, Zoom) needs makeClickPoseGroup()'s -- both Zoom and
+// Scroll are fire-and-forget gestures (recognized once, not held), same
+// shape as the family's other non-"+Hold" Types.
 function kindForCustomFunctionType(type) {
   return (type === 'Click+Hold' || type === 'Right Click+Hold') ? 'hold' : 'pose'
 }
@@ -7727,13 +7765,16 @@ function updateCustomFunctionTypeVisibility(id) {
   // Direct report 2026-09-20: "on desktop, there shouldn't be any touch
   // point controls or settings" -- touch points are a mobile/touch-input
   // concept with no desktop equivalent, so this row never shows on the
-  // Desktop tab regardless of Type, on top of the existing Multi-Point-
-  // only gate. Re-evaluated on every tab switch (see
+  // Desktop tab regardless of Type. Re-evaluated on every tab switch (see
   // refreshAllCustomFunctionTypeVisibility(), wired the same way
   // refreshAllCustomFunctionGroupVisibility() already is) so switching
   // to/from Desktop shows or hides it immediately, not just on the next
-  // Type change.
-  if (touchRow) touchRow.style.display = (type === 'Multi-Point' && getActiveDevPanelTab() !== 'desktop') ? '' : 'none'
+  // Type change. CORRECTED 2026-09-22, direct request: now gated on
+  // Type === Click/Click+Hold specifically (was Multi-Point, now removed
+  // as its own Type -- see customFunctionTypeOptions()'s own comment) --
+  // Zoom/Scroll are pure 2-finger gestures with no N-finger-threshold
+  // concept of their own, so Touch Point Count never applies to them.
+  if (touchRow) touchRow.style.display = ((type === 'Click' || type === 'Click+Hold') && getActiveDevPanelTab() !== 'desktop') ? '' : 'none'
   const clickCountRow = document.querySelector(`.dp-row[data-key="${id}ClickCount"]`)
   if (clickCountRow) clickCountRow.style.display = (type === 'Click' || type === 'Click+Hold') ? '' : 'none'
 }
@@ -7747,21 +7788,27 @@ function refreshAllCustomFunctionTypeVisibility() {
 }
 // This function's own "collision bucket" -- every enabled custom function
 // with the SAME (family, Type, selector) fires on the exact same real
-// gesture. `selector` is Click Count for Click/Click+Hold (the only 2
-// Types with a real chain position to pick), Touch Point Count for
-// Multi-Point, and a constant for Right Click/Right Click+Hold/Scroll
-// (no selector of their own -- ANY 2 enabled functions of one of those 3
-// Types, same family, always collide). Returns `null` for a disabled
-// function (nothing to collide with -- it never fires at all).
+// gesture. `selector` is Click Count for Click/Click+Hold when Touch
+// Point Count is 1 (the only 2 Types with a real chain position to
+// pick), Touch Point Count itself for Click/Click+Hold when that's set
+// above 1 (CORRECTED 2026-09-22 -- this used to be a separate 'Multi-
+// Point' Type branch; Multi-Point's own N-finger-threshold behavior now
+// lives inside Click/Click+Hold via Touch Point Count instead, so this
+// selector moved here with it, per-Type rather than per-Type-value), and
+// a constant for Right Click/Right Click+Hold/Scroll/Zoom (no selector
+// of their own -- ANY 2 enabled functions of one of those Types, same
+// family, always collide). Returns `null` for a disabled function
+// (nothing to collide with -- it never fires at all).
 function customFunctionConflictBucketKey(id) {
   if (!cfg[`${id}Enabled`]) return null
   const entry = customClickFunctionIds.find((e) => e.id === id)
   if (!entry) return null
   const type = cfg[`${id}Type`]
   let selector
-  if (type === 'Click' || type === 'Click+Hold') selector = cfg[`${id}ClickCount`] || '1st'
-  else if (type === 'Multi-Point') selector = cfg[`${id}TouchPointCount`] || 2
-  else selector = 'single'
+  if (type === 'Click' || type === 'Click+Hold') {
+    const touchPoints = cfg[`${id}TouchPointCount`] || 1
+    selector = touchPoints > 1 ? `touch${touchPoints}` : (cfg[`${id}ClickCount`] || '1st')
+  } else selector = 'single'
   return `${entry.family}|${type}|${selector}`
 }
 // Automatic hold-timing conflict resolution (direct spec item) -- when a
@@ -8127,19 +8174,33 @@ function restoreCustomClickFunctions() {
 function customFunctionClickCountOrdinal(id) {
   return { '1st': 1, '2nd': 2, '3rd': 3, '4th': 4 }[cfg[`${id}ClickCount`]] || 1
 }
+// A Click/Click+Hold function whose own Touch Point Count is set above 1
+// has opted into the multi-finger threshold mechanism (see the
+// touchstart/touchend handlers' own "CORRECTED 2026-09-22" comment) --
+// its regular single-pointer click/hold dispatch (this file's existing
+// pointerdown/pointerup-based listeners, which fire per Pointer Events
+// semantics regardless of mouse or touch) needs to stay silent for that
+// function, or a single finger touching down would ALSO fire it via the
+// ordinary 1-finger path in addition to the real N-finger gesture.
+// Desktop-family functions are never affected (Touch Point Count's own
+// row is hidden entirely on Desktop, per updateCustomFunctionTypeVisibility()).
+function customFunctionWantsMultiTouch(id) {
+  return (cfg[`${id}TouchPointCount`] || 1) > 1
+}
 // Piggybacks every enabled 'pose'-kind custom function of the matching
 // Type onto this project's EXISTING click/right-click/scroll detection
 // (see the `pointerup`/`wheel` listeners below). `clickCount` is the
 // ordinal this gesture just resolved to (1-4, defaulting to 1 for Types
-// with no chain of their own -- Right Click/Scroll always pass the
+// with no chain of their own -- Right Click/Scroll/Zoom always pass the
 // default) -- only 'Click' actually gates on it, since it's the only pose
 // Type with a real multi-click CHAIN behind it in this app (see
 // updateCustomFunctionTypeVisibility()'s own comment for why Right
-// Click/Scroll/Multi-Point don't).
+// Click/Scroll/Zoom don't).
 function triggerCustomPoseFunctions(type, clickCount = 1) {
   customClickFunctionIds.forEach(({ id, kind }) => {
     if (kind === 'hold' || cfg[`${id}Type`] !== type) return
     if (type === 'Click' && customFunctionClickCountOrdinal(id) !== clickCount) return
+    if (type === 'Click' && customFunctionWantsMultiTouch(id)) return
     triggerClickPose(id)
   })
 }
@@ -8152,14 +8213,16 @@ function triggerCustomPoseFunctions(type, clickCount = 1) {
 // chp/rchp already have, for free. `ordinal` mirrors triggerCustomPoseFunctions()'s
 // own `clickCount` param -- only 'Click+Hold' gates on it (the only hold
 // Type with a real press-chain, chp/dcHold/tripleClickHold/quadClickHold,
-// behind it); Right Click+Hold/Multi-Point always fire regardless (Right
-// Click+Hold has no chain to begin with; Multi-Point is gated by its own
-// separate Touch Point Count mechanism instead, see the touch listeners
-// below).
+// behind it); Right Click+Hold always fires regardless (no chain of its
+// own to begin with). A Click+Hold function using Touch Point Count > 1
+// is excluded the same way triggerCustomPoseFunctions() excludes its own
+// multi-touch Click functions -- see customFunctionWantsMultiTouch()'s
+// own comment.
 function startCustomHoldFunctions(type, ordinal = 1) {
   customClickFunctionIds.forEach(({ id, kind }) => {
     if (kind !== 'hold' || cfg[`${id}Type`] !== type) return
     if (type === 'Click+Hold' && customFunctionClickCountOrdinal(id) !== ordinal) return
+    if (type === 'Click+Hold' && customFunctionWantsMultiTouch(id)) return
     startClickHoldPose(id)
   })
 }
@@ -8167,6 +8230,7 @@ function endCustomHoldFunctions(type, ordinal = 1) {
   customClickFunctionIds.forEach(({ id, kind }) => {
     if (kind !== 'hold' || cfg[`${id}Type`] !== type) return
     if (type === 'Click+Hold' && customFunctionClickCountOrdinal(id) !== ordinal) return
+    if (type === 'Click+Hold' && customFunctionWantsMultiTouch(id)) return
     endClickHoldPose(id)
   })
 }
@@ -8186,21 +8250,29 @@ window.addEventListener('wheel', (e) => {
   triggerCustomPoseFunctions('Scroll')
   scrollTriggerTimer = setTimeout(() => { scrollTriggerTimer = null }, cfg.multiClickWindowMs)
 }, { passive: true })
-// Multi-Point -- direct spec item ("That Click Function group for Type,
-// will always include -- Click, Click+Hold, Multi-Point [for Mobile]").
-// Tracks the live simultaneous touch-point count; a 'pose'-kind function
-// fires once the INSTANT its own Touch Point Count is first reached (not
-// repeated while those fingers stay down); a 'hold'-kind function starts
-// at that same instant and ends the instant the count drops back below its
-// own threshold -- independent per function, since 2 Multi-Point functions
-// can have different Touch Point Count settings active at once.
+// Multi-finger threshold, reached through Click/Click+Hold's own Touch
+// Point Count setting (CORRECTED 2026-09-22, direct request -- this used
+// to be a separate 'Multi-Point' Type; see customFunctionTypeOptions()'s
+// own comment for the full account of why it moved). Only a function
+// whose OWN Touch Point Count is set above 1 (customFunctionWantsMultiTouch())
+// participates here at all -- one left at the default of 1 finger keeps
+// using the ordinary pointerdown/pointerup-based click/hold detection
+// exclusively (see that mechanism's own exclusion of multi-touch
+// functions, customFunctionWantsMultiTouch()'s call sites). Tracks the
+// live simultaneous touch-point count; a 'pose'-kind function fires once
+// the INSTANT its own Touch Point Count is first reached (not repeated
+// while those fingers stay down); a 'hold'-kind function starts at that
+// same instant and ends the instant the count drops back below its own
+// threshold -- independent per function, since 2 such functions can have
+// different Touch Point Count settings active at once.
 let multiPointActiveTouchCount = 0
 window.addEventListener('touchstart', (e) => {
   const prevCount = multiPointActiveTouchCount
   multiPointActiveTouchCount = e.touches.length
   customClickFunctionIds.forEach(({ id, kind }) => {
-    if (cfg[`${id}Type`] !== 'Multi-Point') return
-    const need = cfg[`${id}TouchPointCount`] || 2
+    const type = cfg[`${id}Type`]
+    if ((type !== 'Click' && type !== 'Click+Hold') || !customFunctionWantsMultiTouch(id)) return
+    const need = cfg[`${id}TouchPointCount`]
     if (prevCount < need && multiPointActiveTouchCount >= need) {
       if (kind === 'hold') startClickHoldPose(id)
       else triggerClickPose(id)
@@ -8211,13 +8283,64 @@ function multiPointHandleTouchEnd(e) {
   const prevCount = multiPointActiveTouchCount
   multiPointActiveTouchCount = e.touches.length
   customClickFunctionIds.forEach(({ id, kind }) => {
-    if (kind !== 'hold' || cfg[`${id}Type`] !== 'Multi-Point') return
-    const need = cfg[`${id}TouchPointCount`] || 2
+    if (kind !== 'hold' || cfg[`${id}Type`] !== 'Click+Hold' || !customFunctionWantsMultiTouch(id)) return
+    const need = cfg[`${id}TouchPointCount`]
     if (prevCount >= need && multiPointActiveTouchCount < need) endClickHoldPose(id)
   })
 }
 window.addEventListener('touchend', multiPointHandleTouchEnd, { passive: true })
 window.addEventListener('touchcancel', multiPointHandleTouchEnd, { passive: true })
+// Zoom/Scroll -- 2 brand-new mobile-only gesture Types (direct request
+// 2026-09-22). Zoom = 2 fingers held, then SEPARATING (pinch-out) while
+// held; Scroll (mobile's own meaning, distinct from Desktop's mouse-wheel
+// Scroll above) = 2 fingers held, then dragged TOGETHER (a pan -- the
+// pair's own centroid moves while the distance between them stays
+// roughly constant). Both are fire-and-forget ('pose' kind, matching
+// kindForCustomFunctionType()) -- recognized once per gesture, not
+// repeated while the fingers stay down, mirroring Multi-Point's own
+// "fires once, the instant its condition is first met" behavior above.
+// Classified from ONE shared 2-touch tracking state so a single gesture
+// can only ever resolve to one or the other, never both, and a gesture
+// that's already fired stays silent for the rest of that same touch
+// sequence. The 2 distance thresholds below are exposed as their own
+// dev-panel sliders (Custom Click Functions group) rather than hardcoded
+// -- UNVERIFIED starting values (40px), a judgment call with no
+// real-device measurement behind it yet; tune live against an actual
+// touch device if the gestures fire too eagerly or too reluctantly.
+let twoFingerGestureState = null
+function touchPairCentroid(touches) {
+  return { x: (touches[0].clientX + touches[1].clientX) / 2, y: (touches[0].clientY + touches[1].clientY) / 2 }
+}
+function touchPairDistance(touches) {
+  const dx = touches[0].clientX - touches[1].clientX
+  const dy = touches[0].clientY - touches[1].clientY
+  return Math.sqrt(dx * dx + dy * dy)
+}
+window.addEventListener('touchstart', (e) => {
+  twoFingerGestureState = e.touches.length === 2
+    ? { startDist: touchPairDistance(e.touches), startCentroid: touchPairCentroid(e.touches), fired: false }
+    : null
+}, { passive: true })
+window.addEventListener('touchmove', (e) => {
+  if (!twoFingerGestureState || twoFingerGestureState.fired || e.touches.length !== 2) return
+  const dist = touchPairDistance(e.touches)
+  const centroid = touchPairCentroid(e.touches)
+  const spread = dist - twoFingerGestureState.startDist
+  const dx = centroid.x - twoFingerGestureState.startCentroid.x
+  const dy = centroid.y - twoFingerGestureState.startCentroid.y
+  const panDist = Math.sqrt(dx * dx + dy * dy)
+  const zoomThreshold = cfg.zoomGestureThresholdPx ?? 40
+  const scrollThreshold = cfg.scrollGestureThresholdPx ?? 40
+  if (spread >= zoomThreshold) {
+    twoFingerGestureState.fired = true
+    triggerCustomPoseFunctions('Zoom')
+  } else if (panDist >= scrollThreshold && spread < zoomThreshold / 2) {
+    twoFingerGestureState.fired = true
+    triggerCustomPoseFunctions('Scroll')
+  }
+}, { passive: true })
+window.addEventListener('touchend', () => { twoFingerGestureState = null }, { passive: true })
+window.addEventListener('touchcancel', () => { twoFingerGestureState = null }, { passive: true })
 // Whether ANY custom hold function of the given Type has been held long
 // enough to count as a genuine hold-release, not a quick tap -- feeds the
 // SAME `lastPointerupWasHoldRelease`/`lastPointerupWasRchpHoldRelease`
@@ -8364,8 +8487,17 @@ function updateSingleTimingGateVisibility(p) {
   const startOn = showBase && cfg[`${p}StartTimeCurveEnabled`] !== false
   setRow('StartTimeCurve', startOn)
   setRow('StartTimeRange', startOn)
-  setGateRow('RetransitionEnabled', showBase)
-  const retransitionOn = showBase && cfg[`${p}RetransitionEnabled`] !== false
+  // Retransition is NOT mode-gated (direct request 2026-09-22: "available
+  // to turn on and off regardless of... single pose or sequence") --
+  // unlike SpeedCurve/StartTimeCurve above, which stay Single-Pose-only
+  // per the original spec's own grouping (not part of this request, left
+  // untouched). Its own trigger-logic side of this (the pose-kind
+  // family's own Sequence-mode retransition check) was fixed to match in
+  // the same round -- see that function's own "CORRECTED 2026-09-22"
+  // comment; the hold-kind family already respected this regardless of
+  // mode since 2026-09-19.
+  setGateRow('RetransitionEnabled', true)
+  const retransitionOn = cfg[`${p}RetransitionEnabled`] !== false
   setRow('RetransitionSpeedMs', retransitionOn)
   setRow('RetransitionStartTimeCurve', retransitionOn)
   setRow('RetransitionStartTimeRange', retransitionOn)
