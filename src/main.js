@@ -6,7 +6,7 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js'
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js'
 import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js'
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js'
-import { initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, applyTextOverrides, setDevTextOverride } from './devpanel/devPanel.js?v=45'
+import { initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, applyTextOverrides, setDevTextOverride } from './devpanel/devPanel.js?v=46'
 
 // A defensive wrapper around devPanel.js's own refreshSelectOptions() --
 // found via live testing (direct user report: "I dont see any of the
@@ -1539,7 +1539,25 @@ const cfg = initDevPanel(DEV_GROUPS, {
   // configured. disableDeletedStaticClickTrigger() (below) closes this
   // specific gap; both cleanup functions run for every deletion and are
   // each a no-op for the case the other one handles.
-  onGroupDeleted: (target) => { cleanupDeletedCustomClickFunction(target); disableDeletedStaticClickTrigger(target) }
+  onGroupDeleted: (target) => { cleanupDeletedCustomClickFunction(target); disableDeletedStaticClickTrigger(target) },
+  // Real bug found live 2026-09-24: Custom Click Functions' own tab-
+  // dependent visibility (Touch Point Count hidden on Desktop, a
+  // function's own group shown/hidden by family, the Zoom/Scroll
+  // threshold rows) is computed by reading `.dp-tab-active` at the
+  // moment each function registers -- correct on a genuine user tab
+  // click (setupCustomFunctionTabVisibilitySync(), registered after
+  // devPanel.js's own tab-click listener), but devPanel.js's own
+  // documented "editingDevice can read wrong for ~0.5s after page load,
+  // self-heals via requestAnimationFrame" gotcha (see its own
+  // healActiveTabOnce() comment) has no equivalent hook for a HOST's own
+  // tab-dependent logic -- confirmed live: Touch Point Count stayed
+  // visible on Desktop after every page load until the user manually
+  // clicked a tab, even though the tab BUTTON itself had already
+  // self-healed to show "Desktop" well before that click. This new
+  // devPanel.js `onDeviceTabChanged` hook (called from both a real click
+  // AND the self-heal correction) re-runs the exact same sweep the
+  // click listener already does, so either path now stays correct.
+  onDeviceTabChanged: () => { refreshAllCustomFunctionGroupVisibility(); refreshAllCustomFunctionTypeVisibility(); updateCustomFunctionsAnchorRowVisibility() }
 })
 onChangeByCtrl.forEach((fn, c) => { c.onChange = fn })
 setupCustomFunctionTabVisibilitySync()

@@ -2736,6 +2736,7 @@ export function initDevPanel(groups, opts = {}) {
     userSwitchedTab = true
     updateTabButtonStyles()
     refreshRowDisplaysForEditingTab()
+    if (opts.onDeviceTabChanged) opts.onDeviceTabChanged(device)
   }
   DEVICES.forEach((d) => tabButtons[d].addEventListener('click', () => switchTab(d)))
   updateTabButtonStyles()
@@ -2766,6 +2767,22 @@ export function initDevPanel(groups, opts = {}) {
       editingDevice = real
       updateTabButtonStyles()
       refreshRowDisplaysForEditingTab()
+      // Real bug found live 2026-09-24: a host's OWN tab-dependent
+      // visibility logic computed once at restore time (main.js's
+      // Custom Click Functions -- getActiveDevPanelTab() reads
+      // `.dp-tab-active` at that moment) can be silently WRONG for good
+      // if editingDevice read wrong at that exact early moment and this
+      // self-heal is the only thing that ever corrects it -- neither
+      // updateTabButtonStyles() nor refreshRowDisplaysForEditingTab()
+      // re-runs a host's own custom logic, only this engine's generic
+      // per-row display. Confirmed live: Touch Point Count stayed
+      // visible on Desktop after a page load until the user manually
+      // clicked a tab (which happens to re-run the host's own listener),
+      // even though `.dp-tab-active` had already visually self-healed to
+      // "Desktop" well before that click. Same `opts.onDeviceTabChanged`
+      // hook switchTab() already calls, so a host only needs to wire it
+      // once to cover both a real user click and this self-heal.
+      if (opts.onDeviceTabChanged) opts.onDeviceTabChanged(editingDevice)
     }
     requestAnimationFrame(healActiveTabOnce)
   }
