@@ -189,7 +189,7 @@
       "loadingPreviewSequenceHoldMs": 0,
       "loadingPreviewSize": 1390,
       "loadingPreviewRotationX": -79.5214147749844,
-      "loadingPreviewRotationY": -3.4505366585857042,
+      "loadingPreviewRotationY": -3.450536658585706,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0.27796090493479864,
       "loadingPreviewOffsetY": -2.3103396034084374,
@@ -6670,7 +6670,7 @@
       "dp_capsTabText": true,
       "dp_capsGroupNames": true,
       "dp_capsSettingsText": false,
-      "dp_textEditMode": true,
+      "dp_textEditMode": false,
       "dp_capsTitleText": false,
       "dp_boldTitle": true,
       "dp_boldTab": true,
@@ -6834,7 +6834,7 @@
       "custom10TweenSpeedMs": 3910,
       "custom10TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom10TweenStartTimeRange": "{\"min\":0,\"max\":1374}",
-      "custom10LoopMode": "Loop",
+      "custom10LoopMode": "Off",
       "custom10LoopHoldMs": 0,
       "custom10TransitionSpeedMs": 700,
       "custom10SpeedCurveEnabled": false,
@@ -6853,7 +6853,7 @@
       "custom10TweenRetransitionSpeedMs": 3550,
       "custom10TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom10TweenRetransitionStartTimeRange": "{\"min\":0,\"max\":618}",
-      "custom10TweenStopEnabled": true,
+      "custom10TweenStopEnabled": false,
       "custom10TweenStopStartTimeCurveEnabled": false,
       "custom10TweenStopStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom10TweenStopStartTimeRange": "{\"min\":0,\"max\":300}",
@@ -7126,7 +7126,7 @@
       "loadingPreviewSequenceHoldMs": 0,
       "loadingPreviewSize": 1390,
       "loadingPreviewRotationX": -79.5214147749844,
-      "loadingPreviewRotationY": -3.4505366585857042,
+      "loadingPreviewRotationY": -3.450536658585706,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0.27796090493479864,
       "loadingPreviewOffsetY": -2.3103396034084374,
@@ -13607,7 +13607,7 @@
       "dp_capsTabText": true,
       "dp_capsGroupNames": true,
       "dp_capsSettingsText": false,
-      "dp_textEditMode": true,
+      "dp_textEditMode": false,
       "dp_capsTitleText": false,
       "dp_boldTitle": true,
       "dp_boldTab": true,
@@ -13771,7 +13771,7 @@
       "custom10TweenSpeedMs": 3910,
       "custom10TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom10TweenStartTimeRange": "{\"min\":0,\"max\":1374}",
-      "custom10LoopMode": "Loop",
+      "custom10LoopMode": "Off",
       "custom10LoopHoldMs": 0,
       "custom10TransitionSpeedMs": 700,
       "custom10SpeedCurveEnabled": false,
@@ -13790,7 +13790,7 @@
       "custom10TweenRetransitionSpeedMs": 3550,
       "custom10TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom10TweenRetransitionStartTimeRange": "{\"min\":0,\"max\":618}",
-      "custom10TweenStopEnabled": true,
+      "custom10TweenStopEnabled": false,
       "custom10TweenStopStartTimeCurveEnabled": false,
       "custom10TweenStopStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom10TweenStopStartTimeRange": "{\"min\":0,\"max\":300}",
@@ -14063,7 +14063,7 @@
       "loadingPreviewSequenceHoldMs": 0,
       "loadingPreviewSize": 1390,
       "loadingPreviewRotationX": -79.5214147749844,
-      "loadingPreviewRotationY": -3.4505366585857042,
+      "loadingPreviewRotationY": -3.450536658585706,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0.27796090493479864,
       "loadingPreviewOffsetY": -2.3103396034084374,
@@ -20544,7 +20544,7 @@
       "dp_capsTabText": true,
       "dp_capsGroupNames": true,
       "dp_capsSettingsText": false,
-      "dp_textEditMode": true,
+      "dp_textEditMode": false,
       "dp_capsTitleText": false,
       "dp_boldTitle": true,
       "dp_boldTab": true,
@@ -20708,7 +20708,7 @@
       "custom10TweenSpeedMs": 3910,
       "custom10TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom10TweenStartTimeRange": "{\"min\":0,\"max\":1374}",
-      "custom10LoopMode": "Loop",
+      "custom10LoopMode": "Off",
       "custom10LoopHoldMs": 0,
       "custom10TransitionSpeedMs": 700,
       "custom10SpeedCurveEnabled": false,
@@ -20727,7 +20727,7 @@
       "custom10TweenRetransitionSpeedMs": 3550,
       "custom10TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom10TweenRetransitionStartTimeRange": "{\"min\":0,\"max\":618}",
-      "custom10TweenStopEnabled": true,
+      "custom10TweenStopEnabled": false,
       "custom10TweenStopStartTimeCurveEnabled": false,
       "custom10TweenStopStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom10TweenStopStartTimeRange": "{\"min\":0,\"max\":300}",
@@ -22576,7 +22576,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 14",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -22646,7 +22646,7 @@
                 "type": "group",
                 "group": {
                   "key": "Rotation",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -22830,7 +22830,7 @@
               },
               {
                 "key": "Rotation",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -23453,7 +23453,7 @@
                 "type": "group",
                 "group": {
                   "key": "Start Time Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -23748,7 +23748,7 @@
               },
               {
                 "key": "Start Time Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -23960,7 +23960,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 9",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -24334,7 +24334,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 8",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -24970,7 +24970,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 7",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -25371,7 +25371,7 @@
       "subgroups": [
         {
           "key": "Custom Click Function 14",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -25441,7 +25441,7 @@
               "type": "group",
               "group": {
                 "key": "Rotation",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -25625,7 +25625,7 @@
             },
             {
               "key": "Rotation",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -26242,7 +26242,7 @@
               "type": "group",
               "group": {
                 "key": "Start Time Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -26537,7 +26537,7 @@
             },
             {
               "key": "Start Time Curve",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -26746,7 +26746,7 @@
         },
         {
           "key": "Custom Click Function 9",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -27117,7 +27117,7 @@
         },
         {
           "key": "Custom Click Function 8",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -27750,7 +27750,7 @@
         },
         {
           "key": "Custom Click Function 7",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
