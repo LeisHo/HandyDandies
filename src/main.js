@@ -7833,6 +7833,19 @@ function buildClickPoseWidgets(p) {
 let customClickFunctionIds = [] // [{id, title, kind, family}] -- kind: 'pose'|'hold'; family: 'desktop'|'mobile'. Mirrors cfg.customClickFunctionIds (JSON), kept in sync by persistCustomClickFunctionIds()
 let nextCustomFunctionN = 1
 function persistCustomClickFunctionIds() {
+  // Capture current collapse state for each custom function group before
+  // saving, so the collapse state can be restored on page load (see
+  // restoreCustomClickFunctions() for the restore side).
+  const anchor = document.querySelector('.dp-group[data-key="Custom Click Functions"]')
+  if (anchor) {
+    const anchorBody = anchor.querySelector(':scope > .dp-group-body')
+    if (anchorBody) {
+      customClickFunctionIds.forEach((entry) => {
+        const g = anchorBody.querySelector(`.dp-group[data-key="${entry.id}"]`)
+        if (g) entry.collapsed = g.classList.contains('collapsed')
+      })
+    }
+  }
   const json = JSON.stringify(customClickFunctionIds)
   cfg.customClickFunctionIds = json
   syncValue('customClickFunctionIds', json)
@@ -8683,6 +8696,18 @@ function restoreCustomClickFunctions() {
     if (m) maxN = Math.max(maxN, parseInt(m[1], 10))
   })
   nextCustomFunctionN = maxN + 1
+  // Reapply collapse state to newly-rebuilt custom function groups -- they
+  // were removed (line 8677) and rebuilt above, but applyOrder() already ran
+  // before this restore hook, so the collapse state wasn't applied to them yet.
+  // Apply the saved collapse state from each entry's own data.
+  if (anchorBody) {
+    anchorBody.querySelectorAll(':scope > .dp-group').forEach((g) => {
+      const key = g.dataset.key
+      const entry = saved.find((e) => e && e.id === key)
+      if (entry && entry.collapsed) g.classList.add('collapsed')
+      else if (entry && !entry.collapsed) g.classList.remove('collapsed')
+    })
+  }
   refreshAllCustomFunctionGroupVisibility()
   refreshAllCustomFunctionTypeVisibility()
   updateCustomFunctionsAnchorRowVisibility()
