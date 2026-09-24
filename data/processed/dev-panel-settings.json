@@ -6088,13 +6088,13 @@
       "cropWristEnabled": true,
       "hideWrist": 46,
       "reactiveArmLengthEnabled": true,
-      "armLengthRange": "{\"min\":0,\"max\":81}",
+      "armLengthRange": "{\"min\":0,\"max\":57}",
       "armLengthCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
-      "wristSplayResponsiveEnabled": false,
+      "wristSplayResponsiveEnabled": true,
       "wristSplayReposeStagger": 4,
       "wristSplayDefault": 0,
-      "wristSplayReactiveEnabled": false,
-      "wristSplayRange": "{\"min\":57,\"max\":-46}",
+      "wristSplayReactiveEnabled": true,
+      "wristSplayRange": "{\"min\":-3,\"max\":-70}",
       "wristSplayCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0.042812347412109375}]",
       "tweenPoses": [
         "COUNTDOWN (VERT) - 0",
@@ -13025,13 +13025,13 @@
       "cropWristEnabled": true,
       "hideWrist": 46,
       "reactiveArmLengthEnabled": true,
-      "armLengthRange": "{\"min\":0,\"max\":81}",
+      "armLengthRange": "{\"min\":0,\"max\":57}",
       "armLengthCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
-      "wristSplayResponsiveEnabled": false,
+      "wristSplayResponsiveEnabled": true,
       "wristSplayReposeStagger": 4,
       "wristSplayDefault": 0,
-      "wristSplayReactiveEnabled": false,
-      "wristSplayRange": "{\"min\":57,\"max\":-46}",
+      "wristSplayReactiveEnabled": true,
+      "wristSplayRange": "{\"min\":-3,\"max\":-70}",
       "wristSplayCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0.042812347412109375}]",
       "tweenPoses": [
         "COUNTDOWN (VERT) - 0",
@@ -19962,13 +19962,13 @@
       "cropWristEnabled": true,
       "hideWrist": 46,
       "reactiveArmLengthEnabled": true,
-      "armLengthRange": "{\"min\":0,\"max\":81}",
+      "armLengthRange": "{\"min\":0,\"max\":57}",
       "armLengthCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
-      "wristSplayResponsiveEnabled": false,
+      "wristSplayResponsiveEnabled": true,
       "wristSplayReposeStagger": 4,
       "wristSplayDefault": 0,
-      "wristSplayReactiveEnabled": false,
-      "wristSplayRange": "{\"min\":57,\"max\":-46}",
+      "wristSplayReactiveEnabled": true,
+      "wristSplayRange": "{\"min\":-3,\"max\":-70}",
       "wristSplayCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0.042812347412109375}]",
       "tweenPoses": [
         "COUNTDOWN (VERT) - 0",
@@ -22339,7 +22339,7 @@
     },
     {
       "key": "Cursor Tracking",
-      "collapsed": true,
+      "collapsed": false,
       "locked": false,
       "items": [
         {
@@ -22362,7 +22362,7 @@
           "type": "group",
           "group": {
             "key": "New Group (3)",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -22472,7 +22472,7 @@
       "subgroups": [
         {
           "key": "New Group (3)",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -22569,7 +22569,7 @@
     },
     {
       "key": "Custom Click Functions",
-      "collapsed": false,
+      "collapsed": true,
       "locked": false,
       "items": [
         {
