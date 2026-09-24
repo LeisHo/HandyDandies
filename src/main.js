@@ -7114,6 +7114,15 @@ const CLICK_COUNT_CHAIN_KEYS = ['click', 'dblclick', 'tripleClick', 'quadClick']
 function customFunctionsNeedClickChain() {
   return customClickFunctionIds.some(({ id, kind }) => kind !== 'hold' && cfg[`${id}Type`] === 'Click' && !customFunctionWantsMultiTouch(id) && customFunctionClickCountOrdinal(id) > 1)
 }
+// Right-click counterpart -- direct request 2026-09-24 ("Right Click
+// should alo have the trigger count setting input. i can do a double or
+// triple riht click"). Same reasoning as customFunctionsNeedClickChain()
+// above, just for Type === 'Right Click' -- no multi-touch exclusion
+// needed here (Touch Point Count's own multi-finger mechanism only ever
+// applies to Click/Click+Hold, never Right Click).
+function customRightClickFunctionsNeedChain() {
+  return customClickFunctionIds.some(({ id, kind }) => kind !== 'hold' && cfg[`${id}Type`] === 'Right Click' && customFunctionClickCountOrdinal(id) > 1)
+}
 let clickPoseClickCount = 0
 let clickPoseClickTimer = null
 window.addEventListener('pointerup', (e) => {
@@ -7163,19 +7172,48 @@ window.addEventListener('pointerup', (e) => {
 })
 // Right Click -- direct request ("also provide another CLick function,
 // the same as the others - 'Right Click'"): the right-button equivalent
-// of the plain 'click' trigger above (quick tap, fire-and-forget, no
-// double-click counterpart requested), reusing triggerClickPose('rc')
-// unchanged -- the only new thing this feature needed at the trigger
-// level is telling a genuine Right-Click Hold-Pose (rchp) release apart
-// from a quick right-button tap, via `lastPointerupWasRchpHoldRelease`
-// (set just above, in the SAME pointerup listener endClickHoldPose('rchp')
-// already uses, so it's always current by the time this one runs).
+// of the plain 'click' trigger above (quick tap, fire-and-forget), reusing
+// triggerClickPose('rc') unchanged -- 'rc' is one of the 10 static
+// triggers deleted 2026-09-20 (LEGACY_REMOVED_POSE_KEYS), so this call is
+// a permanent, harmless no-op now (cfg.rcEnabled is undefined/falsy with
+// no UI left to set it) -- kept rather than removed, since it costs
+// nothing and matches the left-click listener's own identical dead
+// 'click' reference. The only original new thing this feature needed at
+// the trigger level was telling a genuine Right-Click Hold-Pose (rchp)
+// release apart from a quick right-button tap, via
+// `lastPointerupWasRchpHoldRelease` (set just above, in the SAME
+// pointerup listener endClickHoldPose('rchp') already uses, so it's
+// always current by the time this one runs).
+//
+// CORRECTED 2026-09-24 (direct request: "Right Click should alo have the
+// trigger count setting input. i can do a double or triple riht click")
+// -- now debounced/chained exactly like the left-click listener above,
+// via its own separate rightClickPoseClickCount/rightClickPoseClickTimer
+// state and customRightClickFunctionsNeedChain()'s own early-fire
+// shortcut (skip the wait entirely when nothing past a plain right-click
+// is configured). A completely separate counter/timer from the left-
+// click chain -- a right-click and a left-click are never part of the
+// same gesture, so they must never share or reset each other's count.
+let rightClickPoseClickCount = 0
+let rightClickPoseClickTimer = null
 window.addEventListener('pointerup', (e) => {
   if (e.target && e.target.closest && e.target.closest('.dp-panel, #pauseButton')) return
   if (e.button !== 2) return
   if (lastPointerupWasRchpHoldRelease) return
   triggerClickPose('rc')
-  triggerCustomPoseFunctions('Right Click')
+  if (!customRightClickFunctionsNeedChain()) {
+    rightClickPoseClickCount = 0
+    clearTimeout(rightClickPoseClickTimer)
+    triggerCustomPoseFunctions('Right Click', 1)
+    return
+  }
+  rightClickPoseClickCount++
+  clearTimeout(rightClickPoseClickTimer)
+  rightClickPoseClickTimer = setTimeout(() => {
+    const ordinal = Math.min(rightClickPoseClickCount, 4)
+    triggerCustomPoseFunctions('Right Click', ordinal)
+    rightClickPoseClickCount = 0
+  }, cfg.multiClickWindowMs)
 })
 
 // -----------------------------------------------------------------------
@@ -7956,14 +7994,17 @@ function updateCustomFunctionsAnchorRowVisibility() {
 // effect), but the 2 rows spliced in right next to it DO need to show/hide
 // as Type changes. Touch Point Count only means anything for Multi-Point;
 // Click Count (which numbered click/press in this app's own existing
-// left-button click/hold chains should fire this function) only has real
-// chain infrastructure behind 'Click' and 'Click+Hold' -- Right Click/
-// Right Click+Hold/Scroll/Multi-Point have no such chain to select a
+// left-button click/hold chains should fire this function) has real chain
+// infrastructure behind 'Click' and 'Click+Hold', and (CORRECTED
+// 2026-09-24, direct request: "Right Click should alo have the trigger
+// count setting input. i can do a double or triple riht click") now
+// 'Right Click' too -- see customRightClickFunctionsNeedChain()'s/the
+// right-click pointerup listener's own comments for the actual chain.
+// Right Click+Hold/Scroll/Zoom still have no such chain to select a
 // position within (disclosed simplification: those always fire on
-// whichever single press/tap/scroll-tick actually happens, matching this
-// app's own pre-existing "Right Click has no multi-click counterpart"
-// behavior) -- see triggerCustomPoseFunctions()'s/startCustomHoldFunctions()'s
-// own comments for where that's actually enforced.
+// whichever single press/tap/gesture actually happens) -- see
+// triggerCustomPoseFunctions()'s/startCustomHoldFunctions()'s own
+// comments for where that's actually enforced.
 function updateCustomFunctionTypeVisibility(id) {
   const type = cfg[`${id}Type`]
   const touchRow = document.querySelector(`.dp-row[data-key="${id}TouchPointCount"]`)
@@ -7981,7 +8022,7 @@ function updateCustomFunctionTypeVisibility(id) {
   // concept of their own, so Touch Point Count never applies to them.
   if (touchRow) touchRow.style.display = ((type === 'Click' || type === 'Click+Hold') && getActiveDevPanelTab() !== 'desktop') ? '' : 'none'
   const clickCountRow = document.querySelector(`.dp-row[data-key="${id}ClickCount"]`)
-  if (clickCountRow) clickCountRow.style.display = (type === 'Click' || type === 'Click+Hold') ? '' : 'none'
+  if (clickCountRow) clickCountRow.style.display = (type === 'Click' || type === 'Click+Hold' || type === 'Right Click') ? '' : 'none'
 }
 // Re-applies updateCustomFunctionTypeVisibility() for every registered
 // custom function -- needed because that function's own Touch Point
@@ -8000,10 +8041,11 @@ function refreshAllCustomFunctionTypeVisibility() {
 // Point' Type branch; Multi-Point's own N-finger-threshold behavior now
 // lives inside Click/Click+Hold via Touch Point Count instead, so this
 // selector moved here with it, per-Type rather than per-Type-value), and
-// a constant for Right Click/Right Click+Hold/Scroll/Zoom (no selector
-// of their own -- ANY 2 enabled functions of one of those Types, same
-// family, always collide). Returns `null` for a disabled function
-// (nothing to collide with -- it never fires at all).
+// (CORRECTED 2026-09-24) ALSO Click Count for 'Right Click' now that it
+// has its own chain -- a constant for Right Click+Hold/Scroll/Zoom still
+// (no selector of their own -- ANY 2 enabled functions of one of those
+// Types, same family, always collide). Returns `null` for a disabled
+// function (nothing to collide with -- it never fires at all).
 function customFunctionConflictBucketKey(id) {
   if (!cfg[`${id}Enabled`]) return null
   const entry = customClickFunctionIds.find((e) => e.id === id)
@@ -8013,25 +8055,24 @@ function customFunctionConflictBucketKey(id) {
   if (type === 'Click' || type === 'Click+Hold') {
     const touchPoints = cfg[`${id}TouchPointCount`] || 1
     selector = touchPoints > 1 ? `touch${touchPoints}` : (cfg[`${id}ClickCount`] || '1st')
+  } else if (type === 'Right Click') {
+    selector = cfg[`${id}ClickCount`] || '1st'
   } else selector = 'single'
   return `${entry.family}|${type}|${selector}`
 }
 // Automatic hold-timing conflict resolution (direct spec item) -- when a
-// brand-new custom Click/Click+Hold function is created, default its own
-// Click Count to the LOWEST ordinal (1st-4th) not already used by another
-// currently-ENABLED custom function of the same Type+family, instead of
-// always defaulting to '1st' (which would silently collide with whichever
-// function already claimed it, both firing off the exact same press). Only
-// meaningful for Click/Click+Hold -- Right Click/Right Click+Hold/Scroll/
-// Multi-Point have no ordinal of their own (Multi-Point's equivalent,
-// Touch Point Count, keeps its own plain numeric default -- 2 -- since
-// there's no small fixed set of "positions" to auto-spread across the way
-// there is for a 1st-4th click chain). Falls back to '1st' if all 4 slots
-// are already taken -- a genuine collision at that point, which
+// brand-new custom Click/Click+Hold/(2026-09-24) Right Click function is
+// created, default its own Click Count to the LOWEST ordinal (1st-4th)
+// not already used by another currently-ENABLED custom function of the
+// same Type+family, instead of always defaulting to '1st' (which would
+// silently collide with whichever function already claimed it, both
+// firing off the exact same press). Right Click+Hold/Scroll/Zoom still
+// have no ordinal of their own. Falls back to '1st' if all 4 slots are
+// already taken -- a genuine collision at that point, which
 // refreshCustomFunctionConflictWarnings() below will flag rather than
 // silently hide.
 function nextFreeCustomFunctionClickCountOrdinal(type, family) {
-  if (type !== 'Click' && type !== 'Click+Hold') return 1
+  if (type !== 'Click' && type !== 'Click+Hold' && type !== 'Right Click') return 1
   const used = new Set()
   // Deliberately NOT gated on `${id}Enabled` -- a real bug caught live
   // 2026-09-19: every new custom function starts disabled by default
@@ -8561,20 +8602,33 @@ function customFunctionClickCountOrdinal(id) {
 // semantics regardless of mouse or touch) needs to stay silent for that
 // function, or a single finger touching down would ALSO fire it via the
 // ordinary 1-finger path in addition to the real N-finger gesture.
-// Desktop-family functions are never affected (Touch Point Count's own
-// row is hidden entirely on Desktop, per updateCustomFunctionTypeVisibility()).
+//
+// CORRECTED 2026-09-24 (real bug, direct report: "besides Click... none
+// of the other ones work" + "touch oint should have no effect witin
+// dsktop mode"). The old comment here claimed "Desktop-family functions
+// are never affected" -- true only for the dev-panel UI (the row is
+// hidden on Desktop), never true for RUNTIME behavior: a function
+// carrying a stale/leftover TouchPointCount > 1 (e.g. set while
+// previously viewing Mobile, or a leftover default from before the
+// 2026-09-22 default fix) stayed permanently unreachable via a normal
+// desktop click, with no visible setting to explain why -- confirmed
+// live (`custom9`, TouchPointCount left at 2): its own pose-application
+// worked perfectly when triggered directly, only the real click dispatch
+// never reached it. Touch Point Count is a touch-only concept with no
+// meaning on a real desktop device at all, so it's now unconditionally
+// ignored there, regardless of its stored value.
 function customFunctionWantsMultiTouch(id) {
+  if (realDeviceClass() === 'desktop') return false
   return (cfg[`${id}TouchPointCount`] || 1) > 1
 }
 // Piggybacks every enabled 'pose'-kind custom function of the matching
 // Type onto this project's EXISTING click/right-click/scroll detection
 // (see the `pointerup`/`wheel` listeners below). `clickCount` is the
 // ordinal this gesture just resolved to (1-4, defaulting to 1 for Types
-// with no chain of their own -- Right Click/Scroll/Zoom always pass the
-// default) -- only 'Click' actually gates on it, since it's the only pose
-// Type with a real multi-click CHAIN behind it in this app (see
-// updateCustomFunctionTypeVisibility()'s own comment for why Right
-// Click/Scroll/Zoom don't).
+// with no chain of their own -- Scroll/Zoom always pass the default, no
+// multi-click concept for a wheel tick or a 2-finger gesture) -- 'Click'
+// and (CORRECTED 2026-09-24, direct request) 'Right Click' both gate on
+// it now; Scroll/Zoom don't.
 // deviceFamily (normalized 'desktop'|'mobile') is read once per call, not
 // per function -- realDeviceClass() genuinely queries live viewport/touch
 // state, so this avoids paying for that repeatedly across many registered
@@ -8589,7 +8643,7 @@ function triggerCustomPoseFunctions(type, clickCount = 1) {
     // function fired on ANY device, including Desktop. See
     // customFunctionActiveForDeviceFamily()'s own comment.
     if (!customFunctionActiveForDeviceFamily(family, id, deviceFamily)) return
-    if (type === 'Click' && customFunctionClickCountOrdinal(id) !== clickCount) return
+    if ((type === 'Click' || type === 'Right Click') && customFunctionClickCountOrdinal(id) !== clickCount) return
     if (type === 'Click' && customFunctionWantsMultiTouch(id)) return
     triggerClickPose(id)
   })
