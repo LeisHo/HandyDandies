@@ -61,6 +61,10 @@ let alignQuat = new THREE.Quaternion()
 // the mesh is "the palm") that this simpler 2D-rotation spec doesn't
 // need at all.
 let wristCropNormalAligned = null
+// Palm Faces Cursor Distance Curve's own parsed state (2026-09-24) --
+// modulates cursor-tracking responsiveness by hand distance. Parsed
+// from cfg.palmFacesCursorDistanceCurve in parseCursorTrackingConfig().
+let palmFacesCursorDistanceCurveParsed = [{ x: 0, y: 1 }, { x: 1, y: 1 }]
 // dx/dy measured directly in world space (X right, Y up, matching this
 // project's own Field Layout grid and THREE.js's Y-up convention) --
 // deliberately NOT projected through the camera to screen/NDC space:
@@ -542,7 +546,18 @@ const DEV_GROUPS = [
       // crop plane's own normal (see computeRollQuat()'s own comment for
       // why that axis) -- CLAUDE.md 12n, "feel/response curves are
       // sliders, not constants."
-      { key: 'palmFaceRotationOffset', label: 'Palm Face Rotation (Deg)', type: 'slider', min: -180, max: 180, step: 1, def: 0, perDevice: true }
+      { key: 'palmFaceRotationOffset', label: 'Palm Face Rotation (Deg)', type: 'slider', min: -180, max: 180, step: 1, def: 0, perDevice: true },
+      // Palm Faces Cursor Distance Curve -- direct spec item 2026-09-24
+      // ("provide a curve graph input group... so I can set it such that
+      // the further the hand, the less it is responsive to the palm
+      // rotation cursor tracking thing"). Distance-based modulation of
+      // cursor-tracking responsiveness: at distance 0 (cursor), full
+      // tracking; at distance 1 (far), reduced or zero tracking.
+      // Modulates the base cursor-tracking angle BEFORE the offset is
+      // applied (per direct precedent: Arm Length/Responsive Wrist Splay).
+      { key: 'palmFacesCursorDistanceCurveEnabled', label: 'Palm Rotation Distance Curve On/Off', type: 'checkbox', def: false, onChange: () => updateCursorTrackingGateVisibility() },
+      { key: 'palmFacesCursorDistanceCurve', label: 'Palm Rotation Distance Curve (Distance -> Responsiveness)', type: 'text', def: '[{"x":0,"y":1},{"x":1,"y":1}]', onChange: () => parseCursorTrackingConfig() },
+      { key: 'palmFacesCursorDistanceRange', label: 'Min / Max Palm Rotation (Deg)', type: 'text', def: '{"min":0,"max":180}', onChange: () => parseCursorTrackingConfig() }
     ]
   },
   {
@@ -1584,6 +1599,8 @@ parseArmLengthConfig()
 buildArmLengthWidgets()
 parseWristSplayConfig()
 buildWristSplayWidgets()
+parseCursorTrackingConfig()
+updateCursorTrackingGateVisibility()
 // Click-Hold-Pose's own setup call (parseClickHoldConfig/
 // buildClickHoldPoseWidgets per trigger) is NOT made here like the other
 // widgets above -- clickHoldPoseTriggers (which parseClickHoldConfig
@@ -5008,6 +5025,17 @@ function computeArmLengthT(hand, distanceToCursor, minLiveDist, liveDistRange) {
 function parseWristSplayConfig() {
   try { wristSplayRangeParsed = JSON.parse(cfg.wristSplayRange) } catch (e) { /* keep last-good value */ }
   try { wristSplayCurveParsed = JSON.parse(cfg.wristSplayCurve).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
+}
+function parseCursorTrackingConfig() {
+  try { palmFacesCursorDistanceCurveParsed = JSON.parse(cfg.palmFacesCursorDistanceCurve).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
+}
+function updateCursorTrackingGateVisibility() {
+  // Toggle visibility of cursor-tracking curve controls based on
+  // palmFacesCursorDistanceCurveEnabled checkbox state
+  const curveRow = document.querySelector('.dp-row[data-key="palmFacesCursorDistanceCurve"]')
+  const rangeRow = document.querySelector('.dp-row[data-key="palmFacesCursorDistanceRange"]')
+  if (curveRow) curveRow.style.display = cfg.palmFacesCursorDistanceCurveEnabled ? '' : 'none'
+  if (rangeRow) rangeRow.style.display = cfg.palmFacesCursorDistanceCurveEnabled ? '' : 'none'
 }
 // Returns the EXTRA wrist-splay rotation (degrees) this hand should get
 // on top of the Pose group's own shared `cfg.wristSplay` -- 0 when the
@@ -10231,7 +10259,22 @@ function animate() {
         hands.forEach((hand) => {
           const m = new THREE.Matrix4().lookAt(hand.wrapper.position, cursorTarget, UP)
           const desired = new THREE.Quaternion().setFromRotationMatrix(m)
-          const baseDeg = cfg.palmFacesCursor ? computeRadialRollDeg(hand.wrapper.position, cursorTarget) : 0
+          let baseDeg = cfg.palmFacesCursor ? computeRadialRollDeg(hand.wrapper.position, cursorTarget) : 0
+          // Palm Rotation Distance Curve -- modulate cursor-tracking
+          // responsiveness by distance (2026-09-24). At close distance,
+          // full responsiveness; at far distance, reduced (curve y-value
+          // acts as a responsiveness multiplier on baseDeg).
+          if (baseDeg !== 0 && cfg.palmFacesCursorDistanceCurveEnabled) {
+            const distToCursor = hand.wrapper.position.distanceTo(cursorTarget)
+            const minD = Math.min(...hands.map(h => h.wrapper.position.distanceTo(cursorTarget)))
+            const maxD = Math.max(...hands.map(h => h.wrapper.position.distanceTo(cursorTarget)))
+            const range = Math.max(maxD - minD, 1e-6)
+            const normDist = (distToCursor - minD) / range
+            const responsiveness = palmFacesCursorDistanceCurveParsed && palmFacesCursorDistanceCurveParsed.length
+              ? evaluateArmLengthCurve(palmFacesCursorDistanceCurveParsed, normDist)
+              : 1
+            baseDeg = baseDeg * THREE.MathUtils.clamp(responsiveness, 0, 1)
+          }
           // Whole-wrapper rotation only, same mechanism as the default mode;
           // no skeleton/pose involvement either way.
           desired.multiply(computeRollQuat(baseDeg))
