@@ -8473,6 +8473,22 @@ function restoreCustomClickFunctions() {
   })
   nextCustomFunctionN = maxN + 1
   refreshAllCustomFunctionGroupVisibility()
+  refreshAllCustomFunctionTypeVisibility()
+  updateCustomFunctionsAnchorRowVisibility()
+  // Defensive backstop -- live-confirmed 2026-09-24 that a real tab-
+  // dependent staleness can still slip through even with the onDeviceTabChanged
+  // hook wired (devPanel.js's own tab-active self-heal): a real page load
+  // showed Touch Point Count visible on Desktop with `.dp-tab-active`
+  // ALREADY correctly reading "Desktop" at every point checked, yet only
+  // an actual manual tab click (re-running this exact sweep) fixed it --
+  // the precise root cause wasn't pinned down further within this
+  // session's remote-debugging constraints. Re-running the same sweep
+  // once more, comfortably past devPanel.js's own ~500ms self-heal
+  // window (healActiveTabOnce(), 30 rAF frames), closes the gap
+  // regardless of its exact cause -- same "self-heal a value that can
+  // read wrong once at an early moment" pattern this project's own
+  // animate()/renderer-resize code already uses elsewhere.
+  setTimeout(() => { refreshAllCustomFunctionGroupVisibility(); refreshAllCustomFunctionTypeVisibility(); updateCustomFunctionsAnchorRowVisibility() }, 600)
 }
 // Maps a Click-Count select value ('1st'/'2nd'/'3rd'/'4th') to its plain
 // ordinal number, defaulting an unset/unrecognized value to 1 -- shared by
