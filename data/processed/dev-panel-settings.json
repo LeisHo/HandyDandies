@@ -6670,7 +6670,7 @@
       "dp_capsTabText": true,
       "dp_capsGroupNames": true,
       "dp_capsSettingsText": false,
-      "dp_textEditMode": false,
+      "dp_textEditMode": true,
       "dp_capsTitleText": false,
       "dp_boldTitle": true,
       "dp_boldTab": true,
@@ -13607,7 +13607,7 @@
       "dp_capsTabText": true,
       "dp_capsGroupNames": true,
       "dp_capsSettingsText": false,
-      "dp_textEditMode": false,
+      "dp_textEditMode": true,
       "dp_capsTitleText": false,
       "dp_boldTitle": true,
       "dp_boldTab": true,
@@ -20544,7 +20544,7 @@
       "dp_capsTabText": true,
       "dp_capsGroupNames": true,
       "dp_capsSettingsText": false,
-      "dp_textEditMode": false,
+      "dp_textEditMode": true,
       "dp_capsTitleText": false,
       "dp_boldTitle": true,
       "dp_boldTab": true,
@@ -29126,6 +29126,7 @@
     "custom13ClickCount": "Trigger Count",
     "custom14Enabled": "ON/ OFF",
     "custom14Type": "Trigger Type",
-    "custom14ClickCount": "Trigger Count"
+    "custom14ClickCount": "Trigger Count",
+    "Custom Click Function 14": "Right Click"
   }
 }
