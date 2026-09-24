@@ -11236,6 +11236,65 @@ the repo is unaffected by it.
 `refreshRowDisplaysForEditingTab()` newly exported).
 
 --------------------------------------------------------------------------------
+2026-09-24 (4th round)
+
+Direct bug report ("check my current saved click functions. for some
+reason, besides 'Click', the single click function, none of the other
+ones work") investigated via `window.__debug.triggerClickPose()`/
+`startClickHoldPose()`, called directly to bypass the real pointer-event
+listeners entirely and isolate the pose-application pipeline from
+whatever was stopping a real click from reaching it (a genuinely useful
+technique this round, since synthetic PointerEvent dispatch through this
+session's own browser-automation tool proved unreliable for reaching the
+app's real listeners -- see below).
+
+Findings: `custom7`/`custom8`/`custom10` all fire and pose-apply
+correctly when triggered directly -- not bugs, they just need their own
+real gesture (a genuine hold, or a real multi-click chain) rather than a
+single quick click. `custom13`'s own `TargetPose` was simply left blank
+-- a real but separate, DATA gap matching this file's own documented
+"blank TargetPose/TweenSelector fires nothing, no error" gotcha, not a
+code bug; the user needs to pick a Target Pose for it. `custom9` was the
+one genuine code bug: `TouchPointCount` was left at 2 (likely a leftover
+from earlier testing on Mobile), which unconditionally routes a
+function's dispatch through the touch-only multi-finger path --
+permanently unreachable via a desktop mouse click, with the exact same
+custom7-Mode/Type/Enabled otherwise. Confirmed via direct clarification
+("touch oint should have no effect witin dsktop mode") this is a real,
+generalizable gap: `customFunctionWantsMultiTouch()` now unconditionally
+returns `false` on a real desktop device (`realDeviceClass() ===
+'desktop'`), regardless of the control's own stored value -- Touch Point
+Count has no meaning there at all.
+
+Right Click gained its own Trigger Count (Nth click) selector and a
+real, separate debounced click-count chain (own counter/timer, never
+shared with the left-click chain) -- direct request: "Right Click
+should alo have the trigger count setting input. i can do a double or
+triple riht click." Wired through every place the left-click chain
+already touches: row visibility, ordinal gating in
+`triggerCustomPoseFunctions()`, the conflict-bucket key, and the
+auto-spread default for a newly created Right Click function.
+
+A large, still-in-design "Multi Trigger" feature (cycling a single Click
+function through a different tween on each subsequent click, wrapping
+back to its own baseline pose) was started (added static controls to
+`makeClickPoseGroup()`) then DELIBERATELY REVERTED this round, per
+direct instruction ("finish the previous fixes first, then push, then
+do this new shit") -- the partial edit included a "+ Add Trigger" button
+wired to a function that didn't exist yet, which would have thrown if
+clicked. Full design is worked out (reusing `makeClickPoseGroup()` with
+a per-trigger prefix for each added trigger's own complete battery,
+resolved via a per-hand-frozen "effective settings prefix" threaded
+through `triggerClickPose()`/`updateClickPoseForHand()`, confirmed via
+direct clarification that the existing per-hand distance-staggered
+override-on-re-click behavior already gives "closest hands overridden
+early, farther hands finish their current tween" for free once the
+prefix resolution is correct) -- implementation deferred to its own
+clean round rather than landing half-built.
+
+`index.html`'s own `main.js` cache-buster bumped `?v=212` -> `?v=213`.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================
