@@ -6646,7 +6646,17 @@ function endClickHoldPose(p) {
     // meaningfully bigger undertaking deferred for now.
     if (tweenStopDelayOn) {
       chp.stoppingStartTime = now
-      chp.stoppingStartDelay = cfg[`${p}TweenStopStartTimeCurveEnabled`]
+      // Tween Stop Start Time Curve applies a per-hand stagger before
+      // deceleration STARTS. When RetransitionEnabled is ON, this stagger
+      // syncs all hands to finish at the same time (they all have the same
+      // distance-curve-computed delay, so they all start decelerating in
+      // lock-step), then all retransition together. When OFF (freeze at
+      // end), the stagger is actually useful for pacing. Corrected
+      // 2026-09-24: when RetransitionEnabled is true, skip this stagger
+      // entirely -- each hand should start its stop immediately, so
+      // different-distance hands finish at different times and retransition
+      // asynchronously per-hand, per direct user report.
+      chp.stoppingStartDelay = (retransitionOff && cfg[`${p}TweenStopStartTimeCurveEnabled`])
         ? computeStartDelayMs(dists[i], minD, range, trig.tweenStopStartCurveParsed, trig.tweenStopStartRangeParsed)
         : 0
       chp.stoppingDelayMs = Math.max(cfg[`${p}TweenStopDelayCurveEnabled`]
