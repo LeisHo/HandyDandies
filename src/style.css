@@ -387,7 +387,21 @@ html, body {
 .dp-text-input {
   flex: 1 1 auto; min-width: 0; text-align: left; font-size: var(--dp-body-font-size, 11px);
   background: #0f0f18; color: var(--dp-text-color, #e8e8f0); border: 1px solid #3a3a4a; border-radius: 4px;
-  padding: 3px 6px;
+  padding: 3px 6px; cursor: pointer;
+}
+.dp-minmax-editor {
+  flex: 1 1 auto; min-width: 0; align-items: center; padding: 3px 0;
+}
+.dp-minmax-label {
+  font-size: var(--dp-body-font-size, 11px); color: var(--dp-text-color, #c9c9d8); font-weight: normal;
+}
+.dp-minmax-input {
+  min-width: 60px; max-width: 80px; font-size: var(--dp-body-font-size, 11px);
+  background: #0f0f18; color: var(--dp-text-color, #e8e8f0); border: 1px solid #3a3a4a; border-radius: 3px;
+  padding: 2px 4px; text-align: center;
+}
+.dp-minmax-input:focus {
+  border-color: #5a5a6a; outline: none;
 }
 .dp-row input[type=checkbox] { width: 16px; height: 16px; }
 .dp-row.dp-list-picker-row-container label { width: auto; }

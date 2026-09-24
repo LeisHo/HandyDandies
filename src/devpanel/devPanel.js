@@ -925,6 +925,64 @@ export function buildRow(ctrl) {
     const input = el('input', 'dp-text-input', { type: 'text', value: ctrl.def || '' })
     input.addEventListener('input', () => commit(ctrl, input.value))
     row.appendChild(input)
+    // Min / Max Range Editor -- detect {"min":X,"max":Y} pattern and make
+    // it click-editable. Direct spec item 2026-09-24 ("for all min max
+    // sliders, allow me to click the Min time and Max time to change it").
+    // Clicking the input field shows side-by-side min/max number inputs.
+    const isMinMaxRange = (val) => {
+      try {
+        const parsed = JSON.parse(val)
+        return parsed && typeof parsed.min === 'number' && typeof parsed.max === 'number'
+      } catch {
+        return false
+      }
+    }
+    if (isMinMaxRange(ctrl.def || '')) {
+      input.addEventListener('click', (e) => {
+        e.stopPropagation()
+        const currentVal = input.value
+        const parsed = JSON.parse(currentVal)
+        const minInput = el('input', 'dp-minmax-input', { type: 'number', value: parsed.min, min: 0, step: 1 })
+        const maxInput = el('input', 'dp-minmax-input', { type: 'number', value: parsed.max, min: 0, step: 1 })
+        const container = el('div', 'dp-minmax-editor')
+        container.style.display = 'flex'
+        container.style.gap = '8px'
+        const minLabel = el('label', 'dp-minmax-label')
+        minLabel.textContent = 'Min:'
+        minLabel.style.whiteSpace = 'nowrap'
+        const maxLabel = el('label', 'dp-minmax-label')
+        maxLabel.textContent = 'Max:'
+        maxLabel.style.whiteSpace = 'nowrap'
+        container.appendChild(minLabel)
+        container.appendChild(minInput)
+        container.appendChild(maxLabel)
+        container.appendChild(maxInput)
+        const originalDisplay = input.style.display
+        input.style.display = 'none'
+        input.parentNode.insertBefore(container, input)
+        minInput.focus()
+        const finalize = () => {
+          const newMin = parseInt(minInput.value) || parsed.min
+          const newMax = parseInt(maxInput.value) || parsed.max
+          const newVal = JSON.stringify({ min: Math.min(newMin, newMax), max: Math.max(newMin, newMax) })
+          input.value = newVal
+          input.style.display = originalDisplay
+          container.remove()
+          commit(ctrl, newVal)
+        }
+        const onKeyDown = (e) => {
+          if (e.key === 'Enter') finalize()
+          if (e.key === 'Escape') {
+            input.style.display = originalDisplay
+            container.remove()
+          }
+        }
+        minInput.addEventListener('blur', finalize)
+        maxInput.addEventListener('blur', finalize)
+        minInput.addEventListener('keydown', onKeyDown)
+        maxInput.addEventListener('keydown', onKeyDown)
+      })
+    }
     numEls[ctrl.key] = { type: 'text', input }
   } else if (ctrl.type === 'list-picker') {
     row.style.flexDirection = 'column'
