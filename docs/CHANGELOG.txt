@@ -11363,6 +11363,56 @@ still needs the user's own testing.
 `index.html`'s own `main.js` cache-buster bumped `?v=213` -> `?v=214`.
 
 --------------------------------------------------------------------------------
+
+2026-09-24 (6th round)
+
+Mid-round report on a real custom Right Click function named "Right
+Click" (Sequence mode): "it cant be interrupted during its sequence
+tween. Furthermore its Start Time curve group has no on off checkbox."
+
+Investigated the interrupt claim first, live on the deployed site
+(`window.__debug`, plus real `right_click`/`left_click` browser actions
+batched with precise `wait` steps to land squarely mid-tween, since a
+JS-driven per-call round trip is too slow to catch this function's own
+700ms transition window). Both self-interruption (re-right-clicking the
+same function mid-sequence) and cross-function interruption (left-
+clicking a different enabled Click function mid-sequence) were
+confirmed working correctly on the already-live `v214` build -- a real
+right-click mid-tween produced a fresh, later `triggerTime`, and a
+different function's trigger correctly released this one's claim via
+the 5th round's `releaseHandFromOtherFunctions()` fix. Conclusion: this
+report was very likely observed against a stale pre-`v214` browser tab
+(this project's own well-documented recurring failure mode) -- no
+further code change made for this half of the report; the user should
+hard-refresh and retest.
+
+The Start Time Curve checkbox report was real. Root cause: the group's
+one on/off checkbox (`${p}StartTimeCurveEnabled`) is welded bodily into
+the group's own header (`wrapGatedSubgroup()`), and was only ever shown
+when `Mode === 'Single Pose'` (`setRow(..., showBase)`) -- Sequence/
+Chain mode's own always-on Tween Start Time Curve fields
+(`TweenStartTimeCurve`/`TweenStartTimeRange`) had genuinely no toggle of
+their own, a prior "disclosed scoping choice" that reads as a bug once
+actually hit. Fixed by making this ONE shared header checkbox mode-
+INDEPENDENT (`setGateRow(..., true)`), mirroring the Retransition
+group's own already-established "one gate, mode-dependent child fields"
+pattern in the very same function -- now gates the Tween-mode fields
+too when Mode is Sequence/Chain, instead of needing a 2nd checkbox.
+Wired through both runtime delay-computation call sites
+(`triggerClickPose()`'s pose-kind arm, `updateClickHoldPoseForHand()`'s
+hold-kind arm) so turning it off now means zero distance-based stagger
+in Tween mode too, not just Single Pose.
+
+Testing note: could not get a clean load from this sandbox's own local
+static server this round (`net::ERR_CONNECTION_RESET` on `main.js`,
+this project's own documented truncation gotcha) -- confidence rests on
+`node --check` passing and this being a minimal, direct reuse of an
+already-proven pattern (Retransition) in the same function, not new
+mechanics. Worth a live confirm on the next reload.
+
+`index.html`'s own `main.js` cache-buster bumped `?v=214` -> `?v=215`.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

@@ -6201,14 +6201,17 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
   if (trig.active && chp.armedForHoldStartTime !== trig.holdStartTime && now - trig.holdStartTime >= (cfg.holdConfirmMs ?? 0)) {
     chp.armedForHoldStartTime = trig.holdStartTime // dedupe -- arm exactly once per hold-start, not every frame spent waiting
     const isTweenStart = isSequenceOrChainMode(p)
-    // Start Time Curve on/off (Single Pose only, direct spec item) --
-    // Off means no distance-based stagger at all, every hand starts
-    // immediately. Sequence/Tween mode's own start stagger is unaffected
-    // by this gate (a disclosed scoping choice -- see the control's own
-    // comment in makeClickHoldPoseGroup()).
-    const delay = isTweenStart
+    // Start Time Curve on/off -- ONE shared gate now covers both Single
+    // Pose and Sequence/Chain mode's own stagger (CORRECTED 2026-09-24,
+    // direct bug report: the Tween side used to be unconditionally on
+    // with no toggle of its own -- see updateSingleTimingGateVisibility()'s
+    // own matching comment for the full account). Off means no distance-
+    // based stagger at all, every hand starts immediately, regardless of
+    // Mode.
+    const startTimeCurveOff = cfg[`${p}StartTimeCurveEnabled`] === false
+    const delay = startTimeCurveOff ? 0 : (isTweenStart
       ? computeStartDelayMs(live, minLiveDist, liveDistRange, trig.tweenStartCurveParsed, trig.tweenStartRangeParsed)
-      : (cfg[`${p}StartTimeCurveEnabled`] === false ? 0 : computeStartDelayMs(live, minLiveDist, liveDistRange, trig.startCurveParsed, trig.startRangeParsed))
+      : computeStartDelayMs(live, minLiveDist, liveDistRange, trig.startCurveParsed, trig.startRangeParsed))
     chp.pendingClaimAt = now + delay
     chp.pendingFrozenSplayDeg = computeResponsiveWristSplayDeg(live, minLiveDist, liveDistRange)
     // Animation Speed Curve (Single Pose only) -- computed once here,
@@ -7124,11 +7127,15 @@ function triggerClickPose(p) {
     // makeClickHoldPoseGroup()'s own comment) -- picked once here, same
     // as before; now schedules a DEFERRED claim instead of claiming
     // immediately (see updateClickPoseForHand()'s own commit step).
-    // Start Time Curve on/off (Single Pose only) -- Off means no
-    // distance-based stagger, every hand starts immediately.
-    const delay = isTween
+    // Start Time Curve on/off -- ONE shared gate now covers both Single
+    // Pose and Sequence/Chain mode (CORRECTED 2026-09-24, see
+    // updateSingleTimingGateVisibility()'s own comment for the full
+    // account). Off means no distance-based stagger, every hand starts
+    // immediately, regardless of Mode.
+    const startTimeCurveOff = cfg[`${p}StartTimeCurveEnabled`] === false
+    const delay = startTimeCurveOff ? 0 : (isTween
       ? computeStartDelayMs(dists[i], minD, range, trig.tweenStartCurveParsed, trig.tweenStartRangeParsed)
-      : (cfg[`${p}StartTimeCurveEnabled`] === false ? 0 : computeStartDelayMs(dists[i], minD, range, trig.startCurveParsed, trig.startRangeParsed))
+      : computeStartDelayMs(dists[i], minD, range, trig.startCurveParsed, trig.startRangeParsed))
     cp.pendingClaimAt = now + delay
     cp.pendingForwardSnapshot = forwardSnapshot
     cp.pendingNamedPoses = namedPoses
@@ -9067,17 +9074,31 @@ function updateSingleTimingGateVisibility(p) {
   // Start Time Curve... arent in the correct groups... in Sequence
   // mode"): the "Start Time Curve" GROUP itself is no longer hidden
   // outside Single Pose (setGateRow -> setRow for the enable row) --
-  // Tween mode's own always-on start-time curve (TweenStartTimeCurve/
-  // TweenStartTimeRange, no enable toggle of its own) now nests inside
-  // this same group and needs it to stay visible in Sequence/Chain mode
-  // too. Mode is always exactly one of Single Pose/Sequence/Chain, so the
-  // container never actually needs hiding -- one of the 2 branches below
-  // is always the relevant one.
-  setRow('StartTimeCurveEnabled', showBase)
-  const startOn = showBase && cfg[`${p}StartTimeCurveEnabled`] !== false
+  // Tween mode's own start-time curve (TweenStartTimeCurve/
+  // TweenStartTimeRange) now nests inside this same group and needs it to
+  // stay visible in Sequence/Chain mode too. Mode is always exactly one of
+  // Single Pose/Sequence/Chain, so the container never actually needs
+  // hiding -- one of the 2 branches below is always the relevant one.
+  //
+  // CORRECTED 2026-09-24 (later same day -- direct bug report: "its Start
+  // Time curve group has no on off checkbox" while in Sequence mode): the
+  // Tween branch used to be unconditionally on with no toggle of its own
+  // ("a disclosed scoping choice"), which meant the SAME header checkbox
+  // that gates Single Pose's own StartTimeCurve/StartTimeRange simply
+  // vanished (display:none) the instant Mode left Single Pose, since it
+  // was only ever shown via `showBase`. Fixed by making this ONE shared
+  // header checkbox mode-INDEPENDENT (`setGateRow(..., true)`, mirroring
+  // RetransitionEnabled's own already-established "one gate, mode-
+  // dependent child fields" pattern just below) so it now also gates the
+  // Tween-mode fields when Mode is Sequence/Chain -- see this function's
+  // own runtime counterpart in triggerClickPose()/updateClickHoldPoseForHand()
+  // for the matching delay-computation change.
+  setGateRow('StartTimeCurveEnabled', true)
+  const curveEnabled = cfg[`${p}StartTimeCurveEnabled`] !== false
+  const startOn = showBase && curveEnabled
   setRow('StartTimeCurve', startOn)
   setRow('StartTimeRange', startOn)
-  const tweenStartOn = isSequenceOrChainMode(p)
+  const tweenStartOn = isSequenceOrChainMode(p) && curveEnabled
   setRow('TweenStartTimeCurve', tweenStartOn)
   setRow('TweenStartTimeRange', tweenStartOn)
   // Animation Speed Curve has NO Tween-mode equivalent to nest here --

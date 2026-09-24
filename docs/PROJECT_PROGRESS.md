@@ -18,6 +18,22 @@ work seamlessly from there.
 
 ## Currently working on
 
+**SHIPPED 2026-09-24 (6th round) -- fixed the "Right Click" custom
+function's Start Time Curve group having no on/off checkbox in Sequence
+mode; the "can't be interrupted" half of the same report was live-
+verified as ALREADY WORKING on the deployed `v214` build (both self-
+interrupt and cross-function interrupt confirmed via precisely-timed
+real clicks), most likely a stale-tab report.** The checkbox gap was
+real: the group's one header checkbox was only ever shown in Single Pose
+mode; Sequence/Chain mode's own Tween Start Time Curve fields had no
+toggle at all. Fixed by making the shared header checkbox mode-
+independent, mirroring the Retransition group's own established "one
+gate, mode-dependent fields" pattern, wired through both runtime delay
+call sites. `main.js` cache-buster `?v=214` -> `?v=215`. Could not get a
+clean local-sandbox load this round (documented truncation gotcha);
+confidence rests on `node --check` + reuse of a proven pattern. See
+CHANGELOG.txt's 2026-09-24 (6th round) entry.
+
 **SHIPPED 2026-09-24 (5th round) -- fixed a real, severe cross-function
 overwrite bug: "trigger a click function, then can't trigger any other
 one after" (worst with Retransition off).** Root cause: the per-hand
