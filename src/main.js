@@ -6688,14 +6688,16 @@ function endClickHoldPose(p) {
       // entirely -- each hand should start its stop immediately, so
       // different-distance hands finish at different times and retransition
       // asynchronously per-hand, per direct user report.
-      chp.stoppingStartDelay = (retransitionOff && cfg[`${p}TweenStopStartTimeCurveEnabled`])
+      // Tween Stop Start Time Curve and Delay should apply regardless of
+      // Retransition state. The stagger applies to WHEN deceleration starts
+      // (closest hands first), not whether it happens at all. The retransition
+      // delay (added separately below) provides stagger for retransition phase.
+      chp.stoppingStartDelay = cfg[`${p}TweenStopStartTimeCurveEnabled`]
         ? computeStartDelayMs(dists[i], minD, range, trig.tweenStopStartCurveParsed, trig.tweenStopStartRangeParsed)
         : 0
-      chp.stoppingDelayMs = retransitionOff
-        ? Math.max(cfg[`${p}TweenStopDelayCurveEnabled`]
-            ? computeStartDelayMs(dists[i], minD, range, trig.tweenStopDelayCurveParsed, trig.tweenStopDelayRangeParsed)
-            : (cfg[`${p}TweenStopDelayMs`] || 0), 1)
-        : 0
+      chp.stoppingDelayMs = Math.max(cfg[`${p}TweenStopDelayCurveEnabled`]
+        ? computeStartDelayMs(dists[i], minD, range, trig.tweenStopDelayCurveParsed, trig.tweenStopDelayRangeParsed)
+        : (cfg[`${p}TweenStopDelayMs`] || 0), 1)
       // When Retransition is ON, compute the retransition delay based on
       // distance so hands retransition asynchronously per-hand (closest hands
       // retransition first), not all at once. When Retransition is OFF, the
