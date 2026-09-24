@@ -12,8 +12,8 @@
       "pauseBtnIconColor": "#ffffff",
       "pauseBtnBorderColor": "#ffffff",
       "pausedRenderFps": 15,
-      "fieldRows": 7,
-      "fieldCols": 8,
+      "fieldRows": 12,
+      "fieldCols": 13,
       "rowSpacing": 5.5,
       "columnSpacing": 9.5,
       "handScale": 0.85,
@@ -22284,7 +22284,7 @@
     },
     {
       "key": "Field Layout",
-      "collapsed": true,
+      "collapsed": false,
       "locked": false,
       "items": [
         {
