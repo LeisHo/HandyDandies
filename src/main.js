@@ -6,7 +6,7 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js'
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js'
 import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js'
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js'
-import { initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement } from './devpanel/devPanel.js?v=42'
+import { initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, applyTextOverrides } from './devpanel/devPanel.js?v=44'
 
 // A defensive wrapper around devPanel.js's own refreshSelectOptions() --
 // found via live testing (direct user report: "I dont see any of the
@@ -195,20 +195,21 @@ let cursorLogTimer = null
 // window, and the Mouse Tracking Log's own multi-click classification --
 // deliberately still ONE setting, not 3 separately-tuned ones, per this
 // value's own original "for consistency" intent.
-// INVARIANT (see makeClickHoldPoseGroup()'s own `${p}HoldConfirmMs` control
-// comment, 2026-09-15, for the full original account): every CLICK_HOLD_KEYS
-// member's own HoldConfirmMs should be >= this value. If it's lower, a press
-// held just long enough to make its pose VISIBLE isn't necessarily held long
-// enough to be CLASSIFIED as a genuine hold on release (vs. "just another
-// clean click continuing a multi-click chain") -- the pose flashes on then
-// immediately reverses, and/or the click-hold chain misreads a real hold as
-// a clean click. Confirmed live 2026-09-16 as the actual cause of "triple-
-// click-hold works, quad-click-hold doesn't": `quadClickHoldHoldConfirmMs`
-// had drifted to 310ms (below this 500ms threshold) while
-// `tripleClickHoldHoldConfirmMs` correctly sat at 500 -- corrected in the
-// live settings, not by raising this constant. This is a real recurring
-// footgun (the SAME bug class already hit chp/rchp once before) -- when
-// tuning any `${p}HoldConfirmMs` slider, check it against this value.
+// INVARIANT (historical -- see the "Custom Click Functions" anchor group's
+// own global `holdConfirmMs` control comment for the current account):
+// HoldConfirmMs should be >= this value, or a press held just long enough
+// to make its pose VISIBLE isn't necessarily held long enough to be
+// CLASSIFIED as a genuine hold on release (vs. "just another clean click
+// continuing a multi-click chain") -- the pose flashes on then immediately
+// reverses, and/or the click-hold chain misreads a real hold as a clean
+// click. This used to be a real recurring footgun (confirmed live
+// 2026-09-16: `quadClickHoldHoldConfirmMs` drifted to 310ms, below this
+// 500ms threshold, while `tripleClickHoldHoldConfirmMs` correctly sat at
+// 500 -- 2 different per-trigger sliders silently drifting out of sync
+// with each other and with this constant). Structurally impossible now
+// that HoldConfirmMs is ONE global value (2026-09-24), default already
+// matching this constant exactly -- kept as a comment for context, not an
+// active per-slider check anyone still needs to make.
 const MOUSE_LOG_HELD_DRAG_MS = 500
 let mouseLogClickCount = 0
 let mouseLogClickTimer = null
@@ -893,8 +894,26 @@ const DEV_GROUPS = [
     // across a reload on their own).
     title: 'Custom Click Functions',
     controls: [
+      // Internal bookkeeping only, never meant for direct editing -- hidden
+      // from the UI entirely 2026-09-24 (direct request, "I dont need to
+      // see the Custom Function IDs UI. Hide it."). Still a real, restored
+      // control (restoreCustomClickFunctions() still reads/writes
+      // cfg.customClickFunctionIds normally) -- see the module-init call
+      // right after wrapAllClickFunctionGatedSubgroups() that force-hides
+      // this one row's own `.dp-row` permanently, the same
+      // `.dp-row[data-key="..."]` + `style.display='none'` pattern every
+      // other row-visibility function in this file already uses (devPanel.js
+      // itself has no native "hidden" control type).
       { key: 'customClickFunctionIds', label: 'Custom Function IDs (Internal, Auto-Managed)', type: 'text', def: '[]' },
       { key: 'addCustomClickFunctionBtn', label: '+ Add Click Function', type: 'button', onClick: () => addCustomClickFunction() },
+      // Global Hold Confirm Delay (direct request 2026-09-24, replacing
+      // the old per-function `${p}HoldConfirmMs` slider -- see that
+      // control's own former comment, now on makeClickHoldPoseGroup()'s
+      // TransitionSpeedMs control, for the full history/reasoning behind
+      // the 500ms default). One shared value for every hold-kind function
+      // (static or custom) -- see updateClickHoldPoseForHand()'s own
+      // commit-gate for where this is read at runtime.
+      { key: 'holdConfirmMs', label: 'Hold Confirm Delay (Ms)', type: 'slider', min: 0, max: 1000, step: 10, def: 500 },
       // Mobile-only Zoom/Scroll gesture types (direct request 2026-09-22)
       // -- shared detection thresholds, not per-function, since the raw
       // gesture (a 2-finger spread vs. pan) is the same real-world motion
@@ -902,7 +921,10 @@ const DEV_GROUPS = [
       // the touchmove handler's own "CORRECTED 2026-09-22" comment for
       // where these are actually read. Both perDevice: true since a
       // touch-target-size-appropriate threshold plausibly differs between
-      // Mobile and Landscape's own differently-shaped viewports.
+      // Mobile and Landscape's own differently-shaped viewports. Rows
+      // hidden entirely on the Desktop tab 2026-09-24 (direct request --
+      // "should only be available in Mobile and Landscape tabs") -- see
+      // updateCustomFunctionsAnchorRowVisibility()'s own comment.
       { key: 'zoomGestureThresholdPx', label: 'Zoom Gesture Spread Threshold (Px)', type: 'slider', min: 5, max: 150, step: 5, def: 40, perDevice: true },
       { key: 'scrollGestureThresholdPx', label: 'Scroll Gesture Pan Threshold (Px)', type: 'slider', min: 5, max: 150, step: 5, def: 40, perDevice: true }
     ]
@@ -1521,6 +1543,13 @@ const cfg = initDevPanel(DEV_GROUPS, {
 })
 onChangeByCtrl.forEach((fn, c) => { c.onChange = fn })
 setupCustomFunctionTabVisibilitySync()
+updateCustomFunctionsAnchorRowVisibility()
+// Internal bookkeeping row, never meant for direct editing -- permanently
+// hidden 2026-09-24 (see this control's own DEV_GROUPS comment).
+;(() => {
+  const row = document.querySelector('.dp-row[data-key="customClickFunctionIds"]')
+  if (row) row.style.display = 'none'
+})()
 // Arm Length's 2 custom widgets (see their own declaration comments,
 // Pose section below) -- parse whatever initDevPanel() just restored
 // (saved or default) into the cached vars computeArmLengthT() reads every
@@ -2811,7 +2840,7 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       // and Hold Confirm Delay stay visible regardless of mode.
       {
         key: `${p}Mode`, label: 'Mode', type: 'select', def: 'Single Pose', options: () => ['Single Pose', 'Sequence', 'Chain'],
-        onChange: () => { updateClickTriggerModeVisibility(p, [], ['LoopMode', 'OnReleaseMode', 'TriggerAllHands', 'TweenStopStartTimeCurveEnabled', 'TweenStopDelayEnabled']); updateLoopHoldVisibility(p); updateSingleTimingGateVisibility(p); updateTweenStopGateVisibility(p); updateChainModeVisibility(p) }
+        onChange: () => { updateClickTriggerModeVisibility(p, [], ['LoopMode']); updateLoopHoldVisibility(p); updateSingleTimingGateVisibility(p); updateTweenStopGateVisibility(p); updateChainModeVisibility(p) }
       },
       // Offset/Rotation -- direct request 2026-09-17 ("Offset On and Off,
       // to set if the hand itself will be physically offset in the x and
@@ -2911,30 +2940,20 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       // moving the cursor during a hold must never pan, even before the
       // hold is confirmed.
       //
-      // CORRECTED 2026-09-15 -- default raised 150 -> 500 (max 500 -> 1000
-      // for tuning headroom above that), direct follow-up report ("Double
-      // click is still acting weird. I think its registering a single
-      // click first, then when it realizes its double, it causes an
-      // issue"). Root cause: this delay (was 150ms) and
-      // `MOUSE_LOG_HELD_DRAG_MS` (500ms -- the SEPARATE threshold deciding
-      // whether a release counts as a genuine hold, suppressing Click
-      // Pose/Double-Click Pose's own trigger) were 2 different numbers
-      // serving what should be the SAME purpose. Any press lasting between
-      // 150-500ms -- a perfectly normal, not-especially-slow speed for a
-      // double-click's own first tap -- crossed the 150ms "become visible"
-      // threshold WITHOUT crossing the 500ms "count as a genuine hold"
-      // threshold, so this group's own target pose visibly flashed on,
-      // then reversed, entirely independent of whatever Click Pose/
-      // Double-Click Pose went on to do afterward -- confirmed live via a
-      // real simulated 200ms-press double-click (chp's own phase measured
-      // entering 'forward' mid-press, well before either click resolved).
-      // Matching this delay to `MOUSE_LOG_HELD_DRAG_MS` exactly closes the
-      // gap: nothing can become visible without ALSO being long enough to
-      // count as a genuine hold, eliminating the inconsistency rather than
-      // just narrowing its window. Confirmed live: the same 200ms-press
-      // double-click no longer moves chp's own phase out of 'idle' at all
-      // with this delay raised to 500ms.
-      { key: `${p}HoldConfirmMs`, label: 'Hold Confirm Delay (Ms)', type: 'slider', min: 0, max: 1000, step: 10, def: defaults.holdConfirmMs ?? 500 },
+      // Hold Confirm Delay REMOVED as a per-function control 2026-09-24
+      // (direct request: "I thought we took care of this with 1 broad
+      // sweeping system so i dont have to deal with finetuning it
+      // anymore" -- confirmed via AskUserQuestion: replace the per-
+      // function slider with one shared/global value). Every hold-kind
+      // function (static or custom) now reads the single global
+      // `holdConfirmMs` control instead (see the "Custom Click Functions"
+      // anchor group's own DEV_GROUPS entry) -- see
+      // updateClickHoldPoseForHand()'s own commit-gate for where this is
+      // actually read at runtime. The reasoning that originally set this
+      // to 500ms (matching `MOUSE_LOG_HELD_DRAG_MS`, so a normal click's
+      // press-to-release window never becomes visible as a false-start
+      // hold) still applies -- it's just one shared number now instead of
+      // a per-function one.
       { key: `${p}TransitionSpeedMs`, label: 'Animation Speed (Ms)', type: 'slider', min: 0, max: 700, step: 10, def: defaults.transitionSpeedMs ?? 400 },
       // Animation Speed Curve on/off -- direct spec item ("Animation
       // Speed Curve on/off [NEW]" under Single-Pose-mode settings), a
@@ -2972,6 +2991,19 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       // release always retransitions, a disclosed scoping choice.
       { key: `${p}RetransitionEnabled`, label: 'Retransition On/Off', type: 'checkbox', def: true, onChange: () => updateSingleTimingGateVisibility(p) },
       { key: `${p}RetransitionSpeedMs`, label: 'Retransition Speed (Ms)', type: 'slider', min: 0, max: 700, step: 10, def: defaults.retransitionSpeedMs ?? 400 },
+      // Retransition Speed Curve -- direct request 2026-09-24 (item 5):
+      // "In the Retransition settings group, add a Curve Graph input and
+      // min max selector for Retransition speed." Same distance->speed
+      // curve shape as Animation Speed Curve above, just modulating
+      // `${p}RetransitionSpeedMs` (this group's own flat speed slider)
+      // instead of the forward transition's `${p}TransitionSpeedMs` --
+      // see endClickHoldPose()'s own retransition-entry comment for where
+      // this is actually frozen and applied, computed once per hand at
+      // the moment retransition begins (same "frozen at trigger time"
+      // philosophy as every other curve in this file).
+      { key: `${p}RetransitionSpeedCurveEnabled`, label: 'Retransition Speed Curve On/Off', type: 'checkbox', def: false, onChange: () => updateSingleTimingGateVisibility(p) },
+      { key: `${p}RetransitionSpeedCurve`, label: 'Retransition Speed Curve (Distance -> Speed)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickHoldConfig(p) },
+      { key: `${p}RetransitionSpeedCurveRange`, label: 'Retransition Min / Max Speed (Ms)', type: 'text', def: '{"min":50,"max":2000}', onChange: () => parseClickHoldConfig(p) },
       { key: `${p}RetransitionStartTimeCurve`, label: 'Retransition Start Time Curve (Distance -> Start Time)', type: 'text', def: defaults.retransitionStartTimeCurve ?? '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickHoldConfig(p) },
       { key: `${p}RetransitionStartTimeRange`, label: 'Retransition Min / Max Start Time (Ms)', type: 'text', def: defaults.retransitionStartTimeRange ?? '{"min":0,"max":300}', onChange: () => parseClickHoldConfig(p) },
       // Tween mode's own dedicated retransition trio -- direct request
@@ -2990,47 +3022,55 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       { key: `${p}TweenRetransitionSpeedMs`, label: 'Retransition Speed (Ms)', type: 'slider', min: 50, max: 5000, step: 10, def: 800 },
       { key: `${p}TweenRetransitionStartTimeCurve`, label: 'Retransition Start Time Curve (Distance -> Start Time)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickHoldConfig(p) },
       { key: `${p}TweenRetransitionStartTimeRange`, label: 'Retransition Min / Max Start Time (Ms)', type: 'text', def: '{"min":0,"max":300}', onChange: () => parseClickHoldConfig(p) },
-      // Sequence-mode release behavior -- direct spec item ("Sequence-
-      // mode adds its own On Release Mode (Complete Sequence/Stop) with
-      // Trigger All Hands"). Only meaningful for HOLD-based triggers
-      // (chp/rchp/dcHold/tripleClickHold/quadClickHold) -- these are the
-      // only ones with a genuine "release" event mid-tween; the fire-
-      // and-forget family (click/dblclick/rc/tripleClick/quadClick) has
-      // no hold to release, so this doesn't apply there.
-      // 'Stop' (default) = CURRENT/existing behavior, unchanged: release
-      // immediately begins retransition from wherever the hand is right
-      // now, staggered per hand via the existing Retransition Start Time
-      // Curve/Range above. 'Complete Sequence' = the hand keeps playing
-      // (forward pass, or the CURRENT lap if already looping) instead of
+      // Sequence-mode release behavior -- direct spec item, REPLACED
+      // 2026-09-24 (item 10): the old 2-value `${p}OnReleaseMode` select
+      // ('Stop'/'Complete Sequence') is now a plain "Tween Stop On/Off"
+      // checkbox instead, living as an ordinary row INSIDE its own new
+      // "Tween Stop" group rather than a bare select in the main body --
+      // direct spec text: "'Tween Stop' should be its own Setting Group,
+      // Unlike Retransition, Offset etc, It wont have the in-label on/off
+      // checkbox. In this group add *D*Tween Stop On/Off*Checkbox*. If
+      // unchecked, on hold release, all triggered hands will finish their
+      // sequence animation (unless interrupted by a later trigger, in
+      // which case it will transition to the new triggered tween). When
+      // checked, 2 subgroups will then be available - 'Tween Stop Start
+      // Time Curve' and 'Tween Stop Delay'." Only meaningful for HOLD-
+      // based triggers (chp/rchp/dcHold-style, custom Click+Hold
+      // functions) -- these are the only ones with a genuine "release"
+      // event mid-tween; the fire-and-forget family has no hold to
+      // release, so this doesn't apply there. Unchecked = the OLD
+      // 'Complete Sequence' behavior (the hand keeps playing instead of
       // stopping immediately on release -- see updateClickHoldPoseForHand()'s
-      // own `chp.releasePending` handling in the forward/looping phases
-      // for exactly where it checks in.
-      { key: `${p}OnReleaseMode`, label: 'On Release Mode - Complete Sequence, Stop', type: 'select', def: 'Stop', options: () => ['Stop', 'Complete Sequence'] },
-      // Trigger All Hands -- direct clarification (AskUserQuestion,
-      // 2026-09-17): "force simultaneous release... ALL hands immediately
-      // begin their stop/retransition together, overriding each hand's
-      // own normal distance-based stagger delay." Off (default) = every
-      // hand still staggers via the existing Retransition Start Time
-      // Curve/Range, exactly as before this feature existed.
-      { key: `${p}TriggerAllHands`, label: 'Trigger All Hands', type: 'checkbox', def: false },
-      // Tween Stop (Sequence mode's own "Stop" release path) -- direct
-      // spec item, corrected 2026-09-19 after re-reading the verbatim
-      // spec text (an earlier pass wrongly deferred this as "likely
-      // duplicates Retransition Start Time Curve" -- it's genuinely
-      // different: on release, the sequence keeps PLAYING instead of
-      // jumping to retransition, its own tween speed progressively
+      // own `chp.releasePending` handling in the forward/looping phases).
+      // Checked (def, matching the old 'Stop' default) = release begins
+      // retransition/deceleration, with the 2 gated subgroups below
+      // (wrapTweenStopGroup(), further down) available to refine exactly
+      // how. See endClickHoldPose()'s own updated gate for the actual
+      // runtime check.
+      { key: `${p}TweenStopEnabled`, label: 'Tween Stop On/Off', type: 'checkbox', def: true, onChange: () => updateTweenStopGateVisibility(p) },
+      // Trigger All Hands removed 2026-09-24 (direct request, "Remove
+      // 'Trigger All Hands' for now") -- every hand always uses its own
+      // normal distance-based retransition stagger again, same as before
+      // this control existed. See beginTweenReleaseStop()'s own comment
+      // and endClickHoldPose()'s own retransition-stagger block for where
+      // the bypass branch this control gated used to live.
+      // "Tween Stop Start Time Curve" and "Tween Stop Delay" -- the 2
+      // gated subgroups Tween Stop On/Off (above) unlocks when checked
+      // (item 10), each wrapped into its own real nested group "just like
+      // Retransition, Offset, Animation Speed Curve etc" (item 11), i.e.
+      // an in-label on/off checkbox of its own -- see wrapTweenStopGroup()
+      // further down for the actual DOM nesting (outer "Tween Stop" group
+      // containing Tween Stop On/Off as a plain row, plus these 2 nested
+      // gated subgroups). Fields themselves unchanged from their original
+      // 2026-09-19 design: on release, the sequence keeps PLAYING instead
+      // of jumping to retransition, its own tween speed progressively
       // decaying to zero over Tween Stop Delay ("so the pose does not
       // abruptly stop but instead slows down to a stop... if the Tween
-      // Stop Delay is 0, then the hands will just stop abruptly"). Off
-      // by default (def: false) -- preserves this project's own
-      // existing immediate-retransition 'Stop' behavior exactly, unless
-      // explicitly turned on. See updateClickHoldPoseForHand()'s own
-      // 'stopping' phase for the actual per-frame deceleration math, and
-      // endClickHoldPose()'s own comment for how RetransitionEnabled now
-      // ALSO governs Sequence mode's own post-decay behavior (a 2nd
-      // verbatim-text correction -- "whether or not they retransition...
-      // will depend on the settings i already described in Click mode,"
-      // previously scoped to Single Pose only).
+      // Stop Delay is 0, then the hands will just stop abruptly"). See
+      // updateClickHoldPoseForHand()'s own 'stopping' phase for the
+      // actual per-frame deceleration math, and endClickHoldPose()'s own
+      // comment for how RetransitionEnabled now ALSO governs Sequence
+      // mode's own post-decay behavior.
       { key: `${p}TweenStopStartTimeCurveEnabled`, label: 'Tween Stop Start Time Curve On/Off', type: 'checkbox', def: false, onChange: () => updateTweenStopGateVisibility(p) },
       { key: `${p}TweenStopStartTimeCurve`, label: 'Tween Stop Start Time Curve (Distance -> Start Time)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickHoldConfig(p) },
       { key: `${p}TweenStopStartTimeRange`, label: 'Tween Stop Min / Max Start Time (Ms)', type: 'text', def: '{"min":0,"max":300}', onChange: () => parseClickHoldConfig(p) },
@@ -3165,6 +3205,13 @@ function makeClickPoseGroup(p, title, defaults = {}) {
       { key: `${p}PauseDurationMs`, label: 'Pause Duration At Tween End (Ms)', type: 'slider', min: 0, max: 5000, step: 10, def: defaults.pauseDurationMs ?? 500 },
       { key: `${p}RetransitionEnabled`, label: 'Retransition On/Off', type: 'checkbox', def: true, onChange: () => updateSingleTimingGateVisibility(p) },
       { key: `${p}RetransitionSpeedMs`, label: 'Retransition Speed (Ms)', type: 'slider', min: 0, max: 700, step: 10, def: defaults.retransitionSpeedMs ?? 400 },
+      // Retransition Speed Curve -- direct request 2026-09-24 (item 5) --
+      // see makeClickHoldPoseGroup()'s own matching comment for the full
+      // reasoning (shared word-for-word, both factories added this the
+      // same way).
+      { key: `${p}RetransitionSpeedCurveEnabled`, label: 'Retransition Speed Curve On/Off', type: 'checkbox', def: false, onChange: () => updateSingleTimingGateVisibility(p) },
+      { key: `${p}RetransitionSpeedCurve`, label: 'Retransition Speed Curve (Distance -> Speed)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickPoseConfig(p) },
+      { key: `${p}RetransitionSpeedCurveRange`, label: 'Retransition Min / Max Speed (Ms)', type: 'text', def: '{"min":50,"max":2000}', onChange: () => parseClickPoseConfig(p) },
       { key: `${p}RetransitionStartTimeCurve`, label: 'Retransition Start Time Curve (Distance -> Start Time)', type: 'text', def: defaults.retransitionStartTimeCurve ?? '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickPoseConfig(p) },
       { key: `${p}RetransitionStartTimeRange`, label: 'Retransition Min / Max Start Time (Ms)', type: 'text', def: defaults.retransitionStartTimeRange ?? '{"min":0,"max":300}', onChange: () => parseClickPoseConfig(p) }
     ])
@@ -5545,6 +5592,12 @@ function parseClickHoldConfig(p) {
   try { t.tweenStartRangeParsed = JSON.parse(cfg[`${p}TweenStartTimeRange`]) } catch (e) { /* keep last-good value */ }
   try { t.retransitionCurveParsed = JSON.parse(cfg[`${p}RetransitionStartTimeCurve`]).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
   try { t.retransitionRangeParsed = JSON.parse(cfg[`${p}RetransitionStartTimeRange`]) } catch (e) { /* keep last-good value */ }
+  // Retransition's own distance->SPEED curve/range (item 5, 2026-09-24) --
+  // same shape/reasoning as Animation Speed Curve above, just modulating
+  // `${p}RetransitionSpeedMs` (Single Pose's retransition pace) instead
+  // of the forward transition's.
+  try { t.retransitionSpeedCurveParsed = JSON.parse(cfg[`${p}RetransitionSpeedCurve`]).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
+  try { t.retransitionSpeedRangeParsed = JSON.parse(cfg[`${p}RetransitionSpeedCurveRange`]) } catch (e) { /* keep last-good value */ }
   // Tween's own separate RETRANSITION curve/range (direct request: "for
   // all click hold functions, when i select to tween a sequence...
   // provide me 'Retransitioning' settings just like the single poses") --
@@ -5577,7 +5630,7 @@ function getOrInitHandCHP(hand) {
   // keys.
   CLICK_HOLD_KEYS.forEach((p) => {
     if (hand._chp[p]) return
-    hand._chp[p] = { phase: 'idle', forwardStartTime: 0, forwardSnapshot: null, tweenSegments: null, loopStartTime: 0, loopHoldEndTime: 0, loopDirection: 1, retransitionDelay: 0, retransitionStart: null, retransitionStartTime: 0, retransitionIsTween: false, lastAppliedValues: null, frozenSplayDeg: 0, pendingClaimAt: 0, armedForHoldStartTime: -1, pendingFrozenSplayDeg: 0, frozenSpeedMs: 0, pendingFrozenSpeedMs: 0, releasePending: false, stoppingStartTime: 0, stoppingStartDelay: 0, stoppingDelayMs: 1, stoppingLastFrameTime: 0, stoppingBaseElapsedMs: 0, stoppingVirtualElapsedMs: 0, stoppingWasLooping: false, stoppingFreezeAtEnd: false }
+    hand._chp[p] = { phase: 'idle', forwardStartTime: 0, forwardSnapshot: null, tweenSegments: null, loopStartTime: 0, loopHoldEndTime: 0, loopDirection: 1, retransitionDelay: 0, retransitionStart: null, retransitionStartTime: 0, retransitionIsTween: false, retransitionSpeedMs: 0, lastAppliedValues: null, frozenSplayDeg: 0, pendingClaimAt: 0, armedForHoldStartTime: -1, pendingFrozenSplayDeg: 0, frozenSpeedMs: 0, pendingFrozenSpeedMs: 0, releasePending: false, stoppingStartTime: 0, stoppingStartDelay: 0, stoppingDelayMs: 1, stoppingLastFrameTime: 0, stoppingBaseElapsedMs: 0, stoppingVirtualElapsedMs: 0, stoppingWasLooping: false, stoppingFreezeAtEnd: false }
   })
   return hand._chp
 }
@@ -6028,15 +6081,13 @@ function safeTweenSpeedMs(v) { return Number.isFinite(v) ? v : 800 }
 // Shared by updateClickHoldPoseForHand()'s own forward/looping phases
 // (Complete-Sequence mode's own natural-completion stop) -- begins this
 // hand's retransition using the SAME Tween Retransition Start Time
-// Curve/Range every OTHER tween-retransition path already uses, except
-// when Trigger All Hands is on, which bypasses that per-hand stagger
-// entirely (delay 0, every hand starts together) per the direct
-// clarification (AskUserQuestion, 2026-09-17).
+// Curve/Range every OTHER tween-retransition path already uses (Trigger
+// All Hands, which used to bypass this per-hand stagger, was removed
+// 2026-09-24 -- see its own control's former DEV_GROUPS comment).
 function beginTweenReleaseStop(chp, trig, p, values, live, minLiveDist, liveDistRange, now) {
   chp.retransitionStart = values
   chp.retransitionStartTime = now
-  const triggerAllHands = !!cfg[`${p}TriggerAllHands`]
-  chp.retransitionDelay = triggerAllHands ? 0 : computeStartDelayMs(live, minLiveDist, liveDistRange, trig.tweenRetransitionCurveParsed, trig.tweenRetransitionRangeParsed)
+  chp.retransitionDelay = computeStartDelayMs(live, minLiveDist, liveDistRange, trig.tweenRetransitionCurveParsed, trig.tweenRetransitionRangeParsed)
   chp.retransitionIsTween = true
   chp.phase = 'retransition'
   chp.releasePending = false
@@ -6073,7 +6124,7 @@ function isSequenceOrChainMode(p) {
 function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) {
   const trig = clickHoldPoseTriggers[p]
   const chp = getOrInitHandCHP(hand)[p]
-  if (trig.active && chp.armedForHoldStartTime !== trig.holdStartTime && now - trig.holdStartTime >= (cfg[`${p}HoldConfirmMs`] ?? 0)) {
+  if (trig.active && chp.armedForHoldStartTime !== trig.holdStartTime && now - trig.holdStartTime >= (cfg.holdConfirmMs ?? 0)) {
     chp.armedForHoldStartTime = trig.holdStartTime // dedupe -- arm exactly once per hold-start, not every frame spent waiting
     const isTweenStart = isSequenceOrChainMode(p)
     // Start Time Curve on/off (Single Pose only, direct spec item) --
@@ -6320,7 +6371,10 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     // actually starts, so a live Mode change mid-retransition can't yank
     // this hand between the 2 settings pairs mid-flight.
     const elapsed = now - chp.retransitionStartTime
-    const speedMs = Math.max(chp.retransitionIsTween ? cfg[`${p}TweenRetransitionSpeedMs`] : cfg[`${p}RetransitionSpeedMs`], 1)
+    // Retransition Speed Curve (item 5) -- Single-Pose-only override, same
+    // read-time-checked pattern as Animation Speed Curve's own
+    // `cfg[SpeedCurveEnabled] ? chp.frozenSpeedMs : cfg[TransitionSpeedMs]`.
+    const speedMs = Math.max(chp.retransitionIsTween ? cfg[`${p}TweenRetransitionSpeedMs`] : (cfg[`${p}RetransitionSpeedCurveEnabled`] ? chp.retransitionSpeedMs : cfg[`${p}RetransitionSpeedMs`]), 1)
     const progress = elapsed < chp.retransitionDelay ? 0 : THREE.MathUtils.clamp((elapsed - chp.retransitionDelay) / speedMs, 0, 1)
     const values = lerpPoseValues(chp.retransitionStart, poseDefaultValues, progress)
     applyPoseValuesToHand(hand, values, chp.frozenSplayDeg)
@@ -6485,14 +6539,15 @@ function endClickHoldPose(p) {
     const retransitionOff = cfg[`${p}RetransitionEnabled`] === false
     const tweenStopDelayOn = chp.retransitionIsTween && !!cfg[`${p}TweenStopDelayEnabled`]
     if (retransitionOff && !tweenStopDelayOn) return
-    // On Release Mode = 'Complete Sequence' (Sequence mode only, direct
-    // spec item) -- don't stop now; leave `chp.phase` exactly as it is
-    // (still 'forward' or 'looping', genuinely mid-playback) and just
-    // flag it. updateClickHoldPoseForHand()'s own forward/looping phases
-    // check this flag at their own natural completion point (end of the
+    // Tween Stop Off (Sequence mode only, replacing the old 2-value
+    // `${p}OnReleaseMode` select -- item 10, 2026-09-24) -- don't stop
+    // now; leave `chp.phase` exactly as it is (still 'forward' or
+    // 'looping', genuinely mid-playback) and just flag it.
+    // updateClickHoldPoseForHand()'s own forward/looping phases check
+    // this flag at their own natural completion point (end of the
     // current pass/lap) and call beginTweenReleaseStop() from there --
     // see their own matching comments for the full account.
-    if (chp.retransitionIsTween && cfg[`${p}OnReleaseMode`] === 'Complete Sequence') {
+    if (chp.retransitionIsTween && !cfg[`${p}TweenStopEnabled`]) {
       chp.releasePending = true
       return
     }
@@ -6529,15 +6584,20 @@ function endClickHoldPose(p) {
     }
     chp.retransitionStart = chp.lastAppliedValues || { ...poseDefaultValues }
     chp.retransitionStartTime = now
-    // Trigger All Hands (Sequence mode only, direct clarification --
-    // AskUserQuestion, 2026-09-17) -- bypasses the normal per-hand
-    // Tween Retransition stagger entirely (delay 0, every hand starts
-    // together) instead of each hand computing its own distance-based
-    // delay. Single Pose's own Retransition stagger is unaffected.
-    const triggerAllHands = chp.retransitionIsTween && !!cfg[`${p}TriggerAllHands`]
-    chp.retransitionDelay = triggerAllHands ? 0 : (chp.retransitionIsTween
+    // Trigger All Hands (used to bypass this per-hand stagger entirely)
+    // removed 2026-09-24 -- every hand always computes its own distance-
+    // based delay again, same as before that control existed.
+    chp.retransitionDelay = chp.retransitionIsTween
       ? computeStartDelayMs(dists[i], minD, range, trig.tweenRetransitionCurveParsed, trig.tweenRetransitionRangeParsed)
-      : computeStartDelayMs(dists[i], minD, range, trig.retransitionCurveParsed, trig.retransitionRangeParsed))
+      : computeStartDelayMs(dists[i], minD, range, trig.retransitionCurveParsed, trig.retransitionRangeParsed)
+    // Retransition Speed Curve (item 5, 2026-09-24) -- frozen once here,
+    // same "frozen at trigger time" philosophy as Animation Speed Curve's
+    // own `pendingFrozenSpeedMs`/`frozenSpeedMs` pair (see that control's
+    // own comment) -- Single Pose only (`!chp.retransitionIsTween`), per
+    // this control's own scoping to the plain "Retransition" group.
+    chp.retransitionSpeedMs = (!chp.retransitionIsTween && cfg[`${p}RetransitionSpeedCurveEnabled`])
+      ? computeStartDelayMs(dists[i], minD, range, trig.retransitionSpeedCurveParsed, trig.retransitionSpeedRangeParsed)
+      : 0
     chp.phase = 'retransition'
   })
 }
@@ -6729,6 +6789,10 @@ function parseClickPoseConfig(p) {
   try { t.tweenStartRangeParsed = JSON.parse(cfg[`${p}TweenStartTimeRange`]) } catch (e) { /* keep last-good value */ }
   try { t.retransitionCurveParsed = JSON.parse(cfg[`${p}RetransitionStartTimeCurve`]).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
   try { t.retransitionRangeParsed = JSON.parse(cfg[`${p}RetransitionStartTimeRange`]) } catch (e) { /* keep last-good value */ }
+  // Retransition's own distance->SPEED curve/range (item 5, 2026-09-24) --
+  // see parseClickHoldConfig()'s own matching comment.
+  try { t.retransitionSpeedCurveParsed = JSON.parse(cfg[`${p}RetransitionSpeedCurve`]).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
+  try { t.retransitionSpeedRangeParsed = JSON.parse(cfg[`${p}RetransitionSpeedCurveRange`]) } catch (e) { /* keep last-good value */ }
 }
 function getOrInitHandCP(hand) {
   if (!hand._cp) hand._cp = {}
@@ -6747,7 +6811,7 @@ function getOrInitHandCP(hand) {
   // again any time the key list changes.
   CLICK_POSE_KEYS.forEach((p) => {
     if (hand._cp[p]) return
-    hand._cp[p] = { phase: 'idle', triggerTime: 0, forwardSnapshot: null, tweenPoses: null, pauseStartTime: 0, retransitionStart: null, retransitionStartTime: 0, retransitionDelay: 0, lastAppliedValues: null, frozenSplayDeg: 0, pendingClaimAt: 0, pendingForwardSnapshot: null, pendingNamedPoses: null, pendingFrozenSplayDeg: 0, frozenSpeedMs: 0, pendingFrozenSpeedMs: 0, sequenceLapIndex: 1, sequenceLapStartTime: 0, sequenceHoldEndTime: 0, sequenceDirection: 1 }
+    hand._cp[p] = { phase: 'idle', triggerTime: 0, forwardSnapshot: null, tweenPoses: null, pauseStartTime: 0, retransitionStart: null, retransitionStartTime: 0, retransitionDelay: 0, retransitionSpeedMs: 0, lastAppliedValues: null, frozenSplayDeg: 0, pendingClaimAt: 0, pendingForwardSnapshot: null, pendingNamedPoses: null, pendingFrozenSplayDeg: 0, frozenSpeedMs: 0, pendingFrozenSpeedMs: 0, sequenceLapIndex: 1, sequenceLapStartTime: 0, sequenceHoldEndTime: 0, sequenceDirection: 1 }
   })
   return hand._cp
 }
@@ -6924,10 +6988,17 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
       // Computed from THIS hand's own live distance right now, not a
       // shared snapshot -- see this section's own top comment for why.
       cp.retransitionDelay = computeStartDelayMs(live, minLiveDist, liveDistRange, clickPoseTriggers[p].retransitionCurveParsed, clickPoseTriggers[p].retransitionRangeParsed)
+      // Retransition Speed Curve (item 5, 2026-09-24) -- frozen once here,
+      // same "frozen at trigger time" philosophy as Animation Speed
+      // Curve's own frozenSpeedMs pair -- see makeClickHoldPoseGroup()'s
+      // own matching control comment.
+      cp.retransitionSpeedMs = cfg[`${p}RetransitionSpeedCurveEnabled`]
+        ? computeStartDelayMs(live, minLiveDist, liveDistRange, clickPoseTriggers[p].retransitionSpeedCurveParsed, clickPoseTriggers[p].retransitionSpeedRangeParsed)
+        : 0
     }
   } else if (cp.phase === 'retransition') {
     const elapsed = now - cp.retransitionStartTime
-    const speedMs = Math.max(cfg[`${p}RetransitionSpeedMs`], 1)
+    const speedMs = Math.max(cfg[`${p}RetransitionSpeedCurveEnabled`] ? cp.retransitionSpeedMs : cfg[`${p}RetransitionSpeedMs`], 1)
     const progress = elapsed < cp.retransitionDelay ? 0 : THREE.MathUtils.clamp((elapsed - cp.retransitionDelay) / speedMs, 0, 1)
     const values = lerpPoseValues(cp.retransitionStart, poseDefaultValues, progress)
     applyPoseValuesToHand(hand, values, cp.frozenSplayDeg)
@@ -7488,6 +7559,13 @@ function buildClickHoldPoseWidgets(p) {
   const speedCurveCaption = 'X: Distance From Cursor (%, Nearest→Farthest Hand At Trigger Time)  ·  Y: Speed Fraction (0=Min, 1=Max)'
   if (speedCurveRow) buildGenericCurveWidget(speedCurveRow, { caption: speedCurveCaption, defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
   if (speedRangeRow) buildGenericRangeBarWidget(speedRangeRow, { trackMin: 50, trackMax: 2000, unit: 'ms', defaultValue: { min: 50, max: 2000 } })
+  // Retransition Speed Curve's own curve/range widgets (item 5, 2026-09-24)
+  // -- same shape/caption/track ceiling as Animation Speed Curve above,
+  // just modulating Retransition Speed instead.
+  const retransSpeedCurveRow = document.querySelector(`.dp-row[data-key="${p}RetransitionSpeedCurve"]`)
+  const retransSpeedRangeRow = document.querySelector(`.dp-row[data-key="${p}RetransitionSpeedCurveRange"]`)
+  if (retransSpeedCurveRow) buildGenericCurveWidget(retransSpeedCurveRow, { caption: speedCurveCaption, defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
+  if (retransSpeedRangeRow) buildGenericRangeBarWidget(retransSpeedRangeRow, { trackMin: 50, trackMax: 2000, unit: 'ms', defaultValue: { min: 50, max: 2000 } })
   const startCurveRow = document.querySelector(`.dp-row[data-key="${p}StartTimeCurve"]`)
   const startRangeRow = document.querySelector(`.dp-row[data-key="${p}StartTimeRange"]`)
   const tweenStartCurveRow = document.querySelector(`.dp-row[data-key="${p}TweenStartTimeCurve"]`)
@@ -7541,6 +7619,12 @@ function buildClickPoseWidgets(p) {
   const speedCurveCaption = 'X: Distance From Cursor (%, Nearest→Farthest Hand At Trigger Time)  ·  Y: Speed Fraction (0=Min, 1=Max)'
   if (speedCurveRow) buildGenericCurveWidget(speedCurveRow, { caption: speedCurveCaption, defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
   if (speedRangeRow) buildGenericRangeBarWidget(speedRangeRow, { trackMin: 50, trackMax: 2000, unit: 'ms', defaultValue: { min: 50, max: 2000 } })
+  // Retransition Speed Curve's own curve/range widgets (item 5, 2026-09-24)
+  // -- see buildClickHoldPoseWidgets()'s own matching comment.
+  const retransSpeedCurveRow = document.querySelector(`.dp-row[data-key="${p}RetransitionSpeedCurve"]`)
+  const retransSpeedRangeRow = document.querySelector(`.dp-row[data-key="${p}RetransitionSpeedCurveRange"]`)
+  if (retransSpeedCurveRow) buildGenericCurveWidget(retransSpeedCurveRow, { caption: speedCurveCaption, defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
+  if (retransSpeedRangeRow) buildGenericRangeBarWidget(retransSpeedRangeRow, { trackMin: 50, trackMax: 2000, unit: 'ms', defaultValue: { min: 50, max: 2000 } })
   const startCurveRow = document.querySelector(`.dp-row[data-key="${p}StartTimeCurve"]`)
   const startRangeRow = document.querySelector(`.dp-row[data-key="${p}StartTimeRange"]`)
   const tweenStartCurveRow = document.querySelector(`.dp-row[data-key="${p}TweenStartTimeCurve"]`)
@@ -7589,13 +7673,38 @@ function persistCustomClickFunctionIds() {
 // actually iterates), but removing it fully still avoids leaking memory
 // across many create/delete cycles in one long session. Deliberately NOT
 // undo-aware -- see devPanel.js's own onGroupDeleted comment for why.
+//
+// CORRECTED 2026-09-24 (direct request, item 17): deleting a desktop-
+// family function while viewing it on the Mobile/Landscape tab (i.e. it's
+// only visible there via its own `${id}ShowOnMobile` opt-in, not its real
+// home tab) is now a SOFT delete -- "simply treat that as if I unchecked
+// the checkbox in the desktop tab," not a real delete. A mobile-family
+// (mobile-exclusive) function deleted from Mobile/Landscape -- its own
+// home tab, the only tab it's ever visible on -- still gets a REAL delete,
+// same as a desktop-family function deleted from Desktop ("I will still
+// be able to delete Mobile/Landscape exclusive click functions as
+// normal"). devPanel.js's own generic delete flow already removed the DOM
+// node before this hook runs (see its own onGroupDeleted call site) --
+// for the soft case the function still exists conceptually (nothing in
+// customClickFunctionIds/CLICK_POSE_KEYS/CLICK_HOLD_KEYS/trigger-state
+// was touched), so renderCustomClickFunctionGroup() alone (NOT the full
+// registerCustomClickFunction() wrapper, which would re-push a DUPLICATE
+// entry into CLICK_POSE_KEYS/CLICK_HOLD_KEYS) rebuilds its live DOM group
+// fresh from cfg -- correctly hidden on this tab now that ShowOnMobile is
+// off, and still present/visible the next time Desktop is shown.
 function cleanupDeletedCustomClickFunction(target) {
   if (!target || !target.classList || !target.classList.contains('dp-group')) return
   if (!target.dataset.customFunctionFamily) return // not a Custom Click Function's own group (a plain user-created group, or one of the 10 static triggers)
   const title = target.dataset.key
   const idx = customClickFunctionIds.findIndex((e) => e.title === title)
   if (idx === -1) return
-  const { id, kind } = customClickFunctionIds[idx]
+  const { id, kind, family } = customClickFunctionIds[idx]
+  if (family === 'desktop' && getActiveDevPanelTab() === 'mobile') {
+    cfg[`${id}ShowOnMobile`] = false
+    syncValue(`${id}ShowOnMobile`, false)
+    renderCustomClickFunctionGroup(id, title, kind, family)
+    return
+  }
   customClickFunctionIds.splice(idx, 1)
   persistCustomClickFunctionIds()
   const keys = kind === 'hold' ? CLICK_HOLD_KEYS : CLICK_POSE_KEYS
@@ -7717,24 +7826,44 @@ function customFunctionTypeOptions(family) {
 function kindForCustomFunctionType(type) {
   return (type === 'Click+Hold' || type === 'Right Click+Hold') ? 'hold' : 'pose'
 }
-// Shows/hides ONE custom function's group based on its own `family` vs.
-// whichever tab is currently active -- devPanel.js has no per-tab DOM
-// duplication (one shared groupsEl for all 3 devices) and no existing
-// "hide on Desktop only" primitive (its own dynamicDevice checkboxes only
-// ever hide FROM Mobile/Landscape, assuming Desktop is always the
-// baseline), so this is a small, dedicated main.js-side mechanism rather
-// than forcing an ill-fitting reuse of that one.
-function updateCustomFunctionGroupVisibility(g, family) {
+// Whether a custom function (registered under `family`, 'desktop' or
+// 'mobile') should be shown/active for a given device family -- shared by
+// BOTH the dev-panel UI (`deviceFamily` = getActiveDevPanelTab()) and the
+// real runtime trigger dispatch (`deviceFamily` = realDeviceClass(),
+// normalized -- see its own call sites below). CORRECTED 2026-09-24
+// (direct requests, items 13/14/16/17): a function created on its own
+// "home" tab is always active there; a mobile-family function is
+// EXCLUSIVE to Mobile/Landscape and never active on Desktop, no override
+// ("they will not show up nor be active in Desktop mode"); a desktop-
+// family function additionally gets a per-function `${id}ShowOnMobile`
+// opt-in (default OFF -- "by default not have 'Show in Mobile/Landscape'
+// selected") that, when checked, makes it ALSO active on Mobile/Landscape
+// ("When I then select that checkbox, it should immediately show up in
+// the mobile/landscape tab").
+function customFunctionActiveForDeviceFamily(family, id, deviceFamily) {
+  if (family === deviceFamily) return true
+  if (family === 'desktop' && deviceFamily === 'mobile') return !!cfg[`${id}ShowOnMobile`]
+  return false
+}
+// Shows/hides ONE custom function's group based on customFunctionActiveForDeviceFamily()
+// above vs. whichever dev-panel tab is currently active -- devPanel.js has
+// no per-tab DOM duplication (one shared groupsEl for all 3 devices) and
+// no existing "hide on Desktop only" primitive (its own dynamicDevice
+// checkboxes only ever hide FROM Mobile/Landscape, assuming Desktop is
+// always the baseline), so this is a small, dedicated main.js-side
+// mechanism rather than forcing an ill-fitting reuse of that one.
+function updateCustomFunctionGroupVisibility(g, family, id) {
   if (!g) return
   const activeTab = getActiveDevPanelTab()
-  g.style.display = (family === activeTab) ? '' : 'none'
+  g.style.display = customFunctionActiveForDeviceFamily(family, id, activeTab) ? '' : 'none'
 }
 // Refreshes every custom function's own group visibility -- called once
-// right after a new one is created, and wired to fire again on every tab
-// switch (see setupCustomFunctionTabVisibilitySync(), below).
+// right after a new one is created, whenever a `${id}ShowOnMobile`
+// checkbox changes, and wired to fire again on every tab switch (see
+// setupCustomFunctionTabVisibilitySync(), below).
 function refreshAllCustomFunctionGroupVisibility() {
   document.querySelectorAll('.dp-group[data-custom-function-family]').forEach((g) => {
-    updateCustomFunctionGroupVisibility(g, g.dataset.customFunctionFamily)
+    updateCustomFunctionGroupVisibility(g, g.dataset.customFunctionFamily, g.dataset.customFunctionId)
   })
 }
 // Wired once, right after initDevPanel() builds the panel's own tab
@@ -7745,7 +7874,21 @@ function refreshAllCustomFunctionGroupVisibility() {
 // on a non-DEV_MODE visitor, where the panel/tabs were never built.
 function setupCustomFunctionTabVisibilitySync() {
   document.querySelectorAll('.dp-tab').forEach((btn) => {
-    btn.addEventListener('click', () => { refreshAllCustomFunctionGroupVisibility(); refreshAllCustomFunctionTypeVisibility() })
+    btn.addEventListener('click', () => { refreshAllCustomFunctionGroupVisibility(); refreshAllCustomFunctionTypeVisibility(); updateCustomFunctionsAnchorRowVisibility() })
+  })
+}
+// Zoom/Scroll gesture threshold rows (the "Custom Click Functions" anchor
+// group's own static controls, not per-function) -- direct request
+// 2026-09-24 ("Zoom Gesture and Scroll Gesture settings should only be
+// available in Mobile and Landscape tabs"). Same `.dp-row[data-key="..."]`
+// + `style.display` pattern every other row-visibility function in this
+// file already uses; called once at module init (below) and again on every
+// tab switch (setupCustomFunctionTabVisibilitySync(), above).
+function updateCustomFunctionsAnchorRowVisibility() {
+  const hideOnDesktop = getActiveDevPanelTab() === 'desktop'
+  ;['zoomGestureThresholdPx', 'scrollGestureThresholdPx'].forEach((key) => {
+    const row = document.querySelector(`.dp-row[data-key="${key}"]`)
+    if (row) row.style.display = hideOnDesktop ? 'none' : ''
   })
 }
 // Type/Touch-Point-Count/Click-Count row visibility -- Type itself has no
@@ -7912,9 +8055,32 @@ function renderCustomClickFunctionGroup(id, title, kind, family) {
     // simultaneous fingers just to fire a normal Click -- 1 is the
     // correct "ordinary single-finger tap/hold" default, matching how
     // Click/Click+Hold already behave on Desktop.
-    { key: `${id}TouchPointCount`, label: 'Touch Point Count', type: 'slider', min: 1, max: 10, step: 1, def: 1, onChange: () => refreshCustomFunctionConflictWarnings() },
+    // dynamicDevice: true added 2026-09-24 (direct request -- "if a Custom
+    // Click Function is allowed to have independent properties in Mobile
+    // mode, I will have the ability to change the touchpoints for
+    // existing/new click functions in Mobile Tab"): gives this row the
+    // standard "Independent from Desktop" checkbox (§12f-1), so Mobile and
+    // Landscape can each hold their own Touch Point Count when the user
+    // opts in, while staying mirrored/shared by default. The row itself
+    // still never shows on Desktop at all (updateCustomFunctionTypeVisibility()
+    // below), so the checkbox's OTHER half ("Show in Mobile/Landscape") is
+    // simply never reachable here -- consistent with this setting being a
+    // touch-only concept with no Desktop relevance to begin with.
+    { key: `${id}TouchPointCount`, label: 'Touch Point Count', type: 'slider', min: 1, max: 10, step: 1, def: 1, dynamicDevice: true, onChange: () => refreshCustomFunctionConflictWarnings() },
     { key: `${id}ClickCount`, label: kind === 'hold' ? 'Triggers On (Nth Press-And-Hold)' : 'Triggers On (Nth Click)', type: 'select', def: ['1st', '2nd', '3rd', '4th'][defaultClickCountOrdinal - 1], options: () => ['1st', '2nd', '3rd', '4th'], onChange: () => refreshCustomFunctionConflictWarnings() }
   )
+  // "Show in Mobile/Landscape" -- direct request 2026-09-24 (items 13/14/
+  // 16/17): only meaningful for a DESKTOP-family function (a mobile-family
+  // function is already exclusive to Mobile/Landscape by construction, no
+  // opt-in needed or offered). Default OFF ("by default not have 'Show in
+  // Mobile/Landscape' selected") -- checking it immediately makes this
+  // function ALSO active/visible on Mobile/Landscape, via
+  // customFunctionActiveForDeviceFamily() (both the dev-panel UI and the
+  // real runtime trigger dispatch read this same cfg key -- see that
+  // function's own comment).
+  if (family === 'desktop') {
+    controls.splice(1, 0, { key: `${id}ShowOnMobile`, label: 'Show in Mobile/Landscape', type: 'checkbox', def: false, onChange: () => refreshAllCustomFunctionGroupVisibility() })
+  }
   // updateClickFunctionEnabledVisibility() (shared with the 10 static
   // triggers, which have no Type/Touch-Point/Click-Count concept at all)
   // unconditionally shows EVERY row in the body when re-enabled -- it has
@@ -7941,14 +8107,15 @@ function renderCustomClickFunctionGroup(id, title, kind, family) {
     const anchorBody = anchor ? anchor.querySelector(':scope > .dp-group-body') : null
     if (anchorBody) anchorBody.insertBefore(g, anchorBody.firstChild)
     g.dataset.customFunctionFamily = family
-    updateCustomFunctionGroupVisibility(g, family)
+    g.dataset.customFunctionId = id
+    updateCustomFunctionGroupVisibility(g, family, id)
   }
   updateCustomFunctionTypeVisibility(id)
   refreshCustomFunctionConflictWarnings()
   if (kind === 'hold') {
     parseClickHoldConfig(id)
     buildClickHoldPoseWidgets(id)
-    updateClickTriggerModeVisibility(id, [], ['LoopMode', 'OnReleaseMode', 'TriggerAllHands', 'TweenStopStartTimeCurveEnabled', 'TweenStopDelayEnabled'])
+    updateClickTriggerModeVisibility(id, [], ['LoopMode'])
     updateLoopHoldVisibility(id)
     updateOffsetRotationVisibility(id)
     updateSingleTimingGateVisibility(id)
@@ -7971,6 +8138,21 @@ function renderCustomClickFunctionGroup(id, title, kind, family) {
   // own comment. Must run AFTER the wrapping above (it iterates the
   // group body's CURRENT direct children).
   updateClickFunctionEnabledVisibility(id)
+  // Re-apply any saved rename -- direct request 2026-09-24 (item 12,
+  // "Make sure when i rename a Custom Click Function, the name change is
+  // synced across tabs"). Root cause: renderDynamicGroup() -> createGroupElement()
+  // sets a freshly-built group/row's title straight from its own literal
+  // internal key, with no textOverrides lookup at all (only
+  // applyTextOverrides()'s own explicit sweep, normally run once at page
+  // load, actually reapplies a saved rename) -- so any path that REBUILDS
+  // a custom function's group after its first creation (a Type-driven
+  // kind-switch, handleCustomFunctionTypeChange(); the new soft-delete
+  // rebuild, cleanupDeletedCustomClickFunction()) silently reverted its
+  // title/row labels back to their unrenamed defaults, which read as "the
+  // rename didn't stick" whenever one of those paths happened to run.
+  // Calling the same sweep here, every time this function builds a group,
+  // closes that gap regardless of which path triggered the rebuild.
+  applyTextOverrides()
 }
 // Type select's own onChange for a custom function (CORRECTED 2026-09-20,
 // see "Custom Click Functions"'s own DEV_GROUPS comment for the full
@@ -8032,6 +8214,7 @@ function registerCustomClickFunction(id, title, kind, family) {
       speedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], speedRangeParsed: { min: 50, max: 2000 },
       tweenStartCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStartRangeParsed: { min: 0, max: 300 },
       retransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionRangeParsed: { min: 0, max: 300 },
+      retransitionSpeedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionSpeedRangeParsed: { min: 50, max: 2000 },
       tweenRetransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenRetransitionRangeParsed: { min: 0, max: 300 },
       tweenStopStartCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStopStartRangeParsed: { min: 0, max: 300 },
       tweenStopDelayCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStopDelayRangeParsed: { min: 0, max: 2000 }
@@ -8042,7 +8225,8 @@ function registerCustomClickFunction(id, title, kind, family) {
       startCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], startRangeParsed: { min: 0, max: 300 },
       speedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], speedRangeParsed: { min: 50, max: 2000 },
       tweenStartCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStartRangeParsed: { min: 0, max: 300 },
-      retransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionRangeParsed: { min: 0, max: 300 }
+      retransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionRangeParsed: { min: 0, max: 300 },
+      retransitionSpeedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionSpeedRangeParsed: { min: 50, max: 2000 }
     }
   }
   renderCustomClickFunctionGroup(id, title, kind, family)
@@ -8095,6 +8279,7 @@ const NEW_CUSTOM_FUNCTION_TEMPLATE = {
   StartTimeCurveEnabled: false, StartTimeCurve: '[{"x":0,"y":0},{"x":1,"y":1}]', StartTimeRange: '{"min":0,"max":300}',
   PauseDurationMs: 0,
   RetransitionEnabled: false, RetransitionSpeedMs: 400,
+  RetransitionSpeedCurveEnabled: false, RetransitionSpeedCurve: '[{"x":0,"y":0},{"x":1,"y":1}]', RetransitionSpeedCurveRange: '{"min":50,"max":2000}',
   RetransitionStartTimeCurve: '[{"x":0,"y":0},{"x":1,"y":1}]', RetransitionStartTimeRange: '{"min":0,"max":300}'
 }
 // Collapsed state of the 5 mandatory gated subgroups (§ CLAUDE.md
@@ -8211,9 +8396,20 @@ function customFunctionWantsMultiTouch(id) {
 // Type with a real multi-click CHAIN behind it in this app (see
 // updateCustomFunctionTypeVisibility()'s own comment for why Right
 // Click/Scroll/Zoom don't).
+// deviceFamily (normalized 'desktop'|'mobile') is read once per call, not
+// per function -- realDeviceClass() genuinely queries live viewport/touch
+// state, so this avoids paying for that repeatedly across many registered
+// functions in one dispatch.
+function currentDeviceFamily() { return realDeviceClass() === 'desktop' ? 'desktop' : 'mobile' }
 function triggerCustomPoseFunctions(type, clickCount = 1) {
-  customClickFunctionIds.forEach(({ id, kind }) => {
+  const deviceFamily = currentDeviceFamily()
+  customClickFunctionIds.forEach(({ id, kind, family }) => {
     if (kind === 'hold' || cfg[`${id}Type`] !== type) return
+    // Real device/family gating -- direct request 2026-09-24 (item 14):
+    // previously nothing here checked family at all, so a mobile-created
+    // function fired on ANY device, including Desktop. See
+    // customFunctionActiveForDeviceFamily()'s own comment.
+    if (!customFunctionActiveForDeviceFamily(family, id, deviceFamily)) return
     if (type === 'Click' && customFunctionClickCountOrdinal(id) !== clickCount) return
     if (type === 'Click' && customFunctionWantsMultiTouch(id)) return
     triggerClickPose(id)
@@ -8234,16 +8430,20 @@ function triggerCustomPoseFunctions(type, clickCount = 1) {
 // multi-touch Click functions -- see customFunctionWantsMultiTouch()'s
 // own comment.
 function startCustomHoldFunctions(type, ordinal = 1) {
-  customClickFunctionIds.forEach(({ id, kind }) => {
+  const deviceFamily = currentDeviceFamily()
+  customClickFunctionIds.forEach(({ id, kind, family }) => {
     if (kind !== 'hold' || cfg[`${id}Type`] !== type) return
+    if (!customFunctionActiveForDeviceFamily(family, id, deviceFamily)) return
     if (type === 'Click+Hold' && customFunctionClickCountOrdinal(id) !== ordinal) return
     if (type === 'Click+Hold' && customFunctionWantsMultiTouch(id)) return
     startClickHoldPose(id)
   })
 }
 function endCustomHoldFunctions(type, ordinal = 1) {
-  customClickFunctionIds.forEach(({ id, kind }) => {
+  const deviceFamily = currentDeviceFamily()
+  customClickFunctionIds.forEach(({ id, kind, family }) => {
     if (kind !== 'hold' || cfg[`${id}Type`] !== type) return
+    if (!customFunctionActiveForDeviceFamily(family, id, deviceFamily)) return
     if (type === 'Click+Hold' && customFunctionClickCountOrdinal(id) !== ordinal) return
     if (type === 'Click+Hold' && customFunctionWantsMultiTouch(id)) return
     endClickHoldPose(id)
@@ -8299,10 +8499,10 @@ window.addEventListener('wheel', (e) => {
 // Deliberately asymmetric: only LANDING fingers goes through this wait.
 // A finger LIFTING (multiPointHandleTouchEnd(), below) stays instant/
 // un-debounced -- ending a hold the moment its own threshold is no
-// longer met isn't ambiguous the way landing fingers is, and Hold
-// Confirm Delay (`${id}HoldConfirmMs`, makeClickHoldPoseGroup()) already
-// separately owns "was this actually a deliberate hold" for hold-kind
-// functions -- this mechanism only ever resolves WHICH function's
+// longer met isn't ambiguous the way landing fingers is, and the global
+// Hold Confirm Delay (`cfg.holdConfirmMs`, "Custom Click Functions" anchor
+// group) already separately owns "was this actually a deliberate hold" for
+// hold-kind functions -- this mechanism only ever resolves WHICH function's
 // threshold was reached, never click-vs-hold.
 let multiPointActiveTouchCount = 0
 let multiPointDebounceTimer = null
@@ -8325,10 +8525,11 @@ let multiPointSessionFiredPoseId = null
 // because a disabled function isn't a REAL competing candidate for the
 // "is there more than one to disambiguate between" question below.
 function multiPointEligibleFunctions() {
+  const deviceFamily = currentDeviceFamily()
   return customClickFunctionIds
-    .filter(({ id }) => {
+    .filter(({ id, family }) => {
       const type = cfg[`${id}Type`]
-      return cfg[`${id}Enabled`] && (type === 'Click' || type === 'Click+Hold') && customFunctionWantsMultiTouch(id)
+      return cfg[`${id}Enabled`] && (type === 'Click' || type === 'Click+Hold') && customFunctionWantsMultiTouch(id) && customFunctionActiveForDeviceFamily(family, id, deviceFamily)
     })
     .map(({ id, kind }) => ({ id, kind, need: cfg[`${id}TouchPointCount`] }))
     .sort((a, b) => a.need - b.need)
@@ -8356,8 +8557,10 @@ function multiPointHandleTouchEnd(e) {
   multiPointActiveTouchCount = e.touches.length
   // Ending a held function stays instant/un-debounced -- see this
   // block's own top comment for why.
-  customClickFunctionIds.forEach(({ id, kind }) => {
+  const deviceFamily = currentDeviceFamily()
+  customClickFunctionIds.forEach(({ id, kind, family }) => {
     if (kind !== 'hold' || cfg[`${id}Type`] !== 'Click+Hold' || !customFunctionWantsMultiTouch(id)) return
+    if (!customFunctionActiveForDeviceFamily(family, id, deviceFamily)) return
     const need = cfg[`${id}TouchPointCount`]
     const trig = clickHoldPoseTriggers[id]
     if (trig && trig.active && multiPointActiveTouchCount < need) endClickHoldPose(id)
@@ -8478,18 +8681,21 @@ function updateClickTriggerModeVisibility(p, extraSinglePoseKeys, extraTweenKeys
   // managed by 2 different functions racing to set the same row's
   // `display`.
   const singlePoseKeys = ['TargetPose', 'TransitionSpeedMs', ...extraSinglePoseKeys]
-  // Tween's own dedicated speed/curve/range trios (see
+  // Tween's own dedicated speed/curve/range trio (see
   // makeClickHoldPoseGroup()'s own comment for why these are separate
   // fields from the Single Pose trio above, not just hidden duplicates).
-  // The Retransition trio only exists for CLICK_HOLD_KEYS groups (chp/
-  // rchp/dcHold) -- harmless no-op here for CLICK_POSE_KEYS callers
-  // (click/dblclick/rc), whose own rows with these suffixes simply don't
-  // exist, so the `document.querySelector` below just finds nothing.
   // 'TweenSelector' deliberately NOT in this list -- it's Sequence-mode-
   // only now that Chain mode exists (its own TweenChain multi-select
   // replaces it for that mode); see updateChainModeVisibility() below,
-  // which owns both.
-  const tweenKeys = ['TweenSpeedMs', 'TweenStartTimeCurve', 'TweenStartTimeRange', 'TweenRetransitionSpeedMs', 'TweenRetransitionStartTimeCurve', 'TweenRetransitionStartTimeRange', ...extraTweenKeys]
+  // which owns both. The Tween Retransition trio (TweenRetransitionSpeedMs/
+  // StartTimeCurve/StartTimeRange) is NOT in this list -- CORRECTED
+  // 2026-09-24 (item 7, "duplicate Retransition settings"): it moved into
+  // updateSingleTimingGateVisibility()'s own Retransition cluster instead
+  // (nested inside the SAME "Retransition" group now, per
+  // wrapClickFunctionGatedSubgroups()'s own comment), so there's exactly
+  // one function deciding its display, not 2 racing -- same reasoning
+  // StartTimeCurve/the rest of Retransition already got moved out for.
+  const tweenKeys = ['TweenSpeedMs', 'TweenStartTimeCurve', 'TweenStartTimeRange', ...extraTweenKeys]
   // Inline style, not the `hidden` attribute -- devPanel.js's own
   // `.dp-row { display: flex }` stylesheet rule (style.css) is an author
   // rule, which wins the cascade over the UA stylesheet's `[hidden] {
@@ -8585,38 +8791,124 @@ function updateSingleTimingGateVisibility(p) {
   // the same round -- see that function's own "CORRECTED 2026-09-22"
   // comment; the hold-kind family already respected this regardless of
   // mode since 2026-09-19.
+  //
+  // CORRECTED 2026-09-24 (item 7, "duplicate Retransition settings"): the
+  // Enabled gate itself stays mode-independent as above, but WHICH child
+  // fields show underneath it now depends on Mode -- Single Pose's own
+  // trio (RetransitionSpeedMs + its Speed Curve + RetransitionStartTimeCurve/
+  // Range) in Single Pose, the Tween-prefixed trio in Sequence/Chain, never
+  // both at once. The Tween trio only exists for CLICK_HOLD_KEYS groups
+  // (harmless no-op for a pose-kind `p`, whose own rows with these
+  // suffixes don't exist).
   setGateRow('RetransitionEnabled', true)
   const retransitionOn = cfg[`${p}RetransitionEnabled`] !== false
-  setRow('RetransitionSpeedMs', retransitionOn)
-  setRow('RetransitionStartTimeCurve', retransitionOn)
-  setRow('RetransitionStartTimeRange', retransitionOn)
+  const isTweenMode = isSequenceOrChainMode(p)
+  const singleRetransitionOn = retransitionOn && !isTweenMode
+  setRow('RetransitionSpeedMs', singleRetransitionOn)
+  // Retransition Speed Curve (item 5, 2026-09-24) -- own on/off row visible
+  // whenever Single Pose's own Retransition trio is showing (mirrors
+  // SpeedCurveEnabled's own "always-visible master toggle" pattern above),
+  // its own curve/range pair visible only once also switched on.
+  setRow('RetransitionSpeedCurveEnabled', singleRetransitionOn)
+  const retransitionSpeedCurveOn = singleRetransitionOn && !!cfg[`${p}RetransitionSpeedCurveEnabled`]
+  setRow('RetransitionSpeedCurve', retransitionSpeedCurveOn)
+  setRow('RetransitionSpeedCurveRange', retransitionSpeedCurveOn)
+  setRow('RetransitionStartTimeCurve', singleRetransitionOn)
+  setRow('RetransitionStartTimeRange', singleRetransitionOn)
+  const tweenRetransitionOn = retransitionOn && isTweenMode
+  setRow('TweenRetransitionSpeedMs', tweenRetransitionOn)
+  setRow('TweenRetransitionStartTimeCurve', tweenRetransitionOn)
+  setRow('TweenRetransitionStartTimeRange', tweenRetransitionOn)
 }
-// Tween Stop's own sub-gating (Sequence mode only, hold-based triggers
-// only) -- see the control's own DEV_GROUPS comment for the full
-// reasoning. `TweenStopStartTimeCurveEnabled`/`TweenStopDelayEnabled`
-// themselves are Mode-gated by updateClickTriggerModeVisibility()'s own
-// extraTweenKeys list (called alongside this function everywhere it's
-// called); this function owns the finer sub-visibility one level down
-// (the curve/range pair under each Enabled checkbox, and
-// TweenStopDelayCurveEnabled's own row, which only makes sense once
-// TweenStopDelayEnabled is on). Re-checks `isSequence` itself too, so
-// it stays correct even if called on its own outside the Mode-change
-// handler.
+// Tween Stop's own full visibility (Sequence mode only, hold-based
+// triggers only) -- REWRITTEN 2026-09-24 (items 10/11) now that Tween
+// Stop is its own real nested group (wrapTweenStopGroup(), further down)
+// rather than a batch of flat rows. This function is now the SOLE owner
+// of everything Tween-Stop-related, including the mode gate itself (moved
+// IN from updateClickTriggerModeVisibility()'s own extraTweenKeys list,
+// which no longer mentions Tween Stop at all -- same "one function per
+// row, not 2 racing" reasoning updateSingleTimingGateVisibility()'s own
+// header comment already documents for Retransition/SpeedCurve/
+// StartTimeCurve). Re-checks `isSequence` itself too, so it stays correct
+// even if called on its own outside the Mode-change handler.
 function updateTweenStopGateVisibility(p) {
   const isSequence = isSequenceOrChainMode(p)
+  // The outer "Tween Stop" group has no in-label gate row of its own to
+  // piggyback on (direct spec item -- "Unlike Retransition, Offset etc,
+  // It wont have the in-label on off checkbox"), so its own container is
+  // hidden directly here, keyed off `${p}TweenStopEnabled`'s row (a
+  // plain member of that group, not its header).
+  const enabledRow = document.querySelector(`.dp-row[data-key="${p}TweenStopEnabled"]`)
+  const outerGroup = enabledRow ? enabledRow.closest('.dp-group') : null
+  if (outerGroup) outerGroup.style.display = isSequence ? '' : 'none'
   const setRow = (suffix, visible) => {
     const row = document.querySelector(`.dp-row[data-key="${p}${suffix}"]`)
     if (row) row.style.display = visible ? '' : 'none'
   }
-  const startCurveOn = isSequence && !!cfg[`${p}TweenStopStartTimeCurveEnabled`]
+  // setGateRow mirrors updateSingleTimingGateVisibility()'s own helper --
+  // hides the row AND its nearest containing `.dp-group` (the nested
+  // "Tween Stop Start Time Curve"/"Tween Stop Delay" subgroup itself),
+  // not just the row, so an off subgroup disappears entirely rather than
+  // leaving a hollow shell.
+  const setGateRow = (suffix, visible) => {
+    const row = document.querySelector(`.dp-row[data-key="${p}${suffix}"]`)
+    if (!row) return
+    row.style.display = visible ? '' : 'none'
+    const grp = row.closest('.dp-group')
+    if (grp) grp.style.display = visible ? '' : 'none'
+  }
+  const tweenStopOn = isSequence && !!cfg[`${p}TweenStopEnabled`]
+  setGateRow('TweenStopStartTimeCurveEnabled', tweenStopOn)
+  const startCurveOn = tweenStopOn && !!cfg[`${p}TweenStopStartTimeCurveEnabled`]
   setRow('TweenStopStartTimeCurve', startCurveOn)
   setRow('TweenStopStartTimeRange', startCurveOn)
-  const delayOn = isSequence && !!cfg[`${p}TweenStopDelayEnabled`]
+  setGateRow('TweenStopDelayEnabled', tweenStopOn)
+  const delayOn = tweenStopOn && !!cfg[`${p}TweenStopDelayEnabled`]
   setRow('TweenStopDelayMs', delayOn)
   setRow('TweenStopDelayCurveEnabled', delayOn)
   const delayCurveOn = delayOn && !!cfg[`${p}TweenStopDelayCurveEnabled`]
   setRow('TweenStopDelayCurve', delayCurveOn)
   setRow('TweenStopDelayRange', delayCurveOn)
+}
+// Wraps a set of already-existing flat rows into a NEW, plain (non-gated)
+// nested subgroup -- unlike wrapGatedSubgroup() (below), no row is moved
+// into the header; the group is always visible/collapsible on its own,
+// with an ordinary in-body checkbox (if any) governing its own inner
+// content instead of the header. Used for "Tween Stop" (direct spec item
+// 2026-09-24: "Unlike Retransition, Offset etc, It wont have the in-label
+// on off checkbox").
+function wrapPlainSubgroup(anchorKey, memberKeys, subgroupTitle) {
+  const anchorRow = document.querySelector(`.dp-row[data-key="${anchorKey}"]`)
+  if (!anchorRow) return null
+  const parentBody = anchorRow.parentElement
+  const g = createGroupElement(subgroupTitle)
+  parentBody.insertBefore(g, anchorRow)
+  const gb = g.querySelector(':scope > .dp-group-body')
+  memberKeys.forEach((k) => {
+    const row = parentBody.querySelector(`:scope > .dp-row[data-key="${k}"]`)
+    if (row) gb.appendChild(row)
+  })
+  return g
+}
+// Builds the "Tween Stop" group (items 10/11, 2026-09-24): an outer plain
+// group holding `${p}TweenStopEnabled` as an ordinary row, plus 2 REAL
+// nested gated subgroups ("Tween Stop Start Time Curve"/"Tween Stop
+// Delay", each with its own in-label on/off checkbox -- "just like
+// Retransition, Offset, Animation Speed Curve etc"). wrapPlainSubgroup()
+// moves every Tween-Stop-prefixed row into the outer group's body FIRST,
+// so wrapGatedSubgroup() (which looks up each gate row's CURRENT
+// parentElement) correctly nests the 2 subgroups inside it rather than at
+// the function's own top level. Hold-kind only -- fire-and-forget
+// triggers have no Tween Stop fields at all.
+function wrapTweenStopGroup(p) {
+  const g = wrapPlainSubgroup(`${p}TweenStopEnabled`, [
+    `${p}TweenStopEnabled`,
+    `${p}TweenStopStartTimeCurveEnabled`, `${p}TweenStopStartTimeCurve`, `${p}TweenStopStartTimeRange`,
+    `${p}TweenStopDelayEnabled`, `${p}TweenStopDelayMs`, `${p}TweenStopDelayCurveEnabled`, `${p}TweenStopDelayCurve`, `${p}TweenStopDelayRange`
+  ], 'Tween Stop')
+  if (!g) return
+  wrapGatedSubgroup(`${p}TweenStopStartTimeCurveEnabled`, [`${p}TweenStopStartTimeCurve`, `${p}TweenStopStartTimeRange`], 'Tween Stop Start Time Curve')
+  wrapGatedSubgroup(`${p}TweenStopDelayEnabled`, [`${p}TweenStopDelayMs`, `${p}TweenStopDelayCurveEnabled`, `${p}TweenStopDelayCurve`, `${p}TweenStopDelayRange`], 'Tween Stop Delay')
 }
 // Sequence Mode - Count/Loop/Oscillate's own visibility, for the 5
 // fire-and-forget triggers only (click/dblclick/rc/tripleClick/
@@ -8664,7 +8956,7 @@ CLICK_POSE_KEYS.forEach((p) => { parseClickPoseConfig(p); buildClickPoseWidgets(
 // that. Click Pose/Double-Click Pose/Right Click share CLICK_POSE_KEYS'
 // own Pause Duration slider; Click Hold-Pose/Right-Click Hold-Pose don't.
 CLICK_POSE_KEYS.forEach((p) => { updateClickTriggerModeVisibility(p, ['PauseDurationMs']); updateOffsetRotationVisibility(p); updateSingleTimingGateVisibility(p); updateSequencePlayModeVisibility(p); updateChainModeVisibility(p) })
-CLICK_HOLD_KEYS.forEach((p) => { updateClickTriggerModeVisibility(p, [], ['LoopMode', 'OnReleaseMode', 'TriggerAllHands', 'TweenStopStartTimeCurveEnabled', 'TweenStopDelayEnabled']); updateLoopHoldVisibility(p); updateOffsetRotationVisibility(p); updateSingleTimingGateVisibility(p); updateTweenStopGateVisibility(p); updateChainModeVisibility(p) })
+CLICK_HOLD_KEYS.forEach((p) => { updateClickTriggerModeVisibility(p, [], ['LoopMode']); updateLoopHoldVisibility(p); updateOffsetRotationVisibility(p); updateSingleTimingGateVisibility(p); updateTweenStopGateVisibility(p); updateChainModeVisibility(p) })
 // Offset/Rotation/Animation Speed Curve/Start Time Curve/Retransition as
 // "mandatory gated subgroups" -- direct request ("Offset, Rotation,
 // Animaiton Speed Curve, Start Time Curve, Retransition will all be
@@ -8728,7 +9020,29 @@ function wrapClickFunctionGatedSubgroups(p) {
   wrapGatedSubgroup(`${p}RotationEnabled`, [`${p}RotationX`, `${p}RotationY`, `${p}RotationZ`], 'Rotation')
   wrapGatedSubgroup(`${p}SpeedCurveEnabled`, [`${p}SpeedCurve`, `${p}SpeedCurveRange`], 'Animation Speed Curve')
   wrapGatedSubgroup(`${p}StartTimeCurveEnabled`, [`${p}StartTimeCurve`, `${p}StartTimeRange`], 'Start Time Curve')
-  wrapGatedSubgroup(`${p}RetransitionEnabled`, [`${p}RetransitionSpeedMs`, `${p}RetransitionStartTimeCurve`, `${p}RetransitionStartTimeRange`], 'Retransition')
+  // CORRECTED 2026-09-24 (item 7, "duplicate Retransition settings"): the
+  // Tween-mode retransition trio (hold-kind only -- a no-op/silently
+  // skipped for a pose-kind `p`, whose own rows with these suffixes don't
+  // exist) is now nested INSIDE this same "Retransition" group instead of
+  // sitting as separate flat rows elsewhere -- previously, with
+  // RetransitionEnabled's own gate made mode-independent (2026-09-22), a
+  // Sequence-mode hold-kind function showed BOTH this group's Single-Pose
+  // fields AND the flat Tween trio simultaneously, genuinely duplicated.
+  // updateSingleTimingGateVisibility() (below) now shows only whichever
+  // subset actually matches the current Mode, under this one shared
+  // heading -- RetransitionEnabled itself still governs both regardless
+  // of mode, preserving the 2026-09-22 request.
+  wrapGatedSubgroup(`${p}RetransitionEnabled`, [
+    `${p}RetransitionSpeedMs`, `${p}RetransitionSpeedCurveEnabled`, `${p}RetransitionSpeedCurve`, `${p}RetransitionSpeedCurveRange`, `${p}RetransitionStartTimeCurve`, `${p}RetransitionStartTimeRange`,
+    `${p}TweenRetransitionSpeedMs`, `${p}TweenRetransitionStartTimeCurve`, `${p}TweenRetransitionStartTimeRange`
+  ], 'Retransition')
+  // Hold-kind only -- fire-and-forget triggers have no Tween Stop fields.
+  // Must run AFTER the wraps above (harmless either order, since Tween
+  // Stop's own rows are untouched by them) and BEFORE the caller's own
+  // next updateTweenStopGateVisibility(p) call, or that function's
+  // `row.closest('.dp-group')` gate-hiding would still find the OLD
+  // (pre-nesting) ancestor -- see both functions' own comments.
+  if (CLICK_HOLD_KEYS.includes(p)) { wrapTweenStopGroup(p); updateTweenStopGateVisibility(p) }
 }
 // Called once for all 10 static triggers, right here (module init, after
 // every one of their rows definitely exists AND after the widget-
@@ -8778,7 +9092,7 @@ function updateClickFunctionEnabledVisibility(p) {
   if (!enabled) return // fully hidden -- nothing further to reconcile
   const isHoldKind = CLICK_HOLD_KEYS.includes(p)
   if (isHoldKind) {
-    updateClickTriggerModeVisibility(p, [], ['LoopMode', 'OnReleaseMode', 'TriggerAllHands', 'TweenStopStartTimeCurveEnabled', 'TweenStopDelayEnabled'])
+    updateClickTriggerModeVisibility(p, [], ['LoopMode'])
     updateLoopHoldVisibility(p)
     updateTweenStopGateVisibility(p)
   } else {

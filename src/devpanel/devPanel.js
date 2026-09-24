@@ -105,7 +105,7 @@ function savedStatesKey() { return `${storageKeyPrefix}.devSavedStates` }
 function isTouchCapableDevice() {
   return (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) || navigator.maxTouchPoints > 0
 }
-function realDeviceClass() {
+export function realDeviceClass() {
   const w = window.innerWidth, h = window.innerHeight
   if (!isTouchCapableDevice() || Math.min(w, h) >= 768) return 'desktop'
   return w > h ? 'landscape' : 'mobile'
@@ -1333,7 +1333,7 @@ function openTextEditFor(displayEl, key, originalText) {
 // load populates `textOverrides` from saved state, and once up front so a
 // custom group recreated by applyOrder() (built via this same function)
 // picks up its own override too.
-function applyTextOverrides() {
+export function applyTextOverrides() {
   document.querySelectorAll('.dp-group-title-text').forEach((titleText) => {
     const group = titleText.closest('.dp-group')
     const key = group ? group.dataset.key : null
