@@ -21,19 +21,37 @@ work seamlessly from there.
 **SHIPPED + LIVE-VERIFIED 2026-09-24 -- large 17-item Custom Click
 Functions round (device-scoped visibility, global Hold Confirm Delay,
 Retransition Speed Curve, Tween Stop restructure, reference layout
-retrofit), across 6 pushes. All 17 items addressed; 2 real bugs found
-during live verification on the real deployment and fixed.**
+retrofit), across 7 pushes. All 17 items addressed; 2 real bugs found
+during live verification and fixed; 1 same-day design correction (see
+below) replaced a bespoke device-visibility control with an existing
+generic mechanism the user pointed out already covered it.**
+
+**CORRECTED same day:** the device-visibility opt-in described below was
+originally built as its own new `${id}ShowOnMobile` checkbox -- direct
+correction ("the click functions already have a show in mobile and
+landscape checkbox. its the one next to the undock button... remove the
+new one you made") pointed out this duplicated devPanel.js's own
+existing, generic per-row + group-cascade "Show in Mobile/Landscape"
+checkboxes (every control here is already `dynamicDevice: true`).
+Removed the bespoke control; a desktop-family function's own "active on
+Mobile/Landscape" signal now reads `isDevRowVisible('${id}Enabled')`
+directly, with a new-function default-hide and item 17's soft-delete
+both rewired onto the same existing mechanism. Live-verified end to end
+(group cascade checkbox, individual row checkboxes, a fresh function's
+own default-hidden state) -- see CHANGELOG.txt's matching 2026-09-24
+(3rd round) entry.
 
 Real device/tab gating: a desktop-family function defaults OFF on
-Mobile/Landscape with a new "Show in Mobile/Landscape" opt-in; a mobile-
-family function is fully exclusive to Mobile/Landscape -- previously
-NOTHING gated actual trigger firing by device at all, only the dev-panel
-UI's own tab display. Soft-delete: deleting a desktop-family function
-from Mobile/Landscape unchecks the opt-in instead of permanently
-removing it (still a real delete from its own home tab, or for a
-mobile-exclusive function). One global `holdConfirmMs` control replacing
-the old per-function slider; Trigger All Hands removed; Touch Point
-Count independent-per-device; Zoom/Scroll thresholds + the internal
+Mobile/Landscape (via the panel's own existing "Show in Mobile/
+Landscape" checkboxes, per the correction above); a mobile-family
+function is fully exclusive to Mobile/Landscape -- previously NOTHING
+gated actual trigger firing by device at all, only the dev-panel UI's
+own tab display. Soft-delete: deleting a desktop-family function from
+Mobile/Landscape unchecks its visibility instead of permanently removing
+it (still a real delete from its own home tab, or for a mobile-exclusive
+function). One global `holdConfirmMs` control replacing the old
+per-function slider; Trigger All Hands removed; Touch Point Count
+independent-per-device; Zoom/Scroll thresholds + the internal
 Custom Function IDs row hidden appropriately; a new Retransition Speed
 Curve; Tween Stop rebuilt as its own group with 2 real nested gated
 subgroups; renaming now survives a group rebuild; the Sequence-mode

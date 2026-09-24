@@ -11171,6 +11171,71 @@ across 4 pushes this round; `devPanel.js`'s own cache-buster bumped
 `onDeviceTabChanged` hook).
 
 --------------------------------------------------------------------------------
+2026-09-24 (3rd round)
+
+Direct correction, same day: "the click functions already have a show in
+mobile and landscape checkbox. its the one next to the undock button.
+remove the new one you made an make the one i described work... each
+setting also has their own checkbox on the right side. make sure those
+work individually as well."
+
+The earlier same-day `${id}ShowOnMobile` control (items 13/14/16/17) was
+a genuinely redundant, bespoke mechanism -- every control in a custom
+function's group is already `dynamicDevice: true`
+(`withDynamicDevice()`, `makeClickPoseGroup()`/`makeClickHoldPoseGroup()`),
+so each row already has its own "Show in Mobile/Landscape" checkbox, and
+the group's own header (`createGroupElement()`) already carries a
+matching cascade checkbox next to the undock/lock icons that bulk-sets
+every descendant row at once. Removed `${id}ShowOnMobile` entirely
+(control, layout-array entries, the default-hide call sites) and
+rewired everything onto the existing mechanism instead:
+
+- `customFunctionActiveForDeviceFamily()`'s desktop-on-mobile branch now
+  reads `isDevRowVisible('${id}Enabled')` (newly exported from
+  devPanel.js) instead of a dedicated cfg flag -- `${id}Enabled` is the
+  one row read as this function's own "shown on Mobile/Landscape at
+  all" signal, the same row the group's cascade checkbox already flips
+  along with everything else.
+- `addCustomClickFunction()` now defaults every one of a brand-new
+  desktop-family function's own dynamicDevice rows to hidden via
+  `forEachDynamicDeviceDescendant()`/`setDevVisibility()` (both newly
+  exported) -- devVisibility's own generic default is VISIBLE, the wrong
+  default specifically for a just-created function, so this explicitly
+  overrides it once at creation, matching "by default not have 'Show in
+  Mobile/Landscape' selected."
+- Item 17's soft-delete now clears devVisibility for the rebuilt group's
+  own descendants the same way, instead of setting a dedicated flag.
+- New devPanel.js `onDevVisibilityChanged` hook (module-level state, not
+  a closure over `opts` -- the 2 places that actually change
+  devVisibility, `buildRow()`'s row checkbox and `createGroupElement()`'s
+  group cascade checkbox, are both defined BEFORE `initDevPanel()` in
+  the file and have no closure access to its own `opts` parameter)
+  lets main.js re-run its own visibility sweep the instant either
+  checkbox changes -- mirrors `onDeviceTabChanged` from earlier the same
+  day.
+
+Live-verified on the real deployment end to end: unchecking `custom13`'s
+own Enabled-row checkbox hid it on Mobile immediately (no manual tab
+click needed); re-checking via the GROUP's own cascade checkbox (next to
+the undock button) correctly showed it again, with the checkbox's own
+indeterminate state correctly reflecting a genuinely mixed
+Enabled-hidden/others-visible state beforehand; a brand-new function
+(`custom14`) defaulted to fully hidden on Mobile (cascade checkbox
+unchecked, not indeterminate) immediately on creation, confirmed via
+direct DOM inspection, then deleted as test cleanup (a real delete, from
+its own Desktop home tab); an individual row's own checkbox
+(`custom13TargetPose`) toggled independently without affecting the
+Enabled row's own state, confirming per-setting checkboxes still work
+individually as asked. None of this testing was saved/persisted (no
+Save/Sync click during the test sequence) -- the real settings JSON in
+the repo is unaffected by it.
+
+`index.html`'s own `main.js` cache-buster bumped `?v=211` -> `?v=212`;
+`devPanel.js`'s own bumped `?v=46` -> `?v=47` (`isDevRowVisible()`,
+`setDevVisibility()`, `forEachDynamicDeviceDescendant()`,
+`refreshRowDisplaysForEditingTab()` newly exported).
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================
