@@ -56,6 +56,13 @@ let textOverrides = {}
 // control map (numEls, textOverrides) already uses.
 let devVisibility = {} // { [key]: boolean } -- default true (shown) when absent
 let devIndependence = { mobile: {}, landscape: {} } // { [key]: boolean } -- default false (mirrors desktop) when absent
+// Host hook, set by initDevPanel() from opts.onDevVisibilityChanged (2026-
+// 09-24, alongside onDeviceTabChanged) -- module-level rather than a
+// closure over `opts`, since the 2 places that actually change
+// devVisibility (buildRow()'s own row checkbox, createGroupElement()'s own
+// group cascade checkbox) are both top-level functions defined BEFORE
+// initDevPanel(), with no closure access to its own `opts` parameter.
+let hostOnDevVisibilityChanged = null
 const numEls = {} // key -> { slider, numInput } | { type: 'color' } | { type: 'checkbox' }
 // Set by initDevPanel()'s own saveSettings() closure (see its own comment) so
 // the exported saveCurrentSettings() below can trigger a real persisted save.
@@ -157,7 +164,15 @@ function isDynamicDeviceCtrl(ctrl) {
   if (NO_DYNAMIC_DEVICE_TYPES.includes(ctrl.type)) return false
   return ctrl.dynamicDevice !== false
 }
-function isDevRowVisible(key) { return devVisibility[key] !== false }
+export function isDevRowVisible(key) { return devVisibility[key] !== false }
+// Thin setter mirroring setDevTextOverride()'s own pattern -- a host
+// occasionally needs to set a KNOWN, already-decided Show-in-Mobile/
+// Landscape state programmatically (e.g. a new instance of something
+// defaulting hidden until explicitly shown), not simulate a checkbox
+// click. Does not touch the DOM -- call refreshRowDisplaysForEditingTab()
+// afterward to refresh visible chrome, same as any other devVisibility
+// change.
+export function setDevVisibility(key, value) { devVisibility[key] = value }
 // Category-aware default (added 2026-09-17, matching the template's own
 // "UNIVERSAL" correction the same day): when nothing's been explicitly
 // toggled yet for this tab/control, default to the control's OWN
@@ -985,6 +1000,11 @@ export function buildRow(ctrl) {
     visCheckbox.addEventListener('change', () => {
       devVisibility[ctrl.key] = visCheckbox.checked
       refreshRowDisplaysForEditingTab()
+      // Host extension point, added 2026-09-24 alongside onDeviceTabChanged
+      // -- a host with its own logic derived from devVisibility (e.g. "is
+      // this whole feature considered active on Mobile") has no other way
+      // to know a per-row checkbox just changed it.
+      if (hostOnDevVisibilityChanged) hostOnDevVisibilityChanged(ctrl.key)
     })
     const indepCheckbox = el('input', 'dp-dynamic-device-checkbox dp-dynamic-device-checkbox-2nd', { type: 'checkbox', title: 'Independent from Desktop' })
     indepCheckbox.addEventListener('click', (e) => e.stopPropagation())
@@ -1409,6 +1429,10 @@ export function createGroupElement(title) {
   visCascadeCheckbox.addEventListener('change', () => {
     forEachDynamicDeviceDescendant(g, (ctrl) => { devVisibility[ctrl.key] = visCascadeCheckbox.checked })
     refreshRowDisplaysForEditingTab()
+    // Host extension point, added 2026-09-24 -- see buildRow()'s own
+    // identical row-level call for the full reasoning; `null` (not one
+    // specific ctrl.key) since this changed every descendant at once.
+    if (hostOnDevVisibilityChanged) hostOnDevVisibilityChanged(null)
   })
   const indepCascadeCheckbox = el('input', 'dp-group-cascade-checkbox dp-dynamic-device-checkbox-2nd', { type: 'checkbox', title: 'Independent from Desktop (whole group)' })
   indepCascadeCheckbox.style.display = 'none'
@@ -1552,7 +1576,7 @@ function dockAllUndockedGroups() {
 // Walks every dynamicDevice-opted control living inside group element `g`
 // (any nesting depth) and calls `fn(ctrl)` for each -- shared by both
 // cascade checkboxes above and refreshGroupCascadeChrome() below.
-function forEachDynamicDeviceDescendant(g, fn) {
+export function forEachDynamicDeviceDescendant(g, fn) {
   g.querySelectorAll(':scope .dp-row[data-key]').forEach((row) => {
     const ctrl = findCtrl(row.dataset.key)
     if (ctrl && isDynamicDeviceCtrl(ctrl)) fn(ctrl)
@@ -2239,7 +2263,7 @@ function applyStoredValues(values) {
   refreshRowDisplaysForEditingTab()
 }
 
-function refreshRowDisplaysForEditingTab() {
+export function refreshRowDisplaysForEditingTab() {
   devGroups.forEach((group) => group.controls.forEach((ctrl) => {
     if (isDynamicDeviceCtrl(ctrl)) {
       const showing = editingDevice === 'desktop' || isDevRowIndependent(editingDevice, ctrl)
@@ -2461,6 +2485,7 @@ function applyPanelGeometry(panel, geom) {
 export function initDevPanel(groups, opts = {}) {
   devGroups = groups
   storageKeyPrefix = opts.storageKeyPrefix || 'devPanel'
+  hostOnDevVisibilityChanged = opts.onDevVisibilityChanged || null
   editingDevice = realDeviceClass()
   // cfg/store are populated from defaults regardless of DEV_MODE -- these
   // values are the app's real, shipped defaults for every visitor; DEV_MODE

@@ -6,7 +6,7 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js'
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js'
 import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js'
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js'
-import { initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, applyTextOverrides, setDevTextOverride } from './devpanel/devPanel.js?v=46'
+import { initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab } from './devpanel/devPanel.js?v=47'
 
 // A defensive wrapper around devPanel.js's own refreshSelectOptions() --
 // found via live testing (direct user report: "I dont see any of the
@@ -1557,7 +1557,14 @@ const cfg = initDevPanel(DEV_GROUPS, {
   // devPanel.js `onDeviceTabChanged` hook (called from both a real click
   // AND the self-heal correction) re-runs the exact same sweep the
   // click listener already does, so either path now stays correct.
-  onDeviceTabChanged: () => { refreshAllCustomFunctionGroupVisibility(); refreshAllCustomFunctionTypeVisibility(); updateCustomFunctionsAnchorRowVisibility() }
+  onDeviceTabChanged: () => { refreshAllCustomFunctionGroupVisibility(); refreshAllCustomFunctionTypeVisibility(); updateCustomFunctionsAnchorRowVisibility() },
+  // A desktop-family custom function's own "also active on Mobile/
+  // Landscape" state is now read directly from `${id}Enabled`'s own
+  // devVisibility (see customFunctionActiveForDeviceFamily()'s own
+  // comment) -- toggling EITHER that row's own checkbox OR the group's
+  // cascade checkbox needs to immediately re-run this same sweep, the
+  // same way a real tab click already does.
+  onDevVisibilityChanged: () => { refreshAllCustomFunctionGroupVisibility() }
 })
 onChangeByCtrl.forEach((fn, c) => { c.onChange = fn })
 setupCustomFunctionTabVisibilitySync()
@@ -7694,7 +7701,7 @@ function persistCustomClickFunctionIds() {
 //
 // CORRECTED 2026-09-24 (direct request, item 17): deleting a desktop-
 // family function while viewing it on the Mobile/Landscape tab (i.e. it's
-// only visible there via its own `${id}ShowOnMobile` opt-in, not its real
+// only visible there via its own dynamicDevice checkboxes, not its real
 // home tab) is now a SOFT delete -- "simply treat that as if I unchecked
 // the checkbox in the desktop tab," not a real delete. A mobile-family
 // (mobile-exclusive) function deleted from Mobile/Landscape -- its own
@@ -7708,8 +7715,11 @@ function persistCustomClickFunctionIds() {
 // was touched), so renderCustomClickFunctionGroup() alone (NOT the full
 // registerCustomClickFunction() wrapper, which would re-push a DUPLICATE
 // entry into CLICK_POSE_KEYS/CLICK_HOLD_KEYS) rebuilds its live DOM group
-// fresh from cfg -- correctly hidden on this tab now that ShowOnMobile is
-// off, and still present/visible the next time Desktop is shown.
+// fresh from cfg, then forEachDynamicDeviceDescendant() clears
+// devVisibility for every one of its own rows -- the exact same effect
+// unchecking the group's own header cascade checkbox would have (see
+// customFunctionActiveForDeviceFamily()'s own comment) -- still present/
+// visible the next time Desktop is shown.
 function cleanupDeletedCustomClickFunction(target) {
   if (!target || !target.classList || !target.classList.contains('dp-group')) return
   if (!target.dataset.customFunctionFamily) return // not a Custom Click Function's own group (a plain user-created group, or one of the 10 static triggers)
@@ -7718,18 +7728,19 @@ function cleanupDeletedCustomClickFunction(target) {
   if (idx === -1) return
   const { id, kind, family } = customClickFunctionIds[idx]
   if (family === 'desktop' && getActiveDevPanelTab() === 'mobile') {
-    cfg[`${id}ShowOnMobile`] = false
-    syncValue(`${id}ShowOnMobile`, false)
     renderCustomClickFunctionGroup(id, title, kind, family)
-    // Live-confirmed 2026-09-24: renderCustomClickFunctionGroup()'s own
-    // one-time updateCustomFunctionGroupVisibility() call, invoked from
-    // INSIDE this devPanel.js delete-button click handler, did not
-    // correctly hide the rebuilt group here even though every input to
-    // that computation (family/id/ShowOnMobile/the active tab) checked
-    // out correct moments later -- same class of timing gap as the
-    // Touch-Point-Count-stays-visible bug fixed earlier this round.
-    // Re-running the full sweep explicitly, same as a real tab click
-    // does, closes it without needing to pin down the exact cause.
+    const g = document.querySelector(`.dp-group[data-custom-function-id="${id}"]`)
+    if (g) forEachDynamicDeviceDescendant(g, (ctrl) => setDevVisibility(ctrl.key, false))
+    // Live-confirmed 2026-09-24 (against the older ${id}ShowOnMobile
+    // design, same underlying rebuild-then-refresh shape): a one-time
+    // visibility computation invoked from INSIDE this devPanel.js delete-
+    // button click handler did not correctly hide the rebuilt group here
+    // even though every input checked out correct moments later -- same
+    // class of timing gap as the Touch-Point-Count-stays-visible bug
+    // fixed earlier this round. Re-running the full sweep explicitly,
+    // same as a real tab click does, closes it without needing to pin
+    // down the exact cause.
+    refreshRowDisplaysForEditingTab()
     refreshAllCustomFunctionGroupVisibility()
     return
   }
@@ -7862,32 +7873,52 @@ function kindForCustomFunctionType(type) {
 // (direct requests, items 13/14/16/17): a function created on its own
 // "home" tab is always active there; a mobile-family function is
 // EXCLUSIVE to Mobile/Landscape and never active on Desktop, no override
-// ("they will not show up nor be active in Desktop mode"); a desktop-
-// family function additionally gets a per-function `${id}ShowOnMobile`
-// opt-in (default OFF -- "by default not have 'Show in Mobile/Landscape'
-// selected") that, when checked, makes it ALSO active on Mobile/Landscape
-// ("When I then select that checkbox, it should immediately show up in
-// the mobile/landscape tab").
+// ("they will not show up nor be active in Desktop mode").
+//
+// CORRECTED again same day, direct follow-up ("the click functions
+// already have a show in mobile and landscape checkbox. its the one next
+// to the undock button. remove the new one you made an make the one i
+// described work"): a desktop-family function's own "also active on
+// Mobile/Landscape" signal is now read from the SAME generic dynamicDevice
+// mechanism every OTHER row/group in this panel already uses -- every
+// control in a custom function's group is already `dynamicDevice: true`
+// (withDynamicDevice(), makeClickPoseGroup()/makeClickHoldPoseGroup()),
+// so it already has its own per-row "Show in Mobile/Landscape" checkbox,
+// AND the group's own header already carries the SAME cascade checkbox
+// (createGroupElement(), next to the undock/lock icons) that bulk-sets
+// every descendant row's devVisibility at once -- a bespoke per-function
+// `${id}ShowOnMobile` control duplicated a mechanism that already
+// existed. `${id}Enabled` (always present, every kind) is the single
+// representative row read here -- the exact same one the cascade
+// checkbox itself would flip along with everything else -- so checking
+// it is checking "is this function considered shown on Mobile/Landscape
+// at all," while every OTHER row's own individual checkbox still governs
+// that ONE setting's own visibility within an already-shown group,
+// completely independently (isDevRowVisible() is a plain per-key read,
+// with no notion of "the function" bundling them together beyond this
+// one chosen representative).
 function customFunctionActiveForDeviceFamily(family, id, deviceFamily) {
   if (family === deviceFamily) return true
-  if (family === 'desktop' && deviceFamily === 'mobile') return !!cfg[`${id}ShowOnMobile`]
+  if (family === 'desktop' && deviceFamily === 'mobile') return isDevRowVisible(`${id}Enabled`)
   return false
 }
 // Shows/hides ONE custom function's group based on customFunctionActiveForDeviceFamily()
-// above vs. whichever dev-panel tab is currently active -- devPanel.js has
-// no per-tab DOM duplication (one shared groupsEl for all 3 devices) and
-// no existing "hide on Desktop only" primitive (its own dynamicDevice
-// checkboxes only ever hide FROM Mobile/Landscape, assuming Desktop is
-// always the baseline), so this is a small, dedicated main.js-side
-// mechanism rather than forcing an ill-fitting reuse of that one.
+// above vs. whichever dev-panel tab is currently active -- devPanel.js's
+// own generic refreshEmptyGroupVisibility() only auto-hides an empty group
+// on Mobile/Landscape, never a family-mismatched group on DESKTOP (a
+// mobile-family function's own exclusion from Desktop), so this small,
+// dedicated main.js-side mechanism still owns that half; the Mobile/
+// Landscape half now agrees with (and is redundant with, harmlessly)
+// devPanel.js's own empty-group-hide, since both read the same
+// devVisibility state.
 function updateCustomFunctionGroupVisibility(g, family, id) {
   if (!g) return
   const activeTab = getActiveDevPanelTab()
   g.style.display = customFunctionActiveForDeviceFamily(family, id, activeTab) ? '' : 'none'
 }
 // Refreshes every custom function's own group visibility -- called once
-// right after a new one is created, whenever a `${id}ShowOnMobile`
-// checkbox changes, and wired to fire again on every tab switch (see
+// right after a new one is created, whenever a dynamicDevice checkbox
+// inside one changes, and wired to fire again on every tab switch (see
 // setupCustomFunctionTabVisibilitySync(), below).
 function refreshAllCustomFunctionGroupVisibility() {
   document.querySelectorAll('.dp-group[data-custom-function-family]').forEach((g) => {
@@ -8097,18 +8128,19 @@ function renderCustomClickFunctionGroup(id, title, kind, family) {
     { key: `${id}TouchPointCount`, label: 'Touch Point Count', type: 'slider', min: 1, max: 10, step: 1, def: 1, dynamicDevice: true, onChange: () => refreshCustomFunctionConflictWarnings() },
     { key: `${id}ClickCount`, label: kind === 'hold' ? 'Triggers On (Nth Press-And-Hold)' : 'Triggers On (Nth Click)', type: 'select', def: ['1st', '2nd', '3rd', '4th'][defaultClickCountOrdinal - 1], options: () => ['1st', '2nd', '3rd', '4th'], onChange: () => refreshCustomFunctionConflictWarnings() }
   )
-  // "Show in Mobile/Landscape" -- direct request 2026-09-24 (items 13/14/
-  // 16/17): only meaningful for a DESKTOP-family function (a mobile-family
-  // function is already exclusive to Mobile/Landscape by construction, no
-  // opt-in needed or offered). Default OFF ("by default not have 'Show in
-  // Mobile/Landscape' selected") -- checking it immediately makes this
-  // function ALSO active/visible on Mobile/Landscape, via
-  // customFunctionActiveForDeviceFamily() (both the dev-panel UI and the
-  // real runtime trigger dispatch read this same cfg key -- see that
-  // function's own comment).
-  if (family === 'desktop') {
-    controls.splice(1, 0, { key: `${id}ShowOnMobile`, label: 'Show in Mobile/Landscape', type: 'checkbox', def: false, onChange: () => refreshAllCustomFunctionGroupVisibility() })
-  }
+  // No bespoke "Show in Mobile/Landscape" control here -- CORRECTED
+  // 2026-09-24 (direct follow-up: "the click functions already have a
+  // show in mobile and landscape checkbox. its the one next to the
+  // undock button... remove the new one you made"). Every control in
+  // `controls` is already `dynamicDevice: true` (withDynamicDevice(),
+  // makeClickPoseGroup()/makeClickHoldPoseGroup()), so it already has its
+  // own per-row checkbox, AND the group's own header (createGroupElement(),
+  // called by renderDynamicGroup() below) already carries the matching
+  // cascade checkbox -- see customFunctionActiveForDeviceFamily()'s own
+  // comment for exactly which row (`${id}Enabled`) is read as this
+  // function's own "active on Mobile/Landscape" signal, and
+  // addCustomClickFunction()'s own comment for how a brand-new function
+  // defaults every one of these rows to hidden.
   // updateClickFunctionEnabledVisibility() (shared with the 10 static
   // triggers, which have no Type/Touch-Point/Click-Count concept at all)
   // unconditionally shows EVERY row in the body when re-enabled -- it has
@@ -8320,12 +8352,8 @@ function registerCustomClickFunction(id, title, kind, family) {
 const CUSTOM_FUNCTION_TEXT_OVERRIDES = { Enabled: 'ON/ OFF', Type: 'Trigger Type', ClickCount: 'Trigger Count' }
 // `type: 'row'` items use `suffix` (appended to `${id}`); `type: 'group'`
 // items use `title` (a literal, shared group dataset.key -- see above).
-// `ShowOnMobile` only exists for a desktop-family function
-// (renderCustomClickFunctionGroup()'s own conditional splice) -- a no-op
-// row lookup for a mobile-family one, same pattern used throughout this
-// file for a control that doesn't always exist.
 const CUSTOM_FUNCTION_POSE_LAYOUT = [
-  { type: 'row', suffix: 'Enabled' }, { type: 'row', suffix: 'ShowOnMobile' },
+  { type: 'row', suffix: 'Enabled' },
   { type: 'row', suffix: 'Type' }, { type: 'row', suffix: 'TouchPointCount' }, { type: 'row', suffix: 'ClickCount' },
   { type: 'row', suffix: 'Mode' }, { type: 'row', suffix: 'TargetPose' }, { type: 'row', suffix: 'TransitionSpeedMs' },
   { type: 'row', suffix: 'TweenSelector' }, { type: 'row', suffix: 'TweenSpeedMs' }, { type: 'row', suffix: 'PauseDurationMs' },
@@ -8344,7 +8372,7 @@ const CUSTOM_FUNCTION_POSE_LAYOUT = [
 // old flat OnReleaseMode/TweenStop* rows sat at the very end of
 // custom8's own captured order.
 const CUSTOM_FUNCTION_HOLD_LAYOUT = [
-  { type: 'row', suffix: 'Enabled' }, { type: 'row', suffix: 'ShowOnMobile' },
+  { type: 'row', suffix: 'Enabled' },
   { type: 'row', suffix: 'Type' }, { type: 'row', suffix: 'TouchPointCount' }, { type: 'row', suffix: 'ClickCount' },
   { type: 'row', suffix: 'Mode' }, { type: 'row', suffix: 'TweenSelector' },
   { type: 'group', title: 'Offset' }, { type: 'group', title: 'Rotation' },
@@ -8361,8 +8389,7 @@ const CUSTOM_FUNCTION_HOLD_LAYOUT = [
 // needed. Reordering works by appendChild()-ing each layout item in the
 // target sequence -- appendChild MOVES an existing child, so walking the
 // layout array in order naturally leaves the body in that exact sequence;
-// an item whose row/group doesn't exist (e.g. ShowOnMobile on a mobile-
-// family function) is silently skipped.
+// an item whose row/group doesn't exist for this kind is silently skipped.
 function applyCustomFunctionReferenceLayout(id, kind) {
   Object.entries(CUSTOM_FUNCTION_TEXT_OVERRIDES).forEach(([suffix, label]) => setDevTextOverride(`${id}${suffix}`, label))
   applyTextOverrides()
@@ -8434,6 +8461,25 @@ function addCustomClickFunction() {
   customClickFunctionIds.push({ id, title, kind, family })
   registerCustomClickFunction(id, title, kind, family)
   applyNewCustomFunctionTemplate(id)
+  // Direct request 2026-09-24 (item 16): "by default not have 'Show in
+  // Mobile/Landscape' selected" -- a brand-new desktop-family function's
+  // own dynamicDevice rows default to VISIBLE on Mobile/Landscape
+  // (devVisibility's own default, per isDevRowVisible()'s comment), the
+  // same as every other control in this panel. That's the wrong default
+  // specifically for a just-created function -- explicitly hide every one
+  // of its own rows here, the same effect unchecking the group's own
+  // header cascade checkbox would have (see
+  // customFunctionActiveForDeviceFamily()'s own comment for why
+  // `${id}Enabled` is the row actually read as this function's "active on
+  // Mobile/Landscape" signal). Mobile-family functions are already
+  // exclusive to Mobile/Landscape by construction (no opt-in concept to
+  // default), so this only applies to `family === 'desktop'`.
+  if (family === 'desktop') {
+    const g = document.querySelector(`.dp-group[data-custom-function-id="${id}"]`)
+    if (g) forEachDynamicDeviceDescendant(g, (ctrl) => setDevVisibility(ctrl.key, false))
+    refreshRowDisplaysForEditingTab()
+    refreshAllCustomFunctionGroupVisibility()
+  }
   persistCustomClickFunctionIds()
 }
 // Called once from onRestore (see initDevPanel()'s own opts, above) --
