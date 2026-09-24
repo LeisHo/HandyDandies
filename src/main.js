@@ -7721,6 +7721,16 @@ function cleanupDeletedCustomClickFunction(target) {
     cfg[`${id}ShowOnMobile`] = false
     syncValue(`${id}ShowOnMobile`, false)
     renderCustomClickFunctionGroup(id, title, kind, family)
+    // Live-confirmed 2026-09-24: renderCustomClickFunctionGroup()'s own
+    // one-time updateCustomFunctionGroupVisibility() call, invoked from
+    // INSIDE this devPanel.js delete-button click handler, did not
+    // correctly hide the rebuilt group here even though every input to
+    // that computation (family/id/ShowOnMobile/the active tab) checked
+    // out correct moments later -- same class of timing gap as the
+    // Touch-Point-Count-stays-visible bug fixed earlier this round.
+    // Re-running the full sweep explicitly, same as a real tab click
+    // does, closes it without needing to pin down the exact cause.
+    refreshAllCustomFunctionGroupVisibility()
     return
   }
   customClickFunctionIds.splice(idx, 1)
