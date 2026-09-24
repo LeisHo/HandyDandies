@@ -23879,7 +23879,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 8",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -24520,7 +24520,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 7",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -26316,7 +26316,7 @@
         },
         {
           "key": "Custom Click Function 8",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
@@ -26954,7 +26954,7 @@
         },
         {
           "key": "Custom Click Function 7",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
