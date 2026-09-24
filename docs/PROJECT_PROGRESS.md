@@ -18,22 +18,51 @@ work seamlessly from there.
 
 ## Currently working on
 
-**IN PROGRESS 2026-09-24 -- "Multi Trigger" feature for Custom Click
-Functions (cycle a single Click function through a different tween on
-each subsequent click, wrapping back to its own baseline pose after the
-list completes), pose-kind only. Design is fully worked out; NOT yet
-implemented -- a partial edit was started then deliberately reverted
-per direct instruction to land real bug fixes first. Also queued right
-behind it: a "Look-At Damping Curve" group for Cursor Tracking (direct
-request, not yet started).** See CHANGELOG.txt's 2026-09-24 (4th round)
-entry for the full design (per-trigger settings prefix resolution,
-reusing `makeClickPoseGroup()` per added trigger, live DOM group order
-= firing order).
+**SHIPPED 2026-09-24 (5th round) -- fixed a real, severe cross-function
+overwrite bug: "trigger a click function, then can't trigger any other
+one after" (worst with Retransition off).** Root cause: the per-hand
+render-order loop dispatches every non-idle registered function each
+frame with no compositing -- whichever function is later in
+registration order wins a shared hand's final rendered pose, and a
+function stuck in `'paused'` (Retransition off) re-applies forever,
+permanently stomping any earlier function that claims the same hand.
+Fix: new `releaseHandFromOtherFunctions(hand, exceptId)`, called at the
+exact moment a hand commits to a new claim (both the hold-kind and
+pose-kind commit blocks) -- force-releases every OTHER function's claim
+on that hand, so the most recently triggered function is always the
+sole owner. Confirmed by direct code reading that this also fully
+covers the follow-up request ("Sequence tweens will be overwridden by
+subsequent triggers of any kind") -- a same-function re-trigger during
+an active Sequence already restarted itself (pre-existing), and a
+different function triggered mid-Sequence is exactly this round's fix;
+the existing per-hand distance-staggered delay is preserved either way.
+`main.js` cache-buster `?v=213` -> `?v=214`. Real end-to-end click
+verification still needs the user's own testing (synthetic pointer
+events remain unreliable in this sandbox). See CHANGELOG.txt's 2026-09-24
+(5th round) entry.
 
-**SHIPPED same day, pushed clean ahead of Multi Trigger:** a real bug
-fix (`TouchPointCount` was silently blocking a desktop click's normal
-dispatch when left at a stale value >1 -- now ignored entirely on a
-real desktop device) plus Right Click's own new Trigger Count (Nth
+**NEXT UP -- "Multi Trigger" feature for Custom Click Functions** (cycle
+a single Click function through a different tween on each subsequent
+click, wrapping back to its own baseline pose after the list completes),
+pose-kind only. Design is fully worked out; NOT yet implemented -- a
+partial edit was started then deliberately reverted per direct
+instruction to land real bug fixes first. See CHANGELOG.txt's 2026-09-24
+(4th round) entry for the full design (per-trigger settings prefix
+resolution, reusing `makeClickPoseGroup()` per added trigger, live DOM
+group order = firing order).
+
+**ALSO QUEUED:** Offset/Rotation made "sticky/cumulative" (ramp across
+the entire tween duration -- Single Pose, Sequence, and Chain alike --
+from the hand's current live offset/rotation rather than a fixed zero
+baseline, so repeated clicks accumulate); a distance-based magnitude
+curve group for Offset/Rotation (mirroring the existing Animation Speed
+Curve pattern); and a "Look-At Damping Curve" group for Cursor Tracking.
+None of these 3 have code written yet.
+
+**SHIPPED earlier same day, pushed clean ahead of the above:** a real
+bug fix (`TouchPointCount` was silently blocking a desktop click's
+normal dispatch when left at a stale value >1 -- now ignored entirely on
+a real desktop device) plus Right Click's own new Trigger Count (Nth
 click) chain, mirroring the left-click one. Root-caused via a real
 "none of my other click functions work" report -- most of what looked
 broken (custom7/8/10) actually wasn't; only `custom9`'s TouchPointCount

@@ -6146,6 +6146,55 @@ function isSequenceOrChainMode(p) {
   const m = cfg[`${p}Mode`]
   return m === 'Sequence' || m === 'Chain'
 }
+// Real bug found live 2026-09-24, direct report ("i cant trigger any
+// other ones after [triggering one]... i think it has to do with
+// retransition being turned off"): `RetransitionEnabled: false` means a
+// hand INTENTIONALLY stays in 'paused' forever for that one function
+// (see updateClickPoseForHand()'s/updateClickHoldPoseForHand()'s own
+// 'paused' phase comment -- a deliberate, pre-existing feature, not new).
+// But CLICK_POSE_KEYS.forEach()/CLICK_HOLD_KEYS.forEach() (the render-
+// order loop's own per-frame dispatch, see its own top comment) calls
+// updateClickPoseForHand()/updateClickHoldPoseForHand() for EVERY
+// function whose phase isn't 'idle', in ARRAY order, every frame --
+// `triggerClickPose(p)`/`startClickHoldPose(p)` arm EVERY hand
+// unconditionally (just staggered by distance), so once 2+ functions
+// have ever fired, the SAME hand ends up "active" for BOTH
+// simultaneously. Each one's own applyPoseValuesToHand()/
+// applyOffsetRotationToHand() call directly writes hand.wrapper's own
+// position/quaternion -- there's no compositing, so whichever function
+// happens to run LAST in that array's iteration order wins the actual
+// visible pose for that frame. A function stuck in 'paused' forever
+// (Retransition off) reapplies its own target pose every single frame
+// forever, so if it sits AFTER another function in CLICK_POSE_KEYS/
+// CLICK_HOLD_KEYS (simple append/registration order), it permanently
+// stomps that earlier function's own rendering the instant both are
+// active on the same hand -- indistinguishable from "the other function
+// stopped working," matching the report exactly ("double click [a later-
+// registered function] works, but i cant trigger a single click [an
+// earlier one] after").
+//
+// Fix: the moment a hand actually COMMITS to a NEW function (enters
+// 'forward' -- see both commit blocks below), release that SAME hand
+// from every OTHER function's own claim first, forcing their phase back
+// to 'idle' regardless of what phase they were in (including a
+// permanently-stuck 'paused'). Whichever function most recently claimed
+// a hand now unambiguously owns its pose -- the two can never compete to
+// draw the same hand in the same frame again. Scoped to phase/
+// pendingClaimAt only (not `trig.active`/`chp`'s own hold-confirm state),
+// so an in-progress-but-not-yet-visually-committed hold isn't force-
+// released by an unrelated click firing in the meantime.
+function releaseHandFromOtherFunctions(hand, exceptId) {
+  CLICK_POSE_KEYS.forEach((id) => {
+    if (id === exceptId) return
+    const cp = hand._cp && hand._cp[id]
+    if (cp && (cp.phase !== 'idle' || cp.pendingClaimAt)) { cp.phase = 'idle'; cp.pendingClaimAt = 0 }
+  })
+  CLICK_HOLD_KEYS.forEach((id) => {
+    if (id === exceptId) return
+    const chp = hand._chp && hand._chp[id]
+    if (chp && (chp.phase !== 'idle' || chp.pendingClaimAt)) { chp.phase = 'idle'; chp.pendingClaimAt = 0 }
+  })
+}
 function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) {
   const trig = clickHoldPoseTriggers[p]
   const chp = getOrInitHandCHP(hand)[p]
@@ -6204,6 +6253,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     chp.frozenSpeedMs = chp.pendingFrozenSpeedMs
     chp.pendingClaimAt = 0
     chp.releasePending = false // a NEW hold-claim always starts fresh, regardless of a stale flag from a previous release
+    releaseHandFromOtherFunctions(hand, p)
   }
   if (chp.phase === 'forward') {
     // Tween mode (added 2026-09-15, see makeClickHoldPoseGroup()'s own
@@ -6878,6 +6928,7 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
     cp.frozenSplayDeg = cp.pendingFrozenSplayDeg
     cp.frozenSpeedMs = cp.pendingFrozenSpeedMs
     cp.pendingClaimAt = 0
+    releaseHandFromOtherFunctions(hand, p)
   }
   if (cp.phase === 'forward') {
     // No `forwardDelay` subtraction needed anymore -- that delay is now

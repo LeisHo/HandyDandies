@@ -11295,6 +11295,74 @@ clean round rather than landing half-built.
 `index.html`'s own `main.js` cache-buster bumped `?v=212` -> `?v=213`.
 
 --------------------------------------------------------------------------------
+
+2026-09-24 (5th round)
+
+Fixed a real, severe architectural bug: direct report ("something is
+weird. i think it has to do with retransition being turned off. When i
+trigger a click function. i cant trigger any other ones after. So if i
+do a double click, it works, but i cant trigger a single click after.").
+
+Root cause: the main per-hand render-order loop dispatches EVERY
+registered function in `CLICK_POSE_KEYS`/`CLICK_HOLD_KEYS` whose own
+per-hand state isn't `'idle'`, and each dispatch directly overwrites
+`hand.wrapper.position`/`.quaternion` with no compositing -- whichever
+function is LATER in iteration order wins that hand's final rendered
+pose for the frame. A function that reaches `'paused'` with
+`RetransitionEnabled: false` NEVER returns to `'idle'` by design (a
+legitimate, pre-existing feature -- "stays at end pose forever" for that
+one function) -- but it also keeps re-applying its own pose every single
+frame forever, so once a 2nd function claims the SAME hand, whichever of
+the two is registered later in the array permanently stomps the other's
+rendering on every subsequent frame, indistinguishable from "the earlier
+function stopped working." Confirmed reproducible against the user's own
+real saved data -- `custom9`/`custom10`/`custom13`/`custom14` all have
+`RetransitionEnabled: false`.
+
+Fix: new `releaseHandFromOtherFunctions(hand, exceptId)` (inserted just
+before `updateClickHoldPoseForHand`) -- force-resets every OTHER
+function's own per-hand `phase` to `'idle'` and `pendingClaimAt` to `0`
+for a given hand, regardless of what phase they were previously stuck
+in. Called at the exact moment a hand COMMITS to a new claim (the
+`pendingClaimAt && now >= pendingClaimAt` block, in both
+`updateClickHoldPoseForHand`'s hold-kind commit and
+`updateClickPoseForHand`'s pose-kind commit) -- makes "whichever
+function most recently claimed a hand" the sole, unambiguous owner of
+that hand's pose going forward, for every function/mode combination
+(Single Pose, Sequence, Chain; Click, Click+Hold, Right Click; any
+Trigger Count ordinal).
+
+Mid-round follow-up request ("the features i described in regards to
+the multi trigger sequences interrupting each other should apply to
+normal Sequence tweens as well. Sequence tweens will be overwridden by
+subsequent triggers of any kind") confirmed, by direct code reading, to
+already be fully covered by this same fix -- no further change needed.
+Two halves: (1) a SAME function re-triggered mid-Sequence already
+restarts/overrides itself, since `triggerClickPose()`/
+`startClickHoldPose()`'s own per-hand arming
+(`cp.pendingClaimAt`/`chp.pendingClaimAt`) is unconditional regardless
+of the hand's current phase, and the commit step always re-anchors from
+the hand's own live current pose (`hand._lastPoseValues`) rather than a
+fixed snapshot -- this was already true before this round. (2) a
+DIFFERENT function triggered while a Sequence is mid-playback on the
+same hand is exactly the cross-function overwrite case this round's fix
+addresses. Both preserve the existing per-hand distance-staggered
+`pendingClaimAt` delay -- closest hands get overwritten first, farther
+hands finish their current tween until their own delay elapses -- since
+neither half bypasses that arming mechanism.
+
+Testing note: synthetic `PointerEvent` dispatch (multiple targeting
+strategies) again proved unreliable for reaching this app's real
+pointer listeners in this session's browser-automation tool (consistent
+with the 4th-round entry above) -- verification relied on direct code
+tracing plus the already-confirmed-working `window.__debug.*` pipeline
+calls from the prior round, not a full synthetic end-to-end click test.
+`node --check src/main.js` passed. Real-click end-to-end confirmation
+still needs the user's own testing.
+
+`index.html`'s own `main.js` cache-buster bumped `?v=213` -> `?v=214`.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================
