@@ -189,7 +189,7 @@
       "loadingPreviewSequenceHoldMs": 0,
       "loadingPreviewSize": 1390,
       "loadingPreviewRotationX": -79.5214147749844,
-      "loadingPreviewRotationY": -3.4505366585857016,
+      "loadingPreviewRotationY": -3.450536658585703,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0.27796090493479864,
       "loadingPreviewOffsetY": -2.3103396034084374,
@@ -7126,7 +7126,7 @@
       "loadingPreviewSequenceHoldMs": 0,
       "loadingPreviewSize": 1390,
       "loadingPreviewRotationX": -79.5214147749844,
-      "loadingPreviewRotationY": -3.4505366585857016,
+      "loadingPreviewRotationY": -3.450536658585703,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0.27796090493479864,
       "loadingPreviewOffsetY": -2.3103396034084374,
@@ -14063,7 +14063,7 @@
       "loadingPreviewSequenceHoldMs": 0,
       "loadingPreviewSize": 1390,
       "loadingPreviewRotationX": -79.5214147749844,
-      "loadingPreviewRotationY": -3.4505366585857016,
+      "loadingPreviewRotationY": -3.450536658585703,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0.27796090493479864,
       "loadingPreviewOffsetY": -2.3103396034084374,
@@ -22576,7 +22576,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 14",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -22623,7 +22623,7 @@
                 "type": "group",
                 "group": {
                   "key": "Offset",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -22646,7 +22646,7 @@
                 "type": "group",
                 "group": {
                   "key": "Rotation",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -22717,7 +22717,7 @@
                 "type": "group",
                 "group": {
                   "key": "Start Time Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -22810,7 +22810,7 @@
             "subgroups": [
               {
                 "key": "Offset",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -22830,7 +22830,7 @@
               },
               {
                 "key": "Rotation",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -22875,7 +22875,7 @@
               },
               {
                 "key": "Start Time Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -24334,7 +24334,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 8",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -25371,7 +25371,7 @@
       "subgroups": [
         {
           "key": "Custom Click Function 14",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -25418,7 +25418,7 @@
               "type": "group",
               "group": {
                 "key": "Offset",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -25441,7 +25441,7 @@
               "type": "group",
               "group": {
                 "key": "Rotation",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -25512,7 +25512,7 @@
               "type": "group",
               "group": {
                 "key": "Start Time Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -25605,7 +25605,7 @@
           "subgroups": [
             {
               "key": "Offset",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -25625,7 +25625,7 @@
             },
             {
               "key": "Rotation",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -25670,7 +25670,7 @@
             },
             {
               "key": "Start Time Curve",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -27117,7 +27117,7 @@
         },
         {
           "key": "Custom Click Function 8",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
