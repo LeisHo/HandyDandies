@@ -6467,7 +6467,11 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
       if (chp.stoppingFreezeAtEnd) { chp.phase = 'idle'; return } // "the hand will just stop where it is"
       chp.retransitionStart = values
       chp.retransitionStartTime = now
-      chp.retransitionDelay = 0 // the deceleration itself already served as this hand's own stop stagger
+      // When Retransition is OFF, the deceleration itself already served as
+      // this hand's own stop stagger, so retransitionDelay = 0. When
+      // Retransition is ON, use the distance-based delay computed at release
+      // time so closest hands retransition first (asynchronous per-hand).
+      chp.retransitionDelay = chp.retransitionDelayForStop ?? 0
       chp.phase = 'retransition'
     }
   } else if (chp.phase === 'retransition') {
@@ -6687,9 +6691,23 @@ function endClickHoldPose(p) {
       chp.stoppingStartDelay = (retransitionOff && cfg[`${p}TweenStopStartTimeCurveEnabled`])
         ? computeStartDelayMs(dists[i], minD, range, trig.tweenStopStartCurveParsed, trig.tweenStopStartRangeParsed)
         : 0
-      chp.stoppingDelayMs = Math.max(cfg[`${p}TweenStopDelayCurveEnabled`]
-        ? computeStartDelayMs(dists[i], minD, range, trig.tweenStopDelayCurveParsed, trig.tweenStopDelayRangeParsed)
-        : (cfg[`${p}TweenStopDelayMs`] || 0), 1)
+      chp.stoppingDelayMs = retransitionOff
+        ? Math.max(cfg[`${p}TweenStopDelayCurveEnabled`]
+            ? computeStartDelayMs(dists[i], minD, range, trig.tweenStopDelayCurveParsed, trig.tweenStopDelayRangeParsed)
+            : (cfg[`${p}TweenStopDelayMs`] || 0), 1)
+        : 0
+      // When Retransition is ON, compute the retransition delay based on
+      // distance so hands retransition asynchronously per-hand (closest hands
+      // retransition first), not all at once. When Retransition is OFF, the
+      // stopping delay already serves as the stagger, so retransitionDelay
+      // will be 0 (set at the stopping→retransition transition below).
+      if (!retransitionOff) {
+        chp.retransitionDelayForStop = chp.retransitionIsTween
+          ? computeStartDelayMs(dists[i], minD, range, trig.tweenRetransitionCurveParsed, trig.tweenRetransitionRangeParsed)
+          : computeStartDelayMs(dists[i], minD, range, trig.retransitionCurveParsed, trig.retransitionRangeParsed)
+      } else {
+        chp.retransitionDelayForStop = 0
+      }
       chp.stoppingLastFrameTime = now
       chp.stoppingWasLooping = chp.phase === 'looping'
       chp.stoppingBaseElapsedMs = chp.stoppingWasLooping ? 0 : Math.max(now - chp.forwardStartTime, 0)
