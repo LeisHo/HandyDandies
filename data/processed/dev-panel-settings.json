@@ -6727,12 +6727,12 @@
       "custom7StartTimeRange": "{\"min\":0,\"max\":1631}",
       "custom7PauseDurationMs": 0,
       "custom7RetransitionEnabled": true,
-      "custom7RetransitionSpeedMs": 20000,
+      "custom7RetransitionSpeedMs": 1260,
       "custom7RetransitionSpeedCurveEnabled": false,
       "custom7RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom7RetransitionSpeedCurveRange": "{\"min\":50,\"max\":2000}",
       "custom7RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom7RetransitionStartTimeRange": "{\"min\":0,\"max\":1119}",
+      "custom7RetransitionStartTimeRange": "{\"min\":0,\"max\":1048}",
       "custom8Enabled": true,
       "custom8Type": "Click+Hold",
       "custom8TouchPointCount": 1,
@@ -6809,7 +6809,7 @@
       "custom9StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9StartTimeRange": "{\"min\":0,\"max\":300}",
       "custom9PauseDurationMs": 0,
-      "custom9RetransitionEnabled": false,
+      "custom9RetransitionEnabled": true,
       "custom9RetransitionSpeedMs": 400,
       "custom9RetransitionSpeedCurveEnabled": false,
       "custom9RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -6902,7 +6902,7 @@
       "custom14Enabled": true,
       "custom14Type": "Right Click",
       "custom14TouchPointCount": 1,
-      "custom14ClickCount": "4th",
+      "custom14ClickCount": "1st",
       "custom14Mode": "Sequence",
       "custom14OffsetEnabled": false,
       "custom14OffsetX": 0,
@@ -13664,12 +13664,12 @@
       "custom7StartTimeRange": "{\"min\":0,\"max\":1631}",
       "custom7PauseDurationMs": 0,
       "custom7RetransitionEnabled": true,
-      "custom7RetransitionSpeedMs": 20000,
+      "custom7RetransitionSpeedMs": 1260,
       "custom7RetransitionSpeedCurveEnabled": false,
       "custom7RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom7RetransitionSpeedCurveRange": "{\"min\":50,\"max\":2000}",
       "custom7RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom7RetransitionStartTimeRange": "{\"min\":0,\"max\":1119}",
+      "custom7RetransitionStartTimeRange": "{\"min\":0,\"max\":1048}",
       "custom8Enabled": true,
       "custom8Type": "Click+Hold",
       "custom8TouchPointCount": 1,
@@ -13746,7 +13746,7 @@
       "custom9StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9StartTimeRange": "{\"min\":0,\"max\":300}",
       "custom9PauseDurationMs": 0,
-      "custom9RetransitionEnabled": false,
+      "custom9RetransitionEnabled": true,
       "custom9RetransitionSpeedMs": 400,
       "custom9RetransitionSpeedCurveEnabled": false,
       "custom9RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -13839,7 +13839,7 @@
       "custom14Enabled": true,
       "custom14Type": "Right Click",
       "custom14TouchPointCount": 1,
-      "custom14ClickCount": "4th",
+      "custom14ClickCount": "1st",
       "custom14Mode": "Sequence",
       "custom14OffsetEnabled": false,
       "custom14OffsetX": 0,
@@ -20601,12 +20601,12 @@
       "custom7StartTimeRange": "{\"min\":0,\"max\":1631}",
       "custom7PauseDurationMs": 0,
       "custom7RetransitionEnabled": true,
-      "custom7RetransitionSpeedMs": 20000,
+      "custom7RetransitionSpeedMs": 1260,
       "custom7RetransitionSpeedCurveEnabled": false,
       "custom7RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom7RetransitionSpeedCurveRange": "{\"min\":50,\"max\":2000}",
       "custom7RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom7RetransitionStartTimeRange": "{\"min\":0,\"max\":1119}",
+      "custom7RetransitionStartTimeRange": "{\"min\":0,\"max\":1048}",
       "custom8Enabled": true,
       "custom8Type": "Click+Hold",
       "custom8TouchPointCount": 1,
@@ -20683,7 +20683,7 @@
       "custom9StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9StartTimeRange": "{\"min\":0,\"max\":300}",
       "custom9PauseDurationMs": 0,
-      "custom9RetransitionEnabled": false,
+      "custom9RetransitionEnabled": true,
       "custom9RetransitionSpeedMs": 400,
       "custom9RetransitionSpeedCurveEnabled": false,
       "custom9RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -20776,7 +20776,7 @@
       "custom14Enabled": true,
       "custom14Type": "Right Click",
       "custom14TouchPointCount": 1,
-      "custom14ClickCount": "4th",
+      "custom14ClickCount": "1st",
       "custom14Mode": "Sequence",
       "custom14OffsetEnabled": false,
       "custom14OffsetX": 0,
@@ -22576,7 +22576,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 14",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -25088,7 +25088,7 @@
                 "type": "group",
                 "group": {
                   "key": "Animation Speed Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -25111,7 +25111,7 @@
                 "type": "group",
                 "group": {
                   "key": "Start Time Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -25249,7 +25249,7 @@
               },
               {
                 "key": "Animation Speed Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -25269,7 +25269,7 @@
               },
               {
                 "key": "Start Time Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -25371,7 +25371,7 @@
       "subgroups": [
         {
           "key": "Custom Click Function 14",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
@@ -27868,7 +27868,7 @@
               "type": "group",
               "group": {
                 "key": "Animation Speed Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -27891,7 +27891,7 @@
               "type": "group",
               "group": {
                 "key": "Start Time Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -28029,7 +28029,7 @@
             },
             {
               "key": "Animation Speed Curve",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -28049,7 +28049,7 @@
             },
             {
               "key": "Start Time Curve",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
