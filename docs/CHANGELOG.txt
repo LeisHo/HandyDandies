@@ -11061,6 +11061,116 @@ the real Vercel deployment is the recommended next step before treating
 this round as fully confirmed.
 
 --------------------------------------------------------------------------------
+2026-09-24 (2nd round)
+
+Direct follow-up ("fix everything") completing the deferred items from
+the round above, then live-verifying the WHOLE round on the real
+deployment -- found and fixed 2 more real bugs in the process that
+static syntax-checking alone could never have caught.
+
+Item 6 implemented: captured `custom7`'s ("CLICK") and `custom8`'s
+("CLICK + HOLD") own renamed rows (Enabled->"ON/ OFF", Type->"Trigger
+Type", ClickCount->"Trigger Count") and reordered layout from the saved
+settings JSON as `CUSTOM_FUNCTION_POSE_LAYOUT`/`HOLD_LAYOUT`.
+`applyCustomFunctionReferenceLayout()` applies both unconditionally at
+the end of `renderCustomClickFunctionGroup()` -- since that path runs
+for a brand-new function AND every page-load restore alike, this makes
+new functions start with the reference layout AND retrofits existing
+ones (`custom9`/`10`/`13`) automatically, no separate migration needed.
+New exported `setDevTextOverride()` (devPanel.js) makes this possible --
+a thin, deliberate exception to "rename only via openTextEditFor()'s own
+UI interaction" for a host applying a KNOWN, already-decided rename
+programmatically. Also corrected `NEW_CUSTOM_FUNCTION_COLLAPSED_SUBGROUPS`
+to match `custom7`'s actual saved collapse state (Offset/Rotation/Start
+Time Curve collapsed, not the 3 curve groups as the old comment claimed).
+
+Item 7 remainder implemented: Tween mode's own always-on Start Time
+Curve (no enable toggle of its own) now nests inside the SAME "Start
+Time Curve" group Single Pose uses, mirroring the Retransition fix from
+the round above -- the group container no longer hides outside Single
+Pose (Mode is always exactly one of Single Pose/Sequence/Chain, so one
+of the 2 branches is always relevant). Animation Speed Curve stays
+Single-Pose-only, deliberately -- Tween mode has no curve concept for
+its own speed at all (just a flat `TweenSpeedMs` slider), so extending
+it would mean inventing a new feature rather than fixing a grouping bug;
+left for a future explicit request rather than guessed at here.
+
+Live verification on the real deployment (handy-dandies.vercel.app)
+found 2 real bugs neither `node --check` nor the design review could
+have caught:
+
+1. Touch Point Count stayed VISIBLE on Desktop after every fresh page
+load (item 1 regression), even though `.dp-tab-active` already
+correctly read "Desktop" by the time it was checked, and clicking the
+Desktop tab again (re-running the exact same sweep) fixed it instantly.
+Root-caused to devPanel.js's own documented "editingDevice can read
+wrong for ~0.5s after page load, self-heals via requestAnimationFrame"
+gotcha (`healActiveTabOnce()`) having no hook for a HOST's own tab-
+dependent visibility logic -- main.js's Custom Click Functions
+visibility is computed once per function at registration time by
+reading the active tab, and only a genuine user click (which happens to
+also run main.js's own separate listener) ever re-evaluated it
+afterward. Added a new devPanel.js `onDeviceTabChanged` hook, called
+from both `switchTab()` (a real click) and `healActiveTabOnce()`'s
+correction branch -- this alone did NOT fully close the gap in live
+testing (the self-heal's own correction branch never fired in the
+tested case, since `editingDevice` was already right by the time
+checked, yet the row was still wrong), so a second, pragmatic layer was
+added: `restoreCustomClickFunctions()` now re-runs its own full
+visibility sweep synchronously at its own end (previously only
+`refreshAllCustomFunctionGroupVisibility()`, missing the Type-visibility
+and anchor-row sweeps entirely) AND once more via a 600ms `setTimeout`
+backstop, comfortably past devPanel.js's own ~500ms self-heal window.
+The precise remaining race was not pinned down further within this
+session's remote-debugging constraints against a live deployment (no
+attachable debugger) -- the fix is a defensive "self-heal a value that
+can read wrong once at an early moment" backstop, same pattern this
+project's own animate()/renderer-resize code already uses elsewhere, not
+a root-cause fix for the exact remaining timing gap.
+
+2. Item 17's own soft-delete: after unchecking `ShowOnMobile` and
+rebuilding the group, the SAME `updateCustomFunctionGroupVisibility()`
+call `renderCustomClickFunctionGroup()` already runs at creation did not
+correctly hide the group on the Mobile tab it was just deleted from --
+same symptom/same fix shape as bug 1 above (every input checked out
+correct moments later; a real tab click fixed it instantly). Fixed by
+explicitly calling `refreshAllCustomFunctionGroupVisibility()` right
+after the soft-delete rebuild, rather than relying on the one embedded
+call.
+
+Both bugs, and every other item from this round (5/6/7/8/9/10/11/12/13/
+14/16/17), were then live-verified end to end on the real deployment via
+synthetic checkbox clicks, tab switches, and a full soft-delete round
+trip (checked ShowOnMobile -> confirmed visible on Mobile -> deleted
+from Mobile -> confirmed still registered + hidden on Mobile + still
+visible on Desktop, all without a manual tab click). Screenshots
+confirmed the "CLICK"/"CLICK + HOLD"/"CLICK 2"/"CLICK 2 + HOLD"/"CLICK 3"
+renames, the reference layout order (Offset/Rotation immediately after
+Mode for hold-kind; TargetPose/Animation Speed/Pause Duration pulled up
+front for pose-kind), the Retransition Speed Curve widget present on
+every function, and the "Tween Stop" group's exact structure (a plain
+"Tween Stop On/Off" row, then 2 real nested gated subgroups "Tween Stop
+Start Time Curve"/"Tween Stop Delay," each with its own in-label
+checkbox).
+
+Not separately re-verified live this round: item 15 (still believed
+correct from code tracing alone -- a same-kind Type switch genuinely
+never rebuilds the DOM, so there was nothing new to test); items 2/3/8/9
+(simple, low-risk row-visibility/removal changes, already covered by the
+same row-hiding pattern verified elsewhere this round); item 14's real-
+device trigger gating specifically (verifying `realDeviceClass()`
+choosing the right dispatch branch would need genuine touch-device
+emulation, not just dev-panel tab switching -- the dev-panel-side half
+of 14, via `customFunctionActiveForDeviceFamily()`, IS the same function
+verified for 16/17 above, so the shared logic is covered, just not
+exercised through the touch-input code path itself).
+
+`index.html`'s own `main.js` cache-buster bumped `?v=207` -> `?v=211`
+across 4 pushes this round; `devPanel.js`'s own cache-buster bumped
+`?v=44` -> `?v=46` (`setDevTextOverride()` newly exported, plus the
+`onDeviceTabChanged` hook).
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

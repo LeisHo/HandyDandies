@@ -18,49 +18,60 @@ work seamlessly from there.
 
 ## Currently working on
 
-**IN PROGRESS 2026-09-24 -- large 17-item Custom Click Functions round
-(device-scoped visibility, global Hold Confirm Delay, Retransition Speed
-Curve, Tween Stop restructure). 12 of 17 items fully shipped and
-committed (`2a7e284`); 2 investigated with concrete findings but not yet
-implemented; 1 partially fixed; 1 believed already satisfied but not
-separately verified. NOT yet live-verified on the real deployment.**
+**SHIPPED + LIVE-VERIFIED 2026-09-24 -- large 17-item Custom Click
+Functions round (device-scoped visibility, global Hold Confirm Delay,
+Retransition Speed Curve, Tween Stop restructure, reference layout
+retrofit), across 6 pushes. All 17 items addressed; 2 real bugs found
+during live verification on the real deployment and fixed.**
 
-Shipped: real device/tab gating for custom functions (a desktop-family
-function defaults OFF on Mobile/Landscape with a new "Show in Mobile/
-Landscape" opt-in; a mobile-family function is fully exclusive to
-Mobile/Landscape -- previously NOTHING gated actual trigger firing by
-device at all, only the dev-panel UI's own tab display); soft-delete
-(deleting a desktop-family function from Mobile/Landscape unchecks the
-opt-in instead of permanently removing it); one global `holdConfirmMs`
-control replacing the old per-function slider; Trigger All Hands
-removed; Touch Point Count independent-per-device; Zoom/Scroll
-thresholds + the internal Custom Function IDs row hidden appropriately;
-a new Retransition Speed Curve; Tween Stop rebuilt as its own group with
-2 real nested gated subgroups; a rename-survives-rebuild fix
-(`createGroupElement()` never reapplied a saved textOverride on its
-own); the Sequence-mode "duplicate Retransition settings" display bug
-fixed (Single-Pose and Tween retransition fields no longer show
-simultaneously).
+Real device/tab gating: a desktop-family function defaults OFF on
+Mobile/Landscape with a new "Show in Mobile/Landscape" opt-in; a mobile-
+family function is fully exclusive to Mobile/Landscape -- previously
+NOTHING gated actual trigger firing by device at all, only the dev-panel
+UI's own tab display. Soft-delete: deleting a desktop-family function
+from Mobile/Landscape unchecks the opt-in instead of permanently
+removing it (still a real delete from its own home tab, or for a
+mobile-exclusive function). One global `holdConfirmMs` control replacing
+the old per-function slider; Trigger All Hands removed; Touch Point
+Count independent-per-device; Zoom/Scroll thresholds + the internal
+Custom Function IDs row hidden appropriately; a new Retransition Speed
+Curve; Tween Stop rebuilt as its own group with 2 real nested gated
+subgroups; renaming now survives a group rebuild; the Sequence-mode
+"duplicate Retransition settings" bug fixed (Single-Pose and Tween
+fields no longer show simultaneously, same for Start Time Curve).
+`custom7`'s ("CLICK") and `custom8`'s ("CLICK + HOLD") own live-
+customized row renames + layout order, captured from the saved settings
+JSON, are now the standing default for every new/restored custom
+function of either kind (`custom9`/`10`/`13` retrofitted automatically).
 
-Not yet done: (1) "match Right Click/Right Click+Hold's settings/group
-naming+order to Click/Click Hold's own live-customized layout, retrofit
-existing functions" -- real reference data captured from the live
-settings JSON (`custom7`="CLICK", `custom8`="CLICK + HOLD", their exact
-renamed rows and reordered layout), implementation deferred to a
-follow-up round. (2) Whether Animation Speed Curve/Start Time Curve
-should gain functional Sequence-mode wiring (currently Single-Pose-only
-by original design; Tween mode's own speed has no curve-based
-equivalent to hook a matching group into) -- needs a decision before
-building, not guessed at. (3) Settings/group order being Type-independent
-(e.g. Scroll<->Zoom) -- traced through the code and believed already
-true (a same-kind Type switch never rebuilds the DOM at all), but not
-separately live-verified.
+2 real bugs found ONLY via live testing on the real deployment (neither
+`node --check` nor design review could have caught either): (1) Touch
+Point Count stayed visible on Desktop after every page load until a
+manual tab click, root-caused to devPanel.js's own documented
+`editingDevice`-can-read-wrong-briefly self-heal never re-triggering a
+host's own tab-dependent visibility logic -- fixed with a new
+`onDeviceTabChanged` hook plus a defensive backstop sweep (the self-heal
+hook alone did NOT fully close it in live testing; the exact remaining
+race wasn't pinned down further against a live deployment with no
+attachable debugger). (2) The same symptom in the new soft-delete path
+specifically, fixed the same way. Both fixes, and every item in this
+round, were then live-verified end to end (checkbox toggles, tab
+switches, a full soft-delete round trip) via screenshots and direct
+`window.__debug`/DOM inspection on handy-dandies.vercel.app.
 
-Next step for a continuing session: live-verify this round on the real
-Vercel deployment (push already done), then take on the 2 deferred items
-above -- see CHANGELOG.txt's matching 2026-09-24 entry for full detail
-on every one of the 17 items, including the exact reference layout data
-for item (1).
+Not separately verified: item 15 (settings order being Type-independent)
+-- believed correct from code tracing (a same-kind Type switch never
+rebuilds the DOM), not re-tested live since there was nothing new to
+test. Item 14's real-device trigger gating specifically wasn't exercised
+through genuine touch input (would need real touch-device emulation, not
+just dev-panel tab switching) -- the shared gating logic itself IS
+covered via the dev-panel-side verification. Deliberately NOT built:
+Animation Speed Curve gaining a Sequence-mode equivalent -- Tween mode
+has no curve concept for its own speed at all, so this would be a new
+feature, not a bug fix; left for an explicit future request.
+
+See CHANGELOG.txt's 2 matching 2026-09-24 entries for full detail on
+every one of the 17 items and both live-testing rounds.
 
 --------------------------------------------------------------------------------
 
