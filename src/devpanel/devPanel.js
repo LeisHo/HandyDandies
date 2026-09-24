@@ -1333,6 +1333,18 @@ function openTextEditFor(displayEl, key, originalText) {
 // load populates `textOverrides` from saved state, and once up front so a
 // custom group recreated by applyOrder() (built via this same function)
 // picks up its own override too.
+// Sets (or clears, if `text` is null/undefined) one saved rename directly
+// -- a thin, deliberate exception to "rename only happens through
+// openTextEditFor()'s own UI interaction": a host file occasionally needs
+// to apply a KNOWN, already-decided rename programmatically (e.g. a
+// canonical reference layout applied to every new/restored instance of
+// something), not simulate a user double-clicking a title. Does not
+// touch the DOM itself -- call applyTextOverrides() afterward to refresh
+// visible labels, same as any other textOverrides change.
+export function setDevTextOverride(key, text) {
+  if (text === null || text === undefined) delete textOverrides[key]
+  else textOverrides[key] = text
+}
 export function applyTextOverrides() {
   document.querySelectorAll('.dp-group-title-text').forEach((titleText) => {
     const group = titleText.closest('.dp-group')

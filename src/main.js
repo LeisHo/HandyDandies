@@ -6,7 +6,7 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js'
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js'
 import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js'
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js'
-import { initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, applyTextOverrides } from './devpanel/devPanel.js?v=44'
+import { initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, applyTextOverrides, setDevTextOverride } from './devpanel/devPanel.js?v=45'
 
 // A defensive wrapper around devPanel.js's own refreshSelectOptions() --
 // found via live testing (direct user report: "I dont see any of the
@@ -8150,9 +8150,12 @@ function renderCustomClickFunctionGroup(id, title, kind, family) {
   // rebuild, cleanupDeletedCustomClickFunction()) silently reverted its
   // title/row labels back to their unrenamed defaults, which read as "the
   // rename didn't stick" whenever one of those paths happened to run.
-  // Calling the same sweep here, every time this function builds a group,
-  // closes that gap regardless of which path triggered the rebuild.
-  applyTextOverrides()
+  // Folded into applyCustomFunctionReferenceLayout() below, which also
+  // applies the item-6 reference renames/order -- calling it here, every
+  // time this function builds a group, closes the item-12 gap regardless
+  // of which path triggered the rebuild, AND keeps every function
+  // (new or restored) normalized to the reference layout.
+  applyCustomFunctionReferenceLayout(id, kind)
 }
 // Type select's own onChange for a custom function (CORRECTED 2026-09-20,
 // see "Custom Click Functions"'s own DEV_GROUPS comment for the full
@@ -8263,6 +8266,89 @@ function registerCustomClickFunction(id, title, kind, family) {
 // group order/collapse state alongside is handled separately, right
 // after this template is applied -- see the 3 named subgroup keys at the
 // bottom of applyNewCustomFunctionTemplate().
+// Reference row renames + layout order -- direct request 2026-09-24 (item
+// 6): "I have renamed and reordered settings and groups [for 'Click'/
+// 'Click Hold']... Set those setting and group names and ordering as
+// default. So when i Add a new Click Function, it will show it in the
+// same way as 'Click'... Right Click and Right Click Hold should be set
+// to reflect its left click version... modify the existing Custom Click
+// Functions to match." Captured directly from the user's own live-
+// customized `custom7` ("CLICK", pose-kind) and `custom8` ("CLICK +
+// HOLD", hold-kind) via `data/processed/dev-panel-settings.json`'s own
+// `order`/`textOverrides` (read 2026-09-24, after merging 3 concurrent
+// live saves) -- since Right Click/Right Click+Hold share the exact same
+// control battery as Click/Click+Hold respectively (customFunctionTypeOptions()),
+// one reference layout per KIND covers all 4 Types, not just the 2 they
+// were captured from. The top-level function TITLE itself is left
+// untouched (a function's own chosen name, e.g. "CLICK 2," is not part of
+// this) -- only the 3 universal row renames and the internal row/group
+// ORDER are applied. Group titles ('Offset'/'Retransition'/etc) are
+// intentionally NOT part of this rename set -- those titles are SHARED
+// dataset.key values across every function (see this project's own
+// CLAUDE.md "renaming a devPanel.js group is purely cosmetic" gotcha),
+// so renaming one here would silently rename it for every function; the
+// user's own live customization never touched a subgroup title, so this
+// only ever needs the ORDER, not a rename, for those.
+const CUSTOM_FUNCTION_TEXT_OVERRIDES = { Enabled: 'ON/ OFF', Type: 'Trigger Type', ClickCount: 'Trigger Count' }
+// `type: 'row'` items use `suffix` (appended to `${id}`); `type: 'group'`
+// items use `title` (a literal, shared group dataset.key -- see above).
+// `ShowOnMobile` only exists for a desktop-family function
+// (renderCustomClickFunctionGroup()'s own conditional splice) -- a no-op
+// row lookup for a mobile-family one, same pattern used throughout this
+// file for a control that doesn't always exist.
+const CUSTOM_FUNCTION_POSE_LAYOUT = [
+  { type: 'row', suffix: 'Enabled' }, { type: 'row', suffix: 'ShowOnMobile' },
+  { type: 'row', suffix: 'Type' }, { type: 'row', suffix: 'TouchPointCount' }, { type: 'row', suffix: 'ClickCount' },
+  { type: 'row', suffix: 'Mode' }, { type: 'row', suffix: 'TargetPose' }, { type: 'row', suffix: 'TransitionSpeedMs' },
+  { type: 'row', suffix: 'TweenSelector' }, { type: 'row', suffix: 'TweenSpeedMs' }, { type: 'row', suffix: 'PauseDurationMs' },
+  { type: 'group', title: 'Offset' }, { type: 'group', title: 'Rotation' },
+  { type: 'row', suffix: 'SequencePlayMode' }, { type: 'row', suffix: 'SequenceCount' }, { type: 'row', suffix: 'SequenceCountMode' },
+  { type: 'row', suffix: 'SequenceLoopTransition' }, { type: 'row', suffix: 'SequenceHoldMs' },
+  { type: 'group', title: 'Animation Speed Curve' }, { type: 'group', title: 'Start Time Curve' }, { type: 'group', title: 'Retransition' }
+]
+// Retransition/Start Time Curve now also contain their own Tween-mode
+// members internally (items 5/7, this same round) -- no separate top-
+// level entry needed for TweenStartTimeCurve/TweenStartTimeRange/
+// TweenRetransitionSpeedMs/etc, they live INSIDE the 'Start Time Curve'/
+// 'Retransition' groups already (wrapGatedSubgroup()'s own member-key
+// lists), so a top-level `:scope >` lookup for them here would just find
+// nothing. "Tween Stop" (items 10/11) is placed last, matching where the
+// old flat OnReleaseMode/TweenStop* rows sat at the very end of
+// custom8's own captured order.
+const CUSTOM_FUNCTION_HOLD_LAYOUT = [
+  { type: 'row', suffix: 'Enabled' }, { type: 'row', suffix: 'ShowOnMobile' },
+  { type: 'row', suffix: 'Type' }, { type: 'row', suffix: 'TouchPointCount' }, { type: 'row', suffix: 'ClickCount' },
+  { type: 'row', suffix: 'Mode' }, { type: 'row', suffix: 'TweenSelector' },
+  { type: 'group', title: 'Offset' }, { type: 'group', title: 'Rotation' },
+  { type: 'row', suffix: 'TargetPose' }, { type: 'row', suffix: 'TweenChain' }, { type: 'row', suffix: 'TweenSpeedMs' },
+  { type: 'row', suffix: 'LoopMode' }, { type: 'row', suffix: 'LoopHoldMs' }, { type: 'row', suffix: 'TransitionSpeedMs' },
+  { type: 'group', title: 'Animation Speed Curve' }, { type: 'group', title: 'Start Time Curve' },
+  { type: 'group', title: 'Retransition' }, { type: 'group', title: 'Tween Stop' }
+]
+// Applies the reference renames + order to ONE function -- called
+// unconditionally at the end of renderCustomClickFunctionGroup() (both a
+// brand-new function AND a page-load restore go through that same path),
+// so this is simultaneously "new functions start this way" and "existing
+// functions get retrofitted," with no separate one-time data migration
+// needed. Reordering works by appendChild()-ing each layout item in the
+// target sequence -- appendChild MOVES an existing child, so walking the
+// layout array in order naturally leaves the body in that exact sequence;
+// an item whose row/group doesn't exist (e.g. ShowOnMobile on a mobile-
+// family function) is silently skipped.
+function applyCustomFunctionReferenceLayout(id, kind) {
+  Object.entries(CUSTOM_FUNCTION_TEXT_OVERRIDES).forEach(([suffix, label]) => setDevTextOverride(`${id}${suffix}`, label))
+  applyTextOverrides()
+  const enabledRow = document.querySelector(`.dp-row[data-key="${id}Enabled"]`)
+  const body = enabledRow ? enabledRow.parentElement : null
+  if (!body) return
+  const layout = kind === 'hold' ? CUSTOM_FUNCTION_HOLD_LAYOUT : CUSTOM_FUNCTION_POSE_LAYOUT
+  layout.forEach((item) => {
+    const el = item.type === 'row'
+      ? body.querySelector(`:scope > .dp-row[data-key="${id}${item.suffix}"]`)
+      : body.querySelector(`:scope > .dp-group[data-key="${item.title}"]`)
+    if (el) body.appendChild(el)
+  })
+}
 const NEW_CUSTOM_FUNCTION_TEMPLATE = {
   // TouchPointCount corrected 2026-09-22 from 2 to 1 -- see the control's
   // own DEV_GROUPS comment for why 2 is no longer the right default now
@@ -8283,11 +8369,14 @@ const NEW_CUSTOM_FUNCTION_TEMPLATE = {
   RetransitionStartTimeCurve: '[{"x":0,"y":0},{"x":1,"y":1}]', RetransitionStartTimeRange: '{"min":0,"max":300}'
 }
 // Collapsed state of the 5 mandatory gated subgroups (§ CLAUDE.md
-// wrapClickFunctionGatedSubgroups()) matching Custom Click Function 3's
-// own saved order data -- Offset/Rotation left expanded (already
-// createGroupElement()'s own default, so nothing to do for those 2),
-// Animation Speed Curve/Start Time Curve/Retransition collapsed.
-const NEW_CUSTOM_FUNCTION_COLLAPSED_SUBGROUPS = ['Animation Speed Curve', 'Start Time Curve', 'Retransition']
+// wrapClickFunctionGatedSubgroups()) -- CORRECTED 2026-09-24 (item 6) to
+// match `custom7`'s ("CLICK") own actual saved collapse state exactly
+// (`data/processed/dev-panel-settings.json`, read 2026-09-24), which
+// turned out to differ from what this constant previously claimed
+// (Offset/Rotation are actually COLLAPSED in the real reference data, not
+// left at createGroupElement()'s own expanded default as the old comment
+// said -- Animation Speed Curve/Retransition are the ones left expanded).
+const NEW_CUSTOM_FUNCTION_COLLAPSED_SUBGROUPS = ['Offset', 'Rotation', 'Start Time Curve']
 function applyNewCustomFunctionTemplate(id) {
   Object.keys(NEW_CUSTOM_FUNCTION_TEMPLATE).forEach((suffix) => {
     const key = `${id}${suffix}`
@@ -8687,15 +8776,16 @@ function updateClickTriggerModeVisibility(p, extraSinglePoseKeys, extraTweenKeys
   // 'TweenSelector' deliberately NOT in this list -- it's Sequence-mode-
   // only now that Chain mode exists (its own TweenChain multi-select
   // replaces it for that mode); see updateChainModeVisibility() below,
-  // which owns both. The Tween Retransition trio (TweenRetransitionSpeedMs/
-  // StartTimeCurve/StartTimeRange) is NOT in this list -- CORRECTED
-  // 2026-09-24 (item 7, "duplicate Retransition settings"): it moved into
-  // updateSingleTimingGateVisibility()'s own Retransition cluster instead
-  // (nested inside the SAME "Retransition" group now, per
-  // wrapClickFunctionGatedSubgroups()'s own comment), so there's exactly
-  // one function deciding its display, not 2 racing -- same reasoning
-  // StartTimeCurve/the rest of Retransition already got moved out for.
-  const tweenKeys = ['TweenSpeedMs', 'TweenStartTimeCurve', 'TweenStartTimeRange', ...extraTweenKeys]
+  // which owns both. Neither the Tween Retransition trio nor
+  // TweenStartTimeCurve/TweenStartTimeRange are in this list -- CORRECTED
+  // 2026-09-24 (item 7, "duplicate Retransition settings" + "Animation
+  // Speed Curve, Start Time Curve... arent in the correct groups... in
+  // Sequence mode"): both moved into updateSingleTimingGateVisibility()'s
+  // own Retransition/Start Time Curve clusters instead (nested inside
+  // those SAME groups now, per wrapClickFunctionGatedSubgroups()'s own
+  // comment), so there's exactly one function deciding each row's
+  // display, not 2 racing.
+  const tweenKeys = ['TweenSpeedMs', ...extraTweenKeys]
   // Inline style, not the `hidden` attribute -- devPanel.js's own
   // `.dp-row { display: flex }` stylesheet rule (style.css) is an author
   // rule, which wins the cascade over the UA stylesheet's `[hidden] {
@@ -8778,10 +8868,29 @@ function updateSingleTimingGateVisibility(p) {
   const speedOn = showBase && !!cfg[`${p}SpeedCurveEnabled`]
   setRow('SpeedCurve', speedOn)
   setRow('SpeedCurveRange', speedOn)
-  setGateRow('StartTimeCurveEnabled', showBase)
+  // CORRECTED 2026-09-24 (item 7, remainder -- "Animation Speed Curve,
+  // Start Time Curve... arent in the correct groups... in Sequence
+  // mode"): the "Start Time Curve" GROUP itself is no longer hidden
+  // outside Single Pose (setGateRow -> setRow for the enable row) --
+  // Tween mode's own always-on start-time curve (TweenStartTimeCurve/
+  // TweenStartTimeRange, no enable toggle of its own) now nests inside
+  // this same group and needs it to stay visible in Sequence/Chain mode
+  // too. Mode is always exactly one of Single Pose/Sequence/Chain, so the
+  // container never actually needs hiding -- one of the 2 branches below
+  // is always the relevant one.
+  setRow('StartTimeCurveEnabled', showBase)
   const startOn = showBase && cfg[`${p}StartTimeCurveEnabled`] !== false
   setRow('StartTimeCurve', startOn)
   setRow('StartTimeRange', startOn)
+  const tweenStartOn = isSequenceOrChainMode(p)
+  setRow('TweenStartTimeCurve', tweenStartOn)
+  setRow('TweenStartTimeRange', tweenStartOn)
+  // Animation Speed Curve has NO Tween-mode equivalent to nest here --
+  // Tween mode's own speed is a flat `${p}TweenSpeedMs` slider with no
+  // curve concept at all, so this group stays Single-Pose-only exactly as
+  // before (a real gap, not a bug -- adding a genuinely new Tween Speed
+  // Curve feature was deferred pending confirmation rather than invented
+  // here; see CHANGELOG.txt's matching entry).
   // Retransition is NOT mode-gated (direct request 2026-09-22: "available
   // to turn on and off regardless of... single pose or sequence") --
   // unlike SpeedCurve/StartTimeCurve above, which stay Single-Pose-only
@@ -9019,7 +9128,11 @@ function wrapClickFunctionGatedSubgroups(p) {
   wrapGatedSubgroup(`${p}OffsetEnabled`, [`${p}OffsetX`, `${p}OffsetY`], 'Offset')
   wrapGatedSubgroup(`${p}RotationEnabled`, [`${p}RotationX`, `${p}RotationY`, `${p}RotationZ`], 'Rotation')
   wrapGatedSubgroup(`${p}SpeedCurveEnabled`, [`${p}SpeedCurve`, `${p}SpeedCurveRange`], 'Animation Speed Curve')
-  wrapGatedSubgroup(`${p}StartTimeCurveEnabled`, [`${p}StartTimeCurve`, `${p}StartTimeRange`], 'Start Time Curve')
+  // CORRECTED 2026-09-24 (item 7, remainder): Tween mode's own always-on
+  // start-time curve (no enable toggle of its own -- see
+  // updateSingleTimingGateVisibility()'s own comment) nests inside this
+  // SAME "Start Time Curve" group too, no-op for a pose-kind `p`.
+  wrapGatedSubgroup(`${p}StartTimeCurveEnabled`, [`${p}StartTimeCurve`, `${p}StartTimeRange`, `${p}TweenStartTimeCurve`, `${p}TweenStartTimeRange`], 'Start Time Curve')
   // CORRECTED 2026-09-24 (item 7, "duplicate Retransition settings"): the
   // Tween-mode retransition trio (hold-kind only -- a no-op/silently
   // skipped for a pose-kind `p`, whose own rows with these suffixes don't
