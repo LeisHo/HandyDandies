@@ -10879,6 +10879,188 @@ unchanged from the pre-existing (already-working) version.
 `index.html`'s own `main.js` cache-buster bumped `?v=205` -> `?v=206`.
 
 --------------------------------------------------------------------------------
+2026-09-24
+
+Large round of 17 direct requests covering Custom Click Functions'
+device-scoping, timing controls, and dev-panel presentation. Several
+items surfaced/clarified mid-turn (13/16/17 converged into one design;
+items 16/17 were sent while 13 was still being investigated).
+
+Real device/tab gating (items 13/14/16/17) -- the single biggest
+architectural gap found this round: `family` ('desktop'/'mobile', frozen
+at a custom function's creation from whichever dev-panel tab was active)
+previously only ever controlled the DEV-PANEL UI's own group visibility
+(`updateCustomFunctionGroupVisibility`) -- NOTHING in the actual trigger
+dispatch (`triggerCustomPoseFunctions`/`startCustomHoldFunctions`/
+`endCustomHoldFunctions`/the multi-touch dispatch) ever checked family
+against the real device at all, confirmed by direct grep. This meant a
+function created on Mobile could fire on Desktop and vice versa,
+regardless of what the dev-panel UI happened to be showing at the time --
+exactly the user's item-14 report. New shared helper
+`customFunctionActiveForDeviceFamily(family, id, deviceFamily)`: a
+function is active on its own home family always; a mobile-family
+function is EXCLUSIVE to Mobile/Landscape, no override; a desktop-family
+function additionally gets a new `${id}ShowOnMobile` checkbox (def
+false, direct request item 16 -- "by default not have 'Show in Mobile/
+Landscape' selected... When I then select that checkbox, it should
+immediatly show up") that opts it into ALSO being active on
+Mobile/Landscape. Wired into both `updateCustomFunctionGroupVisibility`
+(dev-panel display, keyed off `getActiveDevPanelTab()`) and the real
+trigger dispatch (keyed off `realDeviceClass()`, normalized to
+'desktop'/'mobile' via new `currentDeviceFamily()`) -- including the
+multi-touch threshold dispatch (`multiPointEligibleFunctions()`/
+`multiPointHandleTouchEnd()`), which had the identical gap.
+
+Soft-delete (item 17): deleting a desktop-family function's group from
+the Mobile/Landscape tab (i.e. only visible there via ShowOnMobile, not
+its own home tab) now just unchecks `${id}ShowOnMobile` and rebuilds the
+group fresh (`renderCustomClickFunctionGroup()` directly, NOT the full
+`registerCustomClickFunction()` wrapper -- that would have pushed a
+duplicate entry into `CLICK_POSE_KEYS`/`CLICK_HOLD_KEYS`, since
+devPanel.js's own generic delete flow already removes the DOM node
+before the `onGroupDeleted` hook runs, but the function's real
+bookkeeping/trigger-state was never touched). A mobile-family
+(mobile-exclusive) function, or a desktop-family function deleted from
+its own Desktop tab, still gets a real, permanent delete. Confirmed via
+the user's own follow-up: item 13's original "Show in Mobile checkbox
+checked but function not appearing" report was very likely explained by
+this exact soft-delete gap not existing yet (a prior Delete-from-Mobile
+click permanently removed the function) -- no separate fix needed for 13
+once 16/17 landed.
+
+Global Hold Confirm Delay (item 8, confirmed via AskUserQuestion --
+"Remove the per-function slider, use one shared value"): removed
+`${p}HoldConfirmMs` from `makeClickHoldPoseGroup()`; added one shared
+`holdConfirmMs` control (Custom Click Functions anchor group, def 500ms
+-- same value/reasoning as the old per-function default, matching
+`MOUSE_LOG_HELD_DRAG_MS`). `updateClickHoldPoseForHand()`'s own commit
+gate now reads `cfg.holdConfirmMs` directly. The historical
+"HoldConfirmMs must stay >= MOUSE_LOG_HELD_DRAG_MS" invariant comment
+(the quad-click-hold-vs-triple-click-hold drift bug from 2026-09-16) is
+now structurally impossible with one shared value -- comment updated to
+note this rather than describe an active per-slider check.
+
+Trigger All Hands removed (item 9, "Remove... for now") --
+`${p}TriggerAllHands` control deleted; `beginTweenReleaseStop()` and
+`endClickHoldPose()`'s own retransition-stagger block both always use
+the normal per-hand distance-based delay again (the bypass branch this
+control gated is gone).
+
+Touch Point Count (item 1) marked `dynamicDevice: true` -- gives it the
+standard "Independent from Desktop" checkbox so Mobile and Landscape can
+each hold their own value when the user opts in (the row already never
+showed on Desktop at all). Zoom/Scroll gesture threshold sliders (item
+2) and the internal `customClickFunctionIds` bookkeeping row (item 3)
+hidden on the Desktop tab / permanently, respectively, via the same
+`.dp-row[data-key=...]` + `style.display` pattern used throughout this
+file, wired into `setupCustomFunctionTabVisibilitySync()`'s existing tab-
+click listener.
+
+Retransition Speed Curve (item 5): new `${p}RetransitionSpeedCurveEnabled`/
+`RetransitionSpeedCurve`/`RetransitionSpeedCurveRange` trio, mirroring
+Animation Speed Curve's own shape exactly (same curve widget, same 50-
+2000ms range) but modulating `${p}RetransitionSpeedMs` instead. Frozen
+once per hand at the moment retransition begins (`chp.retransitionSpeedMs`/
+`cp.retransitionSpeedMs`, same "frozen at trigger time" philosophy as
+every other curve in this file) -- Single-Pose-only, matching this
+control's own scoping to the plain "Retransition" group (Tween mode's
+own separate retransition trio is untouched).
+
+Tween Stop as its own group (items 10/11): the old 2-value
+`${p}OnReleaseMode` select ('Stop'/'Complete Sequence') replaced with a
+plain `${p}TweenStopEnabled` checkbox (def true, preserving the old
+'Stop' default), living as an ordinary row inside a NEW "Tween Stop"
+group -- unlike Retransition/Offset/etc, deliberately no in-label gate
+checkbox (direct spec text). 2 new helpers: `wrapPlainSubgroup()` (a
+non-gated nested-group wrap, no header-embedding) builds the outer
+"Tween Stop" container; `wrapTweenStopGroup()` moves every TweenStop*
+row into it, then calls `wrapGatedSubgroup()` twice more to nest "Tween
+Stop Start Time Curve" and "Tween Stop Delay" inside THAT (each with its
+own in-label checkbox, "just like Retransition, Offset, Animation Speed
+Curve etc" per item 11). `updateTweenStopGateVisibility()` rewritten to
+own the whole cluster's visibility end to end, including the outer
+group's own container (no gate row to piggyback on) and the mode check
+itself (moved IN from `updateClickTriggerModeVisibility()`'s own
+`extraTweenKeys` list, which no longer mentions Tween Stop at all -- one
+function per row, not 2 racing). `endClickHoldPose()`'s own
+'Complete Sequence' check now reads `!cfg[TweenStopEnabled]` instead of
+`cfg[OnReleaseMode] === 'Complete Sequence'`.
+
+Rename-survives-rebuild (item 12): root-caused to `createGroupElement()`
+setting a freshly-built group/row's title straight from its own literal
+internal key, with NO textOverrides lookup at creation time (only the
+explicit `applyTextOverrides()` sweep, normally run once at page load,
+actually reapplies a saved rename) -- so any path that rebuilds a custom
+function's group after its first creation (a Type-driven kind-switch,
+`handleCustomFunctionTypeChange()`; the new item-17 soft-delete rebuild)
+silently reverted its title/row labels back to unrenamed defaults.
+Exported `applyTextOverrides()` from devPanel.js; `renderCustomClickFunctionGroup()`
+now calls it as its own last step, every time it builds a group.
+
+Duplicate Retransition settings (item 7, PARTIAL -- the "duplicate"
+half only): in Sequence/Chain mode, hold-kind functions previously
+showed BOTH the Single-Pose "Retransition" group (RetransitionSpeedMs
+etc, unconditionally visible since RetransitionEnabled's own 2026-09-22
+mode-independence fix) AND the flat Tween-prefixed retransition trio
+(TweenRetransitionSpeedMs/StartTimeCurve/StartTimeRange, shown via
+`updateClickTriggerModeVisibility()`'s own `tweenKeys` list) at the same
+time -- 2 visibly separate "retransition" control sets simultaneously,
+genuinely confusing. Fixed by nesting the Tween trio inside the SAME
+"Retransition" wrapGatedSubgroup (added to its own member-key list,
+harmless no-op for a pose-kind `p`, which has no such fields) and moving
+its visibility OUT of `updateClickTriggerModeVisibility()`'s `tweenKeys`
+into `updateSingleTimingGateVisibility()`'s own Retransition block --
+which now shows the Single-Pose trio in Single Pose, the Tween trio in
+Sequence/Chain, never both, while `RetransitionEnabled` itself stays
+mode-independent as the 2026-09-22 request established. NOT addressed
+this round: the OTHER half of item 7 ("Animation Speed Curve, Start Time
+Curve... arent in the correct groups... in Sequence mode") -- these 2
+groups remain Single-Pose-only by original disclosed design, and Tween
+mode's own speed (`${p}TweenSpeedMs`) has no curve-based equivalent to
+wire a matching group into; extending this would mean adding NEW
+Tween-mode toggle/curve fields, a bigger change deferred pending
+confirmation rather than guessed at.
+
+Item 15 ("settings/group order should be Type-independent, e.g. Scroll
+to Zoom") not code-changed -- traced through `handleCustomFunctionTypeChange()`:
+a same-KIND Type switch (Click<->Scroll<->Zoom<->Right Click, all
+'pose'; Click+Hold<->Right Click+Hold, both 'hold') already takes the
+early-return branch (`if (newKind === oldKind) { ...; return }`) with NO
+rebuild at all -- the DOM order is untouched by a Type change alone.
+Only a KIND-changing Type switch (Click -> Click+Hold) rebuilds via a
+different factory function, whose differing field set genuinely can't
+share one order. Believed already satisfied by existing architecture;
+flagged rather than silently assumed correct, since it wasn't
+separately live-verified this round.
+
+Item 6 ("read my git save settings, apply 'Click'/'Click Hold's own
+renamed+reordered layout as the new-function default, retrofit existing
+functions") investigated but NOT implemented this round -- real,
+concrete findings: after merging 3 concurrent live-save commits that
+landed mid-session, `data/processed/dev-panel-settings.json` confirmed
+`custom7`="CLICK" (textOverrides: `custom7Enabled`->"ON/ OFF",
+`custom7Type`->"Trigger Type", `custom7ClickCount`->"Trigger Count") and
+`custom8`="CLICK + HOLD", each with a real, deliberate reorder (e.g.
+custom7: TargetPose/TransitionSpeedMs/TweenSelector/TweenSpeedMs/
+PauseDurationMs pulled up front, Offset/Rotation moved to after
+PauseDurationMs instead of their default position right after Mode, the
+3 curve-based groups pushed to the very end). Deferred implementing the
+actual retrofit (would need a new DOM-reorder helper applying this exact
+sequence to every function/new-function-template, per kind) to a
+follow-up round given its own scope.
+
+`index.html`'s own `main.js` cache-buster bumped `?v=206` -> `?v=207`;
+`devPanel.js`'s own cache-buster (imported from `main.js`) bumped
+`?v=42` -> `?v=44` (`realDeviceClass()`/`applyTextOverrides()` both
+newly exported).
+
+Not live-verified this round (syntax-checked via `node --check` only,
+each edit batch) -- this sandbox's own documented main.js network-
+truncation gotcha was not worked around this round; live verification on
+the real Vercel deployment is the recommended next step before treating
+this round as fully confirmed.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

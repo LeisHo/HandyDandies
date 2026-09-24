@@ -18,6 +18,52 @@ work seamlessly from there.
 
 ## Currently working on
 
+**IN PROGRESS 2026-09-24 -- large 17-item Custom Click Functions round
+(device-scoped visibility, global Hold Confirm Delay, Retransition Speed
+Curve, Tween Stop restructure). 12 of 17 items fully shipped and
+committed (`2a7e284`); 2 investigated with concrete findings but not yet
+implemented; 1 partially fixed; 1 believed already satisfied but not
+separately verified. NOT yet live-verified on the real deployment.**
+
+Shipped: real device/tab gating for custom functions (a desktop-family
+function defaults OFF on Mobile/Landscape with a new "Show in Mobile/
+Landscape" opt-in; a mobile-family function is fully exclusive to
+Mobile/Landscape -- previously NOTHING gated actual trigger firing by
+device at all, only the dev-panel UI's own tab display); soft-delete
+(deleting a desktop-family function from Mobile/Landscape unchecks the
+opt-in instead of permanently removing it); one global `holdConfirmMs`
+control replacing the old per-function slider; Trigger All Hands
+removed; Touch Point Count independent-per-device; Zoom/Scroll
+thresholds + the internal Custom Function IDs row hidden appropriately;
+a new Retransition Speed Curve; Tween Stop rebuilt as its own group with
+2 real nested gated subgroups; a rename-survives-rebuild fix
+(`createGroupElement()` never reapplied a saved textOverride on its
+own); the Sequence-mode "duplicate Retransition settings" display bug
+fixed (Single-Pose and Tween retransition fields no longer show
+simultaneously).
+
+Not yet done: (1) "match Right Click/Right Click+Hold's settings/group
+naming+order to Click/Click Hold's own live-customized layout, retrofit
+existing functions" -- real reference data captured from the live
+settings JSON (`custom7`="CLICK", `custom8`="CLICK + HOLD", their exact
+renamed rows and reordered layout), implementation deferred to a
+follow-up round. (2) Whether Animation Speed Curve/Start Time Curve
+should gain functional Sequence-mode wiring (currently Single-Pose-only
+by original design; Tween mode's own speed has no curve-based
+equivalent to hook a matching group into) -- needs a decision before
+building, not guessed at. (3) Settings/group order being Type-independent
+(e.g. Scroll<->Zoom) -- traced through the code and believed already
+true (a same-kind Type switch never rebuilds the DOM at all), but not
+separately live-verified.
+
+Next step for a continuing session: live-verify this round on the real
+Vercel deployment (push already done), then take on the 2 deferred items
+above -- see CHANGELOG.txt's matching 2026-09-24 entry for full detail
+on every one of the 17 items, including the exact reference layout data
+for item (1).
+
+--------------------------------------------------------------------------------
+
 **SHIPPED 2026-09-22 (2nd round) -- debounced Multi-Point touch-
 threshold detection, so a lower Touch Point Count function no longer
 fires prematurely while fingers are still landing toward a higher one.**
