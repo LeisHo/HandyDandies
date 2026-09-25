@@ -1403,6 +1403,28 @@ const DEV_GROUPS = [
     ]
   },
   {
+    title: 'Quality / Performance',
+    controls: [
+      { key: 'pixelRatio', label: 'Device Pixel Ratio (x)', type: 'slider', min: 0.5, max: 3, step: 0.1, def: Math.min(window.devicePixelRatio || 1, 2), onChange: (v) => { qualityState.pixelRatio = v; applyQualityState() } },
+      { key: 'resolutionScale', label: 'Resolution Scale (%)', type: 'slider', min: 25, max: 100, step: 5, def: 100, onChange: (v) => { qualityState.resolutionScale = v / 100; applyRendererSize(window.innerWidth, window.innerHeight) } },
+      { key: 'qualityPreset', label: 'Quality Preset', type: 'select', def: 'high', options: [{ value: 'low', text: 'Low' }, { value: 'medium', text: 'Medium' }, { value: 'high', text: 'High' }, { value: 'ultra', text: 'Ultra' }], onChange: (v) => {
+        const QUALITY_PRESETS = {
+          low: { pixelRatio: 1, resolutionScale: 50 },
+          medium: { pixelRatio: 1, resolutionScale: 75 },
+          high: { pixelRatio: Math.min(window.devicePixelRatio || 1, 2), resolutionScale: 100 },
+          ultra: { pixelRatio: Math.min(window.devicePixelRatio || 1, 3), resolutionScale: 100 }
+        }
+        const preset = QUALITY_PRESETS[v]
+        if (!preset) return
+        syncValue('pixelRatio', preset.pixelRatio)
+        syncValue('resolutionScale', preset.resolutionScale)
+        qualityState.pixelRatio = preset.pixelRatio
+        qualityState.resolutionScale = preset.resolutionScale / 100
+        applyQualityState()
+      } }
+    ]
+  },
+  {
     title: 'Debug',
     controls: [
       { key: 'showGridHelper', label: 'Show Grid Helper', type: 'checkbox', def: false, onChange: (v) => { if (gridHelper) gridHelper.visible = v } },
@@ -1636,6 +1658,13 @@ renderer.outputColorSpace = THREE.SRGBColorSpace
 // section below) -- three.js ignores a material's own clippingPlanes
 // array unless this is set, per its own docs.
 renderer.localClippingEnabled = true
+
+// ---- Quality / Performance -----------
+const qualityState = { pixelRatio: Math.min(window.devicePixelRatio || 1, 2), resolutionScale: 1 }
+function applyQualityState() {
+    renderer.setPixelRatio(qualityState.pixelRatio)
+    applyRendererSize(window.innerWidth, window.innerHeight)
+}
 
 const scene = new THREE.Scene()
 scene.background = new THREE.Color(cfg.bgColor)
@@ -10084,9 +10113,11 @@ new GLTFLoader().load(
 function applyRendererSize(w, h) {
   camera.aspect = w / h
   camera.updateProjectionMatrix()
-  renderer.setSize(w, h)
-  composer.setSize(w, h)
-  outlinePass.resolution.set(w, h)
+  const scaledW = Math.max(1, Math.round(w * qualityState.resolutionScale))
+  const scaledH = Math.max(1, Math.round(h * qualityState.resolutionScale))
+  renderer.setSize(scaledW, scaledH)
+  composer.setSize(scaledW, scaledH)
+  outlinePass.resolution.set(scaledW, scaledH)
 }
 window.addEventListener('resize', () => applyRendererSize(window.innerWidth, window.innerHeight))
 
