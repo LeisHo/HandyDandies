@@ -24,7 +24,7 @@ function safeRefreshMultiSelectOptions(key) {
   try { refreshMultiSelectOptions(key) } catch (err) { console.error(`safeRefreshMultiSelectOptions('${key}') failed`, err) }
 }
 
-const MODEL_URL = '../data/processed/HAND3D/Hand2.glb'
+const MODEL_URL = '../data/processed/HAND3D/HandyOL.glb'
 // Measured once after the first load -- the rig's own bind-pose "pointing"
 // axis (wrist -> middle fingertip), not assumed to be +Y/-Z.
 let alignQuat = new THREE.Quaternion()
@@ -409,7 +409,7 @@ function tryStartField() {
 }
 setTimeout(() => { logStartupTiming('startupSettingsReady = true (6000ms fallback timeout)'); startupSettingsReady = true; tryStartField() }, 6000)
 let framedOnce = false // camera/lighting/target-plane are framed ONCE, on first build -- Field Layout changes must never re-trigger this (direct request)
-const hands = [] // { wrapper: Group, clone: Object3D, skinnedMesh: SkinnedMesh|null, outlineMesh: Mesh|null }
+const hands = [] // { wrapper: Group, clone: Object3D, skinnedMesh: SkinnedMesh|null, outlineMesh: Mesh|null, emissionMesh: SkinnedMesh|null }
 const sceneState = { fieldRadius: 10 }
 
 const UP = new THREE.Vector3(0, 1, 0)
@@ -1375,7 +1375,15 @@ const DEV_GROUPS = [
     title: 'Outline',
     controls: [
       { key: 'outlineEnabled', label: 'Outline Enabled', type: 'checkbox', def: false, onChange: () => updateOutlineVisibility() },
-      { key: 'useOutlinePass', label: 'Use OutlinePass (Screen-Space)', type: 'checkbox', def: false, onChange: () => updateOutlineVisibility() },
+      // CORRECTED 2026-09-24 (direct request): the old `useOutlinePass`
+      // checkbox only ever chose between 2 techniques, and showed BOTH
+      // techniques' own settings at once regardless of which was active
+      // ("I do not want to see the negative hull sliders and the outline
+      // pass sliders at the same time"). Replaced with a 3-way dropdown
+      // (a 3rd technique, Emission Material, added the same round -- see
+      // ensureEmissionMaterial()'s own comment) with real row-level gating,
+      // all handled inside updateOutlineVisibility() below.
+      { key: 'outlineMechanic', label: 'Outline Mechanic', type: 'select', def: 'Negative Hull', options: () => ['Outline Pass', 'Negative Hull', 'Emission Material'], onChange: () => updateOutlineVisibility() },
       { key: 'outlineColor', label: 'Outline Color', type: 'color', def: '#000000', onChange: (v) => {
         forEachOutlineMaterial((m) => m.uniforms.outlineColor.value.set(v))
         if (outlinePass) { outlinePass.visibleEdgeColor.set(v); outlinePass.hiddenEdgeColor.set(v) }
@@ -1383,7 +1391,9 @@ const DEV_GROUPS = [
       { key: 'hullThickness', label: 'Hull Outline Thickness (% Of Hand Length)', type: 'slider', min: 0, max: 6, step: 0.05, def: 6, onChange: (v) => forEachOutlineMaterial((m) => { m.uniforms.outlineThickness.value = (v / 100) * handLengthRaw }) },
       { key: 'passThickness', label: 'Pass Edge Thickness (Px)', type: 'slider', min: 0.5, max: 15, step: 0.1, def: 0.9, onChange: (v) => { if (outlinePass) outlinePass.edgeThickness = v } },
       { key: 'passStrength', label: 'Pass Edge Strength (x)', type: 'slider', min: 0, max: 15, step: 0.5, def: 15, onChange: (v) => { if (outlinePass) outlinePass.edgeStrength = v } },
-      { key: 'passGlow', label: 'Pass Edge Glow (x)', type: 'slider', min: 0, max: 5, step: 0.1, def: 0, onChange: (v) => { if (outlinePass) outlinePass.edgeGlow = v } }
+      { key: 'passGlow', label: 'Pass Edge Glow (x)', type: 'slider', min: 0, max: 5, step: 0.1, def: 0, onChange: (v) => { if (outlinePass) outlinePass.edgeGlow = v } },
+      { key: 'emissionColor', label: 'Emission Color', type: 'color', def: '#ffffff', onChange: (v) => forEachEmissionMaterial((m) => m.emissive.set(v)) },
+      { key: 'emissionIntensity', label: 'Emission Intensity (x)', type: 'slider', min: 0, max: 5, step: 0.1, def: 1.5, onChange: (v) => forEachEmissionMaterial((m) => { m.emissiveIntensity = v }) }
     ]
   },
   {
@@ -2047,6 +2057,14 @@ function forEachOutlineMaterial(fn) {
   if (outlineMaterial) fn(outlineMaterial)
   hands.forEach((h) => { if (h.outlineMesh && h.outlineMesh.material !== outlineMaterial) fn(h.outlineMesh.material) })
 }
+// Emission Material outline mechanic (2026-09-24, direct request) -- reuses
+// this same "shared base + every hand's own clone" pattern, but the base
+// material here is a plain THREE.MeshStandardMaterial (see
+// ensureEmissionMaterial() below), not a ShaderMaterial like outlineMaterial.
+function forEachEmissionMaterial(fn) {
+  if (emissionMaterial) fn(emissionMaterial)
+  hands.forEach((h) => { if (h.emissionMesh && h.emissionMesh.material !== emissionMaterial) fn(h.emissionMesh.material) })
+}
 function makeGradientTexture(steps, shadowFloor, lightCeiling, threshold) {
   const size = Math.max(2, Math.round(steps))
   const data = new Uint8Array(size * 4)
@@ -2230,12 +2248,67 @@ function buildOutlineMesh(sourceMesh) {
   mesh.material = ensureOutlineMaterial().clone()
   return mesh
 }
+// Emission Material outline mechanic (2026-09-24, direct request: "for
+// outline mechanic, provide me a dropdown selector for the Outline Pass,
+// Negative Hull, and the Emission Material within the new model") -- unlike
+// the 2 techniques above, this one does NOT synthesize its own mesh; it
+// reuses the 2nd, already-separate skinned-mesh primitive HandyOL.glb ships
+// with (GLTF material name "OUTLINE" -- see findOutlineMaterialMesh()) and
+// just swaps in a self-illuminating material for it. Plain
+// MeshStandardMaterial (not a custom ShaderMaterial like outlineMaterial
+// above) -- `emissive`/`emissiveIntensity` alone gives a flat, lighting-
+// independent glow, which is the whole point of this technique as a
+// visually distinct alternative to the flat-color hull shader and the
+// screen-space OutlinePass. `color` stays black so the base (non-emissive)
+// PBR shading contributes nothing -- only the emissive term shows.
+// depthTest/depthWrite stay ON (the default), same per-hand self-occlusion
+// convention as toonMaterial/outlineMaterial (see createToonMaterial()'s
+// own note) -- this mesh gets the same clippingPlanes + onBeforeRender
+// depth-clear treatment as outlineMesh in rebuildField() below.
+let emissionMaterial = null
+function ensureEmissionMaterial() {
+  if (!emissionMaterial) {
+    emissionMaterial = new THREE.MeshStandardMaterial({
+      color: 0x000000,
+      emissive: new THREE.Color(cfg.emissionColor),
+      emissiveIntensity: cfg.emissionIntensity,
+      clippingPlanes: []
+    })
+  }
+  return emissionMaterial
+}
 function updateOutlineVisibility() {
-  const hullVisible = cfg.outlineEnabled && !cfg.useOutlinePass
-  const passOn = cfg.outlineEnabled && cfg.useOutlinePass
-  hands.forEach((h) => { if (h.outlineMesh) h.outlineMesh.visible = hullVisible })
+  const mech = cfg.outlineMechanic
+  const hullVisible = cfg.outlineEnabled && mech === 'Negative Hull'
+  const passOn = cfg.outlineEnabled && mech === 'Outline Pass'
+  const emissionVisible = cfg.outlineEnabled && mech === 'Emission Material'
+  hands.forEach((h) => {
+    if (h.outlineMesh) h.outlineMesh.visible = hullVisible
+    if (h.emissionMesh) h.emissionMesh.visible = emissionVisible
+  })
   outlinePass.enabled = passOn
   outlinePass.selectedObjects = passOn ? hands.map((h) => h.skinnedMesh).filter(Boolean) : []
+  // Dev-panel row gating -- only the active mechanic's own settings show at
+  // once (direct request: "I do not want to see the negative hull sliders
+  // and the outline pass sliders at the same time"). Folded into this same
+  // function (rather than a separately-wired sibling) since every path that
+  // needs this re-evaluated -- outlineMechanic's own onChange, the master
+  // Enabled checkbox, and every rebuildField() -- already calls
+  // updateOutlineVisibility() today.
+  const setRow = (key, visible) => {
+    const row = document.querySelector(`.dp-row[data-key="${key}"]`)
+    if (row) row.style.display = visible ? '' : 'none'
+  }
+  setRow('hullThickness', mech === 'Negative Hull')
+  setRow('passThickness', mech === 'Outline Pass')
+  setRow('passStrength', mech === 'Outline Pass')
+  setRow('passGlow', mech === 'Outline Pass')
+  setRow('emissionColor', mech === 'Emission Material')
+  setRow('emissionIntensity', mech === 'Emission Material')
+  // outlineColor is shared between Outline Pass and Negative Hull only --
+  // Emission Material has its own, separate emissionColor (see this
+  // group's own §12n "split by variant, not a shared value" reasoning).
+  setRow('outlineColor', mech !== 'Emission Material')
 }
 // Field Layout's own "Hide Hands" checkbox -- toggles each hand's whole
 // wrapper Group (fill mesh + outline mesh + everything else parented to
@@ -9767,6 +9840,18 @@ function rebuildField() {
     }
     const outlineMesh = skinnedMesh ? buildOutlineMesh(skinnedMesh) : null
     if (outlineMesh) { outlineMesh.material.clippingPlanes = [handWristClipPlane]; clone.add(outlineMesh) }
+    // Emission Material outline mechanic (2026-09-24) -- unlike outlineMesh
+    // above, this mesh is NOT built here; it's HandyOL.glb's own 2nd
+    // skinned primitive, already a child of `clone` from the GLTF load
+    // itself (see findOutlineMaterialMesh()'s own comment) -- just give it
+    // its own per-hand material/clippingPlanes, same as the fill mesh.
+    // `null` on any model without an 'OUTLINE' material (e.g. Hand2.glb).
+    const emissionMesh = findOutlineMaterialMesh(clone)
+    if (emissionMesh) {
+      emissionMesh.material = ensureEmissionMaterial().clone()
+      emissionMesh.material.clippingPlanes = [handWristClipPlane]
+      emissionMesh.visible = false // updateOutlineVisibility() (below) decides the real state
+    }
     // Depth-buffer-per-hand technique: both materials keep depthTest ON
     // (see createToonMaterial()'s own note) so a hand's own geometry
     // self-occludes correctly, but the depth buffer is wiped immediately
@@ -9807,7 +9892,7 @@ function rebuildField() {
     // it explicitly: false until a hand's first REAL repose, forcing
     // exactly one guaranteed full sync regardless of the gate's other
     // conditions, then never forced again.
-    const hand = { wrapper, clone, skinnedMesh, outlineMesh, wristClipPlane: handWristClipPlane, effectiveRenderOrder: 0, screenX: 0, screenY: 0, screenRadius: 0, currentBaseQuat: cloneBaseQuat.clone(), everReposed: false }
+    const hand = { wrapper, clone, skinnedMesh, outlineMesh, emissionMesh, wristClipPlane: handWristClipPlane, effectiveRenderOrder: 0, screenX: 0, screenY: 0, screenRadius: 0, currentBaseQuat: cloneBaseQuat.clone(), everReposed: false }
     // Also recomputes this hand's OWN Hide Wrist clip plane right before
     // it draws (see updateWristClipPlaneForHand()'s own comment) -- every
     // hand faces a different direction and (own material/plane now, see
@@ -9815,6 +9900,7 @@ function rebuildField() {
     // other hand.
     if (skinnedMesh) skinnedMesh.onBeforeRender = (r) => { updateWristClipPlaneForHand(hand); r.clearDepth() }
     if (outlineMesh) outlineMesh.onBeforeRender = (r) => { updateWristClipPlaneForHand(hand); r.clearDepth() }
+    if (emissionMesh) emissionMesh.onBeforeRender = (r) => { updateWristClipPlaneForHand(hand); r.clearDepth() }
     hands.push(hand)
   }
   relayoutField()
@@ -9838,9 +9924,43 @@ function rebuildField() {
 // -----------------------------------------------------------------------
 // Load model
 // -----------------------------------------------------------------------
+// CORRECTED 2026-09-24 (HandyOL.glb model swap): this used to just return
+// whichever SkinnedMesh traverse() saw LAST, which was harmless while every
+// model here only ever had exactly one real skinned mesh (Hand2.glb's own
+// 'Cube.001' companion mesh has no material/skin, so it was never a
+// candidate). HandyOL.glb genuinely has 2 skinned primitives sharing one
+// mesh/skin -- 'Hand' (the real fill) and 'OUTLINE' (a 2nd, separately-
+// baked mesh for the new Emission Material outline mechanic, see
+// findOutlineMaterialMesh() below) -- so "last one found" is no longer a
+// safe assumption; depending on GLTFLoader's own primitive-to-node
+// ordering it could just as easily return the OUTLINE mesh, which the
+// original hide-everything-but-`skinned` line right after this function's
+// own call site would then wrongly treat as the ONLY visible mesh. Fixed
+// to prefer a mesh whose material is explicitly named 'Hand', falling back
+// to the old "last SkinnedMesh found" behavior only when no such match
+// exists (keeps this fully backward-compatible with Hand2.glb, or any
+// future model with a single, differently-named skinned mesh).
 function findSkinnedMesh(root) {
+  let byHandMaterial = null
+  let anyFound = null
+  root.traverse((obj) => {
+    if (!obj.isSkinnedMesh) return
+    anyFound = obj
+    if (obj.material && obj.material.name === 'Hand') byHandMaterial = obj
+  })
+  return byHandMaterial || anyFound
+}
+// New mesh finder (2026-09-24, Emission Material outline mechanic) --
+// locates HandyOL.glb's own 2nd skinned primitive (GLTF material name
+// 'OUTLINE') so it can be given a self-illuminating material at runtime
+// instead of a made-from-scratch mesh (contrast buildOutlineMesh() above,
+// which clones the FILL mesh's own geometry for the Negative Hull
+// technique). Returns null for a model with no such material (e.g. the
+// older Hand2.glb) -- callers already guard on this, so Emission Material
+// simply has nothing to show rather than throwing.
+function findOutlineMaterialMesh(root) {
   let found = null
-  root.traverse((obj) => { if (obj.isSkinnedMesh) found = obj })
+  root.traverse((obj) => { if (obj.isSkinnedMesh && obj.material && obj.material.name === 'OUTLINE') found = obj })
   return found
 }
 
@@ -10565,6 +10685,7 @@ function updateRenderOrder() {
       : live
     if (hand.skinnedMesh) hand.skinnedMesh.renderOrder = hand.effectiveRenderOrder
     if (hand.outlineMesh) hand.outlineMesh.renderOrder = hand.effectiveRenderOrder - 0.001
+    if (hand.emissionMesh) hand.emissionMesh.renderOrder = hand.effectiveRenderOrder - 0.001
     // Arm Length (Hide Wrist) -- reuses this same live cursor-distance
     // value (`live`, unsmoothed -- Reactive mode intentionally tracks the
     // cursor instantly, no reason to inherit Reordering Flash's own
