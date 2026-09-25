@@ -24,7 +24,7 @@ function safeRefreshMultiSelectOptions(key) {
   try { refreshMultiSelectOptions(key) } catch (err) { console.error(`safeRefreshMultiSelectOptions('${key}') failed`, err) }
 }
 
-const MODEL_URL = '../data/processed/HAND3D/HandyOL.glb'
+const MODEL_URL = '../data/processed/HAND3D/HandipantsOL.glb'
 // Measured once after the first load -- the rig's own bind-pose "pointing"
 // axis (wrist -> middle fingertip), not assumed to be +Y/-Z.
 let alignQuat = new THREE.Quaternion()
