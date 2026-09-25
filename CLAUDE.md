@@ -28,13 +28,13 @@ asset lives at
 `logs/`, `results/`, `tests/` are empty standard-skeleton folders, not yet
 used. See `docs/CODE_SUMMARY.txt` for the full architecture writeup.
 
-**CORRECTED 2026-09-24 — the rigged hand asset is now
-`data/processed/HAND3D/HandyOL.glb`** (direct request to swap models).
-`Hand2.glb` (originally copied from HANDO's own
-`data/HAND3D/HAND-021/Hand2.glb`) is kept in place, unreferenced, per
+**CORRECTED 2026-09-25 — the rigged hand asset is now
+`data/processed/HAND3D/HandipantsOL.glb`** (direct request to swap models).
+Previous model `HandyOL.glb` and original `Hand2.glb` (copied from HANDO's own
+`data/HAND3D/HAND-021/Hand2.glb`) are kept in place, unreferenced, per
 this workspace's "nothing gets deleted by default" convention (parent
 `CLAUDE.md` §11) — not a live fallback, just provenance. See this file's
-own Gotchas for 2 real, load-bearing differences the new model
+own Gotchas for 2 real, load-bearing differences the earlier model
 introduced (a 2nd skinned primitive `findSkinnedMesh()` had to be taught
 to disambiguate, and a severe polycount jump that crashes the WebGL
 context at this project's default field size).
