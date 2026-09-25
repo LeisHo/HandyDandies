@@ -28,6 +28,17 @@ asset lives at
 `logs/`, `results/`, `tests/` are empty standard-skeleton folders, not yet
 used. See `docs/CODE_SUMMARY.txt` for the full architecture writeup.
 
+**CORRECTED 2026-09-24 — the rigged hand asset is now
+`data/processed/HAND3D/HandyOL.glb`** (direct request to swap models).
+`Hand2.glb` (originally copied from HANDO's own
+`data/HAND3D/HAND-021/Hand2.glb`) is kept in place, unreferenced, per
+this workspace's "nothing gets deleted by default" convention (parent
+`CLAUDE.md` §11) — not a live fallback, just provenance. See this file's
+own Gotchas for 2 real, load-bearing differences the new model
+introduced (a 2nd skinned primitive `findSkinnedMesh()` had to be taught
+to disambiguate, and a severe polycount jump that crashes the WebGL
+context at this project's default field size).
+
 ## Untouchable systems
 
 None formally designated yet.
@@ -1005,3 +1016,49 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   with no real-device measurement behind them -- if Zoom/Scroll fire too
   eagerly or too reluctantly on a real report, tune these first before
   suspecting the classification logic itself.
+- **`findSkinnedMesh(root)` used to just return whichever SkinnedMesh
+  `root.traverse()` happened to visit LAST -- safe only by coincidence,
+  as long as a model has exactly one real skinned mesh.** Confirmed as a
+  real, would-have-shipped-silently bug while swapping in `HandyOL.glb`
+  2026-09-24: that model's single mesh has TWO skinned primitives
+  sharing one skin (material "Hand" = the real fill, material "OUTLINE"
+  = a 2nd mesh for the Emission Material outline mechanic, see below) --
+  "last one found" could just as easily have returned the OUTLINE mesh,
+  which the model-load code's own `root.traverse((obj) => { if
+  (obj.isMesh && obj !== skinned) obj.visible = false })` line would then
+  have treated as the ONLY visible mesh, hiding the real Hand fill
+  entirely. Caught by parsing the GLB's own JSON chunk directly (a tiny
+  Node script reading the glTF header + JSON chunk, no three.js needed)
+  BEFORE writing any loader code, per parent `CLAUDE.md` §0a's "read the
+  real source, don't guess" -- not caught live. Fixed: `findSkinnedMesh()`
+  now explicitly prefers a mesh whose `material.name === 'Hand'`,
+  falling back to the old "last found" behavior for any model without
+  one (keeps Hand2.glb, whose one skinned mesh is also named "Hand",
+  working unchanged). A future model with yet another naming convention
+  needs this function extended, not reverted.
+- **`HandyOL.glb` is roughly 40x denser than `Hand2.glb` and crashes the
+  WebGL context outright at this project's default 12x13 (156-hand)
+  field.** Measured directly on a live hand instance: the "Hand" fill
+  mesh has 474,498 vertices / 2,846,976 indices (~949,000 triangles) --
+  and the new "OUTLINE" mesh (see above) has the IDENTICAL count, so
+  every hand carries ~1.9M triangles even before the OUTLINE mesh is
+  ever made visible. Confirmed via console: `[frame-profile]` fps
+  collapsed from a normal 11.2 to 0.0 within seconds
+  (`avgComposerRender` reaching 35,244ms for ONE frame), followed by
+  `GL_INVALID_FRAMEBUFFER_OPERATION` warnings, a real
+  `THREE.WebGLProgram: Shader Error 1286 - VALIDATE_STATUS false` on the
+  new emission `MeshStandardMaterial`, and finally
+  `CONTEXT_LOST_WEBGL`/`WebGLRenderer: Context Lost`. Reproduces on a
+  completely fresh page load with Outline Enabled left at its own
+  default (off) -- this is NOT specific to the Emission Material
+  mechanic or anything code-side; it's the sheer vertex/triangle count
+  of the model itself at the existing default field size. Not fixed in
+  code (a real content/asset decision, not a bug -- see parent
+  `CLAUDE.md` §0a/§0b on why this was surfaced rather than silently
+  patched by, say, forcing a smaller default field size unasked). If a
+  future report describes poor performance, a black screen, or a
+  WebGL-context-lost error with this model in use, check the field's
+  hand count against this model's own polycount first -- it doesn't take
+  many hands at ~949K triangles each to exhaust a browser's GPU
+  resources. Needs either decimation/retopology of the model in the
+  user's own 3D tool, or a much smaller field size, to resolve.

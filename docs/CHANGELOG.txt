@@ -11413,6 +11413,90 @@ mechanics. Worth a live confirm on the next reload.
 `index.html`'s own `main.js` cache-buster bumped `?v=214` -> `?v=215`.
 
 --------------------------------------------------------------------------------
+
+2026-09-24 (7th round)
+
+Direct request: swap the hand model to a new asset
+(`data/processed/HAND3D/HandyOL.glb`), and replace the Outline group's
+old `useOutlinePass` checkbox with a 3-way dropdown -- Outline Pass,
+Negative Hull, Emission Material -- so only the active technique's own
+settings show at once ("I do not want to see the negative hull sliders
+and the outline pass sliders at the same time").
+
+Investigated the new GLB directly (parsing its JSON chunk by hand, not
+guessing from a summary, per CLAUDE.md §0a) before touching code: unlike
+Hand2.glb (one mesh, one skinned primitive), HandyOL.glb's single mesh
+has TWO skinned primitives sharing one skin -- material 0 named "Hand"
+(the real fill) and material 1 named "OUTLINE" (present but unconfigured
+in the GLB itself). This is a real, load-bearing difference:
+`findSkinnedMesh()` used to just return whichever SkinnedMesh
+`traverse()` happened to visit LAST -- harmless with exactly one real
+skinned mesh, but with 2 now present it could just as easily return the
+OUTLINE mesh as "the" skinned mesh, which the model-load code then
+would have treated as the ONLY visible mesh (hiding the real Hand fill
+entirely). Fixed to explicitly prefer a mesh whose material is named
+"Hand", falling back to the old "last found" behavior for any other
+model. New `findOutlineMaterialMesh()` locates the OUTLINE primitive by
+the same name-based approach, used for the new Emission Material
+technique below; called at all 4 real per-hand/per-preview clone sites
+that build a hand instance from `modelRoot`.
+
+Emission Material is a genuinely new 3rd technique (this GLB is the
+first model with an OUTLINE-material primitive at all) -- rather than
+reconstructing "what does Emission Material mean" from guesswork, it
+reuses the model's own already-separate OUTLINE mesh, giving it a
+`THREE.MeshStandardMaterial` with `emissive`/`emissiveIntensity` driven
+by 2 new sliders (Emission Color, Emission Intensity) instead of a
+synthesized shader mesh like Negative Hull. `updateOutlineVisibility()`
+now branches on `cfg.outlineMechanic` for all 3 techniques (hull mesh
+visibility, OutlinePass enable/selectedObjects, and the new emission
+mesh visibility) and, in the same function, hides/shows each
+technique's own dev-panel rows so exactly one battery is visible at a
+time -- folded into this one function rather than a separately-wired
+sibling, since it's already called from every place that needs the
+gating re-evaluated (the dropdown's own onChange, the master Enabled
+checkbox, and every `rebuildField()`).
+
+**Live-verified the code changes thoroughly, and found a real, serious
+asset-level problem in the process.** Every new mechanism was confirmed
+correct on the live deployment (`v216`): both `skinnedMesh` and
+`emissionMesh` populate on every one of 156 built hands; the dropdown
+renders with the right 3 options; switching between all 3 values
+correctly shows/hides exactly the right dev-panel rows (verified via
+`getComputedStyle().display` on all 7 gated rows across all 3
+selections); and enabling each mechanic in turn correctly toggles
+exactly the right runtime state (`outlineMesh.visible` /
+`emissionMesh.visible` / `outlinePass.enabled`, mutually exclusive in
+every case) -- no code bug found in any of this.
+
+**But HandyOL.glb's own geometry is roughly 40x denser than the model it
+replaces, and at this project's default 12x13 (156-hand) field, it
+crashes the WebGL context.** Measured directly on a live hand instance:
+`skinnedMesh` (the "Hand" fill) has 474,498 vertices / 2,846,976 indices
+(~949,000 triangles) -- and the OUTLINE mesh has the IDENTICAL count.
+That's ~1.9M triangles per hand before it's even multiplied by 156
+hands. Confirmed via the console: `[frame-profile]` logging showed fps
+collapsing from a normal 11.2 to 0.0 within seconds
+(`avgComposerRender` ballooning to 35,244ms for a single frame), followed
+by repeated `GL_INVALID_FRAMEBUFFER_OPERATION` warnings, a
+`THREE.WebGLProgram: Shader Error 1286 - VALIDATE_STATUS false` on the
+new MeshStandardMaterial, and finally `CONTEXT_LOST_WEBGL` /
+`WebGLRenderer: Context Lost`. This happened on a completely fresh page
+load with Outline Enabled left at its own default (false) -- i.e. the
+crash is NOT specific to the new Emission Material technique or
+anything this round's code touched; it reproduces from the sheer
+vertex/triangle count of the new model alone, at this project's existing
+default field size. Not something to silently "fix" by decimating the
+mesh in code (out of this round's scope, and a real content decision,
+not a bug) -- surfaced here per CLAUDE.md §0a/§0b instead of guessing at
+a remediation. The user's own 3D tool is where this needs decimating/
+retopologizing if this model is meant to run at the current default
+field size; a much smaller field (e.g. a handful of hands) would very
+likely be fine with the model exactly as-is in the meantime.
+
+`index.html`'s own `main.js` cache-buster bumped `?v=215` -> `?v=216`.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

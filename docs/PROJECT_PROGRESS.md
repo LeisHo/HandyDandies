@@ -18,6 +18,37 @@ work seamlessly from there.
 
 ## Currently working on
 
+**SHIPPED 2026-09-24 (7th round), with a real asset-level problem
+surfaced, not fixed -- swapped the hand model to `HandyOL.glb` and
+replaced the Outline group's checkbox with a 3-way "Outline Mechanic"
+dropdown (Outline Pass / Negative Hull / Emission Material, new this
+round), gating each technique's own settings so only one shows at a
+time.** `findSkinnedMesh()` had to be fixed first -- the new GLB has 2
+skinned primitives sharing one skin ("Hand" fill + a new "OUTLINE" one),
+and the old "last SkinnedMesh found" logic could have picked the wrong
+one as the visible mesh; now explicitly prefers the "Hand"-named
+material, with a matching `findOutlineMaterialMesh()` for the new
+Emission Material technique (renders the model's own OUTLINE mesh with
+an emissive `MeshStandardMaterial` instead of a synthesized shader
+mesh). All of this verified working correctly live on `v216` -- dropdown
+options, exclusive row-gating across all 3 selections, and exclusive
+runtime toggling (hull/pass/emission), no code bug found.
+
+**Real problem found during that same verification, disclosed rather
+than silently patched: HandyOL.glb is ~40x denser than the model it
+replaces (measured: ~949,000 triangles PER MESH, on both the Hand fill
+AND the OUTLINE mesh, per hand) and crashes the WebGL context
+(`CONTEXT_LOST_WEBGL`, fps collapsing from 11.2 to 0.0) at this
+project's default 12x13 (156-hand) field -- reproduces with Outline
+Enabled left at its own default off, so it's not specific to Emission
+Material or anything else this round touched. This needs a decision from
+the user: decimate/retopologize the model in their own 3D tool, or run a
+much smaller field with it as-is for now.** `main.js` cache-buster
+`?v=215` -> `?v=216`. See CHANGELOG.txt's 2026-09-24 (7th round) entry
+for the full investigation (including why parsing the GLB's own JSON
+chunk directly, not guessing from a summary, is what caught the
+`findSkinnedMesh()` risk before it shipped as a visual bug).
+
 **SHIPPED 2026-09-24 (6th round) -- fixed the "Right Click" custom
 function's Start Time Curve group having no on/off checkbox in Sequence
 mode; the "can't be interrupted" half of the same report was live-
