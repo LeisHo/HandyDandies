@@ -1090,3 +1090,35 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   `e.button === 2`, which the trigger reads directly, and
   `customFunctionTypeOptions()` only offers those 2 types for
   desktop-family functions in the first place.
+- **CORRECTED 2026-09-26, same day -- the theory directly above was
+  wrong for the actual device in question. The real device is a Pixel
+  9a on Chrome, not iOS Safari** (direct correction from the user); the
+  `-webkit-touch-callout`/`-webkit-user-select` fix targets a
+  Safari-only mechanism and does nothing on Chrome. Left in place as a
+  harmless no-op there, but it was never the real fix for this report --
+  left uncorrected above (per this file's own convention: add a
+  correction, don't silently rewrite a prior entry) as a caution against
+  assuming a fix that "should" work cross-platform actually does. **The
+  real Chrome/Android mechanism: a sustained, non-moving touch on ANY
+  element is treated as a long-press-equals-right-click gesture** --
+  after Chrome's own internal delay (landing right around this file's
+  own `holdConfirmMs` default of ~500ms), it dispatches a synthetic
+  `contextmenu` event and, if not prevented, opens the native context
+  menu and fires `pointercancel` on the in-flight touch, ending the
+  pointer sequence before or right as `holdConfirmMs` elapses -- this is
+  standard, documented Chrome/Android behavior (the touch equivalent of
+  a right-click, deliberately exposed so pages can implement their own
+  long-press context menus), not guessed. Confirmed via direct grep
+  that nothing in the file previously prevented `contextmenu` at the
+  viewport/window level (only 3 curve-widget dot handlers did, for an
+  unrelated desktop right-click-to-delete feature). Fixed with
+  `canvas.addEventListener('contextmenu', e => e.preventDefault())` on
+  `#viewport`. **If a future mobile report says a sustained-touch
+  gesture "does nothing" while a quick tap works, check which platform
+  is actually being tested FIRST (Chrome/Android vs. Safari/iOS use
+  completely different native mechanisms for this exact symptom class --
+  `-webkit-touch-callout` for one, `contextmenu`+`pointercancel` for the
+  other) before assuming either fix from this file's own history
+  applies.** Not live-verified -- this sandbox hit its own documented
+  `main.js` network-truncation quirk across 5 retries (the standing cap)
+  this round; needs the user's real Pixel 9a to confirm.
