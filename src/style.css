@@ -10,11 +10,28 @@ html, body {
   font-family: system-ui, sans-serif;
 }
 
+/* CORRECTED 2026-09-26 -- direct report: "click functions work on
+   desktop, but... Click+Hold... nothing happens at all" on a real
+   mobile touchscreen, while a plain quick tap (Click type) worked fine.
+   `touch-action: none` alone stops the browser's own scroll/pinch-zoom,
+   but does NOT stop iOS Safari's native long-press callout/selection
+   gesture, which can fire around the same ~300-500ms mark this file's
+   own `holdConfirmMs` checks -- cancelling the in-flight pointer
+   sequence exactly when a real Click+Hold gesture needs it to survive,
+   while a quick tap (well under that threshold) is unaffected. The full
+   3-property combination below is the proven, evidence-based fix for
+   this ("confirmed via real device testing" per HANDYSET's own
+   `.dev-header` comment, the same workspace's touch-drag header bar,
+   which needed the exact same trio for reliable sustained touch on iOS
+   Safari) -- `touch-action` alone was not enough there either. */
 #viewport {
   display: block;
   width: 100vw;
   height: 100vh;
   touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 
 #loading {
