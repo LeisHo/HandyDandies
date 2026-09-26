@@ -11497,6 +11497,61 @@ likely be fine with the model exactly as-is in the meantime.
 `index.html`'s own `main.js` cache-buster bumped `?v=215` -> `?v=216`.
 
 --------------------------------------------------------------------------------
+2026-09-26
+
+Direct report: click functions work on desktop, but not on real mobile
+touch. The user's own description of the failure shifted across several
+messages before it was pinned down -- "works in dev mode, not out of
+it" -> "works with dev panel open, not minimized" -> "minimizing is
+on and off, single click works, none of the others do" -- each
+correction discarded a hypothesis I'd have otherwise chased (a
+dev-mode-gated settings-restore path, a panel-collapse-state gate),
+none of which turned out to be the real cause. Used AskUserQuestion
+once the description had shifted 3+ times, since the remaining
+uncertainty (what actually happens on a real touchscreen) is something
+only the user can observe. Answers: the failing type is Click+Hold
+specifically; the observed behavior is "nothing happens at all" (no
+pose change, no visual feedback) on press-and-hold.
+
+Traced the full trigger chain for Click+Hold on mobile
+(`customFunctionActiveForDeviceFamily()`, `currentDeviceFamily()`,
+`triggerCustomPoseFunctions()`, `restoreCustomClickFunctions()`, the
+`pointerdown`/`pointerup` listeners on `window`) -- no explicit
+`pointerType` exclusion anywhere, and no code-level gating bug found.
+Also confirmed, separately, that "Right Click"/"Right Click+Hold" type
+functions can never work via touch at all -- `customFunctionTypeOptions()`
+only offers those 2 types for desktop-family functions, and the trigger
+reads `e.button === 2` directly, which no touch gesture can produce.
+This is architectural, not a bug; nothing to fix.
+
+For the real Click+Hold failure: `#viewport` had `touch-action: none`
+only. That stops the browser's own scroll/pinch-zoom, but does not stop
+iOS Safari's native long-press callout/text-selection gesture, which
+can fire around the same ~300-500ms mark this file's own `holdConfirmMs`
+checks for -- cancelling the in-flight pointer sequence right when a
+real Click+Hold gesture needs it to survive, while a quick tap (well
+under that threshold) is unaffected. This is not a guess: this exact
+workspace already has a real-device-confirmed fix for the identical
+symptom on a different sustained-touch interaction -- HANDYSET's own
+`.dev-header` CSS rule uses the same 3-property combination with the
+comment "confirmed via real device testing" for its own touch-drag
+header bar, which needed the identical trio for reliable sustained
+touch on iOS Safari. Added `user-select: none` / `-webkit-user-select:
+none` / `-webkit-touch-callout: none` alongside the existing
+`touch-action: none` on `#viewport`.
+
+Not live-verified on a real device -- this sandbox's browser-automation
+tool cannot reproduce iOS Safari's native long-press callout/cancellation
+behavior (a real touchscreen gesture, not something a synthetic
+pointerdown/pointerup pair reproduces), and this project's own CLAUDE.md
+already documents that tool's history of unreliable touch/viewport
+emulation here. Disclosed to the user as evidence-based but pending
+their own real-device retest, per CLAUDE.md §0c/§8.
+
+`src/style.css`'s `#viewport` rule updated; `index.html`'s own
+`style.css` cache-buster bumped `?v=21` -> `?v=22`.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

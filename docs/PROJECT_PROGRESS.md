@@ -18,6 +18,30 @@ work seamlessly from there.
 
 ## Currently working on
 
+**SHIPPED 2026-09-26, pending the user's own real-device retest --
+fixed Click+Hold custom functions doing "nothing at all" on real mobile
+touch.** `#viewport` had `touch-action: none` only, which stops browser
+scroll/pinch-zoom but not iOS Safari's own native long-press callout/
+selection gesture -- that gesture can fire around the same ~300-500ms
+mark this file's `holdConfirmMs` checks for, cancelling the in-flight
+pointer sequence exactly when a Click+Hold needs it to survive (a quick
+tap, well under that threshold, is unaffected -- matching the reported
+"single click works, the others don't"). Added the same 3-property
+combination (`user-select`/`-webkit-user-select`/`-webkit-touch-callout:
+none`) HANDYSET's own `.dev-header` already uses, with a comment
+there saying it's "confirmed via real device testing" for an analogous
+sustained-touch interaction in this same workspace -- evidence-based,
+not a guess. Separately confirmed as architectural, not a bug: "Right
+Click"/"Right Click+Hold" functions can never work via touch at all
+(no touch equivalent to a right mouse button; the trigger reads
+`e.button === 2` directly). Not live-verified here -- this sandbox's
+browser tool cannot reproduce iOS Safari's native long-press
+cancellation; needs the user's own phone to confirm. `src/style.css`'s
+`#viewport` rule updated; `style.css` cache-buster `?v=21` -> `?v=22`.
+See CHANGELOG.txt's 2026-09-26 entry for the full investigation,
+including how the user's own description of the bug shifted 3+ times
+before AskUserQuestion pinned down the actual failing case.
+
 **SHIPPED 2026-09-24 (7th round), with a real asset-level problem
 surfaced, not fixed -- swapped the hand model to `HandyOL.glb` and
 replaced the Outline group's checkbox with a 3-way "Outline Mechanic"
@@ -2674,6 +2698,13 @@ still relevant to understanding current state, per this doc's own
   "Currently working on" above and CHANGELOG.txt for the full account.
 
 ## What's next
+
+**Awaiting the user's real-device retest of the Click+Hold mobile fix
+(see "Currently working on")** -- the iOS long-press-callout theory is
+evidence-based (matches a real-device-confirmed fix for the identical
+symptom elsewhere in this workspace) but genuinely unverified here; this
+sandbox's browser tool cannot reproduce the native long-press
+cancellation the fix targets.
 
 **Awaiting the user's real-device confirmation of the corrected curl-axis
 math (see "Currently working on") -- the strongest evidence yet that this

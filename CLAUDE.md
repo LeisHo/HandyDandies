@@ -1062,3 +1062,31 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   many hands at ~949K triangles each to exhaust a browser's GPU
   resources. Needs either decimation/retopology of the model in the
   user's own 3D tool, or a much smaller field size, to resolve.
+- **`touch-action: none` alone does NOT stop iOS Safari's native long-
+  press callout/text-selection gesture -- that gesture can cancel an
+  in-flight pointer sequence right around the same threshold a "hold"
+  gesture needs, indistinguishable from "Click+Hold does nothing at
+  all" while a plain quick tap (Click) works fine.** Confirmed 2026-09-26
+  via direct report ("click functions work on desktop... the same
+  functions dont seem to work on mobile" -- narrowed over several
+  corrections to specifically Click+Hold, "nothing happens at all" on
+  press-and-hold). `#viewport` only had `touch-action: none`; fixed by
+  adding `user-select: none` / `-webkit-user-select: none` /
+  `-webkit-touch-callout: none` alongside it -- the same 3-property
+  combination HANDYSET's own `.dev-header` CSS rule already uses, with
+  that file's own comment stating it's "confirmed via real device
+  testing" for an analogous sustained-touch-drag interaction in this
+  same workspace. NOT live-verified here -- this sandbox's browser-
+  automation tool cannot reproduce a real iOS long-press cancellation;
+  confidence rests on that cross-project precedent, not a fresh
+  real-device test of THIS fix. If a future report describes any other
+  sustained-touch gesture (a drag, a different hold-type interaction)
+  "doing nothing" specifically on mobile while a quick tap/click works,
+  check for this exact gap (missing `-webkit-touch-callout`/
+  `-webkit-user-select`) before assuming the gesture-detection logic
+  itself is broken. Also confirmed, separately, as architectural and
+  NOT a bug: "Right Click"/"Right Click+Hold" custom functions can
+  never work via touch at all -- no touch gesture produces
+  `e.button === 2`, which the trigger reads directly, and
+  `customFunctionTypeOptions()` only offers those 2 types for
+  desktop-family functions in the first place.
