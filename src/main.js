@@ -6854,6 +6854,34 @@ window.addEventListener('pointerdown', (e) => {
   if (e.button === 0) { startClickHoldPose('chp'); startCustomHoldFunctions('Click+Hold') }
   else if (e.button === 2) { startClickHoldPose('rchp'); startCustomHoldFunctions('Right Click+Hold') }
 })
+// CORRECTED 2026-09-26 -- direct correction from the user: the device
+// actually being tested is a Pixel 9a on Chrome, not iOS Safari. The
+// `-webkit-touch-callout`/`-webkit-user-select` fix added earlier the
+// same day (see style.css's #viewport comment) targets a Safari-only
+// mechanism and does nothing on Chrome -- it's harmless to leave in
+// place (a no-op there) but was not the real fix for this report.
+// Chrome for Android's own long-press gesture recognizer treats a
+// sustained, non-moving touch on ANY element (not just links/images) as
+// a "long press = right click" gesture: after its own internal delay
+// (commonly landing right around the same ~500ms ballpark as this
+// file's own `holdConfirmMs` default), it dispatches a synthetic
+// `contextmenu` event and, if that event's default isn't prevented,
+// opens the native context menu AND fires `pointercancel` on the
+// in-flight touch -- ending the pointer sequence started in the
+// listener above before (or right as) `holdConfirmMs` elapses. This is
+// standard, documented Chrome/Android behavior (the touch equivalent of
+// a right-click, deliberately exposed so pages CAN implement their own
+// context-menu-on-long-press) -- not guessed from first principles.
+// Nothing in this file previously prevented `contextmenu` at the
+// viewport/window level (only 3 curve-widget dot handlers did, for an
+// unrelated desktop right-click-to-delete feature), so every Click+Hold
+// long-press on Android Chrome was being silently claimed and cancelled
+// by this mechanism -- exactly matching "quick tap works, hold does
+// nothing at all." Preventing it here also happens to stop the native
+// context menu from popping up over a desktop Right Click function's
+// own gesture, a small side benefit of the same fix, not a separate
+// change.
+canvas.addEventListener('contextmenu', (e) => e.preventDefault())
 // Direct user report ("for click hold, when i release, it seems to
 // trigger the correct release, but then it calls it again. I suspect it
 // is click hold interferring with click triggers" -- correct diagnosis):
