@@ -18,6 +18,24 @@ work seamlessly from there.
 
 ## Currently working on
 
+**SHIPPED 2026-09-27 (4th round) -- fixed dev panel still feeling slow
+while Global Pause is on.** Same class of bug the 2026-09-21 fix already
+solved for `composer.render()`, just a different function that fix never
+touched: `syncCameraPanelFromLive()` ran 5 `syncValue()` calls every
+single `animate()` tick, unconditionally (deliberate -- camera panel-sync
+stays live while paused) and unthrottled. Each `syncValue()` runs
+devPanel.js's `findCtrl()`, a linear scan over every registered control
+(confirmed by reading its source) -- with this project's real control
+count (every custom function's own ~30-control battery, Multi Trigger
+adding more per trigger, every Rendering Style), that's a real per-frame
+cost regardless of whether the camera moved. Fixed with a cheap "did
+this value change" cache, mirroring the exact guard pattern
+`armLengthWidgetResyncs`' own 6 callbacks already use elsewhere in this
+file (all 6 confirmed to already have it). Not independently verified
+live -- this sandbox's own documented GLB-truncation flakiness blocked a
+clean model load across 5 retries. `main.js` cache-buster `?v=221` ->
+`?v=222`. See CHANGELOG.txt's matching 2026-09-27 (4th round) entry.
+
 **SHIPPED 2026-09-27 (3rd round) -- ported `lib/visibility-tick-loop.js`
 from the sibling "3JS ENGINE" project: `animate()` now stops entirely
 (zero CPU/GPU cost) while this tab is hidden OR the browser window loses

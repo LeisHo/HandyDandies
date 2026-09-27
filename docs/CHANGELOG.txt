@@ -11963,6 +11963,64 @@ buster bumped `?v=220` -> `?v=221`.
 Commit: `2a29200`. Pushed to `https://github.com/LeisHo/HandyDandies`.
 
 --------------------------------------------------------------------------------
+2026-09-27 (4th round)
+
+Direct report: "when i ause the hands, how come the ui is still slow.
+its no longer animting" -- the same class of bug the 2026-09-21 fix
+already solved for `composer.render()` (see `animate()`'s own comment),
+just a different function that fix never touched.
+
+Traced `animate()`'s own body end to end looking for anything still
+running unconditionally and unthrottled while Global Pause is active.
+`controls.update()`/`enforceCameraPanExtent()`/`syncCameraPanelFromLive()`/
+`armLengthWidgetResyncs.forEach(...)` all run regardless of `isPaused`
+(deliberately, per that section's own existing comment -- camera
+navigation is user-driven, not "animation," so it should keep working
+while paused). Checked each: `armLengthWidgetResyncs`' own 6 registered
+callbacks (grepped every one directly) ALL already have a cheap
+`if (input.value === lastSeenValue) return` guard before doing any real
+work -- not the cost. `syncCameraPanelFromLive()` had NO such guard: 5
+`syncValue()` calls, every single tick, unconditionally. Each
+`syncValue()` runs devPanel.js's `findCtrl(key)`, confirmed by reading
+its source directly to be a **linear scan over every registered control
+across every group** -- with this project's real control count (every
+custom click function's own ~30-control battery, Multi Trigger adding
+MORE dynamically per trigger just added this same day, every Rendering
+Style, etc.), that's 5 full linear scans plus 5 real DOM writes
+(`displayValue()`'s slider branch), 60 times a second, competing with
+dev-panel input handling for main-thread time -- regardless of whether
+the camera moved at all. The 2026-09-21 fix never touched this because
+`composer.render()` was the dominant cost at the time; throttling that
+one revealed this one as the next-biggest -- the exact same "fix one
+bottleneck, reveal the next" pattern, not a new kind of bug.
+
+Fixed with a cheap "did this value actually change" cache
+(`__lastSyncedCameraX/Y/Z/Fov/Zoom`), mirroring the EXACT guard pattern
+`armLengthWidgetResyncs`' own 6 callbacks already use -- skips the
+scan+DOM-write entirely on the overwhelming majority of frames where the
+camera is stationary (i.e. essentially all of them while paused and not
+actively orbiting/panning), while still updating within one frame the
+instant the camera genuinely moves. No change to the deliberate
+"camera panel-sync stays live while paused" behavior itself.
+
+**Not independently verified live this round** -- this sandbox's own
+already-documented GLB-truncation flakiness (see this project's CLAUDE.md
+gotcha) blocked a clean model load across 5 retries (the standing cap),
+so `window.__debug` never populated and neither `camera`/`controls` nor
+`syncValue`/`findCtrl` were reachable to test directly. Confidence rests
+on: `node --check` passing, direct tracing of `findCtrl()` confirming
+the O(n) scan by reading its actual source, and this exact guard pattern
+already proven correct (and clearly intentional, not accidental) in 6
+other places in this same file.
+
+`main.js` cache-buster bumped `?v=221` -> `?v=222`.
+
+Commit: `4dcf050`. Pushed to `https://github.com/LeisHo/HandyDandies`.
+(Fast-forward pulled an unrelated concurrent `a5754bb`, "Update
+dev-panel-settings.json via Save Settings" -- the user's own live Save,
+touching only that JSON file -- before pushing this round.)
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

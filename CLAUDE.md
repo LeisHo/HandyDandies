@@ -894,6 +894,35 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   regardless of pause (so the frozen scene stays visible at all), which
   is exactly why it was never gated in the first place and needed a
   throttle instead of a skip.
+- **CORRECTED 2026-09-27 -- exactly the "future feature" scenario the
+  entry above's own closing advice warned about, just found on a
+  PRE-EXISTING function instead of a new one.** Direct report: "when i
+  ause the hands, how come the ui is still slow. its no longer
+  animting." `syncCameraPanelFromLive()` (5 `syncValue()` calls, every
+  `animate()` tick, unconditional -- deliberately not gated by
+  `isPaused`, since camera panel-sync is meant to stay live while
+  paused) was never touched by the 2026-09-21 fix above, because
+  `composer.render()` was the dominant cost at the time. Each
+  `syncValue()` runs devPanel.js's `findCtrl()`, a LINEAR SCAN over
+  every registered control across every group (confirmed by reading its
+  source) -- with this project's real control count (every custom click
+  function's own ~30-control battery, Multi Trigger adding more
+  per trigger, every Rendering Style), 5 scans + 5 real DOM writes 60
+  times a second, regardless of whether the camera moved, is a genuine
+  per-frame cost competing with dev-panel input handling. Fixed with a
+  cheap "did this value change" cache (`__lastSyncedCameraX/Y/Z/Fov/
+  Zoom`), mirroring the exact guard pattern `armLengthWidgetResyncs`'
+  own 6 registered callbacks already use elsewhere in this file (all 6
+  confirmed to already have it before assuming it was the right
+  pattern to copy). **If a future "UI still slow while paused" report
+  recurs after this, the next place to check is any OTHER unconditional,
+  per-frame `syncValue()`/`findCtrl()` call this fix didn't touch** --
+  the underlying `findCtrl()` linear scan itself is still O(n) over the
+  full control list; this fix only removed ONE specific caller's
+  redundant per-frame invocations of it, it didn't make the scan itself
+  faster. Not independently verified live -- this sandbox's own
+  documented GLB-truncation flakiness (below) blocked a clean model
+  load across 5 retries.
 - **`realDeviceClass()` (devPanel.js) used to classify Mobile/Landscape
   purely from viewport dimensions (`Math.min(w,h) >= 768` => Desktop) --
   a real, ordinary desktop browser window with height under 768px
