@@ -56,6 +56,28 @@ let textOverrides = {}
 // control map (numEls, textOverrides) already uses.
 let devVisibility = {} // { [key]: boolean } -- default true (shown) when absent
 let devIndependence = { mobile: {}, landscape: {} } // { [key]: boolean } -- default false (mirrors desktop) when absent
+// CORRECTED 2026-09-27 -- direct report: "Click functions still dont work
+// in non dev mode." Root cause: `applyStoredValues()` only ever iterates
+// `devGroups`' CURRENT contents at the moment it's called -- for a
+// dynamically-registered group (renderDynamicGroup(), HANDY DANDIES' own
+// Custom Click Function architecture), that control doesn't exist in
+// `devGroups` yet the first time `applyStoredValues()` runs (inside
+// `restoreValuesForEveryVisitor()`, at BOOT, before the host has even had a
+// chance to call `restoreCustomClickFunctions()` from `onRestore`) -- so its
+// real saved value (e.g. a function's own Type/TargetPose/Enabled) is
+// silently never applied; `renderDynamicGroup()`'s own seeding step then
+// falls back to the control's hardcoded `def`, permanently. This was
+// invisible in DEV_MODE only because `resetSettings()` (called once, at
+// boot, but ONLY from the DEV_MODE-only panel-construction path -- see its
+// own call site) does a 2nd full fetch+`applyStoredValues()` pass AFTER the
+// custom controls have already been pushed into `devGroups` by the 1st
+// pass's `onRestore` -- giving DEV_MODE visitors a 2nd chance non-DEV_MODE
+// visitors never get. Fixing this by caching whatever `values` blob the
+// most recent successful restore actually saw, so a LATER dynamic
+// registration (renderDynamicGroup()) can look itself up in it directly,
+// instead of only ever seeing whatever `applyStoredValues()` already
+// iterated at that earlier moment.
+let lastRestoredValues = null // { desktop: {...}, mobile: {...}, landscape: {...} } | null
 // Host hook, set by initDevPanel() from opts.onDevVisibilityChanged (2026-
 // 09-24, alongside onDeviceTabChanged) -- module-level rather than a
 // closure over `opts`, since the 2 places that actually change
@@ -1767,12 +1789,27 @@ function addCustomGroup(groupsEl) {
 // cfg/store from each control's own `def` for any key not already
 // present (a previously-restored/saved value is never clobbered),
 // mirroring initDevPanel()'s own bootstrap loop.
+//
+// CORRECTED 2026-09-27 -- "def" was the ONLY fallback here, which silently
+// discarded a dynamically-registered control's own REAL saved value on a
+// non-DEV_MODE visitor (see `lastRestoredValues`'s own declaration comment
+// for the full root-cause account -- HANDY DANDIES' own Custom Click
+// Function architecture is the concrete case this broke). Now checks
+// `lastRestoredValues` (whatever the most recent successful restore fetch
+// actually returned, cached specifically for this) FIRST, per device,
+// exactly mirroring `applyStoredValues()`'s own per-control resolution --
+// falling back to `c.def` only when nothing was ever restored for this key
+// (a brand-new control, or no remote/local settings existed at all yet).
 export function renderDynamicGroup(groupSpec) {
   devGroups.push(groupSpec)
+  const real = realDeviceClass()
   groupSpec.controls.forEach((c) => {
     if (cfg[c.key] !== undefined) return
-    DEVICES.forEach((d) => { store[d][c.key] = c.def })
-    cfg[c.key] = c.def
+    DEVICES.forEach((d) => {
+      const restored = lastRestoredValues && lastRestoredValues[d] ? lastRestoredValues[d][c.key] : undefined
+      store[d][c.key] = restored !== undefined ? restored : c.def
+    })
+    cfg[c.key] = store[real][c.key]
   })
   const groupsEl = document.getElementById('dpGroups')
   if (!groupsEl) return null // DEV_MODE off / panel never built -- nothing to render into
@@ -2593,6 +2630,7 @@ export function initDevPanel(groups, opts = {}) {
   function restoreValuesForEveryVisitor() {
     if (opts.remoteSave) {
       fetchRemoteSettingsUntilSuccess(opts.remoteSave, (settings) => {
+        lastRestoredValues = settings.values || null
         applyStoredValues(settings.values)
         if (opts.onRestore) opts.onRestore()
       })
@@ -2600,7 +2638,7 @@ export function initDevPanel(groups, opts = {}) {
     }
     let saved = null
     try { saved = JSON.parse(localStorage.getItem(settingsKey())) } catch (err) { saved = null }
-    if (saved) applyStoredValues(saved.values)
+    if (saved) { lastRestoredValues = saved.values || null; applyStoredValues(saved.values) }
     // `onRestore` fires here regardless of whether anything was actually
     // FOUND to restore -- it signals "the restore attempt has concluded"
     // (there was genuinely nothing saved yet for a brand-new visitor is a
@@ -3004,6 +3042,7 @@ export function initDevPanel(groups, opts = {}) {
         applyOrder(groupsEl, settings.order)
         devVisibility = settings.devVisibility || {}
         devIndependence = settings.devIndependence || { mobile: {}, landscape: {} }
+        lastRestoredValues = settings.values || null
         applyStoredValues(settings.values)
         textOverrides = settings.textOverrides || {}
         applyTextOverrides()
@@ -3035,6 +3074,7 @@ export function initDevPanel(groups, opts = {}) {
       applyOrder(groupsEl, saved.order)
       devVisibility = saved.devVisibility || {}
       devIndependence = saved.devIndependence || { mobile: {}, landscape: {} }
+      lastRestoredValues = saved.values || null
       applyStoredValues(saved.values)
       textOverrides = saved.textOverrides || {}
       applyTextOverrides()
