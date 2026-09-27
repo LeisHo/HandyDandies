@@ -18,6 +18,30 @@ work seamlessly from there.
 
 ## Currently working on
 
+**SHIPPED 2026-09-27 (5th round) -- added a Zoom Speed slider
+(`cameraZoomSpeed`) to the Camera group**, a plain passthrough to
+OrbitControls' own `zoomSpeed` (def `1.0`, matching three.js's own
+default). `main.js` cache-buster `?v=222` -> `?v=223`.
+
+**STILL OPEN -- dev panel remains slow while Global Pause is on, even
+after the 4th-round fix below.** Direct follow-up: "its sitll slow. so
+when i zoom in s oonly few hands are showing, its much smoother. But if
+its paused, then why does it matter how many hands are there" -- a sharp,
+correct observation. The 2026-09-21 fix throttles `composer.render()`
+to `cfg.pausedRenderFps` (default 15) rather than skipping it -- the
+PER-CALL cost still scales with hand count (more meshes = more GPU work
+per render), so even throttled, more hands = more total busy time per
+second. The 4th-round fix (this same day) only removed a DIFFERENT,
+smaller unconditional cost (`syncCameraPanelFromLive()`'s own redundant
+scans) -- it never touched this. Real fix under discussion with the
+user: switch from "render on a fixed throttled schedule regardless of
+whether anything changed" to "render on demand" (skip `composer.render()`
+entirely unless the camera moved or a dev-panel control that affects the
+rendered scene actually changed) -- a genuine architectural change to
+how/when rendering happens, not a small tweak, so it's being surfaced for
+a decision rather than silently implemented (workspace CLAUDE.md §0a).
+See CHANGELOG.txt's matching entry once a direction is chosen.
+
 **SHIPPED 2026-09-27 (4th round) -- fixed dev panel still feeling slow
 while Global Pause is on.** Same class of bug the 2026-09-21 fix already
 solved for `composer.render()`, just a different function that fix never

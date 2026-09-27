@@ -12023,6 +12023,20 @@ touching only that JSON file -- before pushing this round.)
 --------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
+--------------------------------------------------------------------------------
+2026-09-27 (5th round)
+
+Direct request: "add a zoom speed slider that controls how fast my
+scroll will zoom." Added `cameraZoomSpeed` to the Camera group -- a
+plain passthrough to OrbitControls' own built-in `zoomSpeed` property
+(three.js default `1.0`, matched as this control's own `def` so nothing
+changes until the user actually adjusts it). `perDevice`, same as every
+other Camera control here.
+
+`main.js` cache-buster bumped `?v=222` -> `?v=223`.
+
+Commit: `d594038`. Pushed to `https://github.com/LeisHo/HandyDandies`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a
