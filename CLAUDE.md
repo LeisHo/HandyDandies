@@ -1392,3 +1392,27 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   into ITS OWN body) must run before any inner wrap that expects to find
   those same rows already there. Useful precedent for any future request
   to further subdivide an existing gated subgroup.
+- **A per-frame function (not a per-hand-loop one) must never `return`
+  early from inside a conditional sub-block that skips a hand for a
+  GENUINE reason (e.g. "this hand is outside an eligible range") -- doing
+  so also skips every OTHER thing that function does for that hand THIS
+  FRAME, not just the intended part.** Caught 2026-09-27 while building
+  Start Distance Curve's own eligibility gate, before it ever shipped
+  live: `updateClickHoldPoseForHand(hand, p, ...)` is called once per
+  hand PER FRAME (unlike `triggerClickPose(p)`, which loops over every
+  hand itself via `hands.forEach`) -- an early `return` inside its own
+  arming block for an "ineligible, don't start this hold" hand would ALSO
+  have skipped that same frame's commit-check and phase-dispatch blocks
+  further down in the SAME function, for that SAME hand -- potentially
+  stalling whatever ELSE that hand/prefix might already be mid-way
+  through (a retransition from a PREVIOUS trigger, for instance). Fixed
+  with a plain `eligible` boolean guarding only the specific
+  side-effects that should be skipped (never setting `pendingClaimAt`),
+  letting the rest of the function's own per-frame work continue
+  normally. **Before adding an early `return` inside ANY per-hand-per-
+  frame function in this file (`updateClickPoseForHand`,
+  `updateClickHoldPoseForHand`), check whether it's actually a per-hand
+  LOOP (safe to `return`/`continue` for one hand) or a per-frame
+  function called once per hand externally (where `return` exits ALL of
+  this frame's work for that hand, not just the one thing you meant to
+  skip).**

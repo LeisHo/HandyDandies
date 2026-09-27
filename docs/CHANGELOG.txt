@@ -12265,6 +12265,82 @@ rather than shipped half-built, per 2026-09-24's own entry).
 Commits: `a4e4f0d`, `a6e6dc4`. Pushed to
 `https://github.com/LeisHo/HandyDandies`.
 
+--------------------------------------------------------------------------------
+2026-09-27 (2nd round)
+
+**Item 7 (Start Distance Curve) -- built, completing all 9 items from
+this same day's earlier entry.** New `${p}StartDistanceCurveEnabled`/
+`StartDistanceMin`/`StartDistanceMax`/`StartDistanceCurve` controls in
+both `makeClickPoseGroup()`/`makeClickHoldPoseGroup()`, applied
+automatically to every Multi Trigger sub-trigger too
+(`MULTI_TRIGGER_ALLOWED_SUFFIXES`). Unlike every other distance curve in
+this file (auto-normalized against the CURRENT field's own live min/max
+hand-cursor distance, item 8's own convention, unaffected here), this
+curve has its own EXPLICIT domain: Min/Max serve double duty as BOTH the
+eligibility cutoff (a hand outside the range never triggers at all,
+matching "beyond those bounds, hands will not get triggered") AND the
+curve's own X-axis normalization -- the spec frames these as one
+continuous mechanism, not two. Y is already the final 0-1 tween-amount
+fraction directly, no separate range-rescale slider needed.
+
+New `computeTweenFractionCap(distanceToCursor, distMin, distMax,
+curveParsed)` returns `null` for an ineligible hand (the caller leaves
+that hand completely untouched) or a 0-1 fraction otherwise. Evaluated
+and FROZEN once per hand at arm/trigger time (new
+`cp.pendingTweenFractionCap`/`frozenTweenFractionCap`,
+`chp.pendingTweenFractionCap`/`frozenTweenFractionCap` -- same "frozen
+at trigger time" convention as `frozenSplayDeg`/`frozenSpeedMs`
+throughout this file), in both `triggerClickPose()` and
+`updateClickHoldPoseForHand()`'s own arming block.
+
+**One real correction made before finishing, not caught live:** the
+hold-kind arming block's first draft used an early `return` for an
+ineligible hand -- which would have ALSO skipped that same frame's
+commit-check and phase-dispatch blocks below it, potentially stalling
+some OTHER already-in-progress phase the same hand/prefix might be
+mid-way through (a subtle bug specific to this function's own
+per-frame, not per-hand-loop, structure). Fixed to an `eligible` flag
+that only skips setting `pendingClaimAt` (leaving it 0/falsy, so the
+later commit check simply never fires for this hold-start) without
+exiting the whole function early. The pose-kind equivalent never had
+this risk, since its own analogous `return` sits inside a per-hand
+`forEach` callback, not the whole function.
+
+**Runtime: `cappedT = progress * frozenTweenFractionCap`** scales how
+FAR the interpolation travels, never how LONG it takes -- `progress`
+itself stays completely untouched for timing/phase-transition checks,
+so a 50%-capped hand still takes the FULL configured animation duration
+to reach its own halfway point, exactly matching the spec's own worked
+example ("within the entire tween duration, it will only go halfway").
+Applied to the initial forward pass (both single-pose and tween mode,
+both kinds) and Oscillate/instant-jump laps. Deliberately NOT applied
+to `applyOffsetRotationToHand()`'s own progress (a separate system the
+spec never asked to couple with this one) nor to the "smooth wrap-back"
+cyclic lap mode's own `tCyclic` value (accumulates continuously ACROSS
+laps, not a per-lap 0-1 range, so a simple `progress*cap` doesn't
+translate the same way) -- a disclosed scoping limitation, not an
+oversight.
+
+**Verification:** 2 isolated, no-DOM logic reproductions -- the
+eligibility-gating + curve-evaluation arithmetic (6 cases: below-min/
+above-max correctly ineligible, curve evaluated correctly at both
+endpoints and the midpoint, the spec's own "flat 50%" worked example
+reproduces exactly 0.5) and the full-duration-but-capped-distance
+behavior (5 timestamps across a 5000ms tween confirm the interpolated
+position reaches EXACTLY 50% of the way at the full 5000ms mark, never
+earlier). **NOT live-verified in a real browser** -- 5 navigation
+retries (the standing cap) against a fresh static server all hit this
+sandbox's own documented `main.js` network-truncation quirk again, the
+3rd time this happened across this whole 9-item batch. The entire batch
+(all 9 items, across both rounds) genuinely needs a real hands-on test
+before being fully trusted -- this is a substantial set of changes
+shipped on code-reading, direct-dependency-tracing, and isolated logic
+verification alone, not on watching it actually run.
+
+`main.js` cache-buster bumped `?v=226` -> `?v=227`.
+
+Commit: `b43cc23`. Pushed to `https://github.com/LeisHo/HandyDandies`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

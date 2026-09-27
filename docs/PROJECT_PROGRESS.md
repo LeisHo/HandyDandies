@@ -18,9 +18,9 @@ work seamlessly from there.
 
 ## Currently working on
 
-**IN PROGRESS 2026-09-27 -- a 9-item direct spec on Click Function
-behavior. 7 of 9 items done and pushed; item 7 (Start Distance Curve)
-still ahead, deliberately checkpointed rather than rushed.** Items 1
+**SHIPPED 2026-09-27 -- all 9 items of a direct spec on Click Function
+behavior, across 2 rounds. NOT yet live-verified in a real browser --
+needs a real hands-on test before being fully trusted.** Items 1
 (tracking never interrupts a tween), 3 (offset/rotation spans the full
 duration), 4 (interruptions transition smoothly, no jump), and 8
 (distance curves auto-scale to the farthest hand) were all confirmed
@@ -30,22 +30,27 @@ persists and stacks across different triggered functions, compounds
 every loop lap while a hold-and-loop function is held, and is only ever
 fully unwound by a completed Retransition -- a new per-hand
 `_customOffsetAccum`/`_customRotationAccum` accumulator, verified via
-isolated logic tests (4 scenarios). Item 9: Retransition Speed Curve and
-a new Retransition Start Time Curve are now their own nested,
-toggleable subgroups (previously flat/always-on rows), applied
-automatically to every custom function and Multi Trigger sub-trigger.
-**NOT live-verified in a real browser yet** -- deferred to a single
-hands-on pass once item 7 also lands. See CHANGELOG.txt's 2026-09-27
-entry for the full account. Commits `a4e4f0d`/`a6e6dc4`.
+isolated logic tests. Item 9: Retransition Speed Curve and a new
+Retransition Start Time Curve are now their own nested, toggleable
+subgroups (previously flat/always-on rows). Item 7: a new Start
+Distance Curve subgroup -- min/max distance eligibility gating (a hand
+outside the configured range never triggers at all) plus a curve
+capping how far into the tween an eligible hand animates, frozen once
+per hand at trigger time, applied across the FULL configured animation
+duration (never a shortened one) -- verified via 2 isolated logic
+reproductions (eligibility+curve arithmetic; the actual
+full-duration-but-capped-distance behavior over 5 sample timestamps).
+All 4 new/changed features apply automatically to every custom function
+AND every Multi Trigger sub-trigger, since everything funnels through
+the same 2 group factories and 2 state-machine functions. See
+CHANGELOG.txt's 2 matching 2026-09-27 entries for the full account.
+Commits `a4e4f0d`/`a6e6dc4`/`b43cc23`.
 
-**Item 7 (Start Distance Curve) -- next up, not yet built.** A new
-subgroup, min/max distance eligibility gating (hands outside the
-configured range never trigger) plus a curve controlling how far into
-the tween an eligible hand animates (a 50%-capped hand only interpolates
-halfway to its target, across the FULL configured duration, not a
-shortened one). Needs new controls in both group factories, new curve-
-widget wiring, and a new tween-progress-capping mechanism threaded
-through both state machines.
+**Needs a real hands-on test** -- this sandbox's own documented
+`main.js` network-truncation quirk blocked every live-verification
+attempt across both rounds (5 retries each, the standing cap, hit 3
+separate times total). Everything above is shipped on code-reading,
+direct-dependency-tracing, and isolated logic verification alone.
 
 **SHIPPED 2026-09-27 (6th round) -- render-on-demand: `composer.render()`
 is now skipped entirely while Global Pause is on and nothing has changed,
