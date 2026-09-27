@@ -6204,19 +6204,39 @@ function bakeOffsetRotationIntoAccum(hand, p) {
 // start for the next trigger, not just a visual reset.
 function applyOffsetRotationRetransition(hand, progress, offsetAccumStart, rotationAccumStart) {
   const remaining = 1 - progress
-  if (offsetAccumStart && (offsetAccumStart.x !== 0 || offsetAccumStart.y !== 0)) {
+  const decayedX = offsetAccumStart ? offsetAccumStart.x * remaining : 0
+  const decayedY = offsetAccumStart ? offsetAccumStart.y * remaining : 0
+  if (decayedX !== 0 || decayedY !== 0) {
     _offsetRightVec.setFromMatrixColumn(camera.matrixWorld, 0)
     _offsetUpVec.setFromMatrixColumn(camera.matrixWorld, 1)
-    hand.wrapper.position.addScaledVector(_offsetRightVec, offsetAccumStart.x * remaining)
-    hand.wrapper.position.addScaledVector(_offsetUpVec, offsetAccumStart.y * remaining)
+    hand.wrapper.position.addScaledVector(_offsetRightVec, decayedX)
+    hand.wrapper.position.addScaledVector(_offsetUpVec, decayedY)
   }
-  if (rotationAccumStart && !isIdentityQuat(rotationAccumStart)) {
+  const hasRotation = rotationAccumStart && !isIdentityQuat(rotationAccumStart)
+  if (hasRotation) {
     _offsetQuat.identity().slerp(rotationAccumStart, remaining)
     hand.wrapper.quaternion.multiply(_offsetQuat)
   }
-  if (progress >= 1) {
-    if (hand._customOffsetAccum) { hand._customOffsetAccum.x = 0; hand._customOffsetAccum.y = 0 }
-    if (hand._customRotationAccum) hand._customRotationAccum.identity()
+  // CORRECTED 2026-09-27 (3rd round) -- real bug found via direct
+  // simulation: the REAL accumulator (`hand._customOffsetAccum`/
+  // `_customRotationAccum`) used to stay completely untouched throughout
+  // retransition, only ever cleared at the very end (`progress>=1`) --
+  // meaning a NEW trigger interrupting mid-retransition (before the clear
+  // ever ran) read `applyOffsetRotationToHand()`'s own unconditional
+  // accumulator baseline at its FULL, un-decayed pre-retransition value,
+  // not whatever partially-decayed amount was actually on screen the
+  // instant before. Keeping the real accumulator continuously in sync
+  // with the decayed amount every frame (same "single source of truth"
+  // pattern as `hand.currentSplayDeg`) means a mid-retransition
+  // interruption picks up exactly where the decay visually was, never a
+  // jump back up to the pre-retransition total. `_offsetQuat` is a shared
+  // scratch var reused elsewhere in this file every frame, so the
+  // rotation accumulator is written via a fresh identity+slerp rather
+  // than aliasing that shared reference.
+  if (hand._customOffsetAccum) { hand._customOffsetAccum.x = decayedX; hand._customOffsetAccum.y = decayedY }
+  if (hand._customRotationAccum) {
+    if (hasRotation) hand._customRotationAccum.identity().slerp(rotationAccumStart, remaining)
+    else hand._customRotationAccum.identity()
   }
 }
 // Tween group's own preset capture/apply -- ONLY `tweenPoses` (the ordered
