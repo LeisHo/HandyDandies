@@ -12037,6 +12037,103 @@ other Camera control here.
 
 Commit: `d594038`. Pushed to `https://github.com/LeisHo/HandyDandies`.
 
+--------------------------------------------------------------------------------
+2026-09-27 (6th round)
+
+Direct follow-up to the 4th round's syncCameraPanelFromLive() fix: "its
+sitll slow. so when i zoom in s oonly few hands are shwoing, its much
+smoother. But if its paused, the nwhy does it matter how many hands are
+there" -- correctly reasoned that the 4th round's fix was necessary but
+not sufficient. The remaining, dominant cost while paused was
+composer.render() itself: the 2026-09-21 fix only ever THROTTLED it (to
+cfg.pausedRenderFps) while paused, never skipped it outright -- a
+throttled render is still a REAL render, so its own per-call GPU/CPU
+cost still scales with hand count regardless of how infrequently it
+runs. Presented the user 2 options via AskUserQuestion; user chose
+"Render on demand (recommended)."
+
+Implemented render-on-demand: a new `sceneNeedsRedraw` module-level flag
+in main.js (declared near isPaused/pauseOffsetMs), starting `true` so
+the first frame after load always renders. Set `true` by: (1) a new
+generic `onAnyValueChange` host hook added to devPanel.js -- fires from
+BOTH `commit()` (a real live user edit, at both its
+isDynamicDeviceCtrl-branch and plain-branch call sites) and `syncValue()`
+(a host-driven push, e.g. camera-position sync FROM the live scene, or a
+Saved Preset's "Use" action) -- the same pattern as devPanel.js's own
+pre-existing `hostOnDevVisibilityChanged` module-level-variable bridge,
+since commit()/syncValue() are top-level functions with no closure
+access to initDevPanel()'s own `opts` parameter; and (2) setPaused()
+itself, on both the pause and resume transitions (alongside its existing
+`lastPausedRenderMs = 0` reset).
+
+animate()'s own paused-render gate (previously a plain fixed-interval
+throttle) is now a 3-way OR: always render when not paused; render when
+paused AND sceneNeedsRedraw AND the pausedRenderFps interval has elapsed
+(rate-limits a rapid slider drag to one render per interval, same as
+before); OR render regardless of the dirty flag once a ~2000ms safety-net
+backstop interval has elapsed (a deliberate, hardcoded, UNVERIFIED-by-
+measurement judgment call, not derived from any real measurement -- a
+defensive backstop in case a future change mutates the scene without
+going through either trigger above, per this project's own §0c
+no-unjustified-thresholds convention: labeled as a judgment call, not
+presented as measured). Consuming the flag (`sceneNeedsRedraw = false`)
+only happens on an actual paused-branch render, never on the
+always-render (`!isPaused`) branch, so resuming doesn't need to touch it
+at all.
+
+Net effect: while paused and nothing dev-panel-driven changes, composer.
+render() is now skipped ENTIRELY rather than merely throttled -- near-
+zero per-frame cost regardless of hand count, directly addressing the
+user's own correct observation that hand count shouldn't matter at all
+while paused.
+
+**Live-verified in part, honestly incomplete in another part -- both
+sides stated plainly, per this project's own testing discipline.**
+Loaded successfully on the 4th of 5 permitted navigation retries (the
+standing GLB/main.js truncation flakiness this project's CLAUDE.md
+already documents -- `net::ERR_CONNECTION_RESET` on 3 of the 4 attempts,
+confirmed via read_network_requests, not a regression from this change).
+`window.__debug` populated correctly with every expected object
+(`cfg.pausedRenderFps`, `cfg.cameraZoomSpeed`, `composer`, etc.),
+confirming main.js executed to completion with no runtime error.
+Instrumented `composer.render` with a call-counting wrapper and measured
+**0 render calls over a full 1-second window while paused** -- consistent
+with the fix (paused + clean, unmodified state should render nothing).
+**However, this result is NOT trustworthy as proof of the fix specifically**:
+a follow-up check found this sandbox's own `requestAnimationFrame` was not
+ticking AT ALL in this session at the time of the measurement -- confirmed
+via an independent raw rAF probe (`requestAnimationFrame(function tick(){
+n++; requestAnimationFrame(tick) })`, unrelated to any app code) that also
+read 0 ticks over 1.5s, even immediately after explicitly fronting the tab
+via tabs_select. This is the same general class of tool quirk this
+project's CLAUDE.md already documents multiple times (document.hidden/
+window.innerWidth/clientWidth/computed-style/`window.__debug` misreports),
+extended here to a 6th concrete symptom: rAF itself can fail to tick in
+this sandbox even on an explicitly-fronted tab, which means "0 renders
+measured" could equally mean "the fix works" or "nothing was ticking at
+all, so nothing could have rendered regardless." Confidence instead rests
+on: `node --check` passing on both files; direct tracing of the new
+3-way OR condition and the devPanel.js hostOnAnyValueChange wiring (both
+commit() call sites and syncValue()); and the same hybrid-design pattern
+already reasoned through and approved by the user via AskUserQuestion
+before implementation. **Not verified**: that toggling a dev-panel
+slider while paused actually triggers a prompt render (the
+onAnyValueChange -> sceneNeedsRedraw -> next-frame-render path end to
+end), and that resuming from pause restores full-rate rendering -- both
+blocked by the same rAF-non-ticking sandbox condition, not by any
+observed defect in the code itself.
+
+`main.js` cache-buster bumped `?v=223` -> `?v=224`. devPanel.js import
+version bumped `?v=48` -> `?v=49` (main.js's own import line, not a
+separate index.html script tag -- devPanel.js is loaded as an ES module
+from within main.js per this project's established convention).
+
+Commit: (pending -- see this round's own commit hash once pushed).
+Fast-forward pulled 16 unrelated concurrent commits (all "Update
+dev-panel-settings.json via Save Settings" -- the user's own live Save
+Settings writes, touching only that JSON file) before pushing this
+round.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

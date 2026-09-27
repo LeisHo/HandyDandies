@@ -923,6 +923,66 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   faster. Not independently verified live -- this sandbox's own
   documented GLB-truncation flakiness (below) blocked a clean model
   load across 5 retries.
+- **CORRECTED 2026-09-27, same day, after the entry directly above --
+  the user's own follow-up correctly identified that fix as necessary
+  but not sufficient: "its sitll slow. so when i zoom in s oonly few
+  hands are showing, its much smoother. But if its paused, then why
+  does it matter how many hands are there."** The remaining, dominant
+  cost while paused was `composer.render()` itself: the 2026-09-21 fix
+  (2 entries above) only ever THROTTLED it while paused, never skipped
+  it -- a throttled render is still a REAL render, so its own per-call
+  cost still scales with hand count regardless of how infrequently it
+  runs. Fixed properly this time via **render-on-demand**, chosen over
+  a simpler alternative through AskUserQuestion: a new `sceneNeedsRedraw`
+  module-level flag (declared near `isPaused`/`pauseOffsetMs`) is set by
+  (1) a new generic `onAnyValueChange` devPanel.js host hook -- mirrors
+  the existing `hostOnDevVisibilityChanged` module-variable bridge
+  pattern exactly, since `commit()`/`syncValue()` are top-level functions
+  with no closure access to `initDevPanel()`'s own `opts` -- firing from
+  BOTH real paths a value can change through (`commit()`, a genuine live
+  user edit; `syncValue()`, a host-driven push such as the camera-
+  position sync above or a Saved Preset's "Use" action); and (2)
+  `setPaused()` itself, on both the pause and resume transitions.
+  `animate()`'s own paused-render gate became a 3-way OR: always render
+  when not paused; render when paused AND `sceneNeedsRedraw` AND the
+  `pausedRenderFps` interval has elapsed (same rate-limit as before, so
+  a rapid slider drag doesn't over-render); OR render regardless of the
+  dirty flag once a ~2000ms safety-net backstop interval elapses (a
+  deliberate, UNMEASURED, explicitly-labeled judgment call -- a
+  defensive catch-all for a future change that mutates the scene
+  without going through either real trigger, not a number derived from
+  any measurement -- per this project's own §0c convention of never
+  presenting an arbitrary threshold as if it were measured). Net effect:
+  paused + nothing changed = composer.render() skipped ENTIRELY, not
+  merely throttled -- near-zero cost regardless of hand count, directly
+  addressing the user's own correct reasoning. **Partially live-verified,
+  and honestly incomplete, not silently assumed complete**: the app
+  loaded cleanly (`window.__debug` fully populated -- no runtime error)
+  and a `composer.render` call-counting wrapper measured 0 calls over a
+  1-second window while paused, consistent with the fix -- but a
+  follow-up check found this sandbox's own `requestAnimationFrame` was
+  not ticking AT ALL in that same session, confirmed via an independent
+  raw rAF probe (a plain self-scheduling `requestAnimationFrame` counter,
+  nothing to do with any app code) that also read 0 ticks over 1.5s, even
+  immediately after explicitly fronting the tab via `tabs_select`. This
+  is the same general class of tool quirk already documented multiple
+  times elsewhere in this file (`document.hidden`/`window.innerWidth`/
+  `clientWidth`/computed-style/`window.__debug` misreports), extended
+  here to a 6th concrete symptom: rAF itself failing to tick at all,
+  even on an explicitly-fronted tab -- which means "0 renders measured"
+  is NOT distinguishable from "nothing was ticking regardless of the
+  fix," so it cannot be trusted as proof of this fix specifically. **If a
+  future session needs to actually prove this render-on-demand mechanism
+  works (not just that the app runs without error), first confirm real
+  rAF ticks are occurring via an independent raw probe like the one
+  above BEFORE trusting any render-call-count measurement gathered in
+  the same session** -- otherwise a true negative (rAF suspended) and a
+  correct fix (renders correctly suppressed) are indistinguishable from
+  the outside. Toggling a dev-panel slider while paused (to confirm the
+  onAnyValueChange -> sceneNeedsRedraw -> prompt-render path end to end)
+  and confirming resume restores full-rate rendering both remain
+  genuinely unverified for this same reason, not because of any observed
+  defect in the code.
 - **`realDeviceClass()` (devPanel.js) used to classify Mobile/Landscape
   purely from viewport dimensions (`Math.min(w,h) >= 768` => Desktop) --
   a real, ordinary desktop browser window with height under 768px

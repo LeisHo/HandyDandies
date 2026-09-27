@@ -6,7 +6,7 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js'
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js'
 import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js'
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js'
-import { initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab } from './devpanel/devPanel.js?v=48'
+import { initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab } from './devpanel/devPanel.js?v=49'
 
 // A defensive wrapper around devPanel.js's own refreshSelectOptions() --
 // found via live testing (direct user report: "I dont see any of the
@@ -1636,7 +1636,18 @@ const cfg = initDevPanel(DEV_GROUPS, {
   // comment) -- toggling EITHER that row's own checkbox OR the group's
   // cascade checkbox needs to immediately re-run this same sweep, the
   // same way a real tab click already does.
-  onDevVisibilityChanged: () => { refreshAllCustomFunctionGroupVisibility() }
+  onDevVisibilityChanged: () => { refreshAllCustomFunctionGroupVisibility() },
+  // Render-on-demand while paused (2026-09-27, direct report: "when i
+  // pause the hands, how come the ui is still slow... why does it
+  // matter how many hands are there" -- see sceneNeedsRedraw's own
+  // declaration, near isPaused/setPaused, for the full account). Fires
+  // from devPanel.js's own commit()/syncValue() -- every real way a
+  // control's applied value can change (a live user edit, or a host-
+  // driven push like a Saved Preset's "Use" action or the camera-position
+  // sync below) -- marking the paused render loop dirty so it redraws
+  // promptly instead of waiting for its own throttle interval, or
+  // (normally) not redrawing at all while nothing has actually changed.
+  onAnyValueChange: () => { sceneNeedsRedraw = true }
 })
 onChangeByCtrl.forEach((fn, c) => { c.onChange = fn })
 setupCustomFunctionTabVisibilitySync()
@@ -5845,7 +5856,7 @@ function getOrInitHandCHP(hand) {
   // keys.
   CLICK_HOLD_KEYS.forEach((p) => {
     if (hand._chp[p]) return
-    hand._chp[p] = { phase: 'idle', forwardStartTime: 0, forwardSnapshot: null, tweenSegments: null, loopStartTime: 0, loopHoldEndTime: 0, loopDirection: 1, retransitionDelay: 0, retransitionStart: null, retransitionStartTime: 0, retransitionIsTween: false, retransitionSpeedMs: 0, lastAppliedValues: null, frozenSplayDeg: 0, pendingClaimAt: 0, armedForHoldStartTime: -1, pendingFrozenSplayDeg: 0, frozenSpeedMs: 0, pendingFrozenSpeedMs: 0, releasePending: false, stoppingStartTime: 0, stoppingStartDelay: 0, stoppingDelayMs: 1, stoppingLastFrameTime: 0, stoppingBaseElapsedMs: 0, stoppingVirtualElapsedMs: 0, stoppingWasLooping: false, stoppingFreezeAtEnd: false }
+    hand._chp[p] = { phase: 'idle', forwardStartTime: 0, forwardSnapshot: null, tweenSegments: null, loopStartTime: 0, loopHoldEndTime: 0, loopDirection: 1, retransitionDelay: 0, retransitionStart: null, retransitionStartTime: 0, retransitionIsTween: false, retransitionSpeedMs: 0, lastAppliedValues: null, frozenSplayDeg: 0, pendingClaimAt: 0, armedForHoldStartTime: -1, pendingFrozenSplayDeg: 0, frozenSpeedMs: 0, pendingFrozenSpeedMs: 0, releasePending: false, stoppingStartTime: 0, stoppingStartDelay: 0, stoppingDelayMs: 1, stoppingLastFrameTime: 0, stoppingBaseElapsedMs: 0, stoppingVirtualElapsedMs: 0, stoppingWasLooping: false, stoppingFreezeAtEnd: false, offsetBaked: false, retransitionOffsetAccumStart: null, retransitionRotationAccumStart: null }
   })
   return hand._chp
 }
@@ -6016,19 +6027,63 @@ const _offsetRightVec = new THREE.Vector3()
 const _offsetUpVec = new THREE.Vector3()
 const _offsetEuler = new THREE.Euler()
 const _offsetQuat = new THREE.Quaternion()
-// Click Function Offset/Rotation (Phase 1) -- composes ADDITIVELY on top
-// of whatever cursor-tracking + arm-length already set on hand.wrapper
-// this frame. animate()'s own per-frame loop runs tracking rotation
-// (quaternion.slerp) and applyHandArmLength() BEFORE calling
-// updateRenderOrder() -> updateClickHoldPoseForHand()/
-// updateClickPoseForHand(), so hand.wrapper.position/.quaternion already
-// hold this frame's base transform by the time this runs -- adding to
-// position and right-multiplying the rotation means Offset/Rotation
-// layer on top instead of fighting tracking, exactly as required.
-// `progress` is the SAME per-hand-staggered forward-phase progress the
-// pose-lerp itself uses, so Offset ramps 0->target across the tween
-// exactly like Rotation does (direct user choice: "Ramps like Rotation").
+// CORRECTED 2026-09-27 -- direct spec, 3 related items:
+// (2) "each click function's offset and rotation effects will be
+// stacked when another function is triggered... the 2nd triggered
+// function will simply be applied on top of the hand's 'current'
+// position" -- i.e. genuinely PERSISTENT across different functions, not
+// just visually continuous within one.
+// (5) "If i set an offset or rotation within a sequence looping click
+// function, everytime the loop starts, the offset/rotation sequence is
+// triggered again... if i click and hold forever, the hands will rotate
+// and offset further and further" -- i.e. genuinely PERSISTENT across
+// repeated laps of the SAME function too, unbounded.
+// (6) "Regardless of how far the hands offset or rotate, if they have
+// retransition turned on, they will always retransition back to the
+// original default pose and position and rotation" -- i.e. the ONLY
+// thing that ever clears the accumulated total is a completed
+// Retransition (see applyOffsetRotationRetransition() below).
+//
+// Before this round, `applyPoseOffsetToPosition()`'s own comment
+// documented the OPPOSITE as deliberate: "An ABSOLUTE position... so it
+// can never compound across frames the way repeatedly adding an offset
+// to the same vector would." That was correct for the ORIGINAL spec
+// (Offset/Rotation ramps 0->target across ONE tween, per-function) but
+// is exactly what items 2/5/6 above now ask to change -- confirmed via
+// direct reading of `applyPoseOffsetToPosition()` before touching
+// anything, per this project's own "read the real source, don't guess"
+// convention, since the two requirements looked contradictory at first
+// glance.
+//
+// Model: `hand._customOffsetAccum`/`hand._customRotationAccum` hold the
+// FULL historical contribution already "locked in" from every completed
+// ramp/lap across every function, ever, until a Retransition clears
+// them. `progress` here is relative to the CURRENT, still-in-flight
+// increment only (0 at the start of a fresh ramp/lap, ramping to 1 as it
+// completes) -- NOT the total. The moment a ramp/lap actually reaches
+// progress>=1, the caller must invoke `bakeOffsetRotationIntoAccum()`
+// exactly once (guarded by each state machine's own per-trigger
+// `offsetBaked` flag, reset to false whenever a NEW ramp/lap begins) to
+// fold that increment permanently into the accumulator, and pass
+// `progress=0` on every subsequent frame spent settled/held in that same
+// completed state -- otherwise the same increment would be re-added
+// every single frame, growing without bound even while perfectly still.
 function applyOffsetRotationToHand(hand, p, progress) {
+  if (!hand._customOffsetAccum) hand._customOffsetAccum = { x: 0, y: 0 }
+  if (!hand._customRotationAccum) hand._customRotationAccum = new THREE.Quaternion()
+  _offsetRightVec.setFromMatrixColumn(camera.matrixWorld, 0)
+  _offsetUpVec.setFromMatrixColumn(camera.matrixWorld, 1)
+  // Accumulated baseline from every previously-completed ramp/lap
+  // (any function) -- applied unconditionally, regardless of whether
+  // THIS function's own Offset/Rotation happens to be enabled, so a
+  // 2nd function with Offset off still doesn't erase the 1st function's
+  // already-locked-in contribution (item 2's own "even if the 2nd
+  // function doesn't have its own offset" case).
+  if (hand._customOffsetAccum.x !== 0 || hand._customOffsetAccum.y !== 0) {
+    hand.wrapper.position.addScaledVector(_offsetRightVec, hand._customOffsetAccum.x)
+    hand.wrapper.position.addScaledVector(_offsetUpVec, hand._customOffsetAccum.y)
+  }
+  if (!isIdentityQuat(hand._customRotationAccum)) hand.wrapper.quaternion.multiply(hand._customRotationAccum)
   if (cfg[`${p}OffsetEnabled`]) {
     const ox = (cfg[`${p}OffsetX`] || 0) * progress
     const oy = (cfg[`${p}OffsetY`] || 0) * progress
@@ -6036,8 +6091,6 @@ function applyOffsetRotationToHand(hand, p, progress) {
       // Camera-relative right/up, not world/local axes -- this project's
       // camera only pans/zooms, never rotates, so these stay a stable
       // "up down left right in browser terms" regardless of framing.
-      _offsetRightVec.setFromMatrixColumn(camera.matrixWorld, 0)
-      _offsetUpVec.setFromMatrixColumn(camera.matrixWorld, 1)
       hand.wrapper.position.addScaledVector(_offsetRightVec, ox)
       hand.wrapper.position.addScaledVector(_offsetUpVec, oy)
     }
@@ -6053,6 +6106,51 @@ function applyOffsetRotationToHand(hand, p, progress) {
       // it -- right-multiply, not assignment.
       hand.wrapper.quaternion.multiply(_offsetQuat)
     }
+  }
+}
+function isIdentityQuat(q) { return q.x === 0 && q.y === 0 && q.z === 0 && q.w === 1 }
+// Folds `p`'s own current full Offset/Rotation contribution permanently
+// into the hand's accumulator -- called exactly once, by the state
+// machine, at the instant a ramp/lap's own progress crosses 1. See
+// applyOffsetRotationToHand()'s own comment for the full model.
+function bakeOffsetRotationIntoAccum(hand, p) {
+  if (!hand._customOffsetAccum) hand._customOffsetAccum = { x: 0, y: 0 }
+  if (!hand._customRotationAccum) hand._customRotationAccum = new THREE.Quaternion()
+  if (cfg[`${p}OffsetEnabled`]) {
+    hand._customOffsetAccum.x += cfg[`${p}OffsetX`] || 0
+    hand._customOffsetAccum.y += cfg[`${p}OffsetY`] || 0
+  }
+  if (cfg[`${p}RotationEnabled`]) {
+    const rx = cfg[`${p}RotationX`] || 0, ry = cfg[`${p}RotationY`] || 0, rz = cfg[`${p}RotationZ`] || 0
+    if (rx || ry || rz) {
+      _offsetEuler.set(THREE.MathUtils.degToRad(rx), THREE.MathUtils.degToRad(ry), THREE.MathUtils.degToRad(rz), 'XYZ')
+      hand._customRotationAccum.multiply(_offsetQuat.setFromEuler(_offsetEuler))
+    }
+  }
+}
+// Retransition ALWAYS fully clears the accumulated offset/rotation back
+// to zero, regardless of how large it's grown (item 6) -- ramps the
+// ACCUMULATED total (captured once, at the exact moment Retransition
+// begins -- see both state machines' own `retransitionOffsetAccumStart`/
+// `retransitionRotationAccumStart` snapshot) back down to zero in step
+// with the pose's own retransition progress, then clears the real
+// accumulator entirely once progress reaches 1 -- a genuinely fresh
+// start for the next trigger, not just a visual reset.
+function applyOffsetRotationRetransition(hand, progress, offsetAccumStart, rotationAccumStart) {
+  const remaining = 1 - progress
+  if (offsetAccumStart && (offsetAccumStart.x !== 0 || offsetAccumStart.y !== 0)) {
+    _offsetRightVec.setFromMatrixColumn(camera.matrixWorld, 0)
+    _offsetUpVec.setFromMatrixColumn(camera.matrixWorld, 1)
+    hand.wrapper.position.addScaledVector(_offsetRightVec, offsetAccumStart.x * remaining)
+    hand.wrapper.position.addScaledVector(_offsetUpVec, offsetAccumStart.y * remaining)
+  }
+  if (rotationAccumStart && !isIdentityQuat(rotationAccumStart)) {
+    _offsetQuat.identity().slerp(rotationAccumStart, remaining)
+    hand.wrapper.quaternion.multiply(_offsetQuat)
+  }
+  if (progress >= 1) {
+    if (hand._customOffsetAccum) { hand._customOffsetAccum.x = 0; hand._customOffsetAccum.y = 0 }
+    if (hand._customRotationAccum) hand._customRotationAccum.identity()
   }
 }
 // Tween group's own preset capture/apply -- ONLY `tweenPoses` (the ordered
@@ -6299,13 +6397,27 @@ function safeTweenSpeedMs(v) { return Number.isFinite(v) ? v : 800 }
 // Curve/Range every OTHER tween-retransition path already uses (Trigger
 // All Hands, which used to bypass this per-hand stagger, was removed
 // 2026-09-24 -- see its own control's former DEV_GROUPS comment).
-function beginTweenReleaseStop(chp, trig, p, values, live, minLiveDist, liveDistRange, now) {
+// Item 6 (2026-09-27): snapshots the FULL accumulated offset/rotation
+// total once, at the exact moment retransition begins -- shared by all 3
+// real entry points into 'retransition' phase (this function,
+// updateClickHoldPoseForHand()'s own 'stopping'-phase completion, and
+// endClickHoldPose()'s direct no-stop-delay path) -- see
+// applyOffsetRotationRetransition()'s own comment for why retransition
+// must unwind the REAL total (which may include contributions stacked in
+// by a DIFFERENT function, per item 2), not just this one's own last
+// increment.
+function snapshotOffsetRotationAccumForRetransition(hand, chp) {
+  chp.retransitionOffsetAccumStart = hand._customOffsetAccum ? { ...hand._customOffsetAccum } : { x: 0, y: 0 }
+  chp.retransitionRotationAccumStart = hand._customRotationAccum ? hand._customRotationAccum.clone() : new THREE.Quaternion()
+}
+function beginTweenReleaseStop(hand, chp, trig, p, values, live, minLiveDist, liveDistRange, now) {
   chp.retransitionStart = values
   chp.retransitionStartTime = now
   chp.retransitionDelay = computeStartDelayMs(live, minLiveDist, liveDistRange, trig.tweenRetransitionCurveParsed, trig.tweenRetransitionRangeParsed)
   chp.retransitionIsTween = true
   chp.phase = 'retransition'
   chp.releasePending = false
+  snapshotOffsetRotationAccumForRetransition(hand, chp)
 }
 // Multi-sequence-plus-hold chain builder (direct spec item, the vaguest
 // one-line entry in the original A-L spec -- no detail on exact chaining
@@ -6446,6 +6558,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     chp.frozenSpeedMs = chp.pendingFrozenSpeedMs
     chp.pendingClaimAt = 0
     chp.releasePending = false // a NEW hold-claim always starts fresh, regardless of a stale flag from a previous release
+    chp.offsetBaked = false // a fresh ramp starts a fresh (not-yet-locked-in) increment (item 2/5/6, 2026-09-27)
     releaseHandFromOtherFunctions(hand, p)
   }
   if (chp.phase === 'forward') {
@@ -6479,8 +6592,9 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
       if (progress >= 1 && chp.releasePending) {
         chp.lastAppliedValues = values
         applyPoseValuesToHand(hand, values, chp.frozenSplayDeg)
-        applyOffsetRotationToHand(hand, p, progress)
-        beginTweenReleaseStop(chp, trig, p, values, live, minLiveDist, liveDistRange, now)
+        applyOffsetRotationToHand(hand, p, chp.offsetBaked ? 0 : progress)
+        if (!chp.offsetBaked) { bakeOffsetRotationIntoAccum(hand, p); chp.offsetBaked = true }
+        beginTweenReleaseStop(hand, chp, trig, p, values, live, minLiveDist, liveDistRange, now)
         return
       }
       // Loop Mode -- direct follow-up request, ported from Double Click
@@ -6508,7 +6622,21 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     }
     chp.lastAppliedValues = values
     applyPoseValuesToHand(hand, values, chp.frozenSplayDeg)
-    applyOffsetRotationToHand(hand, p, progress)
+    // Item 2/5/6 (2026-09-27): single-pose-mode holds (and a tween with no
+    // Loop Mode engaged) can linger in THIS phase indefinitely at
+    // progress pinned at 1 while the hold is sustained -- `offsetBaked`
+    // guards against re-baking (and re-adding) the same completed
+    // increment every single frame spent holding, which would otherwise
+    // grow without bound even while perfectly still. Loop Mode's own
+    // transition to 'looping' just above still renders this SAME frame's
+    // progress=1 once, correctly, before 'looping' phase takes over next
+    // frame.
+    if (!chp.offsetBaked) {
+      applyOffsetRotationToHand(hand, p, progress)
+      if (progress >= 1) { bakeOffsetRotationIntoAccum(hand, p); chp.offsetBaked = true }
+    } else {
+      applyOffsetRotationToHand(hand, p, 0)
+    }
   } else if (chp.phase === 'looping') {
     // Continues for as long as the hold lasts. Both cycling styles share
     // this one phase, branching only on which lerp function to call --
@@ -6532,7 +6660,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
       // other config-driven state can still change during a hold, same
       // convention as the 'paused' phase elsewhere in this file).
       applyPoseValuesToHand(hand, chp.lastAppliedValues, chp.frozenSplayDeg)
-      applyOffsetRotationToHand(hand, p, 1) // looping only starts once the forward ramp is fully complete
+      applyOffsetRotationToHand(hand, p, 0) // this lap's own contribution is already baked into the accumulator (item 5, 2026-09-27)
       return
     }
     if (chp.loopHoldEndTime && now >= chp.loopHoldEndTime) {
@@ -6573,14 +6701,20 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     }
     chp.lastAppliedValues = values
     applyPoseValuesToHand(hand, values, chp.frozenSplayDeg)
-    applyOffsetRotationToHand(hand, p, 1) // looping only starts once the forward ramp is fully complete
+    applyOffsetRotationToHand(hand, p, lapT) // item 5 (2026-09-27): THIS lap's own ramp, on top of everything already accumulated
     if (lapT >= 1) {
+      // Item 5 (2026-09-27): "everytime the loop starts, the
+      // offset/rotation sequence is triggered again" -- lock THIS lap's
+      // own contribution in permanently before branching into
+      // stop/hold/restart, exactly mirroring the fire-and-forget pose-kind
+      // family's own sequencePlaying phase (updateClickPoseForHand()).
+      bakeOffsetRotationIntoAccum(hand, p)
       // On Release Mode = 'Complete Sequence' -- a release happened
       // while this lap was already looping (see the forward phase's own
       // matching comment). Finish the CURRENT lap (just completed, right
       // above), then stop -- don't start another lap.
       if (chp.releasePending) {
-        beginTweenReleaseStop(chp, trig, p, values, live, minLiveDist, liveDistRange, now)
+        beginTweenReleaseStop(hand, chp, trig, p, values, live, minLiveDist, liveDistRange, now)
       } else {
         const holdMs = Math.max(cfg[`${p}LoopHoldMs`] ?? 0, 0)
         if (holdMs > 0) chp.loopHoldEndTime = now + holdMs
@@ -6605,7 +6739,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
       // to begin -- completely frozen at whatever was already showing,
       // same convention as every other phase's own pre-stagger hold.
       applyPoseValuesToHand(hand, chp.lastAppliedValues, chp.frozenSplayDeg)
-      applyOffsetRotationToHand(hand, p, 1)
+      applyOffsetRotationToHand(hand, p, 0) // 'stopping' is a deceleration of the POSE, not a new offset/rotation ramp -- nothing new to add
       return
     }
     const tDecay = THREE.MathUtils.clamp((elapsedSinceRelease - chp.stoppingStartDelay) / chp.stoppingDelayMs, 0, 1)
@@ -6624,7 +6758,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     }
     chp.lastAppliedValues = values
     applyPoseValuesToHand(hand, values, chp.frozenSplayDeg)
-    applyOffsetRotationToHand(hand, p, 1)
+    applyOffsetRotationToHand(hand, p, 0) // 'stopping' is a deceleration of the POSE, not a new offset/rotation ramp -- nothing new to add
     if (tDecay >= 1) {
       if (chp.stoppingFreezeAtEnd) { chp.phase = 'idle'; return } // "the hand will just stop where it is"
       chp.retransitionStart = values
@@ -6635,6 +6769,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
       // time so closest hands retransition first (asynchronous per-hand).
       chp.retransitionDelay = chp.retransitionDelayForStop ?? 0
       chp.phase = 'retransition'
+      snapshotOffsetRotationAccumForRetransition(hand, chp)
     }
   } else if (chp.phase === 'retransition') {
     // Tween mode's own dedicated Retransition Speed (direct request --
@@ -6650,7 +6785,11 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     const progress = elapsed < chp.retransitionDelay ? 0 : THREE.MathUtils.clamp((elapsed - chp.retransitionDelay) / speedMs, 0, 1)
     const values = lerpPoseValues(chp.retransitionStart, poseDefaultValues, progress)
     applyPoseValuesToHand(hand, values, chp.frozenSplayDeg)
-    applyOffsetRotationToHand(hand, p, 1 - progress) // ramps back down to 0 as the hand returns to default, inverse of the forward ramp
+    // Item 6 (2026-09-27): unwinds the FULL accumulated offset/rotation
+    // (snapshotted at retransition-start by snapshotOffsetRotationAccumForRetransition())
+    // back to zero, not just this function's own last increment -- and
+    // clears the real accumulator once progress reaches 1.
+    applyOffsetRotationRetransition(hand, progress, chp.retransitionOffsetAccumStart, chp.retransitionRotationAccumStart)
     if (progress >= 1) chp.phase = 'idle' // fully settled at default -- stop overriding, normal cfg-driven posing (inert here since it only re-applies on slider change, not every frame) silently regains control
   }
 }
@@ -6897,6 +7036,7 @@ function endClickHoldPose(p) {
       ? computeStartDelayMs(dists[i], minD, range, trig.retransitionSpeedCurveParsed, trig.retransitionSpeedRangeParsed)
       : 0
     chp.phase = 'retransition'
+    snapshotOffsetRotationAccumForRetransition(hand, chp)
   })
 }
 // Window-level pointerdown/pointerup (same convention as the Mouse
@@ -7137,7 +7277,7 @@ function getOrInitHandCP(hand) {
   // again any time the key list changes.
   CLICK_POSE_KEYS.forEach((p) => {
     if (hand._cp[p]) return
-    hand._cp[p] = { phase: 'idle', triggerTime: 0, forwardSnapshot: null, tweenPoses: null, pauseStartTime: 0, retransitionStart: null, retransitionStartTime: 0, retransitionDelay: 0, retransitionSpeedMs: 0, lastAppliedValues: null, frozenSplayDeg: 0, pendingClaimAt: 0, pendingForwardSnapshot: null, pendingNamedPoses: null, pendingFrozenSplayDeg: 0, frozenSpeedMs: 0, pendingFrozenSpeedMs: 0, sequenceLapIndex: 1, sequenceLapStartTime: 0, sequenceHoldEndTime: 0, sequenceDirection: 1 }
+    hand._cp[p] = { phase: 'idle', triggerTime: 0, forwardSnapshot: null, tweenPoses: null, pauseStartTime: 0, retransitionStart: null, retransitionStartTime: 0, retransitionDelay: 0, retransitionSpeedMs: 0, lastAppliedValues: null, frozenSplayDeg: 0, pendingClaimAt: 0, pendingForwardSnapshot: null, pendingNamedPoses: null, pendingFrozenSplayDeg: 0, frozenSpeedMs: 0, pendingFrozenSpeedMs: 0, sequenceLapIndex: 1, sequenceLapStartTime: 0, sequenceHoldEndTime: 0, sequenceDirection: 1, offsetBaked: false, retransitionOffsetAccumStart: null, retransitionRotationAccumStart: null }
   })
   return hand._cp
 }
@@ -7179,6 +7319,7 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
     cp.frozenSplayDeg = cp.pendingFrozenSplayDeg
     cp.frozenSpeedMs = cp.pendingFrozenSpeedMs
     cp.pendingClaimAt = 0
+    cp.offsetBaked = false // a fresh ramp starts a fresh (not-yet-locked-in) increment
     releaseHandFromOtherFunctions(hand, p)
   }
   if (cp.phase === 'forward') {
@@ -7208,6 +7349,17 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
     applyPoseValuesToHand(hand, values, cp.frozenSplayDeg)
     applyOffsetRotationToHand(hand, p, progress)
     if (progress >= 1) {
+      // Item 5/2 (2026-09-27): this ramp just completed -- lock its own
+      // Offset/Rotation contribution permanently into the hand's
+      // accumulator before moving on, so it's still there (not reset)
+      // once ANY other function's own ramp starts composing on top of it
+      // (item 2), and so a looping Sequence's own FIRST lap already
+      // counts toward the running total the same as every lap after it
+      // (item 5). See applyOffsetRotationToHand()'s own comment for the
+      // full model -- this `if (progress >= 1)` block always transitions
+      // phase on the very same frame it fires (no lingering), so a single
+      // bake call here is exactly once per completed ramp, never repeated.
+      bakeOffsetRotationIntoAccum(hand, p)
       // Sequence Mode - Count/Loop/Oscillate (Sequence mode only) -- see
       // makeClickPoseGroup()'s own control comment for the full
       // reasoning. This initial forward pass IS lap 1; a plain 'Count'
@@ -7240,7 +7392,7 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
     const holdMs = Math.max(cfg[`${p}SequenceHoldMs`] || 0, 0)
     if (cp.sequenceHoldEndTime && now < cp.sequenceHoldEndTime) {
       applyPoseValuesToHand(hand, cp.lastAppliedValues, cp.frozenSplayDeg)
-      applyOffsetRotationToHand(hand, p, 1)
+      applyOffsetRotationToHand(hand, p, 0) // this lap's own contribution is already baked into the accumulator
       return
     }
     if (cp.sequenceHoldEndTime && now >= cp.sequenceHoldEndTime) {
@@ -7270,8 +7422,18 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
     }
     cp.lastAppliedValues = values
     applyPoseValuesToHand(hand, values, cp.frozenSplayDeg)
-    applyOffsetRotationToHand(hand, p, 1)
+    applyOffsetRotationToHand(hand, p, lapT) // item 5 (2026-09-27): THIS lap's own ramp, on top of everything already accumulated
     if (lapT >= 1) {
+      // Item 5 (2026-09-27): "everytime the loop starts, the
+      // offset/rotation sequence is triggered again" -- lock THIS lap's
+      // own contribution in permanently before starting (or ending) the
+      // next one, so an unbounded Loop/Oscillate genuinely keeps growing
+      // lap after lap. This block always transitions/restarts on the
+      // same frame lapT hits 1 (a hold-duration pause included -- see the
+      // `sequenceHoldEndTime` branch above, which correctly renders
+      // progress=0 while paused since the bake already happened here),
+      // so this fires exactly once per completed lap, never repeated.
+      bakeOffsetRotationIntoAccum(hand, p)
       cp.sequenceLapIndex++
       if (cp.sequenceLapIndex > totalLaps) {
         cp.phase = 'paused'
@@ -7291,7 +7453,7 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
     // own top comment for why Responsive Wrist Splay must not keep
     // recalculating throughout an explicit pose transition.
     applyPoseValuesToHand(hand, cp.lastAppliedValues, cp.frozenSplayDeg)
-    applyOffsetRotationToHand(hand, p, 1) // paused only reached once the forward ramp is fully complete
+    applyOffsetRotationToHand(hand, p, 0) // already baked into the accumulator (item 2/5, 2026-09-27) -- nothing new to ramp while just holding
     // Retransition on/off -- available regardless of Single Pose vs.
     // Sequence/Chain mode (direct request 2026-09-22: "The Retransition
     // settings group should be available to turn on and off regardless
@@ -7312,6 +7474,15 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
       cp.phase = 'retransition'
       cp.retransitionStart = cp.lastAppliedValues || { ...poseDefaultValues }
       cp.retransitionStartTime = now
+      // Item 6 (2026-09-27): "Regardless of how far the hands offset or
+      // rotate, if they have retransition turned on, they will always
+      // retransition back to the original default pose and position and
+      // rotation" -- snapshot the FULL accumulated total (which may
+      // include contributions stacked in by OTHER functions, per item 2,
+      // not just this one) once, right here, so retransition unwinds the
+      // real total rather than just this function's own last increment.
+      cp.retransitionOffsetAccumStart = hand._customOffsetAccum ? { ...hand._customOffsetAccum } : { x: 0, y: 0 }
+      cp.retransitionRotationAccumStart = hand._customRotationAccum ? hand._customRotationAccum.clone() : new THREE.Quaternion()
       // Computed from THIS hand's own live distance right now, not a
       // shared snapshot -- see this section's own top comment for why.
       cp.retransitionDelay = computeStartDelayMs(live, minLiveDist, liveDistRange, clickPoseTriggers[p].retransitionCurveParsed, clickPoseTriggers[p].retransitionRangeParsed)
@@ -7329,7 +7500,11 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
     const progress = elapsed < cp.retransitionDelay ? 0 : THREE.MathUtils.clamp((elapsed - cp.retransitionDelay) / speedMs, 0, 1)
     const values = lerpPoseValues(cp.retransitionStart, poseDefaultValues, progress)
     applyPoseValuesToHand(hand, values, cp.frozenSplayDeg)
-    applyOffsetRotationToHand(hand, p, 1 - progress) // ramps back down to 0 as the hand returns to default, inverse of the forward ramp
+    // Item 6 (2026-09-27): unwinds the FULL accumulated offset/rotation
+    // (snapshotted above at retransition-start) back to zero, not just
+    // this function's own last increment -- and clears the real
+    // accumulator once progress reaches 1, a genuinely fresh start.
+    applyOffsetRotationRetransition(hand, progress, cp.retransitionOffsetAccumStart, cp.retransitionRotationAccumStart)
     if (progress >= 1) cp.phase = 'idle'
   }
 }
@@ -10505,12 +10680,32 @@ let pausedAtMs = 0
 // Paused-render throttle's own "last actually rendered" timestamp -- see
 // animate()'s own composer.render() gate, right after updateRenderOrder().
 let lastPausedRenderMs = 0
+// Render-on-demand dirty flag (2026-09-27, direct report: "when i pause
+// the hands, how come the ui is still slow... why does it matter how
+// many hands are there" -- correctly reasoned that composer.render()'s
+// own per-call cost still scales with hand count even while THROTTLED
+// (the 2026-09-21 fix), since a throttled render is still a REAL render,
+// just a less frequent one). Starts true so the very first frame after
+// load always renders. Set true by: onAnyValueChange (devPanel.js's new
+// generic hook -- ANY control's applied value changing, including a
+// camera-position sync FROM the live scene), and setPaused() itself (both
+// directions, so the pause/resume transition frame -- and the anti-
+// staleness safety-net window reset below -- always redraw promptly).
+// Consumed/reset to false inside animate()'s own paused-render gate, only
+// once a redraw actually happens. While paused and nothing sets this
+// true, composer.render() is skipped ENTIRELY (not just throttled) --
+// near-zero per-frame cost regardless of hand count, which is the whole
+// point of this fix. A ~2000ms safety-net backstop (see animate()) still
+// forces an occasional redraw regardless, in case some future change
+// mutates the scene without going through either trigger above.
+let sceneNeedsRedraw = true
 function nowVirtual() { return performance.now() - pauseOffsetMs }
 function setPaused(v) {
   if (v === isPaused) return
   if (v) { isPaused = true; pausedAtMs = performance.now() }
   else { pauseOffsetMs += performance.now() - pausedAtMs; isPaused = false }
   lastPausedRenderMs = 0 // force an immediate render on the very next frame after any pause/resume toggle
+  sceneNeedsRedraw = true // the pause/resume transition itself must always redraw
   // Keeps BOTH triggers of this same state in sync regardless of which
   // one was clicked -- the dev panel's own pre-existing PAUSE/RESUME
   // button (Debug group) and the new always-visible #pauseButton
@@ -10848,32 +11043,35 @@ function animate(dt, now) {
       updateRenderOrder()
       __frameProfiler.updateRenderOrderMs += performance.now() - __uroStart
     }
-    // PERFORMANCE (2026-09-21, direct report: "even when i ahve the
-    // animtion/3js poses paused... it is still very slow when i try to
-    // use the dev panel"): Global Pause already skips updateRenderOrder()
-    // above, but composer.render() itself -- the actual GPU draw call for
-    // every hand mesh plus the OutlinePass -- ran completely unthrottled,
-    // every single requestAnimationFrame tick, regardless of pause. With a
-    // large field this is the dominant per-frame cost (confirmed by the
-    // frame-profiler log just below, which already measures
-    // avgComposerRender specifically), and since JS is single-threaded, a
-    // slow render() call competes directly with dev-panel input handling
-    // for main-thread time -- matches the user's own observation exactly
-    // (zooming in, which frustum-culls hands out of view and renders
-    // fewer of them, measurably speeds the panel back up). While paused,
-    // nothing is animating, so there is no need to redraw at full display
-    // refresh rate -- throttled to `cfg.pausedRenderFps` (Pause Button
-    // group) instead of skipped outright, so any dev-panel-driven visual
-    // change (a color/lighting/material slider) still appears within one
-    // throttle interval (default 1000/15 ~= 67ms -- imperceptible lag for
-    // a value a human is dragging, nowhere close to "stale forever").
-    // controls.update()/panel-sync above are NOT throttled -- camera
-    // orbit/pan/zoom stays responsive even while paused.
+    // PERFORMANCE (2026-09-21, throttled; superseded 2026-09-27 by
+    // render-on-demand -- see sceneNeedsRedraw's own declaration for the
+    // full account). Global Pause already skips updateRenderOrder() above,
+    // but composer.render() itself -- the actual GPU draw call for every
+    // hand mesh plus the OutlinePass -- used to run every single
+    // requestAnimationFrame tick regardless of pause, then (2026-09-21)
+    // merely THROTTLED to cfg.pausedRenderFps. A throttled render is still
+    // a REAL render, so its own per-call cost still scaled with hand count
+    // -- confirmed by direct user follow-up ("so when i zoom in so only
+    // few hands are showing, its much smoother. But if its paused, then
+    // why does it matter how many hands are there") pointing out the
+    // throttle fix was necessary but not sufficient. Render-on-demand: while
+    // paused, composer.render() is skipped ENTIRELY unless sceneNeedsRedraw
+    // is true (set by devPanel.js's onAnyValueChange hook -- ANY control's
+    // applied value changing -- or by setPaused() itself), rate-limited to
+    // cfg.pausedRenderFps so a rapid slider drag doesn't over-render, plus
+    // a ~2000ms safety-net backstop that redraws regardless of the dirty
+    // flag, in case some future change mutates the scene without going
+    // through either trigger. controls.update()/panel-sync above are NOT
+    // throttled -- camera orbit/pan/zoom stays responsive even while paused.
     const __nowForRender = performance.now()
     const __pausedRenderIntervalMs = 1000 / Math.max(1, cfg.pausedRenderFps ?? 15)
-    const __shouldRenderThisFrame = !isPaused || (__nowForRender - lastPausedRenderMs) >= __pausedRenderIntervalMs
+    const __pausedSafetyNetIntervalMs = 2000
+    const __sinceLastPausedRender = __nowForRender - lastPausedRenderMs
+    const __shouldRenderThisFrame = !isPaused
+      || (sceneNeedsRedraw && __sinceLastPausedRender >= __pausedRenderIntervalMs)
+      || __sinceLastPausedRender >= __pausedSafetyNetIntervalMs
     if (__shouldRenderThisFrame) {
-      if (isPaused) lastPausedRenderMs = __nowForRender
+      if (isPaused) { lastPausedRenderMs = __nowForRender; sceneNeedsRedraw = false }
       const __renderStart = performance.now()
       composer.render()
       __frameProfiler.composerRenderMs += performance.now() - __renderStart

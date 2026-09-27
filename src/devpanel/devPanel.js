@@ -85,6 +85,18 @@ let lastRestoredValues = null // { desktop: {...}, mobile: {...}, landscape: {..
 // group cascade checkbox) are both top-level functions defined BEFORE
 // initDevPanel(), with no closure access to its own `opts` parameter.
 let hostOnDevVisibilityChanged = null
+// Same pattern as hostOnDevVisibilityChanged above -- commit()/syncValue()
+// are both top-level functions defined before initDevPanel(), with no
+// closure access to its own `opts` parameter. Added 2026-09-27 (direct
+// need: a host wanting to know "did ANY control's real, applied value
+// just change" -- e.g. to mark a paused render loop dirty -- generically,
+// without individually wiring every control's own onChange). Fires from
+// BOTH real paths a value can change through: commit() (a genuine live
+// user edit) and syncValue() (a host-driven push, e.g. a Saved Preset's
+// "Use" action, or a camera position synced FROM the live scene INTO the
+// panel) -- between the two, every way `cfg`/the visible panel can change
+// is covered.
+let hostOnAnyValueChange = null
 const numEls = {} // key -> { slider, numInput } | { type: 'color' } | { type: 'checkbox' }
 // Set by initDevPanel()'s own saveSettings() closure (see its own comment) so
 // the exported saveCurrentSettings() below can trigger a real persisted save.
@@ -261,6 +273,7 @@ function commit(ctrl, v) {
     if (store[real][ctrl.key] === v) {
       cfg[ctrl.key] = v
       if (ctrl.onChange) ctrl.onChange(v)
+      if (hostOnAnyValueChange) hostOnAnyValueChange(ctrl.key, v)
     }
     return
   }
@@ -272,6 +285,7 @@ function commit(ctrl, v) {
   if (!ctrl.perDevice || editingDevice === realDeviceClass()) {
     cfg[ctrl.key] = v
     if (ctrl.onChange) ctrl.onChange(v)
+    if (hostOnAnyValueChange) hostOnAnyValueChange(ctrl.key, v)
   }
 }
 
@@ -347,6 +361,7 @@ export function syncValue(key, v) {
   }
   cfg[key] = v
   displayValue(ctrl, v)
+  if (hostOnAnyValueChange) hostOnAnyValueChange(key, v)
 }
 
 // Rebuilds entry.items (order + each item's .group) from the LIVE DOM after
@@ -2581,6 +2596,7 @@ export function initDevPanel(groups, opts = {}) {
   devGroups = groups
   storageKeyPrefix = opts.storageKeyPrefix || 'devPanel'
   hostOnDevVisibilityChanged = opts.onDevVisibilityChanged || null
+  hostOnAnyValueChange = opts.onAnyValueChange || null
   editingDevice = realDeviceClass()
   // cfg/store are populated from defaults regardless of DEV_MODE -- these
   // values are the app's real, shipped defaults for every visitor; DEV_MODE
