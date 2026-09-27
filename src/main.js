@@ -6928,7 +6928,31 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     // `cfg[SpeedCurveEnabled] ? chp.frozenSpeedMs : cfg[TransitionSpeedMs]`.
     const speedMs = Math.max(chp.retransitionIsTween ? cfg[`${p}TweenRetransitionSpeedMs`] : (cfg[`${p}RetransitionSpeedCurveEnabled`] ? chp.retransitionSpeedMs : cfg[`${p}RetransitionSpeedMs`]), 1)
     const progress = elapsed < chp.retransitionDelay ? 0 : THREE.MathUtils.clamp((elapsed - chp.retransitionDelay) / speedMs, 0, 1)
-    const values = lerpPoseValues(chp.retransitionStart, poseDefaultValues, progress)
+    // CORRECTED 2026-09-27 (2nd round, real measured bug -- direct report
+    // "there is always a jump on the trigger after a hold release," a
+    // follow-up on the splay fix above) -- retransition used to target
+    // `poseDefaultValues`, a SNAPSHOT only ever resynced at page load or
+    // an explicit "Default" button click. Idle-repose, meanwhile, always
+    // renders from LIVE `cfg` directly (so dragging a Pose slider previews
+    // instantly on every idle hand). The moment the user tunes ANY pose
+    // slider (curl/wristBend/wristSplay/wristRotation/modelRotX-Y-Z/
+    // poseOffset/poseScale) without clicking "Default" afterward, these 2
+    // sources of truth silently diverge -- confirmed live via a direct
+    // state-machine simulation (window.__debug): changing cfg.wristBend
+    // mid-session, then holding/releasing, measured the wrist bone's own
+    // quaternion SNAP the instant retransition finished and idle-repose
+    // took over -- retransition had converged to the STALE default, idle
+    // immediately overwrote it with the live value, a real, visible jump.
+    // Targeting `cfg` directly here instead means retransition ALWAYS
+    // converges to exactly what idle already shows, by construction --
+    // no way for the 2 to disagree again. Trade-off, disclosed rather than
+    // silently absorbed: the "Default" button's own documented effect on
+    // retransition's target is now moot whenever the user has tuned any
+    // pose slider since their last "Default" click (retransition will
+    // follow the live tuning instead of the saved default in that case) --
+    // `poseDefaultValues` is untouched everywhere else (Loading/Pose/Tween
+    // Preview, dcHold's own "always starts from default" exception).
+    const values = lerpPoseValues(chp.retransitionStart, cfg, progress)
     // CORRECTED 2026-09-27 -- see snapshotOffsetRotationAccumForRetransition()'s
     // own comment. Blends from wherever splay actually was the instant
     // retransition began (`chp.retransitionFromSplayDeg`) toward the LIVE
@@ -7695,7 +7719,9 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
     const elapsed = now - cp.retransitionStartTime
     const speedMs = Math.max(cfg[`${p}RetransitionSpeedCurveEnabled`] ? cp.retransitionSpeedMs : cfg[`${p}RetransitionSpeedMs`], 1)
     const progress = elapsed < cp.retransitionDelay ? 0 : THREE.MathUtils.clamp((elapsed - cp.retransitionDelay) / speedMs, 0, 1)
-    const values = lerpPoseValues(cp.retransitionStart, poseDefaultValues, progress)
+    // CORRECTED 2026-09-27 -- see updateClickHoldPoseForHand()'s own
+    // matching 'retransition'-phase comment for the full reasoning.
+    const values = lerpPoseValues(cp.retransitionStart, cfg, progress)
     // CORRECTED 2026-09-27 -- see updateClickHoldPoseForHand()'s own
     // matching 'retransition'-phase comment for the full reasoning.
     const liveSplayTarget = computeResponsiveWristSplayDeg(live, minLiveDist, liveDistRange)
