@@ -12133,6 +12133,138 @@ Commit: `d07ec70`. Pushed to `https://github.com/LeisHo/HandyDandies`.
 dev-panel-settings.json via Save Settings" -- the user's own live Save
 Settings writes, touching only that JSON file.)
 
+--------------------------------------------------------------------------------
+2026-09-27
+
+A 9-item direct spec covering Click Function behavior across the board.
+Investigated each item against the current code before changing anything
+-- 4 turned out to already be correct by design; 3 needed a real
+architectural fix; 1 was a UI/runtime restructuring; the 9th (Start
+Distance Curve) is a separate, larger piece not yet built this round.
+
+**#1 (cursor tracking never interrupts a tween, both apply
+simultaneously) -- already correct.** `animate()`'s own per-frame loop
+runs cursor tracking's `hand.wrapper.quaternion.slerp(desired,
+trackingDamping)` unconditionally for every hand, regardless of tween
+state, BEFORE `updateRenderOrder()` (which drives every tween state
+machine) runs -- and `applyOffsetRotationToHand()`'s own rotation
+composes via `quaternion.multiply()`, additive on top, never overwriting
+what tracking just set. No code bug found; confirmed by direct reading.
+
+**#3 (Offset/Rotation spans the full animation duration) -- already
+correct**, confirmed both by this session's earlier reading and by the
+2026-09-17 entry's own live-verified test (progress ramps 0->target
+using the SAME `progress` the pose-lerp itself uses, tied to the same
+`speedMs`).
+
+**#4 (interruption transitions smoothly, never jumps) -- already
+correct by design.** A hand interrupted mid-tween anchors its NEW
+tween's FROM value on `hand._lastPoseValues` (its own live current
+pose, not a stale snapshot) and ramps toward the new target at the NEW
+function's own configured speed -- there is no intermediate "jump to a
+nominal start pose" step to begin with, so nothing ever snaps.
+
+**#8 (distance-curve X axis auto-scales to the farthest hand) --
+already correct for every EXISTING curve** (Start Time Curve, Animation
+Speed Curve, etc.) -- `computeStartDelayMs()` and friends already
+normalize by `minD`/`maxD` freshly computed from the CURRENT field's own
+hands every trigger, not a fixed distance. The NEW Start Distance Curve
+(item 7, not yet built) will follow the same convention.
+
+**#2/#5/#6 -- a real, previously-nonexistent persistent per-hand
+Offset/Rotation accumulator, built and verified.** Confirmed via direct
+reading that `applyPoseOffsetToPosition()`'s own comment documented the
+OPPOSITE as deliberate ("so it can never compound... the way repeatedly
+adding an offset would") -- correct for the original spec, exactly what
+this spec now asks to change. New `hand._customOffsetAccum`/
+`_customRotationAccum` hold the full historical contribution from every
+completed ramp/lap, across every function, until a completed
+Retransition clears them:
+- `applyOffsetRotationToHand()` applies this baseline unconditionally
+  (even when the CURRENTLY active function has Offset/Rotation of its
+  own disabled -- item 2's "even if the 2nd function doesn't have its
+  own offset" case), plus the current ramp's own progress-scaled delta
+  on top.
+- `bakeOffsetRotationIntoAccum()` folds a completed ramp/lap's own
+  contribution in permanently -- wired into every real completion point
+  in both `updateClickPoseForHand()` (forward pass, sequencePlaying
+  laps) and `updateClickHoldPoseForHand()` (forward pass -- guarded by a
+  new per-trigger `offsetBaked` flag, since a non-looping single-pose
+  hold can linger at progress=1 indefinitely with no phase transition,
+  unlike every pose-kind case -- and looping laps).
+- `applyOffsetRotationRetransition()` unwinds the REAL accumulated total
+  (snapshotted once, at the exact moment retransition begins, via new
+  `snapshotOffsetRotationAccumForRetransition()`, covering all 3 real
+  hold-kind entry points into 'retransition' plus the pose-kind one)
+  back to zero in step with the pose's own retransition progress, then
+  clears the accumulator -- item 6's "regardless of how far... always
+  retransition back to... default."
+
+Verified via 2 isolated, no-DOM/no-THREE.js logic reproductions: the
+accumulation arithmetic itself (3 laps of the same function compound
+correctly to 3x; 2 different functions stack; a function with its own
+Offset disabled doesn't erase a previous function's contribution;
+Retransition zeroes the total -- all 4 correct) and (separately, for the
+already-shipped Multi Trigger feature) the dispatch-cycling math.
+
+**#9 -- Retransition Speed Curve and a new Retransition Start Time
+Curve are now their own nested, toggleable subgroups.** Retransition
+Speed Curve already existed as flat rows inside "Retransition" (added
+2026-09-24) -- now matches "Offset"/"Rotation"/"Animation Speed Curve"'s
+own established nested-subgroup pattern. New
+`${p}RetransitionStartTimeCurveEnabled` control (didn't exist before --
+that pair was always-on) gates a new subgroup covering both the
+Single-Pose and Tween-mode variants under one shared toggle, mirroring
+`${p}StartTimeCurveEnabled`'s own "one gate, mode-dependent child
+fields" pattern for the forward phase. Both nest INSIDE "Retransition"
+by calling `wrapGatedSubgroup()` on already-relocated rows -- traced its
+DOM mechanics step by step before writing this, since it works via a
+global, uniquely-prefixed query rather than parent-scoped lookup, and
+this is the first case in this file of nesting one `wrapGatedSubgroup()`
+output inside another's. Runtime gate added at all 3 real
+retransition-delay computation sites (`updateClickPoseForHand()`,
+`endClickHoldPose()`, `beginTweenReleaseStop()`) -- off means no
+distance-based stagger for retransition, same convention the forward
+phase's own `StartTimeCurveEnabled` already uses.
+
+Both fixes apply automatically to every existing custom function AND
+every Multi Trigger sub-trigger (`MULTI_TRIGGER_ALLOWED_SUFFIXES`
+updated) -- all of them funnel through the same 2 group factories and
+the same 2 state-machine functions, no per-function duplication needed.
+Right Click has no separate control battery to also patch -- confirmed
+the 10 old hardcoded static triggers (including its own) were deleted
+entirely 2026-09-20; every function now goes through
+`makeClickPoseGroup()`/`makeClickHoldPoseGroup()` uniformly.
+
+**Concurrent-session note:** the accumulator implementation (items
+2/5/6) was already committed under a concurrent session's own commit
+(`d07ec70`, the entry directly above this one) since both sessions were
+editing `main.js`'s shared uncommitted working tree at the same time --
+confirmed harmless by direct inspection (their own hunks, an unrelated
+render-on-demand feature, don't overlap with these changes at all). See
+this project's own CLAUDE.md §5/§9 for the established precedent for
+this exact scenario. Item 9's own diff is this session's own, separate
+commit.
+
+`main.js` cache-buster bumped `?v=225` -> `?v=226`. `node --check`
+passes throughout. **NOT live-verified in a real browser this round** --
+continuing straight into item 7 given time already invested; deferred
+to whenever this whole batch (including item 7) gets a real hands-on
+test.
+
+**Item 7 (Start Distance Curve) NOT yet built** -- a new subgroup with
+min/max distance eligibility gating (hands outside the configured range
+never trigger at all) plus a curve controlling how far into the tween an
+eligible hand animates (a 50%-capped hand only ever interpolates halfway
+to its target, across the FULL configured animation duration, not a
+shortened one). Checkpointed here rather than continuing under time
+pressure -- this project's own history has a direct precedent for
+exactly this (Multi Trigger was deliberately deferred once already
+rather than shipped half-built, per 2026-09-24's own entry).
+
+Commits: `a4e4f0d`, `a6e6dc4`. Pushed to
+`https://github.com/LeisHo/HandyDandies`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

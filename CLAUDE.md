@@ -1355,3 +1355,40 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   reasoning, not observed live. The core tick-pause-resume mechanism
   itself WAS verified live (a registered probe callback, ticking ->
   frozen 2s while simulated hidden -> resumed on simulated focus).
+- **`applyPoseOffsetToPosition()`'s own "never compound" design (an
+  ABSOLUTE position recompute from `basePosition` every call) was
+  DELIBERATE for the original Offset/Rotation spec, but is exactly what a
+  later direct request (2026-09-27) asked to reverse -- always re-check
+  whether an existing "this is intentional" comment still describes what
+  the user currently wants before assuming it's still correct.** Confirmed
+  2026-09-27: a request for Offset/Rotation to "stack" across different
+  triggered functions and compound across repeated loop laps directly
+  contradicts this earlier comment's own stated intent. Fixed by adding a
+  genuinely new mechanism (a persistent `hand._customOffsetAccum`/
+  `_customRotationAccum` accumulator, baked in at every real tween/lap
+  completion, cleared only by a completed Retransition) layered ON TOP of
+  the existing per-frame reset, rather than removing the reset itself --
+  see `applyOffsetRotationToHand()`'s own extensive comment for the full
+  model. If a future report describes Offset/Rotation "not sticking"
+  again, check whether `bakeOffsetRotationIntoAccum()` is actually being
+  called at every real completion point in BOTH `updateClickPoseForHand()`
+  and `updateClickHoldPoseForHand()` -- the hold-kind family's own
+  'forward' phase specifically needs its `offsetBaked` per-trigger flag
+  (a non-looping single-pose hold can linger at progress=1 indefinitely
+  with no phase transition, unlike every pose-kind case, so re-baking
+  every single frame without this guard would grow the accumulator
+  without bound even while perfectly still).
+- **`wrapGatedSubgroup()` can be nested inside its own previous output --
+  calling it a 2nd time on rows that a FIRST call already relocated into
+  a new subgroup correctly re-nests them one level deeper, because it
+  finds its own `enabledKey` row via a GLOBAL, uniquely-prefixed
+  `document.querySelector()`, not a parent-scoped one.** Confirmed
+  2026-09-27 while building 2 new subgroups ("Retransition Speed Curve,"
+  "Retransition Start Time Curve") nested inside the existing
+  "Retransition" group -- traced through `wrapGatedSubgroup()`'s own
+  source step by step before relying on this, since it was the first
+  case in this file of nesting one call's output inside another's, and
+  the ORDER matters: the outer wrap (which first moves the target rows
+  into ITS OWN body) must run before any inner wrap that expects to find
+  those same rows already there. Useful precedent for any future request
+  to further subdivide an existing gated subgroup.
