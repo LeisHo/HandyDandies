@@ -18,6 +18,24 @@ work seamlessly from there.
 
 ## Currently working on
 
+**SHIPPED 2026-09-27 (2nd round), not tested this round per direct
+instruction (the user is testing directly) -- reinterpreted the Multi-
+Click Window slider for the rolling successive-click model.** Traced all
+3 real consumers of `cfg.multiClickWindowMs` (the fire-and-forget click
+chain, the click-hold chain, Mouse Log's own classification) before
+touching anything -- all 3 already `clearTimeout`+restart their own
+timer on every new click, which IS the rolling/gap-based model the
+direct spec asked for; the user's own diagnosis of a "fixed whole-
+sequence window" didn't match the real code here. Only the default/range
+needed changing: relabeled to "Rolling Click Window -- Max Gap Between
+Successive Clicks (Ms)," re-ranged/re-defaulted to the spec's own ~200ms
+(min 50/max 600/def 200, was min 200/max 1200/def 600). Flagged, not
+overridden: this project's own real history shows 200ms is stricter than
+450ms, the last value found too tight for a real human's quad-click
+attempt (see CHANGELOG.txt's matching entry) -- worth watching if
+quad-click starts misfiring. No dispatch/logic change. `main.js`
+cache-buster `?v=219` -> `?v=220`.
+
 **SHIPPED 2026-09-27, NEEDS REAL HANDS-ON TESTING (not live-verified this
 round -- sandbox network truncation) -- new Multi Trigger feature for
 pose-kind Custom Click Functions, plus a real Touch Point Count fix.**

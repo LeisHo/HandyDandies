@@ -11812,6 +11812,68 @@ guessed at further without more detail.
 Commit: `b9de5eb`. Pushed to `https://github.com/LeisHo/HandyDandies`.
 
 --------------------------------------------------------------------------------
+2026-09-27 (2nd round)
+
+Direct spec: replace the multi-click classification's "fixed whole-
+sequence window" model with a rolling one -- each click should
+start/restart a short timer measuring the gap since the MOST RECENT
+click, not since the first, so a 10- or 100-click sequence works the
+same way a 4-click one does, with no predetermined cap on the counting
+itself. Explicit instruction: trace the real code before touching
+anything, don't redesign the gesture system, and don't test/verify this
+round (the user will test it directly).
+
+Traced all 3 real consumers of `cfg.multiClickWindowMs` before writing
+anything: the fire-and-forget click chain (`clickPoseClickTimer`,
+`window.addEventListener('pointerup', ...)` for the left button), the
+click-hold chain (`clickHoldChainLastCleanUpTime`, checked at
+`pointerdown`), and Mouse Tracking Log's own click classification
+(`mouseLogClickTimer`). All 3 already call `clearTimeout` and start a
+FRESH timer on every new click/press -- this is already the exact
+rolling, resets-from-the-most-recent-click model the spec describes, not
+a fixed whole-sequence window. The control's own pre-existing comment
+already documented it this way too ("governs how long a gap between
+consecutive clicks is still read as the same multi-click sequence
+continuing"). The user's own diagnosis of the "current problem" didn't
+match what the code actually does here -- surfaced this plainly rather
+than silently either rewriting something that already worked or
+silently doing nothing.
+
+What genuinely needed changing: the DEFAULT and RANGE. 600ms was tuned
+(see this same control's own earlier-in-file history comment) as a
+whole-sequence budget, specifically because a real human's slower later
+clicks in a genuine quad-click attempt kept exceeding a shorter window
+(350ms -> 450ms -> 600ms, each bump a direct fix for a real "it
+registered as a shorter click count" report) -- a reasonable choice
+under THAT framing, but much longer than a natural gap between
+deliberate consecutive clicks under the NEW rolling-gap framing.
+Relabeled ("Rolling Click Window -- Max Gap Between Successive Clicks
+(Ms)") and re-ranged/re-defaulted to the spec's own ~200ms (min 50, max
+600, def 200 -- was min 200, max 1200, def 600), per direct follow-up
+request to update the slider itself, not just its underlying meaning.
+
+**Flagged, not overridden:** this project's own real history above is
+direct evidence that a rolling gap much shorter than 600ms previously
+caused real quad-click misfires for an actual human's slower later
+clicks -- 200ms is significantly stricter than 450ms, the last value
+this project found still too tight. Implemented exactly as specified
+regardless (the user's own explicit default, and they're testing this
+themselves), but this risk is worth knowing about if quad-click (or a
+custom function's own higher click-count ordinal) starts misfiring
+again.
+
+No dispatch/logic change: click/hold actions, pose behavior, and the
+existing 4-tier click-count chain (click/double/triple/quad) are
+untouched, per direct instruction not to redesign the gesture system.
+
+Not live-verified this round, per direct instruction -- `node --check`
+passes; the user will test directly.
+
+`index.html`'s own `main.js` cache-buster bumped `?v=219` -> `?v=220`.
+
+Commit: `dce2f3e`. Pushed to `https://github.com/LeisHo/HandyDandies`.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================
