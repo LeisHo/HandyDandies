@@ -12341,6 +12341,91 @@ verification alone, not on watching it actually run.
 
 Commit: `b43cc23`. Pushed to `https://github.com/LeisHo/HandyDandies`.
 
+--------------------------------------------------------------------------------
+
+2026-09-27 (7th round)
+
+**Root-caused and fixed the "everything looks broken" production outage
+the user reported** (direct report: "somethign looks really broken. the
+background color is wrong and my hand poses look compeltely off. and my
+click functions dont work") -- confirmed live on
+`https://handy-dandies.vercel.app/?dev=1`, NOT caused by this session's
+Click Function work (Multi Trigger, the offset/rotation accumulator,
+items 7/9). Direct evidence, gathered via this session's own browser
+tool against the REAL live deployment (not the sandbox's own unreliable
+local static server):
+
+- `GET /api/save-settings` returned `500 {"ok":false,"error":"Unexpected
+  end of JSON input"}` on every single request (confirmed via a direct
+  `fetch()` from the live page's own console AND via `curl`, both
+  matching).
+- `window.__debug` on the live page showed `cfg.customClickFunctionIds:
+  "[]"` (nothing restored), `scene.background` at the code default white
+  (`{r:1,g:1,b:1}`), and the camera at its hardcoded default position --
+  none of the user's real saved/tuned state, despite 255 hands genuinely
+  existing in the scene (the field DID build, just entirely from
+  hardcoded defaults).
+
+**Root cause:** `data/processed/dev-panel-settings.json` has grown to
+1,213,317 bytes from months of Save/Sync accumulation (this session's
+own 9-item batch added a meaningful chunk of that growth on top of an
+already-large file). GitHub's Contents API only inlines a file's
+`content` field in its response for files roughly <=1MB -- above that,
+`content` comes back empty while `sha`/`size`/`download_url` are still
+present. `api/save-settings.js`'s GET handler
+(`Buffer.from(getData.content || '', 'base64').toString('utf-8')` then
+`JSON.parse(jsonText)`) had no fallback for this: an empty `content`
+produced `jsonText = ''`, and `JSON.parse('')` throws exactly
+"Unexpected end of JSON input" -- the precise error observed. Every
+restore attempt permanently 500'd, so the live page fell back to its
+6-second hardcoded-defaults timeout (`tryStartField()`'s own fallback
+`setTimeout`, main.js) on EVERY load, producing all 3 reported symptoms
+(wrong background, wrong/default poses, zero click functions) as one
+single shared cause -- not 3 separate bugs.
+
+**Fixed** (`api/save-settings.js`, GET handler only -- the POST/save
+path never depended on `content` and was unaffected): when
+`getData.content` is missing/empty, fall back to fetching
+`getData.download_url` (a raw `githubusercontent.com` URL GitHub always
+provides regardless of file size, valid up to 100MB) instead of failing.
+Read-only fallback, no change to how a Save/Sync write is performed.
+
+**Verification:** `node --check` passed. Live-verified the BROKEN state
+directly (the exact 500/error text, `window.__debug` readout above) via
+this session's own browser tool against the real production URL before
+writing the fix -- not a guess. The fix itself was **NOT** live-verified
+end-to-end before this entry: pushed as commit `bd18889`, then polled
+`/api/save-settings` roughly every 15-20s for ~10 minutes (`curl`, ~28
+attempts total) and checked GitHub's own Deployments API
+(`gh api repos/LeisHo/HandyDandies/deployments`) for a new deployment
+record tied to `bd18889` -- neither showed any sign of Vercel having
+redeployed yet in that window (the endpoint kept returning the OLD
+error text verbatim, and the most recent GitHub Deployment record still
+pointed at the PRIOR commit, `a84a400`, from over an hour earlier).
+Every commit earlier this same session deployed within roughly 1-2
+minutes of its own push, so a 10+ minute gap with zero deployment
+record is itself anomalous -- flagged to the user as a separate,
+unresolved question (possibly a stuck/failed Vercel deployment, a
+disconnected GitHub integration, or a platform-side delay this session
+has no visibility into; no Vercel dashboard/API access available here).
+**The code fix is correct and pushed regardless of when/whether Vercel
+picks it up** -- confirmed by direct comparison against the actual
+GitHub Contents API behavior (files over ~1MB omit `content`, still
+provide `download_url`), not just plausible-sounding reasoning.
+
+**Separate, disclosed concern, not acted on this round (scope
+discipline -- the outage was the reported task):** the settings file
+will keep growing as more custom functions/curves/multi-triggers get
+added, and this fix only raises the effective ceiling to `download_url`'s
+own ~100MB limit, it doesn't eliminate the underlying growth. Worth a
+deliberate look eventually (e.g. pruning stale/unused keys, or a format
+that doesn't grow unbounded) -- surfaced here per this project's own
+CLAUDE.md §0a rather than fixed unasked.
+
+No `main.js` changes this round -- cache-buster stays `?v=227`.
+
+Commit: `bd18889`. Pushed to `https://github.com/LeisHo/HandyDandies`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

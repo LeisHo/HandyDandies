@@ -18,6 +18,40 @@ work seamlessly from there.
 
 ## Currently working on
 
+**FIXED 2026-09-27 (7th round) -- the production outage behind "everything
+looks broken" (wrong background color, poses completely off, click
+functions not working). NOT this session's Click Function work -- an
+infrastructure limit.** `data/processed/dev-panel-settings.json` grew
+past ~1MB, crossing GitHub's Contents API threshold for inlining a
+file's `content` field; `api/save-settings.js`'s GET handler had no
+fallback, so `JSON.parse('')` threw on every restore attempt (confirmed
+live via a direct fetch against the real `/api/save-settings` endpoint
+and `window.__debug` on `https://handy-dandies.vercel.app`). With
+restore permanently broken, the app fell back to hardcoded code defaults
+on every load -- explaining all 3 symptoms as one cause. Fixed by
+falling back to GitHub's `download_url` (works up to 100MB) when
+`content` is missing. Commit `bd18889`, pushed.
+
+**STILL OPEN -- not confirmed live.** Vercel had not redeployed commit
+`bd18889` after ~10 minutes of polling (`/api/save-settings` still
+returning the old error verbatim; no new GitHub Deployment record for
+this commit, unlike every earlier commit this session which deployed
+within ~1-2 minutes). This is outside what this sandbox can diagnose
+further (no Vercel dashboard/API access) -- **needs the user to check
+the Vercel dashboard for this project** (a stuck/failed deployment, or
+the GitHub integration having become disconnected) and confirm
+`/api/save-settings` returns `200` again, and that the live app shows
+real saved settings (not defaults) on a fresh load, before treating this
+as resolved. See CLAUDE.md's matching Gotchas entry and CHANGELOG.txt's
+2026-09-27 7th-round entry for the full account.
+
+**Longer-term, disclosed but not acted on:** the settings file will keep
+growing as more state gets saved -- this fix raises the ceiling to
+~100MB, it doesn't remove the unbounded growth. Worth a deliberate look
+eventually (pruning stale keys, or a different storage approach).
+
+--------------------------------------------------------------------------------
+
 **SHIPPED 2026-09-27 -- all 9 items of a direct spec on Click Function
 behavior, across 2 rounds. NOT yet live-verified in a real browser --
 needs a real hands-on test before being fully trusted.** Items 1

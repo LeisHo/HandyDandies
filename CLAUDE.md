@@ -1416,3 +1416,52 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   function called once per hand externally (where `return` exits ALL of
   this frame's work for that hand, not just the one thing you meant to
   skip).**
+- **`data/processed/dev-panel-settings.json` crossing ~1MB breaks the
+  live Save/Sync restore ENTIRELY -- and the failure mode looks like
+  "everything about the app is broken," not like a settings-file
+  problem.** Confirmed live 2026-09-27 on
+  `https://handy-dandies.vercel.app`, a real production outage matching
+  a direct user report ("somethign looks really broken. the background
+  color is wrong and my hand poses look compeltely off. and my click
+  functions dont work"). Root cause: the settings file had grown to
+  1,213,317 bytes; GitHub's Contents API only inlines a file's `content`
+  field for files up to ~1MB, so `api/save-settings.js`'s GET handler
+  received an empty `content` and `JSON.parse('')` threw "Unexpected end
+  of JSON input" on every single restore attempt -- confirmed via a
+  direct `fetch()` against the live `/api/save-settings` endpoint AND
+  `curl`, both returning that exact 500. With restore permanently
+  broken, the live page fell back to `tryStartField()`'s own 6-second
+  hardcoded-defaults timeout on EVERY load (confirmed via
+  `window.__debug`: `cfg.customClickFunctionIds: "[]"`, `scene.background`
+  at the code-default white, camera at its hardcoded default position),
+  which is what actually produced all 3 reported symptoms as ONE shared
+  cause, not 3 separate bugs. Fixed in `api/save-settings.js`'s GET
+  handler by falling back to `getData.download_url` (GitHub always
+  provides this, valid up to 100MB, regardless of whether `content` was
+  inlined) whenever `content` is missing/empty -- read-only fix, the
+  POST/save path never depended on `content` and was never affected.
+  **This ceiling will be hit again** as more custom click functions/
+  curves/multi-triggers get saved -- the fix raises the effective limit
+  to ~100MB, it doesn't remove the underlying unbounded growth (see
+  CHANGELOG.txt's 2026-09-27 7th-round entry for the full account,
+  including a disclosed-but-not-yet-acted-on note about eventually
+  pruning or restructuring this file). If a future report describes the
+  app looking broken in a way that spans MULTIPLE unrelated-seeming
+  systems at once (rendering, poses, AND interaction, simultaneously),
+  check `/api/save-settings`'s own response before assuming a code
+  regression -- a silently-broken restore path produces exactly this
+  shape of symptom, because literally everything ends up running on
+  hardcoded defaults instead of real saved state.
+- **The fix above was pushed (commit `bd18889`) but NOT confirmed live
+  before this entry was written -- Vercel had not redeployed it after
+  ~10 minutes of polling** (`curl` against `/api/save-settings` roughly
+  every 15-20s, ~28 attempts, still returning the OLD error verbatim;
+  `gh api repos/LeisHo/HandyDandies/deployments` still showed the PRIOR
+  commit, `a84a400`, as the most recent deployment record, over an hour
+  old by that point). Every earlier commit this same session deployed
+  within ~1-2 minutes of its own push, so this gap is itself anomalous
+  and unexplained from inside this sandbox (no Vercel dashboard/API
+  access available here) -- if a future session finds `/api/save-settings`
+  still 500ing with this same error after this fix, check whether
+  Vercel's GitHub integration for this repo is actually still connected
+  and auto-deploying before assuming the code fix itself was wrong.
