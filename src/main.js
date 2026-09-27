@@ -1465,7 +1465,24 @@ const DEV_GROUPS = [
       // chain, the Click-Hold chain (dcHold/tripleClickHold/
       // quadClickHold), and this Mouse Tracking Log's own click
       // classification, all 3 at once.
-      { key: 'multiClickWindowMs', label: 'Multi-Click Window (Ms) -- Click/Hold Chains + Multi-Point Touch + Mouse Log', type: 'slider', min: 200, max: 1200, step: 25, def: 600 }
+      // CORRECTED 2026-09-27 -- direct spec ("rolling window model...
+      // approximately 200ms... maximum allowed time between successive
+      // clicks"). Traced all 3 real consumers before changing anything
+      // (per direct instruction): the fire-and-forget click chain
+      // (clickPoseClickTimer), the click-hold chain
+      // (clickHoldChainLastCleanUpTime), and Mouse Log's own
+      // classification (mouseLogClickTimer) ALL already `clearTimeout` +
+      // restart their own timer on every new click/press -- this is
+      // already the exact rolling/resetting-from-the-most-recent-click
+      // model the spec describes, not a fixed whole-sequence window (this
+      // control's own comment directly above already documented it this
+      // way). Only the DEFAULT/RANGE needed changing: 600ms (tuned to
+      // feel like a whole-sequence budget) is much longer than a natural
+      // gap between deliberate consecutive clicks; relabeled and re-
+      // ranged for the gap framing, default dropped to the spec's own
+      // ~200ms. No dispatch/logic change made -- see this project's own
+      // CHANGELOG.txt for the full trace and reasoning.
+      { key: 'multiClickWindowMs', label: 'Rolling Click Window -- Max Gap Between Successive Clicks (Ms)', type: 'slider', min: 50, max: 600, step: 10, def: 200 }
     ]
   }
 ]
