@@ -22,7 +22,7 @@
       "useProgressiveOffset": false,
       "hideHands": false,
       "trackingEnabled": true,
-      "trackingDamping": 0.09,
+      "trackingDamping": 0.05,
       "targetDepthFactor": 0.25,
       "showTargetMarker": false,
       "palmFacesCursor": true,
@@ -6091,14 +6091,14 @@
       "cropWristEnabled": true,
       "hideWrist": 0,
       "reactiveArmLengthEnabled": true,
-      "armLengthRange": "{\"min\":0,\"max\":42}",
+      "armLengthRange": "{\"min\":0,\"max\":63}",
       "armLengthCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
       "wristSplayResponsiveEnabled": true,
       "wristSplayReposeStagger": 1,
       "wristSplayDefault": 6,
       "wristSplayReactiveEnabled": true,
       "wristSplayRange": "{\"min\":30,\"max\":-54}",
-      "wristSplayCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
+      "wristSplayCurve": "[{\"x\":0,\"y\":1},{\"x\":0.6483332316080729,\"y\":0.46708348592122395},{\"x\":1,\"y\":0}]",
       "tweenPoses": [
         "COUNTDOWN (VERT) - 0",
         "COUNTDOWN (VERT) - 1",
@@ -6777,11 +6777,11 @@
       "custom8RetransitionSpeedCurveRange": "{\"min\":50,\"max\":2000}",
       "custom8RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom8RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom8TweenRetransitionSpeedMs": 8000,
+      "custom8TweenRetransitionSpeedMs": 12000,
       "custom8TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom8TweenRetransitionStartTimeRange": "{\"min\":0,\"max\":3000}",
       "custom8TweenStopEnabled": true,
-      "custom8TweenStopStartTimeCurveEnabled": true,
+      "custom8TweenStopStartTimeCurveEnabled": false,
       "custom8TweenStopStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom8TweenStopStartTimeRange": "{\"min\":0,\"max\":3000}",
       "custom8TweenStopDelayEnabled": true,
@@ -13117,14 +13117,14 @@
       "cropWristEnabled": true,
       "hideWrist": 0,
       "reactiveArmLengthEnabled": true,
-      "armLengthRange": "{\"min\":0,\"max\":42}",
+      "armLengthRange": "{\"min\":0,\"max\":63}",
       "armLengthCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
       "wristSplayResponsiveEnabled": true,
       "wristSplayReposeStagger": 1,
       "wristSplayDefault": 6,
       "wristSplayReactiveEnabled": true,
       "wristSplayRange": "{\"min\":30,\"max\":-54}",
-      "wristSplayCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
+      "wristSplayCurve": "[{\"x\":0,\"y\":1},{\"x\":0.6483332316080729,\"y\":0.46708348592122395},{\"x\":1,\"y\":0}]",
       "tweenPoses": [
         "COUNTDOWN (VERT) - 0",
         "COUNTDOWN (VERT) - 1",
@@ -13803,11 +13803,11 @@
       "custom8RetransitionSpeedCurveRange": "{\"min\":50,\"max\":2000}",
       "custom8RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom8RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom8TweenRetransitionSpeedMs": 8000,
+      "custom8TweenRetransitionSpeedMs": 12000,
       "custom8TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom8TweenRetransitionStartTimeRange": "{\"min\":0,\"max\":3000}",
       "custom8TweenStopEnabled": true,
-      "custom8TweenStopStartTimeCurveEnabled": true,
+      "custom8TweenStopStartTimeCurveEnabled": false,
       "custom8TweenStopStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom8TweenStopStartTimeRange": "{\"min\":0,\"max\":3000}",
       "custom8TweenStopDelayEnabled": true,
@@ -20143,14 +20143,14 @@
       "cropWristEnabled": true,
       "hideWrist": 0,
       "reactiveArmLengthEnabled": true,
-      "armLengthRange": "{\"min\":0,\"max\":42}",
+      "armLengthRange": "{\"min\":0,\"max\":63}",
       "armLengthCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
       "wristSplayResponsiveEnabled": true,
       "wristSplayReposeStagger": 1,
       "wristSplayDefault": 6,
       "wristSplayReactiveEnabled": true,
       "wristSplayRange": "{\"min\":30,\"max\":-54}",
-      "wristSplayCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
+      "wristSplayCurve": "[{\"x\":0,\"y\":1},{\"x\":0.6483332316080729,\"y\":0.46708348592122395},{\"x\":1,\"y\":0}]",
       "tweenPoses": [
         "COUNTDOWN (VERT) - 0",
         "COUNTDOWN (VERT) - 1",
@@ -20829,11 +20829,11 @@
       "custom8RetransitionSpeedCurveRange": "{\"min\":50,\"max\":2000}",
       "custom8RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom8RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom8TweenRetransitionSpeedMs": 8000,
+      "custom8TweenRetransitionSpeedMs": 12000,
       "custom8TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom8TweenRetransitionStartTimeRange": "{\"min\":0,\"max\":3000}",
       "custom8TweenStopEnabled": true,
-      "custom8TweenStopStartTimeCurveEnabled": true,
+      "custom8TweenStopStartTimeCurveEnabled": false,
       "custom8TweenStopStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom8TweenStopStartTimeRange": "{\"min\":0,\"max\":3000}",
       "custom8TweenStopDelayEnabled": true,
@@ -22732,7 +22732,7 @@
           "type": "group",
           "group": {
             "key": "New Group (4)",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -22839,7 +22839,7 @@
         },
         {
           "key": "New Group (4)",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
@@ -25225,7 +25225,7 @@
                 "type": "group",
                 "group": {
                   "key": "Tween Stop",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -25514,7 +25514,7 @@
               },
               {
                 "key": "Tween Stop",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -31085,7 +31085,7 @@
               "type": "group",
               "group": {
                 "key": "Tween Stop",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -31374,7 +31374,7 @@
             },
             {
               "key": "Tween Stop",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
