@@ -12128,11 +12128,10 @@ version bumped `?v=48` -> `?v=49` (main.js's own import line, not a
 separate index.html script tag -- devPanel.js is loaded as an ES module
 from within main.js per this project's established convention).
 
-Commit: (pending -- see this round's own commit hash once pushed).
-Fast-forward pulled 16 unrelated concurrent commits (all "Update
+Commit: `d07ec70`. Pushed to `https://github.com/LeisHo/HandyDandies`.
+(Fast-forward pulled 16 unrelated concurrent commits first, all "Update
 dev-panel-settings.json via Save Settings" -- the user's own live Save
-Settings writes, touching only that JSON file) before pushing this
-round.
+Settings writes, touching only that JSON file.)
 
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
