@@ -12426,6 +12426,100 @@ No `main.js` changes this round -- cache-buster stays `?v=227`.
 
 Commit: `bd18889`. Pushed to `https://github.com/LeisHo/HandyDandies`.
 
+--------------------------------------------------------------------------------
+
+2026-09-27 (8th round)
+
+**Fixed wrist splay snapping at every click-function trigger boundary --
+direct report: "when a click function interrupts another click function,
+or interripts a retransition, or interrupts a tween stop occurrence, the
+wrist splay, palm rotation, and wrist crop should never suddenly jump
+values... if i click and hold, then release midway, then wait a second
+or 2, then click on the opposite side of the hand field, the hands will
+jump to accommodate the cursor tracking properties."**
+
+**Root cause, confirmed by direct code tracing (not a live repro --
+this sandbox's own documented network-truncation quirk blocked a clean
+load again this round, 5 retries):** Responsive Wrist Splay
+(`extraSplayDeg` in `applyWristPoseToSkeleton()`) is a live,
+cursor-distance-driven modulation. Idle hands recompute and apply it
+fresh every idle-repose turn -- continuous. Every click function
+(`chp`/`cp`) instead FROZE it once at arm time
+(`pendingFrozenSplayDeg`/`frozenSplayDeg`) and applied that flat
+constant for the trigger's entire lifetime, including through
+'forward', 'looping', 'stopping', and 'retransition'. The 2 systems
+never talked to each other: a hand handed from idle into a trigger (or
+from one trigger into another, or from a trigger back to idle once
+retransition completed) always jumped INSTANTLY between "whatever splay
+it actually had" and "the new governing side's own value" -- exactly
+the reported symptom, and exactly the meaning of "click functions
+shouldn't have any relationship with triggering cursor tracking tweens"
+(a click function's own activity was causing a visible cursor-tracking-
+side discontinuity the instant it let go).
+
+**Fix:** a new `hand.currentSplayDeg` is the single continuously-updated
+"whatever splay is actually on screen right now" value -- written by
+`applyPoseValuesToHand()` (the one funnel every trigger family's own
+per-frame pose application already goes through) and by idle-repose's
+own splay line. Every trigger-boundary now blends FROM this real value
+instead of snapping:
+- **Trigger start** (`chp`/`cp` arm time): `pendingFromSplayDeg =
+  hand.currentSplayDeg` captured alongside the existing
+  `pendingFrozenSplayDeg`; the 'forward' phase now lerps
+  `fromSplayDeg -> frozenSplayDeg` across the SAME `progress` timeline
+  already driving the rest of the pose, instead of jumping to
+  `frozenSplayDeg` on frame 1. This is what makes click-interrupts-click
+  and click-interrupts-retransition smooth: an interrupted hand's
+  `hand.currentSplayDeg` already reflects wherever the OLD trigger (or
+  its own in-progress retransition) had it, so the new trigger picks up
+  exactly there.
+- **Trigger end** (all 3 real chp retransition-entry points, already
+  funneled through the existing `snapshotOffsetRotationAccumForRetransition()`
+  helper -- extended to also capture `retransitionFromSplayDeg`; cp's
+  own 'paused'->'retransition' transition gets the same capture inline):
+  the 'retransition' phase now lerps from that snapshot toward a LIVE
+  target (`computeResponsiveWristSplayDeg(live, minLiveDist,
+  liveDistRange)`, recomputed fresh every frame since the cursor can
+  keep moving throughout retransition) across retransition's own
+  `progress` -- so by the moment `phase` reaches 'idle', splay already
+  equals whatever idle-tracking would show, closing the exact gap the
+  repro describes.
+- 'looping'/'stopping'/'sequencePlaying'/'paused' (both families) are
+  left applying the flat frozen constant, unchanged -- these phases
+  never cross a trigger boundary mid-phase, so there's nothing to blend;
+  only the 2 genuine handoff points (start and end) needed the fix.
+
+"Wrist crop" (Arm Length/Hide Wrist, `computeArmLengthT()`/
+`applyHandArmLength()`) was investigated and found to already be
+frame-continuous and fully decoupled from trigger state -- it runs
+unconditionally every frame for every hand regardless of `overridden`,
+reading live cursor distance directly, with no frozen-at-arm-time
+treatment anywhere. No change needed there; confirmed by reading the
+call site (`updateRenderOrder()`), not assumed. "Palm rotation"
+(cursor-tracking's own wrapper-quaternion slerp) was also confirmed
+already unconditional/continuous every frame regardless of trigger
+state (per item 1 of the 2026-09-27 9-item spec, already shipped
+correct-by-design) -- the fix above is what actually addresses the
+"palm rotation jumps" complaint in practice, since the SAME
+cursor-distance-driven "Responsive" pattern that caused wrist splay's
+jump is the shared mechanism, and this fix is what removes the
+trigger-vs-idle discontinuity for both together.
+
+**NOT live-verified** -- this sandbox's browser automation could not
+get a clean load of this project this round (the standing documented
+network-truncation quirk, 5 retries). Confidence rests on direct,
+careful tracing of all 13 `applyPoseValuesToHand()` call sites (listed
+via `grep`) and confirming each of the 4 genuine trigger-boundary sites
+(chp forward x2, chp retransition, cp forward, cp retransition -- 5
+total call sites once counting both chp forward branches) was updated
+consistently, plus `node --check` for syntax. **Needs the user's own
+real-device retest of the exact repro** (click-hold, release midway,
+wait, click elsewhere) before being fully trusted.
+
+`main.js` cache-buster bumped `?v=227` -> `?v=228`.
+
+Commit: (pending, see this round's own git log).
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

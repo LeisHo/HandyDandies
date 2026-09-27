@@ -5905,7 +5905,7 @@ function getOrInitHandCHP(hand) {
   // keys.
   CLICK_HOLD_KEYS.forEach((p) => {
     if (hand._chp[p]) return
-    hand._chp[p] = { phase: 'idle', forwardStartTime: 0, forwardSnapshot: null, tweenSegments: null, loopStartTime: 0, loopHoldEndTime: 0, loopDirection: 1, retransitionDelay: 0, retransitionStart: null, retransitionStartTime: 0, retransitionIsTween: false, retransitionSpeedMs: 0, lastAppliedValues: null, frozenSplayDeg: 0, pendingClaimAt: 0, armedForHoldStartTime: -1, pendingFrozenSplayDeg: 0, frozenSpeedMs: 0, pendingFrozenSpeedMs: 0, releasePending: false, stoppingStartTime: 0, stoppingStartDelay: 0, stoppingDelayMs: 1, stoppingLastFrameTime: 0, stoppingBaseElapsedMs: 0, stoppingVirtualElapsedMs: 0, stoppingWasLooping: false, stoppingFreezeAtEnd: false, offsetBaked: false, retransitionOffsetAccumStart: null, retransitionRotationAccumStart: null, pendingTweenFractionCap: 1, frozenTweenFractionCap: 1 }
+    hand._chp[p] = { phase: 'idle', forwardStartTime: 0, forwardSnapshot: null, tweenSegments: null, loopStartTime: 0, loopHoldEndTime: 0, loopDirection: 1, retransitionDelay: 0, retransitionStart: null, retransitionStartTime: 0, retransitionIsTween: false, retransitionSpeedMs: 0, lastAppliedValues: null, frozenSplayDeg: 0, pendingClaimAt: 0, armedForHoldStartTime: -1, pendingFrozenSplayDeg: 0, frozenSpeedMs: 0, pendingFrozenSpeedMs: 0, releasePending: false, stoppingStartTime: 0, stoppingStartDelay: 0, stoppingDelayMs: 1, stoppingLastFrameTime: 0, stoppingBaseElapsedMs: 0, stoppingVirtualElapsedMs: 0, stoppingWasLooping: false, stoppingFreezeAtEnd: false, offsetBaked: false, retransitionOffsetAccumStart: null, retransitionRotationAccumStart: null, pendingTweenFractionCap: 1, frozenTweenFractionCap: 1, fromSplayDeg: 0, pendingFromSplayDeg: 0, retransitionFromSplayDeg: 0 }
   })
   return hand._chp
 }
@@ -6044,6 +6044,23 @@ function applyPoseValuesToHand(hand, poseValues, extraSplayDeg) {
   hand.currentBaseQuat.copy(computeBaseQuatFromValues(poseValues))
   // Wrist BEFORE fingers -- see applyAllFingerPoses()'s own comment.
   applyWristPoseToSkeleton(hand.skinnedMesh.skeleton, poseValues, extraSplayDeg)
+  // CORRECTED 2026-09-27 -- direct report: releasing a Click-Hold, waiting
+  // a moment, then clicking elsewhere made the wrist visibly SNAP instead
+  // of transitioning smoothly. Root cause: `extraSplayDeg` (Responsive
+  // Wrist Splay) used to be a flat constant, frozen once at each trigger's
+  // own arm time and applied instantly with no relationship to whatever
+  // splay was ACTUALLY showing the frame before -- idle tracking computes
+  // it fresh from live cursor distance, a trigger freezes it, and neither
+  // side ever blended into the other. `hand.currentSplayDeg` is now the
+  // single continuously-tracked "whatever splay is actually on screen
+  // right now" value every caller (idle-repose AND every trigger phase,
+  // see updateClickPoseForHand()/updateClickHoldPoseForHand()'s own
+  // `fromSplayDeg`/`retransitionFromSplayDeg` capture points) reads as its
+  // own "from" anchor before ramping toward a new target -- closing the
+  // gap between "cursor-tracking-driven" and "click-function-driven" so a
+  // handoff between the two is never a discontinuity, matching this
+  // project's own standing "no interaction ever jumps" rule.
+  hand.currentSplayDeg = extraSplayDeg
   FINGER_NAMES.forEach((name) => applyCurlToSkeleton(name, hand.skinnedMesh.skeleton, hand.currentBaseQuat, hand.wrapper.quaternion, poseValues))
   // An ABSOLUTE position/scale set from this hand's own stored grid
   // `basePosition`, not an additive nudge -- recomputed fresh from
@@ -6476,6 +6493,15 @@ function safeTweenSpeedMs(v) { return Number.isFinite(v) ? v : 800 }
 function snapshotOffsetRotationAccumForRetransition(hand, chp) {
   chp.retransitionOffsetAccumStart = hand._customOffsetAccum ? { ...hand._customOffsetAccum } : { x: 0, y: 0 }
   chp.retransitionRotationAccumStart = hand._customRotationAccum ? hand._customRotationAccum.clone() : new THREE.Quaternion()
+  // CORRECTED 2026-09-27 -- same "no jump on handoff" fix as
+  // applyPoseValuesToHand()'s own comment, captured here since all 3 real
+  // chp retransition-entry points already funnel through this one
+  // function. Whatever splay was actually showing the instant before
+  // retransition began is the correct start point for retransition's own
+  // splay blend (see updateClickHoldPoseForHand()'s 'retransition' phase)
+  // -- never the trigger's frozen target, which may have gone stale if
+  // the cursor moved during a long hold/tween.
+  chp.retransitionFromSplayDeg = hand.currentSplayDeg
 }
 function beginTweenReleaseStop(hand, chp, trig, p, values, live, minLiveDist, liveDistRange, now) {
   chp.retransitionStart = values
@@ -6607,6 +6633,13 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
       chp.pendingClaimAt = now + delay
       chp.pendingTweenFractionCap = tweenFractionCap
       chp.pendingFrozenSplayDeg = computeResponsiveWristSplayDeg(live, minLiveDist, liveDistRange)
+      // CORRECTED 2026-09-27 -- see applyPoseValuesToHand()'s own comment.
+      // Whatever splay this hand was actually showing right before this
+      // hold armed (idle-tracked, or left over from a DIFFERENT trigger
+      // this one is about to interrupt) is the correct start point for
+      // this hold's own forward-phase splay ramp, not an instant jump to
+      // the frozen target.
+      chp.pendingFromSplayDeg = hand.currentSplayDeg
       // Animation Speed Curve (Single Pose only) -- computed once here,
       // same "frozen at arm time" treatment as the splay/delay above, not
       // recomputed live mid-transition. See makeClickHoldPoseGroup()'s own
@@ -6647,6 +6680,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     chp.phase = 'forward'
     chp.forwardStartTime = now
     chp.frozenSplayDeg = chp.pendingFrozenSplayDeg
+    chp.fromSplayDeg = chp.pendingFromSplayDeg // CORRECTED 2026-09-27 -- see the arm-time capture's own comment
     chp.frozenSpeedMs = chp.pendingFrozenSpeedMs
     chp.frozenTweenFractionCap = chp.pendingTweenFractionCap
     chp.pendingClaimAt = 0
@@ -6677,6 +6711,12 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     // `progress` itself stays untouched for the phase-transition checks
     // below; deliberately not applied to Offset/Rotation).
     const cappedT = progress * chp.frozenTweenFractionCap
+    // CORRECTED 2026-09-27 -- see this hand's own `fromSplayDeg` capture
+    // (arm time) and applyPoseValuesToHand()'s own comment. Ramps splay
+    // across the SAME `progress` timeline as the rest of the pose, from
+    // wherever it actually was the instant this hold armed, instead of
+    // jumping straight to the frozen target on frame 1.
+    const splayNow = THREE.MathUtils.lerp(chp.fromSplayDeg ?? chp.frozenSplayDeg, chp.frozenSplayDeg, progress)
     let values
     if (isTween) {
       if (!chp.tweenSegments || chp.tweenSegments.length === 0) return // nothing selected -- leave this hand's pose untouched
@@ -6690,7 +6730,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
       // finish the ONE pass in progress, not start a brand new loop.
       if (progress >= 1 && chp.releasePending) {
         chp.lastAppliedValues = values
-        applyPoseValuesToHand(hand, values, chp.frozenSplayDeg)
+        applyPoseValuesToHand(hand, values, splayNow)
         applyOffsetRotationToHand(hand, p, chp.offsetBaked ? 0 : progress)
         if (!chp.offsetBaked) { bakeOffsetRotationIntoAccum(hand, p); chp.offsetBaked = true }
         beginTweenReleaseStop(hand, chp, trig, p, values, live, minLiveDist, liveDistRange, now)
@@ -6720,7 +6760,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
       values = lerpPoseValues(chp.forwardSnapshot, targetPose, cappedT)
     }
     chp.lastAppliedValues = values
-    applyPoseValuesToHand(hand, values, chp.frozenSplayDeg)
+    applyPoseValuesToHand(hand, values, splayNow)
     // Item 2/5/6 (2026-09-27): single-pose-mode holds (and a tween with no
     // Loop Mode engaged) can linger in THIS phase indefinitely at
     // progress pinned at 1 while the hold is sustained -- `offsetBaked`
@@ -6889,7 +6929,16 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     const speedMs = Math.max(chp.retransitionIsTween ? cfg[`${p}TweenRetransitionSpeedMs`] : (cfg[`${p}RetransitionSpeedCurveEnabled`] ? chp.retransitionSpeedMs : cfg[`${p}RetransitionSpeedMs`]), 1)
     const progress = elapsed < chp.retransitionDelay ? 0 : THREE.MathUtils.clamp((elapsed - chp.retransitionDelay) / speedMs, 0, 1)
     const values = lerpPoseValues(chp.retransitionStart, poseDefaultValues, progress)
-    applyPoseValuesToHand(hand, values, chp.frozenSplayDeg)
+    // CORRECTED 2026-09-27 -- see snapshotOffsetRotationAccumForRetransition()'s
+    // own comment. Blends from wherever splay actually was the instant
+    // retransition began (`chp.retransitionFromSplayDeg`) toward the LIVE
+    // idle target (recomputed fresh every frame, since the cursor can keep
+    // moving throughout retransition) -- by the time progress reaches 1
+    // and this hand goes idle, splay already equals what idle-tracking
+    // would show, so idle repose picks it up with no residual jump.
+    const liveSplayTarget = computeResponsiveWristSplayDeg(live, minLiveDist, liveDistRange)
+    const splayNow = THREE.MathUtils.lerp(chp.retransitionFromSplayDeg ?? chp.frozenSplayDeg, liveSplayTarget, progress)
+    applyPoseValuesToHand(hand, values, splayNow)
     // Item 6 (2026-09-27): unwinds the FULL accumulated offset/rotation
     // (snapshotted at retransition-start by snapshotOffsetRotationAccumForRetransition())
     // back to zero, not just this function's own last increment -- and
@@ -7392,7 +7441,7 @@ function getOrInitHandCP(hand) {
   // again any time the key list changes.
   CLICK_POSE_KEYS.forEach((p) => {
     if (hand._cp[p]) return
-    hand._cp[p] = { phase: 'idle', triggerTime: 0, forwardSnapshot: null, tweenPoses: null, pauseStartTime: 0, retransitionStart: null, retransitionStartTime: 0, retransitionDelay: 0, retransitionSpeedMs: 0, lastAppliedValues: null, frozenSplayDeg: 0, pendingClaimAt: 0, pendingForwardSnapshot: null, pendingNamedPoses: null, pendingFrozenSplayDeg: 0, frozenSpeedMs: 0, pendingFrozenSpeedMs: 0, sequenceLapIndex: 1, sequenceLapStartTime: 0, sequenceHoldEndTime: 0, sequenceDirection: 1, offsetBaked: false, retransitionOffsetAccumStart: null, retransitionRotationAccumStart: null, pendingTweenFractionCap: 1, frozenTweenFractionCap: 1 }
+    hand._cp[p] = { phase: 'idle', triggerTime: 0, forwardSnapshot: null, tweenPoses: null, pauseStartTime: 0, retransitionStart: null, retransitionStartTime: 0, retransitionDelay: 0, retransitionSpeedMs: 0, lastAppliedValues: null, frozenSplayDeg: 0, pendingClaimAt: 0, pendingForwardSnapshot: null, pendingNamedPoses: null, pendingFrozenSplayDeg: 0, frozenSpeedMs: 0, pendingFrozenSpeedMs: 0, sequenceLapIndex: 1, sequenceLapStartTime: 0, sequenceHoldEndTime: 0, sequenceDirection: 1, offsetBaked: false, retransitionOffsetAccumStart: null, retransitionRotationAccumStart: null, pendingTweenFractionCap: 1, frozenTweenFractionCap: 1, fromSplayDeg: 0, pendingFromSplayDeg: 0, retransitionFromSplayDeg: 0 }
   })
   return hand._cp
 }
@@ -7432,6 +7481,7 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
     cp.phase = 'forward'
     cp.triggerTime = now
     cp.frozenSplayDeg = cp.pendingFrozenSplayDeg
+    cp.fromSplayDeg = cp.pendingFromSplayDeg // CORRECTED 2026-09-27 -- see the arm-time capture's own comment
     cp.frozenSpeedMs = cp.pendingFrozenSpeedMs
     cp.frozenTweenFractionCap = cp.pendingTweenFractionCap
     cp.pendingClaimAt = 0
@@ -7463,6 +7513,11 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
     // progress below -- Offset/Rotation is a separate system the spec
     // never asked to couple with this one.
     const cappedT = progress * cp.frozenTweenFractionCap
+    // CORRECTED 2026-09-27 -- see updateClickHoldPoseForHand()'s own
+    // matching comment. Ramps splay from wherever it actually was at
+    // trigger time toward the frozen target, across the same `progress`
+    // timeline as the rest of the pose.
+    const splayNow = THREE.MathUtils.lerp(cp.fromSplayDeg ?? cp.frozenSplayDeg, cp.frozenSplayDeg, progress)
     let values
     if (isTween) {
       if (!cp.tweenPoses || cp.tweenPoses.length < 2) { cp.phase = 'idle'; return } // nothing selected -- abandon this hand's sequence rather than get stuck
@@ -7473,7 +7528,7 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
       values = lerpPoseValues(cp.forwardSnapshot, targetPose, cappedT)
     }
     cp.lastAppliedValues = values
-    applyPoseValuesToHand(hand, values, cp.frozenSplayDeg)
+    applyPoseValuesToHand(hand, values, splayNow)
     applyOffsetRotationToHand(hand, p, progress)
     if (progress >= 1) {
       // Item 5/2 (2026-09-27): this ramp just completed -- lock its own
@@ -7618,6 +7673,9 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
       // real total rather than just this function's own last increment.
       cp.retransitionOffsetAccumStart = hand._customOffsetAccum ? { ...hand._customOffsetAccum } : { x: 0, y: 0 }
       cp.retransitionRotationAccumStart = hand._customRotationAccum ? hand._customRotationAccum.clone() : new THREE.Quaternion()
+      // CORRECTED 2026-09-27 -- see updateClickHoldPoseForHand()'s own
+      // matching capture for the full reasoning.
+      cp.retransitionFromSplayDeg = hand.currentSplayDeg
       // Computed from THIS hand's own live distance right now, not a
       // shared snapshot -- see this section's own top comment for why.
       // Retransition Start Time Curve On/Off (2026-09-27) -- off means no
@@ -7638,7 +7696,11 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
     const speedMs = Math.max(cfg[`${p}RetransitionSpeedCurveEnabled`] ? cp.retransitionSpeedMs : cfg[`${p}RetransitionSpeedMs`], 1)
     const progress = elapsed < cp.retransitionDelay ? 0 : THREE.MathUtils.clamp((elapsed - cp.retransitionDelay) / speedMs, 0, 1)
     const values = lerpPoseValues(cp.retransitionStart, poseDefaultValues, progress)
-    applyPoseValuesToHand(hand, values, cp.frozenSplayDeg)
+    // CORRECTED 2026-09-27 -- see updateClickHoldPoseForHand()'s own
+    // matching 'retransition'-phase comment for the full reasoning.
+    const liveSplayTarget = computeResponsiveWristSplayDeg(live, minLiveDist, liveDistRange)
+    const splayNow = THREE.MathUtils.lerp(cp.retransitionFromSplayDeg ?? cp.frozenSplayDeg, liveSplayTarget, progress)
+    applyPoseValuesToHand(hand, values, splayNow)
     // Item 6 (2026-09-27): unwinds the FULL accumulated offset/rotation
     // (snapshotted above at retransition-start) back to zero, not just
     // this function's own last increment -- and clears the real
@@ -7724,6 +7786,9 @@ function triggerClickPose(p) {
     // comment for why Responsive Wrist Splay must not keep recomputing
     // live throughout an explicit pose transition.
     cp.pendingFrozenSplayDeg = computeResponsiveWristSplayDeg(dists[i], minD, range)
+    // CORRECTED 2026-09-27 -- see updateClickHoldPoseForHand()'s own
+    // matching capture for the full reasoning.
+    cp.pendingFromSplayDeg = hand.currentSplayDeg
     // Animation Speed Curve (Single Pose only) -- same "frozen at
     // trigger time" treatment as the splay above.
     cp.pendingFrozenSpeedMs = (!isTween && cfg[`${p}SpeedCurveEnabled`]) ? computeStartDelayMs(dists[i], minD, range, trig.speedCurveParsed, trig.speedRangeParsed) : 0
@@ -10662,7 +10727,7 @@ function rebuildField() {
     // it explicitly: false until a hand's first REAL repose, forcing
     // exactly one guaranteed full sync regardless of the gate's other
     // conditions, then never forced again.
-    const hand = { wrapper, clone, skinnedMesh, outlineMesh, emissionMesh, wristClipPlane: handWristClipPlane, effectiveRenderOrder: 0, screenX: 0, screenY: 0, screenRadius: 0, currentBaseQuat: cloneBaseQuat.clone(), everReposed: false }
+    const hand = { wrapper, clone, skinnedMesh, outlineMesh, emissionMesh, wristClipPlane: handWristClipPlane, effectiveRenderOrder: 0, screenX: 0, screenY: 0, screenRadius: 0, currentBaseQuat: cloneBaseQuat.clone(), everReposed: false, currentSplayDeg: 0 }
     // Also recomputes this hand's OWN Hide Wrist clip plane right before
     // it draws (see updateWristClipPlaneForHand()'s own comment) -- every
     // hand faces a different direction and (own material/plane now, see
@@ -11657,6 +11722,12 @@ function updateRenderOrder() {
         hand.currentBaseQuat.copy(cloneBaseQuat)
         const extraSplay = computeResponsiveWristSplayDeg(live, minLiveDist, liveDistRange)
         applyWristPoseToSkeleton(hand.skinnedMesh.skeleton, cfg, extraSplay)
+        // Keeps `hand.currentSplayDeg` (see applyPoseValuesToHand()'s own
+        // 2026-09-27 comment) current for idle hands too -- this is the
+        // ONLY splay-applying path in this file that doesn't already run
+        // through applyPoseValuesToHand(), so it needs this line
+        // explicitly rather than getting it for free.
+        hand.currentSplayDeg = extraSplay
         // CORRECTED 2026-09-14, root cause behind the long-running "thumb
         // pose looks wrong" reports, independent of cursor movement. The
         // wrist bone gets re-posed with LIVE Responsive Wrist Splay every

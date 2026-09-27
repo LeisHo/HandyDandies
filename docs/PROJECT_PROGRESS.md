@@ -18,6 +18,25 @@ work seamlessly from there.
 
 ## Currently working on
 
+**FIXED 2026-09-27 (8th round) -- wrist splay snapping at every
+click-function trigger boundary.** Direct report: interrupting a click
+function with another (or a retransition, or a tween stop), or simply
+releasing a hold, waiting, then clicking elsewhere, made the wrist
+visibly snap instead of transitioning smoothly. Root cause: Responsive
+Wrist Splay was frozen to a flat constant for a trigger's whole
+lifetime while idle hands track it live from cursor distance -- the two
+never blended. New `hand.currentSplayDeg` is now the single
+continuously-current value every trigger start/end blends FROM instead
+of snapping to. "Wrist crop" (Arm Length) was checked and found already
+fully decoupled/continuous -- no change needed there. **NOT
+live-verified** -- this sandbox's browser automation hit its own
+standing network-truncation quirk again this round; needs the user's
+own retest of the exact repro (hold, release, wait, click elsewhere).
+See CLAUDE.md's matching Gotchas entry and CHANGELOG.txt's 2026-09-27
+8th-round entry for the full account.
+
+--------------------------------------------------------------------------------
+
 **FIXED 2026-09-27 (7th round) -- the production outage behind "everything
 looks broken" (wrong background color, poses completely off, click
 functions not working). NOT this session's Click Function work -- an

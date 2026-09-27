@@ -1465,3 +1465,40 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   still 500ing with this same error after this fix, check whether
   Vercel's GitHub integration for this repo is actually still connected
   and auto-deploying before assuming the code fix itself was wrong.
+- **Responsive Wrist Splay used to be FROZEN at each click-function
+  trigger's own arm time and applied as a flat constant for the trigger's
+  whole lifetime, while idle hands recompute it fresh every frame from
+  live cursor distance -- the 2 never blended, so every handoff between
+  "click-function-governed" and "cursor-tracking-governed" was an
+  instant snap, not a transition.** Fixed 2026-09-27 per direct report
+  ("when a click function interrupts another... the wrist splay, palm
+  rotation, and wrist crop should never suddenly jump... release midway,
+  wait a second or 2, then click elsewhere, the hands will jump"). New
+  `hand.currentSplayDeg` (written by `applyPoseValuesToHand()`, the one
+  funnel every trigger family's per-frame apply already goes through,
+  and by idle-repose's own splay line) is the single continuously-
+  current value every trigger boundary blends FROM: a NEW trigger's
+  'forward' phase lerps `fromSplayDeg -> frozenSplayDeg` across the same
+  `progress` driving the rest of the pose (captured at arm time as
+  `pendingFromSplayDeg = hand.currentSplayDeg`, so an INTERRUPTED
+  trigger/retransition's own in-progress value is what the new one picks
+  up from, not a stale default); retransition's own phase lerps from a
+  `retransitionFromSplayDeg` snapshot (captured in
+  `snapshotOffsetRotationAccumForRetransition()` for all 3 real chp entry
+  points, inline for cp's 'paused'->'retransition' transition) toward a
+  LIVE recomputed target, so splay already matches idle-tracking by the
+  time `phase` reaches 'idle'. 'looping'/'stopping'/'sequencePlaying'/
+  'paused' phases were deliberately left applying the flat frozen
+  constant unchanged -- they never cross a trigger boundary mid-phase, so
+  there's nothing to blend there. Arm Length/Hide Wrist ("wrist crop")
+  was investigated and found to already be fully decoupled and
+  frame-continuous (`computeArmLengthT()`/`applyHandArmLength()` run
+  unconditionally every frame regardless of `overridden`) -- no change
+  needed. **NOT live-verified** -- this sandbox's browser automation
+  couldn't get a clean load this round either (the standing documented
+  network-truncation quirk). If a future report describes ANY other
+  skeletal/pose property jumping specifically at a trigger start/end
+  boundary (not mid-phase), this is the pattern to replicate: capture a
+  `from` value at arm/retransition-start time from whatever the hand
+  actually has right now, blend across that phase's own progress toward
+  the target, never apply a frozen constant on frame 1 of a NEW phase.
