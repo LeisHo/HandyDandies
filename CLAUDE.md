@@ -1122,3 +1122,58 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   applies.** Not live-verified -- this sandbox hit its own documented
   `main.js` network-truncation quirk across 5 retries (the standing cap)
   this round; needs the user's real Pixel 9a to confirm.
+- **A control dynamically registered via `renderDynamicGroup()` (Custom
+  Click Functions, the only such case in this project) can silently
+  discard its own REAL SAVED VALUE for any non-DEV_MODE visitor, falling
+  back to its hardcoded `def` instead -- with no error, no console
+  warning, nothing.** Confirmed 2026-09-27 via direct report ("Click
+  funcitons still dont work in non dev mode"), a follow-up correction on
+  the contextmenu fix directly above (that fix was real, just not the
+  whole story -- this is a completely separate DATA problem, not a
+  touch-gesture one). Root cause, in `devPanel.js`:
+  `applyStoredValues()` only ever applies a saved value to a control
+  that already exists in `devGroups` AT THE MOMENT it's called. At boot,
+  `restoreValuesForEveryVisitor()` calls `applyStoredValues()` strictly
+  BEFORE `main.js`'s own `onRestore` -> `restoreCustomClickFunctions()`
+  has had a chance to register any Custom Click Function via
+  `renderDynamicGroup()` -- so a function's real saved
+  `Type`/`Enabled`/`TargetPose`/etc. is silently never applied, and
+  `renderDynamicGroup()`'s own seeding step falls back to each control's
+  hardcoded `def` (`Enabled: false`, `TargetPose: ''` -- exactly the
+  "clicking does nothing" symptom this file's own gotcha below already
+  documents for a blank `TargetPose`, just with a different root cause
+  than that entry describes). **Why this was invisible in DEV_MODE**:
+  `resetSettings()` -- called exactly once, at boot, but ONLY reachable
+  from the DEV_MODE-only panel-construction path (strictly after the
+  boot-time restore) -- does a 2ND full fetch+`applyStoredValues()`
+  pass, and by THAT point the custom controls already exist in
+  `devGroups` (pushed there unconditionally by the 1st pass's own
+  `renderDynamicGroup()` calls, regardless of whether the panel DOM
+  exists yet) -- so DEV_MODE gets a lucky 2nd chance a real visitor
+  never gets. Fixed by caching whatever `values` blob each successful
+  restore actually saw (`lastRestoredValues`, new module-level state in
+  `devPanel.js`, set in both `restoreValuesForEveryVisitor()` and
+  `resetSettings()`, remote and localStorage paths alike) so
+  `renderDynamicGroup()`'s own seeding step can check it directly,
+  per device, mirroring `applyStoredValues()`'s own per-control
+  resolution -- falling back to `def` only when nothing was ever
+  restored for that exact key. Verified via an isolated logic-level
+  reproduction (no DOM/three.js needed, since this bug and its fix are
+  pure object/control-flow logic) using `custom7`'s own real saved data
+  from `dev-panel-settings.json`: the buggy sequence reproduced
+  `Enabled: false, TargetPose: ""` against real saved
+  `Enabled: true, TargetPose: "Big Open Palm (S)"`; the fixed sequence
+  recovered all 3 real fields exactly. **NOT verified against this
+  project's own live running app** -- the local static server has no
+  working backend for the git-tracked settings fetch
+  (`opts.remoteSave`), confirmed directly via
+  `window.__debug.cfg.customClickFunctionIds` reading `"[]"` (the
+  code-level default) rather than the real saved array on a local load,
+  meaning this exact bug can't be demonstrated live in this sandbox
+  regardless of whether the fix is correct. **If a FUTURE feature ever
+  dynamically registers a new kind of control after boot (another
+  `renderDynamicGroup()` call site, or an equivalent mechanism), it
+  needs this same `lastRestoredValues` lookup or it will reproduce this
+  exact bug for its own keys** -- the risk is inherent to registering
+  controls after the one-shot boot-time restore has already run, not
+  specific to Custom Click Functions.

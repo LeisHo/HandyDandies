@@ -18,6 +18,37 @@ work seamlessly from there.
 
 ## Currently working on
 
+**SHIPPED 2026-09-27, pending confirmation against the real Vercel
+deployment -- fixed custom click functions silently ignoring their own
+real saved settings (Type/Enabled/TargetPose/etc.) for any non-DEV_MODE
+visitor.** A follow-up correction on top of the 2026-09-26 contextmenu
+fix directly below (that fix was real, just not the whole story). Root
+cause: `applyStoredValues()` (devPanel.js) only applies a saved value to
+a control that already exists in `devGroups` at call time -- at boot,
+this runs BEFORE `main.js`'s own dynamically-created Custom Click
+Function controls get registered via `renderDynamicGroup()`, so each
+function's real saved fields were silently discarded in favor of
+hardcoded defaults (`Enabled: false`, `TargetPose: ''` -- the exact
+"clicking does nothing" symptom this project's CLAUDE.md already
+documents). Invisible in DEV_MODE only because `resetSettings()` -- run
+once at boot, but ONLY reachable from the DEV_MODE-only panel-
+construction path -- does a 2nd fetch+apply pass by which point the
+custom controls already exist, silently masking the bug for a dev
+visitor. Fixed by caching the most recent successful restore's `values`
+blob (`lastRestoredValues`, new module-level state in devPanel.js) and
+having `renderDynamicGroup()`'s own seeding step check it first, per
+device, before falling back to a control's `def`. Verified via an
+isolated logic-level reproduction (no DOM/three.js needed) using
+`custom7`'s own real saved data -- buggy sequence reproduced
+`Enabled: false, TargetPose: ""`; fixed sequence recovered the real
+`Enabled: true, TargetPose: "Big Open Palm (S)"` exactly. NOT verified
+against the live running app directly -- the local static server has no
+working backend for the git-tracked settings fetch, so this couldn't be
+demonstrated live in this sandbox regardless of correctness. `main.js`
+cache-buster `?v=217` -> `?v=218`; `devPanel.js` import `?v=47` ->
+`?v=48`. See CHANGELOG.txt's matching 2026-09-27 entry for the full
+trace.
+
 **SHIPPED 2026-09-26 (2nd round), pending the user's own real-device
 retest -- corrected the Click+Hold mobile fix after the user clarified
 the real device is a Pixel 9a on Chrome, not iOS Safari.** The 1st

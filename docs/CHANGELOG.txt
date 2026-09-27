@@ -11594,6 +11594,80 @@ CLAUDE.md Gotchas. Genuinely unverified live; needs the user's own real
 Pixel 9a retest.
 
 --------------------------------------------------------------------------------
+2026-09-27
+
+Direct follow-up report: "Click funcitons still dont work in non dev
+mode" -- a correction on top of the prior day's contextmenu fix (that
+fix was real and necessary, but not the whole story: it fixed the
+touch-cancellation mechanism, not this separate data problem).
+
+Traced the actual root cause through devPanel.js's own boot sequence
+rather than guessing. `applyStoredValues()` only ever applies a saved
+value to a control that already exists in `devGroups` at the moment
+it's called. At boot, `restoreValuesForEveryVisitor()` calls
+`applyStoredValues()` BEFORE the host (`main.js`'s `onRestore` ->
+`restoreCustomClickFunctions()`) has registered any of this project's
+own dynamically-created Custom Click Function controls via
+`renderDynamicGroup()` -- so each function's real saved
+Type/Enabled/TargetPose/etc. is silently never applied at that point;
+`renderDynamicGroup()`'s own seeding step then falls back to each
+control's hardcoded `def` instead (`Enabled` defaults to `false`,
+`TargetPose` defaults to `''` -- exactly the "clicking does nothing"
+symptom this project's own CLAUDE.md already documents as a real,
+previously-diagnosed failure mode for a blank TargetPose).
+
+This was invisible in DEV_MODE only because `resetSettings()` -- called
+once at boot, but ONLY from the DEV_MODE-only panel-construction path,
+which runs strictly AFTER the boot-time restore -- does a SECOND full
+fetch + `applyStoredValues()` pass. By the time that second pass runs,
+the custom controls already exist in `devGroups` (pushed there by the
+first `onRestore` pass's own `renderDynamicGroup()` calls, which push
+into `devGroups` unconditionally regardless of whether the DOM exists
+yet), so the real values get applied correctly on that second pass. A
+non-DEV_MODE visitor never gets a second pass at all -- confirmed by
+reading `resetSettings()`'s own call site (`initDevPanel()`, called
+once, only reachable after the `if (!DEV_MODE) return cfg` early exit).
+
+Fixed by caching whatever `values` blob each successful restore fetch
+actually saw (both `restoreValuesForEveryVisitor()`'s boot-time fetch
+and `resetSettings()`'s own fetch, remote and localStorage paths alike)
+into a new module-level `lastRestoredValues` in `devPanel.js`.
+`renderDynamicGroup()`'s own seeding step now checks that cache first,
+per device, mirroring `applyStoredValues()`'s own per-control
+resolution exactly -- falling back to `def` only when nothing was ever
+restored for that specific key (a genuinely brand-new control, or no
+settings existed at all yet for a fresh visitor). This fixes the bug
+unconditionally, for every visitor, without depending on a lucky second
+pass that only DEV_MODE happens to get.
+
+Verified via an isolated logic-level reproduction (no DOM/three.js
+needed -- this bug and its fix are pure object/control-flow logic, not
+math), mirroring the real sequence exactly with `custom7`'s own real
+saved data (`Type: "Click", Enabled: true, TargetPose: "Big Open Palm
+(S)"`, read directly from `data/processed/dev-panel-settings.json`):
+the buggy sequence reproduced `Enabled: false, TargetPose: ""` -- the
+disabled/blank-target combination that explains "clicking does
+nothing" -- while the fixed sequence recovered all 3 real values
+exactly. NOT verified against this project's own live running app
+directly this round: the local static server has no working backend
+for the git-tracked settings fetch (`opts.remoteSave` -> `/api/save-
+settings`, a Vercel serverless function that doesn't exist under a
+plain `python3 -m http.server`), so `lastRestoredValues` never receives
+real data to demonstrate the fix against locally, regardless of whether
+the fix itself is correct -- confirmed this by loading the app locally
+and reading `window.__debug.cfg.customClickFunctionIds`, which read
+`"[]"` (the code-level default, meaning the remote fetch never
+succeeded at all in this environment) rather than the real saved array.
+The isolated reproduction mirrors the real code's exact control flow in
+place of a live test this sandbox can't actually perform. Needs
+confirmation against the real Vercel deployment, where the backend
+genuinely exists.
+
+`src/devpanel/devPanel.js`'s own import in `main.js` bumped `?v=47` ->
+`?v=48`; `index.html`'s own `main.js` cache-buster bumped `?v=217` ->
+`?v=218`.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================
