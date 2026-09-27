@@ -6644,13 +6644,18 @@
       "rimColor": "#ffffff",
       "savedToon": [],
       "outlineEnabled": false,
-      "useOutlinePass": false,
+      "outlineMechanic": "Negative Hull",
       "outlineColor": "#000000",
       "hullThickness": 6,
       "passThickness": 0.9,
       "passStrength": 15,
       "passGlow": 0,
+      "emissionColor": "#ffffff",
+      "emissionIntensity": 1.5,
       "bgColor": "#000000",
+      "pixelRatio": 1.25,
+      "resolutionScale": 100,
+      "qualityPreset": "high",
       "showGridHelper": false,
       "showWireframe": false,
       "preventReorderFlash": false,
@@ -6736,6 +6741,8 @@
       "custom7RetransitionSpeedCurveRange": "{\"min\":50,\"max\":2000}",
       "custom7RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom7RetransitionStartTimeRange": "{\"min\":0,\"max\":1048}",
+      "custom7MultiTriggerEnabled": false,
+      "custom7MultiTriggers": "[]",
       "custom8Enabled": true,
       "custom8Type": "Click+Hold",
       "custom8TouchPointCount": 1,
@@ -6819,6 +6826,8 @@
       "custom9RetransitionSpeedCurveRange": "{\"min\":50,\"max\":2000}",
       "custom9RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom9MultiTriggerEnabled": false,
+      "custom9MultiTriggers": "[]",
       "custom10Enabled": false,
       "custom10Type": "Click+Hold",
       "custom10TouchPointCount": 1,
@@ -6902,6 +6911,8 @@
       "custom13RetransitionSpeedCurveRange": "{\"min\":50,\"max\":2000}",
       "custom13RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom13RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom13MultiTriggerEnabled": false,
+      "custom13MultiTriggers": "[]",
       "custom14Enabled": true,
       "custom14Type": "Right Click",
       "custom14TouchPointCount": 1,
@@ -6938,7 +6949,9 @@
       "custom14RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom14RetransitionSpeedCurveRange": "{\"min\":50,\"max\":2000}",
       "custom14RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom14RetransitionStartTimeRange": "{\"min\":0,\"max\":300}"
+      "custom14RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom14MultiTriggerEnabled": false,
+      "custom14MultiTriggers": "[]"
     },
     "mobile": {
       "pauseBtnXOffset": 12,
@@ -13584,13 +13597,18 @@
       "rimColor": "#ffffff",
       "savedToon": [],
       "outlineEnabled": false,
-      "useOutlinePass": false,
+      "outlineMechanic": "Negative Hull",
       "outlineColor": "#000000",
       "hullThickness": 6,
       "passThickness": 0.9,
       "passStrength": 15,
       "passGlow": 0,
+      "emissionColor": "#ffffff",
+      "emissionIntensity": 1.5,
       "bgColor": "#000000",
+      "pixelRatio": 1.25,
+      "resolutionScale": 100,
+      "qualityPreset": "high",
       "showGridHelper": false,
       "showWireframe": false,
       "preventReorderFlash": false,
@@ -13676,6 +13694,8 @@
       "custom7RetransitionSpeedCurveRange": "{\"min\":50,\"max\":2000}",
       "custom7RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom7RetransitionStartTimeRange": "{\"min\":0,\"max\":1048}",
+      "custom7MultiTriggerEnabled": false,
+      "custom7MultiTriggers": "[]",
       "custom8Enabled": true,
       "custom8Type": "Click+Hold",
       "custom8TouchPointCount": 1,
@@ -13759,6 +13779,8 @@
       "custom9RetransitionSpeedCurveRange": "{\"min\":50,\"max\":2000}",
       "custom9RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom9MultiTriggerEnabled": false,
+      "custom9MultiTriggers": "[]",
       "custom10Enabled": false,
       "custom10Type": "Click+Hold",
       "custom10TouchPointCount": 1,
@@ -13842,6 +13864,8 @@
       "custom13RetransitionSpeedCurveRange": "{\"min\":50,\"max\":2000}",
       "custom13RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom13RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom13MultiTriggerEnabled": false,
+      "custom13MultiTriggers": "[]",
       "custom14Enabled": true,
       "custom14Type": "Right Click",
       "custom14TouchPointCount": 1,
@@ -13878,7 +13902,9 @@
       "custom14RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom14RetransitionSpeedCurveRange": "{\"min\":50,\"max\":2000}",
       "custom14RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom14RetransitionStartTimeRange": "{\"min\":0,\"max\":300}"
+      "custom14RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom14MultiTriggerEnabled": false,
+      "custom14MultiTriggers": "[]"
     },
     "landscape": {
       "pauseBtnXOffset": 12,
@@ -20524,13 +20550,18 @@
       "rimColor": "#ffffff",
       "savedToon": [],
       "outlineEnabled": false,
-      "useOutlinePass": false,
+      "outlineMechanic": "Negative Hull",
       "outlineColor": "#000000",
       "hullThickness": 6,
       "passThickness": 0.9,
       "passStrength": 15,
       "passGlow": 0,
+      "emissionColor": "#ffffff",
+      "emissionIntensity": 1.5,
       "bgColor": "#000000",
+      "pixelRatio": 1.25,
+      "resolutionScale": 100,
+      "qualityPreset": "high",
       "showGridHelper": false,
       "showWireframe": false,
       "preventReorderFlash": false,
@@ -20616,6 +20647,8 @@
       "custom7RetransitionSpeedCurveRange": "{\"min\":50,\"max\":2000}",
       "custom7RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom7RetransitionStartTimeRange": "{\"min\":0,\"max\":1048}",
+      "custom7MultiTriggerEnabled": false,
+      "custom7MultiTriggers": "[]",
       "custom8Enabled": true,
       "custom8Type": "Click+Hold",
       "custom8TouchPointCount": 1,
@@ -20699,6 +20732,8 @@
       "custom9RetransitionSpeedCurveRange": "{\"min\":50,\"max\":2000}",
       "custom9RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom9MultiTriggerEnabled": false,
+      "custom9MultiTriggers": "[]",
       "custom10Enabled": false,
       "custom10Type": "Click+Hold",
       "custom10TouchPointCount": 1,
@@ -20782,6 +20817,8 @@
       "custom13RetransitionSpeedCurveRange": "{\"min\":50,\"max\":2000}",
       "custom13RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom13RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom13MultiTriggerEnabled": false,
+      "custom13MultiTriggers": "[]",
       "custom14Enabled": true,
       "custom14Type": "Right Click",
       "custom14TouchPointCount": 1,
@@ -20818,10 +20855,37 @@
       "custom14RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom14RetransitionSpeedCurveRange": "{\"min\":50,\"max\":2000}",
       "custom14RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom14RetransitionStartTimeRange": "{\"min\":0,\"max\":300}"
+      "custom14RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom14MultiTriggerEnabled": false,
+      "custom14MultiTriggers": "[]"
     }
   },
   "order": [
+    {
+      "key": "Quality / Performance",
+      "collapsed": false,
+      "locked": false,
+      "items": [
+        {
+          "type": "row",
+          "key": "pixelRatio"
+        },
+        {
+          "type": "row",
+          "key": "resolutionScale"
+        },
+        {
+          "type": "row",
+          "key": "qualityPreset"
+        }
+      ],
+      "settings": [
+        "pixelRatio",
+        "resolutionScale",
+        "qualityPreset"
+      ],
+      "subgroups": []
+    },
     {
       "key": "Pause Button",
       "collapsed": true,
@@ -22600,7 +22664,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 14",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -22812,6 +22876,33 @@
                   ],
                   "subgroups": []
                 }
+              },
+              {
+                "type": "group",
+                "group": {
+                  "key": "Multi Trigger",
+                  "collapsed": false,
+                  "locked": false,
+                  "items": [
+                    {
+                      "type": "row",
+                      "key": "custom14MultiTriggerEnabled"
+                    },
+                    {
+                      "type": "row",
+                      "key": "custom14MultiTriggers"
+                    },
+                    {
+                      "type": "row"
+                    }
+                  ],
+                  "settings": [
+                    "custom14MultiTriggerEnabled",
+                    "custom14MultiTriggers",
+                    null
+                  ],
+                  "subgroups": []
+                }
               }
             ],
             "settings": [
@@ -22966,6 +23057,30 @@
                   "custom14RetransitionStartTimeRange"
                 ],
                 "subgroups": []
+              },
+              {
+                "key": "Multi Trigger",
+                "collapsed": false,
+                "locked": false,
+                "items": [
+                  {
+                    "type": "row",
+                    "key": "custom14MultiTriggerEnabled"
+                  },
+                  {
+                    "type": "row",
+                    "key": "custom14MultiTriggers"
+                  },
+                  {
+                    "type": "row"
+                  }
+                ],
+                "settings": [
+                  "custom14MultiTriggerEnabled",
+                  "custom14MultiTriggers",
+                  null
+                ],
+                "subgroups": []
               }
             ]
           }
@@ -22974,7 +23089,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 13",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -23186,6 +23301,33 @@
                   ],
                   "subgroups": []
                 }
+              },
+              {
+                "type": "group",
+                "group": {
+                  "key": "Multi Trigger",
+                  "collapsed": false,
+                  "locked": false,
+                  "items": [
+                    {
+                      "type": "row",
+                      "key": "custom13MultiTriggerEnabled"
+                    },
+                    {
+                      "type": "row",
+                      "key": "custom13MultiTriggers"
+                    },
+                    {
+                      "type": "row"
+                    }
+                  ],
+                  "settings": [
+                    "custom13MultiTriggerEnabled",
+                    "custom13MultiTriggers",
+                    null
+                  ],
+                  "subgroups": []
+                }
               }
             ],
             "settings": [
@@ -23340,6 +23482,30 @@
                   "custom13RetransitionStartTimeRange"
                 ],
                 "subgroups": []
+              },
+              {
+                "key": "Multi Trigger",
+                "collapsed": false,
+                "locked": false,
+                "items": [
+                  {
+                    "type": "row",
+                    "key": "custom13MultiTriggerEnabled"
+                  },
+                  {
+                    "type": "row",
+                    "key": "custom13MultiTriggers"
+                  },
+                  {
+                    "type": "row"
+                  }
+                ],
+                "settings": [
+                  "custom13MultiTriggerEnabled",
+                  "custom13MultiTriggers",
+                  null
+                ],
+                "subgroups": []
               }
             ]
           }
@@ -23348,7 +23514,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 10",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -23984,7 +24150,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 9",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -24196,6 +24362,33 @@
                   ],
                   "subgroups": []
                 }
+              },
+              {
+                "type": "group",
+                "group": {
+                  "key": "Multi Trigger",
+                  "collapsed": false,
+                  "locked": false,
+                  "items": [
+                    {
+                      "type": "row",
+                      "key": "custom9MultiTriggerEnabled"
+                    },
+                    {
+                      "type": "row",
+                      "key": "custom9MultiTriggers"
+                    },
+                    {
+                      "type": "row"
+                    }
+                  ],
+                  "settings": [
+                    "custom9MultiTriggerEnabled",
+                    "custom9MultiTriggers",
+                    null
+                  ],
+                  "subgroups": []
+                }
               }
             ],
             "settings": [
@@ -24350,6 +24543,30 @@
                   "custom9RetransitionStartTimeRange"
                 ],
                 "subgroups": []
+              },
+              {
+                "key": "Multi Trigger",
+                "collapsed": false,
+                "locked": false,
+                "items": [
+                  {
+                    "type": "row",
+                    "key": "custom9MultiTriggerEnabled"
+                  },
+                  {
+                    "type": "row",
+                    "key": "custom9MultiTriggers"
+                  },
+                  {
+                    "type": "row"
+                  }
+                ],
+                "settings": [
+                  "custom9MultiTriggerEnabled",
+                  "custom9MultiTriggers",
+                  null
+                ],
+                "subgroups": []
               }
             ]
           }
@@ -24412,7 +24629,7 @@
                 "type": "group",
                 "group": {
                   "key": "Rotation",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -24487,7 +24704,7 @@
                 "type": "group",
                 "group": {
                   "key": "Start Time Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -24520,7 +24737,7 @@
                 "type": "group",
                 "group": {
                   "key": "Retransition",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -24737,7 +24954,7 @@
               },
               {
                 "key": "Rotation",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -24782,7 +24999,7 @@
               },
               {
                 "key": "Start Time Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -24812,7 +25029,7 @@
               },
               {
                 "key": "Retransition",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -24994,7 +25211,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 7",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -25206,6 +25423,33 @@
                   ],
                   "subgroups": []
                 }
+              },
+              {
+                "type": "group",
+                "group": {
+                  "key": "Multi Trigger",
+                  "collapsed": false,
+                  "locked": false,
+                  "items": [
+                    {
+                      "type": "row",
+                      "key": "custom7MultiTriggerEnabled"
+                    },
+                    {
+                      "type": "row",
+                      "key": "custom7MultiTriggers"
+                    },
+                    {
+                      "type": "row"
+                    }
+                  ],
+                  "settings": [
+                    "custom7MultiTriggerEnabled",
+                    "custom7MultiTriggers",
+                    null
+                  ],
+                  "subgroups": []
+                }
               }
             ],
             "settings": [
@@ -25360,6 +25604,30 @@
                   "custom7RetransitionStartTimeRange"
                 ],
                 "subgroups": []
+              },
+              {
+                "key": "Multi Trigger",
+                "collapsed": false,
+                "locked": false,
+                "items": [
+                  {
+                    "type": "row",
+                    "key": "custom7MultiTriggerEnabled"
+                  },
+                  {
+                    "type": "row",
+                    "key": "custom7MultiTriggers"
+                  },
+                  {
+                    "type": "row"
+                  }
+                ],
+                "settings": [
+                  "custom7MultiTriggerEnabled",
+                  "custom7MultiTriggers",
+                  null
+                ],
+                "subgroups": []
               }
             ]
           }
@@ -25395,7 +25663,7 @@
       "subgroups": [
         {
           "key": "Custom Click Function 14",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
@@ -25607,6 +25875,33 @@
                 ],
                 "subgroups": []
               }
+            },
+            {
+              "type": "group",
+              "group": {
+                "key": "Multi Trigger",
+                "collapsed": false,
+                "locked": false,
+                "items": [
+                  {
+                    "type": "row",
+                    "key": "custom14MultiTriggerEnabled"
+                  },
+                  {
+                    "type": "row",
+                    "key": "custom14MultiTriggers"
+                  },
+                  {
+                    "type": "row"
+                  }
+                ],
+                "settings": [
+                  "custom14MultiTriggerEnabled",
+                  "custom14MultiTriggers",
+                  null
+                ],
+                "subgroups": []
+              }
             }
           ],
           "settings": [
@@ -25761,12 +26056,36 @@
                 "custom14RetransitionStartTimeRange"
               ],
               "subgroups": []
+            },
+            {
+              "key": "Multi Trigger",
+              "collapsed": false,
+              "locked": false,
+              "items": [
+                {
+                  "type": "row",
+                  "key": "custom14MultiTriggerEnabled"
+                },
+                {
+                  "type": "row",
+                  "key": "custom14MultiTriggers"
+                },
+                {
+                  "type": "row"
+                }
+              ],
+              "settings": [
+                "custom14MultiTriggerEnabled",
+                "custom14MultiTriggers",
+                null
+              ],
+              "subgroups": []
             }
           ]
         },
         {
           "key": "Custom Click Function 13",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
@@ -25978,6 +26297,33 @@
                 ],
                 "subgroups": []
               }
+            },
+            {
+              "type": "group",
+              "group": {
+                "key": "Multi Trigger",
+                "collapsed": false,
+                "locked": false,
+                "items": [
+                  {
+                    "type": "row",
+                    "key": "custom13MultiTriggerEnabled"
+                  },
+                  {
+                    "type": "row",
+                    "key": "custom13MultiTriggers"
+                  },
+                  {
+                    "type": "row"
+                  }
+                ],
+                "settings": [
+                  "custom13MultiTriggerEnabled",
+                  "custom13MultiTriggers",
+                  null
+                ],
+                "subgroups": []
+              }
             }
           ],
           "settings": [
@@ -26132,12 +26478,36 @@
                 "custom13RetransitionStartTimeRange"
               ],
               "subgroups": []
+            },
+            {
+              "key": "Multi Trigger",
+              "collapsed": false,
+              "locked": false,
+              "items": [
+                {
+                  "type": "row",
+                  "key": "custom13MultiTriggerEnabled"
+                },
+                {
+                  "type": "row",
+                  "key": "custom13MultiTriggers"
+                },
+                {
+                  "type": "row"
+                }
+              ],
+              "settings": [
+                "custom13MultiTriggerEnabled",
+                "custom13MultiTriggers",
+                null
+              ],
+              "subgroups": []
             }
           ]
         },
         {
           "key": "Custom Click Function 10",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
@@ -26770,7 +27140,7 @@
         },
         {
           "key": "Custom Click Function 9",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
@@ -26982,6 +27352,33 @@
                 ],
                 "subgroups": []
               }
+            },
+            {
+              "type": "group",
+              "group": {
+                "key": "Multi Trigger",
+                "collapsed": false,
+                "locked": false,
+                "items": [
+                  {
+                    "type": "row",
+                    "key": "custom9MultiTriggerEnabled"
+                  },
+                  {
+                    "type": "row",
+                    "key": "custom9MultiTriggers"
+                  },
+                  {
+                    "type": "row"
+                  }
+                ],
+                "settings": [
+                  "custom9MultiTriggerEnabled",
+                  "custom9MultiTriggers",
+                  null
+                ],
+                "subgroups": []
+              }
             }
           ],
           "settings": [
@@ -27136,6 +27533,30 @@
                 "custom9RetransitionStartTimeRange"
               ],
               "subgroups": []
+            },
+            {
+              "key": "Multi Trigger",
+              "collapsed": false,
+              "locked": false,
+              "items": [
+                {
+                  "type": "row",
+                  "key": "custom9MultiTriggerEnabled"
+                },
+                {
+                  "type": "row",
+                  "key": "custom9MultiTriggers"
+                },
+                {
+                  "type": "row"
+                }
+              ],
+              "settings": [
+                "custom9MultiTriggerEnabled",
+                "custom9MultiTriggers",
+                null
+              ],
+              "subgroups": []
             }
           ]
         },
@@ -27195,7 +27616,7 @@
               "type": "group",
               "group": {
                 "key": "Rotation",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -27270,7 +27691,7 @@
               "type": "group",
               "group": {
                 "key": "Start Time Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -27303,7 +27724,7 @@
               "type": "group",
               "group": {
                 "key": "Retransition",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -27520,7 +27941,7 @@
             },
             {
               "key": "Rotation",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -27565,7 +27986,7 @@
             },
             {
               "key": "Start Time Curve",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -27595,7 +28016,7 @@
             },
             {
               "key": "Retransition",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -27774,7 +28195,7 @@
         },
         {
           "key": "Custom Click Function 7",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
@@ -27986,6 +28407,33 @@
                 ],
                 "subgroups": []
               }
+            },
+            {
+              "type": "group",
+              "group": {
+                "key": "Multi Trigger",
+                "collapsed": false,
+                "locked": false,
+                "items": [
+                  {
+                    "type": "row",
+                    "key": "custom7MultiTriggerEnabled"
+                  },
+                  {
+                    "type": "row",
+                    "key": "custom7MultiTriggers"
+                  },
+                  {
+                    "type": "row"
+                  }
+                ],
+                "settings": [
+                  "custom7MultiTriggerEnabled",
+                  "custom7MultiTriggers",
+                  null
+                ],
+                "subgroups": []
+              }
             }
           ],
           "settings": [
@@ -28138,6 +28586,30 @@
                 "custom7RetransitionSpeedCurveRange",
                 "custom7RetransitionStartTimeCurve",
                 "custom7RetransitionStartTimeRange"
+              ],
+              "subgroups": []
+            },
+            {
+              "key": "Multi Trigger",
+              "collapsed": false,
+              "locked": false,
+              "items": [
+                {
+                  "type": "row",
+                  "key": "custom7MultiTriggerEnabled"
+                },
+                {
+                  "type": "row",
+                  "key": "custom7MultiTriggers"
+                },
+                {
+                  "type": "row"
+                }
+              ],
+              "settings": [
+                "custom7MultiTriggerEnabled",
+                "custom7MultiTriggers",
+                null
               ],
               "subgroups": []
             }
@@ -28997,11 +29469,19 @@
       "items": [
         {
           "type": "row",
-          "key": "outlineEnabled"
+          "key": "outlineMechanic"
         },
         {
           "type": "row",
-          "key": "useOutlinePass"
+          "key": "emissionColor"
+        },
+        {
+          "type": "row",
+          "key": "emissionIntensity"
+        },
+        {
+          "type": "row",
+          "key": "outlineEnabled"
         },
         {
           "type": "row",
@@ -29025,8 +29505,10 @@
         }
       ],
       "settings": [
+        "outlineMechanic",
+        "emissionColor",
+        "emissionIntensity",
         "outlineEnabled",
-        "useOutlinePass",
         "outlineColor",
         "hullThickness",
         "passThickness",
