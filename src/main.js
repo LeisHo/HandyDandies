@@ -1739,12 +1739,38 @@ function applyCameraControl(key, value) {
   camera.updateProjectionMatrix()
   controls.update()
 }
+// PERFORMANCE (2026-09-27, direct report: "when i pause the hands, how
+// come the ui is still slow. its no longer animating") -- the same class
+// of bug the 2026-09-21 composer.render() throttle fixed (see animate()'s
+// own comment), just a DIFFERENT function that fix never touched. This
+// ran ALL 5 syncValue() calls every single animate() tick, completely
+// unconditionally -- not gated by Global Pause (deliberately, so camera
+// pan/orbit/zoom stays live while paused, see this function's own call
+// site comment), and NOT throttled either. Each syncValue() call runs
+// findCtrl() (devPanel.js), a LINEAR SCAN over every registered control
+// across every group -- with this project's real control count (every
+// custom click function's own ~30-control battery, Multi Trigger adding
+// MORE dynamically per trigger, every Rendering Style, etc.), that's 5
+// full linear scans + 5 real DOM writes (displayValue()'s slider branch),
+// 60 times a second, competing with dev-panel input handling for main-
+// thread time -- regardless of whether the camera actually moved at all.
+// The 2026-09-21 fix didn't touch this because composer.render() was the
+// dominant cost at the time; throttling that one revealed this one as the
+// next-biggest, same "fix one bottleneck, reveal the next" pattern.
+// Fixed with a cheap "did this value actually change" cache, the exact
+// pattern armLengthWidgetResyncs' own registered functions already use
+// (see e.g. the Arm Length curve widget's own `lastSeenValue` guard) --
+// skips the scan+DOM-write entirely on the overwhelming majority of
+// frames where the camera is stationary, while still updating within one
+// frame the instant it genuinely moves.
+let __lastSyncedCameraX = null, __lastSyncedCameraY = null, __lastSyncedCameraZ = null, __lastSyncedCameraFov = null, __lastSyncedCameraZoom = null
 function syncCameraPanelFromLive() {
-  syncValue('cameraX', camera.position.x)
-  syncValue('cameraY', camera.position.y)
-  syncValue('cameraZ', camera.position.z)
-  syncValue('cameraFov', camera.fov)
-  syncValue('cameraZoom', camera.position.distanceTo(controls.target))
+  const x = camera.position.x, y = camera.position.y, z = camera.position.z, fov = camera.fov, zoom = camera.position.distanceTo(controls.target)
+  if (x !== __lastSyncedCameraX) { syncValue('cameraX', x); __lastSyncedCameraX = x }
+  if (y !== __lastSyncedCameraY) { syncValue('cameraY', y); __lastSyncedCameraY = y }
+  if (z !== __lastSyncedCameraZ) { syncValue('cameraZ', z); __lastSyncedCameraZ = z }
+  if (fov !== __lastSyncedCameraFov) { syncValue('cameraFov', fov); __lastSyncedCameraFov = fov }
+  if (zoom !== __lastSyncedCameraZoom) { syncValue('cameraZoom', zoom); __lastSyncedCameraZoom = zoom }
 }
 
 const composer = new EffectComposer(renderer)
