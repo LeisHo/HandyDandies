@@ -28,7 +28,7 @@
       "palmFacesCursor": true,
       "palmFaceRotationOffset": 13,
       "palmFacesCursorDistanceCurveEnabled": true,
-      "palmFacesCursorDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":5}]",
+      "palmFacesCursorDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0.25}]",
       "palmFacesCursorDistanceRange": "{\"min\":0,\"max\":180}",
       "loadingPreviewEnabled": true,
       "loadingPreviewShowLive": false,
@@ -6091,13 +6091,13 @@
       "cropWristEnabled": true,
       "hideWrist": 0,
       "reactiveArmLengthEnabled": true,
-      "armLengthRange": "{\"min\":0,\"max\":100}",
+      "armLengthRange": "{\"min\":0,\"max\":42}",
       "armLengthCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
       "wristSplayResponsiveEnabled": true,
       "wristSplayReposeStagger": 1,
       "wristSplayDefault": 6,
       "wristSplayReactiveEnabled": true,
-      "wristSplayRange": "{\"min\":64,\"max\":-86}",
+      "wristSplayRange": "{\"min\":30,\"max\":-54}",
       "wristSplayCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
       "tweenPoses": [
         "COUNTDOWN (VERT) - 0",
@@ -6716,7 +6716,7 @@
       "custom7RotationX": 0,
       "custom7RotationY": 0,
       "custom7RotationZ": 0,
-      "custom7TargetPose": "Big Open Palm (S)",
+      "custom7TargetPose": "Big Open Palm",
       "custom7TweenSelector": "",
       "custom7TweenSpeedMs": 800,
       "custom7TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -6777,7 +6777,7 @@
       "custom8RetransitionSpeedCurveRange": "{\"min\":50,\"max\":2000}",
       "custom8RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom8RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom8TweenRetransitionSpeedMs": 3410,
+      "custom8TweenRetransitionSpeedMs": 8000,
       "custom8TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom8TweenRetransitionStartTimeRange": "{\"min\":0,\"max\":3000}",
       "custom8TweenStopEnabled": true,
@@ -7054,7 +7054,7 @@
       "palmFacesCursor": true,
       "palmFaceRotationOffset": 0,
       "palmFacesCursorDistanceCurveEnabled": true,
-      "palmFacesCursorDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":5}]",
+      "palmFacesCursorDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0.25}]",
       "palmFacesCursorDistanceRange": "{\"min\":0,\"max\":180}",
       "loadingPreviewEnabled": true,
       "loadingPreviewShowLive": false,
@@ -13117,13 +13117,13 @@
       "cropWristEnabled": true,
       "hideWrist": 0,
       "reactiveArmLengthEnabled": true,
-      "armLengthRange": "{\"min\":0,\"max\":100}",
+      "armLengthRange": "{\"min\":0,\"max\":42}",
       "armLengthCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
       "wristSplayResponsiveEnabled": true,
       "wristSplayReposeStagger": 1,
       "wristSplayDefault": 6,
       "wristSplayReactiveEnabled": true,
-      "wristSplayRange": "{\"min\":64,\"max\":-86}",
+      "wristSplayRange": "{\"min\":30,\"max\":-54}",
       "wristSplayCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
       "tweenPoses": [
         "COUNTDOWN (VERT) - 0",
@@ -13742,7 +13742,7 @@
       "custom7RotationX": 0,
       "custom7RotationY": 0,
       "custom7RotationZ": 0,
-      "custom7TargetPose": "Big Open Palm (S)",
+      "custom7TargetPose": "Big Open Palm",
       "custom7TweenSelector": "",
       "custom7TweenSpeedMs": 800,
       "custom7TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -13803,7 +13803,7 @@
       "custom8RetransitionSpeedCurveRange": "{\"min\":50,\"max\":2000}",
       "custom8RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom8RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom8TweenRetransitionSpeedMs": 3410,
+      "custom8TweenRetransitionSpeedMs": 8000,
       "custom8TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom8TweenRetransitionStartTimeRange": "{\"min\":0,\"max\":3000}",
       "custom8TweenStopEnabled": true,
@@ -14080,7 +14080,7 @@
       "palmFacesCursor": true,
       "palmFaceRotationOffset": 0,
       "palmFacesCursorDistanceCurveEnabled": true,
-      "palmFacesCursorDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":5}]",
+      "palmFacesCursorDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0.25}]",
       "palmFacesCursorDistanceRange": "{\"min\":0,\"max\":180}",
       "loadingPreviewEnabled": true,
       "loadingPreviewShowLive": false,
@@ -20143,13 +20143,13 @@
       "cropWristEnabled": true,
       "hideWrist": 0,
       "reactiveArmLengthEnabled": true,
-      "armLengthRange": "{\"min\":0,\"max\":100}",
+      "armLengthRange": "{\"min\":0,\"max\":42}",
       "armLengthCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
       "wristSplayResponsiveEnabled": true,
       "wristSplayReposeStagger": 1,
       "wristSplayDefault": 6,
       "wristSplayReactiveEnabled": true,
-      "wristSplayRange": "{\"min\":64,\"max\":-86}",
+      "wristSplayRange": "{\"min\":30,\"max\":-54}",
       "wristSplayCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
       "tweenPoses": [
         "COUNTDOWN (VERT) - 0",
@@ -20768,7 +20768,7 @@
       "custom7RotationX": 0,
       "custom7RotationY": 0,
       "custom7RotationZ": 0,
-      "custom7TargetPose": "Big Open Palm (S)",
+      "custom7TargetPose": "Big Open Palm",
       "custom7TweenSelector": "",
       "custom7TweenSpeedMs": 800,
       "custom7TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -20829,7 +20829,7 @@
       "custom8RetransitionSpeedCurveRange": "{\"min\":50,\"max\":2000}",
       "custom8RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom8RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom8TweenRetransitionSpeedMs": 3410,
+      "custom8TweenRetransitionSpeedMs": 8000,
       "custom8TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom8TweenRetransitionStartTimeRange": "{\"min\":0,\"max\":3000}",
       "custom8TweenStopEnabled": true,
@@ -22666,7 +22666,7 @@
           "type": "group",
           "group": {
             "key": "New Group (3)",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -22689,7 +22689,7 @@
           "type": "group",
           "group": {
             "key": "Responsive Wrist Splay",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -22732,7 +22732,7 @@
           "type": "group",
           "group": {
             "key": "New Group (4)",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -22779,7 +22779,7 @@
       "subgroups": [
         {
           "key": "New Group (3)",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -22799,7 +22799,7 @@
         },
         {
           "key": "Responsive Wrist Splay",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -22839,7 +22839,7 @@
         },
         {
           "key": "New Group (4)",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -22876,14 +22876,14 @@
     },
     {
       "key": "Custom Click Functions",
-      "collapsed": true,
+      "collapsed": false,
       "locked": false,
       "items": [
         {
           "type": "group",
           "group": {
             "key": "Custom Click Function 14",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -25005,7 +25005,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 8",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -25641,7 +25641,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 7",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -28755,7 +28755,7 @@
       "subgroups": [
         {
           "key": "Custom Click Function 14",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -30865,7 +30865,7 @@
         },
         {
           "key": "Custom Click Function 8",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
@@ -31498,7 +31498,7 @@
         },
         {
           "key": "Custom Click Function 7",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
