@@ -13,6 +13,16 @@
   }
 }
 </script>
+<!-- Generic, standalone, dependency-free (see its own header comment) --
+     ported from the "3JS ENGINE" project (J:\CLAUDE\PROJECTS\3JS ENGINE),
+     where it was originally built and verified -- stops main.js's own
+     render loop (animate()) entirely while this tab is hidden OR the
+     browser window loses OS focus (covered by another app window), zero
+     CPU/GPU cost either way, and discards the paused-duration gap on
+     resume so nothing jumps forward. Loaded as a PLAIN script, BEFORE
+     src/main.js, so window.VisibilityTickLoop already exists by the time
+     main.js's own top-level code calls registerTick(). -->
+<script src="lib/visibility-tick-loop.js?v=1"></script>
 </head>
 <body>
 <canvas id="viewport"></canvas>
@@ -32,6 +42,6 @@
      .hidden class on it) since the Loading Preview hand animation is
      now the sole loading indicator; an empty #loading is harmless. -->
 <div id="loading"></div>
-<script type="module" src="src/main.js?v=220"></script>
+<script type="module" src="src/main.js?v=221"></script>
 </body>
 </html>

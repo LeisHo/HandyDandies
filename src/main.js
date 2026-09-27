@@ -1787,6 +1787,15 @@ scene.add(targetMarker)
 // Cursor -> world target
 // -----------------------------------------------------------------------
 window.addEventListener('pointermove', (e) => {
+  // Ported pattern, see lib/visibility-tick-loop.js's own "CURSOR/MOUSE
+  // TRACKING" header section -- this handler used to write into cursorNDC
+  // completely unconditionally, tracking input for a page nobody could
+  // see while hidden/unfocused (a background tab, covered by another app
+  // window). animate() itself already stops being called under those same
+  // conditions (see its own comment), so skipping this too keeps
+  // cursorNDC from silently going stale-vs-fresh across a pause/resume
+  // boundary and matches the exact same signal the render loop uses.
+  if (window.VisibilityTickLoop.isPaused()) return
   cursorNDC.set((e.clientX / window.innerWidth) * 2 - 1, -(e.clientY / window.innerHeight) * 2 + 1)
   lastPointerClientX = e.clientX
   lastPointerClientY = e.clientY
@@ -10732,8 +10741,21 @@ function flashImportButton(btn, text) {
 // bottleneck is identified from this data -- do not treat this as
 // permanent instrumentation.
 let __frameProfiler = { frames: 0, updateRenderOrderMs: 0, composerRenderMs: 0, windowStart: performance.now() }
-function animate() {
-  requestAnimationFrame(animate)
+// Runs via the shared lib/visibility-tick-loop.js (ported from "3JS
+// ENGINE", see that file's own header comment for the full account)
+// rather than a raw self-scheduling requestAnimationFrame(animate) --
+// that shared loop stops calling this entirely while this tab is hidden
+// OR the browser window loses OS focus (covered by another app window),
+// zero CPU/GPU cost either way, instead of relying on the browser's own
+// rAF throttling (which slows callbacks down, typically to ~1/sec, but
+// keeps firing them -- still real CPU/GPU cost). `dt`/`now` (seconds
+// since last active tick / performance.now() timestamp) are accepted but
+// unused here -- every timing call site in this function already reads
+// nowVirtual() instead, and syncPauseWithVisibility() (below) keeps that
+// virtual clock continuous across a hidden/unfocused gap the same way it
+// already is across a manual Global Pause, so no in-flight tween jumps
+// forward the moment this tab becomes visible/focused again.
+function animate(dt, now) {
   try {
     renderer.getSize(rendererSizeCheck)
     if (window.innerWidth > 0 && window.innerHeight > 0 && (rendererSizeCheck.x !== window.innerWidth || rendererSizeCheck.y !== window.innerHeight)) {
@@ -10873,7 +10895,34 @@ function animate() {
     console.error('animate() frame threw -- rendering skipped for this frame, loop continues:', err)
   }
 }
-animate()
+window.VisibilityTickLoop.registerTick(animate)
+// Keeps the EXISTING virtual-clock pause mechanism (nowVirtual()/
+// pauseOffsetMs, see setPaused()'s own declaration) continuous across a
+// hidden/unfocused gap too, exactly as it's already continuous across a
+// manual Global Pause -- animate() stops being called entirely while
+// hidden/unfocused (see its own comment above), so without this, the
+// FIRST elapsed-time computation against any in-flight tween's own
+// stored trigger-time, once this tab becomes active again, would include
+// the entire hidden/unfocused duration as if it had all just elapsed --
+// the exact "jump forward" bug this whole mechanism exists to prevent,
+// just via the hidden-tab path instead of the manual-pause path.
+// `isPausedForVisibility` distinguishes an auto-pause THIS code caused
+// from a genuine manual pause the user already had active -- hiding the
+// tab while already manually paused must not auto-resume it the moment
+// the tab comes back; it should stay manually paused until the user
+// un-pauses it themselves.
+let isPausedForVisibility = false
+function syncPauseWithVisibility() {
+  if (window.VisibilityTickLoop.isPaused()) {
+    if (!isPaused) { isPausedForVisibility = true; setPaused(true) }
+  } else if (isPausedForVisibility) {
+    isPausedForVisibility = false
+    setPaused(false)
+  }
+}
+document.addEventListener('visibilitychange', syncPauseWithVisibility)
+window.addEventListener('blur', syncPauseWithVisibility)
+window.addEventListener('focus', syncPauseWithVisibility)
 
 // Render-order stacking driven by distance from the cursor target, not
 // real camera depth -- per direct request, hands FURTHEST from the
