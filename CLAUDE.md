@@ -1231,3 +1231,38 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   drag-reorder across a reload, or not working at all outside `?dev=1`,
   start there -- this is genuinely unverified, not just cautiously
   worded.**
+- **`lib/visibility-tick-loop.js` (added 2026-09-27) is a vendored copy
+  from the sibling "3JS ENGINE" project (`J:\CLAUDE\PROJECTS\3JS
+  ENGINE\lib\visibility-tick-loop.js`), where it was originally built and
+  is the canonical source -- treat it the same as any other vendored
+  file in this workspace (HTML UI ENGINE, TEMPLATE_DEV_PANEL.html): a
+  genuine gap found while integrating it here belongs in the canonical
+  copy first, then gets re-vendored, not patched in place here. It stops
+  `animate()` (registered via `window.VisibilityTickLoop.registerTick()`)
+  entirely while this tab is hidden OR the browser window loses OS focus,
+  and exposes `window.VisibilityTickLoop.isPaused()` for anything else
+  that should stop working under the same conditions -- the pointermove
+  cursor-tracking listener (`cursorNDC`) already uses it. **This
+  project's own `syncPauseWithVisibility()`/`isPausedForVisibility`
+  (main.js, right after `animate()`'s own `registerTick` call) is
+  DELIBERATELY project-specific, not part of the vendored file** -- it
+  bridges the new hidden/unfocused signal into this project's own
+  PRE-EXISTING manual Global Pause (`isPaused`/`setPaused()`/
+  `pauseOffsetMs`), so an in-flight tween's own elapsed-time computation
+  doesn't jump forward by the entire hidden duration the moment the tab
+  becomes active again -- the shared file has no `onPause` hook (only
+  `onResume`) specifically because "what paused means for this project's
+  content" is meant to stay out of the generic file. If a future report
+  describes a tween snapping/jumping forward after the tab was hidden or
+  unfocused for a while, this is the first place to check -- confirm
+  `syncPauseWithVisibility()` is still correctly wired to all 3 events
+  (`visibilitychange`/`blur`/`focus`) before assuming a regression
+  elsewhere. **Not independently verified end-to-end through this
+  project's own real trigger/tween system** -- the hand-model GLB failed
+  to load in this sandbox across 5 retries the round this was added (a
+  pre-existing, already-documented gotcha, see this file's own GLB-
+  truncation entry above), so `window.__debug` never populated and the
+  `setPaused()` sync logic specifically could only be reviewed by direct
+  reasoning, not observed live. The core tick-pause-resume mechanism
+  itself WAS verified live (a registered probe callback, ticking ->
+  frozen 2s while simulated hidden -> resumed on simulated focus).

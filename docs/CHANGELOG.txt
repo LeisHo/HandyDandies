@@ -11874,6 +11874,95 @@ passes; the user will test directly.
 Commit: `dce2f3e`. Pushed to `https://github.com/LeisHo/HandyDandies`.
 
 --------------------------------------------------------------------------------
+2026-09-27 (3rd round)
+
+Direct instruction: port the newest version of `lib/visibility-tick-
+loop.js` (built and verified in the sibling "3JS ENGINE" project,
+J:\CLAUDE\PROJECTS\3JS ENGINE) into this project specifically -- "stop
+rendering animations when the browser is obscured or hidden," plus
+gating cursor tracking the same way ("in regards to animation and
+cursor behaviour").
+
+This project's `animate()` was a raw self-scheduling
+`requestAnimationFrame(animate)` -- does not stop when this tab is
+hidden or the browser window loses OS focus (covered by another
+application window); browsers throttle it (commonly ~1/sec) but keep
+firing it, real wasted CPU/GPU cost. Vendored `lib/visibility-tick-
+loop.js` verbatim (its own header documents the full design: `isPaused()
+= document.hidden || !document.hasFocus()`, since there's no standard
+browser API for genuine on-screen occlusion; unified
+visibilitychange/blur/focus handling so a single real transition -- e.g.
+minimizing a window commonly fires both visibilitychange and blur --
+doesn't double-fire; disclosed gaps: an exotic non-activating always-
+on-top overlay can't be detected at all, and DevTools taking focus also
+pauses the loop, which is expected). `animate()` is now registered via
+`window.VisibilityTickLoop.registerTick(animate)` instead of self-
+scheduling.
+
+This project ALREADY has its own manual Global Pause
+(`isPaused`/`setPaused()`/`nowVirtual()`'s `pauseOffsetMs`, which keeps
+in-flight tween timing continuous across a pause by accumulating
+exactly the real wall-clock duration spent paused). Since `animate()`
+now stops being called AT ALL while hidden/unfocused, a new
+`syncPauseWithVisibility()` (wired to the same 3 events) calls this
+EXISTING `setPaused()` in sync with `VisibilityTickLoop.isPaused()`, so
+`pauseOffsetMs` correctly absorbs a hidden/unfocused gap too --
+without this, the FIRST elapsed-time computation against any in-flight
+tween's own stored trigger-time, the moment the tab returns, would
+include the entire hidden/unfocused duration as if it had all just
+elapsed -- the exact "jump forward" bug this whole mechanism exists to
+prevent, just via the hidden-tab path instead of the manual-pause path.
+`isPausedForVisibility` distinguishes an auto-pause THIS code caused
+from a genuine manual pause the user already had active, so hiding the
+tab while already manually paused correctly stays manually paused
+rather than auto-resuming the moment the tab comes back. Deliberately
+NOT added to the shared `lib/visibility-tick-loop.js` file itself (no
+`onPause` hook exists there, only `onResume`) -- per that file's own
+stated design ("Every project's OWN callback still decides what
+'paused' actually means for its own content... this file only decides
+WHEN"), this project's own virtual-clock-continuity requirement belongs
+in this project's own code, not the generic shared file.
+
+Also gated the `pointermove` cursor-tracking listener (writes into
+`cursorNDC`) on `window.VisibilityTickLoop.isPaused()`, per the shared
+file's own documented "CURSOR/MOUSE TRACKING" pattern and direct
+instruction -- it previously wrote to `cursorNDC` completely
+unconditionally, tracking input for a page nobody could see while
+hidden/covered.
+
+**Verified live**, via the same real-sequenced-tool-calls method used
+in 3JS ENGINE's own verification (not a single script with an in-script
+wait): registered a probe callback via `registerTick` and confirmed the
+full cycle end to end on the actual running app -- ticking normally,
+frozen at an exact count over 2 real seconds while `document.hidden`/
+`hasFocus()` were overridden to simulate hidden, resumed immediately
+once simulated visible/focused again. Also confirmed a genuinely
+backgrounded browser tab (not just a JS-level `document.hidden`
+override) gets its real `requestAnimationFrame` suspended by the
+browser itself regardless of the override -- ticking only resumed once
+the tab was actually fronted, which is itself consistent with (not a
+bug in) the mechanism working as intended.
+
+**Not independently verified**: the app's own hand-model GLB failed to
+load in this sandbox across 5 retries (this project's own CLAUDE.md
+already documents this exact truncation flakiness for this exact
+asset) -- `window.__debug` never populated as a result (it's set only
+after a successful model load, unrelated to this change), so the
+`setPaused()`/`pauseOffsetMs` sync logic specifically could not be
+observed end-to-end through the app's own real trigger/tween system
+this round. Reviewed carefully by direct reasoning instead (traced
+through `nowVirtual()`/`setPaused()`'s own existing, already-correct
+mechanism and confirmed the new sync logic reuses it exactly rather
+than building a parallel one) -- disclosed as reviewed-not-observed
+rather than claimed as fully verified.
+
+`lib/visibility-tick-loop.js` added (new file, vendored copy).
+`index.html`: new `<script>` tag before `main.js`, `main.js` cache-
+buster bumped `?v=220` -> `?v=221`.
+
+Commit: `2a29200`. Pushed to `https://github.com/LeisHo/HandyDandies`.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

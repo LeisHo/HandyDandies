@@ -18,6 +18,32 @@ work seamlessly from there.
 
 ## Currently working on
 
+**SHIPPED 2026-09-27 (3rd round) -- ported `lib/visibility-tick-loop.js`
+from the sibling "3JS ENGINE" project: `animate()` now stops entirely
+(zero CPU/GPU cost) while this tab is hidden OR the browser window loses
+OS focus (covered by another app window), and cursor tracking
+(`cursorNDC`) is gated the same way.** `animate()` was a raw self-
+scheduling `requestAnimationFrame` loop; now registered via
+`window.VisibilityTickLoop.registerTick(animate)`. This project's own
+manual Global Pause (`isPaused`/`setPaused()`/`pauseOffsetMs`, keeping
+in-flight tween timing continuous across a pause) needed a new
+`syncPauseWithVisibility()` to stay correct: since `animate()` no longer
+runs at all while hidden/unfocused, this calls the EXISTING `setPaused()`
+in sync with the new mechanism's own `isPaused()`, so `pauseOffsetMs`
+absorbs a hidden/unfocused gap the same way it already absorbs a manual
+pause -- `isPausedForVisibility` ensures hiding the tab while already
+manually paused doesn't auto-resume it when the tab returns. Verified
+live end-to-end via a registered probe callback (ticking -> frozen for a
+real 2s while simulated hidden -> resumed on simulated focus); the
+`setPaused()`/`pauseOffsetMs` sync logic itself was reviewed carefully
+but not independently observed through the real app (the hand-model GLB
+failed to load in this sandbox across 5 retries, this project's own
+documented truncation flakiness, unrelated to this change) -- disclosed
+as reviewed-not-observed. `lib/visibility-tick-loop.js` added;
+`index.html` new script tag; `main.js` cache-buster `?v=220` -> `?v=221`.
+See CHANGELOG.txt's matching 2026-09-27 (3rd round) entry for the full
+account.
+
 **SHIPPED 2026-09-27 (2nd round), not tested this round per direct
 instruction (the user is testing directly) -- reinterpreted the Multi-
 Click Window slider for the rolling successive-click model.** Traced all
