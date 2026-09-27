@@ -1278,6 +1278,14 @@ const DEV_GROUPS = [
       // (guards against writing into a non-matching device's own stored
       // value) -- no changes needed there for this to work correctly.
       { key: 'cameraZoom', label: 'Zoom (Distance To Pan Target) (x)', type: 'slider', min: 1, max: 800, step: 0.5, def: 260.17068872666084, perDevice: true, onChange: (v) => applyCameraControl('cameraZoom', v) },
+      // Direct request: "add a zoom speed slider that controls how fast
+      // my scroll will zoom." OrbitControls' own `zoomSpeed` (three.js
+      // built-in, default 1.0) directly governs how far one scroll tick/
+      // pinch step moves the camera -- a plain passthrough, no custom
+      // math needed. perDevice like every other Camera control here (a
+      // touch pinch-zoom on Mobile/Landscape may want a different feel
+      // than a desktop scroll wheel).
+      { key: 'cameraZoomSpeed', label: 'Zoom Speed (x)', type: 'slider', min: 0.1, max: 5, step: 0.1, def: 1, perDevice: true, onChange: (v) => { controls.zoomSpeed = v } },
       // Direct request: "Similar to the pose selector, allow me to save,
       // use, overwrite, etc for camera settings" -- mirrors savedPoses'
       // own list-picker shape exactly (captureCurrent/onUse), except
