@@ -18,6 +18,26 @@ work seamlessly from there.
 
 ## Currently working on
 
+**FIXED 2026-09-27 (9th round) -- retransition targeting a stale pose
+snapshot instead of live cfg, the real remaining cause of "always a
+jump on the trigger after a hold release."** Direct follow-up: the 8th
+round's splay fix helped but wasn't the whole story. Root cause,
+confirmed by direct measurement (not just tracing) against the real
+production deployment: retransition animated back toward
+`poseDefaultValues` (a snapshot only resynced at page load or an
+explicit "Default" click), while idle-repose always renders from LIVE
+`cfg`. Tuning any Pose slider without clicking "Default" afterward made
+the two silently diverge -- measured a real wrist-bone quaternion snap
+exactly at the retransition->idle handoff. Fixed by having retransition
+target `cfg` directly instead. **Live-verified end to end** (bug AND
+fix) via the same frame-by-frame reproduction, before and after
+redeploy -- zero discontinuity now. Disclosed trade-off: the "Default"
+button's effect on retransition is moot once a pose slider has been
+tuned since the last click. See CLAUDE.md's matching Gotchas entry and
+CHANGELOG.txt's 2026-09-27 9th-round entry.
+
+--------------------------------------------------------------------------------
+
 **FIXED 2026-09-27 (8th round) -- wrist splay snapping at every
 click-function trigger boundary.** Direct report: interrupting a click
 function with another (or a retransition, or a tween stop), or simply

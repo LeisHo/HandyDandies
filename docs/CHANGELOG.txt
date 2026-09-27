@@ -12520,6 +12520,60 @@ wait, click elsewhere) before being fully trusted.
 
 Commit: `5b77d6e`. Pushed to `https://github.com/LeisHo/HandyDandies`.
 
+--------------------------------------------------------------------------------
+
+2026-09-27 (9th round)
+
+**CORRECTED -- the 8th round's splay fix was necessary but not
+sufficient. Direct follow-up: "the jump is better but not fixed... there
+is always a jump on the trigger after a hold release."**
+
+**Root cause, this time confirmed by direct MEASUREMENT, not just code
+tracing** -- used `window.__debug` to drive `startClickHoldPose()`/
+`endClickHoldPose()`/`updateRenderOrder()` directly against the real
+production deployment and log the wrist bone's own quaternion frame by
+frame. Retransition (`chp`/`cp` 'retransition' phase) animates back
+toward `poseDefaultValues`, a snapshot only resynced at page load or an
+explicit "Default" button click. Idle-repose always renders from LIVE
+`cfg` directly (so a Pose slider previews instantly on every idle hand).
+The moment ANY pose slider (curl/wristBend/wristSplay/wristRotation/
+modelRotX-Y-Z/poseOffset/poseScale) is tuned without a following
+"Default" click, these 2 sources of truth silently diverge. Measured
+directly: after mutating `cfg.wristBend` mid-session, then holding and
+releasing custom8 (a real Click+Hold function), the wrist bone's
+quaternion held steady through the whole retransition
+(`{x:0.1027,y:0.6851,z:0.1022,w:0.7139}`) and then SNAPPED the instant
+`chp.phase` reached 'idle' (`{x:0.1892,y:0.6442,z:0.0172,w:0.7409}`) --
+a real, reproducible, measured discontinuity, not a guess.
+
+**Fix:** `updateClickHoldPoseForHand()`'s and `updateClickPoseForHand()`'s
+own 'retransition' phase now call `lerpPoseValues(retransitionStart, cfg,
+progress)` instead of targeting `poseDefaultValues` -- retransition
+always converges to exactly what idle already shows, by construction, so
+the 2 can never disagree again.
+
+**Disclosed trade-off, not silently absorbed:** the "Default" button's
+own documented effect on retransition's target ("the pose that
+retransitions default back to") is now moot whenever a pose slider has
+been tuned since the last "Default" click -- retransition follows the
+live tuning instead of the saved default in that case.
+`poseDefaultValues` itself is untouched everywhere else it's used
+(Loading/Pose/Tween Preview, dcHold's own "always starts from default"
+exception) -- only these 2 retransition call sites changed.
+
+**Live-verified end to end, both the bug and the fix, via the identical
+reproduction on the real production deployment (not a guess or a
+code-reading-only confidence claim):** after redeploy (`?v=229`), the
+SAME test (mutate `cfg.wristBend`, hold, release, log the wrist bone's
+quaternion through the whole retransition->idle handoff) showed a
+smooth, continuous convergence with ZERO discontinuity at the phase
+boundary -- confirmed against the exact frame-by-frame trace that
+previously caught the bug.
+
+`main.js` cache-buster bumped `?v=228` -> `?v=229`.
+
+Commit: `88a56db`. Pushed to `https://github.com/LeisHo/HandyDandies`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

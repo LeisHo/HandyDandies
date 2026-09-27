@@ -1502,3 +1502,32 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   `from` value at arm/retransition-start time from whatever the hand
   actually has right now, blend across that phase's own progress toward
   the target, never apply a frozen constant on frame 1 of a NEW phase.
+- **CORRECTED 2026-09-27, same day -- the fix above was necessary but
+  not sufficient. `chp`/`cp`'s own 'retransition' phase animated back
+  toward `poseDefaultValues` (a snapshot only resynced at page load or
+  an explicit "Default" click), while idle-repose always renders from
+  LIVE `cfg` directly.** The moment ANY Pose slider is tuned without a
+  following "Default" click, these 2 sources of truth silently diverge
+  -- confirmed by direct MEASUREMENT this time (not just code tracing):
+  used `window.__debug` to drive `startClickHoldPose()`/
+  `endClickHoldPose()`/`updateRenderOrder()` against the real production
+  deployment and logged the wrist bone's own quaternion frame by frame
+  -- it held steady through the whole retransition, then SNAPPED the
+  instant `chp.phase` reached 'idle', a real, reproducible discontinuity.
+  Fixed by having both `updateClickHoldPoseForHand()`'s and
+  `updateClickPoseForHand()`'s 'retransition' phase target `cfg` directly
+  instead of `poseDefaultValues` -- retransition now always converges to
+  exactly what idle already shows, by construction. **Disclosed
+  trade-off:** the "Default" button's own documented effect on
+  retransition's target is now moot whenever a pose slider has been
+  tuned since the last "Default" click (retransition follows the live
+  tuning instead) -- `poseDefaultValues` is untouched everywhere else it's
+  used. **Live-verified end to end** (not just the bug, the fix too) via
+  the identical reproduction against the real deployment after redeploy
+  -- the same frame-by-frame quaternion trace that caught the bug showed
+  zero discontinuity afterward. If a future report describes a pose
+  jumping specifically when retransition completes (not at trigger
+  start), check whether `poseDefaultValues` has gone stale relative to
+  `cfg` for the field in question before assuming the splay-style
+  frozen-vs-live mismatch above is the cause -- these are 2 genuinely
+  different bugs that happen to produce the same symptom.
