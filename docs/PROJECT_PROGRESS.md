@@ -18,8 +18,8 @@ work seamlessly from there.
 
 ## Currently working on
 
-**SHIPPED 2026-09-27, pending confirmation against the real Vercel
-deployment -- fixed custom click functions silently ignoring their own
+**SHIPPED 2026-09-26 (3rd round), pending confirmation against the real
+Vercel deployment -- fixed custom click functions silently ignoring their own
 real saved settings (Type/Enabled/TargetPose/etc.) for any non-DEV_MODE
 visitor.** A follow-up correction on top of the 2026-09-26 contextmenu
 fix directly below (that fix was real, just not the whole story). Root
@@ -46,7 +46,7 @@ against the live running app directly -- the local static server has no
 working backend for the git-tracked settings fetch, so this couldn't be
 demonstrated live in this sandbox regardless of correctness. `main.js`
 cache-buster `?v=217` -> `?v=218`; `devPanel.js` import `?v=47` ->
-`?v=48`. See CHANGELOG.txt's matching 2026-09-27 entry for the full
+`?v=48`. See CHANGELOG.txt's matching 2026-09-26 (3rd round) entry for the full
 trace.
 
 **SHIPPED 2026-09-26 (2nd round), pending the user's own real-device

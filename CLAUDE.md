@@ -1126,7 +1126,7 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   Click Functions, the only such case in this project) can silently
   discard its own REAL SAVED VALUE for any non-DEV_MODE visitor, falling
   back to its hardcoded `def` instead -- with no error, no console
-  warning, nothing.** Confirmed 2026-09-27 via direct report ("Click
+  warning, nothing.** Confirmed 2026-09-26 (3rd round) via direct report ("Click
   funcitons still dont work in non dev mode"), a follow-up correction on
   the contextmenu fix directly above (that fix was real, just not the
   whole story -- this is a completely separate DATA problem, not a

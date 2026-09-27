@@ -11594,7 +11594,7 @@ CLAUDE.md Gotchas. Genuinely unverified live; needs the user's own real
 Pixel 9a retest.
 
 --------------------------------------------------------------------------------
-2026-09-27
+2026-09-26 (3rd round)
 
 Direct follow-up report: "Click funcitons still dont work in non dev
 mode" -- a correction on top of the prior day's contextmenu fix (that
@@ -11666,6 +11666,8 @@ genuinely exists.
 `src/devpanel/devPanel.js`'s own import in `main.js` bumped `?v=47` ->
 `?v=48`; `index.html`'s own `main.js` cache-buster bumped `?v=217` ->
 `?v=218`.
+
+Commit: `226da07`. Pushed to `https://github.com/LeisHo/HandyDandies`.
 
 --------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
