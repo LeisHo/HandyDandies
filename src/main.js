@@ -7964,6 +7964,15 @@ function buildClickPoseWidgets(p) {
 // -----------------------------------------------------------------------
 let customClickFunctionIds = [] // [{id, title, kind, family}] -- kind: 'pose'|'hold'; family: 'desktop'|'mobile'. Mirrors cfg.customClickFunctionIds (JSON), kept in sync by persistCustomClickFunctionIds()
 let nextCustomFunctionN = 1
+// Multi Trigger (added 2026-09-27, direct spec: "for custom click
+// functions i want a new feature: Under Retransition group, add *DC*Multi
+// Trigger*... cycling a single Click function through a different tween
+// on each subsequent click"). Purely runtime, per-page-load state -- NOT
+// persisted -- tracking "which position in the cycle is function `id`
+// currently on." Resets to the base pose (index 0) on every fresh page
+// load, which is the correct, unsurprising default (no user-visible
+// concept of "resume mid-cycle across reloads" was ever requested).
+const customFunctionMultiTriggerIndex = {} // { [id]: number }
 function persistCustomClickFunctionIds() {
   // Capture current collapse state for each custom function group before
   // saving, so the collapse state can be restored on page load (see
@@ -8488,6 +8497,10 @@ function renderCustomClickFunctionGroup(id, title, kind, family) {
     updateSingleTimingGateVisibility(id)
     updateSequencePlayModeVisibility(id)
     updateChainModeVisibility(id)
+    // Multi Trigger -- pose-kind only. Must run before
+    // applyCustomFunctionReferenceLayout() below, or that pass finds no
+    // "Multi Trigger" group yet to move into place after Retransition.
+    setupMultiTriggerGroupForFunction(id)
   }
   // Same mandatory Offset/Rotation/Animation Speed Curve/Start Time
   // Curve/Retransition gated-subgroup wrapping the 10 static triggers
@@ -8660,7 +8673,8 @@ const CUSTOM_FUNCTION_POSE_LAYOUT = [
   { type: 'group', title: 'Offset' }, { type: 'group', title: 'Rotation' },
   { type: 'row', suffix: 'SequencePlayMode' }, { type: 'row', suffix: 'SequenceCount' }, { type: 'row', suffix: 'SequenceCountMode' },
   { type: 'row', suffix: 'SequenceLoopTransition' }, { type: 'row', suffix: 'SequenceHoldMs' },
-  { type: 'group', title: 'Animation Speed Curve' }, { type: 'group', title: 'Start Time Curve' }, { type: 'group', title: 'Retransition' }
+  { type: 'group', title: 'Animation Speed Curve' }, { type: 'group', title: 'Start Time Curve' }, { type: 'group', title: 'Retransition' },
+  { type: 'group', title: 'Multi Trigger' }
 ]
 // Retransition/Start Time Curve now also contain their own Tween-mode
 // members internally (items 5/7, this same round) -- no separate top-
@@ -8761,6 +8775,20 @@ function addCustomClickFunction() {
   customClickFunctionIds.push({ id, title, kind, family })
   registerCustomClickFunction(id, title, kind, family)
   applyNewCustomFunctionTemplate(id)
+  // CORRECTED 2026-09-27 -- real, previously-undiagnosed root cause of a
+  // known symptom (see updateCustomFunctionTypeVisibility()'s own comment
+  // and this project's CLAUDE.md gotcha: "Touch Point Count visible on
+  // Desktop... only an actual manual tab click fixed it"). This function
+  // never called updateCustomFunctionTypeVisibility(id) at all -- the new
+  // function's own Touch Point Count row (built by buildRow(), which has
+  // no notion of "hide on Desktop regardless of Type") stayed at its
+  // default visible state until SOMETHING ELSE happened to call
+  // refreshAllCustomFunctionTypeVisibility() (a tab switch, or the NEXT
+  // page load's own restoreCustomClickFunctions() sweep) -- exactly
+  // matching the documented "only a manual tab click fixed it" behavior,
+  // which was never actually a timing race at all for a freshly-created
+  // function, just a genuinely missing call.
+  updateCustomFunctionTypeVisibility(id)
   // Direct request 2026-09-24 (item 16): "by default not have 'Show in
   // Mobile/Landscape' selected" -- a brand-new desktop-family function's
   // own dynamicDevice rows default to VISIBLE on Mobile/Landscape
@@ -8858,6 +8886,240 @@ function restoreCustomClickFunctions() {
   // animate()/renderer-resize code already uses elsewhere.
   setTimeout(() => { refreshAllCustomFunctionGroupVisibility(); refreshAllCustomFunctionTypeVisibility(); updateCustomFunctionsAnchorRowVisibility() }, 600)
 }
+// Multi Trigger -- direct spec (2026-09-27): "for custom click functions
+// i want a new feature: Under Retransition group, add Multi Trigger. It
+// allows me to use the same click function have different tweens per
+// subsequent triggers... for a single click function, the first click
+// tweens to Pose 2, the 2nd click goes to Pose 3, a 3rd click goes to
+// Pose 4. When it completes the list, the next click just tweens back to
+// Pose 1." Pose-kind only (no equivalent requested/built for hold-kind).
+//
+// Design: each added trigger is treated as its OWN fully independent
+// "shadow function" -- its own `CLICK_POSE_KEYS` entry, its own
+// `clickPoseTriggers[prefix]` parsed-curve cache, its own per-hand
+// `hand._cp[prefix]` state slot -- reusing 100% of the existing
+// triggerClickPose()/updateClickPoseForHand()/applyOffsetRotationToHand()
+// machinery verbatim (all already generic over their own `p` argument,
+// confirmed by direct reading before writing any of this). The ONLY new
+// runtime code is resolveMultiTriggerPrefix(), which decides WHICH
+// prefix a given click should actually dispatch to; the main per-frame
+// render loop already iterates `CLICK_POSE_KEYS` generically, so once a
+// trigger prefix is registered there, it gets driven every frame for
+// free, no render-loop changes needed.
+//
+// Every control here is built via makeClickPoseGroup(prefix, ...) itself
+// (never hand-duplicated), filtered to the named subset -- guarantees
+// "the exact same settings available" by construction, and any future
+// change to the real controls propagates to every trigger automatically.
+const MULTI_TRIGGER_ALLOWED_SUFFIXES = [
+  'Enabled', 'Mode', 'TargetPose', 'TweenSelector', 'TweenSpeedMs', 'TransitionSpeedMs', 'PauseDurationMs',
+  'OffsetEnabled', 'OffsetX', 'OffsetY',
+  'RotationEnabled', 'RotationX', 'RotationY', 'RotationZ',
+  'SpeedCurveEnabled', 'SpeedCurve', 'SpeedCurveRange',
+  'StartTimeCurveEnabled', 'StartTimeCurve', 'StartTimeRange', 'TweenStartTimeCurve', 'TweenStartTimeRange',
+  'RetransitionEnabled', 'RetransitionSpeedMs', 'RetransitionSpeedCurveEnabled', 'RetransitionSpeedCurve', 'RetransitionSpeedCurveRange', 'RetransitionStartTimeCurve', 'RetransitionStartTimeRange'
+]
+function buildMultiTriggerControlsForPrefix(prefix, title) {
+  const base = makeClickPoseGroup(prefix, title, {})
+  return base.controls.filter((c) => MULTI_TRIGGER_ALLOWED_SUFFIXES.some((suffix) => c.key === `${prefix}${suffix}`))
+}
+// Registers ONE trigger's own runtime state + (if a panel exists) its
+// live settings group, nested inside the Multi Trigger wrapper's body,
+// right before the "+ Add Trigger" button row. CRITICAL: the
+// CLICK_POSE_KEYS push / clickPoseTriggers state / cfg seeding
+// (renderDynamicGroup()'s own doing) all happen UNCONDITIONALLY, before
+// the `if (!mtBody) return` DOM-only gate below -- skipping this for a
+// non-DEV_MODE visitor would silently reintroduce a narrower version of
+// the exact "works in dev mode, not production" bug this session already
+// root-caused and fixed once for custom click functions generally (see
+// this same file's `lastRestoredValues`/devPanel.js fix) -- a real
+// visitor must be able to fire every trigger correctly with no panel
+// ever built.
+function registerMultiTriggerTrigger(prefix, title, mtBody, addBtnRow) {
+  if (!CLICK_POSE_KEYS.includes(prefix)) CLICK_POSE_KEYS.push(prefix)
+  if (!clickPoseTriggers[prefix]) {
+    clickPoseTriggers[prefix] = {
+      startCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], startRangeParsed: { min: 0, max: 300 },
+      speedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], speedRangeParsed: { min: 50, max: 2000 },
+      tweenStartCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStartRangeParsed: { min: 0, max: 300 },
+      retransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionRangeParsed: { min: 0, max: 300 },
+      retransitionSpeedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionSpeedRangeParsed: { min: 50, max: 2000 }
+    }
+  }
+  const controls = buildMultiTriggerControlsForPrefix(prefix, title)
+  const g = renderDynamicGroup({ title, controls }) // seeds cfg regardless of DOM; returns null with no panel
+  parseClickPoseConfig(prefix) // pure cfg read -- needed regardless of DOM for real dispatch to work
+  if (!g || !mtBody) return
+  // CORRECTED before ever shipping (caught by re-reading createGroupElement()'s
+  // own source, not live-caught): devPanel.js's createGroupElement() sets
+  // `g.dataset.key = title` (the group's own DISPLAY title, e.g. "Trigger
+  // 1") -- NOT the trigger's own prefix. captureAndPersistMultiTriggerOrder()
+  // needs the real prefix to match DOM order back against
+  // cfg[`${id}MultiTriggers`], so it's stamped here explicitly, the same
+  // way renderCustomClickFunctionGroup() stamps its own
+  // dataset.customFunctionId/Family after the fact rather than relying on
+  // dataset.key.
+  g.dataset.multiTriggerPrefix = prefix
+  mtBody.insertBefore(g, addBtnRow)
+  buildClickPoseWidgets(prefix)
+  updateClickTriggerModeVisibility(prefix, ['PauseDurationMs'])
+  updateChainModeVisibility(prefix)
+  updateOffsetRotationVisibility(prefix)
+  updateSingleTimingGateVisibility(prefix)
+  wrapClickFunctionGatedSubgroups(prefix)
+  updateClickFunctionEnabledVisibility(prefix)
+}
+// Reads cfg[`${id}MultiTriggers`] (the persisted, ordered trigger list)
+// and rebuilds every trigger's own runtime state + (if a panel exists)
+// live group -- called unconditionally from renderCustomClickFunctionGroup()'s
+// pose-kind branch, both for a brand-new function AND a page-load
+// restore, exactly mirroring how the rest of a custom function's own
+// state gets rebuilt from scratch each load (renderDynamicGroup()'s own
+// DOM/CLICK_POSE_KEYS registration is pure runtime state, gone on every
+// reload -- see restoreCustomClickFunctions()'s own matching comment).
+function setupMultiTriggerGroupForFunction(id) {
+  const mtControls = [
+    { key: `${id}MultiTriggerEnabled`, label: 'Multi Trigger (On/Off)', type: 'checkbox', def: false, onChange: () => updateMultiTriggerGroupVisibility(id) },
+    { key: `${id}MultiTriggers`, label: 'Multi Trigger List (internal)', type: 'text', def: '[]' }
+  ]
+  const g = renderDynamicGroup({ title: 'Multi Trigger', controls: mtControls }) // seeds cfg regardless of DOM
+  const functionEnabledRow = document.querySelector(`.dp-row[data-key="${id}Enabled"]`)
+  const functionBody = functionEnabledRow ? functionEnabledRow.parentElement : null
+  let mtBody = null
+  if (g && functionBody) {
+    functionBody.appendChild(g) // relocate out of the top-level panel into this function's own body
+    const listRow = g.querySelector(`.dp-row[data-key="${id}MultiTriggers"]`)
+    if (listRow) listRow.style.display = 'none' // pure bookkeeping, never hand-edited
+    mtBody = g.querySelector(':scope > .dp-group-body')
+  }
+  let addBtnRow = null
+  if (mtBody) {
+    // Pre-clear any stale ghost trigger groups devPanel.js's own generic
+    // applyOrder() may have already created here -- same "nesting a
+    // dynamic group inside a dynamic group" ghost risk this project's own
+    // CLAUDE.md gotcha documents for the identical reason (Custom Click
+    // Functions' own top-level anchor has the identical pre-clear).
+    mtBody.querySelectorAll(':scope > .dp-group').forEach((child) => child.remove())
+    addBtnRow = document.createElement('div')
+    addBtnRow.className = 'dp-row dp-multi-trigger-add-row'
+    const btn = document.createElement('button')
+    btn.type = 'button'
+    btn.textContent = '+ Add Trigger'
+    btn.addEventListener('click', () => addMultiTriggerTrigger(id))
+    addBtnRow.appendChild(btn)
+    mtBody.appendChild(addBtnRow)
+    // Drag-reorder-aware persistence -- devPanel.js's own generic group
+    // order (captureGroup()/applyOrder()) never reaches a non-DEV_MODE
+    // visitor at all (confirmed this same session, see
+    // restoreValuesForEveryVisitor()'s own comment in devPanel.js), and
+    // Multi Trigger's own firing order is functionally significant -- it
+    // cannot rely on live DOM/panel order the way a purely cosmetic
+    // group reorder can. Captured explicitly into cfg[`${id}MultiTriggers`]
+    // (a plain, cfg-backed value every visitor actually restores)
+    // instead, on every drag release within this specific group's body.
+    // Deferred one macrotask so it runs AFTER devPanel.js's own internal
+    // reorder-drop handler (also a pointerup listener, on an ancestor)
+    // has already finished moving the DOM -- same deferred-read technique
+    // this file's own Mouse Log already uses for an analogous "read
+    // AFTER the browser's own default handling" timing requirement.
+    // NOT independently live-verified against a real drag gesture this
+    // round (this session's sandbox could not get a clean live app load
+    // today -- see this round's own commit message) -- flagged honestly
+    // rather than claimed as confirmed.
+    mtBody.addEventListener('pointerup', () => setTimeout(() => captureAndPersistMultiTriggerOrder(id, mtBody, addBtnRow), 0))
+  }
+  let triggers = []
+  try { triggers = JSON.parse(cfg[`${id}MultiTriggers`] || '[]') } catch (e) { triggers = [] }
+  if (!Array.isArray(triggers)) triggers = []
+  triggers.forEach((t) => { if (t && t.prefix) registerMultiTriggerTrigger(t.prefix, t.title || t.prefix, mtBody, addBtnRow) })
+  updateMultiTriggerGroupVisibility(id)
+}
+// "+ Add Trigger" button's own click handler. First trigger added = the
+// tween for the 2nd click on this function; each subsequent one adds the
+// next click after that -- direct spec wording ("if there are none, when
+// i add one, its the tween for the 2nd click. The next one added will be
+// the 3rd").
+function addMultiTriggerTrigger(id) {
+  let triggers = []
+  try { triggers = JSON.parse(cfg[`${id}MultiTriggers`] || '[]') } catch (e) { triggers = [] }
+  if (!Array.isArray(triggers)) triggers = []
+  const n = triggers.length + 1
+  const prefix = `${id}Trig${n}`
+  const title = `Trigger ${n}`
+  triggers.push({ prefix, title })
+  cfg[`${id}MultiTriggers`] = JSON.stringify(triggers)
+  syncValue(`${id}MultiTriggers`, cfg[`${id}MultiTriggers`])
+  // Multiple functions each have their OWN "Multi Trigger" group sharing
+  // the SAME dataset.key (a shared group TITLE, same convention this
+  // file's own "Offset"/"Rotation"/etc subgroups already use across every
+  // function -- see applyCustomFunctionReferenceLayout()'s own comment
+  // for why group titles are deliberately shared, never per-function).
+  // Scoping to the RIGHT one means walking up from this specific
+  // function's own Enabled row instead of a bare document-wide query.
+  const functionEnabledRow = document.querySelector(`.dp-row[data-key="${id}Enabled"]`)
+  const functionBody = functionEnabledRow ? functionEnabledRow.parentElement : null
+  const realMtGroup = functionBody ? functionBody.querySelector(':scope > .dp-group[data-key="Multi Trigger"]') : null
+  const mtBody = realMtGroup ? realMtGroup.querySelector(':scope > .dp-group-body') : null
+  const addBtnRow = mtBody ? mtBody.querySelector(':scope > .dp-multi-trigger-add-row') : null
+  registerMultiTriggerTrigger(prefix, title, mtBody, addBtnRow)
+  saveCurrentSettings()
+}
+// Reads the LIVE DOM order of this function's own trigger sub-groups and
+// rewrites cfg[`${id}MultiTriggers`] to match -- see
+// setupMultiTriggerGroupForFunction()'s own comment for why this can't
+// rely on devPanel.js's generic order mechanism.
+function captureAndPersistMultiTriggerOrder(id, mtBody, addBtnRow) {
+  if (!mtBody) return
+  let triggers = []
+  try { triggers = JSON.parse(cfg[`${id}MultiTriggers`] || '[]') } catch (e) { triggers = [] }
+  if (!Array.isArray(triggers)) triggers = []
+  const byPrefix = {}
+  triggers.forEach((t) => { if (t && t.prefix) byPrefix[t.prefix] = t })
+  const domOrder = Array.from(mtBody.querySelectorAll(':scope > .dp-group'))
+    .map((g) => g.dataset.multiTriggerPrefix)
+    .filter((key) => byPrefix[key])
+  if (domOrder.length !== triggers.length) return // a drag mid-flight or an unrelated pointerup -- don't persist a partial/stale read
+  const reordered = domOrder.map((key) => byPrefix[key])
+  cfg[`${id}MultiTriggers`] = JSON.stringify(reordered)
+  syncValue(`${id}MultiTriggers`, cfg[`${id}MultiTriggers`])
+}
+function updateMultiTriggerGroupVisibility(id) {
+  const functionEnabledRow = document.querySelector(`.dp-row[data-key="${id}Enabled"]`)
+  const functionBody = functionEnabledRow ? functionEnabledRow.parentElement : null
+  const mtGroup = functionBody ? functionBody.querySelector(':scope > .dp-group[data-key="Multi Trigger"]') : null
+  if (!mtGroup) return
+  const mtBody = mtGroup.querySelector(':scope > .dp-group-body')
+  if (!mtBody) return
+  const enabled = !!cfg[`${id}MultiTriggerEnabled`]
+  Array.from(mtBody.children).forEach((child) => {
+    const key = child.dataset ? child.dataset.key : null
+    if (key === `${id}MultiTriggerEnabled`) return // the on/off checkbox itself always stays visible
+    if (key === `${id}MultiTriggers`) { child.style.display = 'none'; return } // pure bookkeeping row, always hidden regardless of Enabled
+    child.style.display = enabled ? '' : 'none'
+  })
+}
+// Decides which prefix a click on function `id` should actually dispatch
+// to: the base function itself (its own top-level Mode/TargetPose/etc),
+// or one of its added triggers, in order, skipping any trigger whose own
+// on/off checkbox is off, wrapping back to the base once the enabled
+// trigger list is exhausted -- direct spec wording ("If a added trigger
+// is turned off, then the trigger order will skip it"; "When it
+// completes the list, the next click just tweens back to Pose 1").
+// A single shared counter per function (not per-hand) -- one user click
+// advances the cycle once, for every hand this function drives, matching
+// the spec's own singular "it tweens to Pose 2" framing.
+function resolveMultiTriggerPrefix(id) {
+  if (!cfg[`${id}MultiTriggerEnabled`]) return id
+  let triggers = []
+  try { triggers = JSON.parse(cfg[`${id}MultiTriggers`] || '[]') } catch (e) { triggers = [] }
+  if (!Array.isArray(triggers)) triggers = []
+  const enabledTriggers = triggers.filter((t) => t && t.prefix && cfg[`${t.prefix}Enabled`] !== false)
+  if (enabledTriggers.length === 0) return id
+  const cycleLength = enabledTriggers.length + 1 // base pose + each enabled trigger
+  const idx = (customFunctionMultiTriggerIndex[id] || 0) % cycleLength
+  customFunctionMultiTriggerIndex[id] = idx + 1
+  return idx === 0 ? id : enabledTriggers[idx - 1].prefix
+}
 // Maps a Click-Count select value ('1st'/'2nd'/'3rd'/'4th') to its plain
 // ordinal number, defaulting an unset/unrecognized value to 1 -- shared by
 // every call site below that needs to compare a custom function's own
@@ -8916,7 +9178,11 @@ function triggerCustomPoseFunctions(type, clickCount = 1) {
     if (!customFunctionActiveForDeviceFamily(family, id, deviceFamily)) return
     if ((type === 'Click' || type === 'Right Click') && customFunctionClickCountOrdinal(id) !== clickCount) return
     if (type === 'Click' && customFunctionWantsMultiTouch(id)) return
-    triggerClickPose(id)
+    // Multi Trigger -- resolved ONCE per real click, here (not inside
+    // triggerClickPose() itself), so every hand this function drives
+    // advances together as a single shared cycle, matching the spec's
+    // own singular framing ("the first click tweens to Pose 2").
+    triggerClickPose(resolveMultiTriggerPrefix(id))
   })
 }
 // Piggybacks every enabled 'hold'-kind custom function of the matching
