@@ -18,6 +18,25 @@ work seamlessly from there.
 
 ## Currently working on
 
+**FIXED 2026-09-27 (10th round) -- Offset/Rotation accumulator not
+tracking retransition's own decay, the 3rd distinct root cause in the
+same jump investigation.** Direct clarification narrowed the repro:
+"single click hold and a click elsewhere after" -- turned out the "click
+elsewhere" fires a real, separate `custom7` (plain `Click` type) on this
+deployment, so the actual scenario is one function interrupting another
+mid-retransition. `applyOffsetRotationRetransition()` left the real
+Offset/Rotation accumulator completely untouched throughout the decay,
+only clearing it at full completion -- an interrupting function read the
+FULL pre-retransition total instead of wherever the decay had gotten to.
+Fixed by keeping the accumulator continuously in sync every frame.
+**Live-verified directly**: logged the accumulator decaying
+(`8,4 -> ... -> 3.727,1.864`), interrupted mid-decay with a real second
+function, confirmed it continued the same trend rather than snapping
+back. See CLAUDE.md's matching Gotchas entry and CHANGELOG.txt's
+2026-09-27 10th-round entry.
+
+--------------------------------------------------------------------------------
+
 **FIXED 2026-09-27 (9th round) -- retransition targeting a stale pose
 snapshot instead of live cfg, the real remaining cause of "always a
 jump on the trigger after a hold release."** Direct follow-up: the 8th

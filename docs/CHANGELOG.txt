@@ -12574,6 +12574,55 @@ previously caught the bug.
 
 Commit: `88a56db`. Pushed to `https://github.com/LeisHo/HandyDandies`.
 
+--------------------------------------------------------------------------------
+
+2026-09-27 (10th round)
+
+**3rd distinct root cause in this same "jump" investigation, found and
+fixed after 2 direct "still not fixed" follow-ups.** Direct clarification
+from the user narrowed the repro precisely: "im testing with a single
+click hold and a click elsewhere after." Investigated by driving the
+real state machine against production via `window.__debug` (both direct
+function calls and real synthetic pointer events on `#viewport`) and
+discovered `custom7` (a real, saved, plain `Click`-type function on this
+deployment) fires on every click, including the "click elsewhere" --
+meaning the repro is really "custom8 (Click+Hold) releases, then custom7
+(plain Click) takes over," an inter-function interruption during custom8's
+own retransition.
+
+**Root cause:** `applyOffsetRotationRetransition()` -- the function that
+decays the Offset/Rotation accumulator back to zero during retransition
+(item 6 of the earlier 9-item spec) -- left the REAL accumulator
+(`hand._customOffsetAccum`/`_customRotationAccum`) completely untouched
+throughout the whole retransition, only ever clearing it once `progress`
+reached 1. A different function interrupting mid-retransition (before
+that clear ever ran) has its own `applyOffsetRotationToHand()` read the
+accumulator's own unconditional baseline at its FULL, un-decayed
+pre-retransition value -- not whatever partially-decayed amount was
+actually on screen an instant before. A real, structural jump back up to
+the old total, specifically in the "one function interrupts another
+mid-retransition" case named in the user's very first message in this
+whole investigation.
+
+**Fix:** the real accumulator is now kept continuously in sync with the
+currently-decayed amount every frame of retransition (the same "single
+source of truth" pattern `hand.currentSplayDeg` already uses for wrist
+splay) -- a mid-retransition interruption now picks up exactly where the
+decay visually was.
+
+**Live-verified directly, not inferred:** enabled Offset on custom8
+(`OffsetX:8, OffsetY:4`), held, released, let retransition decay partway
+(logged `hand._customOffsetAccum` every frame: `8,4 -> 7.917,3.958 ->
+... -> 3.727,1.864`), then interrupted with `triggerClickPose('custom7')`
+right at that point -- the accumulator continued the SAME decay trend
+immediately after (`3.727,1.864 -> 3.385,1.693`), never jumping back to
+`8,4` or anywhere else. `hand.wrapper.position` showed the matching
+smooth, continuous step too.
+
+`main.js` cache-buster bumped `?v=229` -> `?v=230`.
+
+Commit: `a162bc3`. Pushed to `https://github.com/LeisHo/HandyDandies`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

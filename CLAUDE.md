@@ -1531,3 +1531,34 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   `cfg` for the field in question before assuming the splay-style
   frozen-vs-live mismatch above is the cause -- these are 2 genuinely
   different bugs that happen to produce the same symptom.
+- **CORRECTED 2026-09-27, 3rd round of the same jump investigation --
+  `applyOffsetRotationRetransition()` left the REAL Offset/Rotation
+  accumulator (`hand._customOffsetAccum`/`_customRotationAccum`)
+  completely untouched throughout retransition's own decay, only
+  clearing it once `progress` reached 1.** A DIFFERENT function
+  interrupting mid-retransition (before that clear ever ran) had its
+  own `applyOffsetRotationToHand()` read the accumulator at its FULL,
+  un-decayed pre-retransition value -- a real jump back up to the old
+  total, specifically in the "one click function interrupts another
+  mid-retransition" case. Found while chasing 2 direct "still not
+  fixed" follow-ups on the splay/retransition-target fixes above;
+  confirmed this project's real, saved `custom7` (a plain `Click`-type
+  function) fires on every click including a "click elsewhere," so the
+  user's own simplified repro ("single click hold and a click elsewhere
+  after") was actually exercising an inter-function interruption the
+  whole time, not a same-function re-trigger. Fixed by keeping the real
+  accumulator continuously in sync with the currently-decayed amount
+  every frame -- same pattern as `hand.currentSplayDeg`. **Live-verified
+  directly**: enabled Offset on custom8, held, released, logged the
+  accumulator decaying (`8,4 -> 7.917,3.958 -> ... -> 3.727,1.864`),
+  interrupted with a real `triggerClickPose('custom7')` call right at
+  that point, and confirmed the accumulator continued the SAME decay
+  trend immediately after rather than snapping back to `8,4`. If a
+  future report describes a position/rotation offset jumping
+  specifically when one click function interrupts ANOTHER that's
+  mid-retransition (not idle, not mid-forward), this accumulator-sync
+  gap is the pattern to check first -- any other place in this file
+  that decays a persistent per-hand accumulator toward zero over time
+  needs the same "keep the real value continuously in sync, don't just
+  clear it at the end" treatment, or it will reproduce this exact bug
+  class for its own state.
