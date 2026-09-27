@@ -3194,6 +3194,29 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       { key: `${p}StartTimeCurveEnabled`, label: 'Start Time Curve On/Off', type: 'checkbox', def: true, onChange: () => updateSingleTimingGateVisibility(p) },
       { key: `${p}StartTimeCurve`, label: 'Start Time Curve (Distance -> Start Time)', type: 'text', def: defaults.startTimeCurve ?? '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickHoldConfig(p) },
       { key: `${p}StartTimeRange`, label: 'Min / Max Start Time (Ms)', type: 'text', def: defaults.startTimeRange ?? '{"min":0,"max":300}', onChange: () => parseClickHoldConfig(p) },
+      // Start Distance Curve -- direct spec item (2026-09-27): "add a
+      // Start Distance Curve subgroup, just like the Start Time curve
+      // subgroup. BUT instead of time, its measure distance at which
+      // tweens are triggered and how far the tween will tween... beyond
+      // those bounds, hands will not get triggered... the y axis of the
+      // curve graph will define how much of the tween the hand will
+      // execute." Unlike every OTHER distance curve in this file (Start
+      // Time Curve, Animation Speed Curve, etc.), which auto-normalize
+      // against the CURRENT field's own live min/max hand-cursor distance
+      // (item 8's own already-correct convention), this curve has its own
+      // EXPLICIT domain -- Min/Max define BOTH the eligibility cutoff
+      // (a hand outside [Min,Max] never triggers at all, per the spec's
+      // own wording) AND the curve's own X-axis normalization range, by
+      // design (the spec frames these as one continuous mechanism, not
+      // two separate ones). See computeTweenFractionCap()'s own comment
+      // for the runtime side, and triggerClickPose()'s/
+      // updateClickHoldPoseForHand()'s own "frozen at arm/trigger time"
+      // treatment (the same convention every other curve here already
+      // uses) for exactly where this gets evaluated and applied.
+      { key: `${p}StartDistanceCurveEnabled`, label: 'Start Distance Curve On/Off', type: 'checkbox', def: false, onChange: () => updateSingleTimingGateVisibility(p) },
+      { key: `${p}StartDistanceMin`, label: 'Start Distance Min (World Units)', type: 'slider', min: 0, max: 200, step: 1, def: 0 },
+      { key: `${p}StartDistanceMax`, label: 'Start Distance Max (World Units)', type: 'slider', min: 0, max: 200, step: 1, def: 100 },
+      { key: `${p}StartDistanceCurve`, label: 'Start Distance Curve (Distance -> Tween Amount)', type: 'text', def: '[{"x":0,"y":1},{"x":1,"y":1}]', onChange: () => parseClickHoldConfig(p) },
       // Retransition on/off -- direct spec item ("Retransition on/off
       // [NEW behavioral gate]"). Off = the hand stays at its end pose
       // FOREVER, never retransitions back to default -- see
@@ -3421,6 +3444,13 @@ function makeClickPoseGroup(p, title, defaults = {}) {
       { key: `${p}StartTimeCurveEnabled`, label: 'Start Time Curve On/Off', type: 'checkbox', def: true, onChange: () => updateSingleTimingGateVisibility(p) },
       { key: `${p}StartTimeCurve`, label: 'Start Time Curve (Distance -> Start Time)', type: 'text', def: defaults.startTimeCurve ?? '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickPoseConfig(p) },
       { key: `${p}StartTimeRange`, label: 'Min / Max Start Time (Ms)', type: 'text', def: defaults.startTimeRange ?? '{"min":0,"max":300}', onChange: () => parseClickPoseConfig(p) },
+      // Start Distance Curve -- direct spec item (2026-09-27), same
+      // reasoning as makeClickHoldPoseGroup()'s own matching control
+      // comment.
+      { key: `${p}StartDistanceCurveEnabled`, label: 'Start Distance Curve On/Off', type: 'checkbox', def: false, onChange: () => updateSingleTimingGateVisibility(p) },
+      { key: `${p}StartDistanceMin`, label: 'Start Distance Min (World Units)', type: 'slider', min: 0, max: 200, step: 1, def: 0 },
+      { key: `${p}StartDistanceMax`, label: 'Start Distance Max (World Units)', type: 'slider', min: 0, max: 200, step: 1, def: 100 },
+      { key: `${p}StartDistanceCurve`, label: 'Start Distance Curve (Distance -> Tween Amount)', type: 'text', def: '[{"x":0,"y":1},{"x":1,"y":1}]', onChange: () => parseClickPoseConfig(p) },
       { key: `${p}PauseDurationMs`, label: 'Pause Duration At Tween End (Ms)', type: 'slider', min: 0, max: 5000, step: 10, def: defaults.pauseDurationMs ?? 500 },
       { key: `${p}RetransitionEnabled`, label: 'Retransition On/Off', type: 'checkbox', def: true, onChange: () => updateSingleTimingGateVisibility(p) },
       { key: `${p}RetransitionSpeedMs`, label: 'Retransition Speed (Ms)', type: 'slider', min: 0, max: 700, step: 10, def: defaults.retransitionSpeedMs ?? 400 },
@@ -5812,6 +5842,7 @@ const clickHoldPoseTriggers = Object.fromEntries([...CLICK_HOLD_KEYS, ...LEGACY_
   startCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], startRangeParsed: { min: 0, max: 300 },
   speedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], speedRangeParsed: { min: 50, max: 2000 },
   tweenStartCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStartRangeParsed: { min: 0, max: 300 },
+  startDistanceCurveParsed: [{ x: 0, y: 1 }, { x: 1, y: 1 }],
   retransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionRangeParsed: { min: 0, max: 300 },
   tweenRetransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenRetransitionRangeParsed: { min: 0, max: 300 },
   tweenStopStartCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStopStartRangeParsed: { min: 0, max: 300 },
@@ -5831,6 +5862,9 @@ function parseClickHoldConfig(p) {
   // distinct pair, not an alias of the 2 lines above.
   try { t.tweenStartCurveParsed = JSON.parse(cfg[`${p}TweenStartTimeCurve`]).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
   try { t.tweenStartRangeParsed = JSON.parse(cfg[`${p}TweenStartTimeRange`]) } catch (e) { /* keep last-good value */ }
+  // Start Distance Curve (2026-09-27) -- see parseClickPoseConfig()'s own
+  // matching comment.
+  try { t.startDistanceCurveParsed = JSON.parse(cfg[`${p}StartDistanceCurve`]).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
   try { t.retransitionCurveParsed = JSON.parse(cfg[`${p}RetransitionStartTimeCurve`]).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
   try { t.retransitionRangeParsed = JSON.parse(cfg[`${p}RetransitionStartTimeRange`]) } catch (e) { /* keep last-good value */ }
   // Retransition's own distance->SPEED curve/range (item 5, 2026-09-24) --
@@ -5871,7 +5905,7 @@ function getOrInitHandCHP(hand) {
   // keys.
   CLICK_HOLD_KEYS.forEach((p) => {
     if (hand._chp[p]) return
-    hand._chp[p] = { phase: 'idle', forwardStartTime: 0, forwardSnapshot: null, tweenSegments: null, loopStartTime: 0, loopHoldEndTime: 0, loopDirection: 1, retransitionDelay: 0, retransitionStart: null, retransitionStartTime: 0, retransitionIsTween: false, retransitionSpeedMs: 0, lastAppliedValues: null, frozenSplayDeg: 0, pendingClaimAt: 0, armedForHoldStartTime: -1, pendingFrozenSplayDeg: 0, frozenSpeedMs: 0, pendingFrozenSpeedMs: 0, releasePending: false, stoppingStartTime: 0, stoppingStartDelay: 0, stoppingDelayMs: 1, stoppingLastFrameTime: 0, stoppingBaseElapsedMs: 0, stoppingVirtualElapsedMs: 0, stoppingWasLooping: false, stoppingFreezeAtEnd: false, offsetBaked: false, retransitionOffsetAccumStart: null, retransitionRotationAccumStart: null }
+    hand._chp[p] = { phase: 'idle', forwardStartTime: 0, forwardSnapshot: null, tweenSegments: null, loopStartTime: 0, loopHoldEndTime: 0, loopDirection: 1, retransitionDelay: 0, retransitionStart: null, retransitionStartTime: 0, retransitionIsTween: false, retransitionSpeedMs: 0, lastAppliedValues: null, frozenSplayDeg: 0, pendingClaimAt: 0, armedForHoldStartTime: -1, pendingFrozenSplayDeg: 0, frozenSpeedMs: 0, pendingFrozenSpeedMs: 0, releasePending: false, stoppingStartTime: 0, stoppingStartDelay: 0, stoppingDelayMs: 1, stoppingLastFrameTime: 0, stoppingBaseElapsedMs: 0, stoppingVirtualElapsedMs: 0, stoppingWasLooping: false, stoppingFreezeAtEnd: false, offsetBaked: false, retransitionOffsetAccumStart: null, retransitionRotationAccumStart: null, pendingTweenFractionCap: 1, frozenTweenFractionCap: 1 }
   })
   return hand._chp
 }
@@ -6339,6 +6373,24 @@ function computeStartDelayMs(distanceToCursor, minLiveDist, liveDistRange, curve
   const curveY = THREE.MathUtils.clamp(evaluateArmLengthCurve(curveParsed, normDist), 0, 1)
   return rangeParsed.min + (rangeParsed.max - rangeParsed.min) * curveY
 }
+// Start Distance Curve (direct spec, 2026-09-27) -- unlike every curve
+// above (which auto-normalize against the CURRENT field's own live
+// min/max hand-cursor distance, per item 8's own already-correct
+// convention), this curve has its own EXPLICIT domain: `distMin`/
+// `distMax` are the function's own `${p}StartDistanceMin`/Max slider
+// values, not a live field measurement. Returns `null` when
+// `distanceToCursor` falls outside [distMin, distMax] -- the caller must
+// treat this as "do not trigger this hand at all," per the spec's own
+// "beyond those bounds, hands will not get triggered." Otherwise returns
+// the curve's own raw 0-1 Y value directly as the tween-amount fraction
+// (no separate range-rescale needed here, unlike computeStartDelayMs()
+// above -- Y already IS the final fraction).
+function computeTweenFractionCap(distanceToCursor, distMin, distMax, curveParsed) {
+  if (distanceToCursor < distMin || distanceToCursor > distMax) return null
+  const range = Math.max(distMax - distMin, 0.001)
+  const normDist = THREE.MathUtils.clamp((distanceToCursor - distMin) / range, 0, 1)
+  return THREE.MathUtils.clamp(evaluateArmLengthCurve(curveParsed, normDist), 0, 1)
+}
 // NaN/undefined-safe read for `${p}TweenSpeedMs` -- a real, previously-
 // fixed bug class (a stale saved-settings value predating this control,
 // e.g. from before Tween mode existed for a given trigger, dividing down
@@ -6521,25 +6573,46 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
   const chp = getOrInitHandCHP(hand)[p]
   if (trig.active && chp.armedForHoldStartTime !== trig.holdStartTime && now - trig.holdStartTime >= (cfg.holdConfirmMs ?? 0)) {
     chp.armedForHoldStartTime = trig.holdStartTime // dedupe -- arm exactly once per hold-start, not every frame spent waiting
-    const isTweenStart = isSequenceOrChainMode(p)
-    // Start Time Curve on/off -- ONE shared gate now covers both Single
-    // Pose and Sequence/Chain mode's own stagger (CORRECTED 2026-09-24,
-    // direct bug report: the Tween side used to be unconditionally on
-    // with no toggle of its own -- see updateSingleTimingGateVisibility()'s
-    // own matching comment for the full account). Off means no distance-
-    // based stagger at all, every hand starts immediately, regardless of
-    // Mode.
-    const startTimeCurveOff = cfg[`${p}StartTimeCurveEnabled`] === false
-    const delay = startTimeCurveOff ? 0 : (isTweenStart
-      ? computeStartDelayMs(live, minLiveDist, liveDistRange, trig.tweenStartCurveParsed, trig.tweenStartRangeParsed)
-      : computeStartDelayMs(live, minLiveDist, liveDistRange, trig.startCurveParsed, trig.startRangeParsed))
-    chp.pendingClaimAt = now + delay
-    chp.pendingFrozenSplayDeg = computeResponsiveWristSplayDeg(live, minLiveDist, liveDistRange)
-    // Animation Speed Curve (Single Pose only) -- computed once here,
-    // same "frozen at arm time" treatment as the splay/delay above, not
-    // recomputed live mid-transition. See makeClickHoldPoseGroup()'s own
-    // control comment for the full reasoning.
-    chp.pendingFrozenSpeedMs = (!isTweenStart && cfg[`${p}SpeedCurveEnabled`]) ? computeStartDelayMs(live, minLiveDist, liveDistRange, trig.speedCurveParsed, trig.speedRangeParsed) : 0
+    // Start Distance Curve (direct spec, 2026-09-27) -- "beyond those
+    // bounds, hands will not get triggered." Marks this hold-start as
+    // handled (the dedupe above) but, for an ineligible hand, skips the
+    // REST of this block only -- deliberately NOT an early `return` from
+    // the whole function, which would also skip the commit-check and
+    // phase-dispatch blocks below for this frame, potentially stalling
+    // some OTHER already-in-progress phase this same hand/prefix might
+    // be mid-way through. `pendingClaimAt` simply stays at its own
+    // default (0/falsy), so the later `if (chp.pendingClaimAt && ...)`
+    // commit check never fires for this hold-start -- exactly like the
+    // pose-kind family's own equivalent in triggerClickPose().
+    let tweenFractionCap = 1
+    let eligible = true
+    if (cfg[`${p}StartDistanceCurveEnabled`]) {
+      const cap = computeTweenFractionCap(live, cfg[`${p}StartDistanceMin`], cfg[`${p}StartDistanceMax`], trig.startDistanceCurveParsed)
+      if (cap === null) eligible = false
+      else tweenFractionCap = cap
+    }
+    if (eligible) {
+      const isTweenStart = isSequenceOrChainMode(p)
+      // Start Time Curve on/off -- ONE shared gate now covers both Single
+      // Pose and Sequence/Chain mode's own stagger (CORRECTED 2026-09-24,
+      // direct bug report: the Tween side used to be unconditionally on
+      // with no toggle of its own -- see updateSingleTimingGateVisibility()'s
+      // own matching comment for the full account). Off means no distance-
+      // based stagger at all, every hand starts immediately, regardless of
+      // Mode.
+      const startTimeCurveOff = cfg[`${p}StartTimeCurveEnabled`] === false
+      const delay = startTimeCurveOff ? 0 : (isTweenStart
+        ? computeStartDelayMs(live, minLiveDist, liveDistRange, trig.tweenStartCurveParsed, trig.tweenStartRangeParsed)
+        : computeStartDelayMs(live, minLiveDist, liveDistRange, trig.startCurveParsed, trig.startRangeParsed))
+      chp.pendingClaimAt = now + delay
+      chp.pendingTweenFractionCap = tweenFractionCap
+      chp.pendingFrozenSplayDeg = computeResponsiveWristSplayDeg(live, minLiveDist, liveDistRange)
+      // Animation Speed Curve (Single Pose only) -- computed once here,
+      // same "frozen at arm time" treatment as the splay/delay above, not
+      // recomputed live mid-transition. See makeClickHoldPoseGroup()'s own
+      // control comment for the full reasoning.
+      chp.pendingFrozenSpeedMs = (!isTweenStart && cfg[`${p}SpeedCurveEnabled`]) ? computeStartDelayMs(live, minLiveDist, liveDistRange, trig.speedCurveParsed, trig.speedRangeParsed) : 0
+    }
   }
   if (chp.pendingClaimAt && now >= chp.pendingClaimAt) {
     // COMMIT -- this hand's own delay has elapsed; take over right now.
@@ -6575,6 +6648,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     chp.forwardStartTime = now
     chp.frozenSplayDeg = chp.pendingFrozenSplayDeg
     chp.frozenSpeedMs = chp.pendingFrozenSpeedMs
+    chp.frozenTweenFractionCap = chp.pendingTweenFractionCap
     chp.pendingClaimAt = 0
     chp.releasePending = false // a NEW hold-claim always starts fresh, regardless of a stale flag from a previous release
     chp.offsetBaked = false // a fresh ramp starts a fresh (not-yet-locked-in) increment (item 2/5/6, 2026-09-27)
@@ -6597,10 +6671,16 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     // computed once at this hand's own commit above.
     const speedMs = Math.max(isTween ? safeTweenSpeedMs(cfg[`${p}TweenSpeedMs`]) : (cfg[`${p}SpeedCurveEnabled`] ? chp.frozenSpeedMs : cfg[`${p}TransitionSpeedMs`]), 1)
     const progress = THREE.MathUtils.clamp(elapsed / speedMs, 0, 1)
+    // Start Distance Curve (2026-09-27) -- see updateClickPoseForHand()'s
+    // own matching comment for the full reasoning (identical treatment:
+    // scales how far the POSE interpolation travels, never the timing;
+    // `progress` itself stays untouched for the phase-transition checks
+    // below; deliberately not applied to Offset/Rotation).
+    const cappedT = progress * chp.frozenTweenFractionCap
     let values
     if (isTween) {
       if (!chp.tweenSegments || chp.tweenSegments.length === 0) return // nothing selected -- leave this hand's pose untouched
-      values = lerpTweenSegments(chp.tweenSegments, progress)
+      values = lerpTweenSegments(chp.tweenSegments, cappedT)
       // On Release Mode = 'Complete Sequence' (direct spec item) -- a
       // release happened WHILE this forward pass was still playing
       // (endClickHoldPose() left `chp.phase` untouched and only set
@@ -6637,7 +6717,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     } else {
       const targetPose = (cfg.savedPoses || []).find((sp) => sp.name === cfg[`${p}TargetPose`])
       if (!targetPose) return // nothing selected -- leave this hand's pose untouched
-      values = lerpPoseValues(chp.forwardSnapshot, targetPose, progress)
+      values = lerpPoseValues(chp.forwardSnapshot, targetPose, cappedT)
     }
     chp.lastAppliedValues = values
     applyPoseValuesToHand(hand, values, chp.frozenSplayDeg)
@@ -6698,7 +6778,9 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
       const endPos = chp.loopDirection === 1 ? segments : 0
       lapT = THREE.MathUtils.clamp(elapsedSegments / segments, 0, 1)
       const position = startPos + (endPos - startPos) * lapT
-      values = lerpTweenSequence(trig.loopPoses, position / segments)
+      // Start Distance Curve (2026-09-27) -- capped the same way the
+      // initial forward pass is; see this function's own top comment.
+      values = lerpTweenSequence(trig.loopPoses, (position / segments) * chp.frozenTweenFractionCap)
     } else {
       // "Start at the WRAP segment, not segment 0" -- the forward pass
       // just ended exactly at the last pose, so starting the cycle at
@@ -6713,6 +6795,10 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
       // (confirmed live: without the clamp, a hold sometimes froze at an
       // arbitrary mid-transition value like -64 instead of the intended
       // -1).
+      // Start Distance Curve's own cap is deliberately NOT applied here --
+      // `tCyclic` accumulates continuously ACROSS laps, same disclosed
+      // scoping limitation as updateClickPoseForHand()'s own matching
+      // wrap-back branch.
       const segments = trig.loopPoses.length
       lapT = elapsedSegments / segments
       const tCyclic = (segments - 1) + Math.min(elapsedSegments, segments)
@@ -7229,6 +7315,7 @@ const clickPoseTriggers = Object.fromEntries([...CLICK_POSE_KEYS, ...LEGACY_REMO
   startCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], startRangeParsed: { min: 0, max: 300 },
   speedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], speedRangeParsed: { min: 50, max: 2000 },
   tweenStartCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStartRangeParsed: { min: 0, max: 300 },
+  startDistanceCurveParsed: [{ x: 0, y: 1 }, { x: 1, y: 1 }],
   retransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionRangeParsed: { min: 0, max: 300 }
 }]))
 // Direct request 2026-09-17 ("rename the word Tween to Sequence") --
@@ -7275,6 +7362,12 @@ function parseClickPoseConfig(p) {
   // distinct pair, not an alias of the 2 lines above.
   try { t.tweenStartCurveParsed = JSON.parse(cfg[`${p}TweenStartTimeCurve`]).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
   try { t.tweenStartRangeParsed = JSON.parse(cfg[`${p}TweenStartTimeRange`]) } catch (e) { /* keep last-good value */ }
+  // Start Distance Curve (2026-09-27) -- distance->tween-fraction, no
+  // separate range pair (the curve's own Y output IS the 0-1 fraction
+  // directly, unlike every other curve here which rescales Y into a real
+  // unit via a paired Min/Max range) -- see computeTweenFractionCap()'s
+  // own comment.
+  try { t.startDistanceCurveParsed = JSON.parse(cfg[`${p}StartDistanceCurve`]).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
   try { t.retransitionCurveParsed = JSON.parse(cfg[`${p}RetransitionStartTimeCurve`]).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
   try { t.retransitionRangeParsed = JSON.parse(cfg[`${p}RetransitionStartTimeRange`]) } catch (e) { /* keep last-good value */ }
   // Retransition's own distance->SPEED curve/range (item 5, 2026-09-24) --
@@ -7299,7 +7392,7 @@ function getOrInitHandCP(hand) {
   // again any time the key list changes.
   CLICK_POSE_KEYS.forEach((p) => {
     if (hand._cp[p]) return
-    hand._cp[p] = { phase: 'idle', triggerTime: 0, forwardSnapshot: null, tweenPoses: null, pauseStartTime: 0, retransitionStart: null, retransitionStartTime: 0, retransitionDelay: 0, retransitionSpeedMs: 0, lastAppliedValues: null, frozenSplayDeg: 0, pendingClaimAt: 0, pendingForwardSnapshot: null, pendingNamedPoses: null, pendingFrozenSplayDeg: 0, frozenSpeedMs: 0, pendingFrozenSpeedMs: 0, sequenceLapIndex: 1, sequenceLapStartTime: 0, sequenceHoldEndTime: 0, sequenceDirection: 1, offsetBaked: false, retransitionOffsetAccumStart: null, retransitionRotationAccumStart: null }
+    hand._cp[p] = { phase: 'idle', triggerTime: 0, forwardSnapshot: null, tweenPoses: null, pauseStartTime: 0, retransitionStart: null, retransitionStartTime: 0, retransitionDelay: 0, retransitionSpeedMs: 0, lastAppliedValues: null, frozenSplayDeg: 0, pendingClaimAt: 0, pendingForwardSnapshot: null, pendingNamedPoses: null, pendingFrozenSplayDeg: 0, frozenSpeedMs: 0, pendingFrozenSpeedMs: 0, sequenceLapIndex: 1, sequenceLapStartTime: 0, sequenceHoldEndTime: 0, sequenceDirection: 1, offsetBaked: false, retransitionOffsetAccumStart: null, retransitionRotationAccumStart: null, pendingTweenFractionCap: 1, frozenTweenFractionCap: 1 }
   })
   return hand._cp
 }
@@ -7340,6 +7433,7 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
     cp.triggerTime = now
     cp.frozenSplayDeg = cp.pendingFrozenSplayDeg
     cp.frozenSpeedMs = cp.pendingFrozenSpeedMs
+    cp.frozenTweenFractionCap = cp.pendingTweenFractionCap
     cp.pendingClaimAt = 0
     cp.offsetBaked = false // a fresh ramp starts a fresh (not-yet-locked-in) increment
     releaseHandFromOtherFunctions(hand, p)
@@ -7358,14 +7452,25 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
     // trigger time" treatment as the splay.
     const speedMs = Math.max(isTween ? safeTweenSpeedMs(cfg[`${p}TweenSpeedMs`]) : (cfg[`${p}SpeedCurveEnabled`] ? cp.frozenSpeedMs : cfg[`${p}TransitionSpeedMs`]), 1)
     const progress = THREE.MathUtils.clamp(elapsed / speedMs, 0, 1)
+    // Start Distance Curve (2026-09-27) -- `cp.frozenTweenFractionCap`
+    // (1 = no cap, frozen once at trigger time, same convention as
+    // frozenSplayDeg/frozenSpeedMs) scales how FAR the interpolation
+    // travels, never how LONG it takes -- `progress` itself (driving
+    // `elapsed/speedMs` timing and the phase-transition check below)
+    // stays untouched, so a 50%-capped hand still takes the FULL
+    // configured duration to reach its own halfway point, exactly per
+    // spec. Deliberately NOT applied to applyOffsetRotationToHand()'s own
+    // progress below -- Offset/Rotation is a separate system the spec
+    // never asked to couple with this one.
+    const cappedT = progress * cp.frozenTweenFractionCap
     let values
     if (isTween) {
       if (!cp.tweenPoses || cp.tweenPoses.length < 2) { cp.phase = 'idle'; return } // nothing selected -- abandon this hand's sequence rather than get stuck
-      values = lerpTweenSequence(cp.tweenPoses, progress)
+      values = lerpTweenSequence(cp.tweenPoses, cappedT)
     } else {
       const targetPose = (cfg.savedPoses || []).find((sp) => sp.name === cfg[`${p}TargetPose`])
       if (!targetPose) { cp.phase = 'idle'; return } // nothing selected -- abandon this hand's sequence rather than get stuck
-      values = lerpPoseValues(cp.forwardSnapshot, targetPose, progress)
+      values = lerpPoseValues(cp.forwardSnapshot, targetPose, cappedT)
     }
     cp.lastAppliedValues = values
     applyPoseValuesToHand(hand, values, cp.frozenSplayDeg)
@@ -7426,18 +7531,26 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
     const lapT = THREE.MathUtils.clamp((now - cp.sequenceLapStartTime) / speedMs, 0, 1)
     let values
     if (lapStyle === 'Oscillate') {
-      const t = cp.sequenceDirection === 1 ? lapT : 1 - lapT
+      // Start Distance Curve (2026-09-27) -- capped the same way the
+      // initial forward pass is (see this phase's own top comment).
+      const t = (cp.sequenceDirection === 1 ? lapT : 1 - lapT) * cp.frozenTweenFractionCap
       values = lerpTweenSequence(cp.tweenPoses, t)
     } else if (cfg[`${p}SequenceLoopTransition`] === false) {
       // Instant jump back to frame 1 between laps -- each lap plays the
       // SAME forward pass (no smooth wrap segment), matching the
       // control's own "Off = instant jump back to frame 1" wording.
-      values = lerpTweenSequence(cp.tweenPoses, lapT)
+      values = lerpTweenSequence(cp.tweenPoses, lapT * cp.frozenTweenFractionCap)
     } else {
       // Smooth wrap-back -- reuses lerpLoopSequence()'s own cyclic
       // segment math (same as Click Hold-Pose's own Loop Mode), an
       // unbroken interpolation across the poseN->pose1 wrap instead of a
-      // teleport.
+      // teleport. Start Distance Curve's own cap is deliberately NOT
+      // applied here -- `tCyclic` accumulates continuously ACROSS laps
+      // (not a per-lap 0-1 value), so "cap how far this lap goes" doesn't
+      // translate the same simple way; scoped out rather than risking a
+      // subtly wrong implementation of the trickiest case. Disclosed
+      // limitation, not an oversight -- see this session's own final
+      // report/CHANGELOG entry.
       const segments = cp.tweenPoses.length
       const tCyclic = (cp.sequenceLapIndex - 1) * segments + lapT * segments
       values = lerpLoopSequence(cp.tweenPoses, tCyclic)
@@ -7572,6 +7685,23 @@ function triggerClickPose(p) {
   const range = Math.max(maxD - minD, 0.001)
   hands.forEach((hand, i) => {
     const cp = getOrInitHandCP(hand)[p]
+    // Start Distance Curve (direct spec, 2026-09-27) -- "beyond those
+    // bounds, hands will not get triggered": an ineligible hand is left
+    // COMPLETELY untouched by this trigger (no claim scheduled at all,
+    // whatever it was already doing continues exactly as before), same
+    // as this project's own existing convention elsewhere for a hand a
+    // trigger simply doesn't apply to. Evaluated here, per-hand, using
+    // the SAME real distance-to-cursor (`dists[i]`) every other curve in
+    // this function already computes -- see computeTweenFractionCap()'s
+    // own comment for why this curve's own Min/Max is an explicit,
+    // user-set domain, not the live field's own min/max like every other
+    // curve here.
+    let tweenFractionCap = 1
+    if (cfg[`${p}StartDistanceCurveEnabled`]) {
+      const cap = computeTweenFractionCap(dists[i], cfg[`${p}StartDistanceMin`], cfg[`${p}StartDistanceMax`], trig.startDistanceCurveParsed)
+      if (cap === null) return // outside the eligible range -- this hand never triggers
+      tweenFractionCap = cap
+    }
     // Tween's own separate start-time curve/range (see
     // makeClickHoldPoseGroup()'s own comment) -- picked once here, same
     // as before; now schedules a DEFERRED claim instead of claiming
@@ -7588,6 +7718,7 @@ function triggerClickPose(p) {
     cp.pendingClaimAt = now + delay
     cp.pendingForwardSnapshot = forwardSnapshot
     cp.pendingNamedPoses = namedPoses
+    cp.pendingTweenFractionCap = tweenFractionCap
     // Frozen for this hand's entire sequence (forward/paused/
     // retransition) -- see updateClickHoldPoseForHand()'s own top
     // comment for why Responsive Wrist Splay must not keep recomputing
@@ -8169,6 +8300,10 @@ function buildClickHoldPoseWidgets(p) {
   const tweenStopDelayCurveCaption = 'X: Distance From Cursor (%, Nearest→Farthest Hand At Trigger Time)  ·  Y: Delay Fraction (0=Min, 1=Max)'
   if (tweenStopDelayCurveRow) buildGenericCurveWidget(tweenStopDelayCurveRow, { caption: tweenStopDelayCurveCaption, defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
   if (tweenStopDelayRangeRow) buildGenericRangeBarWidget(tweenStopDelayRangeRow, { trackMin: 0, trackMax: 5000, unit: 'ms', defaultValue: { min: 0, max: 2000 } })
+  // Start Distance Curve (2026-09-27) -- see buildClickPoseWidgets()'s own
+  // matching comment.
+  const startDistanceCurveRow = document.querySelector(`.dp-row[data-key="${p}StartDistanceCurve"]`)
+  if (startDistanceCurveRow) buildGenericCurveWidget(startDistanceCurveRow, { caption: 'X: Distance From Cursor (Start Distance Min→Max)  ·  Y: Tween Amount Executed (0=None, 1=Full)', defaultPoints: [{ x: 0, y: 1 }, { x: 1, y: 1 }] })
 }
 // Runs now, not back up near the other widgets' own setup calls (parse-
 // ArmLengthConfig()/buildWristSplayWidgets() etc.) -- this needs
@@ -8208,6 +8343,12 @@ function buildClickPoseWidgets(p) {
   if (tweenStartRangeRow) buildGenericRangeBarWidget(tweenStartRangeRow, { trackMin: 0, trackMax: CLICK_HOLD_START_TIME_TRACK_MAX, unit: 'ms', defaultValue: { min: 0, max: 300 } })
   if (retransCurveRow) buildGenericCurveWidget(retransCurveRow, { caption: curveCaption, defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
   if (retransRangeRow) buildGenericRangeBarWidget(retransRangeRow, { trackMin: 0, trackMax: CLICK_HOLD_START_TIME_TRACK_MAX, unit: 'ms', defaultValue: { min: 0, max: 300 } })
+  // Start Distance Curve (2026-09-27) -- Y is already the final 0-1 tween
+  // fraction directly, no separate range-bar widget needed (unlike every
+  // OTHER curve here, whose Y gets rescaled into a real unit via a paired
+  // Min/Max range slider).
+  const startDistanceCurveRow = document.querySelector(`.dp-row[data-key="${p}StartDistanceCurve"]`)
+  if (startDistanceCurveRow) buildGenericCurveWidget(startDistanceCurveRow, { caption: 'X: Distance From Cursor (Start Distance Min→Max)  ·  Y: Tween Amount Executed (0=None, 1=Full)', defaultPoints: [{ x: 0, y: 1 }, { x: 1, y: 1 }] })
 }
 // -----------------------------------------------------------------------
 // Custom Click Functions (Phase 4) -- runtime-created pose triggers, both
@@ -8850,6 +8991,7 @@ function registerCustomClickFunction(id, title, kind, family) {
       startCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], startRangeParsed: { min: 0, max: 300 },
       speedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], speedRangeParsed: { min: 50, max: 2000 },
       tweenStartCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStartRangeParsed: { min: 0, max: 300 },
+      startDistanceCurveParsed: [{ x: 0, y: 1 }, { x: 1, y: 1 }],
       retransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionRangeParsed: { min: 0, max: 300 },
       retransitionSpeedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionSpeedRangeParsed: { min: 50, max: 2000 },
       tweenRetransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenRetransitionRangeParsed: { min: 0, max: 300 },
@@ -8862,6 +9004,7 @@ function registerCustomClickFunction(id, title, kind, family) {
       startCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], startRangeParsed: { min: 0, max: 300 },
       speedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], speedRangeParsed: { min: 50, max: 2000 },
       tweenStartCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStartRangeParsed: { min: 0, max: 300 },
+      startDistanceCurveParsed: [{ x: 0, y: 1 }, { x: 1, y: 1 }],
       retransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionRangeParsed: { min: 0, max: 300 },
       retransitionSpeedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionSpeedRangeParsed: { min: 50, max: 2000 }
     }
@@ -8934,7 +9077,7 @@ const CUSTOM_FUNCTION_POSE_LAYOUT = [
   { type: 'group', title: 'Offset' }, { type: 'group', title: 'Rotation' },
   { type: 'row', suffix: 'SequencePlayMode' }, { type: 'row', suffix: 'SequenceCount' }, { type: 'row', suffix: 'SequenceCountMode' },
   { type: 'row', suffix: 'SequenceLoopTransition' }, { type: 'row', suffix: 'SequenceHoldMs' },
-  { type: 'group', title: 'Animation Speed Curve' }, { type: 'group', title: 'Start Time Curve' }, { type: 'group', title: 'Retransition' },
+  { type: 'group', title: 'Animation Speed Curve' }, { type: 'group', title: 'Start Time Curve' }, { type: 'group', title: 'Start Distance Curve' }, { type: 'group', title: 'Retransition' },
   { type: 'group', title: 'Multi Trigger' }
 ]
 // Retransition/Start Time Curve now also contain their own Tween-mode
@@ -8953,7 +9096,7 @@ const CUSTOM_FUNCTION_HOLD_LAYOUT = [
   { type: 'group', title: 'Offset' }, { type: 'group', title: 'Rotation' },
   { type: 'row', suffix: 'TargetPose' }, { type: 'row', suffix: 'TweenChain' }, { type: 'row', suffix: 'TweenSpeedMs' },
   { type: 'row', suffix: 'LoopMode' }, { type: 'row', suffix: 'LoopHoldMs' }, { type: 'row', suffix: 'TransitionSpeedMs' },
-  { type: 'group', title: 'Animation Speed Curve' }, { type: 'group', title: 'Start Time Curve' },
+  { type: 'group', title: 'Animation Speed Curve' }, { type: 'group', title: 'Start Time Curve' }, { type: 'group', title: 'Start Distance Curve' },
   { type: 'group', title: 'Retransition' }, { type: 'group', title: 'Tween Stop' }
 ]
 // Applies the reference renames + order to ONE function -- called
@@ -9178,6 +9321,7 @@ const MULTI_TRIGGER_ALLOWED_SUFFIXES = [
   'RotationEnabled', 'RotationX', 'RotationY', 'RotationZ',
   'SpeedCurveEnabled', 'SpeedCurve', 'SpeedCurveRange',
   'StartTimeCurveEnabled', 'StartTimeCurve', 'StartTimeRange', 'TweenStartTimeCurve', 'TweenStartTimeRange',
+  'StartDistanceCurveEnabled', 'StartDistanceMin', 'StartDistanceMax', 'StartDistanceCurve',
   'RetransitionEnabled', 'RetransitionSpeedMs', 'RetransitionSpeedCurveEnabled', 'RetransitionSpeedCurve', 'RetransitionSpeedCurveRange', 'RetransitionStartTimeCurveEnabled', 'RetransitionStartTimeCurve', 'RetransitionStartTimeRange'
 ]
 function buildMultiTriggerControlsForPrefix(prefix, title) {
@@ -9203,6 +9347,7 @@ function registerMultiTriggerTrigger(prefix, title, mtBody, addBtnRow) {
       startCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], startRangeParsed: { min: 0, max: 300 },
       speedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], speedRangeParsed: { min: 50, max: 2000 },
       tweenStartCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStartRangeParsed: { min: 0, max: 300 },
+      startDistanceCurveParsed: [{ x: 0, y: 1 }, { x: 1, y: 1 }],
       retransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionRangeParsed: { min: 0, max: 300 },
       retransitionSpeedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionSpeedRangeParsed: { min: 50, max: 2000 }
     }
@@ -9841,6 +9986,17 @@ function updateSingleTimingGateVisibility(p) {
   const tweenStartOn = isSequenceOrChainMode(p) && curveEnabled
   setRow('TweenStartTimeCurve', tweenStartOn)
   setRow('TweenStartTimeRange', tweenStartOn)
+  // Start Distance Curve (2026-09-27) -- NOT Mode-gated at all (unlike
+  // Start Time Curve above, whose child fields differ between Single
+  // Pose and Tween mode): this curve gates hand ELIGIBILITY and caps how
+  // far the tween goes, both concepts that apply identically regardless
+  // of Mode. The enable checkbox and its own Min/Max/Curve fields are
+  // always shown together, gated only by their own shared on/off.
+  setGateRow('StartDistanceCurveEnabled', true)
+  const startDistanceOn = !!cfg[`${p}StartDistanceCurveEnabled`]
+  setRow('StartDistanceMin', startDistanceOn)
+  setRow('StartDistanceMax', startDistanceOn)
+  setRow('StartDistanceCurve', startDistanceOn)
   // Animation Speed Curve has NO Tween-mode equivalent to nest here --
   // Tween mode's own speed is a flat `${p}TweenSpeedMs` slider with no
   // curve concept at all, so this group stays Single-Pose-only exactly as
@@ -10098,6 +10254,11 @@ function wrapClickFunctionGatedSubgroups(p) {
   // updateSingleTimingGateVisibility()'s own comment) nests inside this
   // SAME "Start Time Curve" group too, no-op for a pose-kind `p`.
   wrapGatedSubgroup(`${p}StartTimeCurveEnabled`, [`${p}StartTimeCurve`, `${p}StartTimeRange`, `${p}TweenStartTimeCurve`, `${p}TweenStartTimeRange`], 'Start Time Curve')
+  // Start Distance Curve -- direct spec item (2026-09-27), same shared
+  // subgroup for both Single Pose and Tween mode (this curve isn't
+  // Mode-gated at all -- see updateSingleTimingGateVisibility()'s own
+  // comment).
+  wrapGatedSubgroup(`${p}StartDistanceCurveEnabled`, [`${p}StartDistanceMin`, `${p}StartDistanceMax`, `${p}StartDistanceCurve`], 'Start Distance Curve')
   // CORRECTED 2026-09-24 (item 7, "duplicate Retransition settings"): the
   // Tween-mode retransition trio (hold-kind only -- a no-op/silently
   // skipped for a pose-kind `p`, whose own rows with these suffixes don't
