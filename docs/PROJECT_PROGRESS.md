@@ -18,8 +18,56 @@ work seamlessly from there.
 
 ## Currently working on
 
-**SHIPPED 2026-09-26 (3rd round), pending confirmation against the real
-Vercel deployment -- fixed custom click functions silently ignoring their own
+**SHIPPED 2026-09-27, NEEDS REAL HANDS-ON TESTING (not live-verified this
+round -- sandbox network truncation) -- new Multi Trigger feature for
+pose-kind Custom Click Functions, plus a real Touch Point Count fix.**
+Multi Trigger (direct spec): a single click function cycles through a
+different tween on each subsequent click -- 1st click = its own base
+Mode/Target Pose, 2nd click = "Trigger 1," 3rd = "Trigger 2," etc., each
+addable via a "+ Add Trigger" button, each its own full settings group
+(Mode/Target Pose/Target Sequence/Animation Speed/Pause Duration/Offset/
+Rotation/curves/Retransition, built by filtering `makeClickPoseGroup()`'s
+own real controls, never hand-duplicated) with its own on/off checkbox
+that also skips it in the cycle order when off; completing the list
+wraps back to the base pose. Reorder by dragging trigger groups in the
+dev panel -- order is captured explicitly into a persisted value (NOT
+devPanel.js's own generic group order, which never reaches a non-DEV_MODE
+visitor -- confirmed this same session). Architecture: each trigger is
+its own fully independent "shadow function" reusing 100% of the existing
+trigger machinery (own `CLICK_POSE_KEYS` entry, own per-hand state) --
+the only new runtime code is `resolveMultiTriggerPrefix()`, called once
+per real click. Built to work correctly with no dev panel at all (cfg
+seeding/registration happens unconditionally, DOM building is the only
+conditional part) -- the same lesson this session's earlier
+`lastRestoredValues` fix already taught. One real bug (drag-reorder
+would have silently never worked -- `dataset.key` holds a group's
+display title, not its prefix) was caught and fixed by reading
+devPanel.js's own source before shipping, not caught live. The dispatch
+resolver's cycling/skip/wraparound logic is verified via an isolated
+4-case logic reproduction (all correct) -- the UI/drag-reorder/full
+click-through-cycle behavior is NOT live-verified and needs real testing
+before being trusted. See CHANGELOG.txt's 2026-09-27 entry for full
+detail.
+
+Touch Point Count fix: `addCustomClickFunction()` never called
+`updateCustomFunctionTypeVisibility(id)` at creation time, so a brand-new
+function's Touch Point Count row stayed visible on Desktop until
+something else happened to refresh it (a tab switch) -- this was the
+real, previously-undiagnosed cause of a symptom this project's own
+CLAUDE.md already flagged once as an unresolved timing race. Fixed by
+adding the missing call.
+
+`index.html`'s own `main.js` cache-buster `?v=218` -> `?v=219`. Commit
+`b9de5eb`.
+
+**Separately investigated, unresolved:** a report of still seeing
+per-function "Hold Confirm Delay" inputs -- no code-level cause found
+(the per-function control was genuinely removed 2026-09-24 in favor of
+one global control; confirmed via direct grep of both source and the
+real saved settings). Most likely a stale browser tab. Flagged, not
+fixed.
+
+**SHIPPED 2026-09-26 (3rd round) -- fixed custom click functions silently ignoring their own
 real saved settings (Type/Enabled/TargetPose/etc.) for any non-DEV_MODE
 visitor.** A follow-up correction on top of the 2026-09-26 contextmenu
 fix directly below (that fix was real, just not the whole story). Root

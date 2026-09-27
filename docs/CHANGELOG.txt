@@ -11670,6 +11670,148 @@ genuinely exists.
 Commit: `226da07`. Pushed to `https://github.com/LeisHo/HandyDandies`.
 
 --------------------------------------------------------------------------------
+2026-09-27
+
+Two changes bundled into one round: a real bug fix found while
+investigating a direct report, and a substantial new feature built per a
+full direct spec.
+
+**Fix: Touch Point Count showing on the Desktop tab for a brand-new
+custom function.** Direct report: "why do i still see touch point count
+slidr in the desktop tab? that should only be visible in mobile and
+landscape tab." This is the exact symptom this project's own CLAUDE.md
+already documented once (2026-09-24) as an unresolved timing race
+("Touch Point Count visible on Desktop... only an actual manual tab
+click fixed it... the precise root cause wasn't pinned down"). Found the
+real, previously-undiagnosed cause this round: `addCustomClickFunction()`
+(the "+ Add Click Function" button) never called
+`updateCustomFunctionTypeVisibility(id)` at creation time -- a brand-new
+function's own Touch Point Count row (built by `buildRow()`, which has
+no notion of "hide on Desktop regardless of Type") stayed at its default
+visible state until something ELSE happened to call
+`refreshAllCustomFunctionTypeVisibility()` (a tab switch, or the next
+page load's own restore sweep) -- which is exactly why "a manual tab
+click fixed it" was ever observed; it was never actually a race for a
+freshly-created function, just a missing call. Fixed by adding the
+missing call.
+
+**New feature: Multi Trigger, pose-kind custom click functions.** Direct
+spec: "Under Retransition group, add Multi Trigger. It allows me to use
+the same click function have different tweens per subsequent triggers...
+for a single click function, the first click tweens to Pose 2, the 2nd
+click goes to Pose 3, a 3rd click goes to Pose 4. When it completes the
+list, the next click just tweens back to Pose 1... Each Added Trigger is
+a settings group within the Multi Trigger group. They too will have on
+and off checkbox in their group label. If a added trigger is turned off,
+then the trigger order will skip it... The trigger tween order will be
+determined by the setting group order within the dev panel." This is the
+same feature the changelog's own 2026-09-24 (4th round) entry describes
+as "large, still-in-design... started then DELIBERATELY REVERTED" per
+direct instruction to land other fixes first -- finally built this
+round, from that same worked-out design.
+
+Architecture: each added trigger is treated as its own fully independent
+"shadow function" -- its own `CLICK_POSE_KEYS` entry, its own
+`clickPoseTriggers[prefix]` parsed-curve cache, its own per-hand
+`hand._cp[prefix]` state slot -- reusing 100% of the existing
+`triggerClickPose()`/`updateClickPoseForHand()`/`applyOffsetRotationToHand()`
+machinery verbatim, confirmed by directly reading all 3 functions in
+full before writing anything: every one of them is already generic over
+its own `p`/prefix argument, with zero hardcoded assumption about what
+that prefix "should" be. The only genuinely new runtime code is
+`resolveMultiTriggerPrefix(id)`, called ONCE per real click (not once
+per hand, matching the spec's own singular framing) from
+`triggerCustomPoseFunctions()`, which decides whether this click routes
+to the base function's own top-level settings or the next enabled
+trigger in the persisted, ordered list -- skipping any trigger whose own
+on/off checkbox is off, and wrapping back to the base once the enabled
+list is exhausted. The main per-frame render loop already iterates
+`CLICK_POSE_KEYS` completely generically, so once a trigger prefix is
+registered there, it gets driven every frame for free -- no render-loop
+changes needed at all.
+
+Every trigger's own control battery (Mode, Target Pose/Target Sequence,
+Animation Speed, Pause Duration At Tween End, Offset, Rotation, Animation
+Speed Curve, Start Time Curve, Retransition) is built by calling
+`makeClickPoseGroup(prefix, title, {})` itself and filtering its
+`controls` array down to the named subset (`MULTI_TRIGGER_ALLOWED_SUFFIXES`)
+-- never hand-duplicated -- so "the exact same settings available" (the
+spec's own wording) holds by construction, and any future change to the
+real controls propagates to every trigger automatically with no separate
+maintenance.
+
+**Deliberately designed to work correctly for a non-DEV_MODE visitor
+too, not just inside the dev panel -- this was the single most important
+design constraint, given this session's own earlier fix for the exact
+opposite mistake (custom click functions silently ignoring their real
+saved settings in production, root-caused and fixed earlier this same
+session via `lastRestoredValues`).** `registerMultiTriggerTrigger()`'s
+own `CLICK_POSE_KEYS` push / `clickPoseTriggers[prefix]` state init /
+`renderDynamicGroup()`'s own cfg-seeding / `parseClickPoseConfig(prefix)`
+curve-cache population all happen UNCONDITIONALLY, before any DOM-only
+gate -- only the actual widget-building and visibility wiring are
+skipped when no panel exists. `setupMultiTriggerGroupForFunction()`
+follows the identical split. A real visitor with no dev panel ever built
+can still fire every trigger correctly.
+
+Trigger firing ORDER is captured explicitly into
+`cfg[`${id}MultiTriggers`]` (a plain, JSON-string, cfg-backed value every
+visitor actually restores via the normal settings-restore pipeline) on
+every drag-release within the Multi Trigger group's own body, rather
+than relying on devPanel.js's own generic group-order mechanism
+(`captureGroup()`/`applyOrder()`) -- confirmed this same session
+(`restoreValuesForEveryVisitor()`'s own comment) that generic order
+never reaches a non-DEV_MODE visitor at all, so Multi Trigger's own
+functionally-significant order could not be allowed to depend on it the
+way a purely cosmetic group reorder safely can.
+
+**One real bug caught and fixed before ever shipping, by re-reading
+devPanel.js's own `createGroupElement()` source directly rather than
+assuming:** it sets a built group's `dataset.key` to its own display
+TITLE (e.g. "Trigger 1"), not to whatever prefix is passed alongside it
+-- the drag-reorder capture (`captureAndPersistMultiTriggerOrder()`)
+would have silently never matched a single DOM group against the
+persisted list without this, since it needs the real PREFIX, not the
+title, to look values back up. Fixed by stamping
+`g.dataset.multiTriggerPrefix = prefix` explicitly right after building
+each trigger's group, the same pattern `renderCustomClickFunctionGroup()`
+already uses for its own `dataset.customFunctionId`/`Family`.
+
+**Verification:** `node --check` passes. The dispatch resolver's own
+cycling logic was verified via an isolated, no-DOM logic reproduction
+(mirroring `resolveMultiTriggerPrefix()` exactly) across 4 cases: all-
+enabled (base->Trig1->Trig2->Trig3->base->...), one trigger disabled
+mid-list (base->Trig1->Trig3->base->..., confirming the skip), Multi
+Trigger switched off entirely (always base), and enabled with zero
+triggers added yet (always base) -- all 4 produced exactly the expected
+sequence. **NOT live-verified in a real browser this round** -- 5
+navigation retries (the standing cap) against a fresh static server all
+hit this sandbox's own documented `main.js` network-truncation quirk,
+worse than earlier in the session since the file is now larger. This is
+a substantial feature shipped without the live click-and-watch
+verification this project's conventions normally require before calling
+something done -- needs real hands-on testing (adding a trigger,
+dragging to reorder more than 2, clicking through a full cycle including
+the wrap-back, disabling a trigger mid-cycle, verifying the drag-reorder
+persistence survives a page reload) before being trusted.
+
+**Separately investigated, not fixed -- no code-level cause found:** a
+report of still seeing "Hold Confirm Delay" per-function inputs. Grepped
+every `HoldConfirmMs`-shaped key across `main.js` and the real saved
+`data/processed/dev-panel-settings.json` -- the per-function control was
+genuinely removed 2026-09-24 (replaced by one global `cfg.holdConfirmMs`
+in the "Custom Click Functions" anchor group), confirmed only ONE
+definition exists in source and zero stale references exist in the real
+saved data. Most likely a stale browser tab still running pre-2026-09-24
+code in memory (this project's own CLAUDE.md documents this exact class
+of gotcha elsewhere) -- flagged honestly as unresolved rather than
+guessed at further without more detail.
+
+`index.html`'s own `main.js` cache-buster bumped `?v=218` -> `?v=219`.
+
+Commit: `b9de5eb`. Pushed to `https://github.com/LeisHo/HandyDandies`.
+
+--------------------------------------------------------------------------------
 <next entry follows the same divider + dated-header pattern>
 
 ================================================================================

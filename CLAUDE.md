@@ -1177,3 +1177,57 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   exact bug for its own keys** -- the risk is inherent to registering
   controls after the one-shot boot-time restore has already run, not
   specific to Custom Click Functions.
+- **`addCustomClickFunction()` (the "+ Add Click Function" button) never
+  called `updateCustomFunctionTypeVisibility(id)` at creation time -- the
+  real, previously-undiagnosed cause of a symptom this file already
+  documented once (2026-09-24) as an unresolved timing race ("Touch Point
+  Count visible on Desktop... only an actual manual tab click fixed it").**
+  Confirmed 2026-09-27 via direct report. It was never actually a race
+  for a FRESHLY-CREATED function -- a brand-new function's Touch Point
+  Count row (built by `buildRow()`, which has no notion of "hide on
+  Desktop regardless of Type") simply stayed at its default-visible state
+  until something ELSE happened to call
+  `refreshAllCustomFunctionTypeVisibility()` (a tab switch, or the NEXT
+  page load's own `restoreCustomClickFunctions()` sweep) -- which is
+  exactly why a manual tab click "fixed" it. Fixed by calling
+  `updateCustomFunctionTypeVisibility(id)` directly inside
+  `addCustomClickFunction()`. If a FUTURE row-visibility rule is added
+  that depends on something other than a control's own value (tab,
+  device, an unrelated sibling control), check every CREATION path (not
+  just the restore-on-load path) explicitly applies it -- this bug
+  existed because only the restore/tab-switch paths called the
+  visibility function, never the live "+Add" path.
+- **devPanel.js's `createGroupElement(title)` sets a built group's
+  `dataset.key` to its own DISPLAY TITLE string, not to any separate
+  identifier a caller might have in mind.** Confirmed 2026-09-27 while
+  building Multi Trigger (see PROJECT_PROGRESS.md's own 2026-09-27
+  entry): code written to match a dynamically-created group's DOM element
+  back to its own underlying id/prefix by reading `g.dataset.key` will
+  silently get the group's TITLE STRING instead (e.g. "Trigger 1"), not
+  whatever real key the caller cares about -- caught before shipping by
+  reading `createGroupElement()`'s own source directly, not caught live.
+  `renderCustomClickFunctionGroup()` already works around this
+  correctly, by stamping its own `dataset.customFunctionId`/
+  `dataset.customFunctionFamily` onto the group AFTER `renderDynamicGroup()`
+  returns it, rather than trying to read anything back out of
+  `dataset.key`. **Any future code that needs to identify a dynamically-
+  built group by something other than its own display title must stamp
+  its own custom `dataset.*` attribute the same way -- `dataset.key`
+  is never a safe source for that.**
+- **NOT YET LIVE-VERIFIED (2026-09-27): the new Multi Trigger feature for
+  Custom Click Functions** (cycling a pose-kind function through
+  different tweens on subsequent clicks -- see PROJECT_PROGRESS.md's own
+  2026-09-27 entry and CHANGELOG.txt's matching entry for the full
+  design). Built and reasoned through carefully -- every dependency
+  (`triggerClickPose`/`updateClickPoseForHand`/`applyOffsetRotationToHand`/
+  `parseClickPoseConfig`/`wrapClickFunctionGatedSubgroups`/
+  `updateClickFunctionEnabledVisibility`) was read in full before writing
+  anything, and the dispatch resolver's own cycling logic was verified in
+  an isolated, no-DOM reproduction -- but this sandbox could not get a
+  clean live app load this round (5 retries, the standing cap, all hit
+  the documented `main.js` network-truncation quirk, worse now that the
+  file is larger). **If a future report describes Multi Trigger not
+  cycling correctly, not skipping a disabled trigger, not persisting a
+  drag-reorder across a reload, or not working at all outside `?dev=1`,
+  start there -- this is genuinely unverified, not just cautiously
+  worded.**
