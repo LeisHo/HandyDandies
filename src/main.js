@@ -6137,6 +6137,14 @@ const _offsetQuat = new THREE.Quaternion()
 function applyOffsetRotationToHand(hand, p, progress) {
   if (!hand._customOffsetAccum) hand._customOffsetAccum = { x: 0, y: 0 }
   if (!hand._customRotationAccum) hand._customRotationAccum = new THREE.Quaternion()
+  // CORRECTED 2026-09-27 (4th round of this same jump investigation) --
+  // records the CURRENT ramp/lap's own in-flight progress fraction so
+  // endClickHoldPose() can bake in exactly however much of it was
+  // actually shown if the hold is released mid-flight, before it ever
+  // reaches its own natural completion (see bakeInFlightOffsetRotation()'s
+  // own comment for the full account of the bug this closes).
+  if (!hand._lastOffsetRotationProgress) hand._lastOffsetRotationProgress = {}
+  hand._lastOffsetRotationProgress[p] = progress
   _offsetRightVec.setFromMatrixColumn(camera.matrixWorld, 0)
   _offsetUpVec.setFromMatrixColumn(camera.matrixWorld, 1)
   // Accumulated baseline from every previously-completed ramp/lap
@@ -6193,6 +6201,45 @@ function bakeOffsetRotationIntoAccum(hand, p) {
       hand._customRotationAccum.multiply(_offsetQuat.setFromEuler(_offsetEuler))
     }
   }
+}
+// CORRECTED 2026-09-27 (4th round of this same jump investigation --
+// direct report: "Its deifnitely during the retransition of stopping
+// time"). bakeOffsetRotationIntoAccum() above always adds the FULL
+// configured Offset/Rotation amount -- correct only when a ramp/lap has
+// genuinely reached its own natural completion (progress/lapT >= 1).
+// `endClickHoldPose()` (the pointer-release handler) transitions a hand
+// straight into 'stopping' or 'retransition' the instant the user
+// releases, REGARDLESS of how far the current ramp/lap had actually
+// gotten -- and neither of its 2 exit branches ever baked anything
+// first. The very next frame, 'stopping'/'retransition' stop calling
+// applyOffsetRotationToHand() with a live progress at all (just the
+// accumulator baseline, progress pinned to 0) -- so whatever fraction of
+// the CURRENT, interrupted ramp had already been visually added
+// (`cfg[OffsetX] * progress`) simply vanished, never having been
+// credited to the accumulator: a real snap the instant a hold is
+// released mid-ramp, exactly matching "during the retransition of
+// stopping." Bakes exactly the FRACTION of the target that was actually
+// showing (via `hand._lastOffsetRotationProgress[p]`, recorded by
+// applyOffsetRotationToHand() every frame) rather than the full amount,
+// then clears that marker so a 2nd accidental call can't double-credit
+// the same fraction again.
+function bakeInFlightOffsetRotation(hand, p) {
+  const fraction = (hand._lastOffsetRotationProgress && hand._lastOffsetRotationProgress[p]) || 0
+  if (fraction <= 0) return
+  if (!hand._customOffsetAccum) hand._customOffsetAccum = { x: 0, y: 0 }
+  if (!hand._customRotationAccum) hand._customRotationAccum = new THREE.Quaternion()
+  if (cfg[`${p}OffsetEnabled`]) {
+    hand._customOffsetAccum.x += (cfg[`${p}OffsetX`] || 0) * fraction
+    hand._customOffsetAccum.y += (cfg[`${p}OffsetY`] || 0) * fraction
+  }
+  if (cfg[`${p}RotationEnabled`]) {
+    const rx = (cfg[`${p}RotationX`] || 0) * fraction, ry = (cfg[`${p}RotationY`] || 0) * fraction, rz = (cfg[`${p}RotationZ`] || 0) * fraction
+    if (rx || ry || rz) {
+      _offsetEuler.set(THREE.MathUtils.degToRad(rx), THREE.MathUtils.degToRad(ry), THREE.MathUtils.degToRad(rz), 'XYZ')
+      hand._customRotationAccum.multiply(_offsetQuat.setFromEuler(_offsetEuler))
+    }
+  }
+  hand._lastOffsetRotationProgress[p] = 0
 }
 // Retransition ALWAYS fully clears the accumulated offset/rotation back
 // to zero, regardless of how large it's grown (item 6) -- ramps the
@@ -6606,12 +6653,24 @@ function releaseHandFromOtherFunctions(hand, exceptId) {
   CLICK_POSE_KEYS.forEach((id) => {
     if (id === exceptId) return
     const cp = hand._cp && hand._cp[id]
-    if (cp && (cp.phase !== 'idle' || cp.pendingClaimAt)) { cp.phase = 'idle'; cp.pendingClaimAt = 0 }
+    if (cp && (cp.phase !== 'idle' || cp.pendingClaimAt)) {
+      // CORRECTED 2026-09-27 -- same bug/fix as endClickHoldPose()'s own
+      // 2 exit points (see bakeInFlightOffsetRotation()'s own comment).
+      // A DIFFERENT function's commit force-idling this one mid-ramp is
+      // just as much a mid-flight interruption as a manual release --
+      // without this, whatever fraction of `id`'s own Offset/Rotation had
+      // already been visually shown vanishes the instant it's forced idle.
+      bakeInFlightOffsetRotation(hand, id)
+      cp.phase = 'idle'; cp.pendingClaimAt = 0
+    }
   })
   CLICK_HOLD_KEYS.forEach((id) => {
     if (id === exceptId) return
     const chp = hand._chp && hand._chp[id]
-    if (chp && (chp.phase !== 'idle' || chp.pendingClaimAt)) { chp.phase = 'idle'; chp.pendingClaimAt = 0 }
+    if (chp && (chp.phase !== 'idle' || chp.pendingClaimAt)) {
+      bakeInFlightOffsetRotation(hand, id)
+      chp.phase = 'idle'; chp.pendingClaimAt = 0
+    }
   })
 }
 function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) {
@@ -7214,9 +7273,20 @@ function endClickHoldPose(p) {
       chp.stoppingBaseElapsedMs = chp.stoppingWasLooping ? 0 : Math.max(now - chp.forwardStartTime, 0)
       chp.stoppingVirtualElapsedMs = 0
       chp.stoppingFreezeAtEnd = retransitionOff
+      // CORRECTED 2026-09-27 -- see bakeInFlightOffsetRotation()'s own
+      // comment. Release can land mid-ramp (forward not yet complete) or
+      // mid-lap (looping) -- either way, whatever fraction of this
+      // function's own Offset/Rotation had already been visually shown
+      // must be credited to the accumulator before 'stopping' stops
+      // calling applyOffsetRotationToHand() with a live progress, or it's
+      // silently lost.
+      bakeInFlightOffsetRotation(hand, p)
       chp.phase = 'stopping'
       return
     }
+    // CORRECTED 2026-09-27 -- same reasoning as the 'stopping' branch
+    // above, for the direct-to-retransition path (no Tween Stop Delay).
+    bakeInFlightOffsetRotation(hand, p)
     chp.retransitionStart = chp.lastAppliedValues || { ...poseDefaultValues }
     chp.retransitionStartTime = now
     // Trigger All Hands (used to bypass this per-hand stagger entirely)
