@@ -3219,6 +3219,10 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       { key: `${p}RetransitionSpeedCurveEnabled`, label: 'Retransition Speed Curve On/Off', type: 'checkbox', def: false, onChange: () => updateSingleTimingGateVisibility(p) },
       { key: `${p}RetransitionSpeedCurve`, label: 'Retransition Speed Curve (Distance -> Speed)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickHoldConfig(p) },
       { key: `${p}RetransitionSpeedCurveRange`, label: 'Retransition Min / Max Speed (Ms)', type: 'text', def: '{"min":50,"max":2000}', onChange: () => parseClickHoldConfig(p) },
+      // Retransition Start Time Curve On/Off -- direct spec item
+      // (2026-09-27), same reasoning as makeClickPoseGroup()'s own
+      // matching control comment.
+      { key: `${p}RetransitionStartTimeCurveEnabled`, label: 'Retransition Start Time Curve On/Off', type: 'checkbox', def: true, onChange: () => updateSingleTimingGateVisibility(p) },
       { key: `${p}RetransitionStartTimeCurve`, label: 'Retransition Start Time Curve (Distance -> Start Time)', type: 'text', def: defaults.retransitionStartTimeCurve ?? '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickHoldConfig(p) },
       { key: `${p}RetransitionStartTimeRange`, label: 'Retransition Min / Max Start Time (Ms)', type: 'text', def: defaults.retransitionStartTimeRange ?? '{"min":0,"max":300}', onChange: () => parseClickHoldConfig(p) },
       // Tween mode's own dedicated retransition trio -- direct request
@@ -3427,6 +3431,17 @@ function makeClickPoseGroup(p, title, defaults = {}) {
       { key: `${p}RetransitionSpeedCurveEnabled`, label: 'Retransition Speed Curve On/Off', type: 'checkbox', def: false, onChange: () => updateSingleTimingGateVisibility(p) },
       { key: `${p}RetransitionSpeedCurve`, label: 'Retransition Speed Curve (Distance -> Speed)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickPoseConfig(p) },
       { key: `${p}RetransitionSpeedCurveRange`, label: 'Retransition Min / Max Speed (Ms)', type: 'text', def: '{"min":50,"max":2000}', onChange: () => parseClickPoseConfig(p) },
+      // Retransition Start Time Curve On/Off -- direct spec item
+      // (2026-09-27): "place the Retransition start time slider and curve
+      // in their own subgroup that can be turned on and off." Previously
+      // this pair had no toggle at all (always on) -- see
+      // wrapClickFunctionGatedSubgroups()'s own comment for the new nested
+      // subgroup this gates, and updateClickPoseForHand()/
+      // endClickHoldPose()/beginTweenReleaseStop()'s own matching runtime
+      // gate for what "off" actually does (skip the distance-based delay
+      // entirely, same convention `${p}StartTimeCurveEnabled` already uses
+      // for the forward phase's own equivalent).
+      { key: `${p}RetransitionStartTimeCurveEnabled`, label: 'Retransition Start Time Curve On/Off', type: 'checkbox', def: true, onChange: () => updateSingleTimingGateVisibility(p) },
       { key: `${p}RetransitionStartTimeCurve`, label: 'Retransition Start Time Curve (Distance -> Start Time)', type: 'text', def: defaults.retransitionStartTimeCurve ?? '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickPoseConfig(p) },
       { key: `${p}RetransitionStartTimeRange`, label: 'Retransition Min / Max Start Time (Ms)', type: 'text', def: defaults.retransitionStartTimeRange ?? '{"min":0,"max":300}', onChange: () => parseClickPoseConfig(p) }
     ])
@@ -6413,7 +6428,11 @@ function snapshotOffsetRotationAccumForRetransition(hand, chp) {
 function beginTweenReleaseStop(hand, chp, trig, p, values, live, minLiveDist, liveDistRange, now) {
   chp.retransitionStart = values
   chp.retransitionStartTime = now
-  chp.retransitionDelay = computeStartDelayMs(live, minLiveDist, liveDistRange, trig.tweenRetransitionCurveParsed, trig.tweenRetransitionRangeParsed)
+  // Retransition Start Time Curve On/Off (2026-09-27) -- off means no
+  // distance-based stagger for retransition either, same convention
+  // `${p}StartTimeCurveEnabled` already uses for the forward phase.
+  chp.retransitionDelay = cfg[`${p}RetransitionStartTimeCurveEnabled`] === false ? 0
+    : computeStartDelayMs(live, minLiveDist, liveDistRange, trig.tweenRetransitionCurveParsed, trig.tweenRetransitionRangeParsed)
   chp.retransitionIsTween = true
   chp.phase = 'retransition'
   chp.releasePending = false
@@ -7024,9 +7043,12 @@ function endClickHoldPose(p) {
     // Trigger All Hands (used to bypass this per-hand stagger entirely)
     // removed 2026-09-24 -- every hand always computes its own distance-
     // based delay again, same as before that control existed.
-    chp.retransitionDelay = chp.retransitionIsTween
+    // Retransition Start Time Curve On/Off (2026-09-27) -- off means no
+    // distance-based stagger for retransition, same convention
+    // `${p}StartTimeCurveEnabled` already uses for the forward phase.
+    chp.retransitionDelay = cfg[`${p}RetransitionStartTimeCurveEnabled`] === false ? 0 : (chp.retransitionIsTween
       ? computeStartDelayMs(dists[i], minD, range, trig.tweenRetransitionCurveParsed, trig.tweenRetransitionRangeParsed)
-      : computeStartDelayMs(dists[i], minD, range, trig.retransitionCurveParsed, trig.retransitionRangeParsed)
+      : computeStartDelayMs(dists[i], minD, range, trig.retransitionCurveParsed, trig.retransitionRangeParsed))
     // Retransition Speed Curve (item 5, 2026-09-24) -- frozen once here,
     // same "frozen at trigger time" philosophy as Animation Speed Curve's
     // own `pendingFrozenSpeedMs`/`frozenSpeedMs` pair (see that control's
@@ -7485,7 +7507,11 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
       cp.retransitionRotationAccumStart = hand._customRotationAccum ? hand._customRotationAccum.clone() : new THREE.Quaternion()
       // Computed from THIS hand's own live distance right now, not a
       // shared snapshot -- see this section's own top comment for why.
-      cp.retransitionDelay = computeStartDelayMs(live, minLiveDist, liveDistRange, clickPoseTriggers[p].retransitionCurveParsed, clickPoseTriggers[p].retransitionRangeParsed)
+      // Retransition Start Time Curve On/Off (2026-09-27) -- off means no
+      // distance-based stagger for retransition, same convention
+      // `${p}StartTimeCurveEnabled` already uses for the forward phase.
+      cp.retransitionDelay = cfg[`${p}RetransitionStartTimeCurveEnabled`] === false ? 0
+        : computeStartDelayMs(live, minLiveDist, liveDistRange, clickPoseTriggers[p].retransitionCurveParsed, clickPoseTriggers[p].retransitionRangeParsed)
       // Retransition Speed Curve (item 5, 2026-09-24) -- frozen once here,
       // same "frozen at trigger time" philosophy as Animation Speed
       // Curve's own frozenSpeedMs pair -- see makeClickHoldPoseGroup()'s
@@ -9152,7 +9178,7 @@ const MULTI_TRIGGER_ALLOWED_SUFFIXES = [
   'RotationEnabled', 'RotationX', 'RotationY', 'RotationZ',
   'SpeedCurveEnabled', 'SpeedCurve', 'SpeedCurveRange',
   'StartTimeCurveEnabled', 'StartTimeCurve', 'StartTimeRange', 'TweenStartTimeCurve', 'TweenStartTimeRange',
-  'RetransitionEnabled', 'RetransitionSpeedMs', 'RetransitionSpeedCurveEnabled', 'RetransitionSpeedCurve', 'RetransitionSpeedCurveRange', 'RetransitionStartTimeCurve', 'RetransitionStartTimeRange'
+  'RetransitionEnabled', 'RetransitionSpeedMs', 'RetransitionSpeedCurveEnabled', 'RetransitionSpeedCurve', 'RetransitionSpeedCurveRange', 'RetransitionStartTimeCurveEnabled', 'RetransitionStartTimeCurve', 'RetransitionStartTimeRange'
 ]
 function buildMultiTriggerControlsForPrefix(prefix, title) {
   const base = makeClickPoseGroup(prefix, title, {})
@@ -9852,12 +9878,21 @@ function updateSingleTimingGateVisibility(p) {
   const retransitionSpeedCurveOn = singleRetransitionOn && !!cfg[`${p}RetransitionSpeedCurveEnabled`]
   setRow('RetransitionSpeedCurve', retransitionSpeedCurveOn)
   setRow('RetransitionSpeedCurveRange', retransitionSpeedCurveOn)
-  setRow('RetransitionStartTimeCurve', singleRetransitionOn)
-  setRow('RetransitionStartTimeRange', singleRetransitionOn)
+  // Retransition Start Time Curve On/Off (direct spec item, 2026-09-27) --
+  // own on/off row visible whenever retransition itself is on, in EITHER
+  // mode (mode-independent, mirroring RetransitionEnabled's/
+  // StartTimeCurveEnabled's own established "one gate, mode-dependent
+  // child fields" pattern) -- its own curve/range pair visible only once
+  // also switched on, AND only for whichever mode's own pair is currently
+  // relevant.
+  setRow('RetransitionStartTimeCurveEnabled', retransitionOn)
+  const retransitionStartCurveEnabled = cfg[`${p}RetransitionStartTimeCurveEnabled`] !== false
+  setRow('RetransitionStartTimeCurve', singleRetransitionOn && retransitionStartCurveEnabled)
+  setRow('RetransitionStartTimeRange', singleRetransitionOn && retransitionStartCurveEnabled)
   const tweenRetransitionOn = retransitionOn && isTweenMode
   setRow('TweenRetransitionSpeedMs', tweenRetransitionOn)
-  setRow('TweenRetransitionStartTimeCurve', tweenRetransitionOn)
-  setRow('TweenRetransitionStartTimeRange', tweenRetransitionOn)
+  setRow('TweenRetransitionStartTimeCurve', tweenRetransitionOn && retransitionStartCurveEnabled)
+  setRow('TweenRetransitionStartTimeRange', tweenRetransitionOn && retransitionStartCurveEnabled)
 }
 // Tween Stop's own full visibility (Sequence mode only, hold-based
 // triggers only) -- REWRITTEN 2026-09-24 (items 10/11) now that Tween
@@ -10076,9 +10111,25 @@ function wrapClickFunctionGatedSubgroups(p) {
   // heading -- RetransitionEnabled itself still governs both regardless
   // of mode, preserving the 2026-09-22 request.
   wrapGatedSubgroup(`${p}RetransitionEnabled`, [
-    `${p}RetransitionSpeedMs`, `${p}RetransitionSpeedCurveEnabled`, `${p}RetransitionSpeedCurve`, `${p}RetransitionSpeedCurveRange`, `${p}RetransitionStartTimeCurve`, `${p}RetransitionStartTimeRange`,
+    `${p}RetransitionSpeedMs`, `${p}RetransitionSpeedCurveEnabled`, `${p}RetransitionSpeedCurve`, `${p}RetransitionSpeedCurveRange`, `${p}RetransitionStartTimeCurveEnabled`, `${p}RetransitionStartTimeCurve`, `${p}RetransitionStartTimeRange`,
     `${p}TweenRetransitionSpeedMs`, `${p}TweenRetransitionStartTimeCurve`, `${p}TweenRetransitionStartTimeRange`
   ], 'Retransition')
+  // Direct spec item (2026-09-27): "add a Retransition Speed Curve group
+  // just like the others where it can get turned on and off... place the
+  // Retransition start time slider and curve in their own subgroup that
+  // can be turned on and off." Both were previously flat rows directly
+  // inside "Retransition" above (the wrap just above this comment moved
+  // them there); nesting them one level deeper here works because
+  // wrapGatedSubgroup() looks up its own `enabledKey` row by a GLOBAL,
+  // uniquely-prefixed query (not scoped to a specific parent) -- by the
+  // time these 2 calls run, both rows already live inside the
+  // "Retransition" group's own body (moved there by the wrap above), so
+  // `enabledRow.parentElement` correctly resolves to THAT body, nesting
+  // these 2 new subgroups inside Retransition rather than as top-level
+  // siblings of it. Order matters: these must run AFTER the outer
+  // Retransition wrap, never before.
+  wrapGatedSubgroup(`${p}RetransitionSpeedCurveEnabled`, [`${p}RetransitionSpeedCurve`, `${p}RetransitionSpeedCurveRange`], 'Retransition Speed Curve')
+  wrapGatedSubgroup(`${p}RetransitionStartTimeCurveEnabled`, [`${p}RetransitionStartTimeCurve`, `${p}RetransitionStartTimeRange`, `${p}TweenRetransitionStartTimeCurve`, `${p}TweenRetransitionStartTimeRange`], 'Retransition Start Time Curve')
   // Hold-kind only -- fire-and-forget triggers have no Tween Stop fields.
   // Must run AFTER the wraps above (harmless either order, since Tween
   // Stop's own rows are untouched by them) and BEFORE the caller's own
