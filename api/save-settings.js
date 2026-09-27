@@ -72,8 +72,36 @@ module.exports = async (req, res) => {
                 return;
             }
             const getData = await getResp.json();
-            const jsonText = Buffer.from(getData.content || '', 'base64').toString('utf-8');
-            res.status(200).json({ ok: true, settings: JSON.parse(jsonText) });
+            // CORRECTED 2026-09-27 -- real production outage, confirmed live
+            // on handy-dandies.vercel.app: GitHub's Contents API only
+            // inlines a file's `content` field for files <= ~1MB; above
+            // that (this file crossed 1.2MB from months of Save/Sync
+            // accumulation) `content` comes back empty while `sha`/`size`/
+            // `download_url` are still present. `JSON.parse('')` on the
+            // empty fallback threw "Unexpected end of JSON input" on EVERY
+            // GET, permanently 500ing the dev panel's own settings restore
+            // -- the live app fell back to its 6-second hardcoded-defaults
+            // timeout on every load (white background, empty custom click
+            // functions, default camera), which read as "everything is
+            // broken" even though no application code was actually at
+            // fault. Fixed by falling back to `download_url` (a raw
+            // githubusercontent.com URL GitHub always provides regardless
+            // of size, up to 100MB) whenever `content` is missing/empty.
+            let jsonText;
+            if (getData.content) {
+                jsonText = Buffer.from(getData.content, 'base64').toString('utf-8');
+            } else if (getData.download_url) {
+                const rawResp = await fetch(getData.download_url, { cache: 'no-store' });
+                if (!rawResp.ok) {
+                    const errText = await rawResp.text();
+                    res.status(502).json({ ok: false, error: `GitHub raw content fetch failed (${rawResp.status}): ${errText}` });
+                    return;
+                }
+                jsonText = await rawResp.text();
+            } else {
+                jsonText = '';
+            }
+            res.status(200).json({ ok: true, settings: jsonText ? JSON.parse(jsonText) : null });
         } catch (err) {
             res.status(500).json({ ok: false, error: String((err && err.message) || err) });
         }
