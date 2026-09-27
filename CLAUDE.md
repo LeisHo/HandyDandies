@@ -1562,3 +1562,36 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   needs the same "keep the real value continuously in sync, don't just
   clear it at the end" treatment, or it will reproduce this exact bug
   class for its own state.
+- **CORRECTED 2026-09-27, 4th round of the same jump investigation --
+  `bakeOffsetRotationIntoAccum()` always adds the FULL configured
+  Offset/Rotation amount, correct only for a ramp/lap's own NATURAL
+  completion. `endClickHoldPose()` (the release handler) transitions a
+  hand straight into 'stopping'/'retransition' the instant the user
+  releases, regardless of how far the ramp had gotten, and neither exit
+  branch ever baked anything first.** Found from a precisely-targeted
+  follow-up report ("Its deifnitely during the retransition of stopping
+  time") -- releasing mid-ramp meant whatever fraction of Offset/Rotation
+  had already been visually shown (`cfg[OffsetX] * progress`) simply
+  vanished the moment 'stopping'/'retransition' took over (they only ever
+  call `applyOffsetRotationToHand()` with progress pinned to 0, baseline
+  only). The identical gap existed in `releaseHandFromOtherFunctions()` --
+  a different function's own commit force-idling a still-active one is
+  just as much a mid-flight interruption as a manual release. Fixed with
+  `hand._lastOffsetRotationProgress[p]` (recorded every frame by
+  `applyOffsetRotationToHand()`) and a new `bakeInFlightOffsetRotation(hand,
+  p)` that bakes exactly that fraction, not the full target, called at
+  both `endClickHoldPose()` exits and both `releaseHandFromOtherFunctions()`
+  loops. **Live-verified precisely**: released custom8 33.27% through a
+  4000ms ramp (`OffsetX:10,OffsetY:6`) -- accumulator went `{0,0} ->
+  {3.327,1.996}` (exactly `10*0.3327`/`6*0.3327`) at the instant of
+  release, and `hand.wrapper.position` was IDENTICAL before and after
+  (the old additive term and the new baked term produced the same value).
+  Also verified the `releaseHandFromOtherFunctions()` path with a real
+  2nd function interrupting mid-ramp. **This is the general pattern for
+  this whole bug family**: ANY per-hand persistent state that's normally
+  "locked in" only at a ramp/lap's own 100% natural completion needs an
+  equivalent partial-credit path for every OTHER way that same phase can
+  end (a manual release, a different function's own interruption, a
+  page-level reset) -- a future feature that adds its own "bake at
+  completion" step should audit every early-exit path for the same gap
+  from the start, not just its own happy path.

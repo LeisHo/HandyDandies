@@ -18,6 +18,25 @@ work seamlessly from there.
 
 ## Currently working on
 
+**FIXED 2026-09-27 (11th round) -- Offset/Rotation contribution
+vanishing when a hold releases mid-ramp, the 4th distinct root cause in
+the same jump investigation.** Precisely-targeted follow-up: "Its
+deifnitely during the retransition of stopping time." Root cause:
+`bakeOffsetRotationIntoAccum()` always credits the FULL configured
+amount, correct only at a ramp's own natural completion --
+`endClickHoldPose()` transitions straight into `'stopping'`/`'retransition'`
+on release regardless of progress, never baking first, so whatever
+fraction had already been shown just vanished. Same gap in
+`releaseHandFromOtherFunctions()`. Fixed with a new
+`bakeInFlightOffsetRotation()` that credits exactly the shown fraction.
+**Live-verified precisely**: released mid-ramp (33.27% through), the
+accumulator picked up exactly `10*0.3327`/`6*0.3327`, and
+`hand.wrapper.position` was byte-identical before and after the
+release. See CLAUDE.md's matching Gotchas entry and CHANGELOG.txt's
+2026-09-27 11th-round entry.
+
+--------------------------------------------------------------------------------
+
 **FIXED 2026-09-27 (10th round) -- Offset/Rotation accumulator not
 tracking retransition's own decay, the 3rd distinct root cause in the
 same jump investigation.** Direct clarification narrowed the repro:

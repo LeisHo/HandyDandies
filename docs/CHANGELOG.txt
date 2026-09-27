@@ -12623,6 +12623,54 @@ smooth, continuous step too.
 
 Commit: `a162bc3`. Pushed to `https://github.com/LeisHo/HandyDandies`.
 
+--------------------------------------------------------------------------------
+
+2026-09-27 (11th round)
+
+**4th distinct root cause in this same jump investigation. Direct
+follow-up, precisely targeted this time: "Its deifnitely during the
+retransition of stopping time."**
+
+**Root cause:** `bakeOffsetRotationIntoAccum()` always adds the FULL
+configured Offset/Rotation amount -- correct only when a ramp/lap
+genuinely reaches its own natural completion (`progress`/`lapT >= 1`).
+`endClickHoldPose()` (the pointer-release handler) transitions a hand
+straight into `'stopping'` or `'retransition'` the INSTANT the user
+releases, regardless of how far the current ramp had actually gotten --
+and neither of its 2 exit branches ever baked anything first.
+`'stopping'`/`'retransition'` then stop calling `applyOffsetRotationToHand()`
+with a live progress at all (just the accumulator baseline) -- so
+whatever fraction of the interrupted ramp had already been visually
+shown (`cfg[OffsetX] * progress`) simply vanished, uncredited: a real
+snap the instant a hold releases mid-ramp, exactly "during the
+[transition into stopping, which leads to] retransition." The identical
+gap existed in `releaseHandFromOtherFunctions()` -- a DIFFERENT
+function's own commit force-idling a still-active one is just as much a
+mid-flight interruption as a manual release.
+
+**Fix:** a new `hand._lastOffsetRotationProgress[p]` (recorded every
+frame by `applyOffsetRotationToHand()`) tracks exactly how far the
+current ramp/lap has gotten. A new `bakeInFlightOffsetRotation(hand, p)`
+bakes exactly THAT fraction of the target -- not the full amount -- then
+clears the marker so a 2nd accidental call can't double-credit it. Called
+at both `endClickHoldPose()` exit points and both loops inside
+`releaseHandFromOtherFunctions()`.
+
+**Live-verified directly, both paths:** (1) released custom8 mid-ramp
+(33.27% through a 4000ms tween, `OffsetX:10, OffsetY:6`) -- accumulator
+went from `{0,0}` to exactly `{3.327, 1.996}` (= `10*0.3327`, `6*0.3327`)
+the instant of release, and `hand.wrapper.position` did not move AT ALL
+across that transition (`-53.676,-28.256` before and after -- the old
+additive term and the new accumulator-based term produced the identical
+value). (2) interrupted custom8 mid-ramp with a real, different function
+(`custom7`) -- accumulator correctly increased by the shown fraction
+rather than losing it, and `wrapper.position` showed only a small,
+smooth step, not a jump.
+
+`main.js` cache-buster bumped `?v=230` -> `?v=231`.
+
+Commit: `ddecfed`. Pushed to `https://github.com/LeisHo/HandyDandies`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a
