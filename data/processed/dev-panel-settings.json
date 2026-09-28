@@ -24079,6 +24079,10 @@
           }
         },
         {
+          "type": "row",
+          "key": "holdConfirmMs"
+        },
+        {
           "type": "group",
           "group": {
             "key": "Custom Click Function 15",
@@ -31255,10 +31259,6 @@
               }
             ]
           }
-        },
-        {
-          "type": "row",
-          "key": "holdConfirmMs"
         },
         {
           "type": "row",
