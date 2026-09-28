@@ -2001,3 +2001,56 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   the report may describe a genuinely PERCEPTUAL effect of ~90 hands
   changing pose in near-unison over `TransitionSpeedMs` (2000ms) rather
   than a per-hand continuity bug at all.
+
+- **9th round of the jump investigation: a genuine multi-hand-vs-single-
+  hand discrepancy found, still NOT root-caused.** Following up on the
+  8th round's own "test multiple hands, not just one" lead: live-
+  instrumented `custom8`'s GLOBAL hold+release (`startClickHoldPose`/
+  `endClickHoldPose` set the trigger's own `active` flag, affecting ALL
+  156 real hands simultaneously -- matching real usage, unlike the 8th
+  round's single-hand-only test) against production, sampling 9 hands
+  spread across the field (`[0, N*0.1, N*0.25, N*0.4, N*0.5, N*0.6,
+  N*0.75, N*0.9, N-1]`). Result: 6 of 9 sampled hands showed a
+  synchronized ~10-15 deg `rHand` bone rotation spike at the SAME tick
+  (~471ms into the post-release decay) -- well above their own
+  surrounding per-tick motion (~2-6 deg), and suspicious specifically
+  because it clustered at the SAME tick across hands with different
+  individual `stoppingDelayMs` (a per-hand, distance-based decay-rate
+  parameter) -- a purely per-hand mechanism (e.g. crossing your own
+  tween-segment boundary) should land at DIFFERENT times per hand, not
+  cluster like this.
+- **2 real test-harness bugs found and fixed while trying to isolate
+  this on a single hand -- both worth remembering for any future live
+  test on this project's own chp/cp state.** (1) Resetting only
+  `chp.phase`/`chp.pendingClaimAt` between successive test runs on the
+  SAME hand left every OTHER field (`stoppingBaseElapsedMs`,
+  `stoppingDelayMs`, `tweenSegments`, etc.) stale from the PRIOR run --
+  confirmed live: a "fresh" test showed `phase: 'idle'` throughout (the
+  hold never actually armed) while simultaneously reporting a
+  `stoppingBaseElapsedMs` value that could only have come from the
+  PREVIOUS test's own leftover state. Fixed by `delete hand._chp.custom8`
+  (forcing `getOrInitHandCHP()` to build a genuinely fresh object) instead
+  of resetting individual fields by hand. (2) Neither of the 2 corrected,
+  cleanly-reset single-hand tests (hand 70, then hand 15) reproduced the
+  multi-hand test's own spike -- hand 70 measured smooth throughout a
+  700ms window spanning the equivalent decay period; hand 15's follow-up
+  crashed (`Cannot read properties of null (reading 'length')` on
+  `chp.tweenSegments.length`) before returning usable data, left
+  undiagnosed given the scale of live-testing effort already spent this
+  round and the prior one.
+- **UNRESOLVED, not abandoned: this discrepancy (multi-hand shows a real
+  anomaly, single-hand tests don't) is itself informative and worth
+  picking up directly in a future round**, rather than re-starting from
+  scratch. Concretely: build a live test that holds/releases `custom8`
+  globally (matching real usage) while logging, at EVERY tick (not just
+  a max-delta summary), the SHARED per-tick inputs
+  (`minD`/`maxD`/`range`, recomputed from all 156 real hands' actual
+  positions every `updateRenderOrder()` call) alongside each sampled
+  hand's own `stoppingDelayMs`/phase/rotation, to see whether the spike
+  correlates with a shift in the SHARED distance envelope (plausible,
+  since many hands transitioning together could shift the field's own
+  min/max distance basis that OTHER systems key off of) or with
+  something else entirely. Absent that, the standing recommendation
+  after 9 rounds without a conclusive repro stands: a real screen
+  recording from the user's own device, isolating the exact repro with
+  nothing else happening, remains the highest-value missing diagnostic.

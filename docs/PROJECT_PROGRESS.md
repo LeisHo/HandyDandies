@@ -18,6 +18,32 @@ work seamlessly from there.
 
 ## Currently working on
 
+**PAUSED, STILL UNRESOLVED 2026-09-28 (20th-21st rounds) -- "hands
+jump" investigation, 9th-10th rounds: a real anomaly found, not yet
+root-caused; multiple more real-world confirmations gathered, no
+further live testing for now.** Following up on the "test multiple
+hands" lead: live production testing found 6 of 9 sampled hands showing
+a synchronized ~10-15 deg rotation spike at the SAME tick during
+`custom8`'s post-release decay when held/released GLOBALLY (matching
+real usage, all 156 hands transitioning together) -- but 2 follow-up
+clean, fully-reset SINGLE-hand tests did not reproduce a comparable
+spike. A 3rd targeted test (an 8671ms hold, long enough to reach
+`'looping'` before release) confirmed 'stopping' correctly FREEZES in
+that case (0.57 deg drift over a full second) -- ruling OUT the
+tween-segment-boundary hypothesis for the looping case specifically. 2
+more real user logs then confirmed the symptom reproduces with a
+completely DIFFERENT interrupting trigger too (not just `custom7`'s
+Multi Trigger), ruling out anything specific to that one function. The
+live test harness itself proved fragile (2 state-contamination bugs
+found and fixed, a 3rd crash undiagnosed) -- further live probing was
+paused given the scale of effort already spent without a confirmed
+mechanism, not because the lead ran out. Next-best steps: either a more
+careful multi-hand harness that logs shared per-tick inputs alongside
+each hand's own rotation, or (the standing recommendation after 10
+rounds without a conclusive repro) a real screen recording from the
+user's own device. See CHANGELOG.txt's 20th/21st-round entries for full
+technical detail.
+
 **COMPLETE 2026-09-28 (19th round) -- Look-At Damping scope fix
 (shipped); "hands jump" investigation 7th-8th rounds STILL UNRESOLVED
 despite extensive live production instrumentation.** Look-At Damping

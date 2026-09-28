@@ -13502,6 +13502,99 @@ across several/all hands at once, not just hand 0.
 
 `main.js` cache-buster bumped `?v=240` -> `?v=241`.
 
+2026-09-28  -  (20th round -- "hands jump" investigation, 9th round:
+multi-hand vs. single-hand live testing, a real anomaly found but not
+root-caused; no code changes this round)
+
+User supplied 2 more fresh mouse+hand logs of the exact same repro
+(Click+Hold on `custom8`, release, then `custom7`'s Multi Trigger
+sub-trigger "Trigger 1" interrupting ~90-135 hands into pose "Fist").
+Following up on the prior round's "test multiple hands, not just one"
+lead: live-instrumented `custom8`'s GLOBAL hold+release (affecting all
+156 real hands simultaneously, matching real usage) against production,
+sampling 9 hands spread across the field. Result: 6 of 9 sampled hands
+showed a synchronized ~10-15 degree `rHand` bone rotation spike at the
+SAME tick (~471ms into the post-release decay) -- notably higher than
+their own surrounding per-tick motion (~2-6 deg), and suspicious
+specifically BECAUSE it clustered at the same tick across hands with
+different individual `stoppingDelayMs` decay-rate parameters (which
+should make a purely per-hand tween-segment-boundary effect land at
+DIFFERENT times per hand, not the same one).
+
+Attempted to isolate and confirm this on individual hands via clean,
+fully-reset single-hand tests (`delete hand._chp.custom8` before each
+run, not just resetting `.phase`, after finding the FIRST attempt was
+itself contaminated by leftover per-hand state from an earlier test on
+the same hand). Neither of 2 follow-up clean single-hand tests (hand 70,
+then hand 15) reproduced a comparable spike -- hand 70's rotation was
+smooth throughout a 700ms window spanning the equivalent decay period;
+hand 15's follow-up test crashed (`chp.tweenSegments` was null,
+un-diagnosed) before returning usable data.
+
+**Genuine, unresolved discrepancy, not a confirmed root cause:** the
+multi-hand test (custom8 held/released GLOBALLY, matching real usage)
+showed a real anomaly; single-hand tests (custom8 held/released for
+ONE hand only, all 155 others idle) did not. This is consistent with
+-- but does not prove -- a per-hand cross-talk mechanism that only
+manifests when many hands are simultaneously transitioning (a shared
+computation recomputed from the whole field's real-time state, not yet
+identified). Given the live test harness itself proved fragile (2
+state-contamination bugs found and fixed this round alone, a 3rd
+crash undiagnosed), and the scale of live-testing effort already spent
+across this and the prior round without a confirmed mechanism, this
+avenue was NOT pursued further this round. All test state was cleaned
+up on the live production app afterward (runtime-only chp/cp fields,
+never persisted to `dev-panel-settings.json`).
+
+**Recommendation for a future round:** either (a) a more robust,
+carefully-isolated live harness that logs the SHARED per-tick inputs
+(`minD`/`maxD`/`range`, every hand's own `stoppingDelayMs`/phase)
+alongside each hand's rotation, run across many hands at once with full
+per-tick resolution (not just max-delta summaries), to actually pin
+down what's shared/correlated at the spike moment; or (b) per this
+file's own long-standing recommendation, a real screen recording from
+the user's own device of the isolated repro remains the highest-value
+missing diagnostic, since 9 rounds of static tracing and live
+instrumentation combined have not conclusively reproduced a jump
+severe enough to explain the report.
+
+No code changes this round -- purely investigative. See CLAUDE.md's
+matching gotcha entry for the full technical detail.
+
+2026-09-28  -  (21st round -- "hands jump" investigation, 10th round:
+2 more real-world data points, no further live testing this round)
+
+User supplied 2 more real logs while the 20th round's writeup was still
+in progress. (1) A `custom8` hold of 8671ms (Double-Click+Hold gesture --
+`holdConfirmMs: 0` means any hold arms every enabled Click+Hold function
+regardless of its own configured ClickCount, per this file's own
+existing gotcha) -- long enough to complete a full 5000ms lap and reach
+`'looping'` before release. Live-tested this specific case directly:
+confirmed `chp.stoppingWasLooping = true` at release, and the `rHand`
+bone measured essentially frozen (0.57 deg drift) across a full second
+of the decay window that follows -- consistent with 'stopping's own
+"hold at release-moment pose" branch for the looping case, and RULING
+OUT the tween-segment-boundary hypothesis (from the 20th round's
+non-looping multi-hand anomaly) as an explanation for this specific
+scenario, since there's no progress-based movement happening here at
+all for it to apply to.
+
+(2) A separate `custom8` hold of 11127ms, this time interrupted by a
+COMPLETELY DIFFERENT trigger (labeled "CLICK", target pose "WAVE 4
+(NS)" -- not `custom7`/`custom7Trig1` at all) -- same "was mid-
+'stopping'" interruption pattern, same "many hands at once" shape. This
+rules out anything specific to `custom7`'s own Multi Trigger mechanism
+as the cause -- the symptom reproduces with ANY trigger interrupting
+`custom8` mid-'stopping', not just the one specific interrupting
+function tested in every prior round.
+
+No further live testing was done on these 2 new data points this round,
+given the scale of live-instrumentation effort already spent across the
+19th-20th rounds without a confirmed mechanism, and the test harness's
+own demonstrated fragility. Both are recorded here as additional
+evidence for whichever future round picks this investigation back up.
+No code changes this round.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a
