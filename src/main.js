@@ -10843,7 +10843,7 @@ function rebuildField() {
     // it explicitly: false until a hand's first REAL repose, forcing
     // exactly one guaranteed full sync regardless of the gate's other
     // conditions, then never forced again.
-    const hand = { wrapper, clone, skinnedMesh, outlineMesh, emissionMesh, wristClipPlane: handWristClipPlane, effectiveRenderOrder: 0, screenX: 0, screenY: 0, screenRadius: 0, currentBaseQuat: cloneBaseQuat.clone(), everReposed: false, currentSplayDeg: 0 }
+    const hand = { wrapper, clone, skinnedMesh, outlineMesh, emissionMesh, wristClipPlane: handWristClipPlane, effectiveRenderOrder: 0, screenX: 0, screenY: 0, screenRadius: 0, currentBaseQuat: cloneBaseQuat.clone(), everReposed: false, currentSplayDeg: 0, _handoffSettleFrames: 0 }
     // Also recomputes this hand's OWN Hide Wrist clip plane right before
     // it draws (see updateWristClipPlaneForHand()'s own comment) -- every
     // hand faces a different direction and (own material/plane now, see
@@ -11410,6 +11410,44 @@ function animate(dt, now) {
         hands.forEach((hand) => {
           const m = new THREE.Matrix4().lookAt(hand.wrapper.position, cursorTarget, UP)
           const desired = new THREE.Quaternion().setFromRotationMatrix(m)
+          // CORRECTED 2026-09-28 (5th round of this same jump investigation) --
+          // direct report, repeated and precise: with Retransition OFF the
+          // jump never happens; with it ON, a hand that was under click-
+          // function control visibly snaps its wrist/palm rotation the
+          // instant a NEW click interrupts its retransition/tween-stop, THEN
+          // continues smoothly (damping still visibly catching up afterward)
+          // -- confirmed happening on a real phone, not reproducible via this
+          // sandbox's own simulation despite extensive direct measurement
+          // (splay, base-quat, wrapper position/rotation all measured
+          // continuous across every boundary tested). Rather than continue
+          // guessing at which exact internal value is discontinuous, this
+          // decouples the HANDOFF's own smoothness from whatever
+          // `cfg.trackingDamping`/`store.mobile.trackingDamping`/
+          // `store.landscape.trackingDamping` (confirmed live in this
+          // project's own git-tracked settings: desktop 0.05, mobile 0.08,
+          // landscape 1 -- i.e. LANDSCAPE HAS ZERO SMOOTHING AT ALL) happens
+          // to be configured to -- a hand gets a guaranteed brief, gentle
+          // catch-up window the instant it stops being trigger-controlled,
+          // regardless of the device's own configured damping and
+          // regardless of which internal mechanism produced the underlying
+          // discontinuity. `hand._wasOverriddenLastFrame` (already tracked
+          // by updateRenderOrder(), read here BEFORE this same frame's own
+          // updateRenderOrder() call runs) is what actually flags "this hand
+          // was trigger-controlled as of last frame" -- reset the settle
+          // window every frame that's true, count it down otherwise. Safe
+          // by construction: this only ever makes the damping SLOWER
+          // (never faster) than what's configured, and only for a short,
+          // fixed window right at the handoff moment.
+          const HANDOFF_SETTLE_FRAMES = 24 // ~400ms at 60fps -- a deliberate, unmeasured judgment call, not derived from any specific timing measurement
+          const HANDOFF_SETTLE_DAMPING_CAP = 0.06 // close to this project's own desktop default (0.05) -- gentle, not sluggish
+          if (hand._wasOverriddenLastFrame) {
+            hand._handoffSettleFrames = HANDOFF_SETTLE_FRAMES
+          } else if (hand._handoffSettleFrames > 0) {
+            hand._handoffSettleFrames--
+          }
+          const effectiveTrackingDamping = (hand._handoffSettleFrames > 0)
+            ? Math.min(cfg.trackingDamping, HANDOFF_SETTLE_DAMPING_CAP)
+            : cfg.trackingDamping
           let baseDeg = cfg.palmFacesCursor ? computeRadialRollDeg(hand.wrapper.position, cursorTarget) : 0
           // Palm Rotation Distance Curve -- modulate cursor-tracking
           // responsiveness by distance (2026-09-24). At close distance,
@@ -11429,7 +11467,7 @@ function animate(dt, now) {
           // Whole-wrapper rotation only, same mechanism as the default mode;
           // no skeleton/pose involvement either way.
           desired.multiply(computeRollQuat(baseDeg))
-          hand.wrapper.quaternion.slerp(desired, cfg.trackingDamping)
+          hand.wrapper.quaternion.slerp(desired, effectiveTrackingDamping)
         })
       }
       const __uroStart = performance.now()
