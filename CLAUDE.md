@@ -1790,3 +1790,44 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   restructured what `desired` means throughout this whole block (renamed
   the old local `desired` to `lookAtDesired`, with a new `desired`
   variable now potentially equal to `hand.currentBaseQuat` instead).
+- **Reordering a control's own position in a DEV_GROUPS array does NOT
+  reliably change where it renders for a returning visitor -- devPanel.js's
+  own `applyOrder()` restores row/group order from the user's own
+  PREVIOUSLY-SAVED `rowKeys`/`order` snapshot, which takes precedence over
+  source array order.** Confirmed live 2026-09-28 (direct report: "the
+  Hold Conirm Delay is still at the bottom fo the Custom Click Functions
+  group" after a prior round had already moved it earlier in
+  `DEV_GROUPS`'s own source array): the real saved settings file's own
+  `order` data for "Custom Click Functions" still had `holdConfirmMs`
+  wherever the user's own EARLIER manual customization had left it, and
+  had NO entry at all for `multiClickWindowMs` (a 2nd control moved INTO
+  this group the same round -- it simply didn't exist in this group's
+  saved order yet, since it used to live under "Debug"). This is the
+  exact same class of gap `applyCustomFunctionReferenceLayout()` (see its
+  own comment) already exists to solve for custom-function rows --
+  `enforceCustomClickFunctionsAnchorOrder()` now does the same thing for
+  these 2 specific static rows, forcing them to the front AFTER
+  `applyOrder()`'s own restore has already run. **Any future request to
+  reorder an EXISTING (not brand-new) control within a group that the
+  user has ever manually customized needs this same explicit post-restore
+  DOM fixup -- changing the DEV_GROUPS array alone is not sufficient**,
+  and this applies doubly to moving a control BETWEEN 2 different groups
+  (the destination group's own saved order won't even have an entry for
+  it, and the source group's saved order references a row no longer
+  built there at all).
+- **A brand-new TOP-LEVEL DEV_GROUPS entry (not nested inside anything)
+  cannot have a user's manual drag-nest into another group persist across
+  reload -- it has no PRIOR entry in the user's own saved panel-order
+  snapshot for `applyOrder()` to restore that nesting from, so it reverts
+  to its own top-level position every time.** Confirmed live 2026-09-28
+  (direct report: "i tried nesting the RESPONSIVE ARM ROTATION group
+  soemwhere and it wont save" -- this was a group added earlier the SAME
+  round). Fixed by folding its controls directly into the DESTINATION
+  group's own source array instead of leaving it as a separate group the
+  user has to manually relocate -- eliminates the need for any drag/
+  persistence mechanism at all. **If a future request adds a new
+  top-level dev-panel group and the user later asks to move/nest it
+  elsewhere, prefer merging its controls into the target group's own
+  source array over relying on a manual drag to persist -- a drag-nest
+  only reliably persists for a group/row that already existed in a
+  PRIOR saved snapshot.**

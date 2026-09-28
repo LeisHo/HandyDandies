@@ -13043,6 +13043,83 @@ on, Tween Stop off) before finishing, never saved.
 
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
+--------------------------------------------------------------------------------
+2026-09-28  -  (15th round -- Debug-group diagnostics batch, direct request)
+
+1. **Mouse Tracking Log rewritten**: a Click+Hold is no longer folded into
+   the same "Drag-release...heldMs" bucket a real camera-pan drag uses
+   (direct correction: "a clickhold is not the same as a click"). A press
+   held past the hold threshold now logs 2 separate lines -- a
+   "...-start" the moment the hold is confirmed (while the button is
+   still down) and a matching "...-release" at pointerup -- never one
+   combined line. Every label also carries its own multi-click ordinal
+   prefix (Double-/Triple-/Quadruple-), computed from a single counter
+   shared between the hold-detection and quick-click paths so they never
+   disagree. "OrbitControls" removed from every label (an implementation
+   detail, not something the user did) -- a genuine drag is still called
+   "Camera Pan"/"Camera Zoom/Dolly", just without naming the library.
+
+2. **Hand Numbers** (Debug group): a plain on-screen 1-based number label
+   per hand, toggled by `handNumbersEnabled`, colored by the new
+   `handNumbersColor` picker right under it. A pooled set of plain HTML
+   divs, projected fresh from each hand's live `wrapper.position` every
+   frame (independent of `preventReorderFlash`'s own separate, only-
+   sometimes-computed screenX/screenY).
+
+3. **Hand Behaviour Log** (Debug group, new): a 2nd log, separate from
+   Mouse Tracking Log, that only fires at real trigger/commit/
+   interruption/retransition-start moments -- never a per-frame play-by-
+   play (direct scoping: "i dont need a log of every frame that the
+   cursor initiates a change... that should only occur when say a cursor
+   tracking sequence is triggered by a click, like in our bug"). Each
+   entry names the hand number, the specific function/mechanism that
+   fired it, and what changed (pose/tween name, or "interrupted <X>,
+   was mid-<phase>"). Instrumented at: forward-commit (both hold- and
+   pose-kind families), being force-released by a DIFFERENT function
+   (`releaseHandFromOtherFunctions()` -- the exact mechanism behind this
+   project's own long-running jump investigation), and every retransition-
+   start / Tween-Stop-decay-finished transition. Naming the triggering
+   mechanism directly (rather than a generic description, or a full
+   runtime stack trace) was confirmed near-zero extra cost, since these
+   are already hand-picked call sites -- see the control's own comment
+   for the reasoning given before building it.
+
+4. **Responsive Arm Rotation moved into Cursor Tracking** (direct report:
+   "i tried nesting the RESPONSIVE ARM ROTATION group soemwhere and it
+   wont save"). Root cause: it was a brand-new top-level DEV_GROUPS entry
+   with no prior position in the user's own saved panel-order snapshot,
+   so a manual drag-nest always reverted on reload. Folded its 4 controls
+   directly into Cursor Tracking's own array instead (positioned above
+   Palm Rotation) -- no drag/persistence needed at all now.
+
+5. **Real bug found and fixed: Hold Confirm Delay / Rolling Click Window
+   not actually at the top of "Custom Click Functions"** despite last
+   round's source reorder (direct report). Confirmed by direct inspection
+   of the real saved settings: devPanel.js's own `applyOrder()` restores
+   row order from the user's own previously-saved `rowKeys` snapshot,
+   which takes precedence over DEV_GROUPS array order -- the snapshot
+   still had `holdConfirmMs` wherever the user's own earlier customization
+   left it, and no entry at all for `multiClickWindowMs` (which lived
+   under "Debug" when that snapshot was captured). New
+   `enforceCustomClickFunctionsAnchorOrder()`, called right after
+   `applyOrder()`'s own restore, forces both rows to the front
+   unconditionally, the same class of fix `applyCustomFunctionReferenceLayout()`
+   already applies to custom-function rows.
+
+6. **Custom-function/Multi-Trigger layout: every flat row now precedes
+   every subgroup** (direct report: "i see individual setitngs in
+   between groups"). `CUSTOM_FUNCTION_POSE_LAYOUT`/`CUSTOM_FUNCTION_HOLD_LAYOUT`
+   reordered so Offset/Rotation/Animation Speed Curve/etc. all sit after
+   every plain setting, not interleaved with Loop/Sequence rows the way
+   last round's reorder left them.
+
+Verified: `node --check src/main.js` passes throughout. Not yet live-
+tested this round (pushed for verification against the deployed build).
+
+`main.js` cache-buster bumped `?v=235` -> `?v=236`.
+
+================================================================================
+APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a
 correction, add a new entry noting the correction rather than editing the
 old one in place.

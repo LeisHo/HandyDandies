@@ -178,6 +178,20 @@ const MOUSE_LOG_MAX_ENTRIES = 200
 const mouseTrackingLogEntries = []
 let mouseTrackingLogEl = null
 let cursorLogTimer = null
+// Hand Behaviour Log's own state (2026-09-28, direct request) -- same
+// shape as Mouse Tracking Log's own state directly above, kept
+// completely separate since the 2 logs serve different purposes and are
+// gated by their own independent checkboxes (see logHandBehaviourEvent()'s
+// own comment for what actually gets logged here).
+const HAND_BEHAVIOUR_LOG_MAX_ENTRIES = 200
+const handBehaviourLogEntries = []
+let handBehaviourLogEl = null
+// Hand Numbers overlay's own state (2026-09-28, direct request) -- a pool
+// of plain HTML label divs, one per hand, built lazily on first enable
+// and reused thereafter (never rebuilt just because the checkbox toggled
+// off then on again) -- see updateHandNumberLabels()'s own comment.
+let handNumberLabelsEl = null
+let handNumberLabelEls = []
 // Ported from TEMPLATE_DEV_PANEL.html's own [JS-13c] Mouse Log (2026-09-14
 // port round, direct request: "I updated the Dev Panel Template to have a
 // mouse log system similar to ours. Update ours to match the template if
@@ -231,7 +245,19 @@ let cursorLogTimer = null
 // matching this constant exactly -- kept as a comment for context, not an
 // active per-slider check anyone still needs to make.
 const MOUSE_LOG_HELD_DRAG_MS = 500
-let mouseLogClickCount = 0
+// CORRECTED 2026-09-28 -- replaces the old release-time-only
+// mouseLogClickCount. Incremented at PRESS time now (not release), so
+// the hold-detection timer below (which fires WHILE a button is still
+// down, before release) and the quick-click debounce path both read the
+// exact same chain position for the same press -- see the pointerdown/
+// pointerup rewrite's own comment for the full reasoning (direct
+// request: "a clickhold is not the same as a click... differentiate
+// between a click, clickhold, as well as multi click/multiclick holds").
+let mouseLogChainCount = 0
+let mouseLogChainResetTimer = null
+let mouseLogHoldTimer = null
+let mouseLogHoldLogged = false
+let mouseLogHoldOrdinalAtPress = 0
 let mouseLogClickTimer = null
 let mouseLogPendingClick = null
 let mouseLogDownInfo = null
@@ -545,6 +571,22 @@ const DEV_GROUPS = [
       // anymore (see that function's own 2026-09-14 correction comment).
       { key: 'targetDepthFactor', label: 'Cursor Target Depth (x Field Radius)', type: 'slider', min: -2, max: 2, step: 0.05, def: 0.6, perDevice: true },
       { key: 'showTargetMarker', label: 'Show Target Marker', type: 'checkbox', def: false, perDevice: true, onChange: (v) => { if (targetMarker) targetMarker.visible = v } },
+      // MOVED here 2026-09-28 (direct request: "i tried nesting the
+      // RESPONSIVE ARM ROTATION group somewhere and it wont save. So can
+      // you place it in the HANDS > CURSOR TRACKING group") -- was
+      // previously its own separate top-level DEV_GROUPS entry; a
+      // brand-new top-level group has no prior entry in the user's own
+      // saved panel-order snapshot to restore a manual drag-nest into, so
+      // it kept reverting to its own top-level position on reload. Folding
+      // it directly into Cursor Tracking's own controls array here means
+      // it just renders in this exact position by construction, with no
+      // drag/persistence needed at all. See animate()'s own cursor-
+      // tracking block for what these 4 controls actually gate, and
+      // buildArmRotationWidgets() for the curve-graph/range-slider UI.
+      { key: 'armRotationEnabled', label: 'Responsive Arm Rotation (Master On/Off)', type: 'checkbox', def: true, perDevice: true },
+      { key: 'armRotationCurveEnabled', label: 'Arm Rotation Distance Curve On/Off', type: 'checkbox', def: false, onChange: () => updateArmRotationGateVisibility() },
+      { key: 'armRotationCurve', label: 'Arm Rotation Distance Curve (Distance -> Rotation Amount)', type: 'text', def: '[{"x":0,"y":1},{"x":1,"y":1}]', onChange: () => parseCursorTrackingConfig() },
+      { key: 'armRotationRange', label: 'Min / Max Arm Rotation (Deg)', type: 'text', def: '{"min":0,"max":180}', onChange: () => parseCursorTrackingConfig() },
       // REDEFINED 2026-09-14 (see computeRadialRollDeg()'s own comment
       // for the full account and the user's own exact reference points):
       // rotates each hand, around the wrist-crop-plane axis, by the
@@ -574,35 +616,6 @@ const DEV_GROUPS = [
       { key: 'palmFacesCursorDistanceCurveEnabled', label: 'Palm Rotation Distance Curve On/Off', type: 'checkbox', def: false, onChange: () => updateCursorTrackingGateVisibility() },
       { key: 'palmFacesCursorDistanceCurve', label: 'Palm Rotation Distance Curve (Distance -> Responsiveness)', type: 'text', def: '[{"x":0,"y":1},{"x":1,"y":1}]', onChange: () => parseCursorTrackingConfig() },
       { key: 'palmFacesCursorDistanceRange', label: 'Min / Max Palm Rotation (Deg)', type: 'text', def: '{"min":0,"max":180}', onChange: () => parseCursorTrackingConfig() }
-    ]
-  },
-  {
-    // Added 2026-09-28, direct request/bug report: "It looks like the
-    // hand models are somewhat leaning towards the cursor... I want you
-    // to separate it from the Enabled Tracking checkbox itself... When
-    // all other functions (Palm Rotation, Wrist Splay, Wrist Cropping,
-    // Arm/Hand rotation) are turned off, turning the Tracking Enabled
-    // checkbox on and off should not have any visual change." Root cause:
-    // the actual "hand orients toward the cursor" lookAt+slerp in
-    // animate() was gated ONLY by `trackingEnabled` itself, with no
-    // separate on/off of its own -- exactly the "leaning" effect the
-    // report describes, always on whenever the master gate is, unrelated
-    // to whether Palm Rotation/Wrist Splay/Wrist Cropping are individually
-    // enabled or not. This group makes that rotation its own named,
-    // independently-toggleable feature (default ON, so existing behavior
-    // is unchanged until the user explicitly turns it off), with the same
-    // distance-curve + min/max-range shape every other Responsive-*
-    // feature in this file already has -- see animate()'s own cursor-
-    // tracking block for exactly how the curve/range bound the rotation's
-    // own angular magnitude (never its direction), and buildArmRotationWidgets()
-    // for the curve-graph/range-slider UI (same builders Wrist Splay/Palm
-    // Rotation already use).
-    title: 'Responsive Arm Rotation',
-    controls: [
-      { key: 'armRotationEnabled', label: 'Responsive Arm Rotation (Master On/Off)', type: 'checkbox', def: true, perDevice: true },
-      { key: 'armRotationCurveEnabled', label: 'Arm Rotation Distance Curve On/Off', type: 'checkbox', def: false, onChange: () => updateArmRotationGateVisibility() },
-      { key: 'armRotationCurve', label: 'Arm Rotation Distance Curve (Distance -> Rotation Amount)', type: 'text', def: '[{"x":0,"y":1},{"x":1,"y":1}]', onChange: () => parseCursorTrackingConfig() },
-      { key: 'armRotationRange', label: 'Min / Max Arm Rotation (Deg)', type: 'text', def: '{"min":0,"max":180}', onChange: () => parseCursorTrackingConfig() }
     ]
   },
   {
@@ -1523,7 +1536,33 @@ const DEV_GROUPS = [
       // otherwise would spam the display every frame.
       { key: 'logCursorPositionEnabled', label: 'Log Regular Cursor Position', type: 'checkbox', def: false, onChange: () => restartCursorLogTimer() },
       { key: 'cursorLogIntervalMs', label: 'Cursor Position Log Interval (Ms)', type: 'slider', min: 100, max: 5000, step: 50, def: 1000, onChange: () => restartCursorLogTimer() },
-      { key: 'clearMouseLogBtn', label: 'Clear Mouse Tracking Log', type: 'button', onClick: () => clearMouseTrackingLog() }
+      { key: 'clearMouseLogBtn', label: 'Clear Mouse Tracking Log', type: 'button', onClick: () => clearMouseTrackingLog() },
+      // Added 2026-09-28, direct request: "denotes which is the 1st hand
+      // and 2nd hand etc etc so i can refer to them." A plain on-screen
+      // number overlay per hand (1-based) -- see updateHandNumberLabels()
+      // for the actual rendering (a pool of absolutely-positioned HTML
+      // divs, kept out of devPanel.js's own DOM, projected fresh every
+      // frame from each hand's real wrapper.position -- independent of
+      // `preventReorderFlash`'s own separate screenX/screenY, which only
+      // ever computes when THAT checkbox is on).
+      { key: 'handNumbersEnabled', label: 'Hand Numbers', type: 'checkbox', def: false },
+      { key: 'handNumbersColor', label: 'Hand Numbers Color', type: 'color', def: '#ffffff' },
+      // Added 2026-09-28, direct request: a log distinct from Mouse
+      // Tracking Log above, specifically for "when a click function that
+      // triggers the hands in some way is initiated... I want to know
+      // what it tweened from and to." Deliberately NOT a per-frame/per-
+      // pose play-by-play (direct follow-up: "i dont need a log of every
+      // frame that the cursor initiates a change... that should only
+      // occur when say a cursor tracking sequence is triggered by a
+      // click, like in our bug") -- only fires at real trigger/commit/
+      // release moments, see logHandBehaviourEvent()'s own call sites for
+      // exactly which. Each entry also names the specific function/
+      // mechanism that fired it (direct request, confirmed near-zero
+      // extra cost since these call sites are hand-picked already -- see
+      // this control's own surrounding discussion) rather than a generic
+      // description alone.
+      { key: 'logHandBehaviourEnabled', label: 'Log Hand Behaviour', type: 'checkbox', def: false },
+      { key: 'clearHandBehaviourLogBtn', label: 'Clear Hand Behaviour Log', type: 'button', onClick: () => clearHandBehaviourLog() }
     ]
   }
 ]
@@ -1613,7 +1652,7 @@ const cfg = initDevPanel(DEV_GROUPS, {
   // declaration comment) -- the field now only ever builds once, using
   // these real values, instead of building once with code defaults and
   // visibly rebuilding again the moment this fires.
-  onRestore: () => { logStartupTiming('onRestore fired -> startupSettingsReady = true'); migrateModeTweenToSequence(); resyncPoseDefaultValues(); restoreCustomClickFunctions(); startupSettingsReady = true; tryStartField() },
+  onRestore: () => { logStartupTiming('onRestore fired -> startupSettingsReady = true'); migrateModeTweenToSequence(); resyncPoseDefaultValues(); restoreCustomClickFunctions(); enforceCustomClickFunctionsAnchorOrder(); startupSettingsReady = true; tryStartField() },
   // Delete-function button (direct spec item) -- devPanel.js's own
   // existing Delete Group/Setting (🗑) icon already lets a real user
   // remove a Custom Click Function's whole group from the panel; the
@@ -1713,6 +1752,7 @@ updateArmRotationGateVisibility()
 // a TDZ ReferenceError. See the matching setup call placed right after
 // that const's own declaration instead.
 buildMouseTrackingLogWidget()
+buildHandBehaviourLogWidget()
 restartCursorLogTimer()
 setupSettingsChangeLog()
 
@@ -1891,85 +1931,112 @@ window.addEventListener('pointermove', (e) => {
 // see its own setup comment) is what actually responds to it; there is no
 // OTHER click-triggered interaction in this app yet (no clickable hands).
 //
-// Extended 2026-09-14 (template-parity port, see this file's own module-
-// level Mouse Log state comment) to classify what the template's own
-// version distinguishes: multi-click (double/triple, same button, within
-// MOUSE_LOG_MULTICLICK_MS) and drag-release (held past
-// MOUSE_LOG_HELD_DRAG_MS, or moved past a small threshold, before
-// release) -- both computed at pointerUP now, since neither is knowable
-// at pointerdown time. `describeTrigger()` factored out unchanged from
-// the original single-listener version so pointerup can reuse the exact
-// same trigger logic pointerdown used to run inline.
+// REWRITTEN 2026-09-28 -- direct request: "make a log entry for both the
+// click hold, as well as the release. so they are 2 separate entries. and
+// stop labeling any click drag as OrbitControls" + "the mouse log should
+// also differentiate between a click, clickhold, as well as multi click/
+// multiclick holds... a clickhold is not the same as a click." A
+// Click+Hold is now a GENUINELY DIFFERENT logged category from a Click,
+// not a "Click"/"Drag-release" label with a heldMs number attached --
+// and it produces 2 separate log lines (a "...-start" the moment the
+// hold is confirmed, WHILE the button is still down, and a matching
+// "...-release" at pointerup), never one combined line.
 //
-// CORRECTED 2026-09-15, direct user report ("how come clicks are logging
-// as Pans even though its just a click, not even a click hold drag") --
-// this always described button 0/1/2 as "Camera Pan"/"Camera Zoom/Dolly
-// (OrbitControls, X-drag)" regardless of whether a drag actually
-// happened, because it was called ONCE per pointerup, before click-vs-
-// drag was even classified, and every call site (including the genuine
-// "Click at"/"Double-click at" ones) reused that same drag-worded
-// string. A plain click that never moved and wasn't held never actually
-// panned/zoomed anything -- OrbitControls only acts on continued
-// pointermove while a button is down. Now takes `wasDrag` (computed by
-// the caller, which already knows heldMs/moved by the time it calls
-// this) and only uses the Camera Pan/Zoom-Dolly wording when a drag
-// genuinely occurred; a plain click is described by button alone.
-function describeMouseLogTrigger(e, wasDrag) {
-  const inPanel = !!e.target?.closest?.('.dp-panel')
-  if (inPanel) return 'Dev Panel interaction'
-  if (!wasDrag) {
-    if (e.button === 0) return 'Canvas (Left Click)'
-    if (e.button === 1) return 'Canvas (Middle Click)'
-    if (e.button === 2) return 'Canvas (Right Click)'
-    return `Unhandled button ${e.button}`
-  }
-  if (e.button === 1) return 'Camera Zoom/Dolly (OrbitControls, middle-drag)'
-  if (e.button === 0 || e.button === 2) return `Camera Pan (OrbitControls, ${e.button === 0 ? 'left' : 'right'}-drag)`
-  return `Unhandled button ${e.button}`
-}
+// `mouseLogChainCount` (module-level, see its own declaration) is
+// incremented at PRESS time now, not release -- the hold-confirm timer
+// below fires WHILE a button is still down, before release, so it needs
+// this hand's own chain position (1st/2nd/3rd/4th rapid press) available
+// before release ever happens. The quick-click debounce path (bottom of
+// pointerup) reads the SAME counter, so a press that becomes a hold and
+// a press that stays quick never disagree about which ordinal they were.
+//
+// "OrbitControls" is gone from every label -- it's an implementation
+// detail, not something the user did. A genuine drag (real cursor
+// movement while held, released before the hold-confirm threshold) is
+// still labeled "Camera Pan"/"Camera Zoom/Dolly" since that's really
+// what it does, just without naming the library. A press that's held
+// past the threshold WITHOUT moving is no longer folded into that same
+// "drag" bucket at all -- it's "Click+Hold" (or "Right-Click+Hold" etc.),
+// since that's the actual gesture a Click+Hold custom function responds
+// to, and mislabeling it as a camera pan (which OrbitControls never
+// actually performed, since nothing moved) was directly misleading when
+// correlating this log against the Hand Behaviour Log below.
 const MOUSE_LOG_MOVE_THRESHOLD_PX = 10
+function mouseLogOrdinalPrefix(n) { return n >= 4 ? 'Quadruple-' : n === 3 ? 'Triple-' : n === 2 ? 'Double-' : '' }
+function mouseLogButtonWord(button) { return button === 2 ? 'Right-' : button === 1 ? 'Middle-' : '' }
+// `target` isn't guaranteed to be an Element (e.g. `document` itself, has
+// no `.closest()`) -- confirmed live as a real crash while testing with a
+// synthetic event dispatched directly on `document`; harmless guard.
+function describeMouseLogContext(target) { return target?.closest?.('.dp-panel') ? 'Dev Panel interaction' : 'Canvas' }
 window.addEventListener('pointerdown', (e) => {
   mouseLogDownInfo = { time: performance.now(), x: e.clientX, y: e.clientY, button: e.button, target: e.target }
+  mouseLogChainCount++
+  clearTimeout(mouseLogChainResetTimer)
+  mouseLogHoldLogged = false
+  mouseLogHoldOrdinalAtPress = mouseLogChainCount
+  clearTimeout(mouseLogHoldTimer)
+  mouseLogHoldTimer = setTimeout(() => {
+    const down = mouseLogDownInfo
+    if (!down) return // already released before the hold threshold -- nothing to log here
+    mouseLogHoldLogged = true
+    // This press just became a hold -- cancel any pending quick-click
+    // line still waiting on it (the debounce below), since it's a
+    // Click+Hold now, not a Click.
+    clearTimeout(mouseLogClickTimer)
+    mouseLogPendingClick = null
+    const label = `${mouseLogOrdinalPrefix(mouseLogHoldOrdinalAtPress)}${mouseLogButtonWord(down.button)}Click+Hold`
+    logMouseTrackingEvent(`${label}-start at (${Math.round(down.x)}, ${Math.round(down.y)}) -> ${describeMouseLogContext(down.target)}`)
+  }, MOUSE_LOG_HELD_DRAG_MS)
 })
 window.addEventListener('pointerup', (e) => {
+  clearTimeout(mouseLogHoldTimer)
   const down = mouseLogDownInfo
   mouseLogDownInfo = null
   const x = Math.round(e.clientX), y = Math.round(e.clientY)
   const heldMs = down ? Math.round(performance.now() - down.time) : 0
   const moved = down ? Math.hypot(e.clientX - down.x, e.clientY - down.y) > MOUSE_LOG_MOVE_THRESHOLD_PX : false
-  const wasDrag = !!(down && (heldMs > MOUSE_LOG_HELD_DRAG_MS || moved))
-  // `e.target` isn't guaranteed to be an Element (e.g. `document` itself,
-  // which has no `.closest()`) -- confirmed live as a real crash while
-  // testing with a synthetic event dispatched directly on `document`; a
-  // genuine user click always targets a real element in practice, but the
-  // optional-chaining guard costs nothing and removes the failure mode
-  // entirely rather than relying on that always being true.
-  const trigger = describeMouseLogTrigger(down ? { target: down.target, button: down.button } : e, wasDrag)
-  // A quick right-click (not dragged) still gets its own distinct,
-  // immediate "Right-click at" line, same as before -- only a GENUINE
-  // right-drag now falls through to the shared Drag-release branch below
-  // (previously every right button release said "-drag" even when
-  // nothing was dragged, and a real right-drag was mislabeled the other
-  // way, as a plain "Right-click").
-  if (down && down.button === 2 && !wasDrag) {
-    logMouseTrackingEvent(`Right-click at (${x}, ${y}) -> ${trigger}`)
+  // Resets the shared chain counter after a real gap in activity, same
+  // debounce feel as the old release-time reset, just scheduled from
+  // release instead of press (harmless either way -- this only matters
+  // once nothing has happened for a whole multiClickWindowMs).
+  clearTimeout(mouseLogChainResetTimer)
+  mouseLogChainResetTimer = setTimeout(() => { mouseLogChainCount = 0 }, cfg.multiClickWindowMs)
+
+  if (mouseLogHoldLogged) {
+    // A "...-start" line already exists for this exact press (logged
+    // above, while the button was still down) -- its own separate,
+    // matching Release, never combined into one line the way a
+    // "Drag-release...heldMs" used to be.
+    const label = `${mouseLogOrdinalPrefix(mouseLogHoldOrdinalAtPress)}${mouseLogButtonWord(down ? down.button : 0)}Click+Hold`
+    logMouseTrackingEvent(`${label}-release at (${x}, ${y}) -> ${describeMouseLogContext(down ? down.target : e.target)} (heldMs:${heldMs})`)
     return
   }
-  if (wasDrag) {
-    logMouseTrackingEvent(`Drag-release at (${x}, ${y}) -> ${trigger} (heldMs:${heldMs})`)
+  if (moved) {
+    // Genuine cursor movement while held, released before the hold
+    // threshold ever fired -- a real camera interaction, never a click.
+    const label = down && down.button === 1 ? 'Camera Zoom/Dolly (middle-drag)' : `Camera Pan (${down && down.button === 2 ? 'right' : 'left'}-drag)`
+    logMouseTrackingEvent(`Drag-release at (${x}, ${y}) -> ${label} (heldMs:${heldMs})`)
     return
   }
-  // Quick click, left or middle button -- debounced into single/double/
-  // triple the same way the template's own version does, so a rapid
-  // double-click doesn't log as 2 separate unrelated clicks.
-  mouseLogClickCount++
-  mouseLogPendingClick = { x, y, trigger }
+  if (down && down.button === 2) {
+    // Quick right-click -- its own immediate line (no debounce, same as
+    // before), now carrying the shared ordinal prefix too (a rapid
+    // double-right-click reads as "Double-Right-Click").
+    logMouseTrackingEvent(`${mouseLogOrdinalPrefix(mouseLogHoldOrdinalAtPress)}Right-Click at (${x}, ${y}) -> ${describeMouseLogContext(down.target)}`)
+    return
+  }
+  // Plain quick left/middle click -- still debounced (wait out the rest
+  // of the multi-click window before writing ONE resolved line, so a
+  // rapid double-click never ALSO logs a separate "Click" line for its
+  // own 1st press), using the SAME press-time chain counter the hold
+  // path above already used.
+  const ord = mouseLogHoldOrdinalAtPress
+  const ctx = describeMouseLogContext(down ? down.target : e.target)
+  mouseLogPendingClick = { x, y, ord, ctx }
   clearTimeout(mouseLogClickTimer)
   mouseLogClickTimer = setTimeout(() => {
-    const kind = mouseLogClickCount >= 3 ? 'Triple-click' : mouseLogClickCount === 2 ? 'Double-click' : 'Click'
     const p = mouseLogPendingClick
-    if (p) logMouseTrackingEvent(`${kind} at (${p.x}, ${p.y}) -> ${p.trigger}`)
-    mouseLogClickCount = 0
+    if (p) logMouseTrackingEvent(`${mouseLogOrdinalPrefix(p.ord)}Click at (${p.x}, ${p.y}) -> ${p.ctx}`)
     mouseLogPendingClick = null
   }, cfg.multiClickWindowMs)
 })
@@ -2098,6 +2165,167 @@ function buildMouseTrackingLogWidget() {
   wrap.appendChild(mouseTrackingLogEl)
   body.appendChild(wrap)
   logMouseLogViewportContext('start')
+}
+// Hand Behaviour Log (Debug group, 2026-09-28) -- direct request: "when a
+// click function that triggers the hands in some way is initiated... I
+// want to know what it tweened from and to... This data will work in
+// conjunction with the Mouse Tracking Log, so i can see exactly when my
+// click triggers this snap." Deliberately NOT a per-frame play-by-play
+// (direct follow-up: "i dont need a log of every frame that the cursor
+// initiates a change in the hand position... that should only occur when
+// say a cursor tracking sequence is triggered by a click, like in our
+// bug") -- only ever called from the small, hand-picked set of real
+// trigger/commit/retransition-start/release call sites (see each call
+// site's own comment for exactly which moment it represents), never from
+// inside a per-frame loop. Each entry also names the specific function/
+// mechanism that logged it (direct request, confirmed near-zero extra
+// cost over the plain description alone, since these call sites are
+// already individually chosen -- a full runtime stack trace was
+// considered and rejected as the expensive alternative: it would only
+// ever show this same small set of call sites from the inside, adding
+// noise, not information). Same MAX_ENTRIES-capped array + `<pre>` widget
+// shape as Mouse Tracking Log above, kept as a fully separate log/state
+// pair since the 2 serve different purposes and have their own
+// independent on/off checkboxes.
+// Resolves a trigger prefix (`p`, e.g. "custom8") to whatever title is
+// ACTUALLY currently shown for it in the dev panel -- per direct
+// instruction ("always ALWAYS use the setting and group names that i
+// set, never used the same old hardbaked names since i dont know
+// those"), reads the LIVE rendered group title text (which already
+// reflects any textOverrides rename) rather than the internal id or the
+// hardcoded default title. Falls back to the raw prefix only if the
+// group genuinely isn't in the DOM for some reason (never normally true
+// for a hand actively being logged, since it had to be triggered through
+// a real, currently-registered function to get here).
+function handLogTriggerLabel(p) {
+  const g = document.querySelector(`.dp-group[data-custom-function-id="${p}"], .dp-group[data-multi-trigger-prefix="${p}"]`)
+  const titleEl = g ? g.querySelector(':scope > .dp-group-header .dp-group-title-text') : null
+  return (titleEl && titleEl.textContent.trim()) || p
+}
+function logHandBehaviourEvent(handIndex, source, text) {
+  if (!cfg.logHandBehaviourEnabled) return
+  const line = `[${new Date().toLocaleTimeString()}] Hand ${handIndex + 1}: ${source} -- ${text}`
+  handBehaviourLogEntries.push(line)
+  if (handBehaviourLogEntries.length > HAND_BEHAVIOUR_LOG_MAX_ENTRIES) handBehaviourLogEntries.shift()
+  if (handBehaviourLogEl) {
+    handBehaviourLogEl.textContent = handBehaviourLogEntries.join('\n')
+    handBehaviourLogEl.scrollTop = handBehaviourLogEl.scrollHeight
+  }
+}
+function clearHandBehaviourLog() {
+  handBehaviourLogEntries.length = 0
+  if (handBehaviourLogEl) handBehaviourLogEl.textContent = ''
+}
+// Same widget shape as buildMouseTrackingLogWidget() directly above
+// (Copy/Save/Clear + a scrolling `<pre>`), appended right after it in the
+// SAME "Debug" group body -- deliberately duplicated rather than
+// abstracted into a shared helper, matching this file's own established
+// convention of NOT forking/generalizing a one-off UI pattern used only
+// twice (see this project's own CLAUDE.md file-map note on devPanel.js
+// for the same reasoning applied to the generic engine itself).
+function buildHandBehaviourLogWidget() {
+  const body = document.querySelector('.dp-group[data-key="Debug"] .dp-group-body')
+  if (!body) return
+  const wrap = elLocal('div', { padding: '4px 6px' })
+  const headerRow = elLocal('div', { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3px' })
+  const label = elLocal('div', { fontSize: '11px', opacity: '0.85' }, { text: 'Hand Behaviour Log' })
+  const copyBtn = elLocal('button', {
+    fontSize: '10px', padding: '2px 8px', background: '#3a3a4a', color: 'inherit',
+    border: 'none', borderRadius: '4px', cursor: 'pointer'
+  }, { text: 'Copy', type: 'button' })
+  const saveBtn = elLocal('button', {
+    fontSize: '10px', padding: '2px 8px', background: '#3a3a4a', color: 'inherit',
+    border: 'none', borderRadius: '4px', cursor: 'pointer'
+  }, { text: 'Save', type: 'button' })
+  const clearBtn = elLocal('button', {
+    fontSize: '10px', padding: '2px 8px', background: '#3a3a4a', color: 'inherit',
+    border: 'none', borderRadius: '4px', cursor: 'pointer'
+  }, { text: 'Clear', type: 'button' })
+  headerRow.appendChild(label)
+  const btnRow = elLocal('div', { display: 'flex', gap: '4px' })
+  btnRow.appendChild(copyBtn)
+  btnRow.appendChild(saveBtn)
+  btnRow.appendChild(clearBtn)
+  headerRow.appendChild(btnRow)
+  handBehaviourLogEl = elLocal('pre', {
+    height: '110px', overflowY: 'auto', margin: '0', padding: '4px 6px',
+    background: 'rgba(255,255,255,0.06)', borderRadius: '4px', fontSize: '10px',
+    whiteSpace: 'pre-wrap', wordBreak: 'break-word'
+  })
+  copyBtn.addEventListener('click', () => {
+    const flash = (msg) => { const orig = copyBtn.textContent; copyBtn.textContent = msg; setTimeout(() => { copyBtn.textContent = orig }, 900) }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(handBehaviourLogEntries.join('\n')).then(() => flash('Copied!')).catch(() => flash('Copy failed'))
+    } else {
+      flash('Copy failed')
+    }
+  })
+  saveBtn.addEventListener('click', () => {
+    const flash = (msg) => { const orig = saveBtn.textContent; saveBtn.textContent = msg; setTimeout(() => { saveBtn.textContent = orig }, 900) }
+    const blob = new Blob([handBehaviourLogEntries.join('\n')], { type: 'text/plain' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    const stamp = new Date().toISOString().replace(/[:.]/g, '-')
+    a.href = url
+    a.download = `hand-behaviour-log-${stamp}.txt`
+    document.body.appendChild(a)
+    a.click()
+    a.remove()
+    URL.revokeObjectURL(url)
+    flash('Saved!')
+  })
+  clearBtn.addEventListener('click', () => clearHandBehaviourLog())
+  wrap.appendChild(headerRow)
+  wrap.appendChild(handBehaviourLogEl)
+  body.appendChild(wrap)
+}
+// Hand Numbers overlay (Debug group, 2026-09-28) -- direct request: "a
+// numeric label is shown on each hand on screen. It just denotes which is
+// the 1st hand and 2nd hand etc etc so i can refer to them." A pool of
+// plain HTML divs (position:fixed, pointer-events:none), grown once to
+// match `hands.length` and reused thereafter -- projected fresh from each
+// hand's own live `wrapper.position` every call, independent of
+// `preventReorderFlash`'s own separate screenX/screenY (that one only
+// computes when THAT checkbox is on; this needs its own numbers
+// regardless of that unrelated debug feature's state). Called
+// unconditionally from animate(), every frame, regardless of Global
+// Pause -- a frozen frame's own hand numbers should still show correctly.
+const _handNumberProjectScratch = new THREE.Vector3()
+function updateHandNumberLabels() {
+  if (!cfg.handNumbersEnabled) {
+    if (handNumberLabelsEl) handNumberLabelsEl.style.display = 'none'
+    return
+  }
+  if (!handNumberLabelsEl) {
+    handNumberLabelsEl = elLocal('div', {
+      position: 'fixed', top: '0', left: '0', width: '100%', height: '100%',
+      pointerEvents: 'none', zIndex: '50', overflow: 'hidden'
+    })
+    document.body.appendChild(handNumberLabelsEl)
+  }
+  handNumberLabelsEl.style.display = ''
+  const canvasRect = renderer.domElement.getBoundingClientRect()
+  while (handNumberLabelEls.length < hands.length) {
+    const el = elLocal('div', {
+      position: 'absolute', transform: 'translate(-50%, -50%)', fontSize: '12px', fontWeight: 'bold',
+      textShadow: '0 0 3px #000, 0 0 3px #000, 0 0 3px #000', whiteSpace: 'nowrap'
+    })
+    handNumberLabelsEl.appendChild(el)
+    handNumberLabelEls.push(el)
+  }
+  const color = cfg.handNumbersColor || '#ffffff'
+  hands.forEach((hand, i) => {
+    const el = handNumberLabelEls[i]
+    _handNumberProjectScratch.copy(hand.wrapper.position).project(camera)
+    // Behind the camera or outside its near/far range -- don't show a
+    // number floating at a stale screen position for an off-screen hand.
+    if (_handNumberProjectScratch.z < -1 || _handNumberProjectScratch.z > 1) { el.style.display = 'none'; return }
+    el.style.display = ''
+    el.style.left = (canvasRect.left + (_handNumberProjectScratch.x * 0.5 + 0.5) * canvasRect.width) + 'px'
+    el.style.top = (canvasRect.top + (-_handNumberProjectScratch.y * 0.5 + 0.5) * canvasRect.height) + 'px'
+    el.style.color = color
+    el.textContent = String(i + 1)
+  })
 }
 // Logs every dev-panel setting change (which control, and the value it was
 // set to) -- direct follow-up request: "if i click a settings in the dev
@@ -6736,6 +6964,7 @@ function beginTweenReleaseStop(hand, chp, trig, p, values, live, minLiveDist, li
   chp.phase = 'retransition'
   chp.releasePending = false
   snapshotOffsetRotationAccumForRetransition(hand, chp)
+  logHandBehaviourEvent(hands.indexOf(hand), handLogTriggerLabel(p), 'retransition begins -> default')
 }
 // Multi-sequence-plus-hold chain builder (direct spec item, the vaguest
 // one-line entry in the original A-L spec -- no detail on exact chaining
@@ -6815,6 +7044,13 @@ function releaseHandFromOtherFunctions(hand, exceptId) {
       // without this, whatever fraction of `id`'s own Offset/Rotation had
       // already been visually shown vanishes the instant it's forced idle.
       bakeInFlightOffsetRotation(hand, id)
+      // Logged BEFORE the phase actually changes, so the entry names the
+      // phase this hand was genuinely interrupted OUT OF (2026-09-28,
+      // direct request) -- this is precisely the "a different click
+      // interrupts this one mid-retransition/mid-tween" moment this
+      // project's own real jump-bug investigation has repeatedly needed
+      // to correlate against the Mouse Tracking Log by hand and by time.
+      logHandBehaviourEvent(hands.indexOf(hand), handLogTriggerLabel(exceptId), `interrupted ${handLogTriggerLabel(id)} (was mid-"${cp.phase}")`)
       cp.phase = 'idle'; cp.pendingClaimAt = 0
     }
   })
@@ -6823,6 +7059,7 @@ function releaseHandFromOtherFunctions(hand, exceptId) {
     const chp = hand._chp && hand._chp[id]
     if (chp && (chp.phase !== 'idle' || chp.pendingClaimAt)) {
       bakeInFlightOffsetRotation(hand, id)
+      logHandBehaviourEvent(hands.indexOf(hand), handLogTriggerLabel(exceptId), `interrupted ${handLogTriggerLabel(id)} (was mid-"${chp.phase}")`)
       chp.phase = 'idle'; chp.pendingClaimAt = 0
     }
   })
@@ -6920,6 +7157,9 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     chp.releasePending = false // a NEW hold-claim always starts fresh, regardless of a stale flag from a previous release
     chp.offsetBaked = false // a fresh ramp starts a fresh (not-yet-locked-in) increment (item 2/5/6, 2026-09-27)
     releaseHandFromOtherFunctions(hand, p)
+    logHandBehaviourEvent(hands.indexOf(hand), handLogTriggerLabel(p), isSequenceOrChainMode(p)
+      ? `triggered -> tween "${cfg[`${p}Mode`] === 'Chain' ? (cfg[`${p}TweenChain`] || []).join(' + ') : cfg[`${p}TweenSelector`]}"`
+      : `triggered -> pose "${cfg[`${p}TargetPose`]}"`)
   }
   if (chp.phase === 'forward') {
     // Tween mode (added 2026-09-15, see makeClickHoldPoseGroup()'s own
@@ -7138,7 +7378,14 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     applyPoseValuesToHand(hand, values, chp.frozenSplayDeg)
     applyOffsetRotationToHand(hand, p, 0) // 'stopping' is a deceleration of the POSE, not a new offset/rotation ramp -- nothing new to add
     if (tDecay >= 1) {
-      if (chp.stoppingFreezeAtEnd) { chp.phase = 'idle'; return } // "the hand will just stop where it is"
+      if (chp.stoppingFreezeAtEnd) {
+        // "the hand will just stop where it is" -- Retransition off, Tween
+        // Stop decay just finished. Logged BEFORE the phase change, same
+        // "name the state actually being left" convention as
+        // releaseHandFromOtherFunctions()'s own matching log call.
+        logHandBehaviourEvent(hands.indexOf(hand), handLogTriggerLabel(p), 'Tween Stop decay finished -> idle (frozen in place, Retransition off)')
+        chp.phase = 'idle'; return
+      }
       chp.retransitionStart = values
       chp.retransitionStartTime = now
       // When Retransition is OFF, the deceleration itself already served as
@@ -7148,6 +7395,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
       chp.retransitionDelay = chp.retransitionDelayForStop ?? 0
       chp.phase = 'retransition'
       snapshotOffsetRotationAccumForRetransition(hand, chp)
+      logHandBehaviourEvent(hands.indexOf(hand), handLogTriggerLabel(p), 'Tween Stop decay finished -> retransition begins')
     }
   } else if (chp.phase === 'retransition') {
     // Tween mode's own dedicated Retransition Speed (direct request --
@@ -7462,6 +7710,7 @@ function endClickHoldPose(p) {
       : 0
     chp.phase = 'retransition'
     snapshotOffsetRotationAccumForRetransition(hand, chp)
+    logHandBehaviourEvent(i, handLogTriggerLabel(p), 'released -> retransition begins')
   })
 }
 // Window-level pointerdown/pointerup (same convention as the Mouse
@@ -7755,6 +8004,9 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
     cp.pendingClaimAt = 0
     cp.offsetBaked = false // a fresh ramp starts a fresh (not-yet-locked-in) increment
     releaseHandFromOtherFunctions(hand, p)
+    logHandBehaviourEvent(hands.indexOf(hand), handLogTriggerLabel(p), isSequenceOrChainMode(p)
+      ? `triggered -> tween "${cfg[`${p}TweenSelector`]}"`
+      : `triggered -> pose "${cfg[`${p}TargetPose`]}"`)
   }
   if (cp.phase === 'forward') {
     // No `forwardDelay` subtraction needed anymore -- that delay is now
@@ -7958,6 +8210,7 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
       cp.retransitionSpeedMs = cfg[`${p}RetransitionSpeedCurveEnabled`]
         ? computeStartDelayMs(live, minLiveDist, liveDistRange, clickPoseTriggers[p].retransitionSpeedCurveParsed, clickPoseTriggers[p].retransitionSpeedRangeParsed)
         : 0
+      logHandBehaviourEvent(hands.indexOf(hand), handLogTriggerLabel(p), 'pause finished -> retransition begins')
     }
   } else if (cp.phase === 'retransition') {
     const elapsed = now - cp.retransitionStartTime
@@ -9436,6 +9689,12 @@ const CUSTOM_FUNCTION_TEXT_OVERRIDES = { Enabled: 'ON/ OFF', Type: 'Trigger Type
 // appendChild()-based relocation (see its own comment) picks this up
 // for every existing function on next restore/rebuild, no data migration
 // needed.
+// CORRECTED 2026-09-28 (direct request: "place all the subgroups below
+// any individual settings. Right now i see individual setitngs in
+// between groups") -- Offset/Rotation used to sit BETWEEN the flat
+// Pause-Duration/Sequence-cluster rows, interleaving a group in among
+// plain settings. Every flat row now comes first, every subgroup last
+// (their own relative order among themselves is unchanged).
 const CUSTOM_FUNCTION_POSE_LAYOUT = [
   { type: 'row', suffix: 'Enabled' },
   { type: 'row', suffix: 'Type' }, { type: 'row', suffix: 'TouchPointCount' }, { type: 'row', suffix: 'ClickCount' },
@@ -9443,9 +9702,9 @@ const CUSTOM_FUNCTION_POSE_LAYOUT = [
   { type: 'row', suffix: 'TargetPose' }, { type: 'row', suffix: 'TweenSelector' },
   { type: 'row', suffix: 'TransitionSpeedMs' }, { type: 'row', suffix: 'TweenSpeedMs' },
   { type: 'row', suffix: 'PauseDurationMs' },
-  { type: 'group', title: 'Offset' }, { type: 'group', title: 'Rotation' },
   { type: 'row', suffix: 'SequencePlayMode' }, { type: 'row', suffix: 'SequenceCount' }, { type: 'row', suffix: 'SequenceCountMode' },
   { type: 'row', suffix: 'SequenceLoopTransition' }, { type: 'row', suffix: 'SequenceHoldMs' },
+  { type: 'group', title: 'Offset' }, { type: 'group', title: 'Rotation' },
   { type: 'group', title: 'Animation Speed Curve' }, { type: 'group', title: 'Start Time Curve' }, { type: 'group', title: 'Start Distance Curve' }, { type: 'group', title: 'Retransition' },
   { type: 'group', title: 'Multi Trigger' }
 ]
@@ -9463,14 +9722,16 @@ const CUSTOM_FUNCTION_POSE_LAYOUT = [
 // Sequence/Chain now sits directly under Mode, Animation Speed right
 // under that, then Offset/Rotation, then Loop -- previously Offset/
 // Rotation sat right after Mode/TweenSelector and the rest came after.
+// CORRECTED 2026-09-28 -- see CUSTOM_FUNCTION_POSE_LAYOUT's own matching
+// comment; same "every flat row before every subgroup" fix.
 const CUSTOM_FUNCTION_HOLD_LAYOUT = [
   { type: 'row', suffix: 'Enabled' },
   { type: 'row', suffix: 'Type' }, { type: 'row', suffix: 'TouchPointCount' }, { type: 'row', suffix: 'ClickCount' },
   { type: 'row', suffix: 'Mode' },
   { type: 'row', suffix: 'TargetPose' }, { type: 'row', suffix: 'TweenSelector' }, { type: 'row', suffix: 'TweenChain' },
   { type: 'row', suffix: 'TransitionSpeedMs' }, { type: 'row', suffix: 'TweenSpeedMs' },
-  { type: 'group', title: 'Offset' }, { type: 'group', title: 'Rotation' },
   { type: 'row', suffix: 'LoopMode' }, { type: 'row', suffix: 'LoopHoldMs' },
+  { type: 'group', title: 'Offset' }, { type: 'group', title: 'Rotation' },
   { type: 'group', title: 'Animation Speed Curve' }, { type: 'group', title: 'Start Time Curve' }, { type: 'group', title: 'Start Distance Curve' },
   { type: 'group', title: 'Retransition' }, { type: 'group', title: 'Tween Stop' }
 ]
@@ -9664,6 +9925,35 @@ function restoreCustomClickFunctions() {
   // read wrong once at an early moment" pattern this project's own
   // animate()/renderer-resize code already uses elsewhere.
   setTimeout(() => { refreshAllCustomFunctionGroupVisibility(); refreshAllCustomFunctionTypeVisibility(); updateCustomFunctionsAnchorRowVisibility() }, 600)
+}
+// CORRECTED 2026-09-28 -- real bug, direct report: "Hold Conirm Delay is
+// still at the bottom fo the Custom Click Functions group... I dont see
+// the multiclick confirm duration." Root cause, confirmed by direct
+// inspection of the real saved settings file: devPanel.js's own generic
+// `applyOrder()` restores this group's ROW order from the user's own
+// PREVIOUSLY-SAVED `rowKeys` snapshot (captured well before this round's
+// item 7 moved `holdConfirmMs`/`multiClickWindowMs` into this group),
+// which takes precedence over this file's own DEV_GROUPS array order --
+// the exact same class of gap `applyCustomFunctionReferenceLayout()`
+// already exists to close for custom-function rows, just never applied
+// to this one static group. The saved snapshot still had `holdConfirmMs`
+// sitting wherever the user's own earlier customization left it (behind
+// "+ Add Click Function"), and had no entry at all for
+// `multiClickWindowMs` (which didn't live in this group yet when that
+// snapshot was captured -- it was still under "Debug" then), so restoring
+// it left both rows wherever the stale/absent order put them instead of
+// the top. Forces both to the front of this group's body, in order,
+// AFTER `applyOrder()`'s own restore has already run (called from
+// `onRestore`, right after `restoreCustomClickFunctions()`) -- so this is
+// always the true final word on their position, regardless of what any
+// legacy saved order says.
+function enforceCustomClickFunctionsAnchorOrder() {
+  const body = document.querySelector('.dp-group[data-key="Custom Click Functions"] > .dp-group-body')
+  if (!body) return
+  const holdRow = body.querySelector(':scope > .dp-row[data-key="holdConfirmMs"]')
+  const windowRow = body.querySelector(':scope > .dp-row[data-key="multiClickWindowMs"]')
+  if (holdRow) body.insertBefore(holdRow, body.firstChild)
+  if (windowRow) body.insertBefore(windowRow, holdRow ? holdRow.nextSibling : body.firstChild)
 }
 // Multi Trigger -- direct spec (2026-09-27): "for custom click functions
 // i want a new feature: Under Retransition group, add Multi Trigger. It
@@ -11604,6 +11894,7 @@ function animate(dt, now) {
     enforceCameraPanExtent()
     syncCameraPanelFromLive()
     armLengthWidgetResyncs.forEach((fn) => fn())
+    updateHandNumberLabels()
     // Global Pause (Debug group, see setPaused()'s own declaration) --
     // skipping cursor-target tracking, the cursor-follow rotation step,
     // and updateRenderOrder() (which drives every Click Pose/Click-Hold-

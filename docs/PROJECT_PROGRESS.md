@@ -18,6 +18,21 @@ work seamlessly from there.
 
 ## Currently working on
 
+**IN PROGRESS 2026-09-28 (15th round) -- Debug-group diagnostics batch,
+built specifically to help correlate future click-triggered jump reports:
+Mouse Tracking Log rewritten (Click+Hold is now genuinely distinct from
+Click, with separate start/release entries; "OrbitControls" wording
+removed), a new Hand Numbers on-screen overlay + color picker, a new
+Hand Behaviour Log (fires only at real trigger/interrupt/retransition
+moments, names the exact mechanism), Responsive Arm Rotation moved into
+Cursor Tracking (a brand-new top-level group couldn't persist a manual
+drag-nest), a real bug fix for Hold Confirm Delay/Rolling Click Window
+not actually landing at the top of Custom Click Functions (devPanel.js's
+own saved row order was overriding the source reorder), and a fix so
+every custom-function subgroup sits below every flat setting instead of
+interleaved. Not yet independently live-verified this round -- see
+CHANGELOG.txt's matching entry.**
+
 **IN PROGRESS 2026-09-28 (14th round) -- an 8-item batch (Wrist
 Cropping/Wrist Splay/Palm Rotation gating by Tracking Enabled, a new
 "Responsive Arm Rotation" feature, Tween Stop's in-label checkbox, custom-
