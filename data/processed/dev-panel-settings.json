@@ -29,7 +29,6 @@
       "armRotationDefault": 100,
       "armRotationCurveEnabled": false,
       "armRotationCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
-      "armRotationRange": "{\"min\":0,\"max\":180}",
       "armRotationDamping": 0.16,
       "palmFacesCursor": true,
       "palmFaceRotationOffset": 13,
@@ -6731,7 +6730,7 @@
       "custom7RotationX": 0,
       "custom7RotationY": 0,
       "custom7RotationZ": 0,
-      "custom7TargetPose": "Big Open Palm",
+      "custom7TargetPose": "Fist",
       "custom7TweenSelector": "",
       "custom7TweenSpeedMs": 800,
       "custom7TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -6772,7 +6771,7 @@
       "custom7Trig1RotationX": 0,
       "custom7Trig1RotationY": 0,
       "custom7Trig1RotationZ": 0,
-      "custom7Trig1TargetPose": "Fist",
+      "custom7Trig1TargetPose": "Big Open Palm",
       "custom7Trig1TweenSelector": "",
       "custom7Trig1TweenSpeedMs": 800,
       "custom7Trig1TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -7112,7 +7111,6 @@
       "armRotationDefault": 100,
       "armRotationCurveEnabled": false,
       "armRotationCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
-      "armRotationRange": "{\"min\":0,\"max\":180}",
       "armRotationDamping": 0.16,
       "palmFacesCursor": true,
       "palmFaceRotationOffset": 0,
@@ -13814,7 +13812,7 @@
       "custom7RotationX": 0,
       "custom7RotationY": 0,
       "custom7RotationZ": 0,
-      "custom7TargetPose": "Big Open Palm",
+      "custom7TargetPose": "Fist",
       "custom7TweenSelector": "",
       "custom7TweenSpeedMs": 800,
       "custom7TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -13855,7 +13853,7 @@
       "custom7Trig1RotationX": 0,
       "custom7Trig1RotationY": 0,
       "custom7Trig1RotationZ": 0,
-      "custom7Trig1TargetPose": "Fist",
+      "custom7Trig1TargetPose": "Big Open Palm",
       "custom7Trig1TweenSelector": "",
       "custom7Trig1TweenSpeedMs": 800,
       "custom7Trig1TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -14195,7 +14193,6 @@
       "armRotationDefault": 100,
       "armRotationCurveEnabled": false,
       "armRotationCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
-      "armRotationRange": "{\"min\":0,\"max\":180}",
       "armRotationDamping": 0.16,
       "palmFacesCursor": true,
       "palmFaceRotationOffset": 0,
@@ -20897,7 +20894,7 @@
       "custom7RotationX": 0,
       "custom7RotationY": 0,
       "custom7RotationZ": 0,
-      "custom7TargetPose": "Big Open Palm",
+      "custom7TargetPose": "Fist",
       "custom7TweenSelector": "",
       "custom7TweenSpeedMs": 800,
       "custom7TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -20938,7 +20935,7 @@
       "custom7Trig1RotationX": 0,
       "custom7Trig1RotationY": 0,
       "custom7Trig1RotationZ": 0,
-      "custom7Trig1TargetPose": "Fist",
+      "custom7Trig1TargetPose": "Big Open Palm",
       "custom7Trig1TweenSelector": "",
       "custom7Trig1TweenSpeedMs": 800,
       "custom7Trig1TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -22354,7 +22351,7 @@
     },
     {
       "key": "Debug",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -23206,7 +23203,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": false,
+      "collapsed": true,
       "locked": false,
       "items": [
         {
@@ -24083,7 +24080,7 @@
                 "type": "group",
                 "group": {
                   "key": "Responsive Arm Rotation",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -24100,10 +24097,6 @@
                     },
                     {
                       "type": "row",
-                      "key": "armRotationRange"
-                    },
-                    {
-                      "type": "row",
                       "key": "armRotationDamping"
                     },
                     {
@@ -24115,7 +24108,6 @@
                     "armRotationEnabled",
                     "armRotationCurveEnabled",
                     "armRotationCurve",
-                    "armRotationRange",
                     "armRotationDamping",
                     "armRotationDefault"
                   ],
@@ -24126,7 +24118,7 @@
                 "type": "group",
                 "group": {
                   "key": "New Group (3)",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -24212,7 +24204,7 @@
                 "type": "group",
                 "group": {
                   "key": "New Group (4)",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -24261,7 +24253,7 @@
             "subgroups": [
               {
                 "key": "Responsive Arm Rotation",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -24278,10 +24270,6 @@
                   },
                   {
                     "type": "row",
-                    "key": "armRotationRange"
-                  },
-                  {
-                    "type": "row",
                     "key": "armRotationDamping"
                   },
                   {
@@ -24293,7 +24281,6 @@
                   "armRotationEnabled",
                   "armRotationCurveEnabled",
                   "armRotationCurve",
-                  "armRotationRange",
                   "armRotationDamping",
                   "armRotationDefault"
                 ],
@@ -24301,7 +24288,7 @@
               },
               {
                 "key": "New Group (3)",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -24381,7 +24368,7 @@
               },
               {
                 "key": "New Group (4)",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -25285,7 +25272,7 @@
               "type": "group",
               "group": {
                 "key": "Responsive Arm Rotation",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -25302,10 +25289,6 @@
                   },
                   {
                     "type": "row",
-                    "key": "armRotationRange"
-                  },
-                  {
-                    "type": "row",
                     "key": "armRotationDamping"
                   },
                   {
@@ -25317,7 +25300,6 @@
                   "armRotationEnabled",
                   "armRotationCurveEnabled",
                   "armRotationCurve",
-                  "armRotationRange",
                   "armRotationDamping",
                   "armRotationDefault"
                 ],
@@ -25328,7 +25310,7 @@
               "type": "group",
               "group": {
                 "key": "New Group (3)",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -25414,7 +25396,7 @@
               "type": "group",
               "group": {
                 "key": "New Group (4)",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -25463,7 +25445,7 @@
           "subgroups": [
             {
               "key": "Responsive Arm Rotation",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -25480,10 +25462,6 @@
                 },
                 {
                   "type": "row",
-                  "key": "armRotationRange"
-                },
-                {
-                  "type": "row",
                   "key": "armRotationDamping"
                 },
                 {
@@ -25495,7 +25473,6 @@
                 "armRotationEnabled",
                 "armRotationCurveEnabled",
                 "armRotationCurve",
-                "armRotationRange",
                 "armRotationDamping",
                 "armRotationDefault"
               ],
@@ -25503,7 +25480,7 @@
             },
             {
               "key": "New Group (3)",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -25583,7 +25560,7 @@
             },
             {
               "key": "New Group (4)",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -29911,7 +29888,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 7",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -30218,7 +30195,7 @@
                 "type": "group",
                 "group": {
                   "key": "Multi Trigger",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -30233,7 +30210,7 @@
                       "type": "group",
                       "group": {
                         "key": "Trigger 1",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -30752,7 +30729,7 @@
                   "subgroups": [
                     {
                       "key": "Trigger 1",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -31504,7 +31481,7 @@
               },
               {
                 "key": "Multi Trigger",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -31519,7 +31496,7 @@
                     "type": "group",
                     "group": {
                       "key": "Trigger 1",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -32038,7 +32015,7 @@
                 "subgroups": [
                   {
                     "key": "Trigger 1",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -36828,7 +36805,7 @@
         },
         {
           "key": "Custom Click Function 7",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
@@ -37135,7 +37112,7 @@
               "type": "group",
               "group": {
                 "key": "Multi Trigger",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -37150,7 +37127,7 @@
                     "type": "group",
                     "group": {
                       "key": "Trigger 1",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -37669,7 +37646,7 @@
                 "subgroups": [
                   {
                     "key": "Trigger 1",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -38421,7 +38398,7 @@
             },
             {
               "key": "Multi Trigger",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -38436,7 +38413,7 @@
                   "type": "group",
                   "group": {
                     "key": "Trigger 1",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -38955,7 +38932,7 @@
               "subgroups": [
                 {
                   "key": "Trigger 1",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
