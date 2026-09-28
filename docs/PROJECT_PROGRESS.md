@@ -42,16 +42,17 @@ still-mostly-posed skeleton straight to the live default. Fixed by giving
 idle-repose the same "blend from `hand._lastPoseValues` toward live
 `cfg`" continuity guarantee every other handoff in this file already has
 (a 400ms blend via the existing `lerpPoseValues()`/`applyPoseValuesToHand()`
-machinery, not a new mechanism). Verified: syntax-checked
-(`node --check`), and the underlying reproduction/measurement was
-confirmed live on the deployed app before the fix; live-testing the FIX
-itself against a local server hit this sandbox's own documented
-network-truncation flakiness 5 times in a row (a known, pre-existing,
-unrelated environment issue -- see CLAUDE.md's Gotchas), so the fix was
-pushed to `main`/Vercel for verification there instead. **Needs a
-post-deploy live re-test (in progress) and, ideally, the user's own
-real-device confirmation** -- see CLAUDE.md's matching Gotchas entry and
-CHANGELOG.txt's 13th-round entry for the full account.
+machinery, not a new mechanism). Verified: syntax-checked (`node --check`); live-testing the FIX itself
+against a local server hit this sandbox's own documented network-
+truncation flakiness 5 times in a row (a known, pre-existing, unrelated
+environment issue -- see CLAUDE.md's Gotchas), so it was pushed to
+`main`/Vercel and re-verified there instead, via the exact same
+instrumented reproduction used to find the bug: the single-tick maximum
+at the override-ending transition dropped from a measured 55.87 degrees
+(before) to 12.9 degrees, now spread gracefully across several ticks and
+decaying toward 0 rather than one isolated spike (after). **Not yet
+confirmed by the user on a real device** -- see CLAUDE.md's matching
+Gotchas entry and CHANGELOG.txt's 13th-round entry for the full account.
 
 --------------------------------------------------------------------------------
 

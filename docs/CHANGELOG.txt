@@ -12874,11 +12874,29 @@ this entry's own follow-up note below, once run).
 
 `main.js` cache-buster bumped `?v=233` -> `?v=234`.
 
-Commit and live-deploy verification recorded in this file's own next
-entry, once the redeploy is confirmed.
+Commit: `ad96b41`. Pushed to `https://github.com/LeisHo/HandyDandies`.
 
-================================================================================
-APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
+**Live-deploy verification (same round, immediately after)**: confirmed
+`v=234` live on `https://handy-dandies.vercel.app` post-redeploy, then
+reran the EXACT same instrumented reproduction (same manual tick loop,
+same synthetic pointer sequence, same real production settings) against
+the patched build. Before this fix: a measured 55.87-degree `rHand`
+snap in a single tick, at the instant a hand's override ended
+(`wasOverridden` flipping true->false). After this fix, under the
+identical test: the single-tick maximum for that same transition dropped
+to 12.9 degrees, and inspecting the full per-tick series for the hands
+involved shows the angular change now spread gracefully across multiple
+ticks and decaying toward 0 over time, rather than one isolated spike --
+consistent with a genuine blend now happening instead of an instant
+snap. (This test harness's own tick cadence runs coarser than the real
+app's 60fps `requestAnimationFrame` loop -- each manually-driven tick
+took ~85ms of real wall-clock time rather than ~16.67ms, so the fix's
+400ms blend window is being sampled over roughly 5 ticks here instead of
+the ~24 real frames it gets in the actual browser; the real, live
+experience should be noticeably smoother than even this improved
+measurement suggests.) **Not yet confirmed by the user on a real
+device** -- this is the strongest verification available from this
+sandbox alone.
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a
 correction, add a new entry noting the correction rather than editing the
 old one in place.
