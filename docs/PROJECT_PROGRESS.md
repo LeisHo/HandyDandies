@@ -18,6 +18,27 @@ work seamlessly from there.
 
 ## Currently working on
 
+**FIXED 2026-09-28 (23rd round) -- Arm Rotation no longer flips 360 deg
+at its own rotation limit; the limit itself is gone.** Root cause:
+`Quaternion.angleTo()` (used to measure the angle from a static neutral
+reference to the live lookAt target) is inherently capped at 180 deg,
+so crossing that point flipped the "shortest path" to the opposite
+rotational direction -- no degree-bound clamp could fix this, it's
+fundamental to computing a fresh angle from a fixed reference every
+frame. Fixed by making Arm Rotation a PERSISTENT per-hand quaternion
+that takes a small slerp step toward the live target every frame
+(same pattern this file's own wrapper-rotation cursor-tracking has
+always used) instead of one big slerp from a fixed reference -- this
+accumulates smoothly past 180/360 deg with no cap. Removed Min/Max Arm
+Rotation (Deg), the now-meaningless control that used to enforce the
+limit. NOT live-verified this round -- the local static server hit a
+new, consistent (not the usual intermittent) truncation of `main.js`
+at 783,360 of 817,793 bytes, reproduced identically via `curl` and on
+a fresh server process; 5 browser-tool retries (this project's own
+cap) also failed. Confidence rests on the syntax check plus this being
+the same trusted pattern already used elsewhere in the file, not a
+fresh live test. See CHANGELOG.txt's 23rd-round entry.
+
 **ROOT-CAUSED AND FIXED 2026-09-28 (22nd round) -- "hands jump"
 investigation, 10th round. Awaiting the user's real-device confirmation.**
 `endClickHoldPose()` re-ran its release logic on hands already in

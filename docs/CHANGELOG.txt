@@ -13637,6 +13637,76 @@ spike at ~471ms post-release predates this fix and wasn't re-checked
 separately; the post-fix run above showed no tick over 3.74 deg in that
 window.
 
+2026-09-28  -  (23rd round -- Arm Rotation continuous-rotation fix,
+direct report: "sometimes, when the hand arm rotation reaches its own
+limit threshold, be it 180 or 360, it ends up spinning 360 in the
+opposite direction to continue the cursor tracking. I dont want that. I
+want it to continue rotating smoothly with no thresholds")
+
+**Root cause: `Quaternion.angleTo()` is inherently capped at 180
+degrees.** Responsive Arm Rotation's original design measured the angle
+between a STATIC neutral reference (`hand.currentBaseQuat`) and the live
+lookAt target via `.angleTo()` every frame, then bounded that angle into
+a Min/Max Arm Rotation (Deg) range. `.angleTo()` reports the shortest-
+path geodesic angle between 2 orientations -- a quaternion and its
+negation represent the SAME rotation, so it can never report more than a
+half-turn. As the cursor continued past the point where the neutral-to-
+target angle would need to exceed 180 deg, the "shortest path" flipped
+to the OTHER rotational direction: a real, sudden discontinuity (the
+reported "spins 360 in the opposite direction"), not a bug in the clamp
+math sitting on top of it -- no degree bound could have fixed this, since
+it's fundamental to computing a fresh angle from a FIXED reference every
+frame.
+
+**Fix: dropped the "angle from a fixed reference" approach entirely.**
+`hand.currentArmRotationQuat` is now a PERSISTENT per-hand orientation
+(never recomputed from `hand.currentBaseQuat` each frame) that takes a
+small slerp step toward the live `lookAtDesired` every frame. Each step
+slerps between 2 CLOSE orientations (the cursor doesn't teleport frame to
+frame), so it never needs to "choose a direction" the way one big slerp
+from a fixed reference does -- many small continuous steps accumulate
+past 180/360 deg exactly like a real arm continuing to turn, with no cap
+at all. This is the SAME "persistent quaternion, incrementally slerped
+toward a fresh target every frame" pattern this file's own wrapper-
+rotation cursor-tracking has always used at the top level (predating
+every feature added this session) -- Arm Rotation now uses it directly
+instead of a bounded-angle-from-neutral wrapper around it.
+
+**Removed: Min/Max Arm Rotation (Deg) (`armRotationRange`)**, the
+control whose whole job was to CAP the rotation angle -- exactly the
+mechanism causing the flip, and no longer meaningful once rotation is
+continuous/unbounded. Removed the control definition, its range-bar
+widget (`buildArmRotationWidgets()`), its JSON parsing
+(`armRotationRangeParsed`, `parseCursorTrackingConfig()`), and its
+visibility gating (`updateArmRotationGateVisibility()`). Default Arm
+Rotation (%) and the optional Reactive Arm Rotation distance curve are
+UNCHANGED in role -- still 0-100% responsiveness -- but now scale the
+PER-FRAME TURN RATE (multiplied with Arm Rotation Damping) instead of a
+bounded target angle. Disclosed behavior change: at 0% responsiveness,
+the hand now simply STOPS tracking and freezes wherever its own
+accumulated rotation currently is, rather than snapping back to exactly
+neutral (the old bounded-angle design's behavior at 0%) -- an
+unavoidable consequence of this no longer being "a fraction of a fixed
+target angle."
+
+Verified: `node --check src/main.js` passes; grepped for every reference
+to the removed `armRotationRangeParsed`/`hand.currentArmRotationDeg` to
+confirm none remain. **NOT live-verified this round** -- the local
+static server hit a NEW, consistent (not the usual intermittent)
+truncation of `main.js` at exactly 783,360 of 817,793 bytes, reproduced
+identically via `curl` (3 retries) AND on a completely fresh server
+process (a different port), ruling out normal server-process flakiness.
+5 browser-tool navigation retries (this project's own established cap)
+also failed. Confidence in the fix rests on: the syntax/reference checks
+above, and that the core technique (a persistent quaternion slerped
+incrementally toward a fresh target every frame) is not novel to this
+change -- it's the exact same pattern this file's own top-level wrapper-
+rotation cursor-tracking has used successfully since before this
+session's work began, just applied directly to Arm Rotation instead of
+wrapped in a bounded-angle calculation.
+
+`main.js` cache-buster bumped `?v=242` -> `?v=243`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

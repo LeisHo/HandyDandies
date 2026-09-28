@@ -76,11 +76,17 @@ let palmFacesCursorDistanceRangeParsed = { min: 0, max: 180 }
 // Responsive Arm Rotation (2026-09-28, new feature -- see animate()'s own
 // cursor-tracking block for the full account) -- separates the actual
 // "hand leans/rotates toward the cursor" rotation out of Tracking Enabled
-// itself, into its own independently-toggleable, distance-curved,
-// min/max-bounded feature, exactly mirroring Responsive Wrist Splay's own
-// curve+range pattern generalized to a full 3D rotation angle.
+// itself, into its own independently-toggleable, distance-curved feature.
+// CORRECTED 2026-09-28, direct report ("when the hand arm rotation
+// reaches its own limit threshold, be it 180 or 360, it ends up spinning
+// 360 in the opposite direction... I want it to continue rotating
+// smoothly with no thresholds") -- the original min/max-DEGREE-bounded
+// design (mirroring Responsive Wrist Splay's own curve+range pattern) is
+// gone; see animate()'s own cursor-tracking block for why a hard angle
+// bound was fundamentally incompatible with continuous rotation
+// (Quaternion.angleTo() is inherently capped at 180 deg, which is what
+// caused the reported flip). `armRotationRangeParsed` no longer exists.
 let armRotationCurveParsed = [{ x: 0, y: 1 }, { x: 1, y: 1 }]
-let armRotationRangeParsed = { min: 0, max: 180 }
 // dx/dy measured directly in world space (X right, Y up, matching this
 // project's own Field Layout grid and THREE.js's Y-up convention) --
 // deliberately NOT projected through the camera to screen/NDC space:
@@ -599,17 +605,21 @@ const DEV_GROUPS = [
       { key: 'armRotationDefault', label: 'Default Arm Rotation (%, Reactive Off)', type: 'slider', min: 0, max: 100, step: 1, def: 100 },
       { key: 'armRotationCurveEnabled', label: 'Reactive Arm Rotation (By Cursor Distance)', type: 'checkbox', def: false, onChange: () => updateArmRotationGateVisibility() },
       { key: 'armRotationCurve', label: 'Arm Rotation Distance Curve (Distance -> Rotation Amount)', type: 'text', def: '[{"x":0,"y":1},{"x":1,"y":1}]', onChange: () => parseCursorTrackingConfig() },
-      { key: 'armRotationRange', label: 'Min / Max Arm Rotation (Deg)', type: 'text', def: '{"min":0,"max":180}', onChange: () => parseCursorTrackingConfig() },
-      // Arm Rotation Damping -- direct request 2026-09-28, same class of
-      // fix as this same round's Wrist Cropping/Wrist Splay damping
-      // (`armLengthDamping`/`wristSplayDamping`): the bounded rotation
-      // angle this feature computes has always been a fresh, undamped
-      // value every frame -- on Landscape specifically (`trackingDamping:
-      // 1.0` in this project's own real saved settings, per this file's
-      // CLAUDE.md gotcha), the wrapper's own slerp toward `desired`
-      // provides ZERO smoothing, so a sudden cursor relocation could snap
-      // this value instantly. Same `min:0.02, max:1, step:0.01, def:1`
-      // convention as every other damping slider in this file.
+      // REMOVED 2026-09-28: Min / Max Arm Rotation (Deg) (`armRotationRange`)
+      // -- direct report ("when the hand arm rotation reaches its own
+      // limit threshold, be it 180 or 360, it ends up spinning 360 in the
+      // opposite direction... I want it to continue rotating smoothly
+      // with no thresholds"). This control's whole job was to CAP the
+      // rotation angle -- exactly the mechanism causing the flip. See
+      // animate()'s own cursor-tracking block for the replacement
+      // (continuous, unbounded, persistent-quaternion slerp).
+      // Arm Rotation Damping -- same class of control as Wrist Cropping/
+      // Wrist Splay damping (`armLengthDamping`/`wristSplayDamping`).
+      // Now this feature's ONLY per-frame rate control (previously
+      // smoothed a bounded target angle; now directly the slerp fraction
+      // driving continuous rotation toward the cursor). Same
+      // `min:0.02, max:1, step:0.01, def:1` convention as every other
+      // damping slider in this file.
       { key: 'armRotationDamping', label: 'Arm Rotation Damping (x)', type: 'slider', min: 0.02, max: 1, step: 0.01, def: 1 },
       // REDEFINED 2026-09-14 (see computeRadialRollDeg()'s own comment
       // for the full account and the user's own exact reference points):
@@ -5613,7 +5623,6 @@ function parseCursorTrackingConfig() {
   try { palmFacesCursorDistanceCurveParsed = JSON.parse(cfg.palmFacesCursorDistanceCurve).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
   try { palmFacesCursorDistanceRangeParsed = JSON.parse(cfg.palmFacesCursorDistanceRange) } catch (e) { /* keep last-good value */ }
   try { armRotationCurveParsed = JSON.parse(cfg.armRotationCurve).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
-  try { armRotationRangeParsed = JSON.parse(cfg.armRotationRange) } catch (e) { /* keep last-good value */ }
 }
 function updateCursorTrackingGateVisibility() {
   // Toggle visibility of cursor-tracking curve controls based on
@@ -5625,9 +5634,7 @@ function updateCursorTrackingGateVisibility() {
 }
 function updateArmRotationGateVisibility() {
   const curveRow = document.querySelector('.dp-row[data-key="armRotationCurve"]')
-  const rangeRow = document.querySelector('.dp-row[data-key="armRotationRange"]')
   if (curveRow) curveRow.style.display = cfg.armRotationCurveEnabled ? '' : 'none'
-  if (rangeRow) rangeRow.style.display = cfg.armRotationCurveEnabled ? '' : 'none'
 }
 // Returns the EXTRA wrist-splay rotation (degrees) this hand should get
 // on top of the Pose group's own shared `cfg.wristSplay` -- 0 when the
@@ -5785,13 +5792,13 @@ function buildCursorTrackingWidgets() {
   if (curveRow) buildGenericCurveWidget(curveRow, { caption: 'X: Distance From Cursor (Nearest→Farthest Hand)  ·  Y: Palm Rotation Responsiveness (0=None, 1=Full)', defaultPoints: [{ x: 0, y: 1 }, { x: 1, y: 1 }] })
   if (rangeRow) buildGenericRangeBarWidget(rangeRow, { trackMin: -180, trackMax: 180, unit: '°', defaultValue: { min: 0, max: 180 } })
 }
-// Responsive Arm Rotation's own curve-graph + range-slider widgets --
-// same builders, same call shape as buildCursorTrackingWidgets() above.
+// Responsive Arm Rotation's own curve-graph widget -- same builder,
+// same call shape as buildCursorTrackingWidgets() above. No range-bar
+// widget anymore (Min/Max Arm Rotation was removed 2026-09-28, see its
+// own DEV_GROUPS comment).
 function buildArmRotationWidgets() {
   const curveRow = document.querySelector('.dp-row[data-key="armRotationCurve"]')
-  const rangeRow = document.querySelector('.dp-row[data-key="armRotationRange"]')
   if (curveRow) buildGenericCurveWidget(curveRow, { caption: 'X: Distance From Cursor (Nearest→Farthest Hand)  ·  Y: Arm Rotation Amount (0=None, 1=Full)', defaultPoints: [{ x: 0, y: 1 }, { x: 1, y: 1 }] })
-  if (rangeRow) buildGenericRangeBarWidget(rangeRow, { trackMin: 0, trackMax: 180, unit: '°', defaultValue: { min: 0, max: 180 } })
 }
 
 function buildArmLengthRangeWidget(row) {
@@ -12161,78 +12168,77 @@ function animate(dt, now) {
           // apply the SAME handoff safety-net cap through, instead of one
           // damping value doing both jobs.
           const inHandoffSettle = hand._handoffSettleFrames > 0
-          // Responsive Arm Rotation (2026-09-28, new feature) -- this is the
-          // actual "hand leans/rotates toward the cursor" rotation, now its
-          // own independently-toggleable feature (direct report: "It looks
-          // like the hand models are somewhat leaning towards the cursor...
+          // Responsive Arm Rotation -- the actual "hand leans/rotates
+          // toward the cursor" rotation, independently-toggleable from
+          // Tracking Enabled itself (direct report: "It looks like the
+          // hand models are somewhat leaning towards the cursor...
           // separate it from the Enabled Tracking checkbox itself... When
-          // all other functions are turned off, turning Tracking Enabled on
-          // and off should not have any visual change"). `hand.currentBaseQuat`
-          // is this hand's own "wherever it'd be with zero cursor influence"
-          // neutral orientation -- with the feature off, `desired` stays
-          // exactly that (matching the "no visual change" requirement).
-          // With it on, bounds/curves the ANGULAR distance between that
-          // neutral orientation and the raw lookAt orientation using the
-          // exact same distance-curve + min/max-range shape Responsive
-          // Wrist Splay already uses (see computeResponsiveWristSplayDeg()'s
-          // own comment), then re-applies that bounded angle along the SAME
-          // axis/direction as the raw lookAt via a fractional slerp -- never
-          // a different rotation, just a scaled amount of the real one.
+          // all other functions are turned off, turning Tracking Enabled
+          // on and off should not have any visual change"). With the
+          // feature off, `desired` stays exactly `hand.currentBaseQuat`
+          // (this hand's own "wherever it'd be with zero cursor
+          // influence" neutral orientation), matching that requirement.
+          // CORRECTED 2026-09-28 (real architecture change, direct
+          // report: "when the hand arm rotation reaches its own limit
+          // threshold, be it 180 or 360, it ends up spinning 360 in the
+          // opposite direction to continue the cursor tracking. I dont
+          // want that. I want it to continue rotating smoothly with no
+          // thresholds"). The ORIGINAL design measured the angle between
+          // the STATIC neutral reference (`hand.currentBaseQuat`) and the
+          // live `lookAtDesired` via `Quaternion.angleTo()`, then bounded
+          // that angle into a Min/Max Arm Rotation (Deg) range (removed
+          // this round, see that control's own DEV_GROUPS comment).
+          // `.angleTo()` is INHERENTLY capped at 180 deg -- it reports the
+          // shortest-path geodesic angle between 2 orientations, and a
+          // quaternion and its negation represent the SAME rotation -- so
+          // as the cursor continued past the point where the neutral-to-
+          // target angle would need to exceed 180 deg, the "shortest
+          // path" flipped to the OTHER rotational direction: a real,
+          // sudden discontinuity, not a bug in the clamp math on top of
+          // it. No degree bound can fix this -- it's fundamental to
+          // computing a fresh angle from a FIXED reference every frame.
+          // Fixed by dropping that approach entirely: `hand.currentArmRotationQuat`
+          // is now a PERSISTENT per-hand orientation (never recomputed
+          // from a static reference) that takes a small slerp step toward
+          // the live `lookAtDesired` every frame. Each step slerps
+          // between 2 CLOSE orientations (the cursor doesn't teleport
+          // frame to frame), so it never needs to "choose a direction"
+          // the way one big slerp from a fixed reference does -- many
+          // small continuous steps accumulate past 180/360 deg exactly
+          // like a real arm continuing to turn, with no cap at all.
           let desired = hand.currentBaseQuat
           if (cfg.armRotationEnabled) {
-            const rawAngleDeg = THREE.MathUtils.radToDeg(hand.currentBaseQuat.angleTo(lookAtDesired))
-            let targetBoundedAngleDeg = 0
-            if (rawAngleDeg > 1e-6) {
-              // Default Arm Rotation -- direct request 2026-09-28: with the
-              // distance curve off, responsiveness used to be hardcoded to
-              // 1 (always full rotation); now uses the tunable default
-              // (0-100%), same role Default Arm Length/Default Wrist Splay
-              // already play for their own features.
-              let responsiveness = (cfg.armRotationDefault ?? 100) / 100
-              if (cfg.armRotationCurveEnabled) {
-                const distToCursor = hand.wrapper.position.distanceTo(cursorTarget)
-                const minD = Math.min(...hands.map(h => h.wrapper.position.distanceTo(cursorTarget)))
-                const maxD = Math.max(...hands.map(h => h.wrapper.position.distanceTo(cursorTarget)))
-                const range = Math.max(maxD - minD, 1e-6)
-                const normDist = (distToCursor - minD) / range
-                responsiveness = (armRotationCurveParsed && armRotationCurveParsed.length)
-                  ? THREE.MathUtils.clamp(evaluateArmLengthCurve(armRotationCurveParsed, normDist), 0, 1)
-                  : 1
-              }
-              const armMinAbs = Math.min(Math.abs(armRotationRangeParsed.min), Math.abs(armRotationRangeParsed.max))
-              const armMaxAbs = Math.max(Math.abs(armRotationRangeParsed.min), Math.abs(armRotationRangeParsed.max))
-              targetBoundedAngleDeg = THREE.MathUtils.clamp(rawAngleDeg * responsiveness, armMinAbs, armMaxAbs)
+            if (!hand.currentArmRotationQuat) hand.currentArmRotationQuat = hand.currentBaseQuat.clone()
+            // Default Arm Rotation / Reactive Arm Rotation curve -- same
+            // role as before, now scaling the PER-FRAME TURN RATE instead
+            // of a bounded target angle. At 0%, the hand simply stops
+            // tracking and freezes wherever its own accumulated rotation
+            // currently is -- a disclosed behavior change from the old
+            // bounded-angle design (which always snapped back to exactly
+            // neutral at 0%), an unavoidable consequence of this no
+            // longer being "a fraction of a fixed target angle."
+            let responsiveness = (cfg.armRotationDefault ?? 100) / 100
+            if (cfg.armRotationCurveEnabled) {
+              const distToCursor = hand.wrapper.position.distanceTo(cursorTarget)
+              const minD = Math.min(...hands.map(h => h.wrapper.position.distanceTo(cursorTarget)))
+              const maxD = Math.max(...hands.map(h => h.wrapper.position.distanceTo(cursorTarget)))
+              const range = Math.max(maxD - minD, 1e-6)
+              const normDist = (distToCursor - minD) / range
+              responsiveness = (armRotationCurveParsed && armRotationCurveParsed.length)
+                ? THREE.MathUtils.clamp(evaluateArmLengthCurve(armRotationCurveParsed, normDist), 0, 1)
+                : 1
             }
-            // Arm Rotation Damping -- direct request 2026-09-28, same class
-            // of fix as this same round's Wrist Cropping/Wrist Splay
-            // damping: `targetBoundedAngleDeg` used to be applied straight,
-            // every frame, with no smoothing at all. `hand.currentArmRotationDeg`
-            // lerps toward the target each frame instead; kept UNCONDITIONAL
-            // (runs even when `rawAngleDeg <= 1e-6`, decaying toward 0) so
-            // it never holds a stale value that would mismatch `rawAngleDeg`
-            // the next frame the hand needs a real rotation again. Also
-            // capped through the SAME handoff-settle safety net as Palm
-            // Rotation's own damping below (`inHandoffSettle`), so a
-            // trigger-interruption handoff still gets a guaranteed gentle
-            // catch-up window regardless of how `armRotationDamping` itself
-            // is configured -- this is now this feature's ONLY damping;
-            // the final wrapper application below no longer re-damps it via
-            // Look-At Damping (see that variable's own correction comment).
+            // Arm Rotation Damping -- same handoff-settle safety net as
+            // before (a trigger-interruption handoff still gets a
+            // guaranteed gentle catch-up window regardless of how this is
+            // configured); now directly the per-frame slerp fraction
+            // (this feature's only rate control, multiplied by
+            // responsiveness above).
             const armRotationDampingAmt = inHandoffSettle
               ? Math.min(THREE.MathUtils.clamp(cfg.armRotationDamping ?? 1, 0.001, 1), HANDOFF_SETTLE_DAMPING_CAP)
               : THREE.MathUtils.clamp(cfg.armRotationDamping ?? 1, 0.001, 1)
-            hand.currentArmRotationDeg = hand.currentArmRotationDeg !== undefined
-              ? hand.currentArmRotationDeg + (targetBoundedAngleDeg - hand.currentArmRotationDeg) * armRotationDampingAmt
-              : targetBoundedAngleDeg
-            if (rawAngleDeg > 1e-6) {
-              // Clamped to [0,1] -- `rawAngleDeg` itself is NOT damped, only
-              // the bounded/responsive angle is, so a sudden DROP in
-              // rawAngleDeg (hand now closer to already facing the cursor)
-              // could otherwise let a still-catching-up damped numerator
-              // exceed its own denominator and overshoot the slerp.
-              const frac = THREE.MathUtils.clamp(hand.currentArmRotationDeg / rawAngleDeg, 0, 1)
-              desired = new THREE.Quaternion().copy(hand.currentBaseQuat).slerp(lookAtDesired, frac)
-            }
+            hand.currentArmRotationQuat.slerp(lookAtDesired, THREE.MathUtils.clamp(armRotationDampingAmt * responsiveness, 0, 1))
+            desired = hand.currentArmRotationQuat
           }
           let baseDeg = cfg.palmFacesCursor ? computeRadialRollDeg(hand.wrapper.position, cursorTarget) : 0
           // Palm Rotation Distance Curve -- modulate cursor-tracking
