@@ -12897,6 +12897,114 @@ experience should be noticeably smoother than even this improved
 measurement suggests.) **Not yet confirmed by the user on a real
 device** -- this is the strongest verification available from this
 sandbox alone.
+
+--------------------------------------------------------------------------------
+2026-09-28  -  (14th round overall -- 8-item batch, direct request: "Do
+everything except 9, push, then do 9")
+
+1. **Wrist Cropping gating.** `computeArmLengthT()`'s reactive (cursor-
+   distance-driven) branch now also requires `cfg.trackingEnabled` --
+   falls back to the static Default Arm Length while tracking is off,
+   same as it already does when Reactive Arm Length itself is off.
+
+2. **Responsive Arm Rotation -- new feature, root cause of "hands lean
+   toward the cursor even with everything else off."** Direct report:
+   with Palm Rotation/Wrist Splay/Wrist Cropping all off, toggling
+   Tracking Enabled alone still visibly changed hand orientation.
+   Root cause: the actual lookAt+slerp "face the cursor" rotation in
+   `animate()`'s cursor-tracking block had ALWAYS been gated only by
+   `trackingEnabled` itself, with no separate on/off -- it wasn't a
+   side effect of another sub-feature, it was simply never its own
+   feature. Added a new "Responsive Arm Rotation" dev-panel group
+   (`armRotationEnabled`, default true so existing behavior is
+   unchanged unless explicitly turned off; `armRotationCurveEnabled`/
+   `armRotationCurve`/`armRotationRange`, same curve-graph + range-
+   slider widgets Wrist Splay/Palm Rotation already use). With it off,
+   `desired` is `hand.currentBaseQuat` (this hand's own neutral, zero-
+   cursor-influence orientation) -- Tracking Enabled then has no
+   observable effect when every sub-feature is off, exactly as
+   requested. With it on, the ANGULAR distance between that neutral
+   orientation and the raw lookAt orientation is bounded/curved via
+   the same distance-curve + min/max-range shape Responsive Wrist
+   Splay uses, then re-applied along the same axis via a fractional
+   slerp -- never a different rotation, just a scaled amount of the
+   real one. `computeResponsiveWristSplayDeg()` also gated the same
+   way (falls back to the static Wrist Splay Default while tracking is
+   off).
+
+3. **Tween Stop's own On/Off checkbox moved into its group's label,**
+   reversing a 2026-09-24 spec decision (direct request this round:
+   "just like the other setting groups within a click function").
+   `wrapTweenStopGroup()` now calls `wrapGatedSubgroup()` (the same
+   mechanism Offset/Rotation/Retransition/etc. already use) instead of
+   `wrapPlainSubgroup()`.
+
+4. **Custom-function control layout reordered** (direct spec: Target
+   Pose/Sequence under Mode, Animation Speed right under that, then
+   Pause Duration, then Offset/Rotation). `CUSTOM_FUNCTION_POSE_LAYOUT`/
+   `CUSTOM_FUNCTION_HOLD_LAYOUT` (the existing appendChild()-based
+   reference-order mechanism, already applied unconditionally on every
+   create/restore/kind-switch) reordered to match -- no new mechanism,
+   just a different sequence. Multi Trigger's own added triggers now
+   also get `applyCustomFunctionReferenceLayout(prefix, 'pose')` (never
+   called for them before), which gracefully skips any layout entry
+   whose row doesn't exist in Multi Trigger's reduced control set.
+
+5. **Real bug found and fixed: Touch Point Count still visible on
+   Desktop after a Type-driven kind switch** (e.g. Click -> Click+Hold).
+   A brand-new function already hid this row correctly (confirmed
+   live) -- the gap was specifically `handleCustomFunctionTypeChange()`'s
+   own rebuild path, which calls `renderCustomClickFunctionGroup()` a
+   2nd time, building a GENUINELY NEW row element. Confirmed via a
+   MutationObserver on the original row (zero attribute mutations ever
+   recorded) while the row the DOM later contained was a different node
+   entirely. Fixed by re-running `updateCustomFunctionTypeVisibility(id)`
+   as the true LAST step of `renderCustomClickFunctionGroup()` (after
+   `applyCustomFunctionReferenceLayout()`), so it always sees whichever
+   row instance is actually live at the end.
+
+6. **Multi Trigger save -- investigated, could NOT reproduce.** Direct
+   report: "when i add multi trigger Trigger, clicking save in the dev
+   panel does not save the new trigger." Live-tested end to end against
+   production (enable Multi Trigger on `custom7`, add a trigger, click
+   the real panel Save button, GET `/api/save-settings` back): every
+   `custom7Trig1*` field AND `custom7MultiTriggers` itself were present
+   and correct in the saved JSON, both immediately after Save and after
+   a full page reload. No fix made -- if this recurs, it's likely
+   something this exact repro didn't hit (a stale already-open tab
+   running pre-fix code is the most likely candidate, given this
+   project's own documented history of that exact failure mode). The
+   test trigger and Multi Trigger-enabled state were removed again
+   before finishing, restoring `custom7` to its original configuration.
+
+7. **Rolling Click Window + Hold Confirm Delay moved to the top of
+   "Custom Click Functions."** `multiClickWindowMs` relocated from the
+   Debug group (where it lived as `MOUSE_LOG_MULTICLICK_MS`'s own
+   evolution) to right after the internal bookkeeping row, alongside
+   `holdConfirmMs` (which already lived in this group, just lower) --
+   both now the first 2 visible rows, before "+ Add Click Function."
+
+8. **Palm Rotation's own Min/Max range was built as a widget (this
+   session's earlier round) but never actually applied to the
+   rotation math -- confirmed by grep, a real pre-existing gap.** Added
+   `palmFacesCursorDistanceRangeParsed` (parsed in
+   `parseCursorTrackingConfig()`, previously missing entirely) and
+   wired it into the roll computation: clamps the final (already
+   curve-scaled) angle's MAGNITUDE to within Min/Max Palm Rotation,
+   sign preserved.
+
+Verified: `node --check src/main.js` passes throughout. Live-tested items
+5 and 6 directly against production via `window.__debug` (item 5's bug
+reproduced and the fix confirmed structurally; item 6 never reproduced).
+Items 1-4/7/8 were not independently live-verified this round (this
+sandbox's local static server hit its own documented network-truncation
+flakiness) -- pushed for verification against the deployed build instead,
+same as the prior round.
+
+`main.js` cache-buster bumped `?v=234` -> `?v=235`.
+
+================================================================================
+APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a
 correction, add a new entry noting the correction rather than editing the
 old one in place.

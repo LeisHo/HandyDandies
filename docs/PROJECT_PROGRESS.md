@@ -18,6 +18,41 @@ work seamlessly from there.
 
 ## Currently working on
 
+**IN PROGRESS 2026-09-28 (14th round) -- an 8-item batch (Wrist
+Cropping/Wrist Splay/Palm Rotation gating by Tracking Enabled, a new
+"Responsive Arm Rotation" feature, Tween Stop's in-label checkbox, custom-
+function control reordering, a Touch Point Count kind-switch bug, a
+Multi-Trigger-save report that could NOT be reproduced, moving 2 controls
+to the top of Custom Click Functions, and a real Palm Rotation min/max
+wiring gap) was implemented and pushed; not yet independently live-
+verified (this sandbox's local server hit its own documented network-
+truncation flakiness) -- see CHANGELOG.txt's matching 2026-09-28 entry for
+the full account of all 8, including which 2 (Touch Point Count, Multi
+Trigger) were actually live-tested against production.** The user's own
+next report should confirm whether the "hands lean toward the cursor even
+with everything else off" symptom and the reordered/relabeled dev-panel
+controls now look right.
+
+**STILL OCCURRING as of 2026-09-28, per the SAME round's direct follow-up
+report -- the prior round's fix (below) was necessary but is now
+confirmed NOT sufficient, and the user has narrowed the real cause
+further: "Its got noting to do wiht cursor tracking. I turned off Palm
+Rotation, Wrist Splay, Wrist Cropping, Tracking Enabled, and its still
+occurring. I turned off Retransition on my clickhold function, and its
+still occuring... Its the Tween stop. the jump doesnt occur when Tween
+Stop is turned off."** This directly implicates the 'stopping' phase in
+`updateClickHoldPoseForHand()` (Sequence mode's own "keep playing,
+decelerate" release path, gated by `${p}TweenStopEnabled`) rather than
+retransition or cursor-tracking -- the investigation below (the wrapper-
+vs-skeleton finding, the idle-repose continuity fix) may still be a real,
+separate improvement, but it is NOT the whole story for this specific
+report. Next step: apply the same live-instrumentation methodology that
+found the idle-repose bug, this time specifically to the 'stopping' phase
+and the moment it hands off (to 'retransition', or to being force-idled
+by a different function) with Tween Stop on vs. off.
+
+---
+
 **LIKELY FIXED 2026-09-28 (13th round, 6th round of the jump
 investigation) -- real root cause found via direct live instrumentation;
 pending the user's own real-device confirmation.** Prior rounds (5

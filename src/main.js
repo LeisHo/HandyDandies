@@ -65,6 +65,22 @@ let wristCropNormalAligned = null
 // modulates cursor-tracking responsiveness by hand distance. Parsed
 // from cfg.palmFacesCursorDistanceCurve in parseCursorTrackingConfig().
 let palmFacesCursorDistanceCurveParsed = [{ x: 0, y: 1 }, { x: 1, y: 1 }]
+// CORRECTED 2026-09-28 -- this range was built as a widget (curve-graph +
+// slider UI, earlier this same session) but the actual rotation math
+// never read it at all -- confirmed by grep, a real pre-existing gap.
+// Now genuinely applied: bounds the FINAL (already curve-scaled) palm
+// roll angle's magnitude to within Min/Max Palm Rotation, sign preserved
+// (same "clamp magnitude, keep sign" treatment as this new control's own
+// Responsive Arm Rotation sibling below).
+let palmFacesCursorDistanceRangeParsed = { min: 0, max: 180 }
+// Responsive Arm Rotation (2026-09-28, new feature -- see animate()'s own
+// cursor-tracking block for the full account) -- separates the actual
+// "hand leans/rotates toward the cursor" rotation out of Tracking Enabled
+// itself, into its own independently-toggleable, distance-curved,
+// min/max-bounded feature, exactly mirroring Responsive Wrist Splay's own
+// curve+range pattern generalized to a full 3D rotation angle.
+let armRotationCurveParsed = [{ x: 0, y: 1 }, { x: 1, y: 1 }]
+let armRotationRangeParsed = { min: 0, max: 180 }
 // dx/dy measured directly in world space (X right, Y up, matching this
 // project's own Field Layout grid and THREE.js's Y-up convention) --
 // deliberately NOT projected through the camera to screen/NDC space:
@@ -561,6 +577,35 @@ const DEV_GROUPS = [
     ]
   },
   {
+    // Added 2026-09-28, direct request/bug report: "It looks like the
+    // hand models are somewhat leaning towards the cursor... I want you
+    // to separate it from the Enabled Tracking checkbox itself... When
+    // all other functions (Palm Rotation, Wrist Splay, Wrist Cropping,
+    // Arm/Hand rotation) are turned off, turning the Tracking Enabled
+    // checkbox on and off should not have any visual change." Root cause:
+    // the actual "hand orients toward the cursor" lookAt+slerp in
+    // animate() was gated ONLY by `trackingEnabled` itself, with no
+    // separate on/off of its own -- exactly the "leaning" effect the
+    // report describes, always on whenever the master gate is, unrelated
+    // to whether Palm Rotation/Wrist Splay/Wrist Cropping are individually
+    // enabled or not. This group makes that rotation its own named,
+    // independently-toggleable feature (default ON, so existing behavior
+    // is unchanged until the user explicitly turns it off), with the same
+    // distance-curve + min/max-range shape every other Responsive-*
+    // feature in this file already has -- see animate()'s own cursor-
+    // tracking block for exactly how the curve/range bound the rotation's
+    // own angular magnitude (never its direction), and buildArmRotationWidgets()
+    // for the curve-graph/range-slider UI (same builders Wrist Splay/Palm
+    // Rotation already use).
+    title: 'Responsive Arm Rotation',
+    controls: [
+      { key: 'armRotationEnabled', label: 'Responsive Arm Rotation (Master On/Off)', type: 'checkbox', def: true, perDevice: true },
+      { key: 'armRotationCurveEnabled', label: 'Arm Rotation Distance Curve On/Off', type: 'checkbox', def: false, onChange: () => updateArmRotationGateVisibility() },
+      { key: 'armRotationCurve', label: 'Arm Rotation Distance Curve (Distance -> Rotation Amount)', type: 'text', def: '[{"x":0,"y":1},{"x":1,"y":1}]', onChange: () => parseCursorTrackingConfig() },
+      { key: 'armRotationRange', label: 'Min / Max Arm Rotation (Deg)', type: 'text', def: '{"min":0,"max":180}', onChange: () => parseCursorTrackingConfig() }
+    ]
+  },
+  {
     // Direct request 2026-09-16: "is it possible to have 1 hand running
     // through a loading sequence, like a loading animation?" then "build
     // it... provide me a checkbox to turn it on and off... appropriate
@@ -920,15 +965,28 @@ const DEV_GROUPS = [
       // other row-visibility function in this file already uses (devPanel.js
       // itself has no native "hidden" control type).
       { key: 'customClickFunctionIds', label: 'Custom Function IDs (Internal, Auto-Managed)', type: 'text', def: '[]' },
-      { key: 'addCustomClickFunctionBtn', label: '+ Add Click Function', type: 'button', onClick: () => addCustomClickFunction() },
-      // Global Hold Confirm Delay (direct request 2026-09-24, replacing
-      // the old per-function `${p}HoldConfirmMs` slider -- see that
-      // control's own former comment, now on makeClickHoldPoseGroup()'s
-      // TransitionSpeedMs control, for the full history/reasoning behind
-      // the 500ms default). One shared value for every hold-kind function
-      // (static or custom) -- see updateClickHoldPoseForHand()'s own
-      // commit-gate for where this is read at runtime.
+      // MOVED to the top of this group 2026-09-28 (direct request) -- both
+      // were previously elsewhere (Hold Confirm Delay lower in this same
+      // group; Rolling Click Window in the Debug group, see
+      // MOUSE_LOG_MULTICLICK_MS's own declaration comment for the full
+      // history of that control). Global Hold Confirm Delay (direct
+      // request 2026-09-24, replacing the old per-function
+      // `${p}HoldConfirmMs` slider -- see that control's own former
+      // comment, now on makeClickHoldPoseGroup()'s TransitionSpeedMs
+      // control, for the full history/reasoning behind the 500ms
+      // default). One shared value for every hold-kind function (static
+      // or custom) -- see updateClickHoldPoseForHand()'s own commit-gate
+      // for where this is read at runtime.
       { key: 'holdConfirmMs', label: 'Hold Confirm Delay (Ms)', type: 'slider', min: 0, max: 1000, step: 10, def: 500 },
+      // Rolling Click Window -- governs how long a gap between consecutive
+      // clicks is still read as "the same multi-click sequence
+      // continuing" for Click Pose's 2/3/4-click chain, the Click-Hold
+      // chain (dcHold/tripleClickHold/quadClickHold), and the Mouse
+      // Tracking Log's own click classification, all 3 at once (see this
+      // control's original Debug-group declaration, now removed, for the
+      // full "rolling window model" derivation).
+      { key: 'multiClickWindowMs', label: 'Rolling Click Window -- Max Gap Between Successive Clicks (Ms)', type: 'slider', min: 50, max: 600, step: 10, def: 200 },
+      { key: 'addCustomClickFunctionBtn', label: '+ Add Click Function', type: 'button', onClick: () => addCustomClickFunction() },
       // Mobile-only Zoom/Scroll gesture types (direct request 2026-09-22)
       // -- shared detection thresholds, not per-function, since the raw
       // gesture (a 2-finger spread vs. pan) is the same real-world motion
@@ -1465,32 +1523,7 @@ const DEV_GROUPS = [
       // otherwise would spam the display every frame.
       { key: 'logCursorPositionEnabled', label: 'Log Regular Cursor Position', type: 'checkbox', def: false, onChange: () => restartCursorLogTimer() },
       { key: 'cursorLogIntervalMs', label: 'Cursor Position Log Interval (Ms)', type: 'slider', min: 100, max: 5000, step: 50, def: 1000, onChange: () => restartCursorLogTimer() },
-      { key: 'clearMouseLogBtn', label: 'Clear Mouse Tracking Log', type: 'button', onClick: () => clearMouseTrackingLog() },
-      // See MOUSE_LOG_MULTICLICK_MS's own declaration comment for why this
-      // is now a slider instead of a hardcoded constant -- governs how
-      // long a gap between consecutive clicks is still read as "the same
-      // multi-click sequence continuing" for Click Pose's 2/3/4-click
-      // chain, the Click-Hold chain (dcHold/tripleClickHold/
-      // quadClickHold), and this Mouse Tracking Log's own click
-      // classification, all 3 at once.
-      // CORRECTED 2026-09-27 -- direct spec ("rolling window model...
-      // approximately 200ms... maximum allowed time between successive
-      // clicks"). Traced all 3 real consumers before changing anything
-      // (per direct instruction): the fire-and-forget click chain
-      // (clickPoseClickTimer), the click-hold chain
-      // (clickHoldChainLastCleanUpTime), and Mouse Log's own
-      // classification (mouseLogClickTimer) ALL already `clearTimeout` +
-      // restart their own timer on every new click/press -- this is
-      // already the exact rolling/resetting-from-the-most-recent-click
-      // model the spec describes, not a fixed whole-sequence window (this
-      // control's own comment directly above already documented it this
-      // way). Only the DEFAULT/RANGE needed changing: 600ms (tuned to
-      // feel like a whole-sequence budget) is much longer than a natural
-      // gap between deliberate consecutive clicks; relabeled and re-
-      // ranged for the gap framing, default dropped to the spec's own
-      // ~200ms. No dispatch/logic change made -- see this project's own
-      // CHANGELOG.txt for the full trace and reasoning.
-      { key: 'multiClickWindowMs', label: 'Rolling Click Window -- Max Gap Between Successive Clicks (Ms)', type: 'slider', min: 50, max: 600, step: 10, def: 200 }
+      { key: 'clearMouseLogBtn', label: 'Clear Mouse Tracking Log', type: 'button', onClick: () => clearMouseTrackingLog() }
     ]
   }
 ]
@@ -1670,6 +1703,8 @@ buildWristSplayWidgets()
 parseCursorTrackingConfig()
 buildCursorTrackingWidgets()
 updateCursorTrackingGateVisibility()
+buildArmRotationWidgets()
+updateArmRotationGateVisibility()
 // Click-Hold-Pose's own setup call (parseClickHoldConfig/
 // buildClickHoldPoseWidgets per trigger) is NOT made here like the other
 // widgets above -- clickHoldPoseTriggers (which parseClickHoldConfig
@@ -5235,7 +5270,13 @@ function parseArmLengthConfig() {
 }
 function computeArmLengthT(hand, distanceToCursor, minLiveDist, liveDistRange) {
   if (!cfg.cropWristEnabled) return 0 // master off -- full arm, always
-  if (!cfg.reactiveArmLengthEnabled) return cfg.hideWrist / 100
+  // CORRECTED 2026-09-28 (direct request/bug report): Responsive (reactive,
+  // cursor-distance-driven) Wrist Cropping must not be active while the
+  // global Tracking Enabled gate is off -- falls back to the static
+  // Default Arm Length exactly as if Reactive Arm Length itself were off,
+  // same as every other Responsive-* feature this same round gates the
+  // same way (Wrist Splay, the new Responsive Arm Rotation).
+  if (!cfg.trackingEnabled || !cfg.reactiveArmLengthEnabled) return cfg.hideWrist / 100
   const normDist = THREE.MathUtils.clamp((distanceToCursor - minLiveDist) / liveDistRange, 0, 1)
   const curveY = THREE.MathUtils.clamp(evaluateArmLengthCurve(armLengthCurveParsed, normDist), 0, 1)
   const minT = armLengthRangeParsed.min / 100, maxT = armLengthRangeParsed.max / 100
@@ -5247,6 +5288,9 @@ function parseWristSplayConfig() {
 }
 function parseCursorTrackingConfig() {
   try { palmFacesCursorDistanceCurveParsed = JSON.parse(cfg.palmFacesCursorDistanceCurve).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
+  try { palmFacesCursorDistanceRangeParsed = JSON.parse(cfg.palmFacesCursorDistanceRange) } catch (e) { /* keep last-good value */ }
+  try { armRotationCurveParsed = JSON.parse(cfg.armRotationCurve).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
+  try { armRotationRangeParsed = JSON.parse(cfg.armRotationRange) } catch (e) { /* keep last-good value */ }
 }
 function updateCursorTrackingGateVisibility() {
   // Toggle visibility of cursor-tracking curve controls based on
@@ -5255,6 +5299,12 @@ function updateCursorTrackingGateVisibility() {
   const rangeRow = document.querySelector('.dp-row[data-key="palmFacesCursorDistanceRange"]')
   if (curveRow) curveRow.style.display = cfg.palmFacesCursorDistanceCurveEnabled ? '' : 'none'
   if (rangeRow) rangeRow.style.display = cfg.palmFacesCursorDistanceCurveEnabled ? '' : 'none'
+}
+function updateArmRotationGateVisibility() {
+  const curveRow = document.querySelector('.dp-row[data-key="armRotationCurve"]')
+  const rangeRow = document.querySelector('.dp-row[data-key="armRotationRange"]')
+  if (curveRow) curveRow.style.display = cfg.armRotationCurveEnabled ? '' : 'none'
+  if (rangeRow) rangeRow.style.display = cfg.armRotationCurveEnabled ? '' : 'none'
 }
 // Returns the EXTRA wrist-splay rotation (degrees) this hand should get
 // on top of the Pose group's own shared `cfg.wristSplay` -- 0 when the
@@ -5267,7 +5317,10 @@ function updateCursorTrackingGateVisibility() {
 // numerically larger.
 function computeResponsiveWristSplayDeg(distanceToCursor, minLiveDist, liveDistRange) {
   if (!cfg.wristSplayResponsiveEnabled) return 0
-  if (!cfg.wristSplayReactiveEnabled) return cfg.wristSplayDefault
+  // CORRECTED 2026-09-28 -- see computeArmLengthT()'s own matching
+  // comment; same "Responsive-* falls back to its static default while
+  // Tracking Enabled is off" treatment.
+  if (!cfg.trackingEnabled || !cfg.wristSplayReactiveEnabled) return cfg.wristSplayDefault
   const normDist = THREE.MathUtils.clamp((distanceToCursor - minLiveDist) / liveDistRange, 0, 1)
   const curveY = THREE.MathUtils.clamp(evaluateArmLengthCurve(wristSplayCurveParsed, normDist), 0, 1)
   const { min, max } = wristSplayRangeParsed
@@ -5405,6 +5458,14 @@ function buildCursorTrackingWidgets() {
   const rangeRow = document.querySelector('.dp-row[data-key="palmFacesCursorDistanceRange"]')
   if (curveRow) buildGenericCurveWidget(curveRow, { caption: 'X: Distance From Cursor (Nearest→Farthest Hand)  ·  Y: Palm Rotation Responsiveness (0=None, 1=Full)', defaultPoints: [{ x: 0, y: 1 }, { x: 1, y: 1 }] })
   if (rangeRow) buildGenericRangeBarWidget(rangeRow, { trackMin: -180, trackMax: 180, unit: '°', defaultValue: { min: 0, max: 180 } })
+}
+// Responsive Arm Rotation's own curve-graph + range-slider widgets --
+// same builders, same call shape as buildCursorTrackingWidgets() above.
+function buildArmRotationWidgets() {
+  const curveRow = document.querySelector('.dp-row[data-key="armRotationCurve"]')
+  const rangeRow = document.querySelector('.dp-row[data-key="armRotationRange"]')
+  if (curveRow) buildGenericCurveWidget(curveRow, { caption: 'X: Distance From Cursor (Nearest→Farthest Hand)  ·  Y: Arm Rotation Amount (0=None, 1=Full)', defaultPoints: [{ x: 0, y: 1 }, { x: 1, y: 1 }] })
+  if (rangeRow) buildGenericRangeBarWidget(rangeRow, { trackMin: 0, trackMax: 180, unit: '°', defaultValue: { min: 0, max: 180 } })
 }
 
 function buildArmLengthRangeWidget(row) {
@@ -9210,6 +9271,24 @@ function renderCustomClickFunctionGroup(id, title, kind, family) {
   // of which path triggered the rebuild, AND keeps every function
   // (new or restored) normalized to the reference layout.
   applyCustomFunctionReferenceLayout(id, kind)
+  // CORRECTED 2026-09-28 -- direct report: "Touch Point Count is still
+  // showing up in new click functions on desktop tab." The EARLIER call
+  // to updateCustomFunctionTypeVisibility() above (right after this
+  // function's own renderDynamicGroup() call) correctly hides the row at
+  // THAT moment -- confirmed live for a brand-new function. But a
+  // Type-driven KIND SWITCH (handleCustomFunctionTypeChange(), Click ->
+  // Click+Hold or similar) calls this whole function a 2nd time, which
+  // calls renderDynamicGroup() again, building a GENUINELY NEW
+  // TouchPointCount row element -- confirmed live via a MutationObserver
+  // on the original row (zero attribute mutations ever recorded) while
+  // the row this project's own DOM query later found was a different
+  // node entirely (`sameNode: false`). Re-running the check here, as the
+  // TRUE last step of this function (after applyCustomFunctionReferenceLayout()'s
+  // own appendChild() calls, which only ever MOVE existing nodes, never
+  // replace them), guarantees it always sees whichever row instance is
+  // actually live at the end, regardless of how many times this function
+  // rebuilt it internally.
+  updateCustomFunctionTypeVisibility(id)
 }
 // Type select's own onChange for a custom function (CORRECTED 2026-09-20,
 // see "Custom Click Functions"'s own DEV_GROUPS comment for the full
@@ -9348,11 +9427,22 @@ function registerCustomClickFunction(id, title, kind, family) {
 const CUSTOM_FUNCTION_TEXT_OVERRIDES = { Enabled: 'ON/ OFF', Type: 'Trigger Type', ClickCount: 'Trigger Count' }
 // `type: 'row'` items use `suffix` (appended to `${id}`); `type: 'group'`
 // items use `title` (a literal, shared group dataset.key -- see above).
+// CORRECTED 2026-09-28 (direct request): Target Pose/Sequence selector
+// now sits directly under Mode, Animation Speed right under that, then
+// Pause Duration, THEN Offset/Rotation -- previously Offset/Rotation sat
+// much earlier (right after ClickCount) and the target/speed/pause
+// cluster came after them. Only the ORDER changed here; every row/group
+// itself is unchanged, so applyCustomFunctionReferenceLayout()'s own
+// appendChild()-based relocation (see its own comment) picks this up
+// for every existing function on next restore/rebuild, no data migration
+// needed.
 const CUSTOM_FUNCTION_POSE_LAYOUT = [
   { type: 'row', suffix: 'Enabled' },
   { type: 'row', suffix: 'Type' }, { type: 'row', suffix: 'TouchPointCount' }, { type: 'row', suffix: 'ClickCount' },
-  { type: 'row', suffix: 'Mode' }, { type: 'row', suffix: 'TargetPose' }, { type: 'row', suffix: 'TransitionSpeedMs' },
-  { type: 'row', suffix: 'TweenSelector' }, { type: 'row', suffix: 'TweenSpeedMs' }, { type: 'row', suffix: 'PauseDurationMs' },
+  { type: 'row', suffix: 'Mode' },
+  { type: 'row', suffix: 'TargetPose' }, { type: 'row', suffix: 'TweenSelector' },
+  { type: 'row', suffix: 'TransitionSpeedMs' }, { type: 'row', suffix: 'TweenSpeedMs' },
+  { type: 'row', suffix: 'PauseDurationMs' },
   { type: 'group', title: 'Offset' }, { type: 'group', title: 'Rotation' },
   { type: 'row', suffix: 'SequencePlayMode' }, { type: 'row', suffix: 'SequenceCount' }, { type: 'row', suffix: 'SequenceCountMode' },
   { type: 'row', suffix: 'SequenceLoopTransition' }, { type: 'row', suffix: 'SequenceHoldMs' },
@@ -9368,13 +9458,19 @@ const CUSTOM_FUNCTION_POSE_LAYOUT = [
 // nothing. "Tween Stop" (items 10/11) is placed last, matching where the
 // old flat OnReleaseMode/TweenStop* rows sat at the very end of
 // custom8's own captured order.
+// CORRECTED 2026-09-28 (direct request, same reasoning as
+// CUSTOM_FUNCTION_POSE_LAYOUT's own matching comment): Target Pose/
+// Sequence/Chain now sits directly under Mode, Animation Speed right
+// under that, then Offset/Rotation, then Loop -- previously Offset/
+// Rotation sat right after Mode/TweenSelector and the rest came after.
 const CUSTOM_FUNCTION_HOLD_LAYOUT = [
   { type: 'row', suffix: 'Enabled' },
   { type: 'row', suffix: 'Type' }, { type: 'row', suffix: 'TouchPointCount' }, { type: 'row', suffix: 'ClickCount' },
-  { type: 'row', suffix: 'Mode' }, { type: 'row', suffix: 'TweenSelector' },
+  { type: 'row', suffix: 'Mode' },
+  { type: 'row', suffix: 'TargetPose' }, { type: 'row', suffix: 'TweenSelector' }, { type: 'row', suffix: 'TweenChain' },
+  { type: 'row', suffix: 'TransitionSpeedMs' }, { type: 'row', suffix: 'TweenSpeedMs' },
   { type: 'group', title: 'Offset' }, { type: 'group', title: 'Rotation' },
-  { type: 'row', suffix: 'TargetPose' }, { type: 'row', suffix: 'TweenChain' }, { type: 'row', suffix: 'TweenSpeedMs' },
-  { type: 'row', suffix: 'LoopMode' }, { type: 'row', suffix: 'LoopHoldMs' }, { type: 'row', suffix: 'TransitionSpeedMs' },
+  { type: 'row', suffix: 'LoopMode' }, { type: 'row', suffix: 'LoopHoldMs' },
   { type: 'group', title: 'Animation Speed Curve' }, { type: 'group', title: 'Start Time Curve' }, { type: 'group', title: 'Start Distance Curve' },
   { type: 'group', title: 'Retransition' }, { type: 'group', title: 'Tween Stop' }
 ]
@@ -9653,6 +9749,14 @@ function registerMultiTriggerTrigger(prefix, title, mtBody, addBtnRow) {
   updateSingleTimingGateVisibility(prefix)
   wrapClickFunctionGatedSubgroups(prefix)
   updateClickFunctionEnabledVisibility(prefix)
+  // Same reference row/group order every regular custom function gets
+  // (item 4, 2026-09-28 direct request) -- applyCustomFunctionReferenceLayout()
+  // silently skips any layout entry whose row/group doesn't exist for
+  // this reduced control set (Type/TouchPointCount/ClickCount/Sequence*
+  // aren't in MULTI_TRIGGER_ALLOWED_SUFFIXES), so this is safe to call
+  // unconditionally with the same 'pose' layout every fire-and-forget
+  // function uses.
+  applyCustomFunctionReferenceLayout(prefix, 'pose')
 }
 // Reads cfg[`${id}MultiTriggers`] (the persisted, ordered trigger list)
 // and rebuilds every trigger's own runtime state + (if a panel exists)
@@ -10410,8 +10514,19 @@ function wrapPlainSubgroup(anchorKey, memberKeys, subgroupTitle) {
 // the function's own top level. Hold-kind only -- fire-and-forget
 // triggers have no Tween Stop fields at all.
 function wrapTweenStopGroup(p) {
-  const g = wrapPlainSubgroup(`${p}TweenStopEnabled`, [
-    `${p}TweenStopEnabled`,
+  // CORRECTED 2026-09-28 (direct request: "Tween Stop On Off checkbox
+  // should be in the setting group label just like the other setting
+  // groups within a click function") -- this REVERSES the original
+  // 2026-09-24 spec decision documented on `${p}TweenStopEnabled`'s own
+  // control comment above ("Unlike Retransition, Offset etc, It wont
+  // have the in-label on off checkbox"). Now built via wrapGatedSubgroup()
+  // (the same mechanism Offset/Rotation/Retransition/etc already use)
+  // instead of wrapPlainSubgroup() -- moves `${p}TweenStopEnabled` bodily
+  // into the group's own header, exactly like every other mandatory
+  // gated subgroup. wrapPlainSubgroup() itself is left defined (no longer
+  // called anywhere in this file) rather than deleted, per this
+  // project's own "nothing gets deleted by default" convention.
+  const g = wrapGatedSubgroup(`${p}TweenStopEnabled`, [
     `${p}TweenStopStartTimeCurveEnabled`, `${p}TweenStopStartTimeCurve`, `${p}TweenStopStartTimeRange`,
     `${p}TweenStopDelayEnabled`, `${p}TweenStopDelayMs`, `${p}TweenStopDelayCurveEnabled`, `${p}TweenStopDelayCurve`, `${p}TweenStopDelayRange`
   ], 'Tween Stop')
@@ -11507,7 +11622,7 @@ function animate(dt, now) {
         // as before.
         hands.forEach((hand) => {
           const m = new THREE.Matrix4().lookAt(hand.wrapper.position, cursorTarget, UP)
-          const desired = new THREE.Quaternion().setFromRotationMatrix(m)
+          const lookAtDesired = new THREE.Quaternion().setFromRotationMatrix(m)
           // CORRECTED 2026-09-28 (5th round of this same jump investigation) --
           // direct report, repeated and precise: with Retransition OFF the
           // jump never happens; with it ON, a hand that was under click-
@@ -11546,6 +11661,44 @@ function animate(dt, now) {
           const effectiveTrackingDamping = (hand._handoffSettleFrames > 0)
             ? Math.min(cfg.trackingDamping, HANDOFF_SETTLE_DAMPING_CAP)
             : cfg.trackingDamping
+          // Responsive Arm Rotation (2026-09-28, new feature) -- this is the
+          // actual "hand leans/rotates toward the cursor" rotation, now its
+          // own independently-toggleable feature (direct report: "It looks
+          // like the hand models are somewhat leaning towards the cursor...
+          // separate it from the Enabled Tracking checkbox itself... When
+          // all other functions are turned off, turning Tracking Enabled on
+          // and off should not have any visual change"). `hand.currentBaseQuat`
+          // is this hand's own "wherever it'd be with zero cursor influence"
+          // neutral orientation -- with the feature off, `desired` stays
+          // exactly that (matching the "no visual change" requirement).
+          // With it on, bounds/curves the ANGULAR distance between that
+          // neutral orientation and the raw lookAt orientation using the
+          // exact same distance-curve + min/max-range shape Responsive
+          // Wrist Splay already uses (see computeResponsiveWristSplayDeg()'s
+          // own comment), then re-applies that bounded angle along the SAME
+          // axis/direction as the raw lookAt via a fractional slerp -- never
+          // a different rotation, just a scaled amount of the real one.
+          let desired = hand.currentBaseQuat
+          if (cfg.armRotationEnabled) {
+            const rawAngleDeg = THREE.MathUtils.radToDeg(hand.currentBaseQuat.angleTo(lookAtDesired))
+            if (rawAngleDeg > 1e-6) {
+              let responsiveness = 1
+              if (cfg.armRotationCurveEnabled) {
+                const distToCursor = hand.wrapper.position.distanceTo(cursorTarget)
+                const minD = Math.min(...hands.map(h => h.wrapper.position.distanceTo(cursorTarget)))
+                const maxD = Math.max(...hands.map(h => h.wrapper.position.distanceTo(cursorTarget)))
+                const range = Math.max(maxD - minD, 1e-6)
+                const normDist = (distToCursor - minD) / range
+                responsiveness = (armRotationCurveParsed && armRotationCurveParsed.length)
+                  ? THREE.MathUtils.clamp(evaluateArmLengthCurve(armRotationCurveParsed, normDist), 0, 1)
+                  : 1
+              }
+              const armMinAbs = Math.min(Math.abs(armRotationRangeParsed.min), Math.abs(armRotationRangeParsed.max))
+              const armMaxAbs = Math.max(Math.abs(armRotationRangeParsed.min), Math.abs(armRotationRangeParsed.max))
+              const boundedAngleDeg = THREE.MathUtils.clamp(rawAngleDeg * responsiveness, armMinAbs, armMaxAbs)
+              desired = new THREE.Quaternion().copy(hand.currentBaseQuat).slerp(lookAtDesired, boundedAngleDeg / rawAngleDeg)
+            }
+          }
           let baseDeg = cfg.palmFacesCursor ? computeRadialRollDeg(hand.wrapper.position, cursorTarget) : 0
           // Palm Rotation Distance Curve -- modulate cursor-tracking
           // responsiveness by distance (2026-09-24). At close distance,
@@ -11562,9 +11715,21 @@ function animate(dt, now) {
               : 1
             baseDeg = baseDeg * THREE.MathUtils.clamp(responsiveness, 0, 1)
           }
+          // CORRECTED 2026-09-28 -- Min/Max Palm Rotation (palmFacesCursorDistanceRange)
+          // was built as a widget earlier this session but never actually
+          // consumed by this math (confirmed by grep -- a real pre-existing
+          // gap). Bounds the final angle's MAGNITUDE (sign preserved, since
+          // computeRadialRollDeg()/the offset slider can both be negative)
+          // to within Min/Max Palm Rotation, same "clamp magnitude, keep
+          // sign" treatment as every other signed-angle control in this file.
+          if (baseDeg !== 0) {
+            const palmMinAbs = Math.min(Math.abs(palmFacesCursorDistanceRangeParsed.min), Math.abs(palmFacesCursorDistanceRangeParsed.max))
+            const palmMaxAbs = Math.max(Math.abs(palmFacesCursorDistanceRangeParsed.min), Math.abs(palmFacesCursorDistanceRangeParsed.max))
+            baseDeg = Math.sign(baseDeg) * THREE.MathUtils.clamp(Math.abs(baseDeg), palmMinAbs, palmMaxAbs)
+          }
           // Whole-wrapper rotation only, same mechanism as the default mode;
           // no skeleton/pose involvement either way.
-          desired.multiply(computeRollQuat(baseDeg))
+          desired = desired.clone().multiply(computeRollQuat(baseDeg))
           hand.wrapper.quaternion.slerp(desired, effectiveTrackingDamping)
         })
       }

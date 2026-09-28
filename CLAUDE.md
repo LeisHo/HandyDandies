@@ -1717,3 +1717,76 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   before assuming the wrapper-level cursor-tracking mechanism is at fault
   again -- it has now been directly measured fully continuous across this
   exact scenario, twice.
+- **CORRECTED 2026-09-28 -- the 6th-round idle-repose fix directly above
+  was necessary but NOT sufficient; the user's own further-narrowed
+  report points at Tween Stop, not retransition or cursor-tracking at
+  all.** Direct follow-up: with Palm Rotation/Wrist Splay/Wrist Cropping/
+  Tracking Enabled ALL off, AND Retransition off, the jump still happens
+  -- but it stops happening the instant `${p}TweenStopEnabled` is turned
+  off. See PROJECT_PROGRESS.md's own matching entry -- this is the next
+  real lead for this investigation, not yet root-caused.
+- **`renderCustomClickFunctionGroup()` can rebuild a custom function's
+  entire DOM group MID-SESSION (via `handleCustomFunctionTypeChange()`,
+  whenever a Type change also swaps the function's underlying `kind` --
+  e.g. Click -> Click+Hold), and this REPLACES every row with a brand-new
+  element, never reusing the old one.** Confirmed live 2026-09-28 via a
+  MutationObserver placed on a control's row BEFORE triggering a kind-
+  switching Type change: zero attribute mutations were ever recorded on
+  that original node, while the row a later DOM query found was a
+  different element entirely (`sameNode: false`). This is exactly why
+  `updateCustomFunctionTypeVisibility(id)`'s own EARLIER call (right after
+  the group's first build, inside `renderCustomClickFunctionGroup()`)
+  correctly hides Touch Point Count for a brand-new function but silently
+  stopped working after a kind-switch -- the row it had hidden was
+  discarded moments later by the SAME function's own kind-switch rebuild,
+  and nothing re-ran the check against the new one. Fixed by re-running
+  `updateCustomFunctionTypeVisibility(id)` as the TRUE last step of
+  `renderCustomClickFunctionGroup()`, after `applyCustomFunctionReferenceLayout()`
+  (whose own `appendChild()` calls only ever MOVE existing nodes, never
+  replace them, so nothing after that point can discard the row again).
+  **Any future per-row visibility/state fix in this function needs to
+  account for this same rebuild-not-reuse behavior** -- a fix applied
+  once, early, is not guaranteed to survive a later kind-switch unless
+  it's either idempotent-and-reapplied at the very end (this fix's own
+  approach) or explicitly re-triggered by `handleCustomFunctionTypeChange()`
+  itself.
+- **Min/Max Palm Rotation (`palmFacesCursorDistanceRange`) was built as a
+  real curve-graph + range-slider widget (an earlier round this same
+  session) but the actual rotation math in `animate()`'s cursor-tracking
+  block never read it at all -- confirmed by grep, a real pre-existing
+  gap, not a regression.** The UI existed and looked fully functional;
+  dragging its handles updated `cfg` correctly, but nothing downstream
+  ever consumed the parsed value. Fixed 2026-09-28 by adding
+  `palmFacesCursorDistanceRangeParsed` (parsed in
+  `parseCursorTrackingConfig()`, previously entirely missing) and
+  clamping the final, already curve-scaled roll angle's MAGNITUDE to
+  within it (sign preserved). **When a control's own widget/UI clearly
+  works (value changes, persists, survives reload) but the FEATURE it's
+  supposed to control seems to have no effect, check whether the
+  computation that should read the parsed value actually does** -- a
+  widget can be 100% correctly built and completely inert at the same
+  time, and neither half of that is visible from the panel alone.
+- **The actual "hand rotates to face the cursor" lookAt+slerp rotation in
+  `animate()`'s cursor-tracking block had NO independent on/off of its
+  own before 2026-09-28 -- it was gated ONLY by the master `trackingEnabled`
+  checkbox, with no separate feature-level toggle, unlike every other
+  cursor-tracking-driven effect (Palm Rotation, Wrist Splay, Wrist
+  Cropping all already had their own master switches).** This is exactly
+  why turning off every OTHER tracking sub-feature still left a visible
+  "hands lean toward the cursor" effect -- there was nothing left to turn
+  off, that rotation WAS what Tracking Enabled itself did. Fixed by
+  adding a new "Responsive Arm Rotation" group/feature
+  (`armRotationEnabled`, default true; `armRotationCurveEnabled`/
+  `armRotationCurve`/`armRotationRange`) that this rotation is now gated
+  by, in addition to `trackingEnabled` -- with it off, a hand's wrapper
+  orientation continuously slerps toward `hand.currentBaseQuat` (its own
+  neutral, zero-cursor-influence orientation) instead of the cursor, so
+  Tracking Enabled alone produces zero visual change once every real
+  sub-feature (this one included) is off. **NOT live-verified this
+  round** -- see this round's own CHANGELOG entry for why (local-server
+  network-truncation flakiness); if a future report describes Whole-Hand
+  Rotation, Loading/Pose Preview, or any OTHER camera-facing lookAt as
+  unexpectedly changed, re-check this specific edit first, since it
+  restructured what `desired` means throughout this whole block (renamed
+  the old local `desired` to `lookAtDesired`, with a new `desired`
+  variable now potentially equal to `hand.currentBaseQuat` instead).
