@@ -23,7 +23,7 @@
       "hideHands": false,
       "trackingEnabled": true,
       "trackingDamping": 0.13,
-      "targetDepthFactor": 1.25,
+      "targetDepthFactor": 0.85,
       "showTargetMarker": false,
       "palmFacesCursor": true,
       "palmFaceRotationOffset": 13,
@@ -196,13 +196,13 @@
       "loadingPreviewSequenceHoldMs": 0,
       "loadingPreviewSize": 1390,
       "loadingPreviewRotationX": -79.52141477498444,
-      "loadingPreviewRotationY": -3.4505366585857034,
+      "loadingPreviewRotationY": -3.4505366585857016,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 1.225225212453898,
-      "loadingPreviewOffsetY": -2.336093655522892,
+      "loadingPreviewOffsetY": -2.3360936555228924,
       "loadingPreviewOffsetZ": -33.384543534396904,
       "loadingPreviewCameraFov": 32,
-      "loadingPreviewCameraZoom": 64.25715498581916,
+      "loadingPreviewCameraZoom": 64.25715498581914,
       "loadingPreviewCameraEditMode": true,
       "customClickFunctionIds": "[{\"id\":\"custom7\",\"title\":\"Custom Click Function 7\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom8\",\"title\":\"Custom Click Function 8\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom9\",\"title\":\"Custom Click Function 9\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom10\",\"title\":\"Custom Click Function 10\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom13\",\"title\":\"Custom Click Function 13\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom14\",\"title\":\"Custom Click Function 14\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom15\",\"title\":\"Custom Click Function 15\",\"kind\":\"hold\",\"family\":\"desktop\"}]",
       "holdConfirmMs": 510,
@@ -6753,6 +6753,40 @@
       "custom7RetransitionStartTimeRange": "{\"min\":0,\"max\":1048}",
       "custom7MultiTriggerEnabled": true,
       "custom7MultiTriggers": "[{\"prefix\":\"custom7Trig1\",\"title\":\"Trigger 1\"}]",
+      "custom7Trig1Enabled": true,
+      "custom7Trig1Mode": "Single Pose",
+      "custom7Trig1OffsetEnabled": false,
+      "custom7Trig1OffsetX": 0,
+      "custom7Trig1OffsetY": 0,
+      "custom7Trig1RotationEnabled": false,
+      "custom7Trig1RotationX": 0,
+      "custom7Trig1RotationY": 0,
+      "custom7Trig1RotationZ": 0,
+      "custom7Trig1TargetPose": "Fist",
+      "custom7Trig1TweenSelector": "",
+      "custom7Trig1TweenSpeedMs": 800,
+      "custom7Trig1TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom7Trig1TweenStartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom7Trig1TransitionSpeedMs": 700,
+      "custom7Trig1SpeedCurveEnabled": false,
+      "custom7Trig1SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom7Trig1SpeedCurveRange": "{\"min\":50,\"max\":2000}",
+      "custom7Trig1StartTimeCurveEnabled": true,
+      "custom7Trig1StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom7Trig1StartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom7Trig1StartDistanceCurveEnabled": false,
+      "custom7Trig1StartDistanceMin": 0,
+      "custom7Trig1StartDistanceMax": 100,
+      "custom7Trig1StartDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
+      "custom7Trig1PauseDurationMs": 500,
+      "custom7Trig1RetransitionEnabled": false,
+      "custom7Trig1RetransitionSpeedMs": 400,
+      "custom7Trig1RetransitionSpeedCurveEnabled": false,
+      "custom7Trig1RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom7Trig1RetransitionSpeedCurveRange": "{\"min\":50,\"max\":2000}",
+      "custom7Trig1RetransitionStartTimeCurveEnabled": true,
+      "custom7Trig1RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom7Trig1RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "custom8Enabled": true,
       "custom8Type": "Click+Hold",
       "custom8TouchPointCount": 1,
@@ -6861,7 +6895,7 @@
       "custom10RotationY": 0,
       "custom10RotationZ": 0,
       "custom10TargetPose": "",
-      "custom10TweenSelector": "Wave",
+      "custom10TweenSelector": "COUNTDOWN - VERTICAL",
       "custom10TweenChain": [],
       "custom10TweenSpeedMs": 3490,
       "custom10TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -6914,7 +6948,7 @@
       "custom13TargetPose": "Clockwise Fan - 4",
       "custom13TweenSelector": "Wave",
       "custom13TweenSpeedMs": 1890,
-      "custom13TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.501666768391927,\"y\":1},{\"x\":1,\"y\":0}]",
+      "custom13TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.3416666666666667,\"y\":0.7501302083333333},{\"x\":1,\"y\":1}]",
       "custom13TweenStartTimeRange": "{\"min\":0,\"max\":3000}",
       "custom13SequencePlayMode": "Count",
       "custom13SequenceCount": 3,
@@ -7037,119 +7071,7 @@
       "custom15TweenStopDelayMs": 0,
       "custom15TweenStopDelayCurveEnabled": false,
       "custom15TweenStopDelayCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom15TweenStopDelayRange": "{\"min\":0,\"max\":2000}",
-      "custom16Enabled": true,
-      "custom16Type": "Click",
-      "custom16TouchPointCount": 1,
-      "custom16ClickCount": "4th",
-      "custom16Mode": "Single Pose",
-      "custom16OffsetEnabled": false,
-      "custom16OffsetX": 0,
-      "custom16OffsetY": 0,
-      "custom16RotationEnabled": false,
-      "custom16RotationX": 0,
-      "custom16RotationY": 0,
-      "custom16RotationZ": 0,
-      "custom16TargetPose": "",
-      "custom16TweenSelector": "",
-      "custom16TweenSpeedMs": 800,
-      "custom16TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom16TweenStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom16SequencePlayMode": "Count",
-      "custom16SequenceCount": 1,
-      "custom16SequenceCountMode": "Loop",
-      "custom16SequenceLoopTransition": true,
-      "custom16SequenceHoldMs": 0,
-      "custom16TransitionSpeedMs": 700,
-      "custom16SpeedCurveEnabled": false,
-      "custom16SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom16SpeedCurveRange": "{\"min\":50,\"max\":2000}",
-      "custom16StartTimeCurveEnabled": false,
-      "custom16StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom16StartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom16StartDistanceCurveEnabled": false,
-      "custom16StartDistanceMin": 0,
-      "custom16StartDistanceMax": 100,
-      "custom16StartDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
-      "custom16PauseDurationMs": 0,
-      "custom16RetransitionEnabled": false,
-      "custom16RetransitionSpeedMs": 400,
-      "custom16RetransitionSpeedCurveEnabled": false,
-      "custom16RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom16RetransitionSpeedCurveRange": "{\"min\":50,\"max\":2000}",
-      "custom16RetransitionStartTimeCurveEnabled": true,
-      "custom16RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom16RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom16MultiTriggerEnabled": true,
-      "custom16MultiTriggers": "[{\"prefix\":\"custom16Trig1\",\"title\":\"Trigger 1\"}]",
-      "custom16Trig1Enabled": true,
-      "custom16Trig1Mode": "Single Pose",
-      "custom16Trig1OffsetEnabled": false,
-      "custom16Trig1OffsetX": 0,
-      "custom16Trig1OffsetY": 0,
-      "custom16Trig1RotationEnabled": false,
-      "custom16Trig1RotationX": 0,
-      "custom16Trig1RotationY": 0,
-      "custom16Trig1RotationZ": 0,
-      "custom16Trig1TargetPose": "Fist",
-      "custom16Trig1TweenSelector": "",
-      "custom16Trig1TweenSpeedMs": 800,
-      "custom16Trig1TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom16Trig1TweenStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom16Trig1TransitionSpeedMs": 700,
-      "custom16Trig1SpeedCurveEnabled": false,
-      "custom16Trig1SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom16Trig1SpeedCurveRange": "{\"min\":50,\"max\":2000}",
-      "custom16Trig1StartTimeCurveEnabled": true,
-      "custom16Trig1StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom16Trig1StartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom16Trig1StartDistanceCurveEnabled": false,
-      "custom16Trig1StartDistanceMin": 0,
-      "custom16Trig1StartDistanceMax": 100,
-      "custom16Trig1StartDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
-      "custom16Trig1PauseDurationMs": 500,
-      "custom16Trig1RetransitionEnabled": false,
-      "custom16Trig1RetransitionSpeedMs": 400,
-      "custom16Trig1RetransitionSpeedCurveEnabled": false,
-      "custom16Trig1RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom16Trig1RetransitionSpeedCurveRange": "{\"min\":50,\"max\":2000}",
-      "custom16Trig1RetransitionStartTimeCurveEnabled": true,
-      "custom16Trig1RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom16Trig1RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom7Trig1Enabled": true,
-      "custom7Trig1Mode": "Single Pose",
-      "custom7Trig1OffsetEnabled": false,
-      "custom7Trig1OffsetX": 0,
-      "custom7Trig1OffsetY": 0,
-      "custom7Trig1RotationEnabled": false,
-      "custom7Trig1RotationX": 0,
-      "custom7Trig1RotationY": 0,
-      "custom7Trig1RotationZ": 0,
-      "custom7Trig1TargetPose": "Fist",
-      "custom7Trig1TweenSelector": "",
-      "custom7Trig1TweenSpeedMs": 800,
-      "custom7Trig1TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom7Trig1TweenStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom7Trig1TransitionSpeedMs": 700,
-      "custom7Trig1SpeedCurveEnabled": false,
-      "custom7Trig1SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom7Trig1SpeedCurveRange": "{\"min\":50,\"max\":2000}",
-      "custom7Trig1StartTimeCurveEnabled": true,
-      "custom7Trig1StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom7Trig1StartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom7Trig1StartDistanceCurveEnabled": false,
-      "custom7Trig1StartDistanceMin": 0,
-      "custom7Trig1StartDistanceMax": 100,
-      "custom7Trig1StartDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
-      "custom7Trig1PauseDurationMs": 500,
-      "custom7Trig1RetransitionEnabled": false,
-      "custom7Trig1RetransitionSpeedMs": 400,
-      "custom7Trig1RetransitionSpeedCurveEnabled": false,
-      "custom7Trig1RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom7Trig1RetransitionSpeedCurveRange": "{\"min\":50,\"max\":2000}",
-      "custom7Trig1RetransitionStartTimeCurveEnabled": true,
-      "custom7Trig1RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom7Trig1RetransitionStartTimeRange": "{\"min\":0,\"max\":300}"
+      "custom15TweenStopDelayRange": "{\"min\":0,\"max\":2000}"
     },
     "mobile": {
       "pauseBtnXOffset": 12,
@@ -7347,13 +7269,13 @@
       "loadingPreviewSequenceHoldMs": 0,
       "loadingPreviewSize": 1390,
       "loadingPreviewRotationX": -79.52141477498444,
-      "loadingPreviewRotationY": -3.4505366585857034,
+      "loadingPreviewRotationY": -3.4505366585857016,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 1.225225212453898,
-      "loadingPreviewOffsetY": -2.336093655522892,
+      "loadingPreviewOffsetY": -2.3360936555228924,
       "loadingPreviewOffsetZ": -33.384543534396904,
       "loadingPreviewCameraFov": 32,
-      "loadingPreviewCameraZoom": 64.25715498581916,
+      "loadingPreviewCameraZoom": 64.25715498581914,
       "loadingPreviewCameraEditMode": true,
       "customClickFunctionIds": "[{\"id\":\"custom7\",\"title\":\"Custom Click Function 7\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom8\",\"title\":\"Custom Click Function 8\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom9\",\"title\":\"Custom Click Function 9\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom10\",\"title\":\"Custom Click Function 10\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom13\",\"title\":\"Custom Click Function 13\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom14\",\"title\":\"Custom Click Function 14\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom15\",\"title\":\"Custom Click Function 15\",\"kind\":\"hold\",\"family\":\"desktop\"}]",
       "holdConfirmMs": 510,
@@ -13904,6 +13826,40 @@
       "custom7RetransitionStartTimeRange": "{\"min\":0,\"max\":1048}",
       "custom7MultiTriggerEnabled": true,
       "custom7MultiTriggers": "[{\"prefix\":\"custom7Trig1\",\"title\":\"Trigger 1\"}]",
+      "custom7Trig1Enabled": true,
+      "custom7Trig1Mode": "Single Pose",
+      "custom7Trig1OffsetEnabled": false,
+      "custom7Trig1OffsetX": 0,
+      "custom7Trig1OffsetY": 0,
+      "custom7Trig1RotationEnabled": false,
+      "custom7Trig1RotationX": 0,
+      "custom7Trig1RotationY": 0,
+      "custom7Trig1RotationZ": 0,
+      "custom7Trig1TargetPose": "Fist",
+      "custom7Trig1TweenSelector": "",
+      "custom7Trig1TweenSpeedMs": 800,
+      "custom7Trig1TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom7Trig1TweenStartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom7Trig1TransitionSpeedMs": 700,
+      "custom7Trig1SpeedCurveEnabled": false,
+      "custom7Trig1SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom7Trig1SpeedCurveRange": "{\"min\":50,\"max\":2000}",
+      "custom7Trig1StartTimeCurveEnabled": true,
+      "custom7Trig1StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom7Trig1StartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom7Trig1StartDistanceCurveEnabled": false,
+      "custom7Trig1StartDistanceMin": 0,
+      "custom7Trig1StartDistanceMax": 100,
+      "custom7Trig1StartDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
+      "custom7Trig1PauseDurationMs": 500,
+      "custom7Trig1RetransitionEnabled": false,
+      "custom7Trig1RetransitionSpeedMs": 400,
+      "custom7Trig1RetransitionSpeedCurveEnabled": false,
+      "custom7Trig1RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom7Trig1RetransitionSpeedCurveRange": "{\"min\":50,\"max\":2000}",
+      "custom7Trig1RetransitionStartTimeCurveEnabled": true,
+      "custom7Trig1RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom7Trig1RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "custom8Enabled": true,
       "custom8Type": "Click+Hold",
       "custom8TouchPointCount": 1,
@@ -14012,7 +13968,7 @@
       "custom10RotationY": 0,
       "custom10RotationZ": 0,
       "custom10TargetPose": "",
-      "custom10TweenSelector": "Wave",
+      "custom10TweenSelector": "COUNTDOWN - VERTICAL",
       "custom10TweenChain": [],
       "custom10TweenSpeedMs": 3490,
       "custom10TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -14065,7 +14021,7 @@
       "custom13TargetPose": "Clockwise Fan - 4",
       "custom13TweenSelector": "Wave",
       "custom13TweenSpeedMs": 1890,
-      "custom13TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.501666768391927,\"y\":1},{\"x\":1,\"y\":0}]",
+      "custom13TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.3416666666666667,\"y\":0.7501302083333333},{\"x\":1,\"y\":1}]",
       "custom13TweenStartTimeRange": "{\"min\":0,\"max\":3000}",
       "custom13SequencePlayMode": "Count",
       "custom13SequenceCount": 3,
@@ -14188,119 +14144,7 @@
       "custom15TweenStopDelayMs": 0,
       "custom15TweenStopDelayCurveEnabled": false,
       "custom15TweenStopDelayCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom15TweenStopDelayRange": "{\"min\":0,\"max\":2000}",
-      "custom16Enabled": true,
-      "custom16Type": "Click",
-      "custom16TouchPointCount": 1,
-      "custom16ClickCount": "4th",
-      "custom16Mode": "Single Pose",
-      "custom16OffsetEnabled": false,
-      "custom16OffsetX": 0,
-      "custom16OffsetY": 0,
-      "custom16RotationEnabled": false,
-      "custom16RotationX": 0,
-      "custom16RotationY": 0,
-      "custom16RotationZ": 0,
-      "custom16TargetPose": "",
-      "custom16TweenSelector": "",
-      "custom16TweenSpeedMs": 800,
-      "custom16TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom16TweenStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom16SequencePlayMode": "Count",
-      "custom16SequenceCount": 1,
-      "custom16SequenceCountMode": "Loop",
-      "custom16SequenceLoopTransition": true,
-      "custom16SequenceHoldMs": 0,
-      "custom16TransitionSpeedMs": 700,
-      "custom16SpeedCurveEnabled": false,
-      "custom16SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom16SpeedCurveRange": "{\"min\":50,\"max\":2000}",
-      "custom16StartTimeCurveEnabled": false,
-      "custom16StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom16StartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom16StartDistanceCurveEnabled": false,
-      "custom16StartDistanceMin": 0,
-      "custom16StartDistanceMax": 100,
-      "custom16StartDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
-      "custom16PauseDurationMs": 0,
-      "custom16RetransitionEnabled": false,
-      "custom16RetransitionSpeedMs": 400,
-      "custom16RetransitionSpeedCurveEnabled": false,
-      "custom16RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom16RetransitionSpeedCurveRange": "{\"min\":50,\"max\":2000}",
-      "custom16RetransitionStartTimeCurveEnabled": true,
-      "custom16RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom16RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom16MultiTriggerEnabled": true,
-      "custom16MultiTriggers": "[{\"prefix\":\"custom16Trig1\",\"title\":\"Trigger 1\"}]",
-      "custom16Trig1Enabled": true,
-      "custom16Trig1Mode": "Single Pose",
-      "custom16Trig1OffsetEnabled": false,
-      "custom16Trig1OffsetX": 0,
-      "custom16Trig1OffsetY": 0,
-      "custom16Trig1RotationEnabled": false,
-      "custom16Trig1RotationX": 0,
-      "custom16Trig1RotationY": 0,
-      "custom16Trig1RotationZ": 0,
-      "custom16Trig1TargetPose": "Fist",
-      "custom16Trig1TweenSelector": "",
-      "custom16Trig1TweenSpeedMs": 800,
-      "custom16Trig1TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom16Trig1TweenStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom16Trig1TransitionSpeedMs": 700,
-      "custom16Trig1SpeedCurveEnabled": false,
-      "custom16Trig1SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom16Trig1SpeedCurveRange": "{\"min\":50,\"max\":2000}",
-      "custom16Trig1StartTimeCurveEnabled": true,
-      "custom16Trig1StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom16Trig1StartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom16Trig1StartDistanceCurveEnabled": false,
-      "custom16Trig1StartDistanceMin": 0,
-      "custom16Trig1StartDistanceMax": 100,
-      "custom16Trig1StartDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
-      "custom16Trig1PauseDurationMs": 500,
-      "custom16Trig1RetransitionEnabled": false,
-      "custom16Trig1RetransitionSpeedMs": 400,
-      "custom16Trig1RetransitionSpeedCurveEnabled": false,
-      "custom16Trig1RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom16Trig1RetransitionSpeedCurveRange": "{\"min\":50,\"max\":2000}",
-      "custom16Trig1RetransitionStartTimeCurveEnabled": true,
-      "custom16Trig1RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom16Trig1RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom7Trig1Enabled": true,
-      "custom7Trig1Mode": "Single Pose",
-      "custom7Trig1OffsetEnabled": false,
-      "custom7Trig1OffsetX": 0,
-      "custom7Trig1OffsetY": 0,
-      "custom7Trig1RotationEnabled": false,
-      "custom7Trig1RotationX": 0,
-      "custom7Trig1RotationY": 0,
-      "custom7Trig1RotationZ": 0,
-      "custom7Trig1TargetPose": "Fist",
-      "custom7Trig1TweenSelector": "",
-      "custom7Trig1TweenSpeedMs": 800,
-      "custom7Trig1TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom7Trig1TweenStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom7Trig1TransitionSpeedMs": 700,
-      "custom7Trig1SpeedCurveEnabled": false,
-      "custom7Trig1SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom7Trig1SpeedCurveRange": "{\"min\":50,\"max\":2000}",
-      "custom7Trig1StartTimeCurveEnabled": true,
-      "custom7Trig1StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom7Trig1StartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom7Trig1StartDistanceCurveEnabled": false,
-      "custom7Trig1StartDistanceMin": 0,
-      "custom7Trig1StartDistanceMax": 100,
-      "custom7Trig1StartDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
-      "custom7Trig1PauseDurationMs": 500,
-      "custom7Trig1RetransitionEnabled": false,
-      "custom7Trig1RetransitionSpeedMs": 400,
-      "custom7Trig1RetransitionSpeedCurveEnabled": false,
-      "custom7Trig1RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom7Trig1RetransitionSpeedCurveRange": "{\"min\":50,\"max\":2000}",
-      "custom7Trig1RetransitionStartTimeCurveEnabled": true,
-      "custom7Trig1RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom7Trig1RetransitionStartTimeRange": "{\"min\":0,\"max\":300}"
+      "custom15TweenStopDelayRange": "{\"min\":0,\"max\":2000}"
     },
     "landscape": {
       "pauseBtnXOffset": 12,
@@ -14498,13 +14342,13 @@
       "loadingPreviewSequenceHoldMs": 0,
       "loadingPreviewSize": 1390,
       "loadingPreviewRotationX": -79.52141477498444,
-      "loadingPreviewRotationY": -3.4505366585857034,
+      "loadingPreviewRotationY": -3.4505366585857016,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 1.225225212453898,
-      "loadingPreviewOffsetY": -2.336093655522892,
+      "loadingPreviewOffsetY": -2.3360936555228924,
       "loadingPreviewOffsetZ": -33.384543534396904,
       "loadingPreviewCameraFov": 32,
-      "loadingPreviewCameraZoom": 64.25715498581916,
+      "loadingPreviewCameraZoom": 64.25715498581914,
       "loadingPreviewCameraEditMode": true,
       "customClickFunctionIds": "[{\"id\":\"custom7\",\"title\":\"Custom Click Function 7\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom8\",\"title\":\"Custom Click Function 8\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom9\",\"title\":\"Custom Click Function 9\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom10\",\"title\":\"Custom Click Function 10\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom13\",\"title\":\"Custom Click Function 13\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom14\",\"title\":\"Custom Click Function 14\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom15\",\"title\":\"Custom Click Function 15\",\"kind\":\"hold\",\"family\":\"desktop\"}]",
       "holdConfirmMs": 510,
@@ -21055,6 +20899,40 @@
       "custom7RetransitionStartTimeRange": "{\"min\":0,\"max\":1048}",
       "custom7MultiTriggerEnabled": true,
       "custom7MultiTriggers": "[{\"prefix\":\"custom7Trig1\",\"title\":\"Trigger 1\"}]",
+      "custom7Trig1Enabled": true,
+      "custom7Trig1Mode": "Single Pose",
+      "custom7Trig1OffsetEnabled": false,
+      "custom7Trig1OffsetX": 0,
+      "custom7Trig1OffsetY": 0,
+      "custom7Trig1RotationEnabled": false,
+      "custom7Trig1RotationX": 0,
+      "custom7Trig1RotationY": 0,
+      "custom7Trig1RotationZ": 0,
+      "custom7Trig1TargetPose": "Fist",
+      "custom7Trig1TweenSelector": "",
+      "custom7Trig1TweenSpeedMs": 800,
+      "custom7Trig1TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom7Trig1TweenStartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom7Trig1TransitionSpeedMs": 700,
+      "custom7Trig1SpeedCurveEnabled": false,
+      "custom7Trig1SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom7Trig1SpeedCurveRange": "{\"min\":50,\"max\":2000}",
+      "custom7Trig1StartTimeCurveEnabled": true,
+      "custom7Trig1StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom7Trig1StartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom7Trig1StartDistanceCurveEnabled": false,
+      "custom7Trig1StartDistanceMin": 0,
+      "custom7Trig1StartDistanceMax": 100,
+      "custom7Trig1StartDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
+      "custom7Trig1PauseDurationMs": 500,
+      "custom7Trig1RetransitionEnabled": false,
+      "custom7Trig1RetransitionSpeedMs": 400,
+      "custom7Trig1RetransitionSpeedCurveEnabled": false,
+      "custom7Trig1RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom7Trig1RetransitionSpeedCurveRange": "{\"min\":50,\"max\":2000}",
+      "custom7Trig1RetransitionStartTimeCurveEnabled": true,
+      "custom7Trig1RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom7Trig1RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "custom8Enabled": true,
       "custom8Type": "Click+Hold",
       "custom8TouchPointCount": 1,
@@ -21163,7 +21041,7 @@
       "custom10RotationY": 0,
       "custom10RotationZ": 0,
       "custom10TargetPose": "",
-      "custom10TweenSelector": "Wave",
+      "custom10TweenSelector": "COUNTDOWN - VERTICAL",
       "custom10TweenChain": [],
       "custom10TweenSpeedMs": 3490,
       "custom10TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -21216,7 +21094,7 @@
       "custom13TargetPose": "Clockwise Fan - 4",
       "custom13TweenSelector": "Wave",
       "custom13TweenSpeedMs": 1890,
-      "custom13TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.501666768391927,\"y\":1},{\"x\":1,\"y\":0}]",
+      "custom13TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.3416666666666667,\"y\":0.7501302083333333},{\"x\":1,\"y\":1}]",
       "custom13TweenStartTimeRange": "{\"min\":0,\"max\":3000}",
       "custom13SequencePlayMode": "Count",
       "custom13SequenceCount": 3,
@@ -21339,119 +21217,7 @@
       "custom15TweenStopDelayMs": 0,
       "custom15TweenStopDelayCurveEnabled": false,
       "custom15TweenStopDelayCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom15TweenStopDelayRange": "{\"min\":0,\"max\":2000}",
-      "custom16Enabled": true,
-      "custom16Type": "Click",
-      "custom16TouchPointCount": 1,
-      "custom16ClickCount": "4th",
-      "custom16Mode": "Single Pose",
-      "custom16OffsetEnabled": false,
-      "custom16OffsetX": 0,
-      "custom16OffsetY": 0,
-      "custom16RotationEnabled": false,
-      "custom16RotationX": 0,
-      "custom16RotationY": 0,
-      "custom16RotationZ": 0,
-      "custom16TargetPose": "",
-      "custom16TweenSelector": "",
-      "custom16TweenSpeedMs": 800,
-      "custom16TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom16TweenStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom16SequencePlayMode": "Count",
-      "custom16SequenceCount": 1,
-      "custom16SequenceCountMode": "Loop",
-      "custom16SequenceLoopTransition": true,
-      "custom16SequenceHoldMs": 0,
-      "custom16TransitionSpeedMs": 700,
-      "custom16SpeedCurveEnabled": false,
-      "custom16SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom16SpeedCurveRange": "{\"min\":50,\"max\":2000}",
-      "custom16StartTimeCurveEnabled": false,
-      "custom16StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom16StartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom16StartDistanceCurveEnabled": false,
-      "custom16StartDistanceMin": 0,
-      "custom16StartDistanceMax": 100,
-      "custom16StartDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
-      "custom16PauseDurationMs": 0,
-      "custom16RetransitionEnabled": false,
-      "custom16RetransitionSpeedMs": 400,
-      "custom16RetransitionSpeedCurveEnabled": false,
-      "custom16RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom16RetransitionSpeedCurveRange": "{\"min\":50,\"max\":2000}",
-      "custom16RetransitionStartTimeCurveEnabled": true,
-      "custom16RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom16RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom16MultiTriggerEnabled": true,
-      "custom16MultiTriggers": "[{\"prefix\":\"custom16Trig1\",\"title\":\"Trigger 1\"}]",
-      "custom16Trig1Enabled": true,
-      "custom16Trig1Mode": "Single Pose",
-      "custom16Trig1OffsetEnabled": false,
-      "custom16Trig1OffsetX": 0,
-      "custom16Trig1OffsetY": 0,
-      "custom16Trig1RotationEnabled": false,
-      "custom16Trig1RotationX": 0,
-      "custom16Trig1RotationY": 0,
-      "custom16Trig1RotationZ": 0,
-      "custom16Trig1TargetPose": "Fist",
-      "custom16Trig1TweenSelector": "",
-      "custom16Trig1TweenSpeedMs": 800,
-      "custom16Trig1TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom16Trig1TweenStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom16Trig1TransitionSpeedMs": 700,
-      "custom16Trig1SpeedCurveEnabled": false,
-      "custom16Trig1SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom16Trig1SpeedCurveRange": "{\"min\":50,\"max\":2000}",
-      "custom16Trig1StartTimeCurveEnabled": true,
-      "custom16Trig1StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom16Trig1StartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom16Trig1StartDistanceCurveEnabled": false,
-      "custom16Trig1StartDistanceMin": 0,
-      "custom16Trig1StartDistanceMax": 100,
-      "custom16Trig1StartDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
-      "custom16Trig1PauseDurationMs": 500,
-      "custom16Trig1RetransitionEnabled": false,
-      "custom16Trig1RetransitionSpeedMs": 400,
-      "custom16Trig1RetransitionSpeedCurveEnabled": false,
-      "custom16Trig1RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom16Trig1RetransitionSpeedCurveRange": "{\"min\":50,\"max\":2000}",
-      "custom16Trig1RetransitionStartTimeCurveEnabled": true,
-      "custom16Trig1RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom16Trig1RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom7Trig1Enabled": true,
-      "custom7Trig1Mode": "Single Pose",
-      "custom7Trig1OffsetEnabled": false,
-      "custom7Trig1OffsetX": 0,
-      "custom7Trig1OffsetY": 0,
-      "custom7Trig1RotationEnabled": false,
-      "custom7Trig1RotationX": 0,
-      "custom7Trig1RotationY": 0,
-      "custom7Trig1RotationZ": 0,
-      "custom7Trig1TargetPose": "Fist",
-      "custom7Trig1TweenSelector": "",
-      "custom7Trig1TweenSpeedMs": 800,
-      "custom7Trig1TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom7Trig1TweenStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom7Trig1TransitionSpeedMs": 700,
-      "custom7Trig1SpeedCurveEnabled": false,
-      "custom7Trig1SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom7Trig1SpeedCurveRange": "{\"min\":50,\"max\":2000}",
-      "custom7Trig1StartTimeCurveEnabled": true,
-      "custom7Trig1StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom7Trig1StartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom7Trig1StartDistanceCurveEnabled": false,
-      "custom7Trig1StartDistanceMin": 0,
-      "custom7Trig1StartDistanceMax": 100,
-      "custom7Trig1StartDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
-      "custom7Trig1PauseDurationMs": 500,
-      "custom7Trig1RetransitionEnabled": false,
-      "custom7Trig1RetransitionSpeedMs": 400,
-      "custom7Trig1RetransitionSpeedCurveEnabled": false,
-      "custom7Trig1RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom7Trig1RetransitionSpeedCurveRange": "{\"min\":50,\"max\":2000}",
-      "custom7Trig1RetransitionStartTimeCurveEnabled": true,
-      "custom7Trig1RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom7Trig1RetransitionStartTimeRange": "{\"min\":0,\"max\":300}"
+      "custom15TweenStopDelayRange": "{\"min\":0,\"max\":2000}"
     }
   },
   "order": [
@@ -24219,7 +23985,7 @@
           "type": "group",
           "group": {
             "key": "Cursor Tracking",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -25381,7 +25147,7 @@
         },
         {
           "key": "Cursor Tracking",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
@@ -25710,10 +25476,6 @@
       "locked": false,
       "items": [
         {
-          "type": "row",
-          "key": "addCustomClickFunctionBtn"
-        },
-        {
           "type": "group",
           "group": {
             "key": "Custom Click Function 15",
@@ -25764,7 +25526,7 @@
                 "type": "group",
                 "group": {
                   "key": "Offset",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -25787,7 +25549,7 @@
                 "type": "group",
                 "group": {
                   "key": "Rotation",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -25823,7 +25585,7 @@
                 "type": "group",
                 "group": {
                   "key": "Animation Speed Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -25846,7 +25608,7 @@
                 "type": "group",
                 "group": {
                   "key": "Start Time Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -25879,7 +25641,7 @@
                 "type": "group",
                 "group": {
                   "key": "Start Distance Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -25907,7 +25669,7 @@
                 "type": "group",
                 "group": {
                   "key": "Retransition",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -25918,7 +25680,7 @@
                       "type": "group",
                       "group": {
                         "key": "Retransition Speed Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -25941,7 +25703,7 @@
                       "type": "group",
                       "group": {
                         "key": "Retransition Start Time Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -25982,7 +25744,7 @@
                   "subgroups": [
                     {
                       "key": "Retransition Speed Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -26002,7 +25764,7 @@
                     },
                     {
                       "key": "Retransition Start Time Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -26037,14 +25799,14 @@
                 "type": "group",
                 "group": {
                   "key": "Tween Stop",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
                       "type": "group",
                       "group": {
                         "key": "Tween Stop Start Time Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -26067,7 +25829,7 @@
                       "type": "group",
                       "group": {
                         "key": "Tween Stop Delay",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -26101,7 +25863,7 @@
                   "subgroups": [
                     {
                       "key": "Tween Stop Start Time Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -26121,7 +25883,7 @@
                     },
                     {
                       "key": "Tween Stop Delay",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -26170,7 +25932,7 @@
             "subgroups": [
               {
                 "key": "Offset",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -26190,7 +25952,7 @@
               },
               {
                 "key": "Rotation",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -26215,7 +25977,7 @@
               },
               {
                 "key": "Animation Speed Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -26235,7 +25997,7 @@
               },
               {
                 "key": "Start Time Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -26265,7 +26027,7 @@
               },
               {
                 "key": "Start Distance Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -26290,7 +26052,7 @@
               },
               {
                 "key": "Retransition",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -26301,7 +26063,7 @@
                     "type": "group",
                     "group": {
                       "key": "Retransition Speed Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -26324,7 +26086,7 @@
                     "type": "group",
                     "group": {
                       "key": "Retransition Start Time Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -26365,7 +26127,7 @@
                 "subgroups": [
                   {
                     "key": "Retransition Speed Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -26385,7 +26147,7 @@
                   },
                   {
                     "key": "Retransition Start Time Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -26417,14 +26179,14 @@
               },
               {
                 "key": "Tween Stop",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
                     "type": "group",
                     "group": {
                       "key": "Tween Stop Start Time Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -26447,7 +26209,7 @@
                     "type": "group",
                     "group": {
                       "key": "Tween Stop Delay",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -26481,7 +26243,7 @@
                 "subgroups": [
                   {
                     "key": "Tween Stop Start Time Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -26501,7 +26263,7 @@
                   },
                   {
                     "key": "Tween Stop Delay",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -26585,7 +26347,7 @@
                 "type": "group",
                 "group": {
                   "key": "Offset",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -26608,7 +26370,7 @@
                 "type": "group",
                 "group": {
                   "key": "Rotation",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -26656,7 +26418,7 @@
                 "type": "group",
                 "group": {
                   "key": "Animation Speed Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -26679,7 +26441,7 @@
                 "type": "group",
                 "group": {
                   "key": "Start Time Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -26712,7 +26474,7 @@
                 "type": "group",
                 "group": {
                   "key": "Start Distance Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -26740,7 +26502,7 @@
                 "type": "group",
                 "group": {
                   "key": "Retransition",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -26751,7 +26513,7 @@
                       "type": "group",
                       "group": {
                         "key": "Retransition Speed Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -26774,7 +26536,7 @@
                       "type": "group",
                       "group": {
                         "key": "Retransition Start Time Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -26800,7 +26562,7 @@
                   "subgroups": [
                     {
                       "key": "Retransition Speed Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -26820,7 +26582,7 @@
                     },
                     {
                       "key": "Retransition Start Time Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -26845,7 +26607,7 @@
                 "type": "group",
                 "group": {
                   "key": "Multi Trigger",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -26889,7 +26651,7 @@
             "subgroups": [
               {
                 "key": "Offset",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -26909,7 +26671,7 @@
               },
               {
                 "key": "Rotation",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -26934,7 +26696,7 @@
               },
               {
                 "key": "Animation Speed Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -26954,7 +26716,7 @@
               },
               {
                 "key": "Start Time Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -26984,7 +26746,7 @@
               },
               {
                 "key": "Start Distance Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -27009,7 +26771,7 @@
               },
               {
                 "key": "Retransition",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -27020,7 +26782,7 @@
                     "type": "group",
                     "group": {
                       "key": "Retransition Speed Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -27043,7 +26805,7 @@
                     "type": "group",
                     "group": {
                       "key": "Retransition Start Time Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -27069,7 +26831,7 @@
                 "subgroups": [
                   {
                     "key": "Retransition Speed Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -27089,7 +26851,7 @@
                   },
                   {
                     "key": "Retransition Start Time Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -27111,7 +26873,7 @@
               },
               {
                 "key": "Multi Trigger",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -27187,7 +26949,7 @@
                 "type": "group",
                 "group": {
                   "key": "Offset",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -27210,7 +26972,7 @@
                 "type": "group",
                 "group": {
                   "key": "Rotation",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -27258,7 +27020,7 @@
                 "type": "group",
                 "group": {
                   "key": "Animation Speed Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -27281,7 +27043,7 @@
                 "type": "group",
                 "group": {
                   "key": "Start Time Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -27314,7 +27076,7 @@
                 "type": "group",
                 "group": {
                   "key": "Start Distance Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -27342,7 +27104,7 @@
                 "type": "group",
                 "group": {
                   "key": "Retransition",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -27353,7 +27115,7 @@
                       "type": "group",
                       "group": {
                         "key": "Retransition Speed Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -27376,7 +27138,7 @@
                       "type": "group",
                       "group": {
                         "key": "Retransition Start Time Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -27402,7 +27164,7 @@
                   "subgroups": [
                     {
                       "key": "Retransition Speed Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -27422,7 +27184,7 @@
                     },
                     {
                       "key": "Retransition Start Time Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -27447,7 +27209,7 @@
                 "type": "group",
                 "group": {
                   "key": "Multi Trigger",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -27491,7 +27253,7 @@
             "subgroups": [
               {
                 "key": "Offset",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -27511,7 +27273,7 @@
               },
               {
                 "key": "Rotation",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -27536,7 +27298,7 @@
               },
               {
                 "key": "Animation Speed Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -27556,7 +27318,7 @@
               },
               {
                 "key": "Start Time Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -27586,7 +27348,7 @@
               },
               {
                 "key": "Start Distance Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -27611,7 +27373,7 @@
               },
               {
                 "key": "Retransition",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -27622,7 +27384,7 @@
                     "type": "group",
                     "group": {
                       "key": "Retransition Speed Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -27645,7 +27407,7 @@
                     "type": "group",
                     "group": {
                       "key": "Retransition Start Time Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -27671,7 +27433,7 @@
                 "subgroups": [
                   {
                     "key": "Retransition Speed Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -27691,7 +27453,7 @@
                   },
                   {
                     "key": "Retransition Start Time Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -27713,7 +27475,7 @@
               },
               {
                 "key": "Multi Trigger",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -27789,7 +27551,7 @@
                 "type": "group",
                 "group": {
                   "key": "Offset",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -27812,7 +27574,7 @@
                 "type": "group",
                 "group": {
                   "key": "Rotation",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -27848,7 +27610,7 @@
                 "type": "group",
                 "group": {
                   "key": "Animation Speed Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -27871,7 +27633,7 @@
                 "type": "group",
                 "group": {
                   "key": "Start Time Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -27904,7 +27666,7 @@
                 "type": "group",
                 "group": {
                   "key": "Start Distance Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -27932,7 +27694,7 @@
                 "type": "group",
                 "group": {
                   "key": "Retransition",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -27943,7 +27705,7 @@
                       "type": "group",
                       "group": {
                         "key": "Retransition Speed Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -27966,7 +27728,7 @@
                       "type": "group",
                       "group": {
                         "key": "Retransition Start Time Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -28007,7 +27769,7 @@
                   "subgroups": [
                     {
                       "key": "Retransition Speed Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -28027,7 +27789,7 @@
                     },
                     {
                       "key": "Retransition Start Time Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -28062,14 +27824,14 @@
                 "type": "group",
                 "group": {
                   "key": "Tween Stop",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
                       "type": "group",
                       "group": {
                         "key": "Tween Stop Start Time Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -28092,7 +27854,7 @@
                       "type": "group",
                       "group": {
                         "key": "Tween Stop Delay",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -28126,7 +27888,7 @@
                   "subgroups": [
                     {
                       "key": "Tween Stop Start Time Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -28146,7 +27908,7 @@
                     },
                     {
                       "key": "Tween Stop Delay",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -28195,7 +27957,7 @@
             "subgroups": [
               {
                 "key": "Offset",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -28215,7 +27977,7 @@
               },
               {
                 "key": "Rotation",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -28240,7 +28002,7 @@
               },
               {
                 "key": "Animation Speed Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -28260,7 +28022,7 @@
               },
               {
                 "key": "Start Time Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -28290,7 +28052,7 @@
               },
               {
                 "key": "Start Distance Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -28315,7 +28077,7 @@
               },
               {
                 "key": "Retransition",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -28326,7 +28088,7 @@
                     "type": "group",
                     "group": {
                       "key": "Retransition Speed Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -28349,7 +28111,7 @@
                     "type": "group",
                     "group": {
                       "key": "Retransition Start Time Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -28390,7 +28152,7 @@
                 "subgroups": [
                   {
                     "key": "Retransition Speed Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -28410,7 +28172,7 @@
                   },
                   {
                     "key": "Retransition Start Time Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -28442,14 +28204,14 @@
               },
               {
                 "key": "Tween Stop",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
                     "type": "group",
                     "group": {
                       "key": "Tween Stop Start Time Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -28472,7 +28234,7 @@
                     "type": "group",
                     "group": {
                       "key": "Tween Stop Delay",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -28506,7 +28268,7 @@
                 "subgroups": [
                   {
                     "key": "Tween Stop Start Time Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -28526,7 +28288,7 @@
                   },
                   {
                     "key": "Tween Stop Delay",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -28610,7 +28372,7 @@
                 "type": "group",
                 "group": {
                   "key": "Offset",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -28633,7 +28395,7 @@
                 "type": "group",
                 "group": {
                   "key": "Rotation",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -28681,7 +28443,7 @@
                 "type": "group",
                 "group": {
                   "key": "Animation Speed Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -28704,7 +28466,7 @@
                 "type": "group",
                 "group": {
                   "key": "Start Time Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -28737,7 +28499,7 @@
                 "type": "group",
                 "group": {
                   "key": "Start Distance Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -28765,7 +28527,7 @@
                 "type": "group",
                 "group": {
                   "key": "Retransition",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -28776,7 +28538,7 @@
                       "type": "group",
                       "group": {
                         "key": "Retransition Speed Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -28799,7 +28561,7 @@
                       "type": "group",
                       "group": {
                         "key": "Retransition Start Time Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -28825,7 +28587,7 @@
                   "subgroups": [
                     {
                       "key": "Retransition Speed Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -28845,7 +28607,7 @@
                     },
                     {
                       "key": "Retransition Start Time Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -28870,7 +28632,7 @@
                 "type": "group",
                 "group": {
                   "key": "Multi Trigger",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -28914,7 +28676,7 @@
             "subgroups": [
               {
                 "key": "Offset",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -28934,7 +28696,7 @@
               },
               {
                 "key": "Rotation",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -28959,7 +28721,7 @@
               },
               {
                 "key": "Animation Speed Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -28979,7 +28741,7 @@
               },
               {
                 "key": "Start Time Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -29009,7 +28771,7 @@
               },
               {
                 "key": "Start Distance Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -29034,7 +28796,7 @@
               },
               {
                 "key": "Retransition",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -29045,7 +28807,7 @@
                     "type": "group",
                     "group": {
                       "key": "Retransition Speed Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -29068,7 +28830,7 @@
                     "type": "group",
                     "group": {
                       "key": "Retransition Start Time Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -29094,7 +28856,7 @@
                 "subgroups": [
                   {
                     "key": "Retransition Speed Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -29114,7 +28876,7 @@
                   },
                   {
                     "key": "Retransition Start Time Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -29136,7 +28898,7 @@
               },
               {
                 "key": "Multi Trigger",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -29212,7 +28974,7 @@
                 "type": "group",
                 "group": {
                   "key": "Offset",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -29235,7 +28997,7 @@
                 "type": "group",
                 "group": {
                   "key": "Rotation",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -29271,7 +29033,7 @@
                 "type": "group",
                 "group": {
                   "key": "Animation Speed Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -29294,7 +29056,7 @@
                 "type": "group",
                 "group": {
                   "key": "Start Time Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -29327,7 +29089,7 @@
                 "type": "group",
                 "group": {
                   "key": "Start Distance Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -29355,7 +29117,7 @@
                 "type": "group",
                 "group": {
                   "key": "Retransition",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -29366,7 +29128,7 @@
                       "type": "group",
                       "group": {
                         "key": "Retransition Speed Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -29389,7 +29151,7 @@
                       "type": "group",
                       "group": {
                         "key": "Retransition Start Time Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -29430,7 +29192,7 @@
                   "subgroups": [
                     {
                       "key": "Retransition Speed Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -29450,7 +29212,7 @@
                     },
                     {
                       "key": "Retransition Start Time Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -29485,14 +29247,14 @@
                 "type": "group",
                 "group": {
                   "key": "Tween Stop",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
                       "type": "group",
                       "group": {
                         "key": "Tween Stop Start Time Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -29515,7 +29277,7 @@
                       "type": "group",
                       "group": {
                         "key": "Tween Stop Delay",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -29549,7 +29311,7 @@
                   "subgroups": [
                     {
                       "key": "Tween Stop Start Time Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -29569,7 +29331,7 @@
                     },
                     {
                       "key": "Tween Stop Delay",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -29618,7 +29380,7 @@
             "subgroups": [
               {
                 "key": "Offset",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -29638,7 +29400,7 @@
               },
               {
                 "key": "Rotation",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -29663,7 +29425,7 @@
               },
               {
                 "key": "Animation Speed Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -29683,7 +29445,7 @@
               },
               {
                 "key": "Start Time Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -29713,7 +29475,7 @@
               },
               {
                 "key": "Start Distance Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -29738,7 +29500,7 @@
               },
               {
                 "key": "Retransition",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -29749,7 +29511,7 @@
                     "type": "group",
                     "group": {
                       "key": "Retransition Speed Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -29772,7 +29534,7 @@
                     "type": "group",
                     "group": {
                       "key": "Retransition Start Time Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -29813,7 +29575,7 @@
                 "subgroups": [
                   {
                     "key": "Retransition Speed Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -29833,7 +29595,7 @@
                   },
                   {
                     "key": "Retransition Start Time Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -29865,14 +29627,14 @@
               },
               {
                 "key": "Tween Stop",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
                     "type": "group",
                     "group": {
                       "key": "Tween Stop Start Time Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -29895,7 +29657,7 @@
                     "type": "group",
                     "group": {
                       "key": "Tween Stop Delay",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -29929,7 +29691,7 @@
                 "subgroups": [
                   {
                     "key": "Tween Stop Start Time Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -29949,7 +29711,7 @@
                   },
                   {
                     "key": "Tween Stop Delay",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -30033,7 +29795,7 @@
                 "type": "group",
                 "group": {
                   "key": "Offset",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -30056,7 +29818,7 @@
                 "type": "group",
                 "group": {
                   "key": "Rotation",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -30160,7 +29922,7 @@
                 "type": "group",
                 "group": {
                   "key": "Start Distance Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -30188,7 +29950,7 @@
                 "type": "group",
                 "group": {
                   "key": "Retransition",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -30199,7 +29961,7 @@
                       "type": "group",
                       "group": {
                         "key": "Retransition Speed Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -30222,7 +29984,7 @@
                       "type": "group",
                       "group": {
                         "key": "Retransition Start Time Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -30248,7 +30010,7 @@
                   "subgroups": [
                     {
                       "key": "Retransition Speed Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -30268,7 +30030,7 @@
                     },
                     {
                       "key": "Retransition Start Time Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -30293,7 +30055,7 @@
                 "type": "group",
                 "group": {
                   "key": "Multi Trigger",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -30417,7 +30179,7 @@
                             "type": "group",
                             "group": {
                               "key": "Start Time Curve",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -30657,7 +30419,7 @@
                           },
                           {
                             "key": "Start Time Curve",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -30936,7 +30698,7 @@
                           "type": "group",
                           "group": {
                             "key": "Start Time Curve",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -31176,7 +30938,7 @@
                         },
                         {
                           "key": "Start Time Curve",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -31357,7 +31119,7 @@
             "subgroups": [
               {
                 "key": "Offset",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -31377,7 +31139,7 @@
               },
               {
                 "key": "Rotation",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -31452,7 +31214,7 @@
               },
               {
                 "key": "Start Distance Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -31477,7 +31239,7 @@
               },
               {
                 "key": "Retransition",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -31488,7 +31250,7 @@
                     "type": "group",
                     "group": {
                       "key": "Retransition Speed Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -31511,7 +31273,7 @@
                     "type": "group",
                     "group": {
                       "key": "Retransition Start Time Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -31537,7 +31299,7 @@
                 "subgroups": [
                   {
                     "key": "Retransition Speed Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -31557,7 +31319,7 @@
                   },
                   {
                     "key": "Retransition Start Time Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -31579,7 +31341,7 @@
               },
               {
                 "key": "Multi Trigger",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -31703,7 +31465,7 @@
                           "type": "group",
                           "group": {
                             "key": "Start Time Curve",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -31943,7 +31705,7 @@
                         },
                         {
                           "key": "Start Time Curve",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -32222,7 +31984,7 @@
                         "type": "group",
                         "group": {
                           "key": "Start Time Curve",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -32462,7 +32224,7 @@
                       },
                       {
                         "key": "Start Time Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -32626,6 +32388,10 @@
         },
         {
           "type": "row",
+          "key": "addCustomClickFunctionBtn"
+        },
+        {
+          "type": "row",
           "key": "holdConfirmMs"
         },
         {
@@ -32698,7 +32464,7 @@
               "type": "group",
               "group": {
                 "key": "Offset",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -32721,7 +32487,7 @@
               "type": "group",
               "group": {
                 "key": "Rotation",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -32757,7 +32523,7 @@
               "type": "group",
               "group": {
                 "key": "Animation Speed Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -32780,7 +32546,7 @@
               "type": "group",
               "group": {
                 "key": "Start Time Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -32813,7 +32579,7 @@
               "type": "group",
               "group": {
                 "key": "Start Distance Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -32841,7 +32607,7 @@
               "type": "group",
               "group": {
                 "key": "Retransition",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -32852,7 +32618,7 @@
                     "type": "group",
                     "group": {
                       "key": "Retransition Speed Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -32875,7 +32641,7 @@
                     "type": "group",
                     "group": {
                       "key": "Retransition Start Time Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -32916,7 +32682,7 @@
                 "subgroups": [
                   {
                     "key": "Retransition Speed Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -32936,7 +32702,7 @@
                   },
                   {
                     "key": "Retransition Start Time Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -32971,14 +32737,14 @@
               "type": "group",
               "group": {
                 "key": "Tween Stop",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
                     "type": "group",
                     "group": {
                       "key": "Tween Stop Start Time Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -33001,7 +32767,7 @@
                     "type": "group",
                     "group": {
                       "key": "Tween Stop Delay",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -33035,7 +32801,7 @@
                 "subgroups": [
                   {
                     "key": "Tween Stop Start Time Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -33055,7 +32821,7 @@
                   },
                   {
                     "key": "Tween Stop Delay",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -33104,7 +32870,7 @@
           "subgroups": [
             {
               "key": "Offset",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -33124,7 +32890,7 @@
             },
             {
               "key": "Rotation",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -33149,7 +32915,7 @@
             },
             {
               "key": "Animation Speed Curve",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -33169,7 +32935,7 @@
             },
             {
               "key": "Start Time Curve",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -33199,7 +32965,7 @@
             },
             {
               "key": "Start Distance Curve",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -33224,7 +32990,7 @@
             },
             {
               "key": "Retransition",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -33235,7 +33001,7 @@
                   "type": "group",
                   "group": {
                     "key": "Retransition Speed Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -33258,7 +33024,7 @@
                   "type": "group",
                   "group": {
                     "key": "Retransition Start Time Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -33299,7 +33065,7 @@
               "subgroups": [
                 {
                   "key": "Retransition Speed Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -33319,7 +33085,7 @@
                 },
                 {
                   "key": "Retransition Start Time Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -33351,14 +33117,14 @@
             },
             {
               "key": "Tween Stop",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
                   "type": "group",
                   "group": {
                     "key": "Tween Stop Start Time Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -33381,7 +33147,7 @@
                   "type": "group",
                   "group": {
                     "key": "Tween Stop Delay",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -33415,7 +33181,7 @@
               "subgroups": [
                 {
                   "key": "Tween Stop Start Time Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -33435,7 +33201,7 @@
                 },
                 {
                   "key": "Tween Stop Delay",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -33516,7 +33282,7 @@
               "type": "group",
               "group": {
                 "key": "Offset",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -33539,7 +33305,7 @@
               "type": "group",
               "group": {
                 "key": "Rotation",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -33587,7 +33353,7 @@
               "type": "group",
               "group": {
                 "key": "Animation Speed Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -33610,7 +33376,7 @@
               "type": "group",
               "group": {
                 "key": "Start Time Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -33643,7 +33409,7 @@
               "type": "group",
               "group": {
                 "key": "Start Distance Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -33671,7 +33437,7 @@
               "type": "group",
               "group": {
                 "key": "Retransition",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -33682,7 +33448,7 @@
                     "type": "group",
                     "group": {
                       "key": "Retransition Speed Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -33705,7 +33471,7 @@
                     "type": "group",
                     "group": {
                       "key": "Retransition Start Time Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -33731,7 +33497,7 @@
                 "subgroups": [
                   {
                     "key": "Retransition Speed Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -33751,7 +33517,7 @@
                   },
                   {
                     "key": "Retransition Start Time Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -33776,7 +33542,7 @@
               "type": "group",
               "group": {
                 "key": "Multi Trigger",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -33820,7 +33586,7 @@
           "subgroups": [
             {
               "key": "Offset",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -33840,7 +33606,7 @@
             },
             {
               "key": "Rotation",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -33865,7 +33631,7 @@
             },
             {
               "key": "Animation Speed Curve",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -33885,7 +33651,7 @@
             },
             {
               "key": "Start Time Curve",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -33915,7 +33681,7 @@
             },
             {
               "key": "Start Distance Curve",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -33940,7 +33706,7 @@
             },
             {
               "key": "Retransition",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -33951,7 +33717,7 @@
                   "type": "group",
                   "group": {
                     "key": "Retransition Speed Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -33974,7 +33740,7 @@
                   "type": "group",
                   "group": {
                     "key": "Retransition Start Time Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -34000,7 +33766,7 @@
               "subgroups": [
                 {
                   "key": "Retransition Speed Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -34020,7 +33786,7 @@
                 },
                 {
                   "key": "Retransition Start Time Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -34042,7 +33808,7 @@
             },
             {
               "key": "Multi Trigger",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -34115,7 +33881,7 @@
               "type": "group",
               "group": {
                 "key": "Offset",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -34138,7 +33904,7 @@
               "type": "group",
               "group": {
                 "key": "Rotation",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -34186,7 +33952,7 @@
               "type": "group",
               "group": {
                 "key": "Animation Speed Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -34209,7 +33975,7 @@
               "type": "group",
               "group": {
                 "key": "Start Time Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -34242,7 +34008,7 @@
               "type": "group",
               "group": {
                 "key": "Start Distance Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -34270,7 +34036,7 @@
               "type": "group",
               "group": {
                 "key": "Retransition",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -34281,7 +34047,7 @@
                     "type": "group",
                     "group": {
                       "key": "Retransition Speed Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -34304,7 +34070,7 @@
                     "type": "group",
                     "group": {
                       "key": "Retransition Start Time Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -34330,7 +34096,7 @@
                 "subgroups": [
                   {
                     "key": "Retransition Speed Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -34350,7 +34116,7 @@
                   },
                   {
                     "key": "Retransition Start Time Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -34375,7 +34141,7 @@
               "type": "group",
               "group": {
                 "key": "Multi Trigger",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -34419,7 +34185,7 @@
           "subgroups": [
             {
               "key": "Offset",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -34439,7 +34205,7 @@
             },
             {
               "key": "Rotation",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -34464,7 +34230,7 @@
             },
             {
               "key": "Animation Speed Curve",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -34484,7 +34250,7 @@
             },
             {
               "key": "Start Time Curve",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -34514,7 +34280,7 @@
             },
             {
               "key": "Start Distance Curve",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -34539,7 +34305,7 @@
             },
             {
               "key": "Retransition",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -34550,7 +34316,7 @@
                   "type": "group",
                   "group": {
                     "key": "Retransition Speed Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -34573,7 +34339,7 @@
                   "type": "group",
                   "group": {
                     "key": "Retransition Start Time Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -34599,7 +34365,7 @@
               "subgroups": [
                 {
                   "key": "Retransition Speed Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -34619,7 +34385,7 @@
                 },
                 {
                   "key": "Retransition Start Time Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -34641,7 +34407,7 @@
             },
             {
               "key": "Multi Trigger",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -34714,7 +34480,7 @@
               "type": "group",
               "group": {
                 "key": "Offset",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -34737,7 +34503,7 @@
               "type": "group",
               "group": {
                 "key": "Rotation",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -34773,7 +34539,7 @@
               "type": "group",
               "group": {
                 "key": "Animation Speed Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -34796,7 +34562,7 @@
               "type": "group",
               "group": {
                 "key": "Start Time Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -34829,7 +34595,7 @@
               "type": "group",
               "group": {
                 "key": "Start Distance Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -34857,7 +34623,7 @@
               "type": "group",
               "group": {
                 "key": "Retransition",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -34868,7 +34634,7 @@
                     "type": "group",
                     "group": {
                       "key": "Retransition Speed Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -34891,7 +34657,7 @@
                     "type": "group",
                     "group": {
                       "key": "Retransition Start Time Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -34932,7 +34698,7 @@
                 "subgroups": [
                   {
                     "key": "Retransition Speed Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -34952,7 +34718,7 @@
                   },
                   {
                     "key": "Retransition Start Time Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -34987,14 +34753,14 @@
               "type": "group",
               "group": {
                 "key": "Tween Stop",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
                     "type": "group",
                     "group": {
                       "key": "Tween Stop Start Time Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -35017,7 +34783,7 @@
                     "type": "group",
                     "group": {
                       "key": "Tween Stop Delay",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -35051,7 +34817,7 @@
                 "subgroups": [
                   {
                     "key": "Tween Stop Start Time Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -35071,7 +34837,7 @@
                   },
                   {
                     "key": "Tween Stop Delay",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -35120,7 +34886,7 @@
           "subgroups": [
             {
               "key": "Offset",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -35140,7 +34906,7 @@
             },
             {
               "key": "Rotation",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -35165,7 +34931,7 @@
             },
             {
               "key": "Animation Speed Curve",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -35185,7 +34951,7 @@
             },
             {
               "key": "Start Time Curve",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -35215,7 +34981,7 @@
             },
             {
               "key": "Start Distance Curve",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -35240,7 +35006,7 @@
             },
             {
               "key": "Retransition",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -35251,7 +35017,7 @@
                   "type": "group",
                   "group": {
                     "key": "Retransition Speed Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -35274,7 +35040,7 @@
                   "type": "group",
                   "group": {
                     "key": "Retransition Start Time Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -35315,7 +35081,7 @@
               "subgroups": [
                 {
                   "key": "Retransition Speed Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -35335,7 +35101,7 @@
                 },
                 {
                   "key": "Retransition Start Time Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -35367,14 +35133,14 @@
             },
             {
               "key": "Tween Stop",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
                   "type": "group",
                   "group": {
                     "key": "Tween Stop Start Time Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -35397,7 +35163,7 @@
                   "type": "group",
                   "group": {
                     "key": "Tween Stop Delay",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -35431,7 +35197,7 @@
               "subgroups": [
                 {
                   "key": "Tween Stop Start Time Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -35451,7 +35217,7 @@
                 },
                 {
                   "key": "Tween Stop Delay",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -35532,7 +35298,7 @@
               "type": "group",
               "group": {
                 "key": "Offset",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -35555,7 +35321,7 @@
               "type": "group",
               "group": {
                 "key": "Rotation",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -35603,7 +35369,7 @@
               "type": "group",
               "group": {
                 "key": "Animation Speed Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -35626,7 +35392,7 @@
               "type": "group",
               "group": {
                 "key": "Start Time Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -35659,7 +35425,7 @@
               "type": "group",
               "group": {
                 "key": "Start Distance Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -35687,7 +35453,7 @@
               "type": "group",
               "group": {
                 "key": "Retransition",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -35698,7 +35464,7 @@
                     "type": "group",
                     "group": {
                       "key": "Retransition Speed Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -35721,7 +35487,7 @@
                     "type": "group",
                     "group": {
                       "key": "Retransition Start Time Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -35747,7 +35513,7 @@
                 "subgroups": [
                   {
                     "key": "Retransition Speed Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -35767,7 +35533,7 @@
                   },
                   {
                     "key": "Retransition Start Time Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -35792,7 +35558,7 @@
               "type": "group",
               "group": {
                 "key": "Multi Trigger",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -35836,7 +35602,7 @@
           "subgroups": [
             {
               "key": "Offset",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -35856,7 +35622,7 @@
             },
             {
               "key": "Rotation",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -35881,7 +35647,7 @@
             },
             {
               "key": "Animation Speed Curve",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -35901,7 +35667,7 @@
             },
             {
               "key": "Start Time Curve",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -35931,7 +35697,7 @@
             },
             {
               "key": "Start Distance Curve",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -35956,7 +35722,7 @@
             },
             {
               "key": "Retransition",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -35967,7 +35733,7 @@
                   "type": "group",
                   "group": {
                     "key": "Retransition Speed Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -35990,7 +35756,7 @@
                   "type": "group",
                   "group": {
                     "key": "Retransition Start Time Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -36016,7 +35782,7 @@
               "subgroups": [
                 {
                   "key": "Retransition Speed Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -36036,7 +35802,7 @@
                 },
                 {
                   "key": "Retransition Start Time Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -36058,7 +35824,7 @@
             },
             {
               "key": "Multi Trigger",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -36131,7 +35897,7 @@
               "type": "group",
               "group": {
                 "key": "Offset",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -36154,7 +35920,7 @@
               "type": "group",
               "group": {
                 "key": "Rotation",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -36190,7 +35956,7 @@
               "type": "group",
               "group": {
                 "key": "Animation Speed Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -36213,7 +35979,7 @@
               "type": "group",
               "group": {
                 "key": "Start Time Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -36246,7 +36012,7 @@
               "type": "group",
               "group": {
                 "key": "Start Distance Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -36274,7 +36040,7 @@
               "type": "group",
               "group": {
                 "key": "Retransition",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -36285,7 +36051,7 @@
                     "type": "group",
                     "group": {
                       "key": "Retransition Speed Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -36308,7 +36074,7 @@
                     "type": "group",
                     "group": {
                       "key": "Retransition Start Time Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -36349,7 +36115,7 @@
                 "subgroups": [
                   {
                     "key": "Retransition Speed Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -36369,7 +36135,7 @@
                   },
                   {
                     "key": "Retransition Start Time Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -36404,14 +36170,14 @@
               "type": "group",
               "group": {
                 "key": "Tween Stop",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
                     "type": "group",
                     "group": {
                       "key": "Tween Stop Start Time Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -36434,7 +36200,7 @@
                     "type": "group",
                     "group": {
                       "key": "Tween Stop Delay",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -36468,7 +36234,7 @@
                 "subgroups": [
                   {
                     "key": "Tween Stop Start Time Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -36488,7 +36254,7 @@
                   },
                   {
                     "key": "Tween Stop Delay",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -36537,7 +36303,7 @@
           "subgroups": [
             {
               "key": "Offset",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -36557,7 +36323,7 @@
             },
             {
               "key": "Rotation",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -36582,7 +36348,7 @@
             },
             {
               "key": "Animation Speed Curve",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -36602,7 +36368,7 @@
             },
             {
               "key": "Start Time Curve",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -36632,7 +36398,7 @@
             },
             {
               "key": "Start Distance Curve",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -36657,7 +36423,7 @@
             },
             {
               "key": "Retransition",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -36668,7 +36434,7 @@
                   "type": "group",
                   "group": {
                     "key": "Retransition Speed Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -36691,7 +36457,7 @@
                   "type": "group",
                   "group": {
                     "key": "Retransition Start Time Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -36732,7 +36498,7 @@
               "subgroups": [
                 {
                   "key": "Retransition Speed Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -36752,7 +36518,7 @@
                 },
                 {
                   "key": "Retransition Start Time Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -36784,14 +36550,14 @@
             },
             {
               "key": "Tween Stop",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
                   "type": "group",
                   "group": {
                     "key": "Tween Stop Start Time Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -36814,7 +36580,7 @@
                   "type": "group",
                   "group": {
                     "key": "Tween Stop Delay",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -36848,7 +36614,7 @@
               "subgroups": [
                 {
                   "key": "Tween Stop Start Time Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -36868,7 +36634,7 @@
                 },
                 {
                   "key": "Tween Stop Delay",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -36949,7 +36715,7 @@
               "type": "group",
               "group": {
                 "key": "Offset",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -36972,7 +36738,7 @@
               "type": "group",
               "group": {
                 "key": "Rotation",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -37076,7 +36842,7 @@
               "type": "group",
               "group": {
                 "key": "Start Distance Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -37104,7 +36870,7 @@
               "type": "group",
               "group": {
                 "key": "Retransition",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -37115,7 +36881,7 @@
                     "type": "group",
                     "group": {
                       "key": "Retransition Speed Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -37138,7 +36904,7 @@
                     "type": "group",
                     "group": {
                       "key": "Retransition Start Time Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -37164,7 +36930,7 @@
                 "subgroups": [
                   {
                     "key": "Retransition Speed Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -37184,7 +36950,7 @@
                   },
                   {
                     "key": "Retransition Start Time Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -37209,7 +36975,7 @@
               "type": "group",
               "group": {
                 "key": "Multi Trigger",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -37333,7 +37099,7 @@
                           "type": "group",
                           "group": {
                             "key": "Start Time Curve",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -37573,7 +37339,7 @@
                         },
                         {
                           "key": "Start Time Curve",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -37852,7 +37618,7 @@
                         "type": "group",
                         "group": {
                           "key": "Start Time Curve",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -38092,7 +37858,7 @@
                       },
                       {
                         "key": "Start Time Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -38273,7 +38039,7 @@
           "subgroups": [
             {
               "key": "Offset",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -38293,7 +38059,7 @@
             },
             {
               "key": "Rotation",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -38368,7 +38134,7 @@
             },
             {
               "key": "Start Distance Curve",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -38393,7 +38159,7 @@
             },
             {
               "key": "Retransition",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -38404,7 +38170,7 @@
                   "type": "group",
                   "group": {
                     "key": "Retransition Speed Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -38427,7 +38193,7 @@
                   "type": "group",
                   "group": {
                     "key": "Retransition Start Time Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -38453,7 +38219,7 @@
               "subgroups": [
                 {
                   "key": "Retransition Speed Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -38473,7 +38239,7 @@
                 },
                 {
                   "key": "Retransition Start Time Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -38495,7 +38261,7 @@
             },
             {
               "key": "Multi Trigger",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -38619,7 +38385,7 @@
                         "type": "group",
                         "group": {
                           "key": "Start Time Curve",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -38859,7 +38625,7 @@
                       },
                       {
                         "key": "Start Time Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -39138,7 +38904,7 @@
                       "type": "group",
                       "group": {
                         "key": "Start Time Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -39378,7 +39144,7 @@
                     },
                     {
                       "key": "Start Time Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
