@@ -33,23 +33,44 @@ next report should confirm whether the "hands lean toward the cursor even
 with everything else off" symptom and the reordered/relabeled dev-panel
 controls now look right.
 
-**STILL OCCURRING as of 2026-09-28, per the SAME round's direct follow-up
-report -- the prior round's fix (below) was necessary but is now
-confirmed NOT sufficient, and the user has narrowed the real cause
-further: "Its got noting to do wiht cursor tracking. I turned off Palm
-Rotation, Wrist Splay, Wrist Cropping, Tracking Enabled, and its still
-occurring. I turned off Retransition on my clickhold function, and its
-still occuring... Its the Tween stop. the jump doesnt occur when Tween
-Stop is turned off."** This directly implicates the 'stopping' phase in
-`updateClickHoldPoseForHand()` (Sequence mode's own "keep playing,
-decelerate" release path, gated by `${p}TweenStopEnabled`) rather than
-retransition or cursor-tracking -- the investigation below (the wrapper-
-vs-skeleton finding, the idle-repose continuity fix) may still be a real,
-separate improvement, but it is NOT the whole story for this specific
-report. Next step: apply the same live-instrumentation methodology that
-found the idle-repose bug, this time specifically to the 'stopping' phase
-and the moment it hands off (to 'retransition', or to being force-idled
-by a different function) with Tween Stop on vs. off.
+**STILL OCCURRING as of 2026-09-28, per direct follow-up report --
+investigated this round with live instrumentation targeting the EXACT
+scenario described; could NOT reproduce a snap.** User's own narrowing:
+"Its got noting to do wiht cursor tracking. I turned off Palm Rotation,
+Wrist Splay, Wrist Cropping, Tracking Enabled, and its still occurring. I
+turned off Retransition on my clickhold function, and its still
+occuring... Its the Tween stop. the jump doesnt occur when Tween Stop is
+turned off." Traced this to a real, specific code path: with
+`RetransitionEnabled` off and `TweenStopEnabled`/`TweenStopDelayEnabled`
+on, release enters the 'stopping' phase (a decaying-speed deceleration)
+and, once fully decayed, jumps straight to `'idle'`
+(`chp.stoppingFreezeAtEnd`) with no retransition step at all. Reproduced
+this EXACT path live against `custom8` (temporarily set to match: Retransition
+off, Tween Stop on) using the same manual-tick instrumentation that found
+the 6th-round idle-repose bug -- including a variant with the cursor
+actively moving throughout the hold and the whole decay. Measured
+result: the largest single-tick wrist-bone delta across ~10 seconds of
+hold+release+decay+idle was ~12 degrees, spread smoothly across several
+ticks, not a single spike -- consistent with the 6th-round idle-repose
+continuity fix (already live, `hand._lastPoseValues` blend) ALREADY
+covering this specific handoff correctly. Test config was reverted to
+custom8's original values (Retransition on, Tween Stop off) afterward,
+never saved.
+
+**Open question, not yet resolved:** the report is real and repeated,
+but this specific, carefully-targeted repro didn't reproduce it. Possible
+explanations not yet ruled out: (a) a real mobile device's own touch
+event sequence differs meaningfully from this sandbox's synthetic
+PointerEvents in a way that matters here specifically; (b) a different
+`tweenSegments` shape (a different saved Sequence, not "FLOWER 3") could
+still show a real discontinuity my fix doesn't fully cover; (c) the
+6th-round fix may have already resolved this exact report and the user
+simply hadn't retested against the newly-deployed build yet when they
+wrote it. **Next step: ask the user to retest on their real device now
+that this round's build (v235, which includes the 6th-round idle-repose
+fix) is live** -- if it still happens, a fresh screen recording of
+ONLY the isolated repro (hold, release, Tween Stop decay, nothing else
+triggered) would be the highest-value next diagnostic.
 
 ---
 

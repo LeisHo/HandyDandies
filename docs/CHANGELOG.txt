@@ -13003,6 +13003,44 @@ same as the prior round.
 
 `main.js` cache-buster bumped `?v=234` -> `?v=235`.
 
+--------------------------------------------------------------------------------
+2026-09-28  -  (same round, item 9 -- the jump investigation's 7th round)
+
+Direct follow-up narrowing the persistent jump report further: "The pose
+jump is still occuring, but i have more data. Its got noting to do wiht
+cursor tracking. I turned off Palm Rotation, Wrist Splay, Wrist Cropping,
+Tracking Enabled, and its still occurring. I turned off Retransition on
+my clickhold function, and its still occuring, so its not to do with the
+retransition. Its the Tween stop. the jump doesnt occur when Tween Stop
+is turned off."
+
+Traced this to a specific, real code path: with `RetransitionEnabled`
+off and `TweenStopEnabled`/`TweenStopDelayEnabled` on, `endClickHoldPose()`
+enters the 'stopping' phase (a decaying-speed deceleration, per
+`updateClickHoldPoseForHand()`'s own 'stopping' branch) and, once fully
+decayed, jumps straight to `'idle'` (`chp.stoppingFreezeAtEnd`) with no
+retransition step. Reproduced this EXACT path live against `custom8`
+(temporarily set to Retransition off / Tween Stop on, matching the
+report) using the same manual-tick, `window.__debug`-driven
+instrumentation that found the 6th-round idle-repose bug -- including a
+variant with the cursor actively moving throughout the whole hold and
+decay. Measured result: the largest single-tick `rHand` wrist-bone delta
+across ~10 seconds of hold+release+decay+idle was ~12 degrees, spread
+smoothly across several ticks rather than one spike -- consistent with
+the 6th-round idle-repose continuity fix (already live in this build)
+correctly covering this specific handoff.
+
+**No further fix made this round** -- this specific, carefully-targeted
+repro did not reproduce a snap, so there was nothing concrete to fix.
+Possible remaining explanations, none yet confirmed: a real device's
+touch event sequence differing from this sandbox's synthetic
+`PointerEvent`s in some way that matters here; a different saved Tween
+Sequence (not "FLOWER 3") still showing a real discontinuity; or the
+6th-round fix having already resolved this exact report before the user
+retested against it. custom8's temporarily-changed settings (Retransition
+off, Tween Stop on) were reverted to their original values (Retransition
+on, Tween Stop off) before finishing, never saved.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a
