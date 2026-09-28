@@ -6731,7 +6731,7 @@
       "custom7RotationX": 0,
       "custom7RotationY": 0,
       "custom7RotationZ": 0,
-      "custom7TargetPose": "Big Open Palm",
+      "custom7TargetPose": "WAVE 4 (NS)",
       "custom7TweenSelector": "",
       "custom7TweenSpeedMs": 800,
       "custom7TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -13814,7 +13814,7 @@
       "custom7RotationX": 0,
       "custom7RotationY": 0,
       "custom7RotationZ": 0,
-      "custom7TargetPose": "Big Open Palm",
+      "custom7TargetPose": "WAVE 4 (NS)",
       "custom7TweenSelector": "",
       "custom7TweenSpeedMs": 800,
       "custom7TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -20897,7 +20897,7 @@
       "custom7RotationX": 0,
       "custom7RotationY": 0,
       "custom7RotationZ": 0,
-      "custom7TargetPose": "Big Open Palm",
+      "custom7TargetPose": "WAVE 4 (NS)",
       "custom7TweenSelector": "",
       "custom7TweenSpeedMs": 800,
       "custom7TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -25627,7 +25627,7 @@
     },
     {
       "key": "Custom Click Functions",
-      "collapsed": true,
+      "collapsed": false,
       "locked": false,
       "items": [
         {
@@ -28488,7 +28488,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 9",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -29911,7 +29911,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 7",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -35411,7 +35411,7 @@
         },
         {
           "key": "Custom Click Function 9",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -36828,7 +36828,7 @@
         },
         {
           "key": "Custom Click Function 7",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
