@@ -21,13 +21,13 @@
       "progressiveRowOffset": 1,
       "useProgressiveOffset": false,
       "hideHands": false,
-      "trackingEnabled": true,
-      "trackingDamping": 1,
+      "trackingEnabled": false,
+      "trackingDamping": 0.13,
       "targetDepthFactor": 2,
       "showTargetMarker": false,
-      "palmFacesCursor": true,
+      "palmFacesCursor": false,
       "palmFaceRotationOffset": 13,
-      "palmFacesCursorDistanceCurveEnabled": true,
+      "palmFacesCursorDistanceCurveEnabled": false,
       "palmFacesCursorDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0.5}]",
       "palmFacesCursorDistanceRange": "{\"min\":0,\"max\":180}",
       "loadingPreviewEnabled": true,
@@ -6088,15 +6088,15 @@
           "poseScale": 12
         }
       ],
-      "cropWristEnabled": true,
+      "cropWristEnabled": false,
       "hideWrist": 0,
-      "reactiveArmLengthEnabled": true,
+      "reactiveArmLengthEnabled": false,
       "armLengthRange": "{\"min\":0,\"max\":63}",
       "armLengthCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
-      "wristSplayResponsiveEnabled": true,
+      "wristSplayResponsiveEnabled": false,
       "wristSplayReposeStagger": 1,
       "wristSplayDefault": 6,
-      "wristSplayReactiveEnabled": true,
+      "wristSplayReactiveEnabled": false,
       "wristSplayRange": "{\"min\":30,\"max\":-54}",
       "wristSplayCurve": "[{\"x\":0,\"y\":1},{\"x\":0.6483332316080729,\"y\":0.46708348592122395},{\"x\":1,\"y\":0}]",
       "tweenPoses": [
@@ -6654,7 +6654,7 @@
       "emissionColor": "#ffffff",
       "emissionIntensity": 1.5,
       "bgColor": "#000000",
-      "pixelRatio": 1,
+      "pixelRatio": 1.25,
       "resolutionScale": 100,
       "qualityPreset": "high",
       "showGridHelper": false,
@@ -7062,7 +7062,7 @@
       "showTargetMarker": false,
       "palmFacesCursor": true,
       "palmFaceRotationOffset": 0,
-      "palmFacesCursorDistanceCurveEnabled": true,
+      "palmFacesCursorDistanceCurveEnabled": false,
       "palmFacesCursorDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0.5}]",
       "palmFacesCursorDistanceRange": "{\"min\":0,\"max\":180}",
       "loadingPreviewEnabled": true,
@@ -13123,15 +13123,15 @@
           "poseScale": 12
         }
       ],
-      "cropWristEnabled": true,
+      "cropWristEnabled": false,
       "hideWrist": 0,
-      "reactiveArmLengthEnabled": true,
+      "reactiveArmLengthEnabled": false,
       "armLengthRange": "{\"min\":0,\"max\":63}",
       "armLengthCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
-      "wristSplayResponsiveEnabled": true,
+      "wristSplayResponsiveEnabled": false,
       "wristSplayReposeStagger": 1,
       "wristSplayDefault": 6,
-      "wristSplayReactiveEnabled": true,
+      "wristSplayReactiveEnabled": false,
       "wristSplayRange": "{\"min\":30,\"max\":-54}",
       "wristSplayCurve": "[{\"x\":0,\"y\":1},{\"x\":0.6483332316080729,\"y\":0.46708348592122395},{\"x\":1,\"y\":0}]",
       "tweenPoses": [
@@ -13689,7 +13689,7 @@
       "emissionColor": "#ffffff",
       "emissionIntensity": 1.5,
       "bgColor": "#000000",
-      "pixelRatio": 1,
+      "pixelRatio": 1.25,
       "resolutionScale": 100,
       "qualityPreset": "high",
       "showGridHelper": false,
@@ -14097,7 +14097,7 @@
       "showTargetMarker": false,
       "palmFacesCursor": true,
       "palmFaceRotationOffset": 0,
-      "palmFacesCursorDistanceCurveEnabled": true,
+      "palmFacesCursorDistanceCurveEnabled": false,
       "palmFacesCursorDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0.5}]",
       "palmFacesCursorDistanceRange": "{\"min\":0,\"max\":180}",
       "loadingPreviewEnabled": true,
@@ -20158,15 +20158,15 @@
           "poseScale": 12
         }
       ],
-      "cropWristEnabled": true,
+      "cropWristEnabled": false,
       "hideWrist": 0,
-      "reactiveArmLengthEnabled": true,
+      "reactiveArmLengthEnabled": false,
       "armLengthRange": "{\"min\":0,\"max\":63}",
       "armLengthCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
-      "wristSplayResponsiveEnabled": true,
+      "wristSplayResponsiveEnabled": false,
       "wristSplayReposeStagger": 1,
       "wristSplayDefault": 6,
-      "wristSplayReactiveEnabled": true,
+      "wristSplayReactiveEnabled": false,
       "wristSplayRange": "{\"min\":30,\"max\":-54}",
       "wristSplayCurve": "[{\"x\":0,\"y\":1},{\"x\":0.6483332316080729,\"y\":0.46708348592122395},{\"x\":1,\"y\":0}]",
       "tweenPoses": [
@@ -20724,7 +20724,7 @@
       "emissionColor": "#ffffff",
       "emissionIntensity": 1.5,
       "bgColor": "#000000",
-      "pixelRatio": 1,
+      "pixelRatio": 1.25,
       "resolutionScale": 100,
       "qualityPreset": "high",
       "showGridHelper": false,
@@ -22663,6 +22663,10 @@
       "items": [
         {
           "type": "row",
+          "key": "trackingEnabled"
+        },
+        {
+          "type": "row",
           "key": "palmFacesCursorDistanceCurveEnabled"
         },
         {
@@ -22672,10 +22676,6 @@
         {
           "type": "row",
           "key": "palmFacesCursorDistanceRange"
-        },
-        {
-          "type": "row",
-          "key": "trackingEnabled"
         },
         {
           "type": "row",
@@ -22693,7 +22693,7 @@
           "type": "group",
           "group": {
             "key": "New Group (3)",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -22759,7 +22759,7 @@
           "type": "group",
           "group": {
             "key": "New Group (4)",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -22795,10 +22795,10 @@
         }
       ],
       "settings": [
+        "trackingEnabled",
         "palmFacesCursorDistanceCurveEnabled",
         "palmFacesCursorDistanceCurve",
         "palmFacesCursorDistanceRange",
-        "trackingEnabled",
         "trackingDamping",
         "targetDepthFactor",
         "showTargetMarker"
@@ -22806,7 +22806,7 @@
       "subgroups": [
         {
           "key": "New Group (3)",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -22866,7 +22866,7 @@
         },
         {
           "key": "New Group (4)",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
