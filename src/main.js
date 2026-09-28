@@ -9930,28 +9930,30 @@ function restoreCustomClickFunctions() {
 // still at the bottom fo the Custom Click Functions group... I dont see
 // the multiclick confirm duration." Root cause, confirmed by direct
 // inspection of the real saved settings file: devPanel.js's own generic
-// `applyOrder()` restores this group's ROW order from the user's own
-// PREVIOUSLY-SAVED `rowKeys` snapshot (captured well before this round's
-// item 7 moved `holdConfirmMs`/`multiClickWindowMs` into this group),
-// which takes precedence over this file's own DEV_GROUPS array order --
-// the exact same class of gap `applyCustomFunctionReferenceLayout()`
-// already exists to close for custom-function rows, just never applied
-// to this one static group. The saved snapshot still had `holdConfirmMs`
-// sitting wherever the user's own earlier customization left it (behind
-// "+ Add Click Function"), and had no entry at all for
-// `multiClickWindowMs` (which didn't live in this group yet when that
-// snapshot was captured -- it was still under "Debug" then), so restoring
-// it left both rows wherever the stale/absent order put them instead of
-// the top. Forces both to the front of this group's body, in order,
-// AFTER `applyOrder()`'s own restore has already run (called from
-// `onRestore`, right after `restoreCustomClickFunctions()`) -- so this is
-// always the true final word on their position, regardless of what any
-// legacy saved order says.
+// `applyOrder()` restores row order from the user's own PREVIOUSLY-SAVED
+// `rowKeys` snapshot, and (confirmed live, NOT just within-group
+// reordering) will physically RELOCATE a row ACROSS group boundaries to
+// match whichever group the saved snapshot says it belongs to --
+// `multiClickWindowMs` was saved as a member of "Debug" (captured before
+// this round moved its own control definition into "Custom Click
+// Functions"), so `applyOrder()` pulled the freshly-built row straight
+// back into Debug's own body, undoing the source-level group change
+// entirely. This is the exact same class of gap
+// `applyCustomFunctionReferenceLayout()` already exists to close for
+// custom-function rows, just never applied to these 2 static ones.
+// Queries the WHOLE document for each row (not scoped to this group's
+// own body) specifically because of this cross-group relocation -- a
+// scoped lookup would silently find nothing for a row `applyOrder()` has
+// already moved somewhere else. Forces both to the front of this
+// group's body, in order, AFTER `applyOrder()`'s own restore has already
+// run (called from `onRestore`, right after `restoreCustomClickFunctions()`)
+// -- so this is always the true final word on their position, regardless
+// of what any legacy saved order says or which group it thinks they're in.
 function enforceCustomClickFunctionsAnchorOrder() {
   const body = document.querySelector('.dp-group[data-key="Custom Click Functions"] > .dp-group-body')
   if (!body) return
-  const holdRow = body.querySelector(':scope > .dp-row[data-key="holdConfirmMs"]')
-  const windowRow = body.querySelector(':scope > .dp-row[data-key="multiClickWindowMs"]')
+  const holdRow = document.querySelector('.dp-row[data-key="holdConfirmMs"]')
+  const windowRow = document.querySelector('.dp-row[data-key="multiClickWindowMs"]')
   if (holdRow) body.insertBefore(holdRow, body.firstChild)
   if (windowRow) body.insertBefore(windowRow, holdRow ? holdRow.nextSibling : body.firstChild)
 }
