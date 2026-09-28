@@ -584,16 +584,20 @@ const DEV_GROUPS = [
       // tracking block for what these 4 controls actually gate, and
       // buildArmRotationWidgets() for the curve-graph/range-slider UI.
       { key: 'armRotationEnabled', label: 'Responsive Arm Rotation (Master On/Off)', type: 'checkbox', def: true, perDevice: true },
-      // Default Arm Rotation -- direct request 2026-09-28 ("provide...
-      // default arm rotation"). Fills the same role Default Arm Length
-      // (`hideWrist`)/Default Wrist Splay (`wristSplayDefault`) already
-      // play for their own features: the RESPONSIVENESS used when Arm
-      // Rotation Distance Curve is off, instead of always hardcoding full
-      // (100%) responsiveness -- see the `responsiveness` variable in
-      // animate()'s own cursor-tracking block. 0-100%, same convention as
-      // Default Arm Length's own crop-percent slider.
-      { key: 'armRotationDefault', label: 'Default Arm Rotation (Responsiveness %, Curve Off)', type: 'slider', min: 0, max: 100, step: 1, def: 100 },
-      { key: 'armRotationCurveEnabled', label: 'Arm Rotation Distance Curve On/Off', type: 'checkbox', def: false, onChange: () => updateArmRotationGateVisibility() },
+      // Default Arm Rotation -- CORRECTED 2026-09-28, direct correction
+      // ("Default Arm Rotation isnt reactiveness. Its just the default if
+      // responsive is turned off. just like the other cursor tracking
+      // setttings"). This is NOT a responsiveness knob of its own -- it's
+      // the same role Default Arm Length (`hideWrist`)/Default Wrist
+      // Splay (`wristSplayDefault`) play for their own features: the flat
+      // value used when the reactive/distance-driven calc is off. Gated
+      // by `armRotationCurveEnabled` below, relabeled to "Reactive Arm
+      // Rotation" to match its siblings' own "Reactive X (By Cursor
+      // Distance)" naming -- when that's OFF, this default (0-100%,
+      // matching Default Arm Length's own crop-percent convention) is
+      // used instead of the curve/range-driven calc, not "always full."
+      { key: 'armRotationDefault', label: 'Default Arm Rotation (%, Reactive Off)', type: 'slider', min: 0, max: 100, step: 1, def: 100 },
+      { key: 'armRotationCurveEnabled', label: 'Reactive Arm Rotation (By Cursor Distance)', type: 'checkbox', def: false, onChange: () => updateArmRotationGateVisibility() },
       { key: 'armRotationCurve', label: 'Arm Rotation Distance Curve (Distance -> Rotation Amount)', type: 'text', def: '[{"x":0,"y":1},{"x":1,"y":1}]', onChange: () => parseCursorTrackingConfig() },
       { key: 'armRotationRange', label: 'Min / Max Arm Rotation (Deg)', type: 'text', def: '{"min":0,"max":180}', onChange: () => parseCursorTrackingConfig() },
       // Arm Rotation Damping -- direct request 2026-09-28, same class of
@@ -12120,9 +12124,18 @@ function animate(dt, now) {
           } else if (hand._handoffSettleFrames > 0) {
             hand._handoffSettleFrames--
           }
-          const effectiveTrackingDamping = (hand._handoffSettleFrames > 0)
-            ? Math.min(cfg.trackingDamping, HANDOFF_SETTLE_DAMPING_CAP)
-            : cfg.trackingDamping
+          // CORRECTED 2026-09-28 (direct question: "Does Look at Damping
+          // only effect Palm Rotation now? It should"). Before this
+          // correction, `effectiveTrackingDamping` was the ONE damping
+          // applied to the WHOLE wrapper quaternion (Arm Rotation lean AND
+          // Palm Rotation roll composed together, then slerped as a single
+          // unit) -- meaning Arm Rotation was being damped TWICE (once by
+          // its own new `armRotationDamping`, again here) while Look-At
+          // Damping's own name/intent never actually meant "everything."
+          // `inHandoffSettle` is now a shared boolean both dampings below
+          // apply the SAME handoff safety-net cap through, instead of one
+          // damping value doing both jobs.
+          const inHandoffSettle = hand._handoffSettleFrames > 0
           // Responsive Arm Rotation (2026-09-28, new feature) -- this is the
           // actual "hand leans/rotates toward the cursor" rotation, now its
           // own independently-toggleable feature (direct report: "It looks
@@ -12168,16 +12181,21 @@ function animate(dt, now) {
             // Arm Rotation Damping -- direct request 2026-09-28, same class
             // of fix as this same round's Wrist Cropping/Wrist Splay
             // damping: `targetBoundedAngleDeg` used to be applied straight,
-            // every frame, with no smoothing at all -- on Landscape
-            // specifically (`trackingDamping: 1.0` in this project's own
-            // real saved settings), the wrapper's own slerp below provides
-            // ZERO smoothing, so a sudden cursor relocation could snap this
-            // value instantly. `hand.currentArmRotationDeg` lerps toward
-            // the target each frame instead; kept UNCONDITIONAL (runs even
-            // when `rawAngleDeg <= 1e-6`, decaying toward 0) so it never
-            // holds a stale value that would mismatch `rawAngleDeg` the
-            // next frame the hand needs a real rotation again.
-            const armRotationDampingAmt = THREE.MathUtils.clamp(cfg.armRotationDamping ?? 1, 0.001, 1)
+            // every frame, with no smoothing at all. `hand.currentArmRotationDeg`
+            // lerps toward the target each frame instead; kept UNCONDITIONAL
+            // (runs even when `rawAngleDeg <= 1e-6`, decaying toward 0) so
+            // it never holds a stale value that would mismatch `rawAngleDeg`
+            // the next frame the hand needs a real rotation again. Also
+            // capped through the SAME handoff-settle safety net as Palm
+            // Rotation's own damping below (`inHandoffSettle`), so a
+            // trigger-interruption handoff still gets a guaranteed gentle
+            // catch-up window regardless of how `armRotationDamping` itself
+            // is configured -- this is now this feature's ONLY damping;
+            // the final wrapper application below no longer re-damps it via
+            // Look-At Damping (see that variable's own correction comment).
+            const armRotationDampingAmt = inHandoffSettle
+              ? Math.min(THREE.MathUtils.clamp(cfg.armRotationDamping ?? 1, 0.001, 1), HANDOFF_SETTLE_DAMPING_CAP)
+              : THREE.MathUtils.clamp(cfg.armRotationDamping ?? 1, 0.001, 1)
             hand.currentArmRotationDeg = hand.currentArmRotationDeg !== undefined
               ? hand.currentArmRotationDeg + (targetBoundedAngleDeg - hand.currentArmRotationDeg) * armRotationDampingAmt
               : targetBoundedAngleDeg
@@ -12219,10 +12237,26 @@ function animate(dt, now) {
             const palmMaxAbs = Math.max(Math.abs(palmFacesCursorDistanceRangeParsed.min), Math.abs(palmFacesCursorDistanceRangeParsed.max))
             baseDeg = Math.sign(baseDeg) * THREE.MathUtils.clamp(Math.abs(baseDeg), palmMinAbs, palmMaxAbs)
           }
+          // Look-At Damping (`trackingDamping`) now applies ONLY here, to
+          // Palm Rotation -- direct question 2026-09-28 ("Does Look at
+          // Damping only effect Palm Rotation now? It should"). Same
+          // per-hand persistent-lerp pattern as Arm Rotation Damping just
+          // above (`hand.currentPalmRollDeg`), through the SAME shared
+          // `inHandoffSettle` safety-net cap, rather than a single final
+          // slerp of the whole composed wrapper quaternion (which used to
+          // silently re-damp Arm Rotation's own already-damped lean on top
+          // of its own smoothing).
+          const palmDampingAmt = inHandoffSettle
+            ? Math.min(cfg.trackingDamping, HANDOFF_SETTLE_DAMPING_CAP)
+            : cfg.trackingDamping
+          hand.currentPalmRollDeg = hand.currentPalmRollDeg !== undefined
+            ? hand.currentPalmRollDeg + (baseDeg - hand.currentPalmRollDeg) * palmDampingAmt
+            : baseDeg
           // Whole-wrapper rotation only, same mechanism as the default mode;
-          // no skeleton/pose involvement either way.
-          desired = desired.clone().multiply(computeRollQuat(baseDeg))
-          hand.wrapper.quaternion.slerp(desired, effectiveTrackingDamping)
+          // no skeleton/pose involvement either way. Arm Rotation's own
+          // `desired` is applied directly (not slerped again) -- it's
+          // already fully damped via armRotationDampingAmt above.
+          hand.wrapper.quaternion.copy(desired).multiply(computeRollQuat(hand.currentPalmRollDeg))
         })
       }
       const __uroStart = performance.now()

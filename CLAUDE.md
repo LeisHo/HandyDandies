@@ -1939,3 +1939,65 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   plain copy-paste of an OLDER version of any of these 3 functions
   (e.g. from git history, or from a stale local branch) would
   silently reintroduce the fixed-240px-non-stretching regression.
+
+- **CRITICAL METHODOLOGY GOTCHA, discovered 2026-09-28 (7th-8th round of
+  the same jump investigation): calling `updateClickHoldPoseForHand()`/
+  `updateClickPoseForHand()` directly to drive a live test (instead of
+  going through `updateRenderOrder()`) skips `hand._wasOverriddenLastFrame`
+  bookkeeping entirely, since that flag is only ever set inside
+  `updateRenderOrder()`'s own per-hand loop.** A first live-production
+  test attempt (calling these 2 functions directly, manually incrementing
+  a fake `now`) measured a spurious ~43-degree "jump" at the interruption
+  commit -- this turned out to be a pure artifact: with
+  `hand._wasOverriddenLastFrame` never set, `updateClickPoseForHand()`'s
+  own commit step (`wasActive = hand._wasOverriddenLastFrame &&
+  hand._lastPoseValues`) fell back to the STATIC trigger-time snapshot
+  (`cp.pendingForwardSnapshot`, built from live `cfg` slider values) as
+  its FROM-anchor instead of the hand's actual current decayed pose --
+  a real discontinuity in the TEST, not the app. Redone correctly by
+  calling `window.__debug.updateRenderOrder()` every tick instead (which
+  internally calls both functions for every hand, with full, correct
+  bookkeeping) -- this eliminated the false jump entirely. **Any future
+  live-instrumentation test of chp/cp state transitions MUST drive
+  through `updateRenderOrder()`, never `updateClickHoldPoseForHand()`/
+  `updateClickPoseForHand()` directly** -- this is the same general
+  class of gap as this file's own earlier "calling `updateRenderOrder()`
+  directly skips `animate()`'s own cursor-tracking wrapper-rotation
+  slerp" methodology gotcha, one level deeper in the call stack.
+- **7th-8th round of the jump investigation: extensive live production
+  instrumentation of the user's own exact real mouse+hand-log repro
+  found NO discontinuity, in EITHER of the 2 transitions tested.**
+  Identified the real trigger chain from the log: `custom8` (Click+Hold,
+  Mode Sequence, LoopMode Loop, TweenSelector "FLOWER 3", TweenStopEnabled
+  true) held ~3.4s then released -- since `TweenSpeedMs` is 5000ms, a
+  3397ms hold never completes even the FIRST lap, so `chp.phase` is
+  still `'forward'` at release (never reaches `'looping'`), meaning
+  `chp.stoppingWasLooping = false` and 'stopping' uses the progress-based
+  decay branch, not the hold-at-release-pose branch. ~3s later,
+  `custom7Trig1` (a Multi Trigger sub-trigger of `custom7`, its own
+  display name "Trigger 1" -- resolved via `cfg.custom7MultiTriggers`,
+  NOT a plain custom function id) fires "Fist" on ~90 hands,
+  interrupting `custom8`'s own mid-'stopping' state via
+  `releaseHandFromOtherFunctions()`. Measured the `rHand` skeleton bone's
+  quaternion at every ~30ms real tick (via `updateRenderOrder()`,
+  correctly, per the methodology gotcha above) across both the release
+  moment (forward->stopping) and the interruption-commit moment
+  (stopping->idle->custom7Trig1 forward) for `hands[0]` in isolation --
+  BOTH transitions showed deltas consistent with the surrounding normal
+  per-tick motion (release: 6.18 deg vs. surrounding ~5-6 deg;
+  interruption: 5.86 deg vs. surrounding ~3-5 deg), no discontinuity
+  either time. **This directly parallels the earlier 5-failed-rounds
+  pattern before the successful 6th round** -- static tracing AND this
+  round's live instrumentation both came up empty, despite the report
+  being precise, real, and repeated. Runtime chp/cp state on the live
+  app was reset to `'idle'` afterward -- purely in-memory fields, never
+  persisted to `dev-panel-settings.json`, so no real saved settings were
+  touched by this investigation. **Most promising untested lead for a
+  future round: this test only ever drove `hands[0]` in isolation --
+  rerun the identical measurement with MANY/ALL real hands ticking
+  together** (a per-hand cross-talk bug in the shared field-wide
+  `minD`/`maxD`/`range` distance computation, recomputed from ALL hands
+  every tick, wouldn't show up testing one hand alone), or consider that
+  the report may describe a genuinely PERCEPTUAL effect of ~90 hands
+  changing pose in near-unison over `TransitionSpeedMs` (2000ms) rather
+  than a per-hand continuity bug at all.

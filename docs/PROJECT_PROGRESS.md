@@ -18,6 +18,36 @@ work seamlessly from there.
 
 ## Currently working on
 
+**COMPLETE 2026-09-28 (19th round) -- Look-At Damping scope fix
+(shipped); "hands jump" investigation 7th-8th rounds STILL UNRESOLVED
+despite extensive live production instrumentation.** Look-At Damping
+(`trackingDamping`) now affects ONLY Palm Rotation -- Arm Rotation was
+previously being damped twice (its own new damping, then again by the
+final wrapper slerp); each is now independently, fully damped, sharing
+the same handoff-settle safety net. Default Arm Rotation's real
+significance was clarified through 3 rounds of direct correction (it's
+a live intensity multiplier on cursor-direction, not a static fallback
+like its Arm Length/Wrist Splay siblings) -- left as-is functionally
+and in naming per direct instruction ("nah its fine that slider doesnt
+hurt if its set right"). The jump investigation: live-instrumented the
+user's own exact real mouse+hand-log repro (`custom8` Click+Hold/
+Sequence/Loop/Tween-Stop, held ~3.4s, released, interrupted ~3s later
+by `custom7Trig1` -- a Multi Trigger sub-trigger of `custom7` -- firing
+"Fist" on ~90 hands) directly against the real deployed app, using
+`window.__debug` + real setTimeout-driven ticking (not this sandbox's
+own unreliable rAF). Found and corrected a real methodology artifact
+(calling internal update functions directly skips
+`_wasOverriddenLastFrame` bookkeeping the real per-frame path
+maintains) before getting a clean measurement. Result: NO discontinuity
+found in the release-into-stopping transition or the interruption-
+commit transition, for a single hand tested in isolation. Most
+promising untested lead for a future round: test across many/all hands
+simultaneously rather than one hand alone, in case this is a per-hand
+cross-talk bug in the shared field-wide distance computation, or a
+genuinely perceptual effect of ~90 hands changing pose in sync rather
+than a per-hand continuity bug at all. See CHANGELOG.txt's 19th-round
+entry for the full account.
+
 **COMPLETE 2026-09-28 (18th round) -- Arm Rotation damping/default
 controls + curve-editor width-responsiveness fix, direct request.**
 Default Arm Rotation (`armRotationDefault`, 0-100% responsiveness when

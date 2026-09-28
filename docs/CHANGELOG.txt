@@ -13395,6 +13395,113 @@ size correctly, not a stale constant.
 
 `main.js` cache-buster bumped `?v=239` -> `?v=240`.
 
+2026-09-28  -  (19th round -- Look-At Damping scope fix + Default Arm
+Rotation clarification, direct follow-up after damping was applied to
+all cursor tracking and the jump still occurred)
+
+**Look-At Damping now affects ONLY Palm Rotation**, per direct question
+("Does Look at Damping only effect Palm Rotation now? It should").
+Before this round, `trackingDamping` was the ONE damping applied to the
+WHOLE wrapper quaternion (Arm Rotation lean AND Palm Rotation roll
+composed together, then slerped as a single unit) -- meaning Arm
+Rotation was being damped TWICE (once by its own `armRotationDamping`,
+again by the final wrapper slerp) while Palm Rotation had no damping of
+its own at all. Restructured so each component is fully, independently
+damped: Arm Rotation's lean quaternion is now applied directly (no
+re-slerp, since `armRotationDamping` already smooths it per-hand);
+Palm Rotation gets its own new per-hand persistent lerp
+(`hand.currentPalmRollDeg`) driven by `trackingDamping` exclusively. A
+shared `inHandoffSettle` boolean (replacing the old single
+`effectiveTrackingDamping` computation) applies the SAME handoff safety-
+net cap to both, so a trigger-interruption handoff still gets a
+guaranteed gentle catch-up window regardless of either damping's own
+configured value.
+
+**Default Arm Rotation labeling was clarified but NOT changed
+functionally**, per 2 rounds of direct correction. First correction:
+"Default Arm Rotation isnt reactiveness. Its just the default if
+responsive is turned off. just like the other cursor tracking
+setttings" -- relabeled `armRotationCurveEnabled` from "Arm Rotation
+Distance Curve On/Off" to "Reactive Arm Rotation (By Cursor Distance)"
+and `armRotationDefault` from "...(Responsiveness %, Curve Off)" to
+"...(%, Reactive Off)", matching Default Arm Length/Default Wrist
+Splay's own naming convention -- the gating logic itself was already
+correct (Default already applied exactly when the curve toggle was
+off). Second correction, clarifying this labeling fix undersold the
+control's real significance: "y change about Default Arm Rotation
+Responsiveness is not just semantic. It was actually controlling the
+intensity of influence of the cursor. when its set to 0, the arms
+point down at all times" -- confirmed correct: at 0, the hand's
+`desired` orientation stays exactly `hand.currentBaseQuat` (zero
+cursor influence); at 100, full lean. A THIRD correction then
+identified a real architectural distinction from its "Default X"
+siblings: unlike Arm Length/Wrist Splay's Default (a static,
+cursor-position-independent fallback value when non-reactive), Arm
+Rotation's Default is a live INTENSITY MULTIPLIER on `rawAngleDeg` (a
+value that's always cursor-direction-driven, every frame, regardless of
+the Reactive toggle) -- "this is distinctly different from the other
+cursor tracking functions." User elected to leave the current
+implementation/naming as-is ("nah its fine that slider doesnt hurt if
+its set right") rather than rename to "Intensity" -- no further code
+change made.
+
+**The "hands jump" investigation, 7th-8th rounds: extensive live
+production instrumentation, no discontinuity found.** New evidence this
+round: a real mouse+hand log showing the exact repro -- `custom8`
+(Click+Hold, Sequence/Loop mode, Tween Stop enabled, TweenSelector
+"FLOWER 3") held ~3.4s then released, decaying via 'stopping' for ~3s,
+then interrupted by `custom7Trig1` (a Multi Trigger sub-trigger of
+`custom7`, titled "Trigger 1", TargetPose "Fist") firing on ~90 hands
+simultaneously. Extensive static code tracing (pose-value FROM-anchor
+continuity, splay FROM-anchor continuity, offset/rotation accumulator
+baking, `_wasOverriddenLastFrame` bookkeeping) found no gap -- all
+already correctly wired from prior rounds' fixes. Live-instrumented the
+EXACT repro directly against the real production deployment
+(`handy-dandies.vercel.app`, not this sandbox), using
+`window.__debug.updateRenderOrder()` ticked via real `setTimeout`-driven
+wall-clock time (not this sandbox's own unreliable `requestAnimationFrame`
+-- the same methodology that found the real bug in the successful 6th
+round after 5 failed static-tracing rounds). A first test attempt
+(calling `updateClickHoldPoseForHand()`/`updateClickPoseForHand()`
+directly, without the real per-frame `updateRenderOrder()` wrapper)
+showed a large 43-degree "jump" that turned out to be a METHODOLOGY
+ARTIFACT -- it skips `hand._wasOverriddenLastFrame` bookkeeping, which
+only the real per-frame path maintains, so the FROM-anchor fell back to
+a stale default snapshot instead of the hand's actual live pose. Redone
+correctly via `updateRenderOrder()` for every tick: measured the
+`rHand` skeleton bone's own quaternion at every ~30ms real tick across
+(a) the last 600ms of the hold and the first 600ms after release
+(forward -> stopping transition, NOT looping since `custom8`'s own
+5000ms `TweenSpeedMs` never completed a full lap within the 3397ms
+hold) -- smooth throughout, release-moment delta (6.18 deg) consistent
+with the surrounding ~5-6 deg per-tick motion, no discontinuity; and
+(b) the exact interruption commit tick (`custom7Trig1` firing on
+`custom8`, mid-'stopping') -- smooth there too, commit-moment delta
+(5.86 deg) consistent with the surrounding ~3-5 deg per-tick motion.
+**Could not reproduce the jump this round either**, despite thorough,
+methodologically-corrected live measurement of the user's own exact
+repro. Runtime chp/cp state on the live app was reset to 'idle'
+afterward (never persisted to `dev-panel-settings.json` -- these are
+in-memory-only fields, so no real user's saved settings were touched).
+
+**Open question, still unresolved:** possible explanations not yet
+ruled out: (a) the jump is a genuinely PERCEPTUAL effect of ~90 hands
+all changing pose simultaneously over `TransitionSpeedMs` (2000ms for
+`custom7Trig1`) -- individually smooth, but reading as "everything
+jumped" when synchronized across a large field, not a per-hand
+continuity bug at all; (b) a discontinuity specific to running with
+ALL 156 real hands simultaneously (rather than the single hand=0 this
+round's tests measured) -- a per-hand cross-talk bug (e.g. in the
+shared `minD`/`maxD`/`range` distance computation) wouldn't show up
+testing one hand in isolation; (c) a mechanism this round's tests
+didn't touch at all (Wrist Cropping/Wrist Splay/Arm Rotation's own
+NEW damping from the 17th-18th rounds, interacting with this exact
+scenario in a way not yet isolated). If a future round revisits this,
+(b) is the most promising untested lead -- rerun this same measurement
+across several/all hands at once, not just hand 0.
+
+`main.js` cache-buster bumped `?v=240` -> `?v=241`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a
