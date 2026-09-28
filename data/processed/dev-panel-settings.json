@@ -7034,7 +7034,7 @@
       "custom15RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "custom15MultiTriggerEnabled": false,
       "custom15MultiTriggers": "[]",
-      "custom7Trig1Enabled": false,
+      "custom7Trig1Enabled": true,
       "custom7Trig1Mode": "Single Pose",
       "custom7Trig1OffsetEnabled": false,
       "custom7Trig1OffsetX": 0,
@@ -7043,12 +7043,12 @@
       "custom7Trig1RotationX": 0,
       "custom7Trig1RotationY": 0,
       "custom7Trig1RotationZ": 0,
-      "custom7Trig1TargetPose": "",
+      "custom7Trig1TargetPose": "Fist",
       "custom7Trig1TweenSelector": "",
       "custom7Trig1TweenSpeedMs": 800,
       "custom7Trig1TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom7Trig1TweenStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom7Trig1TransitionSpeedMs": 400,
+      "custom7Trig1TransitionSpeedMs": 700,
       "custom7Trig1SpeedCurveEnabled": false,
       "custom7Trig1SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom7Trig1SpeedCurveRange": "{\"min\":50,\"max\":2000}",
@@ -7060,7 +7060,7 @@
       "custom7Trig1StartDistanceMax": 100,
       "custom7Trig1StartDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
       "custom7Trig1PauseDurationMs": 500,
-      "custom7Trig1RetransitionEnabled": true,
+      "custom7Trig1RetransitionEnabled": false,
       "custom7Trig1RetransitionSpeedMs": 400,
       "custom7Trig1RetransitionSpeedCurveEnabled": false,
       "custom7Trig1RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -14103,7 +14103,7 @@
       "custom15RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "custom15MultiTriggerEnabled": false,
       "custom15MultiTriggers": "[]",
-      "custom7Trig1Enabled": false,
+      "custom7Trig1Enabled": true,
       "custom7Trig1Mode": "Single Pose",
       "custom7Trig1OffsetEnabled": false,
       "custom7Trig1OffsetX": 0,
@@ -14112,12 +14112,12 @@
       "custom7Trig1RotationX": 0,
       "custom7Trig1RotationY": 0,
       "custom7Trig1RotationZ": 0,
-      "custom7Trig1TargetPose": "",
+      "custom7Trig1TargetPose": "Fist",
       "custom7Trig1TweenSelector": "",
       "custom7Trig1TweenSpeedMs": 800,
       "custom7Trig1TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom7Trig1TweenStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom7Trig1TransitionSpeedMs": 400,
+      "custom7Trig1TransitionSpeedMs": 700,
       "custom7Trig1SpeedCurveEnabled": false,
       "custom7Trig1SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom7Trig1SpeedCurveRange": "{\"min\":50,\"max\":2000}",
@@ -14129,7 +14129,7 @@
       "custom7Trig1StartDistanceMax": 100,
       "custom7Trig1StartDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
       "custom7Trig1PauseDurationMs": 500,
-      "custom7Trig1RetransitionEnabled": true,
+      "custom7Trig1RetransitionEnabled": false,
       "custom7Trig1RetransitionSpeedMs": 400,
       "custom7Trig1RetransitionSpeedCurveEnabled": false,
       "custom7Trig1RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -21172,7 +21172,7 @@
       "custom15RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "custom15MultiTriggerEnabled": false,
       "custom15MultiTriggers": "[]",
-      "custom7Trig1Enabled": false,
+      "custom7Trig1Enabled": true,
       "custom7Trig1Mode": "Single Pose",
       "custom7Trig1OffsetEnabled": false,
       "custom7Trig1OffsetX": 0,
@@ -21181,12 +21181,12 @@
       "custom7Trig1RotationX": 0,
       "custom7Trig1RotationY": 0,
       "custom7Trig1RotationZ": 0,
-      "custom7Trig1TargetPose": "",
+      "custom7Trig1TargetPose": "Fist",
       "custom7Trig1TweenSelector": "",
       "custom7Trig1TweenSpeedMs": 800,
       "custom7Trig1TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom7Trig1TweenStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom7Trig1TransitionSpeedMs": 400,
+      "custom7Trig1TransitionSpeedMs": 700,
       "custom7Trig1SpeedCurveEnabled": false,
       "custom7Trig1SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom7Trig1SpeedCurveRange": "{\"min\":50,\"max\":2000}",
@@ -21198,7 +21198,7 @@
       "custom7Trig1StartDistanceMax": 100,
       "custom7Trig1StartDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
       "custom7Trig1PauseDurationMs": 500,
-      "custom7Trig1RetransitionEnabled": true,
+      "custom7Trig1RetransitionEnabled": false,
       "custom7Trig1RetransitionSpeedMs": 400,
       "custom7Trig1RetransitionSpeedCurveEnabled": false,
       "custom7Trig1RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -27666,6 +27666,18 @@
                             "key": "custom7Trig1Mode"
                           },
                           {
+                            "type": "row",
+                            "key": "custom7Trig1TargetPose"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom7Trig1TransitionSpeedMs"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom7Trig1PauseDurationMs"
+                          },
+                          {
                             "type": "group",
                             "group": {
                               "key": "Offset",
@@ -27718,19 +27730,11 @@
                           },
                           {
                             "type": "row",
-                            "key": "custom7Trig1TargetPose"
-                          },
-                          {
-                            "type": "row",
                             "key": "custom7Trig1TweenSelector"
                           },
                           {
                             "type": "row",
                             "key": "custom7Trig1TweenSpeedMs"
-                          },
-                          {
-                            "type": "row",
-                            "key": "custom7Trig1TransitionSpeedMs"
                           },
                           {
                             "type": "group",
@@ -27759,7 +27763,7 @@
                             "type": "group",
                             "group": {
                               "key": "Start Time Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -27792,7 +27796,7 @@
                             "type": "group",
                             "group": {
                               "key": "Start Distance Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -27817,14 +27821,10 @@
                             }
                           },
                           {
-                            "type": "row",
-                            "key": "custom7Trig1PauseDurationMs"
-                          },
-                          {
                             "type": "group",
                             "group": {
                               "key": "Retransition",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -27930,10 +27930,10 @@
                           "custom7Trig1Enabled",
                           "custom7Trig1Mode",
                           "custom7Trig1TargetPose",
-                          "custom7Trig1TweenSelector",
-                          "custom7Trig1TweenSpeedMs",
                           "custom7Trig1TransitionSpeedMs",
-                          "custom7Trig1PauseDurationMs"
+                          "custom7Trig1PauseDurationMs",
+                          "custom7Trig1TweenSelector",
+                          "custom7Trig1TweenSpeedMs"
                         ],
                         "subgroups": [
                           {
@@ -28003,7 +28003,7 @@
                           },
                           {
                             "key": "Start Time Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -28033,7 +28033,7 @@
                           },
                           {
                             "key": "Start Distance Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -28058,7 +28058,7 @@
                           },
                           {
                             "key": "Retransition",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -28185,6 +28185,18 @@
                           "key": "custom7Trig1Mode"
                         },
                         {
+                          "type": "row",
+                          "key": "custom7Trig1TargetPose"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom7Trig1TransitionSpeedMs"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom7Trig1PauseDurationMs"
+                        },
+                        {
                           "type": "group",
                           "group": {
                             "key": "Offset",
@@ -28237,19 +28249,11 @@
                         },
                         {
                           "type": "row",
-                          "key": "custom7Trig1TargetPose"
-                        },
-                        {
-                          "type": "row",
                           "key": "custom7Trig1TweenSelector"
                         },
                         {
                           "type": "row",
                           "key": "custom7Trig1TweenSpeedMs"
-                        },
-                        {
-                          "type": "row",
-                          "key": "custom7Trig1TransitionSpeedMs"
                         },
                         {
                           "type": "group",
@@ -28278,7 +28282,7 @@
                           "type": "group",
                           "group": {
                             "key": "Start Time Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -28311,7 +28315,7 @@
                           "type": "group",
                           "group": {
                             "key": "Start Distance Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -28336,14 +28340,10 @@
                           }
                         },
                         {
-                          "type": "row",
-                          "key": "custom7Trig1PauseDurationMs"
-                        },
-                        {
                           "type": "group",
                           "group": {
                             "key": "Retransition",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -28449,10 +28449,10 @@
                         "custom7Trig1Enabled",
                         "custom7Trig1Mode",
                         "custom7Trig1TargetPose",
-                        "custom7Trig1TweenSelector",
-                        "custom7Trig1TweenSpeedMs",
                         "custom7Trig1TransitionSpeedMs",
-                        "custom7Trig1PauseDurationMs"
+                        "custom7Trig1PauseDurationMs",
+                        "custom7Trig1TweenSelector",
+                        "custom7Trig1TweenSpeedMs"
                       ],
                       "subgroups": [
                         {
@@ -28522,7 +28522,7 @@
                         },
                         {
                           "key": "Start Time Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -28552,7 +28552,7 @@
                         },
                         {
                           "key": "Start Distance Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -28577,7 +28577,7 @@
                         },
                         {
                           "key": "Retransition",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -28952,6 +28952,18 @@
                           "key": "custom7Trig1Mode"
                         },
                         {
+                          "type": "row",
+                          "key": "custom7Trig1TargetPose"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom7Trig1TransitionSpeedMs"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom7Trig1PauseDurationMs"
+                        },
+                        {
                           "type": "group",
                           "group": {
                             "key": "Offset",
@@ -29004,19 +29016,11 @@
                         },
                         {
                           "type": "row",
-                          "key": "custom7Trig1TargetPose"
-                        },
-                        {
-                          "type": "row",
                           "key": "custom7Trig1TweenSelector"
                         },
                         {
                           "type": "row",
                           "key": "custom7Trig1TweenSpeedMs"
-                        },
-                        {
-                          "type": "row",
-                          "key": "custom7Trig1TransitionSpeedMs"
                         },
                         {
                           "type": "group",
@@ -29045,7 +29049,7 @@
                           "type": "group",
                           "group": {
                             "key": "Start Time Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -29078,7 +29082,7 @@
                           "type": "group",
                           "group": {
                             "key": "Start Distance Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -29103,14 +29107,10 @@
                           }
                         },
                         {
-                          "type": "row",
-                          "key": "custom7Trig1PauseDurationMs"
-                        },
-                        {
                           "type": "group",
                           "group": {
                             "key": "Retransition",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -29216,10 +29216,10 @@
                         "custom7Trig1Enabled",
                         "custom7Trig1Mode",
                         "custom7Trig1TargetPose",
-                        "custom7Trig1TweenSelector",
-                        "custom7Trig1TweenSpeedMs",
                         "custom7Trig1TransitionSpeedMs",
-                        "custom7Trig1PauseDurationMs"
+                        "custom7Trig1PauseDurationMs",
+                        "custom7Trig1TweenSelector",
+                        "custom7Trig1TweenSpeedMs"
                       ],
                       "subgroups": [
                         {
@@ -29289,7 +29289,7 @@
                         },
                         {
                           "key": "Start Time Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -29319,7 +29319,7 @@
                         },
                         {
                           "key": "Start Distance Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -29344,7 +29344,7 @@
                         },
                         {
                           "key": "Retransition",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -29471,6 +29471,18 @@
                         "key": "custom7Trig1Mode"
                       },
                       {
+                        "type": "row",
+                        "key": "custom7Trig1TargetPose"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom7Trig1TransitionSpeedMs"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom7Trig1PauseDurationMs"
+                      },
+                      {
                         "type": "group",
                         "group": {
                           "key": "Offset",
@@ -29523,19 +29535,11 @@
                       },
                       {
                         "type": "row",
-                        "key": "custom7Trig1TargetPose"
-                      },
-                      {
-                        "type": "row",
                         "key": "custom7Trig1TweenSelector"
                       },
                       {
                         "type": "row",
                         "key": "custom7Trig1TweenSpeedMs"
-                      },
-                      {
-                        "type": "row",
-                        "key": "custom7Trig1TransitionSpeedMs"
                       },
                       {
                         "type": "group",
@@ -29564,7 +29568,7 @@
                         "type": "group",
                         "group": {
                           "key": "Start Time Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -29597,7 +29601,7 @@
                         "type": "group",
                         "group": {
                           "key": "Start Distance Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -29622,14 +29626,10 @@
                         }
                       },
                       {
-                        "type": "row",
-                        "key": "custom7Trig1PauseDurationMs"
-                      },
-                      {
                         "type": "group",
                         "group": {
                           "key": "Retransition",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -29735,10 +29735,10 @@
                       "custom7Trig1Enabled",
                       "custom7Trig1Mode",
                       "custom7Trig1TargetPose",
-                      "custom7Trig1TweenSelector",
-                      "custom7Trig1TweenSpeedMs",
                       "custom7Trig1TransitionSpeedMs",
-                      "custom7Trig1PauseDurationMs"
+                      "custom7Trig1PauseDurationMs",
+                      "custom7Trig1TweenSelector",
+                      "custom7Trig1TweenSpeedMs"
                     ],
                     "subgroups": [
                       {
@@ -29808,7 +29808,7 @@
                       },
                       {
                         "key": "Start Time Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -29838,7 +29838,7 @@
                       },
                       {
                         "key": "Start Distance Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -29863,7 +29863,7 @@
                       },
                       {
                         "key": "Retransition",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -34622,6 +34622,18 @@
                           "key": "custom7Trig1Mode"
                         },
                         {
+                          "type": "row",
+                          "key": "custom7Trig1TargetPose"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom7Trig1TransitionSpeedMs"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom7Trig1PauseDurationMs"
+                        },
+                        {
                           "type": "group",
                           "group": {
                             "key": "Offset",
@@ -34674,19 +34686,11 @@
                         },
                         {
                           "type": "row",
-                          "key": "custom7Trig1TargetPose"
-                        },
-                        {
-                          "type": "row",
                           "key": "custom7Trig1TweenSelector"
                         },
                         {
                           "type": "row",
                           "key": "custom7Trig1TweenSpeedMs"
-                        },
-                        {
-                          "type": "row",
-                          "key": "custom7Trig1TransitionSpeedMs"
                         },
                         {
                           "type": "group",
@@ -34715,7 +34719,7 @@
                           "type": "group",
                           "group": {
                             "key": "Start Time Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -34748,7 +34752,7 @@
                           "type": "group",
                           "group": {
                             "key": "Start Distance Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -34773,14 +34777,10 @@
                           }
                         },
                         {
-                          "type": "row",
-                          "key": "custom7Trig1PauseDurationMs"
-                        },
-                        {
                           "type": "group",
                           "group": {
                             "key": "Retransition",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -34886,10 +34886,10 @@
                         "custom7Trig1Enabled",
                         "custom7Trig1Mode",
                         "custom7Trig1TargetPose",
-                        "custom7Trig1TweenSelector",
-                        "custom7Trig1TweenSpeedMs",
                         "custom7Trig1TransitionSpeedMs",
-                        "custom7Trig1PauseDurationMs"
+                        "custom7Trig1PauseDurationMs",
+                        "custom7Trig1TweenSelector",
+                        "custom7Trig1TweenSpeedMs"
                       ],
                       "subgroups": [
                         {
@@ -34959,7 +34959,7 @@
                         },
                         {
                           "key": "Start Time Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -34989,7 +34989,7 @@
                         },
                         {
                           "key": "Start Distance Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -35014,7 +35014,7 @@
                         },
                         {
                           "key": "Retransition",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -35141,6 +35141,18 @@
                         "key": "custom7Trig1Mode"
                       },
                       {
+                        "type": "row",
+                        "key": "custom7Trig1TargetPose"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom7Trig1TransitionSpeedMs"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom7Trig1PauseDurationMs"
+                      },
+                      {
                         "type": "group",
                         "group": {
                           "key": "Offset",
@@ -35193,19 +35205,11 @@
                       },
                       {
                         "type": "row",
-                        "key": "custom7Trig1TargetPose"
-                      },
-                      {
-                        "type": "row",
                         "key": "custom7Trig1TweenSelector"
                       },
                       {
                         "type": "row",
                         "key": "custom7Trig1TweenSpeedMs"
-                      },
-                      {
-                        "type": "row",
-                        "key": "custom7Trig1TransitionSpeedMs"
                       },
                       {
                         "type": "group",
@@ -35234,7 +35238,7 @@
                         "type": "group",
                         "group": {
                           "key": "Start Time Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -35267,7 +35271,7 @@
                         "type": "group",
                         "group": {
                           "key": "Start Distance Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -35292,14 +35296,10 @@
                         }
                       },
                       {
-                        "type": "row",
-                        "key": "custom7Trig1PauseDurationMs"
-                      },
-                      {
                         "type": "group",
                         "group": {
                           "key": "Retransition",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -35405,10 +35405,10 @@
                       "custom7Trig1Enabled",
                       "custom7Trig1Mode",
                       "custom7Trig1TargetPose",
-                      "custom7Trig1TweenSelector",
-                      "custom7Trig1TweenSpeedMs",
                       "custom7Trig1TransitionSpeedMs",
-                      "custom7Trig1PauseDurationMs"
+                      "custom7Trig1PauseDurationMs",
+                      "custom7Trig1TweenSelector",
+                      "custom7Trig1TweenSpeedMs"
                     ],
                     "subgroups": [
                       {
@@ -35478,7 +35478,7 @@
                       },
                       {
                         "key": "Start Time Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -35508,7 +35508,7 @@
                       },
                       {
                         "key": "Start Distance Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -35533,7 +35533,7 @@
                       },
                       {
                         "key": "Retransition",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -35908,6 +35908,18 @@
                         "key": "custom7Trig1Mode"
                       },
                       {
+                        "type": "row",
+                        "key": "custom7Trig1TargetPose"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom7Trig1TransitionSpeedMs"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom7Trig1PauseDurationMs"
+                      },
+                      {
                         "type": "group",
                         "group": {
                           "key": "Offset",
@@ -35960,19 +35972,11 @@
                       },
                       {
                         "type": "row",
-                        "key": "custom7Trig1TargetPose"
-                      },
-                      {
-                        "type": "row",
                         "key": "custom7Trig1TweenSelector"
                       },
                       {
                         "type": "row",
                         "key": "custom7Trig1TweenSpeedMs"
-                      },
-                      {
-                        "type": "row",
-                        "key": "custom7Trig1TransitionSpeedMs"
                       },
                       {
                         "type": "group",
@@ -36001,7 +36005,7 @@
                         "type": "group",
                         "group": {
                           "key": "Start Time Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -36034,7 +36038,7 @@
                         "type": "group",
                         "group": {
                           "key": "Start Distance Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -36059,14 +36063,10 @@
                         }
                       },
                       {
-                        "type": "row",
-                        "key": "custom7Trig1PauseDurationMs"
-                      },
-                      {
                         "type": "group",
                         "group": {
                           "key": "Retransition",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -36172,10 +36172,10 @@
                       "custom7Trig1Enabled",
                       "custom7Trig1Mode",
                       "custom7Trig1TargetPose",
-                      "custom7Trig1TweenSelector",
-                      "custom7Trig1TweenSpeedMs",
                       "custom7Trig1TransitionSpeedMs",
-                      "custom7Trig1PauseDurationMs"
+                      "custom7Trig1PauseDurationMs",
+                      "custom7Trig1TweenSelector",
+                      "custom7Trig1TweenSpeedMs"
                     ],
                     "subgroups": [
                       {
@@ -36245,7 +36245,7 @@
                       },
                       {
                         "key": "Start Time Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -36275,7 +36275,7 @@
                       },
                       {
                         "key": "Start Distance Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -36300,7 +36300,7 @@
                       },
                       {
                         "key": "Retransition",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -36427,6 +36427,18 @@
                       "key": "custom7Trig1Mode"
                     },
                     {
+                      "type": "row",
+                      "key": "custom7Trig1TargetPose"
+                    },
+                    {
+                      "type": "row",
+                      "key": "custom7Trig1TransitionSpeedMs"
+                    },
+                    {
+                      "type": "row",
+                      "key": "custom7Trig1PauseDurationMs"
+                    },
+                    {
                       "type": "group",
                       "group": {
                         "key": "Offset",
@@ -36479,19 +36491,11 @@
                     },
                     {
                       "type": "row",
-                      "key": "custom7Trig1TargetPose"
-                    },
-                    {
-                      "type": "row",
                       "key": "custom7Trig1TweenSelector"
                     },
                     {
                       "type": "row",
                       "key": "custom7Trig1TweenSpeedMs"
-                    },
-                    {
-                      "type": "row",
-                      "key": "custom7Trig1TransitionSpeedMs"
                     },
                     {
                       "type": "group",
@@ -36520,7 +36524,7 @@
                       "type": "group",
                       "group": {
                         "key": "Start Time Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -36553,7 +36557,7 @@
                       "type": "group",
                       "group": {
                         "key": "Start Distance Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -36578,14 +36582,10 @@
                       }
                     },
                     {
-                      "type": "row",
-                      "key": "custom7Trig1PauseDurationMs"
-                    },
-                    {
                       "type": "group",
                       "group": {
                         "key": "Retransition",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -36691,10 +36691,10 @@
                     "custom7Trig1Enabled",
                     "custom7Trig1Mode",
                     "custom7Trig1TargetPose",
-                    "custom7Trig1TweenSelector",
-                    "custom7Trig1TweenSpeedMs",
                     "custom7Trig1TransitionSpeedMs",
-                    "custom7Trig1PauseDurationMs"
+                    "custom7Trig1PauseDurationMs",
+                    "custom7Trig1TweenSelector",
+                    "custom7Trig1TweenSpeedMs"
                   ],
                   "subgroups": [
                     {
@@ -36764,7 +36764,7 @@
                     },
                     {
                       "key": "Start Time Curve",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -36794,7 +36794,7 @@
                     },
                     {
                       "key": "Start Distance Curve",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -36819,7 +36819,7 @@
                     },
                     {
                       "key": "Retransition",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
