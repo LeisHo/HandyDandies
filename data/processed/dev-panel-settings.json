@@ -6105,7 +6105,7 @@
       "wristSplayReactiveEnabled": true,
       "wristSplayRange": "{\"min\":30,\"max\":-54}",
       "wristSplayCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
-      "wristSplayDamping": 1,
+      "wristSplayDamping": 0.08,
       "tweenPoses": [
         "COUNTDOWN (VERT) - 0",
         "COUNTDOWN (VERT) - 1",
@@ -13186,7 +13186,7 @@
       "wristSplayReactiveEnabled": true,
       "wristSplayRange": "{\"min\":30,\"max\":-54}",
       "wristSplayCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
-      "wristSplayDamping": 1,
+      "wristSplayDamping": 0.08,
       "tweenPoses": [
         "COUNTDOWN (VERT) - 0",
         "COUNTDOWN (VERT) - 1",
@@ -20267,7 +20267,7 @@
       "wristSplayReactiveEnabled": true,
       "wristSplayRange": "{\"min\":30,\"max\":-54}",
       "wristSplayCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
-      "wristSplayDamping": 1,
+      "wristSplayDamping": 0.08,
       "tweenPoses": [
         "COUNTDOWN (VERT) - 0",
         "COUNTDOWN (VERT) - 1",
@@ -24166,15 +24166,15 @@
                     },
                     {
                       "type": "row",
+                      "key": "wristSplayReactiveEnabled"
+                    },
+                    {
+                      "type": "row",
                       "key": "wristSplayDamping"
                     },
                     {
                       "type": "row",
                       "key": "wristSplayDefault"
-                    },
-                    {
-                      "type": "row",
-                      "key": "wristSplayReactiveEnabled"
                     },
                     {
                       "type": "row",
@@ -24188,9 +24188,9 @@
                   "settings": [
                     "wristSplayReposeStagger",
                     "wristSplayResponsiveEnabled",
+                    "wristSplayReactiveEnabled",
                     "wristSplayDamping",
                     "wristSplayDefault",
-                    "wristSplayReactiveEnabled",
                     "wristSplayRange",
                     "wristSplayCurve"
                   ],
@@ -24323,15 +24323,15 @@
                   },
                   {
                     "type": "row",
+                    "key": "wristSplayReactiveEnabled"
+                  },
+                  {
+                    "type": "row",
                     "key": "wristSplayDamping"
                   },
                   {
                     "type": "row",
                     "key": "wristSplayDefault"
-                  },
-                  {
-                    "type": "row",
-                    "key": "wristSplayReactiveEnabled"
                   },
                   {
                     "type": "row",
@@ -24345,9 +24345,9 @@
                 "settings": [
                   "wristSplayReposeStagger",
                   "wristSplayResponsiveEnabled",
+                  "wristSplayReactiveEnabled",
                   "wristSplayDamping",
                   "wristSplayDefault",
-                  "wristSplayReactiveEnabled",
                   "wristSplayRange",
                   "wristSplayCurve"
                 ],
@@ -25343,15 +25343,15 @@
                   },
                   {
                     "type": "row",
+                    "key": "wristSplayReactiveEnabled"
+                  },
+                  {
+                    "type": "row",
                     "key": "wristSplayDamping"
                   },
                   {
                     "type": "row",
                     "key": "wristSplayDefault"
-                  },
-                  {
-                    "type": "row",
-                    "key": "wristSplayReactiveEnabled"
                   },
                   {
                     "type": "row",
@@ -25365,9 +25365,9 @@
                 "settings": [
                   "wristSplayReposeStagger",
                   "wristSplayResponsiveEnabled",
+                  "wristSplayReactiveEnabled",
                   "wristSplayDamping",
                   "wristSplayDefault",
-                  "wristSplayReactiveEnabled",
                   "wristSplayRange",
                   "wristSplayCurve"
                 ],
@@ -25500,15 +25500,15 @@
                 },
                 {
                   "type": "row",
+                  "key": "wristSplayReactiveEnabled"
+                },
+                {
+                  "type": "row",
                   "key": "wristSplayDamping"
                 },
                 {
                   "type": "row",
                   "key": "wristSplayDefault"
-                },
-                {
-                  "type": "row",
-                  "key": "wristSplayReactiveEnabled"
                 },
                 {
                   "type": "row",
@@ -25522,9 +25522,9 @@
               "settings": [
                 "wristSplayReposeStagger",
                 "wristSplayResponsiveEnabled",
+                "wristSplayReactiveEnabled",
                 "wristSplayDamping",
                 "wristSplayDefault",
-                "wristSplayReactiveEnabled",
                 "wristSplayRange",
                 "wristSplayCurve"
               ],
