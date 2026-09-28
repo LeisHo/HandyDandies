@@ -6098,7 +6098,7 @@
       "reactiveArmLengthEnabled": true,
       "armLengthRange": "{\"min\":0,\"max\":63}",
       "armLengthCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
-      "armLengthDamping": 1,
+      "armLengthDamping": 0.07,
       "wristSplayResponsiveEnabled": true,
       "wristSplayReposeStagger": 1,
       "wristSplayDefault": 6,
@@ -13179,7 +13179,7 @@
       "reactiveArmLengthEnabled": true,
       "armLengthRange": "{\"min\":0,\"max\":63}",
       "armLengthCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
-      "armLengthDamping": 1,
+      "armLengthDamping": 0.07,
       "wristSplayResponsiveEnabled": true,
       "wristSplayReposeStagger": 1,
       "wristSplayDefault": 6,
@@ -20260,7 +20260,7 @@
       "reactiveArmLengthEnabled": true,
       "armLengthRange": "{\"min\":0,\"max\":63}",
       "armLengthCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
-      "armLengthDamping": 1,
+      "armLengthDamping": 0.07,
       "wristSplayResponsiveEnabled": true,
       "wristSplayReposeStagger": 1,
       "wristSplayDefault": 6,
@@ -23686,17 +23686,12 @@
                   ],
                   "subgroups": []
                 }
-              },
-              {
-                "type": "row",
-                "key": "armLengthDamping"
               }
             ],
             "settings": [
               "poseScale",
               "posePreviewEnabled",
-              "savedPoses",
-              "armLengthDamping"
+              "savedPoses"
             ],
             "subgroups": [
               {
@@ -24115,7 +24110,7 @@
                 "type": "group",
                 "group": {
                   "key": "New Group (3)",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -24153,7 +24148,7 @@
                 "type": "group",
                 "group": {
                   "key": "Responsive Wrist Splay",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -24214,6 +24209,10 @@
                     },
                     {
                       "type": "row",
+                      "key": "armLengthDamping"
+                    },
+                    {
+                      "type": "row",
                       "key": "hideWrist"
                     },
                     {
@@ -24228,6 +24227,7 @@
                   "settings": [
                     "cropWristEnabled",
                     "reactiveArmLengthEnabled",
+                    "armLengthDamping",
                     "hideWrist",
                     "armLengthRange",
                     "armLengthCurve"
@@ -24275,7 +24275,7 @@
               },
               {
                 "key": "New Group (3)",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -24310,7 +24310,7 @@
               },
               {
                 "key": "Responsive Wrist Splay",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -24368,6 +24368,10 @@
                   },
                   {
                     "type": "row",
+                    "key": "armLengthDamping"
+                  },
+                  {
+                    "type": "row",
                     "key": "hideWrist"
                   },
                   {
@@ -24382,6 +24386,7 @@
                 "settings": [
                   "cropWristEnabled",
                   "reactiveArmLengthEnabled",
+                  "armLengthDamping",
                   "hideWrist",
                   "armLengthRange",
                   "armLengthCurve"
@@ -24869,17 +24874,12 @@
                 ],
                 "subgroups": []
               }
-            },
-            {
-              "type": "row",
-              "key": "armLengthDamping"
             }
           ],
           "settings": [
             "poseScale",
             "posePreviewEnabled",
-            "savedPoses",
-            "armLengthDamping"
+            "savedPoses"
           ],
           "subgroups": [
             {
@@ -25292,7 +25292,7 @@
               "type": "group",
               "group": {
                 "key": "New Group (3)",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -25330,7 +25330,7 @@
               "type": "group",
               "group": {
                 "key": "Responsive Wrist Splay",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -25391,6 +25391,10 @@
                   },
                   {
                     "type": "row",
+                    "key": "armLengthDamping"
+                  },
+                  {
+                    "type": "row",
                     "key": "hideWrist"
                   },
                   {
@@ -25405,6 +25409,7 @@
                 "settings": [
                   "cropWristEnabled",
                   "reactiveArmLengthEnabled",
+                  "armLengthDamping",
                   "hideWrist",
                   "armLengthRange",
                   "armLengthCurve"
@@ -25452,7 +25457,7 @@
             },
             {
               "key": "New Group (3)",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -25487,7 +25492,7 @@
             },
             {
               "key": "Responsive Wrist Splay",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -25545,6 +25550,10 @@
                 },
                 {
                   "type": "row",
+                  "key": "armLengthDamping"
+                },
+                {
+                  "type": "row",
                   "key": "hideWrist"
                 },
                 {
@@ -25559,6 +25568,7 @@
               "settings": [
                 "cropWristEnabled",
                 "reactiveArmLengthEnabled",
+                "armLengthDamping",
                 "hideWrist",
                 "armLengthRange",
                 "armLengthCurve"
