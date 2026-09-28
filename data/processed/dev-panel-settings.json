@@ -6088,9 +6088,9 @@
           "poseScale": 12
         }
       ],
-      "cropWristEnabled": false,
+      "cropWristEnabled": true,
       "hideWrist": 0,
-      "reactiveArmLengthEnabled": false,
+      "reactiveArmLengthEnabled": true,
       "armLengthRange": "{\"min\":0,\"max\":63}",
       "armLengthCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
       "wristSplayResponsiveEnabled": true,
@@ -13123,9 +13123,9 @@
           "poseScale": 12
         }
       ],
-      "cropWristEnabled": false,
+      "cropWristEnabled": true,
       "hideWrist": 0,
-      "reactiveArmLengthEnabled": false,
+      "reactiveArmLengthEnabled": true,
       "armLengthRange": "{\"min\":0,\"max\":63}",
       "armLengthCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
       "wristSplayResponsiveEnabled": true,
@@ -20158,9 +20158,9 @@
           "poseScale": 12
         }
       ],
-      "cropWristEnabled": false,
+      "cropWristEnabled": true,
       "hideWrist": 0,
-      "reactiveArmLengthEnabled": false,
+      "reactiveArmLengthEnabled": true,
       "armLengthRange": "{\"min\":0,\"max\":63}",
       "armLengthCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
       "wristSplayResponsiveEnabled": true,
@@ -22719,7 +22719,7 @@
           "type": "group",
           "group": {
             "key": "Responsive Wrist Splay",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -22841,7 +22841,7 @@
         },
         {
           "key": "Responsive Wrist Splay",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
