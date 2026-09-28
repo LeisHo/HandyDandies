@@ -6671,9 +6671,9 @@
       "preventReorderFlash": false,
       "logCursorPositionEnabled": false,
       "cursorLogIntervalMs": 1000,
-      "handNumbersEnabled": true,
+      "handNumbersEnabled": false,
       "handNumbersColor": "#00ff04",
-      "logHandBehaviourEnabled": true,
+      "logHandBehaviourEnabled": false,
       "dp_titleFontSize": 17,
       "dp_tabFontSize": 12,
       "dp_groupTitleFontSize": 14,
@@ -13754,9 +13754,9 @@
       "preventReorderFlash": false,
       "logCursorPositionEnabled": false,
       "cursorLogIntervalMs": 1000,
-      "handNumbersEnabled": true,
+      "handNumbersEnabled": false,
       "handNumbersColor": "#00ff04",
-      "logHandBehaviourEnabled": true,
+      "logHandBehaviourEnabled": false,
       "dp_titleFontSize": 11,
       "dp_tabFontSize": 12,
       "dp_groupTitleFontSize": 11,
@@ -20837,9 +20837,9 @@
       "preventReorderFlash": false,
       "logCursorPositionEnabled": false,
       "cursorLogIntervalMs": 1000,
-      "handNumbersEnabled": true,
+      "handNumbersEnabled": false,
       "handNumbersColor": "#00ff04",
-      "logHandBehaviourEnabled": true,
+      "logHandBehaviourEnabled": false,
       "dp_titleFontSize": 22,
       "dp_tabFontSize": 12,
       "dp_groupTitleFontSize": 11,
@@ -22354,7 +22354,7 @@
     },
     {
       "key": "Debug",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -24060,7 +24060,7 @@
           "type": "group",
           "group": {
             "key": "Cursor Tracking",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -25262,7 +25262,7 @@
         },
         {
           "key": "Cursor Tracking",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
