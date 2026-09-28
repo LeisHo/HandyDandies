@@ -22759,7 +22759,7 @@
           "type": "group",
           "group": {
             "key": "New Group (4)",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -22866,7 +22866,7 @@
         },
         {
           "key": "New Group (4)",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
