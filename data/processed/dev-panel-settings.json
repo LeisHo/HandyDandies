@@ -22,7 +22,7 @@
       "useProgressiveOffset": false,
       "hideHands": false,
       "trackingEnabled": true,
-      "trackingDamping": 0.13,
+      "trackingDamping": 0.32,
       "targetDepthFactor": 0.85,
       "showTargetMarker": false,
       "palmFacesCursor": true,
