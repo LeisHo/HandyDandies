@@ -23,7 +23,7 @@
       "hideHands": false,
       "trackingEnabled": true,
       "trackingDamping": 0.13,
-      "targetDepthFactor": 0.5,
+      "targetDepthFactor": 1.25,
       "showTargetMarker": false,
       "palmFacesCursor": true,
       "palmFaceRotationOffset": 13,
@@ -6093,10 +6093,10 @@
       "reactiveArmLengthEnabled": false,
       "armLengthRange": "{\"min\":0,\"max\":63}",
       "armLengthCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
-      "wristSplayResponsiveEnabled": false,
+      "wristSplayResponsiveEnabled": true,
       "wristSplayReposeStagger": 1,
       "wristSplayDefault": 6,
-      "wristSplayReactiveEnabled": false,
+      "wristSplayReactiveEnabled": true,
       "wristSplayRange": "{\"min\":30,\"max\":-54}",
       "wristSplayCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
       "tweenPoses": [
@@ -13128,10 +13128,10 @@
       "reactiveArmLengthEnabled": false,
       "armLengthRange": "{\"min\":0,\"max\":63}",
       "armLengthCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
-      "wristSplayResponsiveEnabled": false,
+      "wristSplayResponsiveEnabled": true,
       "wristSplayReposeStagger": 1,
       "wristSplayDefault": 6,
-      "wristSplayReactiveEnabled": false,
+      "wristSplayReactiveEnabled": true,
       "wristSplayRange": "{\"min\":30,\"max\":-54}",
       "wristSplayCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
       "tweenPoses": [
@@ -20163,10 +20163,10 @@
       "reactiveArmLengthEnabled": false,
       "armLengthRange": "{\"min\":0,\"max\":63}",
       "armLengthCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
-      "wristSplayResponsiveEnabled": false,
+      "wristSplayResponsiveEnabled": true,
       "wristSplayReposeStagger": 1,
       "wristSplayDefault": 6,
-      "wristSplayReactiveEnabled": false,
+      "wristSplayReactiveEnabled": true,
       "wristSplayRange": "{\"min\":30,\"max\":-54}",
       "wristSplayCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
       "tweenPoses": [
@@ -22681,7 +22681,7 @@
           "type": "group",
           "group": {
             "key": "New Group (3)",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -22719,7 +22719,7 @@
           "type": "group",
           "group": {
             "key": "Responsive Wrist Splay",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -22806,7 +22806,7 @@
       "subgroups": [
         {
           "key": "New Group (3)",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -22841,7 +22841,7 @@
         },
         {
           "key": "Responsive Wrist Splay",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
