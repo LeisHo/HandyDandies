@@ -26,9 +26,11 @@
       "targetDepthFactor": 0.85,
       "showTargetMarker": false,
       "armRotationEnabled": true,
+      "armRotationDefault": 40,
       "armRotationCurveEnabled": false,
       "armRotationCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
       "armRotationRange": "{\"min\":0,\"max\":180}",
+      "armRotationDamping": 0.02,
       "palmFacesCursor": true,
       "palmFaceRotationOffset": 13,
       "palmFacesCursorDistanceCurveEnabled": true,
@@ -6105,7 +6107,7 @@
       "wristSplayReactiveEnabled": true,
       "wristSplayRange": "{\"min\":30,\"max\":-54}",
       "wristSplayCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
-      "wristSplayDamping": 0.08,
+      "wristSplayDamping": 0.53,
       "tweenPoses": [
         "COUNTDOWN (VERT) - 0",
         "COUNTDOWN (VERT) - 1",
@@ -7107,9 +7109,11 @@
       "targetDepthFactor": 0.8,
       "showTargetMarker": false,
       "armRotationEnabled": true,
+      "armRotationDefault": 40,
       "armRotationCurveEnabled": false,
       "armRotationCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
       "armRotationRange": "{\"min\":0,\"max\":180}",
+      "armRotationDamping": 0.02,
       "palmFacesCursor": true,
       "palmFaceRotationOffset": 0,
       "palmFacesCursorDistanceCurveEnabled": true,
@@ -13186,7 +13190,7 @@
       "wristSplayReactiveEnabled": true,
       "wristSplayRange": "{\"min\":30,\"max\":-54}",
       "wristSplayCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
-      "wristSplayDamping": 0.08,
+      "wristSplayDamping": 0.53,
       "tweenPoses": [
         "COUNTDOWN (VERT) - 0",
         "COUNTDOWN (VERT) - 1",
@@ -14188,9 +14192,11 @@
       "targetDepthFactor": 0.6,
       "showTargetMarker": false,
       "armRotationEnabled": true,
+      "armRotationDefault": 40,
       "armRotationCurveEnabled": false,
       "armRotationCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
       "armRotationRange": "{\"min\":0,\"max\":180}",
+      "armRotationDamping": 0.02,
       "palmFacesCursor": true,
       "palmFaceRotationOffset": 0,
       "palmFacesCursorDistanceCurveEnabled": true,
@@ -20267,7 +20273,7 @@
       "wristSplayReactiveEnabled": true,
       "wristSplayRange": "{\"min\":30,\"max\":-54}",
       "wristSplayCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
-      "wristSplayDamping": 0.08,
+      "wristSplayDamping": 0.53,
       "tweenPoses": [
         "COUNTDOWN (VERT) - 0",
         "COUNTDOWN (VERT) - 1",
@@ -24077,7 +24083,7 @@
                 "type": "group",
                 "group": {
                   "key": "Responsive Arm Rotation",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -24095,13 +24101,23 @@
                     {
                       "type": "row",
                       "key": "armRotationRange"
+                    },
+                    {
+                      "type": "row",
+                      "key": "armRotationDamping"
+                    },
+                    {
+                      "type": "row",
+                      "key": "armRotationDefault"
                     }
                   ],
                   "settings": [
                     "armRotationEnabled",
                     "armRotationCurveEnabled",
                     "armRotationCurve",
-                    "armRotationRange"
+                    "armRotationRange",
+                    "armRotationDamping",
+                    "armRotationDefault"
                   ],
                   "subgroups": []
                 }
@@ -24245,7 +24261,7 @@
             "subgroups": [
               {
                 "key": "Responsive Arm Rotation",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -24263,13 +24279,23 @@
                   {
                     "type": "row",
                     "key": "armRotationRange"
+                  },
+                  {
+                    "type": "row",
+                    "key": "armRotationDamping"
+                  },
+                  {
+                    "type": "row",
+                    "key": "armRotationDefault"
                   }
                 ],
                 "settings": [
                   "armRotationEnabled",
                   "armRotationCurveEnabled",
                   "armRotationCurve",
-                  "armRotationRange"
+                  "armRotationRange",
+                  "armRotationDamping",
+                  "armRotationDefault"
                 ],
                 "subgroups": []
               },
@@ -25259,7 +25285,7 @@
               "type": "group",
               "group": {
                 "key": "Responsive Arm Rotation",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -25277,13 +25303,23 @@
                   {
                     "type": "row",
                     "key": "armRotationRange"
+                  },
+                  {
+                    "type": "row",
+                    "key": "armRotationDamping"
+                  },
+                  {
+                    "type": "row",
+                    "key": "armRotationDefault"
                   }
                 ],
                 "settings": [
                   "armRotationEnabled",
                   "armRotationCurveEnabled",
                   "armRotationCurve",
-                  "armRotationRange"
+                  "armRotationRange",
+                  "armRotationDamping",
+                  "armRotationDefault"
                 ],
                 "subgroups": []
               }
@@ -25427,7 +25463,7 @@
           "subgroups": [
             {
               "key": "Responsive Arm Rotation",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -25445,13 +25481,23 @@
                 {
                   "type": "row",
                   "key": "armRotationRange"
+                },
+                {
+                  "type": "row",
+                  "key": "armRotationDamping"
+                },
+                {
+                  "type": "row",
+                  "key": "armRotationDefault"
                 }
               ],
               "settings": [
                 "armRotationEnabled",
                 "armRotationCurveEnabled",
                 "armRotationCurve",
-                "armRotationRange"
+                "armRotationRange",
+                "armRotationDamping",
+                "armRotationDefault"
               ],
               "subgroups": []
             },
@@ -25581,7 +25627,7 @@
     },
     {
       "key": "Custom Click Functions",
-      "collapsed": false,
+      "collapsed": true,
       "locked": false,
       "items": [
         {
