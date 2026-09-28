@@ -21108,104 +21108,6 @@
   },
   "order": [
     {
-      "key": "Quality / Performance",
-      "collapsed": true,
-      "locked": false,
-      "items": [
-        {
-          "type": "row",
-          "key": "pixelRatio"
-        },
-        {
-          "type": "row",
-          "key": "resolutionScale"
-        },
-        {
-          "type": "row",
-          "key": "qualityPreset"
-        }
-      ],
-      "settings": [
-        "pixelRatio",
-        "resolutionScale",
-        "qualityPreset"
-      ],
-      "subgroups": []
-    },
-    {
-      "key": "Pause Button",
-      "collapsed": true,
-      "locked": false,
-      "items": [
-        {
-          "type": "row",
-          "key": "pausedRenderFps"
-        },
-        {
-          "type": "row",
-          "key": "pauseBtnXOffset"
-        },
-        {
-          "type": "row",
-          "key": "pauseBtnYOffset"
-        },
-        {
-          "type": "row",
-          "key": "pauseBtnSize"
-        },
-        {
-          "type": "row",
-          "key": "pauseBtnIconSize"
-        },
-        {
-          "type": "row",
-          "key": "pauseBtnCornerRadius"
-        },
-        {
-          "type": "row",
-          "key": "pauseBtnBorderThickness"
-        },
-        {
-          "type": "row",
-          "key": "pauseBtnOpacity"
-        },
-        {
-          "type": "row",
-          "key": "pauseBtnBgColor"
-        },
-        {
-          "type": "row",
-          "key": "pauseBtnIconColor"
-        },
-        {
-          "type": "row",
-          "key": "pauseBtnBorderColor"
-        }
-      ],
-      "settings": [
-        "pausedRenderFps",
-        "pauseBtnXOffset",
-        "pauseBtnYOffset",
-        "pauseBtnSize",
-        "pauseBtnIconSize",
-        "pauseBtnCornerRadius",
-        "pauseBtnBorderThickness",
-        "pauseBtnOpacity",
-        "pauseBtnBgColor",
-        "pauseBtnIconColor",
-        "pauseBtnBorderColor"
-      ],
-      "subgroups": []
-    },
-    {
-      "key": "Saved Dev Settings",
-      "collapsed": true,
-      "locked": false,
-      "items": [],
-      "settings": [],
-      "subgroups": []
-    },
-    {
       "key": "Dev Panel",
       "collapsed": true,
       "locked": false,
@@ -22277,6 +22179,79 @@
       ]
     },
     {
+      "key": "Debug",
+      "collapsed": true,
+      "locked": false,
+      "items": [
+        {
+          "type": "row",
+          "key": "multiClickWindowMs"
+        },
+        {
+          "type": "row",
+          "key": "pauseAnimations"
+        },
+        {
+          "type": "row",
+          "key": "showGridHelper"
+        },
+        {
+          "type": "row",
+          "key": "showWireframe"
+        },
+        {
+          "type": "row",
+          "key": "preventReorderFlash"
+        },
+        {
+          "type": "row",
+          "key": "logCursorPositionEnabled"
+        },
+        {
+          "type": "row",
+          "key": "cursorLogIntervalMs"
+        },
+        {
+          "type": "row",
+          "key": "clearMouseLogBtn"
+        }
+      ],
+      "settings": [
+        "multiClickWindowMs",
+        "pauseAnimations",
+        "showGridHelper",
+        "showWireframe",
+        "preventReorderFlash",
+        "logCursorPositionEnabled",
+        "cursorLogIntervalMs",
+        "clearMouseLogBtn"
+      ],
+      "subgroups": []
+    },
+    {
+      "key": "Saved Dev Settings",
+      "collapsed": true,
+      "locked": false,
+      "items": [],
+      "settings": [],
+      "subgroups": []
+    },
+    {
+      "key": "Background",
+      "collapsed": true,
+      "locked": false,
+      "items": [
+        {
+          "type": "row",
+          "key": "bgColor"
+        }
+      ],
+      "settings": [
+        "bgColor"
+      ],
+      "subgroups": []
+    },
+    {
       "key": "Loading Preview",
       "collapsed": true,
       "locked": false,
@@ -22577,140 +22552,64 @@
       ]
     },
     {
-      "key": "Tween",
-      "collapsed": true,
+      "key": "New Group (2)",
+      "collapsed": false,
       "locked": false,
       "items": [
-        {
-          "type": "row",
-          "key": "tweenPreviewSpeedMs"
-        },
-        {
-          "type": "row",
-          "key": "tweenPoses"
-        },
-        {
-          "type": "row",
-          "key": "savedTweenSequences"
-        }
-      ],
-      "settings": [
-        "tweenPreviewSpeedMs",
-        "tweenPoses",
-        "savedTweenSequences"
-      ],
-      "subgroups": []
-    },
-    {
-      "key": "Field Layout",
-      "collapsed": true,
-      "locked": false,
-      "items": [
-        {
-          "type": "row",
-          "key": "hideHands"
-        },
-        {
-          "type": "row",
-          "key": "fieldRows"
-        },
-        {
-          "type": "row",
-          "key": "fieldCols"
-        },
-        {
-          "type": "row",
-          "key": "rowSpacing"
-        },
-        {
-          "type": "row",
-          "key": "columnSpacing"
-        },
-        {
-          "type": "row",
-          "key": "handScale"
-        },
-        {
-          "type": "row",
-          "key": "alternateRowOffset"
-        },
-        {
-          "type": "row",
-          "key": "progressiveRowOffset"
-        },
-        {
-          "type": "row",
-          "key": "useProgressiveOffset"
-        }
-      ],
-      "settings": [
-        "hideHands",
-        "fieldRows",
-        "fieldCols",
-        "rowSpacing",
-        "columnSpacing",
-        "handScale",
-        "alternateRowOffset",
-        "progressiveRowOffset",
-        "useProgressiveOffset"
-      ],
-      "subgroups": []
-    },
-    {
-      "key": "Cursor Tracking",
-      "collapsed": true,
-      "locked": false,
-      "items": [
-        {
-          "type": "row",
-          "key": "trackingEnabled"
-        },
-        {
-          "type": "row",
-          "key": "trackingDamping"
-        },
-        {
-          "type": "row",
-          "key": "targetDepthFactor"
-        },
-        {
-          "type": "row",
-          "key": "showTargetMarker"
-        },
         {
           "type": "group",
           "group": {
-            "key": "New Group (3)",
+            "key": "Field Layout",
             "collapsed": true,
             "locked": false,
             "items": [
               {
                 "type": "row",
-                "key": "palmFacesCursor"
+                "key": "hideHands"
               },
               {
                 "type": "row",
-                "key": "palmFaceRotationOffset"
+                "key": "fieldRows"
               },
               {
                 "type": "row",
-                "key": "palmFacesCursorDistanceCurveEnabled"
+                "key": "fieldCols"
               },
               {
                 "type": "row",
-                "key": "palmFacesCursorDistanceRange"
+                "key": "rowSpacing"
               },
               {
                 "type": "row",
-                "key": "palmFacesCursorDistanceCurve"
+                "key": "columnSpacing"
+              },
+              {
+                "type": "row",
+                "key": "handScale"
+              },
+              {
+                "type": "row",
+                "key": "alternateRowOffset"
+              },
+              {
+                "type": "row",
+                "key": "progressiveRowOffset"
+              },
+              {
+                "type": "row",
+                "key": "useProgressiveOffset"
               }
             ],
             "settings": [
-              "palmFacesCursor",
-              "palmFaceRotationOffset",
-              "palmFacesCursorDistanceCurveEnabled",
-              "palmFacesCursorDistanceRange",
-              "palmFacesCursorDistanceCurve"
+              "hideHands",
+              "fieldRows",
+              "fieldCols",
+              "rowSpacing",
+              "columnSpacing",
+              "handScale",
+              "alternateRowOffset",
+              "progressiveRowOffset",
+              "useProgressiveOffset"
             ],
             "subgroups": []
           }
@@ -22718,42 +22617,57 @@
         {
           "type": "group",
           "group": {
-            "key": "Responsive Wrist Splay",
+            "key": "Outline",
             "collapsed": true,
             "locked": false,
             "items": [
               {
                 "type": "row",
-                "key": "wristSplayReposeStagger"
+                "key": "outlineMechanic"
               },
               {
                 "type": "row",
-                "key": "wristSplayResponsiveEnabled"
+                "key": "emissionColor"
               },
               {
                 "type": "row",
-                "key": "wristSplayDefault"
+                "key": "emissionIntensity"
               },
               {
                 "type": "row",
-                "key": "wristSplayReactiveEnabled"
+                "key": "outlineEnabled"
               },
               {
                 "type": "row",
-                "key": "wristSplayRange"
+                "key": "outlineColor"
               },
               {
                 "type": "row",
-                "key": "wristSplayCurve"
+                "key": "hullThickness"
+              },
+              {
+                "type": "row",
+                "key": "passThickness"
+              },
+              {
+                "type": "row",
+                "key": "passStrength"
+              },
+              {
+                "type": "row",
+                "key": "passGlow"
               }
             ],
             "settings": [
-              "wristSplayReposeStagger",
-              "wristSplayResponsiveEnabled",
-              "wristSplayDefault",
-              "wristSplayReactiveEnabled",
-              "wristSplayRange",
-              "wristSplayCurve"
+              "outlineMechanic",
+              "emissionColor",
+              "emissionIntensity",
+              "outlineEnabled",
+              "outlineColor",
+              "hullThickness",
+              "passThickness",
+              "passStrength",
+              "passGlow"
             ],
             "subgroups": []
           }
@@ -22761,160 +22675,2205 @@
         {
           "type": "group",
           "group": {
-            "key": "New Group (4)",
+            "key": "Pose",
+            "collapsed": false,
+            "locked": false,
+            "items": [
+              {
+                "type": "row",
+                "key": "poseScale"
+              },
+              {
+                "type": "row",
+                "key": "posePreviewEnabled"
+              },
+              {
+                "type": "row",
+                "key": "savedPoses"
+              },
+              {
+                "type": "group",
+                "group": {
+                  "key": "New Group (8)",
+                  "collapsed": true,
+                  "locked": false,
+                  "items": [
+                    {
+                      "type": "row",
+                      "key": "poseOffsetX"
+                    },
+                    {
+                      "type": "row",
+                      "key": "poseOffsetY"
+                    },
+                    {
+                      "type": "row",
+                      "key": "poseOffsetZ"
+                    }
+                  ],
+                  "settings": [
+                    "poseOffsetX",
+                    "poseOffsetY",
+                    "poseOffsetZ"
+                  ],
+                  "subgroups": []
+                }
+              },
+              {
+                "type": "group",
+                "group": {
+                  "key": "Whole-Hand Rotation & Thumb",
+                  "collapsed": true,
+                  "locked": false,
+                  "items": [
+                    {
+                      "type": "row",
+                      "key": "modelRotX"
+                    },
+                    {
+                      "type": "row",
+                      "key": "modelRotY"
+                    },
+                    {
+                      "type": "row",
+                      "key": "modelRotZ"
+                    }
+                  ],
+                  "settings": [
+                    "modelRotX",
+                    "modelRotY",
+                    "modelRotZ"
+                  ],
+                  "subgroups": []
+                }
+              },
+              {
+                "type": "group",
+                "group": {
+                  "key": "Wrist",
+                  "collapsed": true,
+                  "locked": false,
+                  "items": [
+                    {
+                      "type": "row",
+                      "key": "wristRotation"
+                    },
+                    {
+                      "type": "row",
+                      "key": "wristBend"
+                    },
+                    {
+                      "type": "row",
+                      "key": "wristSplay"
+                    }
+                  ],
+                  "settings": [
+                    "wristRotation",
+                    "wristBend",
+                    "wristSplay"
+                  ],
+                  "subgroups": []
+                }
+              },
+              {
+                "type": "group",
+                "group": {
+                  "key": "New Group (6)",
+                  "collapsed": true,
+                  "locked": false,
+                  "items": [
+                    {
+                      "type": "row",
+                      "key": "thumbCurl"
+                    },
+                    {
+                      "type": "row",
+                      "key": "tipOnlyCurlThumb"
+                    },
+                    {
+                      "type": "row",
+                      "key": "midOnlyCurlThumb"
+                    },
+                    {
+                      "type": "row",
+                      "key": "baseOnlyCurlThumb"
+                    },
+                    {
+                      "type": "row",
+                      "key": "tipTwistThumb"
+                    },
+                    {
+                      "type": "row",
+                      "key": "thumbSplay"
+                    },
+                    {
+                      "type": "row",
+                      "key": "thumbSplay2"
+                    },
+                    {
+                      "type": "row",
+                      "key": "curlBiasThumb"
+                    }
+                  ],
+                  "settings": [
+                    "thumbCurl",
+                    "tipOnlyCurlThumb",
+                    "midOnlyCurlThumb",
+                    "baseOnlyCurlThumb",
+                    "tipTwistThumb",
+                    "thumbSplay",
+                    "thumbSplay2",
+                    "curlBiasThumb"
+                  ],
+                  "subgroups": []
+                }
+              },
+              {
+                "type": "group",
+                "group": {
+                  "key": "Index",
+                  "collapsed": true,
+                  "locked": false,
+                  "items": [
+                    {
+                      "type": "row",
+                      "key": "midOnlyCurlIndex"
+                    },
+                    {
+                      "type": "row",
+                      "key": "tipOnlyCurlIndex"
+                    },
+                    {
+                      "type": "row",
+                      "key": "baseOnlyCurlIndex"
+                    },
+                    {
+                      "type": "row",
+                      "key": "curlIndex"
+                    },
+                    {
+                      "type": "row",
+                      "key": "tipTwistIndex"
+                    },
+                    {
+                      "type": "row",
+                      "key": "splayIndex"
+                    },
+                    {
+                      "type": "row",
+                      "key": "curlBiasIndex"
+                    },
+                    {
+                      "type": "row",
+                      "key": "splayIndex2"
+                    }
+                  ],
+                  "settings": [
+                    "midOnlyCurlIndex",
+                    "tipOnlyCurlIndex",
+                    "baseOnlyCurlIndex",
+                    "curlIndex",
+                    "tipTwistIndex",
+                    "splayIndex",
+                    "curlBiasIndex",
+                    "splayIndex2"
+                  ],
+                  "subgroups": []
+                }
+              },
+              {
+                "type": "group",
+                "group": {
+                  "key": "Middle",
+                  "collapsed": true,
+                  "locked": false,
+                  "items": [
+                    {
+                      "type": "row",
+                      "key": "midOnlyCurlMiddle"
+                    },
+                    {
+                      "type": "row",
+                      "key": "tipOnlyCurlMiddle"
+                    },
+                    {
+                      "type": "row",
+                      "key": "baseOnlyCurlMiddle"
+                    },
+                    {
+                      "type": "row",
+                      "key": "curlMiddle"
+                    },
+                    {
+                      "type": "row",
+                      "key": "tipTwistMiddle"
+                    },
+                    {
+                      "type": "row",
+                      "key": "splayMiddle"
+                    },
+                    {
+                      "type": "row",
+                      "key": "curlBiasMiddle"
+                    },
+                    {
+                      "type": "row",
+                      "key": "splayMiddle2"
+                    }
+                  ],
+                  "settings": [
+                    "midOnlyCurlMiddle",
+                    "tipOnlyCurlMiddle",
+                    "baseOnlyCurlMiddle",
+                    "curlMiddle",
+                    "tipTwistMiddle",
+                    "splayMiddle",
+                    "curlBiasMiddle",
+                    "splayMiddle2"
+                  ],
+                  "subgroups": []
+                }
+              },
+              {
+                "type": "group",
+                "group": {
+                  "key": "Ring",
+                  "collapsed": true,
+                  "locked": false,
+                  "items": [
+                    {
+                      "type": "row",
+                      "key": "midOnlyCurlRing"
+                    },
+                    {
+                      "type": "row",
+                      "key": "tipOnlyCurlRing"
+                    },
+                    {
+                      "type": "row",
+                      "key": "baseOnlyCurlRing"
+                    },
+                    {
+                      "type": "row",
+                      "key": "curlRing"
+                    },
+                    {
+                      "type": "row",
+                      "key": "tipTwistRing"
+                    },
+                    {
+                      "type": "row",
+                      "key": "splayRing"
+                    },
+                    {
+                      "type": "row",
+                      "key": "curlBiasRing"
+                    },
+                    {
+                      "type": "row",
+                      "key": "splayRing2"
+                    }
+                  ],
+                  "settings": [
+                    "midOnlyCurlRing",
+                    "tipOnlyCurlRing",
+                    "baseOnlyCurlRing",
+                    "curlRing",
+                    "tipTwistRing",
+                    "splayRing",
+                    "curlBiasRing",
+                    "splayRing2"
+                  ],
+                  "subgroups": []
+                }
+              },
+              {
+                "type": "group",
+                "group": {
+                  "key": "Pinky",
+                  "collapsed": true,
+                  "locked": false,
+                  "items": [
+                    {
+                      "type": "row",
+                      "key": "midOnlyCurlPinky"
+                    },
+                    {
+                      "type": "row",
+                      "key": "tipOnlyCurlPinky"
+                    },
+                    {
+                      "type": "row",
+                      "key": "baseOnlyCurlPinky"
+                    },
+                    {
+                      "type": "row",
+                      "key": "curlPinky"
+                    },
+                    {
+                      "type": "row",
+                      "key": "tipTwistPinky"
+                    },
+                    {
+                      "type": "row",
+                      "key": "curlBiasPinky"
+                    },
+                    {
+                      "type": "row",
+                      "key": "splayPinky"
+                    },
+                    {
+                      "type": "row",
+                      "key": "splayPinky2"
+                    }
+                  ],
+                  "settings": [
+                    "midOnlyCurlPinky",
+                    "tipOnlyCurlPinky",
+                    "baseOnlyCurlPinky",
+                    "curlPinky",
+                    "tipTwistPinky",
+                    "curlBiasPinky",
+                    "splayPinky",
+                    "splayPinky2"
+                  ],
+                  "subgroups": []
+                }
+              }
+            ],
+            "settings": [
+              "poseScale",
+              "posePreviewEnabled",
+              "savedPoses"
+            ],
+            "subgroups": [
+              {
+                "key": "New Group (8)",
+                "collapsed": true,
+                "locked": false,
+                "items": [
+                  {
+                    "type": "row",
+                    "key": "poseOffsetX"
+                  },
+                  {
+                    "type": "row",
+                    "key": "poseOffsetY"
+                  },
+                  {
+                    "type": "row",
+                    "key": "poseOffsetZ"
+                  }
+                ],
+                "settings": [
+                  "poseOffsetX",
+                  "poseOffsetY",
+                  "poseOffsetZ"
+                ],
+                "subgroups": []
+              },
+              {
+                "key": "Whole-Hand Rotation & Thumb",
+                "collapsed": true,
+                "locked": false,
+                "items": [
+                  {
+                    "type": "row",
+                    "key": "modelRotX"
+                  },
+                  {
+                    "type": "row",
+                    "key": "modelRotY"
+                  },
+                  {
+                    "type": "row",
+                    "key": "modelRotZ"
+                  }
+                ],
+                "settings": [
+                  "modelRotX",
+                  "modelRotY",
+                  "modelRotZ"
+                ],
+                "subgroups": []
+              },
+              {
+                "key": "Wrist",
+                "collapsed": true,
+                "locked": false,
+                "items": [
+                  {
+                    "type": "row",
+                    "key": "wristRotation"
+                  },
+                  {
+                    "type": "row",
+                    "key": "wristBend"
+                  },
+                  {
+                    "type": "row",
+                    "key": "wristSplay"
+                  }
+                ],
+                "settings": [
+                  "wristRotation",
+                  "wristBend",
+                  "wristSplay"
+                ],
+                "subgroups": []
+              },
+              {
+                "key": "New Group (6)",
+                "collapsed": true,
+                "locked": false,
+                "items": [
+                  {
+                    "type": "row",
+                    "key": "thumbCurl"
+                  },
+                  {
+                    "type": "row",
+                    "key": "tipOnlyCurlThumb"
+                  },
+                  {
+                    "type": "row",
+                    "key": "midOnlyCurlThumb"
+                  },
+                  {
+                    "type": "row",
+                    "key": "baseOnlyCurlThumb"
+                  },
+                  {
+                    "type": "row",
+                    "key": "tipTwistThumb"
+                  },
+                  {
+                    "type": "row",
+                    "key": "thumbSplay"
+                  },
+                  {
+                    "type": "row",
+                    "key": "thumbSplay2"
+                  },
+                  {
+                    "type": "row",
+                    "key": "curlBiasThumb"
+                  }
+                ],
+                "settings": [
+                  "thumbCurl",
+                  "tipOnlyCurlThumb",
+                  "midOnlyCurlThumb",
+                  "baseOnlyCurlThumb",
+                  "tipTwistThumb",
+                  "thumbSplay",
+                  "thumbSplay2",
+                  "curlBiasThumb"
+                ],
+                "subgroups": []
+              },
+              {
+                "key": "Index",
+                "collapsed": true,
+                "locked": false,
+                "items": [
+                  {
+                    "type": "row",
+                    "key": "midOnlyCurlIndex"
+                  },
+                  {
+                    "type": "row",
+                    "key": "tipOnlyCurlIndex"
+                  },
+                  {
+                    "type": "row",
+                    "key": "baseOnlyCurlIndex"
+                  },
+                  {
+                    "type": "row",
+                    "key": "curlIndex"
+                  },
+                  {
+                    "type": "row",
+                    "key": "tipTwistIndex"
+                  },
+                  {
+                    "type": "row",
+                    "key": "splayIndex"
+                  },
+                  {
+                    "type": "row",
+                    "key": "curlBiasIndex"
+                  },
+                  {
+                    "type": "row",
+                    "key": "splayIndex2"
+                  }
+                ],
+                "settings": [
+                  "midOnlyCurlIndex",
+                  "tipOnlyCurlIndex",
+                  "baseOnlyCurlIndex",
+                  "curlIndex",
+                  "tipTwistIndex",
+                  "splayIndex",
+                  "curlBiasIndex",
+                  "splayIndex2"
+                ],
+                "subgroups": []
+              },
+              {
+                "key": "Middle",
+                "collapsed": true,
+                "locked": false,
+                "items": [
+                  {
+                    "type": "row",
+                    "key": "midOnlyCurlMiddle"
+                  },
+                  {
+                    "type": "row",
+                    "key": "tipOnlyCurlMiddle"
+                  },
+                  {
+                    "type": "row",
+                    "key": "baseOnlyCurlMiddle"
+                  },
+                  {
+                    "type": "row",
+                    "key": "curlMiddle"
+                  },
+                  {
+                    "type": "row",
+                    "key": "tipTwistMiddle"
+                  },
+                  {
+                    "type": "row",
+                    "key": "splayMiddle"
+                  },
+                  {
+                    "type": "row",
+                    "key": "curlBiasMiddle"
+                  },
+                  {
+                    "type": "row",
+                    "key": "splayMiddle2"
+                  }
+                ],
+                "settings": [
+                  "midOnlyCurlMiddle",
+                  "tipOnlyCurlMiddle",
+                  "baseOnlyCurlMiddle",
+                  "curlMiddle",
+                  "tipTwistMiddle",
+                  "splayMiddle",
+                  "curlBiasMiddle",
+                  "splayMiddle2"
+                ],
+                "subgroups": []
+              },
+              {
+                "key": "Ring",
+                "collapsed": true,
+                "locked": false,
+                "items": [
+                  {
+                    "type": "row",
+                    "key": "midOnlyCurlRing"
+                  },
+                  {
+                    "type": "row",
+                    "key": "tipOnlyCurlRing"
+                  },
+                  {
+                    "type": "row",
+                    "key": "baseOnlyCurlRing"
+                  },
+                  {
+                    "type": "row",
+                    "key": "curlRing"
+                  },
+                  {
+                    "type": "row",
+                    "key": "tipTwistRing"
+                  },
+                  {
+                    "type": "row",
+                    "key": "splayRing"
+                  },
+                  {
+                    "type": "row",
+                    "key": "curlBiasRing"
+                  },
+                  {
+                    "type": "row",
+                    "key": "splayRing2"
+                  }
+                ],
+                "settings": [
+                  "midOnlyCurlRing",
+                  "tipOnlyCurlRing",
+                  "baseOnlyCurlRing",
+                  "curlRing",
+                  "tipTwistRing",
+                  "splayRing",
+                  "curlBiasRing",
+                  "splayRing2"
+                ],
+                "subgroups": []
+              },
+              {
+                "key": "Pinky",
+                "collapsed": true,
+                "locked": false,
+                "items": [
+                  {
+                    "type": "row",
+                    "key": "midOnlyCurlPinky"
+                  },
+                  {
+                    "type": "row",
+                    "key": "tipOnlyCurlPinky"
+                  },
+                  {
+                    "type": "row",
+                    "key": "baseOnlyCurlPinky"
+                  },
+                  {
+                    "type": "row",
+                    "key": "curlPinky"
+                  },
+                  {
+                    "type": "row",
+                    "key": "tipTwistPinky"
+                  },
+                  {
+                    "type": "row",
+                    "key": "curlBiasPinky"
+                  },
+                  {
+                    "type": "row",
+                    "key": "splayPinky"
+                  },
+                  {
+                    "type": "row",
+                    "key": "splayPinky2"
+                  }
+                ],
+                "settings": [
+                  "midOnlyCurlPinky",
+                  "tipOnlyCurlPinky",
+                  "baseOnlyCurlPinky",
+                  "curlPinky",
+                  "tipTwistPinky",
+                  "curlBiasPinky",
+                  "splayPinky",
+                  "splayPinky2"
+                ],
+                "subgroups": []
+              }
+            ]
+          }
+        },
+        {
+          "type": "group",
+          "group": {
+            "key": "Pose Preview",
+            "collapsed": true,
+            "locked": false,
+            "items": [],
+            "settings": [],
+            "subgroups": []
+          }
+        },
+        {
+          "type": "group",
+          "group": {
+            "key": "Tween",
             "collapsed": true,
             "locked": false,
             "items": [
               {
                 "type": "row",
-                "key": "cropWristEnabled"
+                "key": "tweenPreviewSpeedMs"
               },
               {
                 "type": "row",
-                "key": "reactiveArmLengthEnabled"
+                "key": "tweenPoses"
               },
               {
                 "type": "row",
-                "key": "hideWrist"
-              },
-              {
-                "type": "row",
-                "key": "armLengthRange"
-              },
-              {
-                "type": "row",
-                "key": "armLengthCurve"
+                "key": "savedTweenSequences"
               }
             ],
             "settings": [
-              "cropWristEnabled",
-              "reactiveArmLengthEnabled",
-              "hideWrist",
-              "armLengthRange",
-              "armLengthCurve"
+              "tweenPreviewSpeedMs",
+              "tweenPoses",
+              "savedTweenSequences"
             ],
             "subgroups": []
           }
+        },
+        {
+          "type": "group",
+          "group": {
+            "key": "Cursor Tracking",
+            "collapsed": true,
+            "locked": false,
+            "items": [
+              {
+                "type": "row",
+                "key": "trackingEnabled"
+              },
+              {
+                "type": "row",
+                "key": "trackingDamping"
+              },
+              {
+                "type": "row",
+                "key": "targetDepthFactor"
+              },
+              {
+                "type": "row",
+                "key": "showTargetMarker"
+              },
+              {
+                "type": "group",
+                "group": {
+                  "key": "New Group (3)",
+                  "collapsed": true,
+                  "locked": false,
+                  "items": [
+                    {
+                      "type": "row",
+                      "key": "palmFacesCursor"
+                    },
+                    {
+                      "type": "row",
+                      "key": "palmFaceRotationOffset"
+                    },
+                    {
+                      "type": "row",
+                      "key": "palmFacesCursorDistanceCurveEnabled"
+                    },
+                    {
+                      "type": "row",
+                      "key": "palmFacesCursorDistanceRange"
+                    },
+                    {
+                      "type": "row",
+                      "key": "palmFacesCursorDistanceCurve"
+                    }
+                  ],
+                  "settings": [
+                    "palmFacesCursor",
+                    "palmFaceRotationOffset",
+                    "palmFacesCursorDistanceCurveEnabled",
+                    "palmFacesCursorDistanceRange",
+                    "palmFacesCursorDistanceCurve"
+                  ],
+                  "subgroups": []
+                }
+              },
+              {
+                "type": "group",
+                "group": {
+                  "key": "Responsive Wrist Splay",
+                  "collapsed": true,
+                  "locked": false,
+                  "items": [
+                    {
+                      "type": "row",
+                      "key": "wristSplayReposeStagger"
+                    },
+                    {
+                      "type": "row",
+                      "key": "wristSplayResponsiveEnabled"
+                    },
+                    {
+                      "type": "row",
+                      "key": "wristSplayDefault"
+                    },
+                    {
+                      "type": "row",
+                      "key": "wristSplayReactiveEnabled"
+                    },
+                    {
+                      "type": "row",
+                      "key": "wristSplayRange"
+                    },
+                    {
+                      "type": "row",
+                      "key": "wristSplayCurve"
+                    }
+                  ],
+                  "settings": [
+                    "wristSplayReposeStagger",
+                    "wristSplayResponsiveEnabled",
+                    "wristSplayDefault",
+                    "wristSplayReactiveEnabled",
+                    "wristSplayRange",
+                    "wristSplayCurve"
+                  ],
+                  "subgroups": []
+                }
+              },
+              {
+                "type": "group",
+                "group": {
+                  "key": "New Group (4)",
+                  "collapsed": true,
+                  "locked": false,
+                  "items": [
+                    {
+                      "type": "row",
+                      "key": "cropWristEnabled"
+                    },
+                    {
+                      "type": "row",
+                      "key": "reactiveArmLengthEnabled"
+                    },
+                    {
+                      "type": "row",
+                      "key": "hideWrist"
+                    },
+                    {
+                      "type": "row",
+                      "key": "armLengthRange"
+                    },
+                    {
+                      "type": "row",
+                      "key": "armLengthCurve"
+                    }
+                  ],
+                  "settings": [
+                    "cropWristEnabled",
+                    "reactiveArmLengthEnabled",
+                    "hideWrist",
+                    "armLengthRange",
+                    "armLengthCurve"
+                  ],
+                  "subgroups": []
+                }
+              }
+            ],
+            "settings": [
+              "trackingEnabled",
+              "trackingDamping",
+              "targetDepthFactor",
+              "showTargetMarker"
+            ],
+            "subgroups": [
+              {
+                "key": "New Group (3)",
+                "collapsed": true,
+                "locked": false,
+                "items": [
+                  {
+                    "type": "row",
+                    "key": "palmFacesCursor"
+                  },
+                  {
+                    "type": "row",
+                    "key": "palmFaceRotationOffset"
+                  },
+                  {
+                    "type": "row",
+                    "key": "palmFacesCursorDistanceCurveEnabled"
+                  },
+                  {
+                    "type": "row",
+                    "key": "palmFacesCursorDistanceRange"
+                  },
+                  {
+                    "type": "row",
+                    "key": "palmFacesCursorDistanceCurve"
+                  }
+                ],
+                "settings": [
+                  "palmFacesCursor",
+                  "palmFaceRotationOffset",
+                  "palmFacesCursorDistanceCurveEnabled",
+                  "palmFacesCursorDistanceRange",
+                  "palmFacesCursorDistanceCurve"
+                ],
+                "subgroups": []
+              },
+              {
+                "key": "Responsive Wrist Splay",
+                "collapsed": true,
+                "locked": false,
+                "items": [
+                  {
+                    "type": "row",
+                    "key": "wristSplayReposeStagger"
+                  },
+                  {
+                    "type": "row",
+                    "key": "wristSplayResponsiveEnabled"
+                  },
+                  {
+                    "type": "row",
+                    "key": "wristSplayDefault"
+                  },
+                  {
+                    "type": "row",
+                    "key": "wristSplayReactiveEnabled"
+                  },
+                  {
+                    "type": "row",
+                    "key": "wristSplayRange"
+                  },
+                  {
+                    "type": "row",
+                    "key": "wristSplayCurve"
+                  }
+                ],
+                "settings": [
+                  "wristSplayReposeStagger",
+                  "wristSplayResponsiveEnabled",
+                  "wristSplayDefault",
+                  "wristSplayReactiveEnabled",
+                  "wristSplayRange",
+                  "wristSplayCurve"
+                ],
+                "subgroups": []
+              },
+              {
+                "key": "New Group (4)",
+                "collapsed": true,
+                "locked": false,
+                "items": [
+                  {
+                    "type": "row",
+                    "key": "cropWristEnabled"
+                  },
+                  {
+                    "type": "row",
+                    "key": "reactiveArmLengthEnabled"
+                  },
+                  {
+                    "type": "row",
+                    "key": "hideWrist"
+                  },
+                  {
+                    "type": "row",
+                    "key": "armLengthRange"
+                  },
+                  {
+                    "type": "row",
+                    "key": "armLengthCurve"
+                  }
+                ],
+                "settings": [
+                  "cropWristEnabled",
+                  "reactiveArmLengthEnabled",
+                  "hideWrist",
+                  "armLengthRange",
+                  "armLengthCurve"
+                ],
+                "subgroups": []
+              }
+            ]
+          }
         }
       ],
-      "settings": [
-        "trackingEnabled",
-        "trackingDamping",
-        "targetDepthFactor",
-        "showTargetMarker"
-      ],
+      "settings": [],
       "subgroups": [
         {
-          "key": "New Group (3)",
+          "key": "Field Layout",
           "collapsed": true,
           "locked": false,
           "items": [
             {
               "type": "row",
-              "key": "palmFacesCursor"
+              "key": "hideHands"
             },
             {
               "type": "row",
-              "key": "palmFaceRotationOffset"
+              "key": "fieldRows"
             },
             {
               "type": "row",
-              "key": "palmFacesCursorDistanceCurveEnabled"
+              "key": "fieldCols"
             },
             {
               "type": "row",
-              "key": "palmFacesCursorDistanceRange"
+              "key": "rowSpacing"
             },
             {
               "type": "row",
-              "key": "palmFacesCursorDistanceCurve"
+              "key": "columnSpacing"
+            },
+            {
+              "type": "row",
+              "key": "handScale"
+            },
+            {
+              "type": "row",
+              "key": "alternateRowOffset"
+            },
+            {
+              "type": "row",
+              "key": "progressiveRowOffset"
+            },
+            {
+              "type": "row",
+              "key": "useProgressiveOffset"
             }
           ],
           "settings": [
-            "palmFacesCursor",
-            "palmFaceRotationOffset",
-            "palmFacesCursorDistanceCurveEnabled",
-            "palmFacesCursorDistanceRange",
-            "palmFacesCursorDistanceCurve"
+            "hideHands",
+            "fieldRows",
+            "fieldCols",
+            "rowSpacing",
+            "columnSpacing",
+            "handScale",
+            "alternateRowOffset",
+            "progressiveRowOffset",
+            "useProgressiveOffset"
           ],
           "subgroups": []
         },
         {
-          "key": "Responsive Wrist Splay",
+          "key": "Outline",
           "collapsed": true,
           "locked": false,
           "items": [
             {
               "type": "row",
-              "key": "wristSplayReposeStagger"
+              "key": "outlineMechanic"
             },
             {
               "type": "row",
-              "key": "wristSplayResponsiveEnabled"
+              "key": "emissionColor"
             },
             {
               "type": "row",
-              "key": "wristSplayDefault"
+              "key": "emissionIntensity"
             },
             {
               "type": "row",
-              "key": "wristSplayReactiveEnabled"
+              "key": "outlineEnabled"
             },
             {
               "type": "row",
-              "key": "wristSplayRange"
+              "key": "outlineColor"
             },
             {
               "type": "row",
-              "key": "wristSplayCurve"
+              "key": "hullThickness"
+            },
+            {
+              "type": "row",
+              "key": "passThickness"
+            },
+            {
+              "type": "row",
+              "key": "passStrength"
+            },
+            {
+              "type": "row",
+              "key": "passGlow"
             }
           ],
           "settings": [
-            "wristSplayReposeStagger",
-            "wristSplayResponsiveEnabled",
-            "wristSplayDefault",
-            "wristSplayReactiveEnabled",
-            "wristSplayRange",
-            "wristSplayCurve"
+            "outlineMechanic",
+            "emissionColor",
+            "emissionIntensity",
+            "outlineEnabled",
+            "outlineColor",
+            "hullThickness",
+            "passThickness",
+            "passStrength",
+            "passGlow"
           ],
           "subgroups": []
         },
         {
-          "key": "New Group (4)",
+          "key": "Pose",
+          "collapsed": false,
+          "locked": false,
+          "items": [
+            {
+              "type": "row",
+              "key": "poseScale"
+            },
+            {
+              "type": "row",
+              "key": "posePreviewEnabled"
+            },
+            {
+              "type": "row",
+              "key": "savedPoses"
+            },
+            {
+              "type": "group",
+              "group": {
+                "key": "New Group (8)",
+                "collapsed": true,
+                "locked": false,
+                "items": [
+                  {
+                    "type": "row",
+                    "key": "poseOffsetX"
+                  },
+                  {
+                    "type": "row",
+                    "key": "poseOffsetY"
+                  },
+                  {
+                    "type": "row",
+                    "key": "poseOffsetZ"
+                  }
+                ],
+                "settings": [
+                  "poseOffsetX",
+                  "poseOffsetY",
+                  "poseOffsetZ"
+                ],
+                "subgroups": []
+              }
+            },
+            {
+              "type": "group",
+              "group": {
+                "key": "Whole-Hand Rotation & Thumb",
+                "collapsed": true,
+                "locked": false,
+                "items": [
+                  {
+                    "type": "row",
+                    "key": "modelRotX"
+                  },
+                  {
+                    "type": "row",
+                    "key": "modelRotY"
+                  },
+                  {
+                    "type": "row",
+                    "key": "modelRotZ"
+                  }
+                ],
+                "settings": [
+                  "modelRotX",
+                  "modelRotY",
+                  "modelRotZ"
+                ],
+                "subgroups": []
+              }
+            },
+            {
+              "type": "group",
+              "group": {
+                "key": "Wrist",
+                "collapsed": true,
+                "locked": false,
+                "items": [
+                  {
+                    "type": "row",
+                    "key": "wristRotation"
+                  },
+                  {
+                    "type": "row",
+                    "key": "wristBend"
+                  },
+                  {
+                    "type": "row",
+                    "key": "wristSplay"
+                  }
+                ],
+                "settings": [
+                  "wristRotation",
+                  "wristBend",
+                  "wristSplay"
+                ],
+                "subgroups": []
+              }
+            },
+            {
+              "type": "group",
+              "group": {
+                "key": "New Group (6)",
+                "collapsed": true,
+                "locked": false,
+                "items": [
+                  {
+                    "type": "row",
+                    "key": "thumbCurl"
+                  },
+                  {
+                    "type": "row",
+                    "key": "tipOnlyCurlThumb"
+                  },
+                  {
+                    "type": "row",
+                    "key": "midOnlyCurlThumb"
+                  },
+                  {
+                    "type": "row",
+                    "key": "baseOnlyCurlThumb"
+                  },
+                  {
+                    "type": "row",
+                    "key": "tipTwistThumb"
+                  },
+                  {
+                    "type": "row",
+                    "key": "thumbSplay"
+                  },
+                  {
+                    "type": "row",
+                    "key": "thumbSplay2"
+                  },
+                  {
+                    "type": "row",
+                    "key": "curlBiasThumb"
+                  }
+                ],
+                "settings": [
+                  "thumbCurl",
+                  "tipOnlyCurlThumb",
+                  "midOnlyCurlThumb",
+                  "baseOnlyCurlThumb",
+                  "tipTwistThumb",
+                  "thumbSplay",
+                  "thumbSplay2",
+                  "curlBiasThumb"
+                ],
+                "subgroups": []
+              }
+            },
+            {
+              "type": "group",
+              "group": {
+                "key": "Index",
+                "collapsed": true,
+                "locked": false,
+                "items": [
+                  {
+                    "type": "row",
+                    "key": "midOnlyCurlIndex"
+                  },
+                  {
+                    "type": "row",
+                    "key": "tipOnlyCurlIndex"
+                  },
+                  {
+                    "type": "row",
+                    "key": "baseOnlyCurlIndex"
+                  },
+                  {
+                    "type": "row",
+                    "key": "curlIndex"
+                  },
+                  {
+                    "type": "row",
+                    "key": "tipTwistIndex"
+                  },
+                  {
+                    "type": "row",
+                    "key": "splayIndex"
+                  },
+                  {
+                    "type": "row",
+                    "key": "curlBiasIndex"
+                  },
+                  {
+                    "type": "row",
+                    "key": "splayIndex2"
+                  }
+                ],
+                "settings": [
+                  "midOnlyCurlIndex",
+                  "tipOnlyCurlIndex",
+                  "baseOnlyCurlIndex",
+                  "curlIndex",
+                  "tipTwistIndex",
+                  "splayIndex",
+                  "curlBiasIndex",
+                  "splayIndex2"
+                ],
+                "subgroups": []
+              }
+            },
+            {
+              "type": "group",
+              "group": {
+                "key": "Middle",
+                "collapsed": true,
+                "locked": false,
+                "items": [
+                  {
+                    "type": "row",
+                    "key": "midOnlyCurlMiddle"
+                  },
+                  {
+                    "type": "row",
+                    "key": "tipOnlyCurlMiddle"
+                  },
+                  {
+                    "type": "row",
+                    "key": "baseOnlyCurlMiddle"
+                  },
+                  {
+                    "type": "row",
+                    "key": "curlMiddle"
+                  },
+                  {
+                    "type": "row",
+                    "key": "tipTwistMiddle"
+                  },
+                  {
+                    "type": "row",
+                    "key": "splayMiddle"
+                  },
+                  {
+                    "type": "row",
+                    "key": "curlBiasMiddle"
+                  },
+                  {
+                    "type": "row",
+                    "key": "splayMiddle2"
+                  }
+                ],
+                "settings": [
+                  "midOnlyCurlMiddle",
+                  "tipOnlyCurlMiddle",
+                  "baseOnlyCurlMiddle",
+                  "curlMiddle",
+                  "tipTwistMiddle",
+                  "splayMiddle",
+                  "curlBiasMiddle",
+                  "splayMiddle2"
+                ],
+                "subgroups": []
+              }
+            },
+            {
+              "type": "group",
+              "group": {
+                "key": "Ring",
+                "collapsed": true,
+                "locked": false,
+                "items": [
+                  {
+                    "type": "row",
+                    "key": "midOnlyCurlRing"
+                  },
+                  {
+                    "type": "row",
+                    "key": "tipOnlyCurlRing"
+                  },
+                  {
+                    "type": "row",
+                    "key": "baseOnlyCurlRing"
+                  },
+                  {
+                    "type": "row",
+                    "key": "curlRing"
+                  },
+                  {
+                    "type": "row",
+                    "key": "tipTwistRing"
+                  },
+                  {
+                    "type": "row",
+                    "key": "splayRing"
+                  },
+                  {
+                    "type": "row",
+                    "key": "curlBiasRing"
+                  },
+                  {
+                    "type": "row",
+                    "key": "splayRing2"
+                  }
+                ],
+                "settings": [
+                  "midOnlyCurlRing",
+                  "tipOnlyCurlRing",
+                  "baseOnlyCurlRing",
+                  "curlRing",
+                  "tipTwistRing",
+                  "splayRing",
+                  "curlBiasRing",
+                  "splayRing2"
+                ],
+                "subgroups": []
+              }
+            },
+            {
+              "type": "group",
+              "group": {
+                "key": "Pinky",
+                "collapsed": true,
+                "locked": false,
+                "items": [
+                  {
+                    "type": "row",
+                    "key": "midOnlyCurlPinky"
+                  },
+                  {
+                    "type": "row",
+                    "key": "tipOnlyCurlPinky"
+                  },
+                  {
+                    "type": "row",
+                    "key": "baseOnlyCurlPinky"
+                  },
+                  {
+                    "type": "row",
+                    "key": "curlPinky"
+                  },
+                  {
+                    "type": "row",
+                    "key": "tipTwistPinky"
+                  },
+                  {
+                    "type": "row",
+                    "key": "curlBiasPinky"
+                  },
+                  {
+                    "type": "row",
+                    "key": "splayPinky"
+                  },
+                  {
+                    "type": "row",
+                    "key": "splayPinky2"
+                  }
+                ],
+                "settings": [
+                  "midOnlyCurlPinky",
+                  "tipOnlyCurlPinky",
+                  "baseOnlyCurlPinky",
+                  "curlPinky",
+                  "tipTwistPinky",
+                  "curlBiasPinky",
+                  "splayPinky",
+                  "splayPinky2"
+                ],
+                "subgroups": []
+              }
+            }
+          ],
+          "settings": [
+            "poseScale",
+            "posePreviewEnabled",
+            "savedPoses"
+          ],
+          "subgroups": [
+            {
+              "key": "New Group (8)",
+              "collapsed": true,
+              "locked": false,
+              "items": [
+                {
+                  "type": "row",
+                  "key": "poseOffsetX"
+                },
+                {
+                  "type": "row",
+                  "key": "poseOffsetY"
+                },
+                {
+                  "type": "row",
+                  "key": "poseOffsetZ"
+                }
+              ],
+              "settings": [
+                "poseOffsetX",
+                "poseOffsetY",
+                "poseOffsetZ"
+              ],
+              "subgroups": []
+            },
+            {
+              "key": "Whole-Hand Rotation & Thumb",
+              "collapsed": true,
+              "locked": false,
+              "items": [
+                {
+                  "type": "row",
+                  "key": "modelRotX"
+                },
+                {
+                  "type": "row",
+                  "key": "modelRotY"
+                },
+                {
+                  "type": "row",
+                  "key": "modelRotZ"
+                }
+              ],
+              "settings": [
+                "modelRotX",
+                "modelRotY",
+                "modelRotZ"
+              ],
+              "subgroups": []
+            },
+            {
+              "key": "Wrist",
+              "collapsed": true,
+              "locked": false,
+              "items": [
+                {
+                  "type": "row",
+                  "key": "wristRotation"
+                },
+                {
+                  "type": "row",
+                  "key": "wristBend"
+                },
+                {
+                  "type": "row",
+                  "key": "wristSplay"
+                }
+              ],
+              "settings": [
+                "wristRotation",
+                "wristBend",
+                "wristSplay"
+              ],
+              "subgroups": []
+            },
+            {
+              "key": "New Group (6)",
+              "collapsed": true,
+              "locked": false,
+              "items": [
+                {
+                  "type": "row",
+                  "key": "thumbCurl"
+                },
+                {
+                  "type": "row",
+                  "key": "tipOnlyCurlThumb"
+                },
+                {
+                  "type": "row",
+                  "key": "midOnlyCurlThumb"
+                },
+                {
+                  "type": "row",
+                  "key": "baseOnlyCurlThumb"
+                },
+                {
+                  "type": "row",
+                  "key": "tipTwistThumb"
+                },
+                {
+                  "type": "row",
+                  "key": "thumbSplay"
+                },
+                {
+                  "type": "row",
+                  "key": "thumbSplay2"
+                },
+                {
+                  "type": "row",
+                  "key": "curlBiasThumb"
+                }
+              ],
+              "settings": [
+                "thumbCurl",
+                "tipOnlyCurlThumb",
+                "midOnlyCurlThumb",
+                "baseOnlyCurlThumb",
+                "tipTwistThumb",
+                "thumbSplay",
+                "thumbSplay2",
+                "curlBiasThumb"
+              ],
+              "subgroups": []
+            },
+            {
+              "key": "Index",
+              "collapsed": true,
+              "locked": false,
+              "items": [
+                {
+                  "type": "row",
+                  "key": "midOnlyCurlIndex"
+                },
+                {
+                  "type": "row",
+                  "key": "tipOnlyCurlIndex"
+                },
+                {
+                  "type": "row",
+                  "key": "baseOnlyCurlIndex"
+                },
+                {
+                  "type": "row",
+                  "key": "curlIndex"
+                },
+                {
+                  "type": "row",
+                  "key": "tipTwistIndex"
+                },
+                {
+                  "type": "row",
+                  "key": "splayIndex"
+                },
+                {
+                  "type": "row",
+                  "key": "curlBiasIndex"
+                },
+                {
+                  "type": "row",
+                  "key": "splayIndex2"
+                }
+              ],
+              "settings": [
+                "midOnlyCurlIndex",
+                "tipOnlyCurlIndex",
+                "baseOnlyCurlIndex",
+                "curlIndex",
+                "tipTwistIndex",
+                "splayIndex",
+                "curlBiasIndex",
+                "splayIndex2"
+              ],
+              "subgroups": []
+            },
+            {
+              "key": "Middle",
+              "collapsed": true,
+              "locked": false,
+              "items": [
+                {
+                  "type": "row",
+                  "key": "midOnlyCurlMiddle"
+                },
+                {
+                  "type": "row",
+                  "key": "tipOnlyCurlMiddle"
+                },
+                {
+                  "type": "row",
+                  "key": "baseOnlyCurlMiddle"
+                },
+                {
+                  "type": "row",
+                  "key": "curlMiddle"
+                },
+                {
+                  "type": "row",
+                  "key": "tipTwistMiddle"
+                },
+                {
+                  "type": "row",
+                  "key": "splayMiddle"
+                },
+                {
+                  "type": "row",
+                  "key": "curlBiasMiddle"
+                },
+                {
+                  "type": "row",
+                  "key": "splayMiddle2"
+                }
+              ],
+              "settings": [
+                "midOnlyCurlMiddle",
+                "tipOnlyCurlMiddle",
+                "baseOnlyCurlMiddle",
+                "curlMiddle",
+                "tipTwistMiddle",
+                "splayMiddle",
+                "curlBiasMiddle",
+                "splayMiddle2"
+              ],
+              "subgroups": []
+            },
+            {
+              "key": "Ring",
+              "collapsed": true,
+              "locked": false,
+              "items": [
+                {
+                  "type": "row",
+                  "key": "midOnlyCurlRing"
+                },
+                {
+                  "type": "row",
+                  "key": "tipOnlyCurlRing"
+                },
+                {
+                  "type": "row",
+                  "key": "baseOnlyCurlRing"
+                },
+                {
+                  "type": "row",
+                  "key": "curlRing"
+                },
+                {
+                  "type": "row",
+                  "key": "tipTwistRing"
+                },
+                {
+                  "type": "row",
+                  "key": "splayRing"
+                },
+                {
+                  "type": "row",
+                  "key": "curlBiasRing"
+                },
+                {
+                  "type": "row",
+                  "key": "splayRing2"
+                }
+              ],
+              "settings": [
+                "midOnlyCurlRing",
+                "tipOnlyCurlRing",
+                "baseOnlyCurlRing",
+                "curlRing",
+                "tipTwistRing",
+                "splayRing",
+                "curlBiasRing",
+                "splayRing2"
+              ],
+              "subgroups": []
+            },
+            {
+              "key": "Pinky",
+              "collapsed": true,
+              "locked": false,
+              "items": [
+                {
+                  "type": "row",
+                  "key": "midOnlyCurlPinky"
+                },
+                {
+                  "type": "row",
+                  "key": "tipOnlyCurlPinky"
+                },
+                {
+                  "type": "row",
+                  "key": "baseOnlyCurlPinky"
+                },
+                {
+                  "type": "row",
+                  "key": "curlPinky"
+                },
+                {
+                  "type": "row",
+                  "key": "tipTwistPinky"
+                },
+                {
+                  "type": "row",
+                  "key": "curlBiasPinky"
+                },
+                {
+                  "type": "row",
+                  "key": "splayPinky"
+                },
+                {
+                  "type": "row",
+                  "key": "splayPinky2"
+                }
+              ],
+              "settings": [
+                "midOnlyCurlPinky",
+                "tipOnlyCurlPinky",
+                "baseOnlyCurlPinky",
+                "curlPinky",
+                "tipTwistPinky",
+                "curlBiasPinky",
+                "splayPinky",
+                "splayPinky2"
+              ],
+              "subgroups": []
+            }
+          ]
+        },
+        {
+          "key": "Pose Preview",
+          "collapsed": true,
+          "locked": false,
+          "items": [],
+          "settings": [],
+          "subgroups": []
+        },
+        {
+          "key": "Tween",
           "collapsed": true,
           "locked": false,
           "items": [
             {
               "type": "row",
-              "key": "cropWristEnabled"
+              "key": "tweenPreviewSpeedMs"
             },
             {
               "type": "row",
-              "key": "reactiveArmLengthEnabled"
+              "key": "tweenPoses"
             },
             {
               "type": "row",
-              "key": "hideWrist"
-            },
-            {
-              "type": "row",
-              "key": "armLengthRange"
-            },
-            {
-              "type": "row",
-              "key": "armLengthCurve"
+              "key": "savedTweenSequences"
             }
           ],
           "settings": [
-            "cropWristEnabled",
-            "reactiveArmLengthEnabled",
-            "hideWrist",
-            "armLengthRange",
-            "armLengthCurve"
+            "tweenPreviewSpeedMs",
+            "tweenPoses",
+            "savedTweenSequences"
           ],
           "subgroups": []
+        },
+        {
+          "key": "Cursor Tracking",
+          "collapsed": true,
+          "locked": false,
+          "items": [
+            {
+              "type": "row",
+              "key": "trackingEnabled"
+            },
+            {
+              "type": "row",
+              "key": "trackingDamping"
+            },
+            {
+              "type": "row",
+              "key": "targetDepthFactor"
+            },
+            {
+              "type": "row",
+              "key": "showTargetMarker"
+            },
+            {
+              "type": "group",
+              "group": {
+                "key": "New Group (3)",
+                "collapsed": true,
+                "locked": false,
+                "items": [
+                  {
+                    "type": "row",
+                    "key": "palmFacesCursor"
+                  },
+                  {
+                    "type": "row",
+                    "key": "palmFaceRotationOffset"
+                  },
+                  {
+                    "type": "row",
+                    "key": "palmFacesCursorDistanceCurveEnabled"
+                  },
+                  {
+                    "type": "row",
+                    "key": "palmFacesCursorDistanceRange"
+                  },
+                  {
+                    "type": "row",
+                    "key": "palmFacesCursorDistanceCurve"
+                  }
+                ],
+                "settings": [
+                  "palmFacesCursor",
+                  "palmFaceRotationOffset",
+                  "palmFacesCursorDistanceCurveEnabled",
+                  "palmFacesCursorDistanceRange",
+                  "palmFacesCursorDistanceCurve"
+                ],
+                "subgroups": []
+              }
+            },
+            {
+              "type": "group",
+              "group": {
+                "key": "Responsive Wrist Splay",
+                "collapsed": true,
+                "locked": false,
+                "items": [
+                  {
+                    "type": "row",
+                    "key": "wristSplayReposeStagger"
+                  },
+                  {
+                    "type": "row",
+                    "key": "wristSplayResponsiveEnabled"
+                  },
+                  {
+                    "type": "row",
+                    "key": "wristSplayDefault"
+                  },
+                  {
+                    "type": "row",
+                    "key": "wristSplayReactiveEnabled"
+                  },
+                  {
+                    "type": "row",
+                    "key": "wristSplayRange"
+                  },
+                  {
+                    "type": "row",
+                    "key": "wristSplayCurve"
+                  }
+                ],
+                "settings": [
+                  "wristSplayReposeStagger",
+                  "wristSplayResponsiveEnabled",
+                  "wristSplayDefault",
+                  "wristSplayReactiveEnabled",
+                  "wristSplayRange",
+                  "wristSplayCurve"
+                ],
+                "subgroups": []
+              }
+            },
+            {
+              "type": "group",
+              "group": {
+                "key": "New Group (4)",
+                "collapsed": true,
+                "locked": false,
+                "items": [
+                  {
+                    "type": "row",
+                    "key": "cropWristEnabled"
+                  },
+                  {
+                    "type": "row",
+                    "key": "reactiveArmLengthEnabled"
+                  },
+                  {
+                    "type": "row",
+                    "key": "hideWrist"
+                  },
+                  {
+                    "type": "row",
+                    "key": "armLengthRange"
+                  },
+                  {
+                    "type": "row",
+                    "key": "armLengthCurve"
+                  }
+                ],
+                "settings": [
+                  "cropWristEnabled",
+                  "reactiveArmLengthEnabled",
+                  "hideWrist",
+                  "armLengthRange",
+                  "armLengthCurve"
+                ],
+                "subgroups": []
+              }
+            }
+          ],
+          "settings": [
+            "trackingEnabled",
+            "trackingDamping",
+            "targetDepthFactor",
+            "showTargetMarker"
+          ],
+          "subgroups": [
+            {
+              "key": "New Group (3)",
+              "collapsed": true,
+              "locked": false,
+              "items": [
+                {
+                  "type": "row",
+                  "key": "palmFacesCursor"
+                },
+                {
+                  "type": "row",
+                  "key": "palmFaceRotationOffset"
+                },
+                {
+                  "type": "row",
+                  "key": "palmFacesCursorDistanceCurveEnabled"
+                },
+                {
+                  "type": "row",
+                  "key": "palmFacesCursorDistanceRange"
+                },
+                {
+                  "type": "row",
+                  "key": "palmFacesCursorDistanceCurve"
+                }
+              ],
+              "settings": [
+                "palmFacesCursor",
+                "palmFaceRotationOffset",
+                "palmFacesCursorDistanceCurveEnabled",
+                "palmFacesCursorDistanceRange",
+                "palmFacesCursorDistanceCurve"
+              ],
+              "subgroups": []
+            },
+            {
+              "key": "Responsive Wrist Splay",
+              "collapsed": true,
+              "locked": false,
+              "items": [
+                {
+                  "type": "row",
+                  "key": "wristSplayReposeStagger"
+                },
+                {
+                  "type": "row",
+                  "key": "wristSplayResponsiveEnabled"
+                },
+                {
+                  "type": "row",
+                  "key": "wristSplayDefault"
+                },
+                {
+                  "type": "row",
+                  "key": "wristSplayReactiveEnabled"
+                },
+                {
+                  "type": "row",
+                  "key": "wristSplayRange"
+                },
+                {
+                  "type": "row",
+                  "key": "wristSplayCurve"
+                }
+              ],
+              "settings": [
+                "wristSplayReposeStagger",
+                "wristSplayResponsiveEnabled",
+                "wristSplayDefault",
+                "wristSplayReactiveEnabled",
+                "wristSplayRange",
+                "wristSplayCurve"
+              ],
+              "subgroups": []
+            },
+            {
+              "key": "New Group (4)",
+              "collapsed": true,
+              "locked": false,
+              "items": [
+                {
+                  "type": "row",
+                  "key": "cropWristEnabled"
+                },
+                {
+                  "type": "row",
+                  "key": "reactiveArmLengthEnabled"
+                },
+                {
+                  "type": "row",
+                  "key": "hideWrist"
+                },
+                {
+                  "type": "row",
+                  "key": "armLengthRange"
+                },
+                {
+                  "type": "row",
+                  "key": "armLengthCurve"
+                }
+              ],
+              "settings": [
+                "cropWristEnabled",
+                "reactiveArmLengthEnabled",
+                "hideWrist",
+                "armLengthRange",
+                "armLengthCurve"
+              ],
+              "subgroups": []
+            }
+          ]
         }
       ]
+    },
+    {
+      "key": "Quality / Performance",
+      "collapsed": true,
+      "locked": false,
+      "items": [
+        {
+          "type": "row",
+          "key": "pixelRatio"
+        },
+        {
+          "type": "row",
+          "key": "resolutionScale"
+        },
+        {
+          "type": "row",
+          "key": "qualityPreset"
+        }
+      ],
+      "settings": [
+        "pixelRatio",
+        "resolutionScale",
+        "qualityPreset"
+      ],
+      "subgroups": []
+    },
+    {
+      "key": "Pause Button",
+      "collapsed": true,
+      "locked": false,
+      "items": [
+        {
+          "type": "row",
+          "key": "pausedRenderFps"
+        },
+        {
+          "type": "row",
+          "key": "pauseBtnXOffset"
+        },
+        {
+          "type": "row",
+          "key": "pauseBtnYOffset"
+        },
+        {
+          "type": "row",
+          "key": "pauseBtnSize"
+        },
+        {
+          "type": "row",
+          "key": "pauseBtnIconSize"
+        },
+        {
+          "type": "row",
+          "key": "pauseBtnCornerRadius"
+        },
+        {
+          "type": "row",
+          "key": "pauseBtnBorderThickness"
+        },
+        {
+          "type": "row",
+          "key": "pauseBtnOpacity"
+        },
+        {
+          "type": "row",
+          "key": "pauseBtnBgColor"
+        },
+        {
+          "type": "row",
+          "key": "pauseBtnIconColor"
+        },
+        {
+          "type": "row",
+          "key": "pauseBtnBorderColor"
+        }
+      ],
+      "settings": [
+        "pausedRenderFps",
+        "pauseBtnXOffset",
+        "pauseBtnYOffset",
+        "pauseBtnSize",
+        "pauseBtnIconSize",
+        "pauseBtnCornerRadius",
+        "pauseBtnBorderThickness",
+        "pauseBtnOpacity",
+        "pauseBtnBgColor",
+        "pauseBtnIconColor",
+        "pauseBtnBorderColor"
+      ],
+      "subgroups": []
     },
     {
       "key": "Custom Click Functions",
@@ -32746,676 +34705,6 @@
       ]
     },
     {
-      "key": "Pose",
-      "collapsed": true,
-      "locked": false,
-      "items": [
-        {
-          "type": "row",
-          "key": "poseOffsetX"
-        },
-        {
-          "type": "row",
-          "key": "poseOffsetY"
-        },
-        {
-          "type": "row",
-          "key": "poseOffsetZ"
-        },
-        {
-          "type": "row",
-          "key": "poseScale"
-        },
-        {
-          "type": "row",
-          "key": "posePreviewEnabled"
-        },
-        {
-          "type": "row",
-          "key": "savedPoses"
-        },
-        {
-          "type": "group",
-          "group": {
-            "key": "Whole-Hand Rotation & Thumb",
-            "collapsed": true,
-            "locked": false,
-            "items": [
-              {
-                "type": "row",
-                "key": "modelRotX"
-              },
-              {
-                "type": "row",
-                "key": "modelRotY"
-              },
-              {
-                "type": "row",
-                "key": "modelRotZ"
-              }
-            ],
-            "settings": [
-              "modelRotX",
-              "modelRotY",
-              "modelRotZ"
-            ],
-            "subgroups": []
-          }
-        },
-        {
-          "type": "group",
-          "group": {
-            "key": "Wrist",
-            "collapsed": true,
-            "locked": false,
-            "items": [
-              {
-                "type": "row",
-                "key": "wristRotation"
-              },
-              {
-                "type": "row",
-                "key": "wristBend"
-              },
-              {
-                "type": "row",
-                "key": "wristSplay"
-              }
-            ],
-            "settings": [
-              "wristRotation",
-              "wristBend",
-              "wristSplay"
-            ],
-            "subgroups": []
-          }
-        },
-        {
-          "type": "group",
-          "group": {
-            "key": "New Group (6)",
-            "collapsed": true,
-            "locked": false,
-            "items": [
-              {
-                "type": "row",
-                "key": "thumbCurl"
-              },
-              {
-                "type": "row",
-                "key": "tipOnlyCurlThumb"
-              },
-              {
-                "type": "row",
-                "key": "midOnlyCurlThumb"
-              },
-              {
-                "type": "row",
-                "key": "baseOnlyCurlThumb"
-              },
-              {
-                "type": "row",
-                "key": "tipTwistThumb"
-              },
-              {
-                "type": "row",
-                "key": "thumbSplay"
-              },
-              {
-                "type": "row",
-                "key": "thumbSplay2"
-              },
-              {
-                "type": "row",
-                "key": "curlBiasThumb"
-              }
-            ],
-            "settings": [
-              "thumbCurl",
-              "tipOnlyCurlThumb",
-              "midOnlyCurlThumb",
-              "baseOnlyCurlThumb",
-              "tipTwistThumb",
-              "thumbSplay",
-              "thumbSplay2",
-              "curlBiasThumb"
-            ],
-            "subgroups": []
-          }
-        },
-        {
-          "type": "group",
-          "group": {
-            "key": "Index",
-            "collapsed": true,
-            "locked": false,
-            "items": [
-              {
-                "type": "row",
-                "key": "midOnlyCurlIndex"
-              },
-              {
-                "type": "row",
-                "key": "tipOnlyCurlIndex"
-              },
-              {
-                "type": "row",
-                "key": "baseOnlyCurlIndex"
-              },
-              {
-                "type": "row",
-                "key": "curlIndex"
-              },
-              {
-                "type": "row",
-                "key": "tipTwistIndex"
-              },
-              {
-                "type": "row",
-                "key": "splayIndex"
-              },
-              {
-                "type": "row",
-                "key": "curlBiasIndex"
-              },
-              {
-                "type": "row",
-                "key": "splayIndex2"
-              }
-            ],
-            "settings": [
-              "midOnlyCurlIndex",
-              "tipOnlyCurlIndex",
-              "baseOnlyCurlIndex",
-              "curlIndex",
-              "tipTwistIndex",
-              "splayIndex",
-              "curlBiasIndex",
-              "splayIndex2"
-            ],
-            "subgroups": []
-          }
-        },
-        {
-          "type": "group",
-          "group": {
-            "key": "Middle",
-            "collapsed": true,
-            "locked": false,
-            "items": [
-              {
-                "type": "row",
-                "key": "midOnlyCurlMiddle"
-              },
-              {
-                "type": "row",
-                "key": "tipOnlyCurlMiddle"
-              },
-              {
-                "type": "row",
-                "key": "baseOnlyCurlMiddle"
-              },
-              {
-                "type": "row",
-                "key": "curlMiddle"
-              },
-              {
-                "type": "row",
-                "key": "tipTwistMiddle"
-              },
-              {
-                "type": "row",
-                "key": "splayMiddle"
-              },
-              {
-                "type": "row",
-                "key": "curlBiasMiddle"
-              },
-              {
-                "type": "row",
-                "key": "splayMiddle2"
-              }
-            ],
-            "settings": [
-              "midOnlyCurlMiddle",
-              "tipOnlyCurlMiddle",
-              "baseOnlyCurlMiddle",
-              "curlMiddle",
-              "tipTwistMiddle",
-              "splayMiddle",
-              "curlBiasMiddle",
-              "splayMiddle2"
-            ],
-            "subgroups": []
-          }
-        },
-        {
-          "type": "group",
-          "group": {
-            "key": "Ring",
-            "collapsed": true,
-            "locked": false,
-            "items": [
-              {
-                "type": "row",
-                "key": "midOnlyCurlRing"
-              },
-              {
-                "type": "row",
-                "key": "tipOnlyCurlRing"
-              },
-              {
-                "type": "row",
-                "key": "baseOnlyCurlRing"
-              },
-              {
-                "type": "row",
-                "key": "curlRing"
-              },
-              {
-                "type": "row",
-                "key": "tipTwistRing"
-              },
-              {
-                "type": "row",
-                "key": "splayRing"
-              },
-              {
-                "type": "row",
-                "key": "curlBiasRing"
-              },
-              {
-                "type": "row",
-                "key": "splayRing2"
-              }
-            ],
-            "settings": [
-              "midOnlyCurlRing",
-              "tipOnlyCurlRing",
-              "baseOnlyCurlRing",
-              "curlRing",
-              "tipTwistRing",
-              "splayRing",
-              "curlBiasRing",
-              "splayRing2"
-            ],
-            "subgroups": []
-          }
-        },
-        {
-          "type": "group",
-          "group": {
-            "key": "Pinky",
-            "collapsed": true,
-            "locked": false,
-            "items": [
-              {
-                "type": "row",
-                "key": "midOnlyCurlPinky"
-              },
-              {
-                "type": "row",
-                "key": "tipOnlyCurlPinky"
-              },
-              {
-                "type": "row",
-                "key": "baseOnlyCurlPinky"
-              },
-              {
-                "type": "row",
-                "key": "curlPinky"
-              },
-              {
-                "type": "row",
-                "key": "tipTwistPinky"
-              },
-              {
-                "type": "row",
-                "key": "curlBiasPinky"
-              },
-              {
-                "type": "row",
-                "key": "splayPinky"
-              },
-              {
-                "type": "row",
-                "key": "splayPinky2"
-              }
-            ],
-            "settings": [
-              "midOnlyCurlPinky",
-              "tipOnlyCurlPinky",
-              "baseOnlyCurlPinky",
-              "curlPinky",
-              "tipTwistPinky",
-              "curlBiasPinky",
-              "splayPinky",
-              "splayPinky2"
-            ],
-            "subgroups": []
-          }
-        }
-      ],
-      "settings": [
-        "poseOffsetX",
-        "poseOffsetY",
-        "poseOffsetZ",
-        "poseScale",
-        "posePreviewEnabled",
-        "savedPoses"
-      ],
-      "subgroups": [
-        {
-          "key": "Whole-Hand Rotation & Thumb",
-          "collapsed": true,
-          "locked": false,
-          "items": [
-            {
-              "type": "row",
-              "key": "modelRotX"
-            },
-            {
-              "type": "row",
-              "key": "modelRotY"
-            },
-            {
-              "type": "row",
-              "key": "modelRotZ"
-            }
-          ],
-          "settings": [
-            "modelRotX",
-            "modelRotY",
-            "modelRotZ"
-          ],
-          "subgroups": []
-        },
-        {
-          "key": "Wrist",
-          "collapsed": true,
-          "locked": false,
-          "items": [
-            {
-              "type": "row",
-              "key": "wristRotation"
-            },
-            {
-              "type": "row",
-              "key": "wristBend"
-            },
-            {
-              "type": "row",
-              "key": "wristSplay"
-            }
-          ],
-          "settings": [
-            "wristRotation",
-            "wristBend",
-            "wristSplay"
-          ],
-          "subgroups": []
-        },
-        {
-          "key": "New Group (6)",
-          "collapsed": true,
-          "locked": false,
-          "items": [
-            {
-              "type": "row",
-              "key": "thumbCurl"
-            },
-            {
-              "type": "row",
-              "key": "tipOnlyCurlThumb"
-            },
-            {
-              "type": "row",
-              "key": "midOnlyCurlThumb"
-            },
-            {
-              "type": "row",
-              "key": "baseOnlyCurlThumb"
-            },
-            {
-              "type": "row",
-              "key": "tipTwistThumb"
-            },
-            {
-              "type": "row",
-              "key": "thumbSplay"
-            },
-            {
-              "type": "row",
-              "key": "thumbSplay2"
-            },
-            {
-              "type": "row",
-              "key": "curlBiasThumb"
-            }
-          ],
-          "settings": [
-            "thumbCurl",
-            "tipOnlyCurlThumb",
-            "midOnlyCurlThumb",
-            "baseOnlyCurlThumb",
-            "tipTwistThumb",
-            "thumbSplay",
-            "thumbSplay2",
-            "curlBiasThumb"
-          ],
-          "subgroups": []
-        },
-        {
-          "key": "Index",
-          "collapsed": true,
-          "locked": false,
-          "items": [
-            {
-              "type": "row",
-              "key": "midOnlyCurlIndex"
-            },
-            {
-              "type": "row",
-              "key": "tipOnlyCurlIndex"
-            },
-            {
-              "type": "row",
-              "key": "baseOnlyCurlIndex"
-            },
-            {
-              "type": "row",
-              "key": "curlIndex"
-            },
-            {
-              "type": "row",
-              "key": "tipTwistIndex"
-            },
-            {
-              "type": "row",
-              "key": "splayIndex"
-            },
-            {
-              "type": "row",
-              "key": "curlBiasIndex"
-            },
-            {
-              "type": "row",
-              "key": "splayIndex2"
-            }
-          ],
-          "settings": [
-            "midOnlyCurlIndex",
-            "tipOnlyCurlIndex",
-            "baseOnlyCurlIndex",
-            "curlIndex",
-            "tipTwistIndex",
-            "splayIndex",
-            "curlBiasIndex",
-            "splayIndex2"
-          ],
-          "subgroups": []
-        },
-        {
-          "key": "Middle",
-          "collapsed": true,
-          "locked": false,
-          "items": [
-            {
-              "type": "row",
-              "key": "midOnlyCurlMiddle"
-            },
-            {
-              "type": "row",
-              "key": "tipOnlyCurlMiddle"
-            },
-            {
-              "type": "row",
-              "key": "baseOnlyCurlMiddle"
-            },
-            {
-              "type": "row",
-              "key": "curlMiddle"
-            },
-            {
-              "type": "row",
-              "key": "tipTwistMiddle"
-            },
-            {
-              "type": "row",
-              "key": "splayMiddle"
-            },
-            {
-              "type": "row",
-              "key": "curlBiasMiddle"
-            },
-            {
-              "type": "row",
-              "key": "splayMiddle2"
-            }
-          ],
-          "settings": [
-            "midOnlyCurlMiddle",
-            "tipOnlyCurlMiddle",
-            "baseOnlyCurlMiddle",
-            "curlMiddle",
-            "tipTwistMiddle",
-            "splayMiddle",
-            "curlBiasMiddle",
-            "splayMiddle2"
-          ],
-          "subgroups": []
-        },
-        {
-          "key": "Ring",
-          "collapsed": true,
-          "locked": false,
-          "items": [
-            {
-              "type": "row",
-              "key": "midOnlyCurlRing"
-            },
-            {
-              "type": "row",
-              "key": "tipOnlyCurlRing"
-            },
-            {
-              "type": "row",
-              "key": "baseOnlyCurlRing"
-            },
-            {
-              "type": "row",
-              "key": "curlRing"
-            },
-            {
-              "type": "row",
-              "key": "tipTwistRing"
-            },
-            {
-              "type": "row",
-              "key": "splayRing"
-            },
-            {
-              "type": "row",
-              "key": "curlBiasRing"
-            },
-            {
-              "type": "row",
-              "key": "splayRing2"
-            }
-          ],
-          "settings": [
-            "midOnlyCurlRing",
-            "tipOnlyCurlRing",
-            "baseOnlyCurlRing",
-            "curlRing",
-            "tipTwistRing",
-            "splayRing",
-            "curlBiasRing",
-            "splayRing2"
-          ],
-          "subgroups": []
-        },
-        {
-          "key": "Pinky",
-          "collapsed": true,
-          "locked": false,
-          "items": [
-            {
-              "type": "row",
-              "key": "midOnlyCurlPinky"
-            },
-            {
-              "type": "row",
-              "key": "tipOnlyCurlPinky"
-            },
-            {
-              "type": "row",
-              "key": "baseOnlyCurlPinky"
-            },
-            {
-              "type": "row",
-              "key": "curlPinky"
-            },
-            {
-              "type": "row",
-              "key": "tipTwistPinky"
-            },
-            {
-              "type": "row",
-              "key": "curlBiasPinky"
-            },
-            {
-              "type": "row",
-              "key": "splayPinky"
-            },
-            {
-              "type": "row",
-              "key": "splayPinky2"
-            }
-          ],
-          "settings": [
-            "midOnlyCurlPinky",
-            "tipOnlyCurlPinky",
-            "baseOnlyCurlPinky",
-            "curlPinky",
-            "tipTwistPinky",
-            "curlBiasPinky",
-            "splayPinky",
-            "splayPinky2"
-          ],
-          "subgroups": []
-        }
-      ]
-    },
-    {
-      "key": "Pose Preview",
-      "collapsed": true,
-      "locked": false,
-      "items": [],
-      "settings": [],
-      "subgroups": []
-    },
-    {
       "key": "Camera",
       "collapsed": true,
       "locked": false,
@@ -33594,131 +34883,11 @@
         "rimColor"
       ],
       "subgroups": []
-    },
-    {
-      "key": "Outline",
-      "collapsed": true,
-      "locked": false,
-      "items": [
-        {
-          "type": "row",
-          "key": "outlineMechanic"
-        },
-        {
-          "type": "row",
-          "key": "emissionColor"
-        },
-        {
-          "type": "row",
-          "key": "emissionIntensity"
-        },
-        {
-          "type": "row",
-          "key": "outlineEnabled"
-        },
-        {
-          "type": "row",
-          "key": "outlineColor"
-        },
-        {
-          "type": "row",
-          "key": "hullThickness"
-        },
-        {
-          "type": "row",
-          "key": "passThickness"
-        },
-        {
-          "type": "row",
-          "key": "passStrength"
-        },
-        {
-          "type": "row",
-          "key": "passGlow"
-        }
-      ],
-      "settings": [
-        "outlineMechanic",
-        "emissionColor",
-        "emissionIntensity",
-        "outlineEnabled",
-        "outlineColor",
-        "hullThickness",
-        "passThickness",
-        "passStrength",
-        "passGlow"
-      ],
-      "subgroups": []
-    },
-    {
-      "key": "Background",
-      "collapsed": true,
-      "locked": false,
-      "items": [
-        {
-          "type": "row",
-          "key": "bgColor"
-        }
-      ],
-      "settings": [
-        "bgColor"
-      ],
-      "subgroups": []
-    },
-    {
-      "key": "Debug",
-      "collapsed": true,
-      "locked": false,
-      "items": [
-        {
-          "type": "row",
-          "key": "multiClickWindowMs"
-        },
-        {
-          "type": "row",
-          "key": "pauseAnimations"
-        },
-        {
-          "type": "row",
-          "key": "showGridHelper"
-        },
-        {
-          "type": "row",
-          "key": "showWireframe"
-        },
-        {
-          "type": "row",
-          "key": "preventReorderFlash"
-        },
-        {
-          "type": "row",
-          "key": "logCursorPositionEnabled"
-        },
-        {
-          "type": "row",
-          "key": "cursorLogIntervalMs"
-        },
-        {
-          "type": "row",
-          "key": "clearMouseLogBtn"
-        }
-      ],
-      "settings": [
-        "multiClickWindowMs",
-        "pauseAnimations",
-        "showGridHelper",
-        "showWireframe",
-        "preventReorderFlash",
-        "logCursorPositionEnabled",
-        "cursorLogIntervalMs",
-        "clearMouseLogBtn"
-      ],
-      "subgroups": []
     }
   ],
   "textOverrides": {
     "New Group": "LOADING PREVIEW LIGHTING",
-    "New Group (2)": "CLICK FUNCTIONS",
+    "New Group (2)": "HANDS",
     "Whole-Hand Rotation & Thumb": "ROTATION",
     "New Group (3)": "RESPONSIVE PALM ROTATION",
     "New Group (4)": "RESPONSIVE WRIST CROPPING",
@@ -33754,6 +34923,7 @@
     "custom15Enabled": "ON/ OFF",
     "custom15Type": "Trigger Type",
     "custom15ClickCount": "Trigger Count",
-    "Custom Click Function 15": "RIGHT CLICK + HOLD"
+    "Custom Click Function 15": "RIGHT CLICK + HOLD",
+    "New Group (8)": "OFFSET"
   }
 }
