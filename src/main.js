@@ -584,9 +584,29 @@ const DEV_GROUPS = [
       // tracking block for what these 4 controls actually gate, and
       // buildArmRotationWidgets() for the curve-graph/range-slider UI.
       { key: 'armRotationEnabled', label: 'Responsive Arm Rotation (Master On/Off)', type: 'checkbox', def: true, perDevice: true },
+      // Default Arm Rotation -- direct request 2026-09-28 ("provide...
+      // default arm rotation"). Fills the same role Default Arm Length
+      // (`hideWrist`)/Default Wrist Splay (`wristSplayDefault`) already
+      // play for their own features: the RESPONSIVENESS used when Arm
+      // Rotation Distance Curve is off, instead of always hardcoding full
+      // (100%) responsiveness -- see the `responsiveness` variable in
+      // animate()'s own cursor-tracking block. 0-100%, same convention as
+      // Default Arm Length's own crop-percent slider.
+      { key: 'armRotationDefault', label: 'Default Arm Rotation (Responsiveness %, Curve Off)', type: 'slider', min: 0, max: 100, step: 1, def: 100 },
       { key: 'armRotationCurveEnabled', label: 'Arm Rotation Distance Curve On/Off', type: 'checkbox', def: false, onChange: () => updateArmRotationGateVisibility() },
       { key: 'armRotationCurve', label: 'Arm Rotation Distance Curve (Distance -> Rotation Amount)', type: 'text', def: '[{"x":0,"y":1},{"x":1,"y":1}]', onChange: () => parseCursorTrackingConfig() },
       { key: 'armRotationRange', label: 'Min / Max Arm Rotation (Deg)', type: 'text', def: '{"min":0,"max":180}', onChange: () => parseCursorTrackingConfig() },
+      // Arm Rotation Damping -- direct request 2026-09-28, same class of
+      // fix as this same round's Wrist Cropping/Wrist Splay damping
+      // (`armLengthDamping`/`wristSplayDamping`): the bounded rotation
+      // angle this feature computes has always been a fresh, undamped
+      // value every frame -- on Landscape specifically (`trackingDamping:
+      // 1.0` in this project's own real saved settings, per this file's
+      // CLAUDE.md gotcha), the wrapper's own slerp toward `desired`
+      // provides ZERO smoothing, so a sudden cursor relocation could snap
+      // this value instantly. Same `min:0.02, max:1, step:0.01, def:1`
+      // convention as every other damping slider in this file.
+      { key: 'armRotationDamping', label: 'Arm Rotation Damping (x)', type: 'slider', min: 0.02, max: 1, step: 0.01, def: 1 },
       // REDEFINED 2026-09-14 (see computeRadialRollDeg()'s own comment
       // for the full account and the user's own exact reference points):
       // rotates each hand, around the wrist-crop-plane axis, by the
@@ -5858,8 +5878,18 @@ function buildArmLengthCurveWidget(row) {
   const W = 240, H = 120
   const svgNS = 'http://www.w3.org/2000/svg'
   const svg = document.createElementNS(svgNS, 'svg')
-  svg.setAttribute('width', W); svg.setAttribute('height', H)
-  Object.assign(svg.style, { background: 'rgba(255,255,255,0.06)', borderRadius: '4px', marginTop: '6px', touchAction: 'none', cursor: 'crosshair' })
+  svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H)
+  svg.setAttribute('preserveAspectRatio', 'none')
+  // Stretches to the dev panel's actual width instead of a fixed 240px --
+  // direct request 2026-09-28 ("make all curve editors size with the
+  // width of the dev panel"), the same 3-part fix (viewBox +
+  // preserveAspectRatio, CSS width:100%, and fromPx reading the SVG's
+  // real rendered size, below) documented for TEMPLATE_DEV_PANEL.html's
+  // own `buildCurveEditorRow()`. W/H stay as internal viewBox-coordinate
+  // constants -- still used by toPx, which sets attributes in viewBox
+  // units, unaffected by render size -- only the rendered SIZE changes,
+  // never the coordinate math.
+  Object.assign(svg.style, { width: '100%', height: '120px', display: 'block', background: 'rgba(255,255,255,0.06)', borderRadius: '4px', marginTop: '6px', touchAction: 'none', cursor: 'crosshair' })
   const axisX = document.createElementNS(svgNS, 'line')
   axisX.setAttribute('x1', 0); axisX.setAttribute('y1', H - 1); axisX.setAttribute('x2', W); axisX.setAttribute('y2', H - 1)
   axisX.setAttribute('stroke', 'rgba(255,255,255,0.25)')
@@ -5891,7 +5921,10 @@ function buildArmLengthCurveWidget(row) {
   } catch (e) { /* keep default */ }
 
   const toPx = (p) => ({ x: p.x * W, y: (1 - p.y) * H })
-  const fromPx = (px, py) => ({ x: THREE.MathUtils.clamp(px / W, 0, 1), y: THREE.MathUtils.clamp(1 - py / H, 0, 1) })
+  const fromPx = (px, py) => {
+    const rect = svg.getBoundingClientRect()
+    return { x: THREE.MathUtils.clamp(px / (rect.width || W), 0, 1), y: THREE.MathUtils.clamp(1 - py / (rect.height || H), 0, 1) }
+  }
   let circles = []
 
   function commitPoints() {
@@ -6098,8 +6131,18 @@ function buildWristSplayCurveWidget(row) {
   const W = 240, H = 120
   const svgNS = 'http://www.w3.org/2000/svg'
   const svg = document.createElementNS(svgNS, 'svg')
-  svg.setAttribute('width', W); svg.setAttribute('height', H)
-  Object.assign(svg.style, { background: 'rgba(255,255,255,0.06)', borderRadius: '4px', marginTop: '6px', touchAction: 'none', cursor: 'crosshair' })
+  svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H)
+  svg.setAttribute('preserveAspectRatio', 'none')
+  // Stretches to the dev panel's actual width instead of a fixed 240px --
+  // direct request 2026-09-28 ("make all curve editors size with the
+  // width of the dev panel"), the same 3-part fix (viewBox +
+  // preserveAspectRatio, CSS width:100%, and fromPx reading the SVG's
+  // real rendered size, below) documented for TEMPLATE_DEV_PANEL.html's
+  // own `buildCurveEditorRow()`. W/H stay as internal viewBox-coordinate
+  // constants -- still used by toPx, which sets attributes in viewBox
+  // units, unaffected by render size -- only the rendered SIZE changes,
+  // never the coordinate math.
+  Object.assign(svg.style, { width: '100%', height: '120px', display: 'block', background: 'rgba(255,255,255,0.06)', borderRadius: '4px', marginTop: '6px', touchAction: 'none', cursor: 'crosshair' })
   const axisX = document.createElementNS(svgNS, 'line')
   axisX.setAttribute('x1', 0); axisX.setAttribute('y1', H - 1); axisX.setAttribute('x2', W); axisX.setAttribute('y2', H - 1)
   axisX.setAttribute('stroke', 'rgba(255,255,255,0.25)')
@@ -6120,7 +6163,10 @@ function buildWristSplayCurveWidget(row) {
   } catch (e) { /* keep default */ }
 
   const toPx = (p) => ({ x: p.x * W, y: (1 - p.y) * H })
-  const fromPx = (px, py) => ({ x: THREE.MathUtils.clamp(px / W, 0, 1), y: THREE.MathUtils.clamp(1 - py / H, 0, 1) })
+  const fromPx = (px, py) => {
+    const rect = svg.getBoundingClientRect()
+    return { x: THREE.MathUtils.clamp(px / (rect.width || W), 0, 1), y: THREE.MathUtils.clamp(1 - py / (rect.height || H), 0, 1) }
+  }
   let circles = []
 
   function commitPoints() {
@@ -8728,8 +8774,18 @@ function buildGenericCurveWidget(row, opts) {
   const W = 240, H = 120
   const svgNS = 'http://www.w3.org/2000/svg'
   const svg = document.createElementNS(svgNS, 'svg')
-  svg.setAttribute('width', W); svg.setAttribute('height', H)
-  Object.assign(svg.style, { background: 'rgba(255,255,255,0.06)', borderRadius: '4px', marginTop: '6px', touchAction: 'none', cursor: 'crosshair' })
+  svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H)
+  svg.setAttribute('preserveAspectRatio', 'none')
+  // Stretches to the dev panel's actual width instead of a fixed 240px --
+  // direct request 2026-09-28 ("make all curve editors size with the
+  // width of the dev panel"), the same 3-part fix (viewBox +
+  // preserveAspectRatio, CSS width:100%, and fromPx reading the SVG's
+  // real rendered size, below) documented for TEMPLATE_DEV_PANEL.html's
+  // own `buildCurveEditorRow()`. W/H stay as internal viewBox-coordinate
+  // constants -- still used by toPx, which sets attributes in viewBox
+  // units, unaffected by render size -- only the rendered SIZE changes,
+  // never the coordinate math.
+  Object.assign(svg.style, { width: '100%', height: '120px', display: 'block', background: 'rgba(255,255,255,0.06)', borderRadius: '4px', marginTop: '6px', touchAction: 'none', cursor: 'crosshair' })
   const axisX = document.createElementNS(svgNS, 'line')
   axisX.setAttribute('x1', 0); axisX.setAttribute('y1', H - 1); axisX.setAttribute('x2', W); axisX.setAttribute('y2', H - 1)
   axisX.setAttribute('stroke', 'rgba(255,255,255,0.25)')
@@ -8764,7 +8820,10 @@ function buildGenericCurveWidget(row, opts) {
   } catch (e) { /* keep default */ }
 
   const toPx = (p) => ({ x: p.x * W, y: (1 - p.y) * H })
-  const fromPx = (px, py) => ({ x: THREE.MathUtils.clamp(px / W, 0, 1), y: THREE.MathUtils.clamp(1 - py / H, 0, 1) })
+  const fromPx = (px, py) => {
+    const rect = svg.getBoundingClientRect()
+    return { x: THREE.MathUtils.clamp(px / (rect.width || W), 0, 1), y: THREE.MathUtils.clamp(1 - py / (rect.height || H), 0, 1) }
+  }
   let circles = []
 
   function commitPoints() {
@@ -12084,8 +12143,14 @@ function animate(dt, now) {
           let desired = hand.currentBaseQuat
           if (cfg.armRotationEnabled) {
             const rawAngleDeg = THREE.MathUtils.radToDeg(hand.currentBaseQuat.angleTo(lookAtDesired))
+            let targetBoundedAngleDeg = 0
             if (rawAngleDeg > 1e-6) {
-              let responsiveness = 1
+              // Default Arm Rotation -- direct request 2026-09-28: with the
+              // distance curve off, responsiveness used to be hardcoded to
+              // 1 (always full rotation); now uses the tunable default
+              // (0-100%), same role Default Arm Length/Default Wrist Splay
+              // already play for their own features.
+              let responsiveness = (cfg.armRotationDefault ?? 100) / 100
               if (cfg.armRotationCurveEnabled) {
                 const distToCursor = hand.wrapper.position.distanceTo(cursorTarget)
                 const minD = Math.min(...hands.map(h => h.wrapper.position.distanceTo(cursorTarget)))
@@ -12098,8 +12163,32 @@ function animate(dt, now) {
               }
               const armMinAbs = Math.min(Math.abs(armRotationRangeParsed.min), Math.abs(armRotationRangeParsed.max))
               const armMaxAbs = Math.max(Math.abs(armRotationRangeParsed.min), Math.abs(armRotationRangeParsed.max))
-              const boundedAngleDeg = THREE.MathUtils.clamp(rawAngleDeg * responsiveness, armMinAbs, armMaxAbs)
-              desired = new THREE.Quaternion().copy(hand.currentBaseQuat).slerp(lookAtDesired, boundedAngleDeg / rawAngleDeg)
+              targetBoundedAngleDeg = THREE.MathUtils.clamp(rawAngleDeg * responsiveness, armMinAbs, armMaxAbs)
+            }
+            // Arm Rotation Damping -- direct request 2026-09-28, same class
+            // of fix as this same round's Wrist Cropping/Wrist Splay
+            // damping: `targetBoundedAngleDeg` used to be applied straight,
+            // every frame, with no smoothing at all -- on Landscape
+            // specifically (`trackingDamping: 1.0` in this project's own
+            // real saved settings), the wrapper's own slerp below provides
+            // ZERO smoothing, so a sudden cursor relocation could snap this
+            // value instantly. `hand.currentArmRotationDeg` lerps toward
+            // the target each frame instead; kept UNCONDITIONAL (runs even
+            // when `rawAngleDeg <= 1e-6`, decaying toward 0) so it never
+            // holds a stale value that would mismatch `rawAngleDeg` the
+            // next frame the hand needs a real rotation again.
+            const armRotationDampingAmt = THREE.MathUtils.clamp(cfg.armRotationDamping ?? 1, 0.001, 1)
+            hand.currentArmRotationDeg = hand.currentArmRotationDeg !== undefined
+              ? hand.currentArmRotationDeg + (targetBoundedAngleDeg - hand.currentArmRotationDeg) * armRotationDampingAmt
+              : targetBoundedAngleDeg
+            if (rawAngleDeg > 1e-6) {
+              // Clamped to [0,1] -- `rawAngleDeg` itself is NOT damped, only
+              // the bounded/responsive angle is, so a sudden DROP in
+              // rawAngleDeg (hand now closer to already facing the cursor)
+              // could otherwise let a still-catching-up damped numerator
+              // exceed its own denominator and overshoot the slerp.
+              const frac = THREE.MathUtils.clamp(hand.currentArmRotationDeg / rawAngleDeg, 0, 1)
+              desired = new THREE.Quaternion().copy(hand.currentBaseQuat).slerp(lookAtDesired, frac)
             }
           }
           let baseDeg = cfg.palmFacesCursor ? computeRadialRollDeg(hand.wrapper.position, cursorTarget) : 0

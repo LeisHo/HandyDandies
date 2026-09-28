@@ -13326,6 +13326,75 @@ the fix's actual mechanism works as intended.
 
 `main.js` cache-buster bumped `?v=238` -> `?v=239`.
 
+2026-09-28  -  (18th round -- Arm Rotation damping/default controls +
+curve-editor width-responsiveness fix, direct request: "in responsive
+arm rotation group, provide arm rotation damping, default arm rotation,
+Min Max, and curve editor. Also make all curve editors size with the
+width of the dev panel - here are instructions from the dev panel guy")
+
+**Arm Rotation controls.** Min/Max (`armRotationRange`) and the curve
+editor (`armRotationCurve`) already existed and were already wired
+(`buildArmRotationWidgets()`, called since earlier this session) -- the
+2 genuinely new controls were:
+- **Default Arm Rotation (Responsiveness %, Curve Off)** (`armRotationDefault`,
+  0-100%, def 100) -- with Arm Rotation Distance Curve off, responsiveness
+  used to be hardcoded to 1 (always full rotation); now uses this tunable
+  default, matching the role Default Arm Length/Default Wrist Splay
+  already play for their own features. `def: 100` preserves the exact
+  prior behavior for anyone who never touches it.
+- **Arm Rotation Damping (x)** (`armRotationDamping`, same `min:0.02,
+  max:1, step:0.01, def:1` convention as `trackingDamping`/
+  `armLengthDamping`/`wristSplayDamping`) -- the bounded rotation angle
+  this feature computes used to be applied fresh every frame with zero
+  smoothing of its own; on Landscape specifically (`trackingDamping: 1.0`
+  in this project's own real saved settings) the wrapper's own slerp
+  provides ZERO smoothing either, so this was a real gap in the same
+  class as the 17th round's Wrist Cropping/Wrist Splay damping fix. New
+  `hand.currentArmRotationDeg` lerps toward the target every frame,
+  UNCONDITIONALLY (even when `rawAngleDeg <= 1e-6`, decaying toward 0) so
+  it never holds a stale value that mismatches `rawAngleDeg` next frame;
+  the resulting slerp fraction is clamped to [0,1] as a safety net against
+  the (undamped) `rawAngleDeg` dropping out from under a still-catching-up
+  damped numerator.
+
+**Curve-editor width-responsiveness fix**, applied to all 3 of this
+project's own curve-editor implementations (`buildGenericCurveWidget`,
+`buildArmLengthCurveWidget`, `buildWristSplayCurveWidget` -- confirmed
+separate copies per this file's own standing gotcha, not one shared
+function) -- previously a hardcoded 240x120px SVG that never stretched
+to the panel's actual width. Adapted the 3-part fix supplied by the
+user (originally written for `.claude/TEMPLATE_DEV_PANEL.html`'s own
+`buildCurveEditorRow()`, a DIFFERENT implementation this project's own
+curve widgets were never built from -- ported the PATTERN, not the
+literal code): (1) removed the hardcoded `width`/`height` SVG attributes,
+added a `viewBox="0 0 240 120"` (none existed before) + `preserveAspectRatio="none"`
+so the coordinate space stretches instead of letterboxing; (2) added
+`width:100%; height:120px; display:block` to the SVG's own inline style
+object; (3) `fromPx()` now reads `svg.getBoundingClientRect()` for the
+real rendered size instead of dividing by the fixed `W`/`H` constants
+(kept as internal viewBox-coordinate constants only, still used by
+`toPx()`). Confirmed all 7 `fromPx()` call sites across the 3 functions
+already pass CSS-pixel offsets relative to `svg.getBoundingClientRect()`,
+matching the user's own note that no call sites need to change.
+
+Verified: `node --check src/main.js` passes. Live-tested against the
+local static server -- loaded cleanly on the FIRST navigation attempt,
+255 hands, no unexpected console errors (an earlier stale tab's
+leftover `ERR_CONNECTION_REFUSED` entries from a previous server
+instance were ruled out by checking this load's own real network
+requests directly, which showed a clean 200 OK for every real asset).
+Confirmed both new controls present with the correct default via
+`window.__debug.cfg`. Confirmed the width fix is REAL, not just
+present in markup: a live curve widget's SVG rendered at 228.8px (not
+the old fixed 240px), and a real synthetic click dispatched at 75%
+across that ACTUAL rendered width added a new curve point at
+`x:0.7465` -- matching the real-width-based calculation (171.6/228.8 =
+0.75) rather than the old fixed-240px one (which would have given
+`x:0.715`), directly proving `fromPx()` is reading the live rendered
+size correctly, not a stale constant.
+
+`main.js` cache-buster bumped `?v=239` -> `?v=240`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a
