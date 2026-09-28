@@ -1210,7 +1210,18 @@ const DEV_GROUPS = [
       // initDevPanel() -- see that function's own comment for the full
       // mechanism.
       { key: 'armLengthRange', label: 'Min / Max Arm Length (Crop %)', type: 'text', def: '{"min":0,"max":85}', onChange: () => parseArmLengthConfig() },
-      { key: 'armLengthCurve', label: 'Length Scaling Curve (Distance -> Crop)', type: 'text', def: '[{"x":0,"y":1},{"x":0.148333740234375,"y":0.6613540649414062},{"x":0.4100001017252604,"y":0.31468760172526045},{"x":0.5316670735677084,"y":0.2680206298828125},{"x":0.748333740234375,"y":0.19468739827473958},{"x":1,"y":0}]', onChange: () => parseArmLengthConfig() }
+      { key: 'armLengthCurve', label: 'Length Scaling Curve (Distance -> Crop)', type: 'text', def: '[{"x":0,"y":1},{"x":0.148333740234375,"y":0.6613540649414062},{"x":0.4100001017252604,"y":0.31468760172526045},{"x":0.5316670735677084,"y":0.2680206298828125},{"x":0.748333740234375,"y":0.19468739827473958},{"x":1,"y":0}]', onChange: () => parseArmLengthConfig() },
+      // Direct report 2026-09-28 ("there is no damping for wrist cropping.
+      // So when i click in one corner, then click the opposite corner, it
+      // looks like they alll jumped up"): Reactive Arm Length has always
+      // recomputed `hand.currentArmLengthT` fresh from live cursor
+      // distance every frame with ZERO smoothing -- a sudden cursor
+      // relocation flips which hands are "nearest"/"farthest" in the
+      // field's own min/max distance range, producing a real one-frame
+      // jump. Damped exactly like `trackingDamping` (same min/max/step/
+      // def convention) -- 1 = instant (the old, undamped behavior), lower
+      // = smoother. Applied in animate()'s own per-hand loop, not here.
+      { key: 'armLengthDamping', label: 'Wrist Cropping Damping (x)', type: 'slider', min: 0.02, max: 1, step: 0.01, def: 1 }
     ]
   },
   {
@@ -1266,7 +1277,16 @@ const DEV_GROUPS = [
       { key: 'wristSplayDefault', label: 'Default Wrist Splay (Deg, Reactive Off)', type: 'slider', min: -180, max: 180, step: 1, def: 7 },
       { key: 'wristSplayReactiveEnabled', label: 'Reactive Wrist Splay (By Cursor Distance)', type: 'checkbox', def: true },
       { key: 'wristSplayRange', label: 'Min / Max Wrist Splay (Deg)', type: 'text', def: '{"min":5,"max":-71}', onChange: () => parseWristSplayConfig() },
-      { key: 'wristSplayCurve', label: 'Splay Scaling Curve (Distance -> Splay)', type: 'text', def: '[{"x":0,"y":1},{"x":0.31833343505859374,"y":0.6961458841959636},{"x":1,"y":0.042812347412109375}]', onChange: () => parseWristSplayConfig() }
+      { key: 'wristSplayCurve', label: 'Splay Scaling Curve (Distance -> Splay)', type: 'text', def: '[{"x":0,"y":1},{"x":0.31833343505859374,"y":0.6961458841959636},{"x":1,"y":0.042812347412109375}]', onChange: () => parseWristSplayConfig() },
+      // Same gap, same fix, as Wrist Cropping's own new damping slider
+      // above (direct report 2026-09-28) -- Responsive Wrist Splay's own
+      // `computeResponsiveWristSplayDeg()` recomputes fresh from live
+      // cursor distance every frame (or every Nth frame, per the stagger
+      // above) with ZERO smoothing between refreshes. Damped exactly like
+      // `trackingDamping`/`armLengthDamping` -- 1 = instant (the old,
+      // undamped behavior), lower = smoother. Applied in animate()'s own
+      // per-hand idle-repose block, not here.
+      { key: 'wristSplayDamping', label: 'Wrist Splay Damping (x)', type: 'slider', min: 0.02, max: 1, step: 0.01, def: 1 }
     ]
   },
   // Tween -- direct user request, modeled on HANDO's own "Tween / Export"
@@ -12387,12 +12407,29 @@ function updateRenderOrder() {
     if (hand.outlineMesh) hand.outlineMesh.renderOrder = hand.effectiveRenderOrder - 0.001
     if (hand.emissionMesh) hand.emissionMesh.renderOrder = hand.effectiveRenderOrder - 0.001
     // Arm Length (Hide Wrist) -- reuses this same live cursor-distance
-    // value (`live`, unsmoothed -- Reactive mode intentionally tracks the
-    // cursor instantly, no reason to inherit Reordering Flash's own
-    // smoothing, a different feature solving a different problem) rather
-    // than recomputing it. See computeArmLengthT()/applyHandArmLength()'s
-    // own comments for why this now runs every frame, per hand.
-    hand.currentArmLengthT = computeArmLengthT(hand, live, minLiveDist, liveDistRange)
+    // value (`live`) rather than recomputing it. See computeArmLengthT()/
+    // applyHandArmLength()'s own comments for why this now runs every
+    // frame, per hand.
+    // CORRECTED 2026-09-28, direct report ("there is no damping for wrist
+    // cropping. So when i click in one corner, then click the opposite
+    // corner, it looks like they alll jumped up"): the comment this
+    // replaces claimed "no reason to" smooth this value -- wrong, per the
+    // user's own diagnosis. A sudden cursor relocation flips which hands
+    // are nearest/farthest in the field's own live min/max distance range
+    // (`minLiveDist`/`liveDistRange`, recomputed fresh every frame just
+    // above), so the RAW target can jump hard for many hands in the same
+    // frame even though nothing about that specific hand changed. Damped
+    // via `cfg.armLengthDamping` (same convention as `trackingDamping`) --
+    // lerped from the PREVIOUS frame's own `hand.currentArmLengthT`
+    // instead of snapping straight to the new target; `!== undefined`
+    // mirrors applyHandArmLength()'s own existing "no prior value yet"
+    // fallback, so a hand's very first frame still applies its target
+    // instantly rather than lerping from nothing.
+    const targetArmLengthT = computeArmLengthT(hand, live, minLiveDist, liveDistRange)
+    const armLengthDampingAmt = THREE.MathUtils.clamp(cfg.armLengthDamping ?? 1, 0.001, 1)
+    hand.currentArmLengthT = hand.currentArmLengthT !== undefined
+      ? hand.currentArmLengthT + (targetArmLengthT - hand.currentArmLengthT) * armLengthDampingAmt
+      : targetArmLengthT
     if (hand.skinnedMesh) applyHandArmLength(hand, hand.currentArmLengthT)
     // Click-Hold Pose takes over BOTH finger curls and wrist pose for
     // this hand whenever either trigger is globally active OR this hand
@@ -12511,8 +12548,27 @@ function updateRenderOrder() {
       const isThisHandsStaggerTurn = (idleReposeFrameCounter % staggerCount) === (i % staggerCount)
       const needsIdleRepose = !overridden && ((cfg.wristSplayResponsiveEnabled && isThisHandsStaggerTurn) || hand._wasOverriddenLastFrame || !hand.everReposed)
       if (needsIdleRepose) {
+        const wasEverReposedBeforeThisFrame = hand.everReposed
         hand.everReposed = true
-        const extraSplay = computeResponsiveWristSplayDeg(live, minLiveDist, liveDistRange)
+        const targetSplay = computeResponsiveWristSplayDeg(live, minLiveDist, liveDistRange)
+        // Damping -- direct report 2026-09-28 ("there is no damping for
+        // wrist cropping"), the same class of bug applies here: this value
+        // has always recomputed fresh from live cursor distance (every
+        // frame, or every Nth frame per the stagger above) with ZERO
+        // smoothing between refreshes, so a sudden cursor relocation
+        // produces a real jump. Lerped from `hand.currentSplayDeg` (the
+        // per-hand "current, actually-applied" splay value every other
+        // mechanism in this file already reads/writes) toward the new
+        // target via `cfg.wristSplayDamping` -- composes correctly with
+        // the settle-window blend directly below, which now blends toward
+        // an already-smoothed target instead of a raw one. `hand.everReposed`
+        // starts false, so a hand's very first frame still applies its
+        // target instantly rather than lerping from the field's un-posed
+        // default.
+        const wristSplayDampingAmt = THREE.MathUtils.clamp(cfg.wristSplayDamping ?? 1, 0.001, 1)
+        const extraSplay = wasEverReposedBeforeThisFrame
+          ? hand.currentSplayDeg + (targetSplay - hand.currentSplayDeg) * wristSplayDampingAmt
+          : targetSplay
         // CORRECTED 2026-09-28 (6th round of this same jump investigation --
         // the real root cause, found by direct live instrumentation of
         // `hand.wrapper.quaternion` AND the `rHand` skeleton bone across a

@@ -1874,3 +1874,46 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   `addEventListener` on BOTH old variable names and collapse to a single
   listener** -- don't assume "they used to be 2 elements with the same
   handler" is still safe once they're 1.
+
+- **CORRECTED 2026-09-28, 7th round of the same jump investigation --
+  the real cause, per the user's own direct diagnosis, was neither the
+  wrapper-level cursor-tracking rotation (rounds 1-5) nor the skeleton-
+  level idle-repose handoff (round 6): it's Wrist Cropping (Reactive Arm
+  Length) and Wrist Splay, neither of which had ANY damping at all.**
+  Direct report: "i figured out the jump thing. there is no damping for
+  wrist cropping. So when i click in one corner, then click the opposite
+  corner, it looks like they alll jumped up." Confirmed by code read:
+  `computeArmLengthT()`/`computeResponsiveWristSplayDeg()` have ALWAYS
+  recomputed purely from live cursor distance every frame with zero
+  smoothing between refreshes -- a deliberate prior design choice (the
+  old comment literally said "Reactive mode intentionally tracks the
+  cursor instantly, no reason to inherit Reordering Flash's own
+  smoothing"), now proven wrong. Moving the cursor between 2 distant
+  points (e.g. opposite corners of the field) flips which hands are
+  nearest/farthest in the field's own live min/max distance range, so
+  the RAW target for both values can jump hard for many hands in the
+  SAME frame -- a completely different mechanism from anything the
+  6 prior rounds tested (trigger interruption, retransition targets,
+  offset/rotation accumulators, wrapper rotation), which is exactly why
+  none of them found it. Fixed with 2 new damping sliders
+  (`armLengthDamping`/`wristSplayDamping`, same `min:0.02,max:1,
+  step:0.01,def:1` convention as `trackingDamping`) -- each value now
+  lerps from its own previous-frame running value toward the freshly-
+  computed target instead of snapping to it. **If a future report
+  describes hands jumping when the CURSOR moves a large distance (not
+  specifically at a click-function trigger/interrupt boundary), this is
+  the mechanism to check first -- distinct from every other jump fix
+  this file already documents, which were all about trigger/retransition
+  boundaries, not ordinary cursor movement.** Live-verified: the app
+  loaded cleanly on the FIRST navigation attempt this round (unlike most
+  recent rounds, which needed retries against this project's own
+  documented network-truncation flakiness), both new controls confirmed
+  present with the correct default via `window.__debug.cfg`, and the
+  lerp formula itself confirmed to smooth rather than snap via an
+  isolated, rAF-independent logic check (a simulated 0.1->0.9 jump at
+  damping 0.1 approached gradually across 5 steps, never snapping).
+  NOT yet confirmed against the specific multi-round "jump" report by
+  the user's own real device -- this fixes a real, independently-
+  confirmed gap, but whether it is the COMPLETE explanation for every
+  prior report in this file's long investigation history is still
+  pending that confirmation.

@@ -13269,6 +13269,63 @@ visibly reordered.
 `?v=22` -> `?v=23`; `devPanel.js`'s own import cache-buster bumped
 `?v=49` -> `?v=50`.
 
+2026-09-28  -  (17th round -- Wrist Cropping/Wrist Splay damping,
+direct report: "i figured out the jump thing. there is no damping for
+wrist cropping. So when i click in one corner, then click the opposite
+corner, it looks like they alll jumped up")
+
+Root cause, confirmed by direct code read: `computeArmLengthT()`
+(Reactive Arm Length / Wrist Cropping) and `computeResponsiveWristSplayDeg()`
+(Responsive Wrist Splay) have always recomputed purely from live cursor
+distance every frame with ZERO smoothing -- a deliberate prior design
+choice ("Reactive mode intentionally tracks the cursor instantly, no
+reason to inherit Reordering Flash's own smoothing"), now confirmed
+wrong by the user's own diagnosis: a sudden cursor relocation (e.g.
+opposite corner of the field) flips which hands are nearest/farthest in
+the field's own live min/max distance range, producing a real one-frame
+jump for many hands simultaneously, unrelated to the 6-round trigger-
+interruption jump investigation from the prior several rounds.
+
+Added 2 new damping sliders, same `min:0.02, max:1, step:0.01, def:1`
+convention as the existing `trackingDamping` control (1 = instant/old
+undamped behavior, lower = smoother):
+- **Wrist Cropping Damping (x)** (`armLengthDamping`, Field Layout's Arm
+  Length group) -- `hand.currentArmLengthT` now lerps from its own
+  previous-frame value toward the freshly-computed target each frame
+  instead of snapping to it. Runs unconditionally every frame (this
+  value already had no idle/stagger gating), so the lerp itself needed
+  no extra gating either -- only a `!== undefined` check for a hand's
+  very first frame (mirrors `applyHandArmLength()`'s own existing
+  fallback for the same case).
+- **Wrist Splay Damping (x)** (`wristSplayDamping`, Responsive Wrist
+  Splay group) -- same lerp, applied inside the existing idle-repose
+  block (gated by the pre-existing stagger/`_wasOverriddenLastFrame`/
+  `!everReposed` conditions, unchanged). Lerps from `hand.currentSplayDeg`
+  (the per-hand "current, actually-applied" splay value every other
+  mechanism in this file already reads/writes) toward the target, using
+  `hand.everReposed`'s own state captured BEFORE this frame sets it true
+  -- so a hand's genuine first frame still applies its target instantly.
+  Composes correctly with the existing settle-window blend (the 6th-
+  round trigger-interruption fix) directly below it: that mechanism now
+  blends toward an already-smoothed target instead of a raw one, rather
+  than the 2 mechanisms fighting each other.
+
+Verified: `node --check src/main.js` passes. Live-tested against the
+local static server -- loaded cleanly on the FIRST navigation attempt
+this round (no retry needed against this project's own documented
+network-truncation flakiness), 255 hands, zero unexpected console
+errors (only the pre-existing, unrelated `api/save-settings` 404s).
+Confirmed both new controls exist in the dev panel with the correct
+`def: 1` starting value via `window.__debug.cfg`. The lerp formula
+itself was verified with a pure logic-level check (not dependent on
+this sandbox's own documented rAF-flakiness gotcha, which makes a real
+animate()-frame-driven test unreliable): a simulated 0.1->0.9 target
+jump at damping 0.1 approached gradually (0.18, 0.252, 0.3168, 0.3751,
+0.4276 across 5 steps) rather than snapping in one frame, confirming
+the fix's actual mechanism works as intended.
+
+`main.js` cache-buster bumped `?v=238` -> `?v=239`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

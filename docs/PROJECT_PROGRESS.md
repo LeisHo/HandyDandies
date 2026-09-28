@@ -18,6 +18,25 @@ work seamlessly from there.
 
 ## Currently working on
 
+**COMPLETE 2026-09-28 (17th round) -- likely resolves the multi-round
+"hands jump" investigation: Wrist Cropping/Wrist Splay damping, direct
+report ("i figured out the jump thing. there is no damping for wrist
+cropping. So when i click in one corner, then click the opposite
+corner, it looks like they alll jumped up").** Confirmed via code read:
+both `computeArmLengthT()` and `computeResponsiveWristSplayDeg()` have
+always recomputed purely from live cursor distance every frame with
+zero smoothing -- a sudden cursor relocation flips which hands are
+nearest/farthest in the field, jumping many hands' crop/splay values in
+one frame, unrelated to the prior 6-round trigger-interruption jump
+investigation. Added 2 new damping sliders (`armLengthDamping`,
+`wristSplayDamping`, same convention as the existing `trackingDamping`)
+and lerp the per-hand running value toward the target each frame
+instead of snapping. Live-verified: loaded cleanly on the first
+navigation attempt, both controls confirmed present with the correct
+default, and the lerp formula itself confirmed smooth-not-instant via
+an isolated logic check. See CHANGELOG.txt's 17th-round entry for full
+detail.
+
 **COMPLETE 2026-09-28 (16th round) -- dev-panel template sync against
 `.claude/TEMPLATE_DEV_PANEL.html`'s own ~36 2026-09-27/28-dated changes,
 direct request ("check the dev panel template. Many cahnges have been
