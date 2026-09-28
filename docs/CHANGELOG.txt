@@ -13596,6 +13596,48 @@ evidence for whichever future round picks this investigation back up.
 No code changes this round.
 
 ================================================================================
+2026-09-28 (22nd round) -- HANDS-JUMP ROOT CAUSE FOUND AND FIXED (10th round
+of the jump investigation)
+================================================================================
+
+Root cause: endClickHoldPose() processed every hand whose chp phase wasn't
+'idle' -- including hands still in 'stopping' or 'retransition' from a
+PREVIOUS release of the same hold. With holdConfirmMs = 0 (real saved
+settings), every plain click (e.g. clicking elsewhere to fire custom7)
+also runs startClickHoldPose('custom8') + endClickHoldPose('custom8').
+Hands whose Start Time Curve delay hadn't elapsed never re-committed in
+between, so the release re-entered them into 'stopping' with
+stoppingBaseElapsedMs = now - chp.forwardStartTime measured against the
+OLD hold's start (seconds ago). Tween progress clamped to 1 and every such
+hand snapped to the sequence's END pose in one frame. Hands mid-
+'retransition' were pulled back into 'stopping' the same way. That's why
+turning Tween Stop off made the jump go away, and why it hit many hands
+at once.
+
+Measured live on production (window.__debug, setTimeout-driven ticks via
+updateRenderOrder(), rHand bone quaternion on all 156 hands every tick):
+custom8 hold 3000ms -> release -> 1500ms -> quick press+release.
+  Before fix: re-release tick max 34.41 deg, avg 13.92 deg, 88 hands >8 deg;
+    every surrounding tick max 1.62-5.93 deg.
+  After fix (main.js?v=242): re-release tick max 1.33 deg, avg 0.50 deg,
+    0 hands >8 deg; the next 3s max 2.98 deg, hands progressed normally
+    into 'retransition' (86 of 156 by the end).
+
+Fix (src/main.js, endClickHoldPose): only 'forward'/'looping' hands (the
+ones this hold actually owns) are released; anything else just has its
+un-committed pendingClaimAt cancelled and continues untouched.
+
+Also fixed (latent, not implicated here -- custom8 has Start Distance
+Curve off): 'stopping' now applies chp.frozenTweenFractionCap to its
+tween progress, matching 'forward's own cappedT. Without it a capped
+hand would jump from the capped pose to the uncapped one on release.
+
+Not yet confirmed on the user's real device. The 9th round's multi-hand
+spike at ~471ms post-release predates this fix and wasn't re-checked
+separately; the post-fix run above showed no tick over 3.74 deg in that
+window.
+
+================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a
 correction, add a new entry noting the correction rather than editing the

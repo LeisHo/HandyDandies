@@ -2054,3 +2054,24 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   after 9 rounds without a conclusive repro stands: a real screen
   recording from the user's own device, isolating the exact repro with
   nothing else happening, remains the highest-value missing diagnostic.
+
+- **ROOT CAUSE FOUND 2026-09-28 (10th round of the jump investigation) --
+  supersedes the "UNRESOLVED" entry directly above.** `endClickHoldPose()`
+  used to re-release every non-idle hand, including hands still in
+  'stopping'/'retransition' from a PREVIOUS release. Because
+  `holdConfirmMs` is 0, every plain click re-arms and immediately
+  re-releases every Click+Hold function. Hands whose Start Time Curve
+  delay hadn't elapsed never re-committed in between, so they were
+  re-entered into 'stopping' against the OLD hold's `forwardStartTime`.
+  Progress clamped to 1 and they snapped to the sequence's end pose.
+  Measured on production: 88 of 156 hands >8 deg in one tick (max 34.41
+  deg); after the fix, max 1.33 deg and 0 hands. Fixed by releasing only
+  'forward'/'looping' hands. **General lesson: any "on release" handler
+  must only act on state THIS press actually owns.** A press that never
+  committed on a hand leaves that hand's state from an earlier press in
+  place, and re-running release logic on it replays stale timing. The
+  single-hand tests in rounds 7-9 missed it because they never re-pressed
+  within a hand's own start delay. Test harness that found it: the
+  `setTimeout` + `updateRenderOrder()` tick loop from the "CRITICAL
+  METHODOLOGY GOTCHA" entries, logging the per-tick max/avg/count-over-8-
+  deg rHand delta across ALL hands, not a sample.
