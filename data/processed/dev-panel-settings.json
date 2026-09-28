@@ -25,9 +25,9 @@
       "trackingDamping": 0.13,
       "targetDepthFactor": 0.5,
       "showTargetMarker": false,
-      "palmFacesCursor": false,
+      "palmFacesCursor": true,
       "palmFaceRotationOffset": 13,
-      "palmFacesCursorDistanceCurveEnabled": false,
+      "palmFacesCursorDistanceCurveEnabled": true,
       "palmFacesCursorDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0.5}]",
       "palmFacesCursorDistanceRange": "{\"min\":0,\"max\":180}",
       "loadingPreviewEnabled": true,
@@ -7062,7 +7062,7 @@
       "showTargetMarker": false,
       "palmFacesCursor": true,
       "palmFaceRotationOffset": 0,
-      "palmFacesCursorDistanceCurveEnabled": false,
+      "palmFacesCursorDistanceCurveEnabled": true,
       "palmFacesCursorDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0.5}]",
       "palmFacesCursorDistanceRange": "{\"min\":0,\"max\":180}",
       "loadingPreviewEnabled": true,
@@ -14097,7 +14097,7 @@
       "showTargetMarker": false,
       "palmFacesCursor": true,
       "palmFaceRotationOffset": 0,
-      "palmFacesCursorDistanceCurveEnabled": false,
+      "palmFacesCursorDistanceCurveEnabled": true,
       "palmFacesCursorDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0.5}]",
       "palmFacesCursorDistanceRange": "{\"min\":0,\"max\":180}",
       "loadingPreviewEnabled": true,
@@ -22658,24 +22658,12 @@
     },
     {
       "key": "Cursor Tracking",
-      "collapsed": true,
+      "collapsed": false,
       "locked": false,
       "items": [
         {
           "type": "row",
           "key": "trackingEnabled"
-        },
-        {
-          "type": "row",
-          "key": "palmFacesCursorDistanceCurveEnabled"
-        },
-        {
-          "type": "row",
-          "key": "palmFacesCursorDistanceCurve"
-        },
-        {
-          "type": "row",
-          "key": "palmFacesCursorDistanceRange"
         },
         {
           "type": "row",
@@ -22703,11 +22691,26 @@
               {
                 "type": "row",
                 "key": "palmFaceRotationOffset"
+              },
+              {
+                "type": "row",
+                "key": "palmFacesCursorDistanceCurveEnabled"
+              },
+              {
+                "type": "row",
+                "key": "palmFacesCursorDistanceRange"
+              },
+              {
+                "type": "row",
+                "key": "palmFacesCursorDistanceCurve"
               }
             ],
             "settings": [
               "palmFacesCursor",
-              "palmFaceRotationOffset"
+              "palmFaceRotationOffset",
+              "palmFacesCursorDistanceCurveEnabled",
+              "palmFacesCursorDistanceRange",
+              "palmFacesCursorDistanceCurve"
             ],
             "subgroups": []
           }
@@ -22796,9 +22799,6 @@
       ],
       "settings": [
         "trackingEnabled",
-        "palmFacesCursorDistanceCurveEnabled",
-        "palmFacesCursorDistanceCurve",
-        "palmFacesCursorDistanceRange",
         "trackingDamping",
         "targetDepthFactor",
         "showTargetMarker"
@@ -22816,11 +22816,26 @@
             {
               "type": "row",
               "key": "palmFaceRotationOffset"
+            },
+            {
+              "type": "row",
+              "key": "palmFacesCursorDistanceCurveEnabled"
+            },
+            {
+              "type": "row",
+              "key": "palmFacesCursorDistanceRange"
+            },
+            {
+              "type": "row",
+              "key": "palmFacesCursorDistanceCurve"
             }
           ],
           "settings": [
             "palmFacesCursor",
-            "palmFaceRotationOffset"
+            "palmFaceRotationOffset",
+            "palmFacesCursorDistanceCurveEnabled",
+            "palmFacesCursorDistanceRange",
+            "palmFacesCursorDistanceCurve"
           ],
           "subgroups": []
         },
