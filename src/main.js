@@ -1668,6 +1668,7 @@ buildArmLengthWidgets()
 parseWristSplayConfig()
 buildWristSplayWidgets()
 parseCursorTrackingConfig()
+buildCursorTrackingWidgets()
 updateCursorTrackingGateVisibility()
 // Click-Hold-Pose's own setup call (parseClickHoldConfig/
 // buildClickHoldPoseWidgets per trigger) is NOT made here like the other
@@ -5291,6 +5292,72 @@ function commitTextControl(input, value) {
   input.value = value
   input.dispatchEvent(new Event('input', { bubbles: true }))
 }
+// Click-to-type for a double-handle range-bar widget's own Min/Max readout
+// -- direct request ("for all double toggle sliders, allow me to click the
+// text below that says min max, such that i can click the number and
+// change it," later clarified: "keep those 2 UIs but ALSO allow me to
+// click and type to set the min max"). Mirrors devPanel.js's own existing
+// click-to-edit min/max editor (its 'text' control branch's
+// `isMinMaxRange()` handling) -- same CSS classes/interaction (Enter
+// commits, Escape cancels, blur commits) -- but wired onto the READOUT
+// text these 3 widgets (buildGenericRangeBarWidget/buildArmLengthRangeWidget/
+// buildWristSplayRangeWidget) show instead of the hidden underlying
+// `.dp-text-input`, since all 3 deliberately hide that input and replace
+// it with their own draggable bar UI -- devPanel.js's own built-in click
+// handler on the hidden input can never fire once it's display:none.
+// `getCurrent`/`applyCurrent` let each caller supply its own `current`
+// object and its own commit path (JSON.stringify + commitTextControl for
+// the generic widget; the same for the 2 bespoke ones) without this
+// helper needing to know anything about which widget it's attached to.
+function attachRangeBarClickToEdit(readout, getCurrent, applyCurrent) {
+  readout.style.cursor = 'pointer'
+  readout.addEventListener('click', (e) => {
+    e.stopPropagation()
+    const current = getCurrent()
+    const minInput = elLocal('input', {}, { type: 'number', value: current.min, step: 1 })
+    const maxInput = elLocal('input', {}, { type: 'number', value: current.max, step: 1 })
+    minInput.className = 'dp-minmax-input'
+    maxInput.className = 'dp-minmax-input'
+    const container = elLocal('div', { display: 'flex', gap: '8px', alignItems: 'center', justifyContent: 'center' })
+    container.className = 'dp-minmax-editor'
+    const minLabel = elLocal('label', { whiteSpace: 'nowrap' }, { text: 'Min:' })
+    minLabel.className = 'dp-minmax-label'
+    const maxLabel = elLocal('label', { whiteSpace: 'nowrap' }, { text: 'Max:' })
+    maxLabel.className = 'dp-minmax-label'
+    container.append(minLabel, minInput, maxLabel, maxInput)
+    const originalDisplay = readout.style.display
+    readout.style.display = 'none'
+    readout.parentNode.insertBefore(container, readout)
+    minInput.focus()
+    minInput.select()
+    let finalized = false
+    const finalize = () => {
+      if (finalized) return
+      finalized = true
+      const newMin = parseFloat(minInput.value)
+      const newMax = parseFloat(maxInput.value)
+      applyCurrent({
+        min: Number.isFinite(newMin) ? newMin : current.min,
+        max: Number.isFinite(newMax) ? newMax : current.max
+      })
+      readout.style.display = originalDisplay
+      container.remove()
+    }
+    const cancel = () => {
+      finalized = true
+      readout.style.display = originalDisplay
+      container.remove()
+    }
+    const onKeyDown = (ev) => {
+      if (ev.key === 'Enter') finalize()
+      if (ev.key === 'Escape') cancel()
+    }
+    minInput.addEventListener('blur', () => setTimeout(finalize, 0))
+    maxInput.addEventListener('blur', () => setTimeout(finalize, 0))
+    minInput.addEventListener('keydown', onKeyDown)
+    maxInput.addEventListener('keydown', onKeyDown)
+  })
+}
 // devPanel.js's own Reset/Copy-restore path writes straight to the hidden
 // text input's `.value` property without dispatching an 'input' event
 // (see its own `displayValue()`) -- there's no event for either widget to
@@ -5322,6 +5389,22 @@ function buildWristSplayWidgets() {
   const curveRow = document.querySelector('.dp-row[data-key="wristSplayCurve"]')
   if (rangeRow) buildWristSplayRangeWidget(rangeRow)
   if (curveRow) buildWristSplayCurveWidget(curveRow)
+}
+// Palm Rotation Distance Curve's own curve-graph + double-handle range-bar
+// widgets, replacing the plain JSON-text rows -- direct request ("the palm
+// rotation distance curve, give me the curve graph ui instead of text. the
+// min max should also be the slider with toggles"). Reuses the SAME
+// generic widget builders every other curve+range pair in this file
+// already uses (Start Time Curve, Speed Curve, Start Distance Curve, etc.)
+// -- called once at startup, same timing as buildArmLengthWidgets()/
+// buildWristSplayWidgets() above (this control has no per-hand/per-trigger
+// variant, so it's a single, one-time call, not something re-run per
+// custom function).
+function buildCursorTrackingWidgets() {
+  const curveRow = document.querySelector('.dp-row[data-key="palmFacesCursorDistanceCurve"]')
+  const rangeRow = document.querySelector('.dp-row[data-key="palmFacesCursorDistanceRange"]')
+  if (curveRow) buildGenericCurveWidget(curveRow, { caption: 'X: Distance From Cursor (Nearest→Farthest Hand)  ·  Y: Palm Rotation Responsiveness (0=None, 1=Full)', defaultPoints: [{ x: 0, y: 1 }, { x: 1, y: 1 }] })
+  if (rangeRow) buildGenericRangeBarWidget(rangeRow, { trackMin: -180, trackMax: 180, unit: '°', defaultValue: { min: 0, max: 180 } })
 }
 
 function buildArmLengthRangeWidget(row) {
@@ -5362,6 +5445,11 @@ function buildArmLengthRangeWidget(row) {
     readout.textContent = `Min: ${current.min}%  Max: ${current.max}%`
   }
   redraw()
+  attachRangeBarClickToEdit(readout, () => current, (newVal) => {
+    current = newVal
+    redraw()
+    commitTextControl(input, JSON.stringify(current))
+  })
   armLengthWidgetResyncs.push(() => {
     if (input.value === lastSeenValue) return
     lastSeenValue = input.value
@@ -5590,6 +5678,11 @@ function buildWristSplayRangeWidget(row) {
     readout.textContent = `Min (Farthest Hand): ${current.min}°  Max (Nearest Hand): ${current.max}°`
   }
   redraw()
+  attachRangeBarClickToEdit(readout, () => current, (newVal) => {
+    current = newVal
+    redraw()
+    commitTextControl(input, JSON.stringify(current))
+  })
   armLengthWidgetResyncs.push(() => {
     if (input.value === lastSeenValue) return
     lastSeenValue = input.value
@@ -8198,6 +8291,11 @@ function buildGenericRangeBarWidget(row, opts) {
     readout.textContent = `Min: ${current.min}${unit}  Max: ${current.max}${unit}`
   }
   redraw()
+  attachRangeBarClickToEdit(readout, () => current, (newVal) => {
+    current = newVal
+    redraw()
+    commitTextControl(input, JSON.stringify(current))
+  })
   armLengthWidgetResyncs.push(() => {
     if (input.value === lastSeenValue) return
     lastSeenValue = input.value
