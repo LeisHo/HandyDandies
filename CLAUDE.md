@@ -1831,3 +1831,46 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   source array over relying on a manual drag to persist -- a drag-nest
   only reliably persists for a group/row that already existed in a
   PRIOR saved snapshot.**
+
+- **`devPanel.js`'s own `applyOrder()`/`placeGroup()` had a real,
+  general-purpose version of the exact bug the 2 gotchas directly above
+  worked around at the main.js level -- fixed at the ENGINE level
+  2026-09-28, ported from `.claude/TEMPLATE_DEV_PANEL.html`'s own
+  2026-09-27 fix.** Root cause: `appendChild` on an element already in
+  the DOM moves it to the END of its parent, not into place. Every row/
+  group `placeGroup()` processes gets progressively appended-to-end IN
+  SAVED ORDER -- correctly reconstructing order AMONG THEM -- but a row
+  or group added to DEV_GROUPS AFTER an order was last saved has no
+  entry in that saved order at all, so it's never touched; since
+  everything ELSE then moves past it one at a time, new content ended up
+  FIRST instead of last. Fixed with `appendUntouchedChildren()`: after
+  placing every saved item, explicitly append every current child NOT
+  referenced by the saved order, in its existing relative order.
+  `placeGroup()` now returns the element it placed (not just mutates the
+  DOM) so the caller can mark exactly THAT element "touched" -- immune
+  to the duplicate-key-group ambiguity a re-lookup by `data-key` alone
+  would hit. **This is now fixed generically for every group/row in the
+  panel, not just the 2 specific rows `enforceCustomClickFunctionsAnchorOrder()`
+  patches** -- that function is still correct and harmless to keep, but a
+  brand-new instance of this bug class (a newly-added control landing
+  before old ones after a restore) should no longer need its own
+  anchor-order workaround; if one is still observed after this fix, the
+  bug is somewhere else. Not independently live-tested against a
+  deliberately-constructed stale-order scenario -- confidence rests on
+  code review of the ported fix plus a normal reload correctly restoring
+  this project's own real, already-complex saved group nesting with
+  nothing visibly reordered.
+- **Aliasing 2 previously-separate button variables to the SAME DOM
+  element (done 2026-09-28's header reorg, folding the old bottom
+  `.dp-actions` Copy/Save/Reset row into the header) silently creates a
+  double-fire bug if both variables still have their OWN
+  `addEventListener` call somewhere in the file.** Caught before
+  shipping, not live: `saveBtn`/`saveHeaderBtn` both referencing the
+  same header Save button meant 2 separate listeners were both calling
+  `saveSettings(); clearDevPanelUndoStack()` on every single click --
+  harmless for THIS specific pair (both idempotent), but not
+  automatically safe in general. **Before aliasing any 2 button
+  variables to the same element in a future refactor, grep for every
+  `addEventListener` on BOTH old variable names and collapse to a single
+  listener** -- don't assume "they used to be 2 elements with the same
+  handler" is still safe once they're 1.

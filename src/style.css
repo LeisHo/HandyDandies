@@ -157,7 +157,11 @@ html, body {
 .dp-panel.dp-collapsed .dp-resize { display: none; }
 .dp-header {
   padding: 8px 10px; font-weight: 600; font-size: var(--dp-title-font-size, 13px);
-  background: #25253a; border-radius: 8px 8px 0 0;
+  /* --dp-header-bg-color (Accent Color #2, 2026-09-28) decouples this
+     from --dp-bg-color (the panel BODY background) -- previously this
+     was the only hardcoded color left in the panel with no dev-panel
+     control at all. */
+  background: var(--dp-header-bg-color, #25253a); border-radius: 8px 8px 0 0;
   cursor: grab; touch-action: none;
   display: flex; justify-content: space-between; align-items: center; gap: 8px;
   flex: 0 0 auto;
@@ -170,7 +174,11 @@ html, body {
 .dp-panel.dp-caps-title-text .dp-title { text-transform: uppercase; }
 .dp-icon-btn {
   flex: 0 0 auto; width: 18px; height: 18px; line-height: 16px; text-align: center;
-  background: #3a3a4a; color: var(--dp-text-color, #e8e8f0); border: none; border-radius: 3px;
+  /* --dp-button-bg-color (Button Color, 2026-09-28) decouples every
+     button's background from the accent/panel colors -- applied here and
+     to .dp-actions/.dp-list-picker-actions/.dp-action-button below,
+     the 4 places a button background was previously hardcoded. */
+  background: var(--dp-button-bg-color, #3a3a4a); color: var(--dp-text-color, #e8e8f0); border: none; border-radius: 3px;
   cursor: pointer; font-size: 12px; padding: 0;
 }
 .dp-header-buttons { display: flex; gap: 4px; }
@@ -204,10 +212,10 @@ html, body {
 .dp-tabs .dp-tab.dp-tab-active { background: var(--dp-accent-color, #7d8cff); color: #14142a; font-weight: 600; }
 .dp-actions { display: flex; gap: 6px; padding: 2px 2px 8px; }
 .dp-actions button {
-  flex: 1 1 auto; background: #3a3a4a; border: none; border-radius: 4px;
+  flex: 1 1 auto; background: var(--dp-button-bg-color, #3a3a4a); border: none; border-radius: 4px;
   padding: 5px 4px; cursor: pointer;
 }
-.dp-actions button:active { background: #4a4a5e; }
+.dp-actions button:active { background: color-mix(in srgb, var(--dp-button-bg-color, #3a3a4a) 80%, white 20%); }
 .dp-group { border-top: 1px solid #33333f; }
 .dp-group:first-child { border-top: none; }
 .dp-group.dp-dragging, .dp-row.dp-dragging { opacity: .4; }
@@ -270,8 +278,12 @@ html, body {
    matching the row-level `.dp-dynamic-device-checkbox-2nd` rule below
    that already worked correctly by relying on incidental row-content
    width rather than a real auto-margin push). */
-.dp-group-undock-btn { flex: 0 0 auto; cursor: pointer; opacity: 0.6; padding: 0 2px; }
+/* --dp-accent-color-3 (Accent Color #3, 2026-09-28) decouples checkbox
+   accent-color + the undock arrow's own color from the main Accent
+   Color -- applied here and to the blanket checkbox rule below. */
+.dp-group-undock-btn { flex: 0 0 auto; cursor: pointer; opacity: 0.6; padding: 0 2px; color: var(--dp-accent-color-3, #7d8cff); }
 .dp-group-undock-btn:hover { opacity: 1; }
+.dp-panel input[type=checkbox] { accent-color: var(--dp-accent-color-3, #7d8cff); }
 .dp-group-header > .dp-group-cascade-checkbox { margin-left: auto; }
 /* Locked is the visual INVERSE of unlocked (direct request, 2026-09-17):
    unlocked stays low-opacity until hovered (rule above); a LOCKED icon
@@ -395,6 +407,13 @@ html, body {
    but it no longer changes anything visually -- label color now falls
    through to the normal `.dp-row label` rule above (var(--dp-text-color)). */
 .dp-row input[type=range] { flex: 1 1 auto; min-width: 0; accent-color: var(--dp-slider-color, #7d8cff); }
+/* Editable min/max bound labels flanking a plain slider (2026-09-28,
+   §12h extension) -- small/dim so they read as metadata, not the
+   control's own current value (that's still .dp-num, to the right). */
+.dp-slider-bound {
+  flex: 0 0 auto; font-size: 9px; opacity: 0.6; cursor: pointer; min-width: 16px; text-align: center;
+}
+.dp-slider-bound input.dp-minmax-input { width: 46px; font-size: 9px; padding: 1px 2px; }
 .dp-num {
   flex: 0 0 auto; width: 52px; text-align: right; font-size: var(--dp-value-font-size, var(--dp-body-font-size, 11px));
   background: #0f0f18; color: var(--dp-value-text-color, var(--dp-text-color, #e8e8f0)); border: 1px solid #3a3a4a; border-radius: 4px;
@@ -405,12 +424,6 @@ html, body {
   flex: 1 1 auto; min-width: 0; text-align: left; font-size: var(--dp-body-font-size, 11px);
   background: #0f0f18; color: var(--dp-text-color, #e8e8f0); border: 1px solid #3a3a4a; border-radius: 4px;
   padding: 3px 6px; cursor: pointer;
-}
-.dp-minmax-editor {
-  flex: 1 1 auto; min-width: 0; align-items: center; padding: 3px 0;
-}
-.dp-minmax-label {
-  font-size: var(--dp-body-font-size, 11px); color: var(--dp-text-color, #c9c9d8); font-weight: normal;
 }
 .dp-minmax-input {
   min-width: 60px; max-width: 80px; font-size: var(--dp-body-font-size, 11px);
@@ -441,10 +454,10 @@ html, body {
 .dp-lp-export-checkbox { flex: 0 0 auto; width: 13px; height: 13px; margin: 0; }
 .dp-list-picker-actions { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
 .dp-list-picker-actions button {
-  flex: 1 1 auto; background: #3a3a4a; color: var(--dp-text-color, #e8e8f0); border: none; border-radius: 4px;
+  flex: 1 1 auto; background: var(--dp-button-bg-color, #3a3a4a); color: var(--dp-text-color, #e8e8f0); border: none; border-radius: 4px;
   padding: 5px 4px; font-size: var(--dp-body-font-size, 11px); cursor: pointer;
 }
-.dp-list-picker-actions button:active { background: #4a4a5e; }
+.dp-list-picker-actions button:active { background: color-mix(in srgb, var(--dp-button-bg-color, #3a3a4a) 80%, white 20%); }
 /* A list-picker's OWN groups (§ direct user request: organize saved items
    into groups, drag to reorder) -- deliberately smaller/lighter than the
    outer settings-panel's own .dp-group so the 2 nesting levels (panel
@@ -480,10 +493,10 @@ html, body {
 .dp-lp-row-handle:active, .dp-lp-group-handle:active { cursor: grabbing; }
 .dp-lp-group.dp-dragging, .dp-list-picker-row.dp-dragging { opacity: .4; }
 .dp-action-button {
-  flex: 1 1 auto; background: #3a3a4a; color: var(--dp-text-color, #e8e8f0); border: none; border-radius: 4px;
+  flex: 1 1 auto; background: var(--dp-button-bg-color, #3a3a4a); color: var(--dp-text-color, #e8e8f0); border: none; border-radius: 4px;
   padding: 5px 4px; font-size: var(--dp-body-font-size, 11px); cursor: pointer;
 }
-.dp-action-button:active { background: #4a4a5e; }
+.dp-action-button:active { background: color-mix(in srgb, var(--dp-button-bg-color, #3a3a4a) 80%, white 20%); }
 .dp-multi-select-list { display: flex; flex-direction: column; gap: 4px; margin-top: 2px; }
 .dp-multi-select-row { display: flex; gap: 4px; }
 .dp-multi-select-row select {

@@ -1076,7 +1076,55 @@ export function buildRow(ctrl) {
     numInput.addEventListener('change', () => apply(numInput.value))
     numInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') numInput.blur() })
 
+    // Editable min/max bound labels at each end of the track, ported
+    // from TEMPLATE_DEV_PANEL.html's own 2026-09-28 addition ("provide
+    // the min max numbers at their respective ends, and allow me to
+    // click to edit these 2 values") -- same click-to-type interaction
+    // as numInput above, but targets the slider's own min/max instead of
+    // its current value. Session-only, same as this control's existing
+    // §12h auto-expand -- neither the ORIGINAL min/max nor a typed
+    // override is captured by Copy/Save (only the VALUE is, via
+    // commit()), so this always resets to ctrl.min/ctrl.max on reload,
+    // matching the pre-existing auto-expand's own behavior exactly.
+    function buildBoundLabel(kind) {
+      const boundEl = el('span', 'dp-slider-bound', { textContent: kind === 'min' ? ctrl.min : ctrl.max })
+      boundEl.addEventListener('click', (e) => {
+        e.stopPropagation()
+        if (boundEl.querySelector('input')) return
+        const originalText = boundEl.textContent
+        const boundInput = el('input', 'dp-minmax-input', { type: 'number', value: kind === 'min' ? slider.min : slider.max, step: ctrl.step || 'any' })
+        boundEl.textContent = ''
+        boundEl.appendChild(boundInput)
+        boundInput.focus()
+        boundInput.select()
+        let settled = false
+        const finalize = () => {
+          if (settled) return
+          settled = true
+          let val = parseFloat(boundInput.value)
+          if (isNaN(val)) val = parseFloat(kind === 'min' ? slider.min : slider.max)
+          if (kind === 'min') slider.min = String(val); else slider.max = String(val)
+          const curVal = parseFloat(slider.value)
+          const newMin = parseFloat(slider.min), newMax = parseFloat(slider.max)
+          if (curVal < newMin) apply(slider.min)
+          else if (curVal > newMax) apply(slider.max)
+          boundEl.textContent = val
+        }
+        const cancel = () => { settled = true; boundEl.textContent = originalText }
+        boundInput.addEventListener('blur', () => setTimeout(finalize, 0))
+        boundInput.addEventListener('keydown', (ev) => {
+          if (ev.key === 'Enter') finalize()
+          if (ev.key === 'Escape') cancel()
+        })
+      })
+      return boundEl
+    }
+    const minLabel = buildBoundLabel('min')
+    const maxLabel = buildBoundLabel('max')
+
+    row.appendChild(minLabel)
     row.appendChild(slider)
+    row.appendChild(maxLabel)
     row.appendChild(numInput)
     numEls[ctrl.key] = { slider, numInput }
   }
@@ -1934,9 +1982,23 @@ function setupReorder(container, itemClass, handleClass, getTargets, onDrop, isL
   })
 }
 
+// Locked by default at first build -- ported from TEMPLATE_DEV_PANEL.html's
+// own 2026-09-28 addition ("by default set the lock mode on all the panel
+// specific and debug settings groups"), so the 2 mandatory built-in groups
+// (§12i/§12i-1) can't be accidentally drag-reordered on a fresh page load.
+// Only a DEFAULT, not a permanent override: applyOrder()'s own placeGroup()
+// (below) always overwrites this from a real saved `locked` value the
+// moment one exists, so a user who explicitly unlocks either group stays
+// unlocked across a reload -- "still unlockable per-group" per the request.
+const DEV_PANEL_GROUPS_LOCKED_BY_DEFAULT = new Set(['Dev Panel', 'Debug'])
 function buildDevPanel(groupsEl) {
   devGroups.forEach((group) => {
     const g = createGroupElement(group.title)
+    if (DEV_PANEL_GROUPS_LOCKED_BY_DEFAULT.has(group.title)) {
+      g.classList.add('dp-group-locked')
+      const lockIcon = g.querySelector(':scope > .dp-group-header > .dp-group-lock-icon')
+      if (lockIcon) syncGroupLockIcon(g, lockIcon)
+    }
     const gb = g.querySelector('.dp-group-body')
     group.controls.forEach((ctrl) => gb.appendChild(buildRow(ctrl)))
     groupsEl.appendChild(g)
@@ -2021,7 +2083,7 @@ function organizeDevPanelSubgroups(groupsEl) {
     return g
   }
   makeSub('MECHANICS', ['dp_scrollStrength'], body)
-  makeSub('PANEL UI', ['dp_bgColor', 'dp_accentColor', 'dp_sliderColor', 'dp_opacity'], body)
+  makeSub('PANEL UI', ['dp_bgColor', 'dp_accentColor', 'dp_accentColor2', 'dp_accentColor3', 'dp_buttonColor', 'dp_sliderColor', 'dp_opacity'], body)
   const text = makeSub('TEXT', ['dp_fontFamily'], body)
   const textBody = text.querySelector(':scope > .dp-group-body')
   makeSub('Dev Panel Title', ['dp_boldTitle', 'dp_capsTitleText', 'dp_titleFontSize', 'dp_titleLetterSpacing', 'dp_titleLineHeight', 'dp_buttonTextBorder', 'dp_titleColor'], textBody)
@@ -2296,6 +2358,28 @@ function applyOrder(groupsEl, order) {
   // saved group as its own distinct, correctly-populated group, matching
   // this file's own duplicate-key data exactly instead of collapsing it.
   const usedGroupEls = new Set()
+  // Bug fixed 2026-09-28, ported from TEMPLATE_DEV_PANEL.html's own
+  // 2026-09-27 fix (found live in the sibling "3JS ENGINE" project):
+  // `appendChild` on an element ALREADY in the DOM moves it to the END
+  // of its parent -- it does not insert in place. Every row/subgroup
+  // this function processes gets progressively moved to the end, in
+  // saved order, which correctly reconstructs that order AMONG THEM. But
+  // a row or subgroup added to the real DEV_GROUPS content AFTER this
+  // order was last saved (a newly-shipped control) has no entry in
+  // `savedGroup.items`/`settings`/`subgroups` at all, so this function
+  // never touches it -- it simply stays wherever it already was. Since
+  // new content is appended at the END by the normal buildDevPanel()
+  // pass, and everything ELSE then gets moved past it one at a time, the
+  // untouched new content ends up FIRST instead of last. Fixed by
+  // explicitly appending every current child NOT referenced by the saved
+  // order, in its existing relative order, once the saved items are done
+  // being placed -- new content now always lands at the end, regardless
+  // of when it was added.
+  function appendUntouchedChildren(container, touched) {
+    Array.from(container.children).forEach((child) => {
+      if (!touched.has(child)) container.appendChild(child)
+    })
+  }
   // Places one saved group (and, recursively, every one of its own saved
   // subgroups at any depth) into parentContainer -- either groupsEl
   // itself (top-level) or another group's own .dp-group-body (nested).
@@ -2323,6 +2407,11 @@ function applyOrder(groupsEl, order) {
     }
     usedGroupEls.add(groupEl)
     parentContainer.appendChild(groupEl)
+    // Returned to the caller (below) so it can mark exactly the element
+    // THIS call placed as "touched" -- immune to the duplicate-key
+    // ambiguity a re-lookup by data-key alone would hit (a plain
+    // querySelector always finds the FIRST matching element in the DOM,
+    // which may not be the one this specific call just placed).
     groupEl.classList.toggle('collapsed', !!savedGroup.collapsed)
     groupEl.classList.toggle('dp-group-locked', !!savedGroup.locked)
     const lockIcon = groupEl.querySelector(':scope > .dp-group-header > .dp-group-lock-icon')
@@ -2338,16 +2427,25 @@ function applyOrder(groupsEl, order) {
       ...(savedGroup.settings || []).map((key) => ({ type: 'row', key })),
       ...(savedGroup.subgroups || []).map((group) => ({ type: 'group', group })),
     ]
+    const touched = new Set()
     items.forEach((item) => {
       if (item.type === 'row') {
         const rowEl = rowsByKey[item.key]
-        if (rowEl) groupBody.appendChild(rowEl)
+        if (rowEl) { groupBody.appendChild(rowEl); touched.add(rowEl) }
       } else {
-        placeGroup(item.group, groupBody)
+        const subGroupEl = placeGroup(item.group, groupBody)
+        if (subGroupEl) touched.add(subGroupEl)
       }
     })
+    appendUntouchedChildren(groupBody, touched)
+    return groupEl
   }
-  order.forEach((g) => placeGroup(g, groupsEl))
+  const touchedTopLevel = new Set()
+  order.forEach((g) => {
+    const groupEl = placeGroup(g, groupsEl)
+    if (groupEl) touchedTopLevel.add(groupEl)
+  })
+  appendUntouchedChildren(groupsEl, touchedTopLevel)
 }
 
 // Loads a saved { desktop:{...}, mobile:{...}, landscape:{...} } values blob
@@ -2717,6 +2815,15 @@ export function initDevPanel(groups, opts = {}) {
       { key: 'dp_titleColor', label: 'Dev Panel Title Text Color', type: 'color', def: '#ffffff', onChange: setVar('--dp-title-color') },
       { key: 'dp_textColor', label: 'Dev Panel Non-Title Text Color', type: 'color', def: '#ffffff', onChange: setVar('--dp-text-color') },
       { key: 'dp_accentColor', label: 'Dev Panel Accent Color', type: 'color', def: '#005f8f', onChange: setVar('--dp-accent-color') },
+      // Accent Color #2/#3 + Button Color -- ported from
+      // TEMPLATE_DEV_PANEL.html's own 2026-09-28 addition, decoupling 3
+      // more spots that used to derive from (or hardcode independently
+      // of) Dev Panel Accent Color/Background Color -- see their own
+      // setVar() targets' comments in style.css for exactly what each
+      // one now controls.
+      { key: 'dp_accentColor2', label: 'Dev Panel Accent Color #2 (Header/Title Bar)', type: 'color', def: '#25253a', onChange: setVar('--dp-header-bg-color') },
+      { key: 'dp_accentColor3', label: 'Dev Panel Accent Color #3 (Checkboxes/Undock Arrow)', type: 'color', def: '#7d8cff', onChange: setVar('--dp-accent-color-3') },
+      { key: 'dp_buttonColor', label: 'Dev Panel Button Color', type: 'color', def: '#3a3a4a', onChange: setVar('--dp-button-bg-color') },
       { key: 'dp_sliderColor', label: 'Dev Panel Slider Color', type: 'color', def: '#ffffff', onChange: setVar('--dp-slider-color') },
       { key: 'dp_groupLabelBgColor', label: 'Group Label Background Color', type: 'color', def: '#005f8f', onChange: setVar('--dp-group-label-bg-color') },
       {
@@ -2819,21 +2926,31 @@ export function initDevPanel(groups, opts = {}) {
   // forward-reference-safety reasoning as those.
   const deleteGroupBtn = el('button', 'dp-icon-btn', { type: 'button', textContent: '🗑', title: 'Delete Group/Setting (click, then click a group or setting to delete it)' })
   const undoBtn = el('button', 'dp-icon-btn', { type: 'button', textContent: '↶', title: 'Undo (Ctrl+Z) -- undoes any dev panel change back to the last Save' })
+  // Redo -- ported from TEMPLATE_DEV_PANEL.html's own 2026-09-28 addition,
+  // a mirror of Undo (see devRedoStack/redoDevPanelChange() below).
+  const redoBtn = el('button', 'dp-icon-btn', { type: 'button', textContent: '↷', title: 'Redo (Ctrl+Shift+Z / Ctrl+Y) -- redoes the last undone change' })
   // Header Save button -- ported from TEMPLATE_DEV_PANEL.html's own
   // 2026-09-19 addition (itself ported from Clicko, "add a Sync (save)
   // button on the dev panel top label as well. Both buttns will exist").
-  // `.dp-tabs`/`.dp-actions` (the bottom Copy/Save/Reset row) live INSIDE
-  // `.dp-body`, the scrollable container -- unlike `.dp-header` itself,
-  // which is a separate, always-visible flex sibling of `.dp-panel` (see
-  // that element's own construction above) and never needed the
-  // template's own `position:sticky` fix. Scrolled down into a long
-  // group list, the actual Save button was unreachable without scrolling
-  // back up -- this button fixes exactly that, calling the SAME
-  // saveSettings() closure the bottom Save button already does (wired
-  // below, once that function is in scope), not a separate save path.
+  // `.dp-header` is a separate, always-visible flex sibling of `.dp-panel`
+  // (see that element's own construction above), unlike the scrollable
+  // `.dp-body` a long group list can scroll the bottom row out of reach
+  // of -- this button (and, since 2026-09-28, Copy/Reset alongside it,
+  // see below) fixes exactly that, calling the SAME saveSettings()/
+  // copySettings()/resetSettings() closures the OLD bottom `.dp-actions`
+  // row used, not a separate path. Ported from TEMPLATE_DEV_PANEL.html's
+  // own 2026-09-28 header reorg ("fold Copy/Reset into the header
+  // alongside Redo, remove the separate bottom button row") -- these
+  // ARE `copyBtn`/`resetBtn` themselves (assigned further down, once
+  // those are constructed), not separate elements, so every existing
+  // event listener/flash-message reference to `copyBtn`/`resetBtn`
+  // keeps working unchanged; only WHERE the buttons live in the DOM
+  // changes.
+  const copyHeaderBtn = el('button', 'dp-icon-btn', { type: 'button', textContent: '📋', title: 'Copy Settings' })
   const saveHeaderBtn = el('button', 'dp-icon-btn', { type: 'button', textContent: '💾', title: 'Save' })
+  const resetHeaderBtn = el('button', 'dp-icon-btn', { type: 'button', textContent: '↺', title: 'Reset' })
   const collapseBtn = el('button', 'dp-icon-btn', { type: 'button', textContent: '–', title: 'Collapse' })
-  headerButtons.append(textEditBtn, addGroupBtn, collapseAllBtn, deleteGroupBtn, undoBtn, saveHeaderBtn, collapseBtn)
+  headerButtons.append(textEditBtn, addGroupBtn, collapseAllBtn, deleteGroupBtn, undoBtn, redoBtn, copyHeaderBtn, saveHeaderBtn, resetHeaderBtn, collapseBtn)
   header.appendChild(headerButtons)
   panel.appendChild(header)
 
@@ -2925,12 +3042,14 @@ export function initDevPanel(groups, opts = {}) {
   }
   requestAnimationFrame(healActiveTabOnce)
 
-  const actions = el('div', 'dp-actions')
-  const copyBtn = el('button', null, { type: 'button', textContent: 'Copy' })
-  const saveBtn = el('button', null, { type: 'button', textContent: 'Save' })
-  const resetBtn = el('button', null, { type: 'button', textContent: 'Reset' })
-  actions.append(copyBtn, saveBtn, resetBtn)
-  body.appendChild(actions)
+  // The separate bottom `.dp-actions` row (plain-text Copy/Save/Reset)
+  // is REMOVED per the 2026-09-28 header reorg above -- copyBtn/saveBtn/
+  // resetBtn now just alias the header icon buttons themselves, so every
+  // later `.addEventListener()`/flash-message reference below keeps
+  // working unchanged.
+  const copyBtn = copyHeaderBtn
+  const saveBtn = saveHeaderBtn
+  const resetBtn = resetHeaderBtn
   // Ctrl+F-style search for group/setting names, ported from
   // TEMPLATE_DEV_PANEL.html's own 2026-09-17 addition (itself ported
   // from DickoClicko). This project has no per-tab DOM duplication --
@@ -3033,6 +3152,10 @@ export function initDevPanel(groups, opts = {}) {
       devVisibility: { ...devVisibility },
       devIndependence: { mobile: { ...devIndependence.mobile }, landscape: { ...devIndependence.landscape } }
     }
+    // Folds in any host state OUTSIDE the dev panel's own registered
+    // controls (devSaveCaptureExtra, above) so Save captures it too, not
+    // just Undo/Redo -- see that variable's own comment.
+    if (devSaveCaptureExtra) snapshot.extra = devSaveCaptureExtra()
     if (opts.remoteSave) {
       remoteSaveSnapshot(opts.remoteSave, snapshot).then((result) => {
         flash(result.ok ? 'Saved!' : ('Save failed: ' + result.error))
@@ -3078,6 +3201,7 @@ export function initDevPanel(groups, opts = {}) {
         // saved/remote default) -- this hook is the generic fix, not
         // specific to that one host's own field name.
         if (opts.onRestore) opts.onRestore()
+        if (settings.extra !== undefined && devSaveApplyExtra) devSaveApplyExtra(settings.extra)
       })
       let remoteGeom = null
       try { remoteGeom = JSON.parse(localStorage.getItem(currentGeomKey())) } catch (err) { remoteGeom = null }
@@ -3095,6 +3219,7 @@ export function initDevPanel(groups, opts = {}) {
       textOverrides = saved.textOverrides || {}
       applyTextOverrides()
       if (opts.onRestore) opts.onRestore()
+      if (saved.extra !== undefined && devSaveApplyExtra) devSaveApplyExtra(saved.extra)
     } else {
       // A brand-new visitor with nothing saved yet still needs an initial
       // chrome paint for dynamicDevice rows (§12f-1) -- checkbox checked
@@ -3178,9 +3303,11 @@ export function initDevPanel(groups, opts = {}) {
   // clearDevPanelUndoStack() is a hoisted function declaration defined
   // further down this same function -- safe to reference here since
   // it's only ever actually called on a real click, well after
-  // everything in this file is defined.
+  // everything in this file is defined. saveBtn/saveHeaderBtn are now
+  // the SAME element (2026-09-28 header reorg, see its own comment
+  // above) -- a single listener, not one per alias, or a real click
+  // would call saveSettings() twice.
   saveBtn.addEventListener('click', () => { saveSettings(); clearDevPanelUndoStack() })
-  saveHeaderBtn.addEventListener('click', () => { saveSettings(); clearDevPanelUndoStack() })
   resetBtn.addEventListener('click', resetSettings)
 
   // ------------------------------------------------------------------
@@ -3517,7 +3644,26 @@ export function initDevPanel(groups, opts = {}) {
   // kind for deletions (see pushDevDeleteUndoEntry() above/below -- a
   // value snapshot alone can only recreate a deleted GROUP as an empty
   // shell, and can't recreate a deleted SETTING's control markup at all).
+  // Extension points for host state that changes OUTSIDE a registered
+  // control (e.g. a bone quaternion dragged directly in the 3D scene) --
+  // no-op by default, ported from TEMPLATE_DEV_PANEL.html's own
+  // 2026-09-28 addition. No known use case in this project yet; a future
+  // host can opt in the same way, once one exists:
+  //   devUndoCaptureExtra = () => ({ boneQuat: myBone.quaternion.toArray() })
+  //   devUndoApplyExtra = (extra) => { myBone.quaternion.fromArray(extra.boneQuat) }
+  // devSaveCaptureExtra/devSaveApplyExtra (below, near saveSettings()) are
+  // the equivalent pair for Save/Reset specifically -- Undo/Redo alone
+  // would otherwise silently lose this same state across a Save/reload.
+  let devUndoCaptureExtra = null
+  let devUndoApplyExtra = null
+  // devSaveCaptureExtra/devSaveApplyExtra -- the equivalent pair for
+  // Save/Reset (see saveSettings()/resetSettings() below), so the same
+  // host state Undo/Redo can now cover also survives a real Save/reload,
+  // not just a session-local Undo. No-op by default, same opt-in shape.
+  let devSaveCaptureExtra = null
+  let devSaveApplyExtra = null
   let devUndoStack = []
+  let devRedoStack = []
   let devUndoGestureActive = false
   function pushDevPanelUndoSnapshot() {
     // Deep-cloned (JSON round-trip) -- REQUIRED, not defensive:
@@ -3526,22 +3672,54 @@ export function initDevPanel(groups, opts = {}) {
     // it (a list-picker's items, a multi-select's values) is still the
     // SAME live reference a later edit can mutate in place, which would
     // silently change an already-pushed snapshot underneath Undo.
-    devUndoStack.push({ kind: 'snapshot', data: JSON.parse(JSON.stringify(captureFullPanelState())) })
+    const extra = devUndoCaptureExtra ? devUndoCaptureExtra() : undefined
+    devUndoStack.push({
+      kind: 'snapshot',
+      data: JSON.parse(JSON.stringify(captureFullPanelState())),
+      extra: extra !== undefined ? JSON.parse(JSON.stringify(extra)) : undefined
+    })
   }
   function pushDevDeleteUndoEntry(node, parent, nextSibling) {
     devUndoStack.push({ kind: 'delete', node, parent, nextSibling })
+    devRedoStack = [] // a genuine new edit invalidates any pending redo history
   }
+  // Redo -- ported from TEMPLATE_DEV_PANEL.html's own 2026-09-28 addition.
+  // A separate LIFO stack, populated only by undoDevPanelChange()/
+  // redoDevPanelChange() themselves (never by a real edit directly -- see
+  // the pointerdown listener below, which clears it instead). For a
+  // 'delete' entry, undo and redo are exact mirror images of the same
+  // {node, parent, nextSibling} descriptor.
   function undoDevPanelChange() {
     if (!devUndoStack.length) return
     const entry = devUndoStack.pop()
     if (entry.kind === 'delete') {
+      devRedoStack.push(entry) // redoing = deleting this same node again
       if (entry.nextSibling && entry.nextSibling.parentNode === entry.parent) {
         entry.parent.insertBefore(entry.node, entry.nextSibling)
       } else {
         entry.parent.appendChild(entry.node)
       }
     } else {
+      const extra = devUndoCaptureExtra ? devUndoCaptureExtra() : undefined
+      devRedoStack.push({
+        kind: 'snapshot',
+        data: JSON.parse(JSON.stringify(captureFullPanelState())),
+        extra: extra !== undefined ? JSON.parse(JSON.stringify(extra)) : undefined
+      })
       applyFullPanelState(entry.data)
+      if (entry.extra !== undefined && devUndoApplyExtra) devUndoApplyExtra(entry.extra)
+    }
+  }
+  function redoDevPanelChange() {
+    if (!devRedoStack.length) return
+    const entry = devRedoStack.pop()
+    if (entry.kind === 'delete') {
+      devUndoStack.push(entry) // undoing the redo = re-inserting it again
+      entry.node.remove()
+    } else {
+      pushDevPanelUndoSnapshot()
+      applyFullPanelState(entry.data)
+      if (entry.extra !== undefined && devUndoApplyExtra) devUndoApplyExtra(entry.extra)
     }
   }
   // How long a "gesture" may hold the undo-push gate open with no
@@ -3575,6 +3753,9 @@ export function initDevPanel(groups, opts = {}) {
     if (e.target.closest('.dp-header-buttons')) return
     devUndoGestureActive = true
     pushDevPanelUndoSnapshot()
+    // A genuine new edit invalidates any pending redo history -- standard
+    // undo/redo semantics.
+    devRedoStack = []
     devUndoGestureTimer = setTimeout(resetDevUndoGesture, DEV_UNDO_GESTURE_TIMEOUT_MS)
   }, true)
   document.addEventListener('pointerup', resetDevUndoGesture, true)
@@ -3584,24 +3765,28 @@ export function initDevPanel(groups, opts = {}) {
   // closes, even though the page itself never saw a pointerup.
   window.addEventListener('focus', resetDevUndoGesture)
   undoBtn.addEventListener('click', undoDevPanelChange)
-  // Ctrl+Z -- ignored while focus is in a genuine text-input context (a
-  // rename textarea, a text-type control, the search box) so it doesn't
-  // fight the browser/OS's own native text-field undo. Separate listener
-  // from the existing D/R panel-shortcut one below (that one already
-  // explicitly excludes INPUT/TEXTAREA/SELECT focus wholesale).
+  redoBtn.addEventListener('click', redoDevPanelChange)
+  // Ctrl+Z / Ctrl+Shift+Z / Ctrl+Y -- ignored while focus is in a genuine
+  // text-input context (a rename textarea, a text-type control, the
+  // search box) so it doesn't fight the browser/OS's own native
+  // text-field undo/redo. Separate listener from the existing D/R
+  // panel-shortcut one below (that one already explicitly excludes
+  // INPUT/TEXTAREA/SELECT focus wholesale). Ctrl+Shift+Z/Ctrl+Y (the 2
+  // most common cross-platform Redo shortcuts) added 2026-09-28.
   document.addEventListener('keydown', (e) => {
-    if (!(e.key === 'z' || e.key === 'Z') || !(e.ctrlKey || e.metaKey)) return
+    if (!(e.key === 'z' || e.key === 'Z' || e.key === 'y' || e.key === 'Y') || !(e.ctrlKey || e.metaKey)) return
     const tag = document.activeElement ? document.activeElement.tagName : ''
     if (tag === 'TEXTAREA' || (tag === 'INPUT' && document.activeElement.type === 'text')) return
     e.preventDefault()
-    undoDevPanelChange()
+    const isRedo = (e.key === 'y' || e.key === 'Y') || ((e.key === 'z' || e.key === 'Z') && e.shiftKey)
+    if (isRedo) redoDevPanelChange(); else undoDevPanelChange()
   })
-  // Clears the undo stack on Save/Sync -- per the feature's own "until i
-  // click save, then it starts new again" requirement; wired into
-  // saveBtn's existing click listener just below, not saveSettings()
+  // Clears the undo AND redo stacks on Save/Sync -- per the feature's own
+  // "until i click save, then it starts new again" requirement; wired
+  // into saveBtn's existing click listener just below, not saveSettings()
   // itself, since this is a panel-UI concern, not a settings-persistence
   // one.
-  function clearDevPanelUndoStack() { devUndoStack = [] }
+  function clearDevPanelUndoStack() { devUndoStack = []; devRedoStack = [] }
 
   // Ctrl+F-style search wiring (searchInput/searchCount created above,
   // near groupsEl). See collectDevSearchMatches()'s own comment there

@@ -18,7 +18,35 @@ work seamlessly from there.
 
 ## Currently working on
 
-**IN PROGRESS 2026-09-28 (15th round) -- Debug-group diagnostics batch,
+**COMPLETE 2026-09-28 (16th round) -- dev-panel template sync against
+`.claude/TEMPLATE_DEV_PANEL.html`'s own ~36 2026-09-27/28-dated changes,
+direct request ("check the dev panel template. Many cahnges have been
+made. Implement. If there is something you dont think is necessary to
+implement ask me").** Investigated via a research subagent, then
+confirmed every judgment-call item with the user via AskUserQuestion
+(all answered "do them all"/"port everything") before implementing. All
+10 approved items shipped: Redo (mirrors the existing Undo), a real
+`applyOrder()` bug fix (new DEV_GROUPS content was landing FIRST instead
+of LAST after a saved order restore), Monotone Cubic Hermite curve
+interpolation (replacing Catmull-Rom, overshoot fix -- method-dropdown/
+easing-modes UI deliberately NOT ported, disclosed as a scoping
+simplification), bezier handles now always visible/grabbable with a
+bigger mobile touch hit-radius, 3 new Dev Panel color pickers (Accent #2/
+#3, Button Color), a header reorg (Copy/Reset folded in alongside Redo,
+old bottom button row removed), range-bar readouts now show bare numbers
+at each end of the track instead of a combined center "Min/Max" label,
+2 new no-op host-state extension hooks (Undo/Redo + Save/Reset), "Dev
+Panel"/"Debug" locked by default (still unlockable per-group), and
+editable min/max bounds on plain sliders. Live-verified end to end
+against the local static server (3rd navigation attempt -- the first 2
+hit this project's own documented `devPanel.js` network-truncation
+flakiness) -- clean load (255 hands, zero unexpected console errors),
+every item confirmed via direct DOM inspection, and Undo/Redo
+functionally verified with 2 real mouse clicks. See CHANGELOG.txt's
+16th-round entry for the full account, including which single item
+(the `applyOrder()` fix) rests on code review rather than a live repro.
+
+**COMPLETE 2026-09-28 (15th round) -- Debug-group diagnostics batch,
 built specifically to help correlate future click-triggered jump reports:
 Mouse Tracking Log rewritten (Click+Hold is now genuinely distinct from
 Click, with separate start/release entries; "OrbitControls" wording

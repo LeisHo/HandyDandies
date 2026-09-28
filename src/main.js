@@ -6,7 +6,7 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js'
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js'
 import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js'
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js'
-import { initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab } from './devpanel/devPanel.js?v=49'
+import { initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab } from './devpanel/devPanel.js?v=50'
 
 // A defensive wrapper around devPanel.js's own refreshSelectOptions() --
 // found via live testing (direct user report: "I dont see any of the
@@ -5456,28 +5456,79 @@ function bezierSegmentY(P0, C1, C2, P3, x) {
   const t = (lo + hi) / 2
   return cubicBezier1D(P0.y, C1.y, C2.y, P3.y, t)
 }
+// CORRECTED 2026-09-28 (template follow-up port -- see
+// .claude/TEMPLATE_DEV_PANEL.html's own matching comment, which credits
+// THIS function by name as the un-fixed original it was re-derived from).
+// Direct report: "in Photoshop... it looks like a smooth interpolation.
+// Ours right now doesnt." Root cause: the original uniform Catmull-Rom
+// above ignores each segment's own real X-spacing when estimating
+// tangents, causing visible overshoot/kinks the instant 2 points aren't
+// evenly spaced -- which is almost immediately, since dragging any point
+// horizontally does exactly that. Fixed by switching the non-handle case
+// to Monotone Cubic Hermite (Fritsch-Carlson -- the same algorithm behind
+// D3's curveMonotoneX), which is mathematically guaranteed to never
+// exceed the data's own min/max between any 2 points. `catmullRomY()`
+// above is left defined but unused by this function now (not deleted,
+// per this project's own "nothing gets deleted by default" convention --
+// nothing else in this file calls it either, confirmed by grep, so this
+// is a safe, complete replacement, not a partial one). Bezier-handle
+// override logic (h1/h2) is completely unchanged -- it already overrides
+// PER-SEGMENT before either spline method is ever consulted, so this
+// swap is invisible to any curve that uses handles.
+function curveComputeMonotoneTangents(pts) {
+  const n = pts.length
+  const d = new Array(n - 1)
+  for (let k = 0; k < n - 1; k++) {
+    const dx = pts[k + 1].x - pts[k].x
+    d[k] = dx === 0 ? 0 : (pts[k + 1].y - pts[k].y) / dx
+  }
+  const m = new Array(n)
+  m[0] = d[0] || 0
+  m[n - 1] = d[n - 2] || 0
+  for (let k = 1; k < n - 1; k++) {
+    m[k] = (d[k - 1] === 0 || d[k] === 0 || (d[k - 1] > 0) !== (d[k] > 0)) ? 0 : (d[k - 1] + d[k]) / 2
+  }
+  for (let k = 0; k < n - 1; k++) {
+    if (d[k] === 0) { m[k] = 0; m[k + 1] = 0; continue }
+    const a = m[k] / d[k], b = m[k + 1] / d[k]
+    if (a < 0) m[k] = 0
+    if (b < 0) m[k + 1] = 0
+    const s = a * a + b * b
+    if (s > 9) {
+      const tau = 3 / Math.sqrt(s)
+      m[k] = tau * a * d[k]
+      m[k + 1] = tau * b * d[k]
+    }
+  }
+  return m
+}
+function curveHermiteY(p1, p2, m1, m2, x) {
+  const dx = p2.x - p1.x
+  if (dx === 0) return p1.y
+  const t = (x - p1.x) / dx, t2 = t * t, t3 = t2 * t
+  const h00 = 2 * t3 - 3 * t2 + 1, h10 = t3 - 2 * t2 + t, h01 = -2 * t3 + 3 * t2, h11 = t3 - t2
+  return h00 * p1.y + h10 * dx * m1 + h01 * p2.y + h11 * dx * m2
+}
 function evaluateArmLengthCurve(points, x) {
   if (!points || points.length === 0) return 1
   if (points.length === 1) return points[0].y
   const sorted = points // already kept sorted by the widget itself
   if (x <= sorted[0].x) return sorted[0].y
   if (x >= sorted[sorted.length - 1].x) return sorted[sorted.length - 1].y
+  const tangents = curveComputeMonotoneTangents(sorted)
   for (let i = 0; i < sorted.length - 1; i++) {
     const p1 = sorted[i], p2 = sorted[i + 1]
     if (x >= p1.x && x <= p2.x) {
       // Bezier curve handles override -- see cubicBezier1D()'s own
       // comment. p1.h1/p2.h2 undefined (the overwhelmingly common case,
       // and every pre-existing saved curve) falls straight through to the
-      // original Catmull-Rom line below, unchanged.
+      // monotone Hermite line below.
       if (p1.h1 || p2.h2) {
         const C1 = p1.h1 ? { x: p1.x + p1.h1.x, y: p1.y + p1.h1.y } : p1
         const C2 = p2.h2 ? { x: p2.x + p2.h2.x, y: p2.y + p2.h2.y } : p2
         return bezierSegmentY(p1, C1, C2, p2, x)
       }
-      const p0 = sorted[i - 1] || p1
-      const p3 = sorted[i + 2] || p2
-      const segT = p2.x === p1.x ? 0 : (x - p1.x) / (p2.x - p1.x)
-      return catmullRomY(p0.y, p1.y, p2.y, p3.y, segT)
+      return curveHermiteY(p1, p2, tangents[i], tangents[i + 1], x)
     }
   }
   return sorted[sorted.length - 1].y
@@ -5590,54 +5641,57 @@ function commitTextControl(input, value) {
 // object and its own commit path (JSON.stringify + commitTextControl for
 // the generic widget; the same for the 2 bespoke ones) without this
 // helper needing to know anything about which widget it's attached to.
-function attachRangeBarClickToEdit(readout, getCurrent, applyCurrent) {
-  readout.style.cursor = 'pointer'
-  readout.addEventListener('click', (e) => {
-    e.stopPropagation()
+// CORRECTED 2026-09-28, ported from TEMPLATE_DEV_PANEL.html's own
+// same-day change (direct request there: "Place the min on the left
+// side under the slider, and the max on the right side... I dont need
+// the words 'Min' and 'Max', just the numbers"). Used to render ONE
+// combined center readout ("Min: X  Max: Y") that, when clicked, opened
+// a shared min+max editor beside it. Now builds 2 independently
+// click-to-edit spans, positioned at their own end of the track (the
+// caller's own flex/justify-content styling on `readout` controls the
+// left/right placement -- see each of this function's 3 call sites'
+// own `readout` construction) -- clicking EITHER number edits only
+// that one bound in place, no "Min:"/"Max:" text anywhere. Returns an
+// `update(current)` function the caller's own `redraw()` calls in place
+// of the old direct `readout.textContent = ...` assignment.
+function attachRangeBarClickToEdit(readout, getCurrent, applyCurrent, unit) {
+  readout.textContent = ''
+  Object.assign(readout.style, { display: 'flex', justifyContent: 'space-between', cursor: 'default' })
+  const minSpan = elLocal('span', { cursor: 'pointer' })
+  const maxSpan = elLocal('span', { cursor: 'pointer' })
+  readout.append(minSpan, maxSpan)
+  function render(current) {
+    minSpan.textContent = current.min + (unit || '')
+    maxSpan.textContent = current.max + (unit || '')
+  }
+  function startEdit(span, kind) {
+    if (span.querySelector('input')) return
     const current = getCurrent()
-    const minInput = elLocal('input', {}, { type: 'number', value: current.min, step: 1 })
-    const maxInput = elLocal('input', {}, { type: 'number', value: current.max, step: 1 })
-    minInput.className = 'dp-minmax-input'
-    maxInput.className = 'dp-minmax-input'
-    const container = elLocal('div', { display: 'flex', gap: '8px', alignItems: 'center', justifyContent: 'center' })
-    container.className = 'dp-minmax-editor'
-    const minLabel = elLocal('label', { whiteSpace: 'nowrap' }, { text: 'Min:' })
-    minLabel.className = 'dp-minmax-label'
-    const maxLabel = elLocal('label', { whiteSpace: 'nowrap' }, { text: 'Max:' })
-    maxLabel.className = 'dp-minmax-label'
-    container.append(minLabel, minInput, maxLabel, maxInput)
-    const originalDisplay = readout.style.display
-    readout.style.display = 'none'
-    readout.parentNode.insertBefore(container, readout)
-    minInput.focus()
-    minInput.select()
+    const input = elLocal('input', { width: '52px', textAlign: 'center' }, { type: 'number', value: current[kind], step: 1 })
+    input.className = 'dp-minmax-input'
+    span.textContent = ''
+    span.appendChild(input)
+    input.focus()
+    input.select()
     let finalized = false
     const finalize = () => {
       if (finalized) return
       finalized = true
-      const newMin = parseFloat(minInput.value)
-      const newMax = parseFloat(maxInput.value)
-      applyCurrent({
-        min: Number.isFinite(newMin) ? newMin : current.min,
-        max: Number.isFinite(newMax) ? newMax : current.max
-      })
-      readout.style.display = originalDisplay
-      container.remove()
+      const parsed = parseFloat(input.value)
+      const cur = getCurrent()
+      applyCurrent({ ...cur, [kind]: Number.isFinite(parsed) ? parsed : cur[kind] })
     }
-    const cancel = () => {
-      finalized = true
-      readout.style.display = originalDisplay
-      container.remove()
-    }
-    const onKeyDown = (ev) => {
+    const cancel = () => { finalized = true; render(getCurrent()) }
+    input.addEventListener('blur', () => setTimeout(finalize, 0))
+    input.addEventListener('keydown', (ev) => {
       if (ev.key === 'Enter') finalize()
       if (ev.key === 'Escape') cancel()
-    }
-    minInput.addEventListener('blur', () => setTimeout(finalize, 0))
-    maxInput.addEventListener('blur', () => setTimeout(finalize, 0))
-    minInput.addEventListener('keydown', onKeyDown)
-    maxInput.addEventListener('keydown', onKeyDown)
-  })
+    })
+  }
+  minSpan.addEventListener('click', (e) => { e.stopPropagation(); startEdit(minSpan, 'min') })
+  maxSpan.addEventListener('click', (e) => { e.stopPropagation(); startEdit(maxSpan, 'max') })
+  render(getCurrent())
+  return render
 }
 // devPanel.js's own Reset/Copy-restore path writes straight to the hidden
 // text input's `.value` property without dispatching an 'input' event
@@ -5726,19 +5780,19 @@ function buildArmLengthRangeWidget(row) {
   try { current = JSON.parse(input.value) } catch (e) { /* keep default */ }
   let lastSeenValue = input.value
 
+  const updateReadout = attachRangeBarClickToEdit(readout, () => current, (newVal) => {
+    current = newVal
+    redraw()
+    commitTextControl(input, JSON.stringify(current))
+  }, '%')
   function redraw() {
     fill.style.left = current.min + '%'
     fill.style.right = (100 - current.max) + '%'
     minHandle.style.left = current.min + '%'
     maxHandle.style.left = current.max + '%'
-    readout.textContent = `Min: ${current.min}%  Max: ${current.max}%`
+    updateReadout(current)
   }
   redraw()
-  attachRangeBarClickToEdit(readout, () => current, (newVal) => {
-    current = newVal
-    redraw()
-    commitTextControl(input, JSON.stringify(current))
-  })
   armLengthWidgetResyncs.push(() => {
     if (input.value === lastSeenValue) return
     lastSeenValue = input.value
@@ -5950,12 +6004,24 @@ function buildWristSplayRangeWidget(row) {
   const readout = elLocal('div', { fontSize: '11px', textAlign: 'center', marginTop: '4px', opacity: '0.85' })
   track.appendChild(fill); track.appendChild(zeroTick); track.appendChild(minHandle); track.appendChild(maxHandle)
   wrap.appendChild(track); wrap.appendChild(readout)
+  // The old combined readout carried "(Farthest Hand)"/"(Nearest Hand)"
+  // context beyond a plain Min/Max label -- moved into this standalone
+  // caption (2026-09-28 end-of-track readout change, see
+  // attachRangeBarClickToEdit()'s own comment) so that meaning survives
+  // even though the per-side readouts below now show bare numbers only.
+  const caption = elLocal('div', { fontSize: '9px', opacity: '0.5', marginTop: '2px', textAlign: 'center', fontStyle: 'italic' }, { text: 'Min = Farthest Hand  ·  Max = Nearest Hand' })
+  wrap.appendChild(caption)
   row.appendChild(wrap)
 
   let current = { min: 0, max: -90 }
   try { current = JSON.parse(input.value) } catch (e) { /* keep default */ }
   let lastSeenValue = input.value
 
+  const updateReadout = attachRangeBarClickToEdit(readout, () => current, (newVal) => {
+    current = newVal
+    redraw()
+    commitTextControl(input, JSON.stringify(current))
+  }, '°')
   function redraw() {
     const minPct = toPct(current.min), maxPct = toPct(current.max)
     const leftPct = Math.min(minPct, maxPct), rightPct = Math.max(minPct, maxPct)
@@ -5964,14 +6030,9 @@ function buildWristSplayRangeWidget(row) {
     zeroTick.style.left = toPct(0) + '%'
     minHandle.style.left = minPct + '%'
     maxHandle.style.left = maxPct + '%'
-    readout.textContent = `Min (Farthest Hand): ${current.min}°  Max (Nearest Hand): ${current.max}°`
+    updateReadout(current)
   }
   redraw()
-  attachRangeBarClickToEdit(readout, () => current, (newVal) => {
-    current = newVal
-    redraw()
-    commitTextControl(input, JSON.stringify(current))
-  })
   armLengthWidgetResyncs.push(() => {
     if (input.value === lastSeenValue) return
     lastSeenValue = input.value
@@ -8596,20 +8657,20 @@ function buildGenericRangeBarWidget(row, opts) {
   try { current = JSON.parse(input.value) } catch (e) { /* keep default */ }
   let lastSeenValue = input.value
 
+  const updateReadout = attachRangeBarClickToEdit(readout, () => current, (newVal) => {
+    current = newVal
+    redraw()
+    commitTextControl(input, JSON.stringify(current))
+  }, unit)
   function redraw() {
     const minPct = toPct(current.min), maxPct = toPct(current.max)
     fill.style.left = Math.min(minPct, maxPct) + '%'
     fill.style.right = (100 - Math.max(minPct, maxPct)) + '%'
     minHandle.style.left = minPct + '%'
     maxHandle.style.left = maxPct + '%'
-    readout.textContent = `Min: ${current.min}${unit}  Max: ${current.max}${unit}`
+    updateReadout(current)
   }
   redraw()
-  attachRangeBarClickToEdit(readout, () => current, (newVal) => {
-    current = newVal
-    redraw()
-    commitTextControl(input, JSON.stringify(current))
-  })
   armLengthWidgetResyncs.push(() => {
     if (input.value === lastSeenValue) return
     lastSeenValue = input.value
@@ -8664,14 +8725,13 @@ function buildGenericCurveWidget(row, opts) {
   // handle mechanism (startHandleDrag()'s own Alt/Shift+drag, below) was
   // never actually broken -- confirmed live via a synthetic Alt+drag
   // that correctly created and persisted a real `h1` handle -- but
-  // nothing in the visible UI ever said this gesture existed. A handle
-  // is 100% invisible until one is created (by design -- every existing
-  // saved curve with no handles must render identically to before, per
-  // startHandleDrag()'s own comment), so a user who'd never read the
-  // source comment had no way to discover it: indistinguishable from
-  // "not implemented" from the UI alone. This 2nd caption line is the
-  // fix -- purely a discoverability addition, no interaction/math
-  // changed.
+  // nothing in the visible UI ever said this gesture existed. This
+  // caption line names the gesture; a handle's own dimmed preview
+  // marker (redraw(), below) is what actually makes it discoverable
+  // without reading this text at all -- see that comment for the
+  // 2026-09-28 change ("i want bezier handles to be visible at all
+  // times") that superseded the original invisible-until-dragged
+  // behavior this caption alone used to compensate for.
   const handleHint = elLocal('div', { fontSize: '9px', opacity: '0.5', marginTop: '2px', textAlign: 'center', fontStyle: 'italic' }, { text: 'Alt+Drag a point: Out Handle  ·  Shift+Drag a point: In Handle  ·  Drag a handle back onto its point: Remove' })
   row.appendChild(svg)
   row.appendChild(caption)
@@ -8709,6 +8769,14 @@ function buildGenericCurveWidget(row, opts) {
   // absolute -- added directly to the point) and why every existing saved
   // curve (no handles) renders identically to before.
   const HANDLE_REMOVE_THRESHOLD_PX = 6
+  // 16px invisible touch/click hit-radius under the small 5px visible
+  // dot -- ported from the shared workspace template, direct report
+  // 2026-09-28 ("a plain 5px dot is too small to reliably tap on
+  // mobile"). The visible dot stays exactly as small/decorative as
+  // before (pointer-events:none); every real click/drag/dblclick/
+  // right-click interaction routes through this larger transparent
+  // circle instead.
+  const CURVE_HIT_RADIUS_PX = 16
   function startHandleDrag(p, i, kind, downEv) {
     downEv.stopPropagation()
     downEv.preventDefault()
@@ -8746,34 +8814,50 @@ function buildGenericCurveWidget(row, opts) {
     handleEls.forEach((el) => svg.removeChild(el))
     handleEls = []
     circles.forEach((c) => svg.removeChild(c))
-    circles = points.map((p, i) => {
-      // Handle line + marker (added to the DOM BEFORE the point's own
-      // circle, so the circle renders on top) -- one per side, only when
-      // that side's handle actually exists.
-      ;['h1', 'h2'].forEach((kind) => {
-        if (!p[kind]) return
+    circles = []
+    points.forEach((p, i) => {
+      // Handles are always shown/grabbable, per direct request 2026-09-28
+      // ("i want bezier handles to be visible at all times") -- replacing
+      // the earlier "invisible until dragged once" behavior (a real,
+      // previously-documented discoverability gap, see the caption's own
+      // comment above). A side with no REAL p[kind] yet shows a dimmer
+      // preview marker at the default offset; grabbing and dragging IT is
+      // what actually creates p[kind] and starts influencing the curve
+      // (startHandleDrag(), unchanged) -- purely visual until then, so
+      // evaluateArmLengthCurve()'s own math still behaves exactly as
+      // before for any curve with no real handles.
+      const canHaveH1 = i < points.length - 1, canHaveH2 = i > 0
+      ;[['h1', canHaveH1], ['h2', canHaveH2]].forEach(([kind, canHave]) => {
+        if (!canHave) return
+        const isReal = !!p[kind]
+        const offset = p[kind] || { x: kind === 'h1' ? 0.08 : -0.08, y: 0 }
         const px = toPx(p)
-        const hx = toPx({ x: p.x + p[kind].x, y: p.y + p[kind].y })
+        const hx = toPx({ x: p.x + offset.x, y: p.y + offset.y })
         const line = document.createElementNS(svgNS, 'line')
         line.setAttribute('x1', px.x); line.setAttribute('y1', px.y); line.setAttribute('x2', hx.x); line.setAttribute('y2', hx.y)
-        line.setAttribute('stroke', 'rgba(255,255,255,0.4)'); line.setAttribute('stroke-width', '1')
+        line.setAttribute('stroke', isReal ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.15)'); line.setAttribute('stroke-width', '1')
         svg.appendChild(line)
         handleEls.push(line)
         const marker = document.createElementNS(svgNS, 'rect')
         marker.setAttribute('x', hx.x - 3.5); marker.setAttribute('y', hx.y - 3.5); marker.setAttribute('width', 7); marker.setAttribute('height', 7)
         marker.setAttribute('fill', '#e0a030')
+        marker.setAttribute('fill-opacity', isReal ? '1' : '0.35')
         Object.assign(marker.style, { cursor: 'grab' })
         marker.addEventListener('pointerdown', (downEv) => startHandleDrag(p, i, kind, downEv))
         svg.appendChild(marker)
         handleEls.push(marker)
       })
       const px = toPx(p)
-      const c = document.createElementNS(svgNS, 'circle')
-      c.setAttribute('cx', px.x); c.setAttribute('cy', px.y); c.setAttribute('r', 5)
-      c.setAttribute('fill', 'var(--dp-accent, #7d8cff)')
-      Object.assign(c.style, { cursor: 'grab' })
+      // Bigger invisible hit target UNDER the small visible dot -- see
+      // CURVE_HIT_RADIUS_PX's own comment above. The dot itself is
+      // decorative (pointer-events:none); every real interaction routes
+      // through this larger transparent circle.
+      const hit = document.createElementNS(svgNS, 'circle')
+      hit.setAttribute('cx', px.x); hit.setAttribute('cy', px.y); hit.setAttribute('r', CURVE_HIT_RADIUS_PX)
+      hit.setAttribute('fill', 'transparent')
+      Object.assign(hit.style, { cursor: 'grab' })
       let dragged = false
-      c.addEventListener('pointerdown', (downEv) => {
+      hit.addEventListener('pointerdown', (downEv) => {
         if (downEv.altKey) { startHandleDrag(p, i, 'h1', downEv); return }
         if (downEv.shiftKey) { startHandleDrag(p, i, 'h2', downEv); return }
         downEv.stopPropagation()
@@ -8802,17 +8886,23 @@ function buildGenericCurveWidget(row, opts) {
           commitPoints()
         }
       }
-      c.addEventListener('dblclick', (dblEv) => {
+      hit.addEventListener('dblclick', (dblEv) => {
         dblEv.stopPropagation()
         deletePointIfRemovable()
       })
-      c.addEventListener('contextmenu', (ctxEv) => {
+      hit.addEventListener('contextmenu', (ctxEv) => {
         ctxEv.preventDefault()
         ctxEv.stopPropagation()
         deletePointIfRemovable()
       })
-      svg.appendChild(c)
-      return c
+      svg.appendChild(hit)
+      circles.push(hit)
+      const dot = document.createElementNS(svgNS, 'circle')
+      dot.setAttribute('cx', px.x); dot.setAttribute('cy', px.y); dot.setAttribute('r', 5)
+      dot.setAttribute('fill', 'var(--dp-accent, #7d8cff)')
+      dot.style.pointerEvents = 'none'
+      svg.appendChild(dot)
+      circles.push(dot)
     })
   }
   svg.addEventListener('click', (clickEv) => {
