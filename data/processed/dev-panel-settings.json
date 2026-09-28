@@ -21110,7 +21110,7 @@
     {
       "key": "Dev Panel",
       "collapsed": true,
-      "locked": false,
+      "locked": true,
       "items": [
         {
           "type": "group",
@@ -22181,7 +22181,7 @@
     {
       "key": "Debug",
       "collapsed": true,
-      "locked": false,
+      "locked": true,
       "items": [
         {
           "type": "row",
@@ -22231,329 +22231,793 @@
     {
       "key": "Saved Dev Settings",
       "collapsed": true,
-      "locked": false,
+      "locked": true,
       "items": [],
       "settings": [],
       "subgroups": []
     },
     {
-      "key": "Background",
+      "key": "New Group (9)",
       "collapsed": true,
       "locked": false,
       "items": [
         {
-          "type": "row",
-          "key": "bgColor"
+          "type": "group",
+          "group": {
+            "key": "Pause Button",
+            "collapsed": true,
+            "locked": false,
+            "items": [
+              {
+                "type": "row",
+                "key": "pausedRenderFps"
+              },
+              {
+                "type": "row",
+                "key": "pauseBtnXOffset"
+              },
+              {
+                "type": "row",
+                "key": "pauseBtnYOffset"
+              },
+              {
+                "type": "row",
+                "key": "pauseBtnSize"
+              },
+              {
+                "type": "row",
+                "key": "pauseBtnIconSize"
+              },
+              {
+                "type": "row",
+                "key": "pauseBtnCornerRadius"
+              },
+              {
+                "type": "row",
+                "key": "pauseBtnBorderThickness"
+              },
+              {
+                "type": "row",
+                "key": "pauseBtnOpacity"
+              },
+              {
+                "type": "row",
+                "key": "pauseBtnBgColor"
+              },
+              {
+                "type": "row",
+                "key": "pauseBtnIconColor"
+              },
+              {
+                "type": "row",
+                "key": "pauseBtnBorderColor"
+              }
+            ],
+            "settings": [
+              "pausedRenderFps",
+              "pauseBtnXOffset",
+              "pauseBtnYOffset",
+              "pauseBtnSize",
+              "pauseBtnIconSize",
+              "pauseBtnCornerRadius",
+              "pauseBtnBorderThickness",
+              "pauseBtnOpacity",
+              "pauseBtnBgColor",
+              "pauseBtnIconColor",
+              "pauseBtnBorderColor"
+            ],
+            "subgroups": []
+          }
+        },
+        {
+          "type": "group",
+          "group": {
+            "key": "Background",
+            "collapsed": true,
+            "locked": false,
+            "items": [
+              {
+                "type": "row",
+                "key": "bgColor"
+              }
+            ],
+            "settings": [
+              "bgColor"
+            ],
+            "subgroups": []
+          }
+        },
+        {
+          "type": "group",
+          "group": {
+            "key": "Loading Preview",
+            "collapsed": true,
+            "locked": false,
+            "items": [
+              {
+                "type": "row",
+                "key": "loadingPreviewShowLive"
+              },
+              {
+                "type": "row",
+                "key": "loadingPreviewEnabled"
+              },
+              {
+                "type": "row",
+                "key": "loadingPreviewCameraEditMode"
+              },
+              {
+                "type": "row",
+                "key": "loadingMinTimeMs"
+              },
+              {
+                "type": "group",
+                "group": {
+                  "key": "New Group (5)",
+                  "collapsed": true,
+                  "locked": false,
+                  "items": [
+                    {
+                      "type": "row",
+                      "key": "loadingPreviewRotationX"
+                    },
+                    {
+                      "type": "row",
+                      "key": "loadingPreviewRotationY"
+                    },
+                    {
+                      "type": "row",
+                      "key": "loadingPreviewRotationZ"
+                    },
+                    {
+                      "type": "row",
+                      "key": "loadingPreviewOffsetX"
+                    },
+                    {
+                      "type": "row",
+                      "key": "loadingPreviewOffsetY"
+                    },
+                    {
+                      "type": "row",
+                      "key": "loadingPreviewOffsetZ"
+                    },
+                    {
+                      "type": "row",
+                      "key": "loadingPreviewCameraFov"
+                    },
+                    {
+                      "type": "row",
+                      "key": "loadingPreviewCameraZoom"
+                    },
+                    {
+                      "type": "row",
+                      "key": "loadingPreviewSavedCameras"
+                    }
+                  ],
+                  "settings": [
+                    "loadingPreviewRotationX",
+                    "loadingPreviewRotationY",
+                    "loadingPreviewRotationZ",
+                    "loadingPreviewOffsetX",
+                    "loadingPreviewOffsetY",
+                    "loadingPreviewOffsetZ",
+                    "loadingPreviewCameraFov",
+                    "loadingPreviewCameraZoom",
+                    "loadingPreviewSavedCameras"
+                  ],
+                  "subgroups": []
+                }
+              },
+              {
+                "type": "group",
+                "group": {
+                  "key": "New Group (7)",
+                  "collapsed": true,
+                  "locked": false,
+                  "items": [
+                    {
+                      "type": "row",
+                      "key": "loadingPreviewTweenSelector"
+                    },
+                    {
+                      "type": "row",
+                      "key": "loadingPreviewCameraSelector"
+                    },
+                    {
+                      "type": "row",
+                      "key": "loadingPreviewLightingSelector"
+                    },
+                    {
+                      "type": "row",
+                      "key": "loadingPreviewSequenceMode"
+                    },
+                    {
+                      "type": "row",
+                      "key": "loadingPreviewSequenceCountMode"
+                    },
+                    {
+                      "type": "row",
+                      "key": "loadingPreviewSequenceCount"
+                    },
+                    {
+                      "type": "row",
+                      "key": "loadingPreviewSpeedMs"
+                    },
+                    {
+                      "type": "row",
+                      "key": "loadingPreviewSize"
+                    },
+                    {
+                      "type": "row",
+                      "key": "loadingPreviewSequenceHoldMs"
+                    },
+                    {
+                      "type": "row",
+                      "key": "loadingPreviewSequenceLoopTransition"
+                    }
+                  ],
+                  "settings": [
+                    "loadingPreviewTweenSelector",
+                    "loadingPreviewCameraSelector",
+                    "loadingPreviewLightingSelector",
+                    "loadingPreviewSequenceMode",
+                    "loadingPreviewSequenceCountMode",
+                    "loadingPreviewSequenceCount",
+                    "loadingPreviewSpeedMs",
+                    "loadingPreviewSize",
+                    "loadingPreviewSequenceHoldMs",
+                    "loadingPreviewSequenceLoopTransition"
+                  ],
+                  "subgroups": []
+                }
+              },
+              {
+                "type": "group",
+                "group": {
+                  "key": "New Group",
+                  "collapsed": true,
+                  "locked": false,
+                  "items": [
+                    {
+                      "type": "row",
+                      "key": "loadingPreviewSavedLighting"
+                    }
+                  ],
+                  "settings": [
+                    "loadingPreviewSavedLighting"
+                  ],
+                  "subgroups": []
+                }
+              }
+            ],
+            "settings": [
+              "loadingPreviewShowLive",
+              "loadingPreviewEnabled",
+              "loadingPreviewCameraEditMode",
+              "loadingMinTimeMs"
+            ],
+            "subgroups": [
+              {
+                "key": "New Group (5)",
+                "collapsed": true,
+                "locked": false,
+                "items": [
+                  {
+                    "type": "row",
+                    "key": "loadingPreviewRotationX"
+                  },
+                  {
+                    "type": "row",
+                    "key": "loadingPreviewRotationY"
+                  },
+                  {
+                    "type": "row",
+                    "key": "loadingPreviewRotationZ"
+                  },
+                  {
+                    "type": "row",
+                    "key": "loadingPreviewOffsetX"
+                  },
+                  {
+                    "type": "row",
+                    "key": "loadingPreviewOffsetY"
+                  },
+                  {
+                    "type": "row",
+                    "key": "loadingPreviewOffsetZ"
+                  },
+                  {
+                    "type": "row",
+                    "key": "loadingPreviewCameraFov"
+                  },
+                  {
+                    "type": "row",
+                    "key": "loadingPreviewCameraZoom"
+                  },
+                  {
+                    "type": "row",
+                    "key": "loadingPreviewSavedCameras"
+                  }
+                ],
+                "settings": [
+                  "loadingPreviewRotationX",
+                  "loadingPreviewRotationY",
+                  "loadingPreviewRotationZ",
+                  "loadingPreviewOffsetX",
+                  "loadingPreviewOffsetY",
+                  "loadingPreviewOffsetZ",
+                  "loadingPreviewCameraFov",
+                  "loadingPreviewCameraZoom",
+                  "loadingPreviewSavedCameras"
+                ],
+                "subgroups": []
+              },
+              {
+                "key": "New Group (7)",
+                "collapsed": true,
+                "locked": false,
+                "items": [
+                  {
+                    "type": "row",
+                    "key": "loadingPreviewTweenSelector"
+                  },
+                  {
+                    "type": "row",
+                    "key": "loadingPreviewCameraSelector"
+                  },
+                  {
+                    "type": "row",
+                    "key": "loadingPreviewLightingSelector"
+                  },
+                  {
+                    "type": "row",
+                    "key": "loadingPreviewSequenceMode"
+                  },
+                  {
+                    "type": "row",
+                    "key": "loadingPreviewSequenceCountMode"
+                  },
+                  {
+                    "type": "row",
+                    "key": "loadingPreviewSequenceCount"
+                  },
+                  {
+                    "type": "row",
+                    "key": "loadingPreviewSpeedMs"
+                  },
+                  {
+                    "type": "row",
+                    "key": "loadingPreviewSize"
+                  },
+                  {
+                    "type": "row",
+                    "key": "loadingPreviewSequenceHoldMs"
+                  },
+                  {
+                    "type": "row",
+                    "key": "loadingPreviewSequenceLoopTransition"
+                  }
+                ],
+                "settings": [
+                  "loadingPreviewTweenSelector",
+                  "loadingPreviewCameraSelector",
+                  "loadingPreviewLightingSelector",
+                  "loadingPreviewSequenceMode",
+                  "loadingPreviewSequenceCountMode",
+                  "loadingPreviewSequenceCount",
+                  "loadingPreviewSpeedMs",
+                  "loadingPreviewSize",
+                  "loadingPreviewSequenceHoldMs",
+                  "loadingPreviewSequenceLoopTransition"
+                ],
+                "subgroups": []
+              },
+              {
+                "key": "New Group",
+                "collapsed": true,
+                "locked": false,
+                "items": [
+                  {
+                    "type": "row",
+                    "key": "loadingPreviewSavedLighting"
+                  }
+                ],
+                "settings": [
+                  "loadingPreviewSavedLighting"
+                ],
+                "subgroups": []
+              }
+            ]
+          }
         }
       ],
-      "settings": [
-        "bgColor"
-      ],
-      "subgroups": []
-    },
-    {
-      "key": "Loading Preview",
-      "collapsed": true,
-      "locked": false,
-      "items": [
-        {
-          "type": "row",
-          "key": "loadingPreviewShowLive"
-        },
-        {
-          "type": "row",
-          "key": "loadingPreviewEnabled"
-        },
-        {
-          "type": "row",
-          "key": "loadingPreviewCameraEditMode"
-        },
-        {
-          "type": "row",
-          "key": "loadingMinTimeMs"
-        },
-        {
-          "type": "group",
-          "group": {
-            "key": "New Group (5)",
-            "collapsed": true,
-            "locked": false,
-            "items": [
-              {
-                "type": "row",
-                "key": "loadingPreviewRotationX"
-              },
-              {
-                "type": "row",
-                "key": "loadingPreviewRotationY"
-              },
-              {
-                "type": "row",
-                "key": "loadingPreviewRotationZ"
-              },
-              {
-                "type": "row",
-                "key": "loadingPreviewOffsetX"
-              },
-              {
-                "type": "row",
-                "key": "loadingPreviewOffsetY"
-              },
-              {
-                "type": "row",
-                "key": "loadingPreviewOffsetZ"
-              },
-              {
-                "type": "row",
-                "key": "loadingPreviewCameraFov"
-              },
-              {
-                "type": "row",
-                "key": "loadingPreviewCameraZoom"
-              },
-              {
-                "type": "row",
-                "key": "loadingPreviewSavedCameras"
-              }
-            ],
-            "settings": [
-              "loadingPreviewRotationX",
-              "loadingPreviewRotationY",
-              "loadingPreviewRotationZ",
-              "loadingPreviewOffsetX",
-              "loadingPreviewOffsetY",
-              "loadingPreviewOffsetZ",
-              "loadingPreviewCameraFov",
-              "loadingPreviewCameraZoom",
-              "loadingPreviewSavedCameras"
-            ],
-            "subgroups": []
-          }
-        },
-        {
-          "type": "group",
-          "group": {
-            "key": "New Group (7)",
-            "collapsed": true,
-            "locked": false,
-            "items": [
-              {
-                "type": "row",
-                "key": "loadingPreviewTweenSelector"
-              },
-              {
-                "type": "row",
-                "key": "loadingPreviewCameraSelector"
-              },
-              {
-                "type": "row",
-                "key": "loadingPreviewLightingSelector"
-              },
-              {
-                "type": "row",
-                "key": "loadingPreviewSequenceMode"
-              },
-              {
-                "type": "row",
-                "key": "loadingPreviewSequenceCountMode"
-              },
-              {
-                "type": "row",
-                "key": "loadingPreviewSequenceCount"
-              },
-              {
-                "type": "row",
-                "key": "loadingPreviewSpeedMs"
-              },
-              {
-                "type": "row",
-                "key": "loadingPreviewSize"
-              },
-              {
-                "type": "row",
-                "key": "loadingPreviewSequenceHoldMs"
-              },
-              {
-                "type": "row",
-                "key": "loadingPreviewSequenceLoopTransition"
-              }
-            ],
-            "settings": [
-              "loadingPreviewTweenSelector",
-              "loadingPreviewCameraSelector",
-              "loadingPreviewLightingSelector",
-              "loadingPreviewSequenceMode",
-              "loadingPreviewSequenceCountMode",
-              "loadingPreviewSequenceCount",
-              "loadingPreviewSpeedMs",
-              "loadingPreviewSize",
-              "loadingPreviewSequenceHoldMs",
-              "loadingPreviewSequenceLoopTransition"
-            ],
-            "subgroups": []
-          }
-        },
-        {
-          "type": "group",
-          "group": {
-            "key": "New Group",
-            "collapsed": true,
-            "locked": false,
-            "items": [
-              {
-                "type": "row",
-                "key": "loadingPreviewSavedLighting"
-              }
-            ],
-            "settings": [
-              "loadingPreviewSavedLighting"
-            ],
-            "subgroups": []
-          }
-        }
-      ],
-      "settings": [
-        "loadingPreviewShowLive",
-        "loadingPreviewEnabled",
-        "loadingPreviewCameraEditMode",
-        "loadingMinTimeMs"
-      ],
+      "settings": [],
       "subgroups": [
         {
-          "key": "New Group (5)",
+          "key": "Pause Button",
           "collapsed": true,
           "locked": false,
           "items": [
             {
               "type": "row",
-              "key": "loadingPreviewRotationX"
+              "key": "pausedRenderFps"
             },
             {
               "type": "row",
-              "key": "loadingPreviewRotationY"
+              "key": "pauseBtnXOffset"
             },
             {
               "type": "row",
-              "key": "loadingPreviewRotationZ"
+              "key": "pauseBtnYOffset"
             },
             {
               "type": "row",
-              "key": "loadingPreviewOffsetX"
+              "key": "pauseBtnSize"
             },
             {
               "type": "row",
-              "key": "loadingPreviewOffsetY"
+              "key": "pauseBtnIconSize"
             },
             {
               "type": "row",
-              "key": "loadingPreviewOffsetZ"
+              "key": "pauseBtnCornerRadius"
             },
             {
               "type": "row",
-              "key": "loadingPreviewCameraFov"
+              "key": "pauseBtnBorderThickness"
             },
             {
               "type": "row",
-              "key": "loadingPreviewCameraZoom"
+              "key": "pauseBtnOpacity"
             },
             {
               "type": "row",
-              "key": "loadingPreviewSavedCameras"
+              "key": "pauseBtnBgColor"
+            },
+            {
+              "type": "row",
+              "key": "pauseBtnIconColor"
+            },
+            {
+              "type": "row",
+              "key": "pauseBtnBorderColor"
             }
           ],
           "settings": [
-            "loadingPreviewRotationX",
-            "loadingPreviewRotationY",
-            "loadingPreviewRotationZ",
-            "loadingPreviewOffsetX",
-            "loadingPreviewOffsetY",
-            "loadingPreviewOffsetZ",
-            "loadingPreviewCameraFov",
-            "loadingPreviewCameraZoom",
-            "loadingPreviewSavedCameras"
+            "pausedRenderFps",
+            "pauseBtnXOffset",
+            "pauseBtnYOffset",
+            "pauseBtnSize",
+            "pauseBtnIconSize",
+            "pauseBtnCornerRadius",
+            "pauseBtnBorderThickness",
+            "pauseBtnOpacity",
+            "pauseBtnBgColor",
+            "pauseBtnIconColor",
+            "pauseBtnBorderColor"
           ],
           "subgroups": []
         },
         {
-          "key": "New Group (7)",
+          "key": "Background",
           "collapsed": true,
           "locked": false,
           "items": [
             {
               "type": "row",
-              "key": "loadingPreviewTweenSelector"
-            },
-            {
-              "type": "row",
-              "key": "loadingPreviewCameraSelector"
-            },
-            {
-              "type": "row",
-              "key": "loadingPreviewLightingSelector"
-            },
-            {
-              "type": "row",
-              "key": "loadingPreviewSequenceMode"
-            },
-            {
-              "type": "row",
-              "key": "loadingPreviewSequenceCountMode"
-            },
-            {
-              "type": "row",
-              "key": "loadingPreviewSequenceCount"
-            },
-            {
-              "type": "row",
-              "key": "loadingPreviewSpeedMs"
-            },
-            {
-              "type": "row",
-              "key": "loadingPreviewSize"
-            },
-            {
-              "type": "row",
-              "key": "loadingPreviewSequenceHoldMs"
-            },
-            {
-              "type": "row",
-              "key": "loadingPreviewSequenceLoopTransition"
+              "key": "bgColor"
             }
           ],
           "settings": [
-            "loadingPreviewTweenSelector",
-            "loadingPreviewCameraSelector",
-            "loadingPreviewLightingSelector",
-            "loadingPreviewSequenceMode",
-            "loadingPreviewSequenceCountMode",
-            "loadingPreviewSequenceCount",
-            "loadingPreviewSpeedMs",
-            "loadingPreviewSize",
-            "loadingPreviewSequenceHoldMs",
-            "loadingPreviewSequenceLoopTransition"
+            "bgColor"
           ],
           "subgroups": []
         },
         {
-          "key": "New Group",
+          "key": "Loading Preview",
           "collapsed": true,
           "locked": false,
           "items": [
             {
               "type": "row",
-              "key": "loadingPreviewSavedLighting"
+              "key": "loadingPreviewShowLive"
+            },
+            {
+              "type": "row",
+              "key": "loadingPreviewEnabled"
+            },
+            {
+              "type": "row",
+              "key": "loadingPreviewCameraEditMode"
+            },
+            {
+              "type": "row",
+              "key": "loadingMinTimeMs"
+            },
+            {
+              "type": "group",
+              "group": {
+                "key": "New Group (5)",
+                "collapsed": true,
+                "locked": false,
+                "items": [
+                  {
+                    "type": "row",
+                    "key": "loadingPreviewRotationX"
+                  },
+                  {
+                    "type": "row",
+                    "key": "loadingPreviewRotationY"
+                  },
+                  {
+                    "type": "row",
+                    "key": "loadingPreviewRotationZ"
+                  },
+                  {
+                    "type": "row",
+                    "key": "loadingPreviewOffsetX"
+                  },
+                  {
+                    "type": "row",
+                    "key": "loadingPreviewOffsetY"
+                  },
+                  {
+                    "type": "row",
+                    "key": "loadingPreviewOffsetZ"
+                  },
+                  {
+                    "type": "row",
+                    "key": "loadingPreviewCameraFov"
+                  },
+                  {
+                    "type": "row",
+                    "key": "loadingPreviewCameraZoom"
+                  },
+                  {
+                    "type": "row",
+                    "key": "loadingPreviewSavedCameras"
+                  }
+                ],
+                "settings": [
+                  "loadingPreviewRotationX",
+                  "loadingPreviewRotationY",
+                  "loadingPreviewRotationZ",
+                  "loadingPreviewOffsetX",
+                  "loadingPreviewOffsetY",
+                  "loadingPreviewOffsetZ",
+                  "loadingPreviewCameraFov",
+                  "loadingPreviewCameraZoom",
+                  "loadingPreviewSavedCameras"
+                ],
+                "subgroups": []
+              }
+            },
+            {
+              "type": "group",
+              "group": {
+                "key": "New Group (7)",
+                "collapsed": true,
+                "locked": false,
+                "items": [
+                  {
+                    "type": "row",
+                    "key": "loadingPreviewTweenSelector"
+                  },
+                  {
+                    "type": "row",
+                    "key": "loadingPreviewCameraSelector"
+                  },
+                  {
+                    "type": "row",
+                    "key": "loadingPreviewLightingSelector"
+                  },
+                  {
+                    "type": "row",
+                    "key": "loadingPreviewSequenceMode"
+                  },
+                  {
+                    "type": "row",
+                    "key": "loadingPreviewSequenceCountMode"
+                  },
+                  {
+                    "type": "row",
+                    "key": "loadingPreviewSequenceCount"
+                  },
+                  {
+                    "type": "row",
+                    "key": "loadingPreviewSpeedMs"
+                  },
+                  {
+                    "type": "row",
+                    "key": "loadingPreviewSize"
+                  },
+                  {
+                    "type": "row",
+                    "key": "loadingPreviewSequenceHoldMs"
+                  },
+                  {
+                    "type": "row",
+                    "key": "loadingPreviewSequenceLoopTransition"
+                  }
+                ],
+                "settings": [
+                  "loadingPreviewTweenSelector",
+                  "loadingPreviewCameraSelector",
+                  "loadingPreviewLightingSelector",
+                  "loadingPreviewSequenceMode",
+                  "loadingPreviewSequenceCountMode",
+                  "loadingPreviewSequenceCount",
+                  "loadingPreviewSpeedMs",
+                  "loadingPreviewSize",
+                  "loadingPreviewSequenceHoldMs",
+                  "loadingPreviewSequenceLoopTransition"
+                ],
+                "subgroups": []
+              }
+            },
+            {
+              "type": "group",
+              "group": {
+                "key": "New Group",
+                "collapsed": true,
+                "locked": false,
+                "items": [
+                  {
+                    "type": "row",
+                    "key": "loadingPreviewSavedLighting"
+                  }
+                ],
+                "settings": [
+                  "loadingPreviewSavedLighting"
+                ],
+                "subgroups": []
+              }
             }
           ],
           "settings": [
-            "loadingPreviewSavedLighting"
+            "loadingPreviewShowLive",
+            "loadingPreviewEnabled",
+            "loadingPreviewCameraEditMode",
+            "loadingMinTimeMs"
           ],
-          "subgroups": []
+          "subgroups": [
+            {
+              "key": "New Group (5)",
+              "collapsed": true,
+              "locked": false,
+              "items": [
+                {
+                  "type": "row",
+                  "key": "loadingPreviewRotationX"
+                },
+                {
+                  "type": "row",
+                  "key": "loadingPreviewRotationY"
+                },
+                {
+                  "type": "row",
+                  "key": "loadingPreviewRotationZ"
+                },
+                {
+                  "type": "row",
+                  "key": "loadingPreviewOffsetX"
+                },
+                {
+                  "type": "row",
+                  "key": "loadingPreviewOffsetY"
+                },
+                {
+                  "type": "row",
+                  "key": "loadingPreviewOffsetZ"
+                },
+                {
+                  "type": "row",
+                  "key": "loadingPreviewCameraFov"
+                },
+                {
+                  "type": "row",
+                  "key": "loadingPreviewCameraZoom"
+                },
+                {
+                  "type": "row",
+                  "key": "loadingPreviewSavedCameras"
+                }
+              ],
+              "settings": [
+                "loadingPreviewRotationX",
+                "loadingPreviewRotationY",
+                "loadingPreviewRotationZ",
+                "loadingPreviewOffsetX",
+                "loadingPreviewOffsetY",
+                "loadingPreviewOffsetZ",
+                "loadingPreviewCameraFov",
+                "loadingPreviewCameraZoom",
+                "loadingPreviewSavedCameras"
+              ],
+              "subgroups": []
+            },
+            {
+              "key": "New Group (7)",
+              "collapsed": true,
+              "locked": false,
+              "items": [
+                {
+                  "type": "row",
+                  "key": "loadingPreviewTweenSelector"
+                },
+                {
+                  "type": "row",
+                  "key": "loadingPreviewCameraSelector"
+                },
+                {
+                  "type": "row",
+                  "key": "loadingPreviewLightingSelector"
+                },
+                {
+                  "type": "row",
+                  "key": "loadingPreviewSequenceMode"
+                },
+                {
+                  "type": "row",
+                  "key": "loadingPreviewSequenceCountMode"
+                },
+                {
+                  "type": "row",
+                  "key": "loadingPreviewSequenceCount"
+                },
+                {
+                  "type": "row",
+                  "key": "loadingPreviewSpeedMs"
+                },
+                {
+                  "type": "row",
+                  "key": "loadingPreviewSize"
+                },
+                {
+                  "type": "row",
+                  "key": "loadingPreviewSequenceHoldMs"
+                },
+                {
+                  "type": "row",
+                  "key": "loadingPreviewSequenceLoopTransition"
+                }
+              ],
+              "settings": [
+                "loadingPreviewTweenSelector",
+                "loadingPreviewCameraSelector",
+                "loadingPreviewLightingSelector",
+                "loadingPreviewSequenceMode",
+                "loadingPreviewSequenceCountMode",
+                "loadingPreviewSequenceCount",
+                "loadingPreviewSpeedMs",
+                "loadingPreviewSize",
+                "loadingPreviewSequenceHoldMs",
+                "loadingPreviewSequenceLoopTransition"
+              ],
+              "subgroups": []
+            },
+            {
+              "key": "New Group",
+              "collapsed": true,
+              "locked": false,
+              "items": [
+                {
+                  "type": "row",
+                  "key": "loadingPreviewSavedLighting"
+                }
+              ],
+              "settings": [
+                "loadingPreviewSavedLighting"
+              ],
+              "subgroups": []
+            }
+          ]
         }
       ]
     },
     {
       "key": "New Group (2)",
-      "collapsed": false,
+      "collapsed": true,
       "locked": false,
       "items": [
         {
@@ -22676,7 +23140,7 @@
           "type": "group",
           "group": {
             "key": "Pose",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -23378,17 +23842,6 @@
         {
           "type": "group",
           "group": {
-            "key": "Pose Preview",
-            "collapsed": true,
-            "locked": false,
-            "items": [],
-            "settings": [],
-            "subgroups": []
-          }
-        },
-        {
-          "type": "group",
-          "group": {
             "key": "Tween",
             "collapsed": true,
             "locked": false,
@@ -23792,7 +24245,7 @@
         },
         {
           "key": "Pose",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -24491,14 +24944,6 @@
           ]
         },
         {
-          "key": "Pose Preview",
-          "collapsed": true,
-          "locked": false,
-          "items": [],
-          "settings": [],
-          "subgroups": []
-        },
-        {
           "key": "Tween",
           "collapsed": true,
           "locked": false,
@@ -24784,96 +25229,6 @@
           ]
         }
       ]
-    },
-    {
-      "key": "Quality / Performance",
-      "collapsed": true,
-      "locked": false,
-      "items": [
-        {
-          "type": "row",
-          "key": "pixelRatio"
-        },
-        {
-          "type": "row",
-          "key": "resolutionScale"
-        },
-        {
-          "type": "row",
-          "key": "qualityPreset"
-        }
-      ],
-      "settings": [
-        "pixelRatio",
-        "resolutionScale",
-        "qualityPreset"
-      ],
-      "subgroups": []
-    },
-    {
-      "key": "Pause Button",
-      "collapsed": true,
-      "locked": false,
-      "items": [
-        {
-          "type": "row",
-          "key": "pausedRenderFps"
-        },
-        {
-          "type": "row",
-          "key": "pauseBtnXOffset"
-        },
-        {
-          "type": "row",
-          "key": "pauseBtnYOffset"
-        },
-        {
-          "type": "row",
-          "key": "pauseBtnSize"
-        },
-        {
-          "type": "row",
-          "key": "pauseBtnIconSize"
-        },
-        {
-          "type": "row",
-          "key": "pauseBtnCornerRadius"
-        },
-        {
-          "type": "row",
-          "key": "pauseBtnBorderThickness"
-        },
-        {
-          "type": "row",
-          "key": "pauseBtnOpacity"
-        },
-        {
-          "type": "row",
-          "key": "pauseBtnBgColor"
-        },
-        {
-          "type": "row",
-          "key": "pauseBtnIconColor"
-        },
-        {
-          "type": "row",
-          "key": "pauseBtnBorderColor"
-        }
-      ],
-      "settings": [
-        "pausedRenderFps",
-        "pauseBtnXOffset",
-        "pauseBtnYOffset",
-        "pauseBtnSize",
-        "pauseBtnIconSize",
-        "pauseBtnCornerRadius",
-        "pauseBtnBorderThickness",
-        "pauseBtnOpacity",
-        "pauseBtnBgColor",
-        "pauseBtnIconColor",
-        "pauseBtnBorderColor"
-      ],
-      "subgroups": []
     },
     {
       "key": "Custom Click Functions",
@@ -34705,184 +35060,592 @@
       ]
     },
     {
-      "key": "Camera",
+      "key": "New Group (11)",
       "collapsed": true,
       "locked": false,
       "items": [
         {
-          "type": "row",
-          "key": "cameraZoomSpeed"
+          "type": "group",
+          "group": {
+            "key": "New Group (10)",
+            "collapsed": true,
+            "locked": false,
+            "items": [
+              {
+                "type": "group",
+                "group": {
+                  "key": "Toon Shading",
+                  "collapsed": true,
+                  "locked": false,
+                  "items": [
+                    {
+                      "type": "row",
+                      "key": "savedToon"
+                    },
+                    {
+                      "type": "row",
+                      "key": "toonSteps"
+                    },
+                    {
+                      "type": "row",
+                      "key": "toonStepThreshold"
+                    },
+                    {
+                      "type": "row",
+                      "key": "toonShadowFloor"
+                    },
+                    {
+                      "type": "row",
+                      "key": "toonLightCeiling"
+                    },
+                    {
+                      "type": "row",
+                      "key": "toonBaseTint"
+                    },
+                    {
+                      "type": "row",
+                      "key": "textureInfluence"
+                    },
+                    {
+                      "type": "row",
+                      "key": "toonTint"
+                    },
+                    {
+                      "type": "row",
+                      "key": "rimIntensity"
+                    },
+                    {
+                      "type": "row",
+                      "key": "rimPower"
+                    },
+                    {
+                      "type": "row",
+                      "key": "rimColor"
+                    }
+                  ],
+                  "settings": [
+                    "savedToon",
+                    "toonSteps",
+                    "toonStepThreshold",
+                    "toonShadowFloor",
+                    "toonLightCeiling",
+                    "toonBaseTint",
+                    "textureInfluence",
+                    "toonTint",
+                    "rimIntensity",
+                    "rimPower",
+                    "rimColor"
+                  ],
+                  "subgroups": []
+                }
+              }
+            ],
+            "settings": [],
+            "subgroups": [
+              {
+                "key": "Toon Shading",
+                "collapsed": true,
+                "locked": false,
+                "items": [
+                  {
+                    "type": "row",
+                    "key": "savedToon"
+                  },
+                  {
+                    "type": "row",
+                    "key": "toonSteps"
+                  },
+                  {
+                    "type": "row",
+                    "key": "toonStepThreshold"
+                  },
+                  {
+                    "type": "row",
+                    "key": "toonShadowFloor"
+                  },
+                  {
+                    "type": "row",
+                    "key": "toonLightCeiling"
+                  },
+                  {
+                    "type": "row",
+                    "key": "toonBaseTint"
+                  },
+                  {
+                    "type": "row",
+                    "key": "textureInfluence"
+                  },
+                  {
+                    "type": "row",
+                    "key": "toonTint"
+                  },
+                  {
+                    "type": "row",
+                    "key": "rimIntensity"
+                  },
+                  {
+                    "type": "row",
+                    "key": "rimPower"
+                  },
+                  {
+                    "type": "row",
+                    "key": "rimColor"
+                  }
+                ],
+                "settings": [
+                  "savedToon",
+                  "toonSteps",
+                  "toonStepThreshold",
+                  "toonShadowFloor",
+                  "toonLightCeiling",
+                  "toonBaseTint",
+                  "textureInfluence",
+                  "toonTint",
+                  "rimIntensity",
+                  "rimPower",
+                  "rimColor"
+                ],
+                "subgroups": []
+              }
+            ]
+          }
         },
         {
-          "type": "row",
-          "key": "savedCameras"
+          "type": "group",
+          "group": {
+            "key": "Camera",
+            "collapsed": true,
+            "locked": false,
+            "items": [
+              {
+                "type": "row",
+                "key": "cameraZoomSpeed"
+              },
+              {
+                "type": "row",
+                "key": "savedCameras"
+              },
+              {
+                "type": "row",
+                "key": "lockCameraPan"
+              },
+              {
+                "type": "row",
+                "key": "lockCameraZoom"
+              },
+              {
+                "type": "row",
+                "key": "cameraMaxExtentsEnabled"
+              },
+              {
+                "type": "row",
+                "key": "cameraX"
+              },
+              {
+                "type": "row",
+                "key": "cameraY"
+              },
+              {
+                "type": "row",
+                "key": "cameraZ"
+              },
+              {
+                "type": "row",
+                "key": "cameraFov"
+              },
+              {
+                "type": "row",
+                "key": "cameraZoom"
+              }
+            ],
+            "settings": [
+              "cameraZoomSpeed",
+              "savedCameras",
+              "lockCameraPan",
+              "lockCameraZoom",
+              "cameraMaxExtentsEnabled",
+              "cameraX",
+              "cameraY",
+              "cameraZ",
+              "cameraFov",
+              "cameraZoom"
+            ],
+            "subgroups": []
+          }
         },
         {
-          "type": "row",
-          "key": "lockCameraPan"
+          "type": "group",
+          "group": {
+            "key": "Lighting",
+            "collapsed": true,
+            "locked": false,
+            "items": [
+              {
+                "type": "row",
+                "key": "savedLighting"
+              },
+              {
+                "type": "row",
+                "key": "keyAzimuth"
+              },
+              {
+                "type": "row",
+                "key": "keyElevation"
+              },
+              {
+                "type": "row",
+                "key": "keyTargetHeight"
+              },
+              {
+                "type": "row",
+                "key": "keyIntensity"
+              },
+              {
+                "type": "row",
+                "key": "keyColor"
+              },
+              {
+                "type": "row",
+                "key": "ambientIntensity"
+              },
+              {
+                "type": "row",
+                "key": "ambientSkyColor"
+              },
+              {
+                "type": "row",
+                "key": "ambientGroundColor"
+              }
+            ],
+            "settings": [
+              "savedLighting",
+              "keyAzimuth",
+              "keyElevation",
+              "keyTargetHeight",
+              "keyIntensity",
+              "keyColor",
+              "ambientIntensity",
+              "ambientSkyColor",
+              "ambientGroundColor"
+            ],
+            "subgroups": []
+          }
         },
         {
-          "type": "row",
-          "key": "lockCameraZoom"
-        },
-        {
-          "type": "row",
-          "key": "cameraMaxExtentsEnabled"
-        },
-        {
-          "type": "row",
-          "key": "cameraX"
-        },
-        {
-          "type": "row",
-          "key": "cameraY"
-        },
-        {
-          "type": "row",
-          "key": "cameraZ"
-        },
-        {
-          "type": "row",
-          "key": "cameraFov"
-        },
-        {
-          "type": "row",
-          "key": "cameraZoom"
+          "type": "group",
+          "group": {
+            "key": "Quality / Performance",
+            "collapsed": true,
+            "locked": false,
+            "items": [
+              {
+                "type": "row",
+                "key": "pixelRatio"
+              },
+              {
+                "type": "row",
+                "key": "resolutionScale"
+              },
+              {
+                "type": "row",
+                "key": "qualityPreset"
+              }
+            ],
+            "settings": [
+              "pixelRatio",
+              "resolutionScale",
+              "qualityPreset"
+            ],
+            "subgroups": []
+          }
         }
       ],
-      "settings": [
-        "cameraZoomSpeed",
-        "savedCameras",
-        "lockCameraPan",
-        "lockCameraZoom",
-        "cameraMaxExtentsEnabled",
-        "cameraX",
-        "cameraY",
-        "cameraZ",
-        "cameraFov",
-        "cameraZoom"
-      ],
-      "subgroups": []
-    },
-    {
-      "key": "Lighting",
-      "collapsed": true,
-      "locked": false,
-      "items": [
+      "settings": [],
+      "subgroups": [
         {
-          "type": "row",
-          "key": "savedLighting"
+          "key": "New Group (10)",
+          "collapsed": true,
+          "locked": false,
+          "items": [
+            {
+              "type": "group",
+              "group": {
+                "key": "Toon Shading",
+                "collapsed": true,
+                "locked": false,
+                "items": [
+                  {
+                    "type": "row",
+                    "key": "savedToon"
+                  },
+                  {
+                    "type": "row",
+                    "key": "toonSteps"
+                  },
+                  {
+                    "type": "row",
+                    "key": "toonStepThreshold"
+                  },
+                  {
+                    "type": "row",
+                    "key": "toonShadowFloor"
+                  },
+                  {
+                    "type": "row",
+                    "key": "toonLightCeiling"
+                  },
+                  {
+                    "type": "row",
+                    "key": "toonBaseTint"
+                  },
+                  {
+                    "type": "row",
+                    "key": "textureInfluence"
+                  },
+                  {
+                    "type": "row",
+                    "key": "toonTint"
+                  },
+                  {
+                    "type": "row",
+                    "key": "rimIntensity"
+                  },
+                  {
+                    "type": "row",
+                    "key": "rimPower"
+                  },
+                  {
+                    "type": "row",
+                    "key": "rimColor"
+                  }
+                ],
+                "settings": [
+                  "savedToon",
+                  "toonSteps",
+                  "toonStepThreshold",
+                  "toonShadowFloor",
+                  "toonLightCeiling",
+                  "toonBaseTint",
+                  "textureInfluence",
+                  "toonTint",
+                  "rimIntensity",
+                  "rimPower",
+                  "rimColor"
+                ],
+                "subgroups": []
+              }
+            }
+          ],
+          "settings": [],
+          "subgroups": [
+            {
+              "key": "Toon Shading",
+              "collapsed": true,
+              "locked": false,
+              "items": [
+                {
+                  "type": "row",
+                  "key": "savedToon"
+                },
+                {
+                  "type": "row",
+                  "key": "toonSteps"
+                },
+                {
+                  "type": "row",
+                  "key": "toonStepThreshold"
+                },
+                {
+                  "type": "row",
+                  "key": "toonShadowFloor"
+                },
+                {
+                  "type": "row",
+                  "key": "toonLightCeiling"
+                },
+                {
+                  "type": "row",
+                  "key": "toonBaseTint"
+                },
+                {
+                  "type": "row",
+                  "key": "textureInfluence"
+                },
+                {
+                  "type": "row",
+                  "key": "toonTint"
+                },
+                {
+                  "type": "row",
+                  "key": "rimIntensity"
+                },
+                {
+                  "type": "row",
+                  "key": "rimPower"
+                },
+                {
+                  "type": "row",
+                  "key": "rimColor"
+                }
+              ],
+              "settings": [
+                "savedToon",
+                "toonSteps",
+                "toonStepThreshold",
+                "toonShadowFloor",
+                "toonLightCeiling",
+                "toonBaseTint",
+                "textureInfluence",
+                "toonTint",
+                "rimIntensity",
+                "rimPower",
+                "rimColor"
+              ],
+              "subgroups": []
+            }
+          ]
         },
         {
-          "type": "row",
-          "key": "keyAzimuth"
+          "key": "Camera",
+          "collapsed": true,
+          "locked": false,
+          "items": [
+            {
+              "type": "row",
+              "key": "cameraZoomSpeed"
+            },
+            {
+              "type": "row",
+              "key": "savedCameras"
+            },
+            {
+              "type": "row",
+              "key": "lockCameraPan"
+            },
+            {
+              "type": "row",
+              "key": "lockCameraZoom"
+            },
+            {
+              "type": "row",
+              "key": "cameraMaxExtentsEnabled"
+            },
+            {
+              "type": "row",
+              "key": "cameraX"
+            },
+            {
+              "type": "row",
+              "key": "cameraY"
+            },
+            {
+              "type": "row",
+              "key": "cameraZ"
+            },
+            {
+              "type": "row",
+              "key": "cameraFov"
+            },
+            {
+              "type": "row",
+              "key": "cameraZoom"
+            }
+          ],
+          "settings": [
+            "cameraZoomSpeed",
+            "savedCameras",
+            "lockCameraPan",
+            "lockCameraZoom",
+            "cameraMaxExtentsEnabled",
+            "cameraX",
+            "cameraY",
+            "cameraZ",
+            "cameraFov",
+            "cameraZoom"
+          ],
+          "subgroups": []
         },
         {
-          "type": "row",
-          "key": "keyElevation"
+          "key": "Lighting",
+          "collapsed": true,
+          "locked": false,
+          "items": [
+            {
+              "type": "row",
+              "key": "savedLighting"
+            },
+            {
+              "type": "row",
+              "key": "keyAzimuth"
+            },
+            {
+              "type": "row",
+              "key": "keyElevation"
+            },
+            {
+              "type": "row",
+              "key": "keyTargetHeight"
+            },
+            {
+              "type": "row",
+              "key": "keyIntensity"
+            },
+            {
+              "type": "row",
+              "key": "keyColor"
+            },
+            {
+              "type": "row",
+              "key": "ambientIntensity"
+            },
+            {
+              "type": "row",
+              "key": "ambientSkyColor"
+            },
+            {
+              "type": "row",
+              "key": "ambientGroundColor"
+            }
+          ],
+          "settings": [
+            "savedLighting",
+            "keyAzimuth",
+            "keyElevation",
+            "keyTargetHeight",
+            "keyIntensity",
+            "keyColor",
+            "ambientIntensity",
+            "ambientSkyColor",
+            "ambientGroundColor"
+          ],
+          "subgroups": []
         },
         {
-          "type": "row",
-          "key": "keyTargetHeight"
-        },
-        {
-          "type": "row",
-          "key": "keyIntensity"
-        },
-        {
-          "type": "row",
-          "key": "keyColor"
-        },
-        {
-          "type": "row",
-          "key": "ambientIntensity"
-        },
-        {
-          "type": "row",
-          "key": "ambientSkyColor"
-        },
-        {
-          "type": "row",
-          "key": "ambientGroundColor"
+          "key": "Quality / Performance",
+          "collapsed": true,
+          "locked": false,
+          "items": [
+            {
+              "type": "row",
+              "key": "pixelRatio"
+            },
+            {
+              "type": "row",
+              "key": "resolutionScale"
+            },
+            {
+              "type": "row",
+              "key": "qualityPreset"
+            }
+          ],
+          "settings": [
+            "pixelRatio",
+            "resolutionScale",
+            "qualityPreset"
+          ],
+          "subgroups": []
         }
-      ],
-      "settings": [
-        "savedLighting",
-        "keyAzimuth",
-        "keyElevation",
-        "keyTargetHeight",
-        "keyIntensity",
-        "keyColor",
-        "ambientIntensity",
-        "ambientSkyColor",
-        "ambientGroundColor"
-      ],
-      "subgroups": []
-    },
-    {
-      "key": "Toon Shading",
-      "collapsed": true,
-      "locked": false,
-      "items": [
-        {
-          "type": "row",
-          "key": "savedToon"
-        },
-        {
-          "type": "row",
-          "key": "toonSteps"
-        },
-        {
-          "type": "row",
-          "key": "toonStepThreshold"
-        },
-        {
-          "type": "row",
-          "key": "toonShadowFloor"
-        },
-        {
-          "type": "row",
-          "key": "toonLightCeiling"
-        },
-        {
-          "type": "row",
-          "key": "toonBaseTint"
-        },
-        {
-          "type": "row",
-          "key": "textureInfluence"
-        },
-        {
-          "type": "row",
-          "key": "toonTint"
-        },
-        {
-          "type": "row",
-          "key": "rimIntensity"
-        },
-        {
-          "type": "row",
-          "key": "rimPower"
-        },
-        {
-          "type": "row",
-          "key": "rimColor"
-        }
-      ],
-      "settings": [
-        "savedToon",
-        "toonSteps",
-        "toonStepThreshold",
-        "toonShadowFloor",
-        "toonLightCeiling",
-        "toonBaseTint",
-        "textureInfluence",
-        "toonTint",
-        "rimIntensity",
-        "rimPower",
-        "rimColor"
-      ],
-      "subgroups": []
+      ]
     }
   ],
   "textOverrides": {
@@ -34924,6 +35687,9 @@
     "custom15Type": "Trigger Type",
     "custom15ClickCount": "Trigger Count",
     "Custom Click Function 15": "RIGHT CLICK + HOLD",
-    "New Group (8)": "OFFSET"
+    "New Group (8)": "OFFSET",
+    "New Group (9)": "UI",
+    "New Group (10)": "RENDERING STYLE",
+    "New Group (11)": "THREE.JS"
   }
 }
