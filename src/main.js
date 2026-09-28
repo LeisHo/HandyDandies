@@ -192,6 +192,14 @@ let cursorLogTimer = null
 const HAND_BEHAVIOUR_LOG_MAX_ENTRIES = 200
 const handBehaviourLogEntries = []
 let handBehaviourLogEl = null
+// "Log Hand Behaviour - Detailed" (2026-09-28, direct request) -- a 2nd,
+// independent timer reusing cfg.cursorLogIntervalMs (the SAME interval
+// already driving Cursor Position Log's own restartCursorLogTimer(),
+// directly below) rather than a new slider. Deliberately its own
+// setInterval/checkbox, NOT tied to cfg.logCursorPositionEnabled's own
+// on/off state -- only the RATE is shared between the 2 logs, not
+// whether either one is currently running.
+let handBehaviourDetailedLogTimer = null
 // Hand Numbers overlay's own state (2026-09-28, direct request) -- a pool
 // of plain HTML label divs, one per hand, built lazily on first enable
 // and reused thereafter (never rebuilt just because the checkbox toggled
@@ -1589,7 +1597,7 @@ const DEV_GROUPS = [
       // controls only the REGULAR, timer-driven position log, which
       // otherwise would spam the display every frame.
       { key: 'logCursorPositionEnabled', label: 'Log Regular Cursor Position', type: 'checkbox', def: false, onChange: () => restartCursorLogTimer() },
-      { key: 'cursorLogIntervalMs', label: 'Cursor Position Log Interval (Ms)', type: 'slider', min: 100, max: 5000, step: 50, def: 1000, onChange: () => restartCursorLogTimer() },
+      { key: 'cursorLogIntervalMs', label: 'Cursor Position Log Interval (Ms)', type: 'slider', min: 100, max: 5000, step: 50, def: 1000, onChange: () => { restartCursorLogTimer(); restartHandBehaviourDetailedLogTimer() } },
       { key: 'clearMouseLogBtn', label: 'Clear Mouse Tracking Log', type: 'button', onClick: () => clearMouseTrackingLog() },
       // Added 2026-09-28, direct request: "denotes which is the 1st hand
       // and 2nd hand etc etc so i can refer to them." A plain on-screen
@@ -1616,6 +1624,16 @@ const DEV_GROUPS = [
       // this control's own surrounding discussion) rather than a generic
       // description alone.
       { key: 'logHandBehaviourEnabled', label: 'Log Hand Behaviour', type: 'checkbox', def: false },
+      // Added 2026-09-28, direct request: "on top of the regular Hand
+      // Behaviour log, you will log every hand's pose details at the same
+      // rate as Cursor Position Log." A separate, additive checkbox --
+      // with this on, every hand's current pose fields get appended to the
+      // SAME Hand Behaviour Log display (tagged "DETAILED" per line, see
+      // logHandBehaviourDetailedLine()) on a timer, independent of whether
+      // the plain event-driven Log Hand Behaviour above is also on. Reuses
+      // cfg.cursorLogIntervalMs's own value (no new interval control) via
+      // restartHandBehaviourDetailedLogTimer().
+      { key: 'logHandBehaviourDetailedEnabled', label: 'Log Hand Behaviour - Detailed', type: 'checkbox', def: false, onChange: () => restartHandBehaviourDetailedLogTimer() },
       { key: 'clearHandBehaviourLogBtn', label: 'Clear Hand Behaviour Log', type: 'button', onClick: () => clearHandBehaviourLog() }
     ]
   }
@@ -1808,6 +1826,7 @@ updateArmRotationGateVisibility()
 buildMouseTrackingLogWidget()
 buildHandBehaviourLogWidget()
 restartCursorLogTimer()
+restartHandBehaviourDetailedLogTimer()
 setupSettingsChangeLog()
 
 // -----------------------------------------------------------------------
@@ -2256,9 +2275,12 @@ function handLogTriggerLabel(p) {
   const titleEl = g ? g.querySelector(':scope > .dp-group-header .dp-group-title-text') : null
   return (titleEl && titleEl.textContent.trim()) || p
 }
-function logHandBehaviourEvent(handIndex, source, text) {
-  if (!cfg.logHandBehaviourEnabled) return
-  const line = `[${new Date().toLocaleTimeString()}] Hand ${handIndex + 1}: ${source} -- ${text}`
+// Shared push+truncate+render step, factored out of logHandBehaviourEvent()
+// (2026-09-28) so the new Detailed periodic log below can append into the
+// exact same buffer/display without duplicating this bookkeeping -- a
+// small, behavior-preserving extraction, not a new abstraction over
+// something used only once.
+function appendHandBehaviourLogLine(line) {
   handBehaviourLogEntries.push(line)
   if (handBehaviourLogEntries.length > HAND_BEHAVIOUR_LOG_MAX_ENTRIES) handBehaviourLogEntries.shift()
   if (handBehaviourLogEl) {
@@ -2266,9 +2288,57 @@ function logHandBehaviourEvent(handIndex, source, text) {
     handBehaviourLogEl.scrollTop = handBehaviourLogEl.scrollHeight
   }
 }
+function logHandBehaviourEvent(handIndex, source, text) {
+  if (!cfg.logHandBehaviourEnabled) return
+  appendHandBehaviourLogLine(`[${new Date().toLocaleTimeString()}] Hand ${handIndex + 1}: ${source} -- ${text}`)
+}
 function clearHandBehaviourLog() {
   handBehaviourLogEntries.length = 0
   if (handBehaviourLogEl) handBehaviourLogEl.textContent = ''
+}
+// "Log Hand Behaviour - Detailed" (2026-09-28, direct request) -- see the
+// logHandBehaviourDetailedEnabled control's own comment for the full
+// design. describeHandPoseDetails() summarizes one hand's own live pose
+// (hand._lastPoseValues, the same universal per-hand "last applied pose"
+// object every trigger family and idle-repose already funnel through --
+// see applyPoseValuesToHand()'s own comment) plus its current splay and
+// whichever custom/static trigger (if any) currently governs it, scanning
+// CLICK_HOLD_KEYS/CLICK_POSE_KEYS (the live, dynamically-populated arrays
+// every registered Click+Hold/Click-Pose-kind function -- custom or
+// legacy -- registers itself into).
+function describeHandPoseDetails(hand) {
+  const v = hand._lastPoseValues || {}
+  const fmt = (n) => (typeof n === 'number' && Number.isFinite(n) ? n.toFixed(2) : '—')
+  const poseStr = `thumbCurl=${fmt(v.thumbCurl)} curlIndex=${fmt(v.curlIndex)} curlMiddle=${fmt(v.curlMiddle)} curlRing=${fmt(v.curlRing)} curlPinky=${fmt(v.curlPinky)} wristBend=${fmt(v.wristBend)} wristSplay=${fmt(v.wristSplay)} wristRotation=${fmt(v.wristRotation)}`
+  let activeStr = 'idle'
+  for (const p of CLICK_HOLD_KEYS) {
+    const chp = hand._chp && hand._chp[p]
+    if (chp && chp.phase && chp.phase !== 'idle') { activeStr = `${handLogTriggerLabel(p)}(${chp.phase})`; break }
+  }
+  if (activeStr === 'idle') {
+    for (const p of CLICK_POSE_KEYS) {
+      const cp = hand._cp && hand._cp[p]
+      if (cp && cp.phase && cp.phase !== 'idle') { activeStr = `${handLogTriggerLabel(p)}(${cp.phase})`; break }
+    }
+  }
+  return `${poseStr} splayDeg=${fmt(hand.currentSplayDeg)} active=${activeStr}`
+}
+function logHandBehaviourDetailedTick() {
+  if (!cfg.logHandBehaviourDetailedEnabled) return
+  const stamp = new Date().toLocaleTimeString()
+  hands.forEach((hand, i) => {
+    appendHandBehaviourLogLine(`[${stamp}] Hand ${i + 1}: DETAILED -- ${describeHandPoseDetails(hand)}`)
+  })
+}
+// Reuses cfg.cursorLogIntervalMs -- the SAME slider already driving
+// restartCursorLogTimer()'s own setInterval directly above -- rather than
+// a new interval control (direct request: "at the same rate as Cursor
+// Position Log"). A real setInterval, not piggybacked on the render loop,
+// for the same reason restartCursorLogTimer() already gives.
+function restartHandBehaviourDetailedLogTimer() {
+  if (handBehaviourDetailedLogTimer) { clearInterval(handBehaviourDetailedLogTimer); handBehaviourDetailedLogTimer = null }
+  if (!cfg.logHandBehaviourDetailedEnabled) return
+  handBehaviourDetailedLogTimer = setInterval(logHandBehaviourDetailedTick, cfg.cursorLogIntervalMs)
 }
 // Same widget shape as buildMouseTrackingLogWidget() directly above
 // (Copy/Save/Clear + a scrolling `<pre>`), appended right after it in the

@@ -18,6 +18,28 @@ work seamlessly from there.
 
 ## Currently working on
 
+**ADDED 2026-09-28 (24th round) -- new Debug checkbox "Log Hand
+Behaviour - Detailed".** With it on, a new independent timer (reusing
+the existing Cursor Position Log's own interval slider,
+`cfg.cursorLogIntervalMs`, per direct request -- no new interval
+control added) appends one `DETAILED`-tagged line per hand, per tick,
+into the SAME Hand Behaviour Log display the existing event-driven log
+already writes to -- purely additive; the existing trigger/commit/
+interrupt/retransition-start entries are unaffected. Each line reports
+that hand's current curl/wrist pose values (`hand._lastPoseValues`),
+splay, and whichever trigger (if any) currently governs it. Disclosed,
+not fixed: the log's own 200-entry cap can be exceeded by a single tick
+at this project's default 156-hand field size, so older entries get
+pushed out fast once this checkbox is on -- left as-is pending a
+decision on whether to raise the cap or switch to one consolidated
+multi-line entry per tick. NOT live-verified this round -- hit this
+sandbox's own documented network-truncation quirk 5 times in a row
+(this project's own established retry cap) across 2 different
+static-server processes, `window.__debug` never populated. Confidence
+rests on the syntax check plus direct tracing against the already-
+proven `restartCursorLogTimer()`/`logHandBehaviourEvent()` patterns
+this was built to mirror. See CHANGELOG.txt's 24th-round entry.
+
 **FIXED 2026-09-28 (23rd round) -- Arm Rotation no longer flips 360 deg
 at its own rotation limit; the limit itself is gone.** Root cause:
 `Quaternion.angleTo()` (used to measure the angle from a static neutral

@@ -13707,6 +13707,78 @@ wrapped in a bounded-angle calculation.
 
 `main.js` cache-buster bumped `?v=242` -> `?v=243`.
 
+2026-09-28  -  (24th round -- new Debug checkbox, direct request: "New
+debug checkbox - 'Log Hand Behaviour - Detailed'. When turned on, on top
+of the regular Hand Behaviour log, you will log every hand's pose
+details at the same rate as Cursor Position Log")
+
+Added `logHandBehaviourDetailedEnabled` (Debug group, right below the
+existing `logHandBehaviourEnabled` checkbox). With it on, a new,
+independent `setInterval` timer (`restartHandBehaviourDetailedLogTimer()`)
+appends one line per hand, per tick, to the SAME Hand Behaviour Log
+display/buffer the existing event-driven log already writes to (each
+line tagged `DETAILED` to distinguish it from a real trigger/commit/
+interrupt event) -- additive, not a replacement: the existing
+event-driven entries (trigger/commit/interrupt/retransition-start
+moments) are completely unaffected and keep firing regardless of this
+checkbox's state.
+
+Reuses `cfg.cursorLogIntervalMs` -- the SAME slider already driving
+Cursor Position Log's own timer -- rather than adding a new interval
+control, per the request's own "at the same rate as Cursor Position
+Log." `cursorLogIntervalMs`'s own `onChange` now restarts BOTH timers
+together so they always share the same live rate; the 2 checkboxes
+(`logCursorPositionEnabled`/`logHandBehaviourDetailedEnabled`) remain
+fully independent of each other -- only the rate is shared, not either
+log's own on/off state.
+
+Each per-hand detail line reads `hand._lastPoseValues` (the universal
+per-hand "last applied pose" object every trigger family and idle-repose
+already funnel through -- see `applyPoseValuesToHand()`) for
+thumbCurl/curlIndex/curlMiddle/curlRing/curlPinky/wristBend/wristSplay/
+wristRotation, plus `hand.currentSplayDeg`, plus whichever custom/static
+trigger (if any) currently governs that hand -- scanned via the live,
+dynamically-populated `CLICK_HOLD_KEYS`/`CLICK_POSE_KEYS` arrays every
+registered Click+Hold/Click-Pose-kind function registers itself into,
+reusing `handLogTriggerLabel()` for a display-name-accurate label (same
+convention as the existing event-driven log entries).
+
+`logHandBehaviourEvent()`'s own push+truncate+render bookkeeping was
+factored out into a small shared `appendHandBehaviourLogLine()` helper
+(a behavior-preserving extraction, not a new abstraction over something
+used only once) so the new Detailed tick can append into the exact same
+buffer without duplicating that logic.
+
+**Disclosed, not silently worked around:** `HAND_BEHAVIOUR_LOG_MAX_ENTRIES`
+(200) is unchanged -- with a large field (this project defaults to 156
+hands), one Detailed tick alone can exceed that cap, so turning this
+checkbox on will very quickly push out any older, real event-driven
+entries the log was showing. Left as-is rather than silently inflating
+an arbitrary constant nobody asked to change; if this turns out to be a
+real problem in practice, raising the cap (or switching to a
+one-consolidated-multi-line-entry-per-tick format instead of one entry
+per hand) is the fix to make next, as a deliberate follow-up, not
+something to have guessed at unasked this round.
+
+Verified: `node --check src/main.js` passes; confirmed by direct read
+that `CLICK_HOLD_KEYS`/`CLICK_POSE_KEYS`/`hands`/`cfg` are all real
+module-level bindings already in scope by the time these new functions
+actually run (all 3 new call sites -- the checkbox's own `onChange`, the
+`cursorLogIntervalMs` `onChange`, and the boot-time
+`restartHandBehaviourDetailedLogTimer()` call right after
+`restartCursorLogTimer()` -- fire no earlier than `restartCursorLogTimer()`
+itself already safely does today). **NOT live-verified this round** --
+hit this sandbox's own documented network-truncation quirk 5 times in a
+row (this project's own established retry cap) across 2 different
+static-server processes/ports, alternating between `devPanel.js` and
+`main.js` itself failing with `net::ERR_CONNECTION_RESET` before
+`window.__debug` ever populated. Confidence rests on the syntax check
+above plus direct tracing of every new reference against the existing,
+already-proven `restartCursorLogTimer()`/`logHandBehaviourEvent()`
+patterns this feature was built to mirror -- not on live interaction.
+
+`main.js` cache-buster bumped `?v=243` -> `?v=244`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a
