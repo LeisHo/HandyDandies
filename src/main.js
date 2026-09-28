@@ -7503,7 +7503,12 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
       const speedMs = Math.max(safeTweenSpeedMs(cfg[`${p}TweenSpeedMs`]), 1)
       chp.stoppingVirtualElapsedMs += dt * decayFactor
       const progress = THREE.MathUtils.clamp((chp.stoppingBaseElapsedMs + chp.stoppingVirtualElapsedMs) / speedMs, 0, 1)
-      values = (chp.tweenSegments && chp.tweenSegments.length > 0) ? lerpTweenSegments(chp.tweenSegments, progress) : chp.lastAppliedValues
+      // `* frozenTweenFractionCap` (CORRECTED 2026-09-28) -- the forward
+      // phase this continues from applies Start Distance Curve's cap
+      // (`cappedT`); without it here too, a capped hand would jump from
+      // the capped pose to the uncapped one the instant it entered
+      // 'stopping'. A no-op whenever the cap is 1 (curve off).
+      values = (chp.tweenSegments && chp.tweenSegments.length > 0) ? lerpTweenSegments(chp.tweenSegments, progress * (chp.frozenTweenFractionCap ?? 1)) : chp.lastAppliedValues
     }
     chp.lastAppliedValues = values
     applyPoseValuesToHand(hand, values, chp.frozenSplayDeg)
@@ -7710,6 +7715,26 @@ function endClickHoldPose(p) {
     // (idle, or mid some OTHER trigger's own transition, untouched this
     // whole time) simply continues on its own.
     if (chp.phase === 'idle') { chp.pendingClaimAt = 0; return }
+    // CORRECTED 2026-09-28 (10th round of the hands-jump investigation --
+    // the real, measured root cause). A hand already in 'stopping' or
+    // 'retransition' is NOT being driven by the hold that's ending right
+    // now -- it's still winding down from a PREVIOUS release. That happens
+    // constantly in real use: `holdConfirmMs` is 0 in this project's saved
+    // settings, so EVERY plain click (e.g. "clicking elsewhere" to fire a
+    // different function) also re-arms and immediately re-releases this
+    // hold, and a hand whose own Start Time Curve delay hasn't elapsed yet
+    // never re-commits in between. Re-running the release logic on such a
+    // hand re-entered 'stopping' with `stoppingBaseElapsedMs = now -
+    // chp.forwardStartTime` measured against the OLD hold's forwardStartTime
+    // (seconds ago), clamping tween progress to 1 -- every such hand snapped
+    // straight to the sequence's END pose in one frame. Measured live on
+    // production (custom8, 3s hold, release, 1.5s wait, quick press+release):
+    // 88 of 156 hands jumped >8 deg in that single tick (max 34.41 deg,
+    // avg 13.92 deg) vs. <=5.93 deg per tick everywhere around it. Only
+    // hands this hold actually owns ('forward'/'looping') get released;
+    // everything else just has its un-committed pending claim cancelled and
+    // carries on with whatever it was already doing.
+    if (chp.phase !== 'forward' && chp.phase !== 'looping') { chp.pendingClaimAt = 0; return }
     // Tween mode's own dedicated Retransition Speed/Curve/Range (direct
     // request) -- captured once, right now, rather than read live inside
     // the retransition phase itself, so a Mode change mid-retransition
