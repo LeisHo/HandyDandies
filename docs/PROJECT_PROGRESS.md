@@ -18,29 +18,40 @@ work seamlessly from there.
 
 ## Currently working on
 
-**UNRESOLVED, MITIGATED 2026-09-27/28 (12th round) -- the jump
-investigation's 5th round. Root cause still not isolated; a defensive
-mitigation was shipped instead.** User precisely narrowed the repro
-(Retransition OFF = never happens, ON = happens) and reported it live on
-a real phone (hold, release, click elsewhere -> affected hands snap
-rotation then visibly continue damping toward final state). A real
-methodology bug was found and fixed first: every prior round's testing
-drove the state machine via `updateRenderOrder()` directly, which SKIPS
-`animate()`'s own cursor-tracking rotation slerp entirely -- meaning
-"palm rotation" was NEVER actually being tested. Rebuilt the test with a
-faithful manual replica of that code and re-verified every prior
-boundary (splay, base-quat, wrapper rotation/position) using the
-project's own REAL settings (not simplified) -- still fully continuous,
-no discontinuity found. Confirmed real, useful facts along the way:
-`trackingDamping` is per-device (desktop 0.05, mobile 0.08, **landscape
-1.0 -- zero smoothing**), and `holdConfirmMs: 0` means every plain click
-also arms+releases every Click+Hold function. Shipped a mitigation (not
-a fix): a guaranteed ~24-frame gentle-damping "settle window"
-(`hand._handoffSettleFrames`) the instant a hand exits trigger control,
-capping effective tracking damping regardless of the device's own
-setting. **Needs the user's own retest, and ideally a screen recording
-if it persists** -- see CLAUDE.md's matching Gotchas entries and
-CHANGELOG.txt's 12th-round entry for the full account.
+**LIKELY FIXED 2026-09-28 (13th round, 6th round of the jump
+investigation) -- real root cause found via direct live instrumentation;
+pending the user's own real-device confirmation.** Prior rounds (5
+attempts) all focused on `animate()`'s WRAPPER-level cursor-tracking
+rotation (`trackingDamping`, the `_handoffSettleFrames` settle-window
+mitigation) and never found a discontinuity there because it was the
+wrong mechanism. Broke the stalemate by instrumenting the LIVE deployed
+app directly (`window.__debug`), manually driving real frames (bypassing
+this sandbox's own unreliable `requestAnimationFrame`), and dispatching
+the exact real-device repro (click+hold, release, click elsewhere) via
+synthetic pointer events. Measured result: `hand.wrapper.quaternion`
+changed 0 degrees at the jump moment; the `rHand` skeleton bone jumped
+55.87 degrees in ONE simulated frame. Root cause: idle-repose
+(`updateRenderOrder()`'s `needsIdleRepose` branch) has always applied
+LIVE `cfg` pose values to the skeleton instantly, with zero blend --
+correct only when the hand's own prior transition had already converged.
+`releaseHandFromOtherFunctions()` force-sets an interrupted function's
+phase straight to `'idle'` regardless of how far its own retransition had
+actually gotten (a Sequence-mode retransition can take up to 12 real
+seconds), so idle-repose's very next tick snaps from that abandoned,
+still-mostly-posed skeleton straight to the live default. Fixed by giving
+idle-repose the same "blend from `hand._lastPoseValues` toward live
+`cfg`" continuity guarantee every other handoff in this file already has
+(a 400ms blend via the existing `lerpPoseValues()`/`applyPoseValuesToHand()`
+machinery, not a new mechanism). Verified: syntax-checked
+(`node --check`), and the underlying reproduction/measurement was
+confirmed live on the deployed app before the fix; live-testing the FIX
+itself against a local server hit this sandbox's own documented
+network-truncation flakiness 5 times in a row (a known, pre-existing,
+unrelated environment issue -- see CLAUDE.md's Gotchas), so the fix was
+pushed to `main`/Vercel for verification there instead. **Needs a
+post-deploy live re-test (in progress) and, ideally, the user's own
+real-device confirmation** -- see CLAUDE.md's matching Gotchas entry and
+CHANGELOG.txt's 13th-round entry for the full account.
 
 --------------------------------------------------------------------------------
 
@@ -3048,6 +3059,13 @@ still relevant to understanding current state, per this doc's own
   CHANGELOG.txt for the complete account.
 - **Added Camera presets + Lock Pan/Zoom + Max Extents** -- see
   "Currently working on" above and CHANGELOG.txt for the full account.
+- **Palm Rotation Distance Curve/Range got the curve-graph + slider UI**
+  (previously plain JSON text boxes), plus a new generic click-to-edit
+  min/max mechanism applied to all 3 existing double-handle range-bar
+  widgets in the codebase (Arm Length, Wrist Splay, and this new one) --
+  click either handle's readout to type an exact value, Enter commits,
+  Escape cancels. Verified live (v=233): typed values persist to `cfg`
+  and the editor closes correctly. See CHANGELOG.txt's 2026-09-27 entry.
 
 ## What's next
 

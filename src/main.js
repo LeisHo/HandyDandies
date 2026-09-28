@@ -10941,7 +10941,7 @@ function rebuildField() {
     // it explicitly: false until a hand's first REAL repose, forcing
     // exactly one guaranteed full sync regardless of the gate's other
     // conditions, then never forced again.
-    const hand = { wrapper, clone, skinnedMesh, outlineMesh, emissionMesh, wristClipPlane: handWristClipPlane, effectiveRenderOrder: 0, screenX: 0, screenY: 0, screenRadius: 0, currentBaseQuat: cloneBaseQuat.clone(), everReposed: false, currentSplayDeg: 0, _handoffSettleFrames: 0 }
+    const hand = { wrapper, clone, skinnedMesh, outlineMesh, emissionMesh, wristClipPlane: handWristClipPlane, effectiveRenderOrder: 0, screenX: 0, screenY: 0, screenRadius: 0, currentBaseQuat: cloneBaseQuat.clone(), everReposed: false, currentSplayDeg: 0, _handoffSettleFrames: 0, _idleSettleFrom: null, _idleSettleFromSplay: 0, _idleSettleStartTime: 0 }
     // Also recomputes this hand's OWN Hide Wrist clip plane right before
     // it draws (see updateWristClipPlaneForHand()'s own comment) -- every
     // hand faces a different direction and (own material/plane now, see
@@ -11964,6 +11964,59 @@ function updateRenderOrder() {
       const needsIdleRepose = !overridden && ((cfg.wristSplayResponsiveEnabled && isThisHandsStaggerTurn) || hand._wasOverriddenLastFrame || !hand.everReposed)
       if (needsIdleRepose) {
         hand.everReposed = true
+        const extraSplay = computeResponsiveWristSplayDeg(live, minLiveDist, liveDistRange)
+        // CORRECTED 2026-09-28 (6th round of this same jump investigation --
+        // the real root cause, found by direct live instrumentation of
+        // `hand.wrapper.quaternion` AND the `rHand` skeleton bone across a
+        // real click-hold-then-interrupt sequence: a measured 55.87-degree
+        // ONE-FRAME snap in the wrist BONE, with ZERO wrapper-quaternion
+        // change at that same instant -- proving all 5 prior rounds, which
+        // only ever touched cursor-tracking's WRAPPER-level rotation
+        // (trackingDamping/HANDOFF_SETTLE above), were investigating the
+        // wrong mechanism entirely). Root cause: this branch has always
+        // applied LIVE `cfg` values to the skeleton INSTANTLY, with zero
+        // blend, the instant `hand._wasOverriddenLastFrame` makes
+        // `needsIdleRepose` true -- correct ONLY when whatever function was
+        // just controlling this hand had already converged its own
+        // retransition to progress=1 (by design, matching idle exactly, per
+        // this file's own 2nd-round fix). `releaseHandFromOtherFunctions()`
+        // (see its own comment) force-sets an INTERRUPTED function's phase
+        // straight to 'idle' the instant a DIFFERENT function commits for
+        // the same hand -- with ZERO regard for how far its own retransition
+        // had actually gotten (often single-digit percent, since a Sequence-
+        // mode retransition can take up to `TweenRetransitionSpeedMs`, e.g.
+        // 12 seconds) -- so this branch's very next tick jumps straight from
+        // that abandoned, still-mostly-posed skeleton to the live idle
+        // target, a real, large, one-frame discontinuity. Same "blend from
+        // wherever it actually was" fix already applied to
+        // `hand.currentSplayDeg`/`hand._customOffsetAccum`/
+        // `hand._customRotationAccum` (see `applyPoseValuesToHand()`'s own
+        // comment) -- `hand._lastPoseValues` (the universal per-hand "pose
+        // values actually showing right now" snapshot every trigger family
+        // already stashes) is the correct "from" anchor here too, blended
+        // toward live `cfg` via the SAME `lerpPoseValues()` every
+        // 'retransition' phase already uses, over a fixed
+        // `IDLE_REPOSE_SETTLE_MS` window -- never a second real transition
+        // system, just this branch finally getting the same continuity
+        // guarantee every OTHER handoff in this file already has.
+        const IDLE_REPOSE_SETTLE_MS = 400
+        if (hand._wasOverriddenLastFrame && hand._lastPoseValues) {
+          hand._idleSettleFrom = hand._lastPoseValues
+          hand._idleSettleFromSplay = hand.currentSplayDeg
+          hand._idleSettleStartTime = nowMs
+        }
+        let settleProgress = 1
+        if (hand._idleSettleFrom) {
+          settleProgress = THREE.MathUtils.clamp((nowMs - hand._idleSettleStartTime) / IDLE_REPOSE_SETTLE_MS, 0, 1)
+        }
+        if (settleProgress < 1) {
+          const blendedValues = lerpPoseValues(hand._idleSettleFrom, cfg, settleProgress)
+          const blendedSplay = THREE.MathUtils.lerp(hand._idleSettleFromSplay, extraSplay, settleProgress)
+          applyPoseValuesToHand(hand, blendedValues, blendedSplay)
+          hand._wasOverriddenLastFrame = overridden
+          return
+        }
+        hand._idleSettleFrom = null
         // Not mid any pose-transition this frame -- keep this hand's own
         // per-hand basis mirroring the single shared cloneBaseQuat every
         // idle hand has always used, so Whole-Hand Rotation's existing
@@ -11972,7 +12025,6 @@ function updateRenderOrder() {
         // transition syncs back to the shared value the very next frame,
         // same as it would have before this per-hand basis existed.
         hand.currentBaseQuat.copy(cloneBaseQuat)
-        const extraSplay = computeResponsiveWristSplayDeg(live, minLiveDist, liveDistRange)
         applyWristPoseToSkeleton(hand.skinnedMesh.skeleton, cfg, extraSplay)
         // Keeps `hand.currentSplayDeg` (see applyPoseValuesToHand()'s own
         // 2026-09-27 comment) current for idle hands too -- this is the

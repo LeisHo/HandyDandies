@@ -12735,6 +12735,148 @@ Commit: `b4a423a` (merged with a concurrent `Update dev-panel-settings.json
 via Save Settings` commit from the user's own live browser, `087720f`).
 Pushed to `https://github.com/LeisHo/HandyDandies`.
 
+--------------------------------------------------------------------------------
+2026-09-27  -  (same session, following the 12th-round mitigation above)
+
+Direct follow-up request: "the palm rotation distance curve, give me the
+curve graph ui instead of text. the min max should also be the slider
+with toggles" -- then clarified: "i simply meant keep those 2 uis but
+ALSO allow me to click and type to set the min max" -- then "fix both
+issues though dont stop and ask me if i want to continue or wathever"
+(the 2nd issue being the still-open jump investigation above).
+
+Added:
+- Palm Rotation Distance Curve (`palmFacesCursorDistanceCurve`) and Palm
+  Rotation Distance Range (`palmFacesCursorDistanceRange`) -- previously
+  plain JSON text boxes -- now render as a real curve-graph widget and a
+  double-handle range-bar slider, via a new `buildCursorTrackingWidgets()`
+  reusing the existing generic `buildGenericCurveWidget()`/
+  `buildGenericRangeBarWidget()` builders (no new widget mechanism
+  needed).
+- A new generic `attachRangeBarClickToEdit()` helper, wired into ALL 3
+  double-handle range-bar widgets in the codebase (the new one above,
+  plus the pre-existing Arm Length and Wrist Splay widgets) -- clicking
+  either handle's readout turns it into a text input; Enter commits
+  (dispatching a real `input` event through `commitTextControl()`, so
+  devPanel.js's own commit/save pipeline picks it up exactly as if the
+  user had dragged the handle), Escape cancels, blur commits.
+
+Verified live (v=233): clicked a handle's readout, typed a value via
+direct DOM/event dispatch (not fragile pixel-coordinate clicking, which
+was tried first and found imprecise after a layout shift), pressed
+Enter -- `cfg.palmFacesCursorDistanceRange` became exactly
+`{"min":0,"max":180}`, the editor closed, no console errors.
+
+`main.js` cache-buster bumped `?v=232` -> `?v=233`.
+
+Commit: `d40f088`. Pushed to `https://github.com/LeisHo/HandyDandies`
+(merged with concurrent `Update dev-panel-settings.json via Save
+Settings` commits from the user's own live browser).
+
+--------------------------------------------------------------------------------
+2026-09-28  -  (13th round overall; 6th round of the wrist/palm-rotation
+jump investigation -- the real root cause)
+
+Continuing the same investigation per the user's own "fix both issues...
+dont stop and ask" instruction above. User provided a real screen
+recording of the bug from a real device (3 repro instances) with precise
+timestamps. Video-frame analysis in this sandbox's Browser pane hit a
+hard wall: 3 independent techniques (plain `<video>` seek, `requestVideoFrameCallback`,
+even real `.play()`+`.pause()` with a confirmed-advancing `currentTime`)
+all produced a BYTE-IDENTICAL `drawImage()` canvas capture regardless of
+seek position -- this sandbox's canvas can only ever sample one frozen
+compositor frame from local video, the same general class of tool
+limitation as the `requestAnimationFrame`/`document.hidden` misreports
+already documented elsewhere in this file, now confirmed to also block
+video-frame extraction entirely, not just live-app queries.
+
+Pivoted to direct live instrumentation of the deployed app instead
+(`https://handy-dandies.vercel.app/?dev=1`, via `window.__debug`, which
+exposes `hands`/`cfg`/`updateRenderOrder`/`THREE`/etc.). Worked around 2
+more sandbox quirks to get there: (1) `requestAnimationFrame` was
+suspended in this specific tab (`document.hidden: true` despite the tab
+being the frontmost/selected one) -- forced it live via
+`Object.defineProperty(document, 'hidden', {value: false, ...})` +
+dispatching `visibilitychange`/`focus`, which correctly unpaused this
+project's own `lib/visibility-tick-loop.js`; (2) even after that, real
+rAF ticks proved intermittent/unreliable across separate tool calls (300
+ticks/sec in one call, 0 in the next, no code difference) -- switched to
+a manually-driven tick loop instead (`setTimeout`-scheduled, which fired
+reliably), replicating `animate()`'s own cursor-tracking block (lookAt +
+settle-window-capped slerp) around each direct `dbg.updateRenderOrder()`
+call, so the exact real per-frame order (cursor-tracking, then trigger
+dispatch) was preserved without depending on rAF at all.
+
+Instrumented BOTH `hand.wrapper.quaternion` (the wrapper-level rotation
+every prior round focused on) AND the `rHand` skeleton bone's own local
+quaternion, per hand, per tick, then dispatched the exact real repro via
+synthetic `PointerEvent`s against this project's own real, live
+production settings (`custom8`: Click+Hold, Sequence mode, Retransition
+on, `TweenRetransitionSpeedMs: 12000`; `custom7`/`custom9`: Click,
+Retransition off) -- hold at one position, release, click at a different
+position.
+
+**Measured result, decisive**: at the exact moment of the interrupting
+click, `hand.wrapper.quaternion` changed by 0.00 degrees. The `rHand`
+skeleton bone's LOCAL quaternion changed by **55.87 degrees in a single
+simulated frame**. All 5 prior rounds had been investigating the wrong
+mechanism entirely -- the wrapper-level cursor-tracking rotation is (and
+apparently always was) fully continuous; the real discontinuity is, and
+was always, in the skeleton wrist pose.
+
+**Root cause**: `updateRenderOrder()`'s idle-repose branch
+(`needsIdleRepose`) has always applied LIVE `cfg` pose values to the
+skeleton (`applyWristPoseToSkeleton`/`applyCurlToSkeleton`) completely
+instantly, with no blend of any kind -- this was invisible for the
+entire life of the project because it's only reached once a hand
+genuinely stops being "overridden," and a NORMAL release (no
+interruption) lets retransition converge its own blend to progress=1
+FIRST, at which point its last-applied values already exactly equal what
+idle-repose computes (by the 9th-round fix's own design -- "retransition
+ALWAYS converges to exactly what idle already shows"). But
+`releaseHandFromOtherFunctions()` (called when a DIFFERENT function
+commits and claims the same hand) sets an interrupted function's phase
+straight to `'idle'` unconditionally, with zero regard for how far its
+own retransition had actually gotten -- often single digits of a
+percent, since a Sequence-mode retransition can take up to
+`TweenRetransitionSpeedMs` (12 real seconds) to finish. The very next
+tick, idle-repose jumps straight from that abandoned, still-mostly-posed
+skeleton to the live default target: a real, large, one-frame
+discontinuity, exactly matching every symptom reported across all 6
+rounds (only affects hands "triggered with my animation," only on
+interruption, damping visibly still catching up afterward since the
+WRAPPER rotation continues its own separate, correct, gradual motion the
+whole time).
+
+Fixed by giving idle-repose the same continuity guarantee every other
+handoff in this file already has (`hand.currentSplayDeg`/
+`hand._customOffsetAccum`/`hand._customRotationAccum`, and retransition's
+own `lerpPoseValues()` blend) -- not a new mechanism. On the specific
+tick idle-repose is triggered by `hand._wasOverriddenLastFrame` (i.e.
+this hand just stopped being overridden), it now snapshots
+`hand._lastPoseValues` (the universal per-hand "pose values actually
+showing right now," already stashed by every `applyPoseValuesToHand()`
+call) and blends from there toward live `cfg` over a fixed 400ms window
+(`IDLE_REPOSE_SETTLE_MS`), via `lerpPoseValues()` + `applyPoseValuesToHand()`
+-- the exact same helpers the `'retransition'` phase already uses. Once
+the window elapses, idle-repose reverts to its original, unchanged
+instant-apply behavior for the normal (already-converged) case, so this
+adds zero cost/behavior change to the common path.
+
+Verified: `node --check src/main.js` passes. Live-testing the FIX itself
+(as opposed to the bug reproduction, which WAS live-verified above)
+against a local static server hit this sandbox's own separately-
+documented network-truncation flakiness (`net::ERR_CONNECTION_RESET` on
+`main.js`) 5 times in a row -- a known, pre-existing, unrelated
+environment issue, not evidence against the fix. Pushed to `main` for
+Vercel to redeploy and re-verified against the live URL instead (see
+this entry's own follow-up note below, once run).
+
+`main.js` cache-buster bumped `?v=233` -> `?v=234`.
+
+Commit and live-deploy verification recorded in this file's own next
+entry, once the redeploy is confirmed.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

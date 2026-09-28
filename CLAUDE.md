@@ -1650,3 +1650,70 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   at reproducing this via direct state-machine simulation in this
   sandbox has failed to show a discontinuity, despite the report being
   consistent, precise, and repeated across many rounds.
+- **CORRECTED 2026-09-28 (6th round, same investigation) -- the note
+  directly above was investigating the wrong mechanism the whole time;
+  the real root cause is in the SKELETON, not the wrapper.** Broke the
+  stalemate by instrumenting the LIVE deployed app directly
+  (`window.__debug`, which exposes `hands`/`cfg`/`updateRenderOrder`/
+  `THREE`) rather than another round of pure static-code tracing.
+  Confirmed a NEW sandbox quirk first: this tab's own
+  `requestAnimationFrame` proved genuinely intermittent ACROSS SEPARATE
+  tool calls, not just permanently stuck like the other rAF/
+  `document.hidden` gotchas already documented in this file -- a trivial
+  self-scheduling rAF counter measured 300 ticks/sec in one call, then 0
+  ticks over the same wait in the very next call on the SAME tab, with no
+  code difference and `document.hidden`/`hasFocus`/`visibilityState` all
+  reporting identically both times. Worked around it with a manually-
+  driven `setTimeout` tick loop (reliable every time) that replicates
+  `animate()`'s own cursor-tracking block (lookAt + settle-window-capped
+  slerp) around each direct `dbg.updateRenderOrder()` call, preserving the
+  real per-frame order without depending on rAF at all -- then dispatched
+  the exact real repro via synthetic `PointerEvent`s against this
+  project's own real production settings (`custom8`: Click+Hold, Sequence
+  mode, Retransition on, 12-second retransition; `custom7`/`custom9`:
+  Click, Retransition off).
+  **Measured, decisive**: instrumented BOTH `hand.wrapper.quaternion` (the
+  wrapper rotation every prior round focused on) AND the `rHand` skeleton
+  bone's own local quaternion. At the exact moment of the interrupting
+  click, `hand.wrapper.quaternion` changed 0.00 degrees; `rHand` changed
+  **55.87 degrees in a single simulated frame**. The wrapper-level
+  mechanism really was fully continuous the whole time, exactly as every
+  prior round measured -- it was simply never where the bug lived.
+  **Root cause**: `updateRenderOrder()`'s `needsIdleRepose` branch has
+  always applied LIVE `cfg` pose values to the skeleton
+  (`applyWristPoseToSkeleton`/`applyCurlToSkeleton`) completely instantly,
+  with no "from" anchor at all -- invisible for a NORMAL, uninterrupted
+  release because retransition converges its own blend to progress=1
+  first, matching live `cfg` exactly (by the 9th-round fix's own design).
+  But `releaseHandFromOtherFunctions()` force-sets an INTERRUPTED
+  function's phase straight to `'idle'` the instant a different function
+  commits for the same hand, with zero regard for how far its own
+  retransition had actually gotten (single-digit percent is typical, since
+  a Sequence-mode retransition can take up to `TweenRetransitionSpeedMs`
+  -- 12 real seconds -- to finish). idle-repose's very next tick then
+  jumps straight from that abandoned, still-mostly-posed skeleton to the
+  live default target: a real, large, one-frame discontinuity, matching
+  every symptom reported across all 6 rounds (only affects hands
+  "triggered with my animation," only on interruption, damping visibly
+  still catching up afterward -- that's the WRAPPER rotation's own
+  correct, separate, continuous motion, which was never broken).
+  **Fixed** by giving idle-repose the same "blend from `hand._lastPoseValues`
+  toward live `cfg`" continuity every other handoff in this file already
+  has (`hand.currentSplayDeg`/`_customOffsetAccum`/`_customRotationAccum`,
+  retransition's own `lerpPoseValues()` blend) -- a 400ms blend
+  (`IDLE_REPOSE_SETTLE_MS`) via the SAME `lerpPoseValues()`/
+  `applyPoseValuesToHand()` helpers already proven elsewhere in this file,
+  triggered only on the specific tick `hand._wasOverriddenLastFrame` is
+  the actual reason `needsIdleRepose` fired -- the normal, already-
+  converged case is completely unchanged, zero added cost. Live-testing
+  the FIX ITSELF against a local static server hit this sandbox's own
+  separately-documented `main.js` network-truncation flakiness 5 times in
+  a row (a known, pre-existing, unrelated issue) -- pushed to `main`/
+  Vercel and re-verified against the live URL instead. If a future report
+  describes a wrist/pose snap at a click-function handoff again, check
+  whether `hand._lastPoseValues`/`_idleSettleFrom` continuity is actually
+  reaching the specific call site involved (e.g. a NEW function-release
+  path added later that bypasses `releaseHandFromOtherFunctions()`)
+  before assuming the wrapper-level cursor-tracking mechanism is at fault
+  again -- it has now been directly measured fully continuous across this
+  exact scenario, twice.
