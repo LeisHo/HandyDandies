@@ -6672,7 +6672,7 @@
       "dp_titleColor": "#ffffff",
       "dp_textColor": "#ffffff",
       "dp_accentColor": "#005f8f",
-      "dp_sliderColor": "#ffffff",
+      "dp_sliderColor": "#3a3a4a",
       "dp_groupLabelBgColor": "#005f8f",
       "dp_fontFamily": "Helvetica, Arial, sans-serif",
       "dp_capsButtonText": true,
@@ -13707,7 +13707,7 @@
       "dp_titleColor": "#ffffff",
       "dp_textColor": "#ffffff",
       "dp_accentColor": "#005f8f",
-      "dp_sliderColor": "#ffffff",
+      "dp_sliderColor": "#3a3a4a",
       "dp_groupLabelBgColor": "#005f8f",
       "dp_fontFamily": "Helvetica, Arial, sans-serif",
       "dp_capsButtonText": true,
@@ -20742,7 +20742,7 @@
       "dp_titleColor": "#ffffff",
       "dp_textColor": "#ffffff",
       "dp_accentColor": "#005f8f",
-      "dp_sliderColor": "#ffffff",
+      "dp_sliderColor": "#3a3a4a",
       "dp_groupLabelBgColor": "#005f8f",
       "dp_fontFamily": "Helvetica, Arial, sans-serif",
       "dp_capsButtonText": true,
@@ -21167,7 +21167,7 @@
           "type": "group",
           "group": {
             "key": "TEXT",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -21697,7 +21697,7 @@
         },
         {
           "key": "TEXT",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
@@ -22180,7 +22180,7 @@
     },
     {
       "key": "Debug",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -22238,7 +22238,7 @@
     },
     {
       "key": "New Group (9)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": false,
       "items": [
         {
