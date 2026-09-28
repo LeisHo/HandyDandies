@@ -12350,8 +12350,32 @@ function animate(dt, now) {
           const palmDampingAmt = inHandoffSettle
             ? Math.min(cfg.trackingDamping, HANDOFF_SETTLE_DAMPING_CAP)
             : cfg.trackingDamping
+          // FIXED 2026-09-28 (root cause of the reported "hands spin 360
+          // to continue cursor tracking when crossing under them on the X
+          // axis" -- a DIFFERENT bug from the Arm Rotation flip Round 23
+          // already fixed; that fix didn't touch this code path).
+          // `computeRadialRollDeg()` is `atan2(dx, -dy)` -- its branch cut
+          // (the jump from +180 to -180) falls exactly on dx=0 while
+          // dy>0 (hand ABOVE cursor), i.e. exactly "cursor crosses under
+          // the hand on the X axis." baseDeg jumps from e.g. +180 to
+          // -179 in a single frame there -- a true ~1 deg angular change,
+          // but the OLD plain linear lerp below computed
+          // `baseDeg - currentPalmRollDeg` on the RAW numbers (≈ -359
+          // deg), so it lerped hand.currentPalmRollDeg the LONG way
+          // around (through 90/0/-90) over the next several seconds --
+          // a real, visible near-360 deg spin. Live-verified against the
+          // real deployed app + real field geometry before this fix:
+          // baseDeg genuinely jumped 180 -> -179.01 crossing hand x=9.5
+          // at cursor.y=-25.03 (row 2, one of the reported hands), and
+          // simulating the OLD lerp with the real trackingDamping (0.16)
+          // reproduced exactly this: 90.72 -> 47.57 -> 11.31 -> ... ->
+          // -178.71 over ~40 frames instead of a ~1 deg adjustment.
+          // Fixed by wrapping the delta into (-180, 180] BEFORE applying
+          // the damping fraction, so the lerp always takes the shortest
+          // path -- the same "shortest arc" principle Arm Rotation's own
+          // quaternion slerp already gets for free from THREE.Quaternion.
           hand.currentPalmRollDeg = hand.currentPalmRollDeg !== undefined
-            ? hand.currentPalmRollDeg + (baseDeg - hand.currentPalmRollDeg) * palmDampingAmt
+            ? hand.currentPalmRollDeg + (((baseDeg - hand.currentPalmRollDeg + 180) % 360 + 360) % 360 - 180) * palmDampingAmt
             : baseDeg
           // Whole-wrapper rotation only, same mechanism as the default mode;
           // no skeleton/pose involvement either way. Arm Rotation's own

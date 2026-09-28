@@ -18,6 +18,32 @@ work seamlessly from there.
 
 ## Currently working on
 
+**ROOT-CAUSED AND FIXED 2026-09-28 (25th round) -- the "hands spin 360
+when the cursor crosses under them on the X axis" report, which
+survived the 23rd round's own Arm Rotation fix because it's a genuinely
+DIFFERENT bug.** Round 23 fixed a flip in the Arm Rotation LEAN
+(`hand.currentArmRotationQuat`); this is a separate bug in Palm Rotation
+(`hand.currentPalmRollDeg`), both producing the same "spins 360 to keep
+tracking" symptom. Root cause: `computeRadialRollDeg()`'s `atan2(dx,-dy)`
+formula has a branch cut (jumps from +180 to -180) exactly when the
+cursor crosses under a hand on the X axis -- a true ~1 deg angular
+change, but the old code lerped `currentPalmRollDeg` toward it with a
+PLAIN linear subtraction (no angle-wrap), computing a ~359 deg delta
+instead and visibly spinning the long way around over many frames.
+First ruled out a different, textbook-looking hypothesis (a Matrix4.lookAt
+up-vector gimbal flip in Arm Rotation's own `lookAtDesired`) via a real
+THREE.Quaternion sweep against this project's own live field geometry --
+found completely smooth, no discontinuity anywhere. Then found and
+confirmed the REAL mechanism the same rigorous way: real field geometry,
+real `cfg.trackingDamping` (0.16), real hand position for one of the
+user's own reported hands (row 2, hand index 33) via `window.__debug` --
+the old formula reproduced a `180 -> 90.72 -> 47.57 -> ... -> -178.71`
+spin over ~40 simulated frames; the fix (wrap the delta to the shortest
+path before damping) converges smoothly instead. NOT yet confirmed
+against the redeployed live app showing the actual hand visually not
+spinning -- that's the next step, immediately after push/redeploy in
+this same session. See CHANGELOG.txt's 25th-round entry.
+
 **ADDED 2026-09-28 (24th round) -- new Debug checkbox "Log Hand
 Behaviour - Detailed".** With it on, a new independent timer (reusing
 the existing Cursor Position Log's own interval slider,

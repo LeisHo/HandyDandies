@@ -13779,6 +13779,75 @@ patterns this feature was built to mirror -- not on live interaction.
 
 `main.js` cache-buster bumped `?v=243` -> `?v=244`.
 
+2026-09-28  -  (25th round -- ROOT CAUSE FOUND AND FIXED for a jump
+report that survived the 23rd round's own Arm Rotation fix, direct
+report with a real mouse-position log: "that log is too slow... Recreate
+my test... When i cross under the hands when moving the cursor on the x
+axis, the hands i pass will turn 360 to continue the cursor tracking")
+
+**This is NOT the same bug the 23rd round fixed.** That round fixed a
+flip in the ARM ROTATION lean (`hand.currentArmRotationQuat`); this
+round found a completely separate, still-present bug in PALM ROTATION
+(`hand.currentPalmRollDeg`) -- both produce the same visible symptom
+("the hand spins ~360 to keep tracking"), which is exactly why the 23rd
+round's fix didn't make this report go away.
+
+Root cause: `computeRadialRollDeg(handPos, cursorPos)` returns
+`atan2(dx, -dy)` in degrees -- an `atan2`-based angle has an inherent
+branch cut (a jump from +180 to -180) at `dx=0` while `-dy<0` (i.e.
+`dy>0`, hand ABOVE cursor). That's EXACTLY "cursor crosses under the
+hand on the X axis," matching the report precisely. `baseDeg` genuinely
+jumps from ~+180 to ~-179 across that crossing -- a true ~1 deg angular
+change. The bug: `hand.currentPalmRollDeg`'s own per-frame update was a
+PLAIN LINEAR LERP with no angle-wrap handling
+(`currentPalmRollDeg + (baseDeg - currentPalmRollDeg) * palmDampingAmt`)
+-- computed on the RAW numbers, `baseDeg - currentPalmRollDeg` came out
+to roughly -359 deg instead of the true ~1 deg, so the lerp dutifully
+walked `currentPalmRollDeg` the LONG way around (through 90/0/-90) over
+many frames -- a real, visible near-360 deg spin, purely a numerical
+artifact of the branch cut, not any real cursor-tracking need.
+
+**Investigation method (why this wasn't found by re-testing the 23rd
+round's own fix):** first checked whether `lookAtDesired`'s own
+Matrix4.lookAt(eye, target, UP) construction was ALSO singular near
+`UP`-alignment (a DIFFERENT, textbook-looking gimbal-flip hypothesis) --
+built a real, exact THREE.Quaternion sweep against this project's own
+live field geometry (156 hands, 13x12 grid, columnSpacing 9.5,
+rowSpacing 5.5) and REAL cursorTarget.z (54.85, confirmed live via
+`window.__debug.cursorTarget`, not guessed) across every row from
+bottom to top -- found ZERO discontinuity anywhere (max single-step
+0.52 deg per 0.5-world-unit step, every row identical). This ruled out
+that hypothesis cleanly rather than shipping a fix for the wrong
+mechanism. Re-examined `computeRadialRollDeg()`'s own formula next,
+spotted the `atan2` branch cut by inspection, then confirmed it
+numerically the same way (real field geometry, real `cfg.trackingDamping`
+= 0.16, real hand position for one of the user's own reported hands,
+row 2 of the 13x12 grid): the OLD formula reproduced
+`180 -> 90.72 -> 47.57 -> 11.31 -> ... -> -178.71` over ~40 simulated
+frames for what should have been a ~1 deg correction; the FIXED formula
+(wrap the delta to `(-180, 180]` before applying the damping fraction,
+same "shortest arc" principle Arm Rotation's own THREE.Quaternion slerp
+already gets for free) converged smoothly,
+`175 -> 176.01 -> 176.80 -> ... -> 180.56`, no spin.
+
+Fixed by wrapping `baseDeg - hand.currentPalmRollDeg` into `(-180, 180]`
+before multiplying by `palmDampingAmt`, replacing the old un-wrapped
+subtraction inline (same ternary shape, lazy-evaluated the same way so
+the first-run `undefined` branch is unaffected). No new control, no
+config change -- purely a math correction to an existing mechanism.
+
+Verified: `node --check src/main.js` passes. The fix formula itself was
+directly verified against the REAL deployed app's real field geometry,
+real `cfg.trackingDamping`, and the exact real branch-cut crossing point
+for one of the user's own reported hands (row 2, column 7 -- hand index
+33) via `window.__debug` + THREE.Quaternion/plain-math replication in
+the browser console -- not a guess, a real before/after numeric
+comparison. **NOT yet confirmed against the redeployed live app showing
+the actual hand visually NOT spinning** -- that check happens after this
+push/redeploy, in the same session.
+
+`main.js` cache-buster bumped `?v=244` -> `?v=245`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a
