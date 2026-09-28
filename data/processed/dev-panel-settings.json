@@ -6747,8 +6747,8 @@
       "custom7RetransitionStartTimeCurveEnabled": true,
       "custom7RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom7RetransitionStartTimeRange": "{\"min\":0,\"max\":1048}",
-      "custom7MultiTriggerEnabled": false,
-      "custom7MultiTriggers": "[]",
+      "custom7MultiTriggerEnabled": true,
+      "custom7MultiTriggers": "[{\"prefix\":\"custom7Trig1\",\"title\":\"Trigger 1\"}]",
       "custom8Enabled": true,
       "custom8Type": "Click+Hold",
       "custom8TouchPointCount": 1,
@@ -6780,7 +6780,7 @@
       "custom8StartDistanceMin": 0,
       "custom8StartDistanceMax": 100,
       "custom8StartDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
-      "custom8RetransitionEnabled": false,
+      "custom8RetransitionEnabled": true,
       "custom8RetransitionSpeedMs": 400,
       "custom8RetransitionSpeedCurveEnabled": false,
       "custom8RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -7033,7 +7033,41 @@
       "custom15RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom15RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "custom15MultiTriggerEnabled": false,
-      "custom15MultiTriggers": "[]"
+      "custom15MultiTriggers": "[]",
+      "custom7Trig1Enabled": false,
+      "custom7Trig1Mode": "Single Pose",
+      "custom7Trig1OffsetEnabled": false,
+      "custom7Trig1OffsetX": 0,
+      "custom7Trig1OffsetY": 0,
+      "custom7Trig1RotationEnabled": false,
+      "custom7Trig1RotationX": 0,
+      "custom7Trig1RotationY": 0,
+      "custom7Trig1RotationZ": 0,
+      "custom7Trig1TargetPose": "",
+      "custom7Trig1TweenSelector": "",
+      "custom7Trig1TweenSpeedMs": 800,
+      "custom7Trig1TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom7Trig1TweenStartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom7Trig1TransitionSpeedMs": 400,
+      "custom7Trig1SpeedCurveEnabled": false,
+      "custom7Trig1SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom7Trig1SpeedCurveRange": "{\"min\":50,\"max\":2000}",
+      "custom7Trig1StartTimeCurveEnabled": true,
+      "custom7Trig1StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom7Trig1StartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom7Trig1StartDistanceCurveEnabled": false,
+      "custom7Trig1StartDistanceMin": 0,
+      "custom7Trig1StartDistanceMax": 100,
+      "custom7Trig1StartDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
+      "custom7Trig1PauseDurationMs": 500,
+      "custom7Trig1RetransitionEnabled": true,
+      "custom7Trig1RetransitionSpeedMs": 400,
+      "custom7Trig1RetransitionSpeedCurveEnabled": false,
+      "custom7Trig1RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom7Trig1RetransitionSpeedCurveRange": "{\"min\":50,\"max\":2000}",
+      "custom7Trig1RetransitionStartTimeCurveEnabled": true,
+      "custom7Trig1RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom7Trig1RetransitionStartTimeRange": "{\"min\":0,\"max\":300}"
     },
     "mobile": {
       "pauseBtnXOffset": 12,
@@ -13782,8 +13816,8 @@
       "custom7RetransitionStartTimeCurveEnabled": true,
       "custom7RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom7RetransitionStartTimeRange": "{\"min\":0,\"max\":1048}",
-      "custom7MultiTriggerEnabled": false,
-      "custom7MultiTriggers": "[]",
+      "custom7MultiTriggerEnabled": true,
+      "custom7MultiTriggers": "[{\"prefix\":\"custom7Trig1\",\"title\":\"Trigger 1\"}]",
       "custom8Enabled": true,
       "custom8Type": "Click+Hold",
       "custom8TouchPointCount": 1,
@@ -13815,7 +13849,7 @@
       "custom8StartDistanceMin": 0,
       "custom8StartDistanceMax": 100,
       "custom8StartDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
-      "custom8RetransitionEnabled": false,
+      "custom8RetransitionEnabled": true,
       "custom8RetransitionSpeedMs": 400,
       "custom8RetransitionSpeedCurveEnabled": false,
       "custom8RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -14068,7 +14102,41 @@
       "custom15RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom15RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "custom15MultiTriggerEnabled": false,
-      "custom15MultiTriggers": "[]"
+      "custom15MultiTriggers": "[]",
+      "custom7Trig1Enabled": false,
+      "custom7Trig1Mode": "Single Pose",
+      "custom7Trig1OffsetEnabled": false,
+      "custom7Trig1OffsetX": 0,
+      "custom7Trig1OffsetY": 0,
+      "custom7Trig1RotationEnabled": false,
+      "custom7Trig1RotationX": 0,
+      "custom7Trig1RotationY": 0,
+      "custom7Trig1RotationZ": 0,
+      "custom7Trig1TargetPose": "",
+      "custom7Trig1TweenSelector": "",
+      "custom7Trig1TweenSpeedMs": 800,
+      "custom7Trig1TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom7Trig1TweenStartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom7Trig1TransitionSpeedMs": 400,
+      "custom7Trig1SpeedCurveEnabled": false,
+      "custom7Trig1SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom7Trig1SpeedCurveRange": "{\"min\":50,\"max\":2000}",
+      "custom7Trig1StartTimeCurveEnabled": true,
+      "custom7Trig1StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom7Trig1StartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom7Trig1StartDistanceCurveEnabled": false,
+      "custom7Trig1StartDistanceMin": 0,
+      "custom7Trig1StartDistanceMax": 100,
+      "custom7Trig1StartDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
+      "custom7Trig1PauseDurationMs": 500,
+      "custom7Trig1RetransitionEnabled": true,
+      "custom7Trig1RetransitionSpeedMs": 400,
+      "custom7Trig1RetransitionSpeedCurveEnabled": false,
+      "custom7Trig1RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom7Trig1RetransitionSpeedCurveRange": "{\"min\":50,\"max\":2000}",
+      "custom7Trig1RetransitionStartTimeCurveEnabled": true,
+      "custom7Trig1RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom7Trig1RetransitionStartTimeRange": "{\"min\":0,\"max\":300}"
     },
     "landscape": {
       "pauseBtnXOffset": 12,
@@ -20817,8 +20885,8 @@
       "custom7RetransitionStartTimeCurveEnabled": true,
       "custom7RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom7RetransitionStartTimeRange": "{\"min\":0,\"max\":1048}",
-      "custom7MultiTriggerEnabled": false,
-      "custom7MultiTriggers": "[]",
+      "custom7MultiTriggerEnabled": true,
+      "custom7MultiTriggers": "[{\"prefix\":\"custom7Trig1\",\"title\":\"Trigger 1\"}]",
       "custom8Enabled": true,
       "custom8Type": "Click+Hold",
       "custom8TouchPointCount": 1,
@@ -20850,7 +20918,7 @@
       "custom8StartDistanceMin": 0,
       "custom8StartDistanceMax": 100,
       "custom8StartDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
-      "custom8RetransitionEnabled": false,
+      "custom8RetransitionEnabled": true,
       "custom8RetransitionSpeedMs": 400,
       "custom8RetransitionSpeedCurveEnabled": false,
       "custom8RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -21103,7 +21171,41 @@
       "custom15RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom15RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "custom15MultiTriggerEnabled": false,
-      "custom15MultiTriggers": "[]"
+      "custom15MultiTriggers": "[]",
+      "custom7Trig1Enabled": false,
+      "custom7Trig1Mode": "Single Pose",
+      "custom7Trig1OffsetEnabled": false,
+      "custom7Trig1OffsetX": 0,
+      "custom7Trig1OffsetY": 0,
+      "custom7Trig1RotationEnabled": false,
+      "custom7Trig1RotationX": 0,
+      "custom7Trig1RotationY": 0,
+      "custom7Trig1RotationZ": 0,
+      "custom7Trig1TargetPose": "",
+      "custom7Trig1TweenSelector": "",
+      "custom7Trig1TweenSpeedMs": 800,
+      "custom7Trig1TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom7Trig1TweenStartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom7Trig1TransitionSpeedMs": 400,
+      "custom7Trig1SpeedCurveEnabled": false,
+      "custom7Trig1SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom7Trig1SpeedCurveRange": "{\"min\":50,\"max\":2000}",
+      "custom7Trig1StartTimeCurveEnabled": true,
+      "custom7Trig1StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom7Trig1StartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom7Trig1StartDistanceCurveEnabled": false,
+      "custom7Trig1StartDistanceMin": 0,
+      "custom7Trig1StartDistanceMax": 100,
+      "custom7Trig1StartDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
+      "custom7Trig1PauseDurationMs": 500,
+      "custom7Trig1RetransitionEnabled": true,
+      "custom7Trig1RetransitionSpeedMs": 400,
+      "custom7Trig1RetransitionSpeedCurveEnabled": false,
+      "custom7Trig1RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom7Trig1RetransitionSpeedCurveRange": "{\"min\":50,\"max\":2000}",
+      "custom7Trig1RetransitionStartTimeCurveEnabled": true,
+      "custom7Trig1RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom7Trig1RetransitionStartTimeRange": "{\"min\":0,\"max\":300}"
     }
   },
   "order": [
@@ -22658,7 +22760,7 @@
     },
     {
       "key": "Cursor Tracking",
-      "collapsed": false,
+      "collapsed": true,
       "locked": false,
       "items": [
         {
@@ -26397,7 +26499,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 8",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -27371,7 +27473,7 @@
                 "type": "group",
                 "group": {
                   "key": "Start Time Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -27549,6 +27651,517 @@
                       "key": "custom7MultiTriggers"
                     },
                     {
+                      "type": "group",
+                      "group": {
+                        "key": "Trigger 1",
+                        "collapsed": false,
+                        "locked": false,
+                        "items": [
+                          {
+                            "type": "row",
+                            "key": "custom7Trig1Enabled"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom7Trig1Mode"
+                          },
+                          {
+                            "type": "group",
+                            "group": {
+                              "key": "Offset",
+                              "collapsed": false,
+                              "locked": false,
+                              "items": [
+                                {
+                                  "type": "row",
+                                  "key": "custom7Trig1OffsetX"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "custom7Trig1OffsetY"
+                                }
+                              ],
+                              "settings": [
+                                "custom7Trig1OffsetX",
+                                "custom7Trig1OffsetY"
+                              ],
+                              "subgroups": []
+                            }
+                          },
+                          {
+                            "type": "group",
+                            "group": {
+                              "key": "Rotation",
+                              "collapsed": false,
+                              "locked": false,
+                              "items": [
+                                {
+                                  "type": "row",
+                                  "key": "custom7Trig1RotationX"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "custom7Trig1RotationY"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "custom7Trig1RotationZ"
+                                }
+                              ],
+                              "settings": [
+                                "custom7Trig1RotationX",
+                                "custom7Trig1RotationY",
+                                "custom7Trig1RotationZ"
+                              ],
+                              "subgroups": []
+                            }
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom7Trig1TargetPose"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom7Trig1TweenSelector"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom7Trig1TweenSpeedMs"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom7Trig1TransitionSpeedMs"
+                          },
+                          {
+                            "type": "group",
+                            "group": {
+                              "key": "Animation Speed Curve",
+                              "collapsed": false,
+                              "locked": false,
+                              "items": [
+                                {
+                                  "type": "row",
+                                  "key": "custom7Trig1SpeedCurve"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "custom7Trig1SpeedCurveRange"
+                                }
+                              ],
+                              "settings": [
+                                "custom7Trig1SpeedCurve",
+                                "custom7Trig1SpeedCurveRange"
+                              ],
+                              "subgroups": []
+                            }
+                          },
+                          {
+                            "type": "group",
+                            "group": {
+                              "key": "Start Time Curve",
+                              "collapsed": false,
+                              "locked": false,
+                              "items": [
+                                {
+                                  "type": "row",
+                                  "key": "custom7Trig1StartTimeCurve"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "custom7Trig1StartTimeRange"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "custom7Trig1TweenStartTimeCurve"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "custom7Trig1TweenStartTimeRange"
+                                }
+                              ],
+                              "settings": [
+                                "custom7Trig1StartTimeCurve",
+                                "custom7Trig1StartTimeRange",
+                                "custom7Trig1TweenStartTimeCurve",
+                                "custom7Trig1TweenStartTimeRange"
+                              ],
+                              "subgroups": []
+                            }
+                          },
+                          {
+                            "type": "group",
+                            "group": {
+                              "key": "Start Distance Curve",
+                              "collapsed": false,
+                              "locked": false,
+                              "items": [
+                                {
+                                  "type": "row",
+                                  "key": "custom7Trig1StartDistanceMin"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "custom7Trig1StartDistanceMax"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "custom7Trig1StartDistanceCurve"
+                                }
+                              ],
+                              "settings": [
+                                "custom7Trig1StartDistanceMin",
+                                "custom7Trig1StartDistanceMax",
+                                "custom7Trig1StartDistanceCurve"
+                              ],
+                              "subgroups": []
+                            }
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom7Trig1PauseDurationMs"
+                          },
+                          {
+                            "type": "group",
+                            "group": {
+                              "key": "Retransition",
+                              "collapsed": false,
+                              "locked": false,
+                              "items": [
+                                {
+                                  "type": "row",
+                                  "key": "custom7Trig1RetransitionSpeedMs"
+                                },
+                                {
+                                  "type": "group",
+                                  "group": {
+                                    "key": "Retransition Speed Curve",
+                                    "collapsed": false,
+                                    "locked": false,
+                                    "items": [
+                                      {
+                                        "type": "row",
+                                        "key": "custom7Trig1RetransitionSpeedCurve"
+                                      },
+                                      {
+                                        "type": "row",
+                                        "key": "custom7Trig1RetransitionSpeedCurveRange"
+                                      }
+                                    ],
+                                    "settings": [
+                                      "custom7Trig1RetransitionSpeedCurve",
+                                      "custom7Trig1RetransitionSpeedCurveRange"
+                                    ],
+                                    "subgroups": []
+                                  }
+                                },
+                                {
+                                  "type": "group",
+                                  "group": {
+                                    "key": "Retransition Start Time Curve",
+                                    "collapsed": false,
+                                    "locked": false,
+                                    "items": [
+                                      {
+                                        "type": "row",
+                                        "key": "custom7Trig1RetransitionStartTimeCurve"
+                                      },
+                                      {
+                                        "type": "row",
+                                        "key": "custom7Trig1RetransitionStartTimeRange"
+                                      }
+                                    ],
+                                    "settings": [
+                                      "custom7Trig1RetransitionStartTimeCurve",
+                                      "custom7Trig1RetransitionStartTimeRange"
+                                    ],
+                                    "subgroups": []
+                                  }
+                                }
+                              ],
+                              "settings": [
+                                "custom7Trig1RetransitionSpeedMs"
+                              ],
+                              "subgroups": [
+                                {
+                                  "key": "Retransition Speed Curve",
+                                  "collapsed": false,
+                                  "locked": false,
+                                  "items": [
+                                    {
+                                      "type": "row",
+                                      "key": "custom7Trig1RetransitionSpeedCurve"
+                                    },
+                                    {
+                                      "type": "row",
+                                      "key": "custom7Trig1RetransitionSpeedCurveRange"
+                                    }
+                                  ],
+                                  "settings": [
+                                    "custom7Trig1RetransitionSpeedCurve",
+                                    "custom7Trig1RetransitionSpeedCurveRange"
+                                  ],
+                                  "subgroups": []
+                                },
+                                {
+                                  "key": "Retransition Start Time Curve",
+                                  "collapsed": false,
+                                  "locked": false,
+                                  "items": [
+                                    {
+                                      "type": "row",
+                                      "key": "custom7Trig1RetransitionStartTimeCurve"
+                                    },
+                                    {
+                                      "type": "row",
+                                      "key": "custom7Trig1RetransitionStartTimeRange"
+                                    }
+                                  ],
+                                  "settings": [
+                                    "custom7Trig1RetransitionStartTimeCurve",
+                                    "custom7Trig1RetransitionStartTimeRange"
+                                  ],
+                                  "subgroups": []
+                                }
+                              ]
+                            }
+                          }
+                        ],
+                        "settings": [
+                          "custom7Trig1Enabled",
+                          "custom7Trig1Mode",
+                          "custom7Trig1TargetPose",
+                          "custom7Trig1TweenSelector",
+                          "custom7Trig1TweenSpeedMs",
+                          "custom7Trig1TransitionSpeedMs",
+                          "custom7Trig1PauseDurationMs"
+                        ],
+                        "subgroups": [
+                          {
+                            "key": "Offset",
+                            "collapsed": false,
+                            "locked": false,
+                            "items": [
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1OffsetX"
+                              },
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1OffsetY"
+                              }
+                            ],
+                            "settings": [
+                              "custom7Trig1OffsetX",
+                              "custom7Trig1OffsetY"
+                            ],
+                            "subgroups": []
+                          },
+                          {
+                            "key": "Rotation",
+                            "collapsed": false,
+                            "locked": false,
+                            "items": [
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1RotationX"
+                              },
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1RotationY"
+                              },
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1RotationZ"
+                              }
+                            ],
+                            "settings": [
+                              "custom7Trig1RotationX",
+                              "custom7Trig1RotationY",
+                              "custom7Trig1RotationZ"
+                            ],
+                            "subgroups": []
+                          },
+                          {
+                            "key": "Animation Speed Curve",
+                            "collapsed": false,
+                            "locked": false,
+                            "items": [
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1SpeedCurve"
+                              },
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1SpeedCurveRange"
+                              }
+                            ],
+                            "settings": [
+                              "custom7Trig1SpeedCurve",
+                              "custom7Trig1SpeedCurveRange"
+                            ],
+                            "subgroups": []
+                          },
+                          {
+                            "key": "Start Time Curve",
+                            "collapsed": false,
+                            "locked": false,
+                            "items": [
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1StartTimeCurve"
+                              },
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1StartTimeRange"
+                              },
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1TweenStartTimeCurve"
+                              },
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1TweenStartTimeRange"
+                              }
+                            ],
+                            "settings": [
+                              "custom7Trig1StartTimeCurve",
+                              "custom7Trig1StartTimeRange",
+                              "custom7Trig1TweenStartTimeCurve",
+                              "custom7Trig1TweenStartTimeRange"
+                            ],
+                            "subgroups": []
+                          },
+                          {
+                            "key": "Start Distance Curve",
+                            "collapsed": false,
+                            "locked": false,
+                            "items": [
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1StartDistanceMin"
+                              },
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1StartDistanceMax"
+                              },
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1StartDistanceCurve"
+                              }
+                            ],
+                            "settings": [
+                              "custom7Trig1StartDistanceMin",
+                              "custom7Trig1StartDistanceMax",
+                              "custom7Trig1StartDistanceCurve"
+                            ],
+                            "subgroups": []
+                          },
+                          {
+                            "key": "Retransition",
+                            "collapsed": false,
+                            "locked": false,
+                            "items": [
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1RetransitionSpeedMs"
+                              },
+                              {
+                                "type": "group",
+                                "group": {
+                                  "key": "Retransition Speed Curve",
+                                  "collapsed": false,
+                                  "locked": false,
+                                  "items": [
+                                    {
+                                      "type": "row",
+                                      "key": "custom7Trig1RetransitionSpeedCurve"
+                                    },
+                                    {
+                                      "type": "row",
+                                      "key": "custom7Trig1RetransitionSpeedCurveRange"
+                                    }
+                                  ],
+                                  "settings": [
+                                    "custom7Trig1RetransitionSpeedCurve",
+                                    "custom7Trig1RetransitionSpeedCurveRange"
+                                  ],
+                                  "subgroups": []
+                                }
+                              },
+                              {
+                                "type": "group",
+                                "group": {
+                                  "key": "Retransition Start Time Curve",
+                                  "collapsed": false,
+                                  "locked": false,
+                                  "items": [
+                                    {
+                                      "type": "row",
+                                      "key": "custom7Trig1RetransitionStartTimeCurve"
+                                    },
+                                    {
+                                      "type": "row",
+                                      "key": "custom7Trig1RetransitionStartTimeRange"
+                                    }
+                                  ],
+                                  "settings": [
+                                    "custom7Trig1RetransitionStartTimeCurve",
+                                    "custom7Trig1RetransitionStartTimeRange"
+                                  ],
+                                  "subgroups": []
+                                }
+                              }
+                            ],
+                            "settings": [
+                              "custom7Trig1RetransitionSpeedMs"
+                            ],
+                            "subgroups": [
+                              {
+                                "key": "Retransition Speed Curve",
+                                "collapsed": false,
+                                "locked": false,
+                                "items": [
+                                  {
+                                    "type": "row",
+                                    "key": "custom7Trig1RetransitionSpeedCurve"
+                                  },
+                                  {
+                                    "type": "row",
+                                    "key": "custom7Trig1RetransitionSpeedCurveRange"
+                                  }
+                                ],
+                                "settings": [
+                                  "custom7Trig1RetransitionSpeedCurve",
+                                  "custom7Trig1RetransitionSpeedCurveRange"
+                                ],
+                                "subgroups": []
+                              },
+                              {
+                                "key": "Retransition Start Time Curve",
+                                "collapsed": false,
+                                "locked": false,
+                                "items": [
+                                  {
+                                    "type": "row",
+                                    "key": "custom7Trig1RetransitionStartTimeCurve"
+                                  },
+                                  {
+                                    "type": "row",
+                                    "key": "custom7Trig1RetransitionStartTimeRange"
+                                  }
+                                ],
+                                "settings": [
+                                  "custom7Trig1RetransitionStartTimeCurve",
+                                  "custom7Trig1RetransitionStartTimeRange"
+                                ],
+                                "subgroups": []
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    },
+                    {
                       "type": "row"
                     }
                   ],
@@ -27557,7 +28170,516 @@
                     "custom7MultiTriggers",
                     null
                   ],
-                  "subgroups": []
+                  "subgroups": [
+                    {
+                      "key": "Trigger 1",
+                      "collapsed": false,
+                      "locked": false,
+                      "items": [
+                        {
+                          "type": "row",
+                          "key": "custom7Trig1Enabled"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom7Trig1Mode"
+                        },
+                        {
+                          "type": "group",
+                          "group": {
+                            "key": "Offset",
+                            "collapsed": false,
+                            "locked": false,
+                            "items": [
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1OffsetX"
+                              },
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1OffsetY"
+                              }
+                            ],
+                            "settings": [
+                              "custom7Trig1OffsetX",
+                              "custom7Trig1OffsetY"
+                            ],
+                            "subgroups": []
+                          }
+                        },
+                        {
+                          "type": "group",
+                          "group": {
+                            "key": "Rotation",
+                            "collapsed": false,
+                            "locked": false,
+                            "items": [
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1RotationX"
+                              },
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1RotationY"
+                              },
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1RotationZ"
+                              }
+                            ],
+                            "settings": [
+                              "custom7Trig1RotationX",
+                              "custom7Trig1RotationY",
+                              "custom7Trig1RotationZ"
+                            ],
+                            "subgroups": []
+                          }
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom7Trig1TargetPose"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom7Trig1TweenSelector"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom7Trig1TweenSpeedMs"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom7Trig1TransitionSpeedMs"
+                        },
+                        {
+                          "type": "group",
+                          "group": {
+                            "key": "Animation Speed Curve",
+                            "collapsed": false,
+                            "locked": false,
+                            "items": [
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1SpeedCurve"
+                              },
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1SpeedCurveRange"
+                              }
+                            ],
+                            "settings": [
+                              "custom7Trig1SpeedCurve",
+                              "custom7Trig1SpeedCurveRange"
+                            ],
+                            "subgroups": []
+                          }
+                        },
+                        {
+                          "type": "group",
+                          "group": {
+                            "key": "Start Time Curve",
+                            "collapsed": false,
+                            "locked": false,
+                            "items": [
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1StartTimeCurve"
+                              },
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1StartTimeRange"
+                              },
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1TweenStartTimeCurve"
+                              },
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1TweenStartTimeRange"
+                              }
+                            ],
+                            "settings": [
+                              "custom7Trig1StartTimeCurve",
+                              "custom7Trig1StartTimeRange",
+                              "custom7Trig1TweenStartTimeCurve",
+                              "custom7Trig1TweenStartTimeRange"
+                            ],
+                            "subgroups": []
+                          }
+                        },
+                        {
+                          "type": "group",
+                          "group": {
+                            "key": "Start Distance Curve",
+                            "collapsed": false,
+                            "locked": false,
+                            "items": [
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1StartDistanceMin"
+                              },
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1StartDistanceMax"
+                              },
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1StartDistanceCurve"
+                              }
+                            ],
+                            "settings": [
+                              "custom7Trig1StartDistanceMin",
+                              "custom7Trig1StartDistanceMax",
+                              "custom7Trig1StartDistanceCurve"
+                            ],
+                            "subgroups": []
+                          }
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom7Trig1PauseDurationMs"
+                        },
+                        {
+                          "type": "group",
+                          "group": {
+                            "key": "Retransition",
+                            "collapsed": false,
+                            "locked": false,
+                            "items": [
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1RetransitionSpeedMs"
+                              },
+                              {
+                                "type": "group",
+                                "group": {
+                                  "key": "Retransition Speed Curve",
+                                  "collapsed": false,
+                                  "locked": false,
+                                  "items": [
+                                    {
+                                      "type": "row",
+                                      "key": "custom7Trig1RetransitionSpeedCurve"
+                                    },
+                                    {
+                                      "type": "row",
+                                      "key": "custom7Trig1RetransitionSpeedCurveRange"
+                                    }
+                                  ],
+                                  "settings": [
+                                    "custom7Trig1RetransitionSpeedCurve",
+                                    "custom7Trig1RetransitionSpeedCurveRange"
+                                  ],
+                                  "subgroups": []
+                                }
+                              },
+                              {
+                                "type": "group",
+                                "group": {
+                                  "key": "Retransition Start Time Curve",
+                                  "collapsed": false,
+                                  "locked": false,
+                                  "items": [
+                                    {
+                                      "type": "row",
+                                      "key": "custom7Trig1RetransitionStartTimeCurve"
+                                    },
+                                    {
+                                      "type": "row",
+                                      "key": "custom7Trig1RetransitionStartTimeRange"
+                                    }
+                                  ],
+                                  "settings": [
+                                    "custom7Trig1RetransitionStartTimeCurve",
+                                    "custom7Trig1RetransitionStartTimeRange"
+                                  ],
+                                  "subgroups": []
+                                }
+                              }
+                            ],
+                            "settings": [
+                              "custom7Trig1RetransitionSpeedMs"
+                            ],
+                            "subgroups": [
+                              {
+                                "key": "Retransition Speed Curve",
+                                "collapsed": false,
+                                "locked": false,
+                                "items": [
+                                  {
+                                    "type": "row",
+                                    "key": "custom7Trig1RetransitionSpeedCurve"
+                                  },
+                                  {
+                                    "type": "row",
+                                    "key": "custom7Trig1RetransitionSpeedCurveRange"
+                                  }
+                                ],
+                                "settings": [
+                                  "custom7Trig1RetransitionSpeedCurve",
+                                  "custom7Trig1RetransitionSpeedCurveRange"
+                                ],
+                                "subgroups": []
+                              },
+                              {
+                                "key": "Retransition Start Time Curve",
+                                "collapsed": false,
+                                "locked": false,
+                                "items": [
+                                  {
+                                    "type": "row",
+                                    "key": "custom7Trig1RetransitionStartTimeCurve"
+                                  },
+                                  {
+                                    "type": "row",
+                                    "key": "custom7Trig1RetransitionStartTimeRange"
+                                  }
+                                ],
+                                "settings": [
+                                  "custom7Trig1RetransitionStartTimeCurve",
+                                  "custom7Trig1RetransitionStartTimeRange"
+                                ],
+                                "subgroups": []
+                              }
+                            ]
+                          }
+                        }
+                      ],
+                      "settings": [
+                        "custom7Trig1Enabled",
+                        "custom7Trig1Mode",
+                        "custom7Trig1TargetPose",
+                        "custom7Trig1TweenSelector",
+                        "custom7Trig1TweenSpeedMs",
+                        "custom7Trig1TransitionSpeedMs",
+                        "custom7Trig1PauseDurationMs"
+                      ],
+                      "subgroups": [
+                        {
+                          "key": "Offset",
+                          "collapsed": false,
+                          "locked": false,
+                          "items": [
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1OffsetX"
+                            },
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1OffsetY"
+                            }
+                          ],
+                          "settings": [
+                            "custom7Trig1OffsetX",
+                            "custom7Trig1OffsetY"
+                          ],
+                          "subgroups": []
+                        },
+                        {
+                          "key": "Rotation",
+                          "collapsed": false,
+                          "locked": false,
+                          "items": [
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1RotationX"
+                            },
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1RotationY"
+                            },
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1RotationZ"
+                            }
+                          ],
+                          "settings": [
+                            "custom7Trig1RotationX",
+                            "custom7Trig1RotationY",
+                            "custom7Trig1RotationZ"
+                          ],
+                          "subgroups": []
+                        },
+                        {
+                          "key": "Animation Speed Curve",
+                          "collapsed": false,
+                          "locked": false,
+                          "items": [
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1SpeedCurve"
+                            },
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1SpeedCurveRange"
+                            }
+                          ],
+                          "settings": [
+                            "custom7Trig1SpeedCurve",
+                            "custom7Trig1SpeedCurveRange"
+                          ],
+                          "subgroups": []
+                        },
+                        {
+                          "key": "Start Time Curve",
+                          "collapsed": false,
+                          "locked": false,
+                          "items": [
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1StartTimeCurve"
+                            },
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1StartTimeRange"
+                            },
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1TweenStartTimeCurve"
+                            },
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1TweenStartTimeRange"
+                            }
+                          ],
+                          "settings": [
+                            "custom7Trig1StartTimeCurve",
+                            "custom7Trig1StartTimeRange",
+                            "custom7Trig1TweenStartTimeCurve",
+                            "custom7Trig1TweenStartTimeRange"
+                          ],
+                          "subgroups": []
+                        },
+                        {
+                          "key": "Start Distance Curve",
+                          "collapsed": false,
+                          "locked": false,
+                          "items": [
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1StartDistanceMin"
+                            },
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1StartDistanceMax"
+                            },
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1StartDistanceCurve"
+                            }
+                          ],
+                          "settings": [
+                            "custom7Trig1StartDistanceMin",
+                            "custom7Trig1StartDistanceMax",
+                            "custom7Trig1StartDistanceCurve"
+                          ],
+                          "subgroups": []
+                        },
+                        {
+                          "key": "Retransition",
+                          "collapsed": false,
+                          "locked": false,
+                          "items": [
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1RetransitionSpeedMs"
+                            },
+                            {
+                              "type": "group",
+                              "group": {
+                                "key": "Retransition Speed Curve",
+                                "collapsed": false,
+                                "locked": false,
+                                "items": [
+                                  {
+                                    "type": "row",
+                                    "key": "custom7Trig1RetransitionSpeedCurve"
+                                  },
+                                  {
+                                    "type": "row",
+                                    "key": "custom7Trig1RetransitionSpeedCurveRange"
+                                  }
+                                ],
+                                "settings": [
+                                  "custom7Trig1RetransitionSpeedCurve",
+                                  "custom7Trig1RetransitionSpeedCurveRange"
+                                ],
+                                "subgroups": []
+                              }
+                            },
+                            {
+                              "type": "group",
+                              "group": {
+                                "key": "Retransition Start Time Curve",
+                                "collapsed": false,
+                                "locked": false,
+                                "items": [
+                                  {
+                                    "type": "row",
+                                    "key": "custom7Trig1RetransitionStartTimeCurve"
+                                  },
+                                  {
+                                    "type": "row",
+                                    "key": "custom7Trig1RetransitionStartTimeRange"
+                                  }
+                                ],
+                                "settings": [
+                                  "custom7Trig1RetransitionStartTimeCurve",
+                                  "custom7Trig1RetransitionStartTimeRange"
+                                ],
+                                "subgroups": []
+                              }
+                            }
+                          ],
+                          "settings": [
+                            "custom7Trig1RetransitionSpeedMs"
+                          ],
+                          "subgroups": [
+                            {
+                              "key": "Retransition Speed Curve",
+                              "collapsed": false,
+                              "locked": false,
+                              "items": [
+                                {
+                                  "type": "row",
+                                  "key": "custom7Trig1RetransitionSpeedCurve"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "custom7Trig1RetransitionSpeedCurveRange"
+                                }
+                              ],
+                              "settings": [
+                                "custom7Trig1RetransitionSpeedCurve",
+                                "custom7Trig1RetransitionSpeedCurveRange"
+                              ],
+                              "subgroups": []
+                            },
+                            {
+                              "key": "Retransition Start Time Curve",
+                              "collapsed": false,
+                              "locked": false,
+                              "items": [
+                                {
+                                  "type": "row",
+                                  "key": "custom7Trig1RetransitionStartTimeCurve"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "custom7Trig1RetransitionStartTimeRange"
+                                }
+                              ],
+                              "settings": [
+                                "custom7Trig1RetransitionStartTimeCurve",
+                                "custom7Trig1RetransitionStartTimeRange"
+                              ],
+                              "subgroups": []
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
                 }
               }
             ],
@@ -27646,7 +28768,7 @@
               },
               {
                 "key": "Start Time Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -27815,6 +28937,517 @@
                     "key": "custom7MultiTriggers"
                   },
                   {
+                    "type": "group",
+                    "group": {
+                      "key": "Trigger 1",
+                      "collapsed": false,
+                      "locked": false,
+                      "items": [
+                        {
+                          "type": "row",
+                          "key": "custom7Trig1Enabled"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom7Trig1Mode"
+                        },
+                        {
+                          "type": "group",
+                          "group": {
+                            "key": "Offset",
+                            "collapsed": false,
+                            "locked": false,
+                            "items": [
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1OffsetX"
+                              },
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1OffsetY"
+                              }
+                            ],
+                            "settings": [
+                              "custom7Trig1OffsetX",
+                              "custom7Trig1OffsetY"
+                            ],
+                            "subgroups": []
+                          }
+                        },
+                        {
+                          "type": "group",
+                          "group": {
+                            "key": "Rotation",
+                            "collapsed": false,
+                            "locked": false,
+                            "items": [
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1RotationX"
+                              },
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1RotationY"
+                              },
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1RotationZ"
+                              }
+                            ],
+                            "settings": [
+                              "custom7Trig1RotationX",
+                              "custom7Trig1RotationY",
+                              "custom7Trig1RotationZ"
+                            ],
+                            "subgroups": []
+                          }
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom7Trig1TargetPose"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom7Trig1TweenSelector"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom7Trig1TweenSpeedMs"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom7Trig1TransitionSpeedMs"
+                        },
+                        {
+                          "type": "group",
+                          "group": {
+                            "key": "Animation Speed Curve",
+                            "collapsed": false,
+                            "locked": false,
+                            "items": [
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1SpeedCurve"
+                              },
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1SpeedCurveRange"
+                              }
+                            ],
+                            "settings": [
+                              "custom7Trig1SpeedCurve",
+                              "custom7Trig1SpeedCurveRange"
+                            ],
+                            "subgroups": []
+                          }
+                        },
+                        {
+                          "type": "group",
+                          "group": {
+                            "key": "Start Time Curve",
+                            "collapsed": false,
+                            "locked": false,
+                            "items": [
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1StartTimeCurve"
+                              },
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1StartTimeRange"
+                              },
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1TweenStartTimeCurve"
+                              },
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1TweenStartTimeRange"
+                              }
+                            ],
+                            "settings": [
+                              "custom7Trig1StartTimeCurve",
+                              "custom7Trig1StartTimeRange",
+                              "custom7Trig1TweenStartTimeCurve",
+                              "custom7Trig1TweenStartTimeRange"
+                            ],
+                            "subgroups": []
+                          }
+                        },
+                        {
+                          "type": "group",
+                          "group": {
+                            "key": "Start Distance Curve",
+                            "collapsed": false,
+                            "locked": false,
+                            "items": [
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1StartDistanceMin"
+                              },
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1StartDistanceMax"
+                              },
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1StartDistanceCurve"
+                              }
+                            ],
+                            "settings": [
+                              "custom7Trig1StartDistanceMin",
+                              "custom7Trig1StartDistanceMax",
+                              "custom7Trig1StartDistanceCurve"
+                            ],
+                            "subgroups": []
+                          }
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom7Trig1PauseDurationMs"
+                        },
+                        {
+                          "type": "group",
+                          "group": {
+                            "key": "Retransition",
+                            "collapsed": false,
+                            "locked": false,
+                            "items": [
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1RetransitionSpeedMs"
+                              },
+                              {
+                                "type": "group",
+                                "group": {
+                                  "key": "Retransition Speed Curve",
+                                  "collapsed": false,
+                                  "locked": false,
+                                  "items": [
+                                    {
+                                      "type": "row",
+                                      "key": "custom7Trig1RetransitionSpeedCurve"
+                                    },
+                                    {
+                                      "type": "row",
+                                      "key": "custom7Trig1RetransitionSpeedCurveRange"
+                                    }
+                                  ],
+                                  "settings": [
+                                    "custom7Trig1RetransitionSpeedCurve",
+                                    "custom7Trig1RetransitionSpeedCurveRange"
+                                  ],
+                                  "subgroups": []
+                                }
+                              },
+                              {
+                                "type": "group",
+                                "group": {
+                                  "key": "Retransition Start Time Curve",
+                                  "collapsed": false,
+                                  "locked": false,
+                                  "items": [
+                                    {
+                                      "type": "row",
+                                      "key": "custom7Trig1RetransitionStartTimeCurve"
+                                    },
+                                    {
+                                      "type": "row",
+                                      "key": "custom7Trig1RetransitionStartTimeRange"
+                                    }
+                                  ],
+                                  "settings": [
+                                    "custom7Trig1RetransitionStartTimeCurve",
+                                    "custom7Trig1RetransitionStartTimeRange"
+                                  ],
+                                  "subgroups": []
+                                }
+                              }
+                            ],
+                            "settings": [
+                              "custom7Trig1RetransitionSpeedMs"
+                            ],
+                            "subgroups": [
+                              {
+                                "key": "Retransition Speed Curve",
+                                "collapsed": false,
+                                "locked": false,
+                                "items": [
+                                  {
+                                    "type": "row",
+                                    "key": "custom7Trig1RetransitionSpeedCurve"
+                                  },
+                                  {
+                                    "type": "row",
+                                    "key": "custom7Trig1RetransitionSpeedCurveRange"
+                                  }
+                                ],
+                                "settings": [
+                                  "custom7Trig1RetransitionSpeedCurve",
+                                  "custom7Trig1RetransitionSpeedCurveRange"
+                                ],
+                                "subgroups": []
+                              },
+                              {
+                                "key": "Retransition Start Time Curve",
+                                "collapsed": false,
+                                "locked": false,
+                                "items": [
+                                  {
+                                    "type": "row",
+                                    "key": "custom7Trig1RetransitionStartTimeCurve"
+                                  },
+                                  {
+                                    "type": "row",
+                                    "key": "custom7Trig1RetransitionStartTimeRange"
+                                  }
+                                ],
+                                "settings": [
+                                  "custom7Trig1RetransitionStartTimeCurve",
+                                  "custom7Trig1RetransitionStartTimeRange"
+                                ],
+                                "subgroups": []
+                              }
+                            ]
+                          }
+                        }
+                      ],
+                      "settings": [
+                        "custom7Trig1Enabled",
+                        "custom7Trig1Mode",
+                        "custom7Trig1TargetPose",
+                        "custom7Trig1TweenSelector",
+                        "custom7Trig1TweenSpeedMs",
+                        "custom7Trig1TransitionSpeedMs",
+                        "custom7Trig1PauseDurationMs"
+                      ],
+                      "subgroups": [
+                        {
+                          "key": "Offset",
+                          "collapsed": false,
+                          "locked": false,
+                          "items": [
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1OffsetX"
+                            },
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1OffsetY"
+                            }
+                          ],
+                          "settings": [
+                            "custom7Trig1OffsetX",
+                            "custom7Trig1OffsetY"
+                          ],
+                          "subgroups": []
+                        },
+                        {
+                          "key": "Rotation",
+                          "collapsed": false,
+                          "locked": false,
+                          "items": [
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1RotationX"
+                            },
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1RotationY"
+                            },
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1RotationZ"
+                            }
+                          ],
+                          "settings": [
+                            "custom7Trig1RotationX",
+                            "custom7Trig1RotationY",
+                            "custom7Trig1RotationZ"
+                          ],
+                          "subgroups": []
+                        },
+                        {
+                          "key": "Animation Speed Curve",
+                          "collapsed": false,
+                          "locked": false,
+                          "items": [
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1SpeedCurve"
+                            },
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1SpeedCurveRange"
+                            }
+                          ],
+                          "settings": [
+                            "custom7Trig1SpeedCurve",
+                            "custom7Trig1SpeedCurveRange"
+                          ],
+                          "subgroups": []
+                        },
+                        {
+                          "key": "Start Time Curve",
+                          "collapsed": false,
+                          "locked": false,
+                          "items": [
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1StartTimeCurve"
+                            },
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1StartTimeRange"
+                            },
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1TweenStartTimeCurve"
+                            },
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1TweenStartTimeRange"
+                            }
+                          ],
+                          "settings": [
+                            "custom7Trig1StartTimeCurve",
+                            "custom7Trig1StartTimeRange",
+                            "custom7Trig1TweenStartTimeCurve",
+                            "custom7Trig1TweenStartTimeRange"
+                          ],
+                          "subgroups": []
+                        },
+                        {
+                          "key": "Start Distance Curve",
+                          "collapsed": false,
+                          "locked": false,
+                          "items": [
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1StartDistanceMin"
+                            },
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1StartDistanceMax"
+                            },
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1StartDistanceCurve"
+                            }
+                          ],
+                          "settings": [
+                            "custom7Trig1StartDistanceMin",
+                            "custom7Trig1StartDistanceMax",
+                            "custom7Trig1StartDistanceCurve"
+                          ],
+                          "subgroups": []
+                        },
+                        {
+                          "key": "Retransition",
+                          "collapsed": false,
+                          "locked": false,
+                          "items": [
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1RetransitionSpeedMs"
+                            },
+                            {
+                              "type": "group",
+                              "group": {
+                                "key": "Retransition Speed Curve",
+                                "collapsed": false,
+                                "locked": false,
+                                "items": [
+                                  {
+                                    "type": "row",
+                                    "key": "custom7Trig1RetransitionSpeedCurve"
+                                  },
+                                  {
+                                    "type": "row",
+                                    "key": "custom7Trig1RetransitionSpeedCurveRange"
+                                  }
+                                ],
+                                "settings": [
+                                  "custom7Trig1RetransitionSpeedCurve",
+                                  "custom7Trig1RetransitionSpeedCurveRange"
+                                ],
+                                "subgroups": []
+                              }
+                            },
+                            {
+                              "type": "group",
+                              "group": {
+                                "key": "Retransition Start Time Curve",
+                                "collapsed": false,
+                                "locked": false,
+                                "items": [
+                                  {
+                                    "type": "row",
+                                    "key": "custom7Trig1RetransitionStartTimeCurve"
+                                  },
+                                  {
+                                    "type": "row",
+                                    "key": "custom7Trig1RetransitionStartTimeRange"
+                                  }
+                                ],
+                                "settings": [
+                                  "custom7Trig1RetransitionStartTimeCurve",
+                                  "custom7Trig1RetransitionStartTimeRange"
+                                ],
+                                "subgroups": []
+                              }
+                            }
+                          ],
+                          "settings": [
+                            "custom7Trig1RetransitionSpeedMs"
+                          ],
+                          "subgroups": [
+                            {
+                              "key": "Retransition Speed Curve",
+                              "collapsed": false,
+                              "locked": false,
+                              "items": [
+                                {
+                                  "type": "row",
+                                  "key": "custom7Trig1RetransitionSpeedCurve"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "custom7Trig1RetransitionSpeedCurveRange"
+                                }
+                              ],
+                              "settings": [
+                                "custom7Trig1RetransitionSpeedCurve",
+                                "custom7Trig1RetransitionSpeedCurveRange"
+                              ],
+                              "subgroups": []
+                            },
+                            {
+                              "key": "Retransition Start Time Curve",
+                              "collapsed": false,
+                              "locked": false,
+                              "items": [
+                                {
+                                  "type": "row",
+                                  "key": "custom7Trig1RetransitionStartTimeCurve"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "custom7Trig1RetransitionStartTimeRange"
+                                }
+                              ],
+                              "settings": [
+                                "custom7Trig1RetransitionStartTimeCurve",
+                                "custom7Trig1RetransitionStartTimeRange"
+                              ],
+                              "subgroups": []
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  {
                     "type": "row"
                   }
                 ],
@@ -27823,7 +29456,516 @@
                   "custom7MultiTriggers",
                   null
                 ],
-                "subgroups": []
+                "subgroups": [
+                  {
+                    "key": "Trigger 1",
+                    "collapsed": false,
+                    "locked": false,
+                    "items": [
+                      {
+                        "type": "row",
+                        "key": "custom7Trig1Enabled"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom7Trig1Mode"
+                      },
+                      {
+                        "type": "group",
+                        "group": {
+                          "key": "Offset",
+                          "collapsed": false,
+                          "locked": false,
+                          "items": [
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1OffsetX"
+                            },
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1OffsetY"
+                            }
+                          ],
+                          "settings": [
+                            "custom7Trig1OffsetX",
+                            "custom7Trig1OffsetY"
+                          ],
+                          "subgroups": []
+                        }
+                      },
+                      {
+                        "type": "group",
+                        "group": {
+                          "key": "Rotation",
+                          "collapsed": false,
+                          "locked": false,
+                          "items": [
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1RotationX"
+                            },
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1RotationY"
+                            },
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1RotationZ"
+                            }
+                          ],
+                          "settings": [
+                            "custom7Trig1RotationX",
+                            "custom7Trig1RotationY",
+                            "custom7Trig1RotationZ"
+                          ],
+                          "subgroups": []
+                        }
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom7Trig1TargetPose"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom7Trig1TweenSelector"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom7Trig1TweenSpeedMs"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom7Trig1TransitionSpeedMs"
+                      },
+                      {
+                        "type": "group",
+                        "group": {
+                          "key": "Animation Speed Curve",
+                          "collapsed": false,
+                          "locked": false,
+                          "items": [
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1SpeedCurve"
+                            },
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1SpeedCurveRange"
+                            }
+                          ],
+                          "settings": [
+                            "custom7Trig1SpeedCurve",
+                            "custom7Trig1SpeedCurveRange"
+                          ],
+                          "subgroups": []
+                        }
+                      },
+                      {
+                        "type": "group",
+                        "group": {
+                          "key": "Start Time Curve",
+                          "collapsed": false,
+                          "locked": false,
+                          "items": [
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1StartTimeCurve"
+                            },
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1StartTimeRange"
+                            },
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1TweenStartTimeCurve"
+                            },
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1TweenStartTimeRange"
+                            }
+                          ],
+                          "settings": [
+                            "custom7Trig1StartTimeCurve",
+                            "custom7Trig1StartTimeRange",
+                            "custom7Trig1TweenStartTimeCurve",
+                            "custom7Trig1TweenStartTimeRange"
+                          ],
+                          "subgroups": []
+                        }
+                      },
+                      {
+                        "type": "group",
+                        "group": {
+                          "key": "Start Distance Curve",
+                          "collapsed": false,
+                          "locked": false,
+                          "items": [
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1StartDistanceMin"
+                            },
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1StartDistanceMax"
+                            },
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1StartDistanceCurve"
+                            }
+                          ],
+                          "settings": [
+                            "custom7Trig1StartDistanceMin",
+                            "custom7Trig1StartDistanceMax",
+                            "custom7Trig1StartDistanceCurve"
+                          ],
+                          "subgroups": []
+                        }
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom7Trig1PauseDurationMs"
+                      },
+                      {
+                        "type": "group",
+                        "group": {
+                          "key": "Retransition",
+                          "collapsed": false,
+                          "locked": false,
+                          "items": [
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1RetransitionSpeedMs"
+                            },
+                            {
+                              "type": "group",
+                              "group": {
+                                "key": "Retransition Speed Curve",
+                                "collapsed": false,
+                                "locked": false,
+                                "items": [
+                                  {
+                                    "type": "row",
+                                    "key": "custom7Trig1RetransitionSpeedCurve"
+                                  },
+                                  {
+                                    "type": "row",
+                                    "key": "custom7Trig1RetransitionSpeedCurveRange"
+                                  }
+                                ],
+                                "settings": [
+                                  "custom7Trig1RetransitionSpeedCurve",
+                                  "custom7Trig1RetransitionSpeedCurveRange"
+                                ],
+                                "subgroups": []
+                              }
+                            },
+                            {
+                              "type": "group",
+                              "group": {
+                                "key": "Retransition Start Time Curve",
+                                "collapsed": false,
+                                "locked": false,
+                                "items": [
+                                  {
+                                    "type": "row",
+                                    "key": "custom7Trig1RetransitionStartTimeCurve"
+                                  },
+                                  {
+                                    "type": "row",
+                                    "key": "custom7Trig1RetransitionStartTimeRange"
+                                  }
+                                ],
+                                "settings": [
+                                  "custom7Trig1RetransitionStartTimeCurve",
+                                  "custom7Trig1RetransitionStartTimeRange"
+                                ],
+                                "subgroups": []
+                              }
+                            }
+                          ],
+                          "settings": [
+                            "custom7Trig1RetransitionSpeedMs"
+                          ],
+                          "subgroups": [
+                            {
+                              "key": "Retransition Speed Curve",
+                              "collapsed": false,
+                              "locked": false,
+                              "items": [
+                                {
+                                  "type": "row",
+                                  "key": "custom7Trig1RetransitionSpeedCurve"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "custom7Trig1RetransitionSpeedCurveRange"
+                                }
+                              ],
+                              "settings": [
+                                "custom7Trig1RetransitionSpeedCurve",
+                                "custom7Trig1RetransitionSpeedCurveRange"
+                              ],
+                              "subgroups": []
+                            },
+                            {
+                              "key": "Retransition Start Time Curve",
+                              "collapsed": false,
+                              "locked": false,
+                              "items": [
+                                {
+                                  "type": "row",
+                                  "key": "custom7Trig1RetransitionStartTimeCurve"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "custom7Trig1RetransitionStartTimeRange"
+                                }
+                              ],
+                              "settings": [
+                                "custom7Trig1RetransitionStartTimeCurve",
+                                "custom7Trig1RetransitionStartTimeRange"
+                              ],
+                              "subgroups": []
+                            }
+                          ]
+                        }
+                      }
+                    ],
+                    "settings": [
+                      "custom7Trig1Enabled",
+                      "custom7Trig1Mode",
+                      "custom7Trig1TargetPose",
+                      "custom7Trig1TweenSelector",
+                      "custom7Trig1TweenSpeedMs",
+                      "custom7Trig1TransitionSpeedMs",
+                      "custom7Trig1PauseDurationMs"
+                    ],
+                    "subgroups": [
+                      {
+                        "key": "Offset",
+                        "collapsed": false,
+                        "locked": false,
+                        "items": [
+                          {
+                            "type": "row",
+                            "key": "custom7Trig1OffsetX"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom7Trig1OffsetY"
+                          }
+                        ],
+                        "settings": [
+                          "custom7Trig1OffsetX",
+                          "custom7Trig1OffsetY"
+                        ],
+                        "subgroups": []
+                      },
+                      {
+                        "key": "Rotation",
+                        "collapsed": false,
+                        "locked": false,
+                        "items": [
+                          {
+                            "type": "row",
+                            "key": "custom7Trig1RotationX"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom7Trig1RotationY"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom7Trig1RotationZ"
+                          }
+                        ],
+                        "settings": [
+                          "custom7Trig1RotationX",
+                          "custom7Trig1RotationY",
+                          "custom7Trig1RotationZ"
+                        ],
+                        "subgroups": []
+                      },
+                      {
+                        "key": "Animation Speed Curve",
+                        "collapsed": false,
+                        "locked": false,
+                        "items": [
+                          {
+                            "type": "row",
+                            "key": "custom7Trig1SpeedCurve"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom7Trig1SpeedCurveRange"
+                          }
+                        ],
+                        "settings": [
+                          "custom7Trig1SpeedCurve",
+                          "custom7Trig1SpeedCurveRange"
+                        ],
+                        "subgroups": []
+                      },
+                      {
+                        "key": "Start Time Curve",
+                        "collapsed": false,
+                        "locked": false,
+                        "items": [
+                          {
+                            "type": "row",
+                            "key": "custom7Trig1StartTimeCurve"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom7Trig1StartTimeRange"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom7Trig1TweenStartTimeCurve"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom7Trig1TweenStartTimeRange"
+                          }
+                        ],
+                        "settings": [
+                          "custom7Trig1StartTimeCurve",
+                          "custom7Trig1StartTimeRange",
+                          "custom7Trig1TweenStartTimeCurve",
+                          "custom7Trig1TweenStartTimeRange"
+                        ],
+                        "subgroups": []
+                      },
+                      {
+                        "key": "Start Distance Curve",
+                        "collapsed": false,
+                        "locked": false,
+                        "items": [
+                          {
+                            "type": "row",
+                            "key": "custom7Trig1StartDistanceMin"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom7Trig1StartDistanceMax"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom7Trig1StartDistanceCurve"
+                          }
+                        ],
+                        "settings": [
+                          "custom7Trig1StartDistanceMin",
+                          "custom7Trig1StartDistanceMax",
+                          "custom7Trig1StartDistanceCurve"
+                        ],
+                        "subgroups": []
+                      },
+                      {
+                        "key": "Retransition",
+                        "collapsed": false,
+                        "locked": false,
+                        "items": [
+                          {
+                            "type": "row",
+                            "key": "custom7Trig1RetransitionSpeedMs"
+                          },
+                          {
+                            "type": "group",
+                            "group": {
+                              "key": "Retransition Speed Curve",
+                              "collapsed": false,
+                              "locked": false,
+                              "items": [
+                                {
+                                  "type": "row",
+                                  "key": "custom7Trig1RetransitionSpeedCurve"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "custom7Trig1RetransitionSpeedCurveRange"
+                                }
+                              ],
+                              "settings": [
+                                "custom7Trig1RetransitionSpeedCurve",
+                                "custom7Trig1RetransitionSpeedCurveRange"
+                              ],
+                              "subgroups": []
+                            }
+                          },
+                          {
+                            "type": "group",
+                            "group": {
+                              "key": "Retransition Start Time Curve",
+                              "collapsed": false,
+                              "locked": false,
+                              "items": [
+                                {
+                                  "type": "row",
+                                  "key": "custom7Trig1RetransitionStartTimeCurve"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "custom7Trig1RetransitionStartTimeRange"
+                                }
+                              ],
+                              "settings": [
+                                "custom7Trig1RetransitionStartTimeCurve",
+                                "custom7Trig1RetransitionStartTimeRange"
+                              ],
+                              "subgroups": []
+                            }
+                          }
+                        ],
+                        "settings": [
+                          "custom7Trig1RetransitionSpeedMs"
+                        ],
+                        "subgroups": [
+                          {
+                            "key": "Retransition Speed Curve",
+                            "collapsed": false,
+                            "locked": false,
+                            "items": [
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1RetransitionSpeedCurve"
+                              },
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1RetransitionSpeedCurveRange"
+                              }
+                            ],
+                            "settings": [
+                              "custom7Trig1RetransitionSpeedCurve",
+                              "custom7Trig1RetransitionSpeedCurveRange"
+                            ],
+                            "subgroups": []
+                          },
+                          {
+                            "key": "Retransition Start Time Curve",
+                            "collapsed": false,
+                            "locked": false,
+                            "items": [
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1RetransitionStartTimeCurve"
+                              },
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1RetransitionStartTimeRange"
+                              }
+                            ],
+                            "settings": [
+                              "custom7Trig1RetransitionStartTimeCurve",
+                              "custom7Trig1RetransitionStartTimeRange"
+                            ],
+                            "subgroups": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
               }
             ]
           }
@@ -31316,7 +33458,7 @@
         },
         {
           "key": "Custom Click Function 8",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -32287,7 +34429,7 @@
               "type": "group",
               "group": {
                 "key": "Start Time Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -32465,6 +34607,517 @@
                     "key": "custom7MultiTriggers"
                   },
                   {
+                    "type": "group",
+                    "group": {
+                      "key": "Trigger 1",
+                      "collapsed": false,
+                      "locked": false,
+                      "items": [
+                        {
+                          "type": "row",
+                          "key": "custom7Trig1Enabled"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom7Trig1Mode"
+                        },
+                        {
+                          "type": "group",
+                          "group": {
+                            "key": "Offset",
+                            "collapsed": false,
+                            "locked": false,
+                            "items": [
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1OffsetX"
+                              },
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1OffsetY"
+                              }
+                            ],
+                            "settings": [
+                              "custom7Trig1OffsetX",
+                              "custom7Trig1OffsetY"
+                            ],
+                            "subgroups": []
+                          }
+                        },
+                        {
+                          "type": "group",
+                          "group": {
+                            "key": "Rotation",
+                            "collapsed": false,
+                            "locked": false,
+                            "items": [
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1RotationX"
+                              },
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1RotationY"
+                              },
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1RotationZ"
+                              }
+                            ],
+                            "settings": [
+                              "custom7Trig1RotationX",
+                              "custom7Trig1RotationY",
+                              "custom7Trig1RotationZ"
+                            ],
+                            "subgroups": []
+                          }
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom7Trig1TargetPose"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom7Trig1TweenSelector"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom7Trig1TweenSpeedMs"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom7Trig1TransitionSpeedMs"
+                        },
+                        {
+                          "type": "group",
+                          "group": {
+                            "key": "Animation Speed Curve",
+                            "collapsed": false,
+                            "locked": false,
+                            "items": [
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1SpeedCurve"
+                              },
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1SpeedCurveRange"
+                              }
+                            ],
+                            "settings": [
+                              "custom7Trig1SpeedCurve",
+                              "custom7Trig1SpeedCurveRange"
+                            ],
+                            "subgroups": []
+                          }
+                        },
+                        {
+                          "type": "group",
+                          "group": {
+                            "key": "Start Time Curve",
+                            "collapsed": false,
+                            "locked": false,
+                            "items": [
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1StartTimeCurve"
+                              },
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1StartTimeRange"
+                              },
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1TweenStartTimeCurve"
+                              },
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1TweenStartTimeRange"
+                              }
+                            ],
+                            "settings": [
+                              "custom7Trig1StartTimeCurve",
+                              "custom7Trig1StartTimeRange",
+                              "custom7Trig1TweenStartTimeCurve",
+                              "custom7Trig1TweenStartTimeRange"
+                            ],
+                            "subgroups": []
+                          }
+                        },
+                        {
+                          "type": "group",
+                          "group": {
+                            "key": "Start Distance Curve",
+                            "collapsed": false,
+                            "locked": false,
+                            "items": [
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1StartDistanceMin"
+                              },
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1StartDistanceMax"
+                              },
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1StartDistanceCurve"
+                              }
+                            ],
+                            "settings": [
+                              "custom7Trig1StartDistanceMin",
+                              "custom7Trig1StartDistanceMax",
+                              "custom7Trig1StartDistanceCurve"
+                            ],
+                            "subgroups": []
+                          }
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom7Trig1PauseDurationMs"
+                        },
+                        {
+                          "type": "group",
+                          "group": {
+                            "key": "Retransition",
+                            "collapsed": false,
+                            "locked": false,
+                            "items": [
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1RetransitionSpeedMs"
+                              },
+                              {
+                                "type": "group",
+                                "group": {
+                                  "key": "Retransition Speed Curve",
+                                  "collapsed": false,
+                                  "locked": false,
+                                  "items": [
+                                    {
+                                      "type": "row",
+                                      "key": "custom7Trig1RetransitionSpeedCurve"
+                                    },
+                                    {
+                                      "type": "row",
+                                      "key": "custom7Trig1RetransitionSpeedCurveRange"
+                                    }
+                                  ],
+                                  "settings": [
+                                    "custom7Trig1RetransitionSpeedCurve",
+                                    "custom7Trig1RetransitionSpeedCurveRange"
+                                  ],
+                                  "subgroups": []
+                                }
+                              },
+                              {
+                                "type": "group",
+                                "group": {
+                                  "key": "Retransition Start Time Curve",
+                                  "collapsed": false,
+                                  "locked": false,
+                                  "items": [
+                                    {
+                                      "type": "row",
+                                      "key": "custom7Trig1RetransitionStartTimeCurve"
+                                    },
+                                    {
+                                      "type": "row",
+                                      "key": "custom7Trig1RetransitionStartTimeRange"
+                                    }
+                                  ],
+                                  "settings": [
+                                    "custom7Trig1RetransitionStartTimeCurve",
+                                    "custom7Trig1RetransitionStartTimeRange"
+                                  ],
+                                  "subgroups": []
+                                }
+                              }
+                            ],
+                            "settings": [
+                              "custom7Trig1RetransitionSpeedMs"
+                            ],
+                            "subgroups": [
+                              {
+                                "key": "Retransition Speed Curve",
+                                "collapsed": false,
+                                "locked": false,
+                                "items": [
+                                  {
+                                    "type": "row",
+                                    "key": "custom7Trig1RetransitionSpeedCurve"
+                                  },
+                                  {
+                                    "type": "row",
+                                    "key": "custom7Trig1RetransitionSpeedCurveRange"
+                                  }
+                                ],
+                                "settings": [
+                                  "custom7Trig1RetransitionSpeedCurve",
+                                  "custom7Trig1RetransitionSpeedCurveRange"
+                                ],
+                                "subgroups": []
+                              },
+                              {
+                                "key": "Retransition Start Time Curve",
+                                "collapsed": false,
+                                "locked": false,
+                                "items": [
+                                  {
+                                    "type": "row",
+                                    "key": "custom7Trig1RetransitionStartTimeCurve"
+                                  },
+                                  {
+                                    "type": "row",
+                                    "key": "custom7Trig1RetransitionStartTimeRange"
+                                  }
+                                ],
+                                "settings": [
+                                  "custom7Trig1RetransitionStartTimeCurve",
+                                  "custom7Trig1RetransitionStartTimeRange"
+                                ],
+                                "subgroups": []
+                              }
+                            ]
+                          }
+                        }
+                      ],
+                      "settings": [
+                        "custom7Trig1Enabled",
+                        "custom7Trig1Mode",
+                        "custom7Trig1TargetPose",
+                        "custom7Trig1TweenSelector",
+                        "custom7Trig1TweenSpeedMs",
+                        "custom7Trig1TransitionSpeedMs",
+                        "custom7Trig1PauseDurationMs"
+                      ],
+                      "subgroups": [
+                        {
+                          "key": "Offset",
+                          "collapsed": false,
+                          "locked": false,
+                          "items": [
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1OffsetX"
+                            },
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1OffsetY"
+                            }
+                          ],
+                          "settings": [
+                            "custom7Trig1OffsetX",
+                            "custom7Trig1OffsetY"
+                          ],
+                          "subgroups": []
+                        },
+                        {
+                          "key": "Rotation",
+                          "collapsed": false,
+                          "locked": false,
+                          "items": [
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1RotationX"
+                            },
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1RotationY"
+                            },
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1RotationZ"
+                            }
+                          ],
+                          "settings": [
+                            "custom7Trig1RotationX",
+                            "custom7Trig1RotationY",
+                            "custom7Trig1RotationZ"
+                          ],
+                          "subgroups": []
+                        },
+                        {
+                          "key": "Animation Speed Curve",
+                          "collapsed": false,
+                          "locked": false,
+                          "items": [
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1SpeedCurve"
+                            },
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1SpeedCurveRange"
+                            }
+                          ],
+                          "settings": [
+                            "custom7Trig1SpeedCurve",
+                            "custom7Trig1SpeedCurveRange"
+                          ],
+                          "subgroups": []
+                        },
+                        {
+                          "key": "Start Time Curve",
+                          "collapsed": false,
+                          "locked": false,
+                          "items": [
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1StartTimeCurve"
+                            },
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1StartTimeRange"
+                            },
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1TweenStartTimeCurve"
+                            },
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1TweenStartTimeRange"
+                            }
+                          ],
+                          "settings": [
+                            "custom7Trig1StartTimeCurve",
+                            "custom7Trig1StartTimeRange",
+                            "custom7Trig1TweenStartTimeCurve",
+                            "custom7Trig1TweenStartTimeRange"
+                          ],
+                          "subgroups": []
+                        },
+                        {
+                          "key": "Start Distance Curve",
+                          "collapsed": false,
+                          "locked": false,
+                          "items": [
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1StartDistanceMin"
+                            },
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1StartDistanceMax"
+                            },
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1StartDistanceCurve"
+                            }
+                          ],
+                          "settings": [
+                            "custom7Trig1StartDistanceMin",
+                            "custom7Trig1StartDistanceMax",
+                            "custom7Trig1StartDistanceCurve"
+                          ],
+                          "subgroups": []
+                        },
+                        {
+                          "key": "Retransition",
+                          "collapsed": false,
+                          "locked": false,
+                          "items": [
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1RetransitionSpeedMs"
+                            },
+                            {
+                              "type": "group",
+                              "group": {
+                                "key": "Retransition Speed Curve",
+                                "collapsed": false,
+                                "locked": false,
+                                "items": [
+                                  {
+                                    "type": "row",
+                                    "key": "custom7Trig1RetransitionSpeedCurve"
+                                  },
+                                  {
+                                    "type": "row",
+                                    "key": "custom7Trig1RetransitionSpeedCurveRange"
+                                  }
+                                ],
+                                "settings": [
+                                  "custom7Trig1RetransitionSpeedCurve",
+                                  "custom7Trig1RetransitionSpeedCurveRange"
+                                ],
+                                "subgroups": []
+                              }
+                            },
+                            {
+                              "type": "group",
+                              "group": {
+                                "key": "Retransition Start Time Curve",
+                                "collapsed": false,
+                                "locked": false,
+                                "items": [
+                                  {
+                                    "type": "row",
+                                    "key": "custom7Trig1RetransitionStartTimeCurve"
+                                  },
+                                  {
+                                    "type": "row",
+                                    "key": "custom7Trig1RetransitionStartTimeRange"
+                                  }
+                                ],
+                                "settings": [
+                                  "custom7Trig1RetransitionStartTimeCurve",
+                                  "custom7Trig1RetransitionStartTimeRange"
+                                ],
+                                "subgroups": []
+                              }
+                            }
+                          ],
+                          "settings": [
+                            "custom7Trig1RetransitionSpeedMs"
+                          ],
+                          "subgroups": [
+                            {
+                              "key": "Retransition Speed Curve",
+                              "collapsed": false,
+                              "locked": false,
+                              "items": [
+                                {
+                                  "type": "row",
+                                  "key": "custom7Trig1RetransitionSpeedCurve"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "custom7Trig1RetransitionSpeedCurveRange"
+                                }
+                              ],
+                              "settings": [
+                                "custom7Trig1RetransitionSpeedCurve",
+                                "custom7Trig1RetransitionSpeedCurveRange"
+                              ],
+                              "subgroups": []
+                            },
+                            {
+                              "key": "Retransition Start Time Curve",
+                              "collapsed": false,
+                              "locked": false,
+                              "items": [
+                                {
+                                  "type": "row",
+                                  "key": "custom7Trig1RetransitionStartTimeCurve"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "custom7Trig1RetransitionStartTimeRange"
+                                }
+                              ],
+                              "settings": [
+                                "custom7Trig1RetransitionStartTimeCurve",
+                                "custom7Trig1RetransitionStartTimeRange"
+                              ],
+                              "subgroups": []
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  {
                     "type": "row"
                   }
                 ],
@@ -32473,7 +35126,516 @@
                   "custom7MultiTriggers",
                   null
                 ],
-                "subgroups": []
+                "subgroups": [
+                  {
+                    "key": "Trigger 1",
+                    "collapsed": false,
+                    "locked": false,
+                    "items": [
+                      {
+                        "type": "row",
+                        "key": "custom7Trig1Enabled"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom7Trig1Mode"
+                      },
+                      {
+                        "type": "group",
+                        "group": {
+                          "key": "Offset",
+                          "collapsed": false,
+                          "locked": false,
+                          "items": [
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1OffsetX"
+                            },
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1OffsetY"
+                            }
+                          ],
+                          "settings": [
+                            "custom7Trig1OffsetX",
+                            "custom7Trig1OffsetY"
+                          ],
+                          "subgroups": []
+                        }
+                      },
+                      {
+                        "type": "group",
+                        "group": {
+                          "key": "Rotation",
+                          "collapsed": false,
+                          "locked": false,
+                          "items": [
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1RotationX"
+                            },
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1RotationY"
+                            },
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1RotationZ"
+                            }
+                          ],
+                          "settings": [
+                            "custom7Trig1RotationX",
+                            "custom7Trig1RotationY",
+                            "custom7Trig1RotationZ"
+                          ],
+                          "subgroups": []
+                        }
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom7Trig1TargetPose"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom7Trig1TweenSelector"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom7Trig1TweenSpeedMs"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom7Trig1TransitionSpeedMs"
+                      },
+                      {
+                        "type": "group",
+                        "group": {
+                          "key": "Animation Speed Curve",
+                          "collapsed": false,
+                          "locked": false,
+                          "items": [
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1SpeedCurve"
+                            },
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1SpeedCurveRange"
+                            }
+                          ],
+                          "settings": [
+                            "custom7Trig1SpeedCurve",
+                            "custom7Trig1SpeedCurveRange"
+                          ],
+                          "subgroups": []
+                        }
+                      },
+                      {
+                        "type": "group",
+                        "group": {
+                          "key": "Start Time Curve",
+                          "collapsed": false,
+                          "locked": false,
+                          "items": [
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1StartTimeCurve"
+                            },
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1StartTimeRange"
+                            },
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1TweenStartTimeCurve"
+                            },
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1TweenStartTimeRange"
+                            }
+                          ],
+                          "settings": [
+                            "custom7Trig1StartTimeCurve",
+                            "custom7Trig1StartTimeRange",
+                            "custom7Trig1TweenStartTimeCurve",
+                            "custom7Trig1TweenStartTimeRange"
+                          ],
+                          "subgroups": []
+                        }
+                      },
+                      {
+                        "type": "group",
+                        "group": {
+                          "key": "Start Distance Curve",
+                          "collapsed": false,
+                          "locked": false,
+                          "items": [
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1StartDistanceMin"
+                            },
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1StartDistanceMax"
+                            },
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1StartDistanceCurve"
+                            }
+                          ],
+                          "settings": [
+                            "custom7Trig1StartDistanceMin",
+                            "custom7Trig1StartDistanceMax",
+                            "custom7Trig1StartDistanceCurve"
+                          ],
+                          "subgroups": []
+                        }
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom7Trig1PauseDurationMs"
+                      },
+                      {
+                        "type": "group",
+                        "group": {
+                          "key": "Retransition",
+                          "collapsed": false,
+                          "locked": false,
+                          "items": [
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1RetransitionSpeedMs"
+                            },
+                            {
+                              "type": "group",
+                              "group": {
+                                "key": "Retransition Speed Curve",
+                                "collapsed": false,
+                                "locked": false,
+                                "items": [
+                                  {
+                                    "type": "row",
+                                    "key": "custom7Trig1RetransitionSpeedCurve"
+                                  },
+                                  {
+                                    "type": "row",
+                                    "key": "custom7Trig1RetransitionSpeedCurveRange"
+                                  }
+                                ],
+                                "settings": [
+                                  "custom7Trig1RetransitionSpeedCurve",
+                                  "custom7Trig1RetransitionSpeedCurveRange"
+                                ],
+                                "subgroups": []
+                              }
+                            },
+                            {
+                              "type": "group",
+                              "group": {
+                                "key": "Retransition Start Time Curve",
+                                "collapsed": false,
+                                "locked": false,
+                                "items": [
+                                  {
+                                    "type": "row",
+                                    "key": "custom7Trig1RetransitionStartTimeCurve"
+                                  },
+                                  {
+                                    "type": "row",
+                                    "key": "custom7Trig1RetransitionStartTimeRange"
+                                  }
+                                ],
+                                "settings": [
+                                  "custom7Trig1RetransitionStartTimeCurve",
+                                  "custom7Trig1RetransitionStartTimeRange"
+                                ],
+                                "subgroups": []
+                              }
+                            }
+                          ],
+                          "settings": [
+                            "custom7Trig1RetransitionSpeedMs"
+                          ],
+                          "subgroups": [
+                            {
+                              "key": "Retransition Speed Curve",
+                              "collapsed": false,
+                              "locked": false,
+                              "items": [
+                                {
+                                  "type": "row",
+                                  "key": "custom7Trig1RetransitionSpeedCurve"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "custom7Trig1RetransitionSpeedCurveRange"
+                                }
+                              ],
+                              "settings": [
+                                "custom7Trig1RetransitionSpeedCurve",
+                                "custom7Trig1RetransitionSpeedCurveRange"
+                              ],
+                              "subgroups": []
+                            },
+                            {
+                              "key": "Retransition Start Time Curve",
+                              "collapsed": false,
+                              "locked": false,
+                              "items": [
+                                {
+                                  "type": "row",
+                                  "key": "custom7Trig1RetransitionStartTimeCurve"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "custom7Trig1RetransitionStartTimeRange"
+                                }
+                              ],
+                              "settings": [
+                                "custom7Trig1RetransitionStartTimeCurve",
+                                "custom7Trig1RetransitionStartTimeRange"
+                              ],
+                              "subgroups": []
+                            }
+                          ]
+                        }
+                      }
+                    ],
+                    "settings": [
+                      "custom7Trig1Enabled",
+                      "custom7Trig1Mode",
+                      "custom7Trig1TargetPose",
+                      "custom7Trig1TweenSelector",
+                      "custom7Trig1TweenSpeedMs",
+                      "custom7Trig1TransitionSpeedMs",
+                      "custom7Trig1PauseDurationMs"
+                    ],
+                    "subgroups": [
+                      {
+                        "key": "Offset",
+                        "collapsed": false,
+                        "locked": false,
+                        "items": [
+                          {
+                            "type": "row",
+                            "key": "custom7Trig1OffsetX"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom7Trig1OffsetY"
+                          }
+                        ],
+                        "settings": [
+                          "custom7Trig1OffsetX",
+                          "custom7Trig1OffsetY"
+                        ],
+                        "subgroups": []
+                      },
+                      {
+                        "key": "Rotation",
+                        "collapsed": false,
+                        "locked": false,
+                        "items": [
+                          {
+                            "type": "row",
+                            "key": "custom7Trig1RotationX"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom7Trig1RotationY"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom7Trig1RotationZ"
+                          }
+                        ],
+                        "settings": [
+                          "custom7Trig1RotationX",
+                          "custom7Trig1RotationY",
+                          "custom7Trig1RotationZ"
+                        ],
+                        "subgroups": []
+                      },
+                      {
+                        "key": "Animation Speed Curve",
+                        "collapsed": false,
+                        "locked": false,
+                        "items": [
+                          {
+                            "type": "row",
+                            "key": "custom7Trig1SpeedCurve"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom7Trig1SpeedCurveRange"
+                          }
+                        ],
+                        "settings": [
+                          "custom7Trig1SpeedCurve",
+                          "custom7Trig1SpeedCurveRange"
+                        ],
+                        "subgroups": []
+                      },
+                      {
+                        "key": "Start Time Curve",
+                        "collapsed": false,
+                        "locked": false,
+                        "items": [
+                          {
+                            "type": "row",
+                            "key": "custom7Trig1StartTimeCurve"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom7Trig1StartTimeRange"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom7Trig1TweenStartTimeCurve"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom7Trig1TweenStartTimeRange"
+                          }
+                        ],
+                        "settings": [
+                          "custom7Trig1StartTimeCurve",
+                          "custom7Trig1StartTimeRange",
+                          "custom7Trig1TweenStartTimeCurve",
+                          "custom7Trig1TweenStartTimeRange"
+                        ],
+                        "subgroups": []
+                      },
+                      {
+                        "key": "Start Distance Curve",
+                        "collapsed": false,
+                        "locked": false,
+                        "items": [
+                          {
+                            "type": "row",
+                            "key": "custom7Trig1StartDistanceMin"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom7Trig1StartDistanceMax"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom7Trig1StartDistanceCurve"
+                          }
+                        ],
+                        "settings": [
+                          "custom7Trig1StartDistanceMin",
+                          "custom7Trig1StartDistanceMax",
+                          "custom7Trig1StartDistanceCurve"
+                        ],
+                        "subgroups": []
+                      },
+                      {
+                        "key": "Retransition",
+                        "collapsed": false,
+                        "locked": false,
+                        "items": [
+                          {
+                            "type": "row",
+                            "key": "custom7Trig1RetransitionSpeedMs"
+                          },
+                          {
+                            "type": "group",
+                            "group": {
+                              "key": "Retransition Speed Curve",
+                              "collapsed": false,
+                              "locked": false,
+                              "items": [
+                                {
+                                  "type": "row",
+                                  "key": "custom7Trig1RetransitionSpeedCurve"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "custom7Trig1RetransitionSpeedCurveRange"
+                                }
+                              ],
+                              "settings": [
+                                "custom7Trig1RetransitionSpeedCurve",
+                                "custom7Trig1RetransitionSpeedCurveRange"
+                              ],
+                              "subgroups": []
+                            }
+                          },
+                          {
+                            "type": "group",
+                            "group": {
+                              "key": "Retransition Start Time Curve",
+                              "collapsed": false,
+                              "locked": false,
+                              "items": [
+                                {
+                                  "type": "row",
+                                  "key": "custom7Trig1RetransitionStartTimeCurve"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "custom7Trig1RetransitionStartTimeRange"
+                                }
+                              ],
+                              "settings": [
+                                "custom7Trig1RetransitionStartTimeCurve",
+                                "custom7Trig1RetransitionStartTimeRange"
+                              ],
+                              "subgroups": []
+                            }
+                          }
+                        ],
+                        "settings": [
+                          "custom7Trig1RetransitionSpeedMs"
+                        ],
+                        "subgroups": [
+                          {
+                            "key": "Retransition Speed Curve",
+                            "collapsed": false,
+                            "locked": false,
+                            "items": [
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1RetransitionSpeedCurve"
+                              },
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1RetransitionSpeedCurveRange"
+                              }
+                            ],
+                            "settings": [
+                              "custom7Trig1RetransitionSpeedCurve",
+                              "custom7Trig1RetransitionSpeedCurveRange"
+                            ],
+                            "subgroups": []
+                          },
+                          {
+                            "key": "Retransition Start Time Curve",
+                            "collapsed": false,
+                            "locked": false,
+                            "items": [
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1RetransitionStartTimeCurve"
+                              },
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1RetransitionStartTimeRange"
+                              }
+                            ],
+                            "settings": [
+                              "custom7Trig1RetransitionStartTimeCurve",
+                              "custom7Trig1RetransitionStartTimeRange"
+                            ],
+                            "subgroups": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
               }
             }
           ],
@@ -32562,7 +35724,7 @@
             },
             {
               "key": "Start Time Curve",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -32731,6 +35893,517 @@
                   "key": "custom7MultiTriggers"
                 },
                 {
+                  "type": "group",
+                  "group": {
+                    "key": "Trigger 1",
+                    "collapsed": false,
+                    "locked": false,
+                    "items": [
+                      {
+                        "type": "row",
+                        "key": "custom7Trig1Enabled"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom7Trig1Mode"
+                      },
+                      {
+                        "type": "group",
+                        "group": {
+                          "key": "Offset",
+                          "collapsed": false,
+                          "locked": false,
+                          "items": [
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1OffsetX"
+                            },
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1OffsetY"
+                            }
+                          ],
+                          "settings": [
+                            "custom7Trig1OffsetX",
+                            "custom7Trig1OffsetY"
+                          ],
+                          "subgroups": []
+                        }
+                      },
+                      {
+                        "type": "group",
+                        "group": {
+                          "key": "Rotation",
+                          "collapsed": false,
+                          "locked": false,
+                          "items": [
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1RotationX"
+                            },
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1RotationY"
+                            },
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1RotationZ"
+                            }
+                          ],
+                          "settings": [
+                            "custom7Trig1RotationX",
+                            "custom7Trig1RotationY",
+                            "custom7Trig1RotationZ"
+                          ],
+                          "subgroups": []
+                        }
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom7Trig1TargetPose"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom7Trig1TweenSelector"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom7Trig1TweenSpeedMs"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom7Trig1TransitionSpeedMs"
+                      },
+                      {
+                        "type": "group",
+                        "group": {
+                          "key": "Animation Speed Curve",
+                          "collapsed": false,
+                          "locked": false,
+                          "items": [
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1SpeedCurve"
+                            },
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1SpeedCurveRange"
+                            }
+                          ],
+                          "settings": [
+                            "custom7Trig1SpeedCurve",
+                            "custom7Trig1SpeedCurveRange"
+                          ],
+                          "subgroups": []
+                        }
+                      },
+                      {
+                        "type": "group",
+                        "group": {
+                          "key": "Start Time Curve",
+                          "collapsed": false,
+                          "locked": false,
+                          "items": [
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1StartTimeCurve"
+                            },
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1StartTimeRange"
+                            },
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1TweenStartTimeCurve"
+                            },
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1TweenStartTimeRange"
+                            }
+                          ],
+                          "settings": [
+                            "custom7Trig1StartTimeCurve",
+                            "custom7Trig1StartTimeRange",
+                            "custom7Trig1TweenStartTimeCurve",
+                            "custom7Trig1TweenStartTimeRange"
+                          ],
+                          "subgroups": []
+                        }
+                      },
+                      {
+                        "type": "group",
+                        "group": {
+                          "key": "Start Distance Curve",
+                          "collapsed": false,
+                          "locked": false,
+                          "items": [
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1StartDistanceMin"
+                            },
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1StartDistanceMax"
+                            },
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1StartDistanceCurve"
+                            }
+                          ],
+                          "settings": [
+                            "custom7Trig1StartDistanceMin",
+                            "custom7Trig1StartDistanceMax",
+                            "custom7Trig1StartDistanceCurve"
+                          ],
+                          "subgroups": []
+                        }
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom7Trig1PauseDurationMs"
+                      },
+                      {
+                        "type": "group",
+                        "group": {
+                          "key": "Retransition",
+                          "collapsed": false,
+                          "locked": false,
+                          "items": [
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1RetransitionSpeedMs"
+                            },
+                            {
+                              "type": "group",
+                              "group": {
+                                "key": "Retransition Speed Curve",
+                                "collapsed": false,
+                                "locked": false,
+                                "items": [
+                                  {
+                                    "type": "row",
+                                    "key": "custom7Trig1RetransitionSpeedCurve"
+                                  },
+                                  {
+                                    "type": "row",
+                                    "key": "custom7Trig1RetransitionSpeedCurveRange"
+                                  }
+                                ],
+                                "settings": [
+                                  "custom7Trig1RetransitionSpeedCurve",
+                                  "custom7Trig1RetransitionSpeedCurveRange"
+                                ],
+                                "subgroups": []
+                              }
+                            },
+                            {
+                              "type": "group",
+                              "group": {
+                                "key": "Retransition Start Time Curve",
+                                "collapsed": false,
+                                "locked": false,
+                                "items": [
+                                  {
+                                    "type": "row",
+                                    "key": "custom7Trig1RetransitionStartTimeCurve"
+                                  },
+                                  {
+                                    "type": "row",
+                                    "key": "custom7Trig1RetransitionStartTimeRange"
+                                  }
+                                ],
+                                "settings": [
+                                  "custom7Trig1RetransitionStartTimeCurve",
+                                  "custom7Trig1RetransitionStartTimeRange"
+                                ],
+                                "subgroups": []
+                              }
+                            }
+                          ],
+                          "settings": [
+                            "custom7Trig1RetransitionSpeedMs"
+                          ],
+                          "subgroups": [
+                            {
+                              "key": "Retransition Speed Curve",
+                              "collapsed": false,
+                              "locked": false,
+                              "items": [
+                                {
+                                  "type": "row",
+                                  "key": "custom7Trig1RetransitionSpeedCurve"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "custom7Trig1RetransitionSpeedCurveRange"
+                                }
+                              ],
+                              "settings": [
+                                "custom7Trig1RetransitionSpeedCurve",
+                                "custom7Trig1RetransitionSpeedCurveRange"
+                              ],
+                              "subgroups": []
+                            },
+                            {
+                              "key": "Retransition Start Time Curve",
+                              "collapsed": false,
+                              "locked": false,
+                              "items": [
+                                {
+                                  "type": "row",
+                                  "key": "custom7Trig1RetransitionStartTimeCurve"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "custom7Trig1RetransitionStartTimeRange"
+                                }
+                              ],
+                              "settings": [
+                                "custom7Trig1RetransitionStartTimeCurve",
+                                "custom7Trig1RetransitionStartTimeRange"
+                              ],
+                              "subgroups": []
+                            }
+                          ]
+                        }
+                      }
+                    ],
+                    "settings": [
+                      "custom7Trig1Enabled",
+                      "custom7Trig1Mode",
+                      "custom7Trig1TargetPose",
+                      "custom7Trig1TweenSelector",
+                      "custom7Trig1TweenSpeedMs",
+                      "custom7Trig1TransitionSpeedMs",
+                      "custom7Trig1PauseDurationMs"
+                    ],
+                    "subgroups": [
+                      {
+                        "key": "Offset",
+                        "collapsed": false,
+                        "locked": false,
+                        "items": [
+                          {
+                            "type": "row",
+                            "key": "custom7Trig1OffsetX"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom7Trig1OffsetY"
+                          }
+                        ],
+                        "settings": [
+                          "custom7Trig1OffsetX",
+                          "custom7Trig1OffsetY"
+                        ],
+                        "subgroups": []
+                      },
+                      {
+                        "key": "Rotation",
+                        "collapsed": false,
+                        "locked": false,
+                        "items": [
+                          {
+                            "type": "row",
+                            "key": "custom7Trig1RotationX"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom7Trig1RotationY"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom7Trig1RotationZ"
+                          }
+                        ],
+                        "settings": [
+                          "custom7Trig1RotationX",
+                          "custom7Trig1RotationY",
+                          "custom7Trig1RotationZ"
+                        ],
+                        "subgroups": []
+                      },
+                      {
+                        "key": "Animation Speed Curve",
+                        "collapsed": false,
+                        "locked": false,
+                        "items": [
+                          {
+                            "type": "row",
+                            "key": "custom7Trig1SpeedCurve"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom7Trig1SpeedCurveRange"
+                          }
+                        ],
+                        "settings": [
+                          "custom7Trig1SpeedCurve",
+                          "custom7Trig1SpeedCurveRange"
+                        ],
+                        "subgroups": []
+                      },
+                      {
+                        "key": "Start Time Curve",
+                        "collapsed": false,
+                        "locked": false,
+                        "items": [
+                          {
+                            "type": "row",
+                            "key": "custom7Trig1StartTimeCurve"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom7Trig1StartTimeRange"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom7Trig1TweenStartTimeCurve"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom7Trig1TweenStartTimeRange"
+                          }
+                        ],
+                        "settings": [
+                          "custom7Trig1StartTimeCurve",
+                          "custom7Trig1StartTimeRange",
+                          "custom7Trig1TweenStartTimeCurve",
+                          "custom7Trig1TweenStartTimeRange"
+                        ],
+                        "subgroups": []
+                      },
+                      {
+                        "key": "Start Distance Curve",
+                        "collapsed": false,
+                        "locked": false,
+                        "items": [
+                          {
+                            "type": "row",
+                            "key": "custom7Trig1StartDistanceMin"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom7Trig1StartDistanceMax"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom7Trig1StartDistanceCurve"
+                          }
+                        ],
+                        "settings": [
+                          "custom7Trig1StartDistanceMin",
+                          "custom7Trig1StartDistanceMax",
+                          "custom7Trig1StartDistanceCurve"
+                        ],
+                        "subgroups": []
+                      },
+                      {
+                        "key": "Retransition",
+                        "collapsed": false,
+                        "locked": false,
+                        "items": [
+                          {
+                            "type": "row",
+                            "key": "custom7Trig1RetransitionSpeedMs"
+                          },
+                          {
+                            "type": "group",
+                            "group": {
+                              "key": "Retransition Speed Curve",
+                              "collapsed": false,
+                              "locked": false,
+                              "items": [
+                                {
+                                  "type": "row",
+                                  "key": "custom7Trig1RetransitionSpeedCurve"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "custom7Trig1RetransitionSpeedCurveRange"
+                                }
+                              ],
+                              "settings": [
+                                "custom7Trig1RetransitionSpeedCurve",
+                                "custom7Trig1RetransitionSpeedCurveRange"
+                              ],
+                              "subgroups": []
+                            }
+                          },
+                          {
+                            "type": "group",
+                            "group": {
+                              "key": "Retransition Start Time Curve",
+                              "collapsed": false,
+                              "locked": false,
+                              "items": [
+                                {
+                                  "type": "row",
+                                  "key": "custom7Trig1RetransitionStartTimeCurve"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "custom7Trig1RetransitionStartTimeRange"
+                                }
+                              ],
+                              "settings": [
+                                "custom7Trig1RetransitionStartTimeCurve",
+                                "custom7Trig1RetransitionStartTimeRange"
+                              ],
+                              "subgroups": []
+                            }
+                          }
+                        ],
+                        "settings": [
+                          "custom7Trig1RetransitionSpeedMs"
+                        ],
+                        "subgroups": [
+                          {
+                            "key": "Retransition Speed Curve",
+                            "collapsed": false,
+                            "locked": false,
+                            "items": [
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1RetransitionSpeedCurve"
+                              },
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1RetransitionSpeedCurveRange"
+                              }
+                            ],
+                            "settings": [
+                              "custom7Trig1RetransitionSpeedCurve",
+                              "custom7Trig1RetransitionSpeedCurveRange"
+                            ],
+                            "subgroups": []
+                          },
+                          {
+                            "key": "Retransition Start Time Curve",
+                            "collapsed": false,
+                            "locked": false,
+                            "items": [
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1RetransitionStartTimeCurve"
+                              },
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1RetransitionStartTimeRange"
+                              }
+                            ],
+                            "settings": [
+                              "custom7Trig1RetransitionStartTimeCurve",
+                              "custom7Trig1RetransitionStartTimeRange"
+                            ],
+                            "subgroups": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
                   "type": "row"
                 }
               ],
@@ -32739,7 +36412,516 @@
                 "custom7MultiTriggers",
                 null
               ],
-              "subgroups": []
+              "subgroups": [
+                {
+                  "key": "Trigger 1",
+                  "collapsed": false,
+                  "locked": false,
+                  "items": [
+                    {
+                      "type": "row",
+                      "key": "custom7Trig1Enabled"
+                    },
+                    {
+                      "type": "row",
+                      "key": "custom7Trig1Mode"
+                    },
+                    {
+                      "type": "group",
+                      "group": {
+                        "key": "Offset",
+                        "collapsed": false,
+                        "locked": false,
+                        "items": [
+                          {
+                            "type": "row",
+                            "key": "custom7Trig1OffsetX"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom7Trig1OffsetY"
+                          }
+                        ],
+                        "settings": [
+                          "custom7Trig1OffsetX",
+                          "custom7Trig1OffsetY"
+                        ],
+                        "subgroups": []
+                      }
+                    },
+                    {
+                      "type": "group",
+                      "group": {
+                        "key": "Rotation",
+                        "collapsed": false,
+                        "locked": false,
+                        "items": [
+                          {
+                            "type": "row",
+                            "key": "custom7Trig1RotationX"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom7Trig1RotationY"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom7Trig1RotationZ"
+                          }
+                        ],
+                        "settings": [
+                          "custom7Trig1RotationX",
+                          "custom7Trig1RotationY",
+                          "custom7Trig1RotationZ"
+                        ],
+                        "subgroups": []
+                      }
+                    },
+                    {
+                      "type": "row",
+                      "key": "custom7Trig1TargetPose"
+                    },
+                    {
+                      "type": "row",
+                      "key": "custom7Trig1TweenSelector"
+                    },
+                    {
+                      "type": "row",
+                      "key": "custom7Trig1TweenSpeedMs"
+                    },
+                    {
+                      "type": "row",
+                      "key": "custom7Trig1TransitionSpeedMs"
+                    },
+                    {
+                      "type": "group",
+                      "group": {
+                        "key": "Animation Speed Curve",
+                        "collapsed": false,
+                        "locked": false,
+                        "items": [
+                          {
+                            "type": "row",
+                            "key": "custom7Trig1SpeedCurve"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom7Trig1SpeedCurveRange"
+                          }
+                        ],
+                        "settings": [
+                          "custom7Trig1SpeedCurve",
+                          "custom7Trig1SpeedCurveRange"
+                        ],
+                        "subgroups": []
+                      }
+                    },
+                    {
+                      "type": "group",
+                      "group": {
+                        "key": "Start Time Curve",
+                        "collapsed": false,
+                        "locked": false,
+                        "items": [
+                          {
+                            "type": "row",
+                            "key": "custom7Trig1StartTimeCurve"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom7Trig1StartTimeRange"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom7Trig1TweenStartTimeCurve"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom7Trig1TweenStartTimeRange"
+                          }
+                        ],
+                        "settings": [
+                          "custom7Trig1StartTimeCurve",
+                          "custom7Trig1StartTimeRange",
+                          "custom7Trig1TweenStartTimeCurve",
+                          "custom7Trig1TweenStartTimeRange"
+                        ],
+                        "subgroups": []
+                      }
+                    },
+                    {
+                      "type": "group",
+                      "group": {
+                        "key": "Start Distance Curve",
+                        "collapsed": false,
+                        "locked": false,
+                        "items": [
+                          {
+                            "type": "row",
+                            "key": "custom7Trig1StartDistanceMin"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom7Trig1StartDistanceMax"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom7Trig1StartDistanceCurve"
+                          }
+                        ],
+                        "settings": [
+                          "custom7Trig1StartDistanceMin",
+                          "custom7Trig1StartDistanceMax",
+                          "custom7Trig1StartDistanceCurve"
+                        ],
+                        "subgroups": []
+                      }
+                    },
+                    {
+                      "type": "row",
+                      "key": "custom7Trig1PauseDurationMs"
+                    },
+                    {
+                      "type": "group",
+                      "group": {
+                        "key": "Retransition",
+                        "collapsed": false,
+                        "locked": false,
+                        "items": [
+                          {
+                            "type": "row",
+                            "key": "custom7Trig1RetransitionSpeedMs"
+                          },
+                          {
+                            "type": "group",
+                            "group": {
+                              "key": "Retransition Speed Curve",
+                              "collapsed": false,
+                              "locked": false,
+                              "items": [
+                                {
+                                  "type": "row",
+                                  "key": "custom7Trig1RetransitionSpeedCurve"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "custom7Trig1RetransitionSpeedCurveRange"
+                                }
+                              ],
+                              "settings": [
+                                "custom7Trig1RetransitionSpeedCurve",
+                                "custom7Trig1RetransitionSpeedCurveRange"
+                              ],
+                              "subgroups": []
+                            }
+                          },
+                          {
+                            "type": "group",
+                            "group": {
+                              "key": "Retransition Start Time Curve",
+                              "collapsed": false,
+                              "locked": false,
+                              "items": [
+                                {
+                                  "type": "row",
+                                  "key": "custom7Trig1RetransitionStartTimeCurve"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "custom7Trig1RetransitionStartTimeRange"
+                                }
+                              ],
+                              "settings": [
+                                "custom7Trig1RetransitionStartTimeCurve",
+                                "custom7Trig1RetransitionStartTimeRange"
+                              ],
+                              "subgroups": []
+                            }
+                          }
+                        ],
+                        "settings": [
+                          "custom7Trig1RetransitionSpeedMs"
+                        ],
+                        "subgroups": [
+                          {
+                            "key": "Retransition Speed Curve",
+                            "collapsed": false,
+                            "locked": false,
+                            "items": [
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1RetransitionSpeedCurve"
+                              },
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1RetransitionSpeedCurveRange"
+                              }
+                            ],
+                            "settings": [
+                              "custom7Trig1RetransitionSpeedCurve",
+                              "custom7Trig1RetransitionSpeedCurveRange"
+                            ],
+                            "subgroups": []
+                          },
+                          {
+                            "key": "Retransition Start Time Curve",
+                            "collapsed": false,
+                            "locked": false,
+                            "items": [
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1RetransitionStartTimeCurve"
+                              },
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1RetransitionStartTimeRange"
+                              }
+                            ],
+                            "settings": [
+                              "custom7Trig1RetransitionStartTimeCurve",
+                              "custom7Trig1RetransitionStartTimeRange"
+                            ],
+                            "subgroups": []
+                          }
+                        ]
+                      }
+                    }
+                  ],
+                  "settings": [
+                    "custom7Trig1Enabled",
+                    "custom7Trig1Mode",
+                    "custom7Trig1TargetPose",
+                    "custom7Trig1TweenSelector",
+                    "custom7Trig1TweenSpeedMs",
+                    "custom7Trig1TransitionSpeedMs",
+                    "custom7Trig1PauseDurationMs"
+                  ],
+                  "subgroups": [
+                    {
+                      "key": "Offset",
+                      "collapsed": false,
+                      "locked": false,
+                      "items": [
+                        {
+                          "type": "row",
+                          "key": "custom7Trig1OffsetX"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom7Trig1OffsetY"
+                        }
+                      ],
+                      "settings": [
+                        "custom7Trig1OffsetX",
+                        "custom7Trig1OffsetY"
+                      ],
+                      "subgroups": []
+                    },
+                    {
+                      "key": "Rotation",
+                      "collapsed": false,
+                      "locked": false,
+                      "items": [
+                        {
+                          "type": "row",
+                          "key": "custom7Trig1RotationX"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom7Trig1RotationY"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom7Trig1RotationZ"
+                        }
+                      ],
+                      "settings": [
+                        "custom7Trig1RotationX",
+                        "custom7Trig1RotationY",
+                        "custom7Trig1RotationZ"
+                      ],
+                      "subgroups": []
+                    },
+                    {
+                      "key": "Animation Speed Curve",
+                      "collapsed": false,
+                      "locked": false,
+                      "items": [
+                        {
+                          "type": "row",
+                          "key": "custom7Trig1SpeedCurve"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom7Trig1SpeedCurveRange"
+                        }
+                      ],
+                      "settings": [
+                        "custom7Trig1SpeedCurve",
+                        "custom7Trig1SpeedCurveRange"
+                      ],
+                      "subgroups": []
+                    },
+                    {
+                      "key": "Start Time Curve",
+                      "collapsed": false,
+                      "locked": false,
+                      "items": [
+                        {
+                          "type": "row",
+                          "key": "custom7Trig1StartTimeCurve"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom7Trig1StartTimeRange"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom7Trig1TweenStartTimeCurve"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom7Trig1TweenStartTimeRange"
+                        }
+                      ],
+                      "settings": [
+                        "custom7Trig1StartTimeCurve",
+                        "custom7Trig1StartTimeRange",
+                        "custom7Trig1TweenStartTimeCurve",
+                        "custom7Trig1TweenStartTimeRange"
+                      ],
+                      "subgroups": []
+                    },
+                    {
+                      "key": "Start Distance Curve",
+                      "collapsed": false,
+                      "locked": false,
+                      "items": [
+                        {
+                          "type": "row",
+                          "key": "custom7Trig1StartDistanceMin"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom7Trig1StartDistanceMax"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom7Trig1StartDistanceCurve"
+                        }
+                      ],
+                      "settings": [
+                        "custom7Trig1StartDistanceMin",
+                        "custom7Trig1StartDistanceMax",
+                        "custom7Trig1StartDistanceCurve"
+                      ],
+                      "subgroups": []
+                    },
+                    {
+                      "key": "Retransition",
+                      "collapsed": false,
+                      "locked": false,
+                      "items": [
+                        {
+                          "type": "row",
+                          "key": "custom7Trig1RetransitionSpeedMs"
+                        },
+                        {
+                          "type": "group",
+                          "group": {
+                            "key": "Retransition Speed Curve",
+                            "collapsed": false,
+                            "locked": false,
+                            "items": [
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1RetransitionSpeedCurve"
+                              },
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1RetransitionSpeedCurveRange"
+                              }
+                            ],
+                            "settings": [
+                              "custom7Trig1RetransitionSpeedCurve",
+                              "custom7Trig1RetransitionSpeedCurveRange"
+                            ],
+                            "subgroups": []
+                          }
+                        },
+                        {
+                          "type": "group",
+                          "group": {
+                            "key": "Retransition Start Time Curve",
+                            "collapsed": false,
+                            "locked": false,
+                            "items": [
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1RetransitionStartTimeCurve"
+                              },
+                              {
+                                "type": "row",
+                                "key": "custom7Trig1RetransitionStartTimeRange"
+                              }
+                            ],
+                            "settings": [
+                              "custom7Trig1RetransitionStartTimeCurve",
+                              "custom7Trig1RetransitionStartTimeRange"
+                            ],
+                            "subgroups": []
+                          }
+                        }
+                      ],
+                      "settings": [
+                        "custom7Trig1RetransitionSpeedMs"
+                      ],
+                      "subgroups": [
+                        {
+                          "key": "Retransition Speed Curve",
+                          "collapsed": false,
+                          "locked": false,
+                          "items": [
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1RetransitionSpeedCurve"
+                            },
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1RetransitionSpeedCurveRange"
+                            }
+                          ],
+                          "settings": [
+                            "custom7Trig1RetransitionSpeedCurve",
+                            "custom7Trig1RetransitionSpeedCurveRange"
+                          ],
+                          "subgroups": []
+                        },
+                        {
+                          "key": "Retransition Start Time Curve",
+                          "collapsed": false,
+                          "locked": false,
+                          "items": [
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1RetransitionStartTimeCurve"
+                            },
+                            {
+                              "type": "row",
+                              "key": "custom7Trig1RetransitionStartTimeRange"
+                            }
+                          ],
+                          "settings": [
+                            "custom7Trig1RetransitionStartTimeCurve",
+                            "custom7Trig1RetransitionStartTimeRange"
+                          ],
+                          "subgroups": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }
