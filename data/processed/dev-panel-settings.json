@@ -22,7 +22,7 @@
       "useProgressiveOffset": false,
       "hideHands": false,
       "trackingEnabled": true,
-      "trackingDamping": 0.15,
+      "trackingDamping": 0.02,
       "targetDepthFactor": 0.85,
       "showTargetMarker": false,
       "armRotationEnabled": true,
@@ -6098,7 +6098,7 @@
       "reactiveArmLengthEnabled": true,
       "armLengthRange": "{\"min\":0,\"max\":63}",
       "armLengthCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
-      "armLengthDamping": 0.07,
+      "armLengthDamping": 0.02,
       "wristSplayResponsiveEnabled": true,
       "wristSplayReposeStagger": 1,
       "wristSplayDefault": 6,
@@ -13179,7 +13179,7 @@
       "reactiveArmLengthEnabled": true,
       "armLengthRange": "{\"min\":0,\"max\":63}",
       "armLengthCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
-      "armLengthDamping": 0.07,
+      "armLengthDamping": 0.02,
       "wristSplayResponsiveEnabled": true,
       "wristSplayReposeStagger": 1,
       "wristSplayDefault": 6,
@@ -20260,7 +20260,7 @@
       "reactiveArmLengthEnabled": true,
       "armLengthRange": "{\"min\":0,\"max\":63}",
       "armLengthCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
-      "armLengthDamping": 0.07,
+      "armLengthDamping": 0.02,
       "wristSplayResponsiveEnabled": true,
       "wristSplayReposeStagger": 1,
       "wristSplayDefault": 6,
@@ -24077,7 +24077,7 @@
                 "type": "group",
                 "group": {
                   "key": "Responsive Arm Rotation",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -24110,7 +24110,7 @@
                 "type": "group",
                 "group": {
                   "key": "New Group (3)",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -24148,7 +24148,7 @@
                 "type": "group",
                 "group": {
                   "key": "Responsive Wrist Splay",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -24196,7 +24196,7 @@
                 "type": "group",
                 "group": {
                   "key": "New Group (4)",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -24245,7 +24245,7 @@
             "subgroups": [
               {
                 "key": "Responsive Arm Rotation",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -24275,7 +24275,7 @@
               },
               {
                 "key": "New Group (3)",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -24310,7 +24310,7 @@
               },
               {
                 "key": "Responsive Wrist Splay",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -24355,7 +24355,7 @@
               },
               {
                 "key": "New Group (4)",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -25259,7 +25259,7 @@
               "type": "group",
               "group": {
                 "key": "Responsive Arm Rotation",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -25292,7 +25292,7 @@
               "type": "group",
               "group": {
                 "key": "New Group (3)",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -25330,7 +25330,7 @@
               "type": "group",
               "group": {
                 "key": "Responsive Wrist Splay",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -25378,7 +25378,7 @@
               "type": "group",
               "group": {
                 "key": "New Group (4)",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -25427,7 +25427,7 @@
           "subgroups": [
             {
               "key": "Responsive Arm Rotation",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -25457,7 +25457,7 @@
             },
             {
               "key": "New Group (3)",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -25492,7 +25492,7 @@
             },
             {
               "key": "Responsive Wrist Splay",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -25537,7 +25537,7 @@
             },
             {
               "key": "New Group (4)",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
