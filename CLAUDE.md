@@ -1595,3 +1595,58 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   page-level reset) -- a future feature that adds its own "bake at
   completion" step should audit every early-exit path for the same gap
   from the start, not just its own happy path.
+- **CRITICAL METHODOLOGY GOTCHA, discovered 2026-09-27/28 (5th round of
+  the same jump investigation): calling `updateRenderOrder()` directly to
+  drive a test SKIPS `animate()`'s own cursor-tracking wrapper-rotation
+  slerp entirely -- it's a separate code block that only runs inside
+  `animate()`, never inside `updateRenderOrder()`.** Every prior round's
+  "no jump found" result (including several that specifically claimed to
+  test palm rotation) was measuring `hand.wrapper.quaternion` in a state
+  where it had NEVER been touched by cursor tracking at all during that
+  test session -- `computeRadialRollDeg`/`computeRollQuat` aren't exposed
+  on `window.__debug` either, so testing this properly requires manually
+  inlining animate()'s own lookAt+roll+slerp block (see this round's own
+  CHANGELOG entry for a working inline replica) rather than assuming
+  `updateRenderOrder()` alone is a faithful stand-in for a real frame.
+  **Any future test of ANYTHING involving `hand.wrapper.quaternion` or
+  cursor-tracking-driven behavior in this project MUST either drive real
+  `animate()` frames or explicitly replicate its cursor-tracking block --
+  `updateRenderOrder()` alone is silently insufficient and will falsely
+  report smoothness.**
+- **Cursor tracking's own `trackingDamping` is genuinely per-device and
+  varies enormously in this project's real, live settings** (confirmed
+  2026-09-28 by reading `data/processed/dev-panel-settings.json`
+  directly): desktop `0.05`, mobile `0.08`, **landscape `1.0` -- meaning
+  the Landscape tab has ZERO smoothing on cursor-tracking rotation at
+  all**, a full instant snap to `desired` every frame. A discontinuity
+  too small to perceive on desktop's slow damping would be fully,
+  instantly visible on Landscape. If a future report about
+  jumpy/snappy cursor-tracking rotation specifies or is later found to
+  involve Landscape orientation, check this value first before assuming
+  a logic bug -- it may simply be operating exactly as configured.
+- **Also confirmed 2026-09-28: `holdConfirmMs: 0` in the real saved
+  settings means literally EVERY click (not just a genuine press-and-hold)
+  also fully arms and releases every enabled Click+Hold function** --
+  there is no meaningful distinction between "a quick click" and "a hold
+  that happens to be very short" at the code level when this is 0. Any
+  future investigation into click-vs-hold interaction bugs needs to
+  account for this: a plain "Click"-type function firing is very likely
+  ALSO simultaneously re-arming and re-releasing every Click+Hold
+  function on the same mouse button, not a separate, isolated event.
+- **UNRESOLVED as of 2026-09-28**: despite the methodology fix above and
+  extensive re-testing with the project's own real (not simplified)
+  settings -- including a real quick-reclick-mid-retransition scenario
+  matching the user's own repro -- no further discrete discontinuity was
+  found in wrist splay, `currentBaseQuat`, wrapper quaternion, or wrapper
+  position. A defensive mitigation was shipped instead (a guaranteed
+  brief gentle-damping "settle window," `hand._handoffSettleFrames`, the
+  instant a hand stops being trigger-controlled -- see its own inline
+  comment at the cursor-tracking loop in `animate()`), NOT a confirmed
+  root-cause fix. If a future report describes this same jump
+  persisting, the settle window's own duration/cap (24 frames / 0.06,
+  both disclosed judgment calls with no measurement behind them) is the
+  first thing to tune, and a real screen recording from the reporting
+  device remains the most valuable missing diagnostic -- every attempt
+  at reproducing this via direct state-machine simulation in this
+  sandbox has failed to show a discontinuity, despite the report being
+  consistent, precise, and repeated across many rounds.

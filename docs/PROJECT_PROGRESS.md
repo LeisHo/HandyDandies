@@ -18,6 +18,32 @@ work seamlessly from there.
 
 ## Currently working on
 
+**UNRESOLVED, MITIGATED 2026-09-27/28 (12th round) -- the jump
+investigation's 5th round. Root cause still not isolated; a defensive
+mitigation was shipped instead.** User precisely narrowed the repro
+(Retransition OFF = never happens, ON = happens) and reported it live on
+a real phone (hold, release, click elsewhere -> affected hands snap
+rotation then visibly continue damping toward final state). A real
+methodology bug was found and fixed first: every prior round's testing
+drove the state machine via `updateRenderOrder()` directly, which SKIPS
+`animate()`'s own cursor-tracking rotation slerp entirely -- meaning
+"palm rotation" was NEVER actually being tested. Rebuilt the test with a
+faithful manual replica of that code and re-verified every prior
+boundary (splay, base-quat, wrapper rotation/position) using the
+project's own REAL settings (not simplified) -- still fully continuous,
+no discontinuity found. Confirmed real, useful facts along the way:
+`trackingDamping` is per-device (desktop 0.05, mobile 0.08, **landscape
+1.0 -- zero smoothing**), and `holdConfirmMs: 0` means every plain click
+also arms+releases every Click+Hold function. Shipped a mitigation (not
+a fix): a guaranteed ~24-frame gentle-damping "settle window"
+(`hand._handoffSettleFrames`) the instant a hand exits trigger control,
+capping effective tracking damping regardless of the device's own
+setting. **Needs the user's own retest, and ideally a screen recording
+if it persists** -- see CLAUDE.md's matching Gotchas entries and
+CHANGELOG.txt's 12th-round entry for the full account.
+
+--------------------------------------------------------------------------------
+
 **FIXED 2026-09-27 (11th round) -- Offset/Rotation contribution
 vanishing when a hold releases mid-ramp, the 4th distinct root cause in
 the same jump investigation.** Precisely-targeted follow-up: "Its

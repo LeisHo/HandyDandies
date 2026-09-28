@@ -12671,6 +12671,70 @@ smooth step, not a jump.
 
 Commit: `ddecfed`. Pushed to `https://github.com/LeisHo/HandyDandies`.
 
+--------------------------------------------------------------------------------
+
+2026-09-27/28 (12th round)
+
+**5th round of the same jump investigation. User precisely narrowed it
+via a real A/B test: Retransition OFF (even Single Pose, non-tween) =
+never happens; Retransition ON = happens.** Then, testing live on a real
+phone: "did a click hold at the bottom, let it run, released, clicked
+once at the top -- the ones that had been triggered jumped and rotated
+their wrist position/rotation... didn't reach their final state yet,
+damping still being applied."
+
+**Real methodology bug found and fixed first**: every simulation this
+whole investigation drove the state machine via direct `updateRenderOrder()`
+calls, which SKIPS `animate()`'s own cursor-tracking wrapper-rotation
+slerp entirely (a separate code block, never exercised). Built a manual
+replication (including the real `computeRadialRollDeg`/`computeRollQuat`
+math, inlined since those functions aren't exposed on `window.__debug`)
+and reran every prior boundary test with it -- wrist splay,
+`currentBaseQuat`, wrapper quaternion, and wrapper position all still
+measured fully continuous across every retransition/stopping/interruption
+boundary tested, including a real quick-reclick-mid-retransition
+scenario matching the user's own exact repro, using this project's own
+REAL git-tracked settings (not simplified/patched values, per direct
+request "you can use my git save settings... so you see what I see").
+
+**Confirmed, real, previously-unknown fact**: cursor tracking's own
+`trackingDamping` is genuinely per-device in this project's live
+settings -- desktop 0.05, mobile 0.08, **landscape 1.0 (zero smoothing
+at all)**. Also confirmed `holdConfirmMs: 0` in the real settings, meaning
+literally every click (not just a real "hold") also fully arms and
+releases every enabled Click+Hold function -- and confirmed which of the
+7 real custom functions have Offset/Rotation enabled (none of the
+left-click ones relevant to this exact repro, ruling out cross-function
+accumulator bleed-through as the explanation here specifically).
+
+**No further discrete code bug was isolated** despite this corrected,
+far more faithful methodology and real settings. Given the user's own
+"give it one more go" request and being away from a machine that could
+capture a screen recording, shipped a **defensive mitigation rather than
+a confirmed root-cause fix**: a hand now gets a guaranteed brief (~24
+frame) gentle catch-up window in cursor-tracking's own rotation the
+instant `hand._wasOverriddenLastFrame` goes from true to false (it just
+stopped being trigger-controlled), capping the effective tracking
+damping to a gentle value (0.06) for that window regardless of the
+device's own configured damping. This directly targets the reported
+symptom (a device with snappier/zero damping making ANY residual
+discontinuity fully visible) without depending on first finding the
+exact internal value that's discontinuous. Safe by construction -- only
+ever slows the handoff down, never speeds it up, and only for a short,
+fixed window.
+
+**Honestly disclosed**: this is NOT a confirmed fix for a specific root
+cause the way the prior 4 rounds' fixes were (each of those was measured
+directly, before and after). If the jump persists after this, the next
+diagnostic step is a real screen recording from the user's own phone --
+requested but not yet available this round.
+
+`main.js` cache-buster bumped `?v=231` -> `?v=232`.
+
+Commit: `b4a423a` (merged with a concurrent `Update dev-panel-settings.json
+via Save Settings` commit from the user's own live browser, `087720f`).
+Pushed to `https://github.com/LeisHo/HandyDandies`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a
