@@ -24069,10 +24069,6 @@
               },
               {
                 "type": "row",
-                "key": "trackingDamping"
-              },
-              {
-                "type": "row",
                 "key": "targetDepthFactor"
               },
               {
@@ -24126,12 +24122,16 @@
                 "type": "group",
                 "group": {
                   "key": "New Group (3)",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
                       "type": "row",
                       "key": "palmFacesCursor"
+                    },
+                    {
+                      "type": "row",
+                      "key": "trackingDamping"
                     },
                     {
                       "type": "row",
@@ -24152,6 +24152,7 @@
                   ],
                   "settings": [
                     "palmFacesCursor",
+                    "trackingDamping",
                     "palmFaceRotationOffset",
                     "palmFacesCursorDistanceCurveEnabled",
                     "palmFacesCursorDistanceRange",
@@ -24254,7 +24255,6 @@
             ],
             "settings": [
               "trackingEnabled",
-              "trackingDamping",
               "targetDepthFactor",
               "showTargetMarker"
             ],
@@ -24301,12 +24301,16 @@
               },
               {
                 "key": "New Group (3)",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
                     "type": "row",
                     "key": "palmFacesCursor"
+                  },
+                  {
+                    "type": "row",
+                    "key": "trackingDamping"
                   },
                   {
                     "type": "row",
@@ -24327,6 +24331,7 @@
                 ],
                 "settings": [
                   "palmFacesCursor",
+                  "trackingDamping",
                   "palmFaceRotationOffset",
                   "palmFacesCursorDistanceCurveEnabled",
                   "palmFacesCursorDistanceRange",
@@ -25271,10 +25276,6 @@
             },
             {
               "type": "row",
-              "key": "trackingDamping"
-            },
-            {
-              "type": "row",
               "key": "targetDepthFactor"
             },
             {
@@ -25328,12 +25329,16 @@
               "type": "group",
               "group": {
                 "key": "New Group (3)",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
                     "type": "row",
                     "key": "palmFacesCursor"
+                  },
+                  {
+                    "type": "row",
+                    "key": "trackingDamping"
                   },
                   {
                     "type": "row",
@@ -25354,6 +25359,7 @@
                 ],
                 "settings": [
                   "palmFacesCursor",
+                  "trackingDamping",
                   "palmFaceRotationOffset",
                   "palmFacesCursorDistanceCurveEnabled",
                   "palmFacesCursorDistanceRange",
@@ -25456,7 +25462,6 @@
           ],
           "settings": [
             "trackingEnabled",
-            "trackingDamping",
             "targetDepthFactor",
             "showTargetMarker"
           ],
@@ -25503,12 +25508,16 @@
             },
             {
               "key": "New Group (3)",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
                   "type": "row",
                   "key": "palmFacesCursor"
+                },
+                {
+                  "type": "row",
+                  "key": "trackingDamping"
                 },
                 {
                   "type": "row",
@@ -25529,6 +25538,7 @@
               ],
               "settings": [
                 "palmFacesCursor",
+                "trackingDamping",
                 "palmFaceRotationOffset",
                 "palmFacesCursorDistanceCurveEnabled",
                 "palmFacesCursorDistanceRange",
