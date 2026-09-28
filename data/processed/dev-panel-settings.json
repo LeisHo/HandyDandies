@@ -22,8 +22,8 @@
       "useProgressiveOffset": false,
       "hideHands": false,
       "trackingEnabled": true,
-      "trackingDamping": 0.05,
-      "targetDepthFactor": 0.25,
+      "trackingDamping": 1,
+      "targetDepthFactor": 2,
       "showTargetMarker": false,
       "palmFacesCursor": true,
       "palmFaceRotationOffset": 13,
@@ -22658,7 +22658,7 @@
     },
     {
       "key": "Cursor Tracking",
-      "collapsed": true,
+      "collapsed": false,
       "locked": false,
       "items": [
         {
@@ -22693,7 +22693,7 @@
           "type": "group",
           "group": {
             "key": "New Group (3)",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -22759,7 +22759,7 @@
           "type": "group",
           "group": {
             "key": "New Group (4)",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -22806,7 +22806,7 @@
       "subgroups": [
         {
           "key": "New Group (3)",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
@@ -22866,7 +22866,7 @@
         },
         {
           "key": "New Group (4)",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
