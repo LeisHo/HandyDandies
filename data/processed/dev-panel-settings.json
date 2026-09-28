@@ -33,7 +33,7 @@
       "armRotationDamping": 0.39,
       "palmFacesCursor": true,
       "palmFaceRotationOffset": 13,
-      "palmFacesCursorDistanceCurveEnabled": true,
+      "palmFacesCursorDistanceCurveEnabled": false,
       "palmFacesCursorDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0.5}]",
       "palmFacesCursorDistanceRange": "{\"min\":0,\"max\":180}",
       "loadingPreviewEnabled": true,
@@ -6103,7 +6103,7 @@
       "armLengthDamping": 0.34,
       "wristSplayResponsiveEnabled": true,
       "wristSplayReposeStagger": 1,
-      "wristSplayDefault": 6,
+      "wristSplayDefault": -180,
       "wristSplayReactiveEnabled": true,
       "wristSplayRange": "{\"min\":30,\"max\":-54}",
       "wristSplayCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
@@ -6671,9 +6671,9 @@
       "preventReorderFlash": false,
       "logCursorPositionEnabled": false,
       "cursorLogIntervalMs": 1000,
-      "handNumbersEnabled": false,
-      "handNumbersColor": "#ffffff",
-      "logHandBehaviourEnabled": false,
+      "handNumbersEnabled": true,
+      "handNumbersColor": "#00ff04",
+      "logHandBehaviourEnabled": true,
       "dp_titleFontSize": 17,
       "dp_tabFontSize": 12,
       "dp_groupTitleFontSize": 14,
@@ -6892,7 +6892,7 @@
       "custom9RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "custom9MultiTriggerEnabled": false,
       "custom9MultiTriggers": "[]",
-      "custom10Enabled": true,
+      "custom10Enabled": false,
       "custom10Type": "Click+Hold",
       "custom10TouchPointCount": 1,
       "custom10ClickCount": "2nd",
@@ -6905,13 +6905,13 @@
       "custom10RotationY": 0,
       "custom10RotationZ": 0,
       "custom10TargetPose": "",
-      "custom10TweenSelector": "COUNTDOWN - VERTICAL",
+      "custom10TweenSelector": "Neutral - Vertical Fanning",
       "custom10TweenChain": [],
-      "custom10TweenSpeedMs": 3490,
+      "custom10TweenSpeedMs": 5000,
       "custom10TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom10TweenStartTimeRange": "{\"min\":0,\"max\":1374}",
       "custom10LoopMode": "Loop",
-      "custom10LoopHoldMs": 0,
+      "custom10LoopHoldMs": 1340,
       "custom10TransitionSpeedMs": 700,
       "custom10SpeedCurveEnabled": false,
       "custom10SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -7116,7 +7116,7 @@
       "armRotationDamping": 0.39,
       "palmFacesCursor": true,
       "palmFaceRotationOffset": 0,
-      "palmFacesCursorDistanceCurveEnabled": true,
+      "palmFacesCursorDistanceCurveEnabled": false,
       "palmFacesCursorDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0.5}]",
       "palmFacesCursorDistanceRange": "{\"min\":0,\"max\":180}",
       "loadingPreviewEnabled": true,
@@ -13186,7 +13186,7 @@
       "armLengthDamping": 0.34,
       "wristSplayResponsiveEnabled": true,
       "wristSplayReposeStagger": 1,
-      "wristSplayDefault": 6,
+      "wristSplayDefault": -180,
       "wristSplayReactiveEnabled": true,
       "wristSplayRange": "{\"min\":30,\"max\":-54}",
       "wristSplayCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
@@ -13754,9 +13754,9 @@
       "preventReorderFlash": false,
       "logCursorPositionEnabled": false,
       "cursorLogIntervalMs": 1000,
-      "handNumbersEnabled": false,
-      "handNumbersColor": "#ffffff",
-      "logHandBehaviourEnabled": false,
+      "handNumbersEnabled": true,
+      "handNumbersColor": "#00ff04",
+      "logHandBehaviourEnabled": true,
       "dp_titleFontSize": 11,
       "dp_tabFontSize": 12,
       "dp_groupTitleFontSize": 11,
@@ -13975,7 +13975,7 @@
       "custom9RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "custom9MultiTriggerEnabled": false,
       "custom9MultiTriggers": "[]",
-      "custom10Enabled": true,
+      "custom10Enabled": false,
       "custom10Type": "Click+Hold",
       "custom10TouchPointCount": 1,
       "custom10ClickCount": "2nd",
@@ -13988,13 +13988,13 @@
       "custom10RotationY": 0,
       "custom10RotationZ": 0,
       "custom10TargetPose": "",
-      "custom10TweenSelector": "COUNTDOWN - VERTICAL",
+      "custom10TweenSelector": "Neutral - Vertical Fanning",
       "custom10TweenChain": [],
-      "custom10TweenSpeedMs": 3490,
+      "custom10TweenSpeedMs": 5000,
       "custom10TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom10TweenStartTimeRange": "{\"min\":0,\"max\":1374}",
       "custom10LoopMode": "Loop",
-      "custom10LoopHoldMs": 0,
+      "custom10LoopHoldMs": 1340,
       "custom10TransitionSpeedMs": 700,
       "custom10SpeedCurveEnabled": false,
       "custom10SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -14199,7 +14199,7 @@
       "armRotationDamping": 0.39,
       "palmFacesCursor": true,
       "palmFaceRotationOffset": 0,
-      "palmFacesCursorDistanceCurveEnabled": true,
+      "palmFacesCursorDistanceCurveEnabled": false,
       "palmFacesCursorDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0.5}]",
       "palmFacesCursorDistanceRange": "{\"min\":0,\"max\":180}",
       "loadingPreviewEnabled": true,
@@ -20269,7 +20269,7 @@
       "armLengthDamping": 0.34,
       "wristSplayResponsiveEnabled": true,
       "wristSplayReposeStagger": 1,
-      "wristSplayDefault": 6,
+      "wristSplayDefault": -180,
       "wristSplayReactiveEnabled": true,
       "wristSplayRange": "{\"min\":30,\"max\":-54}",
       "wristSplayCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
@@ -20837,9 +20837,9 @@
       "preventReorderFlash": false,
       "logCursorPositionEnabled": false,
       "cursorLogIntervalMs": 1000,
-      "handNumbersEnabled": false,
-      "handNumbersColor": "#ffffff",
-      "logHandBehaviourEnabled": false,
+      "handNumbersEnabled": true,
+      "handNumbersColor": "#00ff04",
+      "logHandBehaviourEnabled": true,
       "dp_titleFontSize": 22,
       "dp_tabFontSize": 12,
       "dp_groupTitleFontSize": 11,
@@ -21058,7 +21058,7 @@
       "custom9RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "custom9MultiTriggerEnabled": false,
       "custom9MultiTriggers": "[]",
-      "custom10Enabled": true,
+      "custom10Enabled": false,
       "custom10Type": "Click+Hold",
       "custom10TouchPointCount": 1,
       "custom10ClickCount": "2nd",
@@ -21071,13 +21071,13 @@
       "custom10RotationY": 0,
       "custom10RotationZ": 0,
       "custom10TargetPose": "",
-      "custom10TweenSelector": "COUNTDOWN - VERTICAL",
+      "custom10TweenSelector": "Neutral - Vertical Fanning",
       "custom10TweenChain": [],
-      "custom10TweenSpeedMs": 3490,
+      "custom10TweenSpeedMs": 5000,
       "custom10TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom10TweenStartTimeRange": "{\"min\":0,\"max\":1374}",
       "custom10LoopMode": "Loop",
-      "custom10LoopHoldMs": 0,
+      "custom10LoopHoldMs": 1340,
       "custom10TransitionSpeedMs": 700,
       "custom10SpeedCurveEnabled": false,
       "custom10SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -23206,7 +23206,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": false,
       "items": [
         {
@@ -25627,7 +25627,7 @@
     },
     {
       "key": "Custom Click Functions",
-      "collapsed": false,
+      "collapsed": true,
       "locked": false,
       "items": [
         {
@@ -28488,7 +28488,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 9",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -29911,7 +29911,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 7",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -30218,7 +30218,7 @@
                 "type": "group",
                 "group": {
                   "key": "Multi Trigger",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -30233,7 +30233,7 @@
                       "type": "group",
                       "group": {
                         "key": "Trigger 1",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -30752,7 +30752,7 @@
                   "subgroups": [
                     {
                       "key": "Trigger 1",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -31504,7 +31504,7 @@
               },
               {
                 "key": "Multi Trigger",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -31519,7 +31519,7 @@
                     "type": "group",
                     "group": {
                       "key": "Trigger 1",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -32038,7 +32038,7 @@
                 "subgroups": [
                   {
                     "key": "Trigger 1",
-                    "collapsed": false,
+                    "collapsed": true,
                     "locked": false,
                     "items": [
                       {
@@ -35411,7 +35411,7 @@
         },
         {
           "key": "Custom Click Function 9",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
@@ -36828,7 +36828,7 @@
         },
         {
           "key": "Custom Click Function 7",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -37135,7 +37135,7 @@
               "type": "group",
               "group": {
                 "key": "Multi Trigger",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -37150,7 +37150,7 @@
                     "type": "group",
                     "group": {
                       "key": "Trigger 1",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -37669,7 +37669,7 @@
                 "subgroups": [
                   {
                     "key": "Trigger 1",
-                    "collapsed": false,
+                    "collapsed": true,
                     "locked": false,
                     "items": [
                       {
@@ -38421,7 +38421,7 @@
             },
             {
               "key": "Multi Trigger",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -38436,7 +38436,7 @@
                   "type": "group",
                   "group": {
                     "key": "Trigger 1",
-                    "collapsed": false,
+                    "collapsed": true,
                     "locked": false,
                     "items": [
                       {
@@ -38955,7 +38955,7 @@
               "subgroups": [
                 {
                   "key": "Trigger 1",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
