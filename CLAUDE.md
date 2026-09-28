@@ -1917,3 +1917,25 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   confirmed gap, but whether it is the COMPLETE explanation for every
   prior report in this file's long investigation history is still
   pending that confirmation.
+
+- **This project's 3 curve-editor implementations (`buildGenericCurveWidget`,
+  `buildArmLengthCurveWidget`, `buildWristSplayCurveWidget`) had NO
+  `viewBox` at all before 2026-09-28 -- the SVG's `width`/`height`
+  ATTRIBUTES (fixed at 240x120) were the only sizing mechanism, so
+  `toPx`/`fromPx` divided directly by those same fixed constants.**
+  Fixed per user-supplied instructions (originally written for
+  `.claude/TEMPLATE_DEV_PANEL.html`'s own, structurally different
+  `buildCurveEditorRow()`) to stretch to the dev panel's actual width:
+  a `viewBox="0 0 240 120"` + `preserveAspectRatio="none"` was ADDED
+  (didn't exist before), the SVG's own inline style got
+  `width:100%; height:120px; display:block`, and `fromPx()` now reads
+  `svg.getBoundingClientRect()` for the real rendered size instead of
+  the fixed `W`/`H` constants (which stay as internal viewBox-coordinate
+  constants only, still used by `toPx()`). Confirmed via a real
+  synthetic click test that a curve point's resulting X value matches
+  the ACTUAL rendered width (228.8px measured), not the old fixed
+  240px. **Any FUTURE 4th curve-editor implementation added to this
+  file needs this exact same 3-part treatment from the start** -- a
+  plain copy-paste of an OLDER version of any of these 3 functions
+  (e.g. from git history, or from a stale local branch) would
+  silently reintroduce the fixed-240px-non-stretching regression.

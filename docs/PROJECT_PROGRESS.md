@@ -18,6 +18,25 @@ work seamlessly from there.
 
 ## Currently working on
 
+**COMPLETE 2026-09-28 (18th round) -- Arm Rotation damping/default
+controls + curve-editor width-responsiveness fix, direct request.**
+Default Arm Rotation (`armRotationDefault`, 0-100% responsiveness when
+the distance curve is off) and Arm Rotation Damping (`armRotationDamping`,
+same convention as the 17th round's dampings) added alongside the
+already-existing Min/Max (`armRotationRange`) and curve editor
+(`armRotationCurve`). Separately, fixed all 3 of this project's own
+curve-editor implementations (`buildGenericCurveWidget`,
+`buildArmLengthCurveWidget`, `buildWristSplayCurveWidget`) to stretch
+to the dev panel's actual width instead of a hardcoded 240px, adapting
+a 3-part fix the user supplied (originally written for the shared
+workspace template's own curve editor, a different implementation --
+ported the pattern, not the literal code). Live-verified: clean load on
+the first navigation attempt, both new controls confirmed present with
+correct defaults, and the width fix confirmed genuinely working via a
+real synthetic click whose resulting curve-point X matched the actual
+228.8px rendered width, not the old fixed 240px. See CHANGELOG.txt's
+18th-round entry for full detail.
+
 **COMPLETE 2026-09-28 (17th round) -- likely resolves the multi-round
 "hands jump" investigation: Wrist Cropping/Wrist Splay damping, direct
 report ("i figured out the jump thing. there is no damping for wrist
