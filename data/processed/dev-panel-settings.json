@@ -7116,7 +7116,7 @@
       "custom16Trig1RetransitionStartTimeCurveEnabled": true,
       "custom16Trig1RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom16Trig1RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom7Trig1Enabled": false,
+      "custom7Trig1Enabled": true,
       "custom7Trig1Mode": "Single Pose",
       "custom7Trig1OffsetEnabled": false,
       "custom7Trig1OffsetX": 0,
@@ -7125,12 +7125,12 @@
       "custom7Trig1RotationX": 0,
       "custom7Trig1RotationY": 0,
       "custom7Trig1RotationZ": 0,
-      "custom7Trig1TargetPose": "",
+      "custom7Trig1TargetPose": "Fist",
       "custom7Trig1TweenSelector": "",
       "custom7Trig1TweenSpeedMs": 800,
       "custom7Trig1TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom7Trig1TweenStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom7Trig1TransitionSpeedMs": 400,
+      "custom7Trig1TransitionSpeedMs": 700,
       "custom7Trig1SpeedCurveEnabled": false,
       "custom7Trig1SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom7Trig1SpeedCurveRange": "{\"min\":50,\"max\":2000}",
@@ -7142,7 +7142,7 @@
       "custom7Trig1StartDistanceMax": 100,
       "custom7Trig1StartDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
       "custom7Trig1PauseDurationMs": 500,
-      "custom7Trig1RetransitionEnabled": true,
+      "custom7Trig1RetransitionEnabled": false,
       "custom7Trig1RetransitionSpeedMs": 400,
       "custom7Trig1RetransitionSpeedCurveEnabled": false,
       "custom7Trig1RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -14267,7 +14267,7 @@
       "custom16Trig1RetransitionStartTimeCurveEnabled": true,
       "custom16Trig1RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom16Trig1RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom7Trig1Enabled": false,
+      "custom7Trig1Enabled": true,
       "custom7Trig1Mode": "Single Pose",
       "custom7Trig1OffsetEnabled": false,
       "custom7Trig1OffsetX": 0,
@@ -14276,12 +14276,12 @@
       "custom7Trig1RotationX": 0,
       "custom7Trig1RotationY": 0,
       "custom7Trig1RotationZ": 0,
-      "custom7Trig1TargetPose": "",
+      "custom7Trig1TargetPose": "Fist",
       "custom7Trig1TweenSelector": "",
       "custom7Trig1TweenSpeedMs": 800,
       "custom7Trig1TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom7Trig1TweenStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom7Trig1TransitionSpeedMs": 400,
+      "custom7Trig1TransitionSpeedMs": 700,
       "custom7Trig1SpeedCurveEnabled": false,
       "custom7Trig1SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom7Trig1SpeedCurveRange": "{\"min\":50,\"max\":2000}",
@@ -14293,7 +14293,7 @@
       "custom7Trig1StartDistanceMax": 100,
       "custom7Trig1StartDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
       "custom7Trig1PauseDurationMs": 500,
-      "custom7Trig1RetransitionEnabled": true,
+      "custom7Trig1RetransitionEnabled": false,
       "custom7Trig1RetransitionSpeedMs": 400,
       "custom7Trig1RetransitionSpeedCurveEnabled": false,
       "custom7Trig1RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -21418,7 +21418,7 @@
       "custom16Trig1RetransitionStartTimeCurveEnabled": true,
       "custom16Trig1RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom16Trig1RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom7Trig1Enabled": false,
+      "custom7Trig1Enabled": true,
       "custom7Trig1Mode": "Single Pose",
       "custom7Trig1OffsetEnabled": false,
       "custom7Trig1OffsetX": 0,
@@ -21427,12 +21427,12 @@
       "custom7Trig1RotationX": 0,
       "custom7Trig1RotationY": 0,
       "custom7Trig1RotationZ": 0,
-      "custom7Trig1TargetPose": "",
+      "custom7Trig1TargetPose": "Fist",
       "custom7Trig1TweenSelector": "",
       "custom7Trig1TweenSpeedMs": 800,
       "custom7Trig1TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom7Trig1TweenStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom7Trig1TransitionSpeedMs": 400,
+      "custom7Trig1TransitionSpeedMs": 700,
       "custom7Trig1SpeedCurveEnabled": false,
       "custom7Trig1SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom7Trig1SpeedCurveRange": "{\"min\":50,\"max\":2000}",
@@ -21444,7 +21444,7 @@
       "custom7Trig1StartDistanceMax": 100,
       "custom7Trig1StartDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
       "custom7Trig1PauseDurationMs": 500,
-      "custom7Trig1RetransitionEnabled": true,
+      "custom7Trig1RetransitionEnabled": false,
       "custom7Trig1RetransitionSpeedMs": 400,
       "custom7Trig1RetransitionSpeedCurveEnabled": false,
       "custom7Trig1RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -32839,7 +32839,7 @@
                 "type": "group",
                 "group": {
                   "key": "Multi Trigger",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -32963,7 +32963,7 @@
                             "type": "group",
                             "group": {
                               "key": "Start Time Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -33203,7 +33203,7 @@
                           },
                           {
                             "key": "Start Time Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -33482,7 +33482,7 @@
                           "type": "group",
                           "group": {
                             "key": "Start Time Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -33722,7 +33722,7 @@
                         },
                         {
                           "key": "Start Time Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -34125,7 +34125,7 @@
               },
               {
                 "key": "Multi Trigger",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -34249,7 +34249,7 @@
                           "type": "group",
                           "group": {
                             "key": "Start Time Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -34489,7 +34489,7 @@
                         },
                         {
                           "key": "Start Time Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -34768,7 +34768,7 @@
                         "type": "group",
                         "group": {
                           "key": "Start Time Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -35008,7 +35008,7 @@
                       },
                       {
                         "key": "Start Time Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -42394,7 +42394,7 @@
               "type": "group",
               "group": {
                 "key": "Multi Trigger",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -42518,7 +42518,7 @@
                           "type": "group",
                           "group": {
                             "key": "Start Time Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -42758,7 +42758,7 @@
                         },
                         {
                           "key": "Start Time Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -43037,7 +43037,7 @@
                         "type": "group",
                         "group": {
                           "key": "Start Time Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -43277,7 +43277,7 @@
                       },
                       {
                         "key": "Start Time Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -43680,7 +43680,7 @@
             },
             {
               "key": "Multi Trigger",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -43804,7 +43804,7 @@
                         "type": "group",
                         "group": {
                           "key": "Start Time Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -44044,7 +44044,7 @@
                       },
                       {
                         "key": "Start Time Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -44323,7 +44323,7 @@
                       "type": "group",
                       "group": {
                         "key": "Start Time Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -44563,7 +44563,7 @@
                     },
                     {
                       "key": "Start Time Curve",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
