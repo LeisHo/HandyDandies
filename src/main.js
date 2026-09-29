@@ -109,10 +109,24 @@ function computeRadialRollDeg(handPos, cursorPos) {
 // radial angle when Palm Faces Cursor is on, 0 when it's off) plus the
 // live Palm Face Rotation slider, which "just adds onto that rotation
 // number" in both cases, per direct instruction.
+// PERFORMANCE (2026-09-29, found in the same pass as the cursor-tracking
+// lookAt allocation fix -- see _lookAtMatrixScratch/_lookAtQuatScratch's
+// own comment). Called once per hand, every frame, while Tracking
+// Enabled is on -- was allocating a fresh THREE.Quaternion every call
+// (plus a fresh THREE.Vector3 too, whenever wristCropNormalAligned
+// happened to be null). The one real call site
+// (`.multiply(computeRollQuat(...))`) only ever reads the returned
+// quaternion's components, never retains the reference -- safe to
+// return a shared scratch object. `_rollAxisFallbackScratch` is a
+// genuinely constant direction (never mutated by setFromAxisAngle,
+// which only reads its axis argument), so it's a plain shared const,
+// not a per-call scratch.
+const _rollAxisFallbackScratch = new THREE.Vector3(0, 0, -1)
+const _rollQuatScratch = new THREE.Quaternion()
 function computeRollQuat(baseDeg) {
-  const axis = wristCropNormalAligned || new THREE.Vector3(0, 0, -1)
+  const axis = wristCropNormalAligned || _rollAxisFallbackScratch
   const offsetRad = THREE.MathUtils.degToRad((baseDeg || 0) + (cfg.palmFaceRotationOffset || 0))
-  return new THREE.Quaternion().setFromAxisAngle(axis, offsetRad)
+  return _rollQuatScratch.setFromAxisAngle(axis, offsetRad)
 }
 let handLengthRaw = 1
 // The actual rendered MESH's bounding sphere (center + radius), measured
@@ -12332,7 +12346,16 @@ function flashImportButton(btn, text) {
 // console, on their own hardware. Meant to be removed once the real
 // bottleneck is identified from this data -- do not treat this as
 // permanent instrumentation.
-let __frameProfiler = { frames: 0, updateRenderOrderMs: 0, composerRenderMs: 0, windowStart: performance.now() }
+// EXTENDED 2026-09-29 (same diagnosis pass as the scratch-object
+// allocation fixes above) -- `cursorTrackingMs`/`animateTotalMs` added
+// so the NEXT round of real [frame-profile] data can show whether time
+// missing from updateRenderOrder+composerRender (a real observed case:
+// fps=4.2 with BOTH of those measured components reading normal) is
+// this cursor-tracking hands.forEach loop specifically, or something
+// entirely outside it (controls.update()/panel syncs/GC between
+// frames) -- `avgOther` in the console line below is a DERIVED bucket
+// (total minus the 3 measured pieces), not directly instrumented.
+let __frameProfiler = { frames: 0, updateRenderOrderMs: 0, composerRenderMs: 0, cursorTrackingMs: 0, animateTotalMs: 0, windowStart: performance.now() }
 // Runs via the shared lib/visibility-tick-loop.js (ported from "3JS
 // ENGINE", see that file's own header comment for the full account)
 // rather than a raw self-scheduling requestAnimationFrame(animate) --
@@ -12349,6 +12372,11 @@ let __frameProfiler = { frames: 0, updateRenderOrderMs: 0, composerRenderMs: 0, 
 // forward the moment this tab becomes visible/focused again.
 function animate(dt, now) {
   try {
+    // Total-time bucket for the extended [frame-profile] breakdown (see
+    // __frameProfiler's own comment) -- started here, at the true top of
+    // the function, so it covers EVERYTHING this call does, not just the
+    // 2 pieces already individually timed below.
+    const __animateTotalStart = performance.now()
     // Frame Rate Drop Log (2026-09-29, see its DEV_GROUPS controls' own
     // comment for the full request). Measures REAL wall-clock time
     // between successive animate() calls, at the very top of the
@@ -12452,6 +12480,7 @@ function animate(dt, now) {
           cursorDistMinD = Math.min(...__cursorDists)
           cursorDistMaxD = Math.max(...__cursorDists)
         }
+        const __cursorTrackingStart = performance.now()
         hands.forEach((hand) => {
           _lookAtMatrixScratch.lookAt(hand.wrapper.position, cursorTarget, UP)
           const lookAtDesired = _lookAtQuatScratch.setFromRotationMatrix(_lookAtMatrixScratch)
@@ -12643,6 +12672,7 @@ function animate(dt, now) {
           // already fully damped via armRotationDampingAmt above.
           hand.wrapper.quaternion.copy(desired).multiply(computeRollQuat(hand.currentPalmRollDeg))
         })
+        __frameProfiler.cursorTrackingMs += performance.now() - __cursorTrackingStart
       }
       const __uroStart = performance.now()
       updateRenderOrder()
@@ -12682,12 +12712,26 @@ function animate(dt, now) {
       __frameProfiler.composerRenderMs += performance.now() - __renderStart
       __frameProfiler.frames++
     }
+    // Covers everything from the true top of animate() through the
+    // frame-profile block itself -- NOT the trailing Pose Preview render
+    // pass further below (a rare, usually-off edge case, not worth
+    // chasing through the rest of this large function for this
+    // diagnostic's purposes). Still a large improvement over only having
+    // updateRenderOrder/composerRender: a real case was already observed
+    // (fps=4.2 with both of those reading normal) where the missing time
+    // had to be somewhere this line now actually measures.
+    __frameProfiler.animateTotalMs += performance.now() - __animateTotalStart
     {
       const elapsed = performance.now() - __frameProfiler.windowStart
       if (elapsed >= 1000) {
         const f = __frameProfiler.frames
-        console.log(`[frame-profile] fps=${(f / (elapsed / 1000)).toFixed(1)} avgUpdateRenderOrder=${(__frameProfiler.updateRenderOrderMs / f).toFixed(2)}ms avgComposerRender=${(__frameProfiler.composerRenderMs / f).toFixed(2)}ms hands=${hands.length} over ${f} frames`)
-        __frameProfiler = { frames: 0, updateRenderOrderMs: 0, composerRenderMs: 0, windowStart: performance.now() }
+        const avgURO = __frameProfiler.updateRenderOrderMs / f
+        const avgRender = __frameProfiler.composerRenderMs / f
+        const avgCursorTracking = __frameProfiler.cursorTrackingMs / f
+        const avgTotal = __frameProfiler.animateTotalMs / f
+        const avgOther = avgTotal - avgURO - avgRender - avgCursorTracking
+        console.log(`[frame-profile] fps=${(f / (elapsed / 1000)).toFixed(1)} avgTotal=${avgTotal.toFixed(2)}ms avgUpdateRenderOrder=${avgURO.toFixed(2)}ms avgComposerRender=${avgRender.toFixed(2)}ms avgCursorTracking=${avgCursorTracking.toFixed(2)}ms avgOther=${avgOther.toFixed(2)}ms hands=${hands.length} over ${f} frames`)
+        __frameProfiler = { frames: 0, updateRenderOrderMs: 0, composerRenderMs: 0, cursorTrackingMs: 0, animateTotalMs: 0, windowStart: performance.now() }
       }
     }
     // Pose Preview's own tiny render pass -- guarded by offsetParent (null

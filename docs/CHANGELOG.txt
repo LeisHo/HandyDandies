@@ -14124,6 +14124,65 @@ both currently false, and that `wristSplayReposeStagger` is currently
 
 `main.js` cache-buster bumped `?v=249` -> `?v=250`.
 
+2026-09-29  -  (30th round -- freeze investigation continued, using the
+user's own real [frame-profile]/Frame Rate Log/Mouse Tracking Log data
+from testing the 29th round's fixes)
+
+**Confirmed real improvement**: the new Frame Rate Log data showed
+drops now in the 71-330ms range, down from the 1000-4600ms range
+before the 29th round's fixes -- the per-frame-allocation and O(n^2)
+fixes genuinely helped.
+
+**A new, more specific clue in the real `[frame-profile]` console
+data**: one window read `fps=4.2 avgUpdateRenderOrder=13.39ms
+avgComposerRender=5.39ms` -- both of the ONLY 2 pieces the existing
+profiler measures were completely normal, yet fps was 4.2 (~238ms/frame).
+~220ms of real per-frame cost was going somewhere `__frameProfiler`
+never measured at all.
+
+**Found and fixed a 3rd allocation source**, same class as the 29th
+round's fixes: `computeRollQuat()` (called once per hand, every frame,
+whenever Tracking Enabled is on) was allocating a fresh
+`THREE.Quaternion` every call, plus a fresh `THREE.Vector3` too
+whenever `wristCropNormalAligned` happened to be null. Confirmed the
+ONE real call site (`.multiply(computeRollQuat(...))`) only reads the
+returned quaternion's components, never retains the reference -- safe
+to return a shared scratch object; the Vector3 fallback is a genuinely
+constant direction, so it's now a plain shared const instead of a
+per-call allocation.
+
+**Extended `__frameProfiler` itself** rather than guess further:
+added `cursorTrackingMs` (times the same per-hand loop the scratch-
+object fixes touch) and `animateTotalMs` (times from the true top of
+`animate()` through the frame-profile block itself -- not the trailing
+Pose Preview render pass, a rare edge case not worth chasing through
+the rest of this large function for this diagnostic's purposes). The
+console line now reports `avgTotal`/`avgCursorTracking` alongside the
+existing `avgUpdateRenderOrder`/`avgComposerRender`, plus a DERIVED
+`avgOther` bucket (total minus the other 3) so the NEXT round of real
+data will show directly whether the missing ~220ms lives in the
+cursor-tracking loop specifically, or genuinely outside everything
+`animate()` itself does (most likely GC between frames, or something
+in `controls.update()`/panel-sync/hand-number-label code this pass
+didn't touch).
+
+**Still honestly unresolved**: whether these 3 combined fixes fully
+account for the remaining moderate (71-330ms) drops, or whether the
+extended profiler will reveal yet another distinct cost once real data
+comes back. Not claiming this is finished -- reporting real, verified
+incremental progress and better diagnostic coverage for whatever
+happens next.
+
+Verified: `node --check src/main.js` passes; confirmed the ONE
+`computeRollQuat()` call site is safe to alias to a shared scratch
+quaternion (same reasoning as the 29th round's `lookAtDesired` check);
+confirmed `__frameProfiler`'s reset object includes both new fields
+(a stale reset would have left them `undefined` after the first
+1-second window, silently breaking the new averages) -- caught by
+direct read before shipping, not live.
+
+`main.js` cache-buster bumped `?v=250` -> `?v=251`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

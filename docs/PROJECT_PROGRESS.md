@@ -18,6 +18,20 @@ work seamlessly from there.
 
 ## Currently working on
 
+**IN PROGRESS 2026-09-29 (30th round) -- freeze investigation
+continued with real post-fix data.** Confirmed real improvement (Frame
+Rate Log drops now 71-330ms, down from 1000-4600ms before the 29th
+round). Real `[frame-profile]` data surfaced a NEW clue: a window with
+`fps=4.2` but both measured components (`avgUpdateRenderOrder`/
+`avgComposerRender`) normal -- ~220ms/frame going somewhere unmeasured.
+Found and fixed a 3rd per-frame allocation source (`computeRollQuat()`,
+same treatment as the 29th round's fixes). Extended `__frameProfiler`
+itself with `cursorTrackingMs`/`animateTotalMs` + a derived `avgOther`
+bucket so the NEXT round of real console data will show directly
+whether the missing time is the cursor-tracking loop or something
+entirely outside `animate()`. Not yet resolved -- see CHANGELOG.txt's
+30th-round entry.
+
 **PARTIALLY RESOLVED 2026-09-29 (29th round) -- diagnosed the "freezes
 a lot for a lot of click functions" report using the Frame Rate Log's
 own real production data.** Fixed 2 real inefficiencies in `animate()`'s
