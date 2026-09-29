@@ -6670,9 +6670,12 @@
       "preventReorderFlash": false,
       "logCursorPositionEnabled": false,
       "cursorLogIntervalMs": 1000,
-      "handNumbersEnabled": true,
+      "handNumbersEnabled": false,
       "handNumbersColor": "#00ff04",
-      "logHandBehaviourEnabled": true,
+      "logHandBehaviourEnabled": false,
+      "logHandBehaviourDetailedEnabled": false,
+      "logFrameRateDropsEnabled": false,
+      "frameRateDropThresholdFps": 1,
       "dp_titleFontSize": 17,
       "dp_tabFontSize": 12,
       "dp_groupTitleFontSize": 14,
@@ -13752,9 +13755,12 @@
       "preventReorderFlash": false,
       "logCursorPositionEnabled": false,
       "cursorLogIntervalMs": 1000,
-      "handNumbersEnabled": true,
+      "handNumbersEnabled": false,
       "handNumbersColor": "#00ff04",
-      "logHandBehaviourEnabled": true,
+      "logHandBehaviourEnabled": false,
+      "logHandBehaviourDetailedEnabled": false,
+      "logFrameRateDropsEnabled": false,
+      "frameRateDropThresholdFps": 1,
       "dp_titleFontSize": 11,
       "dp_tabFontSize": 12,
       "dp_groupTitleFontSize": 11,
@@ -20834,9 +20840,12 @@
       "preventReorderFlash": false,
       "logCursorPositionEnabled": false,
       "cursorLogIntervalMs": 1000,
-      "handNumbersEnabled": true,
+      "handNumbersEnabled": false,
       "handNumbersColor": "#00ff04",
-      "logHandBehaviourEnabled": true,
+      "logHandBehaviourEnabled": false,
+      "logHandBehaviourDetailedEnabled": false,
+      "logFrameRateDropsEnabled": false,
+      "frameRateDropThresholdFps": 1,
       "dp_titleFontSize": 22,
       "dp_tabFontSize": 12,
       "dp_groupTitleFontSize": 11,
@@ -22397,6 +22406,22 @@
         {
           "type": "row",
           "key": "clearHandBehaviourLogBtn"
+        },
+        {
+          "type": "row",
+          "key": "logHandBehaviourDetailedEnabled"
+        },
+        {
+          "type": "row",
+          "key": "logFrameRateDropsEnabled"
+        },
+        {
+          "type": "row",
+          "key": "frameRateDropThresholdFps"
+        },
+        {
+          "type": "row",
+          "key": "clearFrameRateLogBtn"
         }
       ],
       "settings": [
@@ -22410,7 +22435,11 @@
         "handNumbersEnabled",
         "handNumbersColor",
         "logHandBehaviourEnabled",
-        "clearHandBehaviourLogBtn"
+        "clearHandBehaviourLogBtn",
+        "logHandBehaviourDetailedEnabled",
+        "logFrameRateDropsEnabled",
+        "frameRateDropThresholdFps",
+        "clearFrameRateLogBtn"
       ],
       "subgroups": []
     },
