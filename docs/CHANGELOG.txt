@@ -13997,6 +13997,45 @@ simply didn't follow the pattern its own neighbors already demonstrated.
 `main.js` cache-buster bumped `?v=246` -> `?v=247` -> `?v=248` (2
 emergency fixes, 2 bumps).
 
+2026-09-29  -  (28th round -- new Debug button, direct request: "add a
+button in the debug group. It says Copy All. When clicked it copies
+all active logs")
+
+Added `copyAllLogsBtn` ("Copy All Logs") to the Debug group, after
+`clearFrameRateLogBtn`. `copyAllDebugLogs()` concatenates Mouse
+Tracking Log/Hand Behaviour Log/Frame Rate Log into one clipboard
+payload, each section labeled (`=== <Log Name> ===`), reusing the exact
+`navigator.clipboard.writeText()` pattern each log's own individual
+Copy button already uses -- "active" read as "every log this panel
+tracks" (matching each log's own Copy button, which copies whatever's
+buffered regardless of whether it's currently empty or its own
+checkbox is off) rather than only logs whose enable checkbox happens
+to be on at click time.
+
+Deliberately placed the new function call ONLY from a real button
+click (never top-level setup code) -- given the 27th round's own TDZ
+outage 2 commits ago, this was checked explicitly before writing
+anything: `copyAllDebugLogs()` reads `mouseTrackingLogEntries`/
+`handBehaviourLogEntries`/`frameRateLogEntries`, all 3 already
+correctly declared in the file's own early-state block (the last one
+fixed there specifically because of that outage) -- since this new
+function is only ever invoked by a genuine click, long after the whole
+module has finished its own top-level execution, there's no TDZ risk
+regardless of where the function itself is declared in the file.
+
+Verified: `node --check src/main.js` passes; live-verified against the
+redeployed production app -- confirmed no crash on load (156 hands,
+`window.__debug` populated), found the real button in the live DOM,
+dispatched a real click on it, and confirmed no new console error
+resulted. The clipboard WRITE itself could not be directly confirmed
+in this sandbox (`navigator.clipboard.readText()` refused with
+"Document is not focused," a known limitation of this automated
+browser tool, not a defect in the code) -- confidence rests on reusing
+the identical, already-production-proven `writeText()` call 3 other
+Copy buttons in this same file already use successfully.
+
+`main.js` cache-buster bumped `?v=248` -> `?v=249`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

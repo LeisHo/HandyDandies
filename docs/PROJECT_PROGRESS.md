@@ -18,6 +18,26 @@ work seamlessly from there.
 
 ## Currently working on
 
+**IN PROGRESS 2026-09-29 (29th round) -- diagnosing the "freezes a lot
+for a lot of click functions" report using the Frame Rate Log's own
+real data** (the user pasted a real drop/recover log plus the matching
+Mouse Tracking Log). Pattern: several drops correlate to a click/hold
+event 1-4.6 SECONDS before the freeze (not immediately at the click),
+and one drop had no tracked action in the preceding 5 seconds at all --
+consistent with garbage-collection pressure from per-frame allocation
+rather than any one click handler's own direct cost. Confirmed a real
+candidate: `animate()`'s cursor-tracking loop allocates a fresh
+`new THREE.Matrix4()` + `new THREE.Quaternion()` every frame, for
+every one of 156 hands. Investigation ongoing.
+
+**ADDED 2026-09-29 (28th round) -- "Copy All Logs" button in the Debug
+group**, direct request. Concatenates Mouse Tracking Log/Hand Behaviour
+Log/Frame Rate Log into one clipboard payload. Live-verified (no crash,
+real click dispatched, no new console error) -- the clipboard write
+itself couldn't be directly confirmed in this sandbox (a focus
+limitation of the browser tool, not the code). See CHANGELOG.txt's
+28th-round entry.
+
 **RESOLVED 2026-09-29 (27th round) -- a real production outage caused
 by the 26th round's own commit, found and fixed within minutes of the
 user's live report ("the pause button is missing and the hands arent
