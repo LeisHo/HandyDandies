@@ -184,6 +184,30 @@ const MOUSE_LOG_MAX_ENTRIES = 200
 const mouseTrackingLogEntries = []
 let mouseTrackingLogEl = null
 let cursorLogTimer = null
+// FIXED 2026-09-29 -- REAL PRODUCTION OUTAGE, found live within minutes
+// via console error, not caught before shipping. Frame Rate Drop Log's
+// own attribution source (see its DEV_GROUPS controls' own comment) --
+// these 2 vars MUST be declared up here, at the top of the file, not
+// down next to logMouseTrackingEvent()'s own definition where they were
+// originally placed. buildMouseTrackingLogWidget() is CALLED at module
+// top level (right after initDevPanel()) and internally calls
+// logMouseTrackingEvent() during that same synchronous call -- a `let`
+// declared textually AFTER that call site is still in the temporal dead
+// zone at the moment the call actually runs, throwing "Cannot access
+// 'lastTrackedActionText' before initialization." That's an UNCAUGHT
+// error during top-level module execution, which aborts the ENTIRE
+// script right there -- nothing after it runs, including the real field
+// build and the Pause button's own styling, which is exactly why the
+// live report looked like "the pause button is missing and the hands
+// aren't showing... its all broken looking" rather than anything
+// resembling a "frame rate log" bug. Confirmed via the live console
+// error's own stack trace (logMouseTrackingEvent <- logMouseLogViewportContext
+// <- buildMouseTrackingLogWidget <- the same top-level call this file's
+// own established pattern already uses for exactly this class of
+// TDZ-avoidance -- see mouseTrackingLogEl/cursorLogTimer's own
+// declarations right above, same reasoning, same fix shape).
+let lastTrackedActionText = null
+let lastTrackedActionAt = 0
 // Hand Behaviour Log's own state (2026-09-28, direct request) -- same
 // shape as Mouse Tracking Log's own state directly above, kept
 // completely separate since the 2 logs serve different purposes and are
@@ -2160,8 +2184,10 @@ window.addEventListener('resize', () => logMouseLogViewportContext('resize'))
 // else in the file. `lastTrackedActionAt` uses performance.now() (not the
 // display string's own toLocaleTimeString(), which only has 1-second
 // resolution) so the frame-rate logger can report a real millisecond gap.
-let lastTrackedActionText = null
-let lastTrackedActionAt = 0
+// `lastTrackedActionText`/`lastTrackedActionAt` themselves are declared at
+// the TOP of the file (near mouseTrackingLogEl/cursorLogTimer), not here
+// -- see that declaration's own comment for the real production outage
+// this caused when they were declared here instead.
 function logMouseTrackingEvent(text) {
   lastTrackedActionText = text
   lastTrackedActionAt = performance.now()
