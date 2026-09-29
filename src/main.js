@@ -1634,7 +1634,23 @@ const DEV_GROUPS = [
       // cfg.cursorLogIntervalMs's own value (no new interval control) via
       // restartHandBehaviourDetailedLogTimer().
       { key: 'logHandBehaviourDetailedEnabled', label: 'Log Hand Behaviour - Detailed', type: 'checkbox', def: false, onChange: () => restartHandBehaviourDetailedLogTimer() },
-      { key: 'clearHandBehaviourLogBtn', label: 'Clear Hand Behaviour Log', type: 'button', onClick: () => clearHandBehaviourLog() }
+      { key: 'clearHandBehaviourLogBtn', label: 'Clear Hand Behaviour Log', type: 'button', onClick: () => clearHandBehaviourLog() },
+      // Added 2026-09-29, direct request: "it freezes alot for alot of
+      // click functions... i want a frame rate log. allow me to turn
+      // this system on and off. What i want is a slider to set a frame
+      // rate limit, and when the app frame rate drops under that level,
+      // the log will also log the command or code that caused it."
+      // Measures REAL per-frame wall-clock time between successive
+      // animate() calls (see that function's own top-of-body comment)
+      // -- deliberately NOT the existing __frameProfiler, which only
+      // reports a windowed AVERAGE once a second and can't pinpoint a
+      // single bad frame. Edge-triggered (one DROP line when fps first
+      // crosses below the threshold, one RECOVERED line when it comes
+      // back up, not one line per frame while depressed) to avoid
+      // flooding the log during a sustained slow patch.
+      { key: 'logFrameRateDropsEnabled', label: 'Log Frame Rate Drops', type: 'checkbox', def: false },
+      { key: 'frameRateDropThresholdFps', label: 'Frame Rate Drop Threshold (Fps)', type: 'slider', min: 1, max: 60, step: 1, def: 30 },
+      { key: 'clearFrameRateLogBtn', label: 'Clear Frame Rate Log', type: 'button', onClick: () => clearFrameRateLog() }
     ]
   }
 ]
@@ -1825,6 +1841,7 @@ updateArmRotationGateVisibility()
 // that const's own declaration instead.
 buildMouseTrackingLogWidget()
 buildHandBehaviourLogWidget()
+buildFrameRateLogWidget()
 restartCursorLogTimer()
 restartHandBehaviourDetailedLogTimer()
 setupSettingsChangeLog()
@@ -2132,7 +2149,22 @@ window.addEventListener('resize', () => logMouseLogViewportContext('resize'))
 // set once buildMouseTrackingLogWidget() runs (right after initDevPanel());
 // logging before then (shouldn't normally happen, since no pointer event
 // can fire before the page itself has rendered) just skips the DOM update.
+// Frame Rate Drop Log's own attribution source (2026-09-29, see its
+// DEV_GROUPS controls' own comment) -- rather than build a SEPARATE
+// "recent actions" tracker, this reuses Mouse Tracking Log's own event
+// stream, which already unconditionally records every click (including
+// "what it hit," per that log's own design) and, via
+// setupSettingsChangeLog(), every dev-panel setting change -- between the
+// two, most realistic freeze causes ("clicked a function," "dragged a
+// slider") are already captured with no new call sites needed anywhere
+// else in the file. `lastTrackedActionAt` uses performance.now() (not the
+// display string's own toLocaleTimeString(), which only has 1-second
+// resolution) so the frame-rate logger can report a real millisecond gap.
+let lastTrackedActionText = null
+let lastTrackedActionAt = 0
 function logMouseTrackingEvent(text) {
+  lastTrackedActionText = text
+  lastTrackedActionAt = performance.now()
   const line = `[${new Date().toLocaleTimeString()}] ${text}`
   mouseTrackingLogEntries.push(line)
   if (mouseTrackingLogEntries.length > MOUSE_LOG_MAX_ENTRIES) mouseTrackingLogEntries.shift()
@@ -2401,6 +2433,96 @@ function buildHandBehaviourLogWidget() {
   clearBtn.addEventListener('click', () => clearHandBehaviourLog())
   wrap.appendChild(headerRow)
   wrap.appendChild(handBehaviourLogEl)
+  body.appendChild(wrap)
+}
+// Frame Rate Drop Log's own state (2026-09-29) -- same shape as Mouse
+// Tracking Log/Hand Behaviour Log's own state above. `__lastFrameTimestamp`/
+// `__frameRateBelowThreshold`/`__frameRateDropStartedAt` are declared here
+// (not inside animate()) since they must persist across frames -- see
+// animate()'s own top-of-body comment for how they're used.
+const FRAME_RATE_LOG_MAX_ENTRIES = 200
+const frameRateLogEntries = []
+let frameRateLogEl = null
+let __lastFrameTimestamp = null
+let __frameRateBelowThreshold = false
+let __frameRateDropStartedAt = 0
+// True whenever the PRIOR animate() tick was paused (manually, or
+// auto-paused by syncPauseWithVisibility() while this tab was hidden/
+// unfocused) -- the very next real tick after either must not compute a
+// dt against the stale pre-pause timestamp, which would span the whole
+// pause/hidden duration and register as a false, huge "drop." Starts
+// true so the session's own first real frame also just seeds the
+// baseline instead of comparing against nothing.
+let __wasPausedLastFrame = true
+function appendFrameRateLogLine(line) {
+  frameRateLogEntries.push(line)
+  if (frameRateLogEntries.length > FRAME_RATE_LOG_MAX_ENTRIES) frameRateLogEntries.shift()
+  if (frameRateLogEl) {
+    frameRateLogEl.textContent = frameRateLogEntries.join('\n')
+    frameRateLogEl.scrollTop = frameRateLogEl.scrollHeight
+  }
+}
+function clearFrameRateLog() {
+  frameRateLogEntries.length = 0
+  if (frameRateLogEl) frameRateLogEl.textContent = ''
+}
+// Same widget shape as buildHandBehaviourLogWidget() directly above --
+// Copy/Save/Clear + a scrolling `<pre>`, appended to the SAME "Debug"
+// group body.
+function buildFrameRateLogWidget() {
+  const body = document.querySelector('.dp-group[data-key="Debug"] .dp-group-body')
+  if (!body) return
+  const wrap = elLocal('div', { padding: '4px 6px' })
+  const headerRow = elLocal('div', { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3px' })
+  const label = elLocal('div', { fontSize: '11px', opacity: '0.85' }, { text: 'Frame Rate Log' })
+  const copyBtn = elLocal('button', {
+    fontSize: '10px', padding: '2px 8px', background: '#3a3a4a', color: 'inherit',
+    border: 'none', borderRadius: '4px', cursor: 'pointer'
+  }, { text: 'Copy', type: 'button' })
+  const saveBtn = elLocal('button', {
+    fontSize: '10px', padding: '2px 8px', background: '#3a3a4a', color: 'inherit',
+    border: 'none', borderRadius: '4px', cursor: 'pointer'
+  }, { text: 'Save', type: 'button' })
+  const clearBtn = elLocal('button', {
+    fontSize: '10px', padding: '2px 8px', background: '#3a3a4a', color: 'inherit',
+    border: 'none', borderRadius: '4px', cursor: 'pointer'
+  }, { text: 'Clear', type: 'button' })
+  headerRow.appendChild(label)
+  const btnRow = elLocal('div', { display: 'flex', gap: '4px' })
+  btnRow.appendChild(copyBtn)
+  btnRow.appendChild(saveBtn)
+  btnRow.appendChild(clearBtn)
+  headerRow.appendChild(btnRow)
+  frameRateLogEl = elLocal('pre', {
+    height: '110px', overflowY: 'auto', margin: '0', padding: '4px 6px',
+    background: 'rgba(255,255,255,0.06)', borderRadius: '4px', fontSize: '10px',
+    whiteSpace: 'pre-wrap', wordBreak: 'break-word'
+  })
+  copyBtn.addEventListener('click', () => {
+    const flash = (msg) => { const orig = copyBtn.textContent; copyBtn.textContent = msg; setTimeout(() => { copyBtn.textContent = orig }, 900) }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(frameRateLogEntries.join('\n')).then(() => flash('Copied!')).catch(() => flash('Copy failed'))
+    } else {
+      flash('Copy failed')
+    }
+  })
+  saveBtn.addEventListener('click', () => {
+    const flash = (msg) => { const orig = saveBtn.textContent; saveBtn.textContent = msg; setTimeout(() => { saveBtn.textContent = orig }, 900) }
+    const blob = new Blob([frameRateLogEntries.join('\n')], { type: 'text/plain' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    const stamp = new Date().toISOString().replace(/[:.]/g, '-')
+    a.href = url
+    a.download = `frame-rate-log-${stamp}.txt`
+    document.body.appendChild(a)
+    a.click()
+    a.remove()
+    URL.revokeObjectURL(url)
+    flash('Saved!')
+  })
+  clearBtn.addEventListener('click', () => clearFrameRateLog())
+  wrap.appendChild(headerRow)
+  wrap.appendChild(frameRateLogEl)
   body.appendChild(wrap)
 }
 // Hand Numbers overlay (Debug group, 2026-09-28) -- direct request: "a
@@ -12159,6 +12281,59 @@ let __frameProfiler = { frames: 0, updateRenderOrderMs: 0, composerRenderMs: 0, 
 // forward the moment this tab becomes visible/focused again.
 function animate(dt, now) {
   try {
+    // Frame Rate Drop Log (2026-09-29, see its DEV_GROUPS controls' own
+    // comment for the full request). Measures REAL wall-clock time
+    // between successive animate() calls, at the very top of the
+    // function's own body -- this deliberately captures whatever the
+    // PREVIOUS frame actually cost end to end (including that prior
+    // call's own work), so a single expensive frame is caught precisely,
+    // unlike the existing __frameProfiler below (a windowed AVERAGE
+    // reported once a second, unable to pinpoint one bad frame).
+    // Edge-triggered: one DROP line when fps first crosses below the
+    // threshold, one RECOVERED line when it comes back up -- not one
+    // line per frame while depressed, which would flood the log during
+    // a sustained slow patch. "Likely cause" is Mouse Tracking Log's own
+    // most recently recorded event (a click, or a dev-panel setting
+    // change via setupSettingsChangeLog()) -- a disclosed best-effort
+    // attribution, not a real profiler/call-stack sample: if nothing was
+    // tracked in the preceding 5s, that's stated explicitly rather than
+    // naming a stale, unrelated action. Gated on `!isPaused` -- this
+    // ALSO covers the tab-hidden/unfocused case for free, since
+    // syncPauseWithVisibility() already auto-sets isPaused=true whenever
+    // this tab is backgrounded, so the tick right after a hidden gap (or
+    // a manual pause) never computes a dt spanning that whole gap, which
+    // would otherwise register as one huge false "drop."
+    if (!isPaused) {
+      const __frNow = performance.now()
+      if (__lastFrameTimestamp === null || __wasPausedLastFrame) {
+        __lastFrameTimestamp = __frNow // just resumed/started -- seed the baseline, nothing to compare against yet
+      } else {
+        const __frDtMs = __frNow - __lastFrameTimestamp
+        const __frInstantFps = __frDtMs > 0 ? 1000 / __frDtMs : Infinity
+        if (cfg.logFrameRateDropsEnabled) {
+          const __frThreshold = cfg.frameRateDropThresholdFps ?? 30
+          if (__frInstantFps < __frThreshold) {
+            if (!__frameRateBelowThreshold) {
+              __frameRateBelowThreshold = true
+              __frameRateDropStartedAt = __frNow
+              const __causeAgeMs = lastTrackedActionText ? Math.round(__frNow - lastTrackedActionAt) : null
+              const __causeText = (__causeAgeMs !== null && __causeAgeMs < 5000)
+                ? `${lastTrackedActionText} (${__causeAgeMs}ms before drop)`
+                : 'no tracked action in the last 5s -- likely sustained rendering load (hand count/GPU), not a specific trigger'
+              appendFrameRateLogLine(`[${new Date().toLocaleTimeString()}] DROP -- ${__frInstantFps.toFixed(1)} fps (frame took ${__frDtMs.toFixed(1)}ms, threshold ${__frThreshold}) -- likely cause: ${__causeText}`)
+            }
+          } else if (__frameRateBelowThreshold) {
+            __frameRateBelowThreshold = false
+            const __durationMs = Math.round(__frNow - __frameRateDropStartedAt)
+            appendFrameRateLogLine(`[${new Date().toLocaleTimeString()}] RECOVERED -- back to ${__frInstantFps.toFixed(1)} fps after ${__durationMs}ms below ${__frThreshold} fps`)
+          }
+        }
+        __lastFrameTimestamp = __frNow
+      }
+      __wasPausedLastFrame = false
+    } else {
+      __wasPausedLastFrame = true
+    }
     renderer.getSize(rendererSizeCheck)
     if (window.innerWidth > 0 && window.innerHeight > 0 && (rendererSizeCheck.x !== window.innerWidth || rendererSizeCheck.y !== window.innerHeight)) {
       applyRendererSize(window.innerWidth, window.innerHeight)

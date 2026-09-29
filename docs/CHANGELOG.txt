@@ -13848,6 +13848,79 @@ push/redeploy, in the same session.
 
 `main.js` cache-buster bumped `?v=244` -> `?v=245`.
 
+2026-09-28  -  (26th round -- new Debug feature: Frame Rate Drop Log,
+direct request: "it freezes alot for alot of click functions. before
+you diagnose, what i want is a frame rate log. allow me to turn this
+system on and off. What i want is a slider to set af rame rate limit,
+and when the app frame rate drops under that level, the log will also
+log hte command or code that caused it.")
+
+Added 3 new Debug-group controls: `logFrameRateDropsEnabled` (checkbox,
+master on/off), `frameRateDropThresholdFps` (slider, min 1/max 60/def
+30 -- the requested "frame rate limit" slider), `clearFrameRateLogBtn`.
+A new "Frame Rate Log" widget (Copy/Save/Clear + scrolling `<pre>`, same
+shape as Mouse Tracking Log/Hand Behaviour Log) shows in the Debug
+group.
+
+Measures REAL per-frame wall-clock time between successive `animate()`
+calls (at the very top of that function's own body, before any other
+work) -- deliberately NOT the existing `__frameProfiler` (a windowed
+average logged to console once a second, which can't pinpoint a single
+bad frame; this project's own docs note it was "meant to be removed
+once the real bottleneck is identified... do not treat this as
+permanent instrumentation" -- left untouched, this is new, separate
+instrumentation, not a replacement for it). Edge-triggered: one DROP
+line the instant instantaneous fps first crosses below the threshold,
+one RECOVERED line (with total duration) when it comes back up -- not
+one line per frame while depressed, which would flood the log during a
+sustained slow patch (a disclosed design choice, not a measurement).
+
+"The command or code that caused it": reuses Mouse Tracking Log's own
+existing, ALWAYS-ON event stream (`logMouseTrackingEvent()`, unconditional
+regardless of that log's own checkboxes -- per its own 2026-09-14 design
+note, "the click log itself always runs") rather than building a
+separate tracker -- that stream already unconditionally records every
+click (including "what it hit," e.g. a Custom Click Function) and, via
+the existing `setupSettingsChangeLog()`, every dev-panel setting change.
+2 small lines added to `logMouseTrackingEvent()` itself
+(`lastTrackedActionText`/`lastTrackedActionAt`, using `performance.now()`
+for real millisecond resolution instead of the display string's
+1-second-resolution timestamp) is the only change needed to make this
+whole existing stream available for attribution -- no new call sites
+anywhere else in the file. If nothing was tracked in the preceding 5
+seconds, the log states that explicitly ("likely sustained rendering
+load (hand count/GPU), not a specific trigger") rather than naming a
+stale, unrelated action -- an honest best-effort attribution, not a
+real profiler/call-stack sample.
+
+**A real false-positive was caught and fixed before shipping, not found
+live.** The naive version would have logged a huge false "DROP" the
+instant this tab regains focus after being hidden/backgrounded, OR the
+instant a manual Global Pause ends -- `animate()`'s own dt/now params are
+explicitly NOT used for real timing in this file (every other site uses
+`nowVirtual()`, deliberately kept continuous across exactly this kind of
+gap), but my own new `performance.now()`-based measurement would NOT
+have been continuous across it, producing one artificial multi-second
+"frame." Fixed by gating the whole measurement on `!isPaused` (this
+project's `syncPauseWithVisibility()` already auto-sets `isPaused=true`
+the instant this tab is backgrounded, so a hidden-tab return is covered
+for free) plus an explicit `__wasPausedLastFrame` flag that makes the
+first real tick after ANY pause/resume (manual or auto) just re-seed the
+timestamp baseline instead of computing a dt across the gap.
+
+Verified: `node --check src/main.js` passes; traced every new variable
+reference (`isPaused`, `nowVirtual`'s sibling state, `cfg.logFrameRateDropsEnabled`/
+`cfg.frameRateDropThresholdFps`) to confirm they're in scope by the time
+these new code paths actually run, the same way this file's own
+established `restartCursorLogTimer()`-adjacent pattern already does.
+**NOT live-verified this round** -- this sandbox's own documented
+network-truncation quirk blocked a clean local load (`devPanel.js`
+never finished loading, `window.__debug` never populated); pushed to
+`main`/Vercel and will confirm against the live URL instead, per this
+file's own established fallback for exactly this situation.
+
+`main.js` cache-buster bumped `?v=245` -> `?v=246`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

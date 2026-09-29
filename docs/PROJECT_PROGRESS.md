@@ -18,7 +18,26 @@ work seamlessly from there.
 
 ## Currently working on
 
-**ROOT-CAUSED AND FIXED 2026-09-28 (25th round) -- the "hands spin 360
+**ADDED 2026-09-29 (26th round) -- new "Frame Rate Log" Debug feature,
+direct request after "it freezes alot for alot of click functions":
+a toggle, a Frame Rate Drop Threshold (Fps) slider, and a log that
+records when instantaneous fps drops below that threshold plus a
+best-effort "likely cause" (the most recent tracked click or dev-panel
+setting change).** Measures real per-frame wall-clock time at the top
+of `animate()`'s own body (not the existing windowed-average
+`__frameProfiler`), edge-triggered (one DROP line, one RECOVERED line,
+not a line per frame). Caught and fixed a real false-positive before
+shipping: the tick right after this tab regains focus (or a manual
+pause ends) would otherwise register one huge fake "drop" spanning the
+whole hidden/paused gap -- fixed by gating on `!isPaused` (which already
+covers the tab-hidden case via `syncPauseWithVisibility()`) plus an
+explicit re-seed on the first tick after any pause/resume. NOT
+live-verified this round -- local server hit this sandbox's own
+documented network-truncation issue; pushed to Vercel, confirming
+against the live URL next. See CHANGELOG.txt's 26th-round entry.
+
+**ROOT-CAUSED, FIXED, AND CONFIRMED DEPLOYED 2026-09-28 (25th round) --
+the "hands spin 360
 when the cursor crosses under them on the X axis" report, which
 survived the 23rd round's own Arm Rotation fix because it's a genuinely
 DIFFERENT bug.** Round 23 fixed a flip in the Arm Rotation LEAN
@@ -39,10 +58,13 @@ real `cfg.trackingDamping` (0.16), real hand position for one of the
 user's own reported hands (row 2, hand index 33) via `window.__debug` --
 the old formula reproduced a `180 -> 90.72 -> 47.57 -> ... -> -178.71`
 spin over ~40 simulated frames; the fix (wrap the delta to the shortest
-path before damping) converges smoothly instead. NOT yet confirmed
-against the redeployed live app showing the actual hand visually not
-spinning -- that's the next step, immediately after push/redeploy in
-this same session. See CHANGELOG.txt's 25th-round entry.
+path before damping) converges smoothly instead. Confirmed deployed:
+fetched the live production `main.js` after redeploy and verified the
+exact fixed formula is what's actually served -- not yet confirmed via
+a real-time visual watch of the hand mesh itself (this sandbox's
+rendering-loop tools have a documented rAF-reliability history), so
+that's the one remaining open confirmation if a future report says the
+spin persists. See CHANGELOG.txt's 25th-round entry.
 
 **ADDED 2026-09-28 (24th round) -- new Debug checkbox "Log Hand
 Behaviour - Detailed".** With it on, a new independent timer (reusing
