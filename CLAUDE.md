@@ -2075,3 +2075,43 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   `setTimeout` + `updateRenderOrder()` tick loop from the "CRITICAL
   METHODOLOGY GOTCHA" entries, logging the per-tick max/avg/count-over-8-
   deg rHand delta across ALL hands, not a sample.
+- **REAL PRODUCTION OUTAGE, 2026-09-29 -- new module-level state for a
+  Debug-group feature (the Frame Rate Log) was declared next to its own
+  function definitions, further down the file, instead of in this
+  file's own established early-state block -- and those functions are
+  called at TOP LEVEL, right after `initDevPanel()`, well before that
+  later declaration line ever executes.** A `let`/`const` binding is in
+  the temporal dead zone from the start of its enclosing scope until its
+  own declaration line runs -- referencing it earlier throws "Cannot
+  access '<name>' before initialization," an UNCAUGHT error during
+  top-level module execution that aborts the ENTIRE script right there.
+  Nothing after it ever runs, including `rebuildField()` (the real hand
+  field build) and the Pause button's own styling -- which is exactly
+  why the live symptom looked like "the pause button is missing and the
+  hands arent showing... its all broken looking," not anything
+  resembling the actual feature that broke it. Hit this TWICE in the
+  same commit (`lastTrackedActionText` for Mouse Tracking Log's new
+  attribution hook, then -- only visible once THAT was fixed and the
+  script could reach far enough -- `frameRateLogEl` for the Frame Rate
+  Log widget itself), confirmed via 2 separate live console stack
+  traces. Fixed by moving all 7 new variables up to the same early block
+  `mouseTrackingLogEl`/`cursorLogTimer`/`handBehaviourLogEl` already
+  live in, for this exact reason -- this file already had the right
+  pattern in 2 prior, similar features; this round just didn't follow
+  its own neighbors. **Verifying the 2nd fix was live could NOT rely on
+  `read_console_messages` alone** -- it kept reporting the SAME 2 stale
+  pre-fix errors (still showing the OLD `?v=` in their own stack traces)
+  even after the real fix was confirmed deployed and working, a live
+  repeat of this file's own already-documented "stale console error"
+  tool quirk. Cross-checked instead via `read_network_requests`
+  (confirmed the new `main.js?v=` itself returned 200),
+  `window.__debug` (fully populated, 156 real hands), and 2 real
+  screenshots (Pause button visible; hands rendering with the panel
+  hidden) -- 3 independent signals, not one. **Standing rule for any
+  FUTURE module-level state added to this file**: if the variable is
+  referenced by a function that gets called from TOP-LEVEL setup code
+  (not just from inside another function or an event listener, which is
+  safe regardless of declaration order since it only runs later), declare
+  it in the early-state block near the top of the file, never next to
+  the function it belongs to, no matter how much more "local" that would
+  read.

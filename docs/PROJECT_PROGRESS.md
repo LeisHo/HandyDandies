@@ -18,6 +18,27 @@ work seamlessly from there.
 
 ## Currently working on
 
+**RESOLVED 2026-09-29 (27th round) -- a real production outage caused
+by the 26th round's own commit, found and fixed within minutes of the
+user's live report ("the pause button is missing and the hands arent
+sshowing... its all broken looking").** 2 temporal-dead-zone crashes,
+same mistake made twice: new state for the Frame Rate Log feature
+(`lastTrackedActionText`, `frameRateLogEl`, and 5 others) was declared
+next to its own functions, further down the file, but those functions
+are called at module TOP LEVEL -- referencing a `let`/`const` before its
+own declaration line has executed throws, aborting the entire script
+before the hand field ever builds or the Pause button gets styled.
+Fixed by moving all 7 variables to the file's own established
+early-state block (2 emergency commits, each verified against a real
+Vercel deploy before the next). Confirmed fixed via 3 independent
+signals (not just `read_console_messages`, which kept reporting the
+same 2 stale pre-fix errors even after the real fix was live): a fresh
+network request for the new `main.js` version, `window.__debug` fully
+populated with 156 real hands, and 2 screenshots showing the Pause
+button and the hand field both rendering correctly. See CHANGELOG.txt's
+27th-round entry for the full account, including the standing lesson
+for any future module-level state added to this file.
+
 **ADDED 2026-09-29 (26th round) -- new "Frame Rate Log" Debug feature,
 direct request after "it freezes alot for alot of click functions":
 a toggle, a Frame Rate Drop Threshold (Fps) slider, and a log that
@@ -31,10 +52,9 @@ shipping: the tick right after this tab regains focus (or a manual
 pause ends) would otherwise register one huge fake "drop" spanning the
 whole hidden/paused gap -- fixed by gating on `!isPaused` (which already
 covers the tab-hidden case via `syncPauseWithVisibility()`) plus an
-explicit re-seed on the first tick after any pause/resume. NOT
-live-verified this round -- local server hit this sandbox's own
-documented network-truncation issue; pushed to Vercel, confirming
-against the live URL next. See CHANGELOG.txt's 26th-round entry.
+explicit re-seed on the first tick after any pause/resume. Now
+confirmed live and working after the 27th round's own fix -- see that
+entry above for the outage this shipped with and how it was resolved.
 
 **ROOT-CAUSED, FIXED, AND CONFIRMED DEPLOYED 2026-09-28 (25th round) --
 the "hands spin 360

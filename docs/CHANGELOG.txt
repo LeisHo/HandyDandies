@@ -13921,6 +13921,82 @@ file's own established fallback for exactly this situation.
 
 `main.js` cache-buster bumped `?v=245` -> `?v=246`.
 
+2026-09-29  -  (27th round -- REAL PRODUCTION OUTAGE caused by the 26th
+round's own Frame Rate Log commit, found and fixed live within minutes
+of the user's own report: "idk whats going on but i refreshed the
+vercel deployment and the pause button is missing and the hands arent
+sshowing. idk. its all broken looking")
+
+**2 separate temporal-dead-zone (TDZ) crashes, same root mistake made
+twice in a row within the same commit.** `buildMouseTrackingLogWidget()`
+and `buildFrameRateLogWidget()` are BOTH called at module top level
+(right after `initDevPanel()`, lines ~1866/1868) -- but the 26th round's
+own new state (`lastTrackedActionText`/`lastTrackedActionAt` for Mouse
+Tracking Log's attribution hook; `frameRateLogEl`/`frameRateLogEntries`/
+`FRAME_RATE_LOG_MAX_ENTRIES`/`__lastFrameTimestamp`/
+`__frameRateBelowThreshold`/`__frameRateDropStartedAt`/
+`__wasPausedLastFrame` for the Frame Rate Log itself) was declared
+textually NEXT TO each feature's own function definitions, much FURTHER
+DOWN the file -- a `let`/`const` binding is in the temporal dead zone
+from the start of its scope until the actual declaration line executes,
+so referencing it from a function called BEFORE that line (even though
+the function itself is fully hoisted and callable) throws "Cannot
+access '<name>' before initialization." That's an UNCAUGHT error during
+top-level module execution, which aborts the ENTIRE script right there
+-- nothing after it ever runs, including `rebuildField()` (the real
+hand-field build) and the Pause button's own styling -- which is
+exactly why the live symptom looked like "the pause button is missing
+and the hands arent showing... its all broken looking" rather than
+anything resembling a frame-rate-log bug specifically. Confirmed via
+2 separate live console stack traces, one per crash (the 2nd only
+became visible once the 1st was fixed and the script could reach far
+enough to hit it).
+
+**This is the SAME class of bug this file's own established pattern
+already exists specifically to avoid** -- `mouseTrackingLogEl`/
+`cursorLogTimer`/`handBehaviourLogEl`/etc. are ALL already declared at
+the very top of the file for exactly this reason (their own comments
+say so), and this round's new state should have followed that same
+placement from the start instead of being declared near each function's
+own definition "for locality/readability." Fixed by moving BOTH sets of
+new state (7 variables total) up to the top of the file, immediately
+after `lastPointerClientX`/`lastPointerClientY`'s own declarations --
+same location, same reasoning, same fix shape as the file's own
+pre-existing early-state block.
+
+**2 separate emergency commits, each one round-tripped through a real
+Vercel deploy + live verification before the next was attempted** --
+`0bbf81d` fixed the Mouse Tracking Log crash; live-reloading immediately
+afterward surfaced the SECOND, previously-masked crash (the script had
+never gotten far enough to reach `buildFrameRateLogWidget()`'s own call
+site before); `5e966c9` fixed that one too. Verified the 2nd fix
+properly this time, not by trusting `read_console_messages` alone --
+that tool reported the SAME 2 stale errors (still showing `?v=246`/
+`?v=247` in their own stack traces) even after the real fix was
+confirmed deployed and working, a live repeat of this file's own
+already-documented "read_console_messages can report a STALE,
+already-fixed console error as if it were still current" gotcha.
+Cross-checked instead via `read_network_requests` (confirmed `?v=248`
+itself returned 200), `window.__debug` (fully populated, 156 real
+hands, `logFrameRateDropsEnabled` present in `cfg`), and 2 real
+screenshots (PAUSE button visible; hands rendering correctly with the
+panel hidden) -- all 3 independent signals agreed the app was genuinely
+fixed, not just that the stale console entries had scrolled away.
+
+**Lesson for this file going forward, not just this one feature**: any
+new module-level state referenced by a function that's called at TOP
+LEVEL (not just from inside another function/event-listener, which is
+safe regardless of declaration order) must be declared BEFORE that call
+site in the file -- in practice, that means declaring it in this file's
+own established "early state" block near the top, not next to the
+function it belongs to, whenever the function itself is invoked from
+top-level setup code. This file already had 2 prior features (Mouse
+Tracking Log, Hand Behaviour Log) that got this right; this round
+simply didn't follow the pattern its own neighbors already demonstrated.
+
+`main.js` cache-buster bumped `?v=246` -> `?v=247` -> `?v=248` (2
+emergency fixes, 2 bumps).
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a
