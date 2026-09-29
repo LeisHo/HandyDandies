@@ -520,6 +520,17 @@ const cursorNDC = new THREE.Vector2(0, 0)
 const raycaster = new THREE.Raycaster()
 const projectScratch = new THREE.Vector3()
 const boundsCenterScratch = new THREE.Vector3()
+// PERFORMANCE (2026-09-29, found while diagnosing "it freezes alot for
+// alot of click functions" using the Frame Rate Log's own real data --
+// see animate()'s own cursor-tracking loop for where these are used).
+// `animate()`'s per-hand lookAt was allocating a brand-new
+// THREE.Matrix4 + THREE.Quaternion EVERY frame, for EVERY hand (up to
+// 156) -- real, measurable GC pressure on a hot path, matching this
+// file's own established "_xScratch" convention everywhere else (see
+// projectScratch/boundsCenterScratch directly above). Reused instead of
+// allocated fresh each call.
+const _lookAtMatrixScratch = new THREE.Matrix4()
+const _lookAtQuatScratch = new THREE.Quaternion()
 
 // -----------------------------------------------------------------------
 // Dev panel groups (CLAUDE.md Section 12)
@@ -12420,9 +12431,30 @@ function animate(dt, now) {
         // once for the whole field anymore. With it off, every hand still
         // gets the exact same roll (baseDeg=0, just the live slider), same
         // as before.
+        // PERFORMANCE (2026-09-29, found while diagnosing "it freezes
+        // alot for alot of click functions" via the Frame Rate Log's
+        // own real data). Arm Rotation curve and Palm Rotation Distance
+        // Curve both need "this hand's distance to cursor, normalized
+        // against the CURRENT min/max distance across the WHOLE field"
+        // -- that min/max was being recomputed via hands.map() ONCE PER
+        // HAND inside the loop below (an O(n^2) cost every frame --
+        // 156x156 distance calcs when either curve is on), unlike every
+        // other curve-driven feature in this file, which already
+        // hoists this exact computation once per frame (see
+        // updateRenderOrder()'s own minLiveDist/liveDistRange, the
+        // established pattern this should have followed from the
+        // start). Both curves read the identical distance metric, so
+        // one shared pass covers both; only computed at all when at
+        // least one of them is actually enabled.
+        let cursorDistMinD = 0, cursorDistMaxD = 0
+        if (cfg.armRotationCurveEnabled || cfg.palmFacesCursorDistanceCurveEnabled) {
+          const __cursorDists = hands.map((h) => h.wrapper.position.distanceTo(cursorTarget))
+          cursorDistMinD = Math.min(...__cursorDists)
+          cursorDistMaxD = Math.max(...__cursorDists)
+        }
         hands.forEach((hand) => {
-          const m = new THREE.Matrix4().lookAt(hand.wrapper.position, cursorTarget, UP)
-          const lookAtDesired = new THREE.Quaternion().setFromRotationMatrix(m)
+          _lookAtMatrixScratch.lookAt(hand.wrapper.position, cursorTarget, UP)
+          const lookAtDesired = _lookAtQuatScratch.setFromRotationMatrix(_lookAtMatrixScratch)
           // CORRECTED 2026-09-28 (5th round of this same jump investigation) --
           // direct report, repeated and precise: with Retransition OFF the
           // jump never happens; with it ON, a hand that was under click-
@@ -12522,10 +12554,8 @@ function animate(dt, now) {
             let responsiveness = (cfg.armRotationDefault ?? 100) / 100
             if (cfg.armRotationCurveEnabled) {
               const distToCursor = hand.wrapper.position.distanceTo(cursorTarget)
-              const minD = Math.min(...hands.map(h => h.wrapper.position.distanceTo(cursorTarget)))
-              const maxD = Math.max(...hands.map(h => h.wrapper.position.distanceTo(cursorTarget)))
-              const range = Math.max(maxD - minD, 1e-6)
-              const normDist = (distToCursor - minD) / range
+              const range = Math.max(cursorDistMaxD - cursorDistMinD, 1e-6)
+              const normDist = (distToCursor - cursorDistMinD) / range
               responsiveness = (armRotationCurveParsed && armRotationCurveParsed.length)
                 ? THREE.MathUtils.clamp(evaluateArmLengthCurve(armRotationCurveParsed, normDist), 0, 1)
                 : 1
@@ -12549,10 +12579,8 @@ function animate(dt, now) {
           // acts as a responsiveness multiplier on baseDeg).
           if (baseDeg !== 0 && cfg.palmFacesCursorDistanceCurveEnabled) {
             const distToCursor = hand.wrapper.position.distanceTo(cursorTarget)
-            const minD = Math.min(...hands.map(h => h.wrapper.position.distanceTo(cursorTarget)))
-            const maxD = Math.max(...hands.map(h => h.wrapper.position.distanceTo(cursorTarget)))
-            const range = Math.max(maxD - minD, 1e-6)
-            const normDist = (distToCursor - minD) / range
+            const range = Math.max(cursorDistMaxD - cursorDistMinD, 1e-6)
+            const normDist = (distToCursor - cursorDistMinD) / range
             const responsiveness = palmFacesCursorDistanceCurveParsed && palmFacesCursorDistanceCurveParsed.length
               ? evaluateArmLengthCurve(palmFacesCursorDistanceCurveParsed, normDist)
               : 1

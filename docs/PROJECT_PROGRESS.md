@@ -18,17 +18,31 @@ work seamlessly from there.
 
 ## Currently working on
 
-**IN PROGRESS 2026-09-29 (29th round) -- diagnosing the "freezes a lot
-for a lot of click functions" report using the Frame Rate Log's own
-real data** (the user pasted a real drop/recover log plus the matching
-Mouse Tracking Log). Pattern: several drops correlate to a click/hold
-event 1-4.6 SECONDS before the freeze (not immediately at the click),
-and one drop had no tracked action in the preceding 5 seconds at all --
-consistent with garbage-collection pressure from per-frame allocation
-rather than any one click handler's own direct cost. Confirmed a real
-candidate: `animate()`'s cursor-tracking loop allocates a fresh
-`new THREE.Matrix4()` + `new THREE.Quaternion()` every frame, for
-every one of 156 hands. Investigation ongoing.
+**PARTIALLY RESOLVED 2026-09-29 (29th round) -- diagnosed the "freezes
+a lot for a lot of click functions" report using the Frame Rate Log's
+own real production data.** Fixed 2 real inefficiencies in `animate()`'s
+cursor-tracking loop: per-frame `new THREE.Matrix4()`/`new THREE.Quaternion()`
+allocation (156 hands x 60fps) replaced with reused scratch objects;
+an O(n^2) field-wide min/max distance recompute (Arm Rotation curve /
+Palm Rotation Distance Curve, both currently off but a real latent
+landmine) hoisted to once per frame, matching this file's own
+established pattern everywhere else. **The likely bigger lever is a
+SETTING, not code**: live-measured `updateRenderOrder()` at 36.6ms
+avg per call while completely IDLE (156 hands, nothing triggered) --
+already over the 60fps budget from bookkeeping alone. Traced to
+`wristSplayReposeStagger` ("Reactive Splay Update Stagger," default 4,
+max 8) reading **1** (off) in the real saved settings, matching an
+already-on-record measurement in this file's own history almost
+exactly ("~38ms/frame at 255 hands, the actual lag bottleneck"). Not
+changed -- it's the user's own setting to raise if they want to try it.
+**Honestly unresolved**: neither fix, nor the stagger finding, was
+confirmed to fully explain the reported SEVERITY (freezes up to 4.6
+SECONDS, 30-100x the measured idle baseline) -- a real active-trigger
+reproduction was deliberately not attempted on live production this
+round (too risky this same session, after the 27th round's own
+outage). See CHANGELOG.txt's 29th-round entry for the full account and
+the recommended next step (a real Chrome DevTools Performance
+recording from the user's own device during an actual freeze).
 
 **ADDED 2026-09-29 (28th round) -- "Copy All Logs" button in the Debug
 group**, direct request. Concatenates Mouse Tracking Log/Hand Behaviour

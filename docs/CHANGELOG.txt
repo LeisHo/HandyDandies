@@ -14036,6 +14036,94 @@ Copy buttons in this same file already use successfully.
 
 `main.js` cache-buster bumped `?v=248` -> `?v=249`.
 
+2026-09-29  -  (29th round -- freeze investigation, using the Frame
+Rate Log's own real production data the user pasted)
+
+**Pattern in the real data**: several DROP entries correlated to a
+click/hold event 1-4.6 SECONDS before the freeze (not immediately at
+the click), and one DROP had no tracked action in the preceding 5
+seconds at all. That doesn't fit "this specific click handler is
+slow" -- it fits garbage-collection pressure building up over several
+seconds of activity before a pause finally lands, sometimes with no
+fresh trigger needed at all.
+
+**Found and fixed 2 real inefficiencies** in `animate()`'s own
+cursor-tracking loop (NOT `updateRenderOrder()` -- a separate
+function, see below):
+1. A fresh `new THREE.Matrix4()` + `new THREE.Quaternion()` was
+   allocated every frame, for every one of up to 156 hands -- real GC
+   pressure on a hot path. Replaced with 2 reused module-level scratch
+   objects (`_lookAtMatrixScratch`/`_lookAtQuatScratch`), matching this
+   file's own established `_xScratch` convention used everywhere else.
+   Confirmed the ONE place `lookAtDesired` is read afterward
+   (`hand.currentArmRotationQuat.slerp(lookAtDesired, ...)`) only ever
+   copies its values, never retains the reference -- safe to share one
+   scratch object across all 156 hands' iterations.
+2. Arm Rotation curve and Palm Rotation Distance Curve were BOTH
+   recomputing the whole field's min/max cursor-distance via
+   `hands.map(...)` ONCE PER HAND, inside the per-hand loop -- an O(n^2)
+   cost (156x156 distance calcs, twice) every single frame whenever
+   either curve is enabled, unlike every OTHER curve-driven feature in
+   this file (Arm Length, Wrist Splay, Retransition Speed/Start Time,
+   Tween Stop, Start Distance -- all confirmed via grep to already
+   receive `minLiveDist`/`liveDistRange` as PARAMETERS, computed once
+   per frame in `updateRenderOrder()`). Hoisted the same way: one
+   shared `cursorDistMinD`/`cursorDistMaxD` pass before the per-hand
+   loop, computed only when at least one of the 2 curves is enabled.
+   **Confirmed via live `window.__debug.cfg` that neither curve is
+   currently enabled in the real production settings** -- so this fix
+   doesn't explain today's freezes, but it removes a real, latent O(n^2)
+   landmine for if/when either curve gets turned on.
+
+**Found, but NOT fixed here -- a settings/config issue, not a code
+bug, and the user's own choice to change if they want to**: live-
+measured `updateRenderOrder()` (a DIFFERENT function -- drives every
+hand's idle-repose/trigger state each frame) at an average of 36.6ms
+per call, COMPLETELY IDLE (156 hands, nothing triggered) -- already
+past the ~16.6ms budget for 60fps from bookkeeping alone, before
+`composer.render()`'s own GPU cost. Traced to `cfg.wristSplayReposeStagger`
+("Reactive Splay Update Stagger (Frames, 1=Off)", DEV_GROUPS default 4,
+max 8) reading **1** in the real live settings -- meaning every single
+hand gets the full wrist+5-finger world-axis-corrected bone-math
+idle-repose treatment EVERY frame, with none of the staggering this
+control exists specifically to provide. This matches a measurement
+already on record in this file's own history ("~38ms/frame at 255
+hands, the actual lag bottleneck, not rendering itself") almost
+exactly. Not changed here -- it's the user's own saved setting, not a
+bug to silently override; reported as the single most actionable,
+zero-code-change lever available right now (raising it back toward its
+own default of 4, or up to its max of 8, would proportionally cut this
+per-frame cost).
+
+**Honestly unresolved**: neither fix here, nor the stagger-slider
+finding, was independently confirmed to be the FULL explanation for
+the SEVERITY reported (freezes up to 4.6 SECONDS in one frame -- 30-100x
+worse than the 36.6ms idle baseline measured). Attempting to reproduce
+a real global Click+Hold trigger via `window.__debug` to measure the
+ACTIVE-state cost directly was abandoned mid-attempt rather than risk
+leaving live production hand state in a test-induced condition (the
+27th round's own outage this same session was a direct lesson in how
+costly a careless live-production action can be) -- `clickHoldPoseTriggers`
+isn't exposed on `window.__debug` for a clean global trigger call, and
+a per-hand-only test wouldn't match real usage anyway. If the stagger
+fix alone doesn't resolve the reported severity, the next real step is
+either a Chrome DevTools Performance recording captured on the user's
+own device during a real freeze (the most direct, lowest-risk way to
+see exactly what's on the stack during a multi-second stall), or a
+carefully-scoped live reproduction test in a FUTURE round with a
+verified-safe trigger mechanism.
+
+Verified: `node --check src/main.js` passes; confirmed the ONE
+`lookAtDesired` read is safe to alias to a shared scratch object (see
+above); confirmed no remaining `Math.min(...hands.map` /
+`Math.max(...hands.map` occurrences anywhere in the file after the
+hoist. Live-verified via `window.__debug.cfg` (not guessed) that
+`armRotationCurveEnabled`/`palmFacesCursorDistanceCurveEnabled` are
+both currently false, and that `wristSplayReposeStagger` is currently
+1.
+
+`main.js` cache-buster bumped `?v=249` -> `?v=250`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a
