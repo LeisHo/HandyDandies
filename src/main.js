@@ -1688,7 +1688,18 @@ const DEV_GROUPS = [
       // flooding the log during a sustained slow patch.
       { key: 'logFrameRateDropsEnabled', label: 'Log Frame Rate Drops', type: 'checkbox', def: false },
       { key: 'frameRateDropThresholdFps', label: 'Frame Rate Drop Threshold (Fps)', type: 'slider', min: 1, max: 60, step: 1, def: 30 },
-      { key: 'clearFrameRateLogBtn', label: 'Clear Frame Rate Log', type: 'button', onClick: () => clearFrameRateLog() }
+      { key: 'clearFrameRateLogBtn', label: 'Clear Frame Rate Log', type: 'button', onClick: () => clearFrameRateLog() },
+      // Added 2026-09-29, direct request: "add a button in the debug
+      // group. It says Copy All. When clicked it copies all active
+      // logs." Concatenates Mouse Tracking Log/Hand Behaviour Log/Frame
+      // Rate Log into one clipboard payload, clearly labeled per
+      // section -- same clipboard mechanism each log's own individual
+      // Copy button already uses. "Active" read as "every log this
+      // panel tracks" (same as each log's own Copy button, which copies
+      // whatever's buffered regardless of whether it's currently empty
+      // or its own checkbox happens to be off right now) rather than
+      // only logs whose enable checkbox is on at click time.
+      { key: 'copyAllLogsBtn', label: 'Copy All Logs', type: 'button', onClick: (btn) => copyAllDebugLogs(btn) }
     ]
   }
 ]
@@ -2490,6 +2501,27 @@ function appendFrameRateLogLine(line) {
 function clearFrameRateLog() {
   frameRateLogEntries.length = 0
   if (frameRateLogEl) frameRateLogEl.textContent = ''
+}
+// "Copy All Logs" button (2026-09-29, see its DEV_GROUPS control's own
+// comment). Only ever called from a real button click, never from
+// top-level setup code -- unlike this file's own established
+// early-state block, a plain function declaration referencing
+// mouseTrackingLogEntries/handBehaviourLogEntries/frameRateLogEntries
+// has no TDZ risk here, since all 3 of those are already fully
+// initialized long before a user can click anything.
+function copyAllDebugLogs(btn) {
+  const sections = [
+    ['Mouse Tracking Log', mouseTrackingLogEntries],
+    ['Hand Behaviour Log', handBehaviourLogEntries],
+    ['Frame Rate Log', frameRateLogEntries]
+  ]
+  const text = sections.map(([title, entries]) => `=== ${title} ===\n${entries.length ? entries.join('\n') : '(empty)'}`).join('\n\n')
+  const flash = (msg) => { if (!btn) return; const orig = btn.textContent; btn.textContent = msg; setTimeout(() => { btn.textContent = orig }, 900) }
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(() => flash('Copied!')).catch(() => flash('Copy failed'))
+  } else {
+    flash('Copy failed')
+  }
 }
 // Same widget shape as buildHandBehaviourLogWidget() directly above --
 // Copy/Save/Clear + a scrolling `<pre>`, appended to the SAME "Debug"
