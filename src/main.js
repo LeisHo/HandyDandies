@@ -208,6 +208,20 @@ let cursorLogTimer = null
 // declarations right above, same reasoning, same fix shape).
 let lastTrackedActionText = null
 let lastTrackedActionAt = 0
+// FIXED 2026-09-29, same production-outage fix pass as the vars directly
+// above, same exact class of bug: buildFrameRateLogWidget() is ALSO
+// called at module top level (right after buildHandBehaviourLogWidget()),
+// so frameRateLogEl and friends must live up here too, not down next to
+// their own function definitions -- the live console confirmed this as
+// a SECOND, separate TDZ crash on the very next reload after the first
+// fix deployed ("Cannot access 'frameRateLogEl' before initialization").
+const FRAME_RATE_LOG_MAX_ENTRIES = 200
+const frameRateLogEntries = []
+let frameRateLogEl = null
+let __lastFrameTimestamp = null
+let __frameRateBelowThreshold = false
+let __frameRateDropStartedAt = 0
+let __wasPausedLastFrame = true
 // Hand Behaviour Log's own state (2026-09-28, direct request) -- same
 // shape as Mouse Tracking Log's own state directly above, kept
 // completely separate since the 2 logs serve different purposes and are
@@ -2461,25 +2475,10 @@ function buildHandBehaviourLogWidget() {
   wrap.appendChild(handBehaviourLogEl)
   body.appendChild(wrap)
 }
-// Frame Rate Drop Log's own state (2026-09-29) -- same shape as Mouse
-// Tracking Log/Hand Behaviour Log's own state above. `__lastFrameTimestamp`/
-// `__frameRateBelowThreshold`/`__frameRateDropStartedAt` are declared here
-// (not inside animate()) since they must persist across frames -- see
-// animate()'s own top-of-body comment for how they're used.
-const FRAME_RATE_LOG_MAX_ENTRIES = 200
-const frameRateLogEntries = []
-let frameRateLogEl = null
-let __lastFrameTimestamp = null
-let __frameRateBelowThreshold = false
-let __frameRateDropStartedAt = 0
-// True whenever the PRIOR animate() tick was paused (manually, or
-// auto-paused by syncPauseWithVisibility() while this tab was hidden/
-// unfocused) -- the very next real tick after either must not compute a
-// dt against the stale pre-pause timestamp, which would span the whole
-// pause/hidden duration and register as a false, huge "drop." Starts
-// true so the session's own first real frame also just seeds the
-// baseline instead of comparing against nothing.
-let __wasPausedLastFrame = true
+// Frame Rate Drop Log's own state -- declared at the TOP of the file
+// (near mouseTrackingLogEl/lastTrackedActionText), not here; see that
+// declaration's own comment for the real production outage this caused
+// when it was declared here instead.
 function appendFrameRateLogLine(line) {
   frameRateLogEntries.push(line)
   if (frameRateLogEntries.length > FRAME_RATE_LOG_MAX_ENTRIES) frameRateLogEntries.shift()
