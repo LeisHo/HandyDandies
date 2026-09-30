@@ -14403,6 +14403,76 @@ was checked directly rather than assumed).
 
 `main.js` cache-buster bumped `?v=254` -> `?v=255`.
 
+2026-09-30  -  (35th round -- "whe i do doubel click hold sometimes the
+close hands do a single click then the further hands do the double
+click hold")
+
+**Root cause confirmed by reading both pointerdown listeners directly,
+not guessed.** Two separate, unconditional `window.addEventListener('pointerdown', ...)`
+listeners exist for left-button Click+Hold: the "always fires on every
+press" one (arms `chp` + every ordinal-1 custom Click+Hold function,
+e.g. custom8) and the chain-continuation listener (arms the matching
+ordinal-2/3/4 custom Click+Hold function, e.g. custom10 "Click 2 +
+Hold", once a press is recognized as a clean continuation of the
+previous click). On the 2nd press of a double-click-hold gesture, BOTH
+fired for the SAME press -- nothing suppressed one in favor of the
+other. This is exactly the gap the `CLICK_HOLD_CHAIN_KEYS` section's own
+pre-existing comment already disclosed in principle ("Deliberately
+independent of chp's own state otherwise -- no cross-suppression"), now
+concretely traced to a real reported symptom rather than left as a
+theoretical note.
+
+Each of the 2 racing triggers computes its own PER-HAND commit delay
+from its own independently-shaped Start Time Curve
+(`chp.pendingClaimAt = now + computeStartDelayMs(...)`, distance-based).
+Whichever trigger reaches its own commit time first for a given hand is
+briefly visible; whichever commits second calls
+`releaseHandFromOtherFunctions()` (this file's existing "last commit
+wins" rule) and overwrites it. Since the 2 curves are independently
+configured, the relative commit order between them can flip at
+different distances -- explaining exactly why close hands showed one
+function's result and far hands showed the other's.
+
+Presented the finding plus 3 concrete fix options via AskUserQuestion
+before changing anything (a real architectural behavior decision --
+CLAUDE.md §0a -- not a one-line bug limited to this function). User
+chose: suppress ordinal-1 arming on a press recognized as a chain
+continuation, so only the matching chain ordinal claims that press.
+
+Fixed with a new `isClickHoldChainContinuation(now)` helper (declared
+alongside the existing chain state, `now - clickHoldChainLastCleanUpTime
+<= cfg.multiClickWindowMs`), called from BOTH listeners: the chain
+listener (replacing its own inline duplicate of the same condition) and
+the always-fires listener (new -- only arms `chp`/`startCustomHoldFunctions('Click+Hold')`
+when this press is NOT a chain continuation). Right Click+Hold (button
+2) is untouched -- the chain mechanism has always been left-button-only
+by design (`if (e.button !== 0) return` in the chain listener), so
+there's no equivalent race to fix there.
+
+Verified via an isolated logic-level reproduction (pure control-flow,
+no DOM/three.js needed -- mirrors this project's own established
+methodology for testing dispatch-chain changes this session): a fresh
+press still arms ordinal-1 (`chp`/`startCustomHoldFunctions(Click+Hold, 1)`)
+normally; a press within `multiClickWindowMs` of a clean release now
+arms ONLY the matching chain ordinal (`startCustomHoldFunctions(Click+Hold, 2)`),
+with `chp`/ordinal-1 correctly suppressed. `node --check src/main.js`
+passes.
+
+**Not live-verified against the real running app or real three.js
+rendering** -- the local static server hit this project's own
+documented network-truncation quirk (`net::ERR_CONNECTION_RESET` on
+`src/main.js`) 5 times in a row this round (the standing retry cap), so
+a real mouse-driven double-click-hold gesture against actual hands
+could not be exercised this round. If a future report describes this
+symptom persisting after this fix, re-check first whether some OTHER
+pair of triggers (not custom8/custom10 specifically) share the same
+"one always-fires, one chain-fires, both race by distance" shape --
+this fix only suppresses ordinal-1 during a LEFT-button chain
+continuation, not every possible combination of independently-firing
+hold triggers.
+
+`main.js` cache-buster bumped `?v=255` -> `?v=256`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

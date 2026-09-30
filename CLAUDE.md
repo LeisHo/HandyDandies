@@ -2115,3 +2115,35 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   it in the early-state block near the top of the file, never next to
   the function it belongs to, no matter how much more "local" that would
   read.
+- **Two independently-firing hold triggers can race on the SAME press
+  whenever one is an "always fires on every press" ordinal-1 function
+  (`chp`, or any custom Click+Hold with ClickCount 1st) and the other is
+  a chain-continuation ordinal (2nd/3rd/4th, e.g. custom10 "Click 2 +
+  Hold") -- both listeners are unconditional, separate `pointerdown`
+  handlers with no cross-awareness of each other by default, and each
+  computes its own PER-HAND commit delay from its own independently-
+  shaped Start Time Curve.** Whichever one commits LAST for a given hand
+  wins (`releaseHandFromOtherFunctions()`'s "last commit wins" rule), and
+  since the 2 curves are independently configured, WHICH one wins can
+  flip by distance -- confirmed live as the cause of a real 2026-09-30
+  report ("close hands do a single click then the further hands do the
+  double click hold"). This was already a disclosed, theoretical gap
+  (see `CLICK_HOLD_CHAIN_KEYS`'s own "no cross-suppression" comment) --
+  this is the first time it was traced to a concrete repro. Fixed (per
+  direct user choice among 3 options, not silently picked) via
+  `isClickHoldChainContinuation(now)`: a press recognized as a chain
+  continuation now suppresses ordinal-1/`chp` arming for that SAME
+  press, so only the matching chain ordinal claims it. **This fix is
+  scoped to LEFT-button ordinal-1-vs-chain-ordinal specifically** -- it
+  does NOT address every other theoretically-possible pair of
+  independently-firing hold triggers (e.g. 2 different custom Click+Hold
+  functions that both happen to be ClickCount 1st, which would still
+  race exactly this way with no suppression between them at all). If a
+  future report describes a similar "which hand shows which response
+  flips by distance" symptom for a DIFFERENT pair of hold-kind
+  functions, check whether they're both independently armed on the same
+  press first, before assuming this fix already covers it. **Not
+  live-verified against real three.js rendering** -- verified via an
+  isolated logic-level reproduction only (the local static server hit
+  its own documented `net::ERR_CONNECTION_RESET` truncation quirk 5
+  times in a row this round, the standing retry cap).

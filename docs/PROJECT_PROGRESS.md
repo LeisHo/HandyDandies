@@ -18,6 +18,37 @@ work seamlessly from there.
 
 ## Currently working on
 
+**RESOLVED 2026-09-30 (35th round) -- "close hands do a single click,
+far hands do the double click hold" during Double-Click+Hold.** Root
+cause found by reading both pointerdown listeners directly: the
+always-fires ordinal-1 listener (`chp`/any ordinal-1 custom Click+Hold,
+e.g. custom8) and the chain-continuation listener (ordinal-2/3/4, e.g.
+custom10 "Click 2 + Hold") are two separate, unconditional listeners on
+the same native pointerdown -- both fired on the SAME 2nd press. Each
+has its own independently-shaped Start Time Curve (distance -> per-hand
+commit delay), so whichever armed trigger committed LAST for a given
+hand won via `releaseHandFromOtherFunctions()`'s "last commit wins"
+rule -- and since the two curves can cross over at different distances,
+the visible winner flipped by distance. This concretely confirms (not
+just discloses) the gap the `CLICK_HOLD_CHAIN_KEYS` section's own "no
+cross-suppression" comment already flagged. Presented the finding +
+3 fix options via AskUserQuestion rather than silently picking one
+(architectural behavior change, CLAUDE.md §0a) -- user chose "suppress
+ordinal-1 on a chain-continuation press." Fixed via a new
+`isClickHoldChainContinuation(now)` helper, checked by the always-fires
+listener before arming `chp`/ordinal-1 -- a chain-continuation press now
+arms ONLY the matching chain ordinal. Right Click+Hold (button 2) is
+untouched -- the chain mechanism is left-button-only by design. Verified
+via an isolated logic-level reproduction (no DOM/three.js needed, pure
+control-flow): a fresh press still arms ordinal-1 normally; a chain-
+continuation press suppresses ordinal-1/`chp` and still arms the
+matching ordinal. **Not live-verified against the real running app** --
+the local static server hit its own documented network-truncation quirk
+5 times in a row this round (the standing retry cap), so this could not
+be confirmed against real three.js hand rendering/actual mouse gestures.
+`node --check` passed on the edited file. See CHANGELOG.txt's 35th-round
+entry.
+
 **RESOLVED 2026-09-30 (34th round) -- Tween Retransition Speed Curve's
 missing interactive widget, caught by direct follow-up on the 32nd
 round's own work.** The new Tween-mode Speed Curve controls were added

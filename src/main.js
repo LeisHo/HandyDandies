@@ -8250,7 +8250,19 @@ function endClickHoldPose(p) {
 // way to reach it.
 window.addEventListener('pointerdown', (e) => {
   if (e.target && e.target.closest && e.target.closest('.dp-panel, #pauseButton')) return
-  if (e.button === 0) { startClickHoldPose('chp'); startCustomHoldFunctions('Click+Hold') }
+  // CORRECTED 2026-09-30 -- see isClickHoldChainContinuation()'s own
+  // comment (declared further below, but a plain function declaration is
+  // hoisted, and this callback only ever runs on a real later pointerdown
+  // event, well after that declaration has executed -- not the TDZ-at-
+  // top-level-execution hazard this file's own CLAUDE.md documents
+  // elsewhere). A press recognized as a chain continuation (the 2nd/3rd/
+  // 4th press of a click-hold chain) skips ordinal-1 arming here entirely
+  // -- only the matching chain ordinal (handled by the chain listener
+  // below) claims that press, so an ordinal-1 Click+Hold function no
+  // longer races a same-press chain-ordinal function for the same hands.
+  if (e.button === 0) {
+    if (!isClickHoldChainContinuation(performance.now())) { startClickHoldPose('chp'); startCustomHoldFunctions('Click+Hold') }
+  }
   else if (e.button === 2) { startClickHoldPose('rchp'); startCustomHoldFunctions('Right Click+Hold') }
 })
 // CORRECTED 2026-09-26 -- direct correction from the user: the device
@@ -9024,11 +9036,41 @@ let clickHoldChainActiveKey = null
 // (those are chp's own separate always-fires-on-every-press listener,
 // unaffected by this chain).
 let clickHoldChainActiveOrdinal = 0
+// CORRECTED 2026-09-30, direct bug report: "whe i do doubel click hold
+// sometimes the close hands do a single click then the further hands do
+// the double click hold." Root cause -- confirmed by reading both
+// listeners, not guessed: the chp/ordinal-1 pointerdown listener above
+// (the "always fires on every press" one) and THIS chain listener are
+// two completely separate, unconditional listeners on the same native
+// pointerdown event. On the 2nd press of a double-click-hold gesture,
+// BOTH fired: the always-fires listener re-armed every ordinal-1
+// Click+Hold function (e.g. a plain custom Click+Hold), and this
+// listener armed the ordinal-2 chain function (e.g. "Click 2 + Hold")
+// -- for the SAME press. Each has its OWN independently-shaped Start
+// Time Curve (distance -> per-hand commit delay), and whichever of the
+// two reaches its own commit time first for a given hand is briefly
+// visible before the other one commits and overwrites it via
+// releaseHandFromOtherFunctions()'s "last commit wins" rule -- so the
+// apparent winner per hand flips wherever the two curves cross over,
+// exactly matching "close hands show one, far hands show the other."
+// This was a disclosed gap in principle (see this section's own
+// "Deliberately independent of chp's own state... no cross-suppression"
+// comment above) but never concretely traced to this exact race before.
+// Fixed per direct user decision (asked via AskUserQuestion, not
+// silently picked): a press recognized as a chain continuation
+// suppresses ordinal-1 arming for that SAME press, so only the matching
+// chain ordinal ever arms -- extracted into this helper so the
+// always-fires listener above can check it too, without duplicating the
+// `now - clickHoldChainLastCleanUpTime <= cfg.multiClickWindowMs`
+// condition in two places.
+function isClickHoldChainContinuation(now) {
+  return now - clickHoldChainLastCleanUpTime <= cfg.multiClickWindowMs
+}
 window.addEventListener('pointerdown', (e) => {
   if (e.target && e.target.closest && e.target.closest('.dp-panel, #pauseButton')) return
   if (e.button !== 0) return
   const now = performance.now()
-  if (now - clickHoldChainLastCleanUpTime <= cfg.multiClickWindowMs) {
+  if (isClickHoldChainContinuation(now)) {
     const chainIdx = Math.min(clickHoldChainCount, CLICK_HOLD_CHAIN_KEYS.length - 1)
     const key = CLICK_HOLD_CHAIN_KEYS[chainIdx]
     if (key) { clickHoldChainActiveKey = key; startClickHoldPose(key) }
