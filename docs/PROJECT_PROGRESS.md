@@ -18,6 +18,24 @@ work seamlessly from there.
 
 ## Currently working on
 
+**ADDED 2026-09-30 (32nd round) -- Retransition Speed Curve/Start Time
+Curve now available in any mode with Retransition on.** Investigated
+"Click 2 + Hold" (custom10) empty Retransition groups: traced to
+`RetransitionEnabled` being off (by design), then a separate real gap
+once turned on -- `RetransitionSpeedCurveEnabled` was Single-Pose-mode-
+only with no Tween-mode fallback. Fixed as 2 changes: hold-kind (chp)
+functions got a genuine new Tween-mode Speed Curve pair (mirroring the
+already-existing Start Time Curve's own mode-split pattern); pose-kind
+(cp) functions got a pure visibility fix (their own Speed/Start Time
+Curve math was already mode-independent, only the UI hid it in
+Sequence mode). NOT yet live-verified -- deploying now. See
+CHANGELOG.txt's 32nd-round entry.
+
+Also still pending from this same round: "Clear All Logs" button
+(requested, not yet built) and a broader "start time should never fire
+before hold/click-confirm duration" request for all click functions
+(investigation started, not yet implemented).
+
 **LIKELY ROOT CAUSE FOUND 2026-09-29 (31st round) -- the freeze
 investigation's real breakthrough, using the user's own real Hand
 Behaviour Log data.** A single click firing Multi Trigger's "Trigger 1"

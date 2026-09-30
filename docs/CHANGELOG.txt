@@ -14239,6 +14239,71 @@ correctly untouched -- those aren't a burst-DOM-write concern).
 
 `main.js` cache-buster bumped `?v=251` -> `?v=252`.
 
+2026-09-30  -  (32nd round -- Retransition Speed Curve/Start Time Curve
+made available in any mode with Retransition, direct requests: "check
+why the click function Click 2 Hold group. the retransition groups are
+empty" -> "click 2 hold is still missing retransition speed curve eve
+nwhe nturnd on" -> "retransition speed curve and start time curve
+should be avialable to any mode with retransition")
+
+**Investigation first, established via direct DOM/cfg inspection on the
+live app, not guessed**: "Click 2 + Hold" (`custom10`, hold-kind,
+Mode: Sequence) showed its whole Retransition section empty because
+`custom10RetransitionEnabled` was off -- by design, the master toggle
+correctly hides everything underneath it (confirmed via
+`updateSingleTimingGateVisibility()`'s own source, not assumed). Once
+the user turned Retransition ON, Retransition Speed Curve STILL didn't
+appear -- traced to a SEPARATE, real gap: `RetransitionSpeedCurveEnabled`'s
+own visibility was gated by `singleRetransitionOn` (Single-Pose-mode-
+only), same restriction Animation Speed Curve deliberately has (no
+Tween-mode equivalent, a documented, disclosed scope choice) -- but
+unlike Animation Speed Curve, Retransition Speed Curve had NO Tween-mode
+variant to fall back to either, so a Sequence-mode function like
+custom10 simply had nowhere to configure it at all.
+
+**Fixed as 2 related but distinct changes, per the user's own explicit
+"any mode with retransition" requirement:**
+
+1. **Hold-kind (chp family) -- a genuine NEW feature**: added
+   `${p}TweenRetransitionSpeedCurve`/`${p}TweenRetransitionSpeedCurveRange`
+   (2 new DEV_GROUPS controls, hold-kind template only), sharing the SAME
+   `${p}RetransitionSpeedCurveEnabled` on/off toggle as the existing
+   Single-Pose pair -- exactly mirroring how Retransition Start Time
+   Curve's own single `${p}RetransitionStartTimeCurveEnabled` toggle
+   already gates BOTH its Single-Pose and Tween-mode pairs (a proven,
+   already-working pattern in this same file, not invented fresh).
+   Wired: `parseClickHoldConfig(p)` now parses the 2 new keys into
+   `t.tweenRetransitionSpeedCurveParsed`/`t.tweenRetransitionSpeedRangeParsed`;
+   `updateClickHoldPoseForHand()`'s own freeze point (where
+   `chp.retransitionSpeedMs` is computed once at retransition-start) and
+   its 'retransition'-phase read site both now branch on
+   `chp.retransitionIsTween` to evaluate the correct curve; default
+   trigger-state init (`registerCustomClickFunction()`) and both
+   `wrapGatedSubgroup()` registrations (the outer "Retransition" wrap and
+   the inner "Retransition Speed Curve" wrap) updated to include the 2
+   new keys, matching Start Time Curve's own already-correct registration
+   shape exactly.
+
+2. **Pose-kind (cp family) -- a pure visibility fix, no new feature
+   needed**: confirmed by direct read that `updateClickPoseForHand()`'s
+   own Retransition Speed Curve AND Start Time Curve math is ALREADY
+   unconditional (no mode-branching at all, unlike hold-kind's
+   `chp.retransitionIsTween` checks) -- the underlying feature already
+   works in Sequence mode for pose-kind functions, only the UI was
+   hiding it. Added an `isHoldKindFn = CLICK_HOLD_KEYS.includes(p)` check
+   inside `updateSingleTimingGateVisibility()` (shared by both kinds) so
+   pose-kind's own Speed Curve AND Start Time Curve rows now show
+   whenever Retransition itself is on, in ANY mode, while hold-kind keeps
+   its existing (now-complete) mode-split.
+
+**Verified**: `node --check src/main.js` passes; every new key traced
+through its full path (DEV_GROUPS def -> parse -> freeze -> read ->
+wrapGatedSubgroup registration) before considering this done, not just
+the DOM-visibility half. **NOT live-verified this round** -- deploying
+and confirming next.
+
+`main.js` cache-buster bumped `?v=252` -> `?v=253`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

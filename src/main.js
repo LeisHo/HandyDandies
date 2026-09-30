@@ -3880,6 +3880,20 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       // trio, not the 0-700 Pose Retransition range -- a tween's own
       // release can reasonably want more time than a single pose's.
       { key: `${p}TweenRetransitionSpeedMs`, label: 'Retransition Speed (Ms)', type: 'slider', min: 50, max: 5000, step: 10, def: 800 },
+      // Tween mode's own Retransition Speed CURVE -- direct request
+      // 2026-09-30: "retransition speed curve and start time curve should
+      // be avialable to any mode with retransition." Start Time Curve
+      // already had a Tween-mode pair (directly above); Speed Curve did
+      // not -- Tween mode only ever had the flat Ms slider above, with no
+      // distance-based option. Shares the SAME `${p}RetransitionSpeedCurveEnabled`
+      // on/off checkbox as the Single-Pose pair (mirrors how Start Time
+      // Curve's own single `${p}RetransitionStartTimeCurveEnabled` already
+      // gates BOTH its Single-Pose and Tween pairs) -- see
+      // updateSingleTimingGateVisibility()'s own matching comment for the
+      // visibility side, and updateClickHoldPoseForHand()'s 'retransition'
+      // phase + its own freeze-point for the runtime side.
+      { key: `${p}TweenRetransitionSpeedCurve`, label: 'Retransition Speed Curve (Distance -> Speed)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickHoldConfig(p) },
+      { key: `${p}TweenRetransitionSpeedCurveRange`, label: 'Retransition Min / Max Speed (Ms)', type: 'text', def: '{"min":50,"max":2000}', onChange: () => parseClickHoldConfig(p) },
       { key: `${p}TweenRetransitionStartTimeCurve`, label: 'Retransition Start Time Curve (Distance -> Start Time)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickHoldConfig(p) },
       { key: `${p}TweenRetransitionStartTimeRange`, label: 'Retransition Min / Max Start Time (Ms)', type: 'text', def: '{"min":0,"max":300}', onChange: () => parseClickHoldConfig(p) },
       // Sequence-mode release behavior -- direct spec item, REPLACED
@@ -6693,6 +6707,10 @@ function parseClickHoldConfig(p) {
   // of the forward transition's.
   try { t.retransitionSpeedCurveParsed = JSON.parse(cfg[`${p}RetransitionSpeedCurve`]).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
   try { t.retransitionSpeedRangeParsed = JSON.parse(cfg[`${p}RetransitionSpeedCurveRange`]) } catch (e) { /* keep last-good value */ }
+  // Tween's own separate Retransition SPEED curve/range (2026-09-30) --
+  // see makeClickHoldPoseGroup()'s own matching control comment.
+  try { t.tweenRetransitionSpeedCurveParsed = JSON.parse(cfg[`${p}TweenRetransitionSpeedCurve`]).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
+  try { t.tweenRetransitionSpeedRangeParsed = JSON.parse(cfg[`${p}TweenRetransitionSpeedCurveRange`]) } catch (e) { /* keep last-good value */ }
   // Tween's own separate RETRANSITION curve/range (direct request: "for
   // all click hold functions, when i select to tween a sequence...
   // provide me 'Retransitioning' settings just like the single poses") --
@@ -7847,10 +7865,19 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     // actually starts, so a live Mode change mid-retransition can't yank
     // this hand between the 2 settings pairs mid-flight.
     const elapsed = now - chp.retransitionStartTime
-    // Retransition Speed Curve (item 5) -- Single-Pose-only override, same
-    // read-time-checked pattern as Animation Speed Curve's own
+    // Retransition Speed Curve (item 5; extended to Tween mode 2026-09-30)
+    // -- same read-time-checked pattern as Animation Speed Curve's own
     // `cfg[SpeedCurveEnabled] ? chp.frozenSpeedMs : cfg[TransitionSpeedMs]`.
-    const speedMs = Math.max(chp.retransitionIsTween ? cfg[`${p}TweenRetransitionSpeedMs`] : (cfg[`${p}RetransitionSpeedCurveEnabled`] ? chp.retransitionSpeedMs : cfg[`${p}RetransitionSpeedMs`]), 1)
+    // `chp.retransitionSpeedMs` (frozen above, at retransition-start) is
+    // now correctly populated for BOTH modes whenever the curve is on;
+    // when it's off, fall back to whichever flat Ms slider matches this
+    // hand's own mode.
+    const speedMs = Math.max(
+      cfg[`${p}RetransitionSpeedCurveEnabled`]
+        ? chp.retransitionSpeedMs
+        : (chp.retransitionIsTween ? cfg[`${p}TweenRetransitionSpeedMs`] : cfg[`${p}RetransitionSpeedMs`]),
+      1
+    )
     const progress = elapsed < chp.retransitionDelay ? 0 : THREE.MathUtils.clamp((elapsed - chp.retransitionDelay) / speedMs, 0, 1)
     // CORRECTED 2026-09-27 (2nd round, real measured bug -- direct report
     // "there is always a jump on the trigger after a hold release," a
@@ -8163,13 +8190,19 @@ function endClickHoldPose(p) {
     chp.retransitionDelay = cfg[`${p}RetransitionStartTimeCurveEnabled`] === false ? 0 : (chp.retransitionIsTween
       ? computeStartDelayMs(dists[i], minD, range, trig.tweenRetransitionCurveParsed, trig.tweenRetransitionRangeParsed)
       : computeStartDelayMs(dists[i], minD, range, trig.retransitionCurveParsed, trig.retransitionRangeParsed))
-    // Retransition Speed Curve (item 5, 2026-09-24) -- frozen once here,
-    // same "frozen at trigger time" philosophy as Animation Speed Curve's
-    // own `pendingFrozenSpeedMs`/`frozenSpeedMs` pair (see that control's
-    // own comment) -- Single Pose only (`!chp.retransitionIsTween`), per
-    // this control's own scoping to the plain "Retransition" group.
-    chp.retransitionSpeedMs = (!chp.retransitionIsTween && cfg[`${p}RetransitionSpeedCurveEnabled`])
-      ? computeStartDelayMs(dists[i], minD, range, trig.retransitionSpeedCurveParsed, trig.retransitionSpeedRangeParsed)
+    // Retransition Speed Curve (item 5, 2026-09-24; extended to Tween mode
+    // 2026-09-30, direct request: "retransition speed curve... should be
+    // avialable to any mode with retransition") -- frozen once here, same
+    // "frozen at trigger time" philosophy as Animation Speed Curve's own
+    // `pendingFrozenSpeedMs`/`frozenSpeedMs` pair. ONE shared
+    // `${p}RetransitionSpeedCurveEnabled` checkbox gates both the Single-
+    // Pose and Tween-mode curve (mirrors Retransition Start Time Curve's
+    // own already-established single-shared-toggle pattern); WHICH curve
+    // data gets evaluated still branches on `chp.retransitionIsTween`.
+    chp.retransitionSpeedMs = cfg[`${p}RetransitionSpeedCurveEnabled`]
+      ? (chp.retransitionIsTween
+          ? computeStartDelayMs(dists[i], minD, range, trig.tweenRetransitionSpeedCurveParsed, trig.tweenRetransitionSpeedRangeParsed)
+          : computeStartDelayMs(dists[i], minD, range, trig.retransitionSpeedCurveParsed, trig.retransitionSpeedRangeParsed))
       : 0
     chp.phase = 'retransition'
     snapshotOffsetRotationAccumForRetransition(hand, chp)
@@ -10110,6 +10143,7 @@ function registerCustomClickFunction(id, title, kind, family) {
       startDistanceCurveParsed: [{ x: 0, y: 1 }, { x: 1, y: 1 }],
       retransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionRangeParsed: { min: 0, max: 300 },
       retransitionSpeedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionSpeedRangeParsed: { min: 50, max: 2000 },
+      tweenRetransitionSpeedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenRetransitionSpeedRangeParsed: { min: 50, max: 2000 },
       tweenRetransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenRetransitionRangeParsed: { min: 0, max: 300 },
       tweenStopStartCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStopStartRangeParsed: { min: 0, max: 300 },
       tweenStopDelayCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStopDelayRangeParsed: { min: 0, max: 2000 }
@@ -11204,31 +11238,53 @@ function updateSingleTimingGateVisibility(p) {
   setGateRow('RetransitionEnabled', true)
   const retransitionOn = cfg[`${p}RetransitionEnabled`] !== false
   const isTweenMode = isSequenceOrChainMode(p)
+  // CORRECTED 2026-09-30 (direct request: "retransition speed curve and
+  // start time curve should be avialable to any mode with retransition").
+  // Pose-kind (cp) functions have only ONE Retransition Start Time /
+  // Speed Curve pair each -- no separate Tween-mode variant the way
+  // hold-kind has -- and their own runtime math (updateClickPoseForHand())
+  // already reads both unconditionally, regardless of Mode (confirmed by
+  // direct read: no isTweenMode-equivalent branch there at all, unlike
+  // updateClickHoldPoseForHand()'s own `chp.retransitionIsTween` checks).
+  // Gating their visibility behind `singleRetransitionOn` (Single-Pose-
+  // only) was hiding a fully-functional, already-working control the
+  // moment a pose-kind function switched to Sequence mode. Hold-kind
+  // keeps its existing mode-split below (a real Tween-mode variant exists
+  // for both); pose-kind now shows its one pair whenever Retransition
+  // itself is on, in ANY mode.
+  const isHoldKindFn = CLICK_HOLD_KEYS.includes(p)
   const singleRetransitionOn = retransitionOn && !isTweenMode
+  const retransitionCurvesOn = (isHoldKindFn ? singleRetransitionOn : retransitionOn)
   setRow('RetransitionSpeedMs', singleRetransitionOn)
-  // Retransition Speed Curve (item 5, 2026-09-24) -- own on/off row visible
-  // whenever Single Pose's own Retransition trio is showing (mirrors
-  // SpeedCurveEnabled's own "always-visible master toggle" pattern above),
-  // its own curve/range pair visible only once also switched on.
-  setRow('RetransitionSpeedCurveEnabled', singleRetransitionOn)
-  const retransitionSpeedCurveOn = singleRetransitionOn && !!cfg[`${p}RetransitionSpeedCurveEnabled`]
-  setRow('RetransitionSpeedCurve', retransitionSpeedCurveOn)
-  setRow('RetransitionSpeedCurveRange', retransitionSpeedCurveOn)
   // Retransition Start Time Curve On/Off (direct spec item, 2026-09-27) --
   // own on/off row visible whenever retransition itself is on, in EITHER
   // mode (mode-independent, mirroring RetransitionEnabled's/
   // StartTimeCurveEnabled's own established "one gate, mode-dependent
   // child fields" pattern) -- its own curve/range pair visible only once
   // also switched on, AND only for whichever mode's own pair is currently
-  // relevant.
+  // relevant (hold-kind) or unconditionally (pose-kind, see above).
   setRow('RetransitionStartTimeCurveEnabled', retransitionOn)
   const retransitionStartCurveEnabled = cfg[`${p}RetransitionStartTimeCurveEnabled`] !== false
-  setRow('RetransitionStartTimeCurve', singleRetransitionOn && retransitionStartCurveEnabled)
-  setRow('RetransitionStartTimeRange', singleRetransitionOn && retransitionStartCurveEnabled)
+  setRow('RetransitionStartTimeCurve', retransitionCurvesOn && retransitionStartCurveEnabled)
+  setRow('RetransitionStartTimeRange', retransitionCurvesOn && retransitionStartCurveEnabled)
   const tweenRetransitionOn = retransitionOn && isTweenMode
   setRow('TweenRetransitionSpeedMs', tweenRetransitionOn)
   setRow('TweenRetransitionStartTimeCurve', tweenRetransitionOn && retransitionStartCurveEnabled)
   setRow('TweenRetransitionStartTimeRange', tweenRetransitionOn && retransitionStartCurveEnabled)
+  // Retransition Speed Curve (item 5, 2026-09-24; made mode-independent
+  // for pose-kind, and given a real Tween-mode variant for hold-kind,
+  // 2026-09-30 -- see this block's own top comment) -- own on/off row now
+  // mode-independent (`retransitionOn`, matching RetransitionStartTimeCurveEnabled's
+  // own already-established "one gate, mode-dependent child fields"
+  // pattern directly above).
+  setRow('RetransitionSpeedCurveEnabled', retransitionOn)
+  const retransitionSpeedCurveEnabled = !!cfg[`${p}RetransitionSpeedCurveEnabled`]
+  const retransitionSpeedCurveOn = retransitionCurvesOn && retransitionSpeedCurveEnabled
+  setRow('RetransitionSpeedCurve', retransitionSpeedCurveOn)
+  setRow('RetransitionSpeedCurveRange', retransitionSpeedCurveOn)
+  const tweenRetransitionSpeedCurveOn = tweenRetransitionOn && retransitionSpeedCurveEnabled
+  setRow('TweenRetransitionSpeedCurve', tweenRetransitionSpeedCurveOn)
+  setRow('TweenRetransitionSpeedCurveRange', tweenRetransitionSpeedCurveOn)
 }
 // Tween Stop's own full visibility (Sequence mode only, hold-based
 // triggers only) -- REWRITTEN 2026-09-24 (items 10/11) now that Tween
@@ -11464,7 +11520,7 @@ function wrapClickFunctionGatedSubgroups(p) {
   // of mode, preserving the 2026-09-22 request.
   wrapGatedSubgroup(`${p}RetransitionEnabled`, [
     `${p}RetransitionSpeedMs`, `${p}RetransitionSpeedCurveEnabled`, `${p}RetransitionSpeedCurve`, `${p}RetransitionSpeedCurveRange`, `${p}RetransitionStartTimeCurveEnabled`, `${p}RetransitionStartTimeCurve`, `${p}RetransitionStartTimeRange`,
-    `${p}TweenRetransitionSpeedMs`, `${p}TweenRetransitionStartTimeCurve`, `${p}TweenRetransitionStartTimeRange`
+    `${p}TweenRetransitionSpeedMs`, `${p}TweenRetransitionSpeedCurve`, `${p}TweenRetransitionSpeedCurveRange`, `${p}TweenRetransitionStartTimeCurve`, `${p}TweenRetransitionStartTimeRange`
   ], 'Retransition')
   // Direct spec item (2026-09-27): "add a Retransition Speed Curve group
   // just like the others where it can get turned on and off... place the
@@ -11480,7 +11536,7 @@ function wrapClickFunctionGatedSubgroups(p) {
   // these 2 new subgroups inside Retransition rather than as top-level
   // siblings of it. Order matters: these must run AFTER the outer
   // Retransition wrap, never before.
-  wrapGatedSubgroup(`${p}RetransitionSpeedCurveEnabled`, [`${p}RetransitionSpeedCurve`, `${p}RetransitionSpeedCurveRange`], 'Retransition Speed Curve')
+  wrapGatedSubgroup(`${p}RetransitionSpeedCurveEnabled`, [`${p}RetransitionSpeedCurve`, `${p}RetransitionSpeedCurveRange`, `${p}TweenRetransitionSpeedCurve`, `${p}TweenRetransitionSpeedCurveRange`], 'Retransition Speed Curve')
   wrapGatedSubgroup(`${p}RetransitionStartTimeCurveEnabled`, [`${p}RetransitionStartTimeCurve`, `${p}RetransitionStartTimeRange`, `${p}TweenRetransitionStartTimeCurve`, `${p}TweenRetransitionStartTimeRange`], 'Retransition Start Time Curve')
   // Hold-kind only -- fire-and-forget triggers have no Tween Stop fields.
   // Must run AFTER the wraps above (harmless either order, since Tween
