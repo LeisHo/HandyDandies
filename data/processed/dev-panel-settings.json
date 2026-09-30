@@ -196,7 +196,7 @@
       "loadingPreviewSequenceLoopTransition": true,
       "loadingPreviewSequenceHoldMs": 0,
       "loadingPreviewSize": 1390,
-      "loadingPreviewRotationX": -79.52141477498436,
+      "loadingPreviewRotationX": -79.52141477498444,
       "loadingPreviewRotationY": -3.4505366585857016,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 1.225225212453898,
@@ -6839,6 +6839,8 @@
       "custom8RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom8RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "custom8TweenRetransitionSpeedMs": 12000,
+      "custom8TweenRetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom8TweenRetransitionSpeedCurveRange": "{\"min\":50,\"max\":2000}",
       "custom8TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom8TweenRetransitionStartTimeRange": "{\"min\":0,\"max\":3000}",
       "custom8TweenStopEnabled": true,
@@ -6934,8 +6936,10 @@
       "custom10RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom10RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "custom10TweenRetransitionSpeedMs": 11390,
+      "custom10TweenRetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom10TweenRetransitionSpeedCurveRange": "{\"min\":2001,\"max\":5000}",
       "custom10TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom10TweenRetransitionStartTimeRange": "{\"min\":0,\"max\":1006}",
+      "custom10TweenRetransitionStartTimeRange": "{\"min\":0,\"max\":3000}",
       "custom10TweenStopEnabled": true,
       "custom10TweenStopStartTimeCurveEnabled": true,
       "custom10TweenStopStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -7073,6 +7077,8 @@
       "custom15RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom15RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "custom15TweenRetransitionSpeedMs": 800,
+      "custom15TweenRetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom15TweenRetransitionSpeedCurveRange": "{\"min\":50,\"max\":2000}",
       "custom15TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom15TweenRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "custom15TweenStopEnabled": true,
@@ -7281,7 +7287,7 @@
       "loadingPreviewSequenceLoopTransition": true,
       "loadingPreviewSequenceHoldMs": 0,
       "loadingPreviewSize": 1390,
-      "loadingPreviewRotationX": -79.52141477498436,
+      "loadingPreviewRotationX": -79.52141477498444,
       "loadingPreviewRotationY": -3.4505366585857016,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 1.225225212453898,
@@ -13924,6 +13930,8 @@
       "custom8RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom8RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "custom8TweenRetransitionSpeedMs": 12000,
+      "custom8TweenRetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom8TweenRetransitionSpeedCurveRange": "{\"min\":50,\"max\":2000}",
       "custom8TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom8TweenRetransitionStartTimeRange": "{\"min\":0,\"max\":3000}",
       "custom8TweenStopEnabled": true,
@@ -14019,8 +14027,10 @@
       "custom10RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom10RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "custom10TweenRetransitionSpeedMs": 11390,
+      "custom10TweenRetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom10TweenRetransitionSpeedCurveRange": "{\"min\":2001,\"max\":5000}",
       "custom10TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom10TweenRetransitionStartTimeRange": "{\"min\":0,\"max\":1006}",
+      "custom10TweenRetransitionStartTimeRange": "{\"min\":0,\"max\":3000}",
       "custom10TweenStopEnabled": true,
       "custom10TweenStopStartTimeCurveEnabled": true,
       "custom10TweenStopStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -14158,6 +14168,8 @@
       "custom15RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom15RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "custom15TweenRetransitionSpeedMs": 800,
+      "custom15TweenRetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom15TweenRetransitionSpeedCurveRange": "{\"min\":50,\"max\":2000}",
       "custom15TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom15TweenRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "custom15TweenStopEnabled": true,
@@ -14366,7 +14378,7 @@
       "loadingPreviewSequenceLoopTransition": true,
       "loadingPreviewSequenceHoldMs": 0,
       "loadingPreviewSize": 1390,
-      "loadingPreviewRotationX": -79.52141477498436,
+      "loadingPreviewRotationX": -79.52141477498444,
       "loadingPreviewRotationY": -3.4505366585857016,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 1.225225212453898,
@@ -21009,6 +21021,8 @@
       "custom8RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom8RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "custom8TweenRetransitionSpeedMs": 12000,
+      "custom8TweenRetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom8TweenRetransitionSpeedCurveRange": "{\"min\":50,\"max\":2000}",
       "custom8TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom8TweenRetransitionStartTimeRange": "{\"min\":0,\"max\":3000}",
       "custom8TweenStopEnabled": true,
@@ -21104,8 +21118,10 @@
       "custom10RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom10RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "custom10TweenRetransitionSpeedMs": 11390,
+      "custom10TweenRetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom10TweenRetransitionSpeedCurveRange": "{\"min\":2001,\"max\":5000}",
       "custom10TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom10TweenRetransitionStartTimeRange": "{\"min\":0,\"max\":1006}",
+      "custom10TweenRetransitionStartTimeRange": "{\"min\":0,\"max\":3000}",
       "custom10TweenStopEnabled": true,
       "custom10TweenStopStartTimeCurveEnabled": true,
       "custom10TweenStopStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -21243,6 +21259,8 @@
       "custom15RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom15RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "custom15TweenRetransitionSpeedMs": 800,
+      "custom15TweenRetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom15TweenRetransitionSpeedCurveRange": "{\"min\":50,\"max\":2000}",
       "custom15TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom15TweenRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "custom15TweenStopEnabled": true,
@@ -25864,11 +25882,21 @@
                           {
                             "type": "row",
                             "key": "custom15RetransitionSpeedCurveRange"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom15TweenRetransitionSpeedCurve"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom15TweenRetransitionSpeedCurveRange"
                           }
                         ],
                         "settings": [
                           "custom15RetransitionSpeedCurve",
-                          "custom15RetransitionSpeedCurveRange"
+                          "custom15RetransitionSpeedCurveRange",
+                          "custom15TweenRetransitionSpeedCurve",
+                          "custom15TweenRetransitionSpeedCurveRange"
                         ],
                         "subgroups": []
                       }
@@ -25928,11 +25956,21 @@
                         {
                           "type": "row",
                           "key": "custom15RetransitionSpeedCurveRange"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom15TweenRetransitionSpeedCurve"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom15TweenRetransitionSpeedCurveRange"
                         }
                       ],
                       "settings": [
                         "custom15RetransitionSpeedCurve",
-                        "custom15RetransitionSpeedCurveRange"
+                        "custom15RetransitionSpeedCurveRange",
+                        "custom15TweenRetransitionSpeedCurve",
+                        "custom15TweenRetransitionSpeedCurveRange"
                       ],
                       "subgroups": []
                     },
@@ -26247,11 +26285,21 @@
                         {
                           "type": "row",
                           "key": "custom15RetransitionSpeedCurveRange"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom15TweenRetransitionSpeedCurve"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom15TweenRetransitionSpeedCurveRange"
                         }
                       ],
                       "settings": [
                         "custom15RetransitionSpeedCurve",
-                        "custom15RetransitionSpeedCurveRange"
+                        "custom15RetransitionSpeedCurveRange",
+                        "custom15TweenRetransitionSpeedCurve",
+                        "custom15TweenRetransitionSpeedCurveRange"
                       ],
                       "subgroups": []
                     }
@@ -26311,11 +26359,21 @@
                       {
                         "type": "row",
                         "key": "custom15RetransitionSpeedCurveRange"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom15TweenRetransitionSpeedCurve"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom15TweenRetransitionSpeedCurveRange"
                       }
                     ],
                     "settings": [
                       "custom15RetransitionSpeedCurve",
-                      "custom15RetransitionSpeedCurveRange"
+                      "custom15RetransitionSpeedCurveRange",
+                      "custom15TweenRetransitionSpeedCurve",
+                      "custom15TweenRetransitionSpeedCurveRange"
                     ],
                     "subgroups": []
                   },
@@ -27879,7 +27937,7 @@
                       "type": "group",
                       "group": {
                         "key": "Retransition Speed Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -27889,11 +27947,21 @@
                           {
                             "type": "row",
                             "key": "custom10RetransitionSpeedCurveRange"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom10TweenRetransitionSpeedCurve"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom10TweenRetransitionSpeedCurveRange"
                           }
                         ],
                         "settings": [
                           "custom10RetransitionSpeedCurve",
-                          "custom10RetransitionSpeedCurveRange"
+                          "custom10RetransitionSpeedCurveRange",
+                          "custom10TweenRetransitionSpeedCurve",
+                          "custom10TweenRetransitionSpeedCurveRange"
                         ],
                         "subgroups": []
                       }
@@ -27943,7 +28011,7 @@
                   "subgroups": [
                     {
                       "key": "Retransition Speed Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -27953,11 +28021,21 @@
                         {
                           "type": "row",
                           "key": "custom10RetransitionSpeedCurveRange"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom10TweenRetransitionSpeedCurve"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom10TweenRetransitionSpeedCurveRange"
                         }
                       ],
                       "settings": [
                         "custom10RetransitionSpeedCurve",
-                        "custom10RetransitionSpeedCurveRange"
+                        "custom10RetransitionSpeedCurveRange",
+                        "custom10TweenRetransitionSpeedCurve",
+                        "custom10TweenRetransitionSpeedCurveRange"
                       ],
                       "subgroups": []
                     },
@@ -28262,7 +28340,7 @@
                     "type": "group",
                     "group": {
                       "key": "Retransition Speed Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -28272,11 +28350,21 @@
                         {
                           "type": "row",
                           "key": "custom10RetransitionSpeedCurveRange"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom10TweenRetransitionSpeedCurve"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom10TweenRetransitionSpeedCurveRange"
                         }
                       ],
                       "settings": [
                         "custom10RetransitionSpeedCurve",
-                        "custom10RetransitionSpeedCurveRange"
+                        "custom10RetransitionSpeedCurveRange",
+                        "custom10TweenRetransitionSpeedCurve",
+                        "custom10TweenRetransitionSpeedCurveRange"
                       ],
                       "subgroups": []
                     }
@@ -28326,7 +28414,7 @@
                 "subgroups": [
                   {
                     "key": "Retransition Speed Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -28336,11 +28424,21 @@
                       {
                         "type": "row",
                         "key": "custom10RetransitionSpeedCurveRange"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom10TweenRetransitionSpeedCurve"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom10TweenRetransitionSpeedCurveRange"
                       }
                     ],
                     "settings": [
                       "custom10RetransitionSpeedCurve",
-                      "custom10RetransitionSpeedCurveRange"
+                      "custom10RetransitionSpeedCurveRange",
+                      "custom10TweenRetransitionSpeedCurve",
+                      "custom10TweenRetransitionSpeedCurveRange"
                     ],
                     "subgroups": []
                   },
@@ -29312,11 +29410,21 @@
                           {
                             "type": "row",
                             "key": "custom8RetransitionSpeedCurveRange"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom8TweenRetransitionSpeedCurve"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom8TweenRetransitionSpeedCurveRange"
                           }
                         ],
                         "settings": [
                           "custom8RetransitionSpeedCurve",
-                          "custom8RetransitionSpeedCurveRange"
+                          "custom8RetransitionSpeedCurveRange",
+                          "custom8TweenRetransitionSpeedCurve",
+                          "custom8TweenRetransitionSpeedCurveRange"
                         ],
                         "subgroups": []
                       }
@@ -29376,11 +29484,21 @@
                         {
                           "type": "row",
                           "key": "custom8RetransitionSpeedCurveRange"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom8TweenRetransitionSpeedCurve"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom8TweenRetransitionSpeedCurveRange"
                         }
                       ],
                       "settings": [
                         "custom8RetransitionSpeedCurve",
-                        "custom8RetransitionSpeedCurveRange"
+                        "custom8RetransitionSpeedCurveRange",
+                        "custom8TweenRetransitionSpeedCurve",
+                        "custom8TweenRetransitionSpeedCurveRange"
                       ],
                       "subgroups": []
                     },
@@ -29695,11 +29813,21 @@
                         {
                           "type": "row",
                           "key": "custom8RetransitionSpeedCurveRange"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom8TweenRetransitionSpeedCurve"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom8TweenRetransitionSpeedCurveRange"
                         }
                       ],
                       "settings": [
                         "custom8RetransitionSpeedCurve",
-                        "custom8RetransitionSpeedCurveRange"
+                        "custom8RetransitionSpeedCurveRange",
+                        "custom8TweenRetransitionSpeedCurve",
+                        "custom8TweenRetransitionSpeedCurveRange"
                       ],
                       "subgroups": []
                     }
@@ -29759,11 +29887,21 @@
                       {
                         "type": "row",
                         "key": "custom8RetransitionSpeedCurveRange"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom8TweenRetransitionSpeedCurve"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom8TweenRetransitionSpeedCurveRange"
                       }
                     ],
                     "settings": [
                       "custom8RetransitionSpeedCurve",
-                      "custom8RetransitionSpeedCurveRange"
+                      "custom8RetransitionSpeedCurveRange",
+                      "custom8TweenRetransitionSpeedCurve",
+                      "custom8TweenRetransitionSpeedCurveRange"
                     ],
                     "subgroups": []
                   },
@@ -32799,11 +32937,21 @@
                         {
                           "type": "row",
                           "key": "custom15RetransitionSpeedCurveRange"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom15TweenRetransitionSpeedCurve"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom15TweenRetransitionSpeedCurveRange"
                         }
                       ],
                       "settings": [
                         "custom15RetransitionSpeedCurve",
-                        "custom15RetransitionSpeedCurveRange"
+                        "custom15RetransitionSpeedCurveRange",
+                        "custom15TweenRetransitionSpeedCurve",
+                        "custom15TweenRetransitionSpeedCurveRange"
                       ],
                       "subgroups": []
                     }
@@ -32863,11 +33011,21 @@
                       {
                         "type": "row",
                         "key": "custom15RetransitionSpeedCurveRange"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom15TweenRetransitionSpeedCurve"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom15TweenRetransitionSpeedCurveRange"
                       }
                     ],
                     "settings": [
                       "custom15RetransitionSpeedCurve",
-                      "custom15RetransitionSpeedCurveRange"
+                      "custom15RetransitionSpeedCurveRange",
+                      "custom15TweenRetransitionSpeedCurve",
+                      "custom15TweenRetransitionSpeedCurveRange"
                     ],
                     "subgroups": []
                   },
@@ -33182,11 +33340,21 @@
                       {
                         "type": "row",
                         "key": "custom15RetransitionSpeedCurveRange"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom15TweenRetransitionSpeedCurve"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom15TweenRetransitionSpeedCurveRange"
                       }
                     ],
                     "settings": [
                       "custom15RetransitionSpeedCurve",
-                      "custom15RetransitionSpeedCurveRange"
+                      "custom15RetransitionSpeedCurveRange",
+                      "custom15TweenRetransitionSpeedCurve",
+                      "custom15TweenRetransitionSpeedCurveRange"
                     ],
                     "subgroups": []
                   }
@@ -33246,11 +33414,21 @@
                     {
                       "type": "row",
                       "key": "custom15RetransitionSpeedCurveRange"
+                    },
+                    {
+                      "type": "row",
+                      "key": "custom15TweenRetransitionSpeedCurve"
+                    },
+                    {
+                      "type": "row",
+                      "key": "custom15TweenRetransitionSpeedCurveRange"
                     }
                   ],
                   "settings": [
                     "custom15RetransitionSpeedCurve",
-                    "custom15RetransitionSpeedCurveRange"
+                    "custom15RetransitionSpeedCurveRange",
+                    "custom15TweenRetransitionSpeedCurve",
+                    "custom15TweenRetransitionSpeedCurveRange"
                   ],
                   "subgroups": []
                 },
@@ -34805,7 +34983,7 @@
                     "type": "group",
                     "group": {
                       "key": "Retransition Speed Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -34815,11 +34993,21 @@
                         {
                           "type": "row",
                           "key": "custom10RetransitionSpeedCurveRange"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom10TweenRetransitionSpeedCurve"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom10TweenRetransitionSpeedCurveRange"
                         }
                       ],
                       "settings": [
                         "custom10RetransitionSpeedCurve",
-                        "custom10RetransitionSpeedCurveRange"
+                        "custom10RetransitionSpeedCurveRange",
+                        "custom10TweenRetransitionSpeedCurve",
+                        "custom10TweenRetransitionSpeedCurveRange"
                       ],
                       "subgroups": []
                     }
@@ -34869,7 +35057,7 @@
                 "subgroups": [
                   {
                     "key": "Retransition Speed Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -34879,11 +35067,21 @@
                       {
                         "type": "row",
                         "key": "custom10RetransitionSpeedCurveRange"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom10TweenRetransitionSpeedCurve"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom10TweenRetransitionSpeedCurveRange"
                       }
                     ],
                     "settings": [
                       "custom10RetransitionSpeedCurve",
-                      "custom10RetransitionSpeedCurveRange"
+                      "custom10RetransitionSpeedCurveRange",
+                      "custom10TweenRetransitionSpeedCurve",
+                      "custom10TweenRetransitionSpeedCurveRange"
                     ],
                     "subgroups": []
                   },
@@ -35188,7 +35386,7 @@
                   "type": "group",
                   "group": {
                     "key": "Retransition Speed Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -35198,11 +35396,21 @@
                       {
                         "type": "row",
                         "key": "custom10RetransitionSpeedCurveRange"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom10TweenRetransitionSpeedCurve"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom10TweenRetransitionSpeedCurveRange"
                       }
                     ],
                     "settings": [
                       "custom10RetransitionSpeedCurve",
-                      "custom10RetransitionSpeedCurveRange"
+                      "custom10RetransitionSpeedCurveRange",
+                      "custom10TweenRetransitionSpeedCurve",
+                      "custom10TweenRetransitionSpeedCurveRange"
                     ],
                     "subgroups": []
                   }
@@ -35252,7 +35460,7 @@
               "subgroups": [
                 {
                   "key": "Retransition Speed Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -35262,11 +35470,21 @@
                     {
                       "type": "row",
                       "key": "custom10RetransitionSpeedCurveRange"
+                    },
+                    {
+                      "type": "row",
+                      "key": "custom10TweenRetransitionSpeedCurve"
+                    },
+                    {
+                      "type": "row",
+                      "key": "custom10TweenRetransitionSpeedCurveRange"
                     }
                   ],
                   "settings": [
                     "custom10RetransitionSpeedCurve",
-                    "custom10RetransitionSpeedCurveRange"
+                    "custom10RetransitionSpeedCurveRange",
+                    "custom10TweenRetransitionSpeedCurve",
+                    "custom10TweenRetransitionSpeedCurveRange"
                   ],
                   "subgroups": []
                 },
@@ -36232,11 +36450,21 @@
                         {
                           "type": "row",
                           "key": "custom8RetransitionSpeedCurveRange"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom8TweenRetransitionSpeedCurve"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom8TweenRetransitionSpeedCurveRange"
                         }
                       ],
                       "settings": [
                         "custom8RetransitionSpeedCurve",
-                        "custom8RetransitionSpeedCurveRange"
+                        "custom8RetransitionSpeedCurveRange",
+                        "custom8TweenRetransitionSpeedCurve",
+                        "custom8TweenRetransitionSpeedCurveRange"
                       ],
                       "subgroups": []
                     }
@@ -36296,11 +36524,21 @@
                       {
                         "type": "row",
                         "key": "custom8RetransitionSpeedCurveRange"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom8TweenRetransitionSpeedCurve"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom8TweenRetransitionSpeedCurveRange"
                       }
                     ],
                     "settings": [
                       "custom8RetransitionSpeedCurve",
-                      "custom8RetransitionSpeedCurveRange"
+                      "custom8RetransitionSpeedCurveRange",
+                      "custom8TweenRetransitionSpeedCurve",
+                      "custom8TweenRetransitionSpeedCurveRange"
                     ],
                     "subgroups": []
                   },
@@ -36615,11 +36853,21 @@
                       {
                         "type": "row",
                         "key": "custom8RetransitionSpeedCurveRange"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom8TweenRetransitionSpeedCurve"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom8TweenRetransitionSpeedCurveRange"
                       }
                     ],
                     "settings": [
                       "custom8RetransitionSpeedCurve",
-                      "custom8RetransitionSpeedCurveRange"
+                      "custom8RetransitionSpeedCurveRange",
+                      "custom8TweenRetransitionSpeedCurve",
+                      "custom8TweenRetransitionSpeedCurveRange"
                     ],
                     "subgroups": []
                   }
@@ -36679,11 +36927,21 @@
                     {
                       "type": "row",
                       "key": "custom8RetransitionSpeedCurveRange"
+                    },
+                    {
+                      "type": "row",
+                      "key": "custom8TweenRetransitionSpeedCurve"
+                    },
+                    {
+                      "type": "row",
+                      "key": "custom8TweenRetransitionSpeedCurveRange"
                     }
                   ],
                   "settings": [
                     "custom8RetransitionSpeedCurve",
-                    "custom8RetransitionSpeedCurveRange"
+                    "custom8RetransitionSpeedCurveRange",
+                    "custom8TweenRetransitionSpeedCurve",
+                    "custom8TweenRetransitionSpeedCurveRange"
                   ],
                   "subgroups": []
                 },
