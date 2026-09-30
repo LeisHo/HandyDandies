@@ -6672,9 +6672,9 @@
       "cursorLogIntervalMs": 1000,
       "handNumbersEnabled": false,
       "handNumbersColor": "#00ff04",
-      "logHandBehaviourEnabled": false,
+      "logHandBehaviourEnabled": true,
       "logHandBehaviourDetailedEnabled": false,
-      "logFrameRateDropsEnabled": false,
+      "logFrameRateDropsEnabled": true,
       "frameRateDropThresholdFps": 10,
       "dp_titleFontSize": 17,
       "dp_tabFontSize": 12,
@@ -6864,9 +6864,9 @@
       "custom9RotationZ": 0,
       "custom9TargetPose": "",
       "custom9TweenSelector": "Neutral - Horizontal Fanning",
-      "custom9TweenSpeedMs": 4030,
+      "custom9TweenSpeedMs": 8000,
       "custom9TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom9TweenStartTimeRange": "{\"min\":0,\"max\":939}",
+      "custom9TweenStartTimeRange": "{\"min\":0,\"max\":3000}",
       "custom9SequencePlayMode": "Count",
       "custom9SequenceCount": 1,
       "custom9SequenceCountMode": "Loop",
@@ -6876,7 +6876,7 @@
       "custom9SpeedCurveEnabled": false,
       "custom9SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9SpeedCurveRange": "{\"min\":50,\"max\":2000}",
-      "custom9StartTimeCurveEnabled": false,
+      "custom9StartTimeCurveEnabled": true,
       "custom9StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9StartTimeRange": "{\"min\":0,\"max\":300}",
       "custom9StartDistanceCurveEnabled": false,
@@ -13757,9 +13757,9 @@
       "cursorLogIntervalMs": 1000,
       "handNumbersEnabled": false,
       "handNumbersColor": "#00ff04",
-      "logHandBehaviourEnabled": false,
+      "logHandBehaviourEnabled": true,
       "logHandBehaviourDetailedEnabled": false,
-      "logFrameRateDropsEnabled": false,
+      "logFrameRateDropsEnabled": true,
       "frameRateDropThresholdFps": 10,
       "dp_titleFontSize": 11,
       "dp_tabFontSize": 12,
@@ -13949,9 +13949,9 @@
       "custom9RotationZ": 0,
       "custom9TargetPose": "",
       "custom9TweenSelector": "Neutral - Horizontal Fanning",
-      "custom9TweenSpeedMs": 4030,
+      "custom9TweenSpeedMs": 8000,
       "custom9TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom9TweenStartTimeRange": "{\"min\":0,\"max\":939}",
+      "custom9TweenStartTimeRange": "{\"min\":0,\"max\":3000}",
       "custom9SequencePlayMode": "Count",
       "custom9SequenceCount": 1,
       "custom9SequenceCountMode": "Loop",
@@ -13961,7 +13961,7 @@
       "custom9SpeedCurveEnabled": false,
       "custom9SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9SpeedCurveRange": "{\"min\":50,\"max\":2000}",
-      "custom9StartTimeCurveEnabled": false,
+      "custom9StartTimeCurveEnabled": true,
       "custom9StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9StartTimeRange": "{\"min\":0,\"max\":300}",
       "custom9StartDistanceCurveEnabled": false,
@@ -20842,9 +20842,9 @@
       "cursorLogIntervalMs": 1000,
       "handNumbersEnabled": false,
       "handNumbersColor": "#00ff04",
-      "logHandBehaviourEnabled": false,
+      "logHandBehaviourEnabled": true,
       "logHandBehaviourDetailedEnabled": false,
-      "logFrameRateDropsEnabled": false,
+      "logFrameRateDropsEnabled": true,
       "frameRateDropThresholdFps": 10,
       "dp_titleFontSize": 22,
       "dp_tabFontSize": 12,
@@ -21034,9 +21034,9 @@
       "custom9RotationZ": 0,
       "custom9TargetPose": "",
       "custom9TweenSelector": "Neutral - Horizontal Fanning",
-      "custom9TweenSpeedMs": 4030,
+      "custom9TweenSpeedMs": 8000,
       "custom9TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom9TweenStartTimeRange": "{\"min\":0,\"max\":939}",
+      "custom9TweenStartTimeRange": "{\"min\":0,\"max\":3000}",
       "custom9SequencePlayMode": "Count",
       "custom9SequenceCount": 1,
       "custom9SequenceCountMode": "Loop",
@@ -21046,7 +21046,7 @@
       "custom9SpeedCurveEnabled": false,
       "custom9SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9SpeedCurveRange": "{\"min\":50,\"max\":2000}",
-      "custom9StartTimeCurveEnabled": false,
+      "custom9StartTimeCurveEnabled": true,
       "custom9StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9StartTimeRange": "{\"min\":0,\"max\":300}",
       "custom9StartDistanceCurveEnabled": false,
@@ -28499,7 +28499,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 9",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -29101,7 +29101,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 8",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -29291,7 +29291,7 @@
                 "type": "group",
                 "group": {
                   "key": "Retransition",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -29674,7 +29674,7 @@
               },
               {
                 "key": "Retransition",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -35422,7 +35422,7 @@
         },
         {
           "key": "Custom Click Function 9",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
@@ -36021,7 +36021,7 @@
         },
         {
           "key": "Custom Click Function 8",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -36211,7 +36211,7 @@
               "type": "group",
               "group": {
                 "key": "Retransition",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -36594,7 +36594,7 @@
             },
             {
               "key": "Retransition",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
