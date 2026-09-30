@@ -18,6 +18,22 @@ work seamlessly from there.
 
 ## Currently working on
 
+**LIKELY ROOT CAUSE FOUND 2026-09-29 (31st round) -- the freeze
+investigation's real breakthrough, using the user's own real Hand
+Behaviour Log data.** A single click firing Multi Trigger's "Trigger 1"
+on 100+ hands at once produced ~200 synchronous Hand Behaviour Log
+appends in one tick -- each one doing a full array-join +
+`.textContent` write + `.scrollTop` read (forces a synchronous browser
+layout). ~200 forced reflows in one burst, matching a measured
+1483.7ms frame almost exactly. Fixed by coalescing all 3 log widgets
+(Mouse Tracking/Hand Behaviour/Frame Rate -- confirmed all 3 had the
+identical anti-pattern) into a single `requestAnimationFrame`-batched
+DOM flush via a new shared `scheduleLogDomFlush()`. This is a much
+stronger, more directly-evidenced explanation than the earlier per-
+frame-allocation fixes (which were real improvements but never fully
+explained multi-second stalls). Not yet confirmed against a fresh
+round of real user data. See CHANGELOG.txt's 31st-round entry.
+
 **IN PROGRESS 2026-09-29 (30th round) -- freeze investigation
 continued with real post-fix data.** Confirmed real improvement (Frame
 Rate Log drops now 71-330ms, down from 1000-4600ms before the 29th

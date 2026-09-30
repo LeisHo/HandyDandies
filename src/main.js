@@ -236,6 +236,41 @@ let __lastFrameTimestamp = null
 let __frameRateBelowThreshold = false
 let __frameRateDropStartedAt = 0
 let __wasPausedLastFrame = true
+// PERFORMANCE (2026-09-30) -- found from real production data: a single
+// click firing Multi Trigger's "Trigger 1" on ~100+ hands at once
+// produced ~200 SYNCHRONOUS Hand Behaviour Log appends in one tick, each
+// one separately writing `.textContent` (a full array join, up to 200
+// entries) AND reading `.scrollTop` (forces a synchronous browser
+// layout) -- ~200 forced reflows blocking the main thread in one burst.
+// The real Frame Rate Log data from that same session measured a
+// 1483.7ms frame lining up almost exactly with this exact cascade
+// (Click at 6:25:36 -> the DROP at 6:25:38, "1586ms before drop").
+// Shared fix for all 3 log widgets (Mouse Tracking/Hand Behaviour/Frame
+// Rate all had the identical anti-pattern, confirmed by direct read):
+// any number of append calls within the same tick (or several ticks in
+// a tight synchronous loop) now collapse into ONE real DOM write,
+// coalesced via requestAnimationFrame -- recording a log entry (the
+// array push) stays cheap and synchronous; only RENDERING it to the DOM
+// is now batched. This genuinely is the same underlying mechanism used
+// 3 times, not 3 separate UI widgets, so it's factored out once rather
+// than tripling the exact same bug-prone pattern (see this file's own
+// convention elsewhere of NOT abstracting merely-similar UI, which this
+// isn't -- this is identical low-level logic, not widget duplication).
+function scheduleLogDomFlush(flag, getEl, entries) {
+  if (flag.scheduled) return
+  flag.scheduled = true
+  requestAnimationFrame(() => {
+    flag.scheduled = false
+    const el = getEl()
+    if (el) {
+      el.textContent = entries.join('\n')
+      el.scrollTop = el.scrollHeight
+    }
+  })
+}
+const _mouseLogFlushFlag = { scheduled: false }
+const _handBehaviourLogFlushFlag = { scheduled: false }
+const _frameRateLogFlushFlag = { scheduled: false }
 // Hand Behaviour Log's own state (2026-09-28, direct request) -- same
 // shape as Mouse Tracking Log's own state directly above, kept
 // completely separate since the 2 logs serve different purposes and are
@@ -2244,10 +2279,7 @@ function logMouseTrackingEvent(text) {
   const line = `[${new Date().toLocaleTimeString()}] ${text}`
   mouseTrackingLogEntries.push(line)
   if (mouseTrackingLogEntries.length > MOUSE_LOG_MAX_ENTRIES) mouseTrackingLogEntries.shift()
-  if (mouseTrackingLogEl) {
-    mouseTrackingLogEl.textContent = mouseTrackingLogEntries.join('\n')
-    mouseTrackingLogEl.scrollTop = mouseTrackingLogEl.scrollHeight
-  }
+  scheduleLogDomFlush(_mouseLogFlushFlag, () => mouseTrackingLogEl, mouseTrackingLogEntries)
 }
 function clearMouseTrackingLog() {
   mouseTrackingLogEntries.length = 0
@@ -2391,10 +2423,7 @@ function handLogTriggerLabel(p) {
 function appendHandBehaviourLogLine(line) {
   handBehaviourLogEntries.push(line)
   if (handBehaviourLogEntries.length > HAND_BEHAVIOUR_LOG_MAX_ENTRIES) handBehaviourLogEntries.shift()
-  if (handBehaviourLogEl) {
-    handBehaviourLogEl.textContent = handBehaviourLogEntries.join('\n')
-    handBehaviourLogEl.scrollTop = handBehaviourLogEl.scrollHeight
-  }
+  scheduleLogDomFlush(_handBehaviourLogFlushFlag, () => handBehaviourLogEl, handBehaviourLogEntries)
 }
 function logHandBehaviourEvent(handIndex, source, text) {
   if (!cfg.logHandBehaviourEnabled) return
@@ -2518,10 +2547,7 @@ function buildHandBehaviourLogWidget() {
 function appendFrameRateLogLine(line) {
   frameRateLogEntries.push(line)
   if (frameRateLogEntries.length > FRAME_RATE_LOG_MAX_ENTRIES) frameRateLogEntries.shift()
-  if (frameRateLogEl) {
-    frameRateLogEl.textContent = frameRateLogEntries.join('\n')
-    frameRateLogEl.scrollTop = frameRateLogEl.scrollHeight
-  }
+  scheduleLogDomFlush(_frameRateLogFlushFlag, () => frameRateLogEl, frameRateLogEntries)
 }
 function clearFrameRateLog() {
   frameRateLogEntries.length = 0

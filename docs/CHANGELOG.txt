@@ -14183,6 +14183,62 @@ direct read before shipping, not live.
 
 `main.js` cache-buster bumped `?v=250` -> `?v=251`.
 
+2026-09-29  -  (31st round -- freeze investigation, likely ROOT CAUSE
+FOUND, using the user's own real Hand Behaviour Log + Frame Rate Log +
+Mouse Tracking Log data from testing the 30th round's fixes)
+
+**The decisive clue**: the Hand Behaviour Log showed a single click
+(6:25:36 AM) firing Multi Trigger's "Trigger 1" on over 100 hands at
+once -- ~200 log lines ("interrupted CLICK" + "triggered -> pose
+'Fist'" per hand) all within the same 2-second window. The Frame Rate
+Log's worst-in-this-batch DROP (0.7 fps, frame took 1483.7ms) was
+attributed to "Click at (418, 243) -> Canvas (1586ms before drop)" --
+the SAME click. An earlier DROP in the same data (0.3 fps, 3686.2ms --
+the single worst frame across both rounds of real data so far) traced
+to a Double-Click, plausibly triggering a similar mass-hand cascade.
+
+**Root cause**: `appendHandBehaviourLogLine()`/`logMouseTrackingEvent()`/
+`appendFrameRateLogLine()` (confirmed via direct read -- all 3 have the
+IDENTICAL pattern) each did a full array-join + `.textContent` write +
+`.scrollTop` read on EVERY SINGLE CALL. `.scrollTop` forces a
+synchronous browser layout recalculation. When one user action (a
+click firing a Multi Trigger cycle on ~100+ hands, each producing 2 log
+lines) causes ~200 of these calls SYNCHRONOUSLY in one tick, that's
+~200 forced reflows blocking the main thread in a single burst --
+directly matching the measured 1483.7ms/3686.2ms frame times, far
+better than the earlier per-frame-allocation hypothesis (which was real
+and worth fixing, but never explained multi-second stalls on its own).
+
+**Fixed** by decoupling "recording a log entry" (the array push, stays
+cheap and synchronous) from "rendering it to the DOM" (now coalesced):
+a new shared `scheduleLogDomFlush()` collapses any number of append
+calls within the same tick (or several ticks in a tight synchronous
+loop) into ONE real DOM write, via `requestAnimationFrame`. Applied to
+all 3 log widgets uniformly, via 3 small flag objects
+(`_mouseLogFlushFlag`/`_handBehaviourLogFlushFlag`/`_frameRateLogFlushFlag`)
+-- this is genuinely the same underlying mechanism, not 3 separate UI
+widgets, so factoring it out once (rather than tripling the same
+bug-prone pattern) was the right call even given this file's own usual
+preference against abstracting merely-similar UI. This automatically
+also covers `logHandBehaviourDetailedTick()`'s own per-hand loop (the
+24th round's "Log Hand Behaviour - Detailed" feature), which funnels
+through the same `appendHandBehaviourLogLine()`.
+
+Declared the new helper and its 3 flag objects in the file's own
+established early-state block (learned the hard way 2 rounds ago) --
+though since `scheduleLogDomFlush`/the flags are only ever referenced
+from functions CALLED later (never at top-level synchronous execution
+themselves), this placement wasn't strictly required for correctness
+this time, just for consistency with the established convention.
+
+Verified: `node --check src/main.js` passes; confirmed via grep that no
+other direct `entries.join('\n')` DOM write remains outside the new
+flush helper itself (the Copy/Save buttons' own one-shot
+`.join('\n')` calls, for clipboard/file export, are unaffected and
+correctly untouched -- those aren't a burst-DOM-write concern).
+
+`main.js` cache-buster bumped `?v=251` -> `?v=252`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a
