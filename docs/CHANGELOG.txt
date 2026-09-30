@@ -14304,6 +14304,65 @@ and confirming next.
 
 `main.js` cache-buster bumped `?v=252` -> `?v=253`.
 
+2026-09-30  -  (33rd round -- Clear All Logs button + hold-commit floor
+fix, direct requests: "and also provide a clear all logs button" /
+"for all click functions, even if i set start time to 0 ms, make sure
+that that is after any hold or click confirm duration setting. so that
+if im doing a triple click, the single click wont trigger")
+
+**Clear All Logs**: added `clearAllLogsBtn` next to `copyAllLogsBtn`,
+calling the 3 logs' own existing `clear*()` functions -- no new
+clearing logic needed.
+
+**Hold-commit floor fix**: read through the full click/hold dispatch
+chain before touching anything (fire-and-forget click-count family via
+`clickPoseClickTimer`; the multi-click-HOLD chain family via
+`clickHoldChainCount`'s own pointerdown listener; `chp`'s own
+"always-fires-on-every-press" listener; `updateClickHoldPoseForHand()`'s
+commit gate and Start Time Curve application). Found that MOST of the
+dispatch chain already does what was asked, by construction:
+- Fire-and-forget clicks (`cp.pendingClaimAt = now + delay` at the
+  pose-kind commit site) only ever run from INSIDE the
+  `multiClickWindowMs`-debounced `setTimeout` callback -- so `now`
+  there is already measured AFTER that window closes, meaning Start
+  Time was already "after" the multi-click window even at 0ms.
+- Hold-kind's own Start Time (`chp.pendingClaimAt = now + delay`) is
+  computed inside the SAME block already gated by
+  `now - trig.holdStartTime >= holdConfirmMs` -- so it was already
+  "after" Hold Confirm Delay too, even at 0ms.
+
+**The one real, narrow gap**: that commit gate only checked
+`holdConfirmMs`, never `multiClickWindowMs`. Confirmed live in this
+project's own real saved settings (`holdConfirmMs: 520`,
+`multiClickWindowMs: 200`) that a single held press, spaced further
+apart than 520ms from the next click of an intended multi-click
+gesture, could legitimately cross `holdConfirmMs` and briefly commit/
+become visible before the 2nd/3rd click arrived to interrupt it --
+exactly the reported "single click briefly triggers during a triple
+click" symptom. Fixed by widening the ONE shared gate in
+`updateClickHoldPoseForHand()` (used by every hold-kind trigger --
+chp/rchp/dcHold/tripleClickHold/quadClickHold and every custom
+Click+Hold function, since they all funnel through this one function)
+to `Math.max(cfg.holdConfirmMs ?? 0, cfg.multiClickWindowMs ?? 0)`.
+The multi-click-HOLD chain family (dcHold/etc.) needed no change --
+it never goes through this gate at all, since it only fires once
+ALREADY confirmed to be a chain continuation via a completely separate
+mechanism (proximity to the last clean release), so it has no
+equivalent race.
+
+**Deliberately NOT a broader redesign**: this widens an existing
+numeric floor on one already-correct gate; it does not add any new
+cross-awareness between chp's own listener and the click-count chain
+state, which would have been a materially larger, riskier change to
+core input dispatch. If the reported symptom persists after this
+(e.g., a still-faster double-tap than either confirm window), that
+would point to a genuinely different mechanism and should be
+re-investigated fresh, not assumed to be the same gap.
+
+Verified: `node --check src/main.js` passes.
+
+`main.js` cache-buster bumped `?v=253` -> `?v=254`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

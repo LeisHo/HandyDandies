@@ -18,6 +18,21 @@ work seamlessly from there.
 
 ## Currently working on
 
+**RESOLVED 2026-09-30 (33rd round) -- Clear All Logs button added;
+hold-commit timing fix for the "single click briefly triggers during a
+triple click" report.** Read the full click/hold dispatch chain before
+changing anything: fire-and-forget clicks and hold-kind's own Start
+Time were both already correctly deferred until after their relevant
+confirm window (multiClickWindowMs / holdConfirmMs), by construction.
+The one real gap: `updateClickHoldPoseForHand()`'s shared commit gate
+(used by every hold-kind trigger) only checked `holdConfirmMs`, not
+`multiClickWindowMs` -- confirmed via real saved settings
+(holdConfirmMs 520ms vs. multiClickWindowMs 200ms) that a single held
+press could legitimately cross holdConfirmMs and briefly commit before
+a 2nd/3rd click arrived. Fixed by widening that one gate to the max of
+both windows -- deliberately a narrow numeric fix, not a broader
+cross-awareness redesign. See CHANGELOG.txt's 33rd-round entry.
+
 **ADDED 2026-09-30 (32nd round) -- Retransition Speed Curve/Start Time
 Curve now available in any mode with Retransition on.** Investigated
 "Click 2 + Hold" (custom10) empty Retransition groups: traced to
@@ -28,13 +43,9 @@ functions got a genuine new Tween-mode Speed Curve pair (mirroring the
 already-existing Start Time Curve's own mode-split pattern); pose-kind
 (cp) functions got a pure visibility fix (their own Speed/Start Time
 Curve math was already mode-independent, only the UI hid it in
-Sequence mode). NOT yet live-verified -- deploying now. See
-CHANGELOG.txt's 32nd-round entry.
-
-Also still pending from this same round: "Clear All Logs" button
-(requested, not yet built) and a broader "start time should never fire
-before hold/click-confirm duration" request for all click functions
-(investigation started, not yet implemented).
+Sequence mode). Live-verified: toggled the checkbox on custom10,
+confirmed the new curve rows appeared, reverted the test toggle
+(never saved). See CHANGELOG.txt's 32nd-round entry.
 
 **LIKELY ROOT CAUSE FOUND 2026-09-29 (31st round) -- the freeze
 investigation's real breakthrough, using the user's own real Hand

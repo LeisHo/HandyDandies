@@ -1759,7 +1759,11 @@ const DEV_GROUPS = [
       // whatever's buffered regardless of whether it's currently empty
       // or its own checkbox happens to be off right now) rather than
       // only logs whose enable checkbox is on at click time.
-      { key: 'copyAllLogsBtn', label: 'Copy All Logs', type: 'button', onClick: (btn) => copyAllDebugLogs(btn) }
+      { key: 'copyAllLogsBtn', label: 'Copy All Logs', type: 'button', onClick: (btn) => copyAllDebugLogs(btn) },
+      // Added 2026-09-30, direct request: "provide a clear all logs
+      // button." Clears all 3 logs' own buffers via their existing
+      // individual clear functions -- no new clearing logic needed.
+      { key: 'clearAllLogsBtn', label: 'Clear All Logs', type: 'button', onClick: () => { clearMouseTrackingLog(); clearHandBehaviourLog(); clearFrameRateLog() } }
     ]
   }
 ]
@@ -7523,7 +7527,32 @@ function releaseHandFromOtherFunctions(hand, exceptId) {
 function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) {
   const trig = clickHoldPoseTriggers[p]
   const chp = getOrInitHandCHP(hand)[p]
-  if (trig.active && chp.armedForHoldStartTime !== trig.holdStartTime && now - trig.holdStartTime >= (cfg.holdConfirmMs ?? 0)) {
+  // CORRECTED 2026-09-30, direct request: "for all click functions, even
+  // if i set start time to 0 ms, make sure that that is after any hold or
+  // click confirm duration setting. so that if im doing a triple click,
+  // the single click wont trigger." This function is SHARED by every
+  // hold-kind trigger (chp/rchp/dcHold/tripleClickHold/quadClickHold and
+  // every custom Click+Hold function), so this one gate covers all of
+  // them. Everything downstream of this gate (Start Time Curve's own
+  // delay, computed further below as `now + delay` using THIS frame's
+  // `now`) already runs strictly after it -- so Start Time was already
+  // "after Hold Confirm Delay" by construction, even at 0ms. The real gap
+  // was narrower: this gate only checked `holdConfirmMs`, not
+  // `multiClickWindowMs` -- a genuine race existed where a single press,
+  // held just long enough to cross `holdConfirmMs` (confirmed live at
+  // 520ms in this project's own real saved settings) but released/
+  // re-pressed before `multiClickWindowMs` (200ms) could also confirm
+  // "no further click is coming," could briefly commit and become
+  // visible before the 2nd/3rd click of an intended multi-click arrived
+  // to interrupt it -- exactly the "single click briefly triggers during
+  // a triple click" symptom reported. Widened to the max of both
+  // confirm windows; the multi-click CHAIN family (dcHold/etc.) is
+  // unaffected -- it never goes through this gate at all, since it only
+  // fires once already confirmed to be a chain continuation via a
+  // completely different mechanism (see its own pointerdown listener's
+  // comment), so it has no equivalent race to begin with.
+  const holdCommitFloorMs = Math.max(cfg.holdConfirmMs ?? 0, cfg.multiClickWindowMs ?? 0)
+  if (trig.active && chp.armedForHoldStartTime !== trig.holdStartTime && now - trig.holdStartTime >= holdCommitFloorMs) {
     chp.armedForHoldStartTime = trig.holdStartTime // dedupe -- arm exactly once per hold-start, not every frame spent waiting
     // Start Distance Curve (direct spec, 2026-09-27) -- "beyond those
     // bounds, hands will not get triggered." Marks this hold-start as
