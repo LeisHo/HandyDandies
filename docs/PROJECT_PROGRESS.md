@@ -18,6 +18,16 @@ work seamlessly from there.
 
 ## Currently working on
 
+**RESOLVED 2026-09-30 (34th round) -- Tween Retransition Speed Curve's
+missing interactive widget, caught by direct follow-up on the 32nd
+round's own work.** The new Tween-mode Speed Curve controls were added
+as correct data (raw JSON text fields) but never got the actual
+curve-editor UI (slider+toggle+draggable graph) every other curve
+control in this file has. Fixed by adding the matching
+`buildGenericCurveWidget()`/`buildGenericRangeBarWidget()` calls to
+`buildClickHoldPoseWidgets(p)`, mirroring the existing Single-Pose
+pair exactly. See CHANGELOG.txt's 34th-round entry.
+
 **RESOLVED 2026-09-30 (33rd round) -- Clear All Logs button added;
 hold-commit timing fix for the "single click briefly triggers during a
 triple click" report.** Read the full click/hold dispatch chain before

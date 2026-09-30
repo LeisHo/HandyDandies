@@ -14363,6 +14363,46 @@ Verified: `node --check src/main.js` passes.
 
 `main.js` cache-buster bumped `?v=253` -> `?v=254`.
 
+2026-09-30  -  (34th round -- Tween Retransition Speed Curve's missing
+interactive widget, direct follow-up: "and for retransition speed
+curve make the ui the sliderr toggle and the curve editor")
+
+**A real gap in the 32nd round's own work, caught by direct follow-up,
+not re-discovered independently**: the 32nd round added
+`${p}TweenRetransitionSpeedCurve`/`${p}TweenRetransitionSpeedCurveRange`
+as plain DEV_GROUPS `type: 'text'` controls (the correct DATA layer --
+raw JSON in a text field) but never built the actual interactive
+curve-editor widget every OTHER curve control in this project gets via
+`buildGenericCurveWidget()`/`buildGenericRangeBarWidget()` -- so the
+new pair rendered as bare raw-JSON text boxes instead of a real
+slider+toggle+draggable-curve-graph UI. Confirmed via grep: every
+sibling curve control (Animation Speed Curve, Retransition Start Time
+Curve, its own Tween-mode pair, Tween Stop's 2 pairs, Start Distance
+Curve) has a matching `buildGenericCurveWidget(...Row, {...})` call
+inside `buildClickHoldPoseWidgets(p)`; the new Tween Speed Curve pair
+had none.
+
+Fixed by adding the matching widget-build calls, mirroring the
+existing Single-Pose Retransition Speed Curve pair's own caption/track
+range (50-2000ms) exactly -- inserted into `buildClickHoldPoseWidgets(p)`
+specifically (hold-kind only; pose-kind's sibling function,
+`buildClickPoseWidgets(p)`, has no Tween Retransition Speed Curve
+controls to begin with, confirmed by re-reading its own body before
+touching anything, so it was deliberately left untouched). Confirmed
+this function is already called for both newly-created custom
+functions (`renderCustomClickFunctionGroup()`) and every restored
+one at page load (`CLICK_HOLD_KEYS.forEach(...)`), so no separate
+wiring was needed for either path.
+
+Verified: `node --check src/main.js` passes; confirmed via grep that
+the new widget-build code appears exactly once, inside
+`buildClickHoldPoseWidgets`, not accidentally duplicated into
+`buildClickPoseWidgets` (the 2 functions share large blocks of
+near-identical code, a known drift risk elsewhere in this file, so this
+was checked directly rather than assumed).
+
+`main.js` cache-buster bumped `?v=254` -> `?v=255`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

@@ -9427,6 +9427,17 @@ function buildClickHoldPoseWidgets(p) {
   const retransSpeedRangeRow = document.querySelector(`.dp-row[data-key="${p}RetransitionSpeedCurveRange"]`)
   if (retransSpeedCurveRow) buildGenericCurveWidget(retransSpeedCurveRow, { caption: speedCurveCaption, defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
   if (retransSpeedRangeRow) buildGenericRangeBarWidget(retransSpeedRangeRow, { trackMin: 50, trackMax: 2000, unit: 'ms', defaultValue: { min: 50, max: 2000 } })
+  // Tween's own dedicated Retransition SPEED curve/range (2026-09-30,
+  // direct follow-up: "for retransition speed curve make the ui the
+  // sliderr toggle and the curve editor") -- same shape/caption/track
+  // ceiling as the Single-Pose pair directly above, just Tween-mode's
+  // own, exactly mirroring how the Start Time Curve pair below already
+  // gets a Tween-mode widget alongside its Single-Pose one. Hold-kind
+  // only -- pose-kind has no Tween Retransition Speed Curve variant.
+  const tweenRetransSpeedCurveRow = document.querySelector(`.dp-row[data-key="${p}TweenRetransitionSpeedCurve"]`)
+  const tweenRetransSpeedRangeRow = document.querySelector(`.dp-row[data-key="${p}TweenRetransitionSpeedCurveRange"]`)
+  if (tweenRetransSpeedCurveRow) buildGenericCurveWidget(tweenRetransSpeedCurveRow, { caption: speedCurveCaption, defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
+  if (tweenRetransSpeedRangeRow) buildGenericRangeBarWidget(tweenRetransSpeedRangeRow, { trackMin: 50, trackMax: 2000, unit: 'ms', defaultValue: { min: 50, max: 2000 } })
   const startCurveRow = document.querySelector(`.dp-row[data-key="${p}StartTimeCurve"]`)
   const startRangeRow = document.querySelector(`.dp-row[data-key="${p}StartTimeRange"]`)
   const tweenStartCurveRow = document.querySelector(`.dp-row[data-key="${p}TweenStartTimeCurve"]`)
