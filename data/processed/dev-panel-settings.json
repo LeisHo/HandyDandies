@@ -26383,7 +26383,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 16",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -27295,7 +27295,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 15",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -29828,10 +29828,15 @@
                                     "items": [
                                       {
                                         "type": "row",
+                                        "key": "custom13Trig2RetransitionSpeedCurve"
+                                      },
+                                      {
+                                        "type": "row",
                                         "key": "custom13Trig2RetransitionSpeedCurveRange"
                                       }
                                     ],
                                     "settings": [
+                                      "custom13Trig2RetransitionSpeedCurve",
                                       "custom13Trig2RetransitionSpeedCurveRange"
                                     ],
                                     "subgroups": []
@@ -29850,16 +29855,11 @@
                                       },
                                       {
                                         "type": "row",
-                                        "key": "custom13Trig2RetransitionSpeedCurve"
-                                      },
-                                      {
-                                        "type": "row",
                                         "key": "custom13Trig2RetransitionStartTimeRange"
                                       }
                                     ],
                                     "settings": [
                                       "custom13Trig2RetransitionStartTimeCurve",
-                                      "custom13Trig2RetransitionSpeedCurve",
                                       "custom13Trig2RetransitionStartTimeRange"
                                     ],
                                     "subgroups": []
@@ -29877,10 +29877,15 @@
                                   "items": [
                                     {
                                       "type": "row",
+                                      "key": "custom13Trig2RetransitionSpeedCurve"
+                                    },
+                                    {
+                                      "type": "row",
                                       "key": "custom13Trig2RetransitionSpeedCurveRange"
                                     }
                                   ],
                                   "settings": [
+                                    "custom13Trig2RetransitionSpeedCurve",
                                     "custom13Trig2RetransitionSpeedCurveRange"
                                   ],
                                   "subgroups": []
@@ -29896,16 +29901,11 @@
                                     },
                                     {
                                       "type": "row",
-                                      "key": "custom13Trig2RetransitionSpeedCurve"
-                                    },
-                                    {
-                                      "type": "row",
                                       "key": "custom13Trig2RetransitionStartTimeRange"
                                     }
                                   ],
                                   "settings": [
                                     "custom13Trig2RetransitionStartTimeCurve",
-                                    "custom13Trig2RetransitionSpeedCurve",
                                     "custom13Trig2RetransitionStartTimeRange"
                                   ],
                                   "subgroups": []
@@ -30062,10 +30062,15 @@
                                   "items": [
                                     {
                                       "type": "row",
+                                      "key": "custom13Trig2RetransitionSpeedCurve"
+                                    },
+                                    {
+                                      "type": "row",
                                       "key": "custom13Trig2RetransitionSpeedCurveRange"
                                     }
                                   ],
                                   "settings": [
+                                    "custom13Trig2RetransitionSpeedCurve",
                                     "custom13Trig2RetransitionSpeedCurveRange"
                                   ],
                                   "subgroups": []
@@ -30084,16 +30089,11 @@
                                     },
                                     {
                                       "type": "row",
-                                      "key": "custom13Trig2RetransitionSpeedCurve"
-                                    },
-                                    {
-                                      "type": "row",
                                       "key": "custom13Trig2RetransitionStartTimeRange"
                                     }
                                   ],
                                   "settings": [
                                     "custom13Trig2RetransitionStartTimeCurve",
-                                    "custom13Trig2RetransitionSpeedCurve",
                                     "custom13Trig2RetransitionStartTimeRange"
                                   ],
                                   "subgroups": []
@@ -30111,10 +30111,15 @@
                                 "items": [
                                   {
                                     "type": "row",
+                                    "key": "custom13Trig2RetransitionSpeedCurve"
+                                  },
+                                  {
+                                    "type": "row",
                                     "key": "custom13Trig2RetransitionSpeedCurveRange"
                                   }
                                 ],
                                 "settings": [
+                                  "custom13Trig2RetransitionSpeedCurve",
                                   "custom13Trig2RetransitionSpeedCurveRange"
                                 ],
                                 "subgroups": []
@@ -30130,16 +30135,11 @@
                                   },
                                   {
                                     "type": "row",
-                                    "key": "custom13Trig2RetransitionSpeedCurve"
-                                  },
-                                  {
-                                    "type": "row",
                                     "key": "custom13Trig2RetransitionStartTimeRange"
                                   }
                                 ],
                                 "settings": [
                                   "custom13Trig2RetransitionStartTimeCurve",
-                                  "custom13Trig2RetransitionSpeedCurve",
                                   "custom13Trig2RetransitionStartTimeRange"
                                 ],
                                 "subgroups": []
@@ -30855,10 +30855,15 @@
                                   "items": [
                                     {
                                       "type": "row",
+                                      "key": "custom13Trig2RetransitionSpeedCurve"
+                                    },
+                                    {
+                                      "type": "row",
                                       "key": "custom13Trig2RetransitionSpeedCurveRange"
                                     }
                                   ],
                                   "settings": [
+                                    "custom13Trig2RetransitionSpeedCurve",
                                     "custom13Trig2RetransitionSpeedCurveRange"
                                   ],
                                   "subgroups": []
@@ -30877,16 +30882,11 @@
                                     },
                                     {
                                       "type": "row",
-                                      "key": "custom13Trig2RetransitionSpeedCurve"
-                                    },
-                                    {
-                                      "type": "row",
                                       "key": "custom13Trig2RetransitionStartTimeRange"
                                     }
                                   ],
                                   "settings": [
                                     "custom13Trig2RetransitionStartTimeCurve",
-                                    "custom13Trig2RetransitionSpeedCurve",
                                     "custom13Trig2RetransitionStartTimeRange"
                                   ],
                                   "subgroups": []
@@ -30904,10 +30904,15 @@
                                 "items": [
                                   {
                                     "type": "row",
+                                    "key": "custom13Trig2RetransitionSpeedCurve"
+                                  },
+                                  {
+                                    "type": "row",
                                     "key": "custom13Trig2RetransitionSpeedCurveRange"
                                   }
                                 ],
                                 "settings": [
+                                  "custom13Trig2RetransitionSpeedCurve",
                                   "custom13Trig2RetransitionSpeedCurveRange"
                                 ],
                                 "subgroups": []
@@ -30923,16 +30928,11 @@
                                   },
                                   {
                                     "type": "row",
-                                    "key": "custom13Trig2RetransitionSpeedCurve"
-                                  },
-                                  {
-                                    "type": "row",
                                     "key": "custom13Trig2RetransitionStartTimeRange"
                                   }
                                 ],
                                 "settings": [
                                   "custom13Trig2RetransitionStartTimeCurve",
-                                  "custom13Trig2RetransitionSpeedCurve",
                                   "custom13Trig2RetransitionStartTimeRange"
                                 ],
                                 "subgroups": []
@@ -31089,10 +31089,15 @@
                                 "items": [
                                   {
                                     "type": "row",
+                                    "key": "custom13Trig2RetransitionSpeedCurve"
+                                  },
+                                  {
+                                    "type": "row",
                                     "key": "custom13Trig2RetransitionSpeedCurveRange"
                                   }
                                 ],
                                 "settings": [
+                                  "custom13Trig2RetransitionSpeedCurve",
                                   "custom13Trig2RetransitionSpeedCurveRange"
                                 ],
                                 "subgroups": []
@@ -31111,16 +31116,11 @@
                                   },
                                   {
                                     "type": "row",
-                                    "key": "custom13Trig2RetransitionSpeedCurve"
-                                  },
-                                  {
-                                    "type": "row",
                                     "key": "custom13Trig2RetransitionStartTimeRange"
                                   }
                                 ],
                                 "settings": [
                                   "custom13Trig2RetransitionStartTimeCurve",
-                                  "custom13Trig2RetransitionSpeedCurve",
                                   "custom13Trig2RetransitionStartTimeRange"
                                 ],
                                 "subgroups": []
@@ -31138,10 +31138,15 @@
                               "items": [
                                 {
                                   "type": "row",
+                                  "key": "custom13Trig2RetransitionSpeedCurve"
+                                },
+                                {
+                                  "type": "row",
                                   "key": "custom13Trig2RetransitionSpeedCurveRange"
                                 }
                               ],
                               "settings": [
+                                "custom13Trig2RetransitionSpeedCurve",
                                 "custom13Trig2RetransitionSpeedCurveRange"
                               ],
                               "subgroups": []
@@ -31157,16 +31162,11 @@
                                 },
                                 {
                                   "type": "row",
-                                  "key": "custom13Trig2RetransitionSpeedCurve"
-                                },
-                                {
-                                  "type": "row",
                                   "key": "custom13Trig2RetransitionStartTimeRange"
                                 }
                               ],
                               "settings": [
                                 "custom13Trig2RetransitionStartTimeCurve",
-                                "custom13Trig2RetransitionSpeedCurve",
                                 "custom13Trig2RetransitionStartTimeRange"
                               ],
                               "subgroups": []
@@ -32133,10 +32133,15 @@
                                   "items": [
                                     {
                                       "type": "row",
+                                      "key": "custom13Trig2RetransitionSpeedCurve"
+                                    },
+                                    {
+                                      "type": "row",
                                       "key": "custom13Trig2RetransitionSpeedCurveRange"
                                     }
                                   ],
                                   "settings": [
+                                    "custom13Trig2RetransitionSpeedCurve",
                                     "custom13Trig2RetransitionSpeedCurveRange"
                                   ],
                                   "subgroups": []
@@ -32155,16 +32160,11 @@
                                     },
                                     {
                                       "type": "row",
-                                      "key": "custom13Trig2RetransitionSpeedCurve"
-                                    },
-                                    {
-                                      "type": "row",
                                       "key": "custom13Trig2RetransitionStartTimeRange"
                                     }
                                   ],
                                   "settings": [
                                     "custom13Trig2RetransitionStartTimeCurve",
-                                    "custom13Trig2RetransitionSpeedCurve",
                                     "custom13Trig2RetransitionStartTimeRange"
                                   ],
                                   "subgroups": []
@@ -32182,10 +32182,15 @@
                                 "items": [
                                   {
                                     "type": "row",
+                                    "key": "custom13Trig2RetransitionSpeedCurve"
+                                  },
+                                  {
+                                    "type": "row",
                                     "key": "custom13Trig2RetransitionSpeedCurveRange"
                                   }
                                 ],
                                 "settings": [
+                                  "custom13Trig2RetransitionSpeedCurve",
                                   "custom13Trig2RetransitionSpeedCurveRange"
                                 ],
                                 "subgroups": []
@@ -32201,16 +32206,11 @@
                                   },
                                   {
                                     "type": "row",
-                                    "key": "custom13Trig2RetransitionSpeedCurve"
-                                  },
-                                  {
-                                    "type": "row",
                                     "key": "custom13Trig2RetransitionStartTimeRange"
                                   }
                                 ],
                                 "settings": [
                                   "custom13Trig2RetransitionStartTimeCurve",
-                                  "custom13Trig2RetransitionSpeedCurve",
                                   "custom13Trig2RetransitionStartTimeRange"
                                 ],
                                 "subgroups": []
@@ -32367,10 +32367,15 @@
                                 "items": [
                                   {
                                     "type": "row",
+                                    "key": "custom13Trig2RetransitionSpeedCurve"
+                                  },
+                                  {
+                                    "type": "row",
                                     "key": "custom13Trig2RetransitionSpeedCurveRange"
                                   }
                                 ],
                                 "settings": [
+                                  "custom13Trig2RetransitionSpeedCurve",
                                   "custom13Trig2RetransitionSpeedCurveRange"
                                 ],
                                 "subgroups": []
@@ -32389,16 +32394,11 @@
                                   },
                                   {
                                     "type": "row",
-                                    "key": "custom13Trig2RetransitionSpeedCurve"
-                                  },
-                                  {
-                                    "type": "row",
                                     "key": "custom13Trig2RetransitionStartTimeRange"
                                   }
                                 ],
                                 "settings": [
                                   "custom13Trig2RetransitionStartTimeCurve",
-                                  "custom13Trig2RetransitionSpeedCurve",
                                   "custom13Trig2RetransitionStartTimeRange"
                                 ],
                                 "subgroups": []
@@ -32416,10 +32416,15 @@
                               "items": [
                                 {
                                   "type": "row",
+                                  "key": "custom13Trig2RetransitionSpeedCurve"
+                                },
+                                {
+                                  "type": "row",
                                   "key": "custom13Trig2RetransitionSpeedCurveRange"
                                 }
                               ],
                               "settings": [
+                                "custom13Trig2RetransitionSpeedCurve",
                                 "custom13Trig2RetransitionSpeedCurveRange"
                               ],
                               "subgroups": []
@@ -32435,16 +32440,11 @@
                                 },
                                 {
                                   "type": "row",
-                                  "key": "custom13Trig2RetransitionSpeedCurve"
-                                },
-                                {
-                                  "type": "row",
                                   "key": "custom13Trig2RetransitionStartTimeRange"
                                 }
                               ],
                               "settings": [
                                 "custom13Trig2RetransitionStartTimeCurve",
-                                "custom13Trig2RetransitionSpeedCurve",
                                 "custom13Trig2RetransitionStartTimeRange"
                               ],
                               "subgroups": []
@@ -33160,10 +33160,15 @@
                                 "items": [
                                   {
                                     "type": "row",
+                                    "key": "custom13Trig2RetransitionSpeedCurve"
+                                  },
+                                  {
+                                    "type": "row",
                                     "key": "custom13Trig2RetransitionSpeedCurveRange"
                                   }
                                 ],
                                 "settings": [
+                                  "custom13Trig2RetransitionSpeedCurve",
                                   "custom13Trig2RetransitionSpeedCurveRange"
                                 ],
                                 "subgroups": []
@@ -33182,16 +33187,11 @@
                                   },
                                   {
                                     "type": "row",
-                                    "key": "custom13Trig2RetransitionSpeedCurve"
-                                  },
-                                  {
-                                    "type": "row",
                                     "key": "custom13Trig2RetransitionStartTimeRange"
                                   }
                                 ],
                                 "settings": [
                                   "custom13Trig2RetransitionStartTimeCurve",
-                                  "custom13Trig2RetransitionSpeedCurve",
                                   "custom13Trig2RetransitionStartTimeRange"
                                 ],
                                 "subgroups": []
@@ -33209,10 +33209,15 @@
                               "items": [
                                 {
                                   "type": "row",
+                                  "key": "custom13Trig2RetransitionSpeedCurve"
+                                },
+                                {
+                                  "type": "row",
                                   "key": "custom13Trig2RetransitionSpeedCurveRange"
                                 }
                               ],
                               "settings": [
+                                "custom13Trig2RetransitionSpeedCurve",
                                 "custom13Trig2RetransitionSpeedCurveRange"
                               ],
                               "subgroups": []
@@ -33228,16 +33233,11 @@
                                 },
                                 {
                                   "type": "row",
-                                  "key": "custom13Trig2RetransitionSpeedCurve"
-                                },
-                                {
-                                  "type": "row",
                                   "key": "custom13Trig2RetransitionStartTimeRange"
                                 }
                               ],
                               "settings": [
                                 "custom13Trig2RetransitionStartTimeCurve",
-                                "custom13Trig2RetransitionSpeedCurve",
                                 "custom13Trig2RetransitionStartTimeRange"
                               ],
                               "subgroups": []
@@ -33394,10 +33394,15 @@
                               "items": [
                                 {
                                   "type": "row",
+                                  "key": "custom13Trig2RetransitionSpeedCurve"
+                                },
+                                {
+                                  "type": "row",
                                   "key": "custom13Trig2RetransitionSpeedCurveRange"
                                 }
                               ],
                               "settings": [
+                                "custom13Trig2RetransitionSpeedCurve",
                                 "custom13Trig2RetransitionSpeedCurveRange"
                               ],
                               "subgroups": []
@@ -33416,16 +33421,11 @@
                                 },
                                 {
                                   "type": "row",
-                                  "key": "custom13Trig2RetransitionSpeedCurve"
-                                },
-                                {
-                                  "type": "row",
                                   "key": "custom13Trig2RetransitionStartTimeRange"
                                 }
                               ],
                               "settings": [
                                 "custom13Trig2RetransitionStartTimeCurve",
-                                "custom13Trig2RetransitionSpeedCurve",
                                 "custom13Trig2RetransitionStartTimeRange"
                               ],
                               "subgroups": []
@@ -33443,10 +33443,15 @@
                             "items": [
                               {
                                 "type": "row",
+                                "key": "custom13Trig2RetransitionSpeedCurve"
+                              },
+                              {
+                                "type": "row",
                                 "key": "custom13Trig2RetransitionSpeedCurveRange"
                               }
                             ],
                             "settings": [
+                              "custom13Trig2RetransitionSpeedCurve",
                               "custom13Trig2RetransitionSpeedCurveRange"
                             ],
                             "subgroups": []
@@ -33462,16 +33467,11 @@
                               },
                               {
                                 "type": "row",
-                                "key": "custom13Trig2RetransitionSpeedCurve"
-                              },
-                              {
-                                "type": "row",
                                 "key": "custom13Trig2RetransitionStartTimeRange"
                               }
                             ],
                             "settings": [
                               "custom13Trig2RetransitionStartTimeCurve",
-                              "custom13Trig2RetransitionSpeedCurve",
                               "custom13Trig2RetransitionStartTimeRange"
                             ],
                             "subgroups": []
@@ -44697,7 +44697,7 @@
       "subgroups": [
         {
           "key": "Custom Click Function 16",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
@@ -45606,7 +45606,7 @@
         },
         {
           "key": "Custom Click Function 15",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
@@ -48133,10 +48133,15 @@
                                   "items": [
                                     {
                                       "type": "row",
+                                      "key": "custom13Trig2RetransitionSpeedCurve"
+                                    },
+                                    {
+                                      "type": "row",
                                       "key": "custom13Trig2RetransitionSpeedCurveRange"
                                     }
                                   ],
                                   "settings": [
+                                    "custom13Trig2RetransitionSpeedCurve",
                                     "custom13Trig2RetransitionSpeedCurveRange"
                                   ],
                                   "subgroups": []
@@ -48155,16 +48160,11 @@
                                     },
                                     {
                                       "type": "row",
-                                      "key": "custom13Trig2RetransitionSpeedCurve"
-                                    },
-                                    {
-                                      "type": "row",
                                       "key": "custom13Trig2RetransitionStartTimeRange"
                                     }
                                   ],
                                   "settings": [
                                     "custom13Trig2RetransitionStartTimeCurve",
-                                    "custom13Trig2RetransitionSpeedCurve",
                                     "custom13Trig2RetransitionStartTimeRange"
                                   ],
                                   "subgroups": []
@@ -48182,10 +48182,15 @@
                                 "items": [
                                   {
                                     "type": "row",
+                                    "key": "custom13Trig2RetransitionSpeedCurve"
+                                  },
+                                  {
+                                    "type": "row",
                                     "key": "custom13Trig2RetransitionSpeedCurveRange"
                                   }
                                 ],
                                 "settings": [
+                                  "custom13Trig2RetransitionSpeedCurve",
                                   "custom13Trig2RetransitionSpeedCurveRange"
                                 ],
                                 "subgroups": []
@@ -48201,16 +48206,11 @@
                                   },
                                   {
                                     "type": "row",
-                                    "key": "custom13Trig2RetransitionSpeedCurve"
-                                  },
-                                  {
-                                    "type": "row",
                                     "key": "custom13Trig2RetransitionStartTimeRange"
                                   }
                                 ],
                                 "settings": [
                                   "custom13Trig2RetransitionStartTimeCurve",
-                                  "custom13Trig2RetransitionSpeedCurve",
                                   "custom13Trig2RetransitionStartTimeRange"
                                 ],
                                 "subgroups": []
@@ -48367,10 +48367,15 @@
                                 "items": [
                                   {
                                     "type": "row",
+                                    "key": "custom13Trig2RetransitionSpeedCurve"
+                                  },
+                                  {
+                                    "type": "row",
                                     "key": "custom13Trig2RetransitionSpeedCurveRange"
                                   }
                                 ],
                                 "settings": [
+                                  "custom13Trig2RetransitionSpeedCurve",
                                   "custom13Trig2RetransitionSpeedCurveRange"
                                 ],
                                 "subgroups": []
@@ -48389,16 +48394,11 @@
                                   },
                                   {
                                     "type": "row",
-                                    "key": "custom13Trig2RetransitionSpeedCurve"
-                                  },
-                                  {
-                                    "type": "row",
                                     "key": "custom13Trig2RetransitionStartTimeRange"
                                   }
                                 ],
                                 "settings": [
                                   "custom13Trig2RetransitionStartTimeCurve",
-                                  "custom13Trig2RetransitionSpeedCurve",
                                   "custom13Trig2RetransitionStartTimeRange"
                                 ],
                                 "subgroups": []
@@ -48416,10 +48416,15 @@
                               "items": [
                                 {
                                   "type": "row",
+                                  "key": "custom13Trig2RetransitionSpeedCurve"
+                                },
+                                {
+                                  "type": "row",
                                   "key": "custom13Trig2RetransitionSpeedCurveRange"
                                 }
                               ],
                               "settings": [
+                                "custom13Trig2RetransitionSpeedCurve",
                                 "custom13Trig2RetransitionSpeedCurveRange"
                               ],
                               "subgroups": []
@@ -48435,16 +48440,11 @@
                                 },
                                 {
                                   "type": "row",
-                                  "key": "custom13Trig2RetransitionSpeedCurve"
-                                },
-                                {
-                                  "type": "row",
                                   "key": "custom13Trig2RetransitionStartTimeRange"
                                 }
                               ],
                               "settings": [
                                 "custom13Trig2RetransitionStartTimeCurve",
-                                "custom13Trig2RetransitionSpeedCurve",
                                 "custom13Trig2RetransitionStartTimeRange"
                               ],
                               "subgroups": []
@@ -49160,10 +49160,15 @@
                                 "items": [
                                   {
                                     "type": "row",
+                                    "key": "custom13Trig2RetransitionSpeedCurve"
+                                  },
+                                  {
+                                    "type": "row",
                                     "key": "custom13Trig2RetransitionSpeedCurveRange"
                                   }
                                 ],
                                 "settings": [
+                                  "custom13Trig2RetransitionSpeedCurve",
                                   "custom13Trig2RetransitionSpeedCurveRange"
                                 ],
                                 "subgroups": []
@@ -49182,16 +49187,11 @@
                                   },
                                   {
                                     "type": "row",
-                                    "key": "custom13Trig2RetransitionSpeedCurve"
-                                  },
-                                  {
-                                    "type": "row",
                                     "key": "custom13Trig2RetransitionStartTimeRange"
                                   }
                                 ],
                                 "settings": [
                                   "custom13Trig2RetransitionStartTimeCurve",
-                                  "custom13Trig2RetransitionSpeedCurve",
                                   "custom13Trig2RetransitionStartTimeRange"
                                 ],
                                 "subgroups": []
@@ -49209,10 +49209,15 @@
                               "items": [
                                 {
                                   "type": "row",
+                                  "key": "custom13Trig2RetransitionSpeedCurve"
+                                },
+                                {
+                                  "type": "row",
                                   "key": "custom13Trig2RetransitionSpeedCurveRange"
                                 }
                               ],
                               "settings": [
+                                "custom13Trig2RetransitionSpeedCurve",
                                 "custom13Trig2RetransitionSpeedCurveRange"
                               ],
                               "subgroups": []
@@ -49228,16 +49233,11 @@
                                 },
                                 {
                                   "type": "row",
-                                  "key": "custom13Trig2RetransitionSpeedCurve"
-                                },
-                                {
-                                  "type": "row",
                                   "key": "custom13Trig2RetransitionStartTimeRange"
                                 }
                               ],
                               "settings": [
                                 "custom13Trig2RetransitionStartTimeCurve",
-                                "custom13Trig2RetransitionSpeedCurve",
                                 "custom13Trig2RetransitionStartTimeRange"
                               ],
                               "subgroups": []
@@ -49394,10 +49394,15 @@
                               "items": [
                                 {
                                   "type": "row",
+                                  "key": "custom13Trig2RetransitionSpeedCurve"
+                                },
+                                {
+                                  "type": "row",
                                   "key": "custom13Trig2RetransitionSpeedCurveRange"
                                 }
                               ],
                               "settings": [
+                                "custom13Trig2RetransitionSpeedCurve",
                                 "custom13Trig2RetransitionSpeedCurveRange"
                               ],
                               "subgroups": []
@@ -49416,16 +49421,11 @@
                                 },
                                 {
                                   "type": "row",
-                                  "key": "custom13Trig2RetransitionSpeedCurve"
-                                },
-                                {
-                                  "type": "row",
                                   "key": "custom13Trig2RetransitionStartTimeRange"
                                 }
                               ],
                               "settings": [
                                 "custom13Trig2RetransitionStartTimeCurve",
-                                "custom13Trig2RetransitionSpeedCurve",
                                 "custom13Trig2RetransitionStartTimeRange"
                               ],
                               "subgroups": []
@@ -49443,10 +49443,15 @@
                             "items": [
                               {
                                 "type": "row",
+                                "key": "custom13Trig2RetransitionSpeedCurve"
+                              },
+                              {
+                                "type": "row",
                                 "key": "custom13Trig2RetransitionSpeedCurveRange"
                               }
                             ],
                             "settings": [
+                              "custom13Trig2RetransitionSpeedCurve",
                               "custom13Trig2RetransitionSpeedCurveRange"
                             ],
                             "subgroups": []
@@ -49462,16 +49467,11 @@
                               },
                               {
                                 "type": "row",
-                                "key": "custom13Trig2RetransitionSpeedCurve"
-                              },
-                              {
-                                "type": "row",
                                 "key": "custom13Trig2RetransitionStartTimeRange"
                               }
                             ],
                             "settings": [
                               "custom13Trig2RetransitionStartTimeCurve",
-                              "custom13Trig2RetransitionSpeedCurve",
                               "custom13Trig2RetransitionStartTimeRange"
                             ],
                             "subgroups": []
@@ -50438,10 +50438,15 @@
                                 "items": [
                                   {
                                     "type": "row",
+                                    "key": "custom13Trig2RetransitionSpeedCurve"
+                                  },
+                                  {
+                                    "type": "row",
                                     "key": "custom13Trig2RetransitionSpeedCurveRange"
                                   }
                                 ],
                                 "settings": [
+                                  "custom13Trig2RetransitionSpeedCurve",
                                   "custom13Trig2RetransitionSpeedCurveRange"
                                 ],
                                 "subgroups": []
@@ -50460,16 +50465,11 @@
                                   },
                                   {
                                     "type": "row",
-                                    "key": "custom13Trig2RetransitionSpeedCurve"
-                                  },
-                                  {
-                                    "type": "row",
                                     "key": "custom13Trig2RetransitionStartTimeRange"
                                   }
                                 ],
                                 "settings": [
                                   "custom13Trig2RetransitionStartTimeCurve",
-                                  "custom13Trig2RetransitionSpeedCurve",
                                   "custom13Trig2RetransitionStartTimeRange"
                                 ],
                                 "subgroups": []
@@ -50487,10 +50487,15 @@
                               "items": [
                                 {
                                   "type": "row",
+                                  "key": "custom13Trig2RetransitionSpeedCurve"
+                                },
+                                {
+                                  "type": "row",
                                   "key": "custom13Trig2RetransitionSpeedCurveRange"
                                 }
                               ],
                               "settings": [
+                                "custom13Trig2RetransitionSpeedCurve",
                                 "custom13Trig2RetransitionSpeedCurveRange"
                               ],
                               "subgroups": []
@@ -50506,16 +50511,11 @@
                                 },
                                 {
                                   "type": "row",
-                                  "key": "custom13Trig2RetransitionSpeedCurve"
-                                },
-                                {
-                                  "type": "row",
                                   "key": "custom13Trig2RetransitionStartTimeRange"
                                 }
                               ],
                               "settings": [
                                 "custom13Trig2RetransitionStartTimeCurve",
-                                "custom13Trig2RetransitionSpeedCurve",
                                 "custom13Trig2RetransitionStartTimeRange"
                               ],
                               "subgroups": []
@@ -50672,10 +50672,15 @@
                               "items": [
                                 {
                                   "type": "row",
+                                  "key": "custom13Trig2RetransitionSpeedCurve"
+                                },
+                                {
+                                  "type": "row",
                                   "key": "custom13Trig2RetransitionSpeedCurveRange"
                                 }
                               ],
                               "settings": [
+                                "custom13Trig2RetransitionSpeedCurve",
                                 "custom13Trig2RetransitionSpeedCurveRange"
                               ],
                               "subgroups": []
@@ -50694,16 +50699,11 @@
                                 },
                                 {
                                   "type": "row",
-                                  "key": "custom13Trig2RetransitionSpeedCurve"
-                                },
-                                {
-                                  "type": "row",
                                   "key": "custom13Trig2RetransitionStartTimeRange"
                                 }
                               ],
                               "settings": [
                                 "custom13Trig2RetransitionStartTimeCurve",
-                                "custom13Trig2RetransitionSpeedCurve",
                                 "custom13Trig2RetransitionStartTimeRange"
                               ],
                               "subgroups": []
@@ -50721,10 +50721,15 @@
                             "items": [
                               {
                                 "type": "row",
+                                "key": "custom13Trig2RetransitionSpeedCurve"
+                              },
+                              {
+                                "type": "row",
                                 "key": "custom13Trig2RetransitionSpeedCurveRange"
                               }
                             ],
                             "settings": [
+                              "custom13Trig2RetransitionSpeedCurve",
                               "custom13Trig2RetransitionSpeedCurveRange"
                             ],
                             "subgroups": []
@@ -50740,16 +50745,11 @@
                               },
                               {
                                 "type": "row",
-                                "key": "custom13Trig2RetransitionSpeedCurve"
-                              },
-                              {
-                                "type": "row",
                                 "key": "custom13Trig2RetransitionStartTimeRange"
                               }
                             ],
                             "settings": [
                               "custom13Trig2RetransitionStartTimeCurve",
-                              "custom13Trig2RetransitionSpeedCurve",
                               "custom13Trig2RetransitionStartTimeRange"
                             ],
                             "subgroups": []
@@ -51465,10 +51465,15 @@
                               "items": [
                                 {
                                   "type": "row",
+                                  "key": "custom13Trig2RetransitionSpeedCurve"
+                                },
+                                {
+                                  "type": "row",
                                   "key": "custom13Trig2RetransitionSpeedCurveRange"
                                 }
                               ],
                               "settings": [
+                                "custom13Trig2RetransitionSpeedCurve",
                                 "custom13Trig2RetransitionSpeedCurveRange"
                               ],
                               "subgroups": []
@@ -51487,16 +51492,11 @@
                                 },
                                 {
                                   "type": "row",
-                                  "key": "custom13Trig2RetransitionSpeedCurve"
-                                },
-                                {
-                                  "type": "row",
                                   "key": "custom13Trig2RetransitionStartTimeRange"
                                 }
                               ],
                               "settings": [
                                 "custom13Trig2RetransitionStartTimeCurve",
-                                "custom13Trig2RetransitionSpeedCurve",
                                 "custom13Trig2RetransitionStartTimeRange"
                               ],
                               "subgroups": []
@@ -51514,10 +51514,15 @@
                             "items": [
                               {
                                 "type": "row",
+                                "key": "custom13Trig2RetransitionSpeedCurve"
+                              },
+                              {
+                                "type": "row",
                                 "key": "custom13Trig2RetransitionSpeedCurveRange"
                               }
                             ],
                             "settings": [
+                              "custom13Trig2RetransitionSpeedCurve",
                               "custom13Trig2RetransitionSpeedCurveRange"
                             ],
                             "subgroups": []
@@ -51533,16 +51538,11 @@
                               },
                               {
                                 "type": "row",
-                                "key": "custom13Trig2RetransitionSpeedCurve"
-                              },
-                              {
-                                "type": "row",
                                 "key": "custom13Trig2RetransitionStartTimeRange"
                               }
                             ],
                             "settings": [
                               "custom13Trig2RetransitionStartTimeCurve",
-                              "custom13Trig2RetransitionSpeedCurve",
                               "custom13Trig2RetransitionStartTimeRange"
                             ],
                             "subgroups": []
@@ -51699,10 +51699,15 @@
                             "items": [
                               {
                                 "type": "row",
+                                "key": "custom13Trig2RetransitionSpeedCurve"
+                              },
+                              {
+                                "type": "row",
                                 "key": "custom13Trig2RetransitionSpeedCurveRange"
                               }
                             ],
                             "settings": [
+                              "custom13Trig2RetransitionSpeedCurve",
                               "custom13Trig2RetransitionSpeedCurveRange"
                             ],
                             "subgroups": []
@@ -51721,16 +51726,11 @@
                               },
                               {
                                 "type": "row",
-                                "key": "custom13Trig2RetransitionSpeedCurve"
-                              },
-                              {
-                                "type": "row",
                                 "key": "custom13Trig2RetransitionStartTimeRange"
                               }
                             ],
                             "settings": [
                               "custom13Trig2RetransitionStartTimeCurve",
-                              "custom13Trig2RetransitionSpeedCurve",
                               "custom13Trig2RetransitionStartTimeRange"
                             ],
                             "subgroups": []
@@ -51748,10 +51748,15 @@
                           "items": [
                             {
                               "type": "row",
+                              "key": "custom13Trig2RetransitionSpeedCurve"
+                            },
+                            {
+                              "type": "row",
                               "key": "custom13Trig2RetransitionSpeedCurveRange"
                             }
                           ],
                           "settings": [
+                            "custom13Trig2RetransitionSpeedCurve",
                             "custom13Trig2RetransitionSpeedCurveRange"
                           ],
                           "subgroups": []
@@ -51767,16 +51772,11 @@
                             },
                             {
                               "type": "row",
-                              "key": "custom13Trig2RetransitionSpeedCurve"
-                            },
-                            {
-                              "type": "row",
                               "key": "custom13Trig2RetransitionStartTimeRange"
                             }
                           ],
                           "settings": [
                             "custom13Trig2RetransitionStartTimeCurve",
-                            "custom13Trig2RetransitionSpeedCurve",
                             "custom13Trig2RetransitionStartTimeRange"
                           ],
                           "subgroups": []
