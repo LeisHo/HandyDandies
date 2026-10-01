@@ -10318,6 +10318,14 @@ function renderCustomClickFunctionGroup(id, title, kind, family) {
     updateOffsetRotationVisibility(id)
     updateSingleTimingGateVisibility(id)
     updateTweenStopGateVisibility(id)
+    // Multi Trigger -- CORRECTED 2026-10-01, direct request ("Click
+    // Functions that trigger a sequence should still be able to have
+    // multi trigger functionality"): extended to hold-kind (Click+Hold/
+    // Right Click+Hold) functions, previously pose-kind only. Must run
+    // before applyCustomFunctionReferenceLayout() below, or that pass
+    // finds no "Multi Trigger" group yet to move into place after
+    // Retransition.
+    setupMultiTriggerGroupForFunction(id, 'hold')
   } else {
     parseClickPoseConfig(id)
     buildClickPoseWidgets(id)
@@ -10326,10 +10334,7 @@ function renderCustomClickFunctionGroup(id, title, kind, family) {
     updateSingleTimingGateVisibility(id)
     updateSequencePlayModeVisibility(id)
     updateChainModeVisibility(id)
-    // Multi Trigger -- pose-kind only. Must run before
-    // applyCustomFunctionReferenceLayout() below, or that pass finds no
-    // "Multi Trigger" group yet to move into place after Retransition.
-    setupMultiTriggerGroupForFunction(id)
+    setupMultiTriggerGroupForFunction(id, 'pose')
   }
   // Same mandatory Offset/Rotation/Animation Speed Curve/Start Time
   // Curve/Retransition gated-subgroup wrapping the 10 static triggers
@@ -10826,37 +10831,64 @@ const MULTI_TRIGGER_ALLOWED_SUFFIXES = [
   'StartDistanceCurveEnabled', 'StartDistanceMin', 'StartDistanceMax', 'StartDistanceCurve',
   'RetransitionEnabled', 'RetransitionSpeedMs', 'RetransitionSpeedCurveEnabled', 'RetransitionSpeedCurve', 'RetransitionSpeedCurveRange', 'RetransitionStartTimeCurveEnabled', 'RetransitionStartTimeCurve', 'RetransitionStartTimeRange'
 ]
-function buildMultiTriggerControlsForPrefix(prefix, title) {
-  const base = makeClickPoseGroup(prefix, title, {})
+// CORRECTED 2026-10-01, direct request ("Click Functions that trigger a
+// sequence should still be able to have multi trigger functionality"):
+// generalized from pose-kind-only to BOTH kinds. `kind` selects
+// makeClickHoldPoseGroup() vs makeClickPoseGroup() as the source of
+// truth for what a sub-trigger's own controls look like -- unchanged
+// for pose-kind, newly also covers hold-kind (Click+Hold/Right
+// Click+Hold functions, including ones using Sequence mode to trigger a
+// tween).
+function buildMultiTriggerControlsForPrefix(prefix, title, kind) {
+  const base = kind === 'hold' ? makeClickHoldPoseGroup(prefix, title, {}) : makeClickPoseGroup(prefix, title, {})
   return base.controls.filter((c) => MULTI_TRIGGER_ALLOWED_SUFFIXES.some((suffix) => c.key === `${prefix}${suffix}`))
 }
 // Registers ONE trigger's own runtime state + (if a panel exists) its
 // live settings group, nested inside the Multi Trigger wrapper's body,
 // right before the "+ Add Trigger" button row. CRITICAL: the
-// CLICK_POSE_KEYS push / clickPoseTriggers state / cfg seeding
-// (renderDynamicGroup()'s own doing) all happen UNCONDITIONALLY, before
-// the `if (!mtBody) return` DOM-only gate below -- skipping this for a
-// non-DEV_MODE visitor would silently reintroduce a narrower version of
-// the exact "works in dev mode, not production" bug this session already
-// root-caused and fixed once for custom click functions generally (see
-// this same file's `lastRestoredValues`/devPanel.js fix) -- a real
-// visitor must be able to fire every trigger correctly with no panel
-// ever built.
-function registerMultiTriggerTrigger(prefix, title, mtBody, addBtnRow) {
-  if (!CLICK_POSE_KEYS.includes(prefix)) CLICK_POSE_KEYS.push(prefix)
-  if (!clickPoseTriggers[prefix]) {
-    clickPoseTriggers[prefix] = {
-      startCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], startRangeParsed: { min: 0, max: 300 },
-      speedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], speedRangeParsed: { min: 50, max: 2000 },
-      tweenStartCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStartRangeParsed: { min: 0, max: 300 },
-      startDistanceCurveParsed: [{ x: 0, y: 1 }, { x: 1, y: 1 }],
-      retransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionRangeParsed: { min: 0, max: 300 },
-      retransitionSpeedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionSpeedRangeParsed: { min: 50, max: 2000 }
+// CLICK_POSE_KEYS/CLICK_HOLD_KEYS push / clickPoseTriggers/
+// clickHoldPoseTriggers state / cfg seeding (renderDynamicGroup()'s own
+// doing) all happen UNCONDITIONALLY, before the `if (!mtBody) return`
+// DOM-only gate below -- skipping this for a non-DEV_MODE visitor would
+// silently reintroduce a narrower version of the exact "works in dev
+// mode, not production" bug this session already root-caused and fixed
+// once for custom click functions generally (see this same file's
+// `lastRestoredValues`/devPanel.js fix) -- a real visitor must be able
+// to fire every trigger correctly with no panel ever built.
+function registerMultiTriggerTrigger(prefix, title, mtBody, addBtnRow, kind) {
+  if (kind === 'hold') {
+    if (!CLICK_HOLD_KEYS.includes(prefix)) CLICK_HOLD_KEYS.push(prefix)
+    if (!clickHoldPoseTriggers[prefix]) {
+      clickHoldPoseTriggers[prefix] = {
+        active: false, holdStartTime: 0, forwardSnapshot: null, loopPoses: null, rawChainEntries: null, loopSegmentMs: 1,
+        startCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], startRangeParsed: { min: 0, max: 300 },
+        speedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], speedRangeParsed: { min: 50, max: 2000 },
+        tweenStartCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStartRangeParsed: { min: 0, max: 300 },
+        startDistanceCurveParsed: [{ x: 0, y: 1 }, { x: 1, y: 1 }],
+        retransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionRangeParsed: { min: 0, max: 300 },
+        retransitionSpeedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionSpeedRangeParsed: { min: 50, max: 2000 },
+        tweenRetransitionSpeedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenRetransitionSpeedRangeParsed: { min: 50, max: 2000 },
+        tweenRetransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenRetransitionRangeParsed: { min: 0, max: 300 },
+        tweenStopStartCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStopStartRangeParsed: { min: 0, max: 300 },
+        tweenStopDelayCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStopDelayRangeParsed: { min: 0, max: 2000 }
+      }
+    }
+  } else {
+    if (!CLICK_POSE_KEYS.includes(prefix)) CLICK_POSE_KEYS.push(prefix)
+    if (!clickPoseTriggers[prefix]) {
+      clickPoseTriggers[prefix] = {
+        startCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], startRangeParsed: { min: 0, max: 300 },
+        speedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], speedRangeParsed: { min: 50, max: 2000 },
+        tweenStartCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStartRangeParsed: { min: 0, max: 300 },
+        startDistanceCurveParsed: [{ x: 0, y: 1 }, { x: 1, y: 1 }],
+        retransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionRangeParsed: { min: 0, max: 300 },
+        retransitionSpeedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionSpeedRangeParsed: { min: 50, max: 2000 }
+      }
     }
   }
-  const controls = buildMultiTriggerControlsForPrefix(prefix, title)
+  const controls = buildMultiTriggerControlsForPrefix(prefix, title, kind)
   const g = renderDynamicGroup({ title, controls }) // seeds cfg regardless of DOM; returns null with no panel
-  parseClickPoseConfig(prefix) // pure cfg read -- needed regardless of DOM for real dispatch to work
+  if (kind === 'hold') parseClickHoldConfig(prefix); else parseClickPoseConfig(prefix) // pure cfg read -- needed regardless of DOM for real dispatch to work
   if (!g || !mtBody) return
   // CORRECTED before ever shipping (caught by re-reading createGroupElement()'s
   // own source, not live-caught): devPanel.js's createGroupElement() sets
@@ -10869,9 +10901,16 @@ function registerMultiTriggerTrigger(prefix, title, mtBody, addBtnRow) {
   // dataset.key.
   g.dataset.multiTriggerPrefix = prefix
   mtBody.insertBefore(g, addBtnRow)
-  buildClickPoseWidgets(prefix)
-  updateClickTriggerModeVisibility(prefix, ['PauseDurationMs'])
-  updateChainModeVisibility(prefix)
+  if (kind === 'hold') {
+    buildClickHoldPoseWidgets(prefix)
+    updateClickTriggerModeVisibility(prefix, [], ['LoopMode'])
+    updateLoopHoldVisibility(prefix)
+    updateTweenStopGateVisibility(prefix)
+  } else {
+    buildClickPoseWidgets(prefix)
+    updateClickTriggerModeVisibility(prefix, ['PauseDurationMs'])
+    updateChainModeVisibility(prefix)
+  }
   updateOffsetRotationVisibility(prefix)
   updateSingleTimingGateVisibility(prefix)
   wrapClickFunctionGatedSubgroups(prefix)
@@ -10881,9 +10920,9 @@ function registerMultiTriggerTrigger(prefix, title, mtBody, addBtnRow) {
   // silently skips any layout entry whose row/group doesn't exist for
   // this reduced control set (Type/TouchPointCount/ClickCount/Sequence*
   // aren't in MULTI_TRIGGER_ALLOWED_SUFFIXES), so this is safe to call
-  // unconditionally with the same 'pose' layout every fire-and-forget
-  // function uses.
-  applyCustomFunctionReferenceLayout(prefix, 'pose')
+  // unconditionally with the matching 'hold'/'pose' layout every regular
+  // custom function of that kind uses.
+  applyCustomFunctionReferenceLayout(prefix, kind === 'hold' ? 'hold' : 'pose')
 }
 // Reads cfg[`${id}MultiTriggers`] (the persisted, ordered trigger list)
 // and rebuilds every trigger's own runtime state + (if a panel exists)
@@ -10893,7 +10932,7 @@ function registerMultiTriggerTrigger(prefix, title, mtBody, addBtnRow) {
 // state gets rebuilt from scratch each load (renderDynamicGroup()'s own
 // DOM/CLICK_POSE_KEYS registration is pure runtime state, gone on every
 // reload -- see restoreCustomClickFunctions()'s own matching comment).
-function setupMultiTriggerGroupForFunction(id) {
+function setupMultiTriggerGroupForFunction(id, kind) {
   const mtControls = [
     { key: `${id}MultiTriggerEnabled`, label: 'Multi Trigger (On/Off)', type: 'checkbox', def: false, onChange: () => updateMultiTriggerGroupVisibility(id) },
     { key: `${id}MultiTriggers`, label: 'Multi Trigger List (internal)', type: 'text', def: '[]' }
@@ -10921,7 +10960,7 @@ function setupMultiTriggerGroupForFunction(id) {
     const btn = document.createElement('button')
     btn.type = 'button'
     btn.textContent = '+ Add Trigger'
-    btn.addEventListener('click', () => addMultiTriggerTrigger(id))
+    btn.addEventListener('click', () => addMultiTriggerTrigger(id, kind))
     addBtnRow.appendChild(btn)
     mtBody.appendChild(addBtnRow)
     // Drag-reorder-aware persistence -- devPanel.js's own generic group
@@ -10947,7 +10986,7 @@ function setupMultiTriggerGroupForFunction(id) {
   let triggers = []
   try { triggers = JSON.parse(cfg[`${id}MultiTriggers`] || '[]') } catch (e) { triggers = [] }
   if (!Array.isArray(triggers)) triggers = []
-  triggers.forEach((t) => { if (t && t.prefix) registerMultiTriggerTrigger(t.prefix, t.title || t.prefix, mtBody, addBtnRow) })
+  triggers.forEach((t) => { if (t && t.prefix) registerMultiTriggerTrigger(t.prefix, t.title || t.prefix, mtBody, addBtnRow, kind) })
   updateMultiTriggerGroupVisibility(id)
 }
 // "+ Add Trigger" button's own click handler. First trigger added = the
@@ -10955,7 +10994,7 @@ function setupMultiTriggerGroupForFunction(id) {
 // next click after that -- direct spec wording ("if there are none, when
 // i add one, its the tween for the 2nd click. The next one added will be
 // the 3rd").
-function addMultiTriggerTrigger(id) {
+function addMultiTriggerTrigger(id, kind) {
   let triggers = []
   try { triggers = JSON.parse(cfg[`${id}MultiTriggers`] || '[]') } catch (e) { triggers = [] }
   if (!Array.isArray(triggers)) triggers = []
@@ -10977,7 +11016,7 @@ function addMultiTriggerTrigger(id) {
   const realMtGroup = functionBody ? functionBody.querySelector(':scope > .dp-group[data-key="Multi Trigger"]') : null
   const mtBody = realMtGroup ? realMtGroup.querySelector(':scope > .dp-group-body') : null
   const addBtnRow = mtBody ? mtBody.querySelector(':scope > .dp-multi-trigger-add-row') : null
-  registerMultiTriggerTrigger(prefix, title, mtBody, addBtnRow)
+  registerMultiTriggerTrigger(prefix, title, mtBody, addBtnRow, kind)
   saveCurrentSettings()
 }
 // Reads the LIVE DOM order of this function's own trigger sub-groups and
@@ -11115,6 +11154,18 @@ function triggerCustomPoseFunctions(type, clickCount = 1) {
 // is excluded the same way triggerCustomPoseFunctions() excludes its own
 // multi-touch Click functions -- see customFunctionWantsMultiTouch()'s
 // own comment.
+// Multi Trigger for hold-kind functions -- CORRECTED 2026-10-01, direct
+// request ("Click Functions that trigger a sequence should still be
+// able to have multi trigger functionality"). resolveMultiTriggerPrefix(id)
+// ADVANCES the function's own shared cycle counter every time it's
+// called, so it must be resolved exactly ONCE per physical press and
+// the SAME resolved prefix reused at release -- start/end are 2
+// SEPARATE calls (unlike triggerCustomPoseFunctions()'s own single
+// fire-and-forget call) that both need to agree on which prefix this
+// particular press actually armed. Cached here per function id,
+// written by startCustomHoldFunctions(), read (never re-resolved) by
+// endCustomHoldFunctions().
+const customHoldMultiTriggerActivePrefix = {}
 function startCustomHoldFunctions(type, ordinal = 1) {
   const deviceFamily = currentDeviceFamily()
   customClickFunctionIds.forEach(({ id, kind, family }) => {
@@ -11122,7 +11173,9 @@ function startCustomHoldFunctions(type, ordinal = 1) {
     if (!customFunctionActiveForDeviceFamily(family, id, deviceFamily)) return
     if (type === 'Click+Hold' && customFunctionClickCountOrdinal(id) !== ordinal) return
     if (type === 'Click+Hold' && customFunctionWantsMultiTouch(id)) return
-    startClickHoldPose(id)
+    const prefix = resolveMultiTriggerPrefix(id)
+    customHoldMultiTriggerActivePrefix[id] = prefix
+    startClickHoldPose(prefix)
   })
 }
 function endCustomHoldFunctions(type, ordinal = 1) {
@@ -11132,7 +11185,13 @@ function endCustomHoldFunctions(type, ordinal = 1) {
     if (!customFunctionActiveForDeviceFamily(family, id, deviceFamily)) return
     if (type === 'Click+Hold' && customFunctionClickCountOrdinal(id) !== ordinal) return
     if (type === 'Click+Hold' && customFunctionWantsMultiTouch(id)) return
-    endClickHoldPose(id)
+    // Release whichever prefix THIS press actually armed -- falls back
+    // to the base id if start was somehow never recorded (e.g. Multi
+    // Trigger got disabled mid-hold), matching resolveMultiTriggerPrefix()'s
+    // own "disabled -> base id" behavior.
+    const prefix = customHoldMultiTriggerActivePrefix[id] || id
+    delete customHoldMultiTriggerActivePrefix[id]
+    endClickHoldPose(prefix)
   })
 }
 // Scroll -- direct spec item ("Click Function Type should always include

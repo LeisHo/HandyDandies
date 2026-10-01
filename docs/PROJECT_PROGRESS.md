@@ -58,14 +58,32 @@ functions.** Status per item:
    handle writes back to both real `<input type=range>` elements the
    same way every other main.js-driven devPanel.js control already
    does.
-5. **NOT YET STARTED -- Multi Trigger extended to hold-kind functions
-   and to Sequence-mode (any kind); pose-match-skip-to-next-target
-   logic.** Confirmed via AskUserQuestion: applies to BOTH pose-kind
-   and hold-kind functions in ANY mode; the pose-match check also
-   applies to Sequence-mode triggers, compared against the sequence's
-   first/anchor pose. This is a genuinely large change (mirrors the
-   entire pose-kind Multi Trigger system for `CLICK_HOLD_KEYS`/
-   `clickHoldPoseTriggers`) -- not yet implemented.
+5. **PARTIALLY DONE -- Multi Trigger extended to hold-kind functions.**
+   `registerMultiTriggerTrigger()`/`buildMultiTriggerControlsForPrefix()`/
+   `setupMultiTriggerGroupForFunction()`/`addMultiTriggerTrigger()` now
+   all take a `kind` param and branch between `makeClickHoldPoseGroup()`/
+   `CLICK_HOLD_KEYS`/`clickHoldPoseTriggers` and `makeClickPoseGroup()`/
+   `CLICK_POSE_KEYS`/`clickPoseTriggers`. Hold-kind dispatch wired into
+   `startCustomHoldFunctions()`/`endCustomHoldFunctions()` via a new
+   `customHoldMultiTriggerActivePrefix` cache (resolves the cycle ONCE
+   at press-start, reuses the same prefix at release -- verified via an
+   isolated logic reproduction that start/end always agree and the
+   cycle advances exactly once per press, not per start+end). Sequence
+   mode (TweenSelector/Mode) was already in `MULTI_TRIGGER_ALLOWED_SUFFIXES`,
+   so this also covers "trigger a sequence... should still have multi
+   trigger" for pose-kind, which already worked -- the real gap was
+   hold-kind specifically. **NOT YET DONE: the pose-match-skip-to-next-
+   target logic** (if a trigger's target pose already matches a hand's
+   current pose, skip to the next target or don't fire) -- deferred
+   deliberately, not forgotten. This needs a genuinely new "compare a
+   hand's live pose values against a target" mechanism that doesn't
+   exist anywhere in this codebase yet, PLUS a real design resolution
+   for the tension between Multi Trigger's existing per-FUNCTION shared
+   cycle index and a per-HAND skip decision (different hands could want
+   to skip to different next-targets after the same click). Given this
+   session already shipped 2 real production outages from rushed
+   hold-kind dispatch changes, building this on the same turn as the
+   hold-kind port above was judged too much at once -- next round.
 6. **A pasted "buggy test" log was reviewed** -- the behavior shown
    (a single click resolving Multi Trigger's shared per-function cycle
    counter, firing the SAME resolved trigger for every hand that

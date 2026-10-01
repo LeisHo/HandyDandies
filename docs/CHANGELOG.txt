@@ -14860,6 +14860,68 @@ isolated logic reproductions (the math is the same shape as several
 already-verified widgets this session) plus direct code reading for the
 2 investigations.
 
+2026-10-01  -  (40th round, continued -- Multi Trigger extended to
+hold-kind custom click functions)
+
+**Generalized the entire Multi Trigger system from pose-kind-only to
+both kinds.** `buildMultiTriggerControlsForPrefix(prefix, title, kind)`
+now sources a sub-trigger's own controls from `makeClickHoldPoseGroup()`
+when `kind === 'hold'` (previously always `makeClickPoseGroup()`).
+`registerMultiTriggerTrigger(prefix, title, mtBody, addBtnRow, kind)`
+branches its entire runtime-state seed between `CLICK_HOLD_KEYS`/
+`clickHoldPoseTriggers[prefix]` (the full hold-kind trigger-state shape,
+copied verbatim from `registerCustomClickFunction()`'s own hold branch --
+active/holdStartTime/forwardSnapshot/loopPoses/rawChainEntries/
+loopSegmentMs plus every curve-parsed field) and `CLICK_POSE_KEYS`/
+`clickPoseTriggers[prefix]` (unchanged), and calls `buildClickHoldPoseWidgets()`/
+`updateLoopHoldVisibility()`/`updateTweenStopGateVisibility()` for
+hold-kind vs. `buildClickPoseWidgets()`/`updateChainModeVisibility()`
+for pose-kind. `applyCustomFunctionReferenceLayout(prefix, kind === 'hold'
+? 'hold' : 'pose')` picks the matching reference layout.
+`setupMultiTriggerGroupForFunction(id, kind)`/`addMultiTriggerTrigger(id, kind)`
+thread the new param through from `renderCustomClickFunctionGroup()`'s
+own hold-kind branch (previously only called from the pose-kind branch,
+confirmed via its own code comment: "Pose-kind only -- no equivalent
+requested/built for hold-kind").
+
+**Dispatch wiring was the genuinely new part, not just a parameter
+thread-through.** Pose-kind's fire-and-forget `triggerCustomPoseFunctions()`
+already resolved `resolveMultiTriggerPrefix(id)` once per real click and
+used the result immediately -- nothing to adapt. Hold-kind splits a
+single press into 2 separate calls (`startCustomHoldFunctions()` at
+press-start, `endCustomHoldFunctions()` at release), and
+`resolveMultiTriggerPrefix()` ADVANCES the function's own shared cycle
+counter every time it's called -- calling it independently at both
+start and end would both double-advance the cycle per press AND let
+start/end disagree on which prefix was actually armed (arming Trigger
+2, releasing Trigger 3, which was never started). Fixed with a new
+`customHoldMultiTriggerActivePrefix` cache: resolved once in
+`startCustomHoldFunctions()`, read (never re-resolved) in
+`endCustomHoldFunctions()`, falling back to the base id if a start was
+somehow never recorded (mirrors `resolveMultiTriggerPrefix()`'s own
+"Multi Trigger disabled -> base id" fallback).
+
+Deliberately did NOT also build the pose-match-skip-to-next-target
+behavior requested in the same message (if a trigger's target pose
+already matches a hand's current pose, skip to the next Multi Trigger
+target; if none remain, don't fire) -- see PROJECT_PROGRESS.md's own
+40th-round entry for the full reasoning. In short: it needs a genuinely
+new per-hand pose-comparison mechanism that doesn't exist yet, plus a
+real design resolution for comparing a per-FUNCTION shared cycle index
+against a per-HAND skip decision, and this session has already shipped
+2 real production outages this same day from rushed hold-kind dispatch
+changes -- stacking that novel mechanism onto this same port was judged
+too much risk for one pass. Flagged as explicitly deferred, not
+silently dropped.
+
+Verified: `node --check src/main.js` passes. Isolated logic reproduction
+confirmed start/end always agree on the same resolved prefix across
+repeated press/release cycles, and the shared cycle counter advances
+exactly once per press (base -> Trigger 1 -> Trigger 2 -> base), not
+once per start+end. **Not live-verified in browser this round.**
+
+`main.js` cache-buster bumped `?v=260` -> `?v=261`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a
