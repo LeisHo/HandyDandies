@@ -18,6 +18,33 @@ work seamlessly from there.
 
 ## Currently working on
 
+**KNOWN ISSUE, logged not fixed, 2026-10-01 -- "flashing" on a spatially-
+clustered patch of hands (described: hands 14-17/27-30/40-42/53-55, a
+rectangular region in the upper-left of the 13-column grid) during a
+Click+Hold-release followed by a plain Click shortly after.** Confirmed
+from a real pasted log: every hand in that specific cluster shows 2
+state transitions landing in the SAME tick -- `CLICK + HOLD -- Tween
+Stop decay finished -> retransition begins` immediately followed by
+`CLICK -- interrupted CLICK + HOLD (was mid-"retransition")` ->
+`triggered -> pose "..."` -- while hands outside that cluster have the
+same 2 events spaced further apart. **Working hypothesis, NOT
+confirmed:** the old Click+Hold's own decay-to-retransition timing and
+the new Click's own per-hand Start Time Curve delay are 2 independent
+stagger curves; for hands in this particular distance band from the
+cursor, both happen to resolve within the same frame or two, so the
+hand briefly shows the just-started-retransition pose before being
+immediately overwritten -- if that intermediate pose differs visibly
+from both neighbors, it would read as a flash. Explicitly NOT verified
+further -- this project's own "jump" investigation history (10 rounds,
+see CLAUDE.md) shows multiple plausible-sounding theories for this bug
+CLASS turned out wrong before the real cause was found each time, so
+this hypothesis should be re-tested against real live data, not
+trusted as-is, before building a fix. **Logged per explicit user
+choice** (asked whether to dig in now or log and move on) -- revisit
+when there's bandwidth for a proper live investigation, ideally
+reproducing the EXACT cursor position/field-size/function combination
+from the original report first.
+
 **IN PROGRESS 2026-10-01 (40th round) -- multiple queued requests:
 missing custom click functions, min/max slider rescale, Start Distance
 single-slider, and Multi Trigger extended to hold-kind/Sequence-mode
