@@ -2975,7 +2975,7 @@ export function initDevPanel(groups, opts = {}) {
   const saveHeaderBtn = el('button', 'dp-icon-btn', { type: 'button', textContent: '💾', title: 'Save' })
   const resetHeaderBtn = el('button', 'dp-icon-btn', { type: 'button', textContent: '↺', title: 'Reset' })
   const collapseBtn = el('button', 'dp-icon-btn', { type: 'button', textContent: '–', title: 'Collapse' })
-  headerButtons.append(saveHeaderBtn, setHotkeyBtn, textEditBtn, addGroupBtn, collapseAllBtn, deleteGroupBtn, undoBtn, redoBtn, copyHeaderBtn, resetHeaderBtn, collapseBtn)
+  headerButtons.append(saveHeaderBtn, copyHeaderBtn, resetHeaderBtn, setHotkeyBtn, textEditBtn, addGroupBtn, collapseAllBtn, deleteGroupBtn, undoBtn, redoBtn, collapseBtn)
   header.appendChild(headerButtons)
   panel.appendChild(header)
 
