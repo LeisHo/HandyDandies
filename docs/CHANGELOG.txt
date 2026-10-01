@@ -15094,6 +15094,75 @@ fix, regardless of whether Save reported success.
 bumped `?v=53` -> `?v=54`; `main.js` cache-buster bumped `?v=264` ->
 `?v=265`.
 
+2026-10-01  -  (feature -- Offset Mode dropdown: "XYZ Offset" /
+"Cursor Offset," for every custom click function)
+
+Direct request: "in all custom click functons, in Offset, provide a
+dropdown, there are 2 options, XYZ offset, which is what it is
+currently, and Cursor Offset. Curser offset... will displace the hand
+instead in the xy direction (horizontal) towards or away from the
+cursor. Provide an offset distance slider where i can go both positive
+and negative. Only show the relevant sliders when i choose an offset
+mode."
+
+Added `${p}OffsetMode` (select, default 'XYZ Offset' -- matches the
+pre-existing behavior exactly for every function that never touches
+this new control) and `${p}CursorOffsetDistance` (slider, -50 to 50)
+to both `makeClickHoldPoseGroup()` and `makeClickPoseGroup()`, right
+after the existing `OffsetEnabled`/`OffsetX`/`OffsetY` controls.
+
+The real implementation work was making the NEW mode behave correctly
+through every path that reads an Offset value, not just the obvious
+one. `cfg[OffsetX]`/`cfg[OffsetY]` used to be read directly in 3
+separate places: `applyOffsetRotationToHand()` (the live per-frame
+apply), `bakeOffsetRotationIntoAccum()` (credits the FULL amount to the
+hand's permanent accumulator when a ramp/lap naturally completes), and
+`bakeInFlightOffsetRotation()` (credits only the FRACTION that was
+actually showing when a hold is released mid-ramp -- the exact
+mechanism this project's own 10-round "jump investigation" built to
+stop a hand snapping on interruption). All 3 now call a new shared
+`computeOffsetXY(hand, p)` helper instead of reading cfg directly, so
+Cursor Offset gets the identical direction math in every one of them --
+building this for just the live-apply path and leaving the other 2
+reading the raw slider value directly would have reproduced exactly
+the class of snap/drift bug that investigation already spent 10 rounds
+closing, just for a brand new feature instead of an old one.
+
+Direction math: `_offsetHandToCursor.subVectors(cursorTarget,
+hand.wrapper.position)`, dotted against the existing `_offsetRightVec`
+(camera-right axis, already used by the pre-existing OffsetX mechanism)
+to get a +1/-1 sign -- positive means the cursor is to the hand's
+"right" in screen terms. Multiplying the configured distance by this
+sign means a positive distance always moves the hand TOWARD the
+cursor and a negative one always moves it AWAY, regardless of which
+side the cursor actually is on for that specific hand -- matching
+"towards or away from the cursor" as a single signed control, not an
+X/Y pair (Cursor Offset mode leaves Y at 0; there is no cursor-relative
+vertical equivalent, matching the request's own "xy direction
+(horizontal)" wording).
+
+Also updated: `MULTI_TRIGGER_ALLOWED_SUFFIXES` (so a Multi Trigger
+sub-trigger of either kind gets the same 2 new controls as its parent
+function) and `wrapGatedSubgroup('${p}OffsetEnabled', [...], 'Offset')`'s
+own member-key list (so the new controls nest inside the existing
+"Offset" subgroup, not as stray top-level rows). `updateOffsetRotationVisibility(p)`
+now shows OffsetX/OffsetY only in XYZ mode and CursorOffsetDistance
+only in Cursor mode, both still gated by the outer OffsetEnabled toggle
+exactly as before.
+
+Verified via an isolated logic reproduction of the direction-sign math
+(4 cases: hand left of cursor + positive distance -> moves right/toward;
+same hand + negative distance -> moves left/away; hand right of cursor
++ positive distance -> correctly moves left/toward, confirming the sign
+flips correctly based on which side the cursor is actually on; XYZ
+Offset mode completely unaffected by cursor position, confirming no
+behavior change for every pre-existing function). `node --check`
+passes. **Not live-verified in browser** -- the local static server's
+own documented network-truncation quirk failed all 5 navigation
+attempts this round (the standing retry cap).
+
+`main.js` cache-buster bumped `?v=265` -> `?v=266`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

@@ -3758,8 +3758,21 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       // ON TOP of cursor-tracking's own wrapper rotation (added, never
       // replacing it) so it can never fight the tween's own posing.
       { key: `${p}OffsetEnabled`, label: 'Offset On/Off', type: 'checkbox', def: false, onChange: () => updateOffsetRotationVisibility(p) },
+      // Direct request 2026-10-01: "provide a dropdown, there are 2
+      // options, XYZ offset, which is what it is currently, and Cursor
+      // Offset." XYZ Offset is the pre-existing camera-right/up
+      // OffsetX/OffsetY behavior, unchanged. Cursor Offset is new: ONE
+      // signed distance slider (no X/Y split -- "horizontal towards or
+      // away from the cursor" is a single direction, not 2 independent
+      // axes) that displaces the hand along the camera-right axis,
+      // toward the cursor for a positive value and away for a negative
+      // one, regardless of which side of the hand the cursor is
+      // currently on -- see applyOffsetRotationToHand()'s own comment
+      // for the per-hand direction-sign math.
+      { key: `${p}OffsetMode`, label: 'Offset Mode', type: 'select', def: 'XYZ Offset', options: () => ['XYZ Offset', 'Cursor Offset'], onChange: () => updateOffsetRotationVisibility(p) },
       { key: `${p}OffsetX`, label: 'Offset X (World Units)', type: 'slider', min: -50, max: 50, step: 0.5, def: 0 },
       { key: `${p}OffsetY`, label: 'Offset Y (World Units)', type: 'slider', min: -50, max: 50, step: 0.5, def: 0 },
+      { key: `${p}CursorOffsetDistance`, label: 'Cursor Offset Distance (World Units)', type: 'slider', min: -50, max: 50, step: 0.5, def: 0 },
       { key: `${p}RotationEnabled`, label: 'Rotation On/Off', type: 'checkbox', def: false, onChange: () => updateOffsetRotationVisibility(p) },
       { key: `${p}RotationX`, label: 'Rotation X (Deg)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
       { key: `${p}RotationY`, label: 'Rotation Y (Deg)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
@@ -4069,8 +4082,21 @@ function makeClickPoseGroup(p, title, defaults = {}) {
       // comment for the full reasoning (shared word-for-word, both
       // factories added this the same way).
       { key: `${p}OffsetEnabled`, label: 'Offset On/Off', type: 'checkbox', def: false, onChange: () => updateOffsetRotationVisibility(p) },
+      // Direct request 2026-10-01: "provide a dropdown, there are 2
+      // options, XYZ offset, which is what it is currently, and Cursor
+      // Offset." XYZ Offset is the pre-existing camera-right/up
+      // OffsetX/OffsetY behavior, unchanged. Cursor Offset is new: ONE
+      // signed distance slider (no X/Y split -- "horizontal towards or
+      // away from the cursor" is a single direction, not 2 independent
+      // axes) that displaces the hand along the camera-right axis,
+      // toward the cursor for a positive value and away for a negative
+      // one, regardless of which side of the hand the cursor is
+      // currently on -- see applyOffsetRotationToHand()'s own comment
+      // for the per-hand direction-sign math.
+      { key: `${p}OffsetMode`, label: 'Offset Mode', type: 'select', def: 'XYZ Offset', options: () => ['XYZ Offset', 'Cursor Offset'], onChange: () => updateOffsetRotationVisibility(p) },
       { key: `${p}OffsetX`, label: 'Offset X (World Units)', type: 'slider', min: -50, max: 50, step: 0.5, def: 0 },
       { key: `${p}OffsetY`, label: 'Offset Y (World Units)', type: 'slider', min: -50, max: 50, step: 0.5, def: 0 },
+      { key: `${p}CursorOffsetDistance`, label: 'Cursor Offset Distance (World Units)', type: 'slider', min: -50, max: 50, step: 0.5, def: 0 },
       { key: `${p}RotationEnabled`, label: 'Rotation On/Off', type: 'checkbox', def: false, onChange: () => updateOffsetRotationVisibility(p) },
       { key: `${p}RotationX`, label: 'Rotation X (Deg)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
       { key: `${p}RotationY`, label: 'Rotation Y (Deg)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
@@ -6997,6 +7023,33 @@ const _offsetRightVec = new THREE.Vector3()
 const _offsetUpVec = new THREE.Vector3()
 const _offsetEuler = new THREE.Euler()
 const _offsetQuat = new THREE.Quaternion()
+const _offsetHandToCursor = new THREE.Vector3()
+// Direct request 2026-10-01: Offset Mode dropdown ('XYZ Offset', the
+// pre-existing behavior, vs. 'Cursor Offset', new). Shared by every
+// call site that used to read cfg[OffsetX]/cfg[OffsetY] directly
+// (applyOffsetRotationToHand()'s own live per-frame apply, PLUS
+// bakeOffsetRotationIntoAccum()/bakeInFlightOffsetRotation()'s own
+// permanent-accumulator credits) so Cursor Offset behaves identically
+// through every one of those paths, not just the live-render one.
+// Cursor Offset is ONE signed distance along the camera-right axis --
+// "horizontal towards or away from the cursor" is a single direction,
+// not an independent X/Y pair, so there is no cursor-mode equivalent of
+// OffsetY (Y stays 0 in that mode).
+function computeOffsetXY(hand, p) {
+  if (cfg[`${p}OffsetMode`] === 'Cursor Offset') {
+    // Signed dot product of the hand-to-cursor vector against the
+    // camera-right axis: positive if the cursor is to the "right" of
+    // this hand in screen terms, negative if to the "left". Multiplying
+    // the configured distance by this sign means a positive distance
+    // always moves the hand TOWARD the cursor and a negative one always
+    // moves it AWAY, regardless of which side the cursor actually is on
+    // for this particular hand.
+    _offsetHandToCursor.subVectors(cursorTarget, hand.wrapper.position)
+    const dirSign = _offsetHandToCursor.dot(_offsetRightVec) >= 0 ? 1 : -1
+    return { x: dirSign * (cfg[`${p}CursorOffsetDistance`] || 0), y: 0 }
+  }
+  return { x: cfg[`${p}OffsetX`] || 0, y: cfg[`${p}OffsetY`] || 0 }
+}
 // CORRECTED 2026-09-27 -- direct spec, 3 related items:
 // (2) "each click function's offset and rotation effects will be
 // stacked when another function is triggered... the 2nd triggered
@@ -7063,8 +7116,9 @@ function applyOffsetRotationToHand(hand, p, progress) {
   }
   if (!isIdentityQuat(hand._customRotationAccum)) hand.wrapper.quaternion.multiply(hand._customRotationAccum)
   if (cfg[`${p}OffsetEnabled`]) {
-    const ox = (cfg[`${p}OffsetX`] || 0) * progress
-    const oy = (cfg[`${p}OffsetY`] || 0) * progress
+    const base = computeOffsetXY(hand, p)
+    const ox = base.x * progress
+    const oy = base.y * progress
     if (ox !== 0 || oy !== 0) {
       // Camera-relative right/up, not world/local axes -- this project's
       // camera only pans/zooms, never rotates, so these stay a stable
@@ -7095,8 +7149,9 @@ function bakeOffsetRotationIntoAccum(hand, p) {
   if (!hand._customOffsetAccum) hand._customOffsetAccum = { x: 0, y: 0 }
   if (!hand._customRotationAccum) hand._customRotationAccum = new THREE.Quaternion()
   if (cfg[`${p}OffsetEnabled`]) {
-    hand._customOffsetAccum.x += cfg[`${p}OffsetX`] || 0
-    hand._customOffsetAccum.y += cfg[`${p}OffsetY`] || 0
+    const base = computeOffsetXY(hand, p)
+    hand._customOffsetAccum.x += base.x
+    hand._customOffsetAccum.y += base.y
   }
   if (cfg[`${p}RotationEnabled`]) {
     const rx = cfg[`${p}RotationX`] || 0, ry = cfg[`${p}RotationY`] || 0, rz = cfg[`${p}RotationZ`] || 0
@@ -7133,8 +7188,9 @@ function bakeInFlightOffsetRotation(hand, p) {
   if (!hand._customOffsetAccum) hand._customOffsetAccum = { x: 0, y: 0 }
   if (!hand._customRotationAccum) hand._customRotationAccum = new THREE.Quaternion()
   if (cfg[`${p}OffsetEnabled`]) {
-    hand._customOffsetAccum.x += (cfg[`${p}OffsetX`] || 0) * fraction
-    hand._customOffsetAccum.y += (cfg[`${p}OffsetY`] || 0) * fraction
+    const base = computeOffsetXY(hand, p)
+    hand._customOffsetAccum.x += base.x * fraction
+    hand._customOffsetAccum.y += base.y * fraction
   }
   if (cfg[`${p}RotationEnabled`]) {
     const rx = (cfg[`${p}RotationX`] || 0) * fraction, ry = (cfg[`${p}RotationY`] || 0) * fraction, rz = (cfg[`${p}RotationZ`] || 0) * fraction
@@ -10878,7 +10934,7 @@ function enforceCustomClickFunctionsAnchorOrder() {
 // change to the real controls propagates to every trigger automatically.
 const MULTI_TRIGGER_ALLOWED_SUFFIXES = [
   'Enabled', 'Mode', 'TargetPose', 'TweenSelector', 'TweenSpeedMs', 'TransitionSpeedMs', 'PauseDurationMs',
-  'OffsetEnabled', 'OffsetX', 'OffsetY',
+  'OffsetEnabled', 'OffsetMode', 'OffsetX', 'OffsetY', 'CursorOffsetDistance',
   'RotationEnabled', 'RotationX', 'RotationY', 'RotationZ',
   'SpeedCurveEnabled', 'SpeedCurve', 'SpeedCurveRange',
   'StartTimeCurveEnabled', 'StartTimeCurve', 'StartTimeRange', 'TweenStartTimeCurve', 'TweenStartTimeRange',
@@ -11824,10 +11880,18 @@ function updateSequencePlayModeVisibility(p) {
 // switching never touches this function.
 function updateOffsetRotationVisibility(p) {
   const offsetOn = !!cfg[`${p}OffsetEnabled`]
+  // Direct request 2026-10-01: "only show the relevant sliders when i
+  // choose an offset mode." OffsetMode defaults to 'XYZ Offset' for
+  // every pre-existing function (no saved value yet), matching exactly
+  // the pre-existing behavior for anyone who never touches this new
+  // control.
+  const cursorMode = cfg[`${p}OffsetMode`] === 'Cursor Offset'
   ;['OffsetX', 'OffsetY'].forEach((suffix) => {
     const row = document.querySelector(`.dp-row[data-key="${p}${suffix}"]`)
-    if (row) row.style.display = offsetOn ? '' : 'none'
+    if (row) row.style.display = offsetOn && !cursorMode ? '' : 'none'
   })
+  const cursorOffsetRow = document.querySelector(`.dp-row[data-key="${p}CursorOffsetDistance"]`)
+  if (cursorOffsetRow) cursorOffsetRow.style.display = offsetOn && cursorMode ? '' : 'none'
   const rotationOn = !!cfg[`${p}RotationEnabled`]
   ;['RotationX', 'RotationY', 'RotationZ'].forEach((suffix) => {
     const row = document.querySelector(`.dp-row[data-key="${p}${suffix}"]`)
@@ -11902,7 +11966,7 @@ function wrapGatedSubgroup(enabledKey, memberKeys, subgroupTitle) {
 // Sequence mode, a separate concept from Single Pose's own Retransition
 // on/off).
 function wrapClickFunctionGatedSubgroups(p) {
-  wrapGatedSubgroup(`${p}OffsetEnabled`, [`${p}OffsetX`, `${p}OffsetY`], 'Offset')
+  wrapGatedSubgroup(`${p}OffsetEnabled`, [`${p}OffsetMode`, `${p}OffsetX`, `${p}OffsetY`, `${p}CursorOffsetDistance`], 'Offset')
   wrapGatedSubgroup(`${p}RotationEnabled`, [`${p}RotationX`, `${p}RotationY`, `${p}RotationZ`], 'Rotation')
   wrapGatedSubgroup(`${p}SpeedCurveEnabled`, [`${p}SpeedCurve`, `${p}SpeedCurveRange`], 'Animation Speed Curve')
   // CORRECTED 2026-09-24 (item 7, remainder): Tween mode's own always-on
