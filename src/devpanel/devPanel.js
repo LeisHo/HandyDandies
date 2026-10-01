@@ -2975,7 +2975,7 @@ export function initDevPanel(groups, opts = {}) {
   const saveHeaderBtn = el('button', 'dp-icon-btn', { type: 'button', textContent: '💾', title: 'Save' })
   const resetHeaderBtn = el('button', 'dp-icon-btn', { type: 'button', textContent: '↺', title: 'Reset' })
   const collapseBtn = el('button', 'dp-icon-btn', { type: 'button', textContent: '–', title: 'Collapse' })
-  headerButtons.append(setHotkeyBtn, textEditBtn, addGroupBtn, collapseAllBtn, deleteGroupBtn, undoBtn, redoBtn, copyHeaderBtn, saveHeaderBtn, resetHeaderBtn, collapseBtn)
+  headerButtons.append(saveHeaderBtn, setHotkeyBtn, textEditBtn, addGroupBtn, collapseAllBtn, deleteGroupBtn, undoBtn, redoBtn, copyHeaderBtn, resetHeaderBtn, collapseBtn)
   header.appendChild(headerButtons)
   panel.appendChild(header)
 
@@ -3935,7 +3935,7 @@ export function initDevPanel(groups, opts = {}) {
     let settled = false
     function commit() {
       if (settled) return; settled = true
-      const typed = input.value.trim().toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 2)
+      const typed = input.value.trim().toLowerCase()
       input.remove()
       if (typed) {
         pushDevPanelUndoSnapshot(); devRedoStack = []
@@ -3957,6 +3957,16 @@ export function initDevPanel(groups, opts = {}) {
     input.addEventListener('keydown', (ev) => {
       if (ev.key === 'Enter') { ev.preventDefault(); input.blur() }
       else if (ev.key === 'Escape') { ev.preventDefault(); cancel() }
+      else {
+        ev.preventDefault()
+        // Capture modifier+key combinations
+        const modPrefix = (ev.ctrlKey || ev.metaKey ? 'ctrl+' : '') +
+                          (ev.shiftKey ? 'shift+' : '') +
+                          (ev.altKey ? 'alt+' : '')
+        const keyName = ev.key === ' ' ? 'space' : (ev.key.toLowerCase().match(/^[a-z0-9]$/) ? ev.key.toLowerCase() : null)
+        const capturedKey = modPrefix && keyName ? modPrefix + keyName : ''
+        input.value = capturedKey.toUpperCase()
+      }
     })
     input.addEventListener('click', (ev) => ev.stopPropagation())
   }
@@ -4057,6 +4067,24 @@ export function initDevPanel(groups, opts = {}) {
     document.addEventListener('keydown', (e) => {
       if (activeSliderHotkey) { handleSliderHotkeyModeKey(e); return }
       if (isTypingIntoAnInput(e)) return
+
+      // Support modifier+key combinations (Ctrl+S, Shift+D, etc) - fire immediately, not buffered
+      if (e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) {
+        const modPrefix = (e.ctrlKey || e.metaKey ? 'ctrl+' : '') +
+                          (e.shiftKey ? 'shift+' : '') +
+                          (e.altKey ? 'alt+' : '')
+        const keyName = e.key === ' ' ? 'space' : (e.key.toLowerCase().match(/^[a-z0-9]$/) ? e.key.toLowerCase() : null)
+        if (modPrefix && keyName) {
+          e.preventDefault()
+          const fullKey = modPrefix + keyName
+          if (devHotkeys[fullKey]) {
+            triggerHotkey(devHotkeys[fullKey])
+          }
+        }
+        return
+      }
+
+      // Single letter keys without modifiers - use buffer for sequences
       if (!/^[a-z0-9]$/i.test(e.key)) return
       hotkeyKeyBuffer += e.key.toLowerCase()
       if (hotkeyKeyBuffer.length > 2) hotkeyKeyBuffer = hotkeyKeyBuffer.slice(-2)
