@@ -18,6 +18,32 @@ work seamlessly from there.
 
 ## Currently working on
 
+**RESOLVED 2026-09-30 (39th round) -- real production outage on the
+live Vercel deployment: "pause button is blank and nothing is loading"
+(same symptom signature as the 2026-09-29 TDZ outage, different cause).**
+Root cause: `buildDevPanel(groupsEl)` and `initDevPanel()` are separate,
+sibling top-level functions in `devpanel/devPanel.js` (confirmed: both
+declared at column 0, not nested) -- `buildDevPanel()` has no lexical
+access to anything local to `initDevPanel()`. The 38th round's Set
+Hotkey port added a call to `refreshHotkeysListSubgroup()` (a function
+local to `initDevPanel()`) from inside `buildDevPanel()`, which threw an
+uncaught `ReferenceError` the instant the panel built, aborting
+everything after it in the same call chain. Fixed by only creating the
+empty `#dpHotkeysListContainer` inside `buildDevPanel()`, and calling
+`refreshHotkeysListSubgroup()` from inside `initDevPanel()` itself
+instead, right after its own Set Hotkey state is declared. Also noticed
+and reviewed 2 concurrent commits from the user's own other session
+(`6ef7697`/`8d244e1`, modifier-key hotkey support + a header-button
+reorder) that landed on `main` between my own port and this outage --
+confirmed both are entirely inside `initDevPanel()`'s own body, don't
+touch `buildDevPanel()`, and don't conflict with this fix. `node --check`
+passes on both edited files; pushed immediately as commit `f7d640c`
+given this was a live outage, docs/ETA logged after. **Not independently
+live-verified against the deployed app this round either** -- same
+reasoning as the 38th round (direct code/scope analysis, not browser
+testing); the next real signal is whether the user's own reload of the
+live URL shows the app working again.
+
 **ADDED 2026-09-30 (38th round) -- Set Hotkey feature (per-control
 custom keyboard shortcuts), ported from HANDYSET's own `devPanel.js`.**
 Direct request: "i have a hotkey dev panel system. check it here...

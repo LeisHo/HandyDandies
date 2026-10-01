@@ -14693,6 +14693,79 @@ verification this time.
 own import-version bumped `?v=50` -> `?v=51`; `style.css` bumped `?v=23`
 -> `?v=24`.
 
+2026-09-30  -  (39th round -- REAL PRODUCTION OUTAGE on the live
+Vercel deployment: "its broken. same break as before. pause button is
+blank and nothing is loading")
+
+**Same reported SYMPTOM as the already-documented 2026-09-29 TDZ
+outage, but a genuinely DIFFERENT root cause -- diagnosed by code
+reading, not by reproducing live (this project's own local static
+server was not used this round; the fix was derived directly from the
+file's own function boundaries).** Confirmed via a brace-depth check
+plus direct reading that `buildDevPanel(groupsEl)` (devPanel.js) and
+`initDevPanel()` are 2 SEPARATE, SIBLING top-level functions -- both
+declared flush at column 0, neither nested inside the other.
+`buildDevPanel()` has no lexical access to anything declared inside
+`initDevPanel()`'s own body.
+
+The 38th round's Set Hotkey port added a block inside `buildDevPanel()`
+that both created the `#dpHotkeysListContainer` element AND immediately
+called `refreshHotkeysListSubgroup()` to populate it -- but
+`refreshHotkeysListSubgroup()` is a function declared INSIDE
+`initDevPanel()`'s own body, not a module-level function, so it does
+not exist at all in `buildDevPanel()`'s scope chain. This threw an
+uncaught `ReferenceError` the instant `buildDevPanel()` ran (called
+from inside `initDevPanel()` at a fixed call site), aborting the rest
+of that SAME call stack -- which is why the symptom looked identical to
+last time: whatever runs after the point of failure (the Pause button's
+own styling, hand-field startup, depending on this project's own
+call order) never executes.
+
+Why this specific mistake was easy to make despite already knowing the
+file's own TDZ history: `groupsEl` (a genuine PARAMETER of
+`buildDevPanel(groupsEl)`) worked FINE in the exact same added block --
+only the BORROWED function reference (`refreshHotkeysListSubgroup`,
+assumed shared scope by analogy, never actually checked) was the
+problem. A parameter passed explicitly is not the same thing as a
+same-named variable existing in an enclosing scope, and this file has
+BOTH patterns in active use nearby, making the wrong one easy to assume.
+
+Fixed with the minimal, scope-correct split: `buildDevPanel()` now only
+creates the empty container; `initDevPanel()` calls
+`refreshHotkeysListSubgroup()` itself, once, directly after its own 3
+Set Hotkey state declarations (`devHotkeyIsTouchDevice`/`devHotkeys`/
+`devSetHotkeyArmed`) -- safe because `refreshHotkeysListSubgroup` is
+hoisted within that SAME function's scope, and `devHotkeys` already
+exists by that line (declared the statement before). A real restore
+later (`applyFullPanelState()`) still correctly re-populates the list
+via its own existing `renderAllHotkeyBadges()` call, unchanged.
+
+**Also reviewed, not just noticed:** 2 commits from the user's own
+other, concurrent Claude Code session landed on `main`
+(`6ef7697`/`8d244e1`, both authored by the user's own git identity)
+between the 38th round's port and this outage report -- "Add modifier
+key support to hotkey capture" and a header-button reorder. Read both
+diffs directly before assuming they were unrelated: both are entirely
+inside `initDevPanel()`'s own body, never touch `buildDevPanel()`, and
+don't conflict with or get clobbered by this fix (confirmed by reading
+the file fresh from disk before editing, same as every other fix this
+session). Per CLAUDE.md §5 ("multiple sessions may be active, preserve
+other sessions' work"), this fix builds on top of that session's own
+changes rather than reverting or ignoring them.
+
+Verified: `node --check` passes on both edited files
+(`src/devpanel/devPanel.js`, `src/main.js`'s own import-version bump).
+**Not independently live-verified against the deployed app this
+round** -- pushed immediately as commit `f7d640c` given this was a
+live, user-blocking outage; confidence rests on the scope analysis
+above (a real `ReferenceError` from a genuinely out-of-scope reference
+is not a maybe), not a reproduction. The user's own next reload of the
+live URL is the real confirmation signal.
+
+`devpanel/devPanel.js`'s own import-version bumped `?v=51` -> `?v=52`
+(main.js itself untouched in content this round beyond that one import
+line).
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

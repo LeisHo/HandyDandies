@@ -2211,3 +2211,43 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   custom-click-function control, actually carry `data-key` the same way
   a plain DEV_GROUPS control does) before assuming the hotkey-sequence
   engine itself is broken.
+- **CORRECTED 2026-09-30, REAL PRODUCTION OUTAGE on the live Vercel
+  deployment, same reported symptom as the 2026-09-29 TDZ outage
+  ("pause button blank, nothing loading") but a DIFFERENT root cause --
+  a cross-function SCOPE bug, not a declaration-ORDER bug.**
+  `devpanel/devPanel.js` has 2 SEPARATE, SIBLING top-level functions,
+  `buildDevPanel(groupsEl)` and `initDevPanel()` (both declared flush at
+  column 0, neither nested in the other) -- `buildDevPanel()` has NO
+  lexical access to anything declared inside `initDevPanel()`'s own
+  body, regardless of call order. The Set Hotkey port added a block
+  inside `buildDevPanel()` that called `refreshHotkeysListSubgroup()`
+  -- a function that only exists inside `initDevPanel()`'s own scope --
+  throwing an uncaught `ReferenceError` the instant the panel built and
+  aborting everything after it in that call chain. Confusingly, a
+  DIFFERENT identifier (`groupsEl`) used in the exact same added block
+  worked fine, because it's a genuine PARAMETER of
+  `buildDevPanel(groupsEl)` -- not the same thing as a borrowed
+  same-named variable from an enclosing scope, but easy to conflate when
+  writing new code by analogy to a working neighbor. Fixed by having
+  `buildDevPanel()` only create the empty container, and having
+  `initDevPanel()` itself call `refreshHotkeysListSubgroup()` once,
+  right after its own Set Hotkey state exists. **Standing rule, distinct
+  from (and in addition to) the existing TDZ-declaration-order rule
+  above: before adding a call from inside ANY function in this file to
+  a function or variable that "should" be in scope, confirm which
+  top-level function you're actually inside (check for another
+  `function `/`export function` at column 0 between your edit and the
+  nearest earlier one) -- don't assume 2 pieces of code that feel like
+  they belong together are actually in the same lexical scope just
+  because they're conceptually related or nearby in the file.** This
+  bug was NOT caught by `node --check` (it's syntactically valid JS --
+  referencing an undefined identifier is a runtime error, not a parse
+  error) and was NOT caught by live testing before shipping (per direct
+  instruction, that round's own port was shipped without live
+  verification) -- the only way to catch this class of bug before
+  shipping is exactly the check this rule describes: trace which
+  function you're really inside before trusting a reference resolves.
+  Also confirmed, while fixing this, that 2 concurrent commits from the
+  user's own OTHER session (modifier-key hotkey support, a header-button
+  reorder) landed on `main` in between and were correctly preserved,
+  not clobbered -- see CHANGELOG.txt's matching 39th-round entry.
