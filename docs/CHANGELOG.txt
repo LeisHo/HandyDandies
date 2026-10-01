@@ -15203,6 +15203,86 @@ browser load since nothing about the page-load path changed.
 
 `main.js` cache-buster bumped `?v=266` -> `?v=267`.
 
+2026-10-01  -  (feature -- Cursor Offset Distance Curve: "an offset min
+max, as well as the curve, with x as distance from cursor")
+
+Direct request, immediately following the Cursor Offset axis-correction
+entry directly above: make `${p}CursorOffsetDistance` (the flat signed
+slider Cursor Offset mode uses) optionally driven by a per-hand curve
+based on that hand's own distance from the cursor, instead of a single
+fixed value for every hand -- the same Enabled/Curve/Range triplet shape
+already used throughout this file (Retransition Speed Curve, Start Time
+Curve, Tween Stop Delay Curve, etc.).
+
+Added `${p}CursorOffsetDistanceCurveEnabled` (checkbox), `${p}CursorOffsetDistanceCurve`
+(text, JSON curve points, default a straight 0->1 line), and
+`${p}CursorOffsetDistanceCurveRange` (text, JSON `{min,max}`, default
+-50 to 50 world units -- the "offset min max" the request asked for) to
+both `makeClickHoldPoseGroup()` and `makeClickPoseGroup()`, right after
+the existing `CursorOffsetDistance` slider. All 3 added to
+`MULTI_TRIGGER_ALLOWED_SUFFIXES` and the "Offset" subgroup's
+`wrapGatedSubgroup()` member list, and parsed/cached in
+`parseClickHoldConfig()`/`parseClickPoseConfig()` (`cursorOffsetDistanceCurveParsed`/
+`cursorOffsetDistanceRangeParsed`) the same way every other curve in
+this file already is -- including default entries in both
+`registerCustomClickFunction()`'s and `registerMultiTriggerTrigger()`'s
+own trigger-state initializers, so a brand-new function or sub-trigger
+has a well-formed curve from the moment it's created. Also backfilled
+`NEW_CUSTOM_FUNCTION_TEMPLATE` with `OffsetMode`/`CursorOffsetDistance`
+and the 3 new fields -- a pre-existing gap from when Offset Mode was
+first built earlier today (harmless in practice, since `buildRow()`
+falls back to each control's own `def` for anything missing from this
+template, but filled in while touching the same object anyway).
+
+The one real design decision: X is each hand's LIVE distance to the
+cursor, recomputed fresh every frame -- not a value frozen at trigger
+time, unlike every other curve in this file. Offset is applied
+continuously by `applyOffsetRotationToHand()` for as long as a trigger
+is active/ramping, so a frozen snapshot would mean the SAME value for
+a hand's whole ramp regardless of how far the cursor moved meanwhile,
+defeating the point of a cursor-distance-driven offset. Normalizing
+against the live field-wide min/max distance (not each function's own
+explicit domain, unlike Start Distance Curve) matches how every OTHER
+curve in this file already works.
+
+The implementation obstacle: `computeOffsetXY(hand, p)` (today's
+earlier Cursor Offset helper) takes only `(hand, p)` -- it has no
+access to `minLiveDist`/`liveDistRange`, which only exist as local
+variables inside `updateRenderOrder()`'s own per-frame pre-pass.
+Threading them through was assessed as too invasive: `applyOffsetRotationToHand()`/
+`bakeOffsetRotationIntoAccum()`/`bakeInFlightOffsetRotation()` (its 3
+callers) have 15+ call sites between them, including from
+`releaseHandFromOtherFunctions(hand, exceptId)` -- which has NO
+distance information in its own signature at all, and is itself called
+from multiple places. Resolved by mirroring `minLiveDist`/`liveDistRange`
+into 2 new module-level variables (`liveFieldMinDist`/`liveFieldDistRange`)
+at the exact point `updateRenderOrder()` already computes them --
+`computeOffsetXY()` reads these directly instead of taking them as
+parameters, and computes each hand's own live distance fresh
+(`hand.wrapper.position.distanceTo(cursorTarget)`, one cheap call) --
+zero signature changes to any of the 15+ call sites, and zero risk of
+missing one of them the way a threading approach would have risked.
+
+Verified via an isolated reproduction of the new normalize+rescale
+wiring (computeStartDelayMs()'s own real formula, already trusted and
+used by every other curve in this file, with a simplified linear
+evaluator correct for the default 2-point straight-line curve): nearest
+hand in the field lands exactly at Range.min (-50), farthest exactly at
+Range.max (50), the midpoint hand at the range's own midpoint (0), and
+a distance outside the live min/max clamps to the nearest bound rather
+than overshooting. All 5 cases passed. `node --check` passes.
+
+**Not live-verified in browser** -- attempted via the local static
+server; `src/main.js` fetched cleanly once by itself (889,344 bytes,
+200 OK) but the full page load hit this project's own documented
+network-truncation quirk on `main.js?v=267`/`?v=268` 5 times in a row
+(the standing retry cap), `window.__debug` never populated. Needs
+either a real browser reload past this sandbox's own flakiness, or
+verification against the live Vercel deployment, before this can be
+called confirmed end to end.
+
+`main.js` cache-buster bumped `?v=267` -> `?v=268`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

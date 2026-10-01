@@ -3773,6 +3773,18 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       { key: `${p}OffsetX`, label: 'Offset X (World Units)', type: 'slider', min: -50, max: 50, step: 0.5, def: 0 },
       { key: `${p}OffsetY`, label: 'Offset Y (World Units)', type: 'slider', min: -50, max: 50, step: 0.5, def: 0 },
       { key: `${p}CursorOffsetDistance`, label: 'Cursor Offset Distance (World Units)', type: 'slider', min: -50, max: 50, step: 0.5, def: 0 },
+      // Cursor Offset Distance Curve -- direct request 2026-10-01 ("provide
+      // me an offset min max, as well as the curve, with x as distance from
+      // cursor"). Same distance->value curve shape as every other curve in
+      // this file (X = live field distance-from-cursor, normalized nearest-
+      // to-farthest-hand-in-the-field-THIS-FRAME, not a frozen trigger-time
+      // snapshot -- see computeOffsetXY()'s own comment for why this one is
+      // live rather than frozen), Y rescaled into this Range's min/max --
+      // the "offset min max" the request asked for. Only relevant in Cursor
+      // Offset mode; see updateOffsetRotationVisibility()'s own extension.
+      { key: `${p}CursorOffsetDistanceCurveEnabled`, label: 'Cursor Offset Distance Curve On/Off', type: 'checkbox', def: false, onChange: () => updateOffsetRotationVisibility(p) },
+      { key: `${p}CursorOffsetDistanceCurve`, label: 'Cursor Offset Distance Curve (Distance -> Offset)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickHoldConfig(p) },
+      { key: `${p}CursorOffsetDistanceCurveRange`, label: 'Cursor Offset Min / Max Distance (World Units)', type: 'text', def: '{"min":-50,"max":50}', onChange: () => parseClickHoldConfig(p) },
       { key: `${p}RotationEnabled`, label: 'Rotation On/Off', type: 'checkbox', def: false, onChange: () => updateOffsetRotationVisibility(p) },
       { key: `${p}RotationX`, label: 'Rotation X (Deg)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
       { key: `${p}RotationY`, label: 'Rotation Y (Deg)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
@@ -4097,6 +4109,18 @@ function makeClickPoseGroup(p, title, defaults = {}) {
       { key: `${p}OffsetX`, label: 'Offset X (World Units)', type: 'slider', min: -50, max: 50, step: 0.5, def: 0 },
       { key: `${p}OffsetY`, label: 'Offset Y (World Units)', type: 'slider', min: -50, max: 50, step: 0.5, def: 0 },
       { key: `${p}CursorOffsetDistance`, label: 'Cursor Offset Distance (World Units)', type: 'slider', min: -50, max: 50, step: 0.5, def: 0 },
+      // Cursor Offset Distance Curve -- direct request 2026-10-01 ("provide
+      // me an offset min max, as well as the curve, with x as distance from
+      // cursor"). Same distance->value curve shape as every other curve in
+      // this file (X = live field distance-from-cursor, normalized nearest-
+      // to-farthest-hand-in-the-field-THIS-FRAME, not a frozen trigger-time
+      // snapshot -- see computeOffsetXY()'s own comment for why this one is
+      // live rather than frozen), Y rescaled into this Range's min/max --
+      // the "offset min max" the request asked for. Only relevant in Cursor
+      // Offset mode; see updateOffsetRotationVisibility()'s own extension.
+      { key: `${p}CursorOffsetDistanceCurveEnabled`, label: 'Cursor Offset Distance Curve On/Off', type: 'checkbox', def: false, onChange: () => updateOffsetRotationVisibility(p) },
+      { key: `${p}CursorOffsetDistanceCurve`, label: 'Cursor Offset Distance Curve (Distance -> Offset)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickPoseConfig(p) },
+      { key: `${p}CursorOffsetDistanceCurveRange`, label: 'Cursor Offset Min / Max Distance (World Units)', type: 'text', def: '{"min":-50,"max":50}', onChange: () => parseClickPoseConfig(p) },
       { key: `${p}RotationEnabled`, label: 'Rotation On/Off', type: 'checkbox', def: false, onChange: () => updateOffsetRotationVisibility(p) },
       { key: `${p}RotationX`, label: 'Rotation X (Deg)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
       { key: `${p}RotationY`, label: 'Rotation Y (Deg)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
@@ -6799,6 +6823,10 @@ function parseClickHoldConfig(p) {
   // of the forward transition's.
   try { t.retransitionSpeedCurveParsed = JSON.parse(cfg[`${p}RetransitionSpeedCurve`]).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
   try { t.retransitionSpeedRangeParsed = JSON.parse(cfg[`${p}RetransitionSpeedCurveRange`]) } catch (e) { /* keep last-good value */ }
+  // Cursor Offset Distance Curve (2026-10-01) -- see makeClickHoldPoseGroup()'s
+  // own matching control comment.
+  try { t.cursorOffsetDistanceCurveParsed = JSON.parse(cfg[`${p}CursorOffsetDistanceCurve`]).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
+  try { t.cursorOffsetDistanceRangeParsed = JSON.parse(cfg[`${p}CursorOffsetDistanceCurveRange`]) } catch (e) { /* keep last-good value */ }
   // Tween's own separate Retransition SPEED curve/range (2026-09-30) --
   // see makeClickHoldPoseGroup()'s own matching control comment.
   try { t.tweenRetransitionSpeedCurveParsed = JSON.parse(cfg[`${p}TweenRetransitionSpeedCurve`]).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
@@ -7024,6 +7052,13 @@ const _offsetUpVec = new THREE.Vector3()
 const _offsetEuler = new THREE.Euler()
 const _offsetQuat = new THREE.Quaternion()
 const _offsetHandToCursor = new THREE.Vector3()
+// Cached live field-wide cursor-distance range (2026-10-01), mirrored
+// once per frame from updateRenderOrder()'s own minLiveDist/liveDistRange
+// pre-pass -- see that assignment's own comment for why computeOffsetXY()
+// reads this instead of taking the values as parameters. Defaults keep
+// the curve well-defined (a single hand, or before the first real frame
+// has run) rather than dividing by zero.
+let liveFieldMinDist = 0, liveFieldDistRange = 0.001
 // Direct request 2026-10-01: Offset Mode dropdown ('XYZ Offset', the
 // pre-existing behavior, vs. 'Cursor Offset', new). Shared by every
 // call site that used to read cfg[OffsetX]/cfg[OffsetY] directly
@@ -7058,7 +7093,18 @@ function computeOffsetXY(hand, p) {
     const upComp = _offsetHandToCursor.dot(_offsetUpVec)
     const planarLen = Math.hypot(rightComp, upComp)
     if (planarLen < 1e-6) return { x: 0, y: 0 } // cursor directly in front of/behind the hand -- no well-defined in-plane direction
-    const dist = cfg[`${p}CursorOffsetDistance`] || 0
+    // Cursor Offset Distance Curve (2026-10-01): when enabled, the flat
+    // CursorOffsetDistance slider is replaced by a per-hand, distance-
+    // driven value instead -- X is THIS hand's own LIVE distance to the
+    // cursor (deliberately live, not a frozen trigger-time snapshot,
+    // since this value is read fresh every frame by applyOffsetRotationToHand()
+    // regardless of what phase the hand is in), normalized against the
+    // field-wide live range cached above, then rescaled into the curve's
+    // own Range (the "offset min max" the request asked for).
+    const trig = clickHoldPoseTriggers[p] || clickPoseTriggers[p]
+    const dist = (cfg[`${p}CursorOffsetDistanceCurveEnabled`] && trig)
+      ? computeStartDelayMs(hand.wrapper.position.distanceTo(cursorTarget), liveFieldMinDist, liveFieldDistRange, trig.cursorOffsetDistanceCurveParsed, trig.cursorOffsetDistanceRangeParsed)
+      : (cfg[`${p}CursorOffsetDistance`] || 0)
     return { x: (rightComp / planarLen) * dist, y: (upComp / planarLen) * dist }
   }
   return { x: cfg[`${p}OffsetX`] || 0, y: cfg[`${p}OffsetY`] || 0 }
@@ -8639,6 +8685,10 @@ function parseClickPoseConfig(p) {
   // see parseClickHoldConfig()'s own matching comment.
   try { t.retransitionSpeedCurveParsed = JSON.parse(cfg[`${p}RetransitionSpeedCurve`]).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
   try { t.retransitionSpeedRangeParsed = JSON.parse(cfg[`${p}RetransitionSpeedCurveRange`]) } catch (e) { /* keep last-good value */ }
+  // Cursor Offset Distance Curve (2026-10-01) -- see parseClickHoldConfig()'s
+  // own matching comment.
+  try { t.cursorOffsetDistanceCurveParsed = JSON.parse(cfg[`${p}CursorOffsetDistanceCurve`]).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
+  try { t.cursorOffsetDistanceRangeParsed = JSON.parse(cfg[`${p}CursorOffsetDistanceCurveRange`]) } catch (e) { /* keep last-good value */ }
 }
 function getOrInitHandCP(hand) {
   if (!hand._cp) hand._cp = {}
@@ -9847,6 +9897,15 @@ function buildClickHoldPoseWidgets(p) {
     document.querySelector(`.dp-row[data-key="${p}StartDistanceMax"]`),
     { label: 'Start Distance Min / Max (World Units)', unit: 'wu' }
   )
+  // Cursor Offset Distance Curve (2026-10-01) -- X is the LIVE per-frame
+  // distance-from-cursor (not frozen at trigger time, unlike every other
+  // curve above -- see computeOffsetXY()'s own comment), Y rescaled into
+  // this Range's world-unit min/max (allows negative, matching the flat
+  // slider it replaces when enabled).
+  const cursorOffsetCurveRow = document.querySelector(`.dp-row[data-key="${p}CursorOffsetDistanceCurve"]`)
+  const cursorOffsetRangeRow = document.querySelector(`.dp-row[data-key="${p}CursorOffsetDistanceCurveRange"]`)
+  if (cursorOffsetCurveRow) buildGenericCurveWidget(cursorOffsetCurveRow, { caption: 'X: Distance From Cursor (Live, Nearest→Farthest Hand In Field)  ·  Y: Offset Distance Fraction (0=Min, 1=Max)', defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
+  if (cursorOffsetRangeRow) buildGenericRangeBarWidget(cursorOffsetRangeRow, { trackMin: -50, trackMax: 50, unit: 'wu', defaultValue: { min: -50, max: 50 } })
 }
 // Runs now, not back up near the other widgets' own setup calls (parse-
 // ArmLengthConfig()/buildWristSplayWidgets() etc.) -- this needs
@@ -9899,6 +9958,12 @@ function buildClickPoseWidgets(p) {
     document.querySelector(`.dp-row[data-key="${p}StartDistanceMax"]`),
     { label: 'Start Distance Min / Max (World Units)', unit: 'wu' }
   )
+  // Cursor Offset Distance Curve (2026-10-01) -- see buildClickHoldPoseWidgets()'s
+  // own matching comment.
+  const cursorOffsetCurveRow = document.querySelector(`.dp-row[data-key="${p}CursorOffsetDistanceCurve"]`)
+  const cursorOffsetRangeRow = document.querySelector(`.dp-row[data-key="${p}CursorOffsetDistanceCurveRange"]`)
+  if (cursorOffsetCurveRow) buildGenericCurveWidget(cursorOffsetCurveRow, { caption: 'X: Distance From Cursor (Live, Nearest→Farthest Hand In Field)  ·  Y: Offset Distance Fraction (0=Min, 1=Max)', defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
+  if (cursorOffsetRangeRow) buildGenericRangeBarWidget(cursorOffsetRangeRow, { trackMin: -50, trackMax: 50, unit: 'wu', defaultValue: { min: -50, max: 50 } })
 }
 // -----------------------------------------------------------------------
 // Custom Click Functions (Phase 4) -- runtime-created pose triggers, both
@@ -10570,7 +10635,8 @@ function registerCustomClickFunction(id, title, kind, family) {
       tweenRetransitionSpeedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenRetransitionSpeedRangeParsed: { min: 50, max: 2000 },
       tweenRetransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenRetransitionRangeParsed: { min: 0, max: 300 },
       tweenStopStartCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStopStartRangeParsed: { min: 0, max: 300 },
-      tweenStopDelayCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStopDelayRangeParsed: { min: 0, max: 2000 }
+      tweenStopDelayCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStopDelayRangeParsed: { min: 0, max: 2000 },
+      cursorOffsetDistanceCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], cursorOffsetDistanceRangeParsed: { min: -50, max: 50 }
     }
   } else {
     CLICK_POSE_KEYS.push(id)
@@ -10580,7 +10646,8 @@ function registerCustomClickFunction(id, title, kind, family) {
       tweenStartCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStartRangeParsed: { min: 0, max: 300 },
       startDistanceCurveParsed: [{ x: 0, y: 1 }, { x: 1, y: 1 }],
       retransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionRangeParsed: { min: 0, max: 300 },
-      retransitionSpeedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionSpeedRangeParsed: { min: 50, max: 2000 }
+      retransitionSpeedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionSpeedRangeParsed: { min: 50, max: 2000 },
+      cursorOffsetDistanceCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], cursorOffsetDistanceRangeParsed: { min: -50, max: 50 }
     }
   }
   renderCustomClickFunctionGroup(id, title, kind, family)
@@ -10727,7 +10794,13 @@ const NEW_CUSTOM_FUNCTION_TEMPLATE = {
   // that Touch Point Count doubles as Click/Click+Hold's own multi-touch
   // opt-in.
   Enabled: true, Type: 'Click', TouchPointCount: 1, Mode: 'Single Pose',
-  OffsetEnabled: false, OffsetX: 0, OffsetY: 0,
+  // OffsetMode/CursorOffsetDistance/CursorOffsetDistanceCurve* were never
+  // added here when those controls were first built (2026-10-01) -- a
+  // pre-existing gap, harmless in practice since buildRow() falls back to
+  // each control's own DEV_GROUPS `def` for any field missing from this
+  // template, but filled in now while touching this same object anyway.
+  OffsetEnabled: false, OffsetX: 0, OffsetY: 0, OffsetMode: 'XYZ Offset', CursorOffsetDistance: 0,
+  CursorOffsetDistanceCurveEnabled: false, CursorOffsetDistanceCurve: '[{"x":0,"y":0},{"x":1,"y":1}]', CursorOffsetDistanceCurveRange: '{"min":-50,"max":50}',
   RotationEnabled: false, RotationX: 0, RotationY: 0, RotationZ: 0,
   TargetPose: '', TweenSelector: '', TweenSpeedMs: 800,
   TweenStartTimeCurve: '[{"x":0,"y":0},{"x":1,"y":1}]', TweenStartTimeRange: '{"min":0,"max":300}',
@@ -10948,6 +11021,7 @@ function enforceCustomClickFunctionsAnchorOrder() {
 const MULTI_TRIGGER_ALLOWED_SUFFIXES = [
   'Enabled', 'Mode', 'TargetPose', 'TweenSelector', 'TweenSpeedMs', 'TransitionSpeedMs', 'PauseDurationMs',
   'OffsetEnabled', 'OffsetMode', 'OffsetX', 'OffsetY', 'CursorOffsetDistance',
+  'CursorOffsetDistanceCurveEnabled', 'CursorOffsetDistanceCurve', 'CursorOffsetDistanceCurveRange',
   'RotationEnabled', 'RotationX', 'RotationY', 'RotationZ',
   'SpeedCurveEnabled', 'SpeedCurve', 'SpeedCurveRange',
   'StartTimeCurveEnabled', 'StartTimeCurve', 'StartTimeRange', 'TweenStartTimeCurve', 'TweenStartTimeRange',
@@ -10993,7 +11067,8 @@ function registerMultiTriggerTrigger(prefix, title, mtBody, addBtnRow, kind) {
         tweenRetransitionSpeedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenRetransitionSpeedRangeParsed: { min: 50, max: 2000 },
         tweenRetransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenRetransitionRangeParsed: { min: 0, max: 300 },
         tweenStopStartCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStopStartRangeParsed: { min: 0, max: 300 },
-        tweenStopDelayCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStopDelayRangeParsed: { min: 0, max: 2000 }
+        tweenStopDelayCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStopDelayRangeParsed: { min: 0, max: 2000 },
+        cursorOffsetDistanceCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], cursorOffsetDistanceRangeParsed: { min: -50, max: 50 }
       }
     }
   } else {
@@ -11005,7 +11080,8 @@ function registerMultiTriggerTrigger(prefix, title, mtBody, addBtnRow, kind) {
         tweenStartCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStartRangeParsed: { min: 0, max: 300 },
         startDistanceCurveParsed: [{ x: 0, y: 1 }, { x: 1, y: 1 }],
         retransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionRangeParsed: { min: 0, max: 300 },
-        retransitionSpeedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionSpeedRangeParsed: { min: 50, max: 2000 }
+        retransitionSpeedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionSpeedRangeParsed: { min: 50, max: 2000 },
+        cursorOffsetDistanceCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], cursorOffsetDistanceRangeParsed: { min: -50, max: 50 }
       }
     }
   }
@@ -11903,8 +11979,19 @@ function updateOffsetRotationVisibility(p) {
     const row = document.querySelector(`.dp-row[data-key="${p}${suffix}"]`)
     if (row) row.style.display = offsetOn && !cursorMode ? '' : 'none'
   })
+  // Cursor Offset Distance Curve (2026-10-01): when its own Enabled
+  // checkbox is on, the flat CursorOffsetDistance slider is replaced by
+  // the Curve+Range pair instead -- both still gated behind cursorMode,
+  // same as the flat slider was.
+  const cursorCurveOn = !!cfg[`${p}CursorOffsetDistanceCurveEnabled`]
   const cursorOffsetRow = document.querySelector(`.dp-row[data-key="${p}CursorOffsetDistance"]`)
-  if (cursorOffsetRow) cursorOffsetRow.style.display = offsetOn && cursorMode ? '' : 'none'
+  if (cursorOffsetRow) cursorOffsetRow.style.display = offsetOn && cursorMode && !cursorCurveOn ? '' : 'none'
+  const cursorCurveEnabledRow = document.querySelector(`.dp-row[data-key="${p}CursorOffsetDistanceCurveEnabled"]`)
+  if (cursorCurveEnabledRow) cursorCurveEnabledRow.style.display = offsetOn && cursorMode ? '' : 'none'
+  ;['CursorOffsetDistanceCurve', 'CursorOffsetDistanceCurveRange'].forEach((suffix) => {
+    const row = document.querySelector(`.dp-row[data-key="${p}${suffix}"]`)
+    if (row) row.style.display = offsetOn && cursorMode && cursorCurveOn ? '' : 'none'
+  })
   const rotationOn = !!cfg[`${p}RotationEnabled`]
   ;['RotationX', 'RotationY', 'RotationZ'].forEach((suffix) => {
     const row = document.querySelector(`.dp-row[data-key="${p}${suffix}"]`)
@@ -11979,7 +12066,7 @@ function wrapGatedSubgroup(enabledKey, memberKeys, subgroupTitle) {
 // Sequence mode, a separate concept from Single Pose's own Retransition
 // on/off).
 function wrapClickFunctionGatedSubgroups(p) {
-  wrapGatedSubgroup(`${p}OffsetEnabled`, [`${p}OffsetMode`, `${p}OffsetX`, `${p}OffsetY`, `${p}CursorOffsetDistance`], 'Offset')
+  wrapGatedSubgroup(`${p}OffsetEnabled`, [`${p}OffsetMode`, `${p}OffsetX`, `${p}OffsetY`, `${p}CursorOffsetDistance`, `${p}CursorOffsetDistanceCurveEnabled`, `${p}CursorOffsetDistanceCurve`, `${p}CursorOffsetDistanceCurveRange`], 'Offset')
   wrapGatedSubgroup(`${p}RotationEnabled`, [`${p}RotationX`, `${p}RotationY`, `${p}RotationZ`], 'Rotation')
   wrapGatedSubgroup(`${p}SpeedCurveEnabled`, [`${p}SpeedCurve`, `${p}SpeedCurveRange`], 'Animation Speed Curve')
   // CORRECTED 2026-09-24 (item 7, remainder): Tween mode's own always-on
@@ -13517,6 +13604,15 @@ function updateRenderOrder() {
     return d
   })
   const liveDistRange = Math.max(maxLiveDist - minLiveDist, 0.001)
+  // Mirrored into module-level cache (2026-10-01) so computeOffsetXY()'s
+  // Cursor Offset Distance Curve can read the SAME already-computed live
+  // field range without threading minLiveDist/liveDistRange through
+  // computeOffsetXY()'s own 3 callers -- including releaseHandFromOtherFunctions(),
+  // which has no distance info in its own signature at all and is called
+  // from multiple places unrelated to this per-frame loop. Updated here,
+  // once per frame, right alongside the values it mirrors.
+  liveFieldMinDist = minLiveDist
+  liveFieldDistRange = liveDistRange
   const nowMs = nowVirtual() // virtual clock (see its own declaration) -- one shared timestamp for every hand's own Click-Hold-Pose/Click-Pose progress this frame, not a separate call per hand; only reached at all while !isPaused (animate()'s own gate), so this line simply never runs during a pause
   hands.forEach((hand, i) => {
     const live = liveDistances[i]

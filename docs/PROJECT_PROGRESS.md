@@ -18,47 +18,57 @@ work seamlessly from there.
 
 ## Currently working on
 
-**ADDED 2026-10-01, CORRECTED same day -- Offset Mode dropdown ("XYZ
+**ADDED/CORRECTED/EXTENDED 2026-10-01 -- Offset Mode dropdown ("XYZ
 Offset" / "Cursor Offset") for every custom click function (pose-kind
-and hold-kind, plus Multi Trigger sub-triggers of either).** Direct
-request: provide a dropdown with the pre-existing OffsetX/OffsetY
-behavior as one option, and a new "Cursor Offset" mode as the other --
-a signed distance slider that displaces the hand toward (positive) or
-away (negative) from the cursor. Implementation: a shared
-`computeOffsetXY(hand, p)` helper replaces the 3 previously-separate
-`cfg[OffsetX]`/`cfg[OffsetY]` reads in `applyOffsetRotationToHand()`
-(live per-frame apply), `bakeOffsetRotationIntoAccum()` (full-
-completion bake), and `bakeInFlightOffsetRotation()` (partial-fraction
-bake on interruption) -- all 3 needed to agree, or Cursor Offset would
-behave correctly only in the common case and snap/drift on a hold
-released mid-ramp, exactly the class of bug this project's own
-10-round "jump investigation" exists to prevent. `OffsetMode`/
-`CursorOffsetDistance` added to `MULTI_TRIGGER_ALLOWED_SUFFIXES` and
-the `wrapGatedSubgroup('${p}OffsetEnabled', ...)` member list, and
-`updateOffsetRotationVisibility(p)` shows only the relevant slider(s)
-for whichever mode is selected.
+and hold-kind, plus Multi Trigger sub-triggers of either), now with an
+optional per-hand distance curve.** Direct request: a dropdown with the
+pre-existing OffsetX/OffsetY behavior as one option, and a new "Cursor
+Offset" mode as the other -- a signed distance that displaces the hand
+toward (positive) or away (negative) from the cursor, along both
+camera-local axes (right + up, excluding only camera-forward/depth --
+corrected same day from an initial horizontal-only version per direct
+report: "which ever axis is perp to the camera, thats the one we dont
+offset in"). A shared `computeOffsetXY(hand, p)` helper replaces the 3
+previously-separate `cfg[OffsetX]`/`cfg[OffsetY]` reads in
+`applyOffsetRotationToHand()`/`bakeOffsetRotationIntoAccum()`/
+`bakeInFlightOffsetRotation()` -- all 3 needed to agree, or Cursor
+Offset would snap/drift on interruption, exactly the class of bug this
+project's own 10-round "jump investigation" exists to prevent.
 
-**Correction, same day:** the first version only used the camera-RIGHT
-axis (a horizontal-only +1/-1 sign, Y always 0). Direct correction:
-"which ever axis is perp to the camera, thats the one we dont offset
-in. so x y local to camera." Fixed by projecting the hand-to-cursor
-vector onto BOTH camera-local axes (right and up), normalizing into a
-unit 2D direction, and scaling by the configured distance -- the
-camera-forward/depth axis is excluded by construction. Verified via a
-4-case isolated logic reproduction (diagonal direction, pure-depth = no
-movement, pure-vertical = y-only movement -- the case the old code got
-wrong, depth-contamination immunity). `node --check` passes. `main.js`
-cache-buster at `?v=267`. **Not live-verified in browser** -- the
-local static server failed all 5 navigation attempts the round this
-was built (the standing retry cap); not re-attempted for the axis fix
-since nothing about the page-load path changed.
+**Extended same day, direct request ("provide me an offset min max, as
+well as the curve, with x as distance from cursor"):** the flat
+`CursorOffsetDistance` slider can now optionally be driven by a curve
+instead -- `${p}CursorOffsetDistanceCurveEnabled`/`Curve`/`CurveRange`,
+X = each hand's own LIVE distance to the cursor (recomputed fresh every
+frame, not frozen at trigger time -- deliberate, since Offset applies
+continuously for as long as a trigger ramps), Y rescaled into the
+Range's world-unit min/max. Implementation note: `computeOffsetXY()`
+had no access to the live field's min/max distance (only available as
+local variables inside `updateRenderOrder()`'s per-frame pre-pass, and
+threading them through would have meant touching 15+ call sites
+including `releaseHandFromOtherFunctions()`, which has no distance
+info in its signature at all) -- resolved by mirroring those 2 values
+into module-level cache variables (`liveFieldMinDist`/`liveFieldDistRange`)
+at the exact point they're already computed, read directly by
+`computeOffsetXY()` instead of threaded as parameters. All of
+`MULTI_TRIGGER_ALLOWED_SUFFIXES`, the "Offset" `wrapGatedSubgroup()`
+member list, `parseClickHoldConfig()`/`parseClickPoseConfig()`'s curve-
+parse caches, both trigger-registry default shapes, and
+`NEW_CUSTOM_FUNCTION_TEMPLATE` (also backfilled a pre-existing
+`OffsetMode`/`CursorOffsetDistance` gap from earlier the same day)
+updated to match.
 
-**NEXT (not yet started): "an offset min max, as well as the curve,
-with x as distance from cursor"** -- direct request to make
-`${p}CursorOffsetDistance` optionally curve-driven per-hand (based on
-that hand's live distance from the cursor) instead of a flat slider,
-mirroring the established curve pattern elsewhere in this file (e.g.
-Retransition Speed Curve's Enabled/Curve/Range triplet).
+Verified via 2 isolated logic reproductions (axis-correction: 4 cases;
+curve normalize+rescale: 5 cases, all passed) and `node --check`.
+`main.js` cache-buster at `?v=268`. **Not live-verified in browser for
+either the axis fix or the curve extension** -- the local static
+server's own documented network-truncation quirk failed all 5
+navigation attempts the round the curve feature was built (the
+standing retry cap); `src/main.js` itself fetched cleanly in isolation
+(889,344 bytes) but the full page never reached `window.__debug`
+readiness. Needs a real browser reload past this sandbox's flakiness,
+or verification against the live Vercel deployment, to confirm end to
+end -- see CHANGELOG.txt's matching entries for full detail.
 
 **RESOLVED 2026-10-01 -- "click functions don't really work on mobile"
 (a real regression from this session's own earlier round-37 fix).**
