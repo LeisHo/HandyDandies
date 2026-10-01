@@ -2190,6 +2190,29 @@ window.addEventListener('pointermove', (e) => {
 // actually performed, since nothing moved) was directly misleading when
 // correlating this log against the Hand Behaviour Log below.
 const MOUSE_LOG_MOVE_THRESHOLD_PX = 10
+// CORRECTED 2026-10-01, direct bug report: "click functions don't really
+// work on mobile." Root cause: a real finger tap on a touchscreen
+// naturally has more positional jitter between touchstart and touchend
+// than a mouse click does -- MOUSE_LOG_MOVE_THRESHOLD_PX (10px) is tight
+// enough that an ordinary mobile tap can exceed it even with no
+// intentional movement, misclassifying every mobile multi-click release
+// as "moved too far" (a drag) in the 2 dispatch-affecting call sites below
+// (the click-hold CHAIN's own "moved" check, and this file's own
+// multi-click debounce's "genuine hold/drag" check, added 2026-09-30 --
+// see that section's own comment). That misclassification silently
+// zeroes the click count/cancels the pending resolution -- the SEPARATE
+// Mouse Tracking Log classifier (line ~2225 below) has its own identical
+// vulnerability but only affects a LOG LABEL, which is why the user's
+// own log still correctly showed "Double-Click"/etc. while the REAL
+// dispatch silently failed. Fixed by using a touch-aware threshold at
+// all 3 call sites instead of the one flat constant. 30px for touch is a
+// disclosed judgment call (no measured touch-slop data for this specific
+// app/device), not a measured value -- loosely in line with Android's
+// own documented system touch-slop (~8dp, which is noticeably more than
+// 10 CSS px on most real device pixel ratios), picked generously rather
+// than tuned precisely.
+const MOUSE_LOG_MOVE_THRESHOLD_PX_TOUCH = 30
+function moveThresholdForEvent(e) { return e && e.pointerType === 'touch' ? MOUSE_LOG_MOVE_THRESHOLD_PX_TOUCH : MOUSE_LOG_MOVE_THRESHOLD_PX }
 function mouseLogOrdinalPrefix(n) { return n >= 4 ? 'Quadruple-' : n === 3 ? 'Triple-' : n === 2 ? 'Double-' : '' }
 function mouseLogButtonWord(button) { return button === 2 ? 'Right-' : button === 1 ? 'Middle-' : '' }
 // `target` isn't guaranteed to be an Element (e.g. `document` itself, has
@@ -2222,7 +2245,7 @@ window.addEventListener('pointerup', (e) => {
   mouseLogDownInfo = null
   const x = Math.round(e.clientX), y = Math.round(e.clientY)
   const heldMs = down ? Math.round(performance.now() - down.time) : 0
-  const moved = down ? Math.hypot(e.clientX - down.x, e.clientY - down.y) > MOUSE_LOG_MOVE_THRESHOLD_PX : false
+  const moved = down ? Math.hypot(e.clientX - down.x, e.clientY - down.y) > moveThresholdForEvent(e) : false
   // Resets the shared chain counter after a real gap in activity, same
   // debounce feel as the old release-time reset, just scheduled from
   // release instead of press (harmless either way -- this only matters
@@ -9006,7 +9029,7 @@ window.addEventListener('pointerup', (e) => {
   // gets zeroed by the chain listener for the identical classification.
   if (clickHoldChainDownInfo) {
     const chainHeldMs = performance.now() - clickHoldChainDownInfo.time
-    const chainMoved = Math.hypot(e.clientX - clickHoldChainDownInfo.x, e.clientY - clickHoldChainDownInfo.y) > MOUSE_LOG_MOVE_THRESHOLD_PX
+    const chainMoved = Math.hypot(e.clientX - clickHoldChainDownInfo.x, e.clientY - clickHoldChainDownInfo.y) > moveThresholdForEvent(e)
     if (chainHeldMs > MOUSE_LOG_HELD_DRAG_MS || chainMoved) {
       clickPoseClickCount = 0
       clearTimeout(clickPoseClickTimer)
@@ -9237,7 +9260,7 @@ window.addEventListener('pointerup', (e) => {
   // that log existing or being enabled.
   if (clickHoldChainDownInfo) {
     const heldMs = performance.now() - clickHoldChainDownInfo.time
-    const moved = Math.hypot(e.clientX - clickHoldChainDownInfo.x, e.clientY - clickHoldChainDownInfo.y) > MOUSE_LOG_MOVE_THRESHOLD_PX
+    const moved = Math.hypot(e.clientX - clickHoldChainDownInfo.x, e.clientY - clickHoldChainDownInfo.y) > moveThresholdForEvent(e)
     if (heldMs <= MOUSE_LOG_HELD_DRAG_MS && !moved) {
       clickHoldChainCount++
       clickHoldChainLastCleanUpTime = performance.now()

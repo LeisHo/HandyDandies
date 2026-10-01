@@ -18,6 +18,47 @@ work seamlessly from there.
 
 ## Currently working on
 
+**RESOLVED 2026-10-01 -- "click functions don't really work on mobile"
+(a real regression from this session's own earlier round-37 fix).**
+Confirmed via direct user report ("it does register the multi clicks" --
+the separate Mouse Tracking Log classifier works fine) that the problem
+was specifically in dispatch, not input detection. Root cause:
+`MOUSE_LOG_MOVE_THRESHOLD_PX` (10px) is used to tell "a clean click/
+release" apart from "a genuine hold/drag" in 2 dispatch-affecting call
+sites (the click-hold chain listener's own pre-existing "moved" check,
+and this session's own round-37 debounce fix's "chainMoved" check) -- a
+real finger tap's natural touch jitter commonly exceeds 10px, so on
+mobile this silently misclassified ordinary multi-click releases as
+drags, zeroing the click count / cancelling the pending resolution
+before the custom function ever fired. The Mouse Tracking Log's OWN
+identical-shaped check (a 3rd call site) only affects a LOG LABEL, which
+is exactly why the log still correctly showed "Double-Click" while real
+dispatch silently failed underneath it. Fixed with a new
+`moveThresholdForEvent(e)` helper (30px for `e.pointerType === 'touch'`,
+unchanged 10px for mouse/pen -- the 30px figure is a disclosed judgment
+call, not measured touch-slop data for this specific app/device) applied
+at all 3 call sites. Verified via an isolated logic reproduction (15px
+touch jitter no longer misclassified as moved; a genuine 50px touch drag
+still correctly detected; mouse threshold unchanged). `node --check`
+passes. **Not live-verified on a real device.**
+
+**STILL INVESTIGATING -- "when I enable click functions in mobile tab
+through checkbox, I hit save, it doesn't get saved."** Read `commit()`'s
+own store-write logic directly (devPanel.js) -- for a `dynamicDevice`
+control like `${id}Enabled` (confirmed it IS one, via `withDynamicDevice()`),
+the write to `store[editingDevice]` happens unconditionally regardless of
+`realDeviceClass()`, so the value SHOULD persist through
+`captureFullPanelState()`/Save correctly by this reading. Also confirmed
+`${id}Enabled` has no explicit `perDevice: true`, so it's NOT independent
+per device by default -- checking it on the Mobile tab while non-
+independent also mirrors the SAME value onto Desktop (and Landscape, if
+also non-independent), which could explain unexpected behavior but not
+literally "doesn't save." No confirmed bug found yet -- needs the exact
+checkbox the user means (the Enabled row itself, vs. its own "Independent
+from Desktop" or "Show in Mobile/Landscape" sub-checkbox) and whether
+they're testing from a real mobile device or the Mobile TAB on a desktop
+browser, before continuing further.
+
 **RESOLVED 2026-10-01 -- the "flashing" cluster, root-caused per direct
 user narrowing ("it only happens when retransiton speed curve is on").**
 Confirmed by reading `updateClickHoldPoseForHand()`/`endClickHoldPose()`

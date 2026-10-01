@@ -14979,6 +14979,55 @@ trace matching the reported on/off toggle behavior exactly.
 
 `main.js` cache-buster bumped `?v=262` -> `?v=263`.
 
+2026-10-01  -  (fix -- "click functions don't really work on mobile,"
+a regression from this same session's own round-37 fix)
+
+**Confirmed before guessing further**: direct user report ("it does
+register the multi clicks") established the Mouse Tracking Log's own
+click classification was working fine on mobile -- the failure was
+specifically between "detected" and "dispatched." An earlier hypothesis
+this round (that `isDevRowVisible()` defaults custom functions to
+hidden-on-mobile) was checked directly against the real code and
+disproven -- `isDevRowVisible(key)` returns `devVisibility[key] !== false`,
+i.e. visible BY DEFAULT unless explicitly hidden, the opposite of what
+was assumed. Documented here rather than silently discarded, per this
+project's own "no fabricated justification" convention -- a wrong lead
+ruled out is still worth recording.
+
+Real root cause: `MOUSE_LOG_MOVE_THRESHOLD_PX` (10px) is used in 2
+dispatch-affecting call sites to classify a release as "a clean click"
+vs. "a genuine hold/drag" -- the pre-existing click-hold-chain listener's
+own "moved" check, and THIS SAME SESSION's own round-37 debounce fix's
+"chainMoved" check (added earlier today to fix the double-click-hold
+race). A real finger's natural touch jitter between touchstart and
+touchend commonly exceeds 10px with no intentional movement at all, so
+on mobile this misclassified ordinary multi-click releases as drags,
+silently zeroing `clickPoseClickCount`/cancelling the pending resolution
+before any custom function fired -- while the Mouse Tracking Log's own
+3rd, separate, identically-shaped "moved" check only affects a LOG
+LABEL, which is exactly why the log still correctly showed "Double-
+Click"/"Triple-Click" while the real dispatch silently failed
+underneath it.
+
+Fixed with `moveThresholdForEvent(e)`: 30px for `e.pointerType === 'touch'`,
+unchanged 10px for mouse/pen. The 30px figure is a disclosed judgment
+call (loosely in line with Android's own ~8dp system touch-slop, which
+is noticeably more than 10 CSS px on most real device pixel ratios) --
+not measured touch-slop data for this specific app/device, and labeled
+as such rather than presented as tuned. Applied at all 3 call sites
+(Mouse Tracking Log's own classifier, the chain listener's "moved," and
+the debounce fix's "chainMoved").
+
+Verified via an isolated logic reproduction: 15px of touch jitter no
+longer misclassified as "moved" (would have been under the old flat
+10px); a genuine 50px touch drag is still correctly classified as moved;
+the mouse threshold is unchanged (still 10px, still tight). `node --check`
+passes. **Not live-verified against a real mobile device** -- confidence
+rests on the logic reproduction and the direct match to the reported
+symptom (detected-but-not-dispatched), not an on-device test.
+
+`main.js` cache-buster bumped `?v=263` -> `?v=264`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

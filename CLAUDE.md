@@ -2251,3 +2251,29 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   user's own OTHER session (modifier-key hotkey support, a header-button
   reorder) landed on `main` in between and were correctly preserved,
   not clobbered -- see CHANGELOG.txt's matching 39th-round entry.
+- **Any "was this release a clean click or a genuine hold/drag"
+  classification that uses a fixed pixel move-threshold (this file's own
+  `MOUSE_LOG_MOVE_THRESHOLD_PX`, 10px) is tuned for a MOUSE and silently
+  breaks on touch -- a real finger's natural jitter between touchstart
+  and touchend commonly exceeds 10px with zero intentional movement.**
+  Confirmed as a real, same-session regression 2026-10-01: the round-37
+  debounce fix (earlier the same day) added a NEW use of this exact
+  constant to distinguish a clean click from a drag/hold, and on a real
+  mobile device this misclassified ordinary multi-click releases as
+  drags, silently zeroing the click count before any custom function
+  fired -- while the SEPARATE Mouse Tracking Log's own identically-shaped
+  check only affects a log label, so the log kept correctly showing
+  "Double-Click" while real dispatch failed underneath it (this
+  divergence -- "the log sees it, the function doesn't fire" -- is the
+  signature to watch for). Fixed with `moveThresholdForEvent(e)` (30px
+  for `e.pointerType === 'touch'`, unchanged 10px otherwise) applied at
+  EVERY call site that uses this constant for a dispatch-affecting
+  decision (confirmed 3: the Mouse Tracking Log's own classifier, the
+  click-hold chain listener's "moved," the round-37 fix's "chainMoved").
+  **Any FUTURE code that adds a new "moved" check using this same
+  pixel-distance pattern must use `moveThresholdForEvent(e)`, never the
+  bare `MOUSE_LOG_MOVE_THRESHOLD_PX` constant directly**, or it will
+  reintroduce this exact mobile regression. Not live-verified against a
+  real device -- confidence rests on an isolated logic reproduction and
+  the direct match to the reported "detected but not dispatched"
+  symptom.
