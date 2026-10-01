@@ -2003,6 +2003,19 @@ function buildDevPanel(groupsEl) {
     group.controls.forEach((ctrl) => gb.appendChild(buildRow(ctrl)))
     groupsEl.appendChild(g)
   })
+  // Set Hotkey feature's own listing -- appended directly after its
+  // Sequence Window row, once (every row for this build pass already
+  // exists by this point). Not registered as a control itself, same as
+  // the Named Setting States row above -- a plain container the
+  // Hotkeys-engine code further down writes into via refreshHotkeysListSubgroup().
+  if (!(('ontouchstart' in window) || navigator.maxTouchPoints > 0)) {
+    const seqRow = groupsEl.querySelector('.dp-row[data-key="dp_hotkeySequenceWindowMs"]')
+    if (seqRow && !document.getElementById('dpHotkeysListContainer')) {
+      const listContainer = el('div', null, { id: 'dpHotkeysListContainer' })
+      seqRow.insertAdjacentElement('afterend', listContainer)
+      refreshHotkeysListSubgroup()
+    }
+  }
   // Groups reorder among top-level siblings by default (target: groupsEl
   // itself) and can ALSO be dragged into ANY other group's own body, at
   // ANY depth -- UNLIMITED nesting (corrected 2026-09-14, matching
@@ -2888,6 +2901,11 @@ export function initDevPanel(groups, opts = {}) {
       // panel's own body-scroll wheel intensity, wired on `body` right
       // after its own creation, above.
       { key: 'dp_scrollStrength', label: 'Scroll Strength (X)', type: 'slider', min: 0.2, max: 5, step: 0.1, def: 0.2, defMobile: 1, perDevice: true },
+      // Set Hotkey feature's own timing control -- see this file's own
+      // "SET HOTKEY" section further down for the full system. A real
+      // registered control (persists via Save/Sync/Reset/Undo like any
+      // other setting), not a one-off DOM element.
+      { key: 'dp_hotkeySequenceWindowMs', label: 'Hotkey Sequence Window (Ms)', type: 'slider', min: 100, max: 2000, step: 10, def: 500 },
     ]
   }
   devGroups = [builtInGroup, ...devGroups]
@@ -2917,6 +2935,13 @@ export function initDevPanel(groups, opts = {}) {
   // actually invoked on a real click, well after every one of those is
   // assigned.
   const headerButtons = el('div', 'dp-header-buttons')
+  // Set Hotkey -- ported from HANDYSET's own devPanel.js (2026-09-30
+  // feature there). Re-derived against this file's own DOM conventions,
+  // not copy-pasted: HANDYSET looks controls up via a real DOM `id`
+  // (document.getElementById); buildRow() here never assigns one --
+  // every control is found via `.dp-row[data-key="..."]`, so every
+  // lookup in this port keys off `ctrl.key` instead of an element id.
+  const setHotkeyBtn = el('button', 'dp-icon-btn', { type: 'button', textContent: '⌨', title: 'Set Hotkey (click, then click a checkbox/button/slider to bind a key)' })
   const textEditBtn = el('button', 'dp-icon-btn', { type: 'button', textContent: '✎', title: 'Toggle Label Rename Mode' })
   const addGroupBtn = el('button', 'dp-icon-btn', { type: 'button', textContent: '+', title: 'Add Group (right-click: select settings/groups to fold in)' })
   const collapseAllBtn = el('button', 'dp-icon-btn', { type: 'button', textContent: '⊟', title: 'Collapse All Groups' })
@@ -2950,7 +2975,7 @@ export function initDevPanel(groups, opts = {}) {
   const saveHeaderBtn = el('button', 'dp-icon-btn', { type: 'button', textContent: '💾', title: 'Save' })
   const resetHeaderBtn = el('button', 'dp-icon-btn', { type: 'button', textContent: '↺', title: 'Reset' })
   const collapseBtn = el('button', 'dp-icon-btn', { type: 'button', textContent: '–', title: 'Collapse' })
-  headerButtons.append(textEditBtn, addGroupBtn, collapseAllBtn, deleteGroupBtn, undoBtn, redoBtn, copyHeaderBtn, saveHeaderBtn, resetHeaderBtn, collapseBtn)
+  headerButtons.append(setHotkeyBtn, textEditBtn, addGroupBtn, collapseAllBtn, deleteGroupBtn, undoBtn, redoBtn, copyHeaderBtn, saveHeaderBtn, resetHeaderBtn, collapseBtn)
   header.appendChild(headerButtons)
   panel.appendChild(header)
 
@@ -3261,7 +3286,10 @@ export function initDevPanel(groups, opts = {}) {
       textOverrides: { ...textOverrides },
       devVisibility: { ...devVisibility },
       devIndependence: { mobile: { ...devIndependence.mobile }, landscape: { ...devIndependence.landscape } },
-      panelGeometry
+      panelGeometry,
+      // Set Hotkey feature -- defaults to {} for a state saved before
+      // this field existed.
+      devHotkeys: { ...devHotkeys }
     }
   }
   // Applies a captureFullPanelState() snapshot live -- used by both "Use"
@@ -3280,6 +3308,11 @@ export function initDevPanel(groups, opts = {}) {
     applyStoredValues(state.values)
     textOverrides = { ...(state.textOverrides || {}) }
     applyTextOverrides()
+    // Set Hotkey feature -- re-renders every control's own hotkey badge
+    // from the just-restored map (Undo/Redo/Save/Reset/Load/Use/Set-as-
+    // Default all flow through this one function).
+    devHotkeys = state.devHotkeys ? { ...state.devHotkeys } : {}
+    renderAllHotkeyBadges()
     if (state.panelGeometry) {
       const real = realDeviceClass()
       if (state.panelGeometry[real]) applyPanelGeometry(panel, state.panelGeometry[real])
@@ -3545,7 +3578,7 @@ export function initDevPanel(groups, opts = {}) {
   addGroupBtn.addEventListener('contextmenu', (e) => {
     e.preventDefault()
     if (devGroupSelectionArmed) addGroupBtn.click()
-    else { disarmDevDeleteGroup(); devGroupSelectionArmed = true; addGroupBtn.classList.add('armed') }
+    else { disarmDevDeleteGroup(); disarmSetHotkey(); devGroupSelectionArmed = true; addGroupBtn.classList.add('armed') }
   })
   // Collapses every group (any nesting depth) that isn't already
   // collapsed. No per-tab scoping needed (unlike the template's own
@@ -3575,6 +3608,7 @@ export function initDevPanel(groups, opts = {}) {
       disarmDevDeleteGroup()
     } else {
       disarmDevGroupSelection()
+      disarmSetHotkey()
       devDeleteGroupArmed = true
       deleteGroupBtn.classList.add('armed')
     }
@@ -3787,6 +3821,363 @@ export function initDevPanel(groups, opts = {}) {
   // itself, since this is a panel-UI concern, not a settings-persistence
   // one.
   function clearDevPanelUndoStack() { devUndoStack = []; devRedoStack = [] }
+
+  // ==================================================================
+  // SET HOTKEY -- ported from HANDYSET's own devPanel.js (2026-09-30
+  // feature there, "check it here... implement"). Binds a 1-2 letter
+  // SEQUENTIAL key combo (typed in order, not held simultaneously) to a
+  // checkbox/button/slider. Desktop only (never shown/armed/listened-for
+  // on a touch device). Re-derived against THIS file's own conventions,
+  // not copy-pasted -- see the setHotkeyBtn declaration's own comment
+  // above for the real structural differences (data-key lookup instead
+  // of a DOM id, inline setup instead of named setupX() functions called
+  // from initDevPanelEngine()).
+  // ------------------------------------------------------------------
+  const devHotkeyIsTouchDevice = ('ontouchstart' in window) || navigator.maxTouchPoints > 0
+  let devHotkeys = {} // { [keySequence]: { key: ctrl.key, type: 'checkbox'|'button'|'slider' } }
+  let devSetHotkeyArmed = false
+  // Finds the row + actual control element for a given control type,
+  // keyed by `ctrl.key` via the same `.dp-row[data-key="..."]` pattern
+  // every other lookup in this file already uses (buildRow() never
+  // gives a control its own DOM id).
+  function findHotkeyRow(key) { return groupsEl.querySelector(`.dp-row[data-key="${CSS.escape(key)}"]`) }
+  function findHotkeyControlEl(row, type) {
+    if (!row) return null
+    if (type === 'checkbox') return row.querySelector(':scope > input[type=checkbox]')
+    if (type === 'slider') return row.querySelector(':scope > input[type=range]')
+    return row.querySelector(':scope > button.dp-action-button')
+  }
+  // Which element/control types are eligible -- explicitly excludes the
+  // group title/handle, the header buttons, a slider's own click-to-edit
+  // bound inputs, list-picker/multi-select rows (neither is a plain
+  // checkbox/range/button), and the hotkey badge/input itself.
+  function getHotkeyEligibleTarget(e) {
+    if (e.target.closest('.dp-group-header')) return null
+    if (e.target.closest('.dp-list-picker-row-container')) return null
+    if (e.target.closest('.dp-header-buttons')) return null
+    if (e.target.closest('.dp-hotkey-badge') || e.target.closest('.dp-hotkey-input')) return null
+    const row = e.target.closest('.dp-row')
+    if (!row || !row.dataset.key) return null
+    const checkbox = e.target.closest('input[type=checkbox]')
+    if (checkbox) return { row, type: 'checkbox' }
+    const slider = e.target.closest('input[type=range]')
+    if (slider) return { row, type: 'slider' }
+    const button = e.target.closest('button.dp-action-button')
+    if (button) return { row, type: 'button' }
+    return null
+  }
+  function disarmSetHotkey() {
+    devSetHotkeyArmed = false
+    setHotkeyBtn.classList.remove('armed')
+  }
+  setHotkeyBtn.addEventListener('click', () => {
+    if (devSetHotkeyArmed) {
+      disarmSetHotkey()
+    } else {
+      // Mutual exclusion with Add Group / Delete Group -- same reasoning
+      // as those 2 already disarming each other (see their own arm
+      // sites above, now also patched to disarm this).
+      disarmDevGroupSelection()
+      disarmDevDeleteGroup()
+      devSetHotkeyArmed = true
+      setHotkeyBtn.classList.add('armed')
+    }
+  })
+  function findExistingHotkeyKeyForControl(key) {
+    for (const [seq, entry] of Object.entries(devHotkeys)) { if (entry.key === key) return seq }
+    return null
+  }
+  // Renders (or re-renders) a control's own hotkey badge inside its row
+  // -- either the plain colored-text badge (a saved hotkey exists) or
+  // nothing at all. Inserted right after the row's own drag handle (its
+  // first child), matching "left most within that input's line space".
+  function renderHotkeyBadgeForRow(row, ctrlKey, ctrlType) {
+    const existing = row.querySelector(`:scope > [data-hotkey-target="${CSS.escape(ctrlKey)}"]`)
+    if (existing) existing.remove()
+    const seq = findExistingHotkeyKeyForControl(ctrlKey)
+    if (!seq) return
+    const badge = el('span', 'dp-hotkey-badge', { textContent: seq, title: 'Double-click to edit, double-right-click to delete' })
+    badge.dataset.hotkeyTarget = ctrlKey
+    let lastContextmenuAt = 0
+    badge.addEventListener('dblclick', (e) => {
+      e.preventDefault(); e.stopPropagation()
+      startHotkeyEdit(row, ctrlKey, ctrlType, seq)
+    })
+    badge.addEventListener('contextmenu', (e) => {
+      e.preventDefault(); e.stopPropagation()
+      const now = performance.now()
+      if (now - lastContextmenuAt < getHotkeySequenceWindowMs()) {
+        pushDevPanelUndoSnapshot(); devRedoStack = []
+        delete devHotkeys[seq]
+        renderHotkeyBadgeForRow(row, ctrlKey, ctrlType)
+        refreshHotkeysListSubgroup()
+      }
+      lastContextmenuAt = now
+    })
+    const handle = row.querySelector(':scope > .dp-row-handle')
+    if (handle) row.insertBefore(badge, handle.nextSibling)
+    else row.insertBefore(badge, row.firstChild)
+  }
+  // Opens the inline edit textbox -- both for a brand-new binding (via
+  // Set Hotkey click-capture below) and double-click-to-edit on an
+  // existing badge.
+  function startHotkeyEdit(row, ctrlKey, ctrlType, existingSeq) {
+    const existing = row.querySelector(`:scope > [data-hotkey-target="${CSS.escape(ctrlKey)}"]`)
+    if (existing) existing.remove()
+    const input = el('input', 'dp-hotkey-input', { type: 'text' })
+    input.maxLength = 2
+    input.dataset.hotkeyTarget = ctrlKey
+    if (existingSeq) input.value = existingSeq
+    const handle = row.querySelector(':scope > .dp-row-handle')
+    if (handle) row.insertBefore(input, handle.nextSibling)
+    else row.insertBefore(input, row.firstChild)
+    input.focus(); input.select()
+    let settled = false
+    function commit() {
+      if (settled) return; settled = true
+      const typed = input.value.trim().toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 2)
+      input.remove()
+      if (typed) {
+        pushDevPanelUndoSnapshot(); devRedoStack = []
+        if (existingSeq && existingSeq !== typed) delete devHotkeys[existingSeq]
+        devHotkeys[typed] = { key: ctrlKey, type: ctrlType }
+      } else if (existingSeq) {
+        pushDevPanelUndoSnapshot(); devRedoStack = []
+        delete devHotkeys[existingSeq]
+      }
+      renderHotkeyBadgeForRow(row, ctrlKey, ctrlType)
+      refreshHotkeysListSubgroup()
+    }
+    function cancel() {
+      if (settled) return; settled = true
+      input.remove()
+      renderHotkeyBadgeForRow(row, ctrlKey, ctrlType)
+    }
+    input.addEventListener('blur', commit)
+    input.addEventListener('keydown', (ev) => {
+      if (ev.key === 'Enter') { ev.preventDefault(); input.blur() }
+      else if (ev.key === 'Escape') { ev.preventDefault(); cancel() }
+    })
+    input.addEventListener('click', (ev) => ev.stopPropagation())
+  }
+  // The capturing click listener implementing "click Set Hotkey, then
+  // click a checkbox/button/slider to bind a key" -- same "capturing
+  // listener on panel, gated by an armed flag" shape as Delete Group.
+  if (!devHotkeyIsTouchDevice) {
+    panel.addEventListener('click', (e) => {
+      if (!devSetHotkeyArmed) return
+      if (e.target.closest('.dp-icon-btn')) return
+      const eligible = getHotkeyEligibleTarget(e)
+      if (!eligible) return
+      e.preventDefault()
+      e.stopPropagation()
+      const ctrlKey = eligible.row.dataset.key
+      if (!ctrlKey) return
+      startHotkeyEdit(eligible.row, ctrlKey, eligible.type, findExistingHotkeyKeyForControl(ctrlKey))
+      // Deliberately stays armed, same as Delete -- lets several hotkeys
+      // be set in a row without re-clicking the header button each time.
+    }, true)
+    document.addEventListener('click', (e) => {
+      if (panel.contains(e.target)) return
+      if (devSetHotkeyArmed) disarmSetHotkey()
+    }, true)
+  }
+  // Re-renders every control's own hotkey badge -- called once after
+  // initial build and after Undo/Redo/Save/Reset restores devHotkeys
+  // wholesale (applyFullPanelState()), since those don't go through
+  // startHotkeyEdit()'s own per-row render call.
+  function renderAllHotkeyBadges() {
+    if (devHotkeyIsTouchDevice) return
+    const seenKeys = new Set()
+    Object.values(devHotkeys).forEach((entry) => seenKeys.add(entry.key))
+    groupsEl.querySelectorAll('.dp-hotkey-badge, .dp-hotkey-input').forEach((el) => {
+      if (el.dataset.hotkeyTarget) seenKeys.add(el.dataset.hotkeyTarget)
+    })
+    seenKeys.forEach((ctrlKey) => {
+      if (!ctrlKey) return
+      const row = findHotkeyRow(ctrlKey)
+      if (!row) return
+      const checkboxEl = row.querySelector(':scope > input[type=checkbox]')
+      const sliderEl = row.querySelector(':scope > input[type=range]')
+      const type = checkboxEl ? 'checkbox' : sliderEl ? 'slider' : 'button'
+      renderHotkeyBadgeForRow(row, ctrlKey, type)
+    })
+    refreshHotkeysListSubgroup()
+  }
+
+  // ------------------------------------------------------------------
+  // Key-sequence detection engine -- keys typed IN ORDER within a
+  // configurable window (default 500ms, see the Hotkeys subgroup's own
+  // slider), not held simultaneously.
+  // ------------------------------------------------------------------
+  function getHotkeySequenceWindowMs() {
+    const slider = findHotkeyRow('dp_hotkeySequenceWindowMs')?.querySelector('input[type=range]')
+    return slider ? parseFloat(slider.value) || 500 : 500
+  }
+  let hotkeyKeyBuffer = ''
+  let hotkeyBufferTimer = null
+  function resetHotkeyBuffer() {
+    hotkeyKeyBuffer = ''
+    if (hotkeyBufferTimer) { clearTimeout(hotkeyBufferTimer); hotkeyBufferTimer = null }
+  }
+  function isTypingIntoAnInput(e) {
+    const t = e.target
+    return t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable)
+  }
+  function processHotkeyBuffer() {
+    const exact = devHotkeys[hotkeyKeyBuffer]
+    const hasLongerPossibleMatch = hotkeyKeyBuffer.length === 1 && Object.keys(devHotkeys).some((k) => k.length === 2 && k.startsWith(hotkeyKeyBuffer))
+    if (hasLongerPossibleMatch) {
+      clearTimeout(hotkeyBufferTimer)
+      hotkeyBufferTimer = setTimeout(() => {
+        if (devHotkeys[hotkeyKeyBuffer]) triggerHotkey(devHotkeys[hotkeyKeyBuffer])
+        resetHotkeyBuffer()
+      }, getHotkeySequenceWindowMs())
+      return
+    }
+    if (exact) triggerHotkey(exact)
+    resetHotkeyBuffer()
+  }
+  function triggerHotkey(entry) {
+    const row = findHotkeyRow(entry.key)
+    const el = findHotkeyControlEl(row, entry.type)
+    if (!el) return
+    if (entry.type === 'checkbox') {
+      pushDevPanelUndoSnapshot(); devRedoStack = []
+      el.checked = !el.checked
+      el.dispatchEvent(new Event('change', { bubbles: true }))
+    } else if (entry.type === 'button') {
+      pushDevPanelUndoSnapshot(); devRedoStack = []
+      el.click()
+    } else if (entry.type === 'slider') {
+      enterSliderHotkeyMode(el)
+    }
+  }
+  if (!devHotkeyIsTouchDevice) {
+    document.addEventListener('keydown', (e) => {
+      if (activeSliderHotkey) { handleSliderHotkeyModeKey(e); return }
+      if (isTypingIntoAnInput(e)) return
+      if (!/^[a-z0-9]$/i.test(e.key)) return
+      hotkeyKeyBuffer += e.key.toLowerCase()
+      if (hotkeyKeyBuffer.length > 2) hotkeyKeyBuffer = hotkeyKeyBuffer.slice(-2)
+      processHotkeyBuffer()
+    })
+  }
+
+  // ------------------------------------------------------------------
+  // Slider Hotkey Mode -- triggering a slider's hotkey doesn't change
+  // anything immediately; it arms arrow-key adjustment instead, shown
+  // via a small HUD next to the floating DEV toggle button.
+  // ------------------------------------------------------------------
+  let activeSliderHotkey = null // { el, baseStep, multiplier }
+  function getSliderHotkeyHud() {
+    let hud = document.getElementById('dpHotkeyHud')
+    if (!hud) {
+      hud = el('div', 'dp-hotkey-hud', { id: 'dpHotkeyHud' })
+      hud.style.display = 'none'
+      document.body.appendChild(hud)
+    }
+    return hud
+  }
+  function updateSliderHotkeyHud() {
+    if (!activeSliderHotkey) return
+    const { el: sliderEl, baseStep, multiplier } = activeSliderHotkey
+    const label = sliderEl.closest('.dp-row')?.querySelector('label')?.textContent || sliderEl.closest('.dp-row')?.dataset.key || ''
+    const hud = getSliderHotkeyHud()
+    hud.innerHTML = `<span class="dp-hotkey-hud-label">${label}</span> = ${sliderEl.value} (step ${baseStep * multiplier})`
+    hud.style.display = 'block'
+  }
+  function enterSliderHotkeyMode(sliderEl) {
+    pushDevPanelUndoSnapshot(); devRedoStack = [] // the whole arrow-key session = one undo action
+    activeSliderHotkey = { el: sliderEl, baseStep: parseFloat(sliderEl.step) || 1, multiplier: 1 }
+    updateSliderHotkeyHud()
+  }
+  function exitSliderHotkeyMode() {
+    activeSliderHotkey = null
+    const hud = document.getElementById('dpHotkeyHud')
+    if (hud) hud.style.display = 'none'
+  }
+  function handleSliderHotkeyModeKey(e) {
+    if (!activeSliderHotkey) return
+    const { el: sliderEl, baseStep, multiplier } = activeSliderHotkey
+    if (e.key === 'Escape') { e.preventDefault(); exitSliderHotkeyMode(); return }
+    if (e.key === '+' || e.key === '=') { e.preventDefault(); activeSliderHotkey.multiplier *= 10; updateSliderHotkeyHud(); return }
+    if (e.key === '-' || e.key === '_') { e.preventDefault(); activeSliderHotkey.multiplier = Math.max(0.001, activeSliderHotkey.multiplier / 10); updateSliderHotkeyHud(); return }
+    if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+      e.preventDefault()
+      const step = baseStep * multiplier * (e.key === 'ArrowUp' ? 1 : -1)
+      const min = parseFloat(sliderEl.min), max = parseFloat(sliderEl.max)
+      let val = (parseFloat(sliderEl.value) || 0) + step
+      if (!isNaN(min)) val = Math.max(min, val)
+      if (!isNaN(max)) val = Math.min(max, val)
+      sliderEl.value = val
+      sliderEl.dispatchEvent(new Event('input', { bubbles: true }))
+      updateSliderHotkeyHud()
+    }
+  }
+  // Exits slider hotkey mode on any input/change/click on a DIFFERENT
+  // element than the currently-armed slider.
+  if (!devHotkeyIsTouchDevice) {
+    ;['input', 'change', 'click'].forEach((evtName) => {
+      document.addEventListener(evtName, (e) => {
+        if (!activeSliderHotkey) return
+        if (e.target === activeSliderHotkey.el) return
+        if (e.target.closest && e.target.closest('#dpHotkeyHud')) return
+        exitSliderHotkeyMode()
+      }, true)
+    })
+  }
+
+  // ------------------------------------------------------------------
+  // "Hotkeys" listing -- appended into the built-in "Dev Panel" group,
+  // right after its Sequence Window slider control (a plain, flat
+  // DEV_GROUPS-registered control, 'dp_hotkeySequenceWindowMs' --
+  // registered below -- so it persists via Save/Sync/Reset/Undo like
+  // any other setting). Deliberately NOT a nested sub-group the way
+  // HANDYSET's own ensureHotkeysSubgroup() builds one -- this project's
+  // "Dev Panel" group has no existing nested-subgroup DOM-reorg
+  // machinery, and the listing works identically either way; a cosmetic
+  // simplification, not a functional one.
+  // ------------------------------------------------------------------
+  function refreshHotkeysListSubgroup() {
+    if (devHotkeyIsTouchDevice) return
+    const container = document.getElementById('dpHotkeysListContainer')
+    if (!container) return
+    container.innerHTML = ''
+    const entries = Object.entries(devHotkeys)
+    if (!entries.length) {
+      const empty = el('div', null, { textContent: 'No hotkeys set yet.' })
+      empty.style.cssText = 'font-size:10px; color:#888; padding:2px 0;'
+      container.appendChild(empty)
+      return
+    }
+    entries.forEach(([seq, entry]) => {
+      const row = findHotkeyRow(entry.key)
+      const label = row?.querySelector('label')?.textContent || entry.key
+      const line = el('div', null, { })
+      line.style.cssText = 'display:flex; align-items:center; gap:6px;'
+      const badge = el('span', 'dp-hotkey-badge', { textContent: seq, title: 'Double-click to edit, double-right-click to delete' })
+      let lastContextmenuAt = 0
+      badge.addEventListener('dblclick', (e) => {
+        e.preventDefault(); e.stopPropagation()
+        if (row) startHotkeyEdit(row, entry.key, entry.type, seq)
+      })
+      badge.addEventListener('contextmenu', (e) => {
+        e.preventDefault(); e.stopPropagation()
+        const now = performance.now()
+        if (now - lastContextmenuAt < getHotkeySequenceWindowMs()) {
+          pushDevPanelUndoSnapshot(); devRedoStack = []
+          delete devHotkeys[seq]
+          if (row) renderHotkeyBadgeForRow(row, entry.key, entry.type)
+          refreshHotkeysListSubgroup()
+        }
+        lastContextmenuAt = now
+      })
+      const labelSpan = el('span', null, { textContent: label })
+      line.append(badge, labelSpan)
+      container.appendChild(line)
+    })
+  }
 
   // Ctrl+F-style search wiring (searchInput/searchCount created above,
   // near groupsEl). See collectDevSearchMatches()'s own comment there

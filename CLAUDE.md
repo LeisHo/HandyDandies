@@ -2186,3 +2186,28 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   genuine quick double-click still resolves correctly -- not live-
   verified against the real app (the local static server failed all 5
   navigation attempts this round, the standing retry cap).
+- **The Set Hotkey feature (per-control custom keyboard shortcuts,
+  ported 2026-09-30 from HANDYSET's own `devPanel.js`) is NOT
+  independently live-verified in this project -- per direct instruction
+  ("dont need to verify justs implement as its done there"), only
+  `node --check` confirmed it parses.** Before trusting it works end to
+  end, actually test: clicking the new ⌨ header button arms it; clicking
+  a checkbox/slider/button while armed opens the inline edit textbox;
+  typing 1-2 letters + Enter saves a badge; the badge's own double-click
+  re-opens edit and double-right-click (within the Sequence Window)
+  deletes it; typing that same sequence later (not focused in any text
+  field) actually toggles/clicks/arms the bound control; a slider's own
+  hotkey arms the arrow-key HUD mode correctly; Save/Reset/Undo/Redo all
+  correctly restore `devHotkeys`. **This port used a real DOM `id`-based
+  lookup system (HANDYSET) re-derived into this project's own
+  `.dp-row[data-key="..."]`-based one (`findHotkeyRow()`/
+  `findHotkeyControlEl()`, `src/devpanel/devPanel.js`)
+  -- this is the single highest-risk translation point**, since it was
+  never tested against this project's own real rendered DOM. If a
+  future report says "Set Hotkey doesn't do anything when I click a
+  control" or "the badge never appears," check `findHotkeyRow()`'s own
+  selector against a real control's actual row markup first (e.g. does
+  `buildListPickerRow`-rendered content, or a dynamically-registered
+  custom-click-function control, actually carry `data-key` the same way
+  a plain DEV_GROUPS control does) before assuming the hotkey-sequence
+  engine itself is broken.

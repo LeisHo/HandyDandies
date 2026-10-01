@@ -18,6 +18,28 @@ work seamlessly from there.
 
 ## Currently working on
 
+**ADDED 2026-09-30 (38th round) -- Set Hotkey feature (per-control
+custom keyboard shortcuts), ported from HANDYSET's own `devPanel.js`.**
+Direct request: "i have a hotkey dev panel system. check it here...
+implement." D-key toggle and Undo/Redo already existed here; the
+genuinely new piece was the full Set-Hotkey system (bind a 1-2 letter
+sequential key combo to any checkbox/button/slider; a HUD-driven
+arrow-key "slider hotkey mode"; a live-updating "Hotkeys" listing with
+double-click-to-edit / double-right-click-to-delete; mutual exclusion
+with Add Group/Delete Group). Re-derived against this file's own DOM
+conventions rather than copy-pasted -- HANDYSET looks controls up via a
+real DOM `id` (`document.getElementById`); this file's own `buildRow()`
+never assigns one, so every lookup here keys off `ctrl.key` via
+`.dp-row[data-key="..."]` instead. `devHotkeys` wired into
+`captureFullPanelState()`/`applyFullPanelState()`, so it persists via
+Save/Sync/Reset/Undo/Redo/Named-Setting-States automatically, the same
+way every other piece of panel state already does. Per direct
+instruction, NOT independently live-verified this round (only
+`node --check` on both edited files) -- the user explicitly said not to
+spend time on that. See CHANGELOG.txt's 38th-round entry for the full
+account, and CLAUDE.md's matching gotcha for the structural differences
+future ports from HANDYSET/the template need to re-check, not assume.
+
 **RESOLVED 2026-09-30 (37th round) -- "only a few of the hands get
 triggered" during Double-Click+Hold, caught via a real pasted log.**
 Root cause: the fire-and-forget Click-count debounce timer

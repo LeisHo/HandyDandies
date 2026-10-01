@@ -185,6 +185,30 @@ html, body {
 /* Pressed-look for a toggled-on header icon button (Text Edit Mode while
    active) and for Add Group while right-click-armed for selection. */
 .dp-icon-btn.active, .dp-icon-btn.armed { background: var(--dp-accent-color, #7d8cff); color: #14142a; }
+/* Set Hotkey feature (2026-09-30, ported from HANDYSET's own devPanel.js).
+   A saved hotkey badge reads as plain colored bold text (not a textbox),
+   in the same --dp-button-bg-color every real dev-panel button already
+   uses. The edit textbox (shown while typing/editing) is a plain small
+   input, left-most in the row (inserted right after .dp-row-handle). */
+.dp-hotkey-badge {
+  display: inline-block; color: var(--dp-button-bg-color, #7d8cff); font-weight: bold;
+  font-size: var(--dp-settings-title-font-size, 11px); cursor: default; user-select: none;
+  margin-right: 4px; flex-shrink: 0;
+}
+.dp-hotkey-input {
+  width: 28px; flex-shrink: 0; margin-right: 4px; font-size: var(--dp-settings-title-font-size, 11px);
+  background: #0f0f18; color: var(--dp-text-color, #aaa); border: 1px solid var(--dp-accent-color, #7d8cff);
+  border-radius: 3px; padding: 1px 3px; text-transform: lowercase;
+}
+/* Slider Hotkey Mode HUD -- a small readout, shown only while a slider
+   hotkey is actively armed for arrow-key adjustment. */
+.dp-hotkey-hud {
+  position: fixed; bottom: 12px; right: 70px; z-index: 100000;
+  background: #000; color: var(--dp-text-color, #aaa); border: 1px solid var(--dp-button-bg-color, #3a3a4a);
+  border-radius: 4px; padding: 4px 10px; font-size: var(--dp-settings-title-font-size, 11px);
+  white-space: nowrap; pointer-events: none;
+}
+.dp-hotkey-hud .dp-hotkey-hud-label { font-weight: bold; color: var(--dp-button-bg-color, #7d8cff); }
 .dp-body {
   padding: 4px 8px 10px; overflow-y: auto; flex: 1 1 auto; min-height: 0;
   /* Thin scrollbar (previously the browser default, ~15-17px) so its own

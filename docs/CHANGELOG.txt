@@ -14616,6 +14616,83 @@ stale debounce" scenario to fix there.
 
 `main.js` cache-buster bumped `?v=257` -> `?v=258`.
 
+2026-09-30  -  (38th round -- "i have a hotkey dev panel system. check
+it here... implement," a Set Hotkey port from HANDYSET)
+
+**Located the real source before writing anything, per CLAUDE.md's own
+"read the real source, don't reconstruct from a summary" rule.** The
+user's pasted investigation gave function names and line numbers but no
+code bodies for most of the system -- `find`-ing every `devPanel.js` in
+the workspace by line count matched the pasted line numbers (D-key at
+6660-6667, init calls at 6680-6691) to HANDYSET's own 6713-line file,
+not HANDO's (confirmed directly by reading those exact lines there).
+Confirmed first that D-key toggle and Undo/Redo already exist in this
+project's own `devPanel.js` -- the genuinely missing piece was only the
+"Set Hotkey" custom per-control hotkey-assignment system (~400 lines in
+HANDYSET: `devHotkeys` map, `getHotkeyEligibleTarget()`,
+`renderHotkeyBadgeForRow()`, `startHotkeyEdit()`,
+`setupHotkeyAssignmentCapture()`, the key-sequence buffer/debounce
+engine, Slider Hotkey Mode's own arrow-key HUD, and the Hotkeys listing
+UI).
+
+**Re-derived against this project's own conventions, not copy-pasted --
+confirmed real structural differences before writing a single line:**
+HANDYSET looks up a control via a real DOM `id`
+(`document.getElementById(entry.id)`); this project's own `buildRow()`
+never assigns one -- every control is found via
+`.dp-row[data-key="..."]` (confirmed by grepping this file's own
+existing lookup patterns, e.g. `applyStoredValues()`'s own color/
+checkbox reads). Every function that used `el.id`/`getElementById` in
+the source was rewritten to look up `.dp-row[data-key=...]` + the
+control type's own child selector instead (`findHotkeyRow()`/
+`findHotkeyControlEl()`, new). HANDYSET's header buttons are static
+HTML (`index.html`'s own `<button id="devSetHotkeyBtn">`); this
+project builds them imperatively via `el(...)` inside `initDevPanel()`
+-- added `setHotkeyBtn` the same way, appended into the existing
+`headerButtons.append(...)` call. HANDYSET wires its hotkey setup via 4
+named `setupX()` functions called from `initDevPanelEngine()`; this
+project inlines equivalent setup directly in `initDevPanel()`'s own
+body (matching its own established style for Delete Group/Add Group/
+Undo/Redo, all inline, no separate `setupX()` wrapper) -- no new
+"init call wiring" step was needed as a result.
+
+Also patched the 2 existing mutual-exclusion arm sites (`addGroupBtn`'s
+own contextmenu handler, `deleteGroupBtn`'s own click handler) to ALSO
+call the new `disarmSetHotkey()`, matching HANDYSET's own 2 equivalent
+patch sites exactly (confirmed via grep there) -- without this, Set
+Hotkey could stay armed simultaneously with Add Group or Delete Group,
+making a click on a control ambiguous between 3 different meanings.
+
+`devHotkeys` wired into the EXISTING `captureFullPanelState()`/
+`applyFullPanelState()` pair (not separate new persistence plumbing) --
+confirmed these already underlie Save/Sync/Reset/Copy/Undo/Redo AND
+the Named Setting States (Use/Set-as-Default) system, so adding one
+field there covers every one of those paths at once, exactly the way
+HANDYSET's own `captureFullDevPanelState()`/`applyFullDevPanelState()`
+equivalent already does. The "Hotkey Sequence Window (Ms)" timing
+control is a genuine DEV_GROUPS-registered slider (`dp_hotkeySequenceWindowMs`,
+in the built-in "Dev Panel" group) rather than a one-off DOM element,
+so it persists the same way. One deliberate simplification, disclosed
+rather than hidden: the Hotkeys listing isn't nested inside its own
+sub-group the way HANDYSET's `ensureHotkeysSubgroup()` builds one --
+this project's "Dev Panel" group has no existing nested-subgroup DOM-
+reorg machinery to hook into, and the listing (a plain list, not a
+collapsible group) works identically as a flat addition; purely
+cosmetic, not a functional gap.
+
+Verified: `node --check` on both `src/main.js` (its own `devPanel.js`
+import version bump) and `src/devpanel/devPanel.js` passes. **Per
+direct instruction ("dont need to verify justs implement as its done
+there," later "dont need to verify"), this round was NOT independently
+live-tested against the running app** -- confidence rests on direct
+code reading (both the real HANDYSET source and this project's own
+existing lookup/persistence conventions) rather than browser
+verification this time.
+
+`main.js` cache-buster bumped `?v=258` -> `?v=259`; `devpanel/devPanel.js`'s
+own import-version bumped `?v=50` -> `?v=51`; `style.css` bumped `?v=23`
+-> `?v=24`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a
