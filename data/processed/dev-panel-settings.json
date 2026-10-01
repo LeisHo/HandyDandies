@@ -7061,9 +7061,9 @@
       "custom13TouchPointCount": 1,
       "custom13ClickCount": "3rd",
       "custom13Mode": "Sequence",
-      "custom13OffsetEnabled": false,
-      "custom13OffsetX": 0,
-      "custom13OffsetY": 0,
+      "custom13OffsetEnabled": true,
+      "custom13OffsetX": -12,
+      "custom13OffsetY": 4,
       "custom13RotationEnabled": false,
       "custom13RotationX": 0,
       "custom13RotationY": 0,
@@ -7101,16 +7101,16 @@
       "custom13MultiTriggerEnabled": true,
       "custom13MultiTriggers": "[{\"prefix\":\"custom13Trig1\",\"title\":\"Trigger 1\"},{\"prefix\":\"custom13Trig2\",\"title\":\"Trigger 2\"}]",
       "custom13Trig1Enabled": true,
-      "custom13Trig1Mode": "Single Pose",
+      "custom13Trig1Mode": "Sequence",
       "custom13Trig1OffsetEnabled": true,
-      "custom13Trig1OffsetX": 15,
-      "custom13Trig1OffsetY": 0,
+      "custom13Trig1OffsetX": 13,
+      "custom13Trig1OffsetY": -8,
       "custom13Trig1RotationEnabled": false,
       "custom13Trig1RotationX": 0,
       "custom13Trig1RotationY": 0,
       "custom13Trig1RotationZ": 0,
       "custom13Trig1TargetPose": "COUNTDOWN (VERT) - 3",
-      "custom13Trig1TweenSelector": "",
+      "custom13Trig1TweenSelector": "Birdie",
       "custom13Trig1TweenSpeedMs": 800,
       "custom13Trig1TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom13Trig1TweenStartTimeRange": "{\"min\":0,\"max\":300}",
@@ -14384,9 +14384,9 @@
       "custom13TouchPointCount": 1,
       "custom13ClickCount": "3rd",
       "custom13Mode": "Sequence",
-      "custom13OffsetEnabled": false,
-      "custom13OffsetX": 0,
-      "custom13OffsetY": 0,
+      "custom13OffsetEnabled": true,
+      "custom13OffsetX": -12,
+      "custom13OffsetY": 4,
       "custom13RotationEnabled": false,
       "custom13RotationX": 0,
       "custom13RotationY": 0,
@@ -14424,16 +14424,16 @@
       "custom13MultiTriggerEnabled": true,
       "custom13MultiTriggers": "[{\"prefix\":\"custom13Trig1\",\"title\":\"Trigger 1\"},{\"prefix\":\"custom13Trig2\",\"title\":\"Trigger 2\"}]",
       "custom13Trig1Enabled": true,
-      "custom13Trig1Mode": "Single Pose",
+      "custom13Trig1Mode": "Sequence",
       "custom13Trig1OffsetEnabled": true,
-      "custom13Trig1OffsetX": 15,
-      "custom13Trig1OffsetY": 0,
+      "custom13Trig1OffsetX": 13,
+      "custom13Trig1OffsetY": -8,
       "custom13Trig1RotationEnabled": false,
       "custom13Trig1RotationX": 0,
       "custom13Trig1RotationY": 0,
       "custom13Trig1RotationZ": 0,
       "custom13Trig1TargetPose": "COUNTDOWN (VERT) - 3",
-      "custom13Trig1TweenSelector": "",
+      "custom13Trig1TweenSelector": "Birdie",
       "custom13Trig1TweenSpeedMs": 800,
       "custom13Trig1TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom13Trig1TweenStartTimeRange": "{\"min\":0,\"max\":300}",
@@ -21707,9 +21707,9 @@
       "custom13TouchPointCount": 1,
       "custom13ClickCount": "3rd",
       "custom13Mode": "Sequence",
-      "custom13OffsetEnabled": false,
-      "custom13OffsetX": 0,
-      "custom13OffsetY": 0,
+      "custom13OffsetEnabled": true,
+      "custom13OffsetX": -12,
+      "custom13OffsetY": 4,
       "custom13RotationEnabled": false,
       "custom13RotationX": 0,
       "custom13RotationY": 0,
@@ -21747,16 +21747,16 @@
       "custom13MultiTriggerEnabled": true,
       "custom13MultiTriggers": "[{\"prefix\":\"custom13Trig1\",\"title\":\"Trigger 1\"},{\"prefix\":\"custom13Trig2\",\"title\":\"Trigger 2\"}]",
       "custom13Trig1Enabled": true,
-      "custom13Trig1Mode": "Single Pose",
+      "custom13Trig1Mode": "Sequence",
       "custom13Trig1OffsetEnabled": true,
-      "custom13Trig1OffsetX": 15,
-      "custom13Trig1OffsetY": 0,
+      "custom13Trig1OffsetX": 13,
+      "custom13Trig1OffsetY": -8,
       "custom13Trig1RotationEnabled": false,
       "custom13Trig1RotationX": 0,
       "custom13Trig1RotationY": 0,
       "custom13Trig1RotationZ": 0,
       "custom13Trig1TargetPose": "COUNTDOWN (VERT) - 3",
-      "custom13Trig1TweenSelector": "",
+      "custom13Trig1TweenSelector": "Birdie",
       "custom13Trig1TweenSpeedMs": 800,
       "custom13Trig1TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom13Trig1TweenStartTimeRange": "{\"min\":0,\"max\":300}",
@@ -28809,7 +28809,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 13",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -34401,7 +34401,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 9",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -39237,7 +39237,7 @@
                 "type": "group",
                 "group": {
                   "key": "Start Time Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -39342,7 +39342,7 @@
                       "type": "group",
                       "group": {
                         "key": "Retransition Start Time Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -39413,7 +39413,7 @@
                     },
                     {
                       "key": "Retransition Start Time Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -39670,7 +39670,7 @@
               },
               {
                 "key": "Start Time Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -39769,7 +39769,7 @@
                     "type": "group",
                     "group": {
                       "key": "Retransition Start Time Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -39840,7 +39840,7 @@
                   },
                   {
                     "key": "Retransition Start Time Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -47114,7 +47114,7 @@
         },
         {
           "key": "Custom Click Function 13",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
@@ -52700,7 +52700,7 @@
         },
         {
           "key": "Custom Click Function 9",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
@@ -57533,7 +57533,7 @@
               "type": "group",
               "group": {
                 "key": "Start Time Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -57638,7 +57638,7 @@
                     "type": "group",
                     "group": {
                       "key": "Retransition Start Time Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -57709,7 +57709,7 @@
                   },
                   {
                     "key": "Retransition Start Time Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -57966,7 +57966,7 @@
             },
             {
               "key": "Start Time Curve",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -58065,7 +58065,7 @@
                   "type": "group",
                   "group": {
                     "key": "Retransition Start Time Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -58136,7 +58136,7 @@
                 },
                 {
                   "key": "Retransition Start Time Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
