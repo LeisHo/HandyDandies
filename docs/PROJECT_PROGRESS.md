@@ -18,6 +18,55 @@ work seamlessly from there.
 
 ## Currently working on
 
+**RESOLVED 2026-09-30 (37th round) -- "only a few of the hands get
+triggered" during Double-Click+Hold, caught via a real pasted log.**
+Root cause: the fire-and-forget Click-count debounce timer
+(`clickPoseClickTimer`) is a plain `setTimeout` armed by press #1's
+release, with no awareness that press #2 might currently be a HELD
+press (part of a Click+Hold chain). Since a real hold lasts seconds --
+far longer than `multiClickWindowMs` -- the timer fired WHILE press #2
+was still down, resolved to "just 1 click," and fired the ordinal-1
+fire-and-forget Click function (a Multi Trigger sub-trigger, "Trigger
+1") for nearly every hand, racing against and overwriting the real
+Click+Hold-chain function's result for all but a handful of hands.
+Fixed with 2 changes to the same listener: (1) a new `leftPointerDown`
+flag defers resolution (reschedules rather than fires) while any
+button-0 press is physically down; (2) the SAME heldMs/moved
+classification the click-hold-chain listener itself uses (via the
+shared `clickHoldChainDownInfo`) now also runs in this listener, so a
+release that turns out to be a genuine hold resets/cancels the pending
+count instead of counting it as another click. Verified via an
+isolated logic reproduction using the EXACT timings from the user's own
+pasted log (heldMs:6888, multiClickWindowMs 250) -- zero spurious
+firings, while a legitimate quick double-click (no hold) still resolves
+correctly. `node --check` passes. **Not live-verified against the real
+app this round** -- the local static server's own documented
+`net::ERR_CONNECTION_RESET` truncation quirk failed all 5 navigation
+attempts (the standing retry cap), unlike the prior round which
+succeeded on the 5th. See CHANGELOG.txt's 37th-round entry.
+
+**ADDED 2026-09-30 (36th round) -- "Pause Logs"/"Resume Logs" toggle
+button in the Debug group.** A single button (dynamic label, same
+pattern as the main app's own Pause Button) that flips a new
+`logsPaused` flag; while paused, all 3 append functions
+(`logMouseTrackingEvent`/`appendHandBehaviourLogLine`/
+`appendFrameRateLogLine`) drop new entries at the source instead of
+just skipping the DOM write, so a long pause doesn't silently keep
+growing the in-memory arrays. Each log's own individual enable
+checkbox is untouched by this -- pausing/resuming never flips them.
+Session-only (not a persisted dev-panel value, matching the main Pause
+Button's own convention). Live-verified against the real running app
+(5th navigation attempt succeeded past the local server's own
+documented truncation quirk): button confirmed inside the Debug group,
+clicking it flips the label Pause Logs <-> Resume Logs correctly and
+reverts cleanly, no console errors introduced. The log-suppression
+itself (that a click during the paused window produces no new entry)
+was verified via an isolated logic-level reproduction rather than live
+DOM inspection of the log widget's own `<pre>` content, which didn't
+grow from a synthetic click either way in this sandbox and wasn't worth
+chasing further since that widget's click-routing is pre-existing,
+unrelated code this round didn't touch.
+
 **RESOLVED 2026-09-30 (35th round) -- "close hands do a single click,
 far hands do the double click hold" during Double-Click+Hold.** Root
 cause found by reading both pointerdown listeners directly: the

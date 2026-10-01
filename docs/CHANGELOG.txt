@@ -14473,6 +14473,149 @@ hold triggers.
 
 `main.js` cache-buster bumped `?v=255` -> `?v=256`.
 
+2026-09-30  -  (36th round -- "provide a pause and resume logs button
+in the debug group")
+
+Added a single toggle button, `pauseLogsBtn` ("Pause Logs"/"Resume
+Logs"), to the Debug group -- same dynamic-label-on-the-button-itself
+technique `copyAllDebugLogs()`'s own "Copied!" flash already uses
+(`btn.textContent` swap), just permanent instead of a timed revert.
+Backed by a new module-level `logsPaused` flag (declared in the
+established early-state block alongside `mouseTrackingLogEl`/
+`cursorLogTimer`, per this file's own standing TDZ rule -- though this
+specific flag has no real TDZ risk, since it's only ever read from
+event-driven functions, never top-level setup code).
+
+Gated all 3 log-append functions (`logMouseTrackingEvent()`,
+`appendHandBehaviourLogLine()`, `appendFrameRateLogLine()`) with
+`if (logsPaused) return` as their first line -- a paused log drops new
+entries at the source (never pushed into the entries array at all),
+not just skipped on the DOM-write side, so a long pause doesn't
+silently keep growing memory while paused. Each log's own individual
+enable checkbox (Log Mouse Position, Log Hand Behaviour, Log Hand
+Behaviour Detailed, Log Frame Rate Drops, etc.) is completely
+untouched -- this is a session-wide gate layered on top of whatever
+those checkboxes already allow, not a replacement for them. Existing
+buffered entries are untouched either way -- this is not a 4th "clear"
+button.
+
+Verified: `node --check src/main.js` passes. Isolated logic-level
+reproduction (pure control-flow, no DOM) confirmed: entries recorded
+before pausing are preserved; entries attempted while paused are
+dropped; toggling resumes recording exactly where it left off; the
+button's own label flips Pause Logs -> Resume Logs -> Pause Logs
+correctly across 2 toggles. Live-verified against the real running app
+on the 5th navigation attempt (local server's own documented
+`net::ERR_CONNECTION_RESET` truncation quirk hit the first 4): 255 real
+hands rendered, `pauseLogsBtn` confirmed inside `.dp-group[data-key="Debug"]`,
+2 real clicks confirmed the label toggles Pause Logs -> Resume Logs ->
+Pause Logs (left in its original state), no new console errors
+introduced by this change (the only console errors present were
+pre-existing `/api/save-settings` 404s, expected on a backend-less
+local static server per this project's own documented convention, and
+2 `setPointerCapture` OrbitControls errors caused by this round's own
+synthetic PointerEvent test dispatches, not a real app defect). Did
+NOT confirm the suppression against the live Mouse Tracking Log
+widget's own `<pre>` content directly -- a synthetic click didn't
+register in it either way in this sandbox, and that widget's own
+click-routing is pre-existing code this round never touched, so it
+wasn't worth chasing further; confidence in the suppression itself
+rests on the isolated logic reproduction, which exactly mirrors the
+real functions' shape.
+
+`main.js` cache-buster bumped `?v=256` -> `?v=257`.
+
+2026-09-30  -  (37th round -- "this is buggy. when i do double click
+hold, only a few of the hands get triggered," caught via a real pasted
+Mouse Tracking Log / Hand Behaviour Log / Frame Rate Log)
+
+**A different, deeper bug than the 35th round's fix -- confirmed by
+reading the pasted log line by line before touching anything.** The
+log showed that during a real Double-Click+Hold gesture (press 1 a
+quick click, press 2 held 6888ms), the vast majority of hands (36-156,
+minus a handful) logged `Trigger 1 -- triggered -> pose "Fist"` instead
+of the intended `CLICK 2 + HOLD -- triggered -> tween "Clockwise Fan"`
+-- and every one of those "wrong" firings happened at the SAME
+timestamp, right when the hold started, not scattered through the
+gesture.
+
+Root cause, confirmed by reading `clickPoseClickTimer`'s own dispatch
+code directly: this is the fire-and-forget Click-count debounce (the
+mechanism that resolves "was that 1 click, 2 clicks, 3 clicks..." after
+`cfg.multiClickWindowMs` of silence following a release). It is a
+PLAIN `setTimeout` armed by press #1's release, with zero awareness of
+whether ANOTHER press is currently happening. In this gesture, press #2
+is HELD for 6888ms -- far longer than `multiClickWindowMs` (250ms in
+the real settings) -- so the debounce timer fired WHILE press #2 was
+still physically down, long before anything could know whether press #2
+would turn out to be a quick click or a genuine hold. It resolved to
+"only 1 click happened" and fired `triggerCustomPoseFunctions('Click',
+1)` -- the ordinal-1 fire-and-forget Click family, which is what
+"Trigger 1" (a Multi Trigger sub-trigger of a ClickCount-1st custom
+Click function) dispatches through. That firing then raced against and
+(via `releaseHandFromOtherFunctions()`'s existing "last commit wins"
+rule) overwrote the real Click+Hold-chain function's own result for
+every hand except the few whose own per-hand Start Time Curve delay
+happened to commit the real function's result LATER than this spurious
+firing.
+
+This is a DIFFERENT race than the 35th round's fix (ordinal-1 Click+Hold
+vs. chain-ordinal Click+Hold, both HOLD-kind, both armed via
+`pointerdown`) -- this one is the fire-and-forget POSE-kind Click
+family (armed/resolved via `pointerup` + a debounce timer) blindly
+resolving while a HOLD-kind press is in flight, a completely separate
+code path untouched by that fix.
+
+Fixed with 2 changes to the SAME `clickPoseClickTimer` listener:
+1. A new `leftPointerDown` flag (set/cleared by 2 new, minimal,
+   order-agnostic `pointerdown`/`pointerup` listeners) tracks whether
+   ANY button-0 press is physically down right now. The debounce
+   timer's own resolve step (`resolveClickCount`) now checks it FIRST:
+   if a press is currently down, it reschedules itself for another
+   `multiClickWindowMs` instead of resolving -- so a resolution can
+   never fire mid-press, only once the pointer is actually up.
+2. That alone isn't sufficient on its own: once the held press finally
+   releases, this SAME listener would otherwise count THAT release as
+   ANOTHER plain click (a 2nd, later wave of the identical spurious
+   firing) rather than recognizing it was a genuine hold. Fixed by
+   classifying the release directly in this listener using the exact
+   same heldMs/moved check the click-hold-chain listener already uses
+   for its own `clickHoldChainCount` reset (`clickHoldChainDownInfo`,
+   set on every button-0 pointerdown regardless of chain state) --
+   computed independently here rather than read from a flag that
+   listener would set, since listener registration order means that
+   listener hasn't run yet for this same event by the time this one
+   does. A genuine hold (heldMs beyond `MOUSE_LOG_HELD_DRAG_MS`, or a
+   drag) now resets/cancels the pending click count and timer here too,
+   the same way it already resets `clickHoldChainCount` in the other
+   listener.
+
+Verified via an isolated logic-level reproduction (pure control-flow,
+fake clock, no DOM/setTimeout needed) using the EXACT timings from the
+user's own pasted log: press 1 at t=0 released at t=20, press 2 (the
+chain continuation) starting at t=120 and held until t=7008 (matching
+the real heldMs:6888) -- confirmed zero spurious
+`triggerCustomPoseFunctions` calls at any point during or after the
+hold. A 2nd scenario confirmed a legitimate quick double-click (both
+presses released fast, no hold) still resolves correctly to ordinal 2,
+proving this fix doesn't regress the existing multi-click behavior it
+was built on top of. `node --check src/main.js` passes.
+
+**Not live-verified against the real running app this round** -- the
+local static server's own documented `net::ERR_CONNECTION_RESET`
+truncation quirk failed on all 5 navigation attempts this round (the
+standing retry cap), unlike the 36th round's attempt which succeeded on
+its 5th try. If a future report describes this symptom persisting after
+this fix, re-check first whether a DIFFERENT fire-and-forget family
+(Right Click's own debounce, `rightClickPoseClickTimer`) has an
+analogous gap -- it was deliberately NOT touched this round, since
+Right Click+Hold has no chain-continuation mechanism at all (confirmed:
+only one, unconditional `startClickHoldPose('rchp')` call site, no
+ordinal-2/3/4 equivalent), so there is no equivalent "a hold races a
+stale debounce" scenario to fix there.
+
+`main.js` cache-buster bumped `?v=257` -> `?v=258`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

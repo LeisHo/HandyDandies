@@ -2147,3 +2147,42 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   isolated logic-level reproduction only (the local static server hit
   its own documented `net::ERR_CONNECTION_RESET` truncation quirk 5
   times in a row this round, the standing retry cap).
+- **A debounce `setTimeout` armed by one press's RELEASE has no
+  awareness that a LATER press might currently be physically DOWN --
+  if that later press turns out to be a genuine hold (held for seconds,
+  not a quick click), the debounce fires anyway, mid-hold, resolving to
+  stale pre-hold state.** `clickPoseClickTimer` (the fire-and-forget
+  Click-count debounce) is a real, confirmed example: during a real
+  Double-Click+Hold gesture, press #1's quick release armed a 250ms
+  debounce; press #2 was then held for 6888ms, so the debounce fired
+  WHILE press #2 was still down, resolved to "only 1 click happened,"
+  and fired the ordinal-1 fire-and-forget Click family ("Trigger 1," a
+  Multi Trigger sub-trigger) for nearly every hand -- racing against and
+  (via `releaseHandFromOtherFunctions()`) overwriting the real
+  Click+Hold-chain function's own result for all but a handful of hands.
+  This is a DIFFERENT race than the ordinal-1-vs-chain-ordinal one
+  documented above (that one is 2 HOLD-kind `pointerdown` listeners
+  racing each other; this one is a POSE-kind `pointerup` debounce
+  blindly resolving while a HOLD-kind press is in flight) -- confirming
+  this general failure mode isn't confined to one code path. Fixed with
+  a new `leftPointerDown` flag (the debounce's own resolve step defers/
+  reschedules while ANY button-0 press is down, rather than resolving)
+  PLUS classifying the eventual release with the SAME heldMs/moved check
+  the click-hold-chain listener already uses (`clickHoldChainDownInfo`)
+  -- a release that turns out to be a genuine hold resets/cancels the
+  pending debounce instead of counting as another click. **If a future
+  report describes a different debounced fire-and-forget mechanism
+  (e.g. `rightClickPoseClickTimer`, or any NEW one added later)
+  misfiring during an overlapping hold gesture, this is the pattern to
+  check and the pattern to copy** -- any `setTimeout`-based debounce
+  keyed off a RELEASE, with no check for a currently-in-flight press,
+  has this exact latent gap. `rightClickPoseClickTimer` itself was
+  deliberately left unfixed this round since Right Click+Hold has no
+  chain-continuation mechanism at all (only one, unconditional
+  `startClickHoldPose('rchp')` call site) -- there's currently no
+  analogous hold for it to race against. Verified via an isolated logic
+  reproduction using the exact real timings from a user-pasted log
+  (heldMs:6888, multiClickWindowMs 250) plus a 2nd scenario confirming a
+  genuine quick double-click still resolves correctly -- not live-
+  verified against the real app (the local static server failed all 5
+  navigation attempts this round, the standing retry cap).

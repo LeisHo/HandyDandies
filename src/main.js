@@ -198,6 +198,15 @@ const MOUSE_LOG_MAX_ENTRIES = 200
 const mouseTrackingLogEntries = []
 let mouseTrackingLogEl = null
 let cursorLogTimer = null
+// Pause/Resume Logs toggle's own state (2026-09-30) -- declared here,
+// not next to toggleLogsPaused()/the 3 append functions that read it,
+// per this file's own standing TDZ rule: those append functions are
+// called from real-time event handlers (pointermove/pointerdown/
+// animate()), never from top-level module execution, so this specific
+// case has no real TDZ risk either way -- kept in the early block
+// anyway for consistency, so a future reader never has to re-derive
+// that reasoning per variable.
+let logsPaused = false
 // FIXED 2026-09-29 -- REAL PRODUCTION OUTAGE, found live within minutes
 // via console error, not caught before shipping. Frame Rate Drop Log's
 // own attribution source (see its DEV_GROUPS controls' own comment) --
@@ -1763,7 +1772,23 @@ const DEV_GROUPS = [
       // Added 2026-09-30, direct request: "provide a clear all logs
       // button." Clears all 3 logs' own buffers via their existing
       // individual clear functions -- no new clearing logic needed.
-      { key: 'clearAllLogsBtn', label: 'Clear All Logs', type: 'button', onClick: () => { clearMouseTrackingLog(); clearHandBehaviourLog(); clearFrameRateLog() } }
+      { key: 'clearAllLogsBtn', label: 'Clear All Logs', type: 'button', onClick: () => { clearMouseTrackingLog(); clearHandBehaviourLog(); clearFrameRateLog() } },
+      // Added 2026-09-30, direct request: "provide a pause and resume
+      // logs button in the debug group." A single toggle button (same
+      // pattern as the main Pause Button's own dynamic label, not 2
+      // separate buttons) -- while paused, NEW entries are dropped at
+      // the source in all 3 append functions (logMouseTrackingEvent()/
+      // appendHandBehaviourLogLine()/appendFrameRateLogLine(), see their
+      // own `if (logsPaused) return` guard) rather than just skipping the
+      // DOM write, so a long pause doesn't silently keep growing the
+      // in-memory entries arrays either. Each log's own individual
+      // enable checkbox is left completely alone -- pausing doesn't
+      // flip them off, and resuming doesn't turn anything back on that
+      // wasn't already on; it only gates whether an otherwise-enabled
+      // log actually records anything meanwhile. Existing buffered
+      // entries are untouched either way (this is not a 4th clear
+      // button).
+      { key: 'pauseLogsBtn', label: 'Pause Logs', type: 'button', onClick: (btn) => toggleLogsPaused(btn) }
     ]
   }
 ]
@@ -2278,6 +2303,7 @@ window.addEventListener('resize', () => logMouseLogViewportContext('resize'))
 // -- see that declaration's own comment for the real production outage
 // this caused when they were declared here instead.
 function logMouseTrackingEvent(text) {
+  if (logsPaused) return
   lastTrackedActionText = text
   lastTrackedActionAt = performance.now()
   const line = `[${new Date().toLocaleTimeString()}] ${text}`
@@ -2425,6 +2451,7 @@ function handLogTriggerLabel(p) {
 // small, behavior-preserving extraction, not a new abstraction over
 // something used only once.
 function appendHandBehaviourLogLine(line) {
+  if (logsPaused) return
   handBehaviourLogEntries.push(line)
   if (handBehaviourLogEntries.length > HAND_BEHAVIOUR_LOG_MAX_ENTRIES) handBehaviourLogEntries.shift()
   scheduleLogDomFlush(_handBehaviourLogFlushFlag, () => handBehaviourLogEl, handBehaviourLogEntries)
@@ -2549,6 +2576,7 @@ function buildHandBehaviourLogWidget() {
 // declaration's own comment for the real production outage this caused
 // when it was declared here instead.
 function appendFrameRateLogLine(line) {
+  if (logsPaused) return
   frameRateLogEntries.push(line)
   if (frameRateLogEntries.length > FRAME_RATE_LOG_MAX_ENTRIES) frameRateLogEntries.shift()
   scheduleLogDomFlush(_frameRateLogFlushFlag, () => frameRateLogEl, frameRateLogEntries)
@@ -2556,6 +2584,17 @@ function appendFrameRateLogLine(line) {
 function clearFrameRateLog() {
   frameRateLogEntries.length = 0
   if (frameRateLogEl) frameRateLogEl.textContent = ''
+}
+// "Pause Logs"/"Resume Logs" toggle (2026-09-30, see its DEV_GROUPS
+// control's own comment). Flips the shared `logsPaused` flag every 3
+// append functions check, and relabels the button itself in place --
+// same `btn.textContent` swap technique copyAllDebugLogs()'s own
+// "Copied!"/"Copy failed" flash already uses, just permanent instead of
+// a timed revert. Session-only, like the flag itself: a fresh page load
+// always starts unpaused (this is not a persisted dev-panel value).
+function toggleLogsPaused(btn) {
+  logsPaused = !logsPaused
+  if (btn) btn.textContent = logsPaused ? 'Resume Logs' : 'Pause Logs'
 }
 // "Copy All Logs" button (2026-09-29, see its DEV_GROUPS control's own
 // comment). Only ever called from a real button click, never from
@@ -8888,6 +8927,40 @@ function customRightClickFunctionsNeedChain() {
 }
 let clickPoseClickCount = 0
 let clickPoseClickTimer = null
+// CORRECTED 2026-09-30, direct bug report: "when i do double click hold,
+// only a few of the hands get triggered." Root cause -- confirmed by
+// reading the dispatch code, not guessed: this debounce timer is a plain
+// `setTimeout(..., cfg.multiClickWindowMs)` armed by press #1's release,
+// with NO awareness of whether a 2nd press is currently happening. In a
+// real Double-Click+Hold gesture, press #2 is HELD for seconds -- far
+// longer than `multiClickWindowMs` -- so this timer fires WHILE press #2
+// is still down, long before it's known whether press #2 will turn out
+// to be a quick click or a genuine hold. It resolved to "just 1 click"
+// and fired the ordinal-1 fire-and-forget Click function (e.g. a Multi
+// Trigger sub-trigger) for nearly every hand, racing against and (via
+// releaseHandFromOtherFunctions()'s "last commit wins" rule) overwriting
+// the real Click+Hold-chain function's own result for all but a handful
+// of hands whose per-hand Start Time Curve delay happened to commit the
+// real function later. `leftPointerDown` (declared right below) tracks
+// whether ANY button-0 press is physically down right now; the resolve
+// step now defers (reschedules itself) rather than firing while a press
+// is in flight, so a resolution can never fire mid-hold.
+//
+// That alone isn't sufficient: once the held press is released, this
+// SAME listener would otherwise count that release as ANOTHER plain
+// click (a 2nd, later wave of the same spurious firing) rather than
+// recognizing it was a genuine hold. Fixed by classifying the release
+// directly here, using the SAME heldMs/moved check the click-hold-chain
+// listener itself uses (via the shared `clickHoldChainDownInfo`, set on
+// every button-0 pointerdown regardless of chain state) -- computed
+// independently rather than read from a flag that listener would set,
+// since that listener is registered AFTER this one and hasn't run yet
+// for this same event. A genuine hold consumes the chain here exactly
+// like it already consumes `clickHoldChainCount` in that listener: the
+// pending count/timer is reset/cancelled rather than resolved.
+let leftPointerDown = false
+window.addEventListener('pointerdown', (e) => { if (e.button === 0) leftPointerDown = true })
+window.addEventListener('pointerup', (e) => { if (e.button === 0) leftPointerDown = false })
 window.addEventListener('pointerup', (e) => {
   if (e.target && e.target.closest && e.target.closest('.dp-panel, #pauseButton')) return
   if (e.button !== 0) return
@@ -8896,6 +8969,20 @@ window.addEventListener('pointerup', (e) => {
   // (Click Hold-Pose section, above) for why this must never also count
   // toward Click Pose / Double-Click Pose's own click-count detection.
   if (lastPointerupWasHoldRelease) return
+  // See this section's own comment above: a genuine sustained hold or a
+  // drag on ANY button-0 press (not just chp's own) consumes whatever
+  // click count was pending, the same way clickHoldChainCount already
+  // gets zeroed by the chain listener for the identical classification.
+  if (clickHoldChainDownInfo) {
+    const chainHeldMs = performance.now() - clickHoldChainDownInfo.time
+    const chainMoved = Math.hypot(e.clientX - clickHoldChainDownInfo.x, e.clientY - clickHoldChainDownInfo.y) > MOUSE_LOG_MOVE_THRESHOLD_PX
+    if (chainHeldMs > MOUSE_LOG_HELD_DRAG_MS || chainMoved) {
+      clickPoseClickCount = 0
+      clearTimeout(clickPoseClickTimer)
+      clickPoseClickTimer = null
+      return
+    }
+  }
   // CORRECTED 2026-09-14 (direct user report: "why is there a delay
   // between the click and the triggered pose transition, even if the
   // minimum transition time is set to 0"): every click used to wait the
@@ -8922,7 +9009,12 @@ window.addEventListener('pointerup', (e) => {
   }
   clickPoseClickCount++
   clearTimeout(clickPoseClickTimer)
-  clickPoseClickTimer = setTimeout(() => {
+  const resolveClickCount = () => {
+    // A new press is currently down -- don't resolve "no further click is
+    // coming" while one is genuinely in flight; re-check again next window
+    // rather than firing on stale pre-press state (see this section's own
+    // top comment for the real bug this prevents).
+    if (leftPointerDown) { clickPoseClickTimer = setTimeout(resolveClickCount, cfg.multiClickWindowMs); return }
     const idx = Math.min(clickPoseClickCount, CLICK_COUNT_CHAIN_KEYS.length) - 1
     triggerClickPose(CLICK_COUNT_CHAIN_KEYS[idx])
     // Custom "Click" functions now DO have a click-count selector (Triggers
@@ -8931,7 +9023,8 @@ window.addEventListener('pointerup', (e) => {
     // through, not just a plain single click.
     triggerCustomPoseFunctions('Click', idx + 1)
     clickPoseClickCount = 0
-  }, cfg.multiClickWindowMs)
+  }
+  clickPoseClickTimer = setTimeout(resolveClickCount, cfg.multiClickWindowMs)
 })
 // Right Click -- direct request ("also provide another CLick function,
 // the same as the others - 'Right Click'"): the right-button equivalent
