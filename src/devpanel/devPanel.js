@@ -2006,14 +2006,32 @@ function buildDevPanel(groupsEl) {
   // Set Hotkey feature's own listing -- appended directly after its
   // Sequence Window row, once (every row for this build pass already
   // exists by this point). Not registered as a control itself, same as
-  // the Named Setting States row above -- a plain container the
-  // Hotkeys-engine code further down writes into via refreshHotkeysListSubgroup().
+  // the Named Setting States row above -- a plain, EMPTY container the
+  // Hotkeys-engine code (inside initDevPanel() itself, further down)
+  // writes into via refreshHotkeysListSubgroup().
+  //
+  // CORRECTED 2026-09-30 -- REAL PRODUCTION OUTAGE, same signature as
+  // this file's own documented 2026-09-29 TDZ outage ("pause button
+  // blank, nothing loading") but a DIFFERENT root cause: this function,
+  // buildDevPanel(groupsEl), is a SEPARATE top-level function from
+  // initDevPanel() (confirmed: both declared at column 0, siblings, not
+  // nested) -- it has NO lexical access to initDevPanel()'s own locals,
+  // including refreshHotkeysListSubgroup() itself (which only exists
+  // inside initDevPanel()'s body). The original version of this block
+  // called refreshHotkeysListSubgroup() directly from here, which threw
+  // an uncaught ReferenceError the instant the panel built, aborting
+  // everything after it in the SAME call chain -- exactly matching the
+  // reported symptom. `groupsEl` works fine in this same function only
+  // because it's an explicit PARAMETER of buildDevPanel(groupsEl), not
+  // a borrowed closure variable -- that's what made this bug easy to
+  // miss by analogy. Fixed by only creating the empty container here;
+  // initDevPanel() itself calls refreshHotkeysListSubgroup() once, after
+  // its own Set Hotkey state exists, to actually populate it.
   if (!(('ontouchstart' in window) || navigator.maxTouchPoints > 0)) {
     const seqRow = groupsEl.querySelector('.dp-row[data-key="dp_hotkeySequenceWindowMs"]')
     if (seqRow && !document.getElementById('dpHotkeysListContainer')) {
       const listContainer = el('div', null, { id: 'dpHotkeysListContainer' })
       seqRow.insertAdjacentElement('afterend', listContainer)
-      refreshHotkeysListSubgroup()
     }
   }
   // Groups reorder among top-level siblings by default (target: groupsEl
@@ -3836,6 +3854,15 @@ export function initDevPanel(groups, opts = {}) {
   const devHotkeyIsTouchDevice = ('ontouchstart' in window) || navigator.maxTouchPoints > 0
   let devHotkeys = {} // { [keySequence]: { key: ctrl.key, type: 'checkbox'|'button'|'slider' } }
   let devSetHotkeyArmed = false
+  // Populates the (currently empty) #dpHotkeysListContainer built by
+  // buildDevPanel() earlier in this same initDevPanel() call -- see that
+  // function's own comment for why the call couldn't live there. Safe
+  // here: devHotkeys exists by this line (declared directly above), and
+  // refreshHotkeysListSubgroup() (a hoisted function declaration further
+  // down this same scope) is this function's own local, not a borrowed
+  // one. Correctly re-run later by applyFullPanelState() whenever a real
+  // restore populates devHotkeys for real.
+  if (!devHotkeyIsTouchDevice) refreshHotkeysListSubgroup()
   // Finds the row + actual control element for a given control type,
   // keyed by `ctrl.key` via the same `.dp-row[data-key="..."]` pattern
   // every other lookup in this file already uses (buildRow() never
