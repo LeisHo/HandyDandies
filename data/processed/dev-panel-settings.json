@@ -7135,7 +7135,7 @@
       "custom16RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "custom16MultiTriggerEnabled": false,
       "custom16MultiTriggers": "[]",
-      "custom7Trig2Enabled": false,
+      "custom7Trig2Enabled": true,
       "custom7Trig2Mode": "Single Pose",
       "custom7Trig2OffsetEnabled": false,
       "custom7Trig2OffsetX": 0,
@@ -7144,24 +7144,24 @@
       "custom7Trig2RotationX": 0,
       "custom7Trig2RotationY": 0,
       "custom7Trig2RotationZ": 0,
-      "custom7Trig2TargetPose": "",
+      "custom7Trig2TargetPose": "COUNTDOWN (VERT) - 6",
       "custom7Trig2TweenSelector": "",
       "custom7Trig2TweenSpeedMs": 800,
       "custom7Trig2TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom7Trig2TweenStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom7Trig2TransitionSpeedMs": 400,
-      "custom7Trig2SpeedCurveEnabled": false,
+      "custom7Trig2TransitionSpeedMs": 0,
+      "custom7Trig2SpeedCurveEnabled": true,
       "custom7Trig2SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom7Trig2SpeedCurveRange": "{\"min\":50,\"max\":2000}",
+      "custom7Trig2SpeedCurveRange": "{\"min\":620,\"max\":2000}",
       "custom7Trig2StartTimeCurveEnabled": true,
       "custom7Trig2StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom7Trig2StartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom7Trig2StartTimeRange": "{\"min\":0,\"max\":2267}",
       "custom7Trig2StartDistanceCurveEnabled": false,
       "custom7Trig2StartDistanceMin": 0,
       "custom7Trig2StartDistanceMax": 100,
       "custom7Trig2StartDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
       "custom7Trig2PauseDurationMs": 500,
-      "custom7Trig2RetransitionEnabled": true,
+      "custom7Trig2RetransitionEnabled": false,
       "custom7Trig2RetransitionSpeedMs": 400,
       "custom7Trig2RetransitionSpeedCurveEnabled": false,
       "custom7Trig2RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -14305,7 +14305,7 @@
       "custom16RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "custom16MultiTriggerEnabled": false,
       "custom16MultiTriggers": "[]",
-      "custom7Trig2Enabled": false,
+      "custom7Trig2Enabled": true,
       "custom7Trig2Mode": "Single Pose",
       "custom7Trig2OffsetEnabled": false,
       "custom7Trig2OffsetX": 0,
@@ -14314,24 +14314,24 @@
       "custom7Trig2RotationX": 0,
       "custom7Trig2RotationY": 0,
       "custom7Trig2RotationZ": 0,
-      "custom7Trig2TargetPose": "",
+      "custom7Trig2TargetPose": "COUNTDOWN (VERT) - 6",
       "custom7Trig2TweenSelector": "",
       "custom7Trig2TweenSpeedMs": 800,
       "custom7Trig2TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom7Trig2TweenStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom7Trig2TransitionSpeedMs": 400,
-      "custom7Trig2SpeedCurveEnabled": false,
+      "custom7Trig2TransitionSpeedMs": 0,
+      "custom7Trig2SpeedCurveEnabled": true,
       "custom7Trig2SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom7Trig2SpeedCurveRange": "{\"min\":50,\"max\":2000}",
+      "custom7Trig2SpeedCurveRange": "{\"min\":620,\"max\":2000}",
       "custom7Trig2StartTimeCurveEnabled": true,
       "custom7Trig2StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom7Trig2StartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom7Trig2StartTimeRange": "{\"min\":0,\"max\":2267}",
       "custom7Trig2StartDistanceCurveEnabled": false,
       "custom7Trig2StartDistanceMin": 0,
       "custom7Trig2StartDistanceMax": 100,
       "custom7Trig2StartDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
       "custom7Trig2PauseDurationMs": 500,
-      "custom7Trig2RetransitionEnabled": true,
+      "custom7Trig2RetransitionEnabled": false,
       "custom7Trig2RetransitionSpeedMs": 400,
       "custom7Trig2RetransitionSpeedCurveEnabled": false,
       "custom7Trig2RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -21475,7 +21475,7 @@
       "custom16RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "custom16MultiTriggerEnabled": false,
       "custom16MultiTriggers": "[]",
-      "custom7Trig2Enabled": false,
+      "custom7Trig2Enabled": true,
       "custom7Trig2Mode": "Single Pose",
       "custom7Trig2OffsetEnabled": false,
       "custom7Trig2OffsetX": 0,
@@ -21484,24 +21484,24 @@
       "custom7Trig2RotationX": 0,
       "custom7Trig2RotationY": 0,
       "custom7Trig2RotationZ": 0,
-      "custom7Trig2TargetPose": "",
+      "custom7Trig2TargetPose": "COUNTDOWN (VERT) - 6",
       "custom7Trig2TweenSelector": "",
       "custom7Trig2TweenSpeedMs": 800,
       "custom7Trig2TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom7Trig2TweenStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom7Trig2TransitionSpeedMs": 400,
-      "custom7Trig2SpeedCurveEnabled": false,
+      "custom7Trig2TransitionSpeedMs": 0,
+      "custom7Trig2SpeedCurveEnabled": true,
       "custom7Trig2SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom7Trig2SpeedCurveRange": "{\"min\":50,\"max\":2000}",
+      "custom7Trig2SpeedCurveRange": "{\"min\":620,\"max\":2000}",
       "custom7Trig2StartTimeCurveEnabled": true,
       "custom7Trig2StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom7Trig2StartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom7Trig2StartTimeRange": "{\"min\":0,\"max\":2267}",
       "custom7Trig2StartDistanceCurveEnabled": false,
       "custom7Trig2StartDistanceMin": 0,
       "custom7Trig2StartDistanceMax": 100,
       "custom7Trig2StartDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
       "custom7Trig2PauseDurationMs": 500,
-      "custom7Trig2RetransitionEnabled": true,
+      "custom7Trig2RetransitionEnabled": false,
       "custom7Trig2RetransitionSpeedMs": 400,
       "custom7Trig2RetransitionSpeedCurveEnabled": false,
       "custom7Trig2RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -30915,7 +30915,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 7",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -31748,7 +31748,7 @@
                       "type": "group",
                       "group": {
                         "key": "Trigger 2",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -32775,7 +32775,7 @@
                     },
                     {
                       "key": "Trigger 2",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -34053,7 +34053,7 @@
                     "type": "group",
                     "group": {
                       "key": "Trigger 2",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -35080,7 +35080,7 @@
                   },
                   {
                     "key": "Trigger 2",
-                    "collapsed": false,
+                    "collapsed": true,
                     "locked": false,
                     "items": [
                       {
@@ -40589,7 +40589,7 @@
         },
         {
           "key": "Custom Click Function 7",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -41422,7 +41422,7 @@
                     "type": "group",
                     "group": {
                       "key": "Trigger 2",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -42449,7 +42449,7 @@
                   },
                   {
                     "key": "Trigger 2",
-                    "collapsed": false,
+                    "collapsed": true,
                     "locked": false,
                     "items": [
                       {
@@ -43727,7 +43727,7 @@
                   "type": "group",
                   "group": {
                     "key": "Trigger 2",
-                    "collapsed": false,
+                    "collapsed": true,
                     "locked": false,
                     "items": [
                       {
@@ -44754,7 +44754,7 @@
                 },
                 {
                   "key": "Trigger 2",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
