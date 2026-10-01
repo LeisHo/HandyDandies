@@ -7070,7 +7070,7 @@
       "custom13RotationZ": 0,
       "custom13TargetPose": "Clockwise Fan - 4",
       "custom13TweenSelector": "Wave",
-      "custom13TweenSpeedMs": 1890,
+      "custom13TweenSpeedMs": 3000,
       "custom13TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.3416666666666667,\"y\":0.7501302083333333},{\"x\":1,\"y\":1}]",
       "custom13TweenStartTimeRange": "{\"min\":0,\"max\":3000}",
       "custom13SequencePlayMode": "Count",
@@ -7097,7 +7097,7 @@
       "custom13RetransitionSpeedCurveRange": "{\"min\":50,\"max\":2000}",
       "custom13RetransitionStartTimeCurveEnabled": true,
       "custom13RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom13RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom13RetransitionStartTimeRange": "{\"min\":0,\"max\":2444}",
       "custom13MultiTriggerEnabled": true,
       "custom13MultiTriggers": "[{\"prefix\":\"custom13Trig1\",\"title\":\"Trigger 1\"},{\"prefix\":\"custom13Trig2\",\"title\":\"Trigger 2\"}]",
       "custom13Trig1Enabled": true,
@@ -7105,15 +7105,15 @@
       "custom13Trig1OffsetEnabled": true,
       "custom13Trig1OffsetX": 6,
       "custom13Trig1OffsetY": -8,
-      "custom13Trig1RotationEnabled": false,
-      "custom13Trig1RotationX": 0,
-      "custom13Trig1RotationY": 0,
-      "custom13Trig1RotationZ": 0,
+      "custom13Trig1RotationEnabled": true,
+      "custom13Trig1RotationX": 15,
+      "custom13Trig1RotationY": 5,
+      "custom13Trig1RotationZ": 5,
       "custom13Trig1TargetPose": "COUNTDOWN (VERT) - 3",
       "custom13Trig1TweenSelector": "Birdie",
-      "custom13Trig1TweenSpeedMs": 800,
+      "custom13Trig1TweenSpeedMs": 3000,
       "custom13Trig1TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom13Trig1TweenStartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom13Trig1TweenStartTimeRange": "{\"min\":0,\"max\":1711}",
       "custom13Trig1TransitionSpeedMs": 2000,
       "custom13Trig1SpeedCurveEnabled": false,
       "custom13Trig1SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -7121,7 +7121,7 @@
       "custom13Trig1StartTimeCurveEnabled": true,
       "custom13Trig1StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom13Trig1StartTimeRange": "{\"min\":0,\"max\":2006}",
-      "custom13Trig1StartDistanceCurveEnabled": true,
+      "custom13Trig1StartDistanceCurveEnabled": false,
       "custom13Trig1StartDistanceMin": 0,
       "custom13Trig1StartDistanceMax": 500,
       "custom13Trig1StartDistanceCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -7137,8 +7137,8 @@
       "custom13Trig2Enabled": true,
       "custom13Trig2Mode": "Sequence",
       "custom13Trig2OffsetEnabled": true,
-      "custom13Trig2OffsetX": 20,
-      "custom13Trig2OffsetY": 20,
+      "custom13Trig2OffsetX": -9,
+      "custom13Trig2OffsetY": 12,
       "custom13Trig2RotationEnabled": true,
       "custom13Trig2RotationX": 0,
       "custom13Trig2RotationY": 0,
@@ -7147,7 +7147,7 @@
       "custom13Trig2TweenSelector": "COUNT R",
       "custom13Trig2TweenSpeedMs": 5000,
       "custom13Trig2TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom13Trig2TweenStartTimeRange": "{\"min\":0,\"max\":2073}",
+      "custom13Trig2TweenStartTimeRange": "{\"min\":0,\"max\":3000}",
       "custom13Trig2TransitionSpeedMs": 400,
       "custom13Trig2SpeedCurveEnabled": false,
       "custom13Trig2SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -7155,7 +7155,7 @@
       "custom13Trig2StartTimeCurveEnabled": true,
       "custom13Trig2StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom13Trig2StartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom13Trig2StartDistanceCurveEnabled": true,
+      "custom13Trig2StartDistanceCurveEnabled": false,
       "custom13Trig2StartDistanceMin": 0,
       "custom13Trig2StartDistanceMax": 100,
       "custom13Trig2StartDistanceCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -14393,7 +14393,7 @@
       "custom13RotationZ": 0,
       "custom13TargetPose": "Clockwise Fan - 4",
       "custom13TweenSelector": "Wave",
-      "custom13TweenSpeedMs": 1890,
+      "custom13TweenSpeedMs": 3000,
       "custom13TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.3416666666666667,\"y\":0.7501302083333333},{\"x\":1,\"y\":1}]",
       "custom13TweenStartTimeRange": "{\"min\":0,\"max\":3000}",
       "custom13SequencePlayMode": "Count",
@@ -14420,7 +14420,7 @@
       "custom13RetransitionSpeedCurveRange": "{\"min\":50,\"max\":2000}",
       "custom13RetransitionStartTimeCurveEnabled": true,
       "custom13RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom13RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom13RetransitionStartTimeRange": "{\"min\":0,\"max\":2444}",
       "custom13MultiTriggerEnabled": true,
       "custom13MultiTriggers": "[{\"prefix\":\"custom13Trig1\",\"title\":\"Trigger 1\"},{\"prefix\":\"custom13Trig2\",\"title\":\"Trigger 2\"}]",
       "custom13Trig1Enabled": true,
@@ -14428,15 +14428,15 @@
       "custom13Trig1OffsetEnabled": true,
       "custom13Trig1OffsetX": 6,
       "custom13Trig1OffsetY": -8,
-      "custom13Trig1RotationEnabled": false,
-      "custom13Trig1RotationX": 0,
-      "custom13Trig1RotationY": 0,
-      "custom13Trig1RotationZ": 0,
+      "custom13Trig1RotationEnabled": true,
+      "custom13Trig1RotationX": 15,
+      "custom13Trig1RotationY": 5,
+      "custom13Trig1RotationZ": 5,
       "custom13Trig1TargetPose": "COUNTDOWN (VERT) - 3",
       "custom13Trig1TweenSelector": "Birdie",
-      "custom13Trig1TweenSpeedMs": 800,
+      "custom13Trig1TweenSpeedMs": 3000,
       "custom13Trig1TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom13Trig1TweenStartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom13Trig1TweenStartTimeRange": "{\"min\":0,\"max\":1711}",
       "custom13Trig1TransitionSpeedMs": 2000,
       "custom13Trig1SpeedCurveEnabled": false,
       "custom13Trig1SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -14444,7 +14444,7 @@
       "custom13Trig1StartTimeCurveEnabled": true,
       "custom13Trig1StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom13Trig1StartTimeRange": "{\"min\":0,\"max\":2006}",
-      "custom13Trig1StartDistanceCurveEnabled": true,
+      "custom13Trig1StartDistanceCurveEnabled": false,
       "custom13Trig1StartDistanceMin": 0,
       "custom13Trig1StartDistanceMax": 500,
       "custom13Trig1StartDistanceCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -14460,8 +14460,8 @@
       "custom13Trig2Enabled": true,
       "custom13Trig2Mode": "Sequence",
       "custom13Trig2OffsetEnabled": true,
-      "custom13Trig2OffsetX": 20,
-      "custom13Trig2OffsetY": 20,
+      "custom13Trig2OffsetX": -9,
+      "custom13Trig2OffsetY": 12,
       "custom13Trig2RotationEnabled": true,
       "custom13Trig2RotationX": 0,
       "custom13Trig2RotationY": 0,
@@ -14470,7 +14470,7 @@
       "custom13Trig2TweenSelector": "COUNT R",
       "custom13Trig2TweenSpeedMs": 5000,
       "custom13Trig2TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom13Trig2TweenStartTimeRange": "{\"min\":0,\"max\":2073}",
+      "custom13Trig2TweenStartTimeRange": "{\"min\":0,\"max\":3000}",
       "custom13Trig2TransitionSpeedMs": 400,
       "custom13Trig2SpeedCurveEnabled": false,
       "custom13Trig2SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -14478,7 +14478,7 @@
       "custom13Trig2StartTimeCurveEnabled": true,
       "custom13Trig2StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom13Trig2StartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom13Trig2StartDistanceCurveEnabled": true,
+      "custom13Trig2StartDistanceCurveEnabled": false,
       "custom13Trig2StartDistanceMin": 0,
       "custom13Trig2StartDistanceMax": 100,
       "custom13Trig2StartDistanceCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -21716,7 +21716,7 @@
       "custom13RotationZ": 0,
       "custom13TargetPose": "Clockwise Fan - 4",
       "custom13TweenSelector": "Wave",
-      "custom13TweenSpeedMs": 1890,
+      "custom13TweenSpeedMs": 3000,
       "custom13TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.3416666666666667,\"y\":0.7501302083333333},{\"x\":1,\"y\":1}]",
       "custom13TweenStartTimeRange": "{\"min\":0,\"max\":3000}",
       "custom13SequencePlayMode": "Count",
@@ -21743,7 +21743,7 @@
       "custom13RetransitionSpeedCurveRange": "{\"min\":50,\"max\":2000}",
       "custom13RetransitionStartTimeCurveEnabled": true,
       "custom13RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom13RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom13RetransitionStartTimeRange": "{\"min\":0,\"max\":2444}",
       "custom13MultiTriggerEnabled": true,
       "custom13MultiTriggers": "[{\"prefix\":\"custom13Trig1\",\"title\":\"Trigger 1\"},{\"prefix\":\"custom13Trig2\",\"title\":\"Trigger 2\"}]",
       "custom13Trig1Enabled": true,
@@ -21751,15 +21751,15 @@
       "custom13Trig1OffsetEnabled": true,
       "custom13Trig1OffsetX": 6,
       "custom13Trig1OffsetY": -8,
-      "custom13Trig1RotationEnabled": false,
-      "custom13Trig1RotationX": 0,
-      "custom13Trig1RotationY": 0,
-      "custom13Trig1RotationZ": 0,
+      "custom13Trig1RotationEnabled": true,
+      "custom13Trig1RotationX": 15,
+      "custom13Trig1RotationY": 5,
+      "custom13Trig1RotationZ": 5,
       "custom13Trig1TargetPose": "COUNTDOWN (VERT) - 3",
       "custom13Trig1TweenSelector": "Birdie",
-      "custom13Trig1TweenSpeedMs": 800,
+      "custom13Trig1TweenSpeedMs": 3000,
       "custom13Trig1TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom13Trig1TweenStartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom13Trig1TweenStartTimeRange": "{\"min\":0,\"max\":1711}",
       "custom13Trig1TransitionSpeedMs": 2000,
       "custom13Trig1SpeedCurveEnabled": false,
       "custom13Trig1SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -21767,7 +21767,7 @@
       "custom13Trig1StartTimeCurveEnabled": true,
       "custom13Trig1StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom13Trig1StartTimeRange": "{\"min\":0,\"max\":2006}",
-      "custom13Trig1StartDistanceCurveEnabled": true,
+      "custom13Trig1StartDistanceCurveEnabled": false,
       "custom13Trig1StartDistanceMin": 0,
       "custom13Trig1StartDistanceMax": 500,
       "custom13Trig1StartDistanceCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -21783,8 +21783,8 @@
       "custom13Trig2Enabled": true,
       "custom13Trig2Mode": "Sequence",
       "custom13Trig2OffsetEnabled": true,
-      "custom13Trig2OffsetX": 20,
-      "custom13Trig2OffsetY": 20,
+      "custom13Trig2OffsetX": -9,
+      "custom13Trig2OffsetY": 12,
       "custom13Trig2RotationEnabled": true,
       "custom13Trig2RotationX": 0,
       "custom13Trig2RotationY": 0,
@@ -21793,7 +21793,7 @@
       "custom13Trig2TweenSelector": "COUNT R",
       "custom13Trig2TweenSpeedMs": 5000,
       "custom13Trig2TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom13Trig2TweenStartTimeRange": "{\"min\":0,\"max\":2073}",
+      "custom13Trig2TweenStartTimeRange": "{\"min\":0,\"max\":3000}",
       "custom13Trig2TransitionSpeedMs": 400,
       "custom13Trig2SpeedCurveEnabled": false,
       "custom13Trig2SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -21801,7 +21801,7 @@
       "custom13Trig2StartTimeCurveEnabled": true,
       "custom13Trig2StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom13Trig2StartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom13Trig2StartDistanceCurveEnabled": true,
+      "custom13Trig2StartDistanceCurveEnabled": false,
       "custom13Trig2StartDistanceMin": 0,
       "custom13Trig2StartDistanceMax": 100,
       "custom13Trig2StartDistanceCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -28876,7 +28876,7 @@
                 "type": "group",
                 "group": {
                   "key": "Offset",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -28950,7 +28950,7 @@
                 "type": "group",
                 "group": {
                   "key": "Start Time Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -29335,7 +29335,7 @@
                                   "type": "group",
                                   "group": {
                                     "key": "Retransition Start Time Curve",
-                                    "collapsed": false,
+                                    "collapsed": true,
                                     "locked": false,
                                     "items": [
                                       {
@@ -29381,7 +29381,7 @@
                                 },
                                 {
                                   "key": "Retransition Start Time Curve",
-                                  "collapsed": false,
+                                  "collapsed": true,
                                   "locked": false,
                                   "items": [
                                     {
@@ -29569,7 +29569,7 @@
                                 "type": "group",
                                 "group": {
                                   "key": "Retransition Start Time Curve",
-                                  "collapsed": false,
+                                  "collapsed": true,
                                   "locked": false,
                                   "items": [
                                     {
@@ -29615,7 +29615,7 @@
                               },
                               {
                                 "key": "Retransition Start Time Curve",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
                                   {
@@ -30365,7 +30365,7 @@
                                 "type": "group",
                                 "group": {
                                   "key": "Retransition Start Time Curve",
-                                  "collapsed": false,
+                                  "collapsed": true,
                                   "locked": false,
                                   "items": [
                                     {
@@ -30411,7 +30411,7 @@
                               },
                               {
                                 "key": "Retransition Start Time Curve",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
                                   {
@@ -30599,7 +30599,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Retransition Start Time Curve",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
                                   {
@@ -30645,7 +30645,7 @@
                             },
                             {
                               "key": "Retransition Start Time Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -31199,7 +31199,7 @@
             "subgroups": [
               {
                 "key": "Offset",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -31264,7 +31264,7 @@
               },
               {
                 "key": "Start Time Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -31640,7 +31640,7 @@
                                 "type": "group",
                                 "group": {
                                   "key": "Retransition Start Time Curve",
-                                  "collapsed": false,
+                                  "collapsed": true,
                                   "locked": false,
                                   "items": [
                                     {
@@ -31686,7 +31686,7 @@
                               },
                               {
                                 "key": "Retransition Start Time Curve",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
                                   {
@@ -31874,7 +31874,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Retransition Start Time Curve",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
                                   {
@@ -31920,7 +31920,7 @@
                             },
                             {
                               "key": "Retransition Start Time Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -32670,7 +32670,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Retransition Start Time Curve",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
                                   {
@@ -32716,7 +32716,7 @@
                             },
                             {
                               "key": "Retransition Start Time Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -32904,7 +32904,7 @@
                             "type": "group",
                             "group": {
                               "key": "Retransition Start Time Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -32950,7 +32950,7 @@
                           },
                           {
                             "key": "Retransition Start Time Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -34401,7 +34401,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 9",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -47181,7 +47181,7 @@
               "type": "group",
               "group": {
                 "key": "Offset",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -47255,7 +47255,7 @@
               "type": "group",
               "group": {
                 "key": "Start Time Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -47640,7 +47640,7 @@
                                 "type": "group",
                                 "group": {
                                   "key": "Retransition Start Time Curve",
-                                  "collapsed": false,
+                                  "collapsed": true,
                                   "locked": false,
                                   "items": [
                                     {
@@ -47686,7 +47686,7 @@
                               },
                               {
                                 "key": "Retransition Start Time Curve",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
                                   {
@@ -47874,7 +47874,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Retransition Start Time Curve",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
                                   {
@@ -47920,7 +47920,7 @@
                             },
                             {
                               "key": "Retransition Start Time Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -48670,7 +48670,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Retransition Start Time Curve",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
                                   {
@@ -48716,7 +48716,7 @@
                             },
                             {
                               "key": "Retransition Start Time Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -48904,7 +48904,7 @@
                             "type": "group",
                             "group": {
                               "key": "Retransition Start Time Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -48950,7 +48950,7 @@
                           },
                           {
                             "key": "Retransition Start Time Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -49504,7 +49504,7 @@
           "subgroups": [
             {
               "key": "Offset",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -49569,7 +49569,7 @@
             },
             {
               "key": "Start Time Curve",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -49945,7 +49945,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Retransition Start Time Curve",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
                                   {
@@ -49991,7 +49991,7 @@
                             },
                             {
                               "key": "Retransition Start Time Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -50179,7 +50179,7 @@
                             "type": "group",
                             "group": {
                               "key": "Retransition Start Time Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -50225,7 +50225,7 @@
                           },
                           {
                             "key": "Retransition Start Time Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -50975,7 +50975,7 @@
                             "type": "group",
                             "group": {
                               "key": "Retransition Start Time Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -51021,7 +51021,7 @@
                           },
                           {
                             "key": "Retransition Start Time Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -51209,7 +51209,7 @@
                           "type": "group",
                           "group": {
                             "key": "Retransition Start Time Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -51255,7 +51255,7 @@
                         },
                         {
                           "key": "Retransition Start Time Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -52700,7 +52700,7 @@
         },
         {
           "key": "Custom Click Function 9",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
