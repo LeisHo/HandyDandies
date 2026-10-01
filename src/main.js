@@ -7922,6 +7922,13 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
       // Retransition is ON, use the distance-based delay computed at release
       // time so closest hands retransition first (asynchronous per-hand).
       chp.retransitionDelay = chp.retransitionDelayForStop ?? 0
+      // CORRECTED 2026-10-01 -- see retransitionSpeedMsForStop's own
+      // comment (endClickHoldPose(), Tween Stop Delay branch) for the
+      // real bug this closes: without this line, chp.retransitionSpeedMs
+      // stayed stale/undefined through this entire transition whenever
+      // Tween Stop Delay was involved, corrupting this hand's own
+      // retransition progress the moment Retransition Speed Curve was on.
+      chp.retransitionSpeedMs = chp.retransitionSpeedMsForStop ?? 0
       chp.phase = 'retransition'
       snapshotOffsetRotationAccumForRetransition(hand, chp)
       logHandBehaviourEvent(hands.indexOf(hand), handLogTriggerLabel(p), 'Tween Stop decay finished -> retransition begins')
@@ -8228,6 +8235,30 @@ function endClickHoldPose(p) {
       } else {
         chp.retransitionDelayForStop = 0
       }
+      // CORRECTED 2026-10-01, direct bug report ("it only happens when
+      // retransition speed curve is on" -- a "flashing" cluster of
+      // hands). Root cause: chp.retransitionSpeedMs is read by the
+      // 'retransition' phase (Math.max(chp.retransitionSpeedMs, 1)) but
+      // was only ever COMPUTED in the direct-release-to-retransition path
+      // below (no Tween Stop Delay) -- never here, in the Tween-Stop-
+      // Delay path. A hand released through Tween Stop Delay (as every
+      // flashing hand in the report was, confirmed via its own "Tween
+      // Stop decay finished -> retransition begins" log line) carried
+      // whatever stale/undefined value chp.retransitionSpeedMs already
+      // had into its own retransition phase -- Math.max(undefined, 1) is
+      // NaN, corrupting that hand's own retransition progress the moment
+      // the Speed Curve toggle made this field's value actually matter
+      // (with the curve off, speedMs falls back to a plain cfg read
+      // instead, which is why disabling the curve "fixed" it). Frozen
+      // here, at release time, same "frozen at trigger time" convention
+      // as retransitionDelayForStop directly above -- read back into the
+      // real chp.retransitionSpeedMs at the stopping->retransition
+      // transition itself (see "Tween Stop decay finished" below).
+      chp.retransitionSpeedMsForStop = cfg[`${p}RetransitionSpeedCurveEnabled`]
+        ? (chp.retransitionIsTween
+            ? computeStartDelayMs(dists[i], minD, range, trig.tweenRetransitionSpeedCurveParsed, trig.tweenRetransitionSpeedRangeParsed)
+            : computeStartDelayMs(dists[i], minD, range, trig.retransitionSpeedCurveParsed, trig.retransitionSpeedRangeParsed))
+        : 0
       chp.stoppingLastFrameTime = now
       chp.stoppingWasLooping = chp.phase === 'looping'
       chp.stoppingBaseElapsedMs = chp.stoppingWasLooping ? 0 : Math.max(now - chp.forwardStartTime, 0)

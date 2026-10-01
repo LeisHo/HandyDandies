@@ -14955,6 +14955,30 @@ Ctrl+S keydown still correctly prevents default and sets the value to
 `main.js` cache-buster bumped `?v=261` -> `?v=262`; `devpanel/devPanel.js`'s
 own import-version bumped `?v=52` -> `?v=53`.
 
+2026-10-01  -  (fix -- "flashing" cluster, root-caused per direct user
+narrowing: "it only happens when retransiton speed curve is on")
+
+Confirmed by reading `updateClickHoldPoseForHand()`/`endClickHoldPose()`
+directly: `chp.retransitionSpeedMs` (read by the 'retransition' phase as
+`Math.max(chp.retransitionSpeedMs, 1)`) was only ever computed in the
+direct release-to-retransition path (no Tween Stop Delay) -- never in
+the Tween-Stop-Delay path, which transitions into 'retransition' later
+from the "Tween Stop decay finished" block without recomputing it.
+`Math.max(undefined, 1)` is `NaN`, corrupting that hand's retransition
+progress -- invisible with the curve off (speedMs falls back to a flat
+cfg read instead), which is exactly why toggling the curve off "fixed"
+it for the user. Fixed by freezing `chp.retransitionSpeedMsForStop` at
+release time in the Tween-Stop-Delay branch (mirroring
+`retransitionDelayForStop`'s own existing pattern) and reading it into
+the real `chp.retransitionSpeedMs` at the actual stopping->retransition
+transition. Confirmed pose-kind has no equivalent split path (its own
+`cp.retransitionSpeedMs` is computed once, directly, at its single
+retransition-entry point) -- isolated to hold-kind. `node --check`
+passes. Not live-verified in browser -- confidence rests on the code
+trace matching the reported on/off toggle behavior exactly.
+
+`main.js` cache-buster bumped `?v=262` -> `?v=263`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

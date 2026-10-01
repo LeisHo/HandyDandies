@@ -18,6 +18,32 @@ work seamlessly from there.
 
 ## Currently working on
 
+**RESOLVED 2026-10-01 -- the "flashing" cluster, root-caused per direct
+user narrowing ("it only happens when retransiton speed curve is on").**
+Confirmed by reading `updateClickHoldPoseForHand()`/`endClickHoldPose()`
+directly: `chp.retransitionSpeedMs` (read by the 'retransition' phase as
+`Math.max(chp.retransitionSpeedMs, 1)`) was only ever COMPUTED in the
+direct release-to-retransition path (no Tween Stop Delay) -- never in
+the Tween-Stop-Delay path, which instead transitions into 'retransition'
+later, from the "Tween Stop decay finished" block, without recomputing
+it. Every flashing hand in the original log went through Tween Stop
+Delay (confirmed by its own "Tween Stop decay finished -> retransition
+begins" line), so `chp.retransitionSpeedMs` carried a stale/undefined
+value into retransition -- `Math.max(undefined, 1)` is `NaN`, corrupting
+that hand's retransition progress specifically once Retransition Speed
+Curve made this field's value matter (with the curve off, `speedMs`
+falls back to a plain flat cfg value instead, which is exactly why
+disabling the curve "fixed" it for the user). Fixed by freezing
+`chp.retransitionSpeedMsForStop` at release time in the Tween-Stop-Delay
+branch (mirroring `retransitionDelayForStop`'s own existing pattern) and
+reading it into the real `chp.retransitionSpeedMs` at the actual
+stopping->retransition transition. Confirmed pose-kind has no equivalent
+split path (`cp.retransitionSpeedMs` is computed directly, once, at its
+own single retransition-entry point) -- this bug was isolated to
+hold-kind. `node --check` passes. **Not live-verified in browser** --
+confidence rests on the code-level trace matching the reported
+on/off toggle behavior exactly, not a live reproduction.
+
 **RESOLVED 2026-10-01 -- "when i try to set hotkeys, i cant type into
 the text box."** Root cause: the OTHER concurrent session's own
 "modifier key support" addition to `startHotkeyEdit()`'s keydown
