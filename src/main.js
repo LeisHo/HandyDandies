@@ -7037,16 +7037,29 @@ const _offsetHandToCursor = new THREE.Vector3()
 // OffsetY (Y stays 0 in that mode).
 function computeOffsetXY(hand, p) {
   if (cfg[`${p}OffsetMode`] === 'Cursor Offset') {
-    // Signed dot product of the hand-to-cursor vector against the
-    // camera-right axis: positive if the cursor is to the "right" of
-    // this hand in screen terms, negative if to the "left". Multiplying
-    // the configured distance by this sign means a positive distance
-    // always moves the hand TOWARD the cursor and a negative one always
-    // moves it AWAY, regardless of which side the cursor actually is on
-    // for this particular hand.
+    // CORRECTED 2026-10-01, direct report: "the offset cursor is the
+    // wrong axes. whichever axis is perp to the camera, thats the one
+    // we dont offset in. so x y local to camera." The original version
+    // only read the camera-RIGHT component (a single left/right sign),
+    // silently dropping any vertical difference between the hand and
+    // the cursor -- "toward the cursor" ignored up/down entirely. Fixed
+    // to project the hand-to-cursor vector onto BOTH camera-local axes
+    // (right AND up), excluding only the camera-FORWARD/depth axis (the
+    // one "perp to the camera" -- depth differences don't correspond to
+    // any real on-screen direction to move toward), then normalizes
+    // that 2D (right, up) pair into a unit direction so the configured
+    // distance scales the actual STEP SIZE, not an already-distance-
+    // weighted vector -- a positive distance moves the hand toward the
+    // cursor along this full in-plane direction, negative moves it away,
+    // matching the original "towards or away" framing, just correctly
+    // 2-dimensional instead of 1-dimensional.
     _offsetHandToCursor.subVectors(cursorTarget, hand.wrapper.position)
-    const dirSign = _offsetHandToCursor.dot(_offsetRightVec) >= 0 ? 1 : -1
-    return { x: dirSign * (cfg[`${p}CursorOffsetDistance`] || 0), y: 0 }
+    const rightComp = _offsetHandToCursor.dot(_offsetRightVec)
+    const upComp = _offsetHandToCursor.dot(_offsetUpVec)
+    const planarLen = Math.hypot(rightComp, upComp)
+    if (planarLen < 1e-6) return { x: 0, y: 0 } // cursor directly in front of/behind the hand -- no well-defined in-plane direction
+    const dist = cfg[`${p}CursorOffsetDistance`] || 0
+    return { x: (rightComp / planarLen) * dist, y: (upComp / planarLen) * dist }
   }
   return { x: cfg[`${p}OffsetX`] || 0, y: cfg[`${p}OffsetY`] || 0 }
 }

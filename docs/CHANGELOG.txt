@@ -15163,6 +15163,46 @@ attempts this round (the standing retry cap).
 
 `main.js` cache-buster bumped `?v=265` -> `?v=266`.
 
+2026-10-01  -  (fix -- Cursor Offset used the wrong axis pair; corrects
+the entry directly above)
+
+Direct correction: "The offset cursor is the wrong axes. which ever
+axis is perp to the camera, thats the one we dont offset in. so x y
+local to camera." The just-shipped v1 only ever used `_offsetRightVec`
+(a single camera-right dot product, reduced to a +1/-1 sign) -- Y was
+always 0, so a cursor positioned above or below the hand (rather than
+to its side) produced no vertical displacement at all, even though
+the request's own "xy direction" wording always meant BOTH in-camera-
+plane axes, not just the horizontal one.
+
+`computeOffsetXY(hand, p)` now projects the hand-to-cursor vector onto
+BOTH `_offsetRightVec` AND `_offsetUpVec` (dot product against each),
+normalizes the resulting 2D (right, up) pair into a unit direction
+(`Math.hypot(rightComp, upComp)`), and scales by the configured
+distance -- giving a true in-camera-plane direction toward/away from
+the cursor instead of a horizontal-only sign flip. The camera-forward/
+depth axis is excluded by construction (never dotted against), so a
+cursor directly in front of or behind the hand (no in-plane component
+at all) now correctly produces zero movement instead of falling back
+to a stale horizontal-only guess -- `planarLen < 1e-6` guards this
+exact degenerate case.
+
+Verified via an isolated 4-case logic reproduction (new, replacing the
+prior round's own 4-case check, since the direction math changed):
+(1) cursor diagonally up-right of the hand produces a 45-degree
+direction at the configured magnitude; (2) cursor directly ahead in
+depth only (no right/up component) produces zero movement; (3) cursor
+directly above (no horizontal component) produces pure-vertical
+movement -- this is the case that would have been wrong under the v1
+code (it would have produced x:5,y:0 instead of the correct x:0,y:5);
+(4) a large depth offset mixed with a real in-plane offset never
+contaminates the result. All 4 passed. `node --check` passes.
+**Not live-verified in browser** -- same standing network-truncation
+retry cap as the entry above; this round did not attempt a fresh
+browser load since nothing about the page-load path changed.
+
+`main.js` cache-buster bumped `?v=266` -> `?v=267`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

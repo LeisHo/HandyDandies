@@ -18,35 +18,47 @@ work seamlessly from there.
 
 ## Currently working on
 
-**ADDED 2026-10-01 -- Offset Mode dropdown ("XYZ Offset" / "Cursor
-Offset") for every custom click function (pose-kind and hold-kind, plus
-Multi Trigger sub-triggers of either).** Direct request: provide a
-dropdown with the pre-existing OffsetX/OffsetY behavior as one option,
-and a new "Cursor Offset" mode as the other -- a single signed distance
-slider that displaces the hand horizontally toward (positive) or away
-(negative) from the cursor, regardless of which side of the hand the
-cursor is currently on. Implementation: a new shared `computeOffsetXY(hand, p)`
-helper (direction-sign math: dot the hand-to-cursor vector against the
-camera-right axis to get +1/-1, multiply by the configured distance)
-replaces the 3 previously-separate `cfg[OffsetX]`/`cfg[OffsetY]` reads
-in `applyOffsetRotationToHand()` (live per-frame apply),
-`bakeOffsetRotationIntoAccum()` (full-completion bake), and
-`bakeInFlightOffsetRotation()` (partial-fraction bake on interruption)
--- all 3 needed to agree, or Cursor Offset would behave correctly only
-in the common case and snap/drift on a hold released mid-ramp, exactly
-the class of bug this project's own 10-round "jump investigation"
-exists to prevent. `OffsetMode`/`CursorOffsetDistance` added to
-`MULTI_TRIGGER_ALLOWED_SUFFIXES` and the `wrapGatedSubgroup('${p}OffsetEnabled', ...)`
-member list, so every Multi Trigger sub-trigger gets the same feature
-as its parent function, and `updateOffsetRotationVisibility(p)` now
-shows only the relevant slider(s) for whichever mode is selected.
-Verified via an isolated logic reproduction of the direction math (hand
-left of cursor + positive distance moves right/toward; same hand +
-negative distance moves left/away; hand right of cursor + positive
-distance correctly moves left/toward; XYZ Offset mode completely
-unaffected by cursor position). `node --check` passes. **Not live-
-verified in browser** -- the local static server failed all 5
-navigation attempts this round (the standing retry cap).
+**ADDED 2026-10-01, CORRECTED same day -- Offset Mode dropdown ("XYZ
+Offset" / "Cursor Offset") for every custom click function (pose-kind
+and hold-kind, plus Multi Trigger sub-triggers of either).** Direct
+request: provide a dropdown with the pre-existing OffsetX/OffsetY
+behavior as one option, and a new "Cursor Offset" mode as the other --
+a signed distance slider that displaces the hand toward (positive) or
+away (negative) from the cursor. Implementation: a shared
+`computeOffsetXY(hand, p)` helper replaces the 3 previously-separate
+`cfg[OffsetX]`/`cfg[OffsetY]` reads in `applyOffsetRotationToHand()`
+(live per-frame apply), `bakeOffsetRotationIntoAccum()` (full-
+completion bake), and `bakeInFlightOffsetRotation()` (partial-fraction
+bake on interruption) -- all 3 needed to agree, or Cursor Offset would
+behave correctly only in the common case and snap/drift on a hold
+released mid-ramp, exactly the class of bug this project's own
+10-round "jump investigation" exists to prevent. `OffsetMode`/
+`CursorOffsetDistance` added to `MULTI_TRIGGER_ALLOWED_SUFFIXES` and
+the `wrapGatedSubgroup('${p}OffsetEnabled', ...)` member list, and
+`updateOffsetRotationVisibility(p)` shows only the relevant slider(s)
+for whichever mode is selected.
+
+**Correction, same day:** the first version only used the camera-RIGHT
+axis (a horizontal-only +1/-1 sign, Y always 0). Direct correction:
+"which ever axis is perp to the camera, thats the one we dont offset
+in. so x y local to camera." Fixed by projecting the hand-to-cursor
+vector onto BOTH camera-local axes (right and up), normalizing into a
+unit 2D direction, and scaling by the configured distance -- the
+camera-forward/depth axis is excluded by construction. Verified via a
+4-case isolated logic reproduction (diagonal direction, pure-depth = no
+movement, pure-vertical = y-only movement -- the case the old code got
+wrong, depth-contamination immunity). `node --check` passes. `main.js`
+cache-buster at `?v=267`. **Not live-verified in browser** -- the
+local static server failed all 5 navigation attempts the round this
+was built (the standing retry cap); not re-attempted for the axis fix
+since nothing about the page-load path changed.
+
+**NEXT (not yet started): "an offset min max, as well as the curve,
+with x as distance from cursor"** -- direct request to make
+`${p}CursorOffsetDistance` optionally curve-driven per-hand (based on
+that hand's live distance from the cursor) instead of a flat slider,
+mirroring the established curve pattern elsewhere in this file (e.g.
+Retransition Speed Curve's Enabled/Curve/Range triplet).
 
 **RESOLVED 2026-10-01 -- "click functions don't really work on mobile"
 (a real regression from this session's own earlier round-37 fix).**
