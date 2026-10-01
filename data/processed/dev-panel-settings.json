@@ -16,7 +16,7 @@
       "fieldCols": 13,
       "rowSpacing": 5.5,
       "columnSpacing": 9.5,
-      "handScale": 0.85,
+      "handScale": 0.6,
       "alternateRowOffset": 5,
       "progressiveRowOffset": 1,
       "useProgressiveOffset": false,
@@ -197,13 +197,13 @@
       "loadingPreviewSequenceHoldMs": 0,
       "loadingPreviewSize": 1390,
       "loadingPreviewRotationX": -79.52141477498444,
-      "loadingPreviewRotationY": -3.4505366585857034,
+      "loadingPreviewRotationY": -3.4505366585857016,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 1.225225212453898,
-      "loadingPreviewOffsetY": -2.336093655522892,
+      "loadingPreviewOffsetY": -2.3360936555228924,
       "loadingPreviewOffsetZ": -33.384543534396904,
       "loadingPreviewCameraFov": 32,
-      "loadingPreviewCameraZoom": 64.25715498581916,
+      "loadingPreviewCameraZoom": 64.25715498581914,
       "loadingPreviewCameraEditMode": true,
       "customClickFunctionIds": "[{\"id\":\"custom7\",\"title\":\"Custom Click Function 7\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom8\",\"title\":\"Custom Click Function 8\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom9\",\"title\":\"Custom Click Function 9\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom10\",\"title\":\"Custom Click Function 10\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom13\",\"title\":\"Custom Click Function 13\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom14\",\"title\":\"Custom Click Function 14\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom15\",\"title\":\"Custom Click Function 15\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom16\",\"title\":\"Custom Click Function 16\",\"kind\":\"hold\",\"family\":\"desktop\"}]",
       "holdConfirmMs": 520,
@@ -6662,7 +6662,7 @@
       "emissionColor": "#ffffff",
       "emissionIntensity": 1.5,
       "bgColor": "#000000",
-      "pixelRatio": 1,
+      "pixelRatio": 1.25,
       "resolutionScale": 100,
       "qualityPreset": "high",
       "showGridHelper": false,
@@ -7520,13 +7520,13 @@
       "loadingPreviewSequenceHoldMs": 0,
       "loadingPreviewSize": 1390,
       "loadingPreviewRotationX": -79.52141477498444,
-      "loadingPreviewRotationY": -3.4505366585857034,
+      "loadingPreviewRotationY": -3.4505366585857016,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 1.225225212453898,
-      "loadingPreviewOffsetY": -2.336093655522892,
+      "loadingPreviewOffsetY": -2.3360936555228924,
       "loadingPreviewOffsetZ": -33.384543534396904,
       "loadingPreviewCameraFov": 32,
-      "loadingPreviewCameraZoom": 64.25715498581916,
+      "loadingPreviewCameraZoom": 64.25715498581914,
       "loadingPreviewCameraEditMode": true,
       "customClickFunctionIds": "[{\"id\":\"custom7\",\"title\":\"Custom Click Function 7\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom8\",\"title\":\"Custom Click Function 8\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom9\",\"title\":\"Custom Click Function 9\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom10\",\"title\":\"Custom Click Function 10\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom13\",\"title\":\"Custom Click Function 13\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom14\",\"title\":\"Custom Click Function 14\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom15\",\"title\":\"Custom Click Function 15\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom16\",\"title\":\"Custom Click Function 16\",\"kind\":\"hold\",\"family\":\"desktop\"}]",
       "holdConfirmMs": 520,
@@ -13985,7 +13985,7 @@
       "emissionColor": "#ffffff",
       "emissionIntensity": 1.5,
       "bgColor": "#000000",
-      "pixelRatio": 1,
+      "pixelRatio": 1.25,
       "resolutionScale": 100,
       "qualityPreset": "high",
       "showGridHelper": false,
@@ -14843,13 +14843,13 @@
       "loadingPreviewSequenceHoldMs": 0,
       "loadingPreviewSize": 1390,
       "loadingPreviewRotationX": -79.52141477498444,
-      "loadingPreviewRotationY": -3.4505366585857034,
+      "loadingPreviewRotationY": -3.4505366585857016,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 1.225225212453898,
-      "loadingPreviewOffsetY": -2.336093655522892,
+      "loadingPreviewOffsetY": -2.3360936555228924,
       "loadingPreviewOffsetZ": -33.384543534396904,
       "loadingPreviewCameraFov": 32,
-      "loadingPreviewCameraZoom": 64.25715498581916,
+      "loadingPreviewCameraZoom": 64.25715498581914,
       "loadingPreviewCameraEditMode": true,
       "customClickFunctionIds": "[{\"id\":\"custom7\",\"title\":\"Custom Click Function 7\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom8\",\"title\":\"Custom Click Function 8\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom9\",\"title\":\"Custom Click Function 9\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom10\",\"title\":\"Custom Click Function 10\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom13\",\"title\":\"Custom Click Function 13\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom14\",\"title\":\"Custom Click Function 14\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom15\",\"title\":\"Custom Click Function 15\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom16\",\"title\":\"Custom Click Function 16\",\"kind\":\"hold\",\"family\":\"desktop\"}]",
       "holdConfirmMs": 520,
@@ -21308,7 +21308,7 @@
       "emissionColor": "#ffffff",
       "emissionIntensity": 1.5,
       "bgColor": "#000000",
-      "pixelRatio": 1,
+      "pixelRatio": 1.25,
       "resolutionScale": 100,
       "qualityPreset": "high",
       "showGridHelper": false,
@@ -23967,7 +23967,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": false,
       "items": [
         {
@@ -26383,7 +26383,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 16",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -27295,7 +27295,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 15",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -28207,7 +28207,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 14",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -28809,7 +28809,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 13",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -33489,7 +33489,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 10",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -34401,7 +34401,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 9",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -39237,7 +39237,7 @@
                 "type": "group",
                 "group": {
                   "key": "Start Time Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -39342,7 +39342,7 @@
                       "type": "group",
                       "group": {
                         "key": "Retransition Start Time Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -39413,7 +39413,7 @@
                     },
                     {
                       "key": "Retransition Start Time Curve",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -39670,7 +39670,7 @@
               },
               {
                 "key": "Start Time Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -39769,7 +39769,7 @@
                     "type": "group",
                     "group": {
                       "key": "Retransition Start Time Curve",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -39840,7 +39840,7 @@
                   },
                   {
                     "key": "Retransition Start Time Curve",
-                    "collapsed": false,
+                    "collapsed": true,
                     "locked": false,
                     "items": [
                       {
@@ -44697,7 +44697,7 @@
       "subgroups": [
         {
           "key": "Custom Click Function 16",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -45606,7 +45606,7 @@
         },
         {
           "key": "Custom Click Function 15",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -46515,7 +46515,7 @@
         },
         {
           "key": "Custom Click Function 14",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -47114,7 +47114,7 @@
         },
         {
           "key": "Custom Click Function 13",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -51791,7 +51791,7 @@
         },
         {
           "key": "Custom Click Function 10",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -52700,7 +52700,7 @@
         },
         {
           "key": "Custom Click Function 9",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -57533,7 +57533,7 @@
               "type": "group",
               "group": {
                 "key": "Start Time Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -57638,7 +57638,7 @@
                     "type": "group",
                     "group": {
                       "key": "Retransition Start Time Curve",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -57709,7 +57709,7 @@
                   },
                   {
                     "key": "Retransition Start Time Curve",
-                    "collapsed": false,
+                    "collapsed": true,
                     "locked": false,
                     "items": [
                       {
@@ -57966,7 +57966,7 @@
             },
             {
               "key": "Start Time Curve",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -58065,7 +58065,7 @@
                   "type": "group",
                   "group": {
                     "key": "Retransition Start Time Curve",
-                    "collapsed": false,
+                    "collapsed": true,
                     "locked": false,
                     "items": [
                       {
@@ -58136,7 +58136,7 @@
                 },
                 {
                   "key": "Retransition Start Time Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -63622,9 +63622,7 @@
   },
   "devVisibility": {},
   "devIndependence": {
-    "mobile": {
-      "custom7Enabled": true
-    },
+    "mobile": {},
     "landscape": {}
   },
   "devHotkeys": {}
