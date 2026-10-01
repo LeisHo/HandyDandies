@@ -15028,6 +15028,72 @@ symptom (detected-but-not-dispatched), not an on-device test.
 
 `main.js` cache-buster bumped `?v=263` -> `?v=264`.
 
+2026-10-01  -  (fix -- REAL SYSTEMIC BUG: remote save silently dropped
+devVisibility/devIndependence/devHotkeys on every save, confirmed live
+against the deployed app, not just read in code)
+
+Direct bug report: "when i enable click funcitons in mobile tab through
+cehckbox, i hit save, it doesnt get saved." Traced via LIVE testing
+against `https://handy-dandies.vercel.app` rather than static reading
+alone, once static reading of `commit()`'s own store-write logic came
+back clean (it correctly writes `store[editingDevice][ctrl.key] = v`
+regardless of physical device).
+
+Live reproduction, step by step: opened the dev panel, switched to the
+Mobile tab, clicked the real "Independent from Desktop" checkbox on
+custom7's own Enabled row (confirmed via direct DOM inspection it
+exists, is visible, and is wired). Intercepted `navigator.clipboard.writeText`
+to capture the EXACT JSON Copy Settings produces immediately afterward --
+confirmed `devIndependence.mobile.custom7Enabled === true` and
+`values.mobile.custom7Enabled === true` in memory, both correct. Clicked
+the real Save button -- the POST to `/api/save-settings` returned
+`{"ok":true,"commitSha":"557647e..."}`, a genuine successful commit.
+Pulled that EXACT commit's own copy of `data/processed/dev-panel-settings.json`
+directly: `devIndependence.mobile.custom7Enabled` was `undefined` --
+the value never actually made it into the file that was just
+successfully committed, despite the save reporting success.
+
+Root cause: `remoteSaveSnapshot()` (devPanel.js) does a GET (fetch the
+existing remote file) - merge - POST sequence, and the merge step was:
+`{ ...base, values: snapshot.values, order: snapshot.order, textOverrides: snapshot.textOverrides }`
+-- a hand-picked list of exactly 3 fields. `devVisibility`,
+`devIndependence`, and `devHotkeys` (this SAME session's own Set Hotkey
+feature, added earlier today) were never in that list, so every single
+remote save silently reverted them to whatever the OLD remote file
+already held, completely independent of what actually changed in the
+current session. `api/save-settings.js` itself (the Vercel serverless
+function) was checked and ruled out -- it writes whatever `body` it's
+given verbatim, no selective merging on the backend side at all; the
+selective (and buggy) merge was entirely client-side.
+
+Also found, while fixing: `saveSettings()`'s own snapshot construction
+was separately missing `devHotkeys` entirely (not yet wired in when
+that snapshot shape was first built, before today's Set Hotkey feature
+existed) -- a 2nd, smaller gap in the same area, fixed alongside the
+main one.
+
+Fixed: `saveSettings()`'s snapshot now includes `devHotkeys: { ...devHotkeys }`
+alongside the pre-existing `devVisibility`/`devIndependence`.
+`remoteSaveSnapshot()`'s merge is now `{ ...base, ...snapshot }` -- every
+field the snapshot actually carries (including `extra`, from
+`devSaveCaptureExtra()`, which the old hand-picked list also silently
+missed) survives the round-trip; `base` is now only ever a fallback for
+a field the snapshot doesn't carry at all (e.g. a host-specific field
+already living in the remote file, exactly the scenario this function's
+own top comment describes).
+
+**Impact beyond this one checkbox**: since this is the SAME merge path
+every remote Save goes through, this bug affected every feature backed
+by `devVisibility`/`devIndependence`/`devHotkeys` -- the entire §12f-1
+per-device visibility/independence system, AND this same session's own
+Set Hotkey feature, were never actually persisting remotely. Anyone who
+set a hotkey today and reloaded would have silently lost it before this
+fix, regardless of whether Save reported success.
+
+`node --check` passes. `devpanel/devPanel.js`'s own import-version
+bumped `?v=53` -> `?v=54`; `main.js` cache-buster bumped `?v=264` ->
+`?v=265`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

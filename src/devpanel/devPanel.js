@@ -2629,7 +2629,24 @@ async function remoteSaveSnapshot(remoteSave, snapshot) {
       base = getBody.settings
     }
   } catch (err) { /* fall through -- POST below still proceeds from an empty base */ }
-  const merged = { ...base, values: snapshot.values, order: snapshot.order, textOverrides: snapshot.textOverrides }
+  // CORRECTED 2026-10-01, REAL BUG confirmed live via direct testing
+  // against the deployed app (direct report: "when i enable click
+  // funcitons in mobile tab through cehckbox, i hit save, it doesnt get
+  // saved"). This GET-merge-POST only ever forwarded values/order/
+  // textOverrides into `merged` -- devVisibility/devIndependence/
+  // devHotkeys were silently left out, so EVERY save reverted them to
+  // whatever the OLD remote file already had, regardless of what the
+  // user just changed this session. Confirmed by watching it happen:
+  // captureFullPanelState() held devIndependence.mobile.custom7Enabled
+  // === true right before Save; Save returned {ok:true} with a real
+  // commit sha; the actual committed file still read `undefined` for
+  // that same field. Now forwards every field this snapshot shape
+  // actually has, not a hand-picked subset -- the ONLY things that
+  // should ever come from `base` (the pre-existing remote file) are
+  // fields this snapshot doesn't carry at all (e.g. a host-specific
+  // field like HANDO's own `defaultCamera`, per this function's own
+  // top comment).
+  const merged = { ...base, ...snapshot }
   try {
     const postResp = await fetch(remoteSave.endpoint, {
       method: 'POST',
@@ -3188,12 +3205,20 @@ export function initDevPanel(groups, opts = {}) {
       saveHeaderBtn.title = msg
       setTimeout(() => { saveHeaderBtn.textContent = origIcon; saveHeaderBtn.title = 'Save' }, 900)
     }
+    // CORRECTED 2026-10-01, direct bug report ("when i enable click
+    // funcitons in mobile tab through cehckbox, i hit save, it doesnt
+    // get saved"). devHotkeys was missing from this snapshot entirely --
+    // added alongside the pre-existing devVisibility/devIndependence
+    // (which WERE already here, but see remoteSaveSnapshot()'s own
+    // matching correction for why they never actually reached the
+    // remote file regardless).
     const snapshot = {
       values: Object.fromEntries(DEVICES.map((d) => [d, { ...store[d] }])),
       order: getPanelOrder(groupsEl),
       textOverrides: { ...textOverrides },
       devVisibility: { ...devVisibility },
-      devIndependence: { mobile: { ...devIndependence.mobile }, landscape: { ...devIndependence.landscape } }
+      devIndependence: { mobile: { ...devIndependence.mobile }, landscape: { ...devIndependence.landscape } },
+      devHotkeys: { ...devHotkeys }
     }
     // Folds in any host state OUTSIDE the dev panel's own registered
     // controls (devSaveCaptureExtra, above) so Save captures it too, not

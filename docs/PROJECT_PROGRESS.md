@@ -42,22 +42,34 @@ touch jitter no longer misclassified as moved; a genuine 50px touch drag
 still correctly detected; mouse threshold unchanged). `node --check`
 passes. **Not live-verified on a real device.**
 
-**STILL INVESTIGATING -- "when I enable click functions in mobile tab
-through checkbox, I hit save, it doesn't get saved."** Read `commit()`'s
-own store-write logic directly (devPanel.js) -- for a `dynamicDevice`
-control like `${id}Enabled` (confirmed it IS one, via `withDynamicDevice()`),
-the write to `store[editingDevice]` happens unconditionally regardless of
-`realDeviceClass()`, so the value SHOULD persist through
-`captureFullPanelState()`/Save correctly by this reading. Also confirmed
-`${id}Enabled` has no explicit `perDevice: true`, so it's NOT independent
-per device by default -- checking it on the Mobile tab while non-
-independent also mirrors the SAME value onto Desktop (and Landscape, if
-also non-independent), which could explain unexpected behavior but not
-literally "doesn't save." No confirmed bug found yet -- needs the exact
-checkbox the user means (the Enabled row itself, vs. its own "Independent
-from Desktop" or "Show in Mobile/Landscape" sub-checkbox) and whether
-they're testing from a real mobile device or the Mobile TAB on a desktop
-browser, before continuing further.
+**RESOLVED 2026-10-01 -- "when I enable click functions in mobile tab
+through checkbox, I hit save, it doesn't get saved." A real, SYSTEMIC
+bug, confirmed live against the deployed app, not just read in code.**
+`commit()`'s own store-write logic (checked first) was fine -- the value
+really does land in `store.mobile`/`devIndependence.mobile` in memory.
+The actual bug: `remoteSaveSnapshot()`'s own GET-merge-POST (the
+function that actually talks to `/api/save-settings`) only ever forwarded
+`values`/`order`/`textOverrides` into the merged payload --
+`devVisibility`, `devIndependence`, AND `devHotkeys` (this same session's
+own Set Hotkey feature!) were silently left out, so EVERY remote save
+reverted them to whatever the OLD remote file already had, no matter
+what changed in the current session. Confirmed by direct live testing:
+captured `devIndependence.mobile.custom7Enabled === true` via Copy
+Settings immediately before clicking Save; Save returned `{ok:true}`
+with a real commit sha; pulling that exact commit showed the field still
+`undefined`. Fixed 2 things: (1) `saveSettings()`'s own snapshot was
+missing `devHotkeys` entirely (a separate, smaller gap -- added
+alongside the pre-existing devVisibility/devIndependence); (2)
+`remoteSaveSnapshot()`'s merge now does `{ ...base, ...snapshot }`
+instead of hand-picking 3 fields, so every field the snapshot actually
+carries (including `extra`, another field the old hand-picked list
+missed) survives the round-trip; only a field the snapshot doesn't carry
+at all (a host-specific field in the pre-existing remote file) still
+falls back to `base`. **This bug affected every feature backed by
+devVisibility/devIndependence/devHotkeys remotely** -- not just this one
+checkbox -- so the Set Hotkey feature built earlier this session was
+ALSO silently not persisting remotely until this fix. `node --check`
+passes. Pushed; re-verifying live against the redeployed fix next.
 
 **RESOLVED 2026-10-01 -- the "flashing" cluster, root-caused per direct
 user narrowing ("it only happens when retransiton speed curve is on").**
