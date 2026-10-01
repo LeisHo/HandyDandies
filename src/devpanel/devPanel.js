@@ -3984,7 +3984,19 @@ export function initDevPanel(groups, opts = {}) {
     input.addEventListener('keydown', (ev) => {
       if (ev.key === 'Enter') { ev.preventDefault(); input.blur() }
       else if (ev.key === 'Escape') { ev.preventDefault(); cancel() }
-      else {
+      // CORRECTED 2026-10-01, direct bug report ("when i try to set
+      // hotkeys, i cant type into the text box"). This `else` branch used
+      // to run for EVERY key that wasn't Enter/Escape -- including a
+      // plain letter typed with no modifier at all. It called
+      // preventDefault() unconditionally (blocking the browser's own
+      // normal character insertion) and, since modPrefix is '' when no
+      // modifier is held, immediately overwrote input.value back to ''
+      // -- so every single keystroke both suppressed the typed character
+      // AND wiped the field, making it impossible to type anything.
+      // Gated to only run when an actual modifier key is held; a plain
+      // letter/number now falls through to the browser's own default
+      // text-insertion, exactly as before modifier support was added.
+      else if (ev.ctrlKey || ev.metaKey || ev.shiftKey || ev.altKey) {
         ev.preventDefault()
         // Capture modifier+key combinations
         const modPrefix = (ev.ctrlKey || ev.metaKey ? 'ctrl+' : '') +
@@ -3992,7 +4004,7 @@ export function initDevPanel(groups, opts = {}) {
                           (ev.altKey ? 'alt+' : '')
         const keyName = ev.key === ' ' ? 'space' : (ev.key.toLowerCase().match(/^[a-z0-9]$/) ? ev.key.toLowerCase() : null)
         const capturedKey = modPrefix && keyName ? modPrefix + keyName : ''
-        input.value = capturedKey.toUpperCase()
+        if (capturedKey) input.value = capturedKey.toUpperCase()
       }
     })
     input.addEventListener('click', (ev) => ev.stopPropagation())

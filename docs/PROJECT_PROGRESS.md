@@ -18,6 +18,20 @@ work seamlessly from there.
 
 ## Currently working on
 
+**RESOLVED 2026-10-01 -- "when i try to set hotkeys, i cant type into
+the text box."** Root cause: the OTHER concurrent session's own
+"modifier key support" addition to `startHotkeyEdit()`'s keydown
+handler (`devpanel/devPanel.js`, commit `6ef7697`) ran its
+`preventDefault()` + `input.value = capturedKey` override for EVERY key
+that wasn't Enter/Escape -- including a plain letter with no modifier
+held, where `modPrefix` is `''` and the override set `input.value` back
+to `''` on every keystroke. Fixed by gating that whole branch behind
+`ev.ctrlKey || ev.metaKey || ev.shiftKey || ev.altKey` -- a plain
+letter/number now falls through to the browser's own normal text
+insertion untouched; a real modifier combo (Ctrl+S etc.) still gets
+captured exactly as that session intended. Verified via an isolated
+logic reproduction of both cases. `node --check` passes.
+
 **KNOWN ISSUE, logged not fixed, 2026-10-01 -- "flashing" on a spatially-
 clustered patch of hands (described: hands 14-17/27-30/40-42/53-55, a
 rectangular region in the upper-left of the 13-column grid) during a

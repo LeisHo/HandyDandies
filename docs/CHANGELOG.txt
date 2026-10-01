@@ -14922,6 +14922,39 @@ once per start+end. **Not live-verified in browser this round.**
 
 `main.js` cache-buster bumped `?v=260` -> `?v=261`.
 
+2026-10-01  -  (fix -- "when i try to set hotkeys, i cant type into the
+text box")
+
+Root cause: the OTHER concurrent session's "Add modifier key support to
+hotkey capture" commit (`6ef7697`, reviewed earlier this session when it
+first appeared on `main`) added an `else` branch to
+`startHotkeyEdit()`'s keydown handler that ran for EVERY key that wasn't
+Enter/Escape -- including a plain letter typed with no modifier at all.
+That branch called `preventDefault()` unconditionally (blocking the
+browser's own normal character insertion) and set `input.value` to
+`modPrefix && keyName ? modPrefix + keyName : ''` -- for a plain,
+unmodified letter, `modPrefix` is `''`, so this expression evaluates to
+`''` and wipes the field on every single keystroke. The combination
+(character insertion blocked AND the field cleared immediately after)
+made it impossible to type anything into the box at all.
+
+Fixed by gating the whole branch behind `ev.ctrlKey || ev.metaKey ||
+ev.shiftKey || ev.altKey` -- a plain letter/number now takes neither the
+Enter/Escape branch nor the modifier-capture branch, so it falls through
+with nothing preventing the browser's own default text-insertion,
+exactly as it worked before modifier support was added. A real modifier
+combo (Ctrl+S, Shift+D, etc.) still gets captured and written into
+`input.value` exactly as that other session intended -- this was a
+scope-of-the-condition bug, not a reason to revert the feature.
+
+Verified via an isolated logic reproduction of both cases: a plain "r"
+keydown leaves `preventDefault` uncalled and the input untouched; a
+Ctrl+S keydown still correctly prevents default and sets the value to
+"CTRL+S". `node --check src/devpanel/devPanel.js` passes.
+
+`main.js` cache-buster bumped `?v=261` -> `?v=262`; `devpanel/devPanel.js`'s
+own import-version bumped `?v=52` -> `?v=53`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a
