@@ -6721,6 +6721,7 @@
       "dp_valueTextColor": "#5cc9ff",
       "dp_tabTextColor": "#ffffff",
       "dp_scrollStrength": 0.2,
+      "dp_hotkeySequenceWindowMs": 500,
       "custom7Enabled": true,
       "custom7Type": "Click",
       "custom7TouchPointCount": 1,
@@ -13812,6 +13813,7 @@
       "dp_valueTextColor": "#5cc9ff",
       "dp_tabTextColor": "#ffffff",
       "dp_scrollStrength": 1,
+      "dp_hotkeySequenceWindowMs": 500,
       "custom7Enabled": true,
       "custom7Type": "Click",
       "custom7TouchPointCount": 1,
@@ -20903,6 +20905,7 @@
       "dp_valueTextColor": "#5cc9ff",
       "dp_tabTextColor": "#ffffff",
       "dp_scrollStrength": 0.2,
+      "dp_hotkeySequenceWindowMs": 500,
       "custom7Enabled": true,
       "custom7Type": "Click",
       "custom7TouchPointCount": 1,
@@ -21829,9 +21832,15 @@
               }
             ]
           }
+        },
+        {
+          "type": "row",
+          "key": "dp_hotkeySequenceWindowMs"
         }
       ],
-      "settings": [],
+      "settings": [
+        "dp_hotkeySequenceWindowMs"
+      ],
       "subgroups": [
         {
           "key": "MECHANICS",
@@ -22444,6 +22453,14 @@
         {
           "type": "row",
           "key": "copyAllLogsBtn"
+        },
+        {
+          "type": "row",
+          "key": "clearAllLogsBtn"
+        },
+        {
+          "type": "row",
+          "key": "pauseLogsBtn"
         }
       ],
       "settings": [
@@ -22462,7 +22479,9 @@
         "logFrameRateDropsEnabled",
         "frameRateDropThresholdFps",
         "clearFrameRateLogBtn",
-        "copyAllLogsBtn"
+        "copyAllLogsBtn",
+        "clearAllLogsBtn",
+        "pauseLogsBtn"
       ],
       "subgroups": []
     },
@@ -27736,7 +27755,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 10",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -29199,7 +29218,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 8",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -30060,7 +30079,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 7",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -34782,7 +34801,7 @@
         },
         {
           "key": "Custom Click Function 10",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -36239,7 +36258,7 @@
         },
         {
           "key": "Custom Click Function 8",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -37097,7 +37116,7 @@
         },
         {
           "key": "Custom Click Function 7",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
