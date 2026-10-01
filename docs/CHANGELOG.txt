@@ -14766,6 +14766,100 @@ live URL is the real confirmation signal.
 (main.js itself untouched in content this round beyond that one import
 line).
 
+2026-10-01  -  (40th round, partial -- min/max range-bar rescale fix +
+Start Distance Min/Max merged into a single slider; missing-functions
+investigation; Multi Trigger scope confirmed but not yet built)
+
+**Missing custom click functions investigated via `git log -S` against
+`data/processed/dev-panel-settings.json`, not guessed.** Direct report:
+"I also added 2 click functions previously, saved, now I can't see
+them." `customClickFunctionIds` currently has custom7/8/9/10/13/14/15 --
+gaps at 11/12/16/17. Pickaxe search confirmed custom11/12 last referenced
+in commits from 2026-09-22/09-24, and custom16/17 from 2026-09-27/09-28
+-- all DAYS before this report, and absent from the git history entirely
+by the most recent settings commit (`18183c8`, 2026-09-30). No trace of
+any function beyond custom15 anywhere in the current file. Concluded
+this is not recoverable from this project's own tracked data -- if real,
+it points to a save that never actually synced (browser-only state,
+never reaching git), which cannot be dug up after the fact. Needs the
+user's own input (which IDs, whether Save/Sync was confirmed to succeed)
+to go further.
+
+**"Disappeared when switching Sequence -> Single Pose with 3rd click
+count" -- read `${p}Mode`'s own onChange (`updateClickTriggerModeVisibility`/
+`updateSingleTimingGateVisibility`/`updateSequencePlayModeVisibility`/
+`updateChainModeVisibility`, 4 visibility-only calls) and found nothing
+that touches `customClickFunctionIds` or removes a DOM group.** Not
+root-caused this round -- flagged as needing a live repro or the actual
+affected function's current settings rather than continuing to guess.
+
+**Fixed: min/max range-bar sliders (`buildGenericRangeBarWidget`) now
+rescale when the min/max NUMBERS are edited.** Root cause: `trackMin`/
+`trackMax` (the widget's own drawable scale, used only for position<->value
+conversion) were captured once from `opts` at build time and never
+touched again -- editing `current.min`/`current.max` (the actual
+configured value) to something outside that fixed scale just clamped the
+handle to 0%/100% instead of the track itself expanding. Fixed by making
+`trackMin`/`trackMax` mutable and adding `expandTrackIfNeeded()` (same
+"expand to typed-value ± 20%" convention §12h already uses for a plain
+slider's own click-to-edit bound), called at the top of `redraw()` so
+every path that changes `current` (drag, click-to-edit, restore) picks it
+up for free. Verified via an isolated logic reproduction (typing a max of
+500 against a 0-300 track correctly expanded it to 0-600; a negative min
+expanded the floor the same way) -- not live-tested in browser.
+
+**Added: Start Distance Min/Max is now a single dual-handle slider**,
+direct request ("for start distance min max, make that a single
+slider"), for both hold-kind and pose-kind custom functions.
+Deliberately NOT a schema change: `${p}StartDistanceMin`/`${p}StartDistanceMax`
+remain the real, unchanged settings keys every existing custom function
+(7/8/9/10/13/14/15) already has tuned values for -- replacing them with a
+new combined key (the pattern every OTHER min/max pair in this file
+already uses, e.g. `TweenStopDelayRange`) would have silently reset every
+already-tuned value back to a generic default the instant this shipped,
+which would have made THIS round responsible for exactly the kind of
+data loss the other half of this same round was investigating. New
+`mergeMinMaxSlidersIntoRangeBar(minRow, maxRow, opts)` instead keeps both
+real controls/cfg keys exactly as they are and only changes the visual
+presentation -- the Min row hosts a merged track UI, the Max row is
+hidden, and dragging/editing either handle writes back to the 2 real
+underlying `<input type=range>` elements via the same `commitTextControl()`-
+style technique (set `.value`, dispatch a real `input` event) already used
+elsewhere in this file, so devPanel.js's own commit()/onChange/persistence
+machinery runs exactly as if the user had dragged the original sliders.
+Wired into both `buildClickHoldPoseWidgets(p)` and `buildClickPoseWidgets(p)`,
+right after the existing Start Distance Curve widget. Verified via an
+isolated logic reproduction of the toPct/fromPct round-trip math -- not
+live-tested in browser.
+
+**Multi Trigger extension scope confirmed via AskUserQuestion, not yet
+implemented:** applies to BOTH pose-kind and hold-kind custom functions,
+in ANY mode (Single Pose or Sequence) -- hold-kind currently has ZERO
+Multi Trigger support at all (confirmed: its own code comment says "no
+equivalent requested/built for hold-kind"). The pose-match-skip-to-next-
+target behavior (requested separately: if a trigger's target pose already
+matches a hand's current pose, skip to the next Multi Trigger target, or
+don't fire if none remain) also applies to Sequence-mode triggers,
+compared against the sequence's first/anchor pose. This is a large change
+(mirrors the entire pose-kind Multi Trigger system --
+`registerMultiTriggerTrigger`/`resolveMultiTriggerPrefix`/etc. -- for
+`CLICK_HOLD_KEYS`/`clickHoldPoseTriggers`) -- deferred to a following
+round rather than rushed in behind everything else queued this round.
+
+**Reviewed a pasted "buggy test" log** (a Click+Hold held 3803ms then
+released, followed by a plain click that fired "Trigger 2" -> pose
+"COUNTDOWN (VERT) - 6" for nearly every hand simultaneously). This matches
+Multi Trigger's own documented, intentional design exactly (`resolveMultiTriggerPrefix()`'s
+own comment: "A single shared counter per function (not per-hand) -- one
+user click advances the cycle once, for every hand this function
+drives"). Nothing in this specific log looked like a new, distinct bug.
+
+`main.js` cache-buster bumped `?v=259` -> `?v=260`. `node --check` passes.
+**Not live-verified in browser this round** -- confidence rests on 2
+isolated logic reproductions (the math is the same shape as several
+already-verified widgets this session) plus direct code reading for the
+2 investigations.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

@@ -9238,9 +9238,24 @@ function buildGenericRangeBarWidget(row, opts) {
   row.style.flexDirection = 'column'
   row.style.alignItems = 'stretch'
 
-  const { trackMin, trackMax, unit, defaultValue } = opts
+  const { unit, defaultValue } = opts
+  // CORRECTED 2026-10-01, direct report: "for all min max sliders, when
+  // i change the min and max numbers, scale the slider accordingly.
+  // right now they dont." trackMin/trackMax (the widget's own drawable
+  // scale) used to be captured once from opts and never touched again --
+  // editing current.min/current.max (the actual configured value, via
+  // attachRangeBarClickToEdit's click-to-edit) to something outside
+  // that fixed scale just clamped the handle to 0%/100% instead of the
+  // track itself rescaling. Now mutable, with the same auto-expand-by-
+  // 20%-over convention §12h already uses for a plain slider's own
+  // click-to-edit bound.
+  let trackMin = opts.trackMin, trackMax = opts.trackMax
   const toPct = (v) => THREE.MathUtils.clamp((v - trackMin) / (trackMax - trackMin) * 100, 0, 100)
   const fromPct = (pct) => Math.round(trackMin + (pct / 100) * (trackMax - trackMin))
+  function expandTrackIfNeeded() {
+    if (current.min < trackMin) trackMin = current.min - Math.abs(current.min) * 0.2
+    if (current.max > trackMax) trackMax = current.max + Math.abs(current.max) * 0.2
+  }
 
   const wrap = elLocal('div', { flex: '1', padding: '6px 4px 2px' })
   const track = elLocal('div', { position: 'relative', height: '18px', margin: '0 9px', background: 'rgba(255,255,255,0.12)', borderRadius: '9px' })
@@ -9262,6 +9277,7 @@ function buildGenericRangeBarWidget(row, opts) {
     commitTextControl(input, JSON.stringify(current))
   }, unit)
   function redraw() {
+    expandTrackIfNeeded()
     const minPct = toPct(current.min), maxPct = toPct(current.max)
     fill.style.left = Math.min(minPct, maxPct) + '%'
     fill.style.right = (100 - Math.max(minPct, maxPct)) + '%'
@@ -9289,6 +9305,97 @@ function buildGenericRangeBarWidget(row, opts) {
         window.removeEventListener('pointermove', onMove)
         window.removeEventListener('pointerup', onUp)
         commitTextControl(input, JSON.stringify(current))
+      }
+      window.addEventListener('pointermove', onMove)
+      window.addEventListener('pointerup', onUp)
+    }
+  }
+  minHandle.addEventListener('pointerdown', startDrag('min'))
+  maxHandle.addEventListener('pointerdown', startDrag('max'))
+}
+// Merges 2 EXISTING, independently-registered slider rows into one
+// dual-handle range-bar row -- direct request ("for start distance min
+// max, make that a single slider"). Deliberately NOT a schema change
+// (unlike buildGenericRangeBarWidget above, which backs onto ONE
+// combined {min,max} JSON text control): Start Distance Min/Max are
+// real custom-function settings on every one of this project's existing
+// saved custom functions (confirmed: cfg[`${p}StartDistanceMin`]/`Max`
+// are read directly by computeTweenFractionCap()'s own call sites).
+// Replacing them with a new combined key would reset every already-
+// tuned value back to a generic default the moment this shipped --
+// exactly the kind of silent data loss this same conversation was just
+// about. Instead, this keeps BOTH real controls/cfg keys exactly as
+// they are and only changes the VISUAL presentation: the Min row hosts
+// a merged track UI, the Max row is hidden, and dragging/editing either
+// handle writes back to the 2 REAL underlying <input type=range>
+// elements (same commitTextControl()-style technique already used
+// elsewhere in this file: set .value, dispatch a real 'input' event, so
+// devPanel.js's own commit()/onChange/persistence machinery runs
+// exactly as if the user had dragged the original slider).
+function mergeMinMaxSlidersIntoRangeBar(minRow, maxRow, opts) {
+  if (!minRow || !maxRow) return
+  const minInput = minRow.querySelector('input[type=range]')
+  const maxInput = maxRow.querySelector('input[type=range]')
+  if (!minInput || !maxInput) return
+  const { label, unit } = opts
+  const trackMin = parseFloat(minInput.min), trackMax = parseFloat(maxInput.max)
+  const toPct = (v) => THREE.MathUtils.clamp((v - trackMin) / (trackMax - trackMin) * 100, 0, 100)
+  const fromPct = (pct) => Math.round(trackMin + (pct / 100) * (trackMax - trackMin))
+
+  const labelEl = minRow.querySelector('label')
+  if (labelEl && label) labelEl.textContent = label
+  minInput.style.display = 'none'
+  minRow.style.flexDirection = 'column'
+  minRow.style.alignItems = 'stretch'
+  maxRow.style.display = 'none'
+
+  const wrap = elLocal('div', { flex: '1', padding: '6px 4px 2px' })
+  const track = elLocal('div', { position: 'relative', height: '18px', margin: '0 9px', background: 'rgba(255,255,255,0.12)', borderRadius: '9px' })
+  const fill = elLocal('div', { position: 'absolute', top: '0', bottom: '0', background: 'var(--dp-accent, #7d8cff)', opacity: '0.5', borderRadius: '9px' })
+  const minHandle = elLocal('div', { position: 'absolute', top: '-3px', width: '18px', height: '24px', marginLeft: '-9px', background: 'var(--dp-accent, #7d8cff)', borderRadius: '4px', cursor: 'ew-resize', touchAction: 'none' })
+  const maxHandle = elLocal('div', { position: 'absolute', top: '-3px', width: '18px', height: '24px', marginLeft: '-9px', background: 'var(--dp-accent, #7d8cff)', borderRadius: '4px', cursor: 'ew-resize', touchAction: 'none' })
+  const readout = elLocal('div', { fontSize: '11px', textAlign: 'center', marginTop: '4px', opacity: '0.85' })
+  track.appendChild(fill); track.appendChild(minHandle); track.appendChild(maxHandle)
+  wrap.appendChild(track); wrap.appendChild(readout)
+  minRow.appendChild(wrap)
+
+  let current = { min: parseFloat(minInput.value) || 0, max: parseFloat(maxInput.value) || 0 }
+  let lastSeenMin = minInput.value, lastSeenMax = maxInput.value
+
+  const updateReadout = attachRangeBarClickToEdit(readout, () => current, (newVal) => { current = newVal; redraw(); commitBoth() }, unit)
+  function redraw() {
+    const minPct = toPct(current.min), maxPct = toPct(current.max)
+    fill.style.left = Math.min(minPct, maxPct) + '%'
+    fill.style.right = (100 - Math.max(minPct, maxPct)) + '%'
+    minHandle.style.left = minPct + '%'
+    maxHandle.style.left = maxPct + '%'
+    updateReadout(current)
+  }
+  function commitBoth() {
+    commitTextControl(minInput, String(current.min))
+    commitTextControl(maxInput, String(current.max))
+  }
+  redraw()
+  armLengthWidgetResyncs.push(() => {
+    if (minInput.value === lastSeenMin && maxInput.value === lastSeenMax) return
+    lastSeenMin = minInput.value; lastSeenMax = maxInput.value
+    current = { min: parseFloat(minInput.value) || 0, max: parseFloat(maxInput.value) || 0 }
+    redraw()
+  })
+  function startDrag(handleKey) {
+    return (downEv) => {
+      downEv.preventDefault()
+      function onMove(moveEv) {
+        const rect = track.getBoundingClientRect()
+        if (rect.width <= 0) return
+        const pct = THREE.MathUtils.clamp((moveEv.clientX - rect.left) / rect.width, 0, 1) * 100
+        current[handleKey] = fromPct(pct)
+        redraw()
+      }
+      function onUp() {
+        window.removeEventListener('pointermove', onMove)
+        window.removeEventListener('pointerup', onUp)
+        commitBoth()
       }
       window.addEventListener('pointermove', onMove)
       window.addEventListener('pointerup', onUp)
@@ -9610,6 +9717,13 @@ function buildClickHoldPoseWidgets(p) {
   // matching comment.
   const startDistanceCurveRow = document.querySelector(`.dp-row[data-key="${p}StartDistanceCurve"]`)
   if (startDistanceCurveRow) buildGenericCurveWidget(startDistanceCurveRow, { caption: 'X: Distance From Cursor (Start Distance Min→Max)  ·  Y: Tween Amount Executed (0=None, 1=Full)', defaultPoints: [{ x: 0, y: 1 }, { x: 1, y: 1 }] })
+  // Direct request 2026-10-01 ("for start distance min max, make that a
+  // single slider") -- see mergeMinMaxSlidersIntoRangeBar()'s own comment.
+  mergeMinMaxSlidersIntoRangeBar(
+    document.querySelector(`.dp-row[data-key="${p}StartDistanceMin"]`),
+    document.querySelector(`.dp-row[data-key="${p}StartDistanceMax"]`),
+    { label: 'Start Distance Min / Max (World Units)', unit: 'wu' }
+  )
 }
 // Runs now, not back up near the other widgets' own setup calls (parse-
 // ArmLengthConfig()/buildWristSplayWidgets() etc.) -- this needs
@@ -9655,6 +9769,13 @@ function buildClickPoseWidgets(p) {
   // Min/Max range slider).
   const startDistanceCurveRow = document.querySelector(`.dp-row[data-key="${p}StartDistanceCurve"]`)
   if (startDistanceCurveRow) buildGenericCurveWidget(startDistanceCurveRow, { caption: 'X: Distance From Cursor (Start Distance Min→Max)  ·  Y: Tween Amount Executed (0=None, 1=Full)', defaultPoints: [{ x: 0, y: 1 }, { x: 1, y: 1 }] })
+  // Direct request 2026-10-01 ("for start distance min max, make that a
+  // single slider") -- see mergeMinMaxSlidersIntoRangeBar()'s own comment.
+  mergeMinMaxSlidersIntoRangeBar(
+    document.querySelector(`.dp-row[data-key="${p}StartDistanceMin"]`),
+    document.querySelector(`.dp-row[data-key="${p}StartDistanceMax"]`),
+    { label: 'Start Distance Min / Max (World Units)', unit: 'wu' }
+  )
 }
 // -----------------------------------------------------------------------
 // Custom Click Functions (Phase 4) -- runtime-created pose triggers, both

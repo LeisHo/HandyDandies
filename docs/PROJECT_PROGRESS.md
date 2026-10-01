@@ -18,6 +18,63 @@ work seamlessly from there.
 
 ## Currently working on
 
+**IN PROGRESS 2026-10-01 (40th round) -- multiple queued requests:
+missing custom click functions, min/max slider rescale, Start Distance
+single-slider, and Multi Trigger extended to hold-kind/Sequence-mode
+functions.** Status per item:
+
+1. **Missing custom click functions ("I added 2, saved, now I can't
+   see them") -- INVESTIGATED, NOT RECOVERABLE from this project's own
+   git-tracked data.** `customClickFunctionIds` currently holds
+   custom7/8/9/10/13/14/15 -- gaps at 11/12/16/17 are confirmed OLD
+   (last referenced in commits dated 2026-09-22 through 09-28, days
+   before this report) via `git log -S`, not from a recent session.
+   No trace of any custom function beyond 15 anywhere in the current
+   file (`values`, `order`, or otherwise). If the 2 functions the user
+   means were created and never successfully synced (e.g. a failed
+   `/api/save-settings` call), their data would only ever have existed
+   in that browser session's own live state, which this project has no
+   way to recover after the fact. **Needs the user's own input** to
+   proceed further: which IDs/titles, and whether Save/Sync was
+   actually clicked and confirmed to succeed at the time.
+2. **"Disappeared when switching Sequence -> Single Pose with 3rd
+   click count" -- NOT YET ROOT-CAUSED.** Read `${p}Mode`'s own
+   onChange (4 visibility-update calls only, nothing that touches
+   `customClickFunctionIds` or deletes a DOM group) -- no obvious bug
+   found there. Needs either a live repro or the specific function's
+   current settings to keep investigating; not productive to keep
+   guessing further without one.
+3. **RESOLVED -- min/max range-bar sliders now rescale when you edit
+   the min/max numbers.** `trackMin`/`trackMax` (the widget's own
+   drawable scale) used to be fixed at build time; editing `current.min`/
+   `current.max` outside that scale just clamped the handle to the
+   edge. Fixed with the same "expand by 20% over" convention §12h
+   already uses for a plain slider's own click-to-edit bound.
+4. **RESOLVED -- Start Distance Min/Max is now a single dual-handle
+   slider**, for both hold-kind and pose-kind custom functions. Kept
+   the 2 real underlying settings/cfg keys unchanged (no schema
+   migration, no risk to already-tuned values on custom7-15) --
+   only the visual presentation merges into one row; dragging either
+   handle writes back to both real `<input type=range>` elements the
+   same way every other main.js-driven devPanel.js control already
+   does.
+5. **NOT YET STARTED -- Multi Trigger extended to hold-kind functions
+   and to Sequence-mode (any kind); pose-match-skip-to-next-target
+   logic.** Confirmed via AskUserQuestion: applies to BOTH pose-kind
+   and hold-kind functions in ANY mode; the pose-match check also
+   applies to Sequence-mode triggers, compared against the sequence's
+   first/anchor pose. This is a genuinely large change (mirrors the
+   entire pose-kind Multi Trigger system for `CLICK_HOLD_KEYS`/
+   `clickHoldPoseTriggers`) -- not yet implemented.
+6. **A pasted "buggy test" log was reviewed** -- the behavior shown
+   (a single click resolving Multi Trigger's shared per-function cycle
+   counter, firing the SAME resolved trigger for every hand that
+   function drives) matches this feature's own documented, intentional
+   design ("a single shared counter per function, not per-hand -- one
+   user click advances the cycle once, for every hand"). Nothing in
+   that specific log looks like a NEW bug distinct from items 1/2/5
+   above.
+
 **RESOLVED 2026-09-30 (39th round) -- real production outage on the
 live Vercel deployment: "pause button is blank and nothing is loading"
 (same symptom signature as the 2026-09-29 TDZ outage, different cause).**
