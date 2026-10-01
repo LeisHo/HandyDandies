@@ -6662,7 +6662,7 @@
       "emissionColor": "#ffffff",
       "emissionIntensity": 1.5,
       "bgColor": "#000000",
-      "pixelRatio": 2,
+      "pixelRatio": 1.25,
       "resolutionScale": 100,
       "qualityPreset": "high",
       "showGridHelper": false,
@@ -13985,7 +13985,7 @@
       "emissionColor": "#ffffff",
       "emissionIntensity": 1.5,
       "bgColor": "#000000",
-      "pixelRatio": 2,
+      "pixelRatio": 1.25,
       "resolutionScale": 100,
       "qualityPreset": "high",
       "showGridHelper": false,
@@ -21308,7 +21308,7 @@
       "emissionColor": "#ffffff",
       "emissionIntensity": 1.5,
       "bgColor": "#000000",
-      "pixelRatio": 2,
+      "pixelRatio": 1.25,
       "resolutionScale": 100,
       "qualityPreset": "high",
       "showGridHelper": false,
@@ -26368,7 +26368,7 @@
     },
     {
       "key": "Custom Click Functions",
-      "collapsed": false,
+      "collapsed": true,
       "locked": false,
       "items": [
         {
