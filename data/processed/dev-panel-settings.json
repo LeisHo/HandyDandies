@@ -7111,9 +7111,9 @@
       "custom13Trig1RotationZ": 5,
       "custom13Trig1TargetPose": "COUNTDOWN (VERT) - 3",
       "custom13Trig1TweenSelector": "Birdie",
-      "custom13Trig1TweenSpeedMs": 3000,
+      "custom13Trig1TweenSpeedMs": 5000,
       "custom13Trig1TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom13Trig1TweenStartTimeRange": "{\"min\":0,\"max\":1711}",
+      "custom13Trig1TweenStartTimeRange": "{\"min\":0,\"max\":3000}",
       "custom13Trig1TransitionSpeedMs": 2000,
       "custom13Trig1SpeedCurveEnabled": false,
       "custom13Trig1SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -7167,7 +7167,7 @@
       "custom13Trig2RetransitionSpeedCurveRange": "{\"min\":10000,\"max\":20000}",
       "custom13Trig2RetransitionStartTimeCurveEnabled": true,
       "custom13Trig2RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom13Trig2RetransitionStartTimeRange": "{\"min\":0,\"max\":2156}",
+      "custom13Trig2RetransitionStartTimeRange": "{\"min\":0,\"max\":3000}",
       "custom14Enabled": true,
       "custom14Type": "Right Click",
       "custom14TouchPointCount": 1,
@@ -14434,9 +14434,9 @@
       "custom13Trig1RotationZ": 5,
       "custom13Trig1TargetPose": "COUNTDOWN (VERT) - 3",
       "custom13Trig1TweenSelector": "Birdie",
-      "custom13Trig1TweenSpeedMs": 3000,
+      "custom13Trig1TweenSpeedMs": 5000,
       "custom13Trig1TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom13Trig1TweenStartTimeRange": "{\"min\":0,\"max\":1711}",
+      "custom13Trig1TweenStartTimeRange": "{\"min\":0,\"max\":3000}",
       "custom13Trig1TransitionSpeedMs": 2000,
       "custom13Trig1SpeedCurveEnabled": false,
       "custom13Trig1SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -14490,7 +14490,7 @@
       "custom13Trig2RetransitionSpeedCurveRange": "{\"min\":10000,\"max\":20000}",
       "custom13Trig2RetransitionStartTimeCurveEnabled": true,
       "custom13Trig2RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom13Trig2RetransitionStartTimeRange": "{\"min\":0,\"max\":2156}",
+      "custom13Trig2RetransitionStartTimeRange": "{\"min\":0,\"max\":3000}",
       "custom14Enabled": true,
       "custom14Type": "Right Click",
       "custom14TouchPointCount": 1,
@@ -21757,9 +21757,9 @@
       "custom13Trig1RotationZ": 5,
       "custom13Trig1TargetPose": "COUNTDOWN (VERT) - 3",
       "custom13Trig1TweenSelector": "Birdie",
-      "custom13Trig1TweenSpeedMs": 3000,
+      "custom13Trig1TweenSpeedMs": 5000,
       "custom13Trig1TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom13Trig1TweenStartTimeRange": "{\"min\":0,\"max\":1711}",
+      "custom13Trig1TweenStartTimeRange": "{\"min\":0,\"max\":3000}",
       "custom13Trig1TransitionSpeedMs": 2000,
       "custom13Trig1SpeedCurveEnabled": false,
       "custom13Trig1SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -21813,7 +21813,7 @@
       "custom13Trig2RetransitionSpeedCurveRange": "{\"min\":10000,\"max\":20000}",
       "custom13Trig2RetransitionStartTimeCurveEnabled": true,
       "custom13Trig2RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom13Trig2RetransitionStartTimeRange": "{\"min\":0,\"max\":2156}",
+      "custom13Trig2RetransitionStartTimeRange": "{\"min\":0,\"max\":3000}",
       "custom14Enabled": true,
       "custom14Type": "Right Click",
       "custom14TouchPointCount": 1,
@@ -29301,7 +29301,7 @@
                             "type": "group",
                             "group": {
                               "key": "Retransition",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -29535,7 +29535,7 @@
                           },
                           {
                             "key": "Retransition",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -30331,7 +30331,7 @@
                           "type": "group",
                           "group": {
                             "key": "Retransition",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -30565,7 +30565,7 @@
                         },
                         {
                           "key": "Retransition",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -31606,7 +31606,7 @@
                           "type": "group",
                           "group": {
                             "key": "Retransition",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -31840,7 +31840,7 @@
                         },
                         {
                           "key": "Retransition",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -32636,7 +32636,7 @@
                         "type": "group",
                         "group": {
                           "key": "Retransition",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -32870,7 +32870,7 @@
                       },
                       {
                         "key": "Retransition",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -47606,7 +47606,7 @@
                           "type": "group",
                           "group": {
                             "key": "Retransition",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -47840,7 +47840,7 @@
                         },
                         {
                           "key": "Retransition",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -48636,7 +48636,7 @@
                         "type": "group",
                         "group": {
                           "key": "Retransition",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -48870,7 +48870,7 @@
                       },
                       {
                         "key": "Retransition",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -49911,7 +49911,7 @@
                         "type": "group",
                         "group": {
                           "key": "Retransition",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -50145,7 +50145,7 @@
                       },
                       {
                         "key": "Retransition",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -50941,7 +50941,7 @@
                       "type": "group",
                       "group": {
                         "key": "Retransition",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -51175,7 +51175,7 @@
                     },
                     {
                       "key": "Retransition",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
