@@ -15326,6 +15326,60 @@ being a standard, trivial 1-line invert on a well-established
 
 `main.js` cache-buster bumped `?v=268` -> `?v=269`.
 
+2026-10-02  -  (fix -- Cursor Offset now uses all 3 axes, not just
+camera right/up)
+
+Direct request, immediately following the Invert All Colors entry
+above: "For Cursor Offset mode, include all 3 axes, not just up down
+left right." The 2026-10-01 axis-correction fix added camera-up
+alongside camera-right but deliberately EXCLUDED the camera-forward/
+depth axis ("whichever axis is perp to the camera, thats the one we
+dont offset in") -- this reverses that exclusion specifically for
+Cursor Offset mode: `computeOffsetXY()` now projects the hand-to-cursor
+vector onto all 3 camera-local axes (right, up, AND forward) and
+normalizes the resulting 3D vector into a unit direction, so Cursor
+Offset moves the hand directly toward/away from the cursor in full 3D
+space -- including straight toward/away from the camera when the
+cursor sits nearer/farther in depth than the hand, which previously
+produced zero movement no matter the configured distance.
+
+New `_offsetForwardVec` (camera matrixWorld column 2) added alongside
+the existing `_offsetRightVec`/`_offsetUpVec`, set every frame in
+`applyOffsetRotationToHand()` the same way. `hand._customOffsetAccum`
+extended from `{x,y}` to `{x,y,z}` at all 5 real touchpoints --
+`applyOffsetRotationToHand()`'s own init/baseline-apply,
+`bakeOffsetRotationIntoAccum()`'s init/credit,
+`bakeInFlightOffsetRotation()`'s init/partial-credit,
+`applyOffsetRotationRetransition()`'s own decay (new `decayedZ`,
+mirroring `decayedX`/`decayedY` exactly) and its continuous accumulator
+sync, and both `retransitionOffsetAccumStart` snapshot fallback
+defaults (`chp`'s and `cp`'s) -- missing any one of these would have
+reproduced exactly the class of snap/drift bug this project's own
+10-round "jump investigation" exists to prevent, just for the new Z
+axis specifically rather than the whole feature. XYZ Offset mode's own
+return value now also carries an explicit `z: 0` (it has no Z control
+of its own) so every caller can read a uniform `{x,y,z}` shape
+regardless of mode. Refreshed 2 stale control-definition comments
+(both `OffsetMode` dropdowns, hold-kind and pose-kind factories) that
+still described the ORIGINAL 1-axis version from before even
+yesterday's 2-axis fix.
+
+Verified via an isolated 4-case logic reproduction: cursor directly
+ahead in depth only now produces full-magnitude forward movement
+(previously zero under the 2-axis version); a diagonal up-right-forward
+cursor splits evenly across all 3 axes at the configured magnitude; a
+pure-horizontal cursor still matches the unchanged 2-axis behavior
+exactly (regression check); hand-and-cursor-at-the-same-position stays
+a clean zero, no `NaN`. All 4 passed. `node --check` passes.
+
+**Not live-verified in browser** -- the local static server's own
+documented network-truncation quirk failed all 5 navigation attempts
+(the standing retry cap) on `main.js?v=270`, `window.__debug` never
+populated. Confidence rests on the isolated logic reproduction plus
+direct tracing of all 5 accumulator touchpoints before shipping.
+
+`main.js` cache-buster bumped `?v=269` -> `?v=270`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

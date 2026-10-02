@@ -3787,14 +3787,13 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       // Direct request 2026-10-01: "provide a dropdown, there are 2
       // options, XYZ offset, which is what it is currently, and Cursor
       // Offset." XYZ Offset is the pre-existing camera-right/up
-      // OffsetX/OffsetY behavior, unchanged. Cursor Offset is new: ONE
-      // signed distance slider (no X/Y split -- "horizontal towards or
-      // away from the cursor" is a single direction, not 2 independent
-      // axes) that displaces the hand along the camera-right axis,
-      // toward the cursor for a positive value and away for a negative
-      // one, regardless of which side of the hand the cursor is
-      // currently on -- see applyOffsetRotationToHand()'s own comment
-      // for the per-hand direction-sign math.
+      // OffsetX/OffsetY behavior, unchanged. Cursor Offset is ONE
+      // signed distance slider (no X/Y/Z split) that displaces the hand
+      // toward (positive) or away from (negative) the cursor, along
+      // whichever full 3D direction that actually is -- extended
+      // 2026-10-02 to all 3 camera-local axes (was right+up only) -- see
+      // computeOffsetXY()'s own comment for the full axis history and
+      // the per-hand direction math.
       { key: `${p}OffsetMode`, label: 'Offset Mode', type: 'select', def: 'XYZ Offset', options: () => ['XYZ Offset', 'Cursor Offset'], onChange: () => updateOffsetRotationVisibility(p) },
       { key: `${p}OffsetX`, label: 'Offset X (World Units)', type: 'slider', min: -50, max: 50, step: 0.5, def: 0 },
       { key: `${p}OffsetY`, label: 'Offset Y (World Units)', type: 'slider', min: -50, max: 50, step: 0.5, def: 0 },
@@ -4123,14 +4122,13 @@ function makeClickPoseGroup(p, title, defaults = {}) {
       // Direct request 2026-10-01: "provide a dropdown, there are 2
       // options, XYZ offset, which is what it is currently, and Cursor
       // Offset." XYZ Offset is the pre-existing camera-right/up
-      // OffsetX/OffsetY behavior, unchanged. Cursor Offset is new: ONE
-      // signed distance slider (no X/Y split -- "horizontal towards or
-      // away from the cursor" is a single direction, not 2 independent
-      // axes) that displaces the hand along the camera-right axis,
-      // toward the cursor for a positive value and away for a negative
-      // one, regardless of which side of the hand the cursor is
-      // currently on -- see applyOffsetRotationToHand()'s own comment
-      // for the per-hand direction-sign math.
+      // OffsetX/OffsetY behavior, unchanged. Cursor Offset is ONE
+      // signed distance slider (no X/Y/Z split) that displaces the hand
+      // toward (positive) or away from (negative) the cursor, along
+      // whichever full 3D direction that actually is -- extended
+      // 2026-10-02 to all 3 camera-local axes (was right+up only) -- see
+      // computeOffsetXY()'s own comment for the full axis history and
+      // the per-hand direction math.
       { key: `${p}OffsetMode`, label: 'Offset Mode', type: 'select', def: 'XYZ Offset', options: () => ['XYZ Offset', 'Cursor Offset'], onChange: () => updateOffsetRotationVisibility(p) },
       { key: `${p}OffsetX`, label: 'Offset X (World Units)', type: 'slider', min: -50, max: 50, step: 0.5, def: 0 },
       { key: `${p}OffsetY`, label: 'Offset Y (World Units)', type: 'slider', min: -50, max: 50, step: 0.5, def: 0 },
@@ -7075,6 +7073,14 @@ function applyPoseValuesToHand(hand, poseValues, extraSplayDeg) {
 }
 const _offsetRightVec = new THREE.Vector3()
 const _offsetUpVec = new THREE.Vector3()
+// Added 2026-10-02, direct request ("include all 3 axes, not just up
+// down left right") -- Cursor Offset's own 3rd camera-local axis
+// (camera matrixWorld column 2), used only by Cursor Offset mode. Set
+// alongside _offsetRightVec/_offsetUpVec in applyOffsetRotationToHand()
+// every frame -- bakeOffsetRotationIntoAccum()/bakeInFlightOffsetRotation()
+// rely on whichever value was set most recently THIS frame, same
+// existing convention the other 2 camera-local vectors already use.
+const _offsetForwardVec = new THREE.Vector3()
 const _offsetEuler = new THREE.Euler()
 const _offsetQuat = new THREE.Quaternion()
 const _offsetHandToCursor = new THREE.Vector3()
@@ -7092,33 +7098,35 @@ let liveFieldMinDist = 0, liveFieldDistRange = 0.001
 // bakeOffsetRotationIntoAccum()/bakeInFlightOffsetRotation()'s own
 // permanent-accumulator credits) so Cursor Offset behaves identically
 // through every one of those paths, not just the live-render one.
-// Cursor Offset is ONE signed distance along the camera-right axis --
-// "horizontal towards or away from the cursor" is a single direction,
-// not an independent X/Y pair, so there is no cursor-mode equivalent of
-// OffsetY (Y stays 0 in that mode).
+// Cursor Offset moves the hand toward/away from the cursor in full 3D
+// space -- see computeOffsetXY()'s own comment for the axis history
+// (right+up only, then all 3) -- every caller reads a plain `{x,y,z}`
+// object regardless of mode; XYZ Offset mode has no Z control of its
+// own, so its own `z` is always 0.
 function computeOffsetXY(hand, p) {
   if (cfg[`${p}OffsetMode`] === 'Cursor Offset') {
     // CORRECTED 2026-10-01, direct report: "the offset cursor is the
     // wrong axes. whichever axis is perp to the camera, thats the one
     // we dont offset in. so x y local to camera." The original version
-    // only read the camera-RIGHT component (a single left/right sign),
-    // silently dropping any vertical difference between the hand and
-    // the cursor -- "toward the cursor" ignored up/down entirely. Fixed
-    // to project the hand-to-cursor vector onto BOTH camera-local axes
-    // (right AND up), excluding only the camera-FORWARD/depth axis (the
-    // one "perp to the camera" -- depth differences don't correspond to
-    // any real on-screen direction to move toward), then normalizes
-    // that 2D (right, up) pair into a unit direction so the configured
-    // distance scales the actual STEP SIZE, not an already-distance-
-    // weighted vector -- a positive distance moves the hand toward the
-    // cursor along this full in-plane direction, negative moves it away,
-    // matching the original "towards or away" framing, just correctly
-    // 2-dimensional instead of 1-dimensional.
+    // only read the camera-RIGHT component (a single left/right sign);
+    // fixed to also project onto camera-up, excluding only camera-
+    // forward/depth.
+    //
+    // EXTENDED 2026-10-02, direct request: "include all 3 axes, not
+    // just up down left right." The depth axis is no longer excluded --
+    // projects the hand-to-cursor vector onto all 3 camera-local axes
+    // (right, up, AND forward), normalizes that 3D vector into a unit
+    // direction so the configured distance scales the actual STEP SIZE,
+    // not an already-distance-weighted vector -- a positive distance
+    // moves the hand directly toward the cursor in full 3D (including
+    // straight toward/away from the camera when the cursor sits nearer/
+    // farther in depth), negative moves it directly away.
     _offsetHandToCursor.subVectors(cursorTarget, hand.wrapper.position)
     const rightComp = _offsetHandToCursor.dot(_offsetRightVec)
     const upComp = _offsetHandToCursor.dot(_offsetUpVec)
-    const planarLen = Math.hypot(rightComp, upComp)
-    if (planarLen < 1e-6) return { x: 0, y: 0 } // cursor directly in front of/behind the hand -- no well-defined in-plane direction
+    const forwardComp = _offsetHandToCursor.dot(_offsetForwardVec)
+    const len3 = Math.hypot(rightComp, upComp, forwardComp)
+    if (len3 < 1e-6) return { x: 0, y: 0, z: 0 } // hand and cursor at the exact same position -- no well-defined direction
     // Cursor Offset Distance Curve (2026-10-01): when enabled, the flat
     // CursorOffsetDistance slider is replaced by a per-hand, distance-
     // driven value instead -- X is THIS hand's own LIVE distance to the
@@ -7131,9 +7139,9 @@ function computeOffsetXY(hand, p) {
     const dist = (cfg[`${p}CursorOffsetDistanceCurveEnabled`] && trig)
       ? computeStartDelayMs(hand.wrapper.position.distanceTo(cursorTarget), liveFieldMinDist, liveFieldDistRange, trig.cursorOffsetDistanceCurveParsed, trig.cursorOffsetDistanceRangeParsed)
       : (cfg[`${p}CursorOffsetDistance`] || 0)
-    return { x: (rightComp / planarLen) * dist, y: (upComp / planarLen) * dist }
+    return { x: (rightComp / len3) * dist, y: (upComp / len3) * dist, z: (forwardComp / len3) * dist }
   }
-  return { x: cfg[`${p}OffsetX`] || 0, y: cfg[`${p}OffsetY`] || 0 }
+  return { x: cfg[`${p}OffsetX`] || 0, y: cfg[`${p}OffsetY`] || 0, z: 0 }
 }
 // CORRECTED 2026-09-27 -- direct spec, 3 related items:
 // (2) "each click function's offset and rotation effects will be
@@ -7177,7 +7185,7 @@ function computeOffsetXY(hand, p) {
 // completed state -- otherwise the same increment would be re-added
 // every single frame, growing without bound even while perfectly still.
 function applyOffsetRotationToHand(hand, p, progress) {
-  if (!hand._customOffsetAccum) hand._customOffsetAccum = { x: 0, y: 0 }
+  if (!hand._customOffsetAccum) hand._customOffsetAccum = { x: 0, y: 0, z: 0 }
   if (!hand._customRotationAccum) hand._customRotationAccum = new THREE.Quaternion()
   // CORRECTED 2026-09-27 (4th round of this same jump investigation) --
   // records the CURRENT ramp/lap's own in-flight progress fraction so
@@ -7189,27 +7197,32 @@ function applyOffsetRotationToHand(hand, p, progress) {
   hand._lastOffsetRotationProgress[p] = progress
   _offsetRightVec.setFromMatrixColumn(camera.matrixWorld, 0)
   _offsetUpVec.setFromMatrixColumn(camera.matrixWorld, 1)
+  _offsetForwardVec.setFromMatrixColumn(camera.matrixWorld, 2)
   // Accumulated baseline from every previously-completed ramp/lap
   // (any function) -- applied unconditionally, regardless of whether
   // THIS function's own Offset/Rotation happens to be enabled, so a
   // 2nd function with Offset off still doesn't erase the 1st function's
   // already-locked-in contribution (item 2's own "even if the 2nd
   // function doesn't have its own offset" case).
-  if (hand._customOffsetAccum.x !== 0 || hand._customOffsetAccum.y !== 0) {
+  if (hand._customOffsetAccum.x !== 0 || hand._customOffsetAccum.y !== 0 || hand._customOffsetAccum.z !== 0) {
     hand.wrapper.position.addScaledVector(_offsetRightVec, hand._customOffsetAccum.x)
     hand.wrapper.position.addScaledVector(_offsetUpVec, hand._customOffsetAccum.y)
+    hand.wrapper.position.addScaledVector(_offsetForwardVec, hand._customOffsetAccum.z)
   }
   if (!isIdentityQuat(hand._customRotationAccum)) hand.wrapper.quaternion.multiply(hand._customRotationAccum)
   if (cfg[`${p}OffsetEnabled`]) {
     const base = computeOffsetXY(hand, p)
     const ox = base.x * progress
     const oy = base.y * progress
-    if (ox !== 0 || oy !== 0) {
-      // Camera-relative right/up, not world/local axes -- this project's
-      // camera only pans/zooms, never rotates, so these stay a stable
-      // "up down left right in browser terms" regardless of framing.
+    const oz = base.z * progress
+    if (ox !== 0 || oy !== 0 || oz !== 0) {
+      // Camera-relative right/up/forward, not world/local axes -- this
+      // project's camera only pans/zooms, never rotates, so these stay
+      // stable "up down left right, toward/away from camera" regardless
+      // of framing.
       hand.wrapper.position.addScaledVector(_offsetRightVec, ox)
       hand.wrapper.position.addScaledVector(_offsetUpVec, oy)
+      hand.wrapper.position.addScaledVector(_offsetForwardVec, oz)
     }
   }
   if (cfg[`${p}RotationEnabled`]) {
@@ -7231,12 +7244,13 @@ function isIdentityQuat(q) { return q.x === 0 && q.y === 0 && q.z === 0 && q.w =
 // machine, at the instant a ramp/lap's own progress crosses 1. See
 // applyOffsetRotationToHand()'s own comment for the full model.
 function bakeOffsetRotationIntoAccum(hand, p) {
-  if (!hand._customOffsetAccum) hand._customOffsetAccum = { x: 0, y: 0 }
+  if (!hand._customOffsetAccum) hand._customOffsetAccum = { x: 0, y: 0, z: 0 }
   if (!hand._customRotationAccum) hand._customRotationAccum = new THREE.Quaternion()
   if (cfg[`${p}OffsetEnabled`]) {
     const base = computeOffsetXY(hand, p)
     hand._customOffsetAccum.x += base.x
     hand._customOffsetAccum.y += base.y
+    hand._customOffsetAccum.z += base.z
   }
   if (cfg[`${p}RotationEnabled`]) {
     const rx = cfg[`${p}RotationX`] || 0, ry = cfg[`${p}RotationY`] || 0, rz = cfg[`${p}RotationZ`] || 0
@@ -7270,12 +7284,13 @@ function bakeOffsetRotationIntoAccum(hand, p) {
 function bakeInFlightOffsetRotation(hand, p) {
   const fraction = (hand._lastOffsetRotationProgress && hand._lastOffsetRotationProgress[p]) || 0
   if (fraction <= 0) return
-  if (!hand._customOffsetAccum) hand._customOffsetAccum = { x: 0, y: 0 }
+  if (!hand._customOffsetAccum) hand._customOffsetAccum = { x: 0, y: 0, z: 0 }
   if (!hand._customRotationAccum) hand._customRotationAccum = new THREE.Quaternion()
   if (cfg[`${p}OffsetEnabled`]) {
     const base = computeOffsetXY(hand, p)
     hand._customOffsetAccum.x += base.x * fraction
     hand._customOffsetAccum.y += base.y * fraction
+    hand._customOffsetAccum.z += base.z * fraction
   }
   if (cfg[`${p}RotationEnabled`]) {
     const rx = (cfg[`${p}RotationX`] || 0) * fraction, ry = (cfg[`${p}RotationY`] || 0) * fraction, rz = (cfg[`${p}RotationZ`] || 0) * fraction
@@ -7298,11 +7313,14 @@ function applyOffsetRotationRetransition(hand, progress, offsetAccumStart, rotat
   const remaining = 1 - progress
   const decayedX = offsetAccumStart ? offsetAccumStart.x * remaining : 0
   const decayedY = offsetAccumStart ? offsetAccumStart.y * remaining : 0
-  if (decayedX !== 0 || decayedY !== 0) {
+  const decayedZ = offsetAccumStart ? (offsetAccumStart.z || 0) * remaining : 0
+  if (decayedX !== 0 || decayedY !== 0 || decayedZ !== 0) {
     _offsetRightVec.setFromMatrixColumn(camera.matrixWorld, 0)
     _offsetUpVec.setFromMatrixColumn(camera.matrixWorld, 1)
+    _offsetForwardVec.setFromMatrixColumn(camera.matrixWorld, 2)
     hand.wrapper.position.addScaledVector(_offsetRightVec, decayedX)
     hand.wrapper.position.addScaledVector(_offsetUpVec, decayedY)
+    hand.wrapper.position.addScaledVector(_offsetForwardVec, decayedZ)
   }
   const hasRotation = rotationAccumStart && !isIdentityQuat(rotationAccumStart)
   if (hasRotation) {
@@ -7325,7 +7343,7 @@ function applyOffsetRotationRetransition(hand, progress, offsetAccumStart, rotat
   // scratch var reused elsewhere in this file every frame, so the
   // rotation accumulator is written via a fresh identity+slerp rather
   // than aliasing that shared reference.
-  if (hand._customOffsetAccum) { hand._customOffsetAccum.x = decayedX; hand._customOffsetAccum.y = decayedY }
+  if (hand._customOffsetAccum) { hand._customOffsetAccum.x = decayedX; hand._customOffsetAccum.y = decayedY; hand._customOffsetAccum.z = decayedZ }
   if (hand._customRotationAccum) {
     if (hasRotation) hand._customRotationAccum.identity().slerp(rotationAccumStart, remaining)
     else hand._customRotationAccum.identity()
@@ -7603,7 +7621,7 @@ function safeTweenSpeedMs(v) { return Number.isFinite(v) ? v : 800 }
 // by a DIFFERENT function, per item 2), not just this one's own last
 // increment.
 function snapshotOffsetRotationAccumForRetransition(hand, chp) {
-  chp.retransitionOffsetAccumStart = hand._customOffsetAccum ? { ...hand._customOffsetAccum } : { x: 0, y: 0 }
+  chp.retransitionOffsetAccumStart = hand._customOffsetAccum ? { ...hand._customOffsetAccum } : { x: 0, y: 0, z: 0 }
   chp.retransitionRotationAccumStart = hand._customRotationAccum ? hand._customRotationAccum.clone() : new THREE.Quaternion()
   // CORRECTED 2026-09-27 -- same "no jump on handoff" fix as
   // applyPoseValuesToHand()'s own comment, captured here since all 3 real
@@ -8966,7 +8984,7 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
       // include contributions stacked in by OTHER functions, per item 2,
       // not just this one) once, right here, so retransition unwinds the
       // real total rather than just this function's own last increment.
-      cp.retransitionOffsetAccumStart = hand._customOffsetAccum ? { ...hand._customOffsetAccum } : { x: 0, y: 0 }
+      cp.retransitionOffsetAccumStart = hand._customOffsetAccum ? { ...hand._customOffsetAccum } : { x: 0, y: 0, z: 0 }
       cp.retransitionRotationAccumStart = hand._customRotationAccum ? hand._customRotationAccum.clone() : new THREE.Quaternion()
       // CORRECTED 2026-09-27 -- see updateClickHoldPoseForHand()'s own
       // matching capture for the full reasoning.
