@@ -6869,7 +6869,7 @@
       "custom8TargetPose": "",
       "custom8TweenSelector": "FLOWER 3",
       "custom8TweenChain": [],
-      "custom8TweenSpeedMs": 5000,
+      "custom8TweenSpeedMs": 7000,
       "custom8TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom8TweenStartTimeRange": "{\"min\":0,\"max\":2929}",
       "custom8LoopMode": "Loop",
@@ -6887,26 +6887,26 @@
       "custom8StartDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
       "custom8RetransitionEnabled": true,
       "custom8RetransitionSpeedMs": 400,
-      "custom8RetransitionSpeedCurveEnabled": false,
+      "custom8RetransitionSpeedCurveEnabled": true,
       "custom8RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom8RetransitionSpeedCurveRange": "{\"min\":50,\"max\":2000}",
       "custom8RetransitionStartTimeCurveEnabled": true,
       "custom8RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom8RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "custom8TweenRetransitionSpeedMs": 12000,
-      "custom8TweenRetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom8TweenRetransitionSpeedCurveRange": "{\"min\":5000,\"max\":12000}",
+      "custom8TweenRetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":0.3881894505245363,\"y\":0.6448958079020182},{\"x\":1,\"y\":1}]",
+      "custom8TweenRetransitionSpeedCurveRange": "{\"min\":15000,\"max\":25000}",
       "custom8TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom8TweenRetransitionStartTimeRange": "{\"min\":0,\"max\":3000}",
       "custom8TweenStopEnabled": true,
       "custom8TweenStopStartTimeCurveEnabled": true,
-      "custom8TweenStopStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom8TweenStopStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.2920356073407128,\"y\":0.5210416158040365},{\"x\":1,\"y\":1}]",
       "custom8TweenStopStartTimeRange": "{\"min\":0,\"max\":3000}",
       "custom8TweenStopDelayEnabled": true,
-      "custom8TweenStopDelayMs": 1570,
+      "custom8TweenStopDelayMs": 5000,
       "custom8TweenStopDelayCurveEnabled": true,
-      "custom8TweenStopDelayCurve": "[{\"x\":0,\"y\":0.22156244913736978},{\"x\":1,\"y\":1}]",
-      "custom8TweenStopDelayRange": "{\"min\":1075,\"max\":5000}",
+      "custom8TweenStopDelayCurve": "[{\"x\":0,\"y\":0},{\"x\":0.6235133298954727,\"y\":0.3736457824707031},{\"x\":1,\"y\":1}]",
+      "custom8TweenStopDelayRange": "{\"min\":2614,\"max\":5000}",
       "custom8MultiTriggerEnabled": false,
       "custom8MultiTriggers": "[]",
       "custom9Enabled": true,
@@ -14364,7 +14364,7 @@
       "custom8TargetPose": "",
       "custom8TweenSelector": "FLOWER 3",
       "custom8TweenChain": [],
-      "custom8TweenSpeedMs": 5000,
+      "custom8TweenSpeedMs": 7000,
       "custom8TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom8TweenStartTimeRange": "{\"min\":0,\"max\":2929}",
       "custom8LoopMode": "Loop",
@@ -14382,26 +14382,26 @@
       "custom8StartDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
       "custom8RetransitionEnabled": true,
       "custom8RetransitionSpeedMs": 400,
-      "custom8RetransitionSpeedCurveEnabled": false,
+      "custom8RetransitionSpeedCurveEnabled": true,
       "custom8RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom8RetransitionSpeedCurveRange": "{\"min\":50,\"max\":2000}",
       "custom8RetransitionStartTimeCurveEnabled": true,
       "custom8RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom8RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "custom8TweenRetransitionSpeedMs": 12000,
-      "custom8TweenRetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom8TweenRetransitionSpeedCurveRange": "{\"min\":5000,\"max\":12000}",
+      "custom8TweenRetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":0.3881894505245363,\"y\":0.6448958079020182},{\"x\":1,\"y\":1}]",
+      "custom8TweenRetransitionSpeedCurveRange": "{\"min\":15000,\"max\":25000}",
       "custom8TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom8TweenRetransitionStartTimeRange": "{\"min\":0,\"max\":3000}",
       "custom8TweenStopEnabled": true,
       "custom8TweenStopStartTimeCurveEnabled": true,
-      "custom8TweenStopStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom8TweenStopStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.2920356073407128,\"y\":0.5210416158040365},{\"x\":1,\"y\":1}]",
       "custom8TweenStopStartTimeRange": "{\"min\":0,\"max\":3000}",
       "custom8TweenStopDelayEnabled": true,
-      "custom8TweenStopDelayMs": 1570,
+      "custom8TweenStopDelayMs": 5000,
       "custom8TweenStopDelayCurveEnabled": true,
-      "custom8TweenStopDelayCurve": "[{\"x\":0,\"y\":0.22156244913736978},{\"x\":1,\"y\":1}]",
-      "custom8TweenStopDelayRange": "{\"min\":1075,\"max\":5000}",
+      "custom8TweenStopDelayCurve": "[{\"x\":0,\"y\":0},{\"x\":0.6235133298954727,\"y\":0.3736457824707031},{\"x\":1,\"y\":1}]",
+      "custom8TweenStopDelayRange": "{\"min\":2614,\"max\":5000}",
       "custom8MultiTriggerEnabled": false,
       "custom8MultiTriggers": "[]",
       "custom9Enabled": true,
@@ -21859,7 +21859,7 @@
       "custom8TargetPose": "",
       "custom8TweenSelector": "FLOWER 3",
       "custom8TweenChain": [],
-      "custom8TweenSpeedMs": 5000,
+      "custom8TweenSpeedMs": 7000,
       "custom8TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom8TweenStartTimeRange": "{\"min\":0,\"max\":2929}",
       "custom8LoopMode": "Loop",
@@ -21877,26 +21877,26 @@
       "custom8StartDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
       "custom8RetransitionEnabled": true,
       "custom8RetransitionSpeedMs": 400,
-      "custom8RetransitionSpeedCurveEnabled": false,
+      "custom8RetransitionSpeedCurveEnabled": true,
       "custom8RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom8RetransitionSpeedCurveRange": "{\"min\":50,\"max\":2000}",
       "custom8RetransitionStartTimeCurveEnabled": true,
       "custom8RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom8RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "custom8TweenRetransitionSpeedMs": 12000,
-      "custom8TweenRetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom8TweenRetransitionSpeedCurveRange": "{\"min\":5000,\"max\":12000}",
+      "custom8TweenRetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":0.3881894505245363,\"y\":0.6448958079020182},{\"x\":1,\"y\":1}]",
+      "custom8TweenRetransitionSpeedCurveRange": "{\"min\":15000,\"max\":25000}",
       "custom8TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom8TweenRetransitionStartTimeRange": "{\"min\":0,\"max\":3000}",
       "custom8TweenStopEnabled": true,
       "custom8TweenStopStartTimeCurveEnabled": true,
-      "custom8TweenStopStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom8TweenStopStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.2920356073407128,\"y\":0.5210416158040365},{\"x\":1,\"y\":1}]",
       "custom8TweenStopStartTimeRange": "{\"min\":0,\"max\":3000}",
       "custom8TweenStopDelayEnabled": true,
-      "custom8TweenStopDelayMs": 1570,
+      "custom8TweenStopDelayMs": 5000,
       "custom8TweenStopDelayCurveEnabled": true,
-      "custom8TweenStopDelayCurve": "[{\"x\":0,\"y\":0.22156244913736978},{\"x\":1,\"y\":1}]",
-      "custom8TweenStopDelayRange": "{\"min\":1075,\"max\":5000}",
+      "custom8TweenStopDelayCurve": "[{\"x\":0,\"y\":0},{\"x\":0.6235133298954727,\"y\":0.3736457824707031},{\"x\":1,\"y\":1}]",
+      "custom8TweenStopDelayRange": "{\"min\":2614,\"max\":5000}",
       "custom8MultiTriggerEnabled": false,
       "custom8MultiTriggers": "[]",
       "custom9Enabled": true,
@@ -42243,7 +42243,7 @@
                 "type": "group",
                 "group": {
                   "key": "Retransition",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -42393,14 +42393,14 @@
                 "type": "group",
                 "group": {
                   "key": "Tween Stop",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
                       "type": "group",
                       "group": {
                         "key": "Tween Stop Start Time Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -42423,7 +42423,7 @@
                       "type": "group",
                       "group": {
                         "key": "Tween Stop Delay",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -42457,7 +42457,7 @@
                   "subgroups": [
                     {
                       "key": "Tween Stop Start Time Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -42477,7 +42477,7 @@
                     },
                     {
                       "key": "Tween Stop Delay",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -42695,7 +42695,7 @@
               },
               {
                 "key": "Retransition",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -42842,14 +42842,14 @@
               },
               {
                 "key": "Tween Stop",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
                     "type": "group",
                     "group": {
                       "key": "Tween Stop Start Time Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -42872,7 +42872,7 @@
                     "type": "group",
                     "group": {
                       "key": "Tween Stop Delay",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -42906,7 +42906,7 @@
                 "subgroups": [
                   {
                     "key": "Tween Stop Start Time Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -42926,7 +42926,7 @@
                   },
                   {
                     "key": "Tween Stop Delay",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -63437,7 +63437,7 @@
               "type": "group",
               "group": {
                 "key": "Retransition",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -63587,14 +63587,14 @@
               "type": "group",
               "group": {
                 "key": "Tween Stop",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
                     "type": "group",
                     "group": {
                       "key": "Tween Stop Start Time Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -63617,7 +63617,7 @@
                     "type": "group",
                     "group": {
                       "key": "Tween Stop Delay",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -63651,7 +63651,7 @@
                 "subgroups": [
                   {
                     "key": "Tween Stop Start Time Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -63671,7 +63671,7 @@
                   },
                   {
                     "key": "Tween Stop Delay",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -63889,7 +63889,7 @@
             },
             {
               "key": "Retransition",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -64036,14 +64036,14 @@
             },
             {
               "key": "Tween Stop",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
                   "type": "group",
                   "group": {
                     "key": "Tween Stop Start Time Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -64066,7 +64066,7 @@
                   "type": "group",
                   "group": {
                     "key": "Tween Stop Delay",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -64100,7 +64100,7 @@
               "subgroups": [
                 {
                   "key": "Tween Stop Start Time Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -64120,7 +64120,7 @@
                 },
                 {
                   "key": "Tween Stop Delay",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
