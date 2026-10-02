@@ -15380,6 +15380,95 @@ direct tracing of all 5 accumulator touchpoints before shipping.
 
 `main.js` cache-buster bumped `?v=269` -> `?v=270`.
 
+2026-10-02  -  (feature -- Easing Curve for every click function's
+own forward pose transition, including Multi Trigger sub-triggers)
+
+Direct request: "for every click function, including multi trigger
+instances, provide a curve editor to set the easing of the pose
+transition. X is 0% to 100% of the entire sequence. provide an on off
+checkbox for each."
+
+Added `${p}EasingCurveEnabled` (checkbox) and `${p}EasingCurve` (text,
+JSON curve points, default a straight 0->1 line = identity/no-op) to
+both `makeClickHoldPoseGroup()` and `makeClickPoseGroup()`, right after
+`TransitionSpeedMs`. Wrapped in their own mandatory gated subgroup
+("Easing," via `wrapGatedSubgroup()`) matching this file's own
+established convention for every other on/off curve (Offset, Rotation,
+Animation Speed Curve, Start Time Curve, Start Distance Curve,
+Retransition) -- same "checkbox in the subgroup's own header" pattern
+the request's own "provide an on off checkbox for each" asks for. NOT
+Mode-gated (visible and functional in both Single Pose and Tween/
+Sequence mode alike), same reasoning as Start Distance Curve: the
+forward transition this curve reshapes exists identically regardless
+of Mode.
+
+Added to `MULTI_TRIGGER_ALLOWED_SUFFIXES` and parsed/cached
+(`easingCurveParsed`) in `parseClickHoldConfig()`/`parseClickPoseConfig()`
+the same way every other curve in this file already is, including
+default-shape entries in both `registerCustomClickFunction()`'s and
+`registerMultiTriggerTrigger()`'s own trigger-state initializers (6
+touchpoints total) and `NEW_CUSTOM_FUNCTION_TEMPLATE`, so a brand-new
+function or sub-trigger has a well-formed (identity) curve from the
+moment it's created. Multi Trigger coverage required NO separate
+plumbing beyond the suffix-list addition -- `registerMultiTriggerTrigger()`
+already calls `buildClickHoldPoseWidgets()`/`buildClickPoseWidgets()`,
+`wrapClickFunctionGatedSubgroups()`, and `updateSingleTimingGateVisibility()`
+for its own sub-trigger prefix, so every one of this round's additions
+to those 3 functions applies to sub-triggers automatically, confirmed
+by direct source tracing before relying on it.
+
+The real design decision: WHERE exactly "the pose transition, 0% to
+100% of the entire sequence" maps onto this file's own existing
+progress math. Read both families' `'forward'` phase in full before
+writing anything (per this project's own "read the real source, don't
+guess" convention) -- both compute an identical `progress = clamp(elapsed/speedMs,
+0, 1)`, then `cappedT = progress * frozenTweenFractionCap` feeding
+`lerpTweenSegments()`/`lerpPoseValues()` (cappedT=0 is the exact start
+of the whole sequence, cappedT=1 the exact end, including a full
+multi-segment Tween -- matching "0% to 100% of the entire sequence"
+precisely, for both Single Pose's one-shot transition and Tween/
+Sequence mode's own multi-keyframe sequence). The new `easedProgress`
+(curve-evaluated from raw `progress` via the SAME `evaluateArmLengthCurve()`
+every other curve here already uses, live every frame since X changes
+continuously -- there's no single value to freeze the way most other
+curves freeze at arm time) now feeds `cappedT` and the wrist-splay ramp
+(`splayNow`) -- but raw `progress` itself is left completely untouched
+everywhere else (the `progress >= 1` phase-transition checks,
+`applyOffsetRotationToHand()`'s own progress parameter, every bake
+call) -- the exact same "frozen timing vs. scaled distance" split Start
+Distance Curve already established for this exact pair of functions,
+just reused for easing instead of a distance-based cap.
+
+**Disclosed scoping choice, not an oversight:** this round covers only
+the INITIAL forward ramp (the one transition every click function has,
+regardless of Mode) -- it does NOT yet reshape each subsequent lap's
+own ramp in Loop/Oscillate/Count mode (`'looping'`/`'sequencePlaying'`
+phases' own `lapT`). Scoped out deliberately rather than risking a
+subtly wrong implementation across 2 more phases × 2 families × the
+smooth-wrap-back's cumulative `tCyclic` case in the time available --
+same disclosed-limitation precedent as Start Distance Curve's own
+smooth-wrap-back exclusion. If a future request asks for every lap to
+ease identically (not just the first), this is the next extension
+point, following the exact same `easedProgress` pattern.
+
+Verified via a 4-case isolated logic reproduction of the new wiring
+(disabled matches raw progress exactly; enabled with the default
+linear curve is byte-identical to disabled, confirming a safe default;
+an ease-in curve measurably reshapes `cappedT`/`splayNow` while raw
+`progress` stays completely unchanged -- the key invariant; Start
+Distance Curve's own cap still applies multiplicatively on top of the
+eased value, not instead of it). All 4 passed. `node --check` passes.
+
+**Not live-verified in browser** -- the local static server's own
+documented network-truncation quirk failed all 5 navigation attempts
+(the standing retry cap) on `main.js?v=271`, `window.__debug` never
+populated. Confidence rests on the isolated logic reproduction plus
+direct tracing of every real touchpoint (6 trigger-state inits, 2
+parse-cache sites, 2 widget-builder sites, 1 gated-subgroup wrap, 1
+visibility extension, 2 forward-phase math sites) before shipping.
+
+`main.js` cache-buster bumped `?v=270` -> `?v=271`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

@@ -3904,6 +3904,23 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       // hold) still applies -- it's just one shared number now instead of
       // a per-function one.
       { key: `${p}TransitionSpeedMs`, label: 'Animation Speed (Ms)', type: 'slider', min: 0, max: 700, step: 10, def: defaults.transitionSpeedMs ?? 400 },
+      // Easing Curve -- direct request 2026-10-02 ("for every click
+      // function, including multi trigger instances, provide a curve
+      // editor to set the easing of the pose transition. X is 0% to
+      // 100% of the entire sequence. provide an on off checkbox for
+      // each"). Reshapes the forward transition's own progress (X =
+      // 0-1 fraction through the transition, Y = eased output fraction
+      // fed into the pose/tween interpolation and the splay ramp) --
+      // see updateClickHoldPoseForHand()'s own 'forward' phase comment
+      // for exactly where this is applied and what it deliberately
+      // leaves untouched (the raw timing progress used for phase-
+      // transition checks and Offset/Rotation, same 'frozen timing vs.
+      // scaled distance' split Start Distance Curve already
+      // established). No Range control needed -- Y is already the
+      // final 0-1 fraction, same convention as Start Distance Curve's
+      // own curve.
+      { key: `${p}EasingCurveEnabled`, label: 'Easing Curve On/Off', type: 'checkbox', def: false, onChange: () => updateSingleTimingGateVisibility(p) },
+      { key: `${p}EasingCurve`, label: 'Easing Curve (Progress -> Eased Progress)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickHoldConfig(p) },
       // Animation Speed Curve on/off -- direct spec item ("Animation
       // Speed Curve on/off [NEW]" under Single-Pose-mode settings), a
       // distance->speed curve exactly analogous to Start Time Curve
@@ -4206,6 +4223,22 @@ function makeClickPoseGroup(p, title, defaults = {}) {
       // the pause between loops/oscillations").
       { key: `${p}SequenceHoldMs`, label: 'Sequence Hold Duration (Ms)', type: 'slider', min: 0, max: 5000, step: 10, def: 0 },
       { key: `${p}TransitionSpeedMs`, label: 'Animation Speed (Ms)', type: 'slider', min: 0, max: 700, step: 10, def: defaults.transitionSpeedMs ?? 400 },
+      // Easing Curve -- direct request 2026-10-02 ("for every click
+      // function, including multi trigger instances, provide a curve
+      // editor to set the easing of the pose transition. X is 0% to
+      // 100% of the entire sequence. provide an on off checkbox for
+      // each"). Reshapes the forward transition's own progress (X =
+      // 0-1 fraction through the transition, Y = eased output fraction
+      // fed into the pose/tween interpolation and the splay ramp) --
+      // see updateClickPoseForHand()'s own 'forward' phase comment for
+      // exactly where this is applied and what it deliberately leaves
+      // untouched (the raw timing progress used for phase-transition
+      // checks and Offset/Rotation, same 'frozen timing vs. scaled
+      // distance' split Start Distance Curve already established). No
+      // Range control needed -- Y is already the final 0-1 fraction,
+      // same convention as Start Distance Curve's own curve.
+      { key: `${p}EasingCurveEnabled`, label: 'Easing Curve On/Off', type: 'checkbox', def: false, onChange: () => updateSingleTimingGateVisibility(p) },
+      { key: `${p}EasingCurve`, label: 'Easing Curve (Progress -> Eased Progress)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickPoseConfig(p) },
       // Animation Speed Curve / Start Time Curve / Retransition on-off
       // gates -- see makeClickHoldPoseGroup()'s own matching comments
       // for the full reasoning (shared word-for-word, both factories
@@ -6817,6 +6850,7 @@ const clickHoldPoseTriggers = Object.fromEntries([...CLICK_HOLD_KEYS, ...LEGACY_
   speedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], speedRangeParsed: { min: 50, max: 2000 },
   tweenStartCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStartRangeParsed: { min: 0, max: 300 },
   startDistanceCurveParsed: [{ x: 0, y: 1 }, { x: 1, y: 1 }],
+  easingCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }],
   retransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionRangeParsed: { min: 0, max: 300 },
   tweenRetransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenRetransitionRangeParsed: { min: 0, max: 300 },
   tweenStopStartCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStopStartRangeParsed: { min: 0, max: 300 },
@@ -6839,6 +6873,9 @@ function parseClickHoldConfig(p) {
   // Start Distance Curve (2026-09-27) -- see parseClickPoseConfig()'s own
   // matching comment.
   try { t.startDistanceCurveParsed = JSON.parse(cfg[`${p}StartDistanceCurve`]).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
+  // Easing Curve (2026-10-02) -- see makeClickHoldPoseGroup()'s own
+  // matching control comment.
+  try { t.easingCurveParsed = JSON.parse(cfg[`${p}EasingCurve`]).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
   try { t.retransitionCurveParsed = JSON.parse(cfg[`${p}RetransitionStartTimeCurve`]).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
   try { t.retransitionRangeParsed = JSON.parse(cfg[`${p}RetransitionStartTimeRange`]) } catch (e) { /* keep last-good value */ }
   // Retransition's own distance->SPEED curve/range (item 5, 2026-09-24) --
@@ -7884,18 +7921,27 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     // computed once at this hand's own commit above.
     const speedMs = Math.max(isTween ? safeTweenSpeedMs(cfg[`${p}TweenSpeedMs`]) : (cfg[`${p}SpeedCurveEnabled`] ? chp.frozenSpeedMs : cfg[`${p}TransitionSpeedMs`]), 1)
     const progress = THREE.MathUtils.clamp(elapsed / speedMs, 0, 1)
+    // Easing Curve (2026-10-02) -- reshapes ONLY the pose's own visual
+    // interpolation fraction (`cappedT`/`splayNow` below), never the raw
+    // `progress` used for phase-transition checks or Offset/Rotation
+    // (same "frozen timing vs. scaled distance" split Start Distance
+    // Curve already established, just for easing instead of distance).
+    // Evaluated live every frame (X = progress itself, which changes
+    // continuously) rather than frozen-at-arm-time like most curves here
+    // -- there's no single value to freeze.
+    const easedProgress = cfg[`${p}EasingCurveEnabled`] ? THREE.MathUtils.clamp(evaluateArmLengthCurve(trig.easingCurveParsed, progress), 0, 1) : progress
     // Start Distance Curve (2026-09-27) -- see updateClickPoseForHand()'s
     // own matching comment for the full reasoning (identical treatment:
     // scales how far the POSE interpolation travels, never the timing;
     // `progress` itself stays untouched for the phase-transition checks
     // below; deliberately not applied to Offset/Rotation).
-    const cappedT = progress * chp.frozenTweenFractionCap
+    const cappedT = easedProgress * chp.frozenTweenFractionCap
     // CORRECTED 2026-09-27 -- see this hand's own `fromSplayDeg` capture
     // (arm time) and applyPoseValuesToHand()'s own comment. Ramps splay
-    // across the SAME `progress` timeline as the rest of the pose, from
-    // wherever it actually was the instant this hold armed, instead of
-    // jumping straight to the frozen target on frame 1.
-    const splayNow = THREE.MathUtils.lerp(chp.fromSplayDeg ?? chp.frozenSplayDeg, chp.frozenSplayDeg, progress)
+    // across the SAME (now eased) progress timeline as the rest of the
+    // pose, from wherever it actually was the instant this hold armed,
+    // instead of jumping straight to the frozen target on frame 1.
+    const splayNow = THREE.MathUtils.lerp(chp.fromSplayDeg ?? chp.frozenSplayDeg, chp.frozenSplayDeg, easedProgress)
     let values
     if (isTween) {
       if (!chp.tweenSegments || chp.tweenSegments.length === 0) return // nothing selected -- leave this hand's pose untouched
@@ -8671,6 +8717,7 @@ const clickPoseTriggers = Object.fromEntries([...CLICK_POSE_KEYS, ...LEGACY_REMO
   speedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], speedRangeParsed: { min: 50, max: 2000 },
   tweenStartCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStartRangeParsed: { min: 0, max: 300 },
   startDistanceCurveParsed: [{ x: 0, y: 1 }, { x: 1, y: 1 }],
+  easingCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }],
   retransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionRangeParsed: { min: 0, max: 300 }
 }]))
 // Direct request 2026-09-17 ("rename the word Tween to Sequence") --
@@ -8723,6 +8770,9 @@ function parseClickPoseConfig(p) {
   // unit via a paired Min/Max range) -- see computeTweenFractionCap()'s
   // own comment.
   try { t.startDistanceCurveParsed = JSON.parse(cfg[`${p}StartDistanceCurve`]).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
+  // Easing Curve (2026-10-02) -- see makeClickPoseGroup()'s own matching
+  // control comment.
+  try { t.easingCurveParsed = JSON.parse(cfg[`${p}EasingCurve`]).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
   try { t.retransitionCurveParsed = JSON.parse(cfg[`${p}RetransitionStartTimeCurve`]).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
   try { t.retransitionRangeParsed = JSON.parse(cfg[`${p}RetransitionStartTimeRange`]) } catch (e) { /* keep last-good value */ }
   // Retransition's own distance->SPEED curve/range (item 5, 2026-09-24) --
@@ -8815,6 +8865,9 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
     // trigger time" treatment as the splay.
     const speedMs = Math.max(isTween ? safeTweenSpeedMs(cfg[`${p}TweenSpeedMs`]) : (cfg[`${p}SpeedCurveEnabled`] ? cp.frozenSpeedMs : cfg[`${p}TransitionSpeedMs`]), 1)
     const progress = THREE.MathUtils.clamp(elapsed / speedMs, 0, 1)
+    // Easing Curve (2026-10-02) -- see updateClickHoldPoseForHand()'s own
+    // matching comment for the full reasoning.
+    const easedProgress = cfg[`${p}EasingCurveEnabled`] ? THREE.MathUtils.clamp(evaluateArmLengthCurve(clickPoseTriggers[p].easingCurveParsed, progress), 0, 1) : progress
     // Start Distance Curve (2026-09-27) -- `cp.frozenTweenFractionCap`
     // (1 = no cap, frozen once at trigger time, same convention as
     // frozenSplayDeg/frozenSpeedMs) scales how FAR the interpolation
@@ -8825,12 +8878,12 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
     // spec. Deliberately NOT applied to applyOffsetRotationToHand()'s own
     // progress below -- Offset/Rotation is a separate system the spec
     // never asked to couple with this one.
-    const cappedT = progress * cp.frozenTweenFractionCap
+    const cappedT = easedProgress * cp.frozenTweenFractionCap
     // CORRECTED 2026-09-27 -- see updateClickHoldPoseForHand()'s own
     // matching comment. Ramps splay from wherever it actually was at
-    // trigger time toward the frozen target, across the same `progress`
-    // timeline as the rest of the pose.
-    const splayNow = THREE.MathUtils.lerp(cp.fromSplayDeg ?? cp.frozenSplayDeg, cp.frozenSplayDeg, progress)
+    // trigger time toward the frozen target, across the same (now eased)
+    // progress timeline as the rest of the pose.
+    const splayNow = THREE.MathUtils.lerp(cp.fromSplayDeg ?? cp.frozenSplayDeg, cp.frozenSplayDeg, easedProgress)
     let values
     if (isTween) {
       if (!cp.tweenPoses || cp.tweenPoses.length < 2) { cp.phase = 'idle'; return } // nothing selected -- abandon this hand's sequence rather than get stuck
@@ -9934,6 +9987,12 @@ function buildClickHoldPoseWidgets(p) {
   // matching comment.
   const startDistanceCurveRow = document.querySelector(`.dp-row[data-key="${p}StartDistanceCurve"]`)
   if (startDistanceCurveRow) buildGenericCurveWidget(startDistanceCurveRow, { caption: 'X: Distance From Cursor (Start Distance Min→Max)  ·  Y: Tween Amount Executed (0=None, 1=Full)', defaultPoints: [{ x: 0, y: 1 }, { x: 1, y: 1 }] })
+  // Easing Curve (2026-10-02) -- X is this hand's own transition
+  // progress (0-100%), Y is the eased output fed into the pose/tween
+  // interpolation. No separate range widget -- Y is already the final
+  // 0-1 fraction, same convention as Start Distance Curve just above.
+  const easingCurveRow = document.querySelector(`.dp-row[data-key="${p}EasingCurve"]`)
+  if (easingCurveRow) buildGenericCurveWidget(easingCurveRow, { caption: 'X: Transition Progress (0-100%)  ·  Y: Eased Progress (0=Start, 1=Complete)', defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
   // Direct request 2026-10-01 ("for start distance min max, make that a
   // single slider") -- see mergeMinMaxSlidersIntoRangeBar()'s own comment.
   mergeMinMaxSlidersIntoRangeBar(
@@ -9995,6 +10054,10 @@ function buildClickPoseWidgets(p) {
   // Min/Max range slider).
   const startDistanceCurveRow = document.querySelector(`.dp-row[data-key="${p}StartDistanceCurve"]`)
   if (startDistanceCurveRow) buildGenericCurveWidget(startDistanceCurveRow, { caption: 'X: Distance From Cursor (Start Distance Min→Max)  ·  Y: Tween Amount Executed (0=None, 1=Full)', defaultPoints: [{ x: 0, y: 1 }, { x: 1, y: 1 }] })
+  // Easing Curve (2026-10-02) -- see buildClickHoldPoseWidgets()'s own
+  // matching comment.
+  const easingCurveRow = document.querySelector(`.dp-row[data-key="${p}EasingCurve"]`)
+  if (easingCurveRow) buildGenericCurveWidget(easingCurveRow, { caption: 'X: Transition Progress (0-100%)  ·  Y: Eased Progress (0=Start, 1=Complete)', defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
   // Direct request 2026-10-01 ("for start distance min max, make that a
   // single slider") -- see mergeMinMaxSlidersIntoRangeBar()'s own comment.
   mergeMinMaxSlidersIntoRangeBar(
@@ -10674,6 +10737,7 @@ function registerCustomClickFunction(id, title, kind, family) {
       speedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], speedRangeParsed: { min: 50, max: 2000 },
       tweenStartCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStartRangeParsed: { min: 0, max: 300 },
       startDistanceCurveParsed: [{ x: 0, y: 1 }, { x: 1, y: 1 }],
+      easingCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }],
       retransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionRangeParsed: { min: 0, max: 300 },
       retransitionSpeedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionSpeedRangeParsed: { min: 50, max: 2000 },
       tweenRetransitionSpeedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenRetransitionSpeedRangeParsed: { min: 50, max: 2000 },
@@ -10689,6 +10753,7 @@ function registerCustomClickFunction(id, title, kind, family) {
       speedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], speedRangeParsed: { min: 50, max: 2000 },
       tweenStartCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStartRangeParsed: { min: 0, max: 300 },
       startDistanceCurveParsed: [{ x: 0, y: 1 }, { x: 1, y: 1 }],
+      easingCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }],
       retransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionRangeParsed: { min: 0, max: 300 },
       retransitionSpeedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionSpeedRangeParsed: { min: 50, max: 2000 },
       cursorOffsetDistanceCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], cursorOffsetDistanceRangeParsed: { min: -50, max: 50 }
@@ -10850,6 +10915,7 @@ const NEW_CUSTOM_FUNCTION_TEMPLATE = {
   TweenStartTimeCurve: '[{"x":0,"y":0},{"x":1,"y":1}]', TweenStartTimeRange: '{"min":0,"max":300}',
   SequencePlayMode: 'Count', SequenceCount: 1, SequenceCountMode: 'Loop',
   SequenceLoopTransition: true, SequenceHoldMs: 0, TransitionSpeedMs: 700,
+  EasingCurveEnabled: false, EasingCurve: '[{"x":0,"y":0},{"x":1,"y":1}]',
   SpeedCurveEnabled: false, SpeedCurve: '[{"x":0,"y":0},{"x":1,"y":1}]', SpeedCurveRange: '{"min":50,"max":2000}',
   StartTimeCurveEnabled: false, StartTimeCurve: '[{"x":0,"y":0},{"x":1,"y":1}]', StartTimeRange: '{"min":0,"max":300}',
   PauseDurationMs: 0,
@@ -11064,6 +11130,7 @@ function enforceCustomClickFunctionsAnchorOrder() {
 // change to the real controls propagates to every trigger automatically.
 const MULTI_TRIGGER_ALLOWED_SUFFIXES = [
   'Enabled', 'Mode', 'TargetPose', 'TweenSelector', 'TweenSpeedMs', 'TransitionSpeedMs', 'PauseDurationMs',
+  'EasingCurveEnabled', 'EasingCurve',
   'OffsetEnabled', 'OffsetMode', 'OffsetX', 'OffsetY', 'CursorOffsetDistance',
   'CursorOffsetDistanceCurveEnabled', 'CursorOffsetDistanceCurve', 'CursorOffsetDistanceCurveRange',
   'RotationEnabled', 'RotationX', 'RotationY', 'RotationZ',
@@ -11106,6 +11173,7 @@ function registerMultiTriggerTrigger(prefix, title, mtBody, addBtnRow, kind) {
         speedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], speedRangeParsed: { min: 50, max: 2000 },
         tweenStartCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStartRangeParsed: { min: 0, max: 300 },
         startDistanceCurveParsed: [{ x: 0, y: 1 }, { x: 1, y: 1 }],
+        easingCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }],
         retransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionRangeParsed: { min: 0, max: 300 },
         retransitionSpeedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionSpeedRangeParsed: { min: 50, max: 2000 },
         tweenRetransitionSpeedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenRetransitionSpeedRangeParsed: { min: 50, max: 2000 },
@@ -11123,6 +11191,7 @@ function registerMultiTriggerTrigger(prefix, title, mtBody, addBtnRow, kind) {
         speedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], speedRangeParsed: { min: 50, max: 2000 },
         tweenStartCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStartRangeParsed: { min: 0, max: 300 },
         startDistanceCurveParsed: [{ x: 0, y: 1 }, { x: 1, y: 1 }],
+        easingCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }],
         retransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionRangeParsed: { min: 0, max: 300 },
         retransitionSpeedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionSpeedRangeParsed: { min: 50, max: 2000 },
         cursorOffsetDistanceCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], cursorOffsetDistanceRangeParsed: { min: -50, max: 50 }
@@ -11809,6 +11878,12 @@ function updateSingleTimingGateVisibility(p) {
   setRow('StartDistanceMin', startDistanceOn)
   setRow('StartDistanceMax', startDistanceOn)
   setRow('StartDistanceCurve', startDistanceOn)
+  // Easing Curve (2026-10-02) -- also NOT Mode-gated, same reasoning as
+  // Start Distance Curve directly above: it reshapes the forward
+  // transition's own progress, which exists identically in Single Pose
+  // and Tween/Sequence mode alike.
+  setGateRow('EasingCurveEnabled', true)
+  setRow('EasingCurve', !!cfg[`${p}EasingCurveEnabled`])
   // Animation Speed Curve has NO Tween-mode equivalent to nest here --
   // Tween mode's own speed is a flat `${p}TweenSpeedMs` slider with no
   // curve concept at all, so this group stays Single-Pose-only exactly as
@@ -12110,6 +12185,10 @@ function wrapGatedSubgroup(enabledKey, memberKeys, subgroupTitle) {
 // Sequence mode, a separate concept from Single Pose's own Retransition
 // on/off).
 function wrapClickFunctionGatedSubgroups(p) {
+  // Easing Curve -- direct request 2026-10-02, same mandatory-gated-
+  // subgroup treatment as every other on/off curve below ("provide an
+  // on off checkbox for each").
+  wrapGatedSubgroup(`${p}EasingCurveEnabled`, [`${p}EasingCurve`], 'Easing')
   wrapGatedSubgroup(`${p}OffsetEnabled`, [`${p}OffsetMode`, `${p}OffsetX`, `${p}OffsetY`, `${p}CursorOffsetDistance`, `${p}CursorOffsetDistanceCurveEnabled`, `${p}CursorOffsetDistanceCurve`, `${p}CursorOffsetDistanceCurveRange`], 'Offset')
   wrapGatedSubgroup(`${p}RotationEnabled`, [`${p}RotationX`, `${p}RotationY`, `${p}RotationZ`], 'Rotation')
   wrapGatedSubgroup(`${p}SpeedCurveEnabled`, [`${p}SpeedCurve`, `${p}SpeedCurveRange`], 'Animation Speed Curve')

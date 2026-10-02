@@ -2277,3 +2277,19 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   real device -- confidence rests on an isolated logic reproduction and
   the direct match to the reported "detected but not dispatched"
   symptom.
+- **Easing Curve (2026-10-02) only reshapes the INITIAL `'forward'`
+  ramp -- a disclosed scoping choice, not a bug, if a future report
+  describes a Loop/Oscillate/Count-mode function's 2nd+ lap not
+  easing.** The curve-evaluated `easedProgress` feeds `cappedT`/
+  `splayNow` only inside the `'forward'` phase block in both
+  `updateClickHoldPoseForHand()` and `updateClickPoseForHand()` --
+  `'looping'`'s own cyclic lerp and `'sequencePlaying'`'s own `lapT`
+  still use raw linear progress, same as before this feature existed.
+  Extending it to every lap needs the identical `easedProgress` pattern
+  applied at BOTH of those phases' own lerp call sites, including the
+  smooth-wrap-back's cumulative `tCyclic` case (`cp.phase === 'sequencePlaying'`,
+  `else` branch) -- which Start Distance Curve's own cap deliberately
+  skipped for the same cumulative-value reason (see that control's own
+  comment). If this extension is ever requested, read both phases' full
+  bodies again first; don't assume the 'forward'-phase pattern transfers
+  mechanically to a per-lap context without re-checking.

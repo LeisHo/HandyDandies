@@ -18,37 +18,45 @@ work seamlessly from there.
 
 ## Currently working on
 
-**ADDED 2026-10-02 -- Cursor Offset mode now uses all 3 axes (not just
-camera right/up).** Direct request, reversing yesterday's deliberate
-depth-axis exclusion specifically for this mode: `computeOffsetXY()`
-now projects the hand-to-cursor vector onto camera-right, camera-up,
-AND camera-forward, normalizing the 3D result so the hand can move
-straight toward/away from the camera (when the cursor sits nearer/
-farther in depth) in addition to the existing up/down/left/right.
-`hand._customOffsetAccum` extended from `{x,y}` to `{x,y,z}` at all 5
-real touchpoints (live apply, full-completion bake, partial-fraction
-bake, retransition decay, retransition snapshot fallback) -- missing
-any one would reproduce this project's own documented snap/drift bug
-class for the new axis specifically. Verified via a 4-case isolated
-logic reproduction (all passed) and `node --check`. **Not live-
-verified in browser** -- same documented network-truncation quirk,
-failed all 5 navigation attempts on `main.js?v=270`. `main.js`
-cache-buster at `?v=270`. See CHANGELOG.txt's matching entry for full
-detail.
-
-**ADDED 2026-10-02 -- "Invert All Colors" checkbox in the Toon Shading
-group.** Direct request. Implemented as a full-screen post-process
-(`invertColorsPass`, a `ShaderPass` added to the existing `composer`
-right before `OutputPass`) rather than inverting individual toon
-material colors -- this inverts the actual composited render output
-(hands, background, outline, everything), matching "invert all colors"
-literally. `node --check` passes. **Not live-verified in browser** --
-the local static server's own documented network-truncation quirk
-failed all 5 navigation attempts (the standing retry cap) on
-`main.js?v=269`. See CHANGELOG.txt's matching entry for full detail.
+**ADDED 2026-10-02 -- Easing Curve for every click function's own
+forward pose transition, including Multi Trigger sub-triggers.** Direct
+request: a curve editor (X = 0-100% of the transition, Y = eased
+output) plus its own on/off checkbox, for every click function. Added
+`${p}EasingCurveEnabled`/`${p}EasingCurve` to both factories, wrapped
+in their own mandatory gated "Easing" subgroup (matching Offset/
+Rotation/Animation Speed Curve/etc.'s own established pattern), NOT
+Mode-gated (applies to Single Pose and Tween/Sequence alike). Applied
+to the one transition every function has in common -- both families'
+`'forward'` phase, where raw `progress` now gets curve-evaluated into
+`easedProgress` before feeding `cappedT`/the wrist-splay ramp, while
+raw `progress` itself stays completely untouched for phase-transition
+checks and Offset/Rotation (same frozen-timing/scaled-value split
+Start Distance Curve already established). Multi Trigger coverage
+needed no separate plumbing -- confirmed `registerMultiTriggerTrigger()`
+already calls every function this round touched, for its own
+sub-trigger prefix. **Disclosed scoping choice:** does NOT yet reshape
+each subsequent lap in Loop/Oscillate/Count mode (only the initial
+ramp) -- deliberately scoped out rather than risking a subtly wrong
+implementation across the smooth-wrap-back's cumulative case; the next
+extension point if a future request asks for every lap to ease
+identically. Verified via a 4-case isolated logic reproduction (all
+passed) and `node --check`. **Not live-verified in browser** -- same
+documented network-truncation quirk, failed all 5 navigation attempts
+on `main.js?v=271`. See CHANGELOG.txt's matching entry for full detail.
 
 **Everything below this point is prior session work, already shipped
 and pushed -- kept here as recent context, not active work.**
+
+**ADDED 2026-10-02 -- Cursor Offset mode now uses all 3 axes (not just
+camera right/up).** `computeOffsetXY()` now projects onto camera-right,
+camera-up, AND camera-forward. `hand._customOffsetAccum` extended from
+`{x,y}` to `{x,y,z}` at all 5 real touchpoints. `main.js` cache-buster
+at `?v=270`. See CHANGELOG.txt's matching entry for full detail.
+
+**ADDED 2026-10-02 -- "Invert All Colors" checkbox in the Toon Shading
+group.** A full-screen post-process (`invertColorsPass`, a `ShaderPass`
+before `OutputPass`) rather than inverting individual toon material
+colors. See CHANGELOG.txt's matching entry for full detail.
 
 **ADDED/CORRECTED/EXTENDED 2026-10-01 -- Offset Mode dropdown ("XYZ
 Offset" / "Cursor Offset") for every custom click function (pose-kind
