@@ -15283,6 +15283,49 @@ called confirmed end to end.
 
 `main.js` cache-buster bumped `?v=267` -> `?v=268`.
 
+2026-10-02  -  (feature -- Invert All Colors checkbox, Toon Shading
+group)
+
+Direct request: "In the Toon Shading group, add a checkbox to invert
+all colors." Implemented as a full-screen post-process rather than
+inverting individual toon-material properties one at a time
+(`toonBaseTint`/`toonTint`/`rimColor`): a new `invertColorsPass`
+(`ShaderPass`, imported from `three/addons/postprocessing/ShaderPass.js`,
+added to the existing `composer` right after `outlinePass` and before
+`OutputPass`) with a trivial invert shader
+(`gl_FragColor = vec4(1.0 - color.rgb, color.a)`, sampling `tDiffuse`)
+inverts the ACTUAL composited render output -- hands, background,
+outline, everything -- which is what "invert all colors" means
+literally; inverting just the 3 toon-specific color sliders would miss
+lighting, texture, and every other color source entirely.
+
+New `invertColorsEnabled` checkbox (def `false`) added to the Toon
+Shading group's `DEV_GROUPS` controls, right after `rimColor` -- its
+own `onChange` just flips `invertColorsPass.enabled`. Placed in this
+group because that's where the request put it, not because the effect
+is toon-specific (matches this group's own existing precedent: Outline
+Pass/Emission Material controls there already affect cross-cutting
+rendering, not just "outline" narrowly).
+
+`node --check` passes. No naming collision (grepped for existing
+"invert" usage first -- all unrelated quaternion-math `.invert()`
+calls). Relies on the SAME TDZ-safe pattern every other `DEV_GROUPS`
+control already gets for free (CLAUDE.md's own documented
+detach-before-`initDevPanel()`/reattach-after mitigation covers any
+new control automatically) -- `invertColorsPass` is declared after
+`DEV_GROUPS`'s own module-level definition but the checkbox's
+`onChange` closure only ever runs well after that declaration executes.
+
+**Not live-verified in browser** -- the local static server's own
+documented network-truncation quirk failed all 5 navigation attempts
+(the standing retry cap) on `main.js?v=269`, `window.__debug` never
+populated. Confidence rests on `node --check` plus the shader math
+being a standard, trivial 1-line invert on a well-established
+`ShaderPass` pattern this project already uses successfully for
+`OutlinePass`/`OutputPass`.
+
+`main.js` cache-buster bumped `?v=268` -> `?v=269`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

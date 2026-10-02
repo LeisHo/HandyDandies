@@ -18,6 +18,21 @@ work seamlessly from there.
 
 ## Currently working on
 
+**ADDED 2026-10-02 -- "Invert All Colors" checkbox in the Toon Shading
+group.** Direct request. Implemented as a full-screen post-process
+(`invertColorsPass`, a `ShaderPass` added to the existing `composer`
+right before `OutputPass`) rather than inverting individual toon
+material colors -- this inverts the actual composited render output
+(hands, background, outline, everything), matching "invert all colors"
+literally. `node --check` passes. **Not live-verified in browser** --
+the local static server's own documented network-truncation quirk
+failed all 5 navigation attempts (the standing retry cap) on
+`main.js?v=269`. `main.js` cache-buster at `?v=269`. See CHANGELOG.txt's
+matching entry for full detail.
+
+**Everything below this point is prior session work, already shipped
+and pushed -- kept here as recent context, not active work.**
+
 **ADDED/CORRECTED/EXTENDED 2026-10-01 -- Offset Mode dropdown ("XYZ
 Offset" / "Cursor Offset") for every custom click function (pose-kind
 and hold-kind, plus Multi Trigger sub-triggers of either), now with an

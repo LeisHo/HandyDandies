@@ -6,6 +6,7 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js'
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js'
 import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js'
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js'
+import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js'
 import { initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab } from './devpanel/devPanel.js?v=54'
 
 // A defensive wrapper around devPanel.js's own refreshSelectOptions() --
@@ -1599,6 +1600,17 @@ const DEV_GROUPS = [
       { key: 'rimIntensity', label: 'Rim Light Intensity (x)', type: 'slider', min: 0, max: 3, step: 0.05, def: 0, onChange: (v) => setToonUniform('rimIntensity', v) },
       { key: 'rimPower', label: 'Rim Light Power (x)', type: 'slider', min: 0.5, max: 8, step: 0.1, def: 0.5, onChange: (v) => setToonUniform('rimPower', v) },
       { key: 'rimColor', label: 'Rim Light Color', type: 'color', def: '#ffffff', onChange: (v) => setToonUniform('rimColor', new THREE.Color(v)) },
+      // Direct request 2026-10-02: "add a checkbox to invert all colors."
+      // A full-screen post-process (invertColorsPass, a ShaderPass added
+      // to `composer` -- see its own declaration right after `outlinePass`)
+      // rather than inverting individual toon-material color properties
+      // one at a time: this inverts the ACTUAL rendered pixel output
+      // (hands, background, outline, everything), which is what "invert
+      // all colors" means literally -- inverting just toonBaseTint/
+      // toonTint/rimColor would miss lighting, texture, and every other
+      // color source entirely. Lives in this group because that's where
+      // the request placed it, not because the effect is toon-specific.
+      { key: 'invertColorsEnabled', label: 'Invert All Colors', type: 'checkbox', def: false, onChange: (v) => { invertColorsPass.enabled = v } },
       // Direct request: "We have added a save and export function to the
       // Toon Shading [in HANDO]. Add an import and export function to
       // ours to accept that data." Both flags (not just importable, the
@@ -2107,6 +2119,20 @@ outlinePass.hiddenEdgeColor.set(cfg.outlineColor)
 outlinePass.overlayMaterial.blending = THREE.NormalBlending
 outlinePass.enabled = false // decided by updateOutlineVisibility() once hands exist
 composer.addPass(outlinePass)
+// Invert All Colors (2026-10-02, Toon Shading group) -- a plain
+// screen-space color-invert shader, same tDiffuse-in/gl_FragColor-out
+// convention every ShaderPass expects. Placed BEFORE OutputPass (which
+// still needs to run last for correct color-space output) so the
+// inversion applies to the fully composited scene, not a pre-tonemap
+// buffer.
+const InvertColorsShader = {
+  uniforms: { tDiffuse: { value: null } },
+  vertexShader: 'varying vec2 vUv; void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+  fragmentShader: 'uniform sampler2D tDiffuse; varying vec2 vUv; void main() { vec4 color = texture2D(tDiffuse, vUv); gl_FragColor = vec4(1.0 - color.rgb, color.a); }'
+}
+const invertColorsPass = new ShaderPass(InvertColorsShader)
+invertColorsPass.enabled = !!cfg.invertColorsEnabled
+composer.addPass(invertColorsPass)
 composer.addPass(new OutputPass())
 
 const hemiLight = new THREE.HemisphereLight(cfg.ambientSkyColor, cfg.ambientGroundColor, cfg.ambientIntensity)
