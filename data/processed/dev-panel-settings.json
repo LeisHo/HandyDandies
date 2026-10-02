@@ -7404,14 +7404,14 @@
       "custom17CursorOffsetDistance": 3,
       "custom17CursorOffsetDistanceCurveEnabled": true,
       "custom17CursorOffsetDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":0.3844183344595234,\"y\":0.7775000254313151},{\"x\":1,\"y\":0}]",
-      "custom17CursorOffsetDistanceCurveRange": "{\"min\":-5,\"max\":4}",
+      "custom17CursorOffsetDistanceCurveRange": "{\"min\":-14,\"max\":5}",
       "custom17RotationEnabled": true,
       "custom17RotationX": -48,
-      "custom17RotationY": 34,
-      "custom17RotationZ": -43,
+      "custom17RotationY": 49,
+      "custom17RotationZ": -53,
       "custom17TargetPose": "COUNTDOWN (VERT) - 9",
       "custom17TweenSelector": "Wave",
-      "custom17TweenSpeedMs": 3500,
+      "custom17TweenSpeedMs": 2340,
       "custom17TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom17TweenStartTimeRange": "{\"min\":0,\"max\":6000}",
       "custom17SequencePlayMode": "Count",
@@ -7431,11 +7431,11 @@
       "custom17StartDistanceMax": 100,
       "custom17StartDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
       "custom17PauseDurationMs": 0,
-      "custom17RetransitionEnabled": false,
+      "custom17RetransitionEnabled": true,
       "custom17RetransitionSpeedMs": 400,
       "custom17RetransitionSpeedCurveEnabled": true,
-      "custom17RetransitionSpeedCurve": "[{\"x\":0,\"y\":0.41812489827473953},{\"x\":1,\"y\":1}]",
-      "custom17RetransitionSpeedCurveRange": "{\"min\":1132,\"max\":2000}",
+      "custom17RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":0.531408007806075,\"y\":0.3338541666666667,\"h1\":{\"x\":0.14777333656424285,\"y\":0.1133333841959635}},{\"x\":1,\"y\":1}]",
+      "custom17RetransitionSpeedCurveRange": "{\"min\":20000,\"max\":30000}",
       "custom17RetransitionStartTimeCurveEnabled": true,
       "custom17RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom17RetransitionStartTimeRange": "{\"min\":0,\"max\":3000}",
@@ -14895,14 +14895,14 @@
       "custom17CursorOffsetDistance": 3,
       "custom17CursorOffsetDistanceCurveEnabled": true,
       "custom17CursorOffsetDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":0.3844183344595234,\"y\":0.7775000254313151},{\"x\":1,\"y\":0}]",
-      "custom17CursorOffsetDistanceCurveRange": "{\"min\":-5,\"max\":4}",
+      "custom17CursorOffsetDistanceCurveRange": "{\"min\":-14,\"max\":5}",
       "custom17RotationEnabled": true,
       "custom17RotationX": -48,
-      "custom17RotationY": 34,
-      "custom17RotationZ": -43,
+      "custom17RotationY": 49,
+      "custom17RotationZ": -53,
       "custom17TargetPose": "COUNTDOWN (VERT) - 9",
       "custom17TweenSelector": "Wave",
-      "custom17TweenSpeedMs": 3500,
+      "custom17TweenSpeedMs": 2340,
       "custom17TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom17TweenStartTimeRange": "{\"min\":0,\"max\":6000}",
       "custom17SequencePlayMode": "Count",
@@ -14922,11 +14922,11 @@
       "custom17StartDistanceMax": 100,
       "custom17StartDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
       "custom17PauseDurationMs": 0,
-      "custom17RetransitionEnabled": false,
+      "custom17RetransitionEnabled": true,
       "custom17RetransitionSpeedMs": 400,
       "custom17RetransitionSpeedCurveEnabled": true,
-      "custom17RetransitionSpeedCurve": "[{\"x\":0,\"y\":0.41812489827473953},{\"x\":1,\"y\":1}]",
-      "custom17RetransitionSpeedCurveRange": "{\"min\":1132,\"max\":2000}",
+      "custom17RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":0.531408007806075,\"y\":0.3338541666666667,\"h1\":{\"x\":0.14777333656424285,\"y\":0.1133333841959635}},{\"x\":1,\"y\":1}]",
+      "custom17RetransitionSpeedCurveRange": "{\"min\":20000,\"max\":30000}",
       "custom17RetransitionStartTimeCurveEnabled": true,
       "custom17RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom17RetransitionStartTimeRange": "{\"min\":0,\"max\":3000}",
@@ -22386,14 +22386,14 @@
       "custom17CursorOffsetDistance": 3,
       "custom17CursorOffsetDistanceCurveEnabled": true,
       "custom17CursorOffsetDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":0.3844183344595234,\"y\":0.7775000254313151},{\"x\":1,\"y\":0}]",
-      "custom17CursorOffsetDistanceCurveRange": "{\"min\":-5,\"max\":4}",
+      "custom17CursorOffsetDistanceCurveRange": "{\"min\":-14,\"max\":5}",
       "custom17RotationEnabled": true,
       "custom17RotationX": -48,
-      "custom17RotationY": 34,
-      "custom17RotationZ": -43,
+      "custom17RotationY": 49,
+      "custom17RotationZ": -53,
       "custom17TargetPose": "COUNTDOWN (VERT) - 9",
       "custom17TweenSelector": "Wave",
-      "custom17TweenSpeedMs": 3500,
+      "custom17TweenSpeedMs": 2340,
       "custom17TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom17TweenStartTimeRange": "{\"min\":0,\"max\":6000}",
       "custom17SequencePlayMode": "Count",
@@ -22413,11 +22413,11 @@
       "custom17StartDistanceMax": 100,
       "custom17StartDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
       "custom17PauseDurationMs": 0,
-      "custom17RetransitionEnabled": false,
+      "custom17RetransitionEnabled": true,
       "custom17RetransitionSpeedMs": 400,
       "custom17RetransitionSpeedCurveEnabled": true,
-      "custom17RetransitionSpeedCurve": "[{\"x\":0,\"y\":0.41812489827473953},{\"x\":1,\"y\":1}]",
-      "custom17RetransitionSpeedCurveRange": "{\"min\":1132,\"max\":2000}",
+      "custom17RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":0.531408007806075,\"y\":0.3338541666666667,\"h1\":{\"x\":0.14777333656424285,\"y\":0.1133333841959635}},{\"x\":1,\"y\":1}]",
+      "custom17RetransitionSpeedCurveRange": "{\"min\":20000,\"max\":30000}",
       "custom17RetransitionStartTimeCurveEnabled": true,
       "custom17RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom17RetransitionStartTimeRange": "{\"min\":0,\"max\":3000}",
@@ -27654,7 +27654,7 @@
                 "type": "group",
                 "group": {
                   "key": "Rotation",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -27766,7 +27766,7 @@
                 "type": "group",
                 "group": {
                   "key": "Retransition",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -27960,7 +27960,7 @@
               },
               {
                 "key": "Rotation",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -28060,7 +28060,7 @@
               },
               {
                 "key": "Retransition",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -48869,7 +48869,7 @@
               "type": "group",
               "group": {
                 "key": "Rotation",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -48981,7 +48981,7 @@
               "type": "group",
               "group": {
                 "key": "Retransition",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -49175,7 +49175,7 @@
             },
             {
               "key": "Rotation",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -49275,7 +49275,7 @@
             },
             {
               "key": "Retransition",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
