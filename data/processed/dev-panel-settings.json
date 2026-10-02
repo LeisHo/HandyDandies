@@ -27664,7 +27664,7 @@
                             "type": "group",
                             "group": {
                               "key": "Retransition",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -27923,7 +27923,7 @@
                           },
                           {
                             "key": "Retransition",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -28233,7 +28233,7 @@
                           "type": "group",
                           "group": {
                             "key": "Retransition",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -28492,7 +28492,7 @@
                         },
                         {
                           "key": "Retransition",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -29075,7 +29075,7 @@
                           "type": "group",
                           "group": {
                             "key": "Retransition",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -29334,7 +29334,7 @@
                         },
                         {
                           "key": "Retransition",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -29644,7 +29644,7 @@
                         "type": "group",
                         "group": {
                           "key": "Retransition",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -29903,7 +29903,7 @@
                       },
                       {
                         "key": "Retransition",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -32288,14 +32288,14 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 16",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
                 "type": "group",
                 "group": {
                   "key": "Multi Trigger",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -32813,7 +32813,7 @@
             "subgroups": [
               {
                 "key": "Multi Trigger",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -53350,7 +53350,7 @@
                           "type": "group",
                           "group": {
                             "key": "Retransition",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -53609,7 +53609,7 @@
                         },
                         {
                           "key": "Retransition",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -53919,7 +53919,7 @@
                         "type": "group",
                         "group": {
                           "key": "Retransition",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -54178,7 +54178,7 @@
                       },
                       {
                         "key": "Retransition",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -54761,7 +54761,7 @@
                         "type": "group",
                         "group": {
                           "key": "Retransition",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -55020,7 +55020,7 @@
                       },
                       {
                         "key": "Retransition",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -55330,7 +55330,7 @@
                       "type": "group",
                       "group": {
                         "key": "Retransition",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -55589,7 +55589,7 @@
                     },
                     {
                       "key": "Retransition",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -57954,14 +57954,14 @@
         },
         {
           "key": "Custom Click Function 16",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
               "type": "group",
               "group": {
                 "key": "Multi Trigger",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -58479,7 +58479,7 @@
           "subgroups": [
             {
               "key": "Multi Trigger",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
