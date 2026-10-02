@@ -6769,7 +6769,7 @@
       "custom7RetransitionStartTimeCurveEnabled": true,
       "custom7RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom7RetransitionStartTimeRange": "{\"min\":0,\"max\":1048}",
-      "custom7MultiTriggerEnabled": true,
+      "custom7MultiTriggerEnabled": false,
       "custom7MultiTriggers": "[{\"prefix\":\"custom7Trig1\",\"title\":\"Trigger 1\"},{\"prefix\":\"custom7Trig2\",\"title\":\"Trigger 2\"}]",
       "custom7Trig1Enabled": true,
       "custom7Trig1Mode": "Single Pose",
@@ -14260,7 +14260,7 @@
       "custom7RetransitionStartTimeCurveEnabled": true,
       "custom7RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom7RetransitionStartTimeRange": "{\"min\":0,\"max\":1048}",
-      "custom7MultiTriggerEnabled": true,
+      "custom7MultiTriggerEnabled": false,
       "custom7MultiTriggers": "[{\"prefix\":\"custom7Trig1\",\"title\":\"Trigger 1\"},{\"prefix\":\"custom7Trig2\",\"title\":\"Trigger 2\"}]",
       "custom7Trig1Enabled": true,
       "custom7Trig1Mode": "Single Pose",
@@ -21751,7 +21751,7 @@
       "custom7RetransitionStartTimeCurveEnabled": true,
       "custom7RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom7RetransitionStartTimeRange": "{\"min\":0,\"max\":1048}",
-      "custom7MultiTriggerEnabled": true,
+      "custom7MultiTriggerEnabled": false,
       "custom7MultiTriggers": "[{\"prefix\":\"custom7Trig1\",\"title\":\"Trigger 1\"},{\"prefix\":\"custom7Trig2\",\"title\":\"Trigger 2\"}]",
       "custom7Trig1Enabled": true,
       "custom7Trig1Mode": "Single Pose",
@@ -25325,7 +25325,7 @@
           "type": "group",
           "group": {
             "key": "Cursor Tracking",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -26517,7 +26517,7 @@
         },
         {
           "key": "Cursor Tracking",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
@@ -26872,7 +26872,7 @@
     },
     {
       "key": "Custom Click Functions",
-      "collapsed": false,
+      "collapsed": true,
       "locked": false,
       "items": [
         {
