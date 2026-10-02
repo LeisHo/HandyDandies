@@ -18,6 +18,20 @@ work seamlessly from there.
 
 ## Currently working on
 
+**ADDED 2026-10-02 -- "Offset To Camera" group, per-axis Cursor Offset
+inputs, and Offset Z slider (all click functions + Multi Trigger).**
+Offset To Camera is a new stackable on/off group with a Curve + Min/Max
+pair per axis (camera-local right/up/forward; curve X = live distance to
+the cursor). Cursor Offset mode gained a Curve + Min/Max pair per axis,
+added to the shared distance (0..0 default = unchanged behavior). XYZ
+Offset gained an Offset Z slider (+ = toward camera). All three offset
+paths go through one `computeCombinedOffset()` used by the live apply
+and both bake paths. Open interpretation (flagged to the user, easy to
+change): "to Camera" = camera-local axes. `main.js` at `?v=272`.
+`node --check` + a 7-case logic test pass. **Not live-verified in
+browser** (local-server truncation quirk, 5/5 attempts). See
+CHANGELOG.txt for full detail.
+
 **ADDED 2026-10-02 -- Easing Curve for every click function's own
 forward pose transition, including Multi Trigger sub-triggers.** Direct
 request: a curve editor (X = 0-100% of the transition, Y = eased

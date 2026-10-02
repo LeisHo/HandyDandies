@@ -3740,6 +3740,31 @@ function withDynamicDevice(controls) {
   controls.forEach((c) => { if (!NO_CHECKBOX_TYPES.includes(c.type)) c.dynamicDevice = true })
   return controls
 }
+// Per-axis offset curve controls shared by both click-function factories
+// (2026-10-02, direct request): (1) "Cursor Offset" mode's own per-axis
+// Curve + Min/Max pair for X/Y/Z, and (2) the new stackable "Offset to
+// Camera" group (its own on/off checkbox, then a Curve + Min/Max pair per
+// axis). Generated in a loop rather than hand-written 18 times so the two
+// factories can't drift apart; see computeCursorAxisExtra()/
+// computeCameraOffset() for how each value is actually used. Cursor
+// per-axis ranges default to 0..0 so they add NOTHING until tuned (keeps
+// every existing function's Cursor Offset behavior identical); the camera
+// offset ranges default to 0..10, an arbitrary starting value with no
+// measurement behind it, only live once its own checkbox is on.
+function offsetExtraControls(p, parseFn) {
+  const linear = '[{"x":0,"y":0},{"x":1,"y":1}]'
+  const rows = []
+  ;['X', 'Y', 'Z'].forEach((ax) => {
+    rows.push({ key: `${p}CursorOffset${ax}Curve`, label: `Cursor Offset ${ax} Curve (Distance -> Offset)`, type: 'text', def: linear, onChange: () => parseFn(p) })
+    rows.push({ key: `${p}CursorOffset${ax}Range`, label: `Cursor Offset ${ax} Min / Max (World Units)`, type: 'text', def: '{"min":0,"max":0}', onChange: () => parseFn(p) })
+  })
+  rows.push({ key: `${p}CameraOffsetEnabled`, label: 'Offset To Camera On/Off', type: 'checkbox', def: false, onChange: () => updateOffsetRotationVisibility(p) })
+  ;['X', 'Y', 'Z'].forEach((ax) => {
+    rows.push({ key: `${p}CameraOffset${ax}Curve`, label: `Camera Offset ${ax} Curve (Distance -> Offset)`, type: 'text', def: linear, onChange: () => parseFn(p) })
+    rows.push({ key: `${p}CameraOffset${ax}Range`, label: `Camera Offset ${ax} Min / Max (World Units)`, type: 'text', def: '{"min":0,"max":10}', onChange: () => parseFn(p) })
+  })
+  return rows
+}
 function makeClickHoldPoseGroup(p, title, defaults = {}) {
   return {
     title,
@@ -3797,6 +3822,7 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       { key: `${p}OffsetMode`, label: 'Offset Mode', type: 'select', def: 'XYZ Offset', options: () => ['XYZ Offset', 'Cursor Offset'], onChange: () => updateOffsetRotationVisibility(p) },
       { key: `${p}OffsetX`, label: 'Offset X (World Units)', type: 'slider', min: -50, max: 50, step: 0.5, def: 0 },
       { key: `${p}OffsetY`, label: 'Offset Y (World Units)', type: 'slider', min: -50, max: 50, step: 0.5, def: 0 },
+      { key: `${p}OffsetZ`, label: 'Offset Z (World Units, + Toward Camera)', type: 'slider', min: -50, max: 50, step: 0.5, def: 0 },
       { key: `${p}CursorOffsetDistance`, label: 'Cursor Offset Distance (World Units)', type: 'slider', min: -50, max: 50, step: 0.5, def: 0 },
       // Cursor Offset Distance Curve -- direct request 2026-10-01 ("provide
       // me an offset min max, as well as the curve, with x as distance from
@@ -3810,6 +3836,7 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       { key: `${p}CursorOffsetDistanceCurveEnabled`, label: 'Cursor Offset Distance Curve On/Off', type: 'checkbox', def: false, onChange: () => updateOffsetRotationVisibility(p) },
       { key: `${p}CursorOffsetDistanceCurve`, label: 'Cursor Offset Distance Curve (Distance -> Offset)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickHoldConfig(p) },
       { key: `${p}CursorOffsetDistanceCurveRange`, label: 'Cursor Offset Min / Max Distance (World Units)', type: 'text', def: '{"min":-50,"max":50}', onChange: () => parseClickHoldConfig(p) },
+      ...offsetExtraControls(p, parseClickHoldConfig),
       { key: `${p}RotationEnabled`, label: 'Rotation On/Off', type: 'checkbox', def: false, onChange: () => updateOffsetRotationVisibility(p) },
       { key: `${p}RotationX`, label: 'Rotation X (Deg)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
       { key: `${p}RotationY`, label: 'Rotation Y (Deg)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
@@ -4149,6 +4176,7 @@ function makeClickPoseGroup(p, title, defaults = {}) {
       { key: `${p}OffsetMode`, label: 'Offset Mode', type: 'select', def: 'XYZ Offset', options: () => ['XYZ Offset', 'Cursor Offset'], onChange: () => updateOffsetRotationVisibility(p) },
       { key: `${p}OffsetX`, label: 'Offset X (World Units)', type: 'slider', min: -50, max: 50, step: 0.5, def: 0 },
       { key: `${p}OffsetY`, label: 'Offset Y (World Units)', type: 'slider', min: -50, max: 50, step: 0.5, def: 0 },
+      { key: `${p}OffsetZ`, label: 'Offset Z (World Units, + Toward Camera)', type: 'slider', min: -50, max: 50, step: 0.5, def: 0 },
       { key: `${p}CursorOffsetDistance`, label: 'Cursor Offset Distance (World Units)', type: 'slider', min: -50, max: 50, step: 0.5, def: 0 },
       // Cursor Offset Distance Curve -- direct request 2026-10-01 ("provide
       // me an offset min max, as well as the curve, with x as distance from
@@ -4162,6 +4190,7 @@ function makeClickPoseGroup(p, title, defaults = {}) {
       { key: `${p}CursorOffsetDistanceCurveEnabled`, label: 'Cursor Offset Distance Curve On/Off', type: 'checkbox', def: false, onChange: () => updateOffsetRotationVisibility(p) },
       { key: `${p}CursorOffsetDistanceCurve`, label: 'Cursor Offset Distance Curve (Distance -> Offset)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickPoseConfig(p) },
       { key: `${p}CursorOffsetDistanceCurveRange`, label: 'Cursor Offset Min / Max Distance (World Units)', type: 'text', def: '{"min":-50,"max":50}', onChange: () => parseClickPoseConfig(p) },
+      ...offsetExtraControls(p, parseClickPoseConfig),
       { key: `${p}RotationEnabled`, label: 'Rotation On/Off', type: 'checkbox', def: false, onChange: () => updateOffsetRotationVisibility(p) },
       { key: `${p}RotationX`, label: 'Rotation X (Deg)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
       { key: `${p}RotationY`, label: 'Rotation Y (Deg)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
@@ -6856,6 +6885,22 @@ const clickHoldPoseTriggers = Object.fromEntries([...CLICK_HOLD_KEYS, ...LEGACY_
   tweenStopStartCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStopStartRangeParsed: { min: 0, max: 300 },
   tweenStopDelayCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStopDelayRangeParsed: { min: 0, max: 2000 }
 }]))
+// Per-axis offset curves (2026-10-02) -- see offsetExtraControls()'s own
+// comment. Cached on the trigger-state object as
+// `t.offsetAxis.{cursor|camera}.{X|Y|Z} = { curve, range }`, same
+// "keep last-good value on a bad JSON edit" convention every other curve
+// parse here uses.
+const OFFSET_LINEAR_CURVE = [{ x: 0, y: 0 }, { x: 1, y: 1 }]
+function parseOffsetAxisCurves(t, p) {
+  if (!t.offsetAxis) t.offsetAxis = { cursor: {}, camera: {} }
+  ;[['cursor', 'CursorOffset'], ['camera', 'CameraOffset']].forEach(([bucket, prefix]) => {
+    ;['X', 'Y', 'Z'].forEach((ax) => {
+      const slot = t.offsetAxis[bucket][ax] || (t.offsetAxis[bucket][ax] = { curve: OFFSET_LINEAR_CURVE, range: { min: 0, max: 0 } })
+      try { slot.curve = JSON.parse(cfg[`${p}${prefix}${ax}Curve`]).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
+      try { slot.range = JSON.parse(cfg[`${p}${prefix}${ax}Range`]) } catch (e) { /* keep last-good value */ }
+    })
+  })
+}
 function parseClickHoldConfig(p) {
   const t = clickHoldPoseTriggers[p]
   try { t.startCurveParsed = JSON.parse(cfg[`${p}StartTimeCurve`]).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
@@ -6876,6 +6921,7 @@ function parseClickHoldConfig(p) {
   // Easing Curve (2026-10-02) -- see makeClickHoldPoseGroup()'s own
   // matching control comment.
   try { t.easingCurveParsed = JSON.parse(cfg[`${p}EasingCurve`]).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
+  parseOffsetAxisCurves(t, p)
   try { t.retransitionCurveParsed = JSON.parse(cfg[`${p}RetransitionStartTimeCurve`]).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
   try { t.retransitionRangeParsed = JSON.parse(cfg[`${p}RetransitionStartTimeRange`]) } catch (e) { /* keep last-good value */ }
   // Retransition's own distance->SPEED curve/range (item 5, 2026-09-24) --
@@ -7176,9 +7222,60 @@ function computeOffsetXY(hand, p) {
     const dist = (cfg[`${p}CursorOffsetDistanceCurveEnabled`] && trig)
       ? computeStartDelayMs(hand.wrapper.position.distanceTo(cursorTarget), liveFieldMinDist, liveFieldDistRange, trig.cursorOffsetDistanceCurveParsed, trig.cursorOffsetDistanceRangeParsed)
       : (cfg[`${p}CursorOffsetDistance`] || 0)
-    return { x: (rightComp / len3) * dist, y: (upComp / len3) * dist, z: (forwardComp / len3) * dist }
+    // Per-axis extra distance (2026-10-02, direct request: "for cursor
+    // offset mode... also provide the 2 inputs for the 3 axes
+    // individually"): each axis gets its own Curve + Min/Max pair, ADDED
+    // to the shared distance above before that axis's own direction
+    // component scales it. Ranges default to 0..0, so an untouched
+    // function behaves exactly as before; set the shared distance to 0
+    // to drive the motion purely from the per-axis pairs.
+    const axisSlots = trig && trig.offsetAxis && trig.offsetAxis.cursor
+    let exX = 0, exY = 0, exZ = 0
+    if (axisSlots) {
+      const handDist = hand.wrapper.position.distanceTo(cursorTarget)
+      exX = evalOffsetAxisSlot(axisSlots.X, handDist)
+      exY = evalOffsetAxisSlot(axisSlots.Y, handDist)
+      exZ = evalOffsetAxisSlot(axisSlots.Z, handDist)
+    }
+    return { x: (rightComp / len3) * (dist + exX), y: (upComp / len3) * (dist + exY), z: (forwardComp / len3) * (dist + exZ) }
   }
-  return { x: cfg[`${p}OffsetX`] || 0, y: cfg[`${p}OffsetY`] || 0, z: 0 }
+  return { x: cfg[`${p}OffsetX`] || 0, y: cfg[`${p}OffsetY`] || 0, z: cfg[`${p}OffsetZ`] || 0 }
+}
+const ZERO_OFFSET = Object.freeze({ x: 0, y: 0, z: 0 })
+// One axis's Curve + Min/Max pair -> world-unit value for a hand at
+// `handDist` from the cursor (same live-field-normalized X domain as the
+// Cursor Offset Distance Curve). A 0..0 range short-circuits to 0.
+function evalOffsetAxisSlot(slot, handDist) {
+  if (!slot || !slot.range || (slot.range.min === 0 && slot.range.max === 0)) return 0
+  return computeStartDelayMs(handDist, liveFieldMinDist, liveFieldDistRange, slot.curve, slot.range)
+}
+// "Offset To Camera" (2026-10-02, direct request): a SEPARATE offset
+// that stacks with the main Offset group -- moves the hand along the
+// camera-local right/up/forward axes by a per-axis Curve + Min/Max value
+// (X of each curve = this hand's live distance to the cursor). +Z is
+// toward the camera (camera matrixWorld column 2 points out of the
+// screen). Independent on/off from OffsetEnabled.
+function computeCameraOffset(hand, p) {
+  if (!cfg[`${p}CameraOffsetEnabled`]) return ZERO_OFFSET
+  const trig = clickHoldPoseTriggers[p] || clickPoseTriggers[p]
+  const slots = trig && trig.offsetAxis && trig.offsetAxis.camera
+  if (!slots) return ZERO_OFFSET
+  const handDist = hand.wrapper.position.distanceTo(cursorTarget)
+  return { x: evalOffsetAxisSlot(slots.X, handDist), y: evalOffsetAxisSlot(slots.Y, handDist), z: evalOffsetAxisSlot(slots.Z, handDist) }
+}
+// What applyOffsetRotationToHand()/bakeOffsetRotationIntoAccum()/
+// bakeInFlightOffsetRotation() all read -- the main Offset group's value
+// (when ITS checkbox is on) plus the Offset To Camera value (when ITS
+// checkbox is on). All 3 callers go through this one function so the
+// live apply and both bake paths can never disagree.
+function computeCombinedOffset(hand, p) {
+  const mainOn = !!cfg[`${p}OffsetEnabled`]
+  const camOn = !!cfg[`${p}CameraOffsetEnabled`]
+  if (!mainOn && !camOn) return ZERO_OFFSET
+  const a = mainOn ? computeOffsetXY(hand, p) : ZERO_OFFSET
+  if (!camOn) return a
+  const b = computeCameraOffset(hand, p)
+  return { x: a.x + b.x, y: a.y + b.y, z: a.z + b.z }
 }
 // CORRECTED 2026-09-27 -- direct spec, 3 related items:
 // (2) "each click function's offset and rotation effects will be
@@ -7247,8 +7344,8 @@ function applyOffsetRotationToHand(hand, p, progress) {
     hand.wrapper.position.addScaledVector(_offsetForwardVec, hand._customOffsetAccum.z)
   }
   if (!isIdentityQuat(hand._customRotationAccum)) hand.wrapper.quaternion.multiply(hand._customRotationAccum)
-  if (cfg[`${p}OffsetEnabled`]) {
-    const base = computeOffsetXY(hand, p)
+  if (cfg[`${p}OffsetEnabled`] || cfg[`${p}CameraOffsetEnabled`]) {
+    const base = computeCombinedOffset(hand, p)
     const ox = base.x * progress
     const oy = base.y * progress
     const oz = base.z * progress
@@ -7283,8 +7380,8 @@ function isIdentityQuat(q) { return q.x === 0 && q.y === 0 && q.z === 0 && q.w =
 function bakeOffsetRotationIntoAccum(hand, p) {
   if (!hand._customOffsetAccum) hand._customOffsetAccum = { x: 0, y: 0, z: 0 }
   if (!hand._customRotationAccum) hand._customRotationAccum = new THREE.Quaternion()
-  if (cfg[`${p}OffsetEnabled`]) {
-    const base = computeOffsetXY(hand, p)
+  if (cfg[`${p}OffsetEnabled`] || cfg[`${p}CameraOffsetEnabled`]) {
+    const base = computeCombinedOffset(hand, p)
     hand._customOffsetAccum.x += base.x
     hand._customOffsetAccum.y += base.y
     hand._customOffsetAccum.z += base.z
@@ -7323,8 +7420,8 @@ function bakeInFlightOffsetRotation(hand, p) {
   if (fraction <= 0) return
   if (!hand._customOffsetAccum) hand._customOffsetAccum = { x: 0, y: 0, z: 0 }
   if (!hand._customRotationAccum) hand._customRotationAccum = new THREE.Quaternion()
-  if (cfg[`${p}OffsetEnabled`]) {
-    const base = computeOffsetXY(hand, p)
+  if (cfg[`${p}OffsetEnabled`] || cfg[`${p}CameraOffsetEnabled`]) {
+    const base = computeCombinedOffset(hand, p)
     hand._customOffsetAccum.x += base.x * fraction
     hand._customOffsetAccum.y += base.y * fraction
     hand._customOffsetAccum.z += base.z * fraction
@@ -8773,6 +8870,7 @@ function parseClickPoseConfig(p) {
   // Easing Curve (2026-10-02) -- see makeClickPoseGroup()'s own matching
   // control comment.
   try { t.easingCurveParsed = JSON.parse(cfg[`${p}EasingCurve`]).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
+  parseOffsetAxisCurves(t, p)
   try { t.retransitionCurveParsed = JSON.parse(cfg[`${p}RetransitionStartTimeCurve`]).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
   try { t.retransitionRangeParsed = JSON.parse(cfg[`${p}RetransitionStartTimeRange`]) } catch (e) { /* keep last-good value */ }
   // Retransition's own distance->SPEED curve/range (item 5, 2026-09-24) --
@@ -9918,6 +10016,19 @@ function buildGenericCurveWidget(row, opts) {
 // 2 range) -- called once per trigger, right after initDevPanel(), same
 // timing as buildArmLengthWidgets()/buildWristSplayWidgets().
 const CLICK_HOLD_START_TIME_TRACK_MAX = 3000 // ms -- a deliberately smaller ceiling than the 5000ms Transition Speed sliders, since "start time" is meant to stagger WITHIN a transition, not span longer than one
+// Curve + range-bar widgets for the per-axis Cursor Offset and Offset To
+// Camera rows (2026-10-02) -- shared by both widget builders.
+function buildOffsetAxisWidgets(p) {
+  const caption = 'X: Distance From Cursor (Live, Nearest→Farthest Hand In Field)  ·  Y: Offset Fraction (0=Min, 1=Max)'
+  ;['CursorOffset', 'CameraOffset'].forEach((prefix) => {
+    ;['X', 'Y', 'Z'].forEach((ax) => {
+      const curveRow = document.querySelector(`.dp-row[data-key="${p}${prefix}${ax}Curve"]`)
+      const rangeRow = document.querySelector(`.dp-row[data-key="${p}${prefix}${ax}Range"]`)
+      if (curveRow) buildGenericCurveWidget(curveRow, { caption, defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
+      if (rangeRow) buildGenericRangeBarWidget(rangeRow, { trackMin: -50, trackMax: 50, unit: 'wu', defaultValue: prefix === 'CameraOffset' ? { min: 0, max: 10 } : { min: 0, max: 0 } })
+    })
+  })
+}
 function buildClickHoldPoseWidgets(p) {
   // Animation Speed Curve's own curve/range widgets -- a real gap left
   // over from when this control was first added (SpeedCurve/
@@ -9991,6 +10102,7 @@ function buildClickHoldPoseWidgets(p) {
   // progress (0-100%), Y is the eased output fed into the pose/tween
   // interpolation. No separate range widget -- Y is already the final
   // 0-1 fraction, same convention as Start Distance Curve just above.
+  buildOffsetAxisWidgets(p)
   const easingCurveRow = document.querySelector(`.dp-row[data-key="${p}EasingCurve"]`)
   if (easingCurveRow) buildGenericCurveWidget(easingCurveRow, { caption: 'X: Transition Progress (0-100%)  ·  Y: Eased Progress (0=Start, 1=Complete)', defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
   // Direct request 2026-10-01 ("for start distance min max, make that a
@@ -10056,6 +10168,7 @@ function buildClickPoseWidgets(p) {
   if (startDistanceCurveRow) buildGenericCurveWidget(startDistanceCurveRow, { caption: 'X: Distance From Cursor (Start Distance Min→Max)  ·  Y: Tween Amount Executed (0=None, 1=Full)', defaultPoints: [{ x: 0, y: 1 }, { x: 1, y: 1 }] })
   // Easing Curve (2026-10-02) -- see buildClickHoldPoseWidgets()'s own
   // matching comment.
+  buildOffsetAxisWidgets(p)
   const easingCurveRow = document.querySelector(`.dp-row[data-key="${p}EasingCurve"]`)
   if (easingCurveRow) buildGenericCurveWidget(easingCurveRow, { caption: 'X: Transition Progress (0-100%)  ·  Y: Eased Progress (0=Start, 1=Complete)', defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
   // Direct request 2026-10-01 ("for start distance min max, make that a
@@ -10910,6 +11023,13 @@ const NEW_CUSTOM_FUNCTION_TEMPLATE = {
   // template, but filled in now while touching this same object anyway.
   OffsetEnabled: false, OffsetX: 0, OffsetY: 0, OffsetMode: 'XYZ Offset', CursorOffsetDistance: 0,
   CursorOffsetDistanceCurveEnabled: false, CursorOffsetDistanceCurve: '[{"x":0,"y":0},{"x":1,"y":1}]', CursorOffsetDistanceCurveRange: '{"min":-50,"max":50}',
+  OffsetZ: 0, CameraOffsetEnabled: false,
+  CursorOffsetXCurve: '[{"x":0,"y":0},{"x":1,"y":1}]', CursorOffsetXRange: '{"min":0,"max":0}',
+  CameraOffsetXCurve: '[{"x":0,"y":0},{"x":1,"y":1}]', CameraOffsetXRange: '{"min":0,"max":10}',
+  CursorOffsetYCurve: '[{"x":0,"y":0},{"x":1,"y":1}]', CursorOffsetYRange: '{"min":0,"max":0}',
+  CameraOffsetYCurve: '[{"x":0,"y":0},{"x":1,"y":1}]', CameraOffsetYRange: '{"min":0,"max":10}',
+  CursorOffsetZCurve: '[{"x":0,"y":0},{"x":1,"y":1}]', CursorOffsetZRange: '{"min":0,"max":0}',
+  CameraOffsetZCurve: '[{"x":0,"y":0},{"x":1,"y":1}]', CameraOffsetZRange: '{"min":0,"max":10}',
   RotationEnabled: false, RotationX: 0, RotationY: 0, RotationZ: 0,
   TargetPose: '', TweenSelector: '', TweenSpeedMs: 800,
   TweenStartTimeCurve: '[{"x":0,"y":0},{"x":1,"y":1}]', TweenStartTimeRange: '{"min":0,"max":300}',
@@ -11133,6 +11253,8 @@ const MULTI_TRIGGER_ALLOWED_SUFFIXES = [
   'EasingCurveEnabled', 'EasingCurve',
   'OffsetEnabled', 'OffsetMode', 'OffsetX', 'OffsetY', 'CursorOffsetDistance',
   'CursorOffsetDistanceCurveEnabled', 'CursorOffsetDistanceCurve', 'CursorOffsetDistanceCurveRange',
+  'OffsetZ', 'CursorOffsetXCurve', 'CursorOffsetXRange', 'CursorOffsetYCurve', 'CursorOffsetYRange', 'CursorOffsetZCurve', 'CursorOffsetZRange',
+  'CameraOffsetEnabled', 'CameraOffsetXCurve', 'CameraOffsetXRange', 'CameraOffsetYCurve', 'CameraOffsetYRange', 'CameraOffsetZCurve', 'CameraOffsetZRange',
   'RotationEnabled', 'RotationX', 'RotationY', 'RotationZ',
   'SpeedCurveEnabled', 'SpeedCurve', 'SpeedCurveRange',
   'StartTimeCurveEnabled', 'StartTimeCurve', 'StartTimeRange', 'TweenStartTimeCurve', 'TweenStartTimeRange',
@@ -12094,6 +12216,7 @@ function updateOffsetRotationVisibility(p) {
   // the pre-existing behavior for anyone who never touches this new
   // control.
   const cursorMode = cfg[`${p}OffsetMode`] === 'Cursor Offset'
+  const cameraOffsetOn = !!cfg[`${p}CameraOffsetEnabled`]
   ;['OffsetX', 'OffsetY'].forEach((suffix) => {
     const row = document.querySelector(`.dp-row[data-key="${p}${suffix}"]`)
     if (row) row.style.display = offsetOn && !cursorMode ? '' : 'none'
@@ -12103,6 +12226,18 @@ function updateOffsetRotationVisibility(p) {
   // the Curve+Range pair instead -- both still gated behind cursorMode,
   // same as the flat slider was.
   const cursorCurveOn = !!cfg[`${p}CursorOffsetDistanceCurveEnabled`]
+  // Offset Z / per-axis Cursor Offset rows (2026-10-02): Z only exists in
+  // XYZ mode; the per-axis Curve + Min/Max pairs only in Cursor mode.
+  const offsetZRow = document.querySelector(`.dp-row[data-key="${p}OffsetZ"]`)
+  if (offsetZRow) offsetZRow.style.display = offsetOn && !cursorMode ? '' : 'none'
+  ;['X', 'Y', 'Z'].forEach((ax) => {
+    ;['Curve', 'Range'].forEach((k) => {
+      const row = document.querySelector(`.dp-row[data-key="${p}CursorOffset${ax}${k}"]`)
+      if (row) row.style.display = offsetOn && cursorMode ? '' : 'none'
+      const camRow = document.querySelector(`.dp-row[data-key="${p}CameraOffset${ax}${k}"]`)
+      if (camRow) camRow.style.display = cameraOffsetOn ? '' : 'none'
+    })
+  })
   const cursorOffsetRow = document.querySelector(`.dp-row[data-key="${p}CursorOffsetDistance"]`)
   if (cursorOffsetRow) cursorOffsetRow.style.display = offsetOn && cursorMode && !cursorCurveOn ? '' : 'none'
   const cursorCurveEnabledRow = document.querySelector(`.dp-row[data-key="${p}CursorOffsetDistanceCurveEnabled"]`)
@@ -12189,7 +12324,10 @@ function wrapClickFunctionGatedSubgroups(p) {
   // subgroup treatment as every other on/off curve below ("provide an
   // on off checkbox for each").
   wrapGatedSubgroup(`${p}EasingCurveEnabled`, [`${p}EasingCurve`], 'Easing')
-  wrapGatedSubgroup(`${p}OffsetEnabled`, [`${p}OffsetMode`, `${p}OffsetX`, `${p}OffsetY`, `${p}CursorOffsetDistance`, `${p}CursorOffsetDistanceCurveEnabled`, `${p}CursorOffsetDistanceCurve`, `${p}CursorOffsetDistanceCurveRange`], 'Offset')
+  wrapGatedSubgroup(`${p}OffsetEnabled`, [`${p}OffsetMode`, `${p}OffsetX`, `${p}OffsetY`, `${p}OffsetZ`, `${p}CursorOffsetDistance`, `${p}CursorOffsetDistanceCurveEnabled`, `${p}CursorOffsetDistanceCurve`, `${p}CursorOffsetDistanceCurveRange`, ...['X', 'Y', 'Z'].flatMap((ax) => [`${p}CursorOffset${ax}Curve`, `${p}CursorOffset${ax}Range`])], 'Offset')
+  // "Offset To Camera" (2026-10-02) -- its own mandatory gated subgroup,
+  // independent of (and stackable with) "Offset" above.
+  wrapGatedSubgroup(`${p}CameraOffsetEnabled`, ['X', 'Y', 'Z'].flatMap((ax) => [`${p}CameraOffset${ax}Curve`, `${p}CameraOffset${ax}Range`]), 'Offset To Camera')
   wrapGatedSubgroup(`${p}RotationEnabled`, [`${p}RotationX`, `${p}RotationY`, `${p}RotationZ`], 'Rotation')
   wrapGatedSubgroup(`${p}SpeedCurveEnabled`, [`${p}SpeedCurve`, `${p}SpeedCurveRange`], 'Animation Speed Curve')
   // CORRECTED 2026-09-24 (item 7, remainder): Tween mode's own always-on
