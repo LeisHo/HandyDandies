@@ -7543,10 +7543,10 @@
       "custom18Trig1CursorOffsetDistanceCurveEnabled": true,
       "custom18Trig1CursorOffsetDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":0.4481651900015995,\"y\":0.6334376017252604},{\"x\":1,\"y\":0}]",
       "custom18Trig1CursorOffsetDistanceCurveRange": "{\"min\":-4,\"max\":6}",
-      "custom18Trig1RotationEnabled": false,
-      "custom18Trig1RotationX": 0,
-      "custom18Trig1RotationY": 0,
-      "custom18Trig1RotationZ": 0,
+      "custom18Trig1RotationEnabled": true,
+      "custom18Trig1RotationX": 20,
+      "custom18Trig1RotationY": 90,
+      "custom18Trig1RotationZ": 700,
       "custom18Trig1TargetPose": "FistBent-Rotation-2",
       "custom18Trig1TweenSelector": "Birdie",
       "custom18Trig1TweenSpeedMs": 5000,
@@ -15116,10 +15116,10 @@
       "custom18Trig1CursorOffsetDistanceCurveEnabled": true,
       "custom18Trig1CursorOffsetDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":0.4481651900015995,\"y\":0.6334376017252604},{\"x\":1,\"y\":0}]",
       "custom18Trig1CursorOffsetDistanceCurveRange": "{\"min\":-4,\"max\":6}",
-      "custom18Trig1RotationEnabled": false,
-      "custom18Trig1RotationX": 0,
-      "custom18Trig1RotationY": 0,
-      "custom18Trig1RotationZ": 0,
+      "custom18Trig1RotationEnabled": true,
+      "custom18Trig1RotationX": 20,
+      "custom18Trig1RotationY": 90,
+      "custom18Trig1RotationZ": 700,
       "custom18Trig1TargetPose": "FistBent-Rotation-2",
       "custom18Trig1TweenSelector": "Birdie",
       "custom18Trig1TweenSpeedMs": 5000,
@@ -22689,10 +22689,10 @@
       "custom18Trig1CursorOffsetDistanceCurveEnabled": true,
       "custom18Trig1CursorOffsetDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":0.4481651900015995,\"y\":0.6334376017252604},{\"x\":1,\"y\":0}]",
       "custom18Trig1CursorOffsetDistanceCurveRange": "{\"min\":-4,\"max\":6}",
-      "custom18Trig1RotationEnabled": false,
-      "custom18Trig1RotationX": 0,
-      "custom18Trig1RotationY": 0,
-      "custom18Trig1RotationZ": 0,
+      "custom18Trig1RotationEnabled": true,
+      "custom18Trig1RotationX": 20,
+      "custom18Trig1RotationY": 90,
+      "custom18Trig1RotationZ": 700,
       "custom18Trig1TargetPose": "FistBent-Rotation-2",
       "custom18Trig1TweenSelector": "Birdie",
       "custom18Trig1TweenSpeedMs": 5000,
@@ -27133,7 +27133,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 18",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -27465,7 +27465,7 @@
                 "type": "group",
                 "group": {
                   "key": "Multi Trigger",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -27480,7 +27480,7 @@
                       "type": "group",
                       "group": {
                         "key": "Trigger 1",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -27563,7 +27563,7 @@
                             "type": "group",
                             "group": {
                               "key": "Rotation",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -27834,7 +27834,7 @@
                           },
                           {
                             "key": "Rotation",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -28049,7 +28049,7 @@
                   "subgroups": [
                     {
                       "key": "Trigger 1",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -28132,7 +28132,7 @@
                           "type": "group",
                           "group": {
                             "key": "Rotation",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -28403,7 +28403,7 @@
                         },
                         {
                           "key": "Rotation",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -28876,7 +28876,7 @@
               },
               {
                 "key": "Multi Trigger",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -28891,7 +28891,7 @@
                     "type": "group",
                     "group": {
                       "key": "Trigger 1",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -28974,7 +28974,7 @@
                           "type": "group",
                           "group": {
                             "key": "Rotation",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -29245,7 +29245,7 @@
                         },
                         {
                           "key": "Rotation",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -29460,7 +29460,7 @@
                 "subgroups": [
                   {
                     "key": "Trigger 1",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -29543,7 +29543,7 @@
                         "type": "group",
                         "group": {
                           "key": "Rotation",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -29814,7 +29814,7 @@
                       },
                       {
                         "key": "Rotation",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -52811,7 +52811,7 @@
       "subgroups": [
         {
           "key": "Custom Click Function 18",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
@@ -53143,7 +53143,7 @@
               "type": "group",
               "group": {
                 "key": "Multi Trigger",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -53158,7 +53158,7 @@
                     "type": "group",
                     "group": {
                       "key": "Trigger 1",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -53241,7 +53241,7 @@
                           "type": "group",
                           "group": {
                             "key": "Rotation",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -53512,7 +53512,7 @@
                         },
                         {
                           "key": "Rotation",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -53727,7 +53727,7 @@
                 "subgroups": [
                   {
                     "key": "Trigger 1",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -53810,7 +53810,7 @@
                         "type": "group",
                         "group": {
                           "key": "Rotation",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -54081,7 +54081,7 @@
                       },
                       {
                         "key": "Rotation",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -54554,7 +54554,7 @@
             },
             {
               "key": "Multi Trigger",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -54569,7 +54569,7 @@
                   "type": "group",
                   "group": {
                     "key": "Trigger 1",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -54652,7 +54652,7 @@
                         "type": "group",
                         "group": {
                           "key": "Rotation",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -54923,7 +54923,7 @@
                       },
                       {
                         "key": "Rotation",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -55138,7 +55138,7 @@
               "subgroups": [
                 {
                   "key": "Trigger 1",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -55221,7 +55221,7 @@
                       "type": "group",
                       "group": {
                         "key": "Rotation",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -55492,7 +55492,7 @@
                     },
                     {
                       "key": "Rotation",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
