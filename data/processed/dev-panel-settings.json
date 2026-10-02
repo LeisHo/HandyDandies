@@ -6862,10 +6862,10 @@
       "custom8CursorOffsetDistanceCurveEnabled": false,
       "custom8CursorOffsetDistanceCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom8CursorOffsetDistanceCurveRange": "{\"min\":-50,\"max\":50}",
-      "custom8RotationEnabled": false,
-      "custom8RotationX": 0,
-      "custom8RotationY": 0,
-      "custom8RotationZ": 0,
+      "custom8RotationEnabled": true,
+      "custom8RotationX": 200,
+      "custom8RotationY": -150,
+      "custom8RotationZ": 600,
       "custom8TargetPose": "",
       "custom8TweenSelector": "FLOWER 3",
       "custom8TweenChain": [],
@@ -6925,14 +6925,14 @@
       "custom9RotationEnabled": true,
       "custom9RotationX": 101,
       "custom9RotationY": -120,
-      "custom9RotationZ": 0,
+      "custom9RotationZ": -208,
       "custom9TargetPose": "Clockwise Fan - 5",
       "custom9TweenSelector": "Neutral - Horizontal Fanning",
       "custom9TweenSpeedMs": 4420,
       "custom9TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9TweenStartTimeRange": "{\"min\":0,\"max\":3000}",
       "custom9SequencePlayMode": "Count",
-      "custom9SequenceCount": 3,
+      "custom9SequenceCount": 2,
       "custom9SequenceCountMode": "Loop",
       "custom9SequenceLoopTransition": true,
       "custom9SequenceHoldMs": 0,
@@ -7041,18 +7041,18 @@
       "custom10TouchPointCount": 1,
       "custom10ClickCount": "2nd",
       "custom10Mode": "Sequence",
-      "custom10OffsetEnabled": false,
-      "custom10OffsetMode": "XYZ Offset",
+      "custom10OffsetEnabled": true,
+      "custom10OffsetMode": "Cursor Offset",
       "custom10OffsetX": 0,
       "custom10OffsetY": 0,
-      "custom10CursorOffsetDistance": 0,
+      "custom10CursorOffsetDistance": -1,
       "custom10CursorOffsetDistanceCurveEnabled": false,
       "custom10CursorOffsetDistanceCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom10CursorOffsetDistanceCurveRange": "{\"min\":-50,\"max\":50}",
-      "custom10RotationEnabled": false,
-      "custom10RotationX": 0,
-      "custom10RotationY": 0,
-      "custom10RotationZ": 0,
+      "custom10RotationEnabled": true,
+      "custom10RotationX": -5,
+      "custom10RotationY": 5,
+      "custom10RotationZ": 15,
       "custom10TargetPose": "",
       "custom10TweenSelector": "Clockwise Fan",
       "custom10TweenChain": [],
@@ -7086,7 +7086,7 @@
       "custom10TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom10TweenRetransitionStartTimeRange": "{\"min\":0,\"max\":3000}",
       "custom10TweenStopEnabled": true,
-      "custom10TweenStopStartTimeCurveEnabled": true,
+      "custom10TweenStopStartTimeCurveEnabled": false,
       "custom10TweenStopStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom10TweenStopStartTimeRange": "{\"min\":0,\"max\":3000}",
       "custom10TweenStopDelayEnabled": true,
@@ -14357,10 +14357,10 @@
       "custom8CursorOffsetDistanceCurveEnabled": false,
       "custom8CursorOffsetDistanceCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom8CursorOffsetDistanceCurveRange": "{\"min\":-50,\"max\":50}",
-      "custom8RotationEnabled": false,
-      "custom8RotationX": 0,
-      "custom8RotationY": 0,
-      "custom8RotationZ": 0,
+      "custom8RotationEnabled": true,
+      "custom8RotationX": 200,
+      "custom8RotationY": -150,
+      "custom8RotationZ": 600,
       "custom8TargetPose": "",
       "custom8TweenSelector": "FLOWER 3",
       "custom8TweenChain": [],
@@ -14420,14 +14420,14 @@
       "custom9RotationEnabled": true,
       "custom9RotationX": 101,
       "custom9RotationY": -120,
-      "custom9RotationZ": 0,
+      "custom9RotationZ": -208,
       "custom9TargetPose": "Clockwise Fan - 5",
       "custom9TweenSelector": "Neutral - Horizontal Fanning",
       "custom9TweenSpeedMs": 4420,
       "custom9TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9TweenStartTimeRange": "{\"min\":0,\"max\":3000}",
       "custom9SequencePlayMode": "Count",
-      "custom9SequenceCount": 3,
+      "custom9SequenceCount": 2,
       "custom9SequenceCountMode": "Loop",
       "custom9SequenceLoopTransition": true,
       "custom9SequenceHoldMs": 0,
@@ -14536,18 +14536,18 @@
       "custom10TouchPointCount": 1,
       "custom10ClickCount": "2nd",
       "custom10Mode": "Sequence",
-      "custom10OffsetEnabled": false,
-      "custom10OffsetMode": "XYZ Offset",
+      "custom10OffsetEnabled": true,
+      "custom10OffsetMode": "Cursor Offset",
       "custom10OffsetX": 0,
       "custom10OffsetY": 0,
-      "custom10CursorOffsetDistance": 0,
+      "custom10CursorOffsetDistance": -1,
       "custom10CursorOffsetDistanceCurveEnabled": false,
       "custom10CursorOffsetDistanceCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom10CursorOffsetDistanceCurveRange": "{\"min\":-50,\"max\":50}",
-      "custom10RotationEnabled": false,
-      "custom10RotationX": 0,
-      "custom10RotationY": 0,
-      "custom10RotationZ": 0,
+      "custom10RotationEnabled": true,
+      "custom10RotationX": -5,
+      "custom10RotationY": 5,
+      "custom10RotationZ": 15,
       "custom10TargetPose": "",
       "custom10TweenSelector": "Clockwise Fan",
       "custom10TweenChain": [],
@@ -14581,7 +14581,7 @@
       "custom10TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom10TweenRetransitionStartTimeRange": "{\"min\":0,\"max\":3000}",
       "custom10TweenStopEnabled": true,
-      "custom10TweenStopStartTimeCurveEnabled": true,
+      "custom10TweenStopStartTimeCurveEnabled": false,
       "custom10TweenStopStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom10TweenStopStartTimeRange": "{\"min\":0,\"max\":3000}",
       "custom10TweenStopDelayEnabled": true,
@@ -21852,10 +21852,10 @@
       "custom8CursorOffsetDistanceCurveEnabled": false,
       "custom8CursorOffsetDistanceCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom8CursorOffsetDistanceCurveRange": "{\"min\":-50,\"max\":50}",
-      "custom8RotationEnabled": false,
-      "custom8RotationX": 0,
-      "custom8RotationY": 0,
-      "custom8RotationZ": 0,
+      "custom8RotationEnabled": true,
+      "custom8RotationX": 200,
+      "custom8RotationY": -150,
+      "custom8RotationZ": 600,
       "custom8TargetPose": "",
       "custom8TweenSelector": "FLOWER 3",
       "custom8TweenChain": [],
@@ -21915,14 +21915,14 @@
       "custom9RotationEnabled": true,
       "custom9RotationX": 101,
       "custom9RotationY": -120,
-      "custom9RotationZ": 0,
+      "custom9RotationZ": -208,
       "custom9TargetPose": "Clockwise Fan - 5",
       "custom9TweenSelector": "Neutral - Horizontal Fanning",
       "custom9TweenSpeedMs": 4420,
       "custom9TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9TweenStartTimeRange": "{\"min\":0,\"max\":3000}",
       "custom9SequencePlayMode": "Count",
-      "custom9SequenceCount": 3,
+      "custom9SequenceCount": 2,
       "custom9SequenceCountMode": "Loop",
       "custom9SequenceLoopTransition": true,
       "custom9SequenceHoldMs": 0,
@@ -22031,18 +22031,18 @@
       "custom10TouchPointCount": 1,
       "custom10ClickCount": "2nd",
       "custom10Mode": "Sequence",
-      "custom10OffsetEnabled": false,
-      "custom10OffsetMode": "XYZ Offset",
+      "custom10OffsetEnabled": true,
+      "custom10OffsetMode": "Cursor Offset",
       "custom10OffsetX": 0,
       "custom10OffsetY": 0,
-      "custom10CursorOffsetDistance": 0,
+      "custom10CursorOffsetDistance": -1,
       "custom10CursorOffsetDistanceCurveEnabled": false,
       "custom10CursorOffsetDistanceCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom10CursorOffsetDistanceCurveRange": "{\"min\":-50,\"max\":50}",
-      "custom10RotationEnabled": false,
-      "custom10RotationX": 0,
-      "custom10RotationY": 0,
-      "custom10RotationZ": 0,
+      "custom10RotationEnabled": true,
+      "custom10RotationX": -5,
+      "custom10RotationY": 5,
+      "custom10RotationZ": 15,
       "custom10TargetPose": "",
       "custom10TweenSelector": "Clockwise Fan",
       "custom10TweenChain": [],
@@ -22076,7 +22076,7 @@
       "custom10TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom10TweenRetransitionStartTimeRange": "{\"min\":0,\"max\":3000}",
       "custom10TweenStopEnabled": true,
-      "custom10TweenStopStartTimeCurveEnabled": true,
+      "custom10TweenStopStartTimeCurveEnabled": false,
       "custom10TweenStopStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom10TweenStopStartTimeRange": "{\"min\":0,\"max\":3000}",
       "custom10TweenStopDelayEnabled": true,
@@ -35909,7 +35909,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 10",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -35991,7 +35991,7 @@
                 "type": "group",
                 "group": {
                   "key": "Offset",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -36039,7 +36039,7 @@
                 "type": "group",
                 "group": {
                   "key": "Rotation",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -36331,7 +36331,7 @@
                       "type": "group",
                       "group": {
                         "key": "Tween Stop Delay",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -36385,7 +36385,7 @@
                     },
                     {
                       "key": "Tween Stop Delay",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -36458,7 +36458,7 @@
               },
               {
                 "key": "Offset",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -36503,7 +36503,7 @@
               },
               {
                 "key": "Rotation",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -36780,7 +36780,7 @@
                     "type": "group",
                     "group": {
                       "key": "Tween Stop Delay",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -36834,7 +36834,7 @@
                   },
                   {
                     "key": "Tween Stop Delay",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -36871,7 +36871,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 9",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -42001,7 +42001,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 8",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -42131,7 +42131,7 @@
                 "type": "group",
                 "group": {
                   "key": "Rotation",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -42595,7 +42595,7 @@
               },
               {
                 "key": "Rotation",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -57109,7 +57109,7 @@
         },
         {
           "key": "Custom Click Function 10",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
@@ -57191,7 +57191,7 @@
               "type": "group",
               "group": {
                 "key": "Offset",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -57239,7 +57239,7 @@
               "type": "group",
               "group": {
                 "key": "Rotation",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -57531,7 +57531,7 @@
                     "type": "group",
                     "group": {
                       "key": "Tween Stop Delay",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -57585,7 +57585,7 @@
                   },
                   {
                     "key": "Tween Stop Delay",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -57658,7 +57658,7 @@
             },
             {
               "key": "Offset",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -57703,7 +57703,7 @@
             },
             {
               "key": "Rotation",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -57980,7 +57980,7 @@
                   "type": "group",
                   "group": {
                     "key": "Tween Stop Delay",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -58034,7 +58034,7 @@
                 },
                 {
                   "key": "Tween Stop Delay",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -58068,7 +58068,7 @@
         },
         {
           "key": "Custom Click Function 9",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -63195,7 +63195,7 @@
         },
         {
           "key": "Custom Click Function 8",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
@@ -63325,7 +63325,7 @@
               "type": "group",
               "group": {
                 "key": "Rotation",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -63789,7 +63789,7 @@
             },
             {
               "key": "Rotation",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
