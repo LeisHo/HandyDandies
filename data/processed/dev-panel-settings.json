@@ -207,10 +207,10 @@
       "loadingPreviewSequenceHoldMs": 0,
       "loadingPreviewSize": 1390,
       "loadingPreviewRotationX": -75.46317639228698,
-      "loadingPreviewRotationY": -171.31775806313817,
+      "loadingPreviewRotationY": -171.31775806313814,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": -4.440892098500626e-16,
-      "loadingPreviewOffsetY": -8.881784197001252e-16,
+      "loadingPreviewOffsetY": 0,
       "loadingPreviewOffsetZ": 0,
       "loadingPreviewCameraFov": 32,
       "loadingPreviewCameraZoom": 161.7694831224424,
@@ -6549,11 +6549,11 @@
           "group": "FIST ROTATE"
         }
       ],
-      "cameraX": 3.587196433859648,
-      "cameraY": 7.226320177572674,
-      "cameraZ": 140.3541779670616,
+      "cameraX": 2.636919008609145,
+      "cameraY": 5.312009361593479,
+      "cameraZ": 103.17321803892494,
       "cameraFov": 35,
-      "cameraZoom": 260.17068872666084,
+      "cameraZoom": 103.34352280536584,
       "cameraZoomSpeed": 1,
       "savedCameras": [
         {
@@ -6626,10 +6626,21 @@
           "ty": 33.57715598945507,
           "tz": -1.7891143893104762,
           "fov": 32
+        },
+        {
+          "name": "Camera 8",
+          "cameraX": 2.636919008609145,
+          "cameraY": 5.312009361593479,
+          "cameraZ": 103.17321803892494,
+          "cameraFov": 35,
+          "cameraZoom": 103.34352280536584,
+          "targetX": 0,
+          "targetY": 1.7763568394002505e-15,
+          "targetZ": 0
         }
       ],
       "lockCameraPan": true,
-      "lockCameraZoom": false,
+      "lockCameraZoom": true,
       "cameraMaxExtentsEnabled": true,
       "keyAzimuth": 209,
       "keyElevation": 56,
@@ -6769,6 +6780,9 @@
       "custom7RotationZ": 0,
       "custom7TargetPose": "Big Open Palm",
       "custom7TweenSelector": "",
+      "custom7ReverseSequence": false,
+      "custom7GlideToFirstPose": false,
+      "custom7FirstGlideTimeScale": 1,
       "custom7TweenSpeedMs": 800,
       "custom7TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom7TweenStartTimeRange": "{\"min\":0,\"max\":300}",
@@ -6834,6 +6848,9 @@
       "custom7Trig1RotationZ": 0,
       "custom7Trig1TargetPose": "Fist",
       "custom7Trig1TweenSelector": "",
+      "custom7Trig1ReverseSequence": false,
+      "custom7Trig1GlideToFirstPose": false,
+      "custom7Trig1FirstGlideTimeScale": 1,
       "custom7Trig1TweenSpeedMs": 800,
       "custom7Trig1TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom7Trig1TweenStartTimeRange": "{\"min\":0,\"max\":300}",
@@ -6892,6 +6909,9 @@
       "custom7Trig2RotationZ": 0,
       "custom7Trig2TargetPose": "COUNTDOWN (VERT) - 6",
       "custom7Trig2TweenSelector": "",
+      "custom7Trig2ReverseSequence": false,
+      "custom7Trig2GlideToFirstPose": false,
+      "custom7Trig2FirstGlideTimeScale": 1,
       "custom7Trig2TweenSpeedMs": 800,
       "custom7Trig2TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom7Trig2TweenStartTimeRange": "{\"min\":0,\"max\":300}",
@@ -6953,6 +6973,9 @@
       "custom8RotationZ": 20,
       "custom8TargetPose": "",
       "custom8TweenSelector": "FLOWER 2",
+      "custom8ReverseSequence": false,
+      "custom8GlideToFirstPose": false,
+      "custom8FirstGlideTimeScale": 1,
       "custom8TweenChain": [],
       "custom8TweenSpeedMs": 7000,
       "custom8TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -7032,6 +7055,9 @@
       "custom9RotationZ": -40,
       "custom9TargetPose": "Clockwise Fan - 5",
       "custom9TweenSelector": "Neutral - Horizontal Fanning",
+      "custom9ReverseSequence": false,
+      "custom9GlideToFirstPose": false,
+      "custom9FirstGlideTimeScale": 1,
       "custom9TweenSpeedMs": 4420,
       "custom9TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9TweenStartTimeRange": "{\"min\":0,\"max\":3000}",
@@ -7097,6 +7123,9 @@
       "custom9Trig1RotationZ": -20,
       "custom9Trig1TargetPose": "Wave 5",
       "custom9Trig1TweenSelector": "",
+      "custom9Trig1ReverseSequence": false,
+      "custom9Trig1GlideToFirstPose": false,
+      "custom9Trig1FirstGlideTimeScale": 1,
       "custom9Trig1TweenSpeedMs": 5000,
       "custom9Trig1TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9Trig1TweenStartTimeRange": "{\"min\":0,\"max\":1855}",
@@ -7155,6 +7184,9 @@
       "custom9Trig2RotationZ": -20,
       "custom9Trig2TargetPose": "Birdie (S) - 1",
       "custom9Trig2TweenSelector": "",
+      "custom9Trig2ReverseSequence": false,
+      "custom9Trig2GlideToFirstPose": false,
+      "custom9Trig2FirstGlideTimeScale": 1,
       "custom9Trig2TweenSpeedMs": 800,
       "custom9Trig2TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9Trig2TweenStartTimeRange": "{\"min\":0,\"max\":300}",
@@ -7216,6 +7248,9 @@
       "custom10RotationZ": 15,
       "custom10TargetPose": "",
       "custom10TweenSelector": "Clockwise Fan",
+      "custom10ReverseSequence": false,
+      "custom10GlideToFirstPose": false,
+      "custom10FirstGlideTimeScale": 1,
       "custom10TweenChain": [],
       "custom10TweenSpeedMs": 5000,
       "custom10TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -7292,6 +7327,9 @@
       "custom10Trig1RotationZ": 0,
       "custom10Trig1TargetPose": "Fist - Bent Back",
       "custom10Trig1TweenSelector": "",
+      "custom10Trig1ReverseSequence": false,
+      "custom10Trig1GlideToFirstPose": false,
+      "custom10Trig1FirstGlideTimeScale": 1,
       "custom10Trig1TweenSpeedMs": 800,
       "custom10Trig1TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom10Trig1TweenStartTimeRange": "{\"min\":0,\"max\":300}",
@@ -7352,6 +7390,9 @@
       "custom13RotationZ": 0,
       "custom13TargetPose": "Clockwise Fan - 4",
       "custom13TweenSelector": "Wave",
+      "custom13ReverseSequence": false,
+      "custom13GlideToFirstPose": false,
+      "custom13FirstGlideTimeScale": 1,
       "custom13TweenSpeedMs": 3000,
       "custom13TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.3807471347841095,\"y\":0.5971872965494791},{\"x\":1,\"y\":1}]",
       "custom13TweenStartTimeRange": "{\"min\":0,\"max\":3000}",
@@ -7417,6 +7458,9 @@
       "custom13Trig1RotationZ": 5,
       "custom13Trig1TargetPose": "COUNTDOWN (VERT) - 3",
       "custom13Trig1TweenSelector": "Birdie",
+      "custom13Trig1ReverseSequence": false,
+      "custom13Trig1GlideToFirstPose": false,
+      "custom13Trig1FirstGlideTimeScale": 1,
       "custom13Trig1TweenSpeedMs": 5000,
       "custom13Trig1TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom13Trig1TweenStartTimeRange": "{\"min\":0,\"max\":3000}",
@@ -7475,6 +7519,9 @@
       "custom13Trig2RotationZ": 360,
       "custom13Trig2TargetPose": "",
       "custom13Trig2TweenSelector": "COUNT R",
+      "custom13Trig2ReverseSequence": false,
+      "custom13Trig2GlideToFirstPose": false,
+      "custom13Trig2FirstGlideTimeScale": 1,
       "custom13Trig2TweenSpeedMs": 5000,
       "custom13Trig2TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom13Trig2TweenStartTimeRange": "{\"min\":0,\"max\":3000}",
@@ -7536,6 +7583,9 @@
       "custom14RotationZ": 0,
       "custom14TargetPose": "Clockwise Fan - 4",
       "custom14TweenSelector": "COUNTDOWN - VERTICAL",
+      "custom14ReverseSequence": false,
+      "custom14GlideToFirstPose": false,
+      "custom14FirstGlideTimeScale": 1,
       "custom14TweenSpeedMs": 4200,
       "custom14TweenStartTimeCurve": "[{\"x\":0,\"y\":1},{\"x\":0.49166666666666664,\"y\":0.3604166666666667},{\"x\":1,\"y\":0}]",
       "custom14TweenStartTimeRange": "{\"min\":0,\"max\":1880}",
@@ -7604,6 +7654,9 @@
       "custom15RotationZ": 5,
       "custom15TargetPose": "Point",
       "custom15TweenSelector": "",
+      "custom15ReverseSequence": false,
+      "custom15GlideToFirstPose": false,
+      "custom15FirstGlideTimeScale": 1,
       "custom15TweenChain": [],
       "custom15TweenSpeedMs": 5000,
       "custom15TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -7683,6 +7736,9 @@
       "custom16RotationZ": -146,
       "custom16TargetPose": "",
       "custom16TweenSelector": "",
+      "custom16ReverseSequence": false,
+      "custom16GlideToFirstPose": false,
+      "custom16FirstGlideTimeScale": 1,
       "custom16TweenChain": [
         "FLOWER",
         "FLOWER 2",
@@ -7766,6 +7822,9 @@
       "custom17RotationZ": -53,
       "custom17TargetPose": "COUNTDOWN (VERT) - 9",
       "custom17TweenSelector": "Wave",
+      "custom17ReverseSequence": false,
+      "custom17GlideToFirstPose": false,
+      "custom17FirstGlideTimeScale": 1,
       "custom17TweenSpeedMs": 2340,
       "custom17TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom17TweenStartTimeRange": "{\"min\":0,\"max\":6000}",
@@ -7834,6 +7893,9 @@
       "custom18RotationZ": 0,
       "custom18TargetPose": "",
       "custom18TweenSelector": "FLOWER 3",
+      "custom18ReverseSequence": false,
+      "custom18GlideToFirstPose": true,
+      "custom18FirstGlideTimeScale": 2.8,
       "custom18TweenSpeedMs": 1500,
       "custom18TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.35675047214415456,\"y\":0.6234375},{\"x\":1,\"y\":1}]",
       "custom18TweenStartTimeRange": "{\"min\":0,\"max\":2124}",
@@ -7897,8 +7959,11 @@
       "custom18Trig1RotationX": 20,
       "custom18Trig1RotationY": 0,
       "custom18Trig1RotationZ": 0,
-      "custom18Trig1TargetPose": "Big Open Palm (S)",
+      "custom18Trig1TargetPose": "Fist - Bent Back",
       "custom18Trig1TweenSelector": "Birdie",
+      "custom18Trig1ReverseSequence": false,
+      "custom18Trig1GlideToFirstPose": false,
+      "custom18Trig1FirstGlideTimeScale": 1,
       "custom18Trig1TweenSpeedMs": 5000,
       "custom18Trig1TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom18Trig1TweenStartTimeRange": "{\"min\":0,\"max\":300}",
@@ -7960,6 +8025,9 @@
       "custom19RotationZ": 0,
       "custom19TargetPose": "",
       "custom19TweenSelector": "COUNTDOWN - VERTICAL + LENS COVER",
+      "custom19ReverseSequence": false,
+      "custom19GlideToFirstPose": false,
+      "custom19FirstGlideTimeScale": 1,
       "custom19TweenSpeedMs": 3800,
       "custom19TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom19TweenStartTimeRange": "{\"min\":0,\"max\":300}",
@@ -8200,10 +8268,10 @@
       "loadingPreviewSequenceHoldMs": 0,
       "loadingPreviewSize": 1390,
       "loadingPreviewRotationX": -75.46317639228698,
-      "loadingPreviewRotationY": -171.31775806313817,
+      "loadingPreviewRotationY": -171.31775806313814,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": -4.440892098500626e-16,
-      "loadingPreviewOffsetY": -8.881784197001252e-16,
+      "loadingPreviewOffsetY": 0,
       "loadingPreviewOffsetZ": 0,
       "loadingPreviewCameraFov": 32,
       "loadingPreviewCameraZoom": 161.7694831224424,
@@ -14619,6 +14687,17 @@
           "ty": 33.57715598945507,
           "tz": -1.7891143893104762,
           "fov": 32
+        },
+        {
+          "name": "Camera 8",
+          "cameraX": 2.636919008609145,
+          "cameraY": 5.312009361593479,
+          "cameraZ": 103.17321803892494,
+          "cameraFov": 35,
+          "cameraZoom": 103.34352280536584,
+          "targetX": 0,
+          "targetY": 1.7763568394002505e-15,
+          "targetZ": 0
         }
       ],
       "lockCameraPan": true,
@@ -14762,6 +14841,9 @@
       "custom7RotationZ": 0,
       "custom7TargetPose": "Big Open Palm",
       "custom7TweenSelector": "",
+      "custom7ReverseSequence": false,
+      "custom7GlideToFirstPose": false,
+      "custom7FirstGlideTimeScale": 1,
       "custom7TweenSpeedMs": 800,
       "custom7TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom7TweenStartTimeRange": "{\"min\":0,\"max\":300}",
@@ -14827,6 +14909,9 @@
       "custom7Trig1RotationZ": 0,
       "custom7Trig1TargetPose": "Fist",
       "custom7Trig1TweenSelector": "",
+      "custom7Trig1ReverseSequence": false,
+      "custom7Trig1GlideToFirstPose": false,
+      "custom7Trig1FirstGlideTimeScale": 1,
       "custom7Trig1TweenSpeedMs": 800,
       "custom7Trig1TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom7Trig1TweenStartTimeRange": "{\"min\":0,\"max\":300}",
@@ -14885,6 +14970,9 @@
       "custom7Trig2RotationZ": 0,
       "custom7Trig2TargetPose": "COUNTDOWN (VERT) - 6",
       "custom7Trig2TweenSelector": "",
+      "custom7Trig2ReverseSequence": false,
+      "custom7Trig2GlideToFirstPose": false,
+      "custom7Trig2FirstGlideTimeScale": 1,
       "custom7Trig2TweenSpeedMs": 800,
       "custom7Trig2TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom7Trig2TweenStartTimeRange": "{\"min\":0,\"max\":300}",
@@ -14946,6 +15034,9 @@
       "custom8RotationZ": 20,
       "custom8TargetPose": "",
       "custom8TweenSelector": "FLOWER 2",
+      "custom8ReverseSequence": false,
+      "custom8GlideToFirstPose": false,
+      "custom8FirstGlideTimeScale": 1,
       "custom8TweenChain": [],
       "custom8TweenSpeedMs": 7000,
       "custom8TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -15025,6 +15116,9 @@
       "custom9RotationZ": -40,
       "custom9TargetPose": "Clockwise Fan - 5",
       "custom9TweenSelector": "Neutral - Horizontal Fanning",
+      "custom9ReverseSequence": false,
+      "custom9GlideToFirstPose": false,
+      "custom9FirstGlideTimeScale": 1,
       "custom9TweenSpeedMs": 4420,
       "custom9TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9TweenStartTimeRange": "{\"min\":0,\"max\":3000}",
@@ -15090,6 +15184,9 @@
       "custom9Trig1RotationZ": -20,
       "custom9Trig1TargetPose": "Wave 5",
       "custom9Trig1TweenSelector": "",
+      "custom9Trig1ReverseSequence": false,
+      "custom9Trig1GlideToFirstPose": false,
+      "custom9Trig1FirstGlideTimeScale": 1,
       "custom9Trig1TweenSpeedMs": 5000,
       "custom9Trig1TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9Trig1TweenStartTimeRange": "{\"min\":0,\"max\":1855}",
@@ -15148,6 +15245,9 @@
       "custom9Trig2RotationZ": -20,
       "custom9Trig2TargetPose": "Birdie (S) - 1",
       "custom9Trig2TweenSelector": "",
+      "custom9Trig2ReverseSequence": false,
+      "custom9Trig2GlideToFirstPose": false,
+      "custom9Trig2FirstGlideTimeScale": 1,
       "custom9Trig2TweenSpeedMs": 800,
       "custom9Trig2TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9Trig2TweenStartTimeRange": "{\"min\":0,\"max\":300}",
@@ -15209,6 +15309,9 @@
       "custom10RotationZ": 15,
       "custom10TargetPose": "",
       "custom10TweenSelector": "Clockwise Fan",
+      "custom10ReverseSequence": false,
+      "custom10GlideToFirstPose": false,
+      "custom10FirstGlideTimeScale": 1,
       "custom10TweenChain": [],
       "custom10TweenSpeedMs": 5000,
       "custom10TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -15285,6 +15388,9 @@
       "custom10Trig1RotationZ": 0,
       "custom10Trig1TargetPose": "Fist - Bent Back",
       "custom10Trig1TweenSelector": "",
+      "custom10Trig1ReverseSequence": false,
+      "custom10Trig1GlideToFirstPose": false,
+      "custom10Trig1FirstGlideTimeScale": 1,
       "custom10Trig1TweenSpeedMs": 800,
       "custom10Trig1TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom10Trig1TweenStartTimeRange": "{\"min\":0,\"max\":300}",
@@ -15345,6 +15451,9 @@
       "custom13RotationZ": 0,
       "custom13TargetPose": "Clockwise Fan - 4",
       "custom13TweenSelector": "Wave",
+      "custom13ReverseSequence": false,
+      "custom13GlideToFirstPose": false,
+      "custom13FirstGlideTimeScale": 1,
       "custom13TweenSpeedMs": 3000,
       "custom13TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.3807471347841095,\"y\":0.5971872965494791},{\"x\":1,\"y\":1}]",
       "custom13TweenStartTimeRange": "{\"min\":0,\"max\":3000}",
@@ -15410,6 +15519,9 @@
       "custom13Trig1RotationZ": 5,
       "custom13Trig1TargetPose": "COUNTDOWN (VERT) - 3",
       "custom13Trig1TweenSelector": "Birdie",
+      "custom13Trig1ReverseSequence": false,
+      "custom13Trig1GlideToFirstPose": false,
+      "custom13Trig1FirstGlideTimeScale": 1,
       "custom13Trig1TweenSpeedMs": 5000,
       "custom13Trig1TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom13Trig1TweenStartTimeRange": "{\"min\":0,\"max\":3000}",
@@ -15468,6 +15580,9 @@
       "custom13Trig2RotationZ": 360,
       "custom13Trig2TargetPose": "",
       "custom13Trig2TweenSelector": "COUNT R",
+      "custom13Trig2ReverseSequence": false,
+      "custom13Trig2GlideToFirstPose": false,
+      "custom13Trig2FirstGlideTimeScale": 1,
       "custom13Trig2TweenSpeedMs": 5000,
       "custom13Trig2TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom13Trig2TweenStartTimeRange": "{\"min\":0,\"max\":3000}",
@@ -15529,6 +15644,9 @@
       "custom14RotationZ": 0,
       "custom14TargetPose": "Clockwise Fan - 4",
       "custom14TweenSelector": "COUNTDOWN - VERTICAL",
+      "custom14ReverseSequence": false,
+      "custom14GlideToFirstPose": false,
+      "custom14FirstGlideTimeScale": 1,
       "custom14TweenSpeedMs": 4200,
       "custom14TweenStartTimeCurve": "[{\"x\":0,\"y\":1},{\"x\":0.49166666666666664,\"y\":0.3604166666666667},{\"x\":1,\"y\":0}]",
       "custom14TweenStartTimeRange": "{\"min\":0,\"max\":1880}",
@@ -15597,6 +15715,9 @@
       "custom15RotationZ": 5,
       "custom15TargetPose": "Point",
       "custom15TweenSelector": "",
+      "custom15ReverseSequence": false,
+      "custom15GlideToFirstPose": false,
+      "custom15FirstGlideTimeScale": 1,
       "custom15TweenChain": [],
       "custom15TweenSpeedMs": 5000,
       "custom15TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -15676,6 +15797,9 @@
       "custom16RotationZ": -146,
       "custom16TargetPose": "",
       "custom16TweenSelector": "",
+      "custom16ReverseSequence": false,
+      "custom16GlideToFirstPose": false,
+      "custom16FirstGlideTimeScale": 1,
       "custom16TweenChain": [
         "FLOWER",
         "FLOWER 2",
@@ -15759,6 +15883,9 @@
       "custom17RotationZ": -53,
       "custom17TargetPose": "COUNTDOWN (VERT) - 9",
       "custom17TweenSelector": "Wave",
+      "custom17ReverseSequence": false,
+      "custom17GlideToFirstPose": false,
+      "custom17FirstGlideTimeScale": 1,
       "custom17TweenSpeedMs": 2340,
       "custom17TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom17TweenStartTimeRange": "{\"min\":0,\"max\":6000}",
@@ -15827,6 +15954,9 @@
       "custom18RotationZ": 0,
       "custom18TargetPose": "",
       "custom18TweenSelector": "FLOWER 3",
+      "custom18ReverseSequence": false,
+      "custom18GlideToFirstPose": true,
+      "custom18FirstGlideTimeScale": 2.8,
       "custom18TweenSpeedMs": 1500,
       "custom18TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.35675047214415456,\"y\":0.6234375},{\"x\":1,\"y\":1}]",
       "custom18TweenStartTimeRange": "{\"min\":0,\"max\":2124}",
@@ -15890,8 +16020,11 @@
       "custom18Trig1RotationX": 20,
       "custom18Trig1RotationY": 0,
       "custom18Trig1RotationZ": 0,
-      "custom18Trig1TargetPose": "Big Open Palm (S)",
+      "custom18Trig1TargetPose": "Fist - Bent Back",
       "custom18Trig1TweenSelector": "Birdie",
+      "custom18Trig1ReverseSequence": false,
+      "custom18Trig1GlideToFirstPose": false,
+      "custom18Trig1FirstGlideTimeScale": 1,
       "custom18Trig1TweenSpeedMs": 5000,
       "custom18Trig1TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom18Trig1TweenStartTimeRange": "{\"min\":0,\"max\":300}",
@@ -15953,6 +16086,9 @@
       "custom19RotationZ": 0,
       "custom19TargetPose": "",
       "custom19TweenSelector": "COUNTDOWN - VERTICAL + LENS COVER",
+      "custom19ReverseSequence": false,
+      "custom19GlideToFirstPose": false,
+      "custom19FirstGlideTimeScale": 1,
       "custom19TweenSpeedMs": 3800,
       "custom19TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom19TweenStartTimeRange": "{\"min\":0,\"max\":300}",
@@ -16193,10 +16329,10 @@
       "loadingPreviewSequenceHoldMs": 0,
       "loadingPreviewSize": 1390,
       "loadingPreviewRotationX": -75.46317639228698,
-      "loadingPreviewRotationY": -171.31775806313817,
+      "loadingPreviewRotationY": -171.31775806313814,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": -4.440892098500626e-16,
-      "loadingPreviewOffsetY": -8.881784197001252e-16,
+      "loadingPreviewOffsetY": 0,
       "loadingPreviewOffsetZ": 0,
       "loadingPreviewCameraFov": 32,
       "loadingPreviewCameraZoom": 161.7694831224424,
@@ -22612,6 +22748,17 @@
           "ty": 33.57715598945507,
           "tz": -1.7891143893104762,
           "fov": 32
+        },
+        {
+          "name": "Camera 8",
+          "cameraX": 2.636919008609145,
+          "cameraY": 5.312009361593479,
+          "cameraZ": 103.17321803892494,
+          "cameraFov": 35,
+          "cameraZoom": 103.34352280536584,
+          "targetX": 0,
+          "targetY": 1.7763568394002505e-15,
+          "targetZ": 0
         }
       ],
       "lockCameraPan": false,
@@ -22755,6 +22902,9 @@
       "custom7RotationZ": 0,
       "custom7TargetPose": "Big Open Palm",
       "custom7TweenSelector": "",
+      "custom7ReverseSequence": false,
+      "custom7GlideToFirstPose": false,
+      "custom7FirstGlideTimeScale": 1,
       "custom7TweenSpeedMs": 800,
       "custom7TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom7TweenStartTimeRange": "{\"min\":0,\"max\":300}",
@@ -22820,6 +22970,9 @@
       "custom7Trig1RotationZ": 0,
       "custom7Trig1TargetPose": "Fist",
       "custom7Trig1TweenSelector": "",
+      "custom7Trig1ReverseSequence": false,
+      "custom7Trig1GlideToFirstPose": false,
+      "custom7Trig1FirstGlideTimeScale": 1,
       "custom7Trig1TweenSpeedMs": 800,
       "custom7Trig1TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom7Trig1TweenStartTimeRange": "{\"min\":0,\"max\":300}",
@@ -22878,6 +23031,9 @@
       "custom7Trig2RotationZ": 0,
       "custom7Trig2TargetPose": "COUNTDOWN (VERT) - 6",
       "custom7Trig2TweenSelector": "",
+      "custom7Trig2ReverseSequence": false,
+      "custom7Trig2GlideToFirstPose": false,
+      "custom7Trig2FirstGlideTimeScale": 1,
       "custom7Trig2TweenSpeedMs": 800,
       "custom7Trig2TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom7Trig2TweenStartTimeRange": "{\"min\":0,\"max\":300}",
@@ -22939,6 +23095,9 @@
       "custom8RotationZ": 20,
       "custom8TargetPose": "",
       "custom8TweenSelector": "FLOWER 2",
+      "custom8ReverseSequence": false,
+      "custom8GlideToFirstPose": false,
+      "custom8FirstGlideTimeScale": 1,
       "custom8TweenChain": [],
       "custom8TweenSpeedMs": 7000,
       "custom8TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -23018,6 +23177,9 @@
       "custom9RotationZ": -40,
       "custom9TargetPose": "Clockwise Fan - 5",
       "custom9TweenSelector": "Neutral - Horizontal Fanning",
+      "custom9ReverseSequence": false,
+      "custom9GlideToFirstPose": false,
+      "custom9FirstGlideTimeScale": 1,
       "custom9TweenSpeedMs": 4420,
       "custom9TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9TweenStartTimeRange": "{\"min\":0,\"max\":3000}",
@@ -23083,6 +23245,9 @@
       "custom9Trig1RotationZ": -20,
       "custom9Trig1TargetPose": "Wave 5",
       "custom9Trig1TweenSelector": "",
+      "custom9Trig1ReverseSequence": false,
+      "custom9Trig1GlideToFirstPose": false,
+      "custom9Trig1FirstGlideTimeScale": 1,
       "custom9Trig1TweenSpeedMs": 5000,
       "custom9Trig1TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9Trig1TweenStartTimeRange": "{\"min\":0,\"max\":1855}",
@@ -23141,6 +23306,9 @@
       "custom9Trig2RotationZ": -20,
       "custom9Trig2TargetPose": "Birdie (S) - 1",
       "custom9Trig2TweenSelector": "",
+      "custom9Trig2ReverseSequence": false,
+      "custom9Trig2GlideToFirstPose": false,
+      "custom9Trig2FirstGlideTimeScale": 1,
       "custom9Trig2TweenSpeedMs": 800,
       "custom9Trig2TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9Trig2TweenStartTimeRange": "{\"min\":0,\"max\":300}",
@@ -23202,6 +23370,9 @@
       "custom10RotationZ": 15,
       "custom10TargetPose": "",
       "custom10TweenSelector": "Clockwise Fan",
+      "custom10ReverseSequence": false,
+      "custom10GlideToFirstPose": false,
+      "custom10FirstGlideTimeScale": 1,
       "custom10TweenChain": [],
       "custom10TweenSpeedMs": 5000,
       "custom10TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -23278,6 +23449,9 @@
       "custom10Trig1RotationZ": 0,
       "custom10Trig1TargetPose": "Fist - Bent Back",
       "custom10Trig1TweenSelector": "",
+      "custom10Trig1ReverseSequence": false,
+      "custom10Trig1GlideToFirstPose": false,
+      "custom10Trig1FirstGlideTimeScale": 1,
       "custom10Trig1TweenSpeedMs": 800,
       "custom10Trig1TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom10Trig1TweenStartTimeRange": "{\"min\":0,\"max\":300}",
@@ -23338,6 +23512,9 @@
       "custom13RotationZ": 0,
       "custom13TargetPose": "Clockwise Fan - 4",
       "custom13TweenSelector": "Wave",
+      "custom13ReverseSequence": false,
+      "custom13GlideToFirstPose": false,
+      "custom13FirstGlideTimeScale": 1,
       "custom13TweenSpeedMs": 3000,
       "custom13TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.3807471347841095,\"y\":0.5971872965494791},{\"x\":1,\"y\":1}]",
       "custom13TweenStartTimeRange": "{\"min\":0,\"max\":3000}",
@@ -23403,6 +23580,9 @@
       "custom13Trig1RotationZ": 5,
       "custom13Trig1TargetPose": "COUNTDOWN (VERT) - 3",
       "custom13Trig1TweenSelector": "Birdie",
+      "custom13Trig1ReverseSequence": false,
+      "custom13Trig1GlideToFirstPose": false,
+      "custom13Trig1FirstGlideTimeScale": 1,
       "custom13Trig1TweenSpeedMs": 5000,
       "custom13Trig1TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom13Trig1TweenStartTimeRange": "{\"min\":0,\"max\":3000}",
@@ -23461,6 +23641,9 @@
       "custom13Trig2RotationZ": 360,
       "custom13Trig2TargetPose": "",
       "custom13Trig2TweenSelector": "COUNT R",
+      "custom13Trig2ReverseSequence": false,
+      "custom13Trig2GlideToFirstPose": false,
+      "custom13Trig2FirstGlideTimeScale": 1,
       "custom13Trig2TweenSpeedMs": 5000,
       "custom13Trig2TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom13Trig2TweenStartTimeRange": "{\"min\":0,\"max\":3000}",
@@ -23522,6 +23705,9 @@
       "custom14RotationZ": 0,
       "custom14TargetPose": "Clockwise Fan - 4",
       "custom14TweenSelector": "COUNTDOWN - VERTICAL",
+      "custom14ReverseSequence": false,
+      "custom14GlideToFirstPose": false,
+      "custom14FirstGlideTimeScale": 1,
       "custom14TweenSpeedMs": 4200,
       "custom14TweenStartTimeCurve": "[{\"x\":0,\"y\":1},{\"x\":0.49166666666666664,\"y\":0.3604166666666667},{\"x\":1,\"y\":0}]",
       "custom14TweenStartTimeRange": "{\"min\":0,\"max\":1880}",
@@ -23590,6 +23776,9 @@
       "custom15RotationZ": 5,
       "custom15TargetPose": "Point",
       "custom15TweenSelector": "",
+      "custom15ReverseSequence": false,
+      "custom15GlideToFirstPose": false,
+      "custom15FirstGlideTimeScale": 1,
       "custom15TweenChain": [],
       "custom15TweenSpeedMs": 5000,
       "custom15TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -23669,6 +23858,9 @@
       "custom16RotationZ": -146,
       "custom16TargetPose": "",
       "custom16TweenSelector": "",
+      "custom16ReverseSequence": false,
+      "custom16GlideToFirstPose": false,
+      "custom16FirstGlideTimeScale": 1,
       "custom16TweenChain": [
         "FLOWER",
         "FLOWER 2",
@@ -23752,6 +23944,9 @@
       "custom17RotationZ": -53,
       "custom17TargetPose": "COUNTDOWN (VERT) - 9",
       "custom17TweenSelector": "Wave",
+      "custom17ReverseSequence": false,
+      "custom17GlideToFirstPose": false,
+      "custom17FirstGlideTimeScale": 1,
       "custom17TweenSpeedMs": 2340,
       "custom17TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom17TweenStartTimeRange": "{\"min\":0,\"max\":6000}",
@@ -23820,6 +24015,9 @@
       "custom18RotationZ": 0,
       "custom18TargetPose": "",
       "custom18TweenSelector": "FLOWER 3",
+      "custom18ReverseSequence": false,
+      "custom18GlideToFirstPose": true,
+      "custom18FirstGlideTimeScale": 2.8,
       "custom18TweenSpeedMs": 1500,
       "custom18TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.35675047214415456,\"y\":0.6234375},{\"x\":1,\"y\":1}]",
       "custom18TweenStartTimeRange": "{\"min\":0,\"max\":2124}",
@@ -23883,8 +24081,11 @@
       "custom18Trig1RotationX": 20,
       "custom18Trig1RotationY": 0,
       "custom18Trig1RotationZ": 0,
-      "custom18Trig1TargetPose": "Big Open Palm (S)",
+      "custom18Trig1TargetPose": "Fist - Bent Back",
       "custom18Trig1TweenSelector": "Birdie",
+      "custom18Trig1ReverseSequence": false,
+      "custom18Trig1GlideToFirstPose": false,
+      "custom18Trig1FirstGlideTimeScale": 1,
       "custom18Trig1TweenSpeedMs": 5000,
       "custom18Trig1TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom18Trig1TweenStartTimeRange": "{\"min\":0,\"max\":300}",
@@ -23946,6 +24147,9 @@
       "custom19RotationZ": 0,
       "custom19TargetPose": "",
       "custom19TweenSelector": "COUNTDOWN - VERTICAL + LENS COVER",
+      "custom19ReverseSequence": false,
+      "custom19GlideToFirstPose": false,
+      "custom19FirstGlideTimeScale": 1,
       "custom19TweenSpeedMs": 3800,
       "custom19TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom19TweenStartTimeRange": "{\"min\":0,\"max\":300}",
@@ -25090,7 +25294,7 @@
     },
     {
       "key": "Debug",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -28426,6 +28630,18 @@
               },
               {
                 "type": "row",
+                "key": "custom19ReverseSequence"
+              },
+              {
+                "type": "row",
+                "key": "custom19GlideToFirstPose"
+              },
+              {
+                "type": "row",
+                "key": "custom19FirstGlideTimeScale"
+              },
+              {
+                "type": "row",
                 "key": "custom19TransitionSpeedMs"
               },
               {
@@ -28868,6 +29084,9 @@
               "custom19Mode",
               "custom19TargetPose",
               "custom19TweenSelector",
+              "custom19ReverseSequence",
+              "custom19GlideToFirstPose",
+              "custom19FirstGlideTimeScale",
               "custom19TransitionSpeedMs",
               "custom19TweenSpeedMs",
               "custom19PauseDurationMs",
@@ -29294,6 +29513,18 @@
               },
               {
                 "type": "row",
+                "key": "custom18ReverseSequence"
+              },
+              {
+                "type": "row",
+                "key": "custom18GlideToFirstPose"
+              },
+              {
+                "type": "row",
+                "key": "custom18FirstGlideTimeScale"
+              },
+              {
+                "type": "row",
                 "key": "custom18TransitionSpeedMs"
               },
               {
@@ -29497,7 +29728,7 @@
                 "type": "group",
                 "group": {
                   "key": "Easing",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -29515,7 +29746,7 @@
                 "type": "group",
                 "group": {
                   "key": "Animation Speed Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -29538,7 +29769,7 @@
                 "type": "group",
                 "group": {
                   "key": "Start Time Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -29599,7 +29830,7 @@
                 "type": "group",
                 "group": {
                   "key": "Retransition",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -29740,6 +29971,18 @@
                           },
                           {
                             "type": "row",
+                            "key": "custom18Trig1ReverseSequence"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom18Trig1GlideToFirstPose"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom18Trig1FirstGlideTimeScale"
+                          },
+                          {
+                            "type": "row",
                             "key": "custom18Trig1TransitionSpeedMs"
                           },
                           {
@@ -29754,7 +29997,7 @@
                             "type": "group",
                             "group": {
                               "key": "Offset",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -30132,6 +30375,9 @@
                           "custom18Trig1Mode",
                           "custom18Trig1TargetPose",
                           "custom18Trig1TweenSelector",
+                          "custom18Trig1ReverseSequence",
+                          "custom18Trig1GlideToFirstPose",
+                          "custom18Trig1FirstGlideTimeScale",
                           "custom18Trig1TransitionSpeedMs",
                           "custom18Trig1TweenSpeedMs",
                           "custom18Trig1PauseDurationMs"
@@ -30139,7 +30385,7 @@
                         "subgroups": [
                           {
                             "key": "Offset",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -30525,6 +30771,18 @@
                         },
                         {
                           "type": "row",
+                          "key": "custom18Trig1ReverseSequence"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom18Trig1GlideToFirstPose"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom18Trig1FirstGlideTimeScale"
+                        },
+                        {
+                          "type": "row",
                           "key": "custom18Trig1TransitionSpeedMs"
                         },
                         {
@@ -30539,7 +30797,7 @@
                           "type": "group",
                           "group": {
                             "key": "Offset",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -30917,6 +31175,9 @@
                         "custom18Trig1Mode",
                         "custom18Trig1TargetPose",
                         "custom18Trig1TweenSelector",
+                        "custom18Trig1ReverseSequence",
+                        "custom18Trig1GlideToFirstPose",
+                        "custom18Trig1FirstGlideTimeScale",
                         "custom18Trig1TransitionSpeedMs",
                         "custom18Trig1TweenSpeedMs",
                         "custom18Trig1PauseDurationMs"
@@ -30924,7 +31185,7 @@
                       "subgroups": [
                         {
                           "key": "Offset",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -31288,6 +31549,9 @@
               "custom18Mode",
               "custom18TargetPose",
               "custom18TweenSelector",
+              "custom18ReverseSequence",
+              "custom18GlideToFirstPose",
+              "custom18FirstGlideTimeScale",
               "custom18TransitionSpeedMs",
               "custom18TweenSpeedMs",
               "custom18PauseDurationMs",
@@ -31460,7 +31724,7 @@
               },
               {
                 "key": "Easing",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -31475,7 +31739,7 @@
               },
               {
                 "key": "Animation Speed Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -31495,7 +31759,7 @@
               },
               {
                 "key": "Start Time Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -31550,7 +31814,7 @@
               },
               {
                 "key": "Retransition",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -31688,6 +31952,18 @@
                         },
                         {
                           "type": "row",
+                          "key": "custom18Trig1ReverseSequence"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom18Trig1GlideToFirstPose"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom18Trig1FirstGlideTimeScale"
+                        },
+                        {
+                          "type": "row",
                           "key": "custom18Trig1TransitionSpeedMs"
                         },
                         {
@@ -31702,7 +31978,7 @@
                           "type": "group",
                           "group": {
                             "key": "Offset",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -32080,6 +32356,9 @@
                         "custom18Trig1Mode",
                         "custom18Trig1TargetPose",
                         "custom18Trig1TweenSelector",
+                        "custom18Trig1ReverseSequence",
+                        "custom18Trig1GlideToFirstPose",
+                        "custom18Trig1FirstGlideTimeScale",
                         "custom18Trig1TransitionSpeedMs",
                         "custom18Trig1TweenSpeedMs",
                         "custom18Trig1PauseDurationMs"
@@ -32087,7 +32366,7 @@
                       "subgroups": [
                         {
                           "key": "Offset",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -32473,6 +32752,18 @@
                       },
                       {
                         "type": "row",
+                        "key": "custom18Trig1ReverseSequence"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom18Trig1GlideToFirstPose"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom18Trig1FirstGlideTimeScale"
+                      },
+                      {
+                        "type": "row",
                         "key": "custom18Trig1TransitionSpeedMs"
                       },
                       {
@@ -32487,7 +32778,7 @@
                         "type": "group",
                         "group": {
                           "key": "Offset",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -32865,6 +33156,9 @@
                       "custom18Trig1Mode",
                       "custom18Trig1TargetPose",
                       "custom18Trig1TweenSelector",
+                      "custom18Trig1ReverseSequence",
+                      "custom18Trig1GlideToFirstPose",
+                      "custom18Trig1FirstGlideTimeScale",
                       "custom18Trig1TransitionSpeedMs",
                       "custom18Trig1TweenSpeedMs",
                       "custom18Trig1PauseDurationMs"
@@ -32872,7 +33166,7 @@
                     "subgroups": [
                       {
                         "key": "Offset",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -33233,7 +33527,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 17",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -33263,6 +33557,18 @@
               {
                 "type": "row",
                 "key": "custom17TweenSelector"
+              },
+              {
+                "type": "row",
+                "key": "custom17ReverseSequence"
+              },
+              {
+                "type": "row",
+                "key": "custom17GlideToFirstPose"
+              },
+              {
+                "type": "row",
+                "key": "custom17FirstGlideTimeScale"
               },
               {
                 "type": "row",
@@ -33708,6 +34014,9 @@
               "custom17Mode",
               "custom17TargetPose",
               "custom17TweenSelector",
+              "custom17ReverseSequence",
+              "custom17GlideToFirstPose",
+              "custom17FirstGlideTimeScale",
               "custom17TransitionSpeedMs",
               "custom17TweenSpeedMs",
               "custom17PauseDurationMs",
@@ -34101,7 +34410,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 16",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -34131,6 +34440,18 @@
               {
                 "type": "row",
                 "key": "custom16TweenSelector"
+              },
+              {
+                "type": "row",
+                "key": "custom16ReverseSequence"
+              },
+              {
+                "type": "row",
+                "key": "custom16GlideToFirstPose"
+              },
+              {
+                "type": "row",
+                "key": "custom16FirstGlideTimeScale"
               },
               {
                 "type": "row",
@@ -34728,6 +35049,9 @@
               "custom16Mode",
               "custom16TargetPose",
               "custom16TweenSelector",
+              "custom16ReverseSequence",
+              "custom16GlideToFirstPose",
+              "custom16FirstGlideTimeScale",
               "custom16TweenChain",
               "custom16TransitionSpeedMs",
               "custom16TweenSpeedMs",
@@ -35279,7 +35603,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 15",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -35309,6 +35633,18 @@
               {
                 "type": "row",
                 "key": "custom15TweenSelector"
+              },
+              {
+                "type": "row",
+                "key": "custom15ReverseSequence"
+              },
+              {
+                "type": "row",
+                "key": "custom15GlideToFirstPose"
+              },
+              {
+                "type": "row",
+                "key": "custom15FirstGlideTimeScale"
               },
               {
                 "type": "row",
@@ -35906,6 +36242,9 @@
               "custom15Mode",
               "custom15TargetPose",
               "custom15TweenSelector",
+              "custom15ReverseSequence",
+              "custom15GlideToFirstPose",
+              "custom15FirstGlideTimeScale",
               "custom15TweenChain",
               "custom15TransitionSpeedMs",
               "custom15TweenSpeedMs",
@@ -36457,7 +36796,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 14",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -36487,6 +36826,18 @@
               {
                 "type": "row",
                 "key": "custom14TweenSelector"
+              },
+              {
+                "type": "row",
+                "key": "custom14ReverseSequence"
+              },
+              {
+                "type": "row",
+                "key": "custom14GlideToFirstPose"
+              },
+              {
+                "type": "row",
+                "key": "custom14FirstGlideTimeScale"
               },
               {
                 "type": "row",
@@ -36932,6 +37283,9 @@
               "custom14Mode",
               "custom14TargetPose",
               "custom14TweenSelector",
+              "custom14ReverseSequence",
+              "custom14GlideToFirstPose",
+              "custom14FirstGlideTimeScale",
               "custom14TransitionSpeedMs",
               "custom14TweenSpeedMs",
               "custom14PauseDurationMs",
@@ -37355,6 +37709,18 @@
               {
                 "type": "row",
                 "key": "custom13TweenSelector"
+              },
+              {
+                "type": "row",
+                "key": "custom13ReverseSequence"
+              },
+              {
+                "type": "row",
+                "key": "custom13GlideToFirstPose"
+              },
+              {
+                "type": "row",
+                "key": "custom13FirstGlideTimeScale"
               },
               {
                 "type": "row",
@@ -37804,6 +38170,18 @@
                           },
                           {
                             "type": "row",
+                            "key": "custom13Trig1ReverseSequence"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom13Trig1GlideToFirstPose"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom13Trig1FirstGlideTimeScale"
+                          },
+                          {
+                            "type": "row",
                             "key": "custom13Trig1TransitionSpeedMs"
                           },
                           {
@@ -38196,6 +38574,9 @@
                           "custom13Trig1Mode",
                           "custom13Trig1TargetPose",
                           "custom13Trig1TweenSelector",
+                          "custom13Trig1ReverseSequence",
+                          "custom13Trig1GlideToFirstPose",
+                          "custom13Trig1FirstGlideTimeScale",
                           "custom13Trig1TransitionSpeedMs",
                           "custom13Trig1TweenSpeedMs",
                           "custom13Trig1PauseDurationMs"
@@ -38578,6 +38959,18 @@
                           {
                             "type": "row",
                             "key": "custom13Trig2TweenSelector"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom13Trig2ReverseSequence"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom13Trig2GlideToFirstPose"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom13Trig2FirstGlideTimeScale"
                           },
                           {
                             "type": "row",
@@ -38973,6 +39366,9 @@
                           "custom13Trig2Mode",
                           "custom13Trig2TargetPose",
                           "custom13Trig2TweenSelector",
+                          "custom13Trig2ReverseSequence",
+                          "custom13Trig2GlideToFirstPose",
+                          "custom13Trig2FirstGlideTimeScale",
                           "custom13Trig2TransitionSpeedMs",
                           "custom13Trig2TweenSpeedMs",
                           "custom13Trig2PauseDurationMs"
@@ -39363,6 +39759,18 @@
                         {
                           "type": "row",
                           "key": "custom13Trig1TweenSelector"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom13Trig1ReverseSequence"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom13Trig1GlideToFirstPose"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom13Trig1FirstGlideTimeScale"
                         },
                         {
                           "type": "row",
@@ -39758,6 +40166,9 @@
                         "custom13Trig1Mode",
                         "custom13Trig1TargetPose",
                         "custom13Trig1TweenSelector",
+                        "custom13Trig1ReverseSequence",
+                        "custom13Trig1GlideToFirstPose",
+                        "custom13Trig1FirstGlideTimeScale",
                         "custom13Trig1TransitionSpeedMs",
                         "custom13Trig1TweenSpeedMs",
                         "custom13Trig1PauseDurationMs"
@@ -40137,6 +40548,18 @@
                         {
                           "type": "row",
                           "key": "custom13Trig2TweenSelector"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom13Trig2ReverseSequence"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom13Trig2GlideToFirstPose"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom13Trig2FirstGlideTimeScale"
                         },
                         {
                           "type": "row",
@@ -40532,6 +40955,9 @@
                         "custom13Trig2Mode",
                         "custom13Trig2TargetPose",
                         "custom13Trig2TweenSelector",
+                        "custom13Trig2ReverseSequence",
+                        "custom13Trig2GlideToFirstPose",
+                        "custom13Trig2FirstGlideTimeScale",
                         "custom13Trig2TransitionSpeedMs",
                         "custom13Trig2TweenSpeedMs",
                         "custom13Trig2PauseDurationMs"
@@ -40903,6 +41329,9 @@
               "custom13Mode",
               "custom13TargetPose",
               "custom13TweenSelector",
+              "custom13ReverseSequence",
+              "custom13GlideToFirstPose",
+              "custom13FirstGlideTimeScale",
               "custom13TransitionSpeedMs",
               "custom13TweenSpeedMs",
               "custom13PauseDurationMs",
@@ -41303,6 +41732,18 @@
                         },
                         {
                           "type": "row",
+                          "key": "custom13Trig1ReverseSequence"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom13Trig1GlideToFirstPose"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom13Trig1FirstGlideTimeScale"
+                        },
+                        {
+                          "type": "row",
                           "key": "custom13Trig1TransitionSpeedMs"
                         },
                         {
@@ -41695,6 +42136,9 @@
                         "custom13Trig1Mode",
                         "custom13Trig1TargetPose",
                         "custom13Trig1TweenSelector",
+                        "custom13Trig1ReverseSequence",
+                        "custom13Trig1GlideToFirstPose",
+                        "custom13Trig1FirstGlideTimeScale",
                         "custom13Trig1TransitionSpeedMs",
                         "custom13Trig1TweenSpeedMs",
                         "custom13Trig1PauseDurationMs"
@@ -42077,6 +42521,18 @@
                         {
                           "type": "row",
                           "key": "custom13Trig2TweenSelector"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom13Trig2ReverseSequence"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom13Trig2GlideToFirstPose"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom13Trig2FirstGlideTimeScale"
                         },
                         {
                           "type": "row",
@@ -42472,6 +42928,9 @@
                         "custom13Trig2Mode",
                         "custom13Trig2TargetPose",
                         "custom13Trig2TweenSelector",
+                        "custom13Trig2ReverseSequence",
+                        "custom13Trig2GlideToFirstPose",
+                        "custom13Trig2FirstGlideTimeScale",
                         "custom13Trig2TransitionSpeedMs",
                         "custom13Trig2TweenSpeedMs",
                         "custom13Trig2PauseDurationMs"
@@ -42862,6 +43321,18 @@
                       {
                         "type": "row",
                         "key": "custom13Trig1TweenSelector"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom13Trig1ReverseSequence"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom13Trig1GlideToFirstPose"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom13Trig1FirstGlideTimeScale"
                       },
                       {
                         "type": "row",
@@ -43257,6 +43728,9 @@
                       "custom13Trig1Mode",
                       "custom13Trig1TargetPose",
                       "custom13Trig1TweenSelector",
+                      "custom13Trig1ReverseSequence",
+                      "custom13Trig1GlideToFirstPose",
+                      "custom13Trig1FirstGlideTimeScale",
                       "custom13Trig1TransitionSpeedMs",
                       "custom13Trig1TweenSpeedMs",
                       "custom13Trig1PauseDurationMs"
@@ -43636,6 +44110,18 @@
                       {
                         "type": "row",
                         "key": "custom13Trig2TweenSelector"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom13Trig2ReverseSequence"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom13Trig2GlideToFirstPose"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom13Trig2FirstGlideTimeScale"
                       },
                       {
                         "type": "row",
@@ -44031,6 +44517,9 @@
                       "custom13Trig2Mode",
                       "custom13Trig2TargetPose",
                       "custom13Trig2TweenSelector",
+                      "custom13Trig2ReverseSequence",
+                      "custom13Trig2GlideToFirstPose",
+                      "custom13Trig2FirstGlideTimeScale",
                       "custom13Trig2TransitionSpeedMs",
                       "custom13Trig2TweenSpeedMs",
                       "custom13Trig2PauseDurationMs"
@@ -44399,7 +44888,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 10",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -44429,6 +44918,18 @@
               {
                 "type": "row",
                 "key": "custom10TweenSelector"
+              },
+              {
+                "type": "row",
+                "key": "custom10ReverseSequence"
+              },
+              {
+                "type": "row",
+                "key": "custom10GlideToFirstPose"
+              },
+              {
+                "type": "row",
+                "key": "custom10FirstGlideTimeScale"
               },
               {
                 "type": "row",
@@ -45030,6 +45531,18 @@
                           },
                           {
                             "type": "row",
+                            "key": "custom10Trig1ReverseSequence"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom10Trig1GlideToFirstPose"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom10Trig1FirstGlideTimeScale"
+                          },
+                          {
+                            "type": "row",
                             "key": "custom10Trig1TransitionSpeedMs"
                           },
                           {
@@ -45418,6 +45931,9 @@
                           "custom10Trig1Mode",
                           "custom10Trig1TargetPose",
                           "custom10Trig1TweenSelector",
+                          "custom10Trig1ReverseSequence",
+                          "custom10Trig1GlideToFirstPose",
+                          "custom10Trig1FirstGlideTimeScale",
                           "custom10Trig1TransitionSpeedMs",
                           "custom10Trig1TweenSpeedMs"
                         ],
@@ -45810,6 +46326,18 @@
                         },
                         {
                           "type": "row",
+                          "key": "custom10Trig1ReverseSequence"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom10Trig1GlideToFirstPose"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom10Trig1FirstGlideTimeScale"
+                        },
+                        {
+                          "type": "row",
                           "key": "custom10Trig1TransitionSpeedMs"
                         },
                         {
@@ -46198,6 +46726,9 @@
                         "custom10Trig1Mode",
                         "custom10Trig1TargetPose",
                         "custom10Trig1TweenSelector",
+                        "custom10Trig1ReverseSequence",
+                        "custom10Trig1GlideToFirstPose",
+                        "custom10Trig1FirstGlideTimeScale",
                         "custom10Trig1TransitionSpeedMs",
                         "custom10Trig1TweenSpeedMs"
                       ],
@@ -46568,6 +47099,9 @@
               "custom10Mode",
               "custom10TargetPose",
               "custom10TweenSelector",
+              "custom10ReverseSequence",
+              "custom10GlideToFirstPose",
+              "custom10FirstGlideTimeScale",
               "custom10TweenChain",
               "custom10TransitionSpeedMs",
               "custom10TweenSpeedMs",
@@ -47126,6 +47660,18 @@
                         },
                         {
                           "type": "row",
+                          "key": "custom10Trig1ReverseSequence"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom10Trig1GlideToFirstPose"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom10Trig1FirstGlideTimeScale"
+                        },
+                        {
+                          "type": "row",
                           "key": "custom10Trig1TransitionSpeedMs"
                         },
                         {
@@ -47514,6 +48060,9 @@
                         "custom10Trig1Mode",
                         "custom10Trig1TargetPose",
                         "custom10Trig1TweenSelector",
+                        "custom10Trig1ReverseSequence",
+                        "custom10Trig1GlideToFirstPose",
+                        "custom10Trig1FirstGlideTimeScale",
                         "custom10Trig1TransitionSpeedMs",
                         "custom10Trig1TweenSpeedMs"
                       ],
@@ -47906,6 +48455,18 @@
                       },
                       {
                         "type": "row",
+                        "key": "custom10Trig1ReverseSequence"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom10Trig1GlideToFirstPose"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom10Trig1FirstGlideTimeScale"
+                      },
+                      {
+                        "type": "row",
                         "key": "custom10Trig1TransitionSpeedMs"
                       },
                       {
@@ -48294,6 +48855,9 @@
                       "custom10Trig1Mode",
                       "custom10Trig1TargetPose",
                       "custom10Trig1TweenSelector",
+                      "custom10Trig1ReverseSequence",
+                      "custom10Trig1GlideToFirstPose",
+                      "custom10Trig1FirstGlideTimeScale",
                       "custom10Trig1TransitionSpeedMs",
                       "custom10Trig1TweenSpeedMs"
                     ],
@@ -48661,7 +49225,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 9",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -48691,6 +49255,18 @@
               {
                 "type": "row",
                 "key": "custom9TweenSelector"
+              },
+              {
+                "type": "row",
+                "key": "custom9ReverseSequence"
+              },
+              {
+                "type": "row",
+                "key": "custom9GlideToFirstPose"
+              },
+              {
+                "type": "row",
+                "key": "custom9FirstGlideTimeScale"
               },
               {
                 "type": "row",
@@ -48728,7 +49304,7 @@
                 "type": "group",
                 "group": {
                   "key": "Offset",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -48811,7 +49387,7 @@
                 "type": "group",
                 "group": {
                   "key": "Offset To Camera",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -49137,6 +49713,18 @@
                           {
                             "type": "row",
                             "key": "custom9Trig1TweenSelector"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom9Trig1ReverseSequence"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom9Trig1GlideToFirstPose"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom9Trig1FirstGlideTimeScale"
                           },
                           {
                             "type": "row",
@@ -49532,6 +50120,9 @@
                           "custom9Trig1Mode",
                           "custom9Trig1TargetPose",
                           "custom9Trig1TweenSelector",
+                          "custom9Trig1ReverseSequence",
+                          "custom9Trig1GlideToFirstPose",
+                          "custom9Trig1FirstGlideTimeScale",
                           "custom9Trig1TransitionSpeedMs",
                           "custom9Trig1TweenSpeedMs",
                           "custom9Trig1PauseDurationMs"
@@ -49914,6 +50505,18 @@
                           {
                             "type": "row",
                             "key": "custom9Trig2TweenSelector"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom9Trig2ReverseSequence"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom9Trig2GlideToFirstPose"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom9Trig2FirstGlideTimeScale"
                           },
                           {
                             "type": "row",
@@ -50309,6 +50912,9 @@
                           "custom9Trig2Mode",
                           "custom9Trig2TargetPose",
                           "custom9Trig2TweenSelector",
+                          "custom9Trig2ReverseSequence",
+                          "custom9Trig2GlideToFirstPose",
+                          "custom9Trig2FirstGlideTimeScale",
                           "custom9Trig2TransitionSpeedMs",
                           "custom9Trig2TweenSpeedMs",
                           "custom9Trig2PauseDurationMs"
@@ -50702,6 +51308,18 @@
                         },
                         {
                           "type": "row",
+                          "key": "custom9Trig1ReverseSequence"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom9Trig1GlideToFirstPose"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom9Trig1FirstGlideTimeScale"
+                        },
+                        {
+                          "type": "row",
                           "key": "custom9Trig1TransitionSpeedMs"
                         },
                         {
@@ -51094,6 +51712,9 @@
                         "custom9Trig1Mode",
                         "custom9Trig1TargetPose",
                         "custom9Trig1TweenSelector",
+                        "custom9Trig1ReverseSequence",
+                        "custom9Trig1GlideToFirstPose",
+                        "custom9Trig1FirstGlideTimeScale",
                         "custom9Trig1TransitionSpeedMs",
                         "custom9Trig1TweenSpeedMs",
                         "custom9Trig1PauseDurationMs"
@@ -51476,6 +52097,18 @@
                         },
                         {
                           "type": "row",
+                          "key": "custom9Trig2ReverseSequence"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom9Trig2GlideToFirstPose"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom9Trig2FirstGlideTimeScale"
+                        },
+                        {
+                          "type": "row",
                           "key": "custom9Trig2TransitionSpeedMs"
                         },
                         {
@@ -51868,6 +52501,9 @@
                         "custom9Trig2Mode",
                         "custom9Trig2TargetPose",
                         "custom9Trig2TweenSelector",
+                        "custom9Trig2ReverseSequence",
+                        "custom9Trig2GlideToFirstPose",
+                        "custom9Trig2FirstGlideTimeScale",
                         "custom9Trig2TransitionSpeedMs",
                         "custom9Trig2TweenSpeedMs",
                         "custom9Trig2PauseDurationMs"
@@ -52239,6 +52875,9 @@
               "custom9Mode",
               "custom9TargetPose",
               "custom9TweenSelector",
+              "custom9ReverseSequence",
+              "custom9GlideToFirstPose",
+              "custom9FirstGlideTimeScale",
               "custom9TransitionSpeedMs",
               "custom9TweenSpeedMs",
               "custom9PauseDurationMs",
@@ -52251,7 +52890,7 @@
             "subgroups": [
               {
                 "key": "Offset",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -52331,7 +52970,7 @@
               },
               {
                 "key": "Offset To Camera",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -52636,6 +53275,18 @@
                         {
                           "type": "row",
                           "key": "custom9Trig1TweenSelector"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom9Trig1ReverseSequence"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom9Trig1GlideToFirstPose"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom9Trig1FirstGlideTimeScale"
                         },
                         {
                           "type": "row",
@@ -53031,6 +53682,9 @@
                         "custom9Trig1Mode",
                         "custom9Trig1TargetPose",
                         "custom9Trig1TweenSelector",
+                        "custom9Trig1ReverseSequence",
+                        "custom9Trig1GlideToFirstPose",
+                        "custom9Trig1FirstGlideTimeScale",
                         "custom9Trig1TransitionSpeedMs",
                         "custom9Trig1TweenSpeedMs",
                         "custom9Trig1PauseDurationMs"
@@ -53413,6 +54067,18 @@
                         {
                           "type": "row",
                           "key": "custom9Trig2TweenSelector"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom9Trig2ReverseSequence"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom9Trig2GlideToFirstPose"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom9Trig2FirstGlideTimeScale"
                         },
                         {
                           "type": "row",
@@ -53808,6 +54474,9 @@
                         "custom9Trig2Mode",
                         "custom9Trig2TargetPose",
                         "custom9Trig2TweenSelector",
+                        "custom9Trig2ReverseSequence",
+                        "custom9Trig2GlideToFirstPose",
+                        "custom9Trig2FirstGlideTimeScale",
                         "custom9Trig2TransitionSpeedMs",
                         "custom9Trig2TweenSpeedMs",
                         "custom9Trig2PauseDurationMs"
@@ -54198,6 +54867,18 @@
                       {
                         "type": "row",
                         "key": "custom9Trig1TweenSelector"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom9Trig1ReverseSequence"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom9Trig1GlideToFirstPose"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom9Trig1FirstGlideTimeScale"
                       },
                       {
                         "type": "row",
@@ -54593,6 +55274,9 @@
                       "custom9Trig1Mode",
                       "custom9Trig1TargetPose",
                       "custom9Trig1TweenSelector",
+                      "custom9Trig1ReverseSequence",
+                      "custom9Trig1GlideToFirstPose",
+                      "custom9Trig1FirstGlideTimeScale",
                       "custom9Trig1TransitionSpeedMs",
                       "custom9Trig1TweenSpeedMs",
                       "custom9Trig1PauseDurationMs"
@@ -54972,6 +55656,18 @@
                       {
                         "type": "row",
                         "key": "custom9Trig2TweenSelector"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom9Trig2ReverseSequence"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom9Trig2GlideToFirstPose"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom9Trig2FirstGlideTimeScale"
                       },
                       {
                         "type": "row",
@@ -55367,6 +56063,9 @@
                       "custom9Trig2Mode",
                       "custom9Trig2TargetPose",
                       "custom9Trig2TweenSelector",
+                      "custom9Trig2ReverseSequence",
+                      "custom9Trig2GlideToFirstPose",
+                      "custom9Trig2FirstGlideTimeScale",
                       "custom9Trig2TransitionSpeedMs",
                       "custom9Trig2TweenSpeedMs",
                       "custom9Trig2PauseDurationMs"
@@ -55735,7 +56434,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 8",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -55768,6 +56467,18 @@
               },
               {
                 "type": "row",
+                "key": "custom8ReverseSequence"
+              },
+              {
+                "type": "row",
+                "key": "custom8GlideToFirstPose"
+              },
+              {
+                "type": "row",
+                "key": "custom8FirstGlideTimeScale"
+              },
+              {
+                "type": "row",
                 "key": "custom8TweenChain"
               },
               {
@@ -55790,7 +56501,7 @@
                 "type": "group",
                 "group": {
                   "key": "Offset",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -55931,7 +56642,7 @@
                 "type": "group",
                 "group": {
                   "key": "Rotation",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -55959,7 +56670,7 @@
                 "type": "group",
                 "group": {
                   "key": "Easing",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -55977,7 +56688,7 @@
                 "type": "group",
                 "group": {
                   "key": "Animation Speed Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -56000,7 +56711,7 @@
                 "type": "group",
                 "group": {
                   "key": "Start Time Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -56061,7 +56772,7 @@
                 "type": "group",
                 "group": {
                   "key": "Retransition",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -56211,7 +56922,7 @@
                 "type": "group",
                 "group": {
                   "key": "Tween Stop",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -56362,6 +57073,9 @@
               "custom8Mode",
               "custom8TargetPose",
               "custom8TweenSelector",
+              "custom8ReverseSequence",
+              "custom8GlideToFirstPose",
+              "custom8FirstGlideTimeScale",
               "custom8TweenChain",
               "custom8TransitionSpeedMs",
               "custom8TweenSpeedMs",
@@ -56371,7 +57085,7 @@
             "subgroups": [
               {
                 "key": "Offset",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -56506,7 +57220,7 @@
               },
               {
                 "key": "Rotation",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -56531,7 +57245,7 @@
               },
               {
                 "key": "Easing",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -56546,7 +57260,7 @@
               },
               {
                 "key": "Animation Speed Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -56566,7 +57280,7 @@
               },
               {
                 "key": "Start Time Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -56621,7 +57335,7 @@
               },
               {
                 "key": "Retransition",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -56768,7 +57482,7 @@
               },
               {
                 "key": "Tween Stop",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -56943,6 +57657,18 @@
               {
                 "type": "row",
                 "key": "custom7TweenSelector"
+              },
+              {
+                "type": "row",
+                "key": "custom7ReverseSequence"
+              },
+              {
+                "type": "row",
+                "key": "custom7GlideToFirstPose"
+              },
+              {
+                "type": "row",
+                "key": "custom7FirstGlideTimeScale"
               },
               {
                 "type": "row",
@@ -57392,6 +58118,18 @@
                           },
                           {
                             "type": "row",
+                            "key": "custom7Trig1ReverseSequence"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom7Trig1GlideToFirstPose"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom7Trig1FirstGlideTimeScale"
+                          },
+                          {
+                            "type": "row",
                             "key": "custom7Trig1TransitionSpeedMs"
                           },
                           {
@@ -57784,6 +58522,9 @@
                           "custom7Trig1Mode",
                           "custom7Trig1TargetPose",
                           "custom7Trig1TweenSelector",
+                          "custom7Trig1ReverseSequence",
+                          "custom7Trig1GlideToFirstPose",
+                          "custom7Trig1FirstGlideTimeScale",
                           "custom7Trig1TransitionSpeedMs",
                           "custom7Trig1TweenSpeedMs",
                           "custom7Trig1PauseDurationMs"
@@ -58166,6 +58907,18 @@
                           {
                             "type": "row",
                             "key": "custom7Trig2TweenSelector"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom7Trig2ReverseSequence"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom7Trig2GlideToFirstPose"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom7Trig2FirstGlideTimeScale"
                           },
                           {
                             "type": "row",
@@ -58561,6 +59314,9 @@
                           "custom7Trig2Mode",
                           "custom7Trig2TargetPose",
                           "custom7Trig2TweenSelector",
+                          "custom7Trig2ReverseSequence",
+                          "custom7Trig2GlideToFirstPose",
+                          "custom7Trig2FirstGlideTimeScale",
                           "custom7Trig2TransitionSpeedMs",
                           "custom7Trig2TweenSpeedMs",
                           "custom7Trig2PauseDurationMs"
@@ -58951,6 +59707,18 @@
                         {
                           "type": "row",
                           "key": "custom7Trig1TweenSelector"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom7Trig1ReverseSequence"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom7Trig1GlideToFirstPose"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom7Trig1FirstGlideTimeScale"
                         },
                         {
                           "type": "row",
@@ -59346,6 +60114,9 @@
                         "custom7Trig1Mode",
                         "custom7Trig1TargetPose",
                         "custom7Trig1TweenSelector",
+                        "custom7Trig1ReverseSequence",
+                        "custom7Trig1GlideToFirstPose",
+                        "custom7Trig1FirstGlideTimeScale",
                         "custom7Trig1TransitionSpeedMs",
                         "custom7Trig1TweenSpeedMs",
                         "custom7Trig1PauseDurationMs"
@@ -59725,6 +60496,18 @@
                         {
                           "type": "row",
                           "key": "custom7Trig2TweenSelector"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom7Trig2ReverseSequence"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom7Trig2GlideToFirstPose"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom7Trig2FirstGlideTimeScale"
                         },
                         {
                           "type": "row",
@@ -60120,6 +60903,9 @@
                         "custom7Trig2Mode",
                         "custom7Trig2TargetPose",
                         "custom7Trig2TweenSelector",
+                        "custom7Trig2ReverseSequence",
+                        "custom7Trig2GlideToFirstPose",
+                        "custom7Trig2FirstGlideTimeScale",
                         "custom7Trig2TransitionSpeedMs",
                         "custom7Trig2TweenSpeedMs",
                         "custom7Trig2PauseDurationMs"
@@ -60491,6 +61277,9 @@
               "custom7Mode",
               "custom7TargetPose",
               "custom7TweenSelector",
+              "custom7ReverseSequence",
+              "custom7GlideToFirstPose",
+              "custom7FirstGlideTimeScale",
               "custom7TransitionSpeedMs",
               "custom7TweenSpeedMs",
               "custom7PauseDurationMs",
@@ -60891,6 +61680,18 @@
                         },
                         {
                           "type": "row",
+                          "key": "custom7Trig1ReverseSequence"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom7Trig1GlideToFirstPose"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom7Trig1FirstGlideTimeScale"
+                        },
+                        {
+                          "type": "row",
                           "key": "custom7Trig1TransitionSpeedMs"
                         },
                         {
@@ -61283,6 +62084,9 @@
                         "custom7Trig1Mode",
                         "custom7Trig1TargetPose",
                         "custom7Trig1TweenSelector",
+                        "custom7Trig1ReverseSequence",
+                        "custom7Trig1GlideToFirstPose",
+                        "custom7Trig1FirstGlideTimeScale",
                         "custom7Trig1TransitionSpeedMs",
                         "custom7Trig1TweenSpeedMs",
                         "custom7Trig1PauseDurationMs"
@@ -61665,6 +62469,18 @@
                         {
                           "type": "row",
                           "key": "custom7Trig2TweenSelector"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom7Trig2ReverseSequence"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom7Trig2GlideToFirstPose"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom7Trig2FirstGlideTimeScale"
                         },
                         {
                           "type": "row",
@@ -62060,6 +62876,9 @@
                         "custom7Trig2Mode",
                         "custom7Trig2TargetPose",
                         "custom7Trig2TweenSelector",
+                        "custom7Trig2ReverseSequence",
+                        "custom7Trig2GlideToFirstPose",
+                        "custom7Trig2FirstGlideTimeScale",
                         "custom7Trig2TransitionSpeedMs",
                         "custom7Trig2TweenSpeedMs",
                         "custom7Trig2PauseDurationMs"
@@ -62450,6 +63269,18 @@
                       {
                         "type": "row",
                         "key": "custom7Trig1TweenSelector"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom7Trig1ReverseSequence"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom7Trig1GlideToFirstPose"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom7Trig1FirstGlideTimeScale"
                       },
                       {
                         "type": "row",
@@ -62845,6 +63676,9 @@
                       "custom7Trig1Mode",
                       "custom7Trig1TargetPose",
                       "custom7Trig1TweenSelector",
+                      "custom7Trig1ReverseSequence",
+                      "custom7Trig1GlideToFirstPose",
+                      "custom7Trig1FirstGlideTimeScale",
                       "custom7Trig1TransitionSpeedMs",
                       "custom7Trig1TweenSpeedMs",
                       "custom7Trig1PauseDurationMs"
@@ -63224,6 +64058,18 @@
                       {
                         "type": "row",
                         "key": "custom7Trig2TweenSelector"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom7Trig2ReverseSequence"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom7Trig2GlideToFirstPose"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom7Trig2FirstGlideTimeScale"
                       },
                       {
                         "type": "row",
@@ -63619,6 +64465,9 @@
                       "custom7Trig2Mode",
                       "custom7Trig2TargetPose",
                       "custom7Trig2TweenSelector",
+                      "custom7Trig2ReverseSequence",
+                      "custom7Trig2GlideToFirstPose",
+                      "custom7Trig2FirstGlideTimeScale",
                       "custom7Trig2TransitionSpeedMs",
                       "custom7Trig2TweenSpeedMs",
                       "custom7Trig2PauseDurationMs"
@@ -64041,6 +64890,18 @@
             {
               "type": "row",
               "key": "custom19TweenSelector"
+            },
+            {
+              "type": "row",
+              "key": "custom19ReverseSequence"
+            },
+            {
+              "type": "row",
+              "key": "custom19GlideToFirstPose"
+            },
+            {
+              "type": "row",
+              "key": "custom19FirstGlideTimeScale"
             },
             {
               "type": "row",
@@ -64486,6 +65347,9 @@
             "custom19Mode",
             "custom19TargetPose",
             "custom19TweenSelector",
+            "custom19ReverseSequence",
+            "custom19GlideToFirstPose",
+            "custom19FirstGlideTimeScale",
             "custom19TransitionSpeedMs",
             "custom19TweenSpeedMs",
             "custom19PauseDurationMs",
@@ -64909,6 +65773,18 @@
             },
             {
               "type": "row",
+              "key": "custom18ReverseSequence"
+            },
+            {
+              "type": "row",
+              "key": "custom18GlideToFirstPose"
+            },
+            {
+              "type": "row",
+              "key": "custom18FirstGlideTimeScale"
+            },
+            {
+              "type": "row",
               "key": "custom18TransitionSpeedMs"
             },
             {
@@ -65112,7 +65988,7 @@
               "type": "group",
               "group": {
                 "key": "Easing",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -65130,7 +66006,7 @@
               "type": "group",
               "group": {
                 "key": "Animation Speed Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -65153,7 +66029,7 @@
               "type": "group",
               "group": {
                 "key": "Start Time Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -65214,7 +66090,7 @@
               "type": "group",
               "group": {
                 "key": "Retransition",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -65355,6 +66231,18 @@
                         },
                         {
                           "type": "row",
+                          "key": "custom18Trig1ReverseSequence"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom18Trig1GlideToFirstPose"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom18Trig1FirstGlideTimeScale"
+                        },
+                        {
+                          "type": "row",
                           "key": "custom18Trig1TransitionSpeedMs"
                         },
                         {
@@ -65369,7 +66257,7 @@
                           "type": "group",
                           "group": {
                             "key": "Offset",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -65747,6 +66635,9 @@
                         "custom18Trig1Mode",
                         "custom18Trig1TargetPose",
                         "custom18Trig1TweenSelector",
+                        "custom18Trig1ReverseSequence",
+                        "custom18Trig1GlideToFirstPose",
+                        "custom18Trig1FirstGlideTimeScale",
                         "custom18Trig1TransitionSpeedMs",
                         "custom18Trig1TweenSpeedMs",
                         "custom18Trig1PauseDurationMs"
@@ -65754,7 +66645,7 @@
                       "subgroups": [
                         {
                           "key": "Offset",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -66140,6 +67031,18 @@
                       },
                       {
                         "type": "row",
+                        "key": "custom18Trig1ReverseSequence"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom18Trig1GlideToFirstPose"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom18Trig1FirstGlideTimeScale"
+                      },
+                      {
+                        "type": "row",
                         "key": "custom18Trig1TransitionSpeedMs"
                       },
                       {
@@ -66154,7 +67057,7 @@
                         "type": "group",
                         "group": {
                           "key": "Offset",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -66532,6 +67435,9 @@
                       "custom18Trig1Mode",
                       "custom18Trig1TargetPose",
                       "custom18Trig1TweenSelector",
+                      "custom18Trig1ReverseSequence",
+                      "custom18Trig1GlideToFirstPose",
+                      "custom18Trig1FirstGlideTimeScale",
                       "custom18Trig1TransitionSpeedMs",
                       "custom18Trig1TweenSpeedMs",
                       "custom18Trig1PauseDurationMs"
@@ -66539,7 +67445,7 @@
                     "subgroups": [
                       {
                         "key": "Offset",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -66903,6 +67809,9 @@
             "custom18Mode",
             "custom18TargetPose",
             "custom18TweenSelector",
+            "custom18ReverseSequence",
+            "custom18GlideToFirstPose",
+            "custom18FirstGlideTimeScale",
             "custom18TransitionSpeedMs",
             "custom18TweenSpeedMs",
             "custom18PauseDurationMs",
@@ -67075,7 +67984,7 @@
             },
             {
               "key": "Easing",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -67090,7 +67999,7 @@
             },
             {
               "key": "Animation Speed Curve",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -67110,7 +68019,7 @@
             },
             {
               "key": "Start Time Curve",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -67165,7 +68074,7 @@
             },
             {
               "key": "Retransition",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -67303,6 +68212,18 @@
                       },
                       {
                         "type": "row",
+                        "key": "custom18Trig1ReverseSequence"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom18Trig1GlideToFirstPose"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom18Trig1FirstGlideTimeScale"
+                      },
+                      {
+                        "type": "row",
                         "key": "custom18Trig1TransitionSpeedMs"
                       },
                       {
@@ -67317,7 +68238,7 @@
                         "type": "group",
                         "group": {
                           "key": "Offset",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -67695,6 +68616,9 @@
                       "custom18Trig1Mode",
                       "custom18Trig1TargetPose",
                       "custom18Trig1TweenSelector",
+                      "custom18Trig1ReverseSequence",
+                      "custom18Trig1GlideToFirstPose",
+                      "custom18Trig1FirstGlideTimeScale",
                       "custom18Trig1TransitionSpeedMs",
                       "custom18Trig1TweenSpeedMs",
                       "custom18Trig1PauseDurationMs"
@@ -67702,7 +68626,7 @@
                     "subgroups": [
                       {
                         "key": "Offset",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -68088,6 +69012,18 @@
                     },
                     {
                       "type": "row",
+                      "key": "custom18Trig1ReverseSequence"
+                    },
+                    {
+                      "type": "row",
+                      "key": "custom18Trig1GlideToFirstPose"
+                    },
+                    {
+                      "type": "row",
+                      "key": "custom18Trig1FirstGlideTimeScale"
+                    },
+                    {
+                      "type": "row",
                       "key": "custom18Trig1TransitionSpeedMs"
                     },
                     {
@@ -68102,7 +69038,7 @@
                       "type": "group",
                       "group": {
                         "key": "Offset",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -68480,6 +69416,9 @@
                     "custom18Trig1Mode",
                     "custom18Trig1TargetPose",
                     "custom18Trig1TweenSelector",
+                    "custom18Trig1ReverseSequence",
+                    "custom18Trig1GlideToFirstPose",
+                    "custom18Trig1FirstGlideTimeScale",
                     "custom18Trig1TransitionSpeedMs",
                     "custom18Trig1TweenSpeedMs",
                     "custom18Trig1PauseDurationMs"
@@ -68487,7 +69426,7 @@
                   "subgroups": [
                     {
                       "key": "Offset",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -68845,7 +69784,7 @@
         },
         {
           "key": "Custom Click Function 17",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
@@ -68875,6 +69814,18 @@
             {
               "type": "row",
               "key": "custom17TweenSelector"
+            },
+            {
+              "type": "row",
+              "key": "custom17ReverseSequence"
+            },
+            {
+              "type": "row",
+              "key": "custom17GlideToFirstPose"
+            },
+            {
+              "type": "row",
+              "key": "custom17FirstGlideTimeScale"
             },
             {
               "type": "row",
@@ -69320,6 +70271,9 @@
             "custom17Mode",
             "custom17TargetPose",
             "custom17TweenSelector",
+            "custom17ReverseSequence",
+            "custom17GlideToFirstPose",
+            "custom17FirstGlideTimeScale",
             "custom17TransitionSpeedMs",
             "custom17TweenSpeedMs",
             "custom17PauseDurationMs",
@@ -69710,7 +70664,7 @@
         },
         {
           "key": "Custom Click Function 16",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
@@ -69740,6 +70694,18 @@
             {
               "type": "row",
               "key": "custom16TweenSelector"
+            },
+            {
+              "type": "row",
+              "key": "custom16ReverseSequence"
+            },
+            {
+              "type": "row",
+              "key": "custom16GlideToFirstPose"
+            },
+            {
+              "type": "row",
+              "key": "custom16FirstGlideTimeScale"
             },
             {
               "type": "row",
@@ -70337,6 +71303,9 @@
             "custom16Mode",
             "custom16TargetPose",
             "custom16TweenSelector",
+            "custom16ReverseSequence",
+            "custom16GlideToFirstPose",
+            "custom16FirstGlideTimeScale",
             "custom16TweenChain",
             "custom16TransitionSpeedMs",
             "custom16TweenSpeedMs",
@@ -70885,7 +71854,7 @@
         },
         {
           "key": "Custom Click Function 15",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
@@ -70915,6 +71884,18 @@
             {
               "type": "row",
               "key": "custom15TweenSelector"
+            },
+            {
+              "type": "row",
+              "key": "custom15ReverseSequence"
+            },
+            {
+              "type": "row",
+              "key": "custom15GlideToFirstPose"
+            },
+            {
+              "type": "row",
+              "key": "custom15FirstGlideTimeScale"
             },
             {
               "type": "row",
@@ -71512,6 +72493,9 @@
             "custom15Mode",
             "custom15TargetPose",
             "custom15TweenSelector",
+            "custom15ReverseSequence",
+            "custom15GlideToFirstPose",
+            "custom15FirstGlideTimeScale",
             "custom15TweenChain",
             "custom15TransitionSpeedMs",
             "custom15TweenSpeedMs",
@@ -72060,7 +73044,7 @@
         },
         {
           "key": "Custom Click Function 14",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
@@ -72090,6 +73074,18 @@
             {
               "type": "row",
               "key": "custom14TweenSelector"
+            },
+            {
+              "type": "row",
+              "key": "custom14ReverseSequence"
+            },
+            {
+              "type": "row",
+              "key": "custom14GlideToFirstPose"
+            },
+            {
+              "type": "row",
+              "key": "custom14FirstGlideTimeScale"
             },
             {
               "type": "row",
@@ -72535,6 +73531,9 @@
             "custom14Mode",
             "custom14TargetPose",
             "custom14TweenSelector",
+            "custom14ReverseSequence",
+            "custom14GlideToFirstPose",
+            "custom14FirstGlideTimeScale",
             "custom14TransitionSpeedMs",
             "custom14TweenSpeedMs",
             "custom14PauseDurationMs",
@@ -72955,6 +73954,18 @@
             {
               "type": "row",
               "key": "custom13TweenSelector"
+            },
+            {
+              "type": "row",
+              "key": "custom13ReverseSequence"
+            },
+            {
+              "type": "row",
+              "key": "custom13GlideToFirstPose"
+            },
+            {
+              "type": "row",
+              "key": "custom13FirstGlideTimeScale"
             },
             {
               "type": "row",
@@ -73404,6 +74415,18 @@
                         },
                         {
                           "type": "row",
+                          "key": "custom13Trig1ReverseSequence"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom13Trig1GlideToFirstPose"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom13Trig1FirstGlideTimeScale"
+                        },
+                        {
+                          "type": "row",
                           "key": "custom13Trig1TransitionSpeedMs"
                         },
                         {
@@ -73796,6 +74819,9 @@
                         "custom13Trig1Mode",
                         "custom13Trig1TargetPose",
                         "custom13Trig1TweenSelector",
+                        "custom13Trig1ReverseSequence",
+                        "custom13Trig1GlideToFirstPose",
+                        "custom13Trig1FirstGlideTimeScale",
                         "custom13Trig1TransitionSpeedMs",
                         "custom13Trig1TweenSpeedMs",
                         "custom13Trig1PauseDurationMs"
@@ -74178,6 +75204,18 @@
                         {
                           "type": "row",
                           "key": "custom13Trig2TweenSelector"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom13Trig2ReverseSequence"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom13Trig2GlideToFirstPose"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom13Trig2FirstGlideTimeScale"
                         },
                         {
                           "type": "row",
@@ -74573,6 +75611,9 @@
                         "custom13Trig2Mode",
                         "custom13Trig2TargetPose",
                         "custom13Trig2TweenSelector",
+                        "custom13Trig2ReverseSequence",
+                        "custom13Trig2GlideToFirstPose",
+                        "custom13Trig2FirstGlideTimeScale",
                         "custom13Trig2TransitionSpeedMs",
                         "custom13Trig2TweenSpeedMs",
                         "custom13Trig2PauseDurationMs"
@@ -74963,6 +76004,18 @@
                       {
                         "type": "row",
                         "key": "custom13Trig1TweenSelector"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom13Trig1ReverseSequence"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom13Trig1GlideToFirstPose"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom13Trig1FirstGlideTimeScale"
                       },
                       {
                         "type": "row",
@@ -75358,6 +76411,9 @@
                       "custom13Trig1Mode",
                       "custom13Trig1TargetPose",
                       "custom13Trig1TweenSelector",
+                      "custom13Trig1ReverseSequence",
+                      "custom13Trig1GlideToFirstPose",
+                      "custom13Trig1FirstGlideTimeScale",
                       "custom13Trig1TransitionSpeedMs",
                       "custom13Trig1TweenSpeedMs",
                       "custom13Trig1PauseDurationMs"
@@ -75737,6 +76793,18 @@
                       {
                         "type": "row",
                         "key": "custom13Trig2TweenSelector"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom13Trig2ReverseSequence"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom13Trig2GlideToFirstPose"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom13Trig2FirstGlideTimeScale"
                       },
                       {
                         "type": "row",
@@ -76132,6 +77200,9 @@
                       "custom13Trig2Mode",
                       "custom13Trig2TargetPose",
                       "custom13Trig2TweenSelector",
+                      "custom13Trig2ReverseSequence",
+                      "custom13Trig2GlideToFirstPose",
+                      "custom13Trig2FirstGlideTimeScale",
                       "custom13Trig2TransitionSpeedMs",
                       "custom13Trig2TweenSpeedMs",
                       "custom13Trig2PauseDurationMs"
@@ -76503,6 +77574,9 @@
             "custom13Mode",
             "custom13TargetPose",
             "custom13TweenSelector",
+            "custom13ReverseSequence",
+            "custom13GlideToFirstPose",
+            "custom13FirstGlideTimeScale",
             "custom13TransitionSpeedMs",
             "custom13TweenSpeedMs",
             "custom13PauseDurationMs",
@@ -76903,6 +77977,18 @@
                       },
                       {
                         "type": "row",
+                        "key": "custom13Trig1ReverseSequence"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom13Trig1GlideToFirstPose"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom13Trig1FirstGlideTimeScale"
+                      },
+                      {
+                        "type": "row",
                         "key": "custom13Trig1TransitionSpeedMs"
                       },
                       {
@@ -77295,6 +78381,9 @@
                       "custom13Trig1Mode",
                       "custom13Trig1TargetPose",
                       "custom13Trig1TweenSelector",
+                      "custom13Trig1ReverseSequence",
+                      "custom13Trig1GlideToFirstPose",
+                      "custom13Trig1FirstGlideTimeScale",
                       "custom13Trig1TransitionSpeedMs",
                       "custom13Trig1TweenSpeedMs",
                       "custom13Trig1PauseDurationMs"
@@ -77677,6 +78766,18 @@
                       {
                         "type": "row",
                         "key": "custom13Trig2TweenSelector"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom13Trig2ReverseSequence"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom13Trig2GlideToFirstPose"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom13Trig2FirstGlideTimeScale"
                       },
                       {
                         "type": "row",
@@ -78072,6 +79173,9 @@
                       "custom13Trig2Mode",
                       "custom13Trig2TargetPose",
                       "custom13Trig2TweenSelector",
+                      "custom13Trig2ReverseSequence",
+                      "custom13Trig2GlideToFirstPose",
+                      "custom13Trig2FirstGlideTimeScale",
                       "custom13Trig2TransitionSpeedMs",
                       "custom13Trig2TweenSpeedMs",
                       "custom13Trig2PauseDurationMs"
@@ -78462,6 +79566,18 @@
                     {
                       "type": "row",
                       "key": "custom13Trig1TweenSelector"
+                    },
+                    {
+                      "type": "row",
+                      "key": "custom13Trig1ReverseSequence"
+                    },
+                    {
+                      "type": "row",
+                      "key": "custom13Trig1GlideToFirstPose"
+                    },
+                    {
+                      "type": "row",
+                      "key": "custom13Trig1FirstGlideTimeScale"
                     },
                     {
                       "type": "row",
@@ -78857,6 +79973,9 @@
                     "custom13Trig1Mode",
                     "custom13Trig1TargetPose",
                     "custom13Trig1TweenSelector",
+                    "custom13Trig1ReverseSequence",
+                    "custom13Trig1GlideToFirstPose",
+                    "custom13Trig1FirstGlideTimeScale",
                     "custom13Trig1TransitionSpeedMs",
                     "custom13Trig1TweenSpeedMs",
                     "custom13Trig1PauseDurationMs"
@@ -79236,6 +80355,18 @@
                     {
                       "type": "row",
                       "key": "custom13Trig2TweenSelector"
+                    },
+                    {
+                      "type": "row",
+                      "key": "custom13Trig2ReverseSequence"
+                    },
+                    {
+                      "type": "row",
+                      "key": "custom13Trig2GlideToFirstPose"
+                    },
+                    {
+                      "type": "row",
+                      "key": "custom13Trig2FirstGlideTimeScale"
                     },
                     {
                       "type": "row",
@@ -79631,6 +80762,9 @@
                     "custom13Trig2Mode",
                     "custom13Trig2TargetPose",
                     "custom13Trig2TweenSelector",
+                    "custom13Trig2ReverseSequence",
+                    "custom13Trig2GlideToFirstPose",
+                    "custom13Trig2FirstGlideTimeScale",
                     "custom13Trig2TransitionSpeedMs",
                     "custom13Trig2TweenSpeedMs",
                     "custom13Trig2PauseDurationMs"
@@ -79996,7 +81130,7 @@
         },
         {
           "key": "Custom Click Function 10",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
@@ -80026,6 +81160,18 @@
             {
               "type": "row",
               "key": "custom10TweenSelector"
+            },
+            {
+              "type": "row",
+              "key": "custom10ReverseSequence"
+            },
+            {
+              "type": "row",
+              "key": "custom10GlideToFirstPose"
+            },
+            {
+              "type": "row",
+              "key": "custom10FirstGlideTimeScale"
             },
             {
               "type": "row",
@@ -80627,6 +81773,18 @@
                         },
                         {
                           "type": "row",
+                          "key": "custom10Trig1ReverseSequence"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom10Trig1GlideToFirstPose"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom10Trig1FirstGlideTimeScale"
+                        },
+                        {
+                          "type": "row",
                           "key": "custom10Trig1TransitionSpeedMs"
                         },
                         {
@@ -81015,6 +82173,9 @@
                         "custom10Trig1Mode",
                         "custom10Trig1TargetPose",
                         "custom10Trig1TweenSelector",
+                        "custom10Trig1ReverseSequence",
+                        "custom10Trig1GlideToFirstPose",
+                        "custom10Trig1FirstGlideTimeScale",
                         "custom10Trig1TransitionSpeedMs",
                         "custom10Trig1TweenSpeedMs"
                       ],
@@ -81407,6 +82568,18 @@
                       },
                       {
                         "type": "row",
+                        "key": "custom10Trig1ReverseSequence"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom10Trig1GlideToFirstPose"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom10Trig1FirstGlideTimeScale"
+                      },
+                      {
+                        "type": "row",
                         "key": "custom10Trig1TransitionSpeedMs"
                       },
                       {
@@ -81795,6 +82968,9 @@
                       "custom10Trig1Mode",
                       "custom10Trig1TargetPose",
                       "custom10Trig1TweenSelector",
+                      "custom10Trig1ReverseSequence",
+                      "custom10Trig1GlideToFirstPose",
+                      "custom10Trig1FirstGlideTimeScale",
                       "custom10Trig1TransitionSpeedMs",
                       "custom10Trig1TweenSpeedMs"
                     ],
@@ -82165,6 +83341,9 @@
             "custom10Mode",
             "custom10TargetPose",
             "custom10TweenSelector",
+            "custom10ReverseSequence",
+            "custom10GlideToFirstPose",
+            "custom10FirstGlideTimeScale",
             "custom10TweenChain",
             "custom10TransitionSpeedMs",
             "custom10TweenSpeedMs",
@@ -82723,6 +83902,18 @@
                       },
                       {
                         "type": "row",
+                        "key": "custom10Trig1ReverseSequence"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom10Trig1GlideToFirstPose"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom10Trig1FirstGlideTimeScale"
+                      },
+                      {
+                        "type": "row",
                         "key": "custom10Trig1TransitionSpeedMs"
                       },
                       {
@@ -83111,6 +84302,9 @@
                       "custom10Trig1Mode",
                       "custom10Trig1TargetPose",
                       "custom10Trig1TweenSelector",
+                      "custom10Trig1ReverseSequence",
+                      "custom10Trig1GlideToFirstPose",
+                      "custom10Trig1FirstGlideTimeScale",
                       "custom10Trig1TransitionSpeedMs",
                       "custom10Trig1TweenSpeedMs"
                     ],
@@ -83503,6 +84697,18 @@
                     },
                     {
                       "type": "row",
+                      "key": "custom10Trig1ReverseSequence"
+                    },
+                    {
+                      "type": "row",
+                      "key": "custom10Trig1GlideToFirstPose"
+                    },
+                    {
+                      "type": "row",
+                      "key": "custom10Trig1FirstGlideTimeScale"
+                    },
+                    {
+                      "type": "row",
                       "key": "custom10Trig1TransitionSpeedMs"
                     },
                     {
@@ -83891,6 +85097,9 @@
                     "custom10Trig1Mode",
                     "custom10Trig1TargetPose",
                     "custom10Trig1TweenSelector",
+                    "custom10Trig1ReverseSequence",
+                    "custom10Trig1GlideToFirstPose",
+                    "custom10Trig1FirstGlideTimeScale",
                     "custom10Trig1TransitionSpeedMs",
                     "custom10Trig1TweenSpeedMs"
                   ],
@@ -84255,7 +85464,7 @@
         },
         {
           "key": "Custom Click Function 9",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
@@ -84285,6 +85494,18 @@
             {
               "type": "row",
               "key": "custom9TweenSelector"
+            },
+            {
+              "type": "row",
+              "key": "custom9ReverseSequence"
+            },
+            {
+              "type": "row",
+              "key": "custom9GlideToFirstPose"
+            },
+            {
+              "type": "row",
+              "key": "custom9FirstGlideTimeScale"
             },
             {
               "type": "row",
@@ -84322,7 +85543,7 @@
               "type": "group",
               "group": {
                 "key": "Offset",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -84405,7 +85626,7 @@
               "type": "group",
               "group": {
                 "key": "Offset To Camera",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -84731,6 +85952,18 @@
                         {
                           "type": "row",
                           "key": "custom9Trig1TweenSelector"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom9Trig1ReverseSequence"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom9Trig1GlideToFirstPose"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom9Trig1FirstGlideTimeScale"
                         },
                         {
                           "type": "row",
@@ -85126,6 +86359,9 @@
                         "custom9Trig1Mode",
                         "custom9Trig1TargetPose",
                         "custom9Trig1TweenSelector",
+                        "custom9Trig1ReverseSequence",
+                        "custom9Trig1GlideToFirstPose",
+                        "custom9Trig1FirstGlideTimeScale",
                         "custom9Trig1TransitionSpeedMs",
                         "custom9Trig1TweenSpeedMs",
                         "custom9Trig1PauseDurationMs"
@@ -85508,6 +86744,18 @@
                         {
                           "type": "row",
                           "key": "custom9Trig2TweenSelector"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom9Trig2ReverseSequence"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom9Trig2GlideToFirstPose"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom9Trig2FirstGlideTimeScale"
                         },
                         {
                           "type": "row",
@@ -85903,6 +87151,9 @@
                         "custom9Trig2Mode",
                         "custom9Trig2TargetPose",
                         "custom9Trig2TweenSelector",
+                        "custom9Trig2ReverseSequence",
+                        "custom9Trig2GlideToFirstPose",
+                        "custom9Trig2FirstGlideTimeScale",
                         "custom9Trig2TransitionSpeedMs",
                         "custom9Trig2TweenSpeedMs",
                         "custom9Trig2PauseDurationMs"
@@ -86296,6 +87547,18 @@
                       },
                       {
                         "type": "row",
+                        "key": "custom9Trig1ReverseSequence"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom9Trig1GlideToFirstPose"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom9Trig1FirstGlideTimeScale"
+                      },
+                      {
+                        "type": "row",
                         "key": "custom9Trig1TransitionSpeedMs"
                       },
                       {
@@ -86688,6 +87951,9 @@
                       "custom9Trig1Mode",
                       "custom9Trig1TargetPose",
                       "custom9Trig1TweenSelector",
+                      "custom9Trig1ReverseSequence",
+                      "custom9Trig1GlideToFirstPose",
+                      "custom9Trig1FirstGlideTimeScale",
                       "custom9Trig1TransitionSpeedMs",
                       "custom9Trig1TweenSpeedMs",
                       "custom9Trig1PauseDurationMs"
@@ -87070,6 +88336,18 @@
                       },
                       {
                         "type": "row",
+                        "key": "custom9Trig2ReverseSequence"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom9Trig2GlideToFirstPose"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom9Trig2FirstGlideTimeScale"
+                      },
+                      {
+                        "type": "row",
                         "key": "custom9Trig2TransitionSpeedMs"
                       },
                       {
@@ -87462,6 +88740,9 @@
                       "custom9Trig2Mode",
                       "custom9Trig2TargetPose",
                       "custom9Trig2TweenSelector",
+                      "custom9Trig2ReverseSequence",
+                      "custom9Trig2GlideToFirstPose",
+                      "custom9Trig2FirstGlideTimeScale",
                       "custom9Trig2TransitionSpeedMs",
                       "custom9Trig2TweenSpeedMs",
                       "custom9Trig2PauseDurationMs"
@@ -87833,6 +89114,9 @@
             "custom9Mode",
             "custom9TargetPose",
             "custom9TweenSelector",
+            "custom9ReverseSequence",
+            "custom9GlideToFirstPose",
+            "custom9FirstGlideTimeScale",
             "custom9TransitionSpeedMs",
             "custom9TweenSpeedMs",
             "custom9PauseDurationMs",
@@ -87845,7 +89129,7 @@
           "subgroups": [
             {
               "key": "Offset",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -87925,7 +89209,7 @@
             },
             {
               "key": "Offset To Camera",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -88230,6 +89514,18 @@
                       {
                         "type": "row",
                         "key": "custom9Trig1TweenSelector"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom9Trig1ReverseSequence"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom9Trig1GlideToFirstPose"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom9Trig1FirstGlideTimeScale"
                       },
                       {
                         "type": "row",
@@ -88625,6 +89921,9 @@
                       "custom9Trig1Mode",
                       "custom9Trig1TargetPose",
                       "custom9Trig1TweenSelector",
+                      "custom9Trig1ReverseSequence",
+                      "custom9Trig1GlideToFirstPose",
+                      "custom9Trig1FirstGlideTimeScale",
                       "custom9Trig1TransitionSpeedMs",
                       "custom9Trig1TweenSpeedMs",
                       "custom9Trig1PauseDurationMs"
@@ -89007,6 +90306,18 @@
                       {
                         "type": "row",
                         "key": "custom9Trig2TweenSelector"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom9Trig2ReverseSequence"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom9Trig2GlideToFirstPose"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom9Trig2FirstGlideTimeScale"
                       },
                       {
                         "type": "row",
@@ -89402,6 +90713,9 @@
                       "custom9Trig2Mode",
                       "custom9Trig2TargetPose",
                       "custom9Trig2TweenSelector",
+                      "custom9Trig2ReverseSequence",
+                      "custom9Trig2GlideToFirstPose",
+                      "custom9Trig2FirstGlideTimeScale",
                       "custom9Trig2TransitionSpeedMs",
                       "custom9Trig2TweenSpeedMs",
                       "custom9Trig2PauseDurationMs"
@@ -89792,6 +91106,18 @@
                     {
                       "type": "row",
                       "key": "custom9Trig1TweenSelector"
+                    },
+                    {
+                      "type": "row",
+                      "key": "custom9Trig1ReverseSequence"
+                    },
+                    {
+                      "type": "row",
+                      "key": "custom9Trig1GlideToFirstPose"
+                    },
+                    {
+                      "type": "row",
+                      "key": "custom9Trig1FirstGlideTimeScale"
                     },
                     {
                       "type": "row",
@@ -90187,6 +91513,9 @@
                     "custom9Trig1Mode",
                     "custom9Trig1TargetPose",
                     "custom9Trig1TweenSelector",
+                    "custom9Trig1ReverseSequence",
+                    "custom9Trig1GlideToFirstPose",
+                    "custom9Trig1FirstGlideTimeScale",
                     "custom9Trig1TransitionSpeedMs",
                     "custom9Trig1TweenSpeedMs",
                     "custom9Trig1PauseDurationMs"
@@ -90566,6 +91895,18 @@
                     {
                       "type": "row",
                       "key": "custom9Trig2TweenSelector"
+                    },
+                    {
+                      "type": "row",
+                      "key": "custom9Trig2ReverseSequence"
+                    },
+                    {
+                      "type": "row",
+                      "key": "custom9Trig2GlideToFirstPose"
+                    },
+                    {
+                      "type": "row",
+                      "key": "custom9Trig2FirstGlideTimeScale"
                     },
                     {
                       "type": "row",
@@ -90961,6 +92302,9 @@
                     "custom9Trig2Mode",
                     "custom9Trig2TargetPose",
                     "custom9Trig2TweenSelector",
+                    "custom9Trig2ReverseSequence",
+                    "custom9Trig2GlideToFirstPose",
+                    "custom9Trig2FirstGlideTimeScale",
                     "custom9Trig2TransitionSpeedMs",
                     "custom9Trig2TweenSpeedMs",
                     "custom9Trig2PauseDurationMs"
@@ -91326,7 +92670,7 @@
         },
         {
           "key": "Custom Click Function 8",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
@@ -91359,6 +92703,18 @@
             },
             {
               "type": "row",
+              "key": "custom8ReverseSequence"
+            },
+            {
+              "type": "row",
+              "key": "custom8GlideToFirstPose"
+            },
+            {
+              "type": "row",
+              "key": "custom8FirstGlideTimeScale"
+            },
+            {
+              "type": "row",
               "key": "custom8TweenChain"
             },
             {
@@ -91381,7 +92737,7 @@
               "type": "group",
               "group": {
                 "key": "Offset",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -91522,7 +92878,7 @@
               "type": "group",
               "group": {
                 "key": "Rotation",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -91550,7 +92906,7 @@
               "type": "group",
               "group": {
                 "key": "Easing",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -91568,7 +92924,7 @@
               "type": "group",
               "group": {
                 "key": "Animation Speed Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -91591,7 +92947,7 @@
               "type": "group",
               "group": {
                 "key": "Start Time Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -91652,7 +93008,7 @@
               "type": "group",
               "group": {
                 "key": "Retransition",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -91802,7 +93158,7 @@
               "type": "group",
               "group": {
                 "key": "Tween Stop",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -91953,6 +93309,9 @@
             "custom8Mode",
             "custom8TargetPose",
             "custom8TweenSelector",
+            "custom8ReverseSequence",
+            "custom8GlideToFirstPose",
+            "custom8FirstGlideTimeScale",
             "custom8TweenChain",
             "custom8TransitionSpeedMs",
             "custom8TweenSpeedMs",
@@ -91962,7 +93321,7 @@
           "subgroups": [
             {
               "key": "Offset",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -92097,7 +93456,7 @@
             },
             {
               "key": "Rotation",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -92122,7 +93481,7 @@
             },
             {
               "key": "Easing",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -92137,7 +93496,7 @@
             },
             {
               "key": "Animation Speed Curve",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -92157,7 +93516,7 @@
             },
             {
               "key": "Start Time Curve",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -92212,7 +93571,7 @@
             },
             {
               "key": "Retransition",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -92359,7 +93718,7 @@
             },
             {
               "key": "Tween Stop",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -92531,6 +93890,18 @@
             {
               "type": "row",
               "key": "custom7TweenSelector"
+            },
+            {
+              "type": "row",
+              "key": "custom7ReverseSequence"
+            },
+            {
+              "type": "row",
+              "key": "custom7GlideToFirstPose"
+            },
+            {
+              "type": "row",
+              "key": "custom7FirstGlideTimeScale"
             },
             {
               "type": "row",
@@ -92980,6 +94351,18 @@
                         },
                         {
                           "type": "row",
+                          "key": "custom7Trig1ReverseSequence"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom7Trig1GlideToFirstPose"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom7Trig1FirstGlideTimeScale"
+                        },
+                        {
+                          "type": "row",
                           "key": "custom7Trig1TransitionSpeedMs"
                         },
                         {
@@ -93372,6 +94755,9 @@
                         "custom7Trig1Mode",
                         "custom7Trig1TargetPose",
                         "custom7Trig1TweenSelector",
+                        "custom7Trig1ReverseSequence",
+                        "custom7Trig1GlideToFirstPose",
+                        "custom7Trig1FirstGlideTimeScale",
                         "custom7Trig1TransitionSpeedMs",
                         "custom7Trig1TweenSpeedMs",
                         "custom7Trig1PauseDurationMs"
@@ -93754,6 +95140,18 @@
                         {
                           "type": "row",
                           "key": "custom7Trig2TweenSelector"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom7Trig2ReverseSequence"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom7Trig2GlideToFirstPose"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom7Trig2FirstGlideTimeScale"
                         },
                         {
                           "type": "row",
@@ -94149,6 +95547,9 @@
                         "custom7Trig2Mode",
                         "custom7Trig2TargetPose",
                         "custom7Trig2TweenSelector",
+                        "custom7Trig2ReverseSequence",
+                        "custom7Trig2GlideToFirstPose",
+                        "custom7Trig2FirstGlideTimeScale",
                         "custom7Trig2TransitionSpeedMs",
                         "custom7Trig2TweenSpeedMs",
                         "custom7Trig2PauseDurationMs"
@@ -94539,6 +95940,18 @@
                       {
                         "type": "row",
                         "key": "custom7Trig1TweenSelector"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom7Trig1ReverseSequence"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom7Trig1GlideToFirstPose"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom7Trig1FirstGlideTimeScale"
                       },
                       {
                         "type": "row",
@@ -94934,6 +96347,9 @@
                       "custom7Trig1Mode",
                       "custom7Trig1TargetPose",
                       "custom7Trig1TweenSelector",
+                      "custom7Trig1ReverseSequence",
+                      "custom7Trig1GlideToFirstPose",
+                      "custom7Trig1FirstGlideTimeScale",
                       "custom7Trig1TransitionSpeedMs",
                       "custom7Trig1TweenSpeedMs",
                       "custom7Trig1PauseDurationMs"
@@ -95313,6 +96729,18 @@
                       {
                         "type": "row",
                         "key": "custom7Trig2TweenSelector"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom7Trig2ReverseSequence"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom7Trig2GlideToFirstPose"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom7Trig2FirstGlideTimeScale"
                       },
                       {
                         "type": "row",
@@ -95708,6 +97136,9 @@
                       "custom7Trig2Mode",
                       "custom7Trig2TargetPose",
                       "custom7Trig2TweenSelector",
+                      "custom7Trig2ReverseSequence",
+                      "custom7Trig2GlideToFirstPose",
+                      "custom7Trig2FirstGlideTimeScale",
                       "custom7Trig2TransitionSpeedMs",
                       "custom7Trig2TweenSpeedMs",
                       "custom7Trig2PauseDurationMs"
@@ -96079,6 +97510,9 @@
             "custom7Mode",
             "custom7TargetPose",
             "custom7TweenSelector",
+            "custom7ReverseSequence",
+            "custom7GlideToFirstPose",
+            "custom7FirstGlideTimeScale",
             "custom7TransitionSpeedMs",
             "custom7TweenSpeedMs",
             "custom7PauseDurationMs",
@@ -96479,6 +97913,18 @@
                       },
                       {
                         "type": "row",
+                        "key": "custom7Trig1ReverseSequence"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom7Trig1GlideToFirstPose"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom7Trig1FirstGlideTimeScale"
+                      },
+                      {
+                        "type": "row",
                         "key": "custom7Trig1TransitionSpeedMs"
                       },
                       {
@@ -96871,6 +98317,9 @@
                       "custom7Trig1Mode",
                       "custom7Trig1TargetPose",
                       "custom7Trig1TweenSelector",
+                      "custom7Trig1ReverseSequence",
+                      "custom7Trig1GlideToFirstPose",
+                      "custom7Trig1FirstGlideTimeScale",
                       "custom7Trig1TransitionSpeedMs",
                       "custom7Trig1TweenSpeedMs",
                       "custom7Trig1PauseDurationMs"
@@ -97253,6 +98702,18 @@
                       {
                         "type": "row",
                         "key": "custom7Trig2TweenSelector"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom7Trig2ReverseSequence"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom7Trig2GlideToFirstPose"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom7Trig2FirstGlideTimeScale"
                       },
                       {
                         "type": "row",
@@ -97648,6 +99109,9 @@
                       "custom7Trig2Mode",
                       "custom7Trig2TargetPose",
                       "custom7Trig2TweenSelector",
+                      "custom7Trig2ReverseSequence",
+                      "custom7Trig2GlideToFirstPose",
+                      "custom7Trig2FirstGlideTimeScale",
                       "custom7Trig2TransitionSpeedMs",
                       "custom7Trig2TweenSpeedMs",
                       "custom7Trig2PauseDurationMs"
@@ -98038,6 +99502,18 @@
                     {
                       "type": "row",
                       "key": "custom7Trig1TweenSelector"
+                    },
+                    {
+                      "type": "row",
+                      "key": "custom7Trig1ReverseSequence"
+                    },
+                    {
+                      "type": "row",
+                      "key": "custom7Trig1GlideToFirstPose"
+                    },
+                    {
+                      "type": "row",
+                      "key": "custom7Trig1FirstGlideTimeScale"
                     },
                     {
                       "type": "row",
@@ -98433,6 +99909,9 @@
                     "custom7Trig1Mode",
                     "custom7Trig1TargetPose",
                     "custom7Trig1TweenSelector",
+                    "custom7Trig1ReverseSequence",
+                    "custom7Trig1GlideToFirstPose",
+                    "custom7Trig1FirstGlideTimeScale",
                     "custom7Trig1TransitionSpeedMs",
                     "custom7Trig1TweenSpeedMs",
                     "custom7Trig1PauseDurationMs"
@@ -98812,6 +100291,18 @@
                     {
                       "type": "row",
                       "key": "custom7Trig2TweenSelector"
+                    },
+                    {
+                      "type": "row",
+                      "key": "custom7Trig2ReverseSequence"
+                    },
+                    {
+                      "type": "row",
+                      "key": "custom7Trig2GlideToFirstPose"
+                    },
+                    {
+                      "type": "row",
+                      "key": "custom7Trig2FirstGlideTimeScale"
                     },
                     {
                       "type": "row",
@@ -99207,6 +100698,9 @@
                     "custom7Trig2Mode",
                     "custom7Trig2TargetPose",
                     "custom7Trig2TweenSelector",
+                    "custom7Trig2ReverseSequence",
+                    "custom7Trig2GlideToFirstPose",
+                    "custom7Trig2FirstGlideTimeScale",
                     "custom7Trig2TransitionSpeedMs",
                     "custom7Trig2TweenSpeedMs",
                     "custom7Trig2PauseDurationMs"
@@ -99574,7 +101068,7 @@
     },
     {
       "key": "New Group (11)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": false,
       "items": [
         {
@@ -99737,7 +101231,7 @@
           "type": "group",
           "group": {
             "key": "Camera",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -100040,7 +101534,7 @@
         },
         {
           "key": "Camera",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
@@ -100373,10 +101867,10 @@
   "devHotkeys": {},
   "panelGeometry": {
     "desktop": {
-      "left": 831.1875,
+      "left": 210.375,
       "top": 18.387500762939453,
-      "width": 567.2000122070312,
-      "height": 711.6000366210938
+      "width": 583.2000122070312,
+      "height": 496.8000183105469
     }
   }
 }
