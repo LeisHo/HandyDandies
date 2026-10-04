@@ -323,6 +323,16 @@ let lastTrackedActionAt = 0
 const FRAME_RATE_LOG_MAX_ENTRIES = 200
 const frameRateLogEntries = []
 let frameRateLogEl = null
+// Loading Preview Log (2026-10-04, direct request: "provide a loading preview
+// log in the debug group"). Declared here, not next to its functions, because
+// buildLoadingPreviewLogWidget() is called at module top level -- see the
+// frameRateLogEl comment above for the production outage that rule comes from.
+const LOADING_PREVIEW_LOG_MAX_ENTRIES = 300
+const loadingPreviewLogEntries = []
+let loadingPreviewLogEl = null
+const _loadingPreviewLogFlushFlag = { scheduled: false }
+let loadingPreviewFirstFrameLogged = false
+let loadingPreviewNoSequenceLogged = false
 let __lastFrameTimestamp = null
 let __frameRateBelowThreshold = false
 let __frameRateDropStartedAt = 0
@@ -583,6 +593,7 @@ function tryStartField() {
     if (elapsed < effectiveMinMs) {
       if (!minLoadingTimeTimerSet) {
         minLoadingTimeTimerSet = true
+        logLoadingPreview(`holding the field back ${Math.round(effectiveMinMs - elapsed)}ms more (Min Loading Time ${minMs}ms; preview-ready floor ${Math.round(previewReadyMs)}ms)`)
         setTimeout(tryStartField, effectiveMinMs - elapsed)
       }
       return
@@ -590,6 +601,7 @@ function tryStartField() {
   }
   fieldStarted = true
   logStartupTiming('fieldStarted = true')
+  logLoadingPreview(`field starting -- loading screen hides; preview ${cfg.loadingPreviewShowLive ? 'stays visible (Show Loading Preview is on)' : 'is hidden'}`)
   rebuildField()
   buildPosePreview()
   // ROOT CAUSE of the REAL startup jank, found 2026-09-16 after the
@@ -1875,7 +1887,7 @@ const DEV_GROUPS = [
       // Added 2026-09-30, direct request: "provide a clear all logs
       // button." Clears all 3 logs' own buffers via their existing
       // individual clear functions -- no new clearing logic needed.
-      { key: 'clearAllLogsBtn', label: 'Clear All Logs', type: 'button', onClick: () => { clearMouseTrackingLog(); clearHandBehaviourLog(); clearFrameRateLog() } },
+      { key: 'clearAllLogsBtn', label: 'Clear All Logs', type: 'button', onClick: () => { clearMouseTrackingLog(); clearHandBehaviourLog(); clearFrameRateLog(); clearLoadingPreviewLog() } },
       // Added 2026-09-30, direct request: "provide a pause and resume
       // logs button in the debug group." A single toggle button (same
       // pattern as the main Pause Button's own dynamic label, not 2
@@ -2097,6 +2109,7 @@ updateArmRotationGateVisibility()
 buildMouseTrackingLogWidget()
 buildHandBehaviourLogWidget()
 buildFrameRateLogWidget()
+buildLoadingPreviewLogWidget()
 restartCursorLogTimer()
 restartHandBehaviourDetailedLogTimer()
 setupSettingsChangeLog()
@@ -2761,7 +2774,8 @@ function copyAllDebugLogs(btn) {
   const sections = [
     ['Mouse Tracking Log', mouseTrackingLogEntries],
     ['Hand Behaviour Log', handBehaviourLogEntries],
-    ['Frame Rate Log', frameRateLogEntries]
+    ['Frame Rate Log', frameRateLogEntries],
+    ['Loading Preview Log', loadingPreviewLogEntries]
   ]
   const text = sections.map(([title, entries]) => `=== ${title} ===\n${entries.length ? entries.join('\n') : '(empty)'}`).join('\n\n')
   const flash = (msg) => { if (!btn) return; const orig = btn.textContent; btn.textContent = msg; setTimeout(() => { btn.textContent = orig }, 900) }
@@ -2828,6 +2842,78 @@ function buildFrameRateLogWidget() {
   clearBtn.addEventListener('click', () => clearFrameRateLog())
   wrap.appendChild(headerRow)
   wrap.appendChild(frameRateLogEl)
+  body.appendChild(wrap)
+}
+// Loading Preview Log -- always on (no enable checkbox): the events that matter
+// most happen during startup, before a saved checkbox state would be restored.
+// Honors the shared Pause Logs toggle like the other 3 logs.
+function appendLoadingPreviewLogLine(line) {
+  if (logsPaused) return
+  loadingPreviewLogEntries.push(line)
+  if (loadingPreviewLogEntries.length > LOADING_PREVIEW_LOG_MAX_ENTRIES) loadingPreviewLogEntries.shift()
+  scheduleLogDomFlush(_loadingPreviewLogFlushFlag, () => loadingPreviewLogEl, loadingPreviewLogEntries)
+}
+function logLoadingPreview(text) {
+  appendLoadingPreviewLogLine(`[${new Date().toLocaleTimeString()}] +${Math.round(performance.now() - pageLoadStartMs)}ms ${text}`)
+}
+function clearLoadingPreviewLog() {
+  loadingPreviewLogEntries.length = 0
+  if (loadingPreviewLogEl) loadingPreviewLogEl.textContent = ''
+}
+function buildLoadingPreviewLogWidget() {
+  const body = document.querySelector('.dp-group[data-key="Debug"] .dp-group-body')
+  if (!body) return
+  const wrap = elLocal('div', { padding: '4px 6px' })
+  const headerRow = elLocal('div', { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3px' })
+  const label = elLocal('div', { fontSize: '11px', opacity: '0.85' }, { text: 'Loading Preview Log' })
+  const copyBtn = elLocal('button', {
+    fontSize: '10px', padding: '2px 8px', background: '#3a3a4a', color: 'inherit',
+    border: 'none', borderRadius: '4px', cursor: 'pointer'
+  }, { text: 'Copy', type: 'button' })
+  const saveBtn = elLocal('button', {
+    fontSize: '10px', padding: '2px 8px', background: '#3a3a4a', color: 'inherit',
+    border: 'none', borderRadius: '4px', cursor: 'pointer'
+  }, { text: 'Save', type: 'button' })
+  const clearBtn = elLocal('button', {
+    fontSize: '10px', padding: '2px 8px', background: '#3a3a4a', color: 'inherit',
+    border: 'none', borderRadius: '4px', cursor: 'pointer'
+  }, { text: 'Clear', type: 'button' })
+  headerRow.appendChild(label)
+  const btnRow = elLocal('div', { display: 'flex', gap: '4px' })
+  btnRow.appendChild(copyBtn)
+  btnRow.appendChild(saveBtn)
+  btnRow.appendChild(clearBtn)
+  headerRow.appendChild(btnRow)
+  loadingPreviewLogEl = elLocal('pre', {
+    height: '110px', overflowY: 'auto', margin: '0', padding: '4px 6px',
+    background: 'rgba(255,255,255,0.06)', borderRadius: '4px', fontSize: '10px',
+    whiteSpace: 'pre-wrap', wordBreak: 'break-word'
+  })
+  copyBtn.addEventListener('click', () => {
+    const flash = (msg) => { const orig = copyBtn.textContent; copyBtn.textContent = msg; setTimeout(() => { copyBtn.textContent = orig }, 900) }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(loadingPreviewLogEntries.join('\n')).then(() => flash('Copied!')).catch(() => flash('Copy failed'))
+    } else {
+      flash('Copy failed')
+    }
+  })
+  saveBtn.addEventListener('click', () => {
+    const flash = (msg) => { const orig = saveBtn.textContent; saveBtn.textContent = msg; setTimeout(() => { saveBtn.textContent = orig }, 900) }
+    const blob = new Blob([loadingPreviewLogEntries.join('\n')], { type: 'text/plain' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    const stamp = new Date().toISOString().replace(/[:.]/g, '-')
+    a.href = url
+    a.download = `loading-preview-log-${stamp}.txt`
+    document.body.appendChild(a)
+    a.click()
+    a.remove()
+    URL.revokeObjectURL(url)
+    flash('Saved!')
+  })
+  clearBtn.addEventListener('click', () => clearLoadingPreviewLog())
+  wrap.appendChild(headerRow)
+  wrap.appendChild(loadingPreviewLogEl)
   body.appendChild(wrap)
 }
 // Hand Numbers overlay (Debug group, 2026-09-28) -- direct request: "a
@@ -4832,9 +4918,14 @@ let loadingPreviewSequenceDone = false
 // startup screen" toggle) is off; the original call site below (the
 // GLTFLoader callback) is unchanged, still gated normally.
 function buildLoadingPreview(bypassEnabledGate) {
-  if (!bypassEnabledGate && !cfg.loadingPreviewEnabled) return
+  if (!bypassEnabledGate && !cfg.loadingPreviewEnabled) {
+    logLoadingPreview('build skipped: "Show Hand Loading Animation" is off')
+    return
+  }
+  const lpBuildT0 = performance.now()
   loadingPreviewCanvas = document.getElementById('loadingPreviewCanvas')
-  if (!loadingPreviewCanvas) return
+  if (!loadingPreviewCanvas) { logLoadingPreview('build FAILED: #loadingPreviewCanvas element not found'); return }
+  logLoadingPreview(`build start (${bypassEnabledGate ? 'live toggle' : 'startup'}; fieldStarted=${fieldStarted}; size=${cfg.loadingPreviewSize}px; bg=${cfg.bgColor}; camera="${cfg.loadingPreviewCameraSelector || '(auto-frame)'}"; lighting="${cfg.loadingPreviewLightingSelector || '(scene lights)'}"; tween="${cfg.loadingPreviewTweenSelector || '(none)'}")`)
   // Disposes any previously-built renderer/GL context before creating a
   // new one -- required now that this function can genuinely run more
   // than once per session (the live-preview toggle can rebuild it
@@ -4846,7 +4937,10 @@ function buildLoadingPreview(bypassEnabledGate) {
   loadingPreviewScene = new THREE.Scene()
   // 2026-10-04, direct request: the preview uses the same background colour as
   // the normal app (cfg.bgColor) instead of being transparent over the page.
-  loadingPreviewScene.background = new THREE.Color(cfg.bgColor)
+  // Only while the loading screen is up: once the field is running, the live
+  // preview stays transparent so it does not paint an opaque square over the
+  // hands (the field behind it already has this same background colour).
+  loadingPreviewScene.background = fieldStarted ? null : new THREE.Color(cfg.bgColor)
   loadingPreviewCamera = new THREE.PerspectiveCamera(35, 1, 0.1, 2000)
   loadingPreviewRenderer = new THREE.WebGLRenderer({ canvas: loadingPreviewCanvas, antialias: true, alpha: true })
   // CORRECTED 2026-09-19, direct report ("Loading Preview doesnt work
@@ -4953,6 +5047,7 @@ function buildLoadingPreview(bypassEnabledGate) {
   resizeLoadingPreview()
   repositionLoadingPreview()
   setupLoadingPreviewOrbitControls()
+  logLoadingPreview(`build done in ${Math.round(performance.now() - lpBuildT0)}ms (hand scale x${loadingPreviewModelScale.toFixed(2)}; camera at ${loadingPreviewCamera.position.toArray().map((n) => n.toFixed(2)).join(', ')}; drawing buffer ${loadingPreviewCanvas.width}x${loadingPreviewCanvas.height}; background ${loadingPreviewScene.background ? '#' + loadingPreviewScene.background.getHexString() : 'transparent'})`)
 }
 // Applies one saved item from the Loading Preview's own local
 // `loadingPreviewSavedCameras` list directly to `loadingPreviewCamera` --
@@ -5347,14 +5442,20 @@ function convertHandoLightingPreset(rawItem) {
 let loadingPreviewLiveRafId = null
 function startLoadingPreviewLiveLoop() {
   if (loadingPreviewLiveRafId !== null) return // already running
+  logLoadingPreview('live render loop started')
   const tick = () => {
-    if (!cfg.loadingPreviewShowLive || !loadingPreviewRenderer) { loadingPreviewLiveRafId = null; return }
+    if (!cfg.loadingPreviewShowLive || !loadingPreviewRenderer) {
+      logLoadingPreview(`live render loop stopped (${!cfg.loadingPreviewShowLive ? 'Show Loading Preview is off' : 'renderer is gone'})`)
+      loadingPreviewLiveRafId = null
+      return
+    }
     try {
       updateLoadingPreviewAnimation()
       syncLoadingPreviewCameraFromOrbit()
       loadingPreviewRenderer.render(loadingPreviewScene, loadingPreviewCamera)
     } catch (err) {
       console.error('Loading Preview (live) frame threw -- disabling for this session:', err)
+      logLoadingPreview(`live frame THREW -- disabled for this session: ${err && err.message}`)
       cfg.loadingPreviewShowLive = false
       syncValue('loadingPreviewShowLive', false)
       if (loadingPreviewCanvas) loadingPreviewCanvas.style.display = 'none'
@@ -5378,14 +5479,19 @@ function startLoadingPreviewLiveLoop() {
 // setting. Called from bgColor's onChange, which can fire during startup
 // restore before `loadingPreviewScene` has been initialised -- hence the try.
 function syncLoadingPreviewBackground() {
-  try { if (loadingPreviewScene) loadingPreviewScene.background = new THREE.Color(cfg.bgColor) } catch (err) { /* not built yet */ }
+  try { if (loadingPreviewScene) loadingPreviewScene.background = fieldStarted ? null : new THREE.Color(cfg.bgColor) } catch (err) { /* not built yet */ }
 }
 function setLoadingPreviewLiveVisible(show) {
   if (!show) {
     if (loadingPreviewCanvas) loadingPreviewCanvas.style.display = 'none'
+    logLoadingPreview('Show Loading Preview: OFF -- canvas hidden')
     return
   }
-  if (!modelMeasurementsReady) return
+  if (!modelMeasurementsReady) {
+    logLoadingPreview('Show Loading Preview: ON requested but the hand model is not loaded yet -- ignored (it is applied again when startup finishes)')
+    return
+  }
+  logLoadingPreview('Show Loading Preview: ON -- rebuilding')
   buildLoadingPreview(true)
   // Pre-fieldStarted, the main animate() loop's own existing branch is
   // already animating this renderer every frame -- only start the
@@ -5665,7 +5771,14 @@ function updateLoadingPreviewAnimation() {
   const anchorIdx = rawEntries.findIndex((e) => typeof e === 'string' && e)
   const anchorMatches = anchorIdx >= 0 ? (cfg.savedPoses || []).filter((p) => p.name === rawEntries[anchorIdx]) : []
   const anchorPose = anchorMatches[anchorMatches.length - 1]
-  if (!anchorPose) { applyLoadingPreviewPose(poseDefaultValues); return }
+  if (!anchorPose) {
+    if (!loadingPreviewNoSequenceLogged) {
+      loadingPreviewNoSequenceLogged = true
+      logLoadingPreview(`no playable tween: selected "${cfg.loadingPreviewTweenSelector || '(none)'}", ${seq ? 'found with ' + rawEntries.length + ' entries but its first pose is not in Saved Poses' : 'not found in Saved Tween Sequences'} -- showing the default pose`)
+    }
+    applyLoadingPreviewPose(poseDefaultValues)
+    return
+  }
   if (loadingPreviewSequenceDone) return // frozen at whatever was last applied
   const segments = resolveTweenSegmentsWithAnchor(anchorPose, rawEntries.slice(anchorIdx + 1))
   const lastPose = segments.length > 0 ? segments[segments.length - 1].poseB : anchorPose
@@ -5722,9 +5835,11 @@ function updateLoadingPreviewAnimation() {
   }
   applyLoadingPreviewPose(values)
   if (lapT >= 1) {
+    logLoadingPreview(`lap ${loadingPreviewLapIndex} complete (${playMode}${playMode === 'Count' ? ' of ' + totalLaps : ''})`)
     loadingPreviewLapIndex++
     if (loadingPreviewLapIndex > totalLaps) {
       loadingPreviewSequenceDone = true
+      logLoadingPreview('sequence finished -- holding the last pose')
     } else if (holdMs > 0) {
       loadingPreviewHoldEndMs = now + holdMs
     } else {
@@ -14324,8 +14439,10 @@ function animate(dt, now) {
         updateLoadingPreviewAnimation()
         syncLoadingPreviewCameraFromOrbit()
         loadingPreviewRenderer.render(loadingPreviewScene, loadingPreviewCamera)
+        if (!loadingPreviewFirstFrameLogged) { loadingPreviewFirstFrameLogged = true; logLoadingPreview('first loading-screen preview frame rendered') }
       } catch (lpErr) {
         console.error('Loading Preview frame threw -- disabling it for this session:', lpErr)
+        logLoadingPreview(`loading-screen frame THREW -- preview disabled: ${lpErr && lpErr.message}`)
         loadingPreviewRenderer = null
       }
     }
