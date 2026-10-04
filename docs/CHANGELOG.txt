@@ -15709,6 +15709,70 @@ failures this session are the reason I stopped at 2).
 
 `main.js` cache-buster `?v=275` -> `?v=276`.
 
+2026-10-04  -  (correction + fix -- Offset To Camera redone to the user's
+exact spec; same-function interruption no longer snaps back)
+
+CORRECTION to the two earlier "Offset To Camera" entries (2026-10-02 and
+the 2026-10-04 line-of-sight rebuild), both of which misread the spec.
+The user's own description: "XYZ are world XYZ. So you should measure the
+vector from the hand to the camera. X offset settings address the x vector,
+and y and z for their own. If i only turn z on, then the hands will only
+move in the z axis towards the camera's z value. same for x and y. So there
+is no single axis that is 'towards the camera'. For the curve editor, X is
+still distance from cursor, and y is min to max of the slider i set."
+
+Now: for each axis that is switched on, the hand moves along THAT WORLD
+AXIS ONLY, toward (positive slider value) or away from (negative) the
+camera's own coordinate on that axis. The direction is Math.sign(camera -
+hand) on that axis alone, measured from the hand's rest position, so Z-only
+moves only world Z. The amount is the curve value: curve X = the hand's
+distance from the cursor (normalized nearest->farthest across the field),
+Y = that axis's Min..Max in world units. Full slider amount along the
+axis (sign x amount), not scaled by a direction cosine -- a reading call;
+easy to change. An axis already level with the camera has no direction and
+does not move; the amount is not clamped, so a large value can carry a hand
+past the camera's coordinate. The world displacement is projected onto the
+camera's orthonormal right/up/forward basis so it fits the existing
+accumulator exactly (the camera only pans/zooms, so that basis is
+world-aligned in practice).
+
+Cursor behaviour: an earlier report said the hands reacted to the cursor
+during the offset. The distance is now measured ONCE at trigger time
+(`captureCameraOffsetNorm()`, stored per hand as `pendingFrozenOffsetNorm`
+-> `frozenOffsetNorm` at commit, same frozen-at-arm convention as the speed
+curve) and the amount ramps in with the transition's progress exactly like
+the main Offset group, then is locked into the accumulator. So it is
+cursor-driven at trigger time only, not live. If the intent was no cursor
+involvement at all, X would have to change; flagged to the user.
+
+REVERTED from the previous rebuild: the per-hand line-of-sight Z. Offset Z,
+Cursor Offset's depth component and the retransition decay use the camera's
+own forward axis again (as before the line-of-sight change), since the user
+says there is no single toward-the-camera axis.
+
+FIX (direct report: "when i interrupt a offset to camera sequence, there
+are jumps. They jump back to their original position then do the tween
+again"): re-triggering the SAME function mid-ramp reset the ramp without
+crediting the part of the offset the old ramp had already shown -- only a
+different function's commit or a release baked an in-flight fraction -- so
+the hand snapped back to its older accumulated offset and re-ramped. The
+commit step of BOTH families (`updateClickHoldPoseForHand()` and
+`updateClickPoseForHand()`) now calls `bakeInFlightOffsetRotation(hand, p)`
+first, before the frozen per-trigger values are overwritten. It is a no-op
+for an idle, paused or already-baked hand, and it also covers Rotation (same
+accumulator path), so this is not specific to the camera offset.
+
+Verified: `node --check` passes; a 9-assert logic test of the world-axis
+behaviour (only Z on moves only world Z toward the camera's z; X-only and
+Y-only likewise; all-off is zero; negative = away; curve value follows the
+frozen distance; progress scaling; bake equals shown; a hand level with the
+camera does not move) and a re-trigger test (old: -3.5 snap on the next
+frame; new: only the +0.5 of the new ramp). **Not live-verified in
+browser** -- 2 more navigation attempts hit the documented
+`ERR_CONNECTION_RESET` on `main.js?v=277`.
+
+`main.js` cache-buster `?v=276` -> `?v=277`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

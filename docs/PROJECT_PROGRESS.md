@@ -18,6 +18,17 @@ work seamlessly from there.
 
 ## Currently working on
 
+**2026-10-04 -- Offset To Camera redone to the user's exact spec; same-function
+interruption snap fixed.** X/Y/Z are WORLD axes; each switched-on axis moves
+the hand along that axis only, toward (+) / away (-) the camera's own
+coordinate on it (sign of camera-hand on that axis, full slider amount).
+Curve X = distance from cursor, measured once at trigger time (frozen, so it
+doesn't follow the cursor mid-move); Y = the axis's Min..Max. The earlier
+line-of-sight Z was reverted. Re-triggering the same function mid-ramp now
+banks the in-flight offset/rotation first (no snap back). `main.js` at
+`?v=277`; logic tests pass; **not live-verified** (local-server truncation).
+Open call: full slider amount along the axis, not cosine-scaled.
+
 **2026-10-04 -- Click-function group order now follows "Click Offset Test".**
 Both reference layouts list Offset, Offset To Camera, Rotation, Easing,
 Animation Speed Curve, Start Time Curve, Start Distance Curve,

@@ -3763,7 +3763,7 @@ function offsetExtraControls(p, parseFn) {
     // Per-axis on/off (2026-10-04, direct request) -- default ON so
     // turning the group on behaves exactly as it did before these existed.
     rows.push({ key: `${p}CameraOffset${ax}Enabled`, label: `Camera Offset ${ax} On/Off`, type: 'checkbox', def: true, onChange: () => updateOffsetRotationVisibility(p) })
-    rows.push({ key: `${p}CameraOffset${ax}Curve`, label: `Camera Offset ${ax} Curve (Transition Progress -> Offset)`, type: 'text', def: linear, onChange: () => parseFn(p) })
+    rows.push({ key: `${p}CameraOffset${ax}Curve`, label: `Camera Offset ${ax} Curve (Distance From Cursor -> Offset)`, type: 'text', def: linear, onChange: () => parseFn(p) })
     rows.push({ key: `${p}CameraOffset${ax}Range`, label: `Camera Offset ${ax} Min / Max (World Units)`, type: 'text', def: '{"min":0,"max":10}', onChange: () => parseFn(p) })
   })
   return rows
@@ -7231,7 +7231,6 @@ function computeOffsetXY(hand, p) {
     _offsetHandToCursor.subVectors(cursorTarget, hand.basePosition || hand.wrapper.position)
     const rightComp = _offsetHandToCursor.dot(_offsetRightVec)
     const upComp = _offsetHandToCursor.dot(_offsetUpVec)
-    setLineOfSightForHand(hand) // per-hand line of sight, not one shared camera axis
     const forwardComp = _offsetHandToCursor.dot(_offsetForwardVec)
     const len3 = Math.hypot(rightComp, upComp, forwardComp)
     if (len3 < 1e-6) return { x: 0, y: 0, z: 0 } // hand and cursor at the exact same position -- no well-defined direction
@@ -7274,53 +7273,63 @@ function evalOffsetAxisSlot(slot, handDist) {
   if (!slot || !slot.range || (slot.range.min === 0 && slot.range.max === 0)) return 0
   return computeStartDelayMs(handDist, restFieldMinDist, restFieldDistRange, slot.curve, slot.range)
 }
-// "Offset To Camera" (REBUILT 2026-10-04, direct clarification: "by offset
-// to camera, i mean the actual 3js camera... it should look like the hands
-// are moving closer to further away from the player's POV", and "during the
-// offset, the hands position reacts to my cursor position. that shouldn't
-// happen"). A SEPARATE offset that stacks with the main Offset group.
-//  - Z moves the hand along its own LINE OF SIGHT to the real camera
-//    (setLineOfSightForHand(): hand -> camera position, + = toward the
-//    camera), so it reads as closer/further from the player's POV without
-//    drifting across the screen; X/Y stay camera-right/up.
-//  - NO cursor input. Each axis's curve X is the TRANSITION PROGRESS
-//    (0-100%), Y is rescaled into that axis's Min/Max. The displayed amount
-//    is the NET change from the start of the transition,
-//    value(progress) - value(0) (this file's accumulator treats progress 0
-//    as "nothing new to add", so a nonzero starting value can't be applied
-//    without a snap) -- so with the default linear curve, Min 0 / Max 10
-//    moves the hand 10 units over the transition, and in general the
-//    amplitude is (Max - Min) shaped by the curve.
-//  - Independent on/off from OffsetEnabled, plus a checkbox per axis.
-function setLineOfSightForHand(hand) {
-  _offsetForwardVec.setFromMatrixPosition(camera.matrixWorld).sub(hand.basePosition || hand.wrapper.position)
-  if (_offsetForwardVec.lengthSq() < 1e-9) _offsetForwardVec.setFromMatrixColumn(camera.matrixWorld, 2)
-  else _offsetForwardVec.normalize()
+// "Offset To Camera" (REBUILT AGAIN 2026-10-04, direct spec): X, Y and Z are
+// WORLD axes. For each axis that is switched on, the hand moves ALONG THAT
+// ONE AXIS toward (positive slider value) or away from (negative) the
+// camera's own coordinate on that axis -- i.e. the sign comes from
+// (camera - hand) on that axis only, so with only Z on the hands move only
+// in world Z, toward the camera's z value; there is no single "toward the
+// camera" direction. The amount per axis is the curve value: X of each
+// curve = the hand's distance from the cursor (normalized nearest->farthest
+// across the field), Y = that axis's Min..Max slider range, in world units.
+// FROZEN at trigger time (see captureCameraOffsetNorm()), like every other
+// distance-driven curve in this file, so the offset does NOT follow the
+// cursor while it plays (an earlier version recomputed it live every frame
+// and the hands visibly reacted to cursor movement mid-offset). The amount
+// ramps in with the transition's own progress exactly like the main Offset
+// group, then is locked into the per-hand accumulator. Stacks with the main
+// Offset group; independent on/off plus a checkbox per axis.
+const _cameraWorldPos = new THREE.Vector3()
+const _cameraOffsetWorld = new THREE.Vector3()
+// Normalized (0 nearest .. 1 farthest hand in the field) distance from the
+// cursor, measured from the hand's REST position at the moment of the call.
+function captureCameraOffsetNorm(hand) {
+  const d = (hand.basePosition || hand.wrapper.position).distanceTo(cursorTarget)
+  return THREE.MathUtils.clamp((d - restFieldMinDist) / restFieldDistRange, 0, 1)
 }
-function cameraSlotValueAt(slot, t) {
+function cameraSlotValue(slot, norm) {
   if (!slot || !slot.range) return 0
-  const y = THREE.MathUtils.clamp(evaluateArmLengthCurve(slot.curve, THREE.MathUtils.clamp(t, 0, 1)), 0, 1)
+  const y = THREE.MathUtils.clamp(evaluateArmLengthCurve(slot.curve, norm), 0, 1)
   return slot.range.min + (slot.range.max - slot.range.min) * y
 }
-function computeCameraOffsetAt(p, progress) {
+function computeCameraOffsetAt(hand, p, progress) {
   if (!cfg[`${p}CameraOffsetEnabled`] || !(progress > 0)) return ZERO_OFFSET
   const trig = clickHoldPoseTriggers[p] || clickPoseTriggers[p]
   const slots = trig && trig.offsetAxis && trig.offsetAxis.camera
   if (!slots) return ZERO_OFFSET
-  const net = (slot) => cameraSlotValueAt(slot, progress) - cameraSlotValueAt(slot, 0)
+  const st = (hand._cp && hand._cp[p]) || (hand._chp && hand._chp[p])
+  const norm = st && st.frozenOffsetNorm !== undefined ? st.frozenOffsetNorm : 0
+  _cameraWorldPos.setFromMatrixPosition(camera.matrixWorld)
+  const base = hand.basePosition || hand.wrapper.position
   // `!== false` so a function saved before the per-axis checkboxes existed
-  // (no stored value) keeps all 3 axes on.
-  return {
-    x: cfg[`${p}CameraOffsetXEnabled`] !== false ? net(slots.X) : 0,
-    y: cfg[`${p}CameraOffsetYEnabled`] !== false ? net(slots.Y) : 0,
-    z: cfg[`${p}CameraOffsetZEnabled`] !== false ? net(slots.Z) : 0
-  }
+  // keeps all 3 axes on. Math.sign(0) = 0: an axis already level with the
+  // camera has no direction to move in.
+  const wx = cfg[`${p}CameraOffsetXEnabled`] !== false ? Math.sign(_cameraWorldPos.x - base.x) * cameraSlotValue(slots.X, norm) * progress : 0
+  const wy = cfg[`${p}CameraOffsetYEnabled`] !== false ? Math.sign(_cameraWorldPos.y - base.y) * cameraSlotValue(slots.Y, norm) * progress : 0
+  const wz = cfg[`${p}CameraOffsetZEnabled`] !== false ? Math.sign(_cameraWorldPos.z - base.z) * cameraSlotValue(slots.Z, norm) * progress : 0
+  // The accumulator and apply path work in the camera's right/up/forward
+  // basis (an orthonormal basis), so project the WORLD displacement onto it
+  // -- applying those components along the same vectors reproduces the
+  // world displacement exactly (the camera only pans/zooms, never rotates,
+  // so this basis is also world-aligned in practice).
+  _cameraOffsetWorld.set(wx, wy, wz)
+  return { x: _cameraOffsetWorld.dot(_offsetRightVec), y: _cameraOffsetWorld.dot(_offsetUpVec), z: _cameraOffsetWorld.dot(_offsetForwardVec) }
 }
 // What applyOffsetRotationToHand()/bakeOffsetRotationIntoAccum()/
 // bakeInFlightOffsetRotation() all read, at THEIR progress (live ramp
 // progress / 1 for a full bake / the in-flight fraction): the main Offset
 // group's value scaled by progress (when ITS checkbox is on) plus the
-// Offset To Camera net amount at that progress (when ITS checkbox is on).
+// Offset To Camera amount scaled by the same progress (when ITS checkbox is on).
 // One function for all 3 callers so live apply and both bake paths can
 // never disagree.
 function computeCombinedOffsetAt(hand, p, progress) {
@@ -7330,7 +7339,7 @@ function computeCombinedOffsetAt(hand, p, progress) {
   let a = ZERO_OFFSET
   if (mainOn) { const m = computeOffsetXY(hand, p); a = { x: m.x * progress, y: m.y * progress, z: m.z * progress } }
   if (!camOn) return a
-  const b = computeCameraOffsetAt(p, progress)
+  const b = computeCameraOffsetAt(hand, p, progress)
   return { x: a.x + b.x, y: a.y + b.y, z: a.z + b.z }
 }
 // CORRECTED 2026-09-27 -- direct spec, 3 related items:
@@ -7387,7 +7396,7 @@ function applyOffsetRotationToHand(hand, p, progress) {
   hand._lastOffsetRotationProgress[p] = progress
   _offsetRightVec.setFromMatrixColumn(camera.matrixWorld, 0)
   _offsetUpVec.setFromMatrixColumn(camera.matrixWorld, 1)
-  setLineOfSightForHand(hand) // Z axis = this hand's line of sight to the real camera (2026-10-04)
+  _offsetForwardVec.setFromMatrixColumn(camera.matrixWorld, 2)
   // Accumulated baseline from every previously-completed ramp/lap
   // (any function) -- applied unconditionally, regardless of whether
   // THIS function's own Offset/Rotation happens to be enabled, so a
@@ -7507,7 +7516,7 @@ function applyOffsetRotationRetransition(hand, progress, offsetAccumStart, rotat
   if (decayedX !== 0 || decayedY !== 0 || decayedZ !== 0) {
     _offsetRightVec.setFromMatrixColumn(camera.matrixWorld, 0)
     _offsetUpVec.setFromMatrixColumn(camera.matrixWorld, 1)
-    setLineOfSightForHand(hand)
+    _offsetForwardVec.setFromMatrixColumn(camera.matrixWorld, 2)
     hand.wrapper.position.addScaledVector(_offsetRightVec, decayedX)
     hand.wrapper.position.addScaledVector(_offsetUpVec, decayedY)
     hand.wrapper.position.addScaledVector(_offsetForwardVec, decayedZ)
@@ -8023,10 +8032,24 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
       // same "frozen at arm time" treatment as the splay/delay above, not
       // recomputed live mid-transition. See makeClickHoldPoseGroup()'s own
       // control comment for the full reasoning.
+      chp.pendingFrozenOffsetNorm = captureCameraOffsetNorm(hand)
       chp.pendingFrozenSpeedMs = cfg[`${p}SpeedCurveEnabled`] ? computeStartDelayMs(live, minLiveDist, liveDistRange, trig.speedCurveParsed, trig.speedRangeParsed) : 0
     }
   }
   if (chp.pendingClaimAt && now >= chp.pendingClaimAt) {
+    // FIX 2026-10-04 (direct report: "when i interrupt a offset to camera
+    // sequence, there are jumps. They jump back to their original position
+    // then do the tween again"). Re-triggering the SAME function mid-ramp
+    // resets `offsetBaked`/progress below, but nothing credited the part of
+    // the offset the previous ramp had already shown -- only a DIFFERENT
+    // function's commit (releaseHandFromOtherFunctions()) or a release
+    // baked an in-flight fraction -- so the hand snapped back to its older
+    // accumulated offset and then re-ramped from there. Bake the in-flight
+    // fraction FIRST, before the frozen per-trigger values below are
+    // overwritten (the camera offset reads this function's own
+    // frozenOffsetNorm). No-op (fraction 0) for a hand that was idle,
+    // paused or already baked.
+    bakeInFlightOffsetRotation(hand, p)
     // COMMIT -- this hand's own delay has elapsed; take over right now.
     // FROM value is this hand's own live current pose (`hand._lastPoseValues`,
     // stashed by applyPoseValuesToHand() every time ANY trigger family
@@ -8061,6 +8084,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     chp.frozenSplayDeg = chp.pendingFrozenSplayDeg
     chp.fromSplayDeg = chp.pendingFromSplayDeg // CORRECTED 2026-09-27 -- see the arm-time capture's own comment
     chp.frozenSpeedMs = chp.pendingFrozenSpeedMs
+    chp.frozenOffsetNorm = chp.pendingFrozenOffsetNorm ?? 0
     chp.frozenTweenFractionCap = chp.pendingTweenFractionCap
     chp.pendingClaimAt = 0
     chp.releasePending = false // a NEW hold-claim always starts fresh, regardless of a stale flag from a previous release
@@ -9002,6 +9026,19 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
   const cp = getOrInitHandCP(hand)[p]
   const isTween = isSequenceOrChainMode(p)
   if (cp.pendingClaimAt && now >= cp.pendingClaimAt) {
+    // FIX 2026-10-04 (direct report: "when i interrupt a offset to camera
+    // sequence, there are jumps. They jump back to their original position
+    // then do the tween again"). Re-triggering the SAME function mid-ramp
+    // resets `offsetBaked`/progress below, but nothing credited the part of
+    // the offset the previous ramp had already shown -- only a DIFFERENT
+    // function's commit (releaseHandFromOtherFunctions()) or a release
+    // baked an in-flight fraction -- so the hand snapped back to its older
+    // accumulated offset and then re-ramped from there. Bake the in-flight
+    // fraction FIRST, before the frozen per-trigger values below are
+    // overwritten (the camera offset reads this function's own
+    // frozenOffsetNorm). No-op (fraction 0) for a hand that was idle,
+    // paused or already baked.
+    bakeInFlightOffsetRotation(hand, p)
     // COMMIT -- FROM value is this hand's own live current pose
     // (`hand._lastPoseValues`) whenever `hand._wasOverriddenLastFrame`
     // confirms it was genuinely mid-SOMETHING as of last frame (any
@@ -9016,6 +9053,7 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
     cp.frozenSplayDeg = cp.pendingFrozenSplayDeg
     cp.fromSplayDeg = cp.pendingFromSplayDeg // CORRECTED 2026-09-27 -- see the arm-time capture's own comment
     cp.frozenSpeedMs = cp.pendingFrozenSpeedMs
+    cp.frozenOffsetNorm = cp.pendingFrozenOffsetNorm ?? 0
     cp.frozenTweenFractionCap = cp.pendingTweenFractionCap
     cp.pendingClaimAt = 0
     cp.offsetBaked = false // a fresh ramp starts a fresh (not-yet-locked-in) increment
@@ -9333,6 +9371,7 @@ function triggerClickPose(p) {
     cp.pendingFromSplayDeg = hand.currentSplayDeg
     // Animation Speed Curve (Single Pose only) -- same "frozen at
     // trigger time" treatment as the splay above.
+    cp.pendingFrozenOffsetNorm = captureCameraOffsetNorm(hand)
     cp.pendingFrozenSpeedMs = cfg[`${p}SpeedCurveEnabled`] ? computeStartDelayMs(dists[i], minD, range, trig.speedCurveParsed, trig.speedRangeParsed) : 0
   })
 }
@@ -10095,7 +10134,7 @@ const CLICK_HOLD_START_TIME_TRACK_MAX = 3000 // ms -- a deliberately smaller cei
 // Camera rows (2026-10-02) -- shared by both widget builders.
 function buildOffsetAxisWidgets(p) {
   const cursorCaption = 'X: Distance From Cursor (Live, Nearest→Farthest Hand In Field)  ·  Y: Offset Fraction (0=Min, 1=Max)'
-  const cameraCaption = 'X: Transition Progress (0-100%)  ·  Y: Offset Fraction (0=Min, 1=Max)  ·  Net change from the start of the transition'
+  const cameraCaption = 'X: Distance From Cursor (Nearest→Farthest Hand, Frozen At Trigger)  ·  Y: Offset Fraction (0=Min, 1=Max)  ·  Moves toward (+) / away (-) the camera on this world axis'
   ;['CursorOffset', 'CameraOffset'].forEach((prefix) => {
     const caption = prefix === 'CameraOffset' ? cameraCaption : cursorCaption
     ;['X', 'Y', 'Z'].forEach((ax) => {
