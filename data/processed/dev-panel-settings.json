@@ -7095,7 +7095,7 @@
       "custom9Trig1EasingCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9Trig1SpeedCurveEnabled": true,
       "custom9Trig1SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom9Trig1SpeedCurveRange": "{\"min\":3000,\"max\":4000}",
+      "custom9Trig1SpeedCurveRange": "{\"min\":3000,\"max\":4800}",
       "custom9Trig1StartTimeCurveEnabled": true,
       "custom9Trig1StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9Trig1StartTimeRange": "{\"min\":0,\"max\":1114}",
@@ -15078,7 +15078,7 @@
       "custom9Trig1EasingCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9Trig1SpeedCurveEnabled": true,
       "custom9Trig1SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom9Trig1SpeedCurveRange": "{\"min\":3000,\"max\":4000}",
+      "custom9Trig1SpeedCurveRange": "{\"min\":3000,\"max\":4800}",
       "custom9Trig1StartTimeCurveEnabled": true,
       "custom9Trig1StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9Trig1StartTimeRange": "{\"min\":0,\"max\":1114}",
@@ -23061,7 +23061,7 @@
       "custom9Trig1EasingCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9Trig1SpeedCurveEnabled": true,
       "custom9Trig1SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom9Trig1SpeedCurveRange": "{\"min\":3000,\"max\":4000}",
+      "custom9Trig1SpeedCurveRange": "{\"min\":3000,\"max\":4800}",
       "custom9Trig1StartTimeCurveEnabled": true,
       "custom9Trig1StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9Trig1StartTimeRange": "{\"min\":0,\"max\":1114}",
@@ -49265,7 +49265,7 @@
                             "type": "group",
                             "group": {
                               "key": "Rotation",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -49644,7 +49644,7 @@
                           },
                           {
                             "key": "Rotation",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -50827,7 +50827,7 @@
                           "type": "group",
                           "group": {
                             "key": "Rotation",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -51206,7 +51206,7 @@
                         },
                         {
                           "key": "Rotation",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -52764,7 +52764,7 @@
                           "type": "group",
                           "group": {
                             "key": "Rotation",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -53143,7 +53143,7 @@
                         },
                         {
                           "key": "Rotation",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -54326,7 +54326,7 @@
                         "type": "group",
                         "group": {
                           "key": "Rotation",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -54705,7 +54705,7 @@
                       },
                       {
                         "key": "Rotation",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -84859,7 +84859,7 @@
                           "type": "group",
                           "group": {
                             "key": "Rotation",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -85238,7 +85238,7 @@
                         },
                         {
                           "key": "Rotation",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -86421,7 +86421,7 @@
                         "type": "group",
                         "group": {
                           "key": "Rotation",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -86800,7 +86800,7 @@
                       },
                       {
                         "key": "Rotation",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -88358,7 +88358,7 @@
                         "type": "group",
                         "group": {
                           "key": "Rotation",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -88737,7 +88737,7 @@
                       },
                       {
                         "key": "Rotation",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -89920,7 +89920,7 @@
                       "type": "group",
                       "group": {
                         "key": "Rotation",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -90299,7 +90299,7 @@
                     },
                     {
                       "key": "Rotation",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
