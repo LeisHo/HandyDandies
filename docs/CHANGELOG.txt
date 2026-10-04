@@ -16427,6 +16427,27 @@ produced here (the automation tab's animate loop is paused). Next step needs the
 Profile (and Log Frame Rate Drops), idle for ~10 s, then click through a sequence, then Copy All Logs.
 `main.js` `?v=299` -> `?v=300`.
 
+2026-10-04  -  (performance -- mass-event frame spikes: handLogTriggerLabel() memoized)
+
+User pasted the first logs with Log Frame Profile on (no question attached). Read:
+- IDLE is now ~41 fps (13 ms/frame = hand logic 7 + drawing 5 + other 1). It was ~10 fps before the
+  finger-curl change + idle skip. Drawing is a flat 5-7 ms throughout, so this is not GPU-bound.
+- Sequence playing: 12-19 fps, hand logic 13-17 ms.
+- Spikes: 5-7 fps with hand logic 57-87 ms on frames where a click starts/interrupts functions, and 4.6 fps
+  with 117 ms at 8:13:33 when Trigger 1 hit all 156 hands ("interrupted" + "triggered" each).
+Cause of the spikes: every hand-log call site does logHandBehaviourEvent(hands.indexOf(hand),
+handLogTriggerLabel(p), ...), so the arguments are evaluated BEFORE the function can return early because
+the log is off, and handLogTriggerLabel() did a DOM query over the ~28,600-node panel on each call. Measured
+in the automation tab: 1.3 ms per lookup, 312 lookups (156 hands x 2 events) = 400 ms in one frame, whether or
+not Log Hand Behaviour is on. handLogTriggerLabel() is now memoized per trigger id with a 3 s TTL (a label
+only feeds log text; a rename shows within 3 s). Verified live: 312 lookups 400.6 ms -> 0.28 ms warm (2 ms
+for the first cold call); labels unchanged ("Click - Offset Test", "Trigger 1", "CLICK + HOLD").
+Left alone (measured, smaller): sustained playback cost is the pose pass (~21.7 ms for 156 hands in the
+sandbox, mostly the remaining finger-curl work: per-joint matrix updates + 2 world-position chain walks per
+finger tip for Tip Twist) plus lerpPoseValues/lerpTweenSegments (~6 ms each per 156 hands, a ~60-key object
+allocated per hand per frame). Both are candidates if playback is still too slow after this.
+`main.js` `?v=300` -> `?v=301`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

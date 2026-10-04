@@ -18,6 +18,11 @@ work seamlessly from there.
 
 ## Currently working on
 
+**2026-10-04 -- Mass-event frame spikes fixed (log-label DOM query memoized).** Profile log: idle 41 fps (was ~10),
+playback 12-19 fps, spikes of 87-117 ms hand logic at mass trigger/interrupt events -- caused by an unconditional
+DOM query per hand per event (400 ms for 312 lookups), now cached. `main.js` `?v=301`. Remaining playback cost:
+finger-curl pose pass + per-hand pose-object allocation.
+
 **2026-10-04 -- Log Frame Profile added; waiting on a profile log from the user's machine.** Post-optimisation
 logs: playback ~100-170 ms frames (was 180-380), idle still ~100+ ms -- not the hand logic. `main.js` `?v=300`.
 

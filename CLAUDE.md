@@ -2429,3 +2429,9 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   un-normalized self-comparison reads ~0.03 degrees. Idle hands skip the curl via `hand._idleCurlSig`
   (pose-key signature + wrist splay); anything new that poses fingers outside `applyPoseValuesToHand()` must
   set `hand._idleCurlSig = null`.
+- **Arguments of a disabled log call are still evaluated (2026-10-04).** `logHandBehaviourEvent(hands.indexOf(hand),
+  handLogTriggerLabel(p), ...)` early-returns when the log is off, but only AFTER its arguments were computed;
+  `handLogTriggerLabel()` was a DOM query (~1.3 ms on the 28,600-node panel) and caused ~400 ms spikes on mass
+  events. It is now memoized (3 s TTL). Keep anything expensive out of log-call arguments (build the text lazily
+  behind a `cfg.log...Enabled` check), and read the Frame Rate Log's PROFILE lines (Log Frame Profile) to find
+  spikes instead of guessing.
