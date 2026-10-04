@@ -6978,7 +6978,7 @@
       "custom8TweenStopEnabled": true,
       "custom8TweenStopStartTimeCurveEnabled": true,
       "custom8TweenStopStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.2920356073407128,\"y\":0.5210416158040365},{\"x\":1,\"y\":1}]",
-      "custom8TweenStopStartTimeRange": "{\"min\":0,\"max\":3000}",
+      "custom8TweenStopStartTimeRange": "{\"min\":1287,\"max\":3000}",
       "custom8TweenStopDelayEnabled": true,
       "custom8TweenStopDelayMs": 5000,
       "custom8TweenStopDelayCurveEnabled": true,
@@ -14961,7 +14961,7 @@
       "custom8TweenStopEnabled": true,
       "custom8TweenStopStartTimeCurveEnabled": true,
       "custom8TweenStopStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.2920356073407128,\"y\":0.5210416158040365},{\"x\":1,\"y\":1}]",
-      "custom8TweenStopStartTimeRange": "{\"min\":0,\"max\":3000}",
+      "custom8TweenStopStartTimeRange": "{\"min\":1287,\"max\":3000}",
       "custom8TweenStopDelayEnabled": true,
       "custom8TweenStopDelayMs": 5000,
       "custom8TweenStopDelayCurveEnabled": true,
@@ -22944,7 +22944,7 @@
       "custom8TweenStopEnabled": true,
       "custom8TweenStopStartTimeCurveEnabled": true,
       "custom8TweenStopStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.2920356073407128,\"y\":0.5210416158040365},{\"x\":1,\"y\":1}]",
-      "custom8TweenStopStartTimeRange": "{\"min\":0,\"max\":3000}",
+      "custom8TweenStopStartTimeRange": "{\"min\":1287,\"max\":3000}",
       "custom8TweenStopDelayEnabled": true,
       "custom8TweenStopDelayMs": 5000,
       "custom8TweenStopDelayCurveEnabled": true,
@@ -25168,7 +25168,7 @@
     },
     {
       "key": "New Group (9)",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -28348,7 +28348,7 @@
     },
     {
       "key": "Custom Click Functions",
-      "collapsed": true,
+      "collapsed": false,
       "locked": false,
       "items": [
         {
@@ -29231,7 +29231,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 18",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -33203,7 +33203,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 17",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -34071,7 +34071,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 16",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -35249,7 +35249,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 15",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -36427,7 +36427,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 14",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -37295,7 +37295,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 13",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -44369,7 +44369,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 10",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -48631,7 +48631,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 9",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -55705,36 +55705,9 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 8",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
-              {
-                "type": "group",
-                "group": {
-                  "key": "Multi Trigger",
-                  "collapsed": false,
-                  "locked": false,
-                  "items": [
-                    {
-                      "type": "row",
-                      "key": "custom8MultiTriggerEnabled"
-                    },
-                    {
-                      "type": "row",
-                      "key": "custom8MultiTriggers"
-                    },
-                    {
-                      "type": "row"
-                    }
-                  ],
-                  "settings": [
-                    "custom8MultiTriggerEnabled",
-                    "custom8MultiTriggers",
-                    null
-                  ],
-                  "subgroups": []
-                }
-              },
               {
                 "type": "row",
                 "key": "custom8Enabled"
@@ -55787,7 +55760,7 @@
                 "type": "group",
                 "group": {
                   "key": "Offset",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -55928,7 +55901,7 @@
                 "type": "group",
                 "group": {
                   "key": "Rotation",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -55997,7 +55970,7 @@
                 "type": "group",
                 "group": {
                   "key": "Start Time Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -56058,7 +56031,7 @@
                 "type": "group",
                 "group": {
                   "key": "Retransition",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -56208,14 +56181,14 @@
                 "type": "group",
                 "group": {
                   "key": "Tween Stop",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
                       "type": "group",
                       "group": {
                         "key": "Tween Stop Start Time Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -56238,7 +56211,7 @@
                       "type": "group",
                       "group": {
                         "key": "Tween Stop Delay",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -56272,7 +56245,7 @@
                   "subgroups": [
                     {
                       "key": "Tween Stop Start Time Curve",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -56292,7 +56265,7 @@
                     },
                     {
                       "key": "Tween Stop Delay",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -56322,6 +56295,33 @@
                     }
                   ]
                 }
+              },
+              {
+                "type": "group",
+                "group": {
+                  "key": "Multi Trigger",
+                  "collapsed": true,
+                  "locked": false,
+                  "items": [
+                    {
+                      "type": "row",
+                      "key": "custom8MultiTriggerEnabled"
+                    },
+                    {
+                      "type": "row",
+                      "key": "custom8MultiTriggers"
+                    },
+                    {
+                      "type": "row"
+                    }
+                  ],
+                  "settings": [
+                    "custom8MultiTriggerEnabled",
+                    "custom8MultiTriggers",
+                    null
+                  ],
+                  "subgroups": []
+                }
               }
             ],
             "settings": [
@@ -56340,32 +56340,8 @@
             ],
             "subgroups": [
               {
-                "key": "Multi Trigger",
-                "collapsed": false,
-                "locked": false,
-                "items": [
-                  {
-                    "type": "row",
-                    "key": "custom8MultiTriggerEnabled"
-                  },
-                  {
-                    "type": "row",
-                    "key": "custom8MultiTriggers"
-                  },
-                  {
-                    "type": "row"
-                  }
-                ],
-                "settings": [
-                  "custom8MultiTriggerEnabled",
-                  "custom8MultiTriggers",
-                  null
-                ],
-                "subgroups": []
-              },
-              {
                 "key": "Offset",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -56500,7 +56476,7 @@
               },
               {
                 "key": "Rotation",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -56560,7 +56536,7 @@
               },
               {
                 "key": "Start Time Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -56615,7 +56591,7 @@
               },
               {
                 "key": "Retransition",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -56762,14 +56738,14 @@
               },
               {
                 "key": "Tween Stop",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
                     "type": "group",
                     "group": {
                       "key": "Tween Stop Start Time Curve",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -56792,7 +56768,7 @@
                     "type": "group",
                     "group": {
                       "key": "Tween Stop Delay",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -56826,7 +56802,7 @@
                 "subgroups": [
                   {
                     "key": "Tween Stop Start Time Curve",
-                    "collapsed": false,
+                    "collapsed": true,
                     "locked": false,
                     "items": [
                       {
@@ -56846,7 +56822,7 @@
                   },
                   {
                     "key": "Tween Stop Delay",
-                    "collapsed": false,
+                    "collapsed": true,
                     "locked": false,
                     "items": [
                       {
@@ -56875,6 +56851,30 @@
                     "subgroups": []
                   }
                 ]
+              },
+              {
+                "key": "Multi Trigger",
+                "collapsed": true,
+                "locked": false,
+                "items": [
+                  {
+                    "type": "row",
+                    "key": "custom8MultiTriggerEnabled"
+                  },
+                  {
+                    "type": "row",
+                    "key": "custom8MultiTriggers"
+                  },
+                  {
+                    "type": "row"
+                  }
+                ],
+                "settings": [
+                  "custom8MultiTriggerEnabled",
+                  "custom8MultiTriggers",
+                  null
+                ],
+                "subgroups": []
               }
             ]
           }
@@ -64846,7 +64846,7 @@
         },
         {
           "key": "Custom Click Function 18",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -68815,7 +68815,7 @@
         },
         {
           "key": "Custom Click Function 17",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -69680,7 +69680,7 @@
         },
         {
           "key": "Custom Click Function 16",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -70855,7 +70855,7 @@
         },
         {
           "key": "Custom Click Function 15",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -72030,7 +72030,7 @@
         },
         {
           "key": "Custom Click Function 14",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -72895,7 +72895,7 @@
         },
         {
           "key": "Custom Click Function 13",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -79966,7 +79966,7 @@
         },
         {
           "key": "Custom Click Function 10",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -84225,7 +84225,7 @@
         },
         {
           "key": "Custom Click Function 9",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -91296,36 +91296,9 @@
         },
         {
           "key": "Custom Click Function 8",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
-            {
-              "type": "group",
-              "group": {
-                "key": "Multi Trigger",
-                "collapsed": false,
-                "locked": false,
-                "items": [
-                  {
-                    "type": "row",
-                    "key": "custom8MultiTriggerEnabled"
-                  },
-                  {
-                    "type": "row",
-                    "key": "custom8MultiTriggers"
-                  },
-                  {
-                    "type": "row"
-                  }
-                ],
-                "settings": [
-                  "custom8MultiTriggerEnabled",
-                  "custom8MultiTriggers",
-                  null
-                ],
-                "subgroups": []
-              }
-            },
             {
               "type": "row",
               "key": "custom8Enabled"
@@ -91378,7 +91351,7 @@
               "type": "group",
               "group": {
                 "key": "Offset",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -91519,7 +91492,7 @@
               "type": "group",
               "group": {
                 "key": "Rotation",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -91588,7 +91561,7 @@
               "type": "group",
               "group": {
                 "key": "Start Time Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -91649,7 +91622,7 @@
               "type": "group",
               "group": {
                 "key": "Retransition",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -91799,14 +91772,14 @@
               "type": "group",
               "group": {
                 "key": "Tween Stop",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
                     "type": "group",
                     "group": {
                       "key": "Tween Stop Start Time Curve",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -91829,7 +91802,7 @@
                     "type": "group",
                     "group": {
                       "key": "Tween Stop Delay",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -91863,7 +91836,7 @@
                 "subgroups": [
                   {
                     "key": "Tween Stop Start Time Curve",
-                    "collapsed": false,
+                    "collapsed": true,
                     "locked": false,
                     "items": [
                       {
@@ -91883,7 +91856,7 @@
                   },
                   {
                     "key": "Tween Stop Delay",
-                    "collapsed": false,
+                    "collapsed": true,
                     "locked": false,
                     "items": [
                       {
@@ -91913,6 +91886,33 @@
                   }
                 ]
               }
+            },
+            {
+              "type": "group",
+              "group": {
+                "key": "Multi Trigger",
+                "collapsed": true,
+                "locked": false,
+                "items": [
+                  {
+                    "type": "row",
+                    "key": "custom8MultiTriggerEnabled"
+                  },
+                  {
+                    "type": "row",
+                    "key": "custom8MultiTriggers"
+                  },
+                  {
+                    "type": "row"
+                  }
+                ],
+                "settings": [
+                  "custom8MultiTriggerEnabled",
+                  "custom8MultiTriggers",
+                  null
+                ],
+                "subgroups": []
+              }
             }
           ],
           "settings": [
@@ -91931,32 +91931,8 @@
           ],
           "subgroups": [
             {
-              "key": "Multi Trigger",
-              "collapsed": false,
-              "locked": false,
-              "items": [
-                {
-                  "type": "row",
-                  "key": "custom8MultiTriggerEnabled"
-                },
-                {
-                  "type": "row",
-                  "key": "custom8MultiTriggers"
-                },
-                {
-                  "type": "row"
-                }
-              ],
-              "settings": [
-                "custom8MultiTriggerEnabled",
-                "custom8MultiTriggers",
-                null
-              ],
-              "subgroups": []
-            },
-            {
               "key": "Offset",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -92091,7 +92067,7 @@
             },
             {
               "key": "Rotation",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -92151,7 +92127,7 @@
             },
             {
               "key": "Start Time Curve",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -92206,7 +92182,7 @@
             },
             {
               "key": "Retransition",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -92353,14 +92329,14 @@
             },
             {
               "key": "Tween Stop",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
                   "type": "group",
                   "group": {
                     "key": "Tween Stop Start Time Curve",
-                    "collapsed": false,
+                    "collapsed": true,
                     "locked": false,
                     "items": [
                       {
@@ -92383,7 +92359,7 @@
                   "type": "group",
                   "group": {
                     "key": "Tween Stop Delay",
-                    "collapsed": false,
+                    "collapsed": true,
                     "locked": false,
                     "items": [
                       {
@@ -92417,7 +92393,7 @@
               "subgroups": [
                 {
                   "key": "Tween Stop Start Time Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -92437,7 +92413,7 @@
                 },
                 {
                   "key": "Tween Stop Delay",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -92466,6 +92442,30 @@
                   "subgroups": []
                 }
               ]
+            },
+            {
+              "key": "Multi Trigger",
+              "collapsed": true,
+              "locked": false,
+              "items": [
+                {
+                  "type": "row",
+                  "key": "custom8MultiTriggerEnabled"
+                },
+                {
+                  "type": "row",
+                  "key": "custom8MultiTriggers"
+                },
+                {
+                  "type": "row"
+                }
+              ],
+              "settings": [
+                "custom8MultiTriggerEnabled",
+                "custom8MultiTriggers",
+                null
+              ],
+              "subgroups": []
             }
           ]
         },
