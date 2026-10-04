@@ -13649,6 +13649,10 @@ function makeSliceYielder(budgetMs) {
 }
 // Yields one animation frame (or 50 ms if rAF is not ticking, e.g. a background tab).
 function yieldFrame() {
+  // A genuinely hidden tab has no animation to protect and its rAF/timers are throttled
+  // (up to 1 s per yield), so slicing there would only slow startup. ?debugTiming=1
+  // keeps slicing so it can be measured from an automation tab that reports hidden.
+  if (document.hidden && !DEBUG_TIMING) return Promise.resolve()
   return new Promise((resolve) => {
     let done = false
     const go = () => { if (!done) { done = true; resolve() } }

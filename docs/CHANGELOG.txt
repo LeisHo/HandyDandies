@@ -16264,6 +16264,30 @@ Verified live: log reads build (+584 ms) -> OFF ignored -> "startup cache matche
 kept" -> field starting (+5002 ms); canvas hidden only at the reveal. Not seen visually.
 `main.js` `?v=292` -> `?v=293`.
 
+2026-10-04  -  (startup: loading animation smoothness -- custom-function panel build sliced
+to ~10 ms steps)
+
+Direct report with logs: "better, but the loading animation is still laggy". The Frame Rate Log
+showed one 3.9 s stretch under 10 fps (5:25:51-5:25:55): the dev-mode restore building each click
+function's ~100-row panel group in single 100-280 ms blocks (even after yielding once per function).
+Now renderCustomClickFunctionGroup(), registerMultiTriggerTrigger() and
+setupMultiTriggerGroupForFunction() take an optional `yielder` (makeSliceYielder(10): yields a frame
+once 10 ms of work has accumulated) and await it between their build steps. Every await is
+conditional (`if (yielder) await yielder()`), so an async function that never awaits still runs
+synchronously: Add Click Function and Type changes, which need the finished group immediately, are
+unchanged. The field build now starts as soon as the static settings are applied
+(startFieldBuild(), startupValuesApplied) instead of after the custom-function restore, so the
+finer slicing does not delay the reveal. yieldFrame() resolves immediately in a truly hidden tab.
+
+Measured live (?debugTiming=1, dev mode): long tasks over the whole startup went from ~15 tasks of
+70-280 ms (+ a 342 ms one at the reveal) to 3 tasks (80, 83 and 250 ms; the 250 ms one is after the
+reveal). Wall-clock in the automation tab is inflated (its tab reports hidden, so yields fall back to
+throttled timers) -- not representative; in a foreground tab expect roughly 2x the build work spread
+over frames, ending near the 5 s Min Loading Time. Not seen visually.
+A residual risk: errors inside the now-async group build surface as unhandled promise rejections for
+the synchronous callers instead of thrown exceptions (still logged to the console).
+`main.js` `?v=293` -> `?v=295`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

@@ -18,6 +18,10 @@ work seamlessly from there.
 
 ## Currently working on
 
+**2026-10-04 -- Loading animation smoothness: dev-mode panel build sliced to ~10 ms steps.**
+Long tasks during startup: ~15 x 70-280 ms -> 3 (max 83 ms before the reveal). Field build starts
+in parallel with the restore. `main.js` `?v=295`. See CHANGELOG.txt.
+
 **2026-10-04 -- Loading preview stays up through the loading screen.** The restore's
 Show Loading Preview=OFF no longer hides it, and camera read-back sliders no longer force a
 post-restore rebuild. `main.js` `?v=293`. See CHANGELOG.txt.

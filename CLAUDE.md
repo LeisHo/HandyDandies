@@ -2404,3 +2404,7 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   (the startup preview owns it until tryStartField()). Also keep camera read-back sliders
   (`STARTUP_PREVIEW_DERIVED`) out of any "did settings change" comparison -- they are rewritten
   from the camera preset on every build.
+- **Long builds that must not block the loading animation take a `yielder` (2026-10-04).** Pass
+  `makeSliceYielder(10)` down and write `if (yielder) await yielder()` -- never an unconditional
+  `await`, which would make the synchronous callers (Add Click Function, Type change) asynchronous.
+  `yieldFrame()` skips yielding in a hidden tab unless `?debugTiming=1`.
