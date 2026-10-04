@@ -116,6 +116,17 @@ function round(v, d) {
 }
 
 function settingsKey() { return `${storageKeyPrefix}.devSettings` }
+// Startup profiling (2026-10-04) -- only active with `?debugTiming=1`; pushes
+// {label, ms, ...} entries onto window.__dpProfile so a slow restore can be
+// broken down from the live page without a debugger. No-op otherwise.
+const DP_PROFILE = typeof location !== 'undefined' && /[?&]debugTiming=1/.test(location.search)
+function dpTime(label, fn) {
+  if (!DP_PROFILE) return fn()
+  const t0 = performance.now()
+  try { return fn() } finally {
+    (window.__dpProfile = window.__dpProfile || []).push({ label, atMs: Math.round(t0), ms: Math.round(performance.now() - t0) })
+  }
+}
 function geomKeyPrefix() { return `${storageKeyPrefix}.devPanelGeom.` }
 function savedStatesKey() { return `${storageKeyPrefix}.devSavedStates` }
 // Landscape vs. Mobile is an orientation call, not a separate breakpoint --
@@ -2495,7 +2506,11 @@ function applyOrder(groupsEl, order) {
 function applyStoredValues(values) {
   if (!values) return
   const real = realDeviceClass()
+  const profT0 = DP_PROFILE ? performance.now() : 0
+  const slow = []
+  let nControls = 0, nOnChange = 0, onChangeMs = 0
   devGroups.forEach((group) => group.controls.forEach((ctrl) => {
+    nControls++
     DEVICES.forEach((d) => {
       const v = values[d] ? values[d][ctrl.key] : undefined
       if (v !== undefined) store[d][ctrl.key] = v
@@ -2503,10 +2518,27 @@ function applyStoredValues(values) {
     const realValue = store[real][ctrl.key]
     if (realValue !== undefined) {
       cfg[ctrl.key] = realValue
-      if (ctrl.onChange) ctrl.onChange(realValue)
+      if (ctrl.onChange) {
+        if (DP_PROFILE) {
+          const t = performance.now()
+          ctrl.onChange(realValue)
+          const dt = performance.now() - t
+          nOnChange++; onChangeMs += dt
+          if (dt > 4) slow.push([ctrl.key, Math.round(dt)])
+        } else ctrl.onChange(realValue)
+      }
     }
   }))
+  const profT1 = DP_PROFILE ? performance.now() : 0
   refreshRowDisplaysForEditingTab()
+  if (DP_PROFILE) {
+    slow.sort((a, b) => b[1] - a[1])
+    ;(window.__dpProfile = window.__dpProfile || []).push({
+      label: 'applyStoredValues', atMs: Math.round(profT0), ms: Math.round(performance.now() - profT0),
+      loopMs: Math.round(profT1 - profT0), onChangeMs: Math.round(onChangeMs), refreshMs: Math.round(performance.now() - profT1),
+      nControls, nOnChange, nSlow: slow.length, top: slow.slice(0, 12)
+    })
+  }
 }
 
 export function refreshRowDisplaysForEditingTab() {
@@ -2654,6 +2686,9 @@ async function remoteSaveSnapshot(remoteSave, snapshot) {
   // field like HANDO's own `defaultCamera`, per this function's own
   // top comment).
   const merged = { ...base, ...snapshot }
+  // 2026-10-04: panelGeometry is keyed per device class; keep the devices
+  // this save did not touch rather than letting the spread replace the map.
+  if (snapshot.panelGeometry) merged.panelGeometry = { ...(base.panelGeometry || {}), ...snapshot.panelGeometry }
   try {
     const postResp = await fetch(remoteSave.endpoint, {
       method: 'POST',
@@ -2801,7 +2836,7 @@ export function initDevPanel(groups, opts = {}) {
       fetchRemoteSettingsUntilSuccess(opts.remoteSave, (settings) => {
         lastRestoredValues = settings.values || null
         applyStoredValues(settings.values)
-        if (opts.onRestore) opts.onRestore()
+        if (opts.onRestore) dpTime('onRestore (host callback)', () => opts.onRestore())
       })
       return
     }
@@ -2817,7 +2852,7 @@ export function initDevPanel(groups, opts = {}) {
     // a fresh visitor with empty localStorage -- confirmed as a real gap
     // while building exactly that gate for `poseDefaultValues`'s own
     // resync (see this project's own onRestore usage, main.js).
-    if (opts.onRestore) opts.onRestore()
+    if (opts.onRestore) dpTime('onRestore (host callback)', () => opts.onRestore())
   }
   restoreValuesForEveryVisitor()
 
@@ -3231,6 +3266,17 @@ export function initDevPanel(groups, opts = {}) {
     // controls (devSaveCaptureExtra, above) so Save captures it too, not
     // just Undo/Redo -- see that variable's own comment.
     if (devSaveCaptureExtra) snapshot.extra = devSaveCaptureExtra()
+    // CORRECTED 2026-10-04, direct request ("make sure the save button saves
+    // the dev panel size and location"). With a remote endpoint configured
+    // this function returned early, so the geometry write that used to sit
+    // only in the localStorage branch below never ran: the panel's size and
+    // position were never persisted by Save at all. Now written to this
+    // browser's localStorage on both paths, and also carried in the snapshot
+    // (per device class) so it reaches the git-tracked file too. Group
+    // collapse states were already part of `order` (captureGroup()).
+    const geomNow = getPanelGeometry(panel)
+    try { localStorage.setItem(currentGeomKey(), JSON.stringify(geomNow)) } catch (err) { /* ignore */ }
+    snapshot.panelGeometry = { [realDeviceClass()]: geomNow }
     if (opts.remoteSave) {
       remoteSaveSnapshot(opts.remoteSave, snapshot).then((result) => {
         flash(result.ok ? 'Saved!' : ('Save failed: ' + result.error))
@@ -3253,7 +3299,7 @@ export function initDevPanel(groups, opts = {}) {
   function resetSettings() {
     if (opts.remoteSave) {
       fetchRemoteSettingsUntilSuccess(opts.remoteSave, (settings) => {
-        applyOrder(groupsEl, settings.order)
+        dpTime('applyOrder', () => applyOrder(groupsEl, settings.order))
         devVisibility = settings.devVisibility || {}
         devIndependence = settings.devIndependence || { mobile: {}, landscape: {} }
         lastRestoredValues = settings.values || null
@@ -3275,8 +3321,14 @@ export function initDevPanel(groups, opts = {}) {
         // code defaults on every single page load, never the real
         // saved/remote default) -- this hook is the generic fix, not
         // specific to that one host's own field name.
-        if (opts.onRestore) opts.onRestore()
+        if (opts.onRestore) dpTime('onRestore (host callback)', () => opts.onRestore())
         if (settings.extra !== undefined && devSaveApplyExtra) devSaveApplyExtra(settings.extra)
+        // Saved panel size/position for this device class (2026-10-04).
+        const savedGeom = settings.panelGeometry && settings.panelGeometry[realDeviceClass()]
+        if (savedGeom) {
+          applyPanelGeometry(panel, savedGeom)
+          try { localStorage.setItem(currentGeomKey(), JSON.stringify(savedGeom)) } catch (err) { /* ignore */ }
+        }
       })
       let remoteGeom = null
       try { remoteGeom = JSON.parse(localStorage.getItem(currentGeomKey())) } catch (err) { remoteGeom = null }
@@ -3286,14 +3338,14 @@ export function initDevPanel(groups, opts = {}) {
     let saved = null
     try { saved = JSON.parse(localStorage.getItem(settingsKey())) } catch (err) { saved = null }
     if (saved) {
-      applyOrder(groupsEl, saved.order)
+      dpTime('applyOrder', () => applyOrder(groupsEl, saved.order))
       devVisibility = saved.devVisibility || {}
       devIndependence = saved.devIndependence || { mobile: {}, landscape: {} }
       lastRestoredValues = saved.values || null
       applyStoredValues(saved.values)
       textOverrides = saved.textOverrides || {}
       applyTextOverrides()
-      if (opts.onRestore) opts.onRestore()
+      if (opts.onRestore) dpTime('onRestore (host callback)', () => opts.onRestore())
       if (saved.extra !== undefined && devSaveApplyExtra) devSaveApplyExtra(saved.extra)
     } else {
       // A brand-new visitor with nothing saved yet still needs an initial

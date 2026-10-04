@@ -7,7 +7,7 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js'
 import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js'
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js'
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js'
-import { initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab } from './devpanel/devPanel.js?v=55'
+import { initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab } from './devpanel/devPanel.js?v=56'
 
 // A defensive wrapper around devPanel.js's own refreshSelectOptions() --
 // found via live testing (direct user report: "I dont see any of the
@@ -1740,7 +1740,7 @@ const DEV_GROUPS = [
   {
     title: 'Background',
     controls: [
-      { key: 'bgColor', label: 'Background Color', type: 'color', def: '#ffffff', onChange: (v) => { scene.background = new THREE.Color(v) } }
+      { key: 'bgColor', label: 'Background Color', type: 'color', def: '#ffffff', onChange: (v) => { scene.background = new THREE.Color(v); syncLoadingPreviewBackground() } }
     ]
   },
   {
@@ -1971,7 +1971,21 @@ const cfg = initDevPanel(DEV_GROUPS, {
   // declaration comment) -- the field now only ever builds once, using
   // these real values, instead of building once with code defaults and
   // visibly rebuilding again the moment this fires.
-  onRestore: () => { logStartupTiming('onRestore fired -> startupSettingsReady = true'); migrateModeTweenToSequence(); resyncPoseDefaultValues(); restoreCustomClickFunctions(); enforceCustomClickFunctionsAnchorOrder(); startupSettingsReady = true; tryStartField() },
+  onRestore: () => {
+    logStartupTiming('onRestore fired -> startupSettingsReady = true')
+    // Each step timed when ?debugTiming=1 (see devPanel.js dpTime()).
+    const prof = (label, fn) => {
+      if (!DEBUG_TIMING) { fn(); return }
+      const t0 = performance.now(); fn()
+      ;(window.__dpProfile = window.__dpProfile || []).push({ label, atMs: Math.round(t0), ms: Math.round(performance.now() - t0) })
+    }
+    prof('migrateModeTweenToSequence', migrateModeTweenToSequence)
+    prof('resyncPoseDefaultValues', resyncPoseDefaultValues)
+    prof('restoreCustomClickFunctions', restoreCustomClickFunctions)
+    prof('enforceCustomClickFunctionsAnchorOrder', enforceCustomClickFunctionsAnchorOrder)
+    startupSettingsReady = true
+    prof('tryStartField (from onRestore)', tryStartField)
+  },
   // Delete-function button (direct spec item) -- devPanel.js's own
   // existing Delete Group/Setting (🗑) icon already lets a real user
   // remove a Custom Click Function's whole group from the panel; the
@@ -4820,6 +4834,9 @@ function buildLoadingPreview(bypassEnabledGate) {
   if (loadingPreviewRenderer) { loadingPreviewRenderer.dispose(); loadingPreviewRenderer = null }
   loadingPreviewCanvas.style.display = 'block'
   loadingPreviewScene = new THREE.Scene()
+  // 2026-10-04, direct request: the preview uses the same background colour as
+  // the normal app (cfg.bgColor) instead of being transparent over the page.
+  loadingPreviewScene.background = new THREE.Color(cfg.bgColor)
   loadingPreviewCamera = new THREE.PerspectiveCamera(35, 1, 0.1, 2000)
   loadingPreviewRenderer = new THREE.WebGLRenderer({ canvas: loadingPreviewCanvas, antialias: true, alpha: true })
   // CORRECTED 2026-09-19, direct report ("Loading Preview doesnt work
@@ -5347,6 +5364,12 @@ function startLoadingPreviewLiveLoop() {
 // finished loading, so this checkbox IS reachable before there's
 // anything real to preview yet; silently does nothing in that case
 // rather than throwing on an undefined `modelRoot`.
+// Keeps an already-built preview's background in step with the Background Color
+// setting. Called from bgColor's onChange, which can fire during startup
+// restore before `loadingPreviewScene` has been initialised -- hence the try.
+function syncLoadingPreviewBackground() {
+  try { if (loadingPreviewScene) loadingPreviewScene.background = new THREE.Color(cfg.bgColor) } catch (err) { /* not built yet */ }
+}
 function setLoadingPreviewLiveVisible(show) {
   if (!show) {
     if (loadingPreviewCanvas) loadingPreviewCanvas.style.display = 'none'
