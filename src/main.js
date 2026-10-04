@@ -332,6 +332,14 @@ const loadingPreviewLogEntries = []
 let loadingPreviewLogEl = null
 const _loadingPreviewLogFlushFlag = { scheduled: false }
 let loadingPreviewFirstFrameLogged = false
+// Pose Jump Log (2026-10-04, direct request after "why is there a flash after the 2nd click"):
+// finds one-frame pops on the user's own machine. Declared here because
+// buildPoseJumpLogWidget() is called at module top level.
+const POSE_JUMP_LOG_MAX_ENTRIES = 300
+const poseJumpLogEntries = []
+let poseJumpLogEl = null
+const _poseJumpLogFlushFlag = { scheduled: false }
+let poseJumpLastCheckMs = 0
 let loadingPreviewNoSequenceLogged = false
 let __lastFrameTimestamp = null
 let __frameRateBelowThreshold = false
@@ -750,7 +758,7 @@ function tryStartField() {
   // whatever comes next; don't treat this comment's own reasoning above
   // as the settled explanation.
   renderer.compile(scene, camera)
-  window.__debug = { THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose, resolveTweenSegmentsWithAnchor, lerpTweenSegments, lerpLoopSegments, isHoldEntry, updateLoadingPreviewWristClip, lerpPoseValues, get loadingPreviewRenderer() { return loadingPreviewRenderer }, get loadingPreviewScene() { return loadingPreviewScene }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, get handBoundsCenterLocal() { return handBoundsCenterLocal }, multiPointCommit, multiPointEligibleFunctions, get multiPointActiveTouchCount() { return multiPointActiveTouchCount }, get multiPointSessionFiredPoseId() { return multiPointSessionFiredPoseId } }
+  window.__debug = { THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose, resolveTweenSegmentsWithAnchor, lerpTweenSegments, lerpLoopSegments, isHoldEntry, updateLoadingPreviewWristClip, lerpPoseValues, get loadingPreviewRenderer() { return loadingPreviewRenderer }, get loadingPreviewScene() { return loadingPreviewScene }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, get handBoundsCenterLocal() { return handBoundsCenterLocal }, multiPointCommit, multiPointEligibleFunctions, get multiPointActiveTouchCount() { return multiPointActiveTouchCount }, get multiPointSessionFiredPoseId() { return multiPointSessionFiredPoseId }, detectPoseJumps, get poseJumpLogEntries() { return poseJumpLogEntries } }
   loadingEl.classList.add('hidden')
   // The loading-preview canvas is a top-level sibling of #loading now
   // (2026-09-17, decoupled specifically so this moment doesn't force it
@@ -1979,6 +1987,15 @@ const DEV_GROUPS = [
       { key: 'logFrameRateDropsEnabled', label: 'Log Frame Rate Drops', type: 'checkbox', def: false },
       { key: 'frameRateDropThresholdFps', label: 'Frame Rate Drop Threshold (Fps)', type: 'slider', min: 1, max: 60, step: 1, def: 30 },
       { key: 'clearFrameRateLogBtn', label: 'Clear Frame Rate Log', type: 'button', onClick: () => clearFrameRateLog() },
+      // Pose Jump Log (2026-10-04): logs any frame where a hand's bone rotation or position
+      // changes more than the thresholds below between two consecutive frames -- i.e. a pop, not
+      // smooth motion -- with the hand, bone, size of the jump, frame time and which click
+      // functions/phases were active on that hand. Off by default (it checks every bone of every
+      // hand each frame).
+      { key: 'logPoseJumpsEnabled', label: 'Log Pose Jumps', type: 'checkbox', def: false },
+      { key: 'poseJumpBoneThresholdDeg', label: 'Pose Jump Threshold - Bone (Deg)', type: 'slider', min: 2, max: 90, step: 1, def: 15 },
+      { key: 'poseJumpPositionThreshold', label: 'Pose Jump Threshold - Position (World Units)', type: 'slider', min: 0.1, max: 20, step: 0.1, def: 2 },
+      { key: 'clearPoseJumpLogBtn', label: 'Clear Pose Jump Log', type: 'button', onClick: () => clearPoseJumpLog() },
       // Added 2026-09-29, direct request: "add a button in the debug
       // group. It says Copy All. When clicked it copies all active
       // logs." Concatenates Mouse Tracking Log/Hand Behaviour Log/Frame
@@ -1993,7 +2010,7 @@ const DEV_GROUPS = [
       // Added 2026-09-30, direct request: "provide a clear all logs
       // button." Clears all 3 logs' own buffers via their existing
       // individual clear functions -- no new clearing logic needed.
-      { key: 'clearAllLogsBtn', label: 'Clear All Logs', type: 'button', onClick: () => { clearMouseTrackingLog(); clearHandBehaviourLog(); clearFrameRateLog(); clearLoadingPreviewLog() } },
+      { key: 'clearAllLogsBtn', label: 'Clear All Logs', type: 'button', onClick: () => { clearMouseTrackingLog(); clearHandBehaviourLog(); clearFrameRateLog(); clearLoadingPreviewLog(); clearPoseJumpLog() } },
       // Added 2026-09-30, direct request: "provide a pause and resume
       // logs button in the debug group." A single toggle button (same
       // pattern as the main Pause Button's own dynamic label, not 2
@@ -2226,6 +2243,7 @@ buildMouseTrackingLogWidget()
 buildHandBehaviourLogWidget()
 buildFrameRateLogWidget()
 buildLoadingPreviewLogWidget()
+buildPoseJumpLogWidget()
 restartCursorLogTimer()
 restartHandBehaviourDetailedLogTimer()
 setupSettingsChangeLog()
@@ -2893,7 +2911,8 @@ function copyAllDebugLogs(btn) {
     ['Mouse Tracking Log', mouseTrackingLogEntries],
     ['Hand Behaviour Log', handBehaviourLogEntries],
     ['Frame Rate Log', frameRateLogEntries],
-    ['Loading Preview Log', loadingPreviewLogEntries]
+    ['Loading Preview Log', loadingPreviewLogEntries],
+    ['Pose Jump Log', poseJumpLogEntries]
   ]
   const text = sections.map(([title, entries]) => `=== ${title} ===\n${entries.length ? entries.join('\n') : '(empty)'}`).join('\n\n')
   const flash = (msg) => { if (!btn) return; const orig = btn.textContent; btn.textContent = msg; setTimeout(() => { btn.textContent = orig }, 900) }
@@ -3032,6 +3051,118 @@ function buildLoadingPreviewLogWidget() {
   clearBtn.addEventListener('click', () => clearLoadingPreviewLog())
   wrap.appendChild(headerRow)
   wrap.appendChild(loadingPreviewLogEl)
+  body.appendChild(wrap)
+}
+function appendPoseJumpLogLine(line) {
+  if (logsPaused) return
+  poseJumpLogEntries.push(line)
+  if (poseJumpLogEntries.length > POSE_JUMP_LOG_MAX_ENTRIES) poseJumpLogEntries.shift()
+  scheduleLogDomFlush(_poseJumpLogFlushFlag, () => poseJumpLogEl, poseJumpLogEntries)
+}
+function clearPoseJumpLog() {
+  poseJumpLogEntries.length = 0
+  if (poseJumpLogEl) poseJumpLogEl.textContent = ''
+}
+// Which click functions/phases are active on a hand right now, e.g. "Click - Offset Test:forward".
+function activeFunctionPhases(hand) {
+  const out = []
+  CLICK_POSE_KEYS.forEach((p) => { const st = hand._cp && hand._cp[p]; if (st && st.phase !== 'idle') out.push(`${handLogTriggerLabel(p)}:${st.phase}`) })
+  CLICK_HOLD_KEYS.forEach((p) => { const st = hand._chp && hand._chp[p]; if (st && st.phase !== 'idle') out.push(`${handLogTriggerLabel(p)}:${st.phase}`) })
+  return out.length ? out.join(' + ') : 'idle'
+}
+// Called once per frame (after updateRenderOrder()) while Log Pose Jumps is on. Compares every
+// bone's rotation and the hand's position with the previous frame; one summary line per frame
+// that has any hit (worst 3 hands), including the frame time -- a long frame makes ordinary
+// motion look like a jump, so read "frame Nms" before trusting a hit.
+function detectPoseJumps() {
+  const now = performance.now()
+  const frameMs = poseJumpLastCheckMs ? now - poseJumpLastCheckMs : 0
+  poseJumpLastCheckMs = now
+  const boneRad = THREE.MathUtils.degToRad(cfg.poseJumpBoneThresholdDeg ?? 15)
+  const posThr = cfg.poseJumpPositionThreshold ?? 2
+  const hits = []
+  for (let i = 0; i < hands.length; i++) {
+    const h = hands[i]
+    if (!h._jb) {
+      h._jb = []
+      h.clone.traverse((o) => { if (o.isBone) h._jb.push(o) })
+      h._jq = h._jb.map((b) => b.quaternion.clone())
+      h._jp = h.wrapper.position.clone()
+      continue
+    }
+    let worst = 0, wi = -1
+    for (let b = 0; b < h._jb.length; b++) {
+      const a = h._jb[b].quaternion.angleTo(h._jq[b])
+      if (a > worst) { worst = a; wi = b }
+      h._jq[b].copy(h._jb[b].quaternion)
+    }
+    const dp = h.wrapper.position.distanceTo(h._jp)
+    h._jp.copy(h.wrapper.position)
+    if (worst > boneRad || dp > posThr) hits.push({ i, worst, wi, dp })
+  }
+  if (hits.length === 0) return
+  hits.sort((a, b) => (b.worst / boneRad + b.dp / posThr) - (a.worst / boneRad + a.dp / posThr))
+  const top = hits.slice(0, 3).map((x) => {
+    const h = hands[x.i]
+    const bone = x.wi >= 0 ? h._jb[x.wi].name : '-'
+    return `Hand ${x.i + 1} ${bone} ${THREE.MathUtils.radToDeg(x.worst).toFixed(1)}deg pos ${x.dp.toFixed(2)} [${activeFunctionPhases(h)}]`
+  })
+  appendPoseJumpLogLine(`[${new Date().toLocaleTimeString()}] +${Math.round(now - pageLoadStartMs)}ms frame ${Math.round(frameMs)}ms -- ${hits.length} hand(s) jumped: ${top.join(' | ')}`)
+}
+function buildPoseJumpLogWidget() {
+  const body = document.querySelector('.dp-group[data-key="Debug"] .dp-group-body')
+  if (!body) return
+  const wrap = elLocal('div', { padding: '4px 6px' })
+  const headerRow = elLocal('div', { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3px' })
+  const label = elLocal('div', { fontSize: '11px', opacity: '0.85' }, { text: 'Pose Jump Log' })
+  const copyBtn = elLocal('button', {
+    fontSize: '10px', padding: '2px 8px', background: '#3a3a4a', color: 'inherit',
+    border: 'none', borderRadius: '4px', cursor: 'pointer'
+  }, { text: 'Copy', type: 'button' })
+  const saveBtn = elLocal('button', {
+    fontSize: '10px', padding: '2px 8px', background: '#3a3a4a', color: 'inherit',
+    border: 'none', borderRadius: '4px', cursor: 'pointer'
+  }, { text: 'Save', type: 'button' })
+  const clearBtn = elLocal('button', {
+    fontSize: '10px', padding: '2px 8px', background: '#3a3a4a', color: 'inherit',
+    border: 'none', borderRadius: '4px', cursor: 'pointer'
+  }, { text: 'Clear', type: 'button' })
+  headerRow.appendChild(label)
+  const btnRow = elLocal('div', { display: 'flex', gap: '4px' })
+  btnRow.appendChild(copyBtn)
+  btnRow.appendChild(saveBtn)
+  btnRow.appendChild(clearBtn)
+  headerRow.appendChild(btnRow)
+  poseJumpLogEl = elLocal('pre', {
+    height: '110px', overflowY: 'auto', margin: '0', padding: '4px 6px',
+    background: 'rgba(255,255,255,0.06)', borderRadius: '4px', fontSize: '10px',
+    whiteSpace: 'pre-wrap', wordBreak: 'break-word'
+  })
+  copyBtn.addEventListener('click', () => {
+    const flash = (msg) => { const orig = copyBtn.textContent; copyBtn.textContent = msg; setTimeout(() => { copyBtn.textContent = orig }, 900) }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(poseJumpLogEntries.join('\n')).then(() => flash('Copied!')).catch(() => flash('Copy failed'))
+    } else {
+      flash('Copy failed')
+    }
+  })
+  saveBtn.addEventListener('click', () => {
+    const flash = (msg) => { const orig = saveBtn.textContent; saveBtn.textContent = msg; setTimeout(() => { saveBtn.textContent = orig }, 900) }
+    const blob = new Blob([poseJumpLogEntries.join('\n')], { type: 'text/plain' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    const stamp = new Date().toISOString().replace(/[:.]/g, '-')
+    a.href = url
+    a.download = `pose-jump-log-${stamp}.txt`
+    document.body.appendChild(a)
+    a.click()
+    a.remove()
+    URL.revokeObjectURL(url)
+    flash('Saved!')
+  })
+  clearBtn.addEventListener('click', () => clearPoseJumpLog())
+  wrap.appendChild(headerRow)
+  wrap.appendChild(poseJumpLogEl)
   body.appendChild(wrap)
 }
 // Hand Numbers overlay (Debug group, 2026-09-28) -- direct request: "a
@@ -14659,6 +14790,8 @@ function animate(dt, now) {
       const __uroStart = performance.now()
       updateRenderOrder()
       __frameProfiler.updateRenderOrderMs += performance.now() - __uroStart
+      if (cfg.logPoseJumpsEnabled) detectPoseJumps()
+      else poseJumpLastCheckMs = 0
     }
     // PERFORMANCE (2026-09-21, throttled; superseded 2026-09-27 by
     // render-on-demand -- see sceneNeedsRedraw's own declaration for the
