@@ -7819,15 +7819,15 @@
       "custom18CursorOffsetZCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom18CursorOffsetZRange": "{\"min\":0,\"max\":0}",
       "custom18CameraOffsetEnabled": true,
-      "custom18CameraOffsetXEnabled": true,
+      "custom18CameraOffsetXEnabled": false,
       "custom18CameraOffsetXCurve": "[{\"x\":0,\"y\":0},{\"x\":0.6008967356053974,\"y\":0.4144791920979818},{\"x\":1,\"y\":1}]",
       "custom18CameraOffsetXRange": "{\"min\":-1,\"max\":1}",
-      "custom18CameraOffsetYEnabled": true,
+      "custom18CameraOffsetYEnabled": false,
       "custom18CameraOffsetYCurve": "[{\"x\":0,\"y\":0},{\"x\":0.5504703402417283,\"y\":0.36114590962727866},{\"x\":1,\"y\":1}]",
       "custom18CameraOffsetYRange": "{\"min\":-1,\"max\":1}",
       "custom18CameraOffsetZEnabled": true,
       "custom18CameraOffsetZCurve": "[{\"x\":0,\"y\":0},{\"x\":0.36794184840935257,\"y\":0.6811458587646484,\"h1\":{\"x\":0.15340934767702824,\"y\":0.3188541412353516},\"h2\":{\"x\":-0.12643704746371406,\"y\":-0.173333485921224}},{\"x\":1,\"y\":1}]",
-      "custom18CameraOffsetZRange": "{\"min\":-5,\"max\":10}",
+      "custom18CameraOffsetZRange": "{\"min\":-5,\"max\":5}",
       "custom18RotationEnabled": false,
       "custom18RotationX": 0,
       "custom18RotationY": 0,
@@ -7843,7 +7843,7 @@
       "custom18SequenceLoopTransition": true,
       "custom18SequenceHoldMs": 0,
       "custom18TransitionSpeedMs": 700,
-      "custom18EasingCurveEnabled": true,
+      "custom18EasingCurveEnabled": false,
       "custom18EasingCurve": "[{\"x\":0,\"y\":0.36739578247070315},{\"x\":0.47325302484467274,\"y\":0.6607289632161458,\"h1\":{\"x\":0.23149601493294786,\"y\":-0.0199999491373698}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2984005184624139,\"y\":0.14072901407877603}}]",
       "custom18SpeedCurveEnabled": false,
       "custom18SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -7868,7 +7868,7 @@
       "custom18MultiTriggers": "[{\"prefix\":\"custom18Trig1\",\"title\":\"Trigger 1\"}]",
       "custom18Trig1Enabled": true,
       "custom18Trig1Mode": "Single Pose",
-      "custom18Trig1OffsetEnabled": true,
+      "custom18Trig1OffsetEnabled": false,
       "custom18Trig1OffsetMode": "Hand Axes Offset",
       "custom18Trig1OffsetX": 5,
       "custom18Trig1OffsetY": 5,
@@ -15812,15 +15812,15 @@
       "custom18CursorOffsetZCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom18CursorOffsetZRange": "{\"min\":0,\"max\":0}",
       "custom18CameraOffsetEnabled": true,
-      "custom18CameraOffsetXEnabled": true,
+      "custom18CameraOffsetXEnabled": false,
       "custom18CameraOffsetXCurve": "[{\"x\":0,\"y\":0},{\"x\":0.6008967356053974,\"y\":0.4144791920979818},{\"x\":1,\"y\":1}]",
       "custom18CameraOffsetXRange": "{\"min\":-1,\"max\":1}",
-      "custom18CameraOffsetYEnabled": true,
+      "custom18CameraOffsetYEnabled": false,
       "custom18CameraOffsetYCurve": "[{\"x\":0,\"y\":0},{\"x\":0.5504703402417283,\"y\":0.36114590962727866},{\"x\":1,\"y\":1}]",
       "custom18CameraOffsetYRange": "{\"min\":-1,\"max\":1}",
       "custom18CameraOffsetZEnabled": true,
       "custom18CameraOffsetZCurve": "[{\"x\":0,\"y\":0},{\"x\":0.36794184840935257,\"y\":0.6811458587646484,\"h1\":{\"x\":0.15340934767702824,\"y\":0.3188541412353516},\"h2\":{\"x\":-0.12643704746371406,\"y\":-0.173333485921224}},{\"x\":1,\"y\":1}]",
-      "custom18CameraOffsetZRange": "{\"min\":-5,\"max\":10}",
+      "custom18CameraOffsetZRange": "{\"min\":-5,\"max\":5}",
       "custom18RotationEnabled": false,
       "custom18RotationX": 0,
       "custom18RotationY": 0,
@@ -15836,7 +15836,7 @@
       "custom18SequenceLoopTransition": true,
       "custom18SequenceHoldMs": 0,
       "custom18TransitionSpeedMs": 700,
-      "custom18EasingCurveEnabled": true,
+      "custom18EasingCurveEnabled": false,
       "custom18EasingCurve": "[{\"x\":0,\"y\":0.36739578247070315},{\"x\":0.47325302484467274,\"y\":0.6607289632161458,\"h1\":{\"x\":0.23149601493294786,\"y\":-0.0199999491373698}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2984005184624139,\"y\":0.14072901407877603}}]",
       "custom18SpeedCurveEnabled": false,
       "custom18SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -15861,7 +15861,7 @@
       "custom18MultiTriggers": "[{\"prefix\":\"custom18Trig1\",\"title\":\"Trigger 1\"}]",
       "custom18Trig1Enabled": true,
       "custom18Trig1Mode": "Single Pose",
-      "custom18Trig1OffsetEnabled": true,
+      "custom18Trig1OffsetEnabled": false,
       "custom18Trig1OffsetMode": "Hand Axes Offset",
       "custom18Trig1OffsetX": 5,
       "custom18Trig1OffsetY": 5,
@@ -23805,15 +23805,15 @@
       "custom18CursorOffsetZCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom18CursorOffsetZRange": "{\"min\":0,\"max\":0}",
       "custom18CameraOffsetEnabled": true,
-      "custom18CameraOffsetXEnabled": true,
+      "custom18CameraOffsetXEnabled": false,
       "custom18CameraOffsetXCurve": "[{\"x\":0,\"y\":0},{\"x\":0.6008967356053974,\"y\":0.4144791920979818},{\"x\":1,\"y\":1}]",
       "custom18CameraOffsetXRange": "{\"min\":-1,\"max\":1}",
-      "custom18CameraOffsetYEnabled": true,
+      "custom18CameraOffsetYEnabled": false,
       "custom18CameraOffsetYCurve": "[{\"x\":0,\"y\":0},{\"x\":0.5504703402417283,\"y\":0.36114590962727866},{\"x\":1,\"y\":1}]",
       "custom18CameraOffsetYRange": "{\"min\":-1,\"max\":1}",
       "custom18CameraOffsetZEnabled": true,
       "custom18CameraOffsetZCurve": "[{\"x\":0,\"y\":0},{\"x\":0.36794184840935257,\"y\":0.6811458587646484,\"h1\":{\"x\":0.15340934767702824,\"y\":0.3188541412353516},\"h2\":{\"x\":-0.12643704746371406,\"y\":-0.173333485921224}},{\"x\":1,\"y\":1}]",
-      "custom18CameraOffsetZRange": "{\"min\":-5,\"max\":10}",
+      "custom18CameraOffsetZRange": "{\"min\":-5,\"max\":5}",
       "custom18RotationEnabled": false,
       "custom18RotationX": 0,
       "custom18RotationY": 0,
@@ -23829,7 +23829,7 @@
       "custom18SequenceLoopTransition": true,
       "custom18SequenceHoldMs": 0,
       "custom18TransitionSpeedMs": 700,
-      "custom18EasingCurveEnabled": true,
+      "custom18EasingCurveEnabled": false,
       "custom18EasingCurve": "[{\"x\":0,\"y\":0.36739578247070315},{\"x\":0.47325302484467274,\"y\":0.6607289632161458,\"h1\":{\"x\":0.23149601493294786,\"y\":-0.0199999491373698}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2984005184624139,\"y\":0.14072901407877603}}]",
       "custom18SpeedCurveEnabled": false,
       "custom18SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -23854,7 +23854,7 @@
       "custom18MultiTriggers": "[{\"prefix\":\"custom18Trig1\",\"title\":\"Trigger 1\"}]",
       "custom18Trig1Enabled": true,
       "custom18Trig1Mode": "Single Pose",
-      "custom18Trig1OffsetEnabled": true,
+      "custom18Trig1OffsetEnabled": false,
       "custom18Trig1OffsetMode": "Hand Axes Offset",
       "custom18Trig1OffsetX": 5,
       "custom18Trig1OffsetY": 5,
@@ -29754,7 +29754,7 @@
                             "type": "group",
                             "group": {
                               "key": "Offset",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -30139,7 +30139,7 @@
                         "subgroups": [
                           {
                             "key": "Offset",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -30539,7 +30539,7 @@
                           "type": "group",
                           "group": {
                             "key": "Offset",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -30924,7 +30924,7 @@
                       "subgroups": [
                         {
                           "key": "Offset",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -31702,7 +31702,7 @@
                           "type": "group",
                           "group": {
                             "key": "Offset",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -32087,7 +32087,7 @@
                       "subgroups": [
                         {
                           "key": "Offset",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -32487,7 +32487,7 @@
                         "type": "group",
                         "group": {
                           "key": "Offset",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -32872,7 +32872,7 @@
                     "subgroups": [
                       {
                         "key": "Offset",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -65369,7 +65369,7 @@
                           "type": "group",
                           "group": {
                             "key": "Offset",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -65754,7 +65754,7 @@
                       "subgroups": [
                         {
                           "key": "Offset",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -66154,7 +66154,7 @@
                         "type": "group",
                         "group": {
                           "key": "Offset",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -66539,7 +66539,7 @@
                     "subgroups": [
                       {
                         "key": "Offset",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -67317,7 +67317,7 @@
                         "type": "group",
                         "group": {
                           "key": "Offset",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -67702,7 +67702,7 @@
                     "subgroups": [
                       {
                         "key": "Offset",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -68102,7 +68102,7 @@
                       "type": "group",
                       "group": {
                         "key": "Offset",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -68487,7 +68487,7 @@
                   "subgroups": [
                     {
                       "key": "Offset",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
