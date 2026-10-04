@@ -18,6 +18,13 @@ work seamlessly from there.
 
 ## Currently working on
 
+**2026-10-04 -- Hand Axes Offset mode, Multi Trigger add-duplicates-base, Tween Stop
+now decelerates a looping hand.** Third Offset Mode rotates the offset by the
+hand's own frozen orientation; "+ Add Trigger" copies the base function's
+settings; a hold released during loop 2+ now slows to a stop instead of freezing.
+`main.js` `?v=283`, `devPanel.js` `?v=55`; 16-assert test + load check pass; not
+run in a browser. See CHANGELOG.txt.
+
 **2026-10-04 -- Easing Curve redesigned as a SPEED PROFILE.** X = 0-100% of the
 transition, Y = speed from slowest to fastest, with the bounds taken from the
 function's own speed settings (its Animation Speed Curve range if on, else the

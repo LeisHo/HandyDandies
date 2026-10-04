@@ -7,7 +7,7 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js'
 import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js'
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js'
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js'
-import { initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab } from './devpanel/devPanel.js?v=54'
+import { initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab } from './devpanel/devPanel.js?v=55'
 
 // A defensive wrapper around devPanel.js's own refreshSelectOptions() --
 // found via live testing (direct user report: "I dont see any of the
@@ -260,6 +260,8 @@ let xyFieldMinDist = 0, xyFieldDistRange = 0.001
 // Easing Curve speed-profile lookup tables, one per function prefix (see
 // getEasingProfile()). Declared here per the early-state rule.
 const easingProfileCache = new Map()
+// Scratch vector for the Hand Axes Offset mode (computeOffsetXY()).
+const _handAxesOffsetVec = new THREE.Vector3()
 // Responsive Wrist Splay's own cached/parsed state -- same TDZ reasoning
 // as armLengthRangeParsed/armLengthCurveParsed directly above (declared
 // here, read by parseWristSplayConfig()/computeResponsiveWristSplayDeg()
@@ -3901,7 +3903,7 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       // 2026-10-02 to all 3 camera-local axes (was right+up only) -- see
       // computeOffsetXY()'s own comment for the full axis history and
       // the per-hand direction math.
-      { key: `${p}OffsetMode`, label: 'Offset Mode', type: 'select', def: 'XYZ Offset', options: () => ['XYZ Offset', 'Cursor Offset'], onChange: () => updateOffsetRotationVisibility(p) },
+      { key: `${p}OffsetMode`, label: 'Offset Mode', type: 'select', def: 'XYZ Offset', options: () => ['XYZ Offset', 'Cursor Offset', 'Hand Axes Offset'], onChange: () => updateOffsetRotationVisibility(p) },
       { key: `${p}OffsetX`, label: 'Offset X (World Units)', type: 'slider', min: -50, max: 50, step: 0.5, def: 0 },
       { key: `${p}OffsetY`, label: 'Offset Y (World Units)', type: 'slider', min: -50, max: 50, step: 0.5, def: 0 },
       { key: `${p}OffsetZ`, label: 'Offset Z (World Units, + Toward Camera)', type: 'slider', min: -50, max: 50, step: 0.5, def: 0 },
@@ -4255,7 +4257,7 @@ function makeClickPoseGroup(p, title, defaults = {}) {
       // 2026-10-02 to all 3 camera-local axes (was right+up only) -- see
       // computeOffsetXY()'s own comment for the full axis history and
       // the per-hand direction math.
-      { key: `${p}OffsetMode`, label: 'Offset Mode', type: 'select', def: 'XYZ Offset', options: () => ['XYZ Offset', 'Cursor Offset'], onChange: () => updateOffsetRotationVisibility(p) },
+      { key: `${p}OffsetMode`, label: 'Offset Mode', type: 'select', def: 'XYZ Offset', options: () => ['XYZ Offset', 'Cursor Offset', 'Hand Axes Offset'], onChange: () => updateOffsetRotationVisibility(p) },
       { key: `${p}OffsetX`, label: 'Offset X (World Units)', type: 'slider', min: -50, max: 50, step: 0.5, def: 0 },
       { key: `${p}OffsetY`, label: 'Offset Y (World Units)', type: 'slider', min: -50, max: 50, step: 0.5, def: 0 },
       { key: `${p}OffsetZ`, label: 'Offset Z (World Units, + Toward Camera)', type: 'slider', min: -50, max: 50, step: 0.5, def: 0 },
@@ -7228,7 +7230,7 @@ function getOrInitHandCHP(hand) {
   // keys.
   CLICK_HOLD_KEYS.forEach((p) => {
     if (hand._chp[p]) return
-    hand._chp[p] = { phase: 'idle', forwardStartTime: 0, forwardSnapshot: null, tweenSegments: null, loopStartTime: 0, loopHoldEndTime: 0, loopDirection: 1, retransitionDelay: 0, retransitionStart: null, retransitionStartTime: 0, retransitionIsTween: false, retransitionSpeedMs: 0, lastAppliedValues: null, frozenSplayDeg: 0, pendingClaimAt: 0, armedForHoldStartTime: -1, pendingFrozenSplayDeg: 0, frozenSpeedMs: 0, pendingFrozenSpeedMs: 0, releasePending: false, stoppingStartTime: 0, stoppingStartDelay: 0, stoppingDelayMs: 1, stoppingLastFrameTime: 0, stoppingBaseElapsedMs: 0, stoppingVirtualElapsedMs: 0, stoppingWasLooping: false, stoppingFreezeAtEnd: false, offsetBaked: false, retransitionOffsetAccumStart: null, retransitionRotationAccumStart: null, pendingTweenFractionCap: 1, frozenTweenFractionCap: 1, fromSplayDeg: 0, pendingFromSplayDeg: 0, retransitionFromSplayDeg: 0 }
+    hand._chp[p] = { phase: 'idle', forwardStartTime: 0, forwardSnapshot: null, tweenSegments: null, loopStartTime: 0, loopHoldEndTime: 0, loopDirection: 1, retransitionDelay: 0, retransitionStart: null, retransitionStartTime: 0, retransitionIsTween: false, retransitionSpeedMs: 0, lastAppliedValues: null, frozenSplayDeg: 0, pendingClaimAt: 0, armedForHoldStartTime: -1, pendingFrozenSplayDeg: 0, frozenSpeedMs: 0, pendingFrozenSpeedMs: 0, releasePending: false, stoppingStartTime: 0, stoppingStartDelay: 0, stoppingDelayMs: 1, stoppingLastFrameTime: 0, stoppingBaseElapsedMs: 0, stoppingVirtualElapsedMs: 0, stoppingWasLooping: false, stoppingLoopBaseSegments: null, stoppingFreezeAtEnd: false, offsetBaked: false, retransitionOffsetAccumStart: null, retransitionRotationAccumStart: null, pendingTweenFractionCap: 1, frozenTweenFractionCap: 1, fromSplayDeg: 0, pendingFromSplayDeg: 0, retransitionFromSplayDeg: 0 }
   })
   return hand._chp
 }
@@ -7524,6 +7526,26 @@ function computeOffsetXY(hand, p) {
       exZ = evalOffsetAxisSlot(axisSlots.Z, handDist)
     }
     return { x: (rightComp / len3) * (dist + exX), y: (upComp / len3) * (dist + exY), z: (forwardComp / len3) * (dist + exZ) }
+  }
+  if (cfg[`${p}OffsetMode`] === 'Hand Axes Offset') {
+    // Hand Axes Offset (2026-10-04, direct request: "a 3rd mode. It will use
+    // the hand instance's own XYZ axes as opposed to offsetting by world XYZ
+    // axes. So if the hand is rotated, the XY should be rotated as well").
+    // The same OffsetX/Y/Z sliders, but read as distances along the hand's
+    // OWN axes: the vector is rotated by the hand's orientation, then
+    // projected onto the camera right/up/forward basis the accumulator and
+    // apply path work in (an orthonormal basis, so this reproduces the world
+    // displacement exactly). The orientation is the one FROZEN at trigger
+    // time (`frozenHandQuat`) -- same convention as the camera offset's
+    // frozen distance -- so the live ramp, the full bake and the in-flight
+    // bake all rotate by the same quaternion; reading the live, cursor-
+    // tracking-driven rotation would make the baked amount differ from the
+    // amount shown the frame before and snap the hand. A hand that has not
+    // been triggered through this function falls back to its live rotation.
+    const st = (hand._cp && hand._cp[p]) || (hand._chp && hand._chp[p])
+    _handAxesOffsetVec.set(cfg[`${p}OffsetX`] || 0, cfg[`${p}OffsetY`] || 0, cfg[`${p}OffsetZ`] || 0)
+    _handAxesOffsetVec.applyQuaternion((st && st.frozenHandQuat) || hand.wrapper.quaternion)
+    return { x: _handAxesOffsetVec.dot(_offsetRightVec), y: _handAxesOffsetVec.dot(_offsetUpVec), z: _handAxesOffsetVec.dot(_offsetForwardVec) }
   }
   return { x: cfg[`${p}OffsetX`] || 0, y: cfg[`${p}OffsetY`] || 0, z: cfg[`${p}OffsetZ`] || 0 }
 }
@@ -7976,6 +7998,31 @@ function lerpLoopSequence(poses, tCyclic) {
   const localT = wrapped - segIndex
   return lerpPoseValues(poses[segIndex], poses[(segIndex + 1) % segments], localT)
 }
+// Loop-mode pose helpers shared by the 'looping' phase's bookkeeping and the
+// 'stopping' phase's deceleration of an already-cycling loop (2026-10-04,
+// direct report: "when the tween starts looping, as in on its 2nd or 3rd
+// loop, the tween stop settings no longer apply. It only applies to the first
+// playthrough of the sequence"). Duration of one named-pose segment, in ms.
+function loopSegmentMsFor(p, chp, trig) {
+  return (cfg[`${p}SpeedCurveEnabled`] && chp.frozenSpeedMs > 0)
+    ? Math.max(chp.frozenSpeedMs / Math.max(trig.loopPoses.length, 1), 1)
+    : trig.loopSegmentMs
+}
+// Pose at `elapsedSegments` segments into a lap that began in direction
+// `chp.loopDirection`. Unlike the live 'looping' phase this does NOT clamp at
+// the lap end: Loop keeps wrapping round the cycle and Oscillate bounces off
+// each end, so a decelerating hand keeps travelling through the sequence.
+function loopPoseValuesBeyondLap(p, chp, trig, elapsedSegments) {
+  if (cfg[`${p}LoopMode`] === 'Oscillate') {
+    const segments = trig.loopPoses.length - 1
+    const m = ((elapsedSegments / segments) % 2 + 2) % 2
+    const lapT = m <= 1 ? m : 2 - m // triangle wave: out, then back
+    const position = chp.loopDirection === 1 ? segments * lapT : segments * (1 - lapT)
+    return lerpTweenSequence(trig.loopPoses, (position / segments) * chp.frozenTweenFractionCap)
+  }
+  const segments = trig.loopPoses.length
+  return lerpLoopSequence(trig.loopPoses, (segments - 1) + elapsedSegments)
+}
 function computeStartDelayMs(distanceToCursor, minLiveDist, liveDistRange, curveParsed, rangeParsed) {
   const normDist = THREE.MathUtils.clamp((distanceToCursor - minLiveDist) / liveDistRange, 0, 1)
   const curveY = THREE.MathUtils.clamp(evaluateArmLengthCurve(curveParsed, normDist), 0, 1)
@@ -8365,6 +8412,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
       // recomputed live mid-transition. See makeClickHoldPoseGroup()'s own
       // control comment for the full reasoning.
       chp.pendingFrozenOffsetNorm = captureCameraOffsetNorm(hand)
+      chp.pendingFrozenHandQuat = hand.wrapper.quaternion.clone() // Hand Axes Offset (2026-10-04)
       chp.pendingFrozenSpeedMs = cfg[`${p}SpeedCurveEnabled`] ? computeStartDelayMs(handXYDist(hand), xyFieldMinDist, xyFieldDistRange, trig.speedCurveParsed, trig.speedRangeParsed) : 0
     }
   }
@@ -8417,6 +8465,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     chp.fromSplayDeg = chp.pendingFromSplayDeg // CORRECTED 2026-09-27 -- see the arm-time capture's own comment
     chp.frozenSpeedMs = chp.pendingFrozenSpeedMs
     chp.frozenOffsetNorm = chp.pendingFrozenOffsetNorm ?? 0
+    chp.frozenHandQuat = chp.pendingFrozenHandQuat || null
     chp.frozenTweenFractionCap = chp.pendingTweenFractionCap
     chp.pendingClaimAt = 0
     chp.releasePending = false // a NEW hold-claim always starts fresh, regardless of a stale flag from a previous release
@@ -8559,9 +8608,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     // Per-hand when the Speed Curve is on (2026-10-04) -- same division
     // across the named poses trig.loopSegmentMs uses, from this hand's own
     // frozen speed instead of the shared flat Tween Speed.
-    const loopSegMs = (cfg[`${p}SpeedCurveEnabled`] && chp.frozenSpeedMs > 0)
-      ? Math.max(chp.frozenSpeedMs / Math.max(trig.loopPoses.length, 1), 1)
-      : trig.loopSegmentMs
+    const loopSegMs = loopSegmentMsFor(p, chp, trig)
     const elapsedSegments = (now - chp.loopStartTime) / loopSegMs
     let values, lapT
     if (cfg[`${p}LoopMode`] === 'Oscillate') {
@@ -8643,10 +8690,20 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     const decayFactor = 1 - tDecay // linear ease-out to 0 -- "progressively slowdown to a stop"
     let values
     if (chp.stoppingWasLooping) {
-      // Disclosed simplification (see endClickHoldPose()'s own comment)
-      // -- an already-cycling hand just holds its release-moment pose
-      // for the whole delay rather than continuing to visibly animate.
-      values = chp.lastAppliedValues
+      // CORRECTED 2026-10-04 (was: hold the release-moment pose for the whole
+      // delay, so Tween Stop appeared to work only on the first playthrough).
+      // A hand released while looping now keeps travelling through the
+      // sequence at the same linearly-decaying rate a forward pass uses --
+      // the virtual-elapsed accumulator advances by dt * decayFactor and is
+      // converted to segments with the lap's own segment duration -- and
+      // comes to rest wherever that lands (Loop wraps round, Oscillate
+      // bounces). Falls back to the old hold if the sequence data is gone.
+      chp.stoppingVirtualElapsedMs += dt * decayFactor
+      if (chp.stoppingLoopBaseSegments != null && trig.loopPoses && trig.loopPoses.length >= 2) {
+        values = loopPoseValuesBeyondLap(p, chp, trig, chp.stoppingLoopBaseSegments + chp.stoppingVirtualElapsedMs / loopSegmentMsFor(p, chp, trig))
+      } else {
+        values = chp.lastAppliedValues
+      }
     } else {
       let speedMs = Math.max(animSpeedMs(p, true, chp.frozenSpeedMs), 1)
       // 2026-10-04: this phase continues the forward pass's progress, so it
@@ -9023,6 +9080,18 @@ function endClickHoldPose(p) {
       chp.stoppingLastFrameTime = now
       chp.stoppingWasLooping = chp.phase === 'looping'
       chp.stoppingBaseElapsedMs = chp.stoppingWasLooping ? 0 : Math.max(now - chp.forwardStartTime, 0)
+      // Released while looping: remember how many segments into the lap the
+      // hand was, so 'stopping' can keep it travelling and slow it down
+      // (2026-10-04) instead of freezing it for the whole delay. A hand
+      // released during the end-of-lap Hold Duration sits at the lap end.
+      if (chp.stoppingWasLooping && trig.loopPoses && trig.loopPoses.length >= 2) {
+        const lapSegments = cfg[`${p}LoopMode`] === 'Oscillate' ? trig.loopPoses.length - 1 : trig.loopPoses.length
+        chp.stoppingLoopBaseSegments = (chp.loopHoldEndTime && now < chp.loopHoldEndTime)
+          ? lapSegments
+          : Math.max(now - chp.loopStartTime, 0) / loopSegmentMsFor(p, chp, trig)
+      } else {
+        chp.stoppingLoopBaseSegments = null
+      }
       chp.stoppingVirtualElapsedMs = 0
       chp.stoppingFreezeAtEnd = retransitionOff
       // CORRECTED 2026-09-27 -- see bakeInFlightOffsetRotation()'s own
@@ -9391,6 +9460,7 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
     cp.fromSplayDeg = cp.pendingFromSplayDeg // CORRECTED 2026-09-27 -- see the arm-time capture's own comment
     cp.frozenSpeedMs = cp.pendingFrozenSpeedMs
     cp.frozenOffsetNorm = cp.pendingFrozenOffsetNorm ?? 0
+    cp.frozenHandQuat = cp.pendingFrozenHandQuat || null
     cp.frozenTweenFractionCap = cp.pendingTweenFractionCap
     cp.pendingClaimAt = 0
     cp.offsetBaked = false // a fresh ramp starts a fresh (not-yet-locked-in) increment
@@ -9715,6 +9785,7 @@ function triggerClickPose(p) {
     // Animation Speed Curve (Single Pose only) -- same "frozen at
     // trigger time" treatment as the splay above.
     cp.pendingFrozenOffsetNorm = captureCameraOffsetNorm(hand)
+    cp.pendingFrozenHandQuat = hand.wrapper.quaternion.clone() // Hand Axes Offset (2026-10-04)
     cp.pendingFrozenSpeedMs = cfg[`${p}SpeedCurveEnabled`] ? computeStartDelayMs(dists[i], minD, range, trig.speedCurveParsed, trig.speedRangeParsed) : 0
   })
 }
@@ -11755,7 +11826,7 @@ function buildMultiTriggerControlsForPrefix(prefix, title, kind) {
 // once for custom click functions generally (see this same file's
 // `lastRestoredValues`/devPanel.js fix) -- a real visitor must be able
 // to fire every trigger correctly with no panel ever built.
-function registerMultiTriggerTrigger(prefix, title, mtBody, addBtnRow, kind) {
+function registerMultiTriggerTrigger(prefix, title, mtBody, addBtnRow, kind, seedFromId) {
   if (kind === 'hold') {
     if (!CLICK_HOLD_KEYS.includes(prefix)) CLICK_HOLD_KEYS.push(prefix)
     if (!clickHoldPoseTriggers[prefix]) {
@@ -11791,7 +11862,14 @@ function registerMultiTriggerTrigger(prefix, title, mtBody, addBtnRow, kind) {
     }
   }
   const controls = buildMultiTriggerControlsForPrefix(prefix, title, kind)
-  const g = renderDynamicGroup({ title, controls }) // seeds cfg regardless of DOM; returns null with no panel
+  // seedFromId (2026-10-04, direct request "when i add a trigger in the multi
+  // trigger group, the new trigger settings will be a duplicate of the
+  // settings of the base click function"): only passed by a freshly ADDED
+  // trigger, never by a page-load restore (a restored trigger takes its
+  // saved values). Each control starts as a copy of the base function's
+  // matching `${id}${suffix}` control, on every device.
+  const seedFrom = seedFromId ? (c) => `${seedFromId}${c.key.slice(prefix.length)}` : undefined
+  const g = renderDynamicGroup({ title, controls, seedFrom }) // seeds cfg regardless of DOM; returns null with no panel
   if (kind === 'hold') parseClickHoldConfig(prefix); else parseClickPoseConfig(prefix) // pure cfg read -- needed regardless of DOM for real dispatch to work
   if (!g || !mtBody) return
   // CORRECTED before ever shipping (caught by re-reading createGroupElement()'s
@@ -11920,7 +11998,7 @@ function addMultiTriggerTrigger(id, kind) {
   const realMtGroup = functionBody ? functionBody.querySelector(':scope > .dp-group[data-key="Multi Trigger"]') : null
   const mtBody = realMtGroup ? realMtGroup.querySelector(':scope > .dp-group-body') : null
   const addBtnRow = mtBody ? mtBody.querySelector(':scope > .dp-multi-trigger-add-row') : null
-  registerMultiTriggerTrigger(prefix, title, mtBody, addBtnRow, kind)
+  registerMultiTriggerTrigger(prefix, title, mtBody, addBtnRow, kind, id)
   saveCurrentSettings()
 }
 // Reads the LIVE DOM order of this function's own trigger sub-groups and

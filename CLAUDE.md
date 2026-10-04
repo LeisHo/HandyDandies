@@ -2346,4 +2346,15 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   on (`getEasingProfile()`/`easingProfilePAt()`); do not add a second place that
   reads `animSpeedMs()` for a forward-progress timeline without also applying the
   profile (the hold 'stopping' phase needed it to avoid a snap).
-
+- **Tween Stop on a LOOPING hand (2026-10-04).** The 'stopping' phase used to
+  freeze a hand released during loop 2+ (so Tween Stop seemed to work only on the
+  first playthrough). It now keeps advancing the loop via
+  `loopPoseValuesBeyondLap()` from `chp.stoppingLoopBaseSegments`. If you add
+  another place that computes the loop pose, use `loopSegmentMsFor()` for the
+  segment duration rather than re-deriving the Speed Curve split.
+- **`renderDynamicGroup({ seedFrom })` (2026-10-04)** lets a new dynamic control
+  start as a copy of another control's current per-device values (used by Multi
+  Trigger "+ Add Trigger"). Only pass it for a freshly created group, never on a
+  page-load restore, or it would be skipped anyway (saved values win) but would
+  read confusingly. Offset Mode now has a 3rd value, 'Hand Axes Offset', which
+  uses `chp/cp.frozenHandQuat` captured at arm/commit time.

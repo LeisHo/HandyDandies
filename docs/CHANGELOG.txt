@@ -16019,6 +16019,61 @@ reversed min/max; tween bounds; cache reuse/rebuild). Not run in a browser.
 
 `main.js` cache-buster `?v=281` -> `?v=282`.
 
+2026-10-04  -  (3 changes: Hand Axes Offset mode; Multi Trigger "add" duplicates
+the base function; Tween Stop now slows a LOOPING hand)
+
+1) Hand Axes Offset -- a 3rd OffsetMode on every click function ("XYZ Offset" /
+"Cursor Offset" / "Hand Axes Offset"). Direct request: "use the hand instance's
+own XYZ axes as opposed to offsetting by world XYZ axes. So if the hand is
+rotated, the XY should be rotated as well." The same OffsetX/Y/Z sliders, read
+as distances along the hand's OWN axes: the vector is rotated by the hand's
+orientation and then projected onto the camera right/up/forward basis the
+accumulator already works in. The orientation used is the one FROZEN at trigger
+time (`pendingFrozenHandQuat` -> `frozenHandQuat`, next to the frozen camera-
+offset distance), so the live ramp, the full bake and the in-flight bake all use
+the same quaternion -- reading the live, cursor-tracking-driven rotation would
+make the baked amount differ from what was shown a frame earlier and snap the
+hand. A hand not triggered through the function falls back to its live rotation.
+
+2) Multi Trigger "+ Add Trigger" now duplicates the base click function. Direct
+request: "the new trigger settings will be a duplicate of the settings of the
+base click function." `renderDynamicGroup()` (devPanel.js) gained an optional
+`groupSpec.seedFrom(ctrl)`; a freshly added trigger passes the base function's id
+so every allowed control starts as a copy of `${id}${suffix}` on every device
+(Desktop/Mobile/Landscape). A trigger restored on page load does NOT pass it, so
+saved values still win. The copy includes the base's Enabled flag and Mode.
+
+3) Tween Stop on loops 2+ (bug). Direct report: "when the tween starts looping,
+as in on its 2nd or 3rd loop, the tween stop settings no longer apply. It only
+applies to the first playthrough of the sequence." Cause: a documented
+simplification in `endClickHoldPose()` -- a hand released while in 'looping'
+simply HELD its release pose for the whole stop delay, so Tween Stop's
+deceleration only ever animated during the first forward pass. Now the release
+records how many segments into the lap the hand was
+(`stoppingLoopBaseSegments`; a release during the end-of-lap Hold Duration counts
+as the lap end) and the 'stopping' phase keeps advancing the loop at the same
+linearly-decaying rate a forward pass uses, via the new
+`loopPoseValuesBeyondLap()` / `loopSegmentMsFor()` helpers. Loop mode keeps
+wrapping round the cycle; Oscillate bounces off the ends. The stop Start Time /
+Delay curves, Retransition and Freeze-at-end behave exactly as for a first-pass
+stop. `loopSegmentMsFor()` is now also what the live 'looping' phase uses, so the
+segment duration has one definition.
+
+Disclosed: with the linear decay a stop of length D travels D/2 of virtual time,
+so how many poses it passes depends on Tween Stop Delay vs. the segment speed.
+Offset/Rotation do not continue to ramp during the stop (unchanged: 'stopping'
+bakes what was shown and applies none).
+
+Verified: `node --check` (main.js, devPanel.js) and `tests/top-level-load-check.js`
+pass; a 16-assert test slicing the REAL `computeOffsetXY` and loop helpers out of
+main.js passes (identity == XYZ mode; 90 degrees about Z maps hand-X to world-Y;
+frozen quaternion beats live; XYZ mode unchanged; Loop wraps and is not clamped
+at the lap end; Oscillate is a triangle wave in both directions; segment-ms
+helper with and without the Speed Curve). Not run in a browser (local server
+truncates main.js).
+
+`main.js` cache-buster `?v=282` -> `?v=283`, `devPanel.js` `?v=54` -> `?v=55`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

@@ -1868,9 +1868,16 @@ export function renderDynamicGroup(groupSpec) {
   const real = realDeviceClass()
   groupSpec.controls.forEach((c) => {
     if (cfg[c.key] !== undefined) return
+    // Optional `groupSpec.seedFrom(ctrl)` -> another control's key: a brand-new
+    // control starts as a copy of that control's CURRENT value on every
+    // device (2026-10-04, Multi Trigger "new trigger duplicates the base
+    // click function"). A value restored from saved settings still wins, and
+    // the control's own `def` is the fallback when the source has none.
+    const srcKey = groupSpec.seedFrom ? groupSpec.seedFrom(c) : undefined
     DEVICES.forEach((d) => {
       const restored = lastRestoredValues && lastRestoredValues[d] ? lastRestoredValues[d][c.key] : undefined
-      store[d][c.key] = restored !== undefined ? restored : c.def
+      const copied = srcKey && store[d] ? store[d][srcKey] : undefined
+      store[d][c.key] = restored !== undefined ? restored : (copied !== undefined ? copied : c.def)
     })
     cfg[c.key] = store[real][c.key]
   })
