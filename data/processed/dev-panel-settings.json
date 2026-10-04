@@ -6539,8 +6539,8 @@
           "group": "FIST ROTATE"
         }
       ],
-      "cameraX": 3.587196433859648,
-      "cameraY": 7.226320177572673,
+      "cameraX": 3.5871964338596483,
+      "cameraY": 7.226320177572674,
       "cameraZ": 140.3541779670616,
       "cameraFov": 35,
       "cameraZoom": 260.17068872666084,
@@ -25060,7 +25060,7 @@
     },
     {
       "key": "Debug",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -25261,7 +25261,7 @@
           "type": "group",
           "group": {
             "key": "Loading Preview",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -25645,7 +25645,7 @@
         },
         {
           "key": "Loading Preview",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
@@ -100340,5 +100340,13 @@
     },
     "landscape": {}
   },
-  "devHotkeys": {}
+  "devHotkeys": {},
+  "panelGeometry": {
+    "desktop": {
+      "left": 1048,
+      "top": 18.387500762939453,
+      "width": 331.20001220703125,
+      "height": 711.6000366210938
+    }
+  }
 }
