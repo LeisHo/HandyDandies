@@ -7,7 +7,7 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js'
 import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js'
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js'
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js'
-import { initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab, beginDynamicBatch, endDynamicBatch } from './devpanel/devPanel.js?v=58'
+import { initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab, beginDynamicBatch, endDynamicBatch } from './devpanel/devPanel.js?v=59'
 
 // A defensive wrapper around devPanel.js's own refreshSelectOptions() --
 // found via live testing (direct user report: "I dont see any of the
@@ -523,6 +523,15 @@ let startupPreviewBuilt = false // see maybeBuildStartupLoadingPreview()
 const STARTUP_CACHE_KEY = 'handyDandies.startupCache.v1'
 const STARTUP_BG_KEY = 'handyDandies.startupBg'
 let startupCacheApplied = false
+// Field build state (2026-10-04). The 156 hands are now created in frame-sized
+// slices behind the animating loading hand and only swapped into the scene at the
+// reveal; until fieldBuildAllowed, Field Layout onChanges (fired by the settings
+// restore) must not build anything.
+let fieldBuildAllowed = false
+let fieldBuildStarted = false
+let fieldBuildDone = false
+let fieldBuildInProgress = false
+let fieldBuildDirty = false
 let startupCacheSnapshot = null
 let fieldStarted = false
 // Loading Preview's own "Min Loading Time" (direct request) -- captured
@@ -624,6 +633,21 @@ function tryStartField() {
   // is on -- see the control's own DEV_GROUPS comment for why an
   // artificial delay with nothing to show isn't what was asked for.
   logStartupTiming(`tryStartField() gates passed, loadingPreviewEnabled=${cfg.loadingPreviewEnabled}`)
+  // Build the hand field NOW, in slices behind the loading screen, instead of in one
+  // block at the reveal (2026-10-04). The reveal below waits for it to finish.
+  if (!fieldBuildStarted) {
+    fieldBuildStarted = true
+    fieldBuildAllowed = true
+    logLoadingPreview('settings ready -- building the hand field in slices behind the loading screen')
+    rebuildFieldChunked().then(() => { fieldBuildDone = true; tryStartField() }).catch((err) => {
+      console.error('Chunked field build failed -- falling back to a synchronous build:', err)
+      fieldBuildInProgress = false
+      rebuildField()
+      fieldBuildDone = true
+      tryStartField()
+    })
+  }
+  if (!fieldBuildDone) return
   if (cfg.loadingPreviewEnabled) {
     const minMs = Math.max(0, cfg.loadingMinTimeMs || 0)
     const elapsed = performance.now() - pageLoadStartMs
@@ -666,7 +690,7 @@ function tryStartField() {
   fieldStarted = true
   logStartupTiming('fieldStarted = true')
   logLoadingPreview(`field starting -- loading screen hides; preview ${cfg.loadingPreviewShowLive ? 'stays visible (Show Loading Preview is on)' : 'is hidden'}`)
-  rebuildField()
+  // (the field itself was built in slices earlier -- see rebuildFieldChunked())
   buildPosePreview()
   // ROOT CAUSE of the REAL startup jank, found 2026-09-16 after the
   // settings-restore-race fix above turned out NOT to be it (direct user
@@ -2057,7 +2081,7 @@ const cfg = initDevPanel(DEV_GROUPS, {
   // declaration comment) -- the field now only ever builds once, using
   // these real values, instead of building once with code defaults and
   // visibly rebuilding again the moment this fires.
-  onRestore: () => {
+  onRestore: async () => {
     logStartupTiming('onRestore fired -> startupSettingsReady = true')
     // Each step timed when ?debugTiming=1 (see devPanel.js dpTime()).
     const prof = (label, fn) => {
@@ -2067,7 +2091,9 @@ const cfg = initDevPanel(DEV_GROUPS, {
     }
     prof('migrateModeTweenToSequence', migrateModeTweenToSequence)
     prof('resyncPoseDefaultValues', resyncPoseDefaultValues)
-    prof('restoreCustomClickFunctions', restoreCustomClickFunctions)
+    const tCcf = performance.now()
+    await restoreCustomClickFunctions() // sliced: one function per frame
+    if (DEBUG_TIMING) (window.__dpProfile = window.__dpProfile || []).push({ label: 'restoreCustomClickFunctions (wall, sliced)', atMs: Math.round(tCcf), ms: Math.round(performance.now() - tCcf) })
     prof('enforceCustomClickFunctionsAnchorOrder', enforceCustomClickFunctionsAnchorOrder)
     startupSettingsReady = true
     prof('refreshStartupPreviewAfterRestore', refreshStartupPreviewAfterRestore)
@@ -11894,7 +11920,7 @@ function addCustomClickFunction() {
 // closest-to-top ordering (confirmed by tracing through: inserting A then
 // B at the front each time leaves the order B, A, matching what live
 // creation of A-then-B would have produced).
-function restoreCustomClickFunctions() {
+async function restoreCustomClickFunctions() {
   let saved = []
   try { saved = JSON.parse(cfg.customClickFunctionIds || '[]') } catch (e) { /* leave empty -- malformed value, nothing to restore */ }
   if (!Array.isArray(saved)) saved = []
@@ -11922,12 +11948,15 @@ function restoreCustomClickFunctions() {
   // Batched (2026-10-04, startup perf): see beginDynamicBatch() in devPanel.js.
   beginDynamicBatch()
   try {
-    saved.forEach((entry) => {
-      if (!entry || !entry.id) return
+    // One function per frame (2026-10-04): this is ~100-300 ms each in dev mode,
+    // and as a single block it froze the loading hand for ~2 s.
+    for (const entry of saved) {
+      if (!entry || !entry.id) continue
       registerCustomClickFunction(entry.id, entry.title || entry.id, entry.kind || 'pose', entry.family || 'desktop')
       const m = /^custom(\d+)$/.exec(entry.id)
       if (m) maxN = Math.max(maxN, parseInt(m[1], 10))
-    })
+      await yieldFrame()
+    }
   } finally { endDynamicBatch() }
   nextCustomFunctionN = maxN + 1
   // Reapply collapse state to newly-rebuilt custom function groups -- they
@@ -13394,7 +13423,7 @@ function computeBaseScale() {
 
 function relayoutField() {
   // 2026-10-04: nothing to lay out until the field exists (see rebuildField()).
-  if (!modelLoaded || !fieldStarted) return
+  if (!modelLoaded || !fieldBuildAllowed || fieldBuildInProgress) return
   const rows = cfg.fieldRows, cols = cfg.fieldCols
   const rowSpacing = cfg.rowSpacing, colSpacing = cfg.columnSpacing
   const scaleFactor = computeBaseScale()
@@ -13438,106 +13467,96 @@ function relayoutField() {
 // framing (direct request: "Field layout shouldn't affect view scale") --
 // that framing is derived from the field's size exactly ONCE (framedOnce),
 // the very first time hands are built, and never revisited after that.
-function rebuildField() {
-  // 2026-10-04, startup perf + visual bug: this used to run on every restored
-  // Field Layout / model-rotation onChange as soon as the model had loaded --
-  // measured 100-200 ms EACH during the settings restore, and it put all 156
-  // hands into the scene while the loading screen was still up. tryStartField()
-  // sets fieldStarted and then calls this once with the final restored values.
-  if (!modelLoaded || !fieldStarted) return
-  hands.forEach((hand) => scene.remove(hand.wrapper))
-  hands.length = 0
-  const total = cfg.fieldRows * cfg.fieldCols
-  for (let i = 0; i < total; i++) {
-    const clone = cloneSkeletal(modelRoot)
-    clone.quaternion.copy(alignQuat)
-    const skinnedMesh = findSkinnedMesh(clone)
-    // Own Plane + own cloned material per hand -- see
-    // updateWristClipPlaneForHand()'s own corrected comment for why a
-    // shared material/plane silently discarded almost every hand's mesh.
-    const handWristClipPlane = new THREE.Plane()
-    if (skinnedMesh && toonMaterial) {
-      skinnedMesh.material = toonMaterial.clone()
-      skinnedMesh.material.clippingPlanes = [handWristClipPlane]
-      // `Material.clone()`/`.copy()` does NOT carry over a custom
-      // `onBeforeCompile` override -- it isn't part of the property list
-      // three.js's own `copy()` handles, so a clone silently reverts to
-      // the prototype's no-op default. CONFIRMED live (user-reported: Key
-      // Light color "no longer working" -- white showed real texture
-      // colors, red visibly tinted, meaning the rim-light/toon-tint
-      // duotone blend from createToonMaterial()'s own onBeforeCompile had
-      // gone missing): read back a field hand's own actual compiled
-      // fragment shader source post-fix-1 (the customProgramCacheKey
-      // removal, which did NOT fix this) and confirmed it contained none
-      // of the injected code at all. Re-assigning the function reference
-      // explicitly after cloning is the fix.
-      skinnedMesh.material.onBeforeCompile = toonMaterial.onBeforeCompile
-    }
-    const outlineMesh = skinnedMesh ? buildOutlineMesh(skinnedMesh) : null
-    if (outlineMesh) { outlineMesh.material.clippingPlanes = [handWristClipPlane]; clone.add(outlineMesh) }
-    // Emission Material outline mechanic (2026-09-24) -- unlike outlineMesh
-    // above, this mesh is NOT built here; it's HandyOL.glb's own 2nd
-    // skinned primitive, already a child of `clone` from the GLTF load
-    // itself (see findOutlineMaterialMesh()'s own comment) -- just give it
-    // its own per-hand material/clippingPlanes, same as the fill mesh.
-    // `null` on any model without an 'OUTLINE' material (e.g. Hand2.glb).
-    const emissionMesh = findOutlineMaterialMesh(clone)
-    if (emissionMesh) {
-      emissionMesh.material = ensureEmissionMaterial().clone()
-      emissionMesh.material.clippingPlanes = [handWristClipPlane]
-      emissionMesh.visible = false // updateOutlineVisibility() (below) decides the real state
-    }
-    // Depth-buffer-per-hand technique: both materials keep depthTest ON
-    // (see createToonMaterial()'s own note) so a hand's own geometry
-    // self-occludes correctly, but the depth buffer is wiped immediately
-    // before each hand's own draw call -- so cross-hand stacking is still
-    // decided purely by draw order (renderOrder, from cursor distance,
-    // see updateRenderOrder()) rather than real camera depth, same as
-    // before. Attached to BOTH meshes (not just one) because the outline
-    // mesh is sometimes invisible (`updateOutlineVisibility()`) and
-    // `onBeforeRender` never fires for an invisible object -- the fill
-    // mesh's own clear must not depend on the outline mesh having run.
-    // renderOrder ordering (outline drawn first, epsilon below fill, see
-    // updateRenderOrder()) means fill's clear simply re-clears again right
-    // after -- harmless, since the outline shell is deliberately expanded
-    // (`outlineThickness`) to sit entirely behind the fill surface anyway.
-    const wrapper = new THREE.Group()
-    wrapper.add(clone)
-    scene.add(wrapper)
-    // `currentBaseQuat`: this hand's OWN, per-hand current Whole-Hand-
-    // Rotation basis -- see the "per-hand Whole-Hand Rotation during
-    // pose transitions" section (near applyPoseValuesToHand()) for why
-    // this exists as a per-hand field at all, instead of every hand
-    // simply reading the single shared `cloneBaseQuat` the way this
-    // project did before that feature. Initialized to the current shared
-    // value; kept in sync with it every frame for any hand NOT actively
-    // mid pose-transition (see updateRenderOrder()'s own per-hand loop).
-    // `everReposed`: see updateRenderOrder()'s own `needsIdleRepose` gate
-    // comment -- ROOT CAUSE of a real production bug (direct user report,
-    // 2026-09-15: "weird surface texture... rotation looks off" on
-    // startup, fixed by any 1 click). `currentBaseQuat` right above is
-    // seeded from `cloneBaseQuat` at THIS exact moment -- if that's still
-    // its own module-load-time identity default (cfg not fully restored
-    // yet when the field first builds), every hand's own `currentBaseQuat`
-    // freezes on that stale identity forever, UNLESS something re-syncs
-    // it. Before the idle-repose performance gate existed, that re-sync
-    // ran unconditionally every single frame, so a stale snapshot self-
-    // corrected within 1 frame, invisibly. The gate broke that guarantee
-    // for anyone with Responsive Wrist Splay off -- `everReposed` restores
-    // it explicitly: false until a hand's first REAL repose, forcing
-    // exactly one guaranteed full sync regardless of the gate's other
-    // conditions, then never forced again.
-    const hand = { wrapper, clone, skinnedMesh, outlineMesh, emissionMesh, wristClipPlane: handWristClipPlane, effectiveRenderOrder: 0, screenX: 0, screenY: 0, screenRadius: 0, currentBaseQuat: cloneBaseQuat.clone(), everReposed: false, currentSplayDeg: 0, _handoffSettleFrames: 0, _idleSettleFrom: null, _idleSettleFromSplay: 0, _idleSettleStartTime: 0 }
-    // Also recomputes this hand's OWN Hide Wrist clip plane right before
-    // it draws (see updateWristClipPlaneForHand()'s own comment) -- every
-    // hand faces a different direction and (own material/plane now, see
-    // above) can genuinely hold its own clip state independent of every
-    // other hand.
-    if (skinnedMesh) skinnedMesh.onBeforeRender = (r) => { updateWristClipPlaneForHand(hand); r.clearDepth() }
-    if (outlineMesh) outlineMesh.onBeforeRender = (r) => { updateWristClipPlaneForHand(hand); r.clearDepth() }
-    if (emissionMesh) emissionMesh.onBeforeRender = (r) => { updateWristClipPlaneForHand(hand); r.clearDepth() }
-    hands.push(hand)
+function createFieldHand() {
+  const clone = cloneSkeletal(modelRoot)
+  clone.quaternion.copy(alignQuat)
+  const skinnedMesh = findSkinnedMesh(clone)
+  // Own Plane + own cloned material per hand -- see
+  // updateWristClipPlaneForHand()'s own corrected comment for why a
+  // shared material/plane silently discarded almost every hand's mesh.
+  const handWristClipPlane = new THREE.Plane()
+  if (skinnedMesh && toonMaterial) {
+    skinnedMesh.material = toonMaterial.clone()
+    skinnedMesh.material.clippingPlanes = [handWristClipPlane]
+    // `Material.clone()`/`.copy()` does NOT carry over a custom
+    // `onBeforeCompile` override -- it isn't part of the property list
+    // three.js's own `copy()` handles, so a clone silently reverts to
+    // the prototype's no-op default. CONFIRMED live (user-reported: Key
+    // Light color "no longer working" -- white showed real texture
+    // colors, red visibly tinted, meaning the rim-light/toon-tint
+    // duotone blend from createToonMaterial()'s own onBeforeCompile had
+    // gone missing): read back a field hand's own actual compiled
+    // fragment shader source post-fix-1 (the customProgramCacheKey
+    // removal, which did NOT fix this) and confirmed it contained none
+    // of the injected code at all. Re-assigning the function reference
+    // explicitly after cloning is the fix.
+    skinnedMesh.material.onBeforeCompile = toonMaterial.onBeforeCompile
   }
+  const outlineMesh = skinnedMesh ? buildOutlineMesh(skinnedMesh) : null
+  if (outlineMesh) { outlineMesh.material.clippingPlanes = [handWristClipPlane]; clone.add(outlineMesh) }
+  // Emission Material outline mechanic (2026-09-24) -- unlike outlineMesh
+  // above, this mesh is NOT built here; it's HandyOL.glb's own 2nd
+  // skinned primitive, already a child of `clone` from the GLTF load
+  // itself (see findOutlineMaterialMesh()'s own comment) -- just give it
+  // its own per-hand material/clippingPlanes, same as the fill mesh.
+  // `null` on any model without an 'OUTLINE' material (e.g. Hand2.glb).
+  const emissionMesh = findOutlineMaterialMesh(clone)
+  if (emissionMesh) {
+    emissionMesh.material = ensureEmissionMaterial().clone()
+    emissionMesh.material.clippingPlanes = [handWristClipPlane]
+    emissionMesh.visible = false // updateOutlineVisibility() (below) decides the real state
+  }
+  // Depth-buffer-per-hand technique: both materials keep depthTest ON
+  // (see createToonMaterial()'s own note) so a hand's own geometry
+  // self-occludes correctly, but the depth buffer is wiped immediately
+  // before each hand's own draw call -- so cross-hand stacking is still
+  // decided purely by draw order (renderOrder, from cursor distance,
+  // see updateRenderOrder()) rather than real camera depth, same as
+  // before. Attached to BOTH meshes (not just one) because the outline
+  // mesh is sometimes invisible (`updateOutlineVisibility()`) and
+  // `onBeforeRender` never fires for an invisible object -- the fill
+  // mesh's own clear must not depend on the outline mesh having run.
+  // renderOrder ordering (outline drawn first, epsilon below fill, see
+  // updateRenderOrder()) means fill's clear simply re-clears again right
+  // after -- harmless, since the outline shell is deliberately expanded
+  // (`outlineThickness`) to sit entirely behind the fill surface anyway.
+  const wrapper = new THREE.Group()
+  wrapper.add(clone)
+  // `currentBaseQuat`: this hand's OWN, per-hand current Whole-Hand-
+  // Rotation basis -- see the "per-hand Whole-Hand Rotation during
+  // pose transitions" section (near applyPoseValuesToHand()) for why
+  // this exists as a per-hand field at all, instead of every hand
+  // simply reading the single shared `cloneBaseQuat` the way this
+  // project did before that feature. Initialized to the current shared
+  // value; kept in sync with it every frame for any hand NOT actively
+  // mid pose-transition (see updateRenderOrder()'s own per-hand loop).
+  // `everReposed`: see updateRenderOrder()'s own `needsIdleRepose` gate
+  // comment -- ROOT CAUSE of a real production bug (direct user report,
+  // 2026-09-15: "weird surface texture... rotation looks off" on
+  // startup, fixed by any 1 click). `currentBaseQuat` right above is
+  // seeded from `cloneBaseQuat` at THIS exact moment -- if that's still
+  // its own module-load-time identity default (cfg not fully restored
+  // yet when the field first builds), every hand's own `currentBaseQuat`
+  // freezes on that stale identity forever, UNLESS something re-syncs
+  // it. Before the idle-repose performance gate existed, that re-sync
+  // ran unconditionally every single frame, so a stale snapshot self-
+  // corrected within 1 frame, invisibly. The gate broke that guarantee
+  // for anyone with Responsive Wrist Splay off -- `everReposed` restores
+  // it explicitly: false until a hand's first REAL repose, forcing
+  // exactly one guaranteed full sync regardless of the gate's other
+  // conditions, then never forced again.
+  const hand = { wrapper, clone, skinnedMesh, outlineMesh, emissionMesh, wristClipPlane: handWristClipPlane, effectiveRenderOrder: 0, screenX: 0, screenY: 0, screenRadius: 0, currentBaseQuat: cloneBaseQuat.clone(), everReposed: false, currentSplayDeg: 0, _handoffSettleFrames: 0, _idleSettleFrom: null, _idleSettleFromSplay: 0, _idleSettleStartTime: 0 }
+  // Also recomputes this hand's OWN Hide Wrist clip plane right before
+  // it draws (see updateWristClipPlaneForHand()'s own comment) -- every
+  // hand faces a different direction and (own material/plane now, see
+  // above) can genuinely hold its own clip state independent of every
+  // other hand.
+  if (skinnedMesh) skinnedMesh.onBeforeRender = (r) => { updateWristClipPlaneForHand(hand); r.clearDepth() }
+  if (outlineMesh) outlineMesh.onBeforeRender = (r) => { updateWristClipPlaneForHand(hand); r.clearDepth() }
+  if (emissionMesh) emissionMesh.onBeforeRender = (r) => { updateWristClipPlaneForHand(hand); r.clearDepth() }
+  return hand
+}
+function finishRebuildField() {
   relayoutField()
   // relayoutField() only recomputes clone.position/scale -- a freshly
   // rebuilt hand's own skeleton is a brand-new (bind-pose) clone, so every
@@ -13554,6 +13573,59 @@ function rebuildField() {
     sceneState.fieldRadius = Math.max(Math.sqrt(w * w + h * h) / 2, Math.min(cfg.rowSpacing, cfg.columnSpacing))
     updateKeyLightPosition()
   }
+}
+function rebuildField() {
+  // 2026-10-04, startup perf + visual bug: this used to run on every restored
+  // Field Layout / model-rotation onChange as soon as the model had loaded --
+  // measured 100-200 ms EACH during the settings restore, and it put all 156
+  // hands into the scene while the loading screen was still up. Nothing is built
+  // until startup allows it (fieldBuildAllowed); a change that arrives while the
+  // sliced startup build is running is replayed once it finishes.
+  if (!modelLoaded || !fieldBuildAllowed) return
+  if (fieldBuildInProgress) { fieldBuildDirty = true; return }
+  hands.forEach((hand) => scene.remove(hand.wrapper))
+  hands.length = 0
+  const total = cfg.fieldRows * cfg.fieldCols
+  for (let i = 0; i < total; i++) {
+    const hand = createFieldHand()
+    scene.add(hand.wrapper)
+    hands.push(hand)
+  }
+  finishRebuildField()
+}
+// Yields one animation frame (or 50 ms if rAF is not ticking, e.g. a background tab).
+function yieldFrame() {
+  return new Promise((resolve) => {
+    let done = false
+    const go = () => { if (!done) { done = true; resolve() } }
+    requestAnimationFrame(go)
+    setTimeout(go, 50)
+  })
+}
+// Startup version of rebuildField(): creates the hands in ~6 ms slices (one per
+// frame) so the loading-screen preview keeps animating, keeps them OUT of the scene
+// until all exist, then swaps them in together and runs the normal tail. Measured
+// before this: the synchronous build froze the loading hand for ~0.7 s right
+// before the reveal.
+async function rebuildFieldChunked() {
+  fieldBuildInProgress = true
+  const total = cfg.fieldRows * cfg.fieldCols
+  const pending = []
+  const t0All = performance.now()
+  let slices = 0
+  while (pending.length < total) {
+    const t0 = performance.now()
+    do { pending.push(createFieldHand()) } while (pending.length < total && performance.now() - t0 < 6)
+    slices++
+    await yieldFrame()
+  }
+  hands.forEach((hand) => scene.remove(hand.wrapper))
+  hands.length = 0
+  pending.forEach((hand) => { scene.add(hand.wrapper); hands.push(hand) })
+  fieldBuildInProgress = false
+  finishRebuildField()
+  logLoadingPreview(`field built behind the loading screen: ${total} hands in ${slices} slices over ${Math.round(performance.now() - t0All)}ms`)
+  if (fieldBuildDirty) { fieldBuildDirty = false; rebuildField() }
 }
 
 // -----------------------------------------------------------------------

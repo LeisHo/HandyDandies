@@ -3329,7 +3329,7 @@ export function initDevPanel(groups, opts = {}) {
   saveSettingsRef = saveSettings
   function resetSettings() {
     if (opts.remoteSave) {
-      fetchRemoteSettingsUntilSuccess(opts.remoteSave, (settings) => {
+      fetchRemoteSettingsUntilSuccess(opts.remoteSave, async (settings) => {
         dpTime('applyOrder', () => applyOrder(groupsEl, settings.order))
         devVisibility = settings.devVisibility || {}
         devIndependence = settings.devIndependence || { mobile: {}, landscape: {} }
@@ -3352,7 +3352,9 @@ export function initDevPanel(groups, opts = {}) {
         // code defaults on every single page load, never the real
         // saved/remote default) -- this hook is the generic fix, not
         // specific to that one host's own field name.
-        if (opts.onRestore) dpTime('onRestore (host callback)', () => opts.onRestore())
+        // Awaited (2026-10-04): the host restores its dynamic groups in frame-sized
+        // slices so the loading-screen preview keeps animating.
+        if (opts.onRestore) await dpTime('onRestore (host callback)', () => opts.onRestore())
         if (settings.extra !== undefined && devSaveApplyExtra) devSaveApplyExtra(settings.extra)
         // Saved panel size/position for this device class (2026-10-04).
         const savedGeom = settings.panelGeometry && settings.panelGeometry[realDeviceClass()]
