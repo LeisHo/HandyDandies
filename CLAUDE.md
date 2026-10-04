@@ -2293,3 +2293,15 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   comment). If this extension is ever requested, read both phases' full
   bodies again first; don't assume the 'forward'-phase pattern transfers
   mechanically to a per-lap context without re-checking.
+- **Curve method and graph opacity live on the FIRST POINT of a saved curve's
+  JSON array (`m`, `bg`), not in a wrapper object (2026-10-04).** Every curve
+  in this file is a plain `[{x,y,...}]` JSON array and a dozen call sites do
+  `JSON.parse(...).sort(...)` on it, so the template's `{points, method,
+  bgOpacity}` shape was deliberately NOT adopted. `evaluateArmLengthCurve()`
+  reads `points[0].m` (default 'monotone'); both keys are deleted at their
+  defaults so an untouched curve's saved JSON is unchanged. Anything that
+  rebuilds or reorders a points array (Mirror X, a new widget, a copy
+  routine) must carry `m`/`bg` to the new first point -- `attachCurveEditorExtras()`
+  does this for its own Mirror buttons. The 2 plain-slider/range-bar template
+  items were already in the project before this round, so don't re-port them.
+

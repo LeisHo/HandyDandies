@@ -6082,25 +6082,130 @@ function curveHermiteY(p1, p2, m1, m2, x) {
   const h00 = 2 * t3 - 3 * t2 + 1, h10 = t3 - 2 * t2 + t, h01 = -2 * t3 + 3 * t2, h11 = t3 - t2
   return h00 * p1.y + h10 * dx * m1 + h01 * p2.y + h11 * dx * m2
 }
+// Curve interpolation METHODS (2026-10-04, ported from
+// TEMPLATE_DEV_PANEL.html's curve editor -- direct request "look at the dev
+// panel template and integrate the ui for the curve editors"). The method
+// is stored as `m` on the FIRST point of the saved JSON array (omitted for
+// the default 'monotone', so every pre-existing saved curve is byte-for-byte
+// unchanged and still evaluates exactly as before). A point's own bezier
+// handle (h1/h2) still overrides the method for that one segment.
+const CURVE_METHOD_OPTIONS = [
+  { value: 'monotone', text: 'Monotone Cubic (Smooth, No Overshoot)' },
+  { value: 'catmullrom', text: 'Catmull-Rom (Classic)' },
+  { value: 'natural', text: 'Natural Cubic Spline (Smooth, Global)' },
+  { value: 'linear', text: 'Linear' },
+  { value: 'sine', text: 'Sine (Ease In-Out)' },
+  { value: 'bezier', text: 'Bezier (Ease In-Out)' },
+  { value: 'constant', text: 'Constant (Stepped)' },
+  { value: 'exponential', text: 'Exponential (Ease In-Out)' },
+  { value: 'logarithmic', text: 'Logarithmic' },
+  { value: 'elastic', text: 'Elastic (Ease In-Out)' }
+]
+function curveCatmullRomY(y0, y1, y2, y3, t) {
+  const t2 = t * t, t3 = t2 * t
+  return 0.5 * ((2 * y1) + (-y0 + y2) * t + (2 * y0 - 5 * y1 + 4 * y2 - y3) * t2 + (-y0 + 3 * y1 - 3 * y2 + y3) * t3)
+}
+function curveCatmullRomSegmentY(sorted, i, x) {
+  const p1 = sorted[i], p2 = sorted[i + 1]
+  const p0 = sorted[i - 1] || p1
+  const p3 = sorted[i + 2] || p2
+  const segT = p2.x === p1.x ? 0 : (x - p1.x) / (p2.x - p1.x)
+  return curveCatmullRomY(p0.y, p1.y, p2.y, p3.y, segT)
+}
+function curveComputeNaturalSplineSecondDerivs(sorted) {
+  const n = sorted.length
+  if (n < 3) return new Array(n).fill(0)
+  const h = new Array(n - 1)
+  for (let i = 0; i < n - 1; i++) h[i] = sorted[i + 1].x - sorted[i].x
+  const a = new Array(n).fill(0), b = new Array(n).fill(1), c = new Array(n).fill(0), d = new Array(n).fill(0)
+  for (let i = 1; i < n - 1; i++) {
+    a[i] = h[i - 1]
+    b[i] = 2 * (h[i - 1] + h[i])
+    c[i] = h[i]
+    d[i] = 6 * ((sorted[i + 1].y - sorted[i].y) / h[i] - (sorted[i].y - sorted[i - 1].y) / h[i - 1])
+  }
+  const cp = new Array(n).fill(0), dp = new Array(n).fill(0)
+  for (let i = 1; i < n - 1; i++) {
+    const denom = b[i] - a[i] * cp[i - 1]
+    cp[i] = c[i] / denom
+    dp[i] = (d[i] - a[i] * dp[i - 1]) / denom
+  }
+  const M = new Array(n).fill(0)
+  for (let i = n - 2; i >= 1; i--) M[i] = dp[i] - cp[i] * M[i + 1]
+  return M
+}
+function curveNaturalSplineY(sorted, M, i, x) {
+  const p1 = sorted[i], p2 = sorted[i + 1]
+  const h = p2.x - p1.x
+  if (h === 0) return p1.y
+  const a = (p2.x - x) / h, b = (x - p1.x) / h
+  return a * p1.y + b * p2.y + ((a * a * a - a) * M[i] + (b * b * b - b) * M[i + 1]) * (h * h) / 6
+}
+const CURVE_EASING_FNS = {
+  linear: (t) => t,
+  sine: (t) => -(Math.cos(Math.PI * t) - 1) / 2,
+  bezier: (t) => bezierSegmentY({ x: 0, y: 0 }, { x: 0.42, y: 0 }, { x: 0.58, y: 1 }, { x: 1, y: 1 }, t),
+  constant: (t) => (t < 1 ? 0 : 1),
+  exponential: (t) => {
+    if (t === 0) return 0
+    if (t === 1) return 1
+    return t < 0.5 ? Math.pow(2, 20 * t - 10) / 2 : (2 - Math.pow(2, -20 * t + 10)) / 2
+  },
+  logarithmic: (t) => Math.log10(1 + 9 * t),
+  elastic: (t) => {
+    const c5 = (2 * Math.PI) / 4.5
+    if (t === 0) return 0
+    if (t === 1) return 1
+    return t < 0.5
+      ? -(Math.pow(2, 20 * t - 10) * Math.sin((20 * t - 11.125) * c5)) / 2
+      : (Math.pow(2, -20 * t + 10) * Math.sin((20 * t - 11.125) * c5)) / 2 + 1
+  }
+}
+function curveMirrorX(points) {
+  return points.map((p) => {
+    const np = { x: 1 - p.x, y: p.y }
+    if (p.h2) np.h1 = { x: -p.h2.x, y: p.h2.y }
+    if (p.h1) np.h2 = { x: -p.h1.x, y: p.h1.y }
+    return np
+  }).sort((a, b) => a.x - b.x)
+}
+function curveMirrorY(points) {
+  return points.map((p) => {
+    const np = { x: p.x, y: 1 - p.y }
+    if (p.h1) np.h1 = { x: p.h1.x, y: -p.h1.y }
+    if (p.h2) np.h2 = { x: p.h2.x, y: -p.h2.y }
+    return np
+  })
+}
 function evaluateArmLengthCurve(points, x) {
   if (!points || points.length === 0) return 1
   if (points.length === 1) return points[0].y
   const sorted = points // already kept sorted by the widget itself
   if (x <= sorted[0].x) return sorted[0].y
   if (x >= sorted[sorted.length - 1].x) return sorted[sorted.length - 1].y
-  const tangents = curveComputeMonotoneTangents(sorted)
+  const method = sorted[0].m || 'monotone'
+  const easing = CURVE_EASING_FNS[method]
+  const useMonotone = !easing && method !== 'catmullrom' && method !== 'natural'
+  const tangents = useMonotone ? curveComputeMonotoneTangents(sorted) : null
+  const naturalM = method === 'natural' ? curveComputeNaturalSplineSecondDerivs(sorted) : null
   for (let i = 0; i < sorted.length - 1; i++) {
     const p1 = sorted[i], p2 = sorted[i + 1]
     if (x >= p1.x && x <= p2.x) {
       // Bezier curve handles override -- see cubicBezier1D()'s own
       // comment. p1.h1/p2.h2 undefined (the overwhelmingly common case,
       // and every pre-existing saved curve) falls straight through to the
-      // monotone Hermite line below.
+      // selected interpolation method below (monotone Hermite by default).
       if (p1.h1 || p2.h2) {
         const C1 = p1.h1 ? { x: p1.x + p1.h1.x, y: p1.y + p1.h1.y } : p1
         const C2 = p2.h2 ? { x: p2.x + p2.h2.x, y: p2.y + p2.h2.y } : p2
         return bezierSegmentY(p1, C1, C2, p2, x)
       }
+      if (easing) {
+        const t = p2.x === p1.x ? 0 : (x - p1.x) / (p2.x - p1.x)
+        return p1.y + (p2.y - p1.y) * easing(t)
+      }
+      if (method === 'catmullrom') return curveCatmullRomSegmentY(sorted, i, x)
+      if (method === 'natural') return curveNaturalSplineY(sorted, naturalM, i, x)
       return curveHermiteY(p1, p2, tangents[i], tangents[i + 1], x)
     }
   }
@@ -6398,6 +6503,85 @@ function buildArmLengthRangeWidget(row) {
   maxHandle.addEventListener('pointerdown', startDrag('max', 'min', false))
 }
 
+// Curve editor extras (2026-10-04, ported from TEMPLATE_DEV_PANEL.html's
+// buildCurveEditorRow()): an interpolation-method dropdown, a Graph Opacity
+// slider and Mirror X / Mirror Y buttons, added to each of this file's 3
+// curve widgets (generic, Arm Length, Wrist Splay) through this one helper
+// so they can't drift apart. State lives on the FIRST point of the saved
+// JSON array (`m` = method, `bg` = graph opacity), each omitted at its
+// default so an untouched curve's saved JSON is unchanged. `ctx` gives the
+// helper access to the widget's own closure state: getPoints()/setPoints(),
+// redraw(), commit() (= the widget's commitPoints()).
+const CURVE_GRAPH_OPACITY_DEFAULT = 0.06
+function attachCurveEditorExtras(row, svg, ctx) {
+  const wrap = elLocal('div', { display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '4px' })
+  const select = elLocal('select', { width: '100%' })
+  CURVE_METHOD_OPTIONS.forEach((o) => {
+    const opt = document.createElement('option')
+    opt.value = o.value
+    opt.textContent = o.text
+    select.appendChild(opt)
+  })
+  const opRow = elLocal('div', { display: 'flex', alignItems: 'center', gap: '6px', fontSize: '10px', opacity: '0.85' })
+  const opLabel = elLocal('span', null, { text: 'Graph Opacity:' })
+  const opSlider = elLocal('input', { flex: '1' }, { type: 'range', min: '0', max: '1', step: '0.01' })
+  opRow.append(opLabel, opSlider)
+  wrap.append(select, opRow)
+  row.insertBefore(wrap, svg)
+  const btnRow = elLocal('div', { display: 'flex', gap: '6px', marginTop: '4px' })
+  const mirrorXBtn = elLocal('button', null, { type: 'button', text: 'Mirror X' })
+  const mirrorYBtn = elLocal('button', null, { type: 'button', text: 'Mirror Y' })
+  mirrorXBtn.className = 'dp-action-button'
+  mirrorYBtn.className = 'dp-action-button'
+  btnRow.append(mirrorXBtn, mirrorYBtn)
+  svg.insertAdjacentElement('afterend', btnRow)
+
+  const readMeta = () => {
+    const first = ctx.getPoints()[0] || {}
+    return { m: first.m || 'monotone', bg: first.bg != null ? first.bg : CURVE_GRAPH_OPACITY_DEFAULT }
+  }
+  const writeMeta = (meta) => {
+    const pts = ctx.getPoints()
+    pts.forEach((p, i) => { if (i > 0) { delete p.m; delete p.bg } })
+    const first = pts[0]
+    if (!first) return
+    if (meta.m && meta.m !== 'monotone') first.m = meta.m; else delete first.m
+    if (Math.abs(meta.bg - CURVE_GRAPH_OPACITY_DEFAULT) > 1e-9) first.bg = meta.bg; else delete first.bg
+  }
+  const applyBg = (bg) => { svg.style.background = 'rgba(255,255,255,' + bg + ')' }
+  function sync() {
+    const first = ctx.getPoints()[0] || {}
+    const meta = readMeta()
+    select.value = meta.m
+    opSlider.value = String(meta.bg)
+    if (first.bg != null) applyBg(first.bg)
+  }
+  select.addEventListener('change', () => {
+    const meta = readMeta()
+    meta.m = select.value
+    writeMeta(meta)
+    ctx.redraw()
+    ctx.commit()
+  })
+  opSlider.addEventListener('input', () => {
+    const meta = readMeta()
+    meta.bg = parseFloat(opSlider.value)
+    writeMeta(meta)
+    applyBg(meta.bg)
+  })
+  opSlider.addEventListener('change', () => ctx.commit())
+  const mirror = (fn) => {
+    const meta = readMeta()
+    ctx.setPoints(fn(ctx.getPoints()))
+    writeMeta(meta)
+    ctx.redraw()
+    ctx.commit()
+  }
+  mirrorXBtn.addEventListener('click', () => mirror(curveMirrorX))
+  mirrorYBtn.addEventListener('click', () => mirror(curveMirrorY))
+  sync()
+  return { sync }
+}
 function buildArmLengthCurveWidget(row) {
   const input = row.querySelector('.dp-text-input')
   if (!input) return
@@ -6449,6 +6633,7 @@ function buildArmLengthCurveWidget(row) {
     const parsed = JSON.parse(input.value)
     if (Array.isArray(parsed) && parsed.length >= 2) points = parsed.sort((a, b) => a.x - b.x)
   } catch (e) { /* keep default */ }
+  const curveExtras = attachCurveEditorExtras(row, svg, { getPoints: () => points, setPoints: (arr) => { points = arr }, redraw: () => redraw(), commit: () => commitPoints() })
 
   const toPx = (p) => ({ x: p.x * W, y: (1 - p.y) * H })
   const fromPx = (px, py) => {
@@ -6540,7 +6725,7 @@ function buildArmLengthCurveWidget(row) {
     lastSeenValue = input.value
     try {
       const parsed = JSON.parse(input.value)
-      if (Array.isArray(parsed) && parsed.length >= 2) { points = parsed.sort((a, b) => a.x - b.x); redraw() }
+      if (Array.isArray(parsed) && parsed.length >= 2) { points = parsed.sort((a, b) => a.x - b.x); redraw(); curveExtras.sync() }
     } catch (e) { /* leave displayed state as-is */ }
   })
 }
@@ -6691,6 +6876,7 @@ function buildWristSplayCurveWidget(row) {
     const parsed = JSON.parse(input.value)
     if (Array.isArray(parsed) && parsed.length >= 2) points = parsed.sort((a, b) => a.x - b.x)
   } catch (e) { /* keep default */ }
+  const curveExtras = attachCurveEditorExtras(row, svg, { getPoints: () => points, setPoints: (arr) => { points = arr }, redraw: () => redraw(), commit: () => commitPoints() })
 
   const toPx = (p) => ({ x: p.x * W, y: (1 - p.y) * H })
   const fromPx = (px, py) => {
@@ -6777,7 +6963,7 @@ function buildWristSplayCurveWidget(row) {
     lastSeenValue = input.value
     try {
       const parsed = JSON.parse(input.value)
-      if (Array.isArray(parsed) && parsed.length >= 2) { points = parsed.sort((a, b) => a.x - b.x); redraw() }
+      if (Array.isArray(parsed) && parsed.length >= 2) { points = parsed.sort((a, b) => a.x - b.x); redraw(); curveExtras.sync() }
     } catch (e) { /* leave displayed state as-is */ }
   })
 }
@@ -9940,6 +10126,7 @@ function buildGenericCurveWidget(row, opts) {
     const parsed = JSON.parse(input.value)
     if (Array.isArray(parsed) && parsed.length >= 2) points = parsed.sort((a, b) => a.x - b.x)
   } catch (e) { /* keep default */ }
+  const curveExtras = attachCurveEditorExtras(row, svg, { getPoints: () => points, setPoints: (arr) => { points = arr }, redraw: () => redraw(), commit: () => commitPoints() })
 
   const toPx = (p) => ({ x: p.x * W, y: (1 - p.y) * H })
   const fromPx = (px, py) => {
@@ -10122,7 +10309,7 @@ function buildGenericCurveWidget(row, opts) {
     lastSeenValue = input.value
     try {
       const parsed = JSON.parse(input.value)
-      if (Array.isArray(parsed) && parsed.length >= 2) { points = parsed.sort((a, b) => a.x - b.x); redraw() }
+      if (Array.isArray(parsed) && parsed.length >= 2) { points = parsed.sort((a, b) => a.x - b.x); redraw(); curveExtras.sync() }
     } catch (e) { /* leave displayed state as-is */ }
   })
 }

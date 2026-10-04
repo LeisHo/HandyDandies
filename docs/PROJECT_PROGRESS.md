@@ -18,6 +18,16 @@ work seamlessly from there.
 
 ## Currently working on
 
+**2026-10-04 -- Curve editor extras ported from the dev panel template.**
+All 3 curve widgets now have an interpolation-method dropdown (10 methods),
+a Graph Opacity slider and Mirror X / Mirror Y buttons, backed by method
+support in `evaluateArmLengthCurve()`. Method/opacity are stored on the first
+point of the saved JSON array, omitted at defaults, so existing curves are
+unchanged. The other 2 requested items (plain-slider click-to-edit bounds,
+range-bar bounds at each end) were already in the project and were left
+alone. `main.js` at `?v=278`; 255-assert evaluator test passes; **the UI is
+not verified live** (local-server truncation, 3 attempts). See CHANGELOG.txt.
+
 **2026-10-04 -- Offset To Camera redone to the user's exact spec; same-function
 interruption snap fixed.** X/Y/Z are WORLD axes; each switched-on axis moves
 the hand along that axis only, toward (+) / away (-) the camera's own

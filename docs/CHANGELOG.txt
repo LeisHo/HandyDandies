@@ -15773,6 +15773,61 @@ browser** -- 2 more navigation attempts hit the documented
 
 `main.js` cache-buster `?v=276` -> `?v=277`.
 
+2026-10-04  -  (feature -- curve editor extras ported from the dev panel
+template: interpolation method dropdown, Graph Opacity, Mirror X / Y)
+
+Direct request: "look at the dev panel template and integrate the ui for the
+curve editors and 2 toggle sliders." Nothing in TEMPLATE_DEV_PANEL.html is
+called a "toggle slider", so I asked; the answer was "all" of: curve editor
+extras, plain-slider click-to-edit min/max bounds, and range-bar min/max
+sliders restyled to the template's look.
+
+Finding: 2 of the 3 were ALREADY in this project, ported earlier --
+`devPanel.js` plain sliders already render editable `dp-slider-bound` min/max
+labels at each end of the track (buildBoundLabel(), commented as ported from
+the template's own 2026-09-28 addition), and every range bar
+(`buildGenericRangeBarWidget()`, the Arm Length/Wrist Splay/Palm Rotation
+range bars and `mergeMinMaxSlidersIntoRangeBar()`) already uses
+`attachRangeBarClickToEdit()` to show each bound at its own end of the track
+with no "Min:"/"Max:" text. Nothing changed there.
+
+What was actually missing, now ported, is the curve editor's own extra UI,
+for ALL 3 of this file's curve widgets (generic, Arm Length, Wrist Splay)
+through one shared `attachCurveEditorExtras()`:
+- Interpolation METHOD dropdown (10 options, same as the template): Monotone
+  Cubic (the existing default), Catmull-Rom, Natural Cubic Spline, Linear,
+  Sine, Bezier, Constant (stepped), Exponential, Logarithmic, Elastic.
+- Graph Opacity slider (the graph's background alpha).
+- Mirror X / Mirror Y buttons.
+- `evaluateArmLengthCurve()` (the one evaluator every curve in the file
+  funnels through) now honours the method; the spline/easing helpers were
+  ported from the template. A point's own bezier handle still overrides the
+  method for that one segment, as before.
+
+Storage / compatibility: the method (`m`) and opacity (`bg`) ride on the
+FIRST point of the existing saved JSON array and are omitted at their
+defaults, so every pre-existing saved curve is byte-for-byte unchanged and
+evaluates identically (tested: no `m` == explicit 'monotone' to 1e-12). The
+template stores {points, method, bgOpacity}; that shape would have broken
+every `JSON.parse(...).sort(...)` array reader in this file, so it was not
+used. Mirror re-applies the method/opacity to the new first point. An
+unknown method string falls back to monotone instead of crashing.
+
+Not ported: the template's configurable max point count (this file has no
+point cap) -- not asked for.
+
+Verified: `node --check` passes; a 255-assert test that slices the REAL
+evaluator out of main.js and runs it (every method passes through the data
+points and stays finite across 21 samples; linear/constant/sine behave as
+defined; no-`m` equals monotone; unknown method falls back; Mirror X/Y;
+a bezier handle overrides the method). **The UI itself is not verified** --
+3 navigation attempts hit the documented `ERR_CONNECTION_RESET` on
+`main.js?v=278`, so the dropdown/slider/buttons have never been seen
+rendering or clicked. Layout risk to check first: the dropdown and opacity
+row are inserted above the graph and the buttons directly below it.
+
+`main.js` cache-buster `?v=277` -> `?v=278`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a
