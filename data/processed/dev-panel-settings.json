@@ -25198,7 +25198,7 @@
     },
     {
       "key": "New Group (9)",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -25291,7 +25291,7 @@
           "type": "group",
           "group": {
             "key": "Loading Preview",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -25675,7 +25675,7 @@
         },
         {
           "key": "Loading Preview",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -29261,7 +29261,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 18",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -33233,7 +33233,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 17",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -34101,7 +34101,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 16",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -35279,7 +35279,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 15",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -36457,7 +36457,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 14",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -37325,7 +37325,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 13",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -44399,7 +44399,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 10",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -48661,7 +48661,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 9",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -64876,7 +64876,7 @@
         },
         {
           "key": "Custom Click Function 18",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -68845,7 +68845,7 @@
         },
         {
           "key": "Custom Click Function 17",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -69710,7 +69710,7 @@
         },
         {
           "key": "Custom Click Function 16",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -70885,7 +70885,7 @@
         },
         {
           "key": "Custom Click Function 15",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -72060,7 +72060,7 @@
         },
         {
           "key": "Custom Click Function 14",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -72925,7 +72925,7 @@
         },
         {
           "key": "Custom Click Function 13",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -79996,7 +79996,7 @@
         },
         {
           "key": "Custom Click Function 10",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -84255,7 +84255,7 @@
         },
         {
           "key": "Custom Click Function 9",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
