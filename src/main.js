@@ -532,6 +532,7 @@ let fieldBuildStarted = false
 let fieldBuildDone = false
 let fieldBuildInProgress = false
 let fieldBuildDirty = false
+let startupValuesApplied = false // static cfg values restored (custom functions may still be building)
 let startupCacheSnapshot = null
 let fieldStarted = false
 // Loading Preview's own "Min Loading Time" (direct request) -- captured
@@ -638,6 +639,22 @@ function refreshStartupPreviewAfterRestore() {
   startupPreviewBuilt = false
   maybeBuildStartupLoadingPreview()
 }
+// Starts the sliced field build as soon as the model is ready and the static settings are
+// applied (startupValuesApplied) -- in parallel with the custom-function restore rather than
+// after it (2026-10-04), so the reveal is not delayed by the now finer-sliced restore.
+function startFieldBuild() {
+  if (fieldBuildStarted || !modelMeasurementsReady || !startupValuesApplied) return
+  fieldBuildStarted = true
+  fieldBuildAllowed = true
+  logLoadingPreview('settings applied -- building the hand field in slices behind the loading screen')
+  rebuildFieldChunked().then(() => { fieldBuildDone = true; tryStartField() }).catch((err) => {
+    console.error('Chunked field build failed -- falling back to a synchronous build:', err)
+    fieldBuildInProgress = false
+    rebuildField()
+    fieldBuildDone = true
+    tryStartField()
+  })
+}
 function tryStartField() {
   logStartupTiming(`tryStartField() called (fieldStarted=${fieldStarted} modelReady=${modelMeasurementsReady} settingsReady=${startupSettingsReady})`)
   if (fieldStarted || !modelMeasurementsReady || !startupSettingsReady) return
@@ -647,18 +664,7 @@ function tryStartField() {
   logStartupTiming(`tryStartField() gates passed, loadingPreviewEnabled=${cfg.loadingPreviewEnabled}`)
   // Build the hand field NOW, in slices behind the loading screen, instead of in one
   // block at the reveal (2026-10-04). The reveal below waits for it to finish.
-  if (!fieldBuildStarted) {
-    fieldBuildStarted = true
-    fieldBuildAllowed = true
-    logLoadingPreview('settings ready -- building the hand field in slices behind the loading screen')
-    rebuildFieldChunked().then(() => { fieldBuildDone = true; tryStartField() }).catch((err) => {
-      console.error('Chunked field build failed -- falling back to a synchronous build:', err)
-      fieldBuildInProgress = false
-      rebuildField()
-      fieldBuildDone = true
-      tryStartField()
-    })
-  }
+  startFieldBuild()
   if (!fieldBuildDone) return
   if (cfg.loadingPreviewEnabled) {
     const minMs = Math.max(0, cfg.loadingMinTimeMs || 0)
@@ -763,7 +769,7 @@ function tryStartField() {
     loadingPreviewCanvas.style.display = 'none'
   }
 }
-setTimeout(() => { logStartupTiming('startupSettingsReady = true (6000ms fallback timeout)'); startupSettingsReady = true; maybeBuildStartupLoadingPreview(); tryStartField() }, 6000)
+setTimeout(() => { logStartupTiming('startupSettingsReady = true (6000ms fallback timeout)'); startupSettingsReady = true; startupValuesApplied = true; maybeBuildStartupLoadingPreview(); startFieldBuild(); tryStartField() }, 6000)
 let framedOnce = false // camera/lighting/target-plane are framed ONCE, on first build -- Field Layout changes must never re-trigger this (direct request)
 const hands = [] // { wrapper: Group, clone: Object3D, skinnedMesh: SkinnedMesh|null, outlineMesh: Mesh|null, emissionMesh: SkinnedMesh|null }
 const sceneState = { fieldRadius: 10 }
@@ -2103,6 +2109,8 @@ const cfg = initDevPanel(DEV_GROUPS, {
     }
     prof('migrateModeTweenToSequence', migrateModeTweenToSequence)
     prof('resyncPoseDefaultValues', resyncPoseDefaultValues)
+    startupValuesApplied = true
+    prof('startFieldBuild', startFieldBuild)
     const tCcf = performance.now()
     await restoreCustomClickFunctions() // sliced: one function per frame
     if (DEBUG_TIMING) (window.__dpProfile = window.__dpProfile || []).push({ label: 'restoreCustomClickFunctions (wall, sliced)', atMs: Math.round(tCcf), ms: Math.round(performance.now() - tCcf) })
@@ -11430,7 +11438,7 @@ function refreshCustomFunctionConflictWarnings() {
 // in line") -- every new insert lands in that exact spot, so the newest
 // custom function is always closest to the anchor, pushing earlier ones
 // down one slot each time.
-function renderCustomClickFunctionGroup(id, title, kind, family) {
+async function renderCustomClickFunctionGroup(id, title, kind, family, yielder) {
   const base = profAgg('makeClick*Group', () => kind === 'hold' ? makeClickHoldPoseGroup(id, title, {}) : makeClickPoseGroup(id, title, {}))
   const controls = base.controls.slice()
   const typeOptions = customFunctionTypeOptions(family)
@@ -11516,9 +11524,11 @@ function renderCustomClickFunctionGroup(id, title, kind, family) {
   }
   profAgg('updateCustomFunctionTypeVisibility', () => updateCustomFunctionTypeVisibility(id))
   profAgg('refreshCustomFunctionConflictWarnings', () => refreshCustomFunctionConflictWarnings())
+  if (yielder) await yielder()
   if (kind === 'hold') {
     profAgg('parseClickHoldConfig', () => parseClickHoldConfig(id))
     profAgg('buildClickHoldPoseWidgets', () => buildClickHoldPoseWidgets(id))
+    if (yielder) await yielder()
     profAgg('updateClickTriggerModeVisibility', () => updateClickTriggerModeVisibility(id, [], ['LoopMode']))
     profAgg('updateLoopHoldVisibility', () => updateLoopHoldVisibility(id))
     profAgg('updateOffsetRotationVisibility', () => updateOffsetRotationVisibility(id))
@@ -11531,20 +11541,22 @@ function renderCustomClickFunctionGroup(id, title, kind, family) {
     // before applyCustomFunctionReferenceLayout() below, or that pass
     // finds no "Multi Trigger" group yet to move into place after
     // Retransition.
-    profAgg('setupMultiTriggerGroupForFunction', () => setupMultiTriggerGroupForFunction(id, 'hold'))
+    { const mt = profAgg('setupMultiTriggerGroupForFunction', () => setupMultiTriggerGroupForFunction(id, 'hold', yielder)); if (yielder) await mt }
   } else {
     profAgg('parseClickPoseConfig', () => parseClickPoseConfig(id))
     profAgg('buildClickPoseWidgets', () => buildClickPoseWidgets(id))
+    if (yielder) await yielder()
     profAgg('updateClickTriggerModeVisibility', () => updateClickTriggerModeVisibility(id, ['PauseDurationMs']))
     profAgg('updateOffsetRotationVisibility', () => updateOffsetRotationVisibility(id))
     profAgg('updateSingleTimingGateVisibility', () => updateSingleTimingGateVisibility(id))
     profAgg('updateSequencePlayModeVisibility', () => updateSequencePlayModeVisibility(id))
     profAgg('updateChainModeVisibility', () => updateChainModeVisibility(id))
-    profAgg('setupMultiTriggerGroupForFunction', () => setupMultiTriggerGroupForFunction(id, 'pose'))
+    { const mt = profAgg('setupMultiTriggerGroupForFunction', () => setupMultiTriggerGroupForFunction(id, 'pose', yielder)); if (yielder) await mt }
   }
   // Same mandatory Offset/Rotation/Animation Speed Curve/Start Time
   // Curve/Retransition gated-subgroup wrapping the 10 static triggers
   // get -- see wrapClickFunctionGatedSubgroups()'s own comment.
+  if (yielder) await yielder()
   profAgg('wrapClickFunctionGatedSubgroups', () => wrapClickFunctionGatedSubgroups(id))
   // Same Master On/Off "hide all settings when off" behavior the 10
   // static triggers get -- see updateClickFunctionEnabledVisibility()'s
@@ -11568,6 +11580,7 @@ function renderCustomClickFunctionGroup(id, title, kind, family) {
   // time this function builds a group, closes the item-12 gap regardless
   // of which path triggered the rebuild, AND keeps every function
   // (new or restored) normalized to the reference layout.
+  if (yielder) await yielder()
   profAgg('applyCustomFunctionReferenceLayout', () => applyCustomFunctionReferenceLayout(id, kind))
   // CORRECTED 2026-09-28 -- direct report: "Touch Point Count is still
   // showing up in new click functions on desktop tab." The EARLIER call
@@ -11639,7 +11652,7 @@ function handleCustomFunctionTypeChange(id, title, family) {
 // code needed. The trigger-state object mirrors the exact shape every
 // other entry of its own kind already has (see clickPoseTriggers'/
 // clickHoldPoseTriggers' own declarations).
-function registerCustomClickFunction(id, title, kind, family) {
+function registerCustomClickFunction(id, title, kind, family, yielder) {
   if (kind === 'hold') {
     CLICK_HOLD_KEYS.push(id)
     clickHoldPoseTriggers[id] = {
@@ -11670,7 +11683,7 @@ function registerCustomClickFunction(id, title, kind, family) {
       cursorOffsetDistanceCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], cursorOffsetDistanceRangeParsed: { min: -50, max: 50 }
     }
   }
-  renderCustomClickFunctionGroup(id, title, kind, family)
+  return renderCustomClickFunctionGroup(id, title, kind, family, yielder)
 }
 // "+ Add Click Function" button's own onClick (CORRECTED 2026-09-20, back
 // to a single entry point -- see "Custom Click Functions"'s own
@@ -11968,15 +11981,16 @@ async function restoreCustomClickFunctions() {
   let maxN = 0
   // Batched (2026-10-04, startup perf): see beginDynamicBatch() in devPanel.js.
   beginDynamicBatch()
+  const yielder = makeSliceYielder(10)
   try {
     // One function per frame (2026-10-04): this is ~100-300 ms each in dev mode,
     // and as a single block it froze the loading hand for ~2 s.
     for (const entry of saved) {
       if (!entry || !entry.id) continue
-      registerCustomClickFunction(entry.id, entry.title || entry.id, entry.kind || 'pose', entry.family || 'desktop')
+      await registerCustomClickFunction(entry.id, entry.title || entry.id, entry.kind || 'pose', entry.family || 'desktop', yielder)
       const m = /^custom(\d+)$/.exec(entry.id)
       if (m) maxN = Math.max(maxN, parseInt(m[1], 10))
-      await yieldFrame()
+      await yielder()
     }
   } finally { endDynamicBatch() }
   nextCustomFunctionN = maxN + 1
@@ -12103,7 +12117,7 @@ function buildMultiTriggerControlsForPrefix(prefix, title, kind) {
 // once for custom click functions generally (see this same file's
 // `lastRestoredValues`/devPanel.js fix) -- a real visitor must be able
 // to fire every trigger correctly with no panel ever built.
-function registerMultiTriggerTrigger(prefix, title, mtBody, addBtnRow, kind, seedFromId) {
+async function registerMultiTriggerTrigger(prefix, title, mtBody, addBtnRow, kind, seedFromId, yielder) {
   if (kind === 'hold') {
     if (!CLICK_HOLD_KEYS.includes(prefix)) CLICK_HOLD_KEYS.push(prefix)
     if (!clickHoldPoseTriggers[prefix]) {
@@ -12149,6 +12163,7 @@ function registerMultiTriggerTrigger(prefix, title, mtBody, addBtnRow, kind, see
   const g = renderDynamicGroup({ title, controls, seedFrom }) // seeds cfg regardless of DOM; returns null with no panel
   if (kind === 'hold') parseClickHoldConfig(prefix); else parseClickPoseConfig(prefix) // pure cfg read -- needed regardless of DOM for real dispatch to work
   if (!g || !mtBody) return
+  if (yielder) await yielder()
   // CORRECTED before ever shipping (caught by re-reading createGroupElement()'s
   // own source, not live-caught): devPanel.js's createGroupElement() sets
   // `g.dataset.key = title` (the group's own DISPLAY title, e.g. "Trigger
@@ -12170,6 +12185,7 @@ function registerMultiTriggerTrigger(prefix, title, mtBody, addBtnRow, kind, see
     updateClickTriggerModeVisibility(prefix, ['PauseDurationMs'])
     updateChainModeVisibility(prefix)
   }
+  if (yielder) await yielder()
   updateOffsetRotationVisibility(prefix)
   updateSingleTimingGateVisibility(prefix)
   wrapClickFunctionGatedSubgroups(prefix)
@@ -12191,7 +12207,7 @@ function registerMultiTriggerTrigger(prefix, title, mtBody, addBtnRow, kind, see
 // state gets rebuilt from scratch each load (renderDynamicGroup()'s own
 // DOM/CLICK_POSE_KEYS registration is pure runtime state, gone on every
 // reload -- see restoreCustomClickFunctions()'s own matching comment).
-function setupMultiTriggerGroupForFunction(id, kind) {
+async function setupMultiTriggerGroupForFunction(id, kind, yielder) {
   const mtControls = [
     { key: `${id}MultiTriggerEnabled`, label: 'Multi Trigger (On/Off)', type: 'checkbox', def: false, onChange: () => updateMultiTriggerGroupVisibility(id) },
     { key: `${id}MultiTriggers`, label: 'Multi Trigger List (internal)', type: 'text', def: '[]' }
@@ -12245,7 +12261,11 @@ function setupMultiTriggerGroupForFunction(id, kind) {
   let triggers = []
   try { triggers = JSON.parse(cfg[`${id}MultiTriggers`] || '[]') } catch (e) { triggers = [] }
   if (!Array.isArray(triggers)) triggers = []
-  triggers.forEach((t) => { if (t && t.prefix) registerMultiTriggerTrigger(t.prefix, t.title || t.prefix, mtBody, addBtnRow, kind) })
+  for (const t of triggers) {
+    if (!t || !t.prefix) continue
+    const r = registerMultiTriggerTrigger(t.prefix, t.title || t.prefix, mtBody, addBtnRow, kind, undefined, yielder)
+    if (yielder) await r
+  }
   updateMultiTriggerGroupVisibility(id)
 }
 // "+ Add Trigger" button's own click handler. First trigger added = the
@@ -13614,6 +13634,19 @@ function rebuildField() {
   }
   finishRebuildField()
 }
+// Returns an async function that yields a frame only once `budgetMs` of work has
+// accumulated since the last yield (2026-10-04). Passed down the custom-function build as
+// `yielder` so a ~100-280 ms group build becomes many ~10 ms slices and the loading-screen
+// preview keeps animating. EVERY await on it is conditional (`if (yielder) await yielder()`):
+// an async function that never reaches an await runs to completion synchronously, so the
+// callers that need the finished group right away (Add Click Function, Type changes) are
+// unaffected.
+function makeSliceYielder(budgetMs) {
+  let last = performance.now()
+  return async () => {
+    if (performance.now() - last >= budgetMs) { await yieldFrame(); last = performance.now() }
+  }
+}
 // Yields one animation frame (or 50 ms if rAF is not ticking, e.g. a background tab).
 function yieldFrame() {
   return new Promise((resolve) => {
@@ -13775,6 +13808,7 @@ new GLTFLoader().load(
     // resolves. Same already-loaded GLB, no extra network fetch, same as
     // every other clone this file makes of it.
     maybeBuildStartupLoadingPreview() // no-op until the settings restore has also finished
+    startFieldBuild() // no-op until the static settings are applied
     // Real gap fixed 2026-09-17, direct report ("the Show Loading Preview
     // checkbox doesnt work"): if the "Show Loading Preview (Live)"
     // checkbox was already checked (restored from a saved setting, or
