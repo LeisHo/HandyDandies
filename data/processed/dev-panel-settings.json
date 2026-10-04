@@ -37,7 +37,7 @@
       "palmFacesCursorDistanceRange": "{\"min\":0,\"max\":180}",
       "loadingPreviewEnabled": true,
       "loadingPreviewShowLive": false,
-      "loadingMinTimeMs": 5000,
+      "loadingMinTimeMs": 7000,
       "loadingPreviewTweenSelector": "Waiting Horizontal Tap",
       "loadingPreviewSavedCameras": [
         {
@@ -210,7 +210,7 @@
       "loadingPreviewRotationY": -171.31775806313817,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": -4.440892098500626e-16,
-      "loadingPreviewOffsetY": 0,
+      "loadingPreviewOffsetY": -8.881784197001252e-16,
       "loadingPreviewOffsetZ": 0,
       "loadingPreviewCameraFov": 32,
       "loadingPreviewCameraZoom": 161.7694831224424,
@@ -6549,7 +6549,7 @@
           "group": "FIST ROTATE"
         }
       ],
-      "cameraX": 3.5871964338596483,
+      "cameraX": 3.587196433859648,
       "cameraY": 7.226320177572674,
       "cameraZ": 140.3541779670616,
       "cameraFov": 35,
@@ -8030,7 +8030,7 @@
       "palmFacesCursorDistanceRange": "{\"min\":0,\"max\":180}",
       "loadingPreviewEnabled": true,
       "loadingPreviewShowLive": false,
-      "loadingMinTimeMs": 5000,
+      "loadingMinTimeMs": 7000,
       "loadingPreviewTweenSelector": "Waiting Horizontal Tap",
       "loadingPreviewSavedCameras": [
         {
@@ -8203,7 +8203,7 @@
       "loadingPreviewRotationY": -171.31775806313817,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": -4.440892098500626e-16,
-      "loadingPreviewOffsetY": 0,
+      "loadingPreviewOffsetY": -8.881784197001252e-16,
       "loadingPreviewOffsetZ": 0,
       "loadingPreviewCameraFov": 32,
       "loadingPreviewCameraZoom": 161.7694831224424,
@@ -16023,7 +16023,7 @@
       "palmFacesCursorDistanceRange": "{\"min\":0,\"max\":180}",
       "loadingPreviewEnabled": true,
       "loadingPreviewShowLive": false,
-      "loadingMinTimeMs": 5000,
+      "loadingMinTimeMs": 7000,
       "loadingPreviewTweenSelector": "Waiting Horizontal Tap",
       "loadingPreviewSavedCameras": [
         {
@@ -16196,7 +16196,7 @@
       "loadingPreviewRotationY": -171.31775806313817,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": -4.440892098500626e-16,
-      "loadingPreviewOffsetY": 0,
+      "loadingPreviewOffsetY": -8.881784197001252e-16,
       "loadingPreviewOffsetZ": 0,
       "loadingPreviewCameraFov": 32,
       "loadingPreviewCameraZoom": 161.7694831224424,
@@ -100375,7 +100375,7 @@
     "desktop": {
       "left": 831.1875,
       "top": 18.387500762939453,
-      "width": 564,
+      "width": 567.2000122070312,
       "height": 711.6000366210938
     }
   }
