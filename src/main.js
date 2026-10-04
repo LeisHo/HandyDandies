@@ -626,9 +626,13 @@ function writeStartupCache() {
 // preview-relevant value turned out different, rebuild it once (still behind the
 // loading screen) so it reflects what was actually saved.
 const STARTUP_PREVIEW_RELEVANT = /^(loadingPreview|bgColor$|savedPoses$|savedTweenSequences$|key[A-Z]|ambient)/
+// Read-back sliders derived FROM the selected camera preset by deriveLoadingPreviewOrbitSliders()
+// every build -- not inputs, and they differ between cache and restore whenever the last
+// session orbited the preview, which forced a pointless mid-animation rebuild.
+const STARTUP_PREVIEW_DERIVED = new Set(['loadingPreviewRotationX', 'loadingPreviewRotationY', 'loadingPreviewOffsetX', 'loadingPreviewOffsetY', 'loadingPreviewOffsetZ', 'loadingPreviewCameraZoom', 'loadingPreviewCameraFov', 'loadingPreviewCameraRoll'])
 function refreshStartupPreviewAfterRestore() {
   if (!startupPreviewBuilt || fieldStarted || !startupCacheSnapshot) return
-  const changed = Object.keys(cfg).filter((k) => (STARTUP_PREVIEW_RELEVANT.test(k) || POSE_PRESET_KEYS.includes(k)) && k in startupCacheSnapshot && JSON.stringify(cfg[k]) !== JSON.stringify(startupCacheSnapshot[k]))
+  const changed = Object.keys(cfg).filter((k) => (STARTUP_PREVIEW_RELEVANT.test(k) || POSE_PRESET_KEYS.includes(k)) && !STARTUP_PREVIEW_DERIVED.has(k) && k in startupCacheSnapshot && JSON.stringify(cfg[k]) !== JSON.stringify(startupCacheSnapshot[k]))
   if (changed.length === 0) { logLoadingPreview('restore finished -- startup cache matched, preview kept'); return }
   logLoadingPreview(`restore finished -- ${changed.length} preview value(s) differ from the cache (${changed.slice(0, 4).join(', ')}${changed.length > 4 ? ', ...' : ''}) -- rebuilding`)
   startupPreviewBuilt = false
@@ -5589,6 +5593,15 @@ function syncLoadingPreviewBackground() {
 }
 function setLoadingPreviewLiveVisible(show) {
   if (!show) {
+    // While the loading screen is up the startup preview owns the canvas: the
+    // settings restore applies the saved (usually OFF) checkbox value here, which used
+    // to hide the preview for ~3 s mid-loading until the post-restore rebuild showed it
+    // again (2026-10-04, read off the Loading Preview Log). tryStartField() hides it at
+    // the reveal when the checkbox is off.
+    if (!fieldStarted && startupPreviewBuilt) {
+      logLoadingPreview('Show Loading Preview: OFF ignored -- the loading-screen preview stays up until the field is revealed')
+      return
+    }
     if (loadingPreviewCanvas) loadingPreviewCanvas.style.display = 'none'
     logLoadingPreview('Show Loading Preview: OFF -- canvas hidden')
     return
