@@ -6937,10 +6937,10 @@
       "custom8CameraOffsetZEnabled": true,
       "custom8CameraOffsetZCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom8CameraOffsetZRange": "{\"min\":0,\"max\":10}",
-      "custom8RotationEnabled": false,
-      "custom8RotationX": 200,
-      "custom8RotationY": -150,
-      "custom8RotationZ": 600,
+      "custom8RotationEnabled": true,
+      "custom8RotationX": 20,
+      "custom8RotationY": 20,
+      "custom8RotationZ": 20,
       "custom8TargetPose": "",
       "custom8TweenSelector": "FLOWER 2",
       "custom8TweenChain": [],
@@ -14920,10 +14920,10 @@
       "custom8CameraOffsetZEnabled": true,
       "custom8CameraOffsetZCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom8CameraOffsetZRange": "{\"min\":0,\"max\":10}",
-      "custom8RotationEnabled": false,
-      "custom8RotationX": 200,
-      "custom8RotationY": -150,
-      "custom8RotationZ": 600,
+      "custom8RotationEnabled": true,
+      "custom8RotationX": 20,
+      "custom8RotationY": 20,
+      "custom8RotationZ": 20,
       "custom8TargetPose": "",
       "custom8TweenSelector": "FLOWER 2",
       "custom8TweenChain": [],
@@ -22903,10 +22903,10 @@
       "custom8CameraOffsetZEnabled": true,
       "custom8CameraOffsetZCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom8CameraOffsetZRange": "{\"min\":0,\"max\":10}",
-      "custom8RotationEnabled": false,
-      "custom8RotationX": 200,
-      "custom8RotationY": -150,
-      "custom8RotationZ": 600,
+      "custom8RotationEnabled": true,
+      "custom8RotationX": 20,
+      "custom8RotationY": 20,
+      "custom8RotationZ": 20,
       "custom8TargetPose": "",
       "custom8TweenSelector": "FLOWER 2",
       "custom8TweenChain": [],
@@ -55901,7 +55901,7 @@
                 "type": "group",
                 "group": {
                   "key": "Rotation",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -55947,7 +55947,7 @@
                 "type": "group",
                 "group": {
                   "key": "Animation Speed Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -56031,7 +56031,7 @@
                 "type": "group",
                 "group": {
                   "key": "Retransition",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -56181,7 +56181,7 @@
                 "type": "group",
                 "group": {
                   "key": "Tween Stop",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -56476,7 +56476,7 @@
               },
               {
                 "key": "Rotation",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -56516,7 +56516,7 @@
               },
               {
                 "key": "Animation Speed Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -56591,7 +56591,7 @@
               },
               {
                 "key": "Retransition",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -56738,7 +56738,7 @@
               },
               {
                 "key": "Tween Stop",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -56883,7 +56883,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 7",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -91492,7 +91492,7 @@
               "type": "group",
               "group": {
                 "key": "Rotation",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -91538,7 +91538,7 @@
               "type": "group",
               "group": {
                 "key": "Animation Speed Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -91622,7 +91622,7 @@
               "type": "group",
               "group": {
                 "key": "Retransition",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -91772,7 +91772,7 @@
               "type": "group",
               "group": {
                 "key": "Tween Stop",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -92067,7 +92067,7 @@
             },
             {
               "key": "Rotation",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -92107,7 +92107,7 @@
             },
             {
               "key": "Animation Speed Curve",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -92182,7 +92182,7 @@
             },
             {
               "key": "Retransition",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -92329,7 +92329,7 @@
             },
             {
               "key": "Tween Stop",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -92471,7 +92471,7 @@
         },
         {
           "key": "Custom Click Function 7",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
