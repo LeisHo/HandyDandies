@@ -512,6 +512,7 @@ let idleReposeFrameCounter = 0
 // headroom over that measured figure for a slower/cold-start request.
 let modelMeasurementsReady = false
 let startupSettingsReady = false
+let startupPreviewBuilt = false // see maybeBuildStartupLoadingPreview()
 let fieldStarted = false
 // Loading Preview's own "Min Loading Time" (direct request) -- captured
 // here, at the earliest point this module runs, so the min-time window
@@ -552,6 +553,21 @@ function logStartupTiming(label) {
   }
   const elapsed = Math.round(performance.now() - pageLoadStartMs)
   debugTimingEl.textContent += `${label}: ${elapsed}ms\n`
+}
+// The loading-screen preview is built only once BOTH the hand model and the
+// restored settings are available (2026-10-04). It used to be built the instant
+// the GLB loaded, which is well before the settings restore resolves, so the
+// loading screen showed a preview made from the code DEFAULTS (160 px, white
+// background, auto-frame camera, no tween) and the real configuration only
+// appeared after the field had already started -- found with the new Loading
+// Preview Log (build start at +651 ms showed size=160px bg=#ffffff camera=
+// "(auto-frame)", the same build at field start showed size=1390px bg=#000000
+// camera="Loading Preview Camera 7"). Cost: the preview appears when the
+// restore finishes (about 1-2 s) instead of at +0.5 s.
+function maybeBuildStartupLoadingPreview() {
+  if (startupPreviewBuilt || !modelMeasurementsReady || !startupSettingsReady) return
+  startupPreviewBuilt = true
+  buildLoadingPreview(!!cfg.loadingPreviewShowLive)
 }
 function tryStartField() {
   logStartupTiming(`tryStartField() called (fieldStarted=${fieldStarted} modelReady=${modelMeasurementsReady} settingsReady=${startupSettingsReady})`)
@@ -663,7 +679,7 @@ function tryStartField() {
     loadingPreviewCanvas.style.display = 'none'
   }
 }
-setTimeout(() => { logStartupTiming('startupSettingsReady = true (6000ms fallback timeout)'); startupSettingsReady = true; tryStartField() }, 6000)
+setTimeout(() => { logStartupTiming('startupSettingsReady = true (6000ms fallback timeout)'); startupSettingsReady = true; maybeBuildStartupLoadingPreview(); tryStartField() }, 6000)
 let framedOnce = false // camera/lighting/target-plane are framed ONCE, on first build -- Field Layout changes must never re-trigger this (direct request)
 const hands = [] // { wrapper: Group, clone: Object3D, skinnedMesh: SkinnedMesh|null, outlineMesh: Mesh|null, emissionMesh: SkinnedMesh|null }
 const sceneState = { fieldRadius: 10 }
@@ -2006,6 +2022,7 @@ const cfg = initDevPanel(DEV_GROUPS, {
     prof('restoreCustomClickFunctions', restoreCustomClickFunctions)
     prof('enforceCustomClickFunctionsAnchorOrder', enforceCustomClickFunctionsAnchorOrder)
     startupSettingsReady = true
+    prof('maybeBuildStartupLoadingPreview', maybeBuildStartupLoadingPreview)
     prof('tryStartField (from onRestore)', tryStartField)
   },
   // Delete-function button (direct spec item) -- devPanel.js's own
@@ -5487,8 +5504,8 @@ function setLoadingPreviewLiveVisible(show) {
     logLoadingPreview('Show Loading Preview: OFF -- canvas hidden')
     return
   }
-  if (!modelMeasurementsReady) {
-    logLoadingPreview('Show Loading Preview: ON requested but the hand model is not loaded yet -- ignored (it is applied again when startup finishes)')
+  if (!modelMeasurementsReady || !startupSettingsReady) {
+    logLoadingPreview(`Show Loading Preview: ON requested but ${!modelMeasurementsReady ? 'the hand model is not loaded yet' : 'settings are still being restored'} -- deferred (applied when startup finishes)`)
     return
   }
   logLoadingPreview('Show Loading Preview: ON -- rebuilding')
@@ -13600,7 +13617,7 @@ new GLTFLoader().load(
     // before the (usually slower) settings-restore half of the gate below
     // resolves. Same already-loaded GLB, no extra network fetch, same as
     // every other clone this file makes of it.
-    buildLoadingPreview()
+    maybeBuildStartupLoadingPreview() // no-op until the settings restore has also finished
     // Real gap fixed 2026-09-17, direct report ("the Show Loading Preview
     // checkbox doesnt work"): if the "Show Loading Preview (Live)"
     // checkbox was already checked (restored from a saved setting, or
@@ -13612,7 +13629,9 @@ new GLTFLoader().load(
     // model). Re-running it here, the instant the model itself becomes
     // ready, closes that window instead of leaving the checkbox looking
     // checked but doing nothing until the real field happens to start.
-    if (cfg.loadingPreviewShowLive) setLoadingPreviewLiveVisible(true)
+    // (2026-10-04: superseded -- maybeBuildStartupLoadingPreview() above and in
+    // onRestore now builds with the live-toggle bypass once both the model and
+    // the settings are ready, so this extra call would only double-build.)
     tryStartField()
   },
   undefined,
