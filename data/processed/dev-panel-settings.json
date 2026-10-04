@@ -6684,7 +6684,7 @@
       "emissionColor": "#ffffff",
       "emissionIntensity": 1.5,
       "bgColor": "#000000",
-      "pixelRatio": 1.25,
+      "pixelRatio": 2,
       "resolutionScale": 100,
       "qualityPreset": "high",
       "showGridHelper": false,
@@ -14614,9 +14614,9 @@
           "group": "FIST ROTATE"
         }
       ],
-      "cameraX": 6.571911976419031,
-      "cameraY": 13.238957217999447,
-      "cameraZ": 257.1354315631169,
+      "cameraX": 6.638529594915722,
+      "cameraY": 13.373156794075216,
+      "cameraZ": 259.74194092345493,
       "cameraFov": 35,
       "cameraZoom": 260.17068872666084,
       "cameraZoomSpeed": 1,
@@ -14749,7 +14749,7 @@
       "emissionColor": "#ffffff",
       "emissionIntensity": 1.5,
       "bgColor": "#000000",
-      "pixelRatio": 1.25,
+      "pixelRatio": 2,
       "resolutionScale": 100,
       "qualityPreset": "high",
       "showGridHelper": false,
@@ -22814,7 +22814,7 @@
       "emissionColor": "#ffffff",
       "emissionIntensity": 1.5,
       "bgColor": "#000000",
-      "pixelRatio": 1.25,
+      "pixelRatio": 2,
       "resolutionScale": 100,
       "qualityPreset": "high",
       "showGridHelper": false,
@@ -25306,7 +25306,7 @@
     },
     {
       "key": "Debug",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -101908,6 +101908,12 @@
       "top": 18.387500762939453,
       "width": 586.4000244140625,
       "height": 498.3999938964844
+    },
+    "mobile": {
+      "left": 64.13690948486328,
+      "top": 20.285715103149414,
+      "width": 337.1428527832031,
+      "height": 766.5238037109375
     }
   }
 }
