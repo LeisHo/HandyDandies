@@ -35,7 +35,7 @@
       "palmFacesCursorDistanceCurveEnabled": false,
       "palmFacesCursorDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0.5}]",
       "palmFacesCursorDistanceRange": "{\"min\":0,\"max\":180}",
-      "loadingPreviewEnabled": true,
+      "loadingPreviewEnabled": false,
       "loadingPreviewShowLive": false,
       "loadingMinTimeMs": 4100,
       "loadingPreviewTweenSelector": "Waiting Horizontal Tap",
@@ -8018,7 +8018,7 @@
       "palmFacesCursorDistanceCurveEnabled": false,
       "palmFacesCursorDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0.5}]",
       "palmFacesCursorDistanceRange": "{\"min\":0,\"max\":180}",
-      "loadingPreviewEnabled": true,
+      "loadingPreviewEnabled": false,
       "loadingPreviewShowLive": false,
       "loadingMinTimeMs": 4100,
       "loadingPreviewTweenSelector": "Waiting Horizontal Tap",
@@ -16001,7 +16001,7 @@
       "palmFacesCursorDistanceCurveEnabled": false,
       "palmFacesCursorDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0.5}]",
       "palmFacesCursorDistanceRange": "{\"min\":0,\"max\":180}",
-      "loadingPreviewEnabled": true,
+      "loadingPreviewEnabled": false,
       "loadingPreviewShowLive": false,
       "loadingMinTimeMs": 4100,
       "loadingPreviewTweenSelector": "Waiting Horizontal Tap",
@@ -25060,7 +25060,7 @@
     },
     {
       "key": "Debug",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -25168,7 +25168,7 @@
     },
     {
       "key": "New Group (9)",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -25261,7 +25261,7 @@
           "type": "group",
           "group": {
             "key": "Loading Preview",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -25645,7 +25645,7 @@
         },
         {
           "key": "Loading Preview",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -28348,7 +28348,7 @@
     },
     {
       "key": "Custom Click Functions",
-      "collapsed": true,
+      "collapsed": false,
       "locked": false,
       "items": [
         {
