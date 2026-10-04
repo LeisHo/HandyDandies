@@ -18,6 +18,11 @@ work seamlessly from there.
 
 ## Currently working on
 
+**2026-10-04 -- Finger-curl math 2.15x faster; idle hands skip it when unchanged.** Pose pass 47 -> 21.7 ms
+(156 hands, sandbox); idle frame 47 -> 2 ms; verified bone-for-bone against the kept reference
+implementation (5.5e-5 deg worst of 400 trials). `main.js` `?v=299`. Next: user to confirm the real-machine
+frame rate. See CHANGELOG.txt.
+
 **2026-10-04 -- "Flash after the 2nd click": not reproduced; Pose Jump Log added.** Likely-but-unconfirmed
 cause: Trigger 1 has Pause 0 ms + Retransition (fist and straight back). New Debug-group Pose Jump Log
 records one-frame bone/position pops with the active functions/phases. Waiting on the user's log.

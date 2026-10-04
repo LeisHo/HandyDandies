@@ -16370,6 +16370,46 @@ wiggle is ignored. Costs a pass over every bone each frame only while enabled.
 Next step needs the user: tick Log Pose Jumps, do the clicks, Copy All Logs.
 `main.js` `?v=297` -> `?v=298`.
 
+2026-10-04  -  (performance -- finger-curl pose math 2.15x faster; idle hands skip it when unchanged)
+
+Direct request ("yeah do 1 and 2") after the Pose Jump Log + Frame Rate Log showed 180-380 ms frames
+during playback (jumps scaled with frame time, no discrete pop). Measured in the automation tab for 156
+hands: the per-frame pose pass was ~47 ms, of which applyCurlToSkeleton ~42 ms (click-function
+bookkeeping for all 19 functions/triggers only ~4 ms).
+
+1) FAST CURL. rotateOnTrueWorldAxis() called bone.getWorldQuaternion() on every rotation (up to ~7 per
+joint), and that re-walks and recomposes the whole parent chain each time. New rotateOnTrueWorldAxisFast()
+takes the PARENT's world quaternion -- computed once per finger via one getWorldQuaternion, then advanced
+joint to joint -- and multiplies in the bone's current local quaternion (same value for the uniform
+positive scales this rig has). Bone-by-name lookups are cached per skeleton (skeletonBone()). The original
+is kept verbatim as applyCurlToSkeletonReference() (exposed on window.__debug) purely as the test oracle.
+Verified live on real hands with the user's 105 saved poses: 400 random trials (random pose pair + blend,
+random wrist splay, random wrapper rotation), every bone compared old vs new -> worst case 5.5e-5 degrees
+(~1e-6 rad). pose pass (applyPoseValuesToHand, 156 hands): 46.8 ms -> 21.7 ms (2.15x); curl alone 41.0 ->
+17.6 ms (2.33x). While 100+ hands play a sequence, updateRenderOrder() averaged 38 ms (max 50) versus 53.8
+(max 114) before.
+
+2) IDLE SKIP. An idle hand re-applied all five finger curls EVERY frame (Responsive Wrist Splay with
+wristSplayReposeStagger = 1 touches every hand every frame, and the curl axes follow the wrist). It now
+skips the finger curl when a per-frame signature of everything the curl depends on (all POSE_PRESET_KEYS
+values + cloneBaseQuat) is unchanged and the hand's wrist splay moved < 0.002 degrees since its last idle
+apply (hand._idleCurlSig/_idleCurlSplay). The curl does not depend on the wrapper's rotation (the wrapper is
+excluded from the axis conversion), so cursor tracking alone never invalidates it; verified: finger output
+across random wrapper rotations differs by 3e-5 degrees. The cache is dropped whenever fingers are posed by
+anything else (applyPoseValuesToHand() sets it null, as does resetAllHands()); a pose-setting change changes
+the signature. Verified live: idle updateRenderOrder() 47 ms -> 2.0 ms; skip vs forced full apply 3.4e-6
+degrees; a pose slider change is picked up immediately and matches a fresh reference apply to 3.6e-5 degrees.
+
+A MEASUREMENT TRAP worth remembering: the first equivalence run "failed" with a constant 0.03 degrees. That
+was the comparator, not the code -- several bones (RootNode, carpals...) come out of the GLB as float32
+quaternions that are not exactly unit length, and Quaternion.angleTo() of such a quaternion with its own
+clone is ~0.03 degrees. Always normalize before angleTo() when comparing bone rotations.
+
+Not changed: per-hand sequence bookkeeping during playback (the remaining ~16 ms of the 38 ms), rendering,
+the 6 other uses of getWorldQuaternion elsewhere. Real-machine effect not yet measured -- turn on Log Pose
+Jumps / Frame Rate Log and compare.
+`main.js` `?v=298` -> `?v=299`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

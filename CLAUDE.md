@@ -2421,3 +2421,11 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   `syncPauseWithVisibility()` pauses the virtual clock (`nowVirtual()`) and animation advances in chunks; bone steps
   seen there are an artifact. Use the Debug-group Pose Jump Log on the user's real tab instead. Also note the Hand
   Behaviour Log keeps only 200 entries, so a pasted log may have lost the first lines of the sequence it shows.
+- **Finger-curl performance code has an oracle (2026-10-04).** `applyCurlToSkeleton()` uses
+  `rotateOnTrueWorldAxisFast()` (parent world quaternion computed once per finger); the pre-change version is
+  `applyCurlToSkeletonReference()`, exposed on `window.__debug`. Any further change to the curl math must be
+  re-verified against it on real hands (random saved poses, splay, wrapper rotation) and **normalize
+  quaternions before `angleTo()`** -- the GLB's float32 bone quaternions are not exactly unit length, so an
+  un-normalized self-comparison reads ~0.03 degrees. Idle hands skip the curl via `hand._idleCurlSig`
+  (pose-key signature + wrist splay); anything new that poses fingers outside `applyPoseValuesToHand()` must
+  set `hand._idleCurlSig = null`.
