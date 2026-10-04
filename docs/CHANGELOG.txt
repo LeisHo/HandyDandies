@@ -16288,6 +16288,26 @@ A residual risk: errors inside the now-async group build surface as unhandled pr
 the synchronous callers instead of thrown exceptions (still logged to the console).
 `main.js` `?v=293` -> `?v=295`.
 
+2026-10-04  -  (feature -- Reverse Sequence checkbox for Sequence-mode click functions)
+
+Direct request: "for sequence triggers, add a checkbox under the sequence selector to reverse the
+order of the sequence. So the final pose is the beginning and vice versa."
+New `${p}ReverseSequence` checkbox (default off) directly under the Sequence selector, in both
+click-function factories (pose-kind and hold-kind), in both reference layouts, and in
+MULTI_TRIGGER_ALLOWED_SUFFIXES (so Multi Trigger sub-triggers have it and copy the base on add).
+It shows only in Sequence mode, owned by updateChainModeVisibility() alongside the selector.
+selectedSequenceEntries(p) returns the selected sequence's raw entries reversed when it is on;
+the three places that START a trigger from the selector use it: pose-kind triggerClickPose()
+(namedPoses), hold-kind startClickHoldPose() loopPoses (Loop/Oscillate cycle) and
+rawChainEntries (the forward-pass timeline, whose Hold entries are reversed in place too). The
+saved sequence itself is never modified. Chain mode (a list of sequences) is deliberately NOT
+reversed; the checkbox is hidden there.
+Verified: node --check, load check, a 5-assert test of the real helper + resolver (order reversed,
+Hold entry position reversed, original untouched, missing sequence -> empty), and live: the row is
+immediately after the selector on custom18/custom8, hidden on a Single Pose function, present on a
+Multi Trigger sub-trigger. Playback of a reversed sequence was not watched (no WebGL in this
+sandbox). `main.js` `?v=295` -> `?v=296`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

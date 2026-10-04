@@ -18,6 +18,9 @@ work seamlessly from there.
 
 ## Currently working on
 
+**2026-10-04 -- Reverse Sequence checkbox (Sequence mode click functions + Multi Trigger).**
+`${p}ReverseSequence`; `selectedSequenceEntries()` feeds trigger start. `main.js` `?v=296`.
+
 **2026-10-04 -- Loading animation smoothness: dev-mode panel build sliced to ~10 ms steps.**
 Long tasks during startup: ~15 x 70-280 ms -> 3 (max 83 ms before the reveal). Field build starts
 in parallel with the restore. `main.js` `?v=295`. See CHANGELOG.txt.

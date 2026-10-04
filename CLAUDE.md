@@ -2408,3 +2408,6 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   `makeSliceYielder(10)` down and write `if (yielder) await yielder()` -- never an unconditional
   `await`, which would make the synchronous callers (Add Click Function, Type change) asynchronous.
   `yieldFrame()` skips yielding in a hidden tab unless `?debugTiming=1`.
+- **Read the selected sequence through `selectedSequenceEntries(p)` (2026-10-04).** It applies the
+  function's Reverse Sequence checkbox; a new consumer that reads `savedTweenSequences` by
+  `${p}TweenSelector` directly would silently ignore it. Chain mode is intentionally not reversed.
