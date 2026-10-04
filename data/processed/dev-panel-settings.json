@@ -7843,8 +7843,8 @@
       "custom18SequenceLoopTransition": true,
       "custom18SequenceHoldMs": 0,
       "custom18TransitionSpeedMs": 700,
-      "custom18EasingCurveEnabled": false,
-      "custom18EasingCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom18EasingCurveEnabled": true,
+      "custom18EasingCurve": "[{\"x\":0,\"y\":0.36739578247070315},{\"x\":0.47325302484467274,\"y\":0.6607289632161458,\"h1\":{\"x\":0.23149601493294786,\"y\":-0.0199999491373698}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2984005184624139,\"y\":0.14072901407877603}}]",
       "custom18SpeedCurveEnabled": false,
       "custom18SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom18SpeedCurveRange": "{\"min\":50,\"max\":2000}",
@@ -7859,7 +7859,7 @@
       "custom18RetransitionEnabled": true,
       "custom18RetransitionSpeedMs": 400,
       "custom18RetransitionSpeedCurveEnabled": true,
-      "custom18RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":0.4099505216791401,\"y\":0.6645833333333333,\"h1\":{\"x\":0.14979744267027567,\"y\":0.2666666666666667},\"h2\":{\"x\":-0.17611329310758356,\"y\":-0.16666666666666663}},{\"x\":1,\"y\":1}]",
+      "custom18RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom18RetransitionSpeedCurveRange": "{\"min\":20000,\"max\":24000}",
       "custom18RetransitionStartTimeCurveEnabled": true,
       "custom18RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.3714891079585548,\"y\":0.5605209350585938,\"h1\":{\"x\":0.12348159223296773,\"y\":0.33333333333333326}},{\"x\":1,\"y\":1}]",
@@ -15836,8 +15836,8 @@
       "custom18SequenceLoopTransition": true,
       "custom18SequenceHoldMs": 0,
       "custom18TransitionSpeedMs": 700,
-      "custom18EasingCurveEnabled": false,
-      "custom18EasingCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom18EasingCurveEnabled": true,
+      "custom18EasingCurve": "[{\"x\":0,\"y\":0.36739578247070315},{\"x\":0.47325302484467274,\"y\":0.6607289632161458,\"h1\":{\"x\":0.23149601493294786,\"y\":-0.0199999491373698}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2984005184624139,\"y\":0.14072901407877603}}]",
       "custom18SpeedCurveEnabled": false,
       "custom18SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom18SpeedCurveRange": "{\"min\":50,\"max\":2000}",
@@ -15852,7 +15852,7 @@
       "custom18RetransitionEnabled": true,
       "custom18RetransitionSpeedMs": 400,
       "custom18RetransitionSpeedCurveEnabled": true,
-      "custom18RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":0.4099505216791401,\"y\":0.6645833333333333,\"h1\":{\"x\":0.14979744267027567,\"y\":0.2666666666666667},\"h2\":{\"x\":-0.17611329310758356,\"y\":-0.16666666666666663}},{\"x\":1,\"y\":1}]",
+      "custom18RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom18RetransitionSpeedCurveRange": "{\"min\":20000,\"max\":24000}",
       "custom18RetransitionStartTimeCurveEnabled": true,
       "custom18RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.3714891079585548,\"y\":0.5605209350585938,\"h1\":{\"x\":0.12348159223296773,\"y\":0.33333333333333326}},{\"x\":1,\"y\":1}]",
@@ -23829,8 +23829,8 @@
       "custom18SequenceLoopTransition": true,
       "custom18SequenceHoldMs": 0,
       "custom18TransitionSpeedMs": 700,
-      "custom18EasingCurveEnabled": false,
-      "custom18EasingCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom18EasingCurveEnabled": true,
+      "custom18EasingCurve": "[{\"x\":0,\"y\":0.36739578247070315},{\"x\":0.47325302484467274,\"y\":0.6607289632161458,\"h1\":{\"x\":0.23149601493294786,\"y\":-0.0199999491373698}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2984005184624139,\"y\":0.14072901407877603}}]",
       "custom18SpeedCurveEnabled": false,
       "custom18SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom18SpeedCurveRange": "{\"min\":50,\"max\":2000}",
@@ -23845,7 +23845,7 @@
       "custom18RetransitionEnabled": true,
       "custom18RetransitionSpeedMs": 400,
       "custom18RetransitionSpeedCurveEnabled": true,
-      "custom18RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":0.4099505216791401,\"y\":0.6645833333333333,\"h1\":{\"x\":0.14979744267027567,\"y\":0.2666666666666667},\"h2\":{\"x\":-0.17611329310758356,\"y\":-0.16666666666666663}},{\"x\":1,\"y\":1}]",
+      "custom18RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom18RetransitionSpeedCurveRange": "{\"min\":20000,\"max\":24000}",
       "custom18RetransitionStartTimeCurveEnabled": true,
       "custom18RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.3714891079585548,\"y\":0.5605209350585938,\"h1\":{\"x\":0.12348159223296773,\"y\":0.33333333333333326}},{\"x\":1,\"y\":1}]",
@@ -25291,7 +25291,7 @@
           "type": "group",
           "group": {
             "key": "Loading Preview",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -25675,7 +25675,7 @@
         },
         {
           "key": "Loading Preview",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -28378,7 +28378,7 @@
     },
     {
       "key": "Custom Click Functions",
-      "collapsed": true,
+      "collapsed": false,
       "locked": false,
       "items": [
         {
@@ -29328,7 +29328,7 @@
                 "type": "group",
                 "group": {
                   "key": "Offset",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -29411,7 +29411,7 @@
                 "type": "group",
                 "group": {
                   "key": "Offset To Camera",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -29538,7 +29538,7 @@
                 "type": "group",
                 "group": {
                   "key": "Start Time Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -29610,7 +29610,7 @@
                       "type": "group",
                       "group": {
                         "key": "Retransition Speed Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -29633,7 +29633,7 @@
                       "type": "group",
                       "group": {
                         "key": "Retransition Start Time Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -29659,7 +29659,7 @@
                   "subgroups": [
                     {
                       "key": "Retransition Speed Curve",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -29679,7 +29679,7 @@
                     },
                     {
                       "key": "Retransition Start Time Curve",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -29704,7 +29704,7 @@
                 "type": "group",
                 "group": {
                   "key": "Multi Trigger",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -31300,7 +31300,7 @@
             "subgroups": [
               {
                 "key": "Offset",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -31380,7 +31380,7 @@
               },
               {
                 "key": "Offset To Camera",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -31495,7 +31495,7 @@
               },
               {
                 "key": "Start Time Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -31561,7 +31561,7 @@
                     "type": "group",
                     "group": {
                       "key": "Retransition Speed Curve",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -31584,7 +31584,7 @@
                     "type": "group",
                     "group": {
                       "key": "Retransition Start Time Curve",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -31610,7 +31610,7 @@
                 "subgroups": [
                   {
                     "key": "Retransition Speed Curve",
-                    "collapsed": false,
+                    "collapsed": true,
                     "locked": false,
                     "items": [
                       {
@@ -31630,7 +31630,7 @@
                   },
                   {
                     "key": "Retransition Start Time Curve",
-                    "collapsed": false,
+                    "collapsed": true,
                     "locked": false,
                     "items": [
                       {
@@ -31652,7 +31652,7 @@
               },
               {
                 "key": "Multi Trigger",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -33233,7 +33233,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 17",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -64943,7 +64943,7 @@
               "type": "group",
               "group": {
                 "key": "Offset",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -65026,7 +65026,7 @@
               "type": "group",
               "group": {
                 "key": "Offset To Camera",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -65153,7 +65153,7 @@
               "type": "group",
               "group": {
                 "key": "Start Time Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -65225,7 +65225,7 @@
                     "type": "group",
                     "group": {
                       "key": "Retransition Speed Curve",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -65248,7 +65248,7 @@
                     "type": "group",
                     "group": {
                       "key": "Retransition Start Time Curve",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -65274,7 +65274,7 @@
                 "subgroups": [
                   {
                     "key": "Retransition Speed Curve",
-                    "collapsed": false,
+                    "collapsed": true,
                     "locked": false,
                     "items": [
                       {
@@ -65294,7 +65294,7 @@
                   },
                   {
                     "key": "Retransition Start Time Curve",
-                    "collapsed": false,
+                    "collapsed": true,
                     "locked": false,
                     "items": [
                       {
@@ -65319,7 +65319,7 @@
               "type": "group",
               "group": {
                 "key": "Multi Trigger",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -66915,7 +66915,7 @@
           "subgroups": [
             {
               "key": "Offset",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -66995,7 +66995,7 @@
             },
             {
               "key": "Offset To Camera",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -67110,7 +67110,7 @@
             },
             {
               "key": "Start Time Curve",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -67176,7 +67176,7 @@
                   "type": "group",
                   "group": {
                     "key": "Retransition Speed Curve",
-                    "collapsed": false,
+                    "collapsed": true,
                     "locked": false,
                     "items": [
                       {
@@ -67199,7 +67199,7 @@
                   "type": "group",
                   "group": {
                     "key": "Retransition Start Time Curve",
-                    "collapsed": false,
+                    "collapsed": true,
                     "locked": false,
                     "items": [
                       {
@@ -67225,7 +67225,7 @@
               "subgroups": [
                 {
                   "key": "Retransition Speed Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -67245,7 +67245,7 @@
                 },
                 {
                   "key": "Retransition Start Time Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -67267,7 +67267,7 @@
             },
             {
               "key": "Multi Trigger",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -68845,7 +68845,7 @@
         },
         {
           "key": "Custom Click Function 17",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
