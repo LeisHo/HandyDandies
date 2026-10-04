@@ -6549,11 +6549,11 @@
           "group": "FIST ROTATE"
         }
       ],
-      "cameraX": 0.5358632728036108,
-      "cameraY": 1.0794835610701279,
-      "cameraZ": 20.966415010668186,
+      "cameraX": 3.587196433859648,
+      "cameraY": 7.226320177572674,
+      "cameraZ": 140.3541779670616,
       "cameraFov": 35,
-      "cameraZoom": 140.58585616758702,
+      "cameraZoom": 260.17068872666084,
       "cameraZoomSpeed": 1,
       "savedCameras": [
         {
@@ -7896,7 +7896,7 @@
       "custom18Trig1RotationEnabled": true,
       "custom18Trig1RotationX": 20,
       "custom18Trig1RotationY": 0,
-      "custom18Trig1RotationZ": 700,
+      "custom18Trig1RotationZ": 0,
       "custom18Trig1TargetPose": "Big Open Palm (S)",
       "custom18Trig1TweenSelector": "Birdie",
       "custom18Trig1TweenSpeedMs": 5000,
@@ -15889,7 +15889,7 @@
       "custom18Trig1RotationEnabled": true,
       "custom18Trig1RotationX": 20,
       "custom18Trig1RotationY": 0,
-      "custom18Trig1RotationZ": 700,
+      "custom18Trig1RotationZ": 0,
       "custom18Trig1TargetPose": "Big Open Palm (S)",
       "custom18Trig1TweenSelector": "Birdie",
       "custom18Trig1TweenSpeedMs": 5000,
@@ -23882,7 +23882,7 @@
       "custom18Trig1RotationEnabled": true,
       "custom18Trig1RotationX": 20,
       "custom18Trig1RotationY": 0,
-      "custom18Trig1RotationZ": 700,
+      "custom18Trig1RotationZ": 0,
       "custom18Trig1TargetPose": "Big Open Palm (S)",
       "custom18Trig1TweenSelector": "Birdie",
       "custom18Trig1TweenSpeedMs": 5000,
