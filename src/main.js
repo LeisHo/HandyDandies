@@ -758,7 +758,7 @@ function tryStartField() {
   // whatever comes next; don't treat this comment's own reasoning above
   // as the settled explanation.
   renderer.compile(scene, camera)
-  window.__debug = { THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose, resolveTweenSegmentsWithAnchor, lerpTweenSegments, lerpLoopSegments, isHoldEntry, updateLoadingPreviewWristClip, lerpPoseValues, get loadingPreviewRenderer() { return loadingPreviewRenderer }, get loadingPreviewScene() { return loadingPreviewScene }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, get handBoundsCenterLocal() { return handBoundsCenterLocal }, multiPointCommit, multiPointEligibleFunctions, get multiPointActiveTouchCount() { return multiPointActiveTouchCount }, get multiPointSessionFiredPoseId() { return multiPointSessionFiredPoseId }, detectPoseJumps, get poseJumpLogEntries() { return poseJumpLogEntries }, applyCurlToSkeletonReference }
+  window.__debug = { THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose, resolveTweenSegmentsWithAnchor, lerpTweenSegments, lerpLoopSegments, isHoldEntry, updateLoadingPreviewWristClip, lerpPoseValues, get loadingPreviewRenderer() { return loadingPreviewRenderer }, get loadingPreviewScene() { return loadingPreviewScene }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, get handBoundsCenterLocal() { return handBoundsCenterLocal }, multiPointCommit, multiPointEligibleFunctions, get multiPointActiveTouchCount() { return multiPointActiveTouchCount }, get multiPointSessionFiredPoseId() { return multiPointSessionFiredPoseId }, detectPoseJumps, get poseJumpLogEntries() { return poseJumpLogEntries }, applyCurlToSkeletonReference, handLogTriggerLabel }
   loadingEl.classList.add('hidden')
   // The loading-preview canvas is a top-level sibling of #loading now
   // (2026-09-17, decoupled specifically so this moment doesn't force it
@@ -2748,10 +2748,21 @@ function buildMouseTrackingLogWidget() {
 // group genuinely isn't in the DOM for some reason (never normally true
 // for a hand actively being logged, since it had to be triggered through
 // a real, currently-registered function to get here).
+// Memoized (2026-10-04, found with the Frame Rate Log's new PROFILE lines): one lookup is a DOM query
+// over a ~28,000-node panel, measured ~1.3 ms each, and the log call sites evaluate it (twice per hand per
+// event: "interrupted" + "triggered") EVEN WHEN the Hand Behaviour Log is off -- a mass event across 156 hands
+// cost ~400 ms in one frame (87-117 ms frames on the user's machine). A label only feeds log text, so a
+// short TTL is enough to pick up a rename.
+const _handLogLabelCache = new Map()
 function handLogTriggerLabel(p) {
+  const now = performance.now()
+  const hit = _handLogLabelCache.get(p)
+  if (hit && now - hit.at < 3000) return hit.label
   const g = document.querySelector(`.dp-group[data-custom-function-id="${p}"], .dp-group[data-multi-trigger-prefix="${p}"]`)
   const titleEl = g ? g.querySelector(':scope > .dp-group-header .dp-group-title-text') : null
-  return (titleEl && titleEl.textContent.trim()) || p
+  const label = (titleEl && titleEl.textContent.trim()) || p
+  _handLogLabelCache.set(p, { label, at: now })
+  return label
 }
 // Shared push+truncate+render step, factored out of logHandBehaviourEvent()
 // (2026-09-28) so the new Detailed periodic log below can append into the
