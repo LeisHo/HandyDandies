@@ -5,6 +5,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Handy Dandies</title>
 <link rel="stylesheet" href="src/style.css?v=25">
+<script>
+/* Never flash white on startup (2026-10-04): paint the last-used Background Color
+   before the first frame. main.js writes it to localStorage; with no value yet
+   (first ever visit) the dark default from style.css stays. */
+try {
+  var bg = localStorage.getItem('handyDandies.startupBg');
+  if (bg && /^#[0-9a-fA-F]{3,8}$/.test(bg)) {
+    var st = document.createElement('style');
+    st.textContent = 'html,body{background:' + bg + ' !important}';
+    document.head.appendChild(st);
+  }
+} catch (e) {}
+</script>
 <script type="importmap">
 {
   "imports": {
@@ -44,6 +57,6 @@
      .hidden class on it) since the Loading Preview hand animation is
      now the sole loading indicator; an empty #loading is harmless. -->
 <div id="loading"></div>
-<script type="module" src="src/main.js?v=288"></script>
+<script type="module" src="src/main.js?v=289"></script>
 </body>
 </html>

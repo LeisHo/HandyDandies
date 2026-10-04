@@ -3296,6 +3296,7 @@ export function initDevPanel(groups, opts = {}) {
     // controls (devSaveCaptureExtra, above) so Save captures it too, not
     // just Undo/Redo -- see that variable's own comment.
     if (devSaveCaptureExtra) snapshot.extra = devSaveCaptureExtra()
+    if (opts.onSave) { try { opts.onSave() } catch (err) { /* host hook must never block a save */ } }
     // CORRECTED 2026-10-04, direct request ("make sure the save button saves
     // the dev panel size and location"). With a remote endpoint configured
     // this function returned early, so the geometry write that used to sit

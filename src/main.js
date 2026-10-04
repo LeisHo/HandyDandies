@@ -7,7 +7,7 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js'
 import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js'
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js'
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js'
-import { initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab, beginDynamicBatch, endDynamicBatch } from './devpanel/devPanel.js?v=57'
+import { initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab, beginDynamicBatch, endDynamicBatch } from './devpanel/devPanel.js?v=58'
 
 // A defensive wrapper around devPanel.js's own refreshSelectOptions() --
 // found via live testing (direct user report: "I dont see any of the
@@ -513,6 +513,17 @@ let idleReposeFrameCounter = 0
 let modelMeasurementsReady = false
 let startupSettingsReady = false
 let startupPreviewBuilt = false // see maybeBuildStartupLoadingPreview()
+// Startup cache (2026-10-04, direct request: "the loading hand and poses should
+// load first ... i should never see a white background"). The last restored
+// settings are kept in localStorage and applied to `cfg` right after
+// initDevPanel() returns -- before the scene, lights, camera and loading
+// preview are created -- so the first frames use the user's real values
+// instead of code defaults (white background, 160 px preview, no tween).
+// The network restore still runs afterwards and stays authoritative.
+const STARTUP_CACHE_KEY = 'handyDandies.startupCache.v1'
+const STARTUP_BG_KEY = 'handyDandies.startupBg'
+let startupCacheApplied = false
+let startupCacheSnapshot = null
 let fieldStarted = false
 // Loading Preview's own "Min Loading Time" (direct request) -- captured
 // here, at the earliest point this module runs, so the min-time window
@@ -565,9 +576,46 @@ function logStartupTiming(label) {
 // camera="Loading Preview Camera 7"). Cost: the preview appears when the
 // restore finishes (about 1-2 s) instead of at +0.5 s.
 function maybeBuildStartupLoadingPreview() {
-  if (startupPreviewBuilt || !modelMeasurementsReady || !startupSettingsReady) return
+  // A startup cache counts as "settings available": the preview can build at
+  // model-ready with the last session's real values instead of waiting ~1-2 s
+  // for the network restore (2026-10-04).
+  if (startupPreviewBuilt || !modelMeasurementsReady || !(startupSettingsReady || startupCacheApplied)) return
   startupPreviewBuilt = true
+  logLoadingPreview(`startup preview building from ${startupSettingsReady ? 'restored settings' : 'the startup cache (restore still pending)'}`)
   buildLoadingPreview(!!cfg.loadingPreviewShowLive)
+}
+function applyStartupCache() {
+  try {
+    const raw = localStorage.getItem(`${STARTUP_CACHE_KEY}.${realDeviceClass()}`)
+    if (!raw) return
+    const snap = JSON.parse(raw)
+    if (!snap || typeof snap !== 'object') return
+    // Only keys that already exist (static controls); per-function custom keys are
+    // created later by restoreCustomClickFunctions() from the real restore.
+    Object.keys(snap).forEach((k) => { if (Object.prototype.hasOwnProperty.call(cfg, k)) cfg[k] = snap[k] })
+    startupCacheSnapshot = snap
+    startupCacheApplied = true
+  } catch (err) { /* corrupt or unavailable -- behave as a first visit */ }
+}
+function writeStartupCache() {
+  try {
+    const snap = {}
+    Object.keys(cfg).forEach((k) => { if (typeof cfg[k] !== 'function' && !/^custom\d/.test(k)) snap[k] = cfg[k] })
+    localStorage.setItem(`${STARTUP_CACHE_KEY}.${realDeviceClass()}`, JSON.stringify(snap))
+    if (typeof cfg.bgColor === 'string') localStorage.setItem(STARTUP_BG_KEY, cfg.bgColor)
+  } catch (err) { /* quota/private mode -- the cache is only an optimisation */ }
+}
+// After the real restore: if the preview was built from the cache and any
+// preview-relevant value turned out different, rebuild it once (still behind the
+// loading screen) so it reflects what was actually saved.
+const STARTUP_PREVIEW_RELEVANT = /^(loadingPreview|bgColor$|savedPoses$|savedTweenSequences$|key[A-Z]|ambient)/
+function refreshStartupPreviewAfterRestore() {
+  if (!startupPreviewBuilt || fieldStarted || !startupCacheSnapshot) return
+  const changed = Object.keys(cfg).filter((k) => (STARTUP_PREVIEW_RELEVANT.test(k) || POSE_PRESET_KEYS.includes(k)) && k in startupCacheSnapshot && JSON.stringify(cfg[k]) !== JSON.stringify(startupCacheSnapshot[k]))
+  if (changed.length === 0) { logLoadingPreview('restore finished -- startup cache matched, preview kept'); return }
+  logLoadingPreview(`restore finished -- ${changed.length} preview value(s) differ from the cache (${changed.slice(0, 4).join(', ')}${changed.length > 4 ? ', ...' : ''}) -- rebuilding`)
+  startupPreviewBuilt = false
+  maybeBuildStartupLoadingPreview()
 }
 function tryStartField() {
   logStartupTiming(`tryStartField() called (fieldStarted=${fieldStarted} modelReady=${modelMeasurementsReady} settingsReady=${startupSettingsReady})`)
@@ -2022,6 +2070,8 @@ const cfg = initDevPanel(DEV_GROUPS, {
     prof('restoreCustomClickFunctions', restoreCustomClickFunctions)
     prof('enforceCustomClickFunctionsAnchorOrder', enforceCustomClickFunctionsAnchorOrder)
     startupSettingsReady = true
+    prof('refreshStartupPreviewAfterRestore', refreshStartupPreviewAfterRestore)
+    prof('writeStartupCache', writeStartupCache)
     prof('maybeBuildStartupLoadingPreview', maybeBuildStartupLoadingPreview)
     prof('tryStartField (from onRestore)', tryStartField)
   },
@@ -2091,9 +2141,12 @@ const cfg = initDevPanel(DEV_GROUPS, {
   // sync below) -- marking the paused render loop dirty so it redraws
   // promptly instead of waiting for its own throttle interval, or
   // (normally) not redrawing at all while nothing has actually changed.
-  onAnyValueChange: () => { sceneNeedsRedraw = true }
+  onAnyValueChange: () => { sceneNeedsRedraw = true },
+  // Keep the startup cache in step with what was just saved.
+  onSave: () => writeStartupCache()
 })
 onChangeByCtrl.forEach((fn, c) => { c.onChange = fn })
+applyStartupCache()
 setupCustomFunctionTabVisibilitySync()
 updateCustomFunctionsAnchorRowVisibility()
 // Internal bookkeeping row, never meant for direct editing -- permanently
@@ -2154,7 +2207,9 @@ function applyQualityState() {
 }
 
 const scene = new THREE.Scene()
-scene.background = new THREE.Color(cfg.bgColor)
+// Never white at startup: with no cache yet (first ever visit) use the page's dark
+// loading colour until the restored Background Color arrives.
+scene.background = new THREE.Color(startupCacheApplied ? cfg.bgColor : '#1c1e22')
 
 const camera = new THREE.PerspectiveCamera(cfg.cameraFov, window.innerWidth / window.innerHeight, 0.1, 2000)
 camera.position.set(cfg.cameraX, cfg.cameraY, cfg.cameraZ)
@@ -5504,7 +5559,7 @@ function setLoadingPreviewLiveVisible(show) {
     logLoadingPreview('Show Loading Preview: OFF -- canvas hidden')
     return
   }
-  if (!modelMeasurementsReady || !startupSettingsReady) {
+  if (!modelMeasurementsReady || !(startupSettingsReady || startupCacheApplied)) {
     logLoadingPreview(`Show Loading Preview: ON requested but ${!modelMeasurementsReady ? 'the hand model is not loaded yet' : 'settings are still being restored'} -- deferred (applied when startup finishes)`)
     return
   }
@@ -13338,7 +13393,8 @@ function computeBaseScale() {
 }
 
 function relayoutField() {
-  if (!modelLoaded) return
+  // 2026-10-04: nothing to lay out until the field exists (see rebuildField()).
+  if (!modelLoaded || !fieldStarted) return
   const rows = cfg.fieldRows, cols = cfg.fieldCols
   const rowSpacing = cfg.rowSpacing, colSpacing = cfg.columnSpacing
   const scaleFactor = computeBaseScale()
@@ -13383,7 +13439,12 @@ function relayoutField() {
 // that framing is derived from the field's size exactly ONCE (framedOnce),
 // the very first time hands are built, and never revisited after that.
 function rebuildField() {
-  if (!modelLoaded) return
+  // 2026-10-04, startup perf + visual bug: this used to run on every restored
+  // Field Layout / model-rotation onChange as soon as the model had loaded --
+  // measured 100-200 ms EACH during the settings restore, and it put all 156
+  // hands into the scene while the loading screen was still up. tryStartField()
+  // sets fieldStarted and then calls this once with the final restored values.
+  if (!modelLoaded || !fieldStarted) return
   hands.forEach((hand) => scene.remove(hand.wrapper))
   hands.length = 0
   const total = cfg.fieldRows * cfg.fieldCols
