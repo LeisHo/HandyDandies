@@ -11691,7 +11691,10 @@ const CUSTOM_FUNCTION_HOLD_LAYOUT = [
   // from Click Offset Test); Tween Stop stays last, hold-kind only.
   { type: 'group', title: 'Offset' }, { type: 'group', title: 'Offset To Camera' }, { type: 'group', title: 'Rotation' }, { type: 'group', title: 'Easing' },
   { type: 'group', title: 'Animation Speed Curve' }, { type: 'group', title: 'Start Time Curve' }, { type: 'group', title: 'Start Distance Curve' },
-  { type: 'group', title: 'Retransition' }, { type: 'group', title: 'Tween Stop' }
+  // Multi Trigger last, as in Click Offset Test (2026-10-04, direct request "fix my
+  // group setting order"): it was missing from this list, so hold-kind
+  // functions rendered it ABOVE every row instead of at the bottom.
+  { type: 'group', title: 'Retransition' }, { type: 'group', title: 'Tween Stop' }, { type: 'group', title: 'Multi Trigger' }
 ]
 // Applies the reference renames + order to ONE function -- called
 // unconditionally at the end of renderCustomClickFunctionGroup() (both a
