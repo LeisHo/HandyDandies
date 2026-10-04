@@ -16216,6 +16216,35 @@ Verified: node --check, tests/top-level-load-check.js, live profiling above.
 Not verified visually (screenshots cannot show WebGL here).
 `main.js` `?v=287` -> `?v=291`, `devPanel.js` `?v=57` -> `?v=59`.
 
+2026-10-04  -  (fix -- field hands no longer visibly settle into orientation after the
+reveal)
+
+Direct question: "why do the field hands load in their model default, then take some
+time to tween to the default pose I set? Can't the first render just be the default I
+set?"
+
+Cause: each hand's smoothed look-at orientation (`hand.currentArmRotationQuat`, the
+Responsive Arm Rotation state) was created on its first tracked frame at the hand's
+neutral BASE orientation and then slerped toward the cursor-facing orientation at
+Look-At / Arm Rotation Damping (0.16 in the saved settings), so every freshly built
+field visibly rotated into place for a second or more. A new hand's wrapper itself
+starts at identity (the raw model orientation); read off the live page: identity was 91
+degrees from base and 118 degrees from the cursor-facing orientation. It is now seeded
+at the cursor-facing orientation (`lookAtDesired`), i.e. the orientation it converges to.
+Exception kept: a hand whose responsiveness is exactly 0 (Arm Rotation curve at 0) never
+moves toward the cursor, so it still starts at base.
+
+Already correct, checked: the finger/wrist pose is applied at build time
+(finishRebuildField() -> applyAllFingerPoses()) from the same cfg values as the saved
+default pose; Wrist Splay (!everReposed branch), Wrist Cropping (currentArmLengthT undefined
+branch) and palm roll (currentPalmRollDeg undefined branch) already take their target on a
+hand's first frame. This applies to every field rebuild (startup, Field Layout changes),
+not only the first one.
+
+Not verified live: this sandbox's animate() loop is paused (document.hidden), so the first
+frames could not be observed. Confirmed by reading the state that was being seeded and by
+node --check + tests/top-level-load-check.js. `main.js` `?v=291` -> `?v=292`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

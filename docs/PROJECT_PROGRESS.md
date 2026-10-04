@@ -18,6 +18,10 @@ work seamlessly from there.
 
 ## Currently working on
 
+**2026-10-04 -- New field hands start already facing the cursor (no visible settle).**
+`currentArmRotationQuat` is seeded at the cursor-facing orientation instead of the base
+orientation. Not verified live (animate loop paused in this sandbox). `main.js` `?v=292`.
+
 **2026-10-04 -- Startup: no white screen, loading hand first, field built behind it.**
 localStorage startup cache applied before the scene exists + head-script background;
 preview builds at model-ready; hand field and custom-function restore are built in

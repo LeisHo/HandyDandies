@@ -2394,3 +2394,8 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   Use it to check startup smoothness instead of eyeballing; this sandbox cannot show WebGL
   and its `requestAnimationFrame` is unreliable, so log `<pre>` widgets can look empty here
   even when the buffer is fine (Copy All Logs shows the real buffer).
+- **New hands must start already at their target (2026-10-04).** Any per-hand smoothed value
+  (`currentArmRotationQuat`, `currentPalmRollDeg`, `currentArmLengthT`, `currentSplayDeg`) has
+  to be seeded from the live target on a hand's first frame, not from a neutral value, or every
+  field rebuild visibly "tweens in". `currentArmRotationQuat` was the last one still seeded at
+  `currentBaseQuat`; a new hand's wrapper starts at identity, so never rely on it for the look.

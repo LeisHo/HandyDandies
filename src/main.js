@@ -14406,7 +14406,6 @@ function animate(dt, now) {
           // like a real arm continuing to turn, with no cap at all.
           let desired = hand.currentBaseQuat
           if (cfg.armRotationEnabled) {
-            if (!hand.currentArmRotationQuat) hand.currentArmRotationQuat = hand.currentBaseQuat.clone()
             // Default Arm Rotation / Reactive Arm Rotation curve -- same
             // role as before, now scaling the PER-FRAME TURN RATE instead
             // of a bounded target angle. At 0%, the hand simply stops
@@ -14430,6 +14429,15 @@ function animate(dt, now) {
             // configured); now directly the per-frame slerp fraction
             // (this feature's only rate control, multiplied by
             // responsiveness above).
+            // First tracked frame of a new hand (2026-10-04, direct request: "why do the
+            // field hands load in their model default, then take some time to tween ...
+            // can't the first render just be the default I set?"). The smoothed orientation
+            // used to start at the hand's neutral BASE orientation and slerp toward the
+            // cursor-facing one, so every freshly built field visibly settled for a second
+            // or more. Seed it at the orientation it converges to instead. A hand whose
+            // responsiveness is exactly 0 never moves toward the cursor, so it keeps the
+            // base orientation (unchanged behaviour).
+            if (!hand.currentArmRotationQuat) hand.currentArmRotationQuat = (responsiveness > 0 ? lookAtDesired : hand.currentBaseQuat).clone()
             const armRotationDampingAmt = inHandoffSettle
               ? Math.min(THREE.MathUtils.clamp(cfg.armRotationDamping ?? 1, 0.001, 1), HANDOFF_SETTLE_DAMPING_CAP)
               : THREE.MathUtils.clamp(cfg.armRotationDamping ?? 1, 0.001, 1)
