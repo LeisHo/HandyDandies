@@ -4160,6 +4160,12 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       // Read by selectedSequenceEntries() when a trigger starts; Sequence mode only (Chain mode's
       // list of sequences is not reversed).
       { key: `${p}ReverseSequence`, label: 'Reverse Sequence', type: 'checkbox', def: false },
+      // Glide To Pose 1 (2026-10-04, direct request). ON = the sequence starts with a glide from
+      // the hand's current pose to Pose 1 (the previous behaviour). OFF (the default, per
+      // request) = the current pose is used AS Pose 1 and the sequence moves straight on to
+      // Pose 2. Sequence mode only. The time-scale slider below only applies while this is on.
+      { key: `${p}GlideToFirstPose`, label: 'Glide To Pose 1', type: 'checkbox', def: false, onChange: () => updateChainModeVisibility(p) },
+      { key: `${p}FirstGlideTimeScale`, label: 'First Transition Time Scale (x)', type: 'slider', min: 0.1, max: 5, step: 0.05, def: 1 },
       // Chain mode's own ordered list of saved Tween Sequences (NOT
       // individual poses -- a sequence OF sequences), reusing the exact
       // same drag-to-reorder multi-select control type `tweenPoses`
@@ -4519,6 +4525,12 @@ function makeClickPoseGroup(p, title, defaults = {}) {
       // Read by selectedSequenceEntries() when a trigger starts; Sequence mode only (Chain mode's
       // list of sequences is not reversed).
       { key: `${p}ReverseSequence`, label: 'Reverse Sequence', type: 'checkbox', def: false },
+      // Glide To Pose 1 (2026-10-04, direct request). ON = the sequence starts with a glide from
+      // the hand's current pose to Pose 1 (the previous behaviour). OFF (the default, per
+      // request) = the current pose is used AS Pose 1 and the sequence moves straight on to
+      // Pose 2. Sequence mode only. The time-scale slider below only applies while this is on.
+      { key: `${p}GlideToFirstPose`, label: 'Glide To Pose 1', type: 'checkbox', def: false, onChange: () => updateChainModeVisibility(p) },
+      { key: `${p}FirstGlideTimeScale`, label: 'First Transition Time Scale (x)', type: 'slider', min: 0.1, max: 5, step: 0.05, def: 1 },
       // Tween's own SEPARATE speed/curve/range trio -- see
       // makeClickHoldPoseGroup()'s own matching comment for the full
       // reasoning (shared word-for-word). No Loop checkbox here -- Click
@@ -8144,6 +8156,56 @@ function selectedSequenceEntries(p) {
   const raw = seq ? (seq.tweenPoses || []) : []
   return cfg[`${p}ReverseSequence`] ? raw.slice().reverse() : raw
 }
+// ---- Glide To Pose 1 / First Transition Time Scale (2026-10-04) ----
+// Sequence mode only. `glide` OFF: the hand's current pose is used as Pose 1, so the first
+// named pose is dropped from what the timeline moves TO. `glide` ON: unchanged, except the
+// first transition (current pose -> Pose 1) can be time-scaled.
+function sequenceGlideOn(p) {
+  return cfg[`${p}Mode`] === 'Sequence' && !!cfg[`${p}GlideToFirstPose`]
+}
+// Raw entries (pose names / Hold objects) minus the FIRST pose name when glide is off.
+function sequenceStartEntries(p, entries) {
+  if (cfg[`${p}Mode`] !== 'Sequence' || cfg[`${p}GlideToFirstPose`]) return entries
+  const i = (entries || []).findIndex((e) => typeof e === 'string' && e)
+  return i < 0 ? entries : entries.filter((_, idx) => idx !== i)
+}
+// Resolved poses minus the first when glide is off (pose-kind).
+function sequenceStartPoses(p, poses) {
+  if (!poses || cfg[`${p}Mode`] !== 'Sequence' || cfg[`${p}GlideToFirstPose`]) return poses
+  return poses.slice(1)
+}
+function firstGlideScale(p) {
+  if (!sequenceGlideOn(p)) return 1
+  const k = Number(cfg[`${p}FirstGlideTimeScale`])
+  return Number.isFinite(k) && k > 0 ? k : 1
+}
+// Hold-kind (weighted segments): scales the first real transition's weight by k and returns the
+// factor the TOTAL duration must grow by so every OTHER segment keeps its current duration
+// (segment time = total * weight / sum(weights)).
+function applyFirstGlideScale(p, segments) {
+  const k = firstGlideScale(p)
+  if (k === 1 || !segments || segments.length === 0) return 1
+  const idx = segments.findIndex((seg) => seg.poseA !== seg.poseB)
+  if (idx < 0) return 1
+  const W = segments.reduce((sum, seg) => sum + seg.weight, 0)
+  const w1 = segments[idx].weight
+  if (!(W > 0)) return 1
+  segments[idx].weight = w1 * k
+  return (W + (k - 1) * w1) / W
+}
+// Pose-kind (uniform segments, N of them): total-duration factor and the real-time -> timeline
+// remap for a first segment that takes k times as long as the others.
+function poseGlideTimeFactor(p, tweenPoses) {
+  const k = firstGlideScale(p)
+  const N = tweenPoses ? tweenPoses.length - 1 : 0
+  return (k === 1 || N < 1) ? 1 : (N - 1 + k) / N
+}
+function remapGlideProgress(u, N, k) {
+  if (N < 1 || k === 1) return u
+  const a = k / (N - 1 + k) // share of real time spent on the first segment
+  if (u <= a) return (u / a) * (1 / N)
+  return 1 / N + ((u - a) / (1 - a)) * ((N - 1) / N)
+}
 function resolveTweenSequencePoses(names) {
   return (names || [])
     .map((name) => {
@@ -8751,7 +8813,8 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     // lerpTweenSequence() pairing -- see resolveTweenSegmentsWithAnchor()'s
     // own comment for why a sequence with no Hold entries behaves
     // identically either way.
-    chp.tweenSegments = trig.rawChainEntries ? resolveTweenSegmentsWithAnchor(chp.forwardSnapshot, trig.rawChainEntries) : null
+    chp.tweenSegments = trig.rawChainEntries ? resolveTweenSegmentsWithAnchor(chp.forwardSnapshot, sequenceStartEntries(p, trig.rawChainEntries)) : null
+    chp.glideTimeFactor = applyFirstGlideScale(p, chp.tweenSegments)
     chp.phase = 'forward'
     chp.forwardStartTime = now
     chp.frozenSplayDeg = chp.pendingFrozenSplayDeg
@@ -8791,6 +8854,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     // real elapsed time, and only the pose/splay position is reshaped.
     const easingProfile = cfg[`${p}EasingCurveEnabled`] ? getEasingProfile(p, isTween, trig) : null
     if (easingProfile) speedMs = Math.max(easingProfile.T, 1)
+    speedMs = Math.max(speedMs * (chp.glideTimeFactor || 1), 1) // First Transition Time Scale
     const progress = THREE.MathUtils.clamp(elapsed / speedMs, 0, 1)
     const easedProgress = easingProfile ? easingProfilePAt(easingProfile, progress) : progress
     // Start Distance Curve (2026-09-27) -- see updateClickPoseForHand()'s
@@ -9004,6 +9068,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
       // mapping) or the pose would snap at the handoff.
       const stopEasing = cfg[`${p}EasingCurveEnabled`] ? getEasingProfile(p, true, trig) : null
       if (stopEasing) speedMs = Math.max(stopEasing.T, 1)
+      speedMs = Math.max(speedMs * (chp.glideTimeFactor || 1), 1) // First Transition Time Scale
       chp.stoppingVirtualElapsedMs += dt * decayFactor
       const progressRaw = THREE.MathUtils.clamp((chp.stoppingBaseElapsedMs + chp.stoppingVirtualElapsedMs) / speedMs, 0, 1)
       const progress = stopEasing ? easingProfilePAt(stopEasing, progressRaw) : progressRaw
@@ -9740,7 +9805,10 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
     const wasActive = hand._wasOverriddenLastFrame && hand._lastPoseValues
     const anchor = wasActive ? hand._lastPoseValues : cp.pendingForwardSnapshot
     cp.forwardSnapshot = anchor
-    cp.tweenPoses = (cp.pendingNamedPoses && cp.pendingNamedPoses.length >= 1) ? [anchor, ...cp.pendingNamedPoses] : null
+    const startNamed = sequenceStartPoses(p, cp.pendingNamedPoses)
+    cp.tweenPoses = (startNamed && startNamed.length >= 1) ? [anchor, ...startNamed] : null
+    cp.glideScale = firstGlideScale(p)
+    cp.glideTimeFactor = poseGlideTimeFactor(p, cp.tweenPoses)
     cp.phase = 'forward'
     cp.triggerTime = now
     cp.frozenSplayDeg = cp.pendingFrozenSplayDeg
@@ -9773,6 +9841,7 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
     // getEasingProfile() and updateClickHoldPoseForHand()'s matching comment.
     const easingProfile = cfg[`${p}EasingCurveEnabled`] ? getEasingProfile(p, isTween, clickPoseTriggers[p]) : null
     if (easingProfile) speedMs = Math.max(easingProfile.T, 1)
+    speedMs = Math.max(speedMs * (cp.glideTimeFactor || 1), 1) // First Transition Time Scale
     const progress = THREE.MathUtils.clamp(elapsed / speedMs, 0, 1)
     const easedProgress = easingProfile ? easingProfilePAt(easingProfile, progress) : progress
     // Start Distance Curve (2026-09-27) -- `cp.frozenTweenFractionCap`
@@ -9785,7 +9854,9 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
     // spec. Deliberately NOT applied to applyOffsetRotationToHand()'s own
     // progress below -- Offset/Rotation is a separate system the spec
     // never asked to couple with this one.
-    const cappedT = easedProgress * cp.frozenTweenFractionCap
+    // First Transition Time Scale: remap so the first segment (current pose -> Pose 1) takes glideScale x its share
+    const poseT = (isTween && cp.glideScale && cp.glideScale !== 1 && cp.tweenPoses) ? remapGlideProgress(easedProgress, cp.tweenPoses.length - 1, cp.glideScale) : easedProgress
+    const cappedT = poseT * cp.frozenTweenFractionCap
     // CORRECTED 2026-09-27 -- see updateClickHoldPoseForHand()'s own
     // matching comment. Ramps splay from wherever it actually was at
     // trigger time toward the frozen target, across the same (now eased)
@@ -11773,7 +11844,7 @@ const CUSTOM_FUNCTION_POSE_LAYOUT = [
   { type: 'row', suffix: 'Enabled' },
   { type: 'row', suffix: 'Type' }, { type: 'row', suffix: 'TouchPointCount' }, { type: 'row', suffix: 'ClickCount' },
   { type: 'row', suffix: 'Mode' },
-  { type: 'row', suffix: 'TargetPose' }, { type: 'row', suffix: 'TweenSelector' }, { type: 'row', suffix: 'ReverseSequence' },
+  { type: 'row', suffix: 'TargetPose' }, { type: 'row', suffix: 'TweenSelector' }, { type: 'row', suffix: 'ReverseSequence' }, { type: 'row', suffix: 'GlideToFirstPose' }, { type: 'row', suffix: 'FirstGlideTimeScale' },
   { type: 'row', suffix: 'TransitionSpeedMs' }, { type: 'row', suffix: 'TweenSpeedMs' },
   { type: 'row', suffix: 'PauseDurationMs' },
   { type: 'row', suffix: 'SequencePlayMode' }, { type: 'row', suffix: 'SequenceCount' }, { type: 'row', suffix: 'SequenceCountMode' },
@@ -11810,7 +11881,7 @@ const CUSTOM_FUNCTION_HOLD_LAYOUT = [
   { type: 'row', suffix: 'Enabled' },
   { type: 'row', suffix: 'Type' }, { type: 'row', suffix: 'TouchPointCount' }, { type: 'row', suffix: 'ClickCount' },
   { type: 'row', suffix: 'Mode' },
-  { type: 'row', suffix: 'TargetPose' }, { type: 'row', suffix: 'TweenSelector' }, { type: 'row', suffix: 'ReverseSequence' }, { type: 'row', suffix: 'TweenChain' },
+  { type: 'row', suffix: 'TargetPose' }, { type: 'row', suffix: 'TweenSelector' }, { type: 'row', suffix: 'ReverseSequence' }, { type: 'row', suffix: 'GlideToFirstPose' }, { type: 'row', suffix: 'FirstGlideTimeScale' }, { type: 'row', suffix: 'TweenChain' },
   { type: 'row', suffix: 'TransitionSpeedMs' }, { type: 'row', suffix: 'TweenSpeedMs' },
   { type: 'row', suffix: 'LoopMode' }, { type: 'row', suffix: 'LoopHoldMs' },
   // 2026-10-04 -- same group order as CUSTOM_FUNCTION_POSE_LAYOUT (taken
@@ -12092,7 +12163,7 @@ function enforceCustomClickFunctionsAnchorOrder() {
 // "the exact same settings available" by construction, and any future
 // change to the real controls propagates to every trigger automatically.
 const MULTI_TRIGGER_ALLOWED_SUFFIXES = [
-  'Enabled', 'Mode', 'TargetPose', 'TweenSelector', 'ReverseSequence', 'TweenSpeedMs', 'TransitionSpeedMs', 'PauseDurationMs',
+  'Enabled', 'Mode', 'TargetPose', 'TweenSelector', 'ReverseSequence', 'GlideToFirstPose', 'FirstGlideTimeScale', 'TweenSpeedMs', 'TransitionSpeedMs', 'PauseDurationMs',
   'EasingCurveEnabled', 'EasingCurve',
   'OffsetEnabled', 'OffsetMode', 'OffsetX', 'OffsetY', 'CursorOffsetDistance',
   'CursorOffsetDistanceCurveEnabled', 'CursorOffsetDistanceCurve', 'CursorOffsetDistanceCurveRange',
@@ -12762,6 +12833,10 @@ function updateChainModeVisibility(p) {
   if (selectorRow) selectorRow.style.display = mode === 'Sequence' ? '' : 'none'
   const reverseRow = document.querySelector(`.dp-row[data-key="${p}ReverseSequence"]`)
   if (reverseRow) reverseRow.style.display = mode === 'Sequence' ? '' : 'none'
+  const glideRow = document.querySelector(`.dp-row[data-key="${p}GlideToFirstPose"]`)
+  if (glideRow) glideRow.style.display = mode === 'Sequence' ? '' : 'none'
+  const glideScaleRow = document.querySelector(`.dp-row[data-key="${p}FirstGlideTimeScale"]`)
+  if (glideScaleRow) glideScaleRow.style.display = (mode === 'Sequence' && cfg[`${p}GlideToFirstPose`]) ? '' : 'none'
   const chainRow = document.querySelector(`.dp-row[data-key="${p}TweenChain"]`)
   if (chainRow) chainRow.style.display = mode === 'Chain' ? '' : 'none'
 }
