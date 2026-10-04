@@ -199,7 +199,7 @@
         }
       ],
       "loadingPreviewLightingSelector": "LOADING",
-      "loadingPreviewSpeedMs": 10000,
+      "loadingPreviewSpeedMs": 1650,
       "loadingPreviewSequenceMode": "Loop",
       "loadingPreviewSequenceCount": 1,
       "loadingPreviewSequenceCountMode": "Loop",
@@ -8192,7 +8192,7 @@
         }
       ],
       "loadingPreviewLightingSelector": "LOADING",
-      "loadingPreviewSpeedMs": 10000,
+      "loadingPreviewSpeedMs": 1650,
       "loadingPreviewSequenceMode": "Loop",
       "loadingPreviewSequenceCount": 1,
       "loadingPreviewSequenceCountMode": "Loop",
@@ -16185,7 +16185,7 @@
         }
       ],
       "loadingPreviewLightingSelector": "LOADING",
-      "loadingPreviewSpeedMs": 10000,
+      "loadingPreviewSpeedMs": 1650,
       "loadingPreviewSequenceMode": "Loop",
       "loadingPreviewSequenceCount": 1,
       "loadingPreviewSequenceCountMode": "Loop",
