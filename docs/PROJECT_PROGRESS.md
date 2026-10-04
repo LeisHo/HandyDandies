@@ -18,6 +18,9 @@ work seamlessly from there.
 
 ## Currently working on
 
+**2026-10-04 -- Log Frame Profile added; waiting on a profile log from the user's machine.** Post-optimisation
+logs: playback ~100-170 ms frames (was 180-380), idle still ~100+ ms -- not the hand logic. `main.js` `?v=300`.
+
 **2026-10-04 -- Finger-curl math 2.15x faster; idle hands skip it when unchanged.** Pose pass 47 -> 21.7 ms
 (156 hands, sandbox); idle frame 47 -> 2 ms; verified bone-for-bone against the kept reference
 implementation (5.5e-5 deg worst of 400 trials). `main.js` `?v=299`. Next: user to confirm the real-machine

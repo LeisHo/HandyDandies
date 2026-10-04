@@ -16410,6 +16410,23 @@ the 6 other uses of getWorldQuaternion elsewhere. Real-machine effect not yet me
 Jumps / Frame Rate Log and compare.
 `main.js` `?v=298` -> `?v=299`.
 
+2026-10-04  -  (diagnostics -- Log Frame Profile; reading the post-optimisation logs)
+
+User pasted Mouse/Hand/Frame Rate/Loading Preview logs from a session with the faster finger-curl math
+and idle skip live (no question attached). Read: frames during click playback are mostly 100-170 ms with
+a few worst cases of 310 and 670 ms (before the change: 180-380 ms, 3-5 fps) -- about twice as smooth --
+but the IDLE lines ("no tracked action in the last 5s") are still 105-173 ms. The per-frame hand logic
+measured ~2 ms idle in the automation tab, so the remaining ~100 ms/frame on the user's machine is not
+that code; it is drawing or other per-frame work. The Loading Preview Log in the same paste is clean (one
+continuous sequence, cache matched, field built in 995 ms, reveal at the 7000 ms Min Loading Time).
+Added a "Log Frame Profile" checkbox (Debug group, default off): once per second the existing frame
+profiler's breakdown is appended to the Frame Rate Log -- fps, total ms/frame split into cursor tracking,
+hand logic (updateRenderOrder), drawing (composer.render) and other, plus hand count, drawing-buffer size,
+pixel ratio and pause state. Verified: control present, page loads clean; the lines themselves could not be
+produced here (the automation tab's animate loop is paused). Next step needs the user: tick Log Frame
+Profile (and Log Frame Rate Drops), idle for ~10 s, then click through a sequence, then Copy All Logs.
+`main.js` `?v=299` -> `?v=300`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a
