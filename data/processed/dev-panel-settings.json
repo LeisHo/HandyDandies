@@ -210,7 +210,7 @@
       "loadingPreviewRotationY": -171.31775806313814,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": -4.440892098500626e-16,
-      "loadingPreviewOffsetY": 0,
+      "loadingPreviewOffsetY": -8.881784197001252e-16,
       "loadingPreviewOffsetZ": 0,
       "loadingPreviewCameraFov": 32,
       "loadingPreviewCameraZoom": 161.7694831224424,
@@ -6698,6 +6698,10 @@
       "logHandBehaviourDetailedEnabled": false,
       "logFrameRateDropsEnabled": true,
       "frameRateDropThresholdFps": 10,
+      "logFrameProfileEnabled": true,
+      "logPoseJumpsEnabled": true,
+      "poseJumpBoneThresholdDeg": 15,
+      "poseJumpPositionThreshold": 2,
       "dp_titleFontSize": 17,
       "dp_tabFontSize": 12,
       "dp_groupTitleFontSize": 14,
@@ -8271,7 +8275,7 @@
       "loadingPreviewRotationY": -171.31775806313814,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": -4.440892098500626e-16,
-      "loadingPreviewOffsetY": 0,
+      "loadingPreviewOffsetY": -8.881784197001252e-16,
       "loadingPreviewOffsetZ": 0,
       "loadingPreviewCameraFov": 32,
       "loadingPreviewCameraZoom": 161.7694831224424,
@@ -14759,6 +14763,10 @@
       "logHandBehaviourDetailedEnabled": false,
       "logFrameRateDropsEnabled": true,
       "frameRateDropThresholdFps": 10,
+      "logFrameProfileEnabled": true,
+      "logPoseJumpsEnabled": true,
+      "poseJumpBoneThresholdDeg": 15,
+      "poseJumpPositionThreshold": 2,
       "dp_titleFontSize": 11,
       "dp_tabFontSize": 12,
       "dp_groupTitleFontSize": 11,
@@ -16332,7 +16340,7 @@
       "loadingPreviewRotationY": -171.31775806313814,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": -4.440892098500626e-16,
-      "loadingPreviewOffsetY": 0,
+      "loadingPreviewOffsetY": -8.881784197001252e-16,
       "loadingPreviewOffsetZ": 0,
       "loadingPreviewCameraFov": 32,
       "loadingPreviewCameraZoom": 161.7694831224424,
@@ -22820,6 +22828,10 @@
       "logHandBehaviourDetailedEnabled": false,
       "logFrameRateDropsEnabled": true,
       "frameRateDropThresholdFps": 10,
+      "logFrameProfileEnabled": true,
+      "logPoseJumpsEnabled": true,
+      "poseJumpBoneThresholdDeg": 15,
+      "poseJumpPositionThreshold": 2,
       "dp_titleFontSize": 22,
       "dp_tabFontSize": 12,
       "dp_groupTitleFontSize": 11,
@@ -25368,6 +25380,26 @@
         {
           "type": "row",
           "key": "pauseLogsBtn"
+        },
+        {
+          "type": "row",
+          "key": "logFrameProfileEnabled"
+        },
+        {
+          "type": "row",
+          "key": "logPoseJumpsEnabled"
+        },
+        {
+          "type": "row",
+          "key": "poseJumpBoneThresholdDeg"
+        },
+        {
+          "type": "row",
+          "key": "poseJumpPositionThreshold"
+        },
+        {
+          "type": "row",
+          "key": "clearPoseJumpLogBtn"
         }
       ],
       "settings": [
@@ -25388,7 +25420,12 @@
         "clearFrameRateLogBtn",
         "copyAllLogsBtn",
         "clearAllLogsBtn",
-        "pauseLogsBtn"
+        "pauseLogsBtn",
+        "logFrameProfileEnabled",
+        "logPoseJumpsEnabled",
+        "poseJumpBoneThresholdDeg",
+        "poseJumpPositionThreshold",
+        "clearPoseJumpLogBtn"
       ],
       "subgroups": []
     },
@@ -101869,8 +101906,8 @@
     "desktop": {
       "left": 210.375,
       "top": 18.387500762939453,
-      "width": 583.2000122070312,
-      "height": 496.8000183105469
+      "width": 586.4000244140625,
+      "height": 498.3999938964844
     }
   }
 }
