@@ -4155,6 +4155,11 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       { key: `${p}RotationZ`, label: 'Rotation Z (Deg)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
       { key: `${p}TargetPose`, label: 'Target Pose', type: 'select', def: defaults.targetPose ?? '', options: () => (cfg.savedPoses || []).map((sp) => ({ value: sp.name, group: sp.group || null })) },
       { key: `${p}TweenSelector`, label: 'Sequence', type: 'select', def: '', options: () => (cfg.savedTweenSequences || []).map((s) => ({ value: s.name, group: s.group || null })) },
+      // Reverse Sequence (2026-10-04, direct request: "add a checkbox under the sequence selector
+      // to reverse the order of the sequence, so the final pose is the beginning and vice versa").
+      // Read by selectedSequenceEntries() when a trigger starts; Sequence mode only (Chain mode's
+      // list of sequences is not reversed).
+      { key: `${p}ReverseSequence`, label: 'Reverse Sequence', type: 'checkbox', def: false },
       // Chain mode's own ordered list of saved Tween Sequences (NOT
       // individual poses -- a sequence OF sequences), reusing the exact
       // same drag-to-reorder multi-select control type `tweenPoses`
@@ -4509,6 +4514,11 @@ function makeClickPoseGroup(p, title, defaults = {}) {
       { key: `${p}RotationZ`, label: 'Rotation Z (Deg)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
       { key: `${p}TargetPose`, label: 'Target Pose', type: 'select', def: defaults.targetPose ?? '', options: () => (cfg.savedPoses || []).map((sp) => ({ value: sp.name, group: sp.group || null })) },
       { key: `${p}TweenSelector`, label: 'Sequence', type: 'select', def: '', options: () => (cfg.savedTweenSequences || []).map((s) => ({ value: s.name, group: s.group || null })) },
+      // Reverse Sequence (2026-10-04, direct request: "add a checkbox under the sequence selector
+      // to reverse the order of the sequence, so the final pose is the beginning and vice versa").
+      // Read by selectedSequenceEntries() when a trigger starts; Sequence mode only (Chain mode's
+      // list of sequences is not reversed).
+      { key: `${p}ReverseSequence`, label: 'Reverse Sequence', type: 'checkbox', def: false },
       // Tween's own SEPARATE speed/curve/range trio -- see
       // makeClickHoldPoseGroup()'s own matching comment for the full
       // reasoning (shared word-for-word). No Loop checkbox here -- Click
@@ -8126,6 +8136,14 @@ function useTweenSequencePreset(item) {
 // unfilled row) or no longer exists (deleted since) -- same logic and
 // same "last match wins" duplicate-name tie-break as HANDO's own
 // resolveTweenPoses(), ported here rather than re-derived.
+// The selected Sequence's raw entries (pose names and Hold objects), reversed when the
+// function's Reverse Sequence checkbox is on (2026-10-04) so its last pose becomes the
+// first. Every place that reads `${p}TweenSelector` to START a trigger goes through this.
+function selectedSequenceEntries(p) {
+  const seq = (cfg.savedTweenSequences || []).find((s) => s.name === cfg[`${p}TweenSelector`])
+  const raw = seq ? (seq.tweenPoses || []) : []
+  return cfg[`${p}ReverseSequence`] ? raw.slice().reverse() : raw
+}
 function resolveTweenSequencePoses(names) {
   return (names || [])
     .map((name) => {
@@ -9120,10 +9138,7 @@ function startClickHoldPose(p) {
           const seq = (cfg.savedTweenSequences || []).find((s) => s.name === seqName)
           return seq ? resolveTweenSequencePoses(seq.tweenPoses) : []
         })
-      : (() => {
-          const seq = (cfg.savedTweenSequences || []).find((s) => s.name === cfg[`${p}TweenSelector`])
-          return seq ? resolveTweenSequencePoses(seq.tweenPoses) : []
-        })()
+      : resolveTweenSequencePoses(selectedSequenceEntries(p))
     // Loop/Oscillate's own cyclic sequence -- named poses ONLY, excluding
     // the anchor (briefly changed to include it, reverted same day -- "no
     // you're not meant to include the default pose... i guess we had it
@@ -9151,10 +9166,7 @@ function startClickHoldPose(p) {
           const seq = (cfg.savedTweenSequences || []).find((s) => s.name === seqName)
           return seq ? (seq.tweenPoses || []) : []
         })
-      : (() => {
-          const seq = (cfg.savedTweenSequences || []).find((s) => s.name === cfg[`${p}TweenSelector`])
-          return seq ? (seq.tweenPoses || []) : []
-        })()
+      : selectedSequenceEntries(p)
   } else {
     trig.loopPoses = null
     trig.rawChainEntries = null
@@ -9997,8 +10009,7 @@ function triggerClickPose(p) {
   const isTween = isSequenceOrChainMode(p)
   let namedPoses = null
   if (isTween) {
-    const seq = (cfg.savedTweenSequences || []).find((s) => s.name === cfg[`${p}TweenSelector`])
-    const resolved = seq ? resolveTweenSequencePoses(seq.tweenPoses) : []
+    const resolved = resolveTweenSequencePoses(selectedSequenceEntries(p))
     if (resolved.length >= 1) namedPoses = resolved
   }
   let minD = Infinity, maxD = -Infinity
@@ -11762,7 +11773,7 @@ const CUSTOM_FUNCTION_POSE_LAYOUT = [
   { type: 'row', suffix: 'Enabled' },
   { type: 'row', suffix: 'Type' }, { type: 'row', suffix: 'TouchPointCount' }, { type: 'row', suffix: 'ClickCount' },
   { type: 'row', suffix: 'Mode' },
-  { type: 'row', suffix: 'TargetPose' }, { type: 'row', suffix: 'TweenSelector' },
+  { type: 'row', suffix: 'TargetPose' }, { type: 'row', suffix: 'TweenSelector' }, { type: 'row', suffix: 'ReverseSequence' },
   { type: 'row', suffix: 'TransitionSpeedMs' }, { type: 'row', suffix: 'TweenSpeedMs' },
   { type: 'row', suffix: 'PauseDurationMs' },
   { type: 'row', suffix: 'SequencePlayMode' }, { type: 'row', suffix: 'SequenceCount' }, { type: 'row', suffix: 'SequenceCountMode' },
@@ -11799,7 +11810,7 @@ const CUSTOM_FUNCTION_HOLD_LAYOUT = [
   { type: 'row', suffix: 'Enabled' },
   { type: 'row', suffix: 'Type' }, { type: 'row', suffix: 'TouchPointCount' }, { type: 'row', suffix: 'ClickCount' },
   { type: 'row', suffix: 'Mode' },
-  { type: 'row', suffix: 'TargetPose' }, { type: 'row', suffix: 'TweenSelector' }, { type: 'row', suffix: 'TweenChain' },
+  { type: 'row', suffix: 'TargetPose' }, { type: 'row', suffix: 'TweenSelector' }, { type: 'row', suffix: 'ReverseSequence' }, { type: 'row', suffix: 'TweenChain' },
   { type: 'row', suffix: 'TransitionSpeedMs' }, { type: 'row', suffix: 'TweenSpeedMs' },
   { type: 'row', suffix: 'LoopMode' }, { type: 'row', suffix: 'LoopHoldMs' },
   // 2026-10-04 -- same group order as CUSTOM_FUNCTION_POSE_LAYOUT (taken
@@ -12081,7 +12092,7 @@ function enforceCustomClickFunctionsAnchorOrder() {
 // "the exact same settings available" by construction, and any future
 // change to the real controls propagates to every trigger automatically.
 const MULTI_TRIGGER_ALLOWED_SUFFIXES = [
-  'Enabled', 'Mode', 'TargetPose', 'TweenSelector', 'TweenSpeedMs', 'TransitionSpeedMs', 'PauseDurationMs',
+  'Enabled', 'Mode', 'TargetPose', 'TweenSelector', 'ReverseSequence', 'TweenSpeedMs', 'TransitionSpeedMs', 'PauseDurationMs',
   'EasingCurveEnabled', 'EasingCurve',
   'OffsetEnabled', 'OffsetMode', 'OffsetX', 'OffsetY', 'CursorOffsetDistance',
   'CursorOffsetDistanceCurveEnabled', 'CursorOffsetDistanceCurve', 'CursorOffsetDistanceCurveRange',
@@ -12749,6 +12760,8 @@ function updateChainModeVisibility(p) {
   const mode = cfg[`${p}Mode`]
   const selectorRow = document.querySelector(`.dp-row[data-key="${p}TweenSelector"]`)
   if (selectorRow) selectorRow.style.display = mode === 'Sequence' ? '' : 'none'
+  const reverseRow = document.querySelector(`.dp-row[data-key="${p}ReverseSequence"]`)
+  if (reverseRow) reverseRow.style.display = mode === 'Sequence' ? '' : 'none'
   const chainRow = document.querySelector(`.dp-row[data-key="${p}TweenChain"]`)
   if (chainRow) chainRow.style.display = mode === 'Chain' ? '' : 'none'
 }
