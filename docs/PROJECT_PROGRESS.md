@@ -18,6 +18,15 @@ work seamlessly from there.
 
 ## Currently working on
 
+**ADDED 2026-10-04 -- per-axis on/off for Offset To Camera, and the
+Animation Speed Curve for every click function in every mode.** Three
+default-on checkboxes (X/Y/Z) gate Offset To Camera's axes. The Speed
+Curve group is no longer Single-Pose-only: it now drives Tween Speed in
+Sequence/Chain mode too (forward, hold stopping, hold looping segment,
+pose lap phases) via one `animSpeedMs()` helper. `main.js` at `?v=273`;
+`node --check` + a 12-assert logic test pass; **not live-verified in
+browser** (local-server truncation quirk, 5/5). See CHANGELOG.txt.
+
 **ADDED 2026-10-02 -- "Offset To Camera" group, per-axis Cursor Offset
 inputs, and Offset Z slider (all click functions + Multi Trigger).**
 Offset To Camera is a new stackable on/off group with a Curve + Min/Max

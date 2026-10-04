@@ -15541,6 +15541,51 @@ cap); `window.__debug` never populated.
 
 `main.js` cache-buster bumped `?v=271` -> `?v=272`.
 
+2026-10-04  -  (feature -- per-axis on/off for Offset To Camera, and the
+Animation Speed Curve for every click function in every mode)
+
+Direct request: (1) "in offset to camera, add 3 checkboxes to turn on and
+off each axis"; (2) "for all click functions regardless of trigger or
+target type, provide the toggleable Speed Curve group."
+
+(1) `${p}CameraOffset{X,Y,Z}Enabled` (default ON, so turning the group on
+behaves as before). `computeCameraOffset()` zeroes an axis whose box is
+off (`!== false`, so a function saved before these existed keeps all 3
+on); the axis's Curve + Min/Max rows hide with it; the 3 boxes only show
+while the group's own box is on. Added to the suffix list (Multi
+Trigger), `NEW_CUSTOM_FUNCTION_TEMPLATE`, and the subgroup member list.
+
+(2) The Animation Speed Curve group was Single-Pose-only (Tween mode's
+speed was a flat Tween Speed with no curve). It is now Mode-independent:
+`setGateRow('SpeedCurveEnabled', true)`, the arm-time freeze no longer
+skips Tween/Sequence/Chain (hold and pose families), and a new
+`animSpeedMs(p, isTween, frozenSpeedMs)` is the single place that picks
+the speed -- the frozen per-hand curve value when the curve is on and a
+real frozen value exists, else the mode's flat slider (Tween Speed /
+Animation Speed). It replaces the inline ternary at both forward phases
+and is also used where Tween speed was read directly: the hold 'stopping'
+phase (continues the forward pass's progress, so it must use the same
+per-hand speed or the hand would jump) and the pose-kind Sequence lap
+phase. The hold 'looping' phase's segment length (previously one shared
+`trig.loopSegmentMs`) is now per-hand when the curve is on, dividing the
+hand's frozen speed across the named poses the same way. `> 0` guard: a
+curve switched on mid-hold, before any hand has a frozen value, falls
+back to the flat slider instead of collapsing the transition to 1ms.
+Same range widget (50-2000ms) and same distance-from-cursor X as before.
+Rewrote the now-stale "no Tween-mode equivalent" comment.
+
+Not changed: Chain/Sequence's per-segment weighting inside
+`lerpTweenSegments()` is untouched -- the curve only changes the TOTAL
+duration per hand, which is what the existing Single Pose curve does.
+
+Verified: `node --check` passes; an isolated 12-assert logic test passed
+(flat sliders when off in both modes; frozen value used in both modes
+when on; 0-frozen falls back; per-hand loop segment; axis `!== false`
+gating). **Not live-verified in browser** -- 5/5 navigation attempts hit
+the documented `ERR_CONNECTION_RESET` on `main.js?v=273`.
+
+`main.js` cache-buster bumped `?v=272` -> `?v=273`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

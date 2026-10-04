@@ -3760,6 +3760,9 @@ function offsetExtraControls(p, parseFn) {
   })
   rows.push({ key: `${p}CameraOffsetEnabled`, label: 'Offset To Camera On/Off', type: 'checkbox', def: false, onChange: () => updateOffsetRotationVisibility(p) })
   ;['X', 'Y', 'Z'].forEach((ax) => {
+    // Per-axis on/off (2026-10-04, direct request) -- default ON so
+    // turning the group on behaves exactly as it did before these existed.
+    rows.push({ key: `${p}CameraOffset${ax}Enabled`, label: `Camera Offset ${ax} On/Off`, type: 'checkbox', def: true, onChange: () => updateOffsetRotationVisibility(p) })
     rows.push({ key: `${p}CameraOffset${ax}Curve`, label: `Camera Offset ${ax} Curve (Distance -> Offset)`, type: 'text', def: linear, onChange: () => parseFn(p) })
     rows.push({ key: `${p}CameraOffset${ax}Range`, label: `Camera Offset ${ax} Min / Max (World Units)`, type: 'text', def: '{"min":0,"max":10}', onChange: () => parseFn(p) })
   })
@@ -7261,7 +7264,14 @@ function computeCameraOffset(hand, p) {
   const slots = trig && trig.offsetAxis && trig.offsetAxis.camera
   if (!slots) return ZERO_OFFSET
   const handDist = hand.wrapper.position.distanceTo(cursorTarget)
-  return { x: evalOffsetAxisSlot(slots.X, handDist), y: evalOffsetAxisSlot(slots.Y, handDist), z: evalOffsetAxisSlot(slots.Z, handDist) }
+  // Per-axis on/off (2026-10-04): an axis whose own checkbox is off
+  // contributes nothing. `!== false` so a function saved before these
+  // checkboxes existed (no stored value) keeps all 3 axes on.
+  return {
+    x: cfg[`${p}CameraOffsetXEnabled`] !== false ? evalOffsetAxisSlot(slots.X, handDist) : 0,
+    y: cfg[`${p}CameraOffsetYEnabled`] !== false ? evalOffsetAxisSlot(slots.Y, handDist) : 0,
+    z: cfg[`${p}CameraOffsetZEnabled`] !== false ? evalOffsetAxisSlot(slots.Z, handDist) : 0
+  }
 }
 // What applyOffsetRotationToHand()/bakeOffsetRotationIntoAccum()/
 // bakeInFlightOffsetRotation() all read -- the main Offset group's value
@@ -7686,6 +7696,19 @@ function computeTweenFractionCap(distanceToCursor, distMin, distMax, curveParsed
 // share the same protection instead of just the one trigger that
 // happened to hit it first.
 function safeTweenSpeedMs(v) { return Number.isFinite(v) ? v : 800 }
+// Animation Speed Curve for EVERY mode (2026-10-04, direct request: "for
+// all click functions regardless of trigger or target type, provide the
+// toggleable Speed Curve group") -- previously Single Pose only. The
+// per-hand speed is frozen at arm time (`frozenSpeedMs`, 0 when the curve
+// was off then); when the curve is on AND a real frozen value exists it
+// replaces the flat slider for the mode (Tween Speed for Sequence/Chain,
+// Animation Speed for Single Pose). `> 0` guards a curve switched on
+// mid-hold, before any hand had a frozen value, from collapsing the
+// transition to 1ms.
+function animSpeedMs(p, isTween, frozenSpeedMs) {
+  if (cfg[`${p}SpeedCurveEnabled`] && frozenSpeedMs > 0) return frozenSpeedMs
+  return isTween ? safeTweenSpeedMs(cfg[`${p}TweenSpeedMs`]) : cfg[`${p}TransitionSpeedMs`]
+}
 // Called once per hand per trigger, per frame, from updateRenderOrder()'s
 // own existing per-hand loop -- reuses that loop's own `live`/
 // `minLiveDist`/`liveDistRange` (Arm Length/Wrist Splay's own live-
@@ -7954,7 +7977,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
       // same "frozen at arm time" treatment as the splay/delay above, not
       // recomputed live mid-transition. See makeClickHoldPoseGroup()'s own
       // control comment for the full reasoning.
-      chp.pendingFrozenSpeedMs = (!isTweenStart && cfg[`${p}SpeedCurveEnabled`]) ? computeStartDelayMs(live, minLiveDist, liveDistRange, trig.speedCurveParsed, trig.speedRangeParsed) : 0
+      chp.pendingFrozenSpeedMs = cfg[`${p}SpeedCurveEnabled`] ? computeStartDelayMs(live, minLiveDist, liveDistRange, trig.speedCurveParsed, trig.speedRangeParsed) : 0
     }
   }
   if (chp.pendingClaimAt && now >= chp.pendingClaimAt) {
@@ -8016,7 +8039,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     // Animation Speed Curve (Single Pose only) overrides the flat
     // TransitionSpeedMs slider when enabled -- `chp.frozenSpeedMs` was
     // computed once at this hand's own commit above.
-    const speedMs = Math.max(isTween ? safeTweenSpeedMs(cfg[`${p}TweenSpeedMs`]) : (cfg[`${p}SpeedCurveEnabled`] ? chp.frozenSpeedMs : cfg[`${p}TransitionSpeedMs`]), 1)
+    const speedMs = Math.max(animSpeedMs(p, isTween, chp.frozenSpeedMs), 1)
     const progress = THREE.MathUtils.clamp(elapsed / speedMs, 0, 1)
     // Easing Curve (2026-10-02) -- reshapes ONLY the pose's own visual
     // interpolation fraction (`cappedT`/`splayNow` below), never the raw
@@ -8132,7 +8155,13 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
       chp.loopStartTime = now
       if (cfg[`${p}LoopMode`] === 'Oscillate') chp.loopDirection *= -1
     }
-    const elapsedSegments = (now - chp.loopStartTime) / trig.loopSegmentMs
+    // Per-hand when the Speed Curve is on (2026-10-04) -- same division
+    // across the named poses trig.loopSegmentMs uses, from this hand's own
+    // frozen speed instead of the shared flat Tween Speed.
+    const loopSegMs = (cfg[`${p}SpeedCurveEnabled`] && chp.frozenSpeedMs > 0)
+      ? Math.max(chp.frozenSpeedMs / Math.max(trig.loopPoses.length, 1), 1)
+      : trig.loopSegmentMs
+    const elapsedSegments = (now - chp.loopStartTime) / loopSegMs
     let values, lapT
     if (cfg[`${p}LoopMode`] === 'Oscillate') {
       const segments = trig.loopPoses.length - 1
@@ -8218,7 +8247,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
       // for the whole delay rather than continuing to visibly animate.
       values = chp.lastAppliedValues
     } else {
-      const speedMs = Math.max(safeTweenSpeedMs(cfg[`${p}TweenSpeedMs`]), 1)
+      const speedMs = Math.max(animSpeedMs(p, true, chp.frozenSpeedMs), 1)
       chp.stoppingVirtualElapsedMs += dt * decayFactor
       const progress = THREE.MathUtils.clamp((chp.stoppingBaseElapsedMs + chp.stoppingVirtualElapsedMs) / speedMs, 0, 1)
       // `* frozenTweenFractionCap` (CORRECTED 2026-09-28) -- the forward
@@ -8961,7 +8990,7 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
     // TransitionSpeedMs slider when enabled -- `cp.frozenSpeedMs` was
     // computed once per hand in triggerClickPose(), same "frozen at
     // trigger time" treatment as the splay.
-    const speedMs = Math.max(isTween ? safeTweenSpeedMs(cfg[`${p}TweenSpeedMs`]) : (cfg[`${p}SpeedCurveEnabled`] ? cp.frozenSpeedMs : cfg[`${p}TransitionSpeedMs`]), 1)
+    const speedMs = Math.max(animSpeedMs(p, isTween, cp.frozenSpeedMs), 1)
     const progress = THREE.MathUtils.clamp(elapsed / speedMs, 0, 1)
     // Easing Curve (2026-10-02) -- see updateClickHoldPoseForHand()'s own
     // matching comment for the full reasoning.
@@ -9046,7 +9075,7 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
       cp.sequenceLapStartTime = now
       if (lapStyle === 'Oscillate') cp.sequenceDirection *= -1
     }
-    const speedMs = Math.max(safeTweenSpeedMs(cfg[`${p}TweenSpeedMs`]), 1)
+    const speedMs = Math.max(animSpeedMs(p, true, cp.frozenSpeedMs), 1)
     const lapT = THREE.MathUtils.clamp((now - cp.sequenceLapStartTime) / speedMs, 0, 1)
     let values
     if (lapStyle === 'Oscillate') {
@@ -9258,7 +9287,7 @@ function triggerClickPose(p) {
     cp.pendingFromSplayDeg = hand.currentSplayDeg
     // Animation Speed Curve (Single Pose only) -- same "frozen at
     // trigger time" treatment as the splay above.
-    cp.pendingFrozenSpeedMs = (!isTween && cfg[`${p}SpeedCurveEnabled`]) ? computeStartDelayMs(dists[i], minD, range, trig.speedCurveParsed, trig.speedRangeParsed) : 0
+    cp.pendingFrozenSpeedMs = cfg[`${p}SpeedCurveEnabled`] ? computeStartDelayMs(dists[i], minD, range, trig.speedCurveParsed, trig.speedRangeParsed) : 0
   })
 }
 // Click / Double / Triple / Quadruple-Click Pose disambiguation: N
@@ -11023,7 +11052,7 @@ const NEW_CUSTOM_FUNCTION_TEMPLATE = {
   // template, but filled in now while touching this same object anyway.
   OffsetEnabled: false, OffsetX: 0, OffsetY: 0, OffsetMode: 'XYZ Offset', CursorOffsetDistance: 0,
   CursorOffsetDistanceCurveEnabled: false, CursorOffsetDistanceCurve: '[{"x":0,"y":0},{"x":1,"y":1}]', CursorOffsetDistanceCurveRange: '{"min":-50,"max":50}',
-  OffsetZ: 0, CameraOffsetEnabled: false,
+  OffsetZ: 0, CameraOffsetEnabled: false, CameraOffsetXEnabled: true, CameraOffsetYEnabled: true, CameraOffsetZEnabled: true,
   CursorOffsetXCurve: '[{"x":0,"y":0},{"x":1,"y":1}]', CursorOffsetXRange: '{"min":0,"max":0}',
   CameraOffsetXCurve: '[{"x":0,"y":0},{"x":1,"y":1}]', CameraOffsetXRange: '{"min":0,"max":10}',
   CursorOffsetYCurve: '[{"x":0,"y":0},{"x":1,"y":1}]', CursorOffsetYRange: '{"min":0,"max":0}',
@@ -11254,7 +11283,7 @@ const MULTI_TRIGGER_ALLOWED_SUFFIXES = [
   'OffsetEnabled', 'OffsetMode', 'OffsetX', 'OffsetY', 'CursorOffsetDistance',
   'CursorOffsetDistanceCurveEnabled', 'CursorOffsetDistanceCurve', 'CursorOffsetDistanceCurveRange',
   'OffsetZ', 'CursorOffsetXCurve', 'CursorOffsetXRange', 'CursorOffsetYCurve', 'CursorOffsetYRange', 'CursorOffsetZCurve', 'CursorOffsetZRange',
-  'CameraOffsetEnabled', 'CameraOffsetXCurve', 'CameraOffsetXRange', 'CameraOffsetYCurve', 'CameraOffsetYRange', 'CameraOffsetZCurve', 'CameraOffsetZRange',
+  'CameraOffsetEnabled', 'CameraOffsetXEnabled', 'CameraOffsetYEnabled', 'CameraOffsetZEnabled', 'CameraOffsetXCurve', 'CameraOffsetXRange', 'CameraOffsetYCurve', 'CameraOffsetYRange', 'CameraOffsetZCurve', 'CameraOffsetZRange',
   'RotationEnabled', 'RotationX', 'RotationY', 'RotationZ',
   'SpeedCurveEnabled', 'SpeedCurve', 'SpeedCurveRange',
   'StartTimeCurveEnabled', 'StartTimeCurve', 'StartTimeRange', 'TweenStartTimeCurve', 'TweenStartTimeRange',
@@ -11954,8 +11983,9 @@ function updateSingleTimingGateVisibility(p) {
     const grp = row.closest('.dp-group')
     if (grp) grp.style.display = visible ? '' : 'none'
   }
-  setGateRow('SpeedCurveEnabled', showBase)
-  const speedOn = showBase && !!cfg[`${p}SpeedCurveEnabled`]
+  // Mode-independent (2026-10-04) -- see animSpeedMs()'s own comment.
+  setGateRow('SpeedCurveEnabled', true)
+  const speedOn = !!cfg[`${p}SpeedCurveEnabled`]
   setRow('SpeedCurve', speedOn)
   setRow('SpeedCurveRange', speedOn)
   // CORRECTED 2026-09-24 (item 7, remainder -- "Animation Speed Curve,
@@ -12006,12 +12036,12 @@ function updateSingleTimingGateVisibility(p) {
   // and Tween/Sequence mode alike.
   setGateRow('EasingCurveEnabled', true)
   setRow('EasingCurve', !!cfg[`${p}EasingCurveEnabled`])
-  // Animation Speed Curve has NO Tween-mode equivalent to nest here --
-  // Tween mode's own speed is a flat `${p}TweenSpeedMs` slider with no
-  // curve concept at all, so this group stays Single-Pose-only exactly as
-  // before (a real gap, not a bug -- adding a genuinely new Tween Speed
-  // Curve feature was deferred pending confirmation rather than invented
-  // here; see CHANGELOG.txt's matching entry).
+  // Animation Speed Curve (CORRECTED 2026-10-04): used to be Single-Pose-
+  // only (Tween mode's own speed was a flat `${p}TweenSpeedMs` with no
+  // curve). Direct request -- "for all click functions regardless of
+  // trigger or target type, provide the toggleable Speed Curve group" --
+  // made it Mode-independent above; the same distance->speed curve now
+  // drives Tween Speed in Sequence/Chain mode (see animSpeedMs()).
   // Retransition is NOT mode-gated (direct request 2026-09-22: "available
   // to turn on and off regardless of... single pose or sequence") --
   // unlike SpeedCurve/StartTimeCurve above, which stay Single-Pose-only
@@ -12235,8 +12265,10 @@ function updateOffsetRotationVisibility(p) {
       const row = document.querySelector(`.dp-row[data-key="${p}CursorOffset${ax}${k}"]`)
       if (row) row.style.display = offsetOn && cursorMode ? '' : 'none'
       const camRow = document.querySelector(`.dp-row[data-key="${p}CameraOffset${ax}${k}"]`)
-      if (camRow) camRow.style.display = cameraOffsetOn ? '' : 'none'
+      if (camRow) camRow.style.display = cameraOffsetOn && cfg[`${p}CameraOffset${ax}Enabled`] !== false ? '' : 'none'
     })
+    const camAxisRow = document.querySelector(`.dp-row[data-key="${p}CameraOffset${ax}Enabled"]`)
+    if (camAxisRow) camAxisRow.style.display = cameraOffsetOn ? '' : 'none'
   })
   const cursorOffsetRow = document.querySelector(`.dp-row[data-key="${p}CursorOffsetDistance"]`)
   if (cursorOffsetRow) cursorOffsetRow.style.display = offsetOn && cursorMode && !cursorCurveOn ? '' : 'none'
@@ -12327,7 +12359,7 @@ function wrapClickFunctionGatedSubgroups(p) {
   wrapGatedSubgroup(`${p}OffsetEnabled`, [`${p}OffsetMode`, `${p}OffsetX`, `${p}OffsetY`, `${p}OffsetZ`, `${p}CursorOffsetDistance`, `${p}CursorOffsetDistanceCurveEnabled`, `${p}CursorOffsetDistanceCurve`, `${p}CursorOffsetDistanceCurveRange`, ...['X', 'Y', 'Z'].flatMap((ax) => [`${p}CursorOffset${ax}Curve`, `${p}CursorOffset${ax}Range`])], 'Offset')
   // "Offset To Camera" (2026-10-02) -- its own mandatory gated subgroup,
   // independent of (and stackable with) "Offset" above.
-  wrapGatedSubgroup(`${p}CameraOffsetEnabled`, ['X', 'Y', 'Z'].flatMap((ax) => [`${p}CameraOffset${ax}Curve`, `${p}CameraOffset${ax}Range`]), 'Offset To Camera')
+  wrapGatedSubgroup(`${p}CameraOffsetEnabled`, ['X', 'Y', 'Z'].flatMap((ax) => [`${p}CameraOffset${ax}Enabled`, `${p}CameraOffset${ax}Curve`, `${p}CameraOffset${ax}Range`]), 'Offset To Camera')
   wrapGatedSubgroup(`${p}RotationEnabled`, [`${p}RotationX`, `${p}RotationY`, `${p}RotationZ`], 'Rotation')
   wrapGatedSubgroup(`${p}SpeedCurveEnabled`, [`${p}SpeedCurve`, `${p}SpeedCurveRange`], 'Animation Speed Curve')
   // CORRECTED 2026-09-24 (item 7, remainder): Tween mode's own always-on
