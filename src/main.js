@@ -553,6 +553,14 @@ let minLoadingTimeTimerSet = false
 // Safe to remove once the mobile investigation concludes -- this is a
 // diagnostic aid, not a permanent feature.
 const DEBUG_TIMING = new URLSearchParams(location.search).get('debugTiming') === '1'
+// ?debugTiming=1 also records main-thread long tasks (>50 ms) as [startMs, durationMs] in
+// window.__longTasks, so startup stalls can be read back after load.
+if (DEBUG_TIMING && typeof PerformanceObserver !== 'undefined') {
+  try {
+    window.__longTasks = []
+    new PerformanceObserver((list) => list.getEntries().forEach((e) => window.__longTasks.push([Math.round(e.startTime), Math.round(e.duration)]))).observe({ type: 'longtask', buffered: true })
+  } catch (err) { /* longtask not supported */ }
+}
 let debugTimingEl = null
 // Aggregating timer for ?debugTiming=1 (sums ms per label into window.__dpProfAgg).
 function profAgg(label, fn) {
