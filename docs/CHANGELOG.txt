@@ -16308,6 +16308,40 @@ immediately after the selector on custom18/custom8, hidden on a Single Pose func
 Multi Trigger sub-trigger. Playback of a reversed sequence was not watched (no WebGL in this
 sandbox). `main.js` `?v=295` -> `?v=296`.
 
+2026-10-04  -  (feature -- Glide To Pose 1 checkbox + First Transition Time Scale slider)
+
+Direct request: for every Sequence-mode click function, "add a checkbox. When turned on, it does what
+it's doing now: it glides to the starting Pose 1. When turned off, the sequence takes the current pose
+as Pose 1 and moves on to the next pose. ... if on, provide a slider that scales the amount of time
+that first transition takes." Then: "by default, set all these new checkboxes to be off."
+
+New per-function rows (both factories, both reference layouts, Multi Trigger allowed suffixes), under
+Reverse Sequence, Sequence mode only: `${p}GlideToFirstPose` (checkbox, DEFAULT OFF) and
+`${p}FirstGlideTimeScale` (slider 0.1-5, step 0.05, default 1, visible only while the checkbox is on).
+
+GLIDE OFF: sequenceStartEntries()/sequenceStartPoses() drop the FIRST pose name from what the
+timeline moves to, so the hand's current pose (already the timeline's starting keyframe) acts as
+Pose 1 and the sequence heads straight for Pose 2. A Hold before Pose 1 is kept (it holds the current
+pose). A one-pose sequence has nothing left to move to and does nothing. Loop/Oscillate still cycle
+through ALL named poses after the first pass (Pose 1 comes back on the wrap) -- disclosed choice.
+GLIDE ON: previous behaviour, plus the scale. Hold-kind (weighted segments): applyFirstGlideScale()
+multiplies the first real transition's weight by k and the total duration by (W+(k-1)w1)/W so every
+OTHER segment keeps exactly its current duration (verified numerically for k = 0.25, 0.5, 2, 3.7).
+Applied to the forward phase and the Tween Stop 'stopping' phase (via chp.glideTimeFactor). Pose-kind
+(uniform segments): cp.glideTimeFactor stretches the forward phase by (N-1+k)/N and
+remapGlideProgress() maps real-time progress so the first segment takes k x its share; only the first
+pass is scaled, not later Loop/Count laps. Chain mode is untouched.
+
+DEFAULT-OFF CONSEQUENCE (user-specified): every EXISTING sequence function has no saved value for the
+new key, so it now behaves as glide OFF (current pose = Pose 1) until the checkbox is ticked.
+
+Verified: node --check, load check, a 17-assert test of the real helpers (entry/pose dropping incl.
+leading Hold and one-pose sequence, Chain/glide-on no-ops, other segments' durations unchanged for four
+k values, leading Hold not counted as the glide, remap continuity/monotonicity/endpoints for four (N,k)
+pairs), and live: row order, default off, scale row appears only when ticked, hidden in Single Pose,
+present on a Multi Trigger sub-trigger. Playback not watched (no WebGL in this sandbox).
+`main.js` `?v=296` -> `?v=297`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

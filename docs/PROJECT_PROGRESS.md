@@ -18,6 +18,10 @@ work seamlessly from there.
 
 ## Currently working on
 
+**2026-10-04 -- Glide To Pose 1 (default OFF) + First Transition Time Scale.** Off = the current pose
+is Pose 1; on = glide to Pose 1, optionally time-scaled. Existing sequence functions now default to
+off. `main.js` `?v=297`. See CHANGELOG.txt.
+
 **2026-10-04 -- Reverse Sequence checkbox (Sequence mode click functions + Multi Trigger).**
 `${p}ReverseSequence`; `selectedSequenceEntries()` feeds trigger start. `main.js` `?v=296`.
 

@@ -2411,3 +2411,9 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
 - **Read the selected sequence through `selectedSequenceEntries(p)` (2026-10-04).** It applies the
   function's Reverse Sequence checkbox; a new consumer that reads `savedTweenSequences` by
   `${p}TweenSelector` directly would silently ignore it. Chain mode is intentionally not reversed.
+- **Sequence start behaviour lives in `sequenceStartEntries()` / `sequenceStartPoses()` / `applyFirstGlideScale()`
+  / `remapGlideProgress()` (2026-10-04).** They are applied at the two commit sites (hold: `chp.tweenSegments`,
+  pose: `cp.tweenPoses`). A new timeline consumer that reads `savedTweenSequences` must go through them (and
+  `selectedSequenceEntries()` for Reverse), or it will ignore Glide To Pose 1 / the time scale. The time scale
+  only changes the FIRST pass; any code that recomputes the forward duration needs `chp.glideTimeFactor` /
+  `cp.glideTimeFactor`.
