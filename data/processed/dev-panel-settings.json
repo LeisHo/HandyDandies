@@ -7048,7 +7048,7 @@
       "custom9RetransitionSpeedMs": 400,
       "custom9RetransitionSpeedCurveEnabled": true,
       "custom9RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom9RetransitionSpeedCurveRange": "{\"min\":10596,\"max\":20000}",
+      "custom9RetransitionSpeedCurveRange": "{\"min\":14116,\"max\":20000}",
       "custom9RetransitionStartTimeCurveEnabled": true,
       "custom9RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9RetransitionStartTimeRange": "{\"min\":0,\"max\":3000}",
@@ -7071,20 +7071,20 @@
       "custom9Trig1CursorOffsetYRange": "{\"min\":0,\"max\":0}",
       "custom9Trig1CursorOffsetZCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9Trig1CursorOffsetZRange": "{\"min\":0,\"max\":0}",
-      "custom9Trig1CameraOffsetEnabled": false,
-      "custom9Trig1CameraOffsetXEnabled": true,
+      "custom9Trig1CameraOffsetEnabled": true,
+      "custom9Trig1CameraOffsetXEnabled": false,
       "custom9Trig1CameraOffsetXCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9Trig1CameraOffsetXRange": "{\"min\":0,\"max\":10}",
-      "custom9Trig1CameraOffsetYEnabled": true,
+      "custom9Trig1CameraOffsetYEnabled": false,
       "custom9Trig1CameraOffsetYCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9Trig1CameraOffsetYRange": "{\"min\":0,\"max\":10}",
       "custom9Trig1CameraOffsetZEnabled": true,
-      "custom9Trig1CameraOffsetZCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom9Trig1CameraOffsetZRange": "{\"min\":0,\"max\":10}",
+      "custom9Trig1CameraOffsetZCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
+      "custom9Trig1CameraOffsetZRange": "{\"min\":-10,\"max\":0}",
       "custom9Trig1RotationEnabled": true,
-      "custom9Trig1RotationX": 0,
-      "custom9Trig1RotationY": 0,
-      "custom9Trig1RotationZ": 180,
+      "custom9Trig1RotationX": 15,
+      "custom9Trig1RotationY": 10,
+      "custom9Trig1RotationZ": -20,
       "custom9Trig1TargetPose": "Wave 5",
       "custom9Trig1TweenSelector": "",
       "custom9Trig1TweenSpeedMs": 5000,
@@ -7093,25 +7093,25 @@
       "custom9Trig1TransitionSpeedMs": 3000,
       "custom9Trig1EasingCurveEnabled": false,
       "custom9Trig1EasingCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom9Trig1SpeedCurveEnabled": false,
+      "custom9Trig1SpeedCurveEnabled": true,
       "custom9Trig1SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom9Trig1SpeedCurveRange": "{\"min\":50,\"max\":2000}",
+      "custom9Trig1SpeedCurveRange": "{\"min\":1684,\"max\":2000}",
       "custom9Trig1StartTimeCurveEnabled": true,
       "custom9Trig1StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom9Trig1StartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom9Trig1StartTimeRange": "{\"min\":0,\"max\":1114}",
       "custom9Trig1StartDistanceCurveEnabled": true,
       "custom9Trig1StartDistanceMin": 0,
       "custom9Trig1StartDistanceMax": 10000,
       "custom9Trig1StartDistanceCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9Trig1PauseDurationMs": 0,
-      "custom9Trig1RetransitionEnabled": false,
+      "custom9Trig1RetransitionEnabled": true,
       "custom9Trig1RetransitionSpeedMs": 400,
       "custom9Trig1RetransitionSpeedCurveEnabled": true,
       "custom9Trig1RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom9Trig1RetransitionSpeedCurveRange": "{\"min\":10000,\"max\":20000}",
+      "custom9Trig1RetransitionSpeedCurveRange": "{\"min\":15752,\"max\":24000}",
       "custom9Trig1RetransitionStartTimeCurveEnabled": true,
       "custom9Trig1RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom9Trig1RetransitionStartTimeRange": "{\"min\":0,\"max\":1795}",
+      "custom9Trig1RetransitionStartTimeRange": "{\"min\":0,\"max\":3000}",
       "custom9Trig2Enabled": true,
       "custom9Trig2Mode": "Single Pose",
       "custom9Trig2OffsetEnabled": false,
@@ -7140,9 +7140,9 @@
       "custom9Trig2CameraOffsetZCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9Trig2CameraOffsetZRange": "{\"min\":0,\"max\":10}",
       "custom9Trig2RotationEnabled": true,
-      "custom9Trig2RotationX": 45,
+      "custom9Trig2RotationX": 20,
       "custom9Trig2RotationY": 0,
-      "custom9Trig2RotationZ": 720,
+      "custom9Trig2RotationZ": -20,
       "custom9Trig2TargetPose": "Birdie (S) - 1",
       "custom9Trig2TweenSelector": "",
       "custom9Trig2TweenSpeedMs": 800,
@@ -7151,9 +7151,9 @@
       "custom9Trig2TransitionSpeedMs": 3000,
       "custom9Trig2EasingCurveEnabled": false,
       "custom9Trig2EasingCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom9Trig2SpeedCurveEnabled": false,
+      "custom9Trig2SpeedCurveEnabled": true,
       "custom9Trig2SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom9Trig2SpeedCurveRange": "{\"min\":50,\"max\":2000}",
+      "custom9Trig2SpeedCurveRange": "{\"min\":1416,\"max\":2000}",
       "custom9Trig2StartTimeCurveEnabled": true,
       "custom9Trig2StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9Trig2StartTimeRange": "{\"min\":0,\"max\":2154}",
@@ -7162,11 +7162,11 @@
       "custom9Trig2StartDistanceMax": 100,
       "custom9Trig2StartDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
       "custom9Trig2PauseDurationMs": 0,
-      "custom9Trig2RetransitionEnabled": false,
+      "custom9Trig2RetransitionEnabled": true,
       "custom9Trig2RetransitionSpeedMs": 400,
-      "custom9Trig2RetransitionSpeedCurveEnabled": false,
+      "custom9Trig2RetransitionSpeedCurveEnabled": true,
       "custom9Trig2RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom9Trig2RetransitionSpeedCurveRange": "{\"min\":50,\"max\":2000}",
+      "custom9Trig2RetransitionSpeedCurveRange": "{\"min\":20000,\"max\":25000}",
       "custom9Trig2RetransitionStartTimeCurveEnabled": true,
       "custom9Trig2RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9Trig2RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
@@ -15031,7 +15031,7 @@
       "custom9RetransitionSpeedMs": 400,
       "custom9RetransitionSpeedCurveEnabled": true,
       "custom9RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom9RetransitionSpeedCurveRange": "{\"min\":10596,\"max\":20000}",
+      "custom9RetransitionSpeedCurveRange": "{\"min\":14116,\"max\":20000}",
       "custom9RetransitionStartTimeCurveEnabled": true,
       "custom9RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9RetransitionStartTimeRange": "{\"min\":0,\"max\":3000}",
@@ -15054,20 +15054,20 @@
       "custom9Trig1CursorOffsetYRange": "{\"min\":0,\"max\":0}",
       "custom9Trig1CursorOffsetZCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9Trig1CursorOffsetZRange": "{\"min\":0,\"max\":0}",
-      "custom9Trig1CameraOffsetEnabled": false,
-      "custom9Trig1CameraOffsetXEnabled": true,
+      "custom9Trig1CameraOffsetEnabled": true,
+      "custom9Trig1CameraOffsetXEnabled": false,
       "custom9Trig1CameraOffsetXCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9Trig1CameraOffsetXRange": "{\"min\":0,\"max\":10}",
-      "custom9Trig1CameraOffsetYEnabled": true,
+      "custom9Trig1CameraOffsetYEnabled": false,
       "custom9Trig1CameraOffsetYCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9Trig1CameraOffsetYRange": "{\"min\":0,\"max\":10}",
       "custom9Trig1CameraOffsetZEnabled": true,
-      "custom9Trig1CameraOffsetZCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom9Trig1CameraOffsetZRange": "{\"min\":0,\"max\":10}",
+      "custom9Trig1CameraOffsetZCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
+      "custom9Trig1CameraOffsetZRange": "{\"min\":-10,\"max\":0}",
       "custom9Trig1RotationEnabled": true,
-      "custom9Trig1RotationX": 0,
-      "custom9Trig1RotationY": 0,
-      "custom9Trig1RotationZ": 180,
+      "custom9Trig1RotationX": 15,
+      "custom9Trig1RotationY": 10,
+      "custom9Trig1RotationZ": -20,
       "custom9Trig1TargetPose": "Wave 5",
       "custom9Trig1TweenSelector": "",
       "custom9Trig1TweenSpeedMs": 5000,
@@ -15076,25 +15076,25 @@
       "custom9Trig1TransitionSpeedMs": 3000,
       "custom9Trig1EasingCurveEnabled": false,
       "custom9Trig1EasingCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom9Trig1SpeedCurveEnabled": false,
+      "custom9Trig1SpeedCurveEnabled": true,
       "custom9Trig1SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom9Trig1SpeedCurveRange": "{\"min\":50,\"max\":2000}",
+      "custom9Trig1SpeedCurveRange": "{\"min\":1684,\"max\":2000}",
       "custom9Trig1StartTimeCurveEnabled": true,
       "custom9Trig1StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom9Trig1StartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom9Trig1StartTimeRange": "{\"min\":0,\"max\":1114}",
       "custom9Trig1StartDistanceCurveEnabled": true,
       "custom9Trig1StartDistanceMin": 0,
       "custom9Trig1StartDistanceMax": 10000,
       "custom9Trig1StartDistanceCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9Trig1PauseDurationMs": 0,
-      "custom9Trig1RetransitionEnabled": false,
+      "custom9Trig1RetransitionEnabled": true,
       "custom9Trig1RetransitionSpeedMs": 400,
       "custom9Trig1RetransitionSpeedCurveEnabled": true,
       "custom9Trig1RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom9Trig1RetransitionSpeedCurveRange": "{\"min\":10000,\"max\":20000}",
+      "custom9Trig1RetransitionSpeedCurveRange": "{\"min\":15752,\"max\":24000}",
       "custom9Trig1RetransitionStartTimeCurveEnabled": true,
       "custom9Trig1RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom9Trig1RetransitionStartTimeRange": "{\"min\":0,\"max\":1795}",
+      "custom9Trig1RetransitionStartTimeRange": "{\"min\":0,\"max\":3000}",
       "custom9Trig2Enabled": true,
       "custom9Trig2Mode": "Single Pose",
       "custom9Trig2OffsetEnabled": false,
@@ -15123,9 +15123,9 @@
       "custom9Trig2CameraOffsetZCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9Trig2CameraOffsetZRange": "{\"min\":0,\"max\":10}",
       "custom9Trig2RotationEnabled": true,
-      "custom9Trig2RotationX": 45,
+      "custom9Trig2RotationX": 20,
       "custom9Trig2RotationY": 0,
-      "custom9Trig2RotationZ": 720,
+      "custom9Trig2RotationZ": -20,
       "custom9Trig2TargetPose": "Birdie (S) - 1",
       "custom9Trig2TweenSelector": "",
       "custom9Trig2TweenSpeedMs": 800,
@@ -15134,9 +15134,9 @@
       "custom9Trig2TransitionSpeedMs": 3000,
       "custom9Trig2EasingCurveEnabled": false,
       "custom9Trig2EasingCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom9Trig2SpeedCurveEnabled": false,
+      "custom9Trig2SpeedCurveEnabled": true,
       "custom9Trig2SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom9Trig2SpeedCurveRange": "{\"min\":50,\"max\":2000}",
+      "custom9Trig2SpeedCurveRange": "{\"min\":1416,\"max\":2000}",
       "custom9Trig2StartTimeCurveEnabled": true,
       "custom9Trig2StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9Trig2StartTimeRange": "{\"min\":0,\"max\":2154}",
@@ -15145,11 +15145,11 @@
       "custom9Trig2StartDistanceMax": 100,
       "custom9Trig2StartDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
       "custom9Trig2PauseDurationMs": 0,
-      "custom9Trig2RetransitionEnabled": false,
+      "custom9Trig2RetransitionEnabled": true,
       "custom9Trig2RetransitionSpeedMs": 400,
-      "custom9Trig2RetransitionSpeedCurveEnabled": false,
+      "custom9Trig2RetransitionSpeedCurveEnabled": true,
       "custom9Trig2RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom9Trig2RetransitionSpeedCurveRange": "{\"min\":50,\"max\":2000}",
+      "custom9Trig2RetransitionSpeedCurveRange": "{\"min\":20000,\"max\":25000}",
       "custom9Trig2RetransitionStartTimeCurveEnabled": true,
       "custom9Trig2RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9Trig2RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
@@ -23014,7 +23014,7 @@
       "custom9RetransitionSpeedMs": 400,
       "custom9RetransitionSpeedCurveEnabled": true,
       "custom9RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom9RetransitionSpeedCurveRange": "{\"min\":10596,\"max\":20000}",
+      "custom9RetransitionSpeedCurveRange": "{\"min\":14116,\"max\":20000}",
       "custom9RetransitionStartTimeCurveEnabled": true,
       "custom9RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9RetransitionStartTimeRange": "{\"min\":0,\"max\":3000}",
@@ -23037,20 +23037,20 @@
       "custom9Trig1CursorOffsetYRange": "{\"min\":0,\"max\":0}",
       "custom9Trig1CursorOffsetZCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9Trig1CursorOffsetZRange": "{\"min\":0,\"max\":0}",
-      "custom9Trig1CameraOffsetEnabled": false,
-      "custom9Trig1CameraOffsetXEnabled": true,
+      "custom9Trig1CameraOffsetEnabled": true,
+      "custom9Trig1CameraOffsetXEnabled": false,
       "custom9Trig1CameraOffsetXCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9Trig1CameraOffsetXRange": "{\"min\":0,\"max\":10}",
-      "custom9Trig1CameraOffsetYEnabled": true,
+      "custom9Trig1CameraOffsetYEnabled": false,
       "custom9Trig1CameraOffsetYCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9Trig1CameraOffsetYRange": "{\"min\":0,\"max\":10}",
       "custom9Trig1CameraOffsetZEnabled": true,
-      "custom9Trig1CameraOffsetZCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom9Trig1CameraOffsetZRange": "{\"min\":0,\"max\":10}",
+      "custom9Trig1CameraOffsetZCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
+      "custom9Trig1CameraOffsetZRange": "{\"min\":-10,\"max\":0}",
       "custom9Trig1RotationEnabled": true,
-      "custom9Trig1RotationX": 0,
-      "custom9Trig1RotationY": 0,
-      "custom9Trig1RotationZ": 180,
+      "custom9Trig1RotationX": 15,
+      "custom9Trig1RotationY": 10,
+      "custom9Trig1RotationZ": -20,
       "custom9Trig1TargetPose": "Wave 5",
       "custom9Trig1TweenSelector": "",
       "custom9Trig1TweenSpeedMs": 5000,
@@ -23059,25 +23059,25 @@
       "custom9Trig1TransitionSpeedMs": 3000,
       "custom9Trig1EasingCurveEnabled": false,
       "custom9Trig1EasingCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom9Trig1SpeedCurveEnabled": false,
+      "custom9Trig1SpeedCurveEnabled": true,
       "custom9Trig1SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom9Trig1SpeedCurveRange": "{\"min\":50,\"max\":2000}",
+      "custom9Trig1SpeedCurveRange": "{\"min\":1684,\"max\":2000}",
       "custom9Trig1StartTimeCurveEnabled": true,
       "custom9Trig1StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom9Trig1StartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom9Trig1StartTimeRange": "{\"min\":0,\"max\":1114}",
       "custom9Trig1StartDistanceCurveEnabled": true,
       "custom9Trig1StartDistanceMin": 0,
       "custom9Trig1StartDistanceMax": 10000,
       "custom9Trig1StartDistanceCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9Trig1PauseDurationMs": 0,
-      "custom9Trig1RetransitionEnabled": false,
+      "custom9Trig1RetransitionEnabled": true,
       "custom9Trig1RetransitionSpeedMs": 400,
       "custom9Trig1RetransitionSpeedCurveEnabled": true,
       "custom9Trig1RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom9Trig1RetransitionSpeedCurveRange": "{\"min\":10000,\"max\":20000}",
+      "custom9Trig1RetransitionSpeedCurveRange": "{\"min\":15752,\"max\":24000}",
       "custom9Trig1RetransitionStartTimeCurveEnabled": true,
       "custom9Trig1RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom9Trig1RetransitionStartTimeRange": "{\"min\":0,\"max\":1795}",
+      "custom9Trig1RetransitionStartTimeRange": "{\"min\":0,\"max\":3000}",
       "custom9Trig2Enabled": true,
       "custom9Trig2Mode": "Single Pose",
       "custom9Trig2OffsetEnabled": false,
@@ -23106,9 +23106,9 @@
       "custom9Trig2CameraOffsetZCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9Trig2CameraOffsetZRange": "{\"min\":0,\"max\":10}",
       "custom9Trig2RotationEnabled": true,
-      "custom9Trig2RotationX": 45,
+      "custom9Trig2RotationX": 20,
       "custom9Trig2RotationY": 0,
-      "custom9Trig2RotationZ": 720,
+      "custom9Trig2RotationZ": -20,
       "custom9Trig2TargetPose": "Birdie (S) - 1",
       "custom9Trig2TweenSelector": "",
       "custom9Trig2TweenSpeedMs": 800,
@@ -23117,9 +23117,9 @@
       "custom9Trig2TransitionSpeedMs": 3000,
       "custom9Trig2EasingCurveEnabled": false,
       "custom9Trig2EasingCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom9Trig2SpeedCurveEnabled": false,
+      "custom9Trig2SpeedCurveEnabled": true,
       "custom9Trig2SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom9Trig2SpeedCurveRange": "{\"min\":50,\"max\":2000}",
+      "custom9Trig2SpeedCurveRange": "{\"min\":1416,\"max\":2000}",
       "custom9Trig2StartTimeCurveEnabled": true,
       "custom9Trig2StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9Trig2StartTimeRange": "{\"min\":0,\"max\":2154}",
@@ -23128,11 +23128,11 @@
       "custom9Trig2StartDistanceMax": 100,
       "custom9Trig2StartDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
       "custom9Trig2PauseDurationMs": 0,
-      "custom9Trig2RetransitionEnabled": false,
+      "custom9Trig2RetransitionEnabled": true,
       "custom9Trig2RetransitionSpeedMs": 400,
-      "custom9Trig2RetransitionSpeedCurveEnabled": false,
+      "custom9Trig2RetransitionSpeedCurveEnabled": true,
       "custom9Trig2RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom9Trig2RetransitionSpeedCurveRange": "{\"min\":50,\"max\":2000}",
+      "custom9Trig2RetransitionSpeedCurveRange": "{\"min\":20000,\"max\":25000}",
       "custom9Trig2RetransitionStartTimeCurveEnabled": true,
       "custom9Trig2RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9Trig2RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
@@ -48969,7 +48969,7 @@
                 "type": "group",
                 "group": {
                   "key": "Retransition",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -49311,7 +49311,7 @@
                             "type": "group",
                             "group": {
                               "key": "Animation Speed Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -49334,7 +49334,7 @@
                             "type": "group",
                             "group": {
                               "key": "Start Time Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -49367,7 +49367,7 @@
                             "type": "group",
                             "group": {
                               "key": "Start Distance Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -49406,7 +49406,7 @@
                                   "type": "group",
                                   "group": {
                                     "key": "Retransition Speed Curve",
-                                    "collapsed": false,
+                                    "collapsed": true,
                                     "locked": false,
                                     "items": [
                                       {
@@ -49455,7 +49455,7 @@
                               "subgroups": [
                                 {
                                   "key": "Retransition Speed Curve",
-                                  "collapsed": false,
+                                  "collapsed": true,
                                   "locked": false,
                                   "items": [
                                     {
@@ -49684,7 +49684,7 @@
                           },
                           {
                             "key": "Animation Speed Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -49704,7 +49704,7 @@
                           },
                           {
                             "key": "Start Time Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -49734,7 +49734,7 @@
                           },
                           {
                             "key": "Start Distance Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -49770,7 +49770,7 @@
                                 "type": "group",
                                 "group": {
                                   "key": "Retransition Speed Curve",
-                                  "collapsed": false,
+                                  "collapsed": true,
                                   "locked": false,
                                   "items": [
                                     {
@@ -49819,7 +49819,7 @@
                             "subgroups": [
                               {
                                 "key": "Retransition Speed Curve",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
                                   {
@@ -50042,7 +50042,7 @@
                             "type": "group",
                             "group": {
                               "key": "Rotation",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -50088,7 +50088,7 @@
                             "type": "group",
                             "group": {
                               "key": "Animation Speed Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -50111,7 +50111,7 @@
                             "type": "group",
                             "group": {
                               "key": "Start Time Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -50183,7 +50183,7 @@
                                   "type": "group",
                                   "group": {
                                     "key": "Retransition Speed Curve",
-                                    "collapsed": false,
+                                    "collapsed": true,
                                     "locked": false,
                                     "items": [
                                       {
@@ -50206,7 +50206,7 @@
                                   "type": "group",
                                   "group": {
                                     "key": "Retransition Start Time Curve",
-                                    "collapsed": false,
+                                    "collapsed": true,
                                     "locked": false,
                                     "items": [
                                       {
@@ -50232,7 +50232,7 @@
                               "subgroups": [
                                 {
                                   "key": "Retransition Speed Curve",
-                                  "collapsed": false,
+                                  "collapsed": true,
                                   "locked": false,
                                   "items": [
                                     {
@@ -50252,7 +50252,7 @@
                                 },
                                 {
                                   "key": "Retransition Start Time Curve",
-                                  "collapsed": false,
+                                  "collapsed": true,
                                   "locked": false,
                                   "items": [
                                     {
@@ -50421,7 +50421,7 @@
                           },
                           {
                             "key": "Rotation",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -50461,7 +50461,7 @@
                           },
                           {
                             "key": "Animation Speed Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -50481,7 +50481,7 @@
                           },
                           {
                             "key": "Start Time Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -50547,7 +50547,7 @@
                                 "type": "group",
                                 "group": {
                                   "key": "Retransition Speed Curve",
-                                  "collapsed": false,
+                                  "collapsed": true,
                                   "locked": false,
                                   "items": [
                                     {
@@ -50570,7 +50570,7 @@
                                 "type": "group",
                                 "group": {
                                   "key": "Retransition Start Time Curve",
-                                  "collapsed": false,
+                                  "collapsed": true,
                                   "locked": false,
                                   "items": [
                                     {
@@ -50596,7 +50596,7 @@
                             "subgroups": [
                               {
                                 "key": "Retransition Speed Curve",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
                                   {
@@ -50616,7 +50616,7 @@
                               },
                               {
                                 "key": "Retransition Start Time Curve",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
                                   {
@@ -50873,7 +50873,7 @@
                           "type": "group",
                           "group": {
                             "key": "Animation Speed Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -50896,7 +50896,7 @@
                           "type": "group",
                           "group": {
                             "key": "Start Time Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -50929,7 +50929,7 @@
                           "type": "group",
                           "group": {
                             "key": "Start Distance Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -50968,7 +50968,7 @@
                                 "type": "group",
                                 "group": {
                                   "key": "Retransition Speed Curve",
-                                  "collapsed": false,
+                                  "collapsed": true,
                                   "locked": false,
                                   "items": [
                                     {
@@ -51017,7 +51017,7 @@
                             "subgroups": [
                               {
                                 "key": "Retransition Speed Curve",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
                                   {
@@ -51246,7 +51246,7 @@
                         },
                         {
                           "key": "Animation Speed Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -51266,7 +51266,7 @@
                         },
                         {
                           "key": "Start Time Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -51296,7 +51296,7 @@
                         },
                         {
                           "key": "Start Distance Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -51332,7 +51332,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Retransition Speed Curve",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
                                   {
@@ -51381,7 +51381,7 @@
                           "subgroups": [
                             {
                               "key": "Retransition Speed Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -51601,7 +51601,7 @@
                           "type": "group",
                           "group": {
                             "key": "Rotation",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -51647,7 +51647,7 @@
                           "type": "group",
                           "group": {
                             "key": "Animation Speed Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -51670,7 +51670,7 @@
                           "type": "group",
                           "group": {
                             "key": "Start Time Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -51742,7 +51742,7 @@
                                 "type": "group",
                                 "group": {
                                   "key": "Retransition Speed Curve",
-                                  "collapsed": false,
+                                  "collapsed": true,
                                   "locked": false,
                                   "items": [
                                     {
@@ -51765,7 +51765,7 @@
                                 "type": "group",
                                 "group": {
                                   "key": "Retransition Start Time Curve",
-                                  "collapsed": false,
+                                  "collapsed": true,
                                   "locked": false,
                                   "items": [
                                     {
@@ -51791,7 +51791,7 @@
                             "subgroups": [
                               {
                                 "key": "Retransition Speed Curve",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
                                   {
@@ -51811,7 +51811,7 @@
                               },
                               {
                                 "key": "Retransition Start Time Curve",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
                                   {
@@ -51980,7 +51980,7 @@
                         },
                         {
                           "key": "Rotation",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -52020,7 +52020,7 @@
                         },
                         {
                           "key": "Animation Speed Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -52040,7 +52040,7 @@
                         },
                         {
                           "key": "Start Time Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -52106,7 +52106,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Retransition Speed Curve",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
                                   {
@@ -52129,7 +52129,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Retransition Start Time Curve",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
                                   {
@@ -52155,7 +52155,7 @@
                           "subgroups": [
                             {
                               "key": "Retransition Speed Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -52175,7 +52175,7 @@
                             },
                             {
                               "key": "Retransition Start Time Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -52471,7 +52471,7 @@
               },
               {
                 "key": "Retransition",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -52810,7 +52810,7 @@
                           "type": "group",
                           "group": {
                             "key": "Animation Speed Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -52833,7 +52833,7 @@
                           "type": "group",
                           "group": {
                             "key": "Start Time Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -52866,7 +52866,7 @@
                           "type": "group",
                           "group": {
                             "key": "Start Distance Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -52905,7 +52905,7 @@
                                 "type": "group",
                                 "group": {
                                   "key": "Retransition Speed Curve",
-                                  "collapsed": false,
+                                  "collapsed": true,
                                   "locked": false,
                                   "items": [
                                     {
@@ -52954,7 +52954,7 @@
                             "subgroups": [
                               {
                                 "key": "Retransition Speed Curve",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
                                   {
@@ -53183,7 +53183,7 @@
                         },
                         {
                           "key": "Animation Speed Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -53203,7 +53203,7 @@
                         },
                         {
                           "key": "Start Time Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -53233,7 +53233,7 @@
                         },
                         {
                           "key": "Start Distance Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -53269,7 +53269,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Retransition Speed Curve",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
                                   {
@@ -53318,7 +53318,7 @@
                           "subgroups": [
                             {
                               "key": "Retransition Speed Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -53541,7 +53541,7 @@
                           "type": "group",
                           "group": {
                             "key": "Rotation",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -53587,7 +53587,7 @@
                           "type": "group",
                           "group": {
                             "key": "Animation Speed Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -53610,7 +53610,7 @@
                           "type": "group",
                           "group": {
                             "key": "Start Time Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -53682,7 +53682,7 @@
                                 "type": "group",
                                 "group": {
                                   "key": "Retransition Speed Curve",
-                                  "collapsed": false,
+                                  "collapsed": true,
                                   "locked": false,
                                   "items": [
                                     {
@@ -53705,7 +53705,7 @@
                                 "type": "group",
                                 "group": {
                                   "key": "Retransition Start Time Curve",
-                                  "collapsed": false,
+                                  "collapsed": true,
                                   "locked": false,
                                   "items": [
                                     {
@@ -53731,7 +53731,7 @@
                             "subgroups": [
                               {
                                 "key": "Retransition Speed Curve",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
                                   {
@@ -53751,7 +53751,7 @@
                               },
                               {
                                 "key": "Retransition Start Time Curve",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
                                   {
@@ -53920,7 +53920,7 @@
                         },
                         {
                           "key": "Rotation",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -53960,7 +53960,7 @@
                         },
                         {
                           "key": "Animation Speed Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -53980,7 +53980,7 @@
                         },
                         {
                           "key": "Start Time Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -54046,7 +54046,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Retransition Speed Curve",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
                                   {
@@ -54069,7 +54069,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Retransition Start Time Curve",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
                                   {
@@ -54095,7 +54095,7 @@
                           "subgroups": [
                             {
                               "key": "Retransition Speed Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -54115,7 +54115,7 @@
                             },
                             {
                               "key": "Retransition Start Time Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -54372,7 +54372,7 @@
                         "type": "group",
                         "group": {
                           "key": "Animation Speed Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -54395,7 +54395,7 @@
                         "type": "group",
                         "group": {
                           "key": "Start Time Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -54428,7 +54428,7 @@
                         "type": "group",
                         "group": {
                           "key": "Start Distance Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -54467,7 +54467,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Retransition Speed Curve",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
                                   {
@@ -54516,7 +54516,7 @@
                           "subgroups": [
                             {
                               "key": "Retransition Speed Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -54745,7 +54745,7 @@
                       },
                       {
                         "key": "Animation Speed Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -54765,7 +54765,7 @@
                       },
                       {
                         "key": "Start Time Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -54795,7 +54795,7 @@
                       },
                       {
                         "key": "Start Distance Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -54831,7 +54831,7 @@
                             "type": "group",
                             "group": {
                               "key": "Retransition Speed Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -54880,7 +54880,7 @@
                         "subgroups": [
                           {
                             "key": "Retransition Speed Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -55100,7 +55100,7 @@
                         "type": "group",
                         "group": {
                           "key": "Rotation",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -55146,7 +55146,7 @@
                         "type": "group",
                         "group": {
                           "key": "Animation Speed Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -55169,7 +55169,7 @@
                         "type": "group",
                         "group": {
                           "key": "Start Time Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -55241,7 +55241,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Retransition Speed Curve",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
                                   {
@@ -55264,7 +55264,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Retransition Start Time Curve",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
                                   {
@@ -55290,7 +55290,7 @@
                           "subgroups": [
                             {
                               "key": "Retransition Speed Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -55310,7 +55310,7 @@
                             },
                             {
                               "key": "Retransition Start Time Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -55479,7 +55479,7 @@
                       },
                       {
                         "key": "Rotation",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -55519,7 +55519,7 @@
                       },
                       {
                         "key": "Animation Speed Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -55539,7 +55539,7 @@
                       },
                       {
                         "key": "Start Time Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -55605,7 +55605,7 @@
                             "type": "group",
                             "group": {
                               "key": "Retransition Speed Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -55628,7 +55628,7 @@
                             "type": "group",
                             "group": {
                               "key": "Retransition Start Time Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -55654,7 +55654,7 @@
                         "subgroups": [
                           {
                             "key": "Retransition Speed Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -55674,7 +55674,7 @@
                           },
                           {
                             "key": "Retransition Start Time Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -84563,7 +84563,7 @@
               "type": "group",
               "group": {
                 "key": "Retransition",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -84905,7 +84905,7 @@
                           "type": "group",
                           "group": {
                             "key": "Animation Speed Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -84928,7 +84928,7 @@
                           "type": "group",
                           "group": {
                             "key": "Start Time Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -84961,7 +84961,7 @@
                           "type": "group",
                           "group": {
                             "key": "Start Distance Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -85000,7 +85000,7 @@
                                 "type": "group",
                                 "group": {
                                   "key": "Retransition Speed Curve",
-                                  "collapsed": false,
+                                  "collapsed": true,
                                   "locked": false,
                                   "items": [
                                     {
@@ -85049,7 +85049,7 @@
                             "subgroups": [
                               {
                                 "key": "Retransition Speed Curve",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
                                   {
@@ -85278,7 +85278,7 @@
                         },
                         {
                           "key": "Animation Speed Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -85298,7 +85298,7 @@
                         },
                         {
                           "key": "Start Time Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -85328,7 +85328,7 @@
                         },
                         {
                           "key": "Start Distance Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -85364,7 +85364,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Retransition Speed Curve",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
                                   {
@@ -85413,7 +85413,7 @@
                           "subgroups": [
                             {
                               "key": "Retransition Speed Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -85636,7 +85636,7 @@
                           "type": "group",
                           "group": {
                             "key": "Rotation",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -85682,7 +85682,7 @@
                           "type": "group",
                           "group": {
                             "key": "Animation Speed Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -85705,7 +85705,7 @@
                           "type": "group",
                           "group": {
                             "key": "Start Time Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -85777,7 +85777,7 @@
                                 "type": "group",
                                 "group": {
                                   "key": "Retransition Speed Curve",
-                                  "collapsed": false,
+                                  "collapsed": true,
                                   "locked": false,
                                   "items": [
                                     {
@@ -85800,7 +85800,7 @@
                                 "type": "group",
                                 "group": {
                                   "key": "Retransition Start Time Curve",
-                                  "collapsed": false,
+                                  "collapsed": true,
                                   "locked": false,
                                   "items": [
                                     {
@@ -85826,7 +85826,7 @@
                             "subgroups": [
                               {
                                 "key": "Retransition Speed Curve",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
                                   {
@@ -85846,7 +85846,7 @@
                               },
                               {
                                 "key": "Retransition Start Time Curve",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
                                   {
@@ -86015,7 +86015,7 @@
                         },
                         {
                           "key": "Rotation",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -86055,7 +86055,7 @@
                         },
                         {
                           "key": "Animation Speed Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -86075,7 +86075,7 @@
                         },
                         {
                           "key": "Start Time Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -86141,7 +86141,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Retransition Speed Curve",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
                                   {
@@ -86164,7 +86164,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Retransition Start Time Curve",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
                                   {
@@ -86190,7 +86190,7 @@
                           "subgroups": [
                             {
                               "key": "Retransition Speed Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -86210,7 +86210,7 @@
                             },
                             {
                               "key": "Retransition Start Time Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -86467,7 +86467,7 @@
                         "type": "group",
                         "group": {
                           "key": "Animation Speed Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -86490,7 +86490,7 @@
                         "type": "group",
                         "group": {
                           "key": "Start Time Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -86523,7 +86523,7 @@
                         "type": "group",
                         "group": {
                           "key": "Start Distance Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -86562,7 +86562,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Retransition Speed Curve",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
                                   {
@@ -86611,7 +86611,7 @@
                           "subgroups": [
                             {
                               "key": "Retransition Speed Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -86840,7 +86840,7 @@
                       },
                       {
                         "key": "Animation Speed Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -86860,7 +86860,7 @@
                       },
                       {
                         "key": "Start Time Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -86890,7 +86890,7 @@
                       },
                       {
                         "key": "Start Distance Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -86926,7 +86926,7 @@
                             "type": "group",
                             "group": {
                               "key": "Retransition Speed Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -86975,7 +86975,7 @@
                         "subgroups": [
                           {
                             "key": "Retransition Speed Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -87195,7 +87195,7 @@
                         "type": "group",
                         "group": {
                           "key": "Rotation",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -87241,7 +87241,7 @@
                         "type": "group",
                         "group": {
                           "key": "Animation Speed Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -87264,7 +87264,7 @@
                         "type": "group",
                         "group": {
                           "key": "Start Time Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -87336,7 +87336,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Retransition Speed Curve",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
                                   {
@@ -87359,7 +87359,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Retransition Start Time Curve",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
                                   {
@@ -87385,7 +87385,7 @@
                           "subgroups": [
                             {
                               "key": "Retransition Speed Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -87405,7 +87405,7 @@
                             },
                             {
                               "key": "Retransition Start Time Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -87574,7 +87574,7 @@
                       },
                       {
                         "key": "Rotation",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -87614,7 +87614,7 @@
                       },
                       {
                         "key": "Animation Speed Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -87634,7 +87634,7 @@
                       },
                       {
                         "key": "Start Time Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -87700,7 +87700,7 @@
                             "type": "group",
                             "group": {
                               "key": "Retransition Speed Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -87723,7 +87723,7 @@
                             "type": "group",
                             "group": {
                               "key": "Retransition Start Time Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -87749,7 +87749,7 @@
                         "subgroups": [
                           {
                             "key": "Retransition Speed Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -87769,7 +87769,7 @@
                           },
                           {
                             "key": "Retransition Start Time Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -88065,7 +88065,7 @@
             },
             {
               "key": "Retransition",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -88404,7 +88404,7 @@
                         "type": "group",
                         "group": {
                           "key": "Animation Speed Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -88427,7 +88427,7 @@
                         "type": "group",
                         "group": {
                           "key": "Start Time Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -88460,7 +88460,7 @@
                         "type": "group",
                         "group": {
                           "key": "Start Distance Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -88499,7 +88499,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Retransition Speed Curve",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
                                   {
@@ -88548,7 +88548,7 @@
                           "subgroups": [
                             {
                               "key": "Retransition Speed Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -88777,7 +88777,7 @@
                       },
                       {
                         "key": "Animation Speed Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -88797,7 +88797,7 @@
                       },
                       {
                         "key": "Start Time Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -88827,7 +88827,7 @@
                       },
                       {
                         "key": "Start Distance Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -88863,7 +88863,7 @@
                             "type": "group",
                             "group": {
                               "key": "Retransition Speed Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -88912,7 +88912,7 @@
                         "subgroups": [
                           {
                             "key": "Retransition Speed Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -89135,7 +89135,7 @@
                         "type": "group",
                         "group": {
                           "key": "Rotation",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -89181,7 +89181,7 @@
                         "type": "group",
                         "group": {
                           "key": "Animation Speed Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -89204,7 +89204,7 @@
                         "type": "group",
                         "group": {
                           "key": "Start Time Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -89276,7 +89276,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Retransition Speed Curve",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
                                   {
@@ -89299,7 +89299,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Retransition Start Time Curve",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
                                   {
@@ -89325,7 +89325,7 @@
                           "subgroups": [
                             {
                               "key": "Retransition Speed Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -89345,7 +89345,7 @@
                             },
                             {
                               "key": "Retransition Start Time Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -89514,7 +89514,7 @@
                       },
                       {
                         "key": "Rotation",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -89554,7 +89554,7 @@
                       },
                       {
                         "key": "Animation Speed Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -89574,7 +89574,7 @@
                       },
                       {
                         "key": "Start Time Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -89640,7 +89640,7 @@
                             "type": "group",
                             "group": {
                               "key": "Retransition Speed Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -89663,7 +89663,7 @@
                             "type": "group",
                             "group": {
                               "key": "Retransition Start Time Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -89689,7 +89689,7 @@
                         "subgroups": [
                           {
                             "key": "Retransition Speed Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -89709,7 +89709,7 @@
                           },
                           {
                             "key": "Retransition Start Time Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -89966,7 +89966,7 @@
                       "type": "group",
                       "group": {
                         "key": "Animation Speed Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -89989,7 +89989,7 @@
                       "type": "group",
                       "group": {
                         "key": "Start Time Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -90022,7 +90022,7 @@
                       "type": "group",
                       "group": {
                         "key": "Start Distance Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -90061,7 +90061,7 @@
                             "type": "group",
                             "group": {
                               "key": "Retransition Speed Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -90110,7 +90110,7 @@
                         "subgroups": [
                           {
                             "key": "Retransition Speed Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -90339,7 +90339,7 @@
                     },
                     {
                       "key": "Animation Speed Curve",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -90359,7 +90359,7 @@
                     },
                     {
                       "key": "Start Time Curve",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -90389,7 +90389,7 @@
                     },
                     {
                       "key": "Start Distance Curve",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -90425,7 +90425,7 @@
                           "type": "group",
                           "group": {
                             "key": "Retransition Speed Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -90474,7 +90474,7 @@
                       "subgroups": [
                         {
                           "key": "Retransition Speed Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -90694,7 +90694,7 @@
                       "type": "group",
                       "group": {
                         "key": "Rotation",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -90740,7 +90740,7 @@
                       "type": "group",
                       "group": {
                         "key": "Animation Speed Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -90763,7 +90763,7 @@
                       "type": "group",
                       "group": {
                         "key": "Start Time Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -90835,7 +90835,7 @@
                             "type": "group",
                             "group": {
                               "key": "Retransition Speed Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -90858,7 +90858,7 @@
                             "type": "group",
                             "group": {
                               "key": "Retransition Start Time Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -90884,7 +90884,7 @@
                         "subgroups": [
                           {
                             "key": "Retransition Speed Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -90904,7 +90904,7 @@
                           },
                           {
                             "key": "Retransition Start Time Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -91073,7 +91073,7 @@
                     },
                     {
                       "key": "Rotation",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -91113,7 +91113,7 @@
                     },
                     {
                       "key": "Animation Speed Curve",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -91133,7 +91133,7 @@
                     },
                     {
                       "key": "Start Time Curve",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -91199,7 +91199,7 @@
                           "type": "group",
                           "group": {
                             "key": "Retransition Speed Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -91222,7 +91222,7 @@
                           "type": "group",
                           "group": {
                             "key": "Retransition Start Time Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -91248,7 +91248,7 @@
                       "subgroups": [
                         {
                           "key": "Retransition Speed Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -91268,7 +91268,7 @@
                         },
                         {
                           "key": "Retransition Start Time Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
