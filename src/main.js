@@ -7,7 +7,7 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js'
 import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js'
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js'
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js'
-import { initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab } from './devpanel/devPanel.js?v=56'
+import { initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab, beginDynamicBatch, endDynamicBatch } from './devpanel/devPanel.js?v=57'
 
 // A defensive wrapper around devPanel.js's own refreshSelectOptions() --
 // found via live testing (direct user report: "I dont see any of the
@@ -523,6 +523,16 @@ let minLoadingTimeTimerSet = false
 // diagnostic aid, not a permanent feature.
 const DEBUG_TIMING = new URLSearchParams(location.search).get('debugTiming') === '1'
 let debugTimingEl = null
+// Aggregating timer for ?debugTiming=1 (sums ms per label into window.__dpProfAgg).
+function profAgg(label, fn) {
+  if (!DEBUG_TIMING) return fn()
+  const t0 = performance.now()
+  try { return fn() } finally {
+    const a = (window.__dpProfAgg = window.__dpProfAgg || {})
+    const e = (a[label] = a[label] || { ms: 0, n: 0 })
+    e.ms += performance.now() - t0; e.n++
+  }
+}
 function logStartupTiming(label) {
   if (!DEBUG_TIMING) return
   if (!debugTimingEl) {
@@ -11187,7 +11197,7 @@ function refreshCustomFunctionConflictWarnings() {
 // custom function is always closest to the anchor, pushing earlier ones
 // down one slot each time.
 function renderCustomClickFunctionGroup(id, title, kind, family) {
-  const base = kind === 'hold' ? makeClickHoldPoseGroup(id, title, {}) : makeClickPoseGroup(id, title, {})
+  const base = profAgg('makeClick*Group', () => kind === 'hold' ? makeClickHoldPoseGroup(id, title, {}) : makeClickPoseGroup(id, title, {}))
   const controls = base.controls.slice()
   const typeOptions = customFunctionTypeOptions(family)
   // On a brand-new function, `${id}Type` isn't in cfg yet, so this falls
@@ -11253,7 +11263,7 @@ function renderCustomClickFunctionGroup(id, title, kind, family) {
     const baseOnChange = enabledCtrl.onChange
     enabledCtrl.onChange = () => { if (baseOnChange) baseOnChange(); updateCustomFunctionTypeVisibility(id) }
   }
-  const g = renderDynamicGroup({ title, controls })
+  const g = profAgg('renderDynamicGroup', () => renderDynamicGroup({ title, controls }))
   if (g) {
     // Nested INSIDE the "Custom Click Functions" anchor's own body (a real
     // subgroup), not positioned as a top-level sibling after it -- direct
@@ -11268,18 +11278,18 @@ function renderCustomClickFunctionGroup(id, title, kind, family) {
     if (anchorBody) anchorBody.insertBefore(g, anchorBody.firstChild)
     g.dataset.customFunctionFamily = family
     g.dataset.customFunctionId = id
-    updateCustomFunctionGroupVisibility(g, family, id)
+    profAgg('updateCustomFunctionGroupVisibility', () => updateCustomFunctionGroupVisibility(g, family, id))
   }
-  updateCustomFunctionTypeVisibility(id)
-  refreshCustomFunctionConflictWarnings()
+  profAgg('updateCustomFunctionTypeVisibility', () => updateCustomFunctionTypeVisibility(id))
+  profAgg('refreshCustomFunctionConflictWarnings', () => refreshCustomFunctionConflictWarnings())
   if (kind === 'hold') {
-    parseClickHoldConfig(id)
-    buildClickHoldPoseWidgets(id)
-    updateClickTriggerModeVisibility(id, [], ['LoopMode'])
-    updateLoopHoldVisibility(id)
-    updateOffsetRotationVisibility(id)
-    updateSingleTimingGateVisibility(id)
-    updateTweenStopGateVisibility(id)
+    profAgg('parseClickHoldConfig', () => parseClickHoldConfig(id))
+    profAgg('buildClickHoldPoseWidgets', () => buildClickHoldPoseWidgets(id))
+    profAgg('updateClickTriggerModeVisibility', () => updateClickTriggerModeVisibility(id, [], ['LoopMode']))
+    profAgg('updateLoopHoldVisibility', () => updateLoopHoldVisibility(id))
+    profAgg('updateOffsetRotationVisibility', () => updateOffsetRotationVisibility(id))
+    profAgg('updateSingleTimingGateVisibility', () => updateSingleTimingGateVisibility(id))
+    profAgg('updateTweenStopGateVisibility', () => updateTweenStopGateVisibility(id))
     // Multi Trigger -- CORRECTED 2026-10-01, direct request ("Click
     // Functions that trigger a sequence should still be able to have
     // multi trigger functionality"): extended to hold-kind (Click+Hold/
@@ -11287,26 +11297,26 @@ function renderCustomClickFunctionGroup(id, title, kind, family) {
     // before applyCustomFunctionReferenceLayout() below, or that pass
     // finds no "Multi Trigger" group yet to move into place after
     // Retransition.
-    setupMultiTriggerGroupForFunction(id, 'hold')
+    profAgg('setupMultiTriggerGroupForFunction', () => setupMultiTriggerGroupForFunction(id, 'hold'))
   } else {
-    parseClickPoseConfig(id)
-    buildClickPoseWidgets(id)
-    updateClickTriggerModeVisibility(id, ['PauseDurationMs'])
-    updateOffsetRotationVisibility(id)
-    updateSingleTimingGateVisibility(id)
-    updateSequencePlayModeVisibility(id)
-    updateChainModeVisibility(id)
-    setupMultiTriggerGroupForFunction(id, 'pose')
+    profAgg('parseClickPoseConfig', () => parseClickPoseConfig(id))
+    profAgg('buildClickPoseWidgets', () => buildClickPoseWidgets(id))
+    profAgg('updateClickTriggerModeVisibility', () => updateClickTriggerModeVisibility(id, ['PauseDurationMs']))
+    profAgg('updateOffsetRotationVisibility', () => updateOffsetRotationVisibility(id))
+    profAgg('updateSingleTimingGateVisibility', () => updateSingleTimingGateVisibility(id))
+    profAgg('updateSequencePlayModeVisibility', () => updateSequencePlayModeVisibility(id))
+    profAgg('updateChainModeVisibility', () => updateChainModeVisibility(id))
+    profAgg('setupMultiTriggerGroupForFunction', () => setupMultiTriggerGroupForFunction(id, 'pose'))
   }
   // Same mandatory Offset/Rotation/Animation Speed Curve/Start Time
   // Curve/Retransition gated-subgroup wrapping the 10 static triggers
   // get -- see wrapClickFunctionGatedSubgroups()'s own comment.
-  wrapClickFunctionGatedSubgroups(id)
+  profAgg('wrapClickFunctionGatedSubgroups', () => wrapClickFunctionGatedSubgroups(id))
   // Same Master On/Off "hide all settings when off" behavior the 10
   // static triggers get -- see updateClickFunctionEnabledVisibility()'s
   // own comment. Must run AFTER the wrapping above (it iterates the
   // group body's CURRENT direct children).
-  updateClickFunctionEnabledVisibility(id)
+  profAgg('updateClickFunctionEnabledVisibility', () => updateClickFunctionEnabledVisibility(id))
   // Re-apply any saved rename -- direct request 2026-09-24 (item 12,
   // "Make sure when i rename a Custom Click Function, the name change is
   // synced across tabs"). Root cause: renderDynamicGroup() -> createGroupElement()
@@ -11324,7 +11334,7 @@ function renderCustomClickFunctionGroup(id, title, kind, family) {
   // time this function builds a group, closes the item-12 gap regardless
   // of which path triggered the rebuild, AND keeps every function
   // (new or restored) normalized to the reference layout.
-  applyCustomFunctionReferenceLayout(id, kind)
+  profAgg('applyCustomFunctionReferenceLayout', () => applyCustomFunctionReferenceLayout(id, kind))
   // CORRECTED 2026-09-28 -- direct report: "Touch Point Count is still
   // showing up in new click functions on desktop tab." The EARLIER call
   // to updateCustomFunctionTypeVisibility() above (right after this
@@ -11342,7 +11352,7 @@ function renderCustomClickFunctionGroup(id, title, kind, family) {
   // replace them), guarantees it always sees whichever row instance is
   // actually live at the end, regardless of how many times this function
   // rebuilt it internally.
-  updateCustomFunctionTypeVisibility(id)
+  profAgg('updateCustomFunctionTypeVisibility', () => updateCustomFunctionTypeVisibility(id))
 }
 // Type select's own onChange for a custom function (CORRECTED 2026-09-20,
 // see "Custom Click Functions"'s own DEV_GROUPS comment for the full
@@ -11719,12 +11729,16 @@ function restoreCustomClickFunctions() {
   const anchorBody = anchor ? anchor.querySelector(':scope > .dp-group-body') : null
   if (anchorBody) anchorBody.querySelectorAll(':scope > .dp-group').forEach((g) => g.remove())
   let maxN = 0
-  saved.forEach((entry) => {
-    if (!entry || !entry.id) return
-    registerCustomClickFunction(entry.id, entry.title || entry.id, entry.kind || 'pose', entry.family || 'desktop')
-    const m = /^custom(\d+)$/.exec(entry.id)
-    if (m) maxN = Math.max(maxN, parseInt(m[1], 10))
-  })
+  // Batched (2026-10-04, startup perf): see beginDynamicBatch() in devPanel.js.
+  beginDynamicBatch()
+  try {
+    saved.forEach((entry) => {
+      if (!entry || !entry.id) return
+      registerCustomClickFunction(entry.id, entry.title || entry.id, entry.kind || 'pose', entry.family || 'desktop')
+      const m = /^custom(\d+)$/.exec(entry.id)
+      if (m) maxN = Math.max(maxN, parseInt(m[1], 10))
+    })
+  } finally { endDynamicBatch() }
   nextCustomFunctionN = maxN + 1
   // Reapply collapse state to newly-rebuilt custom function groups -- they
   // were removed (line 8677) and rebuilt above, but applyOrder() already ran

@@ -1898,7 +1898,12 @@ export function renderDynamicGroup(groupSpec) {
   const gb = g.querySelector('.dp-group-body')
   groupSpec.controls.forEach((ctrl) => gb.appendChild(buildRow(ctrl)))
   groupsEl.appendChild(g)
-  refreshRowDisplaysForEditingTab() // picks up any already-saved/restored values for the new keys
+  // Picks up any already-saved/restored values for the new keys. Only this
+  // group's own controls are refreshed (not every control in the panel); the
+  // whole-panel chrome pass runs now, or once at endDynamicBatch().
+  groupSpec.controls.forEach(refreshRowDisplayForCtrl)
+  if (dynamicBatchDepth > 0) dynamicBatchDirty = true
+  else refreshGroupChromeAll()
   return g
 }
 
@@ -2541,20 +2546,36 @@ function applyStoredValues(values) {
   }
 }
 
-export function refreshRowDisplaysForEditingTab() {
-  devGroups.forEach((group) => group.controls.forEach((ctrl) => {
-    if (isDynamicDeviceCtrl(ctrl)) {
-      const showing = editingDevice === 'desktop' || isDevRowIndependent(editingDevice, ctrl)
-      const v = showing ? store[editingDevice][ctrl.key] : store.desktop[ctrl.key]
-      if (v !== undefined) displayValue(ctrl, v)
-      refreshDynamicDeviceRowChrome(ctrl)
-      return
-    }
-    const v = store[ctrl.perDevice ? editingDevice : 'desktop'][ctrl.key]
+function refreshRowDisplayForCtrl(ctrl) {
+  if (isDynamicDeviceCtrl(ctrl)) {
+    const showing = editingDevice === 'desktop' || isDevRowIndependent(editingDevice, ctrl)
+    const v = showing ? store[editingDevice][ctrl.key] : store.desktop[ctrl.key]
     if (v !== undefined) displayValue(ctrl, v)
-  }))
+    refreshDynamicDeviceRowChrome(ctrl)
+    return
+  }
+  const v = store[ctrl.perDevice ? editingDevice : 'desktop'][ctrl.key]
+  if (v !== undefined) displayValue(ctrl, v)
+}
+function refreshGroupChromeAll() {
   document.querySelectorAll('.dp-group').forEach(refreshGroupCascadeChrome)
   refreshEmptyGroupVisibility()
+}
+export function refreshRowDisplaysForEditingTab() {
+  devGroups.forEach((group) => group.controls.forEach(refreshRowDisplayForCtrl))
+  refreshGroupChromeAll()
+}
+// Bulk-build batching for renderDynamicGroup() (2026-10-04). Each dynamic group
+// used to trigger a full-panel refresh (every control's display plus every
+// group's cascade/empty chrome), which is quadratic when ~19 groups of ~100
+// controls are built in a row on startup. A batch refreshes only each new
+// group's own controls and defers the whole-panel chrome pass to the end.
+let dynamicBatchDepth = 0
+let dynamicBatchDirty = false
+export function beginDynamicBatch() { dynamicBatchDepth++ }
+export function endDynamicBatch() {
+  if (dynamicBatchDepth > 0) dynamicBatchDepth--
+  if (dynamicBatchDepth === 0 && dynamicBatchDirty) { dynamicBatchDirty = false; refreshGroupChromeAll() }
 }
 // Direct request 2026-09-20, matching CLICKO's own refreshEmptyGroupVisibility()
 // ("for Plan 1... reference ClickoDicko/Clicko. they do it right") --
@@ -2833,6 +2854,15 @@ export function initDevPanel(groups, opts = {}) {
   // of suppressing it.
   function restoreValuesForEveryVisitor() {
     if (opts.remoteSave) {
+      // 2026-10-04, startup perf (measured with ?debugTiming=1: this pass plus
+      // resetSettings()'s own identical-and-more restore ran
+      // restoreCustomClickFunctions() twice -- 5.9 s then 9.6 s -- re-registered
+      // every custom function (duplicating CLICK_*_KEYS and devGroups entries)
+      // and fetched the ~4 MB settings file twice). A DEV_MODE visitor always
+      // gets resetSettings() later in this function, which restores values AND
+      // order/overrides AND calls onRestore, so this lighter pass is only
+      // needed when there is no panel.
+      if (DEV_MODE) return
       fetchRemoteSettingsUntilSuccess(opts.remoteSave, (settings) => {
         lastRestoredValues = settings.values || null
         applyStoredValues(settings.values)
