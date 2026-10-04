@@ -15828,6 +15828,48 @@ row are inserted above the graph and the buttons directly below it.
 
 `main.js` cache-buster `?v=277` -> `?v=278`.
 
+2026-10-04  -  (FIX -- production outage: "same bug as before. pause button
+missing. hands not loading")
+
+Root cause: the previous round (curve editor extras) declared 3 module-level
+consts -- `CURVE_METHOD_OPTIONS`, `CURVE_EASING_FNS`,
+`CURVE_GRAPH_OPACITY_DEFAULT` -- next to the functions that use them, around
+lines 6092-6515. The curve widgets are built at TOP LEVEL
+(`buildArmLengthWidgets()`/`buildWristSplayWidgets()`, line ~1977, right after
+`initDevPanel()`), so `attachCurveEditorExtras()` read
+`CURVE_METHOD_OPTIONS` while it was still in its temporal dead zone ->
+`ReferenceError: Cannot access 'CURVE_METHOD_OPTIONS' before initialization`,
+an uncaught error that aborted the whole module before `rebuildField()` or the
+Pause button's setup ran. The same failure class as the 2026-09-29 Frame Rate
+Log outage (CLAUDE.md already has the rule: module-level state read during
+top-level setup belongs in the early-state block). I wrote the previous round
+without re-applying that rule, and it was not caught because `node --check`
+cannot see a runtime TDZ error and the local server truncates `main.js`, so the
+page could never be loaded here. Pushed broken for roughly the time between
+that push and this fix.
+
+Fix: the 3 consts moved into the early-state block next to
+`armLengthWidgetResyncs` (lines ~193-225). Their only dependencies are
+function declarations (hoisted) used inside function bodies, so moving them up
+is safe. `evaluateArmLengthCurve()` reads `CURVE_EASING_FNS` on every redraw,
+so it was affected too, not just the new UI.
+
+New guard (this is the part that was missing): `tests/top-level-load-check.js`
+executes main.js's top level in a vm under permissive stubs for three.js, the
+DOM and devPanel.js. A load-order ReferenceError fires regardless of the stubs.
+Control test: against the pushed (broken) commit it fails with exactly
+`ReferenceError: Cannot access 'CURVE_METHOD_OPTIONS' before initialization`
+(exit 1); against the fix it reaches the end of top level (exit 0). Limits: it
+does not execute async paths (onRestore -> restoreCustomClickFunctions(), the
+animation loop) and cannot find logic bugs. Run it before every push that
+touches main.js.
+
+Verified: `node --check` passes; the load check passes on the fix and fails on
+the broken commit. **Not verified in a browser** (local server truncation); the
+user's own reload is the real confirmation.
+
+`main.js` cache-buster `?v=278` -> `?v=279`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

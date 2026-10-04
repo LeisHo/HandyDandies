@@ -2304,4 +2304,20 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   routine) must carry `m`/`bg` to the new first point -- `attachCurveEditorExtras()`
   does this for its own Mirror buttons. The 2 plain-slider/range-bar template
   items were already in the project before this round, so don't re-port them.
+- **SECOND TDZ outage, 2026-10-04 (curve editor extras) -- the standing rule
+  above was not enough on its own; there is now a script that enforces it.**
+  3 new module-level consts (`CURVE_METHOD_OPTIONS`, `CURVE_EASING_FNS`,
+  `CURVE_GRAPH_OPACITY_DEFAULT`) were declared ~4,000 lines below
+  `buildArmLengthWidgets()`, which runs at top level (~line 1977), so the page
+  died with no hands and no Pause button. `node --check` passes on this class of
+  bug (it's a runtime error) and the local server truncates `main.js`, so it
+  can't be caught by loading the page here. **Before pushing ANY change to
+  `src/main.js`, run `node tests/top-level-load-check.js`** -- it executes the
+  module's top level under stubs and fails on a load-order ReferenceError
+  (verified: it reproduces this exact outage on the broken commit). It does not
+  run async paths (onRestore, the animation loop) or find logic bugs, so a new
+  const used only there is still on you to place correctly. Quick rule of thumb
+  that would have prevented this: a `const`/`let` used by anything reachable from
+  top-level setup (widget builders, `registerX()` called at module level,
+  `initDevPanel()` hooks) goes in the early-state block near the top of the file.
 

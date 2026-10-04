@@ -181,6 +181,48 @@ const forearmPosRaw = new THREE.Vector3()
 let armLengthRangeParsed = { min: 30, max: 90 }
 let armLengthCurveParsed = [{ x: 0, y: 1 }, { x: 1, y: 0 }]
 const armLengthWidgetResyncs = []
+// FIX 2026-10-04 (production outage: "pause button missing. hands not
+// loading"): these 3 curve-editor constants used to be declared next to the
+// functions that use them, ~4,000 lines below this point. The curve widgets
+// are BUILT at top level (buildArmLengthWidgets()/buildWristSplayWidgets(),
+// right after initDevPanel()), long before those declarations ran, so
+// reading them threw a temporal-dead-zone ReferenceError that aborted the
+// whole module -- no field, no Pause button. Same rule as the Frame Rate Log
+// outage (see CLAUDE.md): module-level state read during top-level setup
+// belongs in this early block, not next to the code that uses it.
+const CURVE_METHOD_OPTIONS = [
+  { value: 'monotone', text: 'Monotone Cubic (Smooth, No Overshoot)' },
+  { value: 'catmullrom', text: 'Catmull-Rom (Classic)' },
+  { value: 'natural', text: 'Natural Cubic Spline (Smooth, Global)' },
+  { value: 'linear', text: 'Linear' },
+  { value: 'sine', text: 'Sine (Ease In-Out)' },
+  { value: 'bezier', text: 'Bezier (Ease In-Out)' },
+  { value: 'constant', text: 'Constant (Stepped)' },
+  { value: 'exponential', text: 'Exponential (Ease In-Out)' },
+  { value: 'logarithmic', text: 'Logarithmic' },
+  { value: 'elastic', text: 'Elastic (Ease In-Out)' }
+]
+const CURVE_EASING_FNS = {
+  linear: (t) => t,
+  sine: (t) => -(Math.cos(Math.PI * t) - 1) / 2,
+  bezier: (t) => bezierSegmentY({ x: 0, y: 0 }, { x: 0.42, y: 0 }, { x: 0.58, y: 1 }, { x: 1, y: 1 }, t),
+  constant: (t) => (t < 1 ? 0 : 1),
+  exponential: (t) => {
+    if (t === 0) return 0
+    if (t === 1) return 1
+    return t < 0.5 ? Math.pow(2, 20 * t - 10) / 2 : (2 - Math.pow(2, -20 * t + 10)) / 2
+  },
+  logarithmic: (t) => Math.log10(1 + 9 * t),
+  elastic: (t) => {
+    const c5 = (2 * Math.PI) / 4.5
+    if (t === 0) return 0
+    if (t === 1) return 1
+    return t < 0.5
+      ? -(Math.pow(2, 20 * t - 10) * Math.sin((20 * t - 11.125) * c5)) / 2
+      : (Math.pow(2, -20 * t + 10) * Math.sin((20 * t - 11.125) * c5)) / 2 + 1
+  }
+}
+const CURVE_GRAPH_OPACITY_DEFAULT = 0.06
 // Responsive Wrist Splay's own cached/parsed state -- same TDZ reasoning
 // as armLengthRangeParsed/armLengthCurveParsed directly above (declared
 // here, read by parseWristSplayConfig()/computeResponsiveWristSplayDeg()
@@ -6089,18 +6131,6 @@ function curveHermiteY(p1, p2, m1, m2, x) {
 // the default 'monotone', so every pre-existing saved curve is byte-for-byte
 // unchanged and still evaluates exactly as before). A point's own bezier
 // handle (h1/h2) still overrides the method for that one segment.
-const CURVE_METHOD_OPTIONS = [
-  { value: 'monotone', text: 'Monotone Cubic (Smooth, No Overshoot)' },
-  { value: 'catmullrom', text: 'Catmull-Rom (Classic)' },
-  { value: 'natural', text: 'Natural Cubic Spline (Smooth, Global)' },
-  { value: 'linear', text: 'Linear' },
-  { value: 'sine', text: 'Sine (Ease In-Out)' },
-  { value: 'bezier', text: 'Bezier (Ease In-Out)' },
-  { value: 'constant', text: 'Constant (Stepped)' },
-  { value: 'exponential', text: 'Exponential (Ease In-Out)' },
-  { value: 'logarithmic', text: 'Logarithmic' },
-  { value: 'elastic', text: 'Elastic (Ease In-Out)' }
-]
 function curveCatmullRomY(y0, y1, y2, y3, t) {
   const t2 = t * t, t3 = t2 * t
   return 0.5 * ((2 * y1) + (-y0 + y2) * t + (2 * y0 - 5 * y1 + 4 * y2 - y3) * t2 + (-y0 + 3 * y1 - 3 * y2 + y3) * t3)
@@ -6140,26 +6170,6 @@ function curveNaturalSplineY(sorted, M, i, x) {
   if (h === 0) return p1.y
   const a = (p2.x - x) / h, b = (x - p1.x) / h
   return a * p1.y + b * p2.y + ((a * a * a - a) * M[i] + (b * b * b - b) * M[i + 1]) * (h * h) / 6
-}
-const CURVE_EASING_FNS = {
-  linear: (t) => t,
-  sine: (t) => -(Math.cos(Math.PI * t) - 1) / 2,
-  bezier: (t) => bezierSegmentY({ x: 0, y: 0 }, { x: 0.42, y: 0 }, { x: 0.58, y: 1 }, { x: 1, y: 1 }, t),
-  constant: (t) => (t < 1 ? 0 : 1),
-  exponential: (t) => {
-    if (t === 0) return 0
-    if (t === 1) return 1
-    return t < 0.5 ? Math.pow(2, 20 * t - 10) / 2 : (2 - Math.pow(2, -20 * t + 10)) / 2
-  },
-  logarithmic: (t) => Math.log10(1 + 9 * t),
-  elastic: (t) => {
-    const c5 = (2 * Math.PI) / 4.5
-    if (t === 0) return 0
-    if (t === 1) return 1
-    return t < 0.5
-      ? -(Math.pow(2, 20 * t - 10) * Math.sin((20 * t - 11.125) * c5)) / 2
-      : (Math.pow(2, -20 * t + 10) * Math.sin((20 * t - 11.125) * c5)) / 2 + 1
-  }
 }
 function curveMirrorX(points) {
   return points.map((p) => {
@@ -6512,7 +6522,6 @@ function buildArmLengthRangeWidget(row) {
 // default so an untouched curve's saved JSON is unchanged. `ctx` gives the
 // helper access to the widget's own closure state: getPoints()/setPoints(),
 // redraw(), commit() (= the widget's commitPoints()).
-const CURVE_GRAPH_OPACITY_DEFAULT = 0.06
 function attachCurveEditorExtras(row, svg, ctx) {
   const wrap = elLocal('div', { display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '4px' })
   const select = elLocal('select', { width: '100%' })

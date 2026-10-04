@@ -18,6 +18,14 @@ work seamlessly from there.
 
 ## Currently working on
 
+**2026-10-04 -- FIXED production outage (pause button missing, hands not
+loading).** The curve-editor-extras round declared 3 module-level consts ~4,000
+lines below the top-level code that builds the curve widgets -> TDZ
+ReferenceError aborted the module. Consts moved to the early-state block.
+New `tests/top-level-load-check.js` reproduces the crash on the broken commit
+and passes on the fix; run it before pushing any `main.js` change (it cannot
+catch async-path or logic bugs). `main.js` at `?v=279`. Needs a hard refresh.
+
 **2026-10-04 -- Curve editor extras ported from the dev panel template.**
 All 3 curve widgets now have an interpolation-method dropdown (10 methods),
 a Graph Opacity slider and Mirror X / Mirror Y buttons, backed by method
