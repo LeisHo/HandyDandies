@@ -7035,7 +7035,7 @@
       "custom9EasingCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9SpeedCurveEnabled": true,
       "custom9SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom9SpeedCurveRange": "{\"min\":2500,\"max\":3000}",
+      "custom9SpeedCurveRange": "{\"min\":2500,\"max\":3600}",
       "custom9StartTimeCurveEnabled": true,
       "custom9StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9StartTimeRange": "{\"min\":0,\"max\":300}",
@@ -7311,7 +7311,7 @@
       "custom13TouchPointCount": 1,
       "custom13ClickCount": "3rd",
       "custom13Mode": "Sequence",
-      "custom13OffsetEnabled": true,
+      "custom13OffsetEnabled": false,
       "custom13OffsetMode": "XYZ Offset",
       "custom13OffsetX": -5,
       "custom13OffsetY": 4,
@@ -7343,7 +7343,7 @@
       "custom13TargetPose": "Clockwise Fan - 4",
       "custom13TweenSelector": "Wave",
       "custom13TweenSpeedMs": 3000,
-      "custom13TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.3416666666666667,\"y\":0.7501302083333333},{\"x\":1,\"y\":1}]",
+      "custom13TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.3807471347841095,\"y\":0.5971872965494791},{\"x\":1,\"y\":1}]",
       "custom13TweenStartTimeRange": "{\"min\":0,\"max\":3000}",
       "custom13SequencePlayMode": "Count",
       "custom13SequenceCount": 1,
@@ -15018,7 +15018,7 @@
       "custom9EasingCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9SpeedCurveEnabled": true,
       "custom9SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom9SpeedCurveRange": "{\"min\":2500,\"max\":3000}",
+      "custom9SpeedCurveRange": "{\"min\":2500,\"max\":3600}",
       "custom9StartTimeCurveEnabled": true,
       "custom9StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9StartTimeRange": "{\"min\":0,\"max\":300}",
@@ -15294,7 +15294,7 @@
       "custom13TouchPointCount": 1,
       "custom13ClickCount": "3rd",
       "custom13Mode": "Sequence",
-      "custom13OffsetEnabled": true,
+      "custom13OffsetEnabled": false,
       "custom13OffsetMode": "XYZ Offset",
       "custom13OffsetX": -5,
       "custom13OffsetY": 4,
@@ -15326,7 +15326,7 @@
       "custom13TargetPose": "Clockwise Fan - 4",
       "custom13TweenSelector": "Wave",
       "custom13TweenSpeedMs": 3000,
-      "custom13TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.3416666666666667,\"y\":0.7501302083333333},{\"x\":1,\"y\":1}]",
+      "custom13TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.3807471347841095,\"y\":0.5971872965494791},{\"x\":1,\"y\":1}]",
       "custom13TweenStartTimeRange": "{\"min\":0,\"max\":3000}",
       "custom13SequencePlayMode": "Count",
       "custom13SequenceCount": 1,
@@ -23001,7 +23001,7 @@
       "custom9EasingCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9SpeedCurveEnabled": true,
       "custom9SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom9SpeedCurveRange": "{\"min\":2500,\"max\":3000}",
+      "custom9SpeedCurveRange": "{\"min\":2500,\"max\":3600}",
       "custom9StartTimeCurveEnabled": true,
       "custom9StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9StartTimeRange": "{\"min\":0,\"max\":300}",
@@ -23277,7 +23277,7 @@
       "custom13TouchPointCount": 1,
       "custom13ClickCount": "3rd",
       "custom13Mode": "Sequence",
-      "custom13OffsetEnabled": true,
+      "custom13OffsetEnabled": false,
       "custom13OffsetMode": "XYZ Offset",
       "custom13OffsetX": -5,
       "custom13OffsetY": 4,
@@ -23309,7 +23309,7 @@
       "custom13TargetPose": "Clockwise Fan - 4",
       "custom13TweenSelector": "Wave",
       "custom13TweenSpeedMs": 3000,
-      "custom13TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.3416666666666667,\"y\":0.7501302083333333},{\"x\":1,\"y\":1}]",
+      "custom13TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.3807471347841095,\"y\":0.5971872965494791},{\"x\":1,\"y\":1}]",
       "custom13TweenStartTimeRange": "{\"min\":0,\"max\":3000}",
       "custom13SequencePlayMode": "Count",
       "custom13SequenceCount": 1,
@@ -37295,7 +37295,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 13",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -37362,7 +37362,7 @@
                 "type": "group",
                 "group": {
                   "key": "Offset",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -37445,7 +37445,7 @@
                 "type": "group",
                 "group": {
                   "key": "Offset To Camera",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -37572,7 +37572,7 @@
                 "type": "group",
                 "group": {
                   "key": "Start Time Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -40885,7 +40885,7 @@
             "subgroups": [
               {
                 "key": "Offset",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -40965,7 +40965,7 @@
               },
               {
                 "key": "Offset To Camera",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -41080,7 +41080,7 @@
               },
               {
                 "key": "Start Time Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -48631,7 +48631,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 9",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -48885,7 +48885,7 @@
                 "type": "group",
                 "group": {
                   "key": "Animation Speed Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -49089,7 +49089,7 @@
                       "type": "group",
                       "group": {
                         "key": "Trigger 1",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -49124,7 +49124,7 @@
                             "type": "group",
                             "group": {
                               "key": "Offset",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -49207,7 +49207,7 @@
                             "type": "group",
                             "group": {
                               "key": "Offset To Camera",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -49509,7 +49509,7 @@
                         "subgroups": [
                           {
                             "key": "Offset",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -49589,7 +49589,7 @@
                           },
                           {
                             "key": "Offset To Camera",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -50651,7 +50651,7 @@
                   "subgroups": [
                     {
                       "key": "Trigger 1",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -50686,7 +50686,7 @@
                           "type": "group",
                           "group": {
                             "key": "Offset",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -50769,7 +50769,7 @@
                           "type": "group",
                           "group": {
                             "key": "Offset To Camera",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -51071,7 +51071,7 @@
                       "subgroups": [
                         {
                           "key": "Offset",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -51151,7 +51151,7 @@
                         },
                         {
                           "key": "Offset To Camera",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -52396,7 +52396,7 @@
               },
               {
                 "key": "Animation Speed Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -52588,7 +52588,7 @@
                     "type": "group",
                     "group": {
                       "key": "Trigger 1",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -52623,7 +52623,7 @@
                           "type": "group",
                           "group": {
                             "key": "Offset",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -52706,7 +52706,7 @@
                           "type": "group",
                           "group": {
                             "key": "Offset To Camera",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -53008,7 +53008,7 @@
                       "subgroups": [
                         {
                           "key": "Offset",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -53088,7 +53088,7 @@
                         },
                         {
                           "key": "Offset To Camera",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -54150,7 +54150,7 @@
                 "subgroups": [
                   {
                     "key": "Trigger 1",
-                    "collapsed": false,
+                    "collapsed": true,
                     "locked": false,
                     "items": [
                       {
@@ -54185,7 +54185,7 @@
                         "type": "group",
                         "group": {
                           "key": "Offset",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -54268,7 +54268,7 @@
                         "type": "group",
                         "group": {
                           "key": "Offset To Camera",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -54570,7 +54570,7 @@
                     "subgroups": [
                       {
                         "key": "Offset",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -54650,7 +54650,7 @@
                       },
                       {
                         "key": "Offset To Camera",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -72895,7 +72895,7 @@
         },
         {
           "key": "Custom Click Function 13",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
@@ -72962,7 +72962,7 @@
               "type": "group",
               "group": {
                 "key": "Offset",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -73045,7 +73045,7 @@
               "type": "group",
               "group": {
                 "key": "Offset To Camera",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -73172,7 +73172,7 @@
               "type": "group",
               "group": {
                 "key": "Start Time Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -76485,7 +76485,7 @@
           "subgroups": [
             {
               "key": "Offset",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -76565,7 +76565,7 @@
             },
             {
               "key": "Offset To Camera",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -76680,7 +76680,7 @@
             },
             {
               "key": "Start Time Curve",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -84225,7 +84225,7 @@
         },
         {
           "key": "Custom Click Function 9",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -84479,7 +84479,7 @@
               "type": "group",
               "group": {
                 "key": "Animation Speed Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -84683,7 +84683,7 @@
                     "type": "group",
                     "group": {
                       "key": "Trigger 1",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -84718,7 +84718,7 @@
                           "type": "group",
                           "group": {
                             "key": "Offset",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -84801,7 +84801,7 @@
                           "type": "group",
                           "group": {
                             "key": "Offset To Camera",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -85103,7 +85103,7 @@
                       "subgroups": [
                         {
                           "key": "Offset",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -85183,7 +85183,7 @@
                         },
                         {
                           "key": "Offset To Camera",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -86245,7 +86245,7 @@
                 "subgroups": [
                   {
                     "key": "Trigger 1",
-                    "collapsed": false,
+                    "collapsed": true,
                     "locked": false,
                     "items": [
                       {
@@ -86280,7 +86280,7 @@
                         "type": "group",
                         "group": {
                           "key": "Offset",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -86363,7 +86363,7 @@
                         "type": "group",
                         "group": {
                           "key": "Offset To Camera",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -86665,7 +86665,7 @@
                     "subgroups": [
                       {
                         "key": "Offset",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -86745,7 +86745,7 @@
                       },
                       {
                         "key": "Offset To Camera",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -87990,7 +87990,7 @@
             },
             {
               "key": "Animation Speed Curve",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -88182,7 +88182,7 @@
                   "type": "group",
                   "group": {
                     "key": "Trigger 1",
-                    "collapsed": false,
+                    "collapsed": true,
                     "locked": false,
                     "items": [
                       {
@@ -88217,7 +88217,7 @@
                         "type": "group",
                         "group": {
                           "key": "Offset",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -88300,7 +88300,7 @@
                         "type": "group",
                         "group": {
                           "key": "Offset To Camera",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -88602,7 +88602,7 @@
                     "subgroups": [
                       {
                         "key": "Offset",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -88682,7 +88682,7 @@
                       },
                       {
                         "key": "Offset To Camera",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -89744,7 +89744,7 @@
               "subgroups": [
                 {
                   "key": "Trigger 1",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -89779,7 +89779,7 @@
                       "type": "group",
                       "group": {
                         "key": "Offset",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -89862,7 +89862,7 @@
                       "type": "group",
                       "group": {
                         "key": "Offset To Camera",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -90164,7 +90164,7 @@
                   "subgroups": [
                     {
                       "key": "Offset",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -90244,7 +90244,7 @@
                     },
                     {
                       "key": "Offset To Camera",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
