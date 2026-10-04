@@ -1986,6 +1986,11 @@ const DEV_GROUPS = [
       // flooding the log during a sustained slow patch.
       { key: 'logFrameRateDropsEnabled', label: 'Log Frame Rate Drops', type: 'checkbox', def: false },
       { key: 'frameRateDropThresholdFps', label: 'Frame Rate Drop Threshold (Fps)', type: 'slider', min: 1, max: 60, step: 1, def: 30 },
+      // Log Frame Profile (2026-10-04): once per second, appends the existing frame profiler's breakdown
+      // (cursor tracking / per-hand logic / drawing / everything else, in ms per frame) to the Frame Rate
+      // Log, plus the drawing-buffer size, pixel ratio and hand count, so the cost of a slow frame can be
+      // read from a pasted log instead of the browser console.
+      { key: 'logFrameProfileEnabled', label: 'Log Frame Profile', type: 'checkbox', def: false },
       { key: 'clearFrameRateLogBtn', label: 'Clear Frame Rate Log', type: 'button', onClick: () => clearFrameRateLog() },
       // Pose Jump Log (2026-10-04): logs any frame where a hand's bone rotation or position
       // changes more than the thresholds below between two consecutive frames -- i.e. a pop, not
@@ -14650,6 +14655,7 @@ function flashImportButton(btn, text) {
 // entirely outside it (controls.update()/panel syncs/GC between
 // frames) -- `avgOther` in the console line below is a DERIVED bucket
 // (total minus the 3 measured pieces), not directly instrumented.
+const _profileSizeScratch = new THREE.Vector2()
 let __frameProfiler = { frames: 0, updateRenderOrderMs: 0, composerRenderMs: 0, cursorTrackingMs: 0, animateTotalMs: 0, windowStart: performance.now() }
 // Runs via the shared lib/visibility-tick-loop.js (ported from "3JS
 // ENGINE", see that file's own header comment for the full account)
@@ -15035,6 +15041,10 @@ function animate(dt, now) {
         const avgCursorTracking = __frameProfiler.cursorTrackingMs / f
         const avgTotal = __frameProfiler.animateTotalMs / f
         const avgOther = avgTotal - avgURO - avgRender - avgCursorTracking
+        if (cfg.logFrameProfileEnabled) {
+          const sz = renderer.getDrawingBufferSize(_profileSizeScratch)
+          appendFrameRateLogLine(`[${new Date().toLocaleTimeString()}] PROFILE -- ${(f / (elapsed / 1000)).toFixed(1)} fps | per frame: total ${avgTotal.toFixed(1)}ms = cursor tracking ${avgCursorTracking.toFixed(1)} + hand logic ${avgURO.toFixed(1)} + drawing ${avgRender.toFixed(1)} + other ${avgOther.toFixed(1)} | ${hands.length} hands, buffer ${sz.x}x${sz.y}, pixel ratio ${renderer.getPixelRatio()}, paused ${isPaused}`)
+        }
         console.log(`[frame-profile] fps=${(f / (elapsed / 1000)).toFixed(1)} avgTotal=${avgTotal.toFixed(2)}ms avgUpdateRenderOrder=${avgURO.toFixed(2)}ms avgComposerRender=${avgRender.toFixed(2)}ms avgCursorTracking=${avgCursorTracking.toFixed(2)}ms avgOther=${avgOther.toFixed(2)}ms hands=${hands.length} over ${f} frames`)
         __frameProfiler = { frames: 0, updateRenderOrderMs: 0, composerRenderMs: 0, cursorTrackingMs: 0, animateTotalMs: 0, windowStart: performance.now() }
       }
