@@ -18,6 +18,12 @@ work seamlessly from there.
 
 ## Currently working on
 
+**2026-10-04 -- Click-function distance-from-cursor settings now use world X/Y
+only.** Start time / speed / start-distance / retransition / tween-stop curves
+and the offset curves ignore Z. Cursor-tracking features (arm length, wrist
+splay, arm/palm rotation, render order) intentionally stay 3D. `main.js` at
+`?v=281`; load check passes; not run in a browser. See CHANGELOG.txt.
+
 **2026-10-04 -- FIXED: Loading Preview was drawing a hand ~100x too small.**
 The HandipantsOL.glb swap changed model units by 100x (bounds radius 0.2295
 vs the 22.97 the saved preview cameras were tuned for), so presets framed

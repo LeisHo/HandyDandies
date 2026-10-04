@@ -15923,6 +15923,50 @@ has not been run in a browser -- `node --check` and
 
 `main.js` cache-buster `?v=279` -> `?v=280`.
 
+2026-10-04  -  (change -- click-function distance-from-cursor settings now use
+world X/Y only)
+
+Direct request: "for any click function settings that depend on distance from
+cursor, the distance should only be based off of world XY vectors." Before
+this, every one of them measured the full 3D distance, so a hand's Z (including
+a hand pushed along Z by Offset / Offset To Camera) changed its stagger and
+curve values.
+
+What now uses world-XY distance (`dx, dy` only, Z ignored): Start Time Curve
+(Single Pose and Tween), Animation Speed Curve, Start Distance Curve
+(eligibility + cap), Retransition Start Time and Speed curves (Single Pose and
+Tween), Tween Stop Start/Delay curves, the Tween release-stop retransition
+delay, and the Cursor Offset Distance Curve / per-axis Cursor Offset curves /
+Offset To Camera curves (those rest-position distances became XY too).
+Implemented with `cursorDistXY()`, a per-frame `hand._xyCursorDist` plus the
+field's XY min/range (`xyFieldMinDist`/`xyFieldDistRange`, computed in
+`updateRenderOrder()`'s pre-pass and declared in the early-state block), and
+XY-based `dists` arrays in `triggerClickPose()` and `endClickHoldPose()`.
+
+Deliberately NOT changed (still 3D), and why: cursor-TRACKING features --
+Arm Length / wrist cropping, Responsive Wrist Splay, Arm Rotation and Palm
+Rotation distance curves, and the render-order sort -- because you scoped this
+to click-function settings. The wrist splay a click function freezes at
+trigger time keeps using the 3D value (a separate 3D min/range is computed in
+`triggerClickPose()` for just that line), since it blends against the live
+idle splay that is 3D; switching it would reintroduce the pose-handoff jump
+this project spent ten rounds fixing. The Cursor Offset DIRECTION vector is
+also unchanged (it's a direction, not a distance setting). Say if any of those
+should also go XY-only.
+
+Effect to expect: curves tuned against 3D distance will normalize differently
+(the nearest/farthest hand in XY need not match the 3D ones), most noticeably
+if the cursor plane and hand plane are far apart in Z.
+
+Verified: `node --check` and `tests/top-level-load-check.js` pass; a grep
+confirms no `computeStartDelayMs(live` / `computeTweenFractionCap(live` call
+remains and the only 3D `distanceTo(cursorTarget)` calls left are the splay,
+arm/palm rotation and render-order ones listed above; the XY helper tested
+(3-4-5 triangle, Z of +/-999 ignored, directly above the cursor = 0). The
+patched build has not been run in a browser.
+
+`main.js` cache-buster `?v=280` -> `?v=281`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

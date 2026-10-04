@@ -245,6 +245,18 @@ let loadingPreviewModelScale = 1
 let loadingPreviewAnchorActive = false
 const loadingPreviewAnchor = new THREE.Vector3()
 const _loadingPreviewBase = new THREE.Vector3()
+// World-XY-only cursor distance for click-function settings (2026-10-04,
+// direct request: "for any click function settings that depend on distance
+// from cursor, the distance should only be based off of world XY vectors").
+// Depth (Z) is ignored, so a hand being nearer or farther in Z -- including
+// from an Offset / Offset To Camera moving it along Z -- no longer changes
+// its stagger, speed, retransition, start-distance or offset-curve values.
+// Computed once per frame in updateRenderOrder()'s pre-pass
+// (`hand._xyCursorDist` + the field's min/range below). Cursor-TRACKING
+// features (arm length, wrist splay, arm/palm rotation, render order) are
+// deliberately NOT included: they are not click-function settings, and the
+// frozen-at-trigger splay must stay on the same 3D value it blends against.
+let xyFieldMinDist = 0, xyFieldDistRange = 0.001
 // Responsive Wrist Splay's own cached/parsed state -- same TDZ reasoning
 // as armLengthRangeParsed/armLengthCurveParsed directly above (declared
 // here, read by parseWristSplayConfig()/computeResponsiveWristSplayDeg()
@@ -7435,8 +7447,15 @@ let restFieldMinDist = 0, restFieldDistRange = 0.001
 // longer depends on the offset it produces, so live apply and every bake
 // path read the identical number. Rest distances + their field-wide
 // min/range are computed once per frame in updateRenderOrder()'s pre-pass.
+function cursorDistXY(pos) {
+  return Math.hypot(pos.x - cursorTarget.x, pos.y - cursorTarget.y)
+}
+// 2026-10-04: world-XY distance (see xyFieldMinDist's comment).
 function handRestDist(hand) {
-  return hand._restCursorDist !== undefined ? hand._restCursorDist : (hand.basePosition || hand.wrapper.position).distanceTo(cursorTarget)
+  return hand._restCursorDist !== undefined ? hand._restCursorDist : cursorDistXY(hand.basePosition || hand.wrapper.position)
+}
+function handXYDist(hand) {
+  return hand._xyCursorDist !== undefined ? hand._xyCursorDist : cursorDistXY(hand.wrapper.position)
 }
 // Direct request 2026-10-01: Offset Mode dropdown ('XYZ Offset', the
 // pre-existing behavior, vs. 'Cursor Offset', new). Shared by every
@@ -7534,7 +7553,7 @@ const _cameraOffsetWorld = new THREE.Vector3()
 // Normalized (0 nearest .. 1 farthest hand in the field) distance from the
 // cursor, measured from the hand's REST position at the moment of the call.
 function captureCameraOffsetNorm(hand) {
-  const d = (hand.basePosition || hand.wrapper.position).distanceTo(cursorTarget)
+  const d = cursorDistXY(hand.basePosition || hand.wrapper.position) // world XY only (2026-10-04)
   return THREE.MathUtils.clamp((d - restFieldMinDist) / restFieldDistRange, 0, 1)
 }
 function cameraSlotValue(slot, norm) {
@@ -8092,7 +8111,7 @@ function beginTweenReleaseStop(hand, chp, trig, p, values, live, minLiveDist, li
   // distance-based stagger for retransition either, same convention
   // `${p}StartTimeCurveEnabled` already uses for the forward phase.
   chp.retransitionDelay = cfg[`${p}RetransitionStartTimeCurveEnabled`] === false ? 0
-    : computeStartDelayMs(live, minLiveDist, liveDistRange, trig.tweenRetransitionCurveParsed, trig.tweenRetransitionRangeParsed)
+    : computeStartDelayMs(handXYDist(hand), xyFieldMinDist, xyFieldDistRange, trig.tweenRetransitionCurveParsed, trig.tweenRetransitionRangeParsed)
   chp.retransitionIsTween = true
   chp.phase = 'retransition'
   chp.releasePending = false
@@ -8241,7 +8260,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     let tweenFractionCap = 1
     let eligible = true
     if (cfg[`${p}StartDistanceCurveEnabled`]) {
-      const cap = computeTweenFractionCap(live, cfg[`${p}StartDistanceMin`], cfg[`${p}StartDistanceMax`], trig.startDistanceCurveParsed)
+      const cap = computeTweenFractionCap(handXYDist(hand), cfg[`${p}StartDistanceMin`], cfg[`${p}StartDistanceMax`], trig.startDistanceCurveParsed)
       if (cap === null) eligible = false
       else tweenFractionCap = cap
     }
@@ -8256,8 +8275,8 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
       // Mode.
       const startTimeCurveOff = cfg[`${p}StartTimeCurveEnabled`] === false
       const delay = startTimeCurveOff ? 0 : (isTweenStart
-        ? computeStartDelayMs(live, minLiveDist, liveDistRange, trig.tweenStartCurveParsed, trig.tweenStartRangeParsed)
-        : computeStartDelayMs(live, minLiveDist, liveDistRange, trig.startCurveParsed, trig.startRangeParsed))
+        ? computeStartDelayMs(handXYDist(hand), xyFieldMinDist, xyFieldDistRange, trig.tweenStartCurveParsed, trig.tweenStartRangeParsed)
+        : computeStartDelayMs(handXYDist(hand), xyFieldMinDist, xyFieldDistRange, trig.startCurveParsed, trig.startRangeParsed))
       chp.pendingClaimAt = now + delay
       chp.pendingTweenFractionCap = tweenFractionCap
       chp.pendingFrozenSplayDeg = computeResponsiveWristSplayDeg(live, minLiveDist, liveDistRange)
@@ -8273,7 +8292,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
       // recomputed live mid-transition. See makeClickHoldPoseGroup()'s own
       // control comment for the full reasoning.
       chp.pendingFrozenOffsetNorm = captureCameraOffsetNorm(hand)
-      chp.pendingFrozenSpeedMs = cfg[`${p}SpeedCurveEnabled`] ? computeStartDelayMs(live, minLiveDist, liveDistRange, trig.speedCurveParsed, trig.speedRangeParsed) : 0
+      chp.pendingFrozenSpeedMs = cfg[`${p}SpeedCurveEnabled`] ? computeStartDelayMs(handXYDist(hand), xyFieldMinDist, xyFieldDistRange, trig.speedCurveParsed, trig.speedRangeParsed) : 0
     }
   }
   if (chp.pendingClaimAt && now >= chp.pendingClaimAt) {
@@ -8768,7 +8787,7 @@ function endClickHoldPose(p) {
   const now = nowVirtual() // virtual clock -- feeds chp.retransitionStartTime below, an animation-timing field
   let minD = Infinity, maxD = -Infinity
   const dists = hands.map((hand) => {
-    const d = hand.wrapper.position.distanceTo(cursorTarget)
+    const d = cursorDistXY(hand.wrapper.position) // world XY only (2026-10-04)
     if (d < minD) minD = d
     if (d > maxD) maxD = d
     return d
@@ -9499,13 +9518,13 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
       // distance-based stagger for retransition, same convention
       // `${p}StartTimeCurveEnabled` already uses for the forward phase.
       cp.retransitionDelay = cfg[`${p}RetransitionStartTimeCurveEnabled`] === false ? 0
-        : computeStartDelayMs(live, minLiveDist, liveDistRange, clickPoseTriggers[p].retransitionCurveParsed, clickPoseTriggers[p].retransitionRangeParsed)
+        : computeStartDelayMs(handXYDist(hand), xyFieldMinDist, xyFieldDistRange, clickPoseTriggers[p].retransitionCurveParsed, clickPoseTriggers[p].retransitionRangeParsed)
       // Retransition Speed Curve (item 5, 2026-09-24) -- frozen once here,
       // same "frozen at trigger time" philosophy as Animation Speed
       // Curve's own frozenSpeedMs pair -- see makeClickHoldPoseGroup()'s
       // own matching control comment.
       cp.retransitionSpeedMs = cfg[`${p}RetransitionSpeedCurveEnabled`]
-        ? computeStartDelayMs(live, minLiveDist, liveDistRange, clickPoseTriggers[p].retransitionSpeedCurveParsed, clickPoseTriggers[p].retransitionSpeedRangeParsed)
+        ? computeStartDelayMs(handXYDist(hand), xyFieldMinDist, xyFieldDistRange, clickPoseTriggers[p].retransitionSpeedCurveParsed, clickPoseTriggers[p].retransitionSpeedRangeParsed)
         : 0
       logHandBehaviourEvent(hands.indexOf(hand), handLogTriggerLabel(p), 'pause finished -> retransition begins')
     }
@@ -9559,12 +9578,16 @@ function triggerClickPose(p) {
   }
   let minD = Infinity, maxD = -Infinity
   const dists = hands.map((hand) => {
-    const d = hand.wrapper.position.distanceTo(cursorTarget)
+    const d = cursorDistXY(hand.wrapper.position) // world XY only (2026-10-04)
     if (d < minD) minD = d
     if (d > maxD) maxD = d
     return d
   })
   const range = Math.max(maxD - minD, 0.001)
+  // 3D min/range for the frozen wrist splay only -- see the splay line below.
+  let splay3dMin = Infinity, splay3dMax = -Infinity
+  hands.forEach((h3) => { const d3 = h3.wrapper.position.distanceTo(cursorTarget); if (d3 < splay3dMin) splay3dMin = d3; if (d3 > splay3dMax) splay3dMax = d3 })
+  const splay3dRange = Math.max(splay3dMax - splay3dMin, 0.001)
   hands.forEach((hand, i) => {
     const cp = getOrInitHandCP(hand)[p]
     // Start Distance Curve (direct spec, 2026-09-27) -- "beyond those
@@ -9605,7 +9628,7 @@ function triggerClickPose(p) {
     // retransition) -- see updateClickHoldPoseForHand()'s own top
     // comment for why Responsive Wrist Splay must not keep recomputing
     // live throughout an explicit pose transition.
-    cp.pendingFrozenSplayDeg = computeResponsiveWristSplayDeg(dists[i], minD, range)
+    cp.pendingFrozenSplayDeg = computeResponsiveWristSplayDeg(hand.wrapper.position.distanceTo(cursorTarget), splay3dMin, splay3dRange) // 3D on purpose: must match the live idle splay it blends with
     // CORRECTED 2026-09-27 -- see updateClickHoldPoseForHand()'s own
     // matching capture for the full reasoning.
     cp.pendingFromSplayDeg = hand.currentSplayDeg
@@ -14300,13 +14323,27 @@ function updateRenderOrder() {
   let restMin = Infinity, restMax = -Infinity
   for (let ri = 0; ri < hands.length; ri++) {
     const rh = hands[ri]
-    const rd = (rh.basePosition || rh.wrapper.position).distanceTo(cursorTarget)
+    const rd = cursorDistXY(rh.basePosition || rh.wrapper.position) // world XY only (2026-10-04)
     rh._restCursorDist = rd
     if (rd < restMin) restMin = rd
     if (rd > restMax) restMax = rd
   }
   restFieldMinDist = restMin
   restFieldDistRange = Math.max(restMax - restMin, 0.001)
+  // Current-position world-XY distances for the click-function settings that
+  // used the 3D `live` value (start time / speed / retransition / start
+  // distance / tween stop). `live` itself is untouched: render order, arm
+  // length and wrist splay still use it.
+  let xyMin = Infinity, xyMax = -Infinity
+  for (let xi = 0; xi < hands.length; xi++) {
+    const xh = hands[xi]
+    const xd = cursorDistXY(xh.wrapper.position)
+    xh._xyCursorDist = xd
+    if (xd < xyMin) xyMin = xd
+    if (xd > xyMax) xyMax = xd
+  }
+  xyFieldMinDist = xyMin
+  xyFieldDistRange = Math.max(xyMax - xyMin, 0.001)
   const nowMs = nowVirtual() // virtual clock (see its own declaration) -- one shared timestamp for every hand's own Click-Hold-Pose/Click-Pose progress this frame, not a separate call per hand; only reached at all while !isPaused (animate()'s own gate), so this line simply never runs during a pause
   hands.forEach((hand, i) => {
     const live = liveDistances[i]

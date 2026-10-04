@@ -2320,4 +2320,22 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   that would have prevented this: a `const`/`let` used by anything reachable from
   top-level setup (widget builders, `registerX()` called at module level,
   `initDevPanel()` hooks) goes in the early-state block near the top of the file.
+- **Click-function "distance from cursor" is world-XY only (2026-10-04); cursor-
+  tracking features are still 3D on purpose.** Use `handXYDist(hand)` /
+  `xyFieldMinDist` / `xyFieldDistRange` (or `cursorDistXY()` for an ad-hoc
+  position) for any new click-function setting that depends on cursor distance --
+  NOT `hand.wrapper.position.distanceTo(cursorTarget)` and not the `live` /
+  `minLiveDist` / `liveDistRange` arguments, which are 3D and exist for arm
+  length, wrist splay and render order. The frozen wrist splay in
+  `triggerClickPose()` deliberately stays on a 3D value so it matches the live
+  idle splay it blends into.
+- **The Loading Preview's saved cameras are absolute and were tuned for the OLD
+  model scale (2026-10-04).** The current model's bounds radius is 0.2295; the
+  old ones were 22.97 (x100). `applyLoadingPreviewPose()` scales the preview
+  hand by `LOADING_PREVIEW_REFERENCE_RADIUS / handBoundsRadiusLocal` and
+  centres it on the active preset's target whenever a preset is applied. If the
+  model changes scale again and the preview looks empty, check
+  `handBoundsRadiusLocal` first; to confirm what is actually drawn, render the
+  preview scene and read the pixels back (the screenshot tool cannot show WebGL
+  in this environment).
 
