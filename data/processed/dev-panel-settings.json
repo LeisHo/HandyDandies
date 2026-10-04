@@ -7762,11 +7762,11 @@
       "custom18CursorOffsetZRange": "{\"min\":0,\"max\":0}",
       "custom18CameraOffsetEnabled": true,
       "custom18CameraOffsetXCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom18CameraOffsetXRange": "{\"min\":-4,\"max\":4}",
+      "custom18CameraOffsetXRange": "{\"min\":-10,\"max\":15}",
       "custom18CameraOffsetYCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom18CameraOffsetYRange": "{\"min\":-4,\"max\":4}",
+      "custom18CameraOffsetYRange": "{\"min\":-10,\"max\":15}",
       "custom18CameraOffsetZCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom18CameraOffsetZRange": "{\"min\":-4,\"max\":4}",
+      "custom18CameraOffsetZRange": "{\"min\":-15,\"max\":10}",
       "custom18RotationEnabled": false,
       "custom18RotationX": 0,
       "custom18RotationY": 0,
@@ -7798,8 +7798,8 @@
       "custom18RetransitionEnabled": true,
       "custom18RetransitionSpeedMs": 400,
       "custom18RetransitionSpeedCurveEnabled": true,
-      "custom18RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":0.4099505216791401,\"y\":0.6645833333333333,\"h1\":{\"x\":0.14979744267027567,\"y\":0.2666666666666667},\"h2\":{\"x\":-0.17611329310758356,\"y\":-0.16666666666666663}},{\"x\":1,\"y\":0}]",
-      "custom18RetransitionSpeedCurveRange": "{\"min\":15000,\"max\":20000}",
+      "custom18RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":0.4099505216791401,\"y\":0.6645833333333333,\"h1\":{\"x\":0.14979744267027567,\"y\":0.2666666666666667},\"h2\":{\"x\":-0.17611329310758356,\"y\":-0.16666666666666663}},{\"x\":1,\"y\":1}]",
+      "custom18RetransitionSpeedCurveRange": "{\"min\":20000,\"max\":24000}",
       "custom18RetransitionStartTimeCurveEnabled": true,
       "custom18RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.3714891079585548,\"y\":0.5605209350585938,\"h1\":{\"x\":0.12348159223296773,\"y\":0.33333333333333326}},{\"x\":1,\"y\":1}]",
       "custom18RetransitionStartTimeRange": "{\"min\":0,\"max\":1523}",
@@ -15688,11 +15688,11 @@
       "custom18CursorOffsetZRange": "{\"min\":0,\"max\":0}",
       "custom18CameraOffsetEnabled": true,
       "custom18CameraOffsetXCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom18CameraOffsetXRange": "{\"min\":-4,\"max\":4}",
+      "custom18CameraOffsetXRange": "{\"min\":-10,\"max\":15}",
       "custom18CameraOffsetYCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom18CameraOffsetYRange": "{\"min\":-4,\"max\":4}",
+      "custom18CameraOffsetYRange": "{\"min\":-10,\"max\":15}",
       "custom18CameraOffsetZCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom18CameraOffsetZRange": "{\"min\":-4,\"max\":4}",
+      "custom18CameraOffsetZRange": "{\"min\":-15,\"max\":10}",
       "custom18RotationEnabled": false,
       "custom18RotationX": 0,
       "custom18RotationY": 0,
@@ -15724,8 +15724,8 @@
       "custom18RetransitionEnabled": true,
       "custom18RetransitionSpeedMs": 400,
       "custom18RetransitionSpeedCurveEnabled": true,
-      "custom18RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":0.4099505216791401,\"y\":0.6645833333333333,\"h1\":{\"x\":0.14979744267027567,\"y\":0.2666666666666667},\"h2\":{\"x\":-0.17611329310758356,\"y\":-0.16666666666666663}},{\"x\":1,\"y\":0}]",
-      "custom18RetransitionSpeedCurveRange": "{\"min\":15000,\"max\":20000}",
+      "custom18RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":0.4099505216791401,\"y\":0.6645833333333333,\"h1\":{\"x\":0.14979744267027567,\"y\":0.2666666666666667},\"h2\":{\"x\":-0.17611329310758356,\"y\":-0.16666666666666663}},{\"x\":1,\"y\":1}]",
+      "custom18RetransitionSpeedCurveRange": "{\"min\":20000,\"max\":24000}",
       "custom18RetransitionStartTimeCurveEnabled": true,
       "custom18RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.3714891079585548,\"y\":0.5605209350585938,\"h1\":{\"x\":0.12348159223296773,\"y\":0.33333333333333326}},{\"x\":1,\"y\":1}]",
       "custom18RetransitionStartTimeRange": "{\"min\":0,\"max\":1523}",
@@ -23614,11 +23614,11 @@
       "custom18CursorOffsetZRange": "{\"min\":0,\"max\":0}",
       "custom18CameraOffsetEnabled": true,
       "custom18CameraOffsetXCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom18CameraOffsetXRange": "{\"min\":-4,\"max\":4}",
+      "custom18CameraOffsetXRange": "{\"min\":-10,\"max\":15}",
       "custom18CameraOffsetYCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom18CameraOffsetYRange": "{\"min\":-4,\"max\":4}",
+      "custom18CameraOffsetYRange": "{\"min\":-10,\"max\":15}",
       "custom18CameraOffsetZCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom18CameraOffsetZRange": "{\"min\":-4,\"max\":4}",
+      "custom18CameraOffsetZRange": "{\"min\":-15,\"max\":10}",
       "custom18RotationEnabled": false,
       "custom18RotationX": 0,
       "custom18RotationY": 0,
@@ -23650,8 +23650,8 @@
       "custom18RetransitionEnabled": true,
       "custom18RetransitionSpeedMs": 400,
       "custom18RetransitionSpeedCurveEnabled": true,
-      "custom18RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":0.4099505216791401,\"y\":0.6645833333333333,\"h1\":{\"x\":0.14979744267027567,\"y\":0.2666666666666667},\"h2\":{\"x\":-0.17611329310758356,\"y\":-0.16666666666666663}},{\"x\":1,\"y\":0}]",
-      "custom18RetransitionSpeedCurveRange": "{\"min\":15000,\"max\":20000}",
+      "custom18RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":0.4099505216791401,\"y\":0.6645833333333333,\"h1\":{\"x\":0.14979744267027567,\"y\":0.2666666666666667},\"h2\":{\"x\":-0.17611329310758356,\"y\":-0.16666666666666663}},{\"x\":1,\"y\":1}]",
+      "custom18RetransitionSpeedCurveRange": "{\"min\":20000,\"max\":24000}",
       "custom18RetransitionStartTimeCurveEnabled": true,
       "custom18RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.3714891079585548,\"y\":0.5605209350585938,\"h1\":{\"x\":0.12348159223296773,\"y\":0.33333333333333326}},{\"x\":1,\"y\":1}]",
       "custom18RetransitionStartTimeRange": "{\"min\":0,\"max\":1523}",
@@ -29097,7 +29097,7 @@
                 "type": "group",
                 "group": {
                   "key": "Offset",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -29180,7 +29180,7 @@
                 "type": "group",
                 "group": {
                   "key": "Offset To Camera",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -30994,7 +30994,7 @@
             "subgroups": [
               {
                 "key": "Offset",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -31074,7 +31074,7 @@
               },
               {
                 "key": "Offset To Camera",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -33690,7 +33690,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 16",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -34838,7 +34838,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 15",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -34906,7 +34906,7 @@
                 "type": "group",
                 "group": {
                   "key": "Multi Trigger",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -35514,7 +35514,7 @@
               },
               {
                 "key": "Multi Trigger",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -36824,7 +36824,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 13",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -43628,7 +43628,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 10",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -47740,7 +47740,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 9",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -54548,94 +54548,6 @@
             "locked": false,
             "items": [
               {
-                "type": "group",
-                "group": {
-                  "key": "Offset To Camera",
-                  "collapsed": false,
-                  "locked": false,
-                  "items": [
-                    {
-                      "type": "row",
-                      "key": "custom8CameraOffsetXCurve"
-                    },
-                    {
-                      "type": "row",
-                      "key": "custom8CameraOffsetXRange"
-                    },
-                    {
-                      "type": "row",
-                      "key": "custom8CameraOffsetYCurve"
-                    },
-                    {
-                      "type": "row",
-                      "key": "custom8CameraOffsetYRange"
-                    },
-                    {
-                      "type": "row",
-                      "key": "custom8CameraOffsetZCurve"
-                    },
-                    {
-                      "type": "row",
-                      "key": "custom8CameraOffsetZRange"
-                    }
-                  ],
-                  "settings": [
-                    "custom8CameraOffsetXCurve",
-                    "custom8CameraOffsetXRange",
-                    "custom8CameraOffsetYCurve",
-                    "custom8CameraOffsetYRange",
-                    "custom8CameraOffsetZCurve",
-                    "custom8CameraOffsetZRange"
-                  ],
-                  "subgroups": []
-                }
-              },
-              {
-                "type": "group",
-                "group": {
-                  "key": "Easing",
-                  "collapsed": false,
-                  "locked": false,
-                  "items": [
-                    {
-                      "type": "row",
-                      "key": "custom8EasingCurve"
-                    }
-                  ],
-                  "settings": [
-                    "custom8EasingCurve"
-                  ],
-                  "subgroups": []
-                }
-              },
-              {
-                "type": "group",
-                "group": {
-                  "key": "Multi Trigger",
-                  "collapsed": false,
-                  "locked": false,
-                  "items": [
-                    {
-                      "type": "row",
-                      "key": "custom8MultiTriggerEnabled"
-                    },
-                    {
-                      "type": "row",
-                      "key": "custom8MultiTriggers"
-                    },
-                    {
-                      "type": "row"
-                    }
-                  ],
-                  "settings": [
-                    "custom8MultiTriggerEnabled",
-                    "custom8MultiTriggers",
-                    null
-                  ],
-                  "subgroups": []
-                }
-              },
-              {
                 "type": "row",
                 "key": "custom8Enabled"
               },
@@ -54687,7 +54599,7 @@
                 "type": "group",
                 "group": {
                   "key": "Offset",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -54769,8 +54681,51 @@
               {
                 "type": "group",
                 "group": {
-                  "key": "Rotation",
+                  "key": "Offset To Camera",
                   "collapsed": false,
+                  "locked": false,
+                  "items": [
+                    {
+                      "type": "row",
+                      "key": "custom8CameraOffsetXCurve"
+                    },
+                    {
+                      "type": "row",
+                      "key": "custom8CameraOffsetXRange"
+                    },
+                    {
+                      "type": "row",
+                      "key": "custom8CameraOffsetYCurve"
+                    },
+                    {
+                      "type": "row",
+                      "key": "custom8CameraOffsetYRange"
+                    },
+                    {
+                      "type": "row",
+                      "key": "custom8CameraOffsetZCurve"
+                    },
+                    {
+                      "type": "row",
+                      "key": "custom8CameraOffsetZRange"
+                    }
+                  ],
+                  "settings": [
+                    "custom8CameraOffsetXCurve",
+                    "custom8CameraOffsetXRange",
+                    "custom8CameraOffsetYCurve",
+                    "custom8CameraOffsetYRange",
+                    "custom8CameraOffsetZCurve",
+                    "custom8CameraOffsetZRange"
+                  ],
+                  "subgroups": []
+                }
+              },
+              {
+                "type": "group",
+                "group": {
+                  "key": "Rotation",
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -54821,7 +54776,7 @@
                 "type": "group",
                 "group": {
                   "key": "Start Time Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -54881,8 +54836,26 @@
               {
                 "type": "group",
                 "group": {
-                  "key": "Retransition",
+                  "key": "Easing",
                   "collapsed": false,
+                  "locked": false,
+                  "items": [
+                    {
+                      "type": "row",
+                      "key": "custom8EasingCurve"
+                    }
+                  ],
+                  "settings": [
+                    "custom8EasingCurve"
+                  ],
+                  "subgroups": []
+                }
+              },
+              {
+                "type": "group",
+                "group": {
+                  "key": "Retransition",
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -55032,7 +55005,7 @@
                 "type": "group",
                 "group": {
                   "key": "Tween Stop",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -55146,6 +55119,33 @@
                     }
                   ]
                 }
+              },
+              {
+                "type": "group",
+                "group": {
+                  "key": "Multi Trigger",
+                  "collapsed": true,
+                  "locked": false,
+                  "items": [
+                    {
+                      "type": "row",
+                      "key": "custom8MultiTriggerEnabled"
+                    },
+                    {
+                      "type": "row",
+                      "key": "custom8MultiTriggers"
+                    },
+                    {
+                      "type": "row"
+                    }
+                  ],
+                  "settings": [
+                    "custom8MultiTriggerEnabled",
+                    "custom8MultiTriggers",
+                    null
+                  ],
+                  "subgroups": []
+                }
               }
             ],
             "settings": [
@@ -55164,87 +55164,8 @@
             ],
             "subgroups": [
               {
-                "key": "Offset To Camera",
-                "collapsed": false,
-                "locked": false,
-                "items": [
-                  {
-                    "type": "row",
-                    "key": "custom8CameraOffsetXCurve"
-                  },
-                  {
-                    "type": "row",
-                    "key": "custom8CameraOffsetXRange"
-                  },
-                  {
-                    "type": "row",
-                    "key": "custom8CameraOffsetYCurve"
-                  },
-                  {
-                    "type": "row",
-                    "key": "custom8CameraOffsetYRange"
-                  },
-                  {
-                    "type": "row",
-                    "key": "custom8CameraOffsetZCurve"
-                  },
-                  {
-                    "type": "row",
-                    "key": "custom8CameraOffsetZRange"
-                  }
-                ],
-                "settings": [
-                  "custom8CameraOffsetXCurve",
-                  "custom8CameraOffsetXRange",
-                  "custom8CameraOffsetYCurve",
-                  "custom8CameraOffsetYRange",
-                  "custom8CameraOffsetZCurve",
-                  "custom8CameraOffsetZRange"
-                ],
-                "subgroups": []
-              },
-              {
-                "key": "Easing",
-                "collapsed": false,
-                "locked": false,
-                "items": [
-                  {
-                    "type": "row",
-                    "key": "custom8EasingCurve"
-                  }
-                ],
-                "settings": [
-                  "custom8EasingCurve"
-                ],
-                "subgroups": []
-              },
-              {
-                "key": "Multi Trigger",
-                "collapsed": false,
-                "locked": false,
-                "items": [
-                  {
-                    "type": "row",
-                    "key": "custom8MultiTriggerEnabled"
-                  },
-                  {
-                    "type": "row",
-                    "key": "custom8MultiTriggers"
-                  },
-                  {
-                    "type": "row"
-                  }
-                ],
-                "settings": [
-                  "custom8MultiTriggerEnabled",
-                  "custom8MultiTriggers",
-                  null
-                ],
-                "subgroups": []
-              },
-              {
                 "key": "Offset",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -55323,8 +55244,48 @@
                 "subgroups": []
               },
               {
-                "key": "Rotation",
+                "key": "Offset To Camera",
                 "collapsed": false,
+                "locked": false,
+                "items": [
+                  {
+                    "type": "row",
+                    "key": "custom8CameraOffsetXCurve"
+                  },
+                  {
+                    "type": "row",
+                    "key": "custom8CameraOffsetXRange"
+                  },
+                  {
+                    "type": "row",
+                    "key": "custom8CameraOffsetYCurve"
+                  },
+                  {
+                    "type": "row",
+                    "key": "custom8CameraOffsetYRange"
+                  },
+                  {
+                    "type": "row",
+                    "key": "custom8CameraOffsetZCurve"
+                  },
+                  {
+                    "type": "row",
+                    "key": "custom8CameraOffsetZRange"
+                  }
+                ],
+                "settings": [
+                  "custom8CameraOffsetXCurve",
+                  "custom8CameraOffsetXRange",
+                  "custom8CameraOffsetYCurve",
+                  "custom8CameraOffsetYRange",
+                  "custom8CameraOffsetZCurve",
+                  "custom8CameraOffsetZRange"
+                ],
+                "subgroups": []
+              },
+              {
+                "key": "Rotation",
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -55369,7 +55330,7 @@
               },
               {
                 "key": "Start Time Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -55423,8 +55384,23 @@
                 "subgroups": []
               },
               {
-                "key": "Retransition",
+                "key": "Easing",
                 "collapsed": false,
+                "locked": false,
+                "items": [
+                  {
+                    "type": "row",
+                    "key": "custom8EasingCurve"
+                  }
+                ],
+                "settings": [
+                  "custom8EasingCurve"
+                ],
+                "subgroups": []
+              },
+              {
+                "key": "Retransition",
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -55571,7 +55547,7 @@
               },
               {
                 "key": "Tween Stop",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -55684,6 +55660,30 @@
                     "subgroups": []
                   }
                 ]
+              },
+              {
+                "key": "Multi Trigger",
+                "collapsed": true,
+                "locked": false,
+                "items": [
+                  {
+                    "type": "row",
+                    "key": "custom8MultiTriggerEnabled"
+                  },
+                  {
+                    "type": "row",
+                    "key": "custom8MultiTriggers"
+                  },
+                  {
+                    "type": "row"
+                  }
+                ],
+                "settings": [
+                  "custom8MultiTriggerEnabled",
+                  "custom8MultiTriggers",
+                  null
+                ],
+                "subgroups": []
               }
             ]
           }
@@ -55692,7 +55692,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 7",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -63422,7 +63422,7 @@
               "type": "group",
               "group": {
                 "key": "Offset",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -63505,7 +63505,7 @@
               "type": "group",
               "group": {
                 "key": "Offset To Camera",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -65319,7 +65319,7 @@
           "subgroups": [
             {
               "key": "Offset",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -65399,7 +65399,7 @@
             },
             {
               "key": "Offset To Camera",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -68009,7 +68009,7 @@
         },
         {
           "key": "Custom Click Function 16",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -69154,7 +69154,7 @@
         },
         {
           "key": "Custom Click Function 15",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -69222,7 +69222,7 @@
               "type": "group",
               "group": {
                 "key": "Multi Trigger",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -69830,7 +69830,7 @@
             },
             {
               "key": "Multi Trigger",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -71134,7 +71134,7 @@
         },
         {
           "key": "Custom Click Function 13",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -77935,7 +77935,7 @@
         },
         {
           "key": "Custom Click Function 10",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -82044,7 +82044,7 @@
         },
         {
           "key": "Custom Click Function 9",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -88849,94 +88849,6 @@
           "locked": false,
           "items": [
             {
-              "type": "group",
-              "group": {
-                "key": "Offset To Camera",
-                "collapsed": false,
-                "locked": false,
-                "items": [
-                  {
-                    "type": "row",
-                    "key": "custom8CameraOffsetXCurve"
-                  },
-                  {
-                    "type": "row",
-                    "key": "custom8CameraOffsetXRange"
-                  },
-                  {
-                    "type": "row",
-                    "key": "custom8CameraOffsetYCurve"
-                  },
-                  {
-                    "type": "row",
-                    "key": "custom8CameraOffsetYRange"
-                  },
-                  {
-                    "type": "row",
-                    "key": "custom8CameraOffsetZCurve"
-                  },
-                  {
-                    "type": "row",
-                    "key": "custom8CameraOffsetZRange"
-                  }
-                ],
-                "settings": [
-                  "custom8CameraOffsetXCurve",
-                  "custom8CameraOffsetXRange",
-                  "custom8CameraOffsetYCurve",
-                  "custom8CameraOffsetYRange",
-                  "custom8CameraOffsetZCurve",
-                  "custom8CameraOffsetZRange"
-                ],
-                "subgroups": []
-              }
-            },
-            {
-              "type": "group",
-              "group": {
-                "key": "Easing",
-                "collapsed": false,
-                "locked": false,
-                "items": [
-                  {
-                    "type": "row",
-                    "key": "custom8EasingCurve"
-                  }
-                ],
-                "settings": [
-                  "custom8EasingCurve"
-                ],
-                "subgroups": []
-              }
-            },
-            {
-              "type": "group",
-              "group": {
-                "key": "Multi Trigger",
-                "collapsed": false,
-                "locked": false,
-                "items": [
-                  {
-                    "type": "row",
-                    "key": "custom8MultiTriggerEnabled"
-                  },
-                  {
-                    "type": "row",
-                    "key": "custom8MultiTriggers"
-                  },
-                  {
-                    "type": "row"
-                  }
-                ],
-                "settings": [
-                  "custom8MultiTriggerEnabled",
-                  "custom8MultiTriggers",
-                  null
-                ],
-                "subgroups": []
-              }
-            },
-            {
               "type": "row",
               "key": "custom8Enabled"
             },
@@ -88988,7 +88900,7 @@
               "type": "group",
               "group": {
                 "key": "Offset",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -89070,8 +88982,51 @@
             {
               "type": "group",
               "group": {
-                "key": "Rotation",
+                "key": "Offset To Camera",
                 "collapsed": false,
+                "locked": false,
+                "items": [
+                  {
+                    "type": "row",
+                    "key": "custom8CameraOffsetXCurve"
+                  },
+                  {
+                    "type": "row",
+                    "key": "custom8CameraOffsetXRange"
+                  },
+                  {
+                    "type": "row",
+                    "key": "custom8CameraOffsetYCurve"
+                  },
+                  {
+                    "type": "row",
+                    "key": "custom8CameraOffsetYRange"
+                  },
+                  {
+                    "type": "row",
+                    "key": "custom8CameraOffsetZCurve"
+                  },
+                  {
+                    "type": "row",
+                    "key": "custom8CameraOffsetZRange"
+                  }
+                ],
+                "settings": [
+                  "custom8CameraOffsetXCurve",
+                  "custom8CameraOffsetXRange",
+                  "custom8CameraOffsetYCurve",
+                  "custom8CameraOffsetYRange",
+                  "custom8CameraOffsetZCurve",
+                  "custom8CameraOffsetZRange"
+                ],
+                "subgroups": []
+              }
+            },
+            {
+              "type": "group",
+              "group": {
+                "key": "Rotation",
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -89122,7 +89077,7 @@
               "type": "group",
               "group": {
                 "key": "Start Time Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -89182,8 +89137,26 @@
             {
               "type": "group",
               "group": {
-                "key": "Retransition",
+                "key": "Easing",
                 "collapsed": false,
+                "locked": false,
+                "items": [
+                  {
+                    "type": "row",
+                    "key": "custom8EasingCurve"
+                  }
+                ],
+                "settings": [
+                  "custom8EasingCurve"
+                ],
+                "subgroups": []
+              }
+            },
+            {
+              "type": "group",
+              "group": {
+                "key": "Retransition",
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -89333,7 +89306,7 @@
               "type": "group",
               "group": {
                 "key": "Tween Stop",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -89447,6 +89420,33 @@
                   }
                 ]
               }
+            },
+            {
+              "type": "group",
+              "group": {
+                "key": "Multi Trigger",
+                "collapsed": true,
+                "locked": false,
+                "items": [
+                  {
+                    "type": "row",
+                    "key": "custom8MultiTriggerEnabled"
+                  },
+                  {
+                    "type": "row",
+                    "key": "custom8MultiTriggers"
+                  },
+                  {
+                    "type": "row"
+                  }
+                ],
+                "settings": [
+                  "custom8MultiTriggerEnabled",
+                  "custom8MultiTriggers",
+                  null
+                ],
+                "subgroups": []
+              }
             }
           ],
           "settings": [
@@ -89465,87 +89465,8 @@
           ],
           "subgroups": [
             {
-              "key": "Offset To Camera",
-              "collapsed": false,
-              "locked": false,
-              "items": [
-                {
-                  "type": "row",
-                  "key": "custom8CameraOffsetXCurve"
-                },
-                {
-                  "type": "row",
-                  "key": "custom8CameraOffsetXRange"
-                },
-                {
-                  "type": "row",
-                  "key": "custom8CameraOffsetYCurve"
-                },
-                {
-                  "type": "row",
-                  "key": "custom8CameraOffsetYRange"
-                },
-                {
-                  "type": "row",
-                  "key": "custom8CameraOffsetZCurve"
-                },
-                {
-                  "type": "row",
-                  "key": "custom8CameraOffsetZRange"
-                }
-              ],
-              "settings": [
-                "custom8CameraOffsetXCurve",
-                "custom8CameraOffsetXRange",
-                "custom8CameraOffsetYCurve",
-                "custom8CameraOffsetYRange",
-                "custom8CameraOffsetZCurve",
-                "custom8CameraOffsetZRange"
-              ],
-              "subgroups": []
-            },
-            {
-              "key": "Easing",
-              "collapsed": false,
-              "locked": false,
-              "items": [
-                {
-                  "type": "row",
-                  "key": "custom8EasingCurve"
-                }
-              ],
-              "settings": [
-                "custom8EasingCurve"
-              ],
-              "subgroups": []
-            },
-            {
-              "key": "Multi Trigger",
-              "collapsed": false,
-              "locked": false,
-              "items": [
-                {
-                  "type": "row",
-                  "key": "custom8MultiTriggerEnabled"
-                },
-                {
-                  "type": "row",
-                  "key": "custom8MultiTriggers"
-                },
-                {
-                  "type": "row"
-                }
-              ],
-              "settings": [
-                "custom8MultiTriggerEnabled",
-                "custom8MultiTriggers",
-                null
-              ],
-              "subgroups": []
-            },
-            {
               "key": "Offset",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -89624,8 +89545,48 @@
               "subgroups": []
             },
             {
-              "key": "Rotation",
+              "key": "Offset To Camera",
               "collapsed": false,
+              "locked": false,
+              "items": [
+                {
+                  "type": "row",
+                  "key": "custom8CameraOffsetXCurve"
+                },
+                {
+                  "type": "row",
+                  "key": "custom8CameraOffsetXRange"
+                },
+                {
+                  "type": "row",
+                  "key": "custom8CameraOffsetYCurve"
+                },
+                {
+                  "type": "row",
+                  "key": "custom8CameraOffsetYRange"
+                },
+                {
+                  "type": "row",
+                  "key": "custom8CameraOffsetZCurve"
+                },
+                {
+                  "type": "row",
+                  "key": "custom8CameraOffsetZRange"
+                }
+              ],
+              "settings": [
+                "custom8CameraOffsetXCurve",
+                "custom8CameraOffsetXRange",
+                "custom8CameraOffsetYCurve",
+                "custom8CameraOffsetYRange",
+                "custom8CameraOffsetZCurve",
+                "custom8CameraOffsetZRange"
+              ],
+              "subgroups": []
+            },
+            {
+              "key": "Rotation",
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -89670,7 +89631,7 @@
             },
             {
               "key": "Start Time Curve",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -89724,8 +89685,23 @@
               "subgroups": []
             },
             {
-              "key": "Retransition",
+              "key": "Easing",
               "collapsed": false,
+              "locked": false,
+              "items": [
+                {
+                  "type": "row",
+                  "key": "custom8EasingCurve"
+                }
+              ],
+              "settings": [
+                "custom8EasingCurve"
+              ],
+              "subgroups": []
+            },
+            {
+              "key": "Retransition",
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -89872,7 +89848,7 @@
             },
             {
               "key": "Tween Stop",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -89985,12 +89961,36 @@
                   "subgroups": []
                 }
               ]
+            },
+            {
+              "key": "Multi Trigger",
+              "collapsed": true,
+              "locked": false,
+              "items": [
+                {
+                  "type": "row",
+                  "key": "custom8MultiTriggerEnabled"
+                },
+                {
+                  "type": "row",
+                  "key": "custom8MultiTriggers"
+                },
+                {
+                  "type": "row"
+                }
+              ],
+              "settings": [
+                "custom8MultiTriggerEnabled",
+                "custom8MultiTriggers",
+                null
+              ],
+              "subgroups": []
             }
           ]
         },
         {
           "key": "Custom Click Function 7",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
