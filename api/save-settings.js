@@ -90,8 +90,20 @@ module.exports = async (req, res) => {
             let jsonText;
             if (getData.content) {
                 jsonText = Buffer.from(getData.content, 'base64').toString('utf-8');
-            } else if (getData.download_url) {
-                const rawResp = await fetch(getData.download_url, { cache: 'no-store' });
+            } else if (getData.sha) {
+                // CORRECTED 2026-10-04 -- the 2026-09-27 fallback above fetched
+                // `download_url`, which is raw.githubusercontent.com and is CDN-
+                // cached for ~5 minutes, so a reload shortly after a Save served the
+                // PREVIOUS file (confirmed: the endpoint returned
+                // loadingPreviewShowLive=true while the repo's latest commit had
+                // false), which read as "the setting isn't saving" and let the next
+                // Save write the stale values back. The Contents API with the raw
+                // media type returns the same fresh data as the metadata call (up
+                // to 100MB) with no CDN in between.
+                const rawResp = await fetch(`${apiUrl}?ref=${encodeURIComponent(branch)}`, {
+                    headers: { ...headers, Accept: 'application/vnd.github.raw+json' },
+                    cache: 'no-store',
+                });
                 if (!rawResp.ok) {
                     const errText = await rawResp.text();
                     res.status(502).json({ ok: false, error: `GitHub raw content fetch failed (${rawResp.status}): ${errText}` });
@@ -101,6 +113,7 @@ module.exports = async (req, res) => {
             } else {
                 jsonText = '';
             }
+            res.setHeader('Cache-Control', 'no-store');
             res.status(200).json({ ok: true, settings: jsonText ? JSON.parse(jsonText) : null });
         } catch (err) {
             res.status(500).json({ ok: false, error: String((err && err.message) || err) });
