@@ -3763,7 +3763,7 @@ function offsetExtraControls(p, parseFn) {
     // Per-axis on/off (2026-10-04, direct request) -- default ON so
     // turning the group on behaves exactly as it did before these existed.
     rows.push({ key: `${p}CameraOffset${ax}Enabled`, label: `Camera Offset ${ax} On/Off`, type: 'checkbox', def: true, onChange: () => updateOffsetRotationVisibility(p) })
-    rows.push({ key: `${p}CameraOffset${ax}Curve`, label: `Camera Offset ${ax} Curve (Distance -> Offset)`, type: 'text', def: linear, onChange: () => parseFn(p) })
+    rows.push({ key: `${p}CameraOffset${ax}Curve`, label: `Camera Offset ${ax} Curve (Transition Progress -> Offset)`, type: 'text', def: linear, onChange: () => parseFn(p) })
     rows.push({ key: `${p}CameraOffset${ax}Range`, label: `Camera Offset ${ax} Min / Max (World Units)`, type: 'text', def: '{"min":0,"max":10}', onChange: () => parseFn(p) })
   })
   return rows
@@ -7177,6 +7177,27 @@ const _offsetHandToCursor = new THREE.Vector3()
 // the curve well-defined (a single hand, or before the first real frame
 // has run) rather than dividing by zero.
 let liveFieldMinDist = 0, liveFieldDistRange = 0.001
+// REST-position distance domain (2026-10-04) -- see handRestDist()'s own comment.
+let restFieldMinDist = 0, restFieldDistRange = 0.001
+// FIX 2026-10-04 (direct report: "if i do [offset to camera] one after the
+// other, the hand seems to jump backwards"). The Cursor Offset Distance
+// Curve and every per-axis curve measured "distance from cursor" from
+// `hand.wrapper.position` -- which, by the time computeOffsetXY()/
+// computeCameraOffset() run, ALREADY includes the accumulated offset (and,
+// in the bake paths, the full current ramp too, since bake runs right
+// after applyOffsetRotationToHand() adds it). So the value baked into the
+// accumulator at a ramp's end was computed from a different position than
+// the value displayed the frame before, snapping the hand by the
+// difference (~6 world units per axis for a near hand on the user's real
+// -10..15 / -15..10 ranges) the instant every ramp completed -- a reversal
+// right when it should settle. Measuring from the hand's REST (grid)
+// position instead removes the self-reference entirely: the value no
+// longer depends on the offset it produces, so live apply and every bake
+// path read the identical number. Rest distances + their field-wide
+// min/range are computed once per frame in updateRenderOrder()'s pre-pass.
+function handRestDist(hand) {
+  return hand._restCursorDist !== undefined ? hand._restCursorDist : (hand.basePosition || hand.wrapper.position).distanceTo(cursorTarget)
+}
 // Direct request 2026-10-01: Offset Mode dropdown ('XYZ Offset', the
 // pre-existing behavior, vs. 'Cursor Offset', new). Shared by every
 // call site that used to read cfg[OffsetX]/cfg[OffsetY] directly
@@ -7207,9 +7228,10 @@ function computeOffsetXY(hand, p) {
     // moves the hand directly toward the cursor in full 3D (including
     // straight toward/away from the camera when the cursor sits nearer/
     // farther in depth), negative moves it directly away.
-    _offsetHandToCursor.subVectors(cursorTarget, hand.wrapper.position)
+    _offsetHandToCursor.subVectors(cursorTarget, hand.basePosition || hand.wrapper.position)
     const rightComp = _offsetHandToCursor.dot(_offsetRightVec)
     const upComp = _offsetHandToCursor.dot(_offsetUpVec)
+    setLineOfSightForHand(hand) // per-hand line of sight, not one shared camera axis
     const forwardComp = _offsetHandToCursor.dot(_offsetForwardVec)
     const len3 = Math.hypot(rightComp, upComp, forwardComp)
     if (len3 < 1e-6) return { x: 0, y: 0, z: 0 } // hand and cursor at the exact same position -- no well-defined direction
@@ -7223,7 +7245,7 @@ function computeOffsetXY(hand, p) {
     // own Range (the "offset min max" the request asked for).
     const trig = clickHoldPoseTriggers[p] || clickPoseTriggers[p]
     const dist = (cfg[`${p}CursorOffsetDistanceCurveEnabled`] && trig)
-      ? computeStartDelayMs(hand.wrapper.position.distanceTo(cursorTarget), liveFieldMinDist, liveFieldDistRange, trig.cursorOffsetDistanceCurveParsed, trig.cursorOffsetDistanceRangeParsed)
+      ? computeStartDelayMs(handRestDist(hand), restFieldMinDist, restFieldDistRange, trig.cursorOffsetDistanceCurveParsed, trig.cursorOffsetDistanceRangeParsed)
       : (cfg[`${p}CursorOffsetDistance`] || 0)
     // Per-axis extra distance (2026-10-02, direct request: "for cursor
     // offset mode... also provide the 2 inputs for the 3 axes
@@ -7235,7 +7257,7 @@ function computeOffsetXY(hand, p) {
     const axisSlots = trig && trig.offsetAxis && trig.offsetAxis.cursor
     let exX = 0, exY = 0, exZ = 0
     if (axisSlots) {
-      const handDist = hand.wrapper.position.distanceTo(cursorTarget)
+      const handDist = handRestDist(hand)
       exX = evalOffsetAxisSlot(axisSlots.X, handDist)
       exY = evalOffsetAxisSlot(axisSlots.Y, handDist)
       exZ = evalOffsetAxisSlot(axisSlots.Z, handDist)
@@ -7250,41 +7272,65 @@ const ZERO_OFFSET = Object.freeze({ x: 0, y: 0, z: 0 })
 // Cursor Offset Distance Curve). A 0..0 range short-circuits to 0.
 function evalOffsetAxisSlot(slot, handDist) {
   if (!slot || !slot.range || (slot.range.min === 0 && slot.range.max === 0)) return 0
-  return computeStartDelayMs(handDist, liveFieldMinDist, liveFieldDistRange, slot.curve, slot.range)
+  return computeStartDelayMs(handDist, restFieldMinDist, restFieldDistRange, slot.curve, slot.range)
 }
-// "Offset To Camera" (2026-10-02, direct request): a SEPARATE offset
-// that stacks with the main Offset group -- moves the hand along the
-// camera-local right/up/forward axes by a per-axis Curve + Min/Max value
-// (X of each curve = this hand's live distance to the cursor). +Z is
-// toward the camera (camera matrixWorld column 2 points out of the
-// screen). Independent on/off from OffsetEnabled.
-function computeCameraOffset(hand, p) {
-  if (!cfg[`${p}CameraOffsetEnabled`]) return ZERO_OFFSET
+// "Offset To Camera" (REBUILT 2026-10-04, direct clarification: "by offset
+// to camera, i mean the actual 3js camera... it should look like the hands
+// are moving closer to further away from the player's POV", and "during the
+// offset, the hands position reacts to my cursor position. that shouldn't
+// happen"). A SEPARATE offset that stacks with the main Offset group.
+//  - Z moves the hand along its own LINE OF SIGHT to the real camera
+//    (setLineOfSightForHand(): hand -> camera position, + = toward the
+//    camera), so it reads as closer/further from the player's POV without
+//    drifting across the screen; X/Y stay camera-right/up.
+//  - NO cursor input. Each axis's curve X is the TRANSITION PROGRESS
+//    (0-100%), Y is rescaled into that axis's Min/Max. The displayed amount
+//    is the NET change from the start of the transition,
+//    value(progress) - value(0) (this file's accumulator treats progress 0
+//    as "nothing new to add", so a nonzero starting value can't be applied
+//    without a snap) -- so with the default linear curve, Min 0 / Max 10
+//    moves the hand 10 units over the transition, and in general the
+//    amplitude is (Max - Min) shaped by the curve.
+//  - Independent on/off from OffsetEnabled, plus a checkbox per axis.
+function setLineOfSightForHand(hand) {
+  _offsetForwardVec.setFromMatrixPosition(camera.matrixWorld).sub(hand.basePosition || hand.wrapper.position)
+  if (_offsetForwardVec.lengthSq() < 1e-9) _offsetForwardVec.setFromMatrixColumn(camera.matrixWorld, 2)
+  else _offsetForwardVec.normalize()
+}
+function cameraSlotValueAt(slot, t) {
+  if (!slot || !slot.range) return 0
+  const y = THREE.MathUtils.clamp(evaluateArmLengthCurve(slot.curve, THREE.MathUtils.clamp(t, 0, 1)), 0, 1)
+  return slot.range.min + (slot.range.max - slot.range.min) * y
+}
+function computeCameraOffsetAt(p, progress) {
+  if (!cfg[`${p}CameraOffsetEnabled`] || !(progress > 0)) return ZERO_OFFSET
   const trig = clickHoldPoseTriggers[p] || clickPoseTriggers[p]
   const slots = trig && trig.offsetAxis && trig.offsetAxis.camera
   if (!slots) return ZERO_OFFSET
-  const handDist = hand.wrapper.position.distanceTo(cursorTarget)
-  // Per-axis on/off (2026-10-04): an axis whose own checkbox is off
-  // contributes nothing. `!== false` so a function saved before these
-  // checkboxes existed (no stored value) keeps all 3 axes on.
+  const net = (slot) => cameraSlotValueAt(slot, progress) - cameraSlotValueAt(slot, 0)
+  // `!== false` so a function saved before the per-axis checkboxes existed
+  // (no stored value) keeps all 3 axes on.
   return {
-    x: cfg[`${p}CameraOffsetXEnabled`] !== false ? evalOffsetAxisSlot(slots.X, handDist) : 0,
-    y: cfg[`${p}CameraOffsetYEnabled`] !== false ? evalOffsetAxisSlot(slots.Y, handDist) : 0,
-    z: cfg[`${p}CameraOffsetZEnabled`] !== false ? evalOffsetAxisSlot(slots.Z, handDist) : 0
+    x: cfg[`${p}CameraOffsetXEnabled`] !== false ? net(slots.X) : 0,
+    y: cfg[`${p}CameraOffsetYEnabled`] !== false ? net(slots.Y) : 0,
+    z: cfg[`${p}CameraOffsetZEnabled`] !== false ? net(slots.Z) : 0
   }
 }
 // What applyOffsetRotationToHand()/bakeOffsetRotationIntoAccum()/
-// bakeInFlightOffsetRotation() all read -- the main Offset group's value
-// (when ITS checkbox is on) plus the Offset To Camera value (when ITS
-// checkbox is on). All 3 callers go through this one function so the
-// live apply and both bake paths can never disagree.
-function computeCombinedOffset(hand, p) {
+// bakeInFlightOffsetRotation() all read, at THEIR progress (live ramp
+// progress / 1 for a full bake / the in-flight fraction): the main Offset
+// group's value scaled by progress (when ITS checkbox is on) plus the
+// Offset To Camera net amount at that progress (when ITS checkbox is on).
+// One function for all 3 callers so live apply and both bake paths can
+// never disagree.
+function computeCombinedOffsetAt(hand, p, progress) {
   const mainOn = !!cfg[`${p}OffsetEnabled`]
   const camOn = !!cfg[`${p}CameraOffsetEnabled`]
   if (!mainOn && !camOn) return ZERO_OFFSET
-  const a = mainOn ? computeOffsetXY(hand, p) : ZERO_OFFSET
+  let a = ZERO_OFFSET
+  if (mainOn) { const m = computeOffsetXY(hand, p); a = { x: m.x * progress, y: m.y * progress, z: m.z * progress } }
   if (!camOn) return a
-  const b = computeCameraOffset(hand, p)
+  const b = computeCameraOffsetAt(p, progress)
   return { x: a.x + b.x, y: a.y + b.y, z: a.z + b.z }
 }
 // CORRECTED 2026-09-27 -- direct spec, 3 related items:
@@ -7341,7 +7387,7 @@ function applyOffsetRotationToHand(hand, p, progress) {
   hand._lastOffsetRotationProgress[p] = progress
   _offsetRightVec.setFromMatrixColumn(camera.matrixWorld, 0)
   _offsetUpVec.setFromMatrixColumn(camera.matrixWorld, 1)
-  _offsetForwardVec.setFromMatrixColumn(camera.matrixWorld, 2)
+  setLineOfSightForHand(hand) // Z axis = this hand's line of sight to the real camera (2026-10-04)
   // Accumulated baseline from every previously-completed ramp/lap
   // (any function) -- applied unconditionally, regardless of whether
   // THIS function's own Offset/Rotation happens to be enabled, so a
@@ -7355,10 +7401,10 @@ function applyOffsetRotationToHand(hand, p, progress) {
   }
   if (!isIdentityQuat(hand._customRotationAccum)) hand.wrapper.quaternion.multiply(hand._customRotationAccum)
   if (cfg[`${p}OffsetEnabled`] || cfg[`${p}CameraOffsetEnabled`]) {
-    const base = computeCombinedOffset(hand, p)
-    const ox = base.x * progress
-    const oy = base.y * progress
-    const oz = base.z * progress
+    const o = computeCombinedOffsetAt(hand, p, progress)
+    const ox = o.x
+    const oy = o.y
+    const oz = o.z
     if (ox !== 0 || oy !== 0 || oz !== 0) {
       // Camera-relative right/up/forward, not world/local axes -- this
       // project's camera only pans/zooms, never rotates, so these stay
@@ -7391,7 +7437,7 @@ function bakeOffsetRotationIntoAccum(hand, p) {
   if (!hand._customOffsetAccum) hand._customOffsetAccum = { x: 0, y: 0, z: 0 }
   if (!hand._customRotationAccum) hand._customRotationAccum = new THREE.Quaternion()
   if (cfg[`${p}OffsetEnabled`] || cfg[`${p}CameraOffsetEnabled`]) {
-    const base = computeCombinedOffset(hand, p)
+    const base = computeCombinedOffsetAt(hand, p, 1)
     hand._customOffsetAccum.x += base.x
     hand._customOffsetAccum.y += base.y
     hand._customOffsetAccum.z += base.z
@@ -7431,10 +7477,10 @@ function bakeInFlightOffsetRotation(hand, p) {
   if (!hand._customOffsetAccum) hand._customOffsetAccum = { x: 0, y: 0, z: 0 }
   if (!hand._customRotationAccum) hand._customRotationAccum = new THREE.Quaternion()
   if (cfg[`${p}OffsetEnabled`] || cfg[`${p}CameraOffsetEnabled`]) {
-    const base = computeCombinedOffset(hand, p)
-    hand._customOffsetAccum.x += base.x * fraction
-    hand._customOffsetAccum.y += base.y * fraction
-    hand._customOffsetAccum.z += base.z * fraction
+    const base = computeCombinedOffsetAt(hand, p, fraction)
+    hand._customOffsetAccum.x += base.x
+    hand._customOffsetAccum.y += base.y
+    hand._customOffsetAccum.z += base.z
   }
   if (cfg[`${p}RotationEnabled`]) {
     const rx = (cfg[`${p}RotationX`] || 0) * fraction, ry = (cfg[`${p}RotationY`] || 0) * fraction, rz = (cfg[`${p}RotationZ`] || 0) * fraction
@@ -7461,7 +7507,7 @@ function applyOffsetRotationRetransition(hand, progress, offsetAccumStart, rotat
   if (decayedX !== 0 || decayedY !== 0 || decayedZ !== 0) {
     _offsetRightVec.setFromMatrixColumn(camera.matrixWorld, 0)
     _offsetUpVec.setFromMatrixColumn(camera.matrixWorld, 1)
-    _offsetForwardVec.setFromMatrixColumn(camera.matrixWorld, 2)
+    setLineOfSightForHand(hand)
     hand.wrapper.position.addScaledVector(_offsetRightVec, decayedX)
     hand.wrapper.position.addScaledVector(_offsetUpVec, decayedY)
     hand.wrapper.position.addScaledVector(_offsetForwardVec, decayedZ)
@@ -8673,7 +8719,7 @@ function endClickHoldPose(p) {
 // triggers, so a hand can never get stuck mid-transition forever with no
 // way to reach it.
 window.addEventListener('pointerdown', (e) => {
-  if (e.target && e.target.closest && e.target.closest('.dp-panel, #pauseButton')) return
+  if (e.target && e.target.closest && e.target.closest('.dp-panel, #pauseButton, #resetButton')) return
   // CORRECTED 2026-09-30 -- see isClickHoldChainContinuation()'s own
   // comment (declared further below, but a plain function declaration is
   // hoisted, and this callback only ever runs on a real later pointerdown
@@ -9359,7 +9405,7 @@ let leftPointerDown = false
 window.addEventListener('pointerdown', (e) => { if (e.button === 0) leftPointerDown = true })
 window.addEventListener('pointerup', (e) => { if (e.button === 0) leftPointerDown = false })
 window.addEventListener('pointerup', (e) => {
-  if (e.target && e.target.closest && e.target.closest('.dp-panel, #pauseButton')) return
+  if (e.target && e.target.closest && e.target.closest('.dp-panel, #pauseButton, #resetButton')) return
   if (e.button !== 0) return
   // This exact pointerup was releasing a Click-Hold-Pose hold, not a
   // standalone click -- see lastPointerupWasHoldRelease's own comment
@@ -9450,7 +9496,7 @@ window.addEventListener('pointerup', (e) => {
 let rightClickPoseClickCount = 0
 let rightClickPoseClickTimer = null
 window.addEventListener('pointerup', (e) => {
-  if (e.target && e.target.closest && e.target.closest('.dp-panel, #pauseButton')) return
+  if (e.target && e.target.closest && e.target.closest('.dp-panel, #pauseButton, #resetButton')) return
   if (e.button !== 2) return
   if (lastPointerupWasRchpHoldRelease) return
   triggerClickPose('rc')
@@ -9557,7 +9603,7 @@ function isClickHoldChainContinuation(now) {
   return now - clickHoldChainLastCleanUpTime <= cfg.multiClickWindowMs
 }
 window.addEventListener('pointerdown', (e) => {
-  if (e.target && e.target.closest && e.target.closest('.dp-panel, #pauseButton')) return
+  if (e.target && e.target.closest && e.target.closest('.dp-panel, #pauseButton, #resetButton')) return
   if (e.button !== 0) return
   const now = performance.now()
   if (isClickHoldChainContinuation(now)) {
@@ -10048,8 +10094,10 @@ const CLICK_HOLD_START_TIME_TRACK_MAX = 3000 // ms -- a deliberately smaller cei
 // Curve + range-bar widgets for the per-axis Cursor Offset and Offset To
 // Camera rows (2026-10-02) -- shared by both widget builders.
 function buildOffsetAxisWidgets(p) {
-  const caption = 'X: Distance From Cursor (Live, Nearest→Farthest Hand In Field)  ·  Y: Offset Fraction (0=Min, 1=Max)'
+  const cursorCaption = 'X: Distance From Cursor (Live, Nearest→Farthest Hand In Field)  ·  Y: Offset Fraction (0=Min, 1=Max)'
+  const cameraCaption = 'X: Transition Progress (0-100%)  ·  Y: Offset Fraction (0=Min, 1=Max)  ·  Net change from the start of the transition'
   ;['CursorOffset', 'CameraOffset'].forEach((prefix) => {
+    const caption = prefix === 'CameraOffset' ? cameraCaption : cursorCaption
     ;['X', 'Y', 'Z'].forEach((ax) => {
       const curveRow = document.querySelector(`.dp-row[data-key="${p}${prefix}${ax}Curve"]`)
       const rangeRow = document.querySelector(`.dp-row[data-key="${p}${prefix}${ax}Range"]`)
@@ -11668,7 +11716,7 @@ function endCustomHoldFunctions(type, ordinal = 1) {
 // (a deliberate "repeat rate," not a one-shot-per-page-load limit).
 let scrollTriggerTimer = null
 window.addEventListener('wheel', (e) => {
-  if (e.target && e.target.closest && e.target.closest('.dp-panel, #pauseButton')) return
+  if (e.target && e.target.closest && e.target.closest('.dp-panel, #pauseButton, #resetButton')) return
   if (scrollTriggerTimer) return
   triggerCustomPoseFunctions('Scroll')
   scrollTriggerTimer = setTimeout(() => { scrollTriggerTimer = null }, cfg.multiClickWindowMs)
@@ -13047,7 +13095,7 @@ function setPaused(v) {
 // `?dev=1` one -- this is why its own click handler is wired here,
 // unconditionally, rather than via a DEV_GROUPS onClick. Excluded from
 // every click-hold-pose/click-pose/click-count-chain gesture listener
-// via `.closest('.dp-panel, #pauseButton')` (see those listeners' own
+// via `.closest('.dp-panel, #pauseButton, #resetButton')` (see those listeners' own
 // guard, main.js) -- clicking it only ever calls setPaused(), never a
 // cursor-tracking-driven pose/tween trigger.
 function updatePauseButtonIcon() {
@@ -13078,6 +13126,57 @@ function applyPauseButtonStyle() {
   btn.style.background = cfg.pauseBtnBgColor || '#000000'
   btn.style.color = cfg.pauseBtnIconColor || '#ffffff'
   btn.style.opacity = (cfg.pauseBtnOpacity ?? 100) / 100
+  // Reset button (2026-10-04) -- same look/size as Pause, placed to its
+  // right. The 8px gap is an arbitrary judgment call (no measurement).
+  const rb = document.getElementById('resetButton')
+  if (rb) {
+    const size = cfg.pauseBtnSize ?? 40
+    rb.style.left = ((cfg.pauseBtnXOffset ?? 12) + size + 8) + 'px'
+    rb.style.top = btn.style.top
+    rb.style.width = size + 'px'
+    rb.style.height = size + 'px'
+    rb.style.fontSize = btn.style.fontSize
+    rb.style.borderRadius = btn.style.borderRadius
+    rb.style.borderWidth = btn.style.borderWidth
+    rb.style.borderStyle = 'solid'
+    rb.style.borderColor = btn.style.borderColor
+    rb.style.background = btn.style.background
+    rb.style.color = btn.style.color
+    rb.style.opacity = btn.style.opacity
+  }
+}
+// Reset (direct request 2026-10-04: "a reset button next to the pause
+// button that resets all hands back to default position and pose").
+// In-place reset rather than rebuildField() (which re-clones 156 skinned
+// models): every per-hand runtime field is an underscore-prefixed lazily
+// created property (trigger state `_chp`/`_cp`, offset/rotation
+// accumulators, last pose values, settle state, cached distances...), so
+// deleting them all returns each hand to exactly the state a never-touched
+// hand has; the few that live in the hand literal are restored to their
+// literal defaults, and `everReposed = false` forces updateRenderOrder()'s
+// idle repose to re-apply the default pose on the next frame. Also clears
+// the click-count debounce timers and any held-trigger flags so a
+// pending click can't re-trigger a hand right after the reset.
+function resetAllHands() {
+  clearTimeout(clickPoseClickTimer); clickPoseClickCount = 0
+  clearTimeout(rightClickPoseClickTimer); rightClickPoseClickCount = 0
+  Object.keys(clickHoldPoseTriggers).forEach((k) => { if (clickHoldPoseTriggers[k]) clickHoldPoseTriggers[k].active = false })
+  hands.forEach((hand) => {
+    Object.keys(hand).forEach((k) => { if (k.charAt(0) === '_') delete hand[k] })
+    hand._handoffSettleFrames = 0
+    hand._idleSettleFrom = null
+    hand._idleSettleFromSplay = 0
+    hand._idleSettleStartTime = 0
+    hand.everReposed = false
+    hand.currentSplayDeg = 0
+    hand.currentBaseQuat.copy(cloneBaseQuat)
+    if (hand.basePosition) hand.wrapper.position.copy(hand.basePosition)
+    hand.wrapper.quaternion.copy(hand.currentBaseQuat)
+  })
+  // Global Pause stops updateRenderOrder() (which does the idle repose),
+  // so run one pass by hand in that case; unpaused, the next frame does it.
+  if (isPaused) updateRenderOrder()
+  sceneNeedsRedraw = true
 }
 function setupPauseButton() {
   const btn = document.getElementById('pauseButton')
@@ -13086,6 +13185,8 @@ function setupPauseButton() {
     e.stopPropagation()
     setPaused(!isPaused)
   })
+  const resetBtn = document.getElementById('resetButton')
+  if (resetBtn) resetBtn.addEventListener('click', (e) => { e.stopPropagation(); resetAllHands() })
   applyPauseButtonStyle()
   updatePauseButtonIcon()
 }
@@ -13906,6 +14007,16 @@ function updateRenderOrder() {
   // once per frame, right alongside the values it mirrors.
   liveFieldMinDist = minLiveDist
   liveFieldDistRange = liveDistRange
+  let restMin = Infinity, restMax = -Infinity
+  for (let ri = 0; ri < hands.length; ri++) {
+    const rh = hands[ri]
+    const rd = (rh.basePosition || rh.wrapper.position).distanceTo(cursorTarget)
+    rh._restCursorDist = rd
+    if (rd < restMin) restMin = rd
+    if (rd > restMax) restMax = rd
+  }
+  restFieldMinDist = restMin
+  restFieldDistRange = Math.max(restMax - restMin, 0.001)
   const nowMs = nowVirtual() // virtual clock (see its own declaration) -- one shared timestamp for every hand's own Click-Hold-Pose/Click-Pose progress this frame, not a separate call per hand; only reached at all while !isPaused (animate()'s own gate), so this line simply never runs during a pause
   hands.forEach((hand, i) => {
     const live = liveDistances[i]

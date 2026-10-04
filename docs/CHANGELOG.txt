@@ -15586,6 +15586,94 @@ the documented `ERR_CONNECTION_RESET` on `main.js?v=273`.
 
 `main.js` cache-buster bumped `?v=272` -> `?v=273`.
 
+2026-10-04  -  (fix + rebuild + feature -- Offset To Camera rebuilt as a
+real-camera move with no cursor input; offset-curve snap fixed; Reset button)
+
+CORRECTION to the 2026-10-02 "Offset To Camera" entry. That version read
+"to Camera" as camera-local right/up/forward axes and used each hand's
+live distance to the cursor as every curve's X. Two direct reports showed
+both were wrong: "during the offset, the hands position reacts to my
+cursor position. that shouldn't happen" and "by offset to camera, i mean
+the actual 3js camera... it should look like the hands are moving closer
+to further away from the player's POV."
+
+(1) REBUILT. Z now moves each hand along its own LINE OF SIGHT to the real
+camera (`setLineOfSightForHand()`: hand rest position -> camera world
+position, + = toward the camera), so it reads as closer/farther from the
+player's POV without sliding across the screen (verified in a logic test:
+a hand moved 30 units along its line of sight keeps the same perspective
+screen position; the same move along the camera axis does not). X/Y stay
+camera-right/up. There is NO cursor input any more: each axis's curve X is
+the TRANSITION PROGRESS (0-100%) and Y is rescaled into that axis's
+Min/Max. The shown amount is the NET change from the start of the
+transition, value(progress) - value(0), because this file's accumulator
+treats progress 0 as "nothing new to add" and a nonzero starting value
+could only be applied with a snap -- so with the default linear curve,
+Min 0 / Max 10 moves the hand 10 units over the transition, and in general
+the amplitude is (Max - Min) shaped by the curve (Min no longer means an
+absolute starting offset). This is the one interpretation I made without
+asking; easy to change. `computeCombinedOffset()` became
+`computeCombinedOffsetAt(hand, p, progress)` (main Offset x progress +
+camera net amount at that progress) and all 3 callers use it at their own
+progress (live ramp / 1 for a full bake / the in-flight fraction), so live
+apply and both bakes read the same value by construction. The per-axis
+checkboxes, suffix list, template and subgroup members are unchanged; the
+curve captions/labels now say "Transition Progress".
+
+Z for EVERYTHING (Offset Z, Cursor Offset's depth component, the camera
+offset, the retransition decay) now uses the per-hand line of sight instead
+of one shared camera axis, so all of them agree on what "toward the
+camera" means; `computeOffsetXY()` re-sets it per hand before projecting.
+
+(2) ROOT CAUSE of "the hand seems to jump backwards" (reported before the
+clarification): the Cursor Offset Distance Curve and the per-axis curves
+measured the hand's distance to the cursor from `hand.wrapper.position`,
+which by then already includes the offset being applied. The value locked
+in by the bake call at a ramp's end was therefore computed from a different
+position than the value shown the frame before. Reproduced with the user's
+real saved Offset Test ranges (X/Y -10..15, Z -15..10): a near hand showed
+(-9.56, -9.56, -14.56) and baked (-4.08, -4.08, -9.08), a ~9.5-unit snap
+back toward 0 the instant every ramp finished. Fixed for the remaining
+cursor-distance curves (Cursor Offset Distance Curve and the Cursor Offset
+per-axis pairs) by measuring from the hand's REST (grid) position:
+`handRestDist()` plus a per-frame rest-distance min/range computed in
+`updateRenderOrder()`'s pre-pass (`restFieldMinDist`/`restFieldDistRange`),
+and the Cursor Offset direction vector now also starts from the rest
+position. The value no longer depends on the offset it produces. Disclosed
+side effect: those curves now read distance from the hand's grid position
+rather than where it currently sits, so a curve tuned while the old
+feedback was in effect may feel slightly different.
+
+(3) RESET BUTTON (direct request: "a reset button next to the pause button
+that resets all hands back to default position and pose"). New
+`#resetButton` (index.html, glyph U+21BA) to the right of Pause, styled by
+the existing "Pause Button" dev-panel group (same size/colors/opacity, an
+arbitrary 8px gap -- no separate settings group), excluded from every click
+gesture listener alongside Pause. `resetAllHands()` resets in place rather
+than calling `rebuildField()` (which re-clones 156 skinned models): it
+deletes every underscore-prefixed per-hand field (all lazily created --
+trigger state, offset/rotation accumulators, last pose values, settle
+state; confirmed by listing every `hand._x` in the file), restores the few
+fields that live in the hand literal to their literal defaults, sets
+`everReposed = false` so the idle repose re-applies the default pose,
+returns the wrapper to `basePosition` and `currentBaseQuat`, clears the
+click-count debounce timers and held-trigger flags, and runs one
+`updateRenderOrder()` pass itself if Global Pause is on (the idle repose
+lives there). Not touched: cursor-driven wrist-crop smoothing
+(`currentArmLengthT`), which is cursor behavior, not pose.
+
+Verified: `node --check` passes; two isolated logic tests passed (the
+bake-snap reproduction above: old 9.48-unit snap, new 0; and an 11-assert
+test of the rebuilt camera offset: pure function of progress with no cursor
+argument, default 0..10 linear = 0/5/10, min -15..max 10 = 25 net with no
+snap at start, ease-in curve shaping, line-of-sight screen-position
+invariance). **Not live-verified in browser** -- 5 navigation attempts
+across the two code versions all hit the documented `ERR_CONNECTION_RESET`
+on `main.js` (the standing cap). The Reset button in particular has never
+been clicked.
+
+`main.js` cache-buster `?v=273` -> `?v=275`; `style.css` `?v=24` -> `?v=25`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

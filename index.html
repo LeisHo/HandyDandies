@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Handy Dandies</title>
-<link rel="stylesheet" href="src/style.css?v=24">
+<link rel="stylesheet" href="src/style.css?v=25">
 <script type="importmap">
 {
   "imports": {
@@ -37,11 +37,13 @@
      listeners' own comments) -- clicking it never triggers cursor-
      tracking-driven pose/tween functions, only setPaused() itself. -->
 <button id="pauseButton" type="button" aria-label="Pause"></button>
+<!-- Reset button (direct request 2026-10-04) -- sits right of #pauseButton, styled by the same "Pause Button" dev-panel group (applyPauseButtonStyle()); resets every hand to its default position/pose via resetAllHands(). -->
+<button id="resetButton" type="button" aria-label="Reset hands" title="Reset hands">&#8634;</button>
 <!-- "Loading hands…" text removed per direct request (2026-09-20) --
      #loading itself is kept (tryStartField() still toggles its own
      .hidden class on it) since the Loading Preview hand animation is
      now the sole loading indicator; an empty #loading is harmless. -->
 <div id="loading"></div>
-<script type="module" src="src/main.js?v=273"></script>
+<script type="module" src="src/main.js?v=275"></script>
 </body>
 </html>

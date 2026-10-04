@@ -18,6 +18,19 @@ work seamlessly from there.
 
 ## Currently working on
 
+**2026-10-04 -- Offset To Camera REBUILT as a real-camera move; offset-curve
+snap fixed; Reset button added.** Offset To Camera now moves hands along
+their line of sight to the actual 3js camera (Z) and camera right/up (X/Y),
+with NO cursor input -- each axis's curve X is transition progress, shown
+amount = net change from the start (so Min/Max set the amplitude, Max-Min).
+The "jump backwards" was the cursor-distance curves measuring from the
+offset-including position (a ~9.5-unit snap at every ramp end with the real
+saved ranges); they now measure from the hand's rest position. New Reset
+button (right of Pause) calls `resetAllHands()` (in-place reset, no field
+rebuild). `main.js` at `?v=275`; logic tests pass; **not live-verified**
+(local-server truncation, 5/5) -- the Reset button has never been clicked.
+Open interpretation: Min no longer an absolute start value. See CHANGELOG.txt.
+
 **ADDED 2026-10-04 -- per-axis on/off for Offset To Camera, and the
 Animation Speed Curve for every click function in every mode.** Three
 default-on checkboxes (X/Y/Z) gate Offset To Camera's axes. The Speed
