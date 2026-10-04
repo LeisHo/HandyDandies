@@ -11033,7 +11033,15 @@ const CUSTOM_FUNCTION_POSE_LAYOUT = [
   { type: 'row', suffix: 'PauseDurationMs' },
   { type: 'row', suffix: 'SequencePlayMode' }, { type: 'row', suffix: 'SequenceCount' }, { type: 'row', suffix: 'SequenceCountMode' },
   { type: 'row', suffix: 'SequenceLoopTransition' }, { type: 'row', suffix: 'SequenceHoldMs' },
-  { type: 'group', title: 'Offset' }, { type: 'group', title: 'Rotation' },
+  // CORRECTED 2026-10-04 (direct request: "look at the group ordering within
+  // Click Offset Test, I want new click functions and existing functions to
+  // follow this group order") -- read from `custom18`'s own saved `order`
+  // in data/processed/dev-panel-settings.json: Offset, Offset To Camera,
+  // Rotation, Easing, Animation Speed Curve, Start Time Curve, Start
+  // Distance Curve, Retransition, Multi Trigger. The 2 groups that were
+  // missing from this list ('Offset To Camera', 'Easing') are new since
+  // this layout was captured; the flat rows above already matched.
+  { type: 'group', title: 'Offset' }, { type: 'group', title: 'Offset To Camera' }, { type: 'group', title: 'Rotation' }, { type: 'group', title: 'Easing' },
   { type: 'group', title: 'Animation Speed Curve' }, { type: 'group', title: 'Start Time Curve' }, { type: 'group', title: 'Start Distance Curve' }, { type: 'group', title: 'Retransition' },
   { type: 'group', title: 'Multi Trigger' }
 ]
@@ -11060,7 +11068,9 @@ const CUSTOM_FUNCTION_HOLD_LAYOUT = [
   { type: 'row', suffix: 'TargetPose' }, { type: 'row', suffix: 'TweenSelector' }, { type: 'row', suffix: 'TweenChain' },
   { type: 'row', suffix: 'TransitionSpeedMs' }, { type: 'row', suffix: 'TweenSpeedMs' },
   { type: 'row', suffix: 'LoopMode' }, { type: 'row', suffix: 'LoopHoldMs' },
-  { type: 'group', title: 'Offset' }, { type: 'group', title: 'Rotation' },
+  // 2026-10-04 -- same group order as CUSTOM_FUNCTION_POSE_LAYOUT (taken
+  // from Click Offset Test); Tween Stop stays last, hold-kind only.
+  { type: 'group', title: 'Offset' }, { type: 'group', title: 'Offset To Camera' }, { type: 'group', title: 'Rotation' }, { type: 'group', title: 'Easing' },
   { type: 'group', title: 'Animation Speed Curve' }, { type: 'group', title: 'Start Time Curve' }, { type: 'group', title: 'Start Distance Curve' },
   { type: 'group', title: 'Retransition' }, { type: 'group', title: 'Tween Stop' }
 ]

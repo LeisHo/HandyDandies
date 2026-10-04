@@ -18,6 +18,14 @@ work seamlessly from there.
 
 ## Currently working on
 
+**2026-10-04 -- Click-function group order now follows "Click Offset Test".**
+Both reference layouts list Offset, Offset To Camera, Rotation, Easing,
+Animation Speed Curve, Start Time Curve, Start Distance Curve,
+Retransition, (Multi Trigger / Tween Stop) -- verified identical to
+custom18's saved order. Applies to new and existing functions and Multi
+Trigger sub-triggers on next load. `main.js` at `?v=276`; not live-verified
+(local-server truncation). Collapsed defaults for the new groups unchanged.
+
 **2026-10-04 -- Offset To Camera REBUILT as a real-camera move; offset-curve
 snap fixed; Reset button added.** Offset To Camera now moves hands along
 their line of sight to the actual 3js camera (Z) and camera right/up (X/Y),

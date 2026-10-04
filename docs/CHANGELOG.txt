@@ -15674,6 +15674,41 @@ been clicked.
 
 `main.js` cache-buster `?v=273` -> `?v=275`; `style.css` `?v=24` -> `?v=25`.
 
+2026-10-04  -  (fix -- click-function group order now follows "Click Offset
+Test" for every new AND existing function)
+
+Direct request: "look at the group ordering within Click Offset Test, I
+want new click functions and existing functions to follow this group
+order." Read `custom18`'s saved `order` in
+data/processed/dev-panel-settings.json: Offset, Offset To Camera,
+Rotation, Easing, Animation Speed Curve, Start Time Curve, Start Distance
+Curve, Retransition, Multi Trigger. The reference layouts
+(`CUSTOM_FUNCTION_POSE_LAYOUT` / `CUSTOM_FUNCTION_HOLD_LAYOUT`) were
+missing the two groups added since they were captured, so "Offset To
+Camera" and "Easing" landed wherever they happened to be built. Both
+layouts now list them in that order (hold-kind keeps Tween Stop last,
+which only it has). The flat-row order already matched.
+
+No data migration: `applyCustomFunctionReferenceLayout()` runs at the end
+of every `renderCustomClickFunctionGroup()` (new function AND page-load
+restore) and of `registerMultiTriggerTrigger()`, and works by appendChild
+in layout order, so existing functions and Multi Trigger sub-triggers pick
+this up on next load, overriding whatever order was saved for them.
+
+Not changed (not asked): collapsed/expanded defaults for the new groups
+(`NEW_CUSTOM_FUNCTION_COLLAPSED_SUBGROUPS` still lists only Offset,
+Rotation, Start Time Curve, though custom18 itself also has Offset To
+Camera and Retransition collapsed), and Multi Trigger's position inside
+hold-kind functions (it is not in the hold layout).
+
+Verified: `node --check` passes; a script compared the layout arrays
+against custom18's saved order -- group order and flat-row order both match
+exactly. **Not live-verified in browser** -- 2 navigation attempts hit the
+documented `ERR_CONNECTION_RESET` on `main.js?v=276` (the earlier 5/5
+failures this session are the reason I stopped at 2).
+
+`main.js` cache-buster `?v=275` -> `?v=276`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a
