@@ -207,10 +207,10 @@
       "loadingPreviewSequenceHoldMs": 0,
       "loadingPreviewSize": 1390,
       "loadingPreviewRotationX": -75.46317639228698,
-      "loadingPreviewRotationY": -171.31775806313817,
+      "loadingPreviewRotationY": -171.31775806313814,
       "loadingPreviewRotationZ": 0,
-      "loadingPreviewOffsetX": -4.440892098500626e-16,
-      "loadingPreviewOffsetY": -8.881784197001252e-16,
+      "loadingPreviewOffsetX": 0,
+      "loadingPreviewOffsetY": 0,
       "loadingPreviewOffsetZ": 0,
       "loadingPreviewCameraFov": 32,
       "loadingPreviewCameraZoom": 161.7694831224424,
@@ -7959,7 +7959,7 @@
       "custom18Trig1RotationX": 20,
       "custom18Trig1RotationY": 0,
       "custom18Trig1RotationZ": 0,
-      "custom18Trig1TargetPose": "Big Open Palm (S)",
+      "custom18Trig1TargetPose": "Fist - Bent Back",
       "custom18Trig1TweenSelector": "Birdie",
       "custom18Trig1ReverseSequence": false,
       "custom18Trig1GlideToFirstPose": false,
@@ -8268,10 +8268,10 @@
       "loadingPreviewSequenceHoldMs": 0,
       "loadingPreviewSize": 1390,
       "loadingPreviewRotationX": -75.46317639228698,
-      "loadingPreviewRotationY": -171.31775806313817,
+      "loadingPreviewRotationY": -171.31775806313814,
       "loadingPreviewRotationZ": 0,
-      "loadingPreviewOffsetX": -4.440892098500626e-16,
-      "loadingPreviewOffsetY": -8.881784197001252e-16,
+      "loadingPreviewOffsetX": 0,
+      "loadingPreviewOffsetY": 0,
       "loadingPreviewOffsetZ": 0,
       "loadingPreviewCameraFov": 32,
       "loadingPreviewCameraZoom": 161.7694831224424,
@@ -16020,7 +16020,7 @@
       "custom18Trig1RotationX": 20,
       "custom18Trig1RotationY": 0,
       "custom18Trig1RotationZ": 0,
-      "custom18Trig1TargetPose": "Big Open Palm (S)",
+      "custom18Trig1TargetPose": "Fist - Bent Back",
       "custom18Trig1TweenSelector": "Birdie",
       "custom18Trig1ReverseSequence": false,
       "custom18Trig1GlideToFirstPose": false,
@@ -16329,10 +16329,10 @@
       "loadingPreviewSequenceHoldMs": 0,
       "loadingPreviewSize": 1390,
       "loadingPreviewRotationX": -75.46317639228698,
-      "loadingPreviewRotationY": -171.31775806313817,
+      "loadingPreviewRotationY": -171.31775806313814,
       "loadingPreviewRotationZ": 0,
-      "loadingPreviewOffsetX": -4.440892098500626e-16,
-      "loadingPreviewOffsetY": -8.881784197001252e-16,
+      "loadingPreviewOffsetX": 0,
+      "loadingPreviewOffsetY": 0,
       "loadingPreviewOffsetZ": 0,
       "loadingPreviewCameraFov": 32,
       "loadingPreviewCameraZoom": 161.7694831224424,
@@ -24081,7 +24081,7 @@
       "custom18Trig1RotationX": 20,
       "custom18Trig1RotationY": 0,
       "custom18Trig1RotationZ": 0,
-      "custom18Trig1TargetPose": "Big Open Palm (S)",
+      "custom18Trig1TargetPose": "Fist - Bent Back",
       "custom18Trig1TweenSelector": "Birdie",
       "custom18Trig1ReverseSequence": false,
       "custom18Trig1GlideToFirstPose": false,
@@ -28582,7 +28582,7 @@
     },
     {
       "key": "Custom Click Functions",
-      "collapsed": true,
+      "collapsed": false,
       "locked": false,
       "items": [
         {
@@ -29559,7 +29559,7 @@
                 "type": "group",
                 "group": {
                   "key": "Offset",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -29642,7 +29642,7 @@
                 "type": "group",
                 "group": {
                   "key": "Offset To Camera",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -29769,7 +29769,7 @@
                 "type": "group",
                 "group": {
                   "key": "Start Time Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -29830,7 +29830,7 @@
                 "type": "group",
                 "group": {
                   "key": "Retransition",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -31564,7 +31564,7 @@
             "subgroups": [
               {
                 "key": "Offset",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -31644,7 +31644,7 @@
               },
               {
                 "key": "Offset To Camera",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -31759,7 +31759,7 @@
               },
               {
                 "key": "Start Time Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -31814,7 +31814,7 @@
               },
               {
                 "key": "Retransition",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -65819,7 +65819,7 @@
               "type": "group",
               "group": {
                 "key": "Offset",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -65902,7 +65902,7 @@
               "type": "group",
               "group": {
                 "key": "Offset To Camera",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -66029,7 +66029,7 @@
               "type": "group",
               "group": {
                 "key": "Start Time Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -66090,7 +66090,7 @@
               "type": "group",
               "group": {
                 "key": "Retransition",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -67824,7 +67824,7 @@
           "subgroups": [
             {
               "key": "Offset",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -67904,7 +67904,7 @@
             },
             {
               "key": "Offset To Camera",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -68019,7 +68019,7 @@
             },
             {
               "key": "Start Time Curve",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -68074,7 +68074,7 @@
             },
             {
               "key": "Retransition",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -101869,8 +101869,8 @@
     "desktop": {
       "left": 210.375,
       "top": 18.387500762939453,
-      "width": 570.4000244140625,
-      "height": 37.60000228881836
+      "width": 576.7999877929688,
+      "height": 493.6000061035156
     }
   }
 }
