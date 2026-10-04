@@ -2399,3 +2399,8 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   to be seeded from the live target on a hand's first frame, not from a neutral value, or every
   field rebuild visibly "tweens in". `currentArmRotationQuat` was the last one still seeded at
   `currentBaseQuat`; a new hand's wrapper starts at identity, so never rely on it for the look.
+- **A restored onChange can hide the loading-screen preview (2026-10-04).** `loadingPreviewShowLive`'s
+  onChange runs during the settings restore; while `!fieldStarted` it must not touch the canvas
+  (the startup preview owns it until tryStartField()). Also keep camera read-back sliders
+  (`STARTUP_PREVIEW_DERIVED`) out of any "did settings change" comparison -- they are rewritten
+  from the camera preset on every build.

@@ -16245,6 +16245,25 @@ Not verified live: this sandbox's animate() loop is paused (document.hidden), so
 frames could not be observed. Confirmed by reading the state that was being seeded and by
 node --check + tests/top-level-load-check.js. `main.js` `?v=291` -> `?v=292`.
 
+2026-10-04  -  (fix -- loading preview no longer disappears mid-loading)
+
+Direct report with the Loading Preview Log pasted: "the loading appears, then disappears
+for a couple seconds, then comes back for a second or 2, then the field appears".
+The log showed both causes, both in this session's startup code:
+1) +816 ms "Show Loading Preview: OFF -- canvas hidden": the settings restore applies the
+saved (OFF) checkbox value, whose onChange hid the preview canvas while the loading screen
+was still up; the post-restore rebuild at +3809 ms showed it again. Now
+setLoadingPreviewLiveVisible(false) is ignored while `!fieldStarted && startupPreviewBuilt`
+(tryStartField() already hides the canvas at the reveal when the checkbox is off).
+2) The +3809 ms rebuild itself was triggered by loadingPreviewRotationY/OffsetX/OffsetY
+"differing from the cache". Those are read-back sliders that deriveLoadingPreviewOrbitSliders()
+rewrites from the selected camera preset on every build, so they differ whenever the last
+session orbited the preview. They are now excluded (STARTUP_PREVIEW_DERIVED), so the
+post-restore rebuild (which also restarted the animation) only happens for real input changes.
+Verified live: log reads build (+584 ms) -> OFF ignored -> "startup cache matched, preview
+kept" -> field starting (+5002 ms); canvas hidden only at the reveal. Not seen visually.
+`main.js` `?v=292` -> `?v=293`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

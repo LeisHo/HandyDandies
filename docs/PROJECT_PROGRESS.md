@@ -18,6 +18,10 @@ work seamlessly from there.
 
 ## Currently working on
 
+**2026-10-04 -- Loading preview stays up through the loading screen.** The restore's
+Show Loading Preview=OFF no longer hides it, and camera read-back sliders no longer force a
+post-restore rebuild. `main.js` `?v=293`. See CHANGELOG.txt.
+
 **2026-10-04 -- New field hands start already facing the cursor (no visible settle).**
 `currentArmRotationQuat` is seeded at the cursor-facing orientation instead of the base
 orientation. Not verified live (animate loop paused in this sandbox). `main.js` `?v=292`.
