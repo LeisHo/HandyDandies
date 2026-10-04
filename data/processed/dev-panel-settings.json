@@ -7372,7 +7372,7 @@
       "custom13RetransitionStartTimeCurveEnabled": true,
       "custom13RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom13RetransitionStartTimeRange": "{\"min\":0,\"max\":2444}",
-      "custom13MultiTriggerEnabled": true,
+      "custom13MultiTriggerEnabled": false,
       "custom13MultiTriggers": "[{\"prefix\":\"custom13Trig1\",\"title\":\"Trigger 1\"},{\"prefix\":\"custom13Trig2\",\"title\":\"Trigger 2\"}]",
       "custom13Trig1Enabled": true,
       "custom13Trig1Mode": "Sequence",
@@ -15355,7 +15355,7 @@
       "custom13RetransitionStartTimeCurveEnabled": true,
       "custom13RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom13RetransitionStartTimeRange": "{\"min\":0,\"max\":2444}",
-      "custom13MultiTriggerEnabled": true,
+      "custom13MultiTriggerEnabled": false,
       "custom13MultiTriggers": "[{\"prefix\":\"custom13Trig1\",\"title\":\"Trigger 1\"},{\"prefix\":\"custom13Trig2\",\"title\":\"Trigger 2\"}]",
       "custom13Trig1Enabled": true,
       "custom13Trig1Mode": "Sequence",
@@ -23338,7 +23338,7 @@
       "custom13RetransitionStartTimeCurveEnabled": true,
       "custom13RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom13RetransitionStartTimeRange": "{\"min\":0,\"max\":2444}",
-      "custom13MultiTriggerEnabled": true,
+      "custom13MultiTriggerEnabled": false,
       "custom13MultiTriggers": "[{\"prefix\":\"custom13Trig1\",\"title\":\"Trigger 1\"},{\"prefix\":\"custom13Trig2\",\"title\":\"Trigger 2\"}]",
       "custom13Trig1Enabled": true,
       "custom13Trig1Mode": "Sequence",
@@ -37633,7 +37633,7 @@
                 "type": "group",
                 "group": {
                   "key": "Retransition",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -37753,7 +37753,7 @@
                       "type": "group",
                       "group": {
                         "key": "Trigger 1",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -39315,7 +39315,7 @@
                   "subgroups": [
                     {
                       "key": "Trigger 1",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -41135,7 +41135,7 @@
               },
               {
                 "key": "Retransition",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -41252,7 +41252,7 @@
                     "type": "group",
                     "group": {
                       "key": "Trigger 1",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -42814,7 +42814,7 @@
                 "subgroups": [
                   {
                     "key": "Trigger 1",
-                    "collapsed": false,
+                    "collapsed": true,
                     "locked": false,
                     "items": [
                       {
@@ -73233,7 +73233,7 @@
               "type": "group",
               "group": {
                 "key": "Retransition",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -73353,7 +73353,7 @@
                     "type": "group",
                     "group": {
                       "key": "Trigger 1",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -74915,7 +74915,7 @@
                 "subgroups": [
                   {
                     "key": "Trigger 1",
-                    "collapsed": false,
+                    "collapsed": true,
                     "locked": false,
                     "items": [
                       {
@@ -76735,7 +76735,7 @@
             },
             {
               "key": "Retransition",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -76852,7 +76852,7 @@
                   "type": "group",
                   "group": {
                     "key": "Trigger 1",
-                    "collapsed": false,
+                    "collapsed": true,
                     "locked": false,
                     "items": [
                       {
@@ -78414,7 +78414,7 @@
               "subgroups": [
                 {
                   "key": "Trigger 1",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
