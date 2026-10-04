@@ -18,6 +18,15 @@ work seamlessly from there.
 
 ## Currently working on
 
+**2026-10-04 -- Startup 26 s -> 4 s (dev mode); Loading Preview log + fixes; Save keeps
+panel geometry.** Dev mode ran the whole settings restore twice (custom-function
+rebuild 5.9 s + 9.6 s, with duplicate registrations); now once (1.5 s). Startup
+loading preview now waits for restored settings (it was showing code defaults),
+uses the app background while loading, and has a Debug-group log. Save now writes
+panel size/position (it silently didn't with the remote endpoint). `main.js`
+`?v=287`, `devPanel.js` `?v=57`. "Show Loading Preview" checkbox could not be
+reproduced as broken -- see CHANGELOG.txt.
+
 **2026-10-04 -- Hand Axes Offset mode, Multi Trigger add-duplicates-base, Tween Stop
 now decelerates a looping hand.** Third Offset Mode rotates the offset by the
 hand's own frozen orientation; "+ Add Trigger" copies the base function's

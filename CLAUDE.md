@@ -2358,3 +2358,20 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   page-load restore, or it would be skipped anyway (saved values win) but would
   read confusingly. Offset Mode now has a 3rd value, 'Hand Axes Offset', which
   uses `chp/cp.frozenHandQuat` captured at arm/commit time.
+- **Startup performance is measured with `?debugTiming=1` (2026-10-04).** It adds
+  the on-screen timing overlay plus `window.__dpProfile` (per-phase ms: applyStoredValues
+  with its slowest onChanges, applyOrder, each onRestore step) and `window.__dpProfAgg`
+  (summed ms per step inside `renderCustomClickFunctionGroup()`). Read them from the
+  console after load instead of guessing. The slow part was never the network.
+- **Do not add a second "restore everything" pass.** In DEV_MODE with a remote endpoint
+  `resetSettings()` is the single restore; `restoreValuesForEveryVisitor()` returns early
+  there. A second pass re-registers every custom function (duplicate `CLICK_*_KEYS` and
+  `devGroups` entries) and costs seconds. Bulk dynamic-group builds go inside
+  `beginDynamicBatch()`/`endDynamicBatch()` so each group does not refresh the whole panel.
+- **The loading-screen preview must be built from RESTORED settings.** Use
+  `maybeBuildStartupLoadingPreview()` (needs `modelMeasurementsReady` and
+  `startupSettingsReady`); building it from the GLB callback shows code defaults. Its
+  background is `cfg.bgColor` only while `!fieldStarted` and transparent afterwards.
+- **Save writes panel geometry on BOTH paths (2026-10-04).** The remote branch of
+  `saveSettings()` used to return before the localStorage geometry write. Geometry is also
+  sent as `panelGeometry[deviceClass]` and merged per device in `remoteSaveSnapshot()`.

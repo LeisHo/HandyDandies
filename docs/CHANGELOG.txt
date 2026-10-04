@@ -16074,6 +16074,81 @@ truncates main.js).
 
 `main.js` cache-buster `?v=282` -> `?v=283`, `devPanel.js` `?v=54` -> `?v=55`.
 
+2026-10-04  -  (startup 26 s -> 4 s; Loading Preview fixes + log; Save keeps panel
+geometry)
+
+Direct report: loading preview should use the app's background colour; add a
+Loading Preview log to the Debug group; "Show Loading Preview" checkbox doesn't
+work; "startup is very slow and buggy" (pasted Frame Rate Log: frames of 5.9 s
+and 10.6 s with no tracked action); and "make sure the save button saves the dev
+panel size and location and group collapse states".
+
+1) STARTUP (measured on the live site with ?debugTiming=1, new profiling hooks).
+The network was not the problem (settings fetch ~1 s, GLB 73 ms). The main
+thread was blocked ~24 s after the first restore: in dev mode
+restoreValuesForEveryVisitor() AND resetSettings() both fetched the ~4 MB
+settings file and both ran onRestore, so restoreCustomClickFunctions() ran twice
+(5.9 s then 9.6 s). The first pass already had the panel DOM (the fetch resolves
+after initDevPanel() returns) and each pass re-registered every custom function,
+duplicating CLICK_POSE_KEYS/CLICK_HOLD_KEYS and devGroups entries (applyStoredValues
+saw 1,495 controls instead of ~240 + the real set). Fixes: (a) in DEV_MODE with a
+remote endpoint, restoreValuesForEveryVisitor() returns early -- resetSettings()
+restores values, order, overrides and calls onRestore; (b) renderDynamicGroup()
+refreshes only its own controls and the whole-panel cascade/empty-group passes
+run once via beginDynamicBatch()/endDynamicBatch() around the registration loop
+(each of ~19 groups used to trigger a full-panel refresh). Result, same machine:
+restoreCustomClickFunctions 9,567 ms -> 1,498 ms (once), field started at 4,109 ms
+vs 26,012 ms. 4,100 ms of that is the user's own Min Loading Time setting.
+Non-dev visitors only ever ran the first pass (no DOM) and are unaffected.
+Side effect to know: custom-function controls no longer have their onChange fired
+by a restore pass in dev mode (production never did); their values are seeded
+from the restored data and their visibility is applied while they are built.
+
+2) LOADING PREVIEW STARTUP BUG found by the new log: the preview was built the
+instant the GLB loaded, before the settings restore, so the loading screen showed
+a preview made from code DEFAULTS (160 px, #ffffff background, auto-frame camera,
+no tween); the configured one (1390 px, #000000, "Loading Preview Camera 7", tween
+"Waiting Horizontal Tap") only appeared after the field had started. It is now
+built by maybeBuildStartupLoadingPreview() once BOTH model and settings are ready
+(onRestore and the 6 s fallback both call it); setLoadingPreviewLiveVisible() also
+defers until the restore has finished. Verified live: build start now logs the
+saved values, 25 ms build. The preview appears when the restore finishes (~1-3 s)
+instead of at ~0.5 s.
+
+3) BACKGROUND: the preview scene uses cfg.bgColor while the loading screen is up
+(synced live from the Background Color control). Once the field is running the
+live preview is transparent instead -- an opaque square would hide the hands, and
+the field behind it already has the same colour.
+
+4) LOADING PREVIEW LOG (Debug group, always on, Copy/Save/Clear, included in Copy
+All / Clear All, honours Pause Logs): build start/done (size, bg, camera, lighting,
+tween, hand scale, buffer size, build ms), live toggle on/off/deferred, live loop
+start/stop/frame errors, field hold time, field start, first loading-screen frame,
+"no playable tween" reason, lap complete, sequence finished.
+
+5) "SHOW LOADING PREVIEW" CHECKBOX: could not reproduce a failure. On the live
+site it builds and shows the canvas when turned on and hides it when turned off,
+and the preview renders (pixel read-back). The likeliest cause of the report was
+the startup: the UI froze for 10-20 s and the second restore could re-apply the
+saved value over a click. That window is gone (see 1). Not verified visually --
+screenshots here cannot show WebGL. If it still fails, copy the Loading Preview
+Log; it now records every toggle.
+
+6) SAVE now persists panel size/position. With a remote endpoint, saveSettings()
+returned before the localStorage geometry write, so size/position were never
+saved. It now writes this browser's localStorage on both paths and also sends
+`panelGeometry` (per device class) to the settings file; remoteSaveSnapshot()
+merges it with the other devices' entries and the remote restore applies this
+device's entry. Group collapse states were already saved (`collapsed` in
+captureGroup()). Not exercised live (a real Save would write the repo settings
+file).
+
+Profiling hooks (devPanel.js dpTime(), main.js profAgg()/onRestore timers) only
+run with ?debugTiming=1 and write window.__dpProfile / window.__dpProfAgg.
+
+Verified: node --check, tests/top-level-load-check.js; live measurements above.
+`main.js` `?v=283` -> `?v=287`, `devPanel.js` `?v=55` -> `?v=57`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a
