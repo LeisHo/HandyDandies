@@ -18,6 +18,11 @@ work seamlessly from there.
 
 ## Currently working on
 
+**2026-10-04 -- "Flash after the 2nd click": not reproduced; Pose Jump Log added.** Likely-but-unconfirmed
+cause: Trigger 1 has Pause 0 ms + Retransition (fist and straight back). New Debug-group Pose Jump Log
+records one-frame bone/position pops with the active functions/phases. Waiting on the user's log.
+`main.js` `?v=298`. See CHANGELOG.txt.
+
 **2026-10-04 -- Glide To Pose 1 (default OFF) + First Transition Time Scale.** Off = the current pose
 is Pose 1; on = glide to Pose 1, optionally time-scaled. Existing sequence functions now default to
 off. `main.js` `?v=297`. See CHANGELOG.txt.

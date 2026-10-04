@@ -16342,6 +16342,34 @@ pairs), and live: row order, default off, scale row appears only when ticked, hi
 present on a Multi Trigger sub-trigger. Playback not watched (no WebGL in this sandbox).
 `main.js` `?v=296` -> `?v=297`.
 
+2026-10-04  -  (diagnostics -- Pose Jump Log; no fix yet for "a flash after the 2nd click")
+
+Direct report: "look at this log. why is there a flash after the 2nd click". Investigation so far:
+1) The pasted Hand Behaviour Log is capped at 200 entries, so the base function's own "triggered" lines
+   from before 7:18:11 were already dropped; it shows Trigger 1 (custom18Trig1, Single Pose
+   "Fist - Bent Back") interrupting the base Sequence mid-"forward" on each hand, staggered by its
+   Start Time curve (0-1864 ms).
+2) Trigger 1's Pause Duration is 0 ms with Retransition on (700 ms), copied from the Sequence-mode
+   base when it was added, so each hand reaches the fist and springs straight back ("pause finished ->
+   retransition begins" about 1 s later in the log). That is the only thing in the log that fits a
+   "flash", but it is by design, and the user did not confirm it is what they see (their answer to
+   "fist-and-back, or a pop at the instant of the click" was "2", the pop, with no description).
+3) Live frame-by-frame measurement (4 hands, ~13 ms ticks, all bones + position + scale + visibility +
+   wrist clip plane) found no discontinuity attributable to the interruption, but the automation tab
+   reports hidden, so the app's visibility bridge pauses its virtual clock and animation advances in
+   chunks there -- steps in that harness are not trustworthy evidence of a pop in a real tab.
+Because a pop cannot be reproduced from here, added a tool to catch it on the user's machine:
+POSE JUMP LOG (Debug group): checkbox "Log Pose Jumps" (default off), thresholds "Pose Jump Threshold -
+Bone (Deg)" (default 15) and "- Position (World Units)" (default 2), Copy/Save/Clear widget, included in
+Copy All / Clear All / Pause Logs. detectPoseJumps() runs once per frame after updateRenderOrder() and
+compares every bone's rotation and each hand's position with the previous frame; one line per frame with
+any hit (worst 3 hands): hand number, bone, degrees, position change, and the click functions + phases
+active on that hand, plus the frame time (a long frame makes normal motion look like a jump). Verified
+live: an unchanged frame logs nothing, a 40 degree bone twist and a 6-unit move are logged, a 5 degree
+wiggle is ignored. Costs a pass over every bone each frame only while enabled.
+Next step needs the user: tick Log Pose Jumps, do the clicks, Copy All Logs.
+`main.js` `?v=297` -> `?v=298`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

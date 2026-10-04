@@ -2417,3 +2417,7 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   `selectedSequenceEntries()` for Reverse), or it will ignore Glide To Pose 1 / the time scale. The time scale
   only changes the FIRST pass; any code that recomputes the forward duration needs `chp.glideTimeFactor` /
   `cp.glideTimeFactor`.
+- **The automation tab cannot prove or disprove a one-frame pop (2026-10-04).** It reports `document.hidden`, so
+  `syncPauseWithVisibility()` pauses the virtual clock (`nowVirtual()`) and animation advances in chunks; bone steps
+  seen there are an artifact. Use the Debug-group Pose Jump Log on the user's real tab instead. Also note the Hand
+  Behaviour Log keeps only 200 entries, so a pasted log may have lost the first lines of the sequence it shows.
