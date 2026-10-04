@@ -2375,3 +2375,22 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
 - **Save writes panel geometry on BOTH paths (2026-10-04).** The remote branch of
   `saveSettings()` used to return before the localStorage geometry write. Geometry is also
   sent as `panelGeometry[deviceClass]` and merged per device in `remoteSaveSnapshot()`.
+- **Startup cache (2026-10-04).** `applyStartupCache()` copies the last restored cfg
+  (key `handyDandies.startupCache.v1.<device>`) into `cfg` right after `initDevPanel()`;
+  the network restore stays authoritative and rewrites it (`writeStartupCache()`, also on
+  Save via `opts.onSave`). Anything created before the restore (scene background, camera,
+  lights, toon material, loading preview) therefore uses last session's values. If you add
+  a startup-time consumer of `cfg`, it already sees them; if you add a value that must NOT
+  be cached, exclude it in `writeStartupCache()`.
+- **Never build or lay out the field before startup allows it.** `rebuildField()` /
+  `relayoutField()` return until `fieldBuildAllowed`; the startup build is
+  `rebuildFieldChunked()` (hands kept out of the scene until all exist). A new onChange that
+  needs hands before the reveal must not assume `hands` is populated.
+- **Settings GET must never go through `download_url`.** It is raw.githubusercontent.com,
+  CDN-cached ~5 minutes, and served the previous save after a reload (looked like a setting
+  "not saving", and the next Save wrote the stale value back). Use the Contents API with
+  `Accept: application/vnd.github.raw+json`.
+- **`?debugTiming=1` also records long tasks** (`window.__longTasks` = [startMs, durationMs]).
+  Use it to check startup smoothness instead of eyeballing; this sandbox cannot show WebGL
+  and its `requestAnimationFrame` is unreliable, so log `<pre>` widgets can look empty here
+  even when the buffer is fine (Copy All Logs shows the real buffer).

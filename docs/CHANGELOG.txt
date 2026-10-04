@@ -16149,6 +16149,73 @@ run with ?debugTiming=1 and write window.__dpProfile / window.__dpProfAgg.
 Verified: node --check, tests/top-level-load-check.js; live measurements above.
 `main.js` `?v=283` -> `?v=287`, `devPanel.js` `?v=55` -> `?v=57`.
 
+2026-10-04  -  (startup: no white screen, loading hand first, field built behind it;
+settings endpoint served stale data; hold-function group order)
+
+Direct report: "on startup, i see a white background with no hands, it stays like
+that for a while, then the loading hand appears, lags through its sequence, then
+the hand field shows up. The loading hand shouldn't have to load. Make the loading
+hand and poses load first. I should also never see a white background." Plus
+"the Show Loading Preview checkbox doesn't seem to be saving" and "fix my group
+setting order as before".
+
+1) WHITE: the main scene's background was the control default #ffffff until the
+settings restore arrived (~1-2 s). Now (a) a localStorage startup cache of the last
+restored settings is applied to `cfg` right after initDevPanel() returns -- before
+the scene, camera, lights and loading preview are created (applyStartupCache()); the
+scene background comes from it, or a dark #1c1e22 on a first-ever visit; (b) an
+inline <head> script paints the cached Background Color on html/body before the first
+frame (key handyDandies.startupBg). Verified live: html background rgb(0,0,0) from
+the head script, scene background 000000 at load.
+
+2) LOADING HAND FIRST: with the cache present the preview is built the moment the
+model is ready (+558 ms in the live run; it used to wait for the network restore),
+from your real values (1390 px, Camera 11, lighting "LOADING", tween "Waiting
+Horizontal Tap"). After the real restore, refreshStartupPreviewAfterRestore()
+compares the preview-relevant keys with the cache and rebuilds ONCE only if they
+differ (live log: "startup cache matched, preview kept"). The cache is rewritten
+after every restore and on Save (new devPanel opts.onSave hook). Per-function
+custom keys (custom<N>...) are excluded; they come from the real restore.
+
+3) LAG / FIELD APPEARING EARLY. Measured with ?debugTiming=1 (+ new long-task
+recorder, window.__longTasks): `rebuildField()` was only guarded by modelLoaded, so
+every restored Field Layout / model-rotation onChange rebuilt all 156 hands during
+the settings restore (100-200 ms each; applyStoredValues 1,125 ms -> 35 ms after the
+guard) AND added the hands to the scene while the loading screen was up. Now nothing
+is built until startup allows it (fieldBuildAllowed). The field is built in ~6 ms
+slices, one per frame, into a pending list while the loading hand animates, and
+swapped into the scene all at once for the reveal (createFieldHand() /
+finishRebuildField() / rebuildFieldChunked(); a Field Layout change during the build
+is replayed after it). restoreCustomClickFunctions() is now async and yields one
+frame per function; devPanel.js awaits the host onRestore. tryStartField() starts
+the build as soon as settings are ready and reveals when both the build and the
+Min Loading Time are done.
+Result (live): normal visitor path: ZERO main-thread tasks over 50 ms during
+startup. Dev mode (live panel DOM being built): the old ~2 s freeze became ~15 tasks
+of 70-280 ms between 1.5 s and 4.5 s, plus one 342 ms task at the reveal. Dev-mode
+hitches remain because each custom-function group builds ~100 rows of panel DOM;
+not sliced below one function.
+
+4) "SHOW LOADING PREVIEW" NOT SAVING -- REAL BUG, not the checkbox: the settings GET
+(api/save-settings.js) fell back to `download_url` (raw.githubusercontent.com, CDN-
+cached ~5 minutes) for this >1 MB file -- my own 2026-09-27 fix. Right after a Save
+the endpoint served the PREVIOUS file (confirmed: served loadingPreviewShowLive=true
+while the repo's newest commit had false), so a reload showed the old value and the
+next Save wrote it back. This affected every setting, not just this checkbox. Now it
+reads through the Contents API with the raw media type (fresh, up to 100 MB) and
+sends Cache-Control: no-store. Verified: served and repo values match over 6 polls.
+
+5) GROUP ORDER: hold-kind click functions (custom8/10/15/16) rendered "Multi
+Trigger" ABOVE every row because CUSTOM_FUNCTION_HOLD_LAYOUT did not list it; it is
+now last (after Tween Stop), as in Click Offset Test. Pose-kind functions and every
+Multi Trigger sub-trigger were already identical to Click Offset Test (checked live
+against custom18). The order is applied by code on every load, so a Save cannot
+overwrite it.
+
+Verified: node --check, tests/top-level-load-check.js, live profiling above.
+Not verified visually (screenshots cannot show WebGL here).
+`main.js` `?v=287` -> `?v=291`, `devPanel.js` `?v=57` -> `?v=59`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

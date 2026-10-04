@@ -18,6 +18,15 @@ work seamlessly from there.
 
 ## Currently working on
 
+**2026-10-04 -- Startup: no white screen, loading hand first, field built behind it.**
+localStorage startup cache applied before the scene exists + head-script background;
+preview builds at model-ready; hand field and custom-function restore are built in
+frame slices; `rebuildField()` no longer runs during the restore. Normal visitors: no
+long tasks. Dev mode: short 70-280 ms hitches from live panel DOM. Also fixed the
+settings endpoint serving CDN-stale data (why "Show Loading Preview" seemed not to
+save) and Multi Trigger's position in hold-kind functions. `main.js` `?v=291`,
+`devPanel.js` `?v=59`. See CHANGELOG.txt.
+
 **2026-10-04 -- Startup 26 s -> 4 s (dev mode); Loading Preview log + fixes; Save keeps
 panel geometry.** Dev mode ran the whole settings restore twice (custom-function
 rebuild 5.9 s + 9.6 s, with duplicate registrations); now once (1.5 s). Startup
