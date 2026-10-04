@@ -18,6 +18,14 @@ work seamlessly from there.
 
 ## Currently working on
 
+**2026-10-04 -- FIXED: Loading Preview was drawing a hand ~100x too small.**
+The HandipantsOL.glb swap changed model units by 100x (bounds radius 0.2295
+vs the 22.97 the saved preview cameras were tuned for), so presets framed
+empty space. With a preset applied the preview hand is now scaled back up and
+centred on the preset's target. Verified by simulating the formula on the live
+page (0% -> 2.96% coverage, in frame); the patched build itself is not yet run
+in a browser. `main.js` at `?v=280`. See CHANGELOG.txt.
+
 **2026-10-04 -- FIXED production outage (pause button missing, hands not
 loading).** The curve-editor-extras round declared 3 module-level consts ~4,000
 lines below the top-level code that builds the curve widgets -> TDZ

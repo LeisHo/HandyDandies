@@ -15870,6 +15870,59 @@ user's own reload is the real confirmation.
 
 `main.js` cache-buster `?v=278` -> `?v=279`.
 
+2026-10-04  -  (FIX -- Loading Preview was rendering a hand ~100x too small)
+
+Direct report: "can you check why my loading screen doesnt seem to load."
+Diagnosed against the live deployed site (the local server truncates
+main.js). Startup itself is healthy: the app's own `?debugTiming=1` log
+showed the model ready at 540 ms, settings restored at 1548 ms, field
+started at 4106 ms, and the settings endpoint returned 1.6 MB in 1.2 s. The
+preview was "loading" -- it was just drawing nothing visible: rendering the
+preview scene once and reading the pixels back gave 10 non-transparent
+pixels in a 1737x1737 buffer.
+
+Root cause: the preview hand's world bounding box was 0.17 x 0.45 x 0.18,
+and `handBoundsRadiusLocal` is 0.2295 -- exactly 100x smaller than the 22.97
+recorded in CLAUDE.md (2026-09-19) for the earlier models. The
+HandipantsOL.glb model swap (2026-09-25) changed the model's units by 100x.
+Every saved Loading Preview camera is an ABSOLUTE position/target tuned for
+the old size (the selected "Loading Preview Camera 7" sits 114 units out and
+aims ~32 units from the hand), so the new hand was sub-pixel and its centre
+projected to the very bottom edge of the frame. The code comment in
+`buildLoadingPreview()` already described this exact failure mode ("the
+preview WAS rendering, just nothing recognizable was in frame") from an
+earlier cause. Likely broken since the 2026-09-25 swap; I did not test older
+builds.
+
+Fix: when a saved camera preset is applied, the preview hand is scaled by
+`LOADING_PREVIEW_REFERENCE_RADIUS (22.97) / handBoundsRadiusLocal` and its
+bounds centre is placed on the preset's target (a snapshot taken at apply
+time, so orbit-panning does not drag the hand), with the centre -- not the
+wrist origin -- as the rotation pivot: per frame, in
+`applyLoadingPreviewPose()`, base position = anchor - rotate(boundsCentre x
+scale), then the existing pose offsets are added on top. The orbit-camera
+origin follows the anchor. With no preset selected, the original auto-frame
+path is untouched (scale 1, no anchor), since it already sizes itself from
+the real radius. State is declared in the early-state block per the
+standing load-order rule.
+
+Judgment calls, disclosed: 22.97 is the recorded figure for the old models,
+not a re-measurement of those files; "centre on the target" assumes the
+presets were composed with the hand in the middle of frame (true of the
+auto-frame, and the only assumption available without the old model's
+geometry); preset-relative offsets such as "Loading Preview Offset X/Y/Z"
+keep their old-scale meaning.
+
+Verified on the LIVE page by simulating the exact formula on the real
+preview objects: before, 0% coverage and the hand centre at NDC y -0.97;
+after, 2.96% coverage, bbox [708,657]-[1049,1170] in the 1737x1737 buffer,
+fully inside the frame. (Predicted vs measured hand centre differed by 0.6
+world units at 100x scale, ~1% of the hand's size.) The patched code itself
+has not been run in a browser -- `node --check` and
+`tests/top-level-load-check.js` pass; confirm on the next deploy.
+
+`main.js` cache-buster `?v=279` -> `?v=280`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

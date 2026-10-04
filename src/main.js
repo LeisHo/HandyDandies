@@ -223,6 +223,28 @@ const CURVE_EASING_FNS = {
   }
 }
 const CURVE_GRAPH_OPACITY_DEFAULT = 0.06
+// FIX 2026-10-04 ("why my loading screen doesn't seem to load"): the Loading
+// Preview never appeared because it was rendering a hand ~100x too small.
+// Measured live on the deployed site: this model's local bounds radius is
+// 0.2295 vs the 22.97 recorded (CLAUDE.md, 2026-09-19) for the earlier
+// models -- the HandipantsOL.glb swap changed the model's units by exactly
+// 100x. Every saved Loading Preview camera is an ABSOLUTE position/target
+// tuned for the old size (e.g. "Loading Preview Camera 7": 114 units out,
+// aimed ~32 units off the hand), so the 0.45-unit hand was sub-pixel
+// (10 non-transparent pixels in a 1737x1737 buffer) and sat at the very
+// bottom edge of the frame. When a saved preset is applied, the preview
+// hand is now scaled by REFERENCE / actual radius (back to the size the
+// presets were tuned for) and its bounds centre is placed on the preset's
+// target -- see applyLoadingPreviewPose(). Without a preset, the original
+// auto-frame (which already uses the real radius) is unchanged. The
+// reference radius is the one measured for the earlier models; it is a
+// recorded figure, not a re-measurement of those files. Declared here, not
+// next to the preview code, per the early-state rule (CLAUDE.md).
+const LOADING_PREVIEW_REFERENCE_RADIUS = 22.97
+let loadingPreviewModelScale = 1
+let loadingPreviewAnchorActive = false
+const loadingPreviewAnchor = new THREE.Vector3()
+const _loadingPreviewBase = new THREE.Vector3()
 // Responsive Wrist Splay's own cached/parsed state -- same TDZ reasoning
 // as armLengthRangeParsed/armLengthCurveParsed directly above (declared
 // here, read by parseWristSplayConfig()/computeResponsiveWristSplayDeg()
@@ -4932,6 +4954,14 @@ function applyLoadingPreviewCameraPreset(rawItem) {
   loadingPreviewCamera.up.set(0, 1, 0).applyQuaternion(alignQuat)
   loadingPreviewCamera.lookAt(tx, ty, tz)
   loadingPreviewCameraTarget.set(tx, ty, tz)
+  // 2026-10-04 -- see LOADING_PREVIEW_REFERENCE_RADIUS's comment. Snapshot
+  // of the target at apply time (NOT live): panning the orbit camera later
+  // moves loadingPreviewCameraTarget but must not drag the hand with it.
+  if (handBoundsRadiusLocal > 0) {
+    loadingPreviewModelScale = LOADING_PREVIEW_REFERENCE_RADIUS / handBoundsRadiusLocal
+    loadingPreviewAnchor.set(tx, ty, tz)
+    loadingPreviewAnchorActive = true
+  }
   syncLoadingPreviewOrbitControlsTarget()
   deriveLoadingPreviewOrbitSliders()
 }
@@ -4963,6 +4993,8 @@ function applyLoadingPreviewCameraAutoFrame() {
   loadingPreviewCamera.up.set(0, 1, 0).applyQuaternion(alignQuat)
   loadingPreviewCamera.lookAt(target)
   loadingPreviewCameraTarget.copy(target)
+  loadingPreviewModelScale = 1 // auto-frame already sizes itself from the real radius
+  loadingPreviewAnchorActive = false
   syncLoadingPreviewOrbitControlsTarget()
   deriveLoadingPreviewOrbitSliders()
 }
@@ -4980,6 +5012,7 @@ function applyLoadingPreviewCameraAutoFrame() {
 // measured once at model load and never change afterward -- cheap to
 // recompute on demand, no staleness risk either way.
 function loadingPreviewOrbitOrigin() {
+  if (loadingPreviewAnchorActive) return loadingPreviewAnchor.clone() // 2026-10-04: the hand's centre now sits on the anchor
   return handBoundsCenterLocal.clone().applyQuaternion(alignQuat)
 }
 // Built once per buildLoadingPreview() call (mirrors buildPosePreview()'s
@@ -5447,8 +5480,20 @@ function applyLoadingPreviewPose(item) {
   // full account of why a flat world-space offset (this preview's OWN
   // first attempt, and HANDO's own convention) doesn't reproduce "close
   // to the camera" once the camera isn't aligned with world Z.
-  applyPoseOffsetToPosition(loadingPreviewHand.clone, _poseOffsetZeroVec, loadingPreviewCamera, values)
-  loadingPreviewHand.clone.scale.setScalar(values.poseScale ?? 1)
+  // 2026-10-04 -- when a saved camera preset is in use, size the hand back up
+  // to what the presets were tuned for and keep its bounds centre on the
+  // preset's target, with the centre (not the wrist origin) as the rotation
+  // pivot: base position = anchor - rotate(boundsCentre * scale). Pose
+  // offsets are then added on top as before.
+  const previewScale = (values.poseScale ?? 1) * loadingPreviewModelScale
+  let previewBase = _poseOffsetZeroVec
+  if (loadingPreviewAnchorActive) {
+    _loadingPreviewBase.copy(handBoundsCenterLocal).multiplyScalar(previewScale).applyQuaternion(loadingPreviewHand.clone.quaternion)
+    _loadingPreviewBase.copy(loadingPreviewAnchor).sub(_loadingPreviewBase)
+    previewBase = _loadingPreviewBase
+  }
+  applyPoseOffsetToPosition(loadingPreviewHand.clone, previewBase, loadingPreviewCamera, values)
+  loadingPreviewHand.clone.scale.setScalar(previewScale)
   // `item` (NOT `values` -- see this function's own top comment, `values`
   // is rebuilt fresh from ONLY POSE_PRESET_KEYS, which `hideWrist`
   // deliberately isn't a member of) carries `hideWrist` whenever it came
