@@ -6991,7 +6991,7 @@
       "custom9TouchPointCount": 1,
       "custom9ClickCount": "2nd",
       "custom9Mode": "Sequence",
-      "custom9OffsetEnabled": true,
+      "custom9OffsetEnabled": false,
       "custom9OffsetMode": "Cursor Offset",
       "custom9OffsetX": 0,
       "custom9OffsetY": 0,
@@ -7006,20 +7006,20 @@
       "custom9CursorOffsetYRange": "{\"min\":0,\"max\":0}",
       "custom9CursorOffsetZCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9CursorOffsetZRange": "{\"min\":0,\"max\":0}",
-      "custom9CameraOffsetEnabled": false,
-      "custom9CameraOffsetXEnabled": true,
+      "custom9CameraOffsetEnabled": true,
+      "custom9CameraOffsetXEnabled": false,
       "custom9CameraOffsetXCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9CameraOffsetXRange": "{\"min\":0,\"max\":10}",
-      "custom9CameraOffsetYEnabled": true,
+      "custom9CameraOffsetYEnabled": false,
       "custom9CameraOffsetYCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9CameraOffsetYRange": "{\"min\":0,\"max\":10}",
       "custom9CameraOffsetZEnabled": true,
       "custom9CameraOffsetZCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9CameraOffsetZRange": "{\"min\":0,\"max\":10}",
       "custom9RotationEnabled": true,
-      "custom9RotationX": 101,
-      "custom9RotationY": -120,
-      "custom9RotationZ": -208,
+      "custom9RotationX": -40,
+      "custom9RotationY": -40,
+      "custom9RotationZ": -40,
       "custom9TargetPose": "Clockwise Fan - 5",
       "custom9TweenSelector": "Neutral - Horizontal Fanning",
       "custom9TweenSpeedMs": 4420,
@@ -7035,7 +7035,7 @@
       "custom9EasingCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9SpeedCurveEnabled": true,
       "custom9SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom9SpeedCurveRange": "{\"min\":1822,\"max\":2000}",
+      "custom9SpeedCurveRange": "{\"min\":2500,\"max\":3000}",
       "custom9StartTimeCurveEnabled": true,
       "custom9StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9StartTimeRange": "{\"min\":0,\"max\":300}",
@@ -14974,7 +14974,7 @@
       "custom9TouchPointCount": 1,
       "custom9ClickCount": "2nd",
       "custom9Mode": "Sequence",
-      "custom9OffsetEnabled": true,
+      "custom9OffsetEnabled": false,
       "custom9OffsetMode": "Cursor Offset",
       "custom9OffsetX": 0,
       "custom9OffsetY": 0,
@@ -14989,20 +14989,20 @@
       "custom9CursorOffsetYRange": "{\"min\":0,\"max\":0}",
       "custom9CursorOffsetZCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9CursorOffsetZRange": "{\"min\":0,\"max\":0}",
-      "custom9CameraOffsetEnabled": false,
-      "custom9CameraOffsetXEnabled": true,
+      "custom9CameraOffsetEnabled": true,
+      "custom9CameraOffsetXEnabled": false,
       "custom9CameraOffsetXCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9CameraOffsetXRange": "{\"min\":0,\"max\":10}",
-      "custom9CameraOffsetYEnabled": true,
+      "custom9CameraOffsetYEnabled": false,
       "custom9CameraOffsetYCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9CameraOffsetYRange": "{\"min\":0,\"max\":10}",
       "custom9CameraOffsetZEnabled": true,
       "custom9CameraOffsetZCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9CameraOffsetZRange": "{\"min\":0,\"max\":10}",
       "custom9RotationEnabled": true,
-      "custom9RotationX": 101,
-      "custom9RotationY": -120,
-      "custom9RotationZ": -208,
+      "custom9RotationX": -40,
+      "custom9RotationY": -40,
+      "custom9RotationZ": -40,
       "custom9TargetPose": "Clockwise Fan - 5",
       "custom9TweenSelector": "Neutral - Horizontal Fanning",
       "custom9TweenSpeedMs": 4420,
@@ -15018,7 +15018,7 @@
       "custom9EasingCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9SpeedCurveEnabled": true,
       "custom9SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom9SpeedCurveRange": "{\"min\":1822,\"max\":2000}",
+      "custom9SpeedCurveRange": "{\"min\":2500,\"max\":3000}",
       "custom9StartTimeCurveEnabled": true,
       "custom9StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9StartTimeRange": "{\"min\":0,\"max\":300}",
@@ -22957,7 +22957,7 @@
       "custom9TouchPointCount": 1,
       "custom9ClickCount": "2nd",
       "custom9Mode": "Sequence",
-      "custom9OffsetEnabled": true,
+      "custom9OffsetEnabled": false,
       "custom9OffsetMode": "Cursor Offset",
       "custom9OffsetX": 0,
       "custom9OffsetY": 0,
@@ -22972,20 +22972,20 @@
       "custom9CursorOffsetYRange": "{\"min\":0,\"max\":0}",
       "custom9CursorOffsetZCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9CursorOffsetZRange": "{\"min\":0,\"max\":0}",
-      "custom9CameraOffsetEnabled": false,
-      "custom9CameraOffsetXEnabled": true,
+      "custom9CameraOffsetEnabled": true,
+      "custom9CameraOffsetXEnabled": false,
       "custom9CameraOffsetXCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9CameraOffsetXRange": "{\"min\":0,\"max\":10}",
-      "custom9CameraOffsetYEnabled": true,
+      "custom9CameraOffsetYEnabled": false,
       "custom9CameraOffsetYCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9CameraOffsetYRange": "{\"min\":0,\"max\":10}",
       "custom9CameraOffsetZEnabled": true,
       "custom9CameraOffsetZCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9CameraOffsetZRange": "{\"min\":0,\"max\":10}",
       "custom9RotationEnabled": true,
-      "custom9RotationX": 101,
-      "custom9RotationY": -120,
-      "custom9RotationZ": -208,
+      "custom9RotationX": -40,
+      "custom9RotationY": -40,
+      "custom9RotationZ": -40,
       "custom9TargetPose": "Clockwise Fan - 5",
       "custom9TweenSelector": "Neutral - Horizontal Fanning",
       "custom9TweenSpeedMs": 4420,
@@ -23001,7 +23001,7 @@
       "custom9EasingCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9SpeedCurveEnabled": true,
       "custom9SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom9SpeedCurveRange": "{\"min\":1822,\"max\":2000}",
+      "custom9SpeedCurveRange": "{\"min\":2500,\"max\":3000}",
       "custom9StartTimeCurveEnabled": true,
       "custom9StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9StartTimeRange": "{\"min\":0,\"max\":300}",
@@ -48631,7 +48631,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 9",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -48781,7 +48781,7 @@
                 "type": "group",
                 "group": {
                   "key": "Offset To Camera",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -48839,7 +48839,7 @@
                 "type": "group",
                 "group": {
                   "key": "Rotation",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -48885,7 +48885,7 @@
                 "type": "group",
                 "group": {
                   "key": "Animation Speed Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -48908,7 +48908,7 @@
                 "type": "group",
                 "group": {
                   "key": "Start Time Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -52301,7 +52301,7 @@
               },
               {
                 "key": "Offset To Camera",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -52356,7 +52356,7 @@
               },
               {
                 "key": "Rotation",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -52396,7 +52396,7 @@
               },
               {
                 "key": "Animation Speed Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -52416,7 +52416,7 @@
               },
               {
                 "key": "Start Time Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -84225,7 +84225,7 @@
         },
         {
           "key": "Custom Click Function 9",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
@@ -84375,7 +84375,7 @@
               "type": "group",
               "group": {
                 "key": "Offset To Camera",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -84433,7 +84433,7 @@
               "type": "group",
               "group": {
                 "key": "Rotation",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -84479,7 +84479,7 @@
               "type": "group",
               "group": {
                 "key": "Animation Speed Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -84502,7 +84502,7 @@
               "type": "group",
               "group": {
                 "key": "Start Time Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -87895,7 +87895,7 @@
             },
             {
               "key": "Offset To Camera",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -87950,7 +87950,7 @@
             },
             {
               "key": "Rotation",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -87990,7 +87990,7 @@
             },
             {
               "key": "Animation Speed Curve",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -88010,7 +88010,7 @@
             },
             {
               "key": "Start Time Curve",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
