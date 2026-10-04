@@ -7718,7 +7718,7 @@
       "custom16TweenStopDelayCurveEnabled": true,
       "custom16TweenStopDelayCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom16TweenStopDelayRange": "{\"min\":891,\"max\":5000}",
-      "custom16MultiTriggerEnabled": true,
+      "custom16MultiTriggerEnabled": false,
       "custom16MultiTriggers": "[]",
       "custom17Enabled": true,
       "custom17Type": "Click",
@@ -15701,7 +15701,7 @@
       "custom16TweenStopDelayCurveEnabled": true,
       "custom16TweenStopDelayCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom16TweenStopDelayRange": "{\"min\":891,\"max\":5000}",
-      "custom16MultiTriggerEnabled": true,
+      "custom16MultiTriggerEnabled": false,
       "custom16MultiTriggers": "[]",
       "custom17Enabled": true,
       "custom17Type": "Click",
@@ -23684,7 +23684,7 @@
       "custom16TweenStopDelayCurveEnabled": true,
       "custom16TweenStopDelayCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom16TweenStopDelayRange": "{\"min\":891,\"max\":5000}",
-      "custom16MultiTriggerEnabled": true,
+      "custom16MultiTriggerEnabled": false,
       "custom16MultiTriggers": "[]",
       "custom17Enabled": true,
       "custom17Type": "Click",
@@ -34071,14 +34071,14 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 16",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
                 "type": "group",
                 "group": {
                   "key": "Multi Trigger",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -34707,7 +34707,7 @@
             "subgroups": [
               {
                 "key": "Multi Trigger",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -37295,7 +37295,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 13",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -69680,14 +69680,14 @@
         },
         {
           "key": "Custom Click Function 16",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
               "type": "group",
               "group": {
                 "key": "Multi Trigger",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -70316,7 +70316,7 @@
           "subgroups": [
             {
               "key": "Multi Trigger",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -72895,7 +72895,7 @@
         },
         {
           "key": "Custom Click Function 13",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
