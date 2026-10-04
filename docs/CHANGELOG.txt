@@ -15967,6 +15967,58 @@ patched build has not been run in a browser.
 
 `main.js` cache-buster `?v=280` -> `?v=281`.
 
+2026-10-04  -  (redesign -- Easing Curve is now a SPEED PROFILE, not a position
+curve; corrects the 2026-10-02 Easing entry)
+
+Direct report: "i dont think Easing is working right. Not sure if the
+transition progress is correct. It should be a setting to control the
+transition speed throughout the entire transition, so X should be 0 to 100%
+transition, and y should be min max animation speed (with min max based off
+of all other slider settings)." The 2026-10-02 version mapped progress ->
+eased POSITION (Y = how far through the pose), which is a different thing.
+Asked how Y's min/max should be sourced; the answer was "the function's own
+speed settings".
+
+Now: X = progress through the transition (0-100%); Y = speed, 0 = the slowest
+this function's own settings allow, 1 = the fastest. The bounds are DURATIONS
+of the whole transition: with the function's Animation Speed Curve on, its own
+Min/Max range; otherwise the min/max of the relevant speed slider (Tween Speed
+50-5000, Animation Speed 0-700, floored at 20 ms so "fastest" can't be an
+instant jump). At progress p the local duration is D(p) = lerp(slow, fast,
+curve(p)), the pose advances at 1/D(p) per ms, so the transition's total time
+is T = integral of D(p) dp -- an emergent value, no longer the flat slider --
+and the eased position at normalized time u is the inverse of the cumulative
+time. `getEasingProfile()` builds a 64-sample table once per function (cached
+by curve-array identity + bounds); the forward phases set `speedMs = T`, so
+raw `progress` (phase transitions, Offset/Rotation baking) keeps running 0->1
+over real elapsed time and only the pose/splay position is reshaped via
+`easingProfilePAt()`. A hold's 'stopping' phase, which continues the forward
+pass's progress, uses the same profile so there is no snap at the handoff.
+
+Defaults changed: the curve now defaults to flat 0.5 (constant mid speed)
+instead of a 0->1 line, in the controls, the new-function template, the widget
+defaults and the parsed-state initialisers. Enabling Easing therefore replaces
+the flat duration with the profile (it cannot be a no-op, because the bounds
+are absolute). Already-saved EasingCurve values are untouched: any that were
+the old linear default are now a slow->fast ramp, and all are disabled unless
+the user turned them on.
+
+Disclosed limits: (1) with Easing on, the Animation Speed Curve's per-hand
+(distance-based) duration is NOT applied -- its Min/Max still set the bounds
+-- because the profile defines the duration; (2) only the initial forward
+ramp and the hold stopping phase are shaped, not later Loop/Oscillate laps;
+(3) slider bounds are the controls' static min/max, so a bound click-edited in
+the panel is not seen; (4) the 20 ms floor is a judgment call, not measured.
+
+Verified: `node --check` and `tests/top-level-load-check.js` pass; a 24-assert
+test that slices the REAL profile code out of main.js passes (flat curves give
+constant speed with T equal to the bound duration and linear position;
+slow->fast puts the pose less than half way at half the time, fast->slow the
+reverse; endpoints exact and the mapping monotonic; Speed Curve bounds incl.
+reversed min/max; tween bounds; cache reuse/rebuild). Not run in a browser.
+
+`main.js` cache-buster `?v=281` -> `?v=282`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

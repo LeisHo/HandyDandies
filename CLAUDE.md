@@ -2338,4 +2338,12 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   `handBoundsRadiusLocal` first; to confirm what is actually drawn, render the
   preview scene and read the pixels back (the screenshot tool cannot show WebGL
   in this environment).
+- **CORRECTED 2026-10-04: the Easing Curve is a SPEED profile, not a position
+  curve** (the earlier gotcha above that describes `easedProgress` as a curve of
+  position is superseded; the "forward ramp only" scope still holds, plus the hold
+  stopping phase). Y is a speed between the function's own slowest and fastest
+  duration, so `T = integral of D(p) dp` replaces the flat duration when Easing is
+  on (`getEasingProfile()`/`easingProfilePAt()`); do not add a second place that
+  reads `animSpeedMs()` for a forward-progress timeline without also applying the
+  profile (the hold 'stopping' phase needed it to avoid a snap).
 

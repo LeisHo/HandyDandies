@@ -257,6 +257,9 @@ const _loadingPreviewBase = new THREE.Vector3()
 // deliberately NOT included: they are not click-function settings, and the
 // frozen-at-trigger splay must stay on the same 3D value it blends against.
 let xyFieldMinDist = 0, xyFieldDistRange = 0.001
+// Easing Curve speed-profile lookup tables, one per function prefix (see
+// getEasingProfile()). Declared here per the early-state rule.
+const easingProfileCache = new Map()
 // Responsive Wrist Splay's own cached/parsed state -- same TDZ reasoning
 // as armLengthRangeParsed/armLengthCurveParsed directly above (declared
 // here, read by parseWristSplayConfig()/computeResponsiveWristSplayDeg()
@@ -4026,7 +4029,7 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       // final 0-1 fraction, same convention as Start Distance Curve's
       // own curve.
       { key: `${p}EasingCurveEnabled`, label: 'Easing Curve On/Off', type: 'checkbox', def: false, onChange: () => updateSingleTimingGateVisibility(p) },
-      { key: `${p}EasingCurve`, label: 'Easing Curve (Progress -> Eased Progress)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickHoldConfig(p) },
+      { key: `${p}EasingCurve`, label: 'Easing Curve (Progress -> Speed)', type: 'text', def: '[{"x":0,"y":0.5},{"x":1,"y":0.5}]', onChange: () => parseClickHoldConfig(p) },
       // Animation Speed Curve on/off -- direct spec item ("Animation
       // Speed Curve on/off [NEW]" under Single-Pose-mode settings), a
       // distance->speed curve exactly analogous to Start Time Curve
@@ -4346,7 +4349,7 @@ function makeClickPoseGroup(p, title, defaults = {}) {
       // Range control needed -- Y is already the final 0-1 fraction,
       // same convention as Start Distance Curve's own curve.
       { key: `${p}EasingCurveEnabled`, label: 'Easing Curve On/Off', type: 'checkbox', def: false, onChange: () => updateSingleTimingGateVisibility(p) },
-      { key: `${p}EasingCurve`, label: 'Easing Curve (Progress -> Eased Progress)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickPoseConfig(p) },
+      { key: `${p}EasingCurve`, label: 'Easing Curve (Progress -> Speed)', type: 'text', def: '[{"x":0,"y":0.5},{"x":1,"y":0.5}]', onChange: () => parseClickPoseConfig(p) },
       // Animation Speed Curve / Start Time Curve / Retransition on-off
       // gates -- see makeClickHoldPoseGroup()'s own matching comments
       // for the full reasoning (shared word-for-word, both factories
@@ -7134,7 +7137,7 @@ const clickHoldPoseTriggers = Object.fromEntries([...CLICK_HOLD_KEYS, ...LEGACY_
   speedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], speedRangeParsed: { min: 50, max: 2000 },
   tweenStartCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStartRangeParsed: { min: 0, max: 300 },
   startDistanceCurveParsed: [{ x: 0, y: 1 }, { x: 1, y: 1 }],
-  easingCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }],
+  easingCurveParsed: [{ x: 0, y: 0.5 }, { x: 1, y: 0.5 }],
   retransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionRangeParsed: { min: 0, max: 300 },
   tweenRetransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenRetransitionRangeParsed: { min: 0, max: 300 },
   tweenStopStartCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStopStartRangeParsed: { min: 0, max: 300 },
@@ -8019,6 +8022,76 @@ function safeTweenSpeedMs(v) { return Number.isFinite(v) ? v : 800 }
 // Animation Speed for Single Pose). `> 0` guards a curve switched on
 // mid-hold, before any hand had a frozen value, from collapsing the
 // transition to 1ms.
+// EASING CURVE AS A SPEED PROFILE (REDESIGNED 2026-10-04; the first version,
+// 2026-10-02, mapped progress -> eased position, which is not what was
+// wanted). Direct spec: "It should be a setting to control the transition
+// speed throughout the entire transition, so X should be 0 to 100%
+// transition, and Y should be min max animation speed (with min max based
+// off of all other slider settings)", and the user chose "the function's own
+// speed settings" as the source of that min/max.
+//   X = progress through the transition (0-100%)
+//   Y = speed: 0 = the SLOWEST this function's own settings allow, 1 = the
+//       FASTEST.
+// Bounds (as DURATIONS of the whole transition, in ms): with the function's
+// Animation Speed Curve on, its own Min/Max range; otherwise the min/max of
+// the relevant speed slider (Tween Speed 50-5000, Animation Speed 0-700,
+// floored at 20ms so "fastest" can't be an instant jump). These mirror the
+// controls' static min/max -- a bound the user has click-edited in the panel
+// is session-only DOM state and is not seen here.
+// Mechanism: the local duration at progress p is D(p) = lerp(slow, fast,
+// curve(p)); the pose advances at 1/D(p) per ms, so the whole transition
+// takes T = integral of D(p) dp (an emergent total, NOT the flat slider) and
+// the eased position at normalized time u is the inverse of the cumulative
+// time. getEasingProfile() builds that table once per function and caches it;
+// the forward phases then use `speedMs = T` (so every raw-`progress` consumer
+// -- phase transitions, offset baking -- keeps working unchanged) and
+// `easedProgress = easingProfilePAt(profile, progress)`.
+// Disclosed limits: with Easing on, the Animation Speed Curve's per-hand
+// (distance-based) duration is not applied -- the profile replaces the
+// duration -- though its Min/Max still set the profile's bounds; and only the
+// initial forward ramp (plus a hold's stopping phase, which continues it) is
+// shaped, not later Loop/Oscillate laps.
+function easingSpeedBounds(p, isTween, trig) {
+  const FLOOR_MS = 20
+  if (cfg[`${p}SpeedCurveEnabled`] && trig && trig.speedRangeParsed) {
+    const a = trig.speedRangeParsed.min, b = trig.speedRangeParsed.max
+    return { fast: Math.max(Math.min(a, b), FLOOR_MS), slow: Math.max(Math.max(a, b), FLOOR_MS) }
+  }
+  return isTween ? { fast: 50, slow: 5000 } : { fast: FLOOR_MS, slow: 700 }
+}
+function getEasingProfile(p, isTween, trig) {
+  const b = easingSpeedBounds(p, isTween, trig)
+  const curve = trig.easingCurveParsed
+  const cached = easingProfileCache.get(p)
+  if (cached && cached.curve === curve && cached.fast === b.fast && cached.slow === b.slow) return cached
+  const N = 64
+  const ts = new Float64Array(N + 1)
+  const durAt = (x) => b.slow + (b.fast - b.slow) * THREE.MathUtils.clamp(evaluateArmLengthCurve(curve, x), 0, 1)
+  let acc = 0, prevD = durAt(0)
+  for (let i = 1; i <= N; i++) {
+    const d = durAt(i / N)
+    acc += (prevD + d) / 2 / N
+    ts[i] = acc
+    prevD = d
+  }
+  const profile = { curve, fast: b.fast, slow: b.slow, ts, N, T: acc }
+  easingProfileCache.set(p, profile)
+  return profile
+}
+// Eased position (0-1) at normalized time u (0-1): inverse of the cumulative
+// time table, linearly interpolated.
+function easingProfilePAt(profile, u) {
+  const { ts, N, T } = profile
+  const target = THREE.MathUtils.clamp(u, 0, 1) * T
+  let lo = 0, hi = N
+  while (hi - lo > 1) {
+    const mid = (lo + hi) >> 1
+    if (ts[mid] <= target) lo = mid; else hi = mid
+  }
+  const span = ts[lo + 1] - ts[lo]
+  const frac = span > 0 ? (target - ts[lo]) / span : 0
+  return THREE.MathUtils.clamp((lo + frac) / N, 0, 1)
+}
 function animSpeedMs(p, isTween, frozenSpeedMs) {
   if (cfg[`${p}SpeedCurveEnabled`] && frozenSpeedMs > 0) return frozenSpeedMs
   return isTween ? safeTweenSpeedMs(cfg[`${p}TweenSpeedMs`]) : cfg[`${p}TransitionSpeedMs`]
@@ -8368,17 +8441,16 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     // Animation Speed Curve (Single Pose only) overrides the flat
     // TransitionSpeedMs slider when enabled -- `chp.frozenSpeedMs` was
     // computed once at this hand's own commit above.
-    const speedMs = Math.max(animSpeedMs(p, isTween, chp.frozenSpeedMs), 1)
+    let speedMs = Math.max(animSpeedMs(p, isTween, chp.frozenSpeedMs), 1)
+    // Easing Curve = speed profile (redesigned 2026-10-04) -- see
+    // getEasingProfile()'s comment. With it on, the profile's own total
+    // duration replaces the flat/curve duration, so the raw `progress`
+    // below (phase transitions, Offset/Rotation) still runs 0->1 over the
+    // real elapsed time, and only the pose/splay position is reshaped.
+    const easingProfile = cfg[`${p}EasingCurveEnabled`] ? getEasingProfile(p, isTween, trig) : null
+    if (easingProfile) speedMs = Math.max(easingProfile.T, 1)
     const progress = THREE.MathUtils.clamp(elapsed / speedMs, 0, 1)
-    // Easing Curve (2026-10-02) -- reshapes ONLY the pose's own visual
-    // interpolation fraction (`cappedT`/`splayNow` below), never the raw
-    // `progress` used for phase-transition checks or Offset/Rotation
-    // (same "frozen timing vs. scaled distance" split Start Distance
-    // Curve already established, just for easing instead of distance).
-    // Evaluated live every frame (X = progress itself, which changes
-    // continuously) rather than frozen-at-arm-time like most curves here
-    // -- there's no single value to freeze.
-    const easedProgress = cfg[`${p}EasingCurveEnabled`] ? THREE.MathUtils.clamp(evaluateArmLengthCurve(trig.easingCurveParsed, progress), 0, 1) : progress
+    const easedProgress = easingProfile ? easingProfilePAt(easingProfile, progress) : progress
     // Start Distance Curve (2026-09-27) -- see updateClickPoseForHand()'s
     // own matching comment for the full reasoning (identical treatment:
     // scales how far the POSE interpolation travels, never the timing;
@@ -8576,9 +8648,15 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
       // for the whole delay rather than continuing to visibly animate.
       values = chp.lastAppliedValues
     } else {
-      const speedMs = Math.max(animSpeedMs(p, true, chp.frozenSpeedMs), 1)
+      let speedMs = Math.max(animSpeedMs(p, true, chp.frozenSpeedMs), 1)
+      // 2026-10-04: this phase continues the forward pass's progress, so it
+      // must use the same Easing speed profile (duration AND position
+      // mapping) or the pose would snap at the handoff.
+      const stopEasing = cfg[`${p}EasingCurveEnabled`] ? getEasingProfile(p, true, trig) : null
+      if (stopEasing) speedMs = Math.max(stopEasing.T, 1)
       chp.stoppingVirtualElapsedMs += dt * decayFactor
-      const progress = THREE.MathUtils.clamp((chp.stoppingBaseElapsedMs + chp.stoppingVirtualElapsedMs) / speedMs, 0, 1)
+      const progressRaw = THREE.MathUtils.clamp((chp.stoppingBaseElapsedMs + chp.stoppingVirtualElapsedMs) / speedMs, 0, 1)
+      const progress = stopEasing ? easingProfilePAt(stopEasing, progressRaw) : progressRaw
       // `* frozenTweenFractionCap` (CORRECTED 2026-09-28) -- the forward
       // phase this continues from applies Start Distance Curve's cap
       // (`cappedT`); without it here too, a capped hand would jump from
@@ -9172,7 +9250,7 @@ const clickPoseTriggers = Object.fromEntries([...CLICK_POSE_KEYS, ...LEGACY_REMO
   speedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], speedRangeParsed: { min: 50, max: 2000 },
   tweenStartCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStartRangeParsed: { min: 0, max: 300 },
   startDistanceCurveParsed: [{ x: 0, y: 1 }, { x: 1, y: 1 }],
-  easingCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }],
+  easingCurveParsed: [{ x: 0, y: 0.5 }, { x: 1, y: 0.5 }],
   retransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionRangeParsed: { min: 0, max: 300 }
 }]))
 // Direct request 2026-09-17 ("rename the word Tween to Sequence") --
@@ -9333,11 +9411,13 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
     // TransitionSpeedMs slider when enabled -- `cp.frozenSpeedMs` was
     // computed once per hand in triggerClickPose(), same "frozen at
     // trigger time" treatment as the splay.
-    const speedMs = Math.max(animSpeedMs(p, isTween, cp.frozenSpeedMs), 1)
+    let speedMs = Math.max(animSpeedMs(p, isTween, cp.frozenSpeedMs), 1)
+    // Easing Curve = speed profile (redesigned 2026-10-04) -- see
+    // getEasingProfile() and updateClickHoldPoseForHand()'s matching comment.
+    const easingProfile = cfg[`${p}EasingCurveEnabled`] ? getEasingProfile(p, isTween, clickPoseTriggers[p]) : null
+    if (easingProfile) speedMs = Math.max(easingProfile.T, 1)
     const progress = THREE.MathUtils.clamp(elapsed / speedMs, 0, 1)
-    // Easing Curve (2026-10-02) -- see updateClickHoldPoseForHand()'s own
-    // matching comment for the full reasoning.
-    const easedProgress = cfg[`${p}EasingCurveEnabled`] ? THREE.MathUtils.clamp(evaluateArmLengthCurve(clickPoseTriggers[p].easingCurveParsed, progress), 0, 1) : progress
+    const easedProgress = easingProfile ? easingProfilePAt(easingProfile, progress) : progress
     // Start Distance Curve (2026-09-27) -- `cp.frozenTweenFractionCap`
     // (1 = no cap, frozen once at trigger time, same convention as
     // frozenSplayDeg/frozenSpeedMs) scales how FAR the interpolation
@@ -10484,7 +10564,7 @@ function buildClickHoldPoseWidgets(p) {
   // 0-1 fraction, same convention as Start Distance Curve just above.
   buildOffsetAxisWidgets(p)
   const easingCurveRow = document.querySelector(`.dp-row[data-key="${p}EasingCurve"]`)
-  if (easingCurveRow) buildGenericCurveWidget(easingCurveRow, { caption: 'X: Transition Progress (0-100%)  ·  Y: Eased Progress (0=Start, 1=Complete)', defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
+  if (easingCurveRow) buildGenericCurveWidget(easingCurveRow, { caption: 'X: Transition Progress (0-100%)  ·  Y: Speed (0=Slowest, 1=Fastest, Within This Function\'s Own Speed Settings)', defaultPoints: [{ x: 0, y: 0.5 }, { x: 1, y: 0.5 }] })
   // Direct request 2026-10-01 ("for start distance min max, make that a
   // single slider") -- see mergeMinMaxSlidersIntoRangeBar()'s own comment.
   mergeMinMaxSlidersIntoRangeBar(
@@ -10550,7 +10630,7 @@ function buildClickPoseWidgets(p) {
   // matching comment.
   buildOffsetAxisWidgets(p)
   const easingCurveRow = document.querySelector(`.dp-row[data-key="${p}EasingCurve"]`)
-  if (easingCurveRow) buildGenericCurveWidget(easingCurveRow, { caption: 'X: Transition Progress (0-100%)  ·  Y: Eased Progress (0=Start, 1=Complete)', defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
+  if (easingCurveRow) buildGenericCurveWidget(easingCurveRow, { caption: 'X: Transition Progress (0-100%)  ·  Y: Speed (0=Slowest, 1=Fastest, Within This Function\'s Own Speed Settings)', defaultPoints: [{ x: 0, y: 0.5 }, { x: 1, y: 0.5 }] })
   // Direct request 2026-10-01 ("for start distance min max, make that a
   // single slider") -- see mergeMinMaxSlidersIntoRangeBar()'s own comment.
   mergeMinMaxSlidersIntoRangeBar(
@@ -11230,7 +11310,7 @@ function registerCustomClickFunction(id, title, kind, family) {
       speedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], speedRangeParsed: { min: 50, max: 2000 },
       tweenStartCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStartRangeParsed: { min: 0, max: 300 },
       startDistanceCurveParsed: [{ x: 0, y: 1 }, { x: 1, y: 1 }],
-      easingCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }],
+      easingCurveParsed: [{ x: 0, y: 0.5 }, { x: 1, y: 0.5 }],
       retransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionRangeParsed: { min: 0, max: 300 },
       retransitionSpeedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionSpeedRangeParsed: { min: 50, max: 2000 },
       tweenRetransitionSpeedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenRetransitionSpeedRangeParsed: { min: 50, max: 2000 },
@@ -11246,7 +11326,7 @@ function registerCustomClickFunction(id, title, kind, family) {
       speedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], speedRangeParsed: { min: 50, max: 2000 },
       tweenStartCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStartRangeParsed: { min: 0, max: 300 },
       startDistanceCurveParsed: [{ x: 0, y: 1 }, { x: 1, y: 1 }],
-      easingCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }],
+      easingCurveParsed: [{ x: 0, y: 0.5 }, { x: 1, y: 0.5 }],
       retransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionRangeParsed: { min: 0, max: 300 },
       retransitionSpeedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionSpeedRangeParsed: { min: 50, max: 2000 },
       cursorOffsetDistanceCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], cursorOffsetDistanceRangeParsed: { min: -50, max: 50 }
@@ -11425,7 +11505,7 @@ const NEW_CUSTOM_FUNCTION_TEMPLATE = {
   TweenStartTimeCurve: '[{"x":0,"y":0},{"x":1,"y":1}]', TweenStartTimeRange: '{"min":0,"max":300}',
   SequencePlayMode: 'Count', SequenceCount: 1, SequenceCountMode: 'Loop',
   SequenceLoopTransition: true, SequenceHoldMs: 0, TransitionSpeedMs: 700,
-  EasingCurveEnabled: false, EasingCurve: '[{"x":0,"y":0},{"x":1,"y":1}]',
+  EasingCurveEnabled: false, EasingCurve: '[{"x":0,"y":0.5},{"x":1,"y":0.5}]',
   SpeedCurveEnabled: false, SpeedCurve: '[{"x":0,"y":0},{"x":1,"y":1}]', SpeedCurveRange: '{"min":50,"max":2000}',
   StartTimeCurveEnabled: false, StartTimeCurve: '[{"x":0,"y":0},{"x":1,"y":1}]', StartTimeRange: '{"min":0,"max":300}',
   PauseDurationMs: 0,
@@ -11685,7 +11765,7 @@ function registerMultiTriggerTrigger(prefix, title, mtBody, addBtnRow, kind) {
         speedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], speedRangeParsed: { min: 50, max: 2000 },
         tweenStartCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStartRangeParsed: { min: 0, max: 300 },
         startDistanceCurveParsed: [{ x: 0, y: 1 }, { x: 1, y: 1 }],
-        easingCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }],
+        easingCurveParsed: [{ x: 0, y: 0.5 }, { x: 1, y: 0.5 }],
         retransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionRangeParsed: { min: 0, max: 300 },
         retransitionSpeedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionSpeedRangeParsed: { min: 50, max: 2000 },
         tweenRetransitionSpeedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenRetransitionSpeedRangeParsed: { min: 50, max: 2000 },
@@ -11703,7 +11783,7 @@ function registerMultiTriggerTrigger(prefix, title, mtBody, addBtnRow, kind) {
         speedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], speedRangeParsed: { min: 50, max: 2000 },
         tweenStartCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStartRangeParsed: { min: 0, max: 300 },
         startDistanceCurveParsed: [{ x: 0, y: 1 }, { x: 1, y: 1 }],
-        easingCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }],
+        easingCurveParsed: [{ x: 0, y: 0.5 }, { x: 1, y: 0.5 }],
         retransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionRangeParsed: { min: 0, max: 300 },
         retransitionSpeedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionSpeedRangeParsed: { min: 50, max: 2000 },
         cursorOffsetDistanceCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], cursorOffsetDistanceRangeParsed: { min: -50, max: 50 }

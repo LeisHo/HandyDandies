@@ -18,6 +18,14 @@ work seamlessly from there.
 
 ## Currently working on
 
+**2026-10-04 -- Easing Curve redesigned as a SPEED PROFILE.** X = 0-100% of the
+transition, Y = speed from slowest to fastest, with the bounds taken from the
+function's own speed settings (its Animation Speed Curve range if on, else the
+speed slider's min/max). The transition's total time now comes from the
+profile. Forward ramp + hold stopping phase only. Default curve is flat 0.5.
+`main.js` at `?v=282`; 24-assert profile test + load check pass; not run in a
+browser. See CHANGELOG.txt for the limits.
+
 **2026-10-04 -- Click-function distance-from-cursor settings now use world X/Y
 only.** Start time / speed / start-distance / retransition / tween-stop curves
 and the offset curves ignore Z. Cursor-tracking features (arm length, wrist
