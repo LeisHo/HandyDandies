@@ -7095,7 +7095,7 @@
       "custom9Trig1EasingCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9Trig1SpeedCurveEnabled": true,
       "custom9Trig1SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom9Trig1SpeedCurveRange": "{\"min\":1684,\"max\":2000}",
+      "custom9Trig1SpeedCurveRange": "{\"min\":3000,\"max\":4000}",
       "custom9Trig1StartTimeCurveEnabled": true,
       "custom9Trig1StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9Trig1StartTimeRange": "{\"min\":0,\"max\":1114}",
@@ -7153,7 +7153,7 @@
       "custom9Trig2EasingCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9Trig2SpeedCurveEnabled": true,
       "custom9Trig2SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom9Trig2SpeedCurveRange": "{\"min\":1416,\"max\":2000}",
+      "custom9Trig2SpeedCurveRange": "{\"min\":3000,\"max\":4000}",
       "custom9Trig2StartTimeCurveEnabled": true,
       "custom9Trig2StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9Trig2StartTimeRange": "{\"min\":0,\"max\":2154}",
@@ -15078,7 +15078,7 @@
       "custom9Trig1EasingCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9Trig1SpeedCurveEnabled": true,
       "custom9Trig1SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom9Trig1SpeedCurveRange": "{\"min\":1684,\"max\":2000}",
+      "custom9Trig1SpeedCurveRange": "{\"min\":3000,\"max\":4000}",
       "custom9Trig1StartTimeCurveEnabled": true,
       "custom9Trig1StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9Trig1StartTimeRange": "{\"min\":0,\"max\":1114}",
@@ -15136,7 +15136,7 @@
       "custom9Trig2EasingCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9Trig2SpeedCurveEnabled": true,
       "custom9Trig2SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom9Trig2SpeedCurveRange": "{\"min\":1416,\"max\":2000}",
+      "custom9Trig2SpeedCurveRange": "{\"min\":3000,\"max\":4000}",
       "custom9Trig2StartTimeCurveEnabled": true,
       "custom9Trig2StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9Trig2StartTimeRange": "{\"min\":0,\"max\":2154}",
@@ -23061,7 +23061,7 @@
       "custom9Trig1EasingCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9Trig1SpeedCurveEnabled": true,
       "custom9Trig1SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom9Trig1SpeedCurveRange": "{\"min\":1684,\"max\":2000}",
+      "custom9Trig1SpeedCurveRange": "{\"min\":3000,\"max\":4000}",
       "custom9Trig1StartTimeCurveEnabled": true,
       "custom9Trig1StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9Trig1StartTimeRange": "{\"min\":0,\"max\":1114}",
@@ -23119,7 +23119,7 @@
       "custom9Trig2EasingCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9Trig2SpeedCurveEnabled": true,
       "custom9Trig2SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom9Trig2SpeedCurveRange": "{\"min\":1416,\"max\":2000}",
+      "custom9Trig2SpeedCurveRange": "{\"min\":3000,\"max\":4000}",
       "custom9Trig2StartTimeCurveEnabled": true,
       "custom9Trig2StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom9Trig2StartTimeRange": "{\"min\":0,\"max\":2154}",
@@ -49311,7 +49311,7 @@
                             "type": "group",
                             "group": {
                               "key": "Animation Speed Curve",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -49429,7 +49429,7 @@
                                   "type": "group",
                                   "group": {
                                     "key": "Retransition Start Time Curve",
-                                    "collapsed": false,
+                                    "collapsed": true,
                                     "locked": false,
                                     "items": [
                                       {
@@ -49475,7 +49475,7 @@
                                 },
                                 {
                                   "key": "Retransition Start Time Curve",
-                                  "collapsed": false,
+                                  "collapsed": true,
                                   "locked": false,
                                   "items": [
                                     {
@@ -49684,7 +49684,7 @@
                           },
                           {
                             "key": "Animation Speed Curve",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -49793,7 +49793,7 @@
                                 "type": "group",
                                 "group": {
                                   "key": "Retransition Start Time Curve",
-                                  "collapsed": false,
+                                  "collapsed": true,
                                   "locked": false,
                                   "items": [
                                     {
@@ -49839,7 +49839,7 @@
                               },
                               {
                                 "key": "Retransition Start Time Curve",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
                                   {
@@ -49866,7 +49866,7 @@
                       "type": "group",
                       "group": {
                         "key": "Trigger 2",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -49984,7 +49984,7 @@
                             "type": "group",
                             "group": {
                               "key": "Offset To Camera",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -50172,7 +50172,7 @@
                             "type": "group",
                             "group": {
                               "key": "Retransition",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -50366,7 +50366,7 @@
                           },
                           {
                             "key": "Offset To Camera",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -50536,7 +50536,7 @@
                           },
                           {
                             "key": "Retransition",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -50873,7 +50873,7 @@
                           "type": "group",
                           "group": {
                             "key": "Animation Speed Curve",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -50991,7 +50991,7 @@
                                 "type": "group",
                                 "group": {
                                   "key": "Retransition Start Time Curve",
-                                  "collapsed": false,
+                                  "collapsed": true,
                                   "locked": false,
                                   "items": [
                                     {
@@ -51037,7 +51037,7 @@
                               },
                               {
                                 "key": "Retransition Start Time Curve",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
                                   {
@@ -51246,7 +51246,7 @@
                         },
                         {
                           "key": "Animation Speed Curve",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -51355,7 +51355,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Retransition Start Time Curve",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
                                   {
@@ -51401,7 +51401,7 @@
                             },
                             {
                               "key": "Retransition Start Time Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -51425,7 +51425,7 @@
                     },
                     {
                       "key": "Trigger 2",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -51543,7 +51543,7 @@
                           "type": "group",
                           "group": {
                             "key": "Offset To Camera",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -51731,7 +51731,7 @@
                           "type": "group",
                           "group": {
                             "key": "Retransition",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -51925,7 +51925,7 @@
                         },
                         {
                           "key": "Offset To Camera",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -52095,7 +52095,7 @@
                         },
                         {
                           "key": "Retransition",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -52810,7 +52810,7 @@
                           "type": "group",
                           "group": {
                             "key": "Animation Speed Curve",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -52928,7 +52928,7 @@
                                 "type": "group",
                                 "group": {
                                   "key": "Retransition Start Time Curve",
-                                  "collapsed": false,
+                                  "collapsed": true,
                                   "locked": false,
                                   "items": [
                                     {
@@ -52974,7 +52974,7 @@
                               },
                               {
                                 "key": "Retransition Start Time Curve",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
                                   {
@@ -53183,7 +53183,7 @@
                         },
                         {
                           "key": "Animation Speed Curve",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -53292,7 +53292,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Retransition Start Time Curve",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
                                   {
@@ -53338,7 +53338,7 @@
                             },
                             {
                               "key": "Retransition Start Time Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -53365,7 +53365,7 @@
                     "type": "group",
                     "group": {
                       "key": "Trigger 2",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -53483,7 +53483,7 @@
                           "type": "group",
                           "group": {
                             "key": "Offset To Camera",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -53671,7 +53671,7 @@
                           "type": "group",
                           "group": {
                             "key": "Retransition",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -53865,7 +53865,7 @@
                         },
                         {
                           "key": "Offset To Camera",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -54035,7 +54035,7 @@
                         },
                         {
                           "key": "Retransition",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -54372,7 +54372,7 @@
                         "type": "group",
                         "group": {
                           "key": "Animation Speed Curve",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -54490,7 +54490,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Retransition Start Time Curve",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
                                   {
@@ -54536,7 +54536,7 @@
                             },
                             {
                               "key": "Retransition Start Time Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -54745,7 +54745,7 @@
                       },
                       {
                         "key": "Animation Speed Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -54854,7 +54854,7 @@
                             "type": "group",
                             "group": {
                               "key": "Retransition Start Time Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -54900,7 +54900,7 @@
                           },
                           {
                             "key": "Retransition Start Time Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -54924,7 +54924,7 @@
                   },
                   {
                     "key": "Trigger 2",
-                    "collapsed": false,
+                    "collapsed": true,
                     "locked": false,
                     "items": [
                       {
@@ -55042,7 +55042,7 @@
                         "type": "group",
                         "group": {
                           "key": "Offset To Camera",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -55230,7 +55230,7 @@
                         "type": "group",
                         "group": {
                           "key": "Retransition",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -55424,7 +55424,7 @@
                       },
                       {
                         "key": "Offset To Camera",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -55594,7 +55594,7 @@
                       },
                       {
                         "key": "Retransition",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -84905,7 +84905,7 @@
                           "type": "group",
                           "group": {
                             "key": "Animation Speed Curve",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -85023,7 +85023,7 @@
                                 "type": "group",
                                 "group": {
                                   "key": "Retransition Start Time Curve",
-                                  "collapsed": false,
+                                  "collapsed": true,
                                   "locked": false,
                                   "items": [
                                     {
@@ -85069,7 +85069,7 @@
                               },
                               {
                                 "key": "Retransition Start Time Curve",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
                                   {
@@ -85278,7 +85278,7 @@
                         },
                         {
                           "key": "Animation Speed Curve",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -85387,7 +85387,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Retransition Start Time Curve",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
                                   {
@@ -85433,7 +85433,7 @@
                             },
                             {
                               "key": "Retransition Start Time Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -85460,7 +85460,7 @@
                     "type": "group",
                     "group": {
                       "key": "Trigger 2",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -85578,7 +85578,7 @@
                           "type": "group",
                           "group": {
                             "key": "Offset To Camera",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -85766,7 +85766,7 @@
                           "type": "group",
                           "group": {
                             "key": "Retransition",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -85960,7 +85960,7 @@
                         },
                         {
                           "key": "Offset To Camera",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -86130,7 +86130,7 @@
                         },
                         {
                           "key": "Retransition",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -86467,7 +86467,7 @@
                         "type": "group",
                         "group": {
                           "key": "Animation Speed Curve",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -86585,7 +86585,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Retransition Start Time Curve",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
                                   {
@@ -86631,7 +86631,7 @@
                             },
                             {
                               "key": "Retransition Start Time Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -86840,7 +86840,7 @@
                       },
                       {
                         "key": "Animation Speed Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -86949,7 +86949,7 @@
                             "type": "group",
                             "group": {
                               "key": "Retransition Start Time Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -86995,7 +86995,7 @@
                           },
                           {
                             "key": "Retransition Start Time Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -87019,7 +87019,7 @@
                   },
                   {
                     "key": "Trigger 2",
-                    "collapsed": false,
+                    "collapsed": true,
                     "locked": false,
                     "items": [
                       {
@@ -87137,7 +87137,7 @@
                         "type": "group",
                         "group": {
                           "key": "Offset To Camera",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -87325,7 +87325,7 @@
                         "type": "group",
                         "group": {
                           "key": "Retransition",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -87519,7 +87519,7 @@
                       },
                       {
                         "key": "Offset To Camera",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -87689,7 +87689,7 @@
                       },
                       {
                         "key": "Retransition",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -88404,7 +88404,7 @@
                         "type": "group",
                         "group": {
                           "key": "Animation Speed Curve",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -88522,7 +88522,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Retransition Start Time Curve",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
                                   {
@@ -88568,7 +88568,7 @@
                             },
                             {
                               "key": "Retransition Start Time Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -88777,7 +88777,7 @@
                       },
                       {
                         "key": "Animation Speed Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -88886,7 +88886,7 @@
                             "type": "group",
                             "group": {
                               "key": "Retransition Start Time Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -88932,7 +88932,7 @@
                           },
                           {
                             "key": "Retransition Start Time Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -88959,7 +88959,7 @@
                   "type": "group",
                   "group": {
                     "key": "Trigger 2",
-                    "collapsed": false,
+                    "collapsed": true,
                     "locked": false,
                     "items": [
                       {
@@ -89077,7 +89077,7 @@
                         "type": "group",
                         "group": {
                           "key": "Offset To Camera",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -89265,7 +89265,7 @@
                         "type": "group",
                         "group": {
                           "key": "Retransition",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -89459,7 +89459,7 @@
                       },
                       {
                         "key": "Offset To Camera",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -89629,7 +89629,7 @@
                       },
                       {
                         "key": "Retransition",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -89966,7 +89966,7 @@
                       "type": "group",
                       "group": {
                         "key": "Animation Speed Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -90084,7 +90084,7 @@
                             "type": "group",
                             "group": {
                               "key": "Retransition Start Time Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -90130,7 +90130,7 @@
                           },
                           {
                             "key": "Retransition Start Time Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -90339,7 +90339,7 @@
                     },
                     {
                       "key": "Animation Speed Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -90448,7 +90448,7 @@
                           "type": "group",
                           "group": {
                             "key": "Retransition Start Time Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -90494,7 +90494,7 @@
                         },
                         {
                           "key": "Retransition Start Time Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -90518,7 +90518,7 @@
                 },
                 {
                   "key": "Trigger 2",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -90636,7 +90636,7 @@
                       "type": "group",
                       "group": {
                         "key": "Offset To Camera",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -90824,7 +90824,7 @@
                       "type": "group",
                       "group": {
                         "key": "Retransition",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -91018,7 +91018,7 @@
                     },
                     {
                       "key": "Offset To Camera",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -91188,7 +91188,7 @@
                     },
                     {
                       "key": "Retransition",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
