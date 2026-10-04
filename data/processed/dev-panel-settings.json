@@ -29671,16 +29671,16 @@
                 }
               },
               {
+                "type": "row",
+                "key": "custom18MultiTriggerEnabled"
+              },
+              {
                 "type": "group",
                 "group": {
                   "key": "Multi Trigger",
                   "collapsed": false,
                   "locked": false,
                   "items": [
-                    {
-                      "type": "row",
-                      "key": "custom18MultiTriggerEnabled"
-                    },
                     {
                       "type": "row",
                       "key": "custom18MultiTriggers"
@@ -30467,7 +30467,6 @@
                     }
                   ],
                   "settings": [
-                    "custom18MultiTriggerEnabled",
                     "custom18MultiTriggers",
                     null
                   ],
@@ -31265,7 +31264,8 @@
               "custom18SequenceCount",
               "custom18SequenceCountMode",
               "custom18SequenceLoopTransition",
-              "custom18SequenceHoldMs"
+              "custom18SequenceHoldMs",
+              "custom18MultiTriggerEnabled"
             ],
             "subgroups": [
               {
@@ -31625,10 +31625,6 @@
                 "collapsed": false,
                 "locked": false,
                 "items": [
-                  {
-                    "type": "row",
-                    "key": "custom18MultiTriggerEnabled"
-                  },
                   {
                     "type": "row",
                     "key": "custom18MultiTriggers"
@@ -32415,7 +32411,6 @@
                   }
                 ],
                 "settings": [
-                  "custom18MultiTriggerEnabled",
                   "custom18MultiTriggers",
                   null
                 ],
@@ -65286,16 +65281,16 @@
               }
             },
             {
+              "type": "row",
+              "key": "custom18MultiTriggerEnabled"
+            },
+            {
               "type": "group",
               "group": {
                 "key": "Multi Trigger",
                 "collapsed": false,
                 "locked": false,
                 "items": [
-                  {
-                    "type": "row",
-                    "key": "custom18MultiTriggerEnabled"
-                  },
                   {
                     "type": "row",
                     "key": "custom18MultiTriggers"
@@ -66082,7 +66077,6 @@
                   }
                 ],
                 "settings": [
-                  "custom18MultiTriggerEnabled",
                   "custom18MultiTriggers",
                   null
                 ],
@@ -66880,7 +66874,8 @@
             "custom18SequenceCount",
             "custom18SequenceCountMode",
             "custom18SequenceLoopTransition",
-            "custom18SequenceHoldMs"
+            "custom18SequenceHoldMs",
+            "custom18MultiTriggerEnabled"
           ],
           "subgroups": [
             {
@@ -67240,10 +67235,6 @@
               "collapsed": false,
               "locked": false,
               "items": [
-                {
-                  "type": "row",
-                  "key": "custom18MultiTriggerEnabled"
-                },
                 {
                   "type": "row",
                   "key": "custom18MultiTriggers"
@@ -68030,7 +68021,6 @@
                 }
               ],
               "settings": [
-                "custom18MultiTriggerEnabled",
                 "custom18MultiTriggers",
                 null
               ],
