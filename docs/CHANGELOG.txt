@@ -16448,6 +16448,45 @@ finger tip for Tip Twist) plus lerpPoseValues/lerpTweenSegments (~6 ms each per 
 allocated per hand per frame). Both are candidates if playback is still too slow after this.
 `main.js` `?v=300` -> `?v=301`.
 
+2026-10-04  -  (playback speed: pose pass 3.2x faster; "pop after the 2nd click" checked)
+
+Direct request: "do 1 and 2" = (1) cut the remaining playback cost, (2) investigate the
+pop after the 2nd click. Playback was 12-19 fps with hand logic 13-17 ms vs 7 ms idle.
+
+1) MEASURED FIRST (live, 156 hands, in this sandbox): applyPoseValuesToHand 22.5 ms, of
+which the finger curl was 20.2 ms and lerpPoseValues only 3.4 ms. So the curl, not the
+per-hand pose object, was the cost. Fixes:
+ - applyCurlToSkeleton: bone.updateMatrixWorld(true) after every joint recomputed all
+   descendants (the rest of the chain) before they were rotated -- now only that joint's
+   matrixWorld is refreshed (the next joint is refreshed in its own iteration).
+ - New applyAllFingerCurls(): the wrist and its ancestors are refreshed once per hand and
+   each finger starts from that (a carpal parent is one multiply) instead of walking all 8
+   ancestors per finger (getWorldQuaternion).
+ - Tip Twist's direction vector is computed from the already-current matrices instead of
+   two ancestor walks (getWorldPosition x2) per finger.
+ - lerpPoseValues is a generated straight-line function (fresh object, same values; falls
+   back to the loop if code generation is blocked): 0.98 -> 0.23 ms per 156 hands in node,
+   3.4 -> 0.3 ms live.
+ Verified live against the oracle (applyCurlToSkeletonReference) on 12 random hands with
+ random poses, splay and wrapper rotation: max bone difference 0.000074 deg, max matrixWorld
+ difference 6.6e-7, and the chain-only matrix update equals a full forced update exactly.
+ Result (same sandbox): applyPoseValuesToHand 22.5 -> 7.0 ms; finger curls 20.2 -> 7.2 ms.
+ With ~126 of 156 hands playing a sequence: hand logic p50 7.2 ms, p90 14.4, max 26.9.
+ `main.js` `?v=301` -> `?v=302`.
+
+2) POP AFTER THE 2ND CLICK -- not reproduced as a pose pop. Ran click 1, click 2 and a third
+ trigger while sequences were in flight, calling the Pose Jump check every frame at a 25
+ degree threshold: no bone or position discontinuity at either later click (the only hits
+ were the first frame after a 7 s gap between my own tool calls). A clean first click shows
+ only normal fast-sequence steps (~10-12 deg per 20 ms frame). The most likely cause is the
+ 400 ms mass-event frame (label DOM lookups on every hand, fixed last round): the 2nd click is
+ the one that starts a function on ~all hands at once, and a long frame makes every hand
+ appear to jump. Second candidate, unchanged: Trigger 1 with Pause Duration 0 ms +
+ Retransition goes to the fist and straight back by design. If a pop is still seen after
+ v=302, turn on Log Pose Jumps and read "frame Nms" first.
+
+Not verified: real-machine frame rates (the sandbox's absolute numbers differ from yours).
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

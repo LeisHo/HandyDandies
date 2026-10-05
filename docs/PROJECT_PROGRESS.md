@@ -18,6 +18,13 @@ work seamlessly from there.
 
 ## Currently working on
 
+**2026-10-04 -- Playback speed: pose pass 3.2x faster (`main.js` `?v=302`).**
+Finger-curl matrix refresh no longer recomputes descendants, one wrist refresh per hand,
+Tip Twist direction from current matrices, generated `lerpPoseValues`. Oracle-verified
+(max 0.000074 deg). "Pop after the 2nd click" not reproducible as a pose discontinuity;
+most likely the mass-event frame fixed in v=301. Waiting on a real-machine frame profile.
+See CHANGELOG.txt.
+
 **2026-10-04 -- Mass-event frame spikes fixed (log-label DOM query memoized).** Profile log: idle 41 fps (was ~10),
 playback 12-19 fps, spikes of 87-117 ms hand logic at mass trigger/interrupt events -- caused by an unconditional
 DOM query per hand per event (400 ms for 312 lookups), now cached. `main.js` `?v=301`. Remaining playback cost:

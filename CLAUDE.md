@@ -2435,3 +2435,14 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   events. It is now memoized (3 s TTL). Keep anything expensive out of log-call arguments (build the text lazily
   behind a `cfg.log...Enabled` check), and read the Frame Rate Log's PROFILE lines (Log Frame Profile) to find
   spikes instead of guessing.
+- **Measure before optimizing the pose pass (2026-10-04).** Live timing per 156 hands: the finger curl was
+  ~20 of ~22 ms, `lerpPoseValues` only ~3. `applyAllFingerCurls()` (wrist refreshed once, fingers run on the
+  `parentFresh` path) is what `applyPoseValuesToHand()` and the idle path call; `applyCurlToSkeleton()` still
+  works standalone (default `parentFresh = false`). Per-joint it refreshes only that joint's matrixWorld --
+  anything new that reads a DESCENDANT's world matrix inside the loop must not assume it is current. Re-verify
+  any further change against `applyCurlToSkeletonReference()` (random poses, wrapper rotation, normalize before
+  `angleTo`). `lerpPoseValues()` is generated code (`new Function`) built on first call from `POSE_PRESET_KEYS`
+  and `POSE_KEY_DEFAULTS`; a new pose key just needs to be in `POSE_PRESET_KEYS` before the first call.
+- **Do not reset `_cp`/`_chp` to test (2026-10-04).** Wiping a hand's trigger state while it is mid-pose leaves
+  `_wasOverriddenLastFrame` set and produces fake 100-180 degree "jumps" in Log Pose Jumps. Reload the page for a
+  clean run instead. Also, the first frame after a gap between tool calls shows a huge `frame Nms`; ignore it.
