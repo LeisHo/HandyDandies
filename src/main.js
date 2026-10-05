@@ -758,7 +758,7 @@ function tryStartField() {
   // whatever comes next; don't treat this comment's own reasoning above
   // as the settled explanation.
   renderer.compile(scene, camera)
-  window.__debug = { THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose, resolveTweenSegmentsWithAnchor, lerpTweenSegments, lerpLoopSegments, isHoldEntry, updateLoadingPreviewWristClip, lerpPoseValues, get loadingPreviewRenderer() { return loadingPreviewRenderer }, get loadingPreviewScene() { return loadingPreviewScene }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, get handBoundsCenterLocal() { return handBoundsCenterLocal }, multiPointCommit, multiPointEligibleFunctions, get multiPointActiveTouchCount() { return multiPointActiveTouchCount }, get multiPointSessionFiredPoseId() { return multiPointSessionFiredPoseId }, detectPoseJumps, get poseJumpLogEntries() { return poseJumpLogEntries }, applyCurlToSkeletonReference, handLogTriggerLabel }
+  window.__debug = { THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose, resolveTweenSegmentsWithAnchor, lerpTweenSegments, lerpLoopSegments, isHoldEntry, updateLoadingPreviewWristClip, lerpPoseValues, get loadingPreviewRenderer() { return loadingPreviewRenderer }, get loadingPreviewScene() { return loadingPreviewScene }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, get handBoundsCenterLocal() { return handBoundsCenterLocal }, multiPointCommit, multiPointEligibleFunctions, get multiPointActiveTouchCount() { return multiPointActiveTouchCount }, get multiPointSessionFiredPoseId() { return multiPointSessionFiredPoseId }, detectPoseJumps, get poseJumpLogEntries() { return poseJumpLogEntries }, applyCurlToSkeletonReference, handLogTriggerLabel, applyAllFingerCurls }
   loadingEl.classList.add('hidden')
   // The loading-preview canvas is a top-level sibling of #loading now
   // (2026-09-17, decoupled specifically so this moment doesn't force it
@@ -3713,6 +3713,8 @@ const _excludeQuatInv = new THREE.Quaternion()
 // since world = parentWorld * local for the uniform positive scales this rig has. The original is kept
 // as applyCurlToSkeletonReference() and used as the test oracle (every bone compared old vs new).
 const _curlChainQuat = new THREE.Quaternion()
+const _curlParentPos = new THREE.Vector3()
+const _curlParentScale = new THREE.Vector3()
 function rotateOnTrueWorldAxisFast(bone, parentWorldQ, worldAxis, angle, excludeQuat) {
   _worldToLocalQuat.copy(parentWorldQ).multiply(bone.quaternion)
   if (excludeQuat) _worldToLocalQuat.premultiply(_excludeQuatInv.copy(excludeQuat).invert())
@@ -3844,7 +3846,10 @@ const _curlWristRestInvScratch = new THREE.Quaternion()
 // cfg or any hand in the main field. Every existing call site (the main
 // `hands` field, via applyCurl()) omits this arg and behaves exactly as
 // before.
-function applyCurlToSkeleton(fingerName, skeleton, baseQuat, wrapperQuat, values = cfg) {
+// `parentFresh` (2026-10-04, used by applyAllFingerCurls()): the caller already refreshed the wrist bone's
+// world matrix (its ancestors included), so joint 0's parent chain only needs the one carpal level recomputed
+// instead of re-walking all 8 ancestors for every finger. Default false = the original behaviour.
+function applyCurlToSkeleton(fingerName, skeleton, baseQuat, wrapperQuat, values = cfg, parentFresh = false) {
   const joints = FINGER_JOINTS[fingerName]
   const maxDegs = FINGER_MAX_DEG[fingerName]
   const sign = FINGER_SIGN[fingerName]
@@ -3952,7 +3957,17 @@ function applyCurlToSkeleton(fingerName, skeleton, baseQuat, wrapperQuat, values
     const rest = boneRestQuat[boneName]
     if (!bone || !rest) return
     bones[i] = bone
-    if (!chainReady || bone.parent !== prevBone) { bone.parent.getWorldQuaternion(chainWorldQ); chainReady = true } // one chain walk per finger, not per rotation
+    if (!chainReady || bone.parent !== prevBone) {
+      const par = bone.parent
+      if (parentFresh && wristBoneForAxis && (par === wristBoneForAxis || par.parent === wristBoneForAxis)) {
+        // The wrist's world matrix is already current; a carpal parent is one multiply away.
+        if (par !== wristBoneForAxis) { par.updateMatrix(); par.matrixWorld.multiplyMatrices(wristBoneForAxis.matrixWorld, par.matrix) }
+        par.matrixWorld.decompose(_curlParentPos, chainWorldQ, _curlParentScale)
+      } else {
+        par.getWorldQuaternion(chainWorldQ) // one chain walk per finger, not per rotation
+      }
+      chainReady = true
+    }
     bone.quaternion.copy(rest)
     if (i === splayJointIndex) {
       rotateOnTrueWorldAxisFast(bone, chainWorldQ, splayAxis, splayAngle, wrapperQuat)
@@ -3997,13 +4012,37 @@ function applyCurlToSkeleton(fingerName, skeleton, baseQuat, wrapperQuat, values
       // measured live from this joint's own actual current position (see
       // segmentDirection()) -- no `wrapperQuat` exclusion here, unlike the
       // fixed WORLD_X/Y/Z-based axes above.
-      const twistAxis = segmentDirection(bones[i - 1], bone)
+      // Same vector segmentDirection() returns, from matrices that are already current: the previous joint's
+      // matrixWorld was refreshed at the end of its own iteration, and a bone's world POSITION does not depend
+      // on its own rotation, only on its parent's matrix and its local translation.
+      let twistAxis
+      if (bone.parent === bones[i - 1]) {
+        _segFromPos.setFromMatrixPosition(bones[i - 1].matrixWorld)
+        _segToPos.copy(bone.position).applyMatrix4(bones[i - 1].matrixWorld)
+        twistAxis = _segDir.subVectors(_segToPos, _segFromPos).normalize()
+      } else {
+        twistAxis = segmentDirection(bones[i - 1], bone)
+      }
       rotateOnTrueWorldAxisFast(bone, chainWorldQ, twistAxis, THREE.MathUtils.degToRad(FINGER_TIP_TWIST_MAX_DEG * tipTwistT))
     }
     chainWorldQ.multiply(bone.quaternion) // this joint's world quaternion = the next joint's parent
+    // Refresh THIS joint's world matrix only. updateMatrixWorld(true) also recomputed every descendant, i.e. the
+    // rest of the chain, before those joints had been rotated this frame (O(joints^2) per finger).
+    if (parentFresh || bone.parent === prevBone) {
+      bone.updateMatrix()
+      bone.matrixWorld.multiplyMatrices(bone.parent.matrixWorld, bone.matrix)
+    } else {
+      bone.updateMatrixWorld(true)
+    }
     prevBone = bone
-    bone.updateMatrixWorld(true)
   })
+}
+// All five fingers of one hand: refreshes the wrist (and its ancestors) once, then runs each finger on the
+// fast parent path. Falls back to the plain per-finger path if there is no wrist bone.
+function applyAllFingerCurls(skeleton, baseQuat, wrapperQuat, values) {
+  const wrist = skeletonBone(skeleton, 'rHand')
+  if (wrist) wrist.updateWorldMatrix(true, false)
+  for (let i = 0; i < FINGER_NAMES.length; i++) applyCurlToSkeleton(FINGER_NAMES[i], skeleton, baseQuat, wrapperQuat, values, !!wrist)
 }
 // Reference (pre-2026-10-04) implementation of applyCurlToSkeleton(), kept ONLY as the test oracle for the
 // fast path (exposed on window.__debug). Do not call from app code.
@@ -7885,7 +7924,28 @@ function getOrInitHandCHP(hand) {
 // updated comment for how a per-hand basis was added without disturbing
 // Whole-Hand Rotation's existing single-shared-value behavior for every
 // hand that ISN'T mid a pose transition.
+// Generated straight-line version (2026-10-04): one object literal with every key written in place instead of a
+// forEach closure growing a fresh object key by key. Measured ~4x faster (0.98 -> 0.23 ms per 156 hands in node);
+// the output is a fresh object with identical values, so callers that keep the result are unaffected. Built on
+// first use because POSE_KEY_DEFAULTS is only complete after startup; falls back to the loop if code generation
+// is unavailable (e.g. a strict CSP).
+let _lerpPoseValuesFast = null
+function buildLerpPoseValuesFast() {
+  try {
+    let src = 'let av,bv;return {\n'
+    POSE_PRESET_KEYS.forEach((k) => {
+      const q = JSON.stringify(k)
+      src += `${q}:(av=a[${q}],bv=b[${q}],av=av!==undefined?av:D[${q}],bv=bv!==undefined?bv:D[${q}],av+(bv-av)*t),\n`
+    })
+    src += 'hideWrist:(av=a.hideWrist,bv=b.hideWrist,av=av!==undefined?av:100,bv=bv!==undefined?bv:100,av+(bv-av)*t)}'
+    return new Function('D', `return function(a,b,t){${src}}`)(POSE_KEY_DEFAULTS)
+  } catch (err) {
+    return false
+  }
+}
 function lerpPoseValues(a, b, t) {
+  if (_lerpPoseValuesFast === null) _lerpPoseValuesFast = buildLerpPoseValuesFast()
+  if (_lerpPoseValuesFast) return _lerpPoseValuesFast(a, b, t)
   const result = {}
   POSE_PRESET_KEYS.forEach((key) => {
     const av = a[key] !== undefined ? a[key] : POSE_KEY_DEFAULTS[key]
@@ -8019,7 +8079,7 @@ function applyPoseValuesToHand(hand, poseValues, extraSplayDeg) {
   // handoff between the two is never a discontinuity, matching this
   // project's own standing "no interaction ever jumps" rule.
   hand.currentSplayDeg = extraSplayDeg
-  FINGER_NAMES.forEach((name) => applyCurlToSkeleton(name, hand.skinnedMesh.skeleton, hand.currentBaseQuat, hand.wrapper.quaternion, poseValues))
+  applyAllFingerCurls(hand.skinnedMesh.skeleton, hand.currentBaseQuat, hand.wrapper.quaternion, poseValues)
   // An ABSOLUTE position/scale set from this hand's own stored grid
   // `basePosition`, not an additive nudge -- recomputed fresh from
   // `poseValues` every call, so it can never compound across frames the
@@ -15589,7 +15649,7 @@ function updateRenderOrder() {
         // pose/base signature and the wrist splay within 0.002 deg (the curl axes follow the wrist). Output
         // is identical; saves the dominant per-frame cost for idle hands.
         if (hand._idleCurlSig !== idleCurlSig || Math.abs(extraSplay - hand._idleCurlSplay) >= 0.002) {
-          FINGER_NAMES.forEach((name) => applyCurlToSkeleton(name, hand.skinnedMesh.skeleton, hand.currentBaseQuat, hand.wrapper.quaternion, cfg))
+          applyAllFingerCurls(hand.skinnedMesh.skeleton, hand.currentBaseQuat, hand.wrapper.quaternion, cfg)
           hand._idleCurlSig = idleCurlSig
           hand._idleCurlSplay = extraSplay
         }
