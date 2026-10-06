@@ -714,6 +714,7 @@ function tryStartField() {
     }
   }
   fieldStarted = true
+  syncLoadingPreviewBackground() // drops the loading-screen blocker
   logStartupTiming('fieldStarted = true')
   logLoadingPreview(`field starting -- loading screen hides; preview ${cfg.loadingPreviewShowLive ? 'stays visible (Show Loading Preview is on)' : 'is hidden'}`)
   // (the field itself was built in slices earlier -- see rebuildFieldChunked())
@@ -5458,6 +5459,7 @@ function buildLoadingPreview(bypassEnabledGate) {
   // toggle.
   if (loadingPreviewRenderer) { loadingPreviewRenderer.dispose(); loadingPreviewRenderer = null }
   loadingPreviewCanvas.style.display = 'block'
+  syncLoadingPreviewBackground() // loading-screen blocker (x2 area)
   loadingPreviewScene = new THREE.Scene()
   // 2026-10-04, direct request: the preview uses the same background colour as
   // the normal app (cfg.bgColor) instead of being transparent over the page.
@@ -6004,6 +6006,17 @@ function startLoadingPreviewLiveLoop() {
 // restore before `loadingPreviewScene` has been initialised -- hence the try.
 function syncLoadingPreviewBackground() {
   try { if (loadingPreviewScene) loadingPreviewScene.background = fieldStarted ? null : new THREE.Color(cfg.bgColor) } catch (err) { /* not built yet */ }
+  // Loading-screen blocker (2026-10-06, direct request: "the background floor object to block the hand field is too
+  // small. scale it up 2"). The preview canvas is a square of Loading Preview Size px with an opaque background; a
+  // box-shadow spread of half that size in the same colour makes the opaque area twice as wide and tall without
+  // touching the hand's own size, costs no GPU, and follows the canvas's own show/hide. Only while the loading
+  // screen is up: afterwards the preview background is transparent (Show Loading Preview Live), so no blocker then.
+  try {
+    if (loadingPreviewCanvas) {
+      const size = Math.max(20, cfg.loadingPreviewSize || 160)
+      loadingPreviewCanvas.style.boxShadow = fieldStarted ? 'none' : `0 0 0 ${Math.round(size / 2)}px ${cfg.bgColor}`
+    }
+  } catch (err) { /* not built yet */ }
 }
 function setLoadingPreviewLiveVisible(show) {
   if (!show) {
@@ -6083,6 +6096,7 @@ function resizeLoadingPreview() {
   loadingPreviewCamera.aspect = 1
   loadingPreviewCamera.updateProjectionMatrix()
   loadingPreviewRenderer.setSize(size, size, false)
+  syncLoadingPreviewBackground() // the blocker's spread follows the size
 }
 // Loading Preview Offset X/Y (Px) -- same "called once at build time and
 // again on the slider's own onChange" pattern as resizeLoadingPreview()
