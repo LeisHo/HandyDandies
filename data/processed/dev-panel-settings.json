@@ -8569,9 +8569,9 @@
       "custom23Trig1Mode": "Chain",
       "custom23Trig1OffsetEnabled": true,
       "custom23Trig1OffsetMode": "Hand Axes Offset",
-      "custom23Trig1OffsetX": -5,
-      "custom23Trig1OffsetY": -5,
-      "custom23Trig1OffsetZ": -5,
+      "custom23Trig1OffsetX": 2,
+      "custom23Trig1OffsetY": 2,
+      "custom23Trig1OffsetZ": 3,
       "custom23Trig1CursorOffsetDistance": 0,
       "custom23Trig1CursorOffsetDistanceCurveEnabled": false,
       "custom23Trig1CursorOffsetDistanceCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -17846,9 +17846,9 @@
       "custom23Trig1Mode": "Chain",
       "custom23Trig1OffsetEnabled": true,
       "custom23Trig1OffsetMode": "Hand Axes Offset",
-      "custom23Trig1OffsetX": -5,
-      "custom23Trig1OffsetY": -5,
-      "custom23Trig1OffsetZ": -5,
+      "custom23Trig1OffsetX": 2,
+      "custom23Trig1OffsetY": 2,
+      "custom23Trig1OffsetZ": 3,
       "custom23Trig1CursorOffsetDistance": 0,
       "custom23Trig1CursorOffsetDistanceCurveEnabled": false,
       "custom23Trig1CursorOffsetDistanceCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -27123,9 +27123,9 @@
       "custom23Trig1Mode": "Chain",
       "custom23Trig1OffsetEnabled": true,
       "custom23Trig1OffsetMode": "Hand Axes Offset",
-      "custom23Trig1OffsetX": -5,
-      "custom23Trig1OffsetY": -5,
-      "custom23Trig1OffsetZ": -5,
+      "custom23Trig1OffsetX": 2,
+      "custom23Trig1OffsetY": 2,
+      "custom23Trig1OffsetZ": 3,
       "custom23Trig1CursorOffsetDistance": 0,
       "custom23Trig1CursorOffsetDistanceCurveEnabled": false,
       "custom23Trig1CursorOffsetDistanceCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -49773,7 +49773,7 @@
                 "type": "group",
                 "group": {
                   "key": "Multi Trigger",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -49843,7 +49843,7 @@
                             "type": "group",
                             "group": {
                               "key": "Offset",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -50397,7 +50397,7 @@
                         "subgroups": [
                           {
                             "key": "Offset",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -50978,7 +50978,7 @@
                           "type": "group",
                           "group": {
                             "key": "Offset",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -51532,7 +51532,7 @@
                       "subgroups": [
                         {
                           "key": "Offset",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -52582,7 +52582,7 @@
               },
               {
                 "key": "Multi Trigger",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -52652,7 +52652,7 @@
                           "type": "group",
                           "group": {
                             "key": "Offset",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -53206,7 +53206,7 @@
                       "subgroups": [
                         {
                           "key": "Offset",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -53787,7 +53787,7 @@
                         "type": "group",
                         "group": {
                           "key": "Offset",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -54341,7 +54341,7 @@
                     "subgroups": [
                       {
                         "key": "Offset",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -124668,7 +124668,7 @@
               "type": "group",
               "group": {
                 "key": "Multi Trigger",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -124738,7 +124738,7 @@
                           "type": "group",
                           "group": {
                             "key": "Offset",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -125292,7 +125292,7 @@
                       "subgroups": [
                         {
                           "key": "Offset",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -125873,7 +125873,7 @@
                         "type": "group",
                         "group": {
                           "key": "Offset",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -126427,7 +126427,7 @@
                     "subgroups": [
                       {
                         "key": "Offset",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -127477,7 +127477,7 @@
             },
             {
               "key": "Multi Trigger",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -127547,7 +127547,7 @@
                         "type": "group",
                         "group": {
                           "key": "Offset",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -128101,7 +128101,7 @@
                     "subgroups": [
                       {
                         "key": "Offset",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -128682,7 +128682,7 @@
                       "type": "group",
                       "group": {
                         "key": "Offset",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -129236,7 +129236,7 @@
                   "subgroups": [
                     {
                       "key": "Offset",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
