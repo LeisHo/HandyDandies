@@ -8354,7 +8354,7 @@
       "custom21TweenStopDelayMs": 0,
       "custom21TweenStopDelayCurveEnabled": true,
       "custom21TweenStopDelayCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom21TweenStopDelayRange": "{\"min\":1590,\"max\":3777}",
+      "custom21TweenStopDelayRange": "{\"min\":378,\"max\":1979}",
       "custom21MultiTriggerEnabled": true,
       "custom21MultiTriggers": "[{\"prefix\":\"custom21Trig1\",\"title\":\"Trigger 1\"}]",
       "custom21Trig1Enabled": true,
@@ -8434,7 +8434,7 @@
       "custom21Trig1TweenStopDelayMs": 0,
       "custom21Trig1TweenStopDelayCurveEnabled": true,
       "custom21Trig1TweenStopDelayCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom21Trig1TweenStopDelayRange": "{\"min\":1332,\"max\":2598}",
+      "custom21Trig1TweenStopDelayRange": "{\"min\":176,\"max\":1365}",
       "custom22Enabled": true,
       "custom22Type": "Click",
       "custom22TouchPointCount": 1,
@@ -18011,7 +18011,7 @@
       "custom21TweenStopDelayMs": 0,
       "custom21TweenStopDelayCurveEnabled": true,
       "custom21TweenStopDelayCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom21TweenStopDelayRange": "{\"min\":1590,\"max\":3777}",
+      "custom21TweenStopDelayRange": "{\"min\":378,\"max\":1979}",
       "custom21MultiTriggerEnabled": true,
       "custom21MultiTriggers": "[{\"prefix\":\"custom21Trig1\",\"title\":\"Trigger 1\"}]",
       "custom21Trig1Enabled": true,
@@ -18091,7 +18091,7 @@
       "custom21Trig1TweenStopDelayMs": 0,
       "custom21Trig1TweenStopDelayCurveEnabled": true,
       "custom21Trig1TweenStopDelayCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom21Trig1TweenStopDelayRange": "{\"min\":1332,\"max\":2598}",
+      "custom21Trig1TweenStopDelayRange": "{\"min\":176,\"max\":1365}",
       "custom22Enabled": true,
       "custom22Type": "Click",
       "custom22TouchPointCount": 1,
@@ -27668,7 +27668,7 @@
       "custom21TweenStopDelayMs": 0,
       "custom21TweenStopDelayCurveEnabled": true,
       "custom21TweenStopDelayCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom21TweenStopDelayRange": "{\"min\":1590,\"max\":3777}",
+      "custom21TweenStopDelayRange": "{\"min\":378,\"max\":1979}",
       "custom21MultiTriggerEnabled": true,
       "custom21MultiTriggers": "[{\"prefix\":\"custom21Trig1\",\"title\":\"Trigger 1\"}]",
       "custom21Trig1Enabled": true,
@@ -27748,7 +27748,7 @@
       "custom21Trig1TweenStopDelayMs": 0,
       "custom21Trig1TweenStopDelayCurveEnabled": true,
       "custom21Trig1TweenStopDelayCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom21Trig1TweenStopDelayRange": "{\"min\":1332,\"max\":2598}",
+      "custom21Trig1TweenStopDelayRange": "{\"min\":176,\"max\":1365}",
       "custom22Enabled": true,
       "custom22Type": "Click",
       "custom22TouchPointCount": 1,
@@ -58319,7 +58319,7 @@
                 "type": "group",
                 "group": {
                   "key": "Multi Trigger",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -60351,7 +60351,7 @@
               },
               {
                 "key": "Multi Trigger",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -71906,7 +71906,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 21",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -72431,7 +72431,7 @@
                       "type": "group",
                       "group": {
                         "key": "Tween Stop Delay",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -72475,7 +72475,7 @@
                     },
                     {
                       "key": "Tween Stop Delay",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -75236,7 +75236,7 @@
                     "type": "group",
                     "group": {
                       "key": "Tween Stop Delay",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -75280,7 +75280,7 @@
                   },
                   {
                     "key": "Tween Stop Delay",
-                    "collapsed": false,
+                    "collapsed": true,
                     "locked": false,
                     "items": [
                       {
@@ -145202,7 +145202,7 @@
               "type": "group",
               "group": {
                 "key": "Multi Trigger",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -147234,7 +147234,7 @@
             },
             {
               "key": "Multi Trigger",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -158780,7 +158780,7 @@
         },
         {
           "key": "Custom Click Function 21",
-          "collapsed": true,
+          "collapsed": false,
           "locked": true,
           "items": [
             {
@@ -159305,7 +159305,7 @@
                     "type": "group",
                     "group": {
                       "key": "Tween Stop Delay",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -159349,7 +159349,7 @@
                   },
                   {
                     "key": "Tween Stop Delay",
-                    "collapsed": false,
+                    "collapsed": true,
                     "locked": false,
                     "items": [
                       {
@@ -162110,7 +162110,7 @@
                   "type": "group",
                   "group": {
                     "key": "Tween Stop Delay",
-                    "collapsed": false,
+                    "collapsed": true,
                     "locked": false,
                     "items": [
                       {
@@ -162154,7 +162154,7 @@
                 },
                 {
                   "key": "Tween Stop Delay",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -209202,7 +209202,7 @@
       "left": 32.2976188659668,
       "top": 94.44047546386719,
       "width": 351.6071472167969,
-      "height": 769.3690795898438
+      "height": 35.52381134033203
     }
   }
 }
