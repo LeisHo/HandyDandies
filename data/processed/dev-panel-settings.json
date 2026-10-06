@@ -8464,7 +8464,7 @@
       "custom22EasingCurve": "[{\"x\":0,\"y\":0.5},{\"x\":1,\"y\":0.5}]",
       "custom22SpeedCurveEnabled": true,
       "custom22SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom22SpeedCurveRange": "{\"min\":1737,\"max\":2000}",
+      "custom22SpeedCurveRange": "{\"min\":4000,\"max\":7000}",
       "custom22StartTimeCurveEnabled": true,
       "custom22StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom22StartTimeRange": "{\"min\":0,\"max\":300}",
@@ -17675,7 +17675,7 @@
       "custom22EasingCurve": "[{\"x\":0,\"y\":0.5},{\"x\":1,\"y\":0.5}]",
       "custom22SpeedCurveEnabled": true,
       "custom22SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom22SpeedCurveRange": "{\"min\":1737,\"max\":2000}",
+      "custom22SpeedCurveRange": "{\"min\":4000,\"max\":7000}",
       "custom22StartTimeCurveEnabled": true,
       "custom22StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom22StartTimeRange": "{\"min\":0,\"max\":300}",
@@ -26886,7 +26886,7 @@
       "custom22EasingCurve": "[{\"x\":0,\"y\":0.5},{\"x\":1,\"y\":0.5}]",
       "custom22SpeedCurveEnabled": true,
       "custom22SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom22SpeedCurveRange": "{\"min\":1737,\"max\":2000}",
+      "custom22SpeedCurveRange": "{\"min\":4000,\"max\":7000}",
       "custom22StartTimeCurveEnabled": true,
       "custom22StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom22StartTimeRange": "{\"min\":0,\"max\":300}",
@@ -54931,7 +54931,7 @@
                 "type": "group",
                 "group": {
                   "key": "Animation Speed Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -55342,7 +55342,7 @@
               },
               {
                 "key": "Animation Speed Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -126559,7 +126559,7 @@
               "type": "group",
               "group": {
                 "key": "Animation Speed Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -126970,7 +126970,7 @@
             },
             {
               "key": "Animation Speed Curve",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
