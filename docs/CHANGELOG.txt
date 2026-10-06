@@ -16646,6 +16646,25 @@ Verified live (v=309): change a checkbox, orbit the camera 20 units, Undo -> che
 (62.637 before and after); Redo -> camera stayed. A camera-slider edit (62.637 -> 93) is undone (62.637) and
 redone (93).
 
+2026-10-06  -  (loading screen: blocker twice as large)
+
+Direct request: "on loading screen, the background floor object to block the hand field is too small. scale it
+up 2". The only thing that blocks the field on the loading screen is the Loading Preview canvas (a square of
+Loading Preview Size px, 1390 in your settings, with an opaque background in the Background Color). There is no
+separate floor mesh.
+
+Fix (`main.js` `?v=310`): syncLoadingPreviewBackground() now also sets the canvas's box-shadow to
+`0 0 0 <size/2>px <Background Color>` while the loading screen is up, which makes the opaque area twice as wide and
+tall (2780 px for your 1390) without changing the hand's own size, at no GPU cost. It is cleared at the reveal
+(tryStartField() now calls it right after fieldStarted = true), because afterwards the preview background is
+transparent for Show Loading Preview (Live) and a blocker would hide the field. It also follows the size slider
+(resizeLoadingPreview()), Background Color changes and each preview build.
+
+Verified live on the deployed page, polling the canvas style through a reload: while loading, display block, width
+1390px, box-shadow `rgb(0,0,0) 0 0 0 695px`; at the reveal `display none`, `box-shadow none`. Not verified by eye
+(screenshots cannot render WebGL here). If you meant a larger factor of the preview hand itself, or a different
+object, say so.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a
