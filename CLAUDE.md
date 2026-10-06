@@ -2446,3 +2446,8 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
 - **Do not reset `_cp`/`_chp` to test (2026-10-04).** Wiping a hand's trigger state while it is mid-pose leaves
   `_wasOverriddenLastFrame` set and produces fake 100-180 degree "jumps" in Log Pose Jumps. Reload the page for a
   clean run instead. Also, the first frame after a gap between tool calls shows a huge `frame Nms`; ignore it.
+- **Adding a control to a function's factory does not add it to its Multi Triggers (2026-10-06).** A sub-trigger is
+  built from `makeClickHoldPoseGroup()` / `makeClickPoseGroup()` filtered by `MULTI_TRIGGER_ALLOWED_SUFFIXES`. A new
+  control (or a mode-specific variant such as the Tween* retransition fields) must be added to that list or the
+  sub-trigger silently lacks it; a group whose only members are missing renders as an empty shell. If a report says a
+  Multi Trigger group is empty, compare the factory's keys for that Mode against the list first.

@@ -16500,6 +16500,37 @@ with the same top-level keys as Copy Settings (values for desktop/mobile/landsca
 textOverrides, devVisibility, devIndependence, panelGeometry, devHotkeys). The real download
 was intercepted in the test, not saved to disk. Note: the live export is ~5.7 MB.
 
+2026-10-06  -  (Multi Trigger: empty Retransition groups, Tween Stop, loop type)
+
+Direct report on the function titled "1 - CH" (custom21, a Click+Hold in Sequence mode): the
+Multi Trigger's Retransition groups were empty. Cause: MULTI_TRIGGER_ALLOWED_SUFFIXES listed only
+the Single Pose retransition fields; a hold-kind trigger in Sequence/Chain mode uses its own
+Tween* retransition fields (TweenRetransitionSpeedMs / SpeedCurve / SpeedCurveRange /
+StartTimeCurve / StartTimeRange), which the sub-trigger never got, so the Retransition, Retransition
+Speed Curve and Retransition Start Time Curve groups held nothing visible.
+
+Added to every Multi Trigger sub-trigger (the filter is by exact key, so a suffix a kind does not
+have just matches nothing):
+ - the Tween* retransition fields above (fixes the empty groups);
+ - the whole Tween Stop group (On/Off, Start Time Curve, Delay and its curve), hold-kind;
+ - the Chain list (TweenChain), because Mode offers Chain but its selector was missing;
+ - the loop type selector: Loop Mode + Loop Hold Duration (hold-kind), and Sequence Mode (Count /
+   Loop / Oscillate) with Sequence Count, Count Mode, Loop Transition and Hold Duration (pose-kind).
+All runtime reads were already keyed by the trigger's own prefix, so no runtime change was needed;
+pose-kind sub-triggers also now call updateSequencePlayModeVisibility() when built.
+
+Not done, on purpose: a fire-and-forget Click (pose-kind) has no release event, so Tween Stop does
+not apply to it; its Sequence Mode (Count / Loop / Oscillate) is its loop control instead.
+Existing hold sub-triggers had no saved Tween Stop value, so they now show the control's own
+default (On), the same default every base function has; before this the missing value acted as Off
+(the sequence finished instead of slowing to a stop on release).
+
+Verified live (v=304): custom21 Trigger 1 shows 5 visible Retransition rows and rows in both curve
+subgroups, a Tween Stop group with its two subgroups, and Loop Mode; switching custom9 Trigger 1
+to Sequence shows Sequence Mode, Count, Count Mode and Hold Duration (put back, nothing saved).
+Not verified: playback behavior of a Tween Stop / loop on a sub-trigger on a real release.
+`main.js` `?v=303` -> `?v=304`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a
