@@ -9050,7 +9050,7 @@
       "custom27TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom27TweenStartTimeRange": "{\"min\":0,\"max\":1129}",
       "custom27SequencePlayMode": "Count",
-      "custom27SequenceCount": 3,
+      "custom27SequenceCount": 2,
       "custom27SequenceCountMode": "Loop",
       "custom27SequenceLoopTransition": true,
       "custom27SequenceHoldMs": 0,
@@ -9059,7 +9059,7 @@
       "custom27EasingCurve": "[{\"x\":0,\"y\":0.5},{\"x\":0.5000449530512309,\"y\":0.8712501525878906},{\"x\":1,\"y\":0.5}]",
       "custom27SpeedCurveEnabled": true,
       "custom27SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom27SpeedCurveRange": "{\"min\":985,\"max\":1650}",
+      "custom27SpeedCurveRange": "{\"min\":1493,\"max\":2000}",
       "custom27StartTimeCurveEnabled": true,
       "custom27StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom27StartTimeRange": "{\"min\":0,\"max\":300}",
@@ -18327,7 +18327,7 @@
       "custom27TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom27TweenStartTimeRange": "{\"min\":0,\"max\":1129}",
       "custom27SequencePlayMode": "Count",
-      "custom27SequenceCount": 3,
+      "custom27SequenceCount": 2,
       "custom27SequenceCountMode": "Loop",
       "custom27SequenceLoopTransition": true,
       "custom27SequenceHoldMs": 0,
@@ -18336,7 +18336,7 @@
       "custom27EasingCurve": "[{\"x\":0,\"y\":0.5},{\"x\":0.5000449530512309,\"y\":0.8712501525878906},{\"x\":1,\"y\":0.5}]",
       "custom27SpeedCurveEnabled": true,
       "custom27SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom27SpeedCurveRange": "{\"min\":985,\"max\":1650}",
+      "custom27SpeedCurveRange": "{\"min\":1493,\"max\":2000}",
       "custom27StartTimeCurveEnabled": true,
       "custom27StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom27StartTimeRange": "{\"min\":0,\"max\":300}",
@@ -27604,7 +27604,7 @@
       "custom27TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom27TweenStartTimeRange": "{\"min\":0,\"max\":1129}",
       "custom27SequencePlayMode": "Count",
-      "custom27SequenceCount": 3,
+      "custom27SequenceCount": 2,
       "custom27SequenceCountMode": "Loop",
       "custom27SequenceLoopTransition": true,
       "custom27SequenceHoldMs": 0,
@@ -27613,7 +27613,7 @@
       "custom27EasingCurve": "[{\"x\":0,\"y\":0.5},{\"x\":0.5000449530512309,\"y\":0.8712501525878906},{\"x\":1,\"y\":0.5}]",
       "custom27SpeedCurveEnabled": true,
       "custom27SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom27SpeedCurveRange": "{\"min\":985,\"max\":1650}",
+      "custom27SpeedCurveRange": "{\"min\":1493,\"max\":2000}",
       "custom27StartTimeCurveEnabled": true,
       "custom27StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom27StartTimeRange": "{\"min\":0,\"max\":300}",
@@ -32432,7 +32432,7 @@
                 "type": "group",
                 "group": {
                   "key": "Offset To Camera",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -36115,7 +36115,7 @@
               },
               {
                 "key": "Offset To Camera",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -107339,7 +107339,7 @@
               "type": "group",
               "group": {
                 "key": "Offset To Camera",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -111022,7 +111022,7 @@
             },
             {
               "key": "Offset To Camera",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
