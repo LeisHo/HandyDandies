@@ -2473,3 +2473,8 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   480 KB). Three of eight areas applied; the Set Hotkey rewrite, header layout and default-letter header hotkeys
   were left out on purpose (see CHANGELOG.txt 2026-10-06). The next sync should diff against the archive copy made
   after 2026-10-06 03:53, or re-diff from `TEMPLATE_DEV_PANEL_20261006T035346.html`.
+- **Undo/Redo skips the live camera sliders (2026-10-06).** `initDevPanel(..., { undoLiveKeys })` lists controls that follow
+  something outside the panel (here the camera, via `syncCameraPanelFromLive()`); `applyStoredValues(values, skipKeys)` leaves
+  them completely alone, onChange included, because re-running a camera slider's onChange with its own current value still
+  moves the camera. Add any new canvas-driven slider to that list. A step is restored with them only if it began on one of
+  those rows (`entry.liveEdit`).

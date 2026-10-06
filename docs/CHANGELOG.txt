@@ -16624,6 +16624,28 @@ Not applied (the template's other changes do not fit this project's own panel):
  - Default letter hotkeys on header buttons (S Sync, C Copy, R Reset, U Undo, Y Redo, data-hotkey-default):
    would take S, C, U and Y away from user-assigned single-letter hotkeys; left for a decision.
 
+2026-10-06  -  (Undo/Redo no longer remembers the camera unless a slider changed it)
+
+Direct request: "Don't remember camera settings unless changed by sliders" (answering whether undo/redo
+should cover canvas-driven camera moves). Orbit/pan/zoom on the canvas moves the camera and the live-synced
+camera sliders, but is not an undo step, so an older snapshot used to put the camera back to where it was at
+your last panel click.
+
+Now (devPanel.js `?v=63`, `main.js` `?v=309`):
+ - main.js passes `undoLiveKeys: [cameraX, cameraY, cameraZ, cameraFov, cameraZoom]` to initDevPanel().
+ - Each undo entry records `liveEdit` = the press that created it was on one of those rows (or a slider hotkey
+   on one). Undo/Redo apply an entry with those controls skipped ENTIRELY (applyStoredValues(values, skipKeys):
+   no store write, no cfg write, no onChange) unless the entry was a camera-slider edit; redo entries inherit it.
+ - Skipping rather than re-applying the current values matters: a first version overlaid the live values but still
+   ran each camera slider's onChange, and applyCameraControl() moved the camera anyway (72.5 -> 92.5 orbit, then
+   87.6 after Undo).
+ - Camera changes made through a Saved Camera "Use" or the Loading Preview camera are not camera-slider edits, so
+   Undo does not revert them either (by the same rule).
+
+Verified live (v=309): change a checkbox, orbit the camera 20 units, Undo -> checkbox restored, camera stayed
+(62.637 before and after); Redo -> camera stayed. A camera-slider edit (62.637 -> 93) is undone (62.637) and
+redone (93).
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a
