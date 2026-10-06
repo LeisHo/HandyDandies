@@ -1562,8 +1562,16 @@ export function createGroupElement(title) {
   syncGroupLockIcon(g, lockIcon)
   lockIcon.addEventListener('click', (e) => {
     e.stopPropagation()
-    g.classList.toggle('dp-group-locked')
+    const nowLocked = !g.classList.contains('dp-group-locked')
+    g.classList.toggle('dp-group-locked', nowLocked)
     syncGroupLockIcon(g, lockIcon)
+    // Ported from the template's own 2026-10-06 change ("when i lock a group, all subgroups get locked as well,
+    // and vice versa to unlock"): every nested group, at any depth, takes the same state and icon.
+    g.querySelectorAll('.dp-group').forEach((sub) => {
+      sub.classList.toggle('dp-group-locked', nowLocked)
+      const subIcon = sub.querySelector(':scope > .dp-group-header .dp-group-lock-icon')
+      if (subIcon) syncGroupLockIcon(sub, subIcon)
+    })
   })
   // Also stops pointerdown -- setupReorder()'s own group-drag listener is
   // armed by .dp-drag-handle, not this icon, but the icon visually sits in
@@ -3918,8 +3926,20 @@ export function initDevPanel(groups, opts = {}) {
     devUndoGestureActive = false
     if (devUndoGestureTimer) { clearTimeout(devUndoGestureTimer); devUndoGestureTimer = null }
   }
+  // Ported from the template's own 2026-10-06 change ("Scrolling doesn't count"): a pointerdown whose target is
+  // EXACTLY one of these generic wrapper elements (not a more specific descendant) is the empty space you grab to
+  // scroll the panel by dragging, never a real edit. An exact match (not .closest()) stays correct for every
+  // current and future control type: a button, input, drag handle, lock icon or curve SVG is always a more
+  // specific target than its own row/group/scroll area, so it still takes a snapshot.
+  function isDevUndoScrollOnlyTarget(t) {
+    if (t === panel) return true
+    if (!t || !t.classList) return false
+    return ['dp-body', 'dp-group-body', 'dp-row', 'dp-group', 'dp-header-buttons', 'dp-actions', 'dp-list-picker', 'dp-lp-group-body', 'dp-lp-ungrouped-body']
+      .some((c) => t.classList.contains(c))
+  }
   panel.addEventListener('pointerdown', (e) => {
     if (devUndoGestureActive) return
+    if (isDevUndoScrollOnlyTarget(e.target)) return
     // While Delete is armed, the very next click either deletes
     // something (which pushes its own precise pushDevDeleteUndoEntry()
     // instead) or is refused/disarms with no mutation at all -- a plain
@@ -4247,9 +4267,12 @@ export function initDevPanel(groups, opts = {}) {
                           (e.altKey ? 'alt+' : '')
         const keyName = e.key === ' ' ? 'space' : (e.key.toLowerCase().match(/^[a-z0-9]$/) ? e.key.toLowerCase() : null)
         if (modPrefix && keyName) {
-          e.preventDefault()
+          // Template fix 2026-10-04: only intercept a combo that is actually assigned. This used to call
+          // preventDefault() on EVERY Ctrl/Shift/Alt + letter/digit, silently killing the browser's own
+          // shortcuts (Ctrl+F, Ctrl+R, Ctrl+C ...) whether or not any hotkey existed.
           const fullKey = modPrefix + keyName
           if (devHotkeys[fullKey]) {
+            e.preventDefault()
             triggerHotkey(devHotkeys[fullKey])
           }
         }
