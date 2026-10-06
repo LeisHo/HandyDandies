@@ -9014,9 +9014,9 @@
       "custom27Mode": "Sequence",
       "custom27OffsetEnabled": true,
       "custom27OffsetMode": "Hand Axes Offset",
-      "custom27OffsetX": 6,
-      "custom27OffsetY": -4.5,
-      "custom27OffsetZ": 4,
+      "custom27OffsetX": 2,
+      "custom27OffsetY": -3,
+      "custom27OffsetZ": 2,
       "custom27CursorOffsetDistance": 0,
       "custom27CursorOffsetDistanceCurveEnabled": false,
       "custom27CursorOffsetDistanceCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -9030,7 +9030,7 @@
       "custom27CameraOffsetEnabled": true,
       "custom27CameraOffsetXEnabled": true,
       "custom27CameraOffsetXCurve": "[{\"x\":0,\"y\":0},{\"x\":0.6007643775116626,\"y\":0.3027083079020182},{\"x\":1,\"y\":1}]",
-      "custom27CameraOffsetXRange": "{\"min\":0,\"max\":2}",
+      "custom27CameraOffsetXRange": "{\"min\":-1,\"max\":2}",
       "custom27CameraOffsetYEnabled": true,
       "custom27CameraOffsetYCurve": "[{\"x\":0,\"y\":0},{\"x\":0.5737859602454755,\"y\":0.3543749491373698},{\"x\":1,\"y\":1}]",
       "custom27CameraOffsetYRange": "{\"min\":0,\"max\":2}",
@@ -9082,9 +9082,9 @@
       "custom27Trig1Mode": "Sequence",
       "custom27Trig1OffsetEnabled": true,
       "custom27Trig1OffsetMode": "Hand Axes Offset",
-      "custom27Trig1OffsetX": -6,
-      "custom27Trig1OffsetY": 4.5,
-      "custom27Trig1OffsetZ": -4,
+      "custom27Trig1OffsetX": -2,
+      "custom27Trig1OffsetY": 2,
+      "custom27Trig1OffsetZ": -2,
       "custom27Trig1CursorOffsetDistance": 0,
       "custom27Trig1CursorOffsetDistanceCurveEnabled": false,
       "custom27Trig1CursorOffsetDistanceCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -9148,9 +9148,9 @@
       "custom27Trig2Mode": "Sequence",
       "custom27Trig2OffsetEnabled": true,
       "custom27Trig2OffsetMode": "Hand Axes Offset",
-      "custom27Trig2OffsetX": 6,
-      "custom27Trig2OffsetY": -4.5,
-      "custom27Trig2OffsetZ": 4,
+      "custom27Trig2OffsetX": 3,
+      "custom27Trig2OffsetY": -1,
+      "custom27Trig2OffsetZ": 1,
       "custom27Trig2CursorOffsetDistance": 0,
       "custom27Trig2CursorOffsetDistanceCurveEnabled": false,
       "custom27Trig2CursorOffsetDistanceCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -18291,9 +18291,9 @@
       "custom27Mode": "Sequence",
       "custom27OffsetEnabled": true,
       "custom27OffsetMode": "Hand Axes Offset",
-      "custom27OffsetX": 6,
-      "custom27OffsetY": -4.5,
-      "custom27OffsetZ": 4,
+      "custom27OffsetX": 2,
+      "custom27OffsetY": -3,
+      "custom27OffsetZ": 2,
       "custom27CursorOffsetDistance": 0,
       "custom27CursorOffsetDistanceCurveEnabled": false,
       "custom27CursorOffsetDistanceCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -18307,7 +18307,7 @@
       "custom27CameraOffsetEnabled": true,
       "custom27CameraOffsetXEnabled": true,
       "custom27CameraOffsetXCurve": "[{\"x\":0,\"y\":0},{\"x\":0.6007643775116626,\"y\":0.3027083079020182},{\"x\":1,\"y\":1}]",
-      "custom27CameraOffsetXRange": "{\"min\":0,\"max\":2}",
+      "custom27CameraOffsetXRange": "{\"min\":-1,\"max\":2}",
       "custom27CameraOffsetYEnabled": true,
       "custom27CameraOffsetYCurve": "[{\"x\":0,\"y\":0},{\"x\":0.5737859602454755,\"y\":0.3543749491373698},{\"x\":1,\"y\":1}]",
       "custom27CameraOffsetYRange": "{\"min\":0,\"max\":2}",
@@ -18359,9 +18359,9 @@
       "custom27Trig1Mode": "Sequence",
       "custom27Trig1OffsetEnabled": true,
       "custom27Trig1OffsetMode": "Hand Axes Offset",
-      "custom27Trig1OffsetX": -6,
-      "custom27Trig1OffsetY": 4.5,
-      "custom27Trig1OffsetZ": -4,
+      "custom27Trig1OffsetX": -2,
+      "custom27Trig1OffsetY": 2,
+      "custom27Trig1OffsetZ": -2,
       "custom27Trig1CursorOffsetDistance": 0,
       "custom27Trig1CursorOffsetDistanceCurveEnabled": false,
       "custom27Trig1CursorOffsetDistanceCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -18425,9 +18425,9 @@
       "custom27Trig2Mode": "Sequence",
       "custom27Trig2OffsetEnabled": true,
       "custom27Trig2OffsetMode": "Hand Axes Offset",
-      "custom27Trig2OffsetX": 6,
-      "custom27Trig2OffsetY": -4.5,
-      "custom27Trig2OffsetZ": 4,
+      "custom27Trig2OffsetX": 3,
+      "custom27Trig2OffsetY": -1,
+      "custom27Trig2OffsetZ": 1,
       "custom27Trig2CursorOffsetDistance": 0,
       "custom27Trig2CursorOffsetDistanceCurveEnabled": false,
       "custom27Trig2CursorOffsetDistanceCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -27568,9 +27568,9 @@
       "custom27Mode": "Sequence",
       "custom27OffsetEnabled": true,
       "custom27OffsetMode": "Hand Axes Offset",
-      "custom27OffsetX": 6,
-      "custom27OffsetY": -4.5,
-      "custom27OffsetZ": 4,
+      "custom27OffsetX": 2,
+      "custom27OffsetY": -3,
+      "custom27OffsetZ": 2,
       "custom27CursorOffsetDistance": 0,
       "custom27CursorOffsetDistanceCurveEnabled": false,
       "custom27CursorOffsetDistanceCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -27584,7 +27584,7 @@
       "custom27CameraOffsetEnabled": true,
       "custom27CameraOffsetXEnabled": true,
       "custom27CameraOffsetXCurve": "[{\"x\":0,\"y\":0},{\"x\":0.6007643775116626,\"y\":0.3027083079020182},{\"x\":1,\"y\":1}]",
-      "custom27CameraOffsetXRange": "{\"min\":0,\"max\":2}",
+      "custom27CameraOffsetXRange": "{\"min\":-1,\"max\":2}",
       "custom27CameraOffsetYEnabled": true,
       "custom27CameraOffsetYCurve": "[{\"x\":0,\"y\":0},{\"x\":0.5737859602454755,\"y\":0.3543749491373698},{\"x\":1,\"y\":1}]",
       "custom27CameraOffsetYRange": "{\"min\":0,\"max\":2}",
@@ -27636,9 +27636,9 @@
       "custom27Trig1Mode": "Sequence",
       "custom27Trig1OffsetEnabled": true,
       "custom27Trig1OffsetMode": "Hand Axes Offset",
-      "custom27Trig1OffsetX": -6,
-      "custom27Trig1OffsetY": 4.5,
-      "custom27Trig1OffsetZ": -4,
+      "custom27Trig1OffsetX": -2,
+      "custom27Trig1OffsetY": 2,
+      "custom27Trig1OffsetZ": -2,
       "custom27Trig1CursorOffsetDistance": 0,
       "custom27Trig1CursorOffsetDistanceCurveEnabled": false,
       "custom27Trig1CursorOffsetDistanceCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -27702,9 +27702,9 @@
       "custom27Trig2Mode": "Sequence",
       "custom27Trig2OffsetEnabled": true,
       "custom27Trig2OffsetMode": "Hand Axes Offset",
-      "custom27Trig2OffsetX": 6,
-      "custom27Trig2OffsetY": -4.5,
-      "custom27Trig2OffsetZ": 4,
+      "custom27Trig2OffsetX": 3,
+      "custom27Trig2OffsetY": -1,
+      "custom27Trig2OffsetZ": 1,
       "custom27Trig2CursorOffsetDistance": 0,
       "custom27Trig2CursorOffsetDistanceCurveEnabled": false,
       "custom27Trig2CursorOffsetDistanceCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -32270,7 +32270,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 27",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -32349,7 +32349,7 @@
                 "type": "group",
                 "group": {
                   "key": "Offset",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -32432,7 +32432,7 @@
                 "type": "group",
                 "group": {
                   "key": "Offset To Camera",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -32725,7 +32725,7 @@
                 "type": "group",
                 "group": {
                   "key": "Multi Trigger",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -32740,7 +32740,7 @@
                       "type": "group",
                       "group": {
                         "key": "Trigger 1",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -32807,7 +32807,7 @@
                             "type": "group",
                             "group": {
                               "key": "Offset",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -33200,7 +33200,7 @@
                         "subgroups": [
                           {
                             "key": "Offset",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -33557,7 +33557,7 @@
                       "type": "group",
                       "group": {
                         "key": "Trigger 2",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -33624,7 +33624,7 @@
                             "type": "group",
                             "group": {
                               "key": "Offset",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -34017,7 +34017,7 @@
                         "subgroups": [
                           {
                             "key": "Offset",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -34382,7 +34382,7 @@
                   "subgroups": [
                     {
                       "key": "Trigger 1",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -34449,7 +34449,7 @@
                           "type": "group",
                           "group": {
                             "key": "Offset",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -34842,7 +34842,7 @@
                       "subgroups": [
                         {
                           "key": "Offset",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -35196,7 +35196,7 @@
                     },
                     {
                       "key": "Trigger 2",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -35263,7 +35263,7 @@
                           "type": "group",
                           "group": {
                             "key": "Offset",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -35656,7 +35656,7 @@
                       "subgroups": [
                         {
                           "key": "Offset",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -36035,7 +36035,7 @@
             "subgroups": [
               {
                 "key": "Offset",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -36115,7 +36115,7 @@
               },
               {
                 "key": "Offset To Camera",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -36387,7 +36387,7 @@
               },
               {
                 "key": "Multi Trigger",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -36402,7 +36402,7 @@
                     "type": "group",
                     "group": {
                       "key": "Trigger 1",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -36469,7 +36469,7 @@
                           "type": "group",
                           "group": {
                             "key": "Offset",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -36862,7 +36862,7 @@
                       "subgroups": [
                         {
                           "key": "Offset",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -37219,7 +37219,7 @@
                     "type": "group",
                     "group": {
                       "key": "Trigger 2",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -37286,7 +37286,7 @@
                           "type": "group",
                           "group": {
                             "key": "Offset",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -37679,7 +37679,7 @@
                       "subgroups": [
                         {
                           "key": "Offset",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -38044,7 +38044,7 @@
                 "subgroups": [
                   {
                     "key": "Trigger 1",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -38111,7 +38111,7 @@
                         "type": "group",
                         "group": {
                           "key": "Offset",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -38504,7 +38504,7 @@
                     "subgroups": [
                       {
                         "key": "Offset",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -38858,7 +38858,7 @@
                   },
                   {
                     "key": "Trigger 2",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -38925,7 +38925,7 @@
                         "type": "group",
                         "group": {
                           "key": "Offset",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -39318,7 +39318,7 @@
                     "subgroups": [
                       {
                         "key": "Offset",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -107177,7 +107177,7 @@
       "subgroups": [
         {
           "key": "Custom Click Function 27",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
@@ -107256,7 +107256,7 @@
               "type": "group",
               "group": {
                 "key": "Offset",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -107339,7 +107339,7 @@
               "type": "group",
               "group": {
                 "key": "Offset To Camera",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -107632,7 +107632,7 @@
               "type": "group",
               "group": {
                 "key": "Multi Trigger",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -107647,7 +107647,7 @@
                     "type": "group",
                     "group": {
                       "key": "Trigger 1",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -107714,7 +107714,7 @@
                           "type": "group",
                           "group": {
                             "key": "Offset",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -108107,7 +108107,7 @@
                       "subgroups": [
                         {
                           "key": "Offset",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -108464,7 +108464,7 @@
                     "type": "group",
                     "group": {
                       "key": "Trigger 2",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -108531,7 +108531,7 @@
                           "type": "group",
                           "group": {
                             "key": "Offset",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -108924,7 +108924,7 @@
                       "subgroups": [
                         {
                           "key": "Offset",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -109289,7 +109289,7 @@
                 "subgroups": [
                   {
                     "key": "Trigger 1",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -109356,7 +109356,7 @@
                         "type": "group",
                         "group": {
                           "key": "Offset",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -109749,7 +109749,7 @@
                     "subgroups": [
                       {
                         "key": "Offset",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -110103,7 +110103,7 @@
                   },
                   {
                     "key": "Trigger 2",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -110170,7 +110170,7 @@
                         "type": "group",
                         "group": {
                           "key": "Offset",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -110563,7 +110563,7 @@
                     "subgroups": [
                       {
                         "key": "Offset",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -110942,7 +110942,7 @@
           "subgroups": [
             {
               "key": "Offset",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -111022,7 +111022,7 @@
             },
             {
               "key": "Offset To Camera",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -111294,7 +111294,7 @@
             },
             {
               "key": "Multi Trigger",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -111309,7 +111309,7 @@
                   "type": "group",
                   "group": {
                     "key": "Trigger 1",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -111376,7 +111376,7 @@
                         "type": "group",
                         "group": {
                           "key": "Offset",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -111769,7 +111769,7 @@
                     "subgroups": [
                       {
                         "key": "Offset",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -112126,7 +112126,7 @@
                   "type": "group",
                   "group": {
                     "key": "Trigger 2",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -112193,7 +112193,7 @@
                         "type": "group",
                         "group": {
                           "key": "Offset",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -112586,7 +112586,7 @@
                     "subgroups": [
                       {
                         "key": "Offset",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -112951,7 +112951,7 @@
               "subgroups": [
                 {
                   "key": "Trigger 1",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -113018,7 +113018,7 @@
                       "type": "group",
                       "group": {
                         "key": "Offset",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -113411,7 +113411,7 @@
                   "subgroups": [
                     {
                       "key": "Offset",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -113765,7 +113765,7 @@
                 },
                 {
                   "key": "Trigger 2",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -113832,7 +113832,7 @@
                       "type": "group",
                       "group": {
                         "key": "Offset",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -114225,7 +114225,7 @@
                   "subgroups": [
                     {
                       "key": "Offset",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
