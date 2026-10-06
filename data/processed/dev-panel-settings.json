@@ -8300,7 +8300,7 @@
       "custom21CameraOffsetXRange": "{\"min\":0,\"max\":10}",
       "custom21CameraOffsetYEnabled": true,
       "custom21CameraOffsetYCurve": "[{\"x\":0,\"y\":0},{\"x\":0.5917715717562668,\"y\":0.3273958206176758},{\"x\":1,\"y\":1}]",
-      "custom21CameraOffsetYRange": "{\"min\":-2,\"max\":2}",
+      "custom21CameraOffsetYRange": "{\"min\":0,\"max\":2}",
       "custom21CameraOffsetZEnabled": false,
       "custom21CameraOffsetZCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21CameraOffsetZRange": "{\"min\":0,\"max\":10}",
@@ -8380,7 +8380,7 @@
       "custom21Trig1CameraOffsetXRange": "{\"min\":-5,\"max\":5}",
       "custom21Trig1CameraOffsetYEnabled": true,
       "custom21Trig1CameraOffsetYCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
-      "custom21Trig1CameraOffsetYRange": "{\"min\":-2,\"max\":2}",
+      "custom21Trig1CameraOffsetYRange": "{\"min\":-2,\"max\":0}",
       "custom21Trig1CameraOffsetZEnabled": false,
       "custom21Trig1CameraOffsetZCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21Trig1CameraOffsetZRange": "{\"min\":0,\"max\":10}",
@@ -8404,7 +8404,7 @@
       "custom21Trig1EasingCurveEnabled": false,
       "custom21Trig1EasingCurve": "[{\"x\":0,\"y\":0.5},{\"x\":1,\"y\":0.5}]",
       "custom21Trig1SpeedCurveEnabled": true,
-      "custom21Trig1SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom21Trig1SpeedCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
       "custom21Trig1SpeedCurveRange": "{\"min\":922,\"max\":1561}",
       "custom21Trig1StartTimeCurveEnabled": true,
       "custom21Trig1StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -18113,7 +18113,7 @@
       "custom21CameraOffsetXRange": "{\"min\":0,\"max\":10}",
       "custom21CameraOffsetYEnabled": true,
       "custom21CameraOffsetYCurve": "[{\"x\":0,\"y\":0},{\"x\":0.5917715717562668,\"y\":0.3273958206176758},{\"x\":1,\"y\":1}]",
-      "custom21CameraOffsetYRange": "{\"min\":-2,\"max\":2}",
+      "custom21CameraOffsetYRange": "{\"min\":0,\"max\":2}",
       "custom21CameraOffsetZEnabled": false,
       "custom21CameraOffsetZCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21CameraOffsetZRange": "{\"min\":0,\"max\":10}",
@@ -18193,7 +18193,7 @@
       "custom21Trig1CameraOffsetXRange": "{\"min\":-5,\"max\":5}",
       "custom21Trig1CameraOffsetYEnabled": true,
       "custom21Trig1CameraOffsetYCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
-      "custom21Trig1CameraOffsetYRange": "{\"min\":-2,\"max\":2}",
+      "custom21Trig1CameraOffsetYRange": "{\"min\":-2,\"max\":0}",
       "custom21Trig1CameraOffsetZEnabled": false,
       "custom21Trig1CameraOffsetZCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21Trig1CameraOffsetZRange": "{\"min\":0,\"max\":10}",
@@ -18217,7 +18217,7 @@
       "custom21Trig1EasingCurveEnabled": false,
       "custom21Trig1EasingCurve": "[{\"x\":0,\"y\":0.5},{\"x\":1,\"y\":0.5}]",
       "custom21Trig1SpeedCurveEnabled": true,
-      "custom21Trig1SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom21Trig1SpeedCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
       "custom21Trig1SpeedCurveRange": "{\"min\":922,\"max\":1561}",
       "custom21Trig1StartTimeCurveEnabled": true,
       "custom21Trig1StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -27926,7 +27926,7 @@
       "custom21CameraOffsetXRange": "{\"min\":0,\"max\":10}",
       "custom21CameraOffsetYEnabled": true,
       "custom21CameraOffsetYCurve": "[{\"x\":0,\"y\":0},{\"x\":0.5917715717562668,\"y\":0.3273958206176758},{\"x\":1,\"y\":1}]",
-      "custom21CameraOffsetYRange": "{\"min\":-2,\"max\":2}",
+      "custom21CameraOffsetYRange": "{\"min\":0,\"max\":2}",
       "custom21CameraOffsetZEnabled": false,
       "custom21CameraOffsetZCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21CameraOffsetZRange": "{\"min\":0,\"max\":10}",
@@ -28006,7 +28006,7 @@
       "custom21Trig1CameraOffsetXRange": "{\"min\":-5,\"max\":5}",
       "custom21Trig1CameraOffsetYEnabled": true,
       "custom21Trig1CameraOffsetYCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
-      "custom21Trig1CameraOffsetYRange": "{\"min\":-2,\"max\":2}",
+      "custom21Trig1CameraOffsetYRange": "{\"min\":-2,\"max\":0}",
       "custom21Trig1CameraOffsetZEnabled": false,
       "custom21Trig1CameraOffsetZCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21Trig1CameraOffsetZRange": "{\"min\":0,\"max\":10}",
@@ -28030,7 +28030,7 @@
       "custom21Trig1EasingCurveEnabled": false,
       "custom21Trig1EasingCurve": "[{\"x\":0,\"y\":0.5},{\"x\":1,\"y\":0.5}]",
       "custom21Trig1SpeedCurveEnabled": true,
-      "custom21Trig1SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom21Trig1SpeedCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
       "custom21Trig1SpeedCurveRange": "{\"min\":922,\"max\":1561}",
       "custom21Trig1StartTimeCurveEnabled": true,
       "custom21Trig1StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -72874,7 +72874,7 @@
                 "type": "group",
                 "group": {
                   "key": "Tween Stop",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -73126,7 +73126,7 @@
                             "type": "group",
                             "group": {
                               "key": "Offset To Camera",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -73227,10 +73227,6 @@
                             }
                           },
                           {
-                            "type": "row",
-                            "key": "custom21Trig1SpeedCurve"
-                          },
-                          {
                             "type": "group",
                             "group": {
                               "key": "Animation Speed Curve",
@@ -73240,10 +73236,15 @@
                                 {
                                   "type": "row",
                                   "key": "custom21Trig1SpeedCurveRange"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "custom21Trig1SpeedCurve"
                                 }
                               ],
                               "settings": [
-                                "custom21Trig1SpeedCurveRange"
+                                "custom21Trig1SpeedCurveRange",
+                                "custom21Trig1SpeedCurve"
                               ],
                               "subgroups": []
                             }
@@ -73588,8 +73589,7 @@
                           "custom21Trig1TransitionSpeedMs",
                           "custom21Trig1TweenSpeedMs",
                           "custom21Trig1LoopMode",
-                          "custom21Trig1LoopHoldMs",
-                          "custom21Trig1SpeedCurve"
+                          "custom21Trig1LoopHoldMs"
                         ],
                         "subgroups": [
                           {
@@ -73674,7 +73674,7 @@
                           },
                           {
                             "key": "Offset To Camera",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -73775,10 +73775,15 @@
                               {
                                 "type": "row",
                                 "key": "custom21Trig1SpeedCurveRange"
+                              },
+                              {
+                                "type": "row",
+                                "key": "custom21Trig1SpeedCurve"
                               }
                             ],
                             "settings": [
-                              "custom21Trig1SpeedCurveRange"
+                              "custom21Trig1SpeedCurveRange",
+                              "custom21Trig1SpeedCurve"
                             ],
                             "subgroups": []
                           },
@@ -76512,7 +76517,7 @@
                           "type": "group",
                           "group": {
                             "key": "Offset To Camera",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -76613,10 +76618,6 @@
                           }
                         },
                         {
-                          "type": "row",
-                          "key": "custom21Trig1SpeedCurve"
-                        },
-                        {
                           "type": "group",
                           "group": {
                             "key": "Animation Speed Curve",
@@ -76626,10 +76627,15 @@
                               {
                                 "type": "row",
                                 "key": "custom21Trig1SpeedCurveRange"
+                              },
+                              {
+                                "type": "row",
+                                "key": "custom21Trig1SpeedCurve"
                               }
                             ],
                             "settings": [
-                              "custom21Trig1SpeedCurveRange"
+                              "custom21Trig1SpeedCurveRange",
+                              "custom21Trig1SpeedCurve"
                             ],
                             "subgroups": []
                           }
@@ -76974,8 +76980,7 @@
                         "custom21Trig1TransitionSpeedMs",
                         "custom21Trig1TweenSpeedMs",
                         "custom21Trig1LoopMode",
-                        "custom21Trig1LoopHoldMs",
-                        "custom21Trig1SpeedCurve"
+                        "custom21Trig1LoopHoldMs"
                       ],
                       "subgroups": [
                         {
@@ -77060,7 +77065,7 @@
                         },
                         {
                           "key": "Offset To Camera",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -77161,10 +77166,15 @@
                             {
                               "type": "row",
                               "key": "custom21Trig1SpeedCurveRange"
+                            },
+                            {
+                              "type": "row",
+                              "key": "custom21Trig1SpeedCurve"
                             }
                           ],
                           "settings": [
-                            "custom21Trig1SpeedCurveRange"
+                            "custom21Trig1SpeedCurveRange",
+                            "custom21Trig1SpeedCurve"
                           ],
                           "subgroups": []
                         },
@@ -80161,7 +80171,7 @@
               },
               {
                 "key": "Tween Stop",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -80410,7 +80420,7 @@
                           "type": "group",
                           "group": {
                             "key": "Offset To Camera",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -80511,10 +80521,6 @@
                           }
                         },
                         {
-                          "type": "row",
-                          "key": "custom21Trig1SpeedCurve"
-                        },
-                        {
                           "type": "group",
                           "group": {
                             "key": "Animation Speed Curve",
@@ -80524,10 +80530,15 @@
                               {
                                 "type": "row",
                                 "key": "custom21Trig1SpeedCurveRange"
+                              },
+                              {
+                                "type": "row",
+                                "key": "custom21Trig1SpeedCurve"
                               }
                             ],
                             "settings": [
-                              "custom21Trig1SpeedCurveRange"
+                              "custom21Trig1SpeedCurveRange",
+                              "custom21Trig1SpeedCurve"
                             ],
                             "subgroups": []
                           }
@@ -80872,8 +80883,7 @@
                         "custom21Trig1TransitionSpeedMs",
                         "custom21Trig1TweenSpeedMs",
                         "custom21Trig1LoopMode",
-                        "custom21Trig1LoopHoldMs",
-                        "custom21Trig1SpeedCurve"
+                        "custom21Trig1LoopHoldMs"
                       ],
                       "subgroups": [
                         {
@@ -80958,7 +80968,7 @@
                         },
                         {
                           "key": "Offset To Camera",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -81059,10 +81069,15 @@
                             {
                               "type": "row",
                               "key": "custom21Trig1SpeedCurveRange"
+                            },
+                            {
+                              "type": "row",
+                              "key": "custom21Trig1SpeedCurve"
                             }
                           ],
                           "settings": [
-                            "custom21Trig1SpeedCurveRange"
+                            "custom21Trig1SpeedCurveRange",
+                            "custom21Trig1SpeedCurve"
                           ],
                           "subgroups": []
                         },
@@ -83796,7 +83811,7 @@
                         "type": "group",
                         "group": {
                           "key": "Offset To Camera",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -83897,10 +83912,6 @@
                         }
                       },
                       {
-                        "type": "row",
-                        "key": "custom21Trig1SpeedCurve"
-                      },
-                      {
                         "type": "group",
                         "group": {
                           "key": "Animation Speed Curve",
@@ -83910,10 +83921,15 @@
                             {
                               "type": "row",
                               "key": "custom21Trig1SpeedCurveRange"
+                            },
+                            {
+                              "type": "row",
+                              "key": "custom21Trig1SpeedCurve"
                             }
                           ],
                           "settings": [
-                            "custom21Trig1SpeedCurveRange"
+                            "custom21Trig1SpeedCurveRange",
+                            "custom21Trig1SpeedCurve"
                           ],
                           "subgroups": []
                         }
@@ -84258,8 +84274,7 @@
                       "custom21Trig1TransitionSpeedMs",
                       "custom21Trig1TweenSpeedMs",
                       "custom21Trig1LoopMode",
-                      "custom21Trig1LoopHoldMs",
-                      "custom21Trig1SpeedCurve"
+                      "custom21Trig1LoopHoldMs"
                     ],
                     "subgroups": [
                       {
@@ -84344,7 +84359,7 @@
                       },
                       {
                         "key": "Offset To Camera",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -84445,10 +84460,15 @@
                           {
                             "type": "row",
                             "key": "custom21Trig1SpeedCurveRange"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom21Trig1SpeedCurve"
                           }
                         ],
                         "settings": [
-                          "custom21Trig1SpeedCurveRange"
+                          "custom21Trig1SpeedCurveRange",
+                          "custom21Trig1SpeedCurve"
                         ],
                         "subgroups": []
                       },
@@ -168712,7 +168732,7 @@
               "type": "group",
               "group": {
                 "key": "Tween Stop",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -168964,7 +168984,7 @@
                           "type": "group",
                           "group": {
                             "key": "Offset To Camera",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -169065,10 +169085,6 @@
                           }
                         },
                         {
-                          "type": "row",
-                          "key": "custom21Trig1SpeedCurve"
-                        },
-                        {
                           "type": "group",
                           "group": {
                             "key": "Animation Speed Curve",
@@ -169078,10 +169094,15 @@
                               {
                                 "type": "row",
                                 "key": "custom21Trig1SpeedCurveRange"
+                              },
+                              {
+                                "type": "row",
+                                "key": "custom21Trig1SpeedCurve"
                               }
                             ],
                             "settings": [
-                              "custom21Trig1SpeedCurveRange"
+                              "custom21Trig1SpeedCurveRange",
+                              "custom21Trig1SpeedCurve"
                             ],
                             "subgroups": []
                           }
@@ -169426,8 +169447,7 @@
                         "custom21Trig1TransitionSpeedMs",
                         "custom21Trig1TweenSpeedMs",
                         "custom21Trig1LoopMode",
-                        "custom21Trig1LoopHoldMs",
-                        "custom21Trig1SpeedCurve"
+                        "custom21Trig1LoopHoldMs"
                       ],
                       "subgroups": [
                         {
@@ -169512,7 +169532,7 @@
                         },
                         {
                           "key": "Offset To Camera",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -169613,10 +169633,15 @@
                             {
                               "type": "row",
                               "key": "custom21Trig1SpeedCurveRange"
+                            },
+                            {
+                              "type": "row",
+                              "key": "custom21Trig1SpeedCurve"
                             }
                           ],
                           "settings": [
-                            "custom21Trig1SpeedCurveRange"
+                            "custom21Trig1SpeedCurveRange",
+                            "custom21Trig1SpeedCurve"
                           ],
                           "subgroups": []
                         },
@@ -172350,7 +172375,7 @@
                         "type": "group",
                         "group": {
                           "key": "Offset To Camera",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -172451,10 +172476,6 @@
                         }
                       },
                       {
-                        "type": "row",
-                        "key": "custom21Trig1SpeedCurve"
-                      },
-                      {
                         "type": "group",
                         "group": {
                           "key": "Animation Speed Curve",
@@ -172464,10 +172485,15 @@
                             {
                               "type": "row",
                               "key": "custom21Trig1SpeedCurveRange"
+                            },
+                            {
+                              "type": "row",
+                              "key": "custom21Trig1SpeedCurve"
                             }
                           ],
                           "settings": [
-                            "custom21Trig1SpeedCurveRange"
+                            "custom21Trig1SpeedCurveRange",
+                            "custom21Trig1SpeedCurve"
                           ],
                           "subgroups": []
                         }
@@ -172812,8 +172838,7 @@
                       "custom21Trig1TransitionSpeedMs",
                       "custom21Trig1TweenSpeedMs",
                       "custom21Trig1LoopMode",
-                      "custom21Trig1LoopHoldMs",
-                      "custom21Trig1SpeedCurve"
+                      "custom21Trig1LoopHoldMs"
                     ],
                     "subgroups": [
                       {
@@ -172898,7 +172923,7 @@
                       },
                       {
                         "key": "Offset To Camera",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -172999,10 +173024,15 @@
                           {
                             "type": "row",
                             "key": "custom21Trig1SpeedCurveRange"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom21Trig1SpeedCurve"
                           }
                         ],
                         "settings": [
-                          "custom21Trig1SpeedCurveRange"
+                          "custom21Trig1SpeedCurveRange",
+                          "custom21Trig1SpeedCurve"
                         ],
                         "subgroups": []
                       },
@@ -175999,7 +176029,7 @@
             },
             {
               "key": "Tween Stop",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -176248,7 +176278,7 @@
                         "type": "group",
                         "group": {
                           "key": "Offset To Camera",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -176349,10 +176379,6 @@
                         }
                       },
                       {
-                        "type": "row",
-                        "key": "custom21Trig1SpeedCurve"
-                      },
-                      {
                         "type": "group",
                         "group": {
                           "key": "Animation Speed Curve",
@@ -176362,10 +176388,15 @@
                             {
                               "type": "row",
                               "key": "custom21Trig1SpeedCurveRange"
+                            },
+                            {
+                              "type": "row",
+                              "key": "custom21Trig1SpeedCurve"
                             }
                           ],
                           "settings": [
-                            "custom21Trig1SpeedCurveRange"
+                            "custom21Trig1SpeedCurveRange",
+                            "custom21Trig1SpeedCurve"
                           ],
                           "subgroups": []
                         }
@@ -176710,8 +176741,7 @@
                       "custom21Trig1TransitionSpeedMs",
                       "custom21Trig1TweenSpeedMs",
                       "custom21Trig1LoopMode",
-                      "custom21Trig1LoopHoldMs",
-                      "custom21Trig1SpeedCurve"
+                      "custom21Trig1LoopHoldMs"
                     ],
                     "subgroups": [
                       {
@@ -176796,7 +176826,7 @@
                       },
                       {
                         "key": "Offset To Camera",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -176897,10 +176927,15 @@
                           {
                             "type": "row",
                             "key": "custom21Trig1SpeedCurveRange"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom21Trig1SpeedCurve"
                           }
                         ],
                         "settings": [
-                          "custom21Trig1SpeedCurveRange"
+                          "custom21Trig1SpeedCurveRange",
+                          "custom21Trig1SpeedCurve"
                         ],
                         "subgroups": []
                       },
@@ -179634,7 +179669,7 @@
                       "type": "group",
                       "group": {
                         "key": "Offset To Camera",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -179735,10 +179770,6 @@
                       }
                     },
                     {
-                      "type": "row",
-                      "key": "custom21Trig1SpeedCurve"
-                    },
-                    {
                       "type": "group",
                       "group": {
                         "key": "Animation Speed Curve",
@@ -179748,10 +179779,15 @@
                           {
                             "type": "row",
                             "key": "custom21Trig1SpeedCurveRange"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom21Trig1SpeedCurve"
                           }
                         ],
                         "settings": [
-                          "custom21Trig1SpeedCurveRange"
+                          "custom21Trig1SpeedCurveRange",
+                          "custom21Trig1SpeedCurve"
                         ],
                         "subgroups": []
                       }
@@ -180096,8 +180132,7 @@
                     "custom21Trig1TransitionSpeedMs",
                     "custom21Trig1TweenSpeedMs",
                     "custom21Trig1LoopMode",
-                    "custom21Trig1LoopHoldMs",
-                    "custom21Trig1SpeedCurve"
+                    "custom21Trig1LoopHoldMs"
                   ],
                   "subgroups": [
                     {
@@ -180182,7 +180217,7 @@
                     },
                     {
                       "key": "Offset To Camera",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -180283,10 +180318,15 @@
                         {
                           "type": "row",
                           "key": "custom21Trig1SpeedCurveRange"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom21Trig1SpeedCurve"
                         }
                       ],
                       "settings": [
-                        "custom21Trig1SpeedCurveRange"
+                        "custom21Trig1SpeedCurveRange",
+                        "custom21Trig1SpeedCurve"
                       ],
                       "subgroups": []
                     },
@@ -227588,7 +227628,11 @@
       "custom24Trig1CameraOffsetEnabled": true,
       "custom24Trig1CameraOffsetXEnabled": true,
       "custom24Trig1CameraOffsetYEnabled": true,
-      "custom24Trig1CameraOffsetZEnabled": true
+      "custom24Trig1CameraOffsetZEnabled": true,
+      "custom21CameraOffsetEnabled": true,
+      "custom21CameraOffsetXEnabled": true,
+      "custom21CameraOffsetYEnabled": true,
+      "custom21CameraOffsetZEnabled": true
     },
     "landscape": {}
   },
@@ -227604,7 +227648,7 @@
       "left": 32.2976188659668,
       "top": 14.101190567016602,
       "width": 358.46429443359375,
-      "height": 35.52381134033203
+      "height": 772.4166870117188
     }
   }
 }
