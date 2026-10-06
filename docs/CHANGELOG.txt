@@ -16487,6 +16487,19 @@ per-hand pose object, was the cost. Fixes:
 
 Not verified: real-machine frame rates (the sandbox's absolute numbers differ from yours).
 
+2026-10-06  -  (dev panel: Export button)
+
+Direct request: an Export button in the Saved Dev Settings row (Save / Use / Delete / Set
+Default) that does what Copy Settings does but downloads the JSON instead of copying it.
+Added exportDevPanelSettings() in devPanel.js: same captureFullPanelState() as copySettings(),
+pretty-printed (2-space), downloaded as dev-panel-settings.json through a Blob + temporary
+link; the Export button is in the same .dp-actions row with the same styling.
+Verified live (v=303, devPanel.js v=60): the button sits in the same row as Set Default,
+clicking it creates one application/json blob named dev-panel-settings.json, pretty-printed,
+with the same top-level keys as Copy Settings (values for desktop/mobile/landscape, order,
+textOverrides, devVisibility, devIndependence, panelGeometry, devHotkeys). The real download
+was intercepted in the test, not saved to disk. Note: the live export is ~5.7 MB.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a
