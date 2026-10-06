@@ -8234,20 +8234,20 @@
       "custom21TweenSelector": "FLOWER 3",
       "custom21ReverseSequence": false,
       "custom21GlideToFirstPose": true,
-      "custom21FirstGlideTimeScale": 5,
+      "custom21FirstGlideTimeScale": 2,
       "custom21TweenChain": [],
       "custom21TweenSpeedMs": 800,
       "custom21TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom21TweenStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom21LoopMode": "Off",
+      "custom21TweenStartTimeRange": "{\"min\":0,\"max\":1907}",
+      "custom21LoopMode": "Loop",
       "custom21LoopHoldMs": 0,
       "custom21TransitionSpeedMs": 700,
       "custom21EasingCurveEnabled": false,
       "custom21EasingCurve": "[{\"x\":0,\"y\":0.5},{\"x\":1,\"y\":0.5}]",
       "custom21SpeedCurveEnabled": true,
       "custom21SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom21SpeedCurveRange": "{\"min\":1420,\"max\":2000}",
-      "custom21StartTimeCurveEnabled": false,
+      "custom21SpeedCurveRange": "{\"min\":1420,\"max\":1596}",
+      "custom21StartTimeCurveEnabled": true,
       "custom21StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21StartTimeRange": "{\"min\":0,\"max\":300}",
       "custom21StartDistanceCurveEnabled": false,
@@ -8268,9 +8268,9 @@
       "custom21TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21TweenRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "custom21TweenStopEnabled": true,
-      "custom21TweenStopStartTimeCurveEnabled": true,
+      "custom21TweenStopStartTimeCurveEnabled": false,
       "custom21TweenStopStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom21TweenStopStartTimeRange": "{\"min\":0,\"max\":3000}",
+      "custom21TweenStopStartTimeRange": "{\"min\":0,\"max\":764}",
       "custom21TweenStopDelayEnabled": true,
       "custom21TweenStopDelayMs": 0,
       "custom21TweenStopDelayCurveEnabled": true,
@@ -8313,16 +8313,16 @@
       "custom21Trig1TweenSelector": "FLOWER 3",
       "custom21Trig1ReverseSequence": true,
       "custom21Trig1GlideToFirstPose": true,
-      "custom21Trig1FirstGlideTimeScale": 5,
+      "custom21Trig1FirstGlideTimeScale": 2,
       "custom21Trig1TweenSpeedMs": 800,
       "custom21Trig1TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom21Trig1TweenStartTimeRange": "{\"min\":1052,\"max\":2319}",
+      "custom21Trig1TweenStartTimeRange": "{\"min\":0,\"max\":2319}",
       "custom21Trig1TransitionSpeedMs": 700,
       "custom21Trig1EasingCurveEnabled": false,
       "custom21Trig1EasingCurve": "[{\"x\":0,\"y\":0.5},{\"x\":1,\"y\":0.5}]",
       "custom21Trig1SpeedCurveEnabled": true,
       "custom21Trig1SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom21Trig1SpeedCurveRange": "{\"min\":1420,\"max\":2000}",
+      "custom21Trig1SpeedCurveRange": "{\"min\":815,\"max\":1220}",
       "custom21Trig1StartTimeCurveEnabled": true,
       "custom21Trig1StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21Trig1StartTimeRange": "{\"min\":0,\"max\":300}",
@@ -17076,20 +17076,20 @@
       "custom21TweenSelector": "FLOWER 3",
       "custom21ReverseSequence": false,
       "custom21GlideToFirstPose": true,
-      "custom21FirstGlideTimeScale": 5,
+      "custom21FirstGlideTimeScale": 2,
       "custom21TweenChain": [],
       "custom21TweenSpeedMs": 800,
       "custom21TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom21TweenStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom21LoopMode": "Off",
+      "custom21TweenStartTimeRange": "{\"min\":0,\"max\":1907}",
+      "custom21LoopMode": "Loop",
       "custom21LoopHoldMs": 0,
       "custom21TransitionSpeedMs": 700,
       "custom21EasingCurveEnabled": false,
       "custom21EasingCurve": "[{\"x\":0,\"y\":0.5},{\"x\":1,\"y\":0.5}]",
       "custom21SpeedCurveEnabled": true,
       "custom21SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom21SpeedCurveRange": "{\"min\":1420,\"max\":2000}",
-      "custom21StartTimeCurveEnabled": false,
+      "custom21SpeedCurveRange": "{\"min\":1420,\"max\":1596}",
+      "custom21StartTimeCurveEnabled": true,
       "custom21StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21StartTimeRange": "{\"min\":0,\"max\":300}",
       "custom21StartDistanceCurveEnabled": false,
@@ -17110,9 +17110,9 @@
       "custom21TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21TweenRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "custom21TweenStopEnabled": true,
-      "custom21TweenStopStartTimeCurveEnabled": true,
+      "custom21TweenStopStartTimeCurveEnabled": false,
       "custom21TweenStopStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom21TweenStopStartTimeRange": "{\"min\":0,\"max\":3000}",
+      "custom21TweenStopStartTimeRange": "{\"min\":0,\"max\":764}",
       "custom21TweenStopDelayEnabled": true,
       "custom21TweenStopDelayMs": 0,
       "custom21TweenStopDelayCurveEnabled": true,
@@ -17155,16 +17155,16 @@
       "custom21Trig1TweenSelector": "FLOWER 3",
       "custom21Trig1ReverseSequence": true,
       "custom21Trig1GlideToFirstPose": true,
-      "custom21Trig1FirstGlideTimeScale": 5,
+      "custom21Trig1FirstGlideTimeScale": 2,
       "custom21Trig1TweenSpeedMs": 800,
       "custom21Trig1TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom21Trig1TweenStartTimeRange": "{\"min\":1052,\"max\":2319}",
+      "custom21Trig1TweenStartTimeRange": "{\"min\":0,\"max\":2319}",
       "custom21Trig1TransitionSpeedMs": 700,
       "custom21Trig1EasingCurveEnabled": false,
       "custom21Trig1EasingCurve": "[{\"x\":0,\"y\":0.5},{\"x\":1,\"y\":0.5}]",
       "custom21Trig1SpeedCurveEnabled": true,
       "custom21Trig1SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom21Trig1SpeedCurveRange": "{\"min\":1420,\"max\":2000}",
+      "custom21Trig1SpeedCurveRange": "{\"min\":815,\"max\":1220}",
       "custom21Trig1StartTimeCurveEnabled": true,
       "custom21Trig1StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21Trig1StartTimeRange": "{\"min\":0,\"max\":300}",
@@ -25918,20 +25918,20 @@
       "custom21TweenSelector": "FLOWER 3",
       "custom21ReverseSequence": false,
       "custom21GlideToFirstPose": true,
-      "custom21FirstGlideTimeScale": 5,
+      "custom21FirstGlideTimeScale": 2,
       "custom21TweenChain": [],
       "custom21TweenSpeedMs": 800,
       "custom21TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom21TweenStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom21LoopMode": "Off",
+      "custom21TweenStartTimeRange": "{\"min\":0,\"max\":1907}",
+      "custom21LoopMode": "Loop",
       "custom21LoopHoldMs": 0,
       "custom21TransitionSpeedMs": 700,
       "custom21EasingCurveEnabled": false,
       "custom21EasingCurve": "[{\"x\":0,\"y\":0.5},{\"x\":1,\"y\":0.5}]",
       "custom21SpeedCurveEnabled": true,
       "custom21SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom21SpeedCurveRange": "{\"min\":1420,\"max\":2000}",
-      "custom21StartTimeCurveEnabled": false,
+      "custom21SpeedCurveRange": "{\"min\":1420,\"max\":1596}",
+      "custom21StartTimeCurveEnabled": true,
       "custom21StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21StartTimeRange": "{\"min\":0,\"max\":300}",
       "custom21StartDistanceCurveEnabled": false,
@@ -25952,9 +25952,9 @@
       "custom21TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21TweenRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "custom21TweenStopEnabled": true,
-      "custom21TweenStopStartTimeCurveEnabled": true,
+      "custom21TweenStopStartTimeCurveEnabled": false,
       "custom21TweenStopStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom21TweenStopStartTimeRange": "{\"min\":0,\"max\":3000}",
+      "custom21TweenStopStartTimeRange": "{\"min\":0,\"max\":764}",
       "custom21TweenStopDelayEnabled": true,
       "custom21TweenStopDelayMs": 0,
       "custom21TweenStopDelayCurveEnabled": true,
@@ -25997,16 +25997,16 @@
       "custom21Trig1TweenSelector": "FLOWER 3",
       "custom21Trig1ReverseSequence": true,
       "custom21Trig1GlideToFirstPose": true,
-      "custom21Trig1FirstGlideTimeScale": 5,
+      "custom21Trig1FirstGlideTimeScale": 2,
       "custom21Trig1TweenSpeedMs": 800,
       "custom21Trig1TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom21Trig1TweenStartTimeRange": "{\"min\":1052,\"max\":2319}",
+      "custom21Trig1TweenStartTimeRange": "{\"min\":0,\"max\":2319}",
       "custom21Trig1TransitionSpeedMs": 700,
       "custom21Trig1EasingCurveEnabled": false,
       "custom21Trig1EasingCurve": "[{\"x\":0,\"y\":0.5},{\"x\":1,\"y\":0.5}]",
       "custom21Trig1SpeedCurveEnabled": true,
       "custom21Trig1SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom21Trig1SpeedCurveRange": "{\"min\":1420,\"max\":2000}",
+      "custom21Trig1SpeedCurveRange": "{\"min\":815,\"max\":1220}",
       "custom21Trig1StartTimeCurveEnabled": true,
       "custom21Trig1StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21Trig1StartTimeRange": "{\"min\":0,\"max\":300}",
@@ -42328,7 +42328,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 21",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -42823,7 +42823,7 @@
                       "type": "group",
                       "group": {
                         "key": "Tween Stop Start Time Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -42880,7 +42880,7 @@
                   "subgroups": [
                     {
                       "key": "Tween Stop Start Time Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -42950,7 +42950,7 @@
                       "type": "group",
                       "group": {
                         "key": "Trigger 1",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -43745,7 +43745,7 @@
                   "subgroups": [
                     {
                       "key": "Trigger 1",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -44955,7 +44955,7 @@
                     "type": "group",
                     "group": {
                       "key": "Tween Stop Start Time Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -45012,7 +45012,7 @@
                 "subgroups": [
                   {
                     "key": "Tween Stop Start Time Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -45079,7 +45079,7 @@
                     "type": "group",
                     "group": {
                       "key": "Trigger 1",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -45874,7 +45874,7 @@
                 "subgroups": [
                   {
                     "key": "Trigger 1",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -46665,7 +46665,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 20",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -47130,7 +47130,7 @@
                       "type": "group",
                       "group": {
                         "key": "Trigger 1",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -47930,7 +47930,7 @@
                   "subgroups": [
                     {
                       "key": "Trigger 1",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -49106,7 +49106,7 @@
                     "type": "group",
                     "group": {
                       "key": "Trigger 1",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -49906,7 +49906,7 @@
                 "subgroups": [
                   {
                     "key": "Trigger 1",
-                    "collapsed": false,
+                    "collapsed": true,
                     "locked": false,
                     "items": [
                       {
@@ -98313,7 +98313,7 @@
         },
         {
           "key": "Custom Click Function 21",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
@@ -98808,7 +98808,7 @@
                     "type": "group",
                     "group": {
                       "key": "Tween Stop Start Time Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -98865,7 +98865,7 @@
                 "subgroups": [
                   {
                     "key": "Tween Stop Start Time Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -98935,7 +98935,7 @@
                     "type": "group",
                     "group": {
                       "key": "Trigger 1",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -99730,7 +99730,7 @@
                 "subgroups": [
                   {
                     "key": "Trigger 1",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -100940,7 +100940,7 @@
                   "type": "group",
                   "group": {
                     "key": "Tween Stop Start Time Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -100997,7 +100997,7 @@
               "subgroups": [
                 {
                   "key": "Tween Stop Start Time Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -101064,7 +101064,7 @@
                   "type": "group",
                   "group": {
                     "key": "Trigger 1",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -101859,7 +101859,7 @@
               "subgroups": [
                 {
                   "key": "Trigger 1",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -102647,7 +102647,7 @@
         },
         {
           "key": "Custom Click Function 20",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -103112,7 +103112,7 @@
                     "type": "group",
                     "group": {
                       "key": "Trigger 1",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -103912,7 +103912,7 @@
                 "subgroups": [
                   {
                     "key": "Trigger 1",
-                    "collapsed": false,
+                    "collapsed": true,
                     "locked": false,
                     "items": [
                       {
@@ -105088,7 +105088,7 @@
                   "type": "group",
                   "group": {
                     "key": "Trigger 1",
-                    "collapsed": false,
+                    "collapsed": true,
                     "locked": false,
                     "items": [
                       {
@@ -105888,7 +105888,7 @@
               "subgroups": [
                 {
                   "key": "Trigger 1",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -144882,10 +144882,10 @@
       "height": 631.2000122070312
     },
     "mobile": {
-      "left": 53.851192474365234,
-      "top": 12.380952835083008,
-      "width": 340.577392578125,
-      "height": 774.1369018554688
+      "left": 58.5773811340332,
+      "top": 9.339285850524902,
+      "width": 335.8452453613281,
+      "height": 35.52381134033203
     }
   }
 }
