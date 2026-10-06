@@ -2521,13 +2521,18 @@ function applyOrder(groupsEl, order) {
 // control) -- instead applies live cfg/onChange only once per control, for
 // whichever device is actually real right now, matching how a page load
 // itself would behave.
-function applyStoredValues(values) {
+// `skipKeys` (2026-10-06): control keys to leave completely alone -- no store write, no cfg write, NO onChange.
+// Used by Undo/Redo for the live camera sliders (see hostUndoLiveKeys): merely re-running a camera slider's
+// onChange with its own current value is not free (applyCameraControl() re-applies position/zoom sequentially and
+// moved the camera), so those keys must be skipped, not re-applied with their current values.
+function applyStoredValues(values, skipKeys = null) {
   if (!values) return
   const real = realDeviceClass()
   const profT0 = DP_PROFILE ? performance.now() : 0
   const slow = []
   let nControls = 0, nOnChange = 0, onChangeMs = 0
   devGroups.forEach((group) => group.controls.forEach((ctrl) => {
+    if (skipKeys && skipKeys.includes(ctrl.key)) return
     nControls++
     DEVICES.forEach((d) => {
       const v = values[d] ? values[d][ctrl.key] : undefined
@@ -3449,12 +3454,12 @@ export function initDevPanel(groups, opts = {}) {
   // switch to that device/a resize picks up this state's geometry for it
   // too, matching what Copy Settings' own multi-device capture already
   // assumes is possible.
-  function applyFullPanelState(state) {
+  function applyFullPanelState(state, skipKeys = null) {
     if (!state) return
     applyOrder(groupsEl, state.order)
     devVisibility = state.devVisibility || {}
     devIndependence = state.devIndependence || { mobile: {}, landscape: {} }
-    applyStoredValues(state.values)
+    applyStoredValues(state.values, skipKeys)
     textOverrides = { ...(state.textOverrides || {}) }
     applyTextOverrides()
     // Set Hotkey feature -- re-renders every control's own hotkey badge
@@ -3879,19 +3884,10 @@ export function initDevPanel(groups, opts = {}) {
       liveEdit // true when this step was an edit of one of hostUndoLiveKeys (only then does restoring it also restore those)
     })
   }
-  // Applies an undo/redo snapshot, leaving every hostUndoLiveKeys value at what it is RIGHT NOW unless the entry was
-  // an edit of one of them.
+  // Applies an undo/redo snapshot, skipping every hostUndoLiveKeys control entirely (value AND onChange) unless the
+  // entry was an edit of one of them.
   function applyUndoEntryState(entry) {
-    let state = entry.data
-    if (!entry.liveEdit && hostUndoLiveKeys.length && state && state.values) {
-      state = { ...state, values: { ...state.values } }
-      DEVICES.forEach((d) => {
-        if (!state.values[d]) return
-        state.values[d] = { ...state.values[d] }
-        hostUndoLiveKeys.forEach((k) => { if (k in store[d]) state.values[d][k] = store[d][k] })
-      })
-    }
-    applyFullPanelState(state)
+    applyFullPanelState(entry.data, entry.liveEdit || !hostUndoLiveKeys.length ? null : hostUndoLiveKeys)
   }
   function pushDevDeleteUndoEntry(node, parent, nextSibling) {
     devUndoStack.push({ kind: 'delete', node, parent, nextSibling })
