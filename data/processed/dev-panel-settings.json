@@ -8347,14 +8347,14 @@
       "custom21TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21TweenRetransitionStartTimeRange": "{\"min\":0,\"max\":3000}",
       "custom21TweenStopEnabled": true,
-      "custom21TweenStopStartTimeCurveEnabled": true,
+      "custom21TweenStopStartTimeCurveEnabled": false,
       "custom21TweenStopStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom21TweenStopStartTimeRange": "{\"min\":0,\"max\":764}",
+      "custom21TweenStopStartTimeRange": "{\"min\":0,\"max\":2132}",
       "custom21TweenStopDelayEnabled": true,
       "custom21TweenStopDelayMs": 0,
       "custom21TweenStopDelayCurveEnabled": true,
       "custom21TweenStopDelayCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom21TweenStopDelayRange": "{\"min\":1177,\"max\":3777}",
+      "custom21TweenStopDelayRange": "{\"min\":1590,\"max\":3777}",
       "custom21MultiTriggerEnabled": true,
       "custom21MultiTriggers": "[{\"prefix\":\"custom21Trig1\",\"title\":\"Trigger 1\"}]",
       "custom21Trig1Enabled": true,
@@ -8430,11 +8430,11 @@
       "custom21Trig1TweenStopStartTimeCurveEnabled": false,
       "custom21Trig1TweenStopStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21Trig1TweenStopStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom21Trig1TweenStopDelayEnabled": false,
+      "custom21Trig1TweenStopDelayEnabled": true,
       "custom21Trig1TweenStopDelayMs": 0,
-      "custom21Trig1TweenStopDelayCurveEnabled": false,
+      "custom21Trig1TweenStopDelayCurveEnabled": true,
       "custom21Trig1TweenStopDelayCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom21Trig1TweenStopDelayRange": "{\"min\":0,\"max\":2000}",
+      "custom21Trig1TweenStopDelayRange": "{\"min\":1332,\"max\":2598}",
       "custom22Enabled": true,
       "custom22Type": "Click",
       "custom22TouchPointCount": 1,
@@ -18004,14 +18004,14 @@
       "custom21TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21TweenRetransitionStartTimeRange": "{\"min\":0,\"max\":3000}",
       "custom21TweenStopEnabled": true,
-      "custom21TweenStopStartTimeCurveEnabled": true,
+      "custom21TweenStopStartTimeCurveEnabled": false,
       "custom21TweenStopStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom21TweenStopStartTimeRange": "{\"min\":0,\"max\":764}",
+      "custom21TweenStopStartTimeRange": "{\"min\":0,\"max\":2132}",
       "custom21TweenStopDelayEnabled": true,
       "custom21TweenStopDelayMs": 0,
       "custom21TweenStopDelayCurveEnabled": true,
       "custom21TweenStopDelayCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom21TweenStopDelayRange": "{\"min\":1177,\"max\":3777}",
+      "custom21TweenStopDelayRange": "{\"min\":1590,\"max\":3777}",
       "custom21MultiTriggerEnabled": true,
       "custom21MultiTriggers": "[{\"prefix\":\"custom21Trig1\",\"title\":\"Trigger 1\"}]",
       "custom21Trig1Enabled": true,
@@ -18087,11 +18087,11 @@
       "custom21Trig1TweenStopStartTimeCurveEnabled": false,
       "custom21Trig1TweenStopStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21Trig1TweenStopStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom21Trig1TweenStopDelayEnabled": false,
+      "custom21Trig1TweenStopDelayEnabled": true,
       "custom21Trig1TweenStopDelayMs": 0,
-      "custom21Trig1TweenStopDelayCurveEnabled": false,
+      "custom21Trig1TweenStopDelayCurveEnabled": true,
       "custom21Trig1TweenStopDelayCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom21Trig1TweenStopDelayRange": "{\"min\":0,\"max\":2000}",
+      "custom21Trig1TweenStopDelayRange": "{\"min\":1332,\"max\":2598}",
       "custom22Enabled": true,
       "custom22Type": "Click",
       "custom22TouchPointCount": 1,
@@ -18486,7 +18486,7 @@
       "custom24Trig1CursorOffsetYRange": "{\"min\":0,\"max\":0}",
       "custom24Trig1CursorOffsetZCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom24Trig1CursorOffsetZRange": "{\"min\":0,\"max\":0}",
-      "custom24Trig1CameraOffsetEnabled": true,
+      "custom24Trig1CameraOffsetEnabled": false,
       "custom24Trig1CameraOffsetXEnabled": false,
       "custom24Trig1CameraOffsetXCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom24Trig1CameraOffsetXRange": "{\"min\":0,\"max\":10}",
@@ -27661,14 +27661,14 @@
       "custom21TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21TweenRetransitionStartTimeRange": "{\"min\":0,\"max\":3000}",
       "custom21TweenStopEnabled": true,
-      "custom21TweenStopStartTimeCurveEnabled": true,
+      "custom21TweenStopStartTimeCurveEnabled": false,
       "custom21TweenStopStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom21TweenStopStartTimeRange": "{\"min\":0,\"max\":764}",
+      "custom21TweenStopStartTimeRange": "{\"min\":0,\"max\":2132}",
       "custom21TweenStopDelayEnabled": true,
       "custom21TweenStopDelayMs": 0,
       "custom21TweenStopDelayCurveEnabled": true,
       "custom21TweenStopDelayCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom21TweenStopDelayRange": "{\"min\":1177,\"max\":3777}",
+      "custom21TweenStopDelayRange": "{\"min\":1590,\"max\":3777}",
       "custom21MultiTriggerEnabled": true,
       "custom21MultiTriggers": "[{\"prefix\":\"custom21Trig1\",\"title\":\"Trigger 1\"}]",
       "custom21Trig1Enabled": true,
@@ -27744,11 +27744,11 @@
       "custom21Trig1TweenStopStartTimeCurveEnabled": false,
       "custom21Trig1TweenStopStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21Trig1TweenStopStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom21Trig1TweenStopDelayEnabled": false,
+      "custom21Trig1TweenStopDelayEnabled": true,
       "custom21Trig1TweenStopDelayMs": 0,
-      "custom21Trig1TweenStopDelayCurveEnabled": false,
+      "custom21Trig1TweenStopDelayCurveEnabled": true,
       "custom21Trig1TweenStopDelayCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom21Trig1TweenStopDelayRange": "{\"min\":0,\"max\":2000}",
+      "custom21Trig1TweenStopDelayRange": "{\"min\":1332,\"max\":2598}",
       "custom22Enabled": true,
       "custom22Type": "Click",
       "custom22TouchPointCount": 1,
@@ -31001,7 +31001,7 @@
           "type": "group",
           "group": {
             "key": "Field Layout",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -32205,7 +32205,7 @@
       "subgroups": [
         {
           "key": "Field Layout",
-          "collapsed": false,
+          "collapsed": true,
           "locked": true,
           "items": [
             {
@@ -57860,7 +57860,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 24",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -57943,7 +57943,7 @@
                 "type": "group",
                 "group": {
                   "key": "Offset",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": true,
                   "items": [
                     {
@@ -58026,7 +58026,7 @@
                 "type": "group",
                 "group": {
                   "key": "Offset To Camera",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": true,
                   "items": [
                     {
@@ -58319,7 +58319,7 @@
                 "type": "group",
                 "group": {
                   "key": "Multi Trigger",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -58334,7 +58334,7 @@
                       "type": "group",
                       "group": {
                         "key": "Trigger 1",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -58488,7 +58488,7 @@
                             "type": "group",
                             "group": {
                               "key": "Offset To Camera",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -58879,7 +58879,7 @@
                           },
                           {
                             "key": "Offset To Camera",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -59164,7 +59164,7 @@
                   "subgroups": [
                     {
                       "key": "Trigger 1",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -59318,7 +59318,7 @@
                           "type": "group",
                           "group": {
                             "key": "Offset To Camera",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -59709,7 +59709,7 @@
                         },
                         {
                           "key": "Offset To Camera",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -60009,7 +60009,7 @@
             "subgroups": [
               {
                 "key": "Offset",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": true,
                 "items": [
                   {
@@ -60089,7 +60089,7 @@
               },
               {
                 "key": "Offset To Camera",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": true,
                 "items": [
                   {
@@ -60361,7 +60361,7 @@
               },
               {
                 "key": "Multi Trigger",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -60376,7 +60376,7 @@
                     "type": "group",
                     "group": {
                       "key": "Trigger 1",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -60530,7 +60530,7 @@
                           "type": "group",
                           "group": {
                             "key": "Offset To Camera",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -60921,7 +60921,7 @@
                         },
                         {
                           "key": "Offset To Camera",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -61206,7 +61206,7 @@
                 "subgroups": [
                   {
                     "key": "Trigger 1",
-                    "collapsed": false,
+                    "collapsed": true,
                     "locked": false,
                     "items": [
                       {
@@ -61360,7 +61360,7 @@
                         "type": "group",
                         "group": {
                           "key": "Offset To Camera",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -61751,7 +61751,7 @@
                       },
                       {
                         "key": "Offset To Camera",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -71926,7 +71926,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 21",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -72185,7 +72185,7 @@
                 "group": {
                   "key": "Animation Speed Curve",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [
                     {
                       "type": "row",
@@ -72237,6 +72237,10 @@
                 }
               },
               {
+                "type": "row",
+                "key": "custom21TweenStopStartTimeCurve"
+              },
+              {
                 "type": "group",
                 "group": {
                   "key": "Start Distance Curve",
@@ -72263,6 +72267,10 @@
                   ],
                   "subgroups": []
                 }
+              },
+              {
+                "type": "row",
+                "key": "custom21TweenStopDelayCurve"
               },
               {
                 "type": "group",
@@ -72418,27 +72426,22 @@
                 "type": "group",
                 "group": {
                   "key": "Tween Stop",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
                       "type": "group",
                       "group": {
                         "key": "Tween Stop Start Time Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
-                          {
-                            "type": "row",
-                            "key": "custom21TweenStopStartTimeCurve"
-                          },
                           {
                             "type": "row",
                             "key": "custom21TweenStopStartTimeRange"
                           }
                         ],
                         "settings": [
-                          "custom21TweenStopStartTimeCurve",
                           "custom21TweenStopStartTimeRange"
                         ],
                         "subgroups": []
@@ -72448,7 +72451,7 @@
                       "type": "group",
                       "group": {
                         "key": "Tween Stop Delay",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -72461,17 +72464,12 @@
                           },
                           {
                             "type": "row",
-                            "key": "custom21TweenStopDelayCurve"
-                          },
-                          {
-                            "type": "row",
                             "key": "custom21TweenStopDelayRange"
                           }
                         ],
                         "settings": [
                           "custom21TweenStopDelayMs",
                           "custom21TweenStopDelayCurveEnabled",
-                          "custom21TweenStopDelayCurve",
                           "custom21TweenStopDelayRange"
                         ],
                         "subgroups": []
@@ -72482,27 +72480,22 @@
                   "subgroups": [
                     {
                       "key": "Tween Stop Start Time Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
-                        {
-                          "type": "row",
-                          "key": "custom21TweenStopStartTimeCurve"
-                        },
                         {
                           "type": "row",
                           "key": "custom21TweenStopStartTimeRange"
                         }
                       ],
                       "settings": [
-                        "custom21TweenStopStartTimeCurve",
                         "custom21TweenStopStartTimeRange"
                       ],
                       "subgroups": []
                     },
                     {
                       "key": "Tween Stop Delay",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -72515,17 +72508,12 @@
                         },
                         {
                           "type": "row",
-                          "key": "custom21TweenStopDelayCurve"
-                        },
-                        {
-                          "type": "row",
                           "key": "custom21TweenStopDelayRange"
                         }
                       ],
                       "settings": [
                         "custom21TweenStopDelayMs",
                         "custom21TweenStopDelayCurveEnabled",
-                        "custom21TweenStopDelayCurve",
                         "custom21TweenStopDelayRange"
                       ],
                       "subgroups": []
@@ -72537,7 +72525,7 @@
                 "type": "group",
                 "group": {
                   "key": "Multi Trigger",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -72552,7 +72540,7 @@
                       "type": "group",
                       "group": {
                         "key": "Trigger 1",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -73032,7 +73020,7 @@
                             "type": "group",
                             "group": {
                               "key": "Tween Stop",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -73062,7 +73050,7 @@
                                   "type": "group",
                                   "group": {
                                     "key": "Tween Stop Delay",
-                                    "collapsed": true,
+                                    "collapsed": false,
                                     "locked": false,
                                     "items": [
                                       {
@@ -73116,7 +73104,7 @@
                                 },
                                 {
                                   "key": "Tween Stop Delay",
-                                  "collapsed": true,
+                                  "collapsed": false,
                                   "locked": false,
                                   "items": [
                                     {
@@ -73563,7 +73551,7 @@
                           },
                           {
                             "key": "Tween Stop",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -73593,7 +73581,7 @@
                                 "type": "group",
                                 "group": {
                                   "key": "Tween Stop Delay",
-                                  "collapsed": true,
+                                  "collapsed": false,
                                   "locked": false,
                                   "items": [
                                     {
@@ -73647,7 +73635,7 @@
                               },
                               {
                                 "key": "Tween Stop Delay",
-                                "collapsed": true,
+                                "collapsed": false,
                                 "locked": false,
                                 "items": [
                                   {
@@ -73692,7 +73680,7 @@
                   "subgroups": [
                     {
                       "key": "Trigger 1",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -74172,7 +74160,7 @@
                           "type": "group",
                           "group": {
                             "key": "Tween Stop",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -74202,7 +74190,7 @@
                                 "type": "group",
                                 "group": {
                                   "key": "Tween Stop Delay",
-                                  "collapsed": true,
+                                  "collapsed": false,
                                   "locked": false,
                                   "items": [
                                     {
@@ -74256,7 +74244,7 @@
                               },
                               {
                                 "key": "Tween Stop Delay",
-                                "collapsed": true,
+                                "collapsed": false,
                                 "locked": false,
                                 "items": [
                                   {
@@ -74703,7 +74691,7 @@
                         },
                         {
                           "key": "Tween Stop",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -74733,7 +74721,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Tween Stop Delay",
-                                "collapsed": true,
+                                "collapsed": false,
                                 "locked": false,
                                 "items": [
                                   {
@@ -74787,7 +74775,7 @@
                             },
                             {
                               "key": "Tween Stop Delay",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -74839,7 +74827,9 @@
               "custom21TransitionSpeedMs",
               "custom21TweenSpeedMs",
               "custom21LoopMode",
-              "custom21LoopHoldMs"
+              "custom21LoopHoldMs",
+              "custom21TweenStopStartTimeCurve",
+              "custom21TweenStopDelayCurve"
             ],
             "subgroups": [
               {
@@ -75020,7 +75010,7 @@
               {
                 "key": "Animation Speed Curve",
                 "collapsed": true,
-                "locked": false,
+                "locked": true,
                 "items": [
                   {
                     "type": "row",
@@ -75241,27 +75231,22 @@
               },
               {
                 "key": "Tween Stop",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
                     "type": "group",
                     "group": {
                       "key": "Tween Stop Start Time Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
-                        {
-                          "type": "row",
-                          "key": "custom21TweenStopStartTimeCurve"
-                        },
                         {
                           "type": "row",
                           "key": "custom21TweenStopStartTimeRange"
                         }
                       ],
                       "settings": [
-                        "custom21TweenStopStartTimeCurve",
                         "custom21TweenStopStartTimeRange"
                       ],
                       "subgroups": []
@@ -75271,7 +75256,7 @@
                     "type": "group",
                     "group": {
                       "key": "Tween Stop Delay",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -75284,17 +75269,12 @@
                         },
                         {
                           "type": "row",
-                          "key": "custom21TweenStopDelayCurve"
-                        },
-                        {
-                          "type": "row",
                           "key": "custom21TweenStopDelayRange"
                         }
                       ],
                       "settings": [
                         "custom21TweenStopDelayMs",
                         "custom21TweenStopDelayCurveEnabled",
-                        "custom21TweenStopDelayCurve",
                         "custom21TweenStopDelayRange"
                       ],
                       "subgroups": []
@@ -75305,27 +75285,22 @@
                 "subgroups": [
                   {
                     "key": "Tween Stop Start Time Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
-                      {
-                        "type": "row",
-                        "key": "custom21TweenStopStartTimeCurve"
-                      },
                       {
                         "type": "row",
                         "key": "custom21TweenStopStartTimeRange"
                       }
                     ],
                     "settings": [
-                      "custom21TweenStopStartTimeCurve",
                       "custom21TweenStopStartTimeRange"
                     ],
                     "subgroups": []
                   },
                   {
                     "key": "Tween Stop Delay",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -75338,17 +75313,12 @@
                       },
                       {
                         "type": "row",
-                        "key": "custom21TweenStopDelayCurve"
-                      },
-                      {
-                        "type": "row",
                         "key": "custom21TweenStopDelayRange"
                       }
                     ],
                     "settings": [
                       "custom21TweenStopDelayMs",
                       "custom21TweenStopDelayCurveEnabled",
-                      "custom21TweenStopDelayCurve",
                       "custom21TweenStopDelayRange"
                     ],
                     "subgroups": []
@@ -75357,7 +75327,7 @@
               },
               {
                 "key": "Multi Trigger",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -75372,7 +75342,7 @@
                     "type": "group",
                     "group": {
                       "key": "Trigger 1",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -75852,7 +75822,7 @@
                           "type": "group",
                           "group": {
                             "key": "Tween Stop",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -75882,7 +75852,7 @@
                                 "type": "group",
                                 "group": {
                                   "key": "Tween Stop Delay",
-                                  "collapsed": true,
+                                  "collapsed": false,
                                   "locked": false,
                                   "items": [
                                     {
@@ -75936,7 +75906,7 @@
                               },
                               {
                                 "key": "Tween Stop Delay",
-                                "collapsed": true,
+                                "collapsed": false,
                                 "locked": false,
                                 "items": [
                                   {
@@ -76383,7 +76353,7 @@
                         },
                         {
                           "key": "Tween Stop",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -76413,7 +76383,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Tween Stop Delay",
-                                "collapsed": true,
+                                "collapsed": false,
                                 "locked": false,
                                 "items": [
                                   {
@@ -76467,7 +76437,7 @@
                             },
                             {
                               "key": "Tween Stop Delay",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -76512,7 +76482,7 @@
                 "subgroups": [
                   {
                     "key": "Trigger 1",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -76992,7 +76962,7 @@
                         "type": "group",
                         "group": {
                           "key": "Tween Stop",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -77022,7 +76992,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Tween Stop Delay",
-                                "collapsed": true,
+                                "collapsed": false,
                                 "locked": false,
                                 "items": [
                                   {
@@ -77076,7 +77046,7 @@
                             },
                             {
                               "key": "Tween Stop Delay",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -77523,7 +77493,7 @@
                       },
                       {
                         "key": "Tween Stop",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -77553,7 +77523,7 @@
                             "type": "group",
                             "group": {
                               "key": "Tween Stop Delay",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -77607,7 +77577,7 @@
                           },
                           {
                             "key": "Tween Stop Delay",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -77814,7 +77784,7 @@
                 "type": "group",
                 "group": {
                   "key": "Offset To Camera",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": true,
                   "items": [
                     {
@@ -79877,7 +79847,7 @@
               },
               {
                 "key": "Offset To Camera",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": true,
                 "items": [
                   {
@@ -144793,7 +144763,7 @@
         },
         {
           "key": "Custom Click Function 24",
-          "collapsed": false,
+          "collapsed": true,
           "locked": true,
           "items": [
             {
@@ -144876,7 +144846,7 @@
               "type": "group",
               "group": {
                 "key": "Offset",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": true,
                 "items": [
                   {
@@ -144959,7 +144929,7 @@
               "type": "group",
               "group": {
                 "key": "Offset To Camera",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": true,
                 "items": [
                   {
@@ -145252,7 +145222,7 @@
               "type": "group",
               "group": {
                 "key": "Multi Trigger",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -145267,7 +145237,7 @@
                     "type": "group",
                     "group": {
                       "key": "Trigger 1",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -145421,7 +145391,7 @@
                           "type": "group",
                           "group": {
                             "key": "Offset To Camera",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -145812,7 +145782,7 @@
                         },
                         {
                           "key": "Offset To Camera",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -146097,7 +146067,7 @@
                 "subgroups": [
                   {
                     "key": "Trigger 1",
-                    "collapsed": false,
+                    "collapsed": true,
                     "locked": false,
                     "items": [
                       {
@@ -146251,7 +146221,7 @@
                         "type": "group",
                         "group": {
                           "key": "Offset To Camera",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -146642,7 +146612,7 @@
                       },
                       {
                         "key": "Offset To Camera",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -146942,7 +146912,7 @@
           "subgroups": [
             {
               "key": "Offset",
-              "collapsed": false,
+              "collapsed": true,
               "locked": true,
               "items": [
                 {
@@ -147022,7 +146992,7 @@
             },
             {
               "key": "Offset To Camera",
-              "collapsed": false,
+              "collapsed": true,
               "locked": true,
               "items": [
                 {
@@ -147294,7 +147264,7 @@
             },
             {
               "key": "Multi Trigger",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -147309,7 +147279,7 @@
                   "type": "group",
                   "group": {
                     "key": "Trigger 1",
-                    "collapsed": false,
+                    "collapsed": true,
                     "locked": false,
                     "items": [
                       {
@@ -147463,7 +147433,7 @@
                         "type": "group",
                         "group": {
                           "key": "Offset To Camera",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -147854,7 +147824,7 @@
                       },
                       {
                         "key": "Offset To Camera",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -148139,7 +148109,7 @@
               "subgroups": [
                 {
                   "key": "Trigger 1",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -148293,7 +148263,7 @@
                       "type": "group",
                       "group": {
                         "key": "Offset To Camera",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -148684,7 +148654,7 @@
                     },
                     {
                       "key": "Offset To Camera",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -158850,7 +158820,7 @@
         },
         {
           "key": "Custom Click Function 21",
-          "collapsed": true,
+          "collapsed": false,
           "locked": true,
           "items": [
             {
@@ -159109,7 +159079,7 @@
               "group": {
                 "key": "Animation Speed Curve",
                 "collapsed": true,
-                "locked": false,
+                "locked": true,
                 "items": [
                   {
                     "type": "row",
@@ -159161,6 +159131,10 @@
               }
             },
             {
+              "type": "row",
+              "key": "custom21TweenStopStartTimeCurve"
+            },
+            {
               "type": "group",
               "group": {
                 "key": "Start Distance Curve",
@@ -159187,6 +159161,10 @@
                 ],
                 "subgroups": []
               }
+            },
+            {
+              "type": "row",
+              "key": "custom21TweenStopDelayCurve"
             },
             {
               "type": "group",
@@ -159342,27 +159320,22 @@
               "type": "group",
               "group": {
                 "key": "Tween Stop",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
                     "type": "group",
                     "group": {
                       "key": "Tween Stop Start Time Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
-                        {
-                          "type": "row",
-                          "key": "custom21TweenStopStartTimeCurve"
-                        },
                         {
                           "type": "row",
                           "key": "custom21TweenStopStartTimeRange"
                         }
                       ],
                       "settings": [
-                        "custom21TweenStopStartTimeCurve",
                         "custom21TweenStopStartTimeRange"
                       ],
                       "subgroups": []
@@ -159372,7 +159345,7 @@
                     "type": "group",
                     "group": {
                       "key": "Tween Stop Delay",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -159385,17 +159358,12 @@
                         },
                         {
                           "type": "row",
-                          "key": "custom21TweenStopDelayCurve"
-                        },
-                        {
-                          "type": "row",
                           "key": "custom21TweenStopDelayRange"
                         }
                       ],
                       "settings": [
                         "custom21TweenStopDelayMs",
                         "custom21TweenStopDelayCurveEnabled",
-                        "custom21TweenStopDelayCurve",
                         "custom21TweenStopDelayRange"
                       ],
                       "subgroups": []
@@ -159406,27 +159374,22 @@
                 "subgroups": [
                   {
                     "key": "Tween Stop Start Time Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
-                      {
-                        "type": "row",
-                        "key": "custom21TweenStopStartTimeCurve"
-                      },
                       {
                         "type": "row",
                         "key": "custom21TweenStopStartTimeRange"
                       }
                     ],
                     "settings": [
-                      "custom21TweenStopStartTimeCurve",
                       "custom21TweenStopStartTimeRange"
                     ],
                     "subgroups": []
                   },
                   {
                     "key": "Tween Stop Delay",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -159439,17 +159402,12 @@
                       },
                       {
                         "type": "row",
-                        "key": "custom21TweenStopDelayCurve"
-                      },
-                      {
-                        "type": "row",
                         "key": "custom21TweenStopDelayRange"
                       }
                     ],
                     "settings": [
                       "custom21TweenStopDelayMs",
                       "custom21TweenStopDelayCurveEnabled",
-                      "custom21TweenStopDelayCurve",
                       "custom21TweenStopDelayRange"
                     ],
                     "subgroups": []
@@ -159461,7 +159419,7 @@
               "type": "group",
               "group": {
                 "key": "Multi Trigger",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -159476,7 +159434,7 @@
                     "type": "group",
                     "group": {
                       "key": "Trigger 1",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -159956,7 +159914,7 @@
                           "type": "group",
                           "group": {
                             "key": "Tween Stop",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -159986,7 +159944,7 @@
                                 "type": "group",
                                 "group": {
                                   "key": "Tween Stop Delay",
-                                  "collapsed": true,
+                                  "collapsed": false,
                                   "locked": false,
                                   "items": [
                                     {
@@ -160040,7 +159998,7 @@
                               },
                               {
                                 "key": "Tween Stop Delay",
-                                "collapsed": true,
+                                "collapsed": false,
                                 "locked": false,
                                 "items": [
                                   {
@@ -160487,7 +160445,7 @@
                         },
                         {
                           "key": "Tween Stop",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -160517,7 +160475,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Tween Stop Delay",
-                                "collapsed": true,
+                                "collapsed": false,
                                 "locked": false,
                                 "items": [
                                   {
@@ -160571,7 +160529,7 @@
                             },
                             {
                               "key": "Tween Stop Delay",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -160616,7 +160574,7 @@
                 "subgroups": [
                   {
                     "key": "Trigger 1",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -161096,7 +161054,7 @@
                         "type": "group",
                         "group": {
                           "key": "Tween Stop",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -161126,7 +161084,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Tween Stop Delay",
-                                "collapsed": true,
+                                "collapsed": false,
                                 "locked": false,
                                 "items": [
                                   {
@@ -161180,7 +161138,7 @@
                             },
                             {
                               "key": "Tween Stop Delay",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -161627,7 +161585,7 @@
                       },
                       {
                         "key": "Tween Stop",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -161657,7 +161615,7 @@
                             "type": "group",
                             "group": {
                               "key": "Tween Stop Delay",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -161711,7 +161669,7 @@
                           },
                           {
                             "key": "Tween Stop Delay",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -161763,7 +161721,9 @@
             "custom21TransitionSpeedMs",
             "custom21TweenSpeedMs",
             "custom21LoopMode",
-            "custom21LoopHoldMs"
+            "custom21LoopHoldMs",
+            "custom21TweenStopStartTimeCurve",
+            "custom21TweenStopDelayCurve"
           ],
           "subgroups": [
             {
@@ -161944,7 +161904,7 @@
             {
               "key": "Animation Speed Curve",
               "collapsed": true,
-              "locked": false,
+              "locked": true,
               "items": [
                 {
                   "type": "row",
@@ -162165,27 +162125,22 @@
             },
             {
               "key": "Tween Stop",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
                   "type": "group",
                   "group": {
                     "key": "Tween Stop Start Time Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
-                      {
-                        "type": "row",
-                        "key": "custom21TweenStopStartTimeCurve"
-                      },
                       {
                         "type": "row",
                         "key": "custom21TweenStopStartTimeRange"
                       }
                     ],
                     "settings": [
-                      "custom21TweenStopStartTimeCurve",
                       "custom21TweenStopStartTimeRange"
                     ],
                     "subgroups": []
@@ -162195,7 +162150,7 @@
                   "type": "group",
                   "group": {
                     "key": "Tween Stop Delay",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -162208,17 +162163,12 @@
                       },
                       {
                         "type": "row",
-                        "key": "custom21TweenStopDelayCurve"
-                      },
-                      {
-                        "type": "row",
                         "key": "custom21TweenStopDelayRange"
                       }
                     ],
                     "settings": [
                       "custom21TweenStopDelayMs",
                       "custom21TweenStopDelayCurveEnabled",
-                      "custom21TweenStopDelayCurve",
                       "custom21TweenStopDelayRange"
                     ],
                     "subgroups": []
@@ -162229,27 +162179,22 @@
               "subgroups": [
                 {
                   "key": "Tween Stop Start Time Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
-                    {
-                      "type": "row",
-                      "key": "custom21TweenStopStartTimeCurve"
-                    },
                     {
                       "type": "row",
                       "key": "custom21TweenStopStartTimeRange"
                     }
                   ],
                   "settings": [
-                    "custom21TweenStopStartTimeCurve",
                     "custom21TweenStopStartTimeRange"
                   ],
                   "subgroups": []
                 },
                 {
                   "key": "Tween Stop Delay",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -162262,17 +162207,12 @@
                     },
                     {
                       "type": "row",
-                      "key": "custom21TweenStopDelayCurve"
-                    },
-                    {
-                      "type": "row",
                       "key": "custom21TweenStopDelayRange"
                     }
                   ],
                   "settings": [
                     "custom21TweenStopDelayMs",
                     "custom21TweenStopDelayCurveEnabled",
-                    "custom21TweenStopDelayCurve",
                     "custom21TweenStopDelayRange"
                   ],
                   "subgroups": []
@@ -162281,7 +162221,7 @@
             },
             {
               "key": "Multi Trigger",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -162296,7 +162236,7 @@
                   "type": "group",
                   "group": {
                     "key": "Trigger 1",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -162776,7 +162716,7 @@
                         "type": "group",
                         "group": {
                           "key": "Tween Stop",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -162806,7 +162746,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Tween Stop Delay",
-                                "collapsed": true,
+                                "collapsed": false,
                                 "locked": false,
                                 "items": [
                                   {
@@ -162860,7 +162800,7 @@
                             },
                             {
                               "key": "Tween Stop Delay",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -163307,7 +163247,7 @@
                       },
                       {
                         "key": "Tween Stop",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -163337,7 +163277,7 @@
                             "type": "group",
                             "group": {
                               "key": "Tween Stop Delay",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -163391,7 +163331,7 @@
                           },
                           {
                             "key": "Tween Stop Delay",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -163436,7 +163376,7 @@
               "subgroups": [
                 {
                   "key": "Trigger 1",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -163916,7 +163856,7 @@
                       "type": "group",
                       "group": {
                         "key": "Tween Stop",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -163946,7 +163886,7 @@
                             "type": "group",
                             "group": {
                               "key": "Tween Stop Delay",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -164000,7 +163940,7 @@
                           },
                           {
                             "key": "Tween Stop Delay",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -164447,7 +164387,7 @@
                     },
                     {
                       "key": "Tween Stop",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -164477,7 +164417,7 @@
                           "type": "group",
                           "group": {
                             "key": "Tween Stop Delay",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -164531,7 +164471,7 @@
                         },
                         {
                           "key": "Tween Stop Delay",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -164735,7 +164675,7 @@
               "type": "group",
               "group": {
                 "key": "Offset To Camera",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": true,
                 "items": [
                   {
@@ -166798,7 +166738,7 @@
             },
             {
               "key": "Offset To Camera",
-              "collapsed": false,
+              "collapsed": true,
               "locked": true,
               "items": [
                 {
@@ -209300,9 +209240,9 @@
     },
     "mobile": {
       "left": 42.81547546386719,
-      "top": 170.9345245361328,
-      "width": 348.1785888671875,
-      "height": 35.52381134033203
+      "top": 17.14285659790039,
+      "width": 351.6071472167969,
+      "height": 769.375
     }
   }
 }
