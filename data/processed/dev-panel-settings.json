@@ -8347,14 +8347,14 @@
       "custom21TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21TweenRetransitionStartTimeRange": "{\"min\":0,\"max\":3000}",
       "custom21TweenStopEnabled": true,
-      "custom21TweenStopStartTimeCurveEnabled": true,
+      "custom21TweenStopStartTimeCurveEnabled": false,
       "custom21TweenStopStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21TweenStopStartTimeRange": "{\"min\":640,\"max\":1532}",
       "custom21TweenStopDelayEnabled": true,
       "custom21TweenStopDelayMs": 0,
       "custom21TweenStopDelayCurveEnabled": true,
       "custom21TweenStopDelayCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom21TweenStopDelayRange": "{\"min\":1886,\"max\":3713}",
+      "custom21TweenStopDelayRange": "{\"min\":2658,\"max\":4707}",
       "custom21MultiTriggerEnabled": true,
       "custom21MultiTriggers": "[{\"prefix\":\"custom21Trig1\",\"title\":\"Trigger 1\"}]",
       "custom21Trig1Enabled": true,
@@ -8427,14 +8427,14 @@
       "custom21Trig1TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21Trig1TweenRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "custom21Trig1TweenStopEnabled": true,
-      "custom21Trig1TweenStopStartTimeCurveEnabled": true,
+      "custom21Trig1TweenStopStartTimeCurveEnabled": false,
       "custom21Trig1TweenStopStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21Trig1TweenStopStartTimeRange": "{\"min\":994,\"max\":2040}",
       "custom21Trig1TweenStopDelayEnabled": true,
       "custom21Trig1TweenStopDelayMs": 0,
       "custom21Trig1TweenStopDelayCurveEnabled": true,
       "custom21Trig1TweenStopDelayCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom21Trig1TweenStopDelayRange": "{\"min\":1630,\"max\":3622}",
+      "custom21Trig1TweenStopDelayRange": "{\"min\":2212,\"max\":5000}",
       "custom22Enabled": true,
       "custom22Type": "Click",
       "custom22TouchPointCount": 1,
@@ -18004,14 +18004,14 @@
       "custom21TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21TweenRetransitionStartTimeRange": "{\"min\":0,\"max\":3000}",
       "custom21TweenStopEnabled": true,
-      "custom21TweenStopStartTimeCurveEnabled": true,
+      "custom21TweenStopStartTimeCurveEnabled": false,
       "custom21TweenStopStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21TweenStopStartTimeRange": "{\"min\":640,\"max\":1532}",
       "custom21TweenStopDelayEnabled": true,
       "custom21TweenStopDelayMs": 0,
       "custom21TweenStopDelayCurveEnabled": true,
       "custom21TweenStopDelayCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom21TweenStopDelayRange": "{\"min\":1886,\"max\":3713}",
+      "custom21TweenStopDelayRange": "{\"min\":2658,\"max\":4707}",
       "custom21MultiTriggerEnabled": true,
       "custom21MultiTriggers": "[{\"prefix\":\"custom21Trig1\",\"title\":\"Trigger 1\"}]",
       "custom21Trig1Enabled": true,
@@ -18084,14 +18084,14 @@
       "custom21Trig1TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21Trig1TweenRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "custom21Trig1TweenStopEnabled": true,
-      "custom21Trig1TweenStopStartTimeCurveEnabled": true,
+      "custom21Trig1TweenStopStartTimeCurveEnabled": false,
       "custom21Trig1TweenStopStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21Trig1TweenStopStartTimeRange": "{\"min\":994,\"max\":2040}",
       "custom21Trig1TweenStopDelayEnabled": true,
       "custom21Trig1TweenStopDelayMs": 0,
       "custom21Trig1TweenStopDelayCurveEnabled": true,
       "custom21Trig1TweenStopDelayCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom21Trig1TweenStopDelayRange": "{\"min\":1630,\"max\":3622}",
+      "custom21Trig1TweenStopDelayRange": "{\"min\":2212,\"max\":5000}",
       "custom22Enabled": true,
       "custom22Type": "Click",
       "custom22TouchPointCount": 1,
@@ -27661,14 +27661,14 @@
       "custom21TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21TweenRetransitionStartTimeRange": "{\"min\":0,\"max\":3000}",
       "custom21TweenStopEnabled": true,
-      "custom21TweenStopStartTimeCurveEnabled": true,
+      "custom21TweenStopStartTimeCurveEnabled": false,
       "custom21TweenStopStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21TweenStopStartTimeRange": "{\"min\":640,\"max\":1532}",
       "custom21TweenStopDelayEnabled": true,
       "custom21TweenStopDelayMs": 0,
       "custom21TweenStopDelayCurveEnabled": true,
       "custom21TweenStopDelayCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom21TweenStopDelayRange": "{\"min\":1886,\"max\":3713}",
+      "custom21TweenStopDelayRange": "{\"min\":2658,\"max\":4707}",
       "custom21MultiTriggerEnabled": true,
       "custom21MultiTriggers": "[{\"prefix\":\"custom21Trig1\",\"title\":\"Trigger 1\"}]",
       "custom21Trig1Enabled": true,
@@ -27741,14 +27741,14 @@
       "custom21Trig1TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21Trig1TweenRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "custom21Trig1TweenStopEnabled": true,
-      "custom21Trig1TweenStopStartTimeCurveEnabled": true,
+      "custom21Trig1TweenStopStartTimeCurveEnabled": false,
       "custom21Trig1TweenStopStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21Trig1TweenStopStartTimeRange": "{\"min\":994,\"max\":2040}",
       "custom21Trig1TweenStopDelayEnabled": true,
       "custom21Trig1TweenStopDelayMs": 0,
       "custom21Trig1TweenStopDelayCurveEnabled": true,
       "custom21Trig1TweenStopDelayCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom21Trig1TweenStopDelayRange": "{\"min\":1630,\"max\":3622}",
+      "custom21Trig1TweenStopDelayRange": "{\"min\":2212,\"max\":5000}",
       "custom22Enabled": true,
       "custom22Type": "Click",
       "custom22TouchPointCount": 1,
@@ -72431,7 +72431,7 @@
                       "type": "group",
                       "group": {
                         "key": "Tween Stop Delay",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -72475,7 +72475,7 @@
                     },
                     {
                       "key": "Tween Stop Delay",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -72505,7 +72505,7 @@
                 "type": "group",
                 "group": {
                   "key": "Multi Trigger",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -73000,7 +73000,7 @@
                             "type": "group",
                             "group": {
                               "key": "Tween Stop",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -73027,10 +73027,14 @@
                                   }
                                 },
                                 {
+                                  "type": "row",
+                                  "key": "custom21Trig1TweenStopDelayCurve"
+                                },
+                                {
                                   "type": "group",
                                   "group": {
                                     "key": "Tween Stop Delay",
-                                    "collapsed": true,
+                                    "collapsed": false,
                                     "locked": false,
                                     "items": [
                                       {
@@ -73043,24 +73047,21 @@
                                       },
                                       {
                                         "type": "row",
-                                        "key": "custom21Trig1TweenStopDelayCurve"
-                                      },
-                                      {
-                                        "type": "row",
                                         "key": "custom21Trig1TweenStopDelayRange"
                                       }
                                     ],
                                     "settings": [
                                       "custom21Trig1TweenStopDelayMs",
                                       "custom21Trig1TweenStopDelayCurveEnabled",
-                                      "custom21Trig1TweenStopDelayCurve",
                                       "custom21Trig1TweenStopDelayRange"
                                     ],
                                     "subgroups": []
                                   }
                                 }
                               ],
-                              "settings": [],
+                              "settings": [
+                                "custom21Trig1TweenStopDelayCurve"
+                              ],
                               "subgroups": [
                                 {
                                   "key": "Tween Stop Start Time Curve",
@@ -73084,7 +73085,7 @@
                                 },
                                 {
                                   "key": "Tween Stop Delay",
-                                  "collapsed": true,
+                                  "collapsed": false,
                                   "locked": false,
                                   "items": [
                                     {
@@ -73097,17 +73098,12 @@
                                     },
                                     {
                                       "type": "row",
-                                      "key": "custom21Trig1TweenStopDelayCurve"
-                                    },
-                                    {
-                                      "type": "row",
                                       "key": "custom21Trig1TweenStopDelayRange"
                                     }
                                   ],
                                   "settings": [
                                     "custom21Trig1TweenStopDelayMs",
                                     "custom21Trig1TweenStopDelayCurveEnabled",
-                                    "custom21Trig1TweenStopDelayCurve",
                                     "custom21Trig1TweenStopDelayRange"
                                   ],
                                   "subgroups": []
@@ -73531,7 +73527,7 @@
                           },
                           {
                             "key": "Tween Stop",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -73558,10 +73554,14 @@
                                 }
                               },
                               {
+                                "type": "row",
+                                "key": "custom21Trig1TweenStopDelayCurve"
+                              },
+                              {
                                 "type": "group",
                                 "group": {
                                   "key": "Tween Stop Delay",
-                                  "collapsed": true,
+                                  "collapsed": false,
                                   "locked": false,
                                   "items": [
                                     {
@@ -73574,24 +73574,21 @@
                                     },
                                     {
                                       "type": "row",
-                                      "key": "custom21Trig1TweenStopDelayCurve"
-                                    },
-                                    {
-                                      "type": "row",
                                       "key": "custom21Trig1TweenStopDelayRange"
                                     }
                                   ],
                                   "settings": [
                                     "custom21Trig1TweenStopDelayMs",
                                     "custom21Trig1TweenStopDelayCurveEnabled",
-                                    "custom21Trig1TweenStopDelayCurve",
                                     "custom21Trig1TweenStopDelayRange"
                                   ],
                                   "subgroups": []
                                 }
                               }
                             ],
-                            "settings": [],
+                            "settings": [
+                              "custom21Trig1TweenStopDelayCurve"
+                            ],
                             "subgroups": [
                               {
                                 "key": "Tween Stop Start Time Curve",
@@ -73615,7 +73612,7 @@
                               },
                               {
                                 "key": "Tween Stop Delay",
-                                "collapsed": true,
+                                "collapsed": false,
                                 "locked": false,
                                 "items": [
                                   {
@@ -73628,17 +73625,12 @@
                                   },
                                   {
                                     "type": "row",
-                                    "key": "custom21Trig1TweenStopDelayCurve"
-                                  },
-                                  {
-                                    "type": "row",
                                     "key": "custom21Trig1TweenStopDelayRange"
                                   }
                                 ],
                                 "settings": [
                                   "custom21Trig1TweenStopDelayMs",
                                   "custom21Trig1TweenStopDelayCurveEnabled",
-                                  "custom21Trig1TweenStopDelayCurve",
                                   "custom21Trig1TweenStopDelayRange"
                                 ],
                                 "subgroups": []
@@ -74140,7 +74132,7 @@
                           "type": "group",
                           "group": {
                             "key": "Tween Stop",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -74167,10 +74159,14 @@
                                 }
                               },
                               {
+                                "type": "row",
+                                "key": "custom21Trig1TweenStopDelayCurve"
+                              },
+                              {
                                 "type": "group",
                                 "group": {
                                   "key": "Tween Stop Delay",
-                                  "collapsed": true,
+                                  "collapsed": false,
                                   "locked": false,
                                   "items": [
                                     {
@@ -74183,24 +74179,21 @@
                                     },
                                     {
                                       "type": "row",
-                                      "key": "custom21Trig1TweenStopDelayCurve"
-                                    },
-                                    {
-                                      "type": "row",
                                       "key": "custom21Trig1TweenStopDelayRange"
                                     }
                                   ],
                                   "settings": [
                                     "custom21Trig1TweenStopDelayMs",
                                     "custom21Trig1TweenStopDelayCurveEnabled",
-                                    "custom21Trig1TweenStopDelayCurve",
                                     "custom21Trig1TweenStopDelayRange"
                                   ],
                                   "subgroups": []
                                 }
                               }
                             ],
-                            "settings": [],
+                            "settings": [
+                              "custom21Trig1TweenStopDelayCurve"
+                            ],
                             "subgroups": [
                               {
                                 "key": "Tween Stop Start Time Curve",
@@ -74224,7 +74217,7 @@
                               },
                               {
                                 "key": "Tween Stop Delay",
-                                "collapsed": true,
+                                "collapsed": false,
                                 "locked": false,
                                 "items": [
                                   {
@@ -74237,17 +74230,12 @@
                                   },
                                   {
                                     "type": "row",
-                                    "key": "custom21Trig1TweenStopDelayCurve"
-                                  },
-                                  {
-                                    "type": "row",
                                     "key": "custom21Trig1TweenStopDelayRange"
                                   }
                                 ],
                                 "settings": [
                                   "custom21Trig1TweenStopDelayMs",
                                   "custom21Trig1TweenStopDelayCurveEnabled",
-                                  "custom21Trig1TweenStopDelayCurve",
                                   "custom21Trig1TweenStopDelayRange"
                                 ],
                                 "subgroups": []
@@ -74671,7 +74659,7 @@
                         },
                         {
                           "key": "Tween Stop",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -74698,10 +74686,14 @@
                               }
                             },
                             {
+                              "type": "row",
+                              "key": "custom21Trig1TweenStopDelayCurve"
+                            },
+                            {
                               "type": "group",
                               "group": {
                                 "key": "Tween Stop Delay",
-                                "collapsed": true,
+                                "collapsed": false,
                                 "locked": false,
                                 "items": [
                                   {
@@ -74714,24 +74706,21 @@
                                   },
                                   {
                                     "type": "row",
-                                    "key": "custom21Trig1TweenStopDelayCurve"
-                                  },
-                                  {
-                                    "type": "row",
                                     "key": "custom21Trig1TweenStopDelayRange"
                                   }
                                 ],
                                 "settings": [
                                   "custom21Trig1TweenStopDelayMs",
                                   "custom21Trig1TweenStopDelayCurveEnabled",
-                                  "custom21Trig1TweenStopDelayCurve",
                                   "custom21Trig1TweenStopDelayRange"
                                 ],
                                 "subgroups": []
                               }
                             }
                           ],
-                          "settings": [],
+                          "settings": [
+                            "custom21Trig1TweenStopDelayCurve"
+                          ],
                           "subgroups": [
                             {
                               "key": "Tween Stop Start Time Curve",
@@ -74755,7 +74744,7 @@
                             },
                             {
                               "key": "Tween Stop Delay",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -74768,17 +74757,12 @@
                                 },
                                 {
                                   "type": "row",
-                                  "key": "custom21Trig1TweenStopDelayCurve"
-                                },
-                                {
-                                  "type": "row",
                                   "key": "custom21Trig1TweenStopDelayRange"
                                 }
                               ],
                               "settings": [
                                 "custom21Trig1TweenStopDelayMs",
                                 "custom21Trig1TweenStopDelayCurveEnabled",
-                                "custom21Trig1TweenStopDelayCurve",
                                 "custom21Trig1TweenStopDelayRange"
                               ],
                               "subgroups": []
@@ -75236,7 +75220,7 @@
                     "type": "group",
                     "group": {
                       "key": "Tween Stop Delay",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -75280,7 +75264,7 @@
                   },
                   {
                     "key": "Tween Stop Delay",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -75307,7 +75291,7 @@
               },
               {
                 "key": "Multi Trigger",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -75802,7 +75786,7 @@
                           "type": "group",
                           "group": {
                             "key": "Tween Stop",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -75829,10 +75813,14 @@
                                 }
                               },
                               {
+                                "type": "row",
+                                "key": "custom21Trig1TweenStopDelayCurve"
+                              },
+                              {
                                 "type": "group",
                                 "group": {
                                   "key": "Tween Stop Delay",
-                                  "collapsed": true,
+                                  "collapsed": false,
                                   "locked": false,
                                   "items": [
                                     {
@@ -75845,24 +75833,21 @@
                                     },
                                     {
                                       "type": "row",
-                                      "key": "custom21Trig1TweenStopDelayCurve"
-                                    },
-                                    {
-                                      "type": "row",
                                       "key": "custom21Trig1TweenStopDelayRange"
                                     }
                                   ],
                                   "settings": [
                                     "custom21Trig1TweenStopDelayMs",
                                     "custom21Trig1TweenStopDelayCurveEnabled",
-                                    "custom21Trig1TweenStopDelayCurve",
                                     "custom21Trig1TweenStopDelayRange"
                                   ],
                                   "subgroups": []
                                 }
                               }
                             ],
-                            "settings": [],
+                            "settings": [
+                              "custom21Trig1TweenStopDelayCurve"
+                            ],
                             "subgroups": [
                               {
                                 "key": "Tween Stop Start Time Curve",
@@ -75886,7 +75871,7 @@
                               },
                               {
                                 "key": "Tween Stop Delay",
-                                "collapsed": true,
+                                "collapsed": false,
                                 "locked": false,
                                 "items": [
                                   {
@@ -75899,17 +75884,12 @@
                                   },
                                   {
                                     "type": "row",
-                                    "key": "custom21Trig1TweenStopDelayCurve"
-                                  },
-                                  {
-                                    "type": "row",
                                     "key": "custom21Trig1TweenStopDelayRange"
                                   }
                                 ],
                                 "settings": [
                                   "custom21Trig1TweenStopDelayMs",
                                   "custom21Trig1TweenStopDelayCurveEnabled",
-                                  "custom21Trig1TweenStopDelayCurve",
                                   "custom21Trig1TweenStopDelayRange"
                                 ],
                                 "subgroups": []
@@ -76333,7 +76313,7 @@
                         },
                         {
                           "key": "Tween Stop",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -76360,10 +76340,14 @@
                               }
                             },
                             {
+                              "type": "row",
+                              "key": "custom21Trig1TweenStopDelayCurve"
+                            },
+                            {
                               "type": "group",
                               "group": {
                                 "key": "Tween Stop Delay",
-                                "collapsed": true,
+                                "collapsed": false,
                                 "locked": false,
                                 "items": [
                                   {
@@ -76376,24 +76360,21 @@
                                   },
                                   {
                                     "type": "row",
-                                    "key": "custom21Trig1TweenStopDelayCurve"
-                                  },
-                                  {
-                                    "type": "row",
                                     "key": "custom21Trig1TweenStopDelayRange"
                                   }
                                 ],
                                 "settings": [
                                   "custom21Trig1TweenStopDelayMs",
                                   "custom21Trig1TweenStopDelayCurveEnabled",
-                                  "custom21Trig1TweenStopDelayCurve",
                                   "custom21Trig1TweenStopDelayRange"
                                 ],
                                 "subgroups": []
                               }
                             }
                           ],
-                          "settings": [],
+                          "settings": [
+                            "custom21Trig1TweenStopDelayCurve"
+                          ],
                           "subgroups": [
                             {
                               "key": "Tween Stop Start Time Curve",
@@ -76417,7 +76398,7 @@
                             },
                             {
                               "key": "Tween Stop Delay",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -76430,17 +76411,12 @@
                                 },
                                 {
                                   "type": "row",
-                                  "key": "custom21Trig1TweenStopDelayCurve"
-                                },
-                                {
-                                  "type": "row",
                                   "key": "custom21Trig1TweenStopDelayRange"
                                 }
                               ],
                               "settings": [
                                 "custom21Trig1TweenStopDelayMs",
                                 "custom21Trig1TweenStopDelayCurveEnabled",
-                                "custom21Trig1TweenStopDelayCurve",
                                 "custom21Trig1TweenStopDelayRange"
                               ],
                               "subgroups": []
@@ -76942,7 +76918,7 @@
                         "type": "group",
                         "group": {
                           "key": "Tween Stop",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -76969,10 +76945,14 @@
                               }
                             },
                             {
+                              "type": "row",
+                              "key": "custom21Trig1TweenStopDelayCurve"
+                            },
+                            {
                               "type": "group",
                               "group": {
                                 "key": "Tween Stop Delay",
-                                "collapsed": true,
+                                "collapsed": false,
                                 "locked": false,
                                 "items": [
                                   {
@@ -76985,24 +76965,21 @@
                                   },
                                   {
                                     "type": "row",
-                                    "key": "custom21Trig1TweenStopDelayCurve"
-                                  },
-                                  {
-                                    "type": "row",
                                     "key": "custom21Trig1TweenStopDelayRange"
                                   }
                                 ],
                                 "settings": [
                                   "custom21Trig1TweenStopDelayMs",
                                   "custom21Trig1TweenStopDelayCurveEnabled",
-                                  "custom21Trig1TweenStopDelayCurve",
                                   "custom21Trig1TweenStopDelayRange"
                                 ],
                                 "subgroups": []
                               }
                             }
                           ],
-                          "settings": [],
+                          "settings": [
+                            "custom21Trig1TweenStopDelayCurve"
+                          ],
                           "subgroups": [
                             {
                               "key": "Tween Stop Start Time Curve",
@@ -77026,7 +77003,7 @@
                             },
                             {
                               "key": "Tween Stop Delay",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -77039,17 +77016,12 @@
                                 },
                                 {
                                   "type": "row",
-                                  "key": "custom21Trig1TweenStopDelayCurve"
-                                },
-                                {
-                                  "type": "row",
                                   "key": "custom21Trig1TweenStopDelayRange"
                                 }
                               ],
                               "settings": [
                                 "custom21Trig1TweenStopDelayMs",
                                 "custom21Trig1TweenStopDelayCurveEnabled",
-                                "custom21Trig1TweenStopDelayCurve",
                                 "custom21Trig1TweenStopDelayRange"
                               ],
                               "subgroups": []
@@ -77473,7 +77445,7 @@
                       },
                       {
                         "key": "Tween Stop",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -77500,10 +77472,14 @@
                             }
                           },
                           {
+                            "type": "row",
+                            "key": "custom21Trig1TweenStopDelayCurve"
+                          },
+                          {
                             "type": "group",
                             "group": {
                               "key": "Tween Stop Delay",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -77516,24 +77492,21 @@
                                 },
                                 {
                                   "type": "row",
-                                  "key": "custom21Trig1TweenStopDelayCurve"
-                                },
-                                {
-                                  "type": "row",
                                   "key": "custom21Trig1TweenStopDelayRange"
                                 }
                               ],
                               "settings": [
                                 "custom21Trig1TweenStopDelayMs",
                                 "custom21Trig1TweenStopDelayCurveEnabled",
-                                "custom21Trig1TweenStopDelayCurve",
                                 "custom21Trig1TweenStopDelayRange"
                               ],
                               "subgroups": []
                             }
                           }
                         ],
-                        "settings": [],
+                        "settings": [
+                          "custom21Trig1TweenStopDelayCurve"
+                        ],
                         "subgroups": [
                           {
                             "key": "Tween Stop Start Time Curve",
@@ -77557,7 +77530,7 @@
                           },
                           {
                             "key": "Tween Stop Delay",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -77570,17 +77543,12 @@
                               },
                               {
                                 "type": "row",
-                                "key": "custom21Trig1TweenStopDelayCurve"
-                              },
-                              {
-                                "type": "row",
                                 "key": "custom21Trig1TweenStopDelayRange"
                               }
                             ],
                             "settings": [
                               "custom21Trig1TweenStopDelayMs",
                               "custom21Trig1TweenStopDelayCurveEnabled",
-                              "custom21Trig1TweenStopDelayCurve",
                               "custom21Trig1TweenStopDelayRange"
                             ],
                             "subgroups": []
@@ -159305,7 +159273,7 @@
                     "type": "group",
                     "group": {
                       "key": "Tween Stop Delay",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -159349,7 +159317,7 @@
                   },
                   {
                     "key": "Tween Stop Delay",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -159379,7 +159347,7 @@
               "type": "group",
               "group": {
                 "key": "Multi Trigger",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -159874,7 +159842,7 @@
                           "type": "group",
                           "group": {
                             "key": "Tween Stop",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -159901,10 +159869,14 @@
                                 }
                               },
                               {
+                                "type": "row",
+                                "key": "custom21Trig1TweenStopDelayCurve"
+                              },
+                              {
                                 "type": "group",
                                 "group": {
                                   "key": "Tween Stop Delay",
-                                  "collapsed": true,
+                                  "collapsed": false,
                                   "locked": false,
                                   "items": [
                                     {
@@ -159917,24 +159889,21 @@
                                     },
                                     {
                                       "type": "row",
-                                      "key": "custom21Trig1TweenStopDelayCurve"
-                                    },
-                                    {
-                                      "type": "row",
                                       "key": "custom21Trig1TweenStopDelayRange"
                                     }
                                   ],
                                   "settings": [
                                     "custom21Trig1TweenStopDelayMs",
                                     "custom21Trig1TweenStopDelayCurveEnabled",
-                                    "custom21Trig1TweenStopDelayCurve",
                                     "custom21Trig1TweenStopDelayRange"
                                   ],
                                   "subgroups": []
                                 }
                               }
                             ],
-                            "settings": [],
+                            "settings": [
+                              "custom21Trig1TweenStopDelayCurve"
+                            ],
                             "subgroups": [
                               {
                                 "key": "Tween Stop Start Time Curve",
@@ -159958,7 +159927,7 @@
                               },
                               {
                                 "key": "Tween Stop Delay",
-                                "collapsed": true,
+                                "collapsed": false,
                                 "locked": false,
                                 "items": [
                                   {
@@ -159971,17 +159940,12 @@
                                   },
                                   {
                                     "type": "row",
-                                    "key": "custom21Trig1TweenStopDelayCurve"
-                                  },
-                                  {
-                                    "type": "row",
                                     "key": "custom21Trig1TweenStopDelayRange"
                                   }
                                 ],
                                 "settings": [
                                   "custom21Trig1TweenStopDelayMs",
                                   "custom21Trig1TweenStopDelayCurveEnabled",
-                                  "custom21Trig1TweenStopDelayCurve",
                                   "custom21Trig1TweenStopDelayRange"
                                 ],
                                 "subgroups": []
@@ -160405,7 +160369,7 @@
                         },
                         {
                           "key": "Tween Stop",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -160432,10 +160396,14 @@
                               }
                             },
                             {
+                              "type": "row",
+                              "key": "custom21Trig1TweenStopDelayCurve"
+                            },
+                            {
                               "type": "group",
                               "group": {
                                 "key": "Tween Stop Delay",
-                                "collapsed": true,
+                                "collapsed": false,
                                 "locked": false,
                                 "items": [
                                   {
@@ -160448,24 +160416,21 @@
                                   },
                                   {
                                     "type": "row",
-                                    "key": "custom21Trig1TweenStopDelayCurve"
-                                  },
-                                  {
-                                    "type": "row",
                                     "key": "custom21Trig1TweenStopDelayRange"
                                   }
                                 ],
                                 "settings": [
                                   "custom21Trig1TweenStopDelayMs",
                                   "custom21Trig1TweenStopDelayCurveEnabled",
-                                  "custom21Trig1TweenStopDelayCurve",
                                   "custom21Trig1TweenStopDelayRange"
                                 ],
                                 "subgroups": []
                               }
                             }
                           ],
-                          "settings": [],
+                          "settings": [
+                            "custom21Trig1TweenStopDelayCurve"
+                          ],
                           "subgroups": [
                             {
                               "key": "Tween Stop Start Time Curve",
@@ -160489,7 +160454,7 @@
                             },
                             {
                               "key": "Tween Stop Delay",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -160502,17 +160467,12 @@
                                 },
                                 {
                                   "type": "row",
-                                  "key": "custom21Trig1TweenStopDelayCurve"
-                                },
-                                {
-                                  "type": "row",
                                   "key": "custom21Trig1TweenStopDelayRange"
                                 }
                               ],
                               "settings": [
                                 "custom21Trig1TweenStopDelayMs",
                                 "custom21Trig1TweenStopDelayCurveEnabled",
-                                "custom21Trig1TweenStopDelayCurve",
                                 "custom21Trig1TweenStopDelayRange"
                               ],
                               "subgroups": []
@@ -161014,7 +160974,7 @@
                         "type": "group",
                         "group": {
                           "key": "Tween Stop",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -161041,10 +161001,14 @@
                               }
                             },
                             {
+                              "type": "row",
+                              "key": "custom21Trig1TweenStopDelayCurve"
+                            },
+                            {
                               "type": "group",
                               "group": {
                                 "key": "Tween Stop Delay",
-                                "collapsed": true,
+                                "collapsed": false,
                                 "locked": false,
                                 "items": [
                                   {
@@ -161057,24 +161021,21 @@
                                   },
                                   {
                                     "type": "row",
-                                    "key": "custom21Trig1TweenStopDelayCurve"
-                                  },
-                                  {
-                                    "type": "row",
                                     "key": "custom21Trig1TweenStopDelayRange"
                                   }
                                 ],
                                 "settings": [
                                   "custom21Trig1TweenStopDelayMs",
                                   "custom21Trig1TweenStopDelayCurveEnabled",
-                                  "custom21Trig1TweenStopDelayCurve",
                                   "custom21Trig1TweenStopDelayRange"
                                 ],
                                 "subgroups": []
                               }
                             }
                           ],
-                          "settings": [],
+                          "settings": [
+                            "custom21Trig1TweenStopDelayCurve"
+                          ],
                           "subgroups": [
                             {
                               "key": "Tween Stop Start Time Curve",
@@ -161098,7 +161059,7 @@
                             },
                             {
                               "key": "Tween Stop Delay",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -161111,17 +161072,12 @@
                                 },
                                 {
                                   "type": "row",
-                                  "key": "custom21Trig1TweenStopDelayCurve"
-                                },
-                                {
-                                  "type": "row",
                                   "key": "custom21Trig1TweenStopDelayRange"
                                 }
                               ],
                               "settings": [
                                 "custom21Trig1TweenStopDelayMs",
                                 "custom21Trig1TweenStopDelayCurveEnabled",
-                                "custom21Trig1TweenStopDelayCurve",
                                 "custom21Trig1TweenStopDelayRange"
                               ],
                               "subgroups": []
@@ -161545,7 +161501,7 @@
                       },
                       {
                         "key": "Tween Stop",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -161572,10 +161528,14 @@
                             }
                           },
                           {
+                            "type": "row",
+                            "key": "custom21Trig1TweenStopDelayCurve"
+                          },
+                          {
                             "type": "group",
                             "group": {
                               "key": "Tween Stop Delay",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -161588,24 +161548,21 @@
                                 },
                                 {
                                   "type": "row",
-                                  "key": "custom21Trig1TweenStopDelayCurve"
-                                },
-                                {
-                                  "type": "row",
                                   "key": "custom21Trig1TweenStopDelayRange"
                                 }
                               ],
                               "settings": [
                                 "custom21Trig1TweenStopDelayMs",
                                 "custom21Trig1TweenStopDelayCurveEnabled",
-                                "custom21Trig1TweenStopDelayCurve",
                                 "custom21Trig1TweenStopDelayRange"
                               ],
                               "subgroups": []
                             }
                           }
                         ],
-                        "settings": [],
+                        "settings": [
+                          "custom21Trig1TweenStopDelayCurve"
+                        ],
                         "subgroups": [
                           {
                             "key": "Tween Stop Start Time Curve",
@@ -161629,7 +161586,7 @@
                           },
                           {
                             "key": "Tween Stop Delay",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -161642,17 +161599,12 @@
                               },
                               {
                                 "type": "row",
-                                "key": "custom21Trig1TweenStopDelayCurve"
-                              },
-                              {
-                                "type": "row",
                                 "key": "custom21Trig1TweenStopDelayRange"
                               }
                             ],
                             "settings": [
                               "custom21Trig1TweenStopDelayMs",
                               "custom21Trig1TweenStopDelayCurveEnabled",
-                              "custom21Trig1TweenStopDelayCurve",
                               "custom21Trig1TweenStopDelayRange"
                             ],
                             "subgroups": []
@@ -162110,7 +162062,7 @@
                   "type": "group",
                   "group": {
                     "key": "Tween Stop Delay",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -162154,7 +162106,7 @@
                 },
                 {
                   "key": "Tween Stop Delay",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -162181,7 +162133,7 @@
             },
             {
               "key": "Multi Trigger",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -162676,7 +162628,7 @@
                         "type": "group",
                         "group": {
                           "key": "Tween Stop",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -162703,10 +162655,14 @@
                               }
                             },
                             {
+                              "type": "row",
+                              "key": "custom21Trig1TweenStopDelayCurve"
+                            },
+                            {
                               "type": "group",
                               "group": {
                                 "key": "Tween Stop Delay",
-                                "collapsed": true,
+                                "collapsed": false,
                                 "locked": false,
                                 "items": [
                                   {
@@ -162719,24 +162675,21 @@
                                   },
                                   {
                                     "type": "row",
-                                    "key": "custom21Trig1TweenStopDelayCurve"
-                                  },
-                                  {
-                                    "type": "row",
                                     "key": "custom21Trig1TweenStopDelayRange"
                                   }
                                 ],
                                 "settings": [
                                   "custom21Trig1TweenStopDelayMs",
                                   "custom21Trig1TweenStopDelayCurveEnabled",
-                                  "custom21Trig1TweenStopDelayCurve",
                                   "custom21Trig1TweenStopDelayRange"
                                 ],
                                 "subgroups": []
                               }
                             }
                           ],
-                          "settings": [],
+                          "settings": [
+                            "custom21Trig1TweenStopDelayCurve"
+                          ],
                           "subgroups": [
                             {
                               "key": "Tween Stop Start Time Curve",
@@ -162760,7 +162713,7 @@
                             },
                             {
                               "key": "Tween Stop Delay",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -162773,17 +162726,12 @@
                                 },
                                 {
                                   "type": "row",
-                                  "key": "custom21Trig1TweenStopDelayCurve"
-                                },
-                                {
-                                  "type": "row",
                                   "key": "custom21Trig1TweenStopDelayRange"
                                 }
                               ],
                               "settings": [
                                 "custom21Trig1TweenStopDelayMs",
                                 "custom21Trig1TweenStopDelayCurveEnabled",
-                                "custom21Trig1TweenStopDelayCurve",
                                 "custom21Trig1TweenStopDelayRange"
                               ],
                               "subgroups": []
@@ -163207,7 +163155,7 @@
                       },
                       {
                         "key": "Tween Stop",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -163234,10 +163182,14 @@
                             }
                           },
                           {
+                            "type": "row",
+                            "key": "custom21Trig1TweenStopDelayCurve"
+                          },
+                          {
                             "type": "group",
                             "group": {
                               "key": "Tween Stop Delay",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -163250,24 +163202,21 @@
                                 },
                                 {
                                   "type": "row",
-                                  "key": "custom21Trig1TweenStopDelayCurve"
-                                },
-                                {
-                                  "type": "row",
                                   "key": "custom21Trig1TweenStopDelayRange"
                                 }
                               ],
                               "settings": [
                                 "custom21Trig1TweenStopDelayMs",
                                 "custom21Trig1TweenStopDelayCurveEnabled",
-                                "custom21Trig1TweenStopDelayCurve",
                                 "custom21Trig1TweenStopDelayRange"
                               ],
                               "subgroups": []
                             }
                           }
                         ],
-                        "settings": [],
+                        "settings": [
+                          "custom21Trig1TweenStopDelayCurve"
+                        ],
                         "subgroups": [
                           {
                             "key": "Tween Stop Start Time Curve",
@@ -163291,7 +163240,7 @@
                           },
                           {
                             "key": "Tween Stop Delay",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -163304,17 +163253,12 @@
                               },
                               {
                                 "type": "row",
-                                "key": "custom21Trig1TweenStopDelayCurve"
-                              },
-                              {
-                                "type": "row",
                                 "key": "custom21Trig1TweenStopDelayRange"
                               }
                             ],
                             "settings": [
                               "custom21Trig1TweenStopDelayMs",
                               "custom21Trig1TweenStopDelayCurveEnabled",
-                              "custom21Trig1TweenStopDelayCurve",
                               "custom21Trig1TweenStopDelayRange"
                             ],
                             "subgroups": []
@@ -163816,7 +163760,7 @@
                       "type": "group",
                       "group": {
                         "key": "Tween Stop",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -163843,10 +163787,14 @@
                             }
                           },
                           {
+                            "type": "row",
+                            "key": "custom21Trig1TweenStopDelayCurve"
+                          },
+                          {
                             "type": "group",
                             "group": {
                               "key": "Tween Stop Delay",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -163859,24 +163807,21 @@
                                 },
                                 {
                                   "type": "row",
-                                  "key": "custom21Trig1TweenStopDelayCurve"
-                                },
-                                {
-                                  "type": "row",
                                   "key": "custom21Trig1TweenStopDelayRange"
                                 }
                               ],
                               "settings": [
                                 "custom21Trig1TweenStopDelayMs",
                                 "custom21Trig1TweenStopDelayCurveEnabled",
-                                "custom21Trig1TweenStopDelayCurve",
                                 "custom21Trig1TweenStopDelayRange"
                               ],
                               "subgroups": []
                             }
                           }
                         ],
-                        "settings": [],
+                        "settings": [
+                          "custom21Trig1TweenStopDelayCurve"
+                        ],
                         "subgroups": [
                           {
                             "key": "Tween Stop Start Time Curve",
@@ -163900,7 +163845,7 @@
                           },
                           {
                             "key": "Tween Stop Delay",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -163913,17 +163858,12 @@
                               },
                               {
                                 "type": "row",
-                                "key": "custom21Trig1TweenStopDelayCurve"
-                              },
-                              {
-                                "type": "row",
                                 "key": "custom21Trig1TweenStopDelayRange"
                               }
                             ],
                             "settings": [
                               "custom21Trig1TweenStopDelayMs",
                               "custom21Trig1TweenStopDelayCurveEnabled",
-                              "custom21Trig1TweenStopDelayCurve",
                               "custom21Trig1TweenStopDelayRange"
                             ],
                             "subgroups": []
@@ -164347,7 +164287,7 @@
                     },
                     {
                       "key": "Tween Stop",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -164374,10 +164314,14 @@
                           }
                         },
                         {
+                          "type": "row",
+                          "key": "custom21Trig1TweenStopDelayCurve"
+                        },
+                        {
                           "type": "group",
                           "group": {
                             "key": "Tween Stop Delay",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -164390,24 +164334,21 @@
                               },
                               {
                                 "type": "row",
-                                "key": "custom21Trig1TweenStopDelayCurve"
-                              },
-                              {
-                                "type": "row",
                                 "key": "custom21Trig1TweenStopDelayRange"
                               }
                             ],
                             "settings": [
                               "custom21Trig1TweenStopDelayMs",
                               "custom21Trig1TweenStopDelayCurveEnabled",
-                              "custom21Trig1TweenStopDelayCurve",
                               "custom21Trig1TweenStopDelayRange"
                             ],
                             "subgroups": []
                           }
                         }
                       ],
-                      "settings": [],
+                      "settings": [
+                        "custom21Trig1TweenStopDelayCurve"
+                      ],
                       "subgroups": [
                         {
                           "key": "Tween Stop Start Time Curve",
@@ -164431,7 +164372,7 @@
                         },
                         {
                           "key": "Tween Stop Delay",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -164444,17 +164385,12 @@
                             },
                             {
                               "type": "row",
-                              "key": "custom21Trig1TweenStopDelayCurve"
-                            },
-                            {
-                              "type": "row",
                               "key": "custom21Trig1TweenStopDelayRange"
                             }
                           ],
                           "settings": [
                             "custom21Trig1TweenStopDelayMs",
                             "custom21Trig1TweenStopDelayCurveEnabled",
-                            "custom21Trig1TweenStopDelayCurve",
                             "custom21Trig1TweenStopDelayRange"
                           ],
                           "subgroups": []
@@ -209200,7 +209136,7 @@
     },
     "mobile": {
       "left": 32.2976188659668,
-      "top": 94.44047546386719,
+      "top": 15.625,
       "width": 351.6071472167969,
       "height": 35.52381134033203
     }
