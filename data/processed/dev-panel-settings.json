@@ -8207,7 +8207,7 @@
       "custom20RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "custom20MultiTriggerEnabled": true,
       "custom20MultiTriggers": "[{\"prefix\":\"custom20Trig1\",\"title\":\"Trigger 1\"}]",
-      "custom20Trig1Enabled": true,
+      "custom20Trig1Enabled": false,
       "custom20Trig1Mode": "Single Pose",
       "custom20Trig1OffsetEnabled": false,
       "custom20Trig1OffsetMode": "XYZ Offset",
@@ -8295,15 +8295,15 @@
       "custom21CursorOffsetZCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21CursorOffsetZRange": "{\"min\":0,\"max\":0}",
       "custom21CameraOffsetEnabled": true,
-      "custom21CameraOffsetXEnabled": false,
-      "custom21CameraOffsetXCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom21CameraOffsetXRange": "{\"min\":0,\"max\":10}",
+      "custom21CameraOffsetXEnabled": true,
+      "custom21CameraOffsetXCurve": "[{\"x\":0,\"y\":1},{\"x\":0.30546774060532755,\"y\":0.39713541666666663},{\"x\":0.5007559721802237,\"y\":0.06953125000000004},{\"x\":0.7189157984440718,\"y\":0.43046874999999996},{\"x\":1,\"y\":1}]",
+      "custom21CameraOffsetXRange": "{\"min\":-1,\"max\":1}",
       "custom21CameraOffsetYEnabled": true,
-      "custom21CameraOffsetYCurve": "[{\"x\":0,\"y\":0},{\"x\":0.4954779118673887,\"y\":1},{\"x\":1,\"y\":0}]",
-      "custom21CameraOffsetYRange": "{\"min\":-1,\"max\":2}",
-      "custom21CameraOffsetZEnabled": false,
-      "custom21CameraOffsetZCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom21CameraOffsetZRange": "{\"min\":0,\"max\":10}",
+      "custom21CameraOffsetYCurve": "[{\"x\":0,\"y\":1},{\"x\":0.26324325810264726,\"y\":0.7130208333333333},{\"x\":0.4954779118673887,\"y\":0},{\"x\":0.6784506693790032,\"y\":0.5963541666666666},{\"x\":1,\"y\":1}]",
+      "custom21CameraOffsetYRange": "{\"min\":-1,\"max\":1}",
+      "custom21CameraOffsetZEnabled": true,
+      "custom21CameraOffsetZCurve": "[{\"x\":0,\"y\":0},{\"x\":0.5095527393682822,\"y\":0.9255208333333333},{\"x\":1,\"y\":0}]",
+      "custom21CameraOffsetZRange": "{\"min\":-1,\"max\":1}",
       "custom21RotationEnabled": false,
       "custom21RotationX": 0,
       "custom21RotationY": 0,
@@ -8355,7 +8355,7 @@
       "custom21TweenStopDelayCurveEnabled": true,
       "custom21TweenStopDelayCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21TweenStopDelayRange": "{\"min\":3412,\"max\":4707}",
-      "custom21MultiTriggerEnabled": true,
+      "custom21MultiTriggerEnabled": false,
       "custom21MultiTriggers": "[{\"prefix\":\"custom21Trig1\",\"title\":\"Trigger 1\"},{\"prefix\":\"custom21Trig2\",\"title\":\"Trigger 2\"},{\"prefix\":\"custom21Trig3\",\"title\":\"Trigger 3\"}]",
       "custom21Trig1Enabled": true,
       "custom21Trig1Mode": "Sequence",
@@ -18092,7 +18092,7 @@
       "custom20RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "custom20MultiTriggerEnabled": true,
       "custom20MultiTriggers": "[{\"prefix\":\"custom20Trig1\",\"title\":\"Trigger 1\"}]",
-      "custom20Trig1Enabled": true,
+      "custom20Trig1Enabled": false,
       "custom20Trig1Mode": "Single Pose",
       "custom20Trig1OffsetEnabled": false,
       "custom20Trig1OffsetMode": "XYZ Offset",
@@ -18181,14 +18181,14 @@
       "custom21CursorOffsetZRange": "{\"min\":0,\"max\":0}",
       "custom21CameraOffsetEnabled": true,
       "custom21CameraOffsetXEnabled": false,
-      "custom21CameraOffsetXCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom21CameraOffsetXRange": "{\"min\":0,\"max\":10}",
+      "custom21CameraOffsetXCurve": "[{\"x\":0,\"y\":1},{\"x\":0.30546774060532755,\"y\":0.39713541666666663},{\"x\":0.5007559721802237,\"y\":0.06953125000000004},{\"x\":0.7189157984440718,\"y\":0.43046874999999996},{\"x\":1,\"y\":1}]",
+      "custom21CameraOffsetXRange": "{\"min\":-1,\"max\":1}",
       "custom21CameraOffsetYEnabled": true,
-      "custom21CameraOffsetYCurve": "[{\"x\":0,\"y\":0},{\"x\":0.4954779118673887,\"y\":1},{\"x\":1,\"y\":0}]",
-      "custom21CameraOffsetYRange": "{\"min\":-1,\"max\":2}",
+      "custom21CameraOffsetYCurve": "[{\"x\":0,\"y\":1},{\"x\":0.26324325810264726,\"y\":0.7130208333333333},{\"x\":0.4954779118673887,\"y\":0},{\"x\":0.6784506693790032,\"y\":0.5963541666666666},{\"x\":1,\"y\":1}]",
+      "custom21CameraOffsetYRange": "{\"min\":-1,\"max\":1}",
       "custom21CameraOffsetZEnabled": false,
-      "custom21CameraOffsetZCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom21CameraOffsetZRange": "{\"min\":0,\"max\":10}",
+      "custom21CameraOffsetZCurve": "[{\"x\":0,\"y\":0},{\"x\":0.5095527393682822,\"y\":0.9255208333333333},{\"x\":1,\"y\":0}]",
+      "custom21CameraOffsetZRange": "{\"min\":-1,\"max\":1}",
       "custom21RotationEnabled": false,
       "custom21RotationX": 0,
       "custom21RotationY": 0,
@@ -18240,7 +18240,7 @@
       "custom21TweenStopDelayCurveEnabled": true,
       "custom21TweenStopDelayCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21TweenStopDelayRange": "{\"min\":3412,\"max\":4707}",
-      "custom21MultiTriggerEnabled": true,
+      "custom21MultiTriggerEnabled": false,
       "custom21MultiTriggers": "[{\"prefix\":\"custom21Trig1\",\"title\":\"Trigger 1\"},{\"prefix\":\"custom21Trig2\",\"title\":\"Trigger 2\"},{\"prefix\":\"custom21Trig3\",\"title\":\"Trigger 3\"}]",
       "custom21Trig1Enabled": true,
       "custom21Trig1Mode": "Sequence",
@@ -27977,7 +27977,7 @@
       "custom20RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "custom20MultiTriggerEnabled": true,
       "custom20MultiTriggers": "[{\"prefix\":\"custom20Trig1\",\"title\":\"Trigger 1\"}]",
-      "custom20Trig1Enabled": true,
+      "custom20Trig1Enabled": false,
       "custom20Trig1Mode": "Single Pose",
       "custom20Trig1OffsetEnabled": false,
       "custom20Trig1OffsetMode": "XYZ Offset",
@@ -28065,15 +28065,15 @@
       "custom21CursorOffsetZCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21CursorOffsetZRange": "{\"min\":0,\"max\":0}",
       "custom21CameraOffsetEnabled": true,
-      "custom21CameraOffsetXEnabled": false,
-      "custom21CameraOffsetXCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom21CameraOffsetXRange": "{\"min\":0,\"max\":10}",
+      "custom21CameraOffsetXEnabled": true,
+      "custom21CameraOffsetXCurve": "[{\"x\":0,\"y\":1},{\"x\":0.30546774060532755,\"y\":0.39713541666666663},{\"x\":0.5007559721802237,\"y\":0.06953125000000004},{\"x\":0.7189157984440718,\"y\":0.43046874999999996},{\"x\":1,\"y\":1}]",
+      "custom21CameraOffsetXRange": "{\"min\":-1,\"max\":1}",
       "custom21CameraOffsetYEnabled": true,
-      "custom21CameraOffsetYCurve": "[{\"x\":0,\"y\":0},{\"x\":0.4954779118673887,\"y\":1},{\"x\":1,\"y\":0}]",
-      "custom21CameraOffsetYRange": "{\"min\":-1,\"max\":2}",
-      "custom21CameraOffsetZEnabled": false,
-      "custom21CameraOffsetZCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom21CameraOffsetZRange": "{\"min\":0,\"max\":10}",
+      "custom21CameraOffsetYCurve": "[{\"x\":0,\"y\":1},{\"x\":0.26324325810264726,\"y\":0.7130208333333333},{\"x\":0.4954779118673887,\"y\":0},{\"x\":0.6784506693790032,\"y\":0.5963541666666666},{\"x\":1,\"y\":1}]",
+      "custom21CameraOffsetYRange": "{\"min\":-1,\"max\":1}",
+      "custom21CameraOffsetZEnabled": true,
+      "custom21CameraOffsetZCurve": "[{\"x\":0,\"y\":0},{\"x\":0.5095527393682822,\"y\":0.9255208333333333},{\"x\":1,\"y\":0}]",
+      "custom21CameraOffsetZRange": "{\"min\":-1,\"max\":1}",
       "custom21RotationEnabled": false,
       "custom21RotationX": 0,
       "custom21RotationY": 0,
@@ -28125,7 +28125,7 @@
       "custom21TweenStopDelayCurveEnabled": true,
       "custom21TweenStopDelayCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21TweenStopDelayRange": "{\"min\":3412,\"max\":4707}",
-      "custom21MultiTriggerEnabled": true,
+      "custom21MultiTriggerEnabled": false,
       "custom21MultiTriggers": "[{\"prefix\":\"custom21Trig1\",\"title\":\"Trigger 1\"},{\"prefix\":\"custom21Trig2\",\"title\":\"Trigger 2\"},{\"prefix\":\"custom21Trig3\",\"title\":\"Trigger 3\"}]",
       "custom21Trig1Enabled": true,
       "custom21Trig1Mode": "Sequence",
@@ -74109,7 +74109,7 @@
                 "type": "group",
                 "group": {
                   "key": "Multi Trigger",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -81451,7 +81451,7 @@
               },
               {
                 "key": "Multi Trigger",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -88723,7 +88723,7 @@
                 "type": "group",
                 "group": {
                   "key": "Multi Trigger",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -90765,7 +90765,7 @@
               },
               {
                 "key": "Multi Trigger",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -170962,7 +170962,7 @@
               "type": "group",
               "group": {
                 "key": "Multi Trigger",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -178304,7 +178304,7 @@
             },
             {
               "key": "Multi Trigger",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -185573,7 +185573,7 @@
               "type": "group",
               "group": {
                 "key": "Multi Trigger",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -187615,7 +187615,7 @@
             },
             {
               "key": "Multi Trigger",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
