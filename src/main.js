@@ -10617,7 +10617,18 @@ window.addEventListener('pointerup', (e) => {
   // standalone click -- see lastPointerupWasHoldRelease's own comment
   // (Click Hold-Pose section, above) for why this must never also count
   // toward Click Pose / Double-Click Pose's own click-count detection.
-  if (lastPointerupWasHoldRelease) return
+  // CORRECTED 2026-10-06 (direct report: after a Double-Click+Hold, "1 - C" fired right after
+  // the release and interrupted "2 - CH"). This early return used to skip the cancel below, so
+  // press #1's pending click count and debounce timer survived the hold; leftPointerDown only
+  // DEFERS that timer while a press is down, so it resolved to "1 click" the moment the hold
+  // ended. A release that ends a genuine hold consumes the pending chain, exactly like the
+  // held/dragged release classified just below.
+  if (lastPointerupWasHoldRelease) {
+    clickPoseClickCount = 0
+    clearTimeout(clickPoseClickTimer)
+    clickPoseClickTimer = null
+    return
+  }
   // See this section's own comment above: a genuine sustained hold or a
   // drag on ANY button-0 press (not just chp's own) consumes whatever
   // click count was pending, the same way clickHoldChainCount already
