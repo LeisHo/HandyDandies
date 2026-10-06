@@ -8310,7 +8310,7 @@
       "custom21Trig1RotationY": 0,
       "custom21Trig1RotationZ": 0,
       "custom21Trig1TargetPose": "",
-      "custom21Trig1TweenSelector": "FLOWER 3",
+      "custom21Trig1TweenSelector": "FLOWER",
       "custom21Trig1ReverseSequence": true,
       "custom21Trig1GlideToFirstPose": true,
       "custom21Trig1FirstGlideTimeScale": 2,
@@ -8330,7 +8330,7 @@
       "custom21Trig1StartDistanceMin": 0,
       "custom21Trig1StartDistanceMax": 100,
       "custom21Trig1StartDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
-      "custom21Trig1RetransitionEnabled": false,
+      "custom21Trig1RetransitionEnabled": true,
       "custom21Trig1RetransitionSpeedMs": 400,
       "custom21Trig1RetransitionSpeedCurveEnabled": true,
       "custom21Trig1RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -17152,7 +17152,7 @@
       "custom21Trig1RotationY": 0,
       "custom21Trig1RotationZ": 0,
       "custom21Trig1TargetPose": "",
-      "custom21Trig1TweenSelector": "FLOWER 3",
+      "custom21Trig1TweenSelector": "FLOWER",
       "custom21Trig1ReverseSequence": true,
       "custom21Trig1GlideToFirstPose": true,
       "custom21Trig1FirstGlideTimeScale": 2,
@@ -17172,7 +17172,7 @@
       "custom21Trig1StartDistanceMin": 0,
       "custom21Trig1StartDistanceMax": 100,
       "custom21Trig1StartDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
-      "custom21Trig1RetransitionEnabled": false,
+      "custom21Trig1RetransitionEnabled": true,
       "custom21Trig1RetransitionSpeedMs": 400,
       "custom21Trig1RetransitionSpeedCurveEnabled": true,
       "custom21Trig1RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -25994,7 +25994,7 @@
       "custom21Trig1RotationY": 0,
       "custom21Trig1RotationZ": 0,
       "custom21Trig1TargetPose": "",
-      "custom21Trig1TweenSelector": "FLOWER 3",
+      "custom21Trig1TweenSelector": "FLOWER",
       "custom21Trig1ReverseSequence": true,
       "custom21Trig1GlideToFirstPose": true,
       "custom21Trig1FirstGlideTimeScale": 2,
@@ -26014,7 +26014,7 @@
       "custom21Trig1StartDistanceMin": 0,
       "custom21Trig1StartDistanceMax": 100,
       "custom21Trig1StartDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
-      "custom21Trig1RetransitionEnabled": false,
+      "custom21Trig1RetransitionEnabled": true,
       "custom21Trig1RetransitionSpeedMs": 400,
       "custom21Trig1RetransitionSpeedCurveEnabled": true,
       "custom21Trig1RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -42950,7 +42950,7 @@
                       "type": "group",
                       "group": {
                         "key": "Trigger 1",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -43264,7 +43264,7 @@
                             "type": "group",
                             "group": {
                               "key": "Retransition",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -43630,7 +43630,7 @@
                           },
                           {
                             "key": "Retransition",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -43745,7 +43745,7 @@
                   "subgroups": [
                     {
                       "key": "Trigger 1",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -44059,7 +44059,7 @@
                           "type": "group",
                           "group": {
                             "key": "Retransition",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -44425,7 +44425,7 @@
                         },
                         {
                           "key": "Retransition",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -45079,7 +45079,7 @@
                     "type": "group",
                     "group": {
                       "key": "Trigger 1",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -45393,7 +45393,7 @@
                           "type": "group",
                           "group": {
                             "key": "Retransition",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -45759,7 +45759,7 @@
                         },
                         {
                           "key": "Retransition",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -45874,7 +45874,7 @@
                 "subgroups": [
                   {
                     "key": "Trigger 1",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -46188,7 +46188,7 @@
                         "type": "group",
                         "group": {
                           "key": "Retransition",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -46554,7 +46554,7 @@
                       },
                       {
                         "key": "Retransition",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -98945,7 +98945,7 @@
                     "type": "group",
                     "group": {
                       "key": "Trigger 1",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -99259,7 +99259,7 @@
                           "type": "group",
                           "group": {
                             "key": "Retransition",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -99625,7 +99625,7 @@
                         },
                         {
                           "key": "Retransition",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -99740,7 +99740,7 @@
                 "subgroups": [
                   {
                     "key": "Trigger 1",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -100054,7 +100054,7 @@
                         "type": "group",
                         "group": {
                           "key": "Retransition",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -100420,7 +100420,7 @@
                       },
                       {
                         "key": "Retransition",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -101074,7 +101074,7 @@
                   "type": "group",
                   "group": {
                     "key": "Trigger 1",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -101388,7 +101388,7 @@
                         "type": "group",
                         "group": {
                           "key": "Retransition",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -101754,7 +101754,7 @@
                       },
                       {
                         "key": "Retransition",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -101869,7 +101869,7 @@
               "subgroups": [
                 {
                   "key": "Trigger 1",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -102183,7 +102183,7 @@
                       "type": "group",
                       "group": {
                         "key": "Retransition",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -102549,7 +102549,7 @@
                     },
                     {
                       "key": "Retransition",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
