@@ -16563,6 +16563,39 @@ while the right button is down and its hold-release early return also skips the 
 (not reported); it only matters if a Right Click function with Click Count 2nd+ is combined with a
 Right Click+Hold.
 
+2026-10-06  -  (Skip If Same Pose)
+
+Direct request: for all click functions, including triggers, a checkbox "Skip If Same Pose". On = if a
+hand is already in the function's target pose, that function does not trigger for that hand; with Multi
+Trigger it moves on to the next trigger, unless that trigger's target pose is the same too. Not for
+sequences.
+
+Built (`main.js` `?v=306`):
+ - New checkbox `${p}SkipIfSamePose` (default off) in both factories, right under Target Pose, in the
+   layouts, in MULTI_TRIGGER_ALLOWED_SUFFIXES (so every Multi Trigger has its own), and shown only in
+   Single Pose mode like Target Pose (a Sequence/Chain function never skips and the row is hidden).
+ - A hand "is in" the target pose when every pose value it is showing right now (its last applied pose
+   while a function drives it, otherwise the live Pose settings) is within 0.2% of that slider's range of
+   the target pose's value (judgment call, not a measurement; see poseSameTolerance()).
+ - Fire-and-forget Click: triggerCustomPoseFunctions() builds the function's click cycle
+   ([base, ...enabled triggers]) and, if any member has the checkbox on, gives each hand the first trigger
+   from the one this click resolved to whose pose it is NOT in, wrapping around; a hand already in all of
+   them gets none. triggerClickPose(p, onlyHands) arms only those hands (and also checks the box itself, so
+   the multi-finger path is covered).
+ - Click+Hold: startCustomHoldFunctions() does the same assignment at press time and arms every prefix
+   that got hands; updateClickHoldPoseForHand() only arms a hand on a prefix it was allotted (and re-checks
+   the box at arm time). endCustomHoldFunctions() releases every prefix the press armed
+   (customHoldMultiTriggerActivePrefix[id] is now a list).
+ - The shared click counter still advances once per click, so a hand that skipped ahead sees the next
+   trigger first on the next click.
+
+Verified live (v=306, in memory, nothing saved) on "1 - C" (base target Big Open Palm (S), Trigger 1 target
+Fist) with hands forced into a pose: in base pose -> only Trigger 1 fires (156 hands, base 0); in Trigger 1's
+pose -> base fires, Trigger 1 does not; both triggers set to the same pose and hands in it -> nothing fires;
+checkbox off -> fires normally. Click+Hold ("1 - CH" temporarily set to Single Pose, targets Twist 1 / Twist 2):
+hands in the base pose -> Trigger 1 armed on 156, base 0; in Trigger 1's pose -> base 156; in neither -> base 155.
+Not verified: on a real device with your real saved functions; the tolerance value against real poses.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

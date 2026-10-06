@@ -2460,3 +2460,10 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   the visibility pause lifts, send the quick click as a synchronous down+up (timers are throttled to ~1 s in this tab,
   so a `wait(80)` becomes a >500 ms "hold"), raise `cfg.multiClickWindowMs` in memory, and drive
   `__debug.updateRenderOrder()` on an interval.
+- **Skip If Same Pose (2026-10-06).** `handSkipsTrigger(hand, p)` is checked per hand in `triggerClickPose()` (fire-and-forget)
+  and in `updateClickHoldPoseForHand()`'s arming gate (hold), and the Multi Trigger fall-through is decided by
+  `assignHandsToCycle()` at dispatch/press time. A hand's "current pose" is `_lastPoseValues` only while
+  `_wasOverriddenLastFrame`, else live `cfg`; any code that poses a hand must keep those two honest or the check reads a
+  stale pose. A new Single-Pose-style trigger family must be added to `multiTriggerCycle()`'s callers, or it skips the
+  per-hand cycle. In tests, set `_wasOverriddenLastFrame`/`_lastPoseValues` right before the click and do not pump
+  `updateRenderOrder()` until the trigger has fired (an idle pump resets them).
