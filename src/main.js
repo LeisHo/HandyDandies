@@ -4528,6 +4528,10 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       { key: `${p}RotationY`, label: 'Rotation Y (Deg)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
       { key: `${p}RotationZ`, label: 'Rotation Z (Deg)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
       { key: `${p}TargetPose`, label: 'Target Pose', type: 'select', def: defaults.targetPose ?? '', options: () => (cfg.savedPoses || []).map((sp) => ({ value: sp.name, group: sp.group || null })) },
+      // Skip If Same Pose (2026-10-06, direct request). Single Pose mode only: when on, a hand that is
+      // ALREADY in this function's target pose is left alone by this trigger; with Multi Trigger it moves
+      // on to the next trigger in the cycle (see handSkipsTrigger() / triggerCustomPoseFunctions()).
+      { key: `${p}SkipIfSamePose`, label: 'Skip If Same Pose', type: 'checkbox', def: false },
       { key: `${p}TweenSelector`, label: 'Sequence', type: 'select', def: '', options: () => (cfg.savedTweenSequences || []).map((s) => ({ value: s.name, group: s.group || null })) },
       // Reverse Sequence (2026-10-04, direct request: "add a checkbox under the sequence selector
       // to reverse the order of the sequence, so the final pose is the beginning and vice versa").
@@ -4893,6 +4897,10 @@ function makeClickPoseGroup(p, title, defaults = {}) {
       { key: `${p}RotationY`, label: 'Rotation Y (Deg)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
       { key: `${p}RotationZ`, label: 'Rotation Z (Deg)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
       { key: `${p}TargetPose`, label: 'Target Pose', type: 'select', def: defaults.targetPose ?? '', options: () => (cfg.savedPoses || []).map((sp) => ({ value: sp.name, group: sp.group || null })) },
+      // Skip If Same Pose (2026-10-06, direct request). Single Pose mode only: when on, a hand that is
+      // ALREADY in this function's target pose is left alone by this trigger; with Multi Trigger it moves
+      // on to the next trigger in the cycle (see handSkipsTrigger() / triggerCustomPoseFunctions()).
+      { key: `${p}SkipIfSamePose`, label: 'Skip If Same Pose', type: 'checkbox', def: false },
       { key: `${p}TweenSelector`, label: 'Sequence', type: 'select', def: '', options: () => (cfg.savedTweenSequences || []).map((s) => ({ value: s.name, group: s.group || null })) },
       // Reverse Sequence (2026-10-04, direct request: "add a checkbox under the sequence selector
       // to reverse the order of the sequence, so the final pose is the beginning and vice versa").
@@ -9135,6 +9143,10 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
       if (cap === null) eligible = false
       else tweenFractionCap = cap
     }
+    // Skip If Same Pose (2026-10-06): this press may not arm this prefix on this hand (Multi Trigger gave the hand
+    // to another trigger, or it has no trigger left), or the hand is already in the target pose.
+    const allowHands = customHoldHandAllow[p]
+    if (eligible && ((allowHands && !allowHands.has(hand)) || handSkipsTrigger(hand, p))) eligible = false
     if (eligible) {
       const isTweenStart = isSequenceOrChainMode(p)
       // Start Time Curve on/off -- ONE shared gate now covers both Single
@@ -10460,7 +10472,62 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
 // single combined distance snapshot (same technique endClickHoldPose()
 // already uses for ITS OWN per-hand delays) -- a click should feel
 // immediate, not delayed by up to one frame.
-function triggerClickPose(p) {
+// ---- Skip If Same Pose (2026-10-06) ----
+// Single Pose mode only (a sequence never skips). A hand "is in" the target pose when every pose value of what
+// it is showing right now (its last applied pose while a function drives it, otherwise the live Pose settings)
+// is within 0.2% of that value's slider range of the target pose's value. The 0.2% is a judgment call, not a
+// measurement: small enough that a visible difference never counts as the same pose, large enough to absorb
+// float noise from a tween that has just finished.
+let _poseSameTol = null
+function poseSameTolerance() {
+  if (_poseSameTol) return _poseSameTol
+  const t = {}
+  const grp = DEV_GROUPS.find((g) => g.title === 'Pose')
+  POSE_PRESET_KEYS.forEach((k) => {
+    const c = grp ? grp.controls.find((x) => x.key === k) : null
+    t[k] = (c && Number.isFinite(c.min) && Number.isFinite(c.max)) ? Math.max((c.max - c.min) * 0.002, 1e-6) : 0.1
+  })
+  _poseSameTol = t
+  return t
+}
+// The target pose item when this trigger has Skip If Same Pose on (and is in Single Pose mode); otherwise null.
+function skipSamePoseTarget(p) {
+  if (!cfg[`${p}SkipIfSamePose`] || cfg[`${p}Mode`] !== 'Single Pose') return null
+  return (cfg.savedPoses || []).find((sp) => sp.name === cfg[`${p}TargetPose`]) || null
+}
+function handInPose(hand, target) {
+  const cur = (hand._wasOverriddenLastFrame && hand._lastPoseValues) ? hand._lastPoseValues : cfg
+  const tol = poseSameTolerance()
+  for (let i = 0; i < POSE_PRESET_KEYS.length; i++) {
+    const k = POSE_PRESET_KEYS[i]
+    const tv = target[k] !== undefined ? target[k] : POSE_KEY_DEFAULTS[k]
+    const cv = cur[k] !== undefined ? cur[k] : POSE_KEY_DEFAULTS[k]
+    if (Math.abs(cv - tv) > tol[k]) return false
+  }
+  return true
+}
+function handSkipsTrigger(hand, p) {
+  const target = skipSamePoseTarget(p)
+  return !!target && handInPose(hand, target)
+}
+// For every hand, the first trigger in `cycle` (starting at `startIdx`, wrapping) whose target pose the hand is NOT
+// already in; a hand that is already in every trigger's pose gets none. Returns Map(prefix -> Set(hands)).
+function assignHandsToCycle(cycle, startIdx) {
+  const groups = new Map()
+  hands.forEach((hand) => {
+    for (let n = 0; n < cycle.length; n++) {
+      const q = cycle[(startIdx + n) % cycle.length]
+      if (!handSkipsTrigger(hand, q)) {
+        let set = groups.get(q)
+        if (!set) { set = new Set(); groups.set(q, set) }
+        set.add(hand)
+        break
+      }
+    }
+  })
+  return groups
+}
+function triggerClickPose(p, onlyHands = null) {
   if (!cfg[`${p}Enabled`]) return
   const trig = clickPoseTriggers[p]
   const now = nowVirtual() // virtual clock -- feeds cp.triggerTime below, an animation-timing field
@@ -10492,6 +10559,8 @@ function triggerClickPose(p) {
   hands.forEach((h3) => { const d3 = h3.wrapper.position.distanceTo(cursorTarget); if (d3 < splay3dMin) splay3dMin = d3; if (d3 > splay3dMax) splay3dMax = d3 })
   const splay3dRange = Math.max(splay3dMax - splay3dMin, 0.001)
   hands.forEach((hand, i) => {
+    if (onlyHands && !onlyHands.has(hand)) return // Skip If Same Pose / Multi Trigger already chose this trigger for other hands
+    if (handSkipsTrigger(hand, p)) return // Skip If Same Pose: already in the target pose
     const cp = getOrInitHandCP(hand)[p]
     // Start Distance Curve (direct spec, 2026-09-27) -- "beyond those
     // bounds, hands will not get triggered": an ineligible hand is left
@@ -12251,7 +12320,7 @@ const CUSTOM_FUNCTION_POSE_LAYOUT = [
   { type: 'row', suffix: 'Enabled' },
   { type: 'row', suffix: 'Type' }, { type: 'row', suffix: 'TouchPointCount' }, { type: 'row', suffix: 'ClickCount' },
   { type: 'row', suffix: 'Mode' },
-  { type: 'row', suffix: 'TargetPose' }, { type: 'row', suffix: 'TweenSelector' }, { type: 'row', suffix: 'ReverseSequence' }, { type: 'row', suffix: 'GlideToFirstPose' }, { type: 'row', suffix: 'FirstGlideTimeScale' },
+  { type: 'row', suffix: 'TargetPose' }, { type: 'row', suffix: 'SkipIfSamePose' }, { type: 'row', suffix: 'TweenSelector' }, { type: 'row', suffix: 'ReverseSequence' }, { type: 'row', suffix: 'GlideToFirstPose' }, { type: 'row', suffix: 'FirstGlideTimeScale' },
   { type: 'row', suffix: 'TransitionSpeedMs' }, { type: 'row', suffix: 'TweenSpeedMs' },
   { type: 'row', suffix: 'PauseDurationMs' },
   { type: 'row', suffix: 'SequencePlayMode' }, { type: 'row', suffix: 'SequenceCount' }, { type: 'row', suffix: 'SequenceCountMode' },
@@ -12288,7 +12357,7 @@ const CUSTOM_FUNCTION_HOLD_LAYOUT = [
   { type: 'row', suffix: 'Enabled' },
   { type: 'row', suffix: 'Type' }, { type: 'row', suffix: 'TouchPointCount' }, { type: 'row', suffix: 'ClickCount' },
   { type: 'row', suffix: 'Mode' },
-  { type: 'row', suffix: 'TargetPose' }, { type: 'row', suffix: 'TweenSelector' }, { type: 'row', suffix: 'ReverseSequence' }, { type: 'row', suffix: 'GlideToFirstPose' }, { type: 'row', suffix: 'FirstGlideTimeScale' }, { type: 'row', suffix: 'TweenChain' },
+  { type: 'row', suffix: 'TargetPose' }, { type: 'row', suffix: 'SkipIfSamePose' }, { type: 'row', suffix: 'TweenSelector' }, { type: 'row', suffix: 'ReverseSequence' }, { type: 'row', suffix: 'GlideToFirstPose' }, { type: 'row', suffix: 'FirstGlideTimeScale' }, { type: 'row', suffix: 'TweenChain' },
   { type: 'row', suffix: 'TransitionSpeedMs' }, { type: 'row', suffix: 'TweenSpeedMs' },
   { type: 'row', suffix: 'LoopMode' }, { type: 'row', suffix: 'LoopHoldMs' },
   // 2026-10-04 -- same group order as CUSTOM_FUNCTION_POSE_LAYOUT (taken
@@ -12570,7 +12639,7 @@ function enforceCustomClickFunctionsAnchorOrder() {
 // "the exact same settings available" by construction, and any future
 // change to the real controls propagates to every trigger automatically.
 const MULTI_TRIGGER_ALLOWED_SUFFIXES = [
-  'Enabled', 'Mode', 'TargetPose', 'TweenSelector', 'ReverseSequence', 'GlideToFirstPose', 'FirstGlideTimeScale', 'TweenSpeedMs', 'TransitionSpeedMs', 'PauseDurationMs',
+  'Enabled', 'Mode', 'TargetPose', 'SkipIfSamePose', 'TweenSelector', 'ReverseSequence', 'GlideToFirstPose', 'FirstGlideTimeScale', 'TweenSpeedMs', 'TransitionSpeedMs', 'PauseDurationMs',
   'EasingCurveEnabled', 'EasingCurve',
   'OffsetEnabled', 'OffsetMode', 'OffsetX', 'OffsetY', 'CursorOffsetDistance',
   'CursorOffsetDistanceCurveEnabled', 'CursorOffsetDistanceCurve', 'CursorOffsetDistanceCurveRange',
@@ -12846,17 +12915,20 @@ function updateMultiTriggerGroupVisibility(id) {
 // A single shared counter per function (not per-hand) -- one user click
 // advances the cycle once, for every hand this function drives, matching
 // the spec's own singular "it tweens to Pose 2" framing.
-function resolveMultiTriggerPrefix(id) {
-  if (!cfg[`${id}MultiTriggerEnabled`]) return id
+// The click cycle of a function: [id, ...each enabled trigger's prefix]; just [id] without Multi Trigger.
+function multiTriggerCycle(id) {
+  if (!cfg[`${id}MultiTriggerEnabled`]) return [id]
   let triggers = []
   try { triggers = JSON.parse(cfg[`${id}MultiTriggers`] || '[]') } catch (e) { triggers = [] }
   if (!Array.isArray(triggers)) triggers = []
-  const enabledTriggers = triggers.filter((t) => t && t.prefix && cfg[`${t.prefix}Enabled`] !== false)
-  if (enabledTriggers.length === 0) return id
-  const cycleLength = enabledTriggers.length + 1 // base pose + each enabled trigger
-  const idx = (customFunctionMultiTriggerIndex[id] || 0) % cycleLength
+  return [id, ...triggers.filter((t) => t && t.prefix && cfg[`${t.prefix}Enabled`] !== false).map((t) => t.prefix)]
+}
+function resolveMultiTriggerPrefix(id) {
+  const cycle = multiTriggerCycle(id)
+  if (cycle.length === 1) return id
+  const idx = (customFunctionMultiTriggerIndex[id] || 0) % cycle.length // base pose + each enabled trigger
   customFunctionMultiTriggerIndex[id] = idx + 1
-  return idx === 0 ? id : enabledTriggers[idx - 1].prefix
+  return cycle[idx]
 }
 // Maps a Click-Count select value ('1st'/'2nd'/'3rd'/'4th') to its plain
 // ordinal number, defaulting an unset/unrecognized value to 1 -- shared by
@@ -12920,7 +12992,12 @@ function triggerCustomPoseFunctions(type, clickCount = 1) {
     // triggerClickPose() itself), so every hand this function drives
     // advances together as a single shared cycle, matching the spec's
     // own singular framing ("the first click tweens to Pose 2").
-    triggerClickPose(resolveMultiTriggerPrefix(id))
+    const prefix = resolveMultiTriggerPrefix(id)
+    const cycle = multiTriggerCycle(id)
+    if (!cycle.some((q) => skipSamePoseTarget(q))) { triggerClickPose(prefix); return }
+    // Skip If Same Pose is on somewhere in this function's cycle: each hand takes the first trigger, from the one
+    // this click resolved to, whose target pose it is not already in (a hand already in all of them gets none).
+    assignHandsToCycle(cycle, Math.max(cycle.indexOf(prefix), 0)).forEach((set, q) => triggerClickPose(q, set))
   })
 }
 // Piggybacks every enabled 'hold'-kind custom function of the matching
@@ -12948,7 +13025,9 @@ function triggerCustomPoseFunctions(type, clickCount = 1) {
 // particular press actually armed. Cached here per function id,
 // written by startCustomHoldFunctions(), read (never re-resolved) by
 // endCustomHoldFunctions().
-const customHoldMultiTriggerActivePrefix = {}
+const customHoldMultiTriggerActivePrefix = {} // { [id]: string[] } -- every prefix THIS press armed
+// Skip If Same Pose: per armed prefix, the hands THIS press may arm it on (absent = every hand).
+const customHoldHandAllow = {}
 function startCustomHoldFunctions(type, ordinal = 1) {
   const deviceFamily = currentDeviceFamily()
   customClickFunctionIds.forEach(({ id, kind, family }) => {
@@ -12957,8 +13036,16 @@ function startCustomHoldFunctions(type, ordinal = 1) {
     if (type === 'Click+Hold' && customFunctionClickCountOrdinal(id) !== ordinal) return
     if (type === 'Click+Hold' && customFunctionWantsMultiTouch(id)) return
     const prefix = resolveMultiTriggerPrefix(id)
-    customHoldMultiTriggerActivePrefix[id] = prefix
-    startClickHoldPose(prefix)
+    const cycle = multiTriggerCycle(id)
+    if (!cycle.some((q) => skipSamePoseTarget(q))) {
+      customHoldMultiTriggerActivePrefix[id] = [prefix]
+      delete customHoldHandAllow[prefix]
+      startClickHoldPose(prefix)
+      return
+    }
+    const groups = assignHandsToCycle(cycle, Math.max(cycle.indexOf(prefix), 0))
+    customHoldMultiTriggerActivePrefix[id] = Array.from(groups.keys())
+    groups.forEach((set, q) => { customHoldHandAllow[q] = set; startClickHoldPose(q) })
   })
 }
 function endCustomHoldFunctions(type, ordinal = 1) {
@@ -12972,9 +13059,9 @@ function endCustomHoldFunctions(type, ordinal = 1) {
     // to the base id if start was somehow never recorded (e.g. Multi
     // Trigger got disabled mid-hold), matching resolveMultiTriggerPrefix()'s
     // own "disabled -> base id" behavior.
-    const prefix = customHoldMultiTriggerActivePrefix[id] || id
+    const prefixes = customHoldMultiTriggerActivePrefix[id] || [id]
     delete customHoldMultiTriggerActivePrefix[id]
-    endClickHoldPose(prefix)
+    prefixes.forEach((prefix) => { delete customHoldHandAllow[prefix]; endClickHoldPose(prefix) })
   })
 }
 // Scroll -- direct spec item ("Click Function Type should always include
@@ -13208,7 +13295,7 @@ function updateClickTriggerModeVisibility(p, extraSinglePoseKeys, extraTweenKeys
   // their visibility (mode check included), so they're not double-
   // managed by 2 different functions racing to set the same row's
   // `display`.
-  const singlePoseKeys = ['TargetPose', 'TransitionSpeedMs', ...extraSinglePoseKeys]
+  const singlePoseKeys = ['TargetPose', 'SkipIfSamePose', 'TransitionSpeedMs', ...extraSinglePoseKeys]
   // Tween's own dedicated speed/curve/range trio (see
   // makeClickHoldPoseGroup()'s own comment for why these are separate
   // fields from the Single Pose trio above, not just hidden duplicates).
