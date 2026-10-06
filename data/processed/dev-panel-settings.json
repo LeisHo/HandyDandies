@@ -9127,7 +9127,7 @@
       "custom27Trig1EasingCurve": "[{\"x\":0,\"y\":0.5},{\"x\":0.5000449530512309,\"y\":0.8712501525878906},{\"x\":1,\"y\":0.5}]",
       "custom27Trig1SpeedCurveEnabled": true,
       "custom27Trig1SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom27Trig1SpeedCurveRange": "{\"min\":666,\"max\":1214}",
+      "custom27Trig1SpeedCurveRange": "{\"min\":974,\"max\":2000}",
       "custom27Trig1StartTimeCurveEnabled": true,
       "custom27Trig1StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom27Trig1StartTimeRange": "{\"min\":0,\"max\":300}",
@@ -9193,7 +9193,7 @@
       "custom27Trig2EasingCurve": "[{\"x\":0,\"y\":0.5},{\"x\":0.5000449530512309,\"y\":0.8712501525878906},{\"x\":1,\"y\":0.5}]",
       "custom27Trig2SpeedCurveEnabled": true,
       "custom27Trig2SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom27Trig2SpeedCurveRange": "{\"min\":666,\"max\":1528}",
+      "custom27Trig2SpeedCurveRange": "{\"min\":1319,\"max\":1846}",
       "custom27Trig2StartTimeCurveEnabled": true,
       "custom27Trig2StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom27Trig2StartTimeRange": "{\"min\":0,\"max\":300}",
@@ -18404,7 +18404,7 @@
       "custom27Trig1EasingCurve": "[{\"x\":0,\"y\":0.5},{\"x\":0.5000449530512309,\"y\":0.8712501525878906},{\"x\":1,\"y\":0.5}]",
       "custom27Trig1SpeedCurveEnabled": true,
       "custom27Trig1SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom27Trig1SpeedCurveRange": "{\"min\":666,\"max\":1214}",
+      "custom27Trig1SpeedCurveRange": "{\"min\":974,\"max\":2000}",
       "custom27Trig1StartTimeCurveEnabled": true,
       "custom27Trig1StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom27Trig1StartTimeRange": "{\"min\":0,\"max\":300}",
@@ -18470,7 +18470,7 @@
       "custom27Trig2EasingCurve": "[{\"x\":0,\"y\":0.5},{\"x\":0.5000449530512309,\"y\":0.8712501525878906},{\"x\":1,\"y\":0.5}]",
       "custom27Trig2SpeedCurveEnabled": true,
       "custom27Trig2SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom27Trig2SpeedCurveRange": "{\"min\":666,\"max\":1528}",
+      "custom27Trig2SpeedCurveRange": "{\"min\":1319,\"max\":1846}",
       "custom27Trig2StartTimeCurveEnabled": true,
       "custom27Trig2StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom27Trig2StartTimeRange": "{\"min\":0,\"max\":300}",
@@ -27681,7 +27681,7 @@
       "custom27Trig1EasingCurve": "[{\"x\":0,\"y\":0.5},{\"x\":0.5000449530512309,\"y\":0.8712501525878906},{\"x\":1,\"y\":0.5}]",
       "custom27Trig1SpeedCurveEnabled": true,
       "custom27Trig1SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom27Trig1SpeedCurveRange": "{\"min\":666,\"max\":1214}",
+      "custom27Trig1SpeedCurveRange": "{\"min\":974,\"max\":2000}",
       "custom27Trig1StartTimeCurveEnabled": true,
       "custom27Trig1StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom27Trig1StartTimeRange": "{\"min\":0,\"max\":300}",
@@ -27747,7 +27747,7 @@
       "custom27Trig2EasingCurve": "[{\"x\":0,\"y\":0.5},{\"x\":0.5000449530512309,\"y\":0.8712501525878906},{\"x\":1,\"y\":0.5}]",
       "custom27Trig2SpeedCurveEnabled": true,
       "custom27Trig2SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom27Trig2SpeedCurveRange": "{\"min\":666,\"max\":1528}",
+      "custom27Trig2SpeedCurveRange": "{\"min\":1319,\"max\":1846}",
       "custom27Trig2StartTimeCurveEnabled": true,
       "custom27Trig2StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom27Trig2StartTimeRange": "{\"min\":0,\"max\":300}",
@@ -33811,7 +33811,7 @@
                             "type": "group",
                             "group": {
                               "key": "Animation Speed Curve",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -34192,7 +34192,7 @@
                           },
                           {
                             "key": "Animation Speed Curve",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -35450,7 +35450,7 @@
                           "type": "group",
                           "group": {
                             "key": "Animation Speed Curve",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -35831,7 +35831,7 @@
                         },
                         {
                           "key": "Animation Speed Curve",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -37473,7 +37473,7 @@
                           "type": "group",
                           "group": {
                             "key": "Animation Speed Curve",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -37854,7 +37854,7 @@
                         },
                         {
                           "key": "Animation Speed Curve",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -39112,7 +39112,7 @@
                         "type": "group",
                         "group": {
                           "key": "Animation Speed Curve",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -39493,7 +39493,7 @@
                       },
                       {
                         "key": "Animation Speed Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -108718,7 +108718,7 @@
                           "type": "group",
                           "group": {
                             "key": "Animation Speed Curve",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -109099,7 +109099,7 @@
                         },
                         {
                           "key": "Animation Speed Curve",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -110357,7 +110357,7 @@
                         "type": "group",
                         "group": {
                           "key": "Animation Speed Curve",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -110738,7 +110738,7 @@
                       },
                       {
                         "key": "Animation Speed Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -112380,7 +112380,7 @@
                         "type": "group",
                         "group": {
                           "key": "Animation Speed Curve",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -112761,7 +112761,7 @@
                       },
                       {
                         "key": "Animation Speed Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -114019,7 +114019,7 @@
                       "type": "group",
                       "group": {
                         "key": "Animation Speed Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -114400,7 +114400,7 @@
                     },
                     {
                       "key": "Animation Speed Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
