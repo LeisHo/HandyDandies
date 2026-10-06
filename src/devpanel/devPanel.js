@@ -3467,6 +3467,20 @@ export function initDevPanel(groups, opts = {}) {
     }
   }
 
+  // Same snapshot Copy Settings puts on the clipboard (captureFullPanelState()), downloaded as a file instead.
+  function exportDevPanelSettings() {
+    const text = JSON.stringify(captureFullPanelState(), null, 2)
+    const blob = new Blob([text], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'dev-panel-settings.json'
+    document.body.appendChild(a)
+    a.click()
+    a.remove()
+    URL.revokeObjectURL(url)
+  }
+
   copyBtn.addEventListener('click', copySettings)
   // clearDevPanelUndoStack() is a hoisted function declaration defined
   // further down this same function -- safe to reference here since
@@ -3510,7 +3524,8 @@ export function initDevPanel(groups, opts = {}) {
   const useStateBtn = el('button', null, { type: 'button', textContent: 'Use' })
   const deleteStateBtn = el('button', null, { type: 'button', textContent: 'Delete' })
   const setDefaultStateBtn = el('button', null, { type: 'button', textContent: 'Set Default' })
-  savedStatesBtnRow.append(saveStateBtn, useStateBtn, deleteStateBtn, setDefaultStateBtn)
+  const exportStateBtn = el('button', null, { type: 'button', textContent: 'Export' })
+  savedStatesBtnRow.append(saveStateBtn, useStateBtn, deleteStateBtn, setDefaultStateBtn, exportStateBtn)
   savedStatesBody.append(savedStatesSelect, savedStatesBtnRow)
   groupsEl.insertBefore(savedStatesGroup, groupsEl.firstChild)
 
@@ -3573,6 +3588,7 @@ export function initDevPanel(groups, opts = {}) {
   useStateBtn.addEventListener('click', useNamedState)
   deleteStateBtn.addEventListener('click', deleteNamedState)
   setDefaultStateBtn.addEventListener('click', setNamedStateAsDefault)
+  exportStateBtn.addEventListener('click', exportDevPanelSettings)
   renderSavedStatesList()
   // `.dp-collapsed`'s own CSS only hides `.dp-body`/`.dp-resize` -- it
   // can't also shrink the PANEL's own box, for 2 separate reasons that
