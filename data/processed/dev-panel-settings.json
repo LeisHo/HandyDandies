@@ -6684,7 +6684,7 @@
       "emissionColor": "#ffffff",
       "emissionIntensity": 1.5,
       "bgColor": "#000000",
-      "pixelRatio": 2,
+      "pixelRatio": 1.25,
       "resolutionScale": 100,
       "qualityPreset": "high",
       "showGridHelper": false,
@@ -14749,7 +14749,7 @@
       "emissionColor": "#ffffff",
       "emissionIntensity": 1.5,
       "bgColor": "#000000",
-      "pixelRatio": 2,
+      "pixelRatio": 1.25,
       "resolutionScale": 100,
       "qualityPreset": "high",
       "showGridHelper": false,
@@ -22814,7 +22814,7 @@
       "emissionColor": "#ffffff",
       "emissionIntensity": 1.5,
       "bgColor": "#000000",
-      "pixelRatio": 2,
+      "pixelRatio": 1.25,
       "resolutionScale": 100,
       "qualityPreset": "high",
       "showGridHelper": false,
@@ -29517,7 +29517,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 18",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -33564,7 +33564,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 17",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -34447,7 +34447,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 16",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -35640,7 +35640,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 15",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -36833,7 +36833,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 14",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -37716,7 +37716,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 13",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -44925,7 +44925,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 10",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -49262,7 +49262,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 9",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -56471,7 +56471,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 8",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -65777,7 +65777,7 @@
         },
         {
           "key": "Custom Click Function 18",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -69821,7 +69821,7 @@
         },
         {
           "key": "Custom Click Function 17",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -70701,7 +70701,7 @@
         },
         {
           "key": "Custom Click Function 16",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -71891,7 +71891,7 @@
         },
         {
           "key": "Custom Click Function 15",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -73081,7 +73081,7 @@
         },
         {
           "key": "Custom Click Function 14",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -73961,7 +73961,7 @@
         },
         {
           "key": "Custom Click Function 13",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -81167,7 +81167,7 @@
         },
         {
           "key": "Custom Click Function 10",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -85501,7 +85501,7 @@
         },
         {
           "key": "Custom Click Function 9",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -92707,7 +92707,7 @@
         },
         {
           "key": "Custom Click Function 8",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -101906,14 +101906,8 @@
     "desktop": {
       "left": 210.375,
       "top": 18.387500762939453,
-      "width": 586.4000244140625,
-      "height": 498.3999938964844
-    },
-    "mobile": {
-      "left": 64.13690948486328,
-      "top": 20.285715103149414,
-      "width": 337.1428527832031,
-      "height": 766.5238037109375
+      "width": 592.7999877929688,
+      "height": 629.6000366210938
     }
   }
 }
