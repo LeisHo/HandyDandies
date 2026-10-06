@@ -2467,3 +2467,9 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   stale pose. A new Single-Pose-style trigger family must be added to `multiTriggerCycle()`'s callers, or it skips the
   per-hand cycle. In tests, set `_wasOverriddenLastFrame`/`_lastPoseValues` right before the click and do not pump
   `updateRenderOrder()` until the trigger has fired (an idle pump resets them).
+- **Template sync, 2026-10-06: diff against the archive, not the whole file.** `.claude/TEMPLATE_DEV_PANEL_ARCHIVE/` holds a
+  timestamped copy of the template from before each edit; diffing the copy that matches the last port
+  (here the 2026-09-28 05:08 one) against the live template lists exactly what is new (about 400 lines instead of
+  480 KB). Three of eight areas applied; the Set Hotkey rewrite, header layout and default-letter header hotkeys
+  were left out on purpose (see CHANGELOG.txt 2026-10-06). The next sync should diff against the archive copy made
+  after 2026-10-06 03:53, or re-diff from `TEMPLATE_DEV_PANEL_20261006T035346.html`.

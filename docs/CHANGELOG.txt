@@ -16596,6 +16596,34 @@ checkbox off -> fires normally. Click+Hold ("1 - CH" temporarily set to Single P
 hands in the base pose -> Trigger 1 armed on 156, base 0; in Trigger 1's pose -> base 156; in neither -> base 155.
 Not verified: on a real device with your real saved functions; the tolerance value against real poses.
 
+2026-10-06  -  (dev panel template sync)
+
+Direct request: check the Dev Panel template and implement the most recent changes. Method: diffed the
+current J:\CLAUDE\PROJECTS\.claude\TEMPLATE_DEV_PANEL.html against its archived copy from 2026-09-28 05:08
+(the state the 2026-10-04 port was based on); 424 changed lines, in 8 areas.
+
+Applied (devPanel.js `?v=61`, `main.js` `?v=307`), each re-derived for this project's own .dp-* DOM:
+ 1. Undo ignores scroll drags ("Scrolling doesnt count", template 10-06): a pointerdown whose target is exactly
+    the panel, .dp-body, .dp-group-body, .dp-row, .dp-group, .dp-header-buttons, .dp-actions or a list-picker
+    wrapper no longer pushes an undo snapshot. Verified live: change a checkbox, press the empty scroll area,
+    one Undo restored the original value.
+ 2. Locking a group locks every nested group too, and unlocking unlocks them (template 10-06). Verified live on
+    "Dev Panel": locking set 8 nested groups locked with their icons.
+ 3. Hotkeys no longer swallow unassigned modifier combos (template 10-04 fault #1). This project's key listener
+    called preventDefault() on every Ctrl/Shift/Alt + letter/digit, killing Ctrl+F, Ctrl+R, Ctrl+C... whether or
+    not a hotkey was assigned. It now only intercepts a combo that is assigned. Verified live: unassigned
+    Ctrl+F, Ctrl+R and Shift+Q are not default-prevented.
+Already in this project: Export button (added earlier today), Redo, header Copy/Reset/Save, R key resets,
+hotkeys saved in Copy/Save/Undo.
+
+Not applied (the template's other changes do not fit this project's own panel):
+ - The template's Set Hotkey rewrite (faults #2-#6, fixes for a broken port that used an undefined el()): this
+   project's hotkey engine is the HANDYSET one (2-key sequences, slider arrow-key HUD, Hotkeys list subgroup)
+   and does not have those faults (single keys fire at once unless a 2-key sequence could follow; hotkeys are saved).
+ - Template header layout of 2026-09-30 (Sync | Copy | Reset | DEV label ...): this project's header order is its own.
+ - Default letter hotkeys on header buttons (S Sync, C Copy, R Reset, U Undo, Y Redo, data-hotkey-default):
+   would take S, C, U and Y away from user-assigned single-letter hotkeys; left for a decision.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a
