@@ -8490,9 +8490,9 @@
       "custom23Mode": "Sequence",
       "custom23OffsetEnabled": true,
       "custom23OffsetMode": "Hand Axes Offset",
-      "custom23OffsetX": -5,
-      "custom23OffsetY": -5,
-      "custom23OffsetZ": -5,
+      "custom23OffsetX": -2,
+      "custom23OffsetY": -2,
+      "custom23OffsetZ": -2,
       "custom23CursorOffsetDistance": 0,
       "custom23CursorOffsetDistanceCurveEnabled": false,
       "custom23CursorOffsetDistanceCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -8563,7 +8563,7 @@
       "custom23TweenStopDelayCurveEnabled": true,
       "custom23TweenStopDelayCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom23TweenStopDelayRange": "{\"min\":2020,\"max\":5000}",
-      "custom23MultiTriggerEnabled": false,
+      "custom23MultiTriggerEnabled": true,
       "custom23MultiTriggers": "[{\"prefix\":\"custom23Trig1\",\"title\":\"Trigger 1\"}]",
       "custom23Trig1Enabled": true,
       "custom23Trig1Mode": "Chain",
@@ -8582,14 +8582,14 @@
       "custom23Trig1CursorOffsetYRange": "{\"min\":0,\"max\":0}",
       "custom23Trig1CursorOffsetZCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom23Trig1CursorOffsetZRange": "{\"min\":0,\"max\":0}",
-      "custom23Trig1CameraOffsetEnabled": false,
-      "custom23Trig1CameraOffsetXEnabled": true,
+      "custom23Trig1CameraOffsetEnabled": true,
+      "custom23Trig1CameraOffsetXEnabled": false,
       "custom23Trig1CameraOffsetXCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom23Trig1CameraOffsetXRange": "{\"min\":0,\"max\":10}",
       "custom23Trig1CameraOffsetYEnabled": true,
-      "custom23Trig1CameraOffsetYCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom23Trig1CameraOffsetYRange": "{\"min\":0,\"max\":10}",
-      "custom23Trig1CameraOffsetZEnabled": true,
+      "custom23Trig1CameraOffsetYCurve": "[{\"x\":0,\"y\":0},{\"x\":0.598142326292769,\"y\":0.3384375254313151},{\"x\":1,\"y\":1}]",
+      "custom23Trig1CameraOffsetYRange": "{\"min\":-3,\"max\":10}",
+      "custom23Trig1CameraOffsetZEnabled": false,
       "custom23Trig1CameraOffsetZCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom23Trig1CameraOffsetZRange": "{\"min\":0,\"max\":10}",
       "custom23Trig1RotationEnabled": true,
@@ -8602,15 +8602,15 @@
       "custom23Trig1GlideToFirstPose": true,
       "custom23Trig1FirstGlideTimeScale": 1,
       "custom23Trig1TweenChain": [
-        "Waiting Horizontal Tap",
-        "COUNTDOWN - VERTICAL",
+        "Birdie",
+        "Neutral - Horizontal Fanning",
         "COUNT",
         "COUNT R"
       ],
       "custom23Trig1TweenSpeedMs": 800,
       "custom23Trig1TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom23Trig1TweenStartTimeRange": "{\"min\":0,\"max\":1300}",
-      "custom23Trig1LoopMode": "Off",
+      "custom23Trig1LoopMode": "Loop",
       "custom23Trig1LoopHoldMs": 0,
       "custom23Trig1TransitionSpeedMs": 700,
       "custom23Trig1EasingCurveEnabled": false,
@@ -17767,9 +17767,9 @@
       "custom23Mode": "Sequence",
       "custom23OffsetEnabled": true,
       "custom23OffsetMode": "Hand Axes Offset",
-      "custom23OffsetX": -5,
-      "custom23OffsetY": -5,
-      "custom23OffsetZ": -5,
+      "custom23OffsetX": -2,
+      "custom23OffsetY": -2,
+      "custom23OffsetZ": -2,
       "custom23CursorOffsetDistance": 0,
       "custom23CursorOffsetDistanceCurveEnabled": false,
       "custom23CursorOffsetDistanceCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -17840,7 +17840,7 @@
       "custom23TweenStopDelayCurveEnabled": true,
       "custom23TweenStopDelayCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom23TweenStopDelayRange": "{\"min\":2020,\"max\":5000}",
-      "custom23MultiTriggerEnabled": false,
+      "custom23MultiTriggerEnabled": true,
       "custom23MultiTriggers": "[{\"prefix\":\"custom23Trig1\",\"title\":\"Trigger 1\"}]",
       "custom23Trig1Enabled": true,
       "custom23Trig1Mode": "Chain",
@@ -17859,14 +17859,14 @@
       "custom23Trig1CursorOffsetYRange": "{\"min\":0,\"max\":0}",
       "custom23Trig1CursorOffsetZCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom23Trig1CursorOffsetZRange": "{\"min\":0,\"max\":0}",
-      "custom23Trig1CameraOffsetEnabled": false,
-      "custom23Trig1CameraOffsetXEnabled": true,
+      "custom23Trig1CameraOffsetEnabled": true,
+      "custom23Trig1CameraOffsetXEnabled": false,
       "custom23Trig1CameraOffsetXCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom23Trig1CameraOffsetXRange": "{\"min\":0,\"max\":10}",
       "custom23Trig1CameraOffsetYEnabled": true,
-      "custom23Trig1CameraOffsetYCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom23Trig1CameraOffsetYRange": "{\"min\":0,\"max\":10}",
-      "custom23Trig1CameraOffsetZEnabled": true,
+      "custom23Trig1CameraOffsetYCurve": "[{\"x\":0,\"y\":0},{\"x\":0.598142326292769,\"y\":0.3384375254313151},{\"x\":1,\"y\":1}]",
+      "custom23Trig1CameraOffsetYRange": "{\"min\":-3,\"max\":10}",
+      "custom23Trig1CameraOffsetZEnabled": false,
       "custom23Trig1CameraOffsetZCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom23Trig1CameraOffsetZRange": "{\"min\":0,\"max\":10}",
       "custom23Trig1RotationEnabled": true,
@@ -17879,15 +17879,15 @@
       "custom23Trig1GlideToFirstPose": true,
       "custom23Trig1FirstGlideTimeScale": 1,
       "custom23Trig1TweenChain": [
-        "Waiting Horizontal Tap",
-        "COUNTDOWN - VERTICAL",
+        "Birdie",
+        "Neutral - Horizontal Fanning",
         "COUNT",
         "COUNT R"
       ],
       "custom23Trig1TweenSpeedMs": 800,
       "custom23Trig1TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom23Trig1TweenStartTimeRange": "{\"min\":0,\"max\":1300}",
-      "custom23Trig1LoopMode": "Off",
+      "custom23Trig1LoopMode": "Loop",
       "custom23Trig1LoopHoldMs": 0,
       "custom23Trig1TransitionSpeedMs": 700,
       "custom23Trig1EasingCurveEnabled": false,
@@ -27044,9 +27044,9 @@
       "custom23Mode": "Sequence",
       "custom23OffsetEnabled": true,
       "custom23OffsetMode": "Hand Axes Offset",
-      "custom23OffsetX": -5,
-      "custom23OffsetY": -5,
-      "custom23OffsetZ": -5,
+      "custom23OffsetX": -2,
+      "custom23OffsetY": -2,
+      "custom23OffsetZ": -2,
       "custom23CursorOffsetDistance": 0,
       "custom23CursorOffsetDistanceCurveEnabled": false,
       "custom23CursorOffsetDistanceCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -27117,7 +27117,7 @@
       "custom23TweenStopDelayCurveEnabled": true,
       "custom23TweenStopDelayCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom23TweenStopDelayRange": "{\"min\":2020,\"max\":5000}",
-      "custom23MultiTriggerEnabled": false,
+      "custom23MultiTriggerEnabled": true,
       "custom23MultiTriggers": "[{\"prefix\":\"custom23Trig1\",\"title\":\"Trigger 1\"}]",
       "custom23Trig1Enabled": true,
       "custom23Trig1Mode": "Chain",
@@ -27136,14 +27136,14 @@
       "custom23Trig1CursorOffsetYRange": "{\"min\":0,\"max\":0}",
       "custom23Trig1CursorOffsetZCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom23Trig1CursorOffsetZRange": "{\"min\":0,\"max\":0}",
-      "custom23Trig1CameraOffsetEnabled": false,
-      "custom23Trig1CameraOffsetXEnabled": true,
+      "custom23Trig1CameraOffsetEnabled": true,
+      "custom23Trig1CameraOffsetXEnabled": false,
       "custom23Trig1CameraOffsetXCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom23Trig1CameraOffsetXRange": "{\"min\":0,\"max\":10}",
       "custom23Trig1CameraOffsetYEnabled": true,
-      "custom23Trig1CameraOffsetYCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom23Trig1CameraOffsetYRange": "{\"min\":0,\"max\":10}",
-      "custom23Trig1CameraOffsetZEnabled": true,
+      "custom23Trig1CameraOffsetYCurve": "[{\"x\":0,\"y\":0},{\"x\":0.598142326292769,\"y\":0.3384375254313151},{\"x\":1,\"y\":1}]",
+      "custom23Trig1CameraOffsetYRange": "{\"min\":-3,\"max\":10}",
+      "custom23Trig1CameraOffsetZEnabled": false,
       "custom23Trig1CameraOffsetZCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom23Trig1CameraOffsetZRange": "{\"min\":0,\"max\":10}",
       "custom23Trig1RotationEnabled": true,
@@ -27156,15 +27156,15 @@
       "custom23Trig1GlideToFirstPose": true,
       "custom23Trig1FirstGlideTimeScale": 1,
       "custom23Trig1TweenChain": [
-        "Waiting Horizontal Tap",
-        "COUNTDOWN - VERTICAL",
+        "Birdie",
+        "Neutral - Horizontal Fanning",
         "COUNT",
         "COUNT R"
       ],
       "custom23Trig1TweenSpeedMs": 800,
       "custom23Trig1TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom23Trig1TweenStartTimeRange": "{\"min\":0,\"max\":1300}",
-      "custom23Trig1LoopMode": "Off",
+      "custom23Trig1LoopMode": "Loop",
       "custom23Trig1LoopHoldMs": 0,
       "custom23Trig1TransitionSpeedMs": 700,
       "custom23Trig1EasingCurveEnabled": false,
@@ -49166,7 +49166,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 23",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -49233,7 +49233,7 @@
                 "type": "group",
                 "group": {
                   "key": "Offset",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -49788,7 +49788,7 @@
                       "type": "group",
                       "group": {
                         "key": "Trigger 1",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -50923,7 +50923,7 @@
                   "subgroups": [
                     {
                       "key": "Trigger 1",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -52069,7 +52069,7 @@
             "subgroups": [
               {
                 "key": "Offset",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -52597,7 +52597,7 @@
                     "type": "group",
                     "group": {
                       "key": "Trigger 1",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -53732,7 +53732,7 @@
                 "subgroups": [
                   {
                     "key": "Trigger 1",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -124061,7 +124061,7 @@
         },
         {
           "key": "Custom Click Function 23",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
@@ -124128,7 +124128,7 @@
               "type": "group",
               "group": {
                 "key": "Offset",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -124683,7 +124683,7 @@
                     "type": "group",
                     "group": {
                       "key": "Trigger 1",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -125818,7 +125818,7 @@
                 "subgroups": [
                   {
                     "key": "Trigger 1",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -126964,7 +126964,7 @@
           "subgroups": [
             {
               "key": "Offset",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -127492,7 +127492,7 @@
                   "type": "group",
                   "group": {
                     "key": "Trigger 1",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -128627,7 +128627,7 @@
               "subgroups": [
                 {
                   "key": "Trigger 1",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
