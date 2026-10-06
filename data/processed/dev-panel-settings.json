@@ -8398,14 +8398,14 @@
       "custom21Trig1TweenSpeedMs": 800,
       "custom21Trig1TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21Trig1TweenStartTimeRange": "{\"min\":0,\"max\":609}",
-      "custom21Trig1LoopMode": "Off",
+      "custom21Trig1LoopMode": "Loop",
       "custom21Trig1LoopHoldMs": 0,
       "custom21Trig1TransitionSpeedMs": 700,
       "custom21Trig1EasingCurveEnabled": false,
       "custom21Trig1EasingCurve": "[{\"x\":0,\"y\":0.5},{\"x\":1,\"y\":0.5}]",
       "custom21Trig1SpeedCurveEnabled": true,
       "custom21Trig1SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom21Trig1SpeedCurveRange": "{\"min\":1451,\"max\":1965}",
+      "custom21Trig1SpeedCurveRange": "{\"min\":922,\"max\":1561}",
       "custom21Trig1StartTimeCurveEnabled": true,
       "custom21Trig1StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21Trig1StartTimeRange": "{\"min\":0,\"max\":300}",
@@ -18055,14 +18055,14 @@
       "custom21Trig1TweenSpeedMs": 800,
       "custom21Trig1TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21Trig1TweenStartTimeRange": "{\"min\":0,\"max\":609}",
-      "custom21Trig1LoopMode": "Off",
+      "custom21Trig1LoopMode": "Loop",
       "custom21Trig1LoopHoldMs": 0,
       "custom21Trig1TransitionSpeedMs": 700,
       "custom21Trig1EasingCurveEnabled": false,
       "custom21Trig1EasingCurve": "[{\"x\":0,\"y\":0.5},{\"x\":1,\"y\":0.5}]",
       "custom21Trig1SpeedCurveEnabled": true,
       "custom21Trig1SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom21Trig1SpeedCurveRange": "{\"min\":1451,\"max\":1965}",
+      "custom21Trig1SpeedCurveRange": "{\"min\":922,\"max\":1561}",
       "custom21Trig1StartTimeCurveEnabled": true,
       "custom21Trig1StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21Trig1StartTimeRange": "{\"min\":0,\"max\":300}",
@@ -27712,14 +27712,14 @@
       "custom21Trig1TweenSpeedMs": 800,
       "custom21Trig1TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21Trig1TweenStartTimeRange": "{\"min\":0,\"max\":609}",
-      "custom21Trig1LoopMode": "Off",
+      "custom21Trig1LoopMode": "Loop",
       "custom21Trig1LoopHoldMs": 0,
       "custom21Trig1TransitionSpeedMs": 700,
       "custom21Trig1EasingCurveEnabled": false,
       "custom21Trig1EasingCurve": "[{\"x\":0,\"y\":0.5},{\"x\":1,\"y\":0.5}]",
       "custom21Trig1SpeedCurveEnabled": true,
       "custom21Trig1SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom21Trig1SpeedCurveRange": "{\"min\":1451,\"max\":1965}",
+      "custom21Trig1SpeedCurveRange": "{\"min\":922,\"max\":1561}",
       "custom21Trig1StartTimeCurveEnabled": true,
       "custom21Trig1StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21Trig1StartTimeRange": "{\"min\":0,\"max\":300}",
@@ -72763,23 +72763,22 @@
                             }
                           },
                           {
+                            "type": "row",
+                            "key": "custom21Trig1SpeedCurve"
+                          },
+                          {
                             "type": "group",
                             "group": {
                               "key": "Animation Speed Curve",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
-                                {
-                                  "type": "row",
-                                  "key": "custom21Trig1SpeedCurve"
-                                },
                                 {
                                   "type": "row",
                                   "key": "custom21Trig1SpeedCurveRange"
                                 }
                               ],
                               "settings": [
-                                "custom21Trig1SpeedCurve",
                                 "custom21Trig1SpeedCurveRange"
                               ],
                               "subgroups": []
@@ -73125,7 +73124,8 @@
                           "custom21Trig1TransitionSpeedMs",
                           "custom21Trig1TweenSpeedMs",
                           "custom21Trig1LoopMode",
-                          "custom21Trig1LoopHoldMs"
+                          "custom21Trig1LoopHoldMs",
+                          "custom21Trig1SpeedCurve"
                         ],
                         "subgroups": [
                           {
@@ -73305,20 +73305,15 @@
                           },
                           {
                             "key": "Animation Speed Curve",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
-                              {
-                                "type": "row",
-                                "key": "custom21Trig1SpeedCurve"
-                              },
                               {
                                 "type": "row",
                                 "key": "custom21Trig1SpeedCurveRange"
                               }
                             ],
                             "settings": [
-                              "custom21Trig1SpeedCurve",
                               "custom21Trig1SpeedCurveRange"
                             ],
                             "subgroups": []
@@ -73895,23 +73890,22 @@
                           }
                         },
                         {
+                          "type": "row",
+                          "key": "custom21Trig1SpeedCurve"
+                        },
+                        {
                           "type": "group",
                           "group": {
                             "key": "Animation Speed Curve",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
-                              {
-                                "type": "row",
-                                "key": "custom21Trig1SpeedCurve"
-                              },
                               {
                                 "type": "row",
                                 "key": "custom21Trig1SpeedCurveRange"
                               }
                             ],
                             "settings": [
-                              "custom21Trig1SpeedCurve",
                               "custom21Trig1SpeedCurveRange"
                             ],
                             "subgroups": []
@@ -74257,7 +74251,8 @@
                         "custom21Trig1TransitionSpeedMs",
                         "custom21Trig1TweenSpeedMs",
                         "custom21Trig1LoopMode",
-                        "custom21Trig1LoopHoldMs"
+                        "custom21Trig1LoopHoldMs",
+                        "custom21Trig1SpeedCurve"
                       ],
                       "subgroups": [
                         {
@@ -74437,20 +74432,15 @@
                         },
                         {
                           "key": "Animation Speed Curve",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
-                            {
-                              "type": "row",
-                              "key": "custom21Trig1SpeedCurve"
-                            },
                             {
                               "type": "row",
                               "key": "custom21Trig1SpeedCurveRange"
                             }
                           ],
                           "settings": [
-                            "custom21Trig1SpeedCurve",
                             "custom21Trig1SpeedCurveRange"
                           ],
                           "subgroups": []
@@ -75549,23 +75539,22 @@
                           }
                         },
                         {
+                          "type": "row",
+                          "key": "custom21Trig1SpeedCurve"
+                        },
+                        {
                           "type": "group",
                           "group": {
                             "key": "Animation Speed Curve",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
-                              {
-                                "type": "row",
-                                "key": "custom21Trig1SpeedCurve"
-                              },
                               {
                                 "type": "row",
                                 "key": "custom21Trig1SpeedCurveRange"
                               }
                             ],
                             "settings": [
-                              "custom21Trig1SpeedCurve",
                               "custom21Trig1SpeedCurveRange"
                             ],
                             "subgroups": []
@@ -75911,7 +75900,8 @@
                         "custom21Trig1TransitionSpeedMs",
                         "custom21Trig1TweenSpeedMs",
                         "custom21Trig1LoopMode",
-                        "custom21Trig1LoopHoldMs"
+                        "custom21Trig1LoopHoldMs",
+                        "custom21Trig1SpeedCurve"
                       ],
                       "subgroups": [
                         {
@@ -76091,20 +76081,15 @@
                         },
                         {
                           "key": "Animation Speed Curve",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
-                            {
-                              "type": "row",
-                              "key": "custom21Trig1SpeedCurve"
-                            },
                             {
                               "type": "row",
                               "key": "custom21Trig1SpeedCurveRange"
                             }
                           ],
                           "settings": [
-                            "custom21Trig1SpeedCurve",
                             "custom21Trig1SpeedCurveRange"
                           ],
                           "subgroups": []
@@ -76681,23 +76666,22 @@
                         }
                       },
                       {
+                        "type": "row",
+                        "key": "custom21Trig1SpeedCurve"
+                      },
+                      {
                         "type": "group",
                         "group": {
                           "key": "Animation Speed Curve",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
-                            {
-                              "type": "row",
-                              "key": "custom21Trig1SpeedCurve"
-                            },
                             {
                               "type": "row",
                               "key": "custom21Trig1SpeedCurveRange"
                             }
                           ],
                           "settings": [
-                            "custom21Trig1SpeedCurve",
                             "custom21Trig1SpeedCurveRange"
                           ],
                           "subgroups": []
@@ -77043,7 +77027,8 @@
                       "custom21Trig1TransitionSpeedMs",
                       "custom21Trig1TweenSpeedMs",
                       "custom21Trig1LoopMode",
-                      "custom21Trig1LoopHoldMs"
+                      "custom21Trig1LoopHoldMs",
+                      "custom21Trig1SpeedCurve"
                     ],
                     "subgroups": [
                       {
@@ -77223,20 +77208,15 @@
                       },
                       {
                         "key": "Animation Speed Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
-                          {
-                            "type": "row",
-                            "key": "custom21Trig1SpeedCurve"
-                          },
                           {
                             "type": "row",
                             "key": "custom21Trig1SpeedCurveRange"
                           }
                         ],
                         "settings": [
-                          "custom21Trig1SpeedCurve",
                           "custom21Trig1SpeedCurveRange"
                         ],
                         "subgroups": []
@@ -159605,23 +159585,22 @@
                           }
                         },
                         {
+                          "type": "row",
+                          "key": "custom21Trig1SpeedCurve"
+                        },
+                        {
                           "type": "group",
                           "group": {
                             "key": "Animation Speed Curve",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
-                              {
-                                "type": "row",
-                                "key": "custom21Trig1SpeedCurve"
-                              },
                               {
                                 "type": "row",
                                 "key": "custom21Trig1SpeedCurveRange"
                               }
                             ],
                             "settings": [
-                              "custom21Trig1SpeedCurve",
                               "custom21Trig1SpeedCurveRange"
                             ],
                             "subgroups": []
@@ -159967,7 +159946,8 @@
                         "custom21Trig1TransitionSpeedMs",
                         "custom21Trig1TweenSpeedMs",
                         "custom21Trig1LoopMode",
-                        "custom21Trig1LoopHoldMs"
+                        "custom21Trig1LoopHoldMs",
+                        "custom21Trig1SpeedCurve"
                       ],
                       "subgroups": [
                         {
@@ -160147,20 +160127,15 @@
                         },
                         {
                           "key": "Animation Speed Curve",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
-                            {
-                              "type": "row",
-                              "key": "custom21Trig1SpeedCurve"
-                            },
                             {
                               "type": "row",
                               "key": "custom21Trig1SpeedCurveRange"
                             }
                           ],
                           "settings": [
-                            "custom21Trig1SpeedCurve",
                             "custom21Trig1SpeedCurveRange"
                           ],
                           "subgroups": []
@@ -160737,23 +160712,22 @@
                         }
                       },
                       {
+                        "type": "row",
+                        "key": "custom21Trig1SpeedCurve"
+                      },
+                      {
                         "type": "group",
                         "group": {
                           "key": "Animation Speed Curve",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
-                            {
-                              "type": "row",
-                              "key": "custom21Trig1SpeedCurve"
-                            },
                             {
                               "type": "row",
                               "key": "custom21Trig1SpeedCurveRange"
                             }
                           ],
                           "settings": [
-                            "custom21Trig1SpeedCurve",
                             "custom21Trig1SpeedCurveRange"
                           ],
                           "subgroups": []
@@ -161099,7 +161073,8 @@
                       "custom21Trig1TransitionSpeedMs",
                       "custom21Trig1TweenSpeedMs",
                       "custom21Trig1LoopMode",
-                      "custom21Trig1LoopHoldMs"
+                      "custom21Trig1LoopHoldMs",
+                      "custom21Trig1SpeedCurve"
                     ],
                     "subgroups": [
                       {
@@ -161279,20 +161254,15 @@
                       },
                       {
                         "key": "Animation Speed Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
-                          {
-                            "type": "row",
-                            "key": "custom21Trig1SpeedCurve"
-                          },
                           {
                             "type": "row",
                             "key": "custom21Trig1SpeedCurveRange"
                           }
                         ],
                         "settings": [
-                          "custom21Trig1SpeedCurve",
                           "custom21Trig1SpeedCurveRange"
                         ],
                         "subgroups": []
@@ -162391,23 +162361,22 @@
                         }
                       },
                       {
+                        "type": "row",
+                        "key": "custom21Trig1SpeedCurve"
+                      },
+                      {
                         "type": "group",
                         "group": {
                           "key": "Animation Speed Curve",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
-                            {
-                              "type": "row",
-                              "key": "custom21Trig1SpeedCurve"
-                            },
                             {
                               "type": "row",
                               "key": "custom21Trig1SpeedCurveRange"
                             }
                           ],
                           "settings": [
-                            "custom21Trig1SpeedCurve",
                             "custom21Trig1SpeedCurveRange"
                           ],
                           "subgroups": []
@@ -162753,7 +162722,8 @@
                       "custom21Trig1TransitionSpeedMs",
                       "custom21Trig1TweenSpeedMs",
                       "custom21Trig1LoopMode",
-                      "custom21Trig1LoopHoldMs"
+                      "custom21Trig1LoopHoldMs",
+                      "custom21Trig1SpeedCurve"
                     ],
                     "subgroups": [
                       {
@@ -162933,20 +162903,15 @@
                       },
                       {
                         "key": "Animation Speed Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
-                          {
-                            "type": "row",
-                            "key": "custom21Trig1SpeedCurve"
-                          },
                           {
                             "type": "row",
                             "key": "custom21Trig1SpeedCurveRange"
                           }
                         ],
                         "settings": [
-                          "custom21Trig1SpeedCurve",
                           "custom21Trig1SpeedCurveRange"
                         ],
                         "subgroups": []
@@ -163523,23 +163488,22 @@
                       }
                     },
                     {
+                      "type": "row",
+                      "key": "custom21Trig1SpeedCurve"
+                    },
+                    {
                       "type": "group",
                       "group": {
                         "key": "Animation Speed Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
-                          {
-                            "type": "row",
-                            "key": "custom21Trig1SpeedCurve"
-                          },
                           {
                             "type": "row",
                             "key": "custom21Trig1SpeedCurveRange"
                           }
                         ],
                         "settings": [
-                          "custom21Trig1SpeedCurve",
                           "custom21Trig1SpeedCurveRange"
                         ],
                         "subgroups": []
@@ -163885,7 +163849,8 @@
                     "custom21Trig1TransitionSpeedMs",
                     "custom21Trig1TweenSpeedMs",
                     "custom21Trig1LoopMode",
-                    "custom21Trig1LoopHoldMs"
+                    "custom21Trig1LoopHoldMs",
+                    "custom21Trig1SpeedCurve"
                   ],
                   "subgroups": [
                     {
@@ -164065,20 +164030,15 @@
                     },
                     {
                       "key": "Animation Speed Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
-                        {
-                          "type": "row",
-                          "key": "custom21Trig1SpeedCurve"
-                        },
                         {
                           "type": "row",
                           "key": "custom21Trig1SpeedCurveRange"
                         }
                       ],
                       "settings": [
-                        "custom21Trig1SpeedCurve",
                         "custom21Trig1SpeedCurveRange"
                       ],
                       "subgroups": []
@@ -209138,7 +209098,7 @@
       "left": 32.2976188659668,
       "top": 15.625,
       "width": 351.6071472167969,
-      "height": 35.52381134033203
+      "height": 769.3690795898438
     }
   }
 }
