@@ -8278,11 +8278,11 @@
       "custom21TweenStopDelayRange": "{\"min\":2130,\"max\":3777}",
       "custom21MultiTriggerEnabled": true,
       "custom21MultiTriggers": "[{\"prefix\":\"custom21Trig1\",\"title\":\"Trigger 1\"}]",
-      "custom22Enabled": false,
+      "custom22Enabled": true,
       "custom22Type": "Click",
       "custom22TouchPointCount": 1,
       "custom22ClickCount": "1st",
-      "custom22Mode": "Single Pose",
+      "custom22Mode": "Sequence",
       "custom22OffsetEnabled": false,
       "custom22OffsetMode": "XYZ Offset",
       "custom22OffsetX": 0,
@@ -8313,10 +8313,10 @@
       "custom22RotationY": 0,
       "custom22RotationZ": 0,
       "custom22TargetPose": "",
-      "custom22TweenSelector": "",
+      "custom22TweenSelector": "COUNTDOWN - VERTICAL + LENS COVER",
       "custom22ReverseSequence": false,
-      "custom22GlideToFirstPose": false,
-      "custom22FirstGlideTimeScale": 1,
+      "custom22GlideToFirstPose": true,
+      "custom22FirstGlideTimeScale": 2.5,
       "custom22TweenSpeedMs": 800,
       "custom22TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom22TweenStartTimeRange": "{\"min\":0,\"max\":300}",
@@ -16901,11 +16901,11 @@
       "custom21TweenStopDelayRange": "{\"min\":2130,\"max\":3777}",
       "custom21MultiTriggerEnabled": true,
       "custom21MultiTriggers": "[{\"prefix\":\"custom21Trig1\",\"title\":\"Trigger 1\"}]",
-      "custom22Enabled": false,
+      "custom22Enabled": true,
       "custom22Type": "Click",
       "custom22TouchPointCount": 1,
       "custom22ClickCount": "1st",
-      "custom22Mode": "Single Pose",
+      "custom22Mode": "Sequence",
       "custom22OffsetEnabled": false,
       "custom22OffsetMode": "XYZ Offset",
       "custom22OffsetX": 0,
@@ -16936,10 +16936,10 @@
       "custom22RotationY": 0,
       "custom22RotationZ": 0,
       "custom22TargetPose": "",
-      "custom22TweenSelector": "",
+      "custom22TweenSelector": "COUNTDOWN - VERTICAL + LENS COVER",
       "custom22ReverseSequence": false,
-      "custom22GlideToFirstPose": false,
-      "custom22FirstGlideTimeScale": 1,
+      "custom22GlideToFirstPose": true,
+      "custom22FirstGlideTimeScale": 2.5,
       "custom22TweenSpeedMs": 800,
       "custom22TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom22TweenStartTimeRange": "{\"min\":0,\"max\":300}",
@@ -25524,11 +25524,11 @@
       "custom21TweenStopDelayRange": "{\"min\":2130,\"max\":3777}",
       "custom21MultiTriggerEnabled": true,
       "custom21MultiTriggers": "[{\"prefix\":\"custom21Trig1\",\"title\":\"Trigger 1\"}]",
-      "custom22Enabled": false,
+      "custom22Enabled": true,
       "custom22Type": "Click",
       "custom22TouchPointCount": 1,
       "custom22ClickCount": "1st",
-      "custom22Mode": "Single Pose",
+      "custom22Mode": "Sequence",
       "custom22OffsetEnabled": false,
       "custom22OffsetMode": "XYZ Offset",
       "custom22OffsetX": 0,
@@ -25559,10 +25559,10 @@
       "custom22RotationY": 0,
       "custom22RotationZ": 0,
       "custom22TargetPose": "",
-      "custom22TweenSelector": "",
+      "custom22TweenSelector": "COUNTDOWN - VERTICAL + LENS COVER",
       "custom22ReverseSequence": false,
-      "custom22GlideToFirstPose": false,
-      "custom22FirstGlideTimeScale": 1,
+      "custom22GlideToFirstPose": true,
+      "custom22FirstGlideTimeScale": 2.5,
       "custom22TweenSpeedMs": 800,
       "custom22TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom22TweenStartTimeRange": "{\"min\":0,\"max\":300}",
@@ -32957,7 +32957,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 22",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -33840,7 +33840,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 21",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -34328,7 +34328,7 @@
                 "type": "group",
                 "group": {
                   "key": "Tween Stop",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -36460,7 +36460,7 @@
               },
               {
                 "key": "Tween Stop",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -81127,7 +81127,7 @@
         },
         {
           "key": "Custom Click Function 22",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
@@ -82007,7 +82007,7 @@
         },
         {
           "key": "Custom Click Function 21",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -82495,7 +82495,7 @@
               "type": "group",
               "group": {
                 "key": "Tween Stop",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -84627,7 +84627,7 @@
             },
             {
               "key": "Tween Stop",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
