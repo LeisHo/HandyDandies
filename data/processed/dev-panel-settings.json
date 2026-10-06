@@ -8045,7 +8045,7 @@
       "custom18Trig1RetransitionStartTimeCurveEnabled": true,
       "custom18Trig1RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.5245013947182513,\"y\":0.3016667683919271},{\"x\":1,\"y\":1}]",
       "custom18Trig1RetransitionStartTimeRange": "{\"min\":0,\"max\":1785}",
-      "custom19Enabled": true,
+      "custom19Enabled": false,
       "custom19Type": "Scroll",
       "custom19TouchPointCount": 1,
       "custom19ClickCount": "1st",
@@ -17662,7 +17662,7 @@
       "custom18Trig1RetransitionStartTimeCurveEnabled": true,
       "custom18Trig1RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.5245013947182513,\"y\":0.3016667683919271},{\"x\":1,\"y\":1}]",
       "custom18Trig1RetransitionStartTimeRange": "{\"min\":0,\"max\":1785}",
-      "custom19Enabled": true,
+      "custom19Enabled": false,
       "custom19Type": "Scroll",
       "custom19TouchPointCount": 1,
       "custom19ClickCount": "1st",
@@ -27279,7 +27279,7 @@
       "custom18Trig1RetransitionStartTimeCurveEnabled": true,
       "custom18Trig1RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.5245013947182513,\"y\":0.3016667683919271},{\"x\":1,\"y\":1}]",
       "custom18Trig1RetransitionStartTimeRange": "{\"min\":0,\"max\":1785}",
-      "custom19Enabled": true,
+      "custom19Enabled": false,
       "custom19Type": "Scroll",
       "custom19TouchPointCount": 1,
       "custom19ClickCount": "1st",
@@ -33282,7 +33282,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 29",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -119753,7 +119753,7 @@
       "subgroups": [
         {
           "key": "Custom Click Function 29",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -206131,7 +206131,7 @@
     },
     {
       "key": "New Group (11)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": false,
       "items": [
         {
@@ -206893,7 +206893,10 @@
     "custom29Trig1ClickCount": "Trigger Count",
     "custom29Trig2Enabled": "ON/ OFF",
     "custom29Trig2Type": "Trigger Type",
-    "custom29Trig2ClickCount": "Trigger Count"
+    "custom29Trig2ClickCount": "Trigger Count",
+    "Custom Click Function 29": "3 PT",
+    "Custom Click Function 28": "2 PT",
+    "Custom Click Function 19": "SCROLL"
   },
   "devVisibility": {
     "custom17Enabled": true,
