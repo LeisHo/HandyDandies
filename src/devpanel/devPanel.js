@@ -97,6 +97,11 @@ let hostOnDevVisibilityChanged = null
 // panel) -- between the two, every way `cfg`/the visible panel can change
 // is covered.
 let hostOnAnyValueChange = null
+// Keys Undo/Redo must NOT touch unless the step being undone/redone was itself an edit of one of them (2026-10-06,
+// direct request "don't remember camera settings unless changed by sliders"). The host (main.js) passes the live
+// camera sliders: they follow the camera as you orbit/pan/zoom on the canvas, but a canvas drag is not an undo step,
+// so restoring an older snapshot used to jump the camera back to where it was at your last panel click.
+let hostUndoLiveKeys = []
 const numEls = {} // key -> { slider, numInput } | { type: 'color' } | { type: 'checkbox' }
 // Set by initDevPanel()'s own saveSettings() closure (see its own comment) so
 // the exported saveCurrentSettings() below can trigger a real persisted save.
@@ -2814,6 +2819,7 @@ export function initDevPanel(groups, opts = {}) {
   storageKeyPrefix = opts.storageKeyPrefix || 'devPanel'
   hostOnDevVisibilityChanged = opts.onDevVisibilityChanged || null
   hostOnAnyValueChange = opts.onAnyValueChange || null
+  hostUndoLiveKeys = Array.isArray(opts.undoLiveKeys) ? opts.undoLiveKeys : []
   editingDevice = realDeviceClass()
   // cfg/store are populated from defaults regardless of DEV_MODE -- these
   // values are the app's real, shipped defaults for every visitor; DEV_MODE
@@ -3858,7 +3864,7 @@ export function initDevPanel(groups, opts = {}) {
   let devUndoStack = []
   let devRedoStack = []
   let devUndoGestureActive = false
-  function pushDevPanelUndoSnapshot() {
+  function pushDevPanelUndoSnapshot(liveEdit = false) {
     // Deep-cloned (JSON round-trip) -- REQUIRED, not defensive:
     // captureFullPanelState()'s own `values` field is built as
     // `{ ...store[d] }`, a SHALLOW copy -- any array/object VALUE within
@@ -3869,8 +3875,23 @@ export function initDevPanel(groups, opts = {}) {
     devUndoStack.push({
       kind: 'snapshot',
       data: JSON.parse(JSON.stringify(captureFullPanelState())),
-      extra: extra !== undefined ? JSON.parse(JSON.stringify(extra)) : undefined
+      extra: extra !== undefined ? JSON.parse(JSON.stringify(extra)) : undefined,
+      liveEdit // true when this step was an edit of one of hostUndoLiveKeys (only then does restoring it also restore those)
     })
+  }
+  // Applies an undo/redo snapshot, leaving every hostUndoLiveKeys value at what it is RIGHT NOW unless the entry was
+  // an edit of one of them.
+  function applyUndoEntryState(entry) {
+    let state = entry.data
+    if (!entry.liveEdit && hostUndoLiveKeys.length && state && state.values) {
+      state = { ...state, values: { ...state.values } }
+      DEVICES.forEach((d) => {
+        if (!state.values[d]) return
+        state.values[d] = { ...state.values[d] }
+        hostUndoLiveKeys.forEach((k) => { if (k in store[d]) state.values[d][k] = store[d][k] })
+      })
+    }
+    applyFullPanelState(state)
   }
   function pushDevDeleteUndoEntry(node, parent, nextSibling) {
     devUndoStack.push({ kind: 'delete', node, parent, nextSibling })
@@ -3897,9 +3918,10 @@ export function initDevPanel(groups, opts = {}) {
       devRedoStack.push({
         kind: 'snapshot',
         data: JSON.parse(JSON.stringify(captureFullPanelState())),
-        extra: extra !== undefined ? JSON.parse(JSON.stringify(extra)) : undefined
+        extra: extra !== undefined ? JSON.parse(JSON.stringify(extra)) : undefined,
+        liveEdit: entry.liveEdit
       })
-      applyFullPanelState(entry.data)
+      applyUndoEntryState(entry)
       if (entry.extra !== undefined && devUndoApplyExtra) devUndoApplyExtra(entry.extra)
     }
   }
@@ -3910,8 +3932,8 @@ export function initDevPanel(groups, opts = {}) {
       devUndoStack.push(entry) // undoing the redo = re-inserting it again
       entry.node.remove()
     } else {
-      pushDevPanelUndoSnapshot()
-      applyFullPanelState(entry.data)
+      pushDevPanelUndoSnapshot(entry.liveEdit)
+      applyUndoEntryState(entry)
       if (entry.extra !== undefined && devUndoApplyExtra) devUndoApplyExtra(entry.extra)
     }
   }
@@ -3957,7 +3979,8 @@ export function initDevPanel(groups, opts = {}) {
     // `undoBtn.click()` alone does NOT fire pointerdown at all.
     if (e.target.closest('.dp-header-buttons')) return
     devUndoGestureActive = true
-    pushDevPanelUndoSnapshot()
+    const pressedRow = e.target.closest('.dp-row')
+    pushDevPanelUndoSnapshot(!!pressedRow && hostUndoLiveKeys.includes(pressedRow.dataset.key))
     // A genuine new edit invalidates any pending redo history -- standard
     // undo/redo semantics.
     devRedoStack = []
@@ -4311,7 +4334,8 @@ export function initDevPanel(groups, opts = {}) {
     hud.style.display = 'block'
   }
   function enterSliderHotkeyMode(sliderEl) {
-    pushDevPanelUndoSnapshot(); devRedoStack = [] // the whole arrow-key session = one undo action
+    const hkRow = sliderEl.closest('.dp-row')
+    pushDevPanelUndoSnapshot(!!hkRow && hostUndoLiveKeys.includes(hkRow.dataset.key)); devRedoStack = [] // the whole arrow-key session = one undo action
     activeSliderHotkey = { el: sliderEl, baseStep: parseFloat(sliderEl.step) || 1, multiplier: 1 }
     updateSliderHotkeyHud()
   }
