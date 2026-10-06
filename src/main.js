@@ -12569,7 +12569,21 @@ const MULTI_TRIGGER_ALLOWED_SUFFIXES = [
   'SpeedCurveEnabled', 'SpeedCurve', 'SpeedCurveRange',
   'StartTimeCurveEnabled', 'StartTimeCurve', 'StartTimeRange', 'TweenStartTimeCurve', 'TweenStartTimeRange',
   'StartDistanceCurveEnabled', 'StartDistanceMin', 'StartDistanceMax', 'StartDistanceCurve',
-  'RetransitionEnabled', 'RetransitionSpeedMs', 'RetransitionSpeedCurveEnabled', 'RetransitionSpeedCurve', 'RetransitionSpeedCurveRange', 'RetransitionStartTimeCurveEnabled', 'RetransitionStartTimeCurve', 'RetransitionStartTimeRange'
+  'RetransitionEnabled', 'RetransitionSpeedMs', 'RetransitionSpeedCurveEnabled', 'RetransitionSpeedCurve', 'RetransitionSpeedCurveRange', 'RetransitionStartTimeCurveEnabled', 'RetransitionStartTimeCurve', 'RetransitionStartTimeRange',
+  // 2026-10-06 (direct request, "1 - CH"): a hold-kind trigger in Sequence/Chain mode uses its own
+  // Tween* retransition fields, which were missing here, so the Retransition / Retransition Speed
+  // Curve / Retransition Start Time Curve groups of every hold-kind trigger were empty shells in
+  // Sequence mode. A suffix a kind does not have simply matches nothing (the filter is by exact key).
+  'TweenRetransitionSpeedMs', 'TweenRetransitionSpeedCurve', 'TweenRetransitionSpeedCurveRange', 'TweenRetransitionStartTimeCurve', 'TweenRetransitionStartTimeRange',
+  // Chain mode's sequence list (hold-kind; Mode offers Chain but its selector was missing).
+  'TweenChain',
+  // Tween Stop group (hold-kind only: it needs a release event, which a fire-and-forget Click has none of).
+  'TweenStopEnabled', 'TweenStopStartTimeCurveEnabled', 'TweenStopStartTimeCurve', 'TweenStopStartTimeRange',
+  'TweenStopDelayEnabled', 'TweenStopDelayMs', 'TweenStopDelayCurveEnabled', 'TweenStopDelayCurve', 'TweenStopDelayRange',
+  // Loop type selector per trigger: hold-kind = Loop Mode (+ hold duration); pose-kind = Sequence Mode
+  // (Count / Loop / Oscillate) and its Count / Count Mode / Loop Transition / Hold Duration rows.
+  'LoopMode', 'LoopHoldMs',
+  'SequencePlayMode', 'SequenceCount', 'SequenceCountMode', 'SequenceLoopTransition', 'SequenceHoldMs'
 ]
 // CORRECTED 2026-10-01, direct request ("Click Functions that trigger a
 // sequence should still be able to have multi trigger functionality"):
@@ -12662,6 +12676,7 @@ async function registerMultiTriggerTrigger(prefix, title, mtBody, addBtnRow, kin
     buildClickPoseWidgets(prefix)
     updateClickTriggerModeVisibility(prefix, ['PauseDurationMs'])
     updateChainModeVisibility(prefix)
+    updateSequencePlayModeVisibility(prefix)
   }
   if (yielder) await yielder()
   updateOffsetRotationVisibility(prefix)
