@@ -215,7 +215,7 @@
       "loadingPreviewCameraFov": 32,
       "loadingPreviewCameraZoom": 161.7694831224424,
       "loadingPreviewCameraEditMode": true,
-      "customClickFunctionIds": "[{\"id\":\"custom7\",\"title\":\"Custom Click Function 7\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom8\",\"title\":\"Custom Click Function 8\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom9\",\"title\":\"Custom Click Function 9\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom10\",\"title\":\"Custom Click Function 10\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom13\",\"title\":\"Custom Click Function 13\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom14\",\"title\":\"Custom Click Function 14\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom15\",\"title\":\"Custom Click Function 15\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom16\",\"title\":\"Custom Click Function 16\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom17\",\"title\":\"Custom Click Function 17\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom18\",\"title\":\"Custom Click Function 18\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom19\",\"title\":\"Custom Click Function 19\",\"kind\":\"pose\",\"family\":\"mobile\"},{\"id\":\"custom20\",\"title\":\"Custom Click Function 20\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom21\",\"title\":\"Custom Click Function 21\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom22\",\"title\":\"Custom Click Function 22\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom23\",\"title\":\"Custom Click Function 23\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom24\",\"title\":\"Custom Click Function 24\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom25\",\"title\":\"Custom Click Function 25\",\"kind\":\"pose\",\"family\":\"desktop\"}]",
+      "customClickFunctionIds": "[{\"id\":\"custom7\",\"title\":\"Custom Click Function 7\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom8\",\"title\":\"Custom Click Function 8\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom9\",\"title\":\"Custom Click Function 9\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom10\",\"title\":\"Custom Click Function 10\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom13\",\"title\":\"Custom Click Function 13\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom14\",\"title\":\"Custom Click Function 14\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom15\",\"title\":\"Custom Click Function 15\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom16\",\"title\":\"Custom Click Function 16\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom17\",\"title\":\"Custom Click Function 17\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom18\",\"title\":\"Custom Click Function 18\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom19\",\"title\":\"Custom Click Function 19\",\"kind\":\"pose\",\"family\":\"mobile\"},{\"id\":\"custom20\",\"title\":\"Custom Click Function 20\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom21\",\"title\":\"Custom Click Function 21\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom22\",\"title\":\"Custom Click Function 22\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom23\",\"title\":\"Custom Click Function 23\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom24\",\"title\":\"Custom Click Function 24\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom25\",\"title\":\"Custom Click Function 25\",\"kind\":\"hold\",\"family\":\"desktop\"}]",
       "holdConfirmMs": 400,
       "multiClickWindowMs": 370,
       "zoomGestureThresholdPx": 40,
@@ -8491,8 +8491,8 @@
       "custom24RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "custom24MultiTriggerEnabled": true,
       "custom24MultiTriggers": "[{\"prefix\":\"custom24Trig1\",\"title\":\"Trigger 1\"}]",
-      "custom25Enabled": false,
-      "custom25Type": "Click",
+      "custom25Enabled": true,
+      "custom25Type": "Click+Hold",
       "custom25TouchPointCount": 1,
       "custom25ClickCount": "1st",
       "custom25Mode": "Single Pose",
@@ -8699,7 +8699,24 @@
       "custom24Trig1RetransitionSpeedCurveRange": "{\"min\":15000,\"max\":30000}",
       "custom24Trig1RetransitionStartTimeCurveEnabled": false,
       "custom24Trig1RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom24Trig1RetransitionStartTimeRange": "{\"min\":0,\"max\":300}"
+      "custom24Trig1RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom25TweenChain": [],
+      "custom25LoopMode": "Off",
+      "custom25LoopHoldMs": 0,
+      "custom25TweenRetransitionSpeedMs": 800,
+      "custom25TweenRetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom25TweenRetransitionSpeedCurveRange": "{\"min\":50,\"max\":2000}",
+      "custom25TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom25TweenRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom25TweenStopEnabled": true,
+      "custom25TweenStopStartTimeCurveEnabled": false,
+      "custom25TweenStopStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom25TweenStopStartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom25TweenStopDelayEnabled": false,
+      "custom25TweenStopDelayMs": 0,
+      "custom25TweenStopDelayCurveEnabled": false,
+      "custom25TweenStopDelayCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom25TweenStopDelayRange": "{\"min\":0,\"max\":2000}"
     },
     "mobile": {
       "pauseBtnXOffset": 12,
@@ -8916,7 +8933,7 @@
       "loadingPreviewCameraFov": 32,
       "loadingPreviewCameraZoom": 161.7694831224424,
       "loadingPreviewCameraEditMode": true,
-      "customClickFunctionIds": "[{\"id\":\"custom7\",\"title\":\"Custom Click Function 7\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom8\",\"title\":\"Custom Click Function 8\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom9\",\"title\":\"Custom Click Function 9\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom10\",\"title\":\"Custom Click Function 10\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom13\",\"title\":\"Custom Click Function 13\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom14\",\"title\":\"Custom Click Function 14\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom15\",\"title\":\"Custom Click Function 15\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom16\",\"title\":\"Custom Click Function 16\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom17\",\"title\":\"Custom Click Function 17\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom18\",\"title\":\"Custom Click Function 18\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom19\",\"title\":\"Custom Click Function 19\",\"kind\":\"pose\",\"family\":\"mobile\"},{\"id\":\"custom20\",\"title\":\"Custom Click Function 20\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom21\",\"title\":\"Custom Click Function 21\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom22\",\"title\":\"Custom Click Function 22\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom23\",\"title\":\"Custom Click Function 23\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom24\",\"title\":\"Custom Click Function 24\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom25\",\"title\":\"Custom Click Function 25\",\"kind\":\"pose\",\"family\":\"desktop\"}]",
+      "customClickFunctionIds": "[{\"id\":\"custom7\",\"title\":\"Custom Click Function 7\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom8\",\"title\":\"Custom Click Function 8\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom9\",\"title\":\"Custom Click Function 9\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom10\",\"title\":\"Custom Click Function 10\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom13\",\"title\":\"Custom Click Function 13\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom14\",\"title\":\"Custom Click Function 14\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom15\",\"title\":\"Custom Click Function 15\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom16\",\"title\":\"Custom Click Function 16\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom17\",\"title\":\"Custom Click Function 17\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom18\",\"title\":\"Custom Click Function 18\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom19\",\"title\":\"Custom Click Function 19\",\"kind\":\"pose\",\"family\":\"mobile\"},{\"id\":\"custom20\",\"title\":\"Custom Click Function 20\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom21\",\"title\":\"Custom Click Function 21\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom22\",\"title\":\"Custom Click Function 22\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom23\",\"title\":\"Custom Click Function 23\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom24\",\"title\":\"Custom Click Function 24\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom25\",\"title\":\"Custom Click Function 25\",\"kind\":\"hold\",\"family\":\"desktop\"}]",
       "holdConfirmMs": 400,
       "multiClickWindowMs": 370,
       "zoomGestureThresholdPx": 40,
@@ -17192,8 +17209,8 @@
       "custom24RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "custom24MultiTriggerEnabled": true,
       "custom24MultiTriggers": "[{\"prefix\":\"custom24Trig1\",\"title\":\"Trigger 1\"}]",
-      "custom25Enabled": false,
-      "custom25Type": "Click",
+      "custom25Enabled": true,
+      "custom25Type": "Click+Hold",
       "custom25TouchPointCount": 1,
       "custom25ClickCount": "1st",
       "custom25Mode": "Single Pose",
@@ -17400,7 +17417,24 @@
       "custom24Trig1RetransitionSpeedCurveRange": "{\"min\":15000,\"max\":30000}",
       "custom24Trig1RetransitionStartTimeCurveEnabled": false,
       "custom24Trig1RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom24Trig1RetransitionStartTimeRange": "{\"min\":0,\"max\":300}"
+      "custom24Trig1RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom25TweenChain": [],
+      "custom25LoopMode": "Off",
+      "custom25LoopHoldMs": 0,
+      "custom25TweenRetransitionSpeedMs": 800,
+      "custom25TweenRetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom25TweenRetransitionSpeedCurveRange": "{\"min\":50,\"max\":2000}",
+      "custom25TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom25TweenRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom25TweenStopEnabled": true,
+      "custom25TweenStopStartTimeCurveEnabled": false,
+      "custom25TweenStopStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom25TweenStopStartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom25TweenStopDelayEnabled": false,
+      "custom25TweenStopDelayMs": 0,
+      "custom25TweenStopDelayCurveEnabled": false,
+      "custom25TweenStopDelayCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom25TweenStopDelayRange": "{\"min\":0,\"max\":2000}"
     },
     "landscape": {
       "pauseBtnXOffset": 12,
@@ -17617,7 +17651,7 @@
       "loadingPreviewCameraFov": 32,
       "loadingPreviewCameraZoom": 161.7694831224424,
       "loadingPreviewCameraEditMode": true,
-      "customClickFunctionIds": "[{\"id\":\"custom7\",\"title\":\"Custom Click Function 7\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom8\",\"title\":\"Custom Click Function 8\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom9\",\"title\":\"Custom Click Function 9\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom10\",\"title\":\"Custom Click Function 10\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom13\",\"title\":\"Custom Click Function 13\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom14\",\"title\":\"Custom Click Function 14\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom15\",\"title\":\"Custom Click Function 15\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom16\",\"title\":\"Custom Click Function 16\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom17\",\"title\":\"Custom Click Function 17\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom18\",\"title\":\"Custom Click Function 18\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom19\",\"title\":\"Custom Click Function 19\",\"kind\":\"pose\",\"family\":\"mobile\"},{\"id\":\"custom20\",\"title\":\"Custom Click Function 20\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom21\",\"title\":\"Custom Click Function 21\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom22\",\"title\":\"Custom Click Function 22\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom23\",\"title\":\"Custom Click Function 23\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom24\",\"title\":\"Custom Click Function 24\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom25\",\"title\":\"Custom Click Function 25\",\"kind\":\"pose\",\"family\":\"desktop\"}]",
+      "customClickFunctionIds": "[{\"id\":\"custom7\",\"title\":\"Custom Click Function 7\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom8\",\"title\":\"Custom Click Function 8\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom9\",\"title\":\"Custom Click Function 9\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom10\",\"title\":\"Custom Click Function 10\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom13\",\"title\":\"Custom Click Function 13\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom14\",\"title\":\"Custom Click Function 14\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom15\",\"title\":\"Custom Click Function 15\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom16\",\"title\":\"Custom Click Function 16\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom17\",\"title\":\"Custom Click Function 17\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom18\",\"title\":\"Custom Click Function 18\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom19\",\"title\":\"Custom Click Function 19\",\"kind\":\"pose\",\"family\":\"mobile\"},{\"id\":\"custom20\",\"title\":\"Custom Click Function 20\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom21\",\"title\":\"Custom Click Function 21\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom22\",\"title\":\"Custom Click Function 22\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom23\",\"title\":\"Custom Click Function 23\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom24\",\"title\":\"Custom Click Function 24\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom25\",\"title\":\"Custom Click Function 25\",\"kind\":\"hold\",\"family\":\"desktop\"}]",
       "holdConfirmMs": 400,
       "multiClickWindowMs": 370,
       "zoomGestureThresholdPx": 40,
@@ -25893,8 +25927,8 @@
       "custom24RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "custom24MultiTriggerEnabled": true,
       "custom24MultiTriggers": "[{\"prefix\":\"custom24Trig1\",\"title\":\"Trigger 1\"}]",
-      "custom25Enabled": false,
-      "custom25Type": "Click",
+      "custom25Enabled": true,
+      "custom25Type": "Click+Hold",
       "custom25TouchPointCount": 1,
       "custom25ClickCount": "1st",
       "custom25Mode": "Single Pose",
@@ -26101,7 +26135,24 @@
       "custom24Trig1RetransitionSpeedCurveRange": "{\"min\":15000,\"max\":30000}",
       "custom24Trig1RetransitionStartTimeCurveEnabled": false,
       "custom24Trig1RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom24Trig1RetransitionStartTimeRange": "{\"min\":0,\"max\":300}"
+      "custom24Trig1RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom25TweenChain": [],
+      "custom25LoopMode": "Off",
+      "custom25LoopHoldMs": 0,
+      "custom25TweenRetransitionSpeedMs": 800,
+      "custom25TweenRetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom25TweenRetransitionSpeedCurveRange": "{\"min\":50,\"max\":2000}",
+      "custom25TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom25TweenRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom25TweenStopEnabled": true,
+      "custom25TweenStopStartTimeCurveEnabled": false,
+      "custom25TweenStopStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom25TweenStopStartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom25TweenStopDelayEnabled": false,
+      "custom25TweenStopDelayMs": 0,
+      "custom25TweenStopDelayCurveEnabled": false,
+      "custom25TweenStopDelayCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom25TweenStopDelayRange": "{\"min\":0,\"max\":2000}"
     }
   },
   "order": [
@@ -30531,18 +30582,10 @@
       "locked": false,
       "items": [
         {
-          "type": "row",
-          "key": "holdConfirmMs"
-        },
-        {
-          "type": "row",
-          "key": "multiClickWindowMs"
-        },
-        {
           "type": "group",
           "group": {
             "key": "Custom Click Function 25",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -30587,6 +30630,10 @@
               },
               {
                 "type": "row",
+                "key": "custom25TweenChain"
+              },
+              {
+                "type": "row",
                 "key": "custom25TransitionSpeedMs"
               },
               {
@@ -30595,33 +30642,17 @@
               },
               {
                 "type": "row",
-                "key": "custom25PauseDurationMs"
+                "key": "custom25LoopMode"
               },
               {
                 "type": "row",
-                "key": "custom25SequencePlayMode"
-              },
-              {
-                "type": "row",
-                "key": "custom25SequenceCount"
-              },
-              {
-                "type": "row",
-                "key": "custom25SequenceCountMode"
-              },
-              {
-                "type": "row",
-                "key": "custom25SequenceLoopTransition"
-              },
-              {
-                "type": "row",
-                "key": "custom25SequenceHoldMs"
+                "key": "custom25LoopHoldMs"
               },
               {
                 "type": "group",
                 "group": {
                   "key": "Offset",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -30704,7 +30735,7 @@
                 "type": "group",
                 "group": {
                   "key": "Offset To Camera",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -30762,7 +30793,7 @@
                 "type": "group",
                 "group": {
                   "key": "Rotation",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -30790,7 +30821,7 @@
                 "type": "group",
                 "group": {
                   "key": "Easing",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -30808,7 +30839,7 @@
                 "type": "group",
                 "group": {
                   "key": "Animation Speed Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -30831,7 +30862,7 @@
                 "type": "group",
                 "group": {
                   "key": "Start Time Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -30864,7 +30895,7 @@
                 "type": "group",
                 "group": {
                   "key": "Start Distance Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -30892,7 +30923,7 @@
                 "type": "group",
                 "group": {
                   "key": "Retransition",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -30903,7 +30934,7 @@
                       "type": "group",
                       "group": {
                         "key": "Retransition Speed Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -30913,11 +30944,21 @@
                           {
                             "type": "row",
                             "key": "custom25RetransitionSpeedCurveRange"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom25TweenRetransitionSpeedCurve"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom25TweenRetransitionSpeedCurveRange"
                           }
                         ],
                         "settings": [
                           "custom25RetransitionSpeedCurve",
-                          "custom25RetransitionSpeedCurveRange"
+                          "custom25RetransitionSpeedCurveRange",
+                          "custom25TweenRetransitionSpeedCurve",
+                          "custom25TweenRetransitionSpeedCurveRange"
                         ],
                         "subgroups": []
                       }
@@ -30926,7 +30967,7 @@
                       "type": "group",
                       "group": {
                         "key": "Retransition Start Time Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -30936,23 +30977,38 @@
                           {
                             "type": "row",
                             "key": "custom25RetransitionStartTimeRange"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom25TweenRetransitionStartTimeCurve"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom25TweenRetransitionStartTimeRange"
                           }
                         ],
                         "settings": [
                           "custom25RetransitionStartTimeCurve",
-                          "custom25RetransitionStartTimeRange"
+                          "custom25RetransitionStartTimeRange",
+                          "custom25TweenRetransitionStartTimeCurve",
+                          "custom25TweenRetransitionStartTimeRange"
                         ],
                         "subgroups": []
                       }
+                    },
+                    {
+                      "type": "row",
+                      "key": "custom25TweenRetransitionSpeedMs"
                     }
                   ],
                   "settings": [
-                    "custom25RetransitionSpeedMs"
+                    "custom25RetransitionSpeedMs",
+                    "custom25TweenRetransitionSpeedMs"
                   ],
                   "subgroups": [
                     {
                       "key": "Retransition Speed Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -30962,17 +31018,27 @@
                         {
                           "type": "row",
                           "key": "custom25RetransitionSpeedCurveRange"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom25TweenRetransitionSpeedCurve"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom25TweenRetransitionSpeedCurveRange"
                         }
                       ],
                       "settings": [
                         "custom25RetransitionSpeedCurve",
-                        "custom25RetransitionSpeedCurveRange"
+                        "custom25RetransitionSpeedCurveRange",
+                        "custom25TweenRetransitionSpeedCurve",
+                        "custom25TweenRetransitionSpeedCurveRange"
                       ],
                       "subgroups": []
                     },
                     {
                       "key": "Retransition Start Time Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -30982,11 +31048,140 @@
                         {
                           "type": "row",
                           "key": "custom25RetransitionStartTimeRange"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom25TweenRetransitionStartTimeCurve"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom25TweenRetransitionStartTimeRange"
                         }
                       ],
                       "settings": [
                         "custom25RetransitionStartTimeCurve",
-                        "custom25RetransitionStartTimeRange"
+                        "custom25RetransitionStartTimeRange",
+                        "custom25TweenRetransitionStartTimeCurve",
+                        "custom25TweenRetransitionStartTimeRange"
+                      ],
+                      "subgroups": []
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "group",
+                "group": {
+                  "key": "Tween Stop",
+                  "collapsed": false,
+                  "locked": false,
+                  "items": [
+                    {
+                      "type": "group",
+                      "group": {
+                        "key": "Tween Stop Start Time Curve",
+                        "collapsed": false,
+                        "locked": false,
+                        "items": [
+                          {
+                            "type": "row",
+                            "key": "custom25TweenStopStartTimeCurve"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom25TweenStopStartTimeRange"
+                          }
+                        ],
+                        "settings": [
+                          "custom25TweenStopStartTimeCurve",
+                          "custom25TweenStopStartTimeRange"
+                        ],
+                        "subgroups": []
+                      }
+                    },
+                    {
+                      "type": "group",
+                      "group": {
+                        "key": "Tween Stop Delay",
+                        "collapsed": false,
+                        "locked": false,
+                        "items": [
+                          {
+                            "type": "row",
+                            "key": "custom25TweenStopDelayMs"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom25TweenStopDelayCurveEnabled"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom25TweenStopDelayCurve"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom25TweenStopDelayRange"
+                          }
+                        ],
+                        "settings": [
+                          "custom25TweenStopDelayMs",
+                          "custom25TweenStopDelayCurveEnabled",
+                          "custom25TweenStopDelayCurve",
+                          "custom25TweenStopDelayRange"
+                        ],
+                        "subgroups": []
+                      }
+                    }
+                  ],
+                  "settings": [],
+                  "subgroups": [
+                    {
+                      "key": "Tween Stop Start Time Curve",
+                      "collapsed": false,
+                      "locked": false,
+                      "items": [
+                        {
+                          "type": "row",
+                          "key": "custom25TweenStopStartTimeCurve"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom25TweenStopStartTimeRange"
+                        }
+                      ],
+                      "settings": [
+                        "custom25TweenStopStartTimeCurve",
+                        "custom25TweenStopStartTimeRange"
+                      ],
+                      "subgroups": []
+                    },
+                    {
+                      "key": "Tween Stop Delay",
+                      "collapsed": false,
+                      "locked": false,
+                      "items": [
+                        {
+                          "type": "row",
+                          "key": "custom25TweenStopDelayMs"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom25TweenStopDelayCurveEnabled"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom25TweenStopDelayCurve"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom25TweenStopDelayRange"
+                        }
+                      ],
+                      "settings": [
+                        "custom25TweenStopDelayMs",
+                        "custom25TweenStopDelayCurveEnabled",
+                        "custom25TweenStopDelayCurve",
+                        "custom25TweenStopDelayRange"
                       ],
                       "subgroups": []
                     }
@@ -30997,7 +31192,7 @@
                 "type": "group",
                 "group": {
                   "key": "Multi Trigger",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -31032,19 +31227,16 @@
               "custom25ReverseSequence",
               "custom25GlideToFirstPose",
               "custom25FirstGlideTimeScale",
+              "custom25TweenChain",
               "custom25TransitionSpeedMs",
               "custom25TweenSpeedMs",
-              "custom25PauseDurationMs",
-              "custom25SequencePlayMode",
-              "custom25SequenceCount",
-              "custom25SequenceCountMode",
-              "custom25SequenceLoopTransition",
-              "custom25SequenceHoldMs"
+              "custom25LoopMode",
+              "custom25LoopHoldMs"
             ],
             "subgroups": [
               {
                 "key": "Offset",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -31124,7 +31316,7 @@
               },
               {
                 "key": "Offset To Camera",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -31179,7 +31371,7 @@
               },
               {
                 "key": "Rotation",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -31204,7 +31396,7 @@
               },
               {
                 "key": "Easing",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -31219,7 +31411,7 @@
               },
               {
                 "key": "Animation Speed Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -31239,7 +31431,7 @@
               },
               {
                 "key": "Start Time Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -31269,7 +31461,7 @@
               },
               {
                 "key": "Start Distance Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -31294,7 +31486,7 @@
               },
               {
                 "key": "Retransition",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -31305,7 +31497,7 @@
                     "type": "group",
                     "group": {
                       "key": "Retransition Speed Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -31315,11 +31507,21 @@
                         {
                           "type": "row",
                           "key": "custom25RetransitionSpeedCurveRange"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom25TweenRetransitionSpeedCurve"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom25TweenRetransitionSpeedCurveRange"
                         }
                       ],
                       "settings": [
                         "custom25RetransitionSpeedCurve",
-                        "custom25RetransitionSpeedCurveRange"
+                        "custom25RetransitionSpeedCurveRange",
+                        "custom25TweenRetransitionSpeedCurve",
+                        "custom25TweenRetransitionSpeedCurveRange"
                       ],
                       "subgroups": []
                     }
@@ -31328,7 +31530,7 @@
                     "type": "group",
                     "group": {
                       "key": "Retransition Start Time Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -31338,23 +31540,38 @@
                         {
                           "type": "row",
                           "key": "custom25RetransitionStartTimeRange"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom25TweenRetransitionStartTimeCurve"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom25TweenRetransitionStartTimeRange"
                         }
                       ],
                       "settings": [
                         "custom25RetransitionStartTimeCurve",
-                        "custom25RetransitionStartTimeRange"
+                        "custom25RetransitionStartTimeRange",
+                        "custom25TweenRetransitionStartTimeCurve",
+                        "custom25TweenRetransitionStartTimeRange"
                       ],
                       "subgroups": []
                     }
+                  },
+                  {
+                    "type": "row",
+                    "key": "custom25TweenRetransitionSpeedMs"
                   }
                 ],
                 "settings": [
-                  "custom25RetransitionSpeedMs"
+                  "custom25RetransitionSpeedMs",
+                  "custom25TweenRetransitionSpeedMs"
                 ],
                 "subgroups": [
                   {
                     "key": "Retransition Speed Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -31364,17 +31581,27 @@
                       {
                         "type": "row",
                         "key": "custom25RetransitionSpeedCurveRange"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom25TweenRetransitionSpeedCurve"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom25TweenRetransitionSpeedCurveRange"
                       }
                     ],
                     "settings": [
                       "custom25RetransitionSpeedCurve",
-                      "custom25RetransitionSpeedCurveRange"
+                      "custom25RetransitionSpeedCurveRange",
+                      "custom25TweenRetransitionSpeedCurve",
+                      "custom25TweenRetransitionSpeedCurveRange"
                     ],
                     "subgroups": []
                   },
                   {
                     "key": "Retransition Start Time Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -31384,11 +31611,137 @@
                       {
                         "type": "row",
                         "key": "custom25RetransitionStartTimeRange"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom25TweenRetransitionStartTimeCurve"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom25TweenRetransitionStartTimeRange"
                       }
                     ],
                     "settings": [
                       "custom25RetransitionStartTimeCurve",
-                      "custom25RetransitionStartTimeRange"
+                      "custom25RetransitionStartTimeRange",
+                      "custom25TweenRetransitionStartTimeCurve",
+                      "custom25TweenRetransitionStartTimeRange"
+                    ],
+                    "subgroups": []
+                  }
+                ]
+              },
+              {
+                "key": "Tween Stop",
+                "collapsed": false,
+                "locked": false,
+                "items": [
+                  {
+                    "type": "group",
+                    "group": {
+                      "key": "Tween Stop Start Time Curve",
+                      "collapsed": false,
+                      "locked": false,
+                      "items": [
+                        {
+                          "type": "row",
+                          "key": "custom25TweenStopStartTimeCurve"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom25TweenStopStartTimeRange"
+                        }
+                      ],
+                      "settings": [
+                        "custom25TweenStopStartTimeCurve",
+                        "custom25TweenStopStartTimeRange"
+                      ],
+                      "subgroups": []
+                    }
+                  },
+                  {
+                    "type": "group",
+                    "group": {
+                      "key": "Tween Stop Delay",
+                      "collapsed": false,
+                      "locked": false,
+                      "items": [
+                        {
+                          "type": "row",
+                          "key": "custom25TweenStopDelayMs"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom25TweenStopDelayCurveEnabled"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom25TweenStopDelayCurve"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom25TweenStopDelayRange"
+                        }
+                      ],
+                      "settings": [
+                        "custom25TweenStopDelayMs",
+                        "custom25TweenStopDelayCurveEnabled",
+                        "custom25TweenStopDelayCurve",
+                        "custom25TweenStopDelayRange"
+                      ],
+                      "subgroups": []
+                    }
+                  }
+                ],
+                "settings": [],
+                "subgroups": [
+                  {
+                    "key": "Tween Stop Start Time Curve",
+                    "collapsed": false,
+                    "locked": false,
+                    "items": [
+                      {
+                        "type": "row",
+                        "key": "custom25TweenStopStartTimeCurve"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom25TweenStopStartTimeRange"
+                      }
+                    ],
+                    "settings": [
+                      "custom25TweenStopStartTimeCurve",
+                      "custom25TweenStopStartTimeRange"
+                    ],
+                    "subgroups": []
+                  },
+                  {
+                    "key": "Tween Stop Delay",
+                    "collapsed": false,
+                    "locked": false,
+                    "items": [
+                      {
+                        "type": "row",
+                        "key": "custom25TweenStopDelayMs"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom25TweenStopDelayCurveEnabled"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom25TweenStopDelayCurve"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom25TweenStopDelayRange"
+                      }
+                    ],
+                    "settings": [
+                      "custom25TweenStopDelayMs",
+                      "custom25TweenStopDelayCurveEnabled",
+                      "custom25TweenStopDelayCurve",
+                      "custom25TweenStopDelayRange"
                     ],
                     "subgroups": []
                   }
@@ -31396,7 +31749,7 @@
               },
               {
                 "key": "Multi Trigger",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -31422,10 +31775,18 @@
           }
         },
         {
+          "type": "row",
+          "key": "holdConfirmMs"
+        },
+        {
+          "type": "row",
+          "key": "multiClickWindowMs"
+        },
+        {
           "type": "group",
           "group": {
             "key": "Custom Click Function 24",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -82195,7 +82556,7 @@
       "subgroups": [
         {
           "key": "Custom Click Function 25",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
@@ -82240,6 +82601,10 @@
             },
             {
               "type": "row",
+              "key": "custom25TweenChain"
+            },
+            {
+              "type": "row",
               "key": "custom25TransitionSpeedMs"
             },
             {
@@ -82248,33 +82613,17 @@
             },
             {
               "type": "row",
-              "key": "custom25PauseDurationMs"
+              "key": "custom25LoopMode"
             },
             {
               "type": "row",
-              "key": "custom25SequencePlayMode"
-            },
-            {
-              "type": "row",
-              "key": "custom25SequenceCount"
-            },
-            {
-              "type": "row",
-              "key": "custom25SequenceCountMode"
-            },
-            {
-              "type": "row",
-              "key": "custom25SequenceLoopTransition"
-            },
-            {
-              "type": "row",
-              "key": "custom25SequenceHoldMs"
+              "key": "custom25LoopHoldMs"
             },
             {
               "type": "group",
               "group": {
                 "key": "Offset",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -82357,7 +82706,7 @@
               "type": "group",
               "group": {
                 "key": "Offset To Camera",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -82415,7 +82764,7 @@
               "type": "group",
               "group": {
                 "key": "Rotation",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -82443,7 +82792,7 @@
               "type": "group",
               "group": {
                 "key": "Easing",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -82461,7 +82810,7 @@
               "type": "group",
               "group": {
                 "key": "Animation Speed Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -82484,7 +82833,7 @@
               "type": "group",
               "group": {
                 "key": "Start Time Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -82517,7 +82866,7 @@
               "type": "group",
               "group": {
                 "key": "Start Distance Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -82545,7 +82894,7 @@
               "type": "group",
               "group": {
                 "key": "Retransition",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -82556,7 +82905,7 @@
                     "type": "group",
                     "group": {
                       "key": "Retransition Speed Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -82566,11 +82915,21 @@
                         {
                           "type": "row",
                           "key": "custom25RetransitionSpeedCurveRange"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom25TweenRetransitionSpeedCurve"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom25TweenRetransitionSpeedCurveRange"
                         }
                       ],
                       "settings": [
                         "custom25RetransitionSpeedCurve",
-                        "custom25RetransitionSpeedCurveRange"
+                        "custom25RetransitionSpeedCurveRange",
+                        "custom25TweenRetransitionSpeedCurve",
+                        "custom25TweenRetransitionSpeedCurveRange"
                       ],
                       "subgroups": []
                     }
@@ -82579,7 +82938,7 @@
                     "type": "group",
                     "group": {
                       "key": "Retransition Start Time Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -82589,23 +82948,38 @@
                         {
                           "type": "row",
                           "key": "custom25RetransitionStartTimeRange"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom25TweenRetransitionStartTimeCurve"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom25TweenRetransitionStartTimeRange"
                         }
                       ],
                       "settings": [
                         "custom25RetransitionStartTimeCurve",
-                        "custom25RetransitionStartTimeRange"
+                        "custom25RetransitionStartTimeRange",
+                        "custom25TweenRetransitionStartTimeCurve",
+                        "custom25TweenRetransitionStartTimeRange"
                       ],
                       "subgroups": []
                     }
+                  },
+                  {
+                    "type": "row",
+                    "key": "custom25TweenRetransitionSpeedMs"
                   }
                 ],
                 "settings": [
-                  "custom25RetransitionSpeedMs"
+                  "custom25RetransitionSpeedMs",
+                  "custom25TweenRetransitionSpeedMs"
                 ],
                 "subgroups": [
                   {
                     "key": "Retransition Speed Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -82615,17 +82989,27 @@
                       {
                         "type": "row",
                         "key": "custom25RetransitionSpeedCurveRange"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom25TweenRetransitionSpeedCurve"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom25TweenRetransitionSpeedCurveRange"
                       }
                     ],
                     "settings": [
                       "custom25RetransitionSpeedCurve",
-                      "custom25RetransitionSpeedCurveRange"
+                      "custom25RetransitionSpeedCurveRange",
+                      "custom25TweenRetransitionSpeedCurve",
+                      "custom25TweenRetransitionSpeedCurveRange"
                     ],
                     "subgroups": []
                   },
                   {
                     "key": "Retransition Start Time Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -82635,11 +83019,140 @@
                       {
                         "type": "row",
                         "key": "custom25RetransitionStartTimeRange"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom25TweenRetransitionStartTimeCurve"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom25TweenRetransitionStartTimeRange"
                       }
                     ],
                     "settings": [
                       "custom25RetransitionStartTimeCurve",
-                      "custom25RetransitionStartTimeRange"
+                      "custom25RetransitionStartTimeRange",
+                      "custom25TweenRetransitionStartTimeCurve",
+                      "custom25TweenRetransitionStartTimeRange"
+                    ],
+                    "subgroups": []
+                  }
+                ]
+              }
+            },
+            {
+              "type": "group",
+              "group": {
+                "key": "Tween Stop",
+                "collapsed": false,
+                "locked": false,
+                "items": [
+                  {
+                    "type": "group",
+                    "group": {
+                      "key": "Tween Stop Start Time Curve",
+                      "collapsed": false,
+                      "locked": false,
+                      "items": [
+                        {
+                          "type": "row",
+                          "key": "custom25TweenStopStartTimeCurve"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom25TweenStopStartTimeRange"
+                        }
+                      ],
+                      "settings": [
+                        "custom25TweenStopStartTimeCurve",
+                        "custom25TweenStopStartTimeRange"
+                      ],
+                      "subgroups": []
+                    }
+                  },
+                  {
+                    "type": "group",
+                    "group": {
+                      "key": "Tween Stop Delay",
+                      "collapsed": false,
+                      "locked": false,
+                      "items": [
+                        {
+                          "type": "row",
+                          "key": "custom25TweenStopDelayMs"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom25TweenStopDelayCurveEnabled"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom25TweenStopDelayCurve"
+                        },
+                        {
+                          "type": "row",
+                          "key": "custom25TweenStopDelayRange"
+                        }
+                      ],
+                      "settings": [
+                        "custom25TweenStopDelayMs",
+                        "custom25TweenStopDelayCurveEnabled",
+                        "custom25TweenStopDelayCurve",
+                        "custom25TweenStopDelayRange"
+                      ],
+                      "subgroups": []
+                    }
+                  }
+                ],
+                "settings": [],
+                "subgroups": [
+                  {
+                    "key": "Tween Stop Start Time Curve",
+                    "collapsed": false,
+                    "locked": false,
+                    "items": [
+                      {
+                        "type": "row",
+                        "key": "custom25TweenStopStartTimeCurve"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom25TweenStopStartTimeRange"
+                      }
+                    ],
+                    "settings": [
+                      "custom25TweenStopStartTimeCurve",
+                      "custom25TweenStopStartTimeRange"
+                    ],
+                    "subgroups": []
+                  },
+                  {
+                    "key": "Tween Stop Delay",
+                    "collapsed": false,
+                    "locked": false,
+                    "items": [
+                      {
+                        "type": "row",
+                        "key": "custom25TweenStopDelayMs"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom25TweenStopDelayCurveEnabled"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom25TweenStopDelayCurve"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom25TweenStopDelayRange"
+                      }
+                    ],
+                    "settings": [
+                      "custom25TweenStopDelayMs",
+                      "custom25TweenStopDelayCurveEnabled",
+                      "custom25TweenStopDelayCurve",
+                      "custom25TweenStopDelayRange"
                     ],
                     "subgroups": []
                   }
@@ -82650,7 +83163,7 @@
               "type": "group",
               "group": {
                 "key": "Multi Trigger",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -82685,19 +83198,16 @@
             "custom25ReverseSequence",
             "custom25GlideToFirstPose",
             "custom25FirstGlideTimeScale",
+            "custom25TweenChain",
             "custom25TransitionSpeedMs",
             "custom25TweenSpeedMs",
-            "custom25PauseDurationMs",
-            "custom25SequencePlayMode",
-            "custom25SequenceCount",
-            "custom25SequenceCountMode",
-            "custom25SequenceLoopTransition",
-            "custom25SequenceHoldMs"
+            "custom25LoopMode",
+            "custom25LoopHoldMs"
           ],
           "subgroups": [
             {
               "key": "Offset",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -82777,7 +83287,7 @@
             },
             {
               "key": "Offset To Camera",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -82832,7 +83342,7 @@
             },
             {
               "key": "Rotation",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -82857,7 +83367,7 @@
             },
             {
               "key": "Easing",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -82872,7 +83382,7 @@
             },
             {
               "key": "Animation Speed Curve",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -82892,7 +83402,7 @@
             },
             {
               "key": "Start Time Curve",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -82922,7 +83432,7 @@
             },
             {
               "key": "Start Distance Curve",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -82947,7 +83457,7 @@
             },
             {
               "key": "Retransition",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -82958,7 +83468,7 @@
                   "type": "group",
                   "group": {
                     "key": "Retransition Speed Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -82968,11 +83478,21 @@
                       {
                         "type": "row",
                         "key": "custom25RetransitionSpeedCurveRange"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom25TweenRetransitionSpeedCurve"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom25TweenRetransitionSpeedCurveRange"
                       }
                     ],
                     "settings": [
                       "custom25RetransitionSpeedCurve",
-                      "custom25RetransitionSpeedCurveRange"
+                      "custom25RetransitionSpeedCurveRange",
+                      "custom25TweenRetransitionSpeedCurve",
+                      "custom25TweenRetransitionSpeedCurveRange"
                     ],
                     "subgroups": []
                   }
@@ -82981,7 +83501,7 @@
                   "type": "group",
                   "group": {
                     "key": "Retransition Start Time Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -82991,23 +83511,38 @@
                       {
                         "type": "row",
                         "key": "custom25RetransitionStartTimeRange"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom25TweenRetransitionStartTimeCurve"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom25TweenRetransitionStartTimeRange"
                       }
                     ],
                     "settings": [
                       "custom25RetransitionStartTimeCurve",
-                      "custom25RetransitionStartTimeRange"
+                      "custom25RetransitionStartTimeRange",
+                      "custom25TweenRetransitionStartTimeCurve",
+                      "custom25TweenRetransitionStartTimeRange"
                     ],
                     "subgroups": []
                   }
+                },
+                {
+                  "type": "row",
+                  "key": "custom25TweenRetransitionSpeedMs"
                 }
               ],
               "settings": [
-                "custom25RetransitionSpeedMs"
+                "custom25RetransitionSpeedMs",
+                "custom25TweenRetransitionSpeedMs"
               ],
               "subgroups": [
                 {
                   "key": "Retransition Speed Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -83017,17 +83552,27 @@
                     {
                       "type": "row",
                       "key": "custom25RetransitionSpeedCurveRange"
+                    },
+                    {
+                      "type": "row",
+                      "key": "custom25TweenRetransitionSpeedCurve"
+                    },
+                    {
+                      "type": "row",
+                      "key": "custom25TweenRetransitionSpeedCurveRange"
                     }
                   ],
                   "settings": [
                     "custom25RetransitionSpeedCurve",
-                    "custom25RetransitionSpeedCurveRange"
+                    "custom25RetransitionSpeedCurveRange",
+                    "custom25TweenRetransitionSpeedCurve",
+                    "custom25TweenRetransitionSpeedCurveRange"
                   ],
                   "subgroups": []
                 },
                 {
                   "key": "Retransition Start Time Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -83037,11 +83582,137 @@
                     {
                       "type": "row",
                       "key": "custom25RetransitionStartTimeRange"
+                    },
+                    {
+                      "type": "row",
+                      "key": "custom25TweenRetransitionStartTimeCurve"
+                    },
+                    {
+                      "type": "row",
+                      "key": "custom25TweenRetransitionStartTimeRange"
                     }
                   ],
                   "settings": [
                     "custom25RetransitionStartTimeCurve",
-                    "custom25RetransitionStartTimeRange"
+                    "custom25RetransitionStartTimeRange",
+                    "custom25TweenRetransitionStartTimeCurve",
+                    "custom25TweenRetransitionStartTimeRange"
+                  ],
+                  "subgroups": []
+                }
+              ]
+            },
+            {
+              "key": "Tween Stop",
+              "collapsed": false,
+              "locked": false,
+              "items": [
+                {
+                  "type": "group",
+                  "group": {
+                    "key": "Tween Stop Start Time Curve",
+                    "collapsed": false,
+                    "locked": false,
+                    "items": [
+                      {
+                        "type": "row",
+                        "key": "custom25TweenStopStartTimeCurve"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom25TweenStopStartTimeRange"
+                      }
+                    ],
+                    "settings": [
+                      "custom25TweenStopStartTimeCurve",
+                      "custom25TweenStopStartTimeRange"
+                    ],
+                    "subgroups": []
+                  }
+                },
+                {
+                  "type": "group",
+                  "group": {
+                    "key": "Tween Stop Delay",
+                    "collapsed": false,
+                    "locked": false,
+                    "items": [
+                      {
+                        "type": "row",
+                        "key": "custom25TweenStopDelayMs"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom25TweenStopDelayCurveEnabled"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom25TweenStopDelayCurve"
+                      },
+                      {
+                        "type": "row",
+                        "key": "custom25TweenStopDelayRange"
+                      }
+                    ],
+                    "settings": [
+                      "custom25TweenStopDelayMs",
+                      "custom25TweenStopDelayCurveEnabled",
+                      "custom25TweenStopDelayCurve",
+                      "custom25TweenStopDelayRange"
+                    ],
+                    "subgroups": []
+                  }
+                }
+              ],
+              "settings": [],
+              "subgroups": [
+                {
+                  "key": "Tween Stop Start Time Curve",
+                  "collapsed": false,
+                  "locked": false,
+                  "items": [
+                    {
+                      "type": "row",
+                      "key": "custom25TweenStopStartTimeCurve"
+                    },
+                    {
+                      "type": "row",
+                      "key": "custom25TweenStopStartTimeRange"
+                    }
+                  ],
+                  "settings": [
+                    "custom25TweenStopStartTimeCurve",
+                    "custom25TweenStopStartTimeRange"
+                  ],
+                  "subgroups": []
+                },
+                {
+                  "key": "Tween Stop Delay",
+                  "collapsed": false,
+                  "locked": false,
+                  "items": [
+                    {
+                      "type": "row",
+                      "key": "custom25TweenStopDelayMs"
+                    },
+                    {
+                      "type": "row",
+                      "key": "custom25TweenStopDelayCurveEnabled"
+                    },
+                    {
+                      "type": "row",
+                      "key": "custom25TweenStopDelayCurve"
+                    },
+                    {
+                      "type": "row",
+                      "key": "custom25TweenStopDelayRange"
+                    }
+                  ],
+                  "settings": [
+                    "custom25TweenStopDelayMs",
+                    "custom25TweenStopDelayCurveEnabled",
+                    "custom25TweenStopDelayCurve",
+                    "custom25TweenStopDelayRange"
                   ],
                   "subgroups": []
                 }
@@ -83049,7 +83720,7 @@
             },
             {
               "key": "Multi Trigger",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -83075,7 +83746,7 @@
         },
         {
           "key": "Custom Click Function 24",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
