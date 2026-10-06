@@ -8296,10 +8296,10 @@
       "custom21CursorOffsetZRange": "{\"min\":0,\"max\":0}",
       "custom21CameraOffsetEnabled": true,
       "custom21CameraOffsetXEnabled": true,
-      "custom21CameraOffsetXCurve": "[{\"x\":0,\"y\":1},{\"x\":0.5007559721802237,\"y\":0.06953125000000004},{\"x\":1,\"y\":1}]",
+      "custom21CameraOffsetXCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.15416334497072326,\"y\":-0.99453125}},{\"x\":0.5060340324930588,\"y\":0},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.08227726310580863,\"y\":-0.8861979166666667}}]",
       "custom21CameraOffsetXRange": "{\"min\":0,\"max\":1}",
       "custom21CameraOffsetYEnabled": true,
-      "custom21CameraOffsetYCurve": "[{\"x\":0,\"y\":1},{\"x\":0.4954779118673887,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom21CameraOffsetYCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.11369821590565467,\"y\":-0.9220052083333333}},{\"x\":0.4954779118673887,\"y\":0},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.06644308216730355,\"y\":-1}}]",
       "custom21CameraOffsetYRange": "{\"min\":0,\"max\":1}",
       "custom21CameraOffsetZEnabled": true,
       "custom21CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.3388954559199494,\"y\":-0.07447916666666665}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.29867773593204494,\"y\":0.8588541666666667}}]",
@@ -18259,10 +18259,10 @@
       "custom21CursorOffsetZRange": "{\"min\":0,\"max\":0}",
       "custom21CameraOffsetEnabled": true,
       "custom21CameraOffsetXEnabled": false,
-      "custom21CameraOffsetXCurve": "[{\"x\":0,\"y\":1},{\"x\":0.5007559721802237,\"y\":0.06953125000000004},{\"x\":1,\"y\":1}]",
+      "custom21CameraOffsetXCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.15416334497072326,\"y\":-0.99453125}},{\"x\":0.5060340324930588,\"y\":0},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.08227726310580863,\"y\":-0.8861979166666667}}]",
       "custom21CameraOffsetXRange": "{\"min\":0,\"max\":1}",
       "custom21CameraOffsetYEnabled": true,
-      "custom21CameraOffsetYCurve": "[{\"x\":0,\"y\":1},{\"x\":0.4954779118673887,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom21CameraOffsetYCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.11369821590565467,\"y\":-0.9220052083333333}},{\"x\":0.4954779118673887,\"y\":0},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.06644308216730355,\"y\":-1}}]",
       "custom21CameraOffsetYRange": "{\"min\":0,\"max\":1}",
       "custom21CameraOffsetZEnabled": false,
       "custom21CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.3388954559199494,\"y\":-0.07447916666666665}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.29867773593204494,\"y\":0.8588541666666667}}]",
@@ -28222,10 +28222,10 @@
       "custom21CursorOffsetZRange": "{\"min\":0,\"max\":0}",
       "custom21CameraOffsetEnabled": true,
       "custom21CameraOffsetXEnabled": true,
-      "custom21CameraOffsetXCurve": "[{\"x\":0,\"y\":1},{\"x\":0.5007559721802237,\"y\":0.06953125000000004},{\"x\":1,\"y\":1}]",
+      "custom21CameraOffsetXCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.15416334497072326,\"y\":-0.99453125}},{\"x\":0.5060340324930588,\"y\":0},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.08227726310580863,\"y\":-0.8861979166666667}}]",
       "custom21CameraOffsetXRange": "{\"min\":0,\"max\":1}",
       "custom21CameraOffsetYEnabled": true,
-      "custom21CameraOffsetYCurve": "[{\"x\":0,\"y\":1},{\"x\":0.4954779118673887,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom21CameraOffsetYCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.11369821590565467,\"y\":-0.9220052083333333}},{\"x\":0.4954779118673887,\"y\":0},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.06644308216730355,\"y\":-1}}]",
       "custom21CameraOffsetYRange": "{\"min\":0,\"max\":1}",
       "custom21CameraOffsetZEnabled": true,
       "custom21CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.3388954559199494,\"y\":-0.07447916666666665}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.29867773593204494,\"y\":0.8588541666666667}}]",
@@ -239181,12 +239181,6 @@
       "top": 18.375,
       "width": 622.390625,
       "height": 644.390625
-    },
-    "mobile": {
-      "left": 32.2976188659668,
-      "top": 14.101190567016602,
-      "width": 358.46429443359375,
-      "height": 772.4166870117188
     }
   }
 }
