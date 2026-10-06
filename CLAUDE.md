@@ -2451,3 +2451,12 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   control (or a mode-specific variant such as the Tween* retransition fields) must be added to that list or the
   sub-trigger silently lacks it; a group whose only members are missing renders as an empty shell. If a report says a
   Multi Trigger group is empty, compare the factory's keys for that Mode against the list first.
+- **Every early `return` in the left-click count listener must also cancel the pending count (2026-10-06).** The
+  fire-and-forget pointerup listener (`clickPoseClickCount` / `clickPoseClickTimer`) used to `return` on
+  `lastPointerupWasHoldRelease` without clearing them, so a Click+Hold that began with a quick click fired the
+  ordinal-1 Click ("1 - C") about one Rolling Click Window after the hold ended. If a new early-out is added there,
+  decide explicitly whether it consumes the chain (clear both) or leaves it. To test click/hold gestures here:
+  dispatch `PointerEvent`s on `#viewport`, fake `document.hidden`/`hasFocus` and fire `visibilitychange`+`focus` so
+  the visibility pause lifts, send the quick click as a synchronous down+up (timers are throttled to ~1 s in this tab,
+  so a `wait(80)` becomes a >500 ms "hold"), raise `cfg.multiClickWindowMs` in memory, and drive
+  `__debug.updateRenderOrder()` on an interval.

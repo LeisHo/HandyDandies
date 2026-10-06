@@ -16531,6 +16531,38 @@ to Sequence shows Sequence Mode, Count, Count Mode and Hold Duration (put back, 
 Not verified: playback behavior of a Tween Stop / loop on a sub-trigger on a real release.
 `main.js` `?v=303` -> `?v=304`.
 
+2026-10-06  -  (a Click fired after a Double-Click+Hold release)
+
+Direct report with logs: "why does my 2 click override the 2 click hold when I try to do 2 click
+hold" and "when I click hold, the sequence for 2 click runs, but when I release, another animation
+runs". The Hand Behaviour Log showed "1 - C -- interrupted 2 - CH (was mid-stopping)" and
+"1 - C -- triggered -> pose Big Open Palm (S)" on ~156 hands right after the Double-Click+Hold
+release; the Pose Jump Log showed only 2 - CH moving until then.
+
+Cause (reproduced on the live site before the fix, then confirmed gone after): in a click-hold-click
+gesture, press #1's quick release arms the click-count debounce (count 1, Rolling Click Window =
+540 ms in your settings). While press #2 is held, the 10-1 fix defers that timer (it reschedules
+instead of firing). But when press #2 was released, the release handler returned early on
+`lastPointerupWasHoldRelease` BEFORE the code that cancels the pending count and timer, so the timer
+survived, resolved to "1 click" within one window after the release and fired the ordinal-1 Click
+function ("1 - C") on every hand, which then interrupted 2 - CH while it was stopping. The release
+looked like a second animation because it was a different function starting.
+
+Fix: that early return now also zeroes the click count and clears the timer, the same as the
+held/dragged-release branch just below it. A release that ends a genuine hold consumes the pending
+chain.
+
+Verified live (v=305) with synthetic pointer events and the Rolling Click Window set to 3000 ms
+(in memory only) so this sandbox's 1 s timer throttling does not distort it: quick click + held
+second press, then release. Before the fix "1 - C" went from 0 to 153 hands about 2 s after the
+release (156 a second later); after the fix it stays at 0 for 5.6 s after the release, while a plain
+single click still fires "1 - C" on 153 hands. `main.js` `?v=304` -> `?v=305`.
+
+Same pattern exists, unfixed, for Right Click: its debounce (rightClickPoseClickTimer) is not deferred
+while the right button is down and its hold-release early return also skips the cancel. Not changed
+(not reported); it only matters if a Right Click function with Click Count 2nd+ is combined with a
+Right Click+Hold.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a
