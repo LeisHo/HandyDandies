@@ -8517,7 +8517,7 @@
       "custom24CameraOffsetXRange": "{\"min\":0,\"max\":10}",
       "custom24CameraOffsetYEnabled": true,
       "custom24CameraOffsetYCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom24CameraOffsetYRange": "{\"min\":-10,\"max\":10}",
+      "custom24CameraOffsetYRange": "{\"min\":-2,\"max\":2}",
       "custom24CameraOffsetZEnabled": false,
       "custom24CameraOffsetZCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom24CameraOffsetZRange": "{\"min\":0,\"max\":10}",
@@ -8585,7 +8585,7 @@
       "custom24Trig1CameraOffsetXRange": "{\"min\":0,\"max\":10}",
       "custom24Trig1CameraOffsetYEnabled": true,
       "custom24Trig1CameraOffsetYCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
-      "custom24Trig1CameraOffsetYRange": "{\"min\":-10,\"max\":10}",
+      "custom24Trig1CameraOffsetYRange": "{\"min\":-2,\"max\":2}",
       "custom24Trig1CameraOffsetZEnabled": false,
       "custom24Trig1CameraOffsetZCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom24Trig1CameraOffsetZRange": "{\"min\":0,\"max\":10}",
@@ -17359,7 +17359,7 @@
       "custom24CameraOffsetXRange": "{\"min\":0,\"max\":10}",
       "custom24CameraOffsetYEnabled": true,
       "custom24CameraOffsetYCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom24CameraOffsetYRange": "{\"min\":-10,\"max\":10}",
+      "custom24CameraOffsetYRange": "{\"min\":-2,\"max\":2}",
       "custom24CameraOffsetZEnabled": false,
       "custom24CameraOffsetZCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom24CameraOffsetZRange": "{\"min\":0,\"max\":10}",
@@ -17427,7 +17427,7 @@
       "custom24Trig1CameraOffsetXRange": "{\"min\":0,\"max\":10}",
       "custom24Trig1CameraOffsetYEnabled": true,
       "custom24Trig1CameraOffsetYCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
-      "custom24Trig1CameraOffsetYRange": "{\"min\":-10,\"max\":10}",
+      "custom24Trig1CameraOffsetYRange": "{\"min\":-2,\"max\":2}",
       "custom24Trig1CameraOffsetZEnabled": false,
       "custom24Trig1CameraOffsetZCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom24Trig1CameraOffsetZRange": "{\"min\":0,\"max\":10}",
@@ -26201,7 +26201,7 @@
       "custom24CameraOffsetXRange": "{\"min\":0,\"max\":10}",
       "custom24CameraOffsetYEnabled": true,
       "custom24CameraOffsetYCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom24CameraOffsetYRange": "{\"min\":-10,\"max\":10}",
+      "custom24CameraOffsetYRange": "{\"min\":-2,\"max\":2}",
       "custom24CameraOffsetZEnabled": false,
       "custom24CameraOffsetZCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom24CameraOffsetZRange": "{\"min\":0,\"max\":10}",
@@ -26269,7 +26269,7 @@
       "custom24Trig1CameraOffsetXRange": "{\"min\":0,\"max\":10}",
       "custom24Trig1CameraOffsetYEnabled": true,
       "custom24Trig1CameraOffsetYCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
-      "custom24Trig1CameraOffsetYRange": "{\"min\":-10,\"max\":10}",
+      "custom24Trig1CameraOffsetYRange": "{\"min\":-2,\"max\":2}",
       "custom24Trig1CameraOffsetZEnabled": false,
       "custom24Trig1CameraOffsetZCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom24Trig1CameraOffsetZRange": "{\"min\":0,\"max\":10}",
@@ -36205,7 +36205,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 24",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -36367,7 +36367,7 @@
                 "type": "group",
                 "group": {
                   "key": "Offset To Camera",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -36494,7 +36494,7 @@
                 "type": "group",
                 "group": {
                   "key": "Start Time Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -36555,7 +36555,7 @@
                 "type": "group",
                 "group": {
                   "key": "Retransition",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -38369,7 +38369,7 @@
               },
               {
                 "key": "Offset To Camera",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -38484,7 +38484,7 @@
               },
               {
                 "key": "Start Time Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -38539,7 +38539,7 @@
               },
               {
                 "key": "Retransition",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -41445,7 +41445,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 22",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -41734,7 +41734,7 @@
                 "type": "group",
                 "group": {
                   "key": "Start Time Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -41795,7 +41795,7 @@
                 "type": "group",
                 "group": {
                   "key": "Retransition",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -42142,7 +42142,7 @@
               },
               {
                 "key": "Start Time Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -42197,7 +42197,7 @@
               },
               {
                 "key": "Retransition",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -46665,7 +46665,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 20",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -92209,7 +92209,7 @@
         },
         {
           "key": "Custom Click Function 24",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
@@ -92371,7 +92371,7 @@
               "type": "group",
               "group": {
                 "key": "Offset To Camera",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -92498,7 +92498,7 @@
               "type": "group",
               "group": {
                 "key": "Start Time Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -92559,7 +92559,7 @@
               "type": "group",
               "group": {
                 "key": "Retransition",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -94373,7 +94373,7 @@
             },
             {
               "key": "Offset To Camera",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -94488,7 +94488,7 @@
             },
             {
               "key": "Start Time Curve",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -94543,7 +94543,7 @@
             },
             {
               "key": "Retransition",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -97443,7 +97443,7 @@
         },
         {
           "key": "Custom Click Function 22",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
@@ -97732,7 +97732,7 @@
               "type": "group",
               "group": {
                 "key": "Start Time Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -97793,7 +97793,7 @@
               "type": "group",
               "group": {
                 "key": "Retransition",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -98140,7 +98140,7 @@
             },
             {
               "key": "Start Time Curve",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -98195,7 +98195,7 @@
             },
             {
               "key": "Retransition",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -102657,7 +102657,7 @@
         },
         {
           "key": "Custom Click Function 20",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
