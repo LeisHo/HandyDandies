@@ -2478,3 +2478,6 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   them completely alone, onChange included, because re-running a camera slider's onChange with its own current value still
   moves the camera. Add any new canvas-driven slider to that list. A step is restored with them only if it began on one of
   those rows (`entry.liveEdit`).
+- **Chain-mode speed (2026-10-09).** In Chain mode `${p}TweenSpeedMs` is the time of ONE chained sequence; every place that turns
+  it into a duration goes through `animSpeedMs()` / `loopSegmentMsFor()` / `trig.loopSegmentMs`, which multiply by
+  `chainSequenceCount(p)`. A new consumer that reads `TweenSpeedMs` directly will treat it as the whole chain.

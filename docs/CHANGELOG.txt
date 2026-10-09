@@ -16665,6 +16665,38 @@ Verified live on the deployed page, polling the canvas style through a reload: w
 (screenshots cannot render WebGL here). If you meant a larger factor of the preview hand itself, or a different
 object, say so.
 
+2026-10-09  -  (chain animation speed, speed slider defaults, hidden Retransition Start Time rows)
+
+Direct request, 4 items.
+
+1) Chain mode: Animation Speed is now the time of ONE sequence in the chain. chainSequenceCount(p) = how many of
+   the listed chain sequences exist (1 outside Chain mode); animSpeedMs() multiplies the Tween speed by it (and the
+   Animation Speed Curve's frozen per-hand Min/Max speed too), and Loop Mode's per-segment time does the same
+   (trig.loopSegmentMs, loopSegmentMsFor()). Consequence for existing data: a saved Chain function now plays
+   Animation Speed x number of sequences in total, e.g. "Click Hold 3" (5000 ms, 3 sequences) went from 5000 to
+   15000 ms; "3 - CH" (800 ms, 3 sequences, curve on) 800 -> 2400 ms. Sequence and Single Pose functions are unchanged.
+2) Retransition speed: the plain sliders (Single Pose and pose-kind Retransition Speed, max 700; Sequence/Chain
+   Retransition Speed, max 5000) now go to 25000; the Retransition Min / Max Speed range bars (Single Pose and
+   Sequence/Chain, both kinds) have a 25000 track and a default of 50..25000.
+3) Animation speed: the Min / Max Speed (Ms) range (Animation Speed Curve) defaults to 500..1500 (the bar's track is still
+   50..2000). I did not change the Animation Speed sliders themselves (Tween 50..5000, Single Pose 0..700): a
+   500 minimum there would forbid the 0 ms transitions and any saved value under 500. Defaults only apply to new
+   functions and unsaved controls; saved ranges (almost all are 50..2000) are untouched.
+4) Retransition Start Time rows "not shown" - diagnosis, no code change needed for it. Read from the saved settings and
+   confirmed live on the deployed panel (v=311): the rows are controlled by TWO checkboxes, the Retransition group's
+   and the nested "Retransition Start Time Curve" group's own. In your saved file the nested one is OFF (all three
+   devices) for 1 - C, 2 - C, 2 - CH, 3 - C, 3 - CH and 4 - C and their Multi Triggers; the panel's checkbox for
+   them reads unchecked, so the display is correct. It is ON for 1 - CH, R, 3 PT and the older functions, where
+   the rows show. Other functions show nothing because they are disabled, or have Retransition itself OFF (CLICK,
+   RIGHT CLICK + HOLD, SCROLL, 2 PT, Function 30 and a few triggers), or (custom29, "3 PT") belong to the mobile family
+   and are hidden on desktop. The new-function template does not switch it off, so this is not a creation default;
+   I could not tell from the data how those six came to be OFF. Not changed - it is your saved data.
+
+Verified live (v=311): chain functions' animSpeedMs = Animation Speed x sequences (15000 for Click Hold 3; 2400 and
+3000 with a 1000 ms curve value for 3 - CH); a Sequence function is unchanged (800); the Retransition Speed sliders
+read max 25000 on both kinds. Not verified: the new range-bar defaults on a freshly created function; a chain
+actually playing at the new length. `main.js` `?v=310` -> `?v=311`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a
