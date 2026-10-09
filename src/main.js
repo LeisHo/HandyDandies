@@ -759,7 +759,7 @@ function tryStartField() {
   // whatever comes next; don't treat this comment's own reasoning above
   // as the settled explanation.
   renderer.compile(scene, camera)
-  window.__debug = { THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose, resolveTweenSegmentsWithAnchor, lerpTweenSegments, lerpLoopSegments, isHoldEntry, updateLoadingPreviewWristClip, lerpPoseValues, get loadingPreviewRenderer() { return loadingPreviewRenderer }, get loadingPreviewScene() { return loadingPreviewScene }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, get handBoundsCenterLocal() { return handBoundsCenterLocal }, multiPointCommit, multiPointEligibleFunctions, get multiPointActiveTouchCount() { return multiPointActiveTouchCount }, get multiPointSessionFiredPoseId() { return multiPointSessionFiredPoseId }, detectPoseJumps, get poseJumpLogEntries() { return poseJumpLogEntries }, applyCurlToSkeletonReference, handLogTriggerLabel, applyAllFingerCurls, syncCameraPanelFromLive }
+  window.__debug = { THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose, resolveTweenSegmentsWithAnchor, lerpTweenSegments, lerpLoopSegments, isHoldEntry, updateLoadingPreviewWristClip, lerpPoseValues, get loadingPreviewRenderer() { return loadingPreviewRenderer }, get loadingPreviewScene() { return loadingPreviewScene }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, get handBoundsCenterLocal() { return handBoundsCenterLocal }, multiPointCommit, multiPointEligibleFunctions, get multiPointActiveTouchCount() { return multiPointActiveTouchCount }, get multiPointSessionFiredPoseId() { return multiPointSessionFiredPoseId }, detectPoseJumps, get poseJumpLogEntries() { return poseJumpLogEntries }, applyCurlToSkeletonReference, handLogTriggerLabel, applyAllFingerCurls, syncCameraPanelFromLive, animSpeedMs, chainSequenceCount }
   loadingEl.classList.add('hidden')
   // The loading-preview canvas is a top-level sibling of #loading now
   // (2026-09-17, decoupled specifically so this moment doesn't force it
@@ -4667,7 +4667,7 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       // measured basis), matching the Tween trio's own min below.
       { key: `${p}SpeedCurveEnabled`, label: 'Animation Speed Curve On/Off', type: 'checkbox', def: false, onChange: () => updateSingleTimingGateVisibility(p) },
       { key: `${p}SpeedCurve`, label: 'Animation Speed Curve (Distance -> Speed)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickHoldConfig(p) },
-      { key: `${p}SpeedCurveRange`, label: 'Min / Max Speed (Ms)', type: 'text', def: '{"min":50,"max":2000}', onChange: () => parseClickHoldConfig(p) },
+      { key: `${p}SpeedCurveRange`, label: 'Min / Max Speed (Ms)', type: 'text', def: '{"min":500,"max":1500}', onChange: () => parseClickHoldConfig(p) },
       // Start Time Curve on/off -- direct spec item ("Start Time Curve
       // on/off [wraps existing]"). Off = no distance-based stagger at
       // all, every hand starts its forward transition immediately
@@ -4710,7 +4710,7 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       // original spec's own grouping -- Sequence/Tween mode's own
       // release always retransitions, a disclosed scoping choice.
       { key: `${p}RetransitionEnabled`, label: 'Retransition On/Off', type: 'checkbox', def: true, onChange: () => updateSingleTimingGateVisibility(p) },
-      { key: `${p}RetransitionSpeedMs`, label: 'Retransition Speed (Ms)', type: 'slider', min: 0, max: 700, step: 10, def: defaults.retransitionSpeedMs ?? 400 },
+      { key: `${p}RetransitionSpeedMs`, label: 'Retransition Speed (Ms)', type: 'slider', min: 0, max: 25000, step: 10, def: defaults.retransitionSpeedMs ?? 400 },
       // Retransition Speed Curve -- direct request 2026-09-24 (item 5):
       // "In the Retransition settings group, add a Curve Graph input and
       // min max selector for Retransition speed." Same distance->speed
@@ -4723,7 +4723,7 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       // philosophy as every other curve in this file).
       { key: `${p}RetransitionSpeedCurveEnabled`, label: 'Retransition Speed Curve On/Off', type: 'checkbox', def: false, onChange: () => updateSingleTimingGateVisibility(p) },
       { key: `${p}RetransitionSpeedCurve`, label: 'Retransition Speed Curve (Distance -> Speed)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickHoldConfig(p) },
-      { key: `${p}RetransitionSpeedCurveRange`, label: 'Retransition Min / Max Speed (Ms)', type: 'text', def: '{"min":50,"max":2000}', onChange: () => parseClickHoldConfig(p) },
+      { key: `${p}RetransitionSpeedCurveRange`, label: 'Retransition Min / Max Speed (Ms)', type: 'text', def: '{"min":50,"max":25000}', onChange: () => parseClickHoldConfig(p) },
       // Retransition Start Time Curve On/Off -- direct spec item
       // (2026-09-27), same reasoning as makeClickPoseGroup()'s own
       // matching control comment.
@@ -4743,7 +4743,7 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       // FORWARD direction. Same range/step/default as the Tween Start
       // trio, not the 0-700 Pose Retransition range -- a tween's own
       // release can reasonably want more time than a single pose's.
-      { key: `${p}TweenRetransitionSpeedMs`, label: 'Retransition Speed (Ms)', type: 'slider', min: 50, max: 5000, step: 10, def: 800 },
+      { key: `${p}TweenRetransitionSpeedMs`, label: 'Retransition Speed (Ms)', type: 'slider', min: 50, max: 25000, step: 10, def: 800 },
       // Tween mode's own Retransition Speed CURVE -- direct request
       // 2026-09-30: "retransition speed curve and start time curve should
       // be avialable to any mode with retransition." Start Time Curve
@@ -4757,7 +4757,7 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       // visibility side, and updateClickHoldPoseForHand()'s 'retransition'
       // phase + its own freeze-point for the runtime side.
       { key: `${p}TweenRetransitionSpeedCurve`, label: 'Retransition Speed Curve (Distance -> Speed)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickHoldConfig(p) },
-      { key: `${p}TweenRetransitionSpeedCurveRange`, label: 'Retransition Min / Max Speed (Ms)', type: 'text', def: '{"min":50,"max":2000}', onChange: () => parseClickHoldConfig(p) },
+      { key: `${p}TweenRetransitionSpeedCurveRange`, label: 'Retransition Min / Max Speed (Ms)', type: 'text', def: '{"min":50,"max":25000}', onChange: () => parseClickHoldConfig(p) },
       { key: `${p}TweenRetransitionStartTimeCurve`, label: 'Retransition Start Time Curve (Distance -> Start Time)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickHoldConfig(p) },
       { key: `${p}TweenRetransitionStartTimeRange`, label: 'Retransition Min / Max Start Time (Ms)', type: 'text', def: '{"min":0,"max":300}', onChange: () => parseClickHoldConfig(p) },
       // Sequence-mode release behavior -- direct spec item, REPLACED
@@ -4993,7 +4993,7 @@ function makeClickPoseGroup(p, title, defaults = {}) {
       // added this the same way).
       { key: `${p}SpeedCurveEnabled`, label: 'Animation Speed Curve On/Off', type: 'checkbox', def: false, onChange: () => updateSingleTimingGateVisibility(p) },
       { key: `${p}SpeedCurve`, label: 'Animation Speed Curve (Distance -> Speed)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickPoseConfig(p) },
-      { key: `${p}SpeedCurveRange`, label: 'Min / Max Speed (Ms)', type: 'text', def: '{"min":50,"max":2000}', onChange: () => parseClickPoseConfig(p) },
+      { key: `${p}SpeedCurveRange`, label: 'Min / Max Speed (Ms)', type: 'text', def: '{"min":500,"max":1500}', onChange: () => parseClickPoseConfig(p) },
       { key: `${p}StartTimeCurveEnabled`, label: 'Start Time Curve On/Off', type: 'checkbox', def: true, onChange: () => updateSingleTimingGateVisibility(p) },
       { key: `${p}StartTimeCurve`, label: 'Start Time Curve (Distance -> Start Time)', type: 'text', def: defaults.startTimeCurve ?? '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickPoseConfig(p) },
       { key: `${p}StartTimeRange`, label: 'Min / Max Start Time (Ms)', type: 'text', def: defaults.startTimeRange ?? '{"min":0,"max":300}', onChange: () => parseClickPoseConfig(p) },
@@ -5006,14 +5006,14 @@ function makeClickPoseGroup(p, title, defaults = {}) {
       { key: `${p}StartDistanceCurve`, label: 'Start Distance Curve (Distance -> Tween Amount)', type: 'text', def: '[{"x":0,"y":1},{"x":1,"y":1}]', onChange: () => parseClickPoseConfig(p) },
       { key: `${p}PauseDurationMs`, label: 'Pause Duration At Tween End (Ms)', type: 'slider', min: 0, max: 5000, step: 10, def: defaults.pauseDurationMs ?? 500 },
       { key: `${p}RetransitionEnabled`, label: 'Retransition On/Off', type: 'checkbox', def: true, onChange: () => updateSingleTimingGateVisibility(p) },
-      { key: `${p}RetransitionSpeedMs`, label: 'Retransition Speed (Ms)', type: 'slider', min: 0, max: 700, step: 10, def: defaults.retransitionSpeedMs ?? 400 },
+      { key: `${p}RetransitionSpeedMs`, label: 'Retransition Speed (Ms)', type: 'slider', min: 0, max: 25000, step: 10, def: defaults.retransitionSpeedMs ?? 400 },
       // Retransition Speed Curve -- direct request 2026-09-24 (item 5) --
       // see makeClickHoldPoseGroup()'s own matching comment for the full
       // reasoning (shared word-for-word, both factories added this the
       // same way).
       { key: `${p}RetransitionSpeedCurveEnabled`, label: 'Retransition Speed Curve On/Off', type: 'checkbox', def: false, onChange: () => updateSingleTimingGateVisibility(p) },
       { key: `${p}RetransitionSpeedCurve`, label: 'Retransition Speed Curve (Distance -> Speed)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickPoseConfig(p) },
-      { key: `${p}RetransitionSpeedCurveRange`, label: 'Retransition Min / Max Speed (Ms)', type: 'text', def: '{"min":50,"max":2000}', onChange: () => parseClickPoseConfig(p) },
+      { key: `${p}RetransitionSpeedCurveRange`, label: 'Retransition Min / Max Speed (Ms)', type: 'text', def: '{"min":50,"max":25000}', onChange: () => parseClickPoseConfig(p) },
       // Retransition Start Time Curve On/Off -- direct spec item
       // (2026-09-27): "place the Retransition start time slider and curve
       // in their own subgroup that can be turned on and off." Previously
@@ -8780,7 +8780,7 @@ function lerpLoopSequence(poses, tCyclic) {
 // playthrough of the sequence"). Duration of one named-pose segment, in ms.
 function loopSegmentMsFor(p, chp, trig) {
   return (cfg[`${p}SpeedCurveEnabled`] && chp.frozenSpeedMs > 0)
-    ? Math.max(chp.frozenSpeedMs / Math.max(trig.loopPoses.length, 1), 1)
+    ? Math.max(chp.frozenSpeedMs * chainSequenceCount(p) / Math.max(trig.loopPoses.length, 1), 1)
     : trig.loopSegmentMs
 }
 // Pose at `elapsedSegments` segments into a lap that began in direction
@@ -8914,9 +8914,19 @@ function easingProfilePAt(profile, u) {
   const frac = span > 0 ? (target - ts[lo]) / span : 0
   return THREE.MathUtils.clamp((lo + frac) / N, 0, 1)
 }
+// Chain mode (2026-10-09, direct request: "for click functions that trigger a chain, make the animation speed value
+// be the speed of a single sequence within the chain as opposed to the whole chain"): the number of listed sequences
+// that actually exist, so the whole chain takes Animation Speed x that many. 1 in every other mode.
+function chainSequenceCount(p) {
+  if (cfg[`${p}Mode`] !== 'Chain') return 1
+  const seqs = cfg.savedTweenSequences || []
+  const n = (cfg[`${p}TweenChain`] || []).filter((name) => seqs.some((s) => s.name === name)).length
+  return Math.max(n, 1)
+}
 function animSpeedMs(p, isTween, frozenSpeedMs) {
-  if (cfg[`${p}SpeedCurveEnabled`] && frozenSpeedMs > 0) return frozenSpeedMs
-  return isTween ? safeTweenSpeedMs(cfg[`${p}TweenSpeedMs`]) : cfg[`${p}TransitionSpeedMs`]
+  const k = isTween ? chainSequenceCount(p) : 1 // the speed (and the Speed Curve's Min / Max Speed) is per sequence in a chain
+  if (cfg[`${p}SpeedCurveEnabled`] && frozenSpeedMs > 0) return frozenSpeedMs * k
+  return isTween ? safeTweenSpeedMs(cfg[`${p}TweenSpeedMs`]) * k : cfg[`${p}TransitionSpeedMs`]
 }
 // Called once per hand per trigger, per frame, from updateRenderOrder()'s
 // own existing per-hand loop -- reuses that loop's own `live`/
@@ -9641,7 +9651,7 @@ function startClickHoldPose(p) {
     // of Loop's own discrete cycle stops), via resolveTweenSequencePoses()'s
     // own existing string-only mapping, unchanged.
     trig.loopPoses = namedPoses
-    trig.loopSegmentMs = Math.max(safeTweenSpeedMs(cfg[`${p}TweenSpeedMs`]) / Math.max(namedPoses.length, 1), 1)
+    trig.loopSegmentMs = Math.max(safeTweenSpeedMs(cfg[`${p}TweenSpeedMs`]) * chainSequenceCount(p) / Math.max(namedPoses.length, 1), 1)
     // RAW entries (Hold objects intact, NOT run through
     // resolveTweenSequencePoses) -- feeds the one-time forward-pass
     // timeline's own Hold support (direct request: "i want the hold to be
@@ -11422,14 +11432,14 @@ function buildClickHoldPoseWidgets(p) {
   const speedRangeRow = document.querySelector(`.dp-row[data-key="${p}SpeedCurveRange"]`)
   const speedCurveCaption = 'X: Distance From Cursor (%, Nearest→Farthest Hand At Trigger Time)  ·  Y: Speed Fraction (0=Min, 1=Max)'
   if (speedCurveRow) buildGenericCurveWidget(speedCurveRow, { caption: speedCurveCaption, defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
-  if (speedRangeRow) buildGenericRangeBarWidget(speedRangeRow, { trackMin: 50, trackMax: 2000, unit: 'ms', defaultValue: { min: 50, max: 2000 } })
+  if (speedRangeRow) buildGenericRangeBarWidget(speedRangeRow, { trackMin: 50, trackMax: 2000, unit: 'ms', defaultValue: { min: 500, max: 1500 } })
   // Retransition Speed Curve's own curve/range widgets (item 5, 2026-09-24)
   // -- same shape/caption/track ceiling as Animation Speed Curve above,
   // just modulating Retransition Speed instead.
   const retransSpeedCurveRow = document.querySelector(`.dp-row[data-key="${p}RetransitionSpeedCurve"]`)
   const retransSpeedRangeRow = document.querySelector(`.dp-row[data-key="${p}RetransitionSpeedCurveRange"]`)
   if (retransSpeedCurveRow) buildGenericCurveWidget(retransSpeedCurveRow, { caption: speedCurveCaption, defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
-  if (retransSpeedRangeRow) buildGenericRangeBarWidget(retransSpeedRangeRow, { trackMin: 50, trackMax: 2000, unit: 'ms', defaultValue: { min: 50, max: 2000 } })
+  if (retransSpeedRangeRow) buildGenericRangeBarWidget(retransSpeedRangeRow, { trackMin: 50, trackMax: 25000, unit: 'ms', defaultValue: { min: 50, max: 25000 } })
   // Tween's own dedicated Retransition SPEED curve/range (2026-09-30,
   // direct follow-up: "for retransition speed curve make the ui the
   // sliderr toggle and the curve editor") -- same shape/caption/track
@@ -11440,7 +11450,7 @@ function buildClickHoldPoseWidgets(p) {
   const tweenRetransSpeedCurveRow = document.querySelector(`.dp-row[data-key="${p}TweenRetransitionSpeedCurve"]`)
   const tweenRetransSpeedRangeRow = document.querySelector(`.dp-row[data-key="${p}TweenRetransitionSpeedCurveRange"]`)
   if (tweenRetransSpeedCurveRow) buildGenericCurveWidget(tweenRetransSpeedCurveRow, { caption: speedCurveCaption, defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
-  if (tweenRetransSpeedRangeRow) buildGenericRangeBarWidget(tweenRetransSpeedRangeRow, { trackMin: 50, trackMax: 2000, unit: 'ms', defaultValue: { min: 50, max: 2000 } })
+  if (tweenRetransSpeedRangeRow) buildGenericRangeBarWidget(tweenRetransSpeedRangeRow, { trackMin: 50, trackMax: 25000, unit: 'ms', defaultValue: { min: 50, max: 25000 } })
   const startCurveRow = document.querySelector(`.dp-row[data-key="${p}StartTimeCurve"]`)
   const startRangeRow = document.querySelector(`.dp-row[data-key="${p}StartTimeRange"]`)
   const tweenStartCurveRow = document.querySelector(`.dp-row[data-key="${p}TweenStartTimeCurve"]`)
@@ -11520,13 +11530,13 @@ function buildClickPoseWidgets(p) {
   const speedRangeRow = document.querySelector(`.dp-row[data-key="${p}SpeedCurveRange"]`)
   const speedCurveCaption = 'X: Distance From Cursor (%, Nearest→Farthest Hand At Trigger Time)  ·  Y: Speed Fraction (0=Min, 1=Max)'
   if (speedCurveRow) buildGenericCurveWidget(speedCurveRow, { caption: speedCurveCaption, defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
-  if (speedRangeRow) buildGenericRangeBarWidget(speedRangeRow, { trackMin: 50, trackMax: 2000, unit: 'ms', defaultValue: { min: 50, max: 2000 } })
+  if (speedRangeRow) buildGenericRangeBarWidget(speedRangeRow, { trackMin: 50, trackMax: 2000, unit: 'ms', defaultValue: { min: 500, max: 1500 } })
   // Retransition Speed Curve's own curve/range widgets (item 5, 2026-09-24)
   // -- see buildClickHoldPoseWidgets()'s own matching comment.
   const retransSpeedCurveRow = document.querySelector(`.dp-row[data-key="${p}RetransitionSpeedCurve"]`)
   const retransSpeedRangeRow = document.querySelector(`.dp-row[data-key="${p}RetransitionSpeedCurveRange"]`)
   if (retransSpeedCurveRow) buildGenericCurveWidget(retransSpeedCurveRow, { caption: speedCurveCaption, defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
-  if (retransSpeedRangeRow) buildGenericRangeBarWidget(retransSpeedRangeRow, { trackMin: 50, trackMax: 2000, unit: 'ms', defaultValue: { min: 50, max: 2000 } })
+  if (retransSpeedRangeRow) buildGenericRangeBarWidget(retransSpeedRangeRow, { trackMin: 50, trackMax: 25000, unit: 'ms', defaultValue: { min: 50, max: 25000 } })
   const startCurveRow = document.querySelector(`.dp-row[data-key="${p}StartTimeCurve"]`)
   const startRangeRow = document.querySelector(`.dp-row[data-key="${p}StartTimeRange"]`)
   const tweenStartCurveRow = document.querySelector(`.dp-row[data-key="${p}TweenStartTimeCurve"]`)
@@ -12434,11 +12444,11 @@ const NEW_CUSTOM_FUNCTION_TEMPLATE = {
   SequencePlayMode: 'Count', SequenceCount: 1, SequenceCountMode: 'Loop',
   SequenceLoopTransition: true, SequenceHoldMs: 0, TransitionSpeedMs: 700,
   EasingCurveEnabled: false, EasingCurve: '[{"x":0,"y":0.5},{"x":1,"y":0.5}]',
-  SpeedCurveEnabled: false, SpeedCurve: '[{"x":0,"y":0},{"x":1,"y":1}]', SpeedCurveRange: '{"min":50,"max":2000}',
+  SpeedCurveEnabled: false, SpeedCurve: '[{"x":0,"y":0},{"x":1,"y":1}]', SpeedCurveRange: '{"min":500,"max":1500}',
   StartTimeCurveEnabled: false, StartTimeCurve: '[{"x":0,"y":0},{"x":1,"y":1}]', StartTimeRange: '{"min":0,"max":300}',
   PauseDurationMs: 0,
   RetransitionEnabled: false, RetransitionSpeedMs: 400,
-  RetransitionSpeedCurveEnabled: false, RetransitionSpeedCurve: '[{"x":0,"y":0},{"x":1,"y":1}]', RetransitionSpeedCurveRange: '{"min":50,"max":2000}',
+  RetransitionSpeedCurveEnabled: false, RetransitionSpeedCurve: '[{"x":0,"y":0},{"x":1,"y":1}]', RetransitionSpeedCurveRange: '{"min":50,"max":25000}',
   RetransitionStartTimeCurve: '[{"x":0,"y":0},{"x":1,"y":1}]', RetransitionStartTimeRange: '{"min":0,"max":300}'
 }
 // Collapsed state of the 5 mandatory gated subgroups (§ CLAUDE.md
