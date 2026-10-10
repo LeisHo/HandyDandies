@@ -8918,7 +8918,7 @@
       "custom23Trig1CameraOffsetZEnabled": false,
       "custom23Trig1CameraOffsetZCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom23Trig1CameraOffsetZRange": "{\"min\":0,\"max\":10}",
-      "custom23Trig1RotationEnabled": true,
+      "custom23Trig1RotationEnabled": false,
       "custom23Trig1RotationX": 5,
       "custom23Trig1RotationY": 5,
       "custom23Trig1RotationZ": 5,
@@ -9004,7 +9004,7 @@
       "custom24CameraOffsetZEnabled": false,
       "custom24CameraOffsetZCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom24CameraOffsetZRange": "{\"min\":0,\"max\":10}",
-      "custom24RotationEnabled": true,
+      "custom24RotationEnabled": false,
       "custom24RotationX": -15,
       "custom24RotationY": 15,
       "custom24RotationZ": 0,
@@ -18881,7 +18881,7 @@
       "custom23Trig1CameraOffsetZEnabled": false,
       "custom23Trig1CameraOffsetZCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom23Trig1CameraOffsetZRange": "{\"min\":0,\"max\":10}",
-      "custom23Trig1RotationEnabled": true,
+      "custom23Trig1RotationEnabled": false,
       "custom23Trig1RotationX": 5,
       "custom23Trig1RotationY": 5,
       "custom23Trig1RotationZ": 5,
@@ -18967,7 +18967,7 @@
       "custom24CameraOffsetZEnabled": false,
       "custom24CameraOffsetZCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom24CameraOffsetZRange": "{\"min\":0,\"max\":10}",
-      "custom24RotationEnabled": true,
+      "custom24RotationEnabled": false,
       "custom24RotationX": -15,
       "custom24RotationY": 15,
       "custom24RotationZ": 0,
@@ -28844,7 +28844,7 @@
       "custom23Trig1CameraOffsetZEnabled": false,
       "custom23Trig1CameraOffsetZCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom23Trig1CameraOffsetZRange": "{\"min\":0,\"max\":10}",
-      "custom23Trig1RotationEnabled": true,
+      "custom23Trig1RotationEnabled": false,
       "custom23Trig1RotationX": 5,
       "custom23Trig1RotationY": 5,
       "custom23Trig1RotationZ": 5,
@@ -28930,7 +28930,7 @@
       "custom24CameraOffsetZEnabled": false,
       "custom24CameraOffsetZCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom24CameraOffsetZRange": "{\"min\":0,\"max\":10}",
-      "custom24RotationEnabled": true,
+      "custom24RotationEnabled": false,
       "custom24RotationX": -15,
       "custom24RotationY": 15,
       "custom24RotationZ": 0,
@@ -59666,7 +59666,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 24",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -59832,7 +59832,7 @@
                 "type": "group",
                 "group": {
                   "key": "Offset To Camera",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -61895,7 +61895,7 @@
               },
               {
                 "key": "Offset To Camera",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -63838,7 +63838,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 23",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -64084,10 +64084,15 @@
                     {
                       "type": "row",
                       "key": "custom23EasingCurve"
+                    },
+                    {
+                      "type": "row",
+                      "key": "custom23SpeedCurve"
                     }
                   ],
                   "settings": [
-                    "custom23EasingCurve"
+                    "custom23EasingCurve",
+                    "custom23SpeedCurve"
                   ],
                   "subgroups": []
                 }
@@ -64096,20 +64101,15 @@
                 "type": "group",
                 "group": {
                   "key": "Animation Speed Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
-                    {
-                      "type": "row",
-                      "key": "custom23SpeedCurve"
-                    },
                     {
                       "type": "row",
                       "key": "custom23SpeedCurveRange"
                     }
                   ],
                   "settings": [
-                    "custom23SpeedCurve",
                     "custom23SpeedCurveRange"
                   ],
                   "subgroups": []
@@ -64119,7 +64119,7 @@
                 "type": "group",
                 "group": {
                   "key": "Start Time Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -64180,7 +64180,7 @@
                 "type": "group",
                 "group": {
                   "key": "Retransition",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -64330,7 +64330,7 @@
                 "type": "group",
                 "group": {
                   "key": "Tween Stop",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -64603,19 +64603,19 @@
                             }
                           },
                           {
+                            "type": "row",
+                            "key": "custom23Trig1CameraOffsetXCurve"
+                          },
+                          {
                             "type": "group",
                             "group": {
                               "key": "Offset To Camera",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
                                   "type": "row",
                                   "key": "custom23Trig1CameraOffsetXEnabled"
-                                },
-                                {
-                                  "type": "row",
-                                  "key": "custom23Trig1CameraOffsetXCurve"
                                 },
                                 {
                                   "type": "row",
@@ -64648,7 +64648,6 @@
                               ],
                               "settings": [
                                 "custom23Trig1CameraOffsetXEnabled",
-                                "custom23Trig1CameraOffsetXCurve",
                                 "custom23Trig1CameraOffsetXRange",
                                 "custom23Trig1CameraOffsetYEnabled",
                                 "custom23Trig1CameraOffsetYCurve",
@@ -64692,7 +64691,7 @@
                             "type": "group",
                             "group": {
                               "key": "Easing",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -64710,7 +64709,7 @@
                             "type": "group",
                             "group": {
                               "key": "Animation Speed Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -64733,7 +64732,7 @@
                             "type": "group",
                             "group": {
                               "key": "Start Time Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -64794,7 +64793,7 @@
                             "type": "group",
                             "group": {
                               "key": "Retransition",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -64944,7 +64943,7 @@
                             "type": "group",
                             "group": {
                               "key": "Tween Stop",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -65073,7 +65072,8 @@
                           "custom23Trig1TransitionSpeedMs",
                           "custom23Trig1TweenSpeedMs",
                           "custom23Trig1LoopMode",
-                          "custom23Trig1LoopHoldMs"
+                          "custom23Trig1LoopHoldMs",
+                          "custom23Trig1CameraOffsetXCurve"
                         ],
                         "subgroups": [
                           {
@@ -65158,16 +65158,12 @@
                           },
                           {
                             "key": "Offset To Camera",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
                                 "type": "row",
                                 "key": "custom23Trig1CameraOffsetXEnabled"
-                              },
-                              {
-                                "type": "row",
-                                "key": "custom23Trig1CameraOffsetXCurve"
                               },
                               {
                                 "type": "row",
@@ -65200,7 +65196,6 @@
                             ],
                             "settings": [
                               "custom23Trig1CameraOffsetXEnabled",
-                              "custom23Trig1CameraOffsetXCurve",
                               "custom23Trig1CameraOffsetXRange",
                               "custom23Trig1CameraOffsetYEnabled",
                               "custom23Trig1CameraOffsetYCurve",
@@ -65238,7 +65233,7 @@
                           },
                           {
                             "key": "Easing",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -65253,7 +65248,7 @@
                           },
                           {
                             "key": "Animation Speed Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -65273,7 +65268,7 @@
                           },
                           {
                             "key": "Start Time Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -65328,7 +65323,7 @@
                           },
                           {
                             "key": "Retransition",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -65475,7 +65470,7 @@
                           },
                           {
                             "key": "Tween Stop",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -65743,19 +65738,19 @@
                           }
                         },
                         {
+                          "type": "row",
+                          "key": "custom23Trig1CameraOffsetXCurve"
+                        },
+                        {
                           "type": "group",
                           "group": {
                             "key": "Offset To Camera",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
                                 "type": "row",
                                 "key": "custom23Trig1CameraOffsetXEnabled"
-                              },
-                              {
-                                "type": "row",
-                                "key": "custom23Trig1CameraOffsetXCurve"
                               },
                               {
                                 "type": "row",
@@ -65788,7 +65783,6 @@
                             ],
                             "settings": [
                               "custom23Trig1CameraOffsetXEnabled",
-                              "custom23Trig1CameraOffsetXCurve",
                               "custom23Trig1CameraOffsetXRange",
                               "custom23Trig1CameraOffsetYEnabled",
                               "custom23Trig1CameraOffsetYCurve",
@@ -65832,7 +65826,7 @@
                           "type": "group",
                           "group": {
                             "key": "Easing",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -65850,7 +65844,7 @@
                           "type": "group",
                           "group": {
                             "key": "Animation Speed Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -65873,7 +65867,7 @@
                           "type": "group",
                           "group": {
                             "key": "Start Time Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -65934,7 +65928,7 @@
                           "type": "group",
                           "group": {
                             "key": "Retransition",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -66084,7 +66078,7 @@
                           "type": "group",
                           "group": {
                             "key": "Tween Stop",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -66213,7 +66207,8 @@
                         "custom23Trig1TransitionSpeedMs",
                         "custom23Trig1TweenSpeedMs",
                         "custom23Trig1LoopMode",
-                        "custom23Trig1LoopHoldMs"
+                        "custom23Trig1LoopHoldMs",
+                        "custom23Trig1CameraOffsetXCurve"
                       ],
                       "subgroups": [
                         {
@@ -66298,16 +66293,12 @@
                         },
                         {
                           "key": "Offset To Camera",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
                               "type": "row",
                               "key": "custom23Trig1CameraOffsetXEnabled"
-                            },
-                            {
-                              "type": "row",
-                              "key": "custom23Trig1CameraOffsetXCurve"
                             },
                             {
                               "type": "row",
@@ -66340,7 +66331,6 @@
                           ],
                           "settings": [
                             "custom23Trig1CameraOffsetXEnabled",
-                            "custom23Trig1CameraOffsetXCurve",
                             "custom23Trig1CameraOffsetXRange",
                             "custom23Trig1CameraOffsetYEnabled",
                             "custom23Trig1CameraOffsetYCurve",
@@ -66378,7 +66368,7 @@
                         },
                         {
                           "key": "Easing",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -66393,7 +66383,7 @@
                         },
                         {
                           "key": "Animation Speed Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -66413,7 +66403,7 @@
                         },
                         {
                           "key": "Start Time Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -66468,7 +66458,7 @@
                         },
                         {
                           "key": "Retransition",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -66615,7 +66605,7 @@
                         },
                         {
                           "key": "Tween Stop",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -66922,36 +66912,36 @@
                   {
                     "type": "row",
                     "key": "custom23EasingCurve"
+                  },
+                  {
+                    "type": "row",
+                    "key": "custom23SpeedCurve"
                   }
                 ],
                 "settings": [
-                  "custom23EasingCurve"
+                  "custom23EasingCurve",
+                  "custom23SpeedCurve"
                 ],
                 "subgroups": []
               },
               {
                 "key": "Animation Speed Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
-                  {
-                    "type": "row",
-                    "key": "custom23SpeedCurve"
-                  },
                   {
                     "type": "row",
                     "key": "custom23SpeedCurveRange"
                   }
                 ],
                 "settings": [
-                  "custom23SpeedCurve",
                   "custom23SpeedCurveRange"
                 ],
                 "subgroups": []
               },
               {
                 "key": "Start Time Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -67006,7 +66996,7 @@
               },
               {
                 "key": "Retransition",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -67153,7 +67143,7 @@
               },
               {
                 "key": "Tween Stop",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -67423,19 +67413,19 @@
                           }
                         },
                         {
+                          "type": "row",
+                          "key": "custom23Trig1CameraOffsetXCurve"
+                        },
+                        {
                           "type": "group",
                           "group": {
                             "key": "Offset To Camera",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
                                 "type": "row",
                                 "key": "custom23Trig1CameraOffsetXEnabled"
-                              },
-                              {
-                                "type": "row",
-                                "key": "custom23Trig1CameraOffsetXCurve"
                               },
                               {
                                 "type": "row",
@@ -67468,7 +67458,6 @@
                             ],
                             "settings": [
                               "custom23Trig1CameraOffsetXEnabled",
-                              "custom23Trig1CameraOffsetXCurve",
                               "custom23Trig1CameraOffsetXRange",
                               "custom23Trig1CameraOffsetYEnabled",
                               "custom23Trig1CameraOffsetYCurve",
@@ -67512,7 +67501,7 @@
                           "type": "group",
                           "group": {
                             "key": "Easing",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -67530,7 +67519,7 @@
                           "type": "group",
                           "group": {
                             "key": "Animation Speed Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -67553,7 +67542,7 @@
                           "type": "group",
                           "group": {
                             "key": "Start Time Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -67614,7 +67603,7 @@
                           "type": "group",
                           "group": {
                             "key": "Retransition",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -67764,7 +67753,7 @@
                           "type": "group",
                           "group": {
                             "key": "Tween Stop",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -67893,7 +67882,8 @@
                         "custom23Trig1TransitionSpeedMs",
                         "custom23Trig1TweenSpeedMs",
                         "custom23Trig1LoopMode",
-                        "custom23Trig1LoopHoldMs"
+                        "custom23Trig1LoopHoldMs",
+                        "custom23Trig1CameraOffsetXCurve"
                       ],
                       "subgroups": [
                         {
@@ -67978,16 +67968,12 @@
                         },
                         {
                           "key": "Offset To Camera",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
                               "type": "row",
                               "key": "custom23Trig1CameraOffsetXEnabled"
-                            },
-                            {
-                              "type": "row",
-                              "key": "custom23Trig1CameraOffsetXCurve"
                             },
                             {
                               "type": "row",
@@ -68020,7 +68006,6 @@
                           ],
                           "settings": [
                             "custom23Trig1CameraOffsetXEnabled",
-                            "custom23Trig1CameraOffsetXCurve",
                             "custom23Trig1CameraOffsetXRange",
                             "custom23Trig1CameraOffsetYEnabled",
                             "custom23Trig1CameraOffsetYCurve",
@@ -68058,7 +68043,7 @@
                         },
                         {
                           "key": "Easing",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -68073,7 +68058,7 @@
                         },
                         {
                           "key": "Animation Speed Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -68093,7 +68078,7 @@
                         },
                         {
                           "key": "Start Time Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -68148,7 +68133,7 @@
                         },
                         {
                           "key": "Retransition",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -68295,7 +68280,7 @@
                         },
                         {
                           "key": "Tween Stop",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -68563,19 +68548,19 @@
                         }
                       },
                       {
+                        "type": "row",
+                        "key": "custom23Trig1CameraOffsetXCurve"
+                      },
+                      {
                         "type": "group",
                         "group": {
                           "key": "Offset To Camera",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
                               "type": "row",
                               "key": "custom23Trig1CameraOffsetXEnabled"
-                            },
-                            {
-                              "type": "row",
-                              "key": "custom23Trig1CameraOffsetXCurve"
                             },
                             {
                               "type": "row",
@@ -68608,7 +68593,6 @@
                           ],
                           "settings": [
                             "custom23Trig1CameraOffsetXEnabled",
-                            "custom23Trig1CameraOffsetXCurve",
                             "custom23Trig1CameraOffsetXRange",
                             "custom23Trig1CameraOffsetYEnabled",
                             "custom23Trig1CameraOffsetYCurve",
@@ -68652,7 +68636,7 @@
                         "type": "group",
                         "group": {
                           "key": "Easing",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -68670,7 +68654,7 @@
                         "type": "group",
                         "group": {
                           "key": "Animation Speed Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -68693,7 +68677,7 @@
                         "type": "group",
                         "group": {
                           "key": "Start Time Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -68754,7 +68738,7 @@
                         "type": "group",
                         "group": {
                           "key": "Retransition",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -68904,7 +68888,7 @@
                         "type": "group",
                         "group": {
                           "key": "Tween Stop",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -69033,7 +69017,8 @@
                       "custom23Trig1TransitionSpeedMs",
                       "custom23Trig1TweenSpeedMs",
                       "custom23Trig1LoopMode",
-                      "custom23Trig1LoopHoldMs"
+                      "custom23Trig1LoopHoldMs",
+                      "custom23Trig1CameraOffsetXCurve"
                     ],
                     "subgroups": [
                       {
@@ -69118,16 +69103,12 @@
                       },
                       {
                         "key": "Offset To Camera",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
                             "type": "row",
                             "key": "custom23Trig1CameraOffsetXEnabled"
-                          },
-                          {
-                            "type": "row",
-                            "key": "custom23Trig1CameraOffsetXCurve"
                           },
                           {
                             "type": "row",
@@ -69160,7 +69141,6 @@
                         ],
                         "settings": [
                           "custom23Trig1CameraOffsetXEnabled",
-                          "custom23Trig1CameraOffsetXCurve",
                           "custom23Trig1CameraOffsetXRange",
                           "custom23Trig1CameraOffsetYEnabled",
                           "custom23Trig1CameraOffsetYCurve",
@@ -69198,7 +69178,7 @@
                       },
                       {
                         "key": "Easing",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -69213,7 +69193,7 @@
                       },
                       {
                         "key": "Animation Speed Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -69233,7 +69213,7 @@
                       },
                       {
                         "key": "Start Time Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -69288,7 +69268,7 @@
                       },
                       {
                         "key": "Retransition",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -69435,7 +69415,7 @@
                       },
                       {
                         "key": "Tween Stop",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -161050,7 +161030,7 @@
         },
         {
           "key": "Custom Click Function 24",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
@@ -161216,7 +161196,7 @@
               "type": "group",
               "group": {
                 "key": "Offset To Camera",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -163279,7 +163259,7 @@
             },
             {
               "key": "Offset To Camera",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -165219,7 +165199,7 @@
         },
         {
           "key": "Custom Click Function 23",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -165465,10 +165445,15 @@
                   {
                     "type": "row",
                     "key": "custom23EasingCurve"
+                  },
+                  {
+                    "type": "row",
+                    "key": "custom23SpeedCurve"
                   }
                 ],
                 "settings": [
-                  "custom23EasingCurve"
+                  "custom23EasingCurve",
+                  "custom23SpeedCurve"
                 ],
                 "subgroups": []
               }
@@ -165477,20 +165462,15 @@
               "type": "group",
               "group": {
                 "key": "Animation Speed Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
-                  {
-                    "type": "row",
-                    "key": "custom23SpeedCurve"
-                  },
                   {
                     "type": "row",
                     "key": "custom23SpeedCurveRange"
                   }
                 ],
                 "settings": [
-                  "custom23SpeedCurve",
                   "custom23SpeedCurveRange"
                 ],
                 "subgroups": []
@@ -165500,7 +165480,7 @@
               "type": "group",
               "group": {
                 "key": "Start Time Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -165561,7 +165541,7 @@
               "type": "group",
               "group": {
                 "key": "Retransition",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -165711,7 +165691,7 @@
               "type": "group",
               "group": {
                 "key": "Tween Stop",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -165984,19 +165964,19 @@
                           }
                         },
                         {
+                          "type": "row",
+                          "key": "custom23Trig1CameraOffsetXCurve"
+                        },
+                        {
                           "type": "group",
                           "group": {
                             "key": "Offset To Camera",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
                                 "type": "row",
                                 "key": "custom23Trig1CameraOffsetXEnabled"
-                              },
-                              {
-                                "type": "row",
-                                "key": "custom23Trig1CameraOffsetXCurve"
                               },
                               {
                                 "type": "row",
@@ -166029,7 +166009,6 @@
                             ],
                             "settings": [
                               "custom23Trig1CameraOffsetXEnabled",
-                              "custom23Trig1CameraOffsetXCurve",
                               "custom23Trig1CameraOffsetXRange",
                               "custom23Trig1CameraOffsetYEnabled",
                               "custom23Trig1CameraOffsetYCurve",
@@ -166073,7 +166052,7 @@
                           "type": "group",
                           "group": {
                             "key": "Easing",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -166091,7 +166070,7 @@
                           "type": "group",
                           "group": {
                             "key": "Animation Speed Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -166114,7 +166093,7 @@
                           "type": "group",
                           "group": {
                             "key": "Start Time Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -166175,7 +166154,7 @@
                           "type": "group",
                           "group": {
                             "key": "Retransition",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -166325,7 +166304,7 @@
                           "type": "group",
                           "group": {
                             "key": "Tween Stop",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -166454,7 +166433,8 @@
                         "custom23Trig1TransitionSpeedMs",
                         "custom23Trig1TweenSpeedMs",
                         "custom23Trig1LoopMode",
-                        "custom23Trig1LoopHoldMs"
+                        "custom23Trig1LoopHoldMs",
+                        "custom23Trig1CameraOffsetXCurve"
                       ],
                       "subgroups": [
                         {
@@ -166539,16 +166519,12 @@
                         },
                         {
                           "key": "Offset To Camera",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
                               "type": "row",
                               "key": "custom23Trig1CameraOffsetXEnabled"
-                            },
-                            {
-                              "type": "row",
-                              "key": "custom23Trig1CameraOffsetXCurve"
                             },
                             {
                               "type": "row",
@@ -166581,7 +166557,6 @@
                           ],
                           "settings": [
                             "custom23Trig1CameraOffsetXEnabled",
-                            "custom23Trig1CameraOffsetXCurve",
                             "custom23Trig1CameraOffsetXRange",
                             "custom23Trig1CameraOffsetYEnabled",
                             "custom23Trig1CameraOffsetYCurve",
@@ -166619,7 +166594,7 @@
                         },
                         {
                           "key": "Easing",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -166634,7 +166609,7 @@
                         },
                         {
                           "key": "Animation Speed Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -166654,7 +166629,7 @@
                         },
                         {
                           "key": "Start Time Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -166709,7 +166684,7 @@
                         },
                         {
                           "key": "Retransition",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -166856,7 +166831,7 @@
                         },
                         {
                           "key": "Tween Stop",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -167124,19 +167099,19 @@
                         }
                       },
                       {
+                        "type": "row",
+                        "key": "custom23Trig1CameraOffsetXCurve"
+                      },
+                      {
                         "type": "group",
                         "group": {
                           "key": "Offset To Camera",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
                               "type": "row",
                               "key": "custom23Trig1CameraOffsetXEnabled"
-                            },
-                            {
-                              "type": "row",
-                              "key": "custom23Trig1CameraOffsetXCurve"
                             },
                             {
                               "type": "row",
@@ -167169,7 +167144,6 @@
                           ],
                           "settings": [
                             "custom23Trig1CameraOffsetXEnabled",
-                            "custom23Trig1CameraOffsetXCurve",
                             "custom23Trig1CameraOffsetXRange",
                             "custom23Trig1CameraOffsetYEnabled",
                             "custom23Trig1CameraOffsetYCurve",
@@ -167213,7 +167187,7 @@
                         "type": "group",
                         "group": {
                           "key": "Easing",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -167231,7 +167205,7 @@
                         "type": "group",
                         "group": {
                           "key": "Animation Speed Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -167254,7 +167228,7 @@
                         "type": "group",
                         "group": {
                           "key": "Start Time Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -167315,7 +167289,7 @@
                         "type": "group",
                         "group": {
                           "key": "Retransition",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -167465,7 +167439,7 @@
                         "type": "group",
                         "group": {
                           "key": "Tween Stop",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -167594,7 +167568,8 @@
                       "custom23Trig1TransitionSpeedMs",
                       "custom23Trig1TweenSpeedMs",
                       "custom23Trig1LoopMode",
-                      "custom23Trig1LoopHoldMs"
+                      "custom23Trig1LoopHoldMs",
+                      "custom23Trig1CameraOffsetXCurve"
                     ],
                     "subgroups": [
                       {
@@ -167679,16 +167654,12 @@
                       },
                       {
                         "key": "Offset To Camera",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
                             "type": "row",
                             "key": "custom23Trig1CameraOffsetXEnabled"
-                          },
-                          {
-                            "type": "row",
-                            "key": "custom23Trig1CameraOffsetXCurve"
                           },
                           {
                             "type": "row",
@@ -167721,7 +167692,6 @@
                         ],
                         "settings": [
                           "custom23Trig1CameraOffsetXEnabled",
-                          "custom23Trig1CameraOffsetXCurve",
                           "custom23Trig1CameraOffsetXRange",
                           "custom23Trig1CameraOffsetYEnabled",
                           "custom23Trig1CameraOffsetYCurve",
@@ -167759,7 +167729,7 @@
                       },
                       {
                         "key": "Easing",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -167774,7 +167744,7 @@
                       },
                       {
                         "key": "Animation Speed Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -167794,7 +167764,7 @@
                       },
                       {
                         "key": "Start Time Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -167849,7 +167819,7 @@
                       },
                       {
                         "key": "Retransition",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -167996,7 +167966,7 @@
                       },
                       {
                         "key": "Tween Stop",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -168303,36 +168273,36 @@
                 {
                   "type": "row",
                   "key": "custom23EasingCurve"
+                },
+                {
+                  "type": "row",
+                  "key": "custom23SpeedCurve"
                 }
               ],
               "settings": [
-                "custom23EasingCurve"
+                "custom23EasingCurve",
+                "custom23SpeedCurve"
               ],
               "subgroups": []
             },
             {
               "key": "Animation Speed Curve",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
-                {
-                  "type": "row",
-                  "key": "custom23SpeedCurve"
-                },
                 {
                   "type": "row",
                   "key": "custom23SpeedCurveRange"
                 }
               ],
               "settings": [
-                "custom23SpeedCurve",
                 "custom23SpeedCurveRange"
               ],
               "subgroups": []
             },
             {
               "key": "Start Time Curve",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -168387,7 +168357,7 @@
             },
             {
               "key": "Retransition",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -168534,7 +168504,7 @@
             },
             {
               "key": "Tween Stop",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -168804,19 +168774,19 @@
                         }
                       },
                       {
+                        "type": "row",
+                        "key": "custom23Trig1CameraOffsetXCurve"
+                      },
+                      {
                         "type": "group",
                         "group": {
                           "key": "Offset To Camera",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
                               "type": "row",
                               "key": "custom23Trig1CameraOffsetXEnabled"
-                            },
-                            {
-                              "type": "row",
-                              "key": "custom23Trig1CameraOffsetXCurve"
                             },
                             {
                               "type": "row",
@@ -168849,7 +168819,6 @@
                           ],
                           "settings": [
                             "custom23Trig1CameraOffsetXEnabled",
-                            "custom23Trig1CameraOffsetXCurve",
                             "custom23Trig1CameraOffsetXRange",
                             "custom23Trig1CameraOffsetYEnabled",
                             "custom23Trig1CameraOffsetYCurve",
@@ -168893,7 +168862,7 @@
                         "type": "group",
                         "group": {
                           "key": "Easing",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -168911,7 +168880,7 @@
                         "type": "group",
                         "group": {
                           "key": "Animation Speed Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -168934,7 +168903,7 @@
                         "type": "group",
                         "group": {
                           "key": "Start Time Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -168995,7 +168964,7 @@
                         "type": "group",
                         "group": {
                           "key": "Retransition",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -169145,7 +169114,7 @@
                         "type": "group",
                         "group": {
                           "key": "Tween Stop",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -169274,7 +169243,8 @@
                       "custom23Trig1TransitionSpeedMs",
                       "custom23Trig1TweenSpeedMs",
                       "custom23Trig1LoopMode",
-                      "custom23Trig1LoopHoldMs"
+                      "custom23Trig1LoopHoldMs",
+                      "custom23Trig1CameraOffsetXCurve"
                     ],
                     "subgroups": [
                       {
@@ -169359,16 +169329,12 @@
                       },
                       {
                         "key": "Offset To Camera",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
                             "type": "row",
                             "key": "custom23Trig1CameraOffsetXEnabled"
-                          },
-                          {
-                            "type": "row",
-                            "key": "custom23Trig1CameraOffsetXCurve"
                           },
                           {
                             "type": "row",
@@ -169401,7 +169367,6 @@
                         ],
                         "settings": [
                           "custom23Trig1CameraOffsetXEnabled",
-                          "custom23Trig1CameraOffsetXCurve",
                           "custom23Trig1CameraOffsetXRange",
                           "custom23Trig1CameraOffsetYEnabled",
                           "custom23Trig1CameraOffsetYCurve",
@@ -169439,7 +169404,7 @@
                       },
                       {
                         "key": "Easing",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -169454,7 +169419,7 @@
                       },
                       {
                         "key": "Animation Speed Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -169474,7 +169439,7 @@
                       },
                       {
                         "key": "Start Time Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -169529,7 +169494,7 @@
                       },
                       {
                         "key": "Retransition",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -169676,7 +169641,7 @@
                       },
                       {
                         "key": "Tween Stop",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -169944,19 +169909,19 @@
                       }
                     },
                     {
+                      "type": "row",
+                      "key": "custom23Trig1CameraOffsetXCurve"
+                    },
+                    {
                       "type": "group",
                       "group": {
                         "key": "Offset To Camera",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
                             "type": "row",
                             "key": "custom23Trig1CameraOffsetXEnabled"
-                          },
-                          {
-                            "type": "row",
-                            "key": "custom23Trig1CameraOffsetXCurve"
                           },
                           {
                             "type": "row",
@@ -169989,7 +169954,6 @@
                         ],
                         "settings": [
                           "custom23Trig1CameraOffsetXEnabled",
-                          "custom23Trig1CameraOffsetXCurve",
                           "custom23Trig1CameraOffsetXRange",
                           "custom23Trig1CameraOffsetYEnabled",
                           "custom23Trig1CameraOffsetYCurve",
@@ -170033,7 +169997,7 @@
                       "type": "group",
                       "group": {
                         "key": "Easing",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -170051,7 +170015,7 @@
                       "type": "group",
                       "group": {
                         "key": "Animation Speed Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -170074,7 +170038,7 @@
                       "type": "group",
                       "group": {
                         "key": "Start Time Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -170135,7 +170099,7 @@
                       "type": "group",
                       "group": {
                         "key": "Retransition",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -170285,7 +170249,7 @@
                       "type": "group",
                       "group": {
                         "key": "Tween Stop",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -170414,7 +170378,8 @@
                     "custom23Trig1TransitionSpeedMs",
                     "custom23Trig1TweenSpeedMs",
                     "custom23Trig1LoopMode",
-                    "custom23Trig1LoopHoldMs"
+                    "custom23Trig1LoopHoldMs",
+                    "custom23Trig1CameraOffsetXCurve"
                   ],
                   "subgroups": [
                     {
@@ -170499,16 +170464,12 @@
                     },
                     {
                       "key": "Offset To Camera",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
                           "type": "row",
                           "key": "custom23Trig1CameraOffsetXEnabled"
-                        },
-                        {
-                          "type": "row",
-                          "key": "custom23Trig1CameraOffsetXCurve"
                         },
                         {
                           "type": "row",
@@ -170541,7 +170502,6 @@
                       ],
                       "settings": [
                         "custom23Trig1CameraOffsetXEnabled",
-                        "custom23Trig1CameraOffsetXCurve",
                         "custom23Trig1CameraOffsetXRange",
                         "custom23Trig1CameraOffsetYEnabled",
                         "custom23Trig1CameraOffsetYCurve",
@@ -170579,7 +170539,7 @@
                     },
                     {
                       "key": "Easing",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -170594,7 +170554,7 @@
                     },
                     {
                       "key": "Animation Speed Curve",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -170614,7 +170574,7 @@
                     },
                     {
                       "key": "Start Time Curve",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -170669,7 +170629,7 @@
                     },
                     {
                       "key": "Retransition",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -170816,7 +170776,7 @@
                     },
                     {
                       "key": "Tween Stop",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -239183,10 +239143,10 @@
       "height": 644.390625
     },
     "mobile": {
-      "left": 21.9761905670166,
-      "top": 14.101190567016602,
-      "width": 372.452392578125,
-      "height": 771.0952758789062
+      "left": 55.35714340209961,
+      "top": 13.898809432983398,
+      "width": 339.06549072265625,
+      "height": 772.6190795898438
     }
   }
 }
