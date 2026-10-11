@@ -1013,19 +1013,25 @@ const roLevelName = (l) => (l === 0 ? 'Mode' : l === 1 ? 'Fallback' : 'Fallback 
 // Mode terms (+ And / + Or / - Subtract) and the extra Fallback levels are JSON lists kept in two hidden text controls (see buildRenderOrderWidgets()); parsed once per distinct string.
 const RO_VALID_MODES = new Set(RENDER_ORDER_MODE_OPTIONS.map((o) => o.value))
 const roA2A = {}
-let roTermsStr = null, roTermsVal = [], roExtraStr = null, roExtraVal = []
-function roParseTerms() {
-  const str = cfg.renderOrderModeTerms || '[]'
-  if (str === roTermsStr) return roTermsVal
-  roTermsStr = str; roTermsVal = []
-  try { const a = JSON.parse(str); if (Array.isArray(a)) roTermsVal = a.filter((t) => t && (t.op === 'and' || t.op === 'or' || t.op === 'sub') && RO_VALID_MODES.has(t.m) && t.m !== 'none') } catch (e) { /* none */ }
-  return roTermsVal
+let roExtraStr = null, roExtraVal = []
+const roTermsCache = new Map()
+const roCleanTerms = (a) => (Array.isArray(a) ? a.filter((t) => t && (t.op === 'and' || t.op === 'or' || t.op === 'sub') && RO_VALID_MODES.has(t.m) && t.m !== 'none') : [])
+// Every level (Mode, Fallback, Fallback 2, each extra fallback) has its OWN + And / + Or / - Subtract list, stored as JSON.
+function roTermsOf(str) {
+  str = str || '[]'
+  let v = roTermsCache.get(str)
+  if (v) return v
+  v = []
+  try { v = roCleanTerms(JSON.parse(str)) } catch (e) { /* none */ }
+  if (roTermsCache.size > 64) roTermsCache.clear()
+  roTermsCache.set(str, v)
+  return v
 }
 function roParseExtra() {
   const str = cfg.renderOrderExtraFallbacks || '[]'
   if (str === roExtraStr) return roExtraVal
   roExtraStr = str; roExtraVal = []
-  try { const a = JSON.parse(str); if (Array.isArray(a)) roExtraVal = a.filter((t) => t && RO_VALID_MODES.has(t.m)).map((t) => ({ m: t.m, q: RO_VALID_MODES.has(t.q) ? t.q : 'none' })) } catch (e) { /* none */ }
+  try { const a = JSON.parse(str); if (Array.isArray(a)) roExtraVal = a.filter((t) => t && RO_VALID_MODES.has(t.m)).map((t) => ({ m: t.m, q: RO_VALID_MODES.has(t.q) ? t.q : 'none', t: roCleanTerms(t.t) })) } catch (e) { /* none */ }
   return roExtraVal
 }
 const roOptText = (mode) => { const o = RENDER_ORDER_MODE_OPTIONS.find((x) => x.value === mode); return o ? o.text : String(mode) }
@@ -1173,11 +1179,11 @@ function computeRenderOrderRanks() {
     return d > 0 ? 1 : d < 0 ? -1 : 0
   }
   const lv = [
-    { m: evalComposite(cfg.renderOrderMode || 'z', roParseTerms()), q: evalMode(cfg.renderOrderModeExcept) },
-    { m: evalMode(cfg.renderOrderFallback || 'farthestZ'), q: evalMode(cfg.renderOrderFallbackExcept) },
-    { m: evalMode(cfg.renderOrderFallback2 || 'farthestZ'), q: evalMode(cfg.renderOrderFallback2Except) }
+    { m: evalComposite(cfg.renderOrderMode || 'z', roTermsOf(cfg.renderOrderModeTerms)), q: evalMode(cfg.renderOrderModeExcept) },
+    { m: evalComposite(cfg.renderOrderFallback || 'farthestZ', roTermsOf(cfg.renderOrderFallbackTerms)), q: evalMode(cfg.renderOrderFallbackExcept) },
+    { m: evalComposite(cfg.renderOrderFallback2 || 'farthestZ', roTermsOf(cfg.renderOrderFallback2Terms)), q: evalMode(cfg.renderOrderFallback2Except) }
   ]
-  roParseExtra().forEach((e) => lv.push({ m: evalMode(e.m), q: evalMode(e.q) }))
+  roParseExtra().forEach((e) => lv.push({ m: evalComposite(e.m, e.t), q: evalMode(e.q) }))
   // The three levels (each with its optional Except) as one pairwise decision: +1 = a above b, -1 = b above a, 0 = every level ties.
   // roPriority (set as a side effect) = how strong the deciding rule is: 2 * level, +1 when it was a Palm To Arm 'both palms higher' tie-break by arm distance. Lower = stronger.
   const cmpLevels = (a, b) => {
@@ -1309,66 +1315,97 @@ function renestRenderOrderRows() {
   FIELD_LAYOUT_SUBGROUP_SPECS[0].keys.forEach((k) => { const row = body.querySelector(':scope > .dp-row[data-key="' + k + '"]'); if (row) gb.appendChild(row) })
 }
 function buildRenderOrderWidgets() {
-  const selStyle = { flex: '1 1 0', minWidth: '0' }
   const fillSel = (sel, value, allowNone) => {
     RENDER_ORDER_MODE_OPTIONS.forEach((o) => { if (!allowNone && o.value === 'none') return; const op = document.createElement('option'); op.value = o.value; op.textContent = o.text; sel.appendChild(op) })
     sel.value = value
-    Object.assign(sel.style, selStyle)
+    Object.assign(sel.style, { flex: '1 1 0', minWidth: '0' })
   }
-  const mk = (key, kind) => {
+  const OPS = { and: '+ And', or: '+ Or', sub: '- Subtract' }
+  const mkBtn = (text, onClick) => { const b = elLocal('button', null, { type: 'button', text }); b.className = 'dp-action-button'; b.addEventListener('click', onClick); return b }
+  // One level's + And / + Or / - Subtract editor: get() returns the live term array, changed() persists it.
+  const termsEditor = (get, changed) => {
+    const wrap = elLocal('div', { padding: '2px 0' })
+    const bar = elLocal('div', { display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '4px' })
+    const list = elLocal('div', { display: 'flex', flexDirection: 'column', gap: '4px' })
+    wrap.appendChild(bar); wrap.appendChild(list)
+    const redraw = () => {
+      list.textContent = ''
+      get().forEach((it, idx) => {
+        const r = elLocal('div', { display: 'flex', gap: '6px', alignItems: 'center' })
+        r.appendChild(elLocal('span', { flex: '0 0 auto', minWidth: '62px', opacity: '.8', fontSize: '.85em' }, { text: OPS[it.op] || it.op }))
+        const sel = document.createElement('select'); fillSel(sel, it.m, false)
+        sel.addEventListener('change', () => { get()[idx].m = sel.value; changed() })
+        r.appendChild(sel)
+        const x = mkBtn('\u00d7', () => { get().splice(idx, 1); redraw(); changed() }); x.title = 'Remove'
+        r.appendChild(x)
+        list.appendChild(r)
+      })
+    }
+    ;['and', 'or', 'sub'].forEach((op) => bar.appendChild(mkBtn(OPS[op], () => { get().push({ op, m: 'armEnd' }); redraw(); changed() })))
+    return { el: wrap, redraw }
+  }
+  // Hides a text control's own input / label and returns its row + input for a custom widget.
+  const prep = (key) => {
     const row = document.querySelector('.dp-row[data-key="' + key + '"]')
     const input = row && row.querySelector('.dp-text-input')
-    if (!input || row.dataset.roWidget) return
+    if (!input || row.dataset.roWidget) return null
     row.dataset.roWidget = '1'
     input.style.display = 'none'
     const lab = row.querySelector('label')
     if (lab && !lab.querySelector('input,select,button')) lab.style.display = 'none'
     row.style.flexDirection = 'column'; row.style.alignItems = 'stretch'
+    return { row, input }
+  }
+  const readJson = (input) => { try { const a = JSON.parse(input.value); return Array.isArray(a) ? a : [] } catch (e) { return [] } }
+  const mkTerms = (key) => {
+    const p = prep(key)
+    if (!p) return
+    let items = readJson(p.input), lastSeen = p.input.value
+    const ed = termsEditor(() => items, () => { lastSeen = JSON.stringify(items); commitTextControl(p.input, lastSeen) })
+    p.row.appendChild(ed.el)
+    ed.redraw()
+    armLengthWidgetResyncs.push(() => { if (p.input.value === lastSeen) return; lastSeen = p.input.value; items = readJson(p.input); ed.redraw() })
+  }
+  const mkExtras = (key) => {
+    const p = prep(key)
+    if (!p) return
+    let items = readJson(p.input), lastSeen = p.input.value
     const wrap = elLocal('div', { flex: '1', padding: '2px 0' })
     const bar = elLocal('div', { display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '4px' })
-    const list = elLocal('div', { display: 'flex', flexDirection: 'column', gap: '4px' })
-    wrap.appendChild(bar); wrap.appendChild(list); row.appendChild(wrap)
-    let items = []
-    const read = () => { try { const a = JSON.parse(input.value); items = Array.isArray(a) ? a : [] } catch (e) { items = [] } }
-    const write = () => commitTextControl(input, JSON.stringify(items))
-    const mkBtn = (text, onClick) => { const b = elLocal('button', null, { type: 'button', text }); b.className = 'dp-action-button'; b.addEventListener('click', onClick); bar.appendChild(b); return b }
-    const OPS = { and: '+ And', or: '+ Or', sub: '- Subtract' }
+    const list = elLocal('div', { display: 'flex', flexDirection: 'column', gap: '8px' })
+    wrap.appendChild(bar); wrap.appendChild(list); p.row.appendChild(wrap)
+    const write = () => { lastSeen = JSON.stringify(items); commitTextControl(p.input, lastSeen) }
     const redraw = () => {
       list.textContent = ''
       items.forEach((it, idx) => {
+        const block = elLocal('div', { display: 'flex', flexDirection: 'column', gap: '4px' })
         const r = elLocal('div', { display: 'flex', gap: '6px', alignItems: 'center' })
-        if (kind === 'terms') {
-          r.appendChild(elLocal('span', { flex: '0 0 auto', minWidth: '62px', opacity: '.8', fontSize: '.85em' }, { text: OPS[it.op] || it.op }))
-          const sel = document.createElement('select'); fillSel(sel, it.m, false)
-          sel.addEventListener('change', () => { items[idx].m = sel.value; lastSeen = JSON.stringify(items); write() })
-          r.appendChild(sel)
-        } else {
-          r.appendChild(elLocal('span', { flex: '0 0 auto', minWidth: '62px', opacity: '.8', fontSize: '.85em' }, { text: 'Fallback ' + (idx + 3) }))
-          const sel = document.createElement('select'); fillSel(sel, it.m, true)
-          sel.addEventListener('change', () => { items[idx].m = sel.value; lastSeen = JSON.stringify(items); write() })
-          r.appendChild(sel)
-          r.appendChild(elLocal('span', { flex: '0 0 auto', margin: '0 2px 0 4px', opacity: '.75', fontSize: '.85em' }, { text: 'Except' }))
-          const q = document.createElement('select'); fillSel(q, it.q || 'none', true)
-          q.addEventListener('change', () => { items[idx].q = q.value; lastSeen = JSON.stringify(items); write() })
-          r.appendChild(q)
-        }
-        const x = elLocal('button', null, { type: 'button', text: '\u00d7', title: 'Remove' }); x.className = 'dp-action-button'
-        x.addEventListener('click', () => { items.splice(idx, 1); lastSeen = JSON.stringify(items); redraw(); write() })
+        r.appendChild(elLocal('span', { flex: '0 0 auto', minWidth: '62px', opacity: '.8', fontSize: '.85em' }, { text: 'Fallback ' + (idx + 3) }))
+        const sel = document.createElement('select'); fillSel(sel, it.m, true)
+        sel.addEventListener('change', () => { items[idx].m = sel.value; write() })
+        r.appendChild(sel)
+        r.appendChild(elLocal('span', { flex: '0 0 auto', margin: '0 2px 0 4px', opacity: '.75', fontSize: '.85em' }, { text: 'Except' }))
+        const q = document.createElement('select'); fillSel(q, it.q || 'none', true)
+        q.addEventListener('change', () => { items[idx].q = q.value; write() })
+        r.appendChild(q)
+        const x = mkBtn('\u00d7', () => { items.splice(idx, 1); redraw(); write() }); x.title = 'Remove'
         r.appendChild(x)
-        list.appendChild(r)
+        block.appendChild(r)
+        const ed = termsEditor(() => (items[idx].t || (items[idx].t = [])), write)
+        ed.el.style.paddingLeft = '14px'
+        block.appendChild(ed.el)
+        ed.redraw()
+        list.appendChild(block)
       })
     }
-    if (kind === 'terms') {
-      ;['and', 'or', 'sub'].forEach((op) => mkBtn(OPS[op], () => { items.push({ op, m: 'armEnd' }); lastSeen = JSON.stringify(items); redraw(); write() }))
-    } else {
-      mkBtn('+ Add Fallback', () => { items.push({ m: 'farthestZ', q: 'none' }); lastSeen = JSON.stringify(items); redraw(); write() })
-    }
-    let lastSeen = null
-    read(); redraw(); lastSeen = input.value
-    armLengthWidgetResyncs.push(() => { if (input.value === lastSeen) return; lastSeen = input.value; read(); redraw() })
+    bar.appendChild(mkBtn('+ Add Fallback', () => { items.push({ m: 'farthestZ', q: 'none', t: [] }); redraw(); write() }))
+    redraw()
+    armLengthWidgetResyncs.push(() => { if (p.input.value === lastSeen) return; lastSeen = p.input.value; items = readJson(p.input); redraw() })
   }
-  mk('renderOrderModeTerms', 'terms')
-  mk('renderOrderExtraFallbacks', 'fallbacks')
+  mkTerms('renderOrderModeTerms')
+  mkTerms('renderOrderFallbackTerms')
+  mkTerms('renderOrderFallback2Terms')
+  mkExtras('renderOrderExtraFallbacks')
 }
 function mergeExceptSelects() {
   [['renderOrderMode', 'renderOrderModeExcept'], ['renderOrderFallback', 'renderOrderFallbackExcept'], ['renderOrderFallback2', 'renderOrderFallback2Except']].forEach(([a, b]) => {
@@ -1556,6 +1593,8 @@ const DEV_GROUPS = [
       // Flip lock (2026-10-11, direct request: "hands only seem to switch order once per trigger or retransition sequence"): a pair of nearby hands may swap render order at most ONCE per sequence (a new trigger or a retransition starting on either hand); a pair the rules leave tied keeps its previous order.
       // + And / + Or / - Subtract terms of the Render Order Mode (2026-10-11): a JSON list edited through the buttons / dropdowns (buildRenderOrderWidgets()).
       { key: 'renderOrderModeTerms', label: 'Render Order Mode: Terms', type: 'text', placeAfter: 'renderOrderModeExcept', def: '[]' },
+      { key: 'renderOrderFallbackTerms', label: 'Render Order Fallback: Terms', type: 'text', placeAfter: 'renderOrderFallbackExcept', def: '[]' },
+      { key: 'renderOrderFallback2Terms', label: 'Render Order Fallback 2: Terms', type: 'text', placeAfter: 'renderOrderFallback2Except', def: '[]' },
       // Extra Fallback levels beyond Fallback 2, added with the Add Fallback button.
       { key: 'renderOrderExtraFallbacks', label: 'Render Order: Extra Fallbacks', type: 'text', placeAfter: 'renderOrderFallback2Except', def: '[]' },
       { key: 'renderOrderFlipLock', label: 'Render Order: Flip Once Per Sequence', type: 'checkbox', def: true },
@@ -2812,7 +2851,7 @@ DEV_GROUPS.forEach((g) => g.controls.forEach((c) => {
 // whatever was last interacted with there, not a deliberate choice worth
 // preserving).
 const FIELD_LAYOUT_SUBGROUP_SPECS = [
-  { title: 'Render Order', collapsed: false, keys: ['renderOrderMode', 'renderOrderModeExcept', 'renderOrderModeTerms', 'renderOrderFallback', 'renderOrderFallbackExcept', 'renderOrderFallback2', 'renderOrderFallback2Except', 'renderOrderExtraFallbacks', 'renderOrderFlipLock'] }
+  { title: 'Render Order', collapsed: false, keys: ['renderOrderMode', 'renderOrderModeExcept', 'renderOrderModeTerms', 'renderOrderFallback', 'renderOrderFallbackExcept', 'renderOrderFallbackTerms', 'renderOrderFallback2', 'renderOrderFallback2Except', 'renderOrderFallback2Terms', 'renderOrderExtraFallbacks', 'renderOrderFlipLock'] }
 ]
 const POSE_SUBGROUP_SPECS = [
   { title: 'Whole-Hand Rotation & Thumb', collapsed: true, keys: ['modelRotX', 'modelRotY', 'modelRotZ', 'thumbCurl', 'thumbSplay', 'thumbSplay2', 'tipTwistThumb', 'curlBiasThumb', 'baseOnlyCurlThumb', 'midOnlyCurlThumb', 'tipOnlyCurlThumb'] },

@@ -17314,6 +17314,12 @@ Direct requests: put the render order settings in their own "Render Order" group
  - Direct request: for every pair mode (Palm To Arm Base / End, Arm Base / End To Palm Center and the two new ones) the hand CLOSER to the cursor in screen XY (hand._xyCursorDist, the tracking point; ties = lower index) is the FORMER hand: its first-named point is compared with the other hand's second-named point. Former point higher in Z (beyond 0.01 world units) = former hand on top; lower = the other hand on top; within the tolerance = no decision, the next level decides. This replaces the old two-way "A over B and B over A" test and its arm-distance tie-break (a pair is now always one comparison), so the previous behaviour of the existing Palm To Arm modes changes.
  - The Render Order group could stay empty after load: a saved panel order that predates the group puts its rows back into Field Layout after the async restore, so onRestore now re-nests them (organizeGroupSubgroups is idempotent). `main.js` `?v=368` -> `?v=369`.
 
+2026-10-11  -  (+ And / + Or / - Subtract are per render order level)
+
+Direct request: "the +ADD, +OR, +SUBTRACT is per render order mode, so fallbacks will also have their own ADD OR SUBTRACT that is different from the other modes / fallbacks".
+ - Every level now has its OWN term list: Mode (renderOrderModeTerms), Fallback (renderOrderFallbackTerms), Fallback 2 (renderOrderFallback2Terms) and each extra fallback (a "t" array inside its renderOrderExtraFallbacks entry, edited under that fallback's row). computeRenderOrderRanks() builds every level with evalComposite(levelMode, thatLevel's terms) (roTermsOf() parses/caches each list).
+ - The terms editor is one shared function (termsEditor() in buildRenderOrderWidgets()). New Fallback / Fallback 2 term rows sit under their Except, in Field Layout > Render Order. `main.js` `?v=370` -> `?v=371`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a
