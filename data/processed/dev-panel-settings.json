@@ -8295,12 +8295,12 @@
       "custom21CursorOffsetZCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21CursorOffsetZRange": "{\"min\":0,\"max\":0}",
       "custom21CameraOffsetEnabled": true,
-      "custom21CameraOffsetXEnabled": true,
+      "custom21CameraOffsetXEnabled": false,
       "custom21CameraOffsetXCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.34417351623278447,\"y\":0}},{\"x\":0.5060340324930588,\"y\":0,\"h2\":{\"x\":-0.27973719658025675,\"y\":0},\"h1\":{\"x\":0.3008494378315969,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.347939632185172,\"y\":0}}]",
       "custom21CameraOffsetXRange": "{\"min\":0,\"max\":1}",
       "custom21CameraOffsetYEnabled": true,
-      "custom21CameraOffsetYCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.324820628419056,\"y\":0},\"bg\":0.64},{\"x\":0.4954779118673887,\"y\":0,\"h2\":{\"x\":-0.24982818814085822,\"y\":0},\"h1\":{\"x\":0.2392720675151882,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.467575665942766,\"y\":0}}]",
-      "custom21CameraOffsetYRange": "{\"min\":0,\"max\":1}",
+      "custom21CameraOffsetYCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.324820628419056,\"y\":0},\"bg\":0.64,\"m\":\"linear\"},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.467575665942766,\"y\":0}}]",
+      "custom21CameraOffsetYRange": "{\"min\":-1,\"max\":1}",
       "custom21CameraOffsetZEnabled": true,
       "custom21CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.3776012315474063,\"y\":-0.1328125}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.4535008384418726,\"y\":0.6505208333333333}}]",
       "custom21CameraOffsetZRange": "{\"min\":-1,\"max\":3}",
@@ -8322,7 +8322,7 @@
       "custom21LoopHoldMs": 0,
       "custom21TransitionSpeedMs": 700,
       "custom21EasingCurveEnabled": true,
-      "custom21EasingCurve": "[{\"x\":0,\"y\":0},{\"x\":0.483162437804107,\"y\":1},{\"x\":1,\"y\":0}]",
+      "custom21EasingCurve": "[{\"x\":0,\"y\":0.6200210571289062},{\"x\":0.483162437804107,\"y\":1},{\"x\":1,\"y\":0}]",
       "custom21SpeedCurveEnabled": true,
       "custom21SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21SpeedCurveRange": "{\"min\":1545,\"max\":1871}",
@@ -8354,7 +8354,7 @@
       "custom21TweenStopDelayMs": 0,
       "custom21TweenStopDelayCurveEnabled": true,
       "custom21TweenStopDelayCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom21TweenStopDelayRange": "{\"min\":1955,\"max\":3513}",
+      "custom21TweenStopDelayRange": "{\"min\":1729,\"max\":3000}",
       "custom21MultiTriggerEnabled": true,
       "custom21MultiTriggers": "[{\"prefix\":\"custom21Trig1\",\"title\":\"Trigger 1\"},{\"prefix\":\"custom21Trig2\",\"title\":\"Trigger 2\"},{\"prefix\":\"custom21Trig3\",\"title\":\"Trigger 3\"},{\"prefix\":\"custom21Trig4\",\"title\":\"Trigger 4\"},{\"prefix\":\"custom21Trig5\",\"title\":\"Trigger 5\"}]",
       "custom21Trig1Enabled": false,
@@ -9984,8 +9984,8 @@
       "custom21Trig5CameraOffsetXCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.34417351623278447,\"y\":0}},{\"x\":0.5060340324930588,\"y\":0,\"h2\":{\"x\":-0.27973719658025675,\"y\":0},\"h1\":{\"x\":0.3008494378315969,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.347939632185172,\"y\":0}}]",
       "custom21Trig5CameraOffsetXRange": "{\"min\":0,\"max\":1}",
       "custom21Trig5CameraOffsetYEnabled": true,
-      "custom21Trig5CameraOffsetYCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.324820628419056,\"y\":0},\"bg\":0.64},{\"x\":0.4954779118673887,\"y\":1,\"h1\":{\"x\":0.2392720675151882,\"y\":0},\"h2\":{\"x\":-0.24982818814085822,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.467575665942766,\"y\":0}}]",
-      "custom21Trig5CameraOffsetYRange": "{\"min\":-1,\"max\":0}",
+      "custom21Trig5CameraOffsetYCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.324820628419056,\"y\":0},\"bg\":0.64},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.467575665942766,\"y\":0}}]",
+      "custom21Trig5CameraOffsetYRange": "{\"min\":-1,\"max\":1}",
       "custom21Trig5CameraOffsetZEnabled": false,
       "custom21Trig5CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.3776012315474063,\"y\":-0.1328125}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.4535008384418726,\"y\":0.6505208333333333}}]",
       "custom21Trig5CameraOffsetZRange": "{\"min\":-1,\"max\":3}",
@@ -9996,7 +9996,7 @@
       "custom21Trig5TargetPose": "",
       "custom21Trig5SkipIfSamePose": false,
       "custom21Trig5TweenSelector": "FLOWER 3",
-      "custom21Trig5ReverseSequence": false,
+      "custom21Trig5ReverseSequence": true,
       "custom21Trig5GlideToFirstPose": true,
       "custom21Trig5FirstGlideTimeScale": 2,
       "custom21Trig5TweenChain": [],
@@ -10039,7 +10039,7 @@
       "custom21Trig5TweenStopDelayMs": 0,
       "custom21Trig5TweenStopDelayCurveEnabled": true,
       "custom21Trig5TweenStopDelayCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom21Trig5TweenStopDelayRange": "{\"min\":2055,\"max\":2970}"
+      "custom21Trig5TweenStopDelayRange": "{\"min\":1816,\"max\":3034}"
     },
     "mobile": {
       "pauseBtnXOffset": 12,
@@ -18340,9 +18340,9 @@
       "custom21CameraOffsetXCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.34417351623278447,\"y\":0}},{\"x\":0.5060340324930588,\"y\":0,\"h2\":{\"x\":-0.27973719658025675,\"y\":0},\"h1\":{\"x\":0.3008494378315969,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.347939632185172,\"y\":0}}]",
       "custom21CameraOffsetXRange": "{\"min\":0,\"max\":1}",
       "custom21CameraOffsetYEnabled": true,
-      "custom21CameraOffsetYCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.324820628419056,\"y\":0},\"bg\":0.64},{\"x\":0.4954779118673887,\"y\":0,\"h2\":{\"x\":-0.24982818814085822,\"y\":0},\"h1\":{\"x\":0.2392720675151882,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.467575665942766,\"y\":0}}]",
-      "custom21CameraOffsetYRange": "{\"min\":0,\"max\":1}",
-      "custom21CameraOffsetZEnabled": false,
+      "custom21CameraOffsetYCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.324820628419056,\"y\":0},\"bg\":0.64,\"m\":\"linear\"},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.467575665942766,\"y\":0}}]",
+      "custom21CameraOffsetYRange": "{\"min\":-1,\"max\":1}",
+      "custom21CameraOffsetZEnabled": true,
       "custom21CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.3776012315474063,\"y\":-0.1328125}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.4535008384418726,\"y\":0.6505208333333333}}]",
       "custom21CameraOffsetZRange": "{\"min\":-1,\"max\":3}",
       "custom21RotationEnabled": false,
@@ -18363,7 +18363,7 @@
       "custom21LoopHoldMs": 0,
       "custom21TransitionSpeedMs": 700,
       "custom21EasingCurveEnabled": true,
-      "custom21EasingCurve": "[{\"x\":0,\"y\":0},{\"x\":0.483162437804107,\"y\":1},{\"x\":1,\"y\":0}]",
+      "custom21EasingCurve": "[{\"x\":0,\"y\":0.6200210571289062},{\"x\":0.483162437804107,\"y\":1},{\"x\":1,\"y\":0}]",
       "custom21SpeedCurveEnabled": true,
       "custom21SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21SpeedCurveRange": "{\"min\":1545,\"max\":1871}",
@@ -18395,7 +18395,7 @@
       "custom21TweenStopDelayMs": 0,
       "custom21TweenStopDelayCurveEnabled": true,
       "custom21TweenStopDelayCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom21TweenStopDelayRange": "{\"min\":1955,\"max\":3513}",
+      "custom21TweenStopDelayRange": "{\"min\":1729,\"max\":3000}",
       "custom21MultiTriggerEnabled": true,
       "custom21MultiTriggers": "[{\"prefix\":\"custom21Trig1\",\"title\":\"Trigger 1\"},{\"prefix\":\"custom21Trig2\",\"title\":\"Trigger 2\"},{\"prefix\":\"custom21Trig3\",\"title\":\"Trigger 3\"},{\"prefix\":\"custom21Trig4\",\"title\":\"Trigger 4\"},{\"prefix\":\"custom21Trig5\",\"title\":\"Trigger 5\"}]",
       "custom21Trig1Enabled": false,
@@ -20025,8 +20025,8 @@
       "custom21Trig5CameraOffsetXCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.34417351623278447,\"y\":0}},{\"x\":0.5060340324930588,\"y\":0,\"h2\":{\"x\":-0.27973719658025675,\"y\":0},\"h1\":{\"x\":0.3008494378315969,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.347939632185172,\"y\":0}}]",
       "custom21Trig5CameraOffsetXRange": "{\"min\":0,\"max\":1}",
       "custom21Trig5CameraOffsetYEnabled": true,
-      "custom21Trig5CameraOffsetYCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.324820628419056,\"y\":0},\"bg\":0.64},{\"x\":0.4954779118673887,\"y\":1,\"h1\":{\"x\":0.2392720675151882,\"y\":0},\"h2\":{\"x\":-0.24982818814085822,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.467575665942766,\"y\":0}}]",
-      "custom21Trig5CameraOffsetYRange": "{\"min\":-1,\"max\":0}",
+      "custom21Trig5CameraOffsetYCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.324820628419056,\"y\":0},\"bg\":0.64},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.467575665942766,\"y\":0}}]",
+      "custom21Trig5CameraOffsetYRange": "{\"min\":-1,\"max\":1}",
       "custom21Trig5CameraOffsetZEnabled": false,
       "custom21Trig5CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.3776012315474063,\"y\":-0.1328125}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.4535008384418726,\"y\":0.6505208333333333}}]",
       "custom21Trig5CameraOffsetZRange": "{\"min\":-1,\"max\":3}",
@@ -20037,7 +20037,7 @@
       "custom21Trig5TargetPose": "",
       "custom21Trig5SkipIfSamePose": false,
       "custom21Trig5TweenSelector": "FLOWER 3",
-      "custom21Trig5ReverseSequence": false,
+      "custom21Trig5ReverseSequence": true,
       "custom21Trig5GlideToFirstPose": true,
       "custom21Trig5FirstGlideTimeScale": 2,
       "custom21Trig5TweenChain": [],
@@ -20080,7 +20080,7 @@
       "custom21Trig5TweenStopDelayMs": 0,
       "custom21Trig5TweenStopDelayCurveEnabled": true,
       "custom21Trig5TweenStopDelayCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom21Trig5TweenStopDelayRange": "{\"min\":2055,\"max\":2970}"
+      "custom21Trig5TweenStopDelayRange": "{\"min\":1816,\"max\":3034}"
     },
     "landscape": {
       "pauseBtnXOffset": 12,
@@ -28377,12 +28377,12 @@
       "custom21CursorOffsetZCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21CursorOffsetZRange": "{\"min\":0,\"max\":0}",
       "custom21CameraOffsetEnabled": true,
-      "custom21CameraOffsetXEnabled": true,
+      "custom21CameraOffsetXEnabled": false,
       "custom21CameraOffsetXCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.34417351623278447,\"y\":0}},{\"x\":0.5060340324930588,\"y\":0,\"h2\":{\"x\":-0.27973719658025675,\"y\":0},\"h1\":{\"x\":0.3008494378315969,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.347939632185172,\"y\":0}}]",
       "custom21CameraOffsetXRange": "{\"min\":0,\"max\":1}",
       "custom21CameraOffsetYEnabled": true,
-      "custom21CameraOffsetYCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.324820628419056,\"y\":0},\"bg\":0.64},{\"x\":0.4954779118673887,\"y\":0,\"h2\":{\"x\":-0.24982818814085822,\"y\":0},\"h1\":{\"x\":0.2392720675151882,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.467575665942766,\"y\":0}}]",
-      "custom21CameraOffsetYRange": "{\"min\":0,\"max\":1}",
+      "custom21CameraOffsetYCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.324820628419056,\"y\":0},\"bg\":0.64,\"m\":\"linear\"},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.467575665942766,\"y\":0}}]",
+      "custom21CameraOffsetYRange": "{\"min\":-1,\"max\":1}",
       "custom21CameraOffsetZEnabled": true,
       "custom21CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.3776012315474063,\"y\":-0.1328125}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.4535008384418726,\"y\":0.6505208333333333}}]",
       "custom21CameraOffsetZRange": "{\"min\":-1,\"max\":3}",
@@ -28404,7 +28404,7 @@
       "custom21LoopHoldMs": 0,
       "custom21TransitionSpeedMs": 700,
       "custom21EasingCurveEnabled": true,
-      "custom21EasingCurve": "[{\"x\":0,\"y\":0},{\"x\":0.483162437804107,\"y\":1},{\"x\":1,\"y\":0}]",
+      "custom21EasingCurve": "[{\"x\":0,\"y\":0.6200210571289062},{\"x\":0.483162437804107,\"y\":1},{\"x\":1,\"y\":0}]",
       "custom21SpeedCurveEnabled": true,
       "custom21SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21SpeedCurveRange": "{\"min\":1545,\"max\":1871}",
@@ -28436,7 +28436,7 @@
       "custom21TweenStopDelayMs": 0,
       "custom21TweenStopDelayCurveEnabled": true,
       "custom21TweenStopDelayCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom21TweenStopDelayRange": "{\"min\":1955,\"max\":3513}",
+      "custom21TweenStopDelayRange": "{\"min\":1729,\"max\":3000}",
       "custom21MultiTriggerEnabled": true,
       "custom21MultiTriggers": "[{\"prefix\":\"custom21Trig1\",\"title\":\"Trigger 1\"},{\"prefix\":\"custom21Trig2\",\"title\":\"Trigger 2\"},{\"prefix\":\"custom21Trig3\",\"title\":\"Trigger 3\"},{\"prefix\":\"custom21Trig4\",\"title\":\"Trigger 4\"},{\"prefix\":\"custom21Trig5\",\"title\":\"Trigger 5\"}]",
       "custom21Trig1Enabled": false,
@@ -30066,8 +30066,8 @@
       "custom21Trig5CameraOffsetXCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.34417351623278447,\"y\":0}},{\"x\":0.5060340324930588,\"y\":0,\"h2\":{\"x\":-0.27973719658025675,\"y\":0},\"h1\":{\"x\":0.3008494378315969,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.347939632185172,\"y\":0}}]",
       "custom21Trig5CameraOffsetXRange": "{\"min\":0,\"max\":1}",
       "custom21Trig5CameraOffsetYEnabled": true,
-      "custom21Trig5CameraOffsetYCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.324820628419056,\"y\":0},\"bg\":0.64},{\"x\":0.4954779118673887,\"y\":1,\"h1\":{\"x\":0.2392720675151882,\"y\":0},\"h2\":{\"x\":-0.24982818814085822,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.467575665942766,\"y\":0}}]",
-      "custom21Trig5CameraOffsetYRange": "{\"min\":-1,\"max\":0}",
+      "custom21Trig5CameraOffsetYCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.324820628419056,\"y\":0},\"bg\":0.64},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.467575665942766,\"y\":0}}]",
+      "custom21Trig5CameraOffsetYRange": "{\"min\":-1,\"max\":1}",
       "custom21Trig5CameraOffsetZEnabled": false,
       "custom21Trig5CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.3776012315474063,\"y\":-0.1328125}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.4535008384418726,\"y\":0.6505208333333333}}]",
       "custom21Trig5CameraOffsetZRange": "{\"min\":-1,\"max\":3}",
@@ -30078,7 +30078,7 @@
       "custom21Trig5TargetPose": "",
       "custom21Trig5SkipIfSamePose": false,
       "custom21Trig5TweenSelector": "FLOWER 3",
-      "custom21Trig5ReverseSequence": false,
+      "custom21Trig5ReverseSequence": true,
       "custom21Trig5GlideToFirstPose": true,
       "custom21Trig5FirstGlideTimeScale": 2,
       "custom21Trig5TweenChain": [],
@@ -30121,7 +30121,7 @@
       "custom21Trig5TweenStopDelayMs": 0,
       "custom21Trig5TweenStopDelayCurveEnabled": true,
       "custom21Trig5TweenStopDelayCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom21Trig5TweenStopDelayRange": "{\"min\":2055,\"max\":2970}"
+      "custom21Trig5TweenStopDelayRange": "{\"min\":1816,\"max\":3034}"
     }
   },
   "order": [
@@ -74120,7 +74120,7 @@
                 "type": "group",
                 "group": {
                   "key": "Offset To Camera",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -79120,7 +79120,7 @@
                       "type": "group",
                       "group": {
                         "key": "Trigger 5",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -79262,7 +79262,7 @@
                             "type": "group",
                             "group": {
                               "key": "Offset To Camera",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -79366,7 +79366,7 @@
                             "type": "group",
                             "group": {
                               "key": "Animation Speed Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -79630,9 +79630,13 @@
                                   "type": "group",
                                   "group": {
                                     "key": "Tween Stop Delay",
-                                    "collapsed": false,
+                                    "collapsed": true,
                                     "locked": false,
                                     "items": [
+                                      {
+                                        "type": "row",
+                                        "key": "custom21Trig5TweenStopDelayCurve"
+                                      },
                                       {
                                         "type": "row",
                                         "key": "custom21Trig5TweenStopDelayMs"
@@ -79643,17 +79647,13 @@
                                       },
                                       {
                                         "type": "row",
-                                        "key": "custom21Trig5TweenStopDelayCurve"
-                                      },
-                                      {
-                                        "type": "row",
                                         "key": "custom21Trig5TweenStopDelayRange"
                                       }
                                     ],
                                     "settings": [
+                                      "custom21Trig5TweenStopDelayCurve",
                                       "custom21Trig5TweenStopDelayMs",
                                       "custom21Trig5TweenStopDelayCurveEnabled",
-                                      "custom21Trig5TweenStopDelayCurve",
                                       "custom21Trig5TweenStopDelayRange"
                                     ],
                                     "subgroups": []
@@ -79684,9 +79684,13 @@
                                 },
                                 {
                                   "key": "Tween Stop Delay",
-                                  "collapsed": false,
+                                  "collapsed": true,
                                   "locked": false,
                                   "items": [
+                                    {
+                                      "type": "row",
+                                      "key": "custom21Trig5TweenStopDelayCurve"
+                                    },
                                     {
                                       "type": "row",
                                       "key": "custom21Trig5TweenStopDelayMs"
@@ -79697,17 +79701,13 @@
                                     },
                                     {
                                       "type": "row",
-                                      "key": "custom21Trig5TweenStopDelayCurve"
-                                    },
-                                    {
-                                      "type": "row",
                                       "key": "custom21Trig5TweenStopDelayRange"
                                     }
                                   ],
                                   "settings": [
+                                    "custom21Trig5TweenStopDelayCurve",
                                     "custom21Trig5TweenStopDelayMs",
                                     "custom21Trig5TweenStopDelayCurveEnabled",
-                                    "custom21Trig5TweenStopDelayCurve",
                                     "custom21Trig5TweenStopDelayRange"
                                   ],
                                   "subgroups": []
@@ -79814,7 +79814,7 @@
                           },
                           {
                             "key": "Offset To Camera",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -79909,7 +79909,7 @@
                           },
                           {
                             "key": "Animation Speed Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -80161,9 +80161,13 @@
                                 "type": "group",
                                 "group": {
                                   "key": "Tween Stop Delay",
-                                  "collapsed": false,
+                                  "collapsed": true,
                                   "locked": false,
                                   "items": [
+                                    {
+                                      "type": "row",
+                                      "key": "custom21Trig5TweenStopDelayCurve"
+                                    },
                                     {
                                       "type": "row",
                                       "key": "custom21Trig5TweenStopDelayMs"
@@ -80174,17 +80178,13 @@
                                     },
                                     {
                                       "type": "row",
-                                      "key": "custom21Trig5TweenStopDelayCurve"
-                                    },
-                                    {
-                                      "type": "row",
                                       "key": "custom21Trig5TweenStopDelayRange"
                                     }
                                   ],
                                   "settings": [
+                                    "custom21Trig5TweenStopDelayCurve",
                                     "custom21Trig5TweenStopDelayMs",
                                     "custom21Trig5TweenStopDelayCurveEnabled",
-                                    "custom21Trig5TweenStopDelayCurve",
                                     "custom21Trig5TweenStopDelayRange"
                                   ],
                                   "subgroups": []
@@ -80215,9 +80215,13 @@
                               },
                               {
                                 "key": "Tween Stop Delay",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
+                                  {
+                                    "type": "row",
+                                    "key": "custom21Trig5TweenStopDelayCurve"
+                                  },
                                   {
                                     "type": "row",
                                     "key": "custom21Trig5TweenStopDelayMs"
@@ -80228,17 +80232,13 @@
                                   },
                                   {
                                     "type": "row",
-                                    "key": "custom21Trig5TweenStopDelayCurve"
-                                  },
-                                  {
-                                    "type": "row",
                                     "key": "custom21Trig5TweenStopDelayRange"
                                   }
                                 ],
                                 "settings": [
+                                  "custom21Trig5TweenStopDelayCurve",
                                   "custom21Trig5TweenStopDelayMs",
                                   "custom21Trig5TweenStopDelayCurveEnabled",
-                                  "custom21Trig5TweenStopDelayCurve",
                                   "custom21Trig5TweenStopDelayRange"
                                 ],
                                 "subgroups": []
@@ -84776,7 +84776,7 @@
                     },
                     {
                       "key": "Trigger 5",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -84918,7 +84918,7 @@
                           "type": "group",
                           "group": {
                             "key": "Offset To Camera",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -85022,7 +85022,7 @@
                           "type": "group",
                           "group": {
                             "key": "Animation Speed Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -85286,9 +85286,13 @@
                                 "type": "group",
                                 "group": {
                                   "key": "Tween Stop Delay",
-                                  "collapsed": false,
+                                  "collapsed": true,
                                   "locked": false,
                                   "items": [
+                                    {
+                                      "type": "row",
+                                      "key": "custom21Trig5TweenStopDelayCurve"
+                                    },
                                     {
                                       "type": "row",
                                       "key": "custom21Trig5TweenStopDelayMs"
@@ -85299,17 +85303,13 @@
                                     },
                                     {
                                       "type": "row",
-                                      "key": "custom21Trig5TweenStopDelayCurve"
-                                    },
-                                    {
-                                      "type": "row",
                                       "key": "custom21Trig5TweenStopDelayRange"
                                     }
                                   ],
                                   "settings": [
+                                    "custom21Trig5TweenStopDelayCurve",
                                     "custom21Trig5TweenStopDelayMs",
                                     "custom21Trig5TweenStopDelayCurveEnabled",
-                                    "custom21Trig5TweenStopDelayCurve",
                                     "custom21Trig5TweenStopDelayRange"
                                   ],
                                   "subgroups": []
@@ -85340,9 +85340,13 @@
                               },
                               {
                                 "key": "Tween Stop Delay",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
+                                  {
+                                    "type": "row",
+                                    "key": "custom21Trig5TweenStopDelayCurve"
+                                  },
                                   {
                                     "type": "row",
                                     "key": "custom21Trig5TweenStopDelayMs"
@@ -85353,17 +85357,13 @@
                                   },
                                   {
                                     "type": "row",
-                                    "key": "custom21Trig5TweenStopDelayCurve"
-                                  },
-                                  {
-                                    "type": "row",
                                     "key": "custom21Trig5TweenStopDelayRange"
                                   }
                                 ],
                                 "settings": [
+                                  "custom21Trig5TweenStopDelayCurve",
                                   "custom21Trig5TweenStopDelayMs",
                                   "custom21Trig5TweenStopDelayCurveEnabled",
-                                  "custom21Trig5TweenStopDelayCurve",
                                   "custom21Trig5TweenStopDelayRange"
                                 ],
                                 "subgroups": []
@@ -85470,7 +85470,7 @@
                         },
                         {
                           "key": "Offset To Camera",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -85565,7 +85565,7 @@
                         },
                         {
                           "key": "Animation Speed Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -85817,9 +85817,13 @@
                               "type": "group",
                               "group": {
                                 "key": "Tween Stop Delay",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
+                                  {
+                                    "type": "row",
+                                    "key": "custom21Trig5TweenStopDelayCurve"
+                                  },
                                   {
                                     "type": "row",
                                     "key": "custom21Trig5TweenStopDelayMs"
@@ -85830,17 +85834,13 @@
                                   },
                                   {
                                     "type": "row",
-                                    "key": "custom21Trig5TweenStopDelayCurve"
-                                  },
-                                  {
-                                    "type": "row",
                                     "key": "custom21Trig5TweenStopDelayRange"
                                   }
                                 ],
                                 "settings": [
+                                  "custom21Trig5TweenStopDelayCurve",
                                   "custom21Trig5TweenStopDelayMs",
                                   "custom21Trig5TweenStopDelayCurveEnabled",
-                                  "custom21Trig5TweenStopDelayCurve",
                                   "custom21Trig5TweenStopDelayRange"
                                 ],
                                 "subgroups": []
@@ -85871,9 +85871,13 @@
                             },
                             {
                               "key": "Tween Stop Delay",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
+                                {
+                                  "type": "row",
+                                  "key": "custom21Trig5TweenStopDelayCurve"
+                                },
                                 {
                                   "type": "row",
                                   "key": "custom21Trig5TweenStopDelayMs"
@@ -85884,17 +85888,13 @@
                                 },
                                 {
                                   "type": "row",
-                                  "key": "custom21Trig5TweenStopDelayCurve"
-                                },
-                                {
-                                  "type": "row",
                                   "key": "custom21Trig5TweenStopDelayRange"
                                 }
                               ],
                               "settings": [
+                                "custom21Trig5TweenStopDelayCurve",
                                 "custom21Trig5TweenStopDelayMs",
                                 "custom21Trig5TweenStopDelayCurveEnabled",
-                                "custom21Trig5TweenStopDelayCurve",
                                 "custom21Trig5TweenStopDelayRange"
                               ],
                               "subgroups": []
@@ -86008,7 +86008,7 @@
               },
               {
                 "key": "Offset To Camera",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -90984,7 +90984,7 @@
                     "type": "group",
                     "group": {
                       "key": "Trigger 5",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -91126,7 +91126,7 @@
                           "type": "group",
                           "group": {
                             "key": "Offset To Camera",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -91230,7 +91230,7 @@
                           "type": "group",
                           "group": {
                             "key": "Animation Speed Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -91494,9 +91494,13 @@
                                 "type": "group",
                                 "group": {
                                   "key": "Tween Stop Delay",
-                                  "collapsed": false,
+                                  "collapsed": true,
                                   "locked": false,
                                   "items": [
+                                    {
+                                      "type": "row",
+                                      "key": "custom21Trig5TweenStopDelayCurve"
+                                    },
                                     {
                                       "type": "row",
                                       "key": "custom21Trig5TweenStopDelayMs"
@@ -91507,17 +91511,13 @@
                                     },
                                     {
                                       "type": "row",
-                                      "key": "custom21Trig5TweenStopDelayCurve"
-                                    },
-                                    {
-                                      "type": "row",
                                       "key": "custom21Trig5TweenStopDelayRange"
                                     }
                                   ],
                                   "settings": [
+                                    "custom21Trig5TweenStopDelayCurve",
                                     "custom21Trig5TweenStopDelayMs",
                                     "custom21Trig5TweenStopDelayCurveEnabled",
-                                    "custom21Trig5TweenStopDelayCurve",
                                     "custom21Trig5TweenStopDelayRange"
                                   ],
                                   "subgroups": []
@@ -91548,9 +91548,13 @@
                               },
                               {
                                 "key": "Tween Stop Delay",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
+                                  {
+                                    "type": "row",
+                                    "key": "custom21Trig5TweenStopDelayCurve"
+                                  },
                                   {
                                     "type": "row",
                                     "key": "custom21Trig5TweenStopDelayMs"
@@ -91561,17 +91565,13 @@
                                   },
                                   {
                                     "type": "row",
-                                    "key": "custom21Trig5TweenStopDelayCurve"
-                                  },
-                                  {
-                                    "type": "row",
                                     "key": "custom21Trig5TweenStopDelayRange"
                                   }
                                 ],
                                 "settings": [
+                                  "custom21Trig5TweenStopDelayCurve",
                                   "custom21Trig5TweenStopDelayMs",
                                   "custom21Trig5TweenStopDelayCurveEnabled",
-                                  "custom21Trig5TweenStopDelayCurve",
                                   "custom21Trig5TweenStopDelayRange"
                                 ],
                                 "subgroups": []
@@ -91678,7 +91678,7 @@
                         },
                         {
                           "key": "Offset To Camera",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -91773,7 +91773,7 @@
                         },
                         {
                           "key": "Animation Speed Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -92025,9 +92025,13 @@
                               "type": "group",
                               "group": {
                                 "key": "Tween Stop Delay",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
+                                  {
+                                    "type": "row",
+                                    "key": "custom21Trig5TweenStopDelayCurve"
+                                  },
                                   {
                                     "type": "row",
                                     "key": "custom21Trig5TweenStopDelayMs"
@@ -92038,17 +92042,13 @@
                                   },
                                   {
                                     "type": "row",
-                                    "key": "custom21Trig5TweenStopDelayCurve"
-                                  },
-                                  {
-                                    "type": "row",
                                     "key": "custom21Trig5TweenStopDelayRange"
                                   }
                                 ],
                                 "settings": [
+                                  "custom21Trig5TweenStopDelayCurve",
                                   "custom21Trig5TweenStopDelayMs",
                                   "custom21Trig5TweenStopDelayCurveEnabled",
-                                  "custom21Trig5TweenStopDelayCurve",
                                   "custom21Trig5TweenStopDelayRange"
                                 ],
                                 "subgroups": []
@@ -92079,9 +92079,13 @@
                             },
                             {
                               "key": "Tween Stop Delay",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
+                                {
+                                  "type": "row",
+                                  "key": "custom21Trig5TweenStopDelayCurve"
+                                },
                                 {
                                   "type": "row",
                                   "key": "custom21Trig5TweenStopDelayMs"
@@ -92092,17 +92096,13 @@
                                 },
                                 {
                                   "type": "row",
-                                  "key": "custom21Trig5TweenStopDelayCurve"
-                                },
-                                {
-                                  "type": "row",
                                   "key": "custom21Trig5TweenStopDelayRange"
                                 }
                               ],
                               "settings": [
+                                "custom21Trig5TweenStopDelayCurve",
                                 "custom21Trig5TweenStopDelayMs",
                                 "custom21Trig5TweenStopDelayCurveEnabled",
-                                "custom21Trig5TweenStopDelayCurve",
                                 "custom21Trig5TweenStopDelayRange"
                               ],
                               "subgroups": []
@@ -96640,7 +96640,7 @@
                   },
                   {
                     "key": "Trigger 5",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -96782,7 +96782,7 @@
                         "type": "group",
                         "group": {
                           "key": "Offset To Camera",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -96886,7 +96886,7 @@
                         "type": "group",
                         "group": {
                           "key": "Animation Speed Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -97150,9 +97150,13 @@
                               "type": "group",
                               "group": {
                                 "key": "Tween Stop Delay",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
+                                  {
+                                    "type": "row",
+                                    "key": "custom21Trig5TweenStopDelayCurve"
+                                  },
                                   {
                                     "type": "row",
                                     "key": "custom21Trig5TweenStopDelayMs"
@@ -97163,17 +97167,13 @@
                                   },
                                   {
                                     "type": "row",
-                                    "key": "custom21Trig5TweenStopDelayCurve"
-                                  },
-                                  {
-                                    "type": "row",
                                     "key": "custom21Trig5TweenStopDelayRange"
                                   }
                                 ],
                                 "settings": [
+                                  "custom21Trig5TweenStopDelayCurve",
                                   "custom21Trig5TweenStopDelayMs",
                                   "custom21Trig5TweenStopDelayCurveEnabled",
-                                  "custom21Trig5TweenStopDelayCurve",
                                   "custom21Trig5TweenStopDelayRange"
                                 ],
                                 "subgroups": []
@@ -97204,9 +97204,13 @@
                             },
                             {
                               "key": "Tween Stop Delay",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
+                                {
+                                  "type": "row",
+                                  "key": "custom21Trig5TweenStopDelayCurve"
+                                },
                                 {
                                   "type": "row",
                                   "key": "custom21Trig5TweenStopDelayMs"
@@ -97217,17 +97221,13 @@
                                 },
                                 {
                                   "type": "row",
-                                  "key": "custom21Trig5TweenStopDelayCurve"
-                                },
-                                {
-                                  "type": "row",
                                   "key": "custom21Trig5TweenStopDelayRange"
                                 }
                               ],
                               "settings": [
+                                "custom21Trig5TweenStopDelayCurve",
                                 "custom21Trig5TweenStopDelayMs",
                                 "custom21Trig5TweenStopDelayCurveEnabled",
-                                "custom21Trig5TweenStopDelayCurve",
                                 "custom21Trig5TweenStopDelayRange"
                               ],
                               "subgroups": []
@@ -97334,7 +97334,7 @@
                       },
                       {
                         "key": "Offset To Camera",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -97429,7 +97429,7 @@
                       },
                       {
                         "key": "Animation Speed Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -97681,9 +97681,13 @@
                             "type": "group",
                             "group": {
                               "key": "Tween Stop Delay",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
+                                {
+                                  "type": "row",
+                                  "key": "custom21Trig5TweenStopDelayCurve"
+                                },
                                 {
                                   "type": "row",
                                   "key": "custom21Trig5TweenStopDelayMs"
@@ -97694,17 +97698,13 @@
                                 },
                                 {
                                   "type": "row",
-                                  "key": "custom21Trig5TweenStopDelayCurve"
-                                },
-                                {
-                                  "type": "row",
                                   "key": "custom21Trig5TweenStopDelayRange"
                                 }
                               ],
                               "settings": [
+                                "custom21Trig5TweenStopDelayCurve",
                                 "custom21Trig5TweenStopDelayMs",
                                 "custom21Trig5TweenStopDelayCurveEnabled",
-                                "custom21Trig5TweenStopDelayCurve",
                                 "custom21Trig5TweenStopDelayRange"
                               ],
                               "subgroups": []
@@ -97735,9 +97735,13 @@
                           },
                           {
                             "key": "Tween Stop Delay",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
+                              {
+                                "type": "row",
+                                "key": "custom21Trig5TweenStopDelayCurve"
+                              },
                               {
                                 "type": "row",
                                 "key": "custom21Trig5TweenStopDelayMs"
@@ -97748,17 +97752,13 @@
                               },
                               {
                                 "type": "row",
-                                "key": "custom21Trig5TweenStopDelayCurve"
-                              },
-                              {
-                                "type": "row",
                                 "key": "custom21Trig5TweenStopDelayRange"
                               }
                             ],
                             "settings": [
+                              "custom21Trig5TweenStopDelayCurve",
                               "custom21Trig5TweenStopDelayMs",
                               "custom21Trig5TweenStopDelayCurveEnabled",
-                              "custom21Trig5TweenStopDelayCurve",
                               "custom21Trig5TweenStopDelayRange"
                             ],
                             "subgroups": []
@@ -180017,7 +180017,7 @@
               "type": "group",
               "group": {
                 "key": "Offset To Camera",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -185017,7 +185017,7 @@
                     "type": "group",
                     "group": {
                       "key": "Trigger 5",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -185159,7 +185159,7 @@
                           "type": "group",
                           "group": {
                             "key": "Offset To Camera",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -185263,7 +185263,7 @@
                           "type": "group",
                           "group": {
                             "key": "Animation Speed Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -185527,9 +185527,13 @@
                                 "type": "group",
                                 "group": {
                                   "key": "Tween Stop Delay",
-                                  "collapsed": false,
+                                  "collapsed": true,
                                   "locked": false,
                                   "items": [
+                                    {
+                                      "type": "row",
+                                      "key": "custom21Trig5TweenStopDelayCurve"
+                                    },
                                     {
                                       "type": "row",
                                       "key": "custom21Trig5TweenStopDelayMs"
@@ -185540,17 +185544,13 @@
                                     },
                                     {
                                       "type": "row",
-                                      "key": "custom21Trig5TweenStopDelayCurve"
-                                    },
-                                    {
-                                      "type": "row",
                                       "key": "custom21Trig5TweenStopDelayRange"
                                     }
                                   ],
                                   "settings": [
+                                    "custom21Trig5TweenStopDelayCurve",
                                     "custom21Trig5TweenStopDelayMs",
                                     "custom21Trig5TweenStopDelayCurveEnabled",
-                                    "custom21Trig5TweenStopDelayCurve",
                                     "custom21Trig5TweenStopDelayRange"
                                   ],
                                   "subgroups": []
@@ -185581,9 +185581,13 @@
                               },
                               {
                                 "key": "Tween Stop Delay",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
+                                  {
+                                    "type": "row",
+                                    "key": "custom21Trig5TweenStopDelayCurve"
+                                  },
                                   {
                                     "type": "row",
                                     "key": "custom21Trig5TweenStopDelayMs"
@@ -185594,17 +185598,13 @@
                                   },
                                   {
                                     "type": "row",
-                                    "key": "custom21Trig5TweenStopDelayCurve"
-                                  },
-                                  {
-                                    "type": "row",
                                     "key": "custom21Trig5TweenStopDelayRange"
                                   }
                                 ],
                                 "settings": [
+                                  "custom21Trig5TweenStopDelayCurve",
                                   "custom21Trig5TweenStopDelayMs",
                                   "custom21Trig5TweenStopDelayCurveEnabled",
-                                  "custom21Trig5TweenStopDelayCurve",
                                   "custom21Trig5TweenStopDelayRange"
                                 ],
                                 "subgroups": []
@@ -185711,7 +185711,7 @@
                         },
                         {
                           "key": "Offset To Camera",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -185806,7 +185806,7 @@
                         },
                         {
                           "key": "Animation Speed Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -186058,9 +186058,13 @@
                               "type": "group",
                               "group": {
                                 "key": "Tween Stop Delay",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
+                                  {
+                                    "type": "row",
+                                    "key": "custom21Trig5TweenStopDelayCurve"
+                                  },
                                   {
                                     "type": "row",
                                     "key": "custom21Trig5TweenStopDelayMs"
@@ -186071,17 +186075,13 @@
                                   },
                                   {
                                     "type": "row",
-                                    "key": "custom21Trig5TweenStopDelayCurve"
-                                  },
-                                  {
-                                    "type": "row",
                                     "key": "custom21Trig5TweenStopDelayRange"
                                   }
                                 ],
                                 "settings": [
+                                  "custom21Trig5TweenStopDelayCurve",
                                   "custom21Trig5TweenStopDelayMs",
                                   "custom21Trig5TweenStopDelayCurveEnabled",
-                                  "custom21Trig5TweenStopDelayCurve",
                                   "custom21Trig5TweenStopDelayRange"
                                 ],
                                 "subgroups": []
@@ -186112,9 +186112,13 @@
                             },
                             {
                               "key": "Tween Stop Delay",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
+                                {
+                                  "type": "row",
+                                  "key": "custom21Trig5TweenStopDelayCurve"
+                                },
                                 {
                                   "type": "row",
                                   "key": "custom21Trig5TweenStopDelayMs"
@@ -186125,17 +186129,13 @@
                                 },
                                 {
                                   "type": "row",
-                                  "key": "custom21Trig5TweenStopDelayCurve"
-                                },
-                                {
-                                  "type": "row",
                                   "key": "custom21Trig5TweenStopDelayRange"
                                 }
                               ],
                               "settings": [
+                                "custom21Trig5TweenStopDelayCurve",
                                 "custom21Trig5TweenStopDelayMs",
                                 "custom21Trig5TweenStopDelayCurveEnabled",
-                                "custom21Trig5TweenStopDelayCurve",
                                 "custom21Trig5TweenStopDelayRange"
                               ],
                               "subgroups": []
@@ -190673,7 +190673,7 @@
                   },
                   {
                     "key": "Trigger 5",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -190815,7 +190815,7 @@
                         "type": "group",
                         "group": {
                           "key": "Offset To Camera",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -190919,7 +190919,7 @@
                         "type": "group",
                         "group": {
                           "key": "Animation Speed Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -191183,9 +191183,13 @@
                               "type": "group",
                               "group": {
                                 "key": "Tween Stop Delay",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
+                                  {
+                                    "type": "row",
+                                    "key": "custom21Trig5TweenStopDelayCurve"
+                                  },
                                   {
                                     "type": "row",
                                     "key": "custom21Trig5TweenStopDelayMs"
@@ -191196,17 +191200,13 @@
                                   },
                                   {
                                     "type": "row",
-                                    "key": "custom21Trig5TweenStopDelayCurve"
-                                  },
-                                  {
-                                    "type": "row",
                                     "key": "custom21Trig5TweenStopDelayRange"
                                   }
                                 ],
                                 "settings": [
+                                  "custom21Trig5TweenStopDelayCurve",
                                   "custom21Trig5TweenStopDelayMs",
                                   "custom21Trig5TweenStopDelayCurveEnabled",
-                                  "custom21Trig5TweenStopDelayCurve",
                                   "custom21Trig5TweenStopDelayRange"
                                 ],
                                 "subgroups": []
@@ -191237,9 +191237,13 @@
                             },
                             {
                               "key": "Tween Stop Delay",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
+                                {
+                                  "type": "row",
+                                  "key": "custom21Trig5TweenStopDelayCurve"
+                                },
                                 {
                                   "type": "row",
                                   "key": "custom21Trig5TweenStopDelayMs"
@@ -191250,17 +191254,13 @@
                                 },
                                 {
                                   "type": "row",
-                                  "key": "custom21Trig5TweenStopDelayCurve"
-                                },
-                                {
-                                  "type": "row",
                                   "key": "custom21Trig5TweenStopDelayRange"
                                 }
                               ],
                               "settings": [
+                                "custom21Trig5TweenStopDelayCurve",
                                 "custom21Trig5TweenStopDelayMs",
                                 "custom21Trig5TweenStopDelayCurveEnabled",
-                                "custom21Trig5TweenStopDelayCurve",
                                 "custom21Trig5TweenStopDelayRange"
                               ],
                               "subgroups": []
@@ -191367,7 +191367,7 @@
                       },
                       {
                         "key": "Offset To Camera",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -191462,7 +191462,7 @@
                       },
                       {
                         "key": "Animation Speed Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -191714,9 +191714,13 @@
                             "type": "group",
                             "group": {
                               "key": "Tween Stop Delay",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
+                                {
+                                  "type": "row",
+                                  "key": "custom21Trig5TweenStopDelayCurve"
+                                },
                                 {
                                   "type": "row",
                                   "key": "custom21Trig5TweenStopDelayMs"
@@ -191727,17 +191731,13 @@
                                 },
                                 {
                                   "type": "row",
-                                  "key": "custom21Trig5TweenStopDelayCurve"
-                                },
-                                {
-                                  "type": "row",
                                   "key": "custom21Trig5TweenStopDelayRange"
                                 }
                               ],
                               "settings": [
+                                "custom21Trig5TweenStopDelayCurve",
                                 "custom21Trig5TweenStopDelayMs",
                                 "custom21Trig5TweenStopDelayCurveEnabled",
-                                "custom21Trig5TweenStopDelayCurve",
                                 "custom21Trig5TweenStopDelayRange"
                               ],
                               "subgroups": []
@@ -191768,9 +191768,13 @@
                           },
                           {
                             "key": "Tween Stop Delay",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
+                              {
+                                "type": "row",
+                                "key": "custom21Trig5TweenStopDelayCurve"
+                              },
                               {
                                 "type": "row",
                                 "key": "custom21Trig5TweenStopDelayMs"
@@ -191781,17 +191785,13 @@
                               },
                               {
                                 "type": "row",
-                                "key": "custom21Trig5TweenStopDelayCurve"
-                              },
-                              {
-                                "type": "row",
                                 "key": "custom21Trig5TweenStopDelayRange"
                               }
                             ],
                             "settings": [
+                              "custom21Trig5TweenStopDelayCurve",
                               "custom21Trig5TweenStopDelayMs",
                               "custom21Trig5TweenStopDelayCurveEnabled",
-                              "custom21Trig5TweenStopDelayCurve",
                               "custom21Trig5TweenStopDelayRange"
                             ],
                             "subgroups": []
@@ -191905,7 +191905,7 @@
             },
             {
               "key": "Offset To Camera",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -196881,7 +196881,7 @@
                   "type": "group",
                   "group": {
                     "key": "Trigger 5",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -197023,7 +197023,7 @@
                         "type": "group",
                         "group": {
                           "key": "Offset To Camera",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -197127,7 +197127,7 @@
                         "type": "group",
                         "group": {
                           "key": "Animation Speed Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -197391,9 +197391,13 @@
                               "type": "group",
                               "group": {
                                 "key": "Tween Stop Delay",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
+                                  {
+                                    "type": "row",
+                                    "key": "custom21Trig5TweenStopDelayCurve"
+                                  },
                                   {
                                     "type": "row",
                                     "key": "custom21Trig5TweenStopDelayMs"
@@ -197404,17 +197408,13 @@
                                   },
                                   {
                                     "type": "row",
-                                    "key": "custom21Trig5TweenStopDelayCurve"
-                                  },
-                                  {
-                                    "type": "row",
                                     "key": "custom21Trig5TweenStopDelayRange"
                                   }
                                 ],
                                 "settings": [
+                                  "custom21Trig5TweenStopDelayCurve",
                                   "custom21Trig5TweenStopDelayMs",
                                   "custom21Trig5TweenStopDelayCurveEnabled",
-                                  "custom21Trig5TweenStopDelayCurve",
                                   "custom21Trig5TweenStopDelayRange"
                                 ],
                                 "subgroups": []
@@ -197445,9 +197445,13 @@
                             },
                             {
                               "key": "Tween Stop Delay",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
+                                {
+                                  "type": "row",
+                                  "key": "custom21Trig5TweenStopDelayCurve"
+                                },
                                 {
                                   "type": "row",
                                   "key": "custom21Trig5TweenStopDelayMs"
@@ -197458,17 +197462,13 @@
                                 },
                                 {
                                   "type": "row",
-                                  "key": "custom21Trig5TweenStopDelayCurve"
-                                },
-                                {
-                                  "type": "row",
                                   "key": "custom21Trig5TweenStopDelayRange"
                                 }
                               ],
                               "settings": [
+                                "custom21Trig5TweenStopDelayCurve",
                                 "custom21Trig5TweenStopDelayMs",
                                 "custom21Trig5TweenStopDelayCurveEnabled",
-                                "custom21Trig5TweenStopDelayCurve",
                                 "custom21Trig5TweenStopDelayRange"
                               ],
                               "subgroups": []
@@ -197575,7 +197575,7 @@
                       },
                       {
                         "key": "Offset To Camera",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -197670,7 +197670,7 @@
                       },
                       {
                         "key": "Animation Speed Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -197922,9 +197922,13 @@
                             "type": "group",
                             "group": {
                               "key": "Tween Stop Delay",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
+                                {
+                                  "type": "row",
+                                  "key": "custom21Trig5TweenStopDelayCurve"
+                                },
                                 {
                                   "type": "row",
                                   "key": "custom21Trig5TweenStopDelayMs"
@@ -197935,17 +197939,13 @@
                                 },
                                 {
                                   "type": "row",
-                                  "key": "custom21Trig5TweenStopDelayCurve"
-                                },
-                                {
-                                  "type": "row",
                                   "key": "custom21Trig5TweenStopDelayRange"
                                 }
                               ],
                               "settings": [
+                                "custom21Trig5TweenStopDelayCurve",
                                 "custom21Trig5TweenStopDelayMs",
                                 "custom21Trig5TweenStopDelayCurveEnabled",
-                                "custom21Trig5TweenStopDelayCurve",
                                 "custom21Trig5TweenStopDelayRange"
                               ],
                               "subgroups": []
@@ -197976,9 +197976,13 @@
                           },
                           {
                             "key": "Tween Stop Delay",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
+                              {
+                                "type": "row",
+                                "key": "custom21Trig5TweenStopDelayCurve"
+                              },
                               {
                                 "type": "row",
                                 "key": "custom21Trig5TweenStopDelayMs"
@@ -197989,17 +197993,13 @@
                               },
                               {
                                 "type": "row",
-                                "key": "custom21Trig5TweenStopDelayCurve"
-                              },
-                              {
-                                "type": "row",
                                 "key": "custom21Trig5TweenStopDelayRange"
                               }
                             ],
                             "settings": [
+                              "custom21Trig5TweenStopDelayCurve",
                               "custom21Trig5TweenStopDelayMs",
                               "custom21Trig5TweenStopDelayCurveEnabled",
-                              "custom21Trig5TweenStopDelayCurve",
                               "custom21Trig5TweenStopDelayRange"
                             ],
                             "subgroups": []
@@ -202537,7 +202537,7 @@
                 },
                 {
                   "key": "Trigger 5",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -202679,7 +202679,7 @@
                       "type": "group",
                       "group": {
                         "key": "Offset To Camera",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -202783,7 +202783,7 @@
                       "type": "group",
                       "group": {
                         "key": "Animation Speed Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -203047,9 +203047,13 @@
                             "type": "group",
                             "group": {
                               "key": "Tween Stop Delay",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
+                                {
+                                  "type": "row",
+                                  "key": "custom21Trig5TweenStopDelayCurve"
+                                },
                                 {
                                   "type": "row",
                                   "key": "custom21Trig5TweenStopDelayMs"
@@ -203060,17 +203064,13 @@
                                 },
                                 {
                                   "type": "row",
-                                  "key": "custom21Trig5TweenStopDelayCurve"
-                                },
-                                {
-                                  "type": "row",
                                   "key": "custom21Trig5TweenStopDelayRange"
                                 }
                               ],
                               "settings": [
+                                "custom21Trig5TweenStopDelayCurve",
                                 "custom21Trig5TweenStopDelayMs",
                                 "custom21Trig5TweenStopDelayCurveEnabled",
-                                "custom21Trig5TweenStopDelayCurve",
                                 "custom21Trig5TweenStopDelayRange"
                               ],
                               "subgroups": []
@@ -203101,9 +203101,13 @@
                           },
                           {
                             "key": "Tween Stop Delay",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
+                              {
+                                "type": "row",
+                                "key": "custom21Trig5TweenStopDelayCurve"
+                              },
                               {
                                 "type": "row",
                                 "key": "custom21Trig5TweenStopDelayMs"
@@ -203114,17 +203118,13 @@
                               },
                               {
                                 "type": "row",
-                                "key": "custom21Trig5TweenStopDelayCurve"
-                              },
-                              {
-                                "type": "row",
                                 "key": "custom21Trig5TweenStopDelayRange"
                               }
                             ],
                             "settings": [
+                              "custom21Trig5TweenStopDelayCurve",
                               "custom21Trig5TweenStopDelayMs",
                               "custom21Trig5TweenStopDelayCurveEnabled",
-                              "custom21Trig5TweenStopDelayCurve",
                               "custom21Trig5TweenStopDelayRange"
                             ],
                             "subgroups": []
@@ -203231,7 +203231,7 @@
                     },
                     {
                       "key": "Offset To Camera",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -203326,7 +203326,7 @@
                     },
                     {
                       "key": "Animation Speed Curve",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -203578,9 +203578,13 @@
                           "type": "group",
                           "group": {
                             "key": "Tween Stop Delay",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
+                              {
+                                "type": "row",
+                                "key": "custom21Trig5TweenStopDelayCurve"
+                              },
                               {
                                 "type": "row",
                                 "key": "custom21Trig5TweenStopDelayMs"
@@ -203591,17 +203595,13 @@
                               },
                               {
                                 "type": "row",
-                                "key": "custom21Trig5TweenStopDelayCurve"
-                              },
-                              {
-                                "type": "row",
                                 "key": "custom21Trig5TweenStopDelayRange"
                               }
                             ],
                             "settings": [
+                              "custom21Trig5TweenStopDelayCurve",
                               "custom21Trig5TweenStopDelayMs",
                               "custom21Trig5TweenStopDelayCurveEnabled",
-                              "custom21Trig5TweenStopDelayCurve",
                               "custom21Trig5TweenStopDelayRange"
                             ],
                             "subgroups": []
@@ -203632,9 +203632,13 @@
                         },
                         {
                           "key": "Tween Stop Delay",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
+                            {
+                              "type": "row",
+                              "key": "custom21Trig5TweenStopDelayCurve"
+                            },
                             {
                               "type": "row",
                               "key": "custom21Trig5TweenStopDelayMs"
@@ -203645,17 +203649,13 @@
                             },
                             {
                               "type": "row",
-                              "key": "custom21Trig5TweenStopDelayCurve"
-                            },
-                            {
-                              "type": "row",
                               "key": "custom21Trig5TweenStopDelayRange"
                             }
                           ],
                           "settings": [
+                            "custom21Trig5TweenStopDelayCurve",
                             "custom21Trig5TweenStopDelayMs",
                             "custom21Trig5TweenStopDelayCurveEnabled",
-                            "custom21Trig5TweenStopDelayCurve",
                             "custom21Trig5TweenStopDelayRange"
                           ],
                           "subgroups": []
@@ -248441,18 +248441,144 @@
   },
   "devIndependence": {
     "mobile": {
-      "custom13RetransitionSpeedCurveEnabled": false,
+      "custom13RetransitionSpeedCurveEnabled": true,
       "loadingPreviewCameraEditMode": true,
       "loadingPreviewSpeedMs": true,
       "custom24Trig1CameraOffsetEnabled": true,
       "custom24Trig1CameraOffsetXEnabled": true,
       "custom24Trig1CameraOffsetYEnabled": true,
       "custom24Trig1CameraOffsetZEnabled": true,
-      "custom21CameraOffsetEnabled": true,
-      "custom21CameraOffsetXEnabled": true,
-      "custom21CameraOffsetYEnabled": true,
-      "custom21CameraOffsetZEnabled": true,
-      "custom21LoopMode": true
+      "custom21CameraOffsetEnabled": false,
+      "custom21CameraOffsetXEnabled": false,
+      "custom21CameraOffsetYEnabled": false,
+      "custom21CameraOffsetZEnabled": false,
+      "custom21LoopMode": true,
+      "custom13Enabled": true,
+      "custom13Type": true,
+      "custom13TouchPointCount": true,
+      "custom13ClickCount": true,
+      "custom13Mode": true,
+      "custom13TargetPose": true,
+      "custom13SkipIfSamePose": true,
+      "custom13TweenSelector": true,
+      "custom13ReverseSequence": true,
+      "custom13GlideToFirstPose": true,
+      "custom13FirstGlideTimeScale": true,
+      "custom13TransitionSpeedMs": true,
+      "custom13TweenSpeedMs": true,
+      "custom13PauseDurationMs": true,
+      "custom13SequencePlayMode": true,
+      "custom13SequenceCount": true,
+      "custom13SequenceCountMode": true,
+      "custom13SequenceLoopTransition": true,
+      "custom13SequenceHoldMs": true,
+      "custom13OffsetEnabled": true,
+      "custom13OffsetMode": true,
+      "custom13OffsetX": true,
+      "custom13OffsetY": true,
+      "custom13OffsetZ": true,
+      "custom13CursorOffsetDistance": true,
+      "custom13CursorOffsetDistanceCurveEnabled": true,
+      "custom13CameraOffsetEnabled": true,
+      "custom13CameraOffsetXEnabled": true,
+      "custom13CameraOffsetYEnabled": true,
+      "custom13CameraOffsetZEnabled": true,
+      "custom13RotationEnabled": true,
+      "custom13RotationX": true,
+      "custom13RotationY": true,
+      "custom13RotationZ": true,
+      "custom13EasingCurveEnabled": true,
+      "custom13SpeedCurveEnabled": true,
+      "custom13StartTimeCurveEnabled": true,
+      "custom13StartDistanceCurveEnabled": true,
+      "custom13StartDistanceMin": true,
+      "custom13StartDistanceMax": true,
+      "custom13RetransitionEnabled": true,
+      "custom13RetransitionSpeedMs": true,
+      "custom13RetransitionStartTimeCurveEnabled": true,
+      "custom13MultiTriggerEnabled": true,
+      "custom13Trig1Enabled": true,
+      "custom13Trig1Mode": true,
+      "custom13Trig1TargetPose": true,
+      "custom13Trig1SkipIfSamePose": true,
+      "custom13Trig1TweenSelector": true,
+      "custom13Trig1ReverseSequence": true,
+      "custom13Trig1GlideToFirstPose": true,
+      "custom13Trig1FirstGlideTimeScale": true,
+      "custom13Trig1TransitionSpeedMs": true,
+      "custom13Trig1TweenSpeedMs": true,
+      "custom13Trig1PauseDurationMs": true,
+      "custom13Trig1SequencePlayMode": true,
+      "custom13Trig1SequenceCount": true,
+      "custom13Trig1SequenceCountMode": true,
+      "custom13Trig1SequenceLoopTransition": true,
+      "custom13Trig1SequenceHoldMs": true,
+      "custom13Trig1OffsetEnabled": true,
+      "custom13Trig1OffsetMode": true,
+      "custom13Trig1OffsetX": true,
+      "custom13Trig1OffsetY": true,
+      "custom13Trig1OffsetZ": true,
+      "custom13Trig1CursorOffsetDistance": true,
+      "custom13Trig1CursorOffsetDistanceCurveEnabled": true,
+      "custom13Trig1CameraOffsetEnabled": true,
+      "custom13Trig1CameraOffsetXEnabled": true,
+      "custom13Trig1CameraOffsetYEnabled": true,
+      "custom13Trig1CameraOffsetZEnabled": true,
+      "custom13Trig1RotationEnabled": true,
+      "custom13Trig1RotationX": true,
+      "custom13Trig1RotationY": true,
+      "custom13Trig1RotationZ": true,
+      "custom13Trig1EasingCurveEnabled": true,
+      "custom13Trig1SpeedCurveEnabled": true,
+      "custom13Trig1StartTimeCurveEnabled": true,
+      "custom13Trig1StartDistanceCurveEnabled": true,
+      "custom13Trig1StartDistanceMin": true,
+      "custom13Trig1StartDistanceMax": true,
+      "custom13Trig1RetransitionEnabled": true,
+      "custom13Trig1RetransitionSpeedMs": true,
+      "custom13Trig1RetransitionSpeedCurveEnabled": true,
+      "custom13Trig1RetransitionStartTimeCurveEnabled": true,
+      "custom13Trig2Enabled": true,
+      "custom13Trig2Mode": true,
+      "custom13Trig2TargetPose": true,
+      "custom13Trig2SkipIfSamePose": true,
+      "custom13Trig2TweenSelector": true,
+      "custom13Trig2ReverseSequence": true,
+      "custom13Trig2GlideToFirstPose": true,
+      "custom13Trig2FirstGlideTimeScale": true,
+      "custom13Trig2TransitionSpeedMs": true,
+      "custom13Trig2TweenSpeedMs": true,
+      "custom13Trig2PauseDurationMs": true,
+      "custom13Trig2SequencePlayMode": true,
+      "custom13Trig2SequenceCount": true,
+      "custom13Trig2SequenceCountMode": true,
+      "custom13Trig2SequenceLoopTransition": true,
+      "custom13Trig2SequenceHoldMs": true,
+      "custom13Trig2OffsetEnabled": true,
+      "custom13Trig2OffsetMode": true,
+      "custom13Trig2OffsetX": true,
+      "custom13Trig2OffsetY": true,
+      "custom13Trig2OffsetZ": true,
+      "custom13Trig2CursorOffsetDistance": true,
+      "custom13Trig2CursorOffsetDistanceCurveEnabled": true,
+      "custom13Trig2CameraOffsetEnabled": true,
+      "custom13Trig2CameraOffsetXEnabled": true,
+      "custom13Trig2CameraOffsetYEnabled": true,
+      "custom13Trig2CameraOffsetZEnabled": true,
+      "custom13Trig2RotationEnabled": true,
+      "custom13Trig2RotationX": true,
+      "custom13Trig2RotationY": true,
+      "custom13Trig2RotationZ": true,
+      "custom13Trig2EasingCurveEnabled": true,
+      "custom13Trig2SpeedCurveEnabled": true,
+      "custom13Trig2StartTimeCurveEnabled": true,
+      "custom13Trig2StartDistanceCurveEnabled": true,
+      "custom13Trig2StartDistanceMin": true,
+      "custom13Trig2StartDistanceMax": true,
+      "custom13Trig2RetransitionEnabled": true,
+      "custom13Trig2RetransitionSpeedMs": true,
+      "custom13Trig2RetransitionSpeedCurveEnabled": true,
+      "custom13Trig2RetransitionStartTimeCurveEnabled": true
     },
     "landscape": {}
   },
@@ -248465,10 +248591,10 @@
       "height": 644.390625
     },
     "mobile": {
-      "left": 34.78571319580078,
-      "top": 10.851190567016602,
-      "width": 356.2083435058594,
-      "height": 769.5714721679688
+      "left": 27.928571701049805,
+      "top": 9.351190567016602,
+      "width": 334.1071472167969,
+      "height": 777.172607421875
     }
   }
 }
