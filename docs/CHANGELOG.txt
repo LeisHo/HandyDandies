@@ -16826,6 +16826,13 @@ Direct report: the new Cursor Target Depth checkboxes and sliders were not in th
    Min / Max (Deg). Asked what a new Arm Rotation Min / Max should do before building one.
    `main.js` `?v=317` -> `?v=318`.
 
+2026-10-11  -  (Show Target Marker is now the screen point)
+
+Direct request ("screen marker"): the marker is drawn at the cursor's position on the z = 0 field plane, so it sits exactly under the mouse on
+screen -- the point the screen-space click-function distance measures from. It used to sit at the shared Cursor Target Depth, which perspective
+placed away from the mouse whenever that depth was not 0. It is also no longer hidden behind hands (depth test off, high render order).
+The look-at targets (shared and per feature) are unchanged. `main.js` `?v=318` -> `?v=319`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

@@ -2451,6 +2451,8 @@ scene.add(gridHelper)
 
 const targetMarker = new THREE.Mesh(new THREE.SphereGeometry(1, 12, 12), new THREE.MeshBasicMaterial({ color: 0xff5566 }))
 targetMarker.visible = cfg.showTargetMarker
+targetMarker.material.depthTest = false // always visible, even behind hands
+targetMarker.renderOrder = 999999
 scene.add(targetMarker)
 
 // -----------------------------------------------------------------------
@@ -3332,7 +3334,9 @@ function updateCursorTarget() {
     cursorTarget.y = hit.y
   }
   cursorTarget.z = sceneState.fieldRadius * cfg.targetDepthFactor
-  targetMarker.position.copy(cursorTarget)
+  // Screen marker (2026-10-11): drawn on the z = 0 field plane, i.e. exactly under the mouse on screen -- the point the screen-space
+  // click-function distance measures from. (It used to sit at the shared Cursor Target Depth, which perspective draws displaced from the cursor.)
+  targetMarker.position.set(cursorTarget.x, cursorTarget.y, 0)
   updateTrackingTargets()
 }
 // Each cursor-tracking feature has its own Cursor Target Depth (x Field Radius); falls back to the shared one if unset.
