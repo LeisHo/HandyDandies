@@ -6376,8 +6376,8 @@
       "wristSplayTargetDepth": 37.3,
       "wristSplayDefault": -19,
       "wristSplayReactiveEnabled": true,
-      "wristSplayRange": "{\"min\":-46,\"max\":20}",
-      "wristSplayCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.4928009573891334,\"y\":0.0425000508626302}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.4181937688419328,\"y\":0}}]",
+      "wristSplayRange": "{\"min\":-46,\"max\":2}",
+      "wristSplayCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.2691831581499777,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.5909653242143187,\"y\":0}}]",
       "wristSplayDamping": 0.34,
       "tweenPoses": [
         "COUNTDOWN (VERT) - 0",
@@ -6900,7 +6900,7 @@
         }
       ],
       "lockCameraPan": false,
-      "lockCameraZoom": false,
+      "lockCameraZoom": true,
       "cameraMaxExtentsEnabled": false,
       "keyAzimuth": 209,
       "keyElevation": 56,
@@ -15634,8 +15634,8 @@
       "wristSplayTargetDepth": 5.6,
       "wristSplayDefault": -19,
       "wristSplayReactiveEnabled": true,
-      "wristSplayRange": "{\"min\":-46,\"max\":20}",
-      "wristSplayCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.4928009573891334,\"y\":0.0425000508626302}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.4181937688419328,\"y\":0}}]",
+      "wristSplayRange": "{\"min\":-46,\"max\":2}",
+      "wristSplayCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.2691831581499777,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.5909653242143187,\"y\":0}}]",
       "wristSplayDamping": 0.34,
       "tweenPoses": [
         "COUNTDOWN (VERT) - 0",
@@ -24892,8 +24892,8 @@
       "wristSplayTargetDepth": 3.4,
       "wristSplayDefault": -19,
       "wristSplayReactiveEnabled": true,
-      "wristSplayRange": "{\"min\":-46,\"max\":20}",
-      "wristSplayCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.4928009573891334,\"y\":0.0425000508626302}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.4181937688419328,\"y\":0}}]",
+      "wristSplayRange": "{\"min\":-46,\"max\":2}",
+      "wristSplayCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.2691831581499777,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.5909653242143187,\"y\":0}}]",
       "wristSplayDamping": 0.34,
       "tweenPoses": [
         "COUNTDOWN (VERT) - 0",
@@ -30889,7 +30889,7 @@
                 "type": "group",
                 "group": {
                   "key": "Responsive Wrist Splay",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -31140,7 +31140,7 @@
               },
               {
                 "key": "Responsive Wrist Splay",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -32329,7 +32329,7 @@
               "type": "group",
               "group": {
                 "key": "Responsive Wrist Splay",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -32580,7 +32580,7 @@
             },
             {
               "key": "Responsive Wrist Splay",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -185565,7 +185565,7 @@
     },
     {
       "key": "New Group (11)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -185754,7 +185754,7 @@
           "type": "group",
           "group": {
             "key": "Camera",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -186098,7 +186098,7 @@
         },
         {
           "key": "Camera",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
@@ -187967,7 +187967,7 @@
       "left": 820.7999877929688,
       "top": 0,
       "width": 699.2000122070312,
-      "height": 37.60000228881836
+      "height": 725.9500122070312
     }
   }
 }
