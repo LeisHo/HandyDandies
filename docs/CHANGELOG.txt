@@ -17071,6 +17071,18 @@ the plane had a 180 deg step. New lookUpFor(): the up vector is +Y while the aim
 turns faster inside the blend band, which is unavoidable). The 0.8 / 0.2 band is a judgment call with no measurement behind it. With depth on the aim is rarely near vertical, so it is unchanged in practice.
 Verified numerically with the page's own three.js (not visually). `main.js` `?v=339` -> `?v=340`.
 
+2026-10-11  -  (cursor Arm / Palm Rotation pivot on the arm base: Arm = Rotate-at-Base X/Y axes, Palm = Z axis)
+
+Direct request: "palm rotation should rotate the hand model by the Rotate at Base Z axis. While Arm rotation should use the Rotate at Base x and y axes", then "it looks like the entire hand model offsets when i move y cursor".
+ - Before: the wrapper was turned by a look-at (up vector blended toward +Z near vertical since v=340) about the wrapper origin = the wrist cut point, so any aim change swung the whole model about the wrist and the
+   blend added a roll near vertical. That was the "entire hand offsets when I move the cursor in Y".
+ - Now: Arm Rotation is the shortest-arc swing from the reference pointing direction (-Z) to arm-base -> cursor (setFromUnitVectors): its axis is always perpendicular to the pointing direction, i.e. in the mesh X/Y plane,
+   with no up vector, so there is no flip and no roll. Palm Rotation is a roll about the mesh Z axis (the forearm line) as the hand is oriented now. Both are carried by the wrapper quaternion, and applyHandArmLength()
+   now shifts the clone by L = Rt^-1 * (s q0 (base - cut)) - s q base so the ARM BASE stays where it would be with no rotation and the model swings about it (the Rotation-at-Base pivot; identical to the old formula when
+   the wrapper is identity). The aim target uses the arm-base point (armBasePivotInto()), not the wrapper origin; with Use Cursor Target Depth off the target sits at the arm base's own Z. lookUpFor() (v=340) is removed.
+ - Disclosed difference: a swing has no up vector, so a diagonal aim twists the hand slightly compared with the old look-at (about half of yaw x pitch in radians, ~4 deg at 30 x 30 deg). Default pose rotation still
+   composes on top (the clone keeps currentBaseQuat). `main.js` `?v=340` -> `?v=341`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

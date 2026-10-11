@@ -130,8 +130,9 @@ const _rollAxisScratch = new THREE.Vector3()
 // Palm roll axis = the hand's own forearm line AFTER its current model rotation (alignQuat * Whole-Hand * Rotation at Base = hand.currentBaseQuat), so the palm spins about the
 // forearm as the default / triggered pose leaves it (2026-10-11, direct request). With no extra rotation currentBaseQuat is alignQuat and this equals the old fixed axis.
 function computeRollQuat(baseDeg, hand) {
-  const axis = (hand && wristCropNormalRawModel) ? _rollAxisScratch.copy(wristCropNormalRawModel).applyQuaternion(hand.currentBaseQuat) : (wristCropNormalAligned || _rollAxisFallbackScratch)
-  const offsetRad = THREE.MathUtils.degToRad((baseDeg || 0) + (cfg.palmFaceRotationOffset || 0))
+  // Palm Rotation = Rotate-at-Base Z axis: the mesh's own Z axis (the forearm line), as the hand is oriented right now. The mesh points along -Z, hence the negative angle (keeps the old direction).
+  const axis = hand ? _rollAxisScratch.set(0, 0, 1).applyQuaternion(modelBaseFrameQ).applyQuaternion(hand.currentBaseQuat) : (wristCropNormalAligned || _rollAxisFallbackScratch)
+  const offsetRad = THREE.MathUtils.degToRad((baseDeg || 0) + (cfg.palmFaceRotationOffset || 0)) * (hand ? -1 : 1)
   return _rollQuatScratch.setFromAxisAngle(axis, offsetRad)
 }
 let handLengthRaw = 1
@@ -844,15 +845,22 @@ const boundsCenterScratch = new THREE.Vector3()
 // allocated fresh each call.
 const _lookAtMatrixScratch = new THREE.Matrix4()
 const _lookAtQuatScratch = new THREE.Quaternion()
-const _lookFwdScratch = new THREE.Vector3(), _lookUpScratch = new THREE.Vector3()
-// Up vector for the cursor look-at that never degenerates (2026-10-11, direct request: fix the flip). A look-at with a fixed world-up flips the instant the aim direction passes through that up
-// vector (cursor directly above / below a hand, which an XY-only aim does constantly). As the aim gets within ~37 degrees of vertical (|y| > 0.8) the up vector is blended smoothly from world +Y toward
-// +Z (the camera axis), so the orientation stays continuous through vertical; the 0.8 / 0.2 band is a judgment call, not a measurement. Away from vertical (|y| <= 0.8) it is exactly the old +Y.
-function lookUpFor(fwd) {
-  const a = Math.abs(fwd.y)
-  const t = Math.min(Math.max((a - 0.8) / 0.2, 0), 1)
-  const w = t * t * (3 - 2 * t)
-  return _lookUpScratch.set(0, 1 - w, w)
+// Cursor Arm Rotation (2026-10-11, direct request: arm rotation uses the Rotate-at-Base X and Y axes, palm rotation the Z axis, both pivoting on the arm base). The aim is the shortest-arc SWING
+// from the hand's reference pointing direction (-Z of the wrapper, as before) to the direction arm-base -> cursor target. A swing axis is perpendicular to the pointing direction, i.e. it lies in the
+// mesh X/Y plane: pure X/Y rotation, no up vector, so it never flips (the old look-at did when the aim passed through its up vector). The wrapper carries the swing; applyHandArmLength() then moves the
+// clone so the ARM BASE stays where it would be without any rotation and the model swings about it (same pivot as Rotation at Base).
+const _swingRef = new THREE.Vector3(0, 0, -1)
+const _swingDir = new THREE.Vector3(), _swingPivot = new THREE.Vector3(), _swingTarget = new THREE.Vector3()
+const _trkQ0 = new THREE.Quaternion(), _trkRbInv = new THREE.Quaternion(), _trkCut = new THREE.Vector3()
+// World position of the hand's arm base with no tracking rotation: wrapper.position + s * q0 * (forearmBase - cutPoint), q0 = currentBaseQuat * Rb^-1 (same maths as applyHandArmLength()).
+function armBasePivotInto(hand, out) {
+  const t = THREE.MathUtils.clamp(hand.currentArmLengthT ?? 0, 0, 1)
+  if (hand.clipRig) _trkCut.set(0, forearmPosRaw.y - t * hand.clipRig.topY0, 0)
+  else _trkCut.copy(wristPosRaw).sub(forearmPosRaw).multiplyScalar(-t)
+  const rb = hand.currentBaseRb
+  if (rb && (rb.x !== 0 || rb.y !== 0 || rb.z !== 0)) _trkQ0.copy(hand.currentBaseQuat).multiply(_trkRbInv.copy(rb).invert())
+  else _trkQ0.copy(hand.currentBaseQuat)
+  return out.copy(_trkCut).applyQuaternion(_trkQ0).multiplyScalar(computeBaseScale()).add(hand.wrapper.position)
 }
 
 // -----------------------------------------------------------------------
@@ -14624,9 +14632,14 @@ function applyHandArmLength(hand, hideT) {
   // base rotation and the model swings about it. p = s * ( q0 * (base - cut) - q * base ), q0 = q * Rb^-1 = alignQuat * Whole-Hand Rotation; with Rb =
   // identity this is -s * q * cut (the cut point stays on the field position).
   const rb = hand.currentBaseRb
-  if (rb && (rb.x !== 0 || rb.y !== 0 || rb.z !== 0)) {
-    _baseQ0.copy(baseQuat).multiply(_baseRbInv.copy(rb).invert())
+  const wq = hand.wrapper.quaternion
+  const tracked = wq.x !== 0 || wq.y !== 0 || wq.z !== 0
+  // Cursor tracking rotates the WRAPPER; the arm base must stay put, so the clone is shifted by L = Rt^-1 * (s q0 (base - cut)) - s q base (Rt = wrapper rotation). With Rt = identity this is the old formula.
+  if (tracked || (rb && (rb.x !== 0 || rb.y !== 0 || rb.z !== 0))) {
+    if (rb && (rb.x !== 0 || rb.y !== 0 || rb.z !== 0)) _baseQ0.copy(baseQuat).multiply(_baseRbInv.copy(rb).invert())
+    else _baseQ0.copy(baseQuat)
     _brPosA.copy(forearmPosRaw).sub(_cutPointRaw).applyQuaternion(_baseQ0)
+    if (tracked) _brPosA.applyQuaternion(_trkQ0.copy(wq).invert())
     _brPosB.copy(forearmPosRaw).applyQuaternion(baseQuat)
     hand.clone.position.copy(_brPosA).sub(_brPosB).multiplyScalar(scaleFactor)
   } else {
@@ -15736,11 +15749,11 @@ function animate(dt, now) {
         }
         const __cursorTrackingStart = performance.now()
         hands.forEach((hand) => {
-          const __lookTarget = armRotUseDepth ? _trackTargetArm : _trackTargetXY.set(cursorTarget.x, cursorTarget.y, hand.wrapper.position.z)
-          _lookFwdScratch.subVectors(__lookTarget, hand.wrapper.position)
-          if (_lookFwdScratch.lengthSq() > 1e-12) _lookFwdScratch.normalize(); else _lookFwdScratch.set(0, 0, -1)
-          _lookAtMatrixScratch.lookAt(hand.wrapper.position, __lookTarget, lookUpFor(_lookFwdScratch))
-          const lookAtDesired = _lookAtQuatScratch.setFromRotationMatrix(_lookAtMatrixScratch)
+          armBasePivotInto(hand, _swingPivot)
+          _swingTarget.copy(armRotUseDepth ? _trackTargetArm : _trackTargetXY.set(cursorTarget.x, cursorTarget.y, _swingPivot.z))
+          _swingDir.subVectors(_swingTarget, _swingPivot)
+          if (_swingDir.lengthSq() > 1e-12) _swingDir.normalize(); else _swingDir.copy(_swingRef)
+          const lookAtDesired = _lookAtQuatScratch.setFromUnitVectors(_swingRef, _swingDir)
           // CORRECTED 2026-09-28 (5th round of this same jump investigation) --
           // direct report, repeated and precise: with Retransition OFF the
           // jump never happens; with it ON, a hand that was under click-
