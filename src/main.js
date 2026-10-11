@@ -1017,7 +1017,7 @@ function roUpdateSequences() {
   }
 }
 let roPrevRank = null, roLocks = new Map(), roLockPruneCounter = 0
-const roLevelName = (l) => (l === 0 ? 'Mode' : l === 1 ? 'Fallback' : 'Fallback ' + l)
+const roLevelName = (l) => (l === 0 ? 'Mode' : 'Fallback ' + l)
 // Mode terms (+ And / + Or / - Subtract) and the extra Fallback levels are JSON lists kept in two hidden text controls (see buildRenderOrderWidgets()); parsed once per distinct string.
 const RO_VALID_MODES = new Set(RENDER_ORDER_MODE_OPTIONS.map((o) => o.value))
 const roA2A = {}
@@ -1035,12 +1035,41 @@ function roTermsOf(str) {
   roTermsCache.set(str, v)
   return v
 }
+// The fallbacks are ONE list (renderOrderExtraFallbacks, {"v":2,"items":[{m,q,t}]}), every entry deletable. The two former fixed rows (Fallback / Fallback 2, keys renderOrderFallback*, renderOrderFallback2*) are kept
+// only as hidden legacy storage: while the list is still in its old array form it is read as [legacy Fallback, legacy Fallback 2, ...the old extras], and normalizeRenderOrderFallbacks() (onRestore) rewrites it as v2.
+function roLegacyItems() {
+  return [['renderOrderFallback', 'renderOrderFallbackExcept', 'renderOrderFallbackTerms'], ['renderOrderFallback2', 'renderOrderFallback2Except', 'renderOrderFallback2Terms']].map((k) => ({
+    m: RO_VALID_MODES.has(cfg[k[0]]) ? cfg[k[0]] : 'farthestZ', q: RO_VALID_MODES.has(cfg[k[1]]) ? cfg[k[1]] : 'none', t: roTermsOf(cfg[k[2]]).map((x) => ({ op: x.op, m: x.m }))
+  }))
+}
+// Fresh, cleaned, independent copy of the fallback list stored in str (safe for a widget to mutate).
+function roExtraItemsFromStr(str) {
+  let raw
+  try {
+    const p = JSON.parse(str || '[]')
+    if (Array.isArray(p)) raw = roLegacyItems().concat(p)
+    else if (p && p.v === 2 && Array.isArray(p.items)) raw = p.items
+    else raw = roLegacyItems()
+  } catch (e) { raw = roLegacyItems() }
+  return raw.filter((t) => t && RO_VALID_MODES.has(t.m)).map((t) => ({ m: t.m, q: RO_VALID_MODES.has(t.q) ? t.q : 'none', t: roCleanTerms(t.t).map((x) => ({ op: x.op, m: x.m })) }))
+}
 function roParseExtra() {
   const str = cfg.renderOrderExtraFallbacks || '[]'
-  if (str === roExtraStr) return roExtraVal
-  roExtraStr = str; roExtraVal = []
-  try { const a = JSON.parse(str); if (Array.isArray(a)) roExtraVal = a.filter((t) => t && RO_VALID_MODES.has(t.m)).map((t) => ({ m: t.m, q: RO_VALID_MODES.has(t.q) ? t.q : 'none', t: roCleanTerms(t.t) })) } catch (e) { /* none */ }
+  const key = str.charAt(0) === '[' ? str + '|' + cfg.renderOrderFallback + '|' + cfg.renderOrderFallbackExcept + '|' + cfg.renderOrderFallbackTerms + '|' + cfg.renderOrderFallback2 + '|' + cfg.renderOrderFallback2Except + '|' + cfg.renderOrderFallback2Terms : str
+  if (key === roExtraStr) return roExtraVal
+  roExtraStr = key
+  roExtraVal = roExtraItemsFromStr(str)
   return roExtraVal
+}
+// Persists the list in v2 form (called after the settings restore, so the legacy rows' saved values are carried over and the next Save stores them).
+function normalizeRenderOrderFallbacks() {
+  let p = null
+  try { p = JSON.parse(cfg.renderOrderExtraFallbacks || '[]') } catch (e) { /* legacy */ }
+  if (p && !Array.isArray(p) && p.v === 2) return
+  const str = JSON.stringify({ v: 2, items: roExtraItemsFromStr(cfg.renderOrderExtraFallbacks) })
+  const row = document.querySelector('.dp-row[data-key="renderOrderExtraFallbacks"]')
+  const input = row && row.querySelector('.dp-text-input')
+  if (input) commitTextControl(input, str); else cfg.renderOrderExtraFallbacks = str
 }
 const roOptText = (mode) => { const o = RENDER_ORDER_MODE_OPTIONS.find((x) => x.value === mode); return o ? o.text : String(mode) }
 // Which condition the rule fired on for this pair, e.g. "Mode [Palm To Arm End]: Hand 12 palm center Z 4.21 is higher than Hand 13 arm end Z 3.90". Called right after cmpLevels(lo, hi) (it reads roPriority) with the same
@@ -1187,11 +1216,7 @@ function computeRenderOrderRanks() {
     const d = ev.k[a] - ev.k[b]
     return d > 0 ? 1 : d < 0 ? -1 : 0
   }
-  const lv = [
-    { m: evalComposite(cfg.renderOrderMode || 'z', roTermsOf(cfg.renderOrderModeTerms)), q: evalMode(cfg.renderOrderModeExcept) },
-    { m: evalComposite(cfg.renderOrderFallback || 'farthestZ', roTermsOf(cfg.renderOrderFallbackTerms)), q: evalMode(cfg.renderOrderFallbackExcept) },
-    { m: evalComposite(cfg.renderOrderFallback2 || 'farthestZ', roTermsOf(cfg.renderOrderFallback2Terms)), q: evalMode(cfg.renderOrderFallback2Except) }
-  ]
+  const lv = [{ m: evalComposite(cfg.renderOrderMode || 'z', roTermsOf(cfg.renderOrderModeTerms)), q: evalMode(cfg.renderOrderModeExcept) }]
   roParseExtra().forEach((e) => lv.push({ m: evalComposite(e.m, e.t), q: evalMode(e.q) }))
   // The three levels (each with its optional Except) as one pairwise decision: +1 = a above b, -1 = b above a, 0 = every level ties.
   // roPriority (set as a side effect) = how strong the deciding rule is: 2 * level, +1 when it was a Palm To Arm 'both palms higher' tie-break by arm distance. Lower = stronger.
@@ -1378,18 +1403,18 @@ function buildRenderOrderWidgets() {
   const mkExtras = (key) => {
     const p = prep(key)
     if (!p) return
-    let items = readJson(p.input), lastSeen = p.input.value
+    let items = roExtraItemsFromStr(p.input.value), lastSeen = p.input.value
     const wrap = elLocal('div', { flex: '1', padding: '2px 0' })
     const bar = elLocal('div', { display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '4px' })
     const list = elLocal('div', { display: 'flex', flexDirection: 'column', gap: '8px' })
     wrap.appendChild(bar); wrap.appendChild(list); p.row.appendChild(wrap)
-    const write = () => { lastSeen = JSON.stringify(items); commitTextControl(p.input, lastSeen) }
+    const write = () => { lastSeen = JSON.stringify({ v: 2, items }); commitTextControl(p.input, lastSeen) }
     const redraw = () => {
       list.textContent = ''
       items.forEach((it, idx) => {
         const block = elLocal('div', { display: 'flex', flexDirection: 'column', gap: '4px' })
         const r = elLocal('div', { display: 'flex', gap: '6px', alignItems: 'center' })
-        r.appendChild(elLocal('span', { flex: '0 0 auto', minWidth: '62px', opacity: '.8', fontSize: '.85em' }, { text: 'Fallback ' + (idx + 3) }))
+        r.appendChild(elLocal('span', { flex: '0 0 auto', minWidth: '62px', opacity: '.8', fontSize: '.85em' }, { text: 'Fallback ' + (idx + 1) }))
         const sel = document.createElement('select'); fillSel(sel, it.m, true)
         sel.addEventListener('change', () => { items[idx].m = sel.value; write() })
         r.appendChild(sel)
@@ -1409,15 +1434,18 @@ function buildRenderOrderWidgets() {
     }
     bar.appendChild(mkBtn('+ Add Fallback', () => { items.push({ m: 'farthestZ', q: 'none', t: [] }); redraw(); write() }))
     redraw()
-    armLengthWidgetResyncs.push(() => { if (p.input.value === lastSeen) return; lastSeen = p.input.value; items = readJson(p.input); redraw() })
+    armLengthWidgetResyncs.push(() => { if (p.input.value === lastSeen) return; lastSeen = p.input.value; items = roExtraItemsFromStr(p.input.value); redraw() })
   }
   mkTerms('renderOrderModeTerms')
-  mkTerms('renderOrderFallbackTerms')
-  mkTerms('renderOrderFallback2Terms')
   mkExtras('renderOrderExtraFallbacks')
+  // The two former fixed fallbacks live on as hidden legacy storage (see roLegacyItems()).
+  ;['renderOrderFallback', 'renderOrderFallbackExcept', 'renderOrderFallbackTerms', 'renderOrderFallback2', 'renderOrderFallback2Except', 'renderOrderFallback2Terms'].forEach((k) => {
+    const row = document.querySelector('.dp-row[data-key="' + k + '"]')
+    if (row) row.style.display = 'none'
+  })
 }
 function mergeExceptSelects() {
-  [['renderOrderMode', 'renderOrderModeExcept'], ['renderOrderFallback', 'renderOrderFallbackExcept'], ['renderOrderFallback2', 'renderOrderFallback2Except']].forEach(([a, b]) => {
+  [['renderOrderMode', 'renderOrderModeExcept']].forEach(([a, b]) => {
     const rowA = document.querySelector('.dp-row[data-key="' + a + '"]'), rowB = document.querySelector('.dp-row[data-key="' + b + '"]')
     if (!rowA || !rowB) return
     const selA = rowA.querySelector('select'), selB = rowB.querySelector('select')
@@ -2921,6 +2949,7 @@ const cfg = initDevPanel(DEV_GROUPS, {
     logStartupTiming('onRestore fired -> startupSettingsReady = true')
     // A saved panel order that predates the Render Order group puts its rows straight back into Field Layout when it is applied; re-nest them (idempotent, only moves the listed keys).
     try { renestRenderOrderRows() } catch (e) { /* panel not built */ }
+    try { normalizeRenderOrderFallbacks() } catch (e) { /* not ready */ }
     // Each step timed when ?debugTiming=1 (see devPanel.js dpTime()).
     const prof = (label, fn) => {
       if (!DEBUG_TIMING) { fn(); return }

@@ -17324,6 +17324,12 @@ Direct request: "the +ADD, +OR, +SUBTRACT is per render order mode, so fallbacks
 
 Direct request: "for the pair modes, arm base to arm end, palm to arm end, etc, also add the - versions". New modes -Palm To Arm Base, -Palm To Arm End, -Arm Base To Palm Center, -Arm End To Palm Center, -Arm Base To Arm End, -Arm End To Arm Base (RO_PAIR_NEG): the same pair test (the hand closer to the cursor is the former; its first-named point is compared with the other hand's second-named point) with the verdict reversed, so the LOWER former point puts the former hand on top. main.js ?v=371 -> ?v=372.
 
+2026-10-11  -  (Fallback and Fallback 2 are ordinary, deletable fallbacks)
+
+Direct request: "for the existing 2 fallbacks, treat them the same as a regular added fallback, so i can delete them".
+ - There is now ONE fallback list, renderOrderExtraFallbacks, stored as {"v":2,"items":[{m,q,t}]}; every entry (mode, Except, its own + And / + Or / - Subtract terms) can be removed with its x. Entries are numbered Fallback 1, 2, 3 ... in order; the Mode level is level 0. computeRenderOrderRanks() builds lv = [Mode, ...list].
+ - Migration: the old fixed rows (renderOrderFallback / FallbackExcept / FallbackTerms, renderOrderFallback2 / ...) are kept only as HIDDEN legacy storage. While the list is still in its old array form it is read as [legacy Fallback, legacy Fallback 2, ...the old extras] (roLegacyItems()), so nothing changes visibly; normalizeRenderOrderFallbacks() (onRestore) rewrites it as v2 and the next Save stores it. A fresh visitor with nothing saved gets the old defaults as two editable entries (Farthest From Cursor (XYZ), no Except). Deleting every fallback leaves only the Mode level (ties keep the previous order). `main.js` `?v=372` -> `?v=373`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a
