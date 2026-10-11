@@ -17094,6 +17094,12 @@ The mode picks which Z feeds the existing "closest to the camera wins, cursor di
 Rig checked live (23 bones): rForearmBend -> rForearmTwist -> rHand -> rCarpal1-4 / rThumb1; rCarpal2 -> rMid1. The bone Z is the bone's matrixWorld from the previous render (at most one frame old); a missing bone falls back to the field Z.
 While Global Pause is on, render order is not recomputed (updateRenderOrder is paused), so a mode change shows after un-pausing. `main.js` `?v=341` -> `?v=342`.
 
+2026-10-11  -  (Render Order Mode: Closest To Cursor / Farthest From Cursor)
+
+Direct request: modes 4 and 5. "Closest To Cursor" draws the hand nearest the cursor on top; "Farthest From Cursor" is the opposite (the hand furthest from the cursor on top, which is the original pre-Z cursor-distance behaviour).
+Both ignore Z: the order is the cursor distance alone (hand.effectiveRenderOrder = 3D distance to the cursor target, with the existing overlap smoothing): Farthest = distance, Closest = 99999 - distance.
+The Z-based modes (Z Position / Arm Base / Arm End / Palm Center) are unchanged and still use the cursor distance only as a tie-break. `main.js` `?v=342` -> `?v=343`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a
