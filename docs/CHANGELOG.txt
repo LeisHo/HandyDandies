@@ -17110,6 +17110,15 @@ Direct requests: (6/7) "same as 4 and 5 but also uses the Z axis position", and 
    mapped to 0..99999 (0.05 world-unit steps over -2000..+2000, clamped), so two hands that tie on the mode's own value are ordered by the fallback. Z modes: closer to the camera on top; closest = nearest on top; farthest = furthest on top.
  `main.js` `?v=343` -> `?v=344`.
 
+2026-10-11  -  (FIX: Render Order Mode / Fallback dropdowns were empty)
+
+Direct report: "i tested hand render order dropdowns and the dropdowns are empty". Cause (mine, v=342-344): devPanel.js builds a select's options by calling ctrl.options() inside a try/catch, so a plain ARRAY (what I passed) threw and was silently
+treated as empty; the same engine also uses the stored value as the label and only fills a select when the host calls refreshSelectOptions(). My live check even printed "options: []" and I missed it. Fixes:
+ - devPanel.js normalizeOptions(): options may be a function OR a plain array, and an option may carry a label ({ value, text }); fillSelectOptions() shows text (falls back to the value). Existing function-style selects are unaffected. (A latent side effect:
+   the Quality Preset select, which also used a plain array, can now fill too.)
+ - main.js: both controls pass `options: () => RENDER_ORDER_MODE_OPTIONS` and are refreshed with safeRefreshSelectOptions() at startup like every other select.
+ `devPanel.js` `?v=63` -> `?v=64`, `main.js` `?v=344` -> `?v=345`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

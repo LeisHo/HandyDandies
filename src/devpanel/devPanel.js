@@ -714,18 +714,22 @@ function renderListPickerRows(entry) {
 // every future caller remembers to.
 function normalizeOptions(ctrl) {
   let raw = []
-  try { raw = (ctrl.options ? ctrl.options() : []) || [] } catch (err) { raw = [] }
+  // options may be a function (the usual form) or a plain array; an option is a string, or { value, text?, group? } -- text is the label shown (defaults to the value). A plain array used to be silently
+  // treated as empty (ctrl.options() threw on it and the catch swallowed it), leaving the dropdown empty (2026-10-11).
+  try { raw = (typeof ctrl.options === 'function' ? ctrl.options() : ctrl.options) || [] } catch (err) { raw = [] }
   const values = []
   const groupOf = new Map()
+  const textOf = new Map()
   raw.forEach((opt) => {
     if (opt && typeof opt === 'object') {
       values.push(opt.value)
+      if (opt.text !== undefined) textOf.set(opt.value, opt.text)
       if (opt.group) groupOf.set(opt.value, opt.group)
     } else {
       values.push(opt)
     }
   })
-  return { values, groupOf }
+  return { values, groupOf, textOf }
 }
 function fillSelectOptions(ctrl, select, preferredValue) {
   // `ctrl.options()` can be called from `displayValue()` during the
@@ -735,7 +739,7 @@ function fillSelectOptions(ctrl, select, preferredValue) {
   // options yet" rather than letting it propagate -- the host's own
   // later explicit `refreshSelectOptions()` call re-populates for real
   // once its own init has genuinely finished.
-  const { values, groupOf } = normalizeOptions(ctrl)
+  const { values, groupOf, textOf } = normalizeOptions(ctrl)
   select.innerHTML = ''
   // Grouped values render under a labeled <optgroup> -- a native <select>
   // has no interactive/collapsible grouping the way the list-picker's own
@@ -756,7 +760,7 @@ function fillSelectOptions(ctrl, select, preferredValue) {
       }
       parent = groupEls.get(group)
     }
-    parent.appendChild(el('option', null, { value: opt, textContent: opt }))
+    parent.appendChild(el('option', null, { value: opt, textContent: textOf.has(opt) ? textOf.get(opt) : opt }))
   })
   const next = values.includes(preferredValue) ? preferredValue : (values[0] || '')
   select.value = next

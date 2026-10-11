@@ -8,7 +8,7 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js'
 import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js'
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js'
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js'
-import { initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab, beginDynamicBatch, endDynamicBatch } from './devpanel/devPanel.js?v=63'
+import { initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab, beginDynamicBatch, endDynamicBatch } from './devpanel/devPanel.js?v=64'
 
 // A defensive wrapper around devPanel.js's own refreshSelectOptions() --
 // found via live testing (direct user report: "I dont see any of the
@@ -950,9 +950,9 @@ const DEV_GROUPS = [
     // needed to support this, just the `perDevice: true` flag per control.
     controls: [
       // Render Order Mode (2026-10-11, direct request): which point's Z decides which hand draws on top (closest to the camera wins; cursor distance only breaks ties). See renderOrderPriority().
-      { key: 'renderOrderMode', label: 'Render Order Mode', type: 'select', def: 'z', options: RENDER_ORDER_MODE_OPTIONS },
+      { key: 'renderOrderMode', label: 'Render Order Mode', type: 'select', def: 'z', options: () => RENDER_ORDER_MODE_OPTIONS },
       // Fallback: used when two hands tie on the Render Order Mode's own value (same Z to 0.01 world units, or the same distance). Default = the original behaviour (the hand furthest from the cursor on top).
-      { key: 'renderOrderFallback', label: 'Render Order Fallback', type: 'select', def: 'farthestZ', options: RENDER_ORDER_MODE_OPTIONS },
+      { key: 'renderOrderFallback', label: 'Render Order Fallback', type: 'select', def: 'farthestZ', options: () => RENDER_ORDER_MODE_OPTIONS },
       { key: 'fieldRows', label: 'Rows (Count)', type: 'slider', min: 1, max: 40, step: 1, def: 15, perDevice: true, onChange: () => rebuildField() },
       { key: 'fieldCols', label: 'Columns (Count)', type: 'slider', min: 1, max: 40, step: 1, def: 17, perDevice: true, onChange: () => rebuildField() },
       { key: 'rowSpacing', label: 'Row Spacing (World Units)', type: 'slider', min: 2, max: 40, step: 0.5, def: 9.5, perDevice: true, onChange: () => relayoutField() },
@@ -14573,6 +14573,8 @@ updateLoadingPreviewSequenceVisibility()
 // for a cause not fully root-caused (isolated to this exact key --
 // 'chpTargetPose' succeeds every time, 'rchpTargetPose' throws every
 // time, even called alone) -- this must never take down the whole page.
+safeRefreshSelectOptions('renderOrderMode')
+safeRefreshSelectOptions('renderOrderFallback')
 safeRefreshSelectOptions('chpTargetPose')
 safeRefreshSelectOptions('rchpTargetPose')
 safeRefreshSelectOptions('clickTargetPose')
