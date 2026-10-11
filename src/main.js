@@ -561,6 +561,10 @@ let fieldBuildDirty = false
 let startupValuesApplied = false // static cfg values restored (custom functions may still be building)
 let startupCacheSnapshot = null
 let fieldStarted = false
+const _identityQuatTrack = new THREE.Quaternion()
+// The loading screen (text + preview hand + blocker) stays up until the field has actually PAINTED, not just until it was built (2026-10-11): fieldStarted flips when the min-time gate passes,
+// fieldRevealed flips a couple of rendered frames later. See finalizeReveal().
+let fieldRevealed = false, fieldRevealFrames = 0, fieldWarmCompiled = false
 // Loading Preview's own "Min Loading Time" (direct request) -- captured
 // here, at the earliest point this module runs, so the min-time window
 // starts from the true page-load moment, not from whenever tryStartField()
@@ -658,7 +662,7 @@ const STARTUP_PREVIEW_RELEVANT = /^(loadingPreview|bgColor$|savedPoses$|savedTwe
 // session orbited the preview, which forced a pointless mid-animation rebuild.
 const STARTUP_PREVIEW_DERIVED = new Set(['loadingPreviewRotationX', 'loadingPreviewRotationY', 'loadingPreviewOffsetX', 'loadingPreviewOffsetY', 'loadingPreviewOffsetZ', 'loadingPreviewCameraZoom', 'loadingPreviewCameraFov', 'loadingPreviewCameraRoll'])
 function refreshStartupPreviewAfterRestore() {
-  if (!startupPreviewBuilt || fieldStarted || !startupCacheSnapshot) return
+  if (!startupPreviewBuilt || fieldRevealed || !startupCacheSnapshot) return
   const changed = Object.keys(cfg).filter((k) => (STARTUP_PREVIEW_RELEVANT.test(k) || POSE_PRESET_KEYS.includes(k)) && !STARTUP_PREVIEW_DERIVED.has(k) && k in startupCacheSnapshot && JSON.stringify(cfg[k]) !== JSON.stringify(startupCacheSnapshot[k]))
   if (changed.length === 0) { logLoadingPreview('restore finished -- startup cache matched, preview kept'); return }
   logLoadingPreview(`restore finished -- ${changed.length} preview value(s) differ from the cache (${changed.slice(0, 4).join(', ')}${changed.length > 4 ? ', ...' : ''}) -- rebuilding`)
@@ -692,6 +696,9 @@ function tryStartField() {
   // block at the reveal (2026-10-04). The reveal below waits for it to finish.
   startFieldBuild()
   if (!fieldBuildDone) return
+  // Compile the field's shader programs NOW, behind the loading screen, while the min-time wait runs, instead of inside the reveal itself (2026-10-11): with thousands of per-hand materials
+  // that compile is a long synchronous block, and doing it at the reveal froze the loading hand and then showed an empty screen until the field's first frames came out.
+  if (!fieldWarmCompiled) { fieldWarmCompiled = true; try { renderer.compile(scene, camera) } catch (err) { /* the reveal compiles again */ } }
   if (cfg.loadingPreviewEnabled) {
     const minMs = Math.max(0, cfg.loadingMinTimeMs || 0)
     const elapsed = performance.now() - pageLoadStartMs
@@ -732,7 +739,6 @@ function tryStartField() {
     }
   }
   fieldStarted = true
-  syncLoadingPreviewBackground() // drops the loading-screen blocker
   logStartupTiming('fieldStarted = true')
   logLoadingPreview(`field starting -- loading screen hides; preview ${cfg.loadingPreviewShowLive ? 'stays visible (Show Loading Preview is on)' : 'is hidden'}`)
   // (the field itself was built in slices earlier -- see rebuildFieldChunked())
@@ -776,8 +782,16 @@ function tryStartField() {
   // open -- see the next investigation entry in CHANGELOG.txt for
   // whatever comes next; don't treat this comment's own reasoning above
   // as the settled explanation.
-  renderer.compile(scene, camera)
+  if (!fieldWarmCompiled) renderer.compile(scene, camera)
   window.__debug = { stackOnDefault, applyCameraOrientation, syncCameraPanelFromLive, curveByDomain, get domains() { return { xyAll: [xyAllMinDist, xyAllDistRange], splayAll: [splayAllMin, splayAllRange], cropAll: [cropAllMin, cropAllRange], restAll: [restAllMinDist, restAllDistRange], live: [liveFieldMinDist, liveFieldDistRange], splay: [splayFieldMin, splayFieldRange], crop: [cropFieldMin, cropFieldRange], xy: [xyFieldMinDist, xyFieldDistRange], rest: [restFieldMinDist, restFieldDistRange] } }, modelBaseFrameQ, computeBaseRotationQuat, cloneBaseRb, makeClipRig, updateClipRigPlanes, setClipRigT, updateOnScreenFlags, evaluateArmLengthCurve, THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose, resolveTweenSegmentsWithAnchor, lerpTweenSegments, lerpLoopSegments, isHoldEntry, updateLoadingPreviewWristClip, lerpPoseValues, get loadingPreviewRenderer() { return loadingPreviewRenderer }, get loadingPreviewScene() { return loadingPreviewScene }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, get handBoundsCenterLocal() { return handBoundsCenterLocal }, multiPointCommit, multiPointEligibleFunctions, get multiPointActiveTouchCount() { return multiPointActiveTouchCount }, get multiPointSessionFiredPoseId() { return multiPointSessionFiredPoseId }, detectPoseJumps, get poseJumpLogEntries() { return poseJumpLogEntries }, applyCurlToSkeletonReference, handLogTriggerLabel, applyAllFingerCurls, syncCameraPanelFromLive, animSpeedMs, chainSequenceCount, applyFieldBounds, cursorDistXY, hexBrightnessPct, toonThresholdForMidBrightness }
+  // Do NOT hide the loading screen yet: the hands exist but may not have been painted. finalizeReveal() hides it once the field has rendered a couple of frames (or after a 4 s safety net).
+  setTimeout(finalizeReveal, 4000)
+}
+function finalizeReveal() {
+  if (fieldRevealed) return
+  fieldRevealed = true
+  logStartupTiming('reveal finalized (field painted)')
+  syncLoadingPreviewBackground() // drops the loading-screen blocker
   loadingEl.classList.add('hidden')
   // The loading-preview canvas is a top-level sibling of #loading now
   // (2026-09-17, decoupled specifically so this moment doesn't force it
@@ -5669,7 +5683,7 @@ function buildLoadingPreview(bypassEnabledGate) {
   // Only while the loading screen is up: once the field is running, the live
   // preview stays transparent so it does not paint an opaque square over the
   // hands (the field behind it already has this same background colour).
-  loadingPreviewScene.background = fieldStarted ? null : new THREE.Color(cfg.bgColor)
+  loadingPreviewScene.background = fieldRevealed ? null : new THREE.Color(cfg.bgColor)
   loadingPreviewCamera = new THREE.PerspectiveCamera(35, 1, 0.1, 2000)
   loadingPreviewRenderer = new THREE.WebGLRenderer({ canvas: loadingPreviewCanvas, antialias: true, alpha: true })
   // CORRECTED 2026-09-19, direct report ("Loading Preview doesnt work
@@ -6209,7 +6223,7 @@ function startLoadingPreviewLiveLoop() {
 // setting. Called from bgColor's onChange, which can fire during startup
 // restore before `loadingPreviewScene` has been initialised -- hence the try.
 function syncLoadingPreviewBackground() {
-  try { if (loadingPreviewScene) loadingPreviewScene.background = fieldStarted ? null : new THREE.Color(cfg.bgColor) } catch (err) { /* not built yet */ }
+  try { if (loadingPreviewScene) loadingPreviewScene.background = fieldRevealed ? null : new THREE.Color(cfg.bgColor) } catch (err) { /* not built yet */ }
   // Loading-screen blocker (2026-10-06, direct request: "the background floor object to block the hand field is too
   // small. scale it up 2"). The preview canvas is a square of Loading Preview Size px with an opaque background; a
   // box-shadow spread of half that size in the same colour makes the opaque area twice as wide and tall without
@@ -6218,7 +6232,7 @@ function syncLoadingPreviewBackground() {
   try {
     if (loadingPreviewCanvas) {
       const size = Math.max(20, cfg.loadingPreviewSize || 160)
-      loadingPreviewCanvas.style.boxShadow = fieldStarted ? 'none' : `0 0 0 ${Math.round(size / 2)}px ${cfg.bgColor}`
+      loadingPreviewCanvas.style.boxShadow = fieldRevealed ? 'none' : `0 0 0 ${Math.round(size / 2)}px ${cfg.bgColor}`
     }
   } catch (err) { /* not built yet */ }
 }
@@ -6229,7 +6243,7 @@ function setLoadingPreviewLiveVisible(show) {
     // to hide the preview for ~3 s mid-loading until the post-restore rebuild showed it
     // again (2026-10-04, read off the Loading Preview Log). tryStartField() hides it at
     // the reveal when the checkbox is off.
-    if (!fieldStarted && startupPreviewBuilt) {
+    if (!fieldRevealed && startupPreviewBuilt) {
       logLoadingPreview('Show Loading Preview: OFF ignored -- the loading-screen preview stays up until the field is revealed')
       return
     }
@@ -6246,7 +6260,7 @@ function setLoadingPreviewLiveVisible(show) {
   // Pre-fieldStarted, the main animate() loop's own existing branch is
   // already animating this renderer every frame -- only start the
   // separate loop once that branch has permanently stopped.
-  if (fieldStarted) startLoadingPreviewLiveLoop()
+  if (fieldRevealed) startLoadingPreviewLiveLoop()
 }
 // Applies a Lighting preset's own values to the loading preview's own
 // cloned key/hemi lights -- a bespoke version of the main scene's
@@ -15793,7 +15807,9 @@ function animate(dt, now) {
           // the way one big slerp from a fixed reference does -- many
           // small continuous steps accumulate past 180/360 deg exactly
           // like a real arm continuing to turn, with no cap at all.
-          let desired = hand.currentBaseQuat
+          // The WRAPPER's no-cursor-influence orientation is identity: the default pose's own rotation (alignQuat * Whole-Hand * Rotation at Base = currentBaseQuat) already lives on hand.clone,
+          // so using currentBaseQuat here applied it a second time whenever Arm Rotation was off or a hand's responsiveness was 0 (2026-10-11, direct report: tracking didn't respect the default rotation).
+          let desired = _identityQuatTrack
           if (cfg.armRotationEnabled) {
             // Default Arm Rotation / Reactive Arm Rotation curve -- same
             // role as before, now scaling the PER-FRAME TURN RATE instead
@@ -15827,7 +15843,7 @@ function animate(dt, now) {
             // or more. Seed it at the orientation it converges to instead. A hand whose
             // responsiveness is exactly 0 never moves toward the cursor, so it keeps the
             // base orientation (unchanged behaviour).
-            if (!hand.currentArmRotationQuat) hand.currentArmRotationQuat = (responsiveness > 0 ? lookAtDesired : hand.currentBaseQuat).clone()
+            if (!hand.currentArmRotationQuat) hand.currentArmRotationQuat = (responsiveness > 0 ? lookAtDesired : _identityQuatTrack).clone()
             const armRotationDampingAmt = inHandoffSettle
               ? Math.min(THREE.MathUtils.clamp(cfg.armRotationDamping ?? 1, 0.001, 1), HANDOFF_SETTLE_DAMPING_CAP)
               : THREE.MathUtils.clamp(cfg.armRotationDamping ?? 1, 0.001, 1)
@@ -15948,6 +15964,7 @@ function animate(dt, now) {
       composer.render()
       __frameProfiler.composerRenderMs += performance.now() - __renderStart
       __frameProfiler.frames++
+      if (fieldStarted && !fieldRevealed && ++fieldRevealFrames >= 2) finalizeReveal() // two painted field frames, then the loading screen goes
     }
     // Covers everything from the true top of animate() through the
     // frame-profile block itself -- NOT the trailing Pose Preview render
@@ -16003,7 +16020,7 @@ function animate(dt, now) {
     // try/catch, separate from this function's outer one, so a bug in this
     // narrow, brand-new code path can never take down the main field's own
     // per-frame loop with it.
-    if (!fieldStarted && loadingPreviewRenderer) {
+    if (!fieldRevealed && loadingPreviewRenderer) {
       try {
         updateLoadingPreviewAnimation()
         syncLoadingPreviewCameraFromOrbit()

@@ -17032,6 +17032,21 @@ position's own x rotation".
    nothing. Applies to Single Pose targets, Sequence / Chain steps and Skip If Same Pose on field hands. The Default pose itself triggered as a target therefore adds its own rotation again (84 + 84); say if
    that case should be special. `main.js` `?v=334` -> `?v=335`.
 
+2026-10-11  -  (loading screen held until the field has painted; cursor tracking no longer doubles the default rotation)
+
+Direct reports: (1) "even after the min loading time, the loading hand animation dissappears, i see an empty screen for a couple seconds, then the hand field appears ... the hand field should appear
+immediatly"; (2) "make sure cursor tracking also respects the new default poses' rotation settings. doesnt seem that way"; (3) "for rotate arm at base, i dont believe the cropping block is rotating with it".
+ - Loading reveal: fieldStarted used to hide #loading and the preview in the same synchronous block as the field's first render preparation (renderer.compile over every per-hand material, buildPosePreview), so
+   the loading hand froze/vanished before the field had painted. Now: renderer.compile runs as soon as the field is built (behind the loading screen, during the min-time wait); fieldStarted only starts the field;
+   the loading text, preview hand and blocker stay until finalizeReveal(), which runs after two painted field frames (or a 4 s safety net). NOT reproducible in the sandbox (field started at 9388 ms, longest
+   long task ~295 ms), so this is the fix for the identified cause, not a measured before/after; please confirm on your device.
+ - Cursor tracking: hand.clone carries the default pose's rotation (currentBaseQuat = alignQuat * Whole-Hand * Rotation at Base). The WRAPPER's no-cursor-influence orientation was also set to currentBaseQuat
+   (Arm Rotation off, or a hand with 0 responsiveness / the seed), applying the default rotation twice. It is now identity. With Arm Rotation on, the wrapper is the look-at orientation and the clone's default
+   rotation composes on top of it, which was already correct.
+ - Crop block vs rotation: checked on the deployed page with the real skinned mesh: clipped-vertex set at rest = 5479; after rotating the clone (two different rotations), rotating the wrapper and shifting the
+   clone position the set is identical (0 differing vertices); the block is a descendant of the clone. An earlier 1139-vs-5479 difference was a stale-skeleton artifact of the probe, not the app. No code change.
+ `main.js` `?v=335` -> `?v=337`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a
