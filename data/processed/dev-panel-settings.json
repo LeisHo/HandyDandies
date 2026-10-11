@@ -6706,10 +6706,10 @@
       "preventReorderFlash": false,
       "logCursorPositionEnabled": false,
       "cursorLogIntervalMs": 1000,
-      "handNumbersEnabled": true,
+      "handNumbersEnabled": false,
       "handNumbersColor": "#00ff04",
-      "logHandBehaviourEnabled": true,
-      "logHandBehaviourDetailedEnabled": true,
+      "logHandBehaviourEnabled": false,
+      "logHandBehaviourDetailedEnabled": false,
       "logFrameRateDropsEnabled": false,
       "frameRateDropThresholdFps": 10,
       "logFrameProfileEnabled": false,
@@ -15529,10 +15529,10 @@
       "preventReorderFlash": false,
       "logCursorPositionEnabled": false,
       "cursorLogIntervalMs": 1000,
-      "handNumbersEnabled": true,
+      "handNumbersEnabled": false,
       "handNumbersColor": "#00ff04",
-      "logHandBehaviourEnabled": true,
-      "logHandBehaviourDetailedEnabled": true,
+      "logHandBehaviourEnabled": false,
+      "logHandBehaviourDetailedEnabled": false,
       "logFrameRateDropsEnabled": false,
       "frameRateDropThresholdFps": 10,
       "logFrameProfileEnabled": false,
@@ -24352,10 +24352,10 @@
       "preventReorderFlash": false,
       "logCursorPositionEnabled": false,
       "cursorLogIntervalMs": 1000,
-      "handNumbersEnabled": true,
+      "handNumbersEnabled": false,
       "handNumbersColor": "#00ff04",
-      "logHandBehaviourEnabled": true,
-      "logHandBehaviourDetailedEnabled": true,
+      "logHandBehaviourEnabled": false,
+      "logHandBehaviourDetailedEnabled": false,
       "logFrameRateDropsEnabled": false,
       "frameRateDropThresholdFps": 10,
       "logFrameProfileEnabled": false,
@@ -27580,7 +27580,7 @@
     },
     {
       "key": "Debug",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -29376,7 +29376,7 @@
           "type": "group",
           "group": {
             "key": "Cursor Tracking",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -30678,7 +30678,7 @@
         },
         {
           "key": "Cursor Tracking",
-          "collapsed": false,
+          "collapsed": true,
           "locked": true,
           "items": [
             {
