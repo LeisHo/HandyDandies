@@ -9385,7 +9385,7 @@
       "palmRotationVisibleOnly": true,
       "palmRotationUseDepth": true,
       "palmRotationTargetDepth": 5.6,
-      "palmFaceRotationOffset": 0,
+      "palmFaceRotationOffset": 180,
       "palmFacesCursorDistanceCurveEnabled": true,
       "palmFacesCursorDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0.803125}]",
       "palmFacesCursorDistanceRange": "{\"min\":1,\"max\":100}",
@@ -30031,14 +30031,14 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
           "type": "group",
           "group": {
             "key": "Field Layout",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -31003,7 +31003,7 @@
           "type": "group",
           "group": {
             "key": "Cursor Tracking",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -31510,7 +31510,7 @@
       "subgroups": [
         {
           "key": "Field Layout",
-          "collapsed": false,
+          "collapsed": true,
           "locked": true,
           "items": [
             {
@@ -32463,7 +32463,7 @@
         },
         {
           "key": "Cursor Tracking",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
@@ -198391,8 +198391,8 @@
     "mobile": {
       "left": 20,
       "top": 0,
-      "width": 385.5357360839844,
-      "height": 678.625
+      "width": 377.8571472167969,
+      "height": 35.52381134033203
     }
   }
 }
