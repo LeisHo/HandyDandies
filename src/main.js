@@ -1041,7 +1041,7 @@ function roFinishFrame(n, np, cmpLevels, logOn, lockOn, lv) {
       logged++
       const r = cmpLevels(lo, hi)
       const why = roExplain(lv, r, lo, hi, now)
-      const lk = roLocks.get(lo * n + hi)
+      const lk = lockOn ? roLocks.get(lo * n + hi) : undefined
       appendRenderReorderLogLine(stamp + ' -- Hand ' + (lo + 1) + ' now ' + (now ? 'above' : 'below') + ' Hand ' + (hi + 1) + ' (was ' + (was ? 'above' : 'below') + '), decided by ' + why + (lk ? ', WHILE a flip lock was active (seq ' + lk.sa + '/' + lk.sb + ')' : ', flip used (locked until either hand starts a new trigger/retransition)'))
     }
     if (total > logged) appendRenderReorderLogLine(stamp + ' -- +' + (total - logged) + ' more crossings this frame')
