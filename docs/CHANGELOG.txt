@@ -17152,6 +17152,16 @@ degrees slider just allows me to globally shift the palm rotation to fine tune."
    The arm range is new (armRotationRangePct, default 0..100), so existing arm curves behave as 100% at y=1 and scale down as y falls. Re-set the Palm Min / Max % if you want something other than the full 0..100 range.
  `main.js` `?v=347` -> `?v=348`.
 
+2026-10-11  -  (FIX: the Min / Max Palm Rotation row "went missing" after the % change)
+
+Direct report: "the min max slider for palm rotation Palm Rotation Distance Curve is gone. bring it back". Cause (mine, v=348): I gave the percent range a NEW control key (palmFacesCursorDistanceRangePct). The saved layout lists controls by key, so it did not know the new one and the row was
+put at the end of its original group (Cursor Tracking), outside the "Responsive Palm Rotation" subgroup it had lived in. Checked live: the row existed ("Min / Max Palm Rotation (%)") but sat in group "Cursor Tracking". The same happened to the new Min / Max Arm Rotation (%) row.
+ - Palm: the control is back under its ORIGINAL key (palmFacesCursorDistanceRange), so your saved layout places it where it was (between the curve On/Off and the curve). Still percent (label "Min / Max Palm Rotation (%)"). Because the saved value was in degrees
+   (yours was 0..180, earlier -35..180), parseCursorTrackingConfig() treats any value outside 0..100 as legacy degrees and resets it to {"min":0,"max":100} (and updates the row); a value already within 0..100 is read as percent.
+ - Arm: devPanel.js applyOrder() gained a generic rule: a control may declare `placeAfter: '<sibling key>'`; if its key is nowhere in the saved layout it is moved right after that sibling wherever the sibling ended up. Min / Max Arm Rotation (%) declares placeAfter
+   'armRotationCurve', so it appears in "Responsive Arm Rotation" after the distance curve. (Not applied to rows already in the saved layout: Arm Rotation X / Y (Deg) were saved at the bottom of Cursor Tracking, drag them into Responsive Arm Rotation once and Save.)
+ `devPanel.js` `?v=64` -> `?v=65`, `main.js` `?v=348` -> `?v=349`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

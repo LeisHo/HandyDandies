@@ -8,7 +8,7 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js'
 import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js'
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js'
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js'
-import { initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab, beginDynamicBatch, endDynamicBatch } from './devpanel/devPanel.js?v=64'
+import { initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab, beginDynamicBatch, endDynamicBatch } from './devpanel/devPanel.js?v=65'
 
 // A defensive wrapper around devPanel.js's own refreshSelectOptions() --
 // found via live testing (direct user report: "I dont see any of the
@@ -1108,7 +1108,7 @@ const DEV_GROUPS = [
       { key: 'armRotationCurveEnabled', label: 'Reactive Arm Rotation (By Cursor Distance)', type: 'checkbox', def: false, onChange: () => updateArmRotationGateVisibility() },
       { key: 'armRotationCurve', label: 'Arm Rotation Distance Curve (Distance -> Rotation Amount)', type: 'text', def: '[{"x":0,"y":1},{"x":1,"y":1}]', onChange: () => parseCursorTrackingConfig() },
       // Percent of the full 'face the cursor' swing (2026-10-11, direct request): the curve's 0..1 height picks a value between Min % and Max %; 0 = the arm does not rotate, 100 = it turns fully to face the cursor.
-      { key: 'armRotationRangePct', label: 'Min / Max Arm Rotation (%)', type: 'text', def: '{"min":0,"max":100}', onChange: () => parseCursorTrackingConfig() },
+      { key: 'armRotationRangePct', label: 'Min / Max Arm Rotation (%)', type: 'text', placeAfter: 'armRotationCurve', def: '{"min":0,"max":100}', onChange: () => parseCursorTrackingConfig() },
       // REMOVED 2026-09-28: Min / Max Arm Rotation (Deg) (`armRotationRange`)
       // -- direct report ("when the hand arm rotation reaches its own
       // limit threshold, be it 180 or 360, it ends up spinning 360 in the
@@ -1160,9 +1160,9 @@ const DEV_GROUPS = [
       // applied (per direct precedent: Arm Length/Responsive Wrist Splay).
       { key: 'palmFacesCursorDistanceCurveEnabled', label: 'Palm Rotation Distance Curve On/Off', type: 'checkbox', def: false, onChange: () => updateCursorTrackingGateVisibility() },
       { key: 'palmFacesCursorDistanceCurve', label: 'Palm Rotation Distance Curve (Distance -> Responsiveness)', type: 'text', def: '[{"x":0,"y":1},{"x":1,"y":1}]', onChange: () => parseCursorTrackingConfig() },
-      // Percent of the full 'face the cursor' rotation (2026-10-11, direct request): was 'Min / Max Palm Rotation (Deg)' under the key palmFacesCursorDistanceRange. A NEW key on purpose: the old saved value was in degrees
-      // (e.g. -35..180) and would read as -35%..180%. The old key's saved value is simply no longer read.
-      { key: 'palmFacesCursorDistanceRangePct', label: 'Min / Max Palm Rotation (%)', type: 'text', def: '{"min":0,"max":100}', onChange: () => parseCursorTrackingConfig() }
+      // Percent of the full 'face the cursor' rotation (2026-10-11, direct request). SAME key as the old degree version on purpose (a different key left the row out of the saved layout and it showed up at the
+      // bottom of Cursor Tracking, i.e. 'gone'); a legacy degree value (outside 0..100) is migrated to 0..100 in parseCursorTrackingConfig().
+      { key: 'palmFacesCursorDistanceRange', label: 'Min / Max Palm Rotation (%)', type: 'text', def: '{"min":0,"max":100}', onChange: () => parseCursorTrackingConfig() }
     ]
   },
   {
@@ -7390,7 +7390,13 @@ function parseWristSplayConfig() {
 }
 function parseCursorTrackingConfig() {
   try { palmFacesCursorDistanceCurveParsed = JSON.parse(cfg.palmFacesCursorDistanceCurve).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
-  try { palmFacesCursorDistanceRangeParsed = JSON.parse(cfg.palmFacesCursorDistanceRangePct) } catch (e) { /* keep last-good value */ }
+  try { palmFacesCursorDistanceRangeParsed = JSON.parse(cfg.palmFacesCursorDistanceRange) } catch (e) { /* keep last-good value */ }
+  // This value used to be degrees (-180..180, e.g. -35..180). Anything outside 0..100 can only be a legacy degree value: reset it to the full 0..100 percent range instead of reading it as percents.
+  if (palmFacesCursorDistanceRangeParsed && (palmFacesCursorDistanceRangeParsed.min < 0 || palmFacesCursorDistanceRangeParsed.max > 100)) {
+    palmFacesCursorDistanceRangeParsed = { min: 0, max: 100 }
+    cfg.palmFacesCursorDistanceRange = '{"min":0,"max":100}'
+    try { syncValue('palmFacesCursorDistanceRange', cfg.palmFacesCursorDistanceRange) } catch (e) { /* panel not built yet: cfg already holds the fix */ }
+  }
   try { armRotationRangeParsed = JSON.parse(cfg.armRotationRangePct) } catch (e) { /* keep last-good value */ }
   try { armRotationCurveParsed = JSON.parse(cfg.armRotationCurve).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
 }
@@ -7398,7 +7404,7 @@ function updateCursorTrackingGateVisibility() {
   // Toggle visibility of cursor-tracking curve controls based on
   // palmFacesCursorDistanceCurveEnabled checkbox state
   const curveRow = document.querySelector('.dp-row[data-key="palmFacesCursorDistanceCurve"]')
-  const rangeRow = document.querySelector('.dp-row[data-key="palmFacesCursorDistanceRangePct"]')
+  const rangeRow = document.querySelector('.dp-row[data-key="palmFacesCursorDistanceRange"]')
   if (curveRow) curveRow.style.display = cfg.palmFacesCursorDistanceCurveEnabled ? '' : 'none'
   if (rangeRow) rangeRow.style.display = cfg.palmFacesCursorDistanceCurveEnabled ? '' : 'none'
 }
@@ -7567,7 +7573,7 @@ function buildWristSplayWidgets() {
 // custom function).
 function buildCursorTrackingWidgets() {
   const curveRow = document.querySelector('.dp-row[data-key="palmFacesCursorDistanceCurve"]')
-  const rangeRow = document.querySelector('.dp-row[data-key="palmFacesCursorDistanceRangePct"]')
+  const rangeRow = document.querySelector('.dp-row[data-key="palmFacesCursorDistanceRange"]')
   if (curveRow) buildGenericCurveWidget(curveRow, { caption: 'X: Distance From Cursor (Nearest→Farthest On-Screen Hand)  ·  Y: Palm Rotation Responsiveness (0=None, 1=Full)', defaultPoints: [{ x: 0, y: 1 }, { x: 1, y: 1 }] })
   if (rangeRow) buildGenericRangeBarWidget(rangeRow, { trackMin: 0, trackMax: 100, unit: '%', defaultValue: { min: 0, max: 100 } })
 }

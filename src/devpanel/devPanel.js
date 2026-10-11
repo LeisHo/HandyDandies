@@ -2517,6 +2517,16 @@ function applyOrder(groupsEl, order) {
     if (groupEl) touchedTopLevel.add(groupEl)
   })
   appendUntouchedChildren(groupsEl, touchedTopLevel)
+  // A control the saved layout has never heard of (shipped after the layout was last saved) normally lands at the end of its original group, outside the subgroup the user organised its siblings into.
+  // A control may name `placeAfter: '<sibling key>'`; when its own key is not anywhere in the saved order it is moved right after that sibling, wherever the sibling ended up (2026-10-11).
+  const savedStrings = new Set()
+  ;(function collect(o) { if (typeof o === 'string') savedStrings.add(o); else if (Array.isArray(o)) o.forEach(collect); else if (o && typeof o === 'object') Object.values(o).forEach(collect) })(order)
+  Object.keys(rowsByKey).forEach((key) => {
+    const ctrl = findCtrl(key)
+    if (!ctrl || !ctrl.placeAfter || savedStrings.has(key)) return
+    const row = rowsByKey[key], anchor = rowsByKey[ctrl.placeAfter]
+    if (row && anchor && anchor.parentNode) anchor.parentNode.insertBefore(row, anchor.nextSibling)
+  })
 }
 
 // Loads a saved { desktop:{...}, mobile:{...}, landscape:{...} } values blob
