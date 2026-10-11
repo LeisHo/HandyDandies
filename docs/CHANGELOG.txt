@@ -17162,6 +17162,15 @@ put at the end of its original group (Cursor Tracking), outside the "Responsive 
    'armRotationCurve', so it appears in "Responsive Arm Rotation" after the distance curve. (Not applied to rows already in the saved layout: Arm Rotation X / Y (Deg) were saved at the bottom of Cursor Tracking, drag them into Responsive Arm Rotation once and Save.)
  `devPanel.js` `?v=64` -> `?v=65`, `main.js` `?v=348` -> `?v=349`.
 
+2026-10-11  -  (Palm Rotation "face the cursor" angle is measured on screen)
+
+Direct report: with Field Layout Z Offset 0 most hands look right, but at Z Offset 125 the closest hands do not point at the cursor; with the cursor at the midpoint of hands 1019 / 964 / 963 / 909 all four face about the same direction.
+Cause: the palm angle was atan2 of the WORLD x / y difference between the hand's tracking point and the cursor's hit on the z = 0 plane. Hands at z = 125 (camera z 286) are shifted by perspective relative to that z = 0 point, so the world angle is not the on-screen angle.
+MEASURED in the page with the page's own camera: cursor on screen at the midpoint of hands 1019 / 963 / 964 / 1073 at z = 125 -> the old world angles were -143.3 / -95.3 / -133.2 / -144.1 deg (all roughly the same), the true on-screen angles 145 / -35 / 49.4 / -157.2 deg.
+Now computeScreenRollDeg(): same convention (atan2(dx, -dy), dx / dy = hand - cursor) but dx / dy are the SCREEN offsets (pixels) of the hand's projected tracking point from the cursor (cursorNDC), so it is correct at any Z. At Z Offset 0 it differs only by the small perspective
+difference. Falls back to the world angle if the window size is unknown. Arm Rotation's aim is unchanged: its target X / Y is still the cursor's z = 0 plane hit by an earlier explicit request ("the xy should match the true cursor xy ... not some parallax thing"), so it can show the
+same kind of offset for hands at a different Z; say if you want that screen-corrected too. `main.js` `?v=349` -> `?v=350`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

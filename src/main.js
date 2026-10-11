@@ -110,6 +110,17 @@ function computeRadialRollDeg(handPos, cursorPos) {
   const dy = handPos.y - cursorPos.y
   return THREE.MathUtils.radToDeg(Math.atan2(dx, -dy))
 }
+// Palm Rotation's "face the cursor" angle, measured ON SCREEN (2026-10-11, direct report: with Field Layout Z Offset 125 the closest hands did not point at the cursor and hands around it all faced the same way).
+// computeRadialRollDeg() compares WORLD x/y of the hand with the cursor's hit on the z = 0 plane; once hands sit at another depth (Z Offset), perspective moves them on screen relative to that z = 0 point, so the
+// world angle is wrong (measured: four neighbouring hands at z = 125 came out -143 / -95 / -133 / -144 deg while their true on-screen angles were 145 / -35 / 49 / -157). Same convention as computeRadialRollDeg()
+// (angle = atan2(dx, -dy), 0 when the hand is straight below... see that function), but dx / dy are the SCREEN offsets of the hand projected tracking point from the
+// cursor. Falls back to the world angle when the screen size is not known yet.
+function computeScreenRollDeg(handPos, cursorPos) {
+  const w = window.innerWidth, h = window.innerHeight
+  if (!(w > 0 && h > 0)) return computeRadialRollDeg(handPos, cursorPos)
+  _scrV.copy(handPos).project(camera)
+  return THREE.MathUtils.radToDeg(Math.atan2((_scrV.x - cursorNDC.x) * w / 2, -((_scrV.y - cursorNDC.y) * h / 2)))
+}
 // Rotation around the wrist-crop-plane axis by `baseDeg` (the dynamic
 // radial angle when Palm Faces Cursor is on, 0 when it's off) plus the
 // live Palm Face Rotation slider, which "just adds onto that rotation
@@ -16006,7 +16017,7 @@ function animate(dt, now) {
             hand.currentArmRotationQuat.slerp(_armPartialQ, THREE.MathUtils.clamp(armRotationDampingAmt, 0, 1))
             desired = hand.currentArmRotationQuat
           }
-          let baseDeg = cfg.palmFacesCursor ? computeRadialRollDeg(hand._trk, cursorTarget) : 0
+          let baseDeg = cfg.palmFacesCursor ? computeScreenRollDeg(hand._trk, cursorTarget) : 0
           // Palm Rotation Distance Curve -- modulate cursor-tracking
           // responsiveness by distance (2026-09-24). At close distance,
           // full responsiveness; at far distance, reduced (curve y-value
