@@ -32,17 +32,17 @@
       "targetDepthFactor": 60.6,
       "showTargetMarker": true,
       "armRotationEnabled": true,
-      "armRotationUseDepth": true,
+      "armRotationUseDepth": false,
       "armRotationTargetDepth": 112.5,
       "armRotationDefault": 94,
-      "armRotationCurveEnabled": true,
+      "armRotationCurveEnabled": false,
       "armRotationCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.8080220886433459,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.23551813533871668,\"y\":0}}]",
       "armRotationDamping": 0.02,
       "palmFacesCursor": true,
-      "palmRotationUseDepth": true,
+      "palmRotationUseDepth": false,
       "palmRotationTargetDepth": 4.7,
       "palmFaceRotationOffset": 13,
-      "palmFacesCursorDistanceCurveEnabled": false,
+      "palmFacesCursorDistanceCurveEnabled": true,
       "palmFacesCursorDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0.5}]",
       "palmFacesCursorDistanceRange": "{\"min\":0,\"max\":180}",
       "loadingPreviewEnabled": true,
@@ -7021,7 +7021,7 @@
       "custom21CameraOffsetYCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.324820628419056,\"y\":0},\"bg\":0.64,\"m\":\"linear\"},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.467575665942766,\"y\":0}}]",
       "custom21CameraOffsetYRange": "{\"min\":-1,\"max\":2}",
       "custom21CameraOffsetZEnabled": true,
-      "custom21CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.4617051276694197,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.4976274573932865,\"y\":0}}]",
+      "custom21CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.48491380373447907,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2564655009404654,\"y\":0}}]",
       "custom21CameraOffsetZRange": "{\"min\":-30,\"max\":30}",
       "custom21RotationEnabled": false,
       "custom21RotationX": 0,
@@ -8878,14 +8878,14 @@
       "armRotationUseDepth": true,
       "armRotationTargetDepth": 5.6,
       "armRotationDefault": 94,
-      "armRotationCurveEnabled": true,
+      "armRotationCurveEnabled": false,
       "armRotationCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.8080220886433459,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.23551813533871668,\"y\":0}}]",
       "armRotationDamping": 0.02,
       "palmFacesCursor": true,
       "palmRotationUseDepth": true,
       "palmRotationTargetDepth": 5.6,
       "palmFaceRotationOffset": 0,
-      "palmFacesCursorDistanceCurveEnabled": false,
+      "palmFacesCursorDistanceCurveEnabled": true,
       "palmFacesCursorDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0.5}]",
       "palmFacesCursorDistanceRange": "{\"min\":0,\"max\":180}",
       "loadingPreviewEnabled": true,
@@ -15864,7 +15864,7 @@
       "custom21CameraOffsetYCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.324820628419056,\"y\":0},\"bg\":0.64,\"m\":\"linear\"},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.467575665942766,\"y\":0}}]",
       "custom21CameraOffsetYRange": "{\"min\":-1,\"max\":2}",
       "custom21CameraOffsetZEnabled": true,
-      "custom21CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.4617051276694197,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.4976274573932865,\"y\":0}}]",
+      "custom21CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.48491380373447907,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2564655009404654,\"y\":0}}]",
       "custom21CameraOffsetZRange": "{\"min\":-30,\"max\":30}",
       "custom21RotationEnabled": false,
       "custom21RotationX": 0,
@@ -17721,14 +17721,14 @@
       "armRotationUseDepth": true,
       "armRotationTargetDepth": 3.4,
       "armRotationDefault": 94,
-      "armRotationCurveEnabled": true,
+      "armRotationCurveEnabled": false,
       "armRotationCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.8080220886433459,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.23551813533871668,\"y\":0}}]",
       "armRotationDamping": 0.02,
       "palmFacesCursor": true,
       "palmRotationUseDepth": true,
       "palmRotationTargetDepth": 3.4,
       "palmFaceRotationOffset": 0,
-      "palmFacesCursorDistanceCurveEnabled": false,
+      "palmFacesCursorDistanceCurveEnabled": true,
       "palmFacesCursorDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0.5}]",
       "palmFacesCursorDistanceRange": "{\"min\":0,\"max\":180}",
       "loadingPreviewEnabled": true,
@@ -24707,7 +24707,7 @@
       "custom21CameraOffsetYCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.324820628419056,\"y\":0},\"bg\":0.64,\"m\":\"linear\"},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.467575665942766,\"y\":0}}]",
       "custom21CameraOffsetYRange": "{\"min\":-1,\"max\":2}",
       "custom21CameraOffsetZEnabled": true,
-      "custom21CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.4617051276694197,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.4976274573932865,\"y\":0}}]",
+      "custom21CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.48491380373447907,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2564655009404654,\"y\":0}}]",
       "custom21CameraOffsetZRange": "{\"min\":-30,\"max\":30}",
       "custom21RotationEnabled": false,
       "custom21RotationX": 0,
@@ -72507,7 +72507,7 @@
                 "type": "group",
                 "group": {
                   "key": "Multi Trigger",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -77050,7 +77050,7 @@
                       "type": "group",
                       "group": {
                         "key": "Trigger 5",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -82706,7 +82706,7 @@
                     },
                     {
                       "key": "Trigger 5",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -84371,7 +84371,7 @@
               },
               {
                 "key": "Multi Trigger",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -88914,7 +88914,7 @@
                     "type": "group",
                     "group": {
                       "key": "Trigger 5",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -94570,7 +94570,7 @@
                   },
                   {
                     "key": "Trigger 5",
-                    "collapsed": false,
+                    "collapsed": true,
                     "locked": false,
                     "items": [
                       {
@@ -141973,7 +141973,7 @@
               "type": "group",
               "group": {
                 "key": "Multi Trigger",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -146516,7 +146516,7 @@
                     "type": "group",
                     "group": {
                       "key": "Trigger 5",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -152172,7 +152172,7 @@
                   },
                   {
                     "key": "Trigger 5",
-                    "collapsed": false,
+                    "collapsed": true,
                     "locked": false,
                     "items": [
                       {
@@ -153837,7 +153837,7 @@
             },
             {
               "key": "Multi Trigger",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -158380,7 +158380,7 @@
                   "type": "group",
                   "group": {
                     "key": "Trigger 5",
-                    "collapsed": false,
+                    "collapsed": true,
                     "locked": false,
                     "items": [
                       {
@@ -164036,7 +164036,7 @@
                 },
                 {
                   "key": "Trigger 5",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -172596,8 +172596,8 @@
     "desktop": {
       "left": 922.4000244140625,
       "top": 104,
-      "width": 606.4000244140625,
-      "height": 445.9875183105469
+      "width": 609.6000366210938,
+      "height": 447.5874938964844
     }
   }
 }
