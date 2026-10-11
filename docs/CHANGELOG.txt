@@ -17264,6 +17264,12 @@ Direct request: "I want retransition to have its own easing curve as opposed to 
 Direct request: add selections 'Arm End to Palm center' and 'Arm base to palm center' to the dropdowns. They are the MIRROR of Palm To Arm Base / End: hand A goes above hand B when A's arm base (or arm end) is higher in Z than B's palm center (by more than 0.01) and B's arm point is not higher than A's palm; the reverse likewise; when BOTH are higher
 than the other's palm, the hand whose arm base (arm end) is FARTHER from the cursor on screen (XY only) goes above - mirrored from the original rule by assumption (the request did not spell out the tie-break; say if you want something else); when neither is, the level ties. Available in the Mode, Fallback, Fallback 2 and Except dropdowns, handled by the same overlap-layered painter's ordering as the Palm To Arm modes. `main.js` `?v=360` -> `?v=361`.
 
+2026-10-11  -  (Render Order, pairwise modes: each hand is compared only with its 8 nearest hands on screen)
+
+Direct request: 'in regards to render order, only measure a hand with the 8 closest hands (closest in screen space xy)'. For the pairwise modes (Palm To Arm Base / End, Arm Base / End To Palm Center, and any Except using them) a hand used to be compared with every hand whose projected bounding circle overlapped it; it is now compared only with its
+RO_NEIGHBOURS = 8 nearest hands by screen-space XY (distance between the projected hand centers), found with a screen grid and an expanding ring search that stops once the 8th nearest is provably closer than anything unsearched. A pair is evaluated once however many hands list each other. The layering (strongest constraints first, weaker ones only within a layer)
+is unchanged. Scalar-only settings are a plain total order (a global sort) and are not affected. `main.js` `?v=361` -> `?v=362`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

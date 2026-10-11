@@ -906,6 +906,7 @@ function renderOrderBone(hand, key) {
 // exact). A level is either a scalar priority (Z modes, cursor-distance modes; two hands tie when they agree to 0.01 world units) or "Palm To Arm Base", a pairwise rule: hand A goes above hand B when A's palm center is higher
 // in Z than B's arm base (by more than 0.01); when each hand's palm is higher than the other's arm base, the hand whose arm base is FARTHER from the cursor on screen (XY only, no Z) goes above; when neither is, the level ties.
 let roKindXY = false, roPriority = 0
+const RO_NEIGHBOURS = 8 // a hand is only compared with this many nearest hands (screen XY) in the pairwise render-order modes
 let roOrder = [], roPalmZ = null, roBaseZ = null, roBaseXY = null, roEndZ = null, roEndXY = null, roSX = null, roSY = null, roSR = null, roIndeg = null, roHead = null, roDone = null, roVis = null, roLayer = null
 const roScalar = {}
 const _roV = new THREE.Vector3()
@@ -991,40 +992,66 @@ function computeRenderOrderRanks() {
   const vFov = THREE.MathUtils.degToRad(camera.fov)
   const cw = renderer.domElement.clientWidth || window.innerWidth, ch = renderer.domElement.clientHeight || window.innerHeight
   if (!roSX || roSX.length !== n) { roSX = new Float64Array(n); roSY = new Float64Array(n); roSR = new Float64Array(n); roIndeg = new Int32Array(n); roHead = new Int32Array(n); roDone = new Uint8Array(n) }
-  let maxR = 1
+  // Each hand is compared only with its RO_NEIGHBOURS (8) nearest hands in screen-space XY (2026-10-11, direct request: "only measure a hand with the 8 closest hands"), not with every hand whose circle overlaps it.
+  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity
   for (let i = 0; i < n; i++) {
     const h = hands[i]
     _roV.copy(handBoundsCenterLocal).multiplyScalar(h.clone.scale.x).applyQuaternion(alignQuat).applyQuaternion(h.wrapper.quaternion).add(h.wrapper.position)
-    const dist = camera.position.distanceTo(_roV)
-    const pxPerUnit = ch / (2 * Math.tan(vFov / 2) * Math.max(dist, 0.001))
-    roSR[i] = handBoundsRadiusLocal * h.clone.scale.x * pxPerUnit
     _roV.project(camera)
-    roSX[i] = (_roV.x * 0.5 + 0.5) * cw
-    roSY[i] = (-_roV.y * 0.5 + 0.5) * ch
-    if (roSR[i] > maxR) maxR = roSR[i]
+    const sx = (_roV.x * 0.5 + 0.5) * cw, sy = (-_roV.y * 0.5 + 0.5) * ch
+    roSX[i] = sx; roSY[i] = sy
+    if (sx < minX) minX = sx
+    if (sx > maxX) maxX = sx
+    if (sy < minY) minY = sy
+    if (sy > maxY) maxY = sy
   }
-  const cell = Math.max(maxR * 2, 8)
+  const K = Math.min(RO_NEIGHBOURS, n - 1)
+  // grid cell sized for ~2 hands per cell on average, so a ring search finds 8 neighbours within a couple of rings
+  const cell = Math.max(Math.sqrt(Math.max((maxX - minX) * (maxY - minY), 1) * 2 / Math.max(n, 1)), 2)
+  const maxRing = Math.ceil(Math.max(maxX - minX, maxY - minY) / cell) + 2
   const grid = new Map()
-  const cellOf = (i) => (Math.floor(roSX[i] / cell) + 100000) * 200003 + (Math.floor(roSY[i] / cell) + 100000)
-  for (let i = 0; i < n; i++) { const k = cellOf(i); const arr = grid.get(k); if (arr) arr.push(i); else grid.set(k, [i]) }
+  const cxOf = (i) => Math.floor((roSX[i] - minX) / cell), cyOf = (i) => Math.floor((roSY[i] - minY) / cell)
+  const keyOf = (cx, cy) => (cx + 1000) * 200003 + (cy + 1000)
+  for (let i = 0; i < n; i++) { const k = keyOf(cxOf(i), cyOf(i)); const arr = grid.get(k); if (arr) arr.push(i); else grid.set(k, [i]) }
   // Constraints "under is drawn BEFORE over", bucketed by strength (see roPriority: lower = stronger). They can contradict each other (A above B, B above C, C above A), and an unordered cycle check was either too slow or too weak
   // (measured), so: (1) the STRONGEST constraints (priority 0, e.g. Palm To Arm's one-sided "palm higher than the other's arm") give every hand a LAYER = the length of the longest chain of such constraints below it;
   // (2) every weaker constraint (the arm-distance tie-break, the fallbacks) is applied only between hands in the SAME layer, where it cannot contradict the strong ones; (3) layers are drawn bottom to top, each in its own topological order.
   const buckets = [[], [], [], [], [], []]
+  const pairSeen = new Set()
+  const candD = [], candI = []
   for (let i = 0; i < n; i++) {
-    const cx = Math.floor(roSX[i] / cell), cy = Math.floor(roSY[i] / cell)
-    for (let dx = -1; dx <= 1; dx++) for (let dy = -1; dy <= 1; dy++) {
-      const arr = grid.get((cx + dx + 100000) * 200003 + (cy + dy + 100000))
-      if (!arr) continue
-      for (let q = 0; q < arr.length; q++) {
-        const j = arr[q]
-        if (j <= i) continue
-        const ddx = roSX[i] - roSX[j], ddy = roSY[i] - roSY[j], rr = roSR[i] + roSR[j]
-        if (ddx * ddx + ddy * ddy >= rr * rr) continue
-        const r = cmpLevels(i, j)
-        if (r === 0) continue
-        buckets[roPriority].push(r > 0 ? j : i, r > 0 ? i : j) // under, over
+    const cx = cxOf(i), cy = cyOf(i)
+    candD.length = 0; candI.length = 0
+    for (let r = 0; r <= maxRing; r++) {
+      for (let dx = -r; dx <= r; dx++) for (let dy = -r; dy <= r; dy++) {
+        if (Math.max(Math.abs(dx), Math.abs(dy)) !== r) continue
+        const arr = grid.get(keyOf(cx + dx, cy + dy))
+        if (!arr) continue
+        for (let q = 0; q < arr.length; q++) {
+          const j = arr[q]
+          if (j === i) continue
+          const ddx = roSX[i] - roSX[j], ddy = roSY[i] - roSY[j]
+          candD.push(ddx * ddx + ddy * ddy); candI.push(j)
+        }
       }
+      if (candI.length >= K) {
+        // done once the K-th nearest is closer than the unsearched region (everything outside r rings is at least r*cell away)
+        const sorted = candD.slice().sort((x, y) => x - y)
+        const kth = sorted[K - 1]
+        if (K === 0 || kth <= (r * cell) * (r * cell)) break
+      }
+    }
+    if (K <= 0) continue
+    const order = candI.map((_, t) => t).sort((x, y) => candD[x] - candD[y])
+    for (let t = 0; t < Math.min(K, order.length); t++) {
+      const j = candI[order[t]]
+      const lo = i < j ? i : j, hi = i < j ? j : i
+      const key = lo * n + hi
+      if (pairSeen.has(key)) continue
+      pairSeen.add(key)
+      const rr = cmpLevels(lo, hi)
+      if (rr === 0) continue
+      buckets[roPriority].push(rr > 0 ? hi : lo, rr > 0 ? lo : hi) // under, over
     }
   }
   if (!roLayer || roLayer.length !== n) roLayer = new Int32Array(n)
