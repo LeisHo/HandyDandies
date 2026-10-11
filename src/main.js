@@ -392,6 +392,11 @@ let loadingPreviewFirstFrameLogged = false
 // Pose Jump Log (2026-10-04, direct request after "why is there a flash after the 2nd click"):
 // finds one-frame pops on the user's own machine. Declared here because
 // buildPoseJumpLogWidget() is called at module top level.
+// Render Reordering Log (2026-10-11): logs when two nearby hands CROSS in render order. Declared here because buildRenderReorderLogWidget() is called at module top level.
+const RENDER_REORDER_LOG_MAX_ENTRIES = 300
+const renderReorderLogEntries = []
+let renderReorderLogEl = null
+const _renderReorderLogFlushFlag = { scheduled: false }
 const POSE_JUMP_LOG_MAX_ENTRIES = 300
 const poseJumpLogEntries = []
 let poseJumpLogEl = null
@@ -910,6 +915,117 @@ const RO_NEIGHBOURS = 8 // a hand is only compared with this many nearest hands 
 let roOrder = [], roPalmZ = null, roBaseZ = null, roBaseXY = null, roEndZ = null, roEndXY = null, roSX = null, roSY = null, roSR = null, roIndeg = null, roHead = null, roDone = null, roVis = null, roLayer = null
 const roScalar = {}
 const _roV = new THREE.Vector3()
+// ---- Pairwise render-order support (2026-10-11) ----
+// Each hand's K = RO_NEIGHBOURS nearest hands in screen-space XY, as unique pairs: roPairLo[t] < roPairHi[t], t < the returned count.
+let roPairLo = null, roPairHi = null
+function roKnnPairs(n) {
+  const cw = renderer.domElement.clientWidth || window.innerWidth, ch = renderer.domElement.clientHeight || window.innerHeight
+  if (!roSX || roSX.length !== n) { roSX = new Float64Array(n); roSY = new Float64Array(n); roSR = new Float64Array(n); roIndeg = new Int32Array(n); roHead = new Int32Array(n); roDone = new Uint8Array(n) }
+  const K = Math.min(RO_NEIGHBOURS, n - 1)
+  if (!roPairLo || roPairLo.length < n * Math.max(K, 1)) { roPairLo = new Int32Array(n * Math.max(K, 1)); roPairHi = new Int32Array(n * Math.max(K, 1)) }
+  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity
+  for (let i = 0; i < n; i++) {
+    const h = hands[i]
+    _roV.copy(handBoundsCenterLocal).multiplyScalar(h.clone.scale.x).applyQuaternion(alignQuat).applyQuaternion(h.wrapper.quaternion).add(h.wrapper.position)
+    _roV.project(camera)
+    const sx = (_roV.x * 0.5 + 0.5) * cw, sy = (-_roV.y * 0.5 + 0.5) * ch
+    roSX[i] = sx; roSY[i] = sy
+    if (sx < minX) minX = sx
+    if (sx > maxX) maxX = sx
+    if (sy < minY) minY = sy
+    if (sy > maxY) maxY = sy
+  }
+  if (K <= 0) return 0
+  // grid cell sized for ~2 hands per cell on average, so a ring search finds the neighbours within a couple of rings
+  const cell = Math.max(Math.sqrt(Math.max((maxX - minX) * (maxY - minY), 1) * 2 / Math.max(n, 1)), 2)
+  const maxRing = Math.ceil(Math.max(maxX - minX, maxY - minY) / cell) + 2
+  const grid = new Map()
+  const cxOf = (i) => Math.floor((roSX[i] - minX) / cell), cyOf = (i) => Math.floor((roSY[i] - minY) / cell)
+  const keyOf = (cx, cy) => (cx + 1000) * 200003 + (cy + 1000)
+  for (let i = 0; i < n; i++) { const k = keyOf(cxOf(i), cyOf(i)); const arr = grid.get(k); if (arr) arr.push(i); else grid.set(k, [i]) }
+  const pairSeen = new Set()
+  const candD = [], candI = []
+  let count = 0
+  for (let i = 0; i < n; i++) {
+    const cx = cxOf(i), cy = cyOf(i)
+    candD.length = 0; candI.length = 0
+    for (let r = 0; r <= maxRing; r++) {
+      for (let dx = -r; dx <= r; dx++) for (let dy = -r; dy <= r; dy++) {
+        if (Math.max(Math.abs(dx), Math.abs(dy)) !== r) continue
+        const arr = grid.get(keyOf(cx + dx, cy + dy))
+        if (!arr) continue
+        for (let q = 0; q < arr.length; q++) {
+          const j = arr[q]
+          if (j === i) continue
+          const ddx = roSX[i] - roSX[j], ddy = roSY[i] - roSY[j]
+          candD.push(ddx * ddx + ddy * ddy); candI.push(j)
+        }
+      }
+      if (candI.length >= K) {
+        // done once the K-th nearest is closer than the unsearched region (everything outside r rings is at least r*cell away)
+        const sorted = candD.slice().sort((x, y) => x - y)
+        if (sorted[K - 1] <= (r * cell) * (r * cell)) break
+      }
+    }
+    const order = candI.map((_, t) => t).sort((x, y) => candD[x] - candD[y])
+    for (let t = 0; t < Math.min(K, order.length); t++) {
+      const j = candI[order[t]]
+      const lo = i < j ? i : j, hi = i < j ? j : i
+      const key = lo * n + hi
+      if (pairSeen.has(key)) continue
+      pairSeen.add(key)
+      roPairLo[count] = lo; roPairHi[count] = hi; count++
+    }
+  }
+  return count
+}
+// Sequence boundaries per hand: _roSeq changes when the hand starts a new trigger or a retransition on ANY click function (a signature of every non-idle function's phase class + its start time), so "once per
+// trigger or retransition sequence" has a concrete meaning.
+function roUpdateSequences() {
+  const hk = CLICK_HOLD_KEYS, pk = CLICK_POSE_KEYS
+  for (let i = 0; i < hands.length; i++) {
+    const h = hands[i]
+    let sig = 0
+    const cp = h._cp, chp = h._chp
+    if (cp) for (let k = 0; k < pk.length; k++) {
+      const st = cp[pk[k]]
+      if (!st || st.phase === 'idle') continue
+      const ret = st.phase === 'retransition'
+      sig = (sig * 31 + (k + 1) * (ret ? 2 : 1) * 7919 + Math.floor((ret ? st.retransitionStartTime : st.triggerTime) || 0)) % 2147483629
+    }
+    if (chp) for (let k = 0; k < hk.length; k++) {
+      const st = chp[hk[k]]
+      if (!st || st.phase === 'idle') continue
+      const ret = st.phase === 'retransition'
+      sig = (sig * 37 + (k + 1) * (ret ? 2 : 1) * 104729 + Math.floor((ret ? st.retransitionStartTime : st.forwardStartTime) || 0)) % 2147483629
+    }
+    if (h._roSig !== sig) { h._roSig = sig; h._roSeq = (h._roSeq || 0) + 1 }
+  }
+}
+let roPrevRank = null, roLocks = new Map(), roLockPruneCounter = 0
+const RO_LEVEL_NAMES = ['Mode', 'Fallback', 'Fallback 2']
+function roFinishFrame(n, np, cmpLevels, logOn, lockOn) {
+  if (!logOn && !lockOn) { roPrevRank = null; roLocks.clear(); return }
+  if (logOn && roPrevRank && roPrevRank.length === n) {
+    let total = 0, logged = 0
+    const stamp = '[' + new Date().toLocaleTimeString() + '] +' + Math.round(performance.now() - pageLoadStartMs) + 'ms'
+    for (let t = 0; t < np; t++) {
+      const lo = roPairLo[t], hi = roPairHi[t]
+      const was = roPrevRank[lo] > roPrevRank[hi], now = hands[lo]._roRank > hands[hi]._roRank
+      if (was === now) continue
+      total++
+      if (logged >= 20) continue
+      logged++
+      const r = cmpLevels(lo, hi)
+      const why = r === 0 ? 'tie (all levels)' : RO_LEVEL_NAMES[roPriority >> 1] + (roPriority & 1 ? ' (arm-distance tie-break)' : '')
+      const lk = roLocks.get(lo * n + hi)
+      appendRenderReorderLogLine(stamp + ' -- Hand ' + (lo + 1) + ' now ' + (now ? 'above' : 'below') + ' Hand ' + (hi + 1) + ' (was ' + (was ? 'above' : 'below') + '), decided by ' + why + (lk ? ', flip lock set (seq ' + lk.sa + '/' + lk.sb + ')' : ''))
+    }
+    if (total > logged) appendRenderReorderLogLine(stamp + ' -- +' + (total - logged) + ' more crossings this frame')
+  }
+  if (!roPrevRank || roPrevRank.length !== n) roPrevRank = new Int32Array(n)
+  for (let i = 0; i < n; i++) roPrevRank[i] = hands[i]._roRank
+}
 function computeRenderOrderRanks() {
   const n = hands.length
   const camSign = camera.position.z >= 0 ? 1 : -1
@@ -979,84 +1095,47 @@ function computeRenderOrderRanks() {
     return 0
   }
   const pairwise = lv.some((L) => (L.m && L.m.pair) || (L.q && L.q.pair))
-  if (!pairwise) {
-    // Every level is a scalar key: a true total order, so a plain sort is exact.
+  const lockOn = cfg.renderOrderFlipLock !== false
+  const logOn = !!cfg.logRenderReorderEnabled
+  if (lockOn || logOn) roUpdateSequences()
+  if (!pairwise && !lockOn) {
+    // Every level is a scalar key and there is no lock: a true total order, so a plain sort is exact.
     if (roOrder.length !== n) { roOrder = new Array(n); for (let i = 0; i < n; i++) roOrder[i] = i }
     roOrder.sort((a, b) => cmpLevels(a, b) || (a - b))
     for (let r = 0; r < n; r++) hands[roOrder[r]]._roRank = r
+    if (logOn) roFinishFrame(n, roKnnPairs(n), cmpLevels, true, false)
+    else roFinishFrame(n, 0, cmpLevels, false, false)
     return
   }
-  // A pairwise level (Palm To Arm Base / End) is not a total order (A can beat B, B beat C, C beat A), so a global sort cannot honour it (measured: 4-33% of decided pairs came out wrong). What actually matters for drawing order is only
-  // the relation between hands that OVERLAP on screen (painter's algorithm), so: find overlapping pairs with a screen-space grid, decide each with the levels above, and take a topological order of those "A is drawn after B" edges
-  // (Kahn's algorithm; a cycle is broken at the hand with the fewest unmet constraints). Hands that do not overlap anything keep hand-index order.
-  const vFov = THREE.MathUtils.degToRad(camera.fov)
-  const cw = renderer.domElement.clientWidth || window.innerWidth, ch = renderer.domElement.clientHeight || window.innerHeight
-  if (!roSX || roSX.length !== n) { roSX = new Float64Array(n); roSY = new Float64Array(n); roSR = new Float64Array(n); roIndeg = new Int32Array(n); roHead = new Int32Array(n); roDone = new Uint8Array(n) }
-  // Each hand is compared only with its RO_NEIGHBOURS (8) nearest hands in screen-space XY (2026-10-11, direct request: "only measure a hand with the 8 closest hands"), not with every hand whose circle overlaps it.
-  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity
-  for (let i = 0; i < n; i++) {
-    const h = hands[i]
-    _roV.copy(handBoundsCenterLocal).multiplyScalar(h.clone.scale.x).applyQuaternion(alignQuat).applyQuaternion(h.wrapper.quaternion).add(h.wrapper.position)
-    _roV.project(camera)
-    const sx = (_roV.x * 0.5 + 0.5) * cw, sy = (-_roV.y * 0.5 + 0.5) * ch
-    roSX[i] = sx; roSY[i] = sy
-    if (sx < minX) minX = sx
-    if (sx > maxX) maxX = sx
-    if (sy < minY) minY = sy
-    if (sy > maxY) maxY = sy
-  }
-  const K = Math.min(RO_NEIGHBOURS, n - 1)
-  // grid cell sized for ~2 hands per cell on average, so a ring search finds 8 neighbours within a couple of rings
-  const cell = Math.max(Math.sqrt(Math.max((maxX - minX) * (maxY - minY), 1) * 2 / Math.max(n, 1)), 2)
-  const maxRing = Math.ceil(Math.max(maxX - minX, maxY - minY) / cell) + 2
-  const grid = new Map()
-  const cxOf = (i) => Math.floor((roSX[i] - minX) / cell), cyOf = (i) => Math.floor((roSY[i] - minY) / cell)
-  const keyOf = (cx, cy) => (cx + 1000) * 200003 + (cy + 1000)
-  for (let i = 0; i < n; i++) { const k = keyOf(cxOf(i), cyOf(i)); const arr = grid.get(k); if (arr) arr.push(i); else grid.set(k, [i]) }
-  // Constraints "under is drawn BEFORE over", bucketed by strength (see roPriority: lower = stronger). They can contradict each other (A above B, B above C, C above A), and an unordered cycle check was either too slow or too weak
-  // (measured), so: (1) the STRONGEST constraints (priority 0, e.g. Palm To Arm's one-sided "palm higher than the other's arm") give every hand a LAYER = the length of the longest chain of such constraints below it;
-  // (2) every weaker constraint (the arm-distance tie-break, the fallbacks) is applied only between hands in the SAME layer, where it cannot contradict the strong ones; (3) layers are drawn bottom to top, each in its own topological order.
+  // The order is built from pairwise decisions between each hand and its RO_NEIGHBOURS nearest hands on screen: a pairwise level (Palm To Arm ...) is not a total order, and the flip lock is a per-pair memory, neither of
+  // which a global sort can express. Constraints "under is drawn BEFORE over" are bucketed by strength (see roPriority: lower = stronger): (1) the STRONGEST ones (priority 0: the one-sided Palm To Arm decisions, level-0 scalar
+  // rules, and FLIP LOCKS) give every hand a LAYER = the longest chain below it; (2) every weaker constraint is applied only between hands in the SAME layer; (3) layers are drawn bottom to top, each in topological order.
+  const np = roKnnPairs(n)
+  const havePrev = (lockOn || logOn) && roPrevRank && roPrevRank.length === n
   const buckets = [[], [], [], [], [], []]
-  const pairSeen = new Set()
-  const candD = [], candI = []
-  for (let i = 0; i < n; i++) {
-    const cx = cxOf(i), cy = cyOf(i)
-    candD.length = 0; candI.length = 0
-    for (let r = 0; r <= maxRing; r++) {
-      for (let dx = -r; dx <= r; dx++) for (let dy = -r; dy <= r; dy++) {
-        if (Math.max(Math.abs(dx), Math.abs(dy)) !== r) continue
-        const arr = grid.get(keyOf(cx + dx, cy + dy))
-        if (!arr) continue
-        for (let q = 0; q < arr.length; q++) {
-          const j = arr[q]
-          if (j === i) continue
-          const ddx = roSX[i] - roSX[j], ddy = roSY[i] - roSY[j]
-          candD.push(ddx * ddx + ddy * ddy); candI.push(j)
-        }
-      }
-      if (candI.length >= K) {
-        // done once the K-th nearest is closer than the unsearched region (everything outside r rings is at least r*cell away)
-        const sorted = candD.slice().sort((x, y) => x - y)
-        const kth = sorted[K - 1]
-        if (K === 0 || kth <= (r * cell) * (r * cell)) break
-      }
-    }
-    if (K <= 0) continue
-    const order = candI.map((_, t) => t).sort((x, y) => candD[x] - candD[y])
-    for (let t = 0; t < Math.min(K, order.length); t++) {
-      const j = candI[order[t]]
-      const lo = i < j ? i : j, hi = i < j ? j : i
+  // Flip lock: per pair, the relative order may change at most once while neither hand starts a new sequence; a pair left tied keeps its previous order (weakest constraint) instead of flickering with the tie-break.
+  if (++roLockPruneCounter >= 240) { roLockPruneCounter = 0; for (const [k, lk] of roLocks) { const lo = Math.floor(k / n), hi = k % n; if (!hands[lo] || lk.sa !== hands[lo]._roSeq || lk.sb !== hands[hi]._roSeq) roLocks.delete(k) } }
+  for (let t = 0; t < np; t++) {
+    const lo = roPairLo[t], hi = roPairHi[t]
+    let rr = cmpLevels(lo, hi)
+    let pri = roPriority
+    if (lockOn && havePrev) {
+      const prevAbove = roPrevRank[lo] > roPrevRank[hi]
       const key = lo * n + hi
-      if (pairSeen.has(key)) continue
-      pairSeen.add(key)
-      const rr = cmpLevels(lo, hi)
-      if (rr === 0) continue
-      buckets[roPriority].push(rr > 0 ? hi : lo, rr > 0 ? lo : hi) // under, over
+      const lk = roLocks.get(key)
+      if (lk && lk.sa === hands[lo]._roSeq && lk.sb === hands[hi]._roSeq) {
+        rr = prevAbove ? 1 : -1; pri = 0 // locked: keep the order it has
+      } else {
+        if (lk) roLocks.delete(key) // a new sequence started on one of the two hands: unlocked
+        if (rr !== 0) { if ((rr > 0) !== prevAbove) roLocks.set(key, { sa: hands[lo]._roSeq, sb: hands[hi]._roSeq }) } // this is the one allowed flip
+        else { rr = prevAbove ? 1 : -1; pri = 5 }
+      }
     }
+    if (rr === 0) continue
+    buckets[pri].push(rr > 0 ? hi : lo, rr > 0 ? lo : hi) // under, over
   }
   if (!roLayer || roLayer.length !== n) roLayer = new Int32Array(n)
   roLayer.fill(0)
-  // (1) layers from the strongest constraints (longest-path layering with a stall release for the rare cycle among them)
   {
     const list = buckets[0]
     const eTo0 = [], eNext0 = []
@@ -1073,7 +1152,6 @@ function computeRenderOrderRanks() {
       for (let e = roHead[u]; e !== -1; e = eNext0[e]) { const v = eTo0[e]; if (roLayer[v] < roLayer[u] + 1) roLayer[v] = roLayer[u] + 1; if (!roDone[v] && --roIndeg[v] === 0) ready0.push(v) }
     }
   }
-  // (2) weaker constraints, same layer only
   let maxLayer = 0
   for (let i = 0; i < n; i++) if (roLayer[i] > maxLayer) maxLayer = roLayer[i]
   const eTo = [], eNext = []
@@ -1086,7 +1164,6 @@ function computeRenderOrderRanks() {
       eTo.push(over); eNext.push(roHead[under]); roHead[under] = eTo.length - 1; roIndeg[over]++
     }
   }
-  // (3) layers bottom to top, each in topological order (edges never cross layers, so each layer is independent)
   const layers = new Array(maxLayer + 1)
   for (let L = 0; L <= maxLayer; L++) layers[L] = []
   for (let i = 0; i < n; i++) layers[roLayer[i]].push(i)
@@ -1105,6 +1182,7 @@ function computeRenderOrderRanks() {
       for (let e = roHead[u]; e !== -1; e = eNext[e]) { const v = eTo[e]; if (!roDone[v] && --roIndeg[v] === 0) ready.push(v) }
     }
   }
+  roFinishFrame(n, np, cmpLevels, logOn, lockOn)
 }
 // Moves each Except select into its main dropdown's row, to the right of it (the Except rows themselves are hidden). The select keeps its own control binding, so saving / restoring / undo work as for any select.
 function mergeExceptSelects() {
@@ -1271,6 +1349,8 @@ const DEV_GROUPS = [
       // Third level (2026-10-11, direct request): used when two hands tie on both the Mode and the Fallback.
       { key: 'renderOrderFallback2', label: 'Render Order Fallback 2', type: 'select', def: 'farthestZ', placeAfter: 'renderOrderFallback', options: () => RENDER_ORDER_MODE_OPTIONS },
       { key: 'renderOrderFallback2Except', label: 'Render Order Fallback 2: Except', type: 'select', def: 'none', options: () => RENDER_ORDER_MODE_OPTIONS },
+      // Flip lock (2026-10-11, direct request: "hands only seem to switch order once per trigger or retransition sequence"): a pair of nearby hands may swap render order at most ONCE per sequence (a new trigger or a retransition starting on either hand); a pair the rules leave tied keeps its previous order.
+      { key: 'renderOrderFlipLock', label: 'Render Order: Flip Once Per Sequence', type: 'checkbox', def: true },
       { key: 'fieldRows', label: 'Rows (Count)', type: 'slider', min: 1, max: 40, step: 1, def: 15, perDevice: true, onChange: () => rebuildField() },
       { key: 'fieldCols', label: 'Columns (Count)', type: 'slider', min: 1, max: 40, step: 1, def: 17, perDevice: true, onChange: () => rebuildField() },
       { key: 'rowSpacing', label: 'Row Spacing (World Units)', type: 'slider', min: 2, max: 40, step: 0.5, def: 9.5, perDevice: true, onChange: () => relayoutField() },
@@ -2454,6 +2534,9 @@ const DEV_GROUPS = [
       { key: 'poseJumpBoneThresholdDeg', label: 'Pose Jump Threshold - Bone (Deg)', type: 'slider', min: 2, max: 90, step: 1, def: 15 },
       { key: 'poseJumpPositionThreshold', label: 'Pose Jump Threshold - Position (World Units)', type: 'slider', min: 0.1, max: 20, step: 0.1, def: 2 },
       { key: 'clearPoseJumpLogBtn', label: 'Clear Pose Jump Log', type: 'button', onClick: () => clearPoseJumpLog() },
+      // Render Reordering Log (2026-10-11): one line each time two nearby hands (each hand's 8 nearest on screen) swap render order between two frames. Nothing is logged for pairs that keep their order.
+      { key: 'logRenderReorderEnabled', label: 'Log Render Reordering', type: 'checkbox', def: false },
+      { key: 'clearRenderReorderLogBtn', label: 'Clear Render Reordering Log', type: 'button', onClick: () => clearRenderReorderLog() },
       // Added 2026-09-29, direct request: "add a button in the debug
       // group. It says Copy All. When clicked it copies all active
       // logs." Concatenates Mouse Tracking Log/Hand Behaviour Log/Frame
@@ -2468,7 +2551,7 @@ const DEV_GROUPS = [
       // Added 2026-09-30, direct request: "provide a clear all logs
       // button." Clears all 3 logs' own buffers via their existing
       // individual clear functions -- no new clearing logic needed.
-      { key: 'clearAllLogsBtn', label: 'Clear All Logs', type: 'button', onClick: () => { clearMouseTrackingLog(); clearHandBehaviourLog(); clearFrameRateLog(); clearLoadingPreviewLog(); clearPoseJumpLog() } },
+      { key: 'clearAllLogsBtn', label: 'Clear All Logs', type: 'button', onClick: () => { clearMouseTrackingLog(); clearHandBehaviourLog(); clearFrameRateLog(); clearLoadingPreviewLog(); clearPoseJumpLog(); clearRenderReorderLog() } },
       // Added 2026-09-30, direct request: "provide a pause and resume
       // logs button in the debug group." A single toggle button (same
       // pattern as the main Pause Button's own dynamic label, not 2
@@ -2708,6 +2791,7 @@ buildHandBehaviourLogWidget()
 buildFrameRateLogWidget()
 buildLoadingPreviewLogWidget()
 buildPoseJumpLogWidget()
+buildRenderReorderLogWidget()
 restartCursorLogTimer()
 restartHandBehaviourDetailedLogTimer()
 setupSettingsChangeLog()
@@ -3407,7 +3491,8 @@ function copyAllDebugLogs(btn) {
     ['Hand Behaviour Log', handBehaviourLogEntries],
     ['Frame Rate Log', frameRateLogEntries],
     ['Loading Preview Log', loadingPreviewLogEntries],
-    ['Pose Jump Log', poseJumpLogEntries]
+    ['Pose Jump Log', poseJumpLogEntries],
+    ['Render Reordering Log', renderReorderLogEntries]
   ]
   const text = sections.map(([title, entries]) => `=== ${title} ===\n${entries.length ? entries.join('\n') : '(empty)'}`).join('\n\n')
   const flash = (msg) => { if (!btn) return; const orig = btn.textContent; btn.textContent = msg; setTimeout(() => { btn.textContent = orig }, 900) }
@@ -3658,6 +3743,53 @@ function buildPoseJumpLogWidget() {
   clearBtn.addEventListener('click', () => clearPoseJumpLog())
   wrap.appendChild(headerRow)
   wrap.appendChild(poseJumpLogEl)
+  body.appendChild(wrap)
+}
+function appendRenderReorderLogLine(line) {
+  if (logsPaused) return
+  renderReorderLogEntries.push(line)
+  if (renderReorderLogEntries.length > RENDER_REORDER_LOG_MAX_ENTRIES) renderReorderLogEntries.shift()
+  scheduleLogDomFlush(_renderReorderLogFlushFlag, () => renderReorderLogEl, renderReorderLogEntries)
+}
+function clearRenderReorderLog() {
+  renderReorderLogEntries.length = 0
+  if (renderReorderLogEl) renderReorderLogEl.textContent = ''
+}
+function buildRenderReorderLogWidget() {
+  const body = document.querySelector('.dp-group[data-key="Debug"] .dp-group-body')
+  if (!body) return
+  const wrap = elLocal('div', { padding: '4px 6px' })
+  const headerRow = elLocal('div', { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3px' })
+  const label = elLocal('div', { fontSize: '11px', opacity: '0.85' }, { text: 'Render Reordering Log' })
+  const mk = (t) => elLocal('button', { fontSize: '10px', padding: '2px 8px', background: '#3a3a4a', color: 'inherit', border: 'none', borderRadius: '4px', cursor: 'pointer' }, { text: t, type: 'button' })
+  const copyBtn = mk('Copy'), saveBtn = mk('Save'), clearBtn = mk('Clear')
+  headerRow.appendChild(label)
+  const btnRow = elLocal('div', { display: 'flex', gap: '4px' })
+  btnRow.appendChild(copyBtn); btnRow.appendChild(saveBtn); btnRow.appendChild(clearBtn)
+  headerRow.appendChild(btnRow)
+  renderReorderLogEl = elLocal('pre', {
+    height: '110px', overflowY: 'auto', margin: '0', padding: '4px 6px',
+    background: 'rgba(255,255,255,0.06)', borderRadius: '4px', fontSize: '10px',
+    whiteSpace: 'pre-wrap', wordBreak: 'break-word'
+  })
+  copyBtn.addEventListener('click', () => {
+    const flash = (msg) => { const orig = copyBtn.textContent; copyBtn.textContent = msg; setTimeout(() => { copyBtn.textContent = orig }, 900) }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(renderReorderLogEntries.join('\n')).then(() => flash('Copied!')).catch(() => flash('Copy failed'))
+    else flash('Copy failed')
+  })
+  saveBtn.addEventListener('click', () => {
+    const flash = (msg) => { const orig = saveBtn.textContent; saveBtn.textContent = msg; setTimeout(() => { saveBtn.textContent = orig }, 900) }
+    const blob = new Blob([renderReorderLogEntries.join('\n')], { type: 'text/plain' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'render-reorder-log-' + new Date().toISOString().replace(/[:.]/g, '-') + '.txt'
+    document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url)
+    flash('Saved!')
+  })
+  clearBtn.addEventListener('click', () => clearRenderReorderLog())
+  wrap.appendChild(headerRow)
+  wrap.appendChild(renderReorderLogEl)
   body.appendChild(wrap)
 }
 // Hand Numbers overlay (Debug group, 2026-09-28) -- direct request: "a

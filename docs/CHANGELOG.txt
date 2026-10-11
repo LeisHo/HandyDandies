@@ -17270,6 +17270,15 @@ Direct request: 'in regards to render order, only measure a hand with the 8 clos
 RO_NEIGHBOURS = 8 nearest hands by screen-space XY (distance between the projected hand centers), found with a screen grid and an expanding ring search that stops once the 8th nearest is provably closer than anything unsearched. A pair is evaluated once however many hands list each other. The layering (strongest constraints first, weaker ones only within a layer)
 is unchanged. Scalar-only settings are a plain total order (a global sort) and are not affected. `main.js` `?v=361` -> `?v=362`.
 
+2026-10-11  -  (Render Reordering Log, and a flip lock: hands swap render order at most once per sequence)
+
+Direct requests: (1) in Debug > logs, "add a new log ... add log reordering. It will log when 2 hands cross each other in render order. So it wont log when 2 hands dont flip render order"; (2) "the issue im having is that i am having hands that switch intermittently for a period. I want to prevent that, such that hands only seem to switch order once per trigger or retransition sequence".
+ - Debug > "Log Render Reordering" checkbox + a "Render Reordering Log" widget (Copy / Save / Clear, included in Copy All Logs / Clear All Logs) + a "Clear Render Reordering Log" button. One line each time two nearby hands (pairs from each hand's 8 nearest on screen, the same neighbour set the ordering uses) swap relative render order between two consecutive frames: which hands (numbered as on the Hand Numbers
+   overlay), the new vs old order, which level decided it (Mode / Fallback / Fallback 2, or the arm-distance tie-break, or a tie) and whether a flip lock was set. Pairs that keep their order log nothing; at most 20 lines per frame, then "+N more crossings this frame". Off by default.
+ - Flip lock ("Render Order: Flip Once Per Sequence", Field Layout, default ON): for each pair of nearby hands the relative order may change at most ONCE while neither hand starts a new sequence. A sequence boundary for a hand = it starts a new trigger OR a retransition on any click function (each hand carries a signature of every non-idle function's phase class and its start time; _roSeq increments when it changes).
+   Once a pair has flipped it is held (as the strongest constraint) until either hand's sequence changes; a pair the rules leave tied keeps its previous order as the weakest constraint instead of flickering with the tie-break. With the lock on, even scalar-only settings are ordered from these pairwise decisions (over each hand's 8 nearest) instead of a global sort.
+ - Not verified on screen; see the numbers measured in the session summary. `main.js` `?v=362` -> `?v=363`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a
