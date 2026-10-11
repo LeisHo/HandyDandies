@@ -9345,7 +9345,7 @@
       "renderOrderFallback2Except": "closest",
       "renderOrderFlipLock": true,
       "fieldRows": 45,
-      "fieldCols": 20,
+      "fieldCols": 21,
       "rowSpacing": 8.5,
       "columnSpacing": 10,
       "handScale": 1.2,
@@ -16140,7 +16140,7 @@
           "group": "FIST ROTATE"
         }
       ],
-      "cameraX": 3,
+      "cameraX": 0,
       "cameraY": -5.635149554887359e-17,
       "cameraZ": 259.74194092345493,
       "cameraFov": 35,
@@ -30013,7 +30013,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -195452,7 +195452,7 @@
     },
     {
       "key": "New Group (11)",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -198374,7 +198374,7 @@
       "left": 20,
       "top": 0,
       "width": 377.8571472167969,
-      "height": 681.672607421875
+      "height": 35.52381134033203
     }
   }
 }
