@@ -2542,6 +2542,6 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   bezier-handle layer, and the `CURVE_HIT_RADIUS_PX` larger invisible hit-target) rather than copying only the OLDER, handle-less shape of
   `buildArmLengthCurveWidget()`/`buildWristSplayCurveWidget()` -- which is exactly how these 2 ended up behind in the first place.
 - **The hand model is HandipantsOL_Clip.glb (2026-10-11): Draco-compressed, with a "Clipping Block" mesh.** It needs the DRACOLoader set up in main.js (decoder
-  from unpkg). The wrist crop is the block:  /  / , six outward planes +  on every hand material.
+  from unpkg). The wrist crop is the block: `makeClipRig()` / `setClipRigT()` / `updateClipRigPlanes()`, six outward planes + `clipIntersection = true` on every hand material.
   The block must stay named exactly "Clipping Block", unskinned, with its geometry axis-aligned to the model's Y (forearm) axis; to change the 100% position, move the block in Blender.
   Models without the block fall back to the single wrist plane.

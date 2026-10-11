@@ -16880,6 +16880,13 @@ stays in place unreferenced), and use its mesh named "Clipping Block" to clip th
    narrower than the hand's x range (-0.053..0.085) at the hand, not at the forearm. Not compared pixel for pixel against the old crop.
    -> .
 
+2026-10-11  -  (correction to the entry above + the crop-slider mapping, confirmed)
+
+Correction: the entry above lost its closing line to shell quoting. It should end: `main.js` `?v=321` -> `?v=322`.
+Mapping confirmed by the user: for the wrist-cropping sliders, the Clipping Block's authored position is the maximum clip (slider at max / 100%), and at 0 the
+block has cleared the 0 value of the model's local origin axis (its top at 0 on the forearm axis). That is exactly what setClipRigT() does: block top = t * 0.2358
+(authored top), t = 0 parks the block below the mesh so nothing is clipped.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a
