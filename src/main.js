@@ -262,6 +262,12 @@ let fieldBounds = null // { x:[min,max], y:[..], z:[..] } or null when no limit 
 // Per cursor-tracking feature: the cursor target at THAT feature's own depth (2026-10-11), plus its field distance domain.
 const _trackTargetArm = new THREE.Vector3(), _trackTargetPalm = new THREE.Vector3(), _trackTargetSplay = new THREE.Vector3(), _trackTargetCrop = new THREE.Vector3()
 let splayFieldMin = 0, splayFieldRange = 0.001, cropFieldMin = 0, cropFieldRange = 0.001
+// Whole-Hand Rotation at Base (ported from HANDO, 2026-10-11): orientation of the hand MESH's own local axes relative to the model root
+// (product of the local rotations from the skinned mesh up to the scene root, measured at load) and scratch for the base rotation.
+const modelBaseFrameQ = new THREE.Quaternion(), _baseFrameInv = new THREE.Quaternion()
+const cloneBaseRb = new THREE.Quaternion(), _poseBaseRb = new THREE.Quaternion(), _baseRbInv = new THREE.Quaternion(), _baseQ0 = new THREE.Quaternion()
+const _brQx = new THREE.Quaternion(), _brQy = new THREE.Quaternion(), _brQz = new THREE.Quaternion()
+const _brAX = new THREE.Vector3(1, 0, 0), _brAY = new THREE.Vector3(0, 1, 0), _brAZ = new THREE.Vector3(0, 0, 1), _brPosA = new THREE.Vector3(), _brPosB = new THREE.Vector3()
 const _trackTargetXY = new THREE.Vector3() // cursor target at a hand's own depth, for Use Cursor Target Depth = off
 // Screen-space distance scratch + scale (see cursorDistXY()); early-state block so top-level load order is safe.
 const _scrV = new THREE.Vector3(), _scrV2 = new THREE.Vector3()
@@ -768,7 +774,7 @@ function tryStartField() {
   // whatever comes next; don't treat this comment's own reasoning above
   // as the settled explanation.
   renderer.compile(scene, camera)
-  window.__debug = { makeClipRig, updateClipRigPlanes, setClipRigT, updateOnScreenFlags, evaluateArmLengthCurve, THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose, resolveTweenSegmentsWithAnchor, lerpTweenSegments, lerpLoopSegments, isHoldEntry, updateLoadingPreviewWristClip, lerpPoseValues, get loadingPreviewRenderer() { return loadingPreviewRenderer }, get loadingPreviewScene() { return loadingPreviewScene }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, get handBoundsCenterLocal() { return handBoundsCenterLocal }, multiPointCommit, multiPointEligibleFunctions, get multiPointActiveTouchCount() { return multiPointActiveTouchCount }, get multiPointSessionFiredPoseId() { return multiPointSessionFiredPoseId }, detectPoseJumps, get poseJumpLogEntries() { return poseJumpLogEntries }, applyCurlToSkeletonReference, handLogTriggerLabel, applyAllFingerCurls, syncCameraPanelFromLive, animSpeedMs, chainSequenceCount, applyFieldBounds, cursorDistXY, hexBrightnessPct, toonThresholdForMidBrightness }
+  window.__debug = { modelBaseFrameQ, computeBaseRotationQuat, cloneBaseRb, makeClipRig, updateClipRigPlanes, setClipRigT, updateOnScreenFlags, evaluateArmLengthCurve, THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose, resolveTweenSegmentsWithAnchor, lerpTweenSegments, lerpLoopSegments, isHoldEntry, updateLoadingPreviewWristClip, lerpPoseValues, get loadingPreviewRenderer() { return loadingPreviewRenderer }, get loadingPreviewScene() { return loadingPreviewScene }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, get handBoundsCenterLocal() { return handBoundsCenterLocal }, multiPointCommit, multiPointEligibleFunctions, get multiPointActiveTouchCount() { return multiPointActiveTouchCount }, get multiPointSessionFiredPoseId() { return multiPointSessionFiredPoseId }, detectPoseJumps, get poseJumpLogEntries() { return poseJumpLogEntries }, applyCurlToSkeletonReference, handLogTriggerLabel, applyAllFingerCurls, syncCameraPanelFromLive, animSpeedMs, chainSequenceCount, applyFieldBounds, cursorDistXY, hexBrightnessPct, toonThresholdForMidBrightness }
   loadingEl.classList.add('hidden')
   // The loading-preview canvas is a top-level sibling of #loading now
   // (2026-09-17, decoupled specifically so this moment doesn't force it
@@ -1484,6 +1490,11 @@ const DEV_GROUPS = [
       { key: 'modelRotX', label: 'Whole-Hand Rotation X (Deg)', type: 'slider', min: -200, max: 200, step: 1, def: 0, lockRange: true, onChange: () => onWholeHandRotationChange() },
       { key: 'modelRotY', label: 'Whole-Hand Rotation Y (Deg)', type: 'slider', min: -200, max: 200, step: 1, def: 0, lockRange: true, onChange: () => onWholeHandRotationChange() },
       { key: 'modelRotZ', label: 'Whole-Hand Rotation Z (Deg)', type: 'slider', min: -200, max: 200, step: 1, def: 0, lockRange: true, onChange: () => onWholeHandRotationChange() },
+      // Whole-Hand Rotation at Base (ported from HANDO, 2026-10-11): turns the whole hand around the BASE OF THE ARM (the forearm root bone) about the hand
+      // MODEL'S OWN local X/Y/Z axes, applied after Whole-Hand Rotation (so it rotates with it). Same -180..180 range as HANDO. See computeBaseRotationQuat().
+      { key: 'baseRotationX', label: 'Base Rotation X (Deg)', type: 'slider', min: -180, max: 180, step: 1, def: 0, lockRange: true, onChange: () => onWholeHandRotationChange() },
+      { key: 'baseRotationY', label: 'Base Rotation Y (Deg)', type: 'slider', min: -180, max: 180, step: 1, def: 0, lockRange: true, onChange: () => onWholeHandRotationChange() },
+      { key: 'baseRotationZ', label: 'Base Rotation Z (Deg)', type: 'slider', min: -180, max: 180, step: 1, def: 0, lockRange: true, onChange: () => onWholeHandRotationChange() },
       // Ported from HANDO's own "Pose Offset X/Y/Z" + "Pose Scale" sliders
       // (direct request -- see POSE_PRESET_KEYS's own comment for the full
       // account). Deliberately scoped to ACTIVE pose transitions only
@@ -2101,6 +2112,7 @@ DEV_GROUPS.forEach((g) => g.controls.forEach((c) => {
 // preserving).
 const POSE_SUBGROUP_SPECS = [
   { title: 'Whole-Hand Rotation & Thumb', collapsed: true, keys: ['modelRotX', 'modelRotY', 'modelRotZ', 'thumbCurl', 'thumbSplay', 'thumbSplay2', 'tipTwistThumb', 'curlBiasThumb', 'baseOnlyCurlThumb', 'midOnlyCurlThumb', 'tipOnlyCurlThumb'] },
+  { title: 'Whole-Hand Rotation at Base', collapsed: true, keys: ['baseRotationX', 'baseRotationY', 'baseRotationZ'] },
   { title: 'Wrist', collapsed: true, keys: ['wristBend', 'wristSplay', 'wristRotation'] },
   { title: 'Index', collapsed: true, keys: ['curlIndex', 'tipTwistIndex', 'splayIndex', 'curlBiasIndex', 'splayIndex2', 'baseOnlyCurlIndex', 'midOnlyCurlIndex', 'tipOnlyCurlIndex'] },
   { title: 'Middle', collapsed: true, keys: ['curlMiddle', 'tipTwistMiddle', 'splayMiddle', 'curlBiasMiddle', 'splayMiddle2', 'baseOnlyCurlMiddle', 'midOnlyCurlMiddle', 'tipOnlyCurlMiddle'] },
@@ -4385,7 +4397,7 @@ const POSE_PRESET_KEYS = [
   'curlMiddle', 'splayMiddle', 'splayMiddle2', 'curlBiasMiddle', 'baseOnlyCurlMiddle', 'midOnlyCurlMiddle', 'tipOnlyCurlMiddle', 'tipTwistMiddle',
   'curlRing', 'splayRing', 'splayRing2', 'curlBiasRing', 'baseOnlyCurlRing', 'midOnlyCurlRing', 'tipOnlyCurlRing', 'tipTwistRing',
   'curlPinky', 'splayPinky', 'splayPinky2', 'curlBiasPinky', 'baseOnlyCurlPinky', 'midOnlyCurlPinky', 'tipOnlyCurlPinky', 'tipTwistPinky',
-  'wristBend', 'wristSplay', 'wristRotation', 'modelRotX', 'modelRotY', 'modelRotZ',
+  'wristBend', 'wristSplay', 'wristRotation', 'modelRotX', 'modelRotY', 'modelRotZ', 'baseRotationX', 'baseRotationY', 'baseRotationZ',
   // Ported from HANDO (direct request: "i integrated XYZ offset and scale
   // sliders to Pose in Hando. Integrate those so exports load correctly.")
   // -- HANDO's own version is a single GLOBAL modelRoot-level transform
@@ -6280,7 +6292,7 @@ function applyLoadingPreviewPose(item) {
     THREE.MathUtils.degToRad(values.modelRotY),
     THREE.MathUtils.degToRad(values.modelRotZ)
   )
-  loadingPreviewBaseQuat.copy(alignQuat).multiply(new THREE.Quaternion().setFromEuler(_loadingPreviewWholeHandRotEuler))
+  loadingPreviewBaseQuat.copy(alignQuat).multiply(new THREE.Quaternion().setFromEuler(_loadingPreviewWholeHandRotEuler)).multiply(computeBaseRotationQuat(values.baseRotationX || 0, values.baseRotationY || 0, values.baseRotationZ || 0, _poseBaseRb))
   loadingPreviewHand.clone.quaternion.copy(loadingPreviewBaseQuat)
   applyWristPoseToSkeleton(loadingPreviewHand.skinnedMesh.skeleton, values)
   FINGER_NAMES.forEach((name) => applyCurlToSkeleton(name, loadingPreviewHand.skinnedMesh.skeleton, loadingPreviewBaseQuat, null, values))
@@ -6830,7 +6842,7 @@ function previewPosePreset(item) {
     THREE.MathUtils.degToRad(values.modelRotY),
     THREE.MathUtils.degToRad(values.modelRotZ)
   )
-  previewBaseQuat.copy(alignQuat).multiply(new THREE.Quaternion().setFromEuler(_previewWholeHandRotEuler))
+  previewBaseQuat.copy(alignQuat).multiply(new THREE.Quaternion().setFromEuler(_previewWholeHandRotEuler)).multiply(computeBaseRotationQuat(values.baseRotationX || 0, values.baseRotationY || 0, values.baseRotationZ || 0, _poseBaseRb))
   previewHand.clone.quaternion.copy(previewBaseQuat)
   // Wrist BEFORE fingers -- see applyAllFingerPoses()'s own comment for
   // why (rThumb1's parent is rHand, the same bone the wrist rotates;
@@ -6865,7 +6877,18 @@ function updateCloneBaseQuat() {
     THREE.MathUtils.degToRad(cfg.modelRotY),
     THREE.MathUtils.degToRad(cfg.modelRotZ)
   ))
-  cloneBaseQuat.copy(alignQuat).multiply(wholeHandRotQuat)
+  computeBaseRotationQuat(cfg.baseRotationX || 0, cfg.baseRotationY || 0, cfg.baseRotationZ || 0, cloneBaseRb)
+  cloneBaseQuat.copy(alignQuat).multiply(wholeHandRotQuat).multiply(cloneBaseRb)
+}
+// Whole-Hand Rotation at Base (ported from HANDO's updateModelRootRotation): R = F * (Rx * Ry * Rz) * F^-1, where F is the hand mesh's own axes
+// relative to the model root, so X/Y/Z are angles about the mesh's local axes. Expressed in the raw model frame, so it composes as
+// q = alignQuat * WholeHandRotation * R. Stateless (a pure function of the three angles), so it works for presets, tweens and previews.
+function computeBaseRotationQuat(bx, by, bz, out) {
+  out.identity()
+  if (!bx && !by && !bz) return out
+  out.copy(_brQx.setFromAxisAngle(_brAX, THREE.MathUtils.degToRad(bx))).multiply(_brQy.setFromAxisAngle(_brAY, THREE.MathUtils.degToRad(by))).multiply(_brQz.setFromAxisAngle(_brAZ, THREE.MathUtils.degToRad(bz)))
+  _baseFrameInv.copy(modelBaseFrameQ).invert()
+  return out.premultiply(modelBaseFrameQ).multiply(_baseFrameInv)
 }
 // Whole-Hand Rotation's own axes are re-expressed relative to
 // cloneBaseQuat (see applyCurlToSkeleton()'s own `baseQuat` parameter) --
@@ -8284,6 +8307,8 @@ function computeBaseQuatFromValues(values) {
     THREE.MathUtils.degToRad(values.modelRotZ)
   )
   _poseBaseQuat.setFromEuler(_poseBaseQuatEuler)
+  computeBaseRotationQuat(values.baseRotationX || 0, values.baseRotationY || 0, values.baseRotationZ || 0, _poseBaseRb) // left in _poseBaseRb for the caller (the arm-base pivot)
+  _poseBaseQuat.multiply(_poseBaseRb)
   return _poseBaseQuat.premultiply(alignQuat)
 }
 // Applies an interpolated pose to ONE hand's own skeleton -- reuses
@@ -8361,6 +8386,8 @@ function applyPoseValuesToHand(hand, poseValues, extraSplayDeg) {
   if (!hand.skinnedMesh) return
   hand._idleCurlSig = null // fingers are about to be posed by something other than the idle path
   hand.currentBaseQuat.copy(computeBaseQuatFromValues(poseValues))
+  if (!hand.currentBaseRb) hand.currentBaseRb = new THREE.Quaternion()
+  hand.currentBaseRb.copy(_poseBaseRb)
   // Wrist BEFORE fingers -- see applyAllFingerPoses()'s own comment.
   applyWristPoseToSkeleton(hand.skinnedMesh.skeleton, poseValues, extraSplayDeg)
   // CORRECTED 2026-09-27 -- direct report: releasing a Click-Hold, waiting
@@ -14453,7 +14480,17 @@ function applyHandArmLength(hand, hideT) {
     _cutPointRaw.copy(forearmPosRaw).lerp(wristPosRaw, hideT)
   }
   hand.clone.quaternion.copy(baseQuat)
-  hand.clone.position.copy(_cutPointRaw).applyQuaternion(baseQuat).multiplyScalar(-scaleFactor)
+  const rb = hand.currentBaseRb
+  if (rb && (rb.x !== 0 || rb.y !== 0 || rb.z !== 0)) {
+    // Whole-Hand Rotation at Base: the arm-base point (forearmPosRaw) stays where it would be WITHOUT the base rotation, and the hand swings about it.
+    // p = s * ( q0 * (base - cut) - q * base ), with q0 = q * Rb^-1 (the orientation before the base rotation). With Rb = identity this is -s * q * cut, the old line.
+    _baseQ0.copy(baseQuat).multiply(_baseRbInv.copy(rb).invert())
+    _brPosA.copy(forearmPosRaw).sub(_cutPointRaw).applyQuaternion(_baseQ0)
+    _brPosB.copy(forearmPosRaw).applyQuaternion(baseQuat)
+    hand.clone.position.copy(_brPosA).sub(_brPosB).multiplyScalar(scaleFactor)
+  } else {
+    hand.clone.position.copy(_cutPointRaw).applyQuaternion(baseQuat).multiplyScalar(-scaleFactor)
+  }
 }
 
 // "Hide Wrist"/Arm Length clipping plane -- ported from HANDO's own
@@ -14729,7 +14766,7 @@ function createFieldHand() {
   // it explicitly: false until a hand's first REAL repose, forcing
   // exactly one guaranteed full sync regardless of the gate's other
   // conditions, then never forced again.
-  const hand = { wrapper, clone, skinnedMesh, outlineMesh, emissionMesh, wristClipPlane: handWristClipPlane, clipRig, effectiveRenderOrder: 0, screenX: 0, screenY: 0, screenRadius: 0, currentBaseQuat: cloneBaseQuat.clone(), everReposed: false, currentSplayDeg: 0, _handoffSettleFrames: 0, _idleSettleFrom: null, _idleSettleFromSplay: 0, _idleSettleStartTime: 0 }
+  const hand = { wrapper, clone, skinnedMesh, outlineMesh, emissionMesh, wristClipPlane: handWristClipPlane, clipRig, effectiveRenderOrder: 0, screenX: 0, screenY: 0, screenRadius: 0, currentBaseRb: new THREE.Quaternion(), currentBaseQuat: cloneBaseQuat.clone(), everReposed: false, currentSplayDeg: 0, _handoffSettleFrames: 0, _idleSettleFrom: null, _idleSettleFromSplay: 0, _idleSettleStartTime: 0 }
   // Also recomputes this hand's OWN Hide Wrist clip plane right before
   // it draws (see updateWristClipPlaneForHand()'s own comment) -- every
   // hand faces a different direction and (own material/plane now, see
@@ -14938,6 +14975,9 @@ gltfLoader.load(
     // true bind pose.
     skinned.skeleton.bones.forEach((bone) => { boneRestQuat[bone.name] = bone.quaternion.clone() })
     wristPosRaw.copy(wristPos)
+    // Whole-Hand Rotation at Base: the mesh's own axes relative to the scene root = product of the local rotations from the skinned mesh up to the root (HANDO's modelBaseFrameQ).
+    modelBaseFrameQ.identity()
+    for (let o = skinned; o && o !== root; o = o.parent) modelBaseFrameQ.premultiply(o.quaternion)
     const forearmBone = skinned.skeleton.getBoneByName('rForearmBend')
     if (forearmBone) forearmBone.getWorldPosition(forearmPosRaw)
 
@@ -15156,6 +15196,8 @@ function resetAllHands() {
     hand._idleCurlSig = null
     hand.currentSplayDeg = 0
     hand.currentBaseQuat.copy(cloneBaseQuat)
+    if (!hand.currentBaseRb) hand.currentBaseRb = new THREE.Quaternion()
+    hand.currentBaseRb.copy(cloneBaseRb)
     if (hand.basePosition) hand.wrapper.position.copy(hand.basePosition)
     hand.wrapper.quaternion.copy(hand.currentBaseQuat)
   })
@@ -16307,6 +16349,8 @@ function updateRenderOrder() {
         // transition syncs back to the shared value the very next frame,
         // same as it would have before this per-hand basis existed.
         hand.currentBaseQuat.copy(cloneBaseQuat)
+        if (!hand.currentBaseRb) hand.currentBaseRb = new THREE.Quaternion()
+        hand.currentBaseRb.copy(cloneBaseRb)
         applyWristPoseToSkeleton(hand.skinnedMesh.skeleton, cfg, extraSplay)
         // Keeps `hand.currentSplayDeg` (see applyPoseValuesToHand()'s own
         // 2026-09-27 comment) current for idle hands too -- this is the

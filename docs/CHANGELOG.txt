@@ -16900,6 +16900,23 @@ handXYDist() (screen-space XY from the current wrapper position) against the on-
 distance (a feedback loop with a one-frame delay); the earlier rest-position design existed to avoid that. The norm is stored once per frame, so the live ramp and
 the bakes still read the same number. Cursor Offset (main Offset group) is unchanged and still uses the rest position. `main.js` `?v=323` -> `?v=324`.
 
+2026-10-11  -  (Whole-Hand Rotation at Base ported from HANDO into the Pose group)
+
+Direct request: look into HANDO and reference "Rotation at Arm Base"; provide that function in the Pose group. HANDO's version (src/main.js, updateModelRootRotation +
+the baseRotationX/Y/Z sliders, CHANGELOG 2026-10-06 and 2026-10-09 02:09): three sliders, Base Rotation X / Y / Z (Deg, -180..180, step 1) in a "Whole-Hand Rotation at
+Base" subgroup of Pose. They turn the whole hand about the base of the arm (the forearm root bone, rForearmBend) using the hand MESH's own local axes, composed after
+Whole-Hand Rotation: R = F * (Rx * Ry * Rz) * F^-1 and q = q0 * R, where F is the mesh's own axes relative to the model root (product of the local rotations from the
+skinned mesh up to the root, measured once at load) and the arm-base point does not move.
+ - Ported as the same three pose values (baseRotationX/Y/Z are in POSE_PRESET_KEYS, so saved poses, tweens, Click Hold-Pose, the Loading Preview and the Pose Preview
+   all carry and interpolate them, and HANDO poses that include them import correctly). computeBaseRotationQuat() builds R; updateCloneBaseQuat() (shared idle
+   rotation) and computeBaseQuatFromValues() (per hand, per pose) compose q = alignQuat * WholeHandRotation * R. Finger curl axes read the full quaternion, so they stay
+   consistent. New subgroup "Whole-Hand Rotation at Base" in Pose (collapsed).
+ - Pivot: this project already re-centers each hand's arm-crop cut point on its field position (applyHandArmLength). With a base rotation the arm-base point is kept
+   where it would be without the rotation and the hand swings about it: position = s * ( q0 * (base - cut) - q * base ), q0 = q * R^-1; with R = identity this is the old
+   -s * q * cut. hand.currentBaseRb stores R per hand (kept in step with currentBaseQuat at all three places that set it).
+ - The three sliders are absolute Euler angles applied X, then Y, then Z (as in HANDO): the X axis does not follow a Y/Z rotation applied after it.
+ `main.js` `?v=324` -> `?v=325`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a
