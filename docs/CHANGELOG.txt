@@ -17284,6 +17284,13 @@ Direct requests: (1) in Debug > logs, "add a new log ... add log reordering. It 
 Measured on v=363 with a cursor oscillating over a 1925-hand field in 'Closest To Cursor (XY)' mode: lock OFF 12,618 flips (a single pair up to 17 times); lock ON 1,604 flips but a pair still up to 7 times, because a lock edge could be the one dropped when the constraint graph stalled on a cycle, and a lock was recorded for a flip that the graph then did not realise.
 v=364: lock edges are kept apart (derived from last frame's total order, so acyclic among themselves) and a stalled graph always releases a hand with NO unmet lock edge, so only weaker rule constraints can be sacrificed; and the lock is created after the ranks are known, for every nearby pair whose order really changed. The Render Reordering Log now says whether a crossing used the pair's flip or happened while a lock was active (which should not occur). `main.js` `?v=363` -> `?v=364`.
 
+2026-10-11  -  (flip lock: layers computed after the pass; Render Reordering Log names the condition that fired)
+
+Measured on a fresh page with v=364, no triggers: with the lock ON 150 of 1252 flipped pairs still flipped more than once (max 5; lock OFF: every flipped pair, max 17). Cause: when the cycle-breaker force-releases a hand, that hand's layer can be raised AFTER it has already propagated its layer to its neighbours, so a lock edge could end up with equal layers and be
+lost. v=365 computes the layers in a second pass over the finished processing order (exact longest path over the edges that point forward in that order, which always includes every lock edge).
+Direct request: 'in the render order log, also provide a note about which condition triggered the reordering such as palm center, arm base to palm, etc'. Each Render Reordering Log line now ends with the rule that fired, e.g. 'Mode [Palm To Arm End]: Hand 12 palm center Z 4.21 is higher than Hand 13 arm end Z 3.90', or the 'both palms higher ... Hand 12 arm end is farther from the cursor (123.4 vs 98.7)' tie-break, or a scalar mode's
+values ('Closest To Cursor (XY): Hand 12 40.10 vs Hand 13 55.20 (distance, nearer goes above)'), plus 'Except [..] did not oppose it' when a qualifier is set, and a NOTE when the final order differs from what the rule wanted (flip lock / conflicting constraint). `main.js` `?v=364` -> `?v=365`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

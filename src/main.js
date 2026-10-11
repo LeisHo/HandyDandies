@@ -912,7 +912,7 @@ function renderOrderBone(hand, key) {
 // in Z than B's arm base (by more than 0.01); when each hand's palm is higher than the other's arm base, the hand whose arm base is FARTHER from the cursor on screen (XY only, no Z) goes above; when neither is, the level ties.
 let roKindXY = false, roPriority = 0
 const RO_NEIGHBOURS = 8 // a hand is only compared with this many nearest hands (screen XY) in the pairwise render-order modes
-let roOrder = [], roPalmZ = null, roBaseZ = null, roBaseXY = null, roEndZ = null, roEndXY = null, roSX = null, roSY = null, roSR = null, roIndeg = null, roHead = null, roDone = null, roVis = null, roLayer = null, roLockIndeg = null
+let roOrder = [], roPalmZ = null, roBaseZ = null, roBaseXY = null, roEndZ = null, roEndXY = null, roSX = null, roSY = null, roSR = null, roIndeg = null, roHead = null, roDone = null, roVis = null, roLayer = null, roLockIndeg = null, roPos = null
 const roScalar = {}
 const _roV = new THREE.Vector3()
 // ---- Pairwise render-order support (2026-10-11) ----
@@ -1004,7 +1004,30 @@ function roUpdateSequences() {
 }
 let roPrevRank = null, roLocks = new Map(), roLockPruneCounter = 0
 const RO_LEVEL_NAMES = ['Mode', 'Fallback', 'Fallback 2']
-function roFinishFrame(n, np, cmpLevels, logOn, lockOn) {
+const roOptText = (mode) => { const o = RENDER_ORDER_MODE_OPTIONS.find((x) => x.value === mode); return o ? o.text : String(mode) }
+// Which condition the rule fired on for this pair, e.g. "Mode [Palm To Arm End]: Hand 12 palm center Z 4.21 is higher than Hand 13 arm end Z 3.90". Called right after cmpLevels(lo, hi) (it reads roPriority) with the same
+// frame's evaluator arrays. loAbove = the FINAL order; if the rule wanted the other way (flip lock or a conflicting constraint decided), that is said too.
+function roExplain(lv, r, lo, hi, loAbove) {
+  if (r === 0) return 'no level decides this pair (order kept / set by the constraint graph)'
+  const l = roPriority >> 1, kindXY = (roPriority & 1) === 1
+  const L = lv[l], ev = L.m
+  const ruleLoAbove = r > 0
+  const up = ruleLoAbove ? lo : hi, down = ruleLoAbove ? hi : lo
+  let cond
+  if (ev.pair) {
+    const arm = ev.isEnd ? 'arm end' : 'arm base'
+    if (kindXY) cond = 'both ' + (ev.rev ? arm + 's are higher than the other palm' : 'palms are higher than the other ' + arm) + '; Hand ' + (up + 1) + ' ' + arm + ' is farther from the cursor (' + ev.xy[up].toFixed(1) + ' vs ' + ev.xy[down].toFixed(1) + ')'
+    else if (!ev.rev) cond = 'Hand ' + (up + 1) + ' palm center Z ' + roPalmZ[up].toFixed(2) + ' is higher than Hand ' + (down + 1) + ' ' + arm + ' Z ' + ev.z[down].toFixed(2)
+    else cond = 'Hand ' + (up + 1) + ' ' + arm + ' Z ' + ev.z[up].toFixed(2) + ' is higher than Hand ' + (down + 1) + ' palm center Z ' + roPalmZ[down].toFixed(2)
+  } else {
+    const neg = ev.mode === 'closest' || ev.mode === 'closestZ' // their key is minus the distance
+    const show = (i) => ((neg ? -1 : 1) * ev.k[i] * 0.01).toFixed(2)
+    cond = 'Hand ' + (up + 1) + ' ' + show(up) + ' vs Hand ' + (down + 1) + ' ' + show(down) + (neg ? ' (distance, nearer goes above)' : '')
+  }
+  const ex = L.q ? '; Except [' + roOptText(L.q.mode) + '] did not oppose it' : ''
+  return RO_LEVEL_NAMES[l] + ' [' + roOptText(ev.mode) + ']: ' + cond + ex + (ruleLoAbove === loAbove ? '' : ' -- NOTE the rule wanted Hand ' + (up + 1) + ' above, but the final order differs (flip lock / conflicting constraint)')
+}
+function roFinishFrame(n, np, cmpLevels, logOn, lockOn, lv) {
   if (!logOn && !lockOn) { roPrevRank = null; roLocks.clear(); return }
   if (logOn && roPrevRank && roPrevRank.length === n) {
     let total = 0, logged = 0
@@ -1017,7 +1040,7 @@ function roFinishFrame(n, np, cmpLevels, logOn, lockOn) {
       if (logged >= 20) continue
       logged++
       const r = cmpLevels(lo, hi)
-      const why = r === 0 ? 'tie (all levels)' : RO_LEVEL_NAMES[roPriority >> 1] + (roPriority & 1 ? ' (arm-distance tie-break)' : '')
+      const why = roExplain(lv, r, lo, hi, now)
       const lk = roLocks.get(lo * n + hi)
       appendRenderReorderLogLine(stamp + ' -- Hand ' + (lo + 1) + ' now ' + (now ? 'above' : 'below') + ' Hand ' + (hi + 1) + ' (was ' + (was ? 'above' : 'below') + '), decided by ' + why + (lk ? ', WHILE a flip lock was active (seq ' + lk.sa + '/' + lk.sb + ')' : ', flip used (locked until either hand starts a new trigger/retransition)'))
     }
@@ -1059,12 +1082,12 @@ function computeRenderOrderRanks() {
         zArr[i] = (nb ? nb.matrixWorld.elements[14] : h.wrapper.position.z) * camSign
         xyArr[i] = nb ? cursorDistXY(_roV.setFromMatrixPosition(nb.matrixWorld)) : cursorDistXY(h.wrapper.position)
       }
-      ev = { pair: true, z: zArr, xy: xyArr, rev }
+      ev = { pair: true, z: zArr, xy: xyArr, rev, isEnd, mode }
     } else {
       let k = roScalar[mode]
       if (!k || k.length !== n) k = roScalar[mode] = new Float64Array(n)
       for (let i = 0; i < n; i++) k[i] = Math.round(renderOrderPriority(hands[i], mode) / TOL)
-      ev = { pair: false, k }
+      ev = { pair: false, k, mode }
     }
     evs.set(mode, ev)
     return ev
@@ -1111,8 +1134,8 @@ function computeRenderOrderRanks() {
     if (roOrder.length !== n) { roOrder = new Array(n); for (let i = 0; i < n; i++) roOrder[i] = i }
     roOrder.sort((a, b) => cmpLevels(a, b) || (a - b))
     for (let r = 0; r < n; r++) hands[roOrder[r]]._roRank = r
-    if (logOn) roFinishFrame(n, roKnnPairs(n), cmpLevels, true, false)
-    else roFinishFrame(n, 0, cmpLevels, false, false)
+    if (logOn) roFinishFrame(n, roKnnPairs(n), cmpLevels, true, false, lv)
+    else roFinishFrame(n, 0, cmpLevels, false, false, lv)
     return
   }
   // The order is built from pairwise decisions between each hand and its RO_NEIGHBOURS nearest hands on screen: a pairwise level (Palm To Arm ...) is not a total order, and the flip lock is a per-pair memory, neither of
@@ -1157,12 +1180,19 @@ function computeRenderOrderRanks() {
     const ready0 = []
     for (let i = 0; i < n; i++) if (roIndeg[i] === 0) ready0.push(i)
     let placed = 0, qi = 0
+    const proc = [] // processing order; the layer values are computed from it afterwards (a hand force-released out of a cycle can have its layer raised AFTER it has propagated, so propagating during the pass is not reliable)
+    if (!roPos || roPos.length !== n) roPos = new Int32Array(n)
     while (placed < n) {
       if (qi >= ready0.length) { let best = -1, bi = 1e9; for (let i = 0; i < n; i++) if (!roDone[i] && roLockIndeg[i] === 0 && roIndeg[i] < bi) { bi = roIndeg[i]; best = i } if (best < 0) { for (let i = 0; i < n; i++) if (!roDone[i]) { best = i; break } } roIndeg[best] = 0; ready0.push(best) }
       const u = ready0[qi++]
       if (roDone[u]) continue
-      roDone[u] = 1; placed++
-      for (let e = roHead[u]; e !== -1; e = eNext0[e]) { const v = eTo0[e]; if (roLayer[v] < roLayer[u] + 1) roLayer[v] = roLayer[u] + 1; if (eLock0[e]) roLockIndeg[v]--; if (!roDone[v] && --roIndeg[v] === 0) ready0.push(v) }
+      roDone[u] = 1; roPos[u] = placed; placed++; proc.push(u)
+      for (let e = roHead[u]; e !== -1; e = eNext0[e]) { const v = eTo0[e]; if (eLock0[e]) roLockIndeg[v]--; if (!roDone[v] && --roIndeg[v] === 0) ready0.push(v) }
+    }
+    // exact longest-path layers over the KEPT edges (those that point forward in the processing order, which includes every lock edge)
+    for (let k = 0; k < proc.length; k++) {
+      const u = proc[k]
+      for (let e = roHead[u]; e !== -1; e = eNext0[e]) { const v = eTo0[e]; if (roPos[v] > roPos[u] && roLayer[v] < roLayer[u] + 1) roLayer[v] = roLayer[u] + 1 }
     }
   }
   let maxLayer = 0
@@ -1195,7 +1225,7 @@ function computeRenderOrderRanks() {
       for (let e = roHead[u]; e !== -1; e = eNext[e]) { const v = eTo[e]; if (!roDone[v] && --roIndeg[v] === 0) ready.push(v) }
     }
   }
-  roFinishFrame(n, np, cmpLevels, logOn, lockOn)
+  roFinishFrame(n, np, cmpLevels, logOn, lockOn, lv)
 }
 // Moves each Except select into its main dropdown's row, to the right of it (the Except rows themselves are hidden). The select keeps its own control binding, so saving / restoring / undo work as for any select.
 function mergeExceptSelects() {
