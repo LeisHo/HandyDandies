@@ -16850,6 +16850,16 @@ where zKey = round(z / 0.01) (sign flipped if the camera is on the -Z side). The
 emission meshes keep their -0.001 offset; the Show Target Marker render order was raised to 1e15 so it stays on top.
 `main.js` `?v=319` -> `?v=320`.
 
+2026-10-11  -  (Cursor Target Depth is now plain world units Z)
+
+Direct request: remove the "x Field Radius" part; the slider is just the depth Z value. The shared Cursor Target Depth and the four per-feature depth
+sliders (Arm Rotation, Palm Rotation, Wrist Splay, Wrist Cropping) now hold world units along Z (-300..300, step 0.1) and are used directly
+(cursorTarget.z = value). Your saved values were multiples of each device's field radius, so they were converted in
+data/processed/dev-panel-settings.json (value x radius, rounded to 0.1; radius = max(hypot(w, h) / 2, min spacing) per device: desktop 93.31, mobile 112.16,
+landscape 67.95): desktop 0.65 -> 60.6, 0.3 -> 28.0, 0.05 -> 4.7, 0.4 -> 37.3, -1.65 -> -154.0; mobile 0.8 -> 89.7, 0.05 -> 5.6; landscape 0.6 -> 40.8,
+0.05 -> 3.4. Behaviour is unchanged by this round. Defaults follow the same conversion. A browser tab opened before this version still holds the
+old multiples and would write them back on Save: hard-refresh first. `main.js` `?v=320` -> `?v=321`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

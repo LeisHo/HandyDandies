@@ -925,7 +925,7 @@ const DEV_GROUPS = [
       // reads cfg.targetDepthFactor live when it sets cursorTarget.z, so
       // there's no cached per-depth state to refresh on a slider change
       // anymore (see that function's own 2026-09-14 correction comment).
-      { key: 'targetDepthFactor', label: 'Cursor Target Depth (x Field Radius)', type: 'slider', min: -2, max: 2, step: 0.05, def: 0.6, perDevice: true },
+      { key: 'targetDepthFactor', label: 'Cursor Target Depth (World Units Z)', type: 'slider', min: -300, max: 300, step: 0.1, def: 60.6, defMobile: 89.7, defLandscape: 40.8, perDevice: true },
       { key: 'showTargetMarker', label: 'Show Target Marker', type: 'checkbox', def: false, perDevice: true, onChange: (v) => { if (targetMarker) targetMarker.visible = v } },
       // MOVED here 2026-09-28 (direct request: "i tried nesting the
       // RESPONSIVE ARM ROTATION group somewhere and it wont save. So can
@@ -942,7 +942,7 @@ const DEV_GROUPS = [
       { key: 'armRotationEnabled', label: 'Responsive Arm Rotation (Master On/Off)', type: 'checkbox', def: true, perDevice: true },
       // Use Cursor Target Depth (2026-10-11, direct request): on = aim at / measure to the 3D cursor target (depth from Cursor Target Depth); off = screen XY only.
       { key: 'armRotationUseDepth', label: 'Arm Rotation Uses Cursor Target Depth', type: 'checkbox', def: true, perDevice: true },
-      { key: 'armRotationTargetDepth', label: 'Arm Rotation Cursor Target Depth (x Field Radius)', type: 'slider', min: -2, max: 2, step: 0.05, def: 0.05, defMobile: 0.8, defLandscape: 0.6, perDevice: true },
+      { key: 'armRotationTargetDepth', label: 'Arm Rotation Cursor Target Depth (World Units Z)', type: 'slider', min: -300, max: 300, step: 0.1, def: 60.6, defMobile: 89.7, defLandscape: 40.8, perDevice: true },
       // Default Arm Rotation -- CORRECTED 2026-09-28, direct correction
       // ("Default Arm Rotation isnt reactiveness. Its just the default if
       // responsive is turned off. just like the other cursor tracking
@@ -985,7 +985,7 @@ const DEV_GROUPS = [
       { key: 'palmFacesCursor', label: 'Palm Faces Cursor', type: 'checkbox', def: true, perDevice: true },
       // The palm angle itself is already a screen-XY compass; this only switches the distance its Palm Rotation Distance Curve reads.
       { key: 'palmRotationUseDepth', label: 'Palm Rotation Uses Cursor Target Depth', type: 'checkbox', def: true, perDevice: true },
-      { key: 'palmRotationTargetDepth', label: 'Palm Rotation Cursor Target Depth (x Field Radius)', type: 'slider', min: -2, max: 2, step: 0.05, def: 0.05, defMobile: 0.8, defLandscape: 0.6, perDevice: true },
+      { key: 'palmRotationTargetDepth', label: 'Palm Rotation Cursor Target Depth (World Units Z)', type: 'slider', min: -300, max: 300, step: 0.1, def: 60.6, defMobile: 89.7, defLandscape: 40.8, perDevice: true },
       // Adds directly onto whatever angle is already in effect --
       // computeRadialRollDeg()'s own dynamic angle when Palm Faces
       // Cursor is on, or 0 (just this slider alone) when it's off --
@@ -1613,7 +1613,7 @@ const DEV_GROUPS = [
       // = smoother. Applied in animate()'s own per-hand loop, not here.
       { key: 'armLengthDamping', label: 'Wrist Cropping Damping (x)', type: 'slider', min: 0.02, max: 1, step: 0.01, def: 1 },
       { key: 'armLengthUseDepth', label: 'Wrist Cropping Uses Cursor Target Depth', type: 'checkbox', def: true },
-      { key: 'armLengthTargetDepth', label: 'Wrist Cropping Cursor Target Depth (x Field Radius)', type: 'slider', min: -2, max: 2, step: 0.05, def: 0.05, defMobile: 0.8, defLandscape: 0.6, perDevice: true }
+      { key: 'armLengthTargetDepth', label: 'Wrist Cropping Cursor Target Depth (World Units Z)', type: 'slider', min: -300, max: 300, step: 0.1, def: 60.6, defMobile: 89.7, defLandscape: 40.8, perDevice: true }
     ]
   },
   {
@@ -1667,7 +1667,7 @@ const DEV_GROUPS = [
       // nothing"/stale-bind-pose bugs this stagger must not interact with.
       { key: 'wristSplayReposeStagger', label: 'Reactive Splay Update Stagger (Frames, 1=Off)', type: 'slider', min: 1, max: 8, step: 1, def: 4 },
       { key: 'wristSplayUseDepth', label: 'Wrist Splay Uses Cursor Target Depth', type: 'checkbox', def: true },
-      { key: 'wristSplayTargetDepth', label: 'Wrist Splay Cursor Target Depth (x Field Radius)', type: 'slider', min: -2, max: 2, step: 0.05, def: 0.05, defMobile: 0.8, defLandscape: 0.6, perDevice: true },
+      { key: 'wristSplayTargetDepth', label: 'Wrist Splay Cursor Target Depth (World Units Z)', type: 'slider', min: -300, max: 300, step: 0.1, def: 60.6, defMobile: 89.7, defLandscape: 40.8, perDevice: true },
       { key: 'wristSplayDefault', label: 'Default Wrist Splay (Deg, Reactive Off)', type: 'slider', min: -180, max: 180, step: 1, def: 7 },
       { key: 'wristSplayReactiveEnabled', label: 'Reactive Wrist Splay (By Cursor Distance)', type: 'checkbox', def: true },
       { key: 'wristSplayRange', label: 'Min / Max Wrist Splay (Deg)', type: 'text', def: '{"min":5,"max":-71}', onChange: () => parseWristSplayConfig() },
@@ -3333,7 +3333,7 @@ function updateCursorTarget() {
     cursorTarget.x = hit.x
     cursorTarget.y = hit.y
   }
-  cursorTarget.z = sceneState.fieldRadius * cfg.targetDepthFactor
+  cursorTarget.z = cfg.targetDepthFactor // World Units Z (was a multiple of the field radius until 2026-10-11)
   // Screen marker (2026-10-11): drawn on the z = 0 field plane, i.e. exactly under the mouse on screen -- the point the screen-space
   // click-function distance measures from. (It used to sit at the shared Cursor Target Depth, which perspective draws displaced from the cursor.)
   targetMarker.position.set(cursorTarget.x, cursorTarget.y, 0)
@@ -3341,11 +3341,11 @@ function updateCursorTarget() {
 }
 // Each cursor-tracking feature has its own Cursor Target Depth (x Field Radius); falls back to the shared one if unset.
 function updateTrackingTargets() {
-  const R = sceneState.fieldRadius, shared = cfg.targetDepthFactor
-  _trackTargetArm.set(cursorTarget.x, cursorTarget.y, R * (cfg.armRotationTargetDepth ?? shared))
-  _trackTargetPalm.set(cursorTarget.x, cursorTarget.y, R * (cfg.palmRotationTargetDepth ?? shared))
-  _trackTargetSplay.set(cursorTarget.x, cursorTarget.y, R * (cfg.wristSplayTargetDepth ?? shared))
-  _trackTargetCrop.set(cursorTarget.x, cursorTarget.y, R * (cfg.armLengthTargetDepth ?? shared))
+  const shared = cfg.targetDepthFactor // all depths are World Units Z since 2026-10-11
+  _trackTargetArm.set(cursorTarget.x, cursorTarget.y, cfg.armRotationTargetDepth ?? shared)
+  _trackTargetPalm.set(cursorTarget.x, cursorTarget.y, cfg.palmRotationTargetDepth ?? shared)
+  _trackTargetSplay.set(cursorTarget.x, cursorTarget.y, cfg.wristSplayTargetDepth ?? shared)
+  _trackTargetCrop.set(cursorTarget.x, cursorTarget.y, cfg.armLengthTargetDepth ?? shared)
 }
 
 // -----------------------------------------------------------------------
