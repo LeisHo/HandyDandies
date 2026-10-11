@@ -21,7 +21,7 @@
       "renderOrderModeTerms": "[]",
       "renderOrderFallbackTerms": "[]",
       "renderOrderFallback2Terms": "[]",
-      "renderOrderExtraFallbacks": "[]",
+      "renderOrderExtraFallbacks": "{\"v\":2,\"items\":[{\"m\":\"palmToArmEnd\",\"q\":\"armBase\",\"t\":[]},{\"m\":\"armEndToPalm\",\"q\":\"closest\",\"t\":[]}]}",
       "renderOrderFlipLock": true,
       "fieldRows": 40,
       "fieldCols": 60,
@@ -6958,10 +6958,10 @@
       "emissionColor": "#ffffff",
       "emissionIntensity": 1.5,
       "bgColor": "#808080",
-      "pixelRatio": 1.25,
+      "pixelRatio": 2,
       "resolutionScale": 100,
       "qualityPreset": "high",
-      "showTrackingPoints": true,
+      "showTrackingPoints": false,
       "showGridHelper": false,
       "showWireframe": false,
       "preventReorderFlash": false,
@@ -9350,7 +9350,7 @@
       "renderOrderModeTerms": "[]",
       "renderOrderFallbackTerms": "[]",
       "renderOrderFallback2Terms": "[]",
-      "renderOrderExtraFallbacks": "[]",
+      "renderOrderExtraFallbacks": "{\"v\":2,\"items\":[{\"m\":\"palmToArmEnd\",\"q\":\"armBase\",\"t\":[]},{\"m\":\"armEndToPalm\",\"q\":\"closest\",\"t\":[]}]}",
       "renderOrderFlipLock": true,
       "fieldRows": 45,
       "fieldCols": 21,
@@ -16149,7 +16149,7 @@
         }
       ],
       "cameraX": 0,
-      "cameraY": -5.635149554887359e-17,
+      "cameraY": 4.773622868161123e-14,
       "cameraZ": 259.74194092345493,
       "cameraFov": 35,
       "cameraYaw": 0,
@@ -16287,10 +16287,10 @@
       "emissionColor": "#ffffff",
       "emissionIntensity": 1.5,
       "bgColor": "#808080",
-      "pixelRatio": 1.25,
+      "pixelRatio": 2,
       "resolutionScale": 100,
       "qualityPreset": "high",
-      "showTrackingPoints": true,
+      "showTrackingPoints": false,
       "showGridHelper": false,
       "showWireframe": false,
       "preventReorderFlash": false,
@@ -18679,7 +18679,7 @@
       "renderOrderModeTerms": "[]",
       "renderOrderFallbackTerms": "[]",
       "renderOrderFallback2Terms": "[]",
-      "renderOrderExtraFallbacks": "[]",
+      "renderOrderExtraFallbacks": "{\"v\":2,\"items\":[{\"m\":\"palmToArmEnd\",\"q\":\"armBase\",\"t\":[]},{\"m\":\"armEndToPalm\",\"q\":\"closest\",\"t\":[]}]}",
       "renderOrderFlipLock": true,
       "fieldRows": 15,
       "fieldCols": 3,
@@ -25616,10 +25616,10 @@
       "emissionColor": "#ffffff",
       "emissionIntensity": 1.5,
       "bgColor": "#808080",
-      "pixelRatio": 1.25,
+      "pixelRatio": 2,
       "resolutionScale": 100,
       "qualityPreset": "high",
-      "showTrackingPoints": true,
+      "showTrackingPoints": false,
       "showGridHelper": false,
       "showWireframe": false,
       "preventReorderFlash": false,
@@ -29098,7 +29098,7 @@
     },
     {
       "key": "Debug",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -198640,6 +198640,12 @@
       "top": 115.1875,
       "width": 749.5875244140625,
       "height": 607.6000366210938
+    },
+    "mobile": {
+      "left": 20,
+      "top": 0,
+      "width": 384.71429443359375,
+      "height": 35.52381134033203
     }
   }
 }
