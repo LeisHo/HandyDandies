@@ -2481,3 +2481,28 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
 - **Chain-mode speed (2026-10-09).** In Chain mode `${p}TweenSpeedMs` is the time of ONE chained sequence; every place that turns
   it into a duration goes through `animSpeedMs()` / `loopSegmentMsFor()` / `trig.loopSegmentMs`, which multiply by
   `chainSequenceCount(p)`. A new consumer that reads `TweenSpeedMs` directly will treat it as the whole chain.
+- **Checked for the HANDYSET/shared-template "list-picker reassigns its array instead of mutating in place" bug
+  (2026-10-11) — confirmed NOT present here, no code changed.** HANDYSET's own `list-picker` (ported from
+  `.claude/TEMPLATE_DEV_PANEL.html`) used to copy its backing array once at build time and reassign a brand-new
+  private array on every Save/Rename/Delete/Reset/Undo, so any OTHER code holding a direct reference to the real
+  array (e.g. a module-level `SAVED_POSES` array read by Tween playback) never saw the update — fixed there via an
+  in-place `lpSetItems()` helper (`entry.items.length = 0; entry.items.push(...)`), ported into the template
+  itself. This project's `devPanel.js` is already on record (this file's own 2026-09-17 note, above) as an
+  entirely independent hand-built implementation, never template-derived byte-for-byte — confirmed again here:
+  its own `buildListPickerRow()` (all 7 pickers — savedPoses/savedCameras/savedLighting/savedToon/
+  savedTweenSequences/loadingPreviewSavedCameras/loadingPreviewSavedLighting — share this one function) *also*
+  reassigns (`entry.items = entry.items.map(...)`/`.filter(...)`/`.concat(...)`, then `commit(ctrl, entry.items)`
+  → `cfg[ctrl.key] = v`, a fresh array object every time). But that reassignment never goes stale here, because
+  nothing in `main.js` ever caches one of these arrays — every consumer re-reads `cfg.<key>` fresh at the point of
+  use (`chainSequenceCount()`'s `cfg.savedTweenSequences`, the Click-Pose/Click-Hold-Pose Target Pose `<select>`
+  controls' `options()` callbacks reading `cfg.savedPoses`, `tweenPoses`' multi-select `options()`, the loading-
+  preview capture/apply functions) — and `savedPoses`' own `onChange` explicitly calls
+  `safeRefreshSelectOptions()`/`safeRefreshMultiSelectOptions()` immediately after every `commit()`, so dependent
+  dropdowns refresh synchronously rather than relying on some later poll. Net effect: a different mechanism
+  (commit-and-notify over a single shared `cfg` object, vs. true in-place array mutation) reaches the same
+  practical guarantee the HANDYSET fix was for, so there was no bug to port here. Migrating this project's picker
+  onto the shared generic `list-picker` engine was considered and declined for this reason specifically (no
+  problem it would solve) — not evaluated as a cost/benefit tradeoff, since the premise (a live-sync bug) doesn't
+  hold. Don't assume a fix needed elsewhere in the family applies here just because the control is named the
+  same — re-verify the actual read pattern, same "re-verify, don't 1:1 port" discipline as this file's other
+  template-port notes above (2026-09-17, 2026-09-19).

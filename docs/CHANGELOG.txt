@@ -16697,6 +16697,33 @@ Verified live (v=311): chain functions' animSpeedMs = Animation Speed x sequence
 read max 25000 on both kinds. Not verified: the new range-bar defaults on a freshly created function; a chain
 actually playing at the new length. `main.js` `?v=310` -> `?v=311`.
 
+--------------------------------------------------------------------------------
+2026-10-11  -  (list-picker live-array-sync check — investigated, no bug, no change)
+
+Checked whether this project's own Saved Poses/Cameras/Lighting/Toon/Tween-Sequences/Loading-Preview pickers
+(`devPanel.js`'s `buildListPickerRow()`) have the bug just fixed in HANDYSET's own picker and in the shared
+`.claude/TEMPLATE_DEV_PANEL.html` template it was ported from: the generic `list-picker` control used to copy its
+backing array once at build time and reassign a fresh private array on every mutation instead of mutating it in
+place, so other code holding a direct reference to the real array (e.g. a `SAVED_POSES` array read elsewhere by
+Tween playback) never saw live updates.
+
+This project's `devPanel.js` is confirmed (again) to be its own independent hand-built implementation, not
+template-derived (different DOM/class names, single shared DOM across Desktop/Mobile/Landscape, no built-in
+"Debug" group — see this file's own 2026-09-17 CLAUDE.md note). Its list-picker also reassigns `entry.items` on
+every Save/Overwrite/Rename/Delete/+Group/Import/drag-reorder, then calls `commit(ctrl, entry.items)` ->
+`cfg[ctrl.key] = v` (a new array object each time) — same surface pattern as the bug elsewhere. But it never goes
+stale here: nothing in `main.js` caches one of these arrays by reference. Every consumer re-reads `cfg.<key>`
+fresh at the point of use (`chainSequenceCount()`'s `cfg.savedTweenSequences`, the Click-Pose/Click-Hold-Pose
+Target Pose `<select>` controls' `options()`, `tweenPoses`' multi-select `options()`, the loading-preview
+capture/apply functions), and `savedPoses`' own `onChange` already calls `safeRefreshSelectOptions()` /
+`safeRefreshMultiSelectOptions()` immediately after every commit. A different mechanism (commit-and-notify over
+one shared `cfg` object) reaches the same live-sync guarantee the HANDYSET fix restored there, so there was
+nothing to fix here, and migrating this project's picker onto the shared generic engine would be an unwarranted
+architecture change for a problem this codebase doesn't have.
+
+No code changed; no file version bump. Documented in CLAUDE.md's own Gotchas (2026-10-11 entry) so a future
+session doesn't re-investigate this from scratch.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a
