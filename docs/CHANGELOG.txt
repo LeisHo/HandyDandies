@@ -17062,6 +17062,15 @@ updateTrackingTargets() used `cfg.<feature>TargetDepth ?? cfg.targetDepthFactor`
 never become NaN (in practice every per-feature slider always has a value, so this only matters for a never-initialised key). With a feature's "Uses Cursor Target Depth" box off, nothing reads a depth at all
 (unchanged). The shared slider still sets the cursor target's own Z, which render order and the click-function offset direction use. `main.js` `?v=338` -> `?v=339`.
 
+2026-10-11  -  (cursor look-at no longer flips when the cursor passes directly above / below a hand)
+
+Direct request ("yes fix the flip rotation Up thing"). The Arm Rotation look-at used a fixed world +Y up vector, which is degenerate when the aim direction is parallel to it (cursor straight above / below a hand;
+common with Use Cursor Target Depth off, where the aim is purely in the XY plane). MEASURED with the same Matrix4.lookAt: cursor sweeping across the vertical jumped 90 deg in one step, and a cursor circling a hand in
+the plane had a 180 deg step. New lookUpFor(): the up vector is +Y while the aim is within 0.8 of horizontal (|y| <= 0.8, bit-identical to before: 0.000000 deg difference), and blends smoothly (smoothstep) toward +Z
+(the camera axis) as |y| goes 0.8 -> 1, so the orientation is continuous through vertical: the same sweep is now at most 1.45 deg per step, and a full circle at most 8.98 deg per 1 deg of cursor travel (the roll
+turns faster inside the blend band, which is unavoidable). The 0.8 / 0.2 band is a judgment call with no measurement behind it. With depth on the aim is rarely near vertical, so it is unchanged in practice.
+Verified numerically with the page's own three.js (not visually). `main.js` `?v=339` -> `?v=340`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

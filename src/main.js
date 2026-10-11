@@ -844,6 +844,16 @@ const boundsCenterScratch = new THREE.Vector3()
 // allocated fresh each call.
 const _lookAtMatrixScratch = new THREE.Matrix4()
 const _lookAtQuatScratch = new THREE.Quaternion()
+const _lookFwdScratch = new THREE.Vector3(), _lookUpScratch = new THREE.Vector3()
+// Up vector for the cursor look-at that never degenerates (2026-10-11, direct request: fix the flip). A look-at with a fixed world-up flips the instant the aim direction passes through that up
+// vector (cursor directly above / below a hand, which an XY-only aim does constantly). As the aim gets within ~37 degrees of vertical (|y| > 0.8) the up vector is blended smoothly from world +Y toward
+// +Z (the camera axis), so the orientation stays continuous through vertical; the 0.8 / 0.2 band is a judgment call, not a measurement. Away from vertical (|y| <= 0.8) it is exactly the old +Y.
+function lookUpFor(fwd) {
+  const a = Math.abs(fwd.y)
+  const t = Math.min(Math.max((a - 0.8) / 0.2, 0), 1)
+  const w = t * t * (3 - 2 * t)
+  return _lookUpScratch.set(0, 1 - w, w)
+}
 
 // -----------------------------------------------------------------------
 // Dev panel groups (CLAUDE.md Section 12)
@@ -15726,7 +15736,10 @@ function animate(dt, now) {
         }
         const __cursorTrackingStart = performance.now()
         hands.forEach((hand) => {
-          _lookAtMatrixScratch.lookAt(hand.wrapper.position, armRotUseDepth ? _trackTargetArm : _trackTargetXY.set(cursorTarget.x, cursorTarget.y, hand.wrapper.position.z), UP)
+          const __lookTarget = armRotUseDepth ? _trackTargetArm : _trackTargetXY.set(cursorTarget.x, cursorTarget.y, hand.wrapper.position.z)
+          _lookFwdScratch.subVectors(__lookTarget, hand.wrapper.position)
+          if (_lookFwdScratch.lengthSq() > 1e-12) _lookFwdScratch.normalize(); else _lookFwdScratch.set(0, 0, -1)
+          _lookAtMatrixScratch.lookAt(hand.wrapper.position, __lookTarget, lookUpFor(_lookFwdScratch))
           const lookAtDesired = _lookAtQuatScratch.setFromRotationMatrix(_lookAtMatrixScratch)
           // CORRECTED 2026-09-28 (5th round of this same jump investigation) --
           // direct report, repeated and precise: with Retransition OFF the
