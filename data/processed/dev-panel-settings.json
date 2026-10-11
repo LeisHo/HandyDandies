@@ -41,7 +41,7 @@
       "armRotationTargetDepth": -3.1,
       "armRotationDefault": 93,
       "armRotationCurveEnabled": true,
-      "armRotationCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.4867424346417648,\"y\":0.028854115804036407}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.48926774481950175,\"y\":0}}]",
+      "armRotationCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.7518564072464893,\"y\":0.12229181925455734}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.4783416793996347,\"y\":-0.31770833333333326}}]",
       "armRotationRangePct": "{\"min\":0,\"max\":100}",
       "armRotationOffsetX": 0,
       "armRotationOffsetY": 0,
@@ -9299,7 +9299,7 @@
       "armRotationTargetDepth": 5.6,
       "armRotationDefault": 93,
       "armRotationCurveEnabled": true,
-      "armRotationCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.4867424346417648,\"y\":0.028854115804036407}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.48926774481950175,\"y\":0}}]",
+      "armRotationCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.7518564072464893,\"y\":0.12229181925455734}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.4783416793996347,\"y\":-0.31770833333333326}}]",
       "armRotationRangePct": "{\"min\":0,\"max\":100}",
       "armRotationOffsetX": 0,
       "armRotationOffsetY": 0,
@@ -18557,7 +18557,7 @@
       "armRotationTargetDepth": 3.4,
       "armRotationDefault": 93,
       "armRotationCurveEnabled": true,
-      "armRotationCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.4867424346417648,\"y\":0.028854115804036407}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.48926774481950175,\"y\":0}}]",
+      "armRotationCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.7518564072464893,\"y\":0.12229181925455734}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.4783416793996347,\"y\":-0.31770833333333326}}]",
       "armRotationRangePct": "{\"min\":0,\"max\":100}",
       "armRotationOffsetX": 0,
       "armRotationOffsetY": 0,
@@ -29802,14 +29802,14 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
           "type": "group",
           "group": {
             "key": "Field Layout",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -30754,7 +30754,7 @@
           "type": "group",
           "group": {
             "key": "Cursor Tracking",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -30773,7 +30773,7 @@
                 "type": "group",
                 "group": {
                   "key": "Responsive Arm Rotation",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -31030,7 +31030,7 @@
             "subgroups": [
               {
                 "key": "Responsive Arm Rotation",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -31261,7 +31261,7 @@
       "subgroups": [
         {
           "key": "Field Layout",
-          "collapsed": false,
+          "collapsed": true,
           "locked": true,
           "items": [
             {
@@ -32194,7 +32194,7 @@
         },
         {
           "key": "Cursor Tracking",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
@@ -32213,7 +32213,7 @@
               "type": "group",
               "group": {
                 "key": "Responsive Arm Rotation",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -32470,7 +32470,7 @@
           "subgroups": [
             {
               "key": "Responsive Arm Rotation",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -32699,7 +32699,7 @@
     },
     {
       "key": "Custom Click Functions",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -77276,7 +77276,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 21",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -77435,7 +77435,7 @@
                 "type": "group",
                 "group": {
                   "key": "Offset To Camera",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -77947,7 +77947,7 @@
                 "type": "group",
                 "group": {
                   "key": "Multi Trigger",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -90583,7 +90583,7 @@
               },
               {
                 "key": "Offset To Camera",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -91071,7 +91071,7 @@
               },
               {
                 "key": "Multi Trigger",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -153702,7 +153702,7 @@
         },
         {
           "key": "Custom Click Function 21",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -153861,7 +153861,7 @@
               "type": "group",
               "group": {
                 "key": "Offset To Camera",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -154373,7 +154373,7 @@
               "type": "group",
               "group": {
                 "key": "Multi Trigger",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -167009,7 +167009,7 @@
             },
             {
               "key": "Offset To Camera",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -167497,7 +167497,7 @@
             },
             {
               "key": "Multi Trigger",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -185565,7 +185565,7 @@
     },
     {
       "key": "New Group (11)",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -185754,7 +185754,7 @@
           "type": "group",
           "group": {
             "key": "Camera",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -186098,7 +186098,7 @@
         },
         {
           "key": "Camera",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -187967,7 +187967,7 @@
       "left": 820.7999877929688,
       "top": 0,
       "width": 699.2000122070312,
-      "height": 725.9500122070312
+      "height": 37.60000228881836
     }
   }
 }
