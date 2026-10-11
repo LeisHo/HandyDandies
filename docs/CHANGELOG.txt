@@ -17244,6 +17244,12 @@ were broken arbitrarily. Now the constraints are bucketed by strength (2 x level
 v=357 made the overlapping-hand ordering accurate (decided pairs wrong: 0.4% smooth tilt, 0.2% smooth 2x, 3.4% random tilts, down from 42 / 15 / 10%) but its unbounded reachability check cost 270-650 ms per updateRenderOrder() at 1925 hands (about 45 ms before). The check now looks at only the first 40 hands reachable (REACH_CAP, a judgment call:
 cycles among overlapping hands are short), and the topological pass has a stall release for any longer cycle. `main.js` `?v=357` -> `?v=358`.
 
+2026-10-11  -  (Palm To Arm ordering: layers from the strongest rule, weaker rules only within a layer)
+
+v=358's capped cycle check was fast (66-96 ms vs 21 ms for scalar modes) but the cap hid the long cycles, so accuracy fell back to 40 / 15 / 10% of decided pairs wrong. New scheme (v=359): the strongest constraints (priority 0: Palm To Arm's one-sided 'palm higher than the other's arm' decisions, or the level-0 scalar rule) give every hand a LAYER
+(longest chain of such constraints below it, Kahn longest-path with a stall release); every weaker constraint (the arm-distance tie-break, fallbacks, later levels) is applied only between hands in the SAME layer, where it cannot contradict the strong ones; layers are ranked bottom to top, each in its own topological order. A weak rule can therefore never
+override a strong one, which is what the rule's wording asks for. `main.js` `?v=358` -> `?v=359`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

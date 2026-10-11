@@ -904,7 +904,7 @@ function renderOrderBone(hand, key) {
 // exact). A level is either a scalar priority (Z modes, cursor-distance modes; two hands tie when they agree to 0.01 world units) or "Palm To Arm Base", a pairwise rule: hand A goes above hand B when A's palm center is higher
 // in Z than B's arm base (by more than 0.01); when each hand's palm is higher than the other's arm base, the hand whose arm base is FARTHER from the cursor on screen (XY only, no Z) goes above; when neither is, the level ties.
 let roKindXY = false, roPriority = 0
-let roOrder = [], roPalmZ = null, roBaseZ = null, roBaseXY = null, roEndZ = null, roEndXY = null, roSX = null, roSY = null, roSR = null, roIndeg = null, roHead = null, roDone = null, roVis = null
+let roOrder = [], roPalmZ = null, roBaseZ = null, roBaseXY = null, roEndZ = null, roEndXY = null, roSX = null, roSY = null, roSR = null, roIndeg = null, roHead = null, roDone = null, roVis = null, roLayer = null
 const roScalar = {}
 const _roV = new THREE.Vector3()
 function computeRenderOrderRanks() {
@@ -1003,8 +1003,9 @@ function computeRenderOrderRanks() {
   const grid = new Map()
   const cellOf = (i) => (Math.floor(roSX[i] / cell) + 100000) * 200003 + (Math.floor(roSY[i] / cell) + 100000)
   for (let i = 0; i < n; i++) { const k = cellOf(i); const arr = grid.get(k); if (arr) arr.push(i); else grid.set(k, [i]) }
-  // Constraints "under is drawn BEFORE over", bucketed by strength (see roPriority). They can contradict each other (A above B, B above C, C above A), so they are applied strongest first and a constraint that
-  // would close a cycle with the stronger ones already accepted is dropped.
+  // Constraints "under is drawn BEFORE over", bucketed by strength (see roPriority: lower = stronger). They can contradict each other (A above B, B above C, C above A), and an unordered cycle check was either too slow or too weak
+  // (measured), so: (1) the STRONGEST constraints (priority 0, e.g. Palm To Arm's one-sided "palm higher than the other's arm") give every hand a LAYER = the length of the longest chain of such constraints below it;
+  // (2) every weaker constraint (the arm-distance tie-break, the fallbacks) is applied only between hands in the SAME layer, where it cannot contradict the strong ones; (3) layers are drawn bottom to top, each in its own topological order.
   const buckets = [[], [], [], [], [], []]
   for (let i = 0; i < n; i++) {
     const cx = Math.floor(roSX[i] / cell), cy = Math.floor(roSY[i] / cell)
@@ -1022,51 +1023,56 @@ function computeRenderOrderRanks() {
       }
     }
   }
+  if (!roLayer || roLayer.length !== n) roLayer = new Int32Array(n)
+  roLayer.fill(0)
+  // (1) layers from the strongest constraints (longest-path layering with a stall release for the rare cycle among them)
+  {
+    const list = buckets[0]
+    const eTo0 = [], eNext0 = []
+    roHead.fill(-1); roIndeg.fill(0); roDone.fill(0)
+    for (let k = 0; k < list.length; k += 2) { const under = list[k], over = list[k + 1]; eTo0.push(over); eNext0.push(roHead[under]); roHead[under] = eTo0.length - 1; roIndeg[over]++ }
+    const ready0 = []
+    for (let i = 0; i < n; i++) if (roIndeg[i] === 0) ready0.push(i)
+    let placed = 0, qi = 0
+    while (placed < n) {
+      if (qi >= ready0.length) { let best = -1, bi = 1e9; for (let i = 0; i < n; i++) if (!roDone[i] && roIndeg[i] < bi) { bi = roIndeg[i]; best = i } roIndeg[best] = 0; ready0.push(best) }
+      const u = ready0[qi++]
+      if (roDone[u]) continue
+      roDone[u] = 1; placed++
+      for (let e = roHead[u]; e !== -1; e = eNext0[e]) { const v = eTo0[e]; if (roLayer[v] < roLayer[u] + 1) roLayer[v] = roLayer[u] + 1; if (!roDone[v] && --roIndeg[v] === 0) ready0.push(v) }
+    }
+  }
+  // (2) weaker constraints, same layer only
+  let maxLayer = 0
+  for (let i = 0; i < n; i++) if (roLayer[i] > maxLayer) maxLayer = roLayer[i]
   const eTo = [], eNext = []
   roHead.fill(-1); roIndeg.fill(0); roDone.fill(0)
-  if (!roVis || roVis.length !== n) roVis = new Int32Array(n)
-  roVis.fill(0)
-  let stamp = 0
-  const stack = []
-  // Bounded: an unbounded search made this 5-15x slower (measured 270-650 ms vs ~45 ms per update at 1925 hands). Cycles among overlapping hands are short, so looking at the first 40 hands reachable catches them; a cycle that is longer
-  // than the search sees is handled by the stall release in the topological pass below.
-  const REACH_CAP = 40
-  const reaches = (from, target) => { // is there already a (nearby) path from -> target?
-    stamp++
-    stack.length = 0; stack.push(from); roVis[from] = stamp
-    let seen = 0
-    while (stack.length) {
-      const u = stack.pop()
-      if (u === target) return true
-      if (++seen > REACH_CAP) return false
-      for (let e = roHead[u]; e !== -1; e = eNext[e]) { const v = eTo[e]; if (roVis[v] !== stamp) { roVis[v] = stamp; stack.push(v) } }
-    }
-    return false
-  }
-  for (let pr = 0; pr < buckets.length; pr++) {
+  for (let pr = 1; pr < buckets.length; pr++) {
     const list = buckets[pr]
     for (let k = 0; k < list.length; k += 2) {
       const under = list[k], over = list[k + 1]
-      if (reaches(over, under)) continue // would contradict stronger constraints
-      eTo.push(over); eNext.push(roHead[under]); roHead[under] = eTo.length - 1
-      roIndeg[over]++
+      if (roLayer[under] !== roLayer[over]) continue
+      eTo.push(over); eNext.push(roHead[under]); roHead[under] = eTo.length - 1; roIndeg[over]++
     }
   }
-  const ready = []
-  for (let i = 0; i < n; i++) if (roIndeg[i] === 0) ready.push(i)
-  let rank = 0, qi = 0
-  while (rank < n) {
-    if (qi >= ready.length) { // a cycle longer than the search above could see: release the unplaced hand with the fewest unmet constraints
-      let best = -1, bi = 1e9
-      for (let i = 0; i < n; i++) if (!roDone[i] && roIndeg[i] < bi) { bi = roIndeg[i]; best = i }
-      roIndeg[best] = 0
-      ready.push(best)
+  // (3) layers bottom to top, each in topological order (edges never cross layers, so each layer is independent)
+  const layers = new Array(maxLayer + 1)
+  for (let L = 0; L <= maxLayer; L++) layers[L] = []
+  for (let i = 0; i < n; i++) layers[roLayer[i]].push(i)
+  let rank = 0
+  for (let L = 0; L <= maxLayer; L++) {
+    const nodes = layers[L]
+    const ready = []
+    for (let k = 0; k < nodes.length; k++) if (roIndeg[nodes[k]] === 0) ready.push(nodes[k])
+    let qi = 0, placed = 0
+    while (placed < nodes.length) {
+      if (qi >= ready.length) { let best = -1, bi = 1e9; for (let k = 0; k < nodes.length; k++) { const i = nodes[k]; if (!roDone[i] && roIndeg[i] < bi) { bi = roIndeg[i]; best = i } } roIndeg[best] = 0; ready.push(best) }
+      const u = ready[qi++]
+      if (roDone[u]) continue
+      roDone[u] = 1; placed++
+      hands[u]._roRank = rank++
+      for (let e = roHead[u]; e !== -1; e = eNext[e]) { const v = eTo[e]; if (!roDone[v] && --roIndeg[v] === 0) ready.push(v) }
     }
-    const u = ready[qi++]
-    if (roDone[u]) continue
-    roDone[u] = 1
-    hands[u]._roRank = rank++
-    for (let e = roHead[u]; e !== -1; e = eNext[e]) { const v = eTo[e]; if (!roDone[v] && --roIndeg[v] === 0) ready.push(v) }
   }
 }
 // Moves each Except select into its main dropdown's row, to the right of it (the Except rows themselves are hidden). The select keeps its own control binding, so saving / restoring / undo work as for any select.
