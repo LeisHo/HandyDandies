@@ -324,6 +324,7 @@ const _swingE = new THREE.Vector3(), _trkQinv = new THREE.Quaternion()
 const _armPartialQ = new THREE.Quaternion(), _armOffQx = new THREE.Quaternion(), _armOffQy = new THREE.Quaternion(), _armOffAxis = new THREE.Vector3()
 let trkXYFieldMin = 0, trkXYFieldRange = 0.001, trkXYAllMin = 0, trkXYAllRange = 0.001
 let trackingPointCloud = null
+const _cfTmp = new THREE.Vector3() // clickRotatePointInto() scratch
 let renderOrderPointCloud = null // Debug > Show Hand Render Order Points: arm base / arm end / palm center markers
 const _trackTargetXY = new THREE.Vector3() // cursor target at a hand's own depth, for Use Cursor Target Depth = off
 // Screen-space distance scratch + scale (see cursorDistXY()); early-state block so top-level load order is safe.
@@ -1486,6 +1487,15 @@ function handTrackingPointInto(hand, out) {
 // the rest-position distances, the on-screen test, the Cursor Offset direction - uses the hand's tracking point (Cursor Tracking > Tracking Point), via handPoint() / handRestPoint(). hand._trkRest is the same
 // point with the hand at its rest (grid) position: _trk + (basePosition - wrapper.position), i.e. before any click-function offset.
 let trkStamp = -1
+// A click function's Rotation turns the hand about the CUT POINT (the wrapper position): the same pivot cursor-tracking's arm / palm rotation uses. The tracking point is computed at the no-tracking pose, so rotate it
+// about that pivot by the click-function part of the wrapper rotation (hand._cfRot, recorded by mulWrapperRot() last frame; ignored when older than one frame, i.e. no click rotation is active). Offset already moves it
+// (it is built from wrapper.position).
+function clickRotatePointInto(hand, out) {
+  const q = hand._cfRot
+  if (!q || hand._cfRotFrame === undefined || hand._cfRotFrame < idleReposeFrameCounter - 1 || isIdentityQuat(q)) return out
+  _cfTmp.copy(out).sub(hand.wrapper.position).applyQuaternion(q)
+  return out.copy(hand.wrapper.position).add(_cfTmp)
+}
 function handPoint(hand) { return hand._trk || hand.wrapper.position }
 function handRestPoint(hand) { return hand._trkRest || hand.basePosition || hand.wrapper.position }
 // Computed once per frame: the animate() tracking block calls it first (postIncrement = false: updateRenderOrder() has not bumped the frame counter yet), updateRenderOrder() calls it with true and finds it done.
@@ -1497,7 +1507,8 @@ function updateTrackingPoints(postIncrement) {
     const h = hands[i]
     if (!h._trk) { h._trk = new THREE.Vector3(); h._trkRest = new THREE.Vector3() }
     handTrackingPointInto(h, h._trk)
-    if (h.basePosition) h._trkRest.copy(h._trk).add(h.basePosition).sub(h.wrapper.position); else h._trkRest.copy(h._trk)
+    if (h.basePosition) h._trkRest.copy(h._trk).add(h.basePosition).sub(h.wrapper.position); else h._trkRest.copy(h._trk) // rest = before any click-function offset / rotation
+    clickRotatePointInto(h, h._trk) // the tracking point follows a click function's Rotation (about the same cut-point pivot as the arm / palm rotation)
     h._trkXY = cursorDistXY(h._trk)
   }
   refreshTrackingDomains()
@@ -9688,6 +9699,17 @@ function computeCombinedOffsetAt(hand, p, progress) {
 // `progress=0` on every subsequent frame spent settled/held in that same
 // completed state -- otherwise the same increment would be re-added
 // every single frame, growing without bound even while perfectly still.
+// Multiplies a click function's Offset / Rotation quaternion onto the wrapper (after the cursor-tracking rotation, so it turns about the same pivot: the cut point, see applyHandArmLength()) and records the click-function
+// part on its own in hand._cfRot (reset on the first call of each frame) so the tracking point can follow it (clickRotatePointInto()).
+function mulWrapperRot(hand, q) {
+  hand.wrapper.quaternion.multiply(q)
+  if (hand._cfRotFrame !== idleReposeFrameCounter) {
+    if (!hand._cfRot) hand._cfRot = new THREE.Quaternion()
+    hand._cfRot.identity()
+    hand._cfRotFrame = idleReposeFrameCounter
+  }
+  hand._cfRot.multiply(q)
+}
 function applyOffsetRotationToHand(hand, p, progress) {
   if (!hand._customOffsetAccum) hand._customOffsetAccum = { x: 0, y: 0, z: 0 }
   if (!hand._customRotationAccum) hand._customRotationAccum = new THREE.Quaternion()
@@ -9714,7 +9736,7 @@ function applyOffsetRotationToHand(hand, p, progress) {
     hand.wrapper.position.addScaledVector(_offsetUpVec, hand._customOffsetAccum.y)
     hand.wrapper.position.addScaledVector(_offsetForwardVec, hand._customOffsetAccum.z)
   }
-  if (!isIdentityQuat(hand._customRotationAccum)) hand.wrapper.quaternion.multiply(hand._customRotationAccum)
+  if (!isIdentityQuat(hand._customRotationAccum)) mulWrapperRot(hand, hand._customRotationAccum)
   if (cfg[`${p}OffsetEnabled`] || cfg[`${p}CameraOffsetEnabled`]) {
     const o = computeCombinedOffsetAt(hand, p, progress)
     const ox = o.x
@@ -9739,7 +9761,7 @@ function applyOffsetRotationToHand(hand, p, progress) {
       _offsetQuat.setFromEuler(_offsetEuler)
       // Composes on top of the pose's OWN wrist rotation, never overwrites
       // it -- right-multiply, not assignment.
-      hand.wrapper.quaternion.multiply(_offsetQuat)
+      mulWrapperRot(hand, _offsetQuat)
     }
   }
 }
@@ -9830,7 +9852,7 @@ function applyOffsetRotationRetransition(hand, progress, offsetAccumStart, rotat
   const hasRotation = rotationAccumStart && !isIdentityQuat(rotationAccumStart)
   if (hasRotation) {
     _offsetQuat.identity().slerp(rotationAccumStart, remaining)
-    hand.wrapper.quaternion.multiply(_offsetQuat)
+    mulWrapperRot(hand, _offsetQuat)
   }
   // CORRECTED 2026-09-27 (3rd round) -- real bug found via direct
   // simulation: the REAL accumulator (`hand._customOffsetAccum`/
