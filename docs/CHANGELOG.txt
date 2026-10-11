@@ -17133,6 +17133,13 @@ Direct requests: (1) cursor tracking should measure from the end node of rForear
    before the palm roll: wrapper = swing * Rx * Ry * roll.
  - The Tracking Point select also needed the startup safeRefreshSelectOptions() (the empty-dropdown lesson from the Render Order fix). `main.js` `?v=345` -> `?v=346`.
 
+2026-10-11  -  (fix: startup select refresh hit a temporal dead zone)
+
+Found by reading the console after v=346: the startup safeRefreshSelectOptions() calls for Render Order Mode / Fallback / Tracking Point ran before `let sceneNeedsRedraw` is declared, and refreshSelectOptions() commits the value, which fires
+onAnyValueChange -> sceneNeedsRedraw (TDZ ReferenceError, caught and logged by safeRefreshSelectOptions). The dropdowns still filled (the fill happens before the commit), but the console showed 5 errors per load. The three calls now sit after the
+sceneNeedsRedraw declaration (just before the visibilitychange listeners). Also measured live: the Show Hand Tracking Points dots sit exactly on rForearmBend (Arm Base) and rHand (Arm End) in the no-tracking pose; Palm Center is the bind-pose
+position of rMid1, so it is off the posed bone by the finger pose (1.17 units in the test). `main.js` `?v=346` -> `?v=347`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

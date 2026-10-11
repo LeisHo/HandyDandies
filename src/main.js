@@ -14644,9 +14644,6 @@ updateLoadingPreviewSequenceVisibility()
 // for a cause not fully root-caused (isolated to this exact key --
 // 'chpTargetPose' succeeds every time, 'rchpTargetPose' throws every
 // time, even called alone) -- this must never take down the whole page.
-safeRefreshSelectOptions('renderOrderMode')
-safeRefreshSelectOptions('trackingPoint')
-safeRefreshSelectOptions('renderOrderFallback')
 safeRefreshSelectOptions('chpTargetPose')
 safeRefreshSelectOptions('rchpTargetPose')
 safeRefreshSelectOptions('clickTargetPose')
@@ -16203,6 +16200,11 @@ function syncPauseWithVisibility() {
     setPaused(false)
   }
 }
+// Selects whose options are fixed lists: filled once, here, after sceneNeedsRedraw exists (refreshSelectOptions() commits the value, and the commit fires onAnyValueChange -> sceneNeedsRedraw; calling it earlier hit that
+// binding's temporal dead zone: 2026-10-11).
+safeRefreshSelectOptions('renderOrderMode')
+safeRefreshSelectOptions('renderOrderFallback')
+safeRefreshSelectOptions('trackingPoint')
 document.addEventListener('visibilitychange', syncPauseWithVisibility)
 window.addEventListener('blur', syncPauseWithVisibility)
 window.addEventListener('focus', syncPauseWithVisibility)
