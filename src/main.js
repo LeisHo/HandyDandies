@@ -903,7 +903,8 @@ function renderOrderBone(hand, key) {
 // Per-frame render ordering across ALL hands (2026-10-11): the Mode, Fallback and Fallback 2 dropdowns are three levels of one sort; the sorted position becomes each hand's renderOrder (0..n-1, so the values stay small and
 // exact). A level is either a scalar priority (Z modes, cursor-distance modes; two hands tie when they agree to 0.01 world units) or "Palm To Arm Base", a pairwise rule: hand A goes above hand B when A's palm center is higher
 // in Z than B's arm base (by more than 0.01); when each hand's palm is higher than the other's arm base, the hand whose arm base is FARTHER from the cursor on screen (XY only, no Z) goes above; when neither is, the level ties.
-let roOrder = [], roPalmZ = null, roBaseZ = null, roBaseXY = null, roEndZ = null, roEndXY = null, roSX = null, roSY = null, roSR = null, roIndeg = null, roHead = null, roDone = null
+let roKindXY = false, roPriority = 0
+let roOrder = [], roPalmZ = null, roBaseZ = null, roBaseXY = null, roEndZ = null, roEndXY = null, roSX = null, roSY = null, roSR = null, roIndeg = null, roHead = null, roDone = null, roVis = null
 const roScalar = {}
 const _roV = new THREE.Vector3()
 function computeRenderOrderRanks() {
@@ -946,7 +947,7 @@ function computeRenderOrderRanks() {
       const aOver = roPalmZ[a] - ev.z[b] > TOL, bOver = roPalmZ[b] - ev.z[a] > TOL
       if (aOver && !bOver) return 1
       if (bOver && !aOver) return -1
-      if (aOver && bOver) { const d = Math.round(ev.xy[a] / TOL) - Math.round(ev.xy[b] / TOL); return d > 0 ? 1 : d < 0 ? -1 : 0 }
+      if (aOver && bOver) { const d = Math.round(ev.xy[a] / TOL) - Math.round(ev.xy[b] / TOL); roKindXY = d !== 0; return d > 0 ? 1 : d < 0 ? -1 : 0 }
       return 0
     }
     const d = ev.k[a] - ev.k[b]
@@ -958,14 +959,17 @@ function computeRenderOrderRanks() {
     { m: evalMode(cfg.renderOrderFallback2 || 'farthestZ'), q: evalMode(cfg.renderOrderFallback2Except) }
   ]
   // The three levels (each with its optional Except) as one pairwise decision: +1 = a above b, -1 = b above a, 0 = every level ties.
+  // roPriority (set as a side effect) = how strong the deciding rule is: 2 * level, +1 when it was a Palm To Arm 'both palms higher' tie-break by arm distance. Lower = stronger.
   const cmpLevels = (a, b) => {
     for (let l = 0; l < 3; l++) {
       const L = lv[l]
       if (!L.m) continue
+      roKindXY = false
       let r = cmpMode(L.m, a, b)
+      const kindXY = roKindXY
       // Except: the level's decision stands UNLESS the qualifier mode says the opposite for this pair, in which case the level does not decide it (falls through to the next level).
       if (r !== 0 && L.q && cmpMode(L.q, a, b) === -r) r = 0
-      if (r !== 0) return r
+      if (r !== 0) { roPriority = l * 2 + (kindXY ? 1 : 0); return r }
     }
     return 0
   }
@@ -999,9 +1003,9 @@ function computeRenderOrderRanks() {
   const grid = new Map()
   const cellOf = (i) => (Math.floor(roSX[i] / cell) + 100000) * 200003 + (Math.floor(roSY[i] / cell) + 100000)
   for (let i = 0; i < n; i++) { const k = cellOf(i); const arr = grid.get(k); if (arr) arr.push(i); else grid.set(k, [i]) }
-  // edges "u is drawn BEFORE v" (u under v), as linked lists in typed/plain arrays
-  const eTo = [], eNext = []
-  roHead.fill(-1); roIndeg.fill(0); roDone.fill(0)
+  // Constraints "under is drawn BEFORE over", bucketed by strength (see roPriority). They can contradict each other (A above B, B above C, C above A), so they are applied strongest first and a constraint that
+  // would close a cycle with the stronger ones already accepted is dropped.
+  const buckets = [[], [], [], [], [], []]
   for (let i = 0; i < n; i++) {
     const cx = Math.floor(roSX[i] / cell), cy = Math.floor(roSY[i] / cell)
     for (let dx = -1; dx <= 1; dx++) for (let dy = -1; dy <= 1; dy++) {
@@ -1014,27 +1018,42 @@ function computeRenderOrderRanks() {
         if (ddx * ddx + ddy * ddy >= rr * rr) continue
         const r = cmpLevels(i, j)
         if (r === 0) continue
-        const under = r > 0 ? j : i, over = r > 0 ? i : j
-        eTo.push(over); eNext.push(roHead[under]); roHead[under] = eTo.length - 1
-        roIndeg[over]++
+        buckets[roPriority].push(r > 0 ? j : i, r > 0 ? i : j) // under, over
       }
+    }
+  }
+  const eTo = [], eNext = []
+  roHead.fill(-1); roIndeg.fill(0); roDone.fill(0)
+  if (!roVis || roVis.length !== n) roVis = new Int32Array(n)
+  roVis.fill(0)
+  let stamp = 0
+  const stack = []
+  const reaches = (from, target) => { // is there already a path from -> target?
+    stamp++
+    stack.length = 0; stack.push(from); roVis[from] = stamp
+    while (stack.length) {
+      const u = stack.pop()
+      if (u === target) return true
+      for (let e = roHead[u]; e !== -1; e = eNext[e]) { const v = eTo[e]; if (roVis[v] !== stamp) { roVis[v] = stamp; stack.push(v) } }
+    }
+    return false
+  }
+  for (let pr = 0; pr < buckets.length; pr++) {
+    const list = buckets[pr]
+    for (let k = 0; k < list.length; k += 2) {
+      const under = list[k], over = list[k + 1]
+      if (reaches(over, under)) continue // would contradict stronger constraints
+      eTo.push(over); eNext.push(roHead[under]); roHead[under] = eTo.length - 1
+      roIndeg[over]++
     }
   }
   const ready = []
   for (let i = 0; i < n; i++) if (roIndeg[i] === 0) ready.push(i)
-  let rank = 0, qi = 0, doneCount = 0
-  while (doneCount < n) {
-    if (qi >= ready.length) { // a cycle: release the unplaced hand with the fewest unmet constraints
-      let best = -1, bi = 1e9
-      for (let i = 0; i < n; i++) if (!roDone[i] && roIndeg[i] < bi) { bi = roIndeg[i]; best = i }
-      roIndeg[best] = 0
-      ready.push(best)
-    }
+  let rank = 0, qi = 0
+  while (qi < ready.length) {
     const u = ready[qi++]
-    if (roDone[u]) continue
-    roDone[u] = 1; doneCount++
     hands[u]._roRank = rank++
-    for (let e = roHead[u]; e !== -1; e = eNext[e]) { const v = eTo[e]; if (!roDone[v] && --roIndeg[v] === 0) ready.push(v) }
+    for (let e = roHead[u]; e !== -1; e = eNext[e]) { const v = eTo[e]; if (--roIndeg[v] === 0) ready.push(v) }
   }
 }
 // Moves each Except select into its main dropdown's row, to the right of it (the Except rows themselves are hidden). The select keeps its own control binding, so saving / restoring / undo work as for any select.

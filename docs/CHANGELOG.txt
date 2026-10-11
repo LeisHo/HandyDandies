@@ -17234,6 +17234,11 @@ hands with mixed Z (and 44 of 80 fully-decided triples), because tie-breaking by
    each pair is decided by the three levels + Excepts, and the ranks are a topological order of those "drawn after" constraints (Kahn's algorithm; a cycle among overlapping hands is broken at the hand with the fewest unmet constraints). Non-overlapping hands keep hand-index order. Scalar-only settings still use the exact global sort.
  - A pair that overlaps but is decided by NO level keeps whatever order the other constraints give it. `main.js` `?v=355` -> `?v=356`.
 
+2026-10-11  -  (Palm To Arm ordering: contradictory constraints resolved strongest-first)
+
+Measured on v=356 (overlapping, decided pairs only): 42% / 15% / 10% of decided pairs were still wrong for smooth / 2x smooth / random tilts. Cause: cycles among overlapping hands (the 'both palms higher -> farther arm end on top' tie-break contradicting the stronger 'palm higher than the other's arm end' decisions)
+were broken arbitrarily. Now the constraints are bucketed by strength (2 x level, +1 for the arm-distance tie-break) and applied strongest first; a constraint that would close a cycle with the ones already accepted is dropped (reachability check), so the accepted set is acyclic and the topological order always honours every kept constraint. `main.js` `?v=356` -> `?v=357`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a
