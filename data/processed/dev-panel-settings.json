@@ -12,6 +12,8 @@
       "pauseBtnIconColor": "#ffffff",
       "pauseBtnBorderColor": "#ffffff",
       "pausedRenderFps": 15,
+      "renderOrderMode": "armEnd",
+      "renderOrderFallback": "closestZ",
       "fieldRows": 35,
       "fieldCols": 55,
       "rowSpacing": 5,
@@ -6804,9 +6806,9 @@
           "group": "FIST ROTATE"
         }
       ],
-      "cameraX": 6.504385906807994,
-      "cameraY": 9.506408948421004,
-      "cameraZ": 285.99080989108216,
+      "cameraX": 6.504385906807995,
+      "cameraY": 9.506408948421067,
+      "cameraZ": 285.9908280295541,
       "cameraFov": 15,
       "cameraYaw": 0,
       "cameraPitch": 0,
@@ -9262,6 +9264,8 @@
       "pauseBtnIconColor": "#ffffff",
       "pauseBtnBorderColor": "#ffffff",
       "pausedRenderFps": 15,
+      "renderOrderMode": "armEnd",
+      "renderOrderFallback": "closestZ",
       "fieldRows": 24,
       "fieldCols": 12,
       "rowSpacing": 8.5,
@@ -18512,6 +18516,8 @@
       "pauseBtnIconColor": "#ffffff",
       "pauseBtnBorderColor": "#ffffff",
       "pausedRenderFps": 15,
+      "renderOrderMode": "armEnd",
+      "renderOrderFallback": "closestZ",
       "fieldRows": 15,
       "fieldCols": 3,
       "rowSpacing": 9.5,
@@ -29780,7 +29786,7 @@
           "type": "group",
           "group": {
             "key": "Field Layout",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -29842,6 +29848,14 @@
               {
                 "type": "row",
                 "key": "fieldOffsetZ"
+              },
+              {
+                "type": "row",
+                "key": "renderOrderMode"
+              },
+              {
+                "type": "row",
+                "key": "renderOrderFallback"
               }
             ],
             "settings": [
@@ -29859,7 +29873,9 @@
               "fieldBoundsZ",
               "fieldOffsetX",
               "fieldOffsetY",
-              "fieldOffsetZ"
+              "fieldOffsetZ",
+              "renderOrderMode",
+              "renderOrderFallback"
             ],
             "subgroups": []
           }
@@ -31192,7 +31208,7 @@
       "subgroups": [
         {
           "key": "Field Layout",
-          "collapsed": true,
+          "collapsed": false,
           "locked": true,
           "items": [
             {
@@ -31254,6 +31270,14 @@
             {
               "type": "row",
               "key": "fieldOffsetZ"
+            },
+            {
+              "type": "row",
+              "key": "renderOrderMode"
+            },
+            {
+              "type": "row",
+              "key": "renderOrderFallback"
             }
           ],
           "settings": [
@@ -31271,7 +31295,9 @@
             "fieldBoundsZ",
             "fieldOffsetX",
             "fieldOffsetY",
-            "fieldOffsetZ"
+            "fieldOffsetZ",
+            "renderOrderMode",
+            "renderOrderFallback"
           ],
           "subgroups": []
         },
@@ -187857,8 +187883,8 @@
     "desktop": {
       "left": 820.7999877929688,
       "top": 79.1875,
-      "width": 667.2000122070312,
-      "height": 630.7875366210938
+      "width": 670.4000244140625,
+      "height": 632.3875122070312
     }
   }
 }
