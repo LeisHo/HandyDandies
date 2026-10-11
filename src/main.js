@@ -294,7 +294,8 @@ const _brAX = new THREE.Vector3(1, 0, 0), _brAY = new THREE.Vector3(0, 1, 0), _b
 const RENDER_ORDER_MODE_OPTIONS = [
   { value: 'z', text: 'Z Position' }, { value: 'armBase', text: 'Arm Base' }, { value: 'armEnd', text: 'Arm End' }, { value: 'palmCenter', text: 'Palm Center' },
   { value: 'closest', text: 'Closest To Cursor (XY)' }, { value: 'farthest', text: 'Farthest From Cursor (XY)' },
-  { value: 'closestZ', text: 'Closest To Cursor (XYZ)' }, { value: 'farthestZ', text: 'Farthest From Cursor (XYZ)' }
+  { value: 'closestZ', text: 'Closest To Cursor (XYZ)' }, { value: 'farthestZ', text: 'Farthest From Cursor (XYZ)' },
+  { value: 'palmToArm', text: 'Palm To Arm Base' }
 ]
 // Cursor tracking point (2026-10-11): the point on each hand that every cursor-tracking measurement (aim, palm angle, screen-space distances, splay / crop distances) is taken from. Computed at the hand's
 // no-tracking pose (so it does not chase the rotation it drives). hand._trk = world position, hand._trkXY = its screen-space distance to the cursor.
@@ -882,21 +883,69 @@ const _lookAtQuatScratch = new THREE.Quaternion()
 // (matrixWorld, so one frame old at most): armBase = the head of rForearmBend (1st node of the chain), armEnd = the head of rHand = the end (tail) of rForearmTwist (3rd node),
 // palmCenter = the head of rMid1 = the end (tail) of rCarpal2. A missing bone falls back to the field position.
 const RENDER_ORDER_NODES = { armBase: 'rForearmBend', armEnd: 'rHand', palmCenter: 'rMid1' }
-function renderOrderModeZ(hand) {
-  const mode = cfg.renderOrderMode
-  if (!mode || mode === 'z' || !hand.skinnedMesh) return hand.wrapper.position.z
-  if (!hand._roNode || hand._roNode.mode !== mode) hand._roNode = { mode, bone: hand.skinnedMesh.skeleton.getBoneByName(RENDER_ORDER_NODES[mode]) || null }
-  return hand._roNode.bone ? hand._roNode.bone.matrixWorld.elements[14] : hand.wrapper.position.z
+// Z of the point a Z mode stands for: 'z' = the field position, 'armBase' / 'armEnd' / 'palmCenter' = that rig node. Takes the mode explicitly (it used to read cfg.renderOrderMode, so a Z mode chosen as a FALLBACK silently used the primary mode's node).
+function renderOrderModeZ(hand, mode) {
+  if (!mode || mode === 'z' || !RENDER_ORDER_NODES[mode]) return hand.wrapper.position.z
+  const bone = renderOrderBone(hand, mode)
+  return bone ? bone.matrixWorld.elements[14] : hand.wrapper.position.z
 }
 // Priority of a hand under one mode, in world units, higher = drawn on top. Z modes: Z toward the camera. Cursor modes: +/- the distance to the cursor (XY = hand._xyCursorDist, computed each frame before the
 // per-hand loop; XYZ = hand.effectiveRenderOrder, the 3D distance to the cursor target with the overlap smoothing).
+// World position of a rig node (previous render's matrixWorld) used by the render-order modes: key = 'armBase' | 'palmCenter' (| 'armEnd'). Returns the bone or null.
+function renderOrderBone(hand, key) {
+  if (!hand.skinnedMesh) return null
+  const c = hand._roBones || (hand._roBones = {})
+  if (c[key] === undefined) c[key] = hand.skinnedMesh.skeleton.getBoneByName(RENDER_ORDER_NODES[key]) || null
+  return c[key]
+}
+// Per-frame render ordering across ALL hands (2026-10-11): the Mode, Fallback and Fallback 2 dropdowns are three levels of one sort; the sorted position becomes each hand's renderOrder (0..n-1, so the values stay small and
+// exact). A level is either a scalar priority (Z modes, cursor-distance modes; two hands tie when they agree to 0.01 world units) or "Palm To Arm Base", a pairwise rule: hand A goes above hand B when A's palm center is higher
+// in Z than B's arm base (by more than 0.01); when each hand's palm is higher than the other's arm base, the hand whose arm base is FARTHER from the cursor on screen (XY only, no Z) goes above; when neither is, the level ties.
+let roKeys = [null, null, null], roOrder = [], roPalmZ = null, roBaseZ = null, roBaseXY = null
+const _roV = new THREE.Vector3()
+function computeRenderOrderRanks() {
+  const n = hands.length
+  const levels = [cfg.renderOrderMode || 'z', cfg.renderOrderFallback || 'farthestZ', cfg.renderOrderFallback2 || 'farthestZ']
+  const camSign = camera.position.z >= 0 ? 1 : -1
+  const usesPalm = levels.includes('palmToArm')
+  if (usesPalm) {
+    if (!roPalmZ || roPalmZ.length !== n) { roPalmZ = new Float64Array(n); roBaseZ = new Float64Array(n); roBaseXY = new Float64Array(n) }
+    for (let i = 0; i < n; i++) {
+      const h = hands[i], pb = renderOrderBone(h, 'palmCenter'), ab = renderOrderBone(h, 'armBase')
+      roPalmZ[i] = (pb ? pb.matrixWorld.elements[14] : h.wrapper.position.z) * camSign
+      roBaseZ[i] = (ab ? ab.matrixWorld.elements[14] : h.wrapper.position.z) * camSign
+      roBaseXY[i] = ab ? cursorDistXY(_roV.setFromMatrixPosition(ab.matrixWorld)) : cursorDistXY(h.wrapper.position)
+    }
+  }
+  for (let l = 0; l < 3; l++) {
+    if (levels[l] === 'palmToArm') { roKeys[l] = null; continue }
+    if (!roKeys[l] || roKeys[l].length !== n) roKeys[l] = new Float64Array(n)
+    const k = roKeys[l]
+    for (let i = 0; i < n; i++) k[i] = Math.round(renderOrderPriority(hands[i], levels[l]) / 0.01)
+  }
+  if (roOrder.length !== n) { roOrder = new Array(n); for (let i = 0; i < n; i++) roOrder[i] = i }
+  const TOL = 0.01
+  const cmp = (a, b) => {
+    for (let l = 0; l < 3; l++) {
+      const k = roKeys[l]
+      if (k) { const d = k[a] - k[b]; if (d !== 0) return d; continue }
+      const aOver = roPalmZ[a] - roBaseZ[b] > TOL, bOver = roPalmZ[b] - roBaseZ[a] > TOL
+      if (aOver && !bOver) return 1
+      if (bOver && !aOver) return -1
+      if (aOver && bOver) { const d = Math.round(roBaseXY[a] / TOL) - Math.round(roBaseXY[b] / TOL); if (d !== 0) return d }
+    }
+    return a - b // fully tied: keep a stable, fixed order (hand index)
+  }
+  roOrder.sort(cmp)
+  for (let r = 0; r < n; r++) hands[roOrder[r]]._roRank = r
+}
 function renderOrderPriority(hand, mode) {
   switch (mode) {
     case 'closest': return -(hand._xyCursorDist ?? 0)
     case 'farthest': return hand._xyCursorDist ?? 0
     case 'closestZ': return -hand.effectiveRenderOrder
     case 'farthestZ': return hand.effectiveRenderOrder
-    default: return renderOrderModeZ(hand) * (camera.position.z >= 0 ? 1 : -1)
+    default: return renderOrderModeZ(hand, mode) * (camera.position.z >= 0 ? 1 : -1)
   }
 }
 const _swingRef = new THREE.Vector3(0, 0, -1)
@@ -1033,6 +1082,8 @@ const DEV_GROUPS = [
       { key: 'renderOrderMode', label: 'Render Order Mode', type: 'select', def: 'z', options: () => RENDER_ORDER_MODE_OPTIONS },
       // Fallback: used when two hands tie on the Render Order Mode's own value (same Z to 0.01 world units, or the same distance). Default = the original behaviour (the hand furthest from the cursor on top).
       { key: 'renderOrderFallback', label: 'Render Order Fallback', type: 'select', def: 'farthestZ', options: () => RENDER_ORDER_MODE_OPTIONS },
+      // Third level (2026-10-11, direct request): used when two hands tie on both the Mode and the Fallback.
+      { key: 'renderOrderFallback2', label: 'Render Order Fallback 2', type: 'select', def: 'farthestZ', placeAfter: 'renderOrderFallback', options: () => RENDER_ORDER_MODE_OPTIONS },
       { key: 'fieldRows', label: 'Rows (Count)', type: 'slider', min: 1, max: 40, step: 1, def: 15, perDevice: true, onChange: () => rebuildField() },
       { key: 'fieldCols', label: 'Columns (Count)', type: 'slider', min: 1, max: 40, step: 1, def: 17, perDevice: true, onChange: () => rebuildField() },
       { key: 'rowSpacing', label: 'Row Spacing (World Units)', type: 'slider', min: 2, max: 40, step: 0.5, def: 9.5, perDevice: true, onChange: () => relayoutField() },
@@ -16249,6 +16300,7 @@ function syncPauseWithVisibility() {
 // binding's temporal dead zone: 2026-10-11).
 safeRefreshSelectOptions('renderOrderMode')
 safeRefreshSelectOptions('renderOrderFallback')
+safeRefreshSelectOptions('renderOrderFallback2')
 safeRefreshSelectOptions('trackingPoint')
 document.addEventListener('visibilitychange', syncPauseWithVisibility)
 window.addEventListener('blur', syncPauseWithVisibility)
@@ -16473,16 +16525,16 @@ function updateRenderOrder() {
   xyFieldDistRange = Math.max(xyMax - xyMin, 0.001)
   xyAllMinDist = xyAMin; xyAllDistRange = Math.max(xyAMax - xyAMin, 0.001)
   const nowMs = nowVirtual() // virtual clock (see its own declaration) -- one shared timestamp for every hand's own Click-Hold-Pose/Click-Pose progress this frame, not a separate call per hand; only reached at all while !isPaused (animate()'s own gate), so this line simply never runs during a pause
+  // effectiveRenderOrder (the 3D cursor distance with the optional overlap smoothing) feeds the XYZ cursor modes, so it is settled for every hand BEFORE the ranks are computed.
+  for (let ri = 0; ri < hands.length; ri++) {
+    const rh = hands[ri], rlive = liveDistances[ri]
+    rh.effectiveRenderOrder = (flashFixOn && rh.isOverlapping) ? rh.effectiveRenderOrder + (rlive - rh.effectiveRenderOrder) * REORDER_SMOOTHING : rlive
+  }
+  computeRenderOrderRanks()
   hands.forEach((hand, i) => {
     const live = liveDistances[i]
-    hand.effectiveRenderOrder = (flashFixOn && hand.isOverlapping)
-      ? hand.effectiveRenderOrder + (live - hand.effectiveRenderOrder) * REORDER_SMOOTHING
-      : live
-    // Render order (2026-10-11): the Render Order Mode's priority is the primary key (quantised to 0.01 world units so float noise never reorders ties); the Fallback mode's priority breaks ties between hands with
-    // the same primary key. The fallback is mapped to 0..99999 at 0.05 world-unit steps over -2000..+2000 (outside that it clamps), so the primary key always wins (x100000).
-    const roPrimary = Math.round(renderOrderPriority(hand, cfg.renderOrderMode) / 0.01)
-    const roSecondary = Math.min(Math.max(Math.round((renderOrderPriority(hand, cfg.renderOrderFallback || 'farthestZ') + 2000) * 20), 0), 99999)
-    const roBase = roPrimary * 100000 + roSecondary
+    // Render order (2026-10-11): this hand's position in the per-frame sort (see computeRenderOrderRanks()).
+    const roBase = hand._roRank || 0
     if (hand.skinnedMesh) hand.skinnedMesh.renderOrder = roBase
     if (hand.outlineMesh) hand.outlineMesh.renderOrder = roBase - 0.001
     if (hand.emissionMesh) hand.emissionMesh.renderOrder = roBase - 0.001

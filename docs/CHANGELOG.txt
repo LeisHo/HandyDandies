@@ -17193,6 +17193,18 @@ Direct request: "for arm rotation [cursor tracking], the rotation origin should 
  - Verified numerically (2000 random orientations / Rotation-at-Base / crop positions / tracking rotations, the page's own three.js): the cut point stays put to 1.3e-13 units and the pointing axis lands on the aim direction to 2.6e-14. Not seen on screen (the sandbox does not run the animation loop reliably).
  `main.js` `?v=351` -> `?v=352`.
 
+2026-10-11  -  (Render Order: third fallback dropdown and the "Palm To Arm Base" option; render order is now a per-frame sort)
+
+Direct request: a THIRD fallback dropdown ("Render Order Fallback 2", used when two hands tie on both the Mode and the Fallback), and a new option in every render-order dropdown, "Palm To Arm Base": "It measures the Z value difference between 2 hand's Palm center, and Arm Base point. If the Palm center of a hand is higher in
+z value than the arm base points z value, the former hand will render on top. If both palms are higher than each other's arm base, it will default to render the hand which has the arm base point furthest from the cursor on top" -- clarified: "furthest" = screen-space XY only, no Z.
+ - Palm To Arm Base is a PAIRWISE rule, not a number per hand, so the order is now computed by a real sort each frame (computeRenderOrderRanks(), all hands): the three dropdowns are three levels of one comparator, the sorted position (0..n-1) becomes each hand's renderOrder (small exact integers; it also removes the old
+   scalar-packing precision limits). For a pair A, B at that level: A above B when A's palm center (end of rCarpal2 = head of rMid1) is higher in Z than B's arm base (head of rForearmBend) by more than 0.01 and B's palm is not higher than A's arm base; the reverse likewise; when BOTH palms are higher than the other's arm base,
+   the hand whose arm base is farther from the cursor on screen (XY projected distance, no Z) goes above; when NEITHER is, that level ties and the next dropdown decides. "Higher in Z" means closer to the camera (same sign convention as the other Z modes). Node Zs come from the bones' matrixWorld of the previous render.
+ - The scalar levels behave as before (a tie = the same value to 0.01 world units), and fully tied hands keep a fixed order (hand index).
+ - Disclosed limitation: a pairwise rule can be non-transitive (A over B, B over C, C over A); a sort cannot satisfy that, so the result for such a cycle is whatever the sort settles on (deterministic for the same input, may change as hands move). With hands all pointing the same way this does not arise.
+ - Also fixed while in there: a Z mode chosen as a FALLBACK (Arm Base / Arm End / Palm Center) used the PRIMARY mode's rig node (renderOrderModeZ read cfg.renderOrderMode); it now uses its own mode.
+ `main.js` `?v=352` -> `?v=353`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a
