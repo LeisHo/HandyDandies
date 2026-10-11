@@ -5182,6 +5182,9 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       // own curve.
       { key: `${p}EasingCurveEnabled`, label: 'Easing Curve On/Off', type: 'checkbox', def: false, onChange: () => updateSingleTimingGateVisibility(p) },
       { key: `${p}EasingCurve`, label: 'Easing Curve (Progress -> Speed)', type: 'text', def: '[{"x":0,"y":0.5},{"x":1,"y":0.5}]', onChange: () => parseClickHoldConfig(p) },
+      // Retransition has its OWN easing curve (2026-10-11, direct request: "I want retransition to have its own easing curve as opposed to using the global one per click function").
+      { key: `${p}RetransitionEasingCurveEnabled`, label: 'Retransition Easing Curve On/Off', type: 'checkbox', def: false, onChange: () => updateSingleTimingGateVisibility(p) },
+      { key: `${p}RetransitionEasingCurve`, label: 'Retransition Easing Curve (Progress -> Speed)', type: 'text', def: '[{"x":0,"y":0.5},{"x":1,"y":0.5}]', onChange: () => parseClickHoldConfig(p) },
       // Animation Speed Curve on/off -- direct spec item ("Animation
       // Speed Curve on/off [NEW]" under Single-Pose-mode settings), a
       // distance->speed curve exactly analogous to Start Time Curve
@@ -5531,6 +5534,8 @@ function makeClickPoseGroup(p, title, defaults = {}) {
       // same convention as Start Distance Curve's own curve.
       { key: `${p}EasingCurveEnabled`, label: 'Easing Curve On/Off', type: 'checkbox', def: false, onChange: () => updateSingleTimingGateVisibility(p) },
       { key: `${p}EasingCurve`, label: 'Easing Curve (Progress -> Speed)', type: 'text', def: '[{"x":0,"y":0.5},{"x":1,"y":0.5}]', onChange: () => parseClickPoseConfig(p) },
+      { key: `${p}RetransitionEasingCurveEnabled`, label: 'Retransition Easing Curve On/Off', type: 'checkbox', def: false, onChange: () => updateSingleTimingGateVisibility(p) },
+      { key: `${p}RetransitionEasingCurve`, label: 'Retransition Easing Curve (Progress -> Speed)', type: 'text', def: '[{"x":0,"y":0.5},{"x":1,"y":0.5}]', onChange: () => parseClickPoseConfig(p) },
       // Animation Speed Curve / Start Time Curve / Retransition on-off
       // gates -- see makeClickHoldPoseGroup()'s own matching comments
       // for the full reasoning (shared word-for-word, both factories
@@ -8629,6 +8634,7 @@ function parseClickHoldConfig(p) {
   // Easing Curve (2026-10-02) -- see makeClickHoldPoseGroup()'s own
   // matching control comment.
   try { t.easingCurveParsed = JSON.parse(cfg[`${p}EasingCurve`]).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
+  try { t.retransitionEasingCurveParsed = JSON.parse(cfg[`${p}RetransitionEasingCurve`]).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
   parseOffsetAxisCurves(t, p)
   try { t.retransitionCurveParsed = JSON.parse(cfg[`${p}RetransitionStartTimeCurve`]).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
   try { t.retransitionRangeParsed = JSON.parse(cfg[`${p}RetransitionStartTimeRange`]) } catch (e) { /* keep last-good value */ }
@@ -9715,18 +9721,20 @@ function safeTweenSpeedMs(v) { return Number.isFinite(v) ? v : 800 }
 // duration -- though its Min/Max still set the profile's bounds; and only the
 // initial forward ramp (plus a hold's stopping phase, which continues it) is
 // shaped, not later Loop/Oscillate laps.
-function easingSpeedBounds(p, isTween, trig) {
+function easingSpeedBounds(p, isTween, trig, retransition) {
   const FLOOR_MS = 20
-  if (cfg[`${p}SpeedCurveEnabled`] && trig && trig.speedRangeParsed) {
+  // The retransition profile only supplies a SHAPE (the retransition keeps its own duration), so it always uses the function's default bounds rather than the forward Animation Speed Curve's range.
+  if (!retransition && cfg[`${p}SpeedCurveEnabled`] && trig && trig.speedRangeParsed) {
     const a = trig.speedRangeParsed.min, b = trig.speedRangeParsed.max
     return { fast: Math.max(Math.min(a, b), FLOOR_MS), slow: Math.max(Math.max(a, b), FLOOR_MS) }
   }
   return isTween ? { fast: 50, slow: 5000 } : { fast: FLOOR_MS, slow: 700 }
 }
-function getEasingProfile(p, isTween, trig) {
-  const b = easingSpeedBounds(p, isTween, trig)
-  const curve = trig.easingCurveParsed
-  const cached = easingProfileCache.get(p)
+function getEasingProfile(p, isTween, trig, retransition) {
+  const b = easingSpeedBounds(p, isTween, trig, retransition)
+  const curve = retransition ? trig.retransitionEasingCurveParsed : trig.easingCurveParsed
+  const cacheKey = retransition ? p + '|ret' : p
+  const cached = easingProfileCache.get(cacheKey)
   if (cached && cached.curve === curve && cached.fast === b.fast && cached.slow === b.slow) return cached
   const N = 64
   const ts = new Float64Array(N + 1)
@@ -9739,7 +9747,7 @@ function getEasingProfile(p, isTween, trig) {
     prevD = d
   }
   const profile = { curve, fast: b.fast, slow: b.slow, ts, N, T: acc }
-  easingProfileCache.set(p, profile)
+  easingProfileCache.set(cacheKey, profile)
   return profile
 }
 // Eased position (0-1) at normalized time u (0-1): inverse of the cumulative
@@ -10481,7 +10489,8 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     // Live (2026-10-11): progress is accumulated in refreshLiveDistanceState() from the hand's current Retransition Start Time / Speed curves.
     const progress = chp.retProg ?? (elapsed < chp.retransitionDelay ? 0 : THREE.MathUtils.clamp((elapsed - chp.retransitionDelay) / speedMs, 0, 1))
     // Easing Curve also shapes the retransition (2026-10-11, direct request): same curve / same profile as the forward ramp, but the retransition keeps its OWN duration (Retransition Speed); the profile only reshapes the progress within it.
-    const easedProgress = cfg[`${p}EasingCurveEnabled`] ? easingProfilePAt(getEasingProfile(p, !!chp.retransitionIsTween, trig), progress) : progress
+    // UPDATE 2026-10-11 (later the same day): the retransition now has its OWN Easing Curve (Retransition Easing Curve) instead of reusing the forward one; it keeps its own duration.
+    const easedProgress = cfg[`${p}RetransitionEasingCurveEnabled`] ? easingProfilePAt(getEasingProfile(p, !!chp.retransitionIsTween, trig, true), progress) : progress
     // CORRECTED 2026-09-27 (2nd round, real measured bug -- direct report
     // "there is always a jump on the trigger after a hold release," a
     // follow-up on the splay fix above) -- retransition used to target
@@ -11081,6 +11090,7 @@ function parseClickPoseConfig(p) {
   // Easing Curve (2026-10-02) -- see makeClickPoseGroup()'s own matching
   // control comment.
   try { t.easingCurveParsed = JSON.parse(cfg[`${p}EasingCurve`]).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
+  try { t.retransitionEasingCurveParsed = JSON.parse(cfg[`${p}RetransitionEasingCurve`]).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
   parseOffsetAxisCurves(t, p)
   try { t.retransitionCurveParsed = JSON.parse(cfg[`${p}RetransitionStartTimeCurve`]).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
   try { t.retransitionRangeParsed = JSON.parse(cfg[`${p}RetransitionStartTimeRange`]) } catch (e) { /* keep last-good value */ }
@@ -11401,7 +11411,8 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
     // Live (2026-10-11): accumulated in refreshLiveDistanceState() from the hand's current Retransition Start Time / Speed curves.
     const progress = cp.retProg ?? (elapsed < cp.retransitionDelay ? 0 : THREE.MathUtils.clamp((elapsed - cp.retransitionDelay) / speedMs, 0, 1))
     // Easing Curve also shapes the retransition (2026-10-11, direct request): same profile as the forward ramp, retransition keeps its own duration.
-    const easedProgress = cfg[`${p}EasingCurveEnabled`] ? easingProfilePAt(getEasingProfile(p, isSequenceOrChainMode(p), clickPoseTriggers[p]), progress) : progress
+    // UPDATE 2026-10-11 (later the same day): own Retransition Easing Curve, see the matching hold-kind branch.
+    const easedProgress = cfg[`${p}RetransitionEasingCurveEnabled`] ? easingProfilePAt(getEasingProfile(p, isSequenceOrChainMode(p), clickPoseTriggers[p], true), progress) : progress
     // CORRECTED 2026-09-27 -- see updateClickHoldPoseForHand()'s own
     // matching 'retransition'-phase comment for the full reasoning.
     const values = lerpPoseValues(cp.retransitionStart, cfg, easedProgress)
@@ -12424,6 +12435,8 @@ function buildClickHoldPoseWidgets(p) {
   // interpolation. No separate range widget -- Y is already the final
   // 0-1 fraction, same convention as Start Distance Curve just above.
   buildOffsetAxisWidgets(p)
+  const retEasingCurveRow = document.querySelector(`.dp-row[data-key="${p}RetransitionEasingCurve"]`)
+  if (retEasingCurveRow) buildGenericCurveWidget(retEasingCurveRow, { caption: 'X: Retransition Progress (0-100%)  ·  Y: Speed (0=Slowest, 1=Fastest)', defaultPoints: [{ x: 0, y: 0.5 }, { x: 1, y: 0.5 }] })
   const easingCurveRow = document.querySelector(`.dp-row[data-key="${p}EasingCurve"]`)
   if (easingCurveRow) buildGenericCurveWidget(easingCurveRow, { caption: 'X: Transition Progress (0-100%)  ·  Y: Speed (0=Slowest, 1=Fastest, Within This Function\'s Own Speed Settings)', defaultPoints: [{ x: 0, y: 0.5 }, { x: 1, y: 0.5 }] })
   // Direct request 2026-10-01 ("for start distance min max, make that a
@@ -12490,6 +12503,8 @@ function buildClickPoseWidgets(p) {
   // Easing Curve (2026-10-02) -- see buildClickHoldPoseWidgets()'s own
   // matching comment.
   buildOffsetAxisWidgets(p)
+  const retEasingCurveRow = document.querySelector(`.dp-row[data-key="${p}RetransitionEasingCurve"]`)
+  if (retEasingCurveRow) buildGenericCurveWidget(retEasingCurveRow, { caption: 'X: Retransition Progress (0-100%)  ·  Y: Speed (0=Slowest, 1=Fastest)', defaultPoints: [{ x: 0, y: 0.5 }, { x: 1, y: 0.5 }] })
   const easingCurveRow = document.querySelector(`.dp-row[data-key="${p}EasingCurve"]`)
   if (easingCurveRow) buildGenericCurveWidget(easingCurveRow, { caption: 'X: Transition Progress (0-100%)  ·  Y: Speed (0=Slowest, 1=Fastest, Within This Function\'s Own Speed Settings)', defaultPoints: [{ x: 0, y: 0.5 }, { x: 1, y: 0.5 }] })
   // Direct request 2026-10-01 ("for start distance min max, make that a
@@ -13375,6 +13390,7 @@ const NEW_CUSTOM_FUNCTION_TEMPLATE = {
   SequencePlayMode: 'Count', SequenceCount: 1, SequenceCountMode: 'Loop',
   SequenceLoopTransition: true, SequenceHoldMs: 0, TransitionSpeedMs: 700,
   EasingCurveEnabled: false, EasingCurve: '[{"x":0,"y":0.5},{"x":1,"y":0.5}]',
+  RetransitionEasingCurveEnabled: false, RetransitionEasingCurve: '[{"x":0,"y":0.5},{"x":1,"y":0.5}]',
   SpeedCurveEnabled: false, SpeedCurve: '[{"x":0,"y":0},{"x":1,"y":1}]', SpeedCurveRange: '{"min":500,"max":1500}',
   StartTimeCurveEnabled: false, StartTimeCurve: '[{"x":0,"y":0},{"x":1,"y":1}]', StartTimeRange: '{"min":0,"max":300}',
   PauseDurationMs: 0,
@@ -13620,7 +13636,7 @@ function enforceCustomClickFunctionsAnchorOrder() {
 // change to the real controls propagates to every trigger automatically.
 const MULTI_TRIGGER_ALLOWED_SUFFIXES = [
   'Enabled', 'Mode', 'TargetPose', 'SkipIfSamePose', 'TweenSelector', 'ReverseSequence', 'GlideToFirstPose', 'FirstGlideTimeScale', 'TweenSpeedMs', 'TransitionSpeedMs', 'PauseDurationMs',
-  'EasingCurveEnabled', 'EasingCurve',
+  'EasingCurveEnabled', 'EasingCurve', 'RetransitionEasingCurveEnabled', 'RetransitionEasingCurve',
   'OffsetEnabled', 'OffsetMode', 'OffsetX', 'OffsetY', 'CursorOffsetDistance',
   'CursorOffsetDistanceCurveEnabled', 'CursorOffsetDistanceCurve', 'CursorOffsetDistanceCurveRange',
   'OffsetZ', 'CursorOffsetXCurve', 'CursorOffsetXRange', 'CursorOffsetYCurve', 'CursorOffsetYRange', 'CursorOffsetZCurve', 'CursorOffsetZRange',
@@ -14504,6 +14520,9 @@ function updateSingleTimingGateVisibility(p) {
   const tweenRetransitionSpeedCurveOn = tweenRetransitionOn && retransitionSpeedCurveEnabled
   setRow('TweenRetransitionSpeedCurve', tweenRetransitionSpeedCurveOn)
   setRow('TweenRetransitionSpeedCurveRange', tweenRetransitionSpeedCurveOn)
+  // Retransition Easing Curve: the on/off follows Retransition itself; the curve shows while its own box is on.
+  setRow('RetransitionEasingCurveEnabled', retransitionOn)
+  setRow('RetransitionEasingCurve', retransitionOn && !!cfg[`${p}RetransitionEasingCurveEnabled`])
 }
 // Tween Stop's own full visibility (Sequence mode only, hold-based
 // triggers only) -- REWRITTEN 2026-09-24 (items 10/11) now that Tween
@@ -14780,7 +14799,8 @@ function wrapClickFunctionGatedSubgroups(p) {
   // of mode, preserving the 2026-09-22 request.
   wrapGatedSubgroup(`${p}RetransitionEnabled`, [
     `${p}RetransitionSpeedMs`, `${p}RetransitionSpeedCurveEnabled`, `${p}RetransitionSpeedCurveVisibleOnly`, `${p}RetransitionSpeedCurve`, `${p}RetransitionSpeedCurveRange`, `${p}RetransitionStartTimeCurveEnabled`, `${p}RetransitionStartTimeCurveVisibleOnly`, `${p}RetransitionStartTimeCurve`, `${p}RetransitionStartTimeRange`,
-    `${p}TweenRetransitionSpeedMs`, `${p}TweenRetransitionSpeedCurve`, `${p}TweenRetransitionSpeedCurveRange`, `${p}TweenRetransitionStartTimeCurve`, `${p}TweenRetransitionStartTimeRange`
+    `${p}TweenRetransitionSpeedMs`, `${p}TweenRetransitionSpeedCurve`, `${p}TweenRetransitionSpeedCurveRange`, `${p}TweenRetransitionStartTimeCurve`, `${p}TweenRetransitionStartTimeRange`,
+    `${p}RetransitionEasingCurveEnabled`, `${p}RetransitionEasingCurve`
   ], 'Retransition')
   // Direct spec item (2026-09-27): "add a Retransition Speed Curve group
   // just like the others where it can get turned on and off... place the
@@ -14797,6 +14817,7 @@ function wrapClickFunctionGatedSubgroups(p) {
   // siblings of it. Order matters: these must run AFTER the outer
   // Retransition wrap, never before.
   wrapGatedSubgroup(`${p}RetransitionSpeedCurveEnabled`, [`${p}RetransitionSpeedCurveVisibleOnly`, `${p}RetransitionSpeedCurve`, `${p}RetransitionSpeedCurveRange`, `${p}TweenRetransitionSpeedCurve`, `${p}TweenRetransitionSpeedCurveRange`], 'Retransition Speed Curve')
+  wrapGatedSubgroup(`${p}RetransitionEasingCurveEnabled`, [`${p}RetransitionEasingCurve`], 'Retransition Easing Curve')
   wrapGatedSubgroup(`${p}RetransitionStartTimeCurveEnabled`, [`${p}RetransitionStartTimeCurveVisibleOnly`, `${p}RetransitionStartTimeCurve`, `${p}RetransitionStartTimeRange`, `${p}TweenRetransitionStartTimeCurve`, `${p}TweenRetransitionStartTimeRange`], 'Retransition Start Time Curve')
   // Hold-kind only -- fire-and-forget triggers have no Tween Stop fields.
   // Must run AFTER the wraps above (harmless either order, since Tween

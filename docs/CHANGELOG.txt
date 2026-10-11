@@ -17250,6 +17250,15 @@ v=358's capped cycle check was fast (66-96 ms vs 21 ms for scalar modes) but the
 (longest chain of such constraints below it, Kahn longest-path with a stall release); every weaker constraint (the arm-distance tie-break, fallbacks, later levels) is applied only between hands in the SAME layer, where it cannot contradict the strong ones; layers are ranked bottom to top, each in its own topological order. A weak rule can therefore never
 override a strong one, which is what the rule's wording asks for. `main.js` `?v=358` -> `?v=359`.
 
+2026-10-11  -  (Retransition has its OWN Easing Curve)
+
+Direct request: "I want retransition to have its own easing curve as opposed to using the global one per click function."
+ - Every click function (and every Multi Trigger instance) gets a "Retransition Easing Curve" subgroup inside its Retransition group: an on/off checkbox + a curve editor (progress -> speed), keys ${p}RetransitionEasingCurveEnabled / ${p}RetransitionEasingCurve, default off with a flat curve.
+ - The retransition no longer reads the forward Easing Curve at all. With its own box ON it reshapes retransition progress through ITS curve (same speed-profile mechanism as the forward one, getEasingProfile(..., retransition = true), its own cache entry); OFF = linear. The retransition keeps its own duration (Retransition Speed, flat or curve);
+   the curve only reshapes progress within it. Because the forward Easing Curve was reused for the retransition for a few hours earlier today (v=354), functions that relied on that now need their Retransition Easing Curve turned on explicitly (default off).
+ - The shape uses the function's default speed bounds (not the forward Animation Speed Curve's range), since only the shape matters. Wired everywhere the forward Easing Curve is: both control factories, config parsing, the curve widgets, visibility gating (follows Retransition's own on/off), the new-function defaults template and the Multi Trigger allowed-suffix list.
+ `main.js` `?v=359` -> `?v=360`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a
