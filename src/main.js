@@ -75,7 +75,9 @@ let palmFacesCursorDistanceCurveParsed = [{ x: 0, y: 1 }, { x: 1, y: 1 }]
 // roll angle's magnitude to within Min/Max Palm Rotation, sign preserved
 // (same "clamp magnitude, keep sign" treatment as this new control's own
 // Responsive Arm Rotation sibling below).
-let palmFacesCursorDistanceRangeParsed = { min: 0, max: 180 }
+// Min / Max Palm Rotation and Min / Max Arm Rotation are PERCENTS of the full 'face the cursor' rotation (2026-10-11): the distance curve's 0..1 height picks a value between Min % and Max %.
+let palmFacesCursorDistanceRangeParsed = { min: 0, max: 100 }
+let armRotationRangeParsed = { min: 0, max: 100 }
 // Responsive Arm Rotation (2026-09-28, new feature -- see animate()'s own
 // cursor-tracking block for the full account) -- separates the actual
 // "hand leans/rotates toward the cursor" rotation out of Tracking Enabled
@@ -287,7 +289,7 @@ const RENDER_ORDER_MODE_OPTIONS = [
 // no-tracking pose (so it does not chase the rotation it drives). hand._trk = world position, hand._trkXY = its screen-space distance to the cursor.
 const TRACKING_POINT_OPTIONS = [{ value: 'hand', text: 'Hand Position' }, { value: 'armBase', text: 'Arm Base' }, { value: 'armEnd', text: 'Arm End' }, { value: 'palmCenter', text: 'Palm Center' }]
 const palmCenterPosRaw = new THREE.Vector3(), _trkExt = new THREE.Vector3()
-const _armOffQx = new THREE.Quaternion(), _armOffQy = new THREE.Quaternion(), _armOffAxis = new THREE.Vector3()
+const _armPartialQ = new THREE.Quaternion(), _armOffQx = new THREE.Quaternion(), _armOffQy = new THREE.Quaternion(), _armOffAxis = new THREE.Vector3()
 let trkXYFieldMin = 0, trkXYFieldRange = 0.001, trkXYAllMin = 0, trkXYAllRange = 0.001
 let trackingPointCloud = null
 const _trackTargetXY = new THREE.Vector3() // cursor target at a hand's own depth, for Use Cursor Target Depth = off
@@ -1105,6 +1107,8 @@ const DEV_GROUPS = [
       { key: 'armRotationDefault', label: 'Default Arm Rotation (%, Reactive Off)', type: 'slider', min: 0, max: 100, step: 1, def: 100 },
       { key: 'armRotationCurveEnabled', label: 'Reactive Arm Rotation (By Cursor Distance)', type: 'checkbox', def: false, onChange: () => updateArmRotationGateVisibility() },
       { key: 'armRotationCurve', label: 'Arm Rotation Distance Curve (Distance -> Rotation Amount)', type: 'text', def: '[{"x":0,"y":1},{"x":1,"y":1}]', onChange: () => parseCursorTrackingConfig() },
+      // Percent of the full 'face the cursor' swing (2026-10-11, direct request): the curve's 0..1 height picks a value between Min % and Max %; 0 = the arm does not rotate, 100 = it turns fully to face the cursor.
+      { key: 'armRotationRangePct', label: 'Min / Max Arm Rotation (%)', type: 'text', def: '{"min":0,"max":100}', onChange: () => parseCursorTrackingConfig() },
       // REMOVED 2026-09-28: Min / Max Arm Rotation (Deg) (`armRotationRange`)
       // -- direct report ("when the hand arm rotation reaches its own
       // limit threshold, be it 180 or 360, it ends up spinning 360 in the
@@ -1156,7 +1160,9 @@ const DEV_GROUPS = [
       // applied (per direct precedent: Arm Length/Responsive Wrist Splay).
       { key: 'palmFacesCursorDistanceCurveEnabled', label: 'Palm Rotation Distance Curve On/Off', type: 'checkbox', def: false, onChange: () => updateCursorTrackingGateVisibility() },
       { key: 'palmFacesCursorDistanceCurve', label: 'Palm Rotation Distance Curve (Distance -> Responsiveness)', type: 'text', def: '[{"x":0,"y":1},{"x":1,"y":1}]', onChange: () => parseCursorTrackingConfig() },
-      { key: 'palmFacesCursorDistanceRange', label: 'Min / Max Palm Rotation (Deg)', type: 'text', def: '{"min":0,"max":180}', onChange: () => parseCursorTrackingConfig() }
+      // Percent of the full 'face the cursor' rotation (2026-10-11, direct request): was 'Min / Max Palm Rotation (Deg)' under the key palmFacesCursorDistanceRange. A NEW key on purpose: the old saved value was in degrees
+      // (e.g. -35..180) and would read as -35%..180%. The old key's saved value is simply no longer read.
+      { key: 'palmFacesCursorDistanceRangePct', label: 'Min / Max Palm Rotation (%)', type: 'text', def: '{"min":0,"max":100}', onChange: () => parseCursorTrackingConfig() }
     ]
   },
   {
@@ -7384,20 +7390,23 @@ function parseWristSplayConfig() {
 }
 function parseCursorTrackingConfig() {
   try { palmFacesCursorDistanceCurveParsed = JSON.parse(cfg.palmFacesCursorDistanceCurve).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
-  try { palmFacesCursorDistanceRangeParsed = JSON.parse(cfg.palmFacesCursorDistanceRange) } catch (e) { /* keep last-good value */ }
+  try { palmFacesCursorDistanceRangeParsed = JSON.parse(cfg.palmFacesCursorDistanceRangePct) } catch (e) { /* keep last-good value */ }
+  try { armRotationRangeParsed = JSON.parse(cfg.armRotationRangePct) } catch (e) { /* keep last-good value */ }
   try { armRotationCurveParsed = JSON.parse(cfg.armRotationCurve).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
 }
 function updateCursorTrackingGateVisibility() {
   // Toggle visibility of cursor-tracking curve controls based on
   // palmFacesCursorDistanceCurveEnabled checkbox state
   const curveRow = document.querySelector('.dp-row[data-key="palmFacesCursorDistanceCurve"]')
-  const rangeRow = document.querySelector('.dp-row[data-key="palmFacesCursorDistanceRange"]')
+  const rangeRow = document.querySelector('.dp-row[data-key="palmFacesCursorDistanceRangePct"]')
   if (curveRow) curveRow.style.display = cfg.palmFacesCursorDistanceCurveEnabled ? '' : 'none'
   if (rangeRow) rangeRow.style.display = cfg.palmFacesCursorDistanceCurveEnabled ? '' : 'none'
 }
 function updateArmRotationGateVisibility() {
   const curveRow = document.querySelector('.dp-row[data-key="armRotationCurve"]')
   if (curveRow) curveRow.style.display = cfg.armRotationCurveEnabled ? '' : 'none'
+  const armRangeRow = document.querySelector('.dp-row[data-key="armRotationRangePct"]')
+  if (armRangeRow) armRangeRow.style.display = cfg.armRotationCurveEnabled ? '' : 'none'
 }
 // Returns the EXTRA wrist-splay rotation (degrees) this hand should get
 // on top of the Pose group's own shared `cfg.wristSplay` -- 0 when the
@@ -7558,9 +7567,9 @@ function buildWristSplayWidgets() {
 // custom function).
 function buildCursorTrackingWidgets() {
   const curveRow = document.querySelector('.dp-row[data-key="palmFacesCursorDistanceCurve"]')
-  const rangeRow = document.querySelector('.dp-row[data-key="palmFacesCursorDistanceRange"]')
+  const rangeRow = document.querySelector('.dp-row[data-key="palmFacesCursorDistanceRangePct"]')
   if (curveRow) buildGenericCurveWidget(curveRow, { caption: 'X: Distance From Cursor (Nearest→Farthest On-Screen Hand)  ·  Y: Palm Rotation Responsiveness (0=None, 1=Full)', defaultPoints: [{ x: 0, y: 1 }, { x: 1, y: 1 }] })
-  if (rangeRow) buildGenericRangeBarWidget(rangeRow, { trackMin: -180, trackMax: 180, unit: '°', defaultValue: { min: 0, max: 180 } })
+  if (rangeRow) buildGenericRangeBarWidget(rangeRow, { trackMin: 0, trackMax: 100, unit: '%', defaultValue: { min: 0, max: 100 } })
 }
 // Responsive Arm Rotation's own curve-graph widget -- same builder,
 // same call shape as buildCursorTrackingWidgets() above. No range-bar
@@ -7568,7 +7577,9 @@ function buildCursorTrackingWidgets() {
 // own DEV_GROUPS comment).
 function buildArmRotationWidgets() {
   const curveRow = document.querySelector('.dp-row[data-key="armRotationCurve"]')
-  if (curveRow) buildGenericCurveWidget(curveRow, { caption: 'X: Distance From Cursor (Nearest→Farthest On-Screen Hand)  ·  Y: Arm Rotation Amount (0=None, 1=Full)', defaultPoints: [{ x: 0, y: 1 }, { x: 1, y: 1 }] })
+  if (curveRow) buildGenericCurveWidget(curveRow, { caption: 'X: Distance From Cursor (Nearest→Farthest On-Screen Hand)  ·  Y: Arm Rotation Amount (0=Min %, 1=Max %)', defaultPoints: [{ x: 0, y: 1 }, { x: 1, y: 1 }] })
+  const armRangeRow = document.querySelector('.dp-row[data-key="armRotationRangePct"]')
+  if (armRangeRow) buildGenericRangeBarWidget(armRangeRow, { trackMin: 0, trackMax: 100, unit: '%', defaultValue: { min: 0, max: 100 } })
 }
 
 function buildArmLengthRangeWidget(row) {
@@ -15962,9 +15973,9 @@ function animate(dt, now) {
               const armVis = cfg.armRotationVisibleOnly !== false
               const range = armRotUseDepth ? Math.max(cursorDistMaxD - cursorDistMinD, 1e-6) : (armVis ? trkXYFieldRange : trkXYAllRange)
               const normDist = (distToCursor - (armRotUseDepth ? cursorDistMinD : (armVis ? trkXYFieldMin : trkXYAllMin))) / range
-              responsiveness = (armRotationCurveParsed && armRotationCurveParsed.length)
-                ? THREE.MathUtils.clamp(evaluateArmLengthCurve(armRotationCurveParsed, normDist), 0, 1)
-                : 1
+              // The curve's height (0..1) picks a PERCENT between Min % and Max % of the full 'face the cursor' swing (2026-10-11).
+              const armCurveY = (armRotationCurveParsed && armRotationCurveParsed.length) ? THREE.MathUtils.clamp(evaluateArmLengthCurve(armRotationCurveParsed, normDist), 0, 1) : 1
+              responsiveness = THREE.MathUtils.clamp((armRotationRangeParsed.min + (armRotationRangeParsed.max - armRotationRangeParsed.min) * armCurveY) / 100, 0, 1)
             }
             // Arm Rotation Damping -- same handoff-settle safety net as
             // before (a trigger-interruption handoff still gets a
@@ -15980,11 +15991,13 @@ function animate(dt, now) {
             // or more. Seed it at the orientation it converges to instead. A hand whose
             // responsiveness is exactly 0 never moves toward the cursor, so it keeps the
             // base orientation (unchanged behaviour).
-            if (!hand.currentArmRotationQuat) hand.currentArmRotationQuat = (responsiveness > 0 ? lookAtDesired : _identityQuatTrack).clone()
+            // responsiveness is now the FRACTION of the full swing the arm makes (0 = no rotation, 1 = fully facing the cursor): the target is that fraction of the swing, and damping smooths toward it.
+            _armPartialQ.identity().slerp(lookAtDesired, responsiveness)
+            if (!hand.currentArmRotationQuat) hand.currentArmRotationQuat = _armPartialQ.clone()
             const armRotationDampingAmt = inHandoffSettle
               ? Math.min(THREE.MathUtils.clamp(cfg.armRotationDamping ?? 1, 0.001, 1), HANDOFF_SETTLE_DAMPING_CAP)
               : THREE.MathUtils.clamp(cfg.armRotationDamping ?? 1, 0.001, 1)
-            hand.currentArmRotationQuat.slerp(lookAtDesired, THREE.MathUtils.clamp(armRotationDampingAmt * responsiveness, 0, 1))
+            hand.currentArmRotationQuat.slerp(_armPartialQ, THREE.MathUtils.clamp(armRotationDampingAmt, 0, 1))
             desired = hand.currentArmRotationQuat
           }
           let baseDeg = cfg.palmFacesCursor ? computeRadialRollDeg(hand._trk, cursorTarget) : 0
@@ -16000,20 +16013,11 @@ function animate(dt, now) {
             const responsiveness = palmFacesCursorDistanceCurveParsed && palmFacesCursorDistanceCurveParsed.length
               ? evaluateArmLengthCurve(palmFacesCursorDistanceCurveParsed, normDist)
               : 1
-            baseDeg = baseDeg * THREE.MathUtils.clamp(responsiveness, 0, 1)
+            // The curve's height (0..1) picks a PERCENT between Min % and Max % of the full 'face the cursor' rotation (2026-10-11); the Palm Face Rotation (Deg) offset is added afterwards, unscaled.
+            const palmCurveY = THREE.MathUtils.clamp(responsiveness, 0, 1)
+            baseDeg = baseDeg * THREE.MathUtils.clamp((palmFacesCursorDistanceRangeParsed.min + (palmFacesCursorDistanceRangeParsed.max - palmFacesCursorDistanceRangeParsed.min) * palmCurveY) / 100, 0, 1)
           }
-          // CORRECTED 2026-09-28 -- Min/Max Palm Rotation (palmFacesCursorDistanceRange)
-          // was built as a widget earlier this session but never actually
-          // consumed by this math (confirmed by grep -- a real pre-existing
-          // gap). Bounds the final angle's MAGNITUDE (sign preserved, since
-          // computeRadialRollDeg()/the offset slider can both be negative)
-          // to within Min/Max Palm Rotation, same "clamp magnitude, keep
-          // sign" treatment as every other signed-angle control in this file.
-          if (baseDeg !== 0) {
-            const palmMinAbs = Math.min(Math.abs(palmFacesCursorDistanceRangeParsed.min), Math.abs(palmFacesCursorDistanceRangeParsed.max))
-            const palmMaxAbs = Math.max(Math.abs(palmFacesCursorDistanceRangeParsed.min), Math.abs(palmFacesCursorDistanceRangeParsed.max))
-            baseDeg = Math.sign(baseDeg) * THREE.MathUtils.clamp(Math.abs(baseDeg), palmMinAbs, palmMaxAbs)
-          }
+          // (The old degree clamp on Min / Max Palm Rotation is gone: Min / Max are percents of the full rotation now, applied above.)
           // Look-At Damping (`trackingDamping`) now applies ONLY here, to
           // Palm Rotation -- direct question 2026-09-28 ("Does Look at
           // Damping only effect Palm Rotation now? It should"). Same

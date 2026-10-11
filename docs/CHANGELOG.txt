@@ -17140,6 +17140,18 @@ onAnyValueChange -> sceneNeedsRedraw (TDZ ReferenceError, caught and logged by s
 sceneNeedsRedraw declaration (just before the visibilitychange listeners). Also measured live: the Show Hand Tracking Points dots sit exactly on rForearmBend (Arm Base) and rHand (Arm End) in the no-tracking pose; Palm Center is the bind-pose
 position of rMid1, so it is off the posed bone by the finger pose (1.17 units in the test). `main.js` `?v=346` -> `?v=347`.
 
+2026-10-11  -  (Palm / Arm Rotation Min / Max are percents of the full "face the cursor" rotation)
+
+Direct request: "The min max slider for Palm Rotation Distance Curve is the percent the hand rotates to achieve that facing the cursor. so at 0, the hand wont rotate, at 100, it makes the full rotation. So change the min max slider to % as opposed to degrees. The Palm Face Rotation
+degrees slider just allows me to globally shift the palm rotation to fine tune." Then: "same for arm rotation".
+ - Palm Rotation: full rotation = the radial angle that turns the palm to face the cursor (computeRadialRollDeg). With the Palm Rotation Distance Curve on, the curve's 0..1 height picks a percent between Min % and Max % (Min / Max Palm Rotation (%)), and the roll is
+   that percent of the full angle. With the curve off the palm makes 100% of it, as before. The old degree clamp is removed. Palm Face Rotation (Deg) is added afterwards, unscaled, as a global shift (unchanged).
+ - Arm Rotation: full rotation = the swing that points the arm at the cursor. The target is now that percent of the swing (slerp from no rotation toward the full swing): Default Arm Rotation (%) when the Reactive curve is off, otherwise the curve picks a percent between the
+   new Min / Max Arm Rotation (%) (shown with the curve). 0% = no rotation (it used to freeze where it was), 100% = fully facing the cursor. Arm Rotation Damping now just smooths toward that target (it used to be multiplied by the old responsiveness).
+ - Palm range is a NEW control key (palmFacesCursorDistanceRangePct, default 0..100) because the saved value of the old key (palmFacesCursorDistanceRange, your -35..180) was in degrees and would have read as -35%..180%; the old saved value is just no longer read.
+   The arm range is new (armRotationRangePct, default 0..100), so existing arm curves behave as 100% at y=1 and scale down as y falls. Re-set the Palm Min / Max % if you want something other than the full 0..100 range.
+ `main.js` `?v=347` -> `?v=348`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a
