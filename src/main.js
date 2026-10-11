@@ -291,9 +291,12 @@ const _brQx = new THREE.Quaternion(), _brQy = new THREE.Quaternion(), _brQz = ne
 const _brAX = new THREE.Vector3(1, 0, 0), _brAY = new THREE.Vector3(0, 1, 0), _brAZ = new THREE.Vector3(0, 0, 1), _brPosA = new THREE.Vector3(), _brPosB = new THREE.Vector3()
 // Render Order Mode / Fallback options (2026-10-11). Z modes order by a Z position (closest to the camera on top); the cursor modes order by distance to the cursor: XY = screen-space only, XYZ = also the Z gap
 // to the cursor target (its Cursor Target Depth). 'closest' = nearest the cursor on top, 'farthest' = furthest on top.
+// '-' modes (2026-10-11): the same Z with the sign flipped, so the hand with the LOWER Z value is drawn on top.
+const RO_NEG_BASE = { negZ: 'z', negArmBase: 'armBase', negArmEnd: 'armEnd', negPalmCenter: 'palmCenter' }
 const RENDER_ORDER_MODE_OPTIONS = [
   { value: 'none', text: 'None' },
   { value: 'z', text: 'Z Position' }, { value: 'armBase', text: 'Arm Base' }, { value: 'armEnd', text: 'Arm End' }, { value: 'palmCenter', text: 'Palm Center' },
+  { value: 'negZ', text: '-Z Position' }, { value: 'negArmBase', text: '-Arm Base' }, { value: 'negArmEnd', text: '-Arm End' }, { value: 'negPalmCenter', text: '-Palm Center' },
   { value: 'closest', text: 'Closest To Cursor (XY)' }, { value: 'farthest', text: 'Farthest From Cursor (XY)' },
   { value: 'closestZ', text: 'Closest To Cursor (XYZ)' }, { value: 'farthestZ', text: 'Farthest From Cursor (XYZ)' },
   { value: 'palmToArm', text: 'Palm To Arm Base' },
@@ -1003,7 +1006,24 @@ function roUpdateSequences() {
   }
 }
 let roPrevRank = null, roLocks = new Map(), roLockPruneCounter = 0
-const RO_LEVEL_NAMES = ['Mode', 'Fallback', 'Fallback 2']
+const roLevelName = (l) => (l === 0 ? 'Mode' : l === 1 ? 'Fallback' : 'Fallback ' + l)
+// Mode terms (+ And / + Or / - Subtract) and the extra Fallback levels are JSON lists kept in two hidden text controls (see buildRenderOrderWidgets()); parsed once per distinct string.
+const RO_VALID_MODES = new Set(RENDER_ORDER_MODE_OPTIONS.map((o) => o.value))
+let roTermsStr = null, roTermsVal = [], roExtraStr = null, roExtraVal = []
+function roParseTerms() {
+  const str = cfg.renderOrderModeTerms || '[]'
+  if (str === roTermsStr) return roTermsVal
+  roTermsStr = str; roTermsVal = []
+  try { const a = JSON.parse(str); if (Array.isArray(a)) roTermsVal = a.filter((t) => t && (t.op === 'and' || t.op === 'or' || t.op === 'sub') && RO_VALID_MODES.has(t.m) && t.m !== 'none') } catch (e) { /* none */ }
+  return roTermsVal
+}
+function roParseExtra() {
+  const str = cfg.renderOrderExtraFallbacks || '[]'
+  if (str === roExtraStr) return roExtraVal
+  roExtraStr = str; roExtraVal = []
+  try { const a = JSON.parse(str); if (Array.isArray(a)) roExtraVal = a.filter((t) => t && RO_VALID_MODES.has(t.m)).map((t) => ({ m: t.m, q: RO_VALID_MODES.has(t.q) ? t.q : 'none' })) } catch (e) { /* none */ }
+  return roExtraVal
+}
 const roOptText = (mode) => { const o = RENDER_ORDER_MODE_OPTIONS.find((x) => x.value === mode); return o ? o.text : String(mode) }
 // Which condition the rule fired on for this pair, e.g. "Mode [Palm To Arm End]: Hand 12 palm center Z 4.21 is higher than Hand 13 arm end Z 3.90". Called right after cmpLevels(lo, hi) (it reads roPriority) with the same
 // frame's evaluator arrays. loAbove = the FINAL order; if the rule wanted the other way (flip lock or a conflicting constraint decided), that is said too.
@@ -1014,7 +1034,8 @@ function roExplain(lv, r, lo, hi, loAbove) {
   const ruleLoAbove = r > 0
   const up = ruleLoAbove ? lo : hi, down = ruleLoAbove ? hi : lo
   let cond
-  if (ev.pair) {
+  if (ev.comp) cond = 'Hand ' + (up + 1) + ' above Hand ' + (down + 1) + ' (' + ev.detail(up, down) + ')'
+  else if (ev.pair) {
     const arm = ev.isEnd ? 'arm end' : 'arm base'
     if (kindXY) cond = 'both ' + (ev.rev ? arm + 's are higher than the other palm' : 'palms are higher than the other ' + arm) + '; Hand ' + (up + 1) + ' ' + arm + ' is farther from the cursor (' + ev.xy[up].toFixed(1) + ' vs ' + ev.xy[down].toFixed(1) + ')'
     else if (!ev.rev) cond = 'Hand ' + (up + 1) + ' palm center Z ' + roPalmZ[up].toFixed(2) + ' is higher than Hand ' + (down + 1) + ' ' + arm + ' Z ' + ev.z[down].toFixed(2)
@@ -1025,7 +1046,7 @@ function roExplain(lv, r, lo, hi, loAbove) {
     cond = 'Hand ' + (up + 1) + ' ' + show(up) + ' vs Hand ' + (down + 1) + ' ' + show(down) + (neg ? ' (distance, nearer goes above)' : '')
   }
   const ex = L.q ? '; Except [' + roOptText(L.q.mode) + '] did not oppose it' : ''
-  return RO_LEVEL_NAMES[l] + ' [' + roOptText(ev.mode) + ']: ' + cond + ex + (ruleLoAbove === loAbove ? '' : ' -- NOTE the rule wanted Hand ' + (up + 1) + ' above, but the final order differs (flip lock / conflicting constraint)')
+  return roLevelName(l) + ' [' + (ev.comp ? ev.desc : roOptText(ev.mode)) + ']: ' + cond + ex + (ruleLoAbove === loAbove ? '' : ' -- NOTE the rule wanted Hand ' + (up + 1) + ' above, but the final order differs (flip lock / conflicting constraint)')
 }
 function roFinishFrame(n, np, cmpLevels, logOn, lockOn, lv) {
   if (!logOn && !lockOn) { roPrevRank = null; roLocks.clear(); return }
@@ -1092,8 +1113,53 @@ function computeRenderOrderRanks() {
     evs.set(mode, ev)
     return ev
   }
+  // Standardised score of one scalar mode over all hands (mean 0, stdev 1), so differently scaled modes (distances, Z values) can be added / subtracted.
+  const zs = new Map()
+  const zOf = (mode) => {
+    let z = zs.get(mode)
+    if (z) return z
+    z = new Float64Array(n)
+    let sum = 0
+    for (let i = 0; i < n; i++) { z[i] = renderOrderPriority(hands[i], mode); sum += z[i] }
+    const mean = n ? sum / n : 0
+    let v = 0
+    for (let i = 0; i < n; i++) { z[i] -= mean; v += z[i] * z[i] }
+    const sd = Math.sqrt(n ? v / n : 0) || 1
+    for (let i = 0; i < n; i++) z[i] /= sd
+    zs.set(mode, z)
+    return z
+  }
+  // The Mode plus its + And / + Or / - Subtract terms as one evaluator. Terms are read left to right: And / Subtract add / take away the term's standardised score from the group built so far; Or starts a new group.
+  // A group is a sum; its verdict for a pair is the sign of the difference between the two hands' sums (Palm To Arm style modes count as +-1). Groups combine like OR: if any group puts a hand on top and none puts the other
+  // on top, that hand is above; if groups disagree the pair is a tie (the next level decides). With only scalar terms and no Or, the whole thing is one scalar key.
+  const evalComposite = (mainMode, terms) => {
+    if (!terms.length) return evalMode(mainMode)
+    const groups = [[]]
+    if (mainMode && mainMode !== 'none') groups[0].push({ sign: 1, mode: mainMode })
+    terms.forEach((t) => { if (t.op === 'or') groups.push([{ sign: 1, mode: t.m }]); else groups[groups.length - 1].push({ sign: t.op === 'sub' ? -1 : 1, mode: t.m }) })
+    const gs = groups.filter((g) => g.length)
+    if (!gs.length) return null
+    let anyPair = false
+    gs.forEach((g) => g.forEach((it) => { it.ev = evalMode(it.mode); if (it.ev.pair) anyPair = true; else it.z = zOf(it.mode) }))
+    const descGroup = (g) => g.map((it, i) => (i === 0 ? (it.sign < 0 ? '-' : '') : (it.sign < 0 ? ' - ' : ' + ')) + roOptText(it.mode)).join('')
+    const desc = gs.map(descGroup).join(' OR ')
+    if (!anyPair && gs.length === 1) {
+      const k = new Float64Array(n)
+      for (let i = 0; i < n; i++) { let t = 0; gs[0].forEach((it) => { t += it.sign * it.z[i] }); k[i] = Math.round(t * 1000) }
+      return { pair: false, k, mode: 'comp', comp: true, desc, detail: (u, d) => gs[0].map((it) => (it.sign < 0 ? '-' : '+') + roOptText(it.mode) + ' ' + (it.z[u] - it.z[d]).toFixed(2)).join(' ') + ' = ' + ((k[u] - k[d]) / 1000).toFixed(2) }
+    }
+    const groupDiff = (g, a, b) => { let D = 0; g.forEach((it) => { D += it.sign * (it.ev.pair ? cmpMode(it.ev, a, b) : it.z[a] - it.z[b]) }); return D }
+    const cmp = (a, b) => {
+      let pos = false, neg = false
+      for (let g = 0; g < gs.length; g++) { const D = groupDiff(gs[g], a, b); if (D > 0.001) pos = true; else if (D < -0.001) neg = true }
+      return pos && !neg ? 1 : neg && !pos ? -1 : 0
+    }
+    const detail = (u, d) => gs.map((g) => '[' + descGroup(g) + ': ' + groupDiff(g, u, d).toFixed(2) + ']').join(' OR ')
+    return { pair: true, comp: true, cmp, mode: 'comp', desc, detail }
+  }
   // +1 = a goes above b, -1 = b goes above a, 0 = this mode does not decide the pair
   const cmpMode = (ev, a, b) => {
+    if (ev.comp && ev.cmp) return ev.cmp(a, b)
     if (ev.pair) {
       const aOver = ev.rev ? ev.z[a] - roPalmZ[b] > TOL : roPalmZ[a] - ev.z[b] > TOL
       const bOver = ev.rev ? ev.z[b] - roPalmZ[a] > TOL : roPalmZ[b] - ev.z[a] > TOL
@@ -1106,14 +1172,15 @@ function computeRenderOrderRanks() {
     return d > 0 ? 1 : d < 0 ? -1 : 0
   }
   const lv = [
-    { m: evalMode(cfg.renderOrderMode || 'z'), q: evalMode(cfg.renderOrderModeExcept) },
+    { m: evalComposite(cfg.renderOrderMode || 'z', roParseTerms()), q: evalMode(cfg.renderOrderModeExcept) },
     { m: evalMode(cfg.renderOrderFallback || 'farthestZ'), q: evalMode(cfg.renderOrderFallbackExcept) },
     { m: evalMode(cfg.renderOrderFallback2 || 'farthestZ'), q: evalMode(cfg.renderOrderFallback2Except) }
   ]
+  roParseExtra().forEach((e) => lv.push({ m: evalMode(e.m), q: evalMode(e.q) }))
   // The three levels (each with its optional Except) as one pairwise decision: +1 = a above b, -1 = b above a, 0 = every level ties.
   // roPriority (set as a side effect) = how strong the deciding rule is: 2 * level, +1 when it was a Palm To Arm 'both palms higher' tie-break by arm distance. Lower = stronger.
   const cmpLevels = (a, b) => {
-    for (let l = 0; l < 3; l++) {
+    for (let l = 0; l < lv.length; l++) {
       const L = lv[l]
       if (!L.m) continue
       roKindXY = false
@@ -1143,7 +1210,7 @@ function computeRenderOrderRanks() {
   // rules, and FLIP LOCKS) give every hand a LAYER = the longest chain below it; (2) every weaker constraint is applied only between hands in the SAME layer; (3) layers are drawn bottom to top, each in topological order.
   const np = roKnnPairs(n)
   const havePrev = (lockOn || logOn) && roPrevRank && roPrevRank.length === n
-  const buckets = [[], [], [], [], [], []]
+  const buckets = Array.from({ length: 2 * lv.length + 1 }, () => [])
   const lockList = [] // flip-lock edges (under, over): derived from last frame's total order, so they are acyclic among themselves, and they are never dropped
   // Flip lock: per pair, the relative order may change at most once while neither hand starts a new sequence; a pair left tied keeps its previous order (weakest constraint) instead of flickering with the tie-break.
   if (++roLockPruneCounter >= 240) { roLockPruneCounter = 0; for (const [k, lk] of roLocks) { const lo = Math.floor(k / n), hi = k % n; if (!hands[lo] || lk.sa !== hands[lo]._roSeq || lk.sb !== hands[hi]._roSeq) roLocks.delete(k) } }
@@ -1160,7 +1227,7 @@ function computeRenderOrderRanks() {
         continue
       }
       if (lk) roLocks.delete(key) // a new sequence started on one of the two hands: unlocked
-      if (rr === 0) { rr = prevAbove ? 1 : -1; pri = 5 } // tied pair: keep the previous order (weakest constraint)
+      if (rr === 0) { rr = prevAbove ? 1 : -1; pri = 2 * lv.length } // tied pair: keep the previous order (weakest constraint)
       // (an unlocked pair that the rules want flipped is simply allowed to; the lock is recorded after the ranks are known, only if the flip really happened)
     }
     if (rr === 0) continue
@@ -1228,6 +1295,69 @@ function computeRenderOrderRanks() {
   roFinishFrame(n, np, cmpLevels, logOn, lockOn, lv)
 }
 // Moves each Except select into its main dropdown's row, to the right of it (the Except rows themselves are hidden). The select keeps its own control binding, so saving / restoring / undo work as for any select.
+// Render Order list widgets (2026-10-11): the Mode's + And / + Or / - Subtract terms and the unlimited extra Fallback levels. Each is a hidden JSON text control with a button bar and one row per entry.
+function buildRenderOrderWidgets() {
+  const selStyle = { flex: '1 1 0', minWidth: '0' }
+  const fillSel = (sel, value, allowNone) => {
+    RENDER_ORDER_MODE_OPTIONS.forEach((o) => { if (!allowNone && o.value === 'none') return; const op = document.createElement('option'); op.value = o.value; op.textContent = o.text; sel.appendChild(op) })
+    sel.value = value
+    Object.assign(sel.style, selStyle)
+  }
+  const mk = (key, kind) => {
+    const row = document.querySelector('.dp-row[data-key="' + key + '"]')
+    const input = row && row.querySelector('.dp-text-input')
+    if (!input || row.dataset.roWidget) return
+    row.dataset.roWidget = '1'
+    input.style.display = 'none'
+    const lab = row.querySelector('label')
+    if (lab && !lab.querySelector('input,select,button')) lab.style.display = 'none'
+    row.style.flexDirection = 'column'; row.style.alignItems = 'stretch'
+    const wrap = elLocal('div', { flex: '1', padding: '2px 0' })
+    const bar = elLocal('div', { display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '4px' })
+    const list = elLocal('div', { display: 'flex', flexDirection: 'column', gap: '4px' })
+    wrap.appendChild(bar); wrap.appendChild(list); row.appendChild(wrap)
+    let items = []
+    const read = () => { try { const a = JSON.parse(input.value); items = Array.isArray(a) ? a : [] } catch (e) { items = [] } }
+    const write = () => commitTextControl(input, JSON.stringify(items))
+    const mkBtn = (text, onClick) => { const b = elLocal('button', null, { type: 'button', text }); b.className = 'dp-action-button'; b.addEventListener('click', onClick); bar.appendChild(b); return b }
+    const OPS = { and: '+ And', or: '+ Or', sub: '- Subtract' }
+    const redraw = () => {
+      list.textContent = ''
+      items.forEach((it, idx) => {
+        const r = elLocal('div', { display: 'flex', gap: '6px', alignItems: 'center' })
+        if (kind === 'terms') {
+          r.appendChild(elLocal('span', { flex: '0 0 auto', minWidth: '62px', opacity: '.8', fontSize: '.85em' }, { text: OPS[it.op] || it.op }))
+          const sel = document.createElement('select'); fillSel(sel, it.m, false)
+          sel.addEventListener('change', () => { items[idx].m = sel.value; lastSeen = JSON.stringify(items); write() })
+          r.appendChild(sel)
+        } else {
+          r.appendChild(elLocal('span', { flex: '0 0 auto', minWidth: '62px', opacity: '.8', fontSize: '.85em' }, { text: 'Fallback ' + (idx + 3) }))
+          const sel = document.createElement('select'); fillSel(sel, it.m, true)
+          sel.addEventListener('change', () => { items[idx].m = sel.value; lastSeen = JSON.stringify(items); write() })
+          r.appendChild(sel)
+          r.appendChild(elLocal('span', { flex: '0 0 auto', margin: '0 2px 0 4px', opacity: '.75', fontSize: '.85em' }, { text: 'Except' }))
+          const q = document.createElement('select'); fillSel(q, it.q || 'none', true)
+          q.addEventListener('change', () => { items[idx].q = q.value; lastSeen = JSON.stringify(items); write() })
+          r.appendChild(q)
+        }
+        const x = elLocal('button', null, { type: 'button', text: '\u00d7', title: 'Remove' }); x.className = 'dp-action-button'
+        x.addEventListener('click', () => { items.splice(idx, 1); lastSeen = JSON.stringify(items); redraw(); write() })
+        r.appendChild(x)
+        list.appendChild(r)
+      })
+    }
+    if (kind === 'terms') {
+      ;['and', 'or', 'sub'].forEach((op) => mkBtn(OPS[op], () => { items.push({ op, m: 'armEnd' }); lastSeen = JSON.stringify(items); redraw(); write() }))
+    } else {
+      mkBtn('+ Add Fallback', () => { items.push({ m: 'farthestZ', q: 'none' }); lastSeen = JSON.stringify(items); redraw(); write() })
+    }
+    let lastSeen = null
+    read(); redraw(); lastSeen = input.value
+    armLengthWidgetResyncs.push(() => { if (input.value === lastSeen) return; lastSeen = input.value; read(); redraw() })
+  }
+  mk('renderOrderModeTerms', 'terms')
+  mk('renderOrderExtraFallbacks', 'fallbacks')
+}
 function mergeExceptSelects() {
   [['renderOrderMode', 'renderOrderModeExcept'], ['renderOrderFallback', 'renderOrderFallbackExcept'], ['renderOrderFallback2', 'renderOrderFallback2Except']].forEach(([a, b]) => {
     const rowA = document.querySelector('.dp-row[data-key="' + a + '"]'), rowB = document.querySelector('.dp-row[data-key="' + b + '"]')
@@ -1244,6 +1374,7 @@ function mergeExceptSelects() {
   })
 }
 function renderOrderPriority(hand, mode) {
+  if (RO_NEG_BASE[mode]) return -renderOrderPriority(hand, RO_NEG_BASE[mode])
   switch (mode) {
     case 'closest': return -(hand._xyCursorDist ?? 0)
     case 'farthest': return hand._xyCursorDist ?? 0
@@ -1411,6 +1542,10 @@ const DEV_GROUPS = [
       { key: 'renderOrderFallback2', label: 'Render Order Fallback 2', type: 'select', def: 'farthestZ', placeAfter: 'renderOrderFallback', options: () => RENDER_ORDER_MODE_OPTIONS },
       { key: 'renderOrderFallback2Except', label: 'Render Order Fallback 2: Except', type: 'select', def: 'none', options: () => RENDER_ORDER_MODE_OPTIONS },
       // Flip lock (2026-10-11, direct request: "hands only seem to switch order once per trigger or retransition sequence"): a pair of nearby hands may swap render order at most ONCE per sequence (a new trigger or a retransition starting on either hand); a pair the rules leave tied keeps its previous order.
+      // + And / + Or / - Subtract terms of the Render Order Mode (2026-10-11): a JSON list edited through the buttons / dropdowns (buildRenderOrderWidgets()).
+      { key: 'renderOrderModeTerms', label: 'Render Order Mode: Terms', type: 'text', placeAfter: 'renderOrderModeExcept', def: '[]' },
+      // Extra Fallback levels beyond Fallback 2, added with the Add Fallback button.
+      { key: 'renderOrderExtraFallbacks', label: 'Render Order: Extra Fallbacks', type: 'text', placeAfter: 'renderOrderFallback2Except', def: '[]' },
       { key: 'renderOrderFlipLock', label: 'Render Order: Flip Once Per Sequence', type: 'checkbox', def: true },
       { key: 'fieldRows', label: 'Rows (Count)', type: 'slider', min: 1, max: 40, step: 1, def: 15, perDevice: true, onChange: () => rebuildField() },
       { key: 'fieldCols', label: 'Columns (Count)', type: 'slider', min: 1, max: 40, step: 1, def: 17, perDevice: true, onChange: () => rebuildField() },
@@ -2664,6 +2799,9 @@ DEV_GROUPS.forEach((g) => g.controls.forEach((c) => {
 // six happened to be left expanded, evidently just incidental to
 // whatever was last interacted with there, not a deliberate choice worth
 // preserving).
+const FIELD_LAYOUT_SUBGROUP_SPECS = [
+  { title: 'Render Order', collapsed: false, keys: ['renderOrderMode', 'renderOrderModeExcept', 'renderOrderModeTerms', 'renderOrderFallback', 'renderOrderFallbackExcept', 'renderOrderFallback2', 'renderOrderFallback2Except', 'renderOrderExtraFallbacks', 'renderOrderFlipLock'] }
+]
 const POSE_SUBGROUP_SPECS = [
   { title: 'Whole-Hand Rotation & Thumb', collapsed: true, keys: ['modelRotX', 'modelRotY', 'modelRotZ', 'thumbCurl', 'thumbSplay', 'thumbSplay2', 'tipTwistThumb', 'curlBiasThumb', 'baseOnlyCurlThumb', 'midOnlyCurlThumb', 'tipOnlyCurlThumb'] },
   { title: 'Whole-Hand Rotation at Base', collapsed: true, keys: ['baseRotationX', 'baseRotationY', 'baseRotationZ'] },
@@ -2686,7 +2824,7 @@ const DEV_PANEL_SAVE_SECRET = 'PkrbMti03M6xm3FEThYXa8gGW_08BOGj'
 const SAVE_SETTINGS_ENDPOINT = '/api/save-settings'
 const cfg = initDevPanel(DEV_GROUPS, {
   storageKeyPrefix: 'handyDandies',
-  organizeSubgroups: (groupsEl) => organizeGroupSubgroups(groupsEl, 'Pose', POSE_SUBGROUP_SPECS),
+  organizeSubgroups: (groupsEl) => { organizeGroupSubgroups(groupsEl, 'Pose', POSE_SUBGROUP_SPECS); organizeGroupSubgroups(groupsEl, 'Field Layout', FIELD_LAYOUT_SUBGROUP_SPECS) },
   remoteSave: { endpoint: SAVE_SETTINGS_ENDPOINT, secret: DEV_PANEL_SAVE_SECRET },
   // ROOT CAUSE of the middle/ring finger "outstretched" bug's REAL
   // return, 2026-09-16 (direct user report, correctly suspecting "the
@@ -16710,6 +16848,7 @@ safeRefreshSelectOptions('renderOrderModeExcept')
 safeRefreshSelectOptions('renderOrderFallbackExcept')
 safeRefreshSelectOptions('renderOrderFallback2Except')
 mergeExceptSelects()
+buildRenderOrderWidgets()
 safeRefreshSelectOptions('trackingPoint')
 document.addEventListener('visibilitychange', syncPauseWithVisibility)
 window.addEventListener('blur', syncPauseWithVisibility)

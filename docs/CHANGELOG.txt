@@ -17300,6 +17300,14 @@ distance curves (Start Time, Speed, Retransition, Start Distance, Tween Stop, Ca
  - updateTrackingPoints() now runs once per frame at the START of updateRenderOrder() (the animate() tracking block runs it first when tracking is on; the second call is skipped), before the on-screen flags; refreshTrackingDomains() then recomputes the tracking-feature domains from the fresh flags. With Cursor Tracking > Tracking Point = Hand Position, the tracking point IS the field position, so nothing changes for that setting.
  - Left as the field position on purpose: placing / offsetting the hand itself (positions are what get moved), the Prevent Reordering Flash overlap circles and the neighbour search between hands (those relate hands to each other, not to the cursor). `main.js` `?v=366` -> `?v=367`.
 
+2026-10-11  -  (Render Order group, unlimited fallbacks, + And / + Or / - Subtract terms, negated "-" modes)
+
+Direct requests: put the render order settings in their own "Render Order" group inside Field Layout; a button to keep adding fallback scenarios; + And / + Or / - Subtract buttons on the Mode (each adds another dropdown, unlimited); "-Arm End / -Arm Base / -Palm Center / -Z Position" modes (the hand with the LOWER Z goes on top).
+ - New modes -Z Position, -Arm Base, -Arm End, -Palm Center = the same Z with the sign flipped (renderOrderPriority() negates). Arm End + (-Arm End) cancels to 0; Arm End - Arm End cancels; Arm End - (-Arm End) doubles it.
+ - Field Layout > Render Order (nested group, FIELD_LAYOUT_SUBGROUP_SPECS) now holds Mode (+ Except), the Mode's terms, Fallback, Fallback 2, the extra fallbacks and Flip Once Per Sequence.
+ - Add Fallback: renderOrderExtraFallbacks (hidden JSON list [{m,q}]) - each entry is another level (Fallback 3, 4 ...) with its own Except; x removes it. The evaluator now runs over N levels (lv.length), bucket count 2*levels+1 (the old fixed 6 buckets let a Fallback 2 arm-distance tie-break share a slot with "keep previous order"; now separate).
+ - Mode terms: renderOrderModeTerms (hidden JSON list [{op:'and'|'or'|'sub', m}]). Read left to right: And / Subtract add / take away the term's STANDARDISED score (mean 0, stdev 1 over all hands, so distances and Z values are comparable) from the group built so far; Or starts a new group. Scalar-only, no Or = one scalar key (an exact sort). Otherwise a pairwise verdict per group (sign of the difference of the two hands' sums, Palm To Arm style modes count +-1); groups combine like OR: any group puts a hand on top and none the other = that hand above; groups disagreeing = tie (the next level decides). The log names the composite and the per-group values. `main.js` `?v=367` -> `?v=368`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a
