@@ -292,6 +292,7 @@ const _brAX = new THREE.Vector3(1, 0, 0), _brAY = new THREE.Vector3(0, 1, 0), _b
 // Render Order Mode / Fallback options (2026-10-11). Z modes order by a Z position (closest to the camera on top); the cursor modes order by distance to the cursor: XY = screen-space only, XYZ = also the Z gap
 // to the cursor target (its Cursor Target Depth). 'closest' = nearest the cursor on top, 'farthest' = furthest on top.
 const RENDER_ORDER_MODE_OPTIONS = [
+  { value: 'none', text: 'None' },
   { value: 'z', text: 'Z Position' }, { value: 'armBase', text: 'Arm Base' }, { value: 'armEnd', text: 'Arm End' }, { value: 'palmCenter', text: 'Palm Center' },
   { value: 'closest', text: 'Closest To Cursor (XY)' }, { value: 'farthest', text: 'Farthest From Cursor (XY)' },
   { value: 'closestZ', text: 'Closest To Cursor (XYZ)' }, { value: 'farthestZ', text: 'Farthest From Cursor (XYZ)' },
@@ -902,53 +903,90 @@ function renderOrderBone(hand, key) {
 // Per-frame render ordering across ALL hands (2026-10-11): the Mode, Fallback and Fallback 2 dropdowns are three levels of one sort; the sorted position becomes each hand's renderOrder (0..n-1, so the values stay small and
 // exact). A level is either a scalar priority (Z modes, cursor-distance modes; two hands tie when they agree to 0.01 world units) or "Palm To Arm Base", a pairwise rule: hand A goes above hand B when A's palm center is higher
 // in Z than B's arm base (by more than 0.01); when each hand's palm is higher than the other's arm base, the hand whose arm base is FARTHER from the cursor on screen (XY only, no Z) goes above; when neither is, the level ties.
-let roKeys = [null, null, null], roOrder = [], roPalmZ = null, roBaseZ = null, roBaseXY = null, roEndZ = null, roEndXY = null
+let roOrder = [], roPalmZ = null, roBaseZ = null, roBaseXY = null, roEndZ = null, roEndXY = null
+const roScalar = {}
 const _roV = new THREE.Vector3()
 function computeRenderOrderRanks() {
   const n = hands.length
-  const levels = [cfg.renderOrderMode || 'z', cfg.renderOrderFallback || 'farthestZ', cfg.renderOrderFallback2 || 'farthestZ']
   const camSign = camera.position.z >= 0 ? 1 : -1
-  const usesBase = levels.includes('palmToArm'), usesEnd = levels.includes('palmToArmEnd')
-  if (usesBase || usesEnd) {
-    if (!roPalmZ || roPalmZ.length !== n) { roPalmZ = new Float64Array(n); roBaseZ = new Float64Array(n); roBaseXY = new Float64Array(n); roEndZ = new Float64Array(n); roEndXY = new Float64Array(n) }
-    for (let i = 0; i < n; i++) {
-      const h = hands[i], pb = renderOrderBone(h, 'palmCenter')
-      roPalmZ[i] = (pb ? pb.matrixWorld.elements[14] : h.wrapper.position.z) * camSign
-      if (usesBase) {
-        const ab = renderOrderBone(h, 'armBase')
-        roBaseZ[i] = (ab ? ab.matrixWorld.elements[14] : h.wrapper.position.z) * camSign
-        roBaseXY[i] = ab ? cursorDistXY(_roV.setFromMatrixPosition(ab.matrixWorld)) : cursorDistXY(h.wrapper.position)
-      }
-      if (usesEnd) {
-        const eb = renderOrderBone(h, 'armEnd')
-        roEndZ[i] = (eb ? eb.matrixWorld.elements[14] : h.wrapper.position.z) * camSign
-        roEndXY[i] = eb ? cursorDistXY(_roV.setFromMatrixPosition(eb.matrixWorld)) : cursorDistXY(h.wrapper.position)
-      }
-    }
-  }
-  for (let l = 0; l < 3; l++) {
-    if (levels[l] === 'palmToArm' || levels[l] === 'palmToArmEnd') { roKeys[l] = null; continue }
-    if (!roKeys[l] || roKeys[l].length !== n) roKeys[l] = new Float64Array(n)
-    const k = roKeys[l]
-    for (let i = 0; i < n; i++) k[i] = Math.round(renderOrderPriority(hands[i], levels[l]) / 0.01)
-  }
-  if (roOrder.length !== n) { roOrder = new Array(n); for (let i = 0; i < n; i++) roOrder[i] = i }
   const TOL = 0.01
-  const cmp = (a, b) => {
-    for (let l = 0; l < 3; l++) {
-      const k = roKeys[l]
-      if (k) { const d = k[a] - k[b]; if (d !== 0) return d; continue }
-      // Palm To Arm Base / Arm End: compare each hand's palm Z with the OTHER hand's arm base (or arm end) Z
-      const zArr = levels[l] === 'palmToArmEnd' ? roEndZ : roBaseZ, xyArr = levels[l] === 'palmToArmEnd' ? roEndXY : roBaseXY
-      const aOver = roPalmZ[a] - zArr[b] > TOL, bOver = roPalmZ[b] - zArr[a] > TOL
+  // Per-frame evaluators, one per distinct mode used by any level or qualifier: null (None), a scalar key array (two hands tie when equal to 0.01 world units), or the pairwise Palm To Arm Base / Arm End data.
+  const evs = new Map()
+  let palmDone = false
+  const evalMode = (mode) => {
+    if (!mode || mode === 'none') return null
+    if (evs.has(mode)) return evs.get(mode)
+    let ev
+    if (mode === 'palmToArm' || mode === 'palmToArmEnd') {
+      const isEnd = mode === 'palmToArmEnd'
+      if (!roPalmZ || roPalmZ.length !== n) { roPalmZ = new Float64Array(n); roBaseZ = new Float64Array(n); roBaseXY = new Float64Array(n); roEndZ = new Float64Array(n); roEndXY = new Float64Array(n) }
+      if (!palmDone) {
+        palmDone = true
+        for (let i = 0; i < n; i++) { const h = hands[i], pb = renderOrderBone(h, 'palmCenter'); roPalmZ[i] = (pb ? pb.matrixWorld.elements[14] : h.wrapper.position.z) * camSign }
+      }
+      const zArr = isEnd ? roEndZ : roBaseZ, xyArr = isEnd ? roEndXY : roBaseXY, node = isEnd ? 'armEnd' : 'armBase'
+      for (let i = 0; i < n; i++) {
+        const h = hands[i], nb = renderOrderBone(h, node)
+        zArr[i] = (nb ? nb.matrixWorld.elements[14] : h.wrapper.position.z) * camSign
+        xyArr[i] = nb ? cursorDistXY(_roV.setFromMatrixPosition(nb.matrixWorld)) : cursorDistXY(h.wrapper.position)
+      }
+      ev = { pair: true, z: zArr, xy: xyArr }
+    } else {
+      let k = roScalar[mode]
+      if (!k || k.length !== n) k = roScalar[mode] = new Float64Array(n)
+      for (let i = 0; i < n; i++) k[i] = Math.round(renderOrderPriority(hands[i], mode) / TOL)
+      ev = { pair: false, k }
+    }
+    evs.set(mode, ev)
+    return ev
+  }
+  // +1 = a goes above b, -1 = b goes above a, 0 = this mode does not decide the pair
+  const cmpMode = (ev, a, b) => {
+    if (ev.pair) {
+      const aOver = roPalmZ[a] - ev.z[b] > TOL, bOver = roPalmZ[b] - ev.z[a] > TOL
       if (aOver && !bOver) return 1
       if (bOver && !aOver) return -1
-      if (aOver && bOver) { const d = Math.round(xyArr[a] / TOL) - Math.round(xyArr[b] / TOL); if (d !== 0) return d }
+      if (aOver && bOver) { const d = Math.round(ev.xy[a] / TOL) - Math.round(ev.xy[b] / TOL); return d > 0 ? 1 : d < 0 ? -1 : 0 }
+      return 0
+    }
+    const d = ev.k[a] - ev.k[b]
+    return d > 0 ? 1 : d < 0 ? -1 : 0
+  }
+  const lv = [
+    { m: evalMode(cfg.renderOrderMode || 'z'), q: evalMode(cfg.renderOrderModeExcept) },
+    { m: evalMode(cfg.renderOrderFallback || 'farthestZ'), q: evalMode(cfg.renderOrderFallbackExcept) },
+    { m: evalMode(cfg.renderOrderFallback2 || 'farthestZ'), q: evalMode(cfg.renderOrderFallback2Except) }
+  ]
+  if (roOrder.length !== n) { roOrder = new Array(n); for (let i = 0; i < n; i++) roOrder[i] = i }
+  const cmp = (a, b) => {
+    for (let l = 0; l < 3; l++) {
+      const L = lv[l]
+      if (!L.m) continue
+      let r = cmpMode(L.m, a, b)
+      // Except: the level's decision stands UNLESS the qualifier mode says the opposite for this pair, in which case the level does not decide it (falls through to the next level).
+      if (r !== 0 && L.q && cmpMode(L.q, a, b) === -r) r = 0
+      if (r !== 0) return r
     }
     return a - b // fully tied: keep a stable, fixed order (hand index)
   }
   roOrder.sort(cmp)
   for (let r = 0; r < n; r++) hands[roOrder[r]]._roRank = r
+}
+// Moves each Except select into its main dropdown's row, to the right of it (the Except rows themselves are hidden). The select keeps its own control binding, so saving / restoring / undo work as for any select.
+function mergeExceptSelects() {
+  [['renderOrderMode', 'renderOrderModeExcept'], ['renderOrderFallback', 'renderOrderFallbackExcept'], ['renderOrderFallback2', 'renderOrderFallback2Except']].forEach(([a, b]) => {
+    const rowA = document.querySelector('.dp-row[data-key="' + a + '"]'), rowB = document.querySelector('.dp-row[data-key="' + b + '"]')
+    if (!rowA || !rowB) return
+    const selA = rowA.querySelector('select'), selB = rowB.querySelector('select')
+    if (!selA || !selB || selB.parentNode === rowA) return
+    const lab = document.createElement('span')
+    lab.textContent = 'Except'
+    lab.style.cssText = 'margin:0 6px 0 8px;opacity:.75;font-size:.85em;white-space:nowrap;flex:0 0 auto'
+    rowA.appendChild(lab)
+    rowA.appendChild(selB)
+    selA.style.flex = '1 1 0'; selA.style.minWidth = '0'; selB.style.flex = '1 1 0'; selB.style.minWidth = '0'
+    rowB.style.display = 'none'
+  })
 }
 function renderOrderPriority(hand, mode) {
   switch (mode) {
@@ -1091,10 +1129,14 @@ const DEV_GROUPS = [
     controls: [
       // Render Order Mode (2026-10-11, direct request): which point's Z decides which hand draws on top (closest to the camera wins; cursor distance only breaks ties). See renderOrderPriority().
       { key: 'renderOrderMode', label: 'Render Order Mode', type: 'select', def: 'z', options: () => RENDER_ORDER_MODE_OPTIONS },
+      // Except (qualifier) for each level (2026-10-11): this level's decision for a pair is voided (the level ties and the next one decides) when the qualifier mode says the opposite for that pair. The select is moved into the main dropdown's row, to its right (mergeExceptSelects()).
+      { key: 'renderOrderModeExcept', label: 'Render Order Mode: Except', type: 'select', def: 'none', options: () => RENDER_ORDER_MODE_OPTIONS },
       // Fallback: used when two hands tie on the Render Order Mode's own value (same Z to 0.01 world units, or the same distance). Default = the original behaviour (the hand furthest from the cursor on top).
       { key: 'renderOrderFallback', label: 'Render Order Fallback', type: 'select', def: 'farthestZ', options: () => RENDER_ORDER_MODE_OPTIONS },
+      { key: 'renderOrderFallbackExcept', label: 'Render Order Fallback: Except', type: 'select', def: 'none', options: () => RENDER_ORDER_MODE_OPTIONS },
       // Third level (2026-10-11, direct request): used when two hands tie on both the Mode and the Fallback.
       { key: 'renderOrderFallback2', label: 'Render Order Fallback 2', type: 'select', def: 'farthestZ', placeAfter: 'renderOrderFallback', options: () => RENDER_ORDER_MODE_OPTIONS },
+      { key: 'renderOrderFallback2Except', label: 'Render Order Fallback 2: Except', type: 'select', def: 'none', options: () => RENDER_ORDER_MODE_OPTIONS },
       { key: 'fieldRows', label: 'Rows (Count)', type: 'slider', min: 1, max: 40, step: 1, def: 15, perDevice: true, onChange: () => rebuildField() },
       { key: 'fieldCols', label: 'Columns (Count)', type: 'slider', min: 1, max: 40, step: 1, def: 17, perDevice: true, onChange: () => rebuildField() },
       { key: 'rowSpacing', label: 'Row Spacing (World Units)', type: 'slider', min: 2, max: 40, step: 0.5, def: 9.5, perDevice: true, onChange: () => relayoutField() },
@@ -16316,6 +16358,10 @@ function syncPauseWithVisibility() {
 safeRefreshSelectOptions('renderOrderMode')
 safeRefreshSelectOptions('renderOrderFallback')
 safeRefreshSelectOptions('renderOrderFallback2')
+safeRefreshSelectOptions('renderOrderModeExcept')
+safeRefreshSelectOptions('renderOrderFallbackExcept')
+safeRefreshSelectOptions('renderOrderFallback2Except')
+mergeExceptSelects()
 safeRefreshSelectOptions('trackingPoint')
 document.addEventListener('visibilitychange', syncPauseWithVisibility)
 window.addEventListener('blur', syncPauseWithVisibility)

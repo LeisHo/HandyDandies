@@ -17214,6 +17214,17 @@ Direct requests: (1) a new option in the render-order dropdowns, "Palm To Arm En
    (retProg). Now the retransition's progress is passed through the SAME easing profile (getEasingProfile / easingProfilePAt) before it drives the pose blend, the splay blend and the offset / rotation unwind, in both updateClickHoldPoseForHand() and updateClickPoseForHand(). Design choice (say if you want the other): the retransition keeps its own
    duration (Retransition Speed, curve or flat) and the profile only reshapes progress WITHIN it, rather than replacing the duration with the profile's emergent total the way the forward ramp does. The phase still ends on the raw progress reaching 1, so nothing can stick short of the default. Still not shaped: Loop / Oscillate laps after the first.
 
+2026-10-11  -  (Render Order: "Except" qualifier next to each dropdown, and a "None" option in every dropdown)
+
+Direct requests: "on the right of each dropdown, provide a qualifier, as in an 'except' modifier ... with the same selections. So for example, if my first Render Order mode was Palm to Arm End, I can then apply a qualifier such as 'Arm Base' such that 'Palm to Arm End' applies, UNLESS the arm with the palm center higher than the
+other's arm end has an arm base with a z value lesser than the arm base z value of the latter hand", and "within all dropdowns provide a 'none' selection".
+ - Three new selects (renderOrderModeExcept / renderOrderFallbackExcept / renderOrderFallback2Except, default None), each moved into the row of its dropdown, to the right of it behind a small "Except" label (mergeExceptSelects(); the rows they came from are hidden). Same selections as the main dropdowns.
+ - "None" is the first option of every render-order dropdown (Mode, Fallback, Fallback 2 and the three Except ones). As a level it contributes nothing (that level never decides); as an Except it means no qualifier.
+ - Semantics (one rule for any combination): for a pair of hands, the level's mode decides "A above B" (or the reverse) as before. If an Except mode is set and it says the OPPOSITE for that same pair (its own comparison of A and B gives B above A), the level's decision is voided and the level
+   counts as a tie, so the next level (Fallback / Fallback 2, then hand index) decides. Your example: Mode = Palm To Arm End, Except = Arm Base: A over B because A's palm is higher than B's arm end; Arm Base says B above A when A's arm base Z is lower than B's, so the decision is voided for that pair.
+   Choice made where the wording left room: "unless" voids the rule (falls through) rather than flipping it to B above A. Say if you want the flip.
+ - computeRenderOrderRanks() was reworked into per-mode evaluators (one per distinct mode used by any level or qualifier, shared within the frame) so a qualifier can be any scalar or Palm To Arm mode. `main.js` `?v=354` -> `?v=355`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a
