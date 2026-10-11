@@ -17180,6 +17180,19 @@ Direct request: "for all cursor tracking, when not using cursor tracking depth t
    hand's projected tracking point to the cursor (cursorNDC), laid out on the camera's own right / up axes with no depth component. With the box ON it is unchanged (tracking point -> the cursor target at the Arm Rotation Cursor Target Depth).
  `main.js` `?v=350` -> `?v=351`.
 
+2026-10-11  -  (cursor-tracking Arm Rotation pivots on the CUT POINT, with the hand model's local axes)
+
+Direct request: "for arm rotation [cursor tracking], the rotation origin should be the intersection between the 1st arm bone and the cropping plane. But the rotation axes should still be the hand model's local axes. Right now it seems like its using the arm base point regardless of wrist cropping".
+ - Origin: since v=341 the tracking rotation pivoted on the ARM BASE (rForearmBend), so with Wrist Cropping on the whole visible hand swung about a point below the crop. It now pivots on the CUT POINT = where the first arm bone meets the cropping plane
+   (the Clipping Block top at the current crop amount). applyHandArmLength() shifts the clone so that point stays where it is with no tracking: L = Rt^-1 * C0 - s q cut, C0 = s (q0 - q)(base - cut) (zero unless Rotation at Base is used; with none, the wrapper origin IS the cut point and L = -s q cut).
+   Rotation at Base itself still pivots on the arm base, unchanged.
+ - Axes: the swing used to be a world-frame arc (-Z -> aim), so it only matched the model's X / Y axes when the default pose had no rotation. It is now built in the model's own raw frame: the aim direction d is turned into the model frame (q^-1 d, q = the hand's current model orientation incl.
+   the default pose's Whole-Hand / Base rotation) and the swing is the shortest arc taking the hand's own pointing axis (pointDirRawModel, measured at load) onto it, then turned back into the wrapper frame as q * swing * q^-1. Its axis is always perpendicular to the hand's pointing axis, i.e. in the model's
+   local X / Y plane. Consequence to be aware of: at 100% the hand's pointing axis aims AT the cursor whatever the default rotation is (before, the default rotation was composed on top of a world-frame aim, so e.g. a default Base X 180 made the hand point away); Min / Max Arm Rotation (%) scales that swing
+   from the default orientation (0% = the default orientation). The Arm Rotation X / Y (Deg) fine-tune and the palm roll are unchanged (also about the model's local axes).
+ - Verified numerically (2000 random orientations / Rotation-at-Base / crop positions / tracking rotations, the page's own three.js): the cut point stays put to 1.3e-13 units and the pointing axis lands on the aim direction to 2.6e-14. Not seen on screen (the sandbox does not run the animation loop reliably).
+ `main.js` `?v=351` -> `?v=352`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

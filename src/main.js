@@ -300,6 +300,8 @@ const RENDER_ORDER_MODE_OPTIONS = [
 // no-tracking pose (so it does not chase the rotation it drives). hand._trk = world position, hand._trkXY = its screen-space distance to the cursor.
 const TRACKING_POINT_OPTIONS = [{ value: 'hand', text: 'Hand Position' }, { value: 'armBase', text: 'Arm Base' }, { value: 'armEnd', text: 'Arm End' }, { value: 'palmCenter', text: 'Palm Center' }]
 const palmCenterPosRaw = new THREE.Vector3(), _trkExt = new THREE.Vector3()
+const pointDirRawModel = new THREE.Vector3(0, 1, 0) // wrist -> fingertip in the model's raw frame (measured at load); the hand's own pointing axis, before any rotation
+const _swingE = new THREE.Vector3(), _trkQinv = new THREE.Quaternion()
 const _armPartialQ = new THREE.Quaternion(), _armOffQx = new THREE.Quaternion(), _armOffQy = new THREE.Quaternion(), _armOffAxis = new THREE.Vector3()
 let trkXYFieldMin = 0, trkXYFieldRange = 0.001, trkXYAllMin = 0, trkXYAllRange = 0.001
 let trackingPointCloud = null
@@ -14765,13 +14767,17 @@ function applyHandArmLength(hand, hideT) {
   const rb = hand.currentBaseRb
   const wq = hand.wrapper.quaternion
   const tracked = wq.x !== 0 || wq.y !== 0 || wq.z !== 0
-  // Cursor tracking rotates the WRAPPER; the arm base must stay put, so the clone is shifted by L = Rt^-1 * (s q0 (base - cut)) - s q base (Rt = wrapper rotation). With Rt = identity this is the old formula.
+  // Cursor tracking rotates the WRAPPER (about its own origin). Its pivot is the CUT POINT (the intersection of the first arm bone and the cropping plane, 2026-10-11: "the rotation origin should be the intersection
+  // between the 1st arm bone and the cropping plane"), so that point must stay where it is with no tracking: wrapper-frame offset of the cut point without tracking C0 = s (q0 - q) (base - cut) (zero unless there is a Rotation
+  // at Base), and the clone is shifted by L = Rt^-1 C0 - s q cut (Rt = the wrapper's tracking rotation). With Rt = identity this reduces to the formulas above; with no Rotation at Base it is just -s q cut (the wrapper origin IS the cut point).
   if (tracked || (rb && (rb.x !== 0 || rb.y !== 0 || rb.z !== 0))) {
     if (rb && (rb.x !== 0 || rb.y !== 0 || rb.z !== 0)) _baseQ0.copy(baseQuat).multiply(_baseRbInv.copy(rb).invert())
     else _baseQ0.copy(baseQuat)
-    _brPosA.copy(forearmPosRaw).sub(_cutPointRaw).applyQuaternion(_baseQ0)
+    _brPosA.copy(forearmPosRaw).sub(_cutPointRaw)
+    _brPosB.copy(_brPosA).applyQuaternion(baseQuat)
+    _brPosA.applyQuaternion(_baseQ0).sub(_brPosB) // C0 / s
     if (tracked) _brPosA.applyQuaternion(_trkQ0.copy(wq).invert())
-    _brPosB.copy(forearmPosRaw).applyQuaternion(baseQuat)
+    _brPosB.copy(_cutPointRaw).applyQuaternion(baseQuat)
     hand.clone.position.copy(_brPosA).sub(_brPosB).multiplyScalar(scaleFactor)
   } else {
     hand.clone.position.copy(_cutPointRaw).applyQuaternion(baseQuat).multiplyScalar(-scaleFactor)
@@ -15246,6 +15252,7 @@ gltfLoader.load(
     const pointDir = tipPos.clone().sub(wristPos)
     handLengthRaw = Math.max(pointDir.length(), 0.001)
     pointDir.normalize()
+    pointDirRawModel.copy(pointDir)
     alignQuat = new THREE.Quaternion().setFromUnitVectors(pointDir, new THREE.Vector3(0, 0, -1))
 
     // Palm Face Rotation slider's own roll axis -- the wrist crop plane's
@@ -15882,7 +15889,7 @@ function animate(dt, now) {
         }
         const __cursorTrackingStart = performance.now()
         hands.forEach((hand) => {
-          _swingPivot.copy(hand._trk) // aim from the tracking point (the swing itself still pivots on the arm base, see applyHandArmLength())
+          _swingPivot.copy(hand._trk) // aim from the tracking point (the swing itself pivots on the cut point, see applyHandArmLength())
           if (armRotUseDepth) {
             _swingDir.subVectors(_trackTargetArm, _swingPivot)
           } else {
@@ -15898,8 +15905,12 @@ function animate(dt, now) {
               _swingDir.set(cursorTarget.x - _swingPivot.x, cursorTarget.y - _swingPivot.y, 0)
             }
           }
-          if (_swingDir.lengthSq() > 1e-12) _swingDir.normalize(); else _swingDir.copy(_swingRef)
-          const lookAtDesired = _lookAtQuatScratch.setFromUnitVectors(_swingRef, _swingDir)
+          // The swing is built in the HAND MODEL'S OWN (raw, local) frame (2026-10-11, direct request: "the rotation axes should still be the hand model's local axes"): the aim direction is turned into the model frame
+          // (q^-1 d, q = the hand's current model orientation incl. the default pose's Whole-Hand / Base rotation) and the swing is the shortest-arc rotation that takes the hand's own pointing axis (pointDirRawModel) onto it.
+          // Its axis is therefore always perpendicular to the hand's own pointing axis, i.e. in the model's local X / Y plane, whatever the default rotation is. It is turned back into the wrapper frame as q * swing * q^-1 below.
+          _trkQinv.copy(hand.currentBaseQuat).invert()
+          if (_swingDir.lengthSq() > 1e-12) _swingE.copy(_swingDir).normalize().applyQuaternion(_trkQinv); else _swingE.copy(pointDirRawModel)
+          const lookAtDesired = _lookAtQuatScratch.setFromUnitVectors(pointDirRawModel, _swingE)
           // CORRECTED 2026-09-28 (5th round of this same jump investigation) --
           // direct report, repeated and precise: with Retransition OFF the
           // jump never happens; with it ON, a hand that was under click-
@@ -16091,7 +16102,7 @@ function animate(dt, now) {
           // no skeleton/pose involvement either way. Arm Rotation's own
           // `desired` is applied directly (not slerped again) -- it's
           // already fully damped via armRotationDampingAmt above.
-          hand.wrapper.quaternion.copy(desired)
+          hand.wrapper.quaternion.copy(hand.currentBaseQuat).multiply(desired).multiply(_trkQinv) // local-axes swing -> wrapper frame (identity when there is no swing)
           if (cfg.armRotationOffsetX || cfg.armRotationOffsetY) hand.wrapper.quaternion.multiply(armOffsetQuatInto(hand, cfg.armRotationOffsetX || 0, cfg.armRotationOffsetY || 0, _lookAtQuatScratch))
           hand.wrapper.quaternion.multiply(computeRollQuat(hand.currentPalmRollDeg, hand))
         })
