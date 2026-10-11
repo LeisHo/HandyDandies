@@ -219,7 +219,7 @@
       "loadingPreviewRotationX": -75.46317639228698,
       "loadingPreviewRotationY": -171.31775806313814,
       "loadingPreviewRotationZ": 0,
-      "loadingPreviewOffsetX": 0,
+      "loadingPreviewOffsetX": -4.440892098500626e-16,
       "loadingPreviewOffsetY": 0,
       "loadingPreviewOffsetZ": 0,
       "loadingPreviewCameraFov": 32,
@@ -6117,11 +6117,11 @@
       "cropWristEnabled": true,
       "hideWrist": 20,
       "reactiveArmLengthEnabled": true,
-      "armLengthRange": "{\"min\":0,\"max\":80}",
+      "armLengthRange": "{\"min\":0,\"max\":95}",
       "armLengthCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.24038462081061868,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2507394926249372,\"y\":0}}]",
-      "armLengthDamping": 0.66,
+      "armLengthDamping": 0.02,
       "armLengthUseDepth": false,
-      "armLengthTargetDepth": 300,
+      "armLengthTargetDepth": 200,
       "wristSplayResponsiveEnabled": true,
       "wristSplayReposeStagger": 1,
       "wristSplayUseDepth": false,
@@ -9042,7 +9042,7 @@
       "loadingPreviewRotationX": -75.46317639228698,
       "loadingPreviewRotationY": -171.31775806313814,
       "loadingPreviewRotationZ": 0,
-      "loadingPreviewOffsetX": 0,
+      "loadingPreviewOffsetX": -4.440892098500626e-16,
       "loadingPreviewOffsetY": 0,
       "loadingPreviewOffsetZ": 0,
       "loadingPreviewCameraFov": 32,
@@ -14940,9 +14940,9 @@
       "cropWristEnabled": true,
       "hideWrist": 20,
       "reactiveArmLengthEnabled": true,
-      "armLengthRange": "{\"min\":0,\"max\":80}",
+      "armLengthRange": "{\"min\":0,\"max\":95}",
       "armLengthCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.24038462081061868,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2507394926249372,\"y\":0}}]",
-      "armLengthDamping": 0.66,
+      "armLengthDamping": 0.02,
       "armLengthUseDepth": false,
       "armLengthTargetDepth": 5.6,
       "wristSplayResponsiveEnabled": true,
@@ -17865,7 +17865,7 @@
       "loadingPreviewRotationX": -75.46317639228698,
       "loadingPreviewRotationY": -171.31775806313814,
       "loadingPreviewRotationZ": 0,
-      "loadingPreviewOffsetX": 0,
+      "loadingPreviewOffsetX": -4.440892098500626e-16,
       "loadingPreviewOffsetY": 0,
       "loadingPreviewOffsetZ": 0,
       "loadingPreviewCameraFov": 32,
@@ -23763,9 +23763,9 @@
       "cropWristEnabled": true,
       "hideWrist": 20,
       "reactiveArmLengthEnabled": true,
-      "armLengthRange": "{\"min\":0,\"max\":80}",
+      "armLengthRange": "{\"min\":0,\"max\":95}",
       "armLengthCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.24038462081061868,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2507394926249372,\"y\":0}}]",
-      "armLengthDamping": 0.66,
+      "armLengthDamping": 0.02,
       "armLengthUseDepth": false,
       "armLengthTargetDepth": 3.4,
       "wristSplayResponsiveEnabled": true,
@@ -29495,7 +29495,7 @@
                 "type": "group",
                 "group": {
                   "key": "Responsive Wrist Splay",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -29702,7 +29702,7 @@
               },
               {
                 "key": "Responsive Wrist Splay",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -30797,7 +30797,7 @@
               "type": "group",
               "group": {
                 "key": "Responsive Wrist Splay",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -31004,7 +31004,7 @@
             },
             {
               "key": "Responsive Wrist Splay",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -172430,8 +172430,8 @@
     "desktop": {
       "left": 922.4000244140625,
       "top": 104,
-      "width": 593.6000366210938,
-      "height": 439.5874938964844
+      "width": 596.7999877929688,
+      "height": 441.1875
     }
   }
 }
