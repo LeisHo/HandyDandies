@@ -1,5 +1,6 @@
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
+import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js'
 import { clone as cloneSkeletal } from 'three/addons/utils/SkeletonUtils.js'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js'
@@ -25,7 +26,7 @@ function safeRefreshMultiSelectOptions(key) {
   try { refreshMultiSelectOptions(key) } catch (err) { console.error(`safeRefreshMultiSelectOptions('${key}') failed`, err) }
 }
 
-const MODEL_URL = '../data/processed/HAND3D/HandipantsOL.glb'
+const MODEL_URL = '../data/processed/HAND3D/HandipantsOL_Clip.glb' // Draco-compressed, carries the 'Clipping Block' mesh (2026-10-11)
 // Measured once after the first load -- the rig's own bind-pose "pointing"
 // axis (wrist -> middle fingertip), not assumed to be +Y/-Z.
 let alignQuat = new THREE.Quaternion()
@@ -767,7 +768,7 @@ function tryStartField() {
   // whatever comes next; don't treat this comment's own reasoning above
   // as the settled explanation.
   renderer.compile(scene, camera)
-  window.__debug = { updateOnScreenFlags, evaluateArmLengthCurve, THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose, resolveTweenSegmentsWithAnchor, lerpTweenSegments, lerpLoopSegments, isHoldEntry, updateLoadingPreviewWristClip, lerpPoseValues, get loadingPreviewRenderer() { return loadingPreviewRenderer }, get loadingPreviewScene() { return loadingPreviewScene }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, get handBoundsCenterLocal() { return handBoundsCenterLocal }, multiPointCommit, multiPointEligibleFunctions, get multiPointActiveTouchCount() { return multiPointActiveTouchCount }, get multiPointSessionFiredPoseId() { return multiPointSessionFiredPoseId }, detectPoseJumps, get poseJumpLogEntries() { return poseJumpLogEntries }, applyCurlToSkeletonReference, handLogTriggerLabel, applyAllFingerCurls, syncCameraPanelFromLive, animSpeedMs, chainSequenceCount, applyFieldBounds, cursorDistXY, hexBrightnessPct, toonThresholdForMidBrightness }
+  window.__debug = { makeClipRig, updateClipRigPlanes, setClipRigT, updateOnScreenFlags, evaluateArmLengthCurve, THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose, resolveTweenSegmentsWithAnchor, lerpTweenSegments, lerpLoopSegments, isHoldEntry, updateLoadingPreviewWristClip, lerpPoseValues, get loadingPreviewRenderer() { return loadingPreviewRenderer }, get loadingPreviewScene() { return loadingPreviewScene }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, get handBoundsCenterLocal() { return handBoundsCenterLocal }, multiPointCommit, multiPointEligibleFunctions, get multiPointActiveTouchCount() { return multiPointActiveTouchCount }, get multiPointSessionFiredPoseId() { return multiPointSessionFiredPoseId }, detectPoseJumps, get poseJumpLogEntries() { return poseJumpLogEntries }, applyCurlToSkeletonReference, handLogTriggerLabel, applyAllFingerCurls, syncCameraPanelFromLive, animSpeedMs, chainSequenceCount, applyFieldBounds, cursorDistXY, hexBrightnessPct, toonThresholdForMidBrightness }
   loadingEl.classList.add('hidden')
   // The loading-preview canvas is a top-level sibling of #loading now
   // (2026-09-17, decoupled specifically so this moment doesn't force it
@@ -5640,16 +5641,17 @@ function buildLoadingPreview(bypassEnabledGate) {
   // fix -- direct report ("the imported tweens and poses dont seem to
   // read the wrist cropping data for load preview").
   const loadingPreviewWristClipPlane = new THREE.Plane()
+  const loadingPreviewClipRig = makeClipRig(clone)
   if (skinnedMesh && toonMaterial) {
     skinnedMesh.material = toonMaterial.clone()
-    skinnedMesh.material.clippingPlanes = [loadingPreviewWristClipPlane]
+    applyClipRigToMaterial(skinnedMesh.material, loadingPreviewClipRig, loadingPreviewWristClipPlane)
     // Material.clone() doesn't carry over onBeforeCompile -- see
     // rebuildField()'s own matching comment for the real bug this once
     // caused (toon rim-light/tint shading silently reverting to default).
     skinnedMesh.material.onBeforeCompile = toonMaterial.onBeforeCompile
   }
   loadingPreviewScene.add(clone)
-  loadingPreviewHand = { clone, skinnedMesh, wristClipPlane: loadingPreviewWristClipPlane }
+  loadingPreviewHand = { clone, skinnedMesh, wristClipPlane: loadingPreviewWristClipPlane, clipRig: loadingPreviewClipRig }
 
   // A selected Camera preset (direct follow-up request) overrides the
   // existing auto-framed default, applied to this preview's own SEPARATE
@@ -6354,6 +6356,12 @@ const _loadingPreviewClipDir = new THREE.Vector3()
 const _loadingPreviewClipPoint = new THREE.Vector3()
 function updateLoadingPreviewWristClip(hideWristPercent) {
   if (!loadingPreviewHand || !loadingPreviewHand.skinnedMesh || !loadingPreviewHand.wristClipPlane) return
+  if (loadingPreviewHand.clipRig) { // Clipping Block path (see makeClipRig)
+    setClipRigT(loadingPreviewHand.clipRig, (typeof hideWristPercent === 'number' ? hideWristPercent : 100) / 100)
+    loadingPreviewHand.clone.updateMatrixWorld(true)
+    updateClipRigPlanes(loadingPreviewHand.clipRig)
+    return
+  }
   const farBone = loadingPreviewHand.skinnedMesh.skeleton.getBoneByName('rForearmBend')
   const nearBone = loadingPreviewHand.skinnedMesh.skeleton.getBoneByName('rHand')
   if (!farBone || !nearBone) return
@@ -14436,7 +14444,12 @@ const _cutPointRaw = new THREE.Vector3()
 function applyHandArmLength(hand, hideT) {
   const scaleFactor = computeBaseScale()
   const baseQuat = hand.currentBaseQuat
-  _cutPointRaw.copy(forearmPosRaw).lerp(wristPosRaw, hideT)
+  if (hand.clipRig) {
+    setClipRigT(hand.clipRig, hideT)
+    _cutPointRaw.set(forearmPosRaw.x, THREE.MathUtils.clamp(hideT, 0, 1) * hand.clipRig.topY0, forearmPosRaw.z) // the box's top face is the cut
+  } else {
+    _cutPointRaw.copy(forearmPosRaw).lerp(wristPosRaw, hideT)
+  }
   hand.clone.quaternion.copy(baseQuat)
   hand.clone.position.copy(_cutPointRaw).applyQuaternion(baseQuat).multiplyScalar(-scaleFactor)
 }
@@ -14473,12 +14486,55 @@ function applyHandArmLength(hand, hideT) {
 // `material.clippingPlanes` (not `renderer.clippingPlanes`) confines the
 // clip to hand geometry only, so the cursor target marker/grid helper are
 // never affected regardless of draw order.
+// ---- Clipping Block (2026-10-11, direct request) ----
+// The model carries a box mesh called "Clipping Block". Everything inside the box is clipped away; the block is never drawn.
+// The box as authored is the 100% wrist crop (it covers the forearm up to just below the wrist). It slides along the model's
+// own Y axis (Blender's Z, the forearm direction) by the crop amount t (0..1): at t = 0 the TOP of the box sits at 0 on that
+// axis (the forearm base), so nothing is clipped; at t = 1 it is where it was authored. The box is turned into 6 outward
+// planes (world space, from the block's own matrixWorld, so it follows the hand's rotation and scale) and clipped with
+// material.clipIntersection = true, which discards only fragments that are inside ALL six, i.e. inside the box.
+// Models without the block fall back to the single wrist plane (updateWristClipPlaneForHand's old path).
+const _clipNormalMatrix = new THREE.Matrix3()
+function makeClipRig(clone) {
+  const block = clone.getObjectByName('Clipping Block')
+  if (!block || !block.geometry) return null
+  block.geometry.computeBoundingBox()
+  const bb = block.geometry.boundingBox
+  block.visible = false
+  return {
+    block,
+    baseY: block.position.y,
+    topY0: block.position.y + block.scale.y * bb.max.y, // top of the box as authored, in the clone's frame
+    planes: [0, 1, 2, 3, 4, 5].map(() => new THREE.Plane()),
+    localN: [[1, 0, 0], [-1, 0, 0], [0, 1, 0], [0, -1, 0], [0, 0, 1], [0, 0, -1]],
+    localC: [-bb.max.x, bb.min.x, -bb.max.y, bb.min.y, -bb.max.z, bb.min.z] // outward normals: inside the box = negative side of every plane
+  }
+}
+function setClipRigT(rig, t) {
+  const tt = THREE.MathUtils.clamp(t, 0, 1)
+  rig.block.position.y = tt <= 0 ? rig.baseY - 10 : rig.baseY - (1 - tt) * rig.topY0 // t = 0 parks it far below the mesh: clips nothing
+}
+function updateClipRigPlanes(rig) {
+  _clipNormalMatrix.getNormalMatrix(rig.block.matrixWorld)
+  for (let i = 0; i < 6; i++) {
+    const n = rig.localN[i]
+    rig.planes[i].normal.set(n[0], n[1], n[2])
+    rig.planes[i].constant = rig.localC[i]
+    rig.planes[i].applyMatrix4(rig.block.matrixWorld, _clipNormalMatrix)
+  }
+}
+function applyClipRigToMaterial(mat, rig, singlePlane) {
+  if (!mat) return
+  mat.clippingPlanes = rig ? rig.planes : [singlePlane]
+  mat.clipIntersection = !!rig
+}
 const _clipFarPos = new THREE.Vector3()
 const _clipNearPos = new THREE.Vector3()
 const _clipDir = new THREE.Vector3()
 const _clipPoint = new THREE.Vector3()
 function updateWristClipPlaneForHand(hand) {
   if (!hand.skinnedMesh) return
+  if (hand.clipRig) { updateClipRigPlanes(hand.clipRig); return }
   const farBone = hand.skinnedMesh.skeleton.getBoneByName('rForearmBend')
   const nearBone = hand.skinnedMesh.skeleton.getBoneByName('rHand')
   if (!farBone || !nearBone) return
@@ -14599,9 +14655,10 @@ function createFieldHand() {
   // updateWristClipPlaneForHand()'s own corrected comment for why a
   // shared material/plane silently discarded almost every hand's mesh.
   const handWristClipPlane = new THREE.Plane()
+  const clipRig = makeClipRig(clone)
   if (skinnedMesh && toonMaterial) {
     skinnedMesh.material = toonMaterial.clone()
-    skinnedMesh.material.clippingPlanes = [handWristClipPlane]
+    applyClipRigToMaterial(skinnedMesh.material, clipRig, handWristClipPlane)
     // `Material.clone()`/`.copy()` does NOT carry over a custom
     // `onBeforeCompile` override -- it isn't part of the property list
     // three.js's own `copy()` handles, so a clone silently reverts to
@@ -14617,7 +14674,7 @@ function createFieldHand() {
     skinnedMesh.material.onBeforeCompile = toonMaterial.onBeforeCompile
   }
   const outlineMesh = skinnedMesh ? buildOutlineMesh(skinnedMesh) : null
-  if (outlineMesh) { outlineMesh.material.clippingPlanes = [handWristClipPlane]; clone.add(outlineMesh) }
+  if (outlineMesh) { applyClipRigToMaterial(outlineMesh.material, clipRig, handWristClipPlane); clone.add(outlineMesh) }
   // Emission Material outline mechanic (2026-09-24) -- unlike outlineMesh
   // above, this mesh is NOT built here; it's HandyOL.glb's own 2nd
   // skinned primitive, already a child of `clone` from the GLTF load
@@ -14627,7 +14684,7 @@ function createFieldHand() {
   const emissionMesh = findOutlineMaterialMesh(clone)
   if (emissionMesh) {
     emissionMesh.material = ensureEmissionMaterial().clone()
-    emissionMesh.material.clippingPlanes = [handWristClipPlane]
+    applyClipRigToMaterial(emissionMesh.material, clipRig, handWristClipPlane)
     emissionMesh.visible = false // updateOutlineVisibility() (below) decides the real state
   }
   // Depth-buffer-per-hand technique: both materials keep depthTest ON
@@ -14669,7 +14726,7 @@ function createFieldHand() {
   // it explicitly: false until a hand's first REAL repose, forcing
   // exactly one guaranteed full sync regardless of the gate's other
   // conditions, then never forced again.
-  const hand = { wrapper, clone, skinnedMesh, outlineMesh, emissionMesh, wristClipPlane: handWristClipPlane, effectiveRenderOrder: 0, screenX: 0, screenY: 0, screenRadius: 0, currentBaseQuat: cloneBaseQuat.clone(), everReposed: false, currentSplayDeg: 0, _handoffSettleFrames: 0, _idleSettleFrom: null, _idleSettleFromSplay: 0, _idleSettleStartTime: 0 }
+  const hand = { wrapper, clone, skinnedMesh, outlineMesh, emissionMesh, wristClipPlane: handWristClipPlane, clipRig, effectiveRenderOrder: 0, screenX: 0, screenY: 0, screenRadius: 0, currentBaseQuat: cloneBaseQuat.clone(), everReposed: false, currentSplayDeg: 0, _handoffSettleFrames: 0, _idleSettleFrom: null, _idleSettleFromSplay: 0, _idleSettleStartTime: 0 }
   // Also recomputes this hand's OWN Hide Wrist clip plane right before
   // it draws (see updateWristClipPlaneForHand()'s own comment) -- every
   // hand faces a different direction and (own material/plane now, see
@@ -14812,7 +14869,12 @@ function findOutlineMaterialMesh(root) {
   return found
 }
 
-new GLTFLoader().load(
+// The model is Draco-compressed (KHR_draco_mesh_compression is a required extension), so the loader needs a decoder.
+const dracoLoader = new DRACOLoader()
+dracoLoader.setDecoderPath('https://unpkg.com/three@0.169.0/examples/jsm/libs/draco/gltf/')
+const gltfLoader = new GLTFLoader()
+gltfLoader.setDRACOLoader(dracoLoader)
+gltfLoader.load(
   MODEL_URL,
   (gltf) => {
     const root = gltf.scene

@@ -41,7 +41,7 @@ function makeStub(name) {
 }
 
 const sandbox = {}
-;['THREE', 'GLTFLoader', 'cloneSkeletal', 'OrbitControls', 'EffectComposer', 'RenderPass', 'OutlinePass', 'OutputPass', 'ShaderPass',
+;['THREE', 'GLTFLoader', 'DRACOLoader', 'cloneSkeletal', 'OrbitControls', 'EffectComposer', 'RenderPass', 'OutlinePass', 'OutputPass', 'ShaderPass',
   'syncValue', 'organizeGroupSubgroups', 'refreshSelectOptions', 'refreshMultiSelectOptions', 'saveCurrentSettings', 'renderDynamicGroup',
   'createGroupElement', 'realDeviceClass', 'applyTextOverrides', 'setDevTextOverride', 'isDevRowVisible', 'setDevVisibility',
   'forEachDynamicDeviceDescendant', 'refreshRowDisplaysForEditingTab', 'window', 'document', 'navigator', 'performance',
