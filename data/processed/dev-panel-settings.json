@@ -48,8 +48,8 @@
       "palmFacesCursorDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0.5}]",
       "palmFacesCursorDistanceRange": "{\"min\":0,\"max\":180}",
       "loadingPreviewEnabled": true,
-      "loadingPreviewShowLive": false,
-      "loadingMinTimeMs": 200,
+      "loadingPreviewShowLive": true,
+      "loadingMinTimeMs": 5000,
       "loadingPreviewTweenSelector": "Waiting Horizontal Tap",
       "loadingPreviewSavedCameras": [
         {
@@ -161,6 +161,16 @@
           "targetX": 2.3942856137436985,
           "targetY": -6.5953424235676925,
           "targetZ": 1.6201601502529737
+        },
+        {
+          "name": "Loading Preview Camera 12",
+          "cameraX": 0.6763947117372013,
+          "cameraY": 153.16145366319512,
+          "cameraZ": -23.760553485173073,
+          "cameraFov": 32,
+          "targetX": 2.394285613743698,
+          "targetY": -6.595342423567693,
+          "targetZ": 1.6201601502529737
         }
       ],
       "loadingPreviewCameraSelector": "Loading Preview Camera 11",
@@ -218,14 +228,14 @@
       "loadingPreviewSequenceLoopTransition": true,
       "loadingPreviewSequenceHoldMs": 0,
       "loadingPreviewSize": 1390,
-      "loadingPreviewRotationX": -75.46317639228698,
-      "loadingPreviewRotationY": -171.31775806313814,
+      "loadingPreviewRotationX": -80.95249635846959,
+      "loadingPreviewRotationY": -176.12784714656706,
       "loadingPreviewRotationZ": 0,
-      "loadingPreviewOffsetX": -4.440892098500626e-16,
-      "loadingPreviewOffsetY": -8.881784197001252e-16,
+      "loadingPreviewOffsetX": 0,
+      "loadingPreviewOffsetY": 0,
       "loadingPreviewOffsetZ": 0,
       "loadingPreviewCameraFov": 32,
-      "loadingPreviewCameraZoom": 161.7694831224424,
+      "loadingPreviewCameraZoom": 161.76948312244252,
       "loadingPreviewCameraEditMode": true,
       "customClickFunctionIds": "[{\"id\":\"custom19\",\"title\":\"Custom Click Function 19\",\"kind\":\"pose\",\"family\":\"mobile\"},{\"id\":\"custom20\",\"title\":\"Custom Click Function 20\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom21\",\"title\":\"Custom Click Function 21\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom22\",\"title\":\"Custom Click Function 22\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom23\",\"title\":\"Custom Click Function 23\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom24\",\"title\":\"Custom Click Function 24\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom25\",\"title\":\"Custom Click Function 25\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom26\",\"title\":\"Custom Click Function 26\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom27\",\"title\":\"Custom Click Function 27\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom28\",\"title\":\"Custom Click Function 28\",\"kind\":\"pose\",\"family\":\"mobile\"},{\"id\":\"custom29\",\"title\":\"Custom Click Function 29\",\"kind\":\"pose\",\"family\":\"mobile\"},{\"id\":\"custom30\",\"title\":\"Custom Click Function 30\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom31\",\"title\":\"Custom Click Function 31\",\"kind\":\"hold\",\"family\":\"desktop\"}]",
       "holdConfirmMs": 400,
@@ -6682,9 +6692,9 @@
           "group": "FIST ROTATE"
         }
       ],
-      "cameraX": 6.504385906808004,
-      "cameraY": 9.506408948421189,
-      "cameraZ": 260.74570207940275,
+      "cameraX": 6.504385906808002,
+      "cameraY": 9.506408948421129,
+      "cameraZ": 260.7457020794027,
       "cameraFov": 15,
       "cameraYaw": 1.429,
       "cameraPitch": -2.087,
@@ -9176,8 +9186,8 @@
       "palmFacesCursorDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0.5}]",
       "palmFacesCursorDistanceRange": "{\"min\":0,\"max\":180}",
       "loadingPreviewEnabled": true,
-      "loadingPreviewShowLive": false,
-      "loadingMinTimeMs": 200,
+      "loadingPreviewShowLive": true,
+      "loadingMinTimeMs": 5000,
       "loadingPreviewTweenSelector": "Waiting Horizontal Tap",
       "loadingPreviewSavedCameras": [
         {
@@ -9289,6 +9299,16 @@
           "targetX": 2.3942856137436985,
           "targetY": -6.5953424235676925,
           "targetZ": 1.6201601502529737
+        },
+        {
+          "name": "Loading Preview Camera 12",
+          "cameraX": 0.6763947117372013,
+          "cameraY": 153.16145366319512,
+          "cameraZ": -23.760553485173073,
+          "cameraFov": 32,
+          "targetX": 2.394285613743698,
+          "targetY": -6.595342423567693,
+          "targetZ": 1.6201601502529737
         }
       ],
       "loadingPreviewCameraSelector": "Loading Preview Camera 11",
@@ -9346,14 +9366,14 @@
       "loadingPreviewSequenceLoopTransition": true,
       "loadingPreviewSequenceHoldMs": 0,
       "loadingPreviewSize": 1390,
-      "loadingPreviewRotationX": -75.46317639228698,
-      "loadingPreviewRotationY": -171.31775806313814,
+      "loadingPreviewRotationX": -80.95249635846959,
+      "loadingPreviewRotationY": -176.12784714656706,
       "loadingPreviewRotationZ": 0,
-      "loadingPreviewOffsetX": -4.440892098500626e-16,
-      "loadingPreviewOffsetY": -8.881784197001252e-16,
+      "loadingPreviewOffsetX": 0,
+      "loadingPreviewOffsetY": 0,
       "loadingPreviewOffsetZ": 0,
       "loadingPreviewCameraFov": 32,
-      "loadingPreviewCameraZoom": 161.7694831224424,
+      "loadingPreviewCameraZoom": 161.76948312244252,
       "loadingPreviewCameraEditMode": true,
       "customClickFunctionIds": "[{\"id\":\"custom19\",\"title\":\"Custom Click Function 19\",\"kind\":\"pose\",\"family\":\"mobile\"},{\"id\":\"custom20\",\"title\":\"Custom Click Function 20\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom21\",\"title\":\"Custom Click Function 21\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom22\",\"title\":\"Custom Click Function 22\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom23\",\"title\":\"Custom Click Function 23\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom24\",\"title\":\"Custom Click Function 24\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom25\",\"title\":\"Custom Click Function 25\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom26\",\"title\":\"Custom Click Function 26\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom27\",\"title\":\"Custom Click Function 27\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom28\",\"title\":\"Custom Click Function 28\",\"kind\":\"pose\",\"family\":\"mobile\"},{\"id\":\"custom29\",\"title\":\"Custom Click Function 29\",\"kind\":\"pose\",\"family\":\"mobile\"},{\"id\":\"custom30\",\"title\":\"Custom Click Function 30\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom31\",\"title\":\"Custom Click Function 31\",\"kind\":\"hold\",\"family\":\"desktop\"}]",
       "holdConfirmMs": 400,
@@ -18304,8 +18324,8 @@
       "palmFacesCursorDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0.5}]",
       "palmFacesCursorDistanceRange": "{\"min\":0,\"max\":180}",
       "loadingPreviewEnabled": true,
-      "loadingPreviewShowLive": false,
-      "loadingMinTimeMs": 200,
+      "loadingPreviewShowLive": true,
+      "loadingMinTimeMs": 5000,
       "loadingPreviewTweenSelector": "Waiting Horizontal Tap",
       "loadingPreviewSavedCameras": [
         {
@@ -18417,6 +18437,16 @@
           "targetX": 2.3942856137436985,
           "targetY": -6.5953424235676925,
           "targetZ": 1.6201601502529737
+        },
+        {
+          "name": "Loading Preview Camera 12",
+          "cameraX": 0.6763947117372013,
+          "cameraY": 153.16145366319512,
+          "cameraZ": -23.760553485173073,
+          "cameraFov": 32,
+          "targetX": 2.394285613743698,
+          "targetY": -6.595342423567693,
+          "targetZ": 1.6201601502529737
         }
       ],
       "loadingPreviewCameraSelector": "Loading Preview Camera 11",
@@ -18474,14 +18504,14 @@
       "loadingPreviewSequenceLoopTransition": true,
       "loadingPreviewSequenceHoldMs": 0,
       "loadingPreviewSize": 1390,
-      "loadingPreviewRotationX": -75.46317639228698,
-      "loadingPreviewRotationY": -171.31775806313814,
+      "loadingPreviewRotationX": -80.95249635846959,
+      "loadingPreviewRotationY": -176.12784714656706,
       "loadingPreviewRotationZ": 0,
-      "loadingPreviewOffsetX": -4.440892098500626e-16,
-      "loadingPreviewOffsetY": -8.881784197001252e-16,
+      "loadingPreviewOffsetX": 0,
+      "loadingPreviewOffsetY": 0,
       "loadingPreviewOffsetZ": 0,
       "loadingPreviewCameraFov": 32,
-      "loadingPreviewCameraZoom": 161.7694831224424,
+      "loadingPreviewCameraZoom": 161.76948312244252,
       "loadingPreviewCameraEditMode": true,
       "customClickFunctionIds": "[{\"id\":\"custom19\",\"title\":\"Custom Click Function 19\",\"kind\":\"pose\",\"family\":\"mobile\"},{\"id\":\"custom20\",\"title\":\"Custom Click Function 20\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom21\",\"title\":\"Custom Click Function 21\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom22\",\"title\":\"Custom Click Function 22\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom23\",\"title\":\"Custom Click Function 23\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom24\",\"title\":\"Custom Click Function 24\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom25\",\"title\":\"Custom Click Function 25\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom26\",\"title\":\"Custom Click Function 26\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom27\",\"title\":\"Custom Click Function 27\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom28\",\"title\":\"Custom Click Function 28\",\"kind\":\"pose\",\"family\":\"mobile\"},{\"id\":\"custom29\",\"title\":\"Custom Click Function 29\",\"kind\":\"pose\",\"family\":\"mobile\"},{\"id\":\"custom30\",\"title\":\"Custom Click Function 30\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom31\",\"title\":\"Custom Click Function 31\",\"kind\":\"hold\",\"family\":\"desktop\"}]",
       "holdConfirmMs": 400,
@@ -28744,7 +28774,7 @@
                 "type": "group",
                 "group": {
                   "key": "New Group (5)",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -28889,7 +28919,7 @@
             "subgroups": [
               {
                 "key": "New Group (5)",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -29128,7 +29158,7 @@
               "type": "group",
               "group": {
                 "key": "New Group (5)",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -29273,7 +29303,7 @@
           "subgroups": [
             {
               "key": "New Group (5)",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -187481,8 +187511,8 @@
     "desktop": {
       "left": 922.4000244140625,
       "top": 104,
-      "width": 641.6000366210938,
-      "height": 463.5874938964844
+      "width": 644.7999877929688,
+      "height": 465.1875
     }
   }
 }
