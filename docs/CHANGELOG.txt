@@ -16784,6 +16784,27 @@ Direct requests (same round as the screen-space entry above):
  real mouse movement is continuous. If that looks abrupt, a damping slider for the offset norm is the fix.
  `main.js` `?v=312` -> `?v=314`.
 
+2026-10-11  -  (distance curves: max = farthest ON-SCREEN hand, off-screen hands extrapolate)
+
+Direct request: for every curve editor and Min/Max range that depends on hand-to-cursor distance, X = 1 (the max) is the
+farthest hand in screen space only; hands off screen still get the effect, with their fraction extrapolated from the curve.
+ - updateOnScreenFlags() (start of updateRenderOrder) marks each hand _onScr (current position) and _onScrRest (grid
+   position): its centre projects inside the viewport and in front of the camera. If no hand is on screen every hand counts.
+ - Every distance domain now takes its nearest / farthest from on-screen hands only: click-function distance
+   (xyFieldMinDist / xyFieldDistRange, plus the trigger-time dists in triggerClickPose / endClickHoldPose), the rest domain used by
+   Cursor Offset and Offset To Camera, the 3D live domain (Wrist Cropping / Wrist Splay fallbacks), the per-feature
+   Wrist Splay / Wrist Cropping domains, and the Arm Rotation / Palm Rotation pre-pass.
+ - A normalised distance can now exceed 1. computeStartDelayMs, computeArmLengthT, computeResponsiveWristSplayDeg and
+   captureCameraOffsetNorm no longer clamp it to 1, and evaluateArmLengthCurve continues past x = 1 along the slope of the
+   curve's final segment (y = last y + slope * (x - 1)). Callers still clamp the result to 0..1, so a rising curve saturates
+   at the top and a falling one bottoms out at 0. Between the last point and x = 1 it still holds the last value (unchanged).
+   The slope is the straight secant of the last segment whatever curve method is selected: a judgment call.
+ - Start Distance Min / Max stay explicit world-unit sliders (they are not "furthest hand"), so they are unchanged.
+ - Curve captions now say "Nearest->Farthest On-Screen Hand, Live" (the old "At Trigger Time" / "Frozen" wording was stale).
+ Verified on the deployed page: with the camera zoomed in so 4 of 324 hands were on screen, the domain max dropped from 98.5
+ to 8.4 world units while the farthest off-screen hand sat at 102.6; evaluateArmLengthCurve on [(0,1),(1,0.5)] gave 0.75, 0.5,
+ 0.25, 0 at x = 0.5, 1, 1.5, 2. Not run against a real tab or phone. `main.js` `?v=315` -> `?v=316`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

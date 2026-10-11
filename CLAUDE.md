@@ -2520,3 +2520,7 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
 - **Testing live distance without a real tab (2026-10-11).** Fake `window.innerWidth/innerHeight` and `camera.aspect` (the sandbox reports 0, which silently falls
   back to world XY), fake `document.hidden/hasFocus` + fire `visibilitychange`/`focus`, replace `performance.now` with a counter you advance by 16 ms, set
   `cfg.multiClickWindowMs = cfg.holdConfirmMs = 0`, and drive `__debug.updateRenderOrder()` synchronously after each `cursorNDC.set` + `updateCursorTarget()`.
+- **Distance domains are on-screen hands only (2026-10-11).** When you add a new nearest/farthest-hand normalisation, skip hands with `_onScr === false`
+  (`_onScrRest` for rest positions) or use `onScreenMinMax()`, and do not clamp the normalised value to 1 -- off-screen hands are meant to read x > 1 and be
+  extrapolated by `evaluateArmLengthCurve()`. In the sandbox the camera aspect and window size can be 0/NaN, which makes every hand "off screen"; the flags then
+  fall back to all hands, so test with a faked aspect/size.
