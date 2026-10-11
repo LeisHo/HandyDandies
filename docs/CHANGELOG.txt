@@ -17239,6 +17239,11 @@ hands with mixed Z (and 44 of 80 fully-decided triples), because tie-breaking by
 Measured on v=356 (overlapping, decided pairs only): 42% / 15% / 10% of decided pairs were still wrong for smooth / 2x smooth / random tilts. Cause: cycles among overlapping hands (the 'both palms higher -> farther arm end on top' tie-break contradicting the stronger 'palm higher than the other's arm end' decisions)
 were broken arbitrarily. Now the constraints are bucketed by strength (2 x level, +1 for the arm-distance tie-break) and applied strongest first; a constraint that would close a cycle with the ones already accepted is dropped (reachability check), so the accepted set is acyclic and the topological order always honours every kept constraint. `main.js` `?v=356` -> `?v=357`.
 
+2026-10-11  -  (Palm To Arm ordering: bounded cycle check)
+
+v=357 made the overlapping-hand ordering accurate (decided pairs wrong: 0.4% smooth tilt, 0.2% smooth 2x, 3.4% random tilts, down from 42 / 15 / 10%) but its unbounded reachability check cost 270-650 ms per updateRenderOrder() at 1925 hands (about 45 ms before). The check now looks at only the first 40 hands reachable (REACH_CAP, a judgment call:
+cycles among overlapping hands are short), and the topological pass has a stall release for any longer cycle. `main.js` `?v=357` -> `?v=358`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

@@ -1028,12 +1028,17 @@ function computeRenderOrderRanks() {
   roVis.fill(0)
   let stamp = 0
   const stack = []
-  const reaches = (from, target) => { // is there already a path from -> target?
+  // Bounded: an unbounded search made this 5-15x slower (measured 270-650 ms vs ~45 ms per update at 1925 hands). Cycles among overlapping hands are short, so looking at the first 40 hands reachable catches them; a cycle that is longer
+  // than the search sees is handled by the stall release in the topological pass below.
+  const REACH_CAP = 40
+  const reaches = (from, target) => { // is there already a (nearby) path from -> target?
     stamp++
     stack.length = 0; stack.push(from); roVis[from] = stamp
+    let seen = 0
     while (stack.length) {
       const u = stack.pop()
       if (u === target) return true
+      if (++seen > REACH_CAP) return false
       for (let e = roHead[u]; e !== -1; e = eNext[e]) { const v = eTo[e]; if (roVis[v] !== stamp) { roVis[v] = stamp; stack.push(v) } }
     }
     return false
@@ -1050,10 +1055,18 @@ function computeRenderOrderRanks() {
   const ready = []
   for (let i = 0; i < n; i++) if (roIndeg[i] === 0) ready.push(i)
   let rank = 0, qi = 0
-  while (qi < ready.length) {
+  while (rank < n) {
+    if (qi >= ready.length) { // a cycle longer than the search above could see: release the unplaced hand with the fewest unmet constraints
+      let best = -1, bi = 1e9
+      for (let i = 0; i < n; i++) if (!roDone[i] && roIndeg[i] < bi) { bi = roIndeg[i]; best = i }
+      roIndeg[best] = 0
+      ready.push(best)
+    }
     const u = ready[qi++]
+    if (roDone[u]) continue
+    roDone[u] = 1
     hands[u]._roRank = rank++
-    for (let e = roHead[u]; e !== -1; e = eNext[e]) { const v = eTo[e]; if (--roIndeg[v] === 0) ready.push(v) }
+    for (let e = roHead[u]; e !== -1; e = eNext[e]) { const v = eTo[e]; if (!roDone[v] && --roIndeg[v] === 0) ready.push(v) }
   }
 }
 // Moves each Except select into its main dropdown's row, to the right of it (the Except rows themselves are hidden). The select keeps its own control binding, so saving / restoring / undo work as for any select.
