@@ -777,7 +777,7 @@ function tryStartField() {
   // whatever comes next; don't treat this comment's own reasoning above
   // as the settled explanation.
   renderer.compile(scene, camera)
-  window.__debug = { applyCameraOrientation, syncCameraPanelFromLive, curveByDomain, get domains() { return { xyAll: [xyAllMinDist, xyAllDistRange], splayAll: [splayAllMin, splayAllRange], cropAll: [cropAllMin, cropAllRange], restAll: [restAllMinDist, restAllDistRange], live: [liveFieldMinDist, liveFieldDistRange], splay: [splayFieldMin, splayFieldRange], crop: [cropFieldMin, cropFieldRange], xy: [xyFieldMinDist, xyFieldDistRange], rest: [restFieldMinDist, restFieldDistRange] } }, modelBaseFrameQ, computeBaseRotationQuat, cloneBaseRb, makeClipRig, updateClipRigPlanes, setClipRigT, updateOnScreenFlags, evaluateArmLengthCurve, THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose, resolveTweenSegmentsWithAnchor, lerpTweenSegments, lerpLoopSegments, isHoldEntry, updateLoadingPreviewWristClip, lerpPoseValues, get loadingPreviewRenderer() { return loadingPreviewRenderer }, get loadingPreviewScene() { return loadingPreviewScene }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, get handBoundsCenterLocal() { return handBoundsCenterLocal }, multiPointCommit, multiPointEligibleFunctions, get multiPointActiveTouchCount() { return multiPointActiveTouchCount }, get multiPointSessionFiredPoseId() { return multiPointSessionFiredPoseId }, detectPoseJumps, get poseJumpLogEntries() { return poseJumpLogEntries }, applyCurlToSkeletonReference, handLogTriggerLabel, applyAllFingerCurls, syncCameraPanelFromLive, animSpeedMs, chainSequenceCount, applyFieldBounds, cursorDistXY, hexBrightnessPct, toonThresholdForMidBrightness }
+  window.__debug = { stackOnDefault, applyCameraOrientation, syncCameraPanelFromLive, curveByDomain, get domains() { return { xyAll: [xyAllMinDist, xyAllDistRange], splayAll: [splayAllMin, splayAllRange], cropAll: [cropAllMin, cropAllRange], restAll: [restAllMinDist, restAllDistRange], live: [liveFieldMinDist, liveFieldDistRange], splay: [splayFieldMin, splayFieldRange], crop: [cropFieldMin, cropFieldRange], xy: [xyFieldMinDist, xyFieldDistRange], rest: [restFieldMinDist, restFieldDistRange] } }, modelBaseFrameQ, computeBaseRotationQuat, cloneBaseRb, makeClipRig, updateClipRigPlanes, setClipRigT, updateOnScreenFlags, evaluateArmLengthCurve, THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose, resolveTweenSegmentsWithAnchor, lerpTweenSegments, lerpLoopSegments, isHoldEntry, updateLoadingPreviewWristClip, lerpPoseValues, get loadingPreviewRenderer() { return loadingPreviewRenderer }, get loadingPreviewScene() { return loadingPreviewScene }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, get handBoundsCenterLocal() { return handBoundsCenterLocal }, multiPointCommit, multiPointEligibleFunctions, get multiPointActiveTouchCount() { return multiPointActiveTouchCount }, get multiPointSessionFiredPoseId() { return multiPointSessionFiredPoseId }, detectPoseJumps, get poseJumpLogEntries() { return poseJumpLogEntries }, applyCurlToSkeletonReference, handLogTriggerLabel, applyAllFingerCurls, syncCameraPanelFromLive, animSpeedMs, chainSequenceCount, applyFieldBounds, cursorDistXY, hexBrightnessPct, toonThresholdForMidBrightness }
   loadingEl.classList.add('hidden')
   // The loading-preview canvas is a top-level sibling of #loading now
   // (2026-09-17, decoupled specifically so this moment doesn't force it
@@ -1515,10 +1515,10 @@ const DEV_GROUPS = [
       // own normal per-hand position/scale with zero extra code, the same
       // way modelRotX/Y/Z's own per-hand rotation already does during an
       // active transition -- see that mechanism's own precedent.
-      { key: 'poseOffsetX', label: 'Pose Offset X (World Units)', type: 'slider', min: -20, max: 20, step: 0.1, def: 0 },
-      { key: 'poseOffsetY', label: 'Pose Offset Y (World Units)', type: 'slider', min: -20, max: 20, step: 0.1, def: 0 },
-      { key: 'poseOffsetZ', label: 'Pose Offset Z (World Units)', type: 'slider', min: -20, max: 20, step: 0.1, def: 0 },
-      { key: 'poseScale', label: 'Pose Scale (x)', type: 'slider', min: 0.1, max: 3, step: 0.05, def: 1 },
+      { key: 'poseOffsetX', label: 'Pose Offset X (World Units)', type: 'slider', min: -20, max: 20, step: 0.1, def: 0, onChange: () => { cloneBaseVersion++ } },
+      { key: 'poseOffsetY', label: 'Pose Offset Y (World Units)', type: 'slider', min: -20, max: 20, step: 0.1, def: 0, onChange: () => { cloneBaseVersion++ } },
+      { key: 'poseOffsetZ', label: 'Pose Offset Z (World Units)', type: 'slider', min: -20, max: 20, step: 0.1, def: 0, onChange: () => { cloneBaseVersion++ } },
+      { key: 'poseScale', label: 'Pose Scale (x)', type: 'slider', min: 0.1, max: 3, step: 0.05, def: 1, onChange: () => { cloneBaseVersion++ } },
       // Direct user request: import poses exported from HANDO (identical
       // rig/bone names, same Pose-slider set) and preview them without
       // reposing every hand in the field -- "Use" is wired to
@@ -9049,11 +9049,36 @@ function remapGlideProgress(u, N, k) {
   if (u <= a) return (u / a) * (1 / N)
   return 1 / N + ((u - a) / (1 - a)) * ((N - 1) / N)
 }
-function resolveTweenSequencePoses(names) {
+// STACKING ON THE DEFAULT (2026-10-11, direct request: "any tween or sequence triggered should be stacked ontop of the default positions rotations"). The rotation / position keys a saved pose
+// carries are applied as a CHANGE FROM THE DEFAULT POSE, on top of the live default (the sliders): effective = live slider + (pose value - Default pose value), and a pose that does not carry a key
+// (every pose saved before Rotation at Base existed has no Base Rotation) contributes no change instead of snapping to 0. Pose Scale stacks as a ratio. While the sliders equal the Default pose
+// (the normal case) this is exactly the old absolute behaviour for every key the pose does carry. Only field hands use it; the previews keep absolute poses.
+const STACK_KEYS = ['modelRotX', 'modelRotY', 'modelRotZ', 'baseRotationX', 'baseRotationY', 'baseRotationZ', 'poseOffsetX', 'poseOffsetY', 'poseOffsetZ']
+// cloneBaseVersion changes whenever any of the stacking sliders or the Default pose change (their onChange / onWholeHandRotationChange bump it), so it is the cache key.
+function currentStackSig() { return cloneBaseVersion }
+function stackOnDefault(item) {
+  if (!item) return item
+  const sig = currentStackSig()
+  if (item.__stkSig === sig) return item.__stk
+  const out = { ...item }
+  STACK_KEYS.forEach((k) => {
+    const pd = poseDefaultValues[k] ?? 0
+    const v = item[k] !== undefined ? item[k] : pd
+    out[k] = (cfg[k] ?? 0) + (v - pd)
+  })
+  const pdS = poseDefaultValues.poseScale ?? 1
+  const vS = item.poseScale !== undefined ? item.poseScale : pdS
+  out.poseScale = (cfg.poseScale ?? 1) * (pdS ? vS / pdS : 1)
+  Object.defineProperty(item, '__stkSig', { value: sig, writable: true, enumerable: false, configurable: true })
+  Object.defineProperty(item, '__stk', { value: out, writable: true, enumerable: false, configurable: true })
+  return out
+}
+function resolveTweenSequencePoses(names, stack = false) {
   return (names || [])
     .map((name) => {
       const matches = (cfg.savedPoses || []).filter((p) => p.name === name)
-      return matches[matches.length - 1]
+      const pose = matches[matches.length - 1]
+      return stack ? stackOnDefault(pose) : pose
     })
     .filter(Boolean)
 }
@@ -9101,7 +9126,7 @@ function isHoldEntry(val) {
 // -- identical to the plain N-1-equal-segments behavior every existing
 // saved sequence already has, so nothing changes for a sequence that
 // never used Hold.
-function resolveTweenSegmentsWithAnchor(anchorPose, rawEntries) {
+function resolveTweenSegmentsWithAnchor(anchorPose, rawEntries, stack = false) {
   const segments = []
   let lastPose = anchorPose
   ;(rawEntries || []).forEach((entry) => {
@@ -9113,7 +9138,8 @@ function resolveTweenSegmentsWithAnchor(anchorPose, rawEntries) {
     }
     if (typeof entry !== 'string' || !entry) return
     const matches = (cfg.savedPoses || []).filter((p) => p.name === entry)
-    const pose = matches[matches.length - 1]
+    const found = matches[matches.length - 1]
+    const pose = stack ? stackOnDefault(found) : found
     if (!pose || !lastPose) return
     segments.push({ poseA: lastPose, poseB: pose, weight: 1 })
     lastPose = pose
@@ -9751,7 +9777,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     // lerpTweenSequence() pairing -- see resolveTweenSegmentsWithAnchor()'s
     // own comment for why a sequence with no Hold entries behaves
     // identically either way.
-    chp.tweenSegments = trig.rawChainEntries ? resolveTweenSegmentsWithAnchor(chp.forwardSnapshot, sequenceStartEntries(p, trig.rawChainEntries)) : null
+    chp.tweenSegments = trig.rawChainEntries ? resolveTweenSegmentsWithAnchor(chp.forwardSnapshot, sequenceStartEntries(p, trig.rawChainEntries), true) : null
     chp.glideTimeFactor = applyFirstGlideScale(p, chp.tweenSegments)
     chp.phase = 'forward'
     chp.forwardStartTime = now
@@ -9847,7 +9873,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
         chp.loopDirection = -1
       }
     } else {
-      const targetPose = (cfg.savedPoses || []).find((sp) => sp.name === cfg[`${p}TargetPose`])
+      const targetPose = stackOnDefault((cfg.savedPoses || []).find((sp) => sp.name === cfg[`${p}TargetPose`]))
       if (!targetPose) return // nothing selected -- leave this hand's pose untouched
       values = lerpPoseValues(chp.forwardSnapshot, targetPose, cappedT)
     }
@@ -10143,9 +10169,9 @@ function startClickHoldPose(p) {
     const namedPoses = cfg[`${p}Mode`] === 'Chain'
       ? (cfg[`${p}TweenChain`] || []).flatMap((seqName) => {
           const seq = (cfg.savedTweenSequences || []).find((s) => s.name === seqName)
-          return seq ? resolveTweenSequencePoses(seq.tweenPoses) : []
+          return seq ? resolveTweenSequencePoses(seq.tweenPoses, true) : []
         })
-      : resolveTweenSequencePoses(selectedSequenceEntries(p))
+      : resolveTweenSequencePoses(selectedSequenceEntries(p), true)
     // Loop/Oscillate's own cyclic sequence -- named poses ONLY, excluding
     // the anchor (briefly changed to include it, reverted same day -- "no
     // you're not meant to include the default pose... i guess we had it
@@ -10813,7 +10839,7 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
       if (!cp.tweenPoses || cp.tweenPoses.length < 2) { cp.phase = 'idle'; return } // nothing selected -- abandon this hand's sequence rather than get stuck
       values = lerpTweenSequence(cp.tweenPoses, cappedT)
     } else {
-      const targetPose = (cfg.savedPoses || []).find((sp) => sp.name === cfg[`${p}TargetPose`])
+      const targetPose = stackOnDefault((cfg.savedPoses || []).find((sp) => sp.name === cfg[`${p}TargetPose`]))
       if (!targetPose) { cp.phase = 'idle'; return } // nothing selected -- abandon this hand's sequence rather than get stuck
       values = lerpPoseValues(cp.forwardSnapshot, targetPose, cappedT)
     }
@@ -11035,7 +11061,7 @@ function poseSameTolerance() {
 // The target pose item when this trigger has Skip If Same Pose on (and is in Single Pose mode); otherwise null.
 function skipSamePoseTarget(p) {
   if (!cfg[`${p}SkipIfSamePose`] || cfg[`${p}Mode`] !== 'Single Pose') return null
-  return (cfg.savedPoses || []).find((sp) => sp.name === cfg[`${p}TargetPose`]) || null
+  return stackOnDefault((cfg.savedPoses || []).find((sp) => sp.name === cfg[`${p}TargetPose`])) || null
 }
 function handInPose(hand, target) {
   const cur = (hand._wasOverriddenLastFrame && hand._lastPoseValues) ? hand._lastPoseValues : cfg
@@ -11085,7 +11111,7 @@ function triggerClickPose(p, onlyHands = null) {
   const isTween = isSequenceOrChainMode(p)
   let namedPoses = null
   if (isTween) {
-    const resolved = resolveTweenSequencePoses(selectedSequenceEntries(p))
+    const resolved = resolveTweenSequencePoses(selectedSequenceEntries(p), true)
     if (resolved.length >= 1) namedPoses = resolved
   }
   let minD = Infinity, maxD = -Infinity
@@ -15298,6 +15324,7 @@ function resetAllHands() {
     if (!hand.currentBaseRb) hand.currentBaseRb = new THREE.Quaternion()
     hand.currentBaseRb.copy(cloneBaseRb)
     if (hand.basePosition) hand.wrapper.position.copy(hand.basePosition)
+    hand.clone.scale.setScalar(computeBaseScale() * (cfg.poseScale ?? 1)) // Reset also restores the scale a trigger left behind; the idle repose below re-applies the Default pose's offset
     hand.wrapper.quaternion.copy(hand.currentBaseQuat)
   })
   // Global Pause stops updateRenderOrder() (which does the idle repose),
@@ -16477,6 +16504,10 @@ function updateRenderOrder() {
         // through applyPoseValuesToHand(), so it needs this line
         // explicitly rather than getting it for free.
         hand.currentSplayDeg = extraSplay
+        // The idle state INCLUDES the Default pose's Pose Offset X/Y/Z and Pose Scale (2026-10-11): a hand that has finished a retransition already sits at base + offset with that scale, but a hand that
+        // never moved (startup) or was Reset showed the bare grid position at the bare scale, and Reset left whatever scale the last trigger set. One idle state for all three.
+        if (hand.basePosition) applyPoseOffsetToPosition(hand.wrapper, hand.basePosition, camera, cfg)
+        hand.clone.scale.setScalar(computeBaseScale() * (cfg.poseScale ?? 1))
         // CORRECTED 2026-09-14, root cause behind the long-running "thumb
         // pose looks wrong" reports, independent of cursor movement. The
         // wrist bone gets re-posed with LIVE Responsive Wrist Splay every

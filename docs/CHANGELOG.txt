@@ -16984,6 +16984,23 @@ function had run on the hand). Fix: updateCloneBaseQuat() bumps cloneBaseVersion
 Not changed: "Default" copies every pose value, and 105 of your 106 saved poses were saved before Rotation at Base existed, so they carry no base-rotation values -- setting one as Default writes 0 into the
 three Base Rotation sliders (it overwrote nothing you can recover from the pose itself). `main.js` `?v=330` -> `?v=331`.
 
+2026-10-11  -  (triggered poses stack on the Default; Reset restores the default position and scale)
+
+Direct requests: (1) "for arm rotation settings, any tween or sequence triggered should be stacked ontop of the default positions rotations"; (2) "when i set a pose, save, and set as default, when i trigger
+functions, and click reset, it doesnt reset to default"; (3) the wrist cropping geometry should rotate with the hand model with every kind of rotation.
+ - RESET (MEASURED on the deployed page with a Default pose that has Pose Offset 12 / -6 and Pose Scale 1.4): before any trigger a hand sat at the bare grid position at the bare scale; after a trigger
+   and a normal retransition it sat at grid + offset at scale x 1.4; Reset moved it to the bare grid position but LEFT the 1.4 scale. Three states for one "default". Now the idle state includes the
+   Default pose's Pose Offset X/Y/Z and Pose Scale (the idle repose applies applyPoseOffsetToPosition(cfg) and base scale x poseScale), the pose-offset / scale sliders bump cloneBaseVersion so idle hands
+   pick them up, and resetAllHands() restores the scale too. Startup, Reset and a finished retransition now agree.
+ - STACKING: the rotation / position keys a saved pose or tween step carries (Whole-Hand Rotation X/Y/Z, Rotation at Base X/Y/Z, Pose Offset X/Y/Z) are applied as a change from the Default pose on top of the
+   live default: effective = slider + (pose value - Default pose value); Pose Scale stacks as a ratio; a pose that lacks a key (all but one of your 106 poses lack Base Rotation) adds nothing instead of
+   snapping to 0 (it used to undo your Base Rotation X -90). stackOnDefault() does this for every field-hand target: Single Pose targets, Sequence / Chain steps (resolveTweenSequencePoses /
+   resolveTweenSegmentsWithAnchor with stack = true) and Skip If Same Pose. With the sliders equal to the Default pose it is identical to before for every key a pose does carry. The Loading Preview and
+   Pose Preview keep absolute poses.
+ - Cropping geometry: checked (planes from the block's matrixWorld, recomputed at draw time) against Whole-Hand Rotation Y 180 / X 70, Rotation at Base Z 60, cursor-tracking wrapper rotation (119 deg) and a
+   triggered pose (clone rotated 51 deg): the same model points stay clipped / kept in every case. No change needed; tell me the exact case if you still see it not follow.
+ `main.js` `?v=331` -> `?v=332`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a
