@@ -12,11 +12,11 @@
       "pauseBtnIconColor": "#ffffff",
       "pauseBtnBorderColor": "#ffffff",
       "pausedRenderFps": 15,
-      "renderOrderMode": "palmToArm",
-      "renderOrderModeExcept": "palmCenter",
-      "renderOrderFallback": "palmToArmEnd",
+      "renderOrderMode": "closest",
+      "renderOrderModeExcept": "palmToArm",
+      "renderOrderFallback": "none",
       "renderOrderFallbackExcept": "armBase",
-      "renderOrderFallback2": "armEndToPalm",
+      "renderOrderFallback2": "none",
       "renderOrderFallback2Except": "closest",
       "renderOrderFlipLock": true,
       "fieldRows": 40,
@@ -46,9 +46,9 @@
       "armRotationDefault": 93,
       "armRotationCurveEnabled": true,
       "armRotationCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.7518564072464893,\"y\":0.12229181925455734}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.4783416793996347,\"y\":-0.31770833333333326}}]",
-      "armRotationRangePct": "{\"min\":0,\"max\":100}",
-      "armRotationOffsetX": 0,
-      "armRotationOffsetY": 0,
+      "armRotationRangePct": "{\"min\":0,\"max\":81}",
+      "armRotationOffsetX": -1,
+      "armRotationOffsetY": 1,
       "armRotationDamping": 1,
       "palmFacesCursor": true,
       "palmRotationVisibleOnly": true,
@@ -6380,7 +6380,7 @@
       "wristSplayTargetDepth": 37.3,
       "wristSplayDefault": -19,
       "wristSplayReactiveEnabled": true,
-      "wristSplayRange": "{\"min\":-46,\"max\":2}",
+      "wristSplayRange": "{\"min\":-46,\"max\":-8}",
       "wristSplayCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.2691831581499777,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.5909653242143187,\"y\":0}}]",
       "wristSplayDamping": 0.34,
       "tweenPoses": [
@@ -9371,7 +9371,7 @@
       "armRotationDefault": 93,
       "armRotationCurveEnabled": true,
       "armRotationCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.7518564072464893,\"y\":0.12229181925455734}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.4783416793996347,\"y\":-0.31770833333333326}}]",
-      "armRotationRangePct": "{\"min\":0,\"max\":100}",
+      "armRotationRangePct": "{\"min\":0,\"max\":81}",
       "armRotationOffsetX": 0,
       "armRotationOffsetY": 0,
       "armRotationDamping": 1,
@@ -15705,7 +15705,7 @@
       "wristSplayTargetDepth": 5.6,
       "wristSplayDefault": -19,
       "wristSplayReactiveEnabled": true,
-      "wristSplayRange": "{\"min\":-46,\"max\":2}",
+      "wristSplayRange": "{\"min\":-46,\"max\":-8}",
       "wristSplayCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.2691831581499777,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.5909653242143187,\"y\":0}}]",
       "wristSplayDamping": 0.34,
       "tweenPoses": [
@@ -18662,11 +18662,11 @@
       "pauseBtnIconColor": "#ffffff",
       "pauseBtnBorderColor": "#ffffff",
       "pausedRenderFps": 15,
-      "renderOrderMode": "palmToArm",
-      "renderOrderModeExcept": "palmCenter",
-      "renderOrderFallback": "palmToArmEnd",
+      "renderOrderMode": "closest",
+      "renderOrderModeExcept": "palmToArm",
+      "renderOrderFallback": "none",
       "renderOrderFallbackExcept": "armBase",
-      "renderOrderFallback2": "armEndToPalm",
+      "renderOrderFallback2": "none",
       "renderOrderFallback2Except": "closest",
       "renderOrderFlipLock": true,
       "fieldRows": 15,
@@ -18696,7 +18696,7 @@
       "armRotationDefault": 93,
       "armRotationCurveEnabled": true,
       "armRotationCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.7518564072464893,\"y\":0.12229181925455734}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.4783416793996347,\"y\":-0.31770833333333326}}]",
-      "armRotationRangePct": "{\"min\":0,\"max\":100}",
+      "armRotationRangePct": "{\"min\":0,\"max\":81}",
       "armRotationOffsetX": 0,
       "armRotationOffsetY": 0,
       "armRotationDamping": 1,
@@ -25030,7 +25030,7 @@
       "wristSplayTargetDepth": 3.4,
       "wristSplayDefault": -19,
       "wristSplayReactiveEnabled": true,
-      "wristSplayRange": "{\"min\":-46,\"max\":2}",
+      "wristSplayRange": "{\"min\":-46,\"max\":-8}",
       "wristSplayCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.2691831581499777,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.5909653242143187,\"y\":0}}]",
       "wristSplayDamping": 0.34,
       "tweenPoses": [
@@ -30013,14 +30013,14 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
           "type": "group",
           "group": {
             "key": "Field Layout",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -30985,7 +30985,7 @@
           "type": "group",
           "group": {
             "key": "Cursor Tracking",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -31004,7 +31004,7 @@
                 "type": "group",
                 "group": {
                   "key": "Responsive Arm Rotation",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -31120,7 +31120,7 @@
                 "type": "group",
                 "group": {
                   "key": "Responsive Wrist Splay",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -31183,7 +31183,7 @@
                 "type": "group",
                 "group": {
                   "key": "New Group (4)",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -31261,7 +31261,7 @@
             "subgroups": [
               {
                 "key": "Responsive Arm Rotation",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -31371,7 +31371,7 @@
               },
               {
                 "key": "Responsive Wrist Splay",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -31431,7 +31431,7 @@
               },
               {
                 "key": "New Group (4)",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -31492,7 +31492,7 @@
       "subgroups": [
         {
           "key": "Field Layout",
-          "collapsed": true,
+          "collapsed": false,
           "locked": true,
           "items": [
             {
@@ -32445,7 +32445,7 @@
         },
         {
           "key": "Cursor Tracking",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
@@ -32464,7 +32464,7 @@
               "type": "group",
               "group": {
                 "key": "Responsive Arm Rotation",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -32580,7 +32580,7 @@
               "type": "group",
               "group": {
                 "key": "Responsive Wrist Splay",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -32643,7 +32643,7 @@
               "type": "group",
               "group": {
                 "key": "New Group (4)",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -32721,7 +32721,7 @@
           "subgroups": [
             {
               "key": "Responsive Arm Rotation",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -32831,7 +32831,7 @@
             },
             {
               "key": "Responsive Wrist Splay",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -32891,7 +32891,7 @@
             },
             {
               "key": "New Group (4)",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -197699,7 +197699,40 @@
     "custom31RetransitionSpeedMs": false,
     "custom31RetransitionSpeedCurveEnabled": false,
     "custom31RetransitionStartTimeCurveEnabled": false,
-    "custom31MultiTriggerEnabled": false
+    "custom31MultiTriggerEnabled": false,
+    "pausedRenderFps": false,
+    "pauseBtnCornerRadius": false,
+    "pauseBtnBorderThickness": false,
+    "pauseBtnOpacity": false,
+    "pauseBtnBgColor": false,
+    "pauseBtnIconColor": false,
+    "pauseBtnBorderColor": false,
+    "bgColor": false,
+    "loadingPreviewShowLive": false,
+    "loadingPreviewEnabled": false,
+    "loadingPreviewCameraEditMode": false,
+    "loadingMinTimeMs": false,
+    "loadingPreviewRotationX": false,
+    "loadingPreviewRotationY": false,
+    "loadingPreviewRotationZ": false,
+    "loadingPreviewOffsetX": false,
+    "loadingPreviewOffsetY": false,
+    "loadingPreviewOffsetZ": false,
+    "loadingPreviewCameraFov": false,
+    "loadingPreviewCameraZoom": false,
+    "loadingPreviewTweenSelector": false,
+    "loadingPreviewCameraSelector": false,
+    "loadingPreviewLightingSelector": false,
+    "loadingPreviewSequenceMode": false,
+    "loadingPreviewSequenceCountMode": false,
+    "loadingPreviewSequenceCount": false,
+    "loadingPreviewSpeedMs": false,
+    "loadingPreviewSize": false,
+    "loadingPreviewSequenceHoldMs": false,
+    "loadingPreviewSequenceLoopTransition": false,
+    "renderOrderMode": true,
+    "renderOrderFallback": false,
+    "renderOrderFallback2": false
   },
   "devIndependence": {
     "mobile": {
@@ -198393,16 +198426,10 @@
   "devHotkeys": {},
   "panelGeometry": {
     "desktop": {
-      "left": 820.7999877929688,
-      "top": 0,
-      "width": 712,
-      "height": 711.6000366210938
-    },
-    "mobile": {
-      "left": 20,
-      "top": 0,
-      "width": 377.8571472167969,
-      "height": 35.52381134033203
+      "left": 506.38751220703125,
+      "top": 217.58750915527344,
+      "width": 1032.800048828125,
+      "height": 500.3999938964844
     }
   }
 }
