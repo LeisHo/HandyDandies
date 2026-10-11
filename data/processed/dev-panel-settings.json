@@ -12,8 +12,8 @@
       "pauseBtnIconColor": "#ffffff",
       "pauseBtnBorderColor": "#ffffff",
       "pausedRenderFps": 15,
-      "renderOrderMode": "armEnd",
-      "renderOrderFallback": "closestZ",
+      "renderOrderMode": "z",
+      "renderOrderFallback": "closest",
       "fieldRows": 35,
       "fieldCols": 55,
       "rowSpacing": 5,
@@ -29,6 +29,7 @@
       "fieldBoundsX": "{\"min\":-300,\"max\":300}",
       "fieldBoundsY": "{\"min\":-300,\"max\":300}",
       "fieldBoundsZ": "{\"min\":-266,\"max\":125}",
+      "trackingPoint": "armEnd",
       "trackingEnabled": true,
       "trackingDamping": 0.95,
       "targetDepthFactor": 279.6,
@@ -40,6 +41,8 @@
       "armRotationDefault": 93,
       "armRotationCurveEnabled": true,
       "armRotationCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.8080220886433459,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.23551813533871668,\"y\":0}}]",
+      "armRotationOffsetX": 0,
+      "armRotationOffsetY": 0,
       "armRotationDamping": 1,
       "palmFacesCursor": true,
       "palmRotationVisibleOnly": true,
@@ -48,7 +51,7 @@
       "palmFaceRotationOffset": 180,
       "palmFacesCursorDistanceCurveEnabled": true,
       "palmFacesCursorDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
-      "palmFacesCursorDistanceRange": "{\"min\":-35,\"max\":180}",
+      "palmFacesCursorDistanceRange": "{\"min\":0,\"max\":180}",
       "loadingPreviewEnabled": true,
       "loadingPreviewShowLive": false,
       "loadingMinTimeMs": 5000,
@@ -6806,9 +6809,9 @@
           "group": "FIST ROTATE"
         }
       ],
-      "cameraX": 6.504385906807995,
-      "cameraY": 9.506408948421067,
-      "cameraZ": 285.9908280295541,
+      "cameraX": 6.504385906807997,
+      "cameraY": 9.50640894842113,
+      "cameraZ": 286.01320202024317,
       "cameraFov": 15,
       "cameraYaw": 0,
       "cameraPitch": 0,
@@ -6942,6 +6945,7 @@
       "pixelRatio": 1.25,
       "resolutionScale": 100,
       "qualityPreset": "high",
+      "showTrackingPoints": true,
       "showGridHelper": false,
       "showWireframe": false,
       "preventReorderFlash": false,
@@ -9264,8 +9268,8 @@
       "pauseBtnIconColor": "#ffffff",
       "pauseBtnBorderColor": "#ffffff",
       "pausedRenderFps": 15,
-      "renderOrderMode": "armEnd",
-      "renderOrderFallback": "closestZ",
+      "renderOrderMode": "z",
+      "renderOrderFallback": "closest",
       "fieldRows": 24,
       "fieldCols": 12,
       "rowSpacing": 8.5,
@@ -9281,6 +9285,7 @@
       "fieldBoundsX": "{\"min\":-300,\"max\":300}",
       "fieldBoundsY": "{\"min\":-300,\"max\":300}",
       "fieldBoundsZ": "{\"min\":-266,\"max\":125}",
+      "trackingPoint": "armEnd",
       "trackingEnabled": true,
       "trackingDamping": 0.08,
       "targetDepthFactor": 89.7,
@@ -9292,6 +9297,8 @@
       "armRotationDefault": 93,
       "armRotationCurveEnabled": true,
       "armRotationCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.8080220886433459,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.23551813533871668,\"y\":0}}]",
+      "armRotationOffsetX": 0,
+      "armRotationOffsetY": 0,
       "armRotationDamping": 1,
       "palmFacesCursor": true,
       "palmRotationVisibleOnly": true,
@@ -9300,7 +9307,7 @@
       "palmFaceRotationOffset": 0,
       "palmFacesCursorDistanceCurveEnabled": true,
       "palmFacesCursorDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
-      "palmFacesCursorDistanceRange": "{\"min\":-35,\"max\":180}",
+      "palmFacesCursorDistanceRange": "{\"min\":0,\"max\":180}",
       "loadingPreviewEnabled": true,
       "loadingPreviewShowLive": false,
       "loadingMinTimeMs": 5000,
@@ -16194,6 +16201,7 @@
       "pixelRatio": 1.25,
       "resolutionScale": 100,
       "qualityPreset": "high",
+      "showTrackingPoints": true,
       "showGridHelper": false,
       "showWireframe": false,
       "preventReorderFlash": false,
@@ -18516,8 +18524,8 @@
       "pauseBtnIconColor": "#ffffff",
       "pauseBtnBorderColor": "#ffffff",
       "pausedRenderFps": 15,
-      "renderOrderMode": "armEnd",
-      "renderOrderFallback": "closestZ",
+      "renderOrderMode": "z",
+      "renderOrderFallback": "closest",
       "fieldRows": 15,
       "fieldCols": 3,
       "rowSpacing": 9.5,
@@ -18533,6 +18541,7 @@
       "fieldBoundsX": "{\"min\":-300,\"max\":300}",
       "fieldBoundsY": "{\"min\":-300,\"max\":300}",
       "fieldBoundsZ": "{\"min\":-266,\"max\":125}",
+      "trackingPoint": "armEnd",
       "trackingEnabled": true,
       "trackingDamping": 1,
       "targetDepthFactor": 40.8,
@@ -18544,6 +18553,8 @@
       "armRotationDefault": 93,
       "armRotationCurveEnabled": true,
       "armRotationCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.8080220886433459,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.23551813533871668,\"y\":0}}]",
+      "armRotationOffsetX": 0,
+      "armRotationOffsetY": 0,
       "armRotationDamping": 1,
       "palmFacesCursor": true,
       "palmRotationVisibleOnly": true,
@@ -18552,7 +18563,7 @@
       "palmFaceRotationOffset": 0,
       "palmFacesCursorDistanceCurveEnabled": true,
       "palmFacesCursorDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
-      "palmFacesCursorDistanceRange": "{\"min\":-35,\"max\":180}",
+      "palmFacesCursorDistanceRange": "{\"min\":0,\"max\":180}",
       "loadingPreviewEnabled": true,
       "loadingPreviewShowLive": false,
       "loadingMinTimeMs": 5000,
@@ -25446,6 +25457,7 @@
       "pixelRatio": 1.25,
       "resolutionScale": 100,
       "qualityPreset": "high",
+      "showTrackingPoints": true,
       "showGridHelper": false,
       "showWireframe": false,
       "preventReorderFlash": false,
@@ -28867,7 +28879,7 @@
     },
     {
       "key": "Debug",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -28961,6 +28973,10 @@
         {
           "type": "row",
           "key": "clearPoseJumpLogBtn"
+        },
+        {
+          "type": "row",
+          "key": "showTrackingPoints"
         }
       ],
       "settings": [
@@ -28986,7 +29002,8 @@
         "logPoseJumpsEnabled",
         "poseJumpBoneThresholdDeg",
         "poseJumpPositionThreshold",
-        "clearPoseJumpLogBtn"
+        "clearPoseJumpLogBtn",
+        "showTrackingPoints"
       ],
       "subgroups": []
     },
@@ -30745,7 +30762,7 @@
                 "type": "group",
                 "group": {
                   "key": "Responsive Arm Rotation",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -30972,17 +30989,32 @@
                   ],
                   "subgroups": []
                 }
+              },
+              {
+                "type": "row",
+                "key": "trackingPoint"
+              },
+              {
+                "type": "row",
+                "key": "armRotationOffsetX"
+              },
+              {
+                "type": "row",
+                "key": "armRotationOffsetY"
               }
             ],
             "settings": [
               "trackingEnabled",
               "targetDepthFactor",
-              "showTargetMarker"
+              "showTargetMarker",
+              "trackingPoint",
+              "armRotationOffsetX",
+              "armRotationOffsetY"
             ],
             "subgroups": [
               {
                 "key": "Responsive Arm Rotation",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -32155,7 +32187,7 @@
               "type": "group",
               "group": {
                 "key": "Responsive Arm Rotation",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -32382,17 +32414,32 @@
                 ],
                 "subgroups": []
               }
+            },
+            {
+              "type": "row",
+              "key": "trackingPoint"
+            },
+            {
+              "type": "row",
+              "key": "armRotationOffsetX"
+            },
+            {
+              "type": "row",
+              "key": "armRotationOffsetY"
             }
           ],
           "settings": [
             "trackingEnabled",
             "targetDepthFactor",
-            "showTargetMarker"
+            "showTargetMarker",
+            "trackingPoint",
+            "armRotationOffsetX",
+            "armRotationOffsetY"
           ],
           "subgroups": [
             {
               "key": "Responsive Arm Rotation",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -187883,8 +187930,8 @@
     "desktop": {
       "left": 820.7999877929688,
       "top": 79.1875,
-      "width": 670.4000244140625,
-      "height": 632.3875122070312
+      "width": 673.6000366210938,
+      "height": 633.9874877929688
     }
   }
 }
