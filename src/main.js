@@ -2452,7 +2452,7 @@ scene.add(gridHelper)
 const targetMarker = new THREE.Mesh(new THREE.SphereGeometry(1, 12, 12), new THREE.MeshBasicMaterial({ color: 0xff5566 }))
 targetMarker.visible = cfg.showTargetMarker
 targetMarker.material.depthTest = false // always visible, even behind hands
-targetMarker.renderOrder = 999999
+targetMarker.renderOrder = 1e15 // above every hand (hand render orders reach z * 1e7)
 scene.add(targetMarker)
 
 // -----------------------------------------------------------------------
@@ -16009,9 +16009,14 @@ function updateRenderOrder() {
     hand.effectiveRenderOrder = (flashFixOn && hand.isOverlapping)
       ? hand.effectiveRenderOrder + (live - hand.effectiveRenderOrder) * REORDER_SMOOTHING
       : live
-    if (hand.skinnedMesh) hand.skinnedMesh.renderOrder = hand.effectiveRenderOrder
-    if (hand.outlineMesh) hand.outlineMesh.renderOrder = hand.effectiveRenderOrder - 0.001
-    if (hand.emissionMesh) hand.emissionMesh.renderOrder = hand.effectiveRenderOrder - 0.001
+    // Z-position priority (2026-10-11, direct request): the hand closest to the camera in Z always draws above the others;
+    // the cursor-distance order above (effectiveRenderOrder, with its overlap smoothing) only breaks ties between hands at the
+    // same Z (quantised to 0.01 world units so float noise never reorders them). 100000 > any cursor distance, so Z always wins.
+    const zKey = Math.round(hand.wrapper.position.z * (camera.position.z >= 0 ? 1 : -1) / 0.01)
+    const roBase = zKey * 100000 + Math.min(Math.max(hand.effectiveRenderOrder, 0), 99999)
+    if (hand.skinnedMesh) hand.skinnedMesh.renderOrder = roBase
+    if (hand.outlineMesh) hand.outlineMesh.renderOrder = roBase - 0.001
+    if (hand.emissionMesh) hand.emissionMesh.renderOrder = roBase - 0.001
     // Arm Length (Hide Wrist) -- reuses this same live cursor-distance
     // value (`live`) rather than recomputing it. See computeArmLengthT()/
     // applyHandArmLength()'s own comments for why this now runs every

@@ -16842,6 +16842,14 @@ underlying curve math (evaluateArmLengthCurve()) already read a point's h1/h2 ov
 not a math change. Verified live: Alt-drag and Shift-drag on real points of a real, already-tuned curve each created a real, persisted handle,
 and the rendered handle count matched the expected per-point eligibility math exactly. `main.js` `?v=319` -> `?v=320`.
 
+2026-10-11  -  (render order: Z position first)
+
+Direct request: the hand with the Z closest to the camera always renders above the others. renderOrder = zKey * 100000 + cursor-distance order,
+where zKey = round(z / 0.01) (sign flipped if the camera is on the -Z side). The existing cursor-distance order and its overlap smoothing
+(preventReorderFlash) now only decide between hands at the same Z, so a tween that moves a hand in Z reorders it immediately. The outline and
+emission meshes keep their -0.001 offset; the Show Target Marker render order was raised to 1e15 so it stays on top.
+`main.js` `?v=319` -> `?v=320`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a
