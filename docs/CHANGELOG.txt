@@ -17330,6 +17330,10 @@ Direct request: "for the existing 2 fallbacks, treat them the same as a regular 
  - There is now ONE fallback list, renderOrderExtraFallbacks, stored as {"v":2,"items":[{m,q,t}]}; every entry (mode, Except, its own + And / + Or / - Subtract terms) can be removed with its x. Entries are numbered Fallback 1, 2, 3 ... in order; the Mode level is level 0. computeRenderOrderRanks() builds lv = [Mode, ...list].
  - Migration: the old fixed rows (renderOrderFallback / FallbackExcept / FallbackTerms, renderOrderFallback2 / ...) are kept only as HIDDEN legacy storage. While the list is still in its old array form it is read as [legacy Fallback, legacy Fallback 2, ...the old extras] (roLegacyItems()), so nothing changes visibly; normalizeRenderOrderFallbacks() (onRestore) rewrites it as v2 and the next Save stores it. A fresh visitor with nothing saved gets the old defaults as two editable entries (Farthest From Cursor (XYZ), no Except). Deleting every fallback leaves only the Mode level (ties keep the previous order). `main.js` `?v=372` -> `?v=373`.
 
+2026-10-11  -  (Debug: Show Hand Render Order Points)
+
+Direct request: a Debug checkbox to show the other hand points used (arm end, arm base, palm center). New Debug > "Show Hand Render Order Points (Arm Base / Arm End / Palm Center)" (showRenderOrderPoints, default off): updateRenderOrderPointMarkers() draws 3 markers per hand at the same rig bones the Render Order modes measure (renderOrderBone(): rForearmBend / rHand / rMid1, previous-render world positions): arm base orange, arm end magenta, palm center cyan. Separate from Show Hand Tracking Points (green). main.js ?v=373 -> ?v=374.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

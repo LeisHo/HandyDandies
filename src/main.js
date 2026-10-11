@@ -324,6 +324,7 @@ const _swingE = new THREE.Vector3(), _trkQinv = new THREE.Quaternion()
 const _armPartialQ = new THREE.Quaternion(), _armOffQx = new THREE.Quaternion(), _armOffQy = new THREE.Quaternion(), _armOffAxis = new THREE.Vector3()
 let trkXYFieldMin = 0, trkXYFieldRange = 0.001, trkXYAllMin = 0, trkXYAllRange = 0.001
 let trackingPointCloud = null
+let renderOrderPointCloud = null // Debug > Show Hand Render Order Points: arm base / arm end / palm center markers
 const _trackTargetXY = new THREE.Vector3() // cursor target at a hand's own depth, for Use Cursor Target Depth = off
 // Screen-space distance scratch + scale (see cursorDistXY()); early-state block so top-level load order is safe.
 const _scrV = new THREE.Vector3(), _scrV2 = new THREE.Vector3()
@@ -1546,6 +1547,39 @@ function updateTrackingPointMarkers() {
   pos.needsUpdate = true
   trackingPointCloud.visible = true
 }
+// Debug > Show Hand Render Order Points: the three rig points the Render Order modes measure (the same bones, same previous-render world positions as renderOrderBone()): arm base (orange), arm end (magenta),
+// palm center (cyan). One Points object, 3 markers per hand.
+const RO_POINT_COLORS = [[1, 0.67, 0.13], [1, 0.27, 0.93], [0.27, 0.87, 1]]
+const RO_POINT_NODES = ['armBase', 'armEnd', 'palmCenter']
+function updateRenderOrderPointMarkers() {
+  if (!cfg.showRenderOrderPoints) { if (renderOrderPointCloud) renderOrderPointCloud.visible = false; return }
+  if (!renderOrderPointCloud || renderOrderPointCloud.userData.cap < hands.length) {
+    if (renderOrderPointCloud) { scene.remove(renderOrderPointCloud); renderOrderPointCloud.geometry.dispose() }
+    const cap = Math.max(hands.length, 1)
+    const g = new THREE.BufferGeometry()
+    g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(cap * 9), 3))
+    const col = new Float32Array(cap * 9)
+    for (let i = 0; i < cap; i++) for (let k = 0; k < 3; k++) { col[(i * 3 + k) * 3] = RO_POINT_COLORS[k][0]; col[(i * 3 + k) * 3 + 1] = RO_POINT_COLORS[k][1]; col[(i * 3 + k) * 3 + 2] = RO_POINT_COLORS[k][2] }
+    g.setAttribute('color', new THREE.BufferAttribute(col, 3))
+    const m = new THREE.PointsMaterial({ size: 6, sizeAttenuation: false, vertexColors: true, depthTest: false, depthWrite: false })
+    renderOrderPointCloud = new THREE.Points(g, m)
+    renderOrderPointCloud.frustumCulled = false
+    renderOrderPointCloud.renderOrder = 1e15
+    renderOrderPointCloud.userData.cap = cap
+    scene.add(renderOrderPointCloud)
+  }
+  const pos = renderOrderPointCloud.geometry.attributes.position
+  for (let i = 0; i < hands.length; i++) {
+    const h = hands[i]
+    for (let k = 0; k < 3; k++) {
+      const b = renderOrderBone(h, RO_POINT_NODES[k])
+      if (b) { const e = b.matrixWorld.elements; pos.setXYZ(i * 3 + k, e[12], e[13], e[14]) } else pos.setXYZ(i * 3 + k, h.wrapper.position.x, h.wrapper.position.y, h.wrapper.position.z)
+    }
+  }
+  renderOrderPointCloud.geometry.setDrawRange(0, hands.length * 3)
+  pos.needsUpdate = true
+  renderOrderPointCloud.visible = true
+}
 const _swingDir = new THREE.Vector3(), _swingPivot = new THREE.Vector3(), _swingTarget = new THREE.Vector3(), _swingScrR = new THREE.Vector3(), _swingScrU = new THREE.Vector3()
 const _trkQ0 = new THREE.Quaternion(), _trkRbInv = new THREE.Quaternion(), _trkCut = new THREE.Vector3()
 // World position of the hand's arm base with no tracking rotation: wrapper.position + s * q0 * (forearmBase - cutPoint), q0 = currentBaseQuat * Rb^-1 (same maths as applyHandArmLength()).
@@ -2721,6 +2755,7 @@ const DEV_GROUPS = [
     title: 'Debug',
     controls: [
       { key: 'showTrackingPoints', label: 'Show Hand Tracking Points', type: 'checkbox', def: false },
+      { key: 'showRenderOrderPoints', label: 'Show Hand Render Order Points (Arm Base / Arm End / Palm Center)', type: 'checkbox', def: false, placeAfter: 'showTrackingPoints' },
       { key: 'showGridHelper', label: 'Show Grid Helper', type: 'checkbox', def: false, onChange: (v) => { if (gridHelper) gridHelper.visible = v } },
       { key: 'showWireframe', label: 'Show Wireframe', type: 'checkbox', def: false, onChange: (v) => forEachToonMaterial((m) => { m.wireframe = v }) },
       // Freezes a hand's own render-order value (see animate()'s own
@@ -17112,6 +17147,7 @@ function updateRenderOrder() {
   // Wrist Splay / Wrist Cropping each measure to the cursor at their own Cursor Target Depth (2026-10-11).
   updateTrackingTargets()
   updateTrackingPointMarkers()
+  updateRenderOrderPointMarkers()
   let spMin = Infinity, spMax = -Infinity, crMin = Infinity, crMax = -Infinity
   let spAMin = Infinity, spAMax = -Infinity, crAMin = Infinity, crAMax = -Infinity
   for (let ti = 0; ti < hands.length; ti++) {
