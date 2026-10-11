@@ -18,6 +18,12 @@ work seamlessly from there.
 
 ## Currently working on
 
+**Nothing in progress right now.** Most recent work (2026-10-11): all 3 curve-editor widgets now have bezier handles -- Arm Length and Wrist
+Splay's own curve widgets were deliberately separate, older code that never got the interaction layer `buildGenericCurveWidget()` already had;
+ported it in verbatim (UI-only, the underlying curve math already read a point's h1/h2 override unconditionally). Verified live via real
+Alt-drag/Shift-drag `PointerEvent` dispatch on a real saved curve. See CLAUDE.md's and CHANGELOG.txt's matching 2026-10-11 entries. `main.js`
+`?v=319` -> `?v=320`.
+
 **2026-10-04 -- Playback speed: pose pass 3.2x faster (`main.js` `?v=302`).**
 Finger-curl matrix refresh no longer recomputes descendants, one wrist refresh per hand,
 Tip Twist direction from current matrices, generated `lerpPoseValues`. Oracle-verified

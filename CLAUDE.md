@@ -2524,3 +2524,20 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   (`_onScrRest` for rest positions) or use `onScreenMinMax()`, and do not clamp the normalised value to 1 -- off-screen hands are meant to read x > 1 and be
   extrapolated by `evaluateArmLengthCurve()`. In the sandbox the camera aspect and window size can be 0/NaN, which makes every hand "off screen"; the flags then
   fall back to all hands, so test with a faked aspect/size.
+- **CORRECTED 2026-10-11 -- the 2026-09-20 gotcha above ("the project-specific Arm Length/Wrist Splay curve widgets ... are deliberately SEPARATE
+  code and do NOT have bezier handles at all ... this fix does not apply to them") is now obsolete.** Direct request: "fix all curve editors in
+  Handy Dandies so they all have the bezier handles." Ported `buildGenericCurveWidget()`'s own bezier-handle interaction layer (handle
+  state/`startHandleDrag()`/the handle-aware `redraw()` with preview-marker rendering/the Alt+Shift pointerdown routing/the hint caption) into
+  `buildArmLengthCurveWidget()` and `buildWristSplayCurveWidget()` verbatim -- this was a pure UI-layer port, not a math change:
+  `evaluateArmLengthCurve()` (the shared evaluator all 3 widgets already call) already read a point's `h1`/`h2` override unconditionally before
+  this fix, confirmed by its own existing comment ("Bezier-handle override logic (h1/h2) is completely unchanged -- it already overrides
+  PER-SEGMENT before either spline method is ever consulted"), so only the missing CREATE/DRAG interaction needed porting, nothing about how a
+  handle actually bends the curve. Verified live (this project's local server hit its own documented network-truncation quirk twice before a
+  3rd navigation loaded cleanly): dispatched a real Alt+drag `PointerEvent` sequence on the Arm Length widget's own first point (a 6-point,
+  already-tuned real saved curve) and a real Shift+drag on Wrist Splay's own last point -- both correctly created a real, persisted `h1`/`h2`
+  handle in the hidden input's JSON, and the rendered handle-marker count (10 markers for the real 6-point curve: point 0 gets h1 only, points
+  1-4 get both, point 5 gets h2 only) matched the expected per-point eligibility math exactly. **These are now, and should stay, the ONLY 3
+  curve-editor implementations in this file** (confirmed via `grep -n "function build\w*Curve\w*("` -- no 4th exists) -- any FUTURE 4th curve
+  editor should be built on `buildGenericCurveWidget()` directly (or copy ALL 3 of its own documented parts: the viewBox/stretch fix, the
+  bezier-handle layer, and the `CURVE_HIT_RADIUS_PX` larger invisible hit-target) rather than copying only the OLDER, handle-less shape of
+  `buildArmLengthCurveWidget()`/`buildWristSplayCurveWidget()` -- which is exactly how these 2 ended up behind in the first place.

@@ -7523,8 +7523,18 @@ function buildArmLengthCurveWidget(row) {
   // (0-100-scale) Default Arm Length slider expecting "half," silently
   // producing a barely-there 0.5% crop instead of the intended 50%.
   const caption = elLocal('div', { fontSize: '10px', opacity: '0.7', marginTop: '3px', textAlign: 'center' }, { text: 'X: Distance From Cursor (%, Nearest→Farthest On-Screen Hand, Live)  ·  Y: Crop (0%=None, 100%=Full)' })
+  // Bezier handles (2026-10-11, direct request: "fix all curve editors...
+  // so they all have the bezier handles") -- this widget's own curve math
+  // (evaluateArmLengthCurve()) already reads a point's h1/h2 bezier
+  // override unconditionally (it's shared with buildGenericCurveWidget()),
+  // so this was purely a missing INTERACTION layer, not a math gap. See
+  // startHandleDrag()/redraw()'s own handle-rendering block below, ported
+  // verbatim from buildGenericCurveWidget() (the one widget that already
+  // had this) -- same hint caption, same gesture, same data format.
+  const handleHint = elLocal('div', { fontSize: '9px', opacity: '0.5', marginTop: '2px', textAlign: 'center', fontStyle: 'italic' }, { text: 'Alt+Drag a point: Out Handle  ·  Shift+Drag a point: In Handle  ·  Drag a handle back onto its point: Remove' })
   row.appendChild(svg)
   row.appendChild(caption)
+  row.appendChild(handleHint)
 
   let points = [{ x: 0, y: 1 }, { x: 1, y: 0 }]
   try {
@@ -7545,6 +7555,36 @@ function buildArmLengthCurveWidget(row) {
     commitTextControl(input, JSON.stringify(points))
   }
   const CURVE_SAMPLES = 48
+  let handleEls = []
+  // Same bezier-handle mechanism as buildGenericCurveWidget() -- see that
+  // function's own comment for the full gesture/data-format account.
+  const HANDLE_REMOVE_THRESHOLD_PX = 6
+  const CURVE_HIT_RADIUS_PX = 16
+  function startHandleDrag(p, i, kind, downEv) {
+    downEv.stopPropagation()
+    downEv.preventDefault()
+    const canHave = kind === 'h1' ? i < points.length - 1 : i > 0
+    if (!canHave) return
+    if (!p[kind]) p[kind] = { x: kind === 'h1' ? 0.08 : -0.08, y: 0 }
+    function onMove(moveEv) {
+      const rect = svg.getBoundingClientRect()
+      if (rect.width <= 0 || rect.height <= 0) return
+      const np = fromPx(moveEv.clientX - rect.left, moveEv.clientY - rect.top)
+      p[kind] = { x: np.x - p.x, y: np.y - p.y }
+      redraw()
+    }
+    function onUp() {
+      window.removeEventListener('pointermove', onMove)
+      window.removeEventListener('pointerup', onUp)
+      const handlePx = toPx({ x: p.x + p[kind].x, y: p.y + p[kind].y })
+      const pointPx = toPx(p)
+      if (Math.hypot(handlePx.x - pointPx.x, handlePx.y - pointPx.y) <= HANDLE_REMOVE_THRESHOLD_PX) delete p[kind]
+      redraw()
+      commitPoints()
+    }
+    window.addEventListener('pointermove', onMove)
+    window.addEventListener('pointerup', onUp)
+  }
   function redraw() {
     let d = ''
     for (let i = 0; i <= CURVE_SAMPLES; i++) {
@@ -7554,15 +7594,41 @@ function buildArmLengthCurveWidget(row) {
       d += (i === 0 ? 'M' : 'L') + px.x.toFixed(2) + ',' + px.y.toFixed(2) + ' '
     }
     curvePath.setAttribute('d', d.trim())
+    handleEls.forEach((el) => svg.removeChild(el))
+    handleEls = []
     circles.forEach((c) => svg.removeChild(c))
-    circles = points.map((p, i) => {
+    circles = []
+    points.forEach((p, i) => {
+      const canHaveH1 = i < points.length - 1, canHaveH2 = i > 0
+      ;[['h1', canHaveH1], ['h2', canHaveH2]].forEach(([kind, canHave]) => {
+        if (!canHave) return
+        const isReal = !!p[kind]
+        const offset = p[kind] || { x: kind === 'h1' ? 0.08 : -0.08, y: 0 }
+        const px = toPx(p)
+        const hx = toPx({ x: p.x + offset.x, y: p.y + offset.y })
+        const line = document.createElementNS(svgNS, 'line')
+        line.setAttribute('x1', px.x); line.setAttribute('y1', px.y); line.setAttribute('x2', hx.x); line.setAttribute('y2', hx.y)
+        line.setAttribute('stroke', isReal ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.15)'); line.setAttribute('stroke-width', '1')
+        svg.appendChild(line)
+        handleEls.push(line)
+        const marker = document.createElementNS(svgNS, 'rect')
+        marker.setAttribute('x', hx.x - 3.5); marker.setAttribute('y', hx.y - 3.5); marker.setAttribute('width', 7); marker.setAttribute('height', 7)
+        marker.setAttribute('fill', '#e0a030')
+        marker.setAttribute('fill-opacity', isReal ? '1' : '0.35')
+        Object.assign(marker.style, { cursor: 'grab' })
+        marker.addEventListener('pointerdown', (downEv) => startHandleDrag(p, i, kind, downEv))
+        svg.appendChild(marker)
+        handleEls.push(marker)
+      })
       const px = toPx(p)
-      const c = document.createElementNS(svgNS, 'circle')
-      c.setAttribute('cx', px.x); c.setAttribute('cy', px.y); c.setAttribute('r', 5)
-      c.setAttribute('fill', 'var(--dp-accent, #7d8cff)')
-      Object.assign(c.style, { cursor: 'grab' })
+      const hit = document.createElementNS(svgNS, 'circle')
+      hit.setAttribute('cx', px.x); hit.setAttribute('cy', px.y); hit.setAttribute('r', CURVE_HIT_RADIUS_PX)
+      hit.setAttribute('fill', 'transparent')
+      Object.assign(hit.style, { cursor: 'grab' })
       let dragged = false
-      c.addEventListener('pointerdown', (downEv) => {
+      hit.addEventListener('pointerdown', (downEv) => {
+        if (downEv.altKey) { startHandleDrag(p, i, 'h1', downEv); return }
+        if (downEv.shiftKey) { startHandleDrag(p, i, 'h2', downEv); return }
         downEv.stopPropagation()
         dragged = false
         const isEndpoint = i === 0 || i === points.length - 1
@@ -7589,7 +7655,7 @@ function buildArmLengthCurveWidget(row) {
           commitPoints()
         }
       }
-      c.addEventListener('dblclick', (dblEv) => {
+      hit.addEventListener('dblclick', (dblEv) => {
         dblEv.stopPropagation()
         deletePointIfRemovable()
       })
@@ -7598,13 +7664,19 @@ function buildArmLengthCurveWidget(row) {
       // the curve always needs a value at both x=0 and x=1), added
       // alongside it rather than replacing it. preventDefault() suppresses
       // the browser's own native right-click context menu over the dot.
-      c.addEventListener('contextmenu', (ctxEv) => {
+      hit.addEventListener('contextmenu', (ctxEv) => {
         ctxEv.preventDefault()
         ctxEv.stopPropagation()
         deletePointIfRemovable()
       })
-      svg.appendChild(c)
-      return c
+      svg.appendChild(hit)
+      circles.push(hit)
+      const dot = document.createElementNS(svgNS, 'circle')
+      dot.setAttribute('cx', px.x); dot.setAttribute('cy', px.y); dot.setAttribute('r', 5)
+      dot.setAttribute('fill', 'var(--dp-accent, #7d8cff)')
+      dot.style.pointerEvents = 'none'
+      svg.appendChild(dot)
+      circles.push(dot)
     })
   }
   svg.addEventListener('click', (clickEv) => {
@@ -7766,8 +7838,13 @@ function buildWristSplayCurveWidget(row) {
   curvePath.setAttribute('fill', 'none'); curvePath.setAttribute('stroke', 'var(--dp-accent, #7d8cff)'); curvePath.setAttribute('stroke-width', '2')
   svg.appendChild(axisX); svg.appendChild(axisY); svg.appendChild(curvePath)
   const caption = elLocal('div', { fontSize: '10px', opacity: '0.7', marginTop: '3px', textAlign: 'center' }, { text: 'X: Distance From Cursor (%, Nearest→Farthest On-Screen Hand, Live)  ·  Y: Splay Fraction (0=Min End, 1=Max End)' })
+  // Bezier handles (2026-10-11) -- see buildArmLengthCurveWidget()'s own
+  // matching comment; same port, same reasoning, same verbatim source
+  // (buildGenericCurveWidget()).
+  const handleHint = elLocal('div', { fontSize: '9px', opacity: '0.5', marginTop: '2px', textAlign: 'center', fontStyle: 'italic' }, { text: 'Alt+Drag a point: Out Handle  ·  Shift+Drag a point: In Handle  ·  Drag a handle back onto its point: Remove' })
   row.appendChild(svg)
   row.appendChild(caption)
+  row.appendChild(handleHint)
 
   let points = [{ x: 0, y: 1 }, { x: 1, y: 0 }]
   try {
@@ -7788,6 +7865,34 @@ function buildWristSplayCurveWidget(row) {
     commitTextControl(input, JSON.stringify(points))
   }
   const CURVE_SAMPLES = 48
+  let handleEls = []
+  const HANDLE_REMOVE_THRESHOLD_PX = 6
+  const CURVE_HIT_RADIUS_PX = 16
+  function startHandleDrag(p, i, kind, downEv) {
+    downEv.stopPropagation()
+    downEv.preventDefault()
+    const canHave = kind === 'h1' ? i < points.length - 1 : i > 0
+    if (!canHave) return
+    if (!p[kind]) p[kind] = { x: kind === 'h1' ? 0.08 : -0.08, y: 0 }
+    function onMove(moveEv) {
+      const rect = svg.getBoundingClientRect()
+      if (rect.width <= 0 || rect.height <= 0) return
+      const np = fromPx(moveEv.clientX - rect.left, moveEv.clientY - rect.top)
+      p[kind] = { x: np.x - p.x, y: np.y - p.y }
+      redraw()
+    }
+    function onUp() {
+      window.removeEventListener('pointermove', onMove)
+      window.removeEventListener('pointerup', onUp)
+      const handlePx = toPx({ x: p.x + p[kind].x, y: p.y + p[kind].y })
+      const pointPx = toPx(p)
+      if (Math.hypot(handlePx.x - pointPx.x, handlePx.y - pointPx.y) <= HANDLE_REMOVE_THRESHOLD_PX) delete p[kind]
+      redraw()
+      commitPoints()
+    }
+    window.addEventListener('pointermove', onMove)
+    window.addEventListener('pointerup', onUp)
+  }
   function redraw() {
     let d = ''
     for (let i = 0; i <= CURVE_SAMPLES; i++) {
@@ -7797,15 +7902,41 @@ function buildWristSplayCurveWidget(row) {
       d += (i === 0 ? 'M' : 'L') + px.x.toFixed(2) + ',' + px.y.toFixed(2) + ' '
     }
     curvePath.setAttribute('d', d.trim())
+    handleEls.forEach((el) => svg.removeChild(el))
+    handleEls = []
     circles.forEach((c) => svg.removeChild(c))
-    circles = points.map((p, i) => {
+    circles = []
+    points.forEach((p, i) => {
+      const canHaveH1 = i < points.length - 1, canHaveH2 = i > 0
+      ;[['h1', canHaveH1], ['h2', canHaveH2]].forEach(([kind, canHave]) => {
+        if (!canHave) return
+        const isReal = !!p[kind]
+        const offset = p[kind] || { x: kind === 'h1' ? 0.08 : -0.08, y: 0 }
+        const px = toPx(p)
+        const hx = toPx({ x: p.x + offset.x, y: p.y + offset.y })
+        const line = document.createElementNS(svgNS, 'line')
+        line.setAttribute('x1', px.x); line.setAttribute('y1', px.y); line.setAttribute('x2', hx.x); line.setAttribute('y2', hx.y)
+        line.setAttribute('stroke', isReal ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.15)'); line.setAttribute('stroke-width', '1')
+        svg.appendChild(line)
+        handleEls.push(line)
+        const marker = document.createElementNS(svgNS, 'rect')
+        marker.setAttribute('x', hx.x - 3.5); marker.setAttribute('y', hx.y - 3.5); marker.setAttribute('width', 7); marker.setAttribute('height', 7)
+        marker.setAttribute('fill', '#e0a030')
+        marker.setAttribute('fill-opacity', isReal ? '1' : '0.35')
+        Object.assign(marker.style, { cursor: 'grab' })
+        marker.addEventListener('pointerdown', (downEv) => startHandleDrag(p, i, kind, downEv))
+        svg.appendChild(marker)
+        handleEls.push(marker)
+      })
       const px = toPx(p)
-      const c = document.createElementNS(svgNS, 'circle')
-      c.setAttribute('cx', px.x); c.setAttribute('cy', px.y); c.setAttribute('r', 5)
-      c.setAttribute('fill', 'var(--dp-accent, #7d8cff)')
-      Object.assign(c.style, { cursor: 'grab' })
+      const hit = document.createElementNS(svgNS, 'circle')
+      hit.setAttribute('cx', px.x); hit.setAttribute('cy', px.y); hit.setAttribute('r', CURVE_HIT_RADIUS_PX)
+      hit.setAttribute('fill', 'transparent')
+      Object.assign(hit.style, { cursor: 'grab' })
       let dragged = false
-      c.addEventListener('pointerdown', (downEv) => {
+      hit.addEventListener('pointerdown', (downEv) => {
+        if (downEv.altKey) { startHandleDrag(p, i, 'h1', downEv); return }
+        if (downEv.shiftKey) { startHandleDrag(p, i, 'h2', downEv); return }
         downEv.stopPropagation()
         dragged = false
         const isEndpoint = i === 0 || i === points.length - 1
@@ -7832,17 +7963,23 @@ function buildWristSplayCurveWidget(row) {
           commitPoints()
         }
       }
-      c.addEventListener('dblclick', (dblEv) => {
+      hit.addEventListener('dblclick', (dblEv) => {
         dblEv.stopPropagation()
         deletePointIfRemovable()
       })
-      c.addEventListener('contextmenu', (ctxEv) => {
+      hit.addEventListener('contextmenu', (ctxEv) => {
         ctxEv.preventDefault()
         ctxEv.stopPropagation()
         deletePointIfRemovable()
       })
-      svg.appendChild(c)
-      return c
+      svg.appendChild(hit)
+      circles.push(hit)
+      const dot = document.createElementNS(svgNS, 'circle')
+      dot.setAttribute('cx', px.x); dot.setAttribute('cy', px.y); dot.setAttribute('r', 5)
+      dot.setAttribute('fill', 'var(--dp-accent, #7d8cff)')
+      dot.style.pointerEvents = 'none'
+      svg.appendChild(dot)
+      circles.push(dot)
     })
   }
   svg.addEventListener('click', (clickEv) => {

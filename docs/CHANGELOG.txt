@@ -16833,6 +16833,15 @@ screen -- the point the screen-space click-function distance measures from. It u
 placed away from the mouse whenever that depth was not 0. It is also no longer hidden behind hands (depth test off, high render order).
 The look-at targets (shared and per feature) are unchanged. `main.js` `?v=318` -> `?v=319`.
 
+2026-10-11  -  (All 3 curve editors now have bezier handles)
+
+Direct request: "fix all curve editors in Handy Dandies so they all have the bezier handles." Arm Length and Wrist Splay's own curve widgets
+(buildArmLengthCurveWidget()/buildWristSplayCurveWidget()) were deliberately separate, older code that never got the bezier-handle interaction
+buildGenericCurveWidget() already had (see CLAUDE.md's 2026-09-20 gotcha, now corrected). Ported that interaction layer in verbatim -- the
+underlying curve math (evaluateArmLengthCurve()) already read a point's h1/h2 override unconditionally before this, so this is a UI-only change,
+not a math change. Verified live: Alt-drag and Shift-drag on real points of a real, already-tuned curve each created a real, persisted handle,
+and the rendered handle count matched the expected per-point eligibility math exactly. `main.js` `?v=319` -> `?v=320`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a
