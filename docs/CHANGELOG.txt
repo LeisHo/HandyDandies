@@ -17205,6 +17205,15 @@ z value than the arm base points z value, the former hand will render on top. If
  - Also fixed while in there: a Z mode chosen as a FALLBACK (Arm Base / Arm End / Palm Center) used the PRIMARY mode's rig node (renderOrderModeZ read cfg.renderOrderMode); it now uses its own mode.
  `main.js` `?v=352` -> `?v=353`.
 
+2026-10-11  -  (Render Order: Palm To Arm End; Easing Curve now also shapes the retransition)
+
+Direct requests: (1) a new option in the render-order dropdowns, "Palm To Arm End", "similar to palm to arm base, but uses the arm end point instead"; (2) "for easing, i assume that only applies to the triggered sequence and not the retransition. If that is correct, apply the easing to retransition as well".
+ - Palm To Arm End: identical rule to Palm To Arm Base, with the arm END (head of rHand = end of rForearmTwist) in place of the arm base: A goes above B when A's palm center is higher in Z than B's arm end (by more than 0.01) and B's palm is not higher than A's arm end; both higher -> the hand whose arm end is farther from
+   the cursor on screen (XY only) goes above; neither -> that level ties. Available in the Mode, Fallback and Fallback 2 dropdowns. `main.js` `?v=353` -> `?v=354`.
+ - Easing: confirmed from the code that you were right: the Easing Curve (a speed profile: progress -> speed between the function's slowest and fastest allowed duration) only shaped the forward ramp and a hold's stopping phase (documented limit in getEasingProfile()'s comment); the retransition used straight linear progress
+   (retProg). Now the retransition's progress is passed through the SAME easing profile (getEasingProfile / easingProfilePAt) before it drives the pose blend, the splay blend and the offset / rotation unwind, in both updateClickHoldPoseForHand() and updateClickPoseForHand(). Design choice (say if you want the other): the retransition keeps its own
+   duration (Retransition Speed, curve or flat) and the profile only reshapes progress WITHIN it, rather than replacing the duration with the profile's emergent total the way the forward ramp does. The phase still ends on the raw progress reaching 1, so nothing can stick short of the default. Still not shaped: Loop / Oscillate laps after the first.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

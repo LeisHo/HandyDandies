@@ -295,7 +295,8 @@ const RENDER_ORDER_MODE_OPTIONS = [
   { value: 'z', text: 'Z Position' }, { value: 'armBase', text: 'Arm Base' }, { value: 'armEnd', text: 'Arm End' }, { value: 'palmCenter', text: 'Palm Center' },
   { value: 'closest', text: 'Closest To Cursor (XY)' }, { value: 'farthest', text: 'Farthest From Cursor (XY)' },
   { value: 'closestZ', text: 'Closest To Cursor (XYZ)' }, { value: 'farthestZ', text: 'Farthest From Cursor (XYZ)' },
-  { value: 'palmToArm', text: 'Palm To Arm Base' }
+  { value: 'palmToArm', text: 'Palm To Arm Base' },
+  { value: 'palmToArmEnd', text: 'Palm To Arm End' }
 ]
 // Cursor tracking point (2026-10-11): the point on each hand that every cursor-tracking measurement (aim, palm angle, screen-space distances, splay / crop distances) is taken from. Computed at the hand's
 // no-tracking pose (so it does not chase the rotation it drives). hand._trk = world position, hand._trkXY = its screen-space distance to the cursor.
@@ -901,24 +902,32 @@ function renderOrderBone(hand, key) {
 // Per-frame render ordering across ALL hands (2026-10-11): the Mode, Fallback and Fallback 2 dropdowns are three levels of one sort; the sorted position becomes each hand's renderOrder (0..n-1, so the values stay small and
 // exact). A level is either a scalar priority (Z modes, cursor-distance modes; two hands tie when they agree to 0.01 world units) or "Palm To Arm Base", a pairwise rule: hand A goes above hand B when A's palm center is higher
 // in Z than B's arm base (by more than 0.01); when each hand's palm is higher than the other's arm base, the hand whose arm base is FARTHER from the cursor on screen (XY only, no Z) goes above; when neither is, the level ties.
-let roKeys = [null, null, null], roOrder = [], roPalmZ = null, roBaseZ = null, roBaseXY = null
+let roKeys = [null, null, null], roOrder = [], roPalmZ = null, roBaseZ = null, roBaseXY = null, roEndZ = null, roEndXY = null
 const _roV = new THREE.Vector3()
 function computeRenderOrderRanks() {
   const n = hands.length
   const levels = [cfg.renderOrderMode || 'z', cfg.renderOrderFallback || 'farthestZ', cfg.renderOrderFallback2 || 'farthestZ']
   const camSign = camera.position.z >= 0 ? 1 : -1
-  const usesPalm = levels.includes('palmToArm')
-  if (usesPalm) {
-    if (!roPalmZ || roPalmZ.length !== n) { roPalmZ = new Float64Array(n); roBaseZ = new Float64Array(n); roBaseXY = new Float64Array(n) }
+  const usesBase = levels.includes('palmToArm'), usesEnd = levels.includes('palmToArmEnd')
+  if (usesBase || usesEnd) {
+    if (!roPalmZ || roPalmZ.length !== n) { roPalmZ = new Float64Array(n); roBaseZ = new Float64Array(n); roBaseXY = new Float64Array(n); roEndZ = new Float64Array(n); roEndXY = new Float64Array(n) }
     for (let i = 0; i < n; i++) {
-      const h = hands[i], pb = renderOrderBone(h, 'palmCenter'), ab = renderOrderBone(h, 'armBase')
+      const h = hands[i], pb = renderOrderBone(h, 'palmCenter')
       roPalmZ[i] = (pb ? pb.matrixWorld.elements[14] : h.wrapper.position.z) * camSign
-      roBaseZ[i] = (ab ? ab.matrixWorld.elements[14] : h.wrapper.position.z) * camSign
-      roBaseXY[i] = ab ? cursorDistXY(_roV.setFromMatrixPosition(ab.matrixWorld)) : cursorDistXY(h.wrapper.position)
+      if (usesBase) {
+        const ab = renderOrderBone(h, 'armBase')
+        roBaseZ[i] = (ab ? ab.matrixWorld.elements[14] : h.wrapper.position.z) * camSign
+        roBaseXY[i] = ab ? cursorDistXY(_roV.setFromMatrixPosition(ab.matrixWorld)) : cursorDistXY(h.wrapper.position)
+      }
+      if (usesEnd) {
+        const eb = renderOrderBone(h, 'armEnd')
+        roEndZ[i] = (eb ? eb.matrixWorld.elements[14] : h.wrapper.position.z) * camSign
+        roEndXY[i] = eb ? cursorDistXY(_roV.setFromMatrixPosition(eb.matrixWorld)) : cursorDistXY(h.wrapper.position)
+      }
     }
   }
   for (let l = 0; l < 3; l++) {
-    if (levels[l] === 'palmToArm') { roKeys[l] = null; continue }
+    if (levels[l] === 'palmToArm' || levels[l] === 'palmToArmEnd') { roKeys[l] = null; continue }
     if (!roKeys[l] || roKeys[l].length !== n) roKeys[l] = new Float64Array(n)
     const k = roKeys[l]
     for (let i = 0; i < n; i++) k[i] = Math.round(renderOrderPriority(hands[i], levels[l]) / 0.01)
@@ -929,10 +938,12 @@ function computeRenderOrderRanks() {
     for (let l = 0; l < 3; l++) {
       const k = roKeys[l]
       if (k) { const d = k[a] - k[b]; if (d !== 0) return d; continue }
-      const aOver = roPalmZ[a] - roBaseZ[b] > TOL, bOver = roPalmZ[b] - roBaseZ[a] > TOL
+      // Palm To Arm Base / Arm End: compare each hand's palm Z with the OTHER hand's arm base (or arm end) Z
+      const zArr = levels[l] === 'palmToArmEnd' ? roEndZ : roBaseZ, xyArr = levels[l] === 'palmToArmEnd' ? roEndXY : roBaseXY
+      const aOver = roPalmZ[a] - zArr[b] > TOL, bOver = roPalmZ[b] - zArr[a] > TOL
       if (aOver && !bOver) return 1
       if (bOver && !aOver) return -1
-      if (aOver && bOver) { const d = Math.round(roBaseXY[a] / TOL) - Math.round(roBaseXY[b] / TOL); if (d !== 0) return d }
+      if (aOver && bOver) { const d = Math.round(xyArr[a] / TOL) - Math.round(xyArr[b] / TOL); if (d !== 0) return d }
     }
     return a - b // fully tied: keep a stable, fixed order (hand index)
   }
@@ -10324,6 +10335,8 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     )
     // Live (2026-10-11): progress is accumulated in refreshLiveDistanceState() from the hand's current Retransition Start Time / Speed curves.
     const progress = chp.retProg ?? (elapsed < chp.retransitionDelay ? 0 : THREE.MathUtils.clamp((elapsed - chp.retransitionDelay) / speedMs, 0, 1))
+    // Easing Curve also shapes the retransition (2026-10-11, direct request): same curve / same profile as the forward ramp, but the retransition keeps its OWN duration (Retransition Speed); the profile only reshapes the progress within it.
+    const easedProgress = cfg[`${p}EasingCurveEnabled`] ? easingProfilePAt(getEasingProfile(p, !!chp.retransitionIsTween, trig), progress) : progress
     // CORRECTED 2026-09-27 (2nd round, real measured bug -- direct report
     // "there is always a jump on the trigger after a hold release," a
     // follow-up on the splay fix above) -- retransition used to target
@@ -10348,7 +10361,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     // follow the live tuning instead of the saved default in that case) --
     // `poseDefaultValues` is untouched everywhere else (Loading/Pose/Tween
     // Preview, dcHold's own "always starts from default" exception).
-    const values = lerpPoseValues(chp.retransitionStart, cfg, progress)
+    const values = lerpPoseValues(chp.retransitionStart, cfg, easedProgress)
     // CORRECTED 2026-09-27 -- see snapshotOffsetRotationAccumForRetransition()'s
     // own comment. Blends from wherever splay actually was the instant
     // retransition began (`chp.retransitionFromSplayDeg`) toward the LIVE
@@ -10357,13 +10370,13 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     // and this hand goes idle, splay already equals what idle-tracking
     // would show, so idle repose picks it up with no residual jump.
     const liveSplayTarget = splayDegForHand(hand, live, minLiveDist, liveDistRange)
-    const splayNow = THREE.MathUtils.lerp(chp.retransitionFromSplayDeg ?? chp.frozenSplayDeg, liveSplayTarget, progress)
+    const splayNow = THREE.MathUtils.lerp(chp.retransitionFromSplayDeg ?? chp.frozenSplayDeg, liveSplayTarget, easedProgress)
     applyPoseValuesToHand(hand, values, splayNow)
     // Item 6 (2026-09-27): unwinds the FULL accumulated offset/rotation
     // (snapshotted at retransition-start by snapshotOffsetRotationAccumForRetransition())
     // back to zero, not just this function's own last increment -- and
     // clears the real accumulator once progress reaches 1.
-    applyOffsetRotationRetransition(hand, progress, chp.retransitionOffsetAccumStart, chp.retransitionRotationAccumStart)
+    applyOffsetRotationRetransition(hand, easedProgress, chp.retransitionOffsetAccumStart, chp.retransitionRotationAccumStart)
     if (progress >= 1) chp.phase = 'idle' // fully settled at default -- stop overriding, normal cfg-driven posing (inert here since it only re-applies on slider change, not every frame) silently regains control
   }
 }
@@ -11242,19 +11255,21 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
     const speedMs = Math.max(cfg[`${p}RetransitionSpeedCurveEnabled`] ? cp.retransitionSpeedMs : cfg[`${p}RetransitionSpeedMs`], 1)
     // Live (2026-10-11): accumulated in refreshLiveDistanceState() from the hand's current Retransition Start Time / Speed curves.
     const progress = cp.retProg ?? (elapsed < cp.retransitionDelay ? 0 : THREE.MathUtils.clamp((elapsed - cp.retransitionDelay) / speedMs, 0, 1))
+    // Easing Curve also shapes the retransition (2026-10-11, direct request): same profile as the forward ramp, retransition keeps its own duration.
+    const easedProgress = cfg[`${p}EasingCurveEnabled`] ? easingProfilePAt(getEasingProfile(p, isSequenceOrChainMode(p), clickPoseTriggers[p]), progress) : progress
     // CORRECTED 2026-09-27 -- see updateClickHoldPoseForHand()'s own
     // matching 'retransition'-phase comment for the full reasoning.
-    const values = lerpPoseValues(cp.retransitionStart, cfg, progress)
+    const values = lerpPoseValues(cp.retransitionStart, cfg, easedProgress)
     // CORRECTED 2026-09-27 -- see updateClickHoldPoseForHand()'s own
     // matching 'retransition'-phase comment for the full reasoning.
     const liveSplayTarget = splayDegForHand(hand, live, minLiveDist, liveDistRange)
-    const splayNow = THREE.MathUtils.lerp(cp.retransitionFromSplayDeg ?? cp.frozenSplayDeg, liveSplayTarget, progress)
+    const splayNow = THREE.MathUtils.lerp(cp.retransitionFromSplayDeg ?? cp.frozenSplayDeg, liveSplayTarget, easedProgress)
     applyPoseValuesToHand(hand, values, splayNow)
     // Item 6 (2026-09-27): unwinds the FULL accumulated offset/rotation
     // (snapshotted above at retransition-start) back to zero, not just
     // this function's own last increment -- and clears the real
     // accumulator once progress reaches 1, a genuinely fresh start.
-    applyOffsetRotationRetransition(hand, progress, cp.retransitionOffsetAccumStart, cp.retransitionRotationAccumStart)
+    applyOffsetRotationRetransition(hand, easedProgress, cp.retransitionOffsetAccumStart, cp.retransitionRotationAccumStart)
     if (progress >= 1) cp.phase = 'idle'
   }
 }
