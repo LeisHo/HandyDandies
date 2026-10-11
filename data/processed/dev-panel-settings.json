@@ -35,7 +35,7 @@
       "armRotationUseDepth": false,
       "armRotationTargetDepth": 28,
       "armRotationDefault": 94,
-      "armRotationCurveEnabled": false,
+      "armRotationCurveEnabled": true,
       "armRotationCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.8080220886433459,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.23551813533871668,\"y\":0}}]",
       "armRotationDamping": 0.02,
       "palmFacesCursor": true,
@@ -8858,7 +8858,7 @@
       "armRotationUseDepth": true,
       "armRotationTargetDepth": 5.6,
       "armRotationDefault": 94,
-      "armRotationCurveEnabled": false,
+      "armRotationCurveEnabled": true,
       "armRotationCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.8080220886433459,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.23551813533871668,\"y\":0}}]",
       "armRotationDamping": 0.02,
       "palmFacesCursor": true,
@@ -17681,7 +17681,7 @@
       "armRotationUseDepth": true,
       "armRotationTargetDepth": 3.4,
       "armRotationDefault": 94,
-      "armRotationCurveEnabled": false,
+      "armRotationCurveEnabled": true,
       "armRotationCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.8080220886433459,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.23551813533871668,\"y\":0}}]",
       "armRotationDamping": 0.02,
       "palmFacesCursor": true,
@@ -29399,7 +29399,7 @@
                 "type": "group",
                 "group": {
                   "key": "Responsive Arm Rotation",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -29553,7 +29553,7 @@
                 "type": "group",
                 "group": {
                   "key": "New Group (4)",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -29612,7 +29612,7 @@
             "subgroups": [
               {
                 "key": "Responsive Arm Rotation",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -29757,7 +29757,7 @@
               },
               {
                 "key": "New Group (4)",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -30701,7 +30701,7 @@
               "type": "group",
               "group": {
                 "key": "Responsive Arm Rotation",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -30855,7 +30855,7 @@
               "type": "group",
               "group": {
                 "key": "New Group (4)",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -30914,7 +30914,7 @@
           "subgroups": [
             {
               "key": "Responsive Arm Rotation",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -31059,7 +31059,7 @@
             },
             {
               "key": "New Group (4)",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
