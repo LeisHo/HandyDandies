@@ -9351,7 +9351,7 @@
       "renderOrderFallback2Except": "closest",
       "renderOrderFlipLock": true,
       "fieldRows": 45,
-      "fieldCols": 28,
+      "fieldCols": 25,
       "rowSpacing": 8.5,
       "columnSpacing": 10,
       "handScale": 1.2,
