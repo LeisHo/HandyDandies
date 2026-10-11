@@ -776,7 +776,7 @@ function tryStartField() {
   // whatever comes next; don't treat this comment's own reasoning above
   // as the settled explanation.
   renderer.compile(scene, camera)
-  window.__debug = { curveByDomain, get domains() { return { xyAll: [xyAllMinDist, xyAllDistRange], splayAll: [splayAllMin, splayAllRange], cropAll: [cropAllMin, cropAllRange], restAll: [restAllMinDist, restAllDistRange], live: [liveFieldMinDist, liveFieldDistRange], splay: [splayFieldMin, splayFieldRange], crop: [cropFieldMin, cropFieldRange], xy: [xyFieldMinDist, xyFieldDistRange], rest: [restFieldMinDist, restFieldDistRange] } }, modelBaseFrameQ, computeBaseRotationQuat, cloneBaseRb, makeClipRig, updateClipRigPlanes, setClipRigT, updateOnScreenFlags, evaluateArmLengthCurve, THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose, resolveTweenSegmentsWithAnchor, lerpTweenSegments, lerpLoopSegments, isHoldEntry, updateLoadingPreviewWristClip, lerpPoseValues, get loadingPreviewRenderer() { return loadingPreviewRenderer }, get loadingPreviewScene() { return loadingPreviewScene }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, get handBoundsCenterLocal() { return handBoundsCenterLocal }, multiPointCommit, multiPointEligibleFunctions, get multiPointActiveTouchCount() { return multiPointActiveTouchCount }, get multiPointSessionFiredPoseId() { return multiPointSessionFiredPoseId }, detectPoseJumps, get poseJumpLogEntries() { return poseJumpLogEntries }, applyCurlToSkeletonReference, handLogTriggerLabel, applyAllFingerCurls, syncCameraPanelFromLive, animSpeedMs, chainSequenceCount, applyFieldBounds, cursorDistXY, hexBrightnessPct, toonThresholdForMidBrightness }
+  window.__debug = { applyCameraOrientation, syncCameraPanelFromLive, curveByDomain, get domains() { return { xyAll: [xyAllMinDist, xyAllDistRange], splayAll: [splayAllMin, splayAllRange], cropAll: [cropAllMin, cropAllRange], restAll: [restAllMinDist, restAllDistRange], live: [liveFieldMinDist, liveFieldDistRange], splay: [splayFieldMin, splayFieldRange], crop: [cropFieldMin, cropFieldRange], xy: [xyFieldMinDist, xyFieldDistRange], rest: [restFieldMinDist, restFieldDistRange] } }, modelBaseFrameQ, computeBaseRotationQuat, cloneBaseRb, makeClipRig, updateClipRigPlanes, setClipRigT, updateOnScreenFlags, evaluateArmLengthCurve, THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose, resolveTweenSegmentsWithAnchor, lerpTweenSegments, lerpLoopSegments, isHoldEntry, updateLoadingPreviewWristClip, lerpPoseValues, get loadingPreviewRenderer() { return loadingPreviewRenderer }, get loadingPreviewScene() { return loadingPreviewScene }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, get handBoundsCenterLocal() { return handBoundsCenterLocal }, multiPointCommit, multiPointEligibleFunctions, get multiPointActiveTouchCount() { return multiPointActiveTouchCount }, get multiPointSessionFiredPoseId() { return multiPointSessionFiredPoseId }, detectPoseJumps, get poseJumpLogEntries() { return poseJumpLogEntries }, applyCurlToSkeletonReference, handLogTriggerLabel, applyAllFingerCurls, syncCameraPanelFromLive, animSpeedMs, chainSequenceCount, applyFieldBounds, cursorDistXY, hexBrightnessPct, toonThresholdForMidBrightness }
   loadingEl.classList.add('hidden')
   // The loading-preview canvas is a top-level sibling of #loading now
   // (2026-09-17, decoupled specifically so this moment doesn't force it
@@ -1772,6 +1772,12 @@ const DEV_GROUPS = [
       { key: 'cameraY', label: 'Camera Y Position (x)', type: 'slider', min: -300, max: 300, step: 0.5, def: 13.373156794075216, perDevice: true, onChange: (v) => applyCameraControl('cameraY', v) },
       { key: 'cameraZ', label: 'Camera Z Position (x)', type: 'slider', min: 1, max: 500, step: 0.5, def: 259.74194092345493, perDevice: true, onChange: (v) => applyCameraControl('cameraZ', v) },
       { key: 'cameraFov', label: 'Field Of View (Deg)', type: 'slider', min: 15, max: 90, step: 1, def: 35, perDevice: true, onChange: (v) => applyCameraControl('cameraFov', v) },
+      // Camera orientation (2026-10-11, direct request: "provide camera yaw roll pitch sliders"). Turn the camera IN PLACE (its position and distance to the pan target stay put):
+      // Yaw turns it left/right about the world Y axis, Pitch tilts it up/down, Roll spins it about its own view axis (Euler order YXZ, the usual first-person camera). 0/0/0 looks straight
+      // down -Z with +Y up. Two-way bound like the position sliders: dragging the view, a Saved Camera or Default updates them (syncCameraPanelFromLive()).
+      { key: 'cameraYaw', label: 'Camera Yaw (Deg)', type: 'slider', min: -180, max: 180, step: 0.5, def: 1.464, perDevice: true, onChange: () => applyCameraOrientation() },
+      { key: 'cameraPitch', label: 'Camera Pitch (Deg)', type: 'slider', min: -89, max: 89, step: 0.5, def: -2.946, perDevice: true, onChange: () => applyCameraOrientation() },
+      { key: 'cameraRoll', label: 'Camera Roll (Deg)', type: 'slider', min: -180, max: 180, step: 0.5, def: 0, perDevice: true, onChange: () => applyCameraOrientation() },
       // Direct 2-way binding with scroll/pinch zoom, same pattern as the
       // X/Y/Z sliders above: this slider both SETS the camera's distance
       // to its own pan target (setCameraDistance(), below) and is kept in
@@ -2263,7 +2269,7 @@ const cfg = initDevPanel(DEV_GROUPS, {
   // (normally) not redrawing at all while nothing has actually changed.
   onAnyValueChange: () => { sceneNeedsRedraw = true },
   // Undo/Redo leaves the live camera sliders alone unless the step was itself a camera-slider edit (2026-10-06).
-  undoLiveKeys: ['cameraX', 'cameraY', 'cameraZ', 'cameraFov', 'cameraZoom'],
+  undoLiveKeys: ['cameraX', 'cameraY', 'cameraZ', 'cameraFov', 'cameraZoom', 'cameraYaw', 'cameraPitch', 'cameraRoll'],
   // Keep the startup cache in step with what was just saved.
   onSave: () => writeStartupCache()
 })
@@ -2389,6 +2395,18 @@ function applyCameraControl(key, value) {
   camera.updateProjectionMatrix()
   controls.update()
 }
+// Camera Yaw / Pitch / Roll sliders -> the live camera. OrbitControls (rotate disabled) always re-aims the camera at controls.target using camera.up, so the orientation is set
+// the only way it can be: move the pan target to where the new view direction points (same distance as before, so Zoom does not change) and set camera.up to the rolled up vector.
+const _camEuler = new THREE.Euler(0, 0, 0, 'YXZ'), _camQ = new THREE.Quaternion(), _camQ2 = new THREE.Quaternion(), _camFwd = new THREE.Vector3(), _camAxisZ = new THREE.Vector3(0, 0, 1)
+function applyCameraOrientation() {
+  _camEuler.set(THREE.MathUtils.degToRad(cfg.cameraPitch || 0), THREE.MathUtils.degToRad(cfg.cameraYaw || 0), THREE.MathUtils.degToRad(cfg.cameraRoll || 0), 'YXZ')
+  _camQ.setFromEuler(_camEuler)
+  const dist = Math.max(camera.position.distanceTo(controls.target), 1e-3)
+  _camFwd.set(0, 0, -1).applyQuaternion(_camQ)
+  controls.target.copy(camera.position).addScaledVector(_camFwd, dist)
+  camera.up.set(0, 1, 0).applyQuaternion(_camQ)
+  controls.update()
+}
 // PERFORMANCE (2026-09-27, direct report: "when i pause the hands, how
 // come the ui is still slow. its no longer animating") -- the same class
 // of bug the 2026-09-21 composer.render() throttle fixed (see animate()'s
@@ -2414,6 +2432,7 @@ function applyCameraControl(key, value) {
 // frames where the camera is stationary, while still updating within one
 // frame the instant it genuinely moves.
 let __lastSyncedCameraX = null, __lastSyncedCameraY = null, __lastSyncedCameraZ = null, __lastSyncedCameraFov = null, __lastSyncedCameraZoom = null
+let __lastSyncedCameraYaw = null, __lastSyncedCameraPitch = null, __lastSyncedCameraRoll = null
 function syncCameraPanelFromLive() {
   const x = camera.position.x, y = camera.position.y, z = camera.position.z, fov = camera.fov, zoom = camera.position.distanceTo(controls.target)
   if (x !== __lastSyncedCameraX) { syncValue('cameraX', x); __lastSyncedCameraX = x }
@@ -2421,6 +2440,11 @@ function syncCameraPanelFromLive() {
   if (z !== __lastSyncedCameraZ) { syncValue('cameraZ', z); __lastSyncedCameraZ = z }
   if (fov !== __lastSyncedCameraFov) { syncValue('cameraFov', fov); __lastSyncedCameraFov = fov }
   if (zoom !== __lastSyncedCameraZoom) { syncValue('cameraZoom', zoom); __lastSyncedCameraZoom = zoom }
+  _camEuler.setFromQuaternion(camera.quaternion, 'YXZ')
+  const yaw = Math.round(THREE.MathUtils.radToDeg(_camEuler.y) * 1000) / 1000, pitch = Math.round(THREE.MathUtils.radToDeg(_camEuler.x) * 1000) / 1000, roll = Math.round(THREE.MathUtils.radToDeg(_camEuler.z) * 1000) / 1000
+  if (yaw !== __lastSyncedCameraYaw) { syncValue('cameraYaw', yaw); __lastSyncedCameraYaw = yaw }
+  if (pitch !== __lastSyncedCameraPitch) { syncValue('cameraPitch', pitch); __lastSyncedCameraPitch = pitch }
+  if (roll !== __lastSyncedCameraRoll) { syncValue('cameraRoll', roll); __lastSyncedCameraRoll = roll }
 }
 
 const composer = new EffectComposer(renderer)
@@ -5256,7 +5280,7 @@ buildPoseDefaultButton()
 // `camera`/`controls` are declared later in the file (Camera group's own
 // runtime setup) -- fine, since none of these functions actually RUN
 // until a user interacts with the panel, well after full module init.
-const CAMERA_PRESET_KEYS = ['cameraX', 'cameraY', 'cameraZ', 'cameraFov', 'cameraZoom']
+const CAMERA_PRESET_KEYS = ['cameraX', 'cameraY', 'cameraZ', 'cameraFov', 'cameraZoom', 'cameraRoll'] // yaw / pitch follow from position + target; roll is the one orientation value they do not determine
 const CAMERA_KEY_DEFAULTS = {}
 DEV_GROUPS.find((g) => g.title === 'Camera').controls.forEach((c) => {
   if (CAMERA_PRESET_KEYS.includes(c.key)) CAMERA_KEY_DEFAULTS[c.key] = c.def
@@ -5332,12 +5356,18 @@ function applyCameraPreset(rawItem) {
   )
   camera.fov = item.cameraFov !== undefined ? item.cameraFov : CAMERA_KEY_DEFAULTS.cameraFov
   camera.updateProjectionMatrix()
+  // Roll: aim with world-up first to get the yaw/pitch orientation, then spin about the view axis by the saved roll (a preset without one means 0).
+  camera.up.set(0, 1, 0)
+  camera.lookAt(controls.target)
+  _camQ.copy(camera.quaternion).multiply(_camQ2.setFromAxisAngle(_camAxisZ, THREE.MathUtils.degToRad(item.cameraRoll !== undefined ? item.cameraRoll : 0)))
+  camera.up.set(0, 1, 0).applyQuaternion(_camQ)
   controls.update()
   syncValue('cameraX', camera.position.x)
   syncValue('cameraY', camera.position.y)
   syncValue('cameraZ', camera.position.z)
   syncValue('cameraFov', camera.fov)
   syncValue('cameraZoom', camera.position.distanceTo(controls.target))
+  syncCameraPanelFromLive() // yaw / pitch / roll follow the new view
 }
 function getSelectedSavedCameraItem() {
   const selectedRow = document.querySelector('.dp-row[data-key="savedCameras"] .dp-list-picker-row-selected')

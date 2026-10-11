@@ -16961,6 +16961,19 @@ default ON (which is what the code already did since the on-screen change).
  - Not given a checkbox: Start Distance Curve (its Min/Max are explicit world-unit sliders, not "the farthest hand") and Easing (a function of progress, not distance).
  `main.js` `?v=328` -> `?v=329`.
 
+2026-10-11  -  (Camera Yaw / Pitch / Roll sliders)
+
+Direct request: provide camera yaw, roll and pitch sliders. Camera group > Camera Yaw (-180..180), Camera Pitch (-89..89) and Camera Roll (-180..180), per device, 0.5 steps.
+ - Orientation model: Euler order YXZ, the usual first-person camera. 0 / 0 / 0 looks straight down -Z with +Y up; Yaw turns left/right about world Y, Pitch tilts up/down, Roll spins about the
+   view axis. The camera turns IN PLACE: its position and its distance to the pan target (the Zoom slider) do not change.
+ - Mechanism: OrbitControls has rotation disabled and re-aims the camera at controls.target using camera.up every update, so applyCameraOrientation() moves the pan target to where the new
+   direction points and sets camera.up to the rolled up vector. Panning and zooming keep the orientation.
+ - Two-way: syncCameraPanelFromLive() reads the camera quaternion back into the three sliders every frame (cached, 0.001 deg), so a Saved Camera, Default, Max-Extents snap or the X/Y/Z position
+   sliders all show up in them. Existing users: their view is unchanged -- the sliders just display it (default 1.464 / -2.946 / 0 is the code-default camera's own orientation).
+ - Saved Cameras and Default now also store the roll (cameraRoll in CAMERA_PRESET_KEYS); yaw and pitch follow from position + target. The three sliders are in undoLiveKeys (Undo leaves them alone).
+ - Limits: pitch is held to +-89 (straight up/down makes the camera's up direction undefined); the cursor ray still hits the z = 0 plane only while the camera looks toward it.
+ `main.js` `?v=329` -> `?v=330`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a
