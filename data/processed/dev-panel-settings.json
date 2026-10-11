@@ -276,10 +276,10 @@
       "wristBend": 0,
       "wristSplay": 0,
       "wristRotation": 0,
-      "modelRotX": 0,
+      "modelRotX": 90,
       "modelRotY": 0,
       "modelRotZ": 0,
-      "baseRotationX": 180,
+      "baseRotationX": 1,
       "baseRotationY": 0,
       "baseRotationZ": 0,
       "poseOffsetX": 0,
@@ -6163,10 +6163,10 @@
           "wristBend": 0,
           "wristSplay": 0,
           "wristRotation": 0,
-          "modelRotX": 0,
+          "modelRotX": 90,
           "modelRotY": 0,
           "modelRotZ": 0,
-          "baseRotationX": 180,
+          "baseRotationX": 1,
           "baseRotationY": 0,
           "baseRotationZ": 0,
           "poseOffsetX": 0,
@@ -6626,9 +6626,9 @@
           "group": "FIST ROTATE"
         }
       ],
-      "cameraX": 6.504385906807879,
-      "cameraY": 9.506408948421305,
-      "cameraZ": 260.74570207939803,
+      "cameraX": 6.504385906807987,
+      "cameraY": 9.506408948421404,
+      "cameraZ": 260.74570207940235,
       "cameraFov": 15,
       "cameraYaw": 1.429,
       "cameraPitch": -2.087,
@@ -9348,10 +9348,10 @@
       "wristBend": 0,
       "wristSplay": 0,
       "wristRotation": 0,
-      "modelRotX": 0,
+      "modelRotX": 90,
       "modelRotY": 0,
       "modelRotZ": 0,
-      "baseRotationX": 180,
+      "baseRotationX": 1,
       "baseRotationY": 0,
       "baseRotationZ": 0,
       "poseOffsetX": 0,
@@ -15235,10 +15235,10 @@
           "wristBend": 0,
           "wristSplay": 0,
           "wristRotation": 0,
-          "modelRotX": 0,
+          "modelRotX": 90,
           "modelRotY": 0,
           "modelRotZ": 0,
-          "baseRotationX": 180,
+          "baseRotationX": 1,
           "baseRotationY": 0,
           "baseRotationZ": 0,
           "poseOffsetX": 0,
@@ -18420,10 +18420,10 @@
       "wristBend": 0,
       "wristSplay": 0,
       "wristRotation": 0,
-      "modelRotX": 0,
+      "modelRotX": 90,
       "modelRotY": 0,
       "modelRotZ": 0,
-      "baseRotationX": 180,
+      "baseRotationX": 1,
       "baseRotationY": 0,
       "baseRotationZ": 0,
       "poseOffsetX": 0,
@@ -24307,10 +24307,10 @@
           "wristBend": 0,
           "wristSplay": 0,
           "wristRotation": 0,
-          "modelRotX": 0,
+          "modelRotX": 90,
           "modelRotY": 0,
           "modelRotZ": 0,
-          "baseRotationX": 180,
+          "baseRotationX": 1,
           "baseRotationY": 0,
           "baseRotationZ": 0,
           "poseOffsetX": 0,
@@ -29439,7 +29439,7 @@
                 "type": "group",
                 "group": {
                   "key": "Whole-Hand Rotation & Thumb",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -29818,7 +29818,7 @@
               },
               {
                 "key": "Whole-Hand Rotation & Thumb",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -30176,7 +30176,7 @@
           "type": "group",
           "group": {
             "key": "Cursor Tracking",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -30840,7 +30840,7 @@
               "type": "group",
               "group": {
                 "key": "Whole-Hand Rotation & Thumb",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -31219,7 +31219,7 @@
             },
             {
               "key": "Whole-Hand Rotation & Thumb",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -31571,7 +31571,7 @@
         },
         {
           "key": "Cursor Tracking",
-          "collapsed": false,
+          "collapsed": true,
           "locked": true,
           "items": [
             {
@@ -187313,8 +187313,8 @@
     "desktop": {
       "left": 922.4000244140625,
       "top": 104,
-      "width": 625.6000366210938,
-      "height": 455.5874938964844
+      "width": 628.7999877929688,
+      "height": 457.1875
     }
   }
 }
