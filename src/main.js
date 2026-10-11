@@ -262,6 +262,8 @@ let fieldBounds = null // { x:[min,max], y:[..], z:[..] } or null when no limit 
 // Per cursor-tracking feature: the cursor target at THAT feature's own depth (2026-10-11), plus its field distance domain.
 const _trackTargetArm = new THREE.Vector3(), _trackTargetPalm = new THREE.Vector3(), _trackTargetSplay = new THREE.Vector3(), _trackTargetCrop = new THREE.Vector3()
 let splayFieldMin = 0, splayFieldRange = 0.001, cropFieldMin = 0, cropFieldRange = 0.001
+// The same domains over ALL hands (not just the visible ones), used by the "Visible Hands Only" checkboxes when they are off.
+let xyAllMinDist = 0, xyAllDistRange = 0.001, restAllMinDist = 0, restAllDistRange = 0.001, splayAllMin = 0, splayAllRange = 0.001, cropAllMin = 0, cropAllRange = 0.001
 // Whole-Hand Rotation at Base (ported from HANDO, 2026-10-11): orientation of the hand MESH's own local axes relative to the model root
 // (product of the local rotations from the skinned mesh up to the scene root, measured at load) and scratch for the base rotation.
 const modelBaseFrameQ = new THREE.Quaternion(), _baseFrameInv = new THREE.Quaternion()
@@ -774,7 +776,7 @@ function tryStartField() {
   // whatever comes next; don't treat this comment's own reasoning above
   // as the settled explanation.
   renderer.compile(scene, camera)
-  window.__debug = { get domains() { return { live: [liveFieldMinDist, liveFieldDistRange], splay: [splayFieldMin, splayFieldRange], crop: [cropFieldMin, cropFieldRange], xy: [xyFieldMinDist, xyFieldDistRange], rest: [restFieldMinDist, restFieldDistRange] } }, modelBaseFrameQ, computeBaseRotationQuat, cloneBaseRb, makeClipRig, updateClipRigPlanes, setClipRigT, updateOnScreenFlags, evaluateArmLengthCurve, THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose, resolveTweenSegmentsWithAnchor, lerpTweenSegments, lerpLoopSegments, isHoldEntry, updateLoadingPreviewWristClip, lerpPoseValues, get loadingPreviewRenderer() { return loadingPreviewRenderer }, get loadingPreviewScene() { return loadingPreviewScene }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, get handBoundsCenterLocal() { return handBoundsCenterLocal }, multiPointCommit, multiPointEligibleFunctions, get multiPointActiveTouchCount() { return multiPointActiveTouchCount }, get multiPointSessionFiredPoseId() { return multiPointSessionFiredPoseId }, detectPoseJumps, get poseJumpLogEntries() { return poseJumpLogEntries }, applyCurlToSkeletonReference, handLogTriggerLabel, applyAllFingerCurls, syncCameraPanelFromLive, animSpeedMs, chainSequenceCount, applyFieldBounds, cursorDistXY, hexBrightnessPct, toonThresholdForMidBrightness }
+  window.__debug = { curveByDomain, get domains() { return { xyAll: [xyAllMinDist, xyAllDistRange], splayAll: [splayAllMin, splayAllRange], cropAll: [cropAllMin, cropAllRange], restAll: [restAllMinDist, restAllDistRange], live: [liveFieldMinDist, liveFieldDistRange], splay: [splayFieldMin, splayFieldRange], crop: [cropFieldMin, cropFieldRange], xy: [xyFieldMinDist, xyFieldDistRange], rest: [restFieldMinDist, restFieldDistRange] } }, modelBaseFrameQ, computeBaseRotationQuat, cloneBaseRb, makeClipRig, updateClipRigPlanes, setClipRigT, updateOnScreenFlags, evaluateArmLengthCurve, THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose, resolveTweenSegmentsWithAnchor, lerpTweenSegments, lerpLoopSegments, isHoldEntry, updateLoadingPreviewWristClip, lerpPoseValues, get loadingPreviewRenderer() { return loadingPreviewRenderer }, get loadingPreviewScene() { return loadingPreviewScene }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, get handBoundsCenterLocal() { return handBoundsCenterLocal }, multiPointCommit, multiPointEligibleFunctions, get multiPointActiveTouchCount() { return multiPointActiveTouchCount }, get multiPointSessionFiredPoseId() { return multiPointSessionFiredPoseId }, detectPoseJumps, get poseJumpLogEntries() { return poseJumpLogEntries }, applyCurlToSkeletonReference, handLogTriggerLabel, applyAllFingerCurls, syncCameraPanelFromLive, animSpeedMs, chainSequenceCount, applyFieldBounds, cursorDistXY, hexBrightnessPct, toonThresholdForMidBrightness }
   loadingEl.classList.add('hidden')
   // The loading-preview canvas is a top-level sibling of #loading now
   // (2026-09-17, decoupled specifically so this moment doesn't force it
@@ -947,6 +949,8 @@ const DEV_GROUPS = [
       // tracking block for what these 4 controls actually gate, and
       // buildArmRotationWidgets() for the curve-graph/range-slider UI.
       { key: 'armRotationEnabled', label: 'Responsive Arm Rotation (Master On/Off)', type: 'checkbox', def: true, perDevice: true },
+      // Visible Hands Only (2026-10-11): on = the Distance Curve's x = 1 is the farthest hand ON SCREEN (off-screen hands are extrapolated); off = the farthest of ALL hands.
+      { key: 'armRotationVisibleOnly', label: 'Arm Rotation Curve: Visible Hands Only', type: 'checkbox', def: true, perDevice: true },
       // Use Cursor Target Depth (2026-10-11, direct request): on = aim at / measure to the 3D cursor target (depth from Cursor Target Depth); off = screen XY only.
       { key: 'armRotationUseDepth', label: 'Arm Rotation Uses Cursor Target Depth', type: 'checkbox', def: true, perDevice: true },
       { key: 'armRotationTargetDepth', label: 'Arm Rotation Cursor Target Depth (World Units Z)', type: 'slider', min: -300, max: 300, step: 0.1, def: 60.6, defMobile: 89.7, defLandscape: 40.8, perDevice: true },
@@ -990,6 +994,7 @@ const DEV_GROUPS = [
       // prior mechanism this replaced). Default off so nothing changes
       // until opted in.
       { key: 'palmFacesCursor', label: 'Palm Faces Cursor', type: 'checkbox', def: true, perDevice: true },
+      { key: 'palmRotationVisibleOnly', label: 'Palm Rotation Curve: Visible Hands Only', type: 'checkbox', def: true, perDevice: true },
       // The palm angle itself is already a screen-XY compass; this only switches the distance its Palm Rotation Distance Curve reads.
       { key: 'palmRotationUseDepth', label: 'Palm Rotation Uses Cursor Target Depth', type: 'checkbox', def: true, perDevice: true },
       { key: 'palmRotationTargetDepth', label: 'Palm Rotation Cursor Target Depth (World Units Z)', type: 'slider', min: -300, max: 300, step: 0.1, def: 60.6, defMobile: 89.7, defLandscape: 40.8, perDevice: true },
@@ -1625,6 +1630,7 @@ const DEV_GROUPS = [
       // = smoother. Applied in animate()'s own per-hand loop, not here.
       { key: 'armLengthDamping', label: 'Wrist Cropping Damping (x)', type: 'slider', min: 0.02, max: 1, step: 0.01, def: 1 },
       { key: 'armLengthUseDepth', label: 'Wrist Cropping Uses Cursor Target Depth', type: 'checkbox', def: true },
+      { key: 'armLengthVisibleOnly', label: 'Wrist Cropping Curve: Visible Hands Only', type: 'checkbox', def: true },
       { key: 'armLengthTargetDepth', label: 'Wrist Cropping Cursor Target Depth (World Units Z)', type: 'slider', min: -300, max: 300, step: 0.1, def: 60.6, defMobile: 89.7, defLandscape: 40.8, perDevice: true }
     ]
   },
@@ -1663,6 +1669,7 @@ const DEV_GROUPS = [
     title: 'Responsive Wrist Splay',
     controls: [
       { key: 'wristSplayResponsiveEnabled', label: 'Responsive Wrist Splay (Master On/Off)', type: 'checkbox', def: true },
+      { key: 'wristSplayVisibleOnly', label: 'Wrist Splay Curve: Visible Hands Only', type: 'checkbox', def: true },
       // PERFORMANCE (2026-09-16): the idle-repose block this gates is the
       // confirmed sustained frame-cost bottleneck (see updateRenderOrder()'s
       // own comment) -- measured 25-42ms/frame at 240 hands, dominating the
@@ -4574,6 +4581,7 @@ function offsetExtraControls(p, parseFn) {
     rows.push({ key: `${p}CursorOffset${ax}Range`, label: `Cursor Offset ${ax} Min / Max (World Units)`, type: 'text', def: '{"min":0,"max":0}', onChange: () => parseFn(p) })
   })
   rows.push({ key: `${p}CameraOffsetEnabled`, label: 'Offset To Camera On/Off', type: 'checkbox', def: false, onChange: () => updateOffsetRotationVisibility(p) })
+  rows.push({ key: `${p}CameraOffsetVisibleOnly`, label: 'Offset To Camera Curves: Visible Hands Only', type: 'checkbox', def: true }) // see the other Visible Hands Only rows
   ;['X', 'Y', 'Z'].forEach((ax) => {
     // Per-axis on/off (2026-10-04, direct request) -- default ON so
     // turning the group on behaves exactly as it did before these existed.
@@ -4652,6 +4660,8 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       // the "offset min max" the request asked for. Only relevant in Cursor
       // Offset mode; see updateOffsetRotationVisibility()'s own extension.
       { key: `${p}CursorOffsetDistanceCurveEnabled`, label: 'Cursor Offset Distance Curve On/Off', type: 'checkbox', def: false, onChange: () => updateOffsetRotationVisibility(p) },
+      // Visible Hands Only (2026-10-11): on = this curve's X axis runs from the nearest to the farthest hand ON SCREEN (hands past that read x > 1 and are extrapolated); off = nearest to farthest of ALL hands.
+      { key: `${p}CursorOffsetVisibleOnly`, label: 'Cursor Offset Curves: Visible Hands Only', type: 'checkbox', def: true },
       { key: `${p}CursorOffsetDistanceCurve`, label: 'Cursor Offset Distance Curve (Distance -> Offset)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickHoldConfig(p) },
       { key: `${p}CursorOffsetDistanceCurveRange`, label: 'Cursor Offset Min / Max Distance (World Units)', type: 'text', def: '{"min":-50,"max":50}', onChange: () => parseClickHoldConfig(p) },
       ...offsetExtraControls(p, parseClickHoldConfig),
@@ -4795,6 +4805,8 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       // transition. Range 50-2000ms is a disclosed judgment call (no
       // measured basis), matching the Tween trio's own min below.
       { key: `${p}SpeedCurveEnabled`, label: 'Animation Speed Curve On/Off', type: 'checkbox', def: false, onChange: () => updateSingleTimingGateVisibility(p) },
+      // Visible Hands Only (2026-10-11): on = this curve's X axis runs from the nearest to the farthest hand ON SCREEN (hands past that read x > 1 and are extrapolated); off = nearest to farthest of ALL hands.
+      { key: `${p}SpeedCurveVisibleOnly`, label: 'Animation Speed Curve: Visible Hands Only', type: 'checkbox', def: true },
       { key: `${p}SpeedCurve`, label: 'Animation Speed Curve (Distance -> Speed)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickHoldConfig(p) },
       { key: `${p}SpeedCurveRange`, label: 'Min / Max Speed (Ms)', type: 'text', def: '{"min":500,"max":1500}', onChange: () => parseClickHoldConfig(p) },
       // Start Time Curve on/off -- direct spec item ("Start Time Curve
@@ -4803,6 +4815,8 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       // (delay 0) -- same "wraps existing" gate pattern as Retransition
       // on/off below, not a new curve shape of its own.
       { key: `${p}StartTimeCurveEnabled`, label: 'Start Time Curve On/Off', type: 'checkbox', def: true, onChange: () => updateSingleTimingGateVisibility(p) },
+      // Visible Hands Only (2026-10-11): on = this curve's X axis runs from the nearest to the farthest hand ON SCREEN (hands past that read x > 1 and are extrapolated); off = nearest to farthest of ALL hands.
+      { key: `${p}StartTimeCurveVisibleOnly`, label: 'Start Time Curve: Visible Hands Only', type: 'checkbox', def: true },
       { key: `${p}StartTimeCurve`, label: 'Start Time Curve (Distance -> Start Time)', type: 'text', def: defaults.startTimeCurve ?? '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickHoldConfig(p) },
       { key: `${p}StartTimeRange`, label: 'Min / Max Start Time (Ms)', type: 'text', def: defaults.startTimeRange ?? '{"min":0,"max":300}', onChange: () => parseClickHoldConfig(p) },
       // Start Distance Curve -- direct spec item (2026-09-27): "add a
@@ -4851,12 +4865,16 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       // the moment retransition begins (same "frozen at trigger time"
       // philosophy as every other curve in this file).
       { key: `${p}RetransitionSpeedCurveEnabled`, label: 'Retransition Speed Curve On/Off', type: 'checkbox', def: false, onChange: () => updateSingleTimingGateVisibility(p) },
+      // Visible Hands Only (2026-10-11): on = this curve's X axis runs from the nearest to the farthest hand ON SCREEN (hands past that read x > 1 and are extrapolated); off = nearest to farthest of ALL hands.
+      { key: `${p}RetransitionSpeedCurveVisibleOnly`, label: 'Retransition Speed Curve: Visible Hands Only', type: 'checkbox', def: true },
       { key: `${p}RetransitionSpeedCurve`, label: 'Retransition Speed Curve (Distance -> Speed)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickHoldConfig(p) },
       { key: `${p}RetransitionSpeedCurveRange`, label: 'Retransition Min / Max Speed (Ms)', type: 'text', def: '{"min":50,"max":25000}', onChange: () => parseClickHoldConfig(p) },
       // Retransition Start Time Curve On/Off -- direct spec item
       // (2026-09-27), same reasoning as makeClickPoseGroup()'s own
       // matching control comment.
       { key: `${p}RetransitionStartTimeCurveEnabled`, label: 'Retransition Start Time Curve On/Off', type: 'checkbox', def: true, onChange: () => updateSingleTimingGateVisibility(p) },
+      // Visible Hands Only (2026-10-11): on = this curve's X axis runs from the nearest to the farthest hand ON SCREEN (hands past that read x > 1 and are extrapolated); off = nearest to farthest of ALL hands.
+      { key: `${p}RetransitionStartTimeCurveVisibleOnly`, label: 'Retransition Start Time Curve: Visible Hands Only', type: 'checkbox', def: true },
       { key: `${p}RetransitionStartTimeCurve`, label: 'Retransition Start Time Curve (Distance -> Start Time)', type: 'text', def: defaults.retransitionStartTimeCurve ?? '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickHoldConfig(p) },
       { key: `${p}RetransitionStartTimeRange`, label: 'Retransition Min / Max Start Time (Ms)', type: 'text', def: defaults.retransitionStartTimeRange ?? '{"min":0,"max":300}', onChange: () => parseClickHoldConfig(p) },
       // Tween mode's own dedicated retransition trio -- direct request
@@ -4939,11 +4957,15 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       // comment for how RetransitionEnabled now ALSO governs Sequence
       // mode's own post-decay behavior.
       { key: `${p}TweenStopStartTimeCurveEnabled`, label: 'Tween Stop Start Time Curve On/Off', type: 'checkbox', def: false, onChange: () => updateTweenStopGateVisibility(p) },
+      // Visible Hands Only (2026-10-11): on = this curve's X axis runs from the nearest to the farthest hand ON SCREEN (hands past that read x > 1 and are extrapolated); off = nearest to farthest of ALL hands.
+      { key: `${p}TweenStopStartTimeCurveVisibleOnly`, label: 'Tween Stop Start Time Curve: Visible Hands Only', type: 'checkbox', def: true },
       { key: `${p}TweenStopStartTimeCurve`, label: 'Tween Stop Start Time Curve (Distance -> Start Time)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickHoldConfig(p) },
       { key: `${p}TweenStopStartTimeRange`, label: 'Tween Stop Min / Max Start Time (Ms)', type: 'text', def: '{"min":0,"max":300}', onChange: () => parseClickHoldConfig(p) },
       { key: `${p}TweenStopDelayEnabled`, label: 'Tween Stop Delay On/Off', type: 'checkbox', def: false, onChange: () => updateTweenStopGateVisibility(p) },
       { key: `${p}TweenStopDelayMs`, label: 'Tween Stop Delay (Ms)', type: 'slider', min: 0, max: 5000, step: 10, def: 0 },
       { key: `${p}TweenStopDelayCurveEnabled`, label: 'Tween Stop Delay Curve On/Off', type: 'checkbox', def: false, onChange: () => updateTweenStopGateVisibility(p) },
+      // Visible Hands Only (2026-10-11): on = this curve's X axis runs from the nearest to the farthest hand ON SCREEN (hands past that read x > 1 and are extrapolated); off = nearest to farthest of ALL hands.
+      { key: `${p}TweenStopDelayCurveVisibleOnly`, label: 'Tween Stop Delay Curve: Visible Hands Only', type: 'checkbox', def: true },
       { key: `${p}TweenStopDelayCurve`, label: 'Tween Stop Delay Curve (Distance -> Delay)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickHoldConfig(p) },
       { key: `${p}TweenStopDelayRange`, label: 'Tween Stop Min / Max Delay (Ms)', type: 'text', def: '{"min":0,"max":2000}', onChange: () => parseClickHoldConfig(p) }
     ])
@@ -5021,6 +5043,8 @@ function makeClickPoseGroup(p, title, defaults = {}) {
       // the "offset min max" the request asked for. Only relevant in Cursor
       // Offset mode; see updateOffsetRotationVisibility()'s own extension.
       { key: `${p}CursorOffsetDistanceCurveEnabled`, label: 'Cursor Offset Distance Curve On/Off', type: 'checkbox', def: false, onChange: () => updateOffsetRotationVisibility(p) },
+      // Visible Hands Only (2026-10-11): on = this curve's X axis runs from the nearest to the farthest hand ON SCREEN (hands past that read x > 1 and are extrapolated); off = nearest to farthest of ALL hands.
+      { key: `${p}CursorOffsetVisibleOnly`, label: 'Cursor Offset Curves: Visible Hands Only', type: 'checkbox', def: true },
       { key: `${p}CursorOffsetDistanceCurve`, label: 'Cursor Offset Distance Curve (Distance -> Offset)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickPoseConfig(p) },
       { key: `${p}CursorOffsetDistanceCurveRange`, label: 'Cursor Offset Min / Max Distance (World Units)', type: 'text', def: '{"min":-50,"max":50}', onChange: () => parseClickPoseConfig(p) },
       ...offsetExtraControls(p, parseClickPoseConfig),
@@ -5121,9 +5145,13 @@ function makeClickPoseGroup(p, title, defaults = {}) {
       // for the full reasoning (shared word-for-word, both factories
       // added this the same way).
       { key: `${p}SpeedCurveEnabled`, label: 'Animation Speed Curve On/Off', type: 'checkbox', def: false, onChange: () => updateSingleTimingGateVisibility(p) },
+      // Visible Hands Only (2026-10-11): on = this curve's X axis runs from the nearest to the farthest hand ON SCREEN (hands past that read x > 1 and are extrapolated); off = nearest to farthest of ALL hands.
+      { key: `${p}SpeedCurveVisibleOnly`, label: 'Animation Speed Curve: Visible Hands Only', type: 'checkbox', def: true },
       { key: `${p}SpeedCurve`, label: 'Animation Speed Curve (Distance -> Speed)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickPoseConfig(p) },
       { key: `${p}SpeedCurveRange`, label: 'Min / Max Speed (Ms)', type: 'text', def: '{"min":500,"max":1500}', onChange: () => parseClickPoseConfig(p) },
       { key: `${p}StartTimeCurveEnabled`, label: 'Start Time Curve On/Off', type: 'checkbox', def: true, onChange: () => updateSingleTimingGateVisibility(p) },
+      // Visible Hands Only (2026-10-11): on = this curve's X axis runs from the nearest to the farthest hand ON SCREEN (hands past that read x > 1 and are extrapolated); off = nearest to farthest of ALL hands.
+      { key: `${p}StartTimeCurveVisibleOnly`, label: 'Start Time Curve: Visible Hands Only', type: 'checkbox', def: true },
       { key: `${p}StartTimeCurve`, label: 'Start Time Curve (Distance -> Start Time)', type: 'text', def: defaults.startTimeCurve ?? '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickPoseConfig(p) },
       { key: `${p}StartTimeRange`, label: 'Min / Max Start Time (Ms)', type: 'text', def: defaults.startTimeRange ?? '{"min":0,"max":300}', onChange: () => parseClickPoseConfig(p) },
       // Start Distance Curve -- direct spec item (2026-09-27), same
@@ -5141,6 +5169,8 @@ function makeClickPoseGroup(p, title, defaults = {}) {
       // reasoning (shared word-for-word, both factories added this the
       // same way).
       { key: `${p}RetransitionSpeedCurveEnabled`, label: 'Retransition Speed Curve On/Off', type: 'checkbox', def: false, onChange: () => updateSingleTimingGateVisibility(p) },
+      // Visible Hands Only (2026-10-11): on = this curve's X axis runs from the nearest to the farthest hand ON SCREEN (hands past that read x > 1 and are extrapolated); off = nearest to farthest of ALL hands.
+      { key: `${p}RetransitionSpeedCurveVisibleOnly`, label: 'Retransition Speed Curve: Visible Hands Only', type: 'checkbox', def: true },
       { key: `${p}RetransitionSpeedCurve`, label: 'Retransition Speed Curve (Distance -> Speed)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickPoseConfig(p) },
       { key: `${p}RetransitionSpeedCurveRange`, label: 'Retransition Min / Max Speed (Ms)', type: 'text', def: '{"min":50,"max":25000}', onChange: () => parseClickPoseConfig(p) },
       // Retransition Start Time Curve On/Off -- direct spec item
@@ -5154,6 +5184,8 @@ function makeClickPoseGroup(p, title, defaults = {}) {
       // entirely, same convention `${p}StartTimeCurveEnabled` already uses
       // for the forward phase's own equivalent).
       { key: `${p}RetransitionStartTimeCurveEnabled`, label: 'Retransition Start Time Curve On/Off', type: 'checkbox', def: true, onChange: () => updateSingleTimingGateVisibility(p) },
+      // Visible Hands Only (2026-10-11): on = this curve's X axis runs from the nearest to the farthest hand ON SCREEN (hands past that read x > 1 and are extrapolated); off = nearest to farthest of ALL hands.
+      { key: `${p}RetransitionStartTimeCurveVisibleOnly`, label: 'Retransition Start Time Curve: Visible Hands Only', type: 'checkbox', def: true },
       { key: `${p}RetransitionStartTimeCurve`, label: 'Retransition Start Time Curve (Distance -> Start Time)', type: 'text', def: defaults.retransitionStartTimeCurve ?? '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickPoseConfig(p) },
       { key: `${p}RetransitionStartTimeRange`, label: 'Retransition Min / Max Start Time (Ms)', type: 'text', def: defaults.retransitionStartTimeRange ?? '{"min":0,"max":300}', onChange: () => parseClickPoseConfig(p) }
     ])
@@ -7195,9 +7227,10 @@ function updateArmRotationGateVisibility() {
 // numerically larger.
 // Wrist Splay Use Cursor Target Depth (2026-10-11): off = screen-space XY distance only, on = the 3D distance to the cursor target.
 function splayDegForHand(hand, live, minLiveDist, liveDistRange) {
-  if (cfg.wristSplayUseDepth === false) return computeResponsiveWristSplayDeg(handXYDist(hand), xyFieldMinDist, xyFieldDistRange)
+  const vis = cfg.wristSplayVisibleOnly !== false // Visible Hands Only: on = on-screen hands set the domain, off = all hands
+  if (cfg.wristSplayUseDepth === false) return computeResponsiveWristSplayDeg(handXYDist(hand), vis ? xyFieldMinDist : xyAllMinDist, vis ? xyFieldDistRange : xyAllDistRange)
   if (hand._splayDist === undefined) return computeResponsiveWristSplayDeg(live, minLiveDist, liveDistRange)
-  return computeResponsiveWristSplayDeg(hand._splayDist, splayFieldMin, splayFieldRange) // distance to the cursor at Wrist Splay's own depth
+  return computeResponsiveWristSplayDeg(hand._splayDist, vis ? splayFieldMin : splayAllMin, vis ? splayFieldRange : splayAllRange) // distance to the cursor at Wrist Splay's own depth
 }
 function computeResponsiveWristSplayDeg(distanceToCursor, minLiveDist, liveDistRange) {
   if (!cfg.wristSplayResponsiveEnabled) return 0
@@ -8580,7 +8613,7 @@ function computeOffsetXY(hand, p) {
     // own Range (the "offset min max" the request asked for).
     const trig = clickHoldPoseTriggers[p] || clickPoseTriggers[p]
     const dist = (cfg[`${p}CursorOffsetDistanceCurveEnabled`] && trig)
-      ? computeStartDelayMs(handRestDist(hand), restFieldMinDist, restFieldDistRange, trig.cursorOffsetDistanceCurveParsed, trig.cursorOffsetDistanceRangeParsed)
+      ? curveByRestDomain(p, handRestDist(hand), trig.cursorOffsetDistanceCurveParsed, trig.cursorOffsetDistanceRangeParsed)
       : (cfg[`${p}CursorOffsetDistance`] || 0)
     // Per-axis extra distance (2026-10-02, direct request: "for cursor
     // offset mode... also provide the 2 inputs for the 3 axes
@@ -8593,9 +8626,9 @@ function computeOffsetXY(hand, p) {
     let exX = 0, exY = 0, exZ = 0
     if (axisSlots) {
       const handDist = handRestDist(hand)
-      exX = evalOffsetAxisSlot(axisSlots.X, handDist)
-      exY = evalOffsetAxisSlot(axisSlots.Y, handDist)
-      exZ = evalOffsetAxisSlot(axisSlots.Z, handDist)
+      exX = evalOffsetAxisSlot(axisSlots.X, handDist, p)
+      exY = evalOffsetAxisSlot(axisSlots.Y, handDist, p)
+      exZ = evalOffsetAxisSlot(axisSlots.Z, handDist, p)
     }
     return { x: (rightComp / len3) * (dist + exX), y: (upComp / len3) * (dist + exY), z: (forwardComp / len3) * (dist + exZ) }
   }
@@ -8625,9 +8658,9 @@ const ZERO_OFFSET = Object.freeze({ x: 0, y: 0, z: 0 })
 // One axis's Curve + Min/Max pair -> world-unit value for a hand at
 // `handDist` from the cursor (same live-field-normalized X domain as the
 // Cursor Offset Distance Curve). A 0..0 range short-circuits to 0.
-function evalOffsetAxisSlot(slot, handDist) {
+function evalOffsetAxisSlot(slot, handDist, p) {
   if (!slot || !slot.range || (slot.range.min === 0 && slot.range.max === 0)) return 0
-  return computeStartDelayMs(handDist, restFieldMinDist, restFieldDistRange, slot.curve, slot.range)
+  return curveByRestDomain(p, handDist, slot.curve, slot.range)
 }
 // "Offset To Camera" (REBUILT AGAIN 2026-10-04, direct spec): X, Y and Z are
 // WORLD axes. For each axis that is switched on, the hand moves ALONG THAT
@@ -8651,8 +8684,9 @@ const _cameraOffsetWorld = new THREE.Vector3()
 // domain as every other click-function curve (handXYDist / xyFieldMinDist / xyFieldDistRange). Because the offset itself moves
 // the hand, the amount now feeds back on itself a little: the norm is re-read once per frame (refreshLiveDistanceState) and
 // that one stored value is used by the live ramp and by every bake that frame, so nothing snaps at a bake.
-function captureCameraOffsetNorm(hand) {
-  return Math.max((handXYDist(hand) - xyFieldMinDist) / xyFieldDistRange, 0) // > 1 for hands beyond the farthest on-screen hand (extrapolated)
+function captureCameraOffsetNorm(hand, p) {
+  const vis = cfg[`${p}CameraOffsetVisibleOnly`] !== false // Visible Hands Only: on = visible-hands domain, off = all hands
+  return Math.max((handXYDist(hand) - (vis ? xyFieldMinDist : xyAllMinDist)) / (vis ? xyFieldDistRange : xyAllDistRange), 0) // > 1 for hands beyond the farthest on-screen hand (extrapolated)
 }
 function cameraSlotValue(slot, norm) {
   if (!slot || !slot.range) return 0
@@ -9155,6 +9189,17 @@ function loopPoseValuesBeyondLap(p, chp, trig, elapsedSegments) {
   const segments = trig.loopPoses.length
   return lerpLoopSequence(trig.loopPoses, (segments - 1) + elapsedSegments)
 }
+// Same as computeStartDelayMs(), but the nearest-to-farthest domain is chosen by this function's own "Visible Hands Only" checkbox (`${p}${flag}`, default on):
+// on = hands that are on screen, off = all hands. xy = current-position screen distance (every click-function curve).
+function curveByDomain(p, flag, dist, curveParsed, rangeParsed) {
+  const vis = cfg[`${p}${flag}`] !== false
+  return computeStartDelayMs(dist, vis ? xyFieldMinDist : xyAllMinDist, vis ? xyFieldDistRange : xyAllDistRange, curveParsed, rangeParsed)
+}
+// Cursor Offset measures from the REST position, so it uses the rest domain.
+function curveByRestDomain(p, dist, curveParsed, rangeParsed) {
+  const vis = cfg[`${p}CursorOffsetVisibleOnly`] !== false
+  return computeStartDelayMs(dist, vis ? restFieldMinDist : restAllMinDist, vis ? restFieldDistRange : restAllDistRange, curveParsed, rangeParsed)
+}
 function computeStartDelayMs(distanceToCursor, minLiveDist, liveDistRange, curveParsed, rangeParsed) {
   const normDist = Math.max((distanceToCursor - minLiveDist) / liveDistRange, 0) // > 1 for hands beyond the farthest on-screen hand (extrapolated)
   const curveY = THREE.MathUtils.clamp(evaluateArmLengthCurve(curveParsed, normDist), 0, 1)
@@ -9373,7 +9418,7 @@ function beginTweenReleaseStop(hand, chp, trig, p, values, live, minLiveDist, li
   // distance-based stagger for retransition either, same convention
   // `${p}StartTimeCurveEnabled` already uses for the forward phase.
   chp.retransitionDelay = cfg[`${p}RetransitionStartTimeCurveEnabled`] === false ? 0
-    : computeStartDelayMs(handXYDist(hand), xyFieldMinDist, xyFieldDistRange, trig.tweenRetransitionCurveParsed, trig.tweenRetransitionRangeParsed)
+    : curveByDomain(p, 'RetransitionStartTimeCurveVisibleOnly', handXYDist(hand), trig.tweenRetransitionCurveParsed, trig.tweenRetransitionRangeParsed)
   chp.retransitionIsTween = true
   chp.phase = 'retransition'
   chp.releasePending = false
@@ -9488,8 +9533,8 @@ function releaseHandFromOtherFunctions(hand, exceptId) {
 // "nominal clock" advances (fwdNom / loopNom / lapNom) instead of re-dividing a wall-clock elapsed time, and the
 // retransition progress is accumulated (retProg) rather than recomputed from elapsed / speed. With a curve off, or the
 // cursor not moving, every number equals the old frozen one. Cursor Offset was already live.
-function liveCurveValue(hand, curveParsed, rangeParsed) {
-  return computeStartDelayMs(handXYDist(hand), xyFieldMinDist, xyFieldDistRange, curveParsed, rangeParsed)
+function liveCurveValue(hand, curveParsed, rangeParsed, p, flag) {
+  return curveByDomain(p, flag, handXYDist(hand), curveParsed, rangeParsed)
 }
 function liveTempo(nominalMs, liveMs) {
   if (!(nominalMs > 0) || !(liveMs > 0)) return 1
@@ -9497,7 +9542,7 @@ function liveTempo(nominalMs, liveMs) {
 }
 function liveStartDelayMs(hand, p, trig, isTween) {
   if (cfg[`${p}StartTimeCurveEnabled`] === false) return 0
-  return isTween ? liveCurveValue(hand, trig.tweenStartCurveParsed, trig.tweenStartRangeParsed) : liveCurveValue(hand, trig.startCurveParsed, trig.startRangeParsed)
+  return isTween ? liveCurveValue(hand, trig.tweenStartCurveParsed, trig.tweenStartRangeParsed, p, 'StartTimeCurveVisibleOnly') : liveCurveValue(hand, trig.startCurveParsed, trig.startRangeParsed, p, 'StartTimeCurveVisibleOnly')
 }
 // kind: 'hold' (chp state) or 'pose' (cp state). Called at the top of each per-hand update, before any phase logic.
 function refreshLiveDistanceState(st, hand, p, trig, now, kind) {
@@ -9509,14 +9554,14 @@ function refreshLiveDistanceState(st, hand, p, trig, now, kind) {
   const dt = Math.max(now - (st.liveTick ?? now), 0)
   st.liveTick = now
   // Values that are plain functions of distance (no rate): Offset To Camera amount, Start Distance tween amount.
-  if (cfg[`${p}CameraOffsetEnabled`]) st.frozenOffsetNorm = captureCameraOffsetNorm(hand)
+  if (cfg[`${p}CameraOffsetEnabled`]) st.frozenOffsetNorm = captureCameraOffsetNorm(hand, p)
   if (cfg[`${p}StartDistanceCurveEnabled`]) {
     const cap = computeTweenFractionCap(handXYDist(hand), cfg[`${p}StartDistanceMin`], cfg[`${p}StartDistanceMax`], trig.startDistanceCurveParsed)
     if (cap !== null) st.frozenTweenFractionCap = cap // out of range keeps the last cap rather than snapping
   }
   // Rates. Animation Speed Curve -> tempo of the forward / loop / lap clocks (nominal speed = the value at commit).
   let tempo = 1
-  if (cfg[`${p}SpeedCurveEnabled`] && st.frozenSpeedMs > 0 && st.phase !== 'retransition') tempo = liveTempo(st.frozenSpeedMs, liveCurveValue(hand, trig.speedCurveParsed, trig.speedRangeParsed))
+  if (cfg[`${p}SpeedCurveEnabled`] && st.frozenSpeedMs > 0 && st.phase !== 'retransition') tempo = liveTempo(st.frozenSpeedMs, liveCurveValue(hand, trig.speedCurveParsed, trig.speedRangeParsed, p, 'SpeedCurveVisibleOnly'))
   st.liveTempo = tempo
   if (st.phase === 'forward') {
     st.fwdNom = (st.fwdNom ?? 0) + dt * tempo
@@ -9526,8 +9571,8 @@ function refreshLiveDistanceState(st, hand, p, trig, now, kind) {
     if (!(st.sequenceHoldEndTime && now < st.sequenceHoldEndTime)) st.lapNom = (st.lapNom ?? 0) + dt * tempo
   } else if (kind === 'hold' && st.phase === 'stopping') {
     // Tween Stop Start Time / Delay curves, live.
-    st.stoppingStartDelay = cfg[`${p}TweenStopStartTimeCurveEnabled`] ? liveCurveValue(hand, trig.tweenStopStartCurveParsed, trig.tweenStopStartRangeParsed) : 0
-    st.stoppingDelayMs = Math.max(cfg[`${p}TweenStopDelayCurveEnabled`] ? liveCurveValue(hand, trig.tweenStopDelayCurveParsed, trig.tweenStopDelayRangeParsed) : (cfg[`${p}TweenStopDelayMs`] || 0), 1)
+    st.stoppingStartDelay = cfg[`${p}TweenStopStartTimeCurveEnabled`] ? liveCurveValue(hand, trig.tweenStopStartCurveParsed, trig.tweenStopStartRangeParsed, p, 'TweenStopStartTimeCurveVisibleOnly') : 0
+    st.stoppingDelayMs = Math.max(cfg[`${p}TweenStopDelayCurveEnabled`] ? liveCurveValue(hand, trig.tweenStopDelayCurveParsed, trig.tweenStopDelayRangeParsed, p, 'TweenStopDelayCurveVisibleOnly') : (cfg[`${p}TweenStopDelayMs`] || 0), 1)
   } else if (st.phase === 'retransition') {
     if (st._retSeenStart !== st.retransitionStartTime) { // a new retransition just began
       st._retSeenStart = st.retransitionStartTime
@@ -9537,9 +9582,9 @@ function refreshLiveDistanceState(st, hand, p, trig, now, kind) {
     st.retElapsed += dt
     const isTw = kind === 'hold' && !!st.retransitionIsTween
     const delay = cfg[`${p}RetransitionStartTimeCurveEnabled`] === false ? 0
-      : (isTw ? liveCurveValue(hand, trig.tweenRetransitionCurveParsed, trig.tweenRetransitionRangeParsed) : liveCurveValue(hand, trig.retransitionCurveParsed, trig.retransitionRangeParsed))
+      : (isTw ? liveCurveValue(hand, trig.tweenRetransitionCurveParsed, trig.tweenRetransitionRangeParsed, p, 'RetransitionStartTimeCurveVisibleOnly') : liveCurveValue(hand, trig.retransitionCurveParsed, trig.retransitionRangeParsed, p, 'RetransitionStartTimeCurveVisibleOnly'))
     const speedMs = Math.max(cfg[`${p}RetransitionSpeedCurveEnabled`]
-      ? (isTw ? liveCurveValue(hand, trig.tweenRetransitionSpeedCurveParsed, trig.tweenRetransitionSpeedRangeParsed) : liveCurveValue(hand, trig.retransitionSpeedCurveParsed, trig.retransitionSpeedRangeParsed))
+      ? (isTw ? liveCurveValue(hand, trig.tweenRetransitionSpeedCurveParsed, trig.tweenRetransitionSpeedRangeParsed, p, 'RetransitionSpeedCurveVisibleOnly') : liveCurveValue(hand, trig.retransitionSpeedCurveParsed, trig.retransitionSpeedRangeParsed, p, 'RetransitionSpeedCurveVisibleOnly'))
       : (isTw ? cfg[`${p}TweenRetransitionSpeedMs`] : cfg[`${p}RetransitionSpeedMs`]), 1)
     st.retransitionDelay = delay
     const eff = Math.min(dt, st.retElapsed - delay)
@@ -9610,8 +9655,8 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
       // Mode.
       const startTimeCurveOff = cfg[`${p}StartTimeCurveEnabled`] === false
       const delay = startTimeCurveOff ? 0 : (isTweenStart
-        ? computeStartDelayMs(handXYDist(hand), xyFieldMinDist, xyFieldDistRange, trig.tweenStartCurveParsed, trig.tweenStartRangeParsed)
-        : computeStartDelayMs(handXYDist(hand), xyFieldMinDist, xyFieldDistRange, trig.startCurveParsed, trig.startRangeParsed))
+        ? curveByDomain(p, 'StartTimeCurveVisibleOnly', handXYDist(hand), trig.tweenStartCurveParsed, trig.tweenStartRangeParsed)
+        : curveByDomain(p, 'StartTimeCurveVisibleOnly', handXYDist(hand), trig.startCurveParsed, trig.startRangeParsed))
       chp.pendingClaimAt = now + delay
       chp.pendingPressAt = now; chp.pendingIsTween = isTweenStart // live Start Time (refreshLiveDistanceState)
       chp.pendingTweenFractionCap = tweenFractionCap
@@ -9627,9 +9672,9 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
       // same "frozen at arm time" treatment as the splay/delay above, not
       // recomputed live mid-transition. See makeClickHoldPoseGroup()'s own
       // control comment for the full reasoning.
-      chp.pendingFrozenOffsetNorm = captureCameraOffsetNorm(hand)
+      chp.pendingFrozenOffsetNorm = captureCameraOffsetNorm(hand, p)
       chp.pendingFrozenHandQuat = hand.wrapper.quaternion.clone() // Hand Axes Offset (2026-10-04)
-      chp.pendingFrozenSpeedMs = cfg[`${p}SpeedCurveEnabled`] ? computeStartDelayMs(handXYDist(hand), xyFieldMinDist, xyFieldDistRange, trig.speedCurveParsed, trig.speedRangeParsed) : 0
+      chp.pendingFrozenSpeedMs = cfg[`${p}SpeedCurveEnabled`] ? curveByDomain(p, 'SpeedCurveVisibleOnly', handXYDist(hand), trig.speedCurveParsed, trig.speedRangeParsed) : 0
     }
   }
   if (chp.pendingClaimAt && now >= chp.pendingClaimAt) {
@@ -10255,10 +10300,10 @@ function endClickHoldPose(p) {
       // (closest hands first), not whether it happens at all. The retransition
       // delay (added separately below) provides stagger for retransition phase.
       chp.stoppingStartDelay = cfg[`${p}TweenStopStartTimeCurveEnabled`]
-        ? computeStartDelayMs(dists[i], minD, range, trig.tweenStopStartCurveParsed, trig.tweenStopStartRangeParsed)
+        ? curveByDomain(p, 'TweenStopStartTimeCurveVisibleOnly', dists[i], trig.tweenStopStartCurveParsed, trig.tweenStopStartRangeParsed)
         : 0
       chp.stoppingDelayMs = Math.max(cfg[`${p}TweenStopDelayCurveEnabled`]
-        ? computeStartDelayMs(dists[i], minD, range, trig.tweenStopDelayCurveParsed, trig.tweenStopDelayRangeParsed)
+        ? curveByDomain(p, 'TweenStopDelayCurveVisibleOnly', dists[i], trig.tweenStopDelayCurveParsed, trig.tweenStopDelayRangeParsed)
         : (cfg[`${p}TweenStopDelayMs`] || 0), 1)
       // When Retransition is ON, compute the retransition delay based on
       // distance so hands retransition asynchronously per-hand (closest hands
@@ -10267,8 +10312,8 @@ function endClickHoldPose(p) {
       // will be 0 (set at the stopping→retransition transition below).
       if (!retransitionOff) {
         chp.retransitionDelayForStop = chp.retransitionIsTween
-          ? computeStartDelayMs(dists[i], minD, range, trig.tweenRetransitionCurveParsed, trig.tweenRetransitionRangeParsed)
-          : computeStartDelayMs(dists[i], minD, range, trig.retransitionCurveParsed, trig.retransitionRangeParsed)
+          ? curveByDomain(p, 'RetransitionStartTimeCurveVisibleOnly', dists[i], trig.tweenRetransitionCurveParsed, trig.tweenRetransitionRangeParsed)
+          : curveByDomain(p, 'RetransitionStartTimeCurveVisibleOnly', dists[i], trig.retransitionCurveParsed, trig.retransitionRangeParsed)
       } else {
         chp.retransitionDelayForStop = 0
       }
@@ -10293,8 +10338,8 @@ function endClickHoldPose(p) {
       // transition itself (see "Tween Stop decay finished" below).
       chp.retransitionSpeedMsForStop = cfg[`${p}RetransitionSpeedCurveEnabled`]
         ? (chp.retransitionIsTween
-            ? computeStartDelayMs(dists[i], minD, range, trig.tweenRetransitionSpeedCurveParsed, trig.tweenRetransitionSpeedRangeParsed)
-            : computeStartDelayMs(dists[i], minD, range, trig.retransitionSpeedCurveParsed, trig.retransitionSpeedRangeParsed))
+            ? curveByDomain(p, 'RetransitionSpeedCurveVisibleOnly', dists[i], trig.tweenRetransitionSpeedCurveParsed, trig.tweenRetransitionSpeedRangeParsed)
+            : curveByDomain(p, 'RetransitionSpeedCurveVisibleOnly', dists[i], trig.retransitionSpeedCurveParsed, trig.retransitionSpeedRangeParsed))
         : 0
       chp.stoppingLastFrameTime = now
       chp.stoppingWasLooping = chp.phase === 'looping'
@@ -10336,8 +10381,8 @@ function endClickHoldPose(p) {
     // distance-based stagger for retransition, same convention
     // `${p}StartTimeCurveEnabled` already uses for the forward phase.
     chp.retransitionDelay = cfg[`${p}RetransitionStartTimeCurveEnabled`] === false ? 0 : (chp.retransitionIsTween
-      ? computeStartDelayMs(dists[i], minD, range, trig.tweenRetransitionCurveParsed, trig.tweenRetransitionRangeParsed)
-      : computeStartDelayMs(dists[i], minD, range, trig.retransitionCurveParsed, trig.retransitionRangeParsed))
+      ? curveByDomain(p, 'RetransitionStartTimeCurveVisibleOnly', dists[i], trig.tweenRetransitionCurveParsed, trig.tweenRetransitionRangeParsed)
+      : curveByDomain(p, 'RetransitionStartTimeCurveVisibleOnly', dists[i], trig.retransitionCurveParsed, trig.retransitionRangeParsed))
     // Retransition Speed Curve (item 5, 2026-09-24; extended to Tween mode
     // 2026-09-30, direct request: "retransition speed curve... should be
     // avialable to any mode with retransition") -- frozen once here, same
@@ -10349,8 +10394,8 @@ function endClickHoldPose(p) {
     // data gets evaluated still branches on `chp.retransitionIsTween`.
     chp.retransitionSpeedMs = cfg[`${p}RetransitionSpeedCurveEnabled`]
       ? (chp.retransitionIsTween
-          ? computeStartDelayMs(dists[i], minD, range, trig.tweenRetransitionSpeedCurveParsed, trig.tweenRetransitionSpeedRangeParsed)
-          : computeStartDelayMs(dists[i], minD, range, trig.retransitionSpeedCurveParsed, trig.retransitionSpeedRangeParsed))
+          ? curveByDomain(p, 'RetransitionSpeedCurveVisibleOnly', dists[i], trig.tweenRetransitionSpeedCurveParsed, trig.tweenRetransitionSpeedRangeParsed)
+          : curveByDomain(p, 'RetransitionSpeedCurveVisibleOnly', dists[i], trig.retransitionSpeedCurveParsed, trig.retransitionSpeedRangeParsed))
       : 0
     chp.phase = 'retransition'
     snapshotOffsetRotationAccumForRetransition(hand, chp)
@@ -10898,13 +10943,13 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
       // distance-based stagger for retransition, same convention
       // `${p}StartTimeCurveEnabled` already uses for the forward phase.
       cp.retransitionDelay = cfg[`${p}RetransitionStartTimeCurveEnabled`] === false ? 0
-        : computeStartDelayMs(handXYDist(hand), xyFieldMinDist, xyFieldDistRange, clickPoseTriggers[p].retransitionCurveParsed, clickPoseTriggers[p].retransitionRangeParsed)
+        : curveByDomain(p, 'RetransitionStartTimeCurveVisibleOnly', handXYDist(hand), clickPoseTriggers[p].retransitionCurveParsed, clickPoseTriggers[p].retransitionRangeParsed)
       // Retransition Speed Curve (item 5, 2026-09-24) -- frozen once here,
       // same "frozen at trigger time" philosophy as Animation Speed
       // Curve's own frozenSpeedMs pair -- see makeClickHoldPoseGroup()'s
       // own matching control comment.
       cp.retransitionSpeedMs = cfg[`${p}RetransitionSpeedCurveEnabled`]
-        ? computeStartDelayMs(handXYDist(hand), xyFieldMinDist, xyFieldDistRange, clickPoseTriggers[p].retransitionSpeedCurveParsed, clickPoseTriggers[p].retransitionSpeedRangeParsed)
+        ? curveByDomain(p, 'RetransitionSpeedCurveVisibleOnly', handXYDist(hand), clickPoseTriggers[p].retransitionSpeedCurveParsed, clickPoseTriggers[p].retransitionSpeedRangeParsed)
         : 0
       logHandBehaviourEvent(hands.indexOf(hand), handLogTriggerLabel(p), 'pause finished -> retransition begins')
     }
@@ -11057,8 +11102,8 @@ function triggerClickPose(p, onlyHands = null) {
     // immediately, regardless of Mode.
     const startTimeCurveOff = cfg[`${p}StartTimeCurveEnabled`] === false
     const delay = startTimeCurveOff ? 0 : (isTween
-      ? computeStartDelayMs(dists[i], minD, range, trig.tweenStartCurveParsed, trig.tweenStartRangeParsed)
-      : computeStartDelayMs(dists[i], minD, range, trig.startCurveParsed, trig.startRangeParsed))
+      ? curveByDomain(p, 'StartTimeCurveVisibleOnly', dists[i], trig.tweenStartCurveParsed, trig.tweenStartRangeParsed)
+      : curveByDomain(p, 'StartTimeCurveVisibleOnly', dists[i], trig.startCurveParsed, trig.startRangeParsed))
     cp.pendingClaimAt = now + delay
     cp.pendingPressAt = now; cp.pendingIsTween = isTween // live Start Time (refreshLiveDistanceState)
     cp.pendingForwardSnapshot = forwardSnapshot
@@ -11074,9 +11119,9 @@ function triggerClickPose(p, onlyHands = null) {
     cp.pendingFromSplayDeg = hand.currentSplayDeg
     // Animation Speed Curve (Single Pose only) -- same "frozen at
     // trigger time" treatment as the splay above.
-    cp.pendingFrozenOffsetNorm = captureCameraOffsetNorm(hand)
+    cp.pendingFrozenOffsetNorm = captureCameraOffsetNorm(hand, p)
     cp.pendingFrozenHandQuat = hand.wrapper.quaternion.clone() // Hand Axes Offset (2026-10-04)
-    cp.pendingFrozenSpeedMs = cfg[`${p}SpeedCurveEnabled`] ? computeStartDelayMs(dists[i], minD, range, trig.speedCurveParsed, trig.speedRangeParsed) : 0
+    cp.pendingFrozenSpeedMs = cfg[`${p}SpeedCurveEnabled`] ? curveByDomain(p, 'SpeedCurveVisibleOnly', dists[i], trig.speedCurveParsed, trig.speedRangeParsed) : 0
   })
 }
 // Click / Double / Triple / Quadruple-Click Pose disambiguation: N
@@ -13079,10 +13124,10 @@ async function restoreCustomClickFunctions() {
 // in a different group. A row already inside its feature's group is left exactly where the user put it.
 function placeDepthControlsInFeatureGroups() {
   const plan = [
-    ['armRotationEnabled', ['armRotationUseDepth', 'armRotationTargetDepth']],
-    ['palmFacesCursor', ['palmRotationUseDepth', 'palmRotationTargetDepth']],
-    ['cropWristEnabled', ['armLengthUseDepth', 'armLengthTargetDepth']],
-    ['wristSplayResponsiveEnabled', ['wristSplayUseDepth', 'wristSplayTargetDepth']]
+    ['armRotationEnabled', ['armRotationVisibleOnly', 'armRotationUseDepth', 'armRotationTargetDepth']],
+    ['palmFacesCursor', ['palmRotationVisibleOnly', 'palmRotationUseDepth', 'palmRotationTargetDepth']],
+    ['cropWristEnabled', ['armLengthVisibleOnly', 'armLengthUseDepth', 'armLengthTargetDepth']],
+    ['wristSplayResponsiveEnabled', ['wristSplayVisibleOnly', 'wristSplayUseDepth', 'wristSplayTargetDepth']]
   ]
   plan.forEach(([anchorKey, keys]) => {
     const anchor = document.querySelector('.dp-row[data-key="' + anchorKey + '"]')
@@ -13138,6 +13183,7 @@ const MULTI_TRIGGER_ALLOWED_SUFFIXES = [
   'CameraOffsetEnabled', 'CameraOffsetXEnabled', 'CameraOffsetYEnabled', 'CameraOffsetZEnabled', 'CameraOffsetXCurve', 'CameraOffsetXRange', 'CameraOffsetYCurve', 'CameraOffsetYRange', 'CameraOffsetZCurve', 'CameraOffsetZRange',
   'RotationEnabled', 'RotationX', 'RotationY', 'RotationZ',
   'SpeedCurveEnabled', 'SpeedCurve', 'SpeedCurveRange',
+  'SpeedCurveVisibleOnly', 'StartTimeCurveVisibleOnly', 'RetransitionSpeedCurveVisibleOnly', 'RetransitionStartTimeCurveVisibleOnly', 'TweenStopStartTimeCurveVisibleOnly', 'TweenStopDelayCurveVisibleOnly', 'CameraOffsetVisibleOnly', 'CursorOffsetVisibleOnly',
   'StartTimeCurveEnabled', 'StartTimeCurve', 'StartTimeRange', 'TweenStartTimeCurve', 'TweenStartTimeRange',
   'StartDistanceCurveEnabled', 'StartDistanceMin', 'StartDistanceMax', 'StartDistanceCurve',
   'RetransitionEnabled', 'RetransitionSpeedMs', 'RetransitionSpeedCurveEnabled', 'RetransitionSpeedCurve', 'RetransitionSpeedCurveRange', 'RetransitionStartTimeCurveEnabled', 'RetransitionStartTimeCurve', 'RetransitionStartTimeRange',
@@ -14109,12 +14155,12 @@ function wrapTweenStopGroup(p) {
   // called anywhere in this file) rather than deleted, per this
   // project's own "nothing gets deleted by default" convention.
   const g = wrapGatedSubgroup(`${p}TweenStopEnabled`, [
-    `${p}TweenStopStartTimeCurveEnabled`, `${p}TweenStopStartTimeCurve`, `${p}TweenStopStartTimeRange`,
-    `${p}TweenStopDelayEnabled`, `${p}TweenStopDelayMs`, `${p}TweenStopDelayCurveEnabled`, `${p}TweenStopDelayCurve`, `${p}TweenStopDelayRange`
+    `${p}TweenStopStartTimeCurveEnabled`, `${p}TweenStopStartTimeCurveVisibleOnly`, `${p}TweenStopStartTimeCurve`, `${p}TweenStopStartTimeRange`,
+    `${p}TweenStopDelayEnabled`, `${p}TweenStopDelayMs`, `${p}TweenStopDelayCurveEnabled`, `${p}TweenStopDelayCurveVisibleOnly`, `${p}TweenStopDelayCurve`, `${p}TweenStopDelayRange`
   ], 'Tween Stop')
   if (!g) return
-  wrapGatedSubgroup(`${p}TweenStopStartTimeCurveEnabled`, [`${p}TweenStopStartTimeCurve`, `${p}TweenStopStartTimeRange`], 'Tween Stop Start Time Curve')
-  wrapGatedSubgroup(`${p}TweenStopDelayEnabled`, [`${p}TweenStopDelayMs`, `${p}TweenStopDelayCurveEnabled`, `${p}TweenStopDelayCurve`, `${p}TweenStopDelayRange`], 'Tween Stop Delay')
+  wrapGatedSubgroup(`${p}TweenStopStartTimeCurveEnabled`, [`${p}TweenStopStartTimeCurveVisibleOnly`, `${p}TweenStopStartTimeCurve`, `${p}TweenStopStartTimeRange`], 'Tween Stop Start Time Curve')
+  wrapGatedSubgroup(`${p}TweenStopDelayEnabled`, [`${p}TweenStopDelayMs`, `${p}TweenStopDelayCurveEnabled`, `${p}TweenStopDelayCurveVisibleOnly`, `${p}TweenStopDelayCurve`, `${p}TweenStopDelayRange`], 'Tween Stop Delay')
 }
 // Sequence Mode - Count/Loop/Oscillate's own visibility, for the 5
 // fire-and-forget triggers only (click/dblclick/rc/tripleClick/
@@ -14260,17 +14306,17 @@ function wrapClickFunctionGatedSubgroups(p) {
   // subgroup treatment as every other on/off curve below ("provide an
   // on off checkbox for each").
   wrapGatedSubgroup(`${p}EasingCurveEnabled`, [`${p}EasingCurve`], 'Easing')
-  wrapGatedSubgroup(`${p}OffsetEnabled`, [`${p}OffsetMode`, `${p}OffsetX`, `${p}OffsetY`, `${p}OffsetZ`, `${p}CursorOffsetDistance`, `${p}CursorOffsetDistanceCurveEnabled`, `${p}CursorOffsetDistanceCurve`, `${p}CursorOffsetDistanceCurveRange`, ...['X', 'Y', 'Z'].flatMap((ax) => [`${p}CursorOffset${ax}Curve`, `${p}CursorOffset${ax}Range`])], 'Offset')
+  wrapGatedSubgroup(`${p}OffsetEnabled`, [`${p}OffsetMode`, `${p}OffsetX`, `${p}OffsetY`, `${p}OffsetZ`, `${p}CursorOffsetDistance`, `${p}CursorOffsetDistanceCurveEnabled`, `${p}CursorOffsetVisibleOnly`, `${p}CursorOffsetDistanceCurve`, `${p}CursorOffsetDistanceCurveRange`, ...['X', 'Y', 'Z'].flatMap((ax) => [`${p}CursorOffset${ax}Curve`, `${p}CursorOffset${ax}Range`])], 'Offset')
   // "Offset To Camera" (2026-10-02) -- its own mandatory gated subgroup,
   // independent of (and stackable with) "Offset" above.
-  wrapGatedSubgroup(`${p}CameraOffsetEnabled`, ['X', 'Y', 'Z'].flatMap((ax) => [`${p}CameraOffset${ax}Enabled`, `${p}CameraOffset${ax}Curve`, `${p}CameraOffset${ax}Range`]), 'Offset To Camera')
+  wrapGatedSubgroup(`${p}CameraOffsetEnabled`, [`${p}CameraOffsetVisibleOnly`, ...['X', 'Y', 'Z'].flatMap((ax) => [`${p}CameraOffset${ax}Enabled`, `${p}CameraOffset${ax}Curve`, `${p}CameraOffset${ax}Range`])], 'Offset To Camera')
   wrapGatedSubgroup(`${p}RotationEnabled`, [`${p}RotationX`, `${p}RotationY`, `${p}RotationZ`], 'Rotation')
-  wrapGatedSubgroup(`${p}SpeedCurveEnabled`, [`${p}SpeedCurve`, `${p}SpeedCurveRange`], 'Animation Speed Curve')
+  wrapGatedSubgroup(`${p}SpeedCurveEnabled`, [`${p}SpeedCurveVisibleOnly`, `${p}SpeedCurve`, `${p}SpeedCurveRange`], 'Animation Speed Curve')
   // CORRECTED 2026-09-24 (item 7, remainder): Tween mode's own always-on
   // start-time curve (no enable toggle of its own -- see
   // updateSingleTimingGateVisibility()'s own comment) nests inside this
   // SAME "Start Time Curve" group too, no-op for a pose-kind `p`.
-  wrapGatedSubgroup(`${p}StartTimeCurveEnabled`, [`${p}StartTimeCurve`, `${p}StartTimeRange`, `${p}TweenStartTimeCurve`, `${p}TweenStartTimeRange`], 'Start Time Curve')
+  wrapGatedSubgroup(`${p}StartTimeCurveEnabled`, [`${p}StartTimeCurveVisibleOnly`, `${p}StartTimeCurve`, `${p}StartTimeRange`, `${p}TweenStartTimeCurve`, `${p}TweenStartTimeRange`], 'Start Time Curve')
   // Start Distance Curve -- direct spec item (2026-09-27), same shared
   // subgroup for both Single Pose and Tween mode (this curve isn't
   // Mode-gated at all -- see updateSingleTimingGateVisibility()'s own
@@ -14289,7 +14335,7 @@ function wrapClickFunctionGatedSubgroups(p) {
   // heading -- RetransitionEnabled itself still governs both regardless
   // of mode, preserving the 2026-09-22 request.
   wrapGatedSubgroup(`${p}RetransitionEnabled`, [
-    `${p}RetransitionSpeedMs`, `${p}RetransitionSpeedCurveEnabled`, `${p}RetransitionSpeedCurve`, `${p}RetransitionSpeedCurveRange`, `${p}RetransitionStartTimeCurveEnabled`, `${p}RetransitionStartTimeCurve`, `${p}RetransitionStartTimeRange`,
+    `${p}RetransitionSpeedMs`, `${p}RetransitionSpeedCurveEnabled`, `${p}RetransitionSpeedCurveVisibleOnly`, `${p}RetransitionSpeedCurve`, `${p}RetransitionSpeedCurveRange`, `${p}RetransitionStartTimeCurveEnabled`, `${p}RetransitionStartTimeCurveVisibleOnly`, `${p}RetransitionStartTimeCurve`, `${p}RetransitionStartTimeRange`,
     `${p}TweenRetransitionSpeedMs`, `${p}TweenRetransitionSpeedCurve`, `${p}TweenRetransitionSpeedCurveRange`, `${p}TweenRetransitionStartTimeCurve`, `${p}TweenRetransitionStartTimeRange`
   ], 'Retransition')
   // Direct spec item (2026-09-27): "add a Retransition Speed Curve group
@@ -14306,8 +14352,8 @@ function wrapClickFunctionGatedSubgroups(p) {
   // these 2 new subgroups inside Retransition rather than as top-level
   // siblings of it. Order matters: these must run AFTER the outer
   // Retransition wrap, never before.
-  wrapGatedSubgroup(`${p}RetransitionSpeedCurveEnabled`, [`${p}RetransitionSpeedCurve`, `${p}RetransitionSpeedCurveRange`, `${p}TweenRetransitionSpeedCurve`, `${p}TweenRetransitionSpeedCurveRange`], 'Retransition Speed Curve')
-  wrapGatedSubgroup(`${p}RetransitionStartTimeCurveEnabled`, [`${p}RetransitionStartTimeCurve`, `${p}RetransitionStartTimeRange`, `${p}TweenRetransitionStartTimeCurve`, `${p}TweenRetransitionStartTimeRange`], 'Retransition Start Time Curve')
+  wrapGatedSubgroup(`${p}RetransitionSpeedCurveEnabled`, [`${p}RetransitionSpeedCurveVisibleOnly`, `${p}RetransitionSpeedCurve`, `${p}RetransitionSpeedCurveRange`, `${p}TweenRetransitionSpeedCurve`, `${p}TweenRetransitionSpeedCurveRange`], 'Retransition Speed Curve')
+  wrapGatedSubgroup(`${p}RetransitionStartTimeCurveEnabled`, [`${p}RetransitionStartTimeCurveVisibleOnly`, `${p}RetransitionStartTimeCurve`, `${p}RetransitionStartTimeRange`, `${p}TweenRetransitionStartTimeCurve`, `${p}TweenRetransitionStartTimeRange`], 'Retransition Start Time Curve')
   // Hold-kind only -- fire-and-forget triggers have no Tween Stop fields.
   // Must run AFTER the wraps above (harmless either order, since Tween
   // Stop's own rows are untouched by them) and BEFORE the caller's own
@@ -15580,11 +15626,11 @@ function animate(dt, now) {
         let palmDistMinD = 0, palmDistMaxD = 0
         if (cfg.armRotationCurveEnabled && armRotUseDepth) {
           const __armDists = hands.map((h) => h.wrapper.position.distanceTo(_trackTargetArm))
-          ;[cursorDistMinD, cursorDistMaxD] = onScreenMinMax(__armDists)
+          ;[cursorDistMinD, cursorDistMaxD] = cfg.armRotationVisibleOnly !== false ? onScreenMinMax(__armDists) : [Math.min(...__armDists), Math.max(...__armDists)]
         }
         if (cfg.palmFacesCursorDistanceCurveEnabled && palmUseDepth) {
           const __palmDists = hands.map((h) => h.wrapper.position.distanceTo(_trackTargetPalm))
-          ;[palmDistMinD, palmDistMaxD] = onScreenMinMax(__palmDists)
+          ;[palmDistMinD, palmDistMaxD] = cfg.palmRotationVisibleOnly !== false ? onScreenMinMax(__palmDists) : [Math.min(...__palmDists), Math.max(...__palmDists)]
         }
         const __cursorTrackingStart = performance.now()
         hands.forEach((hand) => {
@@ -15688,8 +15734,9 @@ function animate(dt, now) {
             let responsiveness = (cfg.armRotationDefault ?? 100) / 100
             if (cfg.armRotationCurveEnabled) {
               const distToCursor = armRotUseDepth ? hand.wrapper.position.distanceTo(_trackTargetArm) : handXYDist(hand)
-              const range = armRotUseDepth ? Math.max(cursorDistMaxD - cursorDistMinD, 1e-6) : xyFieldDistRange
-              const normDist = (distToCursor - (armRotUseDepth ? cursorDistMinD : xyFieldMinDist)) / range
+              const armVis = cfg.armRotationVisibleOnly !== false
+              const range = armRotUseDepth ? Math.max(cursorDistMaxD - cursorDistMinD, 1e-6) : (armVis ? xyFieldDistRange : xyAllDistRange)
+              const normDist = (distToCursor - (armRotUseDepth ? cursorDistMinD : (armVis ? xyFieldMinDist : xyAllMinDist))) / range
               responsiveness = (armRotationCurveParsed && armRotationCurveParsed.length)
                 ? THREE.MathUtils.clamp(evaluateArmLengthCurve(armRotationCurveParsed, normDist), 0, 1)
                 : 1
@@ -15722,8 +15769,9 @@ function animate(dt, now) {
           // acts as a responsiveness multiplier on baseDeg).
           if (baseDeg !== 0 && cfg.palmFacesCursorDistanceCurveEnabled) {
             const distToCursor = palmUseDepth ? hand.wrapper.position.distanceTo(_trackTargetPalm) : handXYDist(hand)
-            const range = palmUseDepth ? Math.max(palmDistMaxD - palmDistMinD, 1e-6) : xyFieldDistRange
-            const normDist = (distToCursor - (palmUseDepth ? palmDistMinD : xyFieldMinDist)) / range
+            const palmVis = cfg.palmRotationVisibleOnly !== false
+            const range = palmUseDepth ? Math.max(palmDistMaxD - palmDistMinD, 1e-6) : (palmVis ? xyFieldDistRange : xyAllDistRange)
+            const normDist = (distToCursor - (palmUseDepth ? palmDistMinD : (palmVis ? xyFieldMinDist : xyAllMinDist))) / range
             const responsiveness = palmFacesCursorDistanceCurveParsed && palmFacesCursorDistanceCurveParsed.length
               ? evaluateArmLengthCurve(palmFacesCursorDistanceCurveParsed, normDist)
               : 1
@@ -16093,10 +16141,15 @@ function updateRenderOrder() {
   // Wrist Splay / Wrist Cropping each measure to the cursor at their own Cursor Target Depth (2026-10-11).
   updateTrackingTargets()
   let spMin = Infinity, spMax = -Infinity, crMin = Infinity, crMax = -Infinity
+  let spAMin = Infinity, spAMax = -Infinity, crAMin = Infinity, crAMax = -Infinity
   for (let ti = 0; ti < hands.length; ti++) {
     const th = hands[ti], tp = th.wrapper.position
     const ds = tp.distanceTo(_trackTargetSplay), dc = tp.distanceTo(_trackTargetCrop)
     th._splayDist = ds; th._cropDist = dc
+    if (ds < spAMin) spAMin = ds
+    if (ds > spAMax) spAMax = ds
+    if (dc < crAMin) crAMin = dc
+    if (dc > crAMax) crAMax = dc
     if (th._onScr === false) continue // domain = on-screen hands only (2026-10-11)
     if (ds < spMin) spMin = ds
     if (ds > spMax) spMax = ds
@@ -16105,32 +16158,40 @@ function updateRenderOrder() {
   }
   splayFieldMin = spMin; splayFieldRange = Math.max(spMax - spMin, 0.001)
   cropFieldMin = crMin; cropFieldRange = Math.max(crMax - crMin, 0.001)
-  let restMin = Infinity, restMax = -Infinity
+  splayAllMin = spAMin; splayAllRange = Math.max(spAMax - spAMin, 0.001)
+  cropAllMin = crAMin; cropAllRange = Math.max(crAMax - crAMin, 0.001)
+  let restMin = Infinity, restMax = -Infinity, restAMin = Infinity, restAMax = -Infinity
   for (let ri = 0; ri < hands.length; ri++) {
     const rh = hands[ri]
     const rd = cursorDistXY(rh.basePosition || rh.wrapper.position) // world XY only (2026-10-04)
     rh._restCursorDist = rd
+    if (rd < restAMin) restAMin = rd
+    if (rd > restAMax) restAMax = rd
     if (rh._onScrRest === false) continue // domain = on-screen hands only (2026-10-11)
     if (rd < restMin) restMin = rd
     if (rd > restMax) restMax = rd
   }
   restFieldMinDist = restMin
   restFieldDistRange = Math.max(restMax - restMin, 0.001)
+  restAllMinDist = restAMin; restAllDistRange = Math.max(restAMax - restAMin, 0.001)
   // Current-position world-XY distances for the click-function settings that
   // used the 3D `live` value (start time / speed / retransition / start
   // distance / tween stop). `live` itself is untouched: render order, arm
   // length and wrist splay still use it.
-  let xyMin = Infinity, xyMax = -Infinity
+  let xyMin = Infinity, xyMax = -Infinity, xyAMin = Infinity, xyAMax = -Infinity
   for (let xi = 0; xi < hands.length; xi++) {
     const xh = hands[xi]
     const xd = cursorDistXY(xh.wrapper.position)
     xh._xyCursorDist = xd
+    if (xd < xyAMin) xyAMin = xd
+    if (xd > xyAMax) xyAMax = xd
     if (xh._onScr === false) continue // domain = on-screen hands only (2026-10-11)
     if (xd < xyMin) xyMin = xd
     if (xd > xyMax) xyMax = xd
   }
   xyFieldMinDist = xyMin
   xyFieldDistRange = Math.max(xyMax - xyMin, 0.001)
+  xyAllMinDist = xyAMin; xyAllDistRange = Math.max(xyAMax - xyAMin, 0.001)
   const nowMs = nowVirtual() // virtual clock (see its own declaration) -- one shared timestamp for every hand's own Click-Hold-Pose/Click-Pose progress this frame, not a separate call per hand; only reached at all while !isPaused (animate()'s own gate), so this line simply never runs during a pause
   hands.forEach((hand, i) => {
     const live = liveDistances[i]
@@ -16165,8 +16226,8 @@ function updateRenderOrder() {
     // fallback, so a hand's very first frame still applies its target
     // instantly rather than lerping from nothing.
     const targetArmLengthT = cfg.armLengthUseDepth === false
-      ? computeArmLengthT(hand, handXYDist(hand), xyFieldMinDist, xyFieldDistRange) // Wrist Cropping Use Cursor Target Depth off: screen-space XY only
-      : computeArmLengthT(hand, hand._cropDist ?? live, hand._cropDist === undefined ? minLiveDist : cropFieldMin, hand._cropDist === undefined ? liveDistRange : cropFieldRange) // distance to the cursor at Wrist Cropping's own depth
+      ? computeArmLengthT(hand, handXYDist(hand), cfg.armLengthVisibleOnly !== false ? xyFieldMinDist : xyAllMinDist, cfg.armLengthVisibleOnly !== false ? xyFieldDistRange : xyAllDistRange) // Wrist Cropping Use Cursor Target Depth off: screen-space XY only
+      : computeArmLengthT(hand, hand._cropDist ?? live, hand._cropDist === undefined ? minLiveDist : (cfg.armLengthVisibleOnly !== false ? cropFieldMin : cropAllMin), hand._cropDist === undefined ? liveDistRange : (cfg.armLengthVisibleOnly !== false ? cropFieldRange : cropAllRange)) // distance to the cursor at Wrist Cropping's own depth
     const armLengthDampingAmt = THREE.MathUtils.clamp(cfg.armLengthDamping ?? 1, 0.001, 1)
     hand.currentArmLengthT = hand.currentArmLengthT !== undefined
       ? hand.currentArmLengthT + (targetArmLengthT - hand.currentArmLengthT) * armLengthDampingAmt

@@ -16945,6 +16945,22 @@ hand merely sitting beyond a limit because of its grid position does not get a p
 frame (no runaway), a bake preserves the sum, and a live curve change that lowers the ramp moves the hand off the limit immediately. Retransition snapshots the accumulator at its start, so it
 unwinds from the limit. `main.js` `?v=327` -> `?v=328`.
 
+2026-10-11  -  (Visible Hands Only checkbox on every distance curve / Min-Max set)
+
+Direct request: for every curve editor / Min-Max UI set that uses cursor distance, a checkbox for whether it uses ALL hands as the max limit or only the visible hands; on = visible only; all
+default ON (which is what the code already did since the on-screen change).
+ - New checkboxes (default on), each inside its own curve subgroup, next to its On/Off row:
+   per click function (and every Multi Trigger, via MULTI_TRIGGER_ALLOWED_SUFFIXES): Animation Speed Curve, Start Time Curve (single + tween variants), Retransition Start Time Curve and
+   Retransition Speed Curve (single + tween), Tween Stop Start Time Curve, Tween Stop Delay Curve (hold-kind), Offset To Camera Curves (all three axes), Cursor Offset Curves (the distance
+   curve and the three per-axis curves). Keys: ${p}SpeedCurveVisibleOnly, StartTimeCurveVisibleOnly, RetransitionStartTimeCurveVisibleOnly, RetransitionSpeedCurveVisibleOnly,
+   TweenStopStartTimeCurveVisibleOnly, TweenStopDelayCurveVisibleOnly, CameraOffsetVisibleOnly, CursorOffsetVisibleOnly.
+   cursor tracking: armRotationVisibleOnly, palmRotationVisibleOnly, wristSplayVisibleOnly, armLengthVisibleOnly (placed into the arranged feature groups by placeDepthControlsInFeatureGroups).
+ - Mechanism: the pre-pass now keeps a second set of domains over ALL hands next to the on-screen ones (xyAll*, restAll*, splayAll*, cropAll*; Arm/Palm Rotation compute their 3D domain
+   either way). curveByDomain()/curveByRestDomain() pick the domain from the function's checkbox; every click-function curve evaluation (trigger-time, live refresh, release/retransition)
+   goes through them. Off = the old "nearest to farthest of all hands" behaviour; hands past the domain still read x > 1 and are extrapolated as before.
+ - Not given a checkbox: Start Distance Curve (its Min/Max are explicit world-unit sliders, not "the farthest hand") and Easing (a function of progress, not distance).
+ `main.js` `?v=328` -> `?v=329`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a
