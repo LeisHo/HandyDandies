@@ -16887,6 +16887,12 @@ Mapping confirmed by the user: for the wrist-cropping sliders, the Clipping Bloc
 block has cleared the 0 value of the model's local origin axis (its top at 0 on the forearm axis). That is exactly what setClipRigT() does: block top = t * 0.2358
 (authored top), t = 0 parks the block below the mesh so nothing is clipped.
 
+2026-10-11  -  (Clipping Block lookup fix)
+
+The first deploy of the block (v=322) found no block: GLTFLoader sanitizes node names, so "Clipping Block" is "Clipping_Block" in the loaded scene and
+getObjectByName('Clipping Block') returned null -- every hand silently used the old single wrist plane. makeClipRig() now looks for both names.
+The Draco model itself loaded fine (decoder wasm fetched, 6,473-vertex mesh). `main.js` `?v=322` -> `?v=323`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

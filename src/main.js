@@ -14496,7 +14496,8 @@ function applyHandArmLength(hand, hideT) {
 // Models without the block fall back to the single wrist plane (updateWristClipPlaneForHand's old path).
 const _clipNormalMatrix = new THREE.Matrix3()
 function makeClipRig(clone) {
-  const block = clone.getObjectByName('Clipping Block')
+  // GLTFLoader sanitizes node names (spaces become underscores), so the file's "Clipping Block" loads as "Clipping_Block".
+  const block = clone.getObjectByName('Clipping_Block') || clone.getObjectByName('Clipping Block')
   if (!block || !block.geometry) return null
   block.geometry.computeBoundingBox()
   const bb = block.geometry.boundingBox

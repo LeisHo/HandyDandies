@@ -2545,3 +2545,4 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   from unpkg). The wrist crop is the block: `makeClipRig()` / `setClipRigT()` / `updateClipRigPlanes()`, six outward planes + `clipIntersection = true` on every hand material.
   The block must stay named exactly "Clipping Block", unskinned, with its geometry axis-aligned to the model's Y (forearm) axis; to change the 100% position, move the block in Blender.
   Models without the block fall back to the single wrist plane.
+- **GLTFLoader renames nodes with spaces (2026-10-11): the file's "Clipping Block" is `Clipping_Block` in the scene.** `makeClipRig()` looks for both; a lookup by the Blender name alone silently finds nothing and the crop falls back to the single wrist plane (this happened on the first deploy: `hand.clipRig` was undefined).
