@@ -1080,7 +1080,7 @@ function computeRenderOrderRanks() {
       for (let i = 0; i < n; i++) {
         const h = hands[i], nb = renderOrderBone(h, node)
         zArr[i] = (nb ? nb.matrixWorld.elements[14] : h.wrapper.position.z) * camSign
-        xyArr[i] = nb ? cursorDistXY(_roV.setFromMatrixPosition(nb.matrixWorld)) : cursorDistXY(h.wrapper.position)
+        xyArr[i] = nb ? cursorDistXY(_roV.setFromMatrixPosition(nb.matrixWorld)) : cursorDistXY(handPoint(h))
       }
       ev = { pair: true, z: zArr, xy: xyArr, rev, isEnd, mode }
     } else {
@@ -1264,14 +1264,32 @@ function handTrackingPointInto(hand, out) {
   return out.add(_trkExt)
 }
 // Refreshes every hand's tracking point, its screen-space distance to the cursor and the nearest / farthest of those (on-screen hands only, or all hands) that the tracking features' XY curves normalise against.
-function updateTrackingPoints() {
-  let mn = Infinity, mx = -Infinity, amn = Infinity, amx = -Infinity
+// "The grid field position should never be used over the tracking point" (2026-10-11, direct request): EVERY cursor-distance measure of a hand - render order, the click functions' distance curves and domains,
+// the rest-position distances, the on-screen test, the Cursor Offset direction - uses the hand's tracking point (Cursor Tracking > Tracking Point), via handPoint() / handRestPoint(). hand._trkRest is the same
+// point with the hand at its rest (grid) position: _trk + (basePosition - wrapper.position), i.e. before any click-function offset.
+let trkStamp = -1
+function handPoint(hand) { return hand._trk || hand.wrapper.position }
+function handRestPoint(hand) { return hand._trkRest || hand.basePosition || hand.wrapper.position }
+// Computed once per frame: the animate() tracking block calls it first (postIncrement = false: updateRenderOrder() has not bumped the frame counter yet), updateRenderOrder() calls it with true and finds it done.
+function updateTrackingPoints(postIncrement) {
+  const id = postIncrement ? idleReposeFrameCounter : idleReposeFrameCounter + 1
+  if (id === trkStamp) return
+  trkStamp = id
   for (let i = 0; i < hands.length; i++) {
     const h = hands[i]
-    if (!h._trk) h._trk = new THREE.Vector3()
+    if (!h._trk) { h._trk = new THREE.Vector3(); h._trkRest = new THREE.Vector3() }
     handTrackingPointInto(h, h._trk)
-    const xd = cursorDistXY(h._trk)
-    h._trkXY = xd
+    if (h.basePosition) h._trkRest.copy(h._trk).add(h.basePosition).sub(h.wrapper.position); else h._trkRest.copy(h._trk)
+    h._trkXY = cursorDistXY(h._trk)
+  }
+  refreshTrackingDomains()
+}
+// The nearest / farthest screen-space distance to the cursor over the tracking points (on-screen hands only, or all hands) that the tracking features' XY curves normalise against. Needs fresh _onScr flags.
+function refreshTrackingDomains() {
+  let mn = Infinity, mx = -Infinity, amn = Infinity, amx = -Infinity
+  for (let i = 0; i < hands.length; i++) {
+    const h = hands[i], xd = h._trkXY
+    if (xd === undefined) continue
     if (xd < amn) amn = xd
     if (xd > amx) amx = xd
     if (h._onScr === false) continue
@@ -9166,8 +9184,8 @@ function updateOnScreenFlags() {
   let any = false, anyRest = false
   for (let i = 0; i < hands.length; i++) {
     const h = hands[i]
-    h._onScr = isOnScreen(h.wrapper.position)
-    h._onScrRest = isOnScreen(h.basePosition || h.wrapper.position)
+    h._onScr = isOnScreen(handPoint(h))
+    h._onScrRest = isOnScreen(handRestPoint(h))
     if (h._onScr) any = true
     if (h._onScrRest) anyRest = true
   }
@@ -9194,10 +9212,10 @@ function cursorDistXY(pos) {
 }
 // 2026-10-04: world-XY distance (see xyFieldMinDist's comment).
 function handRestDist(hand) {
-  return hand._restCursorDist !== undefined ? hand._restCursorDist : cursorDistXY(hand.basePosition || hand.wrapper.position)
+  return hand._restCursorDist !== undefined ? hand._restCursorDist : cursorDistXY(handRestPoint(hand))
 }
 function handXYDist(hand) {
-  return hand._xyCursorDist !== undefined ? hand._xyCursorDist : cursorDistXY(hand.wrapper.position)
+  return hand._xyCursorDist !== undefined ? hand._xyCursorDist : cursorDistXY(handPoint(hand))
 }
 // Direct request 2026-10-01: Offset Mode dropdown ('XYZ Offset', the
 // pre-existing behavior, vs. 'Cursor Offset', new). Shared by every
@@ -9229,7 +9247,7 @@ function computeOffsetXY(hand, p) {
     // moves the hand directly toward the cursor in full 3D (including
     // straight toward/away from the camera when the cursor sits nearer/
     // farther in depth), negative moves it directly away.
-    _offsetHandToCursor.subVectors(cursorTarget, hand.basePosition || hand.wrapper.position)
+    _offsetHandToCursor.subVectors(cursorTarget, handRestPoint(hand))
     const rightComp = _offsetHandToCursor.dot(_offsetRightVec)
     const upComp = _offsetHandToCursor.dot(_offsetUpVec)
     const forwardComp = _offsetHandToCursor.dot(_offsetForwardVec)
@@ -10841,7 +10859,7 @@ function endClickHoldPose(p) {
   const now = nowVirtual() // virtual clock -- feeds chp.retransitionStartTime below, an animation-timing field
   let minD = Infinity, maxD = -Infinity
   const dists = hands.map((hand) => {
-    const d = cursorDistXY(hand.wrapper.position) // world XY only (2026-10-04)
+    const d = cursorDistXY(handPoint(hand)) // screen-space XY from the tracking point
     if (hand._onScr !== false) { // domain = on-screen hands only (2026-10-11)
       if (d < minD) minD = d
       if (d > maxD) maxD = d
@@ -11719,7 +11737,7 @@ function triggerClickPose(p, onlyHands = null) {
   }
   let minD = Infinity, maxD = -Infinity
   const dists = hands.map((hand) => {
-    const d = cursorDistXY(hand.wrapper.position) // world XY only (2026-10-04)
+    const d = cursorDistXY(handPoint(hand)) // screen-space XY from the tracking point
     if (hand._onScr !== false) { // domain = on-screen hands only (2026-10-11)
       if (d < minD) minD = d
       if (d > maxD) maxD = d
@@ -11729,7 +11747,7 @@ function triggerClickPose(p, onlyHands = null) {
   const range = Math.max(maxD - minD, 0.001)
   // 3D min/range for the frozen wrist splay only -- see the splay line below.
   let splay3dMin = Infinity, splay3dMax = -Infinity
-  hands.forEach((h3) => { if (h3._onScr === false) return; const d3 = h3.wrapper.position.distanceTo(cursorTarget); if (d3 < splay3dMin) splay3dMin = d3; if (d3 > splay3dMax) splay3dMax = d3 })
+  hands.forEach((h3) => { if (h3._onScr === false) return; const d3 = handPoint(h3).distanceTo(cursorTarget); if (d3 < splay3dMin) splay3dMin = d3; if (d3 > splay3dMax) splay3dMax = d3 })
   const splay3dRange = Math.max(splay3dMax - splay3dMin, 0.001)
   hands.forEach((hand, i) => {
     if (onlyHands && !onlyHands.has(hand)) return // Skip If Same Pose / Multi Trigger already chose this trigger for other hands
@@ -11774,7 +11792,7 @@ function triggerClickPose(p, onlyHands = null) {
     // retransition) -- see updateClickHoldPoseForHand()'s own top
     // comment for why Responsive Wrist Splay must not keep recomputing
     // live throughout an explicit pose transition.
-    cp.pendingFrozenSplayDeg = splayDegForHand(hand, hand.wrapper.position.distanceTo(cursorTarget), splay3dMin, splay3dRange) // 3D (with Cursor Target Depth) on purpose: must match the live idle splay it blends with
+    cp.pendingFrozenSplayDeg = splayDegForHand(hand, handPoint(hand).distanceTo(cursorTarget), splay3dMin, splay3dRange) // 3D (with Cursor Target Depth) on purpose: must match the live idle splay it blends with
     // CORRECTED 2026-09-27 -- see updateClickHoldPoseForHand()'s own
     // matching capture for the full reasoning.
     cp.pendingFromSplayDeg = hand.currentSplayDeg
@@ -16769,7 +16787,9 @@ window.addEventListener('focus', syncPauseWithVisibility)
 const REORDER_SMOOTHING = 0.15
 function updateRenderOrder() {
   idleReposeFrameCounter++
+  updateTrackingPoints(true) // before the on-screen flags: every hand-to-cursor measure below uses the tracking point
   updateOnScreenFlags()
+  refreshTrackingDomains() // the tracking domains need this frame's on-screen flags
   updateScreenUnitsPerPx() // world units per screen pixel at the field plane, for the screen-space click-function distance
   // Everything an IDLE hand's finger curl depends on, as one string (2026-10-04): pose settings (finger,
   // wrist, model rotation) and the shared base orientation. The curl is independent of the wrapper's
@@ -16842,7 +16862,7 @@ function updateRenderOrder() {
   // of how far the cursor wanders from it.
   let minLiveDist = Infinity, maxLiveDist = -Infinity
   const liveDistances = hands.map((hand) => {
-    const d = hand.wrapper.position.distanceTo(cursorTarget)
+    const d = handPoint(hand).distanceTo(cursorTarget)
     if (hand._onScr !== false) { // domain = on-screen hands only (2026-10-11)
       if (d < minLiveDist) minLiveDist = d
       if (d > maxLiveDist) maxLiveDist = d
@@ -16861,7 +16881,6 @@ function updateRenderOrder() {
   liveFieldDistRange = liveDistRange
   // Wrist Splay / Wrist Cropping each measure to the cursor at their own Cursor Target Depth (2026-10-11).
   updateTrackingTargets()
-  updateTrackingPoints()
   updateTrackingPointMarkers()
   let spMin = Infinity, spMax = -Infinity, crMin = Infinity, crMax = -Infinity
   let spAMin = Infinity, spAMax = -Infinity, crAMin = Infinity, crAMax = -Infinity
@@ -16886,7 +16905,7 @@ function updateRenderOrder() {
   let restMin = Infinity, restMax = -Infinity, restAMin = Infinity, restAMax = -Infinity
   for (let ri = 0; ri < hands.length; ri++) {
     const rh = hands[ri]
-    const rd = cursorDistXY(rh.basePosition || rh.wrapper.position) // world XY only (2026-10-04)
+    const rd = cursorDistXY(handRestPoint(rh)) // tracking point at the hand's rest position
     rh._restCursorDist = rd
     if (rd < restAMin) restAMin = rd
     if (rd > restAMax) restAMax = rd
@@ -16904,7 +16923,7 @@ function updateRenderOrder() {
   let xyMin = Infinity, xyMax = -Infinity, xyAMin = Infinity, xyAMax = -Infinity
   for (let xi = 0; xi < hands.length; xi++) {
     const xh = hands[xi]
-    const xd = cursorDistXY(xh.wrapper.position)
+    const xd = cursorDistXY(handPoint(xh))
     xh._xyCursorDist = xd
     if (xd < xyAMin) xyAMin = xd
     if (xd > xyAMax) xyAMax = xd
