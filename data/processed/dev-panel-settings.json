@@ -6566,12 +6566,12 @@
           "group": "FIST ROTATE"
         }
       ],
-      "cameraX": 16.473792394407266,
-      "cameraY": 12.979351583472392,
-      "cameraZ": 260.15601203243136,
+      "cameraX": 6.5,
+      "cameraY": 9.5,
+      "cameraZ": 260.5698855348217,
       "cameraFov": 15,
       "cameraZoom": 261,
-      "cameraZoomSpeed": 1,
+      "cameraZoomSpeed": 0.3,
       "savedCameras": [
         {
           "name": "Front",
@@ -170348,7 +170348,7 @@
           "type": "group",
           "group": {
             "key": "Camera",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -170677,7 +170677,7 @@
         },
         {
           "key": "Camera",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
