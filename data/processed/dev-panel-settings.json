@@ -29,7 +29,7 @@
       "fieldBoundsZ": "{\"min\":-266,\"max\":125}",
       "trackingEnabled": true,
       "trackingDamping": 0.95,
-      "targetDepthFactor": 300,
+      "targetDepthFactor": 279.6,
       "showTargetMarker": false,
       "armRotationEnabled": false,
       "armRotationVisibleOnly": true,
@@ -39,14 +39,14 @@
       "armRotationCurveEnabled": true,
       "armRotationCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.8080220886433459,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.23551813533871668,\"y\":0}}]",
       "armRotationDamping": 1,
-      "palmFacesCursor": false,
+      "palmFacesCursor": true,
       "palmRotationVisibleOnly": true,
-      "palmRotationUseDepth": true,
+      "palmRotationUseDepth": false,
       "palmRotationTargetDepth": 27.9,
-      "palmFaceRotationOffset": 0,
+      "palmFaceRotationOffset": 180,
       "palmFacesCursorDistanceCurveEnabled": true,
       "palmFacesCursorDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
-      "palmFacesCursorDistanceRange": "{\"min\":-180,\"max\":180}",
+      "palmFacesCursorDistanceRange": "{\"min\":-35,\"max\":180}",
       "loadingPreviewEnabled": true,
       "loadingPreviewShowLive": false,
       "loadingMinTimeMs": 5000,
@@ -6805,8 +6805,8 @@
         }
       ],
       "cameraX": 6.504385906807994,
-      "cameraY": 9.506408948420946,
-      "cameraZ": 285.99079173791614,
+      "cameraY": 9.506408948421004,
+      "cameraZ": 285.99080989108216,
       "cameraFov": 15,
       "cameraYaw": 0,
       "cameraPitch": 0,
@@ -9296,7 +9296,7 @@
       "palmFaceRotationOffset": 0,
       "palmFacesCursorDistanceCurveEnabled": true,
       "palmFacesCursorDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
-      "palmFacesCursorDistanceRange": "{\"min\":-180,\"max\":180}",
+      "palmFacesCursorDistanceRange": "{\"min\":-35,\"max\":180}",
       "loadingPreviewEnabled": true,
       "loadingPreviewShowLive": false,
       "loadingMinTimeMs": 5000,
@@ -18546,7 +18546,7 @@
       "palmFaceRotationOffset": 0,
       "palmFacesCursorDistanceCurveEnabled": true,
       "palmFacesCursorDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
-      "palmFacesCursorDistanceRange": "{\"min\":-180,\"max\":180}",
+      "palmFacesCursorDistanceRange": "{\"min\":-35,\"max\":180}",
       "loadingPreviewEnabled": true,
       "loadingPreviewShowLive": false,
       "loadingMinTimeMs": 5000,
@@ -29926,7 +29926,7 @@
           "type": "group",
           "group": {
             "key": "Pose",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -30711,15 +30711,11 @@
           "group": {
             "key": "Cursor Tracking",
             "collapsed": false,
-            "locked": true,
+            "locked": false,
             "items": [
               {
                 "type": "row",
                 "key": "trackingEnabled"
-              },
-              {
-                "type": "row",
-                "key": "trackingDamping"
               },
               {
                 "type": "row",
@@ -30733,7 +30729,7 @@
                 "type": "group",
                 "group": {
                   "key": "Responsive Arm Rotation",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -30803,6 +30799,10 @@
                     },
                     {
                       "type": "row",
+                      "key": "trackingDamping"
+                    },
+                    {
+                      "type": "row",
                       "key": "palmRotationTargetDepth"
                     },
                     {
@@ -30826,6 +30826,7 @@
                     "palmFacesCursor",
                     "palmRotationVisibleOnly",
                     "palmRotationUseDepth",
+                    "trackingDamping",
                     "palmRotationTargetDepth",
                     "palmFaceRotationOffset",
                     "palmFacesCursorDistanceCurveEnabled",
@@ -30839,7 +30840,7 @@
                 "type": "group",
                 "group": {
                   "key": "Responsive Wrist Splay",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -30959,14 +30960,13 @@
             ],
             "settings": [
               "trackingEnabled",
-              "trackingDamping",
               "targetDepthFactor",
               "showTargetMarker"
             ],
             "subgroups": [
               {
                 "key": "Responsive Arm Rotation",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -31033,6 +31033,10 @@
                   },
                   {
                     "type": "row",
+                    "key": "trackingDamping"
+                  },
+                  {
+                    "type": "row",
                     "key": "palmRotationTargetDepth"
                   },
                   {
@@ -31056,6 +31060,7 @@
                   "palmFacesCursor",
                   "palmRotationVisibleOnly",
                   "palmRotationUseDepth",
+                  "trackingDamping",
                   "palmRotationTargetDepth",
                   "palmFaceRotationOffset",
                   "palmFacesCursorDistanceCurveEnabled",
@@ -31066,7 +31071,7 @@
               },
               {
                 "key": "Responsive Wrist Splay",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -31327,7 +31332,7 @@
         },
         {
           "key": "Pose",
-          "collapsed": false,
+          "collapsed": true,
           "locked": true,
           "items": [
             {
@@ -32106,15 +32111,11 @@
         {
           "key": "Cursor Tracking",
           "collapsed": false,
-          "locked": true,
+          "locked": false,
           "items": [
             {
               "type": "row",
               "key": "trackingEnabled"
-            },
-            {
-              "type": "row",
-              "key": "trackingDamping"
             },
             {
               "type": "row",
@@ -32128,7 +32129,7 @@
               "type": "group",
               "group": {
                 "key": "Responsive Arm Rotation",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -32198,6 +32199,10 @@
                   },
                   {
                     "type": "row",
+                    "key": "trackingDamping"
+                  },
+                  {
+                    "type": "row",
                     "key": "palmRotationTargetDepth"
                   },
                   {
@@ -32221,6 +32226,7 @@
                   "palmFacesCursor",
                   "palmRotationVisibleOnly",
                   "palmRotationUseDepth",
+                  "trackingDamping",
                   "palmRotationTargetDepth",
                   "palmFaceRotationOffset",
                   "palmFacesCursorDistanceCurveEnabled",
@@ -32234,7 +32240,7 @@
               "type": "group",
               "group": {
                 "key": "Responsive Wrist Splay",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -32354,14 +32360,13 @@
           ],
           "settings": [
             "trackingEnabled",
-            "trackingDamping",
             "targetDepthFactor",
             "showTargetMarker"
           ],
           "subgroups": [
             {
               "key": "Responsive Arm Rotation",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -32428,6 +32433,10 @@
                 },
                 {
                   "type": "row",
+                  "key": "trackingDamping"
+                },
+                {
+                  "type": "row",
                   "key": "palmRotationTargetDepth"
                 },
                 {
@@ -32451,6 +32460,7 @@
                 "palmFacesCursor",
                 "palmRotationVisibleOnly",
                 "palmRotationUseDepth",
+                "trackingDamping",
                 "palmRotationTargetDepth",
                 "palmFaceRotationOffset",
                 "palmFacesCursorDistanceCurveEnabled",
@@ -32461,7 +32471,7 @@
             },
             {
               "key": "Responsive Wrist Splay",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -187847,8 +187857,8 @@
     "desktop": {
       "left": 820.7999877929688,
       "top": 79.1875,
-      "width": 664,
-      "height": 629.1875
+      "width": 667.2000122070312,
+      "height": 630.7875366210938
     }
   }
 }
