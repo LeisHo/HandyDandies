@@ -8417,10 +8417,9 @@ function evalOffsetAxisSlot(slot, handDist) {
 // camera" direction. The amount per axis is the curve value: X of each
 // curve = the hand's distance from the cursor (normalized nearest->farthest
 // across the field), Y = that axis's Min..Max slider range, in world units.
-// FROZEN at trigger time (see captureCameraOffsetNorm()), like every other
-// distance-driven curve in this file, so the offset does NOT follow the
-// cursor while it plays (an earlier version recomputed it live every frame
-// and the hands visibly reacted to cursor movement mid-offset). The amount
+// LIVE since 2026-10-11 (direct request, reversing the earlier frozen-at-trigger design): the
+// distance norm is re-read every frame by refreshLiveDistanceState(), so the amount follows the
+// cursor while it plays. The amount
 // ramps in with the transition's own progress exactly like the main Offset
 // group, then is locked into the per-hand accumulator. Stacks with the main
 // Offset group; independent on/off plus a checkbox per axis.

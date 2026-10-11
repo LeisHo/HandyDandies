@@ -16752,6 +16752,38 @@ Floor and Light Ceiling; Min/Max X/Y/Z position sliders in Field Layout.
  function offsets included. Changing a bound re-lays the field out so idle hands are released when widened.
  `main.js` `?v=311` -> `?v=312`.
 
+2026-10-11  -  (own Cursor Target Depth per tracking feature; click-function distance curves are live)
+
+Direct requests (same round as the screen-space entry above):
+1) Each cursor-tracking feature has its own Cursor Target Depth (x Field Radius) slider next to its checkbox:
+ armRotationTargetDepth, palmRotationTargetDepth, wristSplayTargetDepth, armLengthTargetDepth (per device;
+ defaults 0.05 / 0.8 / 0.6 = your saved shared Cursor Target Depth, so nothing moves until you change one). The
+ shared Cursor Target Depth still drives the target marker, Cursor Offset, render order and Offset To Camera
+ direction. Wrist Splay and Wrist Cropping measure to a target at their own depth with their own field min/range
+ (hand._splayDist / hand._cropDist, set in updateRenderOrder()); Arm Rotation and Palm Rotation use _trackTargetArm
+ / _trackTargetPalm. updateTrackingTargets() refreshes the four targets.
+2) Click-function distance curves are LIVE. "As I drag the cursor around, the rate will change, so the hands closest
+ to the cursor at any time follow the curve editors ... all features within click functions that depend on hand
+ distance." refreshLiveDistanceState() (top of updateClickHoldPoseForHand / updateClickPoseForHand) re-evaluates, from
+ each hand's CURRENT screen-space distance, every frame the function is active:
+  - Start Time (the wait before a hand starts: claim time = press time + current delay),
+  - Animation Speed (a tempo = speed at commit / speed now scales a per-hand nominal clock: fwdNom, loopNom, lapNom;
+    positions stay continuous because the clock is integrated, not re-divided),
+  - Start Distance (tween amount; out of range keeps the last amount),
+  - Offset To Camera (the distance norm),
+  - Retransition Start Time and Speed (progress accumulated in retProg),
+  - Tween Stop Start Time and Delay (live while stopping; the stop's virtual clock also takes the tempo).
+ Cursor Offset was already live. Easing is a function of progress, not distance, so it is unchanged. Rotation has no
+ distance curve of its own, so nothing to make live there. With a curve off or the cursor still, every value equals the old
+ frozen one.
+ Verified on the deployed page (v=314) by driving updateRenderOrder() with a fake clock: custom21 (Click+Hold
+ Sequence) and custom24 (Click Single Pose) ran start -> cursor moved twice -> release -> back to idle; Offset To
+ Camera norm changed 0.349 -> 0.48 -> 0.325 with the cursor, tempo moved 0.955-1.074, hand bone rotation never
+ stepped more than 3.8 degrees in a frame, all hands returned to idle. A cursor teleport of ~1000 px in one frame still
+ moves a hand with Offset To Camera by up to ~35 world units in that frame (the offset follows the curve exactly);
+ real mouse movement is continuous. If that looks abrupt, a damping slider for the offset norm is the fix.
+ `main.js` `?v=312` -> `?v=314`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

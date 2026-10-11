@@ -2513,3 +2513,10 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   for splay.
 - **Hand Position Min / Max (2026-10-11)** is applied by `applyFieldBounds()` after `updateRenderOrder()`; `fieldBounds` is null when all three axes are at the
   default -300..300. Eyedropper buttons use `pickScreenColor()` (EyeDropper or canvas readPixels fallback).
+- **Click-function distance values are live (2026-10-11).** Never freeze a distance-curve result at trigger time. `refreshLiveDistanceState()` runs first in
+  both per-hand update functions; time-based phases read the nominal clocks it advances (`fwdNom`, `loopNom`, `lapNom`) and the accumulated `retProg`, not
+  `now - startTime`. A new phase that divides elapsed time by a distance-driven duration must use these, or it will ignore the cursor. Each cursor-tracking feature
+  has its own target depth (`armRotationTargetDepth` etc., `updateTrackingTargets()`), separate from the shared `targetDepthFactor`.
+- **Testing live distance without a real tab (2026-10-11).** Fake `window.innerWidth/innerHeight` and `camera.aspect` (the sandbox reports 0, which silently falls
+  back to world XY), fake `document.hidden/hasFocus` + fire `visibilitychange`/`focus`, replace `performance.now` with a counter you advance by 16 ms, set
+  `cfg.multiClickWindowMs = cfg.holdConfirmMs = 0`, and drive `__debug.updateRenderOrder()` synchronously after each `cursorNDC.set` + `updateCursorTarget()`.
