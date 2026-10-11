@@ -9351,7 +9351,7 @@
       "renderOrderFallback2Except": "closest",
       "renderOrderFlipLock": true,
       "fieldRows": 45,
-      "fieldCols": 30,
+      "fieldCols": 28,
       "rowSpacing": 8.5,
       "columnSpacing": 10,
       "handScale": 1.2,
@@ -198392,7 +198392,7 @@
       "left": 20,
       "top": 0,
       "width": 377.8571472167969,
-      "height": 681.672607421875
+      "height": 35.52381134033203
     }
   }
 }
