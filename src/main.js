@@ -267,6 +267,7 @@ let xyAllMinDist = 0, xyAllDistRange = 0.001, restAllMinDist = 0, restAllDistRan
 // Whole-Hand Rotation at Base (ported from HANDO, 2026-10-11): orientation of the hand MESH's own local axes relative to the model root
 // (product of the local rotations from the skinned mesh up to the scene root, measured at load) and scratch for the base rotation.
 const modelBaseFrameQ = new THREE.Quaternion(), _baseFrameInv = new THREE.Quaternion()
+let cloneBaseVersion = 0 // bumped whenever the shared Whole-Hand / Base Rotation changes, so idle hands know to pick it up (see updateRenderOrder())
 const cloneBaseRb = new THREE.Quaternion(), _poseBaseRb = new THREE.Quaternion(), _baseRbInv = new THREE.Quaternion(), _baseQ0 = new THREE.Quaternion()
 const _brQx = new THREE.Quaternion(), _brQy = new THREE.Quaternion(), _brQz = new THREE.Quaternion()
 const _brAX = new THREE.Vector3(1, 0, 0), _brAY = new THREE.Vector3(0, 1, 0), _brAZ = new THREE.Vector3(0, 0, 1), _brPosA = new THREE.Vector3(), _brPosB = new THREE.Vector3()
@@ -6941,6 +6942,7 @@ function updateCloneBaseQuat() {
   ))
   computeBaseRotationQuat(cfg.baseRotationX || 0, cfg.baseRotationY || 0, cfg.baseRotationZ || 0, cloneBaseRb)
   cloneBaseQuat.copy(alignQuat).multiply(wholeHandRotQuat).multiply(cloneBaseRb)
+  cloneBaseVersion++
 }
 // Whole-Hand Rotation at Base (ported from HANDO's updateModelRootRotation): R = F * (Rx * Ry * Rz) * F^-1, where F is the hand mesh's own axes
 // relative to the model root, so X/Y/Z are angles about the mesh's local axes. Expressed in the raw model frame, so it composes as
@@ -16378,8 +16380,13 @@ function updateRenderOrder() {
       // 2 must never be delayed).
       const staggerCount = Math.max(1, Math.round(cfg.wristSplayReposeStagger))
       const isThisHandsStaggerTurn = (idleReposeFrameCounter % staggerCount) === (i % staggerCount)
-      const needsIdleRepose = !overridden && ((cfg.wristSplayResponsiveEnabled && isThisHandsStaggerTurn) || hand._wasOverriddenLastFrame || !hand.everReposed)
+      // A changed Whole-Hand Rotation / Rotation at Base (cloneBaseQuat) also forces one repose of an idle hand (2026-10-11). The repose block is the only place an idle
+      // hand copies cloneBaseQuat into currentBaseQuat (which is what turns the model), and it only ran with Responsive Wrist Splay on, after a trigger, or on a hand's
+      // first frame -- so with Responsive Wrist Splay off the rotation sliders, a pose's rotation applied by Default, and Rotation at Base never reached idle hands.
+      const baseChanged = !overridden && hand._cloneBaseVersion !== cloneBaseVersion
+      const needsIdleRepose = !overridden && ((cfg.wristSplayResponsiveEnabled && isThisHandsStaggerTurn) || hand._wasOverriddenLastFrame || !hand.everReposed || baseChanged)
       if (needsIdleRepose) {
+        hand._cloneBaseVersion = cloneBaseVersion
         const wasEverReposedBeforeThisFrame = hand.everReposed
         hand.everReposed = true
         const targetSplay = splayDegForHand(hand, live, minLiveDist, liveDistRange)

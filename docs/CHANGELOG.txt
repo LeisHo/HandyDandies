@@ -16974,6 +16974,16 @@ Direct request: provide camera yaw, roll and pitch sliders. Camera group > Camer
  - Limits: pitch is held to +-89 (straight up/down makes the camera's up direction undefined); the cursor ray still hits the z = 0 plane only while the camera looks toward it.
  `main.js` `?v=329` -> `?v=330`.
 
+2026-10-11  -  (idle hands now pick up Whole-Hand Rotation / Rotation at Base changes even with Responsive Wrist Splay off)
+
+Direct question: "when i set a pose as default position, how come it doesnt apply the model rotation settings?" Cause (MEASURED on the deployed page): with Responsive Wrist Splay off, changing
+modelRotY to 180 set cfg.modelRotY = 180 and rebuilt the shared cloneBaseQuat, but an idle hand's clone.quaternion did not change at all (0 degrees). The only place an idle hand copies cloneBaseQuat
+into hand.currentBaseQuat (what applyHandArmLength() turns the model with) is the idle-repose block, and that block only runs with Responsive Wrist Splay on, for a hand coming off a trigger, or on a
+hand's first frame. So the Whole-Hand Rotation / Rotation at Base sliders, and a pose's rotation applied by "Default", never reached idle hands in that configuration (they only showed up after a click
+function had run on the hand). Fix: updateCloneBaseQuat() bumps cloneBaseVersion; an idle hand whose _cloneBaseVersion differs gets one forced repose. With Responsive Wrist Splay on nothing changes.
+Not changed: "Default" copies every pose value, and 105 of your 106 saved poses were saved before Rotation at Base existed, so they carry no base-rotation values -- setting one as Default writes 0 into the
+three Base Rotation sliders (it overwrote nothing you can recover from the pose itself). `main.js` `?v=330` -> `?v=331`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a
