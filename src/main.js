@@ -903,7 +903,7 @@ function renderOrderBone(hand, key) {
 // Per-frame render ordering across ALL hands (2026-10-11): the Mode, Fallback and Fallback 2 dropdowns are three levels of one sort; the sorted position becomes each hand's renderOrder (0..n-1, so the values stay small and
 // exact). A level is either a scalar priority (Z modes, cursor-distance modes; two hands tie when they agree to 0.01 world units) or "Palm To Arm Base", a pairwise rule: hand A goes above hand B when A's palm center is higher
 // in Z than B's arm base (by more than 0.01); when each hand's palm is higher than the other's arm base, the hand whose arm base is FARTHER from the cursor on screen (XY only, no Z) goes above; when neither is, the level ties.
-let roOrder = [], roPalmZ = null, roBaseZ = null, roBaseXY = null, roEndZ = null, roEndXY = null
+let roOrder = [], roPalmZ = null, roBaseZ = null, roBaseXY = null, roEndZ = null, roEndXY = null, roSX = null, roSY = null, roSR = null, roIndeg = null, roHead = null, roDone = null
 const roScalar = {}
 const _roV = new THREE.Vector3()
 function computeRenderOrderRanks() {
@@ -957,8 +957,8 @@ function computeRenderOrderRanks() {
     { m: evalMode(cfg.renderOrderFallback || 'farthestZ'), q: evalMode(cfg.renderOrderFallbackExcept) },
     { m: evalMode(cfg.renderOrderFallback2 || 'farthestZ'), q: evalMode(cfg.renderOrderFallback2Except) }
   ]
-  if (roOrder.length !== n) { roOrder = new Array(n); for (let i = 0; i < n; i++) roOrder[i] = i }
-  const cmp = (a, b) => {
+  // The three levels (each with its optional Except) as one pairwise decision: +1 = a above b, -1 = b above a, 0 = every level ties.
+  const cmpLevels = (a, b) => {
     for (let l = 0; l < 3; l++) {
       const L = lv[l]
       if (!L.m) continue
@@ -967,10 +967,75 @@ function computeRenderOrderRanks() {
       if (r !== 0 && L.q && cmpMode(L.q, a, b) === -r) r = 0
       if (r !== 0) return r
     }
-    return a - b // fully tied: keep a stable, fixed order (hand index)
+    return 0
   }
-  roOrder.sort(cmp)
-  for (let r = 0; r < n; r++) hands[roOrder[r]]._roRank = r
+  const pairwise = lv.some((L) => (L.m && L.m.pair) || (L.q && L.q.pair))
+  if (!pairwise) {
+    // Every level is a scalar key: a true total order, so a plain sort is exact.
+    if (roOrder.length !== n) { roOrder = new Array(n); for (let i = 0; i < n; i++) roOrder[i] = i }
+    roOrder.sort((a, b) => cmpLevels(a, b) || (a - b))
+    for (let r = 0; r < n; r++) hands[roOrder[r]]._roRank = r
+    return
+  }
+  // A pairwise level (Palm To Arm Base / End) is not a total order (A can beat B, B beat C, C beat A), so a global sort cannot honour it (measured: 4-33% of decided pairs came out wrong). What actually matters for drawing order is only
+  // the relation between hands that OVERLAP on screen (painter's algorithm), so: find overlapping pairs with a screen-space grid, decide each with the levels above, and take a topological order of those "A is drawn after B" edges
+  // (Kahn's algorithm; a cycle is broken at the hand with the fewest unmet constraints). Hands that do not overlap anything keep hand-index order.
+  const vFov = THREE.MathUtils.degToRad(camera.fov)
+  const cw = renderer.domElement.clientWidth || window.innerWidth, ch = renderer.domElement.clientHeight || window.innerHeight
+  if (!roSX || roSX.length !== n) { roSX = new Float64Array(n); roSY = new Float64Array(n); roSR = new Float64Array(n); roIndeg = new Int32Array(n); roHead = new Int32Array(n); roDone = new Uint8Array(n) }
+  let maxR = 1
+  for (let i = 0; i < n; i++) {
+    const h = hands[i]
+    _roV.copy(handBoundsCenterLocal).multiplyScalar(h.clone.scale.x).applyQuaternion(alignQuat).applyQuaternion(h.wrapper.quaternion).add(h.wrapper.position)
+    const dist = camera.position.distanceTo(_roV)
+    const pxPerUnit = ch / (2 * Math.tan(vFov / 2) * Math.max(dist, 0.001))
+    roSR[i] = handBoundsRadiusLocal * h.clone.scale.x * pxPerUnit
+    _roV.project(camera)
+    roSX[i] = (_roV.x * 0.5 + 0.5) * cw
+    roSY[i] = (-_roV.y * 0.5 + 0.5) * ch
+    if (roSR[i] > maxR) maxR = roSR[i]
+  }
+  const cell = Math.max(maxR * 2, 8)
+  const grid = new Map()
+  const cellOf = (i) => (Math.floor(roSX[i] / cell) + 100000) * 200003 + (Math.floor(roSY[i] / cell) + 100000)
+  for (let i = 0; i < n; i++) { const k = cellOf(i); const arr = grid.get(k); if (arr) arr.push(i); else grid.set(k, [i]) }
+  // edges "u is drawn BEFORE v" (u under v), as linked lists in typed/plain arrays
+  const eTo = [], eNext = []
+  roHead.fill(-1); roIndeg.fill(0); roDone.fill(0)
+  for (let i = 0; i < n; i++) {
+    const cx = Math.floor(roSX[i] / cell), cy = Math.floor(roSY[i] / cell)
+    for (let dx = -1; dx <= 1; dx++) for (let dy = -1; dy <= 1; dy++) {
+      const arr = grid.get((cx + dx + 100000) * 200003 + (cy + dy + 100000))
+      if (!arr) continue
+      for (let q = 0; q < arr.length; q++) {
+        const j = arr[q]
+        if (j <= i) continue
+        const ddx = roSX[i] - roSX[j], ddy = roSY[i] - roSY[j], rr = roSR[i] + roSR[j]
+        if (ddx * ddx + ddy * ddy >= rr * rr) continue
+        const r = cmpLevels(i, j)
+        if (r === 0) continue
+        const under = r > 0 ? j : i, over = r > 0 ? i : j
+        eTo.push(over); eNext.push(roHead[under]); roHead[under] = eTo.length - 1
+        roIndeg[over]++
+      }
+    }
+  }
+  const ready = []
+  for (let i = 0; i < n; i++) if (roIndeg[i] === 0) ready.push(i)
+  let rank = 0, qi = 0, doneCount = 0
+  while (doneCount < n) {
+    if (qi >= ready.length) { // a cycle: release the unplaced hand with the fewest unmet constraints
+      let best = -1, bi = 1e9
+      for (let i = 0; i < n; i++) if (!roDone[i] && roIndeg[i] < bi) { bi = roIndeg[i]; best = i }
+      roIndeg[best] = 0
+      ready.push(best)
+    }
+    const u = ready[qi++]
+    if (roDone[u]) continue
+    roDone[u] = 1; doneCount++
+    hands[u]._roRank = rank++
+    for (let e = roHead[u]; e !== -1; e = eNext[e]) { const v = eTo[e]; if (!roDone[v] && --roIndeg[v] === 0) ready.push(v) }
+  }
 }
 // Moves each Except select into its main dropdown's row, to the right of it (the Except rows themselves are hidden). The select keeps its own control binding, so saving / restoring / undo work as for any select.
 function mergeExceptSelects() {

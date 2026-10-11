@@ -17225,6 +17225,15 @@ other's arm end has an arm base with a z value lesser than the arm base z value 
    Choice made where the wording left room: "unless" voids the rule (falls through) rather than flipping it to B above A. Say if you want the flip.
  - computeRenderOrderRanks() was reworked into per-mode evaluators (one per distinct mode used by any level or qualifier, shared within the frame) so a qualifier can be any scalar or Palm To Arm mode. `main.js` `?v=354` -> `?v=355`.
 
+2026-10-11  -  (Render Order with Palm To Arm: painter's-algorithm ordering of overlapping hands instead of a global sort)
+
+Found while testing the Except qualifier (v=355): a pairwise rule (Palm To Arm Base / End) is not a total order, so the global sort could not honour it. MEASURED on the live page with hands tilted: 4-5% of decided pairs came out in the wrong order with smooth, tracking-like tilts and 33% in a field of identical
+hands with mixed Z (and 44 of 80 fully-decided triples), because tie-breaking by hand index mixed with decided pairs makes the comparator inconsistent.
+ - Your follow-up ("if the qualifier is applied, render order moves onto the next fallback, with its own qualifiers") is exactly how a level behaves: a level that does not decide a pair (it ties, or its Except voided it) passes the pair to the next level, which applies its own Except.
+ - Fix (v=356): when any level or Except is a Palm To Arm mode, the order is computed the way a painter's algorithm would: only hands that OVERLAP on screen need a relative order, so overlapping pairs are found with a screen-space grid (each hand's circle = its bounding sphere projected, as the Prevent Reordering Flash code already does),
+   each pair is decided by the three levels + Excepts, and the ranks are a topological order of those "drawn after" constraints (Kahn's algorithm; a cycle among overlapping hands is broken at the hand with the fewest unmet constraints). Non-overlapping hands keep hand-index order. Scalar-only settings still use the exact global sort.
+ - A pair that overlaps but is decided by NO level keeps whatever order the other constraints give it. `main.js` `?v=355` -> `?v=356`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a
