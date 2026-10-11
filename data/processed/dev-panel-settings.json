@@ -8298,12 +8298,12 @@
       "custom21CameraOffsetXEnabled": false,
       "custom21CameraOffsetXCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.34417351623278447,\"y\":0}},{\"x\":0.5060340324930588,\"y\":0,\"h2\":{\"x\":-0.27973719658025675,\"y\":0},\"h1\":{\"x\":0.3008494378315969,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.347939632185172,\"y\":0}}]",
       "custom21CameraOffsetXRange": "{\"min\":0,\"max\":1}",
-      "custom21CameraOffsetYEnabled": true,
+      "custom21CameraOffsetYEnabled": false,
       "custom21CameraOffsetYCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.324820628419056,\"y\":0},\"bg\":0.64,\"m\":\"linear\"},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.467575665942766,\"y\":0}}]",
       "custom21CameraOffsetYRange": "{\"min\":-1,\"max\":2}",
       "custom21CameraOffsetZEnabled": true,
       "custom21CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.3776012315474063,\"y\":-0.1328125}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.4535008384418726,\"y\":0.6505208333333333}}]",
-      "custom21CameraOffsetZRange": "{\"min\":-1,\"max\":3}",
+      "custom21CameraOffsetZRange": "{\"min\":-3,\"max\":3}",
       "custom21RotationEnabled": false,
       "custom21RotationX": 0,
       "custom21RotationY": -5,
@@ -8317,7 +8317,7 @@
       "custom21TweenChain": [],
       "custom21TweenSpeedMs": 800,
       "custom21TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom21TweenStartTimeRange": "{\"min\":0,\"max\":670}",
+      "custom21TweenStartTimeRange": "{\"min\":0,\"max\":500}",
       "custom21LoopMode": "Loop",
       "custom21LoopHoldMs": 0,
       "custom21TransitionSpeedMs": 700,
@@ -9983,12 +9983,12 @@
       "custom21Trig5CameraOffsetXEnabled": false,
       "custom21Trig5CameraOffsetXCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.34417351623278447,\"y\":0}},{\"x\":0.5060340324930588,\"y\":0,\"h2\":{\"x\":-0.27973719658025675,\"y\":0},\"h1\":{\"x\":0.3008494378315969,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.347939632185172,\"y\":0}}]",
       "custom21Trig5CameraOffsetXRange": "{\"min\":0,\"max\":1}",
-      "custom21Trig5CameraOffsetYEnabled": true,
+      "custom21Trig5CameraOffsetYEnabled": false,
       "custom21Trig5CameraOffsetYCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.324820628419056,\"y\":0},\"bg\":0.64},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.467575665942766,\"y\":0}}]",
-      "custom21Trig5CameraOffsetYRange": "{\"min\":-2,\"max\":1}",
-      "custom21Trig5CameraOffsetZEnabled": false,
+      "custom21Trig5CameraOffsetYRange": "{\"min\":0.5,\"max\":1}",
+      "custom21Trig5CameraOffsetZEnabled": true,
       "custom21Trig5CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.3776012315474063,\"y\":-0.1328125}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.4535008384418726,\"y\":0.6505208333333333}}]",
-      "custom21Trig5CameraOffsetZRange": "{\"min\":-1,\"max\":3}",
+      "custom21Trig5CameraOffsetZRange": "{\"min\":-2,\"max\":2}",
       "custom21Trig5RotationEnabled": false,
       "custom21Trig5RotationX": 0,
       "custom21Trig5RotationY": -5,
@@ -10002,7 +10002,7 @@
       "custom21Trig5TweenChain": [],
       "custom21Trig5TweenSpeedMs": 800,
       "custom21Trig5TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom21Trig5TweenStartTimeRange": "{\"min\":0,\"max\":670}",
+      "custom21Trig5TweenStartTimeRange": "{\"min\":0,\"max\":200}",
       "custom21Trig5LoopMode": "Loop",
       "custom21Trig5LoopHoldMs": 0,
       "custom21Trig5TransitionSpeedMs": 700,
@@ -18339,12 +18339,12 @@
       "custom21CameraOffsetXEnabled": false,
       "custom21CameraOffsetXCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.34417351623278447,\"y\":0}},{\"x\":0.5060340324930588,\"y\":0,\"h2\":{\"x\":-0.27973719658025675,\"y\":0},\"h1\":{\"x\":0.3008494378315969,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.347939632185172,\"y\":0}}]",
       "custom21CameraOffsetXRange": "{\"min\":0,\"max\":1}",
-      "custom21CameraOffsetYEnabled": true,
+      "custom21CameraOffsetYEnabled": false,
       "custom21CameraOffsetYCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.324820628419056,\"y\":0},\"bg\":0.64,\"m\":\"linear\"},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.467575665942766,\"y\":0}}]",
       "custom21CameraOffsetYRange": "{\"min\":-1,\"max\":2}",
       "custom21CameraOffsetZEnabled": true,
       "custom21CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.3776012315474063,\"y\":-0.1328125}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.4535008384418726,\"y\":0.6505208333333333}}]",
-      "custom21CameraOffsetZRange": "{\"min\":-1,\"max\":3}",
+      "custom21CameraOffsetZRange": "{\"min\":-3,\"max\":3}",
       "custom21RotationEnabled": false,
       "custom21RotationX": 0,
       "custom21RotationY": -5,
@@ -18358,7 +18358,7 @@
       "custom21TweenChain": [],
       "custom21TweenSpeedMs": 800,
       "custom21TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom21TweenStartTimeRange": "{\"min\":0,\"max\":670}",
+      "custom21TweenStartTimeRange": "{\"min\":0,\"max\":500}",
       "custom21LoopMode": "Loop",
       "custom21LoopHoldMs": 0,
       "custom21TransitionSpeedMs": 700,
@@ -20024,12 +20024,12 @@
       "custom21Trig5CameraOffsetXEnabled": false,
       "custom21Trig5CameraOffsetXCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.34417351623278447,\"y\":0}},{\"x\":0.5060340324930588,\"y\":0,\"h2\":{\"x\":-0.27973719658025675,\"y\":0},\"h1\":{\"x\":0.3008494378315969,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.347939632185172,\"y\":0}}]",
       "custom21Trig5CameraOffsetXRange": "{\"min\":0,\"max\":1}",
-      "custom21Trig5CameraOffsetYEnabled": true,
+      "custom21Trig5CameraOffsetYEnabled": false,
       "custom21Trig5CameraOffsetYCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.324820628419056,\"y\":0},\"bg\":0.64},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.467575665942766,\"y\":0}}]",
-      "custom21Trig5CameraOffsetYRange": "{\"min\":-2,\"max\":1}",
-      "custom21Trig5CameraOffsetZEnabled": false,
+      "custom21Trig5CameraOffsetYRange": "{\"min\":0.5,\"max\":1}",
+      "custom21Trig5CameraOffsetZEnabled": true,
       "custom21Trig5CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.3776012315474063,\"y\":-0.1328125}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.4535008384418726,\"y\":0.6505208333333333}}]",
-      "custom21Trig5CameraOffsetZRange": "{\"min\":-1,\"max\":3}",
+      "custom21Trig5CameraOffsetZRange": "{\"min\":-2,\"max\":2}",
       "custom21Trig5RotationEnabled": false,
       "custom21Trig5RotationX": 0,
       "custom21Trig5RotationY": -5,
@@ -20043,7 +20043,7 @@
       "custom21Trig5TweenChain": [],
       "custom21Trig5TweenSpeedMs": 800,
       "custom21Trig5TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom21Trig5TweenStartTimeRange": "{\"min\":0,\"max\":670}",
+      "custom21Trig5TweenStartTimeRange": "{\"min\":0,\"max\":200}",
       "custom21Trig5LoopMode": "Loop",
       "custom21Trig5LoopHoldMs": 0,
       "custom21Trig5TransitionSpeedMs": 700,
@@ -28380,12 +28380,12 @@
       "custom21CameraOffsetXEnabled": false,
       "custom21CameraOffsetXCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.34417351623278447,\"y\":0}},{\"x\":0.5060340324930588,\"y\":0,\"h2\":{\"x\":-0.27973719658025675,\"y\":0},\"h1\":{\"x\":0.3008494378315969,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.347939632185172,\"y\":0}}]",
       "custom21CameraOffsetXRange": "{\"min\":0,\"max\":1}",
-      "custom21CameraOffsetYEnabled": true,
+      "custom21CameraOffsetYEnabled": false,
       "custom21CameraOffsetYCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.324820628419056,\"y\":0},\"bg\":0.64,\"m\":\"linear\"},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.467575665942766,\"y\":0}}]",
       "custom21CameraOffsetYRange": "{\"min\":-1,\"max\":2}",
       "custom21CameraOffsetZEnabled": true,
       "custom21CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.3776012315474063,\"y\":-0.1328125}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.4535008384418726,\"y\":0.6505208333333333}}]",
-      "custom21CameraOffsetZRange": "{\"min\":-1,\"max\":3}",
+      "custom21CameraOffsetZRange": "{\"min\":-3,\"max\":3}",
       "custom21RotationEnabled": false,
       "custom21RotationX": 0,
       "custom21RotationY": -5,
@@ -28399,7 +28399,7 @@
       "custom21TweenChain": [],
       "custom21TweenSpeedMs": 800,
       "custom21TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom21TweenStartTimeRange": "{\"min\":0,\"max\":670}",
+      "custom21TweenStartTimeRange": "{\"min\":0,\"max\":500}",
       "custom21LoopMode": "Loop",
       "custom21LoopHoldMs": 0,
       "custom21TransitionSpeedMs": 700,
@@ -30065,12 +30065,12 @@
       "custom21Trig5CameraOffsetXEnabled": false,
       "custom21Trig5CameraOffsetXCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.34417351623278447,\"y\":0}},{\"x\":0.5060340324930588,\"y\":0,\"h2\":{\"x\":-0.27973719658025675,\"y\":0},\"h1\":{\"x\":0.3008494378315969,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.347939632185172,\"y\":0}}]",
       "custom21Trig5CameraOffsetXRange": "{\"min\":0,\"max\":1}",
-      "custom21Trig5CameraOffsetYEnabled": true,
+      "custom21Trig5CameraOffsetYEnabled": false,
       "custom21Trig5CameraOffsetYCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.324820628419056,\"y\":0},\"bg\":0.64},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.467575665942766,\"y\":0}}]",
-      "custom21Trig5CameraOffsetYRange": "{\"min\":-2,\"max\":1}",
-      "custom21Trig5CameraOffsetZEnabled": false,
+      "custom21Trig5CameraOffsetYRange": "{\"min\":0.5,\"max\":1}",
+      "custom21Trig5CameraOffsetZEnabled": true,
       "custom21Trig5CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.3776012315474063,\"y\":-0.1328125}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.4535008384418726,\"y\":0.6505208333333333}}]",
-      "custom21Trig5CameraOffsetZRange": "{\"min\":-1,\"max\":3}",
+      "custom21Trig5CameraOffsetZRange": "{\"min\":-2,\"max\":2}",
       "custom21Trig5RotationEnabled": false,
       "custom21Trig5RotationX": 0,
       "custom21Trig5RotationY": -5,
@@ -30084,7 +30084,7 @@
       "custom21Trig5TweenChain": [],
       "custom21Trig5TweenSpeedMs": 800,
       "custom21Trig5TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom21Trig5TweenStartTimeRange": "{\"min\":0,\"max\":670}",
+      "custom21Trig5TweenStartTimeRange": "{\"min\":0,\"max\":200}",
       "custom21Trig5LoopMode": "Loop",
       "custom21Trig5LoopHoldMs": 0,
       "custom21Trig5TransitionSpeedMs": 700,
@@ -74221,23 +74221,22 @@
                 }
               },
               {
+                "type": "row",
+                "key": "custom21SpeedCurve"
+              },
+              {
                 "type": "group",
                 "group": {
                   "key": "Animation Speed Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
-                    {
-                      "type": "row",
-                      "key": "custom21SpeedCurve"
-                    },
                     {
                       "type": "row",
                       "key": "custom21SpeedCurveRange"
                     }
                   ],
                   "settings": [
-                    "custom21SpeedCurve",
                     "custom21SpeedCurveRange"
                   ],
                   "subgroups": []
@@ -75724,7 +75723,7 @@
                       "type": "group",
                       "group": {
                         "key": "Trigger 2",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -76856,7 +76855,7 @@
                       "type": "group",
                       "group": {
                         "key": "Trigger 3",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -77988,7 +77987,7 @@
                       "type": "group",
                       "group": {
                         "key": "Trigger 4",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -79184,10 +79183,6 @@
                               "items": [
                                 {
                                   "type": "row",
-                                  "key": "custom21Trig5OffsetMode"
-                                },
-                                {
-                                  "type": "row",
                                   "key": "custom21Trig5OffsetX"
                                 },
                                 {
@@ -79240,7 +79235,6 @@
                                 }
                               ],
                               "settings": [
-                                "custom21Trig5OffsetMode",
                                 "custom21Trig5OffsetX",
                                 "custom21Trig5OffsetY",
                                 "custom21Trig5OffsetZ",
@@ -79259,12 +79253,20 @@
                             }
                           },
                           {
+                            "type": "row",
+                            "key": "custom21Trig5OffsetMode"
+                          },
+                          {
                             "type": "group",
                             "group": {
                               "key": "Offset To Camera",
                               "collapsed": false,
                               "locked": false,
                               "items": [
+                                {
+                                  "type": "row",
+                                  "key": "custom21Trig5CameraOffsetYCurve"
+                                },
                                 {
                                   "type": "row",
                                   "key": "custom21Trig5CameraOffsetXEnabled"
@@ -79280,10 +79282,6 @@
                                 {
                                   "type": "row",
                                   "key": "custom21Trig5CameraOffsetYEnabled"
-                                },
-                                {
-                                  "type": "row",
-                                  "key": "custom21Trig5CameraOffsetYCurve"
                                 },
                                 {
                                   "type": "row",
@@ -79303,11 +79301,11 @@
                                 }
                               ],
                               "settings": [
+                                "custom21Trig5CameraOffsetYCurve",
                                 "custom21Trig5CameraOffsetXEnabled",
                                 "custom21Trig5CameraOffsetXCurve",
                                 "custom21Trig5CameraOffsetXRange",
                                 "custom21Trig5CameraOffsetYEnabled",
-                                "custom21Trig5CameraOffsetYCurve",
                                 "custom21Trig5CameraOffsetYRange",
                                 "custom21Trig5CameraOffsetZEnabled",
                                 "custom21Trig5CameraOffsetZCurve",
@@ -79729,7 +79727,8 @@
                           "custom21Trig5TransitionSpeedMs",
                           "custom21Trig5TweenSpeedMs",
                           "custom21Trig5LoopMode",
-                          "custom21Trig5LoopHoldMs"
+                          "custom21Trig5LoopHoldMs",
+                          "custom21Trig5OffsetMode"
                         ],
                         "subgroups": [
                           {
@@ -79737,10 +79736,6 @@
                             "collapsed": false,
                             "locked": false,
                             "items": [
-                              {
-                                "type": "row",
-                                "key": "custom21Trig5OffsetMode"
-                              },
                               {
                                 "type": "row",
                                 "key": "custom21Trig5OffsetX"
@@ -79795,7 +79790,6 @@
                               }
                             ],
                             "settings": [
-                              "custom21Trig5OffsetMode",
                               "custom21Trig5OffsetX",
                               "custom21Trig5OffsetY",
                               "custom21Trig5OffsetZ",
@@ -79819,6 +79813,10 @@
                             "items": [
                               {
                                 "type": "row",
+                                "key": "custom21Trig5CameraOffsetYCurve"
+                              },
+                              {
+                                "type": "row",
                                 "key": "custom21Trig5CameraOffsetXEnabled"
                               },
                               {
@@ -79832,10 +79830,6 @@
                               {
                                 "type": "row",
                                 "key": "custom21Trig5CameraOffsetYEnabled"
-                              },
-                              {
-                                "type": "row",
-                                "key": "custom21Trig5CameraOffsetYCurve"
                               },
                               {
                                 "type": "row",
@@ -79855,11 +79849,11 @@
                               }
                             ],
                             "settings": [
+                              "custom21Trig5CameraOffsetYCurve",
                               "custom21Trig5CameraOffsetXEnabled",
                               "custom21Trig5CameraOffsetXCurve",
                               "custom21Trig5CameraOffsetXRange",
                               "custom21Trig5CameraOffsetYEnabled",
-                              "custom21Trig5CameraOffsetYCurve",
                               "custom21Trig5CameraOffsetYRange",
                               "custom21Trig5CameraOffsetZEnabled",
                               "custom21Trig5CameraOffsetZCurve",
@@ -81389,7 +81383,7 @@
                     },
                     {
                       "key": "Trigger 2",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -82518,7 +82512,7 @@
                     },
                     {
                       "key": "Trigger 3",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -83647,7 +83641,7 @@
                     },
                     {
                       "key": "Trigger 4",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -84840,10 +84834,6 @@
                             "items": [
                               {
                                 "type": "row",
-                                "key": "custom21Trig5OffsetMode"
-                              },
-                              {
-                                "type": "row",
                                 "key": "custom21Trig5OffsetX"
                               },
                               {
@@ -84896,7 +84886,6 @@
                               }
                             ],
                             "settings": [
-                              "custom21Trig5OffsetMode",
                               "custom21Trig5OffsetX",
                               "custom21Trig5OffsetY",
                               "custom21Trig5OffsetZ",
@@ -84915,12 +84904,20 @@
                           }
                         },
                         {
+                          "type": "row",
+                          "key": "custom21Trig5OffsetMode"
+                        },
+                        {
                           "type": "group",
                           "group": {
                             "key": "Offset To Camera",
                             "collapsed": false,
                             "locked": false,
                             "items": [
+                              {
+                                "type": "row",
+                                "key": "custom21Trig5CameraOffsetYCurve"
+                              },
                               {
                                 "type": "row",
                                 "key": "custom21Trig5CameraOffsetXEnabled"
@@ -84936,10 +84933,6 @@
                               {
                                 "type": "row",
                                 "key": "custom21Trig5CameraOffsetYEnabled"
-                              },
-                              {
-                                "type": "row",
-                                "key": "custom21Trig5CameraOffsetYCurve"
                               },
                               {
                                 "type": "row",
@@ -84959,11 +84952,11 @@
                               }
                             ],
                             "settings": [
+                              "custom21Trig5CameraOffsetYCurve",
                               "custom21Trig5CameraOffsetXEnabled",
                               "custom21Trig5CameraOffsetXCurve",
                               "custom21Trig5CameraOffsetXRange",
                               "custom21Trig5CameraOffsetYEnabled",
-                              "custom21Trig5CameraOffsetYCurve",
                               "custom21Trig5CameraOffsetYRange",
                               "custom21Trig5CameraOffsetZEnabled",
                               "custom21Trig5CameraOffsetZCurve",
@@ -85385,7 +85378,8 @@
                         "custom21Trig5TransitionSpeedMs",
                         "custom21Trig5TweenSpeedMs",
                         "custom21Trig5LoopMode",
-                        "custom21Trig5LoopHoldMs"
+                        "custom21Trig5LoopHoldMs",
+                        "custom21Trig5OffsetMode"
                       ],
                       "subgroups": [
                         {
@@ -85393,10 +85387,6 @@
                           "collapsed": false,
                           "locked": false,
                           "items": [
-                            {
-                              "type": "row",
-                              "key": "custom21Trig5OffsetMode"
-                            },
                             {
                               "type": "row",
                               "key": "custom21Trig5OffsetX"
@@ -85451,7 +85441,6 @@
                             }
                           ],
                           "settings": [
-                            "custom21Trig5OffsetMode",
                             "custom21Trig5OffsetX",
                             "custom21Trig5OffsetY",
                             "custom21Trig5OffsetZ",
@@ -85475,6 +85464,10 @@
                           "items": [
                             {
                               "type": "row",
+                              "key": "custom21Trig5CameraOffsetYCurve"
+                            },
+                            {
+                              "type": "row",
                               "key": "custom21Trig5CameraOffsetXEnabled"
                             },
                             {
@@ -85488,10 +85481,6 @@
                             {
                               "type": "row",
                               "key": "custom21Trig5CameraOffsetYEnabled"
-                            },
-                            {
-                              "type": "row",
-                              "key": "custom21Trig5CameraOffsetYCurve"
                             },
                             {
                               "type": "row",
@@ -85511,11 +85500,11 @@
                             }
                           ],
                           "settings": [
+                            "custom21Trig5CameraOffsetYCurve",
                             "custom21Trig5CameraOffsetXEnabled",
                             "custom21Trig5CameraOffsetXCurve",
                             "custom21Trig5CameraOffsetXRange",
                             "custom21Trig5CameraOffsetYEnabled",
-                            "custom21Trig5CameraOffsetYCurve",
                             "custom21Trig5CameraOffsetYRange",
                             "custom21Trig5CameraOffsetZEnabled",
                             "custom21Trig5CameraOffsetZCurve",
@@ -85923,7 +85912,8 @@
               "custom21TransitionSpeedMs",
               "custom21TweenSpeedMs",
               "custom21LoopMode",
-              "custom21LoopHoldMs"
+              "custom21LoopHoldMs",
+              "custom21SpeedCurve"
             ],
             "subgroups": [
               {
@@ -86103,20 +86093,15 @@
               },
               {
                 "key": "Animation Speed Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
-                  {
-                    "type": "row",
-                    "key": "custom21SpeedCurve"
-                  },
                   {
                     "type": "row",
                     "key": "custom21SpeedCurveRange"
                   }
                 ],
                 "settings": [
-                  "custom21SpeedCurve",
                   "custom21SpeedCurveRange"
                 ],
                 "subgroups": []
@@ -87588,7 +87573,7 @@
                     "type": "group",
                     "group": {
                       "key": "Trigger 2",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -88720,7 +88705,7 @@
                     "type": "group",
                     "group": {
                       "key": "Trigger 3",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -89852,7 +89837,7 @@
                     "type": "group",
                     "group": {
                       "key": "Trigger 4",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -91048,10 +91033,6 @@
                             "items": [
                               {
                                 "type": "row",
-                                "key": "custom21Trig5OffsetMode"
-                              },
-                              {
-                                "type": "row",
                                 "key": "custom21Trig5OffsetX"
                               },
                               {
@@ -91104,7 +91085,6 @@
                               }
                             ],
                             "settings": [
-                              "custom21Trig5OffsetMode",
                               "custom21Trig5OffsetX",
                               "custom21Trig5OffsetY",
                               "custom21Trig5OffsetZ",
@@ -91123,12 +91103,20 @@
                           }
                         },
                         {
+                          "type": "row",
+                          "key": "custom21Trig5OffsetMode"
+                        },
+                        {
                           "type": "group",
                           "group": {
                             "key": "Offset To Camera",
                             "collapsed": false,
                             "locked": false,
                             "items": [
+                              {
+                                "type": "row",
+                                "key": "custom21Trig5CameraOffsetYCurve"
+                              },
                               {
                                 "type": "row",
                                 "key": "custom21Trig5CameraOffsetXEnabled"
@@ -91144,10 +91132,6 @@
                               {
                                 "type": "row",
                                 "key": "custom21Trig5CameraOffsetYEnabled"
-                              },
-                              {
-                                "type": "row",
-                                "key": "custom21Trig5CameraOffsetYCurve"
                               },
                               {
                                 "type": "row",
@@ -91167,11 +91151,11 @@
                               }
                             ],
                             "settings": [
+                              "custom21Trig5CameraOffsetYCurve",
                               "custom21Trig5CameraOffsetXEnabled",
                               "custom21Trig5CameraOffsetXCurve",
                               "custom21Trig5CameraOffsetXRange",
                               "custom21Trig5CameraOffsetYEnabled",
-                              "custom21Trig5CameraOffsetYCurve",
                               "custom21Trig5CameraOffsetYRange",
                               "custom21Trig5CameraOffsetZEnabled",
                               "custom21Trig5CameraOffsetZCurve",
@@ -91593,7 +91577,8 @@
                         "custom21Trig5TransitionSpeedMs",
                         "custom21Trig5TweenSpeedMs",
                         "custom21Trig5LoopMode",
-                        "custom21Trig5LoopHoldMs"
+                        "custom21Trig5LoopHoldMs",
+                        "custom21Trig5OffsetMode"
                       ],
                       "subgroups": [
                         {
@@ -91601,10 +91586,6 @@
                           "collapsed": false,
                           "locked": false,
                           "items": [
-                            {
-                              "type": "row",
-                              "key": "custom21Trig5OffsetMode"
-                            },
                             {
                               "type": "row",
                               "key": "custom21Trig5OffsetX"
@@ -91659,7 +91640,6 @@
                             }
                           ],
                           "settings": [
-                            "custom21Trig5OffsetMode",
                             "custom21Trig5OffsetX",
                             "custom21Trig5OffsetY",
                             "custom21Trig5OffsetZ",
@@ -91683,6 +91663,10 @@
                           "items": [
                             {
                               "type": "row",
+                              "key": "custom21Trig5CameraOffsetYCurve"
+                            },
+                            {
+                              "type": "row",
                               "key": "custom21Trig5CameraOffsetXEnabled"
                             },
                             {
@@ -91696,10 +91680,6 @@
                             {
                               "type": "row",
                               "key": "custom21Trig5CameraOffsetYEnabled"
-                            },
-                            {
-                              "type": "row",
-                              "key": "custom21Trig5CameraOffsetYCurve"
                             },
                             {
                               "type": "row",
@@ -91719,11 +91699,11 @@
                             }
                           ],
                           "settings": [
+                            "custom21Trig5CameraOffsetYCurve",
                             "custom21Trig5CameraOffsetXEnabled",
                             "custom21Trig5CameraOffsetXCurve",
                             "custom21Trig5CameraOffsetXRange",
                             "custom21Trig5CameraOffsetYEnabled",
-                            "custom21Trig5CameraOffsetYCurve",
                             "custom21Trig5CameraOffsetYRange",
                             "custom21Trig5CameraOffsetZEnabled",
                             "custom21Trig5CameraOffsetZCurve",
@@ -93253,7 +93233,7 @@
                   },
                   {
                     "key": "Trigger 2",
-                    "collapsed": false,
+                    "collapsed": true,
                     "locked": false,
                     "items": [
                       {
@@ -94382,7 +94362,7 @@
                   },
                   {
                     "key": "Trigger 3",
-                    "collapsed": false,
+                    "collapsed": true,
                     "locked": false,
                     "items": [
                       {
@@ -95511,7 +95491,7 @@
                   },
                   {
                     "key": "Trigger 4",
-                    "collapsed": false,
+                    "collapsed": true,
                     "locked": false,
                     "items": [
                       {
@@ -96704,10 +96684,6 @@
                           "items": [
                             {
                               "type": "row",
-                              "key": "custom21Trig5OffsetMode"
-                            },
-                            {
-                              "type": "row",
                               "key": "custom21Trig5OffsetX"
                             },
                             {
@@ -96760,7 +96736,6 @@
                             }
                           ],
                           "settings": [
-                            "custom21Trig5OffsetMode",
                             "custom21Trig5OffsetX",
                             "custom21Trig5OffsetY",
                             "custom21Trig5OffsetZ",
@@ -96779,12 +96754,20 @@
                         }
                       },
                       {
+                        "type": "row",
+                        "key": "custom21Trig5OffsetMode"
+                      },
+                      {
                         "type": "group",
                         "group": {
                           "key": "Offset To Camera",
                           "collapsed": false,
                           "locked": false,
                           "items": [
+                            {
+                              "type": "row",
+                              "key": "custom21Trig5CameraOffsetYCurve"
+                            },
                             {
                               "type": "row",
                               "key": "custom21Trig5CameraOffsetXEnabled"
@@ -96800,10 +96783,6 @@
                             {
                               "type": "row",
                               "key": "custom21Trig5CameraOffsetYEnabled"
-                            },
-                            {
-                              "type": "row",
-                              "key": "custom21Trig5CameraOffsetYCurve"
                             },
                             {
                               "type": "row",
@@ -96823,11 +96802,11 @@
                             }
                           ],
                           "settings": [
+                            "custom21Trig5CameraOffsetYCurve",
                             "custom21Trig5CameraOffsetXEnabled",
                             "custom21Trig5CameraOffsetXCurve",
                             "custom21Trig5CameraOffsetXRange",
                             "custom21Trig5CameraOffsetYEnabled",
-                            "custom21Trig5CameraOffsetYCurve",
                             "custom21Trig5CameraOffsetYRange",
                             "custom21Trig5CameraOffsetZEnabled",
                             "custom21Trig5CameraOffsetZCurve",
@@ -97249,7 +97228,8 @@
                       "custom21Trig5TransitionSpeedMs",
                       "custom21Trig5TweenSpeedMs",
                       "custom21Trig5LoopMode",
-                      "custom21Trig5LoopHoldMs"
+                      "custom21Trig5LoopHoldMs",
+                      "custom21Trig5OffsetMode"
                     ],
                     "subgroups": [
                       {
@@ -97257,10 +97237,6 @@
                         "collapsed": false,
                         "locked": false,
                         "items": [
-                          {
-                            "type": "row",
-                            "key": "custom21Trig5OffsetMode"
-                          },
                           {
                             "type": "row",
                             "key": "custom21Trig5OffsetX"
@@ -97315,7 +97291,6 @@
                           }
                         ],
                         "settings": [
-                          "custom21Trig5OffsetMode",
                           "custom21Trig5OffsetX",
                           "custom21Trig5OffsetY",
                           "custom21Trig5OffsetZ",
@@ -97339,6 +97314,10 @@
                         "items": [
                           {
                             "type": "row",
+                            "key": "custom21Trig5CameraOffsetYCurve"
+                          },
+                          {
+                            "type": "row",
                             "key": "custom21Trig5CameraOffsetXEnabled"
                           },
                           {
@@ -97352,10 +97331,6 @@
                           {
                             "type": "row",
                             "key": "custom21Trig5CameraOffsetYEnabled"
-                          },
-                          {
-                            "type": "row",
-                            "key": "custom21Trig5CameraOffsetYCurve"
                           },
                           {
                             "type": "row",
@@ -97375,11 +97350,11 @@
                           }
                         ],
                         "settings": [
+                          "custom21Trig5CameraOffsetYCurve",
                           "custom21Trig5CameraOffsetXEnabled",
                           "custom21Trig5CameraOffsetXCurve",
                           "custom21Trig5CameraOffsetXRange",
                           "custom21Trig5CameraOffsetYEnabled",
-                          "custom21Trig5CameraOffsetYCurve",
                           "custom21Trig5CameraOffsetYRange",
                           "custom21Trig5CameraOffsetZEnabled",
                           "custom21Trig5CameraOffsetZCurve",
@@ -109094,7 +109069,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 15",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -180118,23 +180093,22 @@
               }
             },
             {
+              "type": "row",
+              "key": "custom21SpeedCurve"
+            },
+            {
               "type": "group",
               "group": {
                 "key": "Animation Speed Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
-                  {
-                    "type": "row",
-                    "key": "custom21SpeedCurve"
-                  },
                   {
                     "type": "row",
                     "key": "custom21SpeedCurveRange"
                   }
                 ],
                 "settings": [
-                  "custom21SpeedCurve",
                   "custom21SpeedCurveRange"
                 ],
                 "subgroups": []
@@ -181621,7 +181595,7 @@
                     "type": "group",
                     "group": {
                       "key": "Trigger 2",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -182753,7 +182727,7 @@
                     "type": "group",
                     "group": {
                       "key": "Trigger 3",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -183885,7 +183859,7 @@
                     "type": "group",
                     "group": {
                       "key": "Trigger 4",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -185081,10 +185055,6 @@
                             "items": [
                               {
                                 "type": "row",
-                                "key": "custom21Trig5OffsetMode"
-                              },
-                              {
-                                "type": "row",
                                 "key": "custom21Trig5OffsetX"
                               },
                               {
@@ -185137,7 +185107,6 @@
                               }
                             ],
                             "settings": [
-                              "custom21Trig5OffsetMode",
                               "custom21Trig5OffsetX",
                               "custom21Trig5OffsetY",
                               "custom21Trig5OffsetZ",
@@ -185156,12 +185125,20 @@
                           }
                         },
                         {
+                          "type": "row",
+                          "key": "custom21Trig5OffsetMode"
+                        },
+                        {
                           "type": "group",
                           "group": {
                             "key": "Offset To Camera",
                             "collapsed": false,
                             "locked": false,
                             "items": [
+                              {
+                                "type": "row",
+                                "key": "custom21Trig5CameraOffsetYCurve"
+                              },
                               {
                                 "type": "row",
                                 "key": "custom21Trig5CameraOffsetXEnabled"
@@ -185177,10 +185154,6 @@
                               {
                                 "type": "row",
                                 "key": "custom21Trig5CameraOffsetYEnabled"
-                              },
-                              {
-                                "type": "row",
-                                "key": "custom21Trig5CameraOffsetYCurve"
                               },
                               {
                                 "type": "row",
@@ -185200,11 +185173,11 @@
                               }
                             ],
                             "settings": [
+                              "custom21Trig5CameraOffsetYCurve",
                               "custom21Trig5CameraOffsetXEnabled",
                               "custom21Trig5CameraOffsetXCurve",
                               "custom21Trig5CameraOffsetXRange",
                               "custom21Trig5CameraOffsetYEnabled",
-                              "custom21Trig5CameraOffsetYCurve",
                               "custom21Trig5CameraOffsetYRange",
                               "custom21Trig5CameraOffsetZEnabled",
                               "custom21Trig5CameraOffsetZCurve",
@@ -185626,7 +185599,8 @@
                         "custom21Trig5TransitionSpeedMs",
                         "custom21Trig5TweenSpeedMs",
                         "custom21Trig5LoopMode",
-                        "custom21Trig5LoopHoldMs"
+                        "custom21Trig5LoopHoldMs",
+                        "custom21Trig5OffsetMode"
                       ],
                       "subgroups": [
                         {
@@ -185634,10 +185608,6 @@
                           "collapsed": false,
                           "locked": false,
                           "items": [
-                            {
-                              "type": "row",
-                              "key": "custom21Trig5OffsetMode"
-                            },
                             {
                               "type": "row",
                               "key": "custom21Trig5OffsetX"
@@ -185692,7 +185662,6 @@
                             }
                           ],
                           "settings": [
-                            "custom21Trig5OffsetMode",
                             "custom21Trig5OffsetX",
                             "custom21Trig5OffsetY",
                             "custom21Trig5OffsetZ",
@@ -185716,6 +185685,10 @@
                           "items": [
                             {
                               "type": "row",
+                              "key": "custom21Trig5CameraOffsetYCurve"
+                            },
+                            {
+                              "type": "row",
                               "key": "custom21Trig5CameraOffsetXEnabled"
                             },
                             {
@@ -185729,10 +185702,6 @@
                             {
                               "type": "row",
                               "key": "custom21Trig5CameraOffsetYEnabled"
-                            },
-                            {
-                              "type": "row",
-                              "key": "custom21Trig5CameraOffsetYCurve"
                             },
                             {
                               "type": "row",
@@ -185752,11 +185721,11 @@
                             }
                           ],
                           "settings": [
+                            "custom21Trig5CameraOffsetYCurve",
                             "custom21Trig5CameraOffsetXEnabled",
                             "custom21Trig5CameraOffsetXCurve",
                             "custom21Trig5CameraOffsetXRange",
                             "custom21Trig5CameraOffsetYEnabled",
-                            "custom21Trig5CameraOffsetYCurve",
                             "custom21Trig5CameraOffsetYRange",
                             "custom21Trig5CameraOffsetZEnabled",
                             "custom21Trig5CameraOffsetZCurve",
@@ -187286,7 +187255,7 @@
                   },
                   {
                     "key": "Trigger 2",
-                    "collapsed": false,
+                    "collapsed": true,
                     "locked": false,
                     "items": [
                       {
@@ -188415,7 +188384,7 @@
                   },
                   {
                     "key": "Trigger 3",
-                    "collapsed": false,
+                    "collapsed": true,
                     "locked": false,
                     "items": [
                       {
@@ -189544,7 +189513,7 @@
                   },
                   {
                     "key": "Trigger 4",
-                    "collapsed": false,
+                    "collapsed": true,
                     "locked": false,
                     "items": [
                       {
@@ -190737,10 +190706,6 @@
                           "items": [
                             {
                               "type": "row",
-                              "key": "custom21Trig5OffsetMode"
-                            },
-                            {
-                              "type": "row",
                               "key": "custom21Trig5OffsetX"
                             },
                             {
@@ -190793,7 +190758,6 @@
                             }
                           ],
                           "settings": [
-                            "custom21Trig5OffsetMode",
                             "custom21Trig5OffsetX",
                             "custom21Trig5OffsetY",
                             "custom21Trig5OffsetZ",
@@ -190812,12 +190776,20 @@
                         }
                       },
                       {
+                        "type": "row",
+                        "key": "custom21Trig5OffsetMode"
+                      },
+                      {
                         "type": "group",
                         "group": {
                           "key": "Offset To Camera",
                           "collapsed": false,
                           "locked": false,
                           "items": [
+                            {
+                              "type": "row",
+                              "key": "custom21Trig5CameraOffsetYCurve"
+                            },
                             {
                               "type": "row",
                               "key": "custom21Trig5CameraOffsetXEnabled"
@@ -190833,10 +190805,6 @@
                             {
                               "type": "row",
                               "key": "custom21Trig5CameraOffsetYEnabled"
-                            },
-                            {
-                              "type": "row",
-                              "key": "custom21Trig5CameraOffsetYCurve"
                             },
                             {
                               "type": "row",
@@ -190856,11 +190824,11 @@
                             }
                           ],
                           "settings": [
+                            "custom21Trig5CameraOffsetYCurve",
                             "custom21Trig5CameraOffsetXEnabled",
                             "custom21Trig5CameraOffsetXCurve",
                             "custom21Trig5CameraOffsetXRange",
                             "custom21Trig5CameraOffsetYEnabled",
-                            "custom21Trig5CameraOffsetYCurve",
                             "custom21Trig5CameraOffsetYRange",
                             "custom21Trig5CameraOffsetZEnabled",
                             "custom21Trig5CameraOffsetZCurve",
@@ -191282,7 +191250,8 @@
                       "custom21Trig5TransitionSpeedMs",
                       "custom21Trig5TweenSpeedMs",
                       "custom21Trig5LoopMode",
-                      "custom21Trig5LoopHoldMs"
+                      "custom21Trig5LoopHoldMs",
+                      "custom21Trig5OffsetMode"
                     ],
                     "subgroups": [
                       {
@@ -191290,10 +191259,6 @@
                         "collapsed": false,
                         "locked": false,
                         "items": [
-                          {
-                            "type": "row",
-                            "key": "custom21Trig5OffsetMode"
-                          },
                           {
                             "type": "row",
                             "key": "custom21Trig5OffsetX"
@@ -191348,7 +191313,6 @@
                           }
                         ],
                         "settings": [
-                          "custom21Trig5OffsetMode",
                           "custom21Trig5OffsetX",
                           "custom21Trig5OffsetY",
                           "custom21Trig5OffsetZ",
@@ -191372,6 +191336,10 @@
                         "items": [
                           {
                             "type": "row",
+                            "key": "custom21Trig5CameraOffsetYCurve"
+                          },
+                          {
+                            "type": "row",
                             "key": "custom21Trig5CameraOffsetXEnabled"
                           },
                           {
@@ -191385,10 +191353,6 @@
                           {
                             "type": "row",
                             "key": "custom21Trig5CameraOffsetYEnabled"
-                          },
-                          {
-                            "type": "row",
-                            "key": "custom21Trig5CameraOffsetYCurve"
                           },
                           {
                             "type": "row",
@@ -191408,11 +191372,11 @@
                           }
                         ],
                         "settings": [
+                          "custom21Trig5CameraOffsetYCurve",
                           "custom21Trig5CameraOffsetXEnabled",
                           "custom21Trig5CameraOffsetXCurve",
                           "custom21Trig5CameraOffsetXRange",
                           "custom21Trig5CameraOffsetYEnabled",
-                          "custom21Trig5CameraOffsetYCurve",
                           "custom21Trig5CameraOffsetYRange",
                           "custom21Trig5CameraOffsetZEnabled",
                           "custom21Trig5CameraOffsetZCurve",
@@ -191820,7 +191784,8 @@
             "custom21TransitionSpeedMs",
             "custom21TweenSpeedMs",
             "custom21LoopMode",
-            "custom21LoopHoldMs"
+            "custom21LoopHoldMs",
+            "custom21SpeedCurve"
           ],
           "subgroups": [
             {
@@ -192000,20 +191965,15 @@
             },
             {
               "key": "Animation Speed Curve",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
-                {
-                  "type": "row",
-                  "key": "custom21SpeedCurve"
-                },
                 {
                   "type": "row",
                   "key": "custom21SpeedCurveRange"
                 }
               ],
               "settings": [
-                "custom21SpeedCurve",
                 "custom21SpeedCurveRange"
               ],
               "subgroups": []
@@ -193485,7 +193445,7 @@
                   "type": "group",
                   "group": {
                     "key": "Trigger 2",
-                    "collapsed": false,
+                    "collapsed": true,
                     "locked": false,
                     "items": [
                       {
@@ -194617,7 +194577,7 @@
                   "type": "group",
                   "group": {
                     "key": "Trigger 3",
-                    "collapsed": false,
+                    "collapsed": true,
                     "locked": false,
                     "items": [
                       {
@@ -195749,7 +195709,7 @@
                   "type": "group",
                   "group": {
                     "key": "Trigger 4",
-                    "collapsed": false,
+                    "collapsed": true,
                     "locked": false,
                     "items": [
                       {
@@ -196945,10 +196905,6 @@
                           "items": [
                             {
                               "type": "row",
-                              "key": "custom21Trig5OffsetMode"
-                            },
-                            {
-                              "type": "row",
                               "key": "custom21Trig5OffsetX"
                             },
                             {
@@ -197001,7 +196957,6 @@
                             }
                           ],
                           "settings": [
-                            "custom21Trig5OffsetMode",
                             "custom21Trig5OffsetX",
                             "custom21Trig5OffsetY",
                             "custom21Trig5OffsetZ",
@@ -197020,12 +196975,20 @@
                         }
                       },
                       {
+                        "type": "row",
+                        "key": "custom21Trig5OffsetMode"
+                      },
+                      {
                         "type": "group",
                         "group": {
                           "key": "Offset To Camera",
                           "collapsed": false,
                           "locked": false,
                           "items": [
+                            {
+                              "type": "row",
+                              "key": "custom21Trig5CameraOffsetYCurve"
+                            },
                             {
                               "type": "row",
                               "key": "custom21Trig5CameraOffsetXEnabled"
@@ -197041,10 +197004,6 @@
                             {
                               "type": "row",
                               "key": "custom21Trig5CameraOffsetYEnabled"
-                            },
-                            {
-                              "type": "row",
-                              "key": "custom21Trig5CameraOffsetYCurve"
                             },
                             {
                               "type": "row",
@@ -197064,11 +197023,11 @@
                             }
                           ],
                           "settings": [
+                            "custom21Trig5CameraOffsetYCurve",
                             "custom21Trig5CameraOffsetXEnabled",
                             "custom21Trig5CameraOffsetXCurve",
                             "custom21Trig5CameraOffsetXRange",
                             "custom21Trig5CameraOffsetYEnabled",
-                            "custom21Trig5CameraOffsetYCurve",
                             "custom21Trig5CameraOffsetYRange",
                             "custom21Trig5CameraOffsetZEnabled",
                             "custom21Trig5CameraOffsetZCurve",
@@ -197490,7 +197449,8 @@
                       "custom21Trig5TransitionSpeedMs",
                       "custom21Trig5TweenSpeedMs",
                       "custom21Trig5LoopMode",
-                      "custom21Trig5LoopHoldMs"
+                      "custom21Trig5LoopHoldMs",
+                      "custom21Trig5OffsetMode"
                     ],
                     "subgroups": [
                       {
@@ -197498,10 +197458,6 @@
                         "collapsed": false,
                         "locked": false,
                         "items": [
-                          {
-                            "type": "row",
-                            "key": "custom21Trig5OffsetMode"
-                          },
                           {
                             "type": "row",
                             "key": "custom21Trig5OffsetX"
@@ -197556,7 +197512,6 @@
                           }
                         ],
                         "settings": [
-                          "custom21Trig5OffsetMode",
                           "custom21Trig5OffsetX",
                           "custom21Trig5OffsetY",
                           "custom21Trig5OffsetZ",
@@ -197580,6 +197535,10 @@
                         "items": [
                           {
                             "type": "row",
+                            "key": "custom21Trig5CameraOffsetYCurve"
+                          },
+                          {
+                            "type": "row",
                             "key": "custom21Trig5CameraOffsetXEnabled"
                           },
                           {
@@ -197593,10 +197552,6 @@
                           {
                             "type": "row",
                             "key": "custom21Trig5CameraOffsetYEnabled"
-                          },
-                          {
-                            "type": "row",
-                            "key": "custom21Trig5CameraOffsetYCurve"
                           },
                           {
                             "type": "row",
@@ -197616,11 +197571,11 @@
                           }
                         ],
                         "settings": [
+                          "custom21Trig5CameraOffsetYCurve",
                           "custom21Trig5CameraOffsetXEnabled",
                           "custom21Trig5CameraOffsetXCurve",
                           "custom21Trig5CameraOffsetXRange",
                           "custom21Trig5CameraOffsetYEnabled",
-                          "custom21Trig5CameraOffsetYCurve",
                           "custom21Trig5CameraOffsetYRange",
                           "custom21Trig5CameraOffsetZEnabled",
                           "custom21Trig5CameraOffsetZCurve",
@@ -199150,7 +199105,7 @@
                 },
                 {
                   "key": "Trigger 2",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -200279,7 +200234,7 @@
                 },
                 {
                   "key": "Trigger 3",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -201408,7 +201363,7 @@
                 },
                 {
                   "key": "Trigger 4",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -202601,10 +202556,6 @@
                         "items": [
                           {
                             "type": "row",
-                            "key": "custom21Trig5OffsetMode"
-                          },
-                          {
-                            "type": "row",
                             "key": "custom21Trig5OffsetX"
                           },
                           {
@@ -202657,7 +202608,6 @@
                           }
                         ],
                         "settings": [
-                          "custom21Trig5OffsetMode",
                           "custom21Trig5OffsetX",
                           "custom21Trig5OffsetY",
                           "custom21Trig5OffsetZ",
@@ -202676,12 +202626,20 @@
                       }
                     },
                     {
+                      "type": "row",
+                      "key": "custom21Trig5OffsetMode"
+                    },
+                    {
                       "type": "group",
                       "group": {
                         "key": "Offset To Camera",
                         "collapsed": false,
                         "locked": false,
                         "items": [
+                          {
+                            "type": "row",
+                            "key": "custom21Trig5CameraOffsetYCurve"
+                          },
                           {
                             "type": "row",
                             "key": "custom21Trig5CameraOffsetXEnabled"
@@ -202697,10 +202655,6 @@
                           {
                             "type": "row",
                             "key": "custom21Trig5CameraOffsetYEnabled"
-                          },
-                          {
-                            "type": "row",
-                            "key": "custom21Trig5CameraOffsetYCurve"
                           },
                           {
                             "type": "row",
@@ -202720,11 +202674,11 @@
                           }
                         ],
                         "settings": [
+                          "custom21Trig5CameraOffsetYCurve",
                           "custom21Trig5CameraOffsetXEnabled",
                           "custom21Trig5CameraOffsetXCurve",
                           "custom21Trig5CameraOffsetXRange",
                           "custom21Trig5CameraOffsetYEnabled",
-                          "custom21Trig5CameraOffsetYCurve",
                           "custom21Trig5CameraOffsetYRange",
                           "custom21Trig5CameraOffsetZEnabled",
                           "custom21Trig5CameraOffsetZCurve",
@@ -203146,7 +203100,8 @@
                     "custom21Trig5TransitionSpeedMs",
                     "custom21Trig5TweenSpeedMs",
                     "custom21Trig5LoopMode",
-                    "custom21Trig5LoopHoldMs"
+                    "custom21Trig5LoopHoldMs",
+                    "custom21Trig5OffsetMode"
                   ],
                   "subgroups": [
                     {
@@ -203154,10 +203109,6 @@
                       "collapsed": false,
                       "locked": false,
                       "items": [
-                        {
-                          "type": "row",
-                          "key": "custom21Trig5OffsetMode"
-                        },
                         {
                           "type": "row",
                           "key": "custom21Trig5OffsetX"
@@ -203212,7 +203163,6 @@
                         }
                       ],
                       "settings": [
-                        "custom21Trig5OffsetMode",
                         "custom21Trig5OffsetX",
                         "custom21Trig5OffsetY",
                         "custom21Trig5OffsetZ",
@@ -203236,6 +203186,10 @@
                       "items": [
                         {
                           "type": "row",
+                          "key": "custom21Trig5CameraOffsetYCurve"
+                        },
+                        {
+                          "type": "row",
                           "key": "custom21Trig5CameraOffsetXEnabled"
                         },
                         {
@@ -203249,10 +203203,6 @@
                         {
                           "type": "row",
                           "key": "custom21Trig5CameraOffsetYEnabled"
-                        },
-                        {
-                          "type": "row",
-                          "key": "custom21Trig5CameraOffsetYCurve"
                         },
                         {
                           "type": "row",
@@ -203272,11 +203222,11 @@
                         }
                       ],
                       "settings": [
+                        "custom21Trig5CameraOffsetYCurve",
                         "custom21Trig5CameraOffsetXEnabled",
                         "custom21Trig5CameraOffsetXCurve",
                         "custom21Trig5CameraOffsetXRange",
                         "custom21Trig5CameraOffsetYEnabled",
-                        "custom21Trig5CameraOffsetYCurve",
                         "custom21Trig5CameraOffsetYRange",
                         "custom21Trig5CameraOffsetZEnabled",
                         "custom21Trig5CameraOffsetZCurve",
@@ -214973,7 +214923,7 @@
         },
         {
           "key": "Custom Click Function 15",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
@@ -248578,7 +248528,11 @@
       "custom13Trig2RetransitionEnabled": true,
       "custom13Trig2RetransitionSpeedMs": true,
       "custom13Trig2RetransitionSpeedCurveEnabled": true,
-      "custom13Trig2RetransitionStartTimeCurveEnabled": true
+      "custom13Trig2RetransitionStartTimeCurveEnabled": true,
+      "custom21Trig5CameraOffsetEnabled": false,
+      "custom21Trig5CameraOffsetXEnabled": false,
+      "custom21Trig5CameraOffsetYEnabled": false,
+      "custom21Trig5CameraOffsetZEnabled": false
     },
     "landscape": {}
   },
@@ -248592,9 +248546,9 @@
     },
     "mobile": {
       "left": 38.44047546386719,
-      "top": 175.70834350585938,
-      "width": 337.53570556640625,
-      "height": 35.52381134033203
+      "top": 6.297619342803955,
+      "width": 340.96429443359375,
+      "height": 780.2142944335938
     }
   }
 }
