@@ -276,6 +276,13 @@ let cloneBaseVersion = 0 // bumped whenever the shared Whole-Hand / Base Rotatio
 const cloneBaseRb = new THREE.Quaternion(), _poseBaseRb = new THREE.Quaternion(), _baseRbInv = new THREE.Quaternion(), _baseQ0 = new THREE.Quaternion()
 const _brQx = new THREE.Quaternion(), _brQy = new THREE.Quaternion(), _brQz = new THREE.Quaternion()
 const _brAX = new THREE.Vector3(1, 0, 0), _brAY = new THREE.Vector3(0, 1, 0), _brAZ = new THREE.Vector3(0, 0, 1), _brPosA = new THREE.Vector3(), _brPosB = new THREE.Vector3()
+// Render Order Mode / Fallback options (2026-10-11). Z modes order by a Z position (closest to the camera on top); the cursor modes order by distance to the cursor: XY = screen-space only, XYZ = also the Z gap
+// to the cursor target (its Cursor Target Depth). 'closest' = nearest the cursor on top, 'farthest' = furthest on top.
+const RENDER_ORDER_MODE_OPTIONS = [
+  { value: 'z', text: 'Z Position' }, { value: 'armBase', text: 'Arm Base' }, { value: 'armEnd', text: 'Arm End' }, { value: 'palmCenter', text: 'Palm Center' },
+  { value: 'closest', text: 'Closest To Cursor (XY)' }, { value: 'farthest', text: 'Farthest From Cursor (XY)' },
+  { value: 'closestZ', text: 'Closest To Cursor (XYZ)' }, { value: 'farthestZ', text: 'Farthest From Cursor (XYZ)' }
+]
 const _trackTargetXY = new THREE.Vector3() // cursor target at a hand's own depth, for Use Cursor Target Depth = off
 // Screen-space distance scratch + scale (see cursorDistXY()); early-state block so top-level load order is safe.
 const _scrV = new THREE.Vector3(), _scrV2 = new THREE.Vector3()
@@ -853,11 +860,22 @@ const _lookAtQuatScratch = new THREE.Quaternion()
 // (matrixWorld, so one frame old at most): armBase = the head of rForearmBend (1st node of the chain), armEnd = the head of rHand = the end (tail) of rForearmTwist (3rd node),
 // palmCenter = the head of rMid1 = the end (tail) of rCarpal2. A missing bone falls back to the field position.
 const RENDER_ORDER_NODES = { armBase: 'rForearmBend', armEnd: 'rHand', palmCenter: 'rMid1' }
-function renderOrderZ(hand) {
+function renderOrderModeZ(hand) {
   const mode = cfg.renderOrderMode
   if (!mode || mode === 'z' || !hand.skinnedMesh) return hand.wrapper.position.z
   if (!hand._roNode || hand._roNode.mode !== mode) hand._roNode = { mode, bone: hand.skinnedMesh.skeleton.getBoneByName(RENDER_ORDER_NODES[mode]) || null }
   return hand._roNode.bone ? hand._roNode.bone.matrixWorld.elements[14] : hand.wrapper.position.z
+}
+// Priority of a hand under one mode, in world units, higher = drawn on top. Z modes: Z toward the camera. Cursor modes: +/- the distance to the cursor (XY = hand._xyCursorDist, computed each frame before the
+// per-hand loop; XYZ = hand.effectiveRenderOrder, the 3D distance to the cursor target with the overlap smoothing).
+function renderOrderPriority(hand, mode) {
+  switch (mode) {
+    case 'closest': return -(hand._xyCursorDist ?? 0)
+    case 'farthest': return hand._xyCursorDist ?? 0
+    case 'closestZ': return -hand.effectiveRenderOrder
+    case 'farthestZ': return hand.effectiveRenderOrder
+    default: return renderOrderModeZ(hand) * (camera.position.z >= 0 ? 1 : -1)
+  }
 }
 const _swingRef = new THREE.Vector3(0, 0, -1)
 const _swingDir = new THREE.Vector3(), _swingPivot = new THREE.Vector3(), _swingTarget = new THREE.Vector3()
@@ -931,8 +949,10 @@ const DEV_GROUPS = [
     // realDeviceClass()` generically -- no devPanel.js changes were
     // needed to support this, just the `perDevice: true` flag per control.
     controls: [
-      // Render Order Mode (2026-10-11, direct request): which point's Z decides which hand draws on top (closest to the camera wins; cursor distance only breaks ties). See renderOrderZ().
-      { key: 'renderOrderMode', label: 'Render Order Mode', type: 'select', def: 'z', options: [{ value: 'z', text: 'Z Position' }, { value: 'armBase', text: 'Arm Base' }, { value: 'armEnd', text: 'Arm End' }, { value: 'palmCenter', text: 'Palm Center' }, { value: 'closest', text: 'Closest To Cursor' }, { value: 'farthest', text: 'Farthest From Cursor' }] },
+      // Render Order Mode (2026-10-11, direct request): which point's Z decides which hand draws on top (closest to the camera wins; cursor distance only breaks ties). See renderOrderPriority().
+      { key: 'renderOrderMode', label: 'Render Order Mode', type: 'select', def: 'z', options: RENDER_ORDER_MODE_OPTIONS },
+      // Fallback: used when two hands tie on the Render Order Mode's own value (same Z to 0.01 world units, or the same distance). Default = the original behaviour (the hand furthest from the cursor on top).
+      { key: 'renderOrderFallback', label: 'Render Order Fallback', type: 'select', def: 'farthestZ', options: RENDER_ORDER_MODE_OPTIONS },
       { key: 'fieldRows', label: 'Rows (Count)', type: 'slider', min: 1, max: 40, step: 1, def: 15, perDevice: true, onChange: () => rebuildField() },
       { key: 'fieldCols', label: 'Columns (Count)', type: 'slider', min: 1, max: 40, step: 1, def: 17, perDevice: true, onChange: () => rebuildField() },
       { key: 'rowSpacing', label: 'Row Spacing (World Units)', type: 'slider', min: 2, max: 40, step: 0.5, def: 9.5, perDevice: true, onChange: () => relayoutField() },
@@ -16331,14 +16351,11 @@ function updateRenderOrder() {
     hand.effectiveRenderOrder = (flashFixOn && hand.isOverlapping)
       ? hand.effectiveRenderOrder + (live - hand.effectiveRenderOrder) * REORDER_SMOOTHING
       : live
-    // Z-position priority (2026-10-11, direct request): the hand closest to the camera in Z always draws above the others;
-    // the cursor-distance order above (effectiveRenderOrder, with its overlap smoothing) only breaks ties between hands at the
-    // same Z (quantised to 0.01 world units so float noise never reorders them). 100000 > any cursor distance, so Z always wins.
-    const zKey = Math.round(renderOrderZ(hand) * (camera.position.z >= 0 ? 1 : -1) / 0.01)
-    // Closest / Farthest To Cursor ignore Z altogether: the cursor distance (effectiveRenderOrder, 3D distance to the cursor target with the overlap smoothing) is the whole order. Farthest = the original
-    // behaviour (the hand furthest from the cursor draws on top); Closest = the reverse (the hand nearest the cursor draws on top).
-    const roDist = Math.min(Math.max(hand.effectiveRenderOrder, 0), 99999)
-    const roBase = cfg.renderOrderMode === 'farthest' ? roDist : cfg.renderOrderMode === 'closest' ? 99999 - roDist : zKey * 100000 + roDist
+    // Render order (2026-10-11): the Render Order Mode's priority is the primary key (quantised to 0.01 world units so float noise never reorders ties); the Fallback mode's priority breaks ties between hands with
+    // the same primary key. The fallback is mapped to 0..99999 at 0.05 world-unit steps over -2000..+2000 (outside that it clamps), so the primary key always wins (x100000).
+    const roPrimary = Math.round(renderOrderPriority(hand, cfg.renderOrderMode) / 0.01)
+    const roSecondary = Math.min(Math.max(Math.round((renderOrderPriority(hand, cfg.renderOrderFallback || 'farthestZ') + 2000) * 20), 0), 99999)
+    const roBase = roPrimary * 100000 + roSecondary
     if (hand.skinnedMesh) hand.skinnedMesh.renderOrder = roBase
     if (hand.outlineMesh) hand.outlineMesh.renderOrder = roBase - 0.001
     if (hand.emissionMesh) hand.emissionMesh.renderOrder = roBase - 0.001

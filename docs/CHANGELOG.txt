@@ -17100,6 +17100,16 @@ Direct request: modes 4 and 5. "Closest To Cursor" draws the hand nearest the cu
 Both ignore Z: the order is the cursor distance alone (hand.effectiveRenderOrder = 3D distance to the cursor target, with the existing overlap smoothing): Farthest = distance, Closest = 99999 - distance.
 The Z-based modes (Z Position / Arm Base / Arm End / Palm Center) are unchanged and still use the cursor distance only as a tie-break. `main.js` `?v=342` -> `?v=343`.
 
+2026-10-11  -  (Render Order: XY vs XYZ cursor modes, and a Fallback dropdown)
+
+Direct requests: (6/7) "same as 4 and 5 but also uses the Z axis position", and "a 2nd drop down with the same options ... the fallback ... if the Z positions are the same, what it falls back to".
+ - Render Order Mode now has 8 options: Z Position, Arm Base, Arm End, Palm Center, Closest To Cursor (XY), Farthest From Cursor (XY), Closest To Cursor (XYZ), Farthest From Cursor (XYZ). The XY modes use the screen-space
+   cursor distance (hand._xyCursorDist, the same one the click functions use); the XYZ modes use the 3D distance to the cursor target (its Cursor Target Depth is the Z), i.e. hand.effectiveRenderOrder with the overlap smoothing.
+   CHANGE: the 'closest' / 'farthest' values shipped a few minutes earlier in v=343 measured the 3D distance; they are now XY-only, and the 3D versions are 'closestZ' / 'farthestZ'. Anyone who picked them in v=343 gets XY now.
+ - New 'Render Order Fallback' dropdown (same options, default 'Farthest From Cursor (XYZ)' = the old behaviour): the order key is renderOrderPriority(mode) quantised to 0.01 world units, times 100000, plus the fallback's priority
+   mapped to 0..99999 (0.05 world-unit steps over -2000..+2000, clamped), so two hands that tie on the mode's own value are ordered by the fallback. Z modes: closer to the camera on top; closest = nearest on top; farthest = furthest on top.
+ `main.js` `?v=343` -> `?v=344`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a
