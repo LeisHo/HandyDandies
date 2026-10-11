@@ -895,6 +895,10 @@ const DEV_GROUPS = [
       // scene -- see updateHandsVisibility()'s own comment.
       { key: 'hideHands', label: 'Hide Hands', type: 'checkbox', def: false, perDevice: true, onChange: () => updateHandsVisibility() },
       // Hand position floor / ceiling (2026-10-11, direct request): every hand's final world position, click-function offsets included, is clamped into these ranges.
+      // Whole-field offset (2026-10-11, direct request): moves every hand's grid position together.
+      { key: 'fieldOffsetX', label: 'Field Offset X (World Units)', type: 'slider', min: -200, max: 200, step: 0.5, def: 0, perDevice: true, onChange: () => relayoutField() },
+      { key: 'fieldOffsetY', label: 'Field Offset Y (World Units)', type: 'slider', min: -200, max: 200, step: 0.5, def: 0, perDevice: true, onChange: () => relayoutField() },
+      { key: 'fieldOffsetZ', label: 'Field Offset Z (World Units)', type: 'slider', min: -200, max: 200, step: 0.5, def: 0, perDevice: true, onChange: () => relayoutField() },
       { key: 'fieldBoundsX', label: 'Hand Position Min / Max X (World Units)', type: 'text', def: '{"min":-300,"max":300}', onChange: () => onFieldBoundsChanged() },
       { key: 'fieldBoundsY', label: 'Hand Position Min / Max Y (World Units)', type: 'text', def: '{"min":-300,"max":300}', onChange: () => onFieldBoundsChanged() },
       { key: 'fieldBoundsZ', label: 'Hand Position Min / Max Z (World Units)', type: 'text', def: '{"min":-300,"max":300}', onChange: () => onFieldBoundsChanged() }
@@ -14403,7 +14407,7 @@ function relayoutField() {
       // it can never compound across frames or drift once a relayout
       // changes the grid underneath an in-progress transition.
       if (!hand.basePosition) hand.basePosition = new THREE.Vector3()
-      hand.basePosition.set(c * colSpacing - w / 2 + rowOffsetX, r * rowSpacing - h / 2, 0)
+      hand.basePosition.set(c * colSpacing - w / 2 + rowOffsetX + (cfg.fieldOffsetX || 0), r * rowSpacing - h / 2 + (cfg.fieldOffsetY || 0), cfg.fieldOffsetZ || 0) // Field Offset X/Y/Z shift the whole field (2026-10-11)
       hand.wrapper.position.copy(hand.basePosition)
       hand.clone.scale.setScalar(scaleFactor)
     }

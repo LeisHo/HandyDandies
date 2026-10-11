@@ -16805,6 +16805,13 @@ farthest hand in screen space only; hands off screen still get the effect, with 
  to 8.4 world units while the farthest off-screen hand sat at 102.6; evaluateArmLengthCurve on [(0,1),(1,0.5)] gave 0.75, 0.5,
  0.25, 0 at x = 0.5, 1, 1.5, 2. Not run against a real tab or phone. `main.js` `?v=315` -> `?v=316`.
 
+2026-10-11  -  (Field Offset X / Y / Z)
+
+Direct request: XYZ offset sliders for the entire hand field. Field Layout > Field Offset X / Y / Z (World Units, -200..200,
+per device, default 0) are added to every hand's grid position in relayoutField() (basePosition), so the whole field moves
+together and click-function offsets, the position bounds and the on-screen distance domains all follow it. The camera framing
+is still frozen at the first build, so the field moves relative to the view. `main.js` `?v=316` -> `?v=317`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a
