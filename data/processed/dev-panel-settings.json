@@ -27,7 +27,7 @@
       "fieldBoundsX": "{\"min\":-300,\"max\":300}",
       "fieldBoundsY": "{\"min\":-300,\"max\":300}",
       "fieldBoundsZ": "{\"min\":-266,\"max\":125}",
-      "trackingEnabled": true,
+      "trackingEnabled": false,
       "trackingDamping": 0.06,
       "targetDepthFactor": 300,
       "showTargetMarker": false,
@@ -6626,9 +6626,9 @@
           "group": "FIST ROTATE"
         }
       ],
-      "cameraX": 6.5043859068078795,
-      "cameraY": 9.506408948421184,
-      "cameraZ": 260.74570207939786,
+      "cameraX": 6.504385906807788,
+      "cameraY": 9.506408948420994,
+      "cameraZ": 260.74570207939416,
       "cameraFov": 15,
       "cameraYaw": 1.429,
       "cameraPitch": -2.087,
@@ -187313,8 +187313,8 @@
     "desktop": {
       "left": 922.4000244140625,
       "top": 104,
-      "width": 632,
-      "height": 458.7875061035156
+      "width": 635.2000122070312,
+      "height": 460.38751220703125
     }
   }
 }
