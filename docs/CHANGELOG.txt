@@ -17010,6 +17010,14 @@ Direct report: "when i click reset or set pose as default, i want the rotation s
    click does not always take focus). syncPoseSlidersTo() blurs the focused panel control first and writes cfg for every key; setSelectedPoseAsDefault() now uses it.
  `main.js` `?v=332` -> `?v=333`.
 
+2026-10-11  -  (Whole-Hand Rotation and Rotation at Base are absolute again; only Pose Offset / Scale stack)
+
+Direct request: "the hand rotation and rotation at base settings for default should be absolute values as opposed to relative". The stacking added earlier today made a triggered pose's Whole-Hand Rotation and
+Rotation at Base a change from the Default (live slider + (pose - Default pose)). They are absolute now: a pose or tween step that carries a rotation value replaces the live value with exactly that number;
+one that does not carry it (105 of 106 saved poses have no Base Rotation) leaves the live slider where it is (it no longer snaps to 0). Pose Offset X/Y/Z and Pose Scale still stack on the Default.
+"Default" and Reset already wrote the pose's / Default pose's rotation values into the sliders as absolute numbers. Interpretation (not confirmed): this is about triggered poses; if it meant something else the
+change is the ABSOLUTE_ROTATION_KEYS list in stackOnDefault(). `main.js` `?v=333` -> `?v=334`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

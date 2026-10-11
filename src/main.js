@@ -9064,7 +9064,10 @@ function remapGlideProgress(u, N, k) {
 // carries are applied as a CHANGE FROM THE DEFAULT POSE, on top of the live default (the sliders): effective = live slider + (pose value - Default pose value), and a pose that does not carry a key
 // (every pose saved before Rotation at Base existed has no Base Rotation) contributes no change instead of snapping to 0. Pose Scale stacks as a ratio. While the sliders equal the Default pose
 // (the normal case) this is exactly the old absolute behaviour for every key the pose does carry. Only field hands use it; the previews keep absolute poses.
-const STACK_KEYS = ['modelRotX', 'modelRotY', 'modelRotZ', 'baseRotationX', 'baseRotationY', 'baseRotationZ', 'poseOffsetX', 'poseOffsetY', 'poseOffsetZ']
+// Whole-Hand Rotation and Rotation at Base are ABSOLUTE (2026-10-11, direct request: "the hand rotation and rotation at base settings for default should be absolute values as opposed to relative"):
+// a pose that carries them replaces the live value, a pose that does not carry them leaves the live slider as it is. Only the offsets stack as a change from the Default (below).
+const ABSOLUTE_ROTATION_KEYS = ['modelRotX', 'modelRotY', 'modelRotZ', 'baseRotationX', 'baseRotationY', 'baseRotationZ']
+const STACK_KEYS = ['poseOffsetX', 'poseOffsetY', 'poseOffsetZ']
 // cloneBaseVersion changes whenever any of the stacking sliders or the Default pose change (their onChange / onWholeHandRotationChange bump it), so it is the cache key.
 function currentStackSig() { return cloneBaseVersion }
 function stackOnDefault(item) {
@@ -9072,6 +9075,7 @@ function stackOnDefault(item) {
   const sig = currentStackSig()
   if (item.__stkSig === sig) return item.__stk
   const out = { ...item }
+  ABSOLUTE_ROTATION_KEYS.forEach((k) => { out[k] = item[k] !== undefined ? item[k] : (cfg[k] ?? 0) })
   STACK_KEYS.forEach((k) => {
     const pd = poseDefaultValues[k] ?? 0
     const v = item[k] !== undefined ? item[k] : pd
