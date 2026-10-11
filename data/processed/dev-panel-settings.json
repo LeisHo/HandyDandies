@@ -35,13 +35,13 @@
       "trackingDamping": 0.1,
       "targetDepthFactor": 279.6,
       "showTargetMarker": false,
-      "armRotationEnabled": false,
+      "armRotationEnabled": true,
       "armRotationVisibleOnly": true,
       "armRotationUseDepth": false,
       "armRotationTargetDepth": -3.1,
       "armRotationDefault": 93,
       "armRotationCurveEnabled": true,
-      "armRotationCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.8080220886433459,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.23551813533871668,\"y\":0}}]",
+      "armRotationCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.8080220886433459,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.23551813533871668,\"y\":0}}]",
       "armRotationRangePct": "{\"min\":0,\"max\":100}",
       "armRotationOffsetX": 0,
       "armRotationOffsetY": 0,
@@ -9299,7 +9299,7 @@
       "armRotationTargetDepth": 5.6,
       "armRotationDefault": 93,
       "armRotationCurveEnabled": true,
-      "armRotationCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.8080220886433459,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.23551813533871668,\"y\":0}}]",
+      "armRotationCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.8080220886433459,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.23551813533871668,\"y\":0}}]",
       "armRotationRangePct": "{\"min\":0,\"max\":100}",
       "armRotationOffsetX": 0,
       "armRotationOffsetY": 0,
@@ -18557,7 +18557,7 @@
       "armRotationTargetDepth": 3.4,
       "armRotationDefault": 93,
       "armRotationCurveEnabled": true,
-      "armRotationCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.8080220886433459,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.23551813533871668,\"y\":0}}]",
+      "armRotationCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.8080220886433459,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.23551813533871668,\"y\":0}}]",
       "armRotationRangePct": "{\"min\":0,\"max\":100}",
       "armRotationOffsetX": 0,
       "armRotationOffsetY": 0,
@@ -29809,7 +29809,7 @@
           "type": "group",
           "group": {
             "key": "Field Layout",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -31261,7 +31261,7 @@
       "subgroups": [
         {
           "key": "Field Layout",
-          "collapsed": false,
+          "collapsed": true,
           "locked": true,
           "items": [
             {
@@ -187965,9 +187965,9 @@
   "panelGeometry": {
     "desktop": {
       "left": 820.7999877929688,
-      "top": 79.1875,
-      "width": 680,
-      "height": 637.1875
+      "top": 524.7875366210938,
+      "width": 683.2000122070312,
+      "height": 193.1750030517578
     }
   }
 }
