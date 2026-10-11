@@ -8303,7 +8303,7 @@
       "custom21CameraOffsetYRange": "{\"min\":-1,\"max\":2}",
       "custom21CameraOffsetZEnabled": true,
       "custom21CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.40141436570814926,\"y\":-0.7492560068766276}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.4535008384418726,\"y\":0.6505208333333333}}]",
-      "custom21CameraOffsetZRange": "{\"min\":-5,\"max\":5}",
+      "custom21CameraOffsetZRange": "{\"min\":-30,\"max\":40}",
       "custom21RotationEnabled": false,
       "custom21RotationX": 0,
       "custom21RotationY": -5,
@@ -9988,7 +9988,7 @@
       "custom21Trig5CameraOffsetYRange": "{\"min\":0.5,\"max\":1}",
       "custom21Trig5CameraOffsetZEnabled": true,
       "custom21Trig5CameraOffsetZCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3703440605486725,\"y\":0.7732640584309896}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.4535008384418726,\"y\":-0.6505208333333333}}]",
-      "custom21Trig5CameraOffsetZRange": "{\"min\":-5,\"max\":5}",
+      "custom21Trig5CameraOffsetZRange": "{\"min\":-40,\"max\":30}",
       "custom21Trig5RotationEnabled": false,
       "custom21Trig5RotationX": 0,
       "custom21Trig5RotationY": -5,
@@ -18344,7 +18344,7 @@
       "custom21CameraOffsetYRange": "{\"min\":-1,\"max\":2}",
       "custom21CameraOffsetZEnabled": true,
       "custom21CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.40141436570814926,\"y\":-0.7492560068766276}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.4535008384418726,\"y\":0.6505208333333333}}]",
-      "custom21CameraOffsetZRange": "{\"min\":-5,\"max\":5}",
+      "custom21CameraOffsetZRange": "{\"min\":-30,\"max\":40}",
       "custom21RotationEnabled": false,
       "custom21RotationX": 0,
       "custom21RotationY": -5,
@@ -20029,7 +20029,7 @@
       "custom21Trig5CameraOffsetYRange": "{\"min\":0.5,\"max\":1}",
       "custom21Trig5CameraOffsetZEnabled": true,
       "custom21Trig5CameraOffsetZCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3703440605486725,\"y\":0.7732640584309896}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.4535008384418726,\"y\":-0.6505208333333333}}]",
-      "custom21Trig5CameraOffsetZRange": "{\"min\":-5,\"max\":5}",
+      "custom21Trig5CameraOffsetZRange": "{\"min\":-40,\"max\":30}",
       "custom21Trig5RotationEnabled": false,
       "custom21Trig5RotationX": 0,
       "custom21Trig5RotationY": -5,
@@ -28385,7 +28385,7 @@
       "custom21CameraOffsetYRange": "{\"min\":-1,\"max\":2}",
       "custom21CameraOffsetZEnabled": true,
       "custom21CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.40141436570814926,\"y\":-0.7492560068766276}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.4535008384418726,\"y\":0.6505208333333333}}]",
-      "custom21CameraOffsetZRange": "{\"min\":-5,\"max\":5}",
+      "custom21CameraOffsetZRange": "{\"min\":-30,\"max\":40}",
       "custom21RotationEnabled": false,
       "custom21RotationX": 0,
       "custom21RotationY": -5,
@@ -30070,7 +30070,7 @@
       "custom21Trig5CameraOffsetYRange": "{\"min\":0.5,\"max\":1}",
       "custom21Trig5CameraOffsetZEnabled": true,
       "custom21Trig5CameraOffsetZCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3703440605486725,\"y\":0.7732640584309896}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.4535008384418726,\"y\":-0.6505208333333333}}]",
-      "custom21Trig5CameraOffsetZRange": "{\"min\":-5,\"max\":5}",
+      "custom21Trig5CameraOffsetZRange": "{\"min\":-40,\"max\":30}",
       "custom21Trig5RotationEnabled": false,
       "custom21Trig5RotationX": 0,
       "custom21Trig5RotationY": -5,
@@ -74149,7 +74149,7 @@
                     },
                     {
                       "type": "row",
-                      "key": "custom21CameraOffsetZEnabled"
+                      "key": "custom21CameraOffsetZRange"
                     },
                     {
                       "type": "row",
@@ -74157,7 +74157,7 @@
                     },
                     {
                       "type": "row",
-                      "key": "custom21CameraOffsetZRange"
+                      "key": "custom21CameraOffsetZEnabled"
                     }
                   ],
                   "settings": [
@@ -74167,9 +74167,9 @@
                     "custom21CameraOffsetYEnabled",
                     "custom21CameraOffsetYCurve",
                     "custom21CameraOffsetYRange",
-                    "custom21CameraOffsetZEnabled",
+                    "custom21CameraOffsetZRange",
                     "custom21CameraOffsetZCurve",
-                    "custom21CameraOffsetZRange"
+                    "custom21CameraOffsetZEnabled"
                   ],
                   "subgroups": []
                 }
@@ -74178,7 +74178,7 @@
                 "type": "group",
                 "group": {
                   "key": "Rotation",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -74221,23 +74221,24 @@
                 }
               },
               {
-                "type": "row",
-                "key": "custom21SpeedCurve"
-              },
-              {
                 "type": "group",
                 "group": {
                   "key": "Animation Speed Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
                       "type": "row",
                       "key": "custom21SpeedCurveRange"
+                    },
+                    {
+                      "type": "row",
+                      "key": "custom21SpeedCurve"
                     }
                   ],
                   "settings": [
-                    "custom21SpeedCurveRange"
+                    "custom21SpeedCurveRange",
+                    "custom21SpeedCurve"
                   ],
                   "subgroups": []
                 }
@@ -79119,7 +79120,7 @@
                       "type": "group",
                       "group": {
                         "key": "Trigger 5",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -79178,7 +79179,7 @@
                             "type": "group",
                             "group": {
                               "key": "Offset",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -79364,7 +79365,7 @@
                             "type": "group",
                             "group": {
                               "key": "Animation Speed Curve",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -79733,7 +79734,7 @@
                         "subgroups": [
                           {
                             "key": "Offset",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -79903,7 +79904,7 @@
                           },
                           {
                             "key": "Animation Speed Curve",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -84770,7 +84771,7 @@
                     },
                     {
                       "key": "Trigger 5",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -84829,7 +84830,7 @@
                           "type": "group",
                           "group": {
                             "key": "Offset",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -85015,7 +85016,7 @@
                           "type": "group",
                           "group": {
                             "key": "Animation Speed Curve",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -85384,7 +85385,7 @@
                       "subgroups": [
                         {
                           "key": "Offset",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -85554,7 +85555,7 @@
                         },
                         {
                           "key": "Animation Speed Curve",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -85912,8 +85913,7 @@
               "custom21TransitionSpeedMs",
               "custom21TweenSpeedMs",
               "custom21LoopMode",
-              "custom21LoopHoldMs",
-              "custom21SpeedCurve"
+              "custom21LoopHoldMs"
             ],
             "subgroups": [
               {
@@ -86027,7 +86027,7 @@
                   },
                   {
                     "type": "row",
-                    "key": "custom21CameraOffsetZEnabled"
+                    "key": "custom21CameraOffsetZRange"
                   },
                   {
                     "type": "row",
@@ -86035,7 +86035,7 @@
                   },
                   {
                     "type": "row",
-                    "key": "custom21CameraOffsetZRange"
+                    "key": "custom21CameraOffsetZEnabled"
                   }
                 ],
                 "settings": [
@@ -86045,15 +86045,15 @@
                   "custom21CameraOffsetYEnabled",
                   "custom21CameraOffsetYCurve",
                   "custom21CameraOffsetYRange",
-                  "custom21CameraOffsetZEnabled",
+                  "custom21CameraOffsetZRange",
                   "custom21CameraOffsetZCurve",
-                  "custom21CameraOffsetZRange"
+                  "custom21CameraOffsetZEnabled"
                 ],
                 "subgroups": []
               },
               {
                 "key": "Rotation",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -86093,16 +86093,21 @@
               },
               {
                 "key": "Animation Speed Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
                     "type": "row",
                     "key": "custom21SpeedCurveRange"
+                  },
+                  {
+                    "type": "row",
+                    "key": "custom21SpeedCurve"
                   }
                 ],
                 "settings": [
-                  "custom21SpeedCurveRange"
+                  "custom21SpeedCurveRange",
+                  "custom21SpeedCurve"
                 ],
                 "subgroups": []
               },
@@ -90969,7 +90974,7 @@
                     "type": "group",
                     "group": {
                       "key": "Trigger 5",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -91028,7 +91033,7 @@
                           "type": "group",
                           "group": {
                             "key": "Offset",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -91214,7 +91219,7 @@
                           "type": "group",
                           "group": {
                             "key": "Animation Speed Curve",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -91583,7 +91588,7 @@
                       "subgroups": [
                         {
                           "key": "Offset",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -91753,7 +91758,7 @@
                         },
                         {
                           "key": "Animation Speed Curve",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -96620,7 +96625,7 @@
                   },
                   {
                     "key": "Trigger 5",
-                    "collapsed": false,
+                    "collapsed": true,
                     "locked": false,
                     "items": [
                       {
@@ -96679,7 +96684,7 @@
                         "type": "group",
                         "group": {
                           "key": "Offset",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -96865,7 +96870,7 @@
                         "type": "group",
                         "group": {
                           "key": "Animation Speed Curve",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -97234,7 +97239,7 @@
                     "subgroups": [
                       {
                         "key": "Offset",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -97404,7 +97409,7 @@
                       },
                       {
                         "key": "Animation Speed Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -109069,7 +109074,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 15",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -111155,7 +111160,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 13",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -118614,10 +118619,6 @@
             "items": [
               {
                 "type": "row",
-                "key": "custom10Enabled"
-              },
-              {
-                "type": "row",
                 "key": "custom10Type"
               },
               {
@@ -121504,10 +121505,13 @@
                     }
                   ]
                 }
+              },
+              {
+                "type": "row",
+                "key": "custom10Enabled"
               }
             ],
             "settings": [
-              "custom10Enabled",
               "custom10Type",
               "custom10TouchPointCount",
               "custom10ClickCount",
@@ -121522,7 +121526,8 @@
               "custom10TransitionSpeedMs",
               "custom10TweenSpeedMs",
               "custom10LoopMode",
-              "custom10LoopHoldMs"
+              "custom10LoopHoldMs",
+              "custom10Enabled"
             ],
             "subgroups": [
               {
@@ -180021,7 +180026,7 @@
                   },
                   {
                     "type": "row",
-                    "key": "custom21CameraOffsetZEnabled"
+                    "key": "custom21CameraOffsetZRange"
                   },
                   {
                     "type": "row",
@@ -180029,7 +180034,7 @@
                   },
                   {
                     "type": "row",
-                    "key": "custom21CameraOffsetZRange"
+                    "key": "custom21CameraOffsetZEnabled"
                   }
                 ],
                 "settings": [
@@ -180039,9 +180044,9 @@
                   "custom21CameraOffsetYEnabled",
                   "custom21CameraOffsetYCurve",
                   "custom21CameraOffsetYRange",
-                  "custom21CameraOffsetZEnabled",
+                  "custom21CameraOffsetZRange",
                   "custom21CameraOffsetZCurve",
-                  "custom21CameraOffsetZRange"
+                  "custom21CameraOffsetZEnabled"
                 ],
                 "subgroups": []
               }
@@ -180050,7 +180055,7 @@
               "type": "group",
               "group": {
                 "key": "Rotation",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -180093,23 +180098,24 @@
               }
             },
             {
-              "type": "row",
-              "key": "custom21SpeedCurve"
-            },
-            {
               "type": "group",
               "group": {
                 "key": "Animation Speed Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
                     "type": "row",
                     "key": "custom21SpeedCurveRange"
+                  },
+                  {
+                    "type": "row",
+                    "key": "custom21SpeedCurve"
                   }
                 ],
                 "settings": [
-                  "custom21SpeedCurveRange"
+                  "custom21SpeedCurveRange",
+                  "custom21SpeedCurve"
                 ],
                 "subgroups": []
               }
@@ -184991,7 +184997,7 @@
                     "type": "group",
                     "group": {
                       "key": "Trigger 5",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -185050,7 +185056,7 @@
                           "type": "group",
                           "group": {
                             "key": "Offset",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -185236,7 +185242,7 @@
                           "type": "group",
                           "group": {
                             "key": "Animation Speed Curve",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -185605,7 +185611,7 @@
                       "subgroups": [
                         {
                           "key": "Offset",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -185775,7 +185781,7 @@
                         },
                         {
                           "key": "Animation Speed Curve",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -190642,7 +190648,7 @@
                   },
                   {
                     "key": "Trigger 5",
-                    "collapsed": false,
+                    "collapsed": true,
                     "locked": false,
                     "items": [
                       {
@@ -190701,7 +190707,7 @@
                         "type": "group",
                         "group": {
                           "key": "Offset",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -190887,7 +190893,7 @@
                         "type": "group",
                         "group": {
                           "key": "Animation Speed Curve",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -191256,7 +191262,7 @@
                     "subgroups": [
                       {
                         "key": "Offset",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -191426,7 +191432,7 @@
                       },
                       {
                         "key": "Animation Speed Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -191784,8 +191790,7 @@
             "custom21TransitionSpeedMs",
             "custom21TweenSpeedMs",
             "custom21LoopMode",
-            "custom21LoopHoldMs",
-            "custom21SpeedCurve"
+            "custom21LoopHoldMs"
           ],
           "subgroups": [
             {
@@ -191899,7 +191904,7 @@
                 },
                 {
                   "type": "row",
-                  "key": "custom21CameraOffsetZEnabled"
+                  "key": "custom21CameraOffsetZRange"
                 },
                 {
                   "type": "row",
@@ -191907,7 +191912,7 @@
                 },
                 {
                   "type": "row",
-                  "key": "custom21CameraOffsetZRange"
+                  "key": "custom21CameraOffsetZEnabled"
                 }
               ],
               "settings": [
@@ -191917,15 +191922,15 @@
                 "custom21CameraOffsetYEnabled",
                 "custom21CameraOffsetYCurve",
                 "custom21CameraOffsetYRange",
-                "custom21CameraOffsetZEnabled",
+                "custom21CameraOffsetZRange",
                 "custom21CameraOffsetZCurve",
-                "custom21CameraOffsetZRange"
+                "custom21CameraOffsetZEnabled"
               ],
               "subgroups": []
             },
             {
               "key": "Rotation",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -191965,16 +191970,21 @@
             },
             {
               "key": "Animation Speed Curve",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
                   "type": "row",
                   "key": "custom21SpeedCurveRange"
+                },
+                {
+                  "type": "row",
+                  "key": "custom21SpeedCurve"
                 }
               ],
               "settings": [
-                "custom21SpeedCurveRange"
+                "custom21SpeedCurveRange",
+                "custom21SpeedCurve"
               ],
               "subgroups": []
             },
@@ -196841,7 +196851,7 @@
                   "type": "group",
                   "group": {
                     "key": "Trigger 5",
-                    "collapsed": false,
+                    "collapsed": true,
                     "locked": false,
                     "items": [
                       {
@@ -196900,7 +196910,7 @@
                         "type": "group",
                         "group": {
                           "key": "Offset",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -197086,7 +197096,7 @@
                         "type": "group",
                         "group": {
                           "key": "Animation Speed Curve",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -197455,7 +197465,7 @@
                     "subgroups": [
                       {
                         "key": "Offset",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -197625,7 +197635,7 @@
                       },
                       {
                         "key": "Animation Speed Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -202492,7 +202502,7 @@
                 },
                 {
                   "key": "Trigger 5",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -202551,7 +202561,7 @@
                       "type": "group",
                       "group": {
                         "key": "Offset",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -202737,7 +202747,7 @@
                       "type": "group",
                       "group": {
                         "key": "Animation Speed Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -203106,7 +203116,7 @@
                   "subgroups": [
                     {
                       "key": "Offset",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -203276,7 +203286,7 @@
                     },
                     {
                       "key": "Animation Speed Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -214923,7 +214933,7 @@
         },
         {
           "key": "Custom Click Function 15",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -217003,7 +217013,7 @@
         },
         {
           "key": "Custom Click Function 13",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
@@ -224459,10 +224469,6 @@
           "items": [
             {
               "type": "row",
-              "key": "custom10Enabled"
-            },
-            {
-              "type": "row",
               "key": "custom10Type"
             },
             {
@@ -227349,10 +227355,13 @@
                   }
                 ]
               }
+            },
+            {
+              "type": "row",
+              "key": "custom10Enabled"
             }
           ],
           "settings": [
-            "custom10Enabled",
             "custom10Type",
             "custom10TouchPointCount",
             "custom10ClickCount",
@@ -227367,7 +227376,8 @@
             "custom10TransitionSpeedMs",
             "custom10TweenSpeedMs",
             "custom10LoopMode",
-            "custom10LoopHoldMs"
+            "custom10LoopHoldMs",
+            "custom10Enabled"
           ],
           "subgroups": [
             {
@@ -248545,10 +248555,10 @@
       "height": 644.390625
     },
     "mobile": {
-      "left": 38.44047546386719,
-      "top": 1.75,
-      "width": 351.25,
-      "height": 784.7738037109375
+      "left": 32.886905670166016,
+      "top": 0,
+      "width": 361.5357360839844,
+      "height": 789.3392944335938
     }
   }
 }
