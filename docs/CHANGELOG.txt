@@ -17308,6 +17308,12 @@ Direct requests: put the render order settings in their own "Render Order" group
  - Add Fallback: renderOrderExtraFallbacks (hidden JSON list [{m,q}]) - each entry is another level (Fallback 3, 4 ...) with its own Except; x removes it. The evaluator now runs over N levels (lv.length), bucket count 2*levels+1 (the old fixed 6 buckets let a Fallback 2 arm-distance tie-break share a slot with "keep previous order"; now separate).
  - Mode terms: renderOrderModeTerms (hidden JSON list [{op:'and'|'or'|'sub', m}]). Read left to right: And / Subtract add / take away the term's STANDARDISED score (mean 0, stdev 1 over all hands, so distances and Z values are comparable) from the group built so far; Or starts a new group. Scalar-only, no Or = one scalar key (an exact sort). Otherwise a pairwise verdict per group (sign of the difference of the two hands' sums, Palm To Arm style modes count +-1); groups combine like OR: any group puts a hand on top and none the other = that hand above; groups disagreeing = tie (the next level decides). The log names the composite and the per-group values. `main.js` `?v=367` -> `?v=368`.
 
+2026-10-11  -  (Arm Base To Arm End / Arm End To Arm Base; pair modes always measure the closer hand as the former; Render Order re-nests after restore)
+
+ - New modes "Arm Base To Arm End" and "Arm End To Arm Base" (RO_PAIR_DEFS).
+ - Direct request: for every pair mode (Palm To Arm Base / End, Arm Base / End To Palm Center and the two new ones) the hand CLOSER to the cursor in screen XY (hand._xyCursorDist, the tracking point; ties = lower index) is the FORMER hand: its first-named point is compared with the other hand's second-named point. Former point higher in Z (beyond 0.01 world units) = former hand on top; lower = the other hand on top; within the tolerance = no decision, the next level decides. This replaces the old two-way "A over B and B over A" test and its arm-distance tie-break (a pair is now always one comparison), so the previous behaviour of the existing Palm To Arm modes changes.
+ - The Render Order group could stay empty after load: a saved panel order that predates the group puts its rows back into Field Layout after the async restore, so onRestore now re-nests them (organizeGroupSubgroups is idempotent). `main.js` `?v=368` -> `?v=369`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

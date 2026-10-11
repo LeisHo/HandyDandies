@@ -293,6 +293,7 @@ const _brAX = new THREE.Vector3(1, 0, 0), _brAY = new THREE.Vector3(0, 1, 0), _b
 // to the cursor target (its Cursor Target Depth). 'closest' = nearest the cursor on top, 'farthest' = furthest on top.
 // '-' modes (2026-10-11): the same Z with the sign flipped, so the hand with the LOWER Z value is drawn on top.
 const RO_NEG_BASE = { negZ: 'z', negArmBase: 'armBase', negArmEnd: 'armEnd', negPalmCenter: 'palmCenter' }
+const RO_PAIR_DEFS = { palmToArm: ['palmCenter', 'armBase'], palmToArmEnd: ['palmCenter', 'armEnd'], armBaseToPalm: ['armBase', 'palmCenter'], armEndToPalm: ['armEnd', 'palmCenter'], armBaseToArmEnd: ['armBase', 'armEnd'], armEndToArmBase: ['armEnd', 'armBase'] }
 const RENDER_ORDER_MODE_OPTIONS = [
   { value: 'none', text: 'None' },
   { value: 'z', text: 'Z Position' }, { value: 'armBase', text: 'Arm Base' }, { value: 'armEnd', text: 'Arm End' }, { value: 'palmCenter', text: 'Palm Center' },
@@ -302,7 +303,9 @@ const RENDER_ORDER_MODE_OPTIONS = [
   { value: 'palmToArm', text: 'Palm To Arm Base' },
   { value: 'palmToArmEnd', text: 'Palm To Arm End' },
   { value: 'armBaseToPalm', text: 'Arm Base To Palm Center' },
-  { value: 'armEndToPalm', text: 'Arm End To Palm Center' }
+  { value: 'armEndToPalm', text: 'Arm End To Palm Center' },
+  { value: 'armBaseToArmEnd', text: 'Arm Base To Arm End' },
+  { value: 'armEndToArmBase', text: 'Arm End To Arm Base' }
 ]
 // Cursor tracking point (2026-10-11): the point on each hand that every cursor-tracking measurement (aim, palm angle, screen-space distances, splay / crop distances) is taken from. Computed at the hand's
 // no-tracking pose (so it does not chase the rotation it drives). hand._trk = world position, hand._trkXY = its screen-space distance to the cursor.
@@ -1009,6 +1012,7 @@ let roPrevRank = null, roLocks = new Map(), roLockPruneCounter = 0
 const roLevelName = (l) => (l === 0 ? 'Mode' : l === 1 ? 'Fallback' : 'Fallback ' + l)
 // Mode terms (+ And / + Or / - Subtract) and the extra Fallback levels are JSON lists kept in two hidden text controls (see buildRenderOrderWidgets()); parsed once per distinct string.
 const RO_VALID_MODES = new Set(RENDER_ORDER_MODE_OPTIONS.map((o) => o.value))
+const roA2A = {}
 let roTermsStr = null, roTermsVal = [], roExtraStr = null, roExtraVal = []
 function roParseTerms() {
   const str = cfg.renderOrderModeTerms || '[]'
@@ -1035,11 +1039,11 @@ function roExplain(lv, r, lo, hi, loAbove) {
   const up = ruleLoAbove ? lo : hi, down = ruleLoAbove ? hi : lo
   let cond
   if (ev.comp) cond = 'Hand ' + (up + 1) + ' above Hand ' + (down + 1) + ' (' + ev.detail(up, down) + ')'
-  else if (ev.pair) {
-    const arm = ev.isEnd ? 'arm end' : 'arm base'
-    if (kindXY) cond = 'both ' + (ev.rev ? arm + 's are higher than the other palm' : 'palms are higher than the other ' + arm) + '; Hand ' + (up + 1) + ' ' + arm + ' is farther from the cursor (' + ev.xy[up].toFixed(1) + ' vs ' + ev.xy[down].toFixed(1) + ')'
-    else if (!ev.rev) cond = 'Hand ' + (up + 1) + ' palm center Z ' + roPalmZ[up].toFixed(2) + ' is higher than Hand ' + (down + 1) + ' ' + arm + ' Z ' + ev.z[down].toFixed(2)
-    else cond = 'Hand ' + (up + 1) + ' ' + arm + ' Z ' + ev.z[up].toFixed(2) + ' is higher than Hand ' + (down + 1) + ' palm center Z ' + roPalmZ[down].toFixed(2)
+  else if (ev.a2a) {
+    const nm = (n) => (n === 'armBase' ? 'arm base' : n === 'armEnd' ? 'arm end' : 'palm center')
+    const fa = hands[up]._xyCursorDist ?? 0, fd = hands[down]._xyCursorDist ?? 0
+    const F = (fa < fd || (fa === fd && up < down)) ? up : down, Lh = F === up ? down : up
+    cond = 'Hand ' + (F + 1) + ' (the closer to the cursor, the former) ' + nm(ev.fromNode) + ' Z ' + ev.fromZ[F].toFixed(2) + (F === up ? ' is higher than ' : ' is lower than ') + 'Hand ' + (Lh + 1) + ' ' + nm(ev.toNode) + ' Z ' + ev.toZ[Lh].toFixed(2)
   } else {
     const neg = ev.mode === 'closest' || ev.mode === 'closestZ' // their key is minus the distance
     const show = (i) => ((neg ? -1 : 1) * ev.k[i] * 0.01).toFixed(2)
@@ -1089,21 +1093,18 @@ function computeRenderOrderRanks() {
     if (!mode || mode === 'none') return null
     if (evs.has(mode)) return evs.get(mode)
     let ev
-    if (mode === 'palmToArm' || mode === 'palmToArmEnd' || mode === 'armBaseToPalm' || mode === 'armEndToPalm') {
-      const isEnd = mode === 'palmToArmEnd' || mode === 'armEndToPalm'
-      const rev = mode === 'armBaseToPalm' || mode === 'armEndToPalm' // mirrored rule: A's ARM point must be higher than B's PALM (instead of A's palm higher than B's arm point)
-      if (!roPalmZ || roPalmZ.length !== n) { roPalmZ = new Float64Array(n); roBaseZ = new Float64Array(n); roBaseXY = new Float64Array(n); roEndZ = new Float64Array(n); roEndXY = new Float64Array(n) }
-      if (!palmDone) {
-        palmDone = true
-        for (let i = 0; i < n; i++) { const h = hands[i], pb = renderOrderBone(h, 'palmCenter'); roPalmZ[i] = (pb ? pb.matrixWorld.elements[14] : h.wrapper.position.z) * camSign }
-      }
-      const zArr = isEnd ? roEndZ : roBaseZ, xyArr = isEnd ? roEndXY : roBaseXY, node = isEnd ? 'armEnd' : 'armBase'
+    if (RO_PAIR_DEFS[mode]) {
+      // Pair modes (2026-10-11): the hand CLOSER to the cursor in screen XY is always the FORMER hand (ties: the lower index); its FIRST-named point is compared with the other hand's SECOND-named point. Former point higher in Z by
+      // more than the tolerance = the former hand is on top; lower = the other hand is on top; within the tolerance = no decision (the next level decides).
+      const fromNode = RO_PAIR_DEFS[mode][0], toNode = RO_PAIR_DEFS[mode][1]
+      let arr = roA2A[mode]
+      if (!arr || arr.fromZ.length !== n) arr = roA2A[mode] = { fromZ: new Float64Array(n), toZ: new Float64Array(n) }
       for (let i = 0; i < n; i++) {
-        const h = hands[i], nb = renderOrderBone(h, node)
-        zArr[i] = (nb ? nb.matrixWorld.elements[14] : h.wrapper.position.z) * camSign
-        xyArr[i] = nb ? cursorDistXY(_roV.setFromMatrixPosition(nb.matrixWorld)) : cursorDistXY(handPoint(h))
+        const h = hands[i], fb = renderOrderBone(h, fromNode), tb = renderOrderBone(h, toNode)
+        arr.fromZ[i] = (fb ? fb.matrixWorld.elements[14] : h.wrapper.position.z) * camSign
+        arr.toZ[i] = (tb ? tb.matrixWorld.elements[14] : h.wrapper.position.z) * camSign
       }
-      ev = { pair: true, z: zArr, xy: xyArr, rev, isEnd, mode }
+      ev = { pair: true, a2a: true, fromZ: arr.fromZ, toZ: arr.toZ, fromNode, toNode, mode }
     } else {
       let k = roScalar[mode]
       if (!k || k.length !== n) k = roScalar[mode] = new Float64Array(n)
@@ -1160,13 +1161,13 @@ function computeRenderOrderRanks() {
   // +1 = a goes above b, -1 = b goes above a, 0 = this mode does not decide the pair
   const cmpMode = (ev, a, b) => {
     if (ev.comp && ev.cmp) return ev.cmp(a, b)
-    if (ev.pair) {
-      const aOver = ev.rev ? ev.z[a] - roPalmZ[b] > TOL : roPalmZ[a] - ev.z[b] > TOL
-      const bOver = ev.rev ? ev.z[b] - roPalmZ[a] > TOL : roPalmZ[b] - ev.z[a] > TOL
-      if (aOver && !bOver) return 1
-      if (bOver && !aOver) return -1
-      if (aOver && bOver) { const d = Math.round(ev.xy[a] / TOL) - Math.round(ev.xy[b] / TOL); roKindXY = d !== 0; return d > 0 ? 1 : d < 0 ? -1 : 0 }
-      return 0
+    if (ev.a2a) {
+      const da = hands[a]._xyCursorDist ?? 0, db = hands[b]._xyCursorDist ?? 0
+      const aFormer = da < db || (da === db && a < b)
+      const F = aFormer ? a : b, Lh = aFormer ? b : a
+      const d = ev.fromZ[F] - ev.toZ[Lh]
+      const vF = d > TOL ? 1 : d < -TOL ? -1 : 0
+      return aFormer ? vF : -vF
     }
     const d = ev.k[a] - ev.k[b]
     return d > 0 ? 1 : d < 0 ? -1 : 0
@@ -2859,6 +2860,8 @@ const cfg = initDevPanel(DEV_GROUPS, {
   // visibly rebuilding again the moment this fires.
   onRestore: async () => {
     logStartupTiming('onRestore fired -> startupSettingsReady = true')
+    // A saved panel order that predates the Render Order group puts its rows straight back into Field Layout when it is applied; re-nest them (idempotent, only moves the listed keys).
+    try { const ge = document.getElementById('dpGroups'); if (ge) organizeGroupSubgroups(ge, 'Field Layout', FIELD_LAYOUT_SUBGROUP_SPECS) } catch (e) { /* panel not built */ }
     // Each step timed when ?debugTiming=1 (see devPanel.js dpTime()).
     const prof = (label, fn) => {
       if (!DEBUG_TIMING) { fn(); return }
