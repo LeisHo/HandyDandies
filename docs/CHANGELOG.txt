@@ -17001,6 +17001,15 @@ functions, and click reset, it doesnt reset to default"; (3) the wrist cropping 
    triggered pose (clone rotated 51 deg): the same model points stay clipped / kept in every case. No change needed; tell me the exact case if you still see it not follow.
  `main.js` `?v=331` -> `?v=332`.
 
+2026-10-11  -  (Reset and "Default" put the Pose sliders on the reset hand's values)
+
+Direct report: "when i click reset or set pose as default, i want the rotation sliders of the Pose group to reflect the values of the reset hand. Right now it doesnt."
+ - Reset (the button next to Pause) only cleared the hands' runtime state; it never touched the Pose sliders, so after tweaking a slider the hands went back to the Default pose while the sliders still
+   showed the tweak. resetAllHands() now first puts every Pose-group slider (and cfg) back on the Default pose (poseDefaultValues) via the new syncPoseSlidersTo(), which also re-poses the field.
+ - "Default" used the same syncValue() loop, which silently skips a slider that has focus (so a rotation / offset box the user had just typed into could keep its old value after the click -- a button
+   click does not always take focus). syncPoseSlidersTo() blurs the focused panel control first and writes cfg for every key; setSelectedPoseAsDefault() now uses it.
+ `main.js` `?v=332` -> `?v=333`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

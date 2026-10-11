@@ -5241,15 +5241,26 @@ function getSelectedSavedPoseItem() {
 // it genuinely "the pose on startup" per the request's own wording (no
 // separate startup-specific persistence needed; this project's normal
 // restore-from-localStorage mechanism already covers it once saved).
+// Puts every Pose-group slider (and cfg) on `values` and re-poses the field -- used by "Default" and by the Reset button so the sliders always show what the hands show
+// (2026-10-11). syncValue() skips a slider that currently has focus (so a live edit is never fought), which would leave a focused rotation / offset box on its old value after a
+// Default or Reset click (a button click does not always take focus, e.g. on touch / Safari), so the focused control is blurred first.
+function syncPoseSlidersTo(values) {
+  const ae = document.activeElement
+  if (ae && ae !== document.body && ae.closest && ae.closest('.dp-panel')) ae.blur()
+  POSE_PRESET_KEYS.forEach((key) => {
+    const v = values[key] !== undefined ? values[key] : POSE_KEY_DEFAULTS[key]
+    syncValue(key, v)
+    cfg[key] = v // syncValue only writes cfg for a control it found; keep the field in step regardless
+  })
+  onWholeHandRotationChange()
+}
 function setSelectedPoseAsDefault() {
   const item = getSelectedSavedPoseItem()
   if (!item) return
-  POSE_PRESET_KEYS.forEach((key) => {
-    const v = item[key] !== undefined ? item[key] : POSE_KEY_DEFAULTS[key]
-    syncValue(key, v)
-    poseDefaultValues[key] = v
-  })
-  onWholeHandRotationChange()
+  const next = {}
+  POSE_PRESET_KEYS.forEach((key) => { next[key] = item[key] !== undefined ? item[key] : POSE_KEY_DEFAULTS[key] })
+  POSE_PRESET_KEYS.forEach((key) => { poseDefaultValues[key] = next[key] })
+  syncPoseSlidersTo(next)
   saveCurrentSettings()
 }
 // Injects the "Default" button directly into the Saved Poses list-
@@ -15308,6 +15319,8 @@ function applyPauseButtonStyle() {
 // the click-count debounce timers and any held-trigger flags so a
 // pending click can't re-trigger a hand right after the reset.
 function resetAllHands() {
+  // The Pose-group sliders go back to the Default pose first, so they show the same values the reset hands now show (2026-10-11).
+  syncPoseSlidersTo(poseDefaultValues)
   clearTimeout(clickPoseClickTimer); clickPoseClickCount = 0
   clearTimeout(rightClickPoseClickTimer); rightClickPoseClickCount = 0
   Object.keys(clickHoldPoseTriggers).forEach((k) => { if (clickHoldPoseTriggers[k]) clickHoldPoseTriggers[k].active = false })
