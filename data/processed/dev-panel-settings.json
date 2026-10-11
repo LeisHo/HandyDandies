@@ -8300,7 +8300,7 @@
       "custom21CameraOffsetXRange": "{\"min\":0,\"max\":1}",
       "custom21CameraOffsetYEnabled": true,
       "custom21CameraOffsetYCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.324820628419056,\"y\":0},\"bg\":0.64,\"m\":\"linear\"},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.467575665942766,\"y\":0}}]",
-      "custom21CameraOffsetYRange": "{\"min\":-1,\"max\":1}",
+      "custom21CameraOffsetYRange": "{\"min\":-1,\"max\":2}",
       "custom21CameraOffsetZEnabled": true,
       "custom21CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.3776012315474063,\"y\":-0.1328125}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.4535008384418726,\"y\":0.6505208333333333}}]",
       "custom21CameraOffsetZRange": "{\"min\":-1,\"max\":3}",
@@ -9985,7 +9985,7 @@
       "custom21Trig5CameraOffsetXRange": "{\"min\":0,\"max\":1}",
       "custom21Trig5CameraOffsetYEnabled": true,
       "custom21Trig5CameraOffsetYCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.324820628419056,\"y\":0},\"bg\":0.64},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.467575665942766,\"y\":0}}]",
-      "custom21Trig5CameraOffsetYRange": "{\"min\":-1,\"max\":1}",
+      "custom21Trig5CameraOffsetYRange": "{\"min\":-2,\"max\":1}",
       "custom21Trig5CameraOffsetZEnabled": false,
       "custom21Trig5CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.3776012315474063,\"y\":-0.1328125}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.4535008384418726,\"y\":0.6505208333333333}}]",
       "custom21Trig5CameraOffsetZRange": "{\"min\":-1,\"max\":3}",
@@ -18341,7 +18341,7 @@
       "custom21CameraOffsetXRange": "{\"min\":0,\"max\":1}",
       "custom21CameraOffsetYEnabled": true,
       "custom21CameraOffsetYCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.324820628419056,\"y\":0},\"bg\":0.64,\"m\":\"linear\"},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.467575665942766,\"y\":0}}]",
-      "custom21CameraOffsetYRange": "{\"min\":-1,\"max\":1}",
+      "custom21CameraOffsetYRange": "{\"min\":-1,\"max\":2}",
       "custom21CameraOffsetZEnabled": true,
       "custom21CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.3776012315474063,\"y\":-0.1328125}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.4535008384418726,\"y\":0.6505208333333333}}]",
       "custom21CameraOffsetZRange": "{\"min\":-1,\"max\":3}",
@@ -20026,7 +20026,7 @@
       "custom21Trig5CameraOffsetXRange": "{\"min\":0,\"max\":1}",
       "custom21Trig5CameraOffsetYEnabled": true,
       "custom21Trig5CameraOffsetYCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.324820628419056,\"y\":0},\"bg\":0.64},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.467575665942766,\"y\":0}}]",
-      "custom21Trig5CameraOffsetYRange": "{\"min\":-1,\"max\":1}",
+      "custom21Trig5CameraOffsetYRange": "{\"min\":-2,\"max\":1}",
       "custom21Trig5CameraOffsetZEnabled": false,
       "custom21Trig5CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.3776012315474063,\"y\":-0.1328125}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.4535008384418726,\"y\":0.6505208333333333}}]",
       "custom21Trig5CameraOffsetZRange": "{\"min\":-1,\"max\":3}",
@@ -28382,7 +28382,7 @@
       "custom21CameraOffsetXRange": "{\"min\":0,\"max\":1}",
       "custom21CameraOffsetYEnabled": true,
       "custom21CameraOffsetYCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.324820628419056,\"y\":0},\"bg\":0.64,\"m\":\"linear\"},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.467575665942766,\"y\":0}}]",
-      "custom21CameraOffsetYRange": "{\"min\":-1,\"max\":1}",
+      "custom21CameraOffsetYRange": "{\"min\":-1,\"max\":2}",
       "custom21CameraOffsetZEnabled": true,
       "custom21CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.3776012315474063,\"y\":-0.1328125}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.4535008384418726,\"y\":0.6505208333333333}}]",
       "custom21CameraOffsetZRange": "{\"min\":-1,\"max\":3}",
@@ -30067,7 +30067,7 @@
       "custom21Trig5CameraOffsetXRange": "{\"min\":0,\"max\":1}",
       "custom21Trig5CameraOffsetYEnabled": true,
       "custom21Trig5CameraOffsetYCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.324820628419056,\"y\":0},\"bg\":0.64},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.467575665942766,\"y\":0}}]",
-      "custom21Trig5CameraOffsetYRange": "{\"min\":-1,\"max\":1}",
+      "custom21Trig5CameraOffsetYRange": "{\"min\":-2,\"max\":1}",
       "custom21Trig5CameraOffsetZEnabled": false,
       "custom21Trig5CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.3776012315474063,\"y\":-0.1328125}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.4535008384418726,\"y\":0.6505208333333333}}]",
       "custom21Trig5CameraOffsetZRange": "{\"min\":-1,\"max\":3}",
@@ -248592,9 +248592,9 @@
     },
     "mobile": {
       "left": 27.928571701049805,
-      "top": 9.351190567016602,
-      "width": 334.1071472167969,
-      "height": 777.172607421875
+      "top": 7.827381134033203,
+      "width": 337.53570556640625,
+      "height": 778.6964721679688
     }
   }
 }
