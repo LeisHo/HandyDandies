@@ -3402,13 +3402,14 @@ function updateCursorTarget() {
   targetMarker.position.set(cursorTarget.x, cursorTarget.y, 0)
   updateTrackingTargets()
 }
-// Each cursor-tracking feature has its own Cursor Target Depth (x Field Radius); falls back to the shared one if unset.
+// Each cursor-tracking feature has its OWN Cursor Target Depth (World Units Z) and never uses the shared Cursor Target Depth slider (2026-10-11, direct request: no fallback to the main slider).
+// The per-feature slider always has a value (its control default); TRACKING_DEPTH_DEFAULT only guards a missing key so it can never turn into NaN.
+const TRACKING_DEPTH_DEFAULT = 60.6
 function updateTrackingTargets() {
-  const shared = cfg.targetDepthFactor // all depths are World Units Z since 2026-10-11
-  _trackTargetArm.set(cursorTarget.x, cursorTarget.y, cfg.armRotationTargetDepth ?? shared)
-  _trackTargetPalm.set(cursorTarget.x, cursorTarget.y, cfg.palmRotationTargetDepth ?? shared)
-  _trackTargetSplay.set(cursorTarget.x, cursorTarget.y, cfg.wristSplayTargetDepth ?? shared)
-  _trackTargetCrop.set(cursorTarget.x, cursorTarget.y, cfg.armLengthTargetDepth ?? shared)
+  _trackTargetArm.set(cursorTarget.x, cursorTarget.y, cfg.armRotationTargetDepth ?? TRACKING_DEPTH_DEFAULT)
+  _trackTargetPalm.set(cursorTarget.x, cursorTarget.y, cfg.palmRotationTargetDepth ?? TRACKING_DEPTH_DEFAULT)
+  _trackTargetSplay.set(cursorTarget.x, cursorTarget.y, cfg.wristSplayTargetDepth ?? TRACKING_DEPTH_DEFAULT)
+  _trackTargetCrop.set(cursorTarget.x, cursorTarget.y, cfg.armLengthTargetDepth ?? TRACKING_DEPTH_DEFAULT)
 }
 
 // -----------------------------------------------------------------------

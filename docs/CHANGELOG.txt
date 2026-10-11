@@ -17055,6 +17055,13 @@ Direct request (after asking how cursor-tracking Arm / Palm Rotation take the de
    computeRollQuat(baseDeg, hand) now builds the axis per hand: the raw forearm normal (wristCropNormalRawModel) turned by hand.currentBaseQuat. With no extra rotation currentBaseQuat is alignQuat, so the
    result equals the old axis; with a default / triggered pose rotation the axis follows it (currentBaseQuat is kept live by the pose code). `main.js` `?v=337` -> `?v=338`.
 
+2026-10-11  -  (per-feature Cursor Target Depth no longer falls back to the shared slider)
+
+Direct request: each cursor-tracking function (Arm Rotation, Palm Rotation, Wrist Splay, Wrist Cropping) must use only its own Cursor Target Depth, never the main Cursor Target Depth slider.
+updateTrackingTargets() used `cfg.<feature>TargetDepth ?? cfg.targetDepthFactor`; the fallback is gone. A missing per-feature value now uses the controls' own default (60.6, TRACKING_DEPTH_DEFAULT) so it can
+never become NaN (in practice every per-feature slider always has a value, so this only matters for a never-initialised key). With a feature's "Uses Cursor Target Depth" box off, nothing reads a depth at all
+(unchanged). The shared slider still sets the cursor target's own Z, which render order and the click-function offset direction use. `main.js` `?v=338` -> `?v=339`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a
