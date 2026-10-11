@@ -41,6 +41,7 @@
       "armRotationDefault": 93,
       "armRotationCurveEnabled": true,
       "armRotationCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.8080220886433459,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.23551813533871668,\"y\":0}}]",
+      "armRotationRangePct": "{\"min\":0,\"max\":100}",
       "armRotationOffsetX": 0,
       "armRotationOffsetY": 0,
       "armRotationDamping": 1,
@@ -51,7 +52,7 @@
       "palmFaceRotationOffset": 180,
       "palmFacesCursorDistanceCurveEnabled": true,
       "palmFacesCursorDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
-      "palmFacesCursorDistanceRange": "{\"min\":0,\"max\":180}",
+      "palmFacesCursorDistanceRange": "{\"min\":0,\"max\":100}",
       "loadingPreviewEnabled": true,
       "loadingPreviewShowLive": false,
       "loadingMinTimeMs": 5000,
@@ -233,14 +234,14 @@
       "loadingPreviewSequenceLoopTransition": true,
       "loadingPreviewSequenceHoldMs": 0,
       "loadingPreviewSize": 1390,
-      "loadingPreviewRotationX": -80.95249635846959,
-      "loadingPreviewRotationY": -176.12784714656706,
+      "loadingPreviewRotationX": -75.46317639228698,
+      "loadingPreviewRotationY": -171.31775806313817,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": -4.440892098500626e-16,
-      "loadingPreviewOffsetY": -8.881784197001252e-16,
+      "loadingPreviewOffsetY": 0,
       "loadingPreviewOffsetZ": 0,
       "loadingPreviewCameraFov": 32,
-      "loadingPreviewCameraZoom": 161.76948312244258,
+      "loadingPreviewCameraZoom": 161.7694831224424,
       "loadingPreviewCameraEditMode": true,
       "customClickFunctionIds": "[{\"id\":\"custom19\",\"title\":\"Custom Click Function 19\",\"kind\":\"pose\",\"family\":\"mobile\"},{\"id\":\"custom20\",\"title\":\"Custom Click Function 20\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom21\",\"title\":\"Custom Click Function 21\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom22\",\"title\":\"Custom Click Function 22\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom23\",\"title\":\"Custom Click Function 23\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom24\",\"title\":\"Custom Click Function 24\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom25\",\"title\":\"Custom Click Function 25\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom26\",\"title\":\"Custom Click Function 26\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom27\",\"title\":\"Custom Click Function 27\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom28\",\"title\":\"Custom Click Function 28\",\"kind\":\"pose\",\"family\":\"mobile\"},{\"id\":\"custom29\",\"title\":\"Custom Click Function 29\",\"kind\":\"pose\",\"family\":\"mobile\"},{\"id\":\"custom30\",\"title\":\"Custom Click Function 30\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom31\",\"title\":\"Custom Click Function 31\",\"kind\":\"hold\",\"family\":\"desktop\"}]",
       "holdConfirmMs": 400,
@@ -6809,9 +6810,9 @@
           "group": "FIST ROTATE"
         }
       ],
-      "cameraX": 6.504385906807997,
-      "cameraY": 9.50640894842113,
-      "cameraZ": 286.01320202024317,
+      "cameraX": 6.504385906807993,
+      "cameraY": 9.506408948421186,
+      "cameraZ": 286.0132020495825,
       "cameraFov": 15,
       "cameraYaw": 0,
       "cameraPitch": 0,
@@ -6945,7 +6946,7 @@
       "pixelRatio": 1.25,
       "resolutionScale": 100,
       "qualityPreset": "high",
-      "showTrackingPoints": true,
+      "showTrackingPoints": false,
       "showGridHelper": false,
       "showWireframe": false,
       "preventReorderFlash": false,
@@ -9297,6 +9298,7 @@
       "armRotationDefault": 93,
       "armRotationCurveEnabled": true,
       "armRotationCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.8080220886433459,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.23551813533871668,\"y\":0}}]",
+      "armRotationRangePct": "{\"min\":0,\"max\":100}",
       "armRotationOffsetX": 0,
       "armRotationOffsetY": 0,
       "armRotationDamping": 1,
@@ -9307,7 +9309,7 @@
       "palmFaceRotationOffset": 0,
       "palmFacesCursorDistanceCurveEnabled": true,
       "palmFacesCursorDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
-      "palmFacesCursorDistanceRange": "{\"min\":0,\"max\":180}",
+      "palmFacesCursorDistanceRange": "{\"min\":0,\"max\":100}",
       "loadingPreviewEnabled": true,
       "loadingPreviewShowLive": false,
       "loadingMinTimeMs": 5000,
@@ -9489,14 +9491,14 @@
       "loadingPreviewSequenceLoopTransition": true,
       "loadingPreviewSequenceHoldMs": 0,
       "loadingPreviewSize": 1390,
-      "loadingPreviewRotationX": -80.95249635846959,
-      "loadingPreviewRotationY": -176.12784714656706,
+      "loadingPreviewRotationX": -75.46317639228698,
+      "loadingPreviewRotationY": -171.31775806313817,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": -4.440892098500626e-16,
-      "loadingPreviewOffsetY": -8.881784197001252e-16,
+      "loadingPreviewOffsetY": 0,
       "loadingPreviewOffsetZ": 0,
       "loadingPreviewCameraFov": 32,
-      "loadingPreviewCameraZoom": 161.76948312244258,
+      "loadingPreviewCameraZoom": 161.7694831224424,
       "loadingPreviewCameraEditMode": true,
       "customClickFunctionIds": "[{\"id\":\"custom19\",\"title\":\"Custom Click Function 19\",\"kind\":\"pose\",\"family\":\"mobile\"},{\"id\":\"custom20\",\"title\":\"Custom Click Function 20\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom21\",\"title\":\"Custom Click Function 21\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom22\",\"title\":\"Custom Click Function 22\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom23\",\"title\":\"Custom Click Function 23\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom24\",\"title\":\"Custom Click Function 24\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom25\",\"title\":\"Custom Click Function 25\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom26\",\"title\":\"Custom Click Function 26\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom27\",\"title\":\"Custom Click Function 27\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom28\",\"title\":\"Custom Click Function 28\",\"kind\":\"pose\",\"family\":\"mobile\"},{\"id\":\"custom29\",\"title\":\"Custom Click Function 29\",\"kind\":\"pose\",\"family\":\"mobile\"},{\"id\":\"custom30\",\"title\":\"Custom Click Function 30\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom31\",\"title\":\"Custom Click Function 31\",\"kind\":\"hold\",\"family\":\"desktop\"}]",
       "holdConfirmMs": 400,
@@ -16201,7 +16203,7 @@
       "pixelRatio": 1.25,
       "resolutionScale": 100,
       "qualityPreset": "high",
-      "showTrackingPoints": true,
+      "showTrackingPoints": false,
       "showGridHelper": false,
       "showWireframe": false,
       "preventReorderFlash": false,
@@ -18553,6 +18555,7 @@
       "armRotationDefault": 93,
       "armRotationCurveEnabled": true,
       "armRotationCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.8080220886433459,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.23551813533871668,\"y\":0}}]",
+      "armRotationRangePct": "{\"min\":0,\"max\":100}",
       "armRotationOffsetX": 0,
       "armRotationOffsetY": 0,
       "armRotationDamping": 1,
@@ -18563,7 +18566,7 @@
       "palmFaceRotationOffset": 0,
       "palmFacesCursorDistanceCurveEnabled": true,
       "palmFacesCursorDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
-      "palmFacesCursorDistanceRange": "{\"min\":0,\"max\":180}",
+      "palmFacesCursorDistanceRange": "{\"min\":0,\"max\":100}",
       "loadingPreviewEnabled": true,
       "loadingPreviewShowLive": false,
       "loadingMinTimeMs": 5000,
@@ -18745,14 +18748,14 @@
       "loadingPreviewSequenceLoopTransition": true,
       "loadingPreviewSequenceHoldMs": 0,
       "loadingPreviewSize": 1390,
-      "loadingPreviewRotationX": -80.95249635846959,
-      "loadingPreviewRotationY": -176.12784714656706,
+      "loadingPreviewRotationX": -75.46317639228698,
+      "loadingPreviewRotationY": -171.31775806313817,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": -4.440892098500626e-16,
-      "loadingPreviewOffsetY": -8.881784197001252e-16,
+      "loadingPreviewOffsetY": 0,
       "loadingPreviewOffsetZ": 0,
       "loadingPreviewCameraFov": 32,
-      "loadingPreviewCameraZoom": 161.76948312244258,
+      "loadingPreviewCameraZoom": 161.7694831224424,
       "loadingPreviewCameraEditMode": true,
       "customClickFunctionIds": "[{\"id\":\"custom19\",\"title\":\"Custom Click Function 19\",\"kind\":\"pose\",\"family\":\"mobile\"},{\"id\":\"custom20\",\"title\":\"Custom Click Function 20\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom21\",\"title\":\"Custom Click Function 21\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom22\",\"title\":\"Custom Click Function 22\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom23\",\"title\":\"Custom Click Function 23\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom24\",\"title\":\"Custom Click Function 24\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom25\",\"title\":\"Custom Click Function 25\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom26\",\"title\":\"Custom Click Function 26\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom27\",\"title\":\"Custom Click Function 27\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom28\",\"title\":\"Custom Click Function 28\",\"kind\":\"pose\",\"family\":\"mobile\"},{\"id\":\"custom29\",\"title\":\"Custom Click Function 29\",\"kind\":\"pose\",\"family\":\"mobile\"},{\"id\":\"custom30\",\"title\":\"Custom Click Function 30\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom31\",\"title\":\"Custom Click Function 31\",\"kind\":\"hold\",\"family\":\"desktop\"}]",
       "holdConfirmMs": 400,
@@ -25457,7 +25460,7 @@
       "pixelRatio": 1.25,
       "resolutionScale": 100,
       "qualityPreset": "high",
-      "showTrackingPoints": true,
+      "showTrackingPoints": false,
       "showGridHelper": false,
       "showWireframe": false,
       "preventReorderFlash": false,
@@ -28879,7 +28882,7 @@
     },
     {
       "key": "Debug",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -30791,6 +30794,10 @@
                     },
                     {
                       "type": "row",
+                      "key": "armRotationRangePct"
+                    },
+                    {
+                      "type": "row",
                       "key": "armRotationDamping"
                     },
                     {
@@ -30805,6 +30812,7 @@
                     "armRotationTargetDepth",
                     "armRotationCurveEnabled",
                     "armRotationCurve",
+                    "armRotationRangePct",
                     "armRotationDamping",
                     "armRotationDefault"
                   ],
@@ -31043,6 +31051,10 @@
                   },
                   {
                     "type": "row",
+                    "key": "armRotationRangePct"
+                  },
+                  {
+                    "type": "row",
                     "key": "armRotationDamping"
                   },
                   {
@@ -31057,6 +31069,7 @@
                   "armRotationTargetDepth",
                   "armRotationCurveEnabled",
                   "armRotationCurve",
+                  "armRotationRangePct",
                   "armRotationDamping",
                   "armRotationDefault"
                 ],
@@ -32216,6 +32229,10 @@
                   },
                   {
                     "type": "row",
+                    "key": "armRotationRangePct"
+                  },
+                  {
+                    "type": "row",
                     "key": "armRotationDamping"
                   },
                   {
@@ -32230,6 +32247,7 @@
                   "armRotationTargetDepth",
                   "armRotationCurveEnabled",
                   "armRotationCurve",
+                  "armRotationRangePct",
                   "armRotationDamping",
                   "armRotationDefault"
                 ],
@@ -32468,6 +32486,10 @@
                 },
                 {
                   "type": "row",
+                  "key": "armRotationRangePct"
+                },
+                {
+                  "type": "row",
                   "key": "armRotationDamping"
                 },
                 {
@@ -32482,6 +32504,7 @@
                 "armRotationTargetDepth",
                 "armRotationCurveEnabled",
                 "armRotationCurve",
+                "armRotationRangePct",
                 "armRotationDamping",
                 "armRotationDefault"
               ],
@@ -187930,8 +187953,8 @@
     "desktop": {
       "left": 820.7999877929688,
       "top": 79.1875,
-      "width": 673.6000366210938,
-      "height": 633.9874877929688
+      "width": 676.7999877929688,
+      "height": 635.5875244140625
     }
   }
 }
