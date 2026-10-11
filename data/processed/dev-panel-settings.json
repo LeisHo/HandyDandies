@@ -33,7 +33,7 @@
       "fieldOffsetZ": 0,
       "fieldBoundsX": "{\"min\":-300,\"max\":300}",
       "fieldBoundsY": "{\"min\":-300,\"max\":300}",
-      "fieldBoundsZ": "{\"min\":-266,\"max\":125}",
+      "fieldBoundsZ": "{\"min\":-300,\"max\":100}",
       "trackingPoint": "armEnd",
       "trackingEnabled": true,
       "trackingDamping": 0.1,
@@ -9350,7 +9350,7 @@
       "renderOrderFallback2": "armEndToPalm",
       "renderOrderFallback2Except": "closest",
       "renderOrderFlipLock": true,
-      "fieldRows": 40,
+      "fieldRows": 45,
       "fieldCols": 30,
       "rowSpacing": 8.5,
       "columnSpacing": 10,
@@ -9364,7 +9364,7 @@
       "fieldOffsetZ": 0,
       "fieldBoundsX": "{\"min\":-300,\"max\":300}",
       "fieldBoundsY": "{\"min\":-300,\"max\":300}",
-      "fieldBoundsZ": "{\"min\":-266,\"max\":125}",
+      "fieldBoundsZ": "{\"min\":-300,\"max\":100}",
       "trackingPoint": "armEnd",
       "trackingEnabled": true,
       "trackingDamping": 0.08,
@@ -18695,7 +18695,7 @@
       "fieldOffsetZ": 0,
       "fieldBoundsX": "{\"min\":-300,\"max\":300}",
       "fieldBoundsY": "{\"min\":-300,\"max\":300}",
-      "fieldBoundsZ": "{\"min\":-266,\"max\":125}",
+      "fieldBoundsZ": "{\"min\":-300,\"max\":100}",
       "trackingPoint": "armEnd",
       "trackingEnabled": true,
       "trackingDamping": 1,
@@ -30038,7 +30038,7 @@
           "type": "group",
           "group": {
             "key": "Field Layout",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -31510,7 +31510,7 @@
       "subgroups": [
         {
           "key": "Field Layout",
-          "collapsed": true,
+          "collapsed": false,
           "locked": true,
           "items": [
             {
@@ -198392,7 +198392,7 @@
       "left": 20,
       "top": 0,
       "width": 377.8571472167969,
-      "height": 35.52381134033203
+      "height": 681.672607421875
     }
   }
 }
