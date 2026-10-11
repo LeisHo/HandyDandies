@@ -279,7 +279,7 @@
       "modelRotX": 0,
       "modelRotY": 0,
       "modelRotZ": 0,
-      "baseRotationX": 0,
+      "baseRotationX": -90,
       "baseRotationY": 0,
       "baseRotationZ": 0,
       "poseOffsetX": 0,
@@ -6166,7 +6166,7 @@
           "modelRotX": 0,
           "modelRotY": 0,
           "modelRotZ": 0,
-          "baseRotationX": 0,
+          "baseRotationX": -90,
           "baseRotationY": 0,
           "baseRotationZ": 0,
           "poseOffsetX": 0,
@@ -9351,7 +9351,7 @@
       "modelRotX": 0,
       "modelRotY": 0,
       "modelRotZ": 0,
-      "baseRotationX": 0,
+      "baseRotationX": -90,
       "baseRotationY": 0,
       "baseRotationZ": 0,
       "poseOffsetX": 0,
@@ -15238,7 +15238,7 @@
           "modelRotX": 0,
           "modelRotY": 0,
           "modelRotZ": 0,
-          "baseRotationX": 0,
+          "baseRotationX": -90,
           "baseRotationY": 0,
           "baseRotationZ": 0,
           "poseOffsetX": 0,
@@ -18423,7 +18423,7 @@
       "modelRotX": 0,
       "modelRotY": 0,
       "modelRotZ": 0,
-      "baseRotationX": 0,
+      "baseRotationX": -90,
       "baseRotationY": 0,
       "baseRotationZ": 0,
       "poseOffsetX": 0,
@@ -24310,7 +24310,7 @@
           "modelRotX": 0,
           "modelRotY": 0,
           "modelRotZ": 0,
-          "baseRotationX": 0,
+          "baseRotationX": -90,
           "baseRotationY": 0,
           "baseRotationZ": 0,
           "poseOffsetX": 0,
@@ -29467,7 +29467,7 @@
                 "type": "group",
                 "group": {
                   "key": "Wrist",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -29843,7 +29843,7 @@
               },
               {
                 "key": "Wrist",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -30868,7 +30868,7 @@
               "type": "group",
               "group": {
                 "key": "Wrist",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -31244,7 +31244,7 @@
             },
             {
               "key": "Wrist",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
