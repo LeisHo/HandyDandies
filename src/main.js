@@ -1297,6 +1297,17 @@ function computeRenderOrderRanks() {
 }
 // Moves each Except select into its main dropdown's row, to the right of it (the Except rows themselves are hidden). The select keeps its own control binding, so saving / restoring / undo work as for any select.
 // Render Order list widgets (2026-10-11): the Mode's + And / + Or / - Subtract terms and the unlimited extra Fallback levels. Each is a hidden JSON text control with a button bar and one row per entry.
+// Field Layout may itself sit inside another group by now (a saved order), so organizeGroupSubgroups() (top-level groups only) cannot find it: move the Render Order rows that are still FLAT directly under Field Layout
+// into its Render Order subgroup (created if needed). Rows the user has deliberately placed elsewhere are left alone.
+function renestRenderOrderRows() {
+  const fl = document.querySelector('.dp-group[data-key="Field Layout"]')
+  const body = fl && fl.querySelector(':scope > .dp-group-body')
+  if (!body) return
+  let g = body.querySelector(':scope > .dp-group[data-key="Render Order"]')
+  if (!g) { g = createGroupElement('Render Order'); body.appendChild(g) }
+  const gb = g.querySelector(':scope > .dp-group-body')
+  FIELD_LAYOUT_SUBGROUP_SPECS[0].keys.forEach((k) => { const row = body.querySelector(':scope > .dp-row[data-key="' + k + '"]'); if (row) gb.appendChild(row) })
+}
 function buildRenderOrderWidgets() {
   const selStyle = { flex: '1 1 0', minWidth: '0' }
   const fillSel = (sel, value, allowNone) => {
@@ -2861,7 +2872,7 @@ const cfg = initDevPanel(DEV_GROUPS, {
   onRestore: async () => {
     logStartupTiming('onRestore fired -> startupSettingsReady = true')
     // A saved panel order that predates the Render Order group puts its rows straight back into Field Layout when it is applied; re-nest them (idempotent, only moves the listed keys).
-    try { const ge = document.getElementById('dpGroups'); if (ge) organizeGroupSubgroups(ge, 'Field Layout', FIELD_LAYOUT_SUBGROUP_SPECS) } catch (e) { /* panel not built */ }
+    try { renestRenderOrderRows() } catch (e) { /* panel not built */ }
     // Each step timed when ?debugTiming=1 (see devPanel.js dpTime()).
     const prof = (label, fn) => {
       if (!DEBUG_TIMING) { fn(); return }
