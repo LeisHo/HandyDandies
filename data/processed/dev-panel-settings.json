@@ -12,9 +12,9 @@
       "pauseBtnIconColor": "#ffffff",
       "pauseBtnBorderColor": "#ffffff",
       "pausedRenderFps": 15,
-      "renderOrderMode": "armEnd",
-      "renderOrderFallback": "closestZ",
-      "renderOrderFallback2": "palmToArm",
+      "renderOrderMode": "palmToArmEnd",
+      "renderOrderFallback": "palmToArm",
+      "renderOrderFallback2": "closest",
       "fieldRows": 35,
       "fieldCols": 55,
       "rowSpacing": 5,
@@ -6811,14 +6811,14 @@
           "group": "FIST ROTATE"
         }
       ],
-      "cameraX": 6.504385906807988,
-      "cameraY": 9.506408948421237,
-      "cameraZ": 313.70008824671027,
+      "cameraX": 6.5,
+      "cameraY": 9.5,
+      "cameraZ": 260.5698855348217,
       "cameraFov": 15,
-      "cameraYaw": 0,
-      "cameraPitch": 0,
+      "cameraYaw": 1.464,
+      "cameraPitch": -2.946,
       "cameraRoll": 0,
-      "cameraZoom": 313.931957673113,
+      "cameraZoom": 261,
       "cameraZoomSpeed": 0.3,
       "savedCameras": [
         {
@@ -7268,7 +7268,7 @@
       "custom21CameraOffsetYCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.324820628419056,\"y\":0},\"bg\":0.64,\"m\":\"linear\"},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.467575665942766,\"y\":0}}]",
       "custom21CameraOffsetYRange": "{\"min\":-1,\"max\":2}",
       "custom21CameraOffsetZEnabled": true,
-      "custom21CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.48491380373447907,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2564655009404654,\"y\":0}}]",
+      "custom21CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.6961633400430457,\"y\":-0.0346875508626302}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2564655009404654,\"y\":0}}]",
       "custom21CameraOffsetZRange": "{\"min\":-30,\"max\":25}",
       "custom21RotationEnabled": false,
       "custom21RotationX": 0,
@@ -7288,7 +7288,7 @@
       "custom21LoopHoldMs": 0,
       "custom21TransitionSpeedMs": 700,
       "custom21EasingCurveEnabled": true,
-      "custom21EasingCurve": "[{\"x\":0,\"y\":0.6200210571289062},{\"x\":0.483162437804107,\"y\":1},{\"x\":1,\"y\":0}]",
+      "custom21EasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.14738803792568153,\"y\":0.0037495930989582815}},{\"x\":0.49191545150689553,\"y\":0.9170832316080729,\"h2\":{\"x\":-0.3370181619707546,\"y\":0},\"h1\":{\"x\":0.3918376215039961,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.14863189491097573,\"y\":0.0037495930989582815}}]",
       "custom21SpeedCurveEnabled": false,
       "custom21SpeedCurveVisibleOnly": true,
       "custom21SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -7700,7 +7700,7 @@
       "custom21Trig5CameraOffsetYCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.324820628419056,\"y\":0},\"bg\":0.64},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.467575665942766,\"y\":0}}]",
       "custom21Trig5CameraOffsetYRange": "{\"min\":0.5,\"max\":1}",
       "custom21Trig5CameraOffsetZEnabled": true,
-      "custom21Trig5CameraOffsetZCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3097879240897103,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.5037202946081415,\"y\":0}}]",
+      "custom21Trig5CameraOffsetZCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3097879240897103,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.6868623093807005,\"y\":0}}]",
       "custom21Trig5CameraOffsetZRange": "{\"min\":-30,\"max\":25}",
       "custom21Trig5RotationEnabled": false,
       "custom21Trig5RotationX": 0,
@@ -7720,7 +7720,7 @@
       "custom21Trig5LoopHoldMs": 0,
       "custom21Trig5TransitionSpeedMs": 700,
       "custom21Trig5EasingCurveEnabled": true,
-      "custom21Trig5EasingCurve": "[{\"x\":0,\"y\":0},{\"x\":0.483162437804107,\"y\":1},{\"x\":1,\"y\":0}]",
+      "custom21Trig5EasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.13141025641025642,\"y\":0.021354166666666674}},{\"x\":0.4775640047513522,\"y\":0.40802103678385415,\"h2\":{\"x\":-0.36457269421436345,\"y\":0},\"h1\":{\"x\":0.4674786073994687,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2249999413123498,\"y\":0.021354166666666674}}]",
       "custom21Trig5SpeedCurveEnabled": false,
       "custom21Trig5SpeedCurveVisibleOnly": true,
       "custom21Trig5SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -9270,9 +9270,9 @@
       "pauseBtnIconColor": "#ffffff",
       "pauseBtnBorderColor": "#ffffff",
       "pausedRenderFps": 15,
-      "renderOrderMode": "armEnd",
-      "renderOrderFallback": "closestZ",
-      "renderOrderFallback2": "palmToArm",
+      "renderOrderMode": "palmToArmEnd",
+      "renderOrderFallback": "palmToArm",
+      "renderOrderFallback2": "closest",
       "fieldRows": 24,
       "fieldCols": 12,
       "rowSpacing": 8.5,
@@ -16526,7 +16526,7 @@
       "custom21CameraOffsetYCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.324820628419056,\"y\":0},\"bg\":0.64,\"m\":\"linear\"},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.467575665942766,\"y\":0}}]",
       "custom21CameraOffsetYRange": "{\"min\":-1,\"max\":2}",
       "custom21CameraOffsetZEnabled": true,
-      "custom21CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.48491380373447907,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2564655009404654,\"y\":0}}]",
+      "custom21CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.6961633400430457,\"y\":-0.0346875508626302}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2564655009404654,\"y\":0}}]",
       "custom21CameraOffsetZRange": "{\"min\":-30,\"max\":25}",
       "custom21RotationEnabled": false,
       "custom21RotationX": 0,
@@ -16546,7 +16546,7 @@
       "custom21LoopHoldMs": 0,
       "custom21TransitionSpeedMs": 700,
       "custom21EasingCurveEnabled": true,
-      "custom21EasingCurve": "[{\"x\":0,\"y\":0.6200210571289062},{\"x\":0.483162437804107,\"y\":1},{\"x\":1,\"y\":0}]",
+      "custom21EasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.14738803792568153,\"y\":0.0037495930989582815}},{\"x\":0.49191545150689553,\"y\":0.9170832316080729,\"h2\":{\"x\":-0.3370181619707546,\"y\":0},\"h1\":{\"x\":0.3918376215039961,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.14863189491097573,\"y\":0.0037495930989582815}}]",
       "custom21SpeedCurveEnabled": false,
       "custom21SpeedCurveVisibleOnly": true,
       "custom21SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -16958,7 +16958,7 @@
       "custom21Trig5CameraOffsetYCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.324820628419056,\"y\":0},\"bg\":0.64},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.467575665942766,\"y\":0}}]",
       "custom21Trig5CameraOffsetYRange": "{\"min\":0.5,\"max\":1}",
       "custom21Trig5CameraOffsetZEnabled": true,
-      "custom21Trig5CameraOffsetZCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3097879240897103,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.5037202946081415,\"y\":0}}]",
+      "custom21Trig5CameraOffsetZCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3097879240897103,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.6868623093807005,\"y\":0}}]",
       "custom21Trig5CameraOffsetZRange": "{\"min\":-30,\"max\":25}",
       "custom21Trig5RotationEnabled": false,
       "custom21Trig5RotationX": 0,
@@ -16978,7 +16978,7 @@
       "custom21Trig5LoopHoldMs": 0,
       "custom21Trig5TransitionSpeedMs": 700,
       "custom21Trig5EasingCurveEnabled": true,
-      "custom21Trig5EasingCurve": "[{\"x\":0,\"y\":0},{\"x\":0.483162437804107,\"y\":1},{\"x\":1,\"y\":0}]",
+      "custom21Trig5EasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.13141025641025642,\"y\":0.021354166666666674}},{\"x\":0.4775640047513522,\"y\":0.40802103678385415,\"h2\":{\"x\":-0.36457269421436345,\"y\":0},\"h1\":{\"x\":0.4674786073994687,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2249999413123498,\"y\":0.021354166666666674}}]",
       "custom21Trig5SpeedCurveEnabled": false,
       "custom21Trig5SpeedCurveVisibleOnly": true,
       "custom21Trig5SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -18528,9 +18528,9 @@
       "pauseBtnIconColor": "#ffffff",
       "pauseBtnBorderColor": "#ffffff",
       "pausedRenderFps": 15,
-      "renderOrderMode": "armEnd",
-      "renderOrderFallback": "closestZ",
-      "renderOrderFallback2": "palmToArm",
+      "renderOrderMode": "palmToArmEnd",
+      "renderOrderFallback": "palmToArm",
+      "renderOrderFallback2": "closest",
       "fieldRows": 15,
       "fieldCols": 3,
       "rowSpacing": 9.5,
@@ -25784,7 +25784,7 @@
       "custom21CameraOffsetYCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.324820628419056,\"y\":0},\"bg\":0.64,\"m\":\"linear\"},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.467575665942766,\"y\":0}}]",
       "custom21CameraOffsetYRange": "{\"min\":-1,\"max\":2}",
       "custom21CameraOffsetZEnabled": true,
-      "custom21CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.48491380373447907,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2564655009404654,\"y\":0}}]",
+      "custom21CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.6961633400430457,\"y\":-0.0346875508626302}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2564655009404654,\"y\":0}}]",
       "custom21CameraOffsetZRange": "{\"min\":-30,\"max\":25}",
       "custom21RotationEnabled": false,
       "custom21RotationX": 0,
@@ -25804,7 +25804,7 @@
       "custom21LoopHoldMs": 0,
       "custom21TransitionSpeedMs": 700,
       "custom21EasingCurveEnabled": true,
-      "custom21EasingCurve": "[{\"x\":0,\"y\":0.6200210571289062},{\"x\":0.483162437804107,\"y\":1},{\"x\":1,\"y\":0}]",
+      "custom21EasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.14738803792568153,\"y\":0.0037495930989582815}},{\"x\":0.49191545150689553,\"y\":0.9170832316080729,\"h2\":{\"x\":-0.3370181619707546,\"y\":0},\"h1\":{\"x\":0.3918376215039961,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.14863189491097573,\"y\":0.0037495930989582815}}]",
       "custom21SpeedCurveEnabled": false,
       "custom21SpeedCurveVisibleOnly": true,
       "custom21SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -26216,7 +26216,7 @@
       "custom21Trig5CameraOffsetYCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.324820628419056,\"y\":0},\"bg\":0.64},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.467575665942766,\"y\":0}}]",
       "custom21Trig5CameraOffsetYRange": "{\"min\":0.5,\"max\":1}",
       "custom21Trig5CameraOffsetZEnabled": true,
-      "custom21Trig5CameraOffsetZCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3097879240897103,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.5037202946081415,\"y\":0}}]",
+      "custom21Trig5CameraOffsetZCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3097879240897103,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.6868623093807005,\"y\":0}}]",
       "custom21Trig5CameraOffsetZRange": "{\"min\":-30,\"max\":25}",
       "custom21Trig5RotationEnabled": false,
       "custom21Trig5RotationX": 0,
@@ -26236,7 +26236,7 @@
       "custom21Trig5LoopHoldMs": 0,
       "custom21Trig5TransitionSpeedMs": 700,
       "custom21Trig5EasingCurveEnabled": true,
-      "custom21Trig5EasingCurve": "[{\"x\":0,\"y\":0},{\"x\":0.483162437804107,\"y\":1},{\"x\":1,\"y\":0}]",
+      "custom21Trig5EasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.13141025641025642,\"y\":0.021354166666666674}},{\"x\":0.4775640047513522,\"y\":0.40802103678385415,\"h2\":{\"x\":-0.36457269421436345,\"y\":0},\"h1\":{\"x\":0.4674786073994687,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2249999413123498,\"y\":0.021354166666666674}}]",
       "custom21Trig5SpeedCurveEnabled": false,
       "custom21Trig5SpeedCurveVisibleOnly": true,
       "custom21Trig5SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -29809,7 +29809,7 @@
           "type": "group",
           "group": {
             "key": "Field Layout",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -31261,7 +31261,7 @@
       "subgroups": [
         {
           "key": "Field Layout",
-          "collapsed": true,
+          "collapsed": false,
           "locked": true,
           "items": [
             {
@@ -32699,7 +32699,7 @@
     },
     {
       "key": "Custom Click Functions",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -77276,7 +77276,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 21",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -77435,7 +77435,7 @@
                 "type": "group",
                 "group": {
                   "key": "Offset To Camera",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -77947,7 +77947,7 @@
                 "type": "group",
                 "group": {
                   "key": "Multi Trigger",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -90583,7 +90583,7 @@
               },
               {
                 "key": "Offset To Camera",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -91071,7 +91071,7 @@
               },
               {
                 "key": "Multi Trigger",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -153702,7 +153702,7 @@
         },
         {
           "key": "Custom Click Function 21",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
@@ -153861,7 +153861,7 @@
               "type": "group",
               "group": {
                 "key": "Offset To Camera",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -154373,7 +154373,7 @@
               "type": "group",
               "group": {
                 "key": "Multi Trigger",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -167009,7 +167009,7 @@
             },
             {
               "key": "Offset To Camera",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -167497,7 +167497,7 @@
             },
             {
               "key": "Multi Trigger",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -185565,7 +185565,7 @@
     },
     {
       "key": "New Group (11)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -185754,7 +185754,7 @@
           "type": "group",
           "group": {
             "key": "Camera",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -186098,7 +186098,7 @@
         },
         {
           "key": "Camera",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
@@ -187965,9 +187965,9 @@
   "panelGeometry": {
     "desktop": {
       "left": 820.7999877929688,
-      "top": 382.38751220703125,
-      "width": 689.6000366210938,
-      "height": 338.7749938964844
+      "top": 0,
+      "width": 699.2000122070312,
+      "height": 725.9500122070312
     }
   }
 }
