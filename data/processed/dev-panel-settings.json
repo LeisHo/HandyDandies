@@ -12,8 +12,9 @@
       "pauseBtnIconColor": "#ffffff",
       "pauseBtnBorderColor": "#ffffff",
       "pausedRenderFps": 15,
-      "renderOrderMode": "z",
-      "renderOrderFallback": "closest",
+      "renderOrderMode": "armEnd",
+      "renderOrderFallback": "closestZ",
+      "renderOrderFallback2": "palmToArm",
       "fieldRows": 35,
       "fieldCols": 55,
       "rowSpacing": 5,
@@ -238,7 +239,7 @@
       "loadingPreviewRotationY": -171.31775806313817,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": -4.440892098500626e-16,
-      "loadingPreviewOffsetY": 0,
+      "loadingPreviewOffsetY": -8.881784197001252e-16,
       "loadingPreviewOffsetZ": 0,
       "loadingPreviewCameraFov": 32,
       "loadingPreviewCameraZoom": 161.7694831224424,
@@ -6810,9 +6811,9 @@
           "group": "FIST ROTATE"
         }
       ],
-      "cameraX": 6.504385906807993,
-      "cameraY": 9.506408948421186,
-      "cameraZ": 286.0132020495825,
+      "cameraX": 6.504385906807988,
+      "cameraY": 9.506408948421235,
+      "cameraZ": 286.01320206423884,
       "cameraFov": 15,
       "cameraYaw": 0,
       "cameraPitch": 0,
@@ -9269,8 +9270,9 @@
       "pauseBtnIconColor": "#ffffff",
       "pauseBtnBorderColor": "#ffffff",
       "pausedRenderFps": 15,
-      "renderOrderMode": "z",
-      "renderOrderFallback": "closest",
+      "renderOrderMode": "armEnd",
+      "renderOrderFallback": "closestZ",
+      "renderOrderFallback2": "palmToArm",
       "fieldRows": 24,
       "fieldCols": 12,
       "rowSpacing": 8.5,
@@ -9495,7 +9497,7 @@
       "loadingPreviewRotationY": -171.31775806313817,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": -4.440892098500626e-16,
-      "loadingPreviewOffsetY": 0,
+      "loadingPreviewOffsetY": -8.881784197001252e-16,
       "loadingPreviewOffsetZ": 0,
       "loadingPreviewCameraFov": 32,
       "loadingPreviewCameraZoom": 161.7694831224424,
@@ -18526,8 +18528,9 @@
       "pauseBtnIconColor": "#ffffff",
       "pauseBtnBorderColor": "#ffffff",
       "pausedRenderFps": 15,
-      "renderOrderMode": "z",
-      "renderOrderFallback": "closest",
+      "renderOrderMode": "armEnd",
+      "renderOrderFallback": "closestZ",
+      "renderOrderFallback2": "palmToArm",
       "fieldRows": 15,
       "fieldCols": 3,
       "rowSpacing": 9.5,
@@ -18752,7 +18755,7 @@
       "loadingPreviewRotationY": -171.31775806313817,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": -4.440892098500626e-16,
-      "loadingPreviewOffsetY": 0,
+      "loadingPreviewOffsetY": -8.881784197001252e-16,
       "loadingPreviewOffsetZ": 0,
       "loadingPreviewCameraFov": 32,
       "loadingPreviewCameraZoom": 161.7694831224424,
@@ -29876,6 +29879,10 @@
               {
                 "type": "row",
                 "key": "renderOrderFallback"
+              },
+              {
+                "type": "row",
+                "key": "renderOrderFallback2"
               }
             ],
             "settings": [
@@ -29895,7 +29902,8 @@
               "fieldOffsetY",
               "fieldOffsetZ",
               "renderOrderMode",
-              "renderOrderFallback"
+              "renderOrderFallback",
+              "renderOrderFallback2"
             ],
             "subgroups": []
           }
@@ -31323,6 +31331,10 @@
             {
               "type": "row",
               "key": "renderOrderFallback"
+            },
+            {
+              "type": "row",
+              "key": "renderOrderFallback2"
             }
           ],
           "settings": [
@@ -31342,7 +31354,8 @@
             "fieldOffsetY",
             "fieldOffsetZ",
             "renderOrderMode",
-            "renderOrderFallback"
+            "renderOrderFallback",
+            "renderOrderFallback2"
           ],
           "subgroups": []
         },
@@ -187953,8 +187966,8 @@
     "desktop": {
       "left": 820.7999877929688,
       "top": 79.1875,
-      "width": 676.7999877929688,
-      "height": 635.5875244140625
+      "width": 680,
+      "height": 637.1875
     }
   }
 }
