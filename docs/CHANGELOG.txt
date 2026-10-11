@@ -17279,6 +17279,11 @@ Direct requests: (1) in Debug > logs, "add a new log ... add log reordering. It 
    Once a pair has flipped it is held (as the strongest constraint) until either hand's sequence changes; a pair the rules leave tied keeps its previous order as the weakest constraint instead of flickering with the tie-break. With the lock on, even scalar-only settings are ordered from these pairwise decisions (over each hand's 8 nearest) instead of a global sort.
  - Not verified on screen; see the numbers measured in the session summary. `main.js` `?v=362` -> `?v=363`.
 
+2026-10-11  -  (flip lock hardened: locks are never dropped, and are recorded only for flips that really happened)
+
+Measured on v=363 with a cursor oscillating over a 1925-hand field in 'Closest To Cursor (XY)' mode: lock OFF 12,618 flips (a single pair up to 17 times); lock ON 1,604 flips but a pair still up to 7 times, because a lock edge could be the one dropped when the constraint graph stalled on a cycle, and a lock was recorded for a flip that the graph then did not realise.
+v=364: lock edges are kept apart (derived from last frame's total order, so acyclic among themselves) and a stalled graph always releases a hand with NO unmet lock edge, so only weaker rule constraints can be sacrificed; and the lock is created after the ranks are known, for every nearby pair whose order really changed. The Render Reordering Log now says whether a crossing used the pair's flip or happened while a lock was active (which should not occur). `main.js` `?v=363` -> `?v=364`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

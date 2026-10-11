@@ -912,7 +912,7 @@ function renderOrderBone(hand, key) {
 // in Z than B's arm base (by more than 0.01); when each hand's palm is higher than the other's arm base, the hand whose arm base is FARTHER from the cursor on screen (XY only, no Z) goes above; when neither is, the level ties.
 let roKindXY = false, roPriority = 0
 const RO_NEIGHBOURS = 8 // a hand is only compared with this many nearest hands (screen XY) in the pairwise render-order modes
-let roOrder = [], roPalmZ = null, roBaseZ = null, roBaseXY = null, roEndZ = null, roEndXY = null, roSX = null, roSY = null, roSR = null, roIndeg = null, roHead = null, roDone = null, roVis = null, roLayer = null
+let roOrder = [], roPalmZ = null, roBaseZ = null, roBaseXY = null, roEndZ = null, roEndXY = null, roSX = null, roSY = null, roSR = null, roIndeg = null, roHead = null, roDone = null, roVis = null, roLayer = null, roLockIndeg = null
 const roScalar = {}
 const _roV = new THREE.Vector3()
 // ---- Pairwise render-order support (2026-10-11) ----
@@ -1019,9 +1019,17 @@ function roFinishFrame(n, np, cmpLevels, logOn, lockOn) {
       const r = cmpLevels(lo, hi)
       const why = r === 0 ? 'tie (all levels)' : RO_LEVEL_NAMES[roPriority >> 1] + (roPriority & 1 ? ' (arm-distance tie-break)' : '')
       const lk = roLocks.get(lo * n + hi)
-      appendRenderReorderLogLine(stamp + ' -- Hand ' + (lo + 1) + ' now ' + (now ? 'above' : 'below') + ' Hand ' + (hi + 1) + ' (was ' + (was ? 'above' : 'below') + '), decided by ' + why + (lk ? ', flip lock set (seq ' + lk.sa + '/' + lk.sb + ')' : ''))
+      appendRenderReorderLogLine(stamp + ' -- Hand ' + (lo + 1) + ' now ' + (now ? 'above' : 'below') + ' Hand ' + (hi + 1) + ' (was ' + (was ? 'above' : 'below') + '), decided by ' + why + (lk ? ', WHILE a flip lock was active (seq ' + lk.sa + '/' + lk.sb + ')' : ', flip used (locked until either hand starts a new trigger/retransition)'))
     }
     if (total > logged) appendRenderReorderLogLine(stamp + ' -- +' + (total - logged) + ' more crossings this frame')
+  }
+  // Flip lock: every nearby pair whose order really changed this frame has used its one flip for the current sequences of its two hands.
+  if (lockOn && roPrevRank && roPrevRank.length === n) {
+    for (let t = 0; t < np; t++) {
+      const lo = roPairLo[t], hi = roPairHi[t]
+      if ((roPrevRank[lo] > roPrevRank[hi]) === (hands[lo]._roRank > hands[hi]._roRank)) continue
+      roLocks.set(lo * n + hi, { sa: hands[lo]._roSeq, sb: hands[hi]._roSeq })
+    }
   }
   if (!roPrevRank || roPrevRank.length !== n) roPrevRank = new Int32Array(n)
   for (let i = 0; i < n; i++) roPrevRank[i] = hands[i]._roRank
@@ -1113,6 +1121,7 @@ function computeRenderOrderRanks() {
   const np = roKnnPairs(n)
   const havePrev = (lockOn || logOn) && roPrevRank && roPrevRank.length === n
   const buckets = [[], [], [], [], [], []]
+  const lockList = [] // flip-lock edges (under, over): derived from last frame's total order, so they are acyclic among themselves, and they are never dropped
   // Flip lock: per pair, the relative order may change at most once while neither hand starts a new sequence; a pair left tied keeps its previous order (weakest constraint) instead of flickering with the tie-break.
   if (++roLockPruneCounter >= 240) { roLockPruneCounter = 0; for (const [k, lk] of roLocks) { const lo = Math.floor(k / n), hi = k % n; if (!hands[lo] || lk.sa !== hands[lo]._roSeq || lk.sb !== hands[hi]._roSeq) roLocks.delete(k) } }
   for (let t = 0; t < np; t++) {
@@ -1124,12 +1133,12 @@ function computeRenderOrderRanks() {
       const key = lo * n + hi
       const lk = roLocks.get(key)
       if (lk && lk.sa === hands[lo]._roSeq && lk.sb === hands[hi]._roSeq) {
-        rr = prevAbove ? 1 : -1; pri = 0 // locked: keep the order it has
-      } else {
-        if (lk) roLocks.delete(key) // a new sequence started on one of the two hands: unlocked
-        if (rr !== 0) { if ((rr > 0) !== prevAbove) roLocks.set(key, { sa: hands[lo]._roSeq, sb: hands[hi]._roSeq }) } // this is the one allowed flip
-        else { rr = prevAbove ? 1 : -1; pri = 5 }
+        lockList.push(prevAbove ? hi : lo, prevAbove ? lo : hi) // locked: keep the order it has
+        continue
       }
+      if (lk) roLocks.delete(key) // a new sequence started on one of the two hands: unlocked
+      if (rr === 0) { rr = prevAbove ? 1 : -1; pri = 5 } // tied pair: keep the previous order (weakest constraint)
+      // (an unlocked pair that the rules want flipped is simply allowed to; the lock is recorded after the ranks are known, only if the flip really happened)
     }
     if (rr === 0) continue
     buckets[pri].push(rr > 0 ? hi : lo, rr > 0 ? lo : hi) // under, over
@@ -1137,19 +1146,23 @@ function computeRenderOrderRanks() {
   if (!roLayer || roLayer.length !== n) roLayer = new Int32Array(n)
   roLayer.fill(0)
   {
+    // Strongest constraints = the lock edges + bucket 0. The graph can contain cycles; whenever it stalls, the hand released is one with NO unmet lock edge (always exists: lock edges are acyclic), so a lock is never broken, only the
+    // weaker rule constraints that conflict with it.
+    if (!roLockIndeg || roLockIndeg.length !== n) roLockIndeg = new Int32Array(n)
     const list = buckets[0]
-    const eTo0 = [], eNext0 = []
-    roHead.fill(-1); roIndeg.fill(0); roDone.fill(0)
-    for (let k = 0; k < list.length; k += 2) { const under = list[k], over = list[k + 1]; eTo0.push(over); eNext0.push(roHead[under]); roHead[under] = eTo0.length - 1; roIndeg[over]++ }
+    const eTo0 = [], eNext0 = [], eLock0 = []
+    roHead.fill(-1); roIndeg.fill(0); roDone.fill(0); roLockIndeg.fill(0)
+    for (let k = 0; k < lockList.length; k += 2) { const under = lockList[k], over = lockList[k + 1]; eTo0.push(over); eNext0.push(roHead[under]); eLock0.push(1); roHead[under] = eTo0.length - 1; roIndeg[over]++; roLockIndeg[over]++ }
+    for (let k = 0; k < list.length; k += 2) { const under = list[k], over = list[k + 1]; eTo0.push(over); eNext0.push(roHead[under]); eLock0.push(0); roHead[under] = eTo0.length - 1; roIndeg[over]++ }
     const ready0 = []
     for (let i = 0; i < n; i++) if (roIndeg[i] === 0) ready0.push(i)
     let placed = 0, qi = 0
     while (placed < n) {
-      if (qi >= ready0.length) { let best = -1, bi = 1e9; for (let i = 0; i < n; i++) if (!roDone[i] && roIndeg[i] < bi) { bi = roIndeg[i]; best = i } roIndeg[best] = 0; ready0.push(best) }
+      if (qi >= ready0.length) { let best = -1, bi = 1e9; for (let i = 0; i < n; i++) if (!roDone[i] && roLockIndeg[i] === 0 && roIndeg[i] < bi) { bi = roIndeg[i]; best = i } if (best < 0) { for (let i = 0; i < n; i++) if (!roDone[i]) { best = i; break } } roIndeg[best] = 0; ready0.push(best) }
       const u = ready0[qi++]
       if (roDone[u]) continue
       roDone[u] = 1; placed++
-      for (let e = roHead[u]; e !== -1; e = eNext0[e]) { const v = eTo0[e]; if (roLayer[v] < roLayer[u] + 1) roLayer[v] = roLayer[u] + 1; if (!roDone[v] && --roIndeg[v] === 0) ready0.push(v) }
+      for (let e = roHead[u]; e !== -1; e = eNext0[e]) { const v = eTo0[e]; if (roLayer[v] < roLayer[u] + 1) roLayer[v] = roLayer[u] + 1; if (eLock0[e]) roLockIndeg[v]--; if (!roDone[v] && --roIndeg[v] === 0) ready0.push(v) }
     }
   }
   let maxLayer = 0
