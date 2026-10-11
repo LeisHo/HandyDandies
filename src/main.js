@@ -257,6 +257,11 @@ const _loadingPreviewBase = new THREE.Vector3()
 // deliberately NOT included: they are not click-function settings, and the
 // frozen-at-trigger splay must stay on the same 3D value it blends against.
 let xyFieldMinDist = 0, xyFieldDistRange = 0.001
+let fieldBounds = null // { x:[min,max], y:[..], z:[..] } or null when no limit is active (Field Layout > Hand Position Min / Max)
+const _trackTargetXY = new THREE.Vector3() // cursor target at a hand's own depth, for Use Cursor Target Depth = off
+// Screen-space distance scratch + scale (see cursorDistXY()); early-state block so top-level load order is safe.
+const _scrV = new THREE.Vector3(), _scrV2 = new THREE.Vector3()
+let screenUnitsPerPx = 0
 // Easing Curve speed-profile lookup tables, one per function prefix (see
 // getEasingProfile()). Declared here per the early-state rule.
 const easingProfileCache = new Map()
@@ -885,7 +890,11 @@ const DEV_GROUPS = [
       // in this group. Toggles each hand's own wrapper Group directly
       // (cheap, no rebuild) rather than removing/re-adding hands from the
       // scene -- see updateHandsVisibility()'s own comment.
-      { key: 'hideHands', label: 'Hide Hands', type: 'checkbox', def: false, perDevice: true, onChange: () => updateHandsVisibility() }
+      { key: 'hideHands', label: 'Hide Hands', type: 'checkbox', def: false, perDevice: true, onChange: () => updateHandsVisibility() },
+      // Hand position floor / ceiling (2026-10-11, direct request): every hand's final world position, click-function offsets included, is clamped into these ranges.
+      { key: 'fieldBoundsX', label: 'Hand Position Min / Max X (World Units)', type: 'text', def: '{"min":-300,"max":300}', onChange: () => onFieldBoundsChanged() },
+      { key: 'fieldBoundsY', label: 'Hand Position Min / Max Y (World Units)', type: 'text', def: '{"min":-300,"max":300}', onChange: () => onFieldBoundsChanged() },
+      { key: 'fieldBoundsZ', label: 'Hand Position Min / Max Z (World Units)', type: 'text', def: '{"min":-300,"max":300}', onChange: () => onFieldBoundsChanged() }
     ]
   },
   {
@@ -924,6 +933,8 @@ const DEV_GROUPS = [
       // tracking block for what these 4 controls actually gate, and
       // buildArmRotationWidgets() for the curve-graph/range-slider UI.
       { key: 'armRotationEnabled', label: 'Responsive Arm Rotation (Master On/Off)', type: 'checkbox', def: true, perDevice: true },
+      // Use Cursor Target Depth (2026-10-11, direct request): on = aim at / measure to the 3D cursor target (depth from Cursor Target Depth); off = screen XY only.
+      { key: 'armRotationUseDepth', label: 'Arm Rotation Uses Cursor Target Depth', type: 'checkbox', def: true, perDevice: true },
       // Default Arm Rotation -- CORRECTED 2026-09-28, direct correction
       // ("Default Arm Rotation isnt reactiveness. Its just the default if
       // responsive is turned off. just like the other cursor tracking
@@ -964,6 +975,8 @@ const DEV_GROUPS = [
       // prior mechanism this replaced). Default off so nothing changes
       // until opted in.
       { key: 'palmFacesCursor', label: 'Palm Faces Cursor', type: 'checkbox', def: true, perDevice: true },
+      // The palm angle itself is already a screen-XY compass; this only switches the distance its Palm Rotation Distance Curve reads.
+      { key: 'palmRotationUseDepth', label: 'Palm Rotation Uses Cursor Target Depth', type: 'checkbox', def: true, perDevice: true },
       // Adds directly onto whatever angle is already in effect --
       // computeRadialRollDeg()'s own dynamic angle when Palm Faces
       // Cursor is on, or 0 (just this slider alone) when it's off --
@@ -1589,7 +1602,8 @@ const DEV_GROUPS = [
       // jump. Damped exactly like `trackingDamping` (same min/max/step/
       // def convention) -- 1 = instant (the old, undamped behavior), lower
       // = smoother. Applied in animate()'s own per-hand loop, not here.
-      { key: 'armLengthDamping', label: 'Wrist Cropping Damping (x)', type: 'slider', min: 0.02, max: 1, step: 0.01, def: 1 }
+      { key: 'armLengthDamping', label: 'Wrist Cropping Damping (x)', type: 'slider', min: 0.02, max: 1, step: 0.01, def: 1 },
+      { key: 'armLengthUseDepth', label: 'Wrist Cropping Uses Cursor Target Depth', type: 'checkbox', def: true }
     ]
   },
   {
@@ -1642,6 +1656,7 @@ const DEV_GROUPS = [
       // stay immediate to avoid reintroducing the 2026-09-15 "click does
       // nothing"/stale-bind-pose bugs this stagger must not interact with.
       { key: 'wristSplayReposeStagger', label: 'Reactive Splay Update Stagger (Frames, 1=Off)', type: 'slider', min: 1, max: 8, step: 1, def: 4 },
+      { key: 'wristSplayUseDepth', label: 'Wrist Splay Uses Cursor Target Depth', type: 'checkbox', def: true },
       { key: 'wristSplayDefault', label: 'Default Wrist Splay (Deg, Reactive Off)', type: 'slider', min: -180, max: 180, step: 1, def: 7 },
       { key: 'wristSplayReactiveEnabled', label: 'Reactive Wrist Splay (By Cursor Distance)', type: 'checkbox', def: true },
       { key: 'wristSplayRange', label: 'Min / Max Wrist Splay (Deg)', type: 'text', def: '{"min":5,"max":-71}', onChange: () => parseWristSplayConfig() },
@@ -1810,8 +1825,12 @@ const DEV_GROUPS = [
     controls: [
       { key: 'toonSteps', label: 'Toon Steps (Count)', type: 'slider', min: 2, max: 6, step: 1, def: 2, onChange: () => rebuildGradientMap() },
       { key: 'toonStepThreshold', label: 'Toon Step Threshold (Bias)', type: 'slider', min: 0.2, max: 5, step: 0.05, def: 2.7, onChange: () => rebuildGradientMap() },
+      // Eyedropper (2026-10-11): click any color on screen; its brightness (0 = black .. 100 = white) becomes this step's value.
+      { key: 'toonStepThresholdPick', label: 'Pick Step Threshold From Screen Color (Eyedropper)', type: 'button', onClick: (btn) => pickToonValueFromScreen('threshold', btn) },
       { key: 'toonShadowFloor', label: 'Toon Shadow Floor (%)', type: 'slider', min: 0, max: 90, step: 1, def: 7, onChange: () => rebuildGradientMap() },
+      { key: 'toonShadowFloorPick', label: 'Pick Shadow Floor From Screen Color (Eyedropper)', type: 'button', onClick: (btn) => pickToonValueFromScreen('floor', btn) },
       { key: 'toonLightCeiling', label: 'Toon Light Ceiling (%)', type: 'slider', min: 10, max: 100, step: 1, def: 100, onChange: () => rebuildGradientMap() },
+      { key: 'toonLightCeilingPick', label: 'Pick Light Ceiling From Screen Color (Eyedropper)', type: 'button', onClick: (btn) => pickToonValueFromScreen('ceiling', btn) },
       { key: 'toonBaseTint', label: 'Toon Base Tint', type: 'color', def: '#ffffff', onChange: (v) => forEachToonMaterial((m) => m.color.set(v)) },
       { key: 'textureInfluence', label: 'Texture Influence (%)', type: 'slider', min: 0, max: 100, step: 1, def: 0, onChange: (v) => setToonUniform('textureInfluence', v / 100) },
       { key: 'toonTint', label: 'Toon Texture Tint', type: 'color', def: '#ffffff', onChange: (v) => setToonUniform('toonTint', new THREE.Color(v)) },
@@ -2237,6 +2256,8 @@ parseWristSplayConfig()
 buildWristSplayWidgets()
 parseCursorTrackingConfig()
 buildCursorTrackingWidgets()
+parseFieldBounds()
+buildFieldBoundsWidgets()
 updateCursorTrackingGateVisibility()
 buildArmRotationWidgets()
 updateArmRotationGateVisibility()
@@ -3348,6 +3369,76 @@ function makeGradientTexture(steps, shadowFloor, lightCeiling, threshold) {
   tex.minFilter = THREE.NearestFilter
   tex.needsUpdate = true
   return tex
+}
+// ---- Toon eyedroppers (2026-10-11, direct request) ----
+// Resolves to '#rrggbb' of a pixel the user clicks, or null if cancelled. Uses the browser EyeDropper (any pixel on
+// screen) where it exists; otherwise (Firefox, Safari, mobile) the next click on the page reads the pixel under it
+// from the WebGL canvas right after a fresh render.
+function pickScreenColor() {
+  if (window.EyeDropper) return new window.EyeDropper().open().then((r) => r.sRGBHex).catch(() => null)
+  return new Promise((resolve) => {
+    const canvas = renderer.domElement
+    const prevCursor = canvas.style.cursor
+    canvas.style.cursor = 'crosshair'
+    const swallow = (e) => { e.preventDefault(); e.stopPropagation() }
+    const onDown = (e) => {
+      swallow(e)
+      window.removeEventListener('pointerdown', onDown, true)
+      canvas.style.cursor = prevCursor
+      ;['pointerup', 'mouseup', 'click'].forEach((t) => { const f = (ev) => { swallow(ev); window.removeEventListener(t, f, true) }; window.addEventListener(t, f, true) })
+      let hex = null
+      try {
+        composer.render()
+        const gl = renderer.getContext()
+        const rect = canvas.getBoundingClientRect()
+        const px = Math.floor((e.clientX - rect.left) / rect.width * canvas.width)
+        const py = Math.floor((1 - (e.clientY - rect.top) / rect.height) * canvas.height)
+        const buf = new Uint8Array(4)
+        gl.readPixels(px, py, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, buf)
+        hex = '#' + [buf[0], buf[1], buf[2]].map((n) => n.toString(16).padStart(2, '0')).join('')
+      } catch (err) { hex = null }
+      resolve(hex)
+    }
+    window.addEventListener('pointerdown', onDown, true)
+  })
+}
+// Brightness 0..100 of an sRGB hex color (Rec. 709 weights on the displayed values, white = 100, black = 0).
+function hexBrightnessPct(hex) {
+  const n = parseInt(hex.slice(1), 16)
+  const r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255
+  return (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255 * 100
+}
+// Threshold that makes the MIDDLE of the ramp (t = 0.5, the middle step of an odd step count) come out at
+// brightness B: B = floor + (ceiling - floor) * 0.5^threshold  =>  threshold = ln((B - floor) / (ceiling - floor)) / ln(0.5).
+function toonThresholdForMidBrightness(B, floor, ceiling) {
+  const span = Math.max(ceiling - floor, 1e-6)
+  const frac = THREE.MathUtils.clamp((B - floor) / span, 0.005, 0.995)
+  return THREE.MathUtils.clamp(Math.round(Math.log(frac) / Math.log(0.5) / 0.05) * 0.05, 0.2, 5)
+}
+function pickToonValueFromScreen(which, btn) {
+  const label = btn.textContent
+  btn.textContent = 'Click a color...'
+  pickScreenColor().then((hex) => {
+    if (!hex) { btn.textContent = label; return }
+    const B = hexBrightnessPct(hex)
+    let msg
+    if (which === 'threshold') {
+      const v = Math.round(toonThresholdForMidBrightness(B, cfg.toonShadowFloor, cfg.toonLightCeiling) * 100) / 100
+      syncValue('toonStepThreshold', v)
+      msg = 'Threshold ' + v + ' (' + Math.round(B) + '% mid)'
+    } else if (which === 'floor') {
+      const v = THREE.MathUtils.clamp(Math.round(B), 0, 90)
+      syncValue('toonShadowFloor', v)
+      msg = 'Floor ' + v + '%'
+    } else {
+      const v = THREE.MathUtils.clamp(Math.round(B), 10, 100)
+      syncValue('toonLightCeiling', v)
+      msg = 'Ceiling ' + v + '%'
+    }
+    rebuildGradientMap()
+    btn.textContent = msg
+    setTimeout(() => { btn.textContent = label }, 2500)
+  })
 }
 function rebuildGradientMap() {
   if (!toonMaterial) return
@@ -7036,6 +7127,11 @@ function updateArmRotationGateVisibility() {
 // `min`/`max` are lerp ENDPOINTS, not a numeric min<=max constraint (see
 // this group's own top comment) -- the lerp itself doesn't care which is
 // numerically larger.
+// Wrist Splay Use Cursor Target Depth (2026-10-11): off = screen-space XY distance only, on = the 3D distance to the cursor target.
+function splayDegForHand(hand, live, minLiveDist, liveDistRange) {
+  if (cfg.wristSplayUseDepth === false) return computeResponsiveWristSplayDeg(handXYDist(hand), xyFieldMinDist, xyFieldDistRange)
+  return computeResponsiveWristSplayDeg(live, minLiveDist, liveDistRange)
+}
 function computeResponsiveWristSplayDeg(distanceToCursor, minLiveDist, liveDistRange) {
   if (!cfg.wristSplayResponsiveEnabled) return 0
   // CORRECTED 2026-09-28 -- see computeArmLengthT()'s own matching
@@ -8169,7 +8265,28 @@ let restFieldMinDist = 0, restFieldDistRange = 0.001
 // longer depends on the offset it produces, so live apply and every bake
 // path read the identical number. Rest distances + their field-wide
 // min/range are computed once per frame in updateRenderOrder()'s pre-pass.
+// SCREEN-SPACE (2026-10-11, direct request: "I only want it to be the XY axis of the actual screen
+// space. So it shouldn't be measuring depth at all"). The hand is projected through the camera and
+// compared with the cursor's own screen position (cursorNDC), so a hand pushed toward or away from
+// the camera (Offset Z, Offset To Camera) or a slightly tilted camera no longer changes its
+// distance. The result is converted back to world units at the z = 0 field plane
+// (`screenUnitsPerPx`, refreshed once per frame) so the Start Distance Min/Max sliders, which are
+// in world units, keep their meaning. Falls back to world XY until the first frame has set the scale.
+function updateScreenUnitsPerPx() {
+  const w = window.innerWidth, h = window.innerHeight
+  screenUnitsPerPx = 0
+  if (!(w > 0 && h > 0)) return
+  _scrV.set(cursorTarget.x, cursorTarget.y, 0).project(camera)
+  _scrV2.set(cursorTarget.x + 1, cursorTarget.y, 0).project(camera)
+  const px = Math.hypot((_scrV2.x - _scrV.x) * w / 2, (_scrV2.y - _scrV.y) * h / 2) // pixels per world unit at the field plane
+  if (px > 1e-6) screenUnitsPerPx = 1 / px
+}
 function cursorDistXY(pos) {
+  if (screenUnitsPerPx > 0) {
+    const w = window.innerWidth, h = window.innerHeight
+    _scrV.copy(pos).project(camera)
+    return Math.hypot((_scrV.x - cursorNDC.x) * w / 2, (_scrV.y - cursorNDC.y) * h / 2) * screenUnitsPerPx
+  }
   return Math.hypot(pos.x - cursorTarget.x, pos.y - cursorTarget.y)
 }
 // 2026-10-04: world-XY distance (see xyFieldMinDist's comment).
@@ -9188,7 +9305,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
         : computeStartDelayMs(handXYDist(hand), xyFieldMinDist, xyFieldDistRange, trig.startCurveParsed, trig.startRangeParsed))
       chp.pendingClaimAt = now + delay
       chp.pendingTweenFractionCap = tweenFractionCap
-      chp.pendingFrozenSplayDeg = computeResponsiveWristSplayDeg(live, minLiveDist, liveDistRange)
+      chp.pendingFrozenSplayDeg = splayDegForHand(hand, live, minLiveDist, liveDistRange)
       // CORRECTED 2026-09-27 -- see applyPoseValuesToHand()'s own comment.
       // Whatever splay this hand was actually showing right before this
       // hold armed (idle-tracked, or left over from a DIFFERENT trigger
@@ -9596,7 +9713,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     // moving throughout retransition) -- by the time progress reaches 1
     // and this hand goes idle, splay already equals what idle-tracking
     // would show, so idle repose picks it up with no residual jump.
-    const liveSplayTarget = computeResponsiveWristSplayDeg(live, minLiveDist, liveDistRange)
+    const liveSplayTarget = splayDegForHand(hand, live, minLiveDist, liveDistRange)
     const splayNow = THREE.MathUtils.lerp(chp.retransitionFromSplayDeg ?? chp.frozenSplayDeg, liveSplayTarget, progress)
     applyPoseValuesToHand(hand, values, splayNow)
     // Item 6 (2026-09-27): unwinds the FULL accumulated offset/rotation
@@ -10479,7 +10596,7 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
     const values = lerpPoseValues(cp.retransitionStart, cfg, progress)
     // CORRECTED 2026-09-27 -- see updateClickHoldPoseForHand()'s own
     // matching 'retransition'-phase comment for the full reasoning.
-    const liveSplayTarget = computeResponsiveWristSplayDeg(live, minLiveDist, liveDistRange)
+    const liveSplayTarget = splayDegForHand(hand, live, minLiveDist, liveDistRange)
     const splayNow = THREE.MathUtils.lerp(cp.retransitionFromSplayDeg ?? cp.frozenSplayDeg, liveSplayTarget, progress)
     applyPoseValuesToHand(hand, values, splayNow)
     // Item 6 (2026-09-27): unwinds the FULL accumulated offset/rotation
@@ -10626,7 +10743,7 @@ function triggerClickPose(p, onlyHands = null) {
     // retransition) -- see updateClickHoldPoseForHand()'s own top
     // comment for why Responsive Wrist Splay must not keep recomputing
     // live throughout an explicit pose transition.
-    cp.pendingFrozenSplayDeg = computeResponsiveWristSplayDeg(hand.wrapper.position.distanceTo(cursorTarget), splay3dMin, splay3dRange) // 3D on purpose: must match the live idle splay it blends with
+    cp.pendingFrozenSplayDeg = (cfg.wristSplayUseDepth === false ? computeResponsiveWristSplayDeg(handXYDist(hand), xyFieldMinDist, xyFieldDistRange) : computeResponsiveWristSplayDeg(hand.wrapper.position.distanceTo(cursorTarget), splay3dMin, splay3dRange)) // 3D (with Cursor Target Depth) on purpose: must match the live idle splay it blends with
     // CORRECTED 2026-09-27 -- see updateClickHoldPoseForHand()'s own
     // matching capture for the full reasoning.
     cp.pendingFromSplayDeg = hand.currentSplayDeg
@@ -14085,6 +14202,39 @@ function computeBaseScale() {
   return (HAND_SCALE_REFERENCE_LENGTH / handLengthRaw) * cfg.handScale
 }
 
+// ---- Hand position floor / ceiling (2026-10-11) ----
+function parseFieldBounds() {
+  const out = {}
+  let limited = false
+  ;['X', 'Y', 'Z'].forEach((A) => {
+    let min = -300, max = 300
+    try { const o = JSON.parse(cfg['fieldBounds' + A] || '{}'); if (Number.isFinite(o.min)) min = o.min; if (Number.isFinite(o.max)) max = o.max } catch (e) { /* keep defaults */ }
+    if (min > max) { const t = min; min = max; max = t }
+    out[A.toLowerCase()] = [min, max]
+    if (min > -300 || max < 300) limited = true
+  })
+  fieldBounds = limited ? out : null
+}
+function onFieldBoundsChanged() {
+  parseFieldBounds()
+  relayoutField() // puts idle hands back on their grid position so widening a bound releases them
+}
+function applyFieldBounds() {
+  if (!fieldBounds) return
+  const b = fieldBounds
+  for (let i = 0; i < hands.length; i++) {
+    const p = hands[i].wrapper.position
+    p.x = Math.min(Math.max(p.x, b.x[0]), b.x[1])
+    p.y = Math.min(Math.max(p.y, b.y[0]), b.y[1])
+    p.z = Math.min(Math.max(p.z, b.z[0]), b.z[1])
+  }
+}
+function buildFieldBoundsWidgets() {
+  ;['X', 'Y', 'Z'].forEach((A) => {
+    const row = document.querySelector('.dp-row[data-key="fieldBounds' + A + '"]')
+    if (row) buildGenericRangeBarWidget(row, { trackMin: -300, trackMax: 300, unit: 'wu', defaultValue: { min: -300, max: 300 } })
+  })
+}
 function relayoutField() {
   // 2026-10-04: nothing to lay out until the field exists (see rebuildField()).
   if (!modelLoaded || !fieldBuildAllowed || fieldBuildInProgress) return
@@ -14985,15 +15135,18 @@ function animate(dt, now) {
         // start). Both curves read the identical distance metric, so
         // one shared pass covers both; only computed at all when at
         // least one of them is actually enabled.
+        // Use Cursor Target Depth (2026-10-11): per feature, off = aim/measure on the screen XY only.
+        const armRotUseDepth = cfg.armRotationUseDepth !== false
+        const palmUseDepth = cfg.palmRotationUseDepth !== false
         let cursorDistMinD = 0, cursorDistMaxD = 0
-        if (cfg.armRotationCurveEnabled || cfg.palmFacesCursorDistanceCurveEnabled) {
+        if ((cfg.armRotationCurveEnabled && armRotUseDepth) || (cfg.palmFacesCursorDistanceCurveEnabled && palmUseDepth)) {
           const __cursorDists = hands.map((h) => h.wrapper.position.distanceTo(cursorTarget))
           cursorDistMinD = Math.min(...__cursorDists)
           cursorDistMaxD = Math.max(...__cursorDists)
         }
         const __cursorTrackingStart = performance.now()
         hands.forEach((hand) => {
-          _lookAtMatrixScratch.lookAt(hand.wrapper.position, cursorTarget, UP)
+          _lookAtMatrixScratch.lookAt(hand.wrapper.position, armRotUseDepth ? cursorTarget : _trackTargetXY.set(cursorTarget.x, cursorTarget.y, hand.wrapper.position.z), UP)
           const lookAtDesired = _lookAtQuatScratch.setFromRotationMatrix(_lookAtMatrixScratch)
           // CORRECTED 2026-09-28 (5th round of this same jump investigation) --
           // direct report, repeated and precise: with Retransition OFF the
@@ -15092,9 +15245,9 @@ function animate(dt, now) {
             // longer being "a fraction of a fixed target angle."
             let responsiveness = (cfg.armRotationDefault ?? 100) / 100
             if (cfg.armRotationCurveEnabled) {
-              const distToCursor = hand.wrapper.position.distanceTo(cursorTarget)
-              const range = Math.max(cursorDistMaxD - cursorDistMinD, 1e-6)
-              const normDist = (distToCursor - cursorDistMinD) / range
+              const distToCursor = armRotUseDepth ? hand.wrapper.position.distanceTo(cursorTarget) : handXYDist(hand)
+              const range = armRotUseDepth ? Math.max(cursorDistMaxD - cursorDistMinD, 1e-6) : xyFieldDistRange
+              const normDist = (distToCursor - (armRotUseDepth ? cursorDistMinD : xyFieldMinDist)) / range
               responsiveness = (armRotationCurveParsed && armRotationCurveParsed.length)
                 ? THREE.MathUtils.clamp(evaluateArmLengthCurve(armRotationCurveParsed, normDist), 0, 1)
                 : 1
@@ -15126,9 +15279,9 @@ function animate(dt, now) {
           // full responsiveness; at far distance, reduced (curve y-value
           // acts as a responsiveness multiplier on baseDeg).
           if (baseDeg !== 0 && cfg.palmFacesCursorDistanceCurveEnabled) {
-            const distToCursor = hand.wrapper.position.distanceTo(cursorTarget)
-            const range = Math.max(cursorDistMaxD - cursorDistMinD, 1e-6)
-            const normDist = (distToCursor - cursorDistMinD) / range
+            const distToCursor = palmUseDepth ? hand.wrapper.position.distanceTo(cursorTarget) : handXYDist(hand)
+            const range = palmUseDepth ? Math.max(cursorDistMaxD - cursorDistMinD, 1e-6) : xyFieldDistRange
+            const normDist = (distToCursor - (palmUseDepth ? cursorDistMinD : xyFieldMinDist)) / range
             const responsiveness = palmFacesCursorDistanceCurveParsed && palmFacesCursorDistanceCurveParsed.length
               ? evaluateArmLengthCurve(palmFacesCursorDistanceCurveParsed, normDist)
               : 1
@@ -15195,6 +15348,7 @@ function animate(dt, now) {
       }
       const __uroStart = performance.now()
       updateRenderOrder()
+      applyFieldBounds()
       __frameProfiler.updateRenderOrderMs += performance.now() - __uroStart
       if (cfg.logPoseJumpsEnabled) detectPoseJumps()
       else poseJumpLastCheckMs = 0
@@ -15404,6 +15558,7 @@ window.addEventListener('focus', syncPauseWithVisibility)
 const REORDER_SMOOTHING = 0.15
 function updateRenderOrder() {
   idleReposeFrameCounter++
+  updateScreenUnitsPerPx() // world units per screen pixel at the field plane, for the screen-space click-function distance
   // Everything an IDLE hand's finger curl depends on, as one string (2026-10-04): pose settings (finger,
   // wrist, model rotation) and the shared base orientation. The curl is independent of the wrapper's
   // rotation (the wrapper is excluded from the world->local axis conversion), so cursor tracking alone
@@ -15542,7 +15697,9 @@ function updateRenderOrder() {
     // mirrors applyHandArmLength()'s own existing "no prior value yet"
     // fallback, so a hand's very first frame still applies its target
     // instantly rather than lerping from nothing.
-    const targetArmLengthT = computeArmLengthT(hand, live, minLiveDist, liveDistRange)
+    const targetArmLengthT = cfg.armLengthUseDepth === false
+      ? computeArmLengthT(hand, handXYDist(hand), xyFieldMinDist, xyFieldDistRange) // Wrist Cropping Use Cursor Target Depth off: screen-space XY only
+      : computeArmLengthT(hand, live, minLiveDist, liveDistRange)
     const armLengthDampingAmt = THREE.MathUtils.clamp(cfg.armLengthDamping ?? 1, 0.001, 1)
     hand.currentArmLengthT = hand.currentArmLengthT !== undefined
       ? hand.currentArmLengthT + (targetArmLengthT - hand.currentArmLengthT) * armLengthDampingAmt
@@ -15667,7 +15824,7 @@ function updateRenderOrder() {
       if (needsIdleRepose) {
         const wasEverReposedBeforeThisFrame = hand.everReposed
         hand.everReposed = true
-        const targetSplay = computeResponsiveWristSplayDeg(live, minLiveDist, liveDistRange)
+        const targetSplay = splayDegForHand(hand, live, minLiveDist, liveDistRange)
         // Damping -- direct report 2026-09-28 ("there is no damping for
         // wrist cropping"), the same class of bug applies here: this value
         // has always recomputed fresh from live cursor distance (every

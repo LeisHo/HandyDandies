@@ -2506,3 +2506,10 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   hold. Don't assume a fix needed elsewhere in the family applies here just because the control is named the
   same — re-verify the actual read pattern, same "re-verify, don't 1:1 port" discipline as this file's other
   template-port notes above (2026-09-17, 2026-09-19).
+- **Click-function distance is screen space (2026-10-11).** `cursorDistXY()` projects through the camera and returns world units at the z = 0 plane via
+  `screenUnitsPerPx` (set in `updateRenderOrder()`); anything that needs "distance from the cursor" for a click-function setting must call it
+  (or `handXYDist()`), never subtract positions. Cursor-tracking features have their own "Uses Cursor Target Depth" checkbox
+  (`armRotationUseDepth`, `palmRotationUseDepth`, `wristSplayUseDepth`, `armLengthUseDepth`); `splayDegForHand()` is the one place that picks 3D vs screen XY
+  for splay.
+- **Hand Position Min / Max (2026-10-11)** is applied by `applyFieldBounds()` after `updateRenderOrder()`; `fieldBounds` is null when all three axes are at the
+  default -300..300. Eyedropper buttons use `pickScreenColor()` (EyeDropper or canvas readPixels fallback).

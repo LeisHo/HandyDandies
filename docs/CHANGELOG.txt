@@ -16724,6 +16724,34 @@ architecture change for a problem this codebase doesn't have.
 No code changed; no file version bump. Documented in CLAUDE.md's own Gotchas (2026-10-11 entry) so a future
 session doesn't re-investigate this from scratch.
 
+2026-10-11  -  (screen-space click distance, per-feature Cursor Target Depth, toon eyedroppers, hand position bounds)
+
+Direct request: click-function cursor distance should be XY of the actual screen, no depth; cursor-tracking
+features keep Cursor Target Depth but each gets an on/off; eyedropper buttons for Toon Step Threshold, Shadow
+Floor and Light Ceiling; Min/Max X/Y/Z position sliders in Field Layout.
+
+1) Screen-space click-function distance. cursorDistXY() now projects the hand through the camera and measures the
+ pixel distance to the cursor's own screen position (cursorNDC), then converts it back to world units at the z = 0
+ field plane (screenUnitsPerPx, refreshed once per frame at the top of updateRenderOrder()), so Start Distance
+ Min/Max (world units) keep their meaning. A hand pushed in Z (Offset Z, Offset To Camera) or a tilted camera no
+ longer changes its distance. Falls back to world XY until the first frame has set the scale. All click-function
+ distance settings go through it (handXYDist / handRestDist / the trigger-time dists).
+2) "Uses Cursor Target Depth" checkbox (default ON = old behaviour) per cursor-tracking feature: Arm Rotation
+ (armRotationUseDepth: off aims at the cursor on the hand's own Z, and its Distance Curve reads screen XY),
+ Palm Rotation (palmRotationUseDepth: its angle is already a screen-XY compass, so this switches only its Distance
+ Curve), Wrist Splay (wristSplayUseDepth, incl. the splay frozen at trigger time) and Wrist Cropping
+ (armLengthUseDepth). Render order stays on the 3D distance.
+3) Toon eyedroppers: three buttons (Step Threshold, Shadow Floor, Light Ceiling). Uses the browser EyeDropper
+ where it exists, otherwise the next click reads the pixel from the WebGL canvas. Brightness = Rec.709 luma of the
+ displayed sRGB color, white 100 / black 0. Floor and Ceiling take it directly (clamped to their slider ranges).
+ Threshold solves floor + (ceiling - floor) * 0.5^threshold = brightness, i.e. the picked color becomes the middle
+ of the ramp (the middle step of an odd step count; with 2 steps there is no middle step, the ramp midpoint is
+ used). Threshold is limited to the slider's 0.2-5 range, so very bright picks stop at 0.2.
+4) Field Layout: Hand Position Min / Max X, Y, Z (three range bars, shared across devices, default -300..300 =
+ no limit). applyFieldBounds() clamps every hand's final world position right after updateRenderOrder(), click-
+ function offsets included. Changing a bound re-lays the field out so idle hands are released when widened.
+ `main.js` `?v=311` -> `?v=312`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a
