@@ -6552,7 +6552,7 @@
       "cameraX": 2.636919008609145,
       "cameraY": 5.312009361593479,
       "cameraZ": 103.17321803892494,
-      "cameraFov": 35,
+      "cameraFov": 90,
       "cameraZoom": 103.34352280536584,
       "cameraZoomSpeed": 1,
       "savedCameras": [
@@ -6639,9 +6639,9 @@
           "targetZ": 0
         }
       ],
-      "lockCameraPan": true,
-      "lockCameraZoom": true,
-      "cameraMaxExtentsEnabled": true,
+      "lockCameraPan": false,
+      "lockCameraZoom": false,
+      "cameraMaxExtentsEnabled": false,
       "keyAzimuth": 209,
       "keyElevation": 56,
       "keyTargetHeight": 2,
@@ -6662,9 +6662,9 @@
           "fov": 32
         }
       ],
-      "toonSteps": 2,
-      "toonStepThreshold": 1.65,
-      "toonShadowFloor": 0,
+      "toonSteps": 3,
+      "toonStepThreshold": 3.05,
+      "toonShadowFloor": 2,
       "toonLightCeiling": 100,
       "toonBaseTint": "#0091ff",
       "textureInfluence": 0,
@@ -16703,9 +16703,9 @@
           "fov": 32
         }
       ],
-      "toonSteps": 2,
-      "toonStepThreshold": 1.65,
-      "toonShadowFloor": 0,
+      "toonSteps": 3,
+      "toonStepThreshold": 3.05,
+      "toonShadowFloor": 2,
       "toonLightCeiling": 100,
       "toonBaseTint": "#0091ff",
       "textureInfluence": 0,
@@ -26744,9 +26744,9 @@
           "fov": 32
         }
       ],
-      "toonSteps": 2,
-      "toonStepThreshold": 1.65,
-      "toonShadowFloor": 0,
+      "toonSteps": 3,
+      "toonStepThreshold": 3.05,
+      "toonShadowFloor": 2,
       "toonLightCeiling": 100,
       "toonBaseTint": "#0091ff",
       "textureInfluence": 0,
@@ -32146,7 +32146,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -33000,7 +33000,7 @@
           "type": "group",
           "group": {
             "key": "Cursor Tracking",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -33023,7 +33023,7 @@
                 "type": "group",
                 "group": {
                   "key": "Responsive Arm Rotation",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -33196,7 +33196,7 @@
             "subgroups": [
               {
                 "key": "Responsive Arm Rotation",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -34192,7 +34192,7 @@
         },
         {
           "key": "Cursor Tracking",
-          "collapsed": true,
+          "collapsed": false,
           "locked": true,
           "items": [
             {
@@ -34215,7 +34215,7 @@
               "type": "group",
               "group": {
                 "key": "Responsive Arm Rotation",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -34388,7 +34388,7 @@
           "subgroups": [
             {
               "key": "Responsive Arm Rotation",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -34547,7 +34547,7 @@
     },
     {
       "key": "Custom Click Functions",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -74120,7 +74120,7 @@
                 "type": "group",
                 "group": {
                   "key": "Offset To Camera",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -85998,7 +85998,7 @@
               },
               {
                 "key": "Offset To Camera",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -179997,7 +179997,7 @@
               "type": "group",
               "group": {
                 "key": "Offset To Camera",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -191875,7 +191875,7 @@
             },
             {
               "key": "Offset To Camera",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -246282,27 +246282,27 @@
     },
     {
       "key": "New Group (11)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
           "type": "group",
           "group": {
             "key": "New Group (10)",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
+              {
+                "type": "row",
+                "key": "savedToon"
+              },
               {
                 "type": "group",
                 "group": {
                   "key": "Toon Shading",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
-                    {
-                      "type": "row",
-                      "key": "savedToon"
-                    },
                     {
                       "type": "row",
                       "key": "toonSteps"
@@ -246349,7 +246349,6 @@
                     }
                   ],
                   "settings": [
-                    "savedToon",
                     "toonSteps",
                     "toonStepThreshold",
                     "toonShadowFloor",
@@ -246366,17 +246365,15 @@
                 }
               }
             ],
-            "settings": [],
+            "settings": [
+              "savedToon"
+            ],
             "subgroups": [
               {
                 "key": "Toon Shading",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
-                  {
-                    "type": "row",
-                    "key": "savedToon"
-                  },
                   {
                     "type": "row",
                     "key": "toonSteps"
@@ -246423,7 +246420,6 @@
                   }
                 ],
                 "settings": [
-                  "savedToon",
                   "toonSteps",
                   "toonStepThreshold",
                   "toonShadowFloor",
@@ -246445,7 +246441,7 @@
           "type": "group",
           "group": {
             "key": "Camera",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -246595,20 +246591,20 @@
       "subgroups": [
         {
           "key": "New Group (10)",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
+            {
+              "type": "row",
+              "key": "savedToon"
+            },
             {
               "type": "group",
               "group": {
                 "key": "Toon Shading",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
-                  {
-                    "type": "row",
-                    "key": "savedToon"
-                  },
                   {
                     "type": "row",
                     "key": "toonSteps"
@@ -246655,7 +246651,6 @@
                   }
                 ],
                 "settings": [
-                  "savedToon",
                   "toonSteps",
                   "toonStepThreshold",
                   "toonShadowFloor",
@@ -246672,17 +246667,15 @@
               }
             }
           ],
-          "settings": [],
+          "settings": [
+            "savedToon"
+          ],
           "subgroups": [
             {
               "key": "Toon Shading",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
-                {
-                  "type": "row",
-                  "key": "savedToon"
-                },
                 {
                   "type": "row",
                   "key": "toonSteps"
@@ -246729,7 +246722,6 @@
                 }
               ],
               "settings": [
-                "savedToon",
                 "toonSteps",
                 "toonStepThreshold",
                 "toonShadowFloor",
@@ -246748,7 +246740,7 @@
         },
         {
           "key": "Camera",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
@@ -248555,10 +248547,10 @@
       "height": 644.390625
     },
     "mobile": {
-      "left": 32.886905670166016,
+      "left": 29.45833396911621,
       "top": 0,
-      "width": 361.5357360839844,
-      "height": 789.3392944335938
+      "width": 364.96429443359375,
+      "height": 790.857177734375
     }
   }
 }
