@@ -17171,6 +17171,15 @@ Now computeScreenRollDeg(): same convention (atan2(dx, -dy), dx / dy = hand - cu
 difference. Falls back to the world angle if the window size is unknown. Arm Rotation's aim is unchanged: its target X / Y is still the cursor's z = 0 plane hit by an earlier explicit request ("the xy should match the true cursor xy ... not some parallax thing"), so it can show the
 same kind of offset for hands at a different Z; say if you want that screen-corrected too. `main.js` `?v=349` -> `?v=350`.
 
+2026-10-11  -  (all cursor tracking is screen space when "Uses Cursor Target Depth" is off)
+
+Direct request: "for all cursor tracking, when not using cursor tracking depth tracker, it should always be screen space". Audit of the four tracking features with their Uses Cursor Target Depth box OFF:
+ - Wrist Splay, Wrist Cropping, and the Arm / Palm Rotation distance curves + their nearest / farthest domains: already screen space (hand._trkXY = cursorDistXY of the projected tracking point). Unchanged.
+ - Palm Rotation angle: screen space since v=350 (computeScreenRollDeg), for both box states.
+ - Arm Rotation AIM: was the world x / y difference to the cursor's z = 0 plane hit at the hand's own Z, which is wrong for hands at another Z (perspective), the same problem the palm angle had. Now the aim direction is the on-screen offset from the
+   hand's projected tracking point to the cursor (cursorNDC), laid out on the camera's own right / up axes with no depth component. With the box ON it is unchanged (tracking point -> the cursor target at the Arm Rotation Cursor Target Depth).
+ `main.js` `?v=350` -> `?v=351`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

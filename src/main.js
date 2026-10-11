@@ -956,7 +956,7 @@ function updateTrackingPointMarkers() {
   pos.needsUpdate = true
   trackingPointCloud.visible = true
 }
-const _swingDir = new THREE.Vector3(), _swingPivot = new THREE.Vector3(), _swingTarget = new THREE.Vector3()
+const _swingDir = new THREE.Vector3(), _swingPivot = new THREE.Vector3(), _swingTarget = new THREE.Vector3(), _swingScrR = new THREE.Vector3(), _swingScrU = new THREE.Vector3()
 const _trkQ0 = new THREE.Quaternion(), _trkRbInv = new THREE.Quaternion(), _trkCut = new THREE.Vector3()
 // World position of the hand's arm base with no tracking rotation: wrapper.position + s * q0 * (forearmBase - cutPoint), q0 = currentBaseQuat * Rb^-1 (same maths as applyHandArmLength()).
 function armBasePivotInto(hand, out) {
@@ -15883,8 +15883,21 @@ function animate(dt, now) {
         const __cursorTrackingStart = performance.now()
         hands.forEach((hand) => {
           _swingPivot.copy(hand._trk) // aim from the tracking point (the swing itself still pivots on the arm base, see applyHandArmLength())
-          _swingTarget.copy(armRotUseDepth ? _trackTargetArm : _trackTargetXY.set(cursorTarget.x, cursorTarget.y, _swingPivot.z))
-          _swingDir.subVectors(_swingTarget, _swingPivot)
+          if (armRotUseDepth) {
+            _swingDir.subVectors(_trackTargetArm, _swingPivot)
+          } else {
+            // Use Cursor Target Depth off = SCREEN SPACE only (2026-10-11, direct request): the aim direction is the on-screen offset from the hand's projected tracking point to the cursor, laid out on the camera's own
+            // right / up axes, with no depth component at all. (It used to be the world x / y difference to the cursor's z = 0 plane hit, which is wrong for hands at another Z: perspective.)
+            const sw = window.innerWidth, sh = window.innerHeight
+            if (sw > 0 && sh > 0) {
+              _scrV.copy(_swingPivot).project(camera)
+              _swingScrR.setFromMatrixColumn(camera.matrixWorld, 0)
+              _swingScrU.setFromMatrixColumn(camera.matrixWorld, 1)
+              _swingDir.copy(_swingScrR).multiplyScalar((cursorNDC.x - _scrV.x) * sw / 2).addScaledVector(_swingScrU, (cursorNDC.y - _scrV.y) * sh / 2)
+            } else {
+              _swingDir.set(cursorTarget.x - _swingPivot.x, cursorTarget.y - _swingPivot.y, 0)
+            }
+          }
           if (_swingDir.lengthSq() > 1e-12) _swingDir.normalize(); else _swingDir.copy(_swingRef)
           const lookAtDesired = _lookAtQuatScratch.setFromUnitVectors(_swingRef, _swingDir)
           // CORRECTED 2026-09-28 (5th round of this same jump investigation) --
