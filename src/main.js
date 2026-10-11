@@ -283,6 +283,13 @@ const RENDER_ORDER_MODE_OPTIONS = [
   { value: 'closest', text: 'Closest To Cursor (XY)' }, { value: 'farthest', text: 'Farthest From Cursor (XY)' },
   { value: 'closestZ', text: 'Closest To Cursor (XYZ)' }, { value: 'farthestZ', text: 'Farthest From Cursor (XYZ)' }
 ]
+// Cursor tracking point (2026-10-11): the point on each hand that every cursor-tracking measurement (aim, palm angle, screen-space distances, splay / crop distances) is taken from. Computed at the hand's
+// no-tracking pose (so it does not chase the rotation it drives). hand._trk = world position, hand._trkXY = its screen-space distance to the cursor.
+const TRACKING_POINT_OPTIONS = [{ value: 'hand', text: 'Hand Position' }, { value: 'armBase', text: 'Arm Base' }, { value: 'armEnd', text: 'Arm End' }, { value: 'palmCenter', text: 'Palm Center' }]
+const palmCenterPosRaw = new THREE.Vector3(), _trkExt = new THREE.Vector3()
+const _armOffQx = new THREE.Quaternion(), _armOffQy = new THREE.Quaternion(), _armOffAxis = new THREE.Vector3()
+let trkXYFieldMin = 0, trkXYFieldRange = 0.001, trkXYAllMin = 0, trkXYAllRange = 0.001
+let trackingPointCloud = null
 const _trackTargetXY = new THREE.Vector3() // cursor target at a hand's own depth, for Use Cursor Target Depth = off
 // Screen-space distance scratch + scale (see cursorDistXY()); early-state block so top-level load order is safe.
 const _scrV = new THREE.Vector3(), _scrV2 = new THREE.Vector3()
@@ -878,6 +885,64 @@ function renderOrderPriority(hand, mode) {
   }
 }
 const _swingRef = new THREE.Vector3(0, 0, -1)
+// World position of the hand's cursor tracking point (Cursor Tracking > Tracking Point) at its no-tracking pose. Hand Position = the field position (the cut point); Arm Base = rForearmBend; Arm End = the head of rHand
+// (the end of rForearmTwist); Palm Center = the head of rMid1 (the end of rCarpal2). Everything but Hand Position hangs off the arm-base pivot: P + scale * q * (node - armBase).
+function handTrackingPointInto(hand, out) {
+  const mode = cfg.trackingPoint
+  if (mode === 'hand') return out.copy(hand.wrapper.position)
+  armBasePivotInto(hand, out)
+  if (mode === 'armBase') return out
+  _trkExt.copy(mode === 'palmCenter' ? palmCenterPosRaw : wristPosRaw).sub(forearmPosRaw).applyQuaternion(hand.currentBaseQuat).multiplyScalar(hand.clone.scale.x)
+  return out.add(_trkExt)
+}
+// Refreshes every hand's tracking point, its screen-space distance to the cursor and the nearest / farthest of those (on-screen hands only, or all hands) that the tracking features' XY curves normalise against.
+function updateTrackingPoints() {
+  let mn = Infinity, mx = -Infinity, amn = Infinity, amx = -Infinity
+  for (let i = 0; i < hands.length; i++) {
+    const h = hands[i]
+    if (!h._trk) h._trk = new THREE.Vector3()
+    handTrackingPointInto(h, h._trk)
+    const xd = cursorDistXY(h._trk)
+    h._trkXY = xd
+    if (xd < amn) amn = xd
+    if (xd > amx) amx = xd
+    if (h._onScr === false) continue
+    if (xd < mn) mn = xd
+    if (xd > mx) mx = xd
+  }
+  if (mn === Infinity) { mn = amn; mx = amx }
+  trkXYFieldMin = mn; trkXYFieldRange = Math.max(mx - mn, 0.001)
+  trkXYAllMin = amn; trkXYAllRange = Math.max(amx - amn, 0.001)
+}
+// Arm Rotation X / Y fine-tune (Cursor Tracking > Responsive Arm Rotation): extra degrees about the mesh's own X and Y axes (the Rotate-at-Base axes) as the hand is oriented now, added on top of the cursor swing.
+function armOffsetQuatInto(hand, xDeg, yDeg, out) {
+  _armOffAxis.set(1, 0, 0).applyQuaternion(modelBaseFrameQ).applyQuaternion(hand.currentBaseQuat)
+  _armOffQx.setFromAxisAngle(_armOffAxis, THREE.MathUtils.degToRad(xDeg))
+  _armOffAxis.set(0, 1, 0).applyQuaternion(modelBaseFrameQ).applyQuaternion(hand.currentBaseQuat)
+  _armOffQy.setFromAxisAngle(_armOffAxis, THREE.MathUtils.degToRad(yDeg))
+  return out.copy(_armOffQx).multiply(_armOffQy)
+}
+// Debug > Show Hand Tracking Points: one dot per hand at its tracking point.
+function updateTrackingPointMarkers() {
+  if (!cfg.showTrackingPoints) { if (trackingPointCloud) trackingPointCloud.visible = false; return }
+  if (!trackingPointCloud || trackingPointCloud.userData.cap < hands.length) {
+    if (trackingPointCloud) { scene.remove(trackingPointCloud); trackingPointCloud.geometry.dispose() }
+    const cap = Math.max(hands.length, 1)
+    const g = new THREE.BufferGeometry()
+    g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(cap * 3), 3))
+    const m = new THREE.PointsMaterial({ color: 0x44ffaa, size: 7, sizeAttenuation: false, depthTest: false, depthWrite: false })
+    trackingPointCloud = new THREE.Points(g, m)
+    trackingPointCloud.frustumCulled = false
+    trackingPointCloud.renderOrder = 1e15
+    trackingPointCloud.userData.cap = cap
+    scene.add(trackingPointCloud)
+  }
+  const pos = trackingPointCloud.geometry.attributes.position
+  for (let i = 0; i < hands.length; i++) { const t = hands[i]._trk; if (t) pos.setXYZ(i, t.x, t.y, t.z) }
+  trackingPointCloud.geometry.setDrawRange(0, hands.length)
+  pos.needsUpdate = true
+  trackingPointCloud.visible = true
+}
 const _swingDir = new THREE.Vector3(), _swingPivot = new THREE.Vector3(), _swingTarget = new THREE.Vector3()
 const _trkQ0 = new THREE.Quaternion(), _trkRbInv = new THREE.Quaternion(), _trkCut = new THREE.Vector3()
 // World position of the hand's arm base with no tracking rotation: wrapper.position + s * q0 * (forearmBase - cutPoint), q0 = currentBaseQuat * Rb^-1 (same maths as applyHandArmLength()).
@@ -997,6 +1062,8 @@ const DEV_GROUPS = [
     // distinction already drawn for the CAMERA's own pan/zoom in that
     // same note.
     controls: [
+      // Tracking Point (2026-10-11, direct request): which point on the hand every cursor-tracking measurement uses. Default = the end of rForearmTwist (Arm End).
+      { key: 'trackingPoint', label: 'Tracking Point', type: 'select', def: 'armEnd', options: () => TRACKING_POINT_OPTIONS },
       { key: 'trackingEnabled', label: 'Tracking Enabled', type: 'checkbox', def: true, perDevice: true },
       { key: 'trackingDamping', label: 'Look-At Damping (x)', type: 'slider', min: 0.02, max: 1, step: 0.01, def: 1, perDevice: true },
       // No onChange needed -- updateCursorTarget() (called every frame)
@@ -1053,6 +1120,9 @@ const DEV_GROUPS = [
       // driving continuous rotation toward the cursor). Same
       // `min:0.02, max:1, step:0.01, def:1` convention as every other
       // damping slider in this file.
+      // Arm Rotation fine-tune (2026-10-11, direct request, like Palm Face Rotation): extra degrees about the mesh X / Y axes on top of the cursor swing.
+      { key: 'armRotationOffsetX', label: 'Arm Rotation X (Deg)', type: 'slider', min: -180, max: 180, step: 1, def: 0, perDevice: true },
+      { key: 'armRotationOffsetY', label: 'Arm Rotation Y (Deg)', type: 'slider', min: -180, max: 180, step: 1, def: 0, perDevice: true },
       { key: 'armRotationDamping', label: 'Arm Rotation Damping (x)', type: 'slider', min: 0.02, max: 1, step: 0.01, def: 1 },
       // REDEFINED 2026-09-14 (see computeRadialRollDeg()'s own comment
       // for the full account and the user's own exact reference points):
@@ -2029,6 +2099,7 @@ const DEV_GROUPS = [
   {
     title: 'Debug',
     controls: [
+      { key: 'showTrackingPoints', label: 'Show Hand Tracking Points', type: 'checkbox', def: false },
       { key: 'showGridHelper', label: 'Show Grid Helper', type: 'checkbox', def: false, onChange: (v) => { if (gridHelper) gridHelper.visible = v } },
       { key: 'showWireframe', label: 'Show Wireframe', type: 'checkbox', def: false, onChange: (v) => forEachToonMaterial((m) => { m.wireframe = v }) },
       // Freezes a hand's own render-order value (see animate()'s own
@@ -7340,7 +7411,7 @@ function updateArmRotationGateVisibility() {
 // Wrist Splay Use Cursor Target Depth (2026-10-11): off = screen-space XY distance only, on = the 3D distance to the cursor target.
 function splayDegForHand(hand, live, minLiveDist, liveDistRange) {
   const vis = cfg.wristSplayVisibleOnly !== false // Visible Hands Only: on = on-screen hands set the domain, off = all hands
-  if (cfg.wristSplayUseDepth === false) return computeResponsiveWristSplayDeg(handXYDist(hand), vis ? xyFieldMinDist : xyAllMinDist, vis ? xyFieldDistRange : xyAllDistRange)
+  if (cfg.wristSplayUseDepth === false) return computeResponsiveWristSplayDeg(hand._trkXY ?? handXYDist(hand), vis ? trkXYFieldMin : trkXYAllMin, vis ? trkXYFieldRange : trkXYAllRange)
   if (hand._splayDist === undefined) return computeResponsiveWristSplayDeg(live, minLiveDist, liveDistRange)
   return computeResponsiveWristSplayDeg(hand._splayDist, vis ? splayFieldMin : splayAllMin, vis ? splayFieldRange : splayAllRange) // distance to the cursor at Wrist Splay's own depth
 }
@@ -14574,6 +14645,7 @@ updateLoadingPreviewSequenceVisibility()
 // 'chpTargetPose' succeeds every time, 'rchpTargetPose' throws every
 // time, even called alone) -- this must never take down the whole page.
 safeRefreshSelectOptions('renderOrderMode')
+safeRefreshSelectOptions('trackingPoint')
 safeRefreshSelectOptions('renderOrderFallback')
 safeRefreshSelectOptions('chpTargetPose')
 safeRefreshSelectOptions('rchpTargetPose')
@@ -15182,6 +15254,7 @@ gltfLoader.load(
     // true bind pose.
     skinned.skeleton.bones.forEach((bone) => { boneRestQuat[bone.name] = bone.quaternion.clone() })
     wristPosRaw.copy(wristPos)
+    { const palmB = skinned.skeleton.getBoneByName('rMid1'); if (palmB) palmB.getWorldPosition(palmCenterPosRaw); else palmCenterPosRaw.copy(wristPos) } // end of rCarpal2
     // Whole-Hand Rotation at Base: the mesh's own axes relative to the scene root = product of the local rotations from the skinned mesh up to the root (HANDO's modelBaseFrameQ).
     modelBaseFrameQ.identity()
     for (let o = skinned; o && o !== root; o = o.parent) modelBaseFrameQ.premultiply(o.quaternion)
@@ -15769,21 +15842,22 @@ function animate(dt, now) {
         // one shared pass covers both; only computed at all when at
         // least one of them is actually enabled.
         // Use Cursor Target Depth (2026-10-11): per feature, off = aim/measure on the screen XY only.
+        updateTrackingPoints() // every cursor-tracking measurement below is taken from the hand's tracking point
         const armRotUseDepth = cfg.armRotationUseDepth !== false
         const palmUseDepth = cfg.palmRotationUseDepth !== false
         let cursorDistMinD = 0, cursorDistMaxD = 0
         let palmDistMinD = 0, palmDistMaxD = 0
         if (cfg.armRotationCurveEnabled && armRotUseDepth) {
-          const __armDists = hands.map((h) => h.wrapper.position.distanceTo(_trackTargetArm))
+          const __armDists = hands.map((h) => h._trk.distanceTo(_trackTargetArm))
           ;[cursorDistMinD, cursorDistMaxD] = cfg.armRotationVisibleOnly !== false ? onScreenMinMax(__armDists) : [Math.min(...__armDists), Math.max(...__armDists)]
         }
         if (cfg.palmFacesCursorDistanceCurveEnabled && palmUseDepth) {
-          const __palmDists = hands.map((h) => h.wrapper.position.distanceTo(_trackTargetPalm))
+          const __palmDists = hands.map((h) => h._trk.distanceTo(_trackTargetPalm))
           ;[palmDistMinD, palmDistMaxD] = cfg.palmRotationVisibleOnly !== false ? onScreenMinMax(__palmDists) : [Math.min(...__palmDists), Math.max(...__palmDists)]
         }
         const __cursorTrackingStart = performance.now()
         hands.forEach((hand) => {
-          armBasePivotInto(hand, _swingPivot)
+          _swingPivot.copy(hand._trk) // aim from the tracking point (the swing itself still pivots on the arm base, see applyHandArmLength())
           _swingTarget.copy(armRotUseDepth ? _trackTargetArm : _trackTargetXY.set(cursorTarget.x, cursorTarget.y, _swingPivot.z))
           _swingDir.subVectors(_swingTarget, _swingPivot)
           if (_swingDir.lengthSq() > 1e-12) _swingDir.normalize(); else _swingDir.copy(_swingRef)
@@ -15887,10 +15961,10 @@ function animate(dt, now) {
             // longer being "a fraction of a fixed target angle."
             let responsiveness = (cfg.armRotationDefault ?? 100) / 100
             if (cfg.armRotationCurveEnabled) {
-              const distToCursor = armRotUseDepth ? hand.wrapper.position.distanceTo(_trackTargetArm) : handXYDist(hand)
+              const distToCursor = armRotUseDepth ? hand._trk.distanceTo(_trackTargetArm) : hand._trkXY
               const armVis = cfg.armRotationVisibleOnly !== false
-              const range = armRotUseDepth ? Math.max(cursorDistMaxD - cursorDistMinD, 1e-6) : (armVis ? xyFieldDistRange : xyAllDistRange)
-              const normDist = (distToCursor - (armRotUseDepth ? cursorDistMinD : (armVis ? xyFieldMinDist : xyAllMinDist))) / range
+              const range = armRotUseDepth ? Math.max(cursorDistMaxD - cursorDistMinD, 1e-6) : (armVis ? trkXYFieldRange : trkXYAllRange)
+              const normDist = (distToCursor - (armRotUseDepth ? cursorDistMinD : (armVis ? trkXYFieldMin : trkXYAllMin))) / range
               responsiveness = (armRotationCurveParsed && armRotationCurveParsed.length)
                 ? THREE.MathUtils.clamp(evaluateArmLengthCurve(armRotationCurveParsed, normDist), 0, 1)
                 : 1
@@ -15916,16 +15990,16 @@ function animate(dt, now) {
             hand.currentArmRotationQuat.slerp(lookAtDesired, THREE.MathUtils.clamp(armRotationDampingAmt * responsiveness, 0, 1))
             desired = hand.currentArmRotationQuat
           }
-          let baseDeg = cfg.palmFacesCursor ? computeRadialRollDeg(hand.wrapper.position, cursorTarget) : 0
+          let baseDeg = cfg.palmFacesCursor ? computeRadialRollDeg(hand._trk, cursorTarget) : 0
           // Palm Rotation Distance Curve -- modulate cursor-tracking
           // responsiveness by distance (2026-09-24). At close distance,
           // full responsiveness; at far distance, reduced (curve y-value
           // acts as a responsiveness multiplier on baseDeg).
           if (baseDeg !== 0 && cfg.palmFacesCursorDistanceCurveEnabled) {
-            const distToCursor = palmUseDepth ? hand.wrapper.position.distanceTo(_trackTargetPalm) : handXYDist(hand)
+            const distToCursor = palmUseDepth ? hand._trk.distanceTo(_trackTargetPalm) : hand._trkXY
             const palmVis = cfg.palmRotationVisibleOnly !== false
-            const range = palmUseDepth ? Math.max(palmDistMaxD - palmDistMinD, 1e-6) : (palmVis ? xyFieldDistRange : xyAllDistRange)
-            const normDist = (distToCursor - (palmUseDepth ? palmDistMinD : (palmVis ? xyFieldMinDist : xyAllMinDist))) / range
+            const range = palmUseDepth ? Math.max(palmDistMaxD - palmDistMinD, 1e-6) : (palmVis ? trkXYFieldRange : trkXYAllRange)
+            const normDist = (distToCursor - (palmUseDepth ? palmDistMinD : (palmVis ? trkXYFieldMin : trkXYAllMin))) / range
             const responsiveness = palmFacesCursorDistanceCurveParsed && palmFacesCursorDistanceCurveParsed.length
               ? evaluateArmLengthCurve(palmFacesCursorDistanceCurveParsed, normDist)
               : 1
@@ -15986,7 +16060,9 @@ function animate(dt, now) {
           // no skeleton/pose involvement either way. Arm Rotation's own
           // `desired` is applied directly (not slerped again) -- it's
           // already fully damped via armRotationDampingAmt above.
-          hand.wrapper.quaternion.copy(desired).multiply(computeRollQuat(hand.currentPalmRollDeg, hand))
+          hand.wrapper.quaternion.copy(desired)
+          if (cfg.armRotationOffsetX || cfg.armRotationOffsetY) hand.wrapper.quaternion.multiply(armOffsetQuatInto(hand, cfg.armRotationOffsetX || 0, cfg.armRotationOffsetY || 0, _lookAtQuatScratch))
+          hand.wrapper.quaternion.multiply(computeRollQuat(hand.currentPalmRollDeg, hand))
         })
         __frameProfiler.cursorTrackingMs += performance.now() - __cursorTrackingStart
       }
@@ -16295,10 +16371,12 @@ function updateRenderOrder() {
   liveFieldDistRange = liveDistRange
   // Wrist Splay / Wrist Cropping each measure to the cursor at their own Cursor Target Depth (2026-10-11).
   updateTrackingTargets()
+  updateTrackingPoints()
+  updateTrackingPointMarkers()
   let spMin = Infinity, spMax = -Infinity, crMin = Infinity, crMax = -Infinity
   let spAMin = Infinity, spAMax = -Infinity, crAMin = Infinity, crAMax = -Infinity
   for (let ti = 0; ti < hands.length; ti++) {
-    const th = hands[ti], tp = th.wrapper.position
+    const th = hands[ti], tp = th._trk
     const ds = tp.distanceTo(_trackTargetSplay), dc = tp.distanceTo(_trackTargetCrop)
     th._splayDist = ds; th._cropDist = dc
     if (ds < spAMin) spAMin = ds
@@ -16381,7 +16459,7 @@ function updateRenderOrder() {
     // fallback, so a hand's very first frame still applies its target
     // instantly rather than lerping from nothing.
     const targetArmLengthT = cfg.armLengthUseDepth === false
-      ? computeArmLengthT(hand, handXYDist(hand), cfg.armLengthVisibleOnly !== false ? xyFieldMinDist : xyAllMinDist, cfg.armLengthVisibleOnly !== false ? xyFieldDistRange : xyAllDistRange) // Wrist Cropping Use Cursor Target Depth off: screen-space XY only
+      ? computeArmLengthT(hand, hand._trkXY ?? handXYDist(hand), cfg.armLengthVisibleOnly !== false ? trkXYFieldMin : trkXYAllMin, cfg.armLengthVisibleOnly !== false ? trkXYFieldRange : trkXYAllRange) // Wrist Cropping Use Cursor Target Depth off: screen-space XY only
       : computeArmLengthT(hand, hand._cropDist ?? live, hand._cropDist === undefined ? minLiveDist : (cfg.armLengthVisibleOnly !== false ? cropFieldMin : cropAllMin), hand._cropDist === undefined ? liveDistRange : (cfg.armLengthVisibleOnly !== false ? cropFieldRange : cropAllRange)) // distance to the cursor at Wrist Cropping's own depth
     const armLengthDampingAmt = THREE.MathUtils.clamp(cfg.armLengthDamping ?? 1, 0.001, 1)
     hand.currentArmLengthT = hand.currentArmLengthT !== undefined

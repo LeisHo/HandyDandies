@@ -17119,6 +17119,20 @@ treated as empty; the same engine also uses the stored value as the label and on
  - main.js: both controls pass `options: () => RENDER_ORDER_MODE_OPTIONS` and are refreshed with safeRefreshSelectOptions() at startup like every other select.
  `devPanel.js` `?v=63` -> `?v=64`, `main.js` `?v=344` -> `?v=345`.
 
+2026-10-11  -  (Cursor tracking point dropdown, Debug tracking-point markers, Arm Rotation X / Y fine-tune sliders)
+
+Direct requests: (1) cursor tracking should measure from the end node of rForearmTwist, "with the screen space projection etc applied", and a Debug checkbox to show it; then "actually ... provide a dropdown in the cursor tracking group with the same points as the render order dropdowns";
+(2) "a slider in cursor tracking arm rotation group to finetune the rotation, similar to palm rotation", then "2 sliders actually, one for the x rotation and one for y rotation".
+ - Cursor Tracking > Tracking Point (trackingPoint, default Arm End): Hand Position (the old origin, the field position / cut point), Arm Base (rForearmBend), Arm End (head of rHand = end of rForearmTwist), Palm Center (head of rMid1 = end of rCarpal2).
+   The Render Order cursor modes are not points, so only the four points are offered. The point is computed at the hand's NO-tracking pose (arm-base pivot + scale * currentBaseQuat * (node - armBase)) so it does not chase the rotation it drives.
+   hand._trk (world position) and hand._trkXY (its screen-space distance to the cursor, via the same projection as the click functions) are refreshed by updateTrackingPoints(), which also keeps separate nearest / farthest domains
+   (trkXYField* = on-screen hands, trkXYAll*). Now measured from the tracking point instead of the field position: the Arm Rotation aim origin, the Arm Rotation and Palm Rotation distance curves and their domains (depth on = distance to the
+   tracking point, depth off = hand._trkXY), the Palm Rotation radial angle, and the Wrist Splay / Wrist Cropping distances and domains. Click functions are NOT changed (they still use the hand's own position).
+ - Debug > Show Hand Tracking Points: a green dot per hand at its tracking point (a Points cloud, always on top).
+ - Arm Rotation X (Deg) / Arm Rotation Y (Deg) (armRotationOffsetX / Y, -180..180, per device, default 0): extra rotation about the mesh's X and Y axes (the Rotate-at-Base axes) as the hand is oriented now, applied after the cursor swing and
+   before the palm roll: wrapper = swing * Rx * Ry * roll.
+ - The Tracking Point select also needed the startup safeRefreshSelectOptions() (the empty-dropdown lesson from the Render Order fix). `main.js` `?v=345` -> `?v=346`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a
