@@ -17083,6 +17083,17 @@ Direct request: "palm rotation should rotate the hand model by the Rotate at Bas
  - Disclosed difference: a swing has no up vector, so a diagonal aim twists the hand slightly compared with the old look-at (about half of yaw x pitch in radians, ~4 deg at 30 x 30 deg). Default pose rotation still
    composes on top (the clone keeps currentBaseQuat). `main.js` `?v=340` -> `?v=341`.
 
+2026-10-11  -  (Render Order Mode dropdown in Field Layout)
+
+Direct request: a dropdown to choose what decides which hand draws on top (current behaviour = Z position), with Arm Base, Arm End and Palm Center. New select 'Render Order Mode' (renderOrderMode, shared across devices) at the top of Field Layout.
+The mode picks which Z feeds the existing "closest to the camera wins, cursor distance breaks ties" ordering (renderOrderZ()):
+ - Z Position: the hand's field position (unchanged default).
+ - Arm Base: world Z of rForearmBend (1st node of the chain).
+ - Arm End: world Z of rHand = the end (tail) of rForearmTwist (3rd node: RootNode > rForearmBend > rForearmTwist > rHand).
+ - Palm Center: world Z of rMid1 = the end (tail) of rCarpal2 (rCarpal2's only child).
+Rig checked live (23 bones): rForearmBend -> rForearmTwist -> rHand -> rCarpal1-4 / rThumb1; rCarpal2 -> rMid1. The bone Z is the bone's matrixWorld from the previous render (at most one frame old); a missing bone falls back to the field Z.
+While Global Pause is on, render order is not recomputed (updateRenderOrder is paused), so a mode change shows after un-pausing. `main.js` `?v=341` -> `?v=342`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

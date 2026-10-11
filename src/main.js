@@ -849,6 +849,16 @@ const _lookAtQuatScratch = new THREE.Quaternion()
 // from the hand's reference pointing direction (-Z of the wrapper, as before) to the direction arm-base -> cursor target. A swing axis is perpendicular to the pointing direction, i.e. it lies in the
 // mesh X/Y plane: pure X/Y rotation, no up vector, so it never flips (the old look-at did when the aim passed through its up vector). The wrapper carries the swing; applyHandArmLength() then moves the
 // clone so the ARM BASE stays where it would be without any rotation and the model swings about it (same pivot as Rotation at Base).
+// Render Order Mode: the Z (world) that orders a hand against the others. 'z' = the hand's field position (the old behaviour); the others read a rig node's world Z from the previous render
+// (matrixWorld, so one frame old at most): armBase = the head of rForearmBend (1st node of the chain), armEnd = the head of rHand = the end (tail) of rForearmTwist (3rd node),
+// palmCenter = the head of rMid1 = the end (tail) of rCarpal2. A missing bone falls back to the field position.
+const RENDER_ORDER_NODES = { armBase: 'rForearmBend', armEnd: 'rHand', palmCenter: 'rMid1' }
+function renderOrderZ(hand) {
+  const mode = cfg.renderOrderMode
+  if (!mode || mode === 'z' || !hand.skinnedMesh) return hand.wrapper.position.z
+  if (!hand._roNode || hand._roNode.mode !== mode) hand._roNode = { mode, bone: hand.skinnedMesh.skeleton.getBoneByName(RENDER_ORDER_NODES[mode]) || null }
+  return hand._roNode.bone ? hand._roNode.bone.matrixWorld.elements[14] : hand.wrapper.position.z
+}
 const _swingRef = new THREE.Vector3(0, 0, -1)
 const _swingDir = new THREE.Vector3(), _swingPivot = new THREE.Vector3(), _swingTarget = new THREE.Vector3()
 const _trkQ0 = new THREE.Quaternion(), _trkRbInv = new THREE.Quaternion(), _trkCut = new THREE.Vector3()
@@ -921,6 +931,8 @@ const DEV_GROUPS = [
     // realDeviceClass()` generically -- no devPanel.js changes were
     // needed to support this, just the `perDevice: true` flag per control.
     controls: [
+      // Render Order Mode (2026-10-11, direct request): which point's Z decides which hand draws on top (closest to the camera wins; cursor distance only breaks ties). See renderOrderZ().
+      { key: 'renderOrderMode', label: 'Render Order Mode', type: 'select', def: 'z', options: [{ value: 'z', text: 'Z Position' }, { value: 'armBase', text: 'Arm Base' }, { value: 'armEnd', text: 'Arm End' }, { value: 'palmCenter', text: 'Palm Center' }] },
       { key: 'fieldRows', label: 'Rows (Count)', type: 'slider', min: 1, max: 40, step: 1, def: 15, perDevice: true, onChange: () => rebuildField() },
       { key: 'fieldCols', label: 'Columns (Count)', type: 'slider', min: 1, max: 40, step: 1, def: 17, perDevice: true, onChange: () => rebuildField() },
       { key: 'rowSpacing', label: 'Row Spacing (World Units)', type: 'slider', min: 2, max: 40, step: 0.5, def: 9.5, perDevice: true, onChange: () => relayoutField() },
@@ -16322,7 +16334,7 @@ function updateRenderOrder() {
     // Z-position priority (2026-10-11, direct request): the hand closest to the camera in Z always draws above the others;
     // the cursor-distance order above (effectiveRenderOrder, with its overlap smoothing) only breaks ties between hands at the
     // same Z (quantised to 0.01 world units so float noise never reorders them). 100000 > any cursor distance, so Z always wins.
-    const zKey = Math.round(hand.wrapper.position.z * (camera.position.z >= 0 ? 1 : -1) / 0.01)
+    const zKey = Math.round(renderOrderZ(hand) * (camera.position.z >= 0 ? 1 : -1) / 0.01)
     const roBase = zKey * 100000 + Math.min(Math.max(hand.effectiveRenderOrder, 0), 99999)
     if (hand.skinnedMesh) hand.skinnedMesh.renderOrder = roBase
     if (hand.outlineMesh) hand.outlineMesh.renderOrder = roBase - 0.001
