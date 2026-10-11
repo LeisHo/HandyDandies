@@ -293,6 +293,8 @@ const _brAX = new THREE.Vector3(1, 0, 0), _brAY = new THREE.Vector3(0, 1, 0), _b
 // to the cursor target (its Cursor Target Depth). 'closest' = nearest the cursor on top, 'farthest' = furthest on top.
 // '-' modes (2026-10-11): the same Z with the sign flipped, so the hand with the LOWER Z value is drawn on top.
 const RO_NEG_BASE = { negZ: 'z', negArmBase: 'armBase', negArmEnd: 'armEnd', negPalmCenter: 'palmCenter' }
+// '-' pair modes (2026-10-11): the same test with the verdict reversed (the LOWER former point goes on top).
+const RO_PAIR_NEG = { negPalmToArm: 'palmToArm', negPalmToArmEnd: 'palmToArmEnd', negArmBaseToPalm: 'armBaseToPalm', negArmEndToPalm: 'armEndToPalm', negArmBaseToArmEnd: 'armBaseToArmEnd', negArmEndToArmBase: 'armEndToArmBase' }
 const RO_PAIR_DEFS = { palmToArm: ['palmCenter', 'armBase'], palmToArmEnd: ['palmCenter', 'armEnd'], armBaseToPalm: ['armBase', 'palmCenter'], armEndToPalm: ['armEnd', 'palmCenter'], armBaseToArmEnd: ['armBase', 'armEnd'], armEndToArmBase: ['armEnd', 'armBase'] }
 const RENDER_ORDER_MODE_OPTIONS = [
   { value: 'none', text: 'None' },
@@ -305,7 +307,13 @@ const RENDER_ORDER_MODE_OPTIONS = [
   { value: 'armBaseToPalm', text: 'Arm Base To Palm Center' },
   { value: 'armEndToPalm', text: 'Arm End To Palm Center' },
   { value: 'armBaseToArmEnd', text: 'Arm Base To Arm End' },
-  { value: 'armEndToArmBase', text: 'Arm End To Arm Base' }
+  { value: 'armEndToArmBase', text: 'Arm End To Arm Base' },
+  { value: 'negPalmToArm', text: '-Palm To Arm Base' },
+  { value: 'negPalmToArmEnd', text: '-Palm To Arm End' },
+  { value: 'negArmBaseToPalm', text: '-Arm Base To Palm Center' },
+  { value: 'negArmEndToPalm', text: '-Arm End To Palm Center' },
+  { value: 'negArmBaseToArmEnd', text: '-Arm Base To Arm End' },
+  { value: 'negArmEndToArmBase', text: '-Arm End To Arm Base' }
 ]
 // Cursor tracking point (2026-10-11): the point on each hand that every cursor-tracking measurement (aim, palm angle, screen-space distances, splay / crop distances) is taken from. Computed at the hand's
 // no-tracking pose (so it does not chase the rotation it drives). hand._trk = world position, hand._trkXY = its screen-space distance to the cursor.
@@ -1049,7 +1057,7 @@ function roExplain(lv, r, lo, hi, loAbove) {
     const nm = (n) => (n === 'armBase' ? 'arm base' : n === 'armEnd' ? 'arm end' : 'palm center')
     const fa = hands[up]._xyCursorDist ?? 0, fd = hands[down]._xyCursorDist ?? 0
     const F = (fa < fd || (fa === fd && up < down)) ? up : down, Lh = F === up ? down : up
-    cond = 'Hand ' + (F + 1) + ' (the closer to the cursor, the former) ' + nm(ev.fromNode) + ' Z ' + ev.fromZ[F].toFixed(2) + (F === up ? ' is higher than ' : ' is lower than ') + 'Hand ' + (Lh + 1) + ' ' + nm(ev.toNode) + ' Z ' + ev.toZ[Lh].toFixed(2)
+    cond = 'Hand ' + (F + 1) + ' (the closer to the cursor, the former) ' + nm(ev.fromNode) + ' Z ' + ev.fromZ[F].toFixed(2) + ((F === up) === !ev.neg ? ' is higher than ' : ' is lower than ') + 'Hand ' + (Lh + 1) + ' ' + nm(ev.toNode) + ' Z ' + ev.toZ[Lh].toFixed(2)
   } else {
     const neg = ev.mode === 'closest' || ev.mode === 'closestZ' // their key is minus the distance
     const show = (i) => ((neg ? -1 : 1) * ev.k[i] * 0.01).toFixed(2)
@@ -1099,10 +1107,11 @@ function computeRenderOrderRanks() {
     if (!mode || mode === 'none') return null
     if (evs.has(mode)) return evs.get(mode)
     let ev
-    if (RO_PAIR_DEFS[mode]) {
+    const pairBase = RO_PAIR_NEG[mode] || mode
+    if (RO_PAIR_DEFS[pairBase]) {
       // Pair modes (2026-10-11): the hand CLOSER to the cursor in screen XY is always the FORMER hand (ties: the lower index); its FIRST-named point is compared with the other hand's SECOND-named point. Former point higher in Z by
       // more than the tolerance = the former hand is on top; lower = the other hand is on top; within the tolerance = no decision (the next level decides).
-      const fromNode = RO_PAIR_DEFS[mode][0], toNode = RO_PAIR_DEFS[mode][1]
+      const fromNode = RO_PAIR_DEFS[pairBase][0], toNode = RO_PAIR_DEFS[pairBase][1]
       let arr = roA2A[mode]
       if (!arr || arr.fromZ.length !== n) arr = roA2A[mode] = { fromZ: new Float64Array(n), toZ: new Float64Array(n) }
       for (let i = 0; i < n; i++) {
@@ -1110,7 +1119,7 @@ function computeRenderOrderRanks() {
         arr.fromZ[i] = (fb ? fb.matrixWorld.elements[14] : h.wrapper.position.z) * camSign
         arr.toZ[i] = (tb ? tb.matrixWorld.elements[14] : h.wrapper.position.z) * camSign
       }
-      ev = { pair: true, a2a: true, fromZ: arr.fromZ, toZ: arr.toZ, fromNode, toNode, mode }
+      ev = { pair: true, a2a: true, fromZ: arr.fromZ, toZ: arr.toZ, fromNode, toNode, mode, neg: !!RO_PAIR_NEG[mode] }
     } else {
       let k = roScalar[mode]
       if (!k || k.length !== n) k = roScalar[mode] = new Float64Array(n)
@@ -1172,7 +1181,7 @@ function computeRenderOrderRanks() {
       const aFormer = da < db || (da === db && a < b)
       const F = aFormer ? a : b, Lh = aFormer ? b : a
       const d = ev.fromZ[F] - ev.toZ[Lh]
-      const vF = d > TOL ? 1 : d < -TOL ? -1 : 0
+      const vF = (d > TOL ? 1 : d < -TOL ? -1 : 0) * (ev.neg ? -1 : 1)
       return aFormer ? vF : -vF
     }
     const d = ev.k[a] - ev.k[b]
