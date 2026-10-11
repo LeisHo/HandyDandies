@@ -258,6 +258,9 @@ const _loadingPreviewBase = new THREE.Vector3()
 // frozen-at-trigger splay must stay on the same 3D value it blends against.
 let xyFieldMinDist = 0, xyFieldDistRange = 0.001
 let fieldBounds = null // { x:[min,max], y:[..], z:[..] } or null when no limit is active (Field Layout > Hand Position Min / Max)
+// Per cursor-tracking feature: the cursor target at THAT feature's own depth (2026-10-11), plus its field distance domain.
+const _trackTargetArm = new THREE.Vector3(), _trackTargetPalm = new THREE.Vector3(), _trackTargetSplay = new THREE.Vector3(), _trackTargetCrop = new THREE.Vector3()
+let splayFieldMin = 0, splayFieldRange = 0.001, cropFieldMin = 0, cropFieldRange = 0.001
 const _trackTargetXY = new THREE.Vector3() // cursor target at a hand's own depth, for Use Cursor Target Depth = off
 // Screen-space distance scratch + scale (see cursorDistXY()); early-state block so top-level load order is safe.
 const _scrV = new THREE.Vector3(), _scrV2 = new THREE.Vector3()
@@ -935,6 +938,7 @@ const DEV_GROUPS = [
       { key: 'armRotationEnabled', label: 'Responsive Arm Rotation (Master On/Off)', type: 'checkbox', def: true, perDevice: true },
       // Use Cursor Target Depth (2026-10-11, direct request): on = aim at / measure to the 3D cursor target (depth from Cursor Target Depth); off = screen XY only.
       { key: 'armRotationUseDepth', label: 'Arm Rotation Uses Cursor Target Depth', type: 'checkbox', def: true, perDevice: true },
+      { key: 'armRotationTargetDepth', label: 'Arm Rotation Cursor Target Depth (x Field Radius)', type: 'slider', min: -2, max: 2, step: 0.05, def: 0.05, defMobile: 0.8, defLandscape: 0.6, perDevice: true },
       // Default Arm Rotation -- CORRECTED 2026-09-28, direct correction
       // ("Default Arm Rotation isnt reactiveness. Its just the default if
       // responsive is turned off. just like the other cursor tracking
@@ -977,6 +981,7 @@ const DEV_GROUPS = [
       { key: 'palmFacesCursor', label: 'Palm Faces Cursor', type: 'checkbox', def: true, perDevice: true },
       // The palm angle itself is already a screen-XY compass; this only switches the distance its Palm Rotation Distance Curve reads.
       { key: 'palmRotationUseDepth', label: 'Palm Rotation Uses Cursor Target Depth', type: 'checkbox', def: true, perDevice: true },
+      { key: 'palmRotationTargetDepth', label: 'Palm Rotation Cursor Target Depth (x Field Radius)', type: 'slider', min: -2, max: 2, step: 0.05, def: 0.05, defMobile: 0.8, defLandscape: 0.6, perDevice: true },
       // Adds directly onto whatever angle is already in effect --
       // computeRadialRollDeg()'s own dynamic angle when Palm Faces
       // Cursor is on, or 0 (just this slider alone) when it's off --
@@ -1603,7 +1608,8 @@ const DEV_GROUPS = [
       // def convention) -- 1 = instant (the old, undamped behavior), lower
       // = smoother. Applied in animate()'s own per-hand loop, not here.
       { key: 'armLengthDamping', label: 'Wrist Cropping Damping (x)', type: 'slider', min: 0.02, max: 1, step: 0.01, def: 1 },
-      { key: 'armLengthUseDepth', label: 'Wrist Cropping Uses Cursor Target Depth', type: 'checkbox', def: true }
+      { key: 'armLengthUseDepth', label: 'Wrist Cropping Uses Cursor Target Depth', type: 'checkbox', def: true },
+      { key: 'armLengthTargetDepth', label: 'Wrist Cropping Cursor Target Depth (x Field Radius)', type: 'slider', min: -2, max: 2, step: 0.05, def: 0.05, defMobile: 0.8, defLandscape: 0.6, perDevice: true }
     ]
   },
   {
@@ -1657,6 +1663,7 @@ const DEV_GROUPS = [
       // nothing"/stale-bind-pose bugs this stagger must not interact with.
       { key: 'wristSplayReposeStagger', label: 'Reactive Splay Update Stagger (Frames, 1=Off)', type: 'slider', min: 1, max: 8, step: 1, def: 4 },
       { key: 'wristSplayUseDepth', label: 'Wrist Splay Uses Cursor Target Depth', type: 'checkbox', def: true },
+      { key: 'wristSplayTargetDepth', label: 'Wrist Splay Cursor Target Depth (x Field Radius)', type: 'slider', min: -2, max: 2, step: 0.05, def: 0.05, defMobile: 0.8, defLandscape: 0.6, perDevice: true },
       { key: 'wristSplayDefault', label: 'Default Wrist Splay (Deg, Reactive Off)', type: 'slider', min: -180, max: 180, step: 1, def: 7 },
       { key: 'wristSplayReactiveEnabled', label: 'Reactive Wrist Splay (By Cursor Distance)', type: 'checkbox', def: true },
       { key: 'wristSplayRange', label: 'Min / Max Wrist Splay (Deg)', type: 'text', def: '{"min":5,"max":-71}', onChange: () => parseWristSplayConfig() },
@@ -3321,6 +3328,15 @@ function updateCursorTarget() {
   }
   cursorTarget.z = sceneState.fieldRadius * cfg.targetDepthFactor
   targetMarker.position.copy(cursorTarget)
+  updateTrackingTargets()
+}
+// Each cursor-tracking feature has its own Cursor Target Depth (x Field Radius); falls back to the shared one if unset.
+function updateTrackingTargets() {
+  const R = sceneState.fieldRadius, shared = cfg.targetDepthFactor
+  _trackTargetArm.set(cursorTarget.x, cursorTarget.y, R * (cfg.armRotationTargetDepth ?? shared))
+  _trackTargetPalm.set(cursorTarget.x, cursorTarget.y, R * (cfg.palmRotationTargetDepth ?? shared))
+  _trackTargetSplay.set(cursorTarget.x, cursorTarget.y, R * (cfg.wristSplayTargetDepth ?? shared))
+  _trackTargetCrop.set(cursorTarget.x, cursorTarget.y, R * (cfg.armLengthTargetDepth ?? shared))
 }
 
 // -----------------------------------------------------------------------
@@ -7130,7 +7146,8 @@ function updateArmRotationGateVisibility() {
 // Wrist Splay Use Cursor Target Depth (2026-10-11): off = screen-space XY distance only, on = the 3D distance to the cursor target.
 function splayDegForHand(hand, live, minLiveDist, liveDistRange) {
   if (cfg.wristSplayUseDepth === false) return computeResponsiveWristSplayDeg(handXYDist(hand), xyFieldMinDist, xyFieldDistRange)
-  return computeResponsiveWristSplayDeg(live, minLiveDist, liveDistRange)
+  if (hand._splayDist === undefined) return computeResponsiveWristSplayDeg(live, minLiveDist, liveDistRange)
+  return computeResponsiveWristSplayDeg(hand._splayDist, splayFieldMin, splayFieldRange) // distance to the cursor at Wrist Splay's own depth
 }
 function computeResponsiveWristSplayDeg(distanceToCursor, minLiveDist, liveDistRange) {
   if (!cfg.wristSplayResponsiveEnabled) return 0
@@ -9238,9 +9255,78 @@ function releaseHandFromOtherFunctions(hand, exceptId) {
     }
   })
 }
+// ---- Live distance-driven values (2026-10-11, direct request) ----
+// "As I drag the cursor around, the rate ... will also change, such that the hands closest to the cursor at any time
+// will always follow the curve editors ... this applies to all features within click functions that depend on hand
+// distance from cursor." Every value a click function reads from a distance curve (Start Time, Animation Speed,
+// Start Distance, Retransition Start Time / Speed, Tween Stop Start Time / Delay, Offset To Camera) used to be frozen
+// at trigger time; it is now re-evaluated from the hand's CURRENT screen-space distance every frame while the
+// function is active. Positions never jump because rates are integrated: a speed change scales how fast a per-hand
+// "nominal clock" advances (fwdNom / loopNom / lapNom) instead of re-dividing a wall-clock elapsed time, and the
+// retransition progress is accumulated (retProg) rather than recomputed from elapsed / speed. With a curve off, or the
+// cursor not moving, every number equals the old frozen one. Cursor Offset was already live.
+function liveCurveValue(hand, curveParsed, rangeParsed) {
+  return computeStartDelayMs(handXYDist(hand), xyFieldMinDist, xyFieldDistRange, curveParsed, rangeParsed)
+}
+function liveTempo(nominalMs, liveMs) {
+  if (!(nominalMs > 0) || !(liveMs > 0)) return 1
+  return THREE.MathUtils.clamp(nominalMs / liveMs, 0.02, 50)
+}
+function liveStartDelayMs(hand, p, trig, isTween) {
+  if (cfg[`${p}StartTimeCurveEnabled`] === false) return 0
+  return isTween ? liveCurveValue(hand, trig.tweenStartCurveParsed, trig.tweenStartRangeParsed) : liveCurveValue(hand, trig.startCurveParsed, trig.startRangeParsed)
+}
+// kind: 'hold' (chp state) or 'pose' (cp state). Called at the top of each per-hand update, before any phase logic.
+function refreshLiveDistanceState(st, hand, p, trig, now, kind) {
+  // Waiting to start: re-evaluate the Start Time delay from where the hand is now.
+  if (st.pendingClaimAt && st.pendingPressAt !== undefined) {
+    st.pendingClaimAt = st.pendingPressAt + liveStartDelayMs(hand, p, trig, !!st.pendingIsTween)
+  }
+  if (st.phase === 'idle') { st.liveTick = now; return }
+  const dt = Math.max(now - (st.liveTick ?? now), 0)
+  st.liveTick = now
+  // Values that are plain functions of distance (no rate): Offset To Camera amount, Start Distance tween amount.
+  if (cfg[`${p}CameraOffsetEnabled`]) st.frozenOffsetNorm = captureCameraOffsetNorm(hand)
+  if (cfg[`${p}StartDistanceCurveEnabled`]) {
+    const cap = computeTweenFractionCap(handXYDist(hand), cfg[`${p}StartDistanceMin`], cfg[`${p}StartDistanceMax`], trig.startDistanceCurveParsed)
+    if (cap !== null) st.frozenTweenFractionCap = cap // out of range keeps the last cap rather than snapping
+  }
+  // Rates. Animation Speed Curve -> tempo of the forward / loop / lap clocks (nominal speed = the value at commit).
+  let tempo = 1
+  if (cfg[`${p}SpeedCurveEnabled`] && st.frozenSpeedMs > 0 && st.phase !== 'retransition') tempo = liveTempo(st.frozenSpeedMs, liveCurveValue(hand, trig.speedCurveParsed, trig.speedRangeParsed))
+  st.liveTempo = tempo
+  if (st.phase === 'forward') {
+    st.fwdNom = (st.fwdNom ?? 0) + dt * tempo
+  } else if (kind === 'hold' && st.phase === 'looping') {
+    if (!(st.loopHoldEndTime && now < st.loopHoldEndTime)) st.loopNom = (st.loopNom ?? 0) + dt * tempo
+  } else if (kind === 'pose' && st.phase === 'sequencePlaying') {
+    if (!(st.sequenceHoldEndTime && now < st.sequenceHoldEndTime)) st.lapNom = (st.lapNom ?? 0) + dt * tempo
+  } else if (kind === 'hold' && st.phase === 'stopping') {
+    // Tween Stop Start Time / Delay curves, live.
+    st.stoppingStartDelay = cfg[`${p}TweenStopStartTimeCurveEnabled`] ? liveCurveValue(hand, trig.tweenStopStartCurveParsed, trig.tweenStopStartRangeParsed) : 0
+    st.stoppingDelayMs = Math.max(cfg[`${p}TweenStopDelayCurveEnabled`] ? liveCurveValue(hand, trig.tweenStopDelayCurveParsed, trig.tweenStopDelayRangeParsed) : (cfg[`${p}TweenStopDelayMs`] || 0), 1)
+  } else if (st.phase === 'retransition') {
+    if (st._retSeenStart !== st.retransitionStartTime) { // a new retransition just began
+      st._retSeenStart = st.retransitionStartTime
+      st.retProg = 0
+      st.retElapsed = Math.max(now - st.retransitionStartTime, 0)
+    }
+    st.retElapsed += dt
+    const isTw = kind === 'hold' && !!st.retransitionIsTween
+    const delay = cfg[`${p}RetransitionStartTimeCurveEnabled`] === false ? 0
+      : (isTw ? liveCurveValue(hand, trig.tweenRetransitionCurveParsed, trig.tweenRetransitionRangeParsed) : liveCurveValue(hand, trig.retransitionCurveParsed, trig.retransitionRangeParsed))
+    const speedMs = Math.max(cfg[`${p}RetransitionSpeedCurveEnabled`]
+      ? (isTw ? liveCurveValue(hand, trig.tweenRetransitionSpeedCurveParsed, trig.tweenRetransitionSpeedRangeParsed) : liveCurveValue(hand, trig.retransitionSpeedCurveParsed, trig.retransitionSpeedRangeParsed))
+      : (isTw ? cfg[`${p}TweenRetransitionSpeedMs`] : cfg[`${p}RetransitionSpeedMs`]), 1)
+    st.retransitionDelay = delay
+    const eff = Math.min(dt, st.retElapsed - delay)
+    if (eff > 0) st.retProg = Math.min((st.retProg ?? 0) + eff / speedMs, 1)
+  }
+}
 function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) {
   const trig = clickHoldPoseTriggers[p]
   const chp = getOrInitHandCHP(hand)[p]
+  refreshLiveDistanceState(chp, hand, p, trig, now, 'hold')
   // CORRECTED 2026-09-30, direct request: "for all click functions, even
   // if i set start time to 0 ms, make sure that that is after any hold or
   // click confirm duration setting. so that if im doing a triple click,
@@ -9304,6 +9390,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
         ? computeStartDelayMs(handXYDist(hand), xyFieldMinDist, xyFieldDistRange, trig.tweenStartCurveParsed, trig.tweenStartRangeParsed)
         : computeStartDelayMs(handXYDist(hand), xyFieldMinDist, xyFieldDistRange, trig.startCurveParsed, trig.startRangeParsed))
       chp.pendingClaimAt = now + delay
+      chp.pendingPressAt = now; chp.pendingIsTween = isTweenStart // live Start Time (refreshLiveDistanceState)
       chp.pendingTweenFractionCap = tweenFractionCap
       chp.pendingFrozenSplayDeg = splayDegForHand(hand, live, minLiveDist, liveDistRange)
       // CORRECTED 2026-09-27 -- see applyPoseValuesToHand()'s own comment.
@@ -9368,6 +9455,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     chp.glideTimeFactor = applyFirstGlideScale(p, chp.tweenSegments)
     chp.phase = 'forward'
     chp.forwardStartTime = now
+    chp.fwdNom = 0; chp.liveTick = now
     chp.frozenSplayDeg = chp.pendingFrozenSplayDeg
     chp.fromSplayDeg = chp.pendingFromSplayDeg // CORRECTED 2026-09-27 -- see the arm-time capture's own comment
     chp.frozenSpeedMs = chp.pendingFrozenSpeedMs
@@ -9393,7 +9481,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     // fully spent BEFORE commit (see the pending-claim block above), so
     // visible movement starts immediately at `chp.forwardStartTime`.
     const isTween = isSequenceOrChainMode(p)
-    const elapsed = now - chp.forwardStartTime
+    const elapsed = chp.fwdNom ?? (now - chp.forwardStartTime) // nominal clock (live Animation Speed tempo)
     // Animation Speed Curve (Single Pose only) overrides the flat
     // TransitionSpeedMs slider when enabled -- `chp.frozenSpeedMs` was
     // computed once at this hand's own commit above.
@@ -9449,6 +9537,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
       if (progress >= 1 && loopMode !== 'Off' && trig.loopPoses && trig.loopPoses.length >= 2) {
         chp.phase = 'looping'
         chp.loopStartTime = now
+        chp.loopNom = 0
         chp.loopHoldEndTime = 0
         // Oscillate's first lap plays BACKWARD (last named pose -> first),
         // continuing seamlessly from where forward just ended -- direction
@@ -9511,13 +9600,14 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
       // "repeat" alternates forward/backward each lap.
       chp.loopHoldEndTime = 0
       chp.loopStartTime = now
+      chp.loopNom = 0
       if (cfg[`${p}LoopMode`] === 'Oscillate') chp.loopDirection *= -1
     }
     // Per-hand when the Speed Curve is on (2026-10-04) -- same division
     // across the named poses trig.loopSegmentMs uses, from this hand's own
     // frozen speed instead of the shared flat Tween Speed.
     const loopSegMs = loopSegmentMsFor(p, chp, trig)
-    const elapsedSegments = (now - chp.loopStartTime) / loopSegMs
+    const elapsedSegments = (chp.loopNom ?? (now - chp.loopStartTime)) / loopSegMs
     let values, lapT
     if (cfg[`${p}LoopMode`] === 'Oscillate') {
       const segments = trig.loopPoses.length - 1
@@ -9570,7 +9660,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
       } else {
         const holdMs = Math.max(cfg[`${p}LoopHoldMs`] ?? 0, 0)
         if (holdMs > 0) chp.loopHoldEndTime = now + holdMs
-        else chp.loopStartTime = now // no hold configured -- restart the lap clock seamlessly, same as the old always-continuous behavior
+        else { chp.loopStartTime = now; chp.loopNom = 0 } // no hold configured -- restart the lap clock seamlessly, same as the old always-continuous behavior
       }
     }
   } else if (chp.phase === 'stopping') {
@@ -9606,7 +9696,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
       // converted to segments with the lap's own segment duration -- and
       // comes to rest wherever that lands (Loop wraps round, Oscillate
       // bounces). Falls back to the old hold if the sequence data is gone.
-      chp.stoppingVirtualElapsedMs += dt * decayFactor
+      chp.stoppingVirtualElapsedMs += dt * decayFactor * (chp.liveTempo || 1)
       if (chp.stoppingLoopBaseSegments != null && trig.loopPoses && trig.loopPoses.length >= 2) {
         values = loopPoseValuesBeyondLap(p, chp, trig, chp.stoppingLoopBaseSegments + chp.stoppingVirtualElapsedMs / loopSegmentMsFor(p, chp, trig))
       } else {
@@ -9620,7 +9710,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
       const stopEasing = cfg[`${p}EasingCurveEnabled`] ? getEasingProfile(p, true, trig) : null
       if (stopEasing) speedMs = Math.max(stopEasing.T, 1)
       speedMs = Math.max(speedMs * (chp.glideTimeFactor || 1), 1) // First Transition Time Scale
-      chp.stoppingVirtualElapsedMs += dt * decayFactor
+      chp.stoppingVirtualElapsedMs += dt * decayFactor * (chp.liveTempo || 1)
       const progressRaw = THREE.MathUtils.clamp((chp.stoppingBaseElapsedMs + chp.stoppingVirtualElapsedMs) / speedMs, 0, 1)
       const progress = stopEasing ? easingProfilePAt(stopEasing, progressRaw) : progressRaw
       // `* frozenTweenFractionCap` (CORRECTED 2026-09-28) -- the forward
@@ -9680,7 +9770,8 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
         : (chp.retransitionIsTween ? cfg[`${p}TweenRetransitionSpeedMs`] : cfg[`${p}RetransitionSpeedMs`]),
       1
     )
-    const progress = elapsed < chp.retransitionDelay ? 0 : THREE.MathUtils.clamp((elapsed - chp.retransitionDelay) / speedMs, 0, 1)
+    // Live (2026-10-11): progress is accumulated in refreshLiveDistanceState() from the hand's current Retransition Start Time / Speed curves.
+    const progress = chp.retProg ?? (elapsed < chp.retransitionDelay ? 0 : THREE.MathUtils.clamp((elapsed - chp.retransitionDelay) / speedMs, 0, 1))
     // CORRECTED 2026-09-27 (2nd round, real measured bug -- direct report
     // "there is always a jump on the trigger after a hold release," a
     // follow-up on the splay fix above) -- retransition used to target
@@ -9982,7 +10073,7 @@ function endClickHoldPose(p) {
         : 0
       chp.stoppingLastFrameTime = now
       chp.stoppingWasLooping = chp.phase === 'looping'
-      chp.stoppingBaseElapsedMs = chp.stoppingWasLooping ? 0 : Math.max(now - chp.forwardStartTime, 0)
+      chp.stoppingBaseElapsedMs = chp.stoppingWasLooping ? 0 : Math.max(chp.fwdNom ?? (now - chp.forwardStartTime), 0)
       // Released while looping: remember how many segments into the lap the
       // hand was, so 'stopping' can keep it travelling and slow it down
       // (2026-10-04) instead of freezing it for the whole delay. A hand
@@ -9991,7 +10082,7 @@ function endClickHoldPose(p) {
         const lapSegments = cfg[`${p}LoopMode`] === 'Oscillate' ? trig.loopPoses.length - 1 : trig.loopPoses.length
         chp.stoppingLoopBaseSegments = (chp.loopHoldEndTime && now < chp.loopHoldEndTime)
           ? lapSegments
-          : Math.max(now - chp.loopStartTime, 0) / loopSegmentMsFor(p, chp, trig)
+          : Math.max(chp.loopNom ?? (now - chp.loopStartTime), 0) / loopSegmentMsFor(p, chp, trig)
       } else {
         chp.stoppingLoopBaseSegments = null
       }
@@ -10334,6 +10425,7 @@ function getOrInitHandCP(hand) {
 function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) {
   const cp = getOrInitHandCP(hand)[p]
   const isTween = isSequenceOrChainMode(p)
+  refreshLiveDistanceState(cp, hand, p, clickPoseTriggers[p], now, 'pose')
   if (cp.pendingClaimAt && now >= cp.pendingClaimAt) {
     // FIX 2026-10-04 (direct report: "when i interrupt a offset to camera
     // sequence, there are jumps. They jump back to their original position
@@ -10362,6 +10454,7 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
     cp.glideTimeFactor = poseGlideTimeFactor(p, cp.tweenPoses)
     cp.phase = 'forward'
     cp.triggerTime = now
+    cp.fwdNom = 0; cp.liveTick = now
     cp.frozenSplayDeg = cp.pendingFrozenSplayDeg
     cp.fromSplayDeg = cp.pendingFromSplayDeg // CORRECTED 2026-09-27 -- see the arm-time capture's own comment
     cp.frozenSpeedMs = cp.pendingFrozenSpeedMs
@@ -10379,7 +10472,7 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
     // No `forwardDelay` subtraction needed anymore -- that delay is now
     // fully spent BEFORE commit above, so visible movement starts
     // immediately at `cp.triggerTime` (now the COMMIT moment).
-    const elapsed = now - cp.triggerTime
+    const elapsed = cp.fwdNom ?? (now - cp.triggerTime) // nominal clock (live Animation Speed tempo)
     // Tween's own separate `${p}TweenSpeedMs`, not `${p}TransitionSpeedMs`
     // -- see makeClickHoldPoseGroup()'s own comment for why these are 2
     // genuinely distinct values, not an aliased view of one field.
@@ -10448,6 +10541,7 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
       if (isTween && (playMode === 'Loop' || playMode === 'Oscillate' || (playMode === 'Count' && totalLaps > 1))) {
         cp.sequenceLapIndex = 1
         cp.sequenceLapStartTime = now
+        cp.lapNom = 0
         cp.sequenceHoldEndTime = 0
         cp.sequenceDirection = 1
         cp.phase = 'sequencePlaying'
@@ -10475,10 +10569,11 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
     if (cp.sequenceHoldEndTime && now >= cp.sequenceHoldEndTime) {
       cp.sequenceHoldEndTime = 0
       cp.sequenceLapStartTime = now
+      cp.lapNom = 0
       if (lapStyle === 'Oscillate') cp.sequenceDirection *= -1
     }
     const speedMs = Math.max(animSpeedMs(p, true, cp.frozenSpeedMs), 1)
-    const lapT = THREE.MathUtils.clamp((now - cp.sequenceLapStartTime) / speedMs, 0, 1)
+    const lapT = THREE.MathUtils.clamp((cp.lapNom ?? (now - cp.sequenceLapStartTime)) / speedMs, 0, 1)
     let values
     if (lapStyle === 'Oscillate') {
       // Start Distance Curve (2026-09-27) -- capped the same way the
@@ -10527,6 +10622,7 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
         cp.sequenceHoldEndTime = now + holdMs
       } else {
         cp.sequenceLapStartTime = now
+        cp.lapNom = 0
         if (lapStyle === 'Oscillate') cp.sequenceDirection *= -1
       }
     }
@@ -10590,7 +10686,8 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
   } else if (cp.phase === 'retransition') {
     const elapsed = now - cp.retransitionStartTime
     const speedMs = Math.max(cfg[`${p}RetransitionSpeedCurveEnabled`] ? cp.retransitionSpeedMs : cfg[`${p}RetransitionSpeedMs`], 1)
-    const progress = elapsed < cp.retransitionDelay ? 0 : THREE.MathUtils.clamp((elapsed - cp.retransitionDelay) / speedMs, 0, 1)
+    // Live (2026-10-11): accumulated in refreshLiveDistanceState() from the hand's current Retransition Start Time / Speed curves.
+    const progress = cp.retProg ?? (elapsed < cp.retransitionDelay ? 0 : THREE.MathUtils.clamp((elapsed - cp.retransitionDelay) / speedMs, 0, 1))
     // CORRECTED 2026-09-27 -- see updateClickHoldPoseForHand()'s own
     // matching 'retransition'-phase comment for the full reasoning.
     const values = lerpPoseValues(cp.retransitionStart, cfg, progress)
@@ -10736,6 +10833,7 @@ function triggerClickPose(p, onlyHands = null) {
       ? computeStartDelayMs(dists[i], minD, range, trig.tweenStartCurveParsed, trig.tweenStartRangeParsed)
       : computeStartDelayMs(dists[i], minD, range, trig.startCurveParsed, trig.startRangeParsed))
     cp.pendingClaimAt = now + delay
+    cp.pendingPressAt = now; cp.pendingIsTween = isTween // live Start Time (refreshLiveDistanceState)
     cp.pendingForwardSnapshot = forwardSnapshot
     cp.pendingNamedPoses = namedPoses
     cp.pendingTweenFractionCap = tweenFractionCap
@@ -10743,7 +10841,7 @@ function triggerClickPose(p, onlyHands = null) {
     // retransition) -- see updateClickHoldPoseForHand()'s own top
     // comment for why Responsive Wrist Splay must not keep recomputing
     // live throughout an explicit pose transition.
-    cp.pendingFrozenSplayDeg = (cfg.wristSplayUseDepth === false ? computeResponsiveWristSplayDeg(handXYDist(hand), xyFieldMinDist, xyFieldDistRange) : computeResponsiveWristSplayDeg(hand.wrapper.position.distanceTo(cursorTarget), splay3dMin, splay3dRange)) // 3D (with Cursor Target Depth) on purpose: must match the live idle splay it blends with
+    cp.pendingFrozenSplayDeg = splayDegForHand(hand, hand.wrapper.position.distanceTo(cursorTarget), splay3dMin, splay3dRange) // 3D (with Cursor Target Depth) on purpose: must match the live idle splay it blends with
     // CORRECTED 2026-09-27 -- see updateClickHoldPoseForHand()'s own
     // matching capture for the full reasoning.
     cp.pendingFromSplayDeg = hand.currentSplayDeg
@@ -15139,14 +15237,20 @@ function animate(dt, now) {
         const armRotUseDepth = cfg.armRotationUseDepth !== false
         const palmUseDepth = cfg.palmRotationUseDepth !== false
         let cursorDistMinD = 0, cursorDistMaxD = 0
-        if ((cfg.armRotationCurveEnabled && armRotUseDepth) || (cfg.palmFacesCursorDistanceCurveEnabled && palmUseDepth)) {
-          const __cursorDists = hands.map((h) => h.wrapper.position.distanceTo(cursorTarget))
-          cursorDistMinD = Math.min(...__cursorDists)
-          cursorDistMaxD = Math.max(...__cursorDists)
+        let palmDistMinD = 0, palmDistMaxD = 0
+        if (cfg.armRotationCurveEnabled && armRotUseDepth) {
+          const __armDists = hands.map((h) => h.wrapper.position.distanceTo(_trackTargetArm))
+          cursorDistMinD = Math.min(...__armDists)
+          cursorDistMaxD = Math.max(...__armDists)
+        }
+        if (cfg.palmFacesCursorDistanceCurveEnabled && palmUseDepth) {
+          const __palmDists = hands.map((h) => h.wrapper.position.distanceTo(_trackTargetPalm))
+          palmDistMinD = Math.min(...__palmDists)
+          palmDistMaxD = Math.max(...__palmDists)
         }
         const __cursorTrackingStart = performance.now()
         hands.forEach((hand) => {
-          _lookAtMatrixScratch.lookAt(hand.wrapper.position, armRotUseDepth ? cursorTarget : _trackTargetXY.set(cursorTarget.x, cursorTarget.y, hand.wrapper.position.z), UP)
+          _lookAtMatrixScratch.lookAt(hand.wrapper.position, armRotUseDepth ? _trackTargetArm : _trackTargetXY.set(cursorTarget.x, cursorTarget.y, hand.wrapper.position.z), UP)
           const lookAtDesired = _lookAtQuatScratch.setFromRotationMatrix(_lookAtMatrixScratch)
           // CORRECTED 2026-09-28 (5th round of this same jump investigation) --
           // direct report, repeated and precise: with Retransition OFF the
@@ -15245,7 +15349,7 @@ function animate(dt, now) {
             // longer being "a fraction of a fixed target angle."
             let responsiveness = (cfg.armRotationDefault ?? 100) / 100
             if (cfg.armRotationCurveEnabled) {
-              const distToCursor = armRotUseDepth ? hand.wrapper.position.distanceTo(cursorTarget) : handXYDist(hand)
+              const distToCursor = armRotUseDepth ? hand.wrapper.position.distanceTo(_trackTargetArm) : handXYDist(hand)
               const range = armRotUseDepth ? Math.max(cursorDistMaxD - cursorDistMinD, 1e-6) : xyFieldDistRange
               const normDist = (distToCursor - (armRotUseDepth ? cursorDistMinD : xyFieldMinDist)) / range
               responsiveness = (armRotationCurveParsed && armRotationCurveParsed.length)
@@ -15279,9 +15383,9 @@ function animate(dt, now) {
           // full responsiveness; at far distance, reduced (curve y-value
           // acts as a responsiveness multiplier on baseDeg).
           if (baseDeg !== 0 && cfg.palmFacesCursorDistanceCurveEnabled) {
-            const distToCursor = palmUseDepth ? hand.wrapper.position.distanceTo(cursorTarget) : handXYDist(hand)
-            const range = palmUseDepth ? Math.max(cursorDistMaxD - cursorDistMinD, 1e-6) : xyFieldDistRange
-            const normDist = (distToCursor - (palmUseDepth ? cursorDistMinD : xyFieldMinDist)) / range
+            const distToCursor = palmUseDepth ? hand.wrapper.position.distanceTo(_trackTargetPalm) : handXYDist(hand)
+            const range = palmUseDepth ? Math.max(palmDistMaxD - palmDistMinD, 1e-6) : xyFieldDistRange
+            const normDist = (distToCursor - (palmUseDepth ? palmDistMinD : xyFieldMinDist)) / range
             const responsiveness = palmFacesCursorDistanceCurveParsed && palmFacesCursorDistanceCurveParsed.length
               ? evaluateArmLengthCurve(palmFacesCursorDistanceCurveParsed, normDist)
               : 1
@@ -15645,6 +15749,20 @@ function updateRenderOrder() {
   // once per frame, right alongside the values it mirrors.
   liveFieldMinDist = minLiveDist
   liveFieldDistRange = liveDistRange
+  // Wrist Splay / Wrist Cropping each measure to the cursor at their own Cursor Target Depth (2026-10-11).
+  updateTrackingTargets()
+  let spMin = Infinity, spMax = -Infinity, crMin = Infinity, crMax = -Infinity
+  for (let ti = 0; ti < hands.length; ti++) {
+    const th = hands[ti], tp = th.wrapper.position
+    const ds = tp.distanceTo(_trackTargetSplay), dc = tp.distanceTo(_trackTargetCrop)
+    th._splayDist = ds; th._cropDist = dc
+    if (ds < spMin) spMin = ds
+    if (ds > spMax) spMax = ds
+    if (dc < crMin) crMin = dc
+    if (dc > crMax) crMax = dc
+  }
+  splayFieldMin = spMin; splayFieldRange = Math.max(spMax - spMin, 0.001)
+  cropFieldMin = crMin; cropFieldRange = Math.max(crMax - crMin, 0.001)
   let restMin = Infinity, restMax = -Infinity
   for (let ri = 0; ri < hands.length; ri++) {
     const rh = hands[ri]
@@ -15699,7 +15817,7 @@ function updateRenderOrder() {
     // instantly rather than lerping from nothing.
     const targetArmLengthT = cfg.armLengthUseDepth === false
       ? computeArmLengthT(hand, handXYDist(hand), xyFieldMinDist, xyFieldDistRange) // Wrist Cropping Use Cursor Target Depth off: screen-space XY only
-      : computeArmLengthT(hand, live, minLiveDist, liveDistRange)
+      : computeArmLengthT(hand, hand._cropDist ?? live, hand._cropDist === undefined ? minLiveDist : cropFieldMin, hand._cropDist === undefined ? liveDistRange : cropFieldRange) // distance to the cursor at Wrist Cropping's own depth
     const armLengthDampingAmt = THREE.MathUtils.clamp(cfg.armLengthDamping ?? 1, 0.001, 1)
     hand.currentArmLengthT = hand.currentArmLengthT !== undefined
       ? hand.currentArmLengthT + (targetArmLengthT - hand.currentArmLengthT) * armLengthDampingAmt
