@@ -63,6 +63,7 @@ let alignQuat = new THREE.Quaternion()
 // the mesh is "the palm") that this simpler 2D-rotation spec doesn't
 // need at all.
 let wristCropNormalAligned = null
+let wristCropNormalRawModel = null // the same forearm axis in the model's own raw frame; computeRollQuat() turns it by each hand's live currentBaseQuat
 // Palm Faces Cursor Distance Curve's own parsed state (2026-09-24) --
 // modulates cursor-tracking responsiveness by hand distance. Parsed
 // from cfg.palmFacesCursorDistanceCurve in parseCursorTrackingConfig().
@@ -125,8 +126,11 @@ function computeRadialRollDeg(handPos, cursorPos) {
 // not a per-call scratch.
 const _rollAxisFallbackScratch = new THREE.Vector3(0, 0, -1)
 const _rollQuatScratch = new THREE.Quaternion()
-function computeRollQuat(baseDeg) {
-  const axis = wristCropNormalAligned || _rollAxisFallbackScratch
+const _rollAxisScratch = new THREE.Vector3()
+// Palm roll axis = the hand's own forearm line AFTER its current model rotation (alignQuat * Whole-Hand * Rotation at Base = hand.currentBaseQuat), so the palm spins about the
+// forearm as the default / triggered pose leaves it (2026-10-11, direct request). With no extra rotation currentBaseQuat is alignQuat and this equals the old fixed axis.
+function computeRollQuat(baseDeg, hand) {
+  const axis = (hand && wristCropNormalRawModel) ? _rollAxisScratch.copy(wristCropNormalRawModel).applyQuaternion(hand.currentBaseQuat) : (wristCropNormalAligned || _rollAxisFallbackScratch)
   const offsetRad = THREE.MathUtils.degToRad((baseDeg || 0) + (cfg.palmFaceRotationOffset || 0))
   return _rollQuatScratch.setFromAxisAngle(axis, offsetRad)
 }
@@ -15100,6 +15104,7 @@ gltfLoader.load(
       forearmBaseBone.getWorldPosition(forearmBasePos)
       const wristCropNormalRaw = wristPos.clone().sub(forearmBasePos).normalize()
       wristCropNormalAligned = wristCropNormalRaw.clone().applyQuaternion(alignQuat)
+      wristCropNormalRawModel = wristCropNormalRaw.clone()
     }
 
     // Real mesh bounding sphere (see its own declaration comment) --
@@ -15920,7 +15925,7 @@ function animate(dt, now) {
           // no skeleton/pose involvement either way. Arm Rotation's own
           // `desired` is applied directly (not slerped again) -- it's
           // already fully damped via armRotationDampingAmt above.
-          hand.wrapper.quaternion.copy(desired).multiply(computeRollQuat(hand.currentPalmRollDeg))
+          hand.wrapper.quaternion.copy(desired).multiply(computeRollQuat(hand.currentPalmRollDeg, hand))
         })
         __frameProfiler.cursorTrackingMs += performance.now() - __cursorTrackingStart
       }

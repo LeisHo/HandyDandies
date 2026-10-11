@@ -17047,6 +17047,14 @@ immediatly"; (2) "make sure cursor tracking also respects the new default poses'
    clone position the set is identical (0 differing vertices); the block is a descendant of the clone. An earlier 1139-vs-5479 difference was a stale-skeleton artifact of the probe, not the app. No code change.
  `main.js` `?v=335` -> `?v=337`.
 
+2026-10-11  -  (Palm Rotation roll axis follows the default pose's rotation)
+
+Direct request (after asking how cursor-tracking Arm / Palm Rotation take the default pose's rotation into account): the palm roll should spin about the forearm as the default leaves it.
+ - Arm Rotation already composed correctly: wrapper = look-at (from the hand's field position) * roll, and the default pose's Whole-Hand / Rotation at Base rotation (hand.clone = currentBaseQuat) sits inside it.
+ - Palm Rotation rolled about a FIXED axis (the wrist-crop normal rotated by alignQuat only), so a default with Whole-Hand or Base rotation made the palm spin about the original forearm line, not the rotated one.
+   computeRollQuat(baseDeg, hand) now builds the axis per hand: the raw forearm normal (wristCropNormalRawModel) turned by hand.currentBaseQuat. With no extra rotation currentBaseQuat is alignQuat, so the
+   result equals the old axis; with a default / triggered pose rotation the axis follows it (currentBaseQuat is kept live by the pose code). `main.js` `?v=337` -> `?v=338`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a
