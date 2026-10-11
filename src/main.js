@@ -767,7 +767,7 @@ function tryStartField() {
   // whatever comes next; don't treat this comment's own reasoning above
   // as the settled explanation.
   renderer.compile(scene, camera)
-  window.__debug = { THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose, resolveTweenSegmentsWithAnchor, lerpTweenSegments, lerpLoopSegments, isHoldEntry, updateLoadingPreviewWristClip, lerpPoseValues, get loadingPreviewRenderer() { return loadingPreviewRenderer }, get loadingPreviewScene() { return loadingPreviewScene }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, get handBoundsCenterLocal() { return handBoundsCenterLocal }, multiPointCommit, multiPointEligibleFunctions, get multiPointActiveTouchCount() { return multiPointActiveTouchCount }, get multiPointSessionFiredPoseId() { return multiPointSessionFiredPoseId }, detectPoseJumps, get poseJumpLogEntries() { return poseJumpLogEntries }, applyCurlToSkeletonReference, handLogTriggerLabel, applyAllFingerCurls, syncCameraPanelFromLive, animSpeedMs, chainSequenceCount, applyFieldBounds, cursorDistXY, hexBrightnessPct, toonThresholdForMidBrightness }
+  window.__debug = { updateOnScreenFlags, evaluateArmLengthCurve, THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose, resolveTweenSegmentsWithAnchor, lerpTweenSegments, lerpLoopSegments, isHoldEntry, updateLoadingPreviewWristClip, lerpPoseValues, get loadingPreviewRenderer() { return loadingPreviewRenderer }, get loadingPreviewScene() { return loadingPreviewScene }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, get handBoundsCenterLocal() { return handBoundsCenterLocal }, multiPointCommit, multiPointEligibleFunctions, get multiPointActiveTouchCount() { return multiPointActiveTouchCount }, get multiPointSessionFiredPoseId() { return multiPointSessionFiredPoseId }, detectPoseJumps, get poseJumpLogEntries() { return poseJumpLogEntries }, applyCurlToSkeletonReference, handLogTriggerLabel, applyAllFingerCurls, syncCameraPanelFromLive, animSpeedMs, chainSequenceCount, applyFieldBounds, cursorDistXY, hexBrightnessPct, toonThresholdForMidBrightness }
   loadingEl.classList.add('hidden')
   // The loading-preview canvas is a top-level sibling of #loading now
   // (2026-09-17, decoupled specifically so this moment doesn't force it
@@ -7056,7 +7056,17 @@ function evaluateArmLengthCurve(points, x) {
   if (points.length === 1) return points[0].y
   const sorted = points // already kept sorted by the widget itself
   if (x <= sorted[0].x) return sorted[0].y
-  if (x >= sorted[sorted.length - 1].x) return sorted[sorted.length - 1].y
+  if (x >= sorted[sorted.length - 1].x) {
+    const last = sorted[sorted.length - 1]
+    // Beyond x = 1 (a hand farther from the cursor than the farthest ON-SCREEN hand, 2026-10-11): continue the curve
+    // along its final segment's slope instead of holding the last value. Callers clamp the result to their own range.
+    if (x > 1 && sorted.length >= 2) {
+      const prev = sorted[sorted.length - 2]
+      const slope = last.x > prev.x ? (last.y - prev.y) / (last.x - prev.x) : 0
+      return last.y + slope * (x - 1)
+    }
+    return last.y
+  }
   const method = sorted[0].m || 'monotone'
   const easing = CURVE_EASING_FNS[method]
   const useMonotone = !easing && method !== 'catmullrom' && method !== 'natural'
@@ -7108,7 +7118,7 @@ function computeArmLengthT(hand, distanceToCursor, minLiveDist, liveDistRange) {
   // same as every other Responsive-* feature this same round gates the
   // same way (Wrist Splay, the new Responsive Arm Rotation).
   if (!cfg.trackingEnabled || !cfg.reactiveArmLengthEnabled) return cfg.hideWrist / 100
-  const normDist = THREE.MathUtils.clamp((distanceToCursor - minLiveDist) / liveDistRange, 0, 1)
+  const normDist = Math.max((distanceToCursor - minLiveDist) / liveDistRange, 0) // > 1 for hands beyond the farthest on-screen hand (extrapolated)
   const curveY = THREE.MathUtils.clamp(evaluateArmLengthCurve(armLengthCurveParsed, normDist), 0, 1)
   const minT = armLengthRangeParsed.min / 100, maxT = armLengthRangeParsed.max / 100
   return minT + (maxT - minT) * curveY
@@ -7155,7 +7165,7 @@ function computeResponsiveWristSplayDeg(distanceToCursor, minLiveDist, liveDistR
   // comment; same "Responsive-* falls back to its static default while
   // Tracking Enabled is off" treatment.
   if (!cfg.trackingEnabled || !cfg.wristSplayReactiveEnabled) return cfg.wristSplayDefault
-  const normDist = THREE.MathUtils.clamp((distanceToCursor - minLiveDist) / liveDistRange, 0, 1)
+  const normDist = Math.max((distanceToCursor - minLiveDist) / liveDistRange, 0) // > 1 for hands beyond the farthest on-screen hand (extrapolated)
   const curveY = THREE.MathUtils.clamp(evaluateArmLengthCurve(wristSplayCurveParsed, normDist), 0, 1)
   const { min, max } = wristSplayRangeParsed
   return min + (max - min) * curveY
@@ -7293,7 +7303,7 @@ function buildWristSplayWidgets() {
 function buildCursorTrackingWidgets() {
   const curveRow = document.querySelector('.dp-row[data-key="palmFacesCursorDistanceCurve"]')
   const rangeRow = document.querySelector('.dp-row[data-key="palmFacesCursorDistanceRange"]')
-  if (curveRow) buildGenericCurveWidget(curveRow, { caption: 'X: Distance From Cursor (Nearest→Farthest Hand)  ·  Y: Palm Rotation Responsiveness (0=None, 1=Full)', defaultPoints: [{ x: 0, y: 1 }, { x: 1, y: 1 }] })
+  if (curveRow) buildGenericCurveWidget(curveRow, { caption: 'X: Distance From Cursor (Nearest→Farthest On-Screen Hand)  ·  Y: Palm Rotation Responsiveness (0=None, 1=Full)', defaultPoints: [{ x: 0, y: 1 }, { x: 1, y: 1 }] })
   if (rangeRow) buildGenericRangeBarWidget(rangeRow, { trackMin: -180, trackMax: 180, unit: '°', defaultValue: { min: 0, max: 180 } })
 }
 // Responsive Arm Rotation's own curve-graph widget -- same builder,
@@ -7302,7 +7312,7 @@ function buildCursorTrackingWidgets() {
 // own DEV_GROUPS comment).
 function buildArmRotationWidgets() {
   const curveRow = document.querySelector('.dp-row[data-key="armRotationCurve"]')
-  if (curveRow) buildGenericCurveWidget(curveRow, { caption: 'X: Distance From Cursor (Nearest→Farthest Hand)  ·  Y: Arm Rotation Amount (0=None, 1=Full)', defaultPoints: [{ x: 0, y: 1 }, { x: 1, y: 1 }] })
+  if (curveRow) buildGenericCurveWidget(curveRow, { caption: 'X: Distance From Cursor (Nearest→Farthest On-Screen Hand)  ·  Y: Arm Rotation Amount (0=None, 1=Full)', defaultPoints: [{ x: 0, y: 1 }, { x: 1, y: 1 }] })
 }
 
 function buildArmLengthRangeWidget(row) {
@@ -7503,7 +7513,7 @@ function buildArmLengthCurveWidget(row) {
   // "(0-1)" axis language here is what led to typing "0.5" into the
   // (0-100-scale) Default Arm Length slider expecting "half," silently
   // producing a barely-there 0.5% crop instead of the intended 50%.
-  const caption = elLocal('div', { fontSize: '10px', opacity: '0.7', marginTop: '3px', textAlign: 'center' }, { text: 'X: Distance From Cursor (%, Nearest→Farthest Hand This Frame)  ·  Y: Crop (0%=None, 100%=Full)' })
+  const caption = elLocal('div', { fontSize: '10px', opacity: '0.7', marginTop: '3px', textAlign: 'center' }, { text: 'X: Distance From Cursor (%, Nearest→Farthest On-Screen Hand, Live)  ·  Y: Crop (0%=None, 100%=Full)' })
   row.appendChild(svg)
   row.appendChild(caption)
 
@@ -7746,7 +7756,7 @@ function buildWristSplayCurveWidget(row) {
   const curvePath = document.createElementNS(svgNS, 'path')
   curvePath.setAttribute('fill', 'none'); curvePath.setAttribute('stroke', 'var(--dp-accent, #7d8cff)'); curvePath.setAttribute('stroke-width', '2')
   svg.appendChild(axisX); svg.appendChild(axisY); svg.appendChild(curvePath)
-  const caption = elLocal('div', { fontSize: '10px', opacity: '0.7', marginTop: '3px', textAlign: 'center' }, { text: 'X: Distance From Cursor (%, Nearest→Farthest Hand This Frame)  ·  Y: Splay Fraction (0=Min End, 1=Max End)' })
+  const caption = elLocal('div', { fontSize: '10px', opacity: '0.7', marginTop: '3px', textAlign: 'center' }, { text: 'X: Distance From Cursor (%, Nearest→Farthest On-Screen Hand, Live)  ·  Y: Splay Fraction (0=Min End, 1=Max End)' })
   row.appendChild(svg)
   row.appendChild(caption)
 
@@ -8298,6 +8308,36 @@ function updateScreenUnitsPerPx() {
   const px = Math.hypot((_scrV2.x - _scrV.x) * w / 2, (_scrV2.y - _scrV.y) * h / 2) // pixels per world unit at the field plane
   if (px > 1e-6) screenUnitsPerPx = 1 / px
 }
+// On-screen test (2026-10-11): every distance curve / Min-Max range normalises against the NEAREST and FARTHEST hand
+// that is actually on screen; hands off screen keep their effect, extrapolated past x = 1 (see evaluateArmLengthCurve()).
+// `_onScr` is read as `!== false`, so an unset flag counts as on screen; if no hand is on screen at all every hand counts.
+const _onScrV = new THREE.Vector3()
+function isOnScreen(pos) {
+  _onScrV.copy(pos).project(camera)
+  return _onScrV.x >= -1 && _onScrV.x <= 1 && _onScrV.y >= -1 && _onScrV.y <= 1 && _onScrV.z > -1 && _onScrV.z < 1
+}
+function updateOnScreenFlags() {
+  let any = false, anyRest = false
+  for (let i = 0; i < hands.length; i++) {
+    const h = hands[i]
+    h._onScr = isOnScreen(h.wrapper.position)
+    h._onScrRest = isOnScreen(h.basePosition || h.wrapper.position)
+    if (h._onScr) any = true
+    if (h._onScrRest) anyRest = true
+  }
+  if (!any) for (let i = 0; i < hands.length; i++) hands[i]._onScr = true
+  if (!anyRest) for (let i = 0; i < hands.length; i++) hands[i]._onScrRest = true
+}
+function onScreenMinMax(dists, flagKey) {
+  let mn = Infinity, mx = -Infinity
+  for (let i = 0; i < dists.length; i++) {
+    if (hands[i][flagKey || '_onScr'] === false) continue
+    if (dists[i] < mn) mn = dists[i]
+    if (dists[i] > mx) mx = dists[i]
+  }
+  if (mn === Infinity) { mn = Math.min(...dists); mx = Math.max(...dists) }
+  return [mn, mx]
+}
 function cursorDistXY(pos) {
   if (screenUnitsPerPx > 0) {
     const w = window.innerWidth, h = window.innerHeight
@@ -8429,7 +8469,7 @@ const _cameraOffsetWorld = new THREE.Vector3()
 // cursor, measured from the hand's REST position at the moment of the call.
 function captureCameraOffsetNorm(hand) {
   const d = cursorDistXY(hand.basePosition || hand.wrapper.position) // world XY only (2026-10-04)
-  return THREE.MathUtils.clamp((d - restFieldMinDist) / restFieldDistRange, 0, 1)
+  return Math.max((d - restFieldMinDist) / restFieldDistRange, 0) // > 1 for hands beyond the farthest on-screen hand (extrapolated)
 }
 function cameraSlotValue(slot, norm) {
   if (!slot || !slot.range) return 0
@@ -8932,7 +8972,7 @@ function loopPoseValuesBeyondLap(p, chp, trig, elapsedSegments) {
   return lerpLoopSequence(trig.loopPoses, (segments - 1) + elapsedSegments)
 }
 function computeStartDelayMs(distanceToCursor, minLiveDist, liveDistRange, curveParsed, rangeParsed) {
-  const normDist = THREE.MathUtils.clamp((distanceToCursor - minLiveDist) / liveDistRange, 0, 1)
+  const normDist = Math.max((distanceToCursor - minLiveDist) / liveDistRange, 0) // > 1 for hands beyond the farthest on-screen hand (extrapolated)
   const curveY = THREE.MathUtils.clamp(evaluateArmLengthCurve(curveParsed, normDist), 0, 1)
   return rangeParsed.min + (rangeParsed.max - rangeParsed.min) * curveY
 }
@@ -9916,8 +9956,10 @@ function endClickHoldPose(p) {
   let minD = Infinity, maxD = -Infinity
   const dists = hands.map((hand) => {
     const d = cursorDistXY(hand.wrapper.position) // world XY only (2026-10-04)
-    if (d < minD) minD = d
-    if (d > maxD) maxD = d
+    if (hand._onScr !== false) { // domain = on-screen hands only (2026-10-11)
+      if (d < minD) minD = d
+      if (d > maxD) maxD = d
+    }
     return d
   })
   const range = Math.max(maxD - minD, 0.001)
@@ -10788,14 +10830,16 @@ function triggerClickPose(p, onlyHands = null) {
   let minD = Infinity, maxD = -Infinity
   const dists = hands.map((hand) => {
     const d = cursorDistXY(hand.wrapper.position) // world XY only (2026-10-04)
-    if (d < minD) minD = d
-    if (d > maxD) maxD = d
+    if (hand._onScr !== false) { // domain = on-screen hands only (2026-10-11)
+      if (d < minD) minD = d
+      if (d > maxD) maxD = d
+    }
     return d
   })
   const range = Math.max(maxD - minD, 0.001)
   // 3D min/range for the frozen wrist splay only -- see the splay line below.
   let splay3dMin = Infinity, splay3dMax = -Infinity
-  hands.forEach((h3) => { const d3 = h3.wrapper.position.distanceTo(cursorTarget); if (d3 < splay3dMin) splay3dMin = d3; if (d3 > splay3dMax) splay3dMax = d3 })
+  hands.forEach((h3) => { if (h3._onScr === false) return; const d3 = h3.wrapper.position.distanceTo(cursorTarget); if (d3 < splay3dMin) splay3dMin = d3; if (d3 > splay3dMax) splay3dMax = d3 })
   const splay3dRange = Math.max(splay3dMax - splay3dMin, 0.001)
   hands.forEach((hand, i) => {
     if (onlyHands && !onlyHands.has(hand)) return // Skip If Same Pose / Multi Trigger already chose this trigger for other hands
@@ -11621,8 +11665,8 @@ const CLICK_HOLD_START_TIME_TRACK_MAX = 3000 // ms -- a deliberately smaller cei
 // Curve + range-bar widgets for the per-axis Cursor Offset and Offset To
 // Camera rows (2026-10-02) -- shared by both widget builders.
 function buildOffsetAxisWidgets(p) {
-  const cursorCaption = 'X: Distance From Cursor (Live, Nearest→Farthest Hand In Field)  ·  Y: Offset Fraction (0=Min, 1=Max)'
-  const cameraCaption = 'X: Distance From Cursor (Nearest→Farthest Hand, Frozen At Trigger)  ·  Y: Offset Fraction (0=Min, 1=Max)  ·  Moves toward (+) / away (-) the camera on this world axis'
+  const cursorCaption = 'X: Distance From Cursor (Live, Nearest→Farthest On-Screen Hand)  ·  Y: Offset Fraction (0=Min, 1=Max)'
+  const cameraCaption = 'X: Distance From Cursor (Nearest→Farthest On-Screen Hand, Live)  ·  Y: Offset Fraction (0=Min, 1=Max)  ·  Moves toward (+) / away (-) the camera on this world axis'
   ;['CursorOffset', 'CameraOffset'].forEach((prefix) => {
     const caption = prefix === 'CameraOffset' ? cameraCaption : cursorCaption
     ;['X', 'Y', 'Z'].forEach((ax) => {
@@ -11644,7 +11688,7 @@ function buildClickHoldPoseWidgets(p) {
   // slider range, not the 0-3000ms start-time ceiling below).
   const speedCurveRow = document.querySelector(`.dp-row[data-key="${p}SpeedCurve"]`)
   const speedRangeRow = document.querySelector(`.dp-row[data-key="${p}SpeedCurveRange"]`)
-  const speedCurveCaption = 'X: Distance From Cursor (%, Nearest→Farthest Hand At Trigger Time)  ·  Y: Speed Fraction (0=Min, 1=Max)'
+  const speedCurveCaption = 'X: Distance From Cursor (%, Nearest→Farthest On-Screen Hand, Live)  ·  Y: Speed Fraction (0=Min, 1=Max)'
   if (speedCurveRow) buildGenericCurveWidget(speedCurveRow, { caption: speedCurveCaption, defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
   if (speedRangeRow) buildGenericRangeBarWidget(speedRangeRow, { trackMin: 50, trackMax: 2000, unit: 'ms', defaultValue: { min: 500, max: 1500 } })
   // Retransition Speed Curve's own curve/range widgets (item 5, 2026-09-24)
@@ -11673,7 +11717,7 @@ function buildClickHoldPoseWidgets(p) {
   const retransRangeRow = document.querySelector(`.dp-row[data-key="${p}RetransitionStartTimeRange"]`)
   const tweenRetransCurveRow = document.querySelector(`.dp-row[data-key="${p}TweenRetransitionStartTimeCurve"]`)
   const tweenRetransRangeRow = document.querySelector(`.dp-row[data-key="${p}TweenRetransitionStartTimeRange"]`)
-  const curveCaption = 'X: Distance From Cursor (%, Nearest→Farthest Hand At Trigger Time)  ·  Y: Start Time Fraction (0=Min, 1=Max)'
+  const curveCaption = 'X: Distance From Cursor (%, Nearest→Farthest On-Screen Hand, Live)  ·  Y: Start Time Fraction (0=Min, 1=Max)'
   if (startCurveRow) buildGenericCurveWidget(startCurveRow, { caption: curveCaption, defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
   if (startRangeRow) buildGenericRangeBarWidget(startRangeRow, { trackMin: 0, trackMax: CLICK_HOLD_START_TIME_TRACK_MAX, unit: 'ms', defaultValue: { min: 0, max: 300 } })
   // Tween's own separate curve/range widgets -- same shape/caption/track
@@ -11695,7 +11739,7 @@ function buildClickHoldPoseWidgets(p) {
   if (tweenStopStartRangeRow) buildGenericRangeBarWidget(tweenStopStartRangeRow, { trackMin: 0, trackMax: CLICK_HOLD_START_TIME_TRACK_MAX, unit: 'ms', defaultValue: { min: 0, max: 300 } })
   const tweenStopDelayCurveRow = document.querySelector(`.dp-row[data-key="${p}TweenStopDelayCurve"]`)
   const tweenStopDelayRangeRow = document.querySelector(`.dp-row[data-key="${p}TweenStopDelayRange"]`)
-  const tweenStopDelayCurveCaption = 'X: Distance From Cursor (%, Nearest→Farthest Hand At Trigger Time)  ·  Y: Delay Fraction (0=Min, 1=Max)'
+  const tweenStopDelayCurveCaption = 'X: Distance From Cursor (%, Nearest→Farthest On-Screen Hand, Live)  ·  Y: Delay Fraction (0=Min, 1=Max)'
   if (tweenStopDelayCurveRow) buildGenericCurveWidget(tweenStopDelayCurveRow, { caption: tweenStopDelayCurveCaption, defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
   if (tweenStopDelayRangeRow) buildGenericRangeBarWidget(tweenStopDelayRangeRow, { trackMin: 0, trackMax: 5000, unit: 'ms', defaultValue: { min: 0, max: 2000 } })
   // Start Distance Curve (2026-09-27) -- see buildClickPoseWidgets()'s own
@@ -11723,7 +11767,7 @@ function buildClickHoldPoseWidgets(p) {
   // slider it replaces when enabled).
   const cursorOffsetCurveRow = document.querySelector(`.dp-row[data-key="${p}CursorOffsetDistanceCurve"]`)
   const cursorOffsetRangeRow = document.querySelector(`.dp-row[data-key="${p}CursorOffsetDistanceCurveRange"]`)
-  if (cursorOffsetCurveRow) buildGenericCurveWidget(cursorOffsetCurveRow, { caption: 'X: Distance From Cursor (Live, Nearest→Farthest Hand In Field)  ·  Y: Offset Distance Fraction (0=Min, 1=Max)', defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
+  if (cursorOffsetCurveRow) buildGenericCurveWidget(cursorOffsetCurveRow, { caption: 'X: Distance From Cursor (Live, Nearest→Farthest On-Screen Hand)  ·  Y: Offset Distance Fraction (0=Min, 1=Max)', defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
   if (cursorOffsetRangeRow) buildGenericRangeBarWidget(cursorOffsetRangeRow, { trackMin: -50, trackMax: 50, unit: 'wu', defaultValue: { min: -50, max: 50 } })
 }
 // Runs now, not back up near the other widgets' own setup calls (parse-
@@ -11742,7 +11786,7 @@ function buildClickPoseWidgets(p) {
   // reasoning (a real gap fixed alongside it, shared word-for-word).
   const speedCurveRow = document.querySelector(`.dp-row[data-key="${p}SpeedCurve"]`)
   const speedRangeRow = document.querySelector(`.dp-row[data-key="${p}SpeedCurveRange"]`)
-  const speedCurveCaption = 'X: Distance From Cursor (%, Nearest→Farthest Hand At Trigger Time)  ·  Y: Speed Fraction (0=Min, 1=Max)'
+  const speedCurveCaption = 'X: Distance From Cursor (%, Nearest→Farthest On-Screen Hand, Live)  ·  Y: Speed Fraction (0=Min, 1=Max)'
   if (speedCurveRow) buildGenericCurveWidget(speedCurveRow, { caption: speedCurveCaption, defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
   if (speedRangeRow) buildGenericRangeBarWidget(speedRangeRow, { trackMin: 50, trackMax: 2000, unit: 'ms', defaultValue: { min: 500, max: 1500 } })
   // Retransition Speed Curve's own curve/range widgets (item 5, 2026-09-24)
@@ -11757,7 +11801,7 @@ function buildClickPoseWidgets(p) {
   const tweenStartRangeRow = document.querySelector(`.dp-row[data-key="${p}TweenStartTimeRange"]`)
   const retransCurveRow = document.querySelector(`.dp-row[data-key="${p}RetransitionStartTimeCurve"]`)
   const retransRangeRow = document.querySelector(`.dp-row[data-key="${p}RetransitionStartTimeRange"]`)
-  const curveCaption = 'X: Distance From Cursor (%, Nearest→Farthest Hand At Trigger Time)  ·  Y: Start Time Fraction (0=Min, 1=Max)'
+  const curveCaption = 'X: Distance From Cursor (%, Nearest→Farthest On-Screen Hand, Live)  ·  Y: Start Time Fraction (0=Min, 1=Max)'
   if (startCurveRow) buildGenericCurveWidget(startCurveRow, { caption: curveCaption, defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
   if (startRangeRow) buildGenericRangeBarWidget(startRangeRow, { trackMin: 0, trackMax: CLICK_HOLD_START_TIME_TRACK_MAX, unit: 'ms', defaultValue: { min: 0, max: 300 } })
   if (tweenStartCurveRow) buildGenericCurveWidget(tweenStartCurveRow, { caption: curveCaption, defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
@@ -11786,7 +11830,7 @@ function buildClickPoseWidgets(p) {
   // own matching comment.
   const cursorOffsetCurveRow = document.querySelector(`.dp-row[data-key="${p}CursorOffsetDistanceCurve"]`)
   const cursorOffsetRangeRow = document.querySelector(`.dp-row[data-key="${p}CursorOffsetDistanceCurveRange"]`)
-  if (cursorOffsetCurveRow) buildGenericCurveWidget(cursorOffsetCurveRow, { caption: 'X: Distance From Cursor (Live, Nearest→Farthest Hand In Field)  ·  Y: Offset Distance Fraction (0=Min, 1=Max)', defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
+  if (cursorOffsetCurveRow) buildGenericCurveWidget(cursorOffsetCurveRow, { caption: 'X: Distance From Cursor (Live, Nearest→Farthest On-Screen Hand)  ·  Y: Offset Distance Fraction (0=Min, 1=Max)', defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
   if (cursorOffsetRangeRow) buildGenericRangeBarWidget(cursorOffsetRangeRow, { trackMin: -50, trackMax: 50, unit: 'wu', defaultValue: { min: -50, max: 50 } })
 }
 // -----------------------------------------------------------------------
@@ -15239,13 +15283,11 @@ function animate(dt, now) {
         let palmDistMinD = 0, palmDistMaxD = 0
         if (cfg.armRotationCurveEnabled && armRotUseDepth) {
           const __armDists = hands.map((h) => h.wrapper.position.distanceTo(_trackTargetArm))
-          cursorDistMinD = Math.min(...__armDists)
-          cursorDistMaxD = Math.max(...__armDists)
+          ;[cursorDistMinD, cursorDistMaxD] = onScreenMinMax(__armDists)
         }
         if (cfg.palmFacesCursorDistanceCurveEnabled && palmUseDepth) {
           const __palmDists = hands.map((h) => h.wrapper.position.distanceTo(_trackTargetPalm))
-          palmDistMinD = Math.min(...__palmDists)
-          palmDistMaxD = Math.max(...__palmDists)
+          ;[palmDistMinD, palmDistMaxD] = onScreenMinMax(__palmDists)
         }
         const __cursorTrackingStart = performance.now()
         hands.forEach((hand) => {
@@ -15661,6 +15703,7 @@ window.addEventListener('focus', syncPauseWithVisibility)
 const REORDER_SMOOTHING = 0.15
 function updateRenderOrder() {
   idleReposeFrameCounter++
+  updateOnScreenFlags()
   updateScreenUnitsPerPx() // world units per screen pixel at the field plane, for the screen-space click-function distance
   // Everything an IDLE hand's finger curl depends on, as one string (2026-10-04): pose settings (finger,
   // wrist, model rotation) and the shared base orientation. The curl is independent of the wrapper's
@@ -15734,8 +15777,10 @@ function updateRenderOrder() {
   let minLiveDist = Infinity, maxLiveDist = -Infinity
   const liveDistances = hands.map((hand) => {
     const d = hand.wrapper.position.distanceTo(cursorTarget)
-    if (d < minLiveDist) minLiveDist = d
-    if (d > maxLiveDist) maxLiveDist = d
+    if (hand._onScr !== false) { // domain = on-screen hands only (2026-10-11)
+      if (d < minLiveDist) minLiveDist = d
+      if (d > maxLiveDist) maxLiveDist = d
+    }
     return d
   })
   const liveDistRange = Math.max(maxLiveDist - minLiveDist, 0.001)
@@ -15755,6 +15800,7 @@ function updateRenderOrder() {
     const th = hands[ti], tp = th.wrapper.position
     const ds = tp.distanceTo(_trackTargetSplay), dc = tp.distanceTo(_trackTargetCrop)
     th._splayDist = ds; th._cropDist = dc
+    if (th._onScr === false) continue // domain = on-screen hands only (2026-10-11)
     if (ds < spMin) spMin = ds
     if (ds > spMax) spMax = ds
     if (dc < crMin) crMin = dc
@@ -15767,6 +15813,7 @@ function updateRenderOrder() {
     const rh = hands[ri]
     const rd = cursorDistXY(rh.basePosition || rh.wrapper.position) // world XY only (2026-10-04)
     rh._restCursorDist = rd
+    if (rh._onScrRest === false) continue // domain = on-screen hands only (2026-10-11)
     if (rd < restMin) restMin = rd
     if (rd > restMax) restMax = rd
   }
@@ -15781,6 +15828,7 @@ function updateRenderOrder() {
     const xh = hands[xi]
     const xd = cursorDistXY(xh.wrapper.position)
     xh._xyCursorDist = xd
+    if (xh._onScr === false) continue // domain = on-screen hands only (2026-10-11)
     if (xd < xyMin) xyMin = xd
     if (xd > xyMax) xyMax = xd
   }
