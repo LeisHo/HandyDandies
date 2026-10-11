@@ -27,7 +27,7 @@
       "fieldBoundsX": "{\"min\":-300,\"max\":300}",
       "fieldBoundsY": "{\"min\":-300,\"max\":300}",
       "fieldBoundsZ": "{\"min\":-266,\"max\":125}",
-      "trackingEnabled": true,
+      "trackingEnabled": false,
       "trackingDamping": 0.06,
       "targetDepthFactor": 300,
       "showTargetMarker": false,
@@ -289,7 +289,7 @@
       "modelRotX": 0,
       "modelRotY": 0,
       "modelRotZ": 0,
-      "baseRotationX": 0,
+      "baseRotationX": 180,
       "baseRotationY": 0,
       "baseRotationZ": 0,
       "poseOffsetX": 0,
@@ -6748,9 +6748,9 @@
           "group": "FIST ROTATE"
         }
       ],
-      "cameraX": 6.5043859068079986,
-      "cameraY": 9.506408948421008,
-      "cameraZ": 260.7457020794026,
+      "cameraX": 6.504385906807997,
+      "cameraY": 9.506408948420948,
+      "cameraZ": 260.7457020794025,
       "cameraFov": 15,
       "cameraYaw": 1.429,
       "cameraPitch": -2.087,
@@ -9483,7 +9483,7 @@
       "modelRotX": 0,
       "modelRotY": 0,
       "modelRotZ": 0,
-      "baseRotationX": 0,
+      "baseRotationX": 180,
       "baseRotationY": 0,
       "baseRotationZ": 0,
       "poseOffsetX": 0,
@@ -18677,7 +18677,7 @@
       "modelRotX": 0,
       "modelRotY": 0,
       "modelRotZ": 0,
-      "baseRotationX": 0,
+      "baseRotationX": 180,
       "baseRotationY": 0,
       "baseRotationZ": 0,
       "poseOffsetX": 0,
@@ -187679,8 +187679,8 @@
     "desktop": {
       "left": 820.7999877929688,
       "top": 79.1875,
-      "width": 654.4000244140625,
-      "height": 624.3875122070312
+      "width": 657.6000366210938,
+      "height": 625.9874877929688
     }
   }
 }
