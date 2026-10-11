@@ -2168,6 +2168,7 @@ const cfg = initDevPanel(DEV_GROUPS, {
     await restoreCustomClickFunctions() // sliced: one function per frame
     if (DEBUG_TIMING) (window.__dpProfile = window.__dpProfile || []).push({ label: 'restoreCustomClickFunctions (wall, sliced)', atMs: Math.round(tCcf), ms: Math.round(performance.now() - tCcf) })
     prof('enforceCustomClickFunctionsAnchorOrder', enforceCustomClickFunctionsAnchorOrder)
+    prof('placeDepthControlsInFeatureGroups', placeDepthControlsInFeatureGroups)
     startupSettingsReady = true
     prof('refreshStartupPreviewAfterRestore', refreshStartupPreviewAfterRestore)
     prof('writeStartupCache', writeStartupCache)
@@ -12893,6 +12894,29 @@ async function restoreCustomClickFunctions() {
 // run (called from `onRestore`, right after `restoreCustomClickFunctions()`)
 // -- so this is always the true final word on their position, regardless
 // of what any legacy saved order says or which group it thinks they're in.
+// Cursor Target Depth controls (2026-10-11): the saved panel order puts new rows at the end of whatever group their source
+// array lives in, which is not the feature group the user arranged (Responsive Arm Rotation, Responsive Palm Rotation,
+// Responsive Wrist Cropping). After the order is restored, move each pair next to its feature's first row when it is sitting
+// in a different group. A row already inside its feature's group is left exactly where the user put it.
+function placeDepthControlsInFeatureGroups() {
+  const plan = [
+    ['armRotationEnabled', ['armRotationUseDepth', 'armRotationTargetDepth']],
+    ['palmFacesCursor', ['palmRotationUseDepth', 'palmRotationTargetDepth']],
+    ['cropWristEnabled', ['armLengthUseDepth', 'armLengthTargetDepth']],
+    ['wristSplayResponsiveEnabled', ['wristSplayUseDepth', 'wristSplayTargetDepth']]
+  ]
+  plan.forEach(([anchorKey, keys]) => {
+    const anchor = document.querySelector('.dp-row[data-key="' + anchorKey + '"]')
+    if (!anchor || !anchor.parentNode) return
+    let after = anchor
+    keys.forEach((k) => {
+      const row = document.querySelector('.dp-row[data-key="' + k + '"]')
+      if (!row) return
+      if (row.parentNode !== anchor.parentNode) after.parentNode.insertBefore(row, after.nextSibling)
+      if (row.parentNode === anchor.parentNode) after = row
+    })
+  })
+}
 function enforceCustomClickFunctionsAnchorOrder() {
   const body = document.querySelector('.dp-group[data-key="Custom Click Functions"] > .dp-group-body')
   if (!body) return

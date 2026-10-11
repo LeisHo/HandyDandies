@@ -16812,6 +16812,20 @@ per device, default 0) are added to every hand's grid position in relayoutField(
 together and click-function offsets, the position bounds and the on-screen distance domains all follow it. The camera framing
 is still frozen at the first build, so the field moves relative to the view. `main.js` `?v=316` -> `?v=317`.
 
+2026-10-11  -  (Cursor Target Depth controls moved into their feature groups; Min/Max Arm Rotation status)
+
+Direct report: the new Cursor Target Depth checkboxes and sliders were not in their groups, and "i cant find my min max arm rotation".
+ - Your saved panel order had the Arm Rotation and Palm Rotation depth rows at the end of the top-level Cursor Tracking group and the
+   Wrist Cropping rows at the end of Pose. placeDepthControlsInFeatureGroups() (run after the order is restored, next to
+   enforceCustomClickFunctionsAnchorOrder()) now moves each pair to sit right after its feature's first row: Responsive Arm Rotation
+   (after Master On/Off), Responsive Palm Rotation (after Palm Faces Cursor), Responsive Wrist Cropping (after its master checkbox) and
+   Responsive Wrist Splay (already inside it). A row already inside its feature group is left where you put it; the next Save records
+   the new placement.
+ - Min / Max Arm Rotation (armRotationRange) does not exist any more: it was removed on 2026-09-28 at your request because it capped the
+   angle and caused the 360-degree flip. Nothing was lost by this round; the saved file has no value for it. Palm Rotation still has its
+   Min / Max (Deg). Asked what a new Arm Rotation Min / Max should do before building one.
+   `main.js` `?v=317` -> `?v=318`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a
