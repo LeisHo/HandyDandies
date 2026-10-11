@@ -49,7 +49,7 @@
       "palmFacesCursorDistanceRange": "{\"min\":0,\"max\":180}",
       "loadingPreviewEnabled": true,
       "loadingPreviewShowLive": false,
-      "loadingMinTimeMs": 4000,
+      "loadingMinTimeMs": 200,
       "loadingPreviewTweenSelector": "Waiting Horizontal Tap",
       "loadingPreviewSavedCameras": [
         {
@@ -6682,9 +6682,9 @@
           "group": "FIST ROTATE"
         }
       ],
-      "cameraX": 6.504385906808006,
-      "cameraY": 9.50640894842125,
-      "cameraZ": 260.7457020794028,
+      "cameraX": 6.504385906808004,
+      "cameraY": 9.506408948421189,
+      "cameraZ": 260.74570207940275,
       "cameraFov": 15,
       "cameraYaw": 1.429,
       "cameraPitch": -2.087,
@@ -9177,7 +9177,7 @@
       "palmFacesCursorDistanceRange": "{\"min\":0,\"max\":180}",
       "loadingPreviewEnabled": true,
       "loadingPreviewShowLive": false,
-      "loadingMinTimeMs": 4000,
+      "loadingMinTimeMs": 200,
       "loadingPreviewTweenSelector": "Waiting Horizontal Tap",
       "loadingPreviewSavedCameras": [
         {
@@ -18305,7 +18305,7 @@
       "palmFacesCursorDistanceRange": "{\"min\":0,\"max\":180}",
       "loadingPreviewEnabled": true,
       "loadingPreviewShowLive": false,
-      "loadingMinTimeMs": 4000,
+      "loadingMinTimeMs": 200,
       "loadingPreviewTweenSelector": "Waiting Horizontal Tap",
       "loadingPreviewSavedCameras": [
         {
@@ -28628,7 +28628,7 @@
     },
     {
       "key": "New Group (9)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -28721,7 +28721,7 @@
           "type": "group",
           "group": {
             "key": "Loading Preview",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -29105,7 +29105,7 @@
         },
         {
           "key": "Loading Preview",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
@@ -29560,7 +29560,7 @@
           "type": "group",
           "group": {
             "key": "Pose",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -30961,7 +30961,7 @@
         },
         {
           "key": "Pose",
-          "collapsed": false,
+          "collapsed": true,
           "locked": true,
           "items": [
             {
@@ -187481,8 +187481,8 @@
     "desktop": {
       "left": 922.4000244140625,
       "top": 104,
-      "width": 638.4000244140625,
-      "height": 461.9875183105469
+      "width": 641.6000366210938,
+      "height": 463.5874938964844
     }
   }
 }
