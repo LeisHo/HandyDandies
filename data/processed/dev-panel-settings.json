@@ -231,11 +231,11 @@
       "loadingPreviewRotationX": -80.95249635846959,
       "loadingPreviewRotationY": -176.12784714656706,
       "loadingPreviewRotationZ": 0,
-      "loadingPreviewOffsetX": 0,
+      "loadingPreviewOffsetX": -4.440892098500626e-16,
       "loadingPreviewOffsetY": 0,
       "loadingPreviewOffsetZ": 0,
       "loadingPreviewCameraFov": 32,
-      "loadingPreviewCameraZoom": 161.76948312244252,
+      "loadingPreviewCameraZoom": 161.76948312244255,
       "loadingPreviewCameraEditMode": true,
       "customClickFunctionIds": "[{\"id\":\"custom19\",\"title\":\"Custom Click Function 19\",\"kind\":\"pose\",\"family\":\"mobile\"},{\"id\":\"custom20\",\"title\":\"Custom Click Function 20\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom21\",\"title\":\"Custom Click Function 21\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom22\",\"title\":\"Custom Click Function 22\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom23\",\"title\":\"Custom Click Function 23\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom24\",\"title\":\"Custom Click Function 24\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom25\",\"title\":\"Custom Click Function 25\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom26\",\"title\":\"Custom Click Function 26\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom27\",\"title\":\"Custom Click Function 27\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom28\",\"title\":\"Custom Click Function 28\",\"kind\":\"pose\",\"family\":\"mobile\"},{\"id\":\"custom29\",\"title\":\"Custom Click Function 29\",\"kind\":\"pose\",\"family\":\"mobile\"},{\"id\":\"custom30\",\"title\":\"Custom Click Function 30\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom31\",\"title\":\"Custom Click Function 31\",\"kind\":\"hold\",\"family\":\"desktop\"}]",
       "holdConfirmMs": 400,
@@ -289,7 +289,7 @@
       "modelRotX": 0,
       "modelRotY": 0,
       "modelRotZ": 0,
-      "baseRotationX": 84,
+      "baseRotationX": 180,
       "baseRotationY": 0,
       "baseRotationZ": 0,
       "poseOffsetX": 0,
@@ -6176,7 +6176,7 @@
           "modelRotX": 0,
           "modelRotY": 0,
           "modelRotZ": 0,
-          "baseRotationX": -90,
+          "baseRotationX": 180,
           "baseRotationY": 0,
           "baseRotationZ": 0,
           "poseOffsetX": 0,
@@ -6692,9 +6692,9 @@
           "group": "FIST ROTATE"
         }
       ],
-      "cameraX": 6.504385906808002,
-      "cameraY": 9.506408948421129,
-      "cameraZ": 260.7457020794027,
+      "cameraX": 6.504385906808,
+      "cameraY": 9.506408948421068,
+      "cameraZ": 260.74570207940263,
       "cameraFov": 15,
       "cameraYaw": 1.429,
       "cameraPitch": -2.087,
@@ -9369,11 +9369,11 @@
       "loadingPreviewRotationX": -80.95249635846959,
       "loadingPreviewRotationY": -176.12784714656706,
       "loadingPreviewRotationZ": 0,
-      "loadingPreviewOffsetX": 0,
+      "loadingPreviewOffsetX": -4.440892098500626e-16,
       "loadingPreviewOffsetY": 0,
       "loadingPreviewOffsetZ": 0,
       "loadingPreviewCameraFov": 32,
-      "loadingPreviewCameraZoom": 161.76948312244252,
+      "loadingPreviewCameraZoom": 161.76948312244255,
       "loadingPreviewCameraEditMode": true,
       "customClickFunctionIds": "[{\"id\":\"custom19\",\"title\":\"Custom Click Function 19\",\"kind\":\"pose\",\"family\":\"mobile\"},{\"id\":\"custom20\",\"title\":\"Custom Click Function 20\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom21\",\"title\":\"Custom Click Function 21\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom22\",\"title\":\"Custom Click Function 22\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom23\",\"title\":\"Custom Click Function 23\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom24\",\"title\":\"Custom Click Function 24\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom25\",\"title\":\"Custom Click Function 25\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom26\",\"title\":\"Custom Click Function 26\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom27\",\"title\":\"Custom Click Function 27\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom28\",\"title\":\"Custom Click Function 28\",\"kind\":\"pose\",\"family\":\"mobile\"},{\"id\":\"custom29\",\"title\":\"Custom Click Function 29\",\"kind\":\"pose\",\"family\":\"mobile\"},{\"id\":\"custom30\",\"title\":\"Custom Click Function 30\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom31\",\"title\":\"Custom Click Function 31\",\"kind\":\"hold\",\"family\":\"desktop\"}]",
       "holdConfirmMs": 400,
@@ -9427,7 +9427,7 @@
       "modelRotX": 0,
       "modelRotY": 0,
       "modelRotZ": 0,
-      "baseRotationX": 84,
+      "baseRotationX": 180,
       "baseRotationY": 0,
       "baseRotationZ": 0,
       "poseOffsetX": 0,
@@ -15314,7 +15314,7 @@
           "modelRotX": 0,
           "modelRotY": 0,
           "modelRotZ": 0,
-          "baseRotationX": -90,
+          "baseRotationX": 180,
           "baseRotationY": 0,
           "baseRotationZ": 0,
           "poseOffsetX": 0,
@@ -18507,11 +18507,11 @@
       "loadingPreviewRotationX": -80.95249635846959,
       "loadingPreviewRotationY": -176.12784714656706,
       "loadingPreviewRotationZ": 0,
-      "loadingPreviewOffsetX": 0,
+      "loadingPreviewOffsetX": -4.440892098500626e-16,
       "loadingPreviewOffsetY": 0,
       "loadingPreviewOffsetZ": 0,
       "loadingPreviewCameraFov": 32,
-      "loadingPreviewCameraZoom": 161.76948312244252,
+      "loadingPreviewCameraZoom": 161.76948312244255,
       "loadingPreviewCameraEditMode": true,
       "customClickFunctionIds": "[{\"id\":\"custom19\",\"title\":\"Custom Click Function 19\",\"kind\":\"pose\",\"family\":\"mobile\"},{\"id\":\"custom20\",\"title\":\"Custom Click Function 20\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom21\",\"title\":\"Custom Click Function 21\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom22\",\"title\":\"Custom Click Function 22\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom23\",\"title\":\"Custom Click Function 23\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom24\",\"title\":\"Custom Click Function 24\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom25\",\"title\":\"Custom Click Function 25\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom26\",\"title\":\"Custom Click Function 26\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom27\",\"title\":\"Custom Click Function 27\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom28\",\"title\":\"Custom Click Function 28\",\"kind\":\"pose\",\"family\":\"mobile\"},{\"id\":\"custom29\",\"title\":\"Custom Click Function 29\",\"kind\":\"pose\",\"family\":\"mobile\"},{\"id\":\"custom30\",\"title\":\"Custom Click Function 30\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom31\",\"title\":\"Custom Click Function 31\",\"kind\":\"hold\",\"family\":\"desktop\"}]",
       "holdConfirmMs": 400,
@@ -18565,7 +18565,7 @@
       "modelRotX": 0,
       "modelRotY": 0,
       "modelRotZ": 0,
-      "baseRotationX": 84,
+      "baseRotationX": 180,
       "baseRotationY": 0,
       "baseRotationZ": 0,
       "poseOffsetX": 0,
@@ -24452,7 +24452,7 @@
           "modelRotX": 0,
           "modelRotY": 0,
           "modelRotZ": 0,
-          "baseRotationX": -90,
+          "baseRotationX": 180,
           "baseRotationY": 0,
           "baseRotationZ": 0,
           "poseOffsetX": 0,
@@ -28658,7 +28658,7 @@
     },
     {
       "key": "New Group (9)",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -29590,7 +29590,7 @@
           "type": "group",
           "group": {
             "key": "Pose",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -30991,7 +30991,7 @@
         },
         {
           "key": "Pose",
-          "collapsed": true,
+          "collapsed": false,
           "locked": true,
           "items": [
             {
@@ -187509,10 +187509,10 @@
   "devHotkeys": {},
   "panelGeometry": {
     "desktop": {
-      "left": 922.4000244140625,
-      "top": 104,
-      "width": 644.7999877929688,
-      "height": 465.1875
+      "left": 820.7999877929688,
+      "top": 79.1875,
+      "width": 651.2000122070312,
+      "height": 622.7875366210938
     }
   }
 }
