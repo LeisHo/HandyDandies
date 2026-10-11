@@ -16929,6 +16929,22 @@ visible hand read as a pose change; only the Base Rotation had its own arm-base 
    in this model). Say if Whole-Hand Rotation should use the mesh axes too.
  `main.js` `?v=326` -> `?v=327`.
 
+2026-10-11  -  (correction: only Base Rotation pivots on the arm base)
+
+The previous entry made Whole-Hand Rotation pivot on the arm base too. The user corrected it: "only base rotation rotates around the base point". applyHandArmLength() is back to: Whole-Hand
+Rotation turns the model about the cut point on the field position (as before this session), and ONLY Whole-Hand Rotation at Base keeps the arm-base point fixed and swings the model about it
+(p = s * ( q0 * (base - cut) - q * base ), q0 = alignQuat * Whole-Hand Rotation). `main.js` `?v=327` -> `?v=328` (the position-limit change below ships in the same version).
+
+2026-10-11  -  (position limits: the hand's internal offset stops at the limit too)
+
+Direct suspicion, confirmed by reading the code: applyFieldBounds() clamped only the SHOWN position (wrapper.position), while the hand's accumulated offset (hand._customOffsetAccum, in
+camera right/up/forward) kept growing behind the limit (every loop lap bakes more in). Moving the cursor then had to unwind that hidden excess before the hand visibly moved.
+Fix: when a hand is clamped, the excess (position before the clamp minus after, in world axes) is projected onto the camera right/up/forward and subtracted from the accumulator, so
+the stored value equals the shown value. Only done for a hand that used its accumulator this frame (hand._accumAppliedFrame === idleReposeFrameCounter, set in applyOffsetRotationToHand), so a
+hand merely sitting beyond a limit because of its grid position does not get a phantom offset. The in-flight ramp is recomputed every frame, so the accumulator takes back only the NEW overshoot each
+frame (no runaway), a bake preserves the sum, and a live curve change that lowers the ramp moves the hand off the limit immediately. Retransition snapshots the accumulator at its start, so it
+unwinds from the limit. `main.js` `?v=327` -> `?v=328`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

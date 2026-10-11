@@ -8754,6 +8754,7 @@ function applyOffsetRotationToHand(hand, p, progress) {
   _offsetRightVec.setFromMatrixColumn(camera.matrixWorld, 0)
   _offsetUpVec.setFromMatrixColumn(camera.matrixWorld, 1)
   _offsetForwardVec.setFromMatrixColumn(camera.matrixWorld, 2)
+  hand._accumAppliedFrame = idleReposeFrameCounter // applyFieldBounds() only takes limit overshoot out of the accumulator for hands that used it this frame
   // Accumulated baseline from every previously-completed ramp/lap
   // (any function) -- applied unconditionally, regardless of whether
   // THIS function's own Offset/Rotation happens to be enabled, so a
@@ -14480,14 +14481,19 @@ function applyHandArmLength(hand, hideT) {
     _cutPointRaw.copy(forearmPosRaw).lerp(wristPosRaw, hideT)
   }
   hand.clone.quaternion.copy(baseQuat)
-  // PIVOT ON THE ARM BASE (2026-10-11, direct request: Whole-Hand Rotation AND Whole-Hand Rotation at Base rotate "the entire arm model locally, around the
-  // arm base point as its rotating origin"). The arm-base point (forearmPosRaw) stays exactly where it is with NO user rotation -- i.e. with only alignQuat, the
-  // cut point sitting on the field position -- and the whole model (arm, hand, cropped part) turns about it. With q = alignQuat * WholeHand * Base this is
-  // p = s * ( alignQuat * (base - cut) - q * base ); with no rotation q = alignQuat and it reduces to the old -s * alignQuat * cut. (Before this the pivot was
-  // the cut point itself, which at a high crop is the wrist, so the rotation read as the hand posing in place.)
-  _brPosA.copy(forearmPosRaw).sub(_cutPointRaw).applyQuaternion(alignQuat)
-  _brPosB.copy(forearmPosRaw).applyQuaternion(baseQuat)
-  hand.clone.position.copy(_brPosA).sub(_brPosB).multiplyScalar(scaleFactor)
+  // Whole-Hand Rotation turns the model about the cut point on the field position (unchanged). ONLY Whole-Hand Rotation at Base pivots on the arm base
+  // (direct request 2026-10-11: "only base rotation rotates around the base point"): the arm-base point (forearmPosRaw) stays where it would be without the
+  // base rotation and the model swings about it. p = s * ( q0 * (base - cut) - q * base ), q0 = q * Rb^-1 = alignQuat * Whole-Hand Rotation; with Rb =
+  // identity this is -s * q * cut (the cut point stays on the field position).
+  const rb = hand.currentBaseRb
+  if (rb && (rb.x !== 0 || rb.y !== 0 || rb.z !== 0)) {
+    _baseQ0.copy(baseQuat).multiply(_baseRbInv.copy(rb).invert())
+    _brPosA.copy(forearmPosRaw).sub(_cutPointRaw).applyQuaternion(_baseQ0)
+    _brPosB.copy(forearmPosRaw).applyQuaternion(baseQuat)
+    hand.clone.position.copy(_brPosA).sub(_brPosB).multiplyScalar(scaleFactor)
+  } else {
+    hand.clone.position.copy(_cutPointRaw).applyQuaternion(baseQuat).multiplyScalar(-scaleFactor)
+  }
 }
 
 // "Hide Wrist"/Arm Length clipping plane -- ported from HANDO's own
@@ -14622,14 +14628,32 @@ function onFieldBoundsChanged() {
   parseFieldBounds()
   relayoutField() // puts idle hands back on their grid position so widening a bound releases them
 }
+const _bndRight = new THREE.Vector3(), _bndUp = new THREE.Vector3(), _bndFwd = new THREE.Vector3()
 function applyFieldBounds() {
   if (!fieldBounds) return
   const b = fieldBounds
+  _bndRight.setFromMatrixColumn(camera.matrixWorld, 0)
+  _bndUp.setFromMatrixColumn(camera.matrixWorld, 1)
+  _bndFwd.setFromMatrixColumn(camera.matrixWorld, 2)
   for (let i = 0; i < hands.length; i++) {
-    const p = hands[i].wrapper.position
-    p.x = Math.min(Math.max(p.x, b.x[0]), b.x[1])
-    p.y = Math.min(Math.max(p.y, b.y[0]), b.y[1])
-    p.z = Math.min(Math.max(p.z, b.z[0]), b.z[1])
+    const hand = hands[i]
+    const p = hand.wrapper.position
+    const cx = Math.min(Math.max(p.x, b.x[0]), b.x[1])
+    const cy = Math.min(Math.max(p.y, b.y[0]), b.y[1])
+    const cz = Math.min(Math.max(p.z, b.z[0]), b.z[1])
+    const ex = p.x - cx, ey = p.y - cy, ez = p.z - cz
+    if (ex !== 0 || ey !== 0 || ez !== 0) {
+      p.set(cx, cy, cz)
+      // The hand is at its limit: its INTERNAL offset must stop there too (2026-10-11, direct report). The excess is taken back out of the hand's accumulated
+      // offset (camera right/up/forward, the basis it is stored in), so the stored value equals the shown value; otherwise it keeps growing behind the limit
+      // and has to unwind before the hand visibly moves again. Only when this frame's position really included that accumulator (applyOffsetRotationToHand).
+      const acc = hand._customOffsetAccum
+      if (acc && hand._accumAppliedFrame === idleReposeFrameCounter) {
+        acc.x -= ex * _bndRight.x + ey * _bndRight.y + ez * _bndRight.z
+        acc.y -= ex * _bndUp.x + ey * _bndUp.y + ez * _bndUp.z
+        acc.z -= ex * _bndFwd.x + ey * _bndFwd.y + ez * _bndFwd.z
+      }
+    }
   }
 }
 function buildFieldBoundsWidgets() {
