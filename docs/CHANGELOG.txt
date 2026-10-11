@@ -16893,6 +16893,13 @@ The first deploy of the block (v=322) found no block: GLTFLoader sanitizes node 
 getObjectByName('Clipping Block') returned null -- every hand silently used the old single wrist plane. makeClipRig() now looks for both names.
 The Draco model itself loaded fine (decoder wasm fetched, 6,473-vertex mesh). `main.js` `?v=322` -> `?v=323`.
 
+2026-10-11  -  (Offset To Camera measures from the hand's current position)
+
+Direct request: the distance that drives Offset To Camera is measured from where the hand currently is, not its rest position. captureCameraOffsetNorm() now uses
+handXYDist() (screen-space XY from the current wrapper position) against the on-screen xy domain. Disclosed: the offset now moves the hand and so changes its own
+distance (a feedback loop with a one-frame delay); the earlier rest-position design existed to avoid that. The norm is stored once per frame, so the live ramp and
+the bakes still read the same number. Cursor Offset (main Offset group) is unchanged and still uses the rest position. `main.js` `?v=323` -> `?v=324`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

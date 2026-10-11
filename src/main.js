@@ -8619,11 +8619,13 @@ function evalOffsetAxisSlot(slot, handDist) {
 // Offset group; independent on/off plus a checkbox per axis.
 const _cameraWorldPos = new THREE.Vector3()
 const _cameraOffsetWorld = new THREE.Vector3()
-// Normalized (0 nearest .. 1 farthest hand in the field) distance from the
-// cursor, measured from the hand's REST position at the moment of the call.
+// Normalized (0 nearest .. 1 farthest on-screen hand) screen-space distance from the cursor, measured from where the hand
+// CURRENTLY is (2026-10-11, direct request -- it used to be the hand's rest/grid position). Uses the same current-position
+// domain as every other click-function curve (handXYDist / xyFieldMinDist / xyFieldDistRange). Because the offset itself moves
+// the hand, the amount now feeds back on itself a little: the norm is re-read once per frame (refreshLiveDistanceState) and
+// that one stored value is used by the live ramp and by every bake that frame, so nothing snaps at a bake.
 function captureCameraOffsetNorm(hand) {
-  const d = cursorDistXY(hand.basePosition || hand.wrapper.position) // world XY only (2026-10-04)
-  return Math.max((d - restFieldMinDist) / restFieldDistRange, 0) // > 1 for hands beyond the farthest on-screen hand (extrapolated)
+  return Math.max((handXYDist(hand) - xyFieldMinDist) / xyFieldDistRange, 0) // > 1 for hands beyond the farthest on-screen hand (extrapolated)
 }
 function cameraSlotValue(slot, norm) {
   if (!slot || !slot.range) return 0
