@@ -16917,6 +16917,18 @@ skinned mesh up to the root, measured once at load) and the arm-base point does 
  - The three sliders are absolute Euler angles applied X, then Y, then Z (as in HANDO): the X axis does not follow a Y/Z rotation applied after it.
  `main.js` `?v=324` -> `?v=325`.
 
+2026-10-11  -  (Whole-Hand Rotation and Rotation at Base now pivot on the arm base)
+
+Direct report: both the Whole-Hand Rotation and the new Rotation-at-Base sliders "only seem to affect the hand pose"; they should rotate the entire arm model about the arm base
+point, using the arm base's own axes. Cause: applyHandArmLength() pinned the CUT point (the wrist at a high crop) on the field position and rotated about it, so a rotation of the
+visible hand read as a pose change; only the Base Rotation had its own arm-base compensation, and that was relative to the whole-hand-rotated orientation.
+ - The clone's position is now p = s * ( alignQuat * (base - cut) - q * base ) for every hand, with q the full orientation (alignQuat * Whole-Hand * Base): the arm-base point stays
+   where it is with no user rotation and BOTH rotations turn the whole model about it. The cut point no longer stays on the field position once a rotation is set (the visible hand swings
+   in an arc about the hidden base). With zero rotation the result is identical to before.
+ - Axes: Whole-Hand Rotation keeps the model's raw X/Y/Z axes; Base Rotation keeps HANDO's mesh-local axes (the mesh frame placed at the arm base). The two differ by the mesh frame (+90 about X
+   in this model). Say if Whole-Hand Rotation should use the mesh axes too.
+ `main.js` `?v=326` -> `?v=327`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

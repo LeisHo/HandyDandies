@@ -14480,17 +14480,14 @@ function applyHandArmLength(hand, hideT) {
     _cutPointRaw.copy(forearmPosRaw).lerp(wristPosRaw, hideT)
   }
   hand.clone.quaternion.copy(baseQuat)
-  const rb = hand.currentBaseRb
-  if (rb && (rb.x !== 0 || rb.y !== 0 || rb.z !== 0)) {
-    // Whole-Hand Rotation at Base: the arm-base point (forearmPosRaw) stays where it would be WITHOUT the base rotation, and the hand swings about it.
-    // p = s * ( q0 * (base - cut) - q * base ), with q0 = q * Rb^-1 (the orientation before the base rotation). With Rb = identity this is -s * q * cut, the old line.
-    _baseQ0.copy(baseQuat).multiply(_baseRbInv.copy(rb).invert())
-    _brPosA.copy(forearmPosRaw).sub(_cutPointRaw).applyQuaternion(_baseQ0)
-    _brPosB.copy(forearmPosRaw).applyQuaternion(baseQuat)
-    hand.clone.position.copy(_brPosA).sub(_brPosB).multiplyScalar(scaleFactor)
-  } else {
-    hand.clone.position.copy(_cutPointRaw).applyQuaternion(baseQuat).multiplyScalar(-scaleFactor)
-  }
+  // PIVOT ON THE ARM BASE (2026-10-11, direct request: Whole-Hand Rotation AND Whole-Hand Rotation at Base rotate "the entire arm model locally, around the
+  // arm base point as its rotating origin"). The arm-base point (forearmPosRaw) stays exactly where it is with NO user rotation -- i.e. with only alignQuat, the
+  // cut point sitting on the field position -- and the whole model (arm, hand, cropped part) turns about it. With q = alignQuat * WholeHand * Base this is
+  // p = s * ( alignQuat * (base - cut) - q * base ); with no rotation q = alignQuat and it reduces to the old -s * alignQuat * cut. (Before this the pivot was
+  // the cut point itself, which at a high crop is the wrist, so the rotation read as the hand posing in place.)
+  _brPosA.copy(forearmPosRaw).sub(_cutPointRaw).applyQuaternion(alignQuat)
+  _brPosB.copy(forearmPosRaw).applyQuaternion(baseQuat)
+  hand.clone.position.copy(_brPosA).sub(_brPosB).multiplyScalar(scaleFactor)
 }
 
 // "Hide Wrist"/Arm Length clipping plane -- ported from HANDO's own
