@@ -12,9 +12,9 @@
       "pauseBtnIconColor": "#ffffff",
       "pauseBtnBorderColor": "#ffffff",
       "pausedRenderFps": 15,
-      "fieldRows": 25,
-      "fieldCols": 25,
-      "rowSpacing": 4,
+      "fieldRows": 35,
+      "fieldCols": 35,
+      "rowSpacing": 5,
       "columnSpacing": 7,
       "handScale": 0.8,
       "alternateRowOffset": 3.5,
@@ -6563,8 +6563,8 @@
           "group": "FIST ROTATE"
         }
       ],
-      "cameraX": 6.5,
-      "cameraY": 9.5,
+      "cameraX": 16.5,
+      "cameraY": 9.500000000000004,
       "cameraZ": 260.5698855348217,
       "cameraFov": 15,
       "cameraZoom": 261,
@@ -28543,7 +28543,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
