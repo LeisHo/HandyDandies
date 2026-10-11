@@ -325,6 +325,7 @@ const _armPartialQ = new THREE.Quaternion(), _armOffQx = new THREE.Quaternion(),
 let trkXYFieldMin = 0, trkXYFieldRange = 0.001, trkXYAllMin = 0, trkXYAllRange = 0.001
 let trackingPointCloud = null
 const _cfTmp = new THREE.Vector3() // clickRotatePointInto() scratch
+const _trkV1 = new THREE.Vector3(), _trkV2 = new THREE.Vector3(), _trkWqInv = new THREE.Quaternion() // handTrackingPointInto() scratch
 let renderOrderPointCloud = null // Debug > Show Hand Render Order Points: arm base / arm end / palm center markers
 const _trackTargetXY = new THREE.Vector3() // cursor target at a hand's own depth, for Use Cursor Target Depth = off
 // Screen-space distance scratch + scale (see cursorDistXY()); early-state block so top-level load order is safe.
@@ -1476,7 +1477,26 @@ const _swingRef = new THREE.Vector3(0, 0, -1)
 // (the end of rForearmTwist); Palm Center = the head of rMid1 (the end of rCarpal2). Everything but Hand Position hangs off the arm-base pivot: P + scale * q * (node - armBase).
 function handTrackingPointInto(hand, out) {
   const mode = cfg.trackingPoint
+  hand._trkPivot = null
   if (mode === 'hand') return out.copy(hand.wrapper.position)
+  // "make sure the tracking point follows the real visible hand model" (2026-10-11): the point is read from the REAL rig bone (the same ones the Render Order modes use, last render's world position), so it follows
+  // everything that moves the visible hand - click-function Offset, Offset To Camera, Rotation, the pose's wrist bend / splay, Pose Scale, arm length. Only the CURSOR-TRACKING rotation is taken back out (it is
+  // rotated about the pivot X = the cut point without tracking, see applyHandArmLength(), by the inverse of the wrapper rotation wq, whose click-function part hand._cfRot is then put back), so the point still
+  // does not chase the arm / palm rotation it drives. Falls back to the computed neutral-pose point below until the hand has been drawn once.
+  const bone = renderOrderBone(hand, mode)
+  if (bone) {
+    const e = bone.matrixWorld.elements
+    if (e[12] !== 0 || e[13] !== 0 || e[14] !== 0) {
+      armBasePivotInto(hand, _trkV1) // P + s q0 d  (leaves _trkCut = d = forearm - cut)
+      _trkV2.copy(_trkCut).applyQuaternion(hand.currentBaseQuat).multiplyScalar(computeBaseScale())
+      _trkV1.sub(_trkV2) // X = P + s (q0 - q) d  (= P unless Rotation at Base is used)
+      if (!hand._trkPivot) hand._trkPivot = new THREE.Vector3()
+      hand._trkPivot.copy(_trkV1)
+      _trkWqInv.copy(hand.wrapper.quaternion).invert()
+      out.set(e[12], e[13], e[14]).sub(_trkV1).applyQuaternion(_trkWqInv).add(_trkV1)
+      return out
+    }
+  }
   armBasePivotInto(hand, out)
   if (mode === 'armBase') return out
   _trkExt.copy(mode === 'palmCenter' ? palmCenterPosRaw : wristPosRaw).sub(forearmPosRaw).applyQuaternion(hand.currentBaseQuat).multiplyScalar(hand.clone.scale.x)
@@ -1493,8 +1513,9 @@ let trkStamp = -1
 function clickRotatePointInto(hand, out) {
   const q = hand._cfRot
   if (!q || hand._cfRotFrame === undefined || hand._cfRotFrame < idleReposeFrameCounter - 1 || isIdentityQuat(q)) return out
-  _cfTmp.copy(out).sub(hand.wrapper.position).applyQuaternion(q)
-  return out.copy(hand.wrapper.position).add(_cfTmp)
+  const pv = hand._trkPivot || hand.wrapper.position
+  _cfTmp.copy(out).sub(pv).applyQuaternion(q)
+  return out.copy(pv).add(_cfTmp)
 }
 function handPoint(hand) { return hand._trk || hand.wrapper.position }
 function handRestPoint(hand) { return hand._trkRest || hand.basePosition || hand.wrapper.position }
