@@ -279,7 +279,7 @@
       "modelRotX": 0,
       "modelRotY": 0,
       "modelRotZ": 0,
-      "baseRotationX": 0,
+      "baseRotationX": 180,
       "baseRotationY": 0,
       "baseRotationZ": 0,
       "poseOffsetX": 0,
@@ -6166,7 +6166,7 @@
           "modelRotX": 0,
           "modelRotY": 0,
           "modelRotZ": 0,
-          "baseRotationX": 0,
+          "baseRotationX": 180,
           "baseRotationY": 0,
           "baseRotationZ": 0,
           "poseOffsetX": 0,
@@ -6626,9 +6626,9 @@
           "group": "FIST ROTATE"
         }
       ],
-      "cameraX": 6.504385906807979,
-      "cameraY": 9.506408948421518,
-      "cameraZ": 260.74570207940224,
+      "cameraX": 6.504385906807879,
+      "cameraY": 9.506408948421305,
+      "cameraZ": 260.74570207939803,
       "cameraFov": 15,
       "cameraYaw": 1.429,
       "cameraPitch": -2.087,
@@ -9351,7 +9351,7 @@
       "modelRotX": 0,
       "modelRotY": 0,
       "modelRotZ": 0,
-      "baseRotationX": 0,
+      "baseRotationX": 180,
       "baseRotationY": 0,
       "baseRotationZ": 0,
       "poseOffsetX": 0,
@@ -15238,7 +15238,7 @@
           "modelRotX": 0,
           "modelRotY": 0,
           "modelRotZ": 0,
-          "baseRotationX": 0,
+          "baseRotationX": 180,
           "baseRotationY": 0,
           "baseRotationZ": 0,
           "poseOffsetX": 0,
@@ -18423,7 +18423,7 @@
       "modelRotX": 0,
       "modelRotY": 0,
       "modelRotZ": 0,
-      "baseRotationX": 0,
+      "baseRotationX": 180,
       "baseRotationY": 0,
       "baseRotationZ": 0,
       "poseOffsetX": 0,
@@ -24310,7 +24310,7 @@
           "modelRotX": 0,
           "modelRotY": 0,
           "modelRotZ": 0,
-          "baseRotationX": 0,
+          "baseRotationX": 180,
           "baseRotationY": 0,
           "baseRotationZ": 0,
           "poseOffsetX": 0,
@@ -187313,8 +187313,8 @@
     "desktop": {
       "left": 922.4000244140625,
       "top": 104,
-      "width": 622.4000244140625,
-      "height": 453.9875183105469
+      "width": 625.6000366210938,
+      "height": 455.5874938964844
     }
   }
 }
