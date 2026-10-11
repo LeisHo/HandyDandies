@@ -297,7 +297,9 @@ const RENDER_ORDER_MODE_OPTIONS = [
   { value: 'closest', text: 'Closest To Cursor (XY)' }, { value: 'farthest', text: 'Farthest From Cursor (XY)' },
   { value: 'closestZ', text: 'Closest To Cursor (XYZ)' }, { value: 'farthestZ', text: 'Farthest From Cursor (XYZ)' },
   { value: 'palmToArm', text: 'Palm To Arm Base' },
-  { value: 'palmToArmEnd', text: 'Palm To Arm End' }
+  { value: 'palmToArmEnd', text: 'Palm To Arm End' },
+  { value: 'armBaseToPalm', text: 'Arm Base To Palm Center' },
+  { value: 'armEndToPalm', text: 'Arm End To Palm Center' }
 ]
 // Cursor tracking point (2026-10-11): the point on each hand that every cursor-tracking measurement (aim, palm angle, screen-space distances, splay / crop distances) is taken from. Computed at the hand's
 // no-tracking pose (so it does not chase the rotation it drives). hand._trk = world position, hand._trkXY = its screen-space distance to the cursor.
@@ -918,8 +920,9 @@ function computeRenderOrderRanks() {
     if (!mode || mode === 'none') return null
     if (evs.has(mode)) return evs.get(mode)
     let ev
-    if (mode === 'palmToArm' || mode === 'palmToArmEnd') {
-      const isEnd = mode === 'palmToArmEnd'
+    if (mode === 'palmToArm' || mode === 'palmToArmEnd' || mode === 'armBaseToPalm' || mode === 'armEndToPalm') {
+      const isEnd = mode === 'palmToArmEnd' || mode === 'armEndToPalm'
+      const rev = mode === 'armBaseToPalm' || mode === 'armEndToPalm' // mirrored rule: A's ARM point must be higher than B's PALM (instead of A's palm higher than B's arm point)
       if (!roPalmZ || roPalmZ.length !== n) { roPalmZ = new Float64Array(n); roBaseZ = new Float64Array(n); roBaseXY = new Float64Array(n); roEndZ = new Float64Array(n); roEndXY = new Float64Array(n) }
       if (!palmDone) {
         palmDone = true
@@ -931,7 +934,7 @@ function computeRenderOrderRanks() {
         zArr[i] = (nb ? nb.matrixWorld.elements[14] : h.wrapper.position.z) * camSign
         xyArr[i] = nb ? cursorDistXY(_roV.setFromMatrixPosition(nb.matrixWorld)) : cursorDistXY(h.wrapper.position)
       }
-      ev = { pair: true, z: zArr, xy: xyArr }
+      ev = { pair: true, z: zArr, xy: xyArr, rev }
     } else {
       let k = roScalar[mode]
       if (!k || k.length !== n) k = roScalar[mode] = new Float64Array(n)
@@ -944,7 +947,8 @@ function computeRenderOrderRanks() {
   // +1 = a goes above b, -1 = b goes above a, 0 = this mode does not decide the pair
   const cmpMode = (ev, a, b) => {
     if (ev.pair) {
-      const aOver = roPalmZ[a] - ev.z[b] > TOL, bOver = roPalmZ[b] - ev.z[a] > TOL
+      const aOver = ev.rev ? ev.z[a] - roPalmZ[b] > TOL : roPalmZ[a] - ev.z[b] > TOL
+      const bOver = ev.rev ? ev.z[b] - roPalmZ[a] > TOL : roPalmZ[b] - ev.z[a] > TOL
       if (aOver && !bOver) return 1
       if (bOver && !aOver) return -1
       if (aOver && bOver) { const d = Math.round(ev.xy[a] / TOL) - Math.round(ev.xy[b] / TOL); roKindXY = d !== 0; return d > 0 ? 1 : d < 0 ? -1 : 0 }

@@ -17259,6 +17259,11 @@ Direct request: "I want retransition to have its own easing curve as opposed to 
  - The shape uses the function's default speed bounds (not the forward Animation Speed Curve's range), since only the shape matters. Wired everywhere the forward Easing Curve is: both control factories, config parsing, the curve widgets, visibility gating (follows Retransition's own on/off), the new-function defaults template and the Multi Trigger allowed-suffix list.
  `main.js` `?v=359` -> `?v=360`.
 
+2026-10-11  -  (Render Order: 'Arm Base To Palm Center' and 'Arm End To Palm Center')
+
+Direct request: add selections 'Arm End to Palm center' and 'Arm base to palm center' to the dropdowns. They are the MIRROR of Palm To Arm Base / End: hand A goes above hand B when A's arm base (or arm end) is higher in Z than B's palm center (by more than 0.01) and B's arm point is not higher than A's palm; the reverse likewise; when BOTH are higher
+than the other's palm, the hand whose arm base (arm end) is FARTHER from the cursor on screen (XY only) goes above - mirrored from the original rule by assumption (the request did not spell out the tie-break; say if you want something else); when neither is, the level ties. Available in the Mode, Fallback, Fallback 2 and Except dropdowns, handled by the same overlap-layered painter's ordering as the Palm To Arm modes. `main.js` `?v=360` -> `?v=361`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a
