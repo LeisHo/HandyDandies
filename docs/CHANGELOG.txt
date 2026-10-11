@@ -17018,6 +17018,20 @@ one that does not carry it (105 of 106 saved poses have no Base Rotation) leaves
 "Default" and Reset already wrote the pose's / Default pose's rotation values into the sliders as absolute numbers. Interpretation (not confirmed): this is about triggered poses; if it meant something else the
 change is the ABSOLUTE_ROTATION_KEYS list in stackOnDefault(). `main.js` `?v=333` -> `?v=334`.
 
+2026-10-11  -  (Reset no longer turns the hand; triggered rotation is added to the default's own rotation)
+
+Direct corrections: (1) "the startup position IS the default position, so reset shouldnt move the hand pose at all ... when i click reset, the hand changes rotation while the sliders stay the same";
+(2) "the rotation settings of the triggered pose or sequence should be applied ontop of the default pose. So if a pose has a rotation x value of 180, that will be taken as 180 from the default
+position's own x rotation".
+ - Reset: MEASURED on the deployed page with the saved settings (cursor tracking OFF, Base Rotation X set): after Reset the hand's WRAPPER was 89.18 degrees from its startup orientation while the clone and all
+   bones matched startup (0.04 / 0.03 degrees). resetAllHands() copied currentBaseQuat onto the wrapper, but a wrapper is identity at startup (the model's own rotation lives on hand.clone; the wrapper only
+   gets an orientation from cursor tracking), so with tracking off nothing corrected it and the whole base rotation was applied twice. Reset now sets the wrapper to identity and drops the lazily-created
+   tracking state (currentArmRotationQuat / currentPalmRollDeg / currentArmLengthT) so it re-seeds as on a fresh start. The sliders were already right; the hand now matches them.
+ - Stacking rule replaced (the previous two versions were "change from the Default pose" and then "rotation absolute"; both were wrong): rotation / offset keys a triggered pose or tween step carries are
+   ADDED to the live default: Whole-Hand Rotation X/Y/Z, Rotation at Base X/Y/Z and Pose Offset X/Y/Z = default + pose value (default X 84, pose X 180 -> 264); Pose Scale multiplies; a missing key adds
+   nothing. Applies to Single Pose targets, Sequence / Chain steps and Skip If Same Pose on field hands. The Default pose itself triggered as a target therefore adds its own rotation again (84 + 84); say if
+   that case should be special. `main.js` `?v=334` -> `?v=335`.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

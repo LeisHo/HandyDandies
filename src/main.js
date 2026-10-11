@@ -9060,14 +9060,11 @@ function remapGlideProgress(u, N, k) {
   if (u <= a) return (u / a) * (1 / N)
   return 1 / N + ((u - a) / (1 - a)) * ((N - 1) / N)
 }
-// STACKING ON THE DEFAULT (2026-10-11, direct request: "any tween or sequence triggered should be stacked ontop of the default positions rotations"). The rotation / position keys a saved pose
-// carries are applied as a CHANGE FROM THE DEFAULT POSE, on top of the live default (the sliders): effective = live slider + (pose value - Default pose value), and a pose that does not carry a key
-// (every pose saved before Rotation at Base existed has no Base Rotation) contributes no change instead of snapping to 0. Pose Scale stacks as a ratio. While the sliders equal the Default pose
-// (the normal case) this is exactly the old absolute behaviour for every key the pose does carry. Only field hands use it; the previews keep absolute poses.
-// Whole-Hand Rotation and Rotation at Base are ABSOLUTE (2026-10-11, direct request: "the hand rotation and rotation at base settings for default should be absolute values as opposed to relative"):
-// a pose that carries them replaces the live value, a pose that does not carry them leaves the live slider as it is. Only the offsets stack as a change from the Default (below).
-const ABSOLUTE_ROTATION_KEYS = ['modelRotX', 'modelRotY', 'modelRotZ', 'baseRotationX', 'baseRotationY', 'baseRotationZ']
-const STACK_KEYS = ['poseOffsetX', 'poseOffsetY', 'poseOffsetZ']
+// STACKING ON THE DEFAULT (2026-10-11, direct request: "the rotation settings of the triggered pose or sequence should be applied ontop of the default pose. So if a pose has a rotation x value
+// of 180, that will be taken as 180 from the default position's own x rotation"). The rotation / position keys a saved pose or tween step carries are ADDED to the live default (the sliders, which
+// are the default pose): Whole-Hand Rotation X/Y/Z, Rotation at Base X/Y/Z and Pose Offset X/Y/Z are default + pose value (default X 84 and a pose with X 180 gives 264); Pose Scale multiplies.
+// A pose that does not carry a key adds nothing (every pose saved before Rotation at Base existed has no Base Rotation). Only field hands use this; the previews keep absolute poses.
+const STACK_KEYS = ['modelRotX', 'modelRotY', 'modelRotZ', 'baseRotationX', 'baseRotationY', 'baseRotationZ', 'poseOffsetX', 'poseOffsetY', 'poseOffsetZ']
 // cloneBaseVersion changes whenever any of the stacking sliders or the Default pose change (their onChange / onWholeHandRotationChange bump it), so it is the cache key.
 function currentStackSig() { return cloneBaseVersion }
 function stackOnDefault(item) {
@@ -9075,15 +9072,8 @@ function stackOnDefault(item) {
   const sig = currentStackSig()
   if (item.__stkSig === sig) return item.__stk
   const out = { ...item }
-  ABSOLUTE_ROTATION_KEYS.forEach((k) => { out[k] = item[k] !== undefined ? item[k] : (cfg[k] ?? 0) })
-  STACK_KEYS.forEach((k) => {
-    const pd = poseDefaultValues[k] ?? 0
-    const v = item[k] !== undefined ? item[k] : pd
-    out[k] = (cfg[k] ?? 0) + (v - pd)
-  })
-  const pdS = poseDefaultValues.poseScale ?? 1
-  const vS = item.poseScale !== undefined ? item.poseScale : pdS
-  out.poseScale = (cfg.poseScale ?? 1) * (pdS ? vS / pdS : 1)
+  STACK_KEYS.forEach((k) => { out[k] = (cfg[k] ?? 0) + (item[k] !== undefined ? item[k] : 0) })
+  out.poseScale = (cfg.poseScale ?? 1) * (item.poseScale !== undefined ? item.poseScale : 1)
   Object.defineProperty(item, '__stkSig', { value: sig, writable: true, enumerable: false, configurable: true })
   Object.defineProperty(item, '__stk', { value: out, writable: true, enumerable: false, configurable: true })
   return out
@@ -15342,7 +15332,13 @@ function resetAllHands() {
     hand.currentBaseRb.copy(cloneBaseRb)
     if (hand.basePosition) hand.wrapper.position.copy(hand.basePosition)
     hand.clone.scale.setScalar(computeBaseScale() * (cfg.poseScale ?? 1)) // Reset also restores the scale a trigger left behind; the idle repose below re-applies the Default pose's offset
-    hand.wrapper.quaternion.copy(hand.currentBaseQuat)
+    // The wrapper starts every hand at identity (its orientation only ever comes from cursor tracking); the model's own orientation lives on hand.clone (currentBaseQuat). Reset used to copy
+    // currentBaseQuat onto the WRAPPER too, so with cursor tracking off nothing ever put it back and the hand turned by the whole base rotation a second time (2026-10-11, measured 89 deg).
+    hand.wrapper.quaternion.identity()
+    // Lazily-created tracking state: dropped so the next tracked frame seeds it from the live target exactly as on a fresh start (no glide from the pre-reset values).
+    delete hand.currentArmRotationQuat
+    delete hand.currentPalmRollDeg
+    delete hand.currentArmLengthT
   })
   // Global Pause stops updateRenderOrder() (which does the idle repose),
   // so run one pass by hand in that case; unpaused, the next frame does it.
