@@ -3501,6 +3501,9 @@ function setupHandOffsetStartupGroup() {
   const tgBody = tg && tg.querySelector(':scope > .dp-group-body')
   const retr = body && body.querySelector(':scope > .dp-group[data-key="Retransition"]')
   if (retr && tgBody) tgBody.appendChild(retr)
+  // The nested groups made here share their titles (Easing, Retransition, Start Time Curve ...) with the same groups of every click function, and a saved layout (and the custom-function rebuild) matches groups by that
+  // internal key: it adopted THESE groups for a click function and then deleted them. Give them keys of their own; the visible titles are unchanged.
+  if (body) body.querySelectorAll('.dp-group').forEach((sg) => { if (!sg.dataset.key.startsWith('Startup > ')) sg.dataset.key = 'Startup > ' + sg.dataset.key })
   gateGroupHeader('Hand Offset On Startup', 'handOffsetOnStartupEnabled')
   nestGroupInto('Hand Offset On Startup', 'Starting State')
   updateHandOffsetGroupVisibility()
