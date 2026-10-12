@@ -17371,6 +17371,10 @@ Direct request: in the THREE.JS group add a toggleable subgroup called Floor - a
 
 The Floor shipped with Floor Color = the Background Color CODE default (white); the saved Background Color here is #808080, so the floor did not match. After the settings restore, while Floor Color still holds its default (#ffffff) and Background Color is something else, Floor Color is set to the Background Color (syncValue); once any other color is saved it is left alone. A deliberately white floor on a non-white background needs a slightly different white (e.g. #fefefe). main.js ?v=380 -> ?v=381.
 
+2026-10-12  -  (the Floor crops the hands)
+
+Direct request: the floor plane should obstruct the hands where they intersect, so the whole floor object can crop all the hands. A depth test cannot do it (every hand clears the depth buffer before its own draw), so while the Floor is on one GLOBAL clipping plane (renderer.clippingPlanes, honoured by the fill, outline and emission materials and the outline pass) sits at the floor Z + 0.001 and removes everything on the far side from the camera. It is a full-plane crop - it does NOT stop at the floor XY extent - and it also crops the other scene objects behind the floor (grid helper, debug markers). Turning the Floor off clears it. main.js ?v=381 -> ?v=382.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

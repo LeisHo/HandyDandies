@@ -3384,8 +3384,12 @@ scene.add(gridHelper)
 // Floor: a MeshBasicMaterial plane (no tone mapping, so it matches the scene background exactly), drawn before every hand (renderOrder far below the hands' 0..n-1 ranks) with depth test / write off, like the hands.
 // FLOOR_BASE_SIZE is generously larger than the view at the default camera; Floor XY Scale multiplies it.
 const FLOOR_BASE_SIZE = 2000
+// The floor OBSTRUCTS the hands (direct request): the hands clear the depth buffer before each draw, so a depth test against the floor cannot crop them; instead one GLOBAL clipping plane at the floor's Z
+// (renderer.clippingPlanes, which every material - fill, outline, emission, the outline pass - honours) removes everything behind it, on the side away from the camera. It is a full-plane crop (not limited to the floor's
+// XY extent), and floor Z + a hair so the floor mesh itself is never clipped.
+const floorClipPlane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0)
 function updateFloor() {
-  if (!cfg.floorEnabled) { if (floorMesh) floorMesh.visible = false; sceneNeedsRedraw = true; return }
+  if (!cfg.floorEnabled) { if (floorMesh) floorMesh.visible = false; if (renderer.clippingPlanes.length) renderer.clippingPlanes = []; sceneNeedsRedraw = true; return }
   if (!floorMesh) {
     floorMesh = new THREE.Mesh(new THREE.PlaneGeometry(FLOOR_BASE_SIZE, FLOOR_BASE_SIZE), new THREE.MeshBasicMaterial({ color: cfg.floorColor, side: THREE.DoubleSide, depthTest: false, depthWrite: false, toneMapped: false }))
     floorMesh.renderOrder = -1000000
@@ -3397,6 +3401,10 @@ function updateFloor() {
   floorMesh.position.set(0, 0, cfg.floorZOffset || 0)
   floorMesh.scale.set(cfg.floorXYScale || 1, cfg.floorXYScale || 1, 1)
   floorMesh.material.color.set(cfg.floorColor || '#ffffff')
+  const fz = cfg.floorZOffset || 0, side = camera.position.z >= 0 ? 1 : -1
+  floorClipPlane.normal.set(0, 0, side)
+  floorClipPlane.constant = -side * fz + 0.001
+  renderer.clippingPlanes = [floorClipPlane]
   sceneNeedsRedraw = true
 }
 function updateFloorRowVisibility() {
