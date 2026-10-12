@@ -4278,7 +4278,7 @@ function buildSnapshotText() {
     L.push('the ' + NEAR + ' hands nearest the cursor (screen XY), rank = drawn order (higher = on top):')
     nearest(NEAR).forEach((o) => {
       const zOf = (n) => { const b = renderOrderBone(o.h, n); return b ? f1(b.matrixWorld.elements[14]) : 'n/a' }
-      L.push('  Hand ' + (o.i + 1) + ' rank ' + o.h._roRank + ' | dist ' + f1(o.h._trkXY) + ' | Z: arm base ' + zOf('armBase') + ', arm end ' + zOf('armEnd') + ', palm ' + zOf('palmCenter'))
+      L.push('  Hand ' + (o.i + 1) + ' rank ' + (o.h._roRank === undefined ? 'n/a' : o.h._roRank) + ' | dist ' + f1(o.h._trkXY) + ' | Z: arm base ' + zOf('armBase') + ', arm end ' + zOf('armEnd') + ', palm ' + zOf('palmCenter'))
     })
     L.push('last Render Reordering Log lines:', last(renderReorderLogEntries, 15))
   }
