@@ -413,6 +413,7 @@ let loadingPreviewFirstFrameLogged = false
 const RENDER_REORDER_LOG_MAX_ENTRIES = 300
 const renderReorderLogEntries = []
 let renderReorderLogEl = null
+let snapshotLogEl = null, snapshotText = '' // Debug > Snapshot: the single, replace-on-press snapshot log
 const _renderReorderLogFlushFlag = { scheduled: false }
 const POSE_JUMP_LOG_MAX_ENTRIES = 300
 const poseJumpLogEntries = []
@@ -1342,14 +1343,21 @@ function computeRenderOrderRanks() {
 // Render Order list widgets (2026-10-11): the Mode's + And / + Or / - Subtract terms and the unlimited extra Fallback levels. Each is a hidden JSON text control with a button bar and one row per entry.
 // Field Layout may itself sit inside another group by now (a saved order), so organizeGroupSubgroups() (top-level groups only) cannot find it: move the Render Order rows that are still FLAT directly under Field Layout
 // into its Render Order subgroup (created if needed). Rows the user has deliberately placed elsewhere are left alone.
-function renestRenderOrderRows() {
-  const fl = document.querySelector('.dp-group[data-key="Field Layout"]')
+function renestSubgroupRows(parentTitle, spec) {
+  const fl = document.querySelector('.dp-group[data-key="' + parentTitle + '"]')
   const body = fl && fl.querySelector(':scope > .dp-group-body')
-  if (!body) return
-  let g = body.querySelector(':scope > .dp-group[data-key="Render Order"]')
-  if (!g) { g = createGroupElement('Render Order'); body.appendChild(g) }
+  if (!body) return null
+  let g = body.querySelector(':scope > .dp-group[data-key="' + spec.title + '"]')
+  if (!g) { g = createGroupElement(spec.title); body.appendChild(g) }
   const gb = g.querySelector(':scope > .dp-group-body')
-  FIELD_LAYOUT_SUBGROUP_SPECS[0].keys.forEach((k) => { const row = body.querySelector(':scope > .dp-row[data-key="' + k + '"]'); if (row) gb.appendChild(row) })
+  spec.keys.forEach((k) => { const row = body.querySelector(':scope > .dp-row[data-key="' + k + '"]'); if (row) gb.appendChild(row) })
+  return gb
+}
+function renestRenderOrderRows() {
+  renestSubgroupRows('Field Layout', FIELD_LAYOUT_SUBGROUP_SPECS[0])
+  const gb = renestSubgroupRows('Debug', SNAPSHOT_SUBGROUP_SPECS[0])
+  const w = document.getElementById('dpSnapshotWidget')
+  if (gb && w && w.parentElement !== gb) gb.appendChild(w)
 }
 function buildRenderOrderWidgets() {
   const fillSel = (sel, value, allowNone) => {
@@ -2918,7 +2926,16 @@ const DEV_GROUPS = [
       // log actually records anything meanwhile. Existing buffered
       // entries are untouched either way (this is not a 4th clear
       // button).
-      { key: 'pauseLogsBtn', label: 'Pause Logs', type: 'button', onClick: (btn) => toggleLogsPaused(btn) }
+      { key: 'pauseLogsBtn', label: 'Pause Logs', type: 'button', onClick: (btn) => toggleLogsPaused(btn) },
+      // Debug > Snapshot (2026-10-11, direct request): one button takes a single log of THIS moment (replaces the previous snapshot, it is not a running log); the checkboxes pick what goes in it.
+      { key: 'snapshotCursor', label: 'Snapshot: Cursor Position', type: 'checkbox', def: true },
+      { key: 'snapshotMouse', label: 'Snapshot: Mouse Tracking', type: 'checkbox', def: true },
+      { key: 'snapshotHandBehaviour', label: 'Snapshot: Hand Behaviour', type: 'checkbox', def: true },
+      { key: 'snapshotFrameRate', label: 'Snapshot: Frame Rate', type: 'checkbox', def: true },
+      { key: 'snapshotPoseJumps', label: 'Snapshot: Pose Jumps', type: 'checkbox', def: true },
+      { key: 'snapshotRenderOrder', label: 'Snapshot: Render Order', type: 'checkbox', def: true },
+      { key: 'snapshotTrackingPoints', label: 'Snapshot: Tracking Points', type: 'checkbox', def: true },
+      { key: 'snapshotTakeBtn', label: 'Take Snapshot', type: 'button', onClick: () => takeDebugSnapshot() }
     ]
   }
 ]
@@ -2957,6 +2974,9 @@ DEV_GROUPS.forEach((g) => g.controls.forEach((c) => {
 const FIELD_LAYOUT_SUBGROUP_SPECS = [
   { title: 'Render Order', collapsed: false, keys: ['renderOrderMode', 'renderOrderModeExcept', 'renderOrderModeTerms', 'renderOrderFallback', 'renderOrderFallbackExcept', 'renderOrderFallbackTerms', 'renderOrderFallback2', 'renderOrderFallback2Except', 'renderOrderFallback2Terms', 'renderOrderExtraFallbacks', 'renderOrderFlipLock'] }
 ]
+const SNAPSHOT_SUBGROUP_SPECS = [
+  { title: 'Snapshot', collapsed: false, keys: ['snapshotCursor', 'snapshotMouse', 'snapshotHandBehaviour', 'snapshotFrameRate', 'snapshotPoseJumps', 'snapshotRenderOrder', 'snapshotTrackingPoints', 'snapshotTakeBtn'] }
+]
 const POSE_SUBGROUP_SPECS = [
   { title: 'Whole-Hand Rotation & Thumb', collapsed: true, keys: ['modelRotX', 'modelRotY', 'modelRotZ', 'thumbCurl', 'thumbSplay', 'thumbSplay2', 'tipTwistThumb', 'curlBiasThumb', 'baseOnlyCurlThumb', 'midOnlyCurlThumb', 'tipOnlyCurlThumb'] },
   { title: 'Whole-Hand Rotation at Base', collapsed: true, keys: ['baseRotationX', 'baseRotationY', 'baseRotationZ'] },
@@ -2979,7 +2999,7 @@ const DEV_PANEL_SAVE_SECRET = 'PkrbMti03M6xm3FEThYXa8gGW_08BOGj'
 const SAVE_SETTINGS_ENDPOINT = '/api/save-settings'
 const cfg = initDevPanel(DEV_GROUPS, {
   storageKeyPrefix: 'handyDandies',
-  organizeSubgroups: (groupsEl) => { organizeGroupSubgroups(groupsEl, 'Pose', POSE_SUBGROUP_SPECS); organizeGroupSubgroups(groupsEl, 'Field Layout', FIELD_LAYOUT_SUBGROUP_SPECS) },
+  organizeSubgroups: (groupsEl) => { organizeGroupSubgroups(groupsEl, 'Pose', POSE_SUBGROUP_SPECS); organizeGroupSubgroups(groupsEl, 'Field Layout', FIELD_LAYOUT_SUBGROUP_SPECS); organizeGroupSubgroups(groupsEl, 'Debug', SNAPSHOT_SUBGROUP_SPECS) },
   remoteSave: { endpoint: SAVE_SETTINGS_ENDPOINT, secret: DEV_PANEL_SAVE_SECRET },
   // ROOT CAUSE of the middle/ring finger "outstretched" bug's REAL
   // return, 2026-09-16 (direct user report, correctly suspecting "the
@@ -3149,6 +3169,7 @@ buildFrameRateLogWidget()
 buildLoadingPreviewLogWidget()
 buildPoseJumpLogWidget()
 buildRenderReorderLogWidget()
+buildSnapshotWidget()
 restartCursorLogTimer()
 restartHandBehaviourDetailedLogTimer()
 setupSettingsChangeLog()
@@ -3849,7 +3870,8 @@ function copyAllDebugLogs(btn) {
     ['Frame Rate Log', frameRateLogEntries],
     ['Loading Preview Log', loadingPreviewLogEntries],
     ['Pose Jump Log', poseJumpLogEntries],
-    ['Render Reordering Log', renderReorderLogEntries]
+    ['Render Reordering Log', renderReorderLogEntries],
+    ['Snapshot', snapshotText ? [snapshotText] : []]
   ]
   const text = sections.map(([title, entries]) => `=== ${title} ===\n${entries.length ? entries.join('\n') : '(empty)'}`).join('\n\n')
   const flash = (msg) => { if (!btn) return; const orig = btn.textContent; btn.textContent = msg; setTimeout(() => { btn.textContent = orig }, 900) }
@@ -4148,6 +4170,127 @@ function buildRenderReorderLogWidget() {
   wrap.appendChild(headerRow)
   wrap.appendChild(renderReorderLogEl)
   body.appendChild(wrap)
+}
+// Debug > Snapshot (2026-10-11): ONE log of the moment the button is pressed, replacing the previous one. Each ticked category writes the CURRENT state plus the last lines of the matching running log.
+function buildSnapshotWidget() {
+  const g = document.querySelector('.dp-group[data-key="Snapshot"] > .dp-group-body') || document.querySelector('.dp-group[data-key="Debug"] .dp-group-body')
+  if (!g || document.getElementById('dpSnapshotWidget')) return
+  const wrap = elLocal('div', { padding: '4px 6px' }, { id: 'dpSnapshotWidget' })
+  const headerRow = elLocal('div', { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3px' })
+  const label = elLocal('div', { fontSize: '11px', opacity: '0.85' }, { text: 'Snapshot' })
+  const mk = (t) => elLocal('button', { fontSize: '10px', padding: '2px 8px', background: '#3a3a4a', color: 'inherit', border: 'none', borderRadius: '4px', cursor: 'pointer' }, { text: t, type: 'button' })
+  const copyBtn = mk('Copy'), saveBtn = mk('Save'), clearBtn = mk('Clear')
+  headerRow.appendChild(label)
+  const btnRow = elLocal('div', { display: 'flex', gap: '4px' })
+  btnRow.appendChild(copyBtn); btnRow.appendChild(saveBtn); btnRow.appendChild(clearBtn)
+  headerRow.appendChild(btnRow)
+  snapshotLogEl = elLocal('pre', { height: '160px', overflowY: 'auto', margin: '0', padding: '4px 6px', background: 'rgba(255,255,255,0.06)', borderRadius: '4px', fontSize: '10px', whiteSpace: 'pre-wrap', wordBreak: 'break-word' })
+  copyBtn.addEventListener('click', () => {
+    const flash = (msg) => { const orig = copyBtn.textContent; copyBtn.textContent = msg; setTimeout(() => { copyBtn.textContent = orig }, 900) }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(snapshotText).then(() => flash('Copied!')).catch(() => flash('Copy failed'))
+    else flash('Copy failed')
+  })
+  saveBtn.addEventListener('click', () => {
+    const blob = new Blob([snapshotText], { type: 'text/plain' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'snapshot-' + new Date().toISOString().replace(/[:.]/g, '-') + '.txt'
+    document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url)
+  })
+  clearBtn.addEventListener('click', () => { snapshotText = ''; snapshotLogEl.textContent = '' })
+  wrap.appendChild(headerRow)
+  wrap.appendChild(snapshotLogEl)
+  g.appendChild(wrap)
+}
+function takeDebugSnapshot() {
+  snapshotText = buildSnapshotText()
+  if (snapshotLogEl) { snapshotLogEl.textContent = snapshotText; snapshotLogEl.scrollTop = 0 }
+}
+function buildSnapshotText() {
+  const L = []
+  const f1 = (v) => (typeof v === 'number' && isFinite(v) ? v.toFixed(2) : String(v))
+  const v3 = (v) => (v ? '(' + f1(v.x) + ', ' + f1(v.y) + ', ' + f1(v.z) + ')' : 'n/a')
+  const last = (arr, n) => (arr.length ? arr.slice(-n).join('\n') : '(none buffered)')
+  const nearest = (n) => hands.map((h, i) => ({ h, i })).filter((o) => o.h._trkXY !== undefined).sort((a, b) => a.h._trkXY - b.h._trkXY).slice(0, n)
+  const NEAR = 15
+  L.push('=== SNAPSHOT ' + new Date().toISOString() + ' (+' + Math.round(performance.now() - pageLoadStartMs) + 'ms) ===')
+  let any = false
+  if (cfg.snapshotCursor) {
+    any = true
+    const w = window.innerWidth, h = window.innerHeight
+    L.push('', '--- Cursor Position ---')
+    L.push('viewport ' + w + 'x' + h + ' @' + (window.devicePixelRatio || 1) + 'x, device class ' + realDeviceClass())
+    L.push('cursor NDC (' + f1(cursorNDC.x) + ', ' + f1(cursorNDC.y) + ') = px (' + Math.round((cursorNDC.x + 1) / 2 * w) + ', ' + Math.round((1 - cursorNDC.y) / 2 * h) + ')')
+    L.push('cursor target (world) ' + v3(cursorTarget))
+    L.push('camera ' + v3(camera.position) + ' fov ' + f1(camera.fov) + ' zoom ' + f1(camera.zoom) + ', looking at ' + v3(controls.target))
+    L.push('hands ' + hands.length + ', animation paused ' + isPaused + ', logs paused ' + logsPaused)
+  }
+  if (cfg.snapshotMouse) {
+    any = true
+    L.push('', '--- Mouse Tracking ---')
+    L.push('last tracked action: ' + (lastTrackedActionText || 'none') + ' | left button down: ' + leftPointerDown)
+    L.push('last Mouse Tracking Log lines:', last(mouseTrackingLogEntries, 15))
+  }
+  if (cfg.snapshotHandBehaviour) {
+    any = true
+    const counts = {}, active = []
+    hands.forEach((hd, i) => {
+      ;[hd._cp, hd._chp].forEach((store) => {
+        if (!store) return
+        Object.keys(store).forEach((k) => {
+          const ph = store[k] && store[k].phase
+          if (!ph || ph === 'idle') return
+          const name = handLogTriggerLabel(k)
+          counts[name + ' : ' + ph] = (counts[name + ' : ' + ph] || 0) + 1
+          if (active.length < 24) active.push('Hand ' + (i + 1) + ' ' + name + ' ' + ph)
+        })
+      })
+    })
+    L.push('', '--- Hand Behaviour ---')
+    const keys = Object.keys(counts)
+    L.push(keys.length ? 'hands not idle, by function and phase:\n' + keys.map((k) => '  ' + k + ' x' + counts[k]).join('\n') : 'every hand is idle')
+    if (active.length) L.push('first ' + active.length + ' active:', active.join('\n'))
+    L.push('last Hand Behaviour Log lines:', last(handBehaviourLogEntries, 20))
+  }
+  if (cfg.snapshotFrameRate) {
+    any = true
+    const fp = __frameProfiler, secs = Math.max((performance.now() - fp.windowStart) / 1000, 0.001)
+    L.push('', '--- Frame Rate ---')
+    if (fp.frames > 0) L.push('current profiling window: ' + fp.frames + ' frames in ' + f1(secs) + ' s = ' + f1(fp.frames / secs) + ' fps; avg per frame: total ' + f1(fp.animateTotalMs / fp.frames) + ' ms, updateRenderOrder ' + f1(fp.updateRenderOrderMs / fp.frames) + ' ms, composer.render ' + f1(fp.composerRenderMs / fp.frames) + ' ms, cursor tracking ' + f1(fp.cursorTrackingMs / fp.frames) + ' ms')
+    else L.push('no frames in the current profiling window yet')
+    L.push('renderer: ' + renderer.info.render.calls + ' draw calls, ' + renderer.info.render.triangles + ' triangles last frame; hands ' + hands.length)
+    L.push('last Frame Rate Log lines:', last(frameRateLogEntries, 15))
+  }
+  if (cfg.snapshotPoseJumps) {
+    any = true
+    L.push('', '--- Pose Jumps ---')
+    L.push('thresholds: bone ' + cfg.poseJumpBoneThresholdDeg + ' deg, position ' + cfg.poseJumpPositionThreshold + ' world units; logging ' + (cfg.logPoseJumpsEnabled ? 'on' : 'off'))
+    L.push('last Pose Jump Log lines:', last(poseJumpLogEntries, 15))
+  }
+  if (cfg.snapshotRenderOrder) {
+    any = true
+    const tm = (str) => roTermsOf(str).map((t) => (t.op === 'sub' ? ' - ' : t.op === 'or' ? ' OR ' : ' + ') + roOptText(t.m)).join('')
+    L.push('', '--- Render Order ---')
+    L.push('Mode: ' + roOptText(cfg.renderOrderMode) + tm(cfg.renderOrderModeTerms) + (cfg.renderOrderModeExcept && cfg.renderOrderModeExcept !== 'none' ? ' | Except ' + roOptText(cfg.renderOrderModeExcept) : ''))
+    roParseExtra().forEach((e, i) => L.push('Fallback ' + (i + 1) + ': ' + roOptText(e.m) + e.t.map((t) => (t.op === 'sub' ? ' - ' : t.op === 'or' ? ' OR ' : ' + ') + roOptText(t.m)).join('') + (e.q !== 'none' ? ' | Except ' + roOptText(e.q) : '')))
+    L.push('flip once per sequence: ' + (cfg.renderOrderFlipLock !== false) + ' | active flip locks: ' + roLocks.size)
+    L.push('the ' + NEAR + ' hands nearest the cursor (screen XY), rank = drawn order (higher = on top):')
+    nearest(NEAR).forEach((o) => {
+      const zOf = (n) => { const b = renderOrderBone(o.h, n); return b ? f1(b.matrixWorld.elements[14]) : 'n/a' }
+      L.push('  Hand ' + (o.i + 1) + ' rank ' + o.h._roRank + ' | dist ' + f1(o.h._trkXY) + ' | Z: arm base ' + zOf('armBase') + ', arm end ' + zOf('armEnd') + ', palm ' + zOf('palmCenter'))
+    })
+    L.push('last Render Reordering Log lines:', last(renderReorderLogEntries, 15))
+  }
+  if (cfg.snapshotTrackingPoints) {
+    any = true
+    L.push('', '--- Tracking Points ---')
+    L.push('Tracking Point mode: ' + cfg.trackingPoint)
+    L.push('the ' + NEAR + ' hands nearest the cursor:')
+    nearest(NEAR).forEach((o) => L.push('  Hand ' + (o.i + 1) + ' tracking ' + v3(o.h._trk) + ' | rest ' + v3(o.h._trkRest) + ' | field position ' + v3(o.h.wrapper.position) + ' | screen dist ' + f1(o.h._trkXY)))
+  }
+  if (!any) L.push('', '(no Snapshot categories are ticked)')
+  return L.join('\n')
 }
 // Hand Numbers overlay (Debug group, 2026-09-28) -- direct request: "a
 // numeric label is shown on each hand on screen. It just denotes which is
