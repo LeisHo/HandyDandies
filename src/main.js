@@ -325,6 +325,8 @@ const _armPartialQ = new THREE.Quaternion(), _armOffQx = new THREE.Quaternion(),
 let trkXYFieldMin = 0, trkXYFieldRange = 0.001, trkXYAllMin = 0, trkXYAllRange = 0.001
 let trackingPointCloud = null
 let floorMesh = null // Floor group: one plane behind the hands
+const STARTUP_FN = 'startupFn' // Hand Offset On Startup: a built-in, hidden-trigger pose-kind click function (prefix startupFn)
+let startupHandOffsetStage = 0, startupConsumeActive = false, startupConsumeUntil = 0 // 0 = waiting for the first click, 1 = the startup transition has been fired
 let startupStaticReleased = false // Starting State > Static Pose On Startup: set by the first click function trigger (runtime only, never saved)
 const _cfTmp = new THREE.Vector3() // clickRotatePointInto() scratch
 const _trkV1 = new THREE.Vector3(), _trkV2 = new THREE.Vector3(), _trkWqInv = new THREE.Quaternion() // handTrackingPointInto() scratch
@@ -1529,7 +1531,7 @@ function clickRotatePointInto(hand, out) {
 }
 // Cursor tracking (arm / palm rotation, reactive wrist splay, reactive arm length) is live only while Tracking Enabled is on AND, with Starting State > Static Pose On Startup on, a click function has been triggered since the
 // page loaded (or since that box was ticked): until then the hands stay in their default pose.
-function trackingActive() { return !!cfg.trackingEnabled && (!cfg.staticPoseOnStartup || startupStaticReleased) }
+function trackingActive() { return !!cfg.trackingEnabled && (!(cfg.staticPoseOnStartup || cfg.handOffsetOnStartupEnabled) || startupStaticReleased) }
 function handPoint(hand) { return hand._trk || hand.wrapper.position }
 function handRestPoint(hand) { return hand._trkRest || hand.basePosition || hand.wrapper.position }
 // Computed once per frame: the animate() tracking block calls it first (postIncrement = false: updateRenderOrder() has not bumped the frame counter yet), updateRenderOrder() calls it with true and finds it done.
@@ -2814,6 +2816,20 @@ const DEV_GROUPS = [
       { key: 'staticPoseOnStartup', label: 'Static Pose On Startup', type: 'checkbox', def: false, onChange: (v) => { if (v) startupStaticReleased = false } }
     ]
   },
+  // Hand Offset On Startup (2026-10-12, direct request), nested into Starting State by nestGroupInto(): with it on, the hands are drawn at startup in the default pose displaced by Offset X / Y / Z; the FIRST click
+  // tweens the offset back to the grid position (that click is consumed, cursor tracking still held), the NEXT click triggers the first real click function and starts cursor tracking. The transition is the hidden
+  // pose-kind click function 'startupFn', so every animation setting below is the click functions' own control (built by makeClickPoseGroup()) minus Offset / Rotation / the trigger rows.
+  {
+    title: 'Hand Offset On Startup',
+    controls: [
+      { key: 'handOffsetOnStartupEnabled', label: 'Hand Offset On Startup On/Off', type: 'checkbox', def: false, onChange: () => onHandOffsetOnStartupToggled() },
+      { key: 'startupHandOffsetX', label: 'Offset X (World Units)', type: 'slider', min: -100, max: 100, step: 0.5, def: 0, onChange: () => applyStartupHandOffset() },
+      { key: 'startupHandOffsetY', label: 'Offset Y (World Units)', type: 'slider', min: -100, max: 100, step: 0.5, def: 0, onChange: () => applyStartupHandOffset() },
+      { key: 'startupHandOffsetZ', label: 'Offset Z (World Units, + Toward Camera)', type: 'slider', min: -100, max: 100, step: 0.5, def: 0, onChange: () => applyStartupHandOffset() },
+      { key: 'startupHandTweenEnabled', label: 'Animation Tween On/Off', type: 'checkbox', def: false },
+      ...startupFnControls()
+    ]
+  },
   {
     title: 'Debug',
     controls: [
@@ -3064,6 +3080,7 @@ const cfg = initDevPanel(DEV_GROUPS, {
       // different color is saved it is left alone (a deliberately white floor on a non-white background needs a slightly different white, e.g. #fefefe).
       if ((cfg.floorColor || '#ffffff').toLowerCase() === '#ffffff' && cfg.bgColor && cfg.bgColor.toLowerCase() !== '#ffffff') syncValue('floorColor', cfg.bgColor)
       gateGroupHeader('Floor', 'floorEnabled'); nestFloorIntoThreeJs(); updateFloorRowVisibility(); updateFloor()
+      gateGroupHeader('Hand Offset On Startup', 'handOffsetOnStartupEnabled'); nestGroupInto('Hand Offset On Startup', 'Starting State'); updateHandOffsetGroupVisibility(); applyStartupHandOffset()
     } catch (e) { /* panel not built */ }
     try { normalizeRenderOrderFallbacks() } catch (e) { /* not ready */ }
     // Each step timed when ?debugTiming=1 (see devPanel.js dpTime()).
@@ -3407,6 +3424,87 @@ function updateFloor() {
   renderer.clippingPlanes = [floorClipPlane]
   sceneNeedsRedraw = true
 }
+// The startup function's controls: the pose-kind click function's own battery (built by makeClickPoseGroup, so they match the click functions exactly) minus the rows that make no sense here - Enabled (forced on in code),
+// Skip If Same Pose, and the function's own Offset / Offset To Camera / Rotation (the transition drives its own offset from the three sliders above).
+function startupFnControls() {
+  const drop = /^(Enabled|SkipIfSamePose|OffsetEnabled|OffsetMode|OffsetX|OffsetY|OffsetZ|CursorOffset|CameraOffset|Rotation)/
+  return makeClickPoseGroup(STARTUP_FN, 'Hand Offset On Startup', { transitionSpeedMs: 1000 }).controls.filter((c) => !drop.test(c.key.slice(STARTUP_FN.length)))
+}
+// While Hand Offset On Startup is on and the first click has not happened (and for a moment after it, so the same click is not also read as a real click function), the real click functions do nothing.
+function startupBlocksClickFunctions() {
+  return !!cfg.handOffsetOnStartupEnabled && (startupHandOffsetStage === 0 || startupConsumeActive || performance.now() < startupConsumeUntil)
+}
+// Puts every hand's camera-relative displacement accumulator (the same store the click functions' Offset bakes into) at the Offset sliders, and drops it again when the feature is switched off before the first click.
+function applyStartupHandOffset() {
+  const on = !!cfg.handOffsetOnStartupEnabled && startupHandOffsetStage === 0
+  for (let i = 0; i < hands.length; i++) {
+    const h = hands[i]
+    if (!h._customOffsetAccum) h._customOffsetAccum = { x: 0, y: 0, z: 0 }
+    const a = h._customOffsetAccum
+    if (on) { a.x = cfg.startupHandOffsetX || 0; a.y = cfg.startupHandOffsetY || 0; a.z = cfg.startupHandOffsetZ || 0; h._startupAccum = true }
+    else if (h._startupAccum && startupHandOffsetStage === 0) { a.x = 0; a.y = 0; a.z = 0; h._startupAccum = false }
+  }
+  sceneNeedsRedraw = true
+}
+function onHandOffsetOnStartupToggled() {
+  startupHandOffsetStage = 0; startupConsumeActive = false; startupConsumeUntil = 0
+  if (cfg.handOffsetOnStartupEnabled) startupStaticReleased = false
+  applyStartupHandOffset()
+  updateHandOffsetGroupVisibility()
+}
+// An idle hand (not mid any click function) still shows the startup displacement: the click-function path applies the accumulator itself, the idle path sets the position from the grid and would drop it.
+function applyStartupDisplacementToIdleHand(hand) {
+  if (!hand._startupAccum) return
+  const a = hand._customOffsetAccum
+  if (!a || (a.x === 0 && a.y === 0 && a.z === 0)) { hand._startupAccum = false; return }
+  hand.wrapper.position.addScaledVector(_offsetRightVec.setFromMatrixColumn(camera.matrixWorld, 0), a.x)
+  hand.wrapper.position.addScaledVector(_offsetUpVec.setFromMatrixColumn(camera.matrixWorld, 1), a.y)
+  hand.wrapper.position.addScaledVector(_offsetForwardVec.setFromMatrixColumn(camera.matrixWorld, 2), a.z)
+}
+// The first click (left button, on the scene - not the dev panel or the Pause / Reset buttons) while the feature is on: fire the startup transition. The transition is a pose-kind click function whose Offset is the
+// NEGATIVE of the three sliders, so the accumulator (= the sliders) ends at 0 when its forward phase completes.
+function fireStartupHandOffset() {
+  startupHandOffsetStage = 1
+  cfg.startupFnOffsetEnabled = true
+  cfg.startupFnOffsetMode = 'XYZ Offset'
+  cfg.startupFnOffsetX = -(cfg.startupHandOffsetX || 0)
+  cfg.startupFnOffsetY = -(cfg.startupHandOffsetY || 0)
+  cfg.startupFnOffsetZ = -(cfg.startupHandOffsetZ || 0)
+  triggerClickPose(STARTUP_FN)
+}
+window.addEventListener('pointerdown', (e) => {
+  if (e.button !== 0 || !cfg.handOffsetOnStartupEnabled || startupHandOffsetStage !== 0) return
+  if (e.target && e.target.closest && e.target.closest('.dp-panel, #pauseButton, #resetButton')) return
+  if (!hands.length || !fieldRevealed) return
+  startupConsumeActive = true
+  fireStartupHandOffset()
+}, true)
+window.addEventListener('pointerup', () => {
+  if (!startupConsumeActive) return
+  startupConsumeActive = false
+  startupConsumeUntil = performance.now() + (cfg.multiClickWindowMs || 250) + 150
+}, true)
+// Hide / show the group's contents with its header checkbox, and arrange the click-function groups the way the request lists them: Animation Tween (Mode, Target Pose / Sequence, ... and the Retransition group inside it).
+function updateHandOffsetGroupVisibility() {
+  const g = document.querySelector('.dp-group[data-key="Hand Offset On Startup"]')
+  const body = g && g.querySelector(':scope > .dp-group-body')
+  if (!body) return
+  // A CSS class (not inline display) so the rows' / groups' own Mode / Enabled visibility logic keeps working underneath when the group is switched back on.
+  if (!document.getElementById('dpStartupStyle')) { const st = document.createElement('style'); st.id = 'dpStartupStyle'; st.textContent = '.dp-startup-off > * { display: none !important }'; document.head.appendChild(st) }
+  body.classList.toggle('dp-startup-off', !cfg.handOffsetOnStartupEnabled)
+}
+function setupHandOffsetStartupGroup() {
+  const tweenMembers = ['Mode', 'TargetPose', 'TweenSelector', 'ReverseSequence', 'GlideToFirstPose', 'FirstGlideTimeScale', 'SequencePlayMode', 'SequenceCount', 'SequenceCountMode', 'SequenceLoopTransition', 'SequenceHoldMs', 'TweenChain'].map((k) => STARTUP_FN + k)
+  const tg = wrapGatedSubgroup('startupHandTweenEnabled', tweenMembers, 'Animation Tween')
+  const g = document.querySelector('.dp-group[data-key="Hand Offset On Startup"]')
+  const body = g && g.querySelector(':scope > .dp-group-body')
+  const tgBody = tg && tg.querySelector(':scope > .dp-group-body')
+  const retr = body && body.querySelector(':scope > .dp-group[data-key="Retransition"]')
+  if (retr && tgBody) tgBody.appendChild(retr)
+  gateGroupHeader('Hand Offset On Startup', 'handOffsetOnStartupEnabled')
+  nestGroupInto('Hand Offset On Startup', 'Starting State')
+  updateHandOffsetGroupVisibility()
+}
 function updateFloorRowVisibility() {
   const on = !!cfg.floorEnabled
   ;['floorColor', 'floorZOffset', 'floorXYScale'].forEach((k) => { const row = document.querySelector('.dp-row[data-key="' + k + '"]'); if (row) row.style.display = on ? '' : 'none' })
@@ -3426,14 +3524,16 @@ function gateGroupHeader(groupTitle, enabledKey) {
 }
 // The Floor group sits inside the user's own "THREE.JS" group (a group they made and renamed): a saved layout from before the Floor existed does not know about it, so while it is still a top-level group, move it into
 // whichever top-level-or-nested group is currently titled THREE.JS. Once a saved layout places it, it is left alone.
-function nestFloorIntoThreeJs() {
+function nestGroupInto(childKey, parentTitle) {
   const groupsEl = document.getElementById('dpGroups')
-  const floor = document.querySelector('.dp-group[data-key="Floor"]')
-  if (!groupsEl || !floor || floor.parentElement !== groupsEl) return
-  const tgt = [...groupsEl.querySelectorAll('.dp-group')].find((g) => { const t = g.querySelector(':scope > .dp-group-header > .dp-group-title-text'); return t && t.textContent.trim().toLowerCase() === 'three.js' })
+  const child = document.querySelector('.dp-group[data-key="' + childKey + '"]')
+  if (!groupsEl || !child || child.parentElement !== groupsEl) return
+  const want = parentTitle.toLowerCase()
+  const tgt = [...groupsEl.querySelectorAll('.dp-group')].find((g) => { if (g === child) return false; const t = g.querySelector(':scope > .dp-group-header > .dp-group-title-text'); return (t && t.textContent.trim().toLowerCase() === want) || (g.dataset.key || '').toLowerCase() === want })
   const body = tgt && tgt.querySelector(':scope > .dp-group-body')
-  if (body) body.appendChild(floor)
+  if (body) body.appendChild(child)
 }
+function nestFloorIntoThreeJs() { nestGroupInto('Floor', 'THREE.JS') }
 // (updateFloor() is first called further down, after sceneNeedsRedraw is declared - calling it here would hit its temporal dead zone.)
 
 const targetMarker = new THREE.Mesh(new THREE.SphereGeometry(1, 12, 12), new THREE.MeshBasicMaterial({ color: 0xff5566 }))
@@ -10657,6 +10757,7 @@ function beginTweenReleaseStop(hand, chp, trig, p, values, live, minLiveDist, li
 // code changes needed anywhere else in the forward/looping/retransition
 // machinery.
 function isSequenceOrChainMode(p) {
+  if (p === STARTUP_FN && !cfg.startupHandTweenEnabled) return false // Animation Tween off: Single Pose with no target = offset only
   const m = cfg[`${p}Mode`]
   return m === 'Sequence' || m === 'Chain'
 }
@@ -11294,6 +11395,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
 }
 function startClickHoldPose(p) {
   if (!cfg[`${p}Enabled`]) return
+  if (startupBlocksClickFunctions()) return
   startupStaticReleased = true
   const trig = clickHoldPoseTriggers[p]
   trig.active = true
@@ -11787,7 +11889,7 @@ window.addEventListener('blur', () => {
 // All 5 static entries (click/dblclick/rc/tripleClick/quadClick) removed
 // 2026-09-20 -- see CLICK_HOLD_KEYS's own matching comment for the full
 // reasoning (identical, just the pose-kind sibling array).
-const CLICK_POSE_KEYS = []
+const CLICK_POSE_KEYS = [STARTUP_FN]
 const clickPoseTriggers = Object.fromEntries([...CLICK_POSE_KEYS, ...LEGACY_REMOVED_POSE_KEYS].map((p) => [p, {
   startCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], startRangeParsed: { min: 0, max: 300 },
   speedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], speedRangeParsed: { min: 50, max: 2000 },
@@ -11989,12 +12091,14 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
     const splayNow = THREE.MathUtils.lerp(cp.fromSplayDeg ?? cp.frozenSplayDeg, cp.frozenSplayDeg, easedProgress)
     let values
     if (isTween) {
-      if (!cp.tweenPoses || cp.tweenPoses.length < 2) { cp.phase = 'idle'; return } // nothing selected -- abandon this hand's sequence rather than get stuck
-      values = lerpTweenSequence(cp.tweenPoses, cappedT)
+      const noSeq = !cp.tweenPoses || cp.tweenPoses.length < 2
+      if (noSeq && p !== STARTUP_FN) { cp.phase = 'idle'; return } // nothing selected -- abandon this hand's sequence rather than get stuck (the startup transition just moves the hands)
+      values = noSeq ? cp.forwardSnapshot : lerpTweenSequence(cp.tweenPoses, cappedT)
     } else {
-      const targetPose = stackOnDefault((cfg.savedPoses || []).find((sp) => sp.name === cfg[`${p}TargetPose`]))
-      if (!targetPose) { cp.phase = 'idle'; return } // nothing selected -- abandon this hand's sequence rather than get stuck
-      values = lerpPoseValues(cp.forwardSnapshot, targetPose, cappedT)
+      const tpName = (p === STARTUP_FN && !cfg.startupHandTweenEnabled) ? '' : cfg[`${p}TargetPose`]
+      const targetPose = stackOnDefault((cfg.savedPoses || []).find((sp) => sp.name === tpName))
+      if (!targetPose && p !== STARTUP_FN) { cp.phase = 'idle'; return } // nothing selected -- abandon this hand's sequence rather than get stuck
+      values = targetPose ? lerpPoseValues(cp.forwardSnapshot, targetPose, cappedT) : cp.forwardSnapshot
     }
     cp.lastAppliedValues = values
     applyPoseValuesToHand(hand, values, splayNow)
@@ -12253,7 +12357,10 @@ function assignHandsToCycle(cycle, startIdx) {
 }
 function triggerClickPose(p, onlyHands = null) {
   if (!cfg[`${p}Enabled`]) return
-  startupStaticReleased = true
+  if (p !== STARTUP_FN) {
+    if (startupBlocksClickFunctions()) return
+    startupStaticReleased = true
+  }
   const trig = clickPoseTriggers[p]
   const now = nowVirtual() // virtual clock -- feeds cp.triggerTime below, an animation-timing field
   // Fallback anchor for a genuinely idle hand (see updateClickPoseForHand()'s
@@ -15457,6 +15564,7 @@ function updateOffsetRotationVisibility(p) {
     if (row) row.style.display = rotationOn ? '' : 'none'
   })
 }
+cfg.startupFnEnabled = true
 CLICK_POSE_KEYS.forEach((p) => { parseClickPoseConfig(p); buildClickPoseWidgets(p) })
 // Every Click-family group's own Mode dropdown (Single Pose vs. Tween) --
 // run once now that all of these rows definitely exist, same reasoning/
@@ -16080,6 +16188,7 @@ function createFieldHand() {
 }
 function finishRebuildField() {
   relayoutField()
+  applyStartupHandOffset()
   // relayoutField() only recomputes clone.position/scale -- a freshly
   // rebuilt hand's own skeleton is a brand-new (bind-pose) clone, so every
   // finger/wrist Pose slider needs reapplying too, or a rebuild (e.g.
@@ -17259,6 +17368,7 @@ buildRenderOrderWidgets()
 gateGroupHeader('Floor', 'floorEnabled')
 updateFloorRowVisibility()
 updateFloor()
+setupHandOffsetStartupGroup()
 safeRefreshSelectOptions('trackingPoint')
 document.addEventListener('visibilitychange', syncPauseWithVisibility)
 window.addEventListener('blur', syncPauseWithVisibility)
@@ -17740,6 +17850,7 @@ function updateRenderOrder() {
         // The idle state INCLUDES the Default pose's Pose Offset X/Y/Z and Pose Scale (2026-10-11): a hand that has finished a retransition already sits at base + offset with that scale, but a hand that
         // never moved (startup) or was Reset showed the bare grid position at the bare scale, and Reset left whatever scale the last trigger set. One idle state for all three.
         if (hand.basePosition) applyPoseOffsetToPosition(hand.wrapper, hand.basePosition, camera, cfg)
+        applyStartupDisplacementToIdleHand(hand)
         hand.clone.scale.setScalar(computeBaseScale() * (cfg.poseScale ?? 1))
         // CORRECTED 2026-09-14, root cause behind the long-running "thumb
         // pose looks wrong" reports, independent of cursor movement. The
