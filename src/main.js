@@ -325,6 +325,10 @@ const _armPartialQ = new THREE.Quaternion(), _armOffQx = new THREE.Quaternion(),
 let trkXYFieldMin = 0, trkXYFieldRange = 0.001, trkXYAllMin = 0, trkXYAllRange = 0.001
 let trackingPointCloud = null
 let floorMesh = null // Floor group: one plane behind the hands
+const SPHERE_FN = 'sphereFn' // Field Grid Sphere Sequence: only the shared Speed / Easing / Start Time / Start Distance curve controls and their parsed caches are borrowed from the click functions
+let sphereStage = 2 // 0 = waiting for the first click (floor only, hands hidden), 1 = spheres running / shown, 2 = done or feature off
+let sphereMesh = null, sphereOn = null, sphereStart = null, sphereDur = null, sphereCap = null
+const sphereParseCache = new Map()
 const STARTUP_FN = 'startupFn' // Hand Offset On Startup: a built-in, hidden-trigger pose-kind click function (prefix startupFn)
 let startupHandOffsetStage = 0, startupConsumeActive = false, startupConsumeUntil = 0 // 0 = waiting for the first click, 1 = the startup transition has been fired
 let startupStaticReleased = false // Starting State > Static Pose On Startup: set by the first click function trigger (runtime only, never saved)
@@ -1531,7 +1535,7 @@ function clickRotatePointInto(hand, out) {
 }
 // Cursor tracking (arm / palm rotation, reactive wrist splay, reactive arm length) is live only while Tracking Enabled is on AND, with Starting State > Static Pose On Startup on, a click function has been triggered since the
 // page loaded (or since that box was ticked): until then the hands stay in their default pose.
-function trackingActive() { return !!cfg.trackingEnabled && (!(cfg.staticPoseOnStartup || cfg.handOffsetOnStartupEnabled) || startupStaticReleased) }
+function trackingActive() { return !!cfg.trackingEnabled && (!(cfg.staticPoseOnStartup || cfg.handOffsetOnStartupEnabled || cfg.sphereSeqEnabled) || startupStaticReleased) }
 function handPoint(hand) { return hand._trk || hand.wrapper.position }
 function handRestPoint(hand) { return hand._trkRest || hand.basePosition || hand.wrapper.position }
 // Computed once per frame: the animate() tracking block calls it first (postIncrement = false: updateRenderOrder() has not bumped the frame counter yet), updateRenderOrder() calls it with true and finds it done.
@@ -2830,6 +2834,26 @@ const DEV_GROUPS = [
       ...startupFnControls()
     ]
   },
+  // Field Grid Sphere Sequence (2026-10-12, direct request), nested into Starting State: an extra startup interaction BEFORE Hand Offset On Startup. Startup shows only the floor (hands hidden); the first click spawns a
+  // sphere at every field grid point (each runs its own timed sequence); the second click removes the spheres, shows the hands and starts the Hand Offset On Startup sequence (or, with that off, just the normal flow).
+  // Speed / Easing / Start Time / Start Distance are the click functions' own controls (prefix sphereFn, built by makeClickPoseGroup()).
+  {
+    title: 'Field Grid Sphere Sequence',
+    controls: [
+      { key: 'sphereSeqEnabled', label: 'Field Grid Sphere Sequence On/Off', type: 'checkbox', def: false, onChange: () => onSphereSeqToggled() },
+      { key: 'sphereStartZOffset', label: 'Sphere Starting Z Offset (World Units)', type: 'slider', min: -200, max: 200, step: 0.5, def: 0 },
+      { key: 'sphereStartRadius', label: 'Sphere Starting Radius (World Units)', type: 'slider', min: 0.1, max: 40, step: 0.1, def: 4 },
+      { key: 'sphereSeqDurationMs', label: 'Sphere Sequence Duration (Ms)', type: 'slider', min: 0, max: 10000, step: 10, def: 1000 },
+      { key: 'sphereColor', label: 'Sphere Color', type: 'color', def: '#d9a98f', onChange: () => { if (sphereMesh) sphereMesh.material.color.set(cfg.sphereColor) } },
+      ...sphereFnControls(),
+      { key: 'sphereRadiusCurveEnabled', label: 'Sphere Radius Curve On/Off', type: 'checkbox', def: false },
+      { key: 'sphereRadiusCurve', label: 'Sphere Radius Curve (Sequence Progress -> Radius)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]' },
+      { key: 'sphereRadiusRange', label: 'Min / Max Sphere Radius (World Units)', type: 'text', def: '{"min":0,"max":4}' },
+      { key: 'sphereZCurveEnabled', label: 'Sphere Z Offset Curve On/Off', type: 'checkbox', def: false },
+      { key: 'sphereZCurve', label: 'Sphere Z Offset Curve (Sequence Progress -> Z)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]' },
+      { key: 'sphereZRange', label: 'Min / Max Sphere Z (World Units)', type: 'text', def: '{"min":-30,"max":0}' }
+    ]
+  },
   {
     title: 'Debug',
     controls: [
@@ -3081,6 +3105,8 @@ const cfg = initDevPanel(DEV_GROUPS, {
       if ((cfg.floorColor || '#ffffff').toLowerCase() === '#ffffff' && cfg.bgColor && cfg.bgColor.toLowerCase() !== '#ffffff') syncValue('floorColor', cfg.bgColor)
       gateGroupHeader('Floor', 'floorEnabled'); nestFloorIntoThreeJs(); updateFloorRowVisibility(); updateFloor()
       gateGroupHeader('Hand Offset On Startup', 'handOffsetOnStartupEnabled'); nestGroupInto('Hand Offset On Startup', 'Starting State'); updateHandOffsetGroupVisibility(); applyStartupHandOffset()
+      gateGroupHeader('Field Grid Sphere Sequence', 'sphereSeqEnabled'); nestGroupInto('Field Grid Sphere Sequence', 'Starting State'); updateGroupContentsVisibility('Field Grid Sphere Sequence', !!cfg.sphereSeqEnabled)
+      if (cfg.sphereSeqEnabled && sphereStage === 2 && !startupConsumeActive) { sphereStage = 0; updateHandsVisibility() } // a saved-on sequence starts waiting for its first click
     } catch (e) { /* panel not built */ }
     try { normalizeRenderOrderFallbacks() } catch (e) { /* not ready */ }
     // Each step timed when ?debugTiming=1 (see devPanel.js dpTime()).
@@ -3430,9 +3456,123 @@ function startupFnControls() {
   const drop = /^(Enabled|SkipIfSamePose|OffsetEnabled|OffsetMode|OffsetX|OffsetY|OffsetZ|CursorOffset|CameraOffset|Rotation)/
   return makeClickPoseGroup(STARTUP_FN, 'Hand Offset On Startup', { transitionSpeedMs: 1000 }).controls.filter((c) => !drop.test(c.key.slice(STARTUP_FN.length)))
 }
+// The sphere sequence's borrowed click-function controls: Animation Speed Curve, Easing, Start Time Curve and Start Distance Curve (the pose-kind factory's own rows, so they match the click functions exactly). The Start
+// Time Curve starts OFF here (the spec: with nothing turned on, every sphere just pops in at the click).
+function sphereFnControls() {
+  const keep = /^(SpeedCurveEnabled|SpeedCurveVisibleOnly|SpeedCurve|SpeedCurveRange|EasingCurveEnabled|EasingCurve|StartTimeCurveEnabled|StartTimeCurveVisibleOnly|StartTimeCurve|StartTimeRange|StartDistanceCurveEnabled|StartDistanceMin|StartDistanceMax|StartDistanceCurve)$/
+  return makeClickPoseGroup(SPHERE_FN, 'Field Grid Sphere Sequence', {}).controls
+    .filter((c) => keep.test(c.key.slice(SPHERE_FN.length)))
+    .map((c) => (c.key === SPHERE_FN + 'StartTimeCurveEnabled' ? { ...c, def: false } : c))
+}
+function sphereParse(str, fallback) {
+  let v = sphereParseCache.get(str)
+  if (v !== undefined) return v
+  try { v = JSON.parse(str) } catch (e) { v = fallback }
+  if (Array.isArray(fallback) && Array.isArray(v)) v = v.slice().sort((a, b) => a.x - b.x)
+  if (sphereParseCache.size > 64) sphereParseCache.clear()
+  sphereParseCache.set(str, v)
+  return v
+}
+// The mesh: ONE InstancedMesh with an instance per hand (same count as the field), toon-shaded like the hands. Rebuilt when the hand count changes.
+function ensureSphereMesh() {
+  if (sphereMesh && sphereMesh.count === hands.length) return
+  if (sphereMesh) { scene.remove(sphereMesh); sphereMesh.geometry.dispose(); sphereMesh.material.dispose() }
+  const mat = new THREE.MeshToonMaterial({ color: cfg.sphereColor || '#d9a98f', gradientMap: makeGradientTexture(cfg.toonSteps, cfg.toonShadowFloor, cfg.toonLightCeiling, cfg.toonStepThreshold) })
+  sphereMesh = new THREE.InstancedMesh(new THREE.SphereGeometry(1, 24, 16), mat, Math.max(hands.length, 1))
+  sphereMesh.frustumCulled = false
+  sphereMesh.name = 'FieldGridSpheres'
+  sphereMesh.visible = false
+  scene.add(sphereMesh)
+  const n = hands.length
+  sphereOn = new Uint8Array(n); sphereStart = new Float64Array(n); sphereDur = new Float64Array(n); sphereCap = new Float64Array(n)
+}
+// First click: every sphere gets its own start time (Start Time Curve), duration (Animation Speed Curve or the Duration slider) and eligibility / reach (Start Distance Curve), all from its distance to the cursor
+// on screen (measured at the field grid point, the hands being hidden), then they run (updateSphereSequence()).
+function startSphereSequence() {
+  ensureSphereMesh()
+  parseClickPoseConfig(SPHERE_FN)
+  const trig = clickPoseTriggers[SPHERE_FN]
+  const n = hands.length, now = nowVirtual()
+  const dist = new Float64Array(n)
+  let vMin = Infinity, vMax = -Infinity, aMin = Infinity, aMax = -Infinity
+  for (let i = 0; i < n; i++) {
+    const d = cursorDistXY(hands[i].basePosition)
+    dist[i] = d
+    if (d < aMin) aMin = d
+    if (d > aMax) aMax = d
+    if (isOnScreen(hands[i].basePosition)) { if (d < vMin) vMin = d; if (d > vMax) vMax = d }
+  }
+  if (vMin === Infinity) { vMin = aMin; vMax = aMax }
+  const dom = (flag) => (cfg[SPHERE_FN + flag] !== false ? [vMin, Math.max(vMax - vMin, 0.001)] : [aMin, Math.max(aMax - aMin, 0.001)])
+  const [stMin, stRange] = dom('StartTimeCurveVisibleOnly'), [spMin, spRange] = dom('SpeedCurveVisibleOnly')
+  for (let i = 0; i < n; i++) {
+    sphereOn[i] = 0
+    let cap = 1
+    if (cfg[SPHERE_FN + 'StartDistanceCurveEnabled']) {
+      const c = computeTweenFractionCap(dist[i], cfg[SPHERE_FN + 'StartDistanceMin'], cfg[SPHERE_FN + 'StartDistanceMax'], trig.startDistanceCurveParsed)
+      if (c === null) continue // outside the eligible range: this sphere never spawns
+      cap = c
+    }
+    const delay = cfg[SPHERE_FN + 'StartTimeCurveEnabled'] ? computeStartDelayMs(dist[i], stMin, stRange, trig.startCurveParsed, trig.startRangeParsed) : 0
+    const dur = cfg[SPHERE_FN + 'SpeedCurveEnabled'] ? computeStartDelayMs(dist[i], spMin, spRange, trig.speedCurveParsed, trig.speedRangeParsed) : (cfg.sphereSeqDurationMs ?? 1000)
+    sphereOn[i] = 1; sphereStart[i] = now + delay; sphereDur[i] = Math.max(dur, 1); sphereCap[i] = cap
+  }
+  sphereMesh.material.color.set(cfg.sphereColor || '#d9a98f')
+  sphereMesh.visible = true
+}
+const _sphM = new THREE.Matrix4(), _sphP = new THREE.Vector3(), _sphQ = new THREE.Quaternion(), _sphS = new THREE.Vector3()
+function updateSphereSequence() {
+  if (!sphereMesh) return
+  if (sphereStage !== 1) { sphereMesh.visible = false; return }
+  const trig = clickPoseTriggers[SPHERE_FN], now = nowVirtual(), n = Math.min(hands.length, sphereMesh.count)
+  const easing = cfg[SPHERE_FN + 'EasingCurveEnabled'] ? getEasingProfile(SPHERE_FN, false, trig) : null
+  const rOn = !!cfg.sphereRadiusCurveEnabled, zOn = !!cfg.sphereZCurveEnabled
+  const rPts = rOn ? sphereParse(cfg.sphereRadiusCurve, [{ x: 0, y: 0 }, { x: 1, y: 1 }]) : null
+  const rRange = rOn ? sphereParse(cfg.sphereRadiusRange, { min: 0, max: 4 }) : null
+  const zPts = zOn ? sphereParse(cfg.sphereZCurve, [{ x: 0, y: 0 }, { x: 1, y: 1 }]) : null
+  const zRange = zOn ? sphereParse(cfg.sphereZRange, { min: -30, max: 0 }) : null
+  const startR = cfg.sphereStartRadius ?? 4, startZ = cfg.sphereStartZOffset || 0
+  _sphQ.identity()
+  for (let i = 0; i < n; i++) {
+    const base = hands[i].basePosition
+    if (!sphereOn[i] || now < sphereStart[i] || !base) { _sphS.set(0, 0, 0); _sphP.set(0, 0, 0) } else {
+      const raw = THREE.MathUtils.clamp((now - sphereStart[i]) / sphereDur[i], 0, 1)
+      const fr = (easing ? easingProfilePAt(easing, raw) : raw) * sphereCap[i]
+      const r = rOn ? rRange.min + (rRange.max - rRange.min) * THREE.MathUtils.clamp(evaluateArmLengthCurve(rPts, fr), 0, 1) : startR
+      const z = zOn ? zRange.min + (zRange.max - zRange.min) * THREE.MathUtils.clamp(evaluateArmLengthCurve(zPts, fr), 0, 1) : base.z + startZ * (1 - fr)
+      _sphP.set(base.x, base.y, z)
+      _sphS.setScalar(Math.max(r, 0))
+    }
+    _sphM.compose(_sphP, _sphQ, _sphS)
+    sphereMesh.setMatrixAt(i, _sphM)
+  }
+  sphereMesh.instanceMatrix.needsUpdate = true
+  sceneNeedsRedraw = true
+}
+function sphereSeqActive() { return !!cfg.sphereSeqEnabled && sphereStage < 2 }
+// Click 1 spawns the spheres, click 2 removes them and shows the hands; Hand Offset On Startup (if on) then waits for ITS first click as before.
+function advanceSphereSequence() {
+  if (sphereStage === 0) { sphereStage = 1; startSphereSequence(); return }
+  sphereStage = 2
+  if (sphereMesh) sphereMesh.visible = false
+  updateHandsVisibility()
+  applyStartupHandOffset()
+  sceneNeedsRedraw = true
+}
+function onSphereSeqToggled() {
+  startupConsumeActive = false; startupConsumeUntil = 0
+  if (cfg.sphereSeqEnabled) { sphereStage = 0; startupStaticReleased = false; startupHandOffsetStage = 0; if (sphereMesh) sphereMesh.visible = false }
+  else { sphereStage = 2; if (sphereMesh) sphereMesh.visible = false }
+  updateHandsVisibility()
+  updateGroupContentsVisibility('Field Grid Sphere Sequence', !!cfg.sphereSeqEnabled)
+  applyStartupHandOffset()
+  sceneNeedsRedraw = true
+}
 // While Hand Offset On Startup is on and the first click has not happened (and for a moment after it, so the same click is not also read as a real click function), the real click functions do nothing.
 function startupBlocksClickFunctions() {
-  return !!cfg.handOffsetOnStartupEnabled && (startupHandOffsetStage === 0 || startupConsumeActive || performance.now() < startupConsumeUntil)
+  if (startupConsumeActive || performance.now() < startupConsumeUntil) return !!(cfg.handOffsetOnStartupEnabled || cfg.sphereSeqEnabled)
+  if (cfg.sphereSeqEnabled && sphereStage < 2) return true
+  return !!cfg.handOffsetOnStartupEnabled && startupHandOffsetStage === 0
 }
 // Puts every hand's camera-relative displacement accumulator (the same store the click functions' Offset bakes into) at the Offset sliders, and drops it again when the feature is switched off before the first click.
 function applyStartupHandOffset() {
@@ -3473,9 +3613,11 @@ function fireStartupHandOffset() {
   triggerClickPose(STARTUP_FN)
 }
 window.addEventListener('pointerdown', (e) => {
-  if (e.button !== 0 || !cfg.handOffsetOnStartupEnabled || startupHandOffsetStage !== 0) return
+  if (e.button !== 0) return
   if (e.target && e.target.closest && e.target.closest('.dp-panel, #pauseButton, #resetButton')) return
   if (!hands.length || !fieldRevealed) return
+  if (sphereSeqActive()) { startupConsumeActive = true; advanceSphereSequence(); return } // Field Grid Sphere Sequence comes first
+  if (!cfg.handOffsetOnStartupEnabled || startupHandOffsetStage !== 0) return
   startupConsumeActive = true
   fireStartupHandOffset()
 }, true)
@@ -3485,6 +3627,13 @@ window.addEventListener('pointerup', () => {
   startupConsumeUntil = performance.now() + (cfg.multiClickWindowMs || 250) + 150
 }, true)
 // Hide / show the group's contents with its header checkbox, and arrange the click-function groups the way the request lists them: Animation Tween (Mode, Target Pose / Sequence, ... and the Retransition group inside it).
+function updateGroupContentsVisibility(groupKey, on) {
+  const g = document.querySelector('.dp-group[data-key="' + groupKey + '"]')
+  const body = g && g.querySelector(':scope > .dp-group-body')
+  if (!body) return
+  if (!document.getElementById('dpStartupStyle')) { const st = document.createElement('style'); st.id = 'dpStartupStyle'; st.textContent = '.dp-startup-off > * { display: none !important }'; document.head.appendChild(st) }
+  body.classList.toggle('dp-startup-off', !on)
+}
 function updateHandOffsetGroupVisibility() {
   const g = document.querySelector('.dp-group[data-key="Hand Offset On Startup"]')
   const body = g && g.querySelector(':scope > .dp-group-body')
@@ -3507,6 +3656,45 @@ function setupHandOffsetStartupGroup() {
   gateGroupHeader('Hand Offset On Startup', 'handOffsetOnStartupEnabled')
   nestGroupInto('Hand Offset On Startup', 'Starting State')
   updateHandOffsetGroupVisibility()
+}
+function setupSphereSequenceGroup() {
+  clickPoseTriggers[SPHERE_FN] = clickPoseTriggers[SPHERE_FN] || {
+    startCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], startRangeParsed: { min: 0, max: 300 },
+    speedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], speedRangeParsed: { min: 50, max: 2000 },
+    tweenStartCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStartRangeParsed: { min: 0, max: 300 },
+    startDistanceCurveParsed: [{ x: 0, y: 1 }, { x: 1, y: 1 }], easingCurveParsed: [{ x: 0, y: 0.5 }, { x: 1, y: 0.5 }],
+    retransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionRangeParsed: { min: 0, max: 300 },
+    retransitionSpeedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionSpeedRangeParsed: { min: 50, max: 2000 },
+    cursorOffsetDistanceCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], cursorOffsetDistanceRangeParsed: { min: -50, max: 50 }
+  }
+  cfg[SPHERE_FN + 'Enabled'] = true
+  parseClickPoseConfig(SPHERE_FN)
+  buildClickPoseWidgets(SPHERE_FN) // curve + range widgets of the borrowed rows
+  updateSingleTimingGateVisibility(SPHERE_FN)
+  wrapClickFunctionGatedSubgroups(SPHERE_FN) // Easing / Animation Speed Curve / Start Time Curve / Start Distance Curve gated subgroups
+  // the two new curve groups
+  const radCurveRow = document.querySelector('.dp-row[data-key="sphereRadiusCurve"]'), radRangeRow = document.querySelector('.dp-row[data-key="sphereRadiusRange"]')
+  if (radCurveRow) buildGenericCurveWidget(radCurveRow, { caption: 'X: Sphere Sequence Progress (0 = Not Started, 100% = Sequence End)  ·  Y: Radius (0=Min, 1=Max)', defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
+  if (radRangeRow) buildGenericRangeBarWidget(radRangeRow, { trackMin: 0, trackMax: 40, unit: 'wu', defaultValue: { min: 0, max: 4 } })
+  const zCurveRow = document.querySelector('.dp-row[data-key="sphereZCurve"]'), zRangeRow = document.querySelector('.dp-row[data-key="sphereZRange"]')
+  if (zCurveRow) buildGenericCurveWidget(zCurveRow, { caption: 'X: Sphere Sequence Progress (0 = Not Started, 100% = Sequence End)  ·  Y: Z (0=Min, 1=Max)', defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
+  if (zRangeRow) buildGenericRangeBarWidget(zRangeRow, { trackMin: -200, trackMax: 200, unit: 'wu', defaultValue: { min: -30, max: 0 } })
+  wrapGatedSubgroup('sphereRadiusCurveEnabled', ['sphereRadiusCurve', 'sphereRadiusRange'], 'Sphere Radius Curve')
+  wrapGatedSubgroup('sphereZCurveEnabled', ['sphereZCurve', 'sphereZRange'], 'Sphere Z Offset Curve')
+  const g = document.querySelector('.dp-group[data-key="Field Grid Sphere Sequence"]')
+  const body = g && g.querySelector(':scope > .dp-group-body')
+  if (body) {
+    // the order the request lists them in
+    ;['Animation Speed Curve', 'Easing', 'Start Time Curve', 'Start Distance Curve', 'Sphere Radius Curve', 'Sphere Z Offset Curve'].forEach((t) => {
+      const sg = body.querySelector(':scope > .dp-group[data-key="' + t + '"]')
+      if (sg) body.appendChild(sg)
+    })
+    // unique internal keys: these titles are shared with the click functions' groups (see setupHandOffsetStartupGroup()'s comment)
+    body.querySelectorAll('.dp-group').forEach((sg) => { if (!sg.dataset.key.startsWith('Sphere > ')) sg.dataset.key = 'Sphere > ' + sg.dataset.key })
+  }
+  gateGroupHeader('Field Grid Sphere Sequence', 'sphereSeqEnabled')
+  nestGroupInto('Field Grid Sphere Sequence', 'Starting State')
+  updateGroupContentsVisibility('Field Grid Sphere Sequence', !!cfg.sphereSeqEnabled)
 }
 function updateFloorRowVisibility() {
   const on = !!cfg.floorEnabled
@@ -4962,7 +5150,8 @@ function updateOutlineVisibility() {
 // hiding the fill/outline meshes separately (which would leave the
 // outline visible on its own if `outlineEnabled` happens to be on).
 function updateHandsVisibility() {
-  hands.forEach((h) => { h.wrapper.visible = !cfg.hideHands })
+  const hide = !!cfg.hideHands || (!!cfg.sphereSeqEnabled && sphereStage < 2) // Field Grid Sphere Sequence: the hands stay hidden until the second click
+  hands.forEach((h) => { h.wrapper.visible = !hide })
 }
 
 // -----------------------------------------------------------------------
@@ -16946,6 +17135,7 @@ function animate(dt, now) {
     syncCameraPanelFromLive()
     armLengthWidgetResyncs.forEach((fn) => fn())
     updateHandNumberLabels()
+    updateSphereSequence()
     // Global Pause (Debug group, see setPaused()'s own declaration) --
     // skipping cursor-target tracking, the cursor-follow rotation step,
     // and updateRenderOrder() (which drives every Click Pose/Click-Hold-
@@ -17372,6 +17562,7 @@ gateGroupHeader('Floor', 'floorEnabled')
 updateFloorRowVisibility()
 updateFloor()
 setupHandOffsetStartupGroup()
+setupSphereSequenceGroup()
 safeRefreshSelectOptions('trackingPoint')
 document.addEventListener('visibilitychange', syncPauseWithVisibility)
 window.addEventListener('blur', syncPauseWithVisibility)
