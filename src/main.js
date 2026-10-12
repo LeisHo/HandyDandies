@@ -2844,6 +2844,7 @@ const DEV_GROUPS = [
       { key: 'sphereStartZOffset', label: 'Sphere Starting Z Offset (World Units)', type: 'slider', min: -200, max: 200, step: 0.5, def: 0 },
       { key: 'sphereStartRadius', label: 'Sphere Starting Radius (World Units)', type: 'slider', min: 0.1, max: 40, step: 0.1, def: 4 },
       { key: 'sphereSeqDurationMs', label: 'Sphere Sequence Duration (Ms)', type: 'slider', min: 0, max: 10000, step: 10, def: 1000 },
+      { key: 'sphereWaitForAll', label: 'Wait For All Spheres', type: 'checkbox', def: false },
       { key: 'sphereColor', label: 'Sphere Color', type: 'color', def: '#d9a98f', onChange: () => { if (sphereMesh) sphereMesh.material.color.set(cfg.sphereColor) } },
       ...sphereFnControls(),
       { key: 'sphereRadiusCurveEnabled', label: 'Sphere Radius Curve On/Off', type: 'checkbox', def: false },
@@ -3551,8 +3552,20 @@ function updateSphereSequence() {
 }
 function sphereSeqActive() { return !!cfg.sphereSeqEnabled && sphereStage < 2 }
 // Click 1 spawns the spheres, click 2 removes them and shows the hands; Hand Offset On Startup (if on) then waits for ITS first click as before.
+// Wait For All Spheres: true once every sphere that would be visible on screen has reached the end of its own sequence (spheres the Start Distance Curve excluded never spawn and are skipped).
+function allVisibleSpheresDone() {
+  const now = nowVirtual(), n = Math.min(hands.length, sphereOn ? sphereOn.length : 0)
+  for (let i = 0; i < n; i++) {
+    if (!sphereOn[i]) continue
+    const b = hands[i].basePosition
+    if (!b || !isOnScreen(b)) continue
+    if (now < sphereStart[i] + sphereDur[i]) return false
+  }
+  return true
+}
 function advanceSphereSequence() {
   if (sphereStage === 0) { sphereStage = 1; startSphereSequence(); return }
+  if (cfg.sphereWaitForAll && !allVisibleSpheresDone()) return // the click is consumed, nothing after the sphere sequence starts yet
   sphereStage = 2
   if (sphereMesh) sphereMesh.visible = false
   updateHandsVisibility()
