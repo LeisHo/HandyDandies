@@ -258,45 +258,45 @@
       "zoomGestureThresholdPx": 40,
       "scrollGestureThresholdPx": 40,
       "posePreviewEnabled": false,
-      "thumbCurl": 75,
-      "thumbSplay": 42,
-      "thumbSplay2": 13,
-      "curlBiasThumb": 32,
-      "baseOnlyCurlThumb": -23,
-      "midOnlyCurlThumb": -8,
-      "tipOnlyCurlThumb": 20,
-      "tipTwistThumb": 46,
-      "curlIndex": 90,
-      "splayIndex": 18,
+      "thumbCurl": 0,
+      "thumbSplay": 0,
+      "thumbSplay2": 0,
+      "curlBiasThumb": 0,
+      "baseOnlyCurlThumb": 0,
+      "midOnlyCurlThumb": 0,
+      "tipOnlyCurlThumb": 0,
+      "tipTwistThumb": 0,
+      "curlIndex": 0,
+      "splayIndex": 0,
       "splayIndex2": 0,
-      "curlBiasIndex": -8,
-      "baseOnlyCurlIndex": 6,
+      "curlBiasIndex": 0,
+      "baseOnlyCurlIndex": 0,
       "midOnlyCurlIndex": 0,
-      "tipOnlyCurlIndex": -1,
+      "tipOnlyCurlIndex": 0,
       "tipTwistIndex": 0,
-      "curlMiddle": 92,
-      "splayMiddle": -15,
+      "curlMiddle": 0,
+      "splayMiddle": 0,
       "splayMiddle2": 0,
       "curlBiasMiddle": 0,
-      "baseOnlyCurlMiddle": -4,
+      "baseOnlyCurlMiddle": 0,
       "midOnlyCurlMiddle": 0,
-      "tipOnlyCurlMiddle": -1,
+      "tipOnlyCurlMiddle": 0,
       "tipTwistMiddle": 0,
-      "curlRing": 98,
-      "splayRing": 40,
+      "curlRing": 0,
+      "splayRing": 0,
       "splayRing2": 0,
       "curlBiasRing": 0,
-      "baseOnlyCurlRing": -15,
+      "baseOnlyCurlRing": 0,
       "midOnlyCurlRing": 0,
-      "tipOnlyCurlRing": 6,
+      "tipOnlyCurlRing": 0,
       "tipTwistRing": 0,
-      "curlPinky": 88,
-      "splayPinky": -90,
-      "splayPinky2": 25,
+      "curlPinky": 0,
+      "splayPinky": 0,
+      "splayPinky2": 0,
       "curlBiasPinky": 0,
       "baseOnlyCurlPinky": 0,
       "midOnlyCurlPinky": 0,
-      "tipOnlyCurlPinky": 15,
+      "tipOnlyCurlPinky": 0,
       "tipTwistPinky": 0,
       "wristBend": 0,
       "wristSplay": 0,
@@ -4451,7 +4451,7 @@
           "elbowBend": 0,
           "elbowSideBend": 0,
           "forearmTwist": 0,
-          "group": "New Group"
+          "group": "Horizontal Fan"
         },
         {
           "name": "Neutral - Horizontal Fanning - 1",
@@ -4507,7 +4507,7 @@
           "elbowBend": 0,
           "elbowSideBend": 0,
           "forearmTwist": 0,
-          "group": "New Group"
+          "group": "Horizontal Fan"
         },
         {
           "name": "Neutral - Horizontal Fanning - 2",
@@ -4563,7 +4563,7 @@
           "elbowBend": 0,
           "elbowSideBend": 0,
           "forearmTwist": 0,
-          "group": "New Group"
+          "group": "Horizontal Fan"
         },
         {
           "name": "Neutral - Horizontal Fanning - 3",
@@ -4619,7 +4619,7 @@
           "elbowBend": 0,
           "elbowSideBend": 0,
           "forearmTwist": 0,
-          "group": "New Group"
+          "group": "Horizontal Fan"
         },
         {
           "name": "Neutral - Horizontal Fanning - 4",
@@ -4675,7 +4675,7 @@
           "elbowBend": 0,
           "elbowSideBend": 0,
           "forearmTwist": 0,
-          "group": "New Group"
+          "group": "Horizontal Fan"
         },
         {
           "name": "Neutral - Horizontal Fanning - 5",
@@ -4731,7 +4731,7 @@
           "elbowBend": 0,
           "elbowSideBend": 0,
           "forearmTwist": 0,
-          "group": "New Group"
+          "group": "Horizontal Fan"
         },
         {
           "name": "Neutral - Horizontal Fanning - 6",
@@ -4787,7 +4787,7 @@
           "elbowBend": 0,
           "elbowSideBend": 0,
           "forearmTwist": 0,
-          "group": "New Group"
+          "group": "Horizontal Fan"
         },
         {
           "name": "Neutral - Horizontal Fanning - 7",
@@ -4843,7 +4843,7 @@
           "elbowBend": 0,
           "elbowSideBend": 0,
           "forearmTwist": 0,
-          "group": "New Group"
+          "group": "Horizontal Fan"
         },
         {
           "name": "Neutral - Vertical Fanning - 0",
@@ -4898,7 +4898,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "Vert Fan"
         },
         {
           "name": "Neutral - Vertical Fanning - 1",
@@ -4953,7 +4954,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "Vert Fan"
         },
         {
           "name": "Neutral - Vertical Fanning - 2",
@@ -5008,7 +5010,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "Vert Fan"
         },
         {
           "name": "Neutral - Vertical Fanning - 3",
@@ -5063,7 +5066,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "Vert Fan"
         },
         {
           "name": "WAVE 5.5 (NS)",
@@ -5173,7 +5177,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "Waiting"
         },
         {
           "name": "Waiting Horizontal Tap - 1",
@@ -5228,7 +5233,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "Waiting"
         },
         {
           "name": "Waiting Hoirzontal Tap - 2",
@@ -5283,7 +5289,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "Waiting"
         },
         {
           "name": "Waiting Horizontal Tap - 3",
@@ -5338,7 +5345,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "Waiting"
         },
         {
           "name": "Waiting Horizontal Tap - 4",
@@ -5393,7 +5401,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "Waiting"
         },
         {
           "name": "Waiting Horizontal Tap - 5",
@@ -5448,7 +5457,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "Waiting"
         },
         {
           "name": "COUNTDOWN (VERT) - 0",
@@ -5507,7 +5517,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "Count Down vert"
         },
         {
           "name": "COUNTDOWN (VERT) - 1",
@@ -5566,7 +5577,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "Count Down vert"
         },
         {
           "name": "COUNTDOWN (VERT) - 2",
@@ -5625,7 +5637,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "Count Down vert"
         },
         {
           "name": "COUNTDOWN (VERT) - 3",
@@ -5684,7 +5697,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "Count Down vert"
         },
         {
           "name": "COUNTDOWN (VERT) - 4",
@@ -5743,7 +5757,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "Count Down vert"
         },
         {
           "name": "COUNTDOWN (VERT) - 5",
@@ -5802,7 +5817,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "Count Down vert"
         },
         {
           "name": "COUNTDOWN (VERT) - 6",
@@ -5861,7 +5877,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "Count Down vert"
         },
         {
           "name": "COUNTDOWN (VERT) - 7",
@@ -5920,7 +5937,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "Count Down vert"
         },
         {
           "name": "COUNTDOWN (VERT) - 8",
@@ -5979,7 +5997,8 @@
           "poseOffsetX": 0,
           "poseOffsetY": 0,
           "poseOffsetZ": 0,
-          "poseScale": 1
+          "poseScale": 1,
+          "group": "Count Down vert"
         },
         {
           "name": "COUNTDOWN (VERT) - 9",
@@ -6038,7 +6057,8 @@
           "poseOffsetX": 0,
           "poseOffsetY": 0,
           "poseOffsetZ": 0,
-          "poseScale": 1
+          "poseScale": 1,
+          "group": "Count Down vert"
         },
         {
           "name": "COUNTDOWN  (VERT) - 10",
@@ -6097,7 +6117,8 @@
           "poseOffsetX": 0,
           "poseOffsetY": 0,
           "poseOffsetZ": 0,
-          "poseScale": 1
+          "poseScale": 1,
+          "group": "Count Down vert"
         },
         {
           "name": "COUNTDOWN (VERT) - LENS COVER",
@@ -6149,7 +6170,8 @@
           "poseOffsetX": 2.22,
           "poseOffsetY": -300,
           "poseOffsetZ": -0.3,
-          "poseScale": 12
+          "poseScale": 12,
+          "group": "Count Down vert"
         },
         {
           "name": "HD - NEUTRAL",
@@ -7013,7 +7035,7 @@
       "dp_capsTabText": true,
       "dp_capsGroupNames": true,
       "dp_capsSettingsText": false,
-      "dp_textEditMode": false,
+      "dp_textEditMode": true,
       "dp_capsTitleText": false,
       "dp_boldTitle": true,
       "dp_boldTab": true,
@@ -9603,45 +9625,45 @@
       "zoomGestureThresholdPx": 40,
       "scrollGestureThresholdPx": 40,
       "posePreviewEnabled": false,
-      "thumbCurl": 75,
-      "thumbSplay": 42,
-      "thumbSplay2": 13,
-      "curlBiasThumb": 32,
-      "baseOnlyCurlThumb": -23,
-      "midOnlyCurlThumb": -8,
-      "tipOnlyCurlThumb": 20,
-      "tipTwistThumb": 46,
-      "curlIndex": 90,
-      "splayIndex": 18,
+      "thumbCurl": 0,
+      "thumbSplay": 0,
+      "thumbSplay2": 0,
+      "curlBiasThumb": 0,
+      "baseOnlyCurlThumb": 0,
+      "midOnlyCurlThumb": 0,
+      "tipOnlyCurlThumb": 0,
+      "tipTwistThumb": 0,
+      "curlIndex": 0,
+      "splayIndex": 0,
       "splayIndex2": 0,
-      "curlBiasIndex": -8,
-      "baseOnlyCurlIndex": 6,
+      "curlBiasIndex": 0,
+      "baseOnlyCurlIndex": 0,
       "midOnlyCurlIndex": 0,
-      "tipOnlyCurlIndex": -1,
+      "tipOnlyCurlIndex": 0,
       "tipTwistIndex": 0,
-      "curlMiddle": 92,
-      "splayMiddle": -15,
+      "curlMiddle": 0,
+      "splayMiddle": 0,
       "splayMiddle2": 0,
       "curlBiasMiddle": 0,
-      "baseOnlyCurlMiddle": -4,
+      "baseOnlyCurlMiddle": 0,
       "midOnlyCurlMiddle": 0,
-      "tipOnlyCurlMiddle": -1,
+      "tipOnlyCurlMiddle": 0,
       "tipTwistMiddle": 0,
-      "curlRing": 98,
-      "splayRing": 40,
+      "curlRing": 0,
+      "splayRing": 0,
       "splayRing2": 0,
       "curlBiasRing": 0,
-      "baseOnlyCurlRing": -15,
+      "baseOnlyCurlRing": 0,
       "midOnlyCurlRing": 0,
-      "tipOnlyCurlRing": 6,
+      "tipOnlyCurlRing": 0,
       "tipTwistRing": 0,
-      "curlPinky": 88,
-      "splayPinky": -90,
-      "splayPinky2": 25,
+      "curlPinky": 0,
+      "splayPinky": 0,
+      "splayPinky2": 0,
       "curlBiasPinky": 0,
       "baseOnlyCurlPinky": 0,
       "midOnlyCurlPinky": 0,
-      "tipOnlyCurlPinky": 15,
+      "tipOnlyCurlPinky": 0,
       "tipTwistPinky": 0,
       "wristBend": 0,
       "wristSplay": 0,
@@ -13796,7 +13818,7 @@
           "elbowBend": 0,
           "elbowSideBend": 0,
           "forearmTwist": 0,
-          "group": "New Group"
+          "group": "Horizontal Fan"
         },
         {
           "name": "Neutral - Horizontal Fanning - 1",
@@ -13852,7 +13874,7 @@
           "elbowBend": 0,
           "elbowSideBend": 0,
           "forearmTwist": 0,
-          "group": "New Group"
+          "group": "Horizontal Fan"
         },
         {
           "name": "Neutral - Horizontal Fanning - 2",
@@ -13908,7 +13930,7 @@
           "elbowBend": 0,
           "elbowSideBend": 0,
           "forearmTwist": 0,
-          "group": "New Group"
+          "group": "Horizontal Fan"
         },
         {
           "name": "Neutral - Horizontal Fanning - 3",
@@ -13964,7 +13986,7 @@
           "elbowBend": 0,
           "elbowSideBend": 0,
           "forearmTwist": 0,
-          "group": "New Group"
+          "group": "Horizontal Fan"
         },
         {
           "name": "Neutral - Horizontal Fanning - 4",
@@ -14020,7 +14042,7 @@
           "elbowBend": 0,
           "elbowSideBend": 0,
           "forearmTwist": 0,
-          "group": "New Group"
+          "group": "Horizontal Fan"
         },
         {
           "name": "Neutral - Horizontal Fanning - 5",
@@ -14076,7 +14098,7 @@
           "elbowBend": 0,
           "elbowSideBend": 0,
           "forearmTwist": 0,
-          "group": "New Group"
+          "group": "Horizontal Fan"
         },
         {
           "name": "Neutral - Horizontal Fanning - 6",
@@ -14132,7 +14154,7 @@
           "elbowBend": 0,
           "elbowSideBend": 0,
           "forearmTwist": 0,
-          "group": "New Group"
+          "group": "Horizontal Fan"
         },
         {
           "name": "Neutral - Horizontal Fanning - 7",
@@ -14188,7 +14210,7 @@
           "elbowBend": 0,
           "elbowSideBend": 0,
           "forearmTwist": 0,
-          "group": "New Group"
+          "group": "Horizontal Fan"
         },
         {
           "name": "Neutral - Vertical Fanning - 0",
@@ -14243,7 +14265,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "Vert Fan"
         },
         {
           "name": "Neutral - Vertical Fanning - 1",
@@ -14298,7 +14321,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "Vert Fan"
         },
         {
           "name": "Neutral - Vertical Fanning - 2",
@@ -14353,7 +14377,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "Vert Fan"
         },
         {
           "name": "Neutral - Vertical Fanning - 3",
@@ -14408,7 +14433,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "Vert Fan"
         },
         {
           "name": "WAVE 5.5 (NS)",
@@ -14518,7 +14544,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "Waiting"
         },
         {
           "name": "Waiting Horizontal Tap - 1",
@@ -14573,7 +14600,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "Waiting"
         },
         {
           "name": "Waiting Hoirzontal Tap - 2",
@@ -14628,7 +14656,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "Waiting"
         },
         {
           "name": "Waiting Horizontal Tap - 3",
@@ -14683,7 +14712,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "Waiting"
         },
         {
           "name": "Waiting Horizontal Tap - 4",
@@ -14738,7 +14768,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "Waiting"
         },
         {
           "name": "Waiting Horizontal Tap - 5",
@@ -14793,7 +14824,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "Waiting"
         },
         {
           "name": "COUNTDOWN (VERT) - 0",
@@ -14852,7 +14884,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "Count Down vert"
         },
         {
           "name": "COUNTDOWN (VERT) - 1",
@@ -14911,7 +14944,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "Count Down vert"
         },
         {
           "name": "COUNTDOWN (VERT) - 2",
@@ -14970,7 +15004,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "Count Down vert"
         },
         {
           "name": "COUNTDOWN (VERT) - 3",
@@ -15029,7 +15064,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "Count Down vert"
         },
         {
           "name": "COUNTDOWN (VERT) - 4",
@@ -15088,7 +15124,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "Count Down vert"
         },
         {
           "name": "COUNTDOWN (VERT) - 5",
@@ -15147,7 +15184,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "Count Down vert"
         },
         {
           "name": "COUNTDOWN (VERT) - 6",
@@ -15206,7 +15244,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "Count Down vert"
         },
         {
           "name": "COUNTDOWN (VERT) - 7",
@@ -15265,7 +15304,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "Count Down vert"
         },
         {
           "name": "COUNTDOWN (VERT) - 8",
@@ -15324,7 +15364,8 @@
           "poseOffsetX": 0,
           "poseOffsetY": 0,
           "poseOffsetZ": 0,
-          "poseScale": 1
+          "poseScale": 1,
+          "group": "Count Down vert"
         },
         {
           "name": "COUNTDOWN (VERT) - 9",
@@ -15383,7 +15424,8 @@
           "poseOffsetX": 0,
           "poseOffsetY": 0,
           "poseOffsetZ": 0,
-          "poseScale": 1
+          "poseScale": 1,
+          "group": "Count Down vert"
         },
         {
           "name": "COUNTDOWN  (VERT) - 10",
@@ -15442,7 +15484,8 @@
           "poseOffsetX": 0,
           "poseOffsetY": 0,
           "poseOffsetZ": 0,
-          "poseScale": 1
+          "poseScale": 1,
+          "group": "Count Down vert"
         },
         {
           "name": "COUNTDOWN (VERT) - LENS COVER",
@@ -15494,7 +15537,8 @@
           "poseOffsetX": 2.22,
           "poseOffsetY": -300,
           "poseOffsetZ": -0.3,
-          "poseScale": 12
+          "poseScale": 12,
+          "group": "Count Down vert"
         },
         {
           "name": "HD - NEUTRAL",
@@ -16358,7 +16402,7 @@
       "dp_capsTabText": true,
       "dp_capsGroupNames": true,
       "dp_capsSettingsText": false,
-      "dp_textEditMode": false,
+      "dp_textEditMode": true,
       "dp_capsTitleText": false,
       "dp_boldTitle": true,
       "dp_boldTab": true,
@@ -18948,45 +18992,45 @@
       "zoomGestureThresholdPx": 40,
       "scrollGestureThresholdPx": 40,
       "posePreviewEnabled": false,
-      "thumbCurl": 75,
-      "thumbSplay": 42,
-      "thumbSplay2": 13,
-      "curlBiasThumb": 32,
-      "baseOnlyCurlThumb": -23,
-      "midOnlyCurlThumb": -8,
-      "tipOnlyCurlThumb": 20,
-      "tipTwistThumb": 46,
-      "curlIndex": 90,
-      "splayIndex": 18,
+      "thumbCurl": 0,
+      "thumbSplay": 0,
+      "thumbSplay2": 0,
+      "curlBiasThumb": 0,
+      "baseOnlyCurlThumb": 0,
+      "midOnlyCurlThumb": 0,
+      "tipOnlyCurlThumb": 0,
+      "tipTwistThumb": 0,
+      "curlIndex": 0,
+      "splayIndex": 0,
       "splayIndex2": 0,
-      "curlBiasIndex": -8,
-      "baseOnlyCurlIndex": 6,
+      "curlBiasIndex": 0,
+      "baseOnlyCurlIndex": 0,
       "midOnlyCurlIndex": 0,
-      "tipOnlyCurlIndex": -1,
+      "tipOnlyCurlIndex": 0,
       "tipTwistIndex": 0,
-      "curlMiddle": 92,
-      "splayMiddle": -15,
+      "curlMiddle": 0,
+      "splayMiddle": 0,
       "splayMiddle2": 0,
       "curlBiasMiddle": 0,
-      "baseOnlyCurlMiddle": -4,
+      "baseOnlyCurlMiddle": 0,
       "midOnlyCurlMiddle": 0,
-      "tipOnlyCurlMiddle": -1,
+      "tipOnlyCurlMiddle": 0,
       "tipTwistMiddle": 0,
-      "curlRing": 98,
-      "splayRing": 40,
+      "curlRing": 0,
+      "splayRing": 0,
       "splayRing2": 0,
       "curlBiasRing": 0,
-      "baseOnlyCurlRing": -15,
+      "baseOnlyCurlRing": 0,
       "midOnlyCurlRing": 0,
-      "tipOnlyCurlRing": 6,
+      "tipOnlyCurlRing": 0,
       "tipTwistRing": 0,
-      "curlPinky": 88,
-      "splayPinky": -90,
-      "splayPinky2": 25,
+      "curlPinky": 0,
+      "splayPinky": 0,
+      "splayPinky2": 0,
       "curlBiasPinky": 0,
       "baseOnlyCurlPinky": 0,
       "midOnlyCurlPinky": 0,
-      "tipOnlyCurlPinky": 15,
+      "tipOnlyCurlPinky": 0,
       "tipTwistPinky": 0,
       "wristBend": 0,
       "wristSplay": 0,
@@ -23141,7 +23185,7 @@
           "elbowBend": 0,
           "elbowSideBend": 0,
           "forearmTwist": 0,
-          "group": "New Group"
+          "group": "Horizontal Fan"
         },
         {
           "name": "Neutral - Horizontal Fanning - 1",
@@ -23197,7 +23241,7 @@
           "elbowBend": 0,
           "elbowSideBend": 0,
           "forearmTwist": 0,
-          "group": "New Group"
+          "group": "Horizontal Fan"
         },
         {
           "name": "Neutral - Horizontal Fanning - 2",
@@ -23253,7 +23297,7 @@
           "elbowBend": 0,
           "elbowSideBend": 0,
           "forearmTwist": 0,
-          "group": "New Group"
+          "group": "Horizontal Fan"
         },
         {
           "name": "Neutral - Horizontal Fanning - 3",
@@ -23309,7 +23353,7 @@
           "elbowBend": 0,
           "elbowSideBend": 0,
           "forearmTwist": 0,
-          "group": "New Group"
+          "group": "Horizontal Fan"
         },
         {
           "name": "Neutral - Horizontal Fanning - 4",
@@ -23365,7 +23409,7 @@
           "elbowBend": 0,
           "elbowSideBend": 0,
           "forearmTwist": 0,
-          "group": "New Group"
+          "group": "Horizontal Fan"
         },
         {
           "name": "Neutral - Horizontal Fanning - 5",
@@ -23421,7 +23465,7 @@
           "elbowBend": 0,
           "elbowSideBend": 0,
           "forearmTwist": 0,
-          "group": "New Group"
+          "group": "Horizontal Fan"
         },
         {
           "name": "Neutral - Horizontal Fanning - 6",
@@ -23477,7 +23521,7 @@
           "elbowBend": 0,
           "elbowSideBend": 0,
           "forearmTwist": 0,
-          "group": "New Group"
+          "group": "Horizontal Fan"
         },
         {
           "name": "Neutral - Horizontal Fanning - 7",
@@ -23533,7 +23577,7 @@
           "elbowBend": 0,
           "elbowSideBend": 0,
           "forearmTwist": 0,
-          "group": "New Group"
+          "group": "Horizontal Fan"
         },
         {
           "name": "Neutral - Vertical Fanning - 0",
@@ -23588,7 +23632,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "Vert Fan"
         },
         {
           "name": "Neutral - Vertical Fanning - 1",
@@ -23643,7 +23688,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "Vert Fan"
         },
         {
           "name": "Neutral - Vertical Fanning - 2",
@@ -23698,7 +23744,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "Vert Fan"
         },
         {
           "name": "Neutral - Vertical Fanning - 3",
@@ -23753,7 +23800,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "Vert Fan"
         },
         {
           "name": "WAVE 5.5 (NS)",
@@ -23863,7 +23911,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "Waiting"
         },
         {
           "name": "Waiting Horizontal Tap - 1",
@@ -23918,7 +23967,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "Waiting"
         },
         {
           "name": "Waiting Hoirzontal Tap - 2",
@@ -23973,7 +24023,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "Waiting"
         },
         {
           "name": "Waiting Horizontal Tap - 3",
@@ -24028,7 +24079,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "Waiting"
         },
         {
           "name": "Waiting Horizontal Tap - 4",
@@ -24083,7 +24135,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "Waiting"
         },
         {
           "name": "Waiting Horizontal Tap - 5",
@@ -24138,7 +24191,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "Waiting"
         },
         {
           "name": "COUNTDOWN (VERT) - 0",
@@ -24197,7 +24251,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "Count Down vert"
         },
         {
           "name": "COUNTDOWN (VERT) - 1",
@@ -24256,7 +24311,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "Count Down vert"
         },
         {
           "name": "COUNTDOWN (VERT) - 2",
@@ -24315,7 +24371,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "Count Down vert"
         },
         {
           "name": "COUNTDOWN (VERT) - 3",
@@ -24374,7 +24431,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "Count Down vert"
         },
         {
           "name": "COUNTDOWN (VERT) - 4",
@@ -24433,7 +24491,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "Count Down vert"
         },
         {
           "name": "COUNTDOWN (VERT) - 5",
@@ -24492,7 +24551,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "Count Down vert"
         },
         {
           "name": "COUNTDOWN (VERT) - 6",
@@ -24551,7 +24611,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "Count Down vert"
         },
         {
           "name": "COUNTDOWN (VERT) - 7",
@@ -24610,7 +24671,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "Count Down vert"
         },
         {
           "name": "COUNTDOWN (VERT) - 8",
@@ -24669,7 +24731,8 @@
           "poseOffsetX": 0,
           "poseOffsetY": 0,
           "poseOffsetZ": 0,
-          "poseScale": 1
+          "poseScale": 1,
+          "group": "Count Down vert"
         },
         {
           "name": "COUNTDOWN (VERT) - 9",
@@ -24728,7 +24791,8 @@
           "poseOffsetX": 0,
           "poseOffsetY": 0,
           "poseOffsetZ": 0,
-          "poseScale": 1
+          "poseScale": 1,
+          "group": "Count Down vert"
         },
         {
           "name": "COUNTDOWN  (VERT) - 10",
@@ -24787,7 +24851,8 @@
           "poseOffsetX": 0,
           "poseOffsetY": 0,
           "poseOffsetZ": 0,
-          "poseScale": 1
+          "poseScale": 1,
+          "group": "Count Down vert"
         },
         {
           "name": "COUNTDOWN (VERT) - LENS COVER",
@@ -24839,7 +24904,8 @@
           "poseOffsetX": 2.22,
           "poseOffsetY": -300,
           "poseOffsetZ": -0.3,
-          "poseScale": 12
+          "poseScale": 12,
+          "group": "Count Down vert"
         },
         {
           "name": "HD - NEUTRAL",
@@ -25703,7 +25769,7 @@
       "dp_capsTabText": true,
       "dp_capsGroupNames": true,
       "dp_capsSettingsText": false,
-      "dp_textEditMode": false,
+      "dp_textEditMode": true,
       "dp_capsTitleText": false,
       "dp_boldTitle": true,
       "dp_boldTab": true,
