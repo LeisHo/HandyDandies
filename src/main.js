@@ -3059,7 +3059,12 @@ const cfg = initDevPanel(DEV_GROUPS, {
     logStartupTiming('onRestore fired -> startupSettingsReady = true')
     // A saved panel order that predates the Render Order group puts its rows straight back into Field Layout when it is applied; re-nest them (idempotent, only moves the listed keys).
     try { renestRenderOrderRows() } catch (e) { /* panel not built */ }
-    try { gateGroupHeader('Floor', 'floorEnabled'); nestFloorIntoThreeJs(); updateFloorRowVisibility(); updateFloor() } catch (e) { /* panel not built */ }
+    try {
+      // Default Floor Color = the Background Color (direct request): while Floor Color still holds its code default (white) and the restored Background Color is something else, start from the Background Color. Once a
+      // different color is saved it is left alone (a deliberately white floor on a non-white background needs a slightly different white, e.g. #fefefe).
+      if ((cfg.floorColor || '#ffffff').toLowerCase() === '#ffffff' && cfg.bgColor && cfg.bgColor.toLowerCase() !== '#ffffff') syncValue('floorColor', cfg.bgColor)
+      gateGroupHeader('Floor', 'floorEnabled'); nestFloorIntoThreeJs(); updateFloorRowVisibility(); updateFloor()
+    } catch (e) { /* panel not built */ }
     try { normalizeRenderOrderFallbacks() } catch (e) { /* not ready */ }
     // Each step timed when ?debugTiming=1 (see devPanel.js dpTime()).
     const prof = (label, fn) => {

@@ -17367,6 +17367,10 @@ Direct request: in the THREE.JS group add a toggleable subgroup called Floor - a
  - Default Floor Color = #ffffff = the Background Color default. A Background Color you have changed is NOT followed automatically - set Floor Color to match.
  - The Floor group is built as a top-level group; nestFloorIntoThreeJs() (run after the settings restore) moves it into the group currently titled THREE.JS (the user's own renamed group) while it is still top-level, i.e. until a saved layout places it. main.js ?v=379 -> ?v=380.
 
+2026-10-12  -  (Floor Color starts from the Background Color)
+
+The Floor shipped with Floor Color = the Background Color CODE default (white); the saved Background Color here is #808080, so the floor did not match. After the settings restore, while Floor Color still holds its default (#ffffff) and Background Color is something else, Floor Color is set to the Background Color (syncValue); once any other color is saved it is left alone. A deliberately white floor on a non-white background needs a slightly different white (e.g. #fefefe). main.js ?v=380 -> ?v=381.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a
