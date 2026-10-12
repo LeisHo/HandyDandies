@@ -7310,9 +7310,9 @@
       "custom21LoopHoldMs": 0,
       "custom21TransitionSpeedMs": 700,
       "custom21EasingCurveEnabled": true,
-      "custom21EasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.14738803792568153,\"y\":0.0037495930989582815}},{\"x\":0.4988660773181022,\"y\":1,\"h2\":{\"x\":-0.217053360727685,\"y\":0.013333384195963527},\"h1\":{\"x\":0.2149543089127548,\"y\":0.08291676839192708}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.14863189491097573,\"y\":0.0037495930989582815}}]",
+      "custom21EasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.31143422537808685,\"y\":0.10374984741210935}},{\"x\":0.5114378003582828,\"y\":0.8504165649414063,\"h2\":{\"x\":-0.217053360727685,\"y\":0.013333384195963527},\"h1\":{\"x\":0.23886151703848635,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2702726881540415,\"y\":0.16374994913736984}}]",
       "custom21RetransitionEasingCurveEnabled": true,
-      "custom21RetransitionEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.13036157000043055,\"y\":0.0769785563151042}},{\"x\":0.5011679019643085,\"y\":1,\"h2\":{\"x\":-0.274628427178499,\"y\":0},\"h1\":{\"x\":0.28158102656376904,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.16974162760472722,\"y\":0.2036458333333333}}]",
+      "custom21RetransitionEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.2821603582750679,\"y\":0.2319791158040364}},{\"x\":0.5000090617275154,\"y\":0.7653124491373697,\"h2\":{\"x\":-0.274628427178499,\"y\":0},\"h1\":{\"x\":0.28158102656376904,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.27982473116064643,\"y\":0.24531224568684895}}]",
       "custom21SpeedCurveEnabled": false,
       "custom21SpeedCurveVisibleOnly": true,
       "custom21SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -7336,7 +7336,7 @@
       "custom21RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "custom21TweenRetransitionSpeedMs": 5000,
-      "custom21TweenRetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom21TweenRetransitionSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.25203236866749906,\"y\":0.040103912353515625}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.3644149408348759,\"y\":0}}]",
       "custom21TweenRetransitionSpeedCurveRange": "{\"min\":20000,\"max\":25254}",
       "custom21TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21TweenRetransitionStartTimeRange": "{\"min\":1601,\"max\":3000}",
@@ -7754,7 +7754,7 @@
       "custom21Trig5EasingCurveEnabled": true,
       "custom21Trig5EasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.13141025641025642,\"y\":0.021354166666666674}},{\"x\":0.4812073634777336,\"y\":1,\"h2\":{\"x\":-0.1985934581630323,\"y\":0},\"h1\":{\"x\":0.2796761312039611,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2249999413123498,\"y\":0.021354166666666674}}]",
       "custom21Trig5RetransitionEasingCurveEnabled": true,
-      "custom21Trig5RetransitionEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.1972623513013316,\"y\":0.068854014078776}},{\"x\":0.49643366904506936,\"y\":1,\"h1\":{\"x\":0.2562622218083621,\"y\":-0.004479217529296919},\"h2\":{\"x\":-0.22884826915913958,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.16267808920756122,\"y\":0.05552088419596357}}]",
+      "custom21Trig5RetransitionEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.2830803612999348,\"y\":0.15552088419596355}},{\"x\":0.49643366904506936,\"y\":0.8021873474121094,\"h1\":{\"x\":0.2562622218083621,\"y\":-0.004479217529296919},\"h2\":{\"x\":-0.22884826915913958,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2723344454208958,\"y\":0.17552057902018225}}]",
       "custom21Trig5SpeedCurveEnabled": false,
       "custom21Trig5SpeedCurveVisibleOnly": true,
       "custom21Trig5SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -7778,7 +7778,7 @@
       "custom21Trig5RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21Trig5RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "custom21Trig5TweenRetransitionSpeedMs": 5000,
-      "custom21Trig5TweenRetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom21Trig5TweenRetransitionSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.24017135630063322,\"y\":0.03197911580403645}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.4904553496601173,\"y\":0}}]",
       "custom21Trig5TweenRetransitionSpeedCurveRange": "{\"min\":20000,\"max\":25692}",
       "custom21Trig5TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21Trig5TweenRetransitionStartTimeRange": "{\"min\":1467,\"max\":3000}",
@@ -16640,9 +16640,9 @@
       "custom21LoopHoldMs": 0,
       "custom21TransitionSpeedMs": 700,
       "custom21EasingCurveEnabled": true,
-      "custom21EasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.14738803792568153,\"y\":0.0037495930989582815}},{\"x\":0.4988660773181022,\"y\":1,\"h2\":{\"x\":-0.217053360727685,\"y\":0.013333384195963527},\"h1\":{\"x\":0.2149543089127548,\"y\":0.08291676839192708}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.14863189491097573,\"y\":0.0037495930989582815}}]",
+      "custom21EasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.31143422537808685,\"y\":0.10374984741210935}},{\"x\":0.5114378003582828,\"y\":0.8504165649414063,\"h2\":{\"x\":-0.217053360727685,\"y\":0.013333384195963527},\"h1\":{\"x\":0.23886151703848635,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2702726881540415,\"y\":0.16374994913736984}}]",
       "custom21RetransitionEasingCurveEnabled": true,
-      "custom21RetransitionEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.13036157000043055,\"y\":0.0769785563151042}},{\"x\":0.5011679019643085,\"y\":1,\"h2\":{\"x\":-0.274628427178499,\"y\":0},\"h1\":{\"x\":0.28158102656376904,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.16974162760472722,\"y\":0.2036458333333333}}]",
+      "custom21RetransitionEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.2821603582750679,\"y\":0.2319791158040364}},{\"x\":0.5000090617275154,\"y\":0.7653124491373697,\"h2\":{\"x\":-0.274628427178499,\"y\":0},\"h1\":{\"x\":0.28158102656376904,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.27982473116064643,\"y\":0.24531224568684895}}]",
       "custom21SpeedCurveEnabled": false,
       "custom21SpeedCurveVisibleOnly": true,
       "custom21SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -16666,7 +16666,7 @@
       "custom21RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "custom21TweenRetransitionSpeedMs": 5000,
-      "custom21TweenRetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom21TweenRetransitionSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.25203236866749906,\"y\":0.040103912353515625}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.3644149408348759,\"y\":0}}]",
       "custom21TweenRetransitionSpeedCurveRange": "{\"min\":20000,\"max\":25254}",
       "custom21TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21TweenRetransitionStartTimeRange": "{\"min\":1601,\"max\":3000}",
@@ -17084,7 +17084,7 @@
       "custom21Trig5EasingCurveEnabled": true,
       "custom21Trig5EasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.13141025641025642,\"y\":0.021354166666666674}},{\"x\":0.4812073634777336,\"y\":1,\"h2\":{\"x\":-0.1985934581630323,\"y\":0},\"h1\":{\"x\":0.2796761312039611,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2249999413123498,\"y\":0.021354166666666674}}]",
       "custom21Trig5RetransitionEasingCurveEnabled": true,
-      "custom21Trig5RetransitionEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.1972623513013316,\"y\":0.068854014078776}},{\"x\":0.49643366904506936,\"y\":1,\"h1\":{\"x\":0.2562622218083621,\"y\":-0.004479217529296919},\"h2\":{\"x\":-0.22884826915913958,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.16267808920756122,\"y\":0.05552088419596357}}]",
+      "custom21Trig5RetransitionEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.2830803612999348,\"y\":0.15552088419596355}},{\"x\":0.49643366904506936,\"y\":0.8021873474121094,\"h1\":{\"x\":0.2562622218083621,\"y\":-0.004479217529296919},\"h2\":{\"x\":-0.22884826915913958,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2723344454208958,\"y\":0.17552057902018225}}]",
       "custom21Trig5SpeedCurveEnabled": false,
       "custom21Trig5SpeedCurveVisibleOnly": true,
       "custom21Trig5SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -17108,7 +17108,7 @@
       "custom21Trig5RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21Trig5RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "custom21Trig5TweenRetransitionSpeedMs": 5000,
-      "custom21Trig5TweenRetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom21Trig5TweenRetransitionSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.24017135630063322,\"y\":0.03197911580403645}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.4904553496601173,\"y\":0}}]",
       "custom21Trig5TweenRetransitionSpeedCurveRange": "{\"min\":20000,\"max\":25692}",
       "custom21Trig5TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21Trig5TweenRetransitionStartTimeRange": "{\"min\":1467,\"max\":3000}",
@@ -25970,9 +25970,9 @@
       "custom21LoopHoldMs": 0,
       "custom21TransitionSpeedMs": 700,
       "custom21EasingCurveEnabled": true,
-      "custom21EasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.14738803792568153,\"y\":0.0037495930989582815}},{\"x\":0.4988660773181022,\"y\":1,\"h2\":{\"x\":-0.217053360727685,\"y\":0.013333384195963527},\"h1\":{\"x\":0.2149543089127548,\"y\":0.08291676839192708}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.14863189491097573,\"y\":0.0037495930989582815}}]",
+      "custom21EasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.31143422537808685,\"y\":0.10374984741210935}},{\"x\":0.5114378003582828,\"y\":0.8504165649414063,\"h2\":{\"x\":-0.217053360727685,\"y\":0.013333384195963527},\"h1\":{\"x\":0.23886151703848635,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2702726881540415,\"y\":0.16374994913736984}}]",
       "custom21RetransitionEasingCurveEnabled": true,
-      "custom21RetransitionEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.13036157000043055,\"y\":0.0769785563151042}},{\"x\":0.5011679019643085,\"y\":1,\"h2\":{\"x\":-0.274628427178499,\"y\":0},\"h1\":{\"x\":0.28158102656376904,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.16974162760472722,\"y\":0.2036458333333333}}]",
+      "custom21RetransitionEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.2821603582750679,\"y\":0.2319791158040364}},{\"x\":0.5000090617275154,\"y\":0.7653124491373697,\"h2\":{\"x\":-0.274628427178499,\"y\":0},\"h1\":{\"x\":0.28158102656376904,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.27982473116064643,\"y\":0.24531224568684895}}]",
       "custom21SpeedCurveEnabled": false,
       "custom21SpeedCurveVisibleOnly": true,
       "custom21SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -25996,7 +25996,7 @@
       "custom21RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "custom21TweenRetransitionSpeedMs": 5000,
-      "custom21TweenRetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom21TweenRetransitionSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.25203236866749906,\"y\":0.040103912353515625}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.3644149408348759,\"y\":0}}]",
       "custom21TweenRetransitionSpeedCurveRange": "{\"min\":20000,\"max\":25254}",
       "custom21TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21TweenRetransitionStartTimeRange": "{\"min\":1601,\"max\":3000}",
@@ -26414,7 +26414,7 @@
       "custom21Trig5EasingCurveEnabled": true,
       "custom21Trig5EasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.13141025641025642,\"y\":0.021354166666666674}},{\"x\":0.4812073634777336,\"y\":1,\"h2\":{\"x\":-0.1985934581630323,\"y\":0},\"h1\":{\"x\":0.2796761312039611,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2249999413123498,\"y\":0.021354166666666674}}]",
       "custom21Trig5RetransitionEasingCurveEnabled": true,
-      "custom21Trig5RetransitionEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.1972623513013316,\"y\":0.068854014078776}},{\"x\":0.49643366904506936,\"y\":1,\"h1\":{\"x\":0.2562622218083621,\"y\":-0.004479217529296919},\"h2\":{\"x\":-0.22884826915913958,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.16267808920756122,\"y\":0.05552088419596357}}]",
+      "custom21Trig5RetransitionEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.2830803612999348,\"y\":0.15552088419596355}},{\"x\":0.49643366904506936,\"y\":0.8021873474121094,\"h1\":{\"x\":0.2562622218083621,\"y\":-0.004479217529296919},\"h2\":{\"x\":-0.22884826915913958,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2723344454208958,\"y\":0.17552057902018225}}]",
       "custom21Trig5SpeedCurveEnabled": false,
       "custom21Trig5SpeedCurveVisibleOnly": true,
       "custom21Trig5SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -26438,7 +26438,7 @@
       "custom21Trig5RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21Trig5RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "custom21Trig5TweenRetransitionSpeedMs": 5000,
-      "custom21Trig5TweenRetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom21Trig5TweenRetransitionSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.24017135630063322,\"y\":0.03197911580403645}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.4904553496601173,\"y\":0}}]",
       "custom21Trig5TweenRetransitionSpeedCurveRange": "{\"min\":20000,\"max\":25692}",
       "custom21Trig5TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21Trig5TweenRetransitionStartTimeRange": "{\"min\":1467,\"max\":3000}",
@@ -30033,14 +30033,14 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
           "type": "group",
           "group": {
             "key": "Field Layout",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -30107,7 +30107,7 @@
                 "type": "group",
                 "group": {
                   "key": "Render Order",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -30192,7 +30192,7 @@
             "subgroups": [
               {
                 "key": "Render Order",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -31611,7 +31611,7 @@
       "subgroups": [
         {
           "key": "Field Layout",
-          "collapsed": false,
+          "collapsed": true,
           "locked": true,
           "items": [
             {
@@ -31678,7 +31678,7 @@
               "type": "group",
               "group": {
                 "key": "Render Order",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -31763,7 +31763,7 @@
           "subgroups": [
             {
               "key": "Render Order",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -33168,7 +33168,7 @@
     },
     {
       "key": "Custom Click Functions",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -80781,7 +80781,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 21",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -81143,7 +81143,7 @@
                 "type": "group",
                 "group": {
                   "key": "Retransition",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -81192,7 +81192,7 @@
                       "type": "group",
                       "group": {
                         "key": "Retransition Start Time Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -81234,7 +81234,7 @@
                       "type": "group",
                       "group": {
                         "key": "Retransition Easing Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -81291,7 +81291,7 @@
                     },
                     {
                       "key": "Retransition Start Time Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -81326,7 +81326,7 @@
                     },
                     {
                       "key": "Retransition Easing Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -81485,7 +81485,7 @@
                 "type": "group",
                 "group": {
                   "key": "Multi Trigger",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -86772,7 +86772,7 @@
                       "type": "group",
                       "group": {
                         "key": "Trigger 5",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -87122,7 +87122,7 @@
                             "type": "group",
                             "group": {
                               "key": "Retransition",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -87133,7 +87133,7 @@
                                   "type": "group",
                                   "group": {
                                     "key": "Retransition Speed Curve",
-                                    "collapsed": true,
+                                    "collapsed": false,
                                     "locked": false,
                                     "items": [
                                       {
@@ -87213,7 +87213,7 @@
                                   "type": "group",
                                   "group": {
                                     "key": "Retransition Easing Curve",
-                                    "collapsed": true,
+                                    "collapsed": false,
                                     "locked": false,
                                     "items": [
                                       {
@@ -87235,7 +87235,7 @@
                               "subgroups": [
                                 {
                                   "key": "Retransition Speed Curve",
-                                  "collapsed": true,
+                                  "collapsed": false,
                                   "locked": false,
                                   "items": [
                                     {
@@ -87305,7 +87305,7 @@
                                 },
                                 {
                                   "key": "Retransition Easing Curve",
-                                  "collapsed": true,
+                                  "collapsed": false,
                                   "locked": false,
                                   "items": [
                                     {
@@ -87749,7 +87749,7 @@
                           },
                           {
                             "key": "Retransition",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -87760,7 +87760,7 @@
                                 "type": "group",
                                 "group": {
                                   "key": "Retransition Speed Curve",
-                                  "collapsed": true,
+                                  "collapsed": false,
                                   "locked": false,
                                   "items": [
                                     {
@@ -87840,7 +87840,7 @@
                                 "type": "group",
                                 "group": {
                                   "key": "Retransition Easing Curve",
-                                  "collapsed": true,
+                                  "collapsed": false,
                                   "locked": false,
                                   "items": [
                                     {
@@ -87862,7 +87862,7 @@
                             "subgroups": [
                               {
                                 "key": "Retransition Speed Curve",
-                                "collapsed": true,
+                                "collapsed": false,
                                 "locked": false,
                                 "items": [
                                   {
@@ -87932,7 +87932,7 @@
                               },
                               {
                                 "key": "Retransition Easing Curve",
-                                "collapsed": true,
+                                "collapsed": false,
                                 "locked": false,
                                 "items": [
                                   {
@@ -93358,7 +93358,7 @@
                     },
                     {
                       "key": "Trigger 5",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -93708,7 +93708,7 @@
                           "type": "group",
                           "group": {
                             "key": "Retransition",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -93719,7 +93719,7 @@
                                 "type": "group",
                                 "group": {
                                   "key": "Retransition Speed Curve",
-                                  "collapsed": true,
+                                  "collapsed": false,
                                   "locked": false,
                                   "items": [
                                     {
@@ -93799,7 +93799,7 @@
                                 "type": "group",
                                 "group": {
                                   "key": "Retransition Easing Curve",
-                                  "collapsed": true,
+                                  "collapsed": false,
                                   "locked": false,
                                   "items": [
                                     {
@@ -93821,7 +93821,7 @@
                             "subgroups": [
                               {
                                 "key": "Retransition Speed Curve",
-                                "collapsed": true,
+                                "collapsed": false,
                                 "locked": false,
                                 "items": [
                                   {
@@ -93891,7 +93891,7 @@
                               },
                               {
                                 "key": "Retransition Easing Curve",
-                                "collapsed": true,
+                                "collapsed": false,
                                 "locked": false,
                                 "items": [
                                   {
@@ -94335,7 +94335,7 @@
                         },
                         {
                           "key": "Retransition",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -94346,7 +94346,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Retransition Speed Curve",
-                                "collapsed": true,
+                                "collapsed": false,
                                 "locked": false,
                                 "items": [
                                   {
@@ -94426,7 +94426,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Retransition Easing Curve",
-                                "collapsed": true,
+                                "collapsed": false,
                                 "locked": false,
                                 "items": [
                                   {
@@ -94448,7 +94448,7 @@
                           "subgroups": [
                             {
                               "key": "Retransition Speed Curve",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -94518,7 +94518,7 @@
                             },
                             {
                               "key": "Retransition Easing Curve",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -94966,7 +94966,7 @@
               },
               {
                 "key": "Retransition",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -95015,7 +95015,7 @@
                     "type": "group",
                     "group": {
                       "key": "Retransition Start Time Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -95057,7 +95057,7 @@
                     "type": "group",
                     "group": {
                       "key": "Retransition Easing Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -95114,7 +95114,7 @@
                   },
                   {
                     "key": "Retransition Start Time Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -95149,7 +95149,7 @@
                   },
                   {
                     "key": "Retransition Easing Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -95302,7 +95302,7 @@
               },
               {
                 "key": "Multi Trigger",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -100589,7 +100589,7 @@
                     "type": "group",
                     "group": {
                       "key": "Trigger 5",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -100939,7 +100939,7 @@
                           "type": "group",
                           "group": {
                             "key": "Retransition",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -100950,7 +100950,7 @@
                                 "type": "group",
                                 "group": {
                                   "key": "Retransition Speed Curve",
-                                  "collapsed": true,
+                                  "collapsed": false,
                                   "locked": false,
                                   "items": [
                                     {
@@ -101030,7 +101030,7 @@
                                 "type": "group",
                                 "group": {
                                   "key": "Retransition Easing Curve",
-                                  "collapsed": true,
+                                  "collapsed": false,
                                   "locked": false,
                                   "items": [
                                     {
@@ -101052,7 +101052,7 @@
                             "subgroups": [
                               {
                                 "key": "Retransition Speed Curve",
-                                "collapsed": true,
+                                "collapsed": false,
                                 "locked": false,
                                 "items": [
                                   {
@@ -101122,7 +101122,7 @@
                               },
                               {
                                 "key": "Retransition Easing Curve",
-                                "collapsed": true,
+                                "collapsed": false,
                                 "locked": false,
                                 "items": [
                                   {
@@ -101566,7 +101566,7 @@
                         },
                         {
                           "key": "Retransition",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -101577,7 +101577,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Retransition Speed Curve",
-                                "collapsed": true,
+                                "collapsed": false,
                                 "locked": false,
                                 "items": [
                                   {
@@ -101657,7 +101657,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Retransition Easing Curve",
-                                "collapsed": true,
+                                "collapsed": false,
                                 "locked": false,
                                 "items": [
                                   {
@@ -101679,7 +101679,7 @@
                           "subgroups": [
                             {
                               "key": "Retransition Speed Curve",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -101749,7 +101749,7 @@
                             },
                             {
                               "key": "Retransition Easing Curve",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -107175,7 +107175,7 @@
                   },
                   {
                     "key": "Trigger 5",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -107525,7 +107525,7 @@
                         "type": "group",
                         "group": {
                           "key": "Retransition",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -107536,7 +107536,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Retransition Speed Curve",
-                                "collapsed": true,
+                                "collapsed": false,
                                 "locked": false,
                                 "items": [
                                   {
@@ -107616,7 +107616,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Retransition Easing Curve",
-                                "collapsed": true,
+                                "collapsed": false,
                                 "locked": false,
                                 "items": [
                                   {
@@ -107638,7 +107638,7 @@
                           "subgroups": [
                             {
                               "key": "Retransition Speed Curve",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -107708,7 +107708,7 @@
                             },
                             {
                               "key": "Retransition Easing Curve",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -108152,7 +108152,7 @@
                       },
                       {
                         "key": "Retransition",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -108163,7 +108163,7 @@
                             "type": "group",
                             "group": {
                               "key": "Retransition Speed Curve",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -108243,7 +108243,7 @@
                             "type": "group",
                             "group": {
                               "key": "Retransition Easing Curve",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -108265,7 +108265,7 @@
                         "subgroups": [
                           {
                             "key": "Retransition Speed Curve",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -108335,7 +108335,7 @@
                           },
                           {
                             "key": "Retransition Easing Curve",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -162025,7 +162025,7 @@
         },
         {
           "key": "Custom Click Function 21",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
@@ -162387,7 +162387,7 @@
               "type": "group",
               "group": {
                 "key": "Retransition",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -162436,7 +162436,7 @@
                     "type": "group",
                     "group": {
                       "key": "Retransition Start Time Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -162478,7 +162478,7 @@
                     "type": "group",
                     "group": {
                       "key": "Retransition Easing Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -162535,7 +162535,7 @@
                   },
                   {
                     "key": "Retransition Start Time Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -162570,7 +162570,7 @@
                   },
                   {
                     "key": "Retransition Easing Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -162729,7 +162729,7 @@
               "type": "group",
               "group": {
                 "key": "Multi Trigger",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -168016,7 +168016,7 @@
                     "type": "group",
                     "group": {
                       "key": "Trigger 5",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -168366,7 +168366,7 @@
                           "type": "group",
                           "group": {
                             "key": "Retransition",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -168377,7 +168377,7 @@
                                 "type": "group",
                                 "group": {
                                   "key": "Retransition Speed Curve",
-                                  "collapsed": true,
+                                  "collapsed": false,
                                   "locked": false,
                                   "items": [
                                     {
@@ -168457,7 +168457,7 @@
                                 "type": "group",
                                 "group": {
                                   "key": "Retransition Easing Curve",
-                                  "collapsed": true,
+                                  "collapsed": false,
                                   "locked": false,
                                   "items": [
                                     {
@@ -168479,7 +168479,7 @@
                             "subgroups": [
                               {
                                 "key": "Retransition Speed Curve",
-                                "collapsed": true,
+                                "collapsed": false,
                                 "locked": false,
                                 "items": [
                                   {
@@ -168549,7 +168549,7 @@
                               },
                               {
                                 "key": "Retransition Easing Curve",
-                                "collapsed": true,
+                                "collapsed": false,
                                 "locked": false,
                                 "items": [
                                   {
@@ -168993,7 +168993,7 @@
                         },
                         {
                           "key": "Retransition",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -169004,7 +169004,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Retransition Speed Curve",
-                                "collapsed": true,
+                                "collapsed": false,
                                 "locked": false,
                                 "items": [
                                   {
@@ -169084,7 +169084,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Retransition Easing Curve",
-                                "collapsed": true,
+                                "collapsed": false,
                                 "locked": false,
                                 "items": [
                                   {
@@ -169106,7 +169106,7 @@
                           "subgroups": [
                             {
                               "key": "Retransition Speed Curve",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -169176,7 +169176,7 @@
                             },
                             {
                               "key": "Retransition Easing Curve",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -174602,7 +174602,7 @@
                   },
                   {
                     "key": "Trigger 5",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -174952,7 +174952,7 @@
                         "type": "group",
                         "group": {
                           "key": "Retransition",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -174963,7 +174963,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Retransition Speed Curve",
-                                "collapsed": true,
+                                "collapsed": false,
                                 "locked": false,
                                 "items": [
                                   {
@@ -175043,7 +175043,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Retransition Easing Curve",
-                                "collapsed": true,
+                                "collapsed": false,
                                 "locked": false,
                                 "items": [
                                   {
@@ -175065,7 +175065,7 @@
                           "subgroups": [
                             {
                               "key": "Retransition Speed Curve",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -175135,7 +175135,7 @@
                             },
                             {
                               "key": "Retransition Easing Curve",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -175579,7 +175579,7 @@
                       },
                       {
                         "key": "Retransition",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -175590,7 +175590,7 @@
                             "type": "group",
                             "group": {
                               "key": "Retransition Speed Curve",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -175670,7 +175670,7 @@
                             "type": "group",
                             "group": {
                               "key": "Retransition Easing Curve",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -175692,7 +175692,7 @@
                         "subgroups": [
                           {
                             "key": "Retransition Speed Curve",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -175762,7 +175762,7 @@
                           },
                           {
                             "key": "Retransition Easing Curve",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -176210,7 +176210,7 @@
             },
             {
               "key": "Retransition",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -176259,7 +176259,7 @@
                   "type": "group",
                   "group": {
                     "key": "Retransition Start Time Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -176301,7 +176301,7 @@
                   "type": "group",
                   "group": {
                     "key": "Retransition Easing Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -176358,7 +176358,7 @@
                 },
                 {
                   "key": "Retransition Start Time Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -176393,7 +176393,7 @@
                 },
                 {
                   "key": "Retransition Easing Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -176546,7 +176546,7 @@
             },
             {
               "key": "Multi Trigger",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -181833,7 +181833,7 @@
                   "type": "group",
                   "group": {
                     "key": "Trigger 5",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -182183,7 +182183,7 @@
                         "type": "group",
                         "group": {
                           "key": "Retransition",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -182194,7 +182194,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Retransition Speed Curve",
-                                "collapsed": true,
+                                "collapsed": false,
                                 "locked": false,
                                 "items": [
                                   {
@@ -182274,7 +182274,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Retransition Easing Curve",
-                                "collapsed": true,
+                                "collapsed": false,
                                 "locked": false,
                                 "items": [
                                   {
@@ -182296,7 +182296,7 @@
                           "subgroups": [
                             {
                               "key": "Retransition Speed Curve",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -182366,7 +182366,7 @@
                             },
                             {
                               "key": "Retransition Easing Curve",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -182810,7 +182810,7 @@
                       },
                       {
                         "key": "Retransition",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -182821,7 +182821,7 @@
                             "type": "group",
                             "group": {
                               "key": "Retransition Speed Curve",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -182901,7 +182901,7 @@
                             "type": "group",
                             "group": {
                               "key": "Retransition Easing Curve",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -182923,7 +182923,7 @@
                         "subgroups": [
                           {
                             "key": "Retransition Speed Curve",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -182993,7 +182993,7 @@
                           },
                           {
                             "key": "Retransition Easing Curve",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -188419,7 +188419,7 @@
                 },
                 {
                   "key": "Trigger 5",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -188769,7 +188769,7 @@
                       "type": "group",
                       "group": {
                         "key": "Retransition",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -188780,7 +188780,7 @@
                             "type": "group",
                             "group": {
                               "key": "Retransition Speed Curve",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -188860,7 +188860,7 @@
                             "type": "group",
                             "group": {
                               "key": "Retransition Easing Curve",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -188882,7 +188882,7 @@
                         "subgroups": [
                           {
                             "key": "Retransition Speed Curve",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -188952,7 +188952,7 @@
                           },
                           {
                             "key": "Retransition Easing Curve",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -189396,7 +189396,7 @@
                     },
                     {
                       "key": "Retransition",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -189407,7 +189407,7 @@
                           "type": "group",
                           "group": {
                             "key": "Retransition Speed Curve",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -189487,7 +189487,7 @@
                           "type": "group",
                           "group": {
                             "key": "Retransition Easing Curve",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -189509,7 +189509,7 @@
                       "subgroups": [
                         {
                           "key": "Retransition Speed Curve",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -189579,7 +189579,7 @@
                         },
                         {
                           "key": "Retransition Easing Curve",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
