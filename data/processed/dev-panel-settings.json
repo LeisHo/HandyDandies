@@ -6908,9 +6908,9 @@
           "group": "FIST ROTATE"
         }
       ],
-      "cameraX": 6.504490851233472,
-      "cameraY": 9.50904587434996,
-      "cameraZ": 260.7456033096728,
+      "cameraX": 6.50449085123347,
+      "cameraY": 9.50904587434994,
+      "cameraZ": 260.74560330967273,
       "cameraFov": 15,
       "cameraYaw": 1.464,
       "cameraPitch": -2.946,
@@ -7047,9 +7047,14 @@
       "emissionColor": "#ffffff",
       "emissionIntensity": 1.5,
       "bgColor": "#808080",
-      "pixelRatio": 1,
+      "floorEnabled": true,
+      "floorColor": "#3c3c3c",
+      "floorZOffset": 0,
+      "floorXYScale": 1,
+      "pixelRatio": 1.25,
       "resolutionScale": 100,
       "qualityPreset": "high",
+      "staticPoseOnStartup": true,
       "showTrackingPoints": false,
       "showRenderOrderPoints": false,
       "showGridHelper": false,
@@ -16473,9 +16478,14 @@
       "emissionColor": "#ffffff",
       "emissionIntensity": 1.5,
       "bgColor": "#808080",
-      "pixelRatio": 1,
+      "floorEnabled": true,
+      "floorColor": "#3c3c3c",
+      "floorZOffset": 0,
+      "floorXYScale": 1,
+      "pixelRatio": 1.25,
       "resolutionScale": 100,
       "qualityPreset": "high",
+      "staticPoseOnStartup": true,
       "showTrackingPoints": false,
       "showRenderOrderPoints": false,
       "showGridHelper": false,
@@ -25899,9 +25909,14 @@
       "emissionColor": "#ffffff",
       "emissionIntensity": 1.5,
       "bgColor": "#808080",
-      "pixelRatio": 1,
+      "floorEnabled": true,
+      "floorColor": "#3c3c3c",
+      "floorZOffset": 0,
+      "floorXYScale": 1,
+      "pixelRatio": 1.25,
       "resolutionScale": 100,
       "qualityPreset": "high",
+      "staticPoseOnStartup": true,
       "showTrackingPoints": false,
       "showRenderOrderPoints": false,
       "showGridHelper": false,
@@ -30425,7 +30440,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -196251,7 +196266,7 @@
           "type": "group",
           "group": {
             "key": "Camera",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -196407,6 +196422,34 @@
               "pixelRatio",
               "resolutionScale",
               "qualityPreset"
+            ],
+            "subgroups": []
+          }
+        },
+        {
+          "type": "group",
+          "group": {
+            "key": "Floor",
+            "collapsed": false,
+            "locked": false,
+            "items": [
+              {
+                "type": "row",
+                "key": "floorColor"
+              },
+              {
+                "type": "row",
+                "key": "floorZOffset"
+              },
+              {
+                "type": "row",
+                "key": "floorXYScale"
+              }
+            ],
+            "settings": [
+              "floorColor",
+              "floorZOffset",
+              "floorXYScale"
             ],
             "subgroups": []
           }
@@ -196595,7 +196638,7 @@
         },
         {
           "key": "Camera",
-          "collapsed": false,
+          "collapsed": true,
           "locked": true,
           "items": [
             {
@@ -196747,8 +196790,48 @@
             "qualityPreset"
           ],
           "subgroups": []
+        },
+        {
+          "key": "Floor",
+          "collapsed": false,
+          "locked": false,
+          "items": [
+            {
+              "type": "row",
+              "key": "floorColor"
+            },
+            {
+              "type": "row",
+              "key": "floorZOffset"
+            },
+            {
+              "type": "row",
+              "key": "floorXYScale"
+            }
+          ],
+          "settings": [
+            "floorColor",
+            "floorZOffset",
+            "floorXYScale"
+          ],
+          "subgroups": []
         }
       ]
+    },
+    {
+      "key": "Starting State",
+      "collapsed": false,
+      "locked": false,
+      "items": [
+        {
+          "type": "row",
+          "key": "staticPoseOnStartup"
+        }
+      ],
+      "settings": [
+        "staticPoseOnStartup"
+      ],
+      "subgroups": []
     }
   ],
   "textOverrides": {
@@ -199036,10 +199119,10 @@
   "devHotkeys": {},
   "panelGeometry": {
     "desktop": {
-      "left": 1055.21875,
-      "top": 41.1875,
-      "width": 756.78125,
-      "height": 611.1875
+      "left": 776.0125122070312,
+      "top": 30.787500381469727,
+      "width": 759.9750366210938,
+      "height": 612.7875366210938
     }
   }
 }
