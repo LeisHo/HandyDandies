@@ -324,6 +324,7 @@ const _swingE = new THREE.Vector3(), _trkQinv = new THREE.Quaternion()
 const _armPartialQ = new THREE.Quaternion(), _armOffQx = new THREE.Quaternion(), _armOffQy = new THREE.Quaternion(), _armOffAxis = new THREE.Vector3()
 let trkXYFieldMin = 0, trkXYFieldRange = 0.001, trkXYAllMin = 0, trkXYAllRange = 0.001
 let trackingPointCloud = null
+let floorMesh = null // Floor group: one plane behind the hands
 let startupStaticReleased = false // Starting State > Static Pose On Startup: set by the first click function trigger (runtime only, never saved)
 const _cfTmp = new THREE.Vector3() // clickRotatePointInto() scratch
 const _trkV1 = new THREE.Vector3(), _trkV2 = new THREE.Vector3(), _trkWqInv = new THREE.Quaternion() // handTrackingPointInto() scratch
@@ -2773,6 +2774,16 @@ const DEV_GROUPS = [
       { key: 'bgColor', label: 'Background Color', type: 'color', def: '#ffffff', onChange: (v) => { scene.background = new THREE.Color(v); syncLoadingPreviewBackground() } }
     ]
   },
+  // Floor (2026-10-11, direct request): ONE plane at world Z 0 (+ Z Offset) that spans the whole screen, drawn behind the hands. The group has its own on/off checkbox in its header. Default color = the Background Color default.
+  {
+    title: 'Floor',
+    controls: [
+      { key: 'floorEnabled', label: 'Floor On/Off', type: 'checkbox', def: false, onChange: () => { updateFloorRowVisibility(); updateFloor() } },
+      { key: 'floorColor', label: 'Floor Color', type: 'color', def: '#ffffff', onChange: () => updateFloor() },
+      { key: 'floorZOffset', label: 'Floor Z Offset (World Units)', type: 'slider', min: -200, max: 200, step: 0.5, def: 0, onChange: () => updateFloor() },
+      { key: 'floorXYScale', label: 'Floor XY Scale (x)', type: 'slider', min: 0.1, max: 10, step: 0.05, def: 1, onChange: () => updateFloor() }
+    ]
+  },
   {
     title: 'Quality / Performance',
     controls: [
@@ -3048,6 +3059,7 @@ const cfg = initDevPanel(DEV_GROUPS, {
     logStartupTiming('onRestore fired -> startupSettingsReady = true')
     // A saved panel order that predates the Render Order group puts its rows straight back into Field Layout when it is applied; re-nest them (idempotent, only moves the listed keys).
     try { renestRenderOrderRows() } catch (e) { /* panel not built */ }
+    try { gateGroupHeader('Floor', 'floorEnabled'); nestFloorIntoThreeJs(); updateFloorRowVisibility(); updateFloor() } catch (e) { /* panel not built */ }
     try { normalizeRenderOrderFallbacks() } catch (e) { /* not ready */ }
     // Each step timed when ?debugTiming=1 (see devPanel.js dpTime()).
     const prof = (label, fn) => {
@@ -3363,6 +3375,53 @@ const gridHelper = new THREE.GridHelper(40, 20, 0x444466, 0x2a2a36)
 gridHelper.rotation.x = Math.PI / 2
 gridHelper.visible = cfg.showGridHelper
 scene.add(gridHelper)
+
+// Floor: a MeshBasicMaterial plane (no tone mapping, so it matches the scene background exactly), drawn before every hand (renderOrder far below the hands' 0..n-1 ranks) with depth test / write off, like the hands.
+// FLOOR_BASE_SIZE is generously larger than the view at the default camera; Floor XY Scale multiplies it.
+const FLOOR_BASE_SIZE = 2000
+function updateFloor() {
+  if (!cfg.floorEnabled) { if (floorMesh) floorMesh.visible = false; sceneNeedsRedraw = true; return }
+  if (!floorMesh) {
+    floorMesh = new THREE.Mesh(new THREE.PlaneGeometry(FLOOR_BASE_SIZE, FLOOR_BASE_SIZE), new THREE.MeshBasicMaterial({ color: cfg.floorColor, side: THREE.DoubleSide, depthTest: false, depthWrite: false, toneMapped: false }))
+    floorMesh.renderOrder = -1000000
+    floorMesh.frustumCulled = false
+    floorMesh.name = 'Floor'
+    scene.add(floorMesh)
+  }
+  floorMesh.visible = true
+  floorMesh.position.set(0, 0, cfg.floorZOffset || 0)
+  floorMesh.scale.set(cfg.floorXYScale || 1, cfg.floorXYScale || 1, 1)
+  floorMesh.material.color.set(cfg.floorColor || '#ffffff')
+  sceneNeedsRedraw = true
+}
+function updateFloorRowVisibility() {
+  const on = !!cfg.floorEnabled
+  ;['floorColor', 'floorZOffset', 'floorXYScale'].forEach((k) => { const row = document.querySelector('.dp-row[data-key="' + k + '"]'); if (row) row.style.display = on ? '' : 'none' })
+}
+// Puts a group's own on/off row into the group HEADER (same placement wrapGatedSubgroup() gives a nested gated subgroup). Idempotent: a saved order applied later can move the row back into the body, so it is also
+// re-run after the settings restore.
+function gateGroupHeader(groupTitle, enabledKey) {
+  const g = document.querySelector('.dp-group[data-key="' + groupTitle + '"]')
+  const enabledRow = g && document.querySelector('.dp-row[data-key="' + enabledKey + '"]')
+  if (!enabledRow) return
+  const header = g.querySelector(':scope > .dp-group-header')
+  if (!header || header.contains(enabledRow)) return
+  enabledRow.classList.add('dp-group-gate-row')
+  enabledRow.querySelectorAll('.dp-dynamic-device-checkbox, .dp-row-handle').forEach((el) => el.remove())
+  const t = header.querySelector(':scope > .dp-group-title-text')
+  if (t) t.insertAdjacentElement('afterend', enabledRow)
+}
+// The Floor group sits inside the user's own "THREE.JS" group (a group they made and renamed): a saved layout from before the Floor existed does not know about it, so while it is still a top-level group, move it into
+// whichever top-level-or-nested group is currently titled THREE.JS. Once a saved layout places it, it is left alone.
+function nestFloorIntoThreeJs() {
+  const groupsEl = document.getElementById('dpGroups')
+  const floor = document.querySelector('.dp-group[data-key="Floor"]')
+  if (!groupsEl || !floor || floor.parentElement !== groupsEl) return
+  const tgt = [...groupsEl.querySelectorAll('.dp-group')].find((g) => { const t = g.querySelector(':scope > .dp-group-header > .dp-group-title-text'); return t && t.textContent.trim().toLowerCase() === 'three.js' })
+  const body = tgt && tgt.querySelector(':scope > .dp-group-body')
+  if (body) body.appendChild(floor)
+}
+// (updateFloor() is first called further down, after sceneNeedsRedraw is declared - calling it here would hit its temporal dead zone.)
 
 const targetMarker = new THREE.Mesh(new THREE.SphereGeometry(1, 12, 12), new THREE.MeshBasicMaterial({ color: 0xff5566 }))
 targetMarker.visible = cfg.showTargetMarker
@@ -17184,6 +17243,9 @@ safeRefreshSelectOptions('renderOrderFallbackExcept')
 safeRefreshSelectOptions('renderOrderFallback2Except')
 mergeExceptSelects()
 buildRenderOrderWidgets()
+gateGroupHeader('Floor', 'floorEnabled')
+updateFloorRowVisibility()
+updateFloor()
 safeRefreshSelectOptions('trackingPoint')
 document.addEventListener('visibilitychange', syncPauseWithVisibility)
 window.addEventListener('blur', syncPauseWithVisibility)

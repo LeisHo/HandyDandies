@@ -17359,6 +17359,14 @@ Direct request: *DC* Starting State, *D* Static Pose On Startup (checkbox): "whe
  - New dev-panel group Starting State with the checkbox staticPoseOnStartup (default off). trackingActive() = Tracking Enabled AND (box off OR a click function has been triggered). It replaces the three Tracking Enabled checks: the cursor-tracking block in animate() (arm / palm rotation), computeArmLengthT() (reactive arm length) and computeResponsiveWristSplayDeg() (reactive wrist splay), so until then the hands keep the default pose, default wrist splay and default crop.
  - The first trigger is the first ENABLED click function that fires: startClickHoldPose() / triggerClickPose() set startupStaticReleased (runtime only, never saved, so every page load starts static again). Ticking the box mid-session re-arms it until the next click function. While waiting, animate() keeps each hand wrapper rotation at identity and parks the damped arm-rotation / palm-roll state at neutral, so when tracking starts the hands ease in from the default pose instead of snapping to the cursor. main.js ?v=378 -> ?v=379.
 
+2026-10-12  -  (Floor)
+
+Direct request: in the THREE.JS group add a toggleable subgroup called Floor - a single plane at world Z 0 that spans the whole screen - with Floor Color (color picker), Floor Z Offset (slider), Floor XY Scale (slider); "set default color to background color".
+ - New dev-panel group Floor (floorEnabled, floorColor, floorZOffset, floorXYScale). Its On/Off checkbox sits in the group HEADER (gateGroupHeader(), the same placement wrapGatedSubgroup() gives a gated subgroup); with it off the other three rows are hidden and the plane is hidden.
+ - updateFloor(): one PlaneGeometry (FLOOR_BASE_SIZE 2000 x 2000 world units) with a MeshBasicMaterial (toneMapped off, so it matches the scene background exactly), positioned at world (0, 0, Floor Z Offset) and scaled by Floor XY Scale; renderOrder -1000000 with depth test / write off, so it is drawn before every hand (the hands also ignore depth), i.e. a backdrop at Z 0 that nothing can be hidden behind. Floor Z Offset -200..200, Floor XY Scale 0.1..10 (a typed value outside either range widens it, as for every slider).
+ - Default Floor Color = #ffffff = the Background Color default. A Background Color you have changed is NOT followed automatically - set Floor Color to match.
+ - The Floor group is built as a top-level group; nestFloorIntoThreeJs() (run after the settings restore) moves it into the group currently titled THREE.JS (the user's own renamed group) while it is still top-level, i.e. until a saved layout places it. main.js ?v=379 -> ?v=380.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a
