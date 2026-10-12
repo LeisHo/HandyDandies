@@ -324,6 +324,7 @@ const _swingE = new THREE.Vector3(), _trkQinv = new THREE.Quaternion()
 const _armPartialQ = new THREE.Quaternion(), _armOffQx = new THREE.Quaternion(), _armOffQy = new THREE.Quaternion(), _armOffAxis = new THREE.Vector3()
 let trkXYFieldMin = 0, trkXYFieldRange = 0.001, trkXYAllMin = 0, trkXYAllRange = 0.001
 let trackingPointCloud = null
+let startupStaticReleased = false // Starting State > Static Pose On Startup: set by the first click function trigger (runtime only, never saved)
 const _cfTmp = new THREE.Vector3() // clickRotatePointInto() scratch
 const _trkV1 = new THREE.Vector3(), _trkV2 = new THREE.Vector3(), _trkWqInv = new THREE.Quaternion() // handTrackingPointInto() scratch
 let renderOrderPointCloud = null // Debug > Show Hand Render Order Points: arm base / arm end / palm center markers
@@ -1525,6 +1526,9 @@ function clickRotatePointInto(hand, out) {
   _cfTmp.copy(out).sub(pv).applyQuaternion(q)
   return out.copy(pv).add(_cfTmp)
 }
+// Cursor tracking (arm / palm rotation, reactive wrist splay, reactive arm length) is live only while Tracking Enabled is on AND, with Starting State > Static Pose On Startup on, a click function has been triggered since the
+// page loaded (or since that box was ticked): until then the hands stay in their default pose.
+function trackingActive() { return !!cfg.trackingEnabled && (!cfg.staticPoseOnStartup || startupStaticReleased) }
 function handPoint(hand) { return hand._trk || hand.wrapper.position }
 function handRestPoint(hand) { return hand._trkRest || hand.basePosition || hand.wrapper.position }
 // Computed once per frame: the animate() tracking block calls it first (postIncrement = false: updateRenderOrder() has not bumped the frame counter yet), updateRenderOrder() calls it with true and finds it done.
@@ -2789,6 +2793,14 @@ const DEV_GROUPS = [
         qualityState.resolutionScale = preset.resolutionScale / 100
         applyQualityState()
       } }
+    ]
+  },
+  // Starting State (2026-10-11, direct request): with Static Pose On Startup on, the hands stay in their default pose - no cursor tracking (arm / palm rotation, reactive wrist splay, reactive arm length) - until the first
+  // click function is triggered. Ticking the box mid-session re-arms it until the next click function.
+  {
+    title: 'Starting State',
+    controls: [
+      { key: 'staticPoseOnStartup', label: 'Static Pose On Startup', type: 'checkbox', def: false, onChange: (v) => { if (v) startupStaticReleased = false } }
     ]
   },
   {
@@ -8266,7 +8278,7 @@ function computeArmLengthT(hand, distanceToCursor, minLiveDist, liveDistRange) {
   // Default Arm Length exactly as if Reactive Arm Length itself were off,
   // same as every other Responsive-* feature this same round gates the
   // same way (Wrist Splay, the new Responsive Arm Rotation).
-  if (!cfg.trackingEnabled || !cfg.reactiveArmLengthEnabled) return cfg.hideWrist / 100
+  if (!trackingActive() || !cfg.reactiveArmLengthEnabled) return cfg.hideWrist / 100
   const normDist = Math.max((distanceToCursor - minLiveDist) / liveDistRange, 0) // > 1 for hands beyond the farthest on-screen hand (extrapolated)
   const curveY = THREE.MathUtils.clamp(evaluateArmLengthCurve(armLengthCurveParsed, normDist), 0, 1)
   const minT = armLengthRangeParsed.min / 100, maxT = armLengthRangeParsed.max / 100
@@ -8323,7 +8335,7 @@ function computeResponsiveWristSplayDeg(distanceToCursor, minLiveDist, liveDistR
   // CORRECTED 2026-09-28 -- see computeArmLengthT()'s own matching
   // comment; same "Responsive-* falls back to its static default while
   // Tracking Enabled is off" treatment.
-  if (!cfg.trackingEnabled || !cfg.wristSplayReactiveEnabled) return cfg.wristSplayDefault
+  if (!trackingActive() || !cfg.wristSplayReactiveEnabled) return cfg.wristSplayDefault
   const normDist = Math.max((distanceToCursor - minLiveDist) / liveDistRange, 0) // > 1 for hands beyond the farthest on-screen hand (extrapolated)
   const curveY = THREE.MathUtils.clamp(evaluateArmLengthCurve(wristSplayCurveParsed, normDist), 0, 1)
   const { min, max } = wristSplayRangeParsed
@@ -11210,6 +11222,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
 }
 function startClickHoldPose(p) {
   if (!cfg[`${p}Enabled`]) return
+  startupStaticReleased = true
   const trig = clickHoldPoseTriggers[p]
   trig.active = true
   trig.holdStartTime = nowVirtual() // virtual clock (see its own declaration) so Global Pause doesn't shift this trigger's forward-phase elapsed time
@@ -12168,6 +12181,7 @@ function assignHandsToCycle(cycle, startIdx) {
 }
 function triggerClickPose(p, onlyHands = null) {
   if (!cfg[`${p}Enabled`]) return
+  startupStaticReleased = true
   const trig = clickPoseTriggers[p]
   const now = nowVirtual() // virtual clock -- feeds cp.triggerTime below, an animation-timing field
   // Fallback anchor for a genuinely idle hand (see updateClickPoseForHand()'s
@@ -16756,7 +16770,7 @@ function animate(dt, now) {
     // advances a phase while `isPaused` is true.
     if (!isPaused) {
       updateCursorTarget()
-      if (cfg.trackingEnabled) {
+      if (trackingActive()) {
         // Per-hand now (not hoisted above the loop like before) -- with Palm
         // Faces Cursor on, each hand's own roll angle depends on ITS OWN
         // position relative to the live cursor (computeRadialRollDeg(), see
@@ -17013,6 +17027,15 @@ function animate(dt, now) {
           hand.wrapper.quaternion.multiply(computeRollQuat(hand.currentPalmRollDeg, hand))
         })
         __frameProfiler.cursorTrackingMs += performance.now() - __cursorTrackingStart
+      } else if (cfg.trackingEnabled) {
+        // Static Pose On Startup, before the first click function: every hand stays at the default pose (wrapper rotation identity), and the damped tracking state is parked at neutral so that once tracking starts the
+        // hands ease in from the default instead of snapping to the live target.
+        for (let i = 0; i < hands.length; i++) {
+          const hd = hands[i]
+          hd.wrapper.quaternion.identity()
+          if (hd.currentArmRotationQuat) hd.currentArmRotationQuat.identity(); else hd.currentArmRotationQuat = new THREE.Quaternion()
+          hd.currentPalmRollDeg = 0
+        }
       }
       const __uroStart = performance.now()
       updateRenderOrder()
