@@ -3072,7 +3072,6 @@ const DEV_GROUPS = [
       { key: 'snapshotCursor', label: 'Snapshot: Cursor Position', type: 'checkbox', def: true },
       { key: 'snapshotMouse', label: 'Snapshot: Mouse Tracking', type: 'checkbox', def: true },
       { key: 'snapshotHandBehaviour', label: 'Snapshot: Hand Behaviour', type: 'checkbox', def: true },
-      { key: 'snapshotHandBehaviourAll', label: 'Snapshot: Hand Behaviour - List Every Hand', type: 'checkbox', def: false },
       { key: 'snapshotFrameRate', label: 'Snapshot: Frame Rate', type: 'checkbox', def: true },
       { key: 'snapshotPoseJumps', label: 'Snapshot: Pose Jumps', type: 'checkbox', def: true },
       { key: 'snapshotRenderOrder', label: 'Snapshot: Render Order', type: 'checkbox', def: true },
@@ -3117,7 +3116,7 @@ const FIELD_LAYOUT_SUBGROUP_SPECS = [
   { title: 'Render Order', collapsed: false, keys: ['renderOrderMode', 'renderOrderModeExcept', 'renderOrderModeTerms', 'renderOrderFallback', 'renderOrderFallbackExcept', 'renderOrderFallbackTerms', 'renderOrderFallback2', 'renderOrderFallback2Except', 'renderOrderFallback2Terms', 'renderOrderExtraFallbacks', 'renderOrderFlipLock'] }
 ]
 const SNAPSHOT_SUBGROUP_SPECS = [
-  { title: 'Snapshot', collapsed: false, keys: ['snapshotCursor', 'snapshotMouse', 'snapshotHandBehaviour', 'snapshotHandBehaviourAll', 'snapshotFrameRate', 'snapshotPoseJumps', 'snapshotRenderOrder', 'snapshotTrackingPoints', 'snapshotTakeBtn'] }
+  { title: 'Snapshot', collapsed: false, keys: ['snapshotCursor', 'snapshotMouse', 'snapshotHandBehaviour', 'snapshotFrameRate', 'snapshotPoseJumps', 'snapshotRenderOrder', 'snapshotTrackingPoints', 'snapshotTakeBtn'] }
 ]
 const POSE_SUBGROUP_SPECS = [
   { title: 'Whole-Hand Rotation & Thumb', collapsed: true, keys: ['modelRotX', 'modelRotY', 'modelRotZ', 'thumbCurl', 'thumbSplay', 'thumbSplay2', 'tipTwistThumb', 'curlBiasThumb', 'baseOnlyCurlThumb', 'midOnlyCurlThumb', 'tipOnlyCurlThumb'] },
@@ -4731,8 +4730,15 @@ function buildSnapshotText() {
   }
   if (cfg.snapshotHandBehaviour) {
     any = true
+    // Every hand, in numeric order, idle or not, with the exact numbers the ordering and the pose are built from (direct request 2026-10-13): field / tracking / rest position, the arm base / arm end /
+    // palm center rig points (current world positions), every rotation and the wrist crop. Bone positions are computed now (getWorldPosition refreshes the bone's parents), so they are exact even while paused.
+    const f3 = (v) => (typeof v === 'number' && isFinite(v) ? v.toFixed(3) : 'n/a')
+    const p3 = (v) => (v ? '(' + f3(v.x) + ', ' + f3(v.y) + ', ' + f3(v.z) + ')' : 'n/a')
+    const _se = new THREE.Euler(), _sv = new THREE.Vector3(), R2D = 180 / Math.PI
+    const eul = (q) => (q ? (_se.setFromQuaternion(q, 'XYZ'), '(' + f3(_se.x * R2D) + ', ' + f3(_se.y * R2D) + ', ' + f3(_se.z * R2D) + ')') : 'n/a')
+    const bonePos = (hd, key) => { const b = renderOrderBone(hd, key); return b ? p3(b.getWorldPosition(_sv)) : 'n/a' }
     const counts = {}, active = [], perHand = []
-    const everyHand = !!cfg.snapshotHandBehaviourAll
+    const everyHand = true
     hands.forEach((hd, i) => {
       const own = []
       ;[hd._cp, hd._chp].forEach((store) => {
@@ -4746,13 +4752,18 @@ function buildSnapshotText() {
           if (!everyHand && active.length < 24) active.push('Hand ' + (i + 1) + ' ' + name + ' ' + ph)
         })
       })
-      if (everyHand) perHand.push('Hand ' + (i + 1) + ': ' + (own.length ? own.join(', ') : 'idle')) // numeric order, one line per hand
+      const wristBone = hd.skinnedMesh && hd.skinnedMesh.skeleton.getBoneByName('rHand')
+      perHand.push('Hand ' + (i + 1) + ': ' + (own.length ? own.join(', ') : 'idle') + '\n' +
+        '  position: field ' + p3(hd.wrapper.position) + ' | tracking point ' + p3(handPoint(hd)) + ' | rest ' + p3(handRestPoint(hd)) + '\n' +
+        '  rig points (world): Arm Base ' + bonePos(hd, 'armBase') + ' | Arm End ' + bonePos(hd, 'armEnd') + ' | Palm Center ' + bonePos(hd, 'palmCenter') + '\n' +
+        '  rotation (deg XYZ): wrapper ' + eul(hd.wrapper.quaternion) + ' | model ' + eul(hd.clone.quaternion) + ' | arm rotation ' + eul(hd.currentArmRotationQuat) + ' | wrist bone local ' + eul(wristBone && wristBone.quaternion) +
+        ' | palm roll ' + f3(hd.currentPalmRollDeg) + ' | wrist splay ' + f3(hd.currentSplayDeg) + ' | click-function rotation ' + eul(hd._customRotationAccum) + ' | click-function offset ' + p3(hd._customOffsetAccum) + '\n' +
+        '  wrist crop: ' + (typeof hd.currentArmLengthT === 'number' ? f3(hd.currentArmLengthT * 100) + '%' : 'n/a') + ' | clone scale ' + f3(hd.clone.scale.x) + ' | render order rank ' + f3(hd._roRank) + ' | XY distance to cursor ' + f3(cursorDistXY(handPoint(hd))))
     })
     L.push('', '--- Hand Behaviour ---')
     const keys = Object.keys(counts)
     L.push(keys.length ? 'hands not idle, by function and phase:\n' + keys.map((k) => '  ' + k + ' x' + counts[k]).join('\n') : 'every hand is idle')
-    if (everyHand) L.push('every hand (' + hands.length + '), in numeric order:', perHand.join('\n'))
-    else if (active.length) L.push('first ' + active.length + ' active:', active.join('\n'))
+    L.push('every hand (' + hands.length + '), in numeric order:', perHand.join('\n'))
     L.push('last Hand Behaviour Log lines:', last(handBehaviourLogEntries, 20))
   }
   if (cfg.snapshotFrameRate) {

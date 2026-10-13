@@ -17422,6 +17422,13 @@ Direct request: use the HANDO two-hand tween export (format hando-two-hand-tween
   Judgment calls (the request was unclear on these): "YP" got a second preset with the dangling #003c8a (same gradient), "RW" a second with #11008f (same gradient); BW / PY use the saved items spelled "HQ _ ..." / "HQ - ...".
   Verified in the page (logic only; the sandbox draws no WebGL): preset apply, floor-on mirroring, "+", editing, delete, outside-click close. Not seen by eye.
 
+2026-10-13  -  Snapshot > Hand Behaviour: full per-hand ordering / rotation / crop data
+  Direct request. With Snapshot: Hand Behaviour ticked, the snapshot now always lists EVERY hand (numeric order), idle or not, each with: phases; position (field / tracking point / rest); the Arm Base, Arm End and Palm Center
+  rig points as exact current world positions (bone.getWorldPosition(), which refreshes the bone's parents, so it is right even while paused); rotations in degrees XYZ (wrapper, model, arm rotation, wrist bone local, palm roll, wrist
+  splay, click-function rotation accumulator) and the click-function offset accumulator; wrist crop %, clone scale, render order rank and XY distance to the cursor. Values a hand has not created yet read n/a. The "List Every Hand"
+  checkbox added earlier is removed (it is now always on; an old saved value is simply unused). Checked in the page by taking a snapshot (255 hands, ~165 KB of text); the sandbox has no running animation loop, so rank / palm roll /
+  arm rotation read n/a there until the loop has run on a real tab.
+
 2026-10-12  -  (Sphere Sequence: clicks do not register while spheres are running)
 
 Direct request: while sphere sequences are running a click will not register. advanceSphereSequence() now returns without doing anything (the click is still consumed, so no real click function fires either) while anySphereRunning() - any started sphere whose sequence has not reached its end, including ones still waiting for their start time. Only once every sphere sequence has finished does the next click advance to the hands / Hand Offset On Startup. Note this makes Wait For All Spheres (on-screen spheres only) redundant: the running check already covers every sphere, on screen or not. Also exposed updateSphereSequence and sphereState on window.__debug for testing. main.js ?v=387 -> ?v=388.
