@@ -47,11 +47,11 @@
       "fieldBoundsYMax": "300",
       "fieldBoundsYMaxCurveEnabled": false,
       "fieldBoundsYMaxCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
-      "fieldBoundsZMin": "-400",
+      "fieldBoundsZMin": "--600",
       "fieldBoundsZMinCurveEnabled": false,
       "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":0}]",
-      "fieldBoundsZMax": "200",
-      "fieldBoundsZMaxCurveEnabled": false,
+      "fieldBoundsZMax": "10000",
+      "fieldBoundsZMaxCurveEnabled": true,
       "fieldBoundsZMaxCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
       "fieldBoundsX": "{\"min\":-300,\"max\":300}",
       "fieldBoundsY": "{\"min\":-300,\"max\":300}",
@@ -7236,14 +7236,14 @@
           "group": "FIST ROTATE"
         }
       ],
-      "cameraX": 20.29573494421685,
-      "cameraY": 37.02280102380188,
-      "cameraZ": 800.3687267310587,
-      "cameraFov": 5,
+      "cameraX": 20.47700165581984,
+      "cameraY": 30.687203284740228,
+      "cameraZ": 680.9930375252058,
+      "cameraFov": 6,
       "cameraYaw": 1.464,
       "cameraPitch": -2.946,
       "cameraRoll": 0,
-      "cameraZoom": 801.5,
+      "cameraZoom": 682,
       "cameraZoomSpeed": 0.3,
       "savedCameras": [
         {
@@ -7364,6 +7364,18 @@
           "targetX": -0.15459770051460153,
           "targetY": -4.170088676810011,
           "targetZ": 0.1892595283359917
+        },
+        {
+          "name": "Camera 12",
+          "cameraX": 20.47700165581984,
+          "cameraY": 30.687203284740228,
+          "cameraZ": 680.9930375252058,
+          "cameraFov": 6,
+          "cameraZoom": 682,
+          "cameraRoll": 0,
+          "targetX": 3.0757204783943917,
+          "targetY": -4.364014152336884,
+          "targetZ": 0.11668489606442625
         }
       ],
       "lockCameraPan": false,
@@ -8150,7 +8162,7 @@
       "custom21CameraOffsetYRange": "{\"min\":-1,\"max\":2}",
       "custom21CameraOffsetZEnabled": true,
       "custom21CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.012574262862515643,\"y\":-0.2529167175292969}},{\"x\":0.07655074151273543,\"y\":0.8537498474121094,\"h1\":{\"x\":0.23570275523609174,\"y\":0.019999821980794308}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.9453359823538497,\"y\":0}}]",
-      "custom21CameraOffsetZRange": "{\"min\":-20,\"max\":40}",
+      "custom21CameraOffsetZRange": "{\"min\":-35,\"max\":1000}",
       "custom21RotationEnabled": false,
       "custom21RotationX": 0,
       "custom21RotationY": -5,
@@ -8607,7 +8619,7 @@
       "custom21Trig5CameraOffsetYRange": "{\"min\":0.5,\"max\":1}",
       "custom21Trig5CameraOffsetZEnabled": true,
       "custom21Trig5CameraOffsetZCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.006085779575111792,\"y\":0.2211456298828125}},{\"x\":0.07977397549852962,\"y\":0.12114562988281252},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.12895447672234484,\"y\":-0.7371877034505209}}]",
-      "custom21Trig5CameraOffsetZRange": "{\"min\":-55,\"max\":2}",
+      "custom21Trig5CameraOffsetZRange": "{\"min\":-55,\"max\":15}",
       "custom21Trig5RotationEnabled": false,
       "custom21Trig5RotationX": 0,
       "custom21Trig5RotationY": -5,
@@ -10646,11 +10658,11 @@
       "fieldBoundsYMax": "300",
       "fieldBoundsYMaxCurveEnabled": false,
       "fieldBoundsYMaxCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
-      "fieldBoundsZMin": "-400",
+      "fieldBoundsZMin": "--600",
       "fieldBoundsZMinCurveEnabled": false,
       "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":0}]",
-      "fieldBoundsZMax": "200",
-      "fieldBoundsZMaxCurveEnabled": false,
+      "fieldBoundsZMax": "10000",
+      "fieldBoundsZMaxCurveEnabled": true,
       "fieldBoundsZMaxCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
       "fieldBoundsX": "{\"min\":-300,\"max\":300}",
       "fieldBoundsY": "{\"min\":-300,\"max\":300}",
@@ -17963,6 +17975,18 @@
           "targetX": -0.15459770051460153,
           "targetY": -4.170088676810011,
           "targetZ": 0.1892595283359917
+        },
+        {
+          "name": "Camera 12",
+          "cameraX": 20.47700165581984,
+          "cameraY": 30.687203284740228,
+          "cameraZ": 680.9930375252058,
+          "cameraFov": 6,
+          "cameraZoom": 682,
+          "cameraRoll": 0,
+          "targetX": 3.0757204783943917,
+          "targetY": -4.364014152336884,
+          "targetZ": 0.11668489606442625
         }
       ],
       "lockCameraPan": false,
@@ -18749,7 +18773,7 @@
       "custom21CameraOffsetYRange": "{\"min\":-1,\"max\":2}",
       "custom21CameraOffsetZEnabled": true,
       "custom21CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.012574262862515643,\"y\":-0.2529167175292969}},{\"x\":0.07655074151273543,\"y\":0.8537498474121094,\"h1\":{\"x\":0.23570275523609174,\"y\":0.019999821980794308}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.9453359823538497,\"y\":0}}]",
-      "custom21CameraOffsetZRange": "{\"min\":-20,\"max\":40}",
+      "custom21CameraOffsetZRange": "{\"min\":-35,\"max\":1000}",
       "custom21RotationEnabled": false,
       "custom21RotationX": 0,
       "custom21RotationY": -5,
@@ -19206,7 +19230,7 @@
       "custom21Trig5CameraOffsetYRange": "{\"min\":0.5,\"max\":1}",
       "custom21Trig5CameraOffsetZEnabled": true,
       "custom21Trig5CameraOffsetZCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.006085779575111792,\"y\":0.2211456298828125}},{\"x\":0.07977397549852962,\"y\":0.12114562988281252},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.12895447672234484,\"y\":-0.7371877034505209}}]",
-      "custom21Trig5CameraOffsetZRange": "{\"min\":-55,\"max\":2}",
+      "custom21Trig5CameraOffsetZRange": "{\"min\":-55,\"max\":15}",
       "custom21Trig5RotationEnabled": false,
       "custom21Trig5RotationX": 0,
       "custom21Trig5RotationY": -5,
@@ -21245,11 +21269,11 @@
       "fieldBoundsYMax": "300",
       "fieldBoundsYMaxCurveEnabled": false,
       "fieldBoundsYMaxCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
-      "fieldBoundsZMin": "-400",
+      "fieldBoundsZMin": "--600",
       "fieldBoundsZMinCurveEnabled": false,
       "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":0}]",
-      "fieldBoundsZMax": "200",
-      "fieldBoundsZMaxCurveEnabled": false,
+      "fieldBoundsZMax": "10000",
+      "fieldBoundsZMaxCurveEnabled": true,
       "fieldBoundsZMaxCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
       "fieldBoundsX": "{\"min\":-300,\"max\":300}",
       "fieldBoundsY": "{\"min\":-300,\"max\":300}",
@@ -28562,6 +28586,18 @@
           "targetX": -0.15459770051460153,
           "targetY": -4.170088676810011,
           "targetZ": 0.1892595283359917
+        },
+        {
+          "name": "Camera 12",
+          "cameraX": 20.47700165581984,
+          "cameraY": 30.687203284740228,
+          "cameraZ": 680.9930375252058,
+          "cameraFov": 6,
+          "cameraZoom": 682,
+          "cameraRoll": 0,
+          "targetX": 3.0757204783943917,
+          "targetY": -4.364014152336884,
+          "targetZ": 0.11668489606442625
         }
       ],
       "lockCameraPan": false,
@@ -29348,7 +29384,7 @@
       "custom21CameraOffsetYRange": "{\"min\":-1,\"max\":2}",
       "custom21CameraOffsetZEnabled": true,
       "custom21CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.012574262862515643,\"y\":-0.2529167175292969}},{\"x\":0.07655074151273543,\"y\":0.8537498474121094,\"h1\":{\"x\":0.23570275523609174,\"y\":0.019999821980794308}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.9453359823538497,\"y\":0}}]",
-      "custom21CameraOffsetZRange": "{\"min\":-20,\"max\":40}",
+      "custom21CameraOffsetZRange": "{\"min\":-35,\"max\":1000}",
       "custom21RotationEnabled": false,
       "custom21RotationX": 0,
       "custom21RotationY": -5,
@@ -29805,7 +29841,7 @@
       "custom21Trig5CameraOffsetYRange": "{\"min\":0.5,\"max\":1}",
       "custom21Trig5CameraOffsetZEnabled": true,
       "custom21Trig5CameraOffsetZCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.006085779575111792,\"y\":0.2211456298828125}},{\"x\":0.07977397549852962,\"y\":0.12114562988281252},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.12895447672234484,\"y\":-0.7371877034505209}}]",
-      "custom21Trig5CameraOffsetZRange": "{\"min\":-55,\"max\":2}",
+      "custom21Trig5CameraOffsetZRange": "{\"min\":-55,\"max\":15}",
       "custom21Trig5RotationEnabled": false,
       "custom21Trig5RotationX": 0,
       "custom21Trig5RotationY": -5,
@@ -237403,7 +237439,7 @@
     },
     {
       "key": "Starting State",
-      "collapsed": false,
+      "collapsed": true,
       "locked": false,
       "items": [
         {
@@ -237422,7 +237458,7 @@
           "type": "group",
           "group": {
             "key": "Hand Offset On Startup",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -237993,7 +238029,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Start Distance Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -238604,7 +238640,7 @@
               },
               {
                 "key": "Startup > Start Distance Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -238654,7 +238690,7 @@
           "type": "group",
           "group": {
             "key": "Field Grid Sphere Sequence",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -238981,7 +239017,7 @@
       "subgroups": [
         {
           "key": "Hand Offset On Startup",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -239552,7 +239588,7 @@
               "type": "group",
               "group": {
                 "key": "Startup > Start Distance Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -240163,7 +240199,7 @@
             },
             {
               "key": "Startup > Start Distance Curve",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -240210,7 +240246,7 @@
         },
         {
           "key": "Field Grid Sphere Sequence",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -243035,8 +243071,8 @@
     "desktop": {
       "left": 942.4249877929688,
       "top": 30.787500381469727,
-      "width": 531.1749877929688,
-      "height": 633.5875244140625
+      "width": 534.375,
+      "height": 635.1875
     }
   }
 }
