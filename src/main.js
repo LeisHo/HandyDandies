@@ -860,7 +860,7 @@ function tryStartField() {
   // whatever comes next; don't treat this comment's own reasoning above
   // as the settled explanation.
   if (!fieldWarmCompiled) renderer.compile(scene, camera)
-  window.__debug = { checkStartupFloorHide, get startupFloorHidden() { return startupFloorHidden }, get floorMesh() { return floorMesh }, updateLoadingPreviewAnimation, get loadingPreview2() { return { hand: loadingPreviewHand, hand2: loadingPreviewHand2, scene: loadingPreviewScene, camera: loadingPreviewCamera, renderer: loadingPreviewRenderer } }, updateSphereSequence, get sphereState() { return { stage: sphereStage, mesh: sphereMesh, on: sphereOn, start: sphereStart, dur: sphereDur, cap: sphereCap, done: sphereDone } }, stackOnDefault, applyCameraOrientation, syncCameraPanelFromLive, curveByDomain, get domains() { return { xyAll: [xyAllMinDist, xyAllDistRange], splayAll: [splayAllMin, splayAllRange], cropAll: [cropAllMin, cropAllRange], restAll: [restAllMinDist, restAllDistRange], live: [liveFieldMinDist, liveFieldDistRange], splay: [splayFieldMin, splayFieldRange], crop: [cropFieldMin, cropFieldRange], xy: [xyFieldMinDist, xyFieldDistRange], rest: [restFieldMinDist, restFieldDistRange] } }, modelBaseFrameQ, computeBaseRotationQuat, cloneBaseRb, makeClipRig, updateClipRigPlanes, setClipRigT, updateOnScreenFlags, evaluateArmLengthCurve, THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose, resolveTweenSegmentsWithAnchor, lerpTweenSegments, lerpLoopSegments, isHoldEntry, updateLoadingPreviewWristClip, lerpPoseValues, get loadingPreviewRenderer() { return loadingPreviewRenderer }, get loadingPreviewScene() { return loadingPreviewScene }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, get handBoundsCenterLocal() { return handBoundsCenterLocal }, multiPointCommit, multiPointEligibleFunctions, get multiPointActiveTouchCount() { return multiPointActiveTouchCount }, get multiPointSessionFiredPoseId() { return multiPointSessionFiredPoseId }, detectPoseJumps, get poseJumpLogEntries() { return poseJumpLogEntries }, applyCurlToSkeletonReference, handLogTriggerLabel, applyAllFingerCurls, syncCameraPanelFromLive, animSpeedMs, chainSequenceCount, applyFieldBounds, cursorDistXY, hexBrightnessPct, toonThresholdForMidBrightness }
+  window.__debug = { handStartupLocked, triggerClickPose, checkStartupFloorHide, get startupFloorHidden() { return startupFloorHidden }, get floorMesh() { return floorMesh }, updateLoadingPreviewAnimation, get loadingPreview2() { return { hand: loadingPreviewHand, hand2: loadingPreviewHand2, scene: loadingPreviewScene, camera: loadingPreviewCamera, renderer: loadingPreviewRenderer } }, updateSphereSequence, get sphereState() { return { stage: sphereStage, mesh: sphereMesh, on: sphereOn, start: sphereStart, dur: sphereDur, cap: sphereCap, done: sphereDone } }, stackOnDefault, applyCameraOrientation, syncCameraPanelFromLive, curveByDomain, get domains() { return { xyAll: [xyAllMinDist, xyAllDistRange], splayAll: [splayAllMin, splayAllRange], cropAll: [cropAllMin, cropAllRange], restAll: [restAllMinDist, restAllDistRange], live: [liveFieldMinDist, liveFieldDistRange], splay: [splayFieldMin, splayFieldRange], crop: [cropFieldMin, cropFieldRange], xy: [xyFieldMinDist, xyFieldDistRange], rest: [restFieldMinDist, restFieldDistRange] } }, modelBaseFrameQ, computeBaseRotationQuat, cloneBaseRb, makeClipRig, updateClipRigPlanes, setClipRigT, updateOnScreenFlags, evaluateArmLengthCurve, THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose, resolveTweenSegmentsWithAnchor, lerpTweenSegments, lerpLoopSegments, isHoldEntry, updateLoadingPreviewWristClip, lerpPoseValues, get loadingPreviewRenderer() { return loadingPreviewRenderer }, get loadingPreviewScene() { return loadingPreviewScene }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, get handBoundsCenterLocal() { return handBoundsCenterLocal }, multiPointCommit, multiPointEligibleFunctions, get multiPointActiveTouchCount() { return multiPointActiveTouchCount }, get multiPointSessionFiredPoseId() { return multiPointSessionFiredPoseId }, detectPoseJumps, get poseJumpLogEntries() { return poseJumpLogEntries }, applyCurlToSkeletonReference, handLogTriggerLabel, applyAllFingerCurls, syncCameraPanelFromLive, animSpeedMs, chainSequenceCount, applyFieldBounds, cursorDistXY, hexBrightnessPct, toonThresholdForMidBrightness }
   // Do NOT hide the loading screen yet: the hands exist but may not have been painted. finalizeReveal() hides it once the field has rendered a couple of frames (or after a 4 s safety net).
   setTimeout(finalizeReveal, 4000)
 }
@@ -3598,7 +3598,9 @@ function startSphereSequence(retrigger) {
   const dom = (flag) => (cfg[SPHERE_FN + flag] !== false ? [vMin, Math.max(vMax - vMin, 0.001)] : [aMin, Math.max(aMax - aMin, 0.001)])
   const [stMin, stRange] = dom('StartTimeCurveVisibleOnly'), [spMin, spRange] = dom('SpeedCurveVisibleOnly')
   for (let i = 0; i < n; i++) {
-    if (retrigger && sphereDone[i]) continue
+    // A later click only triggers spheres that are NOT triggered yet: one that is still running (or already finished its full sequence) is never restarted or interrupted. Excluded spheres and spheres that finished capped
+    // short of the target (Start Distance Curve) can be triggered again from the new cursor position.
+    if (retrigger && (sphereDone[i] || (sphereOn[i] && now < sphereStart[i] + sphereDur[i]))) continue
     sphereOn[i] = 0
     let cap = 1
     if (cfg[SPHERE_FN + 'StartDistanceCurveEnabled']) {
@@ -3666,7 +3668,7 @@ function anySphereRunning() {
 }
 function advanceSphereSequence() {
   if (sphereStage === 0) { sphereStage = 1; startSphereSequence(); return }
-  if (anySphereRunning()) return // clicks do not register while sphere sequences are running
+  if (anySphereRunning()) { startSphereSequence(true); return } // clicks still trigger any untriggered sphere while others run; the running ones are never interrupted
   // Wait For All Spheres: while any on-screen sphere has not reached its target, every click only (re)triggers the sphere sequences of the spheres still short of it (from the new cursor position); nothing after the
   // sphere sequence (hands shown, Hand Offset On Startup) is allowed until all of them are there.
   if (cfg.sphereWaitForAll && !allVisibleSpheresDone()) { startSphereSequence(true); return }
@@ -3713,7 +3715,7 @@ function checkStartupFloorHide() {
 }
 function onHandOffsetOnStartupToggled() {
   startupHandOffsetStage = 0; startupConsumeActive = false; startupConsumeUntil = 0
-  startupFloorHidden = false; hands.forEach((h) => { delete h._startupSeqDone }); try { updateFloor() } catch (e) { /* scene not built yet */ }
+  startupFloorHidden = false; hands.forEach((h) => { delete h._startupSeqDone; delete h._startupTriggered }); try { updateFloor() } catch (e) { /* scene not built yet */ }
   if (cfg.handOffsetOnStartupEnabled) startupStaticReleased = false
   applyStartupHandOffset()
   updateHandOffsetGroupVisibility()
@@ -3729,7 +3731,15 @@ function applyStartupDisplacementToIdleHand(hand) {
 }
 // The first click (left button, on the scene - not the dev panel or the Pause / Reset buttons) while the feature is on: fire the startup transition. The transition is a pose-kind click function whose Offset is the
 // NEGATIVE of the three sliders, so the accumulator (= the sliders) ends at 0 when its forward phase completes.
+// A hand whose Hand Offset On Startup sequence has been triggered (or is waiting for its own start time) and has not reached the end of it yet cannot be interrupted by any other click function (direct request 2026-10-13).
+function handStartupLocked(hand) {
+  const cp = hand._cp && hand._cp[STARTUP_FN]
+  return !!cp && !hand._startupSeqDone && !!(cp.pendingClaimAt || cp.phase !== 'idle')
+}
+function countStartupTriggeredHands() { let n = 0; for (let i = 0; i < hands.length; i++) if (hands[i]._startupTriggered) n++; return n }
+// Returns how many hands this click newly triggered (hands already triggered are skipped by triggerClickPose()).
 function fireStartupHandOffset() {
+  const before = countStartupTriggeredHands()
   startupHandOffsetStage = 1
   cfg.startupFnOffsetEnabled = true
   cfg.startupFnOffsetMode = 'XYZ Offset'
@@ -3737,15 +3747,18 @@ function fireStartupHandOffset() {
   cfg.startupFnOffsetY = -(cfg.startupHandOffsetY || 0)
   cfg.startupFnOffsetZ = -(cfg.startupHandOffsetZ || 0)
   triggerClickPose(STARTUP_FN)
+  return countStartupTriggeredHands() - before
 }
 window.addEventListener('pointerdown', (e) => {
   if (e.button !== 0) return
   if (e.target && e.target.closest && e.target.closest('.dp-panel, #pauseButton, #resetButton, #presetButton, #presetPanel')) return
   if (!hands.length || !fieldRevealed) return
   if (sphereSeqActive()) { startupConsumeActive = true; advanceSphereSequence(); return } // Field Grid Sphere Sequence comes first
-  if (!cfg.handOffsetOnStartupEnabled || startupHandOffsetStage !== 0) return
-  startupConsumeActive = true
-  fireStartupHandOffset()
+  if (!cfg.handOffsetOnStartupEnabled) return
+  if (startupHandOffsetStage === 0) { startupConsumeActive = true; fireStartupHandOffset(); return }
+  // The sequence is under way: a later click still triggers any hand the first click did not reach (Start Distance Curve) from the new cursor position, and is then consumed; hands already triggered carry on untouched.
+  // A click that triggers no new hand falls through to the normal click functions, which cannot touch a hand that is still in its startup sequence (handStartupLocked()).
+  if (hands.some((h) => !h._startupTriggered) && fireStartupHandOffset() > 0) startupConsumeActive = true
 }, true)
 window.addEventListener('pointerup', () => {
   if (!startupConsumeActive) return
@@ -11532,6 +11545,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
       chp.pendingFrozenSpeedMs = cfg[`${p}SpeedCurveEnabled`] ? curveByDomain(p, 'SpeedCurveVisibleOnly', handXYDist(hand), trig.speedCurveParsed, trig.speedRangeParsed) : 0
     }
   }
+  if (chp.pendingClaimAt && p !== STARTUP_FN && handStartupLocked(hand)) chp.pendingClaimAt = 0 // never claims a hand that is still in its startup sequence
   if (chp.pendingClaimAt && now >= chp.pendingClaimAt) {
     // FIX 2026-10-04 (direct report: "when i interrupt a offset to camera
     // sequence, there are jumps. They jump back to their original position
@@ -12552,6 +12566,7 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
   const cp = getOrInitHandCP(hand)[p]
   const isTween = isSequenceOrChainMode(p)
   refreshLiveDistanceState(cp, hand, p, clickPoseTriggers[p], now, 'pose')
+  if (cp.pendingClaimAt && p !== STARTUP_FN && handStartupLocked(hand)) cp.pendingClaimAt = 0 // never claims a hand that is still in its startup sequence
   if (cp.pendingClaimAt && now >= cp.pendingClaimAt) {
     // FIX 2026-10-04 (direct report: "when i interrupt a offset to camera
     // sequence, there are jumps. They jump back to their original position
@@ -12938,6 +12953,7 @@ function triggerClickPose(p, onlyHands = null) {
   const splay3dRange = Math.max(splay3dMax - splay3dMin, 0.001)
   hands.forEach((hand, i) => {
     if (onlyHands && !onlyHands.has(hand)) return // Skip If Same Pose / Multi Trigger already chose this trigger for other hands
+    if (p === STARTUP_FN ? hand._startupTriggered : handStartupLocked(hand)) return // startup sequence: already-triggered hands are never retriggered; every other function skips a hand still in its startup sequence
     if (handSkipsTrigger(hand, p)) return // Skip If Same Pose: already in the target pose
     const cp = getOrInitHandCP(hand)[p]
     // Start Distance Curve (direct spec, 2026-09-27) -- "beyond those
@@ -12971,6 +12987,7 @@ function triggerClickPose(p, onlyHands = null) {
       ? curveByDomain(p, 'StartTimeCurveVisibleOnly', dists[i], trig.tweenStartCurveParsed, trig.tweenStartRangeParsed)
       : curveByDomain(p, 'StartTimeCurveVisibleOnly', dists[i], trig.startCurveParsed, trig.startRangeParsed))
     cp.pendingClaimAt = now + delay
+    if (p === STARTUP_FN) hand._startupTriggered = true
     cp.pendingPressAt = now; cp.pendingIsTween = isTween // live Start Time (refreshLiveDistanceState)
     cp.pendingForwardSnapshot = forwardSnapshot
     cp.pendingNamedPoses = namedPoses

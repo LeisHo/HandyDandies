@@ -17448,6 +17448,16 @@ Direct request: use the HANDO two-hand tween export (format hando-two-hand-tween
   Verified in the page with simulated clicks / a controlled clock: spheres done grew 13, 27, 51, ... 96 across 11 clicks with a Start Distance range of 0-30 (stage stayed 1); with the range off one more click spawned the rest;
   with all 255 done the next click moved to stage 2. Floor: visible while the startup sequence ran, hidden with 0 clipping planes once all 255 hands were done. Three read-only fields were added to window.__debug for this.
 
+2026-10-13  -  Starting State: a triggered sphere / hand always finishes its sequence; untriggered ones can still be triggered by any later click
+  Direct request, for both startup sequences. SPHERES: clicks while spheres are running are no longer ignored; each one triggers only spheres that are not triggered yet (excluded by the Start Distance Curve, or finished
+  capped short of the target) from the new cursor position, and never restarts a sphere that is running or already at its target (startSphereSequence(true) skips them). A click advances to the hands only when no sphere is
+  running (and, with Wait For All Spheres, all are at their target), as before. HANDS (Hand Offset On Startup): each hand has _startupTriggered (set when the startup function arms it). handStartupLocked(hand) = triggered and
+  not yet at the end of its own sequence (_startupSeqDone); while locked, no other click function can claim it: triggerClickPose() skips locked hands and both per-hand update functions drop a pending claim for one. A later
+  click while some hands are still untriggered runs the startup trigger again for just those hands (already-triggered hands are skipped, never restarted) and is consumed only if it newly triggered at least one hand; otherwise
+  it falls through to the normal click functions. Re-armed by toggling Hand Offset On Startup. Verified in the page with simulated clicks / a controlled clock: spheres 13 -> 27 triggered by a second click made while the first
+  13 were running, with 0 running spheres restarted; hands 13 -> 25 triggered, 0 already-triggered hands restarted; with the click-consume window passed, a custom click function claimed 5 free hands and 0 of the 14 locked
+  hands. Two read-only fields (handStartupLocked, triggerClickPose) were added to window.__debug for this.
+
 2026-10-12  -  (Sphere Sequence: clicks do not register while spheres are running)
 
 Direct request: while sphere sequences are running a click will not register. advanceSphereSequence() now returns without doing anything (the click is still consumed, so no real click function fires either) while anySphereRunning() - any started sphere whose sequence has not reached its end, including ones still waiting for their start time. Only once every sphere sequence has finished does the next click advance to the hands / Hand Offset On Startup. Note this makes Wait For All Spheres (on-screen spheres only) redundant: the running check already covers every sphere, on screen or not. Also exposed updateSphereSequence and sphereState on window.__debug for testing. main.js ?v=387 -> ?v=388.
