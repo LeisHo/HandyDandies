@@ -329,6 +329,7 @@ const _swingE = new THREE.Vector3(), _trkQinv = new THREE.Quaternion()
 const _armPartialQ = new THREE.Quaternion(), _armOffQx = new THREE.Quaternion(), _armOffQy = new THREE.Quaternion(), _armOffAxis = new THREE.Vector3()
 let trkXYFieldMin = 0, trkXYFieldRange = 0.001, trkXYAllMin = 0, trkXYAllRange = 0.001
 let trackingPointCloud = null
+let loadingPreviewHand2 = null // second hand of a two-hand loading tween (built lazily, see ensureLoadingPreviewHand2())
 let floorMesh = null // Floor group: one plane behind the hands
 const SPHERE_FN = 'sphereFn' // Field Grid Sphere Sequence: only the shared Speed / Easing / Start Time / Start Distance curve controls and their parsed caches are borrowed from the click functions
 let sphereStage = 2 // 0 = waiting for the first click (floor only, hands hidden), 1 = spheres running / shown, 2 = done or feature off
@@ -1958,6 +1959,9 @@ const DEV_GROUPS = [
       // nothing to show for it isn't what was asked for.
       { key: 'loadingMinTimeMs', label: 'Min Loading Time (Ms)', type: 'slider', min: 0, max: 5000, step: 100, def: 1200 },
       { key: 'loadingPreviewTweenSelector', label: 'Loading Tween Sequence', type: 'select', def: '', options: () => (cfg.savedTweenSequences || []).map((s) => ({ value: s.name, group: s.group || null })) },
+      // Two-hand tween (2026-10-13): reads a HANDO "hando-two-hand-tween" export from the clipboard, adds its poses / second-hand poses / sequence, and selects the sequence as the loading animation. A sequence flagged twoHand
+      // makes the preview render the second hand by itself (see updateLoadingPreviewHand2()).
+      { key: 'loadingPreviewImportTwoHandBtn', label: 'Import Two-Hand Tween From Clipboard (HANDO)', type: 'button', onClick: (btn) => importTwoHandTween(btn) },
       // Camera/Lighting selection for the loading preview's own SEPARATE
       // scene -- direct follow-up request ("allow selecting a Camera
       // setting and a Lighting setting for the chosen loading-preview
@@ -7143,6 +7147,167 @@ const loadingPreviewBaseQuat = new THREE.Quaternion()
 // (modelRotX/Y/Z), applied in applyLoadingPreviewPose() -- same role as
 // Pose Preview's own `_previewWholeHandRotEuler`.
 const _loadingPreviewWholeHandRotEuler = new THREE.Euler()
+// ===== Two-hand loading tween (2026-10-13, direct request) =====
+// A HANDO "hando-two-hand-tween" export carries a main-hand pose list, a second-hand pose list (keys prefixed hand2..., e.g. hand2ThumbCurl) and the second hand's placement (mirror, offset, rotation, scale). Importing it
+// stores the main poses and the second-hand poses (renamed to the normal pose keys, group "2ND HAND") in Saved Poses, and a sequence flagged twoHand (with tweenPosesHand2 and the placement) in Saved Tween Sequences.
+// Selecting that sequence as the Loading Tween Sequence is all it takes: the preview then builds a second hand from the same model.
+// The second hand is placed the way HANDO does it: world = Mirror(about the main hand's centre) * Translate(offset) * MainHand * (rotate / scale about the palm centre). HANDO's world axes map onto this preview's by
+// alignQuat (the same mapping the camera / lighting imports use), the offset is in HANDO units (scaled with the preview hand), and the skeleton is posed UN-mirrored (its base orientation = the main hand's times the
+// rotation) with the reflection applied only to the final matrix - a mirrored copy of a posed hand, not a mirrored pose.
+const HAND2_CONFIG_KEYS = ['mirrorMainHandPose', 'hand2MirrorX', 'hand2MirrorY', 'hand2MirrorZ', 'hand2OffsetX', 'hand2OffsetY', 'hand2OffsetZ', 'hand2RotX', 'hand2RotY', 'hand2RotZ', 'hand2Scale', 'hand2HideWrist']
+function hand2PoseToMainItem(p) {
+  const out = { name: p.name, hand2Pose: true }
+  Object.keys(p).forEach((k) => { if (k.length > 5 && k.startsWith('hand2')) out[k[5].toLowerCase() + k.slice(6)] = p[k] }) // hand2ThumbCurl -> thumbCurl
+  return out
+}
+async function importTwoHandTween(btn) {
+  const flash = (msg) => { if (!btn) return; const orig = btn.dataset.origText || btn.textContent; btn.dataset.origText = orig; btn.textContent = msg; setTimeout(() => { btn.textContent = orig }, 1600) }
+  let text
+  try { text = await navigator.clipboard.readText() } catch (e) {
+    text = prompt('Paste the exported two-hand tween JSON:', '')
+    if (!text) return
+  }
+  let data
+  try { data = JSON.parse(text) } catch (e) { flash('Invalid JSON'); return }
+  if (!data || data.format !== 'hando-two-hand-tween') { flash('Not a two-hand tween export'); return }
+  const mergeByName = (list, incoming) => {
+    const out = list.slice()
+    incoming.forEach((item) => {
+      if (!item || typeof item.name !== 'string') return
+      const i = out.findIndex((x) => x.name === item.name)
+      if (i >= 0) out[i] = { ...item, ...(out[i].group ? { group: out[i].group } : {}) }
+      else out.push(item)
+    })
+    return out
+  }
+  const mainPoses = Array.isArray(data.poses) ? data.poses : []
+  const hand2Poses = (Array.isArray(data.hand2Poses) ? data.hand2Poses : []).filter((p) => p && typeof p.name === 'string').map((p) => ({ ...hand2PoseToMainItem(p), group: '2ND HAND' }))
+  const poses = mergeByName(cfg.savedPoses || [], [...mainPoses, ...hand2Poses])
+  cfg.savedPoses = poses
+  syncValue('savedPoses', poses)
+  const h2 = data.hand2 || {}
+  const placement = {}
+  HAND2_CONFIG_KEYS.forEach((k) => { if (h2[k] !== undefined) placement[k] = h2[k] })
+  const incomingSeqs = (Array.isArray(data.tweenSequences) && data.tweenSequences.length ? data.tweenSequences : [{ name: data.name || 'Two-Hand Tween', tweenPoses: data.tweenPoses, tweenPosesHand2: data.tweenPosesHand2 }])
+    .filter((q) => q && typeof q.name === 'string')
+    .map((q) => ({ name: q.name, tweenPoses: Array.isArray(q.tweenPoses) ? q.tweenPoses : (data.tweenPoses || []), tweenPosesHand2: Array.isArray(q.tweenPosesHand2) ? q.tweenPosesHand2 : (data.tweenPosesHand2 || []), twoHand: h2.show2ndHand !== false, hand2: placement }))
+  if (!incomingSeqs.length) { flash('No sequence found'); return }
+  const sequences = mergeByName(cfg.savedTweenSequences || [], incomingSeqs)
+  cfg.savedTweenSequences = sequences
+  syncValue('savedTweenSequences', sequences)
+  ;['loadingPreviewTweenSelector', 'chpTweenSelector', 'rchpTweenSelector', 'dcHoldTweenSelector', 'rcTweenSelector'].forEach((k) => { try { safeRefreshSelectOptions(k) } catch (e) { /* control may not exist */ } })
+  const pick = incomingSeqs[incomingSeqs.length - 1].name
+  cfg.loadingPreviewTweenSelector = pick
+  syncValue('loadingPreviewTweenSelector', pick)
+  // restart the preview animation on the new sequence
+  loadingPreviewLapIndex = 1; loadingPreviewLapStartMs = performance.now(); loadingPreviewHoldEndMs = 0; loadingPreviewDirection = 1; loadingPreviewSequenceDone = false; loadingPreviewNoSequenceLogged = false
+  logLoadingPreview('imported two-hand tween "' + pick + '": ' + mainPoses.length + ' poses + ' + hand2Poses.length + ' second-hand poses; selected as the loading animation')
+  flash('Imported + selected "' + pick + '"')
+}
+function ensureLoadingPreviewHand2(seq) {
+  const need = !!(seq && seq.twoHand && loadingPreviewScene && loadingPreviewHand && modelRoot)
+  if (!need) {
+    if (loadingPreviewHand2) {
+      if (loadingPreviewScene) loadingPreviewScene.remove(loadingPreviewHand2.clone)
+      loadingPreviewHand2 = null
+    }
+    return
+  }
+  if (loadingPreviewHand2) return
+  const clone = cloneSkeletal(modelRoot)
+  const skinnedMesh = findSkinnedMesh(clone)
+  const plane = new THREE.Plane()
+  const rig = makeClipRig(clone)
+  if (skinnedMesh && toonMaterial) {
+    skinnedMesh.material = toonMaterial.clone()
+    applyClipRigToMaterial(skinnedMesh.material, rig, plane)
+    skinnedMesh.material.onBeforeCompile = toonMaterial.onBeforeCompile
+  }
+  clone.matrixAutoUpdate = false // its matrix is composed by hand each frame (it can be a reflection)
+  loadingPreviewScene.add(clone)
+  loadingPreviewHand2 = { clone, skinnedMesh, wristClipPlane: plane, clipRig: rig }
+}
+const _lp2U = new THREE.Matrix4(), _lp2Pivot = new THREE.Matrix4(), _lp2Tmp = new THREE.Matrix4(), _lp2A = new THREE.Matrix4(), _lp2Ai = new THREE.Matrix4(), _lp2Mir = new THREE.Matrix4(), _lp2Final = new THREE.Matrix4()
+const _lp2Q = new THREE.Quaternion(), _lp2Base = new THREE.Quaternion(), _lp2V = new THREE.Vector3(), _lp2V2 = new THREE.Vector3(), _lp2S = new THREE.Vector3(), _lp2Eul = new THREE.Euler()
+function updateLoadingPreviewHand2(seq, lapStyle, t) {
+  const hand2 = loadingPreviewHand2
+  if (!hand2 || !hand2.skinnedMesh || !loadingPreviewHand || !seq) return
+  const cfg2 = seq.hand2 || {}
+  // the second hand's own pose list (or the main list when it is told to mirror the main hand's pose)
+  const entries2 = (cfg2.mirrorMainHandPose || !(seq.tweenPosesHand2 && seq.tweenPosesHand2.length)) ? (seq.tweenPoses || []) : seq.tweenPosesHand2
+  const aIdx = entries2.findIndex((e) => typeof e === 'string' && e)
+  const found = aIdx >= 0 ? (cfg.savedPoses || []).filter((p) => p.name === entries2[aIdx]) : []
+  const anchor2 = found[found.length - 1]
+  if (!anchor2) return
+  const segs2 = resolveTweenSegmentsWithAnchor(anchor2, entries2.slice(aIdx + 1))
+  const last2 = segs2.length > 0 ? segs2[segs2.length - 1].poseB : anchor2
+  let values
+  if (segs2.length === 0) values = anchor2
+  else if (lapStyle === 'Oscillate') values = lerpTweenSegments(segs2, loadingPreviewDirection === 1 ? t : 1 - t)
+  else if (cfg.loadingPreviewSequenceLoopTransition === false) values = lerpTweenSegments(segs2, t)
+  else {
+    const ring = segs2.concat([{ poseA: last2, poseB: anchor2, weight: 1 }])
+    const totalW = ring.reduce((sum, sg) => sum + sg.weight, 0)
+    values = lerpLoopSegments(ring, (loadingPreviewLapIndex - 1 + t) * totalW)
+  }
+  const V = {}
+  POSE_PRESET_KEYS.forEach((k) => { V[k] = values[k] !== undefined ? values[k] : POSE_KEY_DEFAULTS[k] })
+  // --- placement ---
+  const c1 = loadingPreviewHand.clone
+  c1.updateMatrix()
+  const rad = THREE.MathUtils.degToRad
+  _lp2Eul.set(rad(cfg2.hand2RotX || 0), rad(cfg2.hand2RotY || 0), rad(cfg2.hand2RotZ || 0), 'XYZ')
+  _lp2Q.setFromEuler(_lp2Eul)
+  const s2 = typeof cfg2.hand2Scale === 'number' && cfg2.hand2Scale > 0 ? cfg2.hand2Scale : 1
+  // T(P) R S T(-P): rotate / scale about the palm centre
+  _lp2Pivot.compose(palmCenterPosRaw, _lp2Q, _lp2S.set(s2, s2, s2))
+  _lp2Pivot.multiply(_lp2Tmp.makeTranslation(-palmCenterPosRaw.x, -palmCenterPosRaw.y, -palmCenterPosRaw.z))
+  // offset: HANDO units -> this preview's frame (alignQuat), scaled with the preview hand (the hand is sized to HANDO's units when a camera preset is in use)
+  const unit = c1.scale.x / (LOADING_PREVIEW_REFERENCE_RADIUS / handBoundsRadiusLocal)
+  _lp2V.set(cfg2.hand2OffsetX || 0, cfg2.hand2OffsetY || 0, cfg2.hand2OffsetZ || 0).applyQuaternion(alignQuat).multiplyScalar(unit)
+  _lp2U.copy(c1.matrix).multiply(_lp2Pivot)
+  _lp2U.premultiply(_lp2Tmp.makeTranslation(_lp2V.x, _lp2V.y, _lp2V.z)) // un-mirrored placement
+  // pose the skeleton UN-mirrored (matrices are rebuilt from the un-mirrored matrix first, so the curl axis maths never sees a reflection)
+  hand2.clone.matrix.copy(_lp2U)
+  hand2.clone.matrixWorldNeedsUpdate = true
+  hand2.clone.updateMatrixWorld(true)
+  _lp2Base.copy(c1.quaternion).multiply(_lp2Q)
+  applyWristPoseToSkeleton(hand2.skinnedMesh.skeleton, V)
+  FINGER_NAMES.forEach((name) => applyCurlToSkeleton(name, hand2.skinnedMesh.skeleton, _lp2Base, null, V))
+  // --- reflection about the plane through the main hand's centre (HANDO world axes -> alignQuat) ---
+  const mx = cfg2.hand2MirrorX ? -1 : 1, my = cfg2.hand2MirrorY ? -1 : 1, mz = cfg2.hand2MirrorZ ? -1 : 1
+  if (mx < 0 || my < 0 || mz < 0) {
+    _lp2A.makeRotationFromQuaternion(alignQuat)
+    _lp2Ai.copy(_lp2A).invert()
+    _lp2Mir.makeScale(mx, my, mz).premultiply(_lp2A).multiply(_lp2Ai) // A * diag * A^-1
+    _lp2V2.copy(handBoundsCenterLocal).applyMatrix4(c1.matrix) // the main hand's centre in the preview world
+    _lp2Final.makeTranslation(_lp2V2.x, _lp2V2.y, _lp2V2.z).multiply(_lp2Mir).multiply(_lp2Tmp.makeTranslation(-_lp2V2.x, -_lp2V2.y, -_lp2V2.z)).multiply(_lp2U)
+  } else {
+    _lp2Final.copy(_lp2U)
+  }
+  hand2.clone.matrix.copy(_lp2Final)
+  hand2.clone.matrixWorldNeedsUpdate = true
+  hand2.clone.updateMatrixWorld(true)
+  updateHand2WristClip(typeof cfg2.hand2HideWrist === 'number' ? cfg2.hand2HideWrist : 100)
+}
+// Same crop as updateLoadingPreviewWristClip(), for the second hand.
+function updateHand2WristClip(percent) {
+  const h = loadingPreviewHand2
+  if (!h || !h.skinnedMesh) return
+  if (h.clipRig) {
+    setClipRigT(h.clipRig, percent / 100)
+    updateClipRigPlanes(h.clipRig)
+    return
+  }
+  const farBone = h.skinnedMesh.skeleton.getBoneByName('rForearmBend')
+  const nearBone = h.skinnedMesh.skeleton.getBoneByName('rHand')
+  if (!farBone || !nearBone) return
+  const far = new THREE.Vector3(), near = new THREE.Vector3()
+  farBone.getWorldPosition(far)
+  nearBone.getWorldPosition(near)
+  const dir = near.clone().sub(far).normalize()
+  h.wristClipPlane.setFromNormalAndCoplanarPoint(dir, far.clone().addScaledVector(dir, far.distanceTo(near) * percent / 100))
+}
 // CORRECTED 2026-09-19 -- the Loading Preview's own camera DOES have
 // interactive OrbitControls now (loadingPreviewCameraEditMode, below),
 // but this tracker is still needed: it's the single source of truth
@@ -7279,6 +7444,7 @@ function buildLoadingPreview(bypassEnabledGate) {
   }
   loadingPreviewScene.add(clone)
   loadingPreviewHand = { clone, skinnedMesh, wristClipPlane: loadingPreviewWristClipPlane, clipRig: loadingPreviewClipRig }
+  loadingPreviewHand2 = null // belonged to the previous scene; rebuilt on demand
 
   // A selected Camera preset (direct follow-up request) overrides the
   // existing auto-framed default, applied to this preview's own SEPARATE
@@ -8049,6 +8215,7 @@ function updateLoadingPreviewSequenceVisibility() {
 // anchor at either end.
 function updateLoadingPreviewAnimation() {
   const seq = (cfg.savedTweenSequences || []).find((s) => s.name === cfg.loadingPreviewTweenSelector)
+  ensureLoadingPreviewHand2(seq) // adds / removes the second hand according to the selected sequence
   const rawEntries = seq ? (seq.tweenPoses || []) : []
   // CORRECTED 2026-09-20, direct report ("the imported tweens still dont
   // seem to read the Hold data") -- this used to call
@@ -8132,6 +8299,7 @@ function updateLoadingPreviewAnimation() {
     values = lerpLoopSegments(ringSegments, tCyclic)
   }
   applyLoadingPreviewPose(values)
+  updateLoadingPreviewHand2(seq, lapStyle, typeof easedT !== 'undefined' ? easedT : lapT) // same timeline position, second hand's own poses
   if (lapT >= 1) {
     logLoadingPreview(`lap ${loadingPreviewLapIndex} complete (${playMode}${playMode === 'Count' ? ' of ' + totalLaps : ''})`)
     loadingPreviewLapIndex++
