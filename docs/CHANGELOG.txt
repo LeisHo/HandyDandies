@@ -17480,6 +17480,18 @@ Direct request: use the HANDO two-hand tween export (format hando-two-hand-tween
   remaining visible spheres (0 untriggered); the next click ended the sphere phase (14 hands triggered, spheres kept), hand clicks 23 -> 255 triggered; spheres gone and floor hidden when all visible hands were done; a touch
   pointerdown alone moved the cursor to NDC -0.5; Hand Z Curve start -30 / end +10 with range -30..10. Not exercised end to end: Wait For All Hands (logic reuses the tested allVisibleHandsFinished()) and the in-flight Z shape.
 
+2026-10-13  -  Retransition Distance Curve; Hand Position Min / Max as number inputs with six curve editors
+  Direct request. 1) New toggleable group "Retransition Distance Curve" inside every click function's Retransition group (both families; added to the Multi Trigger allowed suffixes): keys RetransitionDistCurveEnabled /
+  RetransitionDistCurve / RetransitionDistRange (curve editor + Min / Max time range bar, 50-25000 ms track, default 50-2000). X = the hand model's actual distance from the camera position (hand.wrapper.position to
+  camera.position), nearest..farthest hand of the whole field = 0..1 (outside is extrapolated); Y = Min..Max retransition time. When on it REPLACES the Retransition Speed / Retransition Speed Curve duration (my choice, none was
+  specified); read live in refreshLiveDistanceState() via retransitionDistanceMs(). 2) Hand Position Min / Max: each axis is now a single-number Min and a single-number Max input (text inputs: fieldBoundsXMin / XMax ... ZMax,
+  defaults -300 / 300) instead of the range-bar slider, each with its own on/off curve editor (fieldBounds<Axis><Min|Max>Curve(+Enabled), six in all, each in its own gated subgroup "Hand Position Min X Curve" ...). Curve: X =
+  screen-space XY distance of the hand's STARTING field point (basePosition) from the screen centre, over ALL hands (not just visible), nearest..farthest = 0..1; Y = the limit value itself, -300..300 world units = 0..1 (the
+  curve's Y span is my choice). A curve, when on, replaces that number input for that limit per hand; min > max is swapped per hand. The three old range-bar rows (fieldBoundsX / Y / Z) stay as hidden storage; an old saved
+  range is copied into the new inputs once at restore (migrateLegacyFieldBounds()). Verified in the page: all six curve editors built, legacy rows hidden, Max X number input 20 clamped every hand (112 -> 20), a flat Max X
+  curve at y 0.5 clamped them to 0, retransitionDistanceMs() spans exactly the 100-900 ms range with the curve on and returns null when off. Not exercised: the retransition duration inside a live retransition, and the
+  Min-side curves (same code path as Max).
+
 2026-10-12  -  (Sphere Sequence: clicks do not register while spheres are running)
 
 Direct request: while sphere sequences are running a click will not register. advanceSphereSequence() now returns without doing anything (the click is still consumed, so no real click function fires either) while anySphereRunning() - any started sphere whose sequence has not reached its end, including ones still waiting for their start time. Only once every sphere sequence has finished does the next click advance to the hands / Hand Offset On Startup. Note this makes Wait For All Spheres (on-screen spheres only) redundant: the running check already covers every sphere, on screen or not. Also exposed updateSphereSequence and sphereState on window.__debug for testing. main.js ?v=387 -> ?v=388.

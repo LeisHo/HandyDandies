@@ -339,6 +339,8 @@ const STARTUP_FN = 'startupFn' // Hand Offset On Startup: a built-in, hidden-tri
 let startupHandOffsetStage = 0, startupConsumeActive = false, startupConsumeUntil = 0 // 0 = waiting for the first click, 1 = the startup transition has been fired
 let sphereClickCount = 0, sphereKeepForHands = false // Field Grid Sphere Sequence: clicks that triggered spheres so far (Maximum Clicks); true while the spheres stay on screen until their own hand finishes its sequence
 let startupHandClickCount = 0, startupIgnoreStartDistance = false // Hand Offset On Startup: clicks that triggered hands so far (Maximum Clicks); true only while the over-the-limit click triggers every remaining hand
+let camDistFrame = -1, camDistMin = 0, camDistRange = 1 // Retransition Distance Curve: nearest / range of every hand's distance to the camera, cached per frame
+let fbDistFrame = -1, fbDistMin = 0, fbDistRange = 1, fbDist = null // Hand Position Min / Max curves: each hand's starting-point screen distance from the screen centre, cached per frame
 let startupFloorHidden = false // Starting State > Hide Floor After Hand Offset Sequence: set once every hand has finished the startup transition (runtime only, never saved)
 let startupStaticReleased = false // Starting State > Static Pose On Startup: set by the first click function trigger (runtime only, never saved)
 const _cfTmp = new THREE.Vector3() // clickRotatePointInto() scratch
@@ -862,7 +864,7 @@ function tryStartField() {
   // whatever comes next; don't treat this comment's own reasoning above
   // as the settled explanation.
   if (!fieldWarmCompiled) renderer.compile(scene, camera)
-  window.__debug = { untriggeredVisibleSpheres, allVisibleHandsFinished, handStartupLocked, triggerClickPose, checkStartupFloorHide, get startupFloorHidden() { return startupFloorHidden }, get floorMesh() { return floorMesh }, updateLoadingPreviewAnimation, get loadingPreview2() { return { hand: loadingPreviewHand, hand2: loadingPreviewHand2, scene: loadingPreviewScene, camera: loadingPreviewCamera, renderer: loadingPreviewRenderer } }, updateSphereSequence, get sphereState() { return { stage: sphereStage, mesh: sphereMesh, on: sphereOn, start: sphereStart, dur: sphereDur, cap: sphereCap, done: sphereDone, keep: sphereKeepForHands, clicks: sphereClickCount } }, stackOnDefault, applyCameraOrientation, syncCameraPanelFromLive, curveByDomain, get domains() { return { xyAll: [xyAllMinDist, xyAllDistRange], splayAll: [splayAllMin, splayAllRange], cropAll: [cropAllMin, cropAllRange], restAll: [restAllMinDist, restAllDistRange], live: [liveFieldMinDist, liveFieldDistRange], splay: [splayFieldMin, splayFieldRange], crop: [cropFieldMin, cropFieldRange], xy: [xyFieldMinDist, xyFieldDistRange], rest: [restFieldMinDist, restFieldDistRange] } }, modelBaseFrameQ, computeBaseRotationQuat, cloneBaseRb, makeClipRig, updateClipRigPlanes, setClipRigT, updateOnScreenFlags, evaluateArmLengthCurve, THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose, resolveTweenSegmentsWithAnchor, lerpTweenSegments, lerpLoopSegments, isHoldEntry, updateLoadingPreviewWristClip, lerpPoseValues, get loadingPreviewRenderer() { return loadingPreviewRenderer }, get loadingPreviewScene() { return loadingPreviewScene }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, get handBoundsCenterLocal() { return handBoundsCenterLocal }, multiPointCommit, multiPointEligibleFunctions, get multiPointActiveTouchCount() { return multiPointActiveTouchCount }, get multiPointSessionFiredPoseId() { return multiPointSessionFiredPoseId }, detectPoseJumps, get poseJumpLogEntries() { return poseJumpLogEntries }, applyCurlToSkeletonReference, handLogTriggerLabel, applyAllFingerCurls, syncCameraPanelFromLive, animSpeedMs, chainSequenceCount, applyFieldBounds, cursorDistXY, hexBrightnessPct, toonThresholdForMidBrightness }
+  window.__debug = { applyFieldBounds, onFieldBoundsChanged, retransitionDistanceMs, untriggeredVisibleSpheres, allVisibleHandsFinished, handStartupLocked, triggerClickPose, checkStartupFloorHide, get startupFloorHidden() { return startupFloorHidden }, get floorMesh() { return floorMesh }, updateLoadingPreviewAnimation, get loadingPreview2() { return { hand: loadingPreviewHand, hand2: loadingPreviewHand2, scene: loadingPreviewScene, camera: loadingPreviewCamera, renderer: loadingPreviewRenderer } }, updateSphereSequence, get sphereState() { return { stage: sphereStage, mesh: sphereMesh, on: sphereOn, start: sphereStart, dur: sphereDur, cap: sphereCap, done: sphereDone, keep: sphereKeepForHands, clicks: sphereClickCount } }, stackOnDefault, applyCameraOrientation, syncCameraPanelFromLive, curveByDomain, get domains() { return { xyAll: [xyAllMinDist, xyAllDistRange], splayAll: [splayAllMin, splayAllRange], cropAll: [cropAllMin, cropAllRange], restAll: [restAllMinDist, restAllDistRange], live: [liveFieldMinDist, liveFieldDistRange], splay: [splayFieldMin, splayFieldRange], crop: [cropFieldMin, cropFieldRange], xy: [xyFieldMinDist, xyFieldDistRange], rest: [restFieldMinDist, restFieldDistRange] } }, modelBaseFrameQ, computeBaseRotationQuat, cloneBaseRb, makeClipRig, updateClipRigPlanes, setClipRigT, updateOnScreenFlags, evaluateArmLengthCurve, THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose, resolveTweenSegmentsWithAnchor, lerpTweenSegments, lerpLoopSegments, isHoldEntry, updateLoadingPreviewWristClip, lerpPoseValues, get loadingPreviewRenderer() { return loadingPreviewRenderer }, get loadingPreviewScene() { return loadingPreviewScene }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, get handBoundsCenterLocal() { return handBoundsCenterLocal }, multiPointCommit, multiPointEligibleFunctions, get multiPointActiveTouchCount() { return multiPointActiveTouchCount }, get multiPointSessionFiredPoseId() { return multiPointSessionFiredPoseId }, detectPoseJumps, get poseJumpLogEntries() { return poseJumpLogEntries }, applyCurlToSkeletonReference, handLogTriggerLabel, applyAllFingerCurls, syncCameraPanelFromLive, animSpeedMs, chainSequenceCount, applyFieldBounds, cursorDistXY, hexBrightnessPct, toonThresholdForMidBrightness }
   // Do NOT hide the loading screen yet: the hands exist but may not have been painted. finalizeReveal() hides it once the field has rendered a couple of frames (or after a 4 s safety net).
   setTimeout(finalizeReveal, 4000)
 }
@@ -1817,6 +1819,26 @@ const DEV_GROUPS = [
       { key: 'fieldOffsetX', label: 'Field Offset X (World Units)', type: 'slider', min: -200, max: 200, step: 0.5, def: 0, perDevice: true, onChange: () => relayoutField() },
       { key: 'fieldOffsetY', label: 'Field Offset Y (World Units)', type: 'slider', min: -200, max: 200, step: 0.5, def: 0, perDevice: true, onChange: () => relayoutField() },
       { key: 'fieldOffsetZ', label: 'Field Offset Z (World Units)', type: 'slider', min: -200, max: 200, step: 0.5, def: 0, perDevice: true, onChange: () => relayoutField() },
+      // Hand Position Min / Max (2026-10-13, direct request): per axis a single-number Min and Max plus a curve editor for EACH (6 in all). Curve: X = screen-space (XY) distance of the hand's starting field point from the screen
+      // centre (all points of the field, nearest..farthest = 0..1); Y = the Min / Max value itself (-300..300 world units = 0..1). The three old range-bar rows below stay as hidden storage for old saved values.
+      { key: 'fieldBoundsXMin', label: 'Hand Position Min X (World Units)', type: 'text', def: '-300', onChange: () => onFieldBoundsChanged() },
+      { key: 'fieldBoundsXMinCurveEnabled', label: 'Hand Position Min X Curve On/Off', type: 'checkbox', def: false, onChange: () => onFieldBoundsChanged() },
+      { key: 'fieldBoundsXMinCurve', label: 'Hand Position Min X Curve (Screen Distance -> Min X)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":0}]', onChange: () => onFieldBoundsChanged() },
+      { key: 'fieldBoundsXMax', label: 'Hand Position Max X (World Units)', type: 'text', def: '300', onChange: () => onFieldBoundsChanged() },
+      { key: 'fieldBoundsXMaxCurveEnabled', label: 'Hand Position Max X Curve On/Off', type: 'checkbox', def: false, onChange: () => onFieldBoundsChanged() },
+      { key: 'fieldBoundsXMaxCurve', label: 'Hand Position Max X Curve (Screen Distance -> Max X)', type: 'text', def: '[{"x":0,"y":1},{"x":1,"y":1}]', onChange: () => onFieldBoundsChanged() },
+      { key: 'fieldBoundsYMin', label: 'Hand Position Min Y (World Units)', type: 'text', def: '-300', onChange: () => onFieldBoundsChanged() },
+      { key: 'fieldBoundsYMinCurveEnabled', label: 'Hand Position Min Y Curve On/Off', type: 'checkbox', def: false, onChange: () => onFieldBoundsChanged() },
+      { key: 'fieldBoundsYMinCurve', label: 'Hand Position Min Y Curve (Screen Distance -> Min Y)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":0}]', onChange: () => onFieldBoundsChanged() },
+      { key: 'fieldBoundsYMax', label: 'Hand Position Max Y (World Units)', type: 'text', def: '300', onChange: () => onFieldBoundsChanged() },
+      { key: 'fieldBoundsYMaxCurveEnabled', label: 'Hand Position Max Y Curve On/Off', type: 'checkbox', def: false, onChange: () => onFieldBoundsChanged() },
+      { key: 'fieldBoundsYMaxCurve', label: 'Hand Position Max Y Curve (Screen Distance -> Max Y)', type: 'text', def: '[{"x":0,"y":1},{"x":1,"y":1}]', onChange: () => onFieldBoundsChanged() },
+      { key: 'fieldBoundsZMin', label: 'Hand Position Min Z (World Units)', type: 'text', def: '-300', onChange: () => onFieldBoundsChanged() },
+      { key: 'fieldBoundsZMinCurveEnabled', label: 'Hand Position Min Z Curve On/Off', type: 'checkbox', def: false, onChange: () => onFieldBoundsChanged() },
+      { key: 'fieldBoundsZMinCurve', label: 'Hand Position Min Z Curve (Screen Distance -> Min Z)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":0}]', onChange: () => onFieldBoundsChanged() },
+      { key: 'fieldBoundsZMax', label: 'Hand Position Max Z (World Units)', type: 'text', def: '300', onChange: () => onFieldBoundsChanged() },
+      { key: 'fieldBoundsZMaxCurveEnabled', label: 'Hand Position Max Z Curve On/Off', type: 'checkbox', def: false, onChange: () => onFieldBoundsChanged() },
+      { key: 'fieldBoundsZMaxCurve', label: 'Hand Position Max Z Curve (Screen Distance -> Max Z)', type: 'text', def: '[{"x":0,"y":1},{"x":1,"y":1}]', onChange: () => onFieldBoundsChanged() },
       { key: 'fieldBoundsX', label: 'Hand Position Min / Max X (World Units)', type: 'text', def: '{"min":-300,"max":300}', onChange: () => onFieldBoundsChanged() },
       { key: 'fieldBoundsY', label: 'Hand Position Min / Max Y (World Units)', type: 'text', def: '{"min":-300,"max":300}', onChange: () => onFieldBoundsChanged() },
       { key: 'fieldBoundsZ', label: 'Hand Position Min / Max Z (World Units)', type: 'text', def: '{"min":-300,"max":300}', onChange: () => onFieldBoundsChanged() }
@@ -3193,6 +3215,7 @@ const cfg = initDevPanel(DEV_GROUPS, {
     logStartupTiming('onRestore fired -> startupSettingsReady = true')
     // A saved panel order that predates the Render Order group puts its rows straight back into Field Layout when it is applied; re-nest them (idempotent, only moves the listed keys).
     try { renestRenderOrderRows() } catch (e) { /* panel not built */ }
+    try { migrateLegacyFieldBounds(); ;['X', 'Y', 'Z'].forEach((A) => { const r = document.querySelector('.dp-row[data-key="fieldBounds' + A + '"]'); if (r) r.style.display = 'none' }) } catch (e) { /* panel not built */ }
     try {
       // Default Floor Color = the Background Color (direct request): while Floor Color still holds its code default (white) and the restored Background Color is something else, start from the Background Color. Once a
       // different color is saved it is left alone (a deliberately white floor on a non-white background needs a slightly different white, e.g. #fefefe).
@@ -6591,6 +6614,11 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       { key: `${p}RetransitionSpeedCurveVisibleOnly`, label: 'Retransition Speed Curve: Visible Hands Only', type: 'checkbox', def: true },
       { key: `${p}RetransitionSpeedCurve`, label: 'Retransition Speed Curve (Distance -> Speed)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickHoldConfig(p) },
       { key: `${p}RetransitionSpeedCurveRange`, label: 'Retransition Min / Max Speed (Ms)', type: 'text', def: '{"min":50,"max":25000}', onChange: () => parseClickHoldConfig(p) },
+      // Retransition Distance Curve (2026-10-13, direct request): the retransition TIME follows the hand model's actual distance from the camera position (X: nearest -> farthest hand = 0..1, Y: Min..Max time). When on it
+      // replaces the Retransition Speed / Speed Curve duration.
+      { key: `${p}RetransitionDistCurveEnabled`, label: 'Retransition Distance Curve On/Off', type: 'checkbox', def: false, onChange: () => updateSingleTimingGateVisibility(p) },
+      { key: `${p}RetransitionDistCurve`, label: 'Retransition Distance Curve (Camera Distance -> Time)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]' },
+      { key: `${p}RetransitionDistRange`, label: 'Retransition Distance Curve Min / Max Time (Ms)', type: 'text', def: '{"min":50,"max":2000}' },
       // Retransition Start Time Curve On/Off -- direct spec item
       // (2026-09-27), same reasoning as makeClickPoseGroup()'s own
       // matching control comment.
@@ -6897,6 +6925,10 @@ function makeClickPoseGroup(p, title, defaults = {}) {
       { key: `${p}RetransitionSpeedCurveVisibleOnly`, label: 'Retransition Speed Curve: Visible Hands Only', type: 'checkbox', def: true },
       { key: `${p}RetransitionSpeedCurve`, label: 'Retransition Speed Curve (Distance -> Speed)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickPoseConfig(p) },
       { key: `${p}RetransitionSpeedCurveRange`, label: 'Retransition Min / Max Speed (Ms)', type: 'text', def: '{"min":50,"max":25000}', onChange: () => parseClickPoseConfig(p) },
+      // Retransition Distance Curve: see the hold-kind factory's matching comment.
+      { key: `${p}RetransitionDistCurveEnabled`, label: 'Retransition Distance Curve On/Off', type: 'checkbox', def: false, onChange: () => updateSingleTimingGateVisibility(p) },
+      { key: `${p}RetransitionDistCurve`, label: 'Retransition Distance Curve (Camera Distance -> Time)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]' },
+      { key: `${p}RetransitionDistRange`, label: 'Retransition Distance Curve Min / Max Time (Ms)', type: 'text', def: '{"min":50,"max":2000}' },
       // Retransition Start Time Curve On/Off -- direct spec item
       // (2026-09-27): "place the Retransition start time slider and curve
       // in their own subgroup that can be turned on and off." Previously
@@ -11537,7 +11569,8 @@ function refreshLiveDistanceState(st, hand, p, trig, now, kind) {
     const isTw = kind === 'hold' && !!st.retransitionIsTween
     const delay = cfg[`${p}RetransitionStartTimeCurveEnabled`] === false ? 0
       : (isTw ? liveCurveValue(hand, trig.tweenRetransitionCurveParsed, trig.tweenRetransitionRangeParsed, p, 'RetransitionStartTimeCurveVisibleOnly') : liveCurveValue(hand, trig.retransitionCurveParsed, trig.retransitionRangeParsed, p, 'RetransitionStartTimeCurveVisibleOnly'))
-    const speedMs = Math.max(cfg[`${p}RetransitionSpeedCurveEnabled`]
+    const distMs = retransitionDistanceMs(hand, p) // Retransition Distance Curve (null when off) replaces the Retransition Speed duration
+    const speedMs = distMs !== null ? Math.max(distMs, 1) : Math.max(cfg[`${p}RetransitionSpeedCurveEnabled`]
       ? (isTw ? liveCurveValue(hand, trig.tweenRetransitionSpeedCurveParsed, trig.tweenRetransitionSpeedRangeParsed, p, 'RetransitionSpeedCurveVisibleOnly') : liveCurveValue(hand, trig.retransitionSpeedCurveParsed, trig.retransitionSpeedRangeParsed, p, 'RetransitionSpeedCurveVisibleOnly'))
       : (isTw ? cfg[`${p}TweenRetransitionSpeedMs`] : cfg[`${p}RetransitionSpeedMs`]), 1)
     st.retransitionDelay = delay
@@ -13896,6 +13929,9 @@ function buildClickHoldPoseWidgets(p) {
   const retransSpeedRangeRow = document.querySelector(`.dp-row[data-key="${p}RetransitionSpeedCurveRange"]`)
   if (retransSpeedCurveRow) buildGenericCurveWidget(retransSpeedCurveRow, { caption: speedCurveCaption, defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
   if (retransSpeedRangeRow) buildGenericRangeBarWidget(retransSpeedRangeRow, { trackMin: 50, trackMax: 25000, unit: 'ms', defaultValue: { min: 50, max: 25000 } })
+  const retransDistCurveRow = document.querySelector(`.dp-row[data-key="${p}RetransitionDistCurve"]`), retransDistRangeRow = document.querySelector(`.dp-row[data-key="${p}RetransitionDistRange"]`)
+  if (retransDistCurveRow) buildGenericCurveWidget(retransDistCurveRow, { caption: 'X: Hand Distance From Camera (%, Nearest→Farthest Hand, Live)  ·  Y: Retransition Time (0=Min, 1=Max)', defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
+  if (retransDistRangeRow) buildGenericRangeBarWidget(retransDistRangeRow, { trackMin: 50, trackMax: 25000, unit: 'ms', defaultValue: { min: 50, max: 2000 } })
   // Tween's own dedicated Retransition SPEED curve/range (2026-09-30,
   // direct follow-up: "for retransition speed curve make the ui the
   // sliderr toggle and the curve editor") -- same shape/caption/track
@@ -13995,6 +14031,9 @@ function buildClickPoseWidgets(p) {
   const retransSpeedRangeRow = document.querySelector(`.dp-row[data-key="${p}RetransitionSpeedCurveRange"]`)
   if (retransSpeedCurveRow) buildGenericCurveWidget(retransSpeedCurveRow, { caption: speedCurveCaption, defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
   if (retransSpeedRangeRow) buildGenericRangeBarWidget(retransSpeedRangeRow, { trackMin: 50, trackMax: 25000, unit: 'ms', defaultValue: { min: 50, max: 25000 } })
+  const retransDistCurveRow = document.querySelector(`.dp-row[data-key="${p}RetransitionDistCurve"]`), retransDistRangeRow = document.querySelector(`.dp-row[data-key="${p}RetransitionDistRange"]`)
+  if (retransDistCurveRow) buildGenericCurveWidget(retransDistCurveRow, { caption: 'X: Hand Distance From Camera (%, Nearest→Farthest Hand, Live)  ·  Y: Retransition Time (0=Min, 1=Max)', defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
+  if (retransDistRangeRow) buildGenericRangeBarWidget(retransDistRangeRow, { trackMin: 50, trackMax: 25000, unit: 'ms', defaultValue: { min: 50, max: 2000 } })
   const startCurveRow = document.querySelector(`.dp-row[data-key="${p}StartTimeCurve"]`)
   const startRangeRow = document.querySelector(`.dp-row[data-key="${p}StartTimeRange"]`)
   const tweenStartCurveRow = document.querySelector(`.dp-row[data-key="${p}TweenStartTimeCurve"]`)
@@ -15161,6 +15200,7 @@ const MULTI_TRIGGER_ALLOWED_SUFFIXES = [
   'StartTimeCurveEnabled', 'StartTimeCurve', 'StartTimeRange', 'TweenStartTimeCurve', 'TweenStartTimeRange',
   'StartDistanceCurveEnabled', 'StartDistanceMin', 'StartDistanceMax', 'StartDistanceCurve',
   'RetransitionEnabled', 'RetransitionSpeedMs', 'RetransitionSpeedCurveEnabled', 'RetransitionSpeedCurve', 'RetransitionSpeedCurveRange', 'RetransitionStartTimeCurveEnabled', 'RetransitionStartTimeCurve', 'RetransitionStartTimeRange',
+  'RetransitionDistCurveEnabled', 'RetransitionDistCurve', 'RetransitionDistRange',
   // 2026-10-06 (direct request, "1 - CH"): a hold-kind trigger in Sequence/Chain mode uses its own
   // Tween* retransition fields, which were missing here, so the Retransition / Retransition Speed
   // Curve / Retransition Start Time Curve groups of every hold-kind trigger were empty shells in
@@ -16034,6 +16074,10 @@ function updateSingleTimingGateVisibility(p) {
   const tweenRetransitionSpeedCurveOn = tweenRetransitionOn && retransitionSpeedCurveEnabled
   setRow('TweenRetransitionSpeedCurve', tweenRetransitionSpeedCurveOn)
   setRow('TweenRetransitionSpeedCurveRange', tweenRetransitionSpeedCurveOn)
+  setRow('RetransitionDistCurveEnabled', retransitionOn)
+  const retransitionDistOn = retransitionOn && !!cfg[`${p}RetransitionDistCurveEnabled`]
+  setRow('RetransitionDistCurve', retransitionDistOn)
+  setRow('RetransitionDistRange', retransitionDistOn)
   // Retransition Easing Curve: the on/off follows Retransition itself; the curve shows while its own box is on.
   setRow('RetransitionEasingCurveEnabled', retransitionOn)
   setRow('RetransitionEasingCurve', retransitionOn && !!cfg[`${p}RetransitionEasingCurveEnabled`])
@@ -16315,7 +16359,8 @@ function wrapClickFunctionGatedSubgroups(p) {
   wrapGatedSubgroup(`${p}RetransitionEnabled`, [
     `${p}RetransitionSpeedMs`, `${p}RetransitionSpeedCurveEnabled`, `${p}RetransitionSpeedCurveVisibleOnly`, `${p}RetransitionSpeedCurve`, `${p}RetransitionSpeedCurveRange`, `${p}RetransitionStartTimeCurveEnabled`, `${p}RetransitionStartTimeCurveVisibleOnly`, `${p}RetransitionStartTimeCurve`, `${p}RetransitionStartTimeRange`,
     `${p}TweenRetransitionSpeedMs`, `${p}TweenRetransitionSpeedCurve`, `${p}TweenRetransitionSpeedCurveRange`, `${p}TweenRetransitionStartTimeCurve`, `${p}TweenRetransitionStartTimeRange`,
-    `${p}RetransitionEasingCurveEnabled`, `${p}RetransitionEasingCurve`
+    `${p}RetransitionEasingCurveEnabled`, `${p}RetransitionEasingCurve`,
+    `${p}RetransitionDistCurveEnabled`, `${p}RetransitionDistCurve`, `${p}RetransitionDistRange`
   ], 'Retransition')
   // Direct spec item (2026-09-27): "add a Retransition Speed Curve group
   // just like the others where it can get turned on and off... place the
@@ -16333,6 +16378,7 @@ function wrapClickFunctionGatedSubgroups(p) {
   // Retransition wrap, never before.
   wrapGatedSubgroup(`${p}RetransitionSpeedCurveEnabled`, [`${p}RetransitionSpeedCurveVisibleOnly`, `${p}RetransitionSpeedCurve`, `${p}RetransitionSpeedCurveRange`, `${p}TweenRetransitionSpeedCurve`, `${p}TweenRetransitionSpeedCurveRange`], 'Retransition Speed Curve')
   wrapGatedSubgroup(`${p}RetransitionEasingCurveEnabled`, [`${p}RetransitionEasingCurve`], 'Retransition Easing Curve')
+  wrapGatedSubgroup(`${p}RetransitionDistCurveEnabled`, [`${p}RetransitionDistCurve`, `${p}RetransitionDistRange`], 'Retransition Distance Curve')
   wrapGatedSubgroup(`${p}RetransitionStartTimeCurveEnabled`, [`${p}RetransitionStartTimeCurveVisibleOnly`, `${p}RetransitionStartTimeCurve`, `${p}RetransitionStartTimeRange`, `${p}TweenRetransitionStartTimeCurve`, `${p}TweenRetransitionStartTimeRange`], 'Retransition Start Time Curve')
   // Hold-kind only -- fire-and-forget triggers have no Tween Stop fields.
   // Must run AFTER the wraps above (harmless either order, since Tween
@@ -16651,31 +16697,76 @@ function parseFieldBounds() {
   const out = {}
   let limited = false
   ;['X', 'Y', 'Z'].forEach((A) => {
-    let min = -300, max = 300
-    try { const o = JSON.parse(cfg['fieldBounds' + A] || '{}'); if (Number.isFinite(o.min)) min = o.min; if (Number.isFinite(o.max)) max = o.max } catch (e) { /* keep defaults */ }
-    if (min > max) { const t = min; min = max; max = t }
-    out[A.toLowerCase()] = [min, max]
+    const num = (k, d) => { const v = parseFloat(cfg[k]); return Number.isFinite(v) ? v : d }
+    const curve = (k) => { if (!cfg[k + 'Enabled']) return null; limited = true; return sphereParse(cfg[k], [{ x: 0, y: 0.5 }, { x: 1, y: 0.5 }]) }
+    const min = num('fieldBounds' + A + 'Min', -300), max = num('fieldBounds' + A + 'Max', 300)
+    out[A.toLowerCase()] = { min, max, minCurve: curve('fieldBounds' + A + 'MinCurve'), maxCurve: curve('fieldBounds' + A + 'MaxCurve') }
     if (min > -300 || max < 300) limited = true
   })
   fieldBounds = limited ? out : null
+}
+// Old saved Hand Position Min / Max (one range-bar JSON per axis) -> the new Min / Max number inputs, once, while the new inputs are still at their defaults.
+function migrateLegacyFieldBounds() {
+  ;['X', 'Y', 'Z'].forEach((A) => {
+    try {
+      const o = JSON.parse(cfg['fieldBounds' + A] || '{}')
+      if (Number.isFinite(o.min) && o.min !== -300 && cfg['fieldBounds' + A + 'Min'] === '-300') syncValue('fieldBounds' + A + 'Min', String(o.min))
+      if (Number.isFinite(o.max) && o.max !== 300 && cfg['fieldBounds' + A + 'Max'] === '300') syncValue('fieldBounds' + A + 'Max', String(o.max))
+    } catch (e) { /* keep the new inputs' values */ }
+  })
+  parseFieldBounds()
+}
+// Retransition Distance Curve: X = the hand model's actual distance from the camera position, nearest..farthest hand of the whole field = 0..1 (a hand outside that range is extrapolated by the curve); Y = Min..Max time.
+function retransitionDistanceMs(hand, p) {
+  if (!cfg[`${p}RetransitionDistCurveEnabled`]) return null
+  if (camDistFrame !== idleReposeFrameCounter) {
+    camDistFrame = idleReposeFrameCounter
+    let mn = Infinity, mx = -Infinity
+    for (let i = 0; i < hands.length; i++) { const d = hands[i].wrapper.position.distanceTo(camera.position); if (d < mn) mn = d; if (d > mx) mx = d }
+    camDistMin = mn === Infinity ? 0 : mn; camDistRange = Math.max(mx - mn, 0.001)
+  }
+  const x = (hand.wrapper.position.distanceTo(camera.position) - camDistMin) / camDistRange
+  const pts = sphereParse(cfg[`${p}RetransitionDistCurve`], [{ x: 0, y: 0 }, { x: 1, y: 1 }]), rg = sphereParse(cfg[`${p}RetransitionDistRange`], { min: 50, max: 2000 })
+  return rg.min + (rg.max - rg.min) * THREE.MathUtils.clamp(evaluateArmLengthCurve(pts, x), 0, 1)
 }
 function onFieldBoundsChanged() {
   parseFieldBounds()
   relayoutField() // puts idle hands back on their grid position so widening a bound releases them
 }
-const _bndRight = new THREE.Vector3(), _bndUp = new THREE.Vector3(), _bndFwd = new THREE.Vector3()
+const _bndRight = new THREE.Vector3(), _bndUp = new THREE.Vector3(), _bndFwd = new THREE.Vector3(), _bndProj = new THREE.Vector3()
 function applyFieldBounds() {
   if (!fieldBounds) return
   const b = fieldBounds
+  // Curves: X = screen-space XY distance of each hand's STARTING field point from the screen centre, over ALL hands (not just visible ones), nearest..farthest = 0..1; Y (0..1) = -300..300 world units.
+  const anyCurve = !!(b.x.minCurve || b.x.maxCurve || b.y.minCurve || b.y.maxCurve || b.z.minCurve || b.z.maxCurve)
+  if (anyCurve && fbDistFrame !== idleReposeFrameCounter) {
+    fbDistFrame = idleReposeFrameCounter
+    if (!fbDist || fbDist.length !== hands.length) fbDist = new Float64Array(hands.length)
+    const asp = camera.aspect > 0 ? camera.aspect : 1
+    let mn = Infinity, mx = -Infinity
+    for (let i = 0; i < hands.length; i++) {
+      const bp = hands[i].basePosition
+      let d = 0
+      if (bp) { _bndProj.copy(bp).project(camera); d = Math.hypot(_bndProj.x * asp, _bndProj.y) }
+      fbDist[i] = d
+      if (d < mn) mn = d
+      if (d > mx) mx = d
+    }
+    fbDistMin = mn === Infinity ? 0 : mn; fbDistRange = Math.max(mx - mn, 1e-6)
+  }
+  const lim = (ax, curve, fallback, x) => (curve ? -300 + 600 * THREE.MathUtils.clamp(evaluateArmLengthCurve(curve, x), 0, 1) : fallback)
   _bndRight.setFromMatrixColumn(camera.matrixWorld, 0)
   _bndUp.setFromMatrixColumn(camera.matrixWorld, 1)
   _bndFwd.setFromMatrixColumn(camera.matrixWorld, 2)
   for (let i = 0; i < hands.length; i++) {
     const hand = hands[i]
     const p = hand.wrapper.position
-    const cx = Math.min(Math.max(p.x, b.x[0]), b.x[1])
-    const cy = Math.min(Math.max(p.y, b.y[0]), b.y[1])
-    const cz = Math.min(Math.max(p.z, b.z[0]), b.z[1])
+    const xn = anyCurve ? (fbDist[i] - fbDistMin) / fbDistRange : 0
+    const bound = (o) => { let lo = lim(0, o.minCurve, o.min, xn), hi = lim(0, o.maxCurve, o.max, xn); if (lo > hi) { const t = lo; lo = hi; hi = t } return [lo, hi] }
+    const bx = bound(b.x), by = bound(b.y), bz = bound(b.z)
+    const cx = Math.min(Math.max(p.x, bx[0]), bx[1])
+    const cy = Math.min(Math.max(p.y, by[0]), by[1])
+    const cz = Math.min(Math.max(p.z, bz[0]), bz[1])
     const ex = p.x - cx, ey = p.y - cy, ez = p.z - cz
     if (ex !== 0 || ey !== 0 || ez !== 0) {
       p.set(cx, cy, cz)
@@ -16693,8 +16784,13 @@ function applyFieldBounds() {
 }
 function buildFieldBoundsWidgets() {
   ;['X', 'Y', 'Z'].forEach((A) => {
-    const row = document.querySelector('.dp-row[data-key="fieldBounds' + A + '"]')
-    if (row) buildGenericRangeBarWidget(row, { trackMin: -300, trackMax: 300, unit: 'wu', defaultValue: { min: -300, max: 300 } })
+    const legacy = document.querySelector('.dp-row[data-key="fieldBounds' + A + '"]')
+    if (legacy) legacy.style.display = 'none' // old range-bar storage, replaced by the Min / Max number inputs
+    ;['Min', 'Max'].forEach((M) => {
+      const row = document.querySelector('.dp-row[data-key="fieldBounds' + A + M + 'Curve"]')
+      if (row) buildGenericCurveWidget(row, { caption: 'X: Screen Distance Of The Starting Field Point From The Screen Centre (%, Nearest→Farthest Point, All Points)  ·  Y: ' + M + ' ' + A + ' (-300 = 0, 300 = 1, World Units)', defaultPoints: M === 'Min' ? [{ x: 0, y: 0 }, { x: 1, y: 0 }] : [{ x: 0, y: 1 }, { x: 1, y: 1 }] })
+      wrapGatedSubgroup('fieldBounds' + A + M + 'CurveEnabled', ['fieldBounds' + A + M + 'Curve'], 'Hand Position ' + M + ' ' + A + ' Curve')
+    })
   })
 }
 function relayoutField() {
