@@ -17498,6 +17498,19 @@ Direct request: use the HANDO two-hand tween export (format hando-two-hand-tween
   (the other reading: Min curve spans only down to the Min box and Max curve only up to the Max box) - say if that is not what was meant. Verified in the page: boxes Min -50 / Max 80, flat Max curve at y 0.5 limited the hands to
   x 15 (= -50 + 130 * 0.5), flat at y 0 to -50.
 
+2026-10-13  -  FIELD CENTER POINT debug dot, Hand Position curve Min/Max sliders, startup holds tracking until all visible hands finish, Retransition Distance Scaler
+  1. Debug > "FIELD CENTER POINT" (showFieldCenterPoint): one red dot at the centroid of the hand field (average of every hand's basePosition), updateFieldCenterMarker(). 2. Hand Position Min / Max curve groups: each of the six now
+  has a 2-handle Min / Max slider (fieldBounds<Axis><Min|Max>CurveRange, default -300..300) whose two numbers are the Y axis bottom / top (replaces the previous "Y spans the Min / Max number boxes"); the curve X is now XY only: the
+  world-XY distance of each hand's starting field point from the camera's XY position (all hands, nearest..farthest = 0..1; it used a projected screen position before). buildGenericRangeBarWidget() gained an optional decimals
+  option (fractional drag values). 3. Hand Offset On Startup: startupHandPhaseUnfinished() = the sequence is under way and some VISIBLE hand has not finished. Throughout that time the normal click functions are blocked
+  (startupBlocksClickFunctions()) and so cursor tracking stays off (hands static in their default pose); the first click after every visible hand has finished is the one that fires the normal click functions and starts tracking.
+  This makes Wait For All Hands effectively always on (the checkbox is left in place). 4. New toggleable group "Retransition Distance Scaler" in every click function's Retransition group (RetransitionScalerEnabled / Curve /
+  MulRange / DistRange; both families, Multi Trigger suffixes): each hand's retransition speed - the single slider, the Speed Curve or the Distance Curve result - is multiplied by curve(distance from its own field starting
+  point); X = (distance - Min) / (Max - Min) of the distance slider, hands beyond it are extrapolated by the curve, Y maps to the multiplier Min..Max slider (default 0.5..2, distance 0..50); duration = base time / multiplier
+  (my reading of "speed multiplier"), floor 0.05. Verified in the page: red dot at (-2.57, 0, 0) = the computed centroid; Max X curve with range -100..60 at y 0.5 limited every hand to -20; scaler multipliers 0.5 / 1.25 / 2 / 3.5
+  at distance 0 / 25 / 50 / 100 (extrapolated); with real timing a normal click function did NOT fire while the hand sequence ran (0 hands) and fired on the next click after every hand had finished (255). Not exercised: the
+  scaler inside a live retransition, and a phone.
+
 2026-10-12  -  (Sphere Sequence: clicks do not register while spheres are running)
 
 Direct request: while sphere sequences are running a click will not register. advanceSphereSequence() now returns without doing anything (the click is still consumed, so no real click function fires either) while anySphereRunning() - any started sphere whose sequence has not reached its end, including ones still waiting for their start time. Only once every sphere sequence has finished does the next click advance to the hands / Hand Offset On Startup. Note this makes Wait For All Spheres (on-screen spheres only) redundant: the running check already covers every sphere, on screen or not. Also exposed updateSphereSequence and sphereState on window.__debug for testing. main.js ?v=387 -> ?v=388.
