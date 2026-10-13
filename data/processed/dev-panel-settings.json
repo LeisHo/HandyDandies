@@ -53,12 +53,12 @@
       "fieldBoundsYMaxCurveRange": "{\"min\":-300,\"max\":300}",
       "fieldBoundsZMin": "-800",
       "fieldBoundsZMinCurveEnabled": true,
-      "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.5447649843679548,\"y\":0.0214581807454427}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.5659896353007423,\"y\":0}}]",
-      "fieldBoundsZMinCurveRange": "{\"min\":-800,\"max\":-200}",
+      "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.7776759023693519,\"y\":0.1147916158040364}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.41125863888034064,\"y\":-0.12520840962727864}}]",
+      "fieldBoundsZMinCurveRange": "{\"min\":-1500,\"max\":100}",
       "fieldBoundsZMax": "240",
       "fieldBoundsZMaxCurveEnabled": true,
-      "fieldBoundsZMaxCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.4959025644457227,\"y\":-0.019270833333333348}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.4829236705492195,\"y\":0}}]",
-      "fieldBoundsZMaxCurveRange": "{\"min\":150,\"max\":240}",
+      "fieldBoundsZMaxCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.6017711409438923,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.4829236705492195,\"y\":0}}]",
+      "fieldBoundsZMaxCurveRange": "{\"min\":150,\"max\":300}",
       "fieldBoundsX": "{\"min\":-300,\"max\":300}",
       "fieldBoundsY": "{\"min\":-300,\"max\":300}",
       "fieldBoundsZ": "{\"min\":-400,\"max\":200}",
@@ -10815,12 +10815,12 @@
       "fieldBoundsYMaxCurveRange": "{\"min\":-300,\"max\":300}",
       "fieldBoundsZMin": "-800",
       "fieldBoundsZMinCurveEnabled": true,
-      "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.5447649843679548,\"y\":0.0214581807454427}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.5659896353007423,\"y\":0}}]",
-      "fieldBoundsZMinCurveRange": "{\"min\":-800,\"max\":-200}",
+      "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.7776759023693519,\"y\":0.1147916158040364}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.41125863888034064,\"y\":-0.12520840962727864}}]",
+      "fieldBoundsZMinCurveRange": "{\"min\":-1500,\"max\":100}",
       "fieldBoundsZMax": "240",
       "fieldBoundsZMaxCurveEnabled": true,
-      "fieldBoundsZMaxCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.4959025644457227,\"y\":-0.019270833333333348}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.4829236705492195,\"y\":0}}]",
-      "fieldBoundsZMaxCurveRange": "{\"min\":150,\"max\":240}",
+      "fieldBoundsZMaxCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.6017711409438923,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.4829236705492195,\"y\":0}}]",
+      "fieldBoundsZMaxCurveRange": "{\"min\":150,\"max\":300}",
       "fieldBoundsX": "{\"min\":-300,\"max\":300}",
       "fieldBoundsY": "{\"min\":-300,\"max\":300}",
       "fieldBoundsZ": "{\"min\":-400,\"max\":200}",
@@ -21577,12 +21577,12 @@
       "fieldBoundsYMaxCurveRange": "{\"min\":-300,\"max\":300}",
       "fieldBoundsZMin": "-800",
       "fieldBoundsZMinCurveEnabled": true,
-      "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.5447649843679548,\"y\":0.0214581807454427}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.5659896353007423,\"y\":0}}]",
-      "fieldBoundsZMinCurveRange": "{\"min\":-800,\"max\":-200}",
+      "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.7776759023693519,\"y\":0.1147916158040364}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.41125863888034064,\"y\":-0.12520840962727864}}]",
+      "fieldBoundsZMinCurveRange": "{\"min\":-1500,\"max\":100}",
       "fieldBoundsZMax": "240",
       "fieldBoundsZMaxCurveEnabled": true,
-      "fieldBoundsZMaxCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.4959025644457227,\"y\":-0.019270833333333348}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.4829236705492195,\"y\":0}}]",
-      "fieldBoundsZMaxCurveRange": "{\"min\":150,\"max\":240}",
+      "fieldBoundsZMaxCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.6017711409438923,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.4829236705492195,\"y\":0}}]",
+      "fieldBoundsZMaxCurveRange": "{\"min\":150,\"max\":300}",
       "fieldBoundsX": "{\"min\":-300,\"max\":300}",
       "fieldBoundsY": "{\"min\":-300,\"max\":300}",
       "fieldBoundsZ": "{\"min\":-400,\"max\":200}",
@@ -34682,7 +34682,7 @@
                 "type": "group",
                 "group": {
                   "key": "Hand Position Max Z Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -34836,7 +34836,7 @@
               },
               {
                 "key": "Hand Position Max Z Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -36495,7 +36495,7 @@
               "type": "group",
               "group": {
                 "key": "Hand Position Max Z Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -36649,7 +36649,7 @@
             },
             {
               "key": "Hand Position Max Z Curve",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
