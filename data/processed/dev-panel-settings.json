@@ -53,7 +53,7 @@
       "armRotationRangePct": "{\"min\":0,\"max\":81}",
       "armRotationOffsetX": -1,
       "armRotationOffsetY": 1,
-      "armRotationDamping": 1,
+      "armRotationDamping": 0.3,
       "palmFacesCursor": true,
       "palmRotationVisibleOnly": true,
       "palmRotationUseDepth": false,
@@ -6770,8 +6770,8 @@
       "cropWristEnabled": true,
       "hideWrist": 0,
       "reactiveArmLengthEnabled": true,
-      "armLengthRange": "{\"min\":36,\"max\":95}",
-      "armLengthCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.24038462081061868,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2507394926249372,\"y\":0}}]",
+      "armLengthRange": "{\"min\":0,\"max\":100}",
+      "armLengthCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.22698917961348242,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.6369609580568396,\"y\":0}}]",
       "armLengthDamping": 0.06,
       "armLengthUseDepth": false,
       "armLengthVisibleOnly": true,
@@ -7315,10 +7315,10 @@
       "lockCameraPan": true,
       "lockCameraZoom": false,
       "cameraMaxExtentsEnabled": true,
-      "keyAzimuth": 27,
+      "keyAzimuth": 178,
       "keyElevation": 67,
       "keyTargetHeight": 65,
-      "keyIntensity": 6,
+      "keyIntensity": 4.9,
       "keyColor": "#ffffff",
       "ambientIntensity": 0,
       "ambientSkyColor": "#ffffff",
@@ -7333,13 +7333,24 @@
           "ty": 33.57715598945507,
           "tz": -1.7891143893104762,
           "fov": 32
+        },
+        {
+          "name": "Lighting 2",
+          "keyAzimuth": 27,
+          "keyElevation": 67,
+          "keyTargetHeight": 65,
+          "keyIntensity": 4.9,
+          "keyColor": "#ffffff",
+          "ambientIntensity": 0,
+          "ambientSkyColor": "#ffffff",
+          "ambientGroundColor": "#ffffff"
         }
       ],
-      "toonSteps": 3,
-      "toonStepThreshold": 0.5,
-      "toonShadowFloor": 18,
-      "toonLightCeiling": 85,
-      "toonGradient": "[{\"p\":0,\"c\":\"#0055ff\"},{\"p\":1,\"c\":\"#ff6600\"}]",
+      "toonSteps": 2,
+      "toonStepThreshold": 3.2,
+      "toonShadowFloor": 9,
+      "toonLightCeiling": 99,
+      "toonGradient": "[{\"p\":0,\"c\":\"#0040ff\"},{\"p\":1,\"c\":\"#ff5900\"}]",
       "toonBaseTint": "#ffffff",
       "textureInfluence": 0,
       "toonTint": "#ffffff",
@@ -7399,10 +7410,10 @@
       "passGlow": 0,
       "emissionColor": "#ffffff",
       "emissionIntensity": 1.5,
-      "bgColor": "#808080",
+      "bgColor": "#ff8000",
       "floorEnabled": true,
-      "floorColor": "#000000",
-      "floorZOffset": 0,
+      "floorColor": "#00308f",
+      "floorZOffset": -119.5,
       "floorXYScale": 1,
       "pixelRatio": 1.25,
       "resolutionScale": 100,
@@ -16628,8 +16639,8 @@
       "cropWristEnabled": true,
       "hideWrist": 0,
       "reactiveArmLengthEnabled": true,
-      "armLengthRange": "{\"min\":36,\"max\":95}",
-      "armLengthCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.24038462081061868,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2507394926249372,\"y\":0}}]",
+      "armLengthRange": "{\"min\":0,\"max\":100}",
+      "armLengthCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.22698917961348242,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.6369609580568396,\"y\":0}}]",
       "armLengthDamping": 0.06,
       "armLengthUseDepth": false,
       "armLengthVisibleOnly": true,
@@ -17191,13 +17202,24 @@
           "ty": 33.57715598945507,
           "tz": -1.7891143893104762,
           "fov": 32
+        },
+        {
+          "name": "Lighting 2",
+          "keyAzimuth": 27,
+          "keyElevation": 67,
+          "keyTargetHeight": 65,
+          "keyIntensity": 4.9,
+          "keyColor": "#ffffff",
+          "ambientIntensity": 0,
+          "ambientSkyColor": "#ffffff",
+          "ambientGroundColor": "#ffffff"
         }
       ],
       "toonSteps": 3,
       "toonStepThreshold": 5,
       "toonShadowFloor": 0,
       "toonLightCeiling": 100,
-      "toonGradient": "[{\"p\":0,\"c\":\"#0055ff\"},{\"p\":1,\"c\":\"#ff6600\"}]",
+      "toonGradient": "[{\"p\":0,\"c\":\"#0040ff\"},{\"p\":1,\"c\":\"#ff5900\"}]",
       "toonBaseTint": "#0091ff",
       "textureInfluence": 0,
       "toonTint": "#ffffff",
@@ -17257,10 +17279,10 @@
       "passGlow": 0,
       "emissionColor": "#ffffff",
       "emissionIntensity": 1.5,
-      "bgColor": "#808080",
+      "bgColor": "#ff8000",
       "floorEnabled": true,
-      "floorColor": "#000000",
-      "floorZOffset": 0,
+      "floorColor": "#00308f",
+      "floorZOffset": -119.5,
       "floorXYScale": 1,
       "pixelRatio": 1.25,
       "resolutionScale": 100,
@@ -19769,7 +19791,7 @@
       "armRotationRangePct": "{\"min\":0,\"max\":81}",
       "armRotationOffsetX": 0,
       "armRotationOffsetY": 0,
-      "armRotationDamping": 1,
+      "armRotationDamping": 0.3,
       "palmFacesCursor": true,
       "palmRotationVisibleOnly": true,
       "palmRotationUseDepth": true,
@@ -26486,8 +26508,8 @@
       "cropWristEnabled": true,
       "hideWrist": 0,
       "reactiveArmLengthEnabled": true,
-      "armLengthRange": "{\"min\":36,\"max\":95}",
-      "armLengthCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.24038462081061868,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2507394926249372,\"y\":0}}]",
+      "armLengthRange": "{\"min\":0,\"max\":100}",
+      "armLengthCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.22698917961348242,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.6369609580568396,\"y\":0}}]",
       "armLengthDamping": 0.06,
       "armLengthUseDepth": false,
       "armLengthVisibleOnly": true,
@@ -27031,10 +27053,10 @@
       "lockCameraPan": false,
       "lockCameraZoom": false,
       "cameraMaxExtentsEnabled": false,
-      "keyAzimuth": 27,
+      "keyAzimuth": 178,
       "keyElevation": 67,
       "keyTargetHeight": 65,
-      "keyIntensity": 6,
+      "keyIntensity": 4.9,
       "keyColor": "#ffffff",
       "ambientIntensity": 0,
       "ambientSkyColor": "#ffffff",
@@ -27049,13 +27071,24 @@
           "ty": 33.57715598945507,
           "tz": -1.7891143893104762,
           "fov": 32
+        },
+        {
+          "name": "Lighting 2",
+          "keyAzimuth": 27,
+          "keyElevation": 67,
+          "keyTargetHeight": 65,
+          "keyIntensity": 4.9,
+          "keyColor": "#ffffff",
+          "ambientIntensity": 0,
+          "ambientSkyColor": "#ffffff",
+          "ambientGroundColor": "#ffffff"
         }
       ],
-      "toonSteps": 3,
-      "toonStepThreshold": 0.5,
-      "toonShadowFloor": 18,
-      "toonLightCeiling": 85,
-      "toonGradient": "[{\"p\":0,\"c\":\"#0055ff\"},{\"p\":1,\"c\":\"#ff6600\"}]",
+      "toonSteps": 2,
+      "toonStepThreshold": 3.2,
+      "toonShadowFloor": 9,
+      "toonLightCeiling": 99,
+      "toonGradient": "[{\"p\":0,\"c\":\"#0040ff\"},{\"p\":1,\"c\":\"#ff5900\"}]",
       "toonBaseTint": "#ffffff",
       "textureInfluence": 0,
       "toonTint": "#ffffff",
@@ -27115,10 +27148,10 @@
       "passGlow": 0,
       "emissionColor": "#ffffff",
       "emissionIntensity": 1.5,
-      "bgColor": "#808080",
+      "bgColor": "#ff8000",
       "floorEnabled": true,
-      "floorColor": "#000000",
-      "floorZOffset": 0,
+      "floorColor": "#00308f",
+      "floorZOffset": -119.5,
       "floorXYScale": 1,
       "pixelRatio": 1.25,
       "resolutionScale": 100,
@@ -31731,7 +31764,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -32802,7 +32835,7 @@
           "type": "group",
           "group": {
             "key": "Cursor Tracking",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -33000,7 +33033,7 @@
                 "type": "group",
                 "group": {
                   "key": "New Group (4)",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -33248,7 +33281,7 @@
               },
               {
                 "key": "New Group (4)",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -34361,7 +34394,7 @@
         },
         {
           "key": "Cursor Tracking",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
@@ -34559,7 +34592,7 @@
               "type": "group",
               "group": {
                 "key": "New Group (4)",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -34807,7 +34840,7 @@
             },
             {
               "key": "New Group (4)",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -197731,7 +197764,7 @@
           "type": "group",
           "group": {
             "key": "Floor",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -198104,7 +198137,7 @@
         },
         {
           "key": "Floor",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
@@ -203093,7 +203126,7 @@
   "devHotkeys": {},
   "panelGeometry": {
     "desktop": {
-      "left": 1033.625,
+      "left": 1030.425048828125,
       "top": 30.787500381469727,
       "width": 505.57501220703125,
       "height": 620.7875366210938
