@@ -2995,6 +2995,7 @@ const DEV_GROUPS = [
       { key: 'snapshotCursor', label: 'Snapshot: Cursor Position', type: 'checkbox', def: true },
       { key: 'snapshotMouse', label: 'Snapshot: Mouse Tracking', type: 'checkbox', def: true },
       { key: 'snapshotHandBehaviour', label: 'Snapshot: Hand Behaviour', type: 'checkbox', def: true },
+      { key: 'snapshotHandBehaviourAll', label: 'Snapshot: Hand Behaviour - List Every Hand', type: 'checkbox', def: false },
       { key: 'snapshotFrameRate', label: 'Snapshot: Frame Rate', type: 'checkbox', def: true },
       { key: 'snapshotPoseJumps', label: 'Snapshot: Pose Jumps', type: 'checkbox', def: true },
       { key: 'snapshotRenderOrder', label: 'Snapshot: Render Order', type: 'checkbox', def: true },
@@ -3039,7 +3040,7 @@ const FIELD_LAYOUT_SUBGROUP_SPECS = [
   { title: 'Render Order', collapsed: false, keys: ['renderOrderMode', 'renderOrderModeExcept', 'renderOrderModeTerms', 'renderOrderFallback', 'renderOrderFallbackExcept', 'renderOrderFallbackTerms', 'renderOrderFallback2', 'renderOrderFallback2Except', 'renderOrderFallback2Terms', 'renderOrderExtraFallbacks', 'renderOrderFlipLock'] }
 ]
 const SNAPSHOT_SUBGROUP_SPECS = [
-  { title: 'Snapshot', collapsed: false, keys: ['snapshotCursor', 'snapshotMouse', 'snapshotHandBehaviour', 'snapshotFrameRate', 'snapshotPoseJumps', 'snapshotRenderOrder', 'snapshotTrackingPoints', 'snapshotTakeBtn'] }
+  { title: 'Snapshot', collapsed: false, keys: ['snapshotCursor', 'snapshotMouse', 'snapshotHandBehaviour', 'snapshotHandBehaviourAll', 'snapshotFrameRate', 'snapshotPoseJumps', 'snapshotRenderOrder', 'snapshotTrackingPoints', 'snapshotTakeBtn'] }
 ]
 const POSE_SUBGROUP_SPECS = [
   { title: 'Whole-Hand Rotation & Thumb', collapsed: true, keys: ['modelRotX', 'modelRotY', 'modelRotZ', 'thumbCurl', 'thumbSplay', 'thumbSplay2', 'tipTwistThumb', 'curlBiasThumb', 'baseOnlyCurlThumb', 'midOnlyCurlThumb', 'tipOnlyCurlThumb'] },
@@ -4629,8 +4630,10 @@ function buildSnapshotText() {
   }
   if (cfg.snapshotHandBehaviour) {
     any = true
-    const counts = {}, active = []
+    const counts = {}, active = [], perHand = []
+    const everyHand = !!cfg.snapshotHandBehaviourAll
     hands.forEach((hd, i) => {
+      const own = []
       ;[hd._cp, hd._chp].forEach((store) => {
         if (!store) return
         Object.keys(store).forEach((k) => {
@@ -4638,14 +4641,17 @@ function buildSnapshotText() {
           if (!ph || ph === 'idle') return
           const name = handLogTriggerLabel(k)
           counts[name + ' : ' + ph] = (counts[name + ' : ' + ph] || 0) + 1
-          if (active.length < 24) active.push('Hand ' + (i + 1) + ' ' + name + ' ' + ph)
+          own.push(name + ' ' + ph)
+          if (!everyHand && active.length < 24) active.push('Hand ' + (i + 1) + ' ' + name + ' ' + ph)
         })
       })
+      if (everyHand) perHand.push('Hand ' + (i + 1) + ': ' + (own.length ? own.join(', ') : 'idle')) // numeric order, one line per hand
     })
     L.push('', '--- Hand Behaviour ---')
     const keys = Object.keys(counts)
     L.push(keys.length ? 'hands not idle, by function and phase:\n' + keys.map((k) => '  ' + k + ' x' + counts[k]).join('\n') : 'every hand is idle')
-    if (active.length) L.push('first ' + active.length + ' active:', active.join('\n'))
+    if (everyHand) L.push('every hand (' + hands.length + '), in numeric order:', perHand.join('\n'))
+    else if (active.length) L.push('first ' + active.length + ' active:', active.join('\n'))
     L.push('last Hand Behaviour Log lines:', last(handBehaviourLogEntries, 20))
   }
   if (cfg.snapshotFrameRate) {
