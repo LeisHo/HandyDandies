@@ -32518,7 +32518,7 @@
           "type": "group",
           "group": {
             "key": "Field Layout",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -32580,74 +32580,6 @@
               {
                 "type": "row",
                 "key": "fieldOffsetZ"
-              },
-              {
-                "type": "group",
-                "group": {
-                  "key": "Render Order",
-                  "collapsed": true,
-                  "locked": false,
-                  "items": [
-                    {
-                      "type": "row",
-                      "key": "renderOrderMode"
-                    },
-                    {
-                      "type": "row",
-                      "key": "renderOrderModeExcept"
-                    },
-                    {
-                      "type": "row",
-                      "key": "renderOrderModeTerms"
-                    },
-                    {
-                      "type": "row",
-                      "key": "renderOrderFallback"
-                    },
-                    {
-                      "type": "row",
-                      "key": "renderOrderFallbackExcept"
-                    },
-                    {
-                      "type": "row",
-                      "key": "renderOrderFallbackTerms"
-                    },
-                    {
-                      "type": "row",
-                      "key": "renderOrderFallback2"
-                    },
-                    {
-                      "type": "row",
-                      "key": "renderOrderFallback2Except"
-                    },
-                    {
-                      "type": "row",
-                      "key": "renderOrderFallback2Terms"
-                    },
-                    {
-                      "type": "row",
-                      "key": "renderOrderExtraFallbacks"
-                    },
-                    {
-                      "type": "row",
-                      "key": "renderOrderFlipLock"
-                    }
-                  ],
-                  "settings": [
-                    "renderOrderMode",
-                    "renderOrderModeExcept",
-                    "renderOrderModeTerms",
-                    "renderOrderFallback",
-                    "renderOrderFallbackExcept",
-                    "renderOrderFallbackTerms",
-                    "renderOrderFallback2",
-                    "renderOrderFallback2Except",
-                    "renderOrderFallback2Terms",
-                    "renderOrderExtraFallbacks",
-                    "renderOrderFlipLock"
-                  ],
-                  "subgroups": []
-                }
               }
             ],
             "settings": [
@@ -32667,73 +32599,75 @@
               "fieldOffsetY",
               "fieldOffsetZ"
             ],
-            "subgroups": [
+            "subgroups": []
+          }
+        },
+        {
+          "type": "group",
+          "group": {
+            "key": "Render Order",
+            "collapsed": true,
+            "locked": false,
+            "items": [
               {
-                "key": "Render Order",
-                "collapsed": true,
-                "locked": false,
-                "items": [
-                  {
-                    "type": "row",
-                    "key": "renderOrderMode"
-                  },
-                  {
-                    "type": "row",
-                    "key": "renderOrderModeExcept"
-                  },
-                  {
-                    "type": "row",
-                    "key": "renderOrderModeTerms"
-                  },
-                  {
-                    "type": "row",
-                    "key": "renderOrderFallback"
-                  },
-                  {
-                    "type": "row",
-                    "key": "renderOrderFallbackExcept"
-                  },
-                  {
-                    "type": "row",
-                    "key": "renderOrderFallbackTerms"
-                  },
-                  {
-                    "type": "row",
-                    "key": "renderOrderFallback2"
-                  },
-                  {
-                    "type": "row",
-                    "key": "renderOrderFallback2Except"
-                  },
-                  {
-                    "type": "row",
-                    "key": "renderOrderFallback2Terms"
-                  },
-                  {
-                    "type": "row",
-                    "key": "renderOrderExtraFallbacks"
-                  },
-                  {
-                    "type": "row",
-                    "key": "renderOrderFlipLock"
-                  }
-                ],
-                "settings": [
-                  "renderOrderMode",
-                  "renderOrderModeExcept",
-                  "renderOrderModeTerms",
-                  "renderOrderFallback",
-                  "renderOrderFallbackExcept",
-                  "renderOrderFallbackTerms",
-                  "renderOrderFallback2",
-                  "renderOrderFallback2Except",
-                  "renderOrderFallback2Terms",
-                  "renderOrderExtraFallbacks",
-                  "renderOrderFlipLock"
-                ],
-                "subgroups": []
+                "type": "row",
+                "key": "renderOrderMode"
+              },
+              {
+                "type": "row",
+                "key": "renderOrderModeExcept"
+              },
+              {
+                "type": "row",
+                "key": "renderOrderModeTerms"
+              },
+              {
+                "type": "row",
+                "key": "renderOrderFallback"
+              },
+              {
+                "type": "row",
+                "key": "renderOrderFallbackExcept"
+              },
+              {
+                "type": "row",
+                "key": "renderOrderFallbackTerms"
+              },
+              {
+                "type": "row",
+                "key": "renderOrderFallback2"
+              },
+              {
+                "type": "row",
+                "key": "renderOrderFallback2Except"
+              },
+              {
+                "type": "row",
+                "key": "renderOrderFallback2Terms"
+              },
+              {
+                "type": "row",
+                "key": "renderOrderExtraFallbacks"
+              },
+              {
+                "type": "row",
+                "key": "renderOrderFlipLock"
               }
-            ]
+            ],
+            "settings": [
+              "renderOrderMode",
+              "renderOrderModeExcept",
+              "renderOrderModeTerms",
+              "renderOrderFallback",
+              "renderOrderFallbackExcept",
+              "renderOrderFallbackTerms",
+              "renderOrderFallback2",
+              "renderOrderFallback2Except",
+              "renderOrderFallback2Terms",
+              "renderOrderExtraFallbacks",
+              "renderOrderFlipLock"
+            ],
+            "subgroups": []
           }
         },
         {
@@ -33582,7 +33516,7 @@
           "type": "group",
           "group": {
             "key": "Cursor Tracking",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -34089,7 +34023,7 @@
       "subgroups": [
         {
           "key": "Field Layout",
-          "collapsed": true,
+          "collapsed": false,
           "locked": true,
           "items": [
             {
@@ -34151,74 +34085,6 @@
             {
               "type": "row",
               "key": "fieldOffsetZ"
-            },
-            {
-              "type": "group",
-              "group": {
-                "key": "Render Order",
-                "collapsed": true,
-                "locked": false,
-                "items": [
-                  {
-                    "type": "row",
-                    "key": "renderOrderMode"
-                  },
-                  {
-                    "type": "row",
-                    "key": "renderOrderModeExcept"
-                  },
-                  {
-                    "type": "row",
-                    "key": "renderOrderModeTerms"
-                  },
-                  {
-                    "type": "row",
-                    "key": "renderOrderFallback"
-                  },
-                  {
-                    "type": "row",
-                    "key": "renderOrderFallbackExcept"
-                  },
-                  {
-                    "type": "row",
-                    "key": "renderOrderFallbackTerms"
-                  },
-                  {
-                    "type": "row",
-                    "key": "renderOrderFallback2"
-                  },
-                  {
-                    "type": "row",
-                    "key": "renderOrderFallback2Except"
-                  },
-                  {
-                    "type": "row",
-                    "key": "renderOrderFallback2Terms"
-                  },
-                  {
-                    "type": "row",
-                    "key": "renderOrderExtraFallbacks"
-                  },
-                  {
-                    "type": "row",
-                    "key": "renderOrderFlipLock"
-                  }
-                ],
-                "settings": [
-                  "renderOrderMode",
-                  "renderOrderModeExcept",
-                  "renderOrderModeTerms",
-                  "renderOrderFallback",
-                  "renderOrderFallbackExcept",
-                  "renderOrderFallbackTerms",
-                  "renderOrderFallback2",
-                  "renderOrderFallback2Except",
-                  "renderOrderFallback2Terms",
-                  "renderOrderExtraFallbacks",
-                  "renderOrderFlipLock"
-                ],
-                "subgroups": []
-              }
             }
           ],
           "settings": [
@@ -34238,73 +34104,72 @@
             "fieldOffsetY",
             "fieldOffsetZ"
           ],
-          "subgroups": [
+          "subgroups": []
+        },
+        {
+          "key": "Render Order",
+          "collapsed": true,
+          "locked": false,
+          "items": [
             {
-              "key": "Render Order",
-              "collapsed": true,
-              "locked": false,
-              "items": [
-                {
-                  "type": "row",
-                  "key": "renderOrderMode"
-                },
-                {
-                  "type": "row",
-                  "key": "renderOrderModeExcept"
-                },
-                {
-                  "type": "row",
-                  "key": "renderOrderModeTerms"
-                },
-                {
-                  "type": "row",
-                  "key": "renderOrderFallback"
-                },
-                {
-                  "type": "row",
-                  "key": "renderOrderFallbackExcept"
-                },
-                {
-                  "type": "row",
-                  "key": "renderOrderFallbackTerms"
-                },
-                {
-                  "type": "row",
-                  "key": "renderOrderFallback2"
-                },
-                {
-                  "type": "row",
-                  "key": "renderOrderFallback2Except"
-                },
-                {
-                  "type": "row",
-                  "key": "renderOrderFallback2Terms"
-                },
-                {
-                  "type": "row",
-                  "key": "renderOrderExtraFallbacks"
-                },
-                {
-                  "type": "row",
-                  "key": "renderOrderFlipLock"
-                }
-              ],
-              "settings": [
-                "renderOrderMode",
-                "renderOrderModeExcept",
-                "renderOrderModeTerms",
-                "renderOrderFallback",
-                "renderOrderFallbackExcept",
-                "renderOrderFallbackTerms",
-                "renderOrderFallback2",
-                "renderOrderFallback2Except",
-                "renderOrderFallback2Terms",
-                "renderOrderExtraFallbacks",
-                "renderOrderFlipLock"
-              ],
-              "subgroups": []
+              "type": "row",
+              "key": "renderOrderMode"
+            },
+            {
+              "type": "row",
+              "key": "renderOrderModeExcept"
+            },
+            {
+              "type": "row",
+              "key": "renderOrderModeTerms"
+            },
+            {
+              "type": "row",
+              "key": "renderOrderFallback"
+            },
+            {
+              "type": "row",
+              "key": "renderOrderFallbackExcept"
+            },
+            {
+              "type": "row",
+              "key": "renderOrderFallbackTerms"
+            },
+            {
+              "type": "row",
+              "key": "renderOrderFallback2"
+            },
+            {
+              "type": "row",
+              "key": "renderOrderFallback2Except"
+            },
+            {
+              "type": "row",
+              "key": "renderOrderFallback2Terms"
+            },
+            {
+              "type": "row",
+              "key": "renderOrderExtraFallbacks"
+            },
+            {
+              "type": "row",
+              "key": "renderOrderFlipLock"
             }
-          ]
+          ],
+          "settings": [
+            "renderOrderMode",
+            "renderOrderModeExcept",
+            "renderOrderModeTerms",
+            "renderOrderFallback",
+            "renderOrderFallbackExcept",
+            "renderOrderFallbackTerms",
+            "renderOrderFallback2",
+            "renderOrderFallback2Except",
+            "renderOrderFallback2Terms",
+            "renderOrderExtraFallbacks",
+            "renderOrderFlipLock"
+          ],
+          "subgroups": []
         },
         {
           "key": "Outline",
@@ -35141,7 +35006,7 @@
         },
         {
           "key": "Cursor Tracking",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
