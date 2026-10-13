@@ -8,7 +8,7 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js'
 import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js'
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js'
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js'
-import { initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab, beginDynamicBatch, endDynamicBatch } from './devpanel/devPanel.js?v=65'
+import { DEV_MODE, initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab, beginDynamicBatch, endDynamicBatch } from './devpanel/devPanel.js?v=65'
 
 // Toon Shading colour gradient (2026-10-12): MeshToonMaterial's getGradientIrradiance() only reads the RED channel of
 // its gradientMap (a grey ramp). Reading RGB instead is identical for every grey ramp (all channels equal) and lets
@@ -1712,6 +1712,11 @@ function armBasePivotInto(hand, out) {
 // -----------------------------------------------------------------------
 // Dev panel groups (CLAUDE.md Section 12)
 // -----------------------------------------------------------------------
+// Colour Presets (2026-10-13): the built-in presets of the on-page Color Preset selector (button right of Pause / Reset). Each: g = toon gradient JSON, bg = background / floor colour, s / t / f / c = toon steps / step threshold /
+// shadow floor / light ceiling, w = optional button swatch override (BW / WB: their real gradient is all white, which would draw a blank white square). Gradients and toon values come from the user's Saved Toon Shading items of the same names.
+// The live list is the JSON control 'colorPresets' (saved with the dev-panel settings); this is only its default.
+const COLOR_PRESET_SEED = [{"id":"seed1","g":"[{\"p\":0,\"c\":\"#0040ff\"},{\"p\":1,\"c\":\"#ff5900\"}]","bg":"#00308f","s":2,"t":3.2,"f":9,"c":99},{"id":"seed2","g":"[{\"p\":0,\"c\":\"#ffffff\"},{\"p\":1,\"c\":\"#ffffff\"}]","bg":"#000000","s":2,"t":2.5,"f":0,"c":99,"w":["#000000","#ffffff"]},{"id":"seed3","g":"[{\"p\":0,\"c\":\"#ffffff\"},{\"p\":1,\"c\":\"#ffffff\"}]","bg":"#ffffff","s":2,"t":2.5,"f":0,"c":99,"w":["#ffffff","#000000"]},{"id":"seed4","g":"[{\"p\":0,\"c\":\"#ff0000\"},{\"p\":1,\"c\":\"#00b32d\"}]","bg":"#a80000","s":2,"t":2.3,"f":40,"c":82},{"id":"seed5","g":"[{\"p\":0,\"c\":\"#7a005a\"},{\"p\":1,\"c\":\"#ff6600\"}]","bg":"#80003e","s":2,"t":2.3,"f":39,"c":90},{"id":"seed6","g":"[{\"p\":0,\"c\":\"#ff6600\"},{\"p\":1,\"c\":\"#7a005a\"}]","bg":"#e65c00","s":2,"t":4.5,"f":90,"c":80},{"id":"seed7","g":"[{\"p\":0,\"c\":\"#ff6600\"},{\"p\":1,\"c\":\"#7a005a\"}]","bg":"#003c8a","s":2,"t":4.5,"f":90,"c":80},{"id":"seed8","g":"[{\"p\":0,\"c\":\"#ffffff\"},{\"p\":1,\"c\":\"#ff0000\"}]","bg":"#e20000","s":2,"t":2.95,"f":40,"c":40},{"id":"seed9","g":"[{\"p\":0,\"c\":\"#ff0000\"},{\"p\":1,\"c\":\"#ffffff\"}]","bg":"#e20000","s":2,"t":2.95,"f":40,"c":40},{"id":"seed10","g":"[{\"p\":0,\"c\":\"#ff0000\"},{\"p\":1,\"c\":\"#ffffff\"}]","bg":"#11008f","s":2,"t":2.95,"f":40,"c":40},{"id":"seed11","g":"[{\"p\":0,\"c\":\"#000cad\"},{\"p\":1,\"c\":\"#ffffff\"}]","bg":"#db0000","s":2,"t":2.95,"f":40,"c":40},{"id":"seed12","g":"[{\"p\":0,\"c\":\"#ffffff\"},{\"p\":1,\"c\":\"#c20000\"}]","bg":"#00076b","s":2,"t":2.95,"f":40,"c":40},{"id":"seed13","g":"[{\"p\":0,\"c\":\"#0300cc\"},{\"p\":0.6731,\"c\":\"#ff0000\"},{\"p\":1,\"c\":\"#ffffff\"}]","bg":"#ffffff","s":3,"t":5,"f":63,"c":100},{"id":"seed14","g":"[{\"p\":0,\"c\":\"#ffffff\"},{\"p\":0.5192,\"c\":\"#ff0000\"},{\"p\":1,\"c\":\"#0300cc\"}]","bg":"#000657","s":3,"t":5,"f":63,"c":100},{"id":"seed15","g":"[{\"p\":0,\"c\":\"#ff0000\"},{\"p\":1,\"c\":\"#ffffff\"}]","bg":"#e40c0c","s":5,"t":1.45,"f":90,"c":83},{"id":"seed16","g":"[{\"p\":0,\"c\":\"#054d00\"},{\"p\":1,\"c\":\"#42e0ff\"}]","bg":"#002f4d","s":4,"t":5,"f":7,"c":82},{"id":"seed17","g":"[{\"p\":0.6529,\"c\":\"#000000\"},{\"p\":1,\"c\":\"#ffffff\"}]","bg":"#292e3d","s":3,"t":3.8,"f":0,"c":100}]
+const COLOR_PRESET_NEW_DEFAULTS = { s: 2, t: 2.5, f: 50, c: 80 } // a preset added with "+" (direct request)
 const DEV_GROUPS = [
   // Global Pause button (direct request: "add a small pause button icon.
   // Users can click it at any time to pause the entire animation and
@@ -2846,15 +2851,18 @@ const DEV_GROUPS = [
   {
     title: 'Background',
     controls: [
-      { key: 'bgColor', label: 'Background Color', type: 'color', def: '#ffffff', onChange: (v) => { scene.background = new THREE.Color(v); syncLoadingPreviewBackground() } }
+      // While the Floor is on, the Background Color simply follows the Floor Color (its row is hidden then, see updateFloorRowVisibility()); only with the Floor off does it have its own input.
+      { key: 'bgColor', label: 'Background Color', type: 'color', def: '#ffffff', onChange: (v) => { scene.background = new THREE.Color(v); syncLoadingPreviewBackground() } },
+      // Colour presets of the on-page selector (JSON text; the row is hidden, the selector button edits it).
+      { key: 'colorPresets', label: 'Color Presets (JSON)', type: 'text', def: JSON.stringify(COLOR_PRESET_SEED) }
     ]
   },
   // Floor (2026-10-11, direct request): ONE plane at world Z 0 (+ Z Offset) that spans the whole screen, drawn behind the hands. The group has its own on/off checkbox in its header. Default color = the Background Color default.
   {
     title: 'Floor',
     controls: [
-      { key: 'floorEnabled', label: 'Floor On/Off', type: 'checkbox', def: false, onChange: () => { updateFloorRowVisibility(); updateFloor() } },
-      { key: 'floorColor', label: 'Floor Color', type: 'color', def: '#ffffff', onChange: () => updateFloor() },
+      { key: 'floorEnabled', label: 'Floor On/Off', type: 'checkbox', def: false, onChange: () => { syncBackgroundToFloor(); updateFloorRowVisibility(); updateFloor() } },
+      { key: 'floorColor', label: 'Floor Color', type: 'color', def: '#ffffff', onChange: () => { syncBackgroundToFloor(); updateFloor() } },
       { key: 'floorZOffset', label: 'Floor Z Offset (World Units)', type: 'slider', min: -200, max: 200, step: 0.5, def: 0, onChange: () => updateFloor() },
       { key: 'floorXYScale', label: 'Floor XY Scale (x)', type: 'slider', min: 0.1, max: 10, step: 0.05, def: 1, onChange: () => updateFloor() }
     ]
@@ -3174,7 +3182,9 @@ const cfg = initDevPanel(DEV_GROUPS, {
       // Default Floor Color = the Background Color (direct request): while Floor Color still holds its code default (white) and the restored Background Color is something else, start from the Background Color. Once a
       // different color is saved it is left alone (a deliberately white floor on a non-white background needs a slightly different white, e.g. #fefefe).
       if ((cfg.floorColor || '#ffffff').toLowerCase() === '#ffffff' && cfg.bgColor && cfg.bgColor.toLowerCase() !== '#ffffff') syncValue('floorColor', cfg.bgColor)
+      syncBackgroundToFloor()
       gateGroupHeader('Floor', 'floorEnabled'); nestFloorIntoThreeJs(); updateFloorRowVisibility(); updateFloor()
+      renderColorPresetPanel()
       gateGroupHeader('Hand Offset On Startup', 'handOffsetOnStartupEnabled'); nestGroupInto('Hand Offset On Startup', 'Starting State'); updateHandOffsetGroupVisibility(); applyStartupHandOffset()
       gateGroupHeader('Field Grid Sphere Sequence', 'sphereSeqEnabled'); nestGroupInto('Field Grid Sphere Sequence', 'Starting State'); updateGroupContentsVisibility('Field Grid Sphere Sequence', !!cfg.sphereSeqEnabled)
       if (cfg.sphereSeqEnabled && sphereStage === 2 && !startupConsumeActive) { sphereStage = 0; updateHandsVisibility() } // a saved-on sequence starts waiting for its first click
@@ -3711,7 +3721,7 @@ function fireStartupHandOffset() {
 }
 window.addEventListener('pointerdown', (e) => {
   if (e.button !== 0) return
-  if (e.target && e.target.closest && e.target.closest('.dp-panel, #pauseButton, #resetButton')) return
+  if (e.target && e.target.closest && e.target.closest('.dp-panel, #pauseButton, #resetButton, #presetButton, #presetPanel')) return
   if (!hands.length || !fieldRevealed) return
   if (sphereSeqActive()) { startupConsumeActive = true; advanceSphereSequence(); return } // Field Grid Sphere Sequence comes first
   if (!cfg.handOffsetOnStartupEnabled || startupHandOffsetStage !== 0) return
@@ -3796,6 +3806,19 @@ function setupSphereSequenceGroup() {
 function updateFloorRowVisibility() {
   const on = !!cfg.floorEnabled
   ;['floorColor', 'floorZOffset', 'floorXYScale'].forEach((k) => { const row = document.querySelector('.dp-row[data-key="' + k + '"]'); if (row) row.style.display = on ? '' : 'none' })
+  // Background Color follows the Floor Color while the Floor is on, so it only has its own input when the Floor is off.
+  const bgRow = document.querySelector('.dp-row[data-key="bgColor"]'); if (bgRow) bgRow.style.display = on ? 'none' : ''
+  const cpRow = document.querySelector('.dp-row[data-key="colorPresets"]'); if (cpRow) cpRow.style.display = 'none'
+}
+// Background Color = Floor Color while the Floor is on (direct request 2026-10-13). Writes the background through syncValue() (cfg + row, no onChange) and applies it to the scene and the loading-screen blocker.
+function syncBackgroundToFloor() {
+  try {
+    if (!cfg.floorEnabled) return
+    const c = cfg.floorColor || '#ffffff'
+    if ((cfg.bgColor || '').toLowerCase() !== c.toLowerCase()) { cfg.bgColor = c; syncValue('bgColor', c) }
+    scene.background = new THREE.Color(c)
+    syncLoadingPreviewBackground()
+  } catch (err) { /* scene not built yet */ }
 }
 // Puts a group's own on/off row into the group HEADER (same placement wrapGatedSubgroup() gives a nested gated subgroup). Idempotent: a saved order applied later can move the row back into the body, so it is also
 // re-run after the settings restore.
@@ -12216,7 +12239,7 @@ function endClickHoldPose(p) {
 // triggers, so a hand can never get stuck mid-transition forever with no
 // way to reach it.
 window.addEventListener('pointerdown', (e) => {
-  if (e.target && e.target.closest && e.target.closest('.dp-panel, #pauseButton, #resetButton')) return
+  if (e.target && e.target.closest && e.target.closest('.dp-panel, #pauseButton, #resetButton, #presetButton, #presetPanel')) return
   // CORRECTED 2026-09-30 -- see isClickHoldChainContinuation()'s own
   // comment (declared further below, but a plain function declaration is
   // hoisted, and this callback only ever runs on a real later pointerdown
@@ -13006,7 +13029,7 @@ let leftPointerDown = false
 window.addEventListener('pointerdown', (e) => { if (e.button === 0) leftPointerDown = true })
 window.addEventListener('pointerup', (e) => { if (e.button === 0) leftPointerDown = false })
 window.addEventListener('pointerup', (e) => {
-  if (e.target && e.target.closest && e.target.closest('.dp-panel, #pauseButton, #resetButton')) return
+  if (e.target && e.target.closest && e.target.closest('.dp-panel, #pauseButton, #resetButton, #presetButton, #presetPanel')) return
   if (e.button !== 0) return
   // This exact pointerup was releasing a Click-Hold-Pose hold, not a
   // standalone click -- see lastPointerupWasHoldRelease's own comment
@@ -13108,7 +13131,7 @@ window.addEventListener('pointerup', (e) => {
 let rightClickPoseClickCount = 0
 let rightClickPoseClickTimer = null
 window.addEventListener('pointerup', (e) => {
-  if (e.target && e.target.closest && e.target.closest('.dp-panel, #pauseButton, #resetButton')) return
+  if (e.target && e.target.closest && e.target.closest('.dp-panel, #pauseButton, #resetButton, #presetButton, #presetPanel')) return
   if (e.button !== 2) return
   if (lastPointerupWasRchpHoldRelease) return
   triggerClickPose('rc')
@@ -13215,7 +13238,7 @@ function isClickHoldChainContinuation(now) {
   return now - clickHoldChainLastCleanUpTime <= cfg.multiClickWindowMs
 }
 window.addEventListener('pointerdown', (e) => {
-  if (e.target && e.target.closest && e.target.closest('.dp-panel, #pauseButton, #resetButton')) return
+  if (e.target && e.target.closest && e.target.closest('.dp-panel, #pauseButton, #resetButton, #presetButton, #presetPanel')) return
   if (e.button !== 0) return
   const now = performance.now()
   if (isClickHoldChainContinuation(now)) {
@@ -15430,7 +15453,7 @@ function endCustomHoldFunctions(type, ordinal = 1) {
 // (a deliberate "repeat rate," not a one-shot-per-page-load limit).
 let scrollTriggerTimer = null
 window.addEventListener('wheel', (e) => {
-  if (e.target && e.target.closest && e.target.closest('.dp-panel, #pauseButton, #resetButton')) return
+  if (e.target && e.target.closest && e.target.closest('.dp-panel, #pauseButton, #resetButton, #presetButton, #presetPanel')) return
   if (scrollTriggerTimer) return
   triggerCustomPoseFunctions('Scroll')
   scrollTriggerTimer = setTimeout(() => { scrollTriggerTimer = null }, cfg.multiClickWindowMs)
@@ -17024,7 +17047,7 @@ function setPaused(v) {
 // `?dev=1` one -- this is why its own click handler is wired here,
 // unconditionally, rather than via a DEV_GROUPS onClick. Excluded from
 // every click-hold-pose/click-pose/click-count-chain gesture listener
-// via `.closest('.dp-panel, #pauseButton, #resetButton')` (see those listeners' own
+// via `.closest('.dp-panel, #pauseButton, #resetButton, #presetButton, #presetPanel')` (see those listeners' own
 // guard, main.js) -- clicking it only ever calls setPaused(), never a
 // cursor-tracking-driven pose/tween trigger.
 function updatePauseButtonIcon() {
@@ -17073,6 +17096,7 @@ function applyPauseButtonStyle() {
     rb.style.color = btn.style.color
     rb.style.opacity = btn.style.opacity
   }
+  applyColorPresetButtonStyle()
 }
 // Reset (direct request 2026-10-04: "a reset button next to the pause
 // button that resets all hands back to default position and pose").
@@ -17132,6 +17156,191 @@ function setupPauseButton() {
   updatePauseButtonIcon()
 }
 setupPauseButton()
+// =====================================================================================================================
+// Color Preset selector (2026-10-13, direct request): a button right of Pause / Reset that opens a panel of square preset buttons. Each button is filled with the preset's toon gradient and bordered with its background /
+// floor colour (no text). "+" adds a preset (toon steps 2, threshold 2.5, shadow floor 50, light ceiling 80); clicking a preset applies it and opens the editor (gradient bar + background / floor colour + delete) so it can be
+// changed. Built from JS (no index.html / style.css edit); looks come from the Pause Button group's settings. The list is the 'colorPresets' control, so it is saved with the other dev-panel settings; editing is dev-mode only.
+// =====================================================================================================================
+let colorPresetEditingId = null
+function getColorPresets() {
+  try { const a = JSON.parse(cfg.colorPresets); if (Array.isArray(a)) return a } catch (e) { /* default below */ }
+  return COLOR_PRESET_SEED.map((p) => ({ ...p }))
+}
+function setColorPresets(arr) {
+  const json = JSON.stringify(arr)
+  cfg.colorPresets = json
+  try { syncValue('colorPresets', json) } catch (e) { /* panel not built */ }
+}
+function colorPresetSwatch(p) {
+  if (p.w && p.w.length) return 'linear-gradient(135deg, ' + p.w.join(', ') + ')'
+  const stops = parseToonGradient(p.g || '')
+  return 'linear-gradient(135deg, ' + stops.map((x) => x.c + ' ' + (x.p * 100).toFixed(1) + '%').join(', ') + ')'
+}
+// Puts the preset's toon values, gradient and background / floor colour on screen (same path as the dev-panel rows: cfg + row via syncValue, then the effects).
+function applyColorPreset(p) {
+  const toon = { toonSteps: p.s, toonStepThreshold: p.t, toonShadowFloor: p.f, toonLightCeiling: p.c, toonGradient: p.g }
+  Object.keys(toon).forEach((k) => { if (toon[k] === undefined || toon[k] === null) return; cfg[k] = toon[k]; syncValue(k, toon[k]) })
+  rebuildGradientMap()
+  applyColorPresetBackground(p.bg)
+}
+function applyColorPresetBackground(hex) {
+  cfg.floorColor = hex; cfg.bgColor = hex
+  syncValue('floorColor', hex); syncValue('bgColor', hex)
+  scene.background = new THREE.Color(hex)
+  syncLoadingPreviewBackground()
+  updateFloor()
+  sceneNeedsRedraw = true
+}
+function colorPresetBtnStyle() { // shared look of the three kinds of button, from the Pause Button group's settings
+  return { bg: cfg.pauseBtnBgColor || '#000000', border: cfg.pauseBtnBorderColor || '#ffffff', bw: (cfg.pauseBtnBorderThickness ?? 1) + 'px', radius: (cfg.pauseBtnCornerRadius ?? 6) + 'px', fg: cfg.pauseBtnIconColor || '#ffffff', size: cfg.pauseBtnSize ?? 40 }
+}
+function applyColorPresetButtonStyle() {
+  const btn = document.getElementById('presetButton')
+  if (!btn) return
+  const st = colorPresetBtnStyle(), x = (cfg.pauseBtnXOffset ?? 12) + (st.size + 8) * 2
+  btn.style.left = x + 'px'; btn.style.top = (cfg.pauseBtnYOffset ?? 12) + 'px'
+  btn.style.width = st.size + 'px'; btn.style.height = st.size + 'px'
+  btn.style.fontSize = (cfg.pauseBtnIconSize ?? 18) + 'px'
+  btn.style.borderRadius = st.radius; btn.style.borderWidth = st.bw; btn.style.borderStyle = 'solid'; btn.style.borderColor = st.border
+  btn.style.background = st.bg; btn.style.color = st.fg; btn.style.opacity = (cfg.pauseBtnOpacity ?? 100) / 100
+  const panel = document.getElementById('presetPanel')
+  if (panel) {
+    panel.style.left = ((cfg.pauseBtnXOffset ?? 12)) + 'px'; panel.style.top = ((cfg.pauseBtnYOffset ?? 12) + st.size + 8) + 'px'
+    panel.style.background = st.bg; panel.style.color = st.fg; panel.style.borderRadius = st.radius
+    panel.style.border = st.bw + ' solid ' + st.border
+  }
+}
+// A small stand-alone gradient editor (same gestures as the Toon Shade Color Gradient row: click the bar = add a stop, click a handle = colour, double-click a handle = delete, drag = move).
+function buildColorPresetGradientEditor(getStops, onChange) {
+  const wrap = document.createElement('div')
+  wrap.style.cssText = 'width:100%;padding:2px 0 4px'
+  const bar = document.createElement('div')
+  bar.style.cssText = 'position:relative;height:24px;border-radius:4px;border:1px solid rgba(255,255,255,0.3);cursor:copy;touch-action:none'
+  const track = document.createElement('div')
+  track.style.cssText = 'position:relative;height:20px;margin-top:3px'
+  const picker = document.createElement('input')
+  picker.type = 'color'
+  picker.style.cssText = 'position:absolute;opacity:0;pointer-events:none;width:1px;height:1px'
+  wrap.appendChild(bar); wrap.appendChild(track); wrap.appendChild(picker)
+  let stops = [], editing = null, openTimer = 0, lastTap = { st: null, t: 0 }
+  const commit = () => onChange(JSON.stringify(stops.map((x) => ({ p: +x.p.toFixed(4), c: x.c }))))
+  const paintBar = () => { bar.style.background = 'linear-gradient(to right, ' + stops.slice().sort((a, b) => a.p - b.p).map((x) => x.c + ' ' + (x.p * 100).toFixed(1) + '%').join(', ') + ')' }
+  const frac = (cx) => { const r = bar.getBoundingClientRect(); return THREE.MathUtils.clamp((cx - r.left) / Math.max(r.width, 1), 0, 1) }
+  const redraw = () => {
+    stops.sort((a, b) => a.p - b.p)
+    paintBar()
+    track.textContent = ''
+    stops.forEach((st) => {
+      const h = document.createElement('div')
+      h.style.cssText = 'position:absolute;top:0;left:' + (st.p * 100) + '%;width:14px;height:20px;margin-left:-7px;background:' + st.c + ';border:2px solid #fff;border-radius:3px;box-sizing:border-box;cursor:pointer;touch-action:none;box-shadow:0 0 0 1px rgba(0,0,0,0.6)'
+      h.addEventListener('pointerdown', (e) => {
+        e.preventDefault(); e.stopPropagation()
+        try { h.setPointerCapture(e.pointerId) } catch (err) { /* synthetic pointer */ }
+        const x0 = e.clientX; let moved = false
+        const mv = (ev) => { if (Math.abs(ev.clientX - x0) > 3) moved = true; if (moved) { st.p = frac(ev.clientX); h.style.left = (st.p * 100) + '%'; paintBar() } }
+        const up = () => {
+          h.removeEventListener('pointermove', mv); h.removeEventListener('pointerup', up); h.removeEventListener('pointercancel', up)
+          if (moved) { redraw(); commit(); return }
+          const now = performance.now()
+          if (lastTap.st === st && now - lastTap.t < 350) {
+            clearTimeout(openTimer); lastTap = { st: null, t: 0 }
+            if (stops.length > 2) { stops.splice(stops.indexOf(st), 1); redraw(); commit() }
+            return
+          }
+          lastTap = { st, t: now }
+          clearTimeout(openTimer)
+          openTimer = setTimeout(() => { editing = st; picker.value = st.c; picker.click() }, 360)
+        }
+        h.addEventListener('pointermove', mv); h.addEventListener('pointerup', up); h.addEventListener('pointercancel', up)
+      })
+      track.appendChild(h)
+    })
+  }
+  bar.addEventListener('pointerdown', (e) => { e.preventDefault(); e.stopPropagation(); const p = frac(e.clientX); stops.push({ p, c: toonGradientHexAt(stops.slice().sort((a, b) => a.p - b.p), p) }); redraw(); commit() })
+  picker.addEventListener('input', () => { if (!editing) return; editing.c = picker.value.toLowerCase(); redraw(); commit() })
+  return { el: wrap, set(str) { stops = parseToonGradient(str).map((x) => ({ ...x })); redraw() } }
+}
+function renderColorPresetPanel() {
+  const panel = document.getElementById('presetPanel')
+  if (!panel || panel.style.display === 'none') return
+  const st = colorPresetBtnStyle(), presets = getColorPresets()
+  panel.textContent = ''
+  const grid = document.createElement('div')
+  grid.style.cssText = 'display:flex;flex-wrap:wrap;gap:6px'
+  const tileCss = 'box-sizing:border-box;width:' + st.size + 'px;height:' + st.size + 'px;padding:0;margin:0;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:22px;line-height:1;user-select:none;-webkit-tap-highlight-color:transparent;border-radius:' + st.radius + ';'
+  presets.forEach((p) => {
+    const b = document.createElement('button')
+    b.type = 'button'
+    b.style.cssText = tileCss + 'border:4px solid ' + p.bg + ';background:' + colorPresetSwatch(p) + ';' + (p.id === colorPresetEditingId ? 'outline:2px solid ' + st.fg + ';outline-offset:2px;' : '')
+    b.addEventListener('click', (e) => { e.stopPropagation(); applyColorPreset(p); colorPresetEditingId = DEV_MODE ? p.id : null; renderColorPresetPanel() })
+    grid.appendChild(b)
+  })
+  if (DEV_MODE) {
+    const plus = document.createElement('button')
+    plus.type = 'button'; plus.textContent = '+'
+    plus.style.cssText = tileCss + 'border:' + st.bw + ' solid ' + st.border + ';background:' + st.bg + ';color:' + st.fg + ';'
+    plus.addEventListener('click', (e) => {
+      e.stopPropagation()
+      const np = { id: 'p' + Date.now().toString(36), g: cfg.toonGradient, bg: cfg.floorEnabled ? (cfg.floorColor || '#ffffff') : (cfg.bgColor || '#ffffff'), ...COLOR_PRESET_NEW_DEFAULTS }
+      setColorPresets(getColorPresets().concat([np]))
+      applyColorPreset(np)
+      colorPresetEditingId = np.id
+      renderColorPresetPanel()
+    })
+    grid.appendChild(plus)
+  }
+  panel.appendChild(grid)
+  const cur = DEV_MODE && presets.find((p) => p.id === colorPresetEditingId)
+  if (!cur) return
+  const ed = document.createElement('div')
+  ed.style.cssText = 'margin-top:10px;display:flex;flex-direction:column;gap:8px;min-width:' + (st.size * 4) + 'px'
+  const update = (patch) => { // writes the change into the preset, then onto the screen
+    const all = getColorPresets(), i = all.findIndex((p) => p.id === cur.id)
+    if (i < 0) return
+    all[i] = { ...all[i], ...patch }
+    if (patch.g !== undefined) delete all[i].w // an edited gradient no longer uses the BW / WB swatch override
+    setColorPresets(all)
+    if (patch.g !== undefined) { cfg.toonGradient = patch.g; syncValue('toonGradient', patch.g); rebuildGradientMap() }
+    if (patch.bg !== undefined) applyColorPresetBackground(patch.bg)
+    const sw = grid.children[i]; if (sw) { sw.style.background = colorPresetSwatch(all[i]); sw.style.borderColor = all[i].bg }
+  }
+  const gradEd = buildColorPresetGradientEditor(null, (g) => update({ g }))
+  gradEd.set(cur.g)
+  ed.appendChild(gradEd.el)
+  const row = document.createElement('div')
+  row.style.cssText = 'display:flex;align-items:center;gap:10px'
+  const bgIn = document.createElement('input')
+  bgIn.type = 'color'; bgIn.value = cur.bg
+  bgIn.style.cssText = 'width:' + st.size + 'px;height:' + Math.round(st.size * 0.7) + 'px;padding:0;border:1px solid rgba(255,255,255,0.4);background:none;cursor:pointer'
+  bgIn.addEventListener('input', () => update({ bg: bgIn.value }))
+  const del = document.createElement('button')
+  del.type = 'button'; del.textContent = '\u{1F5D1}'
+  del.style.cssText = 'margin-left:auto;padding:2px 8px;cursor:pointer;background:transparent;color:inherit;border:1px solid rgba(255,255,255,0.4);border-radius:4px;font-size:16px'
+  del.addEventListener('click', (e) => { e.stopPropagation(); setColorPresets(getColorPresets().filter((p) => p.id !== cur.id)); colorPresetEditingId = null; renderColorPresetPanel() })
+  row.appendChild(bgIn); row.appendChild(del)
+  ed.appendChild(row)
+  panel.appendChild(ed)
+}
+function setupColorPresetUi() {
+  if (document.getElementById('presetButton')) return
+  const btn = document.createElement('button')
+  btn.id = 'presetButton'; btn.type = 'button'; btn.setAttribute('aria-label', 'Color presets'); btn.title = 'Color presets'; btn.textContent = '\u25A6'
+  btn.style.cssText = 'position:fixed;z-index:100001;padding:0;margin:0;display:flex;align-items:center;justify-content:center;cursor:pointer;line-height:1;user-select:none;-webkit-tap-highlight-color:transparent'
+  const panel = document.createElement('div')
+  panel.id = 'presetPanel'
+  panel.style.cssText = 'position:fixed;z-index:100001;display:none;padding:10px;box-sizing:border-box;max-width:min(320px,calc(100vw - 24px));max-height:calc(100vh - 80px);overflow:auto'
+  document.body.appendChild(btn); document.body.appendChild(panel)
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation()
+    const open = panel.style.display === 'none'
+    panel.style.display = open ? 'block' : 'none'
+    if (open) renderColorPresetPanel(); else colorPresetEditingId = null
+  })
+  // a press anywhere else closes it (a native colour dialog never sends one to the page)
+  document.addEventListener('pointerdown', (e) => { if (panel.style.display !== 'none' && !(e.target.closest && e.target.closest('#presetPanel, #presetButton'))) { panel.style.display = 'none'; colorPresetEditingId = null } }, true)
+  applyColorPresetButtonStyle()
+}
+setupColorPresetUi()
 // The Pose Preview panel's own "Run" button (Saved Tween Sequences list-
 // picker, direct request) -- plays the resolved named-pose sequence on
 // the PREVIEW hand only (never the field), paced by the Tween group's own
