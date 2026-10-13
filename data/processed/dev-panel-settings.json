@@ -7740,9 +7740,9 @@
       "sphereRadiusCurveEnabled": true,
       "sphereRadiusCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.5908072104944381,\"y\":0.3711805979410807}},{\"x\":0.5115116277554114,\"y\":1,\"h1\":{\"x\":0.22562720448113072,\"y\":0},\"h2\":{\"x\":-0.24829763438916708,\"y\":0}},{\"x\":1,\"y\":0.5667348225911458,\"h2\":{\"x\":-0.5817764957016148,\"y\":0.004129536946614665}}]",
       "sphereRadiusRange": "{\"min\":0,\"max\":1}",
-      "sphereZCurveEnabled": false,
-      "sphereZCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "sphereZRange": "{\"min\":-30,\"max\":0}",
+      "sphereZCurveEnabled": true,
+      "sphereZCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.45532200522949196,\"y\":0.03206227620442714}},{\"x\":0.48536968589158147,\"y\":1,\"h2\":{\"x\":-0.37163348195703616,\"y\":-0.10732269287109375},\"h1\":{\"x\":0.2872404914575406,\"y\":0}},{\"x\":1,\"y\":0.4955356597900391,\"h2\":{\"x\":-0.5408813557922837,\"y\":0.04952265421549473}}]",
+      "sphereZRange": "{\"min\":-3,\"max\":3}",
       "showTrackingPoints": false,
       "showRenderOrderPoints": false,
       "showGridHelper": false,
@@ -18182,9 +18182,9 @@
       "sphereRadiusCurveEnabled": true,
       "sphereRadiusCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.5908072104944381,\"y\":0.3711805979410807}},{\"x\":0.5115116277554114,\"y\":1,\"h1\":{\"x\":0.22562720448113072,\"y\":0},\"h2\":{\"x\":-0.24829763438916708,\"y\":0}},{\"x\":1,\"y\":0.5667348225911458,\"h2\":{\"x\":-0.5817764957016148,\"y\":0.004129536946614665}}]",
       "sphereRadiusRange": "{\"min\":0,\"max\":1}",
-      "sphereZCurveEnabled": false,
-      "sphereZCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "sphereZRange": "{\"min\":-30,\"max\":0}",
+      "sphereZCurveEnabled": true,
+      "sphereZCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.45532200522949196,\"y\":0.03206227620442714}},{\"x\":0.48536968589158147,\"y\":1,\"h2\":{\"x\":-0.37163348195703616,\"y\":-0.10732269287109375},\"h1\":{\"x\":0.2872404914575406,\"y\":0}},{\"x\":1,\"y\":0.4955356597900391,\"h2\":{\"x\":-0.5408813557922837,\"y\":0.04952265421549473}}]",
+      "sphereZRange": "{\"min\":-3,\"max\":3}",
       "showTrackingPoints": false,
       "showRenderOrderPoints": false,
       "showGridHelper": false,
@@ -28624,9 +28624,9 @@
       "sphereRadiusCurveEnabled": true,
       "sphereRadiusCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.5908072104944381,\"y\":0.3711805979410807}},{\"x\":0.5115116277554114,\"y\":1,\"h1\":{\"x\":0.22562720448113072,\"y\":0},\"h2\":{\"x\":-0.24829763438916708,\"y\":0}},{\"x\":1,\"y\":0.5667348225911458,\"h2\":{\"x\":-0.5817764957016148,\"y\":0.004129536946614665}}]",
       "sphereRadiusRange": "{\"min\":0,\"max\":1}",
-      "sphereZCurveEnabled": false,
-      "sphereZCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "sphereZRange": "{\"min\":-30,\"max\":0}",
+      "sphereZCurveEnabled": true,
+      "sphereZCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.45532200522949196,\"y\":0.03206227620442714}},{\"x\":0.48536968589158147,\"y\":1,\"h2\":{\"x\":-0.37163348195703616,\"y\":-0.10732269287109375},\"h1\":{\"x\":0.2872404914575406,\"y\":0}},{\"x\":1,\"y\":0.4955356597900391,\"h2\":{\"x\":-0.5408813557922837,\"y\":0.04952265421549473}}]",
+      "sphereZRange": "{\"min\":-3,\"max\":3}",
       "showTrackingPoints": false,
       "showRenderOrderPoints": false,
       "showGridHelper": false,
@@ -223384,7 +223384,7 @@
                 "type": "group",
                 "group": {
                   "key": "Sphere > Sphere Z Offset Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -223524,7 +223524,7 @@
               },
               {
                 "key": "Sphere > Sphere Z Offset Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -224719,7 +224719,7 @@
               "type": "group",
               "group": {
                 "key": "Sphere > Sphere Z Offset Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -224859,7 +224859,7 @@
             },
             {
               "key": "Sphere > Sphere Z Offset Curve",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
