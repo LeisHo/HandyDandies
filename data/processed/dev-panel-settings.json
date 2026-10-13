@@ -7839,7 +7839,7 @@
       "sphereZCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.45532200522949196,\"y\":0.03206227620442714}},{\"x\":0.530303849945888,\"y\":1,\"h2\":{\"x\":-0.13005225587133062,\"y\":0},\"h1\":{\"x\":0.1274864391737438,\"y\":-0.15593744913736973}},{\"x\":1,\"y\":0.13312505086263016,\"h2\":{\"x\":-0.43229694032532007,\"y\":0.24000015258789065}}]",
       "sphereZRange": "{\"min\":-3,\"max\":30}",
       "showTrackingPoints": false,
-      "showFieldCenterPoint": false,
+      "showFieldCenterPoint": true,
       "showRenderOrderPoints": false,
       "showGridHelper": false,
       "showWireframe": false,
@@ -9647,7 +9647,7 @@
       "custom26Trig1RetransitionStartTimeCurveVisibleOnly": true,
       "custom26Trig1RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom26Trig1RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom27Enabled": true,
+      "custom27Enabled": false,
       "custom27Type": "Right Click",
       "custom27TouchPointCount": 1,
       "custom27ClickCount": "1st",
@@ -18601,7 +18601,7 @@
       "sphereZCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.45532200522949196,\"y\":0.03206227620442714}},{\"x\":0.530303849945888,\"y\":1,\"h2\":{\"x\":-0.13005225587133062,\"y\":0},\"h1\":{\"x\":0.1274864391737438,\"y\":-0.15593744913736973}},{\"x\":1,\"y\":0.13312505086263016,\"h2\":{\"x\":-0.43229694032532007,\"y\":0.24000015258789065}}]",
       "sphereZRange": "{\"min\":-3,\"max\":30}",
       "showTrackingPoints": false,
-      "showFieldCenterPoint": false,
+      "showFieldCenterPoint": true,
       "showRenderOrderPoints": false,
       "showGridHelper": false,
       "showWireframe": false,
@@ -20409,7 +20409,7 @@
       "custom26Trig1RetransitionStartTimeCurveVisibleOnly": true,
       "custom26Trig1RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom26Trig1RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom27Enabled": true,
+      "custom27Enabled": false,
       "custom27Type": "Right Click",
       "custom27TouchPointCount": 1,
       "custom27ClickCount": "1st",
@@ -29363,7 +29363,7 @@
       "sphereZCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.45532200522949196,\"y\":0.03206227620442714}},{\"x\":0.530303849945888,\"y\":1,\"h2\":{\"x\":-0.13005225587133062,\"y\":0},\"h1\":{\"x\":0.1274864391737438,\"y\":-0.15593744913736973}},{\"x\":1,\"y\":0.13312505086263016,\"h2\":{\"x\":-0.43229694032532007,\"y\":0.24000015258789065}}]",
       "sphereZRange": "{\"min\":-3,\"max\":30}",
       "showTrackingPoints": false,
-      "showFieldCenterPoint": false,
+      "showFieldCenterPoint": true,
       "showRenderOrderPoints": false,
       "showGridHelper": false,
       "showWireframe": false,
@@ -31171,7 +31171,7 @@
       "custom26Trig1RetransitionStartTimeCurveVisibleOnly": true,
       "custom26Trig1RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom26Trig1RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom27Enabled": true,
+      "custom27Enabled": false,
       "custom27Type": "Right Click",
       "custom27TouchPointCount": 1,
       "custom27ClickCount": "1st",
@@ -34458,14 +34458,14 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
           "type": "group",
           "group": {
             "key": "Field Layout",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -34655,7 +34655,7 @@
                 "type": "group",
                 "group": {
                   "key": "Hand Position Min Z Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -34682,7 +34682,7 @@
                 "type": "group",
                 "group": {
                   "key": "Hand Position Max Z Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -34816,7 +34816,7 @@
               },
               {
                 "key": "Hand Position Min Z Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -34836,7 +34836,7 @@
               },
               {
                 "key": "Hand Position Max Z Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -36278,7 +36278,7 @@
       "subgroups": [
         {
           "key": "Field Layout",
-          "collapsed": false,
+          "collapsed": true,
           "locked": true,
           "items": [
             {
@@ -36468,7 +36468,7 @@
               "type": "group",
               "group": {
                 "key": "Hand Position Min Z Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -36495,7 +36495,7 @@
               "type": "group",
               "group": {
                 "key": "Hand Position Max Z Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -36629,7 +36629,7 @@
             },
             {
               "key": "Hand Position Min Z Curve",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -36649,7 +36649,7 @@
             },
             {
               "key": "Hand Position Max Z Curve",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -254850,7 +254850,7 @@
     },
     {
       "key": "New Group (11)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -255049,7 +255049,7 @@
           "type": "group",
           "group": {
             "key": "Camera",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -255431,7 +255431,7 @@
         },
         {
           "key": "Camera",
-          "collapsed": true,
+          "collapsed": false,
           "locked": true,
           "items": [
             {
