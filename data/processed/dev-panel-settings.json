@@ -223232,7 +223232,7 @@
           "type": "group",
           "group": {
             "key": "Field Grid Sphere Sequence",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -224567,7 +224567,7 @@
         },
         {
           "key": "Field Grid Sphere Sequence",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
