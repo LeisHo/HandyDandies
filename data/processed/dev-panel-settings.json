@@ -7787,7 +7787,7 @@
       "dp_capsTabText": true,
       "dp_capsGroupNames": true,
       "dp_capsSettingsText": false,
-      "dp_textEditMode": true,
+      "dp_textEditMode": false,
       "dp_capsTitleText": false,
       "dp_boldTitle": true,
       "dp_boldTab": true,
@@ -17986,7 +17986,7 @@
       "dp_capsTabText": true,
       "dp_capsGroupNames": true,
       "dp_capsSettingsText": false,
-      "dp_textEditMode": true,
+      "dp_textEditMode": false,
       "dp_capsTitleText": false,
       "dp_boldTitle": true,
       "dp_boldTab": true,
@@ -28185,7 +28185,7 @@
       "dp_capsTabText": true,
       "dp_capsGroupNames": true,
       "dp_capsSettingsText": false,
-      "dp_textEditMode": true,
+      "dp_textEditMode": false,
       "dp_capsTitleText": false,
       "dp_boldTitle": true,
       "dp_boldTab": true,
@@ -35821,7 +35821,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 32",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -118137,7 +118137,7 @@
       "subgroups": [
         {
           "key": "Custom Click Function 32",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
