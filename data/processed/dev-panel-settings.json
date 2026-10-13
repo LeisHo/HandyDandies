@@ -7682,8 +7682,8 @@
       "startupFnGlideToFirstPose": false,
       "startupFnFirstGlideTimeScale": 1,
       "startupFnTweenSpeedMs": 1370,
-      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":1156}",
+      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.6472139464415906,\"y\":0.30988044738769527},{\"x\":1,\"y\":1}]",
+      "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":3000}",
       "startupFnSequencePlayMode": "Count",
       "startupFnSequenceCount": 1,
       "startupFnSequenceCountMode": "Loop",
@@ -7705,7 +7705,7 @@
       "startupFnStartDistanceCurveEnabled": true,
       "startupFnStartDistanceMin": 0,
       "startupFnStartDistanceMax": 40,
-      "startupFnStartDistanceCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.8094914779614888,\"y\":0}},{\"x\":1,\"y\":0}]",
+      "startupFnStartDistanceCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.8094914779614888,\"y\":0}},{\"x\":1,\"y\":1}]",
       "startupFnPauseDurationMs": 500,
       "startupFnRetransitionEnabled": true,
       "startupFnRetransitionSpeedMs": 400,
@@ -18124,8 +18124,8 @@
       "startupFnGlideToFirstPose": false,
       "startupFnFirstGlideTimeScale": 1,
       "startupFnTweenSpeedMs": 1370,
-      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":1156}",
+      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.6472139464415906,\"y\":0.30988044738769527},{\"x\":1,\"y\":1}]",
+      "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":3000}",
       "startupFnSequencePlayMode": "Count",
       "startupFnSequenceCount": 1,
       "startupFnSequenceCountMode": "Loop",
@@ -18147,7 +18147,7 @@
       "startupFnStartDistanceCurveEnabled": true,
       "startupFnStartDistanceMin": 0,
       "startupFnStartDistanceMax": 40,
-      "startupFnStartDistanceCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.8094914779614888,\"y\":0}},{\"x\":1,\"y\":0}]",
+      "startupFnStartDistanceCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.8094914779614888,\"y\":0}},{\"x\":1,\"y\":1}]",
       "startupFnPauseDurationMs": 500,
       "startupFnRetransitionEnabled": true,
       "startupFnRetransitionSpeedMs": 400,
@@ -28566,8 +28566,8 @@
       "startupFnGlideToFirstPose": false,
       "startupFnFirstGlideTimeScale": 1,
       "startupFnTweenSpeedMs": 1370,
-      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":1156}",
+      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.6472139464415906,\"y\":0.30988044738769527},{\"x\":1,\"y\":1}]",
+      "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":3000}",
       "startupFnSequencePlayMode": "Count",
       "startupFnSequenceCount": 1,
       "startupFnSequenceCountMode": "Loop",
@@ -28589,7 +28589,7 @@
       "startupFnStartDistanceCurveEnabled": true,
       "startupFnStartDistanceMin": 0,
       "startupFnStartDistanceMax": 40,
-      "startupFnStartDistanceCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.8094914779614888,\"y\":0}},{\"x\":1,\"y\":0}]",
+      "startupFnStartDistanceCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.8094914779614888,\"y\":0}},{\"x\":1,\"y\":1}]",
       "startupFnPauseDurationMs": 500,
       "startupFnRetransitionEnabled": true,
       "startupFnRetransitionSpeedMs": 400,
@@ -223236,7 +223236,7 @@
           "type": "group",
           "group": {
             "key": "Field Grid Sphere Sequence",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -224572,7 +224572,7 @@
         },
         {
           "key": "Field Grid Sphere Sequence",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -227346,8 +227346,8 @@
     "mobile": {
       "left": 20,
       "top": 0,
-      "width": 394.4285888671875,
-      "height": 558.4642944335938
+      "width": 397.8571472167969,
+      "height": 559.9880981445312
     }
   }
 }
