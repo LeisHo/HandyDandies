@@ -10,6 +10,11 @@ import { OutputPass } from 'three/addons/postprocessing/OutputPass.js'
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js'
 import { initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab, beginDynamicBatch, endDynamicBatch } from './devpanel/devPanel.js?v=65'
 
+// Toon Shading colour gradient (2026-10-12): MeshToonMaterial's getGradientIrradiance() only reads the RED channel of
+// its gradientMap (a grey ramp). Reading RGB instead is identical for every grey ramp (all channels equal) and lets
+// makeGradientTexture() tint each toon step with the Toon Shade Color Gradient. No effect if three's chunk text changes.
+THREE.ShaderChunk.gradientmap_pars_fragment = THREE.ShaderChunk.gradientmap_pars_fragment.replace('vec3( texture2D( gradientMap, coord ).r )', 'texture2D( gradientMap, coord ).rgb')
+
 // A defensive wrapper around devPanel.js's own refreshSelectOptions() --
 // found via live testing (direct user report: "I dont see any of the
 // saved poses in the dropdown for Click Hold Pose Target pose selection")
@@ -1367,6 +1372,61 @@ function renestRenderOrderRows() {
   const w = document.getElementById('dpSnapshotWidget')
   if (gb && w && w.parentElement !== gb) gb.appendChild(w)
 }
+// Toon Shade Color Gradient editor (2026-10-12): a gradient bar with a handle per colour stop. Click the bar to ADD a stop (it takes the
+// colour already there), click a handle to pick its colour, double-click a handle to DELETE it (at least 2 stay), drag a handle to move it.
+// The leftmost stop colours the Shadow Floor shade, the rightmost the Light Ceiling shade (see makeGradientTexture()).
+function buildToonGradientWidget() {
+  const row = document.querySelector('.dp-row[data-key="toonGradient"]')
+  const input = row && row.querySelector('.dp-text-input')
+  if (!input || row.dataset.tgWidget) return
+  row.dataset.tgWidget = '1'
+  input.style.display = 'none'
+  row.style.flexDirection = 'column'; row.style.alignItems = 'stretch'
+  const wrap = elLocal('div', { flex: '1', padding: '6px 8px 4px' })
+  const bar = elLocal('div', { position: 'relative', height: '24px', borderRadius: '4px', border: '1px solid rgba(255,255,255,0.3)', cursor: 'copy', touchAction: 'none' })
+  const track = elLocal('div', { position: 'relative', height: '20px', marginTop: '3px' })
+  const picker = document.createElement('input')
+  picker.type = 'color'
+  picker.style.cssText = 'position:absolute;opacity:0;pointer-events:none;width:1px;height:1px;left:8px;top:0'
+  wrap.appendChild(bar); wrap.appendChild(track); wrap.appendChild(picker); row.appendChild(wrap)
+  let stops = parseToonGradient(input.value).map((x) => ({ ...x })), lastSeen = input.value, editing = null, openTimer = 0, lastTap = { st: null, t: 0 }
+  const commit = () => { lastSeen = JSON.stringify(stops.map((x) => ({ p: +x.p.toFixed(4), c: x.c }))); commitTextControl(input, lastSeen) }
+  const paintBar = () => { bar.style.background = 'linear-gradient(to right, ' + stops.slice().sort((a, b) => a.p - b.p).map((x) => x.c + ' ' + (x.p * 100).toFixed(1) + '%').join(', ') + ')' }
+  const frac = (cx) => { const r = bar.getBoundingClientRect(); return THREE.MathUtils.clamp((cx - r.left) / Math.max(r.width, 1), 0, 1) }
+  const redraw = () => {
+    stops.sort((a, b) => a.p - b.p)
+    paintBar()
+    track.textContent = ''
+    stops.forEach((st) => {
+      const h = elLocal('div', { position: 'absolute', top: '0', left: (st.p * 100) + '%', width: '14px', height: '20px', marginLeft: '-7px', background: st.c, border: '2px solid #fff', borderRadius: '3px', boxSizing: 'border-box', cursor: 'pointer', touchAction: 'none', boxShadow: '0 0 0 1px rgba(0,0,0,0.6)' })
+      h.addEventListener('pointerdown', (e) => {
+        e.preventDefault(); e.stopPropagation()
+        h.setPointerCapture(e.pointerId)
+        const x0 = e.clientX; let moved = false
+        const mv = (ev) => { if (Math.abs(ev.clientX - x0) > 3) moved = true; if (moved) { st.p = frac(ev.clientX); h.style.left = (st.p * 100) + '%'; paintBar() } }
+        const up = () => {
+          h.removeEventListener('pointermove', mv); h.removeEventListener('pointerup', up); h.removeEventListener('pointercancel', up)
+          if (moved) { redraw(); commit(); return }
+          const now = performance.now()
+          if (lastTap.st === st && now - lastTap.t < 350) { // double click: delete (a gradient keeps at least 2 stops)
+            clearTimeout(openTimer); lastTap = { st: null, t: 0 }
+            if (stops.length > 2) { stops.splice(stops.indexOf(st), 1); redraw(); commit() }
+            return
+          }
+          lastTap = { st, t: now }
+          clearTimeout(openTimer)
+          openTimer = setTimeout(() => { editing = st; picker.value = st.c; picker.click() }, 360) // single click: pick this stop's colour
+        }
+        h.addEventListener('pointermove', mv); h.addEventListener('pointerup', up); h.addEventListener('pointercancel', up)
+      })
+      track.appendChild(h)
+    })
+  }
+  bar.addEventListener('pointerdown', (e) => { e.preventDefault(); e.stopPropagation(); const p = frac(e.clientX); stops.push({ p, c: toonGradientHexAt(stops.slice().sort((a, b) => a.p - b.p), p) }); redraw(); commit() })
+  picker.addEventListener('input', () => { if (!editing) return; editing.c = picker.value.toLowerCase(); redraw(); commit() })
+  redraw()
+  armLengthWidgetResyncs.push(() => { if (input.value === lastSeen) return; lastSeen = input.value; stops = parseToonGradient(input.value).map((x) => ({ ...x })); redraw() })
+}
 function buildRenderOrderWidgets() {
   const fillSel = (sel, value, allowNone) => {
     RENDER_ORDER_MODE_OPTIONS.forEach((o) => { if (!allowNone && o.value === 'none') return; const op = document.createElement('option'); op.value = o.value; op.textContent = o.text; sel.appendChild(op) })
@@ -2712,6 +2772,7 @@ const DEV_GROUPS = [
       { key: 'toonShadowFloorPick', label: 'Pick Shadow Floor From Screen Color (Eyedropper)', type: 'button', onClick: (btn) => pickToonValueFromScreen('floor', btn) },
       { key: 'toonLightCeiling', label: 'Toon Light Ceiling (%)', type: 'slider', min: 10, max: 100, step: 1, def: 100, onChange: () => rebuildGradientMap() },
       { key: 'toonLightCeilingPick', label: 'Pick Light Ceiling From Screen Color (Eyedropper)', type: 'button', onClick: (btn) => pickToonValueFromScreen('ceiling', btn) },
+      { key: 'toonGradient', label: 'Toon Shade Color Gradient', type: 'text', def: '[{"p":0,"c":"#ffffff"},{"p":1,"c":"#ffffff"}]', placeAfter: 'toonLightCeilingPick', onChange: () => rebuildGradientMap() },
       { key: 'toonBaseTint', label: 'Toon Base Tint', type: 'color', def: '#ffffff', onChange: (v) => forEachToonMaterial((m) => m.color.set(v)) },
       { key: 'textureInfluence', label: 'Texture Influence (%)', type: 'slider', min: 0, max: 100, step: 1, def: 0, onChange: (v) => setToonUniform('textureInfluence', v / 100) },
       { key: 'toonTint', label: 'Toon Texture Tint', type: 'color', def: '#ffffff', onChange: (v) => setToonUniform('toonTint', new THREE.Color(v)) },
@@ -3397,6 +3458,13 @@ composer.addPass(outlinePass)
 // still needs to run last for correct color-space output) so the
 // inversion applies to the fully composited scene, not a pre-tonemap
 // buffer.
+//
+// CORRECTED 2026-10-12 (direct report: with a Toon Shadow Floor above 0 the darkest shade still inverted to pure
+// white-ish / "read as black by the invert"): the pass sat BEFORE OutputPass, i.e. it inverted the LINEAR light
+// values. A dark display shade of 7% is only ~0.006 in linear light, so 1 - 0.006 = 0.994 linear = ~99.7% on screen:
+// the shadow floor vanished into white instead of becoming 93%. It now runs AFTER OutputPass, on the final
+// sRGB-encoded picture (the canvas only - the dev panel and other HTML are separate and untouched), so every pixel
+// becomes exactly 1 - its displayed value.
 const InvertColorsShader = {
   uniforms: { tDiffuse: { value: null } },
   vertexShader: 'varying vec2 vUv; void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
@@ -3404,8 +3472,8 @@ const InvertColorsShader = {
 }
 const invertColorsPass = new ShaderPass(InvertColorsShader)
 invertColorsPass.enabled = !!cfg.invertColorsEnabled
-composer.addPass(invertColorsPass)
 composer.addPass(new OutputPass())
+composer.addPass(invertColorsPass) // after OutputPass on purpose: inverts the displayed (sRGB) image, see the note above
 
 const hemiLight = new THREE.HemisphereLight(cfg.ambientSkyColor, cfg.ambientGroundColor, cfg.ambientIntensity)
 scene.add(hemiLight)
@@ -4857,14 +4925,45 @@ function forEachEmissionMaterial(fn) {
   if (emissionMaterial) fn(emissionMaterial)
   hands.forEach((h) => { if (h.emissionMesh && h.emissionMesh.material !== emissionMaterial) fn(h.emissionMesh.material) })
 }
+// Toon Shade Color Gradient (2026-10-12): sorted colour stops [{p: 0..1, c: '#rrggbb'}]. The LEFT end tints the darkest toon step (the
+// Shadow Floor shade), the RIGHT end the brightest (the Light Ceiling shade); the steps in between sample the gradient at their own
+// position. A step's brightness is still the Shadow Floor -> Light Ceiling ramp; the gradient colour multiplies it (white = no tint).
+const TOON_GRADIENT_DEFAULT = [{ p: 0, c: '#ffffff' }, { p: 1, c: '#ffffff' }]
+const toonGradientCache = new Map()
+function parseToonGradient(str) {
+  let v = toonGradientCache.get(str)
+  if (v) return v
+  try {
+    const a = JSON.parse(str)
+    if (Array.isArray(a)) v = a.filter((x) => x && typeof x.c === 'string' && /^#[0-9a-f]{6}$/i.test(x.c) && Number.isFinite(+x.p)).map((x) => ({ p: THREE.MathUtils.clamp(+x.p, 0, 1), c: x.c.toLowerCase() })).sort((x, y) => x.p - y.p)
+  } catch (e) { /* default */ }
+  if (!v || v.length < 2) v = TOON_GRADIENT_DEFAULT
+  if (toonGradientCache.size > 64) toonGradientCache.clear()
+  toonGradientCache.set(str, v)
+  return v
+}
+function toonGradientHexAt(stops, t) {
+  if (t <= stops[0].p) return stops[0].c
+  const last = stops[stops.length - 1]
+  if (t >= last.p) return last.c
+  let a = stops[0], b = last
+  for (let k = 0; k < stops.length - 1; k++) if (t >= stops[k].p && t <= stops[k + 1].p) { a = stops[k]; b = stops[k + 1]; break }
+  const u = (t - a.p) / Math.max(b.p - a.p, 1e-6)
+  const ch = (hex, o) => parseInt(hex.slice(o, o + 2), 16)
+  const mix = (o) => Math.round(ch(a.c, o) + (ch(b.c, o) - ch(a.c, o)) * u).toString(16).padStart(2, '0')
+  return '#' + mix(1) + mix(3) + mix(5)
+}
 function makeGradientTexture(steps, shadowFloor, lightCeiling, threshold) {
   const size = Math.max(2, Math.round(steps))
   const data = new Uint8Array(size * 4)
+  const grad = parseToonGradient(cfg.toonGradient || '')
+  const tc = new THREE.Color()
   for (let i = 0; i < size; i++) {
     const t = size <= 1 ? 1 : i / (size - 1)
     const biased = Math.pow(t, threshold)
-    const v = Math.round(THREE.MathUtils.clamp(THREE.MathUtils.lerp(shadowFloor, lightCeiling, biased), 0, 100) / 100 * 255)
-    data[i * 4] = v; data[i * 4 + 1] = v; data[i * 4 + 2] = v; data[i * 4 + 3] = 255
+    const vf = THREE.MathUtils.clamp(THREE.MathUtils.lerp(shadowFloor, lightCeiling, biased), 0, 100) / 100
+    tc.set(toonGradientHexAt(grad, t)) // sRGB hex -> linear working colour
+    data[i * 4] = Math.round(vf * tc.r * 255); data[i * 4 + 1] = Math.round(vf * tc.g * 255); data[i * 4 + 2] = Math.round(vf * tc.b * 255); data[i * 4 + 3] = 255
   }
   const tex = new THREE.DataTexture(data, size, 1, THREE.RGBAFormat)
   tex.magFilter = THREE.NearestFilter
@@ -4966,7 +5065,7 @@ function rebuildGradientMap() {
 // same as HANDO's own version does.
 const TOON_PRESET_KEYS = [
   'toonSteps', 'toonStepThreshold', 'toonShadowFloor', 'toonLightCeiling',
-  'toonBaseTint', 'textureInfluence', 'toonTint', 'rimIntensity', 'rimPower', 'rimColor'
+  'toonBaseTint', 'textureInfluence', 'toonTint', 'rimIntensity', 'rimPower', 'rimColor', 'toonGradient'
 ]
 function captureToonPreset() {
   const item = {}
@@ -17586,6 +17685,7 @@ safeRefreshSelectOptions('renderOrderFallbackExcept')
 safeRefreshSelectOptions('renderOrderFallback2Except')
 mergeExceptSelects()
 buildRenderOrderWidgets()
+buildToonGradientWidget()
 gateGroupHeader('Floor', 'floorEnabled')
 updateFloorRowVisibility()
 updateFloor()
