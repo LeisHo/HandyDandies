@@ -7672,50 +7672,50 @@
       "handOffsetOnStartupEnabled": true,
       "startupHandOffsetX": 0,
       "startupHandOffsetY": 0,
-      "startupHandOffsetZ": 0,
-      "startupHandTweenEnabled": false,
-      "startupFnMode": "Single Pose",
+      "startupHandOffsetZ": -12,
+      "startupHandTweenEnabled": true,
+      "startupFnMode": "Sequence",
       "startupFnTargetPose": "",
-      "startupFnTweenSelector": "",
+      "startupFnTweenSelector": "FLOWER",
       "startupFnReverseSequence": false,
       "startupFnGlideToFirstPose": false,
       "startupFnFirstGlideTimeScale": 1,
       "startupFnTweenSpeedMs": 800,
       "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":300}",
+      "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":1796}",
       "startupFnSequencePlayMode": "Count",
       "startupFnSequenceCount": 1,
       "startupFnSequenceCountMode": "Loop",
       "startupFnSequenceLoopTransition": true,
       "startupFnSequenceHoldMs": 0,
       "startupFnTransitionSpeedMs": 1000,
-      "startupFnEasingCurveEnabled": false,
-      "startupFnEasingCurve": "[{\"x\":0,\"y\":0.5},{\"x\":1,\"y\":0.5}]",
-      "startupFnRetransitionEasingCurveEnabled": false,
-      "startupFnRetransitionEasingCurve": "[{\"x\":0,\"y\":0.5},{\"x\":1,\"y\":0.5}]",
-      "startupFnSpeedCurveEnabled": false,
+      "startupFnEasingCurveEnabled": true,
+      "startupFnEasingCurve": "[{\"x\":0,\"y\":0},{\"x\":0.5252352962170567,\"y\":0.8769793192545573},{\"x\":1,\"y\":0}]",
+      "startupFnRetransitionEasingCurveEnabled": true,
+      "startupFnRetransitionEasingCurve": "[{\"x\":0,\"y\":0},{\"x\":0.4554235972960167,\"y\":0.8331250508626302},{\"x\":1,\"y\":0}]",
+      "startupFnSpeedCurveEnabled": true,
       "startupFnSpeedCurveVisibleOnly": true,
       "startupFnSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "startupFnSpeedCurveRange": "{\"min\":500,\"max\":1500}",
+      "startupFnSpeedCurveRange": "{\"min\":1038,\"max\":1639}",
       "startupFnStartTimeCurveEnabled": true,
       "startupFnStartTimeCurveVisibleOnly": true,
       "startupFnStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "startupFnStartTimeRange": "{\"min\":0,\"max\":300}",
-      "startupFnStartDistanceCurveEnabled": false,
+      "startupFnStartDistanceCurveEnabled": true,
       "startupFnStartDistanceMin": 0,
-      "startupFnStartDistanceMax": 100,
-      "startupFnStartDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
+      "startupFnStartDistanceMax": 58,
+      "startupFnStartDistanceCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "startupFnPauseDurationMs": 500,
       "startupFnRetransitionEnabled": true,
       "startupFnRetransitionSpeedMs": 400,
-      "startupFnRetransitionSpeedCurveEnabled": false,
+      "startupFnRetransitionSpeedCurveEnabled": true,
       "startupFnRetransitionSpeedCurveVisibleOnly": true,
       "startupFnRetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "startupFnRetransitionSpeedCurveRange": "{\"min\":50,\"max\":25000}",
+      "startupFnRetransitionSpeedCurveRange": "{\"min\":1266,\"max\":5171}",
       "startupFnRetransitionStartTimeCurveEnabled": true,
       "startupFnRetransitionStartTimeCurveVisibleOnly": true,
       "startupFnRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "startupFnRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
+      "startupFnRetransitionStartTimeRange": "{\"min\":0,\"max\":251}",
       "sphereSeqEnabled": true,
       "sphereStartZOffset": -15.5,
       "sphereStartRadius": 0.1,
@@ -18114,50 +18114,50 @@
       "handOffsetOnStartupEnabled": true,
       "startupHandOffsetX": 0,
       "startupHandOffsetY": 0,
-      "startupHandOffsetZ": 0,
-      "startupHandTweenEnabled": false,
-      "startupFnMode": "Single Pose",
+      "startupHandOffsetZ": -12,
+      "startupHandTweenEnabled": true,
+      "startupFnMode": "Sequence",
       "startupFnTargetPose": "",
-      "startupFnTweenSelector": "",
+      "startupFnTweenSelector": "FLOWER",
       "startupFnReverseSequence": false,
       "startupFnGlideToFirstPose": false,
       "startupFnFirstGlideTimeScale": 1,
       "startupFnTweenSpeedMs": 800,
       "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":300}",
+      "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":1796}",
       "startupFnSequencePlayMode": "Count",
       "startupFnSequenceCount": 1,
       "startupFnSequenceCountMode": "Loop",
       "startupFnSequenceLoopTransition": true,
       "startupFnSequenceHoldMs": 0,
       "startupFnTransitionSpeedMs": 1000,
-      "startupFnEasingCurveEnabled": false,
-      "startupFnEasingCurve": "[{\"x\":0,\"y\":0.5},{\"x\":1,\"y\":0.5}]",
-      "startupFnRetransitionEasingCurveEnabled": false,
-      "startupFnRetransitionEasingCurve": "[{\"x\":0,\"y\":0.5},{\"x\":1,\"y\":0.5}]",
-      "startupFnSpeedCurveEnabled": false,
+      "startupFnEasingCurveEnabled": true,
+      "startupFnEasingCurve": "[{\"x\":0,\"y\":0},{\"x\":0.5252352962170567,\"y\":0.8769793192545573},{\"x\":1,\"y\":0}]",
+      "startupFnRetransitionEasingCurveEnabled": true,
+      "startupFnRetransitionEasingCurve": "[{\"x\":0,\"y\":0},{\"x\":0.4554235972960167,\"y\":0.8331250508626302},{\"x\":1,\"y\":0}]",
+      "startupFnSpeedCurveEnabled": true,
       "startupFnSpeedCurveVisibleOnly": true,
       "startupFnSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "startupFnSpeedCurveRange": "{\"min\":500,\"max\":1500}",
+      "startupFnSpeedCurveRange": "{\"min\":1038,\"max\":1639}",
       "startupFnStartTimeCurveEnabled": true,
       "startupFnStartTimeCurveVisibleOnly": true,
       "startupFnStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "startupFnStartTimeRange": "{\"min\":0,\"max\":300}",
-      "startupFnStartDistanceCurveEnabled": false,
+      "startupFnStartDistanceCurveEnabled": true,
       "startupFnStartDistanceMin": 0,
-      "startupFnStartDistanceMax": 100,
-      "startupFnStartDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
+      "startupFnStartDistanceMax": 58,
+      "startupFnStartDistanceCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "startupFnPauseDurationMs": 500,
       "startupFnRetransitionEnabled": true,
       "startupFnRetransitionSpeedMs": 400,
-      "startupFnRetransitionSpeedCurveEnabled": false,
+      "startupFnRetransitionSpeedCurveEnabled": true,
       "startupFnRetransitionSpeedCurveVisibleOnly": true,
       "startupFnRetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "startupFnRetransitionSpeedCurveRange": "{\"min\":50,\"max\":25000}",
+      "startupFnRetransitionSpeedCurveRange": "{\"min\":1266,\"max\":5171}",
       "startupFnRetransitionStartTimeCurveEnabled": true,
       "startupFnRetransitionStartTimeCurveVisibleOnly": true,
       "startupFnRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "startupFnRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
+      "startupFnRetransitionStartTimeRange": "{\"min\":0,\"max\":251}",
       "sphereSeqEnabled": true,
       "sphereStartZOffset": -15.5,
       "sphereStartRadius": 0.1,
@@ -28556,50 +28556,50 @@
       "handOffsetOnStartupEnabled": true,
       "startupHandOffsetX": 0,
       "startupHandOffsetY": 0,
-      "startupHandOffsetZ": 0,
-      "startupHandTweenEnabled": false,
-      "startupFnMode": "Single Pose",
+      "startupHandOffsetZ": -12,
+      "startupHandTweenEnabled": true,
+      "startupFnMode": "Sequence",
       "startupFnTargetPose": "",
-      "startupFnTweenSelector": "",
+      "startupFnTweenSelector": "FLOWER",
       "startupFnReverseSequence": false,
       "startupFnGlideToFirstPose": false,
       "startupFnFirstGlideTimeScale": 1,
       "startupFnTweenSpeedMs": 800,
       "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":300}",
+      "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":1796}",
       "startupFnSequencePlayMode": "Count",
       "startupFnSequenceCount": 1,
       "startupFnSequenceCountMode": "Loop",
       "startupFnSequenceLoopTransition": true,
       "startupFnSequenceHoldMs": 0,
       "startupFnTransitionSpeedMs": 1000,
-      "startupFnEasingCurveEnabled": false,
-      "startupFnEasingCurve": "[{\"x\":0,\"y\":0.5},{\"x\":1,\"y\":0.5}]",
-      "startupFnRetransitionEasingCurveEnabled": false,
-      "startupFnRetransitionEasingCurve": "[{\"x\":0,\"y\":0.5},{\"x\":1,\"y\":0.5}]",
-      "startupFnSpeedCurveEnabled": false,
+      "startupFnEasingCurveEnabled": true,
+      "startupFnEasingCurve": "[{\"x\":0,\"y\":0},{\"x\":0.5252352962170567,\"y\":0.8769793192545573},{\"x\":1,\"y\":0}]",
+      "startupFnRetransitionEasingCurveEnabled": true,
+      "startupFnRetransitionEasingCurve": "[{\"x\":0,\"y\":0},{\"x\":0.4554235972960167,\"y\":0.8331250508626302},{\"x\":1,\"y\":0}]",
+      "startupFnSpeedCurveEnabled": true,
       "startupFnSpeedCurveVisibleOnly": true,
       "startupFnSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "startupFnSpeedCurveRange": "{\"min\":500,\"max\":1500}",
+      "startupFnSpeedCurveRange": "{\"min\":1038,\"max\":1639}",
       "startupFnStartTimeCurveEnabled": true,
       "startupFnStartTimeCurveVisibleOnly": true,
       "startupFnStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "startupFnStartTimeRange": "{\"min\":0,\"max\":300}",
-      "startupFnStartDistanceCurveEnabled": false,
+      "startupFnStartDistanceCurveEnabled": true,
       "startupFnStartDistanceMin": 0,
-      "startupFnStartDistanceMax": 100,
-      "startupFnStartDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
+      "startupFnStartDistanceMax": 58,
+      "startupFnStartDistanceCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "startupFnPauseDurationMs": 500,
       "startupFnRetransitionEnabled": true,
       "startupFnRetransitionSpeedMs": 400,
-      "startupFnRetransitionSpeedCurveEnabled": false,
+      "startupFnRetransitionSpeedCurveEnabled": true,
       "startupFnRetransitionSpeedCurveVisibleOnly": true,
       "startupFnRetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "startupFnRetransitionSpeedCurveRange": "{\"min\":50,\"max\":25000}",
+      "startupFnRetransitionSpeedCurveRange": "{\"min\":1266,\"max\":5171}",
       "startupFnRetransitionStartTimeCurveEnabled": true,
       "startupFnRetransitionStartTimeCurveVisibleOnly": true,
       "startupFnRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "startupFnRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
+      "startupFnRetransitionStartTimeRange": "{\"min\":0,\"max\":251}",
       "sphereSeqEnabled": true,
       "sphereStartZOffset": -15.5,
       "sphereStartRadius": 0.1,
@@ -222210,7 +222210,7 @@
     },
     {
       "key": "Starting State",
-      "collapsed": false,
+      "collapsed": true,
       "locked": false,
       "items": [
         {
@@ -223238,7 +223238,7 @@
           "type": "group",
           "group": {
             "key": "Field Grid Sphere Sequence",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -223265,7 +223265,7 @@
                 "type": "group",
                 "group": {
                   "key": "Sphere > Animation Speed Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -223293,7 +223293,7 @@
                 "type": "group",
                 "group": {
                   "key": "Sphere > Easing",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -223311,7 +223311,7 @@
                 "type": "group",
                 "group": {
                   "key": "Sphere > Start Time Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -223339,7 +223339,7 @@
                 "type": "group",
                 "group": {
                   "key": "Sphere > Start Distance Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -223390,7 +223390,7 @@
                 "type": "group",
                 "group": {
                   "key": "Sphere > Sphere Z Offset Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -223420,7 +223420,7 @@
             "subgroups": [
               {
                 "key": "Sphere > Animation Speed Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -223445,7 +223445,7 @@
               },
               {
                 "key": "Sphere > Easing",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -223460,7 +223460,7 @@
               },
               {
                 "key": "Sphere > Start Time Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -223485,7 +223485,7 @@
               },
               {
                 "key": "Sphere > Start Distance Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -223530,7 +223530,7 @@
               },
               {
                 "key": "Sphere > Sphere Z Offset Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -224572,7 +224572,7 @@
         },
         {
           "key": "Field Grid Sphere Sequence",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -224599,7 +224599,7 @@
               "type": "group",
               "group": {
                 "key": "Sphere > Animation Speed Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -224627,7 +224627,7 @@
               "type": "group",
               "group": {
                 "key": "Sphere > Easing",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -224645,7 +224645,7 @@
               "type": "group",
               "group": {
                 "key": "Sphere > Start Time Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -224673,7 +224673,7 @@
               "type": "group",
               "group": {
                 "key": "Sphere > Start Distance Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -224724,7 +224724,7 @@
               "type": "group",
               "group": {
                 "key": "Sphere > Sphere Z Offset Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -224754,7 +224754,7 @@
           "subgroups": [
             {
               "key": "Sphere > Animation Speed Curve",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -224779,7 +224779,7 @@
             },
             {
               "key": "Sphere > Easing",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -224794,7 +224794,7 @@
             },
             {
               "key": "Sphere > Start Time Curve",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -224819,7 +224819,7 @@
             },
             {
               "key": "Sphere > Start Distance Curve",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -224864,7 +224864,7 @@
             },
             {
               "key": "Sphere > Sphere Z Offset Curve",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
