@@ -17458,6 +17458,13 @@ Direct request: use the HANDO two-hand tween export (format hando-two-hand-tween
   13 were running, with 0 running spheres restarted; hands 13 -> 25 triggered, 0 already-triggered hands restarted; with the click-consume window passed, a custom click function claimed 5 free hands and 0 of the 14 locked
   hands. Two read-only fields (handStartupLocked, triggerClickPose) were added to window.__debug for this.
 
+2026-10-13  -  Starting State: "Run Starting State" test button
+  Direct request. A button in the Starting State group (runStartingStateBtn, right under Static Pose On Startup) calls restartStartingState(), which re-arms the whole Starting State as if the page had just loaded: resetAllHands()
+  (every hand back at its grid position and default pose, all per-hand runtime flags dropped), the click-consume window and the Static Pose release cleared, onHandOffsetOnStartupToggled() (stage 0, floor back, per-hand
+  startup flags cleared, the Hand Offset displacement re-applied) and onSphereSeqToggled() (sphere stage back to 0 or 2 when the sequence is off, spheres hidden, hands shown). Nothing is saved or changed in the settings.
+  Verified in the page by running the full flow (3 clicks: spheres, hands, offset; floor hidden once all 255 hands were done), pressing the real button (sphere stage 0, floor visible, 0 hands triggered, the 20-unit offset
+  back on the hands) and running it again (the next click started the spheres).
+
 2026-10-12  -  (Sphere Sequence: clicks do not register while spheres are running)
 
 Direct request: while sphere sequences are running a click will not register. advanceSphereSequence() now returns without doing anything (the click is still consumed, so no real click function fires either) while anySphereRunning() - any started sphere whose sequence has not reached its end, including ones still waiting for their start time. Only once every sphere sequence has finished does the next click advance to the hands / Hand Offset On Startup. Note this makes Wait For All Spheres (on-screen spheres only) redundant: the running check already covers every sphere, on screen or not. Also exposed updateSphereSequence and sphereState on window.__debug for testing. main.js ?v=387 -> ?v=388.

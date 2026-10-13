@@ -2897,6 +2897,8 @@ const DEV_GROUPS = [
     controls: [
       { key: 'staticPoseOnStartup', label: 'Static Pose On Startup', type: 'checkbox', def: false, onChange: (v) => { if (v) startupStaticReleased = false } },
       // On (default): the Floor is hidden (and stops cropping the hands) once EVERY hand has reached the end of its own Hand Offset On Startup sequence. Direct request 2026-10-13.
+      // Test button (direct request 2026-10-13): runs the whole Starting State again without a page refresh.
+      { key: 'runStartingStateBtn', label: 'Run Starting State', type: 'button', placeAfter: 'staticPoseOnStartup', onClick: () => restartStartingState() },
       { key: 'hideFloorAfterHandOffset', label: 'Hide Floor After Hand Offset Sequence', type: 'checkbox', def: true, placeAfter: 'staticPoseOnStartup', onChange: () => { if (!cfg.hideFloorAfterHandOffset) { startupFloorHidden = false; updateFloor() } else checkStartupFloorHide() } }
     ]
   },
@@ -3712,6 +3714,17 @@ function checkStartupFloorHide() {
   for (let i = 0; i < hands.length; i++) if (!hands[i]._startupSeqDone) return
   startupFloorHidden = true
   updateFloor()
+}
+// Re-arms the whole Starting State as if the page had just loaded (direct request 2026-10-13, for test runs): every hand back to its grid position and default pose, the startup flags cleared, the floor back, the
+// Field Grid Sphere Sequence waiting for its first click (or done, when off), the Hand Offset On Startup displacement re-applied, cursor tracking held again for Static Pose / Hand Offset / Sphere Sequence.
+function restartStartingState() {
+  resetAllHands()
+  startupConsumeActive = false; startupConsumeUntil = 0
+  startupStaticReleased = false
+  onHandOffsetOnStartupToggled() // stage 0, startupFloorHidden off, per-hand startup flags cleared, offset displacement re-applied
+  onSphereSeqToggled() // sphereStage back to 0 (or 2 when the sequence is off), spheres hidden, hands shown, offset re-applied
+  updateFloor()
+  sceneNeedsRedraw = true
 }
 function onHandOffsetOnStartupToggled() {
   startupHandOffsetStage = 0; startupConsumeActive = false; startupConsumeUntil = 0
