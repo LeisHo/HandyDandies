@@ -7730,7 +7730,7 @@
       "startupFnSpeedCurveEnabled": true,
       "startupFnSpeedCurveVisibleOnly": true,
       "startupFnSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "startupFnSpeedCurveRange": "{\"min\":1063,\"max\":2000}",
+      "startupFnSpeedCurveRange": "{\"min\":1063,\"max\":1716}",
       "startupFnStartTimeCurveEnabled": true,
       "startupFnStartTimeCurveVisibleOnly": true,
       "startupFnStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -7778,8 +7778,8 @@
       "sphereRadiusCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.5908072104944381,\"y\":0.3711805979410807}},{\"x\":0.6479748640416776,\"y\":1,\"h1\":{\"x\":0.14382032678991374,\"y\":-0.038541666666666696},\"h2\":{\"x\":-0.24829763438916708,\"y\":0}},{\"x\":1,\"y\":0.3814582824707031,\"h2\":{\"x\":-0.5125684895152861,\"y\":0.35333328247070317}}]",
       "sphereRadiusRange": "{\"min\":0,\"max\":1.25}",
       "sphereZCurveEnabled": true,
-      "sphereZCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.45532200522949196,\"y\":0.03206227620442714}},{\"x\":0.48536968589158147,\"y\":1,\"h2\":{\"x\":-0.37163348195703616,\"y\":-0.10732269287109375},\"h1\":{\"x\":0.1274864391737438,\"y\":-0.15593744913736973}},{\"x\":1,\"y\":0.06406250000000002,\"h2\":{\"x\":-0.5894956885288738,\"y\":0.21999994913736975}}]",
-      "sphereZRange": "{\"min\":-3,\"max\":50}",
+      "sphereZCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.45532200522949196,\"y\":0.03206227620442714}},{\"x\":0.6028220538280638,\"y\":1,\"h2\":{\"x\":-0.13005225587133062,\"y\":0},\"h1\":{\"x\":0.1274864391737438,\"y\":-0.15593744913736973}},{\"x\":1,\"y\":0.06406250000000002,\"h2\":{\"x\":-0.43229694032532007,\"y\":0.24000015258789065}}]",
+      "sphereZRange": "{\"min\":-3,\"max\":109}",
       "showTrackingPoints": false,
       "showRenderOrderPoints": false,
       "showGridHelper": false,
@@ -18305,7 +18305,7 @@
       "startupFnSpeedCurveEnabled": true,
       "startupFnSpeedCurveVisibleOnly": true,
       "startupFnSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "startupFnSpeedCurveRange": "{\"min\":1063,\"max\":2000}",
+      "startupFnSpeedCurveRange": "{\"min\":1063,\"max\":1716}",
       "startupFnStartTimeCurveEnabled": true,
       "startupFnStartTimeCurveVisibleOnly": true,
       "startupFnStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -18353,8 +18353,8 @@
       "sphereRadiusCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.5908072104944381,\"y\":0.3711805979410807}},{\"x\":0.6479748640416776,\"y\":1,\"h1\":{\"x\":0.14382032678991374,\"y\":-0.038541666666666696},\"h2\":{\"x\":-0.24829763438916708,\"y\":0}},{\"x\":1,\"y\":0.3814582824707031,\"h2\":{\"x\":-0.5125684895152861,\"y\":0.35333328247070317}}]",
       "sphereRadiusRange": "{\"min\":0,\"max\":1.25}",
       "sphereZCurveEnabled": true,
-      "sphereZCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.45532200522949196,\"y\":0.03206227620442714}},{\"x\":0.48536968589158147,\"y\":1,\"h2\":{\"x\":-0.37163348195703616,\"y\":-0.10732269287109375},\"h1\":{\"x\":0.1274864391737438,\"y\":-0.15593744913736973}},{\"x\":1,\"y\":0.06406250000000002,\"h2\":{\"x\":-0.5894956885288738,\"y\":0.21999994913736975}}]",
-      "sphereZRange": "{\"min\":-3,\"max\":50}",
+      "sphereZCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.45532200522949196,\"y\":0.03206227620442714}},{\"x\":0.6028220538280638,\"y\":1,\"h2\":{\"x\":-0.13005225587133062,\"y\":0},\"h1\":{\"x\":0.1274864391737438,\"y\":-0.15593744913736973}},{\"x\":1,\"y\":0.06406250000000002,\"h2\":{\"x\":-0.43229694032532007,\"y\":0.24000015258789065}}]",
+      "sphereZRange": "{\"min\":-3,\"max\":109}",
       "showTrackingPoints": false,
       "showRenderOrderPoints": false,
       "showGridHelper": false,
@@ -28880,7 +28880,7 @@
       "startupFnSpeedCurveEnabled": true,
       "startupFnSpeedCurveVisibleOnly": true,
       "startupFnSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "startupFnSpeedCurveRange": "{\"min\":1063,\"max\":2000}",
+      "startupFnSpeedCurveRange": "{\"min\":1063,\"max\":1716}",
       "startupFnStartTimeCurveEnabled": true,
       "startupFnStartTimeCurveVisibleOnly": true,
       "startupFnStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -28928,8 +28928,8 @@
       "sphereRadiusCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.5908072104944381,\"y\":0.3711805979410807}},{\"x\":0.6479748640416776,\"y\":1,\"h1\":{\"x\":0.14382032678991374,\"y\":-0.038541666666666696},\"h2\":{\"x\":-0.24829763438916708,\"y\":0}},{\"x\":1,\"y\":0.3814582824707031,\"h2\":{\"x\":-0.5125684895152861,\"y\":0.35333328247070317}}]",
       "sphereRadiusRange": "{\"min\":0,\"max\":1.25}",
       "sphereZCurveEnabled": true,
-      "sphereZCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.45532200522949196,\"y\":0.03206227620442714}},{\"x\":0.48536968589158147,\"y\":1,\"h2\":{\"x\":-0.37163348195703616,\"y\":-0.10732269287109375},\"h1\":{\"x\":0.1274864391737438,\"y\":-0.15593744913736973}},{\"x\":1,\"y\":0.06406250000000002,\"h2\":{\"x\":-0.5894956885288738,\"y\":0.21999994913736975}}]",
-      "sphereZRange": "{\"min\":-3,\"max\":50}",
+      "sphereZCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.45532200522949196,\"y\":0.03206227620442714}},{\"x\":0.6028220538280638,\"y\":1,\"h2\":{\"x\":-0.13005225587133062,\"y\":0},\"h1\":{\"x\":0.1274864391737438,\"y\":-0.15593744913736973}},{\"x\":1,\"y\":0.06406250000000002,\"h2\":{\"x\":-0.43229694032532007,\"y\":0.24000015258789065}}]",
+      "sphereZRange": "{\"min\":-3,\"max\":109}",
       "showTrackingPoints": false,
       "showRenderOrderPoints": false,
       "showGridHelper": false,
@@ -236568,7 +236568,7 @@
     },
     {
       "key": "New Group (11)",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -236767,7 +236767,7 @@
           "type": "group",
           "group": {
             "key": "Camera",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -237149,7 +237149,7 @@
         },
         {
           "key": "Camera",
-          "collapsed": false,
+          "collapsed": true,
           "locked": true,
           "items": [
             {
@@ -237331,7 +237331,7 @@
     },
     {
       "key": "Starting State",
-      "collapsed": true,
+      "collapsed": false,
       "locked": false,
       "items": [
         {
@@ -237350,7 +237350,7 @@
           "type": "group",
           "group": {
             "key": "Hand Offset On Startup",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -237855,7 +237855,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Animation Speed Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -238472,7 +238472,7 @@
               },
               {
                 "key": "Startup > Animation Speed Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -238582,7 +238582,7 @@
           "type": "group",
           "group": {
             "key": "Field Grid Sphere Sequence",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -238909,7 +238909,7 @@
       "subgroups": [
         {
           "key": "Hand Offset On Startup",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
@@ -239414,7 +239414,7 @@
               "type": "group",
               "group": {
                 "key": "Startup > Animation Speed Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -240031,7 +240031,7 @@
             },
             {
               "key": "Startup > Animation Speed Curve",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -240138,7 +240138,7 @@
         },
         {
           "key": "Field Grid Sphere Sequence",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
