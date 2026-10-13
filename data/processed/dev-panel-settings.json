@@ -30852,7 +30852,7 @@
     },
     {
       "key": "New Group (9)",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -31631,7 +31631,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -197268,7 +197268,7 @@
     },
     {
       "key": "New Group (11)",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -197286,7 +197286,7 @@
                 "type": "group",
                 "group": {
                   "key": "Toon Shading",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": true,
                   "items": [
                     {
@@ -197372,7 +197372,7 @@
             "subgroups": [
               {
                 "key": "Toon Shading",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": true,
                 "items": [
                   {
@@ -197661,7 +197661,7 @@
               "type": "group",
               "group": {
                 "key": "Toon Shading",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": true,
                 "items": [
                   {
@@ -197747,7 +197747,7 @@
           "subgroups": [
             {
               "key": "Toon Shading",
-              "collapsed": false,
+              "collapsed": true,
               "locked": true,
               "items": [
                 {
