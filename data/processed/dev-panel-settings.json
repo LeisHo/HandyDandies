@@ -10148,8 +10148,8 @@
       "custom32CameraOffsetYCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
       "custom32CameraOffsetYRange": "{\"min\":-3,\"max\":10}",
       "custom32CameraOffsetZEnabled": true,
-      "custom32CameraOffsetZCurve": "[{\"x\":0,\"y\":0.9456249237060547,\"h1\":{\"x\":0.1394263946946298,\"y\":-0.10458323160807292}},{\"x\":0.1324085732591528,\"y\":0.05895830790201828,\"h2\":{\"x\":-0.1324085732591528,\"y\":0.00875015258789058}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.26054050262663,\"y\":0}}]",
-      "custom32CameraOffsetZRange": "{\"min\":-11,\"max\":15}",
+      "custom32CameraOffsetZCurve": "[{\"x\":0,\"y\":0.9456249237060547,\"h1\":{\"x\":0.10960025202476155,\"y\":-0.11124992370605469}},{\"x\":0.15170798377580558,\"y\":0.06104164123535161,\"h2\":{\"x\":-0.19030653709638373,\"y\":0.06000010172526038}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.26054050262663,\"y\":0}}]",
+      "custom32CameraOffsetZRange": "{\"min\":0,\"max\":8}",
       "custom32RotationEnabled": false,
       "custom32RotationX": 0,
       "custom32RotationY": 0,
@@ -10183,7 +10183,7 @@
       "custom32StartTimeRange": "{\"min\":0,\"max\":3000}",
       "custom32StartDistanceCurveEnabled": true,
       "custom32StartDistanceMin": 0,
-      "custom32StartDistanceMax": 38,
+      "custom32StartDistanceMax": 200,
       "custom32StartDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
       "custom32PauseDurationMs": 0,
       "custom32RetransitionEnabled": true,
@@ -10191,11 +10191,11 @@
       "custom32RetransitionSpeedCurveEnabled": true,
       "custom32RetransitionSpeedCurveVisibleOnly": true,
       "custom32RetransitionSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.25712690991669,\"y\":0}},{\"x\":1,\"y\":1}]",
-      "custom32RetransitionSpeedCurveRange": "{\"min\":22567,\"max\":30000}",
+      "custom32RetransitionSpeedCurveRange": "{\"min\":25000,\"max\":35000}",
       "custom32RetransitionStartTimeCurveEnabled": true,
       "custom32RetransitionStartTimeCurveVisibleOnly": true,
       "custom32RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.29655558667040044,\"y\":0}},{\"x\":1,\"y\":1}]",
-      "custom32RetransitionStartTimeRange": "{\"min\":1680,\"max\":3000}",
+      "custom32RetransitionStartTimeRange": "{\"min\":2570,\"max\":5000}",
       "custom32MultiTriggerEnabled": false,
       "custom32MultiTriggers": "[]"
     },
@@ -20347,8 +20347,8 @@
       "custom32CameraOffsetYCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
       "custom32CameraOffsetYRange": "{\"min\":-3,\"max\":10}",
       "custom32CameraOffsetZEnabled": true,
-      "custom32CameraOffsetZCurve": "[{\"x\":0,\"y\":0.9456249237060547,\"h1\":{\"x\":0.1394263946946298,\"y\":-0.10458323160807292}},{\"x\":0.1324085732591528,\"y\":0.05895830790201828,\"h2\":{\"x\":-0.1324085732591528,\"y\":0.00875015258789058}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.26054050262663,\"y\":0}}]",
-      "custom32CameraOffsetZRange": "{\"min\":-11,\"max\":15}",
+      "custom32CameraOffsetZCurve": "[{\"x\":0,\"y\":0.9456249237060547,\"h1\":{\"x\":0.10960025202476155,\"y\":-0.11124992370605469}},{\"x\":0.15170798377580558,\"y\":0.06104164123535161,\"h2\":{\"x\":-0.19030653709638373,\"y\":0.06000010172526038}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.26054050262663,\"y\":0}}]",
+      "custom32CameraOffsetZRange": "{\"min\":0,\"max\":8}",
       "custom32RotationEnabled": false,
       "custom32RotationX": 0,
       "custom32RotationY": 0,
@@ -20382,7 +20382,7 @@
       "custom32StartTimeRange": "{\"min\":0,\"max\":3000}",
       "custom32StartDistanceCurveEnabled": true,
       "custom32StartDistanceMin": 0,
-      "custom32StartDistanceMax": 38,
+      "custom32StartDistanceMax": 200,
       "custom32StartDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
       "custom32PauseDurationMs": 0,
       "custom32RetransitionEnabled": true,
@@ -20390,11 +20390,11 @@
       "custom32RetransitionSpeedCurveEnabled": true,
       "custom32RetransitionSpeedCurveVisibleOnly": true,
       "custom32RetransitionSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.25712690991669,\"y\":0}},{\"x\":1,\"y\":1}]",
-      "custom32RetransitionSpeedCurveRange": "{\"min\":22567,\"max\":30000}",
+      "custom32RetransitionSpeedCurveRange": "{\"min\":25000,\"max\":35000}",
       "custom32RetransitionStartTimeCurveEnabled": true,
       "custom32RetransitionStartTimeCurveVisibleOnly": true,
       "custom32RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.29655558667040044,\"y\":0}},{\"x\":1,\"y\":1}]",
-      "custom32RetransitionStartTimeRange": "{\"min\":1680,\"max\":3000}",
+      "custom32RetransitionStartTimeRange": "{\"min\":2570,\"max\":5000}",
       "custom32MultiTriggerEnabled": false,
       "custom32MultiTriggers": "[]"
     },
@@ -30546,8 +30546,8 @@
       "custom32CameraOffsetYCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
       "custom32CameraOffsetYRange": "{\"min\":-3,\"max\":10}",
       "custom32CameraOffsetZEnabled": true,
-      "custom32CameraOffsetZCurve": "[{\"x\":0,\"y\":0.9456249237060547,\"h1\":{\"x\":0.1394263946946298,\"y\":-0.10458323160807292}},{\"x\":0.1324085732591528,\"y\":0.05895830790201828,\"h2\":{\"x\":-0.1324085732591528,\"y\":0.00875015258789058}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.26054050262663,\"y\":0}}]",
-      "custom32CameraOffsetZRange": "{\"min\":-11,\"max\":15}",
+      "custom32CameraOffsetZCurve": "[{\"x\":0,\"y\":0.9456249237060547,\"h1\":{\"x\":0.10960025202476155,\"y\":-0.11124992370605469}},{\"x\":0.15170798377580558,\"y\":0.06104164123535161,\"h2\":{\"x\":-0.19030653709638373,\"y\":0.06000010172526038}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.26054050262663,\"y\":0}}]",
+      "custom32CameraOffsetZRange": "{\"min\":0,\"max\":8}",
       "custom32RotationEnabled": false,
       "custom32RotationX": 0,
       "custom32RotationY": 0,
@@ -30581,7 +30581,7 @@
       "custom32StartTimeRange": "{\"min\":0,\"max\":3000}",
       "custom32StartDistanceCurveEnabled": true,
       "custom32StartDistanceMin": 0,
-      "custom32StartDistanceMax": 38,
+      "custom32StartDistanceMax": 200,
       "custom32StartDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
       "custom32PauseDurationMs": 0,
       "custom32RetransitionEnabled": true,
@@ -30589,11 +30589,11 @@
       "custom32RetransitionSpeedCurveEnabled": true,
       "custom32RetransitionSpeedCurveVisibleOnly": true,
       "custom32RetransitionSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.25712690991669,\"y\":0}},{\"x\":1,\"y\":1}]",
-      "custom32RetransitionSpeedCurveRange": "{\"min\":22567,\"max\":30000}",
+      "custom32RetransitionSpeedCurveRange": "{\"min\":25000,\"max\":35000}",
       "custom32RetransitionStartTimeCurveEnabled": true,
       "custom32RetransitionStartTimeCurveVisibleOnly": true,
       "custom32RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.29655558667040044,\"y\":0}},{\"x\":1,\"y\":1}]",
-      "custom32RetransitionStartTimeRange": "{\"min\":1680,\"max\":3000}",
+      "custom32RetransitionStartTimeRange": "{\"min\":2570,\"max\":5000}",
       "custom32MultiTriggerEnabled": false,
       "custom32MultiTriggers": "[]"
     }
@@ -36129,7 +36129,7 @@
                 "type": "group",
                 "group": {
                   "key": "Start Time Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -36167,7 +36167,7 @@
                 "type": "group",
                 "group": {
                   "key": "Start Distance Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -36206,7 +36206,7 @@
                       "type": "group",
                       "group": {
                         "key": "Retransition Speed Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -36283,7 +36283,7 @@
                   "subgroups": [
                     {
                       "key": "Retransition Speed Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -36611,7 +36611,7 @@
               },
               {
                 "key": "Start Time Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -36646,7 +36646,7 @@
               },
               {
                 "key": "Start Distance Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -36682,7 +36682,7 @@
                     "type": "group",
                     "group": {
                       "key": "Retransition Speed Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -36759,7 +36759,7 @@
                 "subgroups": [
                   {
                     "key": "Retransition Speed Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -118445,7 +118445,7 @@
               "type": "group",
               "group": {
                 "key": "Start Time Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -118483,7 +118483,7 @@
               "type": "group",
               "group": {
                 "key": "Start Distance Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -118522,7 +118522,7 @@
                     "type": "group",
                     "group": {
                       "key": "Retransition Speed Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -118599,7 +118599,7 @@
                 "subgroups": [
                   {
                     "key": "Retransition Speed Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -118927,7 +118927,7 @@
             },
             {
               "key": "Start Time Curve",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -118962,7 +118962,7 @@
             },
             {
               "key": "Start Distance Curve",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -118998,7 +118998,7 @@
                   "type": "group",
                   "group": {
                     "key": "Retransition Speed Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -119075,7 +119075,7 @@
               "subgroups": [
                 {
                   "key": "Retransition Speed Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
