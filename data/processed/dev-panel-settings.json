@@ -10132,11 +10132,11 @@
       "custom32CursorOffsetDistanceCurveEnabled": true,
       "custom32CursorOffsetVisibleOnly": true,
       "custom32CursorOffsetDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
-      "custom32CursorOffsetDistanceCurveRange": "{\"min\":0,\"max\":1}",
+      "custom32CursorOffsetDistanceCurveRange": "{\"min\":0,\"max\":25}",
       "custom32CursorOffsetXCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
-      "custom32CursorOffsetXRange": "{\"min\":0,\"max\":4}",
+      "custom32CursorOffsetXRange": "{\"min\":0,\"max\":8}",
       "custom32CursorOffsetYCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
-      "custom32CursorOffsetYRange": "{\"min\":0,\"max\":4}",
+      "custom32CursorOffsetYRange": "{\"min\":0,\"max\":8}",
       "custom32CursorOffsetZCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom32CursorOffsetZRange": "{\"min\":0,\"max\":0}",
       "custom32CameraOffsetEnabled": true,
@@ -10148,8 +10148,8 @@
       "custom32CameraOffsetYCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
       "custom32CameraOffsetYRange": "{\"min\":-3,\"max\":10}",
       "custom32CameraOffsetZEnabled": true,
-      "custom32CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.25697691158432456,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-1,\"y\":0.007708295186360625}}]",
-      "custom32CameraOffsetZRange": "{\"min\":-5,\"max\":14}",
+      "custom32CameraOffsetZCurve": "[{\"x\":0,\"y\":0.9456249237060547,\"h1\":{\"x\":0.1394263946946298,\"y\":-0.10458323160807292}},{\"x\":0.1324085732591528,\"y\":0.05895830790201828,\"h2\":{\"x\":-0.1324085732591528,\"y\":0.00875015258789058}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.26054050262663,\"y\":0}}]",
+      "custom32CameraOffsetZRange": "{\"min\":-11,\"max\":15}",
       "custom32RotationEnabled": false,
       "custom32RotationX": 0,
       "custom32RotationY": 0,
@@ -10176,14 +10176,14 @@
       "custom32SpeedCurveEnabled": true,
       "custom32SpeedCurveVisibleOnly": true,
       "custom32SpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3938263035652174,\"y\":0}},{\"x\":1,\"y\":1}]",
-      "custom32SpeedCurveRange": "{\"min\":729,\"max\":1270}",
+      "custom32SpeedCurveRange": "{\"min\":1226,\"max\":1792}",
       "custom32StartTimeCurveEnabled": true,
       "custom32StartTimeCurveVisibleOnly": true,
-      "custom32StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom32StartTimeRange": "{\"min\":0,\"max\":1720}",
+      "custom32StartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.2253961796992234,\"y\":1}},{\"x\":1,\"y\":1}]",
+      "custom32StartTimeRange": "{\"min\":0,\"max\":3000}",
       "custom32StartDistanceCurveEnabled": true,
       "custom32StartDistanceMin": 0,
-      "custom32StartDistanceMax": 100,
+      "custom32StartDistanceMax": 38,
       "custom32StartDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
       "custom32PauseDurationMs": 0,
       "custom32RetransitionEnabled": true,
@@ -20331,11 +20331,11 @@
       "custom32CursorOffsetDistanceCurveEnabled": true,
       "custom32CursorOffsetVisibleOnly": true,
       "custom32CursorOffsetDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
-      "custom32CursorOffsetDistanceCurveRange": "{\"min\":0,\"max\":1}",
+      "custom32CursorOffsetDistanceCurveRange": "{\"min\":0,\"max\":25}",
       "custom32CursorOffsetXCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
-      "custom32CursorOffsetXRange": "{\"min\":0,\"max\":4}",
+      "custom32CursorOffsetXRange": "{\"min\":0,\"max\":8}",
       "custom32CursorOffsetYCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
-      "custom32CursorOffsetYRange": "{\"min\":0,\"max\":4}",
+      "custom32CursorOffsetYRange": "{\"min\":0,\"max\":8}",
       "custom32CursorOffsetZCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom32CursorOffsetZRange": "{\"min\":0,\"max\":0}",
       "custom32CameraOffsetEnabled": true,
@@ -20347,8 +20347,8 @@
       "custom32CameraOffsetYCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
       "custom32CameraOffsetYRange": "{\"min\":-3,\"max\":10}",
       "custom32CameraOffsetZEnabled": true,
-      "custom32CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.25697691158432456,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-1,\"y\":0.007708295186360625}}]",
-      "custom32CameraOffsetZRange": "{\"min\":-5,\"max\":14}",
+      "custom32CameraOffsetZCurve": "[{\"x\":0,\"y\":0.9456249237060547,\"h1\":{\"x\":0.1394263946946298,\"y\":-0.10458323160807292}},{\"x\":0.1324085732591528,\"y\":0.05895830790201828,\"h2\":{\"x\":-0.1324085732591528,\"y\":0.00875015258789058}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.26054050262663,\"y\":0}}]",
+      "custom32CameraOffsetZRange": "{\"min\":-11,\"max\":15}",
       "custom32RotationEnabled": false,
       "custom32RotationX": 0,
       "custom32RotationY": 0,
@@ -20375,14 +20375,14 @@
       "custom32SpeedCurveEnabled": true,
       "custom32SpeedCurveVisibleOnly": true,
       "custom32SpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3938263035652174,\"y\":0}},{\"x\":1,\"y\":1}]",
-      "custom32SpeedCurveRange": "{\"min\":729,\"max\":1270}",
+      "custom32SpeedCurveRange": "{\"min\":1226,\"max\":1792}",
       "custom32StartTimeCurveEnabled": true,
       "custom32StartTimeCurveVisibleOnly": true,
-      "custom32StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom32StartTimeRange": "{\"min\":0,\"max\":1720}",
+      "custom32StartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.2253961796992234,\"y\":1}},{\"x\":1,\"y\":1}]",
+      "custom32StartTimeRange": "{\"min\":0,\"max\":3000}",
       "custom32StartDistanceCurveEnabled": true,
       "custom32StartDistanceMin": 0,
-      "custom32StartDistanceMax": 100,
+      "custom32StartDistanceMax": 38,
       "custom32StartDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
       "custom32PauseDurationMs": 0,
       "custom32RetransitionEnabled": true,
@@ -30530,11 +30530,11 @@
       "custom32CursorOffsetDistanceCurveEnabled": true,
       "custom32CursorOffsetVisibleOnly": true,
       "custom32CursorOffsetDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
-      "custom32CursorOffsetDistanceCurveRange": "{\"min\":0,\"max\":1}",
+      "custom32CursorOffsetDistanceCurveRange": "{\"min\":0,\"max\":25}",
       "custom32CursorOffsetXCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
-      "custom32CursorOffsetXRange": "{\"min\":0,\"max\":4}",
+      "custom32CursorOffsetXRange": "{\"min\":0,\"max\":8}",
       "custom32CursorOffsetYCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
-      "custom32CursorOffsetYRange": "{\"min\":0,\"max\":4}",
+      "custom32CursorOffsetYRange": "{\"min\":0,\"max\":8}",
       "custom32CursorOffsetZCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom32CursorOffsetZRange": "{\"min\":0,\"max\":0}",
       "custom32CameraOffsetEnabled": true,
@@ -30546,8 +30546,8 @@
       "custom32CameraOffsetYCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
       "custom32CameraOffsetYRange": "{\"min\":-3,\"max\":10}",
       "custom32CameraOffsetZEnabled": true,
-      "custom32CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.25697691158432456,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-1,\"y\":0.007708295186360625}}]",
-      "custom32CameraOffsetZRange": "{\"min\":-5,\"max\":14}",
+      "custom32CameraOffsetZCurve": "[{\"x\":0,\"y\":0.9456249237060547,\"h1\":{\"x\":0.1394263946946298,\"y\":-0.10458323160807292}},{\"x\":0.1324085732591528,\"y\":0.05895830790201828,\"h2\":{\"x\":-0.1324085732591528,\"y\":0.00875015258789058}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.26054050262663,\"y\":0}}]",
+      "custom32CameraOffsetZRange": "{\"min\":-11,\"max\":15}",
       "custom32RotationEnabled": false,
       "custom32RotationX": 0,
       "custom32RotationY": 0,
@@ -30574,14 +30574,14 @@
       "custom32SpeedCurveEnabled": true,
       "custom32SpeedCurveVisibleOnly": true,
       "custom32SpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3938263035652174,\"y\":0}},{\"x\":1,\"y\":1}]",
-      "custom32SpeedCurveRange": "{\"min\":729,\"max\":1270}",
+      "custom32SpeedCurveRange": "{\"min\":1226,\"max\":1792}",
       "custom32StartTimeCurveEnabled": true,
       "custom32StartTimeCurveVisibleOnly": true,
-      "custom32StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom32StartTimeRange": "{\"min\":0,\"max\":1720}",
+      "custom32StartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.2253961796992234,\"y\":1}},{\"x\":1,\"y\":1}]",
+      "custom32StartTimeRange": "{\"min\":0,\"max\":3000}",
       "custom32StartDistanceCurveEnabled": true,
       "custom32StartDistanceMin": 0,
-      "custom32StartDistanceMax": 100,
+      "custom32StartDistanceMax": 38,
       "custom32StartDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
       "custom32PauseDurationMs": 0,
       "custom32RetransitionEnabled": true,
@@ -35904,7 +35904,7 @@
                 "type": "group",
                 "group": {
                   "key": "Offset",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -36129,7 +36129,7 @@
                 "type": "group",
                 "group": {
                   "key": "Start Time Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -36401,7 +36401,7 @@
             "subgroups": [
               {
                 "key": "Offset",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -36611,7 +36611,7 @@
               },
               {
                 "key": "Start Time Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -118220,7 +118220,7 @@
               "type": "group",
               "group": {
                 "key": "Offset",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -118445,7 +118445,7 @@
               "type": "group",
               "group": {
                 "key": "Start Time Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -118717,7 +118717,7 @@
           "subgroups": [
             {
               "key": "Offset",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -118927,7 +118927,7 @@
             },
             {
               "key": "Start Time Curve",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
