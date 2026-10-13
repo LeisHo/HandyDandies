@@ -7662,7 +7662,7 @@
       "bgColor": "#ff8000",
       "floorEnabled": true,
       "floorColor": "#ffffff",
-      "floorZOffset": -119.5,
+      "floorZOffset": -176,
       "floorXYScale": 1,
       "pixelRatio": 1.25,
       "resolutionScale": 100,
@@ -17780,7 +17780,7 @@
       "bgColor": "#ff8000",
       "floorEnabled": true,
       "floorColor": "#ffffff",
-      "floorZOffset": -119.5,
+      "floorZOffset": -176,
       "floorXYScale": 1,
       "pixelRatio": 1.25,
       "resolutionScale": 100,
@@ -27898,7 +27898,7 @@
       "bgColor": "#ff8000",
       "floorEnabled": true,
       "floorColor": "#ffffff",
-      "floorZOffset": -119.5,
+      "floorZOffset": -176,
       "floorXYScale": 1,
       "pixelRatio": 1.25,
       "resolutionScale": 100,
@@ -198148,7 +198148,7 @@
     },
     {
       "key": "New Group (11)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -198511,7 +198511,7 @@
           "type": "group",
           "group": {
             "key": "Floor",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -198884,7 +198884,7 @@
         },
         {
           "key": "Floor",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
