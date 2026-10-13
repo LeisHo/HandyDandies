@@ -12,8 +12,8 @@
       "pauseBtnIconColor": "#ffffff",
       "pauseBtnBorderColor": "#ffffff",
       "pausedRenderFps": 15,
-      "renderOrderMode": "palmToArmEnd",
-      "renderOrderModeExcept": "negArmBaseToPalm",
+      "renderOrderMode": "palmToArm",
+      "renderOrderModeExcept": "none",
       "renderOrderFallback": "palmToArm",
       "renderOrderFallbackExcept": "armEnd",
       "renderOrderFallback2": "none",
@@ -21,7 +21,7 @@
       "renderOrderModeTerms": "[]",
       "renderOrderFallbackTerms": "[]",
       "renderOrderFallback2Terms": "[]",
-      "renderOrderExtraFallbacks": "{\"v\":2,\"items\":[{\"m\":\"negPalmToArm\",\"q\":\"none\",\"t\":[]}]}",
+      "renderOrderExtraFallbacks": "{\"v\":2,\"items\":[{\"m\":\"armEnd\",\"q\":\"none\",\"t\":[]},{\"m\":\"armBase\",\"q\":\"none\",\"t\":[]},{\"m\":\"palmCenter\",\"q\":\"none\",\"t\":[]}]}",
       "renderOrderFlipLock": true,
       "fieldRows": 43,
       "fieldCols": 60,
@@ -10139,7 +10139,7 @@
       "renderOrderModeTerms": "[]",
       "renderOrderFallbackTerms": "[]",
       "renderOrderFallback2Terms": "[]",
-      "renderOrderExtraFallbacks": "{\"v\":2,\"items\":[{\"m\":\"negPalmToArm\",\"q\":\"none\",\"t\":[]}]}",
+      "renderOrderExtraFallbacks": "{\"v\":2,\"items\":[{\"m\":\"armEnd\",\"q\":\"none\",\"t\":[]},{\"m\":\"armBase\",\"q\":\"none\",\"t\":[]},{\"m\":\"palmCenter\",\"q\":\"none\",\"t\":[]}]}",
       "renderOrderFlipLock": true,
       "fieldRows": 45,
       "fieldCols": 21,
@@ -20248,8 +20248,8 @@
       "pauseBtnIconColor": "#ffffff",
       "pauseBtnBorderColor": "#ffffff",
       "pausedRenderFps": 15,
-      "renderOrderMode": "palmToArmEnd",
-      "renderOrderModeExcept": "negArmBaseToPalm",
+      "renderOrderMode": "palmToArm",
+      "renderOrderModeExcept": "none",
       "renderOrderFallback": "palmToArm",
       "renderOrderFallbackExcept": "armEnd",
       "renderOrderFallback2": "none",
@@ -20257,7 +20257,7 @@
       "renderOrderModeTerms": "[]",
       "renderOrderFallbackTerms": "[]",
       "renderOrderFallback2Terms": "[]",
-      "renderOrderExtraFallbacks": "{\"v\":2,\"items\":[{\"m\":\"negPalmToArm\",\"q\":\"none\",\"t\":[]}]}",
+      "renderOrderExtraFallbacks": "{\"v\":2,\"items\":[{\"m\":\"armEnd\",\"q\":\"none\",\"t\":[]},{\"m\":\"armBase\",\"q\":\"none\",\"t\":[]},{\"m\":\"palmCenter\",\"q\":\"none\",\"t\":[]}]}",
       "renderOrderFlipLock": true,
       "fieldRows": 15,
       "fieldCols": 3,
@@ -32606,7 +32606,7 @@
           "type": "group",
           "group": {
             "key": "Render Order",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -34108,7 +34108,7 @@
         },
         {
           "key": "Render Order",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
