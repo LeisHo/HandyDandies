@@ -1401,7 +1401,7 @@ function buildToonGradientWidget() {
       const h = elLocal('div', { position: 'absolute', top: '0', left: (st.p * 100) + '%', width: '14px', height: '20px', marginLeft: '-7px', background: st.c, border: '2px solid #fff', borderRadius: '3px', boxSizing: 'border-box', cursor: 'pointer', touchAction: 'none', boxShadow: '0 0 0 1px rgba(0,0,0,0.6)' })
       h.addEventListener('pointerdown', (e) => {
         e.preventDefault(); e.stopPropagation()
-        h.setPointerCapture(e.pointerId)
+        try { h.setPointerCapture(e.pointerId) } catch (err) { /* synthetic / inactive pointer: the listeners below still work */ }
         const x0 = e.clientX; let moved = false
         const mv = (ev) => { if (Math.abs(ev.clientX - x0) > 3) moved = true; if (moved) { st.p = frac(ev.clientX); h.style.left = (st.p * 100) + '%'; paintBar() } }
         const up = () => {
@@ -1422,7 +1422,11 @@ function buildToonGradientWidget() {
       track.appendChild(h)
     })
   }
-  bar.addEventListener('pointerdown', (e) => { e.preventDefault(); e.stopPropagation(); const p = frac(e.clientX); stops.push({ p, c: toonGradientHexAt(stops.slice().sort((a, b) => a.p - b.p), p) }); redraw(); commit() })
+  bar.addEventListener('pointerdown', (e) => {
+    e.preventDefault(); e.stopPropagation()
+    if (input.value !== lastSeen) { lastSeen = input.value; stops = parseToonGradient(input.value).map((x) => ({ ...x })) } // never edit a stale copy (Reset / Undo / Load may have changed the value since the last poll)
+    const p = frac(e.clientX); stops.push({ p, c: toonGradientHexAt(stops.slice().sort((a, b) => a.p - b.p), p) }); redraw(); commit()
+  })
   picker.addEventListener('input', () => { if (!editing) return; editing.c = picker.value.toLowerCase(); redraw(); commit() })
   redraw()
   armLengthWidgetResyncs.push(() => { if (input.value === lastSeen) return; lastSeen = input.value; stops = parseToonGradient(input.value).map((x) => ({ ...x })); redraw() })
