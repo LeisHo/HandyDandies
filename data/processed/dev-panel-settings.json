@@ -8585,7 +8585,7 @@
       "custom22Enabled": false,
       "custom22Type": "Click",
       "custom22TouchPointCount": 1,
-      "custom22ClickCount": "2nd",
+      "custom22ClickCount": "4th",
       "custom22Mode": "Sequence",
       "custom22OffsetEnabled": true,
       "custom22OffsetMode": "Hand Axes Offset",
@@ -18784,7 +18784,7 @@
       "custom22Enabled": false,
       "custom22Type": "Click",
       "custom22TouchPointCount": 1,
-      "custom22ClickCount": "2nd",
+      "custom22ClickCount": "4th",
       "custom22Mode": "Sequence",
       "custom22OffsetEnabled": true,
       "custom22OffsetMode": "Hand Axes Offset",
@@ -28983,7 +28983,7 @@
       "custom22Enabled": false,
       "custom22Type": "Click",
       "custom22TouchPointCount": 1,
-      "custom22ClickCount": "2nd",
+      "custom22ClickCount": "4th",
       "custom22Mode": "Sequence",
       "custom22OffsetEnabled": true,
       "custom22OffsetMode": "Hand Axes Offset",
@@ -35821,7 +35821,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 32",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -79559,7 +79559,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 22",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -118137,7 +118137,7 @@
       "subgroups": [
         {
           "key": "Custom Click Function 32",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
@@ -161837,7 +161837,7 @@
         },
         {
           "key": "Custom Click Function 22",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
