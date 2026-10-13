@@ -8092,8 +8092,8 @@
       "custom21FirstGlideTimeScale": 2,
       "custom21TweenChain": [],
       "custom21TweenSpeedMs": 1850,
-      "custom21TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom21TweenStartTimeRange": "{\"min\":0,\"max\":999}",
+      "custom21TweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3923405357554021,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-1,\"y\":-0.004166666666666652}}]",
+      "custom21TweenStartTimeRange": "{\"min\":0,\"max\":954}",
       "custom21LoopMode": "Loop",
       "custom21LoopHoldMs": 0,
       "custom21TransitionSpeedMs": 700,
@@ -8103,7 +8103,7 @@
       "custom21RetransitionEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.2821603582750679,\"y\":0.2319791158040364}},{\"x\":0.5000090617275154,\"y\":0.7653124491373697,\"h2\":{\"x\":-0.274628427178499,\"y\":0},\"h1\":{\"x\":0.28158102656376904,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.27982473116064643,\"y\":0.24531224568684895}}]",
       "custom21SpeedCurveEnabled": true,
       "custom21SpeedCurveVisibleOnly": true,
-      "custom21SpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3540610692698091,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.29779759790151816,\"y\":0}}]",
+      "custom21SpeedCurve": "[{\"x\":0,\"y\":0.4848958333333333,\"h1\":{\"x\":0.18893993454020797,\"y\":-0.31999994913736973}},{\"x\":0.5381110700811869,\"y\":0.18489583333333337,\"h1\":{\"x\":0.21696069302365495,\"y\":0.006666564941406161}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.35171360426058296,\"y\":0.02666651407877596}}]",
       "custom21SpeedCurveRange": "{\"min\":1835,\"max\":2000}",
       "custom21StartTimeCurveEnabled": true,
       "custom21StartTimeCurveVisibleOnly": true,
@@ -8534,8 +8534,8 @@
       "custom21Trig5FirstGlideTimeScale": 2,
       "custom21Trig5TweenChain": [],
       "custom21Trig5TweenSpeedMs": 1690,
-      "custom21Trig5TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom21Trig5TweenStartTimeRange": "{\"min\":0,\"max\":200}",
+      "custom21Trig5TweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.4178124926911823,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-1,\"y\":0}}]",
+      "custom21Trig5TweenStartTimeRange": "{\"min\":0,\"max\":1671}",
       "custom21Trig5LoopMode": "Loop",
       "custom21Trig5LoopHoldMs": 0,
       "custom21Trig5TransitionSpeedMs": 700,
@@ -8545,7 +8545,7 @@
       "custom21Trig5RetransitionEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.2830803612999348,\"y\":0.15552088419596355}},{\"x\":0.49643366904506936,\"y\":0.8021873474121094,\"h1\":{\"x\":0.2562622218083621,\"y\":-0.004479217529296919},\"h2\":{\"x\":-0.22884826915913958,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2723344454208958,\"y\":0.17552057902018225}}]",
       "custom21Trig5SpeedCurveEnabled": true,
       "custom21Trig5SpeedCurveVisibleOnly": true,
-      "custom21Trig5SpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.13251392883117016,\"y\":0.9422916412353516}},{\"x\":1,\"y\":1}]",
+      "custom21Trig5SpeedCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.13251392883117016,\"y\":-0.9422916412353516}},{\"x\":0.6210039260525253,\"y\":0.04437510172526038},{\"x\":1,\"y\":0.9772916158040365}]",
       "custom21Trig5SpeedCurveRange": "{\"min\":1820,\"max\":2500}",
       "custom21Trig5StartTimeCurveEnabled": true,
       "custom21Trig5StartTimeCurveVisibleOnly": true,
@@ -18533,8 +18533,8 @@
       "custom21FirstGlideTimeScale": 2,
       "custom21TweenChain": [],
       "custom21TweenSpeedMs": 1850,
-      "custom21TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom21TweenStartTimeRange": "{\"min\":0,\"max\":999}",
+      "custom21TweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3923405357554021,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-1,\"y\":-0.004166666666666652}}]",
+      "custom21TweenStartTimeRange": "{\"min\":0,\"max\":954}",
       "custom21LoopMode": "Loop",
       "custom21LoopHoldMs": 0,
       "custom21TransitionSpeedMs": 700,
@@ -18544,7 +18544,7 @@
       "custom21RetransitionEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.2821603582750679,\"y\":0.2319791158040364}},{\"x\":0.5000090617275154,\"y\":0.7653124491373697,\"h2\":{\"x\":-0.274628427178499,\"y\":0},\"h1\":{\"x\":0.28158102656376904,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.27982473116064643,\"y\":0.24531224568684895}}]",
       "custom21SpeedCurveEnabled": true,
       "custom21SpeedCurveVisibleOnly": true,
-      "custom21SpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3540610692698091,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.29779759790151816,\"y\":0}}]",
+      "custom21SpeedCurve": "[{\"x\":0,\"y\":0.4848958333333333,\"h1\":{\"x\":0.18893993454020797,\"y\":-0.31999994913736973}},{\"x\":0.5381110700811869,\"y\":0.18489583333333337,\"h1\":{\"x\":0.21696069302365495,\"y\":0.006666564941406161}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.35171360426058296,\"y\":0.02666651407877596}}]",
       "custom21SpeedCurveRange": "{\"min\":1835,\"max\":2000}",
       "custom21StartTimeCurveEnabled": true,
       "custom21StartTimeCurveVisibleOnly": true,
@@ -18975,8 +18975,8 @@
       "custom21Trig5FirstGlideTimeScale": 2,
       "custom21Trig5TweenChain": [],
       "custom21Trig5TweenSpeedMs": 1690,
-      "custom21Trig5TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom21Trig5TweenStartTimeRange": "{\"min\":0,\"max\":200}",
+      "custom21Trig5TweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.4178124926911823,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-1,\"y\":0}}]",
+      "custom21Trig5TweenStartTimeRange": "{\"min\":0,\"max\":1671}",
       "custom21Trig5LoopMode": "Loop",
       "custom21Trig5LoopHoldMs": 0,
       "custom21Trig5TransitionSpeedMs": 700,
@@ -18986,7 +18986,7 @@
       "custom21Trig5RetransitionEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.2830803612999348,\"y\":0.15552088419596355}},{\"x\":0.49643366904506936,\"y\":0.8021873474121094,\"h1\":{\"x\":0.2562622218083621,\"y\":-0.004479217529296919},\"h2\":{\"x\":-0.22884826915913958,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2723344454208958,\"y\":0.17552057902018225}}]",
       "custom21Trig5SpeedCurveEnabled": true,
       "custom21Trig5SpeedCurveVisibleOnly": true,
-      "custom21Trig5SpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.13251392883117016,\"y\":0.9422916412353516}},{\"x\":1,\"y\":1}]",
+      "custom21Trig5SpeedCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.13251392883117016,\"y\":-0.9422916412353516}},{\"x\":0.6210039260525253,\"y\":0.04437510172526038},{\"x\":1,\"y\":0.9772916158040365}]",
       "custom21Trig5SpeedCurveRange": "{\"min\":1820,\"max\":2500}",
       "custom21Trig5StartTimeCurveEnabled": true,
       "custom21Trig5StartTimeCurveVisibleOnly": true,
@@ -28974,8 +28974,8 @@
       "custom21FirstGlideTimeScale": 2,
       "custom21TweenChain": [],
       "custom21TweenSpeedMs": 1850,
-      "custom21TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom21TweenStartTimeRange": "{\"min\":0,\"max\":999}",
+      "custom21TweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3923405357554021,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-1,\"y\":-0.004166666666666652}}]",
+      "custom21TweenStartTimeRange": "{\"min\":0,\"max\":954}",
       "custom21LoopMode": "Loop",
       "custom21LoopHoldMs": 0,
       "custom21TransitionSpeedMs": 700,
@@ -28985,7 +28985,7 @@
       "custom21RetransitionEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.2821603582750679,\"y\":0.2319791158040364}},{\"x\":0.5000090617275154,\"y\":0.7653124491373697,\"h2\":{\"x\":-0.274628427178499,\"y\":0},\"h1\":{\"x\":0.28158102656376904,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.27982473116064643,\"y\":0.24531224568684895}}]",
       "custom21SpeedCurveEnabled": true,
       "custom21SpeedCurveVisibleOnly": true,
-      "custom21SpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3540610692698091,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.29779759790151816,\"y\":0}}]",
+      "custom21SpeedCurve": "[{\"x\":0,\"y\":0.4848958333333333,\"h1\":{\"x\":0.18893993454020797,\"y\":-0.31999994913736973}},{\"x\":0.5381110700811869,\"y\":0.18489583333333337,\"h1\":{\"x\":0.21696069302365495,\"y\":0.006666564941406161}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.35171360426058296,\"y\":0.02666651407877596}}]",
       "custom21SpeedCurveRange": "{\"min\":1835,\"max\":2000}",
       "custom21StartTimeCurveEnabled": true,
       "custom21StartTimeCurveVisibleOnly": true,
@@ -29416,8 +29416,8 @@
       "custom21Trig5FirstGlideTimeScale": 2,
       "custom21Trig5TweenChain": [],
       "custom21Trig5TweenSpeedMs": 1690,
-      "custom21Trig5TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom21Trig5TweenStartTimeRange": "{\"min\":0,\"max\":200}",
+      "custom21Trig5TweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.4178124926911823,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-1,\"y\":0}}]",
+      "custom21Trig5TweenStartTimeRange": "{\"min\":0,\"max\":1671}",
       "custom21Trig5LoopMode": "Loop",
       "custom21Trig5LoopHoldMs": 0,
       "custom21Trig5TransitionSpeedMs": 700,
@@ -29427,7 +29427,7 @@
       "custom21Trig5RetransitionEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.2830803612999348,\"y\":0.15552088419596355}},{\"x\":0.49643366904506936,\"y\":0.8021873474121094,\"h1\":{\"x\":0.2562622218083621,\"y\":-0.004479217529296919},\"h2\":{\"x\":-0.22884826915913958,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2723344454208958,\"y\":0.17552057902018225}}]",
       "custom21Trig5SpeedCurveEnabled": true,
       "custom21Trig5SpeedCurveVisibleOnly": true,
-      "custom21Trig5SpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.13251392883117016,\"y\":0.9422916412353516}},{\"x\":1,\"y\":1}]",
+      "custom21Trig5SpeedCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.13251392883117016,\"y\":-0.9422916412353516}},{\"x\":0.6210039260525253,\"y\":0.04437510172526038},{\"x\":1,\"y\":0.9772916158040365}]",
       "custom21Trig5SpeedCurveRange": "{\"min\":1820,\"max\":2500}",
       "custom21Trig5StartTimeCurveEnabled": true,
       "custom21Trig5StartTimeCurveVisibleOnly": true,
@@ -101622,7 +101622,7 @@
                             "type": "group",
                             "group": {
                               "key": "Start Time Curve",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -101891,7 +101891,7 @@
                             "type": "group",
                             "group": {
                               "key": "Tween Stop",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -102255,7 +102255,7 @@
                           },
                           {
                             "key": "Start Time Curve",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -102515,7 +102515,7 @@
                           },
                           {
                             "key": "Tween Stop",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -108208,7 +108208,7 @@
                           "type": "group",
                           "group": {
                             "key": "Start Time Curve",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -108477,7 +108477,7 @@
                           "type": "group",
                           "group": {
                             "key": "Tween Stop",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -108841,7 +108841,7 @@
                         },
                         {
                           "key": "Start Time Curve",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -109101,7 +109101,7 @@
                         },
                         {
                           "key": "Tween Stop",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -115439,7 +115439,7 @@
                           "type": "group",
                           "group": {
                             "key": "Start Time Curve",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -115708,7 +115708,7 @@
                           "type": "group",
                           "group": {
                             "key": "Tween Stop",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -116072,7 +116072,7 @@
                         },
                         {
                           "key": "Start Time Curve",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -116332,7 +116332,7 @@
                         },
                         {
                           "key": "Tween Stop",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -122025,7 +122025,7 @@
                         "type": "group",
                         "group": {
                           "key": "Start Time Curve",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -122294,7 +122294,7 @@
                         "type": "group",
                         "group": {
                           "key": "Tween Stop",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -122658,7 +122658,7 @@
                       },
                       {
                         "key": "Start Time Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -122918,7 +122918,7 @@
                       },
                       {
                         "key": "Tween Stop",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -194064,7 +194064,7 @@
                           "type": "group",
                           "group": {
                             "key": "Start Time Curve",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -194333,7 +194333,7 @@
                           "type": "group",
                           "group": {
                             "key": "Tween Stop",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -194697,7 +194697,7 @@
                         },
                         {
                           "key": "Start Time Curve",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -194957,7 +194957,7 @@
                         },
                         {
                           "key": "Tween Stop",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -200650,7 +200650,7 @@
                         "type": "group",
                         "group": {
                           "key": "Start Time Curve",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -200919,7 +200919,7 @@
                         "type": "group",
                         "group": {
                           "key": "Tween Stop",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -201283,7 +201283,7 @@
                       },
                       {
                         "key": "Start Time Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -201543,7 +201543,7 @@
                       },
                       {
                         "key": "Tween Stop",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -207881,7 +207881,7 @@
                         "type": "group",
                         "group": {
                           "key": "Start Time Curve",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -208150,7 +208150,7 @@
                         "type": "group",
                         "group": {
                           "key": "Tween Stop",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -208514,7 +208514,7 @@
                       },
                       {
                         "key": "Start Time Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -208774,7 +208774,7 @@
                       },
                       {
                         "key": "Tween Stop",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -214467,7 +214467,7 @@
                       "type": "group",
                       "group": {
                         "key": "Start Time Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -214736,7 +214736,7 @@
                       "type": "group",
                       "group": {
                         "key": "Tween Stop",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -215100,7 +215100,7 @@
                     },
                     {
                       "key": "Start Time Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -215360,7 +215360,7 @@
                     },
                     {
                       "key": "Tween Stop",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
