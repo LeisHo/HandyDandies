@@ -54,11 +54,11 @@
       "fieldBoundsZMin": "-800",
       "fieldBoundsZMinCurveEnabled": true,
       "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":1,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.3216775356895817,\"y\":-0.038541666666666696}}]",
-      "fieldBoundsZMinCurveRange": "{\"min\":-500,\"max\":0}",
+      "fieldBoundsZMinCurveRange": "{\"min\":-450,\"max\":0}",
       "fieldBoundsZMax": "240",
       "fieldBoundsZMaxCurveEnabled": true,
-      "fieldBoundsZMaxCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.3786328063377895,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.29398888077240737,\"y\":0.005729166666666674}}]",
-      "fieldBoundsZMaxCurveRange": "{\"min\":150,\"max\":250}",
+      "fieldBoundsZMaxCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.5121900377531334,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.29398888077240737,\"y\":0.005729166666666674}}]",
+      "fieldBoundsZMaxCurveRange": "{\"min\":150,\"max\":230}",
       "fieldBoundsX": "{\"min\":-300,\"max\":300}",
       "fieldBoundsY": "{\"min\":-300,\"max\":300}",
       "fieldBoundsZ": "{\"min\":-400,\"max\":200}",
@@ -8688,7 +8688,7 @@
       "custom21Trig5TweenChain": [],
       "custom21Trig5TweenSpeedMs": 1690,
       "custom21Trig5TweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.4178124926911823,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-1,\"y\":0}}]",
-      "custom21Trig5TweenStartTimeRange": "{\"min\":0,\"max\":1927}",
+      "custom21Trig5TweenStartTimeRange": "{\"min\":0,\"max\":1465}",
       "custom21Trig5LoopMode": "Loop",
       "custom21Trig5LoopHoldMs": 0,
       "custom21Trig5TransitionSpeedMs": 700,
@@ -8699,7 +8699,7 @@
       "custom21Trig5SpeedCurveEnabled": true,
       "custom21Trig5SpeedCurveVisibleOnly": true,
       "custom21Trig5SpeedCurve": "[{\"x\":0,\"y\":0.43729146321614587,\"h1\":{\"x\":0.346455473450293,\"y\":-0.509375}},{\"x\":0.6210039260525253,\"y\":0.04437510172526038},{\"x\":1,\"y\":0.9772916158040365}]",
-      "custom21Trig5SpeedCurveRange": "{\"min\":2016,\"max\":4000}",
+      "custom21Trig5SpeedCurveRange": "{\"min\":2016,\"max\":3026}",
       "custom21Trig5StartTimeCurveEnabled": true,
       "custom21Trig5StartTimeCurveVisibleOnly": true,
       "custom21Trig5StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -10816,11 +10816,11 @@
       "fieldBoundsZMin": "-800",
       "fieldBoundsZMinCurveEnabled": true,
       "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":1,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.3216775356895817,\"y\":-0.038541666666666696}}]",
-      "fieldBoundsZMinCurveRange": "{\"min\":-500,\"max\":0}",
+      "fieldBoundsZMinCurveRange": "{\"min\":-450,\"max\":0}",
       "fieldBoundsZMax": "240",
       "fieldBoundsZMaxCurveEnabled": true,
-      "fieldBoundsZMaxCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.3786328063377895,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.29398888077240737,\"y\":0.005729166666666674}}]",
-      "fieldBoundsZMaxCurveRange": "{\"min\":150,\"max\":250}",
+      "fieldBoundsZMaxCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.5121900377531334,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.29398888077240737,\"y\":0.005729166666666674}}]",
+      "fieldBoundsZMaxCurveRange": "{\"min\":150,\"max\":230}",
       "fieldBoundsX": "{\"min\":-300,\"max\":300}",
       "fieldBoundsY": "{\"min\":-300,\"max\":300}",
       "fieldBoundsZ": "{\"min\":-400,\"max\":200}",
@@ -19450,7 +19450,7 @@
       "custom21Trig5TweenChain": [],
       "custom21Trig5TweenSpeedMs": 1690,
       "custom21Trig5TweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.4178124926911823,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-1,\"y\":0}}]",
-      "custom21Trig5TweenStartTimeRange": "{\"min\":0,\"max\":1927}",
+      "custom21Trig5TweenStartTimeRange": "{\"min\":0,\"max\":1465}",
       "custom21Trig5LoopMode": "Loop",
       "custom21Trig5LoopHoldMs": 0,
       "custom21Trig5TransitionSpeedMs": 700,
@@ -19461,7 +19461,7 @@
       "custom21Trig5SpeedCurveEnabled": true,
       "custom21Trig5SpeedCurveVisibleOnly": true,
       "custom21Trig5SpeedCurve": "[{\"x\":0,\"y\":0.43729146321614587,\"h1\":{\"x\":0.346455473450293,\"y\":-0.509375}},{\"x\":0.6210039260525253,\"y\":0.04437510172526038},{\"x\":1,\"y\":0.9772916158040365}]",
-      "custom21Trig5SpeedCurveRange": "{\"min\":2016,\"max\":4000}",
+      "custom21Trig5SpeedCurveRange": "{\"min\":2016,\"max\":3026}",
       "custom21Trig5StartTimeCurveEnabled": true,
       "custom21Trig5StartTimeCurveVisibleOnly": true,
       "custom21Trig5StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -21578,11 +21578,11 @@
       "fieldBoundsZMin": "-800",
       "fieldBoundsZMinCurveEnabled": true,
       "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":1,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.3216775356895817,\"y\":-0.038541666666666696}}]",
-      "fieldBoundsZMinCurveRange": "{\"min\":-500,\"max\":0}",
+      "fieldBoundsZMinCurveRange": "{\"min\":-450,\"max\":0}",
       "fieldBoundsZMax": "240",
       "fieldBoundsZMaxCurveEnabled": true,
-      "fieldBoundsZMaxCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.3786328063377895,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.29398888077240737,\"y\":0.005729166666666674}}]",
-      "fieldBoundsZMaxCurveRange": "{\"min\":150,\"max\":250}",
+      "fieldBoundsZMaxCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.5121900377531334,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.29398888077240737,\"y\":0.005729166666666674}}]",
+      "fieldBoundsZMaxCurveRange": "{\"min\":150,\"max\":230}",
       "fieldBoundsX": "{\"min\":-300,\"max\":300}",
       "fieldBoundsY": "{\"min\":-300,\"max\":300}",
       "fieldBoundsZ": "{\"min\":-400,\"max\":200}",
@@ -30212,7 +30212,7 @@
       "custom21Trig5TweenChain": [],
       "custom21Trig5TweenSpeedMs": 1690,
       "custom21Trig5TweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.4178124926911823,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-1,\"y\":0}}]",
-      "custom21Trig5TweenStartTimeRange": "{\"min\":0,\"max\":1927}",
+      "custom21Trig5TweenStartTimeRange": "{\"min\":0,\"max\":1465}",
       "custom21Trig5LoopMode": "Loop",
       "custom21Trig5LoopHoldMs": 0,
       "custom21Trig5TransitionSpeedMs": 700,
@@ -30223,7 +30223,7 @@
       "custom21Trig5SpeedCurveEnabled": true,
       "custom21Trig5SpeedCurveVisibleOnly": true,
       "custom21Trig5SpeedCurve": "[{\"x\":0,\"y\":0.43729146321614587,\"h1\":{\"x\":0.346455473450293,\"y\":-0.509375}},{\"x\":0.6210039260525253,\"y\":0.04437510172526038},{\"x\":1,\"y\":0.9772916158040365}]",
-      "custom21Trig5SpeedCurveRange": "{\"min\":2016,\"max\":4000}",
+      "custom21Trig5SpeedCurveRange": "{\"min\":2016,\"max\":3026}",
       "custom21Trig5StartTimeCurveEnabled": true,
       "custom21Trig5StartTimeCurveVisibleOnly": true,
       "custom21Trig5StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -34458,14 +34458,14 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
           "type": "group",
           "group": {
             "key": "Field Layout",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -34655,7 +34655,7 @@
                 "type": "group",
                 "group": {
                   "key": "Hand Position Min Z Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -34682,7 +34682,7 @@
                 "type": "group",
                 "group": {
                   "key": "Hand Position Max Z Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -34816,7 +34816,7 @@
               },
               {
                 "key": "Hand Position Min Z Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -34836,7 +34836,7 @@
               },
               {
                 "key": "Hand Position Max Z Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -36278,7 +36278,7 @@
       "subgroups": [
         {
           "key": "Field Layout",
-          "collapsed": true,
+          "collapsed": false,
           "locked": true,
           "items": [
             {
@@ -36468,7 +36468,7 @@
               "type": "group",
               "group": {
                 "key": "Hand Position Min Z Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -36495,7 +36495,7 @@
               "type": "group",
               "group": {
                 "key": "Hand Position Max Z Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -36629,7 +36629,7 @@
             },
             {
               "key": "Hand Position Min Z Curve",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -36649,7 +36649,7 @@
             },
             {
               "key": "Hand Position Max Z Curve",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
