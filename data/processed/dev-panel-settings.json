@@ -27,7 +27,7 @@
       "fieldCols": 60,
       "rowSpacing": 5,
       "columnSpacing": 8,
-      "handScale": 0.8,
+      "handScale": 0.7,
       "alternateRowOffset": 3.5,
       "progressiveRowOffset": 1,
       "useProgressiveOffset": false,
@@ -8104,7 +8104,7 @@
       "custom21SpeedCurveEnabled": true,
       "custom21SpeedCurveVisibleOnly": true,
       "custom21SpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3540610692698091,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.29779759790151816,\"y\":0}}]",
-      "custom21SpeedCurveRange": "{\"min\":1545,\"max\":1871}",
+      "custom21SpeedCurveRange": "{\"min\":1835,\"max\":2000}",
       "custom21StartTimeCurveEnabled": true,
       "custom21StartTimeCurveVisibleOnly": true,
       "custom21StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -8546,7 +8546,7 @@
       "custom21Trig5SpeedCurveEnabled": true,
       "custom21Trig5SpeedCurveVisibleOnly": true,
       "custom21Trig5SpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.13251392883117016,\"y\":0.9422916412353516}},{\"x\":1,\"y\":1}]",
-      "custom21Trig5SpeedCurveRange": "{\"min\":1676,\"max\":2000}",
+      "custom21Trig5SpeedCurveRange": "{\"min\":1820,\"max\":2500}",
       "custom21Trig5StartTimeCurveEnabled": true,
       "custom21Trig5StartTimeCurveVisibleOnly": true,
       "custom21Trig5StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -18545,7 +18545,7 @@
       "custom21SpeedCurveEnabled": true,
       "custom21SpeedCurveVisibleOnly": true,
       "custom21SpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3540610692698091,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.29779759790151816,\"y\":0}}]",
-      "custom21SpeedCurveRange": "{\"min\":1545,\"max\":1871}",
+      "custom21SpeedCurveRange": "{\"min\":1835,\"max\":2000}",
       "custom21StartTimeCurveEnabled": true,
       "custom21StartTimeCurveVisibleOnly": true,
       "custom21StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -18987,7 +18987,7 @@
       "custom21Trig5SpeedCurveEnabled": true,
       "custom21Trig5SpeedCurveVisibleOnly": true,
       "custom21Trig5SpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.13251392883117016,\"y\":0.9422916412353516}},{\"x\":1,\"y\":1}]",
-      "custom21Trig5SpeedCurveRange": "{\"min\":1676,\"max\":2000}",
+      "custom21Trig5SpeedCurveRange": "{\"min\":1820,\"max\":2500}",
       "custom21Trig5StartTimeCurveEnabled": true,
       "custom21Trig5StartTimeCurveVisibleOnly": true,
       "custom21Trig5StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -28986,7 +28986,7 @@
       "custom21SpeedCurveEnabled": true,
       "custom21SpeedCurveVisibleOnly": true,
       "custom21SpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3540610692698091,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.29779759790151816,\"y\":0}}]",
-      "custom21SpeedCurveRange": "{\"min\":1545,\"max\":1871}",
+      "custom21SpeedCurveRange": "{\"min\":1835,\"max\":2000}",
       "custom21StartTimeCurveEnabled": true,
       "custom21StartTimeCurveVisibleOnly": true,
       "custom21StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -29428,7 +29428,7 @@
       "custom21Trig5SpeedCurveEnabled": true,
       "custom21Trig5SpeedCurveVisibleOnly": true,
       "custom21Trig5SpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.13251392883117016,\"y\":0.9422916412353516}},{\"x\":1,\"y\":1}]",
-      "custom21Trig5SpeedCurveRange": "{\"min\":1676,\"max\":2000}",
+      "custom21Trig5SpeedCurveRange": "{\"min\":1820,\"max\":2500}",
       "custom21Trig5StartTimeCurveEnabled": true,
       "custom21Trig5StartTimeCurveVisibleOnly": true,
       "custom21Trig5StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -33497,7 +33497,7 @@
           "type": "group",
           "group": {
             "key": "Field Layout",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -35022,7 +35022,7 @@
       "subgroups": [
         {
           "key": "Field Layout",
-          "collapsed": true,
+          "collapsed": false,
           "locked": true,
           "items": [
             {
@@ -95615,7 +95615,7 @@
                 "type": "group",
                 "group": {
                   "key": "Animation Speed Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -95912,7 +95912,7 @@
                 "type": "group",
                 "group": {
                   "key": "Tween Stop",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -101594,7 +101594,7 @@
                             "type": "group",
                             "group": {
                               "key": "Animation Speed Curve",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -102230,7 +102230,7 @@
                           },
                           {
                             "key": "Animation Speed Curve",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -108180,7 +108180,7 @@
                           "type": "group",
                           "group": {
                             "key": "Animation Speed Curve",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -108816,7 +108816,7 @@
                         },
                         {
                           "key": "Animation Speed Curve",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -109447,7 +109447,7 @@
               },
               {
                 "key": "Animation Speed Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -109732,7 +109732,7 @@
               },
               {
                 "key": "Tween Stop",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -115411,7 +115411,7 @@
                           "type": "group",
                           "group": {
                             "key": "Animation Speed Curve",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -116047,7 +116047,7 @@
                         },
                         {
                           "key": "Animation Speed Curve",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -121997,7 +121997,7 @@
                         "type": "group",
                         "group": {
                           "key": "Animation Speed Curve",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -122633,7 +122633,7 @@
                       },
                       {
                         "key": "Animation Speed Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -188057,7 +188057,7 @@
               "type": "group",
               "group": {
                 "key": "Animation Speed Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -188354,7 +188354,7 @@
               "type": "group",
               "group": {
                 "key": "Tween Stop",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -194036,7 +194036,7 @@
                           "type": "group",
                           "group": {
                             "key": "Animation Speed Curve",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -194672,7 +194672,7 @@
                         },
                         {
                           "key": "Animation Speed Curve",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -200622,7 +200622,7 @@
                         "type": "group",
                         "group": {
                           "key": "Animation Speed Curve",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -201258,7 +201258,7 @@
                       },
                       {
                         "key": "Animation Speed Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -201889,7 +201889,7 @@
             },
             {
               "key": "Animation Speed Curve",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -202174,7 +202174,7 @@
             },
             {
               "key": "Tween Stop",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -207853,7 +207853,7 @@
                         "type": "group",
                         "group": {
                           "key": "Animation Speed Curve",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -208489,7 +208489,7 @@
                       },
                       {
                         "key": "Animation Speed Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -214439,7 +214439,7 @@
                       "type": "group",
                       "group": {
                         "key": "Animation Speed Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -215075,7 +215075,7 @@
                     },
                     {
                       "key": "Animation Speed Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
