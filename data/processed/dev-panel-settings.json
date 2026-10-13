@@ -50,7 +50,7 @@
       "fieldBoundsZMin": "-300",
       "fieldBoundsZMinCurveEnabled": true,
       "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.1630910985669732,\"y\":0}},{\"x\":1,\"y\":0.47260971069335933,\"h2\":{\"x\":-0.3313389974534513,\"y\":-0.47726198832194}}]",
-      "fieldBoundsZMax": "200",
+      "fieldBoundsZMax": "100",
       "fieldBoundsZMaxCurveEnabled": false,
       "fieldBoundsZMaxCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.24996105891858494,\"y\":0.14666671752929683}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.6586720742700527,\"y\":0.2573959350585937}}]",
       "fieldBoundsX": "{\"min\":-300,\"max\":300}",
@@ -10673,7 +10673,7 @@
       "fieldBoundsZMin": "-300",
       "fieldBoundsZMinCurveEnabled": true,
       "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.1630910985669732,\"y\":0}},{\"x\":1,\"y\":0.47260971069335933,\"h2\":{\"x\":-0.3313389974534513,\"y\":-0.47726198832194}}]",
-      "fieldBoundsZMax": "200",
+      "fieldBoundsZMax": "100",
       "fieldBoundsZMaxCurveEnabled": false,
       "fieldBoundsZMaxCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.24996105891858494,\"y\":0.14666671752929683}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.6586720742700527,\"y\":0.2573959350585937}}]",
       "fieldBoundsX": "{\"min\":-300,\"max\":300}",
@@ -21296,7 +21296,7 @@
       "fieldBoundsZMin": "-300",
       "fieldBoundsZMinCurveEnabled": true,
       "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.1630910985669732,\"y\":0}},{\"x\":1,\"y\":0.47260971069335933,\"h2\":{\"x\":-0.3313389974534513,\"y\":-0.47726198832194}}]",
-      "fieldBoundsZMax": "200",
+      "fieldBoundsZMax": "100",
       "fieldBoundsZMaxCurveEnabled": false,
       "fieldBoundsZMaxCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.24996105891858494,\"y\":0.14666671752929683}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.6586720742700527,\"y\":0.2573959350585937}}]",
       "fieldBoundsX": "{\"min\":-300,\"max\":300}",
@@ -34036,14 +34036,14 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
           "type": "group",
           "group": {
             "key": "Field Layout",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -35796,7 +35796,7 @@
       "subgroups": [
         {
           "key": "Field Layout",
-          "collapsed": true,
+          "collapsed": false,
           "locked": true,
           "items": [
             {
@@ -38667,7 +38667,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 32",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -138280,7 +138280,7 @@
         },
         {
           "key": "Custom Click Function 32",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
