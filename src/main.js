@@ -2795,7 +2795,8 @@ const DEV_GROUPS = [
       // the default camera").
       { key: 'lockCameraPan', label: 'Lock Camera Pan', type: 'checkbox', def: false, perDevice: true, onChange: () => applyCameraLockState() },
       { key: 'lockCameraZoom', label: 'Lock Camera Zoom', type: 'checkbox', def: false, perDevice: true, onChange: () => applyCameraLockState() },
-      { key: 'cameraMaxExtentsEnabled', label: 'Set Default Camera As Max Extents', type: 'checkbox', def: false, perDevice: true, onChange: () => updateCameraMaxExtentsBound() }
+      { key: 'cameraMaxExtentsEnabled', label: 'Set Default Camera As Max Extents', type: 'checkbox', def: false, perDevice: true, onChange: () => updateCameraMaxExtentsBound() },
+      { key: 'cameraXYCenterFieldBtn', label: 'XY Center Field Mid Point', type: 'button', placeAfter: 'cameraMaxExtentsEnabled', onClick: () => xyCenterCameraOnField() }
     ]
   },
   {
@@ -7212,9 +7213,34 @@ function updateCameraMaxExtentsBound() {
 // at runtime (checkbox onChange, or endClickHoldPose()'s own call),
 // never during module init.
 function applyCameraLockState() {
-  const anyHoldActive = clickHoldPoseTriggers.chp.active || clickHoldPoseTriggers.rchp.active
-  controls.enablePan = !cfg.lockCameraPan && !anyHoldActive
-  controls.enableZoom = !cfg.lockCameraZoom
+  // Every hold trigger counts, not only chp / rchp: startClickHoldPose() turns pan off for any of them, so a custom Click+Hold has to keep it off too.
+  let anyHoldActive = false
+  for (const k in clickHoldPoseTriggers) { const t = clickHoldPoseTriggers[k]; if (t && t.active) { anyHoldActive = true; break } }
+  const pan = !cfg.lockCameraPan && !anyHoldActive
+  const zoom = !cfg.lockCameraZoom
+  if (controls.enablePan !== pan) controls.enablePan = pan
+  if (controls.enableZoom !== zoom) controls.enableZoom = zoom
+}
+// Moves the main camera in world X / Y only so the field mid point (the average of every hand's rest position, the same point as the Debug > FIELD CENTER POINT dot) sits on the
+// camera's pan target. The camera and its target move by the same amount, so zoom distance and orientation are untouched.
+function xyCenterCameraOnField() {
+  let sumX = 0, sumY = 0, n = 0
+  for (const hand of hands) {
+    const p = hand.basePosition
+    if (!p) continue
+    sumX += p.x; sumY += p.y; n++
+  }
+  const midX = n ? sumX / n : (cfg.fieldOffsetX || 0)
+  const midY = n ? sumY / n : (cfg.fieldOffsetY || 0)
+  const dx = midX - controls.target.x
+  const dy = midY - controls.target.y
+  camera.position.x += dx
+  camera.position.y += dy
+  controls.target.x += dx
+  controls.target.y += dy
+  controls.update()
+  syncCameraPanelFromLive()
+  sceneNeedsRedraw = true
 }
 const _cameraExtentTargetScratch = new THREE.Vector3()
 const _cameraExtentOffsetScratch = new THREE.Vector3()
@@ -17940,6 +17966,8 @@ function animate(dt, now) {
     // OrbitControls damping/pan-extent/panel-sync keep running unchanged
     // regardless of Global Pause, so the user can still look around while
     // paused.
+    // Re-derive pan / zoom enabled from the Lock checkboxes and any active hold every frame, so a missed update (a restore that does not fire onChange, a reset during a hold) can never leave them stuck off.
+    applyCameraLockState()
     controls.update()
     enforceCameraPanExtent()
     syncCameraPanelFromLive()
