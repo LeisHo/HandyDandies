@@ -31,7 +31,7 @@
       "alternateRowOffset": 3.5,
       "progressiveRowOffset": 1,
       "useProgressiveOffset": false,
-      "hideHands": true,
+      "hideHands": false,
       "fieldOffsetX": 0,
       "fieldOffsetY": 0,
       "fieldOffsetZ": 0,
@@ -7318,11 +7318,11 @@
       "keyAzimuth": 209,
       "keyElevation": 56,
       "keyTargetHeight": 2,
-      "keyIntensity": 4.5,
-      "keyColor": "#ffffff",
+      "keyIntensity": 4,
+      "keyColor": "#ff5b24",
       "ambientIntensity": 0,
-      "ambientSkyColor": "#000000",
-      "ambientGroundColor": "#000000",
+      "ambientSkyColor": "#004cff",
+      "ambientGroundColor": "#004cff",
       "savedLighting": [
         {
           "name": "Front",
@@ -7335,18 +7335,32 @@
           "fov": 32
         }
       ],
-      "toonSteps": 3,
+      "toonSteps": 2,
       "toonStepThreshold": 5,
-      "toonShadowFloor": 0,
+      "toonShadowFloor": 12,
       "toonLightCeiling": 100,
-      "toonBaseTint": "#0091ff",
+      "toonBaseTint": "#ff9500",
       "textureInfluence": 0,
       "toonTint": "#ffffff",
       "rimIntensity": 0,
-      "rimPower": 0.5,
+      "rimPower": 0,
       "rimColor": "#ffffff",
       "invertColorsEnabled": false,
-      "savedToon": [],
+      "savedToon": [
+        {
+          "name": "HD - ORANGE",
+          "toonSteps": 2,
+          "toonStepThreshold": 5,
+          "toonShadowFloor": 12,
+          "toonLightCeiling": 100,
+          "toonBaseTint": "#ff9500",
+          "textureInfluence": 0,
+          "toonTint": "#ffffff",
+          "rimIntensity": 0,
+          "rimPower": 0,
+          "rimColor": "#ffffff"
+        }
+      ],
       "outlineEnabled": false,
       "outlineMechanic": "Negative Hull",
       "outlineColor": "#000000",
@@ -7358,7 +7372,7 @@
       "emissionIntensity": 1.5,
       "bgColor": "#808080",
       "floorEnabled": true,
-      "floorColor": "#3c3c3c",
+      "floorColor": "#000000",
       "floorZOffset": 0,
       "floorXYScale": 1,
       "pixelRatio": 1.25,
@@ -17160,7 +17174,21 @@
       "rimPower": 0.5,
       "rimColor": "#ffffff",
       "invertColorsEnabled": false,
-      "savedToon": [],
+      "savedToon": [
+        {
+          "name": "HD - ORANGE",
+          "toonSteps": 2,
+          "toonStepThreshold": 5,
+          "toonShadowFloor": 12,
+          "toonLightCeiling": 100,
+          "toonBaseTint": "#ff9500",
+          "textureInfluence": 0,
+          "toonTint": "#ffffff",
+          "rimIntensity": 0,
+          "rimPower": 0,
+          "rimColor": "#ffffff"
+        }
+      ],
       "outlineEnabled": false,
       "outlineMechanic": "Negative Hull",
       "outlineColor": "#000000",
@@ -17172,7 +17200,7 @@
       "emissionIntensity": 1.5,
       "bgColor": "#808080",
       "floorEnabled": true,
-      "floorColor": "#3c3c3c",
+      "floorColor": "#000000",
       "floorZOffset": 0,
       "floorXYScale": 1,
       "pixelRatio": 1.25,
@@ -26946,11 +26974,11 @@
       "keyAzimuth": 209,
       "keyElevation": 56,
       "keyTargetHeight": 2,
-      "keyIntensity": 4.5,
-      "keyColor": "#ffffff",
+      "keyIntensity": 4,
+      "keyColor": "#ff5b24",
       "ambientIntensity": 0,
-      "ambientSkyColor": "#000000",
-      "ambientGroundColor": "#000000",
+      "ambientSkyColor": "#004cff",
+      "ambientGroundColor": "#004cff",
       "savedLighting": [
         {
           "name": "Front",
@@ -26963,18 +26991,32 @@
           "fov": 32
         }
       ],
-      "toonSteps": 3,
+      "toonSteps": 2,
       "toonStepThreshold": 5,
-      "toonShadowFloor": 0,
+      "toonShadowFloor": 12,
       "toonLightCeiling": 100,
-      "toonBaseTint": "#0091ff",
+      "toonBaseTint": "#ff9500",
       "textureInfluence": 0,
       "toonTint": "#ffffff",
       "rimIntensity": 0,
-      "rimPower": 0.5,
+      "rimPower": 0,
       "rimColor": "#ffffff",
       "invertColorsEnabled": false,
-      "savedToon": [],
+      "savedToon": [
+        {
+          "name": "HD - ORANGE",
+          "toonSteps": 2,
+          "toonStepThreshold": 5,
+          "toonShadowFloor": 12,
+          "toonLightCeiling": 100,
+          "toonBaseTint": "#ff9500",
+          "textureInfluence": 0,
+          "toonTint": "#ffffff",
+          "rimIntensity": 0,
+          "rimPower": 0,
+          "rimColor": "#ffffff"
+        }
+      ],
       "outlineEnabled": false,
       "outlineMechanic": "Negative Hull",
       "outlineColor": "#000000",
@@ -26986,7 +27028,7 @@
       "emissionIntensity": 1.5,
       "bgColor": "#808080",
       "floorEnabled": true,
-      "floorColor": "#3c3c3c",
+      "floorColor": "#000000",
       "floorZOffset": 0,
       "floorXYScale": 1,
       "pixelRatio": 1.25,
@@ -30903,7 +30945,7 @@
           "type": "group",
           "group": {
             "key": "Loading Preview",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -31287,7 +31329,7 @@
         },
         {
           "key": "Loading Preview",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -31589,14 +31631,14 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
           "type": "group",
           "group": {
             "key": "Field Layout",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -31876,7 +31918,7 @@
           "type": "group",
           "group": {
             "key": "Pose",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -33167,7 +33209,7 @@
       "subgroups": [
         {
           "key": "Field Layout",
-          "collapsed": false,
+          "collapsed": true,
           "locked": true,
           "items": [
             {
@@ -33441,7 +33483,7 @@
         },
         {
           "key": "Pose",
-          "collapsed": false,
+          "collapsed": true,
           "locked": true,
           "items": [
             {
@@ -197233,7 +197275,7 @@
           "type": "group",
           "group": {
             "key": "New Group (10)",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -197244,7 +197286,7 @@
                 "type": "group",
                 "group": {
                   "key": "Toon Shading",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
@@ -197330,7 +197372,7 @@
             "subgroups": [
               {
                 "key": "Toon Shading",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": true,
                 "items": [
                   {
@@ -197493,7 +197535,7 @@
           "type": "group",
           "group": {
             "key": "Lighting",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -197608,7 +197650,7 @@
       "subgroups": [
         {
           "key": "New Group (10)",
-          "collapsed": true,
+          "collapsed": false,
           "locked": true,
           "items": [
             {
@@ -197619,7 +197661,7 @@
               "type": "group",
               "group": {
                 "key": "Toon Shading",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": true,
                 "items": [
                   {
@@ -197705,7 +197747,7 @@
           "subgroups": [
             {
               "key": "Toon Shading",
-              "collapsed": true,
+              "collapsed": false,
               "locked": true,
               "items": [
                 {
@@ -197862,7 +197904,7 @@
         },
         {
           "key": "Lighting",
-          "collapsed": true,
+          "collapsed": false,
           "locked": true,
           "items": [
             {
@@ -197969,7 +198011,7 @@
     },
     {
       "key": "Starting State",
-      "collapsed": false,
+      "collapsed": true,
       "locked": false,
       "items": [
         {
