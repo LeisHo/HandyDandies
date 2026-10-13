@@ -7242,8 +7242,8 @@
           "group": "FIST ROTATE"
         }
       ],
-      "cameraX": 12.963500701353723,
-      "cameraY": 11.851576363914575,
+      "cameraX": 8,
+      "cameraY": 16.5,
       "cameraZ": 336.5419554640869,
       "cameraFov": 14,
       "cameraYaw": 1.464,
@@ -7396,9 +7396,9 @@
           "targetZ": 0.10469792902927295
         }
       ],
-      "lockCameraPan": false,
-      "lockCameraZoom": false,
-      "cameraMaxExtentsEnabled": false,
+      "lockCameraPan": true,
+      "lockCameraZoom": true,
+      "cameraMaxExtentsEnabled": true,
       "keyAzimuth": 27,
       "keyElevation": 67,
       "keyTargetHeight": 65,
