@@ -8173,7 +8173,7 @@
       "custom21CameraOffsetYCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.324820628419056,\"y\":0},\"bg\":0.64,\"m\":\"linear\"},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.467575665942766,\"y\":0}}]",
       "custom21CameraOffsetYRange": "{\"min\":-1,\"max\":2}",
       "custom21CameraOffsetZEnabled": true,
-      "custom21CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.16299501974721012,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-1,\"y\":0}}]",
+      "custom21CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.08351961383334235,\"y\":0}},{\"x\":0.08736335507687218,\"y\":0.8684833526611329},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.8840828651852204,\"y\":0.020228703816731808}}]",
       "custom21CameraOffsetZRange": "{\"min\":-20,\"max\":20}",
       "custom21RotationEnabled": false,
       "custom21RotationX": 0,
@@ -18796,7 +18796,7 @@
       "custom21CameraOffsetYCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.324820628419056,\"y\":0},\"bg\":0.64,\"m\":\"linear\"},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.467575665942766,\"y\":0}}]",
       "custom21CameraOffsetYRange": "{\"min\":-1,\"max\":2}",
       "custom21CameraOffsetZEnabled": true,
-      "custom21CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.16299501974721012,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-1,\"y\":0}}]",
+      "custom21CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.08351961383334235,\"y\":0}},{\"x\":0.08736335507687218,\"y\":0.8684833526611329},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.8840828651852204,\"y\":0.020228703816731808}}]",
       "custom21CameraOffsetZRange": "{\"min\":-20,\"max\":20}",
       "custom21RotationEnabled": false,
       "custom21RotationX": 0,
@@ -29419,7 +29419,7 @@
       "custom21CameraOffsetYCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.324820628419056,\"y\":0},\"bg\":0.64,\"m\":\"linear\"},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.467575665942766,\"y\":0}}]",
       "custom21CameraOffsetYRange": "{\"min\":-1,\"max\":2}",
       "custom21CameraOffsetZEnabled": true,
-      "custom21CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.16299501974721012,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-1,\"y\":0}}]",
+      "custom21CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.08351961383334235,\"y\":0}},{\"x\":0.08736335507687218,\"y\":0.8684833526611329},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.8840828651852204,\"y\":0.020228703816731808}}]",
       "custom21CameraOffsetZRange": "{\"min\":-20,\"max\":20}",
       "custom21RotationEnabled": false,
       "custom21RotationX": 0,
@@ -101324,7 +101324,7 @@
                 "type": "group",
                 "group": {
                   "key": "Offset To Camera",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -107543,7 +107543,7 @@
                       "type": "group",
                       "group": {
                         "key": "Trigger 5",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -114559,7 +114559,7 @@
                     },
                     {
                       "key": "Trigger 5",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -116068,7 +116068,7 @@
               },
               {
                 "key": "Offset To Camera",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -122263,7 +122263,7 @@
                     "type": "group",
                     "group": {
                       "key": "Trigger 5",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -129279,7 +129279,7 @@
                   },
                   {
                     "key": "Trigger 5",
-                    "collapsed": false,
+                    "collapsed": true,
                     "locked": false,
                     "items": [
                       {
@@ -200904,7 +200904,7 @@
               "type": "group",
               "group": {
                 "key": "Offset To Camera",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -207123,7 +207123,7 @@
                     "type": "group",
                     "group": {
                       "key": "Trigger 5",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -214139,7 +214139,7 @@
                   },
                   {
                     "key": "Trigger 5",
-                    "collapsed": false,
+                    "collapsed": true,
                     "locked": false,
                     "items": [
                       {
@@ -215648,7 +215648,7 @@
             },
             {
               "key": "Offset To Camera",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -221843,7 +221843,7 @@
                   "type": "group",
                   "group": {
                     "key": "Trigger 5",
-                    "collapsed": false,
+                    "collapsed": true,
                     "locked": false,
                     "items": [
                       {
@@ -228859,7 +228859,7 @@
                 },
                 {
                   "key": "Trigger 5",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -244372,7 +244372,7 @@
       "left": 20,
       "top": 0,
       "width": 390.1190490722656,
-      "height": 35.52381134033203
+      "height": 572.172607421875
     }
   }
 }
