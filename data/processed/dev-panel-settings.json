@@ -7315,7 +7315,7 @@
       "lockCameraPan": true,
       "lockCameraZoom": false,
       "cameraMaxExtentsEnabled": true,
-      "keyAzimuth": 178,
+      "keyAzimuth": 27,
       "keyElevation": 67,
       "keyTargetHeight": 65,
       "keyIntensity": 4.9,
@@ -7344,20 +7344,31 @@
           "ambientIntensity": 0,
           "ambientSkyColor": "#ffffff",
           "ambientGroundColor": "#ffffff"
+        },
+        {
+          "name": "Lighting 3",
+          "keyAzimuth": 178,
+          "keyElevation": 67,
+          "keyTargetHeight": 65,
+          "keyIntensity": 4.9,
+          "keyColor": "#ffffff",
+          "ambientIntensity": 0,
+          "ambientSkyColor": "#ffffff",
+          "ambientGroundColor": "#ffffff"
         }
       ],
       "toonSteps": 2,
-      "toonStepThreshold": 3.2,
-      "toonShadowFloor": 9,
+      "toonStepThreshold": 2.5,
+      "toonShadowFloor": 0,
       "toonLightCeiling": 99,
-      "toonGradient": "[{\"p\":0,\"c\":\"#0040ff\"},{\"p\":1,\"c\":\"#ff5900\"}]",
+      "toonGradient": "[{\"p\":0,\"c\":\"#ffffff\"},{\"p\":1,\"c\":\"#ffffff\"}]",
       "toonBaseTint": "#ffffff",
       "textureInfluence": 0,
       "toonTint": "#ffffff",
       "rimIntensity": 0,
       "rimPower": 0,
       "rimColor": "#ffffff",
-      "invertColorsEnabled": false,
+      "invertColorsEnabled": true,
       "savedToon": [
         {
           "name": "HD - ORANGE",
@@ -7399,6 +7410,48 @@
           "rimPower": 0,
           "rimColor": "#ffffff",
           "toonGradient": "[{\"p\":0,\"c\":\"#0055ff\"},{\"p\":1,\"c\":\"#ff6600\"}]"
+        },
+        {
+          "name": "HD - COLOR PRESET - ORANGE BLUE",
+          "toonSteps": 2,
+          "toonStepThreshold": 3.2,
+          "toonShadowFloor": 9,
+          "toonLightCeiling": 99,
+          "toonBaseTint": "#ffffff",
+          "textureInfluence": 0,
+          "toonTint": "#ffffff",
+          "rimIntensity": 0,
+          "rimPower": 0,
+          "rimColor": "#ffffff",
+          "toonGradient": "[{\"p\":0,\"c\":\"#0040ff\"},{\"p\":1,\"c\":\"#ff5900\"}]"
+        },
+        {
+          "name": "HQ _ COLOR PRESET - BW",
+          "toonSteps": 2,
+          "toonStepThreshold": 2.5,
+          "toonShadowFloor": 0,
+          "toonLightCeiling": 99,
+          "toonBaseTint": "#ffffff",
+          "textureInfluence": 0,
+          "toonTint": "#ffffff",
+          "rimIntensity": 0,
+          "rimPower": 0,
+          "rimColor": "#ffffff",
+          "toonGradient": "[{\"p\":0,\"c\":\"#ffffff\"},{\"p\":1,\"c\":\"#ffffff\"}]"
+        },
+        {
+          "name": "HD - COLOR PRESET - WB",
+          "toonSteps": 2,
+          "toonStepThreshold": 2.5,
+          "toonShadowFloor": 0,
+          "toonLightCeiling": 99,
+          "toonBaseTint": "#ffffff",
+          "textureInfluence": 0,
+          "toonTint": "#ffffff",
+          "rimIntensity": 0,
+          "rimPower": 0,
+          "rimColor": "#ffffff",
+          "toonGradient": "[{\"p\":0,\"c\":\"#ffffff\"},{\"p\":1,\"c\":\"#ffffff\"}]"
         }
       ],
       "outlineEnabled": false,
@@ -7412,7 +7465,7 @@
       "emissionIntensity": 1.5,
       "bgColor": "#ff8000",
       "floorEnabled": true,
-      "floorColor": "#00308f",
+      "floorColor": "#000000",
       "floorZOffset": -119.5,
       "floorXYScale": 1,
       "pixelRatio": 1.25,
@@ -17184,14 +17237,14 @@
       "lockCameraPan": false,
       "lockCameraZoom": false,
       "cameraMaxExtentsEnabled": true,
-      "keyAzimuth": 209,
-      "keyElevation": 56,
-      "keyTargetHeight": 2,
-      "keyIntensity": 4.5,
+      "keyAzimuth": 27,
+      "keyElevation": 67,
+      "keyTargetHeight": 65,
+      "keyIntensity": 4.9,
       "keyColor": "#ffffff",
       "ambientIntensity": 0,
-      "ambientSkyColor": "#000000",
-      "ambientGroundColor": "#000000",
+      "ambientSkyColor": "#ffffff",
+      "ambientGroundColor": "#ffffff",
       "savedLighting": [
         {
           "name": "Front",
@@ -17213,13 +17266,24 @@
           "ambientIntensity": 0,
           "ambientSkyColor": "#ffffff",
           "ambientGroundColor": "#ffffff"
+        },
+        {
+          "name": "Lighting 3",
+          "keyAzimuth": 178,
+          "keyElevation": 67,
+          "keyTargetHeight": 65,
+          "keyIntensity": 4.9,
+          "keyColor": "#ffffff",
+          "ambientIntensity": 0,
+          "ambientSkyColor": "#ffffff",
+          "ambientGroundColor": "#ffffff"
         }
       ],
       "toonSteps": 3,
       "toonStepThreshold": 5,
       "toonShadowFloor": 0,
       "toonLightCeiling": 100,
-      "toonGradient": "[{\"p\":0,\"c\":\"#0040ff\"},{\"p\":1,\"c\":\"#ff5900\"}]",
+      "toonGradient": "[{\"p\":0,\"c\":\"#ffffff\"},{\"p\":1,\"c\":\"#ffffff\"}]",
       "toonBaseTint": "#0091ff",
       "textureInfluence": 0,
       "toonTint": "#ffffff",
@@ -17268,6 +17332,48 @@
           "rimPower": 0,
           "rimColor": "#ffffff",
           "toonGradient": "[{\"p\":0,\"c\":\"#0055ff\"},{\"p\":1,\"c\":\"#ff6600\"}]"
+        },
+        {
+          "name": "HD - COLOR PRESET - ORANGE BLUE",
+          "toonSteps": 2,
+          "toonStepThreshold": 3.2,
+          "toonShadowFloor": 9,
+          "toonLightCeiling": 99,
+          "toonBaseTint": "#ffffff",
+          "textureInfluence": 0,
+          "toonTint": "#ffffff",
+          "rimIntensity": 0,
+          "rimPower": 0,
+          "rimColor": "#ffffff",
+          "toonGradient": "[{\"p\":0,\"c\":\"#0040ff\"},{\"p\":1,\"c\":\"#ff5900\"}]"
+        },
+        {
+          "name": "HQ _ COLOR PRESET - BW",
+          "toonSteps": 2,
+          "toonStepThreshold": 2.5,
+          "toonShadowFloor": 0,
+          "toonLightCeiling": 99,
+          "toonBaseTint": "#ffffff",
+          "textureInfluence": 0,
+          "toonTint": "#ffffff",
+          "rimIntensity": 0,
+          "rimPower": 0,
+          "rimColor": "#ffffff",
+          "toonGradient": "[{\"p\":0,\"c\":\"#ffffff\"},{\"p\":1,\"c\":\"#ffffff\"}]"
+        },
+        {
+          "name": "HD - COLOR PRESET - WB",
+          "toonSteps": 2,
+          "toonStepThreshold": 2.5,
+          "toonShadowFloor": 0,
+          "toonLightCeiling": 99,
+          "toonBaseTint": "#ffffff",
+          "textureInfluence": 0,
+          "toonTint": "#ffffff",
+          "rimIntensity": 0,
+          "rimPower": 0,
+          "rimColor": "#ffffff",
+          "toonGradient": "[{\"p\":0,\"c\":\"#ffffff\"},{\"p\":1,\"c\":\"#ffffff\"}]"
         }
       ],
       "outlineEnabled": false,
@@ -17281,7 +17387,7 @@
       "emissionIntensity": 1.5,
       "bgColor": "#ff8000",
       "floorEnabled": true,
-      "floorColor": "#00308f",
+      "floorColor": "#000000",
       "floorZOffset": -119.5,
       "floorXYScale": 1,
       "pixelRatio": 1.25,
@@ -27053,7 +27159,7 @@
       "lockCameraPan": false,
       "lockCameraZoom": false,
       "cameraMaxExtentsEnabled": false,
-      "keyAzimuth": 178,
+      "keyAzimuth": 27,
       "keyElevation": 67,
       "keyTargetHeight": 65,
       "keyIntensity": 4.9,
@@ -27082,20 +27188,31 @@
           "ambientIntensity": 0,
           "ambientSkyColor": "#ffffff",
           "ambientGroundColor": "#ffffff"
+        },
+        {
+          "name": "Lighting 3",
+          "keyAzimuth": 178,
+          "keyElevation": 67,
+          "keyTargetHeight": 65,
+          "keyIntensity": 4.9,
+          "keyColor": "#ffffff",
+          "ambientIntensity": 0,
+          "ambientSkyColor": "#ffffff",
+          "ambientGroundColor": "#ffffff"
         }
       ],
       "toonSteps": 2,
-      "toonStepThreshold": 3.2,
-      "toonShadowFloor": 9,
+      "toonStepThreshold": 2.5,
+      "toonShadowFloor": 0,
       "toonLightCeiling": 99,
-      "toonGradient": "[{\"p\":0,\"c\":\"#0040ff\"},{\"p\":1,\"c\":\"#ff5900\"}]",
+      "toonGradient": "[{\"p\":0,\"c\":\"#ffffff\"},{\"p\":1,\"c\":\"#ffffff\"}]",
       "toonBaseTint": "#ffffff",
       "textureInfluence": 0,
       "toonTint": "#ffffff",
       "rimIntensity": 0,
       "rimPower": 0,
       "rimColor": "#ffffff",
-      "invertColorsEnabled": false,
+      "invertColorsEnabled": true,
       "savedToon": [
         {
           "name": "HD - ORANGE",
@@ -27137,6 +27254,48 @@
           "rimPower": 0,
           "rimColor": "#ffffff",
           "toonGradient": "[{\"p\":0,\"c\":\"#0055ff\"},{\"p\":1,\"c\":\"#ff6600\"}]"
+        },
+        {
+          "name": "HD - COLOR PRESET - ORANGE BLUE",
+          "toonSteps": 2,
+          "toonStepThreshold": 3.2,
+          "toonShadowFloor": 9,
+          "toonLightCeiling": 99,
+          "toonBaseTint": "#ffffff",
+          "textureInfluence": 0,
+          "toonTint": "#ffffff",
+          "rimIntensity": 0,
+          "rimPower": 0,
+          "rimColor": "#ffffff",
+          "toonGradient": "[{\"p\":0,\"c\":\"#0040ff\"},{\"p\":1,\"c\":\"#ff5900\"}]"
+        },
+        {
+          "name": "HQ _ COLOR PRESET - BW",
+          "toonSteps": 2,
+          "toonStepThreshold": 2.5,
+          "toonShadowFloor": 0,
+          "toonLightCeiling": 99,
+          "toonBaseTint": "#ffffff",
+          "textureInfluence": 0,
+          "toonTint": "#ffffff",
+          "rimIntensity": 0,
+          "rimPower": 0,
+          "rimColor": "#ffffff",
+          "toonGradient": "[{\"p\":0,\"c\":\"#ffffff\"},{\"p\":1,\"c\":\"#ffffff\"}]"
+        },
+        {
+          "name": "HD - COLOR PRESET - WB",
+          "toonSteps": 2,
+          "toonStepThreshold": 2.5,
+          "toonShadowFloor": 0,
+          "toonLightCeiling": 99,
+          "toonBaseTint": "#ffffff",
+          "textureInfluence": 0,
+          "toonTint": "#ffffff",
+          "rimIntensity": 0,
+          "rimPower": 0,
+          "rimColor": "#ffffff",
+          "toonGradient": "[{\"p\":0,\"c\":\"#ffffff\"},{\"p\":1,\"c\":\"#ffffff\"}]"
         }
       ],
       "outlineEnabled": false,
@@ -27150,7 +27309,7 @@
       "emissionIntensity": 1.5,
       "bgColor": "#ff8000",
       "floorEnabled": true,
-      "floorColor": "#00308f",
+      "floorColor": "#000000",
       "floorZOffset": -119.5,
       "floorXYScale": 1,
       "pixelRatio": 1.25,
@@ -197419,7 +197578,7 @@
                 "type": "group",
                 "group": {
                   "key": "Toon Shading",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
@@ -197510,7 +197669,7 @@
             "subgroups": [
               {
                 "key": "Toon Shading",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": true,
                 "items": [
                   {
@@ -197804,7 +197963,7 @@
               "type": "group",
               "group": {
                 "key": "Toon Shading",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": true,
                 "items": [
                   {
@@ -197895,7 +198054,7 @@
           "subgroups": [
             {
               "key": "Toon Shading",
-              "collapsed": true,
+              "collapsed": false,
               "locked": true,
               "items": [
                 {
