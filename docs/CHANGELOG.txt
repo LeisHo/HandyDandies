@@ -17465,6 +17465,21 @@ Direct request: use the HANDO two-hand tween export (format hando-two-hand-tween
   Verified in the page by running the full flow (3 clicks: spheres, hands, offset; floor hidden once all 255 hands were done), pressing the real button (sphere stage 0, floor visible, 0 hands triggered, the 20-unit offset
   back on the hands) and running it again (the next click started the spheres).
 
+2026-10-13  -  Starting sequences: Maximum Clicks, spheres stay until their hand finishes, visible-only waiting, Hand Z Offset Curve, phone click position
+  1. Field Grid Sphere Sequence > Start Time Curve group was empty: updateSingleTimingGateVisibility() shows the Start Time rows by Mode and the borrowed 'sphereFn' has no Mode, so both stayed hidden; setupSphereSequenceGroup()
+  now sets cfg.sphereFnMode = 'Single Pose'. 2. New "Maximum Clicks" slider in BOTH groups (sphereMaxClicks, startupHandMaxClicks, 1-20, default 3 - my pick, none was specified): that many clicks trigger spheres / hands under
+  the Start Distance Curve; the next click triggers every remaining one with the Start Distance Curve ignored (startSphereSequence(retrigger, ignoreStartDistance), fireStartupHandOffset(ignoreStartDistance)). 3. After the sphere
+  phase the spheres no longer vanish: with Hand Offset On Startup on they stay (sphereKeepForHands) and each disappears when ITS hand finishes (hand._startupSeqDone); the click that ends the sphere phase now also triggers the hands
+  (the separate click that used to remove the spheres is gone); with Hand Offset off they vanish at that click as before. 4. Wait For All Spheres and Maximum Clicks count only spheres at VISIBLE (on-screen) grid points, and
+  only those are ever triggered; "done" = triggered and finished. 5. Once triggered a sphere is frozen (no later click restarts, moves or changes it) until its hand is done; only untriggered spheres can be triggered.
+  6. Phone: the cursor (cursorNDC) was only updated by pointermove, which a touch does not send before pointerdown, so every startup step measured from the PREVIOUS touch position. A capture pointerdown listener (registered
+  first) now sets cursorNDC / lastPointerClient / cursorTarget from the pointerdown itself. 7. Hand Offset On Startup: Offset X / Y sliders removed; Offset Z kept; new group "Hand Z Offset Curve" (curve + Min/Max range, same UI as
+  the sphere Z Offset Curve): with it on, each hand's Z offset follows Min + (Max - Min) * curve(sequence progress) (hands wait at the value at progress 0, end at the value at progress 1; applyOffsetRotationToHand() override for
+  STARTUP_FN + startupHandZStart()/End()); off = the slider as before. New "Wait For All Hands" checkbox: clicks are consumed until every visible hand has finished its startup sequence. 8. Hide Floor After Hand Offset Sequence
+  now looks only at visible hands (allVisibleHandsFinished()). Verified in the page with simulated touch / mouse clicks and a controlled clock: Start Time rows visible; Max Clicks 2 -> spheres 6, 12, then the 3rd click triggered all
+  remaining visible spheres (0 untriggered); the next click ended the sphere phase (14 hands triggered, spheres kept), hand clicks 23 -> 255 triggered; spheres gone and floor hidden when all visible hands were done; a touch
+  pointerdown alone moved the cursor to NDC -0.5; Hand Z Curve start -30 / end +10 with range -30..10. Not exercised end to end: Wait For All Hands (logic reuses the tested allVisibleHandsFinished()) and the in-flight Z shape.
+
 2026-10-12  -  (Sphere Sequence: clicks do not register while spheres are running)
 
 Direct request: while sphere sequences are running a click will not register. advanceSphereSequence() now returns without doing anything (the click is still consumed, so no real click function fires either) while anySphereRunning() - any started sphere whose sequence has not reached its end, including ones still waiting for their start time. Only once every sphere sequence has finished does the next click advance to the hands / Hand Offset On Startup. Note this makes Wait For All Spheres (on-screen spheres only) redundant: the running check already covers every sphere, on screen or not. Also exposed updateSphereSequence and sphereState on window.__debug for testing. main.js ?v=387 -> ?v=388.
