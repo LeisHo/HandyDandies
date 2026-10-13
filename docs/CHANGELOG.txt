@@ -17396,6 +17396,10 @@ Direct request: a toggleable group Field Grid Sphere Sequence inside Starting St
 
 Direct request: a Wait For All Spheres checkbox: when on, the Hand Offset On Startup sequence and everything after it do not trigger until every sphere that would be visible on screen has reached the end state of its sphere sequence. New sphereWaitForAll (default off). advanceSphereSequence() now checks allVisibleSpheresDone() before click 2: every sphere that was started (the Start Distance Curve can exclude some) AND whose grid point is on screen (isOnScreen) must have now >= its start time + its duration (the end of its own sequence, so the Start Time / Speed curves and Easing are all accounted for). While some are still running the click is consumed (real click functions stay blocked) and nothing advances; the next click after the last one lands goes through. main.js ?v=385 -> ?v=386.
 
+2026-10-12  -  (Sphere Sequence: clicks do not register while spheres are running)
+
+Direct request: while sphere sequences are running a click will not register. advanceSphereSequence() now returns without doing anything (the click is still consumed, so no real click function fires either) while anySphereRunning() - any started sphere whose sequence has not reached its end, including ones still waiting for their start time. Only once every sphere sequence has finished does the next click advance to the hands / Hand Offset On Startup. Note this makes Wait For All Spheres (on-screen spheres only) redundant: the running check already covers every sphere, on screen or not. Also exposed updateSphereSequence and sphereState on window.__debug for testing. main.js ?v=387 -> ?v=388.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

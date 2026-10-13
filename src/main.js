@@ -3563,8 +3563,15 @@ function allVisibleSpheresDone() {
   }
   return true
 }
+// True while any sphere sequence is still running (started or waiting for its start time, not yet at its end).
+function anySphereRunning() {
+  const now = nowVirtual(), n = sphereOn ? Math.min(sphereOn.length, hands.length) : 0
+  for (let i = 0; i < n; i++) if (sphereOn[i] && now < sphereStart[i] + sphereDur[i]) return true
+  return false
+}
 function advanceSphereSequence() {
   if (sphereStage === 0) { sphereStage = 1; startSphereSequence(); return }
+  if (anySphereRunning()) return // clicks do not register while sphere sequences are running
   if (cfg.sphereWaitForAll && !allVisibleSpheresDone()) return // the click is consumed, nothing after the sphere sequence starts yet
   sphereStage = 2
   if (sphereMesh) sphereMesh.visible = false
