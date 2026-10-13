@@ -8129,7 +8129,7 @@
       "custom21TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21TweenRetransitionStartTimeRange": "{\"min\":1601,\"max\":3000}",
       "custom21TweenStopEnabled": true,
-      "custom21TweenStopStartTimeCurveEnabled": false,
+      "custom21TweenStopStartTimeCurveEnabled": true,
       "custom21TweenStopStartTimeCurveVisibleOnly": true,
       "custom21TweenStopStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21TweenStopStartTimeRange": "{\"min\":640,\"max\":1532}",
@@ -18570,7 +18570,7 @@
       "custom21TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21TweenRetransitionStartTimeRange": "{\"min\":1601,\"max\":3000}",
       "custom21TweenStopEnabled": true,
-      "custom21TweenStopStartTimeCurveEnabled": false,
+      "custom21TweenStopStartTimeCurveEnabled": true,
       "custom21TweenStopStartTimeCurveVisibleOnly": true,
       "custom21TweenStopStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21TweenStopStartTimeRange": "{\"min\":640,\"max\":1532}",
@@ -29011,7 +29011,7 @@
       "custom21TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21TweenRetransitionStartTimeRange": "{\"min\":1601,\"max\":3000}",
       "custom21TweenStopEnabled": true,
-      "custom21TweenStopStartTimeCurveEnabled": false,
+      "custom21TweenStopStartTimeCurveEnabled": true,
       "custom21TweenStopStartTimeCurveVisibleOnly": true,
       "custom21TweenStopStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21TweenStopStartTimeRange": "{\"min\":640,\"max\":1532}",
@@ -95912,14 +95912,14 @@
                 "type": "group",
                 "group": {
                   "key": "Tween Stop",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
                       "type": "group",
                       "group": {
                         "key": "Tween Stop Start Time Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -95986,7 +95986,7 @@
                   "subgroups": [
                     {
                       "key": "Tween Stop Start Time Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -101891,7 +101891,7 @@
                             "type": "group",
                             "group": {
                               "key": "Tween Stop",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -102515,7 +102515,7 @@
                           },
                           {
                             "key": "Tween Stop",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -108477,7 +108477,7 @@
                           "type": "group",
                           "group": {
                             "key": "Tween Stop",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -109101,7 +109101,7 @@
                         },
                         {
                           "key": "Tween Stop",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -109732,14 +109732,14 @@
               },
               {
                 "key": "Tween Stop",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
                     "type": "group",
                     "group": {
                       "key": "Tween Stop Start Time Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -109806,7 +109806,7 @@
                 "subgroups": [
                   {
                     "key": "Tween Stop Start Time Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -115708,7 +115708,7 @@
                           "type": "group",
                           "group": {
                             "key": "Tween Stop",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -116332,7 +116332,7 @@
                         },
                         {
                           "key": "Tween Stop",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -122294,7 +122294,7 @@
                         "type": "group",
                         "group": {
                           "key": "Tween Stop",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -122918,7 +122918,7 @@
                       },
                       {
                         "key": "Tween Stop",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -188354,14 +188354,14 @@
               "type": "group",
               "group": {
                 "key": "Tween Stop",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
                     "type": "group",
                     "group": {
                       "key": "Tween Stop Start Time Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -188428,7 +188428,7 @@
                 "subgroups": [
                   {
                     "key": "Tween Stop Start Time Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -194333,7 +194333,7 @@
                           "type": "group",
                           "group": {
                             "key": "Tween Stop",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -194957,7 +194957,7 @@
                         },
                         {
                           "key": "Tween Stop",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -200919,7 +200919,7 @@
                         "type": "group",
                         "group": {
                           "key": "Tween Stop",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -201543,7 +201543,7 @@
                       },
                       {
                         "key": "Tween Stop",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -202174,14 +202174,14 @@
             },
             {
               "key": "Tween Stop",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
                   "type": "group",
                   "group": {
                     "key": "Tween Stop Start Time Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -202248,7 +202248,7 @@
               "subgroups": [
                 {
                   "key": "Tween Stop Start Time Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -208150,7 +208150,7 @@
                         "type": "group",
                         "group": {
                           "key": "Tween Stop",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -208774,7 +208774,7 @@
                       },
                       {
                         "key": "Tween Stop",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -214736,7 +214736,7 @@
                       "type": "group",
                       "group": {
                         "key": "Tween Stop",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -215360,7 +215360,7 @@
                     },
                     {
                       "key": "Tween Stop",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
