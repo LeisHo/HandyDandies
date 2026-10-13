@@ -7725,7 +7725,7 @@
       "startupFnStartTimeRange": "{\"min\":0,\"max\":300}",
       "startupFnStartDistanceCurveEnabled": true,
       "startupFnStartDistanceMin": 0,
-      "startupFnStartDistanceMax": 61,
+      "startupFnStartDistanceMax": 40,
       "startupFnStartDistanceCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.8094914779614888,\"y\":0}},{\"x\":1,\"y\":1}]",
       "startupFnPauseDurationMs": 500,
       "startupFnRetransitionEnabled": true,
@@ -7766,8 +7766,8 @@
       "sphereRadiusCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.5908072104944381,\"y\":0.3711805979410807}},{\"x\":0.5115116277554114,\"y\":1,\"h1\":{\"x\":0.22562720448113072,\"y\":0},\"h2\":{\"x\":-0.24829763438916708,\"y\":0}},{\"x\":1,\"y\":0.3814582824707031,\"h2\":{\"x\":-0.5125684895152861,\"y\":0.35333328247070317}}]",
       "sphereRadiusRange": "{\"min\":0,\"max\":1.25}",
       "sphereZCurveEnabled": true,
-      "sphereZCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.45532200522949196,\"y\":0.03206227620442714}},{\"x\":0.48536968589158147,\"y\":1,\"h2\":{\"x\":-0.37163348195703616,\"y\":-0.10732269287109375},\"h1\":{\"x\":0.14253729085260458,\"y\":0}},{\"x\":1,\"y\":0.16572926839192703,\"h2\":{\"x\":-0.5894956885288738,\"y\":0.21999994913736975}}]",
-      "sphereZRange": "{\"min\":-3,\"max\":25}",
+      "sphereZCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.45532200522949196,\"y\":0.03206227620442714}},{\"x\":0.48536968589158147,\"y\":1,\"h2\":{\"x\":-0.37163348195703616,\"y\":-0.10732269287109375},\"h1\":{\"x\":0.1274864391737438,\"y\":-0.15593744913736973}},{\"x\":1,\"y\":0.06406250000000002,\"h2\":{\"x\":-0.5894956885288738,\"y\":0.21999994913736975}}]",
+      "sphereZRange": "{\"min\":-3,\"max\":50}",
       "showTrackingPoints": false,
       "showRenderOrderPoints": false,
       "showGridHelper": false,
@@ -18288,7 +18288,7 @@
       "startupFnStartTimeRange": "{\"min\":0,\"max\":300}",
       "startupFnStartDistanceCurveEnabled": true,
       "startupFnStartDistanceMin": 0,
-      "startupFnStartDistanceMax": 61,
+      "startupFnStartDistanceMax": 40,
       "startupFnStartDistanceCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.8094914779614888,\"y\":0}},{\"x\":1,\"y\":1}]",
       "startupFnPauseDurationMs": 500,
       "startupFnRetransitionEnabled": true,
@@ -18329,8 +18329,8 @@
       "sphereRadiusCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.5908072104944381,\"y\":0.3711805979410807}},{\"x\":0.5115116277554114,\"y\":1,\"h1\":{\"x\":0.22562720448113072,\"y\":0},\"h2\":{\"x\":-0.24829763438916708,\"y\":0}},{\"x\":1,\"y\":0.3814582824707031,\"h2\":{\"x\":-0.5125684895152861,\"y\":0.35333328247070317}}]",
       "sphereRadiusRange": "{\"min\":0,\"max\":1.25}",
       "sphereZCurveEnabled": true,
-      "sphereZCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.45532200522949196,\"y\":0.03206227620442714}},{\"x\":0.48536968589158147,\"y\":1,\"h2\":{\"x\":-0.37163348195703616,\"y\":-0.10732269287109375},\"h1\":{\"x\":0.14253729085260458,\"y\":0}},{\"x\":1,\"y\":0.16572926839192703,\"h2\":{\"x\":-0.5894956885288738,\"y\":0.21999994913736975}}]",
-      "sphereZRange": "{\"min\":-3,\"max\":25}",
+      "sphereZCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.45532200522949196,\"y\":0.03206227620442714}},{\"x\":0.48536968589158147,\"y\":1,\"h2\":{\"x\":-0.37163348195703616,\"y\":-0.10732269287109375},\"h1\":{\"x\":0.1274864391737438,\"y\":-0.15593744913736973}},{\"x\":1,\"y\":0.06406250000000002,\"h2\":{\"x\":-0.5894956885288738,\"y\":0.21999994913736975}}]",
+      "sphereZRange": "{\"min\":-3,\"max\":50}",
       "showTrackingPoints": false,
       "showRenderOrderPoints": false,
       "showGridHelper": false,
@@ -28851,7 +28851,7 @@
       "startupFnStartTimeRange": "{\"min\":0,\"max\":300}",
       "startupFnStartDistanceCurveEnabled": true,
       "startupFnStartDistanceMin": 0,
-      "startupFnStartDistanceMax": 61,
+      "startupFnStartDistanceMax": 40,
       "startupFnStartDistanceCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.8094914779614888,\"y\":0}},{\"x\":1,\"y\":1}]",
       "startupFnPauseDurationMs": 500,
       "startupFnRetransitionEnabled": true,
@@ -28892,8 +28892,8 @@
       "sphereRadiusCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.5908072104944381,\"y\":0.3711805979410807}},{\"x\":0.5115116277554114,\"y\":1,\"h1\":{\"x\":0.22562720448113072,\"y\":0},\"h2\":{\"x\":-0.24829763438916708,\"y\":0}},{\"x\":1,\"y\":0.3814582824707031,\"h2\":{\"x\":-0.5125684895152861,\"y\":0.35333328247070317}}]",
       "sphereRadiusRange": "{\"min\":0,\"max\":1.25}",
       "sphereZCurveEnabled": true,
-      "sphereZCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.45532200522949196,\"y\":0.03206227620442714}},{\"x\":0.48536968589158147,\"y\":1,\"h2\":{\"x\":-0.37163348195703616,\"y\":-0.10732269287109375},\"h1\":{\"x\":0.14253729085260458,\"y\":0}},{\"x\":1,\"y\":0.16572926839192703,\"h2\":{\"x\":-0.5894956885288738,\"y\":0.21999994913736975}}]",
-      "sphereZRange": "{\"min\":-3,\"max\":25}",
+      "sphereZCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.45532200522949196,\"y\":0.03206227620442714}},{\"x\":0.48536968589158147,\"y\":1,\"h2\":{\"x\":-0.37163348195703616,\"y\":-0.10732269287109375},\"h1\":{\"x\":0.1274864391737438,\"y\":-0.15593744913736973}},{\"x\":1,\"y\":0.06406250000000002,\"h2\":{\"x\":-0.5894956885288738,\"y\":0.21999994913736975}}]",
+      "sphereZRange": "{\"min\":-3,\"max\":50}",
       "showTrackingPoints": false,
       "showRenderOrderPoints": false,
       "showGridHelper": false,
@@ -237314,7 +237314,7 @@
           "type": "group",
           "group": {
             "key": "Hand Offset On Startup",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -237819,7 +237819,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Animation Speed Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -237847,7 +237847,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Start Time Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -237885,7 +237885,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Start Distance Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -238436,7 +238436,7 @@
               },
               {
                 "key": "Startup > Animation Speed Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -238461,7 +238461,7 @@
               },
               {
                 "key": "Startup > Start Time Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -238496,7 +238496,7 @@
               },
               {
                 "key": "Startup > Start Distance Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -238546,7 +238546,7 @@
           "type": "group",
           "group": {
             "key": "Field Grid Sphere Sequence",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -238698,7 +238698,7 @@
                 "type": "group",
                 "group": {
                   "key": "Sphere > Sphere Z Offset Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -238843,7 +238843,7 @@
               },
               {
                 "key": "Sphere > Sphere Z Offset Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -238873,7 +238873,7 @@
       "subgroups": [
         {
           "key": "Hand Offset On Startup",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -239378,7 +239378,7 @@
               "type": "group",
               "group": {
                 "key": "Startup > Animation Speed Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -239406,7 +239406,7 @@
               "type": "group",
               "group": {
                 "key": "Startup > Start Time Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -239444,7 +239444,7 @@
               "type": "group",
               "group": {
                 "key": "Startup > Start Distance Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -239995,7 +239995,7 @@
             },
             {
               "key": "Startup > Animation Speed Curve",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -240020,7 +240020,7 @@
             },
             {
               "key": "Startup > Start Time Curve",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -240055,7 +240055,7 @@
             },
             {
               "key": "Startup > Start Distance Curve",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -240102,7 +240102,7 @@
         },
         {
           "key": "Field Grid Sphere Sequence",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
@@ -240254,7 +240254,7 @@
               "type": "group",
               "group": {
                 "key": "Sphere > Sphere Z Offset Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -240399,7 +240399,7 @@
             },
             {
               "key": "Sphere > Sphere Z Offset Curve",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
