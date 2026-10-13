@@ -37,7 +37,7 @@
       "fieldOffsetZ": 0,
       "fieldBoundsX": "{\"min\":-300,\"max\":300}",
       "fieldBoundsY": "{\"min\":-300,\"max\":300}",
-      "fieldBoundsZ": "{\"min\":-300,\"max\":100}",
+      "fieldBoundsZ": "{\"min\":-300,\"max\":200}",
       "trackingPoint": "armEnd",
       "trackingEnabled": true,
       "trackingDamping": 0.23,
@@ -10479,7 +10479,7 @@
       "fieldOffsetZ": 0,
       "fieldBoundsX": "{\"min\":-300,\"max\":300}",
       "fieldBoundsY": "{\"min\":-300,\"max\":300}",
-      "fieldBoundsZ": "{\"min\":-300,\"max\":100}",
+      "fieldBoundsZ": "{\"min\":-300,\"max\":200}",
       "trackingPoint": "armEnd",
       "trackingEnabled": true,
       "trackingDamping": 0.08,
@@ -20921,7 +20921,7 @@
       "fieldOffsetZ": 0,
       "fieldBoundsX": "{\"min\":-300,\"max\":300}",
       "fieldBoundsY": "{\"min\":-300,\"max\":300}",
-      "fieldBoundsZ": "{\"min\":-300,\"max\":100}",
+      "fieldBoundsZ": "{\"min\":-300,\"max\":200}",
       "trackingPoint": "armEnd",
       "trackingEnabled": true,
       "trackingDamping": 1,
@@ -33493,14 +33493,14 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
           "type": "group",
           "group": {
             "key": "Field Layout",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -35025,7 +35025,7 @@
       "subgroups": [
         {
           "key": "Field Layout",
-          "collapsed": true,
+          "collapsed": false,
           "locked": true,
           "items": [
             {
