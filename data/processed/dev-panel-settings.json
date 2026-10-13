@@ -7243,7 +7243,7 @@
         }
       ],
       "cameraX": 8,
-      "cameraY": 16.5,
+      "cameraY": 18.5,
       "cameraZ": 336.5419554640869,
       "cameraFov": 14,
       "cameraYaw": 1.464,
@@ -7396,7 +7396,7 @@
           "targetZ": 0.10469792902927295
         }
       ],
-      "lockCameraPan": true,
+      "lockCameraPan": false,
       "lockCameraZoom": true,
       "cameraMaxExtentsEnabled": true,
       "keyAzimuth": 27,
@@ -38074,7 +38074,7 @@
     },
     {
       "key": "Custom Click Functions",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
