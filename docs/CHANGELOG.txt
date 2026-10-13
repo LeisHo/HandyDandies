@@ -17429,6 +17429,13 @@ Direct request: use the HANDO two-hand tween export (format hando-two-hand-tween
   checkbox added earlier is removed (it is now always on; an old saved value is simply unused). Checked in the page by taking a snapshot (255 hands, ~165 KB of text); the sandbox has no running animation loop, so rank / palm roll /
   arm rotation read n/a there until the loop has run on a real tab.
 
+2026-10-13  -  Tween Stop Start Time: the sequence keeps running instead of pausing
+  Direct report. In the 'stopping' phase (updateClickHoldPoseForHand), Tween Stop Start Time used to freeze the hand (early return) for its whole duration, then Tween Stop Delay started decelerating. Now the Start Time
+  window is the stretch after release during which the sequence keeps running at NORMAL speed (decayFactor stays 1, for forward passes and for looping / oscillating sequences alike); when it ends, Tween Stop Delay slows the
+  sequence linearly from normal speed to a full halt, then Retransition / freeze follows as before. Only that one block changed. Checked the timing formula numerically (start 500 ms, delay 1000 ms: factor 1.00 through 500 ms,
+  then 0.50 at 1000 ms, 0.00 at 1500 ms); not exercised on live hands (the sandbox cannot show the hands animating). Known and unchanged: Start Time only applies when Tween Stop Delay is on (with it off the hand goes
+  straight to Retransition / stays).
+
 2026-10-12  -  (Sphere Sequence: clicks do not register while spheres are running)
 
 Direct request: while sphere sequences are running a click will not register. advanceSphereSequence() now returns without doing anything (the click is still consumed, so no real click function fires either) while anySphereRunning() - any started sphere whose sequence has not reached its end, including ones still waiting for their start time. Only once every sphere sequence has finished does the next click advance to the hands / Hand Offset On Startup. Note this makes Wait For All Spheres (on-screen spheres only) redundant: the running check already covers every sphere, on screen or not. Also exposed updateSphereSequence and sphereState on window.__debug for testing. main.js ?v=387 -> ?v=388.

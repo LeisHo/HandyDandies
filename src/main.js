@@ -11776,15 +11776,10 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     const dt = Math.max(0, now - chp.stoppingLastFrameTime)
     chp.stoppingLastFrameTime = now
     const elapsedSinceRelease = now - chp.stoppingStartTime
-    if (elapsedSinceRelease < chp.stoppingStartDelay) {
-      // Still waiting for this hand's own Tween Stop Start Time stagger
-      // to begin -- completely frozen at whatever was already showing,
-      // same convention as every other phase's own pre-stagger hold.
-      applyPoseValuesToHand(hand, chp.lastAppliedValues, chp.frozenSplayDeg)
-      applyOffsetRotationToHand(hand, p, 0) // 'stopping' is a deceleration of the POSE, not a new offset/rotation ramp -- nothing new to add
-      return
-    }
-    const tDecay = THREE.MathUtils.clamp((elapsedSinceRelease - chp.stoppingStartDelay) / chp.stoppingDelayMs, 0, 1)
+    // CORRECTED 2026-10-13 (direct report: "the sequence pauses during that duration. it shouldnt"). Tween Stop Start Time is how long the sequence KEEPS RUNNING AT NORMAL SPEED after release;
+    // only when it has elapsed does Tween Stop Delay start slowing it from normal speed to a full halt. This used to freeze the hand for the whole Start Time (an early return), which is a pause, not a
+    // continuation. Now the start-time window just keeps decayFactor at 1 (the same advance a held sequence makes) and the deceleration clock starts when it ends.
+    const tDecay = THREE.MathUtils.clamp((elapsedSinceRelease - chp.stoppingStartDelay) / chp.stoppingDelayMs, 0, 1) // 0 for the whole Start Time window
     const decayFactor = 1 - tDecay // linear ease-out to 0 -- "progressively slowdown to a stop"
     let values
     if (chp.stoppingWasLooping) {
