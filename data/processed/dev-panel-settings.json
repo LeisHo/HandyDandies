@@ -8631,7 +8631,7 @@
       "custom21Trig5CameraOffsetYRange": "{\"min\":0.5,\"max\":1}",
       "custom21Trig5CameraOffsetZEnabled": true,
       "custom21Trig5CameraOffsetZCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.11245519817770544,\"y\":0.6356243133544922}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.12114747248816116,\"y\":0}}]",
-      "custom21Trig5CameraOffsetZRange": "{\"min\":-40,\"max\":0}",
+      "custom21Trig5CameraOffsetZRange": "{\"min\":-40,\"max\":-5}",
       "custom21Trig5RotationEnabled": false,
       "custom21Trig5RotationX": 0,
       "custom21Trig5RotationY": -5,
@@ -19254,7 +19254,7 @@
       "custom21Trig5CameraOffsetYRange": "{\"min\":0.5,\"max\":1}",
       "custom21Trig5CameraOffsetZEnabled": true,
       "custom21Trig5CameraOffsetZCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.11245519817770544,\"y\":0.6356243133544922}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.12114747248816116,\"y\":0}}]",
-      "custom21Trig5CameraOffsetZRange": "{\"min\":-40,\"max\":0}",
+      "custom21Trig5CameraOffsetZRange": "{\"min\":-40,\"max\":-5}",
       "custom21Trig5RotationEnabled": false,
       "custom21Trig5RotationX": 0,
       "custom21Trig5RotationY": -5,
@@ -29877,7 +29877,7 @@
       "custom21Trig5CameraOffsetYRange": "{\"min\":0.5,\"max\":1}",
       "custom21Trig5CameraOffsetZEnabled": true,
       "custom21Trig5CameraOffsetZCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.11245519817770544,\"y\":0.6356243133544922}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.12114747248816116,\"y\":0}}]",
-      "custom21Trig5CameraOffsetZRange": "{\"min\":-40,\"max\":0}",
+      "custom21Trig5CameraOffsetZRange": "{\"min\":-40,\"max\":-5}",
       "custom21Trig5RotationEnabled": false,
       "custom21Trig5RotationX": 0,
       "custom21Trig5RotationY": -5,
@@ -107543,7 +107543,7 @@
                       "type": "group",
                       "group": {
                         "key": "Trigger 5",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -114559,7 +114559,7 @@
                     },
                     {
                       "key": "Trigger 5",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -122263,7 +122263,7 @@
                     "type": "group",
                     "group": {
                       "key": "Trigger 5",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -129279,7 +129279,7 @@
                   },
                   {
                     "key": "Trigger 5",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -207123,7 +207123,7 @@
                     "type": "group",
                     "group": {
                       "key": "Trigger 5",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -214139,7 +214139,7 @@
                   },
                   {
                     "key": "Trigger 5",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -221843,7 +221843,7 @@
                   "type": "group",
                   "group": {
                     "key": "Trigger 5",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -228859,7 +228859,7 @@
                 },
                 {
                   "key": "Trigger 5",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -244371,8 +244371,8 @@
     "mobile": {
       "left": 20,
       "top": 0,
-      "width": 390.1190490722656,
-      "height": 572.172607421875
+      "width": 396.9761962890625,
+      "height": 35.52381134033203
     }
   }
 }
