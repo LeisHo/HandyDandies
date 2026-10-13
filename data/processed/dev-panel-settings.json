@@ -7352,6 +7352,18 @@
           "targetX": -0.15494373426241476,
           "targetY": -3.9049830861738197,
           "targetZ": 0.17562085189382515
+        },
+        {
+          "name": "Camera 11",
+          "cameraX": 20.29573494421685,
+          "cameraY": 37.02280102380188,
+          "cameraZ": 800.3687267310587,
+          "cameraFov": 5,
+          "cameraZoom": 801.5,
+          "cameraRoll": 0,
+          "targetX": -0.15459770051460153,
+          "targetY": -4.170088676810011,
+          "targetZ": 0.1892595283359917
         }
       ],
       "lockCameraPan": false,
@@ -17939,6 +17951,18 @@
           "targetX": -0.15494373426241476,
           "targetY": -3.9049830861738197,
           "targetZ": 0.17562085189382515
+        },
+        {
+          "name": "Camera 11",
+          "cameraX": 20.29573494421685,
+          "cameraY": 37.02280102380188,
+          "cameraZ": 800.3687267310587,
+          "cameraFov": 5,
+          "cameraZoom": 801.5,
+          "cameraRoll": 0,
+          "targetX": -0.15459770051460153,
+          "targetY": -4.170088676810011,
+          "targetZ": 0.1892595283359917
         }
       ],
       "lockCameraPan": false,
@@ -28526,6 +28550,18 @@
           "targetX": -0.15494373426241476,
           "targetY": -3.9049830861738197,
           "targetZ": 0.17562085189382515
+        },
+        {
+          "name": "Camera 11",
+          "cameraX": 20.29573494421685,
+          "cameraY": 37.02280102380188,
+          "cameraZ": 800.3687267310587,
+          "cameraFov": 5,
+          "cameraZoom": 801.5,
+          "cameraRoll": 0,
+          "targetX": -0.15459770051460153,
+          "targetY": -4.170088676810011,
+          "targetZ": 0.1892595283359917
         }
       ],
       "lockCameraPan": false,
