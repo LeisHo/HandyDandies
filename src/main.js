@@ -4608,7 +4608,9 @@ function buildSnapshotText() {
   const f1 = (v) => (typeof v === 'number' && isFinite(v) ? v.toFixed(2) : String(v))
   const v3 = (v) => (v ? '(' + f1(v.x) + ', ' + f1(v.y) + ', ' + f1(v.z) + ')' : 'n/a')
   const last = (arr, n) => (arr.length ? arr.slice(-n).join('\n') : '(none buffered)')
-  const nearest = (n) => hands.map((h, i) => ({ h, i })).filter((o) => o.h._trkXY !== undefined).sort((a, b) => a.h._trkXY - b.h._trkXY).slice(0, n)
+  // Distances are measured NOW from the current cursor (cursorNDC keeps following the mouse), not read from hand._trkXY: that is only refreshed by updateRenderOrder(), which does not run while the app is paused,
+  // so while paused the 'nearest' list used to be stuck on the cursor position from the moment of the pause.
+  const nearest = (n) => hands.map((h, i) => ({ h, i, d: cursorDistXY(handPoint(h)) })).sort((a, b) => a.d - b.d).slice(0, n)
   const NEAR = 15
   L.push('=== SNAPSHOT ' + new Date().toISOString() + ' (+' + Math.round(performance.now() - pageLoadStartMs) + 'ms) ===')
   let any = false
@@ -4679,7 +4681,7 @@ function buildSnapshotText() {
     L.push('the ' + NEAR + ' hands nearest the cursor (screen XY), rank = drawn order (higher = on top):')
     nearest(NEAR).forEach((o) => {
       const zOf = (n) => { const b = renderOrderBone(o.h, n); return b ? f1(b.matrixWorld.elements[14]) : 'n/a' }
-      L.push('  Hand ' + (o.i + 1) + ' rank ' + (o.h._roRank === undefined ? 'n/a' : o.h._roRank) + ' | dist ' + f1(o.h._trkXY) + ' | Z: arm base ' + zOf('armBase') + ', arm end ' + zOf('armEnd') + ', palm ' + zOf('palmCenter'))
+      L.push('  Hand ' + (o.i + 1) + ' rank ' + (o.h._roRank === undefined ? 'n/a' : o.h._roRank) + ' | dist ' + f1(o.d) + ' | Z: arm base ' + zOf('armBase') + ', arm end ' + zOf('armEnd') + ', palm ' + zOf('palmCenter'))
     })
     L.push('last Render Reordering Log lines:', last(renderReorderLogEntries, 15))
   }
@@ -4688,7 +4690,7 @@ function buildSnapshotText() {
     L.push('', '--- Tracking Points ---')
     L.push('Tracking Point mode: ' + cfg.trackingPoint)
     L.push('the ' + NEAR + ' hands nearest the cursor:')
-    nearest(NEAR).forEach((o) => L.push('  Hand ' + (o.i + 1) + ' tracking ' + v3(o.h._trk) + ' | rest ' + v3(o.h._trkRest) + ' | field position ' + v3(o.h.wrapper.position) + ' | screen dist ' + f1(o.h._trkXY)))
+    nearest(NEAR).forEach((o) => L.push('  Hand ' + (o.i + 1) + ' tracking ' + v3(o.h._trk) + ' | rest ' + v3(o.h._trkRest) + ' | field position ' + v3(o.h.wrapper.position) + ' | screen dist ' + f1(o.d)))
   }
   if (!any) L.push('', '(no Snapshot categories are ticked)')
   return L.join('\n')
