@@ -7663,16 +7663,17 @@
       "colorPresets": "[{\"id\":\"seed1\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#0040ff\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#ff5900\\\"}]\",\"bg\":\"#00308f\",\"s\":2,\"t\":3.2,\"f\":9,\"c\":99},{\"id\":\"seed2\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#ffffff\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#ffffff\\\"}]\",\"bg\":\"#000000\",\"s\":2,\"t\":2.5,\"f\":0,\"c\":99,\"w\":[\"#000000\",\"#ffffff\"]},{\"id\":\"seed3\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#ffffff\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#ffffff\\\"}]\",\"bg\":\"#ffffff\",\"s\":2,\"t\":2.5,\"f\":0,\"c\":99,\"w\":[\"#ffffff\",\"#000000\"]},{\"id\":\"seed4\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#ff0000\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#00b32d\\\"}]\",\"bg\":\"#a80000\",\"s\":2,\"t\":2.3,\"f\":40,\"c\":82},{\"id\":\"seed5\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#7a005a\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#ff6600\\\"}]\",\"bg\":\"#80003e\",\"s\":2,\"t\":2.3,\"f\":39,\"c\":90},{\"id\":\"seed6\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#ff6600\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#7a005a\\\"}]\",\"bg\":\"#e65c00\",\"s\":2,\"t\":4.5,\"f\":90,\"c\":80},{\"id\":\"seed7\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#ff6600\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#7a005a\\\"}]\",\"bg\":\"#003c8a\",\"s\":2,\"t\":4.5,\"f\":90,\"c\":80},{\"id\":\"seed8\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#ffffff\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#ff0000\\\"}]\",\"bg\":\"#e20000\",\"s\":2,\"t\":2.95,\"f\":40,\"c\":40},{\"id\":\"seed9\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#ff0000\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#ffffff\\\"}]\",\"bg\":\"#e20000\",\"s\":2,\"t\":2.95,\"f\":40,\"c\":40},{\"id\":\"seed10\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#ff0000\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#ffffff\\\"}]\",\"bg\":\"#11008f\",\"s\":2,\"t\":2.95,\"f\":40,\"c\":40},{\"id\":\"seed11\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#000cad\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#ffffff\\\"}]\",\"bg\":\"#db0000\",\"s\":2,\"t\":2.95,\"f\":40,\"c\":40},{\"id\":\"seed12\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#ffffff\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#c20000\\\"}]\",\"bg\":\"#00076b\",\"s\":2,\"t\":2.95,\"f\":40,\"c\":40},{\"id\":\"seed13\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#0300cc\\\"},{\\\"p\\\":0.6731,\\\"c\\\":\\\"#ff0000\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#ffffff\\\"}]\",\"bg\":\"#ffffff\",\"s\":3,\"t\":5,\"f\":63,\"c\":100},{\"id\":\"seed14\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#ffffff\\\"},{\\\"p\\\":0.5192,\\\"c\\\":\\\"#ff0000\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#0300cc\\\"}]\",\"bg\":\"#000657\",\"s\":3,\"t\":5,\"f\":63,\"c\":100},{\"id\":\"seed15\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#ff0000\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#ffffff\\\"}]\",\"bg\":\"#e40c0c\",\"s\":5,\"t\":1.45,\"f\":90,\"c\":83},{\"id\":\"seed16\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#054d00\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#42e0ff\\\"}]\",\"bg\":\"#002f4d\",\"s\":4,\"t\":5,\"f\":7,\"c\":82},{\"id\":\"seed17\",\"g\":\"[{\\\"p\\\":0.6529,\\\"c\\\":\\\"#000000\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#ffffff\\\"}]\",\"bg\":\"#292e3d\",\"s\":3,\"t\":3.8,\"f\":0,\"c\":100}]",
       "floorEnabled": true,
       "floorColor": "#000000",
-      "floorZOffset": -300,
+      "floorZOffset": 0,
       "floorXYScale": 1,
-      "pixelRatio": 1.25,
+      "pixelRatio": 2,
       "resolutionScale": 100,
       "qualityPreset": "high",
       "staticPoseOnStartup": true,
+      "hideFloorAfterHandOffset": true,
       "handOffsetOnStartupEnabled": true,
       "startupHandOffsetX": 0,
       "startupHandOffsetY": 0,
-      "startupHandOffsetZ": -12,
+      "startupHandOffsetZ": -22,
       "startupHandTweenEnabled": true,
       "startupFnMode": "Sequence",
       "startupFnTargetPose": "",
@@ -7680,7 +7681,7 @@
       "startupFnReverseSequence": false,
       "startupFnGlideToFirstPose": false,
       "startupFnFirstGlideTimeScale": 1,
-      "startupFnTweenSpeedMs": 800,
+      "startupFnTweenSpeedMs": 1800,
       "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":1796}",
       "startupFnSequencePlayMode": "Count",
@@ -17660,7 +17661,7 @@
         }
       ],
       "cameraX": 0,
-      "cameraY": 4.773622868161123e-14,
+      "cameraY": 9.552880885877141e-14,
       "cameraZ": 259.74194092345493,
       "cameraFov": 35,
       "cameraYaw": 0,
@@ -18104,16 +18105,17 @@
       "colorPresets": "[{\"id\":\"seed1\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#0040ff\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#ff5900\\\"}]\",\"bg\":\"#00308f\",\"s\":2,\"t\":3.2,\"f\":9,\"c\":99},{\"id\":\"seed2\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#ffffff\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#ffffff\\\"}]\",\"bg\":\"#000000\",\"s\":2,\"t\":2.5,\"f\":0,\"c\":99,\"w\":[\"#000000\",\"#ffffff\"]},{\"id\":\"seed3\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#ffffff\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#ffffff\\\"}]\",\"bg\":\"#ffffff\",\"s\":2,\"t\":2.5,\"f\":0,\"c\":99,\"w\":[\"#ffffff\",\"#000000\"]},{\"id\":\"seed4\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#ff0000\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#00b32d\\\"}]\",\"bg\":\"#a80000\",\"s\":2,\"t\":2.3,\"f\":40,\"c\":82},{\"id\":\"seed5\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#7a005a\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#ff6600\\\"}]\",\"bg\":\"#80003e\",\"s\":2,\"t\":2.3,\"f\":39,\"c\":90},{\"id\":\"seed6\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#ff6600\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#7a005a\\\"}]\",\"bg\":\"#e65c00\",\"s\":2,\"t\":4.5,\"f\":90,\"c\":80},{\"id\":\"seed7\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#ff6600\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#7a005a\\\"}]\",\"bg\":\"#003c8a\",\"s\":2,\"t\":4.5,\"f\":90,\"c\":80},{\"id\":\"seed8\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#ffffff\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#ff0000\\\"}]\",\"bg\":\"#e20000\",\"s\":2,\"t\":2.95,\"f\":40,\"c\":40},{\"id\":\"seed9\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#ff0000\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#ffffff\\\"}]\",\"bg\":\"#e20000\",\"s\":2,\"t\":2.95,\"f\":40,\"c\":40},{\"id\":\"seed10\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#ff0000\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#ffffff\\\"}]\",\"bg\":\"#11008f\",\"s\":2,\"t\":2.95,\"f\":40,\"c\":40},{\"id\":\"seed11\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#000cad\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#ffffff\\\"}]\",\"bg\":\"#db0000\",\"s\":2,\"t\":2.95,\"f\":40,\"c\":40},{\"id\":\"seed12\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#ffffff\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#c20000\\\"}]\",\"bg\":\"#00076b\",\"s\":2,\"t\":2.95,\"f\":40,\"c\":40},{\"id\":\"seed13\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#0300cc\\\"},{\\\"p\\\":0.6731,\\\"c\\\":\\\"#ff0000\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#ffffff\\\"}]\",\"bg\":\"#ffffff\",\"s\":3,\"t\":5,\"f\":63,\"c\":100},{\"id\":\"seed14\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#ffffff\\\"},{\\\"p\\\":0.5192,\\\"c\\\":\\\"#ff0000\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#0300cc\\\"}]\",\"bg\":\"#000657\",\"s\":3,\"t\":5,\"f\":63,\"c\":100},{\"id\":\"seed15\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#ff0000\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#ffffff\\\"}]\",\"bg\":\"#e40c0c\",\"s\":5,\"t\":1.45,\"f\":90,\"c\":83},{\"id\":\"seed16\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#054d00\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#42e0ff\\\"}]\",\"bg\":\"#002f4d\",\"s\":4,\"t\":5,\"f\":7,\"c\":82},{\"id\":\"seed17\",\"g\":\"[{\\\"p\\\":0.6529,\\\"c\\\":\\\"#000000\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#ffffff\\\"}]\",\"bg\":\"#292e3d\",\"s\":3,\"t\":3.8,\"f\":0,\"c\":100}]",
       "floorEnabled": true,
       "floorColor": "#000000",
-      "floorZOffset": -300,
+      "floorZOffset": 0,
       "floorXYScale": 1,
-      "pixelRatio": 1.25,
+      "pixelRatio": 2,
       "resolutionScale": 100,
       "qualityPreset": "high",
       "staticPoseOnStartup": true,
+      "hideFloorAfterHandOffset": true,
       "handOffsetOnStartupEnabled": true,
       "startupHandOffsetX": 0,
       "startupHandOffsetY": 0,
-      "startupHandOffsetZ": -12,
+      "startupHandOffsetZ": -22,
       "startupHandTweenEnabled": true,
       "startupFnMode": "Sequence",
       "startupFnTargetPose": "",
@@ -18121,7 +18123,7 @@
       "startupFnReverseSequence": false,
       "startupFnGlideToFirstPose": false,
       "startupFnFirstGlideTimeScale": 1,
-      "startupFnTweenSpeedMs": 800,
+      "startupFnTweenSpeedMs": 1800,
       "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":1796}",
       "startupFnSequencePlayMode": "Count",
@@ -28545,16 +28547,17 @@
       "colorPresets": "[{\"id\":\"seed1\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#0040ff\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#ff5900\\\"}]\",\"bg\":\"#00308f\",\"s\":2,\"t\":3.2,\"f\":9,\"c\":99},{\"id\":\"seed2\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#ffffff\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#ffffff\\\"}]\",\"bg\":\"#000000\",\"s\":2,\"t\":2.5,\"f\":0,\"c\":99,\"w\":[\"#000000\",\"#ffffff\"]},{\"id\":\"seed3\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#ffffff\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#ffffff\\\"}]\",\"bg\":\"#ffffff\",\"s\":2,\"t\":2.5,\"f\":0,\"c\":99,\"w\":[\"#ffffff\",\"#000000\"]},{\"id\":\"seed4\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#ff0000\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#00b32d\\\"}]\",\"bg\":\"#a80000\",\"s\":2,\"t\":2.3,\"f\":40,\"c\":82},{\"id\":\"seed5\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#7a005a\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#ff6600\\\"}]\",\"bg\":\"#80003e\",\"s\":2,\"t\":2.3,\"f\":39,\"c\":90},{\"id\":\"seed6\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#ff6600\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#7a005a\\\"}]\",\"bg\":\"#e65c00\",\"s\":2,\"t\":4.5,\"f\":90,\"c\":80},{\"id\":\"seed7\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#ff6600\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#7a005a\\\"}]\",\"bg\":\"#003c8a\",\"s\":2,\"t\":4.5,\"f\":90,\"c\":80},{\"id\":\"seed8\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#ffffff\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#ff0000\\\"}]\",\"bg\":\"#e20000\",\"s\":2,\"t\":2.95,\"f\":40,\"c\":40},{\"id\":\"seed9\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#ff0000\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#ffffff\\\"}]\",\"bg\":\"#e20000\",\"s\":2,\"t\":2.95,\"f\":40,\"c\":40},{\"id\":\"seed10\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#ff0000\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#ffffff\\\"}]\",\"bg\":\"#11008f\",\"s\":2,\"t\":2.95,\"f\":40,\"c\":40},{\"id\":\"seed11\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#000cad\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#ffffff\\\"}]\",\"bg\":\"#db0000\",\"s\":2,\"t\":2.95,\"f\":40,\"c\":40},{\"id\":\"seed12\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#ffffff\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#c20000\\\"}]\",\"bg\":\"#00076b\",\"s\":2,\"t\":2.95,\"f\":40,\"c\":40},{\"id\":\"seed13\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#0300cc\\\"},{\\\"p\\\":0.6731,\\\"c\\\":\\\"#ff0000\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#ffffff\\\"}]\",\"bg\":\"#ffffff\",\"s\":3,\"t\":5,\"f\":63,\"c\":100},{\"id\":\"seed14\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#ffffff\\\"},{\\\"p\\\":0.5192,\\\"c\\\":\\\"#ff0000\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#0300cc\\\"}]\",\"bg\":\"#000657\",\"s\":3,\"t\":5,\"f\":63,\"c\":100},{\"id\":\"seed15\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#ff0000\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#ffffff\\\"}]\",\"bg\":\"#e40c0c\",\"s\":5,\"t\":1.45,\"f\":90,\"c\":83},{\"id\":\"seed16\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#054d00\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#42e0ff\\\"}]\",\"bg\":\"#002f4d\",\"s\":4,\"t\":5,\"f\":7,\"c\":82},{\"id\":\"seed17\",\"g\":\"[{\\\"p\\\":0.6529,\\\"c\\\":\\\"#000000\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#ffffff\\\"}]\",\"bg\":\"#292e3d\",\"s\":3,\"t\":3.8,\"f\":0,\"c\":100}]",
       "floorEnabled": true,
       "floorColor": "#000000",
-      "floorZOffset": -300,
+      "floorZOffset": 0,
       "floorXYScale": 1,
-      "pixelRatio": 1.25,
+      "pixelRatio": 2,
       "resolutionScale": 100,
       "qualityPreset": "high",
       "staticPoseOnStartup": true,
+      "hideFloorAfterHandOffset": true,
       "handOffsetOnStartupEnabled": true,
       "startupHandOffsetX": 0,
       "startupHandOffsetY": 0,
-      "startupHandOffsetZ": -12,
+      "startupHandOffsetZ": -22,
       "startupHandTweenEnabled": true,
       "startupFnMode": "Sequence",
       "startupFnTargetPose": "",
@@ -28562,7 +28565,7 @@
       "startupFnReverseSequence": false,
       "startupFnGlideToFirstPose": false,
       "startupFnFirstGlideTimeScale": 1,
-      "startupFnTweenSpeedMs": 800,
+      "startupFnTweenSpeedMs": 1800,
       "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":1796}",
       "startupFnSequencePlayMode": "Count",
@@ -33497,7 +33500,7 @@
           "type": "group",
           "group": {
             "key": "Field Layout",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -35022,7 +35025,7 @@
       "subgroups": [
         {
           "key": "Field Layout",
-          "collapsed": false,
+          "collapsed": true,
           "locked": true,
           "items": [
             {
@@ -36530,7 +36533,7 @@
     },
     {
       "key": "Custom Click Functions",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -95347,7 +95350,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 21",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -95615,7 +95618,7 @@
                 "type": "group",
                 "group": {
                   "key": "Animation Speed Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -95919,7 +95922,7 @@
                       "type": "group",
                       "group": {
                         "key": "Tween Stop Start Time Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -95947,7 +95950,7 @@
                       "type": "group",
                       "group": {
                         "key": "Tween Stop Delay",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -95986,7 +95989,7 @@
                   "subgroups": [
                     {
                       "key": "Tween Stop Start Time Curve",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -96011,7 +96014,7 @@
                     },
                     {
                       "key": "Tween Stop Delay",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -96051,7 +96054,7 @@
                 "type": "group",
                 "group": {
                   "key": "Multi Trigger",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -101338,7 +101341,7 @@
                       "type": "group",
                       "group": {
                         "key": "Trigger 5",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -101594,7 +101597,7 @@
                             "type": "group",
                             "group": {
                               "key": "Animation Speed Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -101622,7 +101625,7 @@
                             "type": "group",
                             "group": {
                               "key": "Start Time Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -101898,7 +101901,7 @@
                                   "type": "group",
                                   "group": {
                                     "key": "Tween Stop Start Time Curve",
-                                    "collapsed": false,
+                                    "collapsed": true,
                                     "locked": false,
                                     "items": [
                                       {
@@ -101926,7 +101929,7 @@
                                   "type": "group",
                                   "group": {
                                     "key": "Tween Stop Delay",
-                                    "collapsed": false,
+                                    "collapsed": true,
                                     "locked": false,
                                     "items": [
                                       {
@@ -101965,7 +101968,7 @@
                               "subgroups": [
                                 {
                                   "key": "Tween Stop Start Time Curve",
-                                  "collapsed": false,
+                                  "collapsed": true,
                                   "locked": false,
                                   "items": [
                                     {
@@ -101990,7 +101993,7 @@
                                 },
                                 {
                                   "key": "Tween Stop Delay",
-                                  "collapsed": false,
+                                  "collapsed": true,
                                   "locked": false,
                                   "items": [
                                     {
@@ -102230,7 +102233,7 @@
                           },
                           {
                             "key": "Animation Speed Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -102255,7 +102258,7 @@
                           },
                           {
                             "key": "Start Time Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -102522,7 +102525,7 @@
                                 "type": "group",
                                 "group": {
                                   "key": "Tween Stop Start Time Curve",
-                                  "collapsed": false,
+                                  "collapsed": true,
                                   "locked": false,
                                   "items": [
                                     {
@@ -102550,7 +102553,7 @@
                                 "type": "group",
                                 "group": {
                                   "key": "Tween Stop Delay",
-                                  "collapsed": false,
+                                  "collapsed": true,
                                   "locked": false,
                                   "items": [
                                     {
@@ -102589,7 +102592,7 @@
                             "subgroups": [
                               {
                                 "key": "Tween Stop Start Time Curve",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
                                   {
@@ -102614,7 +102617,7 @@
                               },
                               {
                                 "key": "Tween Stop Delay",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
                                   {
@@ -107924,7 +107927,7 @@
                     },
                     {
                       "key": "Trigger 5",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -108180,7 +108183,7 @@
                           "type": "group",
                           "group": {
                             "key": "Animation Speed Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -108208,7 +108211,7 @@
                           "type": "group",
                           "group": {
                             "key": "Start Time Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -108484,7 +108487,7 @@
                                 "type": "group",
                                 "group": {
                                   "key": "Tween Stop Start Time Curve",
-                                  "collapsed": false,
+                                  "collapsed": true,
                                   "locked": false,
                                   "items": [
                                     {
@@ -108512,7 +108515,7 @@
                                 "type": "group",
                                 "group": {
                                   "key": "Tween Stop Delay",
-                                  "collapsed": false,
+                                  "collapsed": true,
                                   "locked": false,
                                   "items": [
                                     {
@@ -108551,7 +108554,7 @@
                             "subgroups": [
                               {
                                 "key": "Tween Stop Start Time Curve",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
                                   {
@@ -108576,7 +108579,7 @@
                               },
                               {
                                 "key": "Tween Stop Delay",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
                                   {
@@ -108816,7 +108819,7 @@
                         },
                         {
                           "key": "Animation Speed Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -108841,7 +108844,7 @@
                         },
                         {
                           "key": "Start Time Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -109108,7 +109111,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Tween Stop Start Time Curve",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
                                   {
@@ -109136,7 +109139,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Tween Stop Delay",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
                                   {
@@ -109175,7 +109178,7 @@
                           "subgroups": [
                             {
                               "key": "Tween Stop Start Time Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -109200,7 +109203,7 @@
                             },
                             {
                               "key": "Tween Stop Delay",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -109447,7 +109450,7 @@
               },
               {
                 "key": "Animation Speed Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -109739,7 +109742,7 @@
                     "type": "group",
                     "group": {
                       "key": "Tween Stop Start Time Curve",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -109767,7 +109770,7 @@
                     "type": "group",
                     "group": {
                       "key": "Tween Stop Delay",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -109806,7 +109809,7 @@
                 "subgroups": [
                   {
                     "key": "Tween Stop Start Time Curve",
-                    "collapsed": false,
+                    "collapsed": true,
                     "locked": false,
                     "items": [
                       {
@@ -109831,7 +109834,7 @@
                   },
                   {
                     "key": "Tween Stop Delay",
-                    "collapsed": false,
+                    "collapsed": true,
                     "locked": false,
                     "items": [
                       {
@@ -109868,7 +109871,7 @@
               },
               {
                 "key": "Multi Trigger",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -115155,7 +115158,7 @@
                     "type": "group",
                     "group": {
                       "key": "Trigger 5",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -115411,7 +115414,7 @@
                           "type": "group",
                           "group": {
                             "key": "Animation Speed Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -115439,7 +115442,7 @@
                           "type": "group",
                           "group": {
                             "key": "Start Time Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -115715,7 +115718,7 @@
                                 "type": "group",
                                 "group": {
                                   "key": "Tween Stop Start Time Curve",
-                                  "collapsed": false,
+                                  "collapsed": true,
                                   "locked": false,
                                   "items": [
                                     {
@@ -115743,7 +115746,7 @@
                                 "type": "group",
                                 "group": {
                                   "key": "Tween Stop Delay",
-                                  "collapsed": false,
+                                  "collapsed": true,
                                   "locked": false,
                                   "items": [
                                     {
@@ -115782,7 +115785,7 @@
                             "subgroups": [
                               {
                                 "key": "Tween Stop Start Time Curve",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
                                   {
@@ -115807,7 +115810,7 @@
                               },
                               {
                                 "key": "Tween Stop Delay",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
                                   {
@@ -116047,7 +116050,7 @@
                         },
                         {
                           "key": "Animation Speed Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -116072,7 +116075,7 @@
                         },
                         {
                           "key": "Start Time Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -116339,7 +116342,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Tween Stop Start Time Curve",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
                                   {
@@ -116367,7 +116370,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Tween Stop Delay",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
                                   {
@@ -116406,7 +116409,7 @@
                           "subgroups": [
                             {
                               "key": "Tween Stop Start Time Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -116431,7 +116434,7 @@
                             },
                             {
                               "key": "Tween Stop Delay",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -121741,7 +121744,7 @@
                   },
                   {
                     "key": "Trigger 5",
-                    "collapsed": false,
+                    "collapsed": true,
                     "locked": false,
                     "items": [
                       {
@@ -121997,7 +122000,7 @@
                         "type": "group",
                         "group": {
                           "key": "Animation Speed Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -122025,7 +122028,7 @@
                         "type": "group",
                         "group": {
                           "key": "Start Time Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -122301,7 +122304,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Tween Stop Start Time Curve",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
                                   {
@@ -122329,7 +122332,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Tween Stop Delay",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
                                   {
@@ -122368,7 +122371,7 @@
                           "subgroups": [
                             {
                               "key": "Tween Stop Start Time Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -122393,7 +122396,7 @@
                             },
                             {
                               "key": "Tween Stop Delay",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -122633,7 +122636,7 @@
                       },
                       {
                         "key": "Animation Speed Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -122658,7 +122661,7 @@
                       },
                       {
                         "key": "Start Time Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -122925,7 +122928,7 @@
                             "type": "group",
                             "group": {
                               "key": "Tween Stop Start Time Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -122953,7 +122956,7 @@
                             "type": "group",
                             "group": {
                               "key": "Tween Stop Delay",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -122992,7 +122995,7 @@
                         "subgroups": [
                           {
                             "key": "Tween Stop Start Time Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -123017,7 +123020,7 @@
                           },
                           {
                             "key": "Tween Stop Delay",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -187789,7 +187792,7 @@
         },
         {
           "key": "Custom Click Function 21",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -188057,7 +188060,7 @@
               "type": "group",
               "group": {
                 "key": "Animation Speed Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -188361,7 +188364,7 @@
                     "type": "group",
                     "group": {
                       "key": "Tween Stop Start Time Curve",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -188389,7 +188392,7 @@
                     "type": "group",
                     "group": {
                       "key": "Tween Stop Delay",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -188428,7 +188431,7 @@
                 "subgroups": [
                   {
                     "key": "Tween Stop Start Time Curve",
-                    "collapsed": false,
+                    "collapsed": true,
                     "locked": false,
                     "items": [
                       {
@@ -188453,7 +188456,7 @@
                   },
                   {
                     "key": "Tween Stop Delay",
-                    "collapsed": false,
+                    "collapsed": true,
                     "locked": false,
                     "items": [
                       {
@@ -188493,7 +188496,7 @@
               "type": "group",
               "group": {
                 "key": "Multi Trigger",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -193780,7 +193783,7 @@
                     "type": "group",
                     "group": {
                       "key": "Trigger 5",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -194036,7 +194039,7 @@
                           "type": "group",
                           "group": {
                             "key": "Animation Speed Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -194064,7 +194067,7 @@
                           "type": "group",
                           "group": {
                             "key": "Start Time Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -194340,7 +194343,7 @@
                                 "type": "group",
                                 "group": {
                                   "key": "Tween Stop Start Time Curve",
-                                  "collapsed": false,
+                                  "collapsed": true,
                                   "locked": false,
                                   "items": [
                                     {
@@ -194368,7 +194371,7 @@
                                 "type": "group",
                                 "group": {
                                   "key": "Tween Stop Delay",
-                                  "collapsed": false,
+                                  "collapsed": true,
                                   "locked": false,
                                   "items": [
                                     {
@@ -194407,7 +194410,7 @@
                             "subgroups": [
                               {
                                 "key": "Tween Stop Start Time Curve",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
                                   {
@@ -194432,7 +194435,7 @@
                               },
                               {
                                 "key": "Tween Stop Delay",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
                                   {
@@ -194672,7 +194675,7 @@
                         },
                         {
                           "key": "Animation Speed Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -194697,7 +194700,7 @@
                         },
                         {
                           "key": "Start Time Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -194964,7 +194967,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Tween Stop Start Time Curve",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
                                   {
@@ -194992,7 +194995,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Tween Stop Delay",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
                                   {
@@ -195031,7 +195034,7 @@
                           "subgroups": [
                             {
                               "key": "Tween Stop Start Time Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -195056,7 +195059,7 @@
                             },
                             {
                               "key": "Tween Stop Delay",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -200366,7 +200369,7 @@
                   },
                   {
                     "key": "Trigger 5",
-                    "collapsed": false,
+                    "collapsed": true,
                     "locked": false,
                     "items": [
                       {
@@ -200622,7 +200625,7 @@
                         "type": "group",
                         "group": {
                           "key": "Animation Speed Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -200650,7 +200653,7 @@
                         "type": "group",
                         "group": {
                           "key": "Start Time Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -200926,7 +200929,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Tween Stop Start Time Curve",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
                                   {
@@ -200954,7 +200957,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Tween Stop Delay",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
                                   {
@@ -200993,7 +200996,7 @@
                           "subgroups": [
                             {
                               "key": "Tween Stop Start Time Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -201018,7 +201021,7 @@
                             },
                             {
                               "key": "Tween Stop Delay",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -201258,7 +201261,7 @@
                       },
                       {
                         "key": "Animation Speed Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -201283,7 +201286,7 @@
                       },
                       {
                         "key": "Start Time Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -201550,7 +201553,7 @@
                             "type": "group",
                             "group": {
                               "key": "Tween Stop Start Time Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -201578,7 +201581,7 @@
                             "type": "group",
                             "group": {
                               "key": "Tween Stop Delay",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -201617,7 +201620,7 @@
                         "subgroups": [
                           {
                             "key": "Tween Stop Start Time Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -201642,7 +201645,7 @@
                           },
                           {
                             "key": "Tween Stop Delay",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -201889,7 +201892,7 @@
             },
             {
               "key": "Animation Speed Curve",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -202181,7 +202184,7 @@
                   "type": "group",
                   "group": {
                     "key": "Tween Stop Start Time Curve",
-                    "collapsed": false,
+                    "collapsed": true,
                     "locked": false,
                     "items": [
                       {
@@ -202209,7 +202212,7 @@
                   "type": "group",
                   "group": {
                     "key": "Tween Stop Delay",
-                    "collapsed": false,
+                    "collapsed": true,
                     "locked": false,
                     "items": [
                       {
@@ -202248,7 +202251,7 @@
               "subgroups": [
                 {
                   "key": "Tween Stop Start Time Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -202273,7 +202276,7 @@
                 },
                 {
                   "key": "Tween Stop Delay",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -202310,7 +202313,7 @@
             },
             {
               "key": "Multi Trigger",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -207597,7 +207600,7 @@
                   "type": "group",
                   "group": {
                     "key": "Trigger 5",
-                    "collapsed": false,
+                    "collapsed": true,
                     "locked": false,
                     "items": [
                       {
@@ -207853,7 +207856,7 @@
                         "type": "group",
                         "group": {
                           "key": "Animation Speed Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -207881,7 +207884,7 @@
                         "type": "group",
                         "group": {
                           "key": "Start Time Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -208157,7 +208160,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Tween Stop Start Time Curve",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
                                   {
@@ -208185,7 +208188,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Tween Stop Delay",
-                                "collapsed": false,
+                                "collapsed": true,
                                 "locked": false,
                                 "items": [
                                   {
@@ -208224,7 +208227,7 @@
                           "subgroups": [
                             {
                               "key": "Tween Stop Start Time Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -208249,7 +208252,7 @@
                             },
                             {
                               "key": "Tween Stop Delay",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -208489,7 +208492,7 @@
                       },
                       {
                         "key": "Animation Speed Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -208514,7 +208517,7 @@
                       },
                       {
                         "key": "Start Time Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -208781,7 +208784,7 @@
                             "type": "group",
                             "group": {
                               "key": "Tween Stop Start Time Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -208809,7 +208812,7 @@
                             "type": "group",
                             "group": {
                               "key": "Tween Stop Delay",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -208848,7 +208851,7 @@
                         "subgroups": [
                           {
                             "key": "Tween Stop Start Time Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -208873,7 +208876,7 @@
                           },
                           {
                             "key": "Tween Stop Delay",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -214183,7 +214186,7 @@
                 },
                 {
                   "key": "Trigger 5",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -214439,7 +214442,7 @@
                       "type": "group",
                       "group": {
                         "key": "Animation Speed Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -214467,7 +214470,7 @@
                       "type": "group",
                       "group": {
                         "key": "Start Time Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -214743,7 +214746,7 @@
                             "type": "group",
                             "group": {
                               "key": "Tween Stop Start Time Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -214771,7 +214774,7 @@
                             "type": "group",
                             "group": {
                               "key": "Tween Stop Delay",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -214810,7 +214813,7 @@
                         "subgroups": [
                           {
                             "key": "Tween Stop Start Time Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -214835,7 +214838,7 @@
                           },
                           {
                             "key": "Tween Stop Delay",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -215075,7 +215078,7 @@
                     },
                     {
                       "key": "Animation Speed Curve",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -215100,7 +215103,7 @@
                     },
                     {
                       "key": "Start Time Curve",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -215367,7 +215370,7 @@
                           "type": "group",
                           "group": {
                             "key": "Tween Stop Start Time Curve",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -215395,7 +215398,7 @@
                           "type": "group",
                           "group": {
                             "key": "Tween Stop Delay",
-                            "collapsed": false,
+                            "collapsed": true,
                             "locked": false,
                             "items": [
                               {
@@ -215434,7 +215437,7 @@
                       "subgroups": [
                         {
                           "key": "Tween Stop Start Time Curve",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -215459,7 +215462,7 @@
                         },
                         {
                           "key": "Tween Stop Delay",
-                          "collapsed": false,
+                          "collapsed": true,
                           "locked": false,
                           "items": [
                             {
@@ -221434,7 +221437,7 @@
     },
     {
       "key": "New Group (11)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -222197,7 +222200,7 @@
     },
     {
       "key": "Starting State",
-      "collapsed": true,
+      "collapsed": false,
       "locked": false,
       "items": [
         {
@@ -222205,10 +222208,14 @@
           "key": "staticPoseOnStartup"
         },
         {
+          "type": "row",
+          "key": "hideFloorAfterHandOffset"
+        },
+        {
           "type": "group",
           "group": {
             "key": "Hand Offset On Startup",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -223540,12 +223547,13 @@
         }
       ],
       "settings": [
-        "staticPoseOnStartup"
+        "staticPoseOnStartup",
+        "hideFloorAfterHandOffset"
       ],
       "subgroups": [
         {
           "key": "Hand Offset On Startup",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
@@ -227329,6 +227337,12 @@
       "top": 30.787500381469727,
       "width": 524.7750244140625,
       "height": 630.3875122070312
+    },
+    "mobile": {
+      "left": 20,
+      "top": 0,
+      "width": 391.5714416503906,
+      "height": 549.3333740234375
     }
   }
 }
