@@ -7218,7 +7218,7 @@
           "group": "FIST ROTATE"
         }
       ],
-      "cameraX": 6.504490851233483,
+      "cameraX": 6.5044908512334825,
       "cameraY": 9.509045874349919,
       "cameraZ": 260.7456033096733,
       "cameraFov": 15,
@@ -7357,11 +7357,11 @@
           "ambientGroundColor": "#ffffff"
         }
       ],
-      "toonSteps": 4,
+      "toonSteps": 2,
       "toonStepThreshold": 5,
-      "toonShadowFloor": 7,
-      "toonLightCeiling": 82,
-      "toonGradient": "[{\"p\":0,\"c\":\"#054d00\"},{\"p\":1,\"c\":\"#42e0ff\"}]",
+      "toonShadowFloor": 0,
+      "toonLightCeiling": 54,
+      "toonGradient": "[{\"p\":0,\"c\":\"#b5b5b5\"},{\"p\":1,\"c\":\"#000000\"}]",
       "toonBaseTint": "#ffffff",
       "textureInfluence": 0,
       "toonTint": "#ffffff",
@@ -7634,6 +7634,20 @@
           "rimPower": 0,
           "rimColor": "#ffffff",
           "toonGradient": "[{\"p\":0,\"c\":\"#054d00\"},{\"p\":1,\"c\":\"#42e0ff\"}]"
+        },
+        {
+          "name": "HD - COLOR PRESET - BGW",
+          "toonSteps": 3,
+          "toonStepThreshold": 3.8,
+          "toonShadowFloor": 0,
+          "toonLightCeiling": 100,
+          "toonBaseTint": "#ffffff",
+          "textureInfluence": 0,
+          "toonTint": "#ffffff",
+          "rimIntensity": 0,
+          "rimPower": 0,
+          "rimColor": "#ffffff",
+          "toonGradient": "[{\"p\":0.6529,\"c\":\"#000000\"},{\"p\":1,\"c\":\"#ffffff\"}]"
         }
       ],
       "outlineEnabled": false,
@@ -7647,7 +7661,7 @@
       "emissionIntensity": 1.5,
       "bgColor": "#ff8000",
       "floorEnabled": true,
-      "floorColor": "#002f4d",
+      "floorColor": "#ffffff",
       "floorZOffset": -119.5,
       "floorXYScale": 1,
       "pixelRatio": 1.25,
@@ -17462,10 +17476,10 @@
         }
       ],
       "toonSteps": 3,
-      "toonStepThreshold": 5,
+      "toonStepThreshold": 1.9,
       "toonShadowFloor": 0,
       "toonLightCeiling": 100,
-      "toonGradient": "[{\"p\":0,\"c\":\"#054d00\"},{\"p\":1,\"c\":\"#42e0ff\"}]",
+      "toonGradient": "[{\"p\":0,\"c\":\"#b5b5b5\"},{\"p\":1,\"c\":\"#000000\"}]",
       "toonBaseTint": "#0091ff",
       "textureInfluence": 0,
       "toonTint": "#ffffff",
@@ -17738,6 +17752,20 @@
           "rimPower": 0,
           "rimColor": "#ffffff",
           "toonGradient": "[{\"p\":0,\"c\":\"#054d00\"},{\"p\":1,\"c\":\"#42e0ff\"}]"
+        },
+        {
+          "name": "HD - COLOR PRESET - BGW",
+          "toonSteps": 3,
+          "toonStepThreshold": 3.8,
+          "toonShadowFloor": 0,
+          "toonLightCeiling": 100,
+          "toonBaseTint": "#ffffff",
+          "textureInfluence": 0,
+          "toonTint": "#ffffff",
+          "rimIntensity": 0,
+          "rimPower": 0,
+          "rimColor": "#ffffff",
+          "toonGradient": "[{\"p\":0.6529,\"c\":\"#000000\"},{\"p\":1,\"c\":\"#ffffff\"}]"
         }
       ],
       "outlineEnabled": false,
@@ -17751,7 +17779,7 @@
       "emissionIntensity": 1.5,
       "bgColor": "#ff8000",
       "floorEnabled": true,
-      "floorColor": "#002f4d",
+      "floorColor": "#ffffff",
       "floorZOffset": -119.5,
       "floorXYScale": 1,
       "pixelRatio": 1.25,
@@ -27565,11 +27593,11 @@
           "ambientGroundColor": "#ffffff"
         }
       ],
-      "toonSteps": 4,
+      "toonSteps": 2,
       "toonStepThreshold": 5,
-      "toonShadowFloor": 7,
-      "toonLightCeiling": 82,
-      "toonGradient": "[{\"p\":0,\"c\":\"#054d00\"},{\"p\":1,\"c\":\"#42e0ff\"}]",
+      "toonShadowFloor": 0,
+      "toonLightCeiling": 54,
+      "toonGradient": "[{\"p\":0,\"c\":\"#b5b5b5\"},{\"p\":1,\"c\":\"#000000\"}]",
       "toonBaseTint": "#ffffff",
       "textureInfluence": 0,
       "toonTint": "#ffffff",
@@ -27842,6 +27870,20 @@
           "rimPower": 0,
           "rimColor": "#ffffff",
           "toonGradient": "[{\"p\":0,\"c\":\"#054d00\"},{\"p\":1,\"c\":\"#42e0ff\"}]"
+        },
+        {
+          "name": "HD - COLOR PRESET - BGW",
+          "toonSteps": 3,
+          "toonStepThreshold": 3.8,
+          "toonShadowFloor": 0,
+          "toonLightCeiling": 100,
+          "toonBaseTint": "#ffffff",
+          "textureInfluence": 0,
+          "toonTint": "#ffffff",
+          "rimIntensity": 0,
+          "rimPower": 0,
+          "rimColor": "#ffffff",
+          "toonGradient": "[{\"p\":0.6529,\"c\":\"#000000\"},{\"p\":1,\"c\":\"#ffffff\"}]"
         }
       ],
       "outlineEnabled": false,
@@ -27855,7 +27897,7 @@
       "emissionIntensity": 1.5,
       "bgColor": "#ff8000",
       "floorEnabled": true,
-      "floorColor": "#002f4d",
+      "floorColor": "#ffffff",
       "floorZOffset": -119.5,
       "floorXYScale": 1,
       "pixelRatio": 1.25,
