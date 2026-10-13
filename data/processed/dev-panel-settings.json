@@ -10123,20 +10123,20 @@
       "custom32TouchPointCount": 1,
       "custom32ClickCount": "2nd",
       "custom32Mode": "Single Pose",
-      "custom32OffsetEnabled": false,
-      "custom32OffsetMode": "XYZ Offset",
+      "custom32OffsetEnabled": true,
+      "custom32OffsetMode": "Cursor Offset",
       "custom32OffsetX": 0,
       "custom32OffsetY": 0,
       "custom32OffsetZ": 0,
       "custom32CursorOffsetDistance": 0,
-      "custom32CursorOffsetDistanceCurveEnabled": false,
+      "custom32CursorOffsetDistanceCurveEnabled": true,
       "custom32CursorOffsetVisibleOnly": true,
-      "custom32CursorOffsetDistanceCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom32CursorOffsetDistanceCurveRange": "{\"min\":-50,\"max\":50}",
-      "custom32CursorOffsetXCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom32CursorOffsetXRange": "{\"min\":0,\"max\":0}",
-      "custom32CursorOffsetYCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom32CursorOffsetYRange": "{\"min\":0,\"max\":0}",
+      "custom32CursorOffsetDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
+      "custom32CursorOffsetDistanceCurveRange": "{\"min\":0,\"max\":1}",
+      "custom32CursorOffsetXCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
+      "custom32CursorOffsetXRange": "{\"min\":0,\"max\":4}",
+      "custom32CursorOffsetYCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
+      "custom32CursorOffsetYRange": "{\"min\":0,\"max\":4}",
       "custom32CursorOffsetZCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom32CursorOffsetZRange": "{\"min\":0,\"max\":0}",
       "custom32CameraOffsetEnabled": true,
@@ -10148,8 +10148,8 @@
       "custom32CameraOffsetYCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
       "custom32CameraOffsetYRange": "{\"min\":-3,\"max\":10}",
       "custom32CameraOffsetZEnabled": true,
-      "custom32CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.37628148226379754,\"y\":-0.0456249872843425}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.8781184266067901,\"y\":0}}]",
-      "custom32CameraOffsetZRange": "{\"min\":-5,\"max\":10}",
+      "custom32CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.25697691158432456,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-1,\"y\":0.007708295186360625}}]",
+      "custom32CameraOffsetZRange": "{\"min\":-5,\"max\":14}",
       "custom32RotationEnabled": false,
       "custom32RotationX": 0,
       "custom32RotationY": 0,
@@ -10170,18 +10170,18 @@
       "custom32SequenceHoldMs": 0,
       "custom32TransitionSpeedMs": 700,
       "custom32EasingCurveEnabled": true,
-      "custom32EasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.20258785846483215,\"y\":0}},{\"x\":0.3569823394598722,\"y\":1,\"h2\":{\"x\":-0.1824663021624027,\"y\":0}},{\"x\":1,\"y\":0}]",
+      "custom32EasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.20258785846483215,\"y\":0}},{\"x\":0.4990952313737364,\"y\":0.9579165140787761,\"h2\":{\"x\":-0.1824663021624027,\"y\":0},\"h1\":{\"x\":0.27019014095677446,\"y\":-0.015416717529296853}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.26054050262663,\"y\":0}}]",
       "custom32RetransitionEasingCurveEnabled": true,
       "custom32RetransitionEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.21411385772542704,\"y\":0.042812474568684866}},{\"x\":0.4901148684717166,\"y\":0.6028124491373699,\"h2\":{\"x\":-0.2509101092131055,\"y\":0.04666671752929674}},{\"x\":1,\"y\":0}]",
       "custom32SpeedCurveEnabled": true,
       "custom32SpeedCurveVisibleOnly": true,
-      "custom32SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom32SpeedCurveRange": "{\"min\":500,\"max\":994}",
+      "custom32SpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3938263035652174,\"y\":0}},{\"x\":1,\"y\":1}]",
+      "custom32SpeedCurveRange": "{\"min\":729,\"max\":1270}",
       "custom32StartTimeCurveEnabled": true,
       "custom32StartTimeCurveVisibleOnly": true,
       "custom32StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom32StartTimeRange": "{\"min\":0,\"max\":1039}",
-      "custom32StartDistanceCurveEnabled": false,
+      "custom32StartTimeRange": "{\"min\":0,\"max\":1720}",
+      "custom32StartDistanceCurveEnabled": true,
       "custom32StartDistanceMin": 0,
       "custom32StartDistanceMax": 100,
       "custom32StartDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
@@ -10190,12 +10190,12 @@
       "custom32RetransitionSpeedMs": 400,
       "custom32RetransitionSpeedCurveEnabled": true,
       "custom32RetransitionSpeedCurveVisibleOnly": true,
-      "custom32RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom32RetransitionSpeedCurveRange": "{\"min\":21997,\"max\":25000}",
+      "custom32RetransitionSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.25712690991669,\"y\":0}},{\"x\":1,\"y\":1}]",
+      "custom32RetransitionSpeedCurveRange": "{\"min\":22567,\"max\":30000}",
       "custom32RetransitionStartTimeCurveEnabled": true,
       "custom32RetransitionStartTimeCurveVisibleOnly": true,
-      "custom32RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom32RetransitionStartTimeRange": "{\"min\":761,\"max\":3000}",
+      "custom32RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.29655558667040044,\"y\":0}},{\"x\":1,\"y\":1}]",
+      "custom32RetransitionStartTimeRange": "{\"min\":1680,\"max\":3000}",
       "custom32MultiTriggerEnabled": false,
       "custom32MultiTriggers": "[]"
     },
@@ -20322,20 +20322,20 @@
       "custom32TouchPointCount": 1,
       "custom32ClickCount": "2nd",
       "custom32Mode": "Single Pose",
-      "custom32OffsetEnabled": false,
-      "custom32OffsetMode": "XYZ Offset",
+      "custom32OffsetEnabled": true,
+      "custom32OffsetMode": "Cursor Offset",
       "custom32OffsetX": 0,
       "custom32OffsetY": 0,
       "custom32OffsetZ": 0,
       "custom32CursorOffsetDistance": 0,
-      "custom32CursorOffsetDistanceCurveEnabled": false,
+      "custom32CursorOffsetDistanceCurveEnabled": true,
       "custom32CursorOffsetVisibleOnly": true,
-      "custom32CursorOffsetDistanceCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom32CursorOffsetDistanceCurveRange": "{\"min\":-50,\"max\":50}",
-      "custom32CursorOffsetXCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom32CursorOffsetXRange": "{\"min\":0,\"max\":0}",
-      "custom32CursorOffsetYCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom32CursorOffsetYRange": "{\"min\":0,\"max\":0}",
+      "custom32CursorOffsetDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
+      "custom32CursorOffsetDistanceCurveRange": "{\"min\":0,\"max\":1}",
+      "custom32CursorOffsetXCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
+      "custom32CursorOffsetXRange": "{\"min\":0,\"max\":4}",
+      "custom32CursorOffsetYCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
+      "custom32CursorOffsetYRange": "{\"min\":0,\"max\":4}",
       "custom32CursorOffsetZCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom32CursorOffsetZRange": "{\"min\":0,\"max\":0}",
       "custom32CameraOffsetEnabled": true,
@@ -20347,8 +20347,8 @@
       "custom32CameraOffsetYCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
       "custom32CameraOffsetYRange": "{\"min\":-3,\"max\":10}",
       "custom32CameraOffsetZEnabled": true,
-      "custom32CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.37628148226379754,\"y\":-0.0456249872843425}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.8781184266067901,\"y\":0}}]",
-      "custom32CameraOffsetZRange": "{\"min\":-5,\"max\":10}",
+      "custom32CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.25697691158432456,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-1,\"y\":0.007708295186360625}}]",
+      "custom32CameraOffsetZRange": "{\"min\":-5,\"max\":14}",
       "custom32RotationEnabled": false,
       "custom32RotationX": 0,
       "custom32RotationY": 0,
@@ -20369,18 +20369,18 @@
       "custom32SequenceHoldMs": 0,
       "custom32TransitionSpeedMs": 700,
       "custom32EasingCurveEnabled": true,
-      "custom32EasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.20258785846483215,\"y\":0}},{\"x\":0.3569823394598722,\"y\":1,\"h2\":{\"x\":-0.1824663021624027,\"y\":0}},{\"x\":1,\"y\":0}]",
+      "custom32EasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.20258785846483215,\"y\":0}},{\"x\":0.4990952313737364,\"y\":0.9579165140787761,\"h2\":{\"x\":-0.1824663021624027,\"y\":0},\"h1\":{\"x\":0.27019014095677446,\"y\":-0.015416717529296853}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.26054050262663,\"y\":0}}]",
       "custom32RetransitionEasingCurveEnabled": true,
       "custom32RetransitionEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.21411385772542704,\"y\":0.042812474568684866}},{\"x\":0.4901148684717166,\"y\":0.6028124491373699,\"h2\":{\"x\":-0.2509101092131055,\"y\":0.04666671752929674}},{\"x\":1,\"y\":0}]",
       "custom32SpeedCurveEnabled": true,
       "custom32SpeedCurveVisibleOnly": true,
-      "custom32SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom32SpeedCurveRange": "{\"min\":500,\"max\":994}",
+      "custom32SpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3938263035652174,\"y\":0}},{\"x\":1,\"y\":1}]",
+      "custom32SpeedCurveRange": "{\"min\":729,\"max\":1270}",
       "custom32StartTimeCurveEnabled": true,
       "custom32StartTimeCurveVisibleOnly": true,
       "custom32StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom32StartTimeRange": "{\"min\":0,\"max\":1039}",
-      "custom32StartDistanceCurveEnabled": false,
+      "custom32StartTimeRange": "{\"min\":0,\"max\":1720}",
+      "custom32StartDistanceCurveEnabled": true,
       "custom32StartDistanceMin": 0,
       "custom32StartDistanceMax": 100,
       "custom32StartDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
@@ -20389,12 +20389,12 @@
       "custom32RetransitionSpeedMs": 400,
       "custom32RetransitionSpeedCurveEnabled": true,
       "custom32RetransitionSpeedCurveVisibleOnly": true,
-      "custom32RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom32RetransitionSpeedCurveRange": "{\"min\":21997,\"max\":25000}",
+      "custom32RetransitionSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.25712690991669,\"y\":0}},{\"x\":1,\"y\":1}]",
+      "custom32RetransitionSpeedCurveRange": "{\"min\":22567,\"max\":30000}",
       "custom32RetransitionStartTimeCurveEnabled": true,
       "custom32RetransitionStartTimeCurveVisibleOnly": true,
-      "custom32RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom32RetransitionStartTimeRange": "{\"min\":761,\"max\":3000}",
+      "custom32RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.29655558667040044,\"y\":0}},{\"x\":1,\"y\":1}]",
+      "custom32RetransitionStartTimeRange": "{\"min\":1680,\"max\":3000}",
       "custom32MultiTriggerEnabled": false,
       "custom32MultiTriggers": "[]"
     },
@@ -30521,20 +30521,20 @@
       "custom32TouchPointCount": 1,
       "custom32ClickCount": "2nd",
       "custom32Mode": "Single Pose",
-      "custom32OffsetEnabled": false,
-      "custom32OffsetMode": "XYZ Offset",
+      "custom32OffsetEnabled": true,
+      "custom32OffsetMode": "Cursor Offset",
       "custom32OffsetX": 0,
       "custom32OffsetY": 0,
       "custom32OffsetZ": 0,
       "custom32CursorOffsetDistance": 0,
-      "custom32CursorOffsetDistanceCurveEnabled": false,
+      "custom32CursorOffsetDistanceCurveEnabled": true,
       "custom32CursorOffsetVisibleOnly": true,
-      "custom32CursorOffsetDistanceCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom32CursorOffsetDistanceCurveRange": "{\"min\":-50,\"max\":50}",
-      "custom32CursorOffsetXCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom32CursorOffsetXRange": "{\"min\":0,\"max\":0}",
-      "custom32CursorOffsetYCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom32CursorOffsetYRange": "{\"min\":0,\"max\":0}",
+      "custom32CursorOffsetDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
+      "custom32CursorOffsetDistanceCurveRange": "{\"min\":0,\"max\":1}",
+      "custom32CursorOffsetXCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
+      "custom32CursorOffsetXRange": "{\"min\":0,\"max\":4}",
+      "custom32CursorOffsetYCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
+      "custom32CursorOffsetYRange": "{\"min\":0,\"max\":4}",
       "custom32CursorOffsetZCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom32CursorOffsetZRange": "{\"min\":0,\"max\":0}",
       "custom32CameraOffsetEnabled": true,
@@ -30546,8 +30546,8 @@
       "custom32CameraOffsetYCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":0}]",
       "custom32CameraOffsetYRange": "{\"min\":-3,\"max\":10}",
       "custom32CameraOffsetZEnabled": true,
-      "custom32CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.37628148226379754,\"y\":-0.0456249872843425}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.8781184266067901,\"y\":0}}]",
-      "custom32CameraOffsetZRange": "{\"min\":-5,\"max\":10}",
+      "custom32CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.25697691158432456,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-1,\"y\":0.007708295186360625}}]",
+      "custom32CameraOffsetZRange": "{\"min\":-5,\"max\":14}",
       "custom32RotationEnabled": false,
       "custom32RotationX": 0,
       "custom32RotationY": 0,
@@ -30568,18 +30568,18 @@
       "custom32SequenceHoldMs": 0,
       "custom32TransitionSpeedMs": 700,
       "custom32EasingCurveEnabled": true,
-      "custom32EasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.20258785846483215,\"y\":0}},{\"x\":0.3569823394598722,\"y\":1,\"h2\":{\"x\":-0.1824663021624027,\"y\":0}},{\"x\":1,\"y\":0}]",
+      "custom32EasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.20258785846483215,\"y\":0}},{\"x\":0.4990952313737364,\"y\":0.9579165140787761,\"h2\":{\"x\":-0.1824663021624027,\"y\":0},\"h1\":{\"x\":0.27019014095677446,\"y\":-0.015416717529296853}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.26054050262663,\"y\":0}}]",
       "custom32RetransitionEasingCurveEnabled": true,
       "custom32RetransitionEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.21411385772542704,\"y\":0.042812474568684866}},{\"x\":0.4901148684717166,\"y\":0.6028124491373699,\"h2\":{\"x\":-0.2509101092131055,\"y\":0.04666671752929674}},{\"x\":1,\"y\":0}]",
       "custom32SpeedCurveEnabled": true,
       "custom32SpeedCurveVisibleOnly": true,
-      "custom32SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom32SpeedCurveRange": "{\"min\":500,\"max\":994}",
+      "custom32SpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3938263035652174,\"y\":0}},{\"x\":1,\"y\":1}]",
+      "custom32SpeedCurveRange": "{\"min\":729,\"max\":1270}",
       "custom32StartTimeCurveEnabled": true,
       "custom32StartTimeCurveVisibleOnly": true,
       "custom32StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom32StartTimeRange": "{\"min\":0,\"max\":1039}",
-      "custom32StartDistanceCurveEnabled": false,
+      "custom32StartTimeRange": "{\"min\":0,\"max\":1720}",
+      "custom32StartDistanceCurveEnabled": true,
       "custom32StartDistanceMin": 0,
       "custom32StartDistanceMax": 100,
       "custom32StartDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
@@ -30588,12 +30588,12 @@
       "custom32RetransitionSpeedMs": 400,
       "custom32RetransitionSpeedCurveEnabled": true,
       "custom32RetransitionSpeedCurveVisibleOnly": true,
-      "custom32RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom32RetransitionSpeedCurveRange": "{\"min\":21997,\"max\":25000}",
+      "custom32RetransitionSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.25712690991669,\"y\":0}},{\"x\":1,\"y\":1}]",
+      "custom32RetransitionSpeedCurveRange": "{\"min\":22567,\"max\":30000}",
       "custom32RetransitionStartTimeCurveEnabled": true,
       "custom32RetransitionStartTimeCurveVisibleOnly": true,
-      "custom32RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom32RetransitionStartTimeRange": "{\"min\":761,\"max\":3000}",
+      "custom32RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.29655558667040044,\"y\":0}},{\"x\":1,\"y\":1}]",
+      "custom32RetransitionStartTimeRange": "{\"min\":1680,\"max\":3000}",
       "custom32MultiTriggerEnabled": false,
       "custom32MultiTriggers": "[]"
     }
@@ -35904,7 +35904,7 @@
                 "type": "group",
                 "group": {
                   "key": "Offset",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -36083,7 +36083,7 @@
                 "type": "group",
                 "group": {
                   "key": "Easing",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -36101,7 +36101,7 @@
                 "type": "group",
                 "group": {
                   "key": "Animation Speed Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -36129,7 +36129,7 @@
                 "type": "group",
                 "group": {
                   "key": "Start Time Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -36206,7 +36206,7 @@
                       "type": "group",
                       "group": {
                         "key": "Retransition Speed Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -36283,7 +36283,7 @@
                   "subgroups": [
                     {
                       "key": "Retransition Speed Curve",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -36401,7 +36401,7 @@
             "subgroups": [
               {
                 "key": "Offset",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -36571,7 +36571,7 @@
               },
               {
                 "key": "Easing",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -36586,7 +36586,7 @@
               },
               {
                 "key": "Animation Speed Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -36611,7 +36611,7 @@
               },
               {
                 "key": "Start Time Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -36682,7 +36682,7 @@
                     "type": "group",
                     "group": {
                       "key": "Retransition Speed Curve",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -36759,7 +36759,7 @@
                 "subgroups": [
                   {
                     "key": "Retransition Speed Curve",
-                    "collapsed": false,
+                    "collapsed": true,
                     "locked": false,
                     "items": [
                       {
@@ -118220,7 +118220,7 @@
               "type": "group",
               "group": {
                 "key": "Offset",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -118399,7 +118399,7 @@
               "type": "group",
               "group": {
                 "key": "Easing",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -118417,7 +118417,7 @@
               "type": "group",
               "group": {
                 "key": "Animation Speed Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -118445,7 +118445,7 @@
               "type": "group",
               "group": {
                 "key": "Start Time Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -118522,7 +118522,7 @@
                     "type": "group",
                     "group": {
                       "key": "Retransition Speed Curve",
-                      "collapsed": false,
+                      "collapsed": true,
                       "locked": false,
                       "items": [
                         {
@@ -118599,7 +118599,7 @@
                 "subgroups": [
                   {
                     "key": "Retransition Speed Curve",
-                    "collapsed": false,
+                    "collapsed": true,
                     "locked": false,
                     "items": [
                       {
@@ -118717,7 +118717,7 @@
           "subgroups": [
             {
               "key": "Offset",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -118887,7 +118887,7 @@
             },
             {
               "key": "Easing",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -118902,7 +118902,7 @@
             },
             {
               "key": "Animation Speed Curve",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -118927,7 +118927,7 @@
             },
             {
               "key": "Start Time Curve",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -118998,7 +118998,7 @@
                   "type": "group",
                   "group": {
                     "key": "Retransition Speed Curve",
-                    "collapsed": false,
+                    "collapsed": true,
                     "locked": false,
                     "items": [
                       {
@@ -119075,7 +119075,7 @@
               "subgroups": [
                 {
                   "key": "Retransition Speed Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
