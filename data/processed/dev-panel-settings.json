@@ -25,8 +25,8 @@
       "renderOrderFlipLock": true,
       "fieldRows": 40,
       "fieldCols": 60,
-      "rowSpacing": 5,
-      "columnSpacing": 7,
+      "rowSpacing": 4.5,
+      "columnSpacing": 6.5,
       "handScale": 0.8,
       "alternateRowOffset": 3.5,
       "progressiveRowOffset": 1,
@@ -32518,7 +32518,7 @@
           "type": "group",
           "group": {
             "key": "Field Layout",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -33582,7 +33582,7 @@
           "type": "group",
           "group": {
             "key": "Cursor Tracking",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -33780,7 +33780,7 @@
                 "type": "group",
                 "group": {
                   "key": "New Group (4)",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -34028,7 +34028,7 @@
               },
               {
                 "key": "New Group (4)",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -34089,7 +34089,7 @@
       "subgroups": [
         {
           "key": "Field Layout",
-          "collapsed": true,
+          "collapsed": false,
           "locked": true,
           "items": [
             {
@@ -35141,7 +35141,7 @@
         },
         {
           "key": "Cursor Tracking",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -35339,7 +35339,7 @@
               "type": "group",
               "group": {
                 "key": "New Group (4)",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -35587,7 +35587,7 @@
             },
             {
               "key": "New Group (4)",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -198148,14 +198148,14 @@
     },
     {
       "key": "New Group (11)",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
           "type": "group",
           "group": {
             "key": "New Group (10)",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -198166,7 +198166,7 @@
                 "type": "group",
                 "group": {
                   "key": "Toon Shading",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": true,
                   "items": [
                     {
@@ -198257,7 +198257,7 @@
             "subgroups": [
               {
                 "key": "Toon Shading",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": true,
                 "items": [
                   {
@@ -198425,7 +198425,7 @@
           "type": "group",
           "group": {
             "key": "Lighting",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -198511,7 +198511,7 @@
           "type": "group",
           "group": {
             "key": "Floor",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -198540,7 +198540,7 @@
       "subgroups": [
         {
           "key": "New Group (10)",
-          "collapsed": false,
+          "collapsed": true,
           "locked": true,
           "items": [
             {
@@ -198551,7 +198551,7 @@
               "type": "group",
               "group": {
                 "key": "Toon Shading",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": true,
                 "items": [
                   {
@@ -198642,7 +198642,7 @@
           "subgroups": [
             {
               "key": "Toon Shading",
-              "collapsed": false,
+              "collapsed": true,
               "locked": true,
               "items": [
                 {
@@ -198804,7 +198804,7 @@
         },
         {
           "key": "Lighting",
-          "collapsed": false,
+          "collapsed": true,
           "locked": true,
           "items": [
             {
@@ -198884,7 +198884,7 @@
         },
         {
           "key": "Floor",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
