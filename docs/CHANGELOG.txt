@@ -17492,6 +17492,12 @@ Direct request: use the HANDO two-hand tween export (format hando-two-hand-tween
   curve at y 0.5 clamped them to 0, retransitionDistanceMs() spans exactly the 100-900 ms range with the curve on and returns null when off. Not exercised: the retransition duration inside a live retransition, and the
   Min-side curves (same code path as Max).
 
+2026-10-13  -  Hand Position Min / Max curves: Y spans the axis's own Min box value to Max box value
+  Direct request ("make the curve's min or max value the one I put in the text box"). The Y axis of all six curve editors no longer runs over a fixed -300..300; Y 0 = that axis's Min number box value and Y 1 = its Max
+  number box value (both the Min-limit and the Max-limit curve of an axis), so a curve limit = Min box + (Max box - Min box) * curve(x); min > max is still swapped per hand. Captions updated. My reading of the request
+  (the other reading: Min curve spans only down to the Min box and Max curve only up to the Max box) - say if that is not what was meant. Verified in the page: boxes Min -50 / Max 80, flat Max curve at y 0.5 limited the hands to
+  x 15 (= -50 + 130 * 0.5), flat at y 0 to -50.
+
 2026-10-12  -  (Sphere Sequence: clicks do not register while spheres are running)
 
 Direct request: while sphere sequences are running a click will not register. advanceSphereSequence() now returns without doing anything (the click is still consumed, so no real click function fires either) while anySphereRunning() - any started sphere whose sequence has not reached its end, including ones still waiting for their start time. Only once every sphere sequence has finished does the next click advance to the hands / Hand Offset On Startup. Note this makes Wait For All Spheres (on-screen spheres only) redundant: the running check already covers every sphere, on screen or not. Also exposed updateSphereSequence and sphereState on window.__debug for testing. main.js ?v=387 -> ?v=388.

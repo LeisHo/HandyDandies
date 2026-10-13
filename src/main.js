@@ -16737,7 +16737,7 @@ const _bndRight = new THREE.Vector3(), _bndUp = new THREE.Vector3(), _bndFwd = n
 function applyFieldBounds() {
   if (!fieldBounds) return
   const b = fieldBounds
-  // Curves: X = screen-space XY distance of each hand's STARTING field point from the screen centre, over ALL hands (not just visible ones), nearest..farthest = 0..1; Y (0..1) = -300..300 world units.
+  // Curves: X = screen-space XY distance of each hand's STARTING field point from the screen centre, over ALL hands (not just visible ones), nearest..farthest = 0..1; Y (0..1) = this axis's Min box value..Max box value.
   const anyCurve = !!(b.x.minCurve || b.x.maxCurve || b.y.minCurve || b.y.maxCurve || b.z.minCurve || b.z.maxCurve)
   if (anyCurve && fbDistFrame !== idleReposeFrameCounter) {
     fbDistFrame = idleReposeFrameCounter
@@ -16754,7 +16754,8 @@ function applyFieldBounds() {
     }
     fbDistMin = mn === Infinity ? 0 : mn; fbDistRange = Math.max(mx - mn, 1e-6)
   }
-  const lim = (ax, curve, fallback, x) => (curve ? -300 + 600 * THREE.MathUtils.clamp(evaluateArmLengthCurve(curve, x), 0, 1) : fallback)
+  // The curve's Y (0..1) runs from the axis's Min number box value (0) to its Max number box value (1) (direct request 2026-10-13); with the curve off the limit is simply that box's own value.
+  const lim = (o, curve, fallback, x) => (curve ? o.min + (o.max - o.min) * THREE.MathUtils.clamp(evaluateArmLengthCurve(curve, x), 0, 1) : fallback)
   _bndRight.setFromMatrixColumn(camera.matrixWorld, 0)
   _bndUp.setFromMatrixColumn(camera.matrixWorld, 1)
   _bndFwd.setFromMatrixColumn(camera.matrixWorld, 2)
@@ -16762,7 +16763,7 @@ function applyFieldBounds() {
     const hand = hands[i]
     const p = hand.wrapper.position
     const xn = anyCurve ? (fbDist[i] - fbDistMin) / fbDistRange : 0
-    const bound = (o) => { let lo = lim(0, o.minCurve, o.min, xn), hi = lim(0, o.maxCurve, o.max, xn); if (lo > hi) { const t = lo; lo = hi; hi = t } return [lo, hi] }
+    const bound = (o) => { let lo = lim(o, o.minCurve, o.min, xn), hi = lim(o, o.maxCurve, o.max, xn); if (lo > hi) { const t = lo; lo = hi; hi = t } return [lo, hi] }
     const bx = bound(b.x), by = bound(b.y), bz = bound(b.z)
     const cx = Math.min(Math.max(p.x, bx[0]), bx[1])
     const cy = Math.min(Math.max(p.y, by[0]), by[1])
@@ -16788,7 +16789,7 @@ function buildFieldBoundsWidgets() {
     if (legacy) legacy.style.display = 'none' // old range-bar storage, replaced by the Min / Max number inputs
     ;['Min', 'Max'].forEach((M) => {
       const row = document.querySelector('.dp-row[data-key="fieldBounds' + A + M + 'Curve"]')
-      if (row) buildGenericCurveWidget(row, { caption: 'X: Screen Distance Of The Starting Field Point From The Screen Centre (%, Nearest→Farthest Point, All Points)  ·  Y: ' + M + ' ' + A + ' (-300 = 0, 300 = 1, World Units)', defaultPoints: M === 'Min' ? [{ x: 0, y: 0 }, { x: 1, y: 0 }] : [{ x: 0, y: 1 }, { x: 1, y: 1 }] })
+      if (row) buildGenericCurveWidget(row, { caption: 'X: Screen Distance Of The Starting Field Point From The Screen Centre (%, Nearest→Farthest Point, All Points)  ·  Y: ' + M + ' ' + A + ' Limit (0 = The Min ' + A + ' Box Value, 1 = The Max ' + A + ' Box Value)', defaultPoints: M === 'Min' ? [{ x: 0, y: 0 }, { x: 1, y: 0 }] : [{ x: 0, y: 1 }, { x: 1, y: 1 }] })
       wrapGatedSubgroup('fieldBounds' + A + M + 'CurveEnabled', ['fieldBounds' + A + M + 'Curve'], 'Hand Position ' + M + ' ' + A + ' Curve')
     })
   })
