@@ -7236,14 +7236,14 @@
           "group": "FIST ROTATE"
         }
       ],
-      "cameraX": 6.50449085123349,
-      "cameraY": 9.509045874349821,
-      "cameraZ": 260.7456033096737,
-      "cameraFov": 15,
+      "cameraX": 48.83400034294874,
+      "cameraY": 94.77293110618407,
+      "cameraZ": 1917.012273414873,
+      "cameraFov": 2,
       "cameraYaw": 1.464,
       "cameraPitch": -2.946,
       "cameraRoll": 0,
-      "cameraZoom": 260.9999999999999,
+      "cameraZoom": 1920.0000000000005,
       "cameraZoomSpeed": 0.3,
       "savedCameras": [
         {
@@ -7328,11 +7328,23 @@
           "targetX": 6.638529594915725,
           "targetY": -1.598721155460225e-14,
           "targetZ": -0.4287478032059083
+        },
+        {
+          "name": "HDDD",
+          "cameraX": 48.83400034294874,
+          "cameraY": 94.77293110618407,
+          "cameraZ": 1917.012273414873,
+          "cameraFov": 2,
+          "cameraZoom": 1920,
+          "cameraRoll": 0,
+          "targetX": -0.15494373426241476,
+          "targetY": -3.9049830861738197,
+          "targetZ": 0.17562085189382515
         }
       ],
-      "lockCameraPan": true,
+      "lockCameraPan": false,
       "lockCameraZoom": false,
-      "cameraMaxExtentsEnabled": true,
+      "cameraMaxExtentsEnabled": false,
       "keyAzimuth": 27,
       "keyElevation": 67,
       "keyTargetHeight": 65,
@@ -17891,6 +17903,18 @@
           "targetX": 6.638529594915725,
           "targetY": -1.598721155460225e-14,
           "targetZ": -0.4287478032059083
+        },
+        {
+          "name": "HDDD",
+          "cameraX": 48.83400034294874,
+          "cameraY": 94.77293110618407,
+          "cameraZ": 1917.012273414873,
+          "cameraFov": 2,
+          "cameraZoom": 1920,
+          "cameraRoll": 0,
+          "targetX": -0.15494373426241476,
+          "targetY": -3.9049830861738197,
+          "targetZ": 0.17562085189382515
         }
       ],
       "lockCameraPan": false,
@@ -28454,6 +28478,18 @@
           "targetX": 6.638529594915725,
           "targetY": -1.598721155460225e-14,
           "targetZ": -0.4287478032059083
+        },
+        {
+          "name": "HDDD",
+          "cameraX": 48.83400034294874,
+          "cameraY": 94.77293110618407,
+          "cameraZ": 1917.012273414873,
+          "cameraFov": 2,
+          "cameraZoom": 1920,
+          "cameraRoll": 0,
+          "targetX": -0.15494373426241476,
+          "targetY": -3.9049830861738197,
+          "targetZ": 0.17562085189382515
         }
       ],
       "lockCameraPan": false,
@@ -236532,7 +236568,7 @@
     },
     {
       "key": "New Group (11)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -236731,7 +236767,7 @@
           "type": "group",
           "group": {
             "key": "Camera",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -237113,7 +237149,7 @@
         },
         {
           "key": "Camera",
-          "collapsed": true,
+          "collapsed": false,
           "locked": true,
           "items": [
             {
@@ -237295,7 +237331,7 @@
     },
     {
       "key": "Starting State",
-      "collapsed": false,
+      "collapsed": true,
       "locked": false,
       "items": [
         {
@@ -238546,7 +238582,7 @@
           "type": "group",
           "group": {
             "key": "Field Grid Sphere Sequence",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -238675,7 +238711,7 @@
                 "type": "group",
                 "group": {
                   "key": "Sphere > Sphere Radius Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -238698,7 +238734,7 @@
                 "type": "group",
                 "group": {
                   "key": "Sphere > Sphere Z Offset Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -238823,7 +238859,7 @@
               },
               {
                 "key": "Sphere > Sphere Radius Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -238843,7 +238879,7 @@
               },
               {
                 "key": "Sphere > Sphere Z Offset Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -240102,7 +240138,7 @@
         },
         {
           "key": "Field Grid Sphere Sequence",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -240231,7 +240267,7 @@
               "type": "group",
               "group": {
                 "key": "Sphere > Sphere Radius Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -240254,7 +240290,7 @@
               "type": "group",
               "group": {
                 "key": "Sphere > Sphere Z Offset Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -240379,7 +240415,7 @@
             },
             {
               "key": "Sphere > Sphere Radius Curve",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -240399,7 +240435,7 @@
             },
             {
               "key": "Sphere > Sphere Z Offset Curve",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
