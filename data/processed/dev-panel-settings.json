@@ -7703,7 +7703,7 @@
       "startupFnGlideToFirstPose": false,
       "startupFnFirstGlideTimeScale": 1,
       "startupFnTweenSpeedMs": 1370,
-      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.6472139464415906,\"y\":0.30988044738769527},{\"x\":1,\"y\":1}]",
+      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.5359289260517377,\"y\":0.4695831298828125},{\"x\":1,\"y\":1}]",
       "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":3000}",
       "startupFnSequencePlayMode": "Count",
       "startupFnSequenceCount": 1,
@@ -7723,9 +7723,9 @@
       "startupFnStartTimeCurveVisibleOnly": true,
       "startupFnStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "startupFnStartTimeRange": "{\"min\":0,\"max\":300}",
-      "startupFnStartDistanceCurveEnabled": false,
+      "startupFnStartDistanceCurveEnabled": true,
       "startupFnStartDistanceMin": 0,
-      "startupFnStartDistanceMax": 40,
+      "startupFnStartDistanceMax": 66,
       "startupFnStartDistanceCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.8094914779614888,\"y\":0}},{\"x\":1,\"y\":0}]",
       "startupFnPauseDurationMs": 500,
       "startupFnRetransitionEnabled": true,
@@ -7756,7 +7756,7 @@
       "sphereFnSpeedCurveRange": "{\"min\":1273,\"max\":2000}",
       "sphereFnStartTimeCurveEnabled": true,
       "sphereFnStartTimeCurveVisibleOnly": true,
-      "sphereFnStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.38207478320159394,\"y\":1}},{\"x\":1,\"y\":1,\"h2\":{\"x\":0,\"y\":-0.2470832824707031}}]",
+      "sphereFnStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.13289772912856024,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":0,\"y\":-0.2470832824707031}}]",
       "sphereFnStartTimeRange": "{\"min\":0,\"max\":1826}",
       "sphereFnStartDistanceCurveEnabled": true,
       "sphereFnStartDistanceMin": 0,
@@ -7767,7 +7767,7 @@
       "sphereRadiusRange": "{\"min\":0,\"max\":1.25}",
       "sphereZCurveEnabled": true,
       "sphereZCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.45532200522949196,\"y\":0.03206227620442714}},{\"x\":0.48536968589158147,\"y\":1,\"h2\":{\"x\":-0.37163348195703616,\"y\":-0.10732269287109375},\"h1\":{\"x\":0.14253729085260458,\"y\":0}},{\"x\":1,\"y\":0.16572926839192703,\"h2\":{\"x\":-0.5894956885288738,\"y\":0.21999994913736975}}]",
-      "sphereZRange": "{\"min\":-3,\"max\":15}",
+      "sphereZRange": "{\"min\":-3,\"max\":25}",
       "showTrackingPoints": false,
       "showRenderOrderPoints": false,
       "showGridHelper": false,
@@ -18266,7 +18266,7 @@
       "startupFnGlideToFirstPose": false,
       "startupFnFirstGlideTimeScale": 1,
       "startupFnTweenSpeedMs": 1370,
-      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.6472139464415906,\"y\":0.30988044738769527},{\"x\":1,\"y\":1}]",
+      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.5359289260517377,\"y\":0.4695831298828125},{\"x\":1,\"y\":1}]",
       "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":3000}",
       "startupFnSequencePlayMode": "Count",
       "startupFnSequenceCount": 1,
@@ -18286,9 +18286,9 @@
       "startupFnStartTimeCurveVisibleOnly": true,
       "startupFnStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "startupFnStartTimeRange": "{\"min\":0,\"max\":300}",
-      "startupFnStartDistanceCurveEnabled": false,
+      "startupFnStartDistanceCurveEnabled": true,
       "startupFnStartDistanceMin": 0,
-      "startupFnStartDistanceMax": 40,
+      "startupFnStartDistanceMax": 66,
       "startupFnStartDistanceCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.8094914779614888,\"y\":0}},{\"x\":1,\"y\":0}]",
       "startupFnPauseDurationMs": 500,
       "startupFnRetransitionEnabled": true,
@@ -18319,7 +18319,7 @@
       "sphereFnSpeedCurveRange": "{\"min\":1273,\"max\":2000}",
       "sphereFnStartTimeCurveEnabled": true,
       "sphereFnStartTimeCurveVisibleOnly": true,
-      "sphereFnStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.38207478320159394,\"y\":1}},{\"x\":1,\"y\":1,\"h2\":{\"x\":0,\"y\":-0.2470832824707031}}]",
+      "sphereFnStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.13289772912856024,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":0,\"y\":-0.2470832824707031}}]",
       "sphereFnStartTimeRange": "{\"min\":0,\"max\":1826}",
       "sphereFnStartDistanceCurveEnabled": true,
       "sphereFnStartDistanceMin": 0,
@@ -18330,7 +18330,7 @@
       "sphereRadiusRange": "{\"min\":0,\"max\":1.25}",
       "sphereZCurveEnabled": true,
       "sphereZCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.45532200522949196,\"y\":0.03206227620442714}},{\"x\":0.48536968589158147,\"y\":1,\"h2\":{\"x\":-0.37163348195703616,\"y\":-0.10732269287109375},\"h1\":{\"x\":0.14253729085260458,\"y\":0}},{\"x\":1,\"y\":0.16572926839192703,\"h2\":{\"x\":-0.5894956885288738,\"y\":0.21999994913736975}}]",
-      "sphereZRange": "{\"min\":-3,\"max\":15}",
+      "sphereZRange": "{\"min\":-3,\"max\":25}",
       "showTrackingPoints": false,
       "showRenderOrderPoints": false,
       "showGridHelper": false,
@@ -28829,7 +28829,7 @@
       "startupFnGlideToFirstPose": false,
       "startupFnFirstGlideTimeScale": 1,
       "startupFnTweenSpeedMs": 1370,
-      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.6472139464415906,\"y\":0.30988044738769527},{\"x\":1,\"y\":1}]",
+      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":0.5359289260517377,\"y\":0.4695831298828125},{\"x\":1,\"y\":1}]",
       "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":3000}",
       "startupFnSequencePlayMode": "Count",
       "startupFnSequenceCount": 1,
@@ -28849,9 +28849,9 @@
       "startupFnStartTimeCurveVisibleOnly": true,
       "startupFnStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "startupFnStartTimeRange": "{\"min\":0,\"max\":300}",
-      "startupFnStartDistanceCurveEnabled": false,
+      "startupFnStartDistanceCurveEnabled": true,
       "startupFnStartDistanceMin": 0,
-      "startupFnStartDistanceMax": 40,
+      "startupFnStartDistanceMax": 66,
       "startupFnStartDistanceCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.8094914779614888,\"y\":0}},{\"x\":1,\"y\":0}]",
       "startupFnPauseDurationMs": 500,
       "startupFnRetransitionEnabled": true,
@@ -28882,7 +28882,7 @@
       "sphereFnSpeedCurveRange": "{\"min\":1273,\"max\":2000}",
       "sphereFnStartTimeCurveEnabled": true,
       "sphereFnStartTimeCurveVisibleOnly": true,
-      "sphereFnStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.38207478320159394,\"y\":1}},{\"x\":1,\"y\":1,\"h2\":{\"x\":0,\"y\":-0.2470832824707031}}]",
+      "sphereFnStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.13289772912856024,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":0,\"y\":-0.2470832824707031}}]",
       "sphereFnStartTimeRange": "{\"min\":0,\"max\":1826}",
       "sphereFnStartDistanceCurveEnabled": true,
       "sphereFnStartDistanceMin": 0,
@@ -28893,7 +28893,7 @@
       "sphereRadiusRange": "{\"min\":0,\"max\":1.25}",
       "sphereZCurveEnabled": true,
       "sphereZCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.45532200522949196,\"y\":0.03206227620442714}},{\"x\":0.48536968589158147,\"y\":1,\"h2\":{\"x\":-0.37163348195703616,\"y\":-0.10732269287109375},\"h1\":{\"x\":0.14253729085260458,\"y\":0}},{\"x\":1,\"y\":0.16572926839192703,\"h2\":{\"x\":-0.5894956885288738,\"y\":0.21999994913736975}}]",
-      "sphereZRange": "{\"min\":-3,\"max\":15}",
+      "sphereZRange": "{\"min\":-3,\"max\":25}",
       "showTrackingPoints": false,
       "showRenderOrderPoints": false,
       "showGridHelper": false,
@@ -237314,7 +237314,7 @@
           "type": "group",
           "group": {
             "key": "Hand Offset On Startup",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -237847,7 +237847,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Start Time Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -237885,7 +237885,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Start Distance Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -238461,7 +238461,7 @@
               },
               {
                 "key": "Startup > Start Time Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -238496,7 +238496,7 @@
               },
               {
                 "key": "Startup > Start Distance Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -238619,7 +238619,7 @@
                 "type": "group",
                 "group": {
                   "key": "Sphere > Start Time Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -238773,7 +238773,7 @@
               },
               {
                 "key": "Sphere > Start Time Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -238873,7 +238873,7 @@
       "subgroups": [
         {
           "key": "Hand Offset On Startup",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
@@ -239406,7 +239406,7 @@
               "type": "group",
               "group": {
                 "key": "Startup > Start Time Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -239444,7 +239444,7 @@
               "type": "group",
               "group": {
                 "key": "Startup > Start Distance Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -240020,7 +240020,7 @@
             },
             {
               "key": "Startup > Start Time Curve",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -240055,7 +240055,7 @@
             },
             {
               "key": "Startup > Start Distance Curve",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -240175,7 +240175,7 @@
               "type": "group",
               "group": {
                 "key": "Sphere > Start Time Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -240329,7 +240329,7 @@
             },
             {
               "key": "Sphere > Start Time Curve",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
