@@ -26,7 +26,7 @@
       "fieldRows": 43,
       "fieldCols": 60,
       "rowSpacing": 5,
-      "columnSpacing": 8,
+      "columnSpacing": 9,
       "handScale": 0.7,
       "alternateRowOffset": 3.5,
       "progressiveRowOffset": 1,
@@ -47,12 +47,12 @@
       "fieldBoundsYMax": "300",
       "fieldBoundsYMaxCurveEnabled": false,
       "fieldBoundsYMaxCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
-      "fieldBoundsZMin": "-270",
+      "fieldBoundsZMin": "-800",
       "fieldBoundsZMinCurveEnabled": true,
-      "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3446503065540787,\"y\":0}},{\"x\":1,\"y\":0.7381251017252604,\"h2\":{\"x\":0,\"y\":-0.6081250508626301}}]",
-      "fieldBoundsZMax": "260",
-      "fieldBoundsZMaxCurveEnabled": false,
-      "fieldBoundsZMaxCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.24996105891858494,\"y\":0.14666671752929683}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.6586720742700527,\"y\":0.2573959350585937}}]",
+      "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3446503065540787,\"y\":0}},{\"x\":1,\"y\":0.5081250508626303,\"h2\":{\"x\":0,\"y\":-0.6081250508626301}}]",
+      "fieldBoundsZMax": "240",
+      "fieldBoundsZMaxCurveEnabled": true,
+      "fieldBoundsZMaxCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.30570223261902074,\"y\":-0.05333353678385422}},{\"x\":1,\"y\":0.5173957824707032,\"h2\":{\"x\":-0.6586720742700527,\"y\":0.2573959350585937}}]",
       "fieldBoundsX": "{\"min\":-300,\"max\":300}",
       "fieldBoundsY": "{\"min\":-300,\"max\":300}",
       "fieldBoundsZ": "{\"min\":-400,\"max\":200}",
@@ -7762,7 +7762,7 @@
       "startupFnReverseSequence": false,
       "startupFnGlideToFirstPose": false,
       "startupFnFirstGlideTimeScale": 1,
-      "startupFnTweenSpeedMs": 1370,
+      "startupFnTweenSpeedMs": 5000,
       "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.29914436960931434,\"y\":0.006354141235351607}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.3221476094538043,\"y\":0}}]",
       "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":4065}",
       "startupFnSequencePlayMode": "Count",
@@ -7772,13 +7772,13 @@
       "startupFnSequenceHoldMs": 0,
       "startupFnTransitionSpeedMs": 1000,
       "startupFnEasingCurveEnabled": true,
-      "startupFnEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.18930272830490874,\"y\":0}},{\"x\":0.5252352962170567,\"y\":0.8769793192545573,\"h2\":{\"x\":-0.1834656925937842,\"y\":0.0824996948242187},\"h1\":{\"x\":0.22311255820288733,\"y\":0.035833231608072946}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2647676214425735,\"y\":0.1928123474121094}}]",
+      "startupFnEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.641785019541944,\"y\":0.052811940511067745}},{\"x\":0.6155540678169089,\"y\":0.8794792175292969,\"h2\":{\"x\":-0.1834656925937842,\"y\":0.0824996948242187},\"h1\":{\"x\":0.22311255820288733,\"y\":0.035833231608072946}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.32378713774545476,\"y\":0.09281234741210942}}]",
       "startupFnRetransitionEasingCurveEnabled": true,
       "startupFnRetransitionEasingCurve": "[{\"x\":0,\"y\":0},{\"x\":0.4554235972960167,\"y\":0.8331250508626302},{\"x\":1,\"y\":0}]",
       "startupFnSpeedCurveEnabled": true,
       "startupFnSpeedCurveVisibleOnly": true,
       "startupFnSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3975100633428528,\"y\":0.0054166158040364065}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.2893590448759581,\"y\":0}}]",
-      "startupFnSpeedCurveRange": "{\"min\":1503,\"max\":2000}",
+      "startupFnSpeedCurveRange": "{\"min\":1665,\"max\":2000}",
       "startupFnStartTimeCurveEnabled": true,
       "startupFnStartTimeCurveVisibleOnly": true,
       "startupFnStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -8173,8 +8173,8 @@
       "custom21CameraOffsetYCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.324820628419056,\"y\":0},\"bg\":0.64,\"m\":\"linear\"},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.467575665942766,\"y\":0}}]",
       "custom21CameraOffsetYRange": "{\"min\":-1,\"max\":2}",
       "custom21CameraOffsetZEnabled": true,
-      "custom21CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.012574262862515643,\"y\":-0.2529167175292969}},{\"x\":0.1327935656964728,\"y\":0.79375,\"h1\":{\"x\":0.23570275523609174,\"y\":0.019999821980794308}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.9150637134518514,\"y\":0.46708323160807297}}]",
-      "custom21CameraOffsetZRange": "{\"min\":-40,\"max\":30}",
+      "custom21CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.11388892971310444,\"y\":-0.04572906494140627}},{\"x\":0.12700440557562195,\"y\":0.6142709096272787,\"h1\":{\"x\":0.09344735901548248,\"y\":-0.2333333333333334},\"h2\":{\"x\":-0.09016867766752461,\"y\":0.23999989827473955}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.6795430133837066,\"y\":0}}]",
+      "custom21CameraOffsetZRange": "{\"min\":-40,\"max\":20}",
       "custom21RotationEnabled": false,
       "custom21RotationX": 0,
       "custom21RotationY": -5,
@@ -10670,12 +10670,12 @@
       "fieldBoundsYMax": "300",
       "fieldBoundsYMaxCurveEnabled": false,
       "fieldBoundsYMaxCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
-      "fieldBoundsZMin": "-270",
+      "fieldBoundsZMin": "-800",
       "fieldBoundsZMinCurveEnabled": true,
-      "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3446503065540787,\"y\":0}},{\"x\":1,\"y\":0.7381251017252604,\"h2\":{\"x\":0,\"y\":-0.6081250508626301}}]",
-      "fieldBoundsZMax": "260",
-      "fieldBoundsZMaxCurveEnabled": false,
-      "fieldBoundsZMaxCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.24996105891858494,\"y\":0.14666671752929683}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.6586720742700527,\"y\":0.2573959350585937}}]",
+      "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3446503065540787,\"y\":0}},{\"x\":1,\"y\":0.5081250508626303,\"h2\":{\"x\":0,\"y\":-0.6081250508626301}}]",
+      "fieldBoundsZMax": "240",
+      "fieldBoundsZMaxCurveEnabled": true,
+      "fieldBoundsZMaxCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.30570223261902074,\"y\":-0.05333353678385422}},{\"x\":1,\"y\":0.5173957824707032,\"h2\":{\"x\":-0.6586720742700527,\"y\":0.2573959350585937}}]",
       "fieldBoundsX": "{\"min\":-300,\"max\":300}",
       "fieldBoundsY": "{\"min\":-300,\"max\":300}",
       "fieldBoundsZ": "{\"min\":-400,\"max\":200}",
@@ -18385,7 +18385,7 @@
       "startupFnReverseSequence": false,
       "startupFnGlideToFirstPose": false,
       "startupFnFirstGlideTimeScale": 1,
-      "startupFnTweenSpeedMs": 1370,
+      "startupFnTweenSpeedMs": 5000,
       "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.29914436960931434,\"y\":0.006354141235351607}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.3221476094538043,\"y\":0}}]",
       "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":4065}",
       "startupFnSequencePlayMode": "Count",
@@ -18395,13 +18395,13 @@
       "startupFnSequenceHoldMs": 0,
       "startupFnTransitionSpeedMs": 1000,
       "startupFnEasingCurveEnabled": true,
-      "startupFnEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.18930272830490874,\"y\":0}},{\"x\":0.5252352962170567,\"y\":0.8769793192545573,\"h2\":{\"x\":-0.1834656925937842,\"y\":0.0824996948242187},\"h1\":{\"x\":0.22311255820288733,\"y\":0.035833231608072946}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2647676214425735,\"y\":0.1928123474121094}}]",
+      "startupFnEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.641785019541944,\"y\":0.052811940511067745}},{\"x\":0.6155540678169089,\"y\":0.8794792175292969,\"h2\":{\"x\":-0.1834656925937842,\"y\":0.0824996948242187},\"h1\":{\"x\":0.22311255820288733,\"y\":0.035833231608072946}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.32378713774545476,\"y\":0.09281234741210942}}]",
       "startupFnRetransitionEasingCurveEnabled": true,
       "startupFnRetransitionEasingCurve": "[{\"x\":0,\"y\":0},{\"x\":0.4554235972960167,\"y\":0.8331250508626302},{\"x\":1,\"y\":0}]",
       "startupFnSpeedCurveEnabled": true,
       "startupFnSpeedCurveVisibleOnly": true,
       "startupFnSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3975100633428528,\"y\":0.0054166158040364065}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.2893590448759581,\"y\":0}}]",
-      "startupFnSpeedCurveRange": "{\"min\":1503,\"max\":2000}",
+      "startupFnSpeedCurveRange": "{\"min\":1665,\"max\":2000}",
       "startupFnStartTimeCurveEnabled": true,
       "startupFnStartTimeCurveVisibleOnly": true,
       "startupFnStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -18796,8 +18796,8 @@
       "custom21CameraOffsetYCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.324820628419056,\"y\":0},\"bg\":0.64,\"m\":\"linear\"},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.467575665942766,\"y\":0}}]",
       "custom21CameraOffsetYRange": "{\"min\":-1,\"max\":2}",
       "custom21CameraOffsetZEnabled": true,
-      "custom21CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.012574262862515643,\"y\":-0.2529167175292969}},{\"x\":0.1327935656964728,\"y\":0.79375,\"h1\":{\"x\":0.23570275523609174,\"y\":0.019999821980794308}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.9150637134518514,\"y\":0.46708323160807297}}]",
-      "custom21CameraOffsetZRange": "{\"min\":-40,\"max\":30}",
+      "custom21CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.11388892971310444,\"y\":-0.04572906494140627}},{\"x\":0.12700440557562195,\"y\":0.6142709096272787,\"h1\":{\"x\":0.09344735901548248,\"y\":-0.2333333333333334},\"h2\":{\"x\":-0.09016867766752461,\"y\":0.23999989827473955}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.6795430133837066,\"y\":0}}]",
+      "custom21CameraOffsetZRange": "{\"min\":-40,\"max\":20}",
       "custom21RotationEnabled": false,
       "custom21RotationX": 0,
       "custom21RotationY": -5,
@@ -21293,12 +21293,12 @@
       "fieldBoundsYMax": "300",
       "fieldBoundsYMaxCurveEnabled": false,
       "fieldBoundsYMaxCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
-      "fieldBoundsZMin": "-270",
+      "fieldBoundsZMin": "-800",
       "fieldBoundsZMinCurveEnabled": true,
-      "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3446503065540787,\"y\":0}},{\"x\":1,\"y\":0.7381251017252604,\"h2\":{\"x\":0,\"y\":-0.6081250508626301}}]",
-      "fieldBoundsZMax": "260",
-      "fieldBoundsZMaxCurveEnabled": false,
-      "fieldBoundsZMaxCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.24996105891858494,\"y\":0.14666671752929683}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.6586720742700527,\"y\":0.2573959350585937}}]",
+      "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3446503065540787,\"y\":0}},{\"x\":1,\"y\":0.5081250508626303,\"h2\":{\"x\":0,\"y\":-0.6081250508626301}}]",
+      "fieldBoundsZMax": "240",
+      "fieldBoundsZMaxCurveEnabled": true,
+      "fieldBoundsZMaxCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.30570223261902074,\"y\":-0.05333353678385422}},{\"x\":1,\"y\":0.5173957824707032,\"h2\":{\"x\":-0.6586720742700527,\"y\":0.2573959350585937}}]",
       "fieldBoundsX": "{\"min\":-300,\"max\":300}",
       "fieldBoundsY": "{\"min\":-300,\"max\":300}",
       "fieldBoundsZ": "{\"min\":-400,\"max\":200}",
@@ -29008,7 +29008,7 @@
       "startupFnReverseSequence": false,
       "startupFnGlideToFirstPose": false,
       "startupFnFirstGlideTimeScale": 1,
-      "startupFnTweenSpeedMs": 1370,
+      "startupFnTweenSpeedMs": 5000,
       "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.29914436960931434,\"y\":0.006354141235351607}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.3221476094538043,\"y\":0}}]",
       "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":4065}",
       "startupFnSequencePlayMode": "Count",
@@ -29018,13 +29018,13 @@
       "startupFnSequenceHoldMs": 0,
       "startupFnTransitionSpeedMs": 1000,
       "startupFnEasingCurveEnabled": true,
-      "startupFnEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.18930272830490874,\"y\":0}},{\"x\":0.5252352962170567,\"y\":0.8769793192545573,\"h2\":{\"x\":-0.1834656925937842,\"y\":0.0824996948242187},\"h1\":{\"x\":0.22311255820288733,\"y\":0.035833231608072946}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2647676214425735,\"y\":0.1928123474121094}}]",
+      "startupFnEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.641785019541944,\"y\":0.052811940511067745}},{\"x\":0.6155540678169089,\"y\":0.8794792175292969,\"h2\":{\"x\":-0.1834656925937842,\"y\":0.0824996948242187},\"h1\":{\"x\":0.22311255820288733,\"y\":0.035833231608072946}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.32378713774545476,\"y\":0.09281234741210942}}]",
       "startupFnRetransitionEasingCurveEnabled": true,
       "startupFnRetransitionEasingCurve": "[{\"x\":0,\"y\":0},{\"x\":0.4554235972960167,\"y\":0.8331250508626302},{\"x\":1,\"y\":0}]",
       "startupFnSpeedCurveEnabled": true,
       "startupFnSpeedCurveVisibleOnly": true,
       "startupFnSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3975100633428528,\"y\":0.0054166158040364065}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.2893590448759581,\"y\":0}}]",
-      "startupFnSpeedCurveRange": "{\"min\":1503,\"max\":2000}",
+      "startupFnSpeedCurveRange": "{\"min\":1665,\"max\":2000}",
       "startupFnStartTimeCurveEnabled": true,
       "startupFnStartTimeCurveVisibleOnly": true,
       "startupFnStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -29419,8 +29419,8 @@
       "custom21CameraOffsetYCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.324820628419056,\"y\":0},\"bg\":0.64,\"m\":\"linear\"},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.467575665942766,\"y\":0}}]",
       "custom21CameraOffsetYRange": "{\"min\":-1,\"max\":2}",
       "custom21CameraOffsetZEnabled": true,
-      "custom21CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.012574262862515643,\"y\":-0.2529167175292969}},{\"x\":0.1327935656964728,\"y\":0.79375,\"h1\":{\"x\":0.23570275523609174,\"y\":0.019999821980794308}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.9150637134518514,\"y\":0.46708323160807297}}]",
-      "custom21CameraOffsetZRange": "{\"min\":-40,\"max\":30}",
+      "custom21CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.11388892971310444,\"y\":-0.04572906494140627}},{\"x\":0.12700440557562195,\"y\":0.6142709096272787,\"h1\":{\"x\":0.09344735901548248,\"y\":-0.2333333333333334},\"h2\":{\"x\":-0.09016867766752461,\"y\":0.23999989827473955}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.6795430133837066,\"y\":0}}]",
+      "custom21CameraOffsetZRange": "{\"min\":-40,\"max\":20}",
       "custom21RotationEnabled": false,
       "custom21RotationX": 0,
       "custom21RotationY": -5,
@@ -101165,7 +101165,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 21",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -101324,7 +101324,7 @@
                 "type": "group",
                 "group": {
                   "key": "Offset To Camera",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -101527,7 +101527,7 @@
                 "type": "group",
                 "group": {
                   "key": "Retransition",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -116068,7 +116068,7 @@
               },
               {
                 "key": "Offset To Camera",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -116253,7 +116253,7 @@
               },
               {
                 "key": "Retransition",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -200745,7 +200745,7 @@
         },
         {
           "key": "Custom Click Function 21",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
@@ -200904,7 +200904,7 @@
               "type": "group",
               "group": {
                 "key": "Offset To Camera",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -201107,7 +201107,7 @@
               "type": "group",
               "group": {
                 "key": "Retransition",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -215648,7 +215648,7 @@
             },
             {
               "key": "Offset To Camera",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -215833,7 +215833,7 @@
             },
             {
               "key": "Retransition",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -237999,7 +237999,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Animation Speed Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -238616,7 +238616,7 @@
               },
               {
                 "key": "Startup > Animation Speed Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -239558,7 +239558,7 @@
               "type": "group",
               "group": {
                 "key": "Startup > Animation Speed Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -240175,7 +240175,7 @@
             },
             {
               "key": "Startup > Animation Speed Curve",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
