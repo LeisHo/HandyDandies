@@ -7236,14 +7236,14 @@
           "group": "FIST ROTATE"
         }
       ],
-      "cameraX": 15.32444872888409,
-      "cameraY": 18.96805895866134,
-      "cameraZ": 454.8542267011317,
-      "cameraFov": 8,
+      "cameraX": 13.398060563347988,
+      "cameraY": 15.087755562034772,
+      "cameraZ": 379.47861874878555,
+      "cameraFov": 11,
       "cameraYaw": 1.464,
       "cameraPitch": -2.946,
       "cameraRoll": 0,
-      "cameraZoom": 455.5,
+      "cameraZoom": 380.00000000000006,
       "cameraZoomSpeed": 0.3,
       "savedCameras": [
         {
@@ -7376,6 +7376,18 @@
           "targetX": 3.0757204783943917,
           "targetY": -4.364014152336884,
           "targetZ": 0.11668489606442625
+        },
+        {
+          "name": "Camera 13",
+          "cameraX": 13.398060563347988,
+          "cameraY": 15.087755562034772,
+          "cameraZ": 379.47861874878555,
+          "cameraFov": 11,
+          "cameraZoom": 380,
+          "cameraRoll": 0,
+          "targetX": 3.7023320480669444,
+          "targetY": -4.442248288536057,
+          "targetZ": 0.10469792902927295
         }
       ],
       "lockCameraPan": false,
@@ -17987,6 +17999,18 @@
           "targetX": 3.0757204783943917,
           "targetY": -4.364014152336884,
           "targetZ": 0.11668489606442625
+        },
+        {
+          "name": "Camera 13",
+          "cameraX": 13.398060563347988,
+          "cameraY": 15.087755562034772,
+          "cameraZ": 379.47861874878555,
+          "cameraFov": 11,
+          "cameraZoom": 380,
+          "cameraRoll": 0,
+          "targetX": 3.7023320480669444,
+          "targetY": -4.442248288536057,
+          "targetZ": 0.10469792902927295
         }
       ],
       "lockCameraPan": false,
@@ -28598,6 +28622,18 @@
           "targetX": 3.0757204783943917,
           "targetY": -4.364014152336884,
           "targetZ": 0.11668489606442625
+        },
+        {
+          "name": "Camera 13",
+          "cameraX": 13.398060563347988,
+          "cameraY": 15.087755562034772,
+          "cameraZ": 379.47861874878555,
+          "cameraFov": 11,
+          "cameraZoom": 380,
+          "cameraRoll": 0,
+          "targetX": 3.7023320480669444,
+          "targetY": -4.442248288536057,
+          "targetZ": 0.10469792902927295
         }
       ],
       "lockCameraPan": false,
