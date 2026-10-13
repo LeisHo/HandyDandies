@@ -17436,6 +17436,18 @@ Direct request: use the HANDO two-hand tween export (format hando-two-hand-tween
   then 0.50 at 1000 ms, 0.00 at 1500 ms); not exercised on live hands (the sandbox cannot show the hands animating). Known and unchanged: Start Time only applies when Tween Stop Delay is on (with it off the hand goes
   straight to Retransition / stays).
 
+2026-10-13  -  Starting State: Hide Floor After Hand Offset Sequence, hands always loaded and shown, Wait For All Spheres fixed
+  (1) New Starting State checkbox "Hide Floor After Hand Offset Sequence" (hideFloorAfterHandOffset, ON by default per direct follow-up): once the Hand Offset On Startup transition has been fired and EVERY hand has reached the
+  end of its own sequence (hand._startupSeqDone, set when its forward ramp completes or when another function interrupts it), checkStartupFloorHide() (called each frame after applyFieldBounds()) sets startupFloorHidden, which
+  updateFloor() treats like Floor Off (floor mesh hidden AND the clipping plane cleared, so the floor stops cropping the hands). Re-armed by toggling Hand Offset On Startup; a manual Floor On/Off toggle also clears it.
+  (2) Hands are no longer hidden while the Field Grid Sphere Sequence waits for its second click (updateHandsVisibility() only honours Hide Hands now): they are always built and shown, and the Floor's clipping plane is what covers them.
+  This changes the earlier spec that the hands stay hidden until the second sphere click.
+  (3) Wait For All Spheres fixed. It used to count excluded (Start Distance Curve) and part-way capped spheres as finished and just swallowed the click. Now each sphere has a sphereDone flag (full sequence finished, cap 1);
+  while any on-screen sphere is not done, every click re-runs startSphereSequence(true), which leaves finished spheres alone and gives every other sphere a fresh start time / duration / eligibility from the NEW cursor position;
+  only when all on-screen spheres are done does the next click advance (hands shown, Hand Offset On Startup allowed). Clicks while spheres are still running stay ignored, as before.
+  Verified in the page with simulated clicks / a controlled clock: spheres done grew 13, 27, 51, ... 96 across 11 clicks with a Start Distance range of 0-30 (stage stayed 1); with the range off one more click spawned the rest;
+  with all 255 done the next click moved to stage 2. Floor: visible while the startup sequence ran, hidden with 0 clipping planes once all 255 hands were done. Three read-only fields were added to window.__debug for this.
+
 2026-10-12  -  (Sphere Sequence: clicks do not register while spheres are running)
 
 Direct request: while sphere sequences are running a click will not register. advanceSphereSequence() now returns without doing anything (the click is still consumed, so no real click function fires either) while anySphereRunning() - any started sphere whose sequence has not reached its end, including ones still waiting for their start time. Only once every sphere sequence has finished does the next click advance to the hands / Hand Offset On Startup. Note this makes Wait For All Spheres (on-screen spheres only) redundant: the running check already covers every sphere, on screen or not. Also exposed updateSphereSequence and sphereState on window.__debug for testing. main.js ?v=387 -> ?v=388.

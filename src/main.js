@@ -333,10 +333,11 @@ let loadingPreviewHand2 = null // second hand of a two-hand loading tween (built
 let floorMesh = null // Floor group: one plane behind the hands
 const SPHERE_FN = 'sphereFn' // Field Grid Sphere Sequence: only the shared Speed / Easing / Start Time / Start Distance curve controls and their parsed caches are borrowed from the click functions
 let sphereStage = 2 // 0 = waiting for the first click (floor only, hands hidden), 1 = spheres running / shown, 2 = done or feature off
-let sphereMesh = null, sphereOn = null, sphereStart = null, sphereDur = null, sphereCap = null
+let sphereMesh = null, sphereOn = null, sphereStart = null, sphereDur = null, sphereCap = null, sphereDone = null // sphereDone[i] = 1 once sphere i has reached its target scale and position (Wait For All Spheres)
 const sphereParseCache = new Map()
 const STARTUP_FN = 'startupFn' // Hand Offset On Startup: a built-in, hidden-trigger pose-kind click function (prefix startupFn)
 let startupHandOffsetStage = 0, startupConsumeActive = false, startupConsumeUntil = 0 // 0 = waiting for the first click, 1 = the startup transition has been fired
+let startupFloorHidden = false // Starting State > Hide Floor After Hand Offset Sequence: set once every hand has finished the startup transition (runtime only, never saved)
 let startupStaticReleased = false // Starting State > Static Pose On Startup: set by the first click function trigger (runtime only, never saved)
 const _cfTmp = new THREE.Vector3() // clickRotatePointInto() scratch
 const _trkV1 = new THREE.Vector3(), _trkV2 = new THREE.Vector3(), _trkWqInv = new THREE.Quaternion() // handTrackingPointInto() scratch
@@ -859,7 +860,7 @@ function tryStartField() {
   // whatever comes next; don't treat this comment's own reasoning above
   // as the settled explanation.
   if (!fieldWarmCompiled) renderer.compile(scene, camera)
-  window.__debug = { updateLoadingPreviewAnimation, get loadingPreview2() { return { hand: loadingPreviewHand, hand2: loadingPreviewHand2, scene: loadingPreviewScene, camera: loadingPreviewCamera, renderer: loadingPreviewRenderer } }, updateSphereSequence, get sphereState() { return { stage: sphereStage, mesh: sphereMesh, on: sphereOn, start: sphereStart, dur: sphereDur, cap: sphereCap } }, stackOnDefault, applyCameraOrientation, syncCameraPanelFromLive, curveByDomain, get domains() { return { xyAll: [xyAllMinDist, xyAllDistRange], splayAll: [splayAllMin, splayAllRange], cropAll: [cropAllMin, cropAllRange], restAll: [restAllMinDist, restAllDistRange], live: [liveFieldMinDist, liveFieldDistRange], splay: [splayFieldMin, splayFieldRange], crop: [cropFieldMin, cropFieldRange], xy: [xyFieldMinDist, xyFieldDistRange], rest: [restFieldMinDist, restFieldDistRange] } }, modelBaseFrameQ, computeBaseRotationQuat, cloneBaseRb, makeClipRig, updateClipRigPlanes, setClipRigT, updateOnScreenFlags, evaluateArmLengthCurve, THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose, resolveTweenSegmentsWithAnchor, lerpTweenSegments, lerpLoopSegments, isHoldEntry, updateLoadingPreviewWristClip, lerpPoseValues, get loadingPreviewRenderer() { return loadingPreviewRenderer }, get loadingPreviewScene() { return loadingPreviewScene }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, get handBoundsCenterLocal() { return handBoundsCenterLocal }, multiPointCommit, multiPointEligibleFunctions, get multiPointActiveTouchCount() { return multiPointActiveTouchCount }, get multiPointSessionFiredPoseId() { return multiPointSessionFiredPoseId }, detectPoseJumps, get poseJumpLogEntries() { return poseJumpLogEntries }, applyCurlToSkeletonReference, handLogTriggerLabel, applyAllFingerCurls, syncCameraPanelFromLive, animSpeedMs, chainSequenceCount, applyFieldBounds, cursorDistXY, hexBrightnessPct, toonThresholdForMidBrightness }
+  window.__debug = { checkStartupFloorHide, get startupFloorHidden() { return startupFloorHidden }, get floorMesh() { return floorMesh }, updateLoadingPreviewAnimation, get loadingPreview2() { return { hand: loadingPreviewHand, hand2: loadingPreviewHand2, scene: loadingPreviewScene, camera: loadingPreviewCamera, renderer: loadingPreviewRenderer } }, updateSphereSequence, get sphereState() { return { stage: sphereStage, mesh: sphereMesh, on: sphereOn, start: sphereStart, dur: sphereDur, cap: sphereCap, done: sphereDone } }, stackOnDefault, applyCameraOrientation, syncCameraPanelFromLive, curveByDomain, get domains() { return { xyAll: [xyAllMinDist, xyAllDistRange], splayAll: [splayAllMin, splayAllRange], cropAll: [cropAllMin, cropAllRange], restAll: [restAllMinDist, restAllDistRange], live: [liveFieldMinDist, liveFieldDistRange], splay: [splayFieldMin, splayFieldRange], crop: [cropFieldMin, cropFieldRange], xy: [xyFieldMinDist, xyFieldDistRange], rest: [restFieldMinDist, restFieldDistRange] } }, modelBaseFrameQ, computeBaseRotationQuat, cloneBaseRb, makeClipRig, updateClipRigPlanes, setClipRigT, updateOnScreenFlags, evaluateArmLengthCurve, THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose, resolveTweenSegmentsWithAnchor, lerpTweenSegments, lerpLoopSegments, isHoldEntry, updateLoadingPreviewWristClip, lerpPoseValues, get loadingPreviewRenderer() { return loadingPreviewRenderer }, get loadingPreviewScene() { return loadingPreviewScene }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, get handBoundsCenterLocal() { return handBoundsCenterLocal }, multiPointCommit, multiPointEligibleFunctions, get multiPointActiveTouchCount() { return multiPointActiveTouchCount }, get multiPointSessionFiredPoseId() { return multiPointSessionFiredPoseId }, detectPoseJumps, get poseJumpLogEntries() { return poseJumpLogEntries }, applyCurlToSkeletonReference, handLogTriggerLabel, applyAllFingerCurls, syncCameraPanelFromLive, animSpeedMs, chainSequenceCount, applyFieldBounds, cursorDistXY, hexBrightnessPct, toonThresholdForMidBrightness }
   // Do NOT hide the loading screen yet: the hands exist but may not have been painted. finalizeReveal() hides it once the field has rendered a couple of frames (or after a 4 s safety net).
   setTimeout(finalizeReveal, 4000)
 }
@@ -2861,7 +2862,7 @@ const DEV_GROUPS = [
   {
     title: 'Floor',
     controls: [
-      { key: 'floorEnabled', label: 'Floor On/Off', type: 'checkbox', def: false, onChange: () => { syncBackgroundToFloor(); updateFloorRowVisibility(); updateFloor() } },
+      { key: 'floorEnabled', label: 'Floor On/Off', type: 'checkbox', def: false, onChange: () => { startupFloorHidden = false; syncBackgroundToFloor(); updateFloorRowVisibility(); updateFloor() } },
       { key: 'floorColor', label: 'Floor Color', type: 'color', def: '#ffffff', onChange: () => { syncBackgroundToFloor(); updateFloor() } },
       { key: 'floorZOffset', label: 'Floor Z Offset (World Units)', type: 'slider', min: -200, max: 200, step: 0.5, def: 0, onChange: () => updateFloor() },
       { key: 'floorXYScale', label: 'Floor XY Scale (x)', type: 'slider', min: 0.1, max: 10, step: 0.05, def: 1, onChange: () => updateFloor() }
@@ -2894,7 +2895,9 @@ const DEV_GROUPS = [
   {
     title: 'Starting State',
     controls: [
-      { key: 'staticPoseOnStartup', label: 'Static Pose On Startup', type: 'checkbox', def: false, onChange: (v) => { if (v) startupStaticReleased = false } }
+      { key: 'staticPoseOnStartup', label: 'Static Pose On Startup', type: 'checkbox', def: false, onChange: (v) => { if (v) startupStaticReleased = false } },
+      // On (default): the Floor is hidden (and stops cropping the hands) once EVERY hand has reached the end of its own Hand Offset On Startup sequence. Direct request 2026-10-13.
+      { key: 'hideFloorAfterHandOffset', label: 'Hide Floor After Hand Offset Sequence', type: 'checkbox', def: true, placeAfter: 'staticPoseOnStartup', onChange: () => { if (!cfg.hideFloorAfterHandOffset) { startupFloorHidden = false; updateFloor() } else checkStartupFloorHide() } }
     ]
   },
   // Hand Offset On Startup (2026-10-12, direct request), nested into Starting State by nestGroupInto(): with it on, the hands are drawn at startup in the default pose displaced by Offset X / Y / Z; the FIRST click
@@ -3519,7 +3522,7 @@ const FLOOR_BASE_SIZE = 2000
 // XY extent), and floor Z + a hair so the floor mesh itself is never clipped.
 const floorClipPlane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0)
 function updateFloor() {
-  if (!cfg.floorEnabled) { if (floorMesh) floorMesh.visible = false; if (renderer.clippingPlanes.length) renderer.clippingPlanes = []; sceneNeedsRedraw = true; return }
+  if (!cfg.floorEnabled || startupFloorHidden) { if (floorMesh) floorMesh.visible = false; if (renderer.clippingPlanes.length) renderer.clippingPlanes = []; sceneNeedsRedraw = true; return }
   if (!floorMesh) {
     floorMesh = new THREE.Mesh(new THREE.PlaneGeometry(FLOOR_BASE_SIZE, FLOOR_BASE_SIZE), new THREE.MeshBasicMaterial({ color: cfg.floorColor, side: THREE.DoubleSide, depthTest: false, depthWrite: false, toneMapped: false }))
     floorMesh.renderOrder = -1000000
@@ -3571,12 +3574,14 @@ function ensureSphereMesh() {
   sphereMesh.visible = false
   scene.add(sphereMesh)
   const n = hands.length
-  sphereOn = new Uint8Array(n); sphereStart = new Float64Array(n); sphereDur = new Float64Array(n); sphereCap = new Float64Array(n)
+  sphereOn = new Uint8Array(n); sphereStart = new Float64Array(n); sphereDur = new Float64Array(n); sphereCap = new Float64Array(n); sphereDone = new Uint8Array(n)
 }
 // First click: every sphere gets its own start time (Start Time Curve), duration (Animation Speed Curve or the Duration slider) and eligibility / reach (Start Distance Curve), all from its distance to the cursor
 // on screen (measured at the field grid point, the hands being hidden), then they run (updateSphereSequence()).
-function startSphereSequence() {
+// retrigger = true (Wait For All Spheres, a later click): spheres that already reached their target are left alone, every other sphere gets a fresh start time / duration / eligibility from the NEW cursor position.
+function startSphereSequence(retrigger) {
   ensureSphereMesh()
+  if (!retrigger) sphereDone.fill(0)
   parseClickPoseConfig(SPHERE_FN)
   const trig = clickPoseTriggers[SPHERE_FN]
   const n = hands.length, now = nowVirtual()
@@ -3593,6 +3598,7 @@ function startSphereSequence() {
   const dom = (flag) => (cfg[SPHERE_FN + flag] !== false ? [vMin, Math.max(vMax - vMin, 0.001)] : [aMin, Math.max(aMax - aMin, 0.001)])
   const [stMin, stRange] = dom('StartTimeCurveVisibleOnly'), [spMin, spRange] = dom('SpeedCurveVisibleOnly')
   for (let i = 0; i < n; i++) {
+    if (retrigger && sphereDone[i]) continue
     sphereOn[i] = 0
     let cap = 1
     if (cfg[SPHERE_FN + 'StartDistanceCurveEnabled']) {
@@ -3625,6 +3631,7 @@ function updateSphereSequence() {
     if (!sphereOn[i] || now < sphereStart[i] || !base) { _sphS.set(0, 0, 0); _sphP.set(0, 0, 0) } else {
       const raw = THREE.MathUtils.clamp((now - sphereStart[i]) / sphereDur[i], 0, 1)
       const fr = (easing ? easingProfilePAt(easing, raw) : raw) * sphereCap[i]
+      if (raw >= 1 && sphereCap[i] >= 1) sphereDone[i] = 1 // full sequence finished with no Start Distance cap: target scale and position reached
       const r = rOn ? rRange.min + (rRange.max - rRange.min) * THREE.MathUtils.clamp(evaluateArmLengthCurve(rPts, fr), 0, 1) : startR
       const z = zOn ? zRange.min + (zRange.max - zRange.min) * THREE.MathUtils.clamp(evaluateArmLengthCurve(zPts, fr), 0, 1) : base.z + startZ * (1 - fr)
       _sphP.set(base.x, base.y, z)
@@ -3638,14 +3645,16 @@ function updateSphereSequence() {
 }
 function sphereSeqActive() { return !!cfg.sphereSeqEnabled && sphereStage < 2 }
 // Click 1 spawns the spheres, click 2 removes them and shows the hands; Hand Offset On Startup (if on) then waits for ITS first click as before.
-// Wait For All Spheres: true once every sphere that would be visible on screen has reached the end of its own sequence (spheres the Start Distance Curve excluded never spawn and are skipped).
+// Wait For All Spheres: true once EVERY sphere that is on screen has reached its target scale and position (the full sequence, not capped by the Start Distance Curve). A sphere the Start Distance Curve excluded, or only
+// part-way capped, has not, so it counts as not done until a later click spawns it fully.
 function allVisibleSpheresDone() {
   const now = nowVirtual(), n = Math.min(hands.length, sphereOn ? sphereOn.length : 0)
   for (let i = 0; i < n; i++) {
-    if (!sphereOn[i]) continue
     const b = hands[i].basePosition
     if (!b || !isOnScreen(b)) continue
-    if (now < sphereStart[i] + sphereDur[i]) return false
+    if (sphereDone[i]) continue
+    if (sphereOn[i] && sphereCap[i] >= 1 && now >= sphereStart[i] + sphereDur[i]) { sphereDone[i] = 1; continue } // finished since the last frame
+    return false
   }
   return true
 }
@@ -3658,7 +3667,9 @@ function anySphereRunning() {
 function advanceSphereSequence() {
   if (sphereStage === 0) { sphereStage = 1; startSphereSequence(); return }
   if (anySphereRunning()) return // clicks do not register while sphere sequences are running
-  if (cfg.sphereWaitForAll && !allVisibleSpheresDone()) return // the click is consumed, nothing after the sphere sequence starts yet
+  // Wait For All Spheres: while any on-screen sphere has not reached its target, every click only (re)triggers the sphere sequences of the spheres still short of it (from the new cursor position); nothing after the
+  // sphere sequence (hands shown, Hand Offset On Startup) is allowed until all of them are there.
+  if (cfg.sphereWaitForAll && !allVisibleSpheresDone()) { startSphereSequence(true); return }
   sphereStage = 2
   if (sphereMesh) sphereMesh.visible = false
   updateHandsVisibility()
@@ -3692,8 +3703,17 @@ function applyStartupHandOffset() {
   }
   sceneNeedsRedraw = true
 }
+// Hide Floor After Hand Offset Sequence: once the startup transition has been fired and every hand has finished it (hand._startupSeqDone: set when its forward ramp completes, or when another function interrupts it),
+// the Floor is switched off (updateFloor() treats startupFloorHidden like Floor Off, which also stops the clipping plane cropping the hands). Called once per frame; cheap until the transition is under way.
+function checkStartupFloorHide() {
+  if (startupFloorHidden || startupHandOffsetStage !== 1 || !cfg.hideFloorAfterHandOffset || !cfg.floorEnabled || !hands.length) return
+  for (let i = 0; i < hands.length; i++) if (!hands[i]._startupSeqDone) return
+  startupFloorHidden = true
+  updateFloor()
+}
 function onHandOffsetOnStartupToggled() {
   startupHandOffsetStage = 0; startupConsumeActive = false; startupConsumeUntil = 0
+  startupFloorHidden = false; hands.forEach((h) => { delete h._startupSeqDone }); try { updateFloor() } catch (e) { /* scene not built yet */ }
   if (cfg.handOffsetOnStartupEnabled) startupStaticReleased = false
   applyStartupHandOffset()
   updateHandOffsetGroupVisibility()
@@ -5319,7 +5339,9 @@ function updateOutlineVisibility() {
 // hiding the fill/outline meshes separately (which would leave the
 // outline visible on its own if `outlineEnabled` happens to be on).
 function updateHandsVisibility() {
-  const hide = !!cfg.hideHands || (!!cfg.sphereSeqEnabled && sphereStage < 2) // Field Grid Sphere Sequence: the hands stay hidden until the second click
+  // CORRECTED 2026-10-13 (direct request: "all hand models should be loaded on startup, so they will be visible on startup if not being covered by the floor object"): the Field Grid Sphere Sequence no longer hides the hands
+  // until its second click; they are always built and shown, and the Floor's clipping plane is what covers them.
+  const hide = !!cfg.hideHands
   hands.forEach((h) => { h.wrapper.visible = !hide })
 }
 
@@ -11335,6 +11357,7 @@ function releaseHandFromOtherFunctions(hand, exceptId) {
       // without this, whatever fraction of `id`'s own Offset/Rotation had
       // already been visually shown vanishes the instant it's forced idle.
       bakeInFlightOffsetRotation(hand, id)
+      if (id === STARTUP_FN) hand._startupSeqDone = true // interrupted counts as finished for Hide Floor After Hand Offset Sequence
       // Logged BEFORE the phase actually changes, so the entry names the
       // phase this hand was genuinely interrupted OUT OF (2026-09-28,
       // direct request) -- this is precisely the "a different click
@@ -12635,6 +12658,7 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
       // phase on the very same frame it fires (no lingering), so a single
       // bake call here is exactly once per completed ramp, never repeated.
       bakeOffsetRotationIntoAccum(hand, p)
+      if (p === STARTUP_FN) hand._startupSeqDone = true // Hide Floor After Hand Offset Sequence: this hand has reached the end of its own startup sequence
       // Sequence Mode - Count/Loop/Oscillate (Sequence mode only) -- see
       // makeClickPoseGroup()'s own control comment for the full
       // reasoning. This initial forward pass IS lap 1; a plain 'Count'
@@ -17928,6 +17952,7 @@ function animate(dt, now) {
       const __uroStart = performance.now()
       updateRenderOrder()
       applyFieldBounds()
+      checkStartupFloorHide()
       __frameProfiler.updateRenderOrderMs += performance.now() - __uroStart
       if (cfg.logPoseJumpsEnabled) detectPoseJumps()
       else poseJumpLastCheckMs = 0
