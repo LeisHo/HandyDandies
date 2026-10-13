@@ -223389,16 +223389,16 @@
                   "items": [
                     {
                       "type": "row",
-                      "key": "sphereZCurve"
+                      "key": "sphereZRange"
                     },
                     {
                       "type": "row",
-                      "key": "sphereZRange"
+                      "key": "sphereZCurve"
                     }
                   ],
                   "settings": [
-                    "sphereZCurve",
-                    "sphereZRange"
+                    "sphereZRange",
+                    "sphereZCurve"
                   ],
                   "subgroups": []
                 }
@@ -223529,16 +223529,16 @@
                 "items": [
                   {
                     "type": "row",
-                    "key": "sphereZCurve"
+                    "key": "sphereZRange"
                   },
                   {
                     "type": "row",
-                    "key": "sphereZRange"
+                    "key": "sphereZCurve"
                   }
                 ],
                 "settings": [
-                  "sphereZCurve",
-                  "sphereZRange"
+                  "sphereZRange",
+                  "sphereZCurve"
                 ],
                 "subgroups": []
               }
@@ -224724,16 +224724,16 @@
                 "items": [
                   {
                     "type": "row",
-                    "key": "sphereZCurve"
+                    "key": "sphereZRange"
                   },
                   {
                     "type": "row",
-                    "key": "sphereZRange"
+                    "key": "sphereZCurve"
                   }
                 ],
                 "settings": [
-                  "sphereZCurve",
-                  "sphereZRange"
+                  "sphereZRange",
+                  "sphereZCurve"
                 ],
                 "subgroups": []
               }
@@ -224864,16 +224864,16 @@
               "items": [
                 {
                   "type": "row",
-                  "key": "sphereZCurve"
+                  "key": "sphereZRange"
                 },
                 {
                   "type": "row",
-                  "key": "sphereZRange"
+                  "key": "sphereZCurve"
                 }
               ],
               "settings": [
-                "sphereZCurve",
-                "sphereZRange"
+                "sphereZRange",
+                "sphereZCurve"
               ],
               "subgroups": []
             }
