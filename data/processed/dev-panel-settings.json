@@ -6794,8 +6794,8 @@
       "cropWristEnabled": true,
       "hideWrist": 0,
       "reactiveArmLengthEnabled": true,
-      "armLengthRange": "{\"min\":0,\"max\":90}",
-      "armLengthCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.22698917961348242,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.7429738798105838,\"y\":0.036666615804036407}}]",
+      "armLengthRange": "{\"min\":0,\"max\":54}",
+      "armLengthCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.5121113503476612,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.5056890012642226,\"y\":0}}]",
       "armLengthDamping": 0.21,
       "armLengthUseDepth": false,
       "armLengthVisibleOnly": true,
@@ -17556,8 +17556,8 @@
       "cropWristEnabled": true,
       "hideWrist": 0,
       "reactiveArmLengthEnabled": true,
-      "armLengthRange": "{\"min\":0,\"max\":90}",
-      "armLengthCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.22698917961348242,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.7429738798105838,\"y\":0.036666615804036407}}]",
+      "armLengthRange": "{\"min\":0,\"max\":54}",
+      "armLengthCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.5121113503476612,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.5056890012642226,\"y\":0}}]",
       "armLengthDamping": 0.06,
       "armLengthUseDepth": false,
       "armLengthVisibleOnly": true,
@@ -28318,8 +28318,8 @@
       "cropWristEnabled": true,
       "hideWrist": 0,
       "reactiveArmLengthEnabled": true,
-      "armLengthRange": "{\"min\":0,\"max\":90}",
-      "armLengthCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.22698917961348242,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.7429738798105838,\"y\":0.036666615804036407}}]",
+      "armLengthRange": "{\"min\":0,\"max\":54}",
+      "armLengthCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.5121113503476612,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.5056890012642226,\"y\":0}}]",
       "armLengthDamping": 0.21,
       "armLengthUseDepth": false,
       "armLengthVisibleOnly": true,
@@ -35771,7 +35771,7 @@
           "type": "group",
           "group": {
             "key": "Cursor Tracking",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -35969,7 +35969,7 @@
                 "type": "group",
                 "group": {
                   "key": "New Group (4)",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -36217,7 +36217,7 @@
               },
               {
                 "key": "New Group (4)",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -37569,7 +37569,7 @@
         },
         {
           "key": "Cursor Tracking",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
@@ -37767,7 +37767,7 @@
               "type": "group",
               "group": {
                 "key": "New Group (4)",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -38015,7 +38015,7 @@
             },
             {
               "key": "New Group (4)",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
