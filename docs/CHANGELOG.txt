@@ -17515,6 +17515,14 @@ Direct request: use the HANDO two-hand tween export (format hando-two-hand-tween
 
 Direct request: while sphere sequences are running a click will not register. advanceSphereSequence() now returns without doing anything (the click is still consumed, so no real click function fires either) while anySphereRunning() - any started sphere whose sequence has not reached its end, including ones still waiting for their start time. Only once every sphere sequence has finished does the next click advance to the hands / Hand Offset On Startup. Note this makes Wait For All Spheres (on-screen spheres only) redundant: the running check already covers every sphere, on screen or not. Also exposed updateSphereSequence and sphereState on window.__debug for testing. main.js ?v=387 -> ?v=388.
 
+2026-10-13  -  Hand Offset On Startup: Hand Scale Curve
+  Direct request (after a garbled first message, clarified): a "Hand Scale Curve" group in Hand Offset On Startup, the same UI as the sphere Radius Curve (on/off + curve editor + Min / Max range bar), but for the hand's scale.
+  Keys startupHandScaleCurveEnabled / startupHandScaleCurve / startupHandScaleRange (default 0..1, track 0-4 x, fractional drag via the new decimals option). The value is a multiple of the hand's normal scale (1 = normal): each
+  hand's scale follows Min + (Max - Min) * curve(its own startup sequence progress); while waiting (idle, including the start-time delay) it sits at the value at progress 0; once its sequence is finished
+  (hand._startupSeqDone) it is back at its normal scale (end the curve at 1 for a seamless handoff - my choice, nothing was specified). Applied at the two places the scale is set: the idle repose block and
+  applyOffsetRotationToHand() for STARTUP_FN (which gets the eased sequence progress). Verified in the page with a controlled clock: range 0.2..1 -> idle ratio 0.200, then 0.277, 0.413, 0.550, 0.686, 0.823, 0.959 over the
+  sequence, 1.0 once finished.
+
 2026-10-13  -  Camera: XY Center Field Mid Point button, and pan / zoom lock state re-derived every frame
 
 Direct requests: (1) "in the camera group, add a button XY Center Field Mid Point... my camera will be moved in the xy axes to center the field mid point. zoom and rotation will not be touched"; (2) "when i have my camera fully unlocked. i still cant pan or zoom".
