@@ -8233,7 +8233,7 @@
       "custom21StartDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
       "custom21RetransitionEnabled": true,
       "custom21RetransitionSpeedMs": 400,
-      "custom21RetransitionSpeedCurveEnabled": true,
+      "custom21RetransitionSpeedCurveEnabled": false,
       "custom21RetransitionSpeedCurveVisibleOnly": true,
       "custom21RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21RetransitionSpeedCurveRange": "{\"min\":50,\"max\":2000}",
@@ -8241,14 +8241,14 @@
       "custom21RetransitionDistCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21RetransitionDistRange": "{\"min\":50,\"max\":2000}",
       "custom21RetransitionScalerEnabled": true,
-      "custom21RetransitionScalerCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.5057884380792447,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.5091626558514599,\"y\":0}}]",
+      "custom21RetransitionScalerCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.5140945168802775,\"y\":-0.12760416666666663}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.278253513093899,\"y\":0.6923957824707031}}]",
       "custom21RetransitionScalerMulRange": "{\"min\":0.05,\"max\":1}",
-      "custom21RetransitionScalerDistRange": "{\"min\":0,\"max\":500}",
+      "custom21RetransitionScalerDistRange": "{\"min\":0,\"max\":800}",
       "custom21RetransitionStartTimeCurveEnabled": true,
       "custom21RetransitionStartTimeCurveVisibleOnly": true,
       "custom21RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom21TweenRetransitionSpeedMs": 5000,
+      "custom21TweenRetransitionSpeedMs": 15700,
       "custom21TweenRetransitionSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.25203236866749906,\"y\":0.040103912353515625}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.3644149408348759,\"y\":0}}]",
       "custom21TweenRetransitionSpeedCurveRange": "{\"min\":20000,\"max\":25254}",
       "custom21TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -8710,7 +8710,7 @@
       "custom21Trig5StartDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
       "custom21Trig5RetransitionEnabled": true,
       "custom21Trig5RetransitionSpeedMs": 400,
-      "custom21Trig5RetransitionSpeedCurveEnabled": true,
+      "custom21Trig5RetransitionSpeedCurveEnabled": false,
       "custom21Trig5RetransitionSpeedCurveVisibleOnly": true,
       "custom21Trig5RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21Trig5RetransitionSpeedCurveRange": "{\"min\":50,\"max\":2000}",
@@ -8718,14 +8718,14 @@
       "custom21Trig5RetransitionDistCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21Trig5RetransitionDistRange": "{\"min\":50,\"max\":2000}",
       "custom21Trig5RetransitionScalerEnabled": true,
-      "custom21Trig5RetransitionScalerCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.4852664201895783,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.5164638827639227,\"y\":0}}]",
+      "custom21Trig5RetransitionScalerCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.4852664201895783,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2102190045029062,\"y\":0.4944791793823242}}]",
       "custom21Trig5RetransitionScalerMulRange": "{\"min\":0.1,\"max\":1}",
-      "custom21Trig5RetransitionScalerDistRange": "{\"min\":0,\"max\":500}",
+      "custom21Trig5RetransitionScalerDistRange": "{\"min\":0,\"max\":800}",
       "custom21Trig5RetransitionStartTimeCurveEnabled": true,
       "custom21Trig5RetransitionStartTimeCurveVisibleOnly": true,
       "custom21Trig5RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21Trig5RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom21Trig5TweenRetransitionSpeedMs": 5000,
+      "custom21Trig5TweenRetransitionSpeedMs": 18140,
       "custom21Trig5TweenRetransitionSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.24017135630063322,\"y\":0.03197911580403645}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.4904553496601173,\"y\":0}}]",
       "custom21Trig5TweenRetransitionSpeedCurveRange": "{\"min\":20000,\"max\":25692}",
       "custom21Trig5TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -18995,7 +18995,7 @@
       "custom21StartDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
       "custom21RetransitionEnabled": true,
       "custom21RetransitionSpeedMs": 400,
-      "custom21RetransitionSpeedCurveEnabled": true,
+      "custom21RetransitionSpeedCurveEnabled": false,
       "custom21RetransitionSpeedCurveVisibleOnly": true,
       "custom21RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21RetransitionSpeedCurveRange": "{\"min\":50,\"max\":2000}",
@@ -19003,14 +19003,14 @@
       "custom21RetransitionDistCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21RetransitionDistRange": "{\"min\":50,\"max\":2000}",
       "custom21RetransitionScalerEnabled": true,
-      "custom21RetransitionScalerCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.5057884380792447,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.5091626558514599,\"y\":0}}]",
+      "custom21RetransitionScalerCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.5140945168802775,\"y\":-0.12760416666666663}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.278253513093899,\"y\":0.6923957824707031}}]",
       "custom21RetransitionScalerMulRange": "{\"min\":0.05,\"max\":1}",
-      "custom21RetransitionScalerDistRange": "{\"min\":0,\"max\":500}",
+      "custom21RetransitionScalerDistRange": "{\"min\":0,\"max\":800}",
       "custom21RetransitionStartTimeCurveEnabled": true,
       "custom21RetransitionStartTimeCurveVisibleOnly": true,
       "custom21RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom21TweenRetransitionSpeedMs": 5000,
+      "custom21TweenRetransitionSpeedMs": 15700,
       "custom21TweenRetransitionSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.25203236866749906,\"y\":0.040103912353515625}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.3644149408348759,\"y\":0}}]",
       "custom21TweenRetransitionSpeedCurveRange": "{\"min\":20000,\"max\":25254}",
       "custom21TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -19472,7 +19472,7 @@
       "custom21Trig5StartDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
       "custom21Trig5RetransitionEnabled": true,
       "custom21Trig5RetransitionSpeedMs": 400,
-      "custom21Trig5RetransitionSpeedCurveEnabled": true,
+      "custom21Trig5RetransitionSpeedCurveEnabled": false,
       "custom21Trig5RetransitionSpeedCurveVisibleOnly": true,
       "custom21Trig5RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21Trig5RetransitionSpeedCurveRange": "{\"min\":50,\"max\":2000}",
@@ -19480,14 +19480,14 @@
       "custom21Trig5RetransitionDistCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21Trig5RetransitionDistRange": "{\"min\":50,\"max\":2000}",
       "custom21Trig5RetransitionScalerEnabled": true,
-      "custom21Trig5RetransitionScalerCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.4852664201895783,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.5164638827639227,\"y\":0}}]",
+      "custom21Trig5RetransitionScalerCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.4852664201895783,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2102190045029062,\"y\":0.4944791793823242}}]",
       "custom21Trig5RetransitionScalerMulRange": "{\"min\":0.1,\"max\":1}",
-      "custom21Trig5RetransitionScalerDistRange": "{\"min\":0,\"max\":500}",
+      "custom21Trig5RetransitionScalerDistRange": "{\"min\":0,\"max\":800}",
       "custom21Trig5RetransitionStartTimeCurveEnabled": true,
       "custom21Trig5RetransitionStartTimeCurveVisibleOnly": true,
       "custom21Trig5RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21Trig5RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom21Trig5TweenRetransitionSpeedMs": 5000,
+      "custom21Trig5TweenRetransitionSpeedMs": 18140,
       "custom21Trig5TweenRetransitionSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.24017135630063322,\"y\":0.03197911580403645}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.4904553496601173,\"y\":0}}]",
       "custom21Trig5TweenRetransitionSpeedCurveRange": "{\"min\":20000,\"max\":25692}",
       "custom21Trig5TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -29757,7 +29757,7 @@
       "custom21StartDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
       "custom21RetransitionEnabled": true,
       "custom21RetransitionSpeedMs": 400,
-      "custom21RetransitionSpeedCurveEnabled": true,
+      "custom21RetransitionSpeedCurveEnabled": false,
       "custom21RetransitionSpeedCurveVisibleOnly": true,
       "custom21RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21RetransitionSpeedCurveRange": "{\"min\":50,\"max\":2000}",
@@ -29765,14 +29765,14 @@
       "custom21RetransitionDistCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21RetransitionDistRange": "{\"min\":50,\"max\":2000}",
       "custom21RetransitionScalerEnabled": true,
-      "custom21RetransitionScalerCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.5057884380792447,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.5091626558514599,\"y\":0}}]",
+      "custom21RetransitionScalerCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.5140945168802775,\"y\":-0.12760416666666663}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.278253513093899,\"y\":0.6923957824707031}}]",
       "custom21RetransitionScalerMulRange": "{\"min\":0.05,\"max\":1}",
-      "custom21RetransitionScalerDistRange": "{\"min\":0,\"max\":500}",
+      "custom21RetransitionScalerDistRange": "{\"min\":0,\"max\":800}",
       "custom21RetransitionStartTimeCurveEnabled": true,
       "custom21RetransitionStartTimeCurveVisibleOnly": true,
       "custom21RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom21TweenRetransitionSpeedMs": 5000,
+      "custom21TweenRetransitionSpeedMs": 15700,
       "custom21TweenRetransitionSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.25203236866749906,\"y\":0.040103912353515625}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.3644149408348759,\"y\":0}}]",
       "custom21TweenRetransitionSpeedCurveRange": "{\"min\":20000,\"max\":25254}",
       "custom21TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -30234,7 +30234,7 @@
       "custom21Trig5StartDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
       "custom21Trig5RetransitionEnabled": true,
       "custom21Trig5RetransitionSpeedMs": 400,
-      "custom21Trig5RetransitionSpeedCurveEnabled": true,
+      "custom21Trig5RetransitionSpeedCurveEnabled": false,
       "custom21Trig5RetransitionSpeedCurveVisibleOnly": true,
       "custom21Trig5RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21Trig5RetransitionSpeedCurveRange": "{\"min\":50,\"max\":2000}",
@@ -30242,14 +30242,14 @@
       "custom21Trig5RetransitionDistCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21Trig5RetransitionDistRange": "{\"min\":50,\"max\":2000}",
       "custom21Trig5RetransitionScalerEnabled": true,
-      "custom21Trig5RetransitionScalerCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.4852664201895783,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.5164638827639227,\"y\":0}}]",
+      "custom21Trig5RetransitionScalerCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.4852664201895783,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2102190045029062,\"y\":0.4944791793823242}}]",
       "custom21Trig5RetransitionScalerMulRange": "{\"min\":0.1,\"max\":1}",
-      "custom21Trig5RetransitionScalerDistRange": "{\"min\":0,\"max\":500}",
+      "custom21Trig5RetransitionScalerDistRange": "{\"min\":0,\"max\":800}",
       "custom21Trig5RetransitionStartTimeCurveEnabled": true,
       "custom21Trig5RetransitionStartTimeCurveVisibleOnly": true,
       "custom21Trig5RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21Trig5RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom21Trig5TweenRetransitionSpeedMs": 5000,
+      "custom21Trig5TweenRetransitionSpeedMs": 18140,
       "custom21Trig5TweenRetransitionSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.24017135630063322,\"y\":0.03197911580403645}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.4904553496601173,\"y\":0}}]",
       "custom21Trig5TweenRetransitionSpeedCurveRange": "{\"min\":20000,\"max\":25692}",
       "custom21Trig5TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -114859,7 +114859,7 @@
                                   "type": "group",
                                   "group": {
                                     "key": "Retransition Speed Curve",
-                                    "collapsed": true,
+                                    "collapsed": false,
                                     "locked": false,
                                     "items": [
                                       {
@@ -115012,7 +115012,7 @@
                               "subgroups": [
                                 {
                                   "key": "Retransition Speed Curve",
-                                  "collapsed": true,
+                                  "collapsed": false,
                                   "locked": false,
                                   "items": [
                                     {
@@ -115582,7 +115582,7 @@
                                 "type": "group",
                                 "group": {
                                   "key": "Retransition Speed Curve",
-                                  "collapsed": true,
+                                  "collapsed": false,
                                   "locked": false,
                                   "items": [
                                     {
@@ -115735,7 +115735,7 @@
                             "subgroups": [
                               {
                                 "key": "Retransition Speed Curve",
-                                "collapsed": true,
+                                "collapsed": false,
                                 "locked": false,
                                 "items": [
                                   {
@@ -122405,7 +122405,7 @@
                                 "type": "group",
                                 "group": {
                                   "key": "Retransition Speed Curve",
-                                  "collapsed": true,
+                                  "collapsed": false,
                                   "locked": false,
                                   "items": [
                                     {
@@ -122558,7 +122558,7 @@
                             "subgroups": [
                               {
                                 "key": "Retransition Speed Curve",
-                                "collapsed": true,
+                                "collapsed": false,
                                 "locked": false,
                                 "items": [
                                   {
@@ -123128,7 +123128,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Retransition Speed Curve",
-                                "collapsed": true,
+                                "collapsed": false,
                                 "locked": false,
                                 "items": [
                                   {
@@ -123281,7 +123281,7 @@
                           "subgroups": [
                             {
                               "key": "Retransition Speed Curve",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -130692,7 +130692,7 @@
                                 "type": "group",
                                 "group": {
                                   "key": "Retransition Speed Curve",
-                                  "collapsed": true,
+                                  "collapsed": false,
                                   "locked": false,
                                   "items": [
                                     {
@@ -130845,7 +130845,7 @@
                             "subgroups": [
                               {
                                 "key": "Retransition Speed Curve",
-                                "collapsed": true,
+                                "collapsed": false,
                                 "locked": false,
                                 "items": [
                                   {
@@ -131415,7 +131415,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Retransition Speed Curve",
-                                "collapsed": true,
+                                "collapsed": false,
                                 "locked": false,
                                 "items": [
                                   {
@@ -131568,7 +131568,7 @@
                           "subgroups": [
                             {
                               "key": "Retransition Speed Curve",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -138238,7 +138238,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Retransition Speed Curve",
-                                "collapsed": true,
+                                "collapsed": false,
                                 "locked": false,
                                 "items": [
                                   {
@@ -138391,7 +138391,7 @@
                           "subgroups": [
                             {
                               "key": "Retransition Speed Curve",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -138961,7 +138961,7 @@
                             "type": "group",
                             "group": {
                               "key": "Retransition Speed Curve",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -139114,7 +139114,7 @@
                         "subgroups": [
                           {
                             "key": "Retransition Speed Curve",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -223237,7 +223237,7 @@
                                 "type": "group",
                                 "group": {
                                   "key": "Retransition Speed Curve",
-                                  "collapsed": true,
+                                  "collapsed": false,
                                   "locked": false,
                                   "items": [
                                     {
@@ -223390,7 +223390,7 @@
                             "subgroups": [
                               {
                                 "key": "Retransition Speed Curve",
-                                "collapsed": true,
+                                "collapsed": false,
                                 "locked": false,
                                 "items": [
                                   {
@@ -223960,7 +223960,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Retransition Speed Curve",
-                                "collapsed": true,
+                                "collapsed": false,
                                 "locked": false,
                                 "items": [
                                   {
@@ -224113,7 +224113,7 @@
                           "subgroups": [
                             {
                               "key": "Retransition Speed Curve",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -230783,7 +230783,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Retransition Speed Curve",
-                                "collapsed": true,
+                                "collapsed": false,
                                 "locked": false,
                                 "items": [
                                   {
@@ -230936,7 +230936,7 @@
                           "subgroups": [
                             {
                               "key": "Retransition Speed Curve",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -231506,7 +231506,7 @@
                             "type": "group",
                             "group": {
                               "key": "Retransition Speed Curve",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -231659,7 +231659,7 @@
                         "subgroups": [
                           {
                             "key": "Retransition Speed Curve",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -239070,7 +239070,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Retransition Speed Curve",
-                                "collapsed": true,
+                                "collapsed": false,
                                 "locked": false,
                                 "items": [
                                   {
@@ -239223,7 +239223,7 @@
                           "subgroups": [
                             {
                               "key": "Retransition Speed Curve",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -239793,7 +239793,7 @@
                             "type": "group",
                             "group": {
                               "key": "Retransition Speed Curve",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -239946,7 +239946,7 @@
                         "subgroups": [
                           {
                             "key": "Retransition Speed Curve",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -246616,7 +246616,7 @@
                             "type": "group",
                             "group": {
                               "key": "Retransition Speed Curve",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -246769,7 +246769,7 @@
                         "subgroups": [
                           {
                             "key": "Retransition Speed Curve",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -247339,7 +247339,7 @@
                           "type": "group",
                           "group": {
                             "key": "Retransition Speed Curve",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -247492,7 +247492,7 @@
                       "subgroups": [
                         {
                           "key": "Retransition Speed Curve",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
