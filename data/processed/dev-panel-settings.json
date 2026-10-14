@@ -18019,8 +18019,8 @@
           "group": "FIST ROTATE"
         }
       ],
-      "cameraX": -3.1379657005855006,
-      "cameraY": -3.765921456243344,
+      "cameraX": -3.1777777777777776,
+      "cameraY": 1.5930860059053377e-14,
       "cameraZ": 260.17068872666084,
       "cameraFov": 35,
       "cameraYaw": 0,
@@ -18622,7 +18622,7 @@
       "sphereFnStartTimeRange": "{\"min\":0,\"max\":2173}",
       "sphereFnStartDistanceCurveEnabled": true,
       "sphereFnStartDistanceMin": 0,
-      "sphereFnStartDistanceMax": 55,
+      "sphereFnStartDistanceMax": 80,
       "sphereFnStartDistanceCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.4903901949768603,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.5496817246187704,\"y\":0}}]",
       "sphereRadiusCurveEnabled": true,
       "sphereRadiusCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.5352221846639439,\"y\":0}},{\"x\":0.5614528862320837,\"y\":1,\"h1\":{\"x\":0.11037376290175072,\"y\":0},\"h2\":{\"x\":-0.11706297360857076,\"y\":0}},{\"x\":1,\"y\":0.30385411580403643,\"h2\":{\"x\":-0.453301867765189,\"y\":0.07239583333333333}}]",
@@ -254895,7 +254895,7 @@
     },
     {
       "key": "New Group (11)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -255094,7 +255094,7 @@
           "type": "group",
           "group": {
             "key": "Camera",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -255481,7 +255481,7 @@
         },
         {
           "key": "Camera",
-          "collapsed": true,
+          "collapsed": false,
           "locked": true,
           "items": [
             {
@@ -255668,7 +255668,7 @@
     },
     {
       "key": "Starting State",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -257174,7 +257174,7 @@
           "type": "group",
           "group": {
             "key": "Field Grid Sphere Sequence",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -257275,7 +257275,7 @@
                 "type": "group",
                 "group": {
                   "key": "Sphere > Start Distance Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
@@ -257426,7 +257426,7 @@
               },
               {
                 "key": "Sphere > Start Distance Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": true,
                 "items": [
                   {
@@ -258985,7 +258985,7 @@
         },
         {
           "key": "Field Grid Sphere Sequence",
-          "collapsed": false,
+          "collapsed": true,
           "locked": true,
           "items": [
             {
@@ -259086,7 +259086,7 @@
               "type": "group",
               "group": {
                 "key": "Sphere > Start Distance Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": true,
                 "items": [
                   {
@@ -259237,7 +259237,7 @@
             },
             {
               "key": "Sphere > Start Distance Curve",
-              "collapsed": true,
+              "collapsed": false,
               "locked": true,
               "items": [
                 {
@@ -261872,9 +261872,9 @@
     },
     "mobile": {
       "left": 20,
-      "top": 0,
-      "width": 404.71429443359375,
-      "height": 631.0833740234375
+      "top": 2.702380895614624,
+      "width": 408.1428527832031,
+      "height": 629.8988037109375
     }
   }
 }
