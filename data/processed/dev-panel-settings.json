@@ -18185,8 +18185,8 @@
           "targetZ": 0
         }
       ],
-      "lockCameraPan": false,
-      "lockCameraZoom": false,
+      "lockCameraPan": true,
+      "lockCameraZoom": true,
       "cameraMaxExtentsEnabled": true,
       "keyAzimuth": 27,
       "keyElevation": 67,
@@ -254895,7 +254895,7 @@
     },
     {
       "key": "New Group (11)",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -261874,7 +261874,7 @@
       "left": 20,
       "top": 2.702380895614624,
       "width": 408.1428527832031,
-      "height": 629.8988037109375
+      "height": 35.52381134033203
     }
   }
 }
