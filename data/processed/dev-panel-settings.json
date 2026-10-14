@@ -7785,7 +7785,7 @@
       "startupFnFirstGlideTimeScale": 1,
       "startupFnTweenSpeedMs": 5000,
       "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.29914436960931434,\"y\":0.006354141235351607}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.3221476094538043,\"y\":0}}]",
-      "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":4065}",
+      "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":2698}",
       "startupFnSequencePlayMode": "Count",
       "startupFnSequenceCount": 1,
       "startupFnSequenceCountMode": "Loop",
@@ -7799,7 +7799,7 @@
       "startupFnSpeedCurveEnabled": true,
       "startupFnSpeedCurveVisibleOnly": true,
       "startupFnSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3975100633428528,\"y\":0.0054166158040364065}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.2893590448759581,\"y\":0}}]",
-      "startupFnSpeedCurveRange": "{\"min\":1007,\"max\":1408}",
+      "startupFnSpeedCurveRange": "{\"min\":770,\"max\":1128}",
       "startupFnStartTimeCurveEnabled": true,
       "startupFnStartTimeCurveVisibleOnly": true,
       "startupFnStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -18562,7 +18562,7 @@
       "startupFnFirstGlideTimeScale": 1,
       "startupFnTweenSpeedMs": 5000,
       "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.29914436960931434,\"y\":0.006354141235351607}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.3221476094538043,\"y\":0}}]",
-      "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":4065}",
+      "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":2698}",
       "startupFnSequencePlayMode": "Count",
       "startupFnSequenceCount": 1,
       "startupFnSequenceCountMode": "Loop",
@@ -18576,7 +18576,7 @@
       "startupFnSpeedCurveEnabled": true,
       "startupFnSpeedCurveVisibleOnly": true,
       "startupFnSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3975100633428528,\"y\":0.0054166158040364065}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.2893590448759581,\"y\":0}}]",
-      "startupFnSpeedCurveRange": "{\"min\":1007,\"max\":1408}",
+      "startupFnSpeedCurveRange": "{\"min\":770,\"max\":1128}",
       "startupFnStartTimeCurveEnabled": true,
       "startupFnStartTimeCurveVisibleOnly": true,
       "startupFnStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -29339,7 +29339,7 @@
       "startupFnFirstGlideTimeScale": 1,
       "startupFnTweenSpeedMs": 5000,
       "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.29914436960931434,\"y\":0.006354141235351607}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.3221476094538043,\"y\":0}}]",
-      "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":4065}",
+      "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":2698}",
       "startupFnSequencePlayMode": "Count",
       "startupFnSequenceCount": 1,
       "startupFnSequenceCountMode": "Loop",
@@ -29353,7 +29353,7 @@
       "startupFnSpeedCurveEnabled": true,
       "startupFnSpeedCurveVisibleOnly": true,
       "startupFnSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3975100633428528,\"y\":0.0054166158040364065}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.2893590448759581,\"y\":0}}]",
-      "startupFnSpeedCurveRange": "{\"min\":1007,\"max\":1408}",
+      "startupFnSpeedCurveRange": "{\"min\":770,\"max\":1128}",
       "startupFnStartTimeCurveEnabled": true,
       "startupFnStartTimeCurveVisibleOnly": true,
       "startupFnStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -256326,7 +256326,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Start Time Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
@@ -257069,7 +257069,7 @@
               },
               {
                 "key": "Startup > Start Time Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": true,
                 "items": [
                   {
@@ -258140,7 +258140,7 @@
               "type": "group",
               "group": {
                 "key": "Startup > Start Time Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": true,
                 "items": [
                   {
@@ -258883,7 +258883,7 @@
             },
             {
               "key": "Startup > Start Time Curve",
-              "collapsed": true,
+              "collapsed": false,
               "locked": true,
               "items": [
                 {
