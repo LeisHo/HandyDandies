@@ -7779,11 +7779,11 @@
       "startupHandTweenEnabled": true,
       "startupFnMode": "Sequence",
       "startupFnTargetPose": "",
-      "startupFnTweenSelector": "FLOWER",
+      "startupFnTweenSelector": "FLOWER 3",
       "startupFnReverseSequence": false,
       "startupFnGlideToFirstPose": false,
       "startupFnFirstGlideTimeScale": 1,
-      "startupFnTweenSpeedMs": 5000,
+      "startupFnTweenSpeedMs": 1210,
       "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.29914436960931434,\"y\":0.006354141235351607}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.3221476094538043,\"y\":0}}]",
       "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":2698}",
       "startupFnSequencePlayMode": "Count",
@@ -7799,7 +7799,7 @@
       "startupFnSpeedCurveEnabled": true,
       "startupFnSpeedCurveVisibleOnly": true,
       "startupFnSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3975100633428528,\"y\":0.0054166158040364065}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.2893590448759581,\"y\":0}}]",
-      "startupFnSpeedCurveRange": "{\"min\":422,\"max\":800}",
+      "startupFnSpeedCurveRange": "{\"min\":504,\"max\":728}",
       "startupFnStartTimeCurveEnabled": true,
       "startupFnStartTimeCurveVisibleOnly": true,
       "startupFnStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -7831,7 +7831,7 @@
       "sphereStartRadius": 0.1,
       "sphereSeqDurationMs": 1850,
       "sphereWaitForAll": true,
-      "sphereMaxClicks": 2,
+      "sphereMaxClicks": 1,
       "sphereColor": "#ffffff",
       "sphereFnEasingCurveEnabled": true,
       "sphereFnEasingCurve": "[{\"x\":0,\"y\":0.35864588419596355,\"h1\":{\"x\":0.4122650674970208,\"y\":0.17406234741210935}},{\"x\":0.5008438316877292,\"y\":1,\"h1\":{\"x\":0.21963354271552937,\"y\":0},\"h2\":{\"x\":-0.224651357220149,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2713254844522799,\"y\":0}}]",
@@ -18576,7 +18576,7 @@
       "startupFnSpeedCurveEnabled": true,
       "startupFnSpeedCurveVisibleOnly": true,
       "startupFnSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3975100633428528,\"y\":0.0054166158040364065}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.2893590448759581,\"y\":0}}]",
-      "startupFnSpeedCurveRange": "{\"min\":422,\"max\":800}",
+      "startupFnSpeedCurveRange": "{\"min\":504,\"max\":728}",
       "startupFnStartTimeCurveEnabled": true,
       "startupFnStartTimeCurveVisibleOnly": true,
       "startupFnStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -29333,11 +29333,11 @@
       "startupHandTweenEnabled": true,
       "startupFnMode": "Sequence",
       "startupFnTargetPose": "",
-      "startupFnTweenSelector": "FLOWER",
+      "startupFnTweenSelector": "FLOWER 3",
       "startupFnReverseSequence": false,
       "startupFnGlideToFirstPose": false,
       "startupFnFirstGlideTimeScale": 1,
-      "startupFnTweenSpeedMs": 5000,
+      "startupFnTweenSpeedMs": 1210,
       "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.29914436960931434,\"y\":0.006354141235351607}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.3221476094538043,\"y\":0}}]",
       "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":2698}",
       "startupFnSequencePlayMode": "Count",
@@ -29353,7 +29353,7 @@
       "startupFnSpeedCurveEnabled": true,
       "startupFnSpeedCurveVisibleOnly": true,
       "startupFnSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3975100633428528,\"y\":0.0054166158040364065}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.2893590448759581,\"y\":0}}]",
-      "startupFnSpeedCurveRange": "{\"min\":422,\"max\":800}",
+      "startupFnSpeedCurveRange": "{\"min\":504,\"max\":728}",
       "startupFnStartTimeCurveEnabled": true,
       "startupFnStartTimeCurveVisibleOnly": true,
       "startupFnStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -29385,7 +29385,7 @@
       "sphereStartRadius": 0.1,
       "sphereSeqDurationMs": 1850,
       "sphereWaitForAll": true,
-      "sphereMaxClicks": 2,
+      "sphereMaxClicks": 1,
       "sphereColor": "#ffffff",
       "sphereFnEasingCurveEnabled": true,
       "sphereFnEasingCurve": "[{\"x\":0,\"y\":0.35864588419596355,\"h1\":{\"x\":0.4122650674970208,\"y\":0.17406234741210935}},{\"x\":0.5008438316877292,\"y\":1,\"h1\":{\"x\":0.21963354271552937,\"y\":0},\"h2\":{\"x\":-0.224651357220149,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2713254844522799,\"y\":0}}]",
@@ -255698,7 +255698,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Animation Tween",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
@@ -256458,7 +256458,7 @@
             "subgroups": [
               {
                 "key": "Startup > Animation Tween",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": true,
                 "items": [
                   {
@@ -257303,7 +257303,7 @@
                 "type": "group",
                 "group": {
                   "key": "Sphere > Sphere Radius Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": true,
                   "items": [
                     {
@@ -257326,7 +257326,7 @@
                 "type": "group",
                 "group": {
                   "key": "Sphere > Sphere Z Offset Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": true,
                   "items": [
                     {
@@ -257451,7 +257451,7 @@
               },
               {
                 "key": "Sphere > Sphere Radius Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": true,
                 "items": [
                   {
@@ -257471,7 +257471,7 @@
               },
               {
                 "key": "Sphere > Sphere Z Offset Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": true,
                 "items": [
                   {
@@ -257512,7 +257512,7 @@
               "type": "group",
               "group": {
                 "key": "Startup > Animation Tween",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": true,
                 "items": [
                   {
@@ -258272,7 +258272,7 @@
           "subgroups": [
             {
               "key": "Startup > Animation Tween",
-              "collapsed": true,
+              "collapsed": false,
               "locked": true,
               "items": [
                 {
@@ -259114,7 +259114,7 @@
               "type": "group",
               "group": {
                 "key": "Sphere > Sphere Radius Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": true,
                 "items": [
                   {
@@ -259137,7 +259137,7 @@
               "type": "group",
               "group": {
                 "key": "Sphere > Sphere Z Offset Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": true,
                 "items": [
                   {
@@ -259262,7 +259262,7 @@
             },
             {
               "key": "Sphere > Sphere Radius Curve",
-              "collapsed": false,
+              "collapsed": true,
               "locked": true,
               "items": [
                 {
@@ -259282,7 +259282,7 @@
             },
             {
               "key": "Sphere > Sphere Z Offset Curve",
-              "collapsed": false,
+              "collapsed": true,
               "locked": true,
               "items": [
                 {
