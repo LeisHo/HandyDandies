@@ -73,8 +73,8 @@
       "armRotationTargetDepth": -3.1,
       "armRotationDefault": 93,
       "armRotationCurveEnabled": true,
-      "armRotationCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.44608244339596637,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.07509241884103501,\"y\":-0.4144793192545573}}]",
-      "armRotationRangePct": "{\"min\":0,\"max\":81}",
+      "armRotationCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.706576782488409,\"y\":0.9814582824707031}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.6728633463885945,\"y\":-1}}]",
+      "armRotationRangePct": "{\"min\":0,\"max\":90}",
       "armRotationOffsetX": -1,
       "armRotationOffsetY": 1,
       "armRotationDamping": 0.3,
@@ -10835,8 +10835,8 @@
       "armRotationTargetDepth": 5.6,
       "armRotationDefault": 93,
       "armRotationCurveEnabled": true,
-      "armRotationCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.44608244339596637,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.07509241884103501,\"y\":-0.4144793192545573}}]",
-      "armRotationRangePct": "{\"min\":0,\"max\":81}",
+      "armRotationCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.706576782488409,\"y\":0.9814582824707031}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.6728633463885945,\"y\":-1}}]",
+      "armRotationRangePct": "{\"min\":0,\"max\":90}",
       "armRotationOffsetX": 0,
       "armRotationOffsetY": 0,
       "armRotationDamping": 1,
@@ -21597,8 +21597,8 @@
       "armRotationTargetDepth": 3.4,
       "armRotationDefault": 93,
       "armRotationCurveEnabled": true,
-      "armRotationCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.44608244339596637,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.07509241884103501,\"y\":-0.4144793192545573}}]",
-      "armRotationRangePct": "{\"min\":0,\"max\":81}",
+      "armRotationCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.706576782488409,\"y\":0.9814582824707031}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.6728633463885945,\"y\":-1}}]",
+      "armRotationRangePct": "{\"min\":0,\"max\":90}",
       "armRotationOffsetX": 0,
       "armRotationOffsetY": 0,
       "armRotationDamping": 0.3,
@@ -34458,7 +34458,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -35771,7 +35771,7 @@
           "type": "group",
           "group": {
             "key": "Cursor Tracking",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -35790,7 +35790,7 @@
                 "type": "group",
                 "group": {
                   "key": "Responsive Arm Rotation",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -36047,7 +36047,7 @@
             "subgroups": [
               {
                 "key": "Responsive Arm Rotation",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -37569,7 +37569,7 @@
         },
         {
           "key": "Cursor Tracking",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
@@ -37588,7 +37588,7 @@
               "type": "group",
               "group": {
                 "key": "Responsive Arm Rotation",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -37845,7 +37845,7 @@
           "subgroups": [
             {
               "key": "Responsive Arm Rotation",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
