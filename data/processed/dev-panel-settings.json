@@ -7819,11 +7819,11 @@
       "sphereMaxClicks": 2,
       "sphereColor": "#ffffff",
       "sphereFnEasingCurveEnabled": true,
-      "sphereFnEasingCurve": "[{\"x\":0,\"y\":0.35864588419596355,\"h1\":{\"x\":0.4122650674970208,\"y\":0.17406234741210935}},{\"x\":0.5008438316877292,\"y\":1,\"h1\":{\"x\":0.21963354271552937,\"y\":0},\"h2\":{\"x\":-0.224651357220149,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2713254844522799,\"y\":0}}]",
+      "sphereFnEasingCurve": "[{\"x\":0,\"y\":0.35864588419596355,\"h1\":{\"x\":0.5633511609093976,\"y\":0.08860740661621092}},{\"x\":0.5008438316877292,\"y\":1,\"h1\":{\"x\":0.21963354271552937,\"y\":0},\"h2\":{\"x\":-0.224651357220149,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2713254844522799,\"y\":0}}]",
       "sphereFnSpeedCurveEnabled": true,
       "sphereFnSpeedCurveVisibleOnly": true,
       "sphereFnSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.430298627920699,\"y\":0.03343734741210935}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.29879683618114206,\"y\":0}}]",
-      "sphereFnSpeedCurveRange": "{\"min\":1273,\"max\":2307}",
+      "sphereFnSpeedCurveRange": "{\"min\":1065,\"max\":1653}",
       "sphereFnStartTimeCurveEnabled": true,
       "sphereFnStartTimeCurveVisibleOnly": true,
       "sphereFnStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.13289772912856024,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":0,\"y\":-0.2470832824707031}}]",
@@ -7834,7 +7834,7 @@
       "sphereFnStartDistanceCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.4903901949768603,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.5496817246187704,\"y\":0}}]",
       "sphereRadiusCurveEnabled": true,
       "sphereRadiusCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.5352221846639439,\"y\":0}},{\"x\":0.5614528862320837,\"y\":1,\"h1\":{\"x\":0.11037376290175072,\"y\":0},\"h2\":{\"x\":-0.11706297360857076,\"y\":0}},{\"x\":1,\"y\":0.30385411580403643,\"h2\":{\"x\":-0.453301867765189,\"y\":0.07239583333333333}}]",
-      "sphereRadiusRange": "{\"min\":0,\"max\":1.25}",
+      "sphereRadiusRange": "{\"min\":0,\"max\":1.15}",
       "sphereZCurveEnabled": true,
       "sphereZCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.45532200522949196,\"y\":0.03206227620442714}},{\"x\":0.530303849945888,\"y\":1,\"h2\":{\"x\":-0.13005225587133062,\"y\":0},\"h1\":{\"x\":0.1274864391737438,\"y\":-0.15593744913736973}},{\"x\":1,\"y\":0.13312505086263016,\"h2\":{\"x\":-0.43229694032532007,\"y\":0.24000015258789065}}]",
       "sphereZRange": "{\"min\":-3,\"max\":30}",
@@ -18581,11 +18581,11 @@
       "sphereMaxClicks": 2,
       "sphereColor": "#ffffff",
       "sphereFnEasingCurveEnabled": true,
-      "sphereFnEasingCurve": "[{\"x\":0,\"y\":0.35864588419596355,\"h1\":{\"x\":0.4122650674970208,\"y\":0.17406234741210935}},{\"x\":0.5008438316877292,\"y\":1,\"h1\":{\"x\":0.21963354271552937,\"y\":0},\"h2\":{\"x\":-0.224651357220149,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2713254844522799,\"y\":0}}]",
+      "sphereFnEasingCurve": "[{\"x\":0,\"y\":0.35864588419596355,\"h1\":{\"x\":0.5633511609093976,\"y\":0.08860740661621092}},{\"x\":0.5008438316877292,\"y\":1,\"h1\":{\"x\":0.21963354271552937,\"y\":0},\"h2\":{\"x\":-0.224651357220149,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2713254844522799,\"y\":0}}]",
       "sphereFnSpeedCurveEnabled": true,
       "sphereFnSpeedCurveVisibleOnly": true,
       "sphereFnSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.430298627920699,\"y\":0.03343734741210935}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.29879683618114206,\"y\":0}}]",
-      "sphereFnSpeedCurveRange": "{\"min\":1273,\"max\":2307}",
+      "sphereFnSpeedCurveRange": "{\"min\":1065,\"max\":1653}",
       "sphereFnStartTimeCurveEnabled": true,
       "sphereFnStartTimeCurveVisibleOnly": true,
       "sphereFnStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.13289772912856024,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":0,\"y\":-0.2470832824707031}}]",
@@ -18596,7 +18596,7 @@
       "sphereFnStartDistanceCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.4903901949768603,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.5496817246187704,\"y\":0}}]",
       "sphereRadiusCurveEnabled": true,
       "sphereRadiusCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.5352221846639439,\"y\":0}},{\"x\":0.5614528862320837,\"y\":1,\"h1\":{\"x\":0.11037376290175072,\"y\":0},\"h2\":{\"x\":-0.11706297360857076,\"y\":0}},{\"x\":1,\"y\":0.30385411580403643,\"h2\":{\"x\":-0.453301867765189,\"y\":0.07239583333333333}}]",
-      "sphereRadiusRange": "{\"min\":0,\"max\":1.25}",
+      "sphereRadiusRange": "{\"min\":0,\"max\":1.15}",
       "sphereZCurveEnabled": true,
       "sphereZCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.45532200522949196,\"y\":0.03206227620442714}},{\"x\":0.530303849945888,\"y\":1,\"h2\":{\"x\":-0.13005225587133062,\"y\":0},\"h1\":{\"x\":0.1274864391737438,\"y\":-0.15593744913736973}},{\"x\":1,\"y\":0.13312505086263016,\"h2\":{\"x\":-0.43229694032532007,\"y\":0.24000015258789065}}]",
       "sphereZRange": "{\"min\":-3,\"max\":30}",
@@ -29343,11 +29343,11 @@
       "sphereMaxClicks": 2,
       "sphereColor": "#ffffff",
       "sphereFnEasingCurveEnabled": true,
-      "sphereFnEasingCurve": "[{\"x\":0,\"y\":0.35864588419596355,\"h1\":{\"x\":0.4122650674970208,\"y\":0.17406234741210935}},{\"x\":0.5008438316877292,\"y\":1,\"h1\":{\"x\":0.21963354271552937,\"y\":0},\"h2\":{\"x\":-0.224651357220149,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2713254844522799,\"y\":0}}]",
+      "sphereFnEasingCurve": "[{\"x\":0,\"y\":0.35864588419596355,\"h1\":{\"x\":0.5633511609093976,\"y\":0.08860740661621092}},{\"x\":0.5008438316877292,\"y\":1,\"h1\":{\"x\":0.21963354271552937,\"y\":0},\"h2\":{\"x\":-0.224651357220149,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2713254844522799,\"y\":0}}]",
       "sphereFnSpeedCurveEnabled": true,
       "sphereFnSpeedCurveVisibleOnly": true,
       "sphereFnSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.430298627920699,\"y\":0.03343734741210935}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.29879683618114206,\"y\":0}}]",
-      "sphereFnSpeedCurveRange": "{\"min\":1273,\"max\":2307}",
+      "sphereFnSpeedCurveRange": "{\"min\":1065,\"max\":1653}",
       "sphereFnStartTimeCurveEnabled": true,
       "sphereFnStartTimeCurveVisibleOnly": true,
       "sphereFnStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.13289772912856024,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":0,\"y\":-0.2470832824707031}}]",
@@ -29358,7 +29358,7 @@
       "sphereFnStartDistanceCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.4903901949768603,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.5496817246187704,\"y\":0}}]",
       "sphereRadiusCurveEnabled": true,
       "sphereRadiusCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.5352221846639439,\"y\":0}},{\"x\":0.5614528862320837,\"y\":1,\"h1\":{\"x\":0.11037376290175072,\"y\":0},\"h2\":{\"x\":-0.11706297360857076,\"y\":0}},{\"x\":1,\"y\":0.30385411580403643,\"h2\":{\"x\":-0.453301867765189,\"y\":0.07239583333333333}}]",
-      "sphereRadiusRange": "{\"min\":0,\"max\":1.25}",
+      "sphereRadiusRange": "{\"min\":0,\"max\":1.15}",
       "sphereZCurveEnabled": true,
       "sphereZCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.45532200522949196,\"y\":0.03206227620442714}},{\"x\":0.530303849945888,\"y\":1,\"h2\":{\"x\":-0.13005225587133062,\"y\":0},\"h1\":{\"x\":0.1274864391737438,\"y\":-0.15593744913736973}},{\"x\":1,\"y\":0.13312505086263016,\"h2\":{\"x\":-0.43229694032532007,\"y\":0.24000015258789065}}]",
       "sphereZRange": "{\"min\":-3,\"max\":30}",
@@ -257086,7 +257086,7 @@
           "type": "group",
           "group": {
             "key": "Field Grid Sphere Sequence",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -257113,7 +257113,7 @@
                 "type": "group",
                 "group": {
                   "key": "Sphere > Animation Speed Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -257141,7 +257141,7 @@
                 "type": "group",
                 "group": {
                   "key": "Sphere > Easing",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -257215,7 +257215,7 @@
                 "type": "group",
                 "group": {
                   "key": "Sphere > Sphere Radius Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -257273,7 +257273,7 @@
             "subgroups": [
               {
                 "key": "Sphere > Animation Speed Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -257298,7 +257298,7 @@
               },
               {
                 "key": "Sphere > Easing",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -257363,7 +257363,7 @@
               },
               {
                 "key": "Sphere > Sphere Radius Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -258854,7 +258854,7 @@
         },
         {
           "key": "Field Grid Sphere Sequence",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
@@ -258881,7 +258881,7 @@
               "type": "group",
               "group": {
                 "key": "Sphere > Animation Speed Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -258909,7 +258909,7 @@
               "type": "group",
               "group": {
                 "key": "Sphere > Easing",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -258983,7 +258983,7 @@
               "type": "group",
               "group": {
                 "key": "Sphere > Sphere Radius Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -259041,7 +259041,7 @@
           "subgroups": [
             {
               "key": "Sphere > Animation Speed Curve",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -259066,7 +259066,7 @@
             },
             {
               "key": "Sphere > Easing",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -259131,7 +259131,7 @@
             },
             {
               "key": "Sphere > Sphere Radius Curve",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -261741,8 +261741,8 @@
     "mobile": {
       "left": 20,
       "top": 0,
-      "width": 401.2857360839844,
-      "height": 632.9880981445312
+      "width": 404.71429443359375,
+      "height": 634.5119018554688
     }
   }
 }
