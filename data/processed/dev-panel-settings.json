@@ -18019,8 +18019,8 @@
           "group": "FIST ROTATE"
         }
       ],
-      "cameraX": -3.1777777777777776,
-      "cameraY": 1.5930860059053377e-14,
+      "cameraX": -3.1379657005855006,
+      "cameraY": -3.765921456243344,
       "cameraZ": 260.17068872666084,
       "cameraFov": 35,
       "cameraYaw": 0,
@@ -18620,7 +18620,7 @@
       "sphereFnStartTimeCurveVisibleOnly": true,
       "sphereFnStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.13289772912856024,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":0,\"y\":-0.2470832824707031}}]",
       "sphereFnStartTimeRange": "{\"min\":0,\"max\":2173}",
-      "sphereFnStartDistanceCurveEnabled": false,
+      "sphereFnStartDistanceCurveEnabled": true,
       "sphereFnStartDistanceMin": 0,
       "sphereFnStartDistanceMax": 55,
       "sphereFnStartDistanceCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.4903901949768603,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.5496817246187704,\"y\":0}}]",
@@ -254895,7 +254895,7 @@
     },
     {
       "key": "New Group (11)",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -255094,7 +255094,7 @@
           "type": "group",
           "group": {
             "key": "Camera",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -255481,7 +255481,7 @@
         },
         {
           "key": "Camera",
-          "collapsed": false,
+          "collapsed": true,
           "locked": true,
           "items": [
             {
@@ -255669,7 +255669,7 @@
     {
       "key": "Starting State",
       "collapsed": true,
-      "locked": false,
+      "locked": true,
       "items": [
         {
           "type": "row",
@@ -255688,7 +255688,7 @@
           "group": {
             "key": "Hand Offset On Startup",
             "collapsed": true,
-            "locked": false,
+            "locked": true,
             "items": [
               {
                 "type": "row",
@@ -255699,7 +255699,7 @@
                 "group": {
                   "key": "Startup > Animation Tween",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [
                     {
                       "type": "row",
@@ -255750,7 +255750,7 @@
                       "group": {
                         "key": "Startup > Retransition",
                         "collapsed": true,
-                        "locked": false,
+                        "locked": true,
                         "items": [
                           {
                             "type": "row",
@@ -255761,7 +255761,7 @@
                             "group": {
                               "key": "Startup > Retransition Speed Curve",
                               "collapsed": true,
-                              "locked": false,
+                              "locked": true,
                               "items": [
                                 {
                                   "type": "row",
@@ -255789,7 +255789,7 @@
                             "group": {
                               "key": "Startup > Retransition Start Time Curve",
                               "collapsed": true,
-                              "locked": false,
+                              "locked": true,
                               "items": [
                                 {
                                   "type": "row",
@@ -255817,7 +255817,7 @@
                             "group": {
                               "key": "Startup > Retransition Easing Curve",
                               "collapsed": true,
-                              "locked": false,
+                              "locked": true,
                               "items": [
                                 {
                                   "type": "row",
@@ -255835,7 +255835,7 @@
                             "group": {
                               "key": "Startup > Retransition Distance Curve",
                               "collapsed": true,
-                              "locked": false,
+                              "locked": true,
                               "items": [
                                 {
                                   "type": "row",
@@ -255858,7 +255858,7 @@
                             "group": {
                               "key": "Startup > Retransition Distance Scaler",
                               "collapsed": true,
-                              "locked": false,
+                              "locked": true,
                               "items": [
                                 {
                                   "type": "row",
@@ -255889,7 +255889,7 @@
                           {
                             "key": "Startup > Retransition Speed Curve",
                             "collapsed": true,
-                            "locked": false,
+                            "locked": true,
                             "items": [
                               {
                                 "type": "row",
@@ -255914,7 +255914,7 @@
                           {
                             "key": "Startup > Retransition Start Time Curve",
                             "collapsed": true,
-                            "locked": false,
+                            "locked": true,
                             "items": [
                               {
                                 "type": "row",
@@ -255939,7 +255939,7 @@
                           {
                             "key": "Startup > Retransition Easing Curve",
                             "collapsed": true,
-                            "locked": false,
+                            "locked": true,
                             "items": [
                               {
                                 "type": "row",
@@ -255954,7 +255954,7 @@
                           {
                             "key": "Startup > Retransition Distance Curve",
                             "collapsed": true,
-                            "locked": false,
+                            "locked": true,
                             "items": [
                               {
                                 "type": "row",
@@ -255974,7 +255974,7 @@
                           {
                             "key": "Startup > Retransition Distance Scaler",
                             "collapsed": true,
-                            "locked": false,
+                            "locked": true,
                             "items": [
                               {
                                 "type": "row",
@@ -256017,7 +256017,7 @@
                     {
                       "key": "Startup > Retransition",
                       "collapsed": true,
-                      "locked": false,
+                      "locked": true,
                       "items": [
                         {
                           "type": "row",
@@ -256028,7 +256028,7 @@
                           "group": {
                             "key": "Startup > Retransition Speed Curve",
                             "collapsed": true,
-                            "locked": false,
+                            "locked": true,
                             "items": [
                               {
                                 "type": "row",
@@ -256056,7 +256056,7 @@
                           "group": {
                             "key": "Startup > Retransition Start Time Curve",
                             "collapsed": true,
-                            "locked": false,
+                            "locked": true,
                             "items": [
                               {
                                 "type": "row",
@@ -256084,7 +256084,7 @@
                           "group": {
                             "key": "Startup > Retransition Easing Curve",
                             "collapsed": true,
-                            "locked": false,
+                            "locked": true,
                             "items": [
                               {
                                 "type": "row",
@@ -256102,7 +256102,7 @@
                           "group": {
                             "key": "Startup > Retransition Distance Curve",
                             "collapsed": true,
-                            "locked": false,
+                            "locked": true,
                             "items": [
                               {
                                 "type": "row",
@@ -256125,7 +256125,7 @@
                           "group": {
                             "key": "Startup > Retransition Distance Scaler",
                             "collapsed": true,
-                            "locked": false,
+                            "locked": true,
                             "items": [
                               {
                                 "type": "row",
@@ -256156,7 +256156,7 @@
                         {
                           "key": "Startup > Retransition Speed Curve",
                           "collapsed": true,
-                          "locked": false,
+                          "locked": true,
                           "items": [
                             {
                               "type": "row",
@@ -256181,7 +256181,7 @@
                         {
                           "key": "Startup > Retransition Start Time Curve",
                           "collapsed": true,
-                          "locked": false,
+                          "locked": true,
                           "items": [
                             {
                               "type": "row",
@@ -256206,7 +256206,7 @@
                         {
                           "key": "Startup > Retransition Easing Curve",
                           "collapsed": true,
-                          "locked": false,
+                          "locked": true,
                           "items": [
                             {
                               "type": "row",
@@ -256221,7 +256221,7 @@
                         {
                           "key": "Startup > Retransition Distance Curve",
                           "collapsed": true,
-                          "locked": false,
+                          "locked": true,
                           "items": [
                             {
                               "type": "row",
@@ -256241,7 +256241,7 @@
                         {
                           "key": "Startup > Retransition Distance Scaler",
                           "collapsed": true,
-                          "locked": false,
+                          "locked": true,
                           "items": [
                             {
                               "type": "row",
@@ -256281,7 +256281,7 @@
                 "group": {
                   "key": "Startup > Easing",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [
                     {
                       "type": "row",
@@ -256299,7 +256299,7 @@
                 "group": {
                   "key": "Startup > Animation Speed Curve",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [
                     {
                       "type": "row",
@@ -256327,7 +256327,7 @@
                 "group": {
                   "key": "Startup > Start Time Curve",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [
                     {
                       "type": "row",
@@ -256364,8 +256364,8 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Start Distance Curve",
-                  "collapsed": true,
-                  "locked": false,
+                  "collapsed": false,
+                  "locked": true,
                   "items": [
                     {
                       "type": "row",
@@ -256405,7 +256405,7 @@
                 "group": {
                   "key": "Startup > Hand Z Offset Curve",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [
                     {
                       "type": "row",
@@ -256428,7 +256428,7 @@
                 "group": {
                   "key": "Startup > Hand Scale Curve",
                   "collapsed": false,
-                  "locked": false,
+                  "locked": true,
                   "items": [
                     {
                       "type": "row",
@@ -256459,7 +256459,7 @@
               {
                 "key": "Startup > Animation Tween",
                 "collapsed": true,
-                "locked": false,
+                "locked": true,
                 "items": [
                   {
                     "type": "row",
@@ -256510,7 +256510,7 @@
                     "group": {
                       "key": "Startup > Retransition",
                       "collapsed": true,
-                      "locked": false,
+                      "locked": true,
                       "items": [
                         {
                           "type": "row",
@@ -256521,7 +256521,7 @@
                           "group": {
                             "key": "Startup > Retransition Speed Curve",
                             "collapsed": true,
-                            "locked": false,
+                            "locked": true,
                             "items": [
                               {
                                 "type": "row",
@@ -256549,7 +256549,7 @@
                           "group": {
                             "key": "Startup > Retransition Start Time Curve",
                             "collapsed": true,
-                            "locked": false,
+                            "locked": true,
                             "items": [
                               {
                                 "type": "row",
@@ -256577,7 +256577,7 @@
                           "group": {
                             "key": "Startup > Retransition Easing Curve",
                             "collapsed": true,
-                            "locked": false,
+                            "locked": true,
                             "items": [
                               {
                                 "type": "row",
@@ -256595,7 +256595,7 @@
                           "group": {
                             "key": "Startup > Retransition Distance Curve",
                             "collapsed": true,
-                            "locked": false,
+                            "locked": true,
                             "items": [
                               {
                                 "type": "row",
@@ -256618,7 +256618,7 @@
                           "group": {
                             "key": "Startup > Retransition Distance Scaler",
                             "collapsed": true,
-                            "locked": false,
+                            "locked": true,
                             "items": [
                               {
                                 "type": "row",
@@ -256649,7 +256649,7 @@
                         {
                           "key": "Startup > Retransition Speed Curve",
                           "collapsed": true,
-                          "locked": false,
+                          "locked": true,
                           "items": [
                             {
                               "type": "row",
@@ -256674,7 +256674,7 @@
                         {
                           "key": "Startup > Retransition Start Time Curve",
                           "collapsed": true,
-                          "locked": false,
+                          "locked": true,
                           "items": [
                             {
                               "type": "row",
@@ -256699,7 +256699,7 @@
                         {
                           "key": "Startup > Retransition Easing Curve",
                           "collapsed": true,
-                          "locked": false,
+                          "locked": true,
                           "items": [
                             {
                               "type": "row",
@@ -256714,7 +256714,7 @@
                         {
                           "key": "Startup > Retransition Distance Curve",
                           "collapsed": true,
-                          "locked": false,
+                          "locked": true,
                           "items": [
                             {
                               "type": "row",
@@ -256734,7 +256734,7 @@
                         {
                           "key": "Startup > Retransition Distance Scaler",
                           "collapsed": true,
-                          "locked": false,
+                          "locked": true,
                           "items": [
                             {
                               "type": "row",
@@ -256777,7 +256777,7 @@
                   {
                     "key": "Startup > Retransition",
                     "collapsed": true,
-                    "locked": false,
+                    "locked": true,
                     "items": [
                       {
                         "type": "row",
@@ -256788,7 +256788,7 @@
                         "group": {
                           "key": "Startup > Retransition Speed Curve",
                           "collapsed": true,
-                          "locked": false,
+                          "locked": true,
                           "items": [
                             {
                               "type": "row",
@@ -256816,7 +256816,7 @@
                         "group": {
                           "key": "Startup > Retransition Start Time Curve",
                           "collapsed": true,
-                          "locked": false,
+                          "locked": true,
                           "items": [
                             {
                               "type": "row",
@@ -256844,7 +256844,7 @@
                         "group": {
                           "key": "Startup > Retransition Easing Curve",
                           "collapsed": true,
-                          "locked": false,
+                          "locked": true,
                           "items": [
                             {
                               "type": "row",
@@ -256862,7 +256862,7 @@
                         "group": {
                           "key": "Startup > Retransition Distance Curve",
                           "collapsed": true,
-                          "locked": false,
+                          "locked": true,
                           "items": [
                             {
                               "type": "row",
@@ -256885,7 +256885,7 @@
                         "group": {
                           "key": "Startup > Retransition Distance Scaler",
                           "collapsed": true,
-                          "locked": false,
+                          "locked": true,
                           "items": [
                             {
                               "type": "row",
@@ -256916,7 +256916,7 @@
                       {
                         "key": "Startup > Retransition Speed Curve",
                         "collapsed": true,
-                        "locked": false,
+                        "locked": true,
                         "items": [
                           {
                             "type": "row",
@@ -256941,7 +256941,7 @@
                       {
                         "key": "Startup > Retransition Start Time Curve",
                         "collapsed": true,
-                        "locked": false,
+                        "locked": true,
                         "items": [
                           {
                             "type": "row",
@@ -256966,7 +256966,7 @@
                       {
                         "key": "Startup > Retransition Easing Curve",
                         "collapsed": true,
-                        "locked": false,
+                        "locked": true,
                         "items": [
                           {
                             "type": "row",
@@ -256981,7 +256981,7 @@
                       {
                         "key": "Startup > Retransition Distance Curve",
                         "collapsed": true,
-                        "locked": false,
+                        "locked": true,
                         "items": [
                           {
                             "type": "row",
@@ -257001,7 +257001,7 @@
                       {
                         "key": "Startup > Retransition Distance Scaler",
                         "collapsed": true,
-                        "locked": false,
+                        "locked": true,
                         "items": [
                           {
                             "type": "row",
@@ -257030,7 +257030,7 @@
               {
                 "key": "Startup > Easing",
                 "collapsed": true,
-                "locked": false,
+                "locked": true,
                 "items": [
                   {
                     "type": "row",
@@ -257045,7 +257045,7 @@
               {
                 "key": "Startup > Animation Speed Curve",
                 "collapsed": true,
-                "locked": false,
+                "locked": true,
                 "items": [
                   {
                     "type": "row",
@@ -257070,7 +257070,7 @@
               {
                 "key": "Startup > Start Time Curve",
                 "collapsed": true,
-                "locked": false,
+                "locked": true,
                 "items": [
                   {
                     "type": "row",
@@ -257104,8 +257104,8 @@
               },
               {
                 "key": "Startup > Start Distance Curve",
-                "collapsed": true,
-                "locked": false,
+                "collapsed": false,
+                "locked": true,
                 "items": [
                   {
                     "type": "row",
@@ -257130,7 +257130,7 @@
               {
                 "key": "Startup > Hand Z Offset Curve",
                 "collapsed": true,
-                "locked": false,
+                "locked": true,
                 "items": [
                   {
                     "type": "row",
@@ -257150,7 +257150,7 @@
               {
                 "key": "Startup > Hand Scale Curve",
                 "collapsed": false,
-                "locked": false,
+                "locked": true,
                 "items": [
                   {
                     "type": "row",
@@ -257174,8 +257174,8 @@
           "type": "group",
           "group": {
             "key": "Field Grid Sphere Sequence",
-            "collapsed": true,
-            "locked": false,
+            "collapsed": false,
+            "locked": true,
             "items": [
               {
                 "type": "row",
@@ -257202,7 +257202,7 @@
                 "group": {
                   "key": "Sphere > Animation Speed Curve",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [
                     {
                       "type": "row",
@@ -257230,7 +257230,7 @@
                 "group": {
                   "key": "Sphere > Easing",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [
                     {
                       "type": "row",
@@ -257248,7 +257248,7 @@
                 "group": {
                   "key": "Sphere > Start Time Curve",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [
                     {
                       "type": "row",
@@ -257276,7 +257276,7 @@
                 "group": {
                   "key": "Sphere > Start Distance Curve",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [
                     {
                       "type": "row",
@@ -257304,7 +257304,7 @@
                 "group": {
                   "key": "Sphere > Sphere Radius Curve",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [
                     {
                       "type": "row",
@@ -257327,7 +257327,7 @@
                 "group": {
                   "key": "Sphere > Sphere Z Offset Curve",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [
                     {
                       "type": "row",
@@ -257362,7 +257362,7 @@
               {
                 "key": "Sphere > Animation Speed Curve",
                 "collapsed": true,
-                "locked": false,
+                "locked": true,
                 "items": [
                   {
                     "type": "row",
@@ -257387,7 +257387,7 @@
               {
                 "key": "Sphere > Easing",
                 "collapsed": true,
-                "locked": false,
+                "locked": true,
                 "items": [
                   {
                     "type": "row",
@@ -257402,7 +257402,7 @@
               {
                 "key": "Sphere > Start Time Curve",
                 "collapsed": true,
-                "locked": false,
+                "locked": true,
                 "items": [
                   {
                     "type": "row",
@@ -257427,7 +257427,7 @@
               {
                 "key": "Sphere > Start Distance Curve",
                 "collapsed": true,
-                "locked": false,
+                "locked": true,
                 "items": [
                   {
                     "type": "row",
@@ -257452,7 +257452,7 @@
               {
                 "key": "Sphere > Sphere Radius Curve",
                 "collapsed": true,
-                "locked": false,
+                "locked": true,
                 "items": [
                   {
                     "type": "row",
@@ -257472,7 +257472,7 @@
               {
                 "key": "Sphere > Sphere Z Offset Curve",
                 "collapsed": true,
-                "locked": false,
+                "locked": true,
                 "items": [
                   {
                     "type": "row",
@@ -257502,7 +257502,7 @@
         {
           "key": "Hand Offset On Startup",
           "collapsed": true,
-          "locked": false,
+          "locked": true,
           "items": [
             {
               "type": "row",
@@ -257513,7 +257513,7 @@
               "group": {
                 "key": "Startup > Animation Tween",
                 "collapsed": true,
-                "locked": false,
+                "locked": true,
                 "items": [
                   {
                     "type": "row",
@@ -257564,7 +257564,7 @@
                     "group": {
                       "key": "Startup > Retransition",
                       "collapsed": true,
-                      "locked": false,
+                      "locked": true,
                       "items": [
                         {
                           "type": "row",
@@ -257575,7 +257575,7 @@
                           "group": {
                             "key": "Startup > Retransition Speed Curve",
                             "collapsed": true,
-                            "locked": false,
+                            "locked": true,
                             "items": [
                               {
                                 "type": "row",
@@ -257603,7 +257603,7 @@
                           "group": {
                             "key": "Startup > Retransition Start Time Curve",
                             "collapsed": true,
-                            "locked": false,
+                            "locked": true,
                             "items": [
                               {
                                 "type": "row",
@@ -257631,7 +257631,7 @@
                           "group": {
                             "key": "Startup > Retransition Easing Curve",
                             "collapsed": true,
-                            "locked": false,
+                            "locked": true,
                             "items": [
                               {
                                 "type": "row",
@@ -257649,7 +257649,7 @@
                           "group": {
                             "key": "Startup > Retransition Distance Curve",
                             "collapsed": true,
-                            "locked": false,
+                            "locked": true,
                             "items": [
                               {
                                 "type": "row",
@@ -257672,7 +257672,7 @@
                           "group": {
                             "key": "Startup > Retransition Distance Scaler",
                             "collapsed": true,
-                            "locked": false,
+                            "locked": true,
                             "items": [
                               {
                                 "type": "row",
@@ -257703,7 +257703,7 @@
                         {
                           "key": "Startup > Retransition Speed Curve",
                           "collapsed": true,
-                          "locked": false,
+                          "locked": true,
                           "items": [
                             {
                               "type": "row",
@@ -257728,7 +257728,7 @@
                         {
                           "key": "Startup > Retransition Start Time Curve",
                           "collapsed": true,
-                          "locked": false,
+                          "locked": true,
                           "items": [
                             {
                               "type": "row",
@@ -257753,7 +257753,7 @@
                         {
                           "key": "Startup > Retransition Easing Curve",
                           "collapsed": true,
-                          "locked": false,
+                          "locked": true,
                           "items": [
                             {
                               "type": "row",
@@ -257768,7 +257768,7 @@
                         {
                           "key": "Startup > Retransition Distance Curve",
                           "collapsed": true,
-                          "locked": false,
+                          "locked": true,
                           "items": [
                             {
                               "type": "row",
@@ -257788,7 +257788,7 @@
                         {
                           "key": "Startup > Retransition Distance Scaler",
                           "collapsed": true,
-                          "locked": false,
+                          "locked": true,
                           "items": [
                             {
                               "type": "row",
@@ -257831,7 +257831,7 @@
                   {
                     "key": "Startup > Retransition",
                     "collapsed": true,
-                    "locked": false,
+                    "locked": true,
                     "items": [
                       {
                         "type": "row",
@@ -257842,7 +257842,7 @@
                         "group": {
                           "key": "Startup > Retransition Speed Curve",
                           "collapsed": true,
-                          "locked": false,
+                          "locked": true,
                           "items": [
                             {
                               "type": "row",
@@ -257870,7 +257870,7 @@
                         "group": {
                           "key": "Startup > Retransition Start Time Curve",
                           "collapsed": true,
-                          "locked": false,
+                          "locked": true,
                           "items": [
                             {
                               "type": "row",
@@ -257898,7 +257898,7 @@
                         "group": {
                           "key": "Startup > Retransition Easing Curve",
                           "collapsed": true,
-                          "locked": false,
+                          "locked": true,
                           "items": [
                             {
                               "type": "row",
@@ -257916,7 +257916,7 @@
                         "group": {
                           "key": "Startup > Retransition Distance Curve",
                           "collapsed": true,
-                          "locked": false,
+                          "locked": true,
                           "items": [
                             {
                               "type": "row",
@@ -257939,7 +257939,7 @@
                         "group": {
                           "key": "Startup > Retransition Distance Scaler",
                           "collapsed": true,
-                          "locked": false,
+                          "locked": true,
                           "items": [
                             {
                               "type": "row",
@@ -257970,7 +257970,7 @@
                       {
                         "key": "Startup > Retransition Speed Curve",
                         "collapsed": true,
-                        "locked": false,
+                        "locked": true,
                         "items": [
                           {
                             "type": "row",
@@ -257995,7 +257995,7 @@
                       {
                         "key": "Startup > Retransition Start Time Curve",
                         "collapsed": true,
-                        "locked": false,
+                        "locked": true,
                         "items": [
                           {
                             "type": "row",
@@ -258020,7 +258020,7 @@
                       {
                         "key": "Startup > Retransition Easing Curve",
                         "collapsed": true,
-                        "locked": false,
+                        "locked": true,
                         "items": [
                           {
                             "type": "row",
@@ -258035,7 +258035,7 @@
                       {
                         "key": "Startup > Retransition Distance Curve",
                         "collapsed": true,
-                        "locked": false,
+                        "locked": true,
                         "items": [
                           {
                             "type": "row",
@@ -258055,7 +258055,7 @@
                       {
                         "key": "Startup > Retransition Distance Scaler",
                         "collapsed": true,
-                        "locked": false,
+                        "locked": true,
                         "items": [
                           {
                             "type": "row",
@@ -258095,7 +258095,7 @@
               "group": {
                 "key": "Startup > Easing",
                 "collapsed": true,
-                "locked": false,
+                "locked": true,
                 "items": [
                   {
                     "type": "row",
@@ -258113,7 +258113,7 @@
               "group": {
                 "key": "Startup > Animation Speed Curve",
                 "collapsed": true,
-                "locked": false,
+                "locked": true,
                 "items": [
                   {
                     "type": "row",
@@ -258141,7 +258141,7 @@
               "group": {
                 "key": "Startup > Start Time Curve",
                 "collapsed": true,
-                "locked": false,
+                "locked": true,
                 "items": [
                   {
                     "type": "row",
@@ -258178,8 +258178,8 @@
               "type": "group",
               "group": {
                 "key": "Startup > Start Distance Curve",
-                "collapsed": true,
-                "locked": false,
+                "collapsed": false,
+                "locked": true,
                 "items": [
                   {
                     "type": "row",
@@ -258219,7 +258219,7 @@
               "group": {
                 "key": "Startup > Hand Z Offset Curve",
                 "collapsed": true,
-                "locked": false,
+                "locked": true,
                 "items": [
                   {
                     "type": "row",
@@ -258242,7 +258242,7 @@
               "group": {
                 "key": "Startup > Hand Scale Curve",
                 "collapsed": false,
-                "locked": false,
+                "locked": true,
                 "items": [
                   {
                     "type": "row",
@@ -258273,7 +258273,7 @@
             {
               "key": "Startup > Animation Tween",
               "collapsed": true,
-              "locked": false,
+              "locked": true,
               "items": [
                 {
                   "type": "row",
@@ -258324,7 +258324,7 @@
                   "group": {
                     "key": "Startup > Retransition",
                     "collapsed": true,
-                    "locked": false,
+                    "locked": true,
                     "items": [
                       {
                         "type": "row",
@@ -258335,7 +258335,7 @@
                         "group": {
                           "key": "Startup > Retransition Speed Curve",
                           "collapsed": true,
-                          "locked": false,
+                          "locked": true,
                           "items": [
                             {
                               "type": "row",
@@ -258363,7 +258363,7 @@
                         "group": {
                           "key": "Startup > Retransition Start Time Curve",
                           "collapsed": true,
-                          "locked": false,
+                          "locked": true,
                           "items": [
                             {
                               "type": "row",
@@ -258391,7 +258391,7 @@
                         "group": {
                           "key": "Startup > Retransition Easing Curve",
                           "collapsed": true,
-                          "locked": false,
+                          "locked": true,
                           "items": [
                             {
                               "type": "row",
@@ -258409,7 +258409,7 @@
                         "group": {
                           "key": "Startup > Retransition Distance Curve",
                           "collapsed": true,
-                          "locked": false,
+                          "locked": true,
                           "items": [
                             {
                               "type": "row",
@@ -258432,7 +258432,7 @@
                         "group": {
                           "key": "Startup > Retransition Distance Scaler",
                           "collapsed": true,
-                          "locked": false,
+                          "locked": true,
                           "items": [
                             {
                               "type": "row",
@@ -258463,7 +258463,7 @@
                       {
                         "key": "Startup > Retransition Speed Curve",
                         "collapsed": true,
-                        "locked": false,
+                        "locked": true,
                         "items": [
                           {
                             "type": "row",
@@ -258488,7 +258488,7 @@
                       {
                         "key": "Startup > Retransition Start Time Curve",
                         "collapsed": true,
-                        "locked": false,
+                        "locked": true,
                         "items": [
                           {
                             "type": "row",
@@ -258513,7 +258513,7 @@
                       {
                         "key": "Startup > Retransition Easing Curve",
                         "collapsed": true,
-                        "locked": false,
+                        "locked": true,
                         "items": [
                           {
                             "type": "row",
@@ -258528,7 +258528,7 @@
                       {
                         "key": "Startup > Retransition Distance Curve",
                         "collapsed": true,
-                        "locked": false,
+                        "locked": true,
                         "items": [
                           {
                             "type": "row",
@@ -258548,7 +258548,7 @@
                       {
                         "key": "Startup > Retransition Distance Scaler",
                         "collapsed": true,
-                        "locked": false,
+                        "locked": true,
                         "items": [
                           {
                             "type": "row",
@@ -258591,7 +258591,7 @@
                 {
                   "key": "Startup > Retransition",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [
                     {
                       "type": "row",
@@ -258602,7 +258602,7 @@
                       "group": {
                         "key": "Startup > Retransition Speed Curve",
                         "collapsed": true,
-                        "locked": false,
+                        "locked": true,
                         "items": [
                           {
                             "type": "row",
@@ -258630,7 +258630,7 @@
                       "group": {
                         "key": "Startup > Retransition Start Time Curve",
                         "collapsed": true,
-                        "locked": false,
+                        "locked": true,
                         "items": [
                           {
                             "type": "row",
@@ -258658,7 +258658,7 @@
                       "group": {
                         "key": "Startup > Retransition Easing Curve",
                         "collapsed": true,
-                        "locked": false,
+                        "locked": true,
                         "items": [
                           {
                             "type": "row",
@@ -258676,7 +258676,7 @@
                       "group": {
                         "key": "Startup > Retransition Distance Curve",
                         "collapsed": true,
-                        "locked": false,
+                        "locked": true,
                         "items": [
                           {
                             "type": "row",
@@ -258699,7 +258699,7 @@
                       "group": {
                         "key": "Startup > Retransition Distance Scaler",
                         "collapsed": true,
-                        "locked": false,
+                        "locked": true,
                         "items": [
                           {
                             "type": "row",
@@ -258730,7 +258730,7 @@
                     {
                       "key": "Startup > Retransition Speed Curve",
                       "collapsed": true,
-                      "locked": false,
+                      "locked": true,
                       "items": [
                         {
                           "type": "row",
@@ -258755,7 +258755,7 @@
                     {
                       "key": "Startup > Retransition Start Time Curve",
                       "collapsed": true,
-                      "locked": false,
+                      "locked": true,
                       "items": [
                         {
                           "type": "row",
@@ -258780,7 +258780,7 @@
                     {
                       "key": "Startup > Retransition Easing Curve",
                       "collapsed": true,
-                      "locked": false,
+                      "locked": true,
                       "items": [
                         {
                           "type": "row",
@@ -258795,7 +258795,7 @@
                     {
                       "key": "Startup > Retransition Distance Curve",
                       "collapsed": true,
-                      "locked": false,
+                      "locked": true,
                       "items": [
                         {
                           "type": "row",
@@ -258815,7 +258815,7 @@
                     {
                       "key": "Startup > Retransition Distance Scaler",
                       "collapsed": true,
-                      "locked": false,
+                      "locked": true,
                       "items": [
                         {
                           "type": "row",
@@ -258844,7 +258844,7 @@
             {
               "key": "Startup > Easing",
               "collapsed": true,
-              "locked": false,
+              "locked": true,
               "items": [
                 {
                   "type": "row",
@@ -258859,7 +258859,7 @@
             {
               "key": "Startup > Animation Speed Curve",
               "collapsed": true,
-              "locked": false,
+              "locked": true,
               "items": [
                 {
                   "type": "row",
@@ -258884,7 +258884,7 @@
             {
               "key": "Startup > Start Time Curve",
               "collapsed": true,
-              "locked": false,
+              "locked": true,
               "items": [
                 {
                   "type": "row",
@@ -258918,8 +258918,8 @@
             },
             {
               "key": "Startup > Start Distance Curve",
-              "collapsed": true,
-              "locked": false,
+              "collapsed": false,
+              "locked": true,
               "items": [
                 {
                   "type": "row",
@@ -258944,7 +258944,7 @@
             {
               "key": "Startup > Hand Z Offset Curve",
               "collapsed": true,
-              "locked": false,
+              "locked": true,
               "items": [
                 {
                   "type": "row",
@@ -258964,7 +258964,7 @@
             {
               "key": "Startup > Hand Scale Curve",
               "collapsed": false,
-              "locked": false,
+              "locked": true,
               "items": [
                 {
                   "type": "row",
@@ -258985,8 +258985,8 @@
         },
         {
           "key": "Field Grid Sphere Sequence",
-          "collapsed": true,
-          "locked": false,
+          "collapsed": false,
+          "locked": true,
           "items": [
             {
               "type": "row",
@@ -259013,7 +259013,7 @@
               "group": {
                 "key": "Sphere > Animation Speed Curve",
                 "collapsed": true,
-                "locked": false,
+                "locked": true,
                 "items": [
                   {
                     "type": "row",
@@ -259041,7 +259041,7 @@
               "group": {
                 "key": "Sphere > Easing",
                 "collapsed": true,
-                "locked": false,
+                "locked": true,
                 "items": [
                   {
                     "type": "row",
@@ -259059,7 +259059,7 @@
               "group": {
                 "key": "Sphere > Start Time Curve",
                 "collapsed": true,
-                "locked": false,
+                "locked": true,
                 "items": [
                   {
                     "type": "row",
@@ -259087,7 +259087,7 @@
               "group": {
                 "key": "Sphere > Start Distance Curve",
                 "collapsed": true,
-                "locked": false,
+                "locked": true,
                 "items": [
                   {
                     "type": "row",
@@ -259115,7 +259115,7 @@
               "group": {
                 "key": "Sphere > Sphere Radius Curve",
                 "collapsed": true,
-                "locked": false,
+                "locked": true,
                 "items": [
                   {
                     "type": "row",
@@ -259138,7 +259138,7 @@
               "group": {
                 "key": "Sphere > Sphere Z Offset Curve",
                 "collapsed": true,
-                "locked": false,
+                "locked": true,
                 "items": [
                   {
                     "type": "row",
@@ -259173,7 +259173,7 @@
             {
               "key": "Sphere > Animation Speed Curve",
               "collapsed": true,
-              "locked": false,
+              "locked": true,
               "items": [
                 {
                   "type": "row",
@@ -259198,7 +259198,7 @@
             {
               "key": "Sphere > Easing",
               "collapsed": true,
-              "locked": false,
+              "locked": true,
               "items": [
                 {
                   "type": "row",
@@ -259213,7 +259213,7 @@
             {
               "key": "Sphere > Start Time Curve",
               "collapsed": true,
-              "locked": false,
+              "locked": true,
               "items": [
                 {
                   "type": "row",
@@ -259238,7 +259238,7 @@
             {
               "key": "Sphere > Start Distance Curve",
               "collapsed": true,
-              "locked": false,
+              "locked": true,
               "items": [
                 {
                   "type": "row",
@@ -259263,7 +259263,7 @@
             {
               "key": "Sphere > Sphere Radius Curve",
               "collapsed": true,
-              "locked": false,
+              "locked": true,
               "items": [
                 {
                   "type": "row",
@@ -259283,7 +259283,7 @@
             {
               "key": "Sphere > Sphere Z Offset Curve",
               "collapsed": true,
-              "locked": false,
+              "locked": true,
               "items": [
                 {
                   "type": "row",
@@ -261110,9 +261110,9 @@
     "sphereFnEasingCurveEnabled": false,
     "sphereFnStartTimeCurveEnabled": false,
     "sphereFnStartTimeCurveVisibleOnly": false,
-    "sphereFnStartDistanceCurveEnabled": false,
-    "sphereFnStartDistanceMin": false,
-    "sphereFnStartDistanceMax": false,
+    "sphereFnStartDistanceCurveEnabled": true,
+    "sphereFnStartDistanceMin": true,
+    "sphereFnStartDistanceMax": true,
     "sphereRadiusCurveEnabled": false,
     "sphereZCurveEnabled": false
   },
@@ -261801,7 +261801,64 @@
       "loadingPreviewSequenceCount": false,
       "loadingPreviewSize": false,
       "loadingPreviewSequenceHoldMs": false,
-      "loadingPreviewSequenceLoopTransition": false
+      "loadingPreviewSequenceLoopTransition": false,
+      "staticPoseOnStartup": true,
+      "hideFloorAfterHandOffset": true,
+      "handOffsetOnStartupEnabled": true,
+      "startupHandOffsetZ": true,
+      "startupHandTweenEnabled": true,
+      "startupFnMode": true,
+      "startupFnTargetPose": true,
+      "startupFnTweenSelector": true,
+      "startupFnReverseSequence": true,
+      "startupFnGlideToFirstPose": true,
+      "startupFnFirstGlideTimeScale": true,
+      "startupFnSequencePlayMode": true,
+      "startupFnSequenceCount": true,
+      "startupFnSequenceCountMode": true,
+      "startupFnSequenceLoopTransition": true,
+      "startupFnSequenceHoldMs": true,
+      "startupFnRetransitionEnabled": true,
+      "startupFnRetransitionSpeedMs": true,
+      "startupFnRetransitionSpeedCurveEnabled": true,
+      "startupFnRetransitionSpeedCurveVisibleOnly": true,
+      "startupFnRetransitionStartTimeCurveEnabled": true,
+      "startupFnRetransitionStartTimeCurveVisibleOnly": true,
+      "startupFnRetransitionEasingCurveEnabled": true,
+      "startupFnRetransitionDistCurveEnabled": true,
+      "startupFnRetransitionScalerEnabled": true,
+      "startupFnTweenSpeedMs": true,
+      "startupFnTransitionSpeedMs": true,
+      "startupFnEasingCurveEnabled": true,
+      "startupFnSpeedCurveEnabled": true,
+      "startupFnSpeedCurveVisibleOnly": true,
+      "startupFnStartTimeCurveEnabled": true,
+      "startupFnStartTimeCurveVisibleOnly": true,
+      "startupFnStartDistanceCurveEnabled": true,
+      "startupFnStartDistanceMin": true,
+      "startupFnStartDistanceMax": true,
+      "startupFnPauseDurationMs": true,
+      "startupHandMaxClicks": true,
+      "startupHandWaitForAll": true,
+      "startupHandZCurveEnabled": true,
+      "startupHandScaleCurveEnabled": true,
+      "sphereSeqEnabled": true,
+      "sphereStartZOffset": true,
+      "sphereStartRadius": true,
+      "sphereSeqDurationMs": true,
+      "sphereWaitForAll": true,
+      "sphereColor": true,
+      "sphereFnSpeedCurveEnabled": true,
+      "sphereFnSpeedCurveVisibleOnly": true,
+      "sphereFnEasingCurveEnabled": true,
+      "sphereFnStartTimeCurveEnabled": true,
+      "sphereFnStartTimeCurveVisibleOnly": true,
+      "sphereFnStartDistanceCurveEnabled": true,
+      "sphereFnStartDistanceMin": true,
+      "sphereFnStartDistanceMax": true,
+      "sphereRadiusCurveEnabled": true,
+      "sphereZCurveEnabled": true,
+      "sphereMaxClicks": true
     },
     "landscape": {}
   },
@@ -261816,8 +261873,8 @@
     "mobile": {
       "left": 20,
       "top": 0,
-      "width": 397.8571472167969,
-      "height": 637.5595092773438
+      "width": 404.71429443359375,
+      "height": 631.0833740234375
     }
   }
 }
