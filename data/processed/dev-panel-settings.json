@@ -53,7 +53,7 @@
       "fieldBoundsYMaxCurveRange": "{\"min\":-300,\"max\":300}",
       "fieldBoundsZMin": "-800",
       "fieldBoundsZMinCurveEnabled": true,
-      "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.07681410990834386,\"y\":0.014791870117187522}},{\"x\":0.2078887978034134,\"y\":0,\"h1\":{\"x\":0.22169400877054363,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.7257649533817951,\"y\":0}}]",
+      "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.07681410990834386,\"y\":0.014791870117187522}},{\"x\":0.20627049423198482,\"y\":0.12145843505859377,\"h1\":{\"x\":0.3511503930941846,\"y\":0.43333333333333324},\"h2\":{\"x\":-0.10194695203855877,\"y\":-0.12145843505859377}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.7257649533817951,\"y\":0}}]",
       "fieldBoundsZMinCurveRange": "{\"min\":-800,\"max\":-200}",
       "fieldBoundsZMax": "240",
       "fieldBoundsZMaxCurveEnabled": true,
@@ -8218,7 +8218,7 @@
       "custom21EasingCurveEnabled": true,
       "custom21EasingCurve": "[{\"x\":0,\"y\":0.5639582316080729,\"h1\":{\"x\":0.31143422537808685,\"y\":0.10374984741210935}},{\"x\":0.5114378003582828,\"y\":0.8504165649414063,\"h2\":{\"x\":-0.217053360727685,\"y\":0.013333384195963527},\"h1\":{\"x\":0.23886151703848635,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2702726881540415,\"y\":0.16374994913736984}}]",
       "custom21RetransitionEasingCurveEnabled": true,
-      "custom21RetransitionEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.2821603582750679,\"y\":0.2319791158040364}},{\"x\":0.5000090617275154,\"y\":0.7653124491373697,\"h2\":{\"x\":-0.274628427178499,\"y\":0},\"h1\":{\"x\":0.28158102656376904,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.27982473116064643,\"y\":0.24531224568684895}}]",
+      "custom21RetransitionEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.42983859032236926,\"y\":0.20052083333333337}},{\"x\":0.5000090617275154,\"y\":0.7653124491373697,\"h2\":{\"x\":-0.274628427178499,\"y\":0},\"h1\":{\"x\":0.28158102656376904,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.44474229855675507,\"y\":0.2738543192545573}}]",
       "custom21SpeedCurveEnabled": true,
       "custom21SpeedCurveVisibleOnly": true,
       "custom21SpeedCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.3614426923386011,\"y\":-0.06291694641113277}},{\"x\":0.5434193258084055,\"y\":0,\"h1\":{\"x\":0.1377118711641958,\"y\":0},\"h2\":{\"x\":-0.1619136237453131,\"y\":-0.0011459350585938388}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.45658067419159454,\"y\":0}}]",
@@ -8242,7 +8242,7 @@
       "custom21RetransitionDistRange": "{\"min\":50,\"max\":2000}",
       "custom21RetransitionScalerEnabled": true,
       "custom21RetransitionScalerCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.5140945168802775,\"y\":-0.12760416666666663}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.278253513093899,\"y\":0.6923957824707031}}]",
-      "custom21RetransitionScalerMulRange": "{\"min\":0.05,\"max\":1}",
+      "custom21RetransitionScalerMulRange": "{\"min\":0.1,\"max\":0.8}",
       "custom21RetransitionScalerDistRange": "{\"min\":0,\"max\":800}",
       "custom21RetransitionStartTimeCurveEnabled": true,
       "custom21RetransitionStartTimeCurveVisibleOnly": true,
@@ -8251,8 +8251,8 @@
       "custom21TweenRetransitionSpeedMs": 15700,
       "custom21TweenRetransitionSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.25203236866749906,\"y\":0.040103912353515625}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.3644149408348759,\"y\":0}}]",
       "custom21TweenRetransitionSpeedCurveRange": "{\"min\":20000,\"max\":25254}",
-      "custom21TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom21TweenRetransitionStartTimeRange": "{\"min\":1601,\"max\":3000}",
+      "custom21TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.35062653339382605,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.350678091120192,\"y\":0}}]",
+      "custom21TweenRetransitionStartTimeRange": "{\"min\":0,\"max\":3000}",
       "custom21TweenStopEnabled": true,
       "custom21TweenStopStartTimeCurveEnabled": true,
       "custom21TweenStopStartTimeCurveVisibleOnly": true,
@@ -8698,7 +8698,7 @@
       "custom21Trig5RetransitionEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.2830803612999348,\"y\":0.15552088419596355}},{\"x\":0.49643366904506936,\"y\":0.8021873474121094,\"h1\":{\"x\":0.2562622218083621,\"y\":-0.004479217529296919},\"h2\":{\"x\":-0.22884826915913958,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2723344454208958,\"y\":0.17552057902018225}}]",
       "custom21Trig5SpeedCurveEnabled": true,
       "custom21Trig5SpeedCurveVisibleOnly": true,
-      "custom21Trig5SpeedCurve": "[{\"x\":0,\"y\":0.43729146321614587,\"h1\":{\"x\":0.346455473450293,\"y\":-0.509375}},{\"x\":0.6210039260525253,\"y\":0.04437510172526038},{\"x\":1,\"y\":0.9772916158040365}]",
+      "custom21Trig5SpeedCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.09843733693158263,\"y\":-1}},{\"x\":0.6210039260525253,\"y\":0.04437510172526038,\"h1\":{\"x\":0.19969375710351267,\"y\":-0.04437510172526038}},{\"x\":1,\"y\":0.9772916158040365,\"h2\":{\"x\":-0.33250912701458235,\"y\":0.02270838419596355}}]",
       "custom21Trig5SpeedCurveRange": "{\"min\":2016,\"max\":3026}",
       "custom21Trig5StartTimeCurveEnabled": true,
       "custom21Trig5StartTimeCurveVisibleOnly": true,
@@ -10815,7 +10815,7 @@
       "fieldBoundsYMaxCurveRange": "{\"min\":-300,\"max\":300}",
       "fieldBoundsZMin": "-800",
       "fieldBoundsZMinCurveEnabled": true,
-      "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.07681410990834386,\"y\":0.014791870117187522}},{\"x\":0.2078887978034134,\"y\":0,\"h1\":{\"x\":0.22169400877054363,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.7257649533817951,\"y\":0}}]",
+      "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.07681410990834386,\"y\":0.014791870117187522}},{\"x\":0.20627049423198482,\"y\":0.12145843505859377,\"h1\":{\"x\":0.3511503930941846,\"y\":0.43333333333333324},\"h2\":{\"x\":-0.10194695203855877,\"y\":-0.12145843505859377}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.7257649533817951,\"y\":0}}]",
       "fieldBoundsZMinCurveRange": "{\"min\":-800,\"max\":-200}",
       "fieldBoundsZMax": "240",
       "fieldBoundsZMaxCurveEnabled": true,
@@ -18980,7 +18980,7 @@
       "custom21EasingCurveEnabled": true,
       "custom21EasingCurve": "[{\"x\":0,\"y\":0.5639582316080729,\"h1\":{\"x\":0.31143422537808685,\"y\":0.10374984741210935}},{\"x\":0.5114378003582828,\"y\":0.8504165649414063,\"h2\":{\"x\":-0.217053360727685,\"y\":0.013333384195963527},\"h1\":{\"x\":0.23886151703848635,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2702726881540415,\"y\":0.16374994913736984}}]",
       "custom21RetransitionEasingCurveEnabled": true,
-      "custom21RetransitionEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.2821603582750679,\"y\":0.2319791158040364}},{\"x\":0.5000090617275154,\"y\":0.7653124491373697,\"h2\":{\"x\":-0.274628427178499,\"y\":0},\"h1\":{\"x\":0.28158102656376904,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.27982473116064643,\"y\":0.24531224568684895}}]",
+      "custom21RetransitionEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.42983859032236926,\"y\":0.20052083333333337}},{\"x\":0.5000090617275154,\"y\":0.7653124491373697,\"h2\":{\"x\":-0.274628427178499,\"y\":0},\"h1\":{\"x\":0.28158102656376904,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.44474229855675507,\"y\":0.2738543192545573}}]",
       "custom21SpeedCurveEnabled": true,
       "custom21SpeedCurveVisibleOnly": true,
       "custom21SpeedCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.3614426923386011,\"y\":-0.06291694641113277}},{\"x\":0.5434193258084055,\"y\":0,\"h1\":{\"x\":0.1377118711641958,\"y\":0},\"h2\":{\"x\":-0.1619136237453131,\"y\":-0.0011459350585938388}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.45658067419159454,\"y\":0}}]",
@@ -19004,7 +19004,7 @@
       "custom21RetransitionDistRange": "{\"min\":50,\"max\":2000}",
       "custom21RetransitionScalerEnabled": true,
       "custom21RetransitionScalerCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.5140945168802775,\"y\":-0.12760416666666663}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.278253513093899,\"y\":0.6923957824707031}}]",
-      "custom21RetransitionScalerMulRange": "{\"min\":0.05,\"max\":1}",
+      "custom21RetransitionScalerMulRange": "{\"min\":0.1,\"max\":0.8}",
       "custom21RetransitionScalerDistRange": "{\"min\":0,\"max\":800}",
       "custom21RetransitionStartTimeCurveEnabled": true,
       "custom21RetransitionStartTimeCurveVisibleOnly": true,
@@ -19013,8 +19013,8 @@
       "custom21TweenRetransitionSpeedMs": 15700,
       "custom21TweenRetransitionSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.25203236866749906,\"y\":0.040103912353515625}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.3644149408348759,\"y\":0}}]",
       "custom21TweenRetransitionSpeedCurveRange": "{\"min\":20000,\"max\":25254}",
-      "custom21TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom21TweenRetransitionStartTimeRange": "{\"min\":1601,\"max\":3000}",
+      "custom21TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.35062653339382605,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.350678091120192,\"y\":0}}]",
+      "custom21TweenRetransitionStartTimeRange": "{\"min\":0,\"max\":3000}",
       "custom21TweenStopEnabled": true,
       "custom21TweenStopStartTimeCurveEnabled": true,
       "custom21TweenStopStartTimeCurveVisibleOnly": true,
@@ -19460,7 +19460,7 @@
       "custom21Trig5RetransitionEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.2830803612999348,\"y\":0.15552088419596355}},{\"x\":0.49643366904506936,\"y\":0.8021873474121094,\"h1\":{\"x\":0.2562622218083621,\"y\":-0.004479217529296919},\"h2\":{\"x\":-0.22884826915913958,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2723344454208958,\"y\":0.17552057902018225}}]",
       "custom21Trig5SpeedCurveEnabled": true,
       "custom21Trig5SpeedCurveVisibleOnly": true,
-      "custom21Trig5SpeedCurve": "[{\"x\":0,\"y\":0.43729146321614587,\"h1\":{\"x\":0.346455473450293,\"y\":-0.509375}},{\"x\":0.6210039260525253,\"y\":0.04437510172526038},{\"x\":1,\"y\":0.9772916158040365}]",
+      "custom21Trig5SpeedCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.09843733693158263,\"y\":-1}},{\"x\":0.6210039260525253,\"y\":0.04437510172526038,\"h1\":{\"x\":0.19969375710351267,\"y\":-0.04437510172526038}},{\"x\":1,\"y\":0.9772916158040365,\"h2\":{\"x\":-0.33250912701458235,\"y\":0.02270838419596355}}]",
       "custom21Trig5SpeedCurveRange": "{\"min\":2016,\"max\":3026}",
       "custom21Trig5StartTimeCurveEnabled": true,
       "custom21Trig5StartTimeCurveVisibleOnly": true,
@@ -21577,7 +21577,7 @@
       "fieldBoundsYMaxCurveRange": "{\"min\":-300,\"max\":300}",
       "fieldBoundsZMin": "-800",
       "fieldBoundsZMinCurveEnabled": true,
-      "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.07681410990834386,\"y\":0.014791870117187522}},{\"x\":0.2078887978034134,\"y\":0,\"h1\":{\"x\":0.22169400877054363,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.7257649533817951,\"y\":0}}]",
+      "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.07681410990834386,\"y\":0.014791870117187522}},{\"x\":0.20627049423198482,\"y\":0.12145843505859377,\"h1\":{\"x\":0.3511503930941846,\"y\":0.43333333333333324},\"h2\":{\"x\":-0.10194695203855877,\"y\":-0.12145843505859377}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.7257649533817951,\"y\":0}}]",
       "fieldBoundsZMinCurveRange": "{\"min\":-800,\"max\":-200}",
       "fieldBoundsZMax": "240",
       "fieldBoundsZMaxCurveEnabled": true,
@@ -29742,7 +29742,7 @@
       "custom21EasingCurveEnabled": true,
       "custom21EasingCurve": "[{\"x\":0,\"y\":0.5639582316080729,\"h1\":{\"x\":0.31143422537808685,\"y\":0.10374984741210935}},{\"x\":0.5114378003582828,\"y\":0.8504165649414063,\"h2\":{\"x\":-0.217053360727685,\"y\":0.013333384195963527},\"h1\":{\"x\":0.23886151703848635,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2702726881540415,\"y\":0.16374994913736984}}]",
       "custom21RetransitionEasingCurveEnabled": true,
-      "custom21RetransitionEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.2821603582750679,\"y\":0.2319791158040364}},{\"x\":0.5000090617275154,\"y\":0.7653124491373697,\"h2\":{\"x\":-0.274628427178499,\"y\":0},\"h1\":{\"x\":0.28158102656376904,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.27982473116064643,\"y\":0.24531224568684895}}]",
+      "custom21RetransitionEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.42983859032236926,\"y\":0.20052083333333337}},{\"x\":0.5000090617275154,\"y\":0.7653124491373697,\"h2\":{\"x\":-0.274628427178499,\"y\":0},\"h1\":{\"x\":0.28158102656376904,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.44474229855675507,\"y\":0.2738543192545573}}]",
       "custom21SpeedCurveEnabled": true,
       "custom21SpeedCurveVisibleOnly": true,
       "custom21SpeedCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.3614426923386011,\"y\":-0.06291694641113277}},{\"x\":0.5434193258084055,\"y\":0,\"h1\":{\"x\":0.1377118711641958,\"y\":0},\"h2\":{\"x\":-0.1619136237453131,\"y\":-0.0011459350585938388}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.45658067419159454,\"y\":0}}]",
@@ -29766,7 +29766,7 @@
       "custom21RetransitionDistRange": "{\"min\":50,\"max\":2000}",
       "custom21RetransitionScalerEnabled": true,
       "custom21RetransitionScalerCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.5140945168802775,\"y\":-0.12760416666666663}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.278253513093899,\"y\":0.6923957824707031}}]",
-      "custom21RetransitionScalerMulRange": "{\"min\":0.05,\"max\":1}",
+      "custom21RetransitionScalerMulRange": "{\"min\":0.1,\"max\":0.8}",
       "custom21RetransitionScalerDistRange": "{\"min\":0,\"max\":800}",
       "custom21RetransitionStartTimeCurveEnabled": true,
       "custom21RetransitionStartTimeCurveVisibleOnly": true,
@@ -29775,8 +29775,8 @@
       "custom21TweenRetransitionSpeedMs": 15700,
       "custom21TweenRetransitionSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.25203236866749906,\"y\":0.040103912353515625}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.3644149408348759,\"y\":0}}]",
       "custom21TweenRetransitionSpeedCurveRange": "{\"min\":20000,\"max\":25254}",
-      "custom21TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom21TweenRetransitionStartTimeRange": "{\"min\":1601,\"max\":3000}",
+      "custom21TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.35062653339382605,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.350678091120192,\"y\":0}}]",
+      "custom21TweenRetransitionStartTimeRange": "{\"min\":0,\"max\":3000}",
       "custom21TweenStopEnabled": true,
       "custom21TweenStopStartTimeCurveEnabled": true,
       "custom21TweenStopStartTimeCurveVisibleOnly": true,
@@ -30222,7 +30222,7 @@
       "custom21Trig5RetransitionEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.2830803612999348,\"y\":0.15552088419596355}},{\"x\":0.49643366904506936,\"y\":0.8021873474121094,\"h1\":{\"x\":0.2562622218083621,\"y\":-0.004479217529296919},\"h2\":{\"x\":-0.22884826915913958,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2723344454208958,\"y\":0.17552057902018225}}]",
       "custom21Trig5SpeedCurveEnabled": true,
       "custom21Trig5SpeedCurveVisibleOnly": true,
-      "custom21Trig5SpeedCurve": "[{\"x\":0,\"y\":0.43729146321614587,\"h1\":{\"x\":0.346455473450293,\"y\":-0.509375}},{\"x\":0.6210039260525253,\"y\":0.04437510172526038},{\"x\":1,\"y\":0.9772916158040365}]",
+      "custom21Trig5SpeedCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.09843733693158263,\"y\":-1}},{\"x\":0.6210039260525253,\"y\":0.04437510172526038,\"h1\":{\"x\":0.19969375710351267,\"y\":-0.04437510172526038}},{\"x\":1,\"y\":0.9772916158040365,\"h2\":{\"x\":-0.33250912701458235,\"y\":0.02270838419596355}}]",
       "custom21Trig5SpeedCurveRange": "{\"min\":2016,\"max\":3026}",
       "custom21Trig5StartTimeCurveEnabled": true,
       "custom21Trig5StartTimeCurveVisibleOnly": true,
@@ -34458,14 +34458,14 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
           "type": "group",
           "group": {
             "key": "Field Layout",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -34655,7 +34655,7 @@
                 "type": "group",
                 "group": {
                   "key": "Hand Position Min Z Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -34682,7 +34682,7 @@
                 "type": "group",
                 "group": {
                   "key": "Hand Position Max Z Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -34816,7 +34816,7 @@
               },
               {
                 "key": "Hand Position Min Z Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -34836,7 +34836,7 @@
               },
               {
                 "key": "Hand Position Max Z Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -36278,7 +36278,7 @@
       "subgroups": [
         {
           "key": "Field Layout",
-          "collapsed": false,
+          "collapsed": true,
           "locked": true,
           "items": [
             {
@@ -36468,7 +36468,7 @@
               "type": "group",
               "group": {
                 "key": "Hand Position Min Z Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -36495,7 +36495,7 @@
               "type": "group",
               "group": {
                 "key": "Hand Position Max Z Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -36629,7 +36629,7 @@
             },
             {
               "key": "Hand Position Min Z Curve",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -36649,7 +36649,7 @@
             },
             {
               "key": "Hand Position Max Z Curve",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -38074,7 +38074,7 @@
     },
     {
       "key": "Custom Click Functions",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -107643,7 +107643,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 21",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -108054,7 +108054,7 @@
                       "type": "group",
                       "group": {
                         "key": "Retransition Start Time Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -108096,7 +108096,7 @@
                       "type": "group",
                       "group": {
                         "key": "Retransition Easing Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -108204,7 +108204,7 @@
                     },
                     {
                       "key": "Retransition Start Time Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -108239,7 +108239,7 @@
                     },
                     {
                       "key": "Retransition Easing Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -108443,7 +108443,7 @@
                 "type": "group",
                 "group": {
                   "key": "Multi Trigger",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -114498,7 +114498,7 @@
                       "type": "group",
                       "group": {
                         "key": "Trigger 5",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -114848,7 +114848,7 @@
                             "type": "group",
                             "group": {
                               "key": "Retransition",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -114859,7 +114859,7 @@
                                   "type": "group",
                                   "group": {
                                     "key": "Retransition Speed Curve",
-                                    "collapsed": true,
+                                    "collapsed": false,
                                     "locked": false,
                                     "items": [
                                       {
@@ -114980,7 +114980,7 @@
                                   "type": "group",
                                   "group": {
                                     "key": "Retransition Distance Scaler",
-                                    "collapsed": true,
+                                    "collapsed": false,
                                     "locked": false,
                                     "items": [
                                       {
@@ -115012,7 +115012,7 @@
                               "subgroups": [
                                 {
                                   "key": "Retransition Speed Curve",
-                                  "collapsed": true,
+                                  "collapsed": false,
                                   "locked": false,
                                   "items": [
                                     {
@@ -115117,7 +115117,7 @@
                                 },
                                 {
                                   "key": "Retransition Distance Scaler",
-                                  "collapsed": true,
+                                  "collapsed": false,
                                   "locked": false,
                                   "items": [
                                     {
@@ -115571,7 +115571,7 @@
                           },
                           {
                             "key": "Retransition",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -115582,7 +115582,7 @@
                                 "type": "group",
                                 "group": {
                                   "key": "Retransition Speed Curve",
-                                  "collapsed": true,
+                                  "collapsed": false,
                                   "locked": false,
                                   "items": [
                                     {
@@ -115703,7 +115703,7 @@
                                 "type": "group",
                                 "group": {
                                   "key": "Retransition Distance Scaler",
-                                  "collapsed": true,
+                                  "collapsed": false,
                                   "locked": false,
                                   "items": [
                                     {
@@ -115735,7 +115735,7 @@
                             "subgroups": [
                               {
                                 "key": "Retransition Speed Curve",
-                                "collapsed": true,
+                                "collapsed": false,
                                 "locked": false,
                                 "items": [
                                   {
@@ -115840,7 +115840,7 @@
                               },
                               {
                                 "key": "Retransition Distance Scaler",
-                                "collapsed": true,
+                                "collapsed": false,
                                 "locked": false,
                                 "items": [
                                   {
@@ -122044,7 +122044,7 @@
                     },
                     {
                       "key": "Trigger 5",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -122394,7 +122394,7 @@
                           "type": "group",
                           "group": {
                             "key": "Retransition",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -122405,7 +122405,7 @@
                                 "type": "group",
                                 "group": {
                                   "key": "Retransition Speed Curve",
-                                  "collapsed": true,
+                                  "collapsed": false,
                                   "locked": false,
                                   "items": [
                                     {
@@ -122526,7 +122526,7 @@
                                 "type": "group",
                                 "group": {
                                   "key": "Retransition Distance Scaler",
-                                  "collapsed": true,
+                                  "collapsed": false,
                                   "locked": false,
                                   "items": [
                                     {
@@ -122558,7 +122558,7 @@
                             "subgroups": [
                               {
                                 "key": "Retransition Speed Curve",
-                                "collapsed": true,
+                                "collapsed": false,
                                 "locked": false,
                                 "items": [
                                   {
@@ -122663,7 +122663,7 @@
                               },
                               {
                                 "key": "Retransition Distance Scaler",
-                                "collapsed": true,
+                                "collapsed": false,
                                 "locked": false,
                                 "items": [
                                   {
@@ -123117,7 +123117,7 @@
                         },
                         {
                           "key": "Retransition",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -123128,7 +123128,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Retransition Speed Curve",
-                                "collapsed": true,
+                                "collapsed": false,
                                 "locked": false,
                                 "items": [
                                   {
@@ -123249,7 +123249,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Retransition Distance Scaler",
-                                "collapsed": true,
+                                "collapsed": false,
                                 "locked": false,
                                 "items": [
                                   {
@@ -123281,7 +123281,7 @@
                           "subgroups": [
                             {
                               "key": "Retransition Speed Curve",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -123386,7 +123386,7 @@
                             },
                             {
                               "key": "Retransition Distance Scaler",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -123893,7 +123893,7 @@
                     "type": "group",
                     "group": {
                       "key": "Retransition Start Time Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -123935,7 +123935,7 @@
                     "type": "group",
                     "group": {
                       "key": "Retransition Easing Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -124043,7 +124043,7 @@
                   },
                   {
                     "key": "Retransition Start Time Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -124078,7 +124078,7 @@
                   },
                   {
                     "key": "Retransition Easing Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -124276,7 +124276,7 @@
               },
               {
                 "key": "Multi Trigger",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -130331,7 +130331,7 @@
                     "type": "group",
                     "group": {
                       "key": "Trigger 5",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -130681,7 +130681,7 @@
                           "type": "group",
                           "group": {
                             "key": "Retransition",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -130692,7 +130692,7 @@
                                 "type": "group",
                                 "group": {
                                   "key": "Retransition Speed Curve",
-                                  "collapsed": true,
+                                  "collapsed": false,
                                   "locked": false,
                                   "items": [
                                     {
@@ -130813,7 +130813,7 @@
                                 "type": "group",
                                 "group": {
                                   "key": "Retransition Distance Scaler",
-                                  "collapsed": true,
+                                  "collapsed": false,
                                   "locked": false,
                                   "items": [
                                     {
@@ -130845,7 +130845,7 @@
                             "subgroups": [
                               {
                                 "key": "Retransition Speed Curve",
-                                "collapsed": true,
+                                "collapsed": false,
                                 "locked": false,
                                 "items": [
                                   {
@@ -130950,7 +130950,7 @@
                               },
                               {
                                 "key": "Retransition Distance Scaler",
-                                "collapsed": true,
+                                "collapsed": false,
                                 "locked": false,
                                 "items": [
                                   {
@@ -131404,7 +131404,7 @@
                         },
                         {
                           "key": "Retransition",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -131415,7 +131415,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Retransition Speed Curve",
-                                "collapsed": true,
+                                "collapsed": false,
                                 "locked": false,
                                 "items": [
                                   {
@@ -131536,7 +131536,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Retransition Distance Scaler",
-                                "collapsed": true,
+                                "collapsed": false,
                                 "locked": false,
                                 "items": [
                                   {
@@ -131568,7 +131568,7 @@
                           "subgroups": [
                             {
                               "key": "Retransition Speed Curve",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -131673,7 +131673,7 @@
                             },
                             {
                               "key": "Retransition Distance Scaler",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -137877,7 +137877,7 @@
                   },
                   {
                     "key": "Trigger 5",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -138227,7 +138227,7 @@
                         "type": "group",
                         "group": {
                           "key": "Retransition",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -138238,7 +138238,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Retransition Speed Curve",
-                                "collapsed": true,
+                                "collapsed": false,
                                 "locked": false,
                                 "items": [
                                   {
@@ -138359,7 +138359,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Retransition Distance Scaler",
-                                "collapsed": true,
+                                "collapsed": false,
                                 "locked": false,
                                 "items": [
                                   {
@@ -138391,7 +138391,7 @@
                           "subgroups": [
                             {
                               "key": "Retransition Speed Curve",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -138496,7 +138496,7 @@
                             },
                             {
                               "key": "Retransition Distance Scaler",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -138950,7 +138950,7 @@
                       },
                       {
                         "key": "Retransition",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -138961,7 +138961,7 @@
                             "type": "group",
                             "group": {
                               "key": "Retransition Speed Curve",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -139082,7 +139082,7 @@
                             "type": "group",
                             "group": {
                               "key": "Retransition Distance Scaler",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -139114,7 +139114,7 @@
                         "subgroups": [
                           {
                             "key": "Retransition Speed Curve",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -139219,7 +139219,7 @@
                           },
                           {
                             "key": "Retransition Distance Scaler",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -216021,7 +216021,7 @@
         },
         {
           "key": "Custom Click Function 21",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
@@ -216432,7 +216432,7 @@
                     "type": "group",
                     "group": {
                       "key": "Retransition Start Time Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -216474,7 +216474,7 @@
                     "type": "group",
                     "group": {
                       "key": "Retransition Easing Curve",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -216582,7 +216582,7 @@
                   },
                   {
                     "key": "Retransition Start Time Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -216617,7 +216617,7 @@
                   },
                   {
                     "key": "Retransition Easing Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -216821,7 +216821,7 @@
               "type": "group",
               "group": {
                 "key": "Multi Trigger",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -222876,7 +222876,7 @@
                     "type": "group",
                     "group": {
                       "key": "Trigger 5",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -223226,7 +223226,7 @@
                           "type": "group",
                           "group": {
                             "key": "Retransition",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -223237,7 +223237,7 @@
                                 "type": "group",
                                 "group": {
                                   "key": "Retransition Speed Curve",
-                                  "collapsed": true,
+                                  "collapsed": false,
                                   "locked": false,
                                   "items": [
                                     {
@@ -223358,7 +223358,7 @@
                                 "type": "group",
                                 "group": {
                                   "key": "Retransition Distance Scaler",
-                                  "collapsed": true,
+                                  "collapsed": false,
                                   "locked": false,
                                   "items": [
                                     {
@@ -223390,7 +223390,7 @@
                             "subgroups": [
                               {
                                 "key": "Retransition Speed Curve",
-                                "collapsed": true,
+                                "collapsed": false,
                                 "locked": false,
                                 "items": [
                                   {
@@ -223495,7 +223495,7 @@
                               },
                               {
                                 "key": "Retransition Distance Scaler",
-                                "collapsed": true,
+                                "collapsed": false,
                                 "locked": false,
                                 "items": [
                                   {
@@ -223949,7 +223949,7 @@
                         },
                         {
                           "key": "Retransition",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -223960,7 +223960,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Retransition Speed Curve",
-                                "collapsed": true,
+                                "collapsed": false,
                                 "locked": false,
                                 "items": [
                                   {
@@ -224081,7 +224081,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Retransition Distance Scaler",
-                                "collapsed": true,
+                                "collapsed": false,
                                 "locked": false,
                                 "items": [
                                   {
@@ -224113,7 +224113,7 @@
                           "subgroups": [
                             {
                               "key": "Retransition Speed Curve",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -224218,7 +224218,7 @@
                             },
                             {
                               "key": "Retransition Distance Scaler",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -230422,7 +230422,7 @@
                   },
                   {
                     "key": "Trigger 5",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -230772,7 +230772,7 @@
                         "type": "group",
                         "group": {
                           "key": "Retransition",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -230783,7 +230783,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Retransition Speed Curve",
-                                "collapsed": true,
+                                "collapsed": false,
                                 "locked": false,
                                 "items": [
                                   {
@@ -230904,7 +230904,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Retransition Distance Scaler",
-                                "collapsed": true,
+                                "collapsed": false,
                                 "locked": false,
                                 "items": [
                                   {
@@ -230936,7 +230936,7 @@
                           "subgroups": [
                             {
                               "key": "Retransition Speed Curve",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -231041,7 +231041,7 @@
                             },
                             {
                               "key": "Retransition Distance Scaler",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -231495,7 +231495,7 @@
                       },
                       {
                         "key": "Retransition",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -231506,7 +231506,7 @@
                             "type": "group",
                             "group": {
                               "key": "Retransition Speed Curve",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -231627,7 +231627,7 @@
                             "type": "group",
                             "group": {
                               "key": "Retransition Distance Scaler",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -231659,7 +231659,7 @@
                         "subgroups": [
                           {
                             "key": "Retransition Speed Curve",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -231764,7 +231764,7 @@
                           },
                           {
                             "key": "Retransition Distance Scaler",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -232271,7 +232271,7 @@
                   "type": "group",
                   "group": {
                     "key": "Retransition Start Time Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -232313,7 +232313,7 @@
                   "type": "group",
                   "group": {
                     "key": "Retransition Easing Curve",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -232421,7 +232421,7 @@
                 },
                 {
                   "key": "Retransition Start Time Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -232456,7 +232456,7 @@
                 },
                 {
                   "key": "Retransition Easing Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -232654,7 +232654,7 @@
             },
             {
               "key": "Multi Trigger",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -238709,7 +238709,7 @@
                   "type": "group",
                   "group": {
                     "key": "Trigger 5",
-                    "collapsed": true,
+                    "collapsed": false,
                     "locked": false,
                     "items": [
                       {
@@ -239059,7 +239059,7 @@
                         "type": "group",
                         "group": {
                           "key": "Retransition",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -239070,7 +239070,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Retransition Speed Curve",
-                                "collapsed": true,
+                                "collapsed": false,
                                 "locked": false,
                                 "items": [
                                   {
@@ -239191,7 +239191,7 @@
                               "type": "group",
                               "group": {
                                 "key": "Retransition Distance Scaler",
-                                "collapsed": true,
+                                "collapsed": false,
                                 "locked": false,
                                 "items": [
                                   {
@@ -239223,7 +239223,7 @@
                           "subgroups": [
                             {
                               "key": "Retransition Speed Curve",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -239328,7 +239328,7 @@
                             },
                             {
                               "key": "Retransition Distance Scaler",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -239782,7 +239782,7 @@
                       },
                       {
                         "key": "Retransition",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -239793,7 +239793,7 @@
                             "type": "group",
                             "group": {
                               "key": "Retransition Speed Curve",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -239914,7 +239914,7 @@
                             "type": "group",
                             "group": {
                               "key": "Retransition Distance Scaler",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -239946,7 +239946,7 @@
                         "subgroups": [
                           {
                             "key": "Retransition Speed Curve",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -240051,7 +240051,7 @@
                           },
                           {
                             "key": "Retransition Distance Scaler",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -246255,7 +246255,7 @@
                 },
                 {
                   "key": "Trigger 5",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -246605,7 +246605,7 @@
                       "type": "group",
                       "group": {
                         "key": "Retransition",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -246616,7 +246616,7 @@
                             "type": "group",
                             "group": {
                               "key": "Retransition Speed Curve",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -246737,7 +246737,7 @@
                             "type": "group",
                             "group": {
                               "key": "Retransition Distance Scaler",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -246769,7 +246769,7 @@
                         "subgroups": [
                           {
                             "key": "Retransition Speed Curve",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -246874,7 +246874,7 @@
                           },
                           {
                             "key": "Retransition Distance Scaler",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -247328,7 +247328,7 @@
                     },
                     {
                       "key": "Retransition",
-                      "collapsed": true,
+                      "collapsed": false,
                       "locked": false,
                       "items": [
                         {
@@ -247339,7 +247339,7 @@
                           "type": "group",
                           "group": {
                             "key": "Retransition Speed Curve",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -247460,7 +247460,7 @@
                           "type": "group",
                           "group": {
                             "key": "Retransition Distance Scaler",
-                            "collapsed": true,
+                            "collapsed": false,
                             "locked": false,
                             "items": [
                               {
@@ -247492,7 +247492,7 @@
                       "subgroups": [
                         {
                           "key": "Retransition Speed Curve",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
@@ -247597,7 +247597,7 @@
                         },
                         {
                           "key": "Retransition Distance Scaler",
-                          "collapsed": true,
+                          "collapsed": false,
                           "locked": false,
                           "items": [
                             {
