@@ -7243,13 +7243,13 @@
         }
       ],
       "cameraX": 1.9534883720930232,
-      "cameraY": 1.656334795846795e-14,
-      "cameraZ": 269.92514276732584,
-      "cameraFov": 15,
+      "cameraY": 6.827405905246495e-15,
+      "cameraZ": 110.92514276732585,
+      "cameraFov": 35,
       "cameraYaw": 0,
       "cameraPitch": 0,
       "cameraRoll": 0,
-      "cameraZoom": 270.5,
+      "cameraZoom": 111.5,
       "cameraZoomSpeed": 0.3,
       "savedCameras": [
         {
