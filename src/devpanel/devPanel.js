@@ -3820,6 +3820,7 @@ export function initDevPanel(groups, opts = {}) {
   // An item selector (2026-10-15, direct request) instead of a dropdown: one row per saved state, click to select, the default one carries a star badge.
   const savedStatesList = el('div', 'dp-ss-list')
   let selectedStateName = ''
+  let activeStateName = '' // the item the panel currently shows (last Used / Set Default / Save New / Overwrite, or the default after the main Save); session-only: after a refresh the panel loads the live settings, which are the default item as of the last Save
   const savedStatesBtnRow = el('div', 'dp-actions')
   savedStatesBtnRow.style.flexWrap = 'wrap'
   const saveStateBtn = el('button', null, { type: 'button', textContent: 'Save New', title: 'Save the current panel as a NEW named item (asks for a name). The main Save button overwrites the default item instead.' })
@@ -3879,11 +3880,13 @@ export function initDevPanel(groups, opts = {}) {
     let def = getDefaultStateName()
     if (def && !states[def]) { setDefaultStateName(''); def = '' } // the default item was deleted
     if (!states[selectedStateName]) selectedStateName = ''
+    if (!states[activeStateName]) activeStateName = ''
     savedStatesList.innerHTML = ''
     if (!names.length) savedStatesList.appendChild(el('div', 'dp-ss-empty', { textContent: 'No saved settings yet' }))
     names.forEach((name) => {
       const row = el('div', 'dp-ss-row' + (name === selectedStateName ? ' selected' : ''))
       row.appendChild(el('span', 'dp-ss-name', { textContent: name, title: name }))
+      if (name === activeStateName) row.appendChild(el('span', 'dp-ss-badge dp-ss-badge-use', { textContent: '\u25CF In use', title: 'The settings the panel currently shows' }))
       if (name === def) row.appendChild(el('span', 'dp-ss-badge', { textContent: '\u2605 Default', title: 'The main Save button overwrites this item' }))
       row.addEventListener('click', () => { selectedStateName = name; renderSavedStatesList() })
       savedStatesList.appendChild(row)
@@ -3898,6 +3901,8 @@ export function initDevPanel(groups, opts = {}) {
       if (!states[name]) { setDefaultStateName(''); renderSavedStatesList(); return }
       states[name] = await packState(captureFullPanelState())
       const failed = setSavedStates(states)
+      activeStateName = name
+      renderSavedStatesList()
       if (failed) console.warn(`Default saved settings "${name}" not updated: browser storage for the page is full (${failed}).`)
     } catch (err) { console.warn('Default saved settings not updated', err) }
   }
@@ -3916,6 +3921,7 @@ export function initDevPanel(groups, opts = {}) {
       return
     }
     selectedStateName = name
+    activeStateName = name
     renderSavedStatesList()
   }
   async function overwriteNamedState() {
@@ -3927,6 +3933,7 @@ export function initDevPanel(groups, opts = {}) {
     states[name] = await packState(captureFullPanelState())
     const failed = setSavedStates(states)
     if (failed) { window.alert(`Could not save "${name}": this browser's storage for the page is full (${failed}).`); return }
+    activeStateName = name
     renderSavedStatesList()
   }
   async function useNamedState() {
@@ -3936,7 +3943,7 @@ export function initDevPanel(groups, opts = {}) {
     if (!states[name]) return
     let state
     try { state = await unpackState(states[name]) } catch (err) { window.alert(`Could not read "${name}" (${(err && err.message) || err}).`); return }
-    if (state) applyFullPanelState(state)
+    if (state) { applyFullPanelState(state); activeStateName = name; renderSavedStatesList() }
   }
   function deleteNamedState() {
     const name = selectedStateName
@@ -3957,6 +3964,7 @@ export function initDevPanel(groups, opts = {}) {
     let state
     try { state = await unpackState(states[name]) } catch (err) { window.alert(`Could not read "${name}" (${(err && err.message) || err}).`); return }
     if (!state) return
+    activeStateName = name
     setDefaultStateName(name) // marked before the save below, which then refreshes this item from the panel (the same state)
     renderSavedStatesList()
     applyFullPanelState(state)
@@ -3968,6 +3976,7 @@ export function initDevPanel(groups, opts = {}) {
   deleteStateBtn.addEventListener('click', deleteNamedState)
   setDefaultStateBtn.addEventListener('click', setNamedStateAsDefault)
   exportStateBtn.addEventListener('click', exportDevPanelSettings)
+  activeStateName = getDefaultStateName()
   renderSavedStatesList()
   // `.dp-collapsed`'s own CSS only hides `.dp-body`/`.dp-resize` -- it
   // can't also shrink the PANEL's own box, for 2 separate reasons that

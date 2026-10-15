@@ -244,6 +244,7 @@ body:not(.hd-revealed) #pauseButton, body:not(.hd-revealed) #resetButton, body:n
 .dp-ss-row.selected { background: rgba(108, 140, 255, 0.3); }
 .dp-ss-name { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .dp-ss-badge { flex: 0 0 auto; font-size: 0.85em; padding: 0 6px; border-radius: 8px; background: var(--dp-accent, #6c8cff); color: #000; }
+.dp-ss-badge-use { background: #4ade80; }
 .dp-ss-empty { opacity: 0.6; padding: 4px 6px; }
 .dp-actions button {
   flex: 1 1 auto; background: var(--dp-button-bg-color, #3a3a4a); border: none; border-radius: 4px;
