@@ -5861,6 +5861,10 @@
           "elbowBend": 0,
           "elbowSideBend": 0,
           "forearmTwist": 0,
+          "poseOffsetX": 0,
+          "poseOffsetY": 0,
+          "poseOffsetZ": 0,
+          "poseScale": 1,
           "group": "Closed Flower"
         },
         {
@@ -7858,6 +7862,13 @@
             "y": 0.3351155550179231,
             "z": -0.0987886594508207
           }
+        },
+        {
+          "name": "Closed to Open Flower ",
+          "tweenPoses": [
+            "Closed Flower (DS)",
+            "Big Open Palm (S)"
+          ]
         }
       ],
       "cameraX": 1.9534883720930232,
@@ -16654,6 +16665,10 @@
           "elbowBend": 0,
           "elbowSideBend": 0,
           "forearmTwist": 0,
+          "poseOffsetX": 0,
+          "poseOffsetY": 0,
+          "poseOffsetZ": 0,
+          "poseScale": 1,
           "group": "Closed Flower"
         },
         {
@@ -18651,6 +18666,13 @@
             "y": 0.3351155550179231,
             "z": -0.0987886594508207
           }
+        },
+        {
+          "name": "Closed to Open Flower ",
+          "tweenPoses": [
+            "Closed Flower (DS)",
+            "Big Open Palm (S)"
+          ]
         }
       ],
       "cameraX": -3.1777777777777776,
@@ -27447,6 +27469,10 @@
           "elbowBend": 0,
           "elbowSideBend": 0,
           "forearmTwist": 0,
+          "poseOffsetX": 0,
+          "poseOffsetY": 0,
+          "poseOffsetZ": 0,
+          "poseScale": 1,
           "group": "Closed Flower"
         },
         {
@@ -29444,6 +29470,13 @@
             "y": 0.3351155550179231,
             "z": -0.0987886594508207
           }
+        },
+        {
+          "name": "Closed to Open Flower ",
+          "tweenPoses": [
+            "Closed Flower (DS)",
+            "Big Open Palm (S)"
+          ]
         }
       ],
       "cameraX": 6.6385295949156875,
@@ -32921,7 +32954,7 @@
     },
     {
       "key": "New Group (9)",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -33017,7 +33050,7 @@
           "type": "group",
           "group": {
             "key": "Loading Preview",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -33040,7 +33073,7 @@
                 "type": "group",
                 "group": {
                   "key": "New Group (7)",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -33102,7 +33135,7 @@
                 "type": "group",
                 "group": {
                   "key": "New Group (5)",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -33159,7 +33192,7 @@
                 "type": "group",
                 "group": {
                   "key": "New Group",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -33257,7 +33290,7 @@
           "type": "group",
           "group": {
             "key": "Field Layout",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -34040,7 +34073,7 @@
           "type": "group",
           "group": {
             "key": "Tween",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -34345,7 +34378,7 @@
     },
     {
       "key": "Custom Click Functions",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -34844,7 +34877,7 @@
     },
     {
       "key": "Starting State",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -34863,7 +34896,7 @@
           "type": "group",
           "group": {
             "key": "Hand Offset On Startup",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -34874,7 +34907,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Animation Tween",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
@@ -39337,12 +39370,6 @@
       "top": 30.787500381469727,
       "width": 595.1749877929688,
       "height": 665.5875244140625
-    },
-    "mobile": {
-      "left": 79.2797622680664,
-      "top": 88.04762268066406,
-      "width": 311.71429443359375,
-      "height": 35.52381134033203
     }
   }
 }
