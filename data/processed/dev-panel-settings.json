@@ -39148,7 +39148,7 @@
     },
     {
       "key": "Saved Dev Settings",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [],
       "settings": []
@@ -40650,7 +40650,7 @@
           "type": "group",
           "group": {
             "key": "New Group (13)",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
