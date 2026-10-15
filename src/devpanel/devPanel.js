@@ -3605,6 +3605,7 @@ export function initDevPanel(groups, opts = {}) {
     const geomNow = getPanelGeometry(panel)
     try { localStorage.setItem(currentGeomKey(), JSON.stringify(geomNow)) } catch (err) { /* ignore */ }
     snapshot.panelGeometry = { [realDeviceClass()]: geomNow }
+    overwriteDefaultSavedState() // the default item in Saved Dev Settings follows every Save (no-op when none is set)
     if (opts.remoteSave) {
       // returns the promise so a host that must not reload before the save lands (the hand model Use) can wait for it
       return remoteSaveSnapshot(opts.remoteSave, snapshot).then((result) => {
@@ -3816,15 +3817,19 @@ export function initDevPanel(groups, opts = {}) {
   // the DOM, never touched by applyOrder()'s row-placement logic.
   const savedStatesGroup = createGroupElement('Saved Dev Settings')
   const savedStatesBody = savedStatesGroup.querySelector(':scope > .dp-group-body')
-  const savedStatesSelect = el('select', null, { style: 'width:100%; margin-bottom:5px;' })
+  // An item selector (2026-10-15, direct request) instead of a dropdown: one row per saved state, click to select, the default one carries a star badge.
+  const savedStatesList = el('div', 'dp-ss-list')
+  let selectedStateName = ''
   const savedStatesBtnRow = el('div', 'dp-actions')
-  const saveStateBtn = el('button', null, { type: 'button', textContent: 'Save' })
+  savedStatesBtnRow.style.flexWrap = 'wrap'
+  const saveStateBtn = el('button', null, { type: 'button', textContent: 'Save New', title: 'Save the current panel as a NEW named item (asks for a name). The main Save button overwrites the default item instead.' })
+  const overwriteStateBtn = el('button', null, { type: 'button', textContent: 'Overwrite', title: 'Replace the selected item with the current panel' })
   const useStateBtn = el('button', null, { type: 'button', textContent: 'Use' })
   const deleteStateBtn = el('button', null, { type: 'button', textContent: 'Delete' })
   const setDefaultStateBtn = el('button', null, { type: 'button', textContent: 'Set Default' })
   const exportStateBtn = el('button', null, { type: 'button', textContent: 'Export' })
-  savedStatesBtnRow.append(saveStateBtn, useStateBtn, deleteStateBtn, setDefaultStateBtn, exportStateBtn)
-  savedStatesBody.append(savedStatesSelect, savedStatesBtnRow)
+  savedStatesBtnRow.append(saveStateBtn, overwriteStateBtn, useStateBtn, deleteStateBtn, setDefaultStateBtn, exportStateBtn)
+  savedStatesBody.append(savedStatesList, savedStatesBtnRow)
   groupsEl.insertBefore(savedStatesGroup, groupsEl.firstChild)
 
   function getSavedStates() {
@@ -3863,17 +3868,38 @@ export function initDevPanel(groups, opts = {}) {
     if (entry && typeof entry.gz === 'string') return JSON.parse(await gunzipFromB64(entry.gz))
     return entry
   }
+  // Which saved state is "the default" (marked with a star, overwritten by the main Save button) is remembered per browser, next to the saved states themselves.
+  function defaultStateKey() { return `${storageKeyPrefix}.devDefaultState` }
+  function getDefaultStateName() { try { return localStorage.getItem(defaultStateKey()) || '' } catch (err) { return '' } }
+  function setDefaultStateName(name) { try { if (name) localStorage.setItem(defaultStateKey(), name); else localStorage.removeItem(defaultStateKey()) } catch (err) { /* ignore */ } }
+  function flashStateBtn(btn, msg) { const orig = btn.textContent; btn.textContent = msg; setTimeout(() => { btn.textContent = orig }, 900) }
   function renderSavedStatesList() {
     const states = getSavedStates()
-    const prevValue = savedStatesSelect.value
-    savedStatesSelect.innerHTML = ''
-    Object.keys(states).forEach((name) => {
-      const opt = document.createElement('option')
-      opt.value = name
-      opt.textContent = name
-      savedStatesSelect.appendChild(opt)
+    const names = Object.keys(states)
+    let def = getDefaultStateName()
+    if (def && !states[def]) { setDefaultStateName(''); def = '' } // the default item was deleted
+    if (!states[selectedStateName]) selectedStateName = ''
+    savedStatesList.innerHTML = ''
+    if (!names.length) savedStatesList.appendChild(el('div', 'dp-ss-empty', { textContent: 'No saved settings yet' }))
+    names.forEach((name) => {
+      const row = el('div', 'dp-ss-row' + (name === selectedStateName ? ' selected' : ''))
+      row.appendChild(el('span', 'dp-ss-name', { textContent: name, title: name }))
+      if (name === def) row.appendChild(el('span', 'dp-ss-badge', { textContent: '\u2605 Default', title: 'The main Save button overwrites this item' }))
+      row.addEventListener('click', () => { selectedStateName = name; renderSavedStatesList() })
+      savedStatesList.appendChild(row)
     })
-    if (states[prevValue]) savedStatesSelect.value = prevValue
+  }
+  // The main Save button also overwrites the default item with the current panel (2026-10-15, direct request). No default set = nothing to overwrite. Never blocks the real save.
+  async function overwriteDefaultSavedState() {
+    try {
+      const name = getDefaultStateName()
+      if (!name) return
+      const states = getSavedStates()
+      if (!states[name]) { setDefaultStateName(''); renderSavedStatesList(); return }
+      states[name] = await packState(captureFullPanelState())
+      const failed = setSavedStates(states)
+      if (failed) console.warn(`Default saved settings "${name}" not updated: browser storage for the page is full (${failed}).`)
+    } catch (err) { console.warn('Default saved settings not updated', err) }
   }
   async function saveNamedState() {
     const name = window.prompt('Save current settings as:')
@@ -3889,12 +3915,23 @@ export function initDevPanel(groups, opts = {}) {
       window.alert(`Could not save "${name}": this browser's storage for the page is full (${failed}). Delete some saved settings with Delete and try again.`)
       return
     }
+    selectedStateName = name
     renderSavedStatesList()
-    savedStatesSelect.value = name
+  }
+  async function overwriteNamedState() {
+    const name = selectedStateName
+    if (!name) { flashStateBtn(overwriteStateBtn, 'Select one'); return }
+    if (!window.confirm(`Replace "${name}" with the current settings?`)) return
+    const states = getSavedStates()
+    for (const k of Object.keys(states)) if (states[k] && typeof states[k].gz !== 'string') states[k] = await packState(states[k])
+    states[name] = await packState(captureFullPanelState())
+    const failed = setSavedStates(states)
+    if (failed) { window.alert(`Could not save "${name}": this browser's storage for the page is full (${failed}).`); return }
+    renderSavedStatesList()
   }
   async function useNamedState() {
-    const name = savedStatesSelect.value
-    if (!name) return
+    const name = selectedStateName
+    if (!name) { flashStateBtn(useStateBtn, 'Select one'); return }
     const states = getSavedStates()
     if (!states[name]) return
     let state
@@ -3902,26 +3939,31 @@ export function initDevPanel(groups, opts = {}) {
     if (state) applyFullPanelState(state)
   }
   function deleteNamedState() {
-    const name = savedStatesSelect.value
-    if (!name) return
-    if (!window.confirm(`Delete "${name}"?`)) return
+    const name = selectedStateName
+    if (!name) { flashStateBtn(deleteStateBtn, 'Select one'); return }
+    if (!window.confirm(`Delete "${name}"?${name === getDefaultStateName() ? ' It is the default item.' : ''}`)) return
     const states = getSavedStates()
     delete states[name]
     setSavedStates(states)
+    if (name === getDefaultStateName()) setDefaultStateName('')
+    selectedStateName = ''
     renderSavedStatesList()
   }
   async function setNamedStateAsDefault() {
-    const name = savedStatesSelect.value
-    if (!name) return
+    const name = selectedStateName
+    if (!name) { flashStateBtn(setDefaultStateBtn, 'Select one'); return }
     const states = getSavedStates()
     if (!states[name]) return
     let state
     try { state = await unpackState(states[name]) } catch (err) { window.alert(`Could not read "${name}" (${(err && err.message) || err}).`); return }
     if (!state) return
+    setDefaultStateName(name) // marked before the save below, which then refreshes this item from the panel (the same state)
+    renderSavedStatesList()
     applyFullPanelState(state)
     saveSettings()
   }
   saveStateBtn.addEventListener('click', saveNamedState)
+  overwriteStateBtn.addEventListener('click', overwriteNamedState)
   useStateBtn.addEventListener('click', useNamedState)
   deleteStateBtn.addEventListener('click', deleteNamedState)
   setDefaultStateBtn.addEventListener('click', setNamedStateAsDefault)
