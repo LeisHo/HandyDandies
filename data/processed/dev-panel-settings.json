@@ -8262,7 +8262,7 @@
       "pixelRatio": 1.25,
       "resolutionScale": 100,
       "qualityPreset": "high",
-      "staticPoseOnStartup": true,
+      "staticPoseOnStartup": false,
       "hideFloorAfterHandOffset": true,
       "handOffsetOnStartupEnabled": true,
       "startupHandMaxClicks": 2,
@@ -8345,7 +8345,7 @@
       "sphereFnStartTimeCurveVisibleOnly": true,
       "sphereFnStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.13289772912856024,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":0,\"y\":-0.2470832824707031}}]",
       "sphereFnStartTimeRange": "{\"min\":0,\"max\":2173}",
-      "sphereFnStartDistanceCurveEnabled": true,
+      "sphereFnStartDistanceCurveEnabled": false,
       "sphereFnStartDistanceMin": 0,
       "sphereFnStartDistanceMax": 65,
       "sphereFnStartDistanceCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.4903901949768603,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.5496817246187704,\"y\":0}}]",
@@ -19624,7 +19624,7 @@
       "sphereFnStartTimeCurveVisibleOnly": true,
       "sphereFnStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.13289772912856024,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":0,\"y\":-0.2470832824707031}}]",
       "sphereFnStartTimeRange": "{\"min\":0,\"max\":2173}",
-      "sphereFnStartDistanceCurveEnabled": true,
+      "sphereFnStartDistanceCurveEnabled": false,
       "sphereFnStartDistanceMin": 0,
       "sphereFnStartDistanceMax": 65,
       "sphereFnStartDistanceCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.4903901949768603,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.5496817246187704,\"y\":0}}]",
@@ -30820,7 +30820,7 @@
       "pixelRatio": 1.25,
       "resolutionScale": 100,
       "qualityPreset": "high",
-      "staticPoseOnStartup": true,
+      "staticPoseOnStartup": false,
       "hideFloorAfterHandOffset": true,
       "handOffsetOnStartupEnabled": true,
       "startupHandMaxClicks": 2,
@@ -30903,7 +30903,7 @@
       "sphereFnStartTimeCurveVisibleOnly": true,
       "sphereFnStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.13289772912856024,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":0,\"y\":-0.2470832824707031}}]",
       "sphereFnStartTimeRange": "{\"min\":0,\"max\":2173}",
-      "sphereFnStartDistanceCurveEnabled": true,
+      "sphereFnStartDistanceCurveEnabled": false,
       "sphereFnStartDistanceMin": 0,
       "sphereFnStartDistanceMax": 65,
       "sphereFnStartDistanceCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.4903901949768603,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.5496817246187704,\"y\":0}}]",
@@ -257193,7 +257193,7 @@
           "type": "group",
           "group": {
             "key": "Hand Offset On Startup",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -258520,7 +258520,7 @@
       "subgroups": [
         {
           "key": "Hand Offset On Startup",
-          "collapsed": false,
+          "collapsed": true,
           "locked": true,
           "items": [
             {
