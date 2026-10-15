@@ -113,12 +113,12 @@
       "fieldBoundsYMaxCurveRange": "{\"min\":-275,\"max\":300}",
       "fieldBoundsZMin": "-800",
       "fieldBoundsZMinCurveEnabled": true,
-      "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3627146779827312,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.5237834702928685,\"y\":0}}]",
+      "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.9528458288968122,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.25137871577513693,\"y\":0}}]",
       "fieldBoundsZMinCurveRange": "{\"min\":-500,\"max\":-150}",
       "fieldBoundsZMax": "240",
       "fieldBoundsZMaxCurveEnabled": true,
       "fieldBoundsZMaxCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.7710241189949432,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":0,\"y\":1}}]",
-      "fieldBoundsZMaxCurveRange": "{\"min\":5,\"max\":180}",
+      "fieldBoundsZMaxCurveRange": "{\"min\":5,\"max\":160}",
       "fieldBoundsX": "{\"min\":-300,\"max\":300}",
       "fieldBoundsY": "{\"min\":-300,\"max\":300}",
       "fieldBoundsZ": "{\"min\":-400,\"max\":200}",
@@ -16048,12 +16048,12 @@
       "fieldBoundsYMaxCurveRange": "{\"min\":-275,\"max\":300}",
       "fieldBoundsZMin": "-800",
       "fieldBoundsZMinCurveEnabled": true,
-      "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3627146779827312,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.5237834702928685,\"y\":0}}]",
+      "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.9528458288968122,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.25137871577513693,\"y\":0}}]",
       "fieldBoundsZMinCurveRange": "{\"min\":-500,\"max\":-150}",
       "fieldBoundsZMax": "240",
       "fieldBoundsZMaxCurveEnabled": true,
       "fieldBoundsZMaxCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.7710241189949432,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":0,\"y\":1}}]",
-      "fieldBoundsZMaxCurveRange": "{\"min\":5,\"max\":180}",
+      "fieldBoundsZMaxCurveRange": "{\"min\":5,\"max\":160}",
       "fieldBoundsX": "{\"min\":-300,\"max\":300}",
       "fieldBoundsY": "{\"min\":-300,\"max\":300}",
       "fieldBoundsZ": "{\"min\":-400,\"max\":200}",
@@ -31983,12 +31983,12 @@
       "fieldBoundsYMaxCurveRange": "{\"min\":-275,\"max\":300}",
       "fieldBoundsZMin": "-800",
       "fieldBoundsZMinCurveEnabled": true,
-      "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3627146779827312,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.5237834702928685,\"y\":0}}]",
+      "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.9528458288968122,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.25137871577513693,\"y\":0}}]",
       "fieldBoundsZMinCurveRange": "{\"min\":-500,\"max\":-150}",
       "fieldBoundsZMax": "240",
       "fieldBoundsZMaxCurveEnabled": true,
       "fieldBoundsZMaxCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.7710241189949432,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":0,\"y\":1}}]",
-      "fieldBoundsZMaxCurveRange": "{\"min\":5,\"max\":180}",
+      "fieldBoundsZMaxCurveRange": "{\"min\":5,\"max\":160}",
       "fieldBoundsX": "{\"min\":-300,\"max\":300}",
       "fieldBoundsY": "{\"min\":-300,\"max\":300}",
       "fieldBoundsZ": "{\"min\":-400,\"max\":200}",
@@ -48719,7 +48719,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -48730,7 +48730,7 @@
           "type": "group",
           "group": {
             "key": "Field Layout",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -48915,7 +48915,7 @@
                 "type": "group",
                 "group": {
                   "key": "Hand Position Min Z Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
@@ -48941,7 +48941,7 @@
                 "type": "group",
                 "group": {
                   "key": "Hand Position Max Z Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
