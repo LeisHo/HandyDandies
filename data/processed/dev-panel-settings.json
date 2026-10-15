@@ -11772,27 +11772,27 @@
       "custom52Trig2RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "rvEnabled": true,
       "rvHoldOnly": false,
-      "rvVelocityRange": "{\"min\":200,\"max\":1000}",
+      "rvVelocityRange": "{\"min\":400,\"max\":1000}",
       "rvVelocitySmoothing": 0.31,
-      "rvTriggerDistanceRange": "{\"min\":20,\"max\":100}",
+      "rvTriggerDistanceRange": "{\"min\":10,\"max\":100}",
       "rvTriggerDistanceCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3572238009602319,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.3288804677939753,\"y\":-0.008645884195963571}}]",
       "rvStartTimeEnabled": true,
       "rvStartTimeRange": "{\"min\":0,\"max\":500}",
       "rvStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3174898914645726,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.3223635039520899,\"y\":0}}]",
       "rvSpeedEnabled": true,
-      "rvSpeedRange": "{\"min\":300,\"max\":1000}",
+      "rvSpeedRange": "{\"min\":400,\"max\":1500}",
       "rvSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.2515702070184387,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.24036571904091975,\"y\":0}}]",
       "rvRetransitionEnabled": true,
       "rvRetransitionSpeedMs": 400,
-      "rvRetransitionSpeedCurveEnabled": false,
-      "rvRetransitionSpeedRange": "{\"min\":700,\"max\":1200}",
+      "rvRetransitionSpeedCurveEnabled": true,
+      "rvRetransitionSpeedRange": "{\"min\":1000,\"max\":1500}",
       "rvRetransitionSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3532455511941396,\"y\":0.016041819254557277}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.30411404903012607,\"y\":-0.010624949137369777}}]",
-      "rvRetransitionStartTimeCurveEnabled": false,
+      "rvRetransitionStartTimeCurveEnabled": true,
       "rvRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
-      "rvRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "rvRetransitionEasingCurveEnabled": false,
-      "rvRetransitionEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.13192274029367795,\"y\":0.00958328247070317}},{\"x\":0.4876786159319298,\"y\":1,\"h2\":{\"x\":-0.13935139945584618,\"y\":0},\"h1\":{\"x\":0.15902448817117493,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.18443573828960846,\"y\":0.0029164632161458037}}]",
-      "rvEasingCurveEnabled": false,
+      "rvRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3761819986567636,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.35357760153286977,\"y\":0}}]",
+      "rvRetransitionEasingCurveEnabled": true,
+      "rvRetransitionEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.13192274029367795,\"y\":0.00958328247070317}},{\"x\":0.4876786159319298,\"y\":1,\"h2\":{\"x\":-0.21182526574229643,\"y\":0},\"h1\":{\"x\":0.2234719746970209,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.18443573828960846,\"y\":0.0029164632161458037}}]",
+      "rvEasingCurveEnabled": true,
       "rvEasingCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "rvSet1Enabled": true,
       "rvSet1Angle": 0,
@@ -36400,7 +36400,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -37221,7 +37221,7 @@
           "type": "group",
           "group": {
             "key": "Cursor Tracking",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -37487,7 +37487,7 @@
                 "type": "group",
                 "group": {
                   "key": "Responsive Velocity",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -37536,7 +37536,7 @@
                       "type": "group",
                       "group": {
                         "key": "Displacement Speed Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -37558,7 +37558,7 @@
                       "type": "group",
                       "group": {
                         "key": "Retransition",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -37569,7 +37569,7 @@
                             "type": "group",
                             "group": {
                               "key": "Retransition Speed Curve",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -37591,7 +37591,7 @@
                             "type": "group",
                             "group": {
                               "key": "Retransition Start Time Curve",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -37613,7 +37613,7 @@
                             "type": "group",
                             "group": {
                               "key": "Retransition Easing Curve",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -38353,7 +38353,7 @@
     },
     {
       "key": "Starting State",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -38372,7 +38372,7 @@
           "type": "group",
           "group": {
             "key": "Hand Offset On Startup",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -38612,7 +38612,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Animation Speed Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": true,
                   "items": [
                     {
@@ -38639,7 +38639,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Start Time Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": true,
                   "items": [
                     {
@@ -38861,7 +38861,7 @@
                 "type": "group",
                 "group": {
                   "key": "Sphere > Start Time Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": true,
                   "items": [
                     {
