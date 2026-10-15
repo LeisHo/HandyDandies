@@ -631,3 +631,19 @@ body:not(.hd-revealed) #pauseButton, body:not(.hd-revealed) #resetButton, body:n
   font-weight: var(--dp-button-weight, 400);
 }
 .dp-panel.dp-caps-settings-text .dp-row label { text-transform: uppercase; }
+/* UI Layout Engine Inspector (lib/ui-engine/inspector.mjs) mounted in Loading Preview > Layout. The engine ships these classes unstyled; themed here with the panel's own colours. */
+.dp-ui-inspector { font-size: 11px; }
+.dp-ui-inspector .ui-inspector-row { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; flex-wrap: wrap; }
+.dp-ui-inspector .ui-inspector-label { color: inherit; opacity: 0.7; min-width: 90px; font-size: 10px; }
+.dp-ui-inspector .ui-inspector-select, .dp-ui-inspector .ui-inspector-text-input { background: rgba(0,0,0,0.35); color: inherit; border: 1px solid rgba(255,255,255,0.25); border-radius: 3px; font-size: 11px; padding: 2px 4px; flex: 1; min-width: 60px; }
+.dp-ui-inspector .ui-inspector-button { background: var(--dp-accent, #7d8cff); color: #000; border: none; border-radius: 3px; padding: 3px 8px; font-size: 10px; font-weight: bold; cursor: pointer; }
+.dp-ui-inspector .ui-inspector-section { margin: 8px 0; border-top: 1px solid rgba(255,255,255,0.15); padding-top: 6px; }
+.dp-ui-inspector .ui-inspector-section-title { font-weight: bold; margin-bottom: 4px; cursor: pointer; }
+.dp-ui-inspector .ui-inspector-section-body.ui-inspector-collapsed { display: none; }
+.dp-ui-inspector .ui-inspector-hint, .dp-ui-inspector .ui-inspector-note { opacity: 0.6; font-style: italic; }
+.dp-ui-inspector .ui-inspector-config-dump { background: rgba(0,0,0,0.4); padding: 6px; font-size: 9px; max-height: 160px; overflow: auto; white-space: pre-wrap; word-break: break-all; }
+.dp-ui-inspector .ui-inspector-context-tabs { gap: 4px; }
+.dp-ui-inspector .ui-inspector-tab-button { opacity: 0.6; }
+.dp-ui-inspector .ui-inspector-tab-active { opacity: 1; box-shadow: 0 0 0 2px #fff inset; }
+.dp-ui-inspector .ui-inspector-group-label { opacity: 0.7; font-size: 10px; font-style: italic; }
+.dp-ui-inspector .ui-inspector-add-override-picker { border: 1px dashed var(--dp-accent, #7d8cff); padding: 6px; margin-top: 6px; border-radius: 4px; }

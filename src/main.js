@@ -8,7 +8,8 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js'
 import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js'
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js'
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js'
-import { createUIElement, replaceLayoutNode } from '../lib/ui-engine/registry.mjs'
+import { createUIElement, replaceLayoutNode, registerStorageBackend, loadLayoutConfig, captureAllLayoutConfigs, setActiveContextOverride, getElement as getEngineElement } from '../lib/ui-engine/registry.mjs'
+import { mountInspector, refreshInspector } from '../lib/ui-engine/inspector.mjs'
 import { resolveLengthValue } from '../lib/ui-engine/engine.mjs'
 import { DEV_MODE, initDevPanel, syncValue, setControlValue, copyControlState, isApplyingPanelState, onPanelStateApplied, peekRestoredValue, forgetControlsWithPrefix, seedControlValue, refreshListPickerTogglesByKey, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab, beginDynamicBatch, endDynamicBatch, refreshListPickerMarksByKey } from './devpanel/devPanel.js?v=87'
 
@@ -862,41 +863,124 @@ function lpBlendFrac() { return THREE.MathUtils.clamp((cfg.loadingPreviewScalePc
 function lpBlend(px) { return { pxValue: px, vwValue: px / lpRef() * 100, blend: lpBlendFrac(), vwUnit: 'vmin' } }
 function lpLen(px) { return resolveLengthValue(lpBlend(px), {}) }
 // The canvas's real rendered width when it is on screen (what the engine's CSS made of the blended length), else the same arithmetic in plain numbers.
-function lpCanvasPx() { const w = loadingPreviewCanvas ? loadingPreviewCanvas.offsetWidth : 0; return w > 0 ? w : Math.max(20, Math.round(lpPx(cfg.loadingPreviewSize || 160))) }
 function lpPx(px) { const vmin = Math.min(window.innerWidth, window.innerHeight); return px * ((1 - lpBlendFrac()) + lpBlendFrac() * vmin / lpRef()) }
-const lpEngineLayouts = {} // element id -> the layout JSON last handed to the engine (an unchanged layout is not re-resolved)
-function lpApplyEngineElement(id, node, layout) {
-  if (!node) return
-  const json = JSON.stringify(layout)
-  if (lpEngineLayouts[id] === json) return
+// The position and size of the animation and of the text are owned by the UI Layout Engine and edited with ITS Inspector (Loading Preview > Layout): any mode (anchored to a browser side, centred, fixed to a corner ...)
+// and any CSS length (px, vw, vh, vmin, %) per axis, plus Mobile Portrait / Mobile Landscape overrides. The engine's layouts are stored as JSON in the hidden cfg.loadingPreviewLayout, so they travel with Save, Reset,
+// Undo and every saved dev setting. Until the Inspector has ever stored a layout, the first one is built from the older Px sliders (so nothing moves).
+function lpSeedLen(px) {
+  const b = lpBlendFrac()
+  if (b >= 0.999) return Math.round(px / lpRef() * 100000) / 1000 + 'vmin'
+  if (b <= 0.001) return px + 'px'
+  return 'calc(' + (1 - b) * px + 'px + ' + Math.round(b * px / lpRef() * 100000) / 1000 + 'vmin)'
+}
+function lpSeedLayout(id) {
+  const off = id === 'loadingPreviewText' ? [cfg.loadingPreviewTextOffsetX ?? 0, cfg.loadingPreviewTextOffsetY ?? 0] : [cfg.loadingPreviewPosX || 0, cfg.loadingPreviewPosY || 0]
+  const position = { mode: 'anchor', horizontal: { anchor: 'center', offset: lpSeedLen(off[0]) }, vertical: { anchor: 'center', offset: lpSeedLen(off[1]) } }
+  if (id === 'loadingPreviewText') return { position, size: { width: { mode: 'content' }, height: { mode: 'content' } } }
+  const s = lpSeedLen(Math.max(20, cfg.loadingPreviewSize || 160))
+  return { position, size: { width: { mode: 'fixed', value: s }, height: { mode: 'fixed', value: s } } }
+}
+const lpRegistered = {}
+let lpBackendReady = false, lpPersisting = false, lpLoadingStored = false
+let lpRestoreDone = false // until the settings restore has landed in cfg, layouts are only shown, never stored (the seed would come from code defaults)
+function lpPreviewBuilt() { try { return !!(loadingPreviewCanvas && loadingPreviewRenderer) } catch (e) { return false } } // loadingPreviewCanvas is declared far below: this can run before it exists
+const LP_ENGINE_IDS = ['loadingPreviewCanvas', 'loadingPreviewText']
+function lpEnsureBackend() {
+  if (lpBackendReady) return
+  lpBackendReady = true
+  registerStorageBackend({
+    save: (state) => lpWriteLayoutCfg(state),
+    load: () => { try { return cfg.loadingPreviewLayout ? JSON.parse(cfg.loadingPreviewLayout) : null } catch (e) { return null } }
+  })
+}
+function lpOwnState() { const all = captureAllLayoutConfigs(); const out = {}; LP_ENGINE_IDS.forEach((id) => { if (all[id]) out[id] = all[id] }); return out }
+function lpWriteLayoutCfg(state) {
+  const own = {}
+  LP_ENGINE_IDS.forEach((id) => { if (state && state[id]) own[id] = state[id] })
+  const json = JSON.stringify(own)
+  if (json === cfg.loadingPreviewLayout) return
+  lpPersisting = true
+  try { cfg.loadingPreviewLayout = json; try { syncValue('loadingPreviewLayout', json) } catch (e) { /* no panel */ } } finally { lpPersisting = false }
+}
+// Engine -> cfg after the Inspector (or anything) changed a layout.
+function lpPersistLayoutIfChanged() { try { lpWriteLayoutCfg(lpOwnState()) } catch (e) { /* engine not ready */ } }
+// cfg -> engine (a restore, Use, Undo, Reset): loads the stored layouts into every registered element, then re-measures.
+function lpLoadStoredLayout() {
+  if (lpPersisting || lpLoadingStored) return
+  lpEnsureBackend()
+  lpLoadingStored = true
+  try {
+    if (cfg.loadingPreviewLayout) loadLayoutConfig()
+    try { refreshInspector() } catch (e) { /* not mounted */ }
+    if (lpPreviewBuilt()) resizeLoadingPreview()
+  } catch (e) { console.error('Loading Preview layout (UI engine) restore failed', e) } finally { lpLoadingStored = false }
+}
+function lpEngineContext() { const d = realDeviceClass(); return d === 'mobile' ? 'mobilePortrait' : (d === 'landscape' ? 'mobileLandscape' : 'base') }
+function lpSyncEngineContext() { try { setActiveContextOverride(lpEngineContext()) } catch (e) { /* engine not ready */ } }
+function lpEnsureEngineElement(id, node) {
+  if (!node || lpRegistered[id]) return
+  lpEnsureBackend()
   try {
     node.classList.add('ui-element')
-    if (lpEngineLayouts[id] === undefined) createUIElement({ id, role: 'decoration', layout, domNode: node })
-    else { replaceLayoutNode(id, ['position'], layout.position); replaceLayoutNode(id, ['size'], layout.size) }
-    lpEngineLayouts[id] = json
+    createUIElement({ id, role: 'decoration', layout: lpSeedLayout(id), domNode: node, group: 'Loading Preview', propertyLabel: id === 'loadingPreviewText' ? 'Text' : 'Animation' })
+    lpRegistered[id] = true
+    lpLoadStoredLayout() // a layout stored by the Inspector wins over the seed
+    if (lpRestoreDone) lpPersistLayoutIfChanged() // keeps every seed (an element the stored layout does not know yet) part of every save
+    lpSyncEngineContext()
   } catch (e) { console.error('Loading Preview layout (UI engine) failed for ' + id, e) }
 }
-function lpCenteredLayout(offX, offY, size) {
-  return { position: { mode: 'anchor', horizontal: { anchor: 'center', offset: lpBlend(offX) }, vertical: { anchor: 'center', offset: lpBlend(offY) } }, size }
-}
+function applyLoadingPreviewLayout() { lpEnsureEngineElement('loadingPreviewCanvas', document.getElementById('loadingPreviewCanvas')) }
+function applyLoadingPreviewTextLayout(el) { lpEnsureEngineElement('loadingPreviewText', el) }
 let lpCanvasObserver = null
-function applyLoadingPreviewLayout() {
-  // Keeps the WebGL buffer (and the blocker spread) matched to the box the browser actually gives the canvas whenever the browser is resized or the canvas is shown.
-  if (!lpCanvasObserver && typeof ResizeObserver !== 'undefined') {
-    const cv = document.getElementById('loadingPreviewCanvas')
-    if (cv) { lpCanvasObserver = new ResizeObserver(() => { if (loadingPreviewRenderer && cv.offsetWidth > 0) resizeLoadingPreview() }); lpCanvasObserver.observe(cv) }
-  }
-  const s = lpBlend(Math.max(20, cfg.loadingPreviewSize || 160))
-  lpApplyEngineElement('loadingPreviewCanvas', document.getElementById('loadingPreviewCanvas'), lpCenteredLayout(cfg.loadingPreviewPosX || 0, cfg.loadingPreviewPosY || 0, { width: { mode: 'fixed', value: s }, height: { mode: 'fixed', value: s } }))
+function lpObserveCanvas() {
+  if (lpCanvasObserver || typeof ResizeObserver === 'undefined') return
+  const cv = document.getElementById('loadingPreviewCanvas')
+  if (cv) { lpCanvasObserver = new ResizeObserver(() => { if (loadingPreviewRenderer && cv.offsetWidth > 0) resizeLoadingPreview() }); lpCanvasObserver.observe(cv) }
 }
-function applyLoadingPreviewTextLayout(el) {
-  lpApplyEngineElement('loadingPreviewText', el, lpCenteredLayout(cfg.loadingPreviewTextOffsetX ?? 0, cfg.loadingPreviewTextOffsetY ?? 0, { width: { mode: 'content' }, height: { mode: 'content' } }))
+// The canvas's real rendered box (what the engine's CSS made of its layout), else the legacy size slider.
+function lpCanvasW() { const w = loadingPreviewCanvas ? loadingPreviewCanvas.offsetWidth : 0; return w > 0 ? w : Math.max(20, Math.round(lpPx(cfg.loadingPreviewSize || 160))) }
+function lpCanvasH() { const h = loadingPreviewCanvas ? loadingPreviewCanvas.offsetHeight : 0; return h > 0 ? h : Math.max(20, Math.round(lpPx(cfg.loadingPreviewSize || 160))) }
+const LP_LAYOUT_GROUP_KEY = 'Loading Preview > Layout'
+const LP_LEGACY_LAYOUT_ROWS = ['loadingPreviewSize', 'loadingPreviewPosX', 'loadingPreviewPosY', 'loadingPreviewTextOffsetX', 'loadingPreviewTextOffsetY', 'loadingPreviewLayout']
+// Builds (or finds again after a saved layout restored it) the Layout subgroup of Loading Preview and mounts the UI engine's Inspector in it: element picker (Animation / Text), Base / Mobile Portrait / Mobile Landscape tabs,
+// position mode (anchor / fixed / absolute ...), alignment to a browser side, offsets and size in any CSS unit. Idempotent.
+function setupLoadingPreviewLayoutGroup() {
+  applyLoadingPreviewLayout()
+  const textEl = document.getElementById('loadingPreviewText')
+  if (textEl) applyLoadingPreviewTextLayout(textEl)
+  // The settings are restored now. With no stored layout yet, the layouts built from code defaults are rebuilt from the restored Px values (so nothing moves); a stored one is loaded.
+  lpRestoreDone = true
+  if (cfg.loadingPreviewLayout) lpLoadStoredLayout()
+  else { LP_ENGINE_IDS.forEach((id) => { if (lpRegistered[id]) { const seed = lpSeedLayout(id); try { replaceLayoutNode(id, ['position'], seed.position); replaceLayoutNode(id, ['size'], seed.size) } catch (e) { console.error(e) } } }); lpPersistLayoutIfChanged() }
+  lpSyncEngineContext()
+  const lpGroup = document.querySelector('.dp-group[data-key="Loading Preview"]')
+  if (!lpGroup) return
+  // The older Px sliders for the same things are replaced by the Inspector (their values only seeded the first layout): hidden.
+  LP_LEGACY_LAYOUT_ROWS.forEach((k) => { const r = document.querySelector('.dp-row[data-key="' + k + '"]'); if (r) r.style.display = 'none' })
+  let g = document.querySelector('.dp-group[data-key="' + LP_LAYOUT_GROUP_KEY + '"]')
+  if (!g) {
+    g = createGroupElement('Layout (UI Engine Inspector)')
+    g.dataset.key = LP_LAYOUT_GROUP_KEY
+    lpGroup.querySelector(':scope > .dp-group-body').appendChild(g)
+  }
+  const title = g.querySelector(':scope > .dp-group-header .dp-group-title-text')
+  if (title && title.textContent === LP_LAYOUT_GROUP_KEY) title.textContent = 'Layout (UI Engine Inspector)'
+  const body = g.querySelector(':scope > .dp-group-body')
+  if (!body) return
+  body.innerHTML = ''
+  const mount = document.createElement('div')
+  mount.className = 'dp-ui-inspector'
+  body.appendChild(mount)
+  try { mountInspector(mount) } catch (e) { console.error('UI engine Inspector failed to mount', e); return }
+  let t = null
+  const persistSoon = () => { clearTimeout(t); t = setTimeout(() => { lpPersistLayoutIfChanged(); resizeLoadingPreview(); updateLoadingPreviewText() }, 120) }
+  ;['input', 'change', 'click'].forEach((ev) => mount.addEventListener(ev, persistSoon))
 }
 function refreshLoadingPreviewLayout() {
   try { resizeLoadingPreview() } catch (e) { /* preview not built yet */ }
   updateLoadingPreviewText()
 }
-window.addEventListener('resize', () => { if (loadingPreviewCanvas && loadingPreviewRenderer) resizeLoadingPreview(); updateLoadingPreviewText() })
+window.addEventListener('resize', () => { lpSyncEngineContext(); if (lpPreviewBuilt()) resizeLoadingPreview(); updateLoadingPreviewText() })
 
 const LOADING_TEXT_ROW_KEYS = ['loadingPreviewTextContent', 'loadingPreviewTextFontSize', 'loadingPreviewTextLetterSpacing', 'loadingPreviewTextColor', 'loadingPreviewTextFont', 'loadingPreviewTextOffsetX', 'loadingPreviewTextOffsetY']
 const LOADING_TEXT_GROUP_KEY = 'Loading Preview > Text'
@@ -2502,8 +2586,9 @@ const DEV_GROUPS = [
       // Responsive to the browser (2026-10-15, direct request: "font and animation size and placement to be responsive to the browser"), through the UI Layout Engine's blended-length values (lib/ui-engine, see
       // applyLoadingPreviewLayout()). Every Px value of the Loading Preview (animation size, its position, the text's size, letter spacing and offsets) is the value AT the reference browser size; Scale With Browser blends it
       // from fixed pixels (0%) to growing / shrinking with the browser's shorter side (100%), so the whole composition keeps its proportions on a phone, a tablet and a big desktop.
-      { key: 'loadingPreviewScalePct', label: 'Scale With Browser (%)', type: 'slider', min: 0, max: 100, step: 1, def: 100, perDevice: true, onChange: () => refreshLoadingPreviewLayout() },
-      { key: 'loadingPreviewScaleRefPx', label: 'Browser Reference Size (Px, Shorter Side)', type: 'slider', min: 300, max: 3000, step: 10, def: 1080, perDevice: true, onChange: () => refreshLoadingPreviewLayout() },
+      { key: 'loadingPreviewLayout', label: 'Loading Preview Layout (internal, edited in the Layout group)', type: 'text', def: '', onChange: () => lpLoadStoredLayout() },
+      { key: 'loadingPreviewScalePct', label: 'Font Scale With Browser (%)', type: 'slider', min: 0, max: 100, step: 1, def: 100, perDevice: true, onChange: () => refreshLoadingPreviewLayout() },
+      { key: 'loadingPreviewScaleRefPx', label: 'Font Reference Browser Size (Px, Shorter Side)', type: 'slider', min: 300, max: 3000, step: 10, def: 1080, perDevice: true, onChange: () => refreshLoadingPreviewLayout() },
       { key: 'loadingPreviewPosX', label: 'Loading Preview Position X (Px)', type: 'slider', min: -1500, max: 1500, step: 1, def: 0, perDevice: true, onChange: () => refreshLoadingPreviewLayout() },
       { key: 'loadingPreviewPosY', label: 'Loading Preview Position Y (Px)', type: 'slider', min: -1500, max: 1500, step: 1, def: 0, perDevice: true, onChange: () => refreshLoadingPreviewLayout() },
       // CORRECTED 2026-09-19, direct request+follow-up ("Loading Preview
@@ -3705,6 +3790,7 @@ const cfg = initDevPanel(DEV_GROUPS, {
     prof('placeDepthControlsInFeatureGroups', placeDepthControlsInFeatureGroups)
     prof('placeLoadingPreviewLightingRows', placeLoadingPreviewLightingRows)
     prof('setupLoadingPreviewTextGroup', setupLoadingPreviewTextGroup)
+    prof('setupLoadingPreviewLayoutGroup', setupLoadingPreviewLayoutGroup)
     try { await setupResponsiveVelocity() } catch (e) { console.error('Responsive Velocity setup failed', e) }
     exclusiveTriggersReady = true // from here on a user turning a click function on / changing its trigger switches an overlapping one off
     refreshCustomFunctionConflictWarnings()
@@ -8823,7 +8909,7 @@ function syncLoadingPreviewBackground() {
   // screen is up: afterwards the preview background is transparent (Show Loading Preview Live), so no blocker then.
   try {
     if (loadingPreviewCanvas) {
-      const size = lpCanvasPx()
+      const size = Math.max(lpCanvasW(), lpCanvasH())
       loadingPreviewCanvas.style.boxShadow = fieldRevealed ? 'none' : `0 0 0 ${Math.round(size / 2)}px ${cfg.bgColor}`
     }
   } catch (err) { /* not built yet */ }
@@ -8900,11 +8986,12 @@ function applyLoadingPreviewLightingDefault() {
 // otherwise never take effect until next reload).
 function resizeLoadingPreview() {
   if (!loadingPreviewCanvas || !loadingPreviewRenderer) return
-  applyLoadingPreviewLayout() // the canvas's CSS size / position come from the UI Layout Engine (responsive); only the WebGL buffer size is set here
-  const size = lpCanvasPx()
-  loadingPreviewCamera.aspect = 1
+  applyLoadingPreviewLayout() // the canvas's CSS size / position come from the UI Layout Engine (edited in its Inspector); only the WebGL buffer size is set here
+  lpObserveCanvas()
+  const w = lpCanvasW(), h = lpCanvasH()
+  loadingPreviewCamera.aspect = w / h
   loadingPreviewCamera.updateProjectionMatrix()
-  loadingPreviewRenderer.setSize(size, size, false)
+  loadingPreviewRenderer.setSize(w, h, false)
   syncLoadingPreviewBackground() // the blocker's spread follows the size
 }
 // Loading Preview Offset X/Y (Px) -- same "called once at build time and
