@@ -17070,6 +17070,10 @@ function triggerCustomPoseFunctions(type, clickCount = 1) {
   const deviceFamily = currentDeviceFamily()
   customClickFunctionIds.forEach(({ id, kind, family }) => {
     if (kind === 'hold' || cfg[`${id}Type`] !== type) return
+    // A function that is switched OFF fires nothing, including its Multi Trigger triggers (2026-10-15, direct report: only one hand followed the function being tuned while the others did something else). The base
+    // Enabled used to be checked only through startClickHoldPose() / triggerClickPose() for the prefix that got resolved, and a trigger prefix has its own Enabled, so every disabled function whose trigger was
+    // left on still fired on the presses its cycle landed on the trigger, together with the enabled one, and each hand ended up with whichever finished last.
+    if (!cfg[`${id}Enabled`]) return
     // Real device/family gating -- direct request 2026-09-24 (item 14):
     // previously nothing here checked family at all, so a mobile-created
     // function fired on ANY device, including Desktop. See
@@ -17121,6 +17125,7 @@ function startCustomHoldFunctions(type, ordinal = 1) {
   const deviceFamily = currentDeviceFamily()
   customClickFunctionIds.forEach(({ id, kind, family }) => {
     if (kind !== 'hold' || cfg[`${id}Type`] !== type) return
+    if (!cfg[`${id}Enabled`]) return // a switched-off function fires nothing, not even an enabled Multi Trigger trigger (see triggerCustomPoseFunctions())
     if (!customFunctionActiveForDeviceFamily(family, id, deviceFamily)) return
     if (type === 'Click+Hold' && customFunctionClickCountOrdinal(id) !== ordinal) return
     if (type === 'Click+Hold' && customFunctionWantsMultiTouch(id)) return
