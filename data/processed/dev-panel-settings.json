@@ -31,7 +31,7 @@
       "alternateRowOffset": 4,
       "progressiveRowOffset": 1,
       "useProgressiveOffset": false,
-      "hideHands": false,
+      "hideHands": true,
       "fieldOffsetX": 0,
       "fieldOffsetY": 0,
       "fieldOffsetZ": 0,
@@ -87,7 +87,7 @@
       "palmFacesCursorDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
       "palmFacesCursorDistanceRange": "{\"min\":1,\"max\":100}",
       "loadingPreviewEnabled": true,
-      "loadingPreviewShowLive": false,
+      "loadingPreviewShowLive": true,
       "loadingMinTimeMs": 5000,
       "loadingPreviewTweenSelector": "Two-Hand Tween",
       "loadingPreviewSavedCameras": [
@@ -277,14 +277,14 @@
       "loadingPreviewSequenceLoopTransition": true,
       "loadingPreviewSequenceHoldMs": 0,
       "loadingPreviewSize": 1390,
-      "loadingPreviewRotationX": -72.64061830901377,
-      "loadingPreviewRotationY": -84.41125744088593,
+      "loadingPreviewRotationX": -78.6159921048935,
+      "loadingPreviewRotationY": 178.0181192233658,
       "loadingPreviewRotationZ": 0,
-      "loadingPreviewOffsetX": 144.75565031265816,
-      "loadingPreviewOffsetY": 7.428233832709653,
-      "loadingPreviewOffsetZ": -60.063441995166734,
+      "loadingPreviewOffsetX": 15.362602066778717,
+      "loadingPreviewOffsetY": -1.8931168418711346,
+      "loadingPreviewOffsetZ": -26.95792336884333,
       "loadingPreviewCameraFov": 32,
-      "loadingPreviewCameraZoom": 554.0259038461437,
+      "loadingPreviewCameraZoom": 631.5047486471495,
       "loadingPreviewCameraEditMode": true,
       "customClickFunctionIds": "[{\"id\":\"custom19\",\"title\":\"Custom Click Function 19\",\"kind\":\"pose\",\"family\":\"mobile\"},{\"id\":\"custom20\",\"title\":\"Custom Click Function 20\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom21\",\"title\":\"Custom Click Function 21\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom22\",\"title\":\"Custom Click Function 22\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom23\",\"title\":\"Custom Click Function 23\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom24\",\"title\":\"Custom Click Function 24\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom25\",\"title\":\"Custom Click Function 25\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom26\",\"title\":\"Custom Click Function 26\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom27\",\"title\":\"Custom Click Function 27\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom28\",\"title\":\"Custom Click Function 28\",\"kind\":\"pose\",\"family\":\"mobile\"},{\"id\":\"custom29\",\"title\":\"Custom Click Function 29\",\"kind\":\"pose\",\"family\":\"mobile\"},{\"id\":\"custom30\",\"title\":\"Custom Click Function 30\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom31\",\"title\":\"Custom Click Function 31\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom32\",\"title\":\"Custom Click Function 32\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom33\",\"title\":\"Custom Click Function 33\",\"kind\":\"pose\",\"family\":\"desktop\"}]",
       "holdConfirmMs": 400,
@@ -11322,7 +11322,7 @@
       "alternateRowOffset": -6.5,
       "progressiveRowOffset": 1,
       "useProgressiveOffset": false,
-      "hideHands": false,
+      "hideHands": true,
       "fieldOffsetX": 0,
       "fieldOffsetY": 0,
       "fieldOffsetZ": 0,
@@ -11378,7 +11378,7 @@
       "palmFacesCursorDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
       "palmFacesCursorDistanceRange": "{\"min\":1,\"max\":100}",
       "loadingPreviewEnabled": true,
-      "loadingPreviewShowLive": false,
+      "loadingPreviewShowLive": true,
       "loadingMinTimeMs": 5000,
       "loadingPreviewTweenSelector": "Two-Hand Tween",
       "loadingPreviewSavedCameras": [
@@ -11568,14 +11568,14 @@
       "loadingPreviewSequenceLoopTransition": true,
       "loadingPreviewSequenceHoldMs": 0,
       "loadingPreviewSize": 1390,
-      "loadingPreviewRotationX": -72.64061830901377,
-      "loadingPreviewRotationY": -84.41125744088593,
+      "loadingPreviewRotationX": -78.6159921048935,
+      "loadingPreviewRotationY": 178.0181192233658,
       "loadingPreviewRotationZ": 0,
-      "loadingPreviewOffsetX": 144.75565031265816,
-      "loadingPreviewOffsetY": 7.428233832709653,
-      "loadingPreviewOffsetZ": -60.063441995166734,
+      "loadingPreviewOffsetX": 15.362602066778717,
+      "loadingPreviewOffsetY": -1.8931168418711346,
+      "loadingPreviewOffsetZ": -26.95792336884333,
       "loadingPreviewCameraFov": 32,
-      "loadingPreviewCameraZoom": 554.0259038461437,
+      "loadingPreviewCameraZoom": 631.5047486471495,
       "loadingPreviewCameraEditMode": true,
       "customClickFunctionIds": "[{\"id\":\"custom19\",\"title\":\"Custom Click Function 19\",\"kind\":\"pose\",\"family\":\"mobile\"},{\"id\":\"custom20\",\"title\":\"Custom Click Function 20\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom21\",\"title\":\"Custom Click Function 21\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom22\",\"title\":\"Custom Click Function 22\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom23\",\"title\":\"Custom Click Function 23\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom24\",\"title\":\"Custom Click Function 24\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom25\",\"title\":\"Custom Click Function 25\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom26\",\"title\":\"Custom Click Function 26\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom27\",\"title\":\"Custom Click Function 27\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom28\",\"title\":\"Custom Click Function 28\",\"kind\":\"pose\",\"family\":\"mobile\"},{\"id\":\"custom29\",\"title\":\"Custom Click Function 29\",\"kind\":\"pose\",\"family\":\"mobile\"},{\"id\":\"custom30\",\"title\":\"Custom Click Function 30\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom31\",\"title\":\"Custom Click Function 31\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom32\",\"title\":\"Custom Click Function 32\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom33\",\"title\":\"Custom Click Function 33\",\"kind\":\"pose\",\"family\":\"desktop\"}]",
       "holdConfirmMs": 400,
@@ -22669,7 +22669,7 @@
       "palmFacesCursorDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
       "palmFacesCursorDistanceRange": "{\"min\":1,\"max\":100}",
       "loadingPreviewEnabled": true,
-      "loadingPreviewShowLive": false,
+      "loadingPreviewShowLive": true,
       "loadingMinTimeMs": 5000,
       "loadingPreviewTweenSelector": "Two-Hand Tween",
       "loadingPreviewSavedCameras": [
@@ -22859,14 +22859,14 @@
       "loadingPreviewSequenceLoopTransition": true,
       "loadingPreviewSequenceHoldMs": 0,
       "loadingPreviewSize": 1390,
-      "loadingPreviewRotationX": -72.64061830901377,
-      "loadingPreviewRotationY": -84.41125744088593,
+      "loadingPreviewRotationX": -78.6159921048935,
+      "loadingPreviewRotationY": 178.0181192233658,
       "loadingPreviewRotationZ": 0,
-      "loadingPreviewOffsetX": 144.75565031265816,
-      "loadingPreviewOffsetY": 7.428233832709653,
-      "loadingPreviewOffsetZ": -60.063441995166734,
+      "loadingPreviewOffsetX": 15.362602066778717,
+      "loadingPreviewOffsetY": -1.8931168418711346,
+      "loadingPreviewOffsetZ": -26.95792336884333,
       "loadingPreviewCameraFov": 32,
-      "loadingPreviewCameraZoom": 554.0259038461437,
+      "loadingPreviewCameraZoom": 631.5047486471495,
       "loadingPreviewCameraEditMode": true,
       "customClickFunctionIds": "[{\"id\":\"custom19\",\"title\":\"Custom Click Function 19\",\"kind\":\"pose\",\"family\":\"mobile\"},{\"id\":\"custom20\",\"title\":\"Custom Click Function 20\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom21\",\"title\":\"Custom Click Function 21\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom22\",\"title\":\"Custom Click Function 22\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom23\",\"title\":\"Custom Click Function 23\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom24\",\"title\":\"Custom Click Function 24\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom25\",\"title\":\"Custom Click Function 25\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom26\",\"title\":\"Custom Click Function 26\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom27\",\"title\":\"Custom Click Function 27\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom28\",\"title\":\"Custom Click Function 28\",\"kind\":\"pose\",\"family\":\"mobile\"},{\"id\":\"custom29\",\"title\":\"Custom Click Function 29\",\"kind\":\"pose\",\"family\":\"mobile\"},{\"id\":\"custom30\",\"title\":\"Custom Click Function 30\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom31\",\"title\":\"Custom Click Function 31\",\"kind\":\"hold\",\"family\":\"desktop\"},{\"id\":\"custom32\",\"title\":\"Custom Click Function 32\",\"kind\":\"pose\",\"family\":\"desktop\"},{\"id\":\"custom33\",\"title\":\"Custom Click Function 33\",\"kind\":\"pose\",\"family\":\"desktop\"}]",
       "holdConfirmMs": 400,
@@ -35246,7 +35246,7 @@
     },
     {
       "key": "New Group (9)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -35344,7 +35344,7 @@
           "type": "group",
           "group": {
             "key": "Loading Preview",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -35425,7 +35425,7 @@
                 "type": "group",
                 "group": {
                   "key": "New Group (7)",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -35572,7 +35572,7 @@
               },
               {
                 "key": "New Group (7)",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -35738,7 +35738,7 @@
         },
         {
           "key": "Loading Preview",
-          "collapsed": true,
+          "collapsed": false,
           "locked": false,
           "items": [
             {
@@ -35819,7 +35819,7 @@
               "type": "group",
               "group": {
                 "key": "New Group (7)",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -35966,7 +35966,7 @@
             },
             {
               "key": "New Group (7)",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -36045,14 +36045,14 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
           "type": "group",
           "group": {
             "key": "Field Layout",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -37358,7 +37358,7 @@
           "type": "group",
           "group": {
             "key": "Cursor Tracking",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -37865,7 +37865,7 @@
       "subgroups": [
         {
           "key": "Field Layout",
-          "collapsed": true,
+          "collapsed": false,
           "locked": true,
           "items": [
             {
@@ -39156,7 +39156,7 @@
         },
         {
           "key": "Cursor Tracking",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -261454,18 +261454,18 @@
     "pauseBtnIconColor": false,
     "pauseBtnBorderColor": false,
     "bgColor": false,
-    "loadingPreviewShowLive": false,
-    "loadingPreviewEnabled": false,
-    "loadingPreviewCameraEditMode": false,
-    "loadingMinTimeMs": false,
-    "loadingPreviewRotationX": false,
-    "loadingPreviewRotationY": false,
-    "loadingPreviewRotationZ": false,
-    "loadingPreviewOffsetX": false,
-    "loadingPreviewOffsetY": false,
-    "loadingPreviewOffsetZ": false,
-    "loadingPreviewCameraFov": false,
-    "loadingPreviewCameraZoom": false,
+    "loadingPreviewShowLive": true,
+    "loadingPreviewEnabled": true,
+    "loadingPreviewCameraEditMode": true,
+    "loadingMinTimeMs": true,
+    "loadingPreviewRotationX": true,
+    "loadingPreviewRotationY": true,
+    "loadingPreviewRotationZ": true,
+    "loadingPreviewOffsetX": true,
+    "loadingPreviewOffsetY": true,
+    "loadingPreviewOffsetZ": true,
+    "loadingPreviewCameraFov": true,
+    "loadingPreviewCameraZoom": true,
     "loadingPreviewTweenSelector": false,
     "loadingPreviewCameraSelector": false,
     "loadingPreviewLightingSelector": false,
@@ -261689,8 +261689,8 @@
   "devIndependence": {
     "mobile": {
       "custom13RetransitionSpeedCurveEnabled": true,
-      "loadingPreviewCameraEditMode": false,
-      "loadingPreviewSpeedMs": false,
+      "loadingPreviewCameraEditMode": true,
+      "loadingPreviewSpeedMs": true,
       "custom24Trig1CameraOffsetEnabled": false,
       "custom24Trig1CameraOffsetXEnabled": false,
       "custom24Trig1CameraOffsetYEnabled": false,
@@ -262352,26 +262352,26 @@
       "pauseBtnIconColor": false,
       "pauseBtnBorderColor": false,
       "bgColor": false,
-      "loadingPreviewShowLive": false,
-      "loadingPreviewEnabled": false,
-      "loadingMinTimeMs": false,
-      "loadingPreviewRotationX": false,
-      "loadingPreviewRotationY": false,
-      "loadingPreviewRotationZ": false,
-      "loadingPreviewOffsetX": false,
-      "loadingPreviewOffsetY": false,
-      "loadingPreviewOffsetZ": false,
-      "loadingPreviewCameraFov": false,
-      "loadingPreviewCameraZoom": false,
-      "loadingPreviewTweenSelector": false,
-      "loadingPreviewCameraSelector": false,
-      "loadingPreviewLightingSelector": false,
-      "loadingPreviewSequenceMode": false,
-      "loadingPreviewSequenceCountMode": false,
-      "loadingPreviewSequenceCount": false,
-      "loadingPreviewSize": false,
-      "loadingPreviewSequenceHoldMs": false,
-      "loadingPreviewSequenceLoopTransition": false,
+      "loadingPreviewShowLive": true,
+      "loadingPreviewEnabled": true,
+      "loadingMinTimeMs": true,
+      "loadingPreviewRotationX": true,
+      "loadingPreviewRotationY": true,
+      "loadingPreviewRotationZ": true,
+      "loadingPreviewOffsetX": true,
+      "loadingPreviewOffsetY": true,
+      "loadingPreviewOffsetZ": true,
+      "loadingPreviewCameraFov": true,
+      "loadingPreviewCameraZoom": true,
+      "loadingPreviewTweenSelector": true,
+      "loadingPreviewCameraSelector": true,
+      "loadingPreviewLightingSelector": true,
+      "loadingPreviewSequenceMode": true,
+      "loadingPreviewSequenceCountMode": true,
+      "loadingPreviewSequenceCount": true,
+      "loadingPreviewSize": true,
+      "loadingPreviewSequenceHoldMs": true,
+      "loadingPreviewSequenceLoopTransition": true,
       "staticPoseOnStartup": true,
       "hideFloorAfterHandOffset": true,
       "handOffsetOnStartupEnabled": true,
@@ -262443,8 +262443,8 @@
     "mobile": {
       "left": 20,
       "top": 2.6964285373687744,
-      "width": 397.8571472167969,
-      "height": 498.23809814453125
+      "width": 408.1428527832031,
+      "height": 177.39881896972656
     }
   }
 }
