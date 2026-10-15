@@ -7400,65 +7400,7 @@
       "wristSplayRange": "{\"min\":-5,\"max\":0}",
       "wristSplayCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.520072387209009,\"y\":0.023333485921223973}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.47992761279099105,\"y\":-0.0033332824707030806}}]",
       "wristSplayDamping": 0.24,
-      "tweenPoses": [
-        "COUNTDOWN (VERT) - 0",
-        "COUNTDOWN (VERT) - 1",
-        {
-          "type": "hold",
-          "percent": 50
-        },
-        "COUNTDOWN (VERT) - 2",
-        {
-          "type": "hold",
-          "percent": 50
-        },
-        "COUNTDOWN (VERT) - 3",
-        {
-          "type": "hold",
-          "percent": 50
-        },
-        "COUNTDOWN (VERT) - 4",
-        {
-          "type": "hold",
-          "percent": 50
-        },
-        "COUNTDOWN (VERT) - 5",
-        {
-          "type": "hold",
-          "percent": 50
-        },
-        "COUNTDOWN (VERT) - 6",
-        {
-          "type": "hold",
-          "percent": 50
-        },
-        "COUNTDOWN (VERT) - 7",
-        {
-          "type": "hold",
-          "percent": 50
-        },
-        "COUNTDOWN (VERT) - 8",
-        {
-          "type": "hold",
-          "percent": 50
-        },
-        "COUNTDOWN (VERT) - 9",
-        {
-          "type": "hold",
-          "percent": 50
-        },
-        "COUNTDOWN  (VERT) - 10",
-        {
-          "type": "hold",
-          "percent": 50
-        },
-        "Big Open Palm",
-        "COUNTDOWN (VERT) - LENS COVER",
-        {
-          "type": "hold",
-          "percent": 300
-        }
-      ],
+      "tweenPoses": [],
       "tweenPreviewSpeedMs": 602,
       "savedTweenSequences": [
         {
@@ -7879,6 +7821,18 @@
           "tweenPoses": [
             "Closed Flower (DS)",
             "Big Open Palm (S)",
+            "Fist"
+          ]
+        },
+        {
+          "name": "Closed-Flower-Hold-Fist",
+          "tweenPoses": [
+            "Closed Flower (DS)",
+            "Big Open Palm (S)",
+            {
+              "type": "hold",
+              "percent": 300
+            },
             "Fist"
           ]
         }
@@ -8475,7 +8429,7 @@
       "startupFnSequenceHoldMs": 5000,
       "startupFnTransitionSpeedMs": 1000,
       "startupFnEasingCurveEnabled": true,
-      "startupFnEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.2485080295802641,\"y\":0}},{\"x\":0.32285552539002327,\"y\":0.9069791158040365,\"h2\":{\"x\":-0.2860917370786542,\"y\":0.12635421752929688},\"h1\":{\"x\":0.1716551757120629,\"y\":0.07333323160807292}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.7033847803335065,\"y\":0}}]",
+      "startupFnEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.09543983904136633,\"y\":0.00031229654947917407}},{\"x\":1,\"y\":1,\"h2\":{\"x\":0,\"y\":-0.5199999491373698}}]",
       "startupFnRetransitionEasingCurveEnabled": true,
       "startupFnRetransitionEasingCurve": "[{\"x\":0,\"y\":0},{\"x\":0.4554235972960167,\"y\":0.8331250508626302},{\"x\":1,\"y\":0}]",
       "startupFnSpeedCurveEnabled": true,
@@ -18216,65 +18170,7 @@
       "wristSplayRange": "{\"min\":-5,\"max\":0}",
       "wristSplayCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.520072387209009,\"y\":0.023333485921223973}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.47992761279099105,\"y\":-0.0033332824707030806}}]",
       "wristSplayDamping": 0.24,
-      "tweenPoses": [
-        "COUNTDOWN (VERT) - 0",
-        "COUNTDOWN (VERT) - 1",
-        {
-          "type": "hold",
-          "percent": 50
-        },
-        "COUNTDOWN (VERT) - 2",
-        {
-          "type": "hold",
-          "percent": 50
-        },
-        "COUNTDOWN (VERT) - 3",
-        {
-          "type": "hold",
-          "percent": 50
-        },
-        "COUNTDOWN (VERT) - 4",
-        {
-          "type": "hold",
-          "percent": 50
-        },
-        "COUNTDOWN (VERT) - 5",
-        {
-          "type": "hold",
-          "percent": 50
-        },
-        "COUNTDOWN (VERT) - 6",
-        {
-          "type": "hold",
-          "percent": 50
-        },
-        "COUNTDOWN (VERT) - 7",
-        {
-          "type": "hold",
-          "percent": 50
-        },
-        "COUNTDOWN (VERT) - 8",
-        {
-          "type": "hold",
-          "percent": 50
-        },
-        "COUNTDOWN (VERT) - 9",
-        {
-          "type": "hold",
-          "percent": 50
-        },
-        "COUNTDOWN  (VERT) - 10",
-        {
-          "type": "hold",
-          "percent": 50
-        },
-        "Big Open Palm",
-        "COUNTDOWN (VERT) - LENS COVER",
-        {
-          "type": "hold",
-          "percent": 300
-        }
-      ],
+      "tweenPoses": [],
       "tweenPreviewSpeedMs": 602,
       "savedTweenSequences": [
         {
@@ -18695,6 +18591,18 @@
           "tweenPoses": [
             "Closed Flower (DS)",
             "Big Open Palm (S)",
+            "Fist"
+          ]
+        },
+        {
+          "name": "Closed-Flower-Hold-Fist",
+          "tweenPoses": [
+            "Closed Flower (DS)",
+            "Big Open Palm (S)",
+            {
+              "type": "hold",
+              "percent": 300
+            },
             "Fist"
           ]
         }
@@ -19291,7 +19199,7 @@
       "startupFnSequenceHoldMs": 0,
       "startupFnTransitionSpeedMs": 1000,
       "startupFnEasingCurveEnabled": true,
-      "startupFnEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.2485080295802641,\"y\":0}},{\"x\":0.32285552539002327,\"y\":0.9069791158040365,\"h2\":{\"x\":-0.2860917370786542,\"y\":0.12635421752929688},\"h1\":{\"x\":0.1716551757120629,\"y\":0.07333323160807292}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.7033847803335065,\"y\":0}}]",
+      "startupFnEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.09543983904136633,\"y\":0.00031229654947917407}},{\"x\":1,\"y\":1,\"h2\":{\"x\":0,\"y\":-0.5199999491373698}}]",
       "startupFnRetransitionEasingCurveEnabled": true,
       "startupFnRetransitionEasingCurve": "[{\"x\":0,\"y\":0},{\"x\":0.4554235972960167,\"y\":0.8331250508626302},{\"x\":1,\"y\":0}]",
       "startupFnSpeedCurveEnabled": true,
@@ -29032,65 +28940,7 @@
       "wristSplayRange": "{\"min\":-5,\"max\":0}",
       "wristSplayCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.520072387209009,\"y\":0.023333485921223973}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.47992761279099105,\"y\":-0.0033332824707030806}}]",
       "wristSplayDamping": 0.24,
-      "tweenPoses": [
-        "COUNTDOWN (VERT) - 0",
-        "COUNTDOWN (VERT) - 1",
-        {
-          "type": "hold",
-          "percent": 50
-        },
-        "COUNTDOWN (VERT) - 2",
-        {
-          "type": "hold",
-          "percent": 50
-        },
-        "COUNTDOWN (VERT) - 3",
-        {
-          "type": "hold",
-          "percent": 50
-        },
-        "COUNTDOWN (VERT) - 4",
-        {
-          "type": "hold",
-          "percent": 50
-        },
-        "COUNTDOWN (VERT) - 5",
-        {
-          "type": "hold",
-          "percent": 50
-        },
-        "COUNTDOWN (VERT) - 6",
-        {
-          "type": "hold",
-          "percent": 50
-        },
-        "COUNTDOWN (VERT) - 7",
-        {
-          "type": "hold",
-          "percent": 50
-        },
-        "COUNTDOWN (VERT) - 8",
-        {
-          "type": "hold",
-          "percent": 50
-        },
-        "COUNTDOWN (VERT) - 9",
-        {
-          "type": "hold",
-          "percent": 50
-        },
-        "COUNTDOWN  (VERT) - 10",
-        {
-          "type": "hold",
-          "percent": 50
-        },
-        "Big Open Palm",
-        "COUNTDOWN (VERT) - LENS COVER",
-        {
-          "type": "hold",
-          "percent": 300
-        }
-      ],
+      "tweenPoses": [],
       "tweenPreviewSpeedMs": 602,
       "savedTweenSequences": [
         {
@@ -29511,6 +29361,18 @@
           "tweenPoses": [
             "Closed Flower (DS)",
             "Big Open Palm (S)",
+            "Fist"
+          ]
+        },
+        {
+          "name": "Closed-Flower-Hold-Fist",
+          "tweenPoses": [
+            "Closed Flower (DS)",
+            "Big Open Palm (S)",
+            {
+              "type": "hold",
+              "percent": 300
+            },
             "Fist"
           ]
         }
@@ -30107,7 +29969,7 @@
       "startupFnSequenceHoldMs": 5000,
       "startupFnTransitionSpeedMs": 1000,
       "startupFnEasingCurveEnabled": true,
-      "startupFnEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.2485080295802641,\"y\":0}},{\"x\":0.32285552539002327,\"y\":0.9069791158040365,\"h2\":{\"x\":-0.2860917370786542,\"y\":0.12635421752929688},\"h1\":{\"x\":0.1716551757120629,\"y\":0.07333323160807292}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.7033847803335065,\"y\":0}}]",
+      "startupFnEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.09543983904136633,\"y\":0.00031229654947917407}},{\"x\":1,\"y\":1,\"h2\":{\"x\":0,\"y\":-0.5199999491373698}}]",
       "startupFnRetransitionEasingCurveEnabled": true,
       "startupFnRetransitionEasingCurve": "[{\"x\":0,\"y\":0},{\"x\":0.4554235972960167,\"y\":0.8331250508626302},{\"x\":1,\"y\":0}]",
       "startupFnSpeedCurveEnabled": true,
@@ -33315,7 +33177,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -34109,7 +33971,7 @@
           "type": "group",
           "group": {
             "key": "Tween",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -35155,7 +35017,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Easing",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": true,
                   "items": [
                     {
