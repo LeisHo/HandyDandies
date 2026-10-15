@@ -985,6 +985,7 @@ function finalizeReveal() {
   logStartupTiming('reveal finalized (field painted)')
   syncLoadingPreviewBackground() // drops the loading-screen blocker
   loadingEl.classList.add('hidden')
+  document.body.classList.add('hd-revealed') // shows the Pause / Reset / Color Presets buttons (style.css hides them until now)
   // The loading-preview canvas is a top-level sibling of #loading now
   // (2026-09-17, decoupled specifically so this moment doesn't force it
   // to disappear too) -- hide it UNLESS the live-preview toggle wants it

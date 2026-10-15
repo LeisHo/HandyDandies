@@ -106,6 +106,8 @@ html, body {
   -webkit-tap-highlight-color: transparent;
 }
 #pauseButton:hover, #resetButton:hover { background: rgba(0, 0, 0, 0.75); }
+/* The three corner buttons (Pause, Reset, Color Presets) stay hidden until the loading screen is gone (2026-10-15, direct request): body gets .hd-revealed in finalizeReveal(). visibility, not display, so their own styling code is untouched. */
+body:not(.hd-revealed) #pauseButton, body:not(.hd-revealed) #resetButton, body:not(.hd-revealed) #presetButton, body:not(.hd-revealed) #presetPanel { visibility: hidden; pointer-events: none; }
 
 /* ---------------------------------------------------------------------
    Dev panel (CLAUDE.md Section 12) -- reused verbatim from ADA BATHROOM's
