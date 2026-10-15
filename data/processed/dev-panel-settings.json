@@ -7961,7 +7961,7 @@
         }
       ],
       "cameraX": 1.9534883720930232,
-      "cameraY": 1.1598705435868485e-14,
+      "cameraY": 4.6394821743473946e-14,
       "cameraZ": 214.9004898795015,
       "cameraFov": 20,
       "cameraYaw": 0,
@@ -12801,14 +12801,12 @@
       "custom37ReverseSequence": false,
       "custom37GlideToFirstPose": true,
       "custom37FirstGlideTimeScale": 2.2,
+      "custom37TweenChain": [],
       "custom37TweenSpeedMs": 800,
       "custom37TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom37TweenStartTimeRange": "{\"min\":0,\"max\":1300}",
-      "custom37SequencePlayMode": "Count",
-      "custom37SequenceCount": 1,
-      "custom37SequenceCountMode": "Loop",
-      "custom37SequenceLoopTransition": true,
-      "custom37SequenceHoldMs": 0,
+      "custom37LoopMode": "Off",
+      "custom37LoopHoldMs": 0,
       "custom37TransitionSpeedMs": 700,
       "custom37EasingCurveEnabled": true,
       "custom37EasingCurve": "[{\"x\":0,\"y\":0},{\"x\":0.4880215276248272,\"y\":0.9433334350585938},{\"x\":1,\"y\":0}]",
@@ -12826,7 +12824,6 @@
       "custom37StartDistanceMin": 0,
       "custom37StartDistanceMax": 100,
       "custom37StartDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
-      "custom37PauseDurationMs": 500,
       "custom37RetransitionEnabled": true,
       "custom37RetransitionSpeedMs": 400,
       "custom37RetransitionSpeedCurveEnabled": true,
@@ -12844,6 +12841,22 @@
       "custom37RetransitionStartTimeCurveVisibleOnly": true,
       "custom37RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom37RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom37TweenRetransitionSpeedMs": 800,
+      "custom37TweenRetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom37TweenRetransitionSpeedCurveRange": "{\"min\":50,\"max\":25000}",
+      "custom37TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom37TweenRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom37TweenStopEnabled": true,
+      "custom37TweenStopStartTimeCurveEnabled": false,
+      "custom37TweenStopStartTimeCurveVisibleOnly": true,
+      "custom37TweenStopStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom37TweenStopStartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom37TweenStopDelayEnabled": false,
+      "custom37TweenStopDelayMs": 0,
+      "custom37TweenStopDelayCurveEnabled": false,
+      "custom37TweenStopDelayCurveVisibleOnly": true,
+      "custom37TweenStopDelayCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom37TweenStopDelayRange": "{\"min\":0,\"max\":2000}",
       "custom37MultiTriggerEnabled": true,
       "custom37MultiTriggers": "[{\"prefix\":\"custom37Trig1\",\"title\":\"Trigger 1\"}]",
       "custom37Trig1Enabled": true,
@@ -12899,14 +12912,12 @@
       "custom37Trig1ReverseSequence": false,
       "custom37Trig1GlideToFirstPose": true,
       "custom37Trig1FirstGlideTimeScale": 1,
+      "custom37Trig1TweenChain": [],
       "custom37Trig1TweenSpeedMs": 800,
       "custom37Trig1TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom37Trig1TweenStartTimeRange": "{\"min\":0,\"max\":1300}",
-      "custom37Trig1SequencePlayMode": "Count",
-      "custom37Trig1SequenceCount": 1,
-      "custom37Trig1SequenceCountMode": "Loop",
-      "custom37Trig1SequenceLoopTransition": true,
-      "custom37Trig1SequenceHoldMs": 0,
+      "custom37Trig1LoopMode": "Off",
+      "custom37Trig1LoopHoldMs": 0,
       "custom37Trig1TransitionSpeedMs": 700,
       "custom37Trig1EasingCurveEnabled": true,
       "custom37Trig1EasingCurve": "[{\"x\":0,\"y\":0},{\"x\":0.49199298989367773,\"y\":0.7869791666666667},{\"x\":1,\"y\":0}]",
@@ -12924,7 +12935,6 @@
       "custom37Trig1StartDistanceMin": 0,
       "custom37Trig1StartDistanceMax": 100,
       "custom37Trig1StartDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
-      "custom37Trig1PauseDurationMs": 500,
       "custom37Trig1RetransitionEnabled": true,
       "custom37Trig1RetransitionSpeedMs": 400,
       "custom37Trig1RetransitionSpeedCurveEnabled": true,
@@ -12942,6 +12952,22 @@
       "custom37Trig1RetransitionStartTimeCurveVisibleOnly": true,
       "custom37Trig1RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom37Trig1RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom37Trig1TweenRetransitionSpeedMs": 800,
+      "custom37Trig1TweenRetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom37Trig1TweenRetransitionSpeedCurveRange": "{\"min\":50,\"max\":25000}",
+      "custom37Trig1TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom37Trig1TweenRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom37Trig1TweenStopEnabled": true,
+      "custom37Trig1TweenStopStartTimeCurveEnabled": false,
+      "custom37Trig1TweenStopStartTimeCurveVisibleOnly": true,
+      "custom37Trig1TweenStopStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom37Trig1TweenStopStartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom37Trig1TweenStopDelayEnabled": false,
+      "custom37Trig1TweenStopDelayMs": 0,
+      "custom37Trig1TweenStopDelayCurveEnabled": false,
+      "custom37Trig1TweenStopDelayCurveVisibleOnly": true,
+      "custom37Trig1TweenStopDelayCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom37Trig1TweenStopDelayRange": "{\"min\":0,\"max\":2000}",
       "custom39Enabled": true,
       "custom39Type": "Click+Hold",
       "custom39TouchPointCount": 1,
@@ -15895,45 +15921,7 @@
       "custom50Trig1RetransitionStartTimeCurveEnabled": false,
       "custom50Trig1RetransitionStartTimeCurveVisibleOnly": true,
       "custom50Trig1RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom50Trig1RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom37TweenChain": [],
-      "custom37LoopMode": "Off",
-      "custom37LoopHoldMs": 0,
-      "custom37TweenRetransitionSpeedMs": 800,
-      "custom37TweenRetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom37TweenRetransitionSpeedCurveRange": "{\"min\":50,\"max\":25000}",
-      "custom37TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom37TweenRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom37TweenStopEnabled": true,
-      "custom37TweenStopStartTimeCurveEnabled": false,
-      "custom37TweenStopStartTimeCurveVisibleOnly": true,
-      "custom37TweenStopStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom37TweenStopStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom37TweenStopDelayEnabled": false,
-      "custom37TweenStopDelayMs": 0,
-      "custom37TweenStopDelayCurveEnabled": false,
-      "custom37TweenStopDelayCurveVisibleOnly": true,
-      "custom37TweenStopDelayCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom37TweenStopDelayRange": "{\"min\":0,\"max\":2000}",
-      "custom37Trig1TweenChain": [],
-      "custom37Trig1LoopMode": "Off",
-      "custom37Trig1LoopHoldMs": 0,
-      "custom37Trig1TweenRetransitionSpeedMs": 800,
-      "custom37Trig1TweenRetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom37Trig1TweenRetransitionSpeedCurveRange": "{\"min\":50,\"max\":25000}",
-      "custom37Trig1TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom37Trig1TweenRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom37Trig1TweenStopEnabled": true,
-      "custom37Trig1TweenStopStartTimeCurveEnabled": false,
-      "custom37Trig1TweenStopStartTimeCurveVisibleOnly": true,
-      "custom37Trig1TweenStopStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom37Trig1TweenStopStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom37Trig1TweenStopDelayEnabled": false,
-      "custom37Trig1TweenStopDelayMs": 0,
-      "custom37Trig1TweenStopDelayCurveEnabled": false,
-      "custom37Trig1TweenStopDelayCurveVisibleOnly": true,
-      "custom37Trig1TweenStopDelayCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom37Trig1TweenStopDelayRange": "{\"min\":0,\"max\":2000}"
+      "custom50Trig1RetransitionStartTimeRange": "{\"min\":0,\"max\":300}"
     },
     "mobile": {
       "pauseBtnXOffset": 12,
@@ -28736,14 +28724,12 @@
       "custom37ReverseSequence": false,
       "custom37GlideToFirstPose": true,
       "custom37FirstGlideTimeScale": 2.2,
+      "custom37TweenChain": [],
       "custom37TweenSpeedMs": 800,
       "custom37TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom37TweenStartTimeRange": "{\"min\":0,\"max\":1300}",
-      "custom37SequencePlayMode": "Count",
-      "custom37SequenceCount": 1,
-      "custom37SequenceCountMode": "Loop",
-      "custom37SequenceLoopTransition": true,
-      "custom37SequenceHoldMs": 0,
+      "custom37LoopMode": "Off",
+      "custom37LoopHoldMs": 0,
       "custom37TransitionSpeedMs": 700,
       "custom37EasingCurveEnabled": true,
       "custom37EasingCurve": "[{\"x\":0,\"y\":0},{\"x\":0.4880215276248272,\"y\":0.9433334350585938},{\"x\":1,\"y\":0}]",
@@ -28761,7 +28747,6 @@
       "custom37StartDistanceMin": 0,
       "custom37StartDistanceMax": 100,
       "custom37StartDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
-      "custom37PauseDurationMs": 500,
       "custom37RetransitionEnabled": true,
       "custom37RetransitionSpeedMs": 400,
       "custom37RetransitionSpeedCurveEnabled": true,
@@ -28779,6 +28764,22 @@
       "custom37RetransitionStartTimeCurveVisibleOnly": true,
       "custom37RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom37RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom37TweenRetransitionSpeedMs": 800,
+      "custom37TweenRetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom37TweenRetransitionSpeedCurveRange": "{\"min\":50,\"max\":25000}",
+      "custom37TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom37TweenRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom37TweenStopEnabled": true,
+      "custom37TweenStopStartTimeCurveEnabled": false,
+      "custom37TweenStopStartTimeCurveVisibleOnly": true,
+      "custom37TweenStopStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom37TweenStopStartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom37TweenStopDelayEnabled": false,
+      "custom37TweenStopDelayMs": 0,
+      "custom37TweenStopDelayCurveEnabled": false,
+      "custom37TweenStopDelayCurveVisibleOnly": true,
+      "custom37TweenStopDelayCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom37TweenStopDelayRange": "{\"min\":0,\"max\":2000}",
       "custom37MultiTriggerEnabled": true,
       "custom37MultiTriggers": "[{\"prefix\":\"custom37Trig1\",\"title\":\"Trigger 1\"}]",
       "custom37Trig1Enabled": true,
@@ -28834,14 +28835,12 @@
       "custom37Trig1ReverseSequence": false,
       "custom37Trig1GlideToFirstPose": true,
       "custom37Trig1FirstGlideTimeScale": 1,
+      "custom37Trig1TweenChain": [],
       "custom37Trig1TweenSpeedMs": 800,
       "custom37Trig1TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom37Trig1TweenStartTimeRange": "{\"min\":0,\"max\":1300}",
-      "custom37Trig1SequencePlayMode": "Count",
-      "custom37Trig1SequenceCount": 1,
-      "custom37Trig1SequenceCountMode": "Loop",
-      "custom37Trig1SequenceLoopTransition": true,
-      "custom37Trig1SequenceHoldMs": 0,
+      "custom37Trig1LoopMode": "Off",
+      "custom37Trig1LoopHoldMs": 0,
       "custom37Trig1TransitionSpeedMs": 700,
       "custom37Trig1EasingCurveEnabled": true,
       "custom37Trig1EasingCurve": "[{\"x\":0,\"y\":0},{\"x\":0.49199298989367773,\"y\":0.7869791666666667},{\"x\":1,\"y\":0}]",
@@ -28859,7 +28858,6 @@
       "custom37Trig1StartDistanceMin": 0,
       "custom37Trig1StartDistanceMax": 100,
       "custom37Trig1StartDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
-      "custom37Trig1PauseDurationMs": 500,
       "custom37Trig1RetransitionEnabled": true,
       "custom37Trig1RetransitionSpeedMs": 400,
       "custom37Trig1RetransitionSpeedCurveEnabled": true,
@@ -28877,6 +28875,22 @@
       "custom37Trig1RetransitionStartTimeCurveVisibleOnly": true,
       "custom37Trig1RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom37Trig1RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom37Trig1TweenRetransitionSpeedMs": 800,
+      "custom37Trig1TweenRetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom37Trig1TweenRetransitionSpeedCurveRange": "{\"min\":50,\"max\":25000}",
+      "custom37Trig1TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom37Trig1TweenRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom37Trig1TweenStopEnabled": true,
+      "custom37Trig1TweenStopStartTimeCurveEnabled": false,
+      "custom37Trig1TweenStopStartTimeCurveVisibleOnly": true,
+      "custom37Trig1TweenStopStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom37Trig1TweenStopStartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom37Trig1TweenStopDelayEnabled": false,
+      "custom37Trig1TweenStopDelayMs": 0,
+      "custom37Trig1TweenStopDelayCurveEnabled": false,
+      "custom37Trig1TweenStopDelayCurveVisibleOnly": true,
+      "custom37Trig1TweenStopDelayCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom37Trig1TweenStopDelayRange": "{\"min\":0,\"max\":2000}",
       "custom39Enabled": true,
       "custom39Type": "Click+Hold",
       "custom39TouchPointCount": 1,
@@ -31830,45 +31844,7 @@
       "custom50Trig1RetransitionStartTimeCurveEnabled": false,
       "custom50Trig1RetransitionStartTimeCurveVisibleOnly": true,
       "custom50Trig1RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom50Trig1RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom37TweenChain": [],
-      "custom37LoopMode": "Off",
-      "custom37LoopHoldMs": 0,
-      "custom37TweenRetransitionSpeedMs": 800,
-      "custom37TweenRetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom37TweenRetransitionSpeedCurveRange": "{\"min\":50,\"max\":25000}",
-      "custom37TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom37TweenRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom37TweenStopEnabled": true,
-      "custom37TweenStopStartTimeCurveEnabled": false,
-      "custom37TweenStopStartTimeCurveVisibleOnly": true,
-      "custom37TweenStopStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom37TweenStopStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom37TweenStopDelayEnabled": false,
-      "custom37TweenStopDelayMs": 0,
-      "custom37TweenStopDelayCurveEnabled": false,
-      "custom37TweenStopDelayCurveVisibleOnly": true,
-      "custom37TweenStopDelayCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom37TweenStopDelayRange": "{\"min\":0,\"max\":2000}",
-      "custom37Trig1TweenChain": [],
-      "custom37Trig1LoopMode": "Off",
-      "custom37Trig1LoopHoldMs": 0,
-      "custom37Trig1TweenRetransitionSpeedMs": 800,
-      "custom37Trig1TweenRetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom37Trig1TweenRetransitionSpeedCurveRange": "{\"min\":50,\"max\":25000}",
-      "custom37Trig1TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom37Trig1TweenRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom37Trig1TweenStopEnabled": true,
-      "custom37Trig1TweenStopStartTimeCurveEnabled": false,
-      "custom37Trig1TweenStopStartTimeCurveVisibleOnly": true,
-      "custom37Trig1TweenStopStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom37Trig1TweenStopStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom37Trig1TweenStopDelayEnabled": false,
-      "custom37Trig1TweenStopDelayMs": 0,
-      "custom37Trig1TweenStopDelayCurveEnabled": false,
-      "custom37Trig1TweenStopDelayCurveVisibleOnly": true,
-      "custom37Trig1TweenStopDelayCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom37Trig1TweenStopDelayRange": "{\"min\":0,\"max\":2000}"
+      "custom50Trig1RetransitionStartTimeRange": "{\"min\":0,\"max\":300}"
     },
     "landscape": {
       "pauseBtnXOffset": 12,
@@ -44671,14 +44647,12 @@
       "custom37ReverseSequence": false,
       "custom37GlideToFirstPose": true,
       "custom37FirstGlideTimeScale": 2.2,
+      "custom37TweenChain": [],
       "custom37TweenSpeedMs": 800,
       "custom37TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom37TweenStartTimeRange": "{\"min\":0,\"max\":1300}",
-      "custom37SequencePlayMode": "Count",
-      "custom37SequenceCount": 1,
-      "custom37SequenceCountMode": "Loop",
-      "custom37SequenceLoopTransition": true,
-      "custom37SequenceHoldMs": 0,
+      "custom37LoopMode": "Off",
+      "custom37LoopHoldMs": 0,
       "custom37TransitionSpeedMs": 700,
       "custom37EasingCurveEnabled": true,
       "custom37EasingCurve": "[{\"x\":0,\"y\":0},{\"x\":0.4880215276248272,\"y\":0.9433334350585938},{\"x\":1,\"y\":0}]",
@@ -44696,7 +44670,6 @@
       "custom37StartDistanceMin": 0,
       "custom37StartDistanceMax": 100,
       "custom37StartDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
-      "custom37PauseDurationMs": 500,
       "custom37RetransitionEnabled": true,
       "custom37RetransitionSpeedMs": 400,
       "custom37RetransitionSpeedCurveEnabled": true,
@@ -44714,6 +44687,22 @@
       "custom37RetransitionStartTimeCurveVisibleOnly": true,
       "custom37RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom37RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom37TweenRetransitionSpeedMs": 800,
+      "custom37TweenRetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom37TweenRetransitionSpeedCurveRange": "{\"min\":50,\"max\":25000}",
+      "custom37TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom37TweenRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom37TweenStopEnabled": true,
+      "custom37TweenStopStartTimeCurveEnabled": false,
+      "custom37TweenStopStartTimeCurveVisibleOnly": true,
+      "custom37TweenStopStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom37TweenStopStartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom37TweenStopDelayEnabled": false,
+      "custom37TweenStopDelayMs": 0,
+      "custom37TweenStopDelayCurveEnabled": false,
+      "custom37TweenStopDelayCurveVisibleOnly": true,
+      "custom37TweenStopDelayCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom37TweenStopDelayRange": "{\"min\":0,\"max\":2000}",
       "custom37MultiTriggerEnabled": true,
       "custom37MultiTriggers": "[{\"prefix\":\"custom37Trig1\",\"title\":\"Trigger 1\"}]",
       "custom37Trig1Enabled": true,
@@ -44769,14 +44758,12 @@
       "custom37Trig1ReverseSequence": false,
       "custom37Trig1GlideToFirstPose": true,
       "custom37Trig1FirstGlideTimeScale": 1,
+      "custom37Trig1TweenChain": [],
       "custom37Trig1TweenSpeedMs": 800,
       "custom37Trig1TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom37Trig1TweenStartTimeRange": "{\"min\":0,\"max\":1300}",
-      "custom37Trig1SequencePlayMode": "Count",
-      "custom37Trig1SequenceCount": 1,
-      "custom37Trig1SequenceCountMode": "Loop",
-      "custom37Trig1SequenceLoopTransition": true,
-      "custom37Trig1SequenceHoldMs": 0,
+      "custom37Trig1LoopMode": "Off",
+      "custom37Trig1LoopHoldMs": 0,
       "custom37Trig1TransitionSpeedMs": 700,
       "custom37Trig1EasingCurveEnabled": true,
       "custom37Trig1EasingCurve": "[{\"x\":0,\"y\":0},{\"x\":0.49199298989367773,\"y\":0.7869791666666667},{\"x\":1,\"y\":0}]",
@@ -44794,7 +44781,6 @@
       "custom37Trig1StartDistanceMin": 0,
       "custom37Trig1StartDistanceMax": 100,
       "custom37Trig1StartDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
-      "custom37Trig1PauseDurationMs": 500,
       "custom37Trig1RetransitionEnabled": true,
       "custom37Trig1RetransitionSpeedMs": 400,
       "custom37Trig1RetransitionSpeedCurveEnabled": true,
@@ -44812,6 +44798,22 @@
       "custom37Trig1RetransitionStartTimeCurveVisibleOnly": true,
       "custom37Trig1RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom37Trig1RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom37Trig1TweenRetransitionSpeedMs": 800,
+      "custom37Trig1TweenRetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom37Trig1TweenRetransitionSpeedCurveRange": "{\"min\":50,\"max\":25000}",
+      "custom37Trig1TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom37Trig1TweenRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom37Trig1TweenStopEnabled": true,
+      "custom37Trig1TweenStopStartTimeCurveEnabled": false,
+      "custom37Trig1TweenStopStartTimeCurveVisibleOnly": true,
+      "custom37Trig1TweenStopStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom37Trig1TweenStopStartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom37Trig1TweenStopDelayEnabled": false,
+      "custom37Trig1TweenStopDelayMs": 0,
+      "custom37Trig1TweenStopDelayCurveEnabled": false,
+      "custom37Trig1TweenStopDelayCurveVisibleOnly": true,
+      "custom37Trig1TweenStopDelayCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom37Trig1TweenStopDelayRange": "{\"min\":0,\"max\":2000}",
       "custom39Enabled": true,
       "custom39Type": "Click+Hold",
       "custom39TouchPointCount": 1,
@@ -47765,45 +47767,7 @@
       "custom50Trig1RetransitionStartTimeCurveEnabled": false,
       "custom50Trig1RetransitionStartTimeCurveVisibleOnly": true,
       "custom50Trig1RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom50Trig1RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom37TweenChain": [],
-      "custom37LoopMode": "Off",
-      "custom37LoopHoldMs": 0,
-      "custom37TweenRetransitionSpeedMs": 800,
-      "custom37TweenRetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom37TweenRetransitionSpeedCurveRange": "{\"min\":50,\"max\":25000}",
-      "custom37TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom37TweenRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom37TweenStopEnabled": true,
-      "custom37TweenStopStartTimeCurveEnabled": false,
-      "custom37TweenStopStartTimeCurveVisibleOnly": true,
-      "custom37TweenStopStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom37TweenStopStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom37TweenStopDelayEnabled": false,
-      "custom37TweenStopDelayMs": 0,
-      "custom37TweenStopDelayCurveEnabled": false,
-      "custom37TweenStopDelayCurveVisibleOnly": true,
-      "custom37TweenStopDelayCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom37TweenStopDelayRange": "{\"min\":0,\"max\":2000}",
-      "custom37Trig1TweenChain": [],
-      "custom37Trig1LoopMode": "Off",
-      "custom37Trig1LoopHoldMs": 0,
-      "custom37Trig1TweenRetransitionSpeedMs": 800,
-      "custom37Trig1TweenRetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom37Trig1TweenRetransitionSpeedCurveRange": "{\"min\":50,\"max\":25000}",
-      "custom37Trig1TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom37Trig1TweenRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom37Trig1TweenStopEnabled": true,
-      "custom37Trig1TweenStopStartTimeCurveEnabled": false,
-      "custom37Trig1TweenStopStartTimeCurveVisibleOnly": true,
-      "custom37Trig1TweenStopStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom37Trig1TweenStopStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom37Trig1TweenStopDelayEnabled": false,
-      "custom37Trig1TweenStopDelayMs": 0,
-      "custom37Trig1TweenStopDelayCurveEnabled": false,
-      "custom37Trig1TweenStopDelayCurveVisibleOnly": true,
-      "custom37Trig1TweenStopDelayCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom37Trig1TweenStopDelayRange": "{\"min\":0,\"max\":2000}"
+      "custom50Trig1RetransitionStartTimeRange": "{\"min\":0,\"max\":300}"
     }
   },
   "order": [
@@ -48139,7 +48103,7 @@
     },
     {
       "key": "Debug",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -49839,16 +49803,6 @@
       "locked": true,
       "items": [
         {
-          "type": "group",
-          "group": {
-            "key": "2 - CH Copy",
-            "collapsed": true,
-            "locked": false,
-            "items": [],
-            "settings": []
-          }
-        },
-        {
           "type": "row",
           "key": "holdConfirmMs"
         },
@@ -49859,6 +49813,16 @@
         {
           "type": "row",
           "key": "customFunctionSelector"
+        },
+        {
+          "type": "group",
+          "group": {
+            "key": "2 - CH Copy",
+            "collapsed": true,
+            "locked": false,
+            "items": [],
+            "settings": []
+          }
         },
         {
           "type": "group",
@@ -49897,16 +49861,6 @@
             "collapsed": true,
             "locked": false,
             "items": [
-              {
-                "type": "group",
-                "group": {
-                  "key": "35 FT - 1 - C Copy",
-                  "collapsed": true,
-                  "locked": false,
-                  "items": [],
-                  "settings": []
-                }
-              },
               {
                 "type": "group",
                 "group": {
@@ -49956,6 +49910,16 @@
                   "items": [],
                   "settings": []
                 }
+              },
+              {
+                "type": "group",
+                "group": {
+                  "key": "35 FT - 1 - C Copy",
+                  "collapsed": true,
+                  "locked": false,
+                  "items": [],
+                  "settings": []
+                }
               }
             ],
             "settings": []
@@ -49968,46 +49932,6 @@
             "collapsed": true,
             "locked": false,
             "items": [
-              {
-                "type": "group",
-                "group": {
-                  "key": "1 - C Copy",
-                  "collapsed": true,
-                  "locked": false,
-                  "items": [],
-                  "settings": []
-                }
-              },
-              {
-                "type": "group",
-                "group": {
-                  "key": "1 - CH Copy",
-                  "collapsed": true,
-                  "locked": false,
-                  "items": [],
-                  "settings": []
-                }
-              },
-              {
-                "type": "group",
-                "group": {
-                  "key": "2 - C Copy",
-                  "collapsed": true,
-                  "locked": false,
-                  "items": [],
-                  "settings": []
-                }
-              },
-              {
-                "type": "group",
-                "group": {
-                  "key": "2 - CH Copy",
-                  "collapsed": true,
-                  "locked": false,
-                  "items": [],
-                  "settings": []
-                }
-              },
               {
                 "type": "group",
                 "group": {
@@ -50148,46 +50072,6 @@
                   "items": [],
                   "settings": []
                 }
-              },
-              {
-                "type": "group",
-                "group": {
-                  "key": "Custom Click Function 26",
-                  "collapsed": true,
-                  "locked": false,
-                  "items": [],
-                  "settings": []
-                }
-              },
-              {
-                "type": "group",
-                "group": {
-                  "key": "Custom Click Function 27",
-                  "collapsed": true,
-                  "locked": false,
-                  "items": [],
-                  "settings": []
-                }
-              },
-              {
-                "type": "group",
-                "group": {
-                  "key": "Custom Click Function 30",
-                  "collapsed": true,
-                  "locked": false,
-                  "items": [],
-                  "settings": []
-                }
-              },
-              {
-                "type": "group",
-                "group": {
-                  "key": "Custom Click Function 31",
-                  "collapsed": true,
-                  "locked": false,
-                  "items": [],
-                  "settings": []
-                }
               }
             ],
             "settings": []
@@ -50257,26 +50141,6 @@
                 }
               }
             ],
-            "settings": []
-          }
-        },
-        {
-          "type": "group",
-          "group": {
-            "key": "Custom Click Function 29",
-            "collapsed": true,
-            "locked": false,
-            "items": [],
-            "settings": []
-          }
-        },
-        {
-          "type": "group",
-          "group": {
-            "key": "Custom Click Function 28",
-            "collapsed": true,
-            "locked": false,
-            "items": [],
             "settings": []
           }
         }
@@ -57427,8 +57291,8 @@
     "desktop": {
       "left": 749.6124877929688,
       "top": 0,
-      "width": 773.5750122070312,
-      "height": 716.4000244140625
+      "width": 776.7750244140625,
+      "height": 711.6000366210938
     }
   }
 }
