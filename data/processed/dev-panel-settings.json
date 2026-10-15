@@ -8268,8 +8268,8 @@
       "startupHandMaxClicks": 2,
       "startupHandOffsetZ": 0,
       "startupHandWaitForAll": true,
-      "startupTrackArm": true,
-      "startupTrackPalm": true,
+      "startupTrackArm": false,
+      "startupTrackPalm": false,
       "startupTrackSplay": false,
       "startupTrackCrop": false,
       "startupHandZCurveEnabled": false,
@@ -19547,8 +19547,8 @@
       "startupHandMaxClicks": 2,
       "startupHandOffsetZ": -22,
       "startupHandWaitForAll": true,
-      "startupTrackArm": true,
-      "startupTrackPalm": true,
+      "startupTrackArm": false,
+      "startupTrackPalm": false,
       "startupTrackSplay": false,
       "startupTrackCrop": false,
       "startupHandZCurveEnabled": false,
@@ -30826,8 +30826,8 @@
       "startupHandMaxClicks": 2,
       "startupHandOffsetZ": 0,
       "startupHandWaitForAll": true,
-      "startupTrackArm": true,
-      "startupTrackPalm": true,
+      "startupTrackArm": false,
+      "startupTrackPalm": false,
       "startupTrackSplay": false,
       "startupTrackCrop": false,
       "startupHandZCurveEnabled": false,
@@ -257193,7 +257193,7 @@
           "type": "group",
           "group": {
             "key": "Hand Offset On Startup",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -258520,7 +258520,7 @@
       "subgroups": [
         {
           "key": "Hand Offset On Startup",
-          "collapsed": true,
+          "collapsed": false,
           "locked": true,
           "items": [
             {
