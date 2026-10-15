@@ -390,7 +390,7 @@
       "loadingPreviewSequenceHoldMs": 0,
       "loadingPreviewSize": 1600,
       "loadingPreviewRotationX": -85.46571581217302,
-      "loadingPreviewRotationY": -109.10457274713563,
+      "loadingPreviewRotationY": -109.10457274713559,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0,
       "loadingPreviewOffsetY": 0,
@@ -8415,14 +8415,14 @@
           ]
         }
       ],
-      "cameraX": 1.5544272264775383,
-      "cameraY": 1.9520685262324363e-13,
-      "cameraZ": 197.9877959952518,
-      "cameraFov": 20,
+      "cameraX": 1.9534883720930232,
+      "cameraY": 5.541526766141773e-15,
+      "cameraZ": 115.97925521912504,
+      "cameraFov": 35,
       "cameraYaw": 0,
       "cameraPitch": 0,
       "cameraRoll": 0,
-      "cameraZoom": 99.00000000000001,
+      "cameraZoom": 90.5,
       "cameraZoomSpeed": 0.3,
       "savedCameras": [
         {
@@ -12347,7 +12347,7 @@
       "loadingPreviewSequenceHoldMs": 0,
       "loadingPreviewSize": 1390,
       "loadingPreviewRotationX": -85.46571581217302,
-      "loadingPreviewRotationY": -109.10457274713563,
+      "loadingPreviewRotationY": -109.10457274713559,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0,
       "loadingPreviewOffsetY": 0,
@@ -24304,7 +24304,7 @@
       "loadingPreviewSequenceHoldMs": 0,
       "loadingPreviewSize": 1600,
       "loadingPreviewRotationX": -85.46571581217302,
-      "loadingPreviewRotationY": -109.10457274713563,
+      "loadingPreviewRotationY": -109.10457274713559,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0,
       "loadingPreviewOffsetY": 0,
@@ -36406,7 +36406,7 @@
     },
     {
       "key": "Saved Dev Settings",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [],
       "settings": []
@@ -37901,7 +37901,7 @@
     },
     {
       "key": "Custom Click Functions",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -38016,7 +38016,7 @@
               {
                 "type": "group",
                 "group": {
-                  "key": "20 FT - R - CH Copy",
+                  "key": "20 FT - 1 - C Copy",
                   "collapsed": true,
                   "locked": false,
                   "items": [],
@@ -38026,7 +38026,7 @@
               {
                 "type": "group",
                 "group": {
-                  "key": "20 FT - 1 - C Copy",
+                  "key": "20 FT - R - CH Copy",
                   "collapsed": true,
                   "locked": false,
                   "items": [],
@@ -38066,7 +38066,7 @@
     },
     {
       "key": "New Group (11)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -38177,7 +38177,7 @@
           "type": "group",
           "group": {
             "key": "Camera",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -42547,7 +42547,7 @@
     "desktop": {
       "left": 1001.625,
       "top": 0,
-      "width": 543.9750366210938,
+      "width": 547.1749877929688,
       "height": 711.6000366210938
     },
     "mobile": {
