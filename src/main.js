@@ -8,6 +8,8 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js'
 import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js'
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js'
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js'
+import { createUIElement, replaceLayoutNode } from '../lib/ui-engine/registry.mjs'
+import { resolveLengthValue } from '../lib/ui-engine/engine.mjs'
 import { DEV_MODE, initDevPanel, syncValue, setControlValue, copyControlState, isApplyingPanelState, onPanelStateApplied, peekRestoredValue, forgetControlsWithPrefix, seedControlValue, refreshListPickerTogglesByKey, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab, beginDynamicBatch, endDynamicBatch, refreshListPickerMarksByKey } from './devpanel/devPanel.js?v=86'
 
 // Toon Shading colour gradient (2026-10-12): MeshToonMaterial's getGradientIrradiance() only reads the RED channel of
@@ -831,7 +833,7 @@ function updateLoadingPreviewText() {
     loadingPreviewTextEl = document.createElement('div')
     loadingPreviewTextEl.id = 'loadingPreviewText'
     // Above the loading-preview canvas (z-index 100000) and the loading blocker, below the dev panel (200000); never takes a click.
-    loadingPreviewTextEl.style.cssText = 'position:fixed;left:50%;top:50%;z-index:100002;pointer-events:none;white-space:pre-wrap;text-align:center;line-height:1.2;user-select:none;'
+    loadingPreviewTextEl.style.cssText = 'z-index:100002;pointer-events:none;white-space:pre-wrap;text-align:center;line-height:1.2;user-select:none;' // position / size / offsets come from the UI Layout Engine (applyLoadingPreviewTextLayout())
     document.body.appendChild(loadingPreviewTextEl)
     const cv0 = document.getElementById('loadingPreviewCanvas')
     if (cv0 && typeof MutationObserver !== 'undefined') new MutationObserver(() => updateLoadingPreviewText()).observe(cv0, { attributes: true, attributeFilter: ['style'] })
@@ -842,16 +844,60 @@ function updateLoadingPreviewText() {
   const animationShown = !cv || cv.style.display !== 'none'
   el.style.display = (cfg.loadingPreviewTextEnabled && (!fieldRevealed || animationShown)) ? 'block' : 'none'
   el.textContent = cfg.loadingPreviewTextContent ?? ''
-  el.style.fontSize = (cfg.loadingPreviewTextFontSize ?? 32) + 'px'
+  el.style.fontSize = lpLen(cfg.loadingPreviewTextFontSize ?? 32)
   el.style.color = cfg.loadingPreviewTextColor || '#ffffff'
-  el.style.letterSpacing = (cfg.loadingPreviewTextLetterSpacing ?? 0) + 'px'
-  el.style.paddingLeft = (cfg.loadingPreviewTextLetterSpacing ?? 0) + 'px' // letter-spacing also trails the last letter; this keeps the text centred on its anchor
+  el.style.letterSpacing = lpLen(cfg.loadingPreviewTextLetterSpacing ?? 0)
+  el.style.paddingLeft = lpLen(cfg.loadingPreviewTextLetterSpacing ?? 0) // letter-spacing also trails the last letter; this keeps the text centred on its anchor
   const f = LOADING_TEXT_FONTS.find((x) => x.name === cfg.loadingPreviewTextFont) || LOADING_TEXT_FONTS[0]
   el.style.fontFamily = f.css
   // Start fetching the selected family now (a no-op once loaded); the text swaps from the fallback font when it arrives.
   if (cfg.loadingPreviewTextEnabled && document.fonts && document.fonts.load) document.fonts.load('16px "' + f.name + '"').catch(() => {})
-  el.style.transform = `translate(calc(-50% + ${cfg.loadingPreviewTextOffsetX ?? 0}px), calc(-50% + ${cfg.loadingPreviewTextOffsetY ?? 0}px))`
+  applyLoadingPreviewTextLayout(el)
 }
+// ---- Loading Preview: responsive size / placement through the UI Layout Engine (2026-10-15) ----
+// Blended length = the engine's { pxValue, vwValue, blend, vwUnit } (resolves to a native calc() the browser re-evaluates on every resize, no JS needed): the Px value at the reference size, the same share of the
+// browser's shorter side (vmin) at 100%, and a continuous mix between. lpPx() is the same arithmetic in plain numbers, for the few places that need pixels (the WebGL buffer, the blocker's spread).
+function lpRef() { return Math.max(cfg.loadingPreviewScaleRefPx || 1080, 100) }
+function lpBlendFrac() { return THREE.MathUtils.clamp((cfg.loadingPreviewScalePct ?? 100) / 100, 0, 1) }
+function lpBlend(px) { return { pxValue: px, vwValue: px / lpRef() * 100, blend: lpBlendFrac(), vwUnit: 'vmin' } }
+function lpLen(px) { return resolveLengthValue(lpBlend(px), {}) }
+// The canvas's real rendered width when it is on screen (what the engine's CSS made of the blended length), else the same arithmetic in plain numbers.
+function lpCanvasPx() { const w = loadingPreviewCanvas ? loadingPreviewCanvas.offsetWidth : 0; return w > 0 ? w : Math.max(20, Math.round(lpPx(cfg.loadingPreviewSize || 160))) }
+function lpPx(px) { const vmin = Math.min(window.innerWidth, window.innerHeight); return px * ((1 - lpBlendFrac()) + lpBlendFrac() * vmin / lpRef()) }
+const lpEngineLayouts = {} // element id -> the layout JSON last handed to the engine (an unchanged layout is not re-resolved)
+function lpApplyEngineElement(id, node, layout) {
+  if (!node) return
+  const json = JSON.stringify(layout)
+  if (lpEngineLayouts[id] === json) return
+  try {
+    node.classList.add('ui-element')
+    if (lpEngineLayouts[id] === undefined) createUIElement({ id, role: 'decoration', layout, domNode: node })
+    else { replaceLayoutNode(id, ['position'], layout.position); replaceLayoutNode(id, ['size'], layout.size) }
+    lpEngineLayouts[id] = json
+  } catch (e) { console.error('Loading Preview layout (UI engine) failed for ' + id, e) }
+}
+function lpCenteredLayout(offX, offY, size) {
+  return { position: { mode: 'anchor', horizontal: { anchor: 'center', offset: lpBlend(offX) }, vertical: { anchor: 'center', offset: lpBlend(offY) } }, size }
+}
+let lpCanvasObserver = null
+function applyLoadingPreviewLayout() {
+  // Keeps the WebGL buffer (and the blocker spread) matched to the box the browser actually gives the canvas whenever the browser is resized or the canvas is shown.
+  if (!lpCanvasObserver && typeof ResizeObserver !== 'undefined') {
+    const cv = document.getElementById('loadingPreviewCanvas')
+    if (cv) { lpCanvasObserver = new ResizeObserver(() => { if (loadingPreviewRenderer && cv.offsetWidth > 0) resizeLoadingPreview() }); lpCanvasObserver.observe(cv) }
+  }
+  const s = lpBlend(Math.max(20, cfg.loadingPreviewSize || 160))
+  lpApplyEngineElement('loadingPreviewCanvas', document.getElementById('loadingPreviewCanvas'), lpCenteredLayout(cfg.loadingPreviewPosX || 0, cfg.loadingPreviewPosY || 0, { width: { mode: 'fixed', value: s }, height: { mode: 'fixed', value: s } }))
+}
+function applyLoadingPreviewTextLayout(el) {
+  lpApplyEngineElement('loadingPreviewText', el, lpCenteredLayout(cfg.loadingPreviewTextOffsetX ?? 0, cfg.loadingPreviewTextOffsetY ?? 0, { width: { mode: 'content' }, height: { mode: 'content' } }))
+}
+function refreshLoadingPreviewLayout() {
+  try { resizeLoadingPreview() } catch (e) { /* preview not built yet */ }
+  updateLoadingPreviewText()
+}
+window.addEventListener('resize', () => { if (loadingPreviewCanvas && loadingPreviewRenderer) resizeLoadingPreview(); updateLoadingPreviewText() })
+
 const LOADING_TEXT_ROW_KEYS = ['loadingPreviewTextContent', 'loadingPreviewTextFontSize', 'loadingPreviewTextLetterSpacing', 'loadingPreviewTextColor', 'loadingPreviewTextFont', 'loadingPreviewTextOffsetX', 'loadingPreviewTextOffsetY']
 const LOADING_TEXT_GROUP_KEY = 'Loading Preview > Text'
 function updateLoadingPreviewTextGroupVisibility() {
@@ -1126,7 +1172,7 @@ function tryStartField() {
   // whatever comes next; don't treat this comment's own reasoning above
   // as the settled explanation.
   if (!fieldWarmCompiled) renderer.compile(scene, camera)
-  window.__debug = { cleanupDeletedVelocityGroup, rvReconcileSets, rvDebug: () => ({ vel: [rvVx, rvVy], speed: rvSpeed, sets: rvSetList, hasState: rvHasState }), updateResponsiveVelocity, rvConflicts, rvAddSet, rvRefreshUi, refreshCustomFunctionConflictWarnings, enforceExclusiveTrigger, restoreCustomClickFunctions, updateSmallScaleModels, placeSmallScaleModelRows, smallScaleGeomCache, get smallScaleLevels() { return smallScaleLevels }, updateFingerCurlSkip, refreshAllTweenSequenceSelectors, reconcileCustomFunctions, captureCustomFunctionsForUndo, renameCustomFunction, placeHandModelRows, syncHandModelWithSettings, refreshHandModelList, get activeHandModelId() { return activeHandModelId }, importHandModelFile, useHandModel, placeLoadingPreviewLightingRows, applyOffsetRotationToHand, applyOffsetRotationRetransition, parseClickPoseConfig, parseClickHoldConfig, cropPointInWrapperFrame, rotateHandAboutCropPoint, rotateHandAboutWorldPoint, cursorFieldPoint, captureClickCursorPivot, rotationDegAt, applyWorldRigid, rotationModeOf, get customFunctionCollapseReady() { return customFunctionCollapseReady }, markCustomFunctionCollapseReady: () => { customFunctionCollapseReady = true }, applyCustomFunctionCollapse, persistCustomClickFunctionIds, bakeOffsetRotationIntoAccum, loopLapProgress, loopLapEnd, rotateHandAboutArmBase, updateLoadingPreviewHand2, buildLoopTimelines, loopPoseValuesBeyondLap, get palmCenterPosRaw() { return palmCenterPosRaw }, get handoPivotRaw() { return handoPivotRaw }, get handBoundsBoxCenterRaw() { return handBoundsBoxCenterRaw }, get alignQuat() { return alignQuat }, get loadingPreviewModelScale() { return loadingPreviewModelScale }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, handBoundsCenterLocal, LOADING_PREVIEW_REFERENCE_RADIUS, importTwoHandTween, convertHandoCameraPreset, applyLoadingPreviewCameraPreset, animateFrame: (...a) => animate(...a), releaseStartupHold, trackingActiveFor, placeStartupRetransitionGroup, startupHandScale, updateFieldCenterMarker, get fieldCenterPoint() { return fieldCenterPoint }, retransitionScalerMul, startupHandPhaseUnfinished, applyFieldBounds, onFieldBoundsChanged, retransitionDistanceMs, untriggeredVisibleSpheres, allVisibleHandsFinished, handStartupLocked, triggerClickPose, checkStartupFloorHide, get startupFloorHidden() { return startupFloorHidden }, get floorMesh() { return floorMesh }, updateLoadingPreviewAnimation, get loadingPreview2() { return { hand: loadingPreviewHand, hand2: loadingPreviewHand2, scene: loadingPreviewScene, camera: loadingPreviewCamera, renderer: loadingPreviewRenderer } }, updateSphereSequence, get sphereState() { return { stage: sphereStage, mesh: sphereMesh, on: sphereOn, start: sphereStart, dur: sphereDur, cap: sphereCap, done: sphereDone, keep: sphereKeepForHands, clicks: sphereClickCount } }, stackOnDefault, applyCameraOrientation, syncCameraPanelFromLive, curveByDomain, get domains() { return { xyAll: [xyAllMinDist, xyAllDistRange], splayAll: [splayAllMin, splayAllRange], cropAll: [cropAllMin, cropAllRange], restAll: [restAllMinDist, restAllDistRange], live: [liveFieldMinDist, liveFieldDistRange], splay: [splayFieldMin, splayFieldRange], crop: [cropFieldMin, cropFieldRange], xy: [xyFieldMinDist, xyFieldDistRange], rest: [restFieldMinDist, restFieldDistRange] } }, modelBaseFrameQ, computeBaseRotationQuat, cloneBaseRb, makeClipRig, updateClipRigPlanes, setClipRigT, updateOnScreenFlags, evaluateArmLengthCurve, THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose, resolveTweenSegmentsWithAnchor, lerpTweenSegments, lerpLoopSegments, isHoldEntry, updateLoadingPreviewWristClip, lerpPoseValues, get loadingPreviewRenderer() { return loadingPreviewRenderer }, get loadingPreviewScene() { return loadingPreviewScene }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, get handBoundsCenterLocal() { return handBoundsCenterLocal }, multiPointCommit, multiPointEligibleFunctions, get multiPointActiveTouchCount() { return multiPointActiveTouchCount }, get multiPointSessionFiredPoseId() { return multiPointSessionFiredPoseId }, detectPoseJumps, get poseJumpLogEntries() { return poseJumpLogEntries }, applyCurlToSkeletonReference, handLogTriggerLabel, applyAllFingerCurls, syncCameraPanelFromLive, animSpeedMs, chainSequenceCount, applyFieldBounds, cursorDistXY, hexBrightnessPct, toonThresholdForMidBrightness }
+  window.__debug = { refreshLoadingPreviewLayout, lpLen, cleanupDeletedVelocityGroup, rvReconcileSets, rvDebug: () => ({ vel: [rvVx, rvVy], speed: rvSpeed, sets: rvSetList, hasState: rvHasState }), updateResponsiveVelocity, rvConflicts, rvAddSet, rvRefreshUi, refreshCustomFunctionConflictWarnings, enforceExclusiveTrigger, restoreCustomClickFunctions, updateSmallScaleModels, placeSmallScaleModelRows, smallScaleGeomCache, get smallScaleLevels() { return smallScaleLevels }, updateFingerCurlSkip, refreshAllTweenSequenceSelectors, reconcileCustomFunctions, captureCustomFunctionsForUndo, renameCustomFunction, placeHandModelRows, syncHandModelWithSettings, refreshHandModelList, get activeHandModelId() { return activeHandModelId }, importHandModelFile, useHandModel, placeLoadingPreviewLightingRows, applyOffsetRotationToHand, applyOffsetRotationRetransition, parseClickPoseConfig, parseClickHoldConfig, cropPointInWrapperFrame, rotateHandAboutCropPoint, rotateHandAboutWorldPoint, cursorFieldPoint, captureClickCursorPivot, rotationDegAt, applyWorldRigid, rotationModeOf, get customFunctionCollapseReady() { return customFunctionCollapseReady }, markCustomFunctionCollapseReady: () => { customFunctionCollapseReady = true }, applyCustomFunctionCollapse, persistCustomClickFunctionIds, bakeOffsetRotationIntoAccum, loopLapProgress, loopLapEnd, rotateHandAboutArmBase, updateLoadingPreviewHand2, buildLoopTimelines, loopPoseValuesBeyondLap, get palmCenterPosRaw() { return palmCenterPosRaw }, get handoPivotRaw() { return handoPivotRaw }, get handBoundsBoxCenterRaw() { return handBoundsBoxCenterRaw }, get alignQuat() { return alignQuat }, get loadingPreviewModelScale() { return loadingPreviewModelScale }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, handBoundsCenterLocal, LOADING_PREVIEW_REFERENCE_RADIUS, importTwoHandTween, convertHandoCameraPreset, applyLoadingPreviewCameraPreset, animateFrame: (...a) => animate(...a), releaseStartupHold, trackingActiveFor, placeStartupRetransitionGroup, startupHandScale, updateFieldCenterMarker, get fieldCenterPoint() { return fieldCenterPoint }, retransitionScalerMul, startupHandPhaseUnfinished, applyFieldBounds, onFieldBoundsChanged, retransitionDistanceMs, untriggeredVisibleSpheres, allVisibleHandsFinished, handStartupLocked, triggerClickPose, checkStartupFloorHide, get startupFloorHidden() { return startupFloorHidden }, get floorMesh() { return floorMesh }, updateLoadingPreviewAnimation, get loadingPreview2() { return { hand: loadingPreviewHand, hand2: loadingPreviewHand2, scene: loadingPreviewScene, camera: loadingPreviewCamera, renderer: loadingPreviewRenderer } }, updateSphereSequence, get sphereState() { return { stage: sphereStage, mesh: sphereMesh, on: sphereOn, start: sphereStart, dur: sphereDur, cap: sphereCap, done: sphereDone, keep: sphereKeepForHands, clicks: sphereClickCount } }, stackOnDefault, applyCameraOrientation, syncCameraPanelFromLive, curveByDomain, get domains() { return { xyAll: [xyAllMinDist, xyAllDistRange], splayAll: [splayAllMin, splayAllRange], cropAll: [cropAllMin, cropAllRange], restAll: [restAllMinDist, restAllDistRange], live: [liveFieldMinDist, liveFieldDistRange], splay: [splayFieldMin, splayFieldRange], crop: [cropFieldMin, cropFieldRange], xy: [xyFieldMinDist, xyFieldDistRange], rest: [restFieldMinDist, restFieldDistRange] } }, modelBaseFrameQ, computeBaseRotationQuat, cloneBaseRb, makeClipRig, updateClipRigPlanes, setClipRigT, updateOnScreenFlags, evaluateArmLengthCurve, THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose, resolveTweenSegmentsWithAnchor, lerpTweenSegments, lerpLoopSegments, isHoldEntry, updateLoadingPreviewWristClip, lerpPoseValues, get loadingPreviewRenderer() { return loadingPreviewRenderer }, get loadingPreviewScene() { return loadingPreviewScene }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, get handBoundsCenterLocal() { return handBoundsCenterLocal }, multiPointCommit, multiPointEligibleFunctions, get multiPointActiveTouchCount() { return multiPointActiveTouchCount }, get multiPointSessionFiredPoseId() { return multiPointSessionFiredPoseId }, detectPoseJumps, get poseJumpLogEntries() { return poseJumpLogEntries }, applyCurlToSkeletonReference, handLogTriggerLabel, applyAllFingerCurls, syncCameraPanelFromLive, animSpeedMs, chainSequenceCount, applyFieldBounds, cursorDistXY, hexBrightnessPct, toonThresholdForMidBrightness }
   // Do NOT hide the loading screen yet: the hands exist but may not have been painted. finalizeReveal() hides it once the field has rendered a couple of frames (or after a 4 s safety net).
   setTimeout(finalizeReveal, 4000)
 }
@@ -2453,6 +2499,13 @@ const DEV_GROUPS = [
       { key: 'loadingPreviewSequenceLoopTransition', label: 'Loop Transition On/Off', type: 'checkbox', def: true },
       { key: 'loadingPreviewSequenceHoldMs', label: 'Sequence Hold Duration (Ms)', type: 'slider', min: 0, max: 5000, step: 10, def: 0 },
       { key: 'loadingPreviewSize', label: 'Loading Preview Size (Px)', type: 'slider', min: 80, max: 400, step: 10, def: 160, onChange: () => resizeLoadingPreview() },
+      // Responsive to the browser (2026-10-15, direct request: "font and animation size and placement to be responsive to the browser"), through the UI Layout Engine's blended-length values (lib/ui-engine, see
+      // applyLoadingPreviewLayout()). Every Px value of the Loading Preview (animation size, its position, the text's size, letter spacing and offsets) is the value AT the reference browser size; Scale With Browser blends it
+      // from fixed pixels (0%) to growing / shrinking with the browser's shorter side (100%), so the whole composition keeps its proportions on a phone, a tablet and a big desktop.
+      { key: 'loadingPreviewScalePct', label: 'Scale With Browser (%)', type: 'slider', min: 0, max: 100, step: 1, def: 100, perDevice: true, onChange: () => refreshLoadingPreviewLayout() },
+      { key: 'loadingPreviewScaleRefPx', label: 'Browser Reference Size (Px, Shorter Side)', type: 'slider', min: 300, max: 3000, step: 10, def: 1080, perDevice: true, onChange: () => refreshLoadingPreviewLayout() },
+      { key: 'loadingPreviewPosX', label: 'Loading Preview Position X (Px)', type: 'slider', min: -1500, max: 1500, step: 1, def: 0, perDevice: true, onChange: () => refreshLoadingPreviewLayout() },
+      { key: 'loadingPreviewPosY', label: 'Loading Preview Position Y (Px)', type: 'slider', min: -1500, max: 1500, step: 1, def: 0, perDevice: true, onChange: () => refreshLoadingPreviewLayout() },
       // CORRECTED 2026-09-19, direct request+follow-up ("Loading Preview
       // Rotation X Y Z and XY offset should reflect the camera settings"
       // -> confirmed via AskUserQuestion: repurpose, don't keep the old
@@ -3735,7 +3788,7 @@ const cfg = initDevPanel(DEV_GROUPS, {
   // (normally) not redrawing at all while nothing has actually changed.
   onAnyValueChange: () => { sceneNeedsRedraw = true },
   // Undo/Redo leaves the live camera sliders alone unless the step was itself a camera-slider edit (2026-10-06).
-  onSavedStateApplied: () => applySavedStateDefaults(),
+  onSavedStateApplied: (state) => applySavedStateDefaults(state),
   undoLiveKeys: ['cameraX', 'cameraY', 'cameraZ', 'cameraFov', 'cameraZoom', 'cameraYaw', 'cameraPitch', 'cameraRoll'],
   // Keep the startup cache in step with what was just saved.
   onBeforeSave: () => persistCustomClickFunctionIds(),
@@ -7653,7 +7706,10 @@ function loadCameraDefaultFromCfg() {
 }
 // After a whole saved dev setting was applied (Use / Set Default; direct request 2026-10-15: "when I click Use ... make sure the camera uses the default camera for that dev setting set", "it should indicate
 // [the default] regardless"): re-derive every default from the settings now in cfg, put the live camera on the set's default camera, and refresh all item selector marks.
-function applySavedStateDefaults() {
+function applySavedStateDefaults(state) {
+  // The default camera belongs to ONE dev setting (2026-10-15, direct request): a setting saved before it was stored has no such value, so it must not inherit the previous setting's default.
+  const sv = state && state.values ? (state.values[realDeviceClass()] || state.values.desktop) : null
+  if (!sv || sv.cameraDefaultPreset === undefined) { cfg.cameraDefaultPreset = ''; try { syncValue('cameraDefaultPreset', '') } catch (e) { /* no panel */ } }
   resyncPoseDefaultValues()
   loadCameraDefaultFromCfg()
   if (cameraDefaultTargetKnown) {
@@ -8766,7 +8822,7 @@ function syncLoadingPreviewBackground() {
   // screen is up: afterwards the preview background is transparent (Show Loading Preview Live), so no blocker then.
   try {
     if (loadingPreviewCanvas) {
-      const size = Math.max(20, cfg.loadingPreviewSize || 160)
+      const size = lpCanvasPx()
       loadingPreviewCanvas.style.boxShadow = fieldRevealed ? 'none' : `0 0 0 ${Math.round(size / 2)}px ${cfg.bgColor}`
     }
   } catch (err) { /* not built yet */ }
@@ -8843,9 +8899,8 @@ function applyLoadingPreviewLightingDefault() {
 // otherwise never take effect until next reload).
 function resizeLoadingPreview() {
   if (!loadingPreviewCanvas || !loadingPreviewRenderer) return
-  const size = Math.max(20, cfg.loadingPreviewSize || 160)
-  loadingPreviewCanvas.style.width = size + 'px'
-  loadingPreviewCanvas.style.height = size + 'px'
+  applyLoadingPreviewLayout() // the canvas's CSS size / position come from the UI Layout Engine (responsive); only the WebGL buffer size is set here
+  const size = lpCanvasPx()
   loadingPreviewCamera.aspect = 1
   loadingPreviewCamera.updateProjectionMatrix()
   loadingPreviewRenderer.setSize(size, size, false)
@@ -8873,7 +8928,7 @@ function resizeLoadingPreview() {
 // grow independent options again later.
 function repositionLoadingPreview() {
   if (!loadingPreviewCanvas) return
-  loadingPreviewCanvas.style.transform = 'translate(-50%, -50%)'
+  applyLoadingPreviewLayout() // centring is the engine's anchor layout now (a hand-set transform here would override it)
 }
 // Applies one pose-shaped values object to ONLY the loading-preview hand's
 // skeleton -- deliberately a 3rd near-duplicate of previewPosePreset()
