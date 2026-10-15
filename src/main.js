@@ -15268,7 +15268,16 @@ function persistCustomClickFunctionIds() {
 // unchecking the group's own header cascade checkbox would have (see
 // customFunctionActiveForDeviceFamily()'s own comment) -- still present/
 // visible the next time Desktop is shown.
+// A deleted group takes every custom function group nested inside it along (2026-10-15, direct report: "right now i still see functions i have deleted" -- deleting a folder group left its functions registered, listed
+// in the Custom Click Function Selector and still firing, because only a function's OWN group was ever cleaned up). The folder may already be detached from the page here, its subtree is still readable.
 function cleanupDeletedCustomClickFunction(target) {
+  if (!target || !target.classList || !target.classList.contains('dp-group')) return
+  if (target.querySelectorAll) {
+    Array.from(target.querySelectorAll('.dp-group[data-custom-function-family]')).forEach((g) => cleanupDeletedCustomClickFunctionGroup(g))
+  }
+  cleanupDeletedCustomClickFunctionGroup(target)
+}
+function cleanupDeletedCustomClickFunctionGroup(target) {
   if (!target || !target.classList || !target.classList.contains('dp-group')) return
   if (!target.dataset.customFunctionFamily) return // not a Custom Click Function's own group (a plain user-created group, or one of the 10 static triggers)
   const title = target.dataset.key
