@@ -23,7 +23,7 @@
       "renderOrderFallback2Terms": "[]",
       "renderOrderExtraFallbacks": "{\"v\":2,\"items\":[{\"m\":\"armEnd\",\"q\":\"none\",\"t\":[]},{\"m\":\"armBase\",\"q\":\"none\",\"t\":[]},{\"m\":\"palmCenter\",\"q\":\"none\",\"t\":[]}]}",
       "renderOrderFlipLock": true,
-      "handModelId": "repo:HandipantsFixedBone",
+      "handModelId": "repo:HD-300",
       "handModels": [
         {
           "name": "Handipants Fixed Bone",
@@ -81,7 +81,7 @@
           "source": "repo"
         }
       ],
-      "smallScaleModelsEnabled": false,
+      "smallScaleModelsEnabled": true,
       "smallScaleModelLevels": "[]",
       "fieldRows": 43,
       "fieldCols": 60,
@@ -94,7 +94,7 @@
       "hideHands": false,
       "fieldOffsetX": 0,
       "fieldOffsetY": 0,
-      "fieldOffsetZ": 0,
+      "fieldOffsetZ": -300,
       "fieldBoundsXMin": "-300",
       "fieldBoundsXMinCurveEnabled": false,
       "fieldBoundsXMinCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":0}]",
@@ -390,7 +390,7 @@
       "loadingPreviewSequenceHoldMs": 0,
       "loadingPreviewSize": 1600,
       "loadingPreviewRotationX": -85.46571581217302,
-      "loadingPreviewRotationY": -109.10457274713559,
+      "loadingPreviewRotationY": -109.10457274713558,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0,
       "loadingPreviewOffsetY": 0,
@@ -7903,7 +7903,7 @@
         }
       ],
       "cameraX": 1.9534883720930232,
-      "cameraY": 2.382856509440966e-13,
+      "cameraY": 2.549102312425221e-13,
       "cameraZ": 115.97925521912504,
       "cameraFov": 33,
       "cameraYaw": 0,
@@ -10845,7 +10845,7 @@
       "renderOrderFallback2Terms": "[]",
       "renderOrderExtraFallbacks": "{\"v\":2,\"items\":[{\"m\":\"armEnd\",\"q\":\"none\",\"t\":[]},{\"m\":\"armBase\",\"q\":\"none\",\"t\":[]},{\"m\":\"palmCenter\",\"q\":\"none\",\"t\":[]}]}",
       "renderOrderFlipLock": true,
-      "handModelId": "repo:HandipantsFixedBone",
+      "handModelId": "repo:HD-300",
       "handModels": [
         {
           "name": "Handipants Fixed Bone",
@@ -11212,7 +11212,7 @@
       "loadingPreviewSequenceHoldMs": 0,
       "loadingPreviewSize": 1390,
       "loadingPreviewRotationX": -85.46571581217302,
-      "loadingPreviewRotationY": -109.10457274713559,
+      "loadingPreviewRotationY": -109.10457274713558,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0,
       "loadingPreviewOffsetY": 0,
@@ -21667,7 +21667,7 @@
       "renderOrderFallback2Terms": "[]",
       "renderOrderExtraFallbacks": "{\"v\":2,\"items\":[{\"m\":\"armEnd\",\"q\":\"none\",\"t\":[]},{\"m\":\"armBase\",\"q\":\"none\",\"t\":[]},{\"m\":\"palmCenter\",\"q\":\"none\",\"t\":[]}]}",
       "renderOrderFlipLock": true,
-      "handModelId": "repo:HandipantsFixedBone",
+      "handModelId": "repo:HD-300",
       "handModels": [
         {
           "name": "Handipants Fixed Bone",
@@ -22034,7 +22034,7 @@
       "loadingPreviewSequenceHoldMs": 0,
       "loadingPreviewSize": 1600,
       "loadingPreviewRotationX": -85.46571581217302,
-      "loadingPreviewRotationY": -109.10457274713559,
+      "loadingPreviewRotationY": -109.10457274713558,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0,
       "loadingPreviewOffsetY": 0,
@@ -33458,7 +33458,7 @@
                 "type": "group",
                 "group": {
                   "key": "Render Order",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [],
                   "settings": []
@@ -39487,8 +39487,8 @@
     "desktop": {
       "left": 928.0250244140625,
       "top": 30.787500381469727,
-      "width": 614.375,
-      "height": 675.1875
+      "width": 617.5750122070312,
+      "height": 676.7875366210938
     },
     "mobile": {
       "left": 20,
