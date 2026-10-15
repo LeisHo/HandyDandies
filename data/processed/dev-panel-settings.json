@@ -118,7 +118,7 @@
       "fieldBoundsZMax": "240",
       "fieldBoundsZMaxCurveEnabled": true,
       "fieldBoundsZMaxCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.7710241189949432,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":0,\"y\":1}}]",
-      "fieldBoundsZMaxCurveRange": "{\"min\":5,\"max\":60}",
+      "fieldBoundsZMaxCurveRange": "{\"min\":5,\"max\":150}",
       "fieldBoundsX": "{\"min\":-300,\"max\":300}",
       "fieldBoundsY": "{\"min\":-300,\"max\":300}",
       "fieldBoundsZ": "{\"min\":-400,\"max\":200}",
@@ -8684,7 +8684,7 @@
       "dp_capsTabText": true,
       "dp_capsGroupNames": true,
       "dp_capsSettingsText": false,
-      "dp_textEditMode": true,
+      "dp_textEditMode": false,
       "dp_capsTitleText": false,
       "dp_boldTitle": true,
       "dp_boldTab": true,
@@ -14464,8 +14464,8 @@
       "custom44CameraOffsetYCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.324820628419056,\"y\":0},\"bg\":0.64,\"m\":\"linear\"},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.467575665942766,\"y\":0}}]",
       "custom44CameraOffsetYRange": "{\"min\":-1,\"max\":2}",
       "custom44CameraOffsetZEnabled": true,
-      "custom44CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.04670762177773661,\"y\":0}},{\"x\":0.09227976625101168,\"y\":0.8186457316080729,\"h2\":{\"x\":-0.037737375931002695,\"y\":0.18135426839192714},\"h1\":{\"x\":0.01212991123103406,\"y\":-0.3866666158040364}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.8901992394345661,\"y\":0.011979166666666652}}]",
-      "custom44CameraOffsetZRange": "{\"min\":5,\"max\":50}",
+      "custom44CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.04670762177773661,\"y\":0}},{\"x\":0.03702139600558676,\"y\":0.8536458333333333,\"h2\":{\"x\":-0.037737375931002695,\"y\":0.18135426839192714},\"h1\":{\"x\":-0.005391083083388162,\"y\":-0.4266667683919271}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.9926294067135123,\"y\":0}}]",
+      "custom44CameraOffsetZRange": "{\"min\":5,\"max\":30}",
       "custom44RotationCurveVisibleOnly": true,
       "custom44RotationXCurveEnabled": false,
       "custom44RotationXCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -16030,7 +16030,7 @@
       "fieldBoundsZMax": "240",
       "fieldBoundsZMaxCurveEnabled": true,
       "fieldBoundsZMaxCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.7710241189949432,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":0,\"y\":1}}]",
-      "fieldBoundsZMaxCurveRange": "{\"min\":5,\"max\":60}",
+      "fieldBoundsZMaxCurveRange": "{\"min\":5,\"max\":150}",
       "fieldBoundsX": "{\"min\":-300,\"max\":300}",
       "fieldBoundsY": "{\"min\":-300,\"max\":300}",
       "fieldBoundsZ": "{\"min\":-400,\"max\":200}",
@@ -24596,7 +24596,7 @@
       "dp_capsTabText": true,
       "dp_capsGroupNames": true,
       "dp_capsSettingsText": false,
-      "dp_textEditMode": true,
+      "dp_textEditMode": false,
       "dp_capsTitleText": false,
       "dp_boldTitle": true,
       "dp_boldTab": true,
@@ -30376,8 +30376,8 @@
       "custom44CameraOffsetYCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.324820628419056,\"y\":0},\"bg\":0.64,\"m\":\"linear\"},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.467575665942766,\"y\":0}}]",
       "custom44CameraOffsetYRange": "{\"min\":-1,\"max\":2}",
       "custom44CameraOffsetZEnabled": true,
-      "custom44CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.04670762177773661,\"y\":0}},{\"x\":0.09227976625101168,\"y\":0.8186457316080729,\"h2\":{\"x\":-0.037737375931002695,\"y\":0.18135426839192714},\"h1\":{\"x\":0.01212991123103406,\"y\":-0.3866666158040364}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.8901992394345661,\"y\":0.011979166666666652}}]",
-      "custom44CameraOffsetZRange": "{\"min\":5,\"max\":50}",
+      "custom44CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.04670762177773661,\"y\":0}},{\"x\":0.03702139600558676,\"y\":0.8536458333333333,\"h2\":{\"x\":-0.037737375931002695,\"y\":0.18135426839192714},\"h1\":{\"x\":-0.005391083083388162,\"y\":-0.4266667683919271}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.9926294067135123,\"y\":0}}]",
+      "custom44CameraOffsetZRange": "{\"min\":5,\"max\":30}",
       "custom44RotationCurveVisibleOnly": true,
       "custom44RotationXCurveEnabled": false,
       "custom44RotationXCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -31942,7 +31942,7 @@
       "fieldBoundsZMax": "240",
       "fieldBoundsZMaxCurveEnabled": true,
       "fieldBoundsZMaxCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.7710241189949432,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":0,\"y\":1}}]",
-      "fieldBoundsZMaxCurveRange": "{\"min\":5,\"max\":60}",
+      "fieldBoundsZMaxCurveRange": "{\"min\":5,\"max\":150}",
       "fieldBoundsX": "{\"min\":-300,\"max\":300}",
       "fieldBoundsY": "{\"min\":-300,\"max\":300}",
       "fieldBoundsZ": "{\"min\":-400,\"max\":200}",
@@ -40508,7 +40508,7 @@
       "dp_capsTabText": true,
       "dp_capsGroupNames": true,
       "dp_capsSettingsText": false,
-      "dp_textEditMode": true,
+      "dp_textEditMode": false,
       "dp_capsTitleText": false,
       "dp_boldTitle": true,
       "dp_boldTab": true,
@@ -46288,8 +46288,8 @@
       "custom44CameraOffsetYCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.324820628419056,\"y\":0},\"bg\":0.64,\"m\":\"linear\"},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.467575665942766,\"y\":0}}]",
       "custom44CameraOffsetYRange": "{\"min\":-1,\"max\":2}",
       "custom44CameraOffsetZEnabled": true,
-      "custom44CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.04670762177773661,\"y\":0}},{\"x\":0.09227976625101168,\"y\":0.8186457316080729,\"h2\":{\"x\":-0.037737375931002695,\"y\":0.18135426839192714},\"h1\":{\"x\":0.01212991123103406,\"y\":-0.3866666158040364}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.8901992394345661,\"y\":0.011979166666666652}}]",
-      "custom44CameraOffsetZRange": "{\"min\":5,\"max\":50}",
+      "custom44CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.04670762177773661,\"y\":0}},{\"x\":0.03702139600558676,\"y\":0.8536458333333333,\"h2\":{\"x\":-0.037737375931002695,\"y\":0.18135426839192714},\"h1\":{\"x\":-0.005391083083388162,\"y\":-0.4266667683919271}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.9926294067135123,\"y\":0}}]",
+      "custom44CameraOffsetZRange": "{\"min\":5,\"max\":30}",
       "custom44RotationCurveVisibleOnly": true,
       "custom44RotationXCurveEnabled": false,
       "custom44RotationXCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -48650,7 +48650,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -48661,7 +48661,7 @@
           "type": "group",
           "group": {
             "key": "Field Layout",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -48846,7 +48846,7 @@
                 "type": "group",
                 "group": {
                   "key": "Hand Position Min Z Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
@@ -49766,7 +49766,7 @@
     },
     {
       "key": "Custom Click Functions",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -49805,7 +49805,7 @@
           "type": "group",
           "group": {
             "key": "New Group (15)",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
