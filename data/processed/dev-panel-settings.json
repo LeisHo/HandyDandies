@@ -7842,7 +7842,7 @@
         }
       ],
       "cameraX": 1.9534883720930232,
-      "cameraY": 5.541526766141775e-14,
+      "cameraY": 7.203984795984307e-14,
       "cameraZ": 115.97925521912504,
       "cameraFov": 33,
       "cameraYaw": 0,
@@ -33045,7 +33045,7 @@
                 "type": "group",
                 "group": {
                   "key": "New Group (5)",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -33102,7 +33102,7 @@
                 "type": "group",
                 "group": {
                   "key": "New Group",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -39266,8 +39266,8 @@
     "desktop": {
       "left": 942.4249877929688,
       "top": 30.787500381469727,
-      "width": 575.9750366210938,
-      "height": 655.9874877929688
+      "width": 579.1749877929688,
+      "height": 657.5875244140625
     },
     "mobile": {
       "left": 79.2797622680664,
