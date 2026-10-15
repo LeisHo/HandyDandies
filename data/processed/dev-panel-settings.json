@@ -421,42 +421,42 @@
           "fnId": "custom29"
         },
         {
-          "name": "15 FT - R - C",
+          "name": "35 FT - R - C",
           "fnId": "custom52",
           "group": "20 FOV TEST"
         },
         {
-          "name": "15 FT - R - CH",
+          "name": "35 FT - R - CH",
           "fnId": "custom51",
           "group": "20 FOV TEST"
         },
         {
-          "name": "15 FT - 1 - C",
+          "name": "35 FT - 1 - C",
           "fnId": "custom50",
           "group": "20 FOV TEST"
         },
         {
-          "name": "15 FT - 1 - CH",
+          "name": "35  FT - 1 - CH",
           "fnId": "custom39",
           "group": "20 FOV TEST"
         },
         {
-          "name": "15 FT - 2 - C",
+          "name": "35 FT - 2 - C",
           "fnId": "custom40",
           "group": "20 FOV TEST"
         },
         {
-          "name": "15 FT - 2 - CH",
+          "name": "35 FT - 2 - CH",
           "fnId": "custom41",
           "group": "20 FOV TEST"
         },
         {
-          "name": "15 FT - 3 - C",
+          "name": "35 FT - 3 - C",
           "fnId": "custom42",
           "group": "20 FOV TEST"
         },
         {
-          "name": "15 FT - 3 - CH",
+          "name": "35 FT - 3 - CH",
           "fnId": "custom43",
           "group": "20 FOV TEST"
         }
@@ -8415,18 +8415,30 @@
           ]
         }
       ],
-      "cameraX": 1.963636363636364,
-      "cameraY": 9.184850993605146e-15,
-      "cameraZ": 257.48779599525176,
-      "cameraFov": 15,
+      "cameraX": 1.9534883720930234,
+      "cameraY": 2.945275551949384e-14,
+      "cameraZ": 56.47925521912509,
+      "cameraFov": 30,
       "cameraYaw": 0,
       "cameraPitch": 0,
       "cameraRoll": 0,
-      "cameraZoom": 149.99999999999994,
+      "cameraZoom": 90.50000000000001,
       "cameraZoomSpeed": 0.3,
       "savedCameras": [
         {
-          "name": "HD - MOBILE - 35FOV",
+          "name": "HD - DESKTOP - 30 FOV",
+          "cameraX": 1.9534883720930232,
+          "cameraY": 5.541526766141773e-15,
+          "cameraZ": 115.97925521912504,
+          "cameraFov": 30,
+          "cameraZoom": 90.5,
+          "cameraRoll": 0,
+          "targetX": 1.9534883720930232,
+          "targetY": 0,
+          "targetZ": 25.479255219125044
+        },
+        {
+          "name": "HD - MOBILE - 30FOV",
           "cameraX": -3.1777777777777776,
           "cameraY": 2.071011807676939e-13,
           "cameraZ": 260.17068872666084,
@@ -8438,16 +8450,16 @@
           "targetZ": 0
         },
         {
-          "name": "HD - DESKTOP - 15 FOV",
-          "cameraX": 1.963636363636364,
-          "cameraY": 9.184850993605146e-15,
-          "cameraZ": 257.48779599525176,
-          "cameraFov": 15,
-          "cameraZoom": 149.99999999999994,
+          "name": "HD - DESKTOP - 20 FOV",
+          "cameraX": 1.9534883720930232,
+          "cameraY": 2.0272434216195883e-13,
+          "cameraZ": 223.4004898795015,
+          "cameraFov": 20,
+          "cameraZoom": 99,
           "cameraRoll": 0,
-          "targetX": 1.963636363636364,
-          "targetY": 0,
-          "targetZ": 107.4877959952518
+          "targetX": 1.9534883720930232,
+          "targetY": 1.9666234050617943e-13,
+          "targetZ": 124.40048987950149
         }
       ],
       "lockCameraPan": true,
@@ -12199,42 +12211,42 @@
           "fnId": "custom29"
         },
         {
-          "name": "15 FT - R - C",
+          "name": "35 FT - R - C",
           "fnId": "custom52",
           "group": "20 FOV TEST"
         },
         {
-          "name": "15 FT - R - CH",
+          "name": "35 FT - R - CH",
           "fnId": "custom51",
           "group": "20 FOV TEST"
         },
         {
-          "name": "15 FT - 1 - C",
+          "name": "35 FT - 1 - C",
           "fnId": "custom50",
           "group": "20 FOV TEST"
         },
         {
-          "name": "15 FT - 1 - CH",
+          "name": "35  FT - 1 - CH",
           "fnId": "custom39",
           "group": "20 FOV TEST"
         },
         {
-          "name": "15 FT - 2 - C",
+          "name": "35 FT - 2 - C",
           "fnId": "custom40",
           "group": "20 FOV TEST"
         },
         {
-          "name": "15 FT - 2 - CH",
+          "name": "35 FT - 2 - CH",
           "fnId": "custom41",
           "group": "20 FOV TEST"
         },
         {
-          "name": "15 FT - 3 - C",
+          "name": "35 FT - 3 - C",
           "fnId": "custom42",
           "group": "20 FOV TEST"
         },
         {
-          "name": "15 FT - 3 - CH",
+          "name": "35 FT - 3 - CH",
           "fnId": "custom43",
           "group": "20 FOV TEST"
         }
@@ -20204,7 +20216,19 @@
       "cameraZoomSpeed": 1,
       "savedCameras": [
         {
-          "name": "HD - MOBILE - 35FOV",
+          "name": "HD - DESKTOP - 30 FOV",
+          "cameraX": 1.9534883720930232,
+          "cameraY": 5.541526766141773e-15,
+          "cameraZ": 115.97925521912504,
+          "cameraFov": 30,
+          "cameraZoom": 90.5,
+          "cameraRoll": 0,
+          "targetX": 1.9534883720930232,
+          "targetY": 0,
+          "targetZ": 25.479255219125044
+        },
+        {
+          "name": "HD - MOBILE - 30FOV",
           "cameraX": -3.1777777777777776,
           "cameraY": 2.071011807676939e-13,
           "cameraZ": 260.17068872666084,
@@ -20216,16 +20240,16 @@
           "targetZ": 0
         },
         {
-          "name": "HD - DESKTOP - 15 FOV",
-          "cameraX": 1.963636363636364,
-          "cameraY": 9.184850993605146e-15,
-          "cameraZ": 257.48779599525176,
-          "cameraFov": 15,
-          "cameraZoom": 149.99999999999994,
+          "name": "HD - DESKTOP - 20 FOV",
+          "cameraX": 1.9534883720930232,
+          "cameraY": 2.0272434216195883e-13,
+          "cameraZ": 223.4004898795015,
+          "cameraFov": 20,
+          "cameraZoom": 99,
           "cameraRoll": 0,
-          "targetX": 1.963636363636364,
-          "targetY": 0,
-          "targetZ": 107.4877959952518
+          "targetX": 1.9534883720930232,
+          "targetY": 1.9666234050617943e-13,
+          "targetZ": 124.40048987950149
         }
       ],
       "lockCameraPan": true,
@@ -23977,42 +24001,42 @@
           "fnId": "custom29"
         },
         {
-          "name": "15 FT - R - C",
+          "name": "35 FT - R - C",
           "fnId": "custom52",
           "group": "20 FOV TEST"
         },
         {
-          "name": "15 FT - R - CH",
+          "name": "35 FT - R - CH",
           "fnId": "custom51",
           "group": "20 FOV TEST"
         },
         {
-          "name": "15 FT - 1 - C",
+          "name": "35 FT - 1 - C",
           "fnId": "custom50",
           "group": "20 FOV TEST"
         },
         {
-          "name": "15 FT - 1 - CH",
+          "name": "35  FT - 1 - CH",
           "fnId": "custom39",
           "group": "20 FOV TEST"
         },
         {
-          "name": "15 FT - 2 - C",
+          "name": "35 FT - 2 - C",
           "fnId": "custom40",
           "group": "20 FOV TEST"
         },
         {
-          "name": "15 FT - 2 - CH",
+          "name": "35 FT - 2 - CH",
           "fnId": "custom41",
           "group": "20 FOV TEST"
         },
         {
-          "name": "15 FT - 3 - C",
+          "name": "35 FT - 3 - C",
           "fnId": "custom42",
           "group": "20 FOV TEST"
         },
         {
-          "name": "15 FT - 3 - CH",
+          "name": "35 FT - 3 - CH",
           "fnId": "custom43",
           "group": "20 FOV TEST"
         }
@@ -31982,7 +32006,19 @@
       "cameraZoomSpeed": 1,
       "savedCameras": [
         {
-          "name": "HD - MOBILE - 35FOV",
+          "name": "HD - DESKTOP - 30 FOV",
+          "cameraX": 1.9534883720930232,
+          "cameraY": 5.541526766141773e-15,
+          "cameraZ": 115.97925521912504,
+          "cameraFov": 30,
+          "cameraZoom": 90.5,
+          "cameraRoll": 0,
+          "targetX": 1.9534883720930232,
+          "targetY": 0,
+          "targetZ": 25.479255219125044
+        },
+        {
+          "name": "HD - MOBILE - 30FOV",
           "cameraX": -3.1777777777777776,
           "cameraY": 2.071011807676939e-13,
           "cameraZ": 260.17068872666084,
@@ -31994,16 +32030,16 @@
           "targetZ": 0
         },
         {
-          "name": "HD - DESKTOP - 15 FOV",
-          "cameraX": 1.963636363636364,
-          "cameraY": 9.184850993605146e-15,
-          "cameraZ": 257.48779599525176,
-          "cameraFov": 15,
-          "cameraZoom": 149.99999999999994,
+          "name": "HD - DESKTOP - 20 FOV",
+          "cameraX": 1.9534883720930232,
+          "cameraY": 2.0272434216195883e-13,
+          "cameraZ": 223.4004898795015,
+          "cameraFov": 20,
+          "cameraZoom": 99,
           "cameraRoll": 0,
-          "targetX": 1.963636363636364,
-          "targetY": 0,
-          "targetZ": 107.4877959952518
+          "targetX": 1.9534883720930232,
+          "targetY": 1.9666234050617943e-13,
+          "targetZ": 124.40048987950149
         }
       ],
       "lockCameraPan": false,
@@ -37640,7 +37676,7 @@
           "type": "group",
           "group": {
             "key": "Camera",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -38748,12 +38784,12 @@
     "custom43Trig1Type": "Trigger Type",
     "custom43Trig1ClickCount": "Trigger Count",
     "New Group (14)": "20 FOV - TEST",
-    "35 FT - 3 - CH Copy": "15 FT - 3 - CH",
-    "35 FT - 3 - C Copy": "15 FT - 3 - C",
-    "35 FT - 2 - CH Copy": "15 FT - 2 - CH",
-    "35 FT - Copy": "15 FT - 2 - C",
-    "35 FT - 1 - CH Copy": "15 FT - 1 - CH",
-    "35 FT - 1 - C Copy": "15 FT - 1 - C",
+    "35 FT - 3 - CH Copy": "35 FT - 3 - CH",
+    "35 FT - 3 - C Copy": "35 FT - 3 - C",
+    "35 FT - 2 - CH Copy": "35 FT - 2 - CH",
+    "35 FT - Copy": "35 FT - 2 - C",
+    "35 FT - 1 - CH Copy": "35  FT - 1 - CH",
+    "35 FT - 1 - C Copy": "35 FT - 1 - C",
     "custom44Enabled": "ON/ OFF",
     "custom44Type": "Trigger Type",
     "custom44ClickCount": "Trigger Count",
@@ -38808,11 +38844,11 @@
     "custom50Enabled": "ON/ OFF",
     "custom50Type": "Trigger Type",
     "custom50ClickCount": "Trigger Count",
-    "New Group (16)": "15 FOV - TEST",
+    "New Group (16)": "35 FOV - TEST",
     "custom51Enabled": "ON/ OFF",
     "custom51Type": "Trigger Type",
     "custom51ClickCount": "Trigger Count",
-    "20 FT - 1 - C Copy": "15 FT - R - CH",
+    "20 FT - 1 - C Copy": "35 FT - R - CH",
     "custom51Trig1Enabled": "ON/ OFF",
     "custom51Trig1Type": "Trigger Type",
     "custom51Trig1ClickCount": "Trigger Count",
@@ -38828,7 +38864,7 @@
     "custom52Trig2Enabled": "ON/ OFF",
     "custom52Trig2Type": "Trigger Type",
     "custom52Trig2ClickCount": "Trigger Count",
-    "20 FT - R - CH Copy": "15 FT - R - C"
+    "20 FT - R - CH Copy": "35 FT - R - C"
   },
   "devVisibility": {
     "custom17Enabled": true,
