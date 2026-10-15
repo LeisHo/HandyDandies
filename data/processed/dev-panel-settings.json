@@ -64,7 +64,7 @@
       "fieldBoundsZ": "{\"min\":-400,\"max\":200}",
       "trackingPoint": "armEnd",
       "trackingEnabled": true,
-      "trackingDamping": 0.02,
+      "trackingDamping": 0.22,
       "targetDepthFactor": 279.6,
       "showTargetMarker": false,
       "armRotationEnabled": true,
@@ -77,7 +77,7 @@
       "armRotationRangePct": "{\"min\":0,\"max\":86}",
       "armRotationOffsetX": -1,
       "armRotationOffsetY": 1,
-      "armRotationDamping": 0.02,
+      "armRotationDamping": 0.25,
       "palmFacesCursor": true,
       "palmRotationVisibleOnly": true,
       "palmRotationUseDepth": false,
@@ -6796,7 +6796,7 @@
       "reactiveArmLengthEnabled": true,
       "armLengthRange": "{\"min\":0,\"max\":94}",
       "armLengthCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.5056890012642226,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.5121113503476612,\"y\":0}}]",
-      "armLengthDamping": 0.11,
+      "armLengthDamping": 0.24,
       "armLengthUseDepth": false,
       "armLengthVisibleOnly": true,
       "armLengthTargetDepth": 200,
@@ -6809,7 +6809,7 @@
       "wristSplayReactiveEnabled": true,
       "wristSplayRange": "{\"min\":-53,\"max\":0}",
       "wristSplayCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.520072387209009,\"y\":0.023333485921223973}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.47992761279099105,\"y\":-0.0033332824707030806}}]",
-      "wristSplayDamping": 0.12,
+      "wristSplayDamping": 0.24,
       "tweenPoses": [
         "COUNTDOWN (VERT) - 0",
         "COUNTDOWN (VERT) - 1",
@@ -7242,8 +7242,8 @@
           "group": "FIST ROTATE"
         }
       ],
-      "cameraX": 1.9534883720930232,
-      "cameraY": -0.15410826989059342,
+      "cameraX": 1.5682191670518537,
+      "cameraY": 1.4640212155340089,
       "cameraZ": 110.92522879152789,
       "cameraFov": 35,
       "cameraYaw": 0,
@@ -7776,7 +7776,7 @@
       "startupHandScaleCurveEnabled": true,
       "startupHandScaleCurve": "[{\"x\":0,\"y\":0.0023956298828125,\"bg\":0,\"h1\":{\"x\":0.19245170221083716,\"y\":0.7133331298828125}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.05830970611652653,\"y\":0}}]",
       "startupHandScaleRange": "{\"min\":0,\"max\":1}",
-      "startupHandTweenEnabled": true,
+      "startupHandTweenEnabled": false,
       "startupFnMode": "Sequence",
       "startupFnTargetPose": "",
       "startupFnTweenSelector": "FLOWER 3",
@@ -7804,7 +7804,7 @@
       "startupFnStartTimeCurveVisibleOnly": true,
       "startupFnStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "startupFnStartTimeRange": "{\"min\":0,\"max\":300}",
-      "startupFnStartDistanceCurveEnabled": true,
+      "startupFnStartDistanceCurveEnabled": false,
       "startupFnStartDistanceMin": 0,
       "startupFnStartDistanceMax": 65,
       "startupFnStartDistanceCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.8094914779614888,\"y\":0}},{\"x\":1,\"y\":1}]",
@@ -18581,7 +18581,7 @@
       "startupFnStartTimeCurveVisibleOnly": true,
       "startupFnStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "startupFnStartTimeRange": "{\"min\":0,\"max\":300}",
-      "startupFnStartDistanceCurveEnabled": true,
+      "startupFnStartDistanceCurveEnabled": false,
       "startupFnStartDistanceMin": 0,
       "startupFnStartDistanceMax": 65,
       "startupFnStartDistanceCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.8094914779614888,\"y\":0}},{\"x\":1,\"y\":1}]",
@@ -21631,7 +21631,7 @@
       "armRotationRangePct": "{\"min\":0,\"max\":86}",
       "armRotationOffsetX": 0,
       "armRotationOffsetY": 0,
-      "armRotationDamping": 0.02,
+      "armRotationDamping": 0.25,
       "palmFacesCursor": true,
       "palmRotationVisibleOnly": true,
       "palmRotationUseDepth": true,
@@ -28350,7 +28350,7 @@
       "reactiveArmLengthEnabled": true,
       "armLengthRange": "{\"min\":0,\"max\":94}",
       "armLengthCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.5056890012642226,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.5121113503476612,\"y\":0}}]",
-      "armLengthDamping": 0.11,
+      "armLengthDamping": 0.24,
       "armLengthUseDepth": false,
       "armLengthVisibleOnly": true,
       "armLengthTargetDepth": 3.4,
@@ -28363,7 +28363,7 @@
       "wristSplayReactiveEnabled": true,
       "wristSplayRange": "{\"min\":-53,\"max\":0}",
       "wristSplayCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.520072387209009,\"y\":0.023333485921223973}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.47992761279099105,\"y\":-0.0033332824707030806}}]",
-      "wristSplayDamping": 0.12,
+      "wristSplayDamping": 0.24,
       "tweenPoses": [
         "COUNTDOWN (VERT) - 0",
         "COUNTDOWN (VERT) - 1",
@@ -29330,7 +29330,7 @@
       "startupHandScaleCurveEnabled": true,
       "startupHandScaleCurve": "[{\"x\":0,\"y\":0.0023956298828125,\"bg\":0,\"h1\":{\"x\":0.19245170221083716,\"y\":0.7133331298828125}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.05830970611652653,\"y\":0}}]",
       "startupHandScaleRange": "{\"min\":0,\"max\":1}",
-      "startupHandTweenEnabled": true,
+      "startupHandTweenEnabled": false,
       "startupFnMode": "Sequence",
       "startupFnTargetPose": "",
       "startupFnTweenSelector": "FLOWER 3",
@@ -29358,7 +29358,7 @@
       "startupFnStartTimeCurveVisibleOnly": true,
       "startupFnStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "startupFnStartTimeRange": "{\"min\":0,\"max\":300}",
-      "startupFnStartDistanceCurveEnabled": true,
+      "startupFnStartDistanceCurveEnabled": false,
       "startupFnStartDistanceMin": 0,
       "startupFnStartDistanceMax": 65,
       "startupFnStartDistanceCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.8094914779614888,\"y\":0}},{\"x\":1,\"y\":1}]",
@@ -34503,7 +34503,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -257174,7 +257174,7 @@
           "type": "group",
           "group": {
             "key": "Field Grid Sphere Sequence",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -258985,7 +258985,7 @@
         },
         {
           "key": "Field Grid Sphere Sequence",
-          "collapsed": true,
+          "collapsed": false,
           "locked": true,
           "items": [
             {
