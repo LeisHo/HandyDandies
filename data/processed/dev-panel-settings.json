@@ -390,7 +390,7 @@
       "loadingPreviewSequenceHoldMs": 0,
       "loadingPreviewSize": 1600,
       "loadingPreviewRotationX": -85.46571581217302,
-      "loadingPreviewRotationY": -109.10457274713559,
+      "loadingPreviewRotationY": -109.10457274713558,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0,
       "loadingPreviewOffsetY": 0,
@@ -7915,7 +7915,7 @@
         }
       ],
       "cameraX": 1.9534883720930232,
-      "cameraY": 5.541526766141773e-15,
+      "cameraY": 2.21661070645671e-14,
       "cameraZ": 115.97925521912504,
       "cameraFov": 35,
       "cameraYaw": 0,
@@ -9607,7 +9607,7 @@
       "custom21Trig5TweenStopDelayCurveVisibleOnly": true,
       "custom21Trig5TweenStopDelayCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21Trig5TweenStopDelayRange": "{\"min\":1297,\"max\":2217}",
-      "custom22Enabled": false,
+      "custom22Enabled": true,
       "custom22Type": "Click",
       "custom22TouchPointCount": 1,
       "custom22ClickCount": "4th",
@@ -10001,7 +10001,7 @@
       "custom23Trig1RetransitionStartTimeCurveVisibleOnly": true,
       "custom23Trig1RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom23Trig1RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom24Enabled": false,
+      "custom24Enabled": true,
       "custom24Type": "Click",
       "custom24TouchPointCount": 1,
       "custom24ClickCount": "4th",
@@ -10622,7 +10622,7 @@
       "custom26Trig1RetransitionStartTimeCurveVisibleOnly": true,
       "custom26Trig1RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom26Trig1RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom27Enabled": false,
+      "custom27Enabled": true,
       "custom27Type": "Right Click",
       "custom27TouchPointCount": 1,
       "custom27ClickCount": "1st",
@@ -13261,7 +13261,7 @@
       "loadingPreviewSequenceHoldMs": 0,
       "loadingPreviewSize": 1390,
       "loadingPreviewRotationX": -85.46571581217302,
-      "loadingPreviewRotationY": -109.10457274713559,
+      "loadingPreviewRotationY": -109.10457274713558,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0,
       "loadingPreviewOffsetY": 0,
@@ -22478,7 +22478,7 @@
       "custom21Trig5TweenStopDelayCurveVisibleOnly": true,
       "custom21Trig5TweenStopDelayCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21Trig5TweenStopDelayRange": "{\"min\":1297,\"max\":2217}",
-      "custom22Enabled": false,
+      "custom22Enabled": true,
       "custom22Type": "Click",
       "custom22TouchPointCount": 1,
       "custom22ClickCount": "4th",
@@ -22872,7 +22872,7 @@
       "custom23Trig1RetransitionStartTimeCurveVisibleOnly": true,
       "custom23Trig1RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom23Trig1RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom24Enabled": false,
+      "custom24Enabled": true,
       "custom24Type": "Click",
       "custom24TouchPointCount": 1,
       "custom24ClickCount": "4th",
@@ -23493,7 +23493,7 @@
       "custom26Trig1RetransitionStartTimeCurveVisibleOnly": true,
       "custom26Trig1RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom26Trig1RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom27Enabled": false,
+      "custom27Enabled": true,
       "custom27Type": "Right Click",
       "custom27TouchPointCount": 1,
       "custom27ClickCount": "1st",
@@ -26132,7 +26132,7 @@
       "loadingPreviewSequenceHoldMs": 0,
       "loadingPreviewSize": 1600,
       "loadingPreviewRotationX": -85.46571581217302,
-      "loadingPreviewRotationY": -109.10457274713559,
+      "loadingPreviewRotationY": -109.10457274713558,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0,
       "loadingPreviewOffsetY": 0,
@@ -35349,7 +35349,7 @@
       "custom21Trig5TweenStopDelayCurveVisibleOnly": true,
       "custom21Trig5TweenStopDelayCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom21Trig5TweenStopDelayRange": "{\"min\":1297,\"max\":2217}",
-      "custom22Enabled": false,
+      "custom22Enabled": true,
       "custom22Type": "Click",
       "custom22TouchPointCount": 1,
       "custom22ClickCount": "4th",
@@ -35743,7 +35743,7 @@
       "custom23Trig1RetransitionStartTimeCurveVisibleOnly": true,
       "custom23Trig1RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom23Trig1RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom24Enabled": false,
+      "custom24Enabled": true,
       "custom24Type": "Click",
       "custom24TouchPointCount": 1,
       "custom24ClickCount": "4th",
@@ -36364,7 +36364,7 @@
       "custom26Trig1RetransitionStartTimeCurveVisibleOnly": true,
       "custom26Trig1RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom26Trig1RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom27Enabled": false,
+      "custom27Enabled": true,
       "custom27Type": "Right Click",
       "custom27TouchPointCount": 1,
       "custom27ClickCount": "1st",
@@ -40647,168 +40647,6 @@
       "locked": true,
       "items": [
         {
-          "type": "group",
-          "group": {
-            "key": "New Group (13)",
-            "collapsed": true,
-            "locked": false,
-            "items": [
-              {
-                "type": "group",
-                "group": {
-                  "key": "2 - CH Copy",
-                  "collapsed": true,
-                  "locked": false,
-                  "items": [],
-                  "settings": []
-                }
-              },
-              {
-                "type": "group",
-                "group": {
-                  "key": "2 - C Copy",
-                  "collapsed": true,
-                  "locked": false,
-                  "items": [],
-                  "settings": []
-                }
-              },
-              {
-                "type": "group",
-                "group": {
-                  "key": "1 - CH Copy",
-                  "collapsed": true,
-                  "locked": false,
-                  "items": [],
-                  "settings": []
-                }
-              },
-              {
-                "type": "group",
-                "group": {
-                  "key": "1 - C Copy",
-                  "collapsed": true,
-                  "locked": false,
-                  "items": [],
-                  "settings": []
-                }
-              }
-            ],
-            "settings": []
-          }
-        },
-        {
-          "type": "group",
-          "group": {
-            "key": "New Group (12)",
-            "collapsed": true,
-            "locked": false,
-            "items": [
-              {
-                "type": "group",
-                "group": {
-                  "key": "Custom Click Function 31",
-                  "collapsed": true,
-                  "locked": false,
-                  "items": [],
-                  "settings": []
-                }
-              },
-              {
-                "type": "group",
-                "group": {
-                  "key": "Custom Click Function 30",
-                  "collapsed": true,
-                  "locked": false,
-                  "items": [],
-                  "settings": []
-                }
-              },
-              {
-                "type": "group",
-                "group": {
-                  "key": "Custom Click Function 27",
-                  "collapsed": true,
-                  "locked": false,
-                  "items": [],
-                  "settings": []
-                }
-              },
-              {
-                "type": "group",
-                "group": {
-                  "key": "Custom Click Function 26",
-                  "collapsed": true,
-                  "locked": false,
-                  "items": [],
-                  "settings": []
-                }
-              },
-              {
-                "type": "group",
-                "group": {
-                  "key": "Custom Click Function 25",
-                  "collapsed": true,
-                  "locked": false,
-                  "items": [],
-                  "settings": []
-                }
-              },
-              {
-                "type": "group",
-                "group": {
-                  "key": "Custom Click Function 24",
-                  "collapsed": true,
-                  "locked": false,
-                  "items": [],
-                  "settings": []
-                }
-              },
-              {
-                "type": "group",
-                "group": {
-                  "key": "Custom Click Function 23",
-                  "collapsed": true,
-                  "locked": false,
-                  "items": [],
-                  "settings": []
-                }
-              },
-              {
-                "type": "group",
-                "group": {
-                  "key": "Custom Click Function 22",
-                  "collapsed": true,
-                  "locked": false,
-                  "items": [],
-                  "settings": []
-                }
-              },
-              {
-                "type": "group",
-                "group": {
-                  "key": "Custom Click Function 21",
-                  "collapsed": true,
-                  "locked": false,
-                  "items": [],
-                  "settings": []
-                }
-              },
-              {
-                "type": "group",
-                "group": {
-                  "key": "Custom Click Function 20",
-                  "collapsed": true,
-                  "locked": false,
-                  "items": [],
-                  "settings": []
-                }
-              }
-            ],
-            "settings": []
-          }
-        },
-        {
           "type": "row",
           "key": "holdConfirmMs"
         },
@@ -40847,6 +40685,168 @@
             "collapsed": true,
             "locked": false,
             "items": [],
+            "settings": []
+          }
+        },
+        {
+          "type": "group",
+          "group": {
+            "key": "New Group (13)",
+            "collapsed": true,
+            "locked": false,
+            "items": [
+              {
+                "type": "group",
+                "group": {
+                  "key": "1 - C Copy",
+                  "collapsed": true,
+                  "locked": false,
+                  "items": [],
+                  "settings": []
+                }
+              },
+              {
+                "type": "group",
+                "group": {
+                  "key": "1 - CH Copy",
+                  "collapsed": true,
+                  "locked": false,
+                  "items": [],
+                  "settings": []
+                }
+              },
+              {
+                "type": "group",
+                "group": {
+                  "key": "2 - C Copy",
+                  "collapsed": true,
+                  "locked": false,
+                  "items": [],
+                  "settings": []
+                }
+              },
+              {
+                "type": "group",
+                "group": {
+                  "key": "2 - CH Copy",
+                  "collapsed": true,
+                  "locked": false,
+                  "items": [],
+                  "settings": []
+                }
+              }
+            ],
+            "settings": []
+          }
+        },
+        {
+          "type": "group",
+          "group": {
+            "key": "New Group (12)",
+            "collapsed": true,
+            "locked": false,
+            "items": [
+              {
+                "type": "group",
+                "group": {
+                  "key": "Custom Click Function 20",
+                  "collapsed": true,
+                  "locked": false,
+                  "items": [],
+                  "settings": []
+                }
+              },
+              {
+                "type": "group",
+                "group": {
+                  "key": "Custom Click Function 21",
+                  "collapsed": true,
+                  "locked": false,
+                  "items": [],
+                  "settings": []
+                }
+              },
+              {
+                "type": "group",
+                "group": {
+                  "key": "Custom Click Function 22",
+                  "collapsed": true,
+                  "locked": false,
+                  "items": [],
+                  "settings": []
+                }
+              },
+              {
+                "type": "group",
+                "group": {
+                  "key": "Custom Click Function 23",
+                  "collapsed": true,
+                  "locked": false,
+                  "items": [],
+                  "settings": []
+                }
+              },
+              {
+                "type": "group",
+                "group": {
+                  "key": "Custom Click Function 24",
+                  "collapsed": true,
+                  "locked": false,
+                  "items": [],
+                  "settings": []
+                }
+              },
+              {
+                "type": "group",
+                "group": {
+                  "key": "Custom Click Function 25",
+                  "collapsed": true,
+                  "locked": false,
+                  "items": [],
+                  "settings": []
+                }
+              },
+              {
+                "type": "group",
+                "group": {
+                  "key": "Custom Click Function 26",
+                  "collapsed": true,
+                  "locked": false,
+                  "items": [],
+                  "settings": []
+                }
+              },
+              {
+                "type": "group",
+                "group": {
+                  "key": "Custom Click Function 27",
+                  "collapsed": true,
+                  "locked": false,
+                  "items": [],
+                  "settings": []
+                }
+              },
+              {
+                "type": "group",
+                "group": {
+                  "key": "Custom Click Function 30",
+                  "collapsed": true,
+                  "locked": false,
+                  "items": [],
+                  "settings": []
+                }
+              },
+              {
+                "type": "group",
+                "group": {
+                  "key": "Custom Click Function 31",
+                  "collapsed": true,
+                  "locked": false,
+                  "items": [],
+                  "settings": []
+                }
+              }
+            ],
             "settings": []
           }
         },
@@ -46640,8 +46640,8 @@
     "desktop": {
       "left": 908.8250122070312,
       "top": 30.787500381469727,
-      "width": 639.9750366210938,
-      "height": 705.6124877929688
+      "width": 643.1749877929688,
+      "height": 707.2125244140625
     },
     "mobile": {
       "left": 20,
