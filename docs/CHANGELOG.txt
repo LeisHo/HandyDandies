@@ -17553,6 +17553,17 @@ Direct request: while sphere sequences are running a click will not register. ad
   hand._startupEase > 0 (its own 90-frame counter), so the cap lasts the whole ease. Measured now from the same repro: 7.5, 62.2, 92.4, 109, 118, 123, 126, 127.5, 128.4, 129.4 deg at frames 0, 10 ... 90, largest single-frame
   step 7.5 deg, no snap.
 
+2026-10-14  -  Two-hand loading tween: placement now follows HANDO exactly (hands were too far apart / mis-framed)
+  Direct report: importing a two-hand tween as the Loading Preview animation put the hands too far apart. Compared against HANDO itself (served locally, its own two-hand placement read back with the same numbers - offset -43 / -4,
+  Mirror X, Rot Y 4, Scale 1, Whole-Hand Rotation Y 107 / Z -258): HANDO reflects the second hand about a FIXED world plane through the main hand's bounding centre at load (sceneState.center) and turns / scales the main hand
+  about its PALM; convertHandoCameraPreset() maps HANDO's camera and target by a pure rotation (alignQuat, no translation). Two differences from that in the preview, both fixed: 1) updateLoadingPreviewHand2() mirrored about the main
+  hand's CURRENT centre; it now uses HANDO's fixed point expressed in the preview (c1.position + alignQuat * modelScale * ((Cn - Pn) + s * Rh * Pn)), so a Whole-Hand Rotation no longer changes the gap; 2) applyLoadingPreviewPose()
+  pinned the main hand's bounds centre to the camera preset's target, which is not where HANDO has it (a two-hand preset such as "2 HAND TWIDDLING" aims BETWEEN the hands, ~16 units off the main hand), shifting the pair against the
+  frame; for a two-hand sequence the main hand now sits at modelScale * (alignQuat*Pn - s * baseQuat*Pn), exactly HANDO's placement under the rotated camera (loadingPreviewTwoHandActive; single-hand sequences keep the old pinning).
+  Verified against HANDO's own numbers: hand-2 minus hand-1 in HANDO axes = (50.5, -4.0, 0.0) in the preview vs (49.5, -3.9, 0.0) in HANDO (bounding-sphere vs bounding-box centre explains the ~2%); preview hand 1 centre
+  (-2.1, 36.9, -11.5) vs HANDO (-1.8, 32.4, -10.9). Before the fix the preview gap was the plain offset (43.2) with this rotation, i.e. narrower than HANDO's 49.6, so this widens that case; if the hands still look too far
+  apart against HANDO, the remaining difference is the camera / canvas aspect, which I could not read from here. Test aids added to window.__debug.
+
 2026-10-13  -  Camera: XY Center Field Mid Point button, and pan / zoom lock state re-derived every frame
 
 Direct requests: (1) "in the camera group, add a button XY Center Field Mid Point... my camera will be moved in the xy axes to center the field mid point. zoom and rotation will not be touched"; (2) "when i have my camera fully unlocked. i still cant pan or zoom".

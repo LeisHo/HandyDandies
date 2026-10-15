@@ -268,7 +268,7 @@ const LOADING_PREVIEW_REFERENCE_RADIUS = 22.97
 let loadingPreviewModelScale = 1
 let loadingPreviewAnchorActive = false
 const loadingPreviewAnchor = new THREE.Vector3()
-const _loadingPreviewBase = new THREE.Vector3()
+const _loadingPreviewBase = new THREE.Vector3(), _loadingPreviewV2 = new THREE.Vector3()
 // World-XY-only cursor distance for click-function settings (2026-10-04,
 // direct request: "for any click function settings that depend on distance
 // from cursor, the distance should only be based off of world XY vectors").
@@ -330,6 +330,7 @@ const _armPartialQ = new THREE.Quaternion(), _armOffQx = new THREE.Quaternion(),
 let trkXYFieldMin = 0, trkXYFieldRange = 0.001, trkXYAllMin = 0, trkXYAllRange = 0.001
 let trackingPointCloud = null
 let fieldCenterPoint = null // Debug > FIELD CENTER POINT: one red dot at the centroid of the hand field
+let loadingPreviewTwoHandActive = false // the selected Loading Tween Sequence is a two-hand one (set by ensureLoadingPreviewHand2())
 let loadingPreviewHand2 = null // second hand of a two-hand loading tween (built lazily, see ensureLoadingPreviewHand2())
 let floorMesh = null // Floor group: one plane behind the hands
 const SPHERE_FN = 'sphereFn' // Field Grid Sphere Sequence: only the shared Speed / Easing / Start Time / Start Distance curve controls and their parsed caches are borrowed from the click functions
@@ -865,7 +866,7 @@ function tryStartField() {
   // whatever comes next; don't treat this comment's own reasoning above
   // as the settled explanation.
   if (!fieldWarmCompiled) renderer.compile(scene, camera)
-  window.__debug = { animateFrame: (...a) => animate(...a), releaseStartupHold, trackingActiveFor, placeStartupRetransitionGroup, startupHandScale, updateFieldCenterMarker, get fieldCenterPoint() { return fieldCenterPoint }, retransitionScalerMul, startupHandPhaseUnfinished, applyFieldBounds, onFieldBoundsChanged, retransitionDistanceMs, untriggeredVisibleSpheres, allVisibleHandsFinished, handStartupLocked, triggerClickPose, checkStartupFloorHide, get startupFloorHidden() { return startupFloorHidden }, get floorMesh() { return floorMesh }, updateLoadingPreviewAnimation, get loadingPreview2() { return { hand: loadingPreviewHand, hand2: loadingPreviewHand2, scene: loadingPreviewScene, camera: loadingPreviewCamera, renderer: loadingPreviewRenderer } }, updateSphereSequence, get sphereState() { return { stage: sphereStage, mesh: sphereMesh, on: sphereOn, start: sphereStart, dur: sphereDur, cap: sphereCap, done: sphereDone, keep: sphereKeepForHands, clicks: sphereClickCount } }, stackOnDefault, applyCameraOrientation, syncCameraPanelFromLive, curveByDomain, get domains() { return { xyAll: [xyAllMinDist, xyAllDistRange], splayAll: [splayAllMin, splayAllRange], cropAll: [cropAllMin, cropAllRange], restAll: [restAllMinDist, restAllDistRange], live: [liveFieldMinDist, liveFieldDistRange], splay: [splayFieldMin, splayFieldRange], crop: [cropFieldMin, cropFieldRange], xy: [xyFieldMinDist, xyFieldDistRange], rest: [restFieldMinDist, restFieldDistRange] } }, modelBaseFrameQ, computeBaseRotationQuat, cloneBaseRb, makeClipRig, updateClipRigPlanes, setClipRigT, updateOnScreenFlags, evaluateArmLengthCurve, THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose, resolveTweenSegmentsWithAnchor, lerpTweenSegments, lerpLoopSegments, isHoldEntry, updateLoadingPreviewWristClip, lerpPoseValues, get loadingPreviewRenderer() { return loadingPreviewRenderer }, get loadingPreviewScene() { return loadingPreviewScene }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, get handBoundsCenterLocal() { return handBoundsCenterLocal }, multiPointCommit, multiPointEligibleFunctions, get multiPointActiveTouchCount() { return multiPointActiveTouchCount }, get multiPointSessionFiredPoseId() { return multiPointSessionFiredPoseId }, detectPoseJumps, get poseJumpLogEntries() { return poseJumpLogEntries }, applyCurlToSkeletonReference, handLogTriggerLabel, applyAllFingerCurls, syncCameraPanelFromLive, animSpeedMs, chainSequenceCount, applyFieldBounds, cursorDistXY, hexBrightnessPct, toonThresholdForMidBrightness }
+  window.__debug = { updateLoadingPreviewHand2, get palmCenterPosRaw() { return palmCenterPosRaw }, get alignQuat() { return alignQuat }, get loadingPreviewModelScale() { return loadingPreviewModelScale }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, handBoundsCenterLocal, LOADING_PREVIEW_REFERENCE_RADIUS, importTwoHandTween, convertHandoCameraPreset, applyLoadingPreviewCameraPreset, animateFrame: (...a) => animate(...a), releaseStartupHold, trackingActiveFor, placeStartupRetransitionGroup, startupHandScale, updateFieldCenterMarker, get fieldCenterPoint() { return fieldCenterPoint }, retransitionScalerMul, startupHandPhaseUnfinished, applyFieldBounds, onFieldBoundsChanged, retransitionDistanceMs, untriggeredVisibleSpheres, allVisibleHandsFinished, handStartupLocked, triggerClickPose, checkStartupFloorHide, get startupFloorHidden() { return startupFloorHidden }, get floorMesh() { return floorMesh }, updateLoadingPreviewAnimation, get loadingPreview2() { return { hand: loadingPreviewHand, hand2: loadingPreviewHand2, scene: loadingPreviewScene, camera: loadingPreviewCamera, renderer: loadingPreviewRenderer } }, updateSphereSequence, get sphereState() { return { stage: sphereStage, mesh: sphereMesh, on: sphereOn, start: sphereStart, dur: sphereDur, cap: sphereCap, done: sphereDone, keep: sphereKeepForHands, clicks: sphereClickCount } }, stackOnDefault, applyCameraOrientation, syncCameraPanelFromLive, curveByDomain, get domains() { return { xyAll: [xyAllMinDist, xyAllDistRange], splayAll: [splayAllMin, splayAllRange], cropAll: [cropAllMin, cropAllRange], restAll: [restAllMinDist, restAllDistRange], live: [liveFieldMinDist, liveFieldDistRange], splay: [splayFieldMin, splayFieldRange], crop: [cropFieldMin, cropFieldRange], xy: [xyFieldMinDist, xyFieldDistRange], rest: [restFieldMinDist, restFieldDistRange] } }, modelBaseFrameQ, computeBaseRotationQuat, cloneBaseRb, makeClipRig, updateClipRigPlanes, setClipRigT, updateOnScreenFlags, evaluateArmLengthCurve, THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose, resolveTweenSegmentsWithAnchor, lerpTweenSegments, lerpLoopSegments, isHoldEntry, updateLoadingPreviewWristClip, lerpPoseValues, get loadingPreviewRenderer() { return loadingPreviewRenderer }, get loadingPreviewScene() { return loadingPreviewScene }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, get handBoundsCenterLocal() { return handBoundsCenterLocal }, multiPointCommit, multiPointEligibleFunctions, get multiPointActiveTouchCount() { return multiPointActiveTouchCount }, get multiPointSessionFiredPoseId() { return multiPointSessionFiredPoseId }, detectPoseJumps, get poseJumpLogEntries() { return poseJumpLogEntries }, applyCurlToSkeletonReference, handLogTriggerLabel, applyAllFingerCurls, syncCameraPanelFromLive, animSpeedMs, chainSequenceCount, applyFieldBounds, cursorDistXY, hexBrightnessPct, toonThresholdForMidBrightness }
   // Do NOT hide the loading screen yet: the hands exist but may not have been painted. finalizeReveal() hides it once the field has rendered a couple of frames (or after a 4 s safety net).
   setTimeout(finalizeReveal, 4000)
 }
@@ -7518,6 +7519,7 @@ async function importTwoHandTween(btn) {
 }
 function ensureLoadingPreviewHand2(seq) {
   const need = !!(seq && seq.twoHand && loadingPreviewScene && loadingPreviewHand && modelRoot)
+  loadingPreviewTwoHandActive = need
   if (!need) {
     if (loadingPreviewHand2) {
       if (loadingPreviewScene) loadingPreviewScene.remove(loadingPreviewHand2.clone)
@@ -7540,6 +7542,7 @@ function ensureLoadingPreviewHand2(seq) {
   loadingPreviewHand2 = { clone, skinnedMesh, wristClipPlane: plane, clipRig: rig }
 }
 const _lp2U = new THREE.Matrix4(), _lp2Pivot = new THREE.Matrix4(), _lp2Tmp = new THREE.Matrix4(), _lp2A = new THREE.Matrix4(), _lp2Ai = new THREE.Matrix4(), _lp2Mir = new THREE.Matrix4(), _lp2Final = new THREE.Matrix4()
+const _lp2Rh = new THREE.Quaternion()
 const _lp2Q = new THREE.Quaternion(), _lp2Base = new THREE.Quaternion(), _lp2V = new THREE.Vector3(), _lp2V2 = new THREE.Vector3(), _lp2S = new THREE.Vector3(), _lp2Eul = new THREE.Euler()
 function updateLoadingPreviewHand2(seq, lapStyle, t) {
   const hand2 = loadingPreviewHand2
@@ -7592,7 +7595,15 @@ function updateLoadingPreviewHand2(seq, lapStyle, t) {
     _lp2A.makeRotationFromQuaternion(alignQuat)
     _lp2Ai.copy(_lp2A).invert()
     _lp2Mir.makeScale(mx, my, mz).premultiply(_lp2A).multiply(_lp2Ai) // A * diag * A^-1
-    _lp2V2.copy(handBoundsCenterLocal).applyMatrix4(c1.matrix) // the main hand's centre in the preview world
+    // CORRECTED 2026-10-14 (direct report: with a two-hand tween the hands were too far apart). HANDO reflects about a FIXED world plane through sceneState.center = the bounding-box centre of the main hand AT LOAD (neutral,
+    // un-rotated, scale 1) - NOT about the main hand's current centre. The main hand there turns about its PALM, so with a Whole-Hand Rotation its centre swings away from that fixed point and the mirrored hand lands
+    // farther (or nearer) than the plain offset; this preview turns the main hand about its own bounds centre instead, so its current centre was the wrong plane. The same fixed point expressed in this preview: HANDO's
+    // main hand maps raw x -> Pn + s*Rh*(x - Pn) (Pn = palm centre, s = Pose Scale, Rh = its whole-hand rotation, alignQuat^-1 * the preview hand's quaternion), the preview is that times (alignQuat, modelScale, a translation
+    // t) and has the main hand at c1.position, which puts the anchor Cn (the neutral bounds centre) at c1.position + alignQuat * modelScale * ((Cn - Pn) + s*Rh*Pn). With no rotation / scale 1 it is the old point.
+    // (A non-zero Pose Offset on the main hand moves HANDO's hand but not its anchor; the preview adds it to the position, so that case is left as it was.)
+    const sMain = loadingPreviewModelScale > 0 ? c1.scale.x / loadingPreviewModelScale : 1
+    _lp2Rh.copy(alignQuat).invert().multiply(c1.quaternion)
+    _lp2V2.copy(palmCenterPosRaw).applyQuaternion(_lp2Rh).multiplyScalar(sMain).add(handBoundsCenterLocal).sub(palmCenterPosRaw).applyQuaternion(alignQuat).multiplyScalar(loadingPreviewModelScale).add(c1.position)
     _lp2Final.makeTranslation(_lp2V2.x, _lp2V2.y, _lp2V2.z).multiply(_lp2Mir).multiply(_lp2Tmp.makeTranslation(-_lp2V2.x, -_lp2V2.y, -_lp2V2.z)).multiply(_lp2U)
   } else {
     _lp2Final.copy(_lp2U)
@@ -8413,7 +8424,16 @@ function applyLoadingPreviewPose(item) {
   // offsets are then added on top as before.
   const previewScale = (values.poseScale ?? 1) * loadingPreviewModelScale
   let previewBase = _poseOffsetZeroVec
-  if (loadingPreviewAnchorActive) {
+  if (loadingPreviewAnchorActive && loadingPreviewTwoHandActive) {
+    // Two-hand tween (2026-10-14, direct report: the two hands were too far apart). convertHandoCameraPreset() maps HANDO's camera AND target by a pure rotation (alignQuat, no translation), so for this preview to look like
+    // HANDO under that camera the main hand must sit exactly where HANDO puts it, not be re-centred on the target: HANDO turns / scales the main hand about its PALM centre Pn (x -> Pn + s*R*(x - Pn)), which in this
+    // preview (raw -> alignQuat * modelScale) is a base position of modelScale * (alignQuat*Pn - s * baseQuat*Pn). Pinning the bounds centre to the target (the single-hand behaviour) moves the pair off HANDO's framing - a preset
+    // such as "2 HAND TWIDDLING" deliberately aims between the hands - and so moved hand 2, whose mirror plane is HANDO's fixed one (see updateLoadingPreviewHand2()), relative to the frame.
+    _loadingPreviewBase.copy(palmCenterPosRaw).applyQuaternion(alignQuat)
+    _loadingPreviewBase.addScaledVector(_loadingPreviewV2.copy(palmCenterPosRaw).applyQuaternion(loadingPreviewHand.clone.quaternion), -(values.poseScale ?? 1))
+    _loadingPreviewBase.multiplyScalar(loadingPreviewModelScale)
+    previewBase = _loadingPreviewBase
+  } else if (loadingPreviewAnchorActive) {
     _loadingPreviewBase.copy(handBoundsCenterLocal).multiplyScalar(previewScale).applyQuaternion(loadingPreviewHand.clone.quaternion)
     _loadingPreviewBase.copy(loadingPreviewAnchor).sub(_loadingPreviewBase)
     previewBase = _loadingPreviewBase
