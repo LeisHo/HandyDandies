@@ -6862,6 +6862,10 @@
           "elbowBend": 0,
           "elbowSideBend": 0,
           "forearmTwist": 0,
+          "poseOffsetX": 0,
+          "poseOffsetY": 0,
+          "poseOffsetZ": 0,
+          "poseScale": 1,
           "group": "BASE"
         },
         {
@@ -7868,6 +7872,14 @@
           "tweenPoses": [
             "Closed Flower (DS)",
             "Big Open Palm (S)"
+          ]
+        },
+        {
+          "name": "Closed-Flower-Fist",
+          "tweenPoses": [
+            "Closed Flower (DS)",
+            "Big Open Palm (S)",
+            "Fist"
           ]
         }
       ],
@@ -17666,6 +17678,10 @@
           "elbowBend": 0,
           "elbowSideBend": 0,
           "forearmTwist": 0,
+          "poseOffsetX": 0,
+          "poseOffsetY": 0,
+          "poseOffsetZ": 0,
+          "poseScale": 1,
           "group": "BASE"
         },
         {
@@ -18672,6 +18688,14 @@
           "tweenPoses": [
             "Closed Flower (DS)",
             "Big Open Palm (S)"
+          ]
+        },
+        {
+          "name": "Closed-Flower-Fist",
+          "tweenPoses": [
+            "Closed Flower (DS)",
+            "Big Open Palm (S)",
+            "Fist"
           ]
         }
       ],
@@ -28470,6 +28494,10 @@
           "elbowBend": 0,
           "elbowSideBend": 0,
           "forearmTwist": 0,
+          "poseOffsetX": 0,
+          "poseOffsetY": 0,
+          "poseOffsetZ": 0,
+          "poseScale": 1,
           "group": "BASE"
         },
         {
@@ -29476,6 +29504,14 @@
           "tweenPoses": [
             "Closed Flower (DS)",
             "Big Open Palm (S)"
+          ]
+        },
+        {
+          "name": "Closed-Flower-Fist",
+          "tweenPoses": [
+            "Closed Flower (DS)",
+            "Big Open Palm (S)",
+            "Fist"
           ]
         }
       ],
@@ -33279,7 +33315,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -34877,7 +34913,7 @@
     },
     {
       "key": "Starting State",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
