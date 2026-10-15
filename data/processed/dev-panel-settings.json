@@ -13755,7 +13755,7 @@
       "custom39Trig5TweenStopDelayCurveVisibleOnly": true,
       "custom39Trig5TweenStopDelayCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom39Trig5TweenStopDelayRange": "{\"min\":1297,\"max\":2217}",
-      "custom40Enabled": true,
+      "custom40Enabled": false,
       "custom40Type": "Click",
       "custom40TouchPointCount": 1,
       "custom40ClickCount": "4th",
@@ -13952,7 +13952,7 @@
       "custom40Trig1RetransitionStartTimeCurveVisibleOnly": true,
       "custom40Trig1RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom40Trig1RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom41Enabled": true,
+      "custom41Enabled": false,
       "custom41Type": "Click+Hold",
       "custom41TouchPointCount": 1,
       "custom41ClickCount": "2nd",
@@ -14149,7 +14149,7 @@
       "custom41Trig1RetransitionStartTimeCurveVisibleOnly": true,
       "custom41Trig1RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom41Trig1RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom42Enabled": true,
+      "custom42Enabled": false,
       "custom42Type": "Click",
       "custom42TouchPointCount": 1,
       "custom42ClickCount": "4th",
@@ -14346,7 +14346,7 @@
       "custom42Trig1RetransitionStartTimeCurveVisibleOnly": true,
       "custom42Trig1RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom42Trig1RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom43Enabled": true,
+      "custom43Enabled": false,
       "custom43Type": "Click+Hold",
       "custom43TouchPointCount": 1,
       "custom43ClickCount": "3rd",
@@ -28329,7 +28329,7 @@
       "custom39Trig5TweenStopDelayCurveVisibleOnly": true,
       "custom39Trig5TweenStopDelayCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom39Trig5TweenStopDelayRange": "{\"min\":1297,\"max\":2217}",
-      "custom40Enabled": true,
+      "custom40Enabled": false,
       "custom40Type": "Click",
       "custom40TouchPointCount": 1,
       "custom40ClickCount": "4th",
@@ -28526,7 +28526,7 @@
       "custom40Trig1RetransitionStartTimeCurveVisibleOnly": true,
       "custom40Trig1RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom40Trig1RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom41Enabled": true,
+      "custom41Enabled": false,
       "custom41Type": "Click+Hold",
       "custom41TouchPointCount": 1,
       "custom41ClickCount": "2nd",
@@ -28723,7 +28723,7 @@
       "custom41Trig1RetransitionStartTimeCurveVisibleOnly": true,
       "custom41Trig1RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom41Trig1RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom42Enabled": true,
+      "custom42Enabled": false,
       "custom42Type": "Click",
       "custom42TouchPointCount": 1,
       "custom42ClickCount": "4th",
@@ -28920,7 +28920,7 @@
       "custom42Trig1RetransitionStartTimeCurveVisibleOnly": true,
       "custom42Trig1RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom42Trig1RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom43Enabled": true,
+      "custom43Enabled": false,
       "custom43Type": "Click+Hold",
       "custom43TouchPointCount": 1,
       "custom43ClickCount": "3rd",
@@ -42903,7 +42903,7 @@
       "custom39Trig5TweenStopDelayCurveVisibleOnly": true,
       "custom39Trig5TweenStopDelayCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom39Trig5TweenStopDelayRange": "{\"min\":1297,\"max\":2217}",
-      "custom40Enabled": true,
+      "custom40Enabled": false,
       "custom40Type": "Click",
       "custom40TouchPointCount": 1,
       "custom40ClickCount": "4th",
@@ -43100,7 +43100,7 @@
       "custom40Trig1RetransitionStartTimeCurveVisibleOnly": true,
       "custom40Trig1RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom40Trig1RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom41Enabled": true,
+      "custom41Enabled": false,
       "custom41Type": "Click+Hold",
       "custom41TouchPointCount": 1,
       "custom41ClickCount": "2nd",
@@ -43297,7 +43297,7 @@
       "custom41Trig1RetransitionStartTimeCurveVisibleOnly": true,
       "custom41Trig1RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom41Trig1RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom42Enabled": true,
+      "custom42Enabled": false,
       "custom42Type": "Click",
       "custom42TouchPointCount": 1,
       "custom42ClickCount": "4th",
@@ -43494,7 +43494,7 @@
       "custom42Trig1RetransitionStartTimeCurveVisibleOnly": true,
       "custom42Trig1RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom42Trig1RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
-      "custom43Enabled": true,
+      "custom43Enabled": false,
       "custom43Type": "Click+Hold",
       "custom43TouchPointCount": 1,
       "custom43ClickCount": "3rd",
@@ -45801,14 +45801,14 @@
           "type": "group",
           "group": {
             "key": "New Group (14)",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
                 "type": "group",
                 "group": {
-                  "key": "35 FT - 3 - CH Copy",
-                  "collapsed": true,
+                  "key": "35 FT - 1 - C Copy",
+                  "collapsed": false,
                   "locked": false,
                   "items": [],
                   "settings": []
@@ -45817,7 +45817,17 @@
               {
                 "type": "group",
                 "group": {
-                  "key": "35 FT - 3 - C Copy",
+                  "key": "35 FT - 1 - CH Copy",
+                  "collapsed": false,
+                  "locked": false,
+                  "items": [],
+                  "settings": []
+                }
+              },
+              {
+                "type": "group",
+                "group": {
+                  "key": "35 FT - Copy",
                   "collapsed": true,
                   "locked": false,
                   "items": [],
@@ -45837,7 +45847,7 @@
               {
                 "type": "group",
                 "group": {
-                  "key": "35 FT - Copy",
+                  "key": "35 FT - 3 - C Copy",
                   "collapsed": true,
                   "locked": false,
                   "items": [],
@@ -45847,18 +45857,8 @@
               {
                 "type": "group",
                 "group": {
-                  "key": "35 FT - 1 - CH Copy",
-                  "collapsed": false,
-                  "locked": false,
-                  "items": [],
-                  "settings": []
-                }
-              },
-              {
-                "type": "group",
-                "group": {
-                  "key": "35 FT - 1 - C Copy",
-                  "collapsed": false,
+                  "key": "35 FT - 3 - CH Copy",
+                  "collapsed": true,
                   "locked": false,
                   "items": [],
                   "settings": []
@@ -53139,8 +53139,8 @@
     "desktop": {
       "left": 908.8250122070312,
       "top": 30.787500381469727,
-      "width": 643.1749877929688,
-      "height": 707.2125244140625
+      "width": 646.375,
+      "height": 708.8125
     },
     "mobile": {
       "left": 20,
