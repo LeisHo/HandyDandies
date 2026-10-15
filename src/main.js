@@ -865,7 +865,7 @@ function tryStartField() {
   // whatever comes next; don't treat this comment's own reasoning above
   // as the settled explanation.
   if (!fieldWarmCompiled) renderer.compile(scene, camera)
-  window.__debug = { startupHandScale, updateFieldCenterMarker, get fieldCenterPoint() { return fieldCenterPoint }, retransitionScalerMul, startupHandPhaseUnfinished, applyFieldBounds, onFieldBoundsChanged, retransitionDistanceMs, untriggeredVisibleSpheres, allVisibleHandsFinished, handStartupLocked, triggerClickPose, checkStartupFloorHide, get startupFloorHidden() { return startupFloorHidden }, get floorMesh() { return floorMesh }, updateLoadingPreviewAnimation, get loadingPreview2() { return { hand: loadingPreviewHand, hand2: loadingPreviewHand2, scene: loadingPreviewScene, camera: loadingPreviewCamera, renderer: loadingPreviewRenderer } }, updateSphereSequence, get sphereState() { return { stage: sphereStage, mesh: sphereMesh, on: sphereOn, start: sphereStart, dur: sphereDur, cap: sphereCap, done: sphereDone, keep: sphereKeepForHands, clicks: sphereClickCount } }, stackOnDefault, applyCameraOrientation, syncCameraPanelFromLive, curveByDomain, get domains() { return { xyAll: [xyAllMinDist, xyAllDistRange], splayAll: [splayAllMin, splayAllRange], cropAll: [cropAllMin, cropAllRange], restAll: [restAllMinDist, restAllDistRange], live: [liveFieldMinDist, liveFieldDistRange], splay: [splayFieldMin, splayFieldRange], crop: [cropFieldMin, cropFieldRange], xy: [xyFieldMinDist, xyFieldDistRange], rest: [restFieldMinDist, restFieldDistRange] } }, modelBaseFrameQ, computeBaseRotationQuat, cloneBaseRb, makeClipRig, updateClipRigPlanes, setClipRigT, updateOnScreenFlags, evaluateArmLengthCurve, THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose, resolveTweenSegmentsWithAnchor, lerpTweenSegments, lerpLoopSegments, isHoldEntry, updateLoadingPreviewWristClip, lerpPoseValues, get loadingPreviewRenderer() { return loadingPreviewRenderer }, get loadingPreviewScene() { return loadingPreviewScene }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, get handBoundsCenterLocal() { return handBoundsCenterLocal }, multiPointCommit, multiPointEligibleFunctions, get multiPointActiveTouchCount() { return multiPointActiveTouchCount }, get multiPointSessionFiredPoseId() { return multiPointSessionFiredPoseId }, detectPoseJumps, get poseJumpLogEntries() { return poseJumpLogEntries }, applyCurlToSkeletonReference, handLogTriggerLabel, applyAllFingerCurls, syncCameraPanelFromLive, animSpeedMs, chainSequenceCount, applyFieldBounds, cursorDistXY, hexBrightnessPct, toonThresholdForMidBrightness }
+  window.__debug = { releaseStartupHold, trackingActiveFor, placeStartupRetransitionGroup, startupHandScale, updateFieldCenterMarker, get fieldCenterPoint() { return fieldCenterPoint }, retransitionScalerMul, startupHandPhaseUnfinished, applyFieldBounds, onFieldBoundsChanged, retransitionDistanceMs, untriggeredVisibleSpheres, allVisibleHandsFinished, handStartupLocked, triggerClickPose, checkStartupFloorHide, get startupFloorHidden() { return startupFloorHidden }, get floorMesh() { return floorMesh }, updateLoadingPreviewAnimation, get loadingPreview2() { return { hand: loadingPreviewHand, hand2: loadingPreviewHand2, scene: loadingPreviewScene, camera: loadingPreviewCamera, renderer: loadingPreviewRenderer } }, updateSphereSequence, get sphereState() { return { stage: sphereStage, mesh: sphereMesh, on: sphereOn, start: sphereStart, dur: sphereDur, cap: sphereCap, done: sphereDone, keep: sphereKeepForHands, clicks: sphereClickCount } }, stackOnDefault, applyCameraOrientation, syncCameraPanelFromLive, curveByDomain, get domains() { return { xyAll: [xyAllMinDist, xyAllDistRange], splayAll: [splayAllMin, splayAllRange], cropAll: [cropAllMin, cropAllRange], restAll: [restAllMinDist, restAllDistRange], live: [liveFieldMinDist, liveFieldDistRange], splay: [splayFieldMin, splayFieldRange], crop: [cropFieldMin, cropFieldRange], xy: [xyFieldMinDist, xyFieldDistRange], rest: [restFieldMinDist, restFieldDistRange] } }, modelBaseFrameQ, computeBaseRotationQuat, cloneBaseRb, makeClipRig, updateClipRigPlanes, setClipRigT, updateOnScreenFlags, evaluateArmLengthCurve, THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose, resolveTweenSegmentsWithAnchor, lerpTweenSegments, lerpLoopSegments, isHoldEntry, updateLoadingPreviewWristClip, lerpPoseValues, get loadingPreviewRenderer() { return loadingPreviewRenderer }, get loadingPreviewScene() { return loadingPreviewScene }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, get handBoundsCenterLocal() { return handBoundsCenterLocal }, multiPointCommit, multiPointEligibleFunctions, get multiPointActiveTouchCount() { return multiPointActiveTouchCount }, get multiPointSessionFiredPoseId() { return multiPointSessionFiredPoseId }, detectPoseJumps, get poseJumpLogEntries() { return poseJumpLogEntries }, applyCurlToSkeletonReference, handLogTriggerLabel, applyAllFingerCurls, syncCameraPanelFromLive, animSpeedMs, chainSequenceCount, applyFieldBounds, cursorDistXY, hexBrightnessPct, toonThresholdForMidBrightness }
   // Do NOT hide the loading screen yet: the hands exist but may not have been painted. finalizeReveal() hides it once the field has rendered a couple of frames (or after a 4 s safety net).
   setTimeout(finalizeReveal, 4000)
 }
@@ -1606,6 +1606,25 @@ function clickRotatePointInto(hand, out) {
 }
 // Cursor tracking (arm / palm rotation, reactive wrist splay, reactive arm length) is live only while Tracking Enabled is on AND, with Starting State > Static Pose On Startup on, a click function has been triggered since the
 // page loaded (or since that box was ticked): until then the hands stay in their default pose.
+// Per-feature cursor tracking (direct request 2026-10-14): Hand Offset On Startup has one checkbox each for Arm Rotation / Palm Rotation / Wrist Splay / Wrist Cropping that switches that tracking on from the very start of the
+// startup, instead of waiting for the startup hold to be released. Static Pose On Startup is the OVERRIDE: with it on, nothing tracks (whatever those boxes say) until the hold is released; with it off, a ticked feature tracks.
+// The click that ends the startup hold used to switch tracking on at full strength: Wrist Cropping and Wrist Splay (damping default 1 = instant), and Arm / Palm Rotation on a damping-1 device, jumped from their static
+// startup values to the live cursor-driven ones in a single frame (direct report 2026-10-14: "on the next click the pose seems to jump"). Releasing now starts a short ease-in window on every hand (_startupEase frames) during
+// which those four dampings are capped (Arm / Palm through the existing handoff-settle window), so tracking blends in instead.
+const STARTUP_EASE_FRAMES = 90, STARTUP_EASE_DAMPING = 0.06 // ~1.5 s at 60 fps / a gentle fraction per frame: unmeasured judgment calls, not derived from any measurement
+function releaseStartupHold() {
+  if (startupStaticReleased) return
+  startupStaticReleased = true
+  if (!(cfg.staticPoseOnStartup || cfg.handOffsetOnStartupEnabled || cfg.sphereSeqEnabled)) return // no startup hold was active: nothing to ease in from
+  for (let i = 0; i < hands.length; i++) { hands[i]._startupEase = STARTUP_EASE_FRAMES; hands[i]._handoffSettleFrames = Math.max(hands[i]._handoffSettleFrames || 0, STARTUP_EASE_FRAMES) }
+}
+function startupHoldReleased() { return !(cfg.staticPoseOnStartup || cfg.handOffsetOnStartupEnabled || cfg.sphereSeqEnabled) || startupStaticReleased }
+function trackingActiveFor(kind) { // kind: 'Arm' | 'Palm' | 'Splay' | 'Crop'
+  if (!cfg.trackingEnabled) return false
+  if (startupHoldReleased()) return true
+  if (cfg.staticPoseOnStartup) return false
+  return !!cfg.handOffsetOnStartupEnabled && !!cfg['startupTrack' + kind]
+}
 function trackingActive() { return !!cfg.trackingEnabled && (!(cfg.staticPoseOnStartup || cfg.handOffsetOnStartupEnabled || cfg.sphereSeqEnabled) || startupStaticReleased) }
 function handPoint(hand) { return hand._trk || hand.wrapper.position }
 function handRestPoint(hand) { return hand._trkRest || hand.basePosition || hand.wrapper.position }
@@ -2967,6 +2986,11 @@ const DEV_GROUPS = [
       { key: 'startupHandOffsetZ', label: 'Offset Z (World Units, + Toward Camera)', type: 'slider', min: -100, max: 100, step: 0.5, def: 0, onChange: () => applyStartupHandOffset() },
       // Wait For All Hands: while any VISIBLE hand has not finished its own startup sequence, every click only (re)triggers hands and is consumed - the normal click functions stay out until all visible hands are done.
       { key: 'startupHandWaitForAll', label: 'Wait For All Hands', type: 'checkbox', def: false },
+      // Cursor tracking from the start of the startup (direct request 2026-10-14): each ticked feature is on from the beginning instead of after the startup hold. Static Pose On Startup overrides all four.
+      { key: 'startupTrackArm', label: 'Arm Rotation Tracking From Start', type: 'checkbox', def: false },
+      { key: 'startupTrackPalm', label: 'Palm Rotation Tracking From Start', type: 'checkbox', def: false },
+      { key: 'startupTrackSplay', label: 'Wrist Splay Tracking From Start', type: 'checkbox', def: false },
+      { key: 'startupTrackCrop', label: 'Wrist Cropping Tracking From Start', type: 'checkbox', def: false },
       // Hand Z Offset Curve (same UI as the sphere's Z Offset Curve): ON, the Z offset (camera forward, + toward the camera) of each hand follows this curve over its own sequence progress, between Min and Max; the hands wait at the
       // curve's value at progress 0 and end at its value at progress 1. OFF, the Offset Z slider is the start displacement that tweens back to the grid position.
       { key: 'startupHandZCurveEnabled', label: 'Hand Z Offset Curve On/Off', type: 'checkbox', def: false, onChange: () => applyStartupHandOffset() },
@@ -3258,7 +3282,7 @@ const cfg = initDevPanel(DEV_GROUPS, {
       syncBackgroundToFloor()
       gateGroupHeader('Floor', 'floorEnabled'); nestFloorIntoThreeJs(); updateFloorRowVisibility(); updateFloor()
       renderColorPresetPanel()
-      gateGroupHeader('Hand Offset On Startup', 'handOffsetOnStartupEnabled'); nestGroupInto('Hand Offset On Startup', 'Starting State'); updateHandOffsetGroupVisibility(); applyStartupHandOffset()
+      placeStartupRetransitionGroup(); gateGroupHeader('Hand Offset On Startup', 'handOffsetOnStartupEnabled'); nestGroupInto('Hand Offset On Startup', 'Starting State'); updateHandOffsetGroupVisibility(); applyStartupHandOffset()
       gateGroupHeader('Field Grid Sphere Sequence', 'sphereSeqEnabled'); nestGroupInto('Field Grid Sphere Sequence', 'Starting State'); updateGroupContentsVisibility('Field Grid Sphere Sequence', !!cfg.sphereSeqEnabled)
       if (cfg.sphereSeqEnabled && sphereStage === 2 && !startupConsumeActive) { sphereStage = 0; updateHandsVisibility() } // a saved-on sequence starts waiting for its first click
     } catch (e) { /* panel not built */ }
@@ -3840,7 +3864,7 @@ function restartStartingState() {
 }
 function onHandOffsetOnStartupToggled() {
   startupHandOffsetStage = 0; startupConsumeActive = false; startupConsumeUntil = 0
-  startupFloorHidden = false; startupHandClickCount = 0; hands.forEach((h) => { delete h._startupSeqDone; delete h._startupTriggered }); try { updateFloor() } catch (e) { /* scene not built yet */ }
+  startupFloorHidden = false; startupHandClickCount = 0; hands.forEach((h) => { delete h._startupSeqDone; delete h._startupTriggered; delete h._startupClick }); try { updateFloor() } catch (e) { /* scene not built yet */ }
   if (cfg.handOffsetOnStartupEnabled) startupStaticReleased = false
   applyStartupHandOffset()
   updateHandOffsetGroupVisibility()
@@ -3946,13 +3970,25 @@ function setupHandOffsetStartupGroup() {
   const body = g && g.querySelector(':scope > .dp-group-body')
   const tgBody = tg && tg.querySelector(':scope > .dp-group-body')
   const retr = body && body.querySelector(':scope > .dp-group[data-key="Retransition"]')
-  if (retr && tgBody) tgBody.appendChild(retr)
+  // (The Retransition group used to be moved INTO Animation Tween, so it was hidden whenever Animation Tween was off; it now stays a group of its own, see placeStartupRetransitionGroup().)
   // The nested groups made here share their titles (Easing, Retransition, Start Time Curve ...) with the same groups of every click function, and a saved layout (and the custom-function rebuild) matches groups by that
   // internal key: it adopted THESE groups for a click function and then deleted them. Give them keys of their own; the visible titles are unchanged.
   if (body) body.querySelectorAll('.dp-group').forEach((sg) => { if (!sg.dataset.key.startsWith('Startup > ')) sg.dataset.key = 'Startup > ' + sg.dataset.key })
+  placeStartupRetransitionGroup()
   gateGroupHeader('Hand Offset On Startup', 'handOffsetOnStartupEnabled')
   nestGroupInto('Hand Offset On Startup', 'Starting State')
   updateHandOffsetGroupVisibility()
+}
+// Hand Offset On Startup > Retransition (direct request 2026-10-14): a group of its own, directly under Hand Offset On Startup right after Animation Tween, visible whether or not Animation Tween is on. A saved panel layout
+// from before this change still has it nested inside Animation Tween and applyOrder() restores that, so this is re-run after every restore; the next Save writes the new arrangement.
+function placeStartupRetransitionGroup() {
+  const g = document.querySelector('.dp-group[data-key="Hand Offset On Startup"]')
+  const body = g && g.querySelector(':scope > .dp-group-body')
+  if (!body) return
+  const retr = body.querySelector('.dp-group[data-key="Startup > Retransition"], .dp-group[data-key="Retransition"]')
+  if (!retr || retr.parentElement === body) return
+  const tw = body.querySelector(':scope > .dp-group[data-key="Startup > Animation Tween"], :scope > .dp-group[data-key="Animation Tween"]')
+  if (tw && tw.nextSibling) body.insertBefore(retr, tw.nextSibling); else body.appendChild(retr)
 }
 function setupSphereSequenceGroup() {
   clickPoseTriggers[SPHERE_FN] = clickPoseTriggers[SPHERE_FN] || {
@@ -9215,7 +9251,7 @@ function computeArmLengthT(hand, distanceToCursor, minLiveDist, liveDistRange) {
   // Default Arm Length exactly as if Reactive Arm Length itself were off,
   // same as every other Responsive-* feature this same round gates the
   // same way (Wrist Splay, the new Responsive Arm Rotation).
-  if (!trackingActive() || !cfg.reactiveArmLengthEnabled) return cfg.hideWrist / 100
+  if (!trackingActiveFor('Crop') || !cfg.reactiveArmLengthEnabled) return cfg.hideWrist / 100
   const normDist = Math.max((distanceToCursor - minLiveDist) / liveDistRange, 0) // > 1 for hands beyond the farthest on-screen hand (extrapolated)
   const curveY = THREE.MathUtils.clamp(evaluateArmLengthCurve(armLengthCurveParsed, normDist), 0, 1)
   const minT = armLengthRangeParsed.min / 100, maxT = armLengthRangeParsed.max / 100
@@ -9272,7 +9308,7 @@ function computeResponsiveWristSplayDeg(distanceToCursor, minLiveDist, liveDistR
   // CORRECTED 2026-09-28 -- see computeArmLengthT()'s own matching
   // comment; same "Responsive-* falls back to its static default while
   // Tracking Enabled is off" treatment.
-  if (!trackingActive() || !cfg.wristSplayReactiveEnabled) return cfg.wristSplayDefault
+  if (!trackingActiveFor('Splay') || !cfg.wristSplayReactiveEnabled) return cfg.wristSplayDefault
   const normDist = Math.max((distanceToCursor - minLiveDist) / liveDistRange, 0) // > 1 for hands beyond the farthest on-screen hand (extrapolated)
   const curveY = THREE.MathUtils.clamp(evaluateArmLengthCurve(wristSplayCurveParsed, normDist), 0, 1)
   const { min, max } = wristSplayRangeParsed
@@ -11609,8 +11645,17 @@ function releaseHandFromOtherFunctions(hand, exceptId) {
 // retransition progress is accumulated (retProg) rather than recomputed from elapsed / speed. With a curve off, or the
 // cursor not moving, every number equals the old frozen one. Cursor Offset was already live.
 function liveCurveValue(hand, curveParsed, rangeParsed, p, flag) {
-  return curveByDomain(p, flag, handXYDist(hand), curveParsed, rangeParsed)
+  return curveByDomainFor(hand, p, flag, curveParsed, rangeParsed)
 }
+// The startup hand sequence measures "distance from the cursor" from the CLICK POINT that triggered the hand (direct request 2026-10-14), not from the live cursor: at trigger time triggerClickPose() freezes the hand's
+// distance and the nearest..farthest domain (hand._startupClick); every live evaluation for STARTUP_FN then reads those instead of the moving cursor. Every other function keeps the live behaviour.
+function curveByDomainFor(hand, p, flag, curveParsed, rangeParsed) {
+  const k = p === STARTUP_FN ? hand._startupClick : null
+  if (!k) return curveByDomain(p, flag, handXYDist(hand), curveParsed, rangeParsed)
+  const vis = cfg[`${p}${flag}`] !== false
+  return computeStartDelayMs(k.dist, vis ? k.min : k.minAll, vis ? k.range : k.rangeAll, curveParsed, rangeParsed)
+}
+function handDistFor(hand, p) { return (p === STARTUP_FN && hand._startupClick) ? hand._startupClick.dist : handXYDist(hand) }
 function liveTempo(nominalMs, liveMs) {
   if (!(nominalMs > 0) || !(liveMs > 0)) return 1
   return THREE.MathUtils.clamp(nominalMs / liveMs, 0.02, 50)
@@ -11631,7 +11676,7 @@ function refreshLiveDistanceState(st, hand, p, trig, now, kind) {
   // Values that are plain functions of distance (no rate): Offset To Camera amount, Start Distance tween amount.
   if (cfg[`${p}CameraOffsetEnabled`]) st.frozenOffsetNorm = captureCameraOffsetNorm(hand, p)
   if (cfg[`${p}StartDistanceCurveEnabled`]) {
-    const cap = computeTweenFractionCap(handXYDist(hand), cfg[`${p}StartDistanceMin`], cfg[`${p}StartDistanceMax`], trig.startDistanceCurveParsed)
+    const cap = computeTweenFractionCap(handDistFor(hand, p), cfg[`${p}StartDistanceMin`], cfg[`${p}StartDistanceMax`], trig.startDistanceCurveParsed)
     if (cap !== null) st.frozenTweenFractionCap = cap // out of range keeps the last cap rather than snapping
   }
   // Rates. Animation Speed Curve -> tempo of the forward / loop / lap clocks (nominal speed = the value at commit).
@@ -12161,7 +12206,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
 function startClickHoldPose(p) {
   if (!cfg[`${p}Enabled`]) return
   if (startupBlocksClickFunctions()) return
-  startupStaticReleased = true // (startupBlocksClickFunctions() is true until every visible hand has finished its startup sequence, so this click is the one that starts cursor tracking)
+  releaseStartupHold() // (startupBlocksClickFunctions() is true until every visible hand has finished its startup sequence, so this click is the one that starts cursor tracking)
   const trig = clickHoldPoseTriggers[p]
   trig.active = true
   trig.holdStartTime = nowVirtual() // virtual clock (see its own declaration) so Global Pause doesn't shift this trigger's forward-phase elapsed time
@@ -13025,13 +13070,13 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
       // distance-based stagger for retransition, same convention
       // `${p}StartTimeCurveEnabled` already uses for the forward phase.
       cp.retransitionDelay = cfg[`${p}RetransitionStartTimeCurveEnabled`] === false ? 0
-        : curveByDomain(p, 'RetransitionStartTimeCurveVisibleOnly', handXYDist(hand), clickPoseTriggers[p].retransitionCurveParsed, clickPoseTriggers[p].retransitionRangeParsed)
+        : curveByDomainFor(hand, p, 'RetransitionStartTimeCurveVisibleOnly', clickPoseTriggers[p].retransitionCurveParsed, clickPoseTriggers[p].retransitionRangeParsed)
       // Retransition Speed Curve (item 5, 2026-09-24) -- frozen once here,
       // same "frozen at trigger time" philosophy as Animation Speed
       // Curve's own frozenSpeedMs pair -- see makeClickHoldPoseGroup()'s
       // own matching control comment.
       cp.retransitionSpeedMs = cfg[`${p}RetransitionSpeedCurveEnabled`]
-        ? curveByDomain(p, 'RetransitionSpeedCurveVisibleOnly', handXYDist(hand), clickPoseTriggers[p].retransitionSpeedCurveParsed, clickPoseTriggers[p].retransitionSpeedRangeParsed)
+        ? curveByDomainFor(hand, p, 'RetransitionSpeedCurveVisibleOnly', clickPoseTriggers[p].retransitionSpeedCurveParsed, clickPoseTriggers[p].retransitionSpeedRangeParsed)
         : 0
       logHandBehaviourEvent(hands.indexOf(hand), handLogTriggerLabel(p), 'pause finished -> retransition begins')
     }
@@ -13126,7 +13171,7 @@ function triggerClickPose(p, onlyHands = null) {
   if (!cfg[`${p}Enabled`]) return
   if (p !== STARTUP_FN) {
     if (startupBlocksClickFunctions()) return
-    startupStaticReleased = true
+    releaseStartupHold()
   }
   const trig = clickPoseTriggers[p]
   const now = nowVirtual() // virtual clock -- feeds cp.triggerTime below, an animation-timing field
@@ -13195,7 +13240,7 @@ function triggerClickPose(p, onlyHands = null) {
       ? curveByDomain(p, 'StartTimeCurveVisibleOnly', dists[i], trig.tweenStartCurveParsed, trig.tweenStartRangeParsed)
       : curveByDomain(p, 'StartTimeCurveVisibleOnly', dists[i], trig.startCurveParsed, trig.startRangeParsed))
     cp.pendingClaimAt = now + delay
-    if (p === STARTUP_FN) hand._startupTriggered = true
+    if (p === STARTUP_FN) { hand._startupTriggered = true; hand._startupClick = { dist: dists[i], min: xyFieldMinDist, range: xyFieldDistRange, minAll: xyAllMinDist, rangeAll: xyAllDistRange } } // frozen click-point distance + domain
     cp.pendingPressAt = now; cp.pendingIsTween = isTween // live Start Time (refreshLiveDistanceState)
     cp.pendingForwardSnapshot = forwardSnapshot
     cp.pendingNamedPoses = namedPoses
@@ -17999,7 +18044,8 @@ function animate(dt, now) {
     // advances a phase while `isPaused` is true.
     if (!isPaused) {
       updateCursorTarget()
-      if (trackingActive()) {
+      const armTrackOn = trackingActiveFor('Arm'), palmTrackOn = trackingActiveFor('Palm')
+      if (armTrackOn || palmTrackOn) {
         // Per-hand now (not hoisted above the loop like before) -- with Palm
         // Faces Cursor on, each hand's own roll angle depends on ITS OWN
         // position relative to the live cursor (computeRadialRollDeg(), see
@@ -18148,7 +18194,7 @@ function animate(dt, now) {
           // The WRAPPER's no-cursor-influence orientation is identity: the default pose's own rotation (alignQuat * Whole-Hand * Rotation at Base = currentBaseQuat) already lives on hand.clone,
           // so using currentBaseQuat here applied it a second time whenever Arm Rotation was off or a hand's responsiveness was 0 (2026-10-11, direct report: tracking didn't respect the default rotation).
           let desired = _identityQuatTrack
-          if (cfg.armRotationEnabled) {
+          if (cfg.armRotationEnabled && armTrackOn) {
             // Default Arm Rotation / Reactive Arm Rotation curve -- same
             // role as before, now scaling the PER-FRAME TURN RATE instead
             // of a bounded target angle. At 0%, the hand simply stops
@@ -18190,7 +18236,7 @@ function animate(dt, now) {
             hand.currentArmRotationQuat.slerp(_armPartialQ, THREE.MathUtils.clamp(armRotationDampingAmt, 0, 1))
             desired = hand.currentArmRotationQuat
           }
-          let baseDeg = cfg.palmFacesCursor ? computeScreenRollDeg(hand._trk, cursorTarget) : 0
+          let baseDeg = cfg.palmFacesCursor && palmTrackOn ? computeScreenRollDeg(hand._trk, cursorTarget) : 0
           // Palm Rotation Distance Curve -- modulate cursor-tracking
           // responsiveness by distance (2026-09-24). At close distance,
           // full responsiveness; at far distance, reduced (curve y-value
@@ -18682,7 +18728,8 @@ function updateRenderOrder() {
     const targetArmLengthT = cfg.armLengthUseDepth === false
       ? computeArmLengthT(hand, hand._trkXY ?? handXYDist(hand), cfg.armLengthVisibleOnly !== false ? trkXYFieldMin : trkXYAllMin, cfg.armLengthVisibleOnly !== false ? trkXYFieldRange : trkXYAllRange) // Wrist Cropping Use Cursor Target Depth off: screen-space XY only
       : computeArmLengthT(hand, hand._cropDist ?? live, hand._cropDist === undefined ? minLiveDist : (cfg.armLengthVisibleOnly !== false ? cropFieldMin : cropAllMin), hand._cropDist === undefined ? liveDistRange : (cfg.armLengthVisibleOnly !== false ? cropFieldRange : cropAllRange)) // distance to the cursor at Wrist Cropping's own depth
-    const armLengthDampingAmt = THREE.MathUtils.clamp(cfg.armLengthDamping ?? 1, 0.001, 1)
+    let armLengthDampingAmt = THREE.MathUtils.clamp(cfg.armLengthDamping ?? 1, 0.001, 1)
+    if (hand._startupEase > 0) { armLengthDampingAmt = Math.min(armLengthDampingAmt, STARTUP_EASE_DAMPING); hand._startupEase-- } // ease-in after the startup hold is released (see releaseStartupHold())
     hand.currentArmLengthT = hand.currentArmLengthT !== undefined
       ? hand.currentArmLengthT + (targetArmLengthT - hand.currentArmLengthT) * armLengthDampingAmt
       : targetArmLengthT
@@ -18826,7 +18873,8 @@ function updateRenderOrder() {
         // starts false, so a hand's very first frame still applies its
         // target instantly rather than lerping from the field's un-posed
         // default.
-        const wristSplayDampingAmt = THREE.MathUtils.clamp(cfg.wristSplayDamping ?? 1, 0.001, 1)
+        let wristSplayDampingAmt = THREE.MathUtils.clamp(cfg.wristSplayDamping ?? 1, 0.001, 1)
+        if (hand._startupEase > 0) wristSplayDampingAmt = Math.min(wristSplayDampingAmt, STARTUP_EASE_DAMPING) // ease-in after the startup hold is released
         const extraSplay = wasEverReposedBeforeThisFrame
           ? hand.currentSplayDeg + (targetSplay - hand.currentSplayDeg) * wristSplayDampingAmt
           : targetSplay

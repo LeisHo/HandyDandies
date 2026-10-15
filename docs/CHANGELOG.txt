@@ -17523,6 +17523,19 @@ Direct request: while sphere sequences are running a click will not register. ad
   applyOffsetRotationToHand() for STARTUP_FN (which gets the eased sequence progress). Verified in the page with a controlled clock: range 0.2..1 -> idle ratio 0.200, then 0.277, 0.413, 0.550, 0.686, 0.823, 0.959 over the
   sequence, 1.0 once finished.
 
+2026-10-14  -  Hand Offset On Startup: own Retransition group, tracking-from-start checkboxes, click-point distance, ease-in when tracking starts
+  1. The Retransition group of Hand Offset On Startup was moved INTO Animation Tween (so hidden whenever Animation Tween was off - the default); it is now its own group directly after Animation Tween
+  (placeStartupRetransitionGroup(), re-run after every settings restore because an old saved layout nests it back; the next Save writes the new arrangement). 2. Four new checkboxes in the group - Arm Rotation / Palm
+  Rotation / Wrist Splay / Wrist Cropping Tracking From Start (startupTrackArm / Palm / Splay / Crop): a ticked feature tracks the cursor from the very start of the startup instead of after the startup hold. Static Pose On
+  Startup is the OVERRIDE: with it on nothing tracks (whatever those boxes say) until the hold is released; off, ticked features track (trackingActiveFor(kind) at the three gates: wrist crop, wrist splay, and arm / palm rotation
+  in animate()). 3. For the startup hand sequence, "distance from the cursor" now means distance from the CLICK POINT that triggered the hand: triggerClickPose() freezes the hand's distance and the nearest..farthest domain
+  (hand._startupClick) and every live evaluation for STARTUP_FN (Start Time / Animation Speed / Start Distance / Retransition curves) reads those (curveByDomainFor() / handDistFor()) instead of the moving cursor. The sphere
+  sequence already measured once at the click. 4. Checked the report "on the next click the hands' pose jumps": the pose itself continues smoothly from where it is (thumb curl 79 -> 78.5 -> 77.9 ... toward the target), but
+  Wrist Cropping and Wrist Splay (damping default 1 = instant) jumped from their static startup values to the live cursor-driven ones in ONE frame when the startup hold was released (measured: crop 0 -> 0.226 in a
+  frame, splay -2.19), and Arm / Palm Rotation would on a damping-1 device. releaseStartupHold() (both release sites) now starts a 90-frame ease-in: crop / splay dampings are capped at 0.06 and Arm / Palm go through the
+  existing handoff-settle window; measured now 0.014, 0.026, 0.038, 0.049, 0.060. 90 frames / 0.06 are unmeasured judgment calls. Verified in the page (controlled clock): Retransition group top level and visible with Animation
+  Tween off, and re-placed after a simulated old layout; tracking matrix none / arm+crop / static-override = 0000 / 1001 / 0000; a start time delay did not change when the cursor moved away after the click.
+
 2026-10-13  -  Camera: XY Center Field Mid Point button, and pan / zoom lock state re-derived every frame
 
 Direct requests: (1) "in the camera group, add a button XY Center Field Mid Point... my camera will be moved in the xy axes to center the field mid point. zoom and rotation will not be touched"; (2) "when i have my camera fully unlocked. i still cant pan or zoom".
