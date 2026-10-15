@@ -10137,6 +10137,7 @@ function buildArmLengthCurveWidget(row) {
   }
   const CURVE_SAMPLES = 48
   let handleEls = []
+  let handleHits = [] // { marker, p, i, kind } of every REAL (user-made) bezier handle, rebuilt by redraw(): the point's own hit circle looks here first
   // Same bezier-handle mechanism as buildGenericCurveWidget() -- see that
   // function's own comment for the full gesture/data-format account.
   const HANDLE_REMOVE_THRESHOLD_PX = 6
@@ -10177,6 +10178,7 @@ function buildArmLengthCurveWidget(row) {
     curvePath.setAttribute('d', d.trim())
     handleEls.forEach((el) => svg.removeChild(el))
     handleEls = []
+    handleHits = []
     circles.forEach((c) => svg.removeChild(c))
     circles = []
     points.forEach((p, i) => {
@@ -10198,6 +10200,7 @@ function buildArmLengthCurveWidget(row) {
         marker.setAttribute('fill-opacity', isReal ? '1' : '0.35')
         Object.assign(marker.style, { cursor: 'grab' })
         marker.addEventListener('pointerdown', (downEv) => startHandleDrag(p, i, kind, downEv))
+        if (isReal) handleHits.push({ marker, p, i, kind })
         svg.appendChild(marker)
         handleEls.push(marker)
       })
@@ -10210,6 +10213,21 @@ function buildArmLengthCurveWidget(row) {
       hit.addEventListener('pointerdown', (downEv) => {
         if (downEv.altKey) { startHandleDrag(p, i, 'h1', downEv); return }
         if (downEv.shiftKey) { startHandleDrag(p, i, 'h2', downEv); return }
+        // A bezier handle that sits on (or very near) a curve point is grabbed instead of the point (2026-10-15, direct report: a handle made too short could not be dragged again, the point moved instead). The point's
+        // hit circle is drawn on top of the handle marker, so without this the circle always wins when they overlap. The 7 / 12 px reach is a judgment call, not a measurement.
+        {
+          // The handle wins when the click is nearer to it than to the point, or within 7 px (12 px for touch) of it -- so a handle lying on its point is picked, while a point whose handle is a few pixels away can still be grabbed by its centre.
+          const hr = hit.getBoundingClientRect()
+          const pointD = Math.hypot(downEv.clientX - (hr.left + hr.width / 2), downEv.clientY - (hr.top + hr.height / 2))
+          const grabPx = downEv.pointerType === 'touch' ? 12 : 7
+          let best = null, bestD = Infinity
+          handleHits.forEach((h) => {
+            const r = h.marker.getBoundingClientRect()
+            const d = Math.hypot(downEv.clientX - (r.left + r.width / 2), downEv.clientY - (r.top + r.height / 2))
+            if (d <= Math.max(grabPx, pointD) && d < bestD) { bestD = d; best = h }
+          })
+          if (best) { startHandleDrag(best.p, best.i, best.kind, downEv); return }
+        }
         downEv.stopPropagation()
         dragged = false
         const isEndpoint = i === 0 || i === points.length - 1
@@ -10447,6 +10465,7 @@ function buildWristSplayCurveWidget(row) {
   }
   const CURVE_SAMPLES = 48
   let handleEls = []
+  let handleHits = [] // { marker, p, i, kind } of every REAL (user-made) bezier handle, rebuilt by redraw(): the point's own hit circle looks here first
   const HANDLE_REMOVE_THRESHOLD_PX = 6
   const CURVE_HIT_RADIUS_PX = 16
   function startHandleDrag(p, i, kind, downEv) {
@@ -10485,6 +10504,7 @@ function buildWristSplayCurveWidget(row) {
     curvePath.setAttribute('d', d.trim())
     handleEls.forEach((el) => svg.removeChild(el))
     handleEls = []
+    handleHits = []
     circles.forEach((c) => svg.removeChild(c))
     circles = []
     points.forEach((p, i) => {
@@ -10506,6 +10526,7 @@ function buildWristSplayCurveWidget(row) {
         marker.setAttribute('fill-opacity', isReal ? '1' : '0.35')
         Object.assign(marker.style, { cursor: 'grab' })
         marker.addEventListener('pointerdown', (downEv) => startHandleDrag(p, i, kind, downEv))
+        if (isReal) handleHits.push({ marker, p, i, kind })
         svg.appendChild(marker)
         handleEls.push(marker)
       })
@@ -10518,6 +10539,21 @@ function buildWristSplayCurveWidget(row) {
       hit.addEventListener('pointerdown', (downEv) => {
         if (downEv.altKey) { startHandleDrag(p, i, 'h1', downEv); return }
         if (downEv.shiftKey) { startHandleDrag(p, i, 'h2', downEv); return }
+        // A bezier handle that sits on (or very near) a curve point is grabbed instead of the point (2026-10-15, direct report: a handle made too short could not be dragged again, the point moved instead). The point's
+        // hit circle is drawn on top of the handle marker, so without this the circle always wins when they overlap. The 7 / 12 px reach is a judgment call, not a measurement.
+        {
+          // The handle wins when the click is nearer to it than to the point, or within 7 px (12 px for touch) of it -- so a handle lying on its point is picked, while a point whose handle is a few pixels away can still be grabbed by its centre.
+          const hr = hit.getBoundingClientRect()
+          const pointD = Math.hypot(downEv.clientX - (hr.left + hr.width / 2), downEv.clientY - (hr.top + hr.height / 2))
+          const grabPx = downEv.pointerType === 'touch' ? 12 : 7
+          let best = null, bestD = Infinity
+          handleHits.forEach((h) => {
+            const r = h.marker.getBoundingClientRect()
+            const d = Math.hypot(downEv.clientX - (r.left + r.width / 2), downEv.clientY - (r.top + r.height / 2))
+            if (d <= Math.max(grabPx, pointD) && d < bestD) { bestD = d; best = h }
+          })
+          if (best) { startHandleDrag(best.p, best.i, best.kind, downEv); return }
+        }
         downEv.stopPropagation()
         dragged = false
         const isEndpoint = i === 0 || i === points.length - 1
@@ -14567,6 +14603,7 @@ function buildGenericCurveWidget(row, opts) {
   }
   const CURVE_SAMPLES = 48
   let handleEls = []
+  let handleHits = [] // { marker, p, i, kind } of every REAL (user-made) bezier handle, rebuilt by redraw(): the point's own hit circle looks here first
   // Bezier curve handles (direct spec item, this widget only -- the
   // project-specific Arm Length/Wrist Splay curve widgets are deliberately
   // separate copies, per their own comments, and are NOT extended here).
@@ -14627,6 +14664,7 @@ function buildGenericCurveWidget(row, opts) {
     curvePath.setAttribute('d', d.trim())
     handleEls.forEach((el) => svg.removeChild(el))
     handleEls = []
+    handleHits = []
     circles.forEach((c) => svg.removeChild(c))
     circles = []
     points.forEach((p, i) => {
@@ -14658,6 +14696,7 @@ function buildGenericCurveWidget(row, opts) {
         marker.setAttribute('fill-opacity', isReal ? '1' : '0.35')
         Object.assign(marker.style, { cursor: 'grab' })
         marker.addEventListener('pointerdown', (downEv) => startHandleDrag(p, i, kind, downEv))
+        if (isReal) handleHits.push({ marker, p, i, kind })
         svg.appendChild(marker)
         handleEls.push(marker)
       })
@@ -14674,6 +14713,21 @@ function buildGenericCurveWidget(row, opts) {
       hit.addEventListener('pointerdown', (downEv) => {
         if (downEv.altKey) { startHandleDrag(p, i, 'h1', downEv); return }
         if (downEv.shiftKey) { startHandleDrag(p, i, 'h2', downEv); return }
+        // A bezier handle that sits on (or very near) a curve point is grabbed instead of the point (2026-10-15, direct report: a handle made too short could not be dragged again, the point moved instead). The point's
+        // hit circle is drawn on top of the handle marker, so without this the circle always wins when they overlap. The 7 / 12 px reach is a judgment call, not a measurement.
+        {
+          // The handle wins when the click is nearer to it than to the point, or within 7 px (12 px for touch) of it -- so a handle lying on its point is picked, while a point whose handle is a few pixels away can still be grabbed by its centre.
+          const hr = hit.getBoundingClientRect()
+          const pointD = Math.hypot(downEv.clientX - (hr.left + hr.width / 2), downEv.clientY - (hr.top + hr.height / 2))
+          const grabPx = downEv.pointerType === 'touch' ? 12 : 7
+          let best = null, bestD = Infinity
+          handleHits.forEach((h) => {
+            const r = h.marker.getBoundingClientRect()
+            const d = Math.hypot(downEv.clientX - (r.left + r.width / 2), downEv.clientY - (r.top + r.height / 2))
+            if (d <= Math.max(grabPx, pointD) && d < bestD) { bestD = d; best = h }
+          })
+          if (best) { startHandleDrag(best.p, best.i, best.kind, downEv); return }
+        }
         downEv.stopPropagation()
         dragged = false
         const isEndpoint = i === 0 || i === points.length - 1
