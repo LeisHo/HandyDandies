@@ -869,7 +869,7 @@ function tryStartField() {
   // whatever comes next; don't treat this comment's own reasoning above
   // as the settled explanation.
   if (!fieldWarmCompiled) renderer.compile(scene, camera)
-  window.__debug = { updateLoadingPreviewHand2, get palmCenterPosRaw() { return palmCenterPosRaw }, get handoPivotRaw() { return handoPivotRaw }, get handBoundsBoxCenterRaw() { return handBoundsBoxCenterRaw }, get alignQuat() { return alignQuat }, get loadingPreviewModelScale() { return loadingPreviewModelScale }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, handBoundsCenterLocal, LOADING_PREVIEW_REFERENCE_RADIUS, importTwoHandTween, convertHandoCameraPreset, applyLoadingPreviewCameraPreset, animateFrame: (...a) => animate(...a), releaseStartupHold, trackingActiveFor, placeStartupRetransitionGroup, startupHandScale, updateFieldCenterMarker, get fieldCenterPoint() { return fieldCenterPoint }, retransitionScalerMul, startupHandPhaseUnfinished, applyFieldBounds, onFieldBoundsChanged, retransitionDistanceMs, untriggeredVisibleSpheres, allVisibleHandsFinished, handStartupLocked, triggerClickPose, checkStartupFloorHide, get startupFloorHidden() { return startupFloorHidden }, get floorMesh() { return floorMesh }, updateLoadingPreviewAnimation, get loadingPreview2() { return { hand: loadingPreviewHand, hand2: loadingPreviewHand2, scene: loadingPreviewScene, camera: loadingPreviewCamera, renderer: loadingPreviewRenderer } }, updateSphereSequence, get sphereState() { return { stage: sphereStage, mesh: sphereMesh, on: sphereOn, start: sphereStart, dur: sphereDur, cap: sphereCap, done: sphereDone, keep: sphereKeepForHands, clicks: sphereClickCount } }, stackOnDefault, applyCameraOrientation, syncCameraPanelFromLive, curveByDomain, get domains() { return { xyAll: [xyAllMinDist, xyAllDistRange], splayAll: [splayAllMin, splayAllRange], cropAll: [cropAllMin, cropAllRange], restAll: [restAllMinDist, restAllDistRange], live: [liveFieldMinDist, liveFieldDistRange], splay: [splayFieldMin, splayFieldRange], crop: [cropFieldMin, cropFieldRange], xy: [xyFieldMinDist, xyFieldDistRange], rest: [restFieldMinDist, restFieldDistRange] } }, modelBaseFrameQ, computeBaseRotationQuat, cloneBaseRb, makeClipRig, updateClipRigPlanes, setClipRigT, updateOnScreenFlags, evaluateArmLengthCurve, THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose, resolveTweenSegmentsWithAnchor, lerpTweenSegments, lerpLoopSegments, isHoldEntry, updateLoadingPreviewWristClip, lerpPoseValues, get loadingPreviewRenderer() { return loadingPreviewRenderer }, get loadingPreviewScene() { return loadingPreviewScene }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, get handBoundsCenterLocal() { return handBoundsCenterLocal }, multiPointCommit, multiPointEligibleFunctions, get multiPointActiveTouchCount() { return multiPointActiveTouchCount }, get multiPointSessionFiredPoseId() { return multiPointSessionFiredPoseId }, detectPoseJumps, get poseJumpLogEntries() { return poseJumpLogEntries }, applyCurlToSkeletonReference, handLogTriggerLabel, applyAllFingerCurls, syncCameraPanelFromLive, animSpeedMs, chainSequenceCount, applyFieldBounds, cursorDistXY, hexBrightnessPct, toonThresholdForMidBrightness }
+  window.__debug = { applyOffsetRotationToHand, bakeOffsetRotationIntoAccum, loopLapProgress, loopLapEnd, rotateHandAboutArmBase, updateLoadingPreviewHand2, get palmCenterPosRaw() { return palmCenterPosRaw }, get handoPivotRaw() { return handoPivotRaw }, get handBoundsBoxCenterRaw() { return handBoundsBoxCenterRaw }, get alignQuat() { return alignQuat }, get loadingPreviewModelScale() { return loadingPreviewModelScale }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, handBoundsCenterLocal, LOADING_PREVIEW_REFERENCE_RADIUS, importTwoHandTween, convertHandoCameraPreset, applyLoadingPreviewCameraPreset, animateFrame: (...a) => animate(...a), releaseStartupHold, trackingActiveFor, placeStartupRetransitionGroup, startupHandScale, updateFieldCenterMarker, get fieldCenterPoint() { return fieldCenterPoint }, retransitionScalerMul, startupHandPhaseUnfinished, applyFieldBounds, onFieldBoundsChanged, retransitionDistanceMs, untriggeredVisibleSpheres, allVisibleHandsFinished, handStartupLocked, triggerClickPose, checkStartupFloorHide, get startupFloorHidden() { return startupFloorHidden }, get floorMesh() { return floorMesh }, updateLoadingPreviewAnimation, get loadingPreview2() { return { hand: loadingPreviewHand, hand2: loadingPreviewHand2, scene: loadingPreviewScene, camera: loadingPreviewCamera, renderer: loadingPreviewRenderer } }, updateSphereSequence, get sphereState() { return { stage: sphereStage, mesh: sphereMesh, on: sphereOn, start: sphereStart, dur: sphereDur, cap: sphereCap, done: sphereDone, keep: sphereKeepForHands, clicks: sphereClickCount } }, stackOnDefault, applyCameraOrientation, syncCameraPanelFromLive, curveByDomain, get domains() { return { xyAll: [xyAllMinDist, xyAllDistRange], splayAll: [splayAllMin, splayAllRange], cropAll: [cropAllMin, cropAllRange], restAll: [restAllMinDist, restAllDistRange], live: [liveFieldMinDist, liveFieldDistRange], splay: [splayFieldMin, splayFieldRange], crop: [cropFieldMin, cropFieldRange], xy: [xyFieldMinDist, xyFieldDistRange], rest: [restFieldMinDist, restFieldDistRange] } }, modelBaseFrameQ, computeBaseRotationQuat, cloneBaseRb, makeClipRig, updateClipRigPlanes, setClipRigT, updateOnScreenFlags, evaluateArmLengthCurve, THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose, resolveTweenSegmentsWithAnchor, lerpTweenSegments, lerpLoopSegments, isHoldEntry, updateLoadingPreviewWristClip, lerpPoseValues, get loadingPreviewRenderer() { return loadingPreviewRenderer }, get loadingPreviewScene() { return loadingPreviewScene }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, get handBoundsCenterLocal() { return handBoundsCenterLocal }, multiPointCommit, multiPointEligibleFunctions, get multiPointActiveTouchCount() { return multiPointActiveTouchCount }, get multiPointSessionFiredPoseId() { return multiPointSessionFiredPoseId }, detectPoseJumps, get poseJumpLogEntries() { return poseJumpLogEntries }, applyCurlToSkeletonReference, handLogTriggerLabel, applyAllFingerCurls, syncCameraPanelFromLive, animSpeedMs, chainSequenceCount, applyFieldBounds, cursorDistXY, hexBrightnessPct, toonThresholdForMidBrightness }
   // Do NOT hide the loading screen yet: the hands exist but may not have been painted. finalizeReveal() hides it once the field has rendered a couple of frames (or after a 4 s safety net).
   setTimeout(finalizeReveal, 4000)
 }
@@ -6441,6 +6441,9 @@ function offsetExtraControls(p, parseFn) {
     rows.push({ key: `${p}CameraOffset${ax}Curve`, label: `Camera Offset ${ax} Curve (Distance From Cursor -> Offset)`, type: 'text', def: linear, onChange: () => parseFn(p) })
     rows.push({ key: `${p}CameraOffset${ax}Range`, label: `Camera Offset ${ax} Min / Max (World Units)`, type: 'text', def: '{"min":0,"max":10}', onChange: () => parseFn(p) })
   })
+  // Retransition Between Loops (2026-10-14): see loopLapProgress(). One checkbox per group so each can be set on its own.
+  rows.push({ key: `${p}OffsetLoopRetransition`, label: 'Offset: Retransition Between Loops', type: 'checkbox', def: false })
+  rows.push({ key: `${p}CameraOffsetLoopRetransition`, label: 'Offset To Camera: Retransition Between Loops', type: 'checkbox', def: false })
   return rows
 }
 function makeClickHoldPoseGroup(p, title, defaults = {}) {
@@ -6521,6 +6524,13 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       { key: `${p}RotationX`, label: 'Rotation X (Deg)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
       { key: `${p}RotationY`, label: 'Rotation Y (Deg)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
       { key: `${p}RotationZ`, label: 'Rotation Z (Deg)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
+      { key: `${p}RotationLoopRetransition`, label: 'Rotation: Retransition Between Loops', type: 'checkbox', def: false },
+      // Rotation at Base (2026-10-14, direct request): the same ramp / accumulate / retransition behaviour as Rotation above, but the hand turns about its ARM BASE (like a pose's Whole-Hand Rotation at Base) instead of about the cut point, in the model's own X / Y / Z axes.
+      { key: `${p}BaseRotationEnabled`, label: 'Rotation at Base On/Off', type: 'checkbox', def: false, onChange: () => updateOffsetRotationVisibility(p) },
+      { key: `${p}BaseRotationX`, label: 'Base Rotation X (Deg)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
+      { key: `${p}BaseRotationY`, label: 'Base Rotation Y (Deg)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
+      { key: `${p}BaseRotationZ`, label: 'Base Rotation Z (Deg)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
+      { key: `${p}BaseRotationLoopRetransition`, label: 'Rotation at Base: Retransition Between Loops', type: 'checkbox', def: false },
       { key: `${p}TargetPose`, label: 'Target Pose', type: 'select', def: defaults.targetPose ?? '', options: () => (cfg.savedPoses || []).map((sp) => ({ value: sp.name, group: sp.group || null })) },
       // Skip If Same Pose (2026-10-06, direct request). Single Pose mode only: when on, a hand that is
       // ALREADY in this function's target pose is left alone by this trigger; with Multi Trigger it moves
@@ -6918,6 +6928,13 @@ function makeClickPoseGroup(p, title, defaults = {}) {
       { key: `${p}RotationX`, label: 'Rotation X (Deg)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
       { key: `${p}RotationY`, label: 'Rotation Y (Deg)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
       { key: `${p}RotationZ`, label: 'Rotation Z (Deg)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
+      { key: `${p}RotationLoopRetransition`, label: 'Rotation: Retransition Between Loops', type: 'checkbox', def: false },
+      // Rotation at Base (2026-10-14, direct request): the same ramp / accumulate / retransition behaviour as Rotation above, but the hand turns about its ARM BASE (like a pose's Whole-Hand Rotation at Base) instead of about the cut point, in the model's own X / Y / Z axes.
+      { key: `${p}BaseRotationEnabled`, label: 'Rotation at Base On/Off', type: 'checkbox', def: false, onChange: () => updateOffsetRotationVisibility(p) },
+      { key: `${p}BaseRotationX`, label: 'Base Rotation X (Deg)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
+      { key: `${p}BaseRotationY`, label: 'Base Rotation Y (Deg)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
+      { key: `${p}BaseRotationZ`, label: 'Base Rotation Z (Deg)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
+      { key: `${p}BaseRotationLoopRetransition`, label: 'Rotation at Base: Retransition Between Loops', type: 'checkbox', def: false },
       { key: `${p}TargetPose`, label: 'Target Pose', type: 'select', def: defaults.targetPose ?? '', options: () => (cfg.savedPoses || []).map((sp) => ({ value: sp.name, group: sp.group || null })) },
       // Skip If Same Pose (2026-10-06, direct request). Single Pose mode only: when on, a hand that is
       // ALREADY in this function's target pose is left alone by this trigger; with Multi Trigger it moves
@@ -10864,14 +10881,14 @@ function computeCameraOffsetAt(hand, p, progress) {
 // Offset To Camera amount scaled by the same progress (when ITS checkbox is on).
 // One function for all 3 callers so live apply and both bake paths can
 // never disagree.
-function computeCombinedOffsetAt(hand, p, progress) {
+function computeCombinedOffsetAt(hand, p, progress, camProgress = progress) {
   const mainOn = !!cfg[`${p}OffsetEnabled`]
   const camOn = !!cfg[`${p}CameraOffsetEnabled`]
   if (!mainOn && !camOn) return ZERO_OFFSET
   let a = ZERO_OFFSET
   if (mainOn) { const m = computeOffsetXY(hand, p); a = { x: m.x * progress, y: m.y * progress, z: m.z * progress } }
   if (!camOn) return a
-  const b = computeCameraOffsetAt(hand, p, progress)
+  const b = computeCameraOffsetAt(hand, p, camProgress)
   return { x: a.x + b.x, y: a.y + b.y, z: a.z + b.z }
 }
 // CORRECTED 2026-09-27 -- direct spec, 3 related items:
@@ -10926,7 +10943,12 @@ function mulWrapperRot(hand, q) {
   }
   hand._cfRot.multiply(q)
 }
-function applyOffsetRotationToHand(hand, p, progress) {
+// `progressIn` is a plain number (every group follows it) or { o, c, r, b } = Offset / Offset To Camera / Rotation / Rotation at Base, so each group can follow its own
+// Retransition Between Loops shape (see loopLapProgress()). A negative value is the inverse (Oscillate, every other loop).
+function normOffsetProgress(v) { return typeof v === 'number' ? { o: v, c: v, r: v, b: v } : v }
+function applyOffsetRotationToHand(hand, p, progressIn) {
+  const pr = normOffsetProgress(progressIn)
+  const progress = pr.o // plain number for the startup-only curves below
   if (!hand._customOffsetAccum) hand._customOffsetAccum = { x: 0, y: 0, z: 0 }
   if (!hand._customRotationAccum) hand._customRotationAccum = new THREE.Quaternion()
   // CORRECTED 2026-09-27 (4th round of this same jump investigation) --
@@ -10936,7 +10958,7 @@ function applyOffsetRotationToHand(hand, p, progress) {
   // reaches its own natural completion (see bakeInFlightOffsetRotation()'s
   // own comment for the full account of the bug this closes).
   if (!hand._lastOffsetRotationProgress) hand._lastOffsetRotationProgress = {}
-  hand._lastOffsetRotationProgress[p] = progress
+  hand._lastOffsetRotationProgress[p] = pr
   if (p === STARTUP_FN && startupHandScaleActive(hand)) hand.clone.scale.multiplyScalar(startupHandScale(progress)) // Hand Scale Curve (applyPoseValuesToHand() has just set the plain scale this frame)
   _offsetRightVec.setFromMatrixColumn(camera.matrixWorld, 0)
   _offsetUpVec.setFromMatrixColumn(camera.matrixWorld, 1)
@@ -10954,8 +10976,9 @@ function applyOffsetRotationToHand(hand, p, progress) {
     hand.wrapper.position.addScaledVector(_offsetForwardVec, hand._customOffsetAccum.z)
   }
   if (!isIdentityQuat(hand._customRotationAccum)) mulWrapperRot(hand, hand._customRotationAccum)
+  if (hand._customBaseRotAccum && !isIdentityQuat(hand._customBaseRotAccum)) rotateHandAboutArmBase(hand, hand._customBaseRotAccum)
   if (cfg[`${p}OffsetEnabled`] || cfg[`${p}CameraOffsetEnabled`]) {
-    const o = computeCombinedOffsetAt(hand, p, progress)
+    const o = computeCombinedOffsetAt(hand, p, pr.o, pr.c)
     const ox = o.x
     const oy = o.y
     let oz = o.z
@@ -10971,9 +10994,9 @@ function applyOffsetRotationToHand(hand, p, progress) {
     }
   }
   if (cfg[`${p}RotationEnabled`]) {
-    const rx = (cfg[`${p}RotationX`] || 0) * progress
-    const ry = (cfg[`${p}RotationY`] || 0) * progress
-    const rz = (cfg[`${p}RotationZ`] || 0) * progress
+    const rx = (cfg[`${p}RotationX`] || 0) * pr.r
+    const ry = (cfg[`${p}RotationY`] || 0) * pr.r
+    const rz = (cfg[`${p}RotationZ`] || 0) * pr.r
     if (rx !== 0 || ry !== 0 || rz !== 0) {
       _offsetEuler.set(THREE.MathUtils.degToRad(rx), THREE.MathUtils.degToRad(ry), THREE.MathUtils.degToRad(rz), 'XYZ')
       _offsetQuat.setFromEuler(_offsetEuler)
@@ -10982,26 +11005,83 @@ function applyOffsetRotationToHand(hand, p, progress) {
       mulWrapperRot(hand, _offsetQuat)
     }
   }
+  if (cfg[`${p}BaseRotationEnabled`]) {
+    const bx = (cfg[`${p}BaseRotationX`] || 0) * pr.b, by = (cfg[`${p}BaseRotationY`] || 0) * pr.b, bz = (cfg[`${p}BaseRotationZ`] || 0) * pr.b
+    if (bx !== 0 || by !== 0 || bz !== 0) {
+      _offsetEuler.set(THREE.MathUtils.degToRad(bx), THREE.MathUtils.degToRad(by), THREE.MathUtils.degToRad(bz), 'XYZ')
+      rotateHandAboutArmBase(hand, _offsetQuat.setFromEuler(_offsetEuler))
+    }
+  }
+}
+const _baseRotQ = new THREE.Quaternion(), _baseRotInv = new THREE.Quaternion(), _baseRotB = new THREE.Vector3(), _baseRotT = new THREE.Vector3(), _baseRotV = new THREE.Vector3()
+// Rotation at Base (2026-10-14): turns the whole hand (rigidly, fingers included) about its ARM BASE by `q`, given in the MODEL's own axes - the same rotation a pose's Whole-Hand Rotation at Base makes, but added on top of
+// whatever the pose and cursor tracking are doing. Rotating the wrapper about its own origin (the cut point, mulWrapperRot()) and then moving the wrapper by (B - q'B) puts the pivot at the arm base B instead.
+function rotateHandAboutArmBase(hand, q) {
+  const cq = hand.clone.quaternion
+  _baseRotQ.copy(cq).multiply(q).multiply(_baseRotInv.copy(cq).invert()) // q in the wrapper's own frame
+  _baseRotB.copy(forearmPosRaw).multiplyScalar(hand.clone.scale.x).applyQuaternion(cq).add(hand.clone.position) // arm base in the wrapper's frame
+  _baseRotT.copy(_baseRotB).sub(_baseRotV.copy(_baseRotB).applyQuaternion(_baseRotQ)) // B - q'B
+  hand.wrapper.position.add(_baseRotT.applyQuaternion(hand.wrapper.quaternion))
+  hand.wrapper.quaternion.multiply(_baseRotQ)
+}
+// Retransition Between Loops (2026-10-14, direct request). With a group's checkbox on, what a lap adds is undone again, so looping never accumulates:
+//  - Loop / Count-Loop: the lap's increment rises 0 -> 1 over the lap and falls back to 0 over the loop-to-loop (wrap-back) segment, which is the lap's last 1/n for a pose-kind function (it ends with the wrap) and the
+//    lap's FIRST 1/n for a hold-kind function (it starts on the wrap, after the forward pass), where the fall starts from the previous lap's end value (loopCarry; 0 on the first lap). Nothing is baked at lap end.
+//  - Oscillate: no shaping; every other lap is the inverse (loop 1 normal, loop 2 inverted, ...), so two laps cancel. dir is +1 / -1.
+// n = poses in the lap (the wrap is 1 of n segments). Groups with their checkbox off keep the old behaviour (linear rise, baked in full).
+const LOOP_RETRANSITION_FLAGS = { o: 'OffsetLoopRetransition', c: 'CameraOffsetLoopRetransition', r: 'RotationLoopRetransition', b: 'BaseRotationLoopRetransition' }
+function loopLapProgress(p, kind, lapT, carry, n, oscillate, dir) {
+  const t = Math.min(Math.max(lapT, 0), 1)
+  const w = Math.min(Math.max(1 / Math.max(n, 2), 0.05), 0.95)
+  const out = {}
+  Object.keys(LOOP_RETRANSITION_FLAGS).forEach((k) => {
+    if (!cfg[p + LOOP_RETRANSITION_FLAGS[k]]) { out[k] = t; return }
+    if (oscillate) { out[k] = dir * t; return }
+    if (kind === 'hold') out[k] = t < w ? carry * (1 - t / w) : (t - w) / (1 - w)
+    else out[k] = t < 1 - w ? t / (1 - w) : (1 - t) / w
+  })
+  return out
+}
+// What to bake into the accumulators when a lap completes.
+function loopLapEnd(p, oscillate, dir) {
+  const out = {}
+  Object.keys(LOOP_RETRANSITION_FLAGS).forEach((k) => { out[k] = cfg[p + LOOP_RETRANSITION_FLAGS[k]] ? (oscillate ? dir : 0) : 1 })
+  return out
+}
+// What is still shown while a lap's Hold Duration pause runs (everything is baked, except a hold-kind shaped Loop lap that ends at 1 and is carried into the next lap's wrap).
+function loopPausedProg(p, kind, carry, oscillate) {
+  const out = {}
+  Object.keys(LOOP_RETRANSITION_FLAGS).forEach((k) => { out[k] = (kind === 'hold' && !oscillate && cfg[p + LOOP_RETRANSITION_FLAGS[k]]) ? carry : 0 })
+  return out
 }
 function isIdentityQuat(q) { return q.x === 0 && q.y === 0 && q.z === 0 && q.w === 1 }
 // Folds `p`'s own current full Offset/Rotation contribution permanently
 // into the hand's accumulator -- called exactly once, by the state
 // machine, at the instant a ramp/lap's own progress crosses 1. See
 // applyOffsetRotationToHand()'s own comment for the full model.
-function bakeOffsetRotationIntoAccum(hand, p) {
+function bakeOffsetRotationIntoAccum(hand, p, fracIn = 1) {
+  const f = normOffsetProgress(fracIn) // the full amount by default; a loop's end value (0, or +/-1 for Oscillate) when Retransition Between Loops is on
   if (!hand._customOffsetAccum) hand._customOffsetAccum = { x: 0, y: 0, z: 0 }
   if (!hand._customRotationAccum) hand._customRotationAccum = new THREE.Quaternion()
-  if (cfg[`${p}OffsetEnabled`] || cfg[`${p}CameraOffsetEnabled`]) {
-    const base = computeCombinedOffsetAt(hand, p, 1)
+  if (!hand._customBaseRotAccum) hand._customBaseRotAccum = new THREE.Quaternion()
+  if ((cfg[`${p}OffsetEnabled`] || cfg[`${p}CameraOffsetEnabled`]) && (f.o || f.c)) {
+    const base = computeCombinedOffsetAt(hand, p, f.o, f.c)
     hand._customOffsetAccum.x += base.x
     hand._customOffsetAccum.y += base.y
     hand._customOffsetAccum.z += base.z
   }
-  if (cfg[`${p}RotationEnabled`]) {
-    const rx = cfg[`${p}RotationX`] || 0, ry = cfg[`${p}RotationY`] || 0, rz = cfg[`${p}RotationZ`] || 0
+  if (cfg[`${p}RotationEnabled`] && f.r) {
+    const rx = (cfg[`${p}RotationX`] || 0) * f.r, ry = (cfg[`${p}RotationY`] || 0) * f.r, rz = (cfg[`${p}RotationZ`] || 0) * f.r
     if (rx || ry || rz) {
       _offsetEuler.set(THREE.MathUtils.degToRad(rx), THREE.MathUtils.degToRad(ry), THREE.MathUtils.degToRad(rz), 'XYZ')
       hand._customRotationAccum.multiply(_offsetQuat.setFromEuler(_offsetEuler))
+    }
+  }
+  if (cfg[`${p}BaseRotationEnabled`] && f.b) {
+    const bx = (cfg[`${p}BaseRotationX`] || 0) * f.b, by = (cfg[`${p}BaseRotationY`] || 0) * f.b, bz = (cfg[`${p}BaseRotationZ`] || 0) * f.b
+    if (bx || by || bz) {
+      _offsetEuler.set(THREE.MathUtils.degToRad(bx), THREE.MathUtils.degToRad(by), THREE.MathUtils.degToRad(bz), 'XYZ')
+      hand._customBaseRotAccum.multiply(_offsetQuat.setFromEuler(_offsetEuler))
     }
   }
 }
@@ -11027,23 +11107,11 @@ function bakeOffsetRotationIntoAccum(hand, p) {
 // then clears that marker so a 2nd accidental call can't double-credit
 // the same fraction again.
 function bakeInFlightOffsetRotation(hand, p) {
-  const fraction = (hand._lastOffsetRotationProgress && hand._lastOffsetRotationProgress[p]) || 0
-  if (fraction <= 0) return
-  if (!hand._customOffsetAccum) hand._customOffsetAccum = { x: 0, y: 0, z: 0 }
-  if (!hand._customRotationAccum) hand._customRotationAccum = new THREE.Quaternion()
-  if (cfg[`${p}OffsetEnabled`] || cfg[`${p}CameraOffsetEnabled`]) {
-    const base = computeCombinedOffsetAt(hand, p, fraction)
-    hand._customOffsetAccum.x += base.x
-    hand._customOffsetAccum.y += base.y
-    hand._customOffsetAccum.z += base.z
-  }
-  if (cfg[`${p}RotationEnabled`]) {
-    const rx = (cfg[`${p}RotationX`] || 0) * fraction, ry = (cfg[`${p}RotationY`] || 0) * fraction, rz = (cfg[`${p}RotationZ`] || 0) * fraction
-    if (rx || ry || rz) {
-      _offsetEuler.set(THREE.MathUtils.degToRad(rx), THREE.MathUtils.degToRad(ry), THREE.MathUtils.degToRad(rz), 'XYZ')
-      hand._customRotationAccum.multiply(_offsetQuat.setFromEuler(_offsetEuler))
-    }
-  }
+  const shown = hand._lastOffsetRotationProgress && hand._lastOffsetRotationProgress[p]
+  if (!shown) return
+  const f = normOffsetProgress(shown) // each group's own fraction, possibly negative (Oscillate inverse) or shaped (Retransition Between Loops)
+  if (!f.o && !f.c && !f.r && !f.b) return
+  bakeOffsetRotationIntoAccum(hand, p, f)
   hand._lastOffsetRotationProgress[p] = 0
 }
 // Retransition ALWAYS fully clears the accumulated offset/rotation back
@@ -11054,7 +11122,8 @@ function bakeInFlightOffsetRotation(hand, p) {
 // with the pose's own retransition progress, then clears the real
 // accumulator entirely once progress reaches 1 -- a genuinely fresh
 // start for the next trigger, not just a visual reset.
-function applyOffsetRotationRetransition(hand, progress, offsetAccumStart, rotationAccumStart) {
+const _baseRotDecay = new THREE.Quaternion()
+function applyOffsetRotationRetransition(hand, progress, offsetAccumStart, rotationAccumStart, baseAccumStart) {
   const remaining = 1 - progress
   const decayedX = offsetAccumStart ? offsetAccumStart.x * remaining : 0
   const decayedY = offsetAccumStart ? offsetAccumStart.y * remaining : 0
@@ -11088,6 +11157,12 @@ function applyOffsetRotationRetransition(hand, progress, offsetAccumStart, rotat
   // scratch var reused elsewhere in this file every frame, so the
   // rotation accumulator is written via a fresh identity+slerp rather
   // than aliasing that shared reference.
+  const hasBase = baseAccumStart && !isIdentityQuat(baseAccumStart)
+  if (hasBase) rotateHandAboutArmBase(hand, _baseRotDecay.identity().slerp(baseAccumStart, remaining))
+  if (hand._customBaseRotAccum) {
+    if (hasBase) hand._customBaseRotAccum.identity().slerp(baseAccumStart, remaining)
+    else hand._customBaseRotAccum.identity()
+  }
   if (hand._customOffsetAccum) { hand._customOffsetAccum.x = decayedX; hand._customOffsetAccum.y = decayedY; hand._customOffsetAccum.z = decayedZ }
   if (hand._customRotationAccum) {
     if (hasRotation) hand._customRotationAccum.identity().slerp(rotationAccumStart, remaining)
@@ -11577,6 +11652,7 @@ function animSpeedMs(p, isTween, frozenSpeedMs) {
 function snapshotOffsetRotationAccumForRetransition(hand, chp) {
   chp.retransitionOffsetAccumStart = hand._customOffsetAccum ? { ...hand._customOffsetAccum } : { x: 0, y: 0, z: 0 }
   chp.retransitionRotationAccumStart = hand._customRotationAccum ? hand._customRotationAccum.clone() : new THREE.Quaternion()
+  chp.retransitionBaseAccumStart = hand._customBaseRotAccum ? hand._customBaseRotAccum.clone() : new THREE.Quaternion()
   // CORRECTED 2026-09-27 -- same "no jump on handoff" fix as
   // applyPoseValuesToHand()'s own comment, captured here since all 3 real
   // chp retransition-entry points already funnel through this one
@@ -11993,6 +12069,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
       const loopMode = cfg[`${p}LoopMode`]
       if (progress >= 1 && loopMode !== 'Off' && trig.loopPoses && trig.loopPoses.length >= 2) {
         chp.phase = 'looping'
+        chp.loopCarry = 0
         chp.loopStartTime = now
         chp.loopNom = 0
         chp.loopHoldEndTime = 0
@@ -12048,7 +12125,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
       // other config-driven state can still change during a hold, same
       // convention as the 'paused' phase elsewhere in this file).
       applyPoseValuesToHand(hand, chp.lastAppliedValues, chp.frozenSplayDeg)
-      applyOffsetRotationToHand(hand, p, 0) // this lap's own contribution is already baked into the accumulator (item 5, 2026-09-27)
+      applyOffsetRotationToHand(hand, p, loopPausedProg(p, 'hold', chp.loopCarry || 0, cfg[`${p}LoopMode`] === 'Oscillate')) // this lap's own contribution is already baked into the accumulator (item 5, 2026-09-27)
       return
     }
     if (chp.loopHoldEndTime && now >= chp.loopHoldEndTime) {
@@ -12100,14 +12177,16 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     }
     chp.lastAppliedValues = values
     applyPoseValuesToHand(hand, values, chp.frozenSplayDeg)
-    applyOffsetRotationToHand(hand, p, lapT) // item 5 (2026-09-27): THIS lap's own ramp, on top of everything already accumulated
+    const holdOsc = cfg[`${p}LoopMode`] === 'Oscillate'
+    applyOffsetRotationToHand(hand, p, loopLapProgress(p, 'hold', lapT, chp.loopCarry || 0, trig.loopPoses.length, holdOsc, chp.loopDirection)) // item 5 (2026-09-27): THIS lap's own ramp, on top of everything already accumulated
     if (lapT >= 1) {
       // Item 5 (2026-09-27): "everytime the loop starts, the
       // offset/rotation sequence is triggered again" -- lock THIS lap's
       // own contribution in permanently before branching into
       // stop/hold/restart, exactly mirroring the fire-and-forget pose-kind
       // family's own sequencePlaying phase (updateClickPoseForHand()).
-      bakeOffsetRotationIntoAccum(hand, p)
+      bakeOffsetRotationIntoAccum(hand, p, loopLapEnd(p, holdOsc, chp.loopDirection))
+      chp.loopCarry = 1 // a shaped Loop lap ends at 1 (not baked); the next lap's wrap-back falls from it
       // On Release Mode = 'Complete Sequence' -- a release happened
       // while this lap was already looping (see the forward phase's own
       // matching comment). Finish the CURRENT lap (just completed, right
@@ -12266,7 +12345,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     // (snapshotted at retransition-start by snapshotOffsetRotationAccumForRetransition())
     // back to zero, not just this function's own last increment -- and
     // clears the real accumulator once progress reaches 1.
-    applyOffsetRotationRetransition(hand, easedProgress, chp.retransitionOffsetAccumStart, chp.retransitionRotationAccumStart)
+    applyOffsetRotationRetransition(hand, easedProgress, chp.retransitionOffsetAccumStart, chp.retransitionRotationAccumStart, chp.retransitionBaseAccumStart)
     if (progress >= 1) chp.phase = 'idle' // fully settled at default -- stop overriding, normal cfg-driven posing (inert here since it only re-applies on slider change, not every frame) silently regains control
   }
 }
@@ -13027,7 +13106,7 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
     const holdMs = Math.max(cfg[`${p}SequenceHoldMs`] || 0, 0)
     if (cp.sequenceHoldEndTime && now < cp.sequenceHoldEndTime) {
       applyPoseValuesToHand(hand, cp.lastAppliedValues, cp.frozenSplayDeg)
-      applyOffsetRotationToHand(hand, p, 0) // this lap's own contribution is already baked into the accumulator
+      applyOffsetRotationToHand(hand, p, loopPausedProg(p, 'pose', 0, lapStyle === 'Oscillate')) // this lap's own contribution is already baked into the accumulator
       return
     }
     if (cp.sequenceHoldEndTime && now >= cp.sequenceHoldEndTime) {
@@ -13066,7 +13145,7 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
     }
     cp.lastAppliedValues = values
     applyPoseValuesToHand(hand, values, cp.frozenSplayDeg)
-    applyOffsetRotationToHand(hand, p, lapT) // item 5 (2026-09-27): THIS lap's own ramp, on top of everything already accumulated
+    applyOffsetRotationToHand(hand, p, loopLapProgress(p, 'pose', lapT, 0, cp.tweenPoses.length, lapStyle === 'Oscillate', cp.sequenceDirection)) // item 5 (2026-09-27): THIS lap's own ramp, on top of everything already accumulated
     if (lapT >= 1) {
       // Item 5 (2026-09-27): "everytime the loop starts, the
       // offset/rotation sequence is triggered again" -- lock THIS lap's
@@ -13077,7 +13156,7 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
       // `sequenceHoldEndTime` branch above, which correctly renders
       // progress=0 while paused since the bake already happened here),
       // so this fires exactly once per completed lap, never repeated.
-      bakeOffsetRotationIntoAccum(hand, p)
+      bakeOffsetRotationIntoAccum(hand, p, loopLapEnd(p, lapStyle === 'Oscillate', cp.sequenceDirection))
       cp.sequenceLapIndex++
       if (cp.sequenceLapIndex > totalLaps) {
         cp.phase = 'paused'
@@ -13128,6 +13207,7 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
       // real total rather than just this function's own last increment.
       cp.retransitionOffsetAccumStart = hand._customOffsetAccum ? { ...hand._customOffsetAccum } : { x: 0, y: 0, z: 0 }
       cp.retransitionRotationAccumStart = hand._customRotationAccum ? hand._customRotationAccum.clone() : new THREE.Quaternion()
+      cp.retransitionBaseAccumStart = hand._customBaseRotAccum ? hand._customBaseRotAccum.clone() : new THREE.Quaternion()
       // CORRECTED 2026-09-27 -- see updateClickHoldPoseForHand()'s own
       // matching capture for the full reasoning.
       cp.retransitionFromSplayDeg = hand.currentSplayDeg
@@ -13167,7 +13247,7 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
     // (snapshotted above at retransition-start) back to zero, not just
     // this function's own last increment -- and clears the real
     // accumulator once progress reaches 1, a genuinely fresh start.
-    applyOffsetRotationRetransition(hand, easedProgress, cp.retransitionOffsetAccumStart, cp.retransitionRotationAccumStart)
+    applyOffsetRotationRetransition(hand, easedProgress, cp.retransitionOffsetAccumStart, cp.retransitionRotationAccumStart, cp.retransitionBaseAccumStart)
     if (progress >= 1) cp.phase = 'idle'
   }
 }
@@ -15404,6 +15484,7 @@ const MULTI_TRIGGER_ALLOWED_SUFFIXES = [
   'OffsetZ', 'CursorOffsetXCurve', 'CursorOffsetXRange', 'CursorOffsetYCurve', 'CursorOffsetYRange', 'CursorOffsetZCurve', 'CursorOffsetZRange',
   'CameraOffsetEnabled', 'CameraOffsetXEnabled', 'CameraOffsetYEnabled', 'CameraOffsetZEnabled', 'CameraOffsetXCurve', 'CameraOffsetXRange', 'CameraOffsetYCurve', 'CameraOffsetYRange', 'CameraOffsetZCurve', 'CameraOffsetZRange',
   'RotationEnabled', 'RotationX', 'RotationY', 'RotationZ',
+  'OffsetLoopRetransition', 'CameraOffsetLoopRetransition', 'RotationLoopRetransition', 'BaseRotationEnabled', 'BaseRotationX', 'BaseRotationY', 'BaseRotationZ', 'BaseRotationLoopRetransition',
   'SpeedCurveEnabled', 'SpeedCurve', 'SpeedCurveRange',
   'SpeedCurveVisibleOnly', 'StartTimeCurveVisibleOnly', 'RetransitionSpeedCurveVisibleOnly', 'RetransitionStartTimeCurveVisibleOnly', 'TweenStopStartTimeCurveVisibleOnly', 'TweenStopDelayCurveVisibleOnly', 'CameraOffsetVisibleOnly', 'CursorOffsetVisibleOnly',
   'StartTimeCurveEnabled', 'StartTimeCurve', 'StartTimeRange', 'TweenStartTimeCurve', 'TweenStartTimeRange',
@@ -16469,6 +16550,11 @@ function updateOffsetRotationVisibility(p) {
     const row = document.querySelector(`.dp-row[data-key="${p}${suffix}"]`)
     if (row) row.style.display = rotationOn ? '' : 'none'
   })
+  const baseRotationOn = !!cfg[`${p}BaseRotationEnabled`]
+  ;['BaseRotationX', 'BaseRotationY', 'BaseRotationZ'].forEach((suffix) => {
+    const row = document.querySelector(`.dp-row[data-key="${p}${suffix}"]`)
+    if (row) row.style.display = baseRotationOn ? '' : 'none'
+  })
 }
 cfg.startupFnEnabled = true
 CLICK_POSE_KEYS.forEach((p) => { parseClickPoseConfig(p); buildClickPoseWidgets(p) })
@@ -16543,11 +16629,12 @@ function wrapClickFunctionGatedSubgroups(p) {
   // subgroup treatment as every other on/off curve below ("provide an
   // on off checkbox for each").
   wrapGatedSubgroup(`${p}EasingCurveEnabled`, [`${p}EasingCurve`], 'Easing')
-  wrapGatedSubgroup(`${p}OffsetEnabled`, [`${p}OffsetMode`, `${p}OffsetX`, `${p}OffsetY`, `${p}OffsetZ`, `${p}CursorOffsetDistance`, `${p}CursorOffsetDistanceCurveEnabled`, `${p}CursorOffsetVisibleOnly`, `${p}CursorOffsetDistanceCurve`, `${p}CursorOffsetDistanceCurveRange`, ...['X', 'Y', 'Z'].flatMap((ax) => [`${p}CursorOffset${ax}Curve`, `${p}CursorOffset${ax}Range`])], 'Offset')
+  wrapGatedSubgroup(`${p}OffsetEnabled`, [`${p}OffsetLoopRetransition`, `${p}OffsetMode`, `${p}OffsetX`, `${p}OffsetY`, `${p}OffsetZ`, `${p}CursorOffsetDistance`, `${p}CursorOffsetDistanceCurveEnabled`, `${p}CursorOffsetVisibleOnly`, `${p}CursorOffsetDistanceCurve`, `${p}CursorOffsetDistanceCurveRange`, ...['X', 'Y', 'Z'].flatMap((ax) => [`${p}CursorOffset${ax}Curve`, `${p}CursorOffset${ax}Range`])], 'Offset')
   // "Offset To Camera" (2026-10-02) -- its own mandatory gated subgroup,
   // independent of (and stackable with) "Offset" above.
-  wrapGatedSubgroup(`${p}CameraOffsetEnabled`, [`${p}CameraOffsetVisibleOnly`, ...['X', 'Y', 'Z'].flatMap((ax) => [`${p}CameraOffset${ax}Enabled`, `${p}CameraOffset${ax}Curve`, `${p}CameraOffset${ax}Range`])], 'Offset To Camera')
-  wrapGatedSubgroup(`${p}RotationEnabled`, [`${p}RotationX`, `${p}RotationY`, `${p}RotationZ`], 'Rotation')
+  wrapGatedSubgroup(`${p}CameraOffsetEnabled`, [`${p}CameraOffsetLoopRetransition`, `${p}CameraOffsetVisibleOnly`, ...['X', 'Y', 'Z'].flatMap((ax) => [`${p}CameraOffset${ax}Enabled`, `${p}CameraOffset${ax}Curve`, `${p}CameraOffset${ax}Range`])], 'Offset To Camera')
+  wrapGatedSubgroup(`${p}RotationEnabled`, [`${p}RotationLoopRetransition`, `${p}RotationX`, `${p}RotationY`, `${p}RotationZ`], 'Rotation')
+  wrapGatedSubgroup(`${p}BaseRotationEnabled`, [`${p}BaseRotationLoopRetransition`, `${p}BaseRotationX`, `${p}BaseRotationY`, `${p}BaseRotationZ`], 'Rotation at Base')
   wrapGatedSubgroup(`${p}SpeedCurveEnabled`, [`${p}SpeedCurveVisibleOnly`, `${p}SpeedCurve`, `${p}SpeedCurveRange`], 'Animation Speed Curve')
   // CORRECTED 2026-09-24 (item 7, remainder): Tween mode's own always-on
   // start-time curve (no enable toggle of its own -- see
