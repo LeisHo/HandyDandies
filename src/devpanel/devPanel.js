@@ -626,6 +626,15 @@ function buildGroupHeader(entry, path) {
       g.classList.toggle('dp-lp-group-selected', entry.selectedGroups.has(path))
       return
     }
+    // A plain click also PICKS the group (2026-10-15, direct request: clicking a group only expanded / collapsed it and never highlighted it like an item, so Rename / Duplicate had no group to act on): the group is
+    // highlighted, the item selection is cleared (the same way clicking an item clears the group pick), and the group still expands / collapses as before. Ctrl / Cmd-click above is unchanged (multi-pick, no collapse).
+    entry.selectedGroups = new Set([path])
+    entry.lastPick = 'group'
+    entry.listEl.querySelectorAll('.dp-lp-group-selected').forEach((x) => x.classList.remove('dp-lp-group-selected'))
+    g.classList.add('dp-lp-group-selected')
+    entry.selectedItem = null
+    entry.multiSelected = new Set()
+    entry.listEl.querySelectorAll('.dp-list-picker-row-selected, .dp-list-picker-row-multi-selected').forEach((r) => r.classList.remove('dp-list-picker-row-selected', 'dp-list-picker-row-multi-selected'))
     g.classList.toggle('collapsed')
     if (g.classList.contains('collapsed')) entry.collapsedGroups.add(path)
     else entry.collapsedGroups.delete(path)
