@@ -3803,8 +3803,35 @@ export function initDevPanel(groups, opts = {}) {
       return raw ? JSON.parse(raw) : {}
     } catch (err) { return {} }
   }
+  // Returns null on success, or a short reason. It used to swallow every error, so a full browser storage made "Save" silently do nothing (2026-10-15, direct report: "Saved Dev Settings still not saving new instances. I click save, I give it a name and it doesn't show up in the drop down"). One state is the whole panel
+  // (about 1.5 million characters with the real settings) and a browser keeps only about 5 million characters per site, so roughly the 4th save failed.
   function setSavedStates(states) {
-    try { localStorage.setItem(savedStatesKey(), JSON.stringify(states)) } catch (err) { /* ignore -- storage full/unavailable, same tolerance as saveSettings() */ }
+    try { localStorage.setItem(savedStatesKey(), JSON.stringify(states)); return null } catch (err) { return (err && err.name) || 'storage error' }
+  }
+  // A saved state is stored gzip-compressed (base64) as { gz }, about a tenth of its size; older plain states are still read as they are and are compressed the next time anything is saved.
+  async function gzipToB64(str) {
+    const cs = new CompressionStream('gzip')
+    const w = cs.writable.getWriter(); w.write(new TextEncoder().encode(str)); w.close()
+    const buf = new Uint8Array(await new Response(cs.readable).arrayBuffer())
+    let bin = ''
+    for (let i = 0; i < buf.length; i += 0x8000) bin += String.fromCharCode.apply(null, buf.subarray(i, i + 0x8000))
+    return btoa(bin)
+  }
+  async function gunzipFromB64(b64) {
+    const bin = atob(b64)
+    const buf = new Uint8Array(bin.length)
+    for (let i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i)
+    const ds = new DecompressionStream('gzip')
+    const w = ds.writable.getWriter(); w.write(buf); w.close()
+    return new Response(ds.readable).text()
+  }
+  async function packState(state) {
+    if (typeof CompressionStream === 'undefined') return state
+    try { return { gz: await gzipToB64(JSON.stringify(state)) } } catch (err) { return state }
+  }
+  async function unpackState(entry) {
+    if (entry && typeof entry.gz === 'string') return JSON.parse(await gunzipFromB64(entry.gz))
+    return entry
   }
   function renderSavedStatesList() {
     const states = getSavedStates()
@@ -3818,21 +3845,31 @@ export function initDevPanel(groups, opts = {}) {
     })
     if (states[prevValue]) savedStatesSelect.value = prevValue
   }
-  function saveNamedState() {
+  async function saveNamedState() {
     const name = window.prompt('Save current settings as:')
     if (!name) return
     const states = getSavedStates()
     if (states[name] && !window.confirm(`"${name}" already exists. Overwrite it?`)) return
-    states[name] = captureFullPanelState()
-    setSavedStates(states)
+    const snapshot = captureFullPanelState()
+    // Compress this one and any older plain ones first, so a full storage frees up before the write is tried.
+    for (const k of Object.keys(states)) if (states[k] && typeof states[k].gz !== 'string') states[k] = await packState(states[k])
+    states[name] = await packState(snapshot)
+    const failed = setSavedStates(states)
+    if (failed) {
+      window.alert(`Could not save "${name}": this browser's storage for the page is full (${failed}). Delete some saved settings with Delete and try again.`)
+      return
+    }
     renderSavedStatesList()
     savedStatesSelect.value = name
   }
-  function useNamedState() {
+  async function useNamedState() {
     const name = savedStatesSelect.value
     if (!name) return
     const states = getSavedStates()
-    if (states[name]) applyFullPanelState(states[name])
+    if (!states[name]) return
+    let state
+    try { state = await unpackState(states[name]) } catch (err) { window.alert(`Could not read "${name}" (${(err && err.message) || err}).`); return }
+    if (state) applyFullPanelState(state)
   }
   function deleteNamedState() {
     const name = savedStatesSelect.value
@@ -3843,11 +3880,13 @@ export function initDevPanel(groups, opts = {}) {
     setSavedStates(states)
     renderSavedStatesList()
   }
-  function setNamedStateAsDefault() {
+  async function setNamedStateAsDefault() {
     const name = savedStatesSelect.value
     if (!name) return
     const states = getSavedStates()
-    const state = states[name]
+    if (!states[name]) return
+    let state
+    try { state = await unpackState(states[name]) } catch (err) { window.alert(`Could not read "${name}" (${(err && err.message) || err}).`); return }
     if (!state) return
     applyFullPanelState(state)
     saveSettings()
