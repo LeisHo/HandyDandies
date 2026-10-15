@@ -94,7 +94,7 @@
       "hideHands": false,
       "fieldOffsetX": 0,
       "fieldOffsetY": 0,
-      "fieldOffsetZ": -300,
+      "fieldOffsetZ": 0,
       "fieldBoundsXMin": "-300",
       "fieldBoundsXMinCurveEnabled": false,
       "fieldBoundsXMinCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":0}]",
@@ -413,42 +413,42 @@
           "fnId": "custom19"
         },
         {
-          "name": "1 - C",
+          "name": "35 FT - 1 - C",
           "fnId": "custom20",
           "group": "35 FOV TEST"
         },
         {
-          "name": "1 - CH",
+          "name": "35 FT - 1 - CH",
           "fnId": "custom21",
           "group": "35 FOV TEST"
         },
         {
-          "name": "2 - C",
+          "name": "35 FT -",
           "fnId": "custom22",
           "group": "35 FOV TEST"
         },
         {
-          "name": "2 - CH",
+          "name": "35 FT - 2 - CH",
           "fnId": "custom23",
           "group": "35 FOV TEST"
         },
         {
-          "name": "3 - C",
+          "name": "35 FT - 3 - C",
           "fnId": "custom24",
           "group": "35 FOV TEST"
         },
         {
-          "name": "3 - CH",
+          "name": "35 FT - 3 - CH",
           "fnId": "custom25",
           "group": "35 FOV TEST"
         },
         {
-          "name": "4 - C",
+          "name": "35 FT - 4 - C",
           "fnId": "custom26",
           "group": "35 FOV TEST"
         },
         {
-          "name": "RC",
+          "name": "35 FT - RC",
           "fnId": "custom27",
           "group": "35 FOV TEST"
         },
@@ -461,11 +461,11 @@
           "fnId": "custom29"
         },
         {
-          "name": "SCROLL",
+          "name": "35 FT - SCROLL",
           "fnId": "custom30"
         },
         {
-          "name": "RCH",
+          "name": "35 FT - RCH",
           "fnId": "custom31",
           "group": "35 FOV TEST"
         },
@@ -13570,42 +13570,42 @@
           "fnId": "custom19"
         },
         {
-          "name": "1 - C",
+          "name": "35 FT - 1 - C",
           "fnId": "custom20",
           "group": "35 FOV TEST"
         },
         {
-          "name": "1 - CH",
+          "name": "35 FT - 1 - CH",
           "fnId": "custom21",
           "group": "35 FOV TEST"
         },
         {
-          "name": "2 - C",
+          "name": "35 FT -",
           "fnId": "custom22",
           "group": "35 FOV TEST"
         },
         {
-          "name": "2 - CH",
+          "name": "35 FT - 2 - CH",
           "fnId": "custom23",
           "group": "35 FOV TEST"
         },
         {
-          "name": "3 - C",
+          "name": "35 FT - 3 - C",
           "fnId": "custom24",
           "group": "35 FOV TEST"
         },
         {
-          "name": "3 - CH",
+          "name": "35 FT - 3 - CH",
           "fnId": "custom25",
           "group": "35 FOV TEST"
         },
         {
-          "name": "4 - C",
+          "name": "35 FT - 4 - C",
           "fnId": "custom26",
           "group": "35 FOV TEST"
         },
         {
-          "name": "RC",
+          "name": "35 FT - RC",
           "fnId": "custom27",
           "group": "35 FOV TEST"
         },
@@ -13618,11 +13618,11 @@
           "fnId": "custom29"
         },
         {
-          "name": "SCROLL",
+          "name": "35 FT - SCROLL",
           "fnId": "custom30"
         },
         {
-          "name": "RCH",
+          "name": "35 FT - RCH",
           "fnId": "custom31",
           "group": "35 FOV TEST"
         },
@@ -26727,42 +26727,42 @@
           "fnId": "custom19"
         },
         {
-          "name": "1 - C",
+          "name": "35 FT - 1 - C",
           "fnId": "custom20",
           "group": "35 FOV TEST"
         },
         {
-          "name": "1 - CH",
+          "name": "35 FT - 1 - CH",
           "fnId": "custom21",
           "group": "35 FOV TEST"
         },
         {
-          "name": "2 - C",
+          "name": "35 FT -",
           "fnId": "custom22",
           "group": "35 FOV TEST"
         },
         {
-          "name": "2 - CH",
+          "name": "35 FT - 2 - CH",
           "fnId": "custom23",
           "group": "35 FOV TEST"
         },
         {
-          "name": "3 - C",
+          "name": "35 FT - 3 - C",
           "fnId": "custom24",
           "group": "35 FOV TEST"
         },
         {
-          "name": "3 - CH",
+          "name": "35 FT - 3 - CH",
           "fnId": "custom25",
           "group": "35 FOV TEST"
         },
         {
-          "name": "4 - C",
+          "name": "35 FT - 4 - C",
           "fnId": "custom26",
           "group": "35 FOV TEST"
         },
         {
-          "name": "RC",
+          "name": "35 FT - RC",
           "fnId": "custom27",
           "group": "35 FOV TEST"
         },
@@ -26775,11 +26775,11 @@
           "fnId": "custom29"
         },
         {
-          "name": "SCROLL",
+          "name": "35 FT - SCROLL",
           "fnId": "custom30"
         },
         {
-          "name": "RCH",
+          "name": "35 FT - RCH",
           "fnId": "custom31",
           "group": "35 FOV TEST"
         },
@@ -40385,7 +40385,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -40396,7 +40396,7 @@
           "type": "group",
           "group": {
             "key": "Field Layout",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -41501,7 +41501,7 @@
     },
     {
       "key": "Custom Click Functions",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -41617,7 +41617,7 @@
           "type": "group",
           "group": {
             "key": "New Group (12)",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -42760,7 +42760,7 @@
     "custom20Enabled": "ON/ OFF",
     "custom20Type": "Trigger Type",
     "custom20ClickCount": "Trigger Count",
-    "Custom Click Function 20": "1 - C",
+    "Custom Click Function 20": "35 FT - 1 - C",
     "custom21Enabled": "ON/ OFF",
     "custom21Type": "Trigger Type",
     "custom21ClickCount": "Trigger Count",
@@ -42770,17 +42770,17 @@
     "custom23Enabled": "ON/ OFF",
     "custom23Type": "Trigger Type",
     "custom23ClickCount": "Trigger Count",
-    "Custom Click Function 21": "1 - CH",
-    "Custom Click Function 22": "2 - C",
-    "Custom Click Function 23": "2 - CH",
+    "Custom Click Function 21": "35 FT - 1 - CH",
+    "Custom Click Function 22": "35 FT - ",
+    "Custom Click Function 23": "35 FT - 2 - CH",
     "custom24Enabled": "ON/ OFF",
     "custom24Type": "Trigger Type",
     "custom24ClickCount": "Trigger Count",
     "custom25Enabled": "ON/ OFF",
     "custom25Type": "Trigger Type",
     "custom25ClickCount": "Trigger Count",
-    "Custom Click Function 24": "3 - C",
-    "Custom Click Function 25": "3 - CH",
+    "Custom Click Function 24": "35 FT - 3 - C",
+    "Custom Click Function 25": "35 FT - 3 - CH",
     "custom20Trig1Enabled": "ON/ OFF",
     "custom20Trig1Type": "Trigger Type",
     "custom20Trig1ClickCount": "Trigger Count",
@@ -42799,8 +42799,8 @@
     "custom27Enabled": "ON/ OFF",
     "custom27Type": "Trigger Type",
     "custom27ClickCount": "Trigger Count",
-    "Custom Click Function 26": "4 - C",
-    "Custom Click Function 27": "RC",
+    "Custom Click Function 26": "35 FT - 4 - C",
+    "Custom Click Function 27": "35 FT - RC",
     "custom27Trig1Enabled": "ON/ OFF",
     "custom27Trig1Type": "Trigger Type",
     "custom27Trig1ClickCount": "Trigger Count",
@@ -42846,11 +42846,11 @@
     "custom21Trig5Enabled": "ON/ OFF",
     "custom21Trig5Type": "Trigger Type",
     "custom21Trig5ClickCount": "Trigger Count",
-    "Custom Click Function 30": "SCROLL",
+    "Custom Click Function 30": "35 FT - SCROLL",
     "custom31Enabled": "ON/ OFF",
     "custom31Type": "Trigger Type",
     "custom31ClickCount": "Trigger Count",
-    "Custom Click Function 31": "RCH",
+    "Custom Click Function 31": "35 FT - RCH",
     "custom32Enabled": "ON/ OFF",
     "custom32Type": "Trigger Type",
     "custom32ClickCount": "Trigger Count",
