@@ -10,7 +10,7 @@ import { OutputPass } from 'three/addons/postprocessing/OutputPass.js'
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js'
 import { createUIElement, replaceLayoutNode } from '../lib/ui-engine/registry.mjs'
 import { resolveLengthValue } from '../lib/ui-engine/engine.mjs'
-import { DEV_MODE, initDevPanel, syncValue, setControlValue, copyControlState, isApplyingPanelState, onPanelStateApplied, peekRestoredValue, forgetControlsWithPrefix, seedControlValue, refreshListPickerTogglesByKey, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab, beginDynamicBatch, endDynamicBatch, refreshListPickerMarksByKey } from './devpanel/devPanel.js?v=86'
+import { DEV_MODE, initDevPanel, syncValue, setControlValue, copyControlState, isApplyingPanelState, onPanelStateApplied, peekRestoredValue, forgetControlsWithPrefix, seedControlValue, refreshListPickerTogglesByKey, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab, beginDynamicBatch, endDynamicBatch, refreshListPickerMarksByKey } from './devpanel/devPanel.js?v=87'
 
 // Toon Shading colour gradient (2026-10-12): MeshToonMaterial's getGradientIrradiance() only reads the RED channel of
 // its gradientMap (a grey ramp). Reading RGB instead is identical for every grey ramp (all channels equal) and lets
@@ -3789,6 +3789,7 @@ const cfg = initDevPanel(DEV_GROUPS, {
   onAnyValueChange: () => { sceneNeedsRedraw = true },
   // Undo/Redo leaves the live camera sliders alone unless the step was itself a camera-slider edit (2026-10-06).
   onSavedStateApplied: (state) => applySavedStateDefaults(state),
+  sanitizeOrder: (order) => sanitizeVelocitySavedOrder(order),
   undoLiveKeys: ['cameraX', 'cameraY', 'cameraZ', 'cameraFov', 'cameraZoom', 'cameraYaw', 'cameraPitch', 'cameraRoll'],
   // Keep the startup cache in step with what was just saved.
   onBeforeSave: () => persistCustomClickFunctionIds(),
@@ -9968,8 +9969,6 @@ function rvSharedControls() {
     { key: 'rvSpeedEnabled', label: 'On/Off', type: 'checkbox', def: true, ...pd },
     { key: 'rvSpeedRange', label: 'Min / Max Displacement Speed (Ms)', type: 'text', def: '{"min":150,"max":600}', ...pd },
     { key: 'rvSpeedCurve', label: 'Displacement Speed Curve (Distance -> Duration)', type: 'text', def: RV_LIN, ...pd },
-    // The list of Displacement Angle sets (bookkeeping; the set groups are inserted at this row).
-    { key: 'rvSets', label: 'Displacement Angle Sets (internal)', type: 'text', def: '[]', onChange: () => rvReconcileSets() },
     // Retransition
     { key: 'rvRetransitionEnabled', label: 'On/Off', type: 'checkbox', def: true, ...pd },
     { key: 'rvRetransitionSpeedMs', label: 'Retransition Speed (Ms)', type: 'slider', min: 0, max: 3000, step: 10, def: 400, ...pd },
@@ -9983,7 +9982,9 @@ function rvSharedControls() {
     { key: 'rvRetransitionEasingCurve', label: 'Retransition Easing Curve (Progress -> Amount)', type: 'text', def: RV_LIN, ...pd },
     // Easing
     { key: 'rvEasingCurveEnabled', label: 'On/Off', type: 'checkbox', def: false, ...pd },
-    { key: 'rvEasingCurve', label: 'Easing Curve (Progress -> Amount)', type: 'text', def: RV_LIN, ...pd }
+    { key: 'rvEasingCurve', label: 'Easing Curve (Progress -> Amount)', type: 'text', def: RV_LIN, ...pd },
+    // The list of Displacement Angle sets (bookkeeping; the set groups and their Add button are inserted at this row, i.e. BELOW Retransition and Easing - 2026-10-15, direct request).
+    { key: 'rvSets', label: 'Displacement Angle Sets (internal)', type: 'text', def: '[]', onChange: () => rvReconcileSets() }
   ]
 }
 function rvSetControls(S) {
@@ -10122,6 +10123,29 @@ async function setupResponsiveVelocity() {
   rvPersistSets()
   applyTextOverrides()
   rvRefreshUi()
+}
+// A saved layout cannot place anything inside Responsive Velocity or a Displacement Angle set (2026-10-15, direct report: duplicate empty Retransition / Easing groups). Those groups are rebuilt from code on every load, but
+// their subgroups carry the same titles as a Custom Click Function's own (Retransition, Easing, ...), and applyOrder() finds a saved group by title anywhere in the panel: it pulled a function's real groups and rows
+// (custom29...) into this group, and left empty placeholders behind for the duplicates. Dropping what a saved layout says about their insides (the group itself keeps its place and open / closed state) stops both,
+// for the live settings and for every named saved setting alike.
+function sanitizeVelocitySavedOrder(order) {
+  if (!Array.isArray(order)) return order
+  let copy = null
+  const clean = (nodes) => nodes.forEach((n) => {
+    if (!n || typeof n !== 'object') return
+    const k = typeof n.key === 'string' ? n.key : ''
+    if (k === 'Responsive Velocity' || k.startsWith('Displacement Angle to Velocity')) {
+      if ((n.items && n.items.length) || (n.settings && n.settings.length) || (n.subgroups && n.subgroups.length)) { n.items = []; n.settings = []; n.subgroups = [] }
+      return
+    }
+    ;(n.items || []).forEach((it) => { if (it && it.type === 'group' && it.group) clean([it.group]) })
+    if (Array.isArray(n.subgroups)) clean(n.subgroups)
+  })
+  const needs = (nodes) => nodes.some((n) => n && typeof n === 'object' && (n.key === 'Responsive Velocity' || (typeof n.key === 'string' && n.key.startsWith('Displacement Angle to Velocity')) || needs((n.items || []).filter((it) => it && it.group).map((it) => it.group)) || (Array.isArray(n.subgroups) && needs(n.subgroups))))
+  if (!needs(order)) return order
+  copy = JSON.parse(JSON.stringify(order))
+  clean(copy)
+  return copy
 }
 function rvMainBody() { const g = document.querySelector('.dp-group[data-rv-main]'); return g ? g.querySelector(':scope > .dp-group-body') : null }
 function rvAddSet() {

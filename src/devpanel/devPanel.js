@@ -102,6 +102,7 @@ let hostOnAnyValueChange = null
 // camera sliders: they follow the camera as you orbit/pan/zoom on the canvas, but a canvas drag is not an undo step,
 // so restoring an older snapshot used to jump the camera back to where it was at your last panel click.
 let hostUndoLiveKeys = []
+let hostSanitizeOrder = null // (order) => order: the host may drop parts of a saved layout it rebuilds itself every load, before applyOrder() uses it
 let hostOnSavedStateApplied = null // (state) => void: the host re-derives what depends on a whole saved state (default camera, item selector marks) after Use / Set Default
 const numEls = {} // key -> { slider, numInput } | { type: 'color' } | { type: 'checkbox' }
 // Set by initDevPanel()'s own saveSettings() closure (see its own comment) so
@@ -2668,6 +2669,7 @@ function getPanelOrder(groupsEl) {
 
 function applyOrder(groupsEl, order) {
   if (!order) return
+  if (hostSanitizeOrder) { try { order = hostSanitizeOrder(order) || order } catch (e) { console.warn('sanitizeOrder failed', e) } }
   // A GLOBAL map, not scoped per-group -- a row saved under a DIFFERENT
   // group than the one buildDevPanel() originally put it in (the user
   // dragged it there) has to be found wherever it currently lives in the
@@ -3153,6 +3155,7 @@ export function initDevPanel(groups, opts = {}) {
   hostOnAnyValueChange = opts.onAnyValueChange || null
   hostUndoLiveKeys = Array.isArray(opts.undoLiveKeys) ? opts.undoLiveKeys : []
   hostOnSavedStateApplied = typeof opts.onSavedStateApplied === 'function' ? opts.onSavedStateApplied : null
+  hostSanitizeOrder = typeof opts.sanitizeOrder === 'function' ? opts.sanitizeOrder : null
   editingDevice = realDeviceClass()
   // cfg/store are populated from defaults regardless of DEV_MODE -- these
   // values are the app's real, shipped defaults for every visitor; DEV_MODE
