@@ -8415,30 +8415,30 @@
           ]
         }
       ],
-      "cameraX": 1.9534883720930232,
-      "cameraY": 5.541526766141773e-15,
-      "cameraZ": 115.97925521912504,
-      "cameraFov": 30,
+      "cameraX": 1.5544272264775378,
+      "cameraY": 2.336607621164705e-13,
+      "cameraZ": 257.48779599525176,
+      "cameraFov": 15,
       "cameraYaw": 0,
       "cameraPitch": 0,
       "cameraRoll": 0,
-      "cameraZoom": 90.5,
+      "cameraZoom": 149.99999999999997,
       "cameraZoomSpeed": 0.3,
       "savedCameras": [
         {
-          "name": "HD - DESKTOP - 30 FOV",
-          "cameraX": 1.9534883720930232,
-          "cameraY": 5.541526766141773e-15,
-          "cameraZ": 115.97925521912504,
-          "cameraFov": 30,
-          "cameraZoom": 90.5,
+          "name": "HD - DESKTOP - 15 FOV",
+          "cameraX": 1.5544272264775378,
+          "cameraY": 2.336607621164705e-13,
+          "cameraZ": 257.48779599525176,
+          "cameraFov": 15,
+          "cameraZoom": 149.99999999999997,
           "cameraRoll": 0,
-          "targetX": 1.9534883720930232,
-          "targetY": 0,
-          "targetZ": 25.479255219125044
+          "targetX": 1.5544272264775378,
+          "targetY": 2.2447591112286533e-13,
+          "targetZ": 107.48779599525179
         },
         {
-          "name": "HD - MOBILE - 30FOV",
+          "name": "HD - MOBILE - 35FOV",
           "cameraX": -3.1777777777777776,
           "cameraY": 2.071011807676939e-13,
           "cameraZ": 260.17068872666084,
@@ -8450,7 +8450,7 @@
           "targetZ": 0
         },
         {
-          "name": "HD - DESKTOP - 20 FOV",
+          "name": "DESKTOP 20 FOV",
           "cameraX": 1.9534883720930232,
           "cameraY": 2.0272434216195883e-13,
           "cameraZ": 223.4004898795015,
@@ -8463,8 +8463,8 @@
         }
       ],
       "lockCameraPan": true,
-      "lockCameraZoom": true,
-      "cameraMaxExtentsEnabled": true,
+      "lockCameraZoom": false,
+      "cameraMaxExtentsEnabled": false,
       "keyAzimuth": 27,
       "keyElevation": 67,
       "keyTargetHeight": 65,
@@ -20216,19 +20216,19 @@
       "cameraZoomSpeed": 1,
       "savedCameras": [
         {
-          "name": "HD - DESKTOP - 30 FOV",
-          "cameraX": 1.9534883720930232,
-          "cameraY": 5.541526766141773e-15,
-          "cameraZ": 115.97925521912504,
-          "cameraFov": 30,
-          "cameraZoom": 90.5,
+          "name": "HD - DESKTOP - 15 FOV",
+          "cameraX": 1.5544272264775378,
+          "cameraY": 2.336607621164705e-13,
+          "cameraZ": 257.48779599525176,
+          "cameraFov": 15,
+          "cameraZoom": 149.99999999999997,
           "cameraRoll": 0,
-          "targetX": 1.9534883720930232,
-          "targetY": 0,
-          "targetZ": 25.479255219125044
+          "targetX": 1.5544272264775378,
+          "targetY": 2.2447591112286533e-13,
+          "targetZ": 107.48779599525179
         },
         {
-          "name": "HD - MOBILE - 30FOV",
+          "name": "HD - MOBILE - 35FOV",
           "cameraX": -3.1777777777777776,
           "cameraY": 2.071011807676939e-13,
           "cameraZ": 260.17068872666084,
@@ -20240,7 +20240,7 @@
           "targetZ": 0
         },
         {
-          "name": "HD - DESKTOP - 20 FOV",
+          "name": "DESKTOP 20 FOV",
           "cameraX": 1.9534883720930232,
           "cameraY": 2.0272434216195883e-13,
           "cameraZ": 223.4004898795015,
@@ -32006,19 +32006,19 @@
       "cameraZoomSpeed": 1,
       "savedCameras": [
         {
-          "name": "HD - DESKTOP - 30 FOV",
-          "cameraX": 1.9534883720930232,
-          "cameraY": 5.541526766141773e-15,
-          "cameraZ": 115.97925521912504,
-          "cameraFov": 30,
-          "cameraZoom": 90.5,
+          "name": "HD - DESKTOP - 15 FOV",
+          "cameraX": 1.5544272264775378,
+          "cameraY": 2.336607621164705e-13,
+          "cameraZ": 257.48779599525176,
+          "cameraFov": 15,
+          "cameraZoom": 149.99999999999997,
           "cameraRoll": 0,
-          "targetX": 1.9534883720930232,
-          "targetY": 0,
-          "targetZ": 25.479255219125044
+          "targetX": 1.5544272264775378,
+          "targetY": 2.2447591112286533e-13,
+          "targetZ": 107.48779599525179
         },
         {
-          "name": "HD - MOBILE - 30FOV",
+          "name": "HD - MOBILE - 35FOV",
           "cameraX": -3.1777777777777776,
           "cameraY": 2.071011807676939e-13,
           "cameraZ": 260.17068872666084,
@@ -32030,7 +32030,7 @@
           "targetZ": 0
         },
         {
-          "name": "HD - DESKTOP - 20 FOV",
+          "name": "DESKTOP 20 FOV",
           "cameraX": 1.9534883720930232,
           "cameraY": 2.0272434216195883e-13,
           "cameraZ": 223.4004898795015,
@@ -42046,7 +42046,7 @@
     "desktop": {
       "left": 1001.625,
       "top": 0,
-      "width": 547.1749877929688,
+      "width": 550.375,
       "height": 711.6000366210938
     },
     "mobile": {
