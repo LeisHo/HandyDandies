@@ -35304,7 +35304,7 @@
     },
     {
       "key": "Saved Dev Settings",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [],
       "settings": [],
@@ -36103,7 +36103,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -263798,7 +263798,7 @@
       "left": 88.46428680419922,
       "top": 76.01786041259766,
       "width": 305.96429443359375,
-      "height": 35.52381134033203
+      "height": 694.6785888671875
     }
   }
 }
