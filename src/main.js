@@ -2148,6 +2148,11 @@ const DEV_GROUPS = [
       { key: 'loadingPreviewAmbientSkyColor', label: 'Preview Ambient Sky Color', type: 'color', def: '#cfe8ff', onChange: () => applyLoadingPreviewLightSliders() },
       { key: 'loadingPreviewAmbientGroundColor', label: 'Preview Ambient Ground Color', type: 'color', def: '#000000', onChange: () => applyLoadingPreviewLightSliders() },
       { key: 'loadingPreviewSpeedMs', label: 'Loading Preview Speed (Ms / Cycle)', type: 'slider', min: 200, max: 5000, step: 50, def: 900 },
+      // 2nd Hand Extra Offset X / Y / Z (2026-10-14, direct request: the two-hand loading tween still looked too far apart): added on top of the imported 2nd-hand placement (HANDO's Offset X / Y / Z, in HANDO's own world units, applied before the
+      // mirror). With the usual mirror on X an imported Offset X is negative, so a POSITIVE extra X pulls the 2nd hand toward the main hand. 0 = exactly HANDO's placement (checked bone-for-bone against HANDO: <= 0.3 units).
+      { key: 'loadingPreviewHand2ExtraX', label: 'Loading Preview 2nd Hand Extra Offset X (Units, + = Toward Main Hand)', type: 'slider', min: -100, max: 100, step: 0.5, def: 0 },
+      { key: 'loadingPreviewHand2ExtraY', label: 'Loading Preview 2nd Hand Extra Offset Y (Units)', type: 'slider', min: -100, max: 100, step: 0.5, def: 0 },
+      { key: 'loadingPreviewHand2ExtraZ', label: 'Loading Preview 2nd Hand Extra Offset Z (Units)', type: 'slider', min: -100, max: 100, step: 0.5, def: 0 },
       // Sequence Mode - Count/Loop/Oscillate -- direct spec item, the
       // SAME control shape just added to every click function (see
       // makeClickPoseGroup()'s own matching comment for the full
@@ -7639,7 +7644,7 @@ function updateLoadingPreviewHand2(seq, lapStyle, t) {
   _lp2Pivot.multiply(_lp2Tmp.makeTranslation(-handoPivotRaw.x, -handoPivotRaw.y, -handoPivotRaw.z))
   // offset: HANDO units -> this preview's frame (alignQuat), scaled with the preview hand (the hand is sized to HANDO's units when a camera preset is in use)
   const unit = c1.scale.x / (LOADING_PREVIEW_REFERENCE_RADIUS / handBoundsRadiusLocal)
-  _lp2V.set(cfg2.hand2OffsetX || 0, cfg2.hand2OffsetY || 0, cfg2.hand2OffsetZ || 0).applyQuaternion(alignQuat).multiplyScalar(unit)
+  _lp2V.set((cfg2.hand2OffsetX || 0) + (cfg.loadingPreviewHand2ExtraX || 0), (cfg2.hand2OffsetY || 0) + (cfg.loadingPreviewHand2ExtraY || 0), (cfg2.hand2OffsetZ || 0) + (cfg.loadingPreviewHand2ExtraZ || 0)).applyQuaternion(alignQuat).multiplyScalar(unit)
   _lp2U.copy(c1.matrix).multiply(_lp2Pivot)
   _lp2U.premultiply(_lp2Tmp.makeTranslation(_lp2V.x, _lp2V.y, _lp2V.z)) // un-mirrored placement
   // pose the skeleton UN-mirrored (matrices are rebuilt from the un-mirrored matrix first, so the curl axis maths never sees a reflection)
