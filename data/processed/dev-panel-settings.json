@@ -8415,14 +8415,14 @@
           ]
         }
       ],
-      "cameraX": 1.9534883720930234,
-      "cameraY": 2.945275551949384e-14,
-      "cameraZ": 56.47925521912509,
+      "cameraX": 1.9534883720930232,
+      "cameraY": 5.541526766141773e-15,
+      "cameraZ": 115.97925521912504,
       "cameraFov": 30,
       "cameraYaw": 0,
       "cameraPitch": 0,
       "cameraRoll": 0,
-      "cameraZoom": 90.50000000000001,
+      "cameraZoom": 90.5,
       "cameraZoomSpeed": 0.3,
       "savedCameras": [
         {
