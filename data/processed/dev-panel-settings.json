@@ -7969,13 +7969,13 @@
         }
       ],
       "cameraX": 1.9534883720930232,
-      "cameraY": 1.1598705435868485e-14,
-      "cameraZ": 214.9004898795015,
+      "cameraY": 1.5369317329299283e-14,
+      "cameraZ": 276.47925521912504,
       "cameraFov": 15,
       "cameraYaw": 0,
       "cameraPitch": 0,
       "cameraRoll": 0,
-      "cameraZoom": 189.42123466037646,
+      "cameraZoom": 251,
       "cameraZoomSpeed": 0.3,
       "savedCameras": [
         {
@@ -50408,7 +50408,7 @@
     },
     {
       "key": "Custom Click Functions",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
