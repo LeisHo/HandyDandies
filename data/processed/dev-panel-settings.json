@@ -100,7 +100,7 @@
       "palmFacesCursorDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
       "palmFacesCursorDistanceRange": "{\"min\":1,\"max\":100}",
       "loadingPreviewEnabled": true,
-      "loadingPreviewShowLive": true,
+      "loadingPreviewShowLive": false,
       "loadingMinTimeMs": 3300,
       "loadingPreviewTweenSelector": "Two-Hand Tween",
       "loadingPreviewSavedCameras": [
@@ -343,7 +343,7 @@
       "loadingPreviewSequenceHoldMs": 0,
       "loadingPreviewSize": 1600,
       "loadingPreviewRotationX": -85.46571581217302,
-      "loadingPreviewRotationY": -109.10457274713552,
+      "loadingPreviewRotationY": -109.10457274713563,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0,
       "loadingPreviewOffsetY": 0,
@@ -7856,7 +7856,7 @@
         }
       ],
       "cameraX": 1.9534883720930232,
-      "cameraY": 2.0503649034724588e-13,
+      "cameraY": 2.2166107064567122e-13,
       "cameraZ": 115.97925521912504,
       "cameraFov": 33,
       "cameraYaw": 0,
@@ -11117,7 +11117,7 @@
       "loadingPreviewSequenceHoldMs": 0,
       "loadingPreviewSize": 1390,
       "loadingPreviewRotationX": -85.46571581217302,
-      "loadingPreviewRotationY": -109.10457274713552,
+      "loadingPreviewRotationY": -109.10457274713563,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0,
       "loadingPreviewOffsetY": 0,
@@ -21648,7 +21648,7 @@
       "palmFacesCursorDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
       "palmFacesCursorDistanceRange": "{\"min\":1,\"max\":100}",
       "loadingPreviewEnabled": true,
-      "loadingPreviewShowLive": true,
+      "loadingPreviewShowLive": false,
       "loadingMinTimeMs": 3300,
       "loadingPreviewTweenSelector": "Two-Hand Tween",
       "loadingPreviewSavedCameras": [
@@ -21891,7 +21891,7 @@
       "loadingPreviewSequenceHoldMs": 0,
       "loadingPreviewSize": 1600,
       "loadingPreviewRotationX": -85.46571581217302,
-      "loadingPreviewRotationY": -109.10457274713552,
+      "loadingPreviewRotationY": -109.10457274713563,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0,
       "loadingPreviewOffsetY": 0,
@@ -39319,10 +39319,10 @@
   "devHotkeys": {},
   "panelGeometry": {
     "desktop": {
-      "left": 942.4249877929688,
+      "left": 928.0250244140625,
       "top": 30.787500381469727,
-      "width": 604.7750244140625,
-      "height": 670.3875122070312
+      "width": 611.1749877929688,
+      "height": 673.5875244140625
     },
     "mobile": {
       "left": 20,
