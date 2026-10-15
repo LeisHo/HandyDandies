@@ -11782,10 +11782,10 @@
       "rvSpeedEnabled": true,
       "rvSpeedRange": "{\"min\":1000,\"max\":1500}",
       "rvSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.2515702070184387,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.24036571904091975,\"y\":0}}]",
-      "rvRetransitionEnabled": false,
-      "rvRetransitionSpeedMs": 400,
+      "rvRetransitionEnabled": true,
+      "rvRetransitionSpeedMs": 3000,
       "rvRetransitionSpeedCurveEnabled": true,
-      "rvRetransitionSpeedRange": "{\"min\":1000,\"max\":1500}",
+      "rvRetransitionSpeedRange": "{\"min\":1500,\"max\":2000}",
       "rvRetransitionSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3532455511941396,\"y\":0.016041819254557277}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.30411404903012607,\"y\":-0.010624949137369777}}]",
       "rvRetransitionStartTimeCurveEnabled": true,
       "rvRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
@@ -37558,7 +37558,7 @@
                       "type": "group",
                       "group": {
                         "key": "Retransition",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
