@@ -114,11 +114,11 @@
       "fieldBoundsZMin": "-800",
       "fieldBoundsZMinCurveEnabled": true,
       "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.9528458288968122,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.25137871577513693,\"y\":0}}]",
-      "fieldBoundsZMinCurveRange": "{\"min\":-300,\"max\":-100}",
+      "fieldBoundsZMinCurveRange": "{\"min\":-200,\"max\":-100}",
       "fieldBoundsZMax": "240",
       "fieldBoundsZMaxCurveEnabled": true,
       "fieldBoundsZMaxCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.7710241189949432,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":0,\"y\":1}}]",
-      "fieldBoundsZMaxCurveRange": "{\"min\":5,\"max\":100}",
+      "fieldBoundsZMaxCurveRange": "{\"min\":5,\"max\":50}",
       "fieldBoundsX": "{\"min\":-300,\"max\":300}",
       "fieldBoundsY": "{\"min\":-300,\"max\":300}",
       "fieldBoundsZ": "{\"min\":-400,\"max\":200}",
@@ -390,7 +390,7 @@
       "loadingPreviewSequenceHoldMs": 0,
       "loadingPreviewSize": 1600,
       "loadingPreviewRotationX": -85.46571581217302,
-      "loadingPreviewRotationY": -109.10457274713559,
+      "loadingPreviewRotationY": -109.10457274713558,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0,
       "loadingPreviewOffsetY": 0,
@@ -406,7 +406,7 @@
       "loadingPreviewTextOffsetX": -660,
       "loadingPreviewTextOffsetY": 318,
       "loadingPreviewCameraEditMode": true,
-      "customClickFunctionIds": "[{\"id\":\"custom19\",\"title\":\"Custom Click Function 19\",\"kind\":\"pose\",\"family\":\"mobile\",\"collapsed\":true,\"sub\":{\"Offset\":true,\"Offset To Camera\":true,\"Rotation\":true,\"Rotation/Rotation Curve X\":true,\"Rotation/Rotation Curve Y\":true,\"Rotation/Rotation Curve Z\":true,\"Easing\":true,\"Animation Speed Curve\":true,\"Start Time Curve\":true,\"Start Distance Curve\":true,\"Retransition\":true,\"Retransition/Retransition Speed Curve\":true,\"Retransition/Retransition Start Time Curve\":true,\"Retransition/Retransition Easing Curve\":true,\"Retransition/Retransition Distance Curve\":true,\"Retransition/Retransition Distance Scaler\":true,\"Multi Trigger\":true},\"cv\":2},{\"id\":\"custom28\",\"title\":\"Custom Click Function 28\",\"kind\":\"pose\",\"family\":\"mobile\",\"collapsed\":true,\"sub\":{\"Offset\":true,\"Offset To Camera\":true,\"Rotation\":true,\"Rotation/Rotation Curve X\":true,\"Rotation/Rotation Curve Y\":true,\"Rotation/Rotation Curve Z\":true,\"Easing\":true,\"Animation Speed Curve\":true,\"Start Time Curve\":true,\"Start Distance Curve\":true,\"Retransition\":true,\"Retransition/Retransition Speed Curve\":true,\"Retransition/Retransition Start Time Curve\":true,\"Retransition/Retransition Easing Curve\":true,\"Retransition/Retransition Distance Curve\":true,\"Retransition/Retransition Distance Scaler\":true,\"Multi Trigger\":true,\"Multi Trigger/Trigger 1\":true,\"Multi Trigger/Trigger 1/Offset\":true,\"Multi Trigger/Trigger 1/Offset To Camera\":true,\"Multi Trigger/Trigger 1/Rotation\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 1/Easing\":true,\"Multi Trigger/Trigger 1/Animation Speed Curve\":true,\"Multi Trigger/Trigger 1/Start Time Curve\":true,\"Multi Trigger/Trigger 1/Start Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Scaler\":true},\"cv\":2},{\"id\":\"custom29\",\"title\":\"Custom Click Function 29\",\"kind\":\"pose\",\"family\":\"mobile\",\"collapsed\":true,\"sub\":{\"Offset\":true,\"Offset To Camera\":true,\"Rotation\":true,\"Rotation/Rotation Curve X\":true,\"Rotation/Rotation Curve Y\":true,\"Rotation/Rotation Curve Z\":true,\"Easing\":true,\"Animation Speed Curve\":true,\"Start Time Curve\":true,\"Start Distance Curve\":true,\"Retransition\":true,\"Retransition/Retransition Speed Curve\":true,\"Retransition/Retransition Start Time Curve\":true,\"Retransition/Retransition Easing Curve\":true,\"Retransition/Retransition Distance Curve\":true,\"Retransition/Retransition Distance Scaler\":true,\"Multi Trigger\":true,\"Multi Trigger/Trigger 1\":true,\"Multi Trigger/Trigger 1/Offset\":true,\"Multi Trigger/Trigger 1/Offset To Camera\":true,\"Multi Trigger/Trigger 1/Rotation\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 1/Easing\":true,\"Multi Trigger/Trigger 1/Animation Speed Curve\":true,\"Multi Trigger/Trigger 1/Start Time Curve\":true,\"Multi Trigger/Trigger 1/Start Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Scaler\":true,\"Multi Trigger/Trigger 2\":true,\"Multi Trigger/Trigger 2/Offset\":true,\"Multi Trigger/Trigger 2/Offset To Camera\":true,\"Multi Trigger/Trigger 2/Rotation\":true,\"Multi Trigger/Trigger 2/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 2/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 2/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 2/Easing\":true,\"Multi Trigger/Trigger 2/Animation Speed Curve\":true,\"Multi Trigger/Trigger 2/Start Time Curve\":true,\"Multi Trigger/Trigger 2/Start Distance Curve\":true,\"Multi Trigger/Trigger 2/Retransition\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Distance Scaler\":true},\"cv\":2},{\"id\":\"custom39\",\"title\":\"35 FT - 1 - CH Copy\",\"kind\":\"hold\",\"family\":\"desktop\",\"collapsed\":true,\"sub\":{\"Offset\":true,\"Offset To Camera\":true,\"Rotation\":true,\"Rotation/Rotation Curve X\":true,\"Rotation/Rotation Curve Y\":true,\"Rotation/Rotation Curve Z\":true,\"Easing\":true,\"Animation Speed Curve\":true,\"Start Time Curve\":true,\"Start Distance Curve\":true,\"Retransition\":true,\"Retransition/Retransition Speed Curve\":true,\"Retransition/Retransition Start Time Curve\":true,\"Retransition/Retransition Easing Curve\":true,\"Retransition/Retransition Distance Curve\":true,\"Retransition/Retransition Distance Scaler\":true,\"Tween Stop\":true,\"Tween Stop/Tween Stop Start Time Curve\":true,\"Tween Stop/Tween Stop Delay\":true,\"Multi Trigger\":true,\"Multi Trigger/Trigger 1\":true,\"Multi Trigger/Trigger 1/Offset\":true,\"Multi Trigger/Trigger 1/Offset To Camera\":true,\"Multi Trigger/Trigger 1/Rotation\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 1/Easing\":true,\"Multi Trigger/Trigger 1/Animation Speed Curve\":true,\"Multi Trigger/Trigger 1/Start Time Curve\":true,\"Multi Trigger/Trigger 1/Start Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Scaler\":true,\"Multi Trigger/Trigger 1/Tween Stop\":true,\"Multi Trigger/Trigger 1/Tween Stop/Tween Stop Start Time Curve\":true,\"Multi Trigger/Trigger 1/Tween Stop/Tween Stop Delay\":true,\"Multi Trigger/Trigger 2\":true,\"Multi Trigger/Trigger 2/Offset\":true,\"Multi Trigger/Trigger 2/Offset To Camera\":true,\"Multi Trigger/Trigger 2/Rotation\":true,\"Multi Trigger/Trigger 2/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 2/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 2/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 2/Easing\":true,\"Multi Trigger/Trigger 2/Animation Speed Curve\":true,\"Multi Trigger/Trigger 2/Start Time Curve\":true,\"Multi Trigger/Trigger 2/Start Distance Curve\":true,\"Multi Trigger/Trigger 2/Retransition\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Distance Scaler\":true,\"Multi Trigger/Trigger 2/Tween Stop\":true,\"Multi Trigger/Trigger 2/Tween Stop/Tween Stop Start Time Curve\":true,\"Multi Trigger/Trigger 2/Tween Stop/Tween Stop Delay\":true,\"Multi Trigger/Trigger 3\":true,\"Multi Trigger/Trigger 3/Offset\":true,\"Multi Trigger/Trigger 3/Offset To Camera\":true,\"Multi Trigger/Trigger 3/Rotation\":true,\"Multi Trigger/Trigger 3/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 3/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 3/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 3/Easing\":true,\"Multi Trigger/Trigger 3/Animation Speed Curve\":true,\"Multi Trigger/Trigger 3/Start Time Curve\":true,\"Multi Trigger/Trigger 3/Start Distance Curve\":true,\"Multi Trigger/Trigger 3/Retransition\":true,\"Multi Trigger/Trigger 3/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 3/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 3/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 3/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 3/Retransition/Retransition Distance Scaler\":true,\"Multi Trigger/Trigger 3/Tween Stop\":true,\"Multi Trigger/Trigger 3/Tween Stop/Tween Stop Start Time Curve\":true,\"Multi Trigger/Trigger 3/Tween Stop/Tween Stop Delay\":true,\"Multi Trigger/Trigger 4\":true,\"Multi Trigger/Trigger 4/Offset\":true,\"Multi Trigger/Trigger 4/Offset To Camera\":true,\"Multi Trigger/Trigger 4/Rotation\":true,\"Multi Trigger/Trigger 4/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 4/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 4/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 4/Easing\":true,\"Multi Trigger/Trigger 4/Animation Speed Curve\":true,\"Multi Trigger/Trigger 4/Start Time Curve\":true,\"Multi Trigger/Trigger 4/Start Distance Curve\":true,\"Multi Trigger/Trigger 4/Retransition\":true,\"Multi Trigger/Trigger 4/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 4/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 4/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 4/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 4/Retransition/Retransition Distance Scaler\":true,\"Multi Trigger/Trigger 4/Tween Stop\":true,\"Multi Trigger/Trigger 4/Tween Stop/Tween Stop Start Time Curve\":true,\"Multi Trigger/Trigger 4/Tween Stop/Tween Stop Delay\":true,\"Multi Trigger/Trigger 5\":true,\"Multi Trigger/Trigger 5/Offset\":true,\"Multi Trigger/Trigger 5/Offset To Camera\":true,\"Multi Trigger/Trigger 5/Rotation\":true,\"Multi Trigger/Trigger 5/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 5/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 5/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 5/Easing\":true,\"Multi Trigger/Trigger 5/Animation Speed Curve\":true,\"Multi Trigger/Trigger 5/Start Time Curve\":true,\"Multi Trigger/Trigger 5/Start Distance Curve\":true,\"Multi Trigger/Trigger 5/Retransition\":true,\"Multi Trigger/Trigger 5/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 5/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 5/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 5/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 5/Retransition/Retransition Distance Scaler\":true,\"Multi Trigger/Trigger 5/Tween Stop\":true,\"Multi Trigger/Trigger 5/Tween Stop/Tween Stop Start Time Curve\":true,\"Multi Trigger/Trigger 5/Tween Stop/Tween Stop Delay\":true},\"cv\":2,\"parent\":[\"New Group (16)\"]},{\"id\":\"custom40\",\"title\":\"35 FT - Copy\",\"kind\":\"pose\",\"family\":\"desktop\",\"collapsed\":true,\"sub\":{\"Offset\":true,\"Offset To Camera\":true,\"Rotation\":true,\"Rotation/Rotation Curve X\":true,\"Rotation/Rotation Curve Y\":true,\"Rotation/Rotation Curve Z\":true,\"Easing\":true,\"Animation Speed Curve\":true,\"Start Time Curve\":true,\"Start Distance Curve\":true,\"Retransition\":true,\"Retransition/Retransition Speed Curve\":true,\"Retransition/Retransition Start Time Curve\":true,\"Retransition/Retransition Easing Curve\":true,\"Retransition/Retransition Distance Curve\":true,\"Retransition/Retransition Distance Scaler\":true,\"Multi Trigger\":true,\"Multi Trigger/Trigger 1\":true,\"Multi Trigger/Trigger 1/Offset\":true,\"Multi Trigger/Trigger 1/Offset To Camera\":true,\"Multi Trigger/Trigger 1/Rotation\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 1/Easing\":true,\"Multi Trigger/Trigger 1/Animation Speed Curve\":true,\"Multi Trigger/Trigger 1/Start Time Curve\":true,\"Multi Trigger/Trigger 1/Start Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Scaler\":true},\"cv\":2,\"parent\":[\"New Group (16)\"]},{\"id\":\"custom42\",\"title\":\"35 FT - 3 - C Copy\",\"kind\":\"pose\",\"family\":\"desktop\",\"collapsed\":true,\"sub\":{\"Offset\":true,\"Offset To Camera\":true,\"Rotation\":true,\"Rotation/Rotation Curve X\":true,\"Rotation/Rotation Curve Y\":true,\"Rotation/Rotation Curve Z\":true,\"Easing\":true,\"Animation Speed Curve\":true,\"Start Time Curve\":true,\"Start Distance Curve\":true,\"Retransition\":true,\"Retransition/Retransition Speed Curve\":true,\"Retransition/Retransition Start Time Curve\":true,\"Retransition/Retransition Easing Curve\":true,\"Retransition/Retransition Distance Curve\":true,\"Retransition/Retransition Distance Scaler\":true,\"Multi Trigger\":true,\"Multi Trigger/Trigger 1\":true,\"Multi Trigger/Trigger 1/Offset\":true,\"Multi Trigger/Trigger 1/Offset To Camera\":true,\"Multi Trigger/Trigger 1/Rotation\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 1/Easing\":true,\"Multi Trigger/Trigger 1/Animation Speed Curve\":true,\"Multi Trigger/Trigger 1/Start Time Curve\":true,\"Multi Trigger/Trigger 1/Start Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Scaler\":true},\"cv\":2,\"parent\":[\"New Group (16)\"]},{\"id\":\"custom43\",\"title\":\"35 FT - 3 - CH Copy\",\"kind\":\"hold\",\"family\":\"desktop\",\"collapsed\":true,\"sub\":{\"Offset\":true,\"Offset To Camera\":true,\"Rotation\":true,\"Rotation/Rotation Curve X\":true,\"Rotation/Rotation Curve Y\":true,\"Rotation/Rotation Curve Z\":true,\"Easing\":true,\"Animation Speed Curve\":true,\"Start Time Curve\":true,\"Start Distance Curve\":true,\"Retransition\":true,\"Retransition/Retransition Speed Curve\":true,\"Retransition/Retransition Start Time Curve\":true,\"Retransition/Retransition Easing Curve\":true,\"Retransition/Retransition Distance Curve\":true,\"Retransition/Retransition Distance Scaler\":true,\"Tween Stop\":true,\"Tween Stop/Tween Stop Start Time Curve\":true,\"Tween Stop/Tween Stop Delay\":true,\"Multi Trigger\":true,\"Multi Trigger/Trigger 1\":true,\"Multi Trigger/Trigger 1/Offset\":true,\"Multi Trigger/Trigger 1/Offset To Camera\":true,\"Multi Trigger/Trigger 1/Rotation\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 1/Easing\":true,\"Multi Trigger/Trigger 1/Animation Speed Curve\":true,\"Multi Trigger/Trigger 1/Start Time Curve\":true,\"Multi Trigger/Trigger 1/Start Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Scaler\":true,\"Multi Trigger/Trigger 1/Tween Stop\":true,\"Multi Trigger/Trigger 1/Tween Stop/Tween Stop Start Time Curve\":true,\"Multi Trigger/Trigger 1/Tween Stop/Tween Stop Delay\":true},\"cv\":2,\"parent\":[\"New Group (16)\"]},{\"id\":\"custom50\",\"title\":\"35 FT - 1 - C Copy\",\"kind\":\"pose\",\"family\":\"desktop\",\"collapsed\":true,\"sub\":{\"Offset\":true,\"Offset To Camera\":true,\"Rotation\":true,\"Rotation/Rotation Curve X\":true,\"Rotation/Rotation Curve Y\":true,\"Rotation/Rotation Curve Z\":true,\"Easing\":true,\"Animation Speed Curve\":true,\"Start Time Curve\":true,\"Start Distance Curve\":true,\"Retransition\":true,\"Retransition/Retransition Speed Curve\":true,\"Retransition/Retransition Start Time Curve\":true,\"Retransition/Retransition Easing Curve\":true,\"Retransition/Retransition Distance Curve\":true,\"Retransition/Retransition Distance Scaler\":true,\"Multi Trigger\":true,\"Multi Trigger/Trigger 1\":true,\"Multi Trigger/Trigger 1/Offset\":true,\"Multi Trigger/Trigger 1/Offset To Camera\":true,\"Multi Trigger/Trigger 1/Rotation\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 1/Easing\":true,\"Multi Trigger/Trigger 1/Animation Speed Curve\":true,\"Multi Trigger/Trigger 1/Start Time Curve\":true,\"Multi Trigger/Trigger 1/Start Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Scaler\":true},\"cv\":2,\"parent\":[\"New Group (16)\"]},{\"id\":\"custom41\",\"title\":\"35 FT - 2 - CH Copy\",\"kind\":\"hold\",\"family\":\"desktop\",\"collapsed\":true,\"sub\":{\"Offset\":true,\"Offset To Camera\":true,\"Rotation\":true,\"Rotation/Rotation Curve X\":true,\"Rotation/Rotation Curve Y\":true,\"Rotation/Rotation Curve Z\":true,\"Easing\":true,\"Animation Speed Curve\":true,\"Start Time Curve\":true,\"Start Distance Curve\":true,\"Retransition\":true,\"Retransition/Retransition Speed Curve\":true,\"Retransition/Retransition Start Time Curve\":true,\"Retransition/Retransition Easing Curve\":true,\"Retransition/Retransition Distance Curve\":true,\"Retransition/Retransition Distance Scaler\":true,\"Tween Stop\":true,\"Tween Stop/Tween Stop Start Time Curve\":true,\"Tween Stop/Tween Stop Delay\":true,\"Multi Trigger\":true},\"cv\":2,\"parent\":[\"New Group (16)\"]},{\"id\":\"custom51\",\"title\":\"20 FT - 1 - C Copy\",\"kind\":\"hold\",\"family\":\"desktop\",\"collapsed\":true,\"sub\":{\"Offset\":true,\"Offset To Camera\":true,\"Rotation\":true,\"Rotation/Rotation Curve X\":true,\"Rotation/Rotation Curve Y\":true,\"Rotation/Rotation Curve Z\":true,\"Easing\":true,\"Animation Speed Curve\":true,\"Start Time Curve\":true,\"Start Distance Curve\":true,\"Retransition\":true,\"Retransition/Retransition Speed Curve\":true,\"Retransition/Retransition Start Time Curve\":true,\"Retransition/Retransition Easing Curve\":true,\"Retransition/Retransition Distance Curve\":true,\"Retransition/Retransition Distance Scaler\":true,\"Tween Stop\":true,\"Tween Stop/Tween Stop Start Time Curve\":true,\"Tween Stop/Tween Stop Delay\":true,\"Multi Trigger\":true,\"Multi Trigger/Trigger 1\":true,\"Multi Trigger/Trigger 1/Offset\":true,\"Multi Trigger/Trigger 1/Offset To Camera\":true,\"Multi Trigger/Trigger 1/Rotation\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 1/Easing\":true,\"Multi Trigger/Trigger 1/Animation Speed Curve\":true,\"Multi Trigger/Trigger 1/Start Time Curve\":true,\"Multi Trigger/Trigger 1/Start Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Scaler\":true,\"Multi Trigger/Trigger 1/Tween Stop\":true,\"Multi Trigger/Trigger 1/Tween Stop/Tween Stop Start Time Curve\":true,\"Multi Trigger/Trigger 1/Tween Stop/Tween Stop Delay\":true,\"Multi Trigger/Trigger 2\":true,\"Multi Trigger/Trigger 2/Offset\":true,\"Multi Trigger/Trigger 2/Offset To Camera\":true,\"Multi Trigger/Trigger 2/Rotation\":true,\"Multi Trigger/Trigger 2/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 2/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 2/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 2/Easing\":true,\"Multi Trigger/Trigger 2/Animation Speed Curve\":true,\"Multi Trigger/Trigger 2/Start Time Curve\":true,\"Multi Trigger/Trigger 2/Start Distance Curve\":true,\"Multi Trigger/Trigger 2/Retransition\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Distance Scaler\":true,\"Multi Trigger/Trigger 2/Tween Stop\":true,\"Multi Trigger/Trigger 2/Tween Stop/Tween Stop Start Time Curve\":true,\"Multi Trigger/Trigger 2/Tween Stop/Tween Stop Delay\":true},\"cv\":2,\"parent\":[\"New Group (16)\"]},{\"id\":\"custom52\",\"title\":\"20 FT - R - CH Copy\",\"kind\":\"pose\",\"family\":\"desktop\",\"collapsed\":true,\"sub\":{\"Offset\":true,\"Offset To Camera\":true,\"Rotation\":true,\"Rotation/Rotation Curve X\":true,\"Rotation/Rotation Curve Y\":true,\"Rotation/Rotation Curve Z\":true,\"Easing\":true,\"Animation Speed Curve\":true,\"Start Time Curve\":true,\"Start Distance Curve\":true,\"Retransition\":true,\"Retransition/Retransition Speed Curve\":true,\"Retransition/Retransition Start Time Curve\":true,\"Retransition/Retransition Easing Curve\":true,\"Retransition/Retransition Distance Curve\":true,\"Retransition/Retransition Distance Scaler\":true,\"Multi Trigger\":true,\"Multi Trigger/Trigger 1\":true,\"Multi Trigger/Trigger 1/Offset\":true,\"Multi Trigger/Trigger 1/Offset To Camera\":true,\"Multi Trigger/Trigger 1/Rotation\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 1/Easing\":true,\"Multi Trigger/Trigger 1/Animation Speed Curve\":true,\"Multi Trigger/Trigger 1/Start Time Curve\":true,\"Multi Trigger/Trigger 1/Start Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Scaler\":true,\"Multi Trigger/Trigger 2\":true,\"Multi Trigger/Trigger 2/Offset\":true,\"Multi Trigger/Trigger 2/Offset To Camera\":true,\"Multi Trigger/Trigger 2/Rotation\":true,\"Multi Trigger/Trigger 2/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 2/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 2/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 2/Easing\":true,\"Multi Trigger/Trigger 2/Animation Speed Curve\":true,\"Multi Trigger/Trigger 2/Start Time Curve\":true,\"Multi Trigger/Trigger 2/Start Distance Curve\":true,\"Multi Trigger/Trigger 2/Retransition\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Distance Scaler\":true},\"cv\":2,\"parent\":[\"New Group (16)\"]}]",
+      "customClickFunctionIds": "[{\"id\":\"custom19\",\"title\":\"Custom Click Function 19\",\"kind\":\"pose\",\"family\":\"mobile\",\"collapsed\":true,\"sub\":{\"Offset\":true,\"Offset To Camera\":true,\"Rotation\":true,\"Rotation/Rotation Curve X\":true,\"Rotation/Rotation Curve Y\":true,\"Rotation/Rotation Curve Z\":true,\"Easing\":true,\"Animation Speed Curve\":true,\"Start Time Curve\":true,\"Start Distance Curve\":true,\"Retransition\":true,\"Retransition/Retransition Speed Curve\":true,\"Retransition/Retransition Start Time Curve\":true,\"Retransition/Retransition Easing Curve\":true,\"Retransition/Retransition Distance Curve\":true,\"Retransition/Retransition Distance Scaler\":true,\"Multi Trigger\":true},\"cv\":2},{\"id\":\"custom28\",\"title\":\"Custom Click Function 28\",\"kind\":\"pose\",\"family\":\"mobile\",\"collapsed\":true,\"sub\":{\"Offset\":true,\"Offset To Camera\":true,\"Rotation\":true,\"Rotation/Rotation Curve X\":true,\"Rotation/Rotation Curve Y\":true,\"Rotation/Rotation Curve Z\":true,\"Easing\":true,\"Animation Speed Curve\":true,\"Start Time Curve\":true,\"Start Distance Curve\":true,\"Retransition\":true,\"Retransition/Retransition Speed Curve\":true,\"Retransition/Retransition Start Time Curve\":true,\"Retransition/Retransition Easing Curve\":true,\"Retransition/Retransition Distance Curve\":true,\"Retransition/Retransition Distance Scaler\":true,\"Multi Trigger\":true,\"Multi Trigger/Trigger 1\":true,\"Multi Trigger/Trigger 1/Offset\":true,\"Multi Trigger/Trigger 1/Offset To Camera\":true,\"Multi Trigger/Trigger 1/Rotation\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 1/Easing\":true,\"Multi Trigger/Trigger 1/Animation Speed Curve\":true,\"Multi Trigger/Trigger 1/Start Time Curve\":true,\"Multi Trigger/Trigger 1/Start Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Scaler\":true},\"cv\":2},{\"id\":\"custom29\",\"title\":\"Custom Click Function 29\",\"kind\":\"pose\",\"family\":\"mobile\",\"collapsed\":true,\"sub\":{\"Offset\":true,\"Offset To Camera\":true,\"Rotation\":true,\"Rotation/Rotation Curve X\":true,\"Rotation/Rotation Curve Y\":true,\"Rotation/Rotation Curve Z\":true,\"Animation Speed Curve\":true,\"Start Time Curve\":true,\"Start Distance Curve\":true,\"Multi Trigger\":true,\"Multi Trigger/Trigger 1\":true,\"Multi Trigger/Trigger 1/Offset\":true,\"Multi Trigger/Trigger 1/Offset To Camera\":true,\"Multi Trigger/Trigger 1/Rotation\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 1/Easing\":true,\"Multi Trigger/Trigger 1/Animation Speed Curve\":true,\"Multi Trigger/Trigger 1/Start Time Curve\":true,\"Multi Trigger/Trigger 1/Start Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Scaler\":true,\"Multi Trigger/Trigger 2\":true,\"Multi Trigger/Trigger 2/Offset\":true,\"Multi Trigger/Trigger 2/Offset To Camera\":true,\"Multi Trigger/Trigger 2/Rotation\":true,\"Multi Trigger/Trigger 2/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 2/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 2/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 2/Easing\":true,\"Multi Trigger/Trigger 2/Animation Speed Curve\":true,\"Multi Trigger/Trigger 2/Start Time Curve\":true,\"Multi Trigger/Trigger 2/Start Distance Curve\":true,\"Multi Trigger/Trigger 2/Retransition\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Distance Scaler\":true},\"cv\":2},{\"id\":\"custom39\",\"title\":\"35 FT - 1 - CH Copy\",\"kind\":\"hold\",\"family\":\"desktop\",\"collapsed\":false,\"sub\":{\"Offset\":true,\"Offset To Camera\":true,\"Rotation\":true,\"Rotation/Rotation Curve X\":true,\"Rotation/Rotation Curve Y\":true,\"Rotation/Rotation Curve Z\":true,\"Easing\":true,\"Animation Speed Curve\":true,\"Start Time Curve\":true,\"Start Distance Curve\":true,\"Retransition\":false,\"Retransition/Retransition Speed Curve\":true,\"Retransition/Retransition Start Time Curve\":true,\"Retransition/Retransition Easing Curve\":true,\"Retransition/Retransition Distance Curve\":true,\"Retransition/Retransition Distance Scaler\":false,\"Tween Stop\":true,\"Tween Stop/Tween Stop Start Time Curve\":true,\"Tween Stop/Tween Stop Delay\":true,\"Multi Trigger\":false,\"Multi Trigger/Trigger 5\":false,\"Multi Trigger/Trigger 5/Offset\":true,\"Multi Trigger/Trigger 5/Offset To Camera\":true,\"Multi Trigger/Trigger 5/Rotation\":true,\"Multi Trigger/Trigger 5/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 5/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 5/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 5/Easing\":true,\"Multi Trigger/Trigger 5/Animation Speed Curve\":true,\"Multi Trigger/Trigger 5/Start Time Curve\":true,\"Multi Trigger/Trigger 5/Start Distance Curve\":true,\"Multi Trigger/Trigger 5/Retransition\":false,\"Multi Trigger/Trigger 5/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 5/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 5/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 5/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 5/Retransition/Retransition Distance Scaler\":true,\"Multi Trigger/Trigger 5/Tween Stop\":true,\"Multi Trigger/Trigger 5/Tween Stop/Tween Stop Start Time Curve\":true,\"Multi Trigger/Trigger 5/Tween Stop/Tween Stop Delay\":true},\"cv\":2,\"parent\":[\"New Group (16)\"]},{\"id\":\"custom40\",\"title\":\"35 FT - Copy\",\"kind\":\"pose\",\"family\":\"desktop\",\"collapsed\":true,\"sub\":{\"Offset\":true,\"Offset To Camera\":true,\"Rotation\":true,\"Rotation/Rotation Curve X\":true,\"Rotation/Rotation Curve Y\":true,\"Rotation/Rotation Curve Z\":true,\"Easing\":true,\"Animation Speed Curve\":true,\"Start Time Curve\":true,\"Start Distance Curve\":true,\"Retransition\":true,\"Retransition/Retransition Speed Curve\":true,\"Retransition/Retransition Start Time Curve\":true,\"Retransition/Retransition Easing Curve\":true,\"Retransition/Retransition Distance Curve\":true,\"Retransition/Retransition Distance Scaler\":true,\"Multi Trigger\":true,\"Multi Trigger/Trigger 1\":true,\"Multi Trigger/Trigger 1/Offset\":true,\"Multi Trigger/Trigger 1/Offset To Camera\":true,\"Multi Trigger/Trigger 1/Rotation\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 1/Easing\":true,\"Multi Trigger/Trigger 1/Animation Speed Curve\":true,\"Multi Trigger/Trigger 1/Start Time Curve\":true,\"Multi Trigger/Trigger 1/Start Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Scaler\":true},\"cv\":2,\"parent\":[\"New Group (16)\"]},{\"id\":\"custom42\",\"title\":\"35 FT - 3 - C Copy\",\"kind\":\"pose\",\"family\":\"desktop\",\"collapsed\":true,\"sub\":{\"Offset\":true,\"Offset To Camera\":true,\"Rotation\":true,\"Rotation/Rotation Curve X\":true,\"Rotation/Rotation Curve Y\":true,\"Rotation/Rotation Curve Z\":true,\"Easing\":true,\"Animation Speed Curve\":true,\"Start Time Curve\":true,\"Start Distance Curve\":true,\"Retransition\":true,\"Retransition/Retransition Speed Curve\":true,\"Retransition/Retransition Start Time Curve\":true,\"Retransition/Retransition Easing Curve\":true,\"Retransition/Retransition Distance Curve\":true,\"Retransition/Retransition Distance Scaler\":true,\"Multi Trigger\":true,\"Multi Trigger/Trigger 1\":true,\"Multi Trigger/Trigger 1/Offset\":true,\"Multi Trigger/Trigger 1/Offset To Camera\":true,\"Multi Trigger/Trigger 1/Rotation\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 1/Easing\":true,\"Multi Trigger/Trigger 1/Animation Speed Curve\":true,\"Multi Trigger/Trigger 1/Start Time Curve\":true,\"Multi Trigger/Trigger 1/Start Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Scaler\":true},\"cv\":2,\"parent\":[\"New Group (16)\"]},{\"id\":\"custom43\",\"title\":\"35 FT - 3 - CH Copy\",\"kind\":\"hold\",\"family\":\"desktop\",\"collapsed\":true,\"sub\":{\"Offset\":true,\"Offset To Camera\":true,\"Rotation\":true,\"Rotation/Rotation Curve X\":true,\"Rotation/Rotation Curve Y\":true,\"Rotation/Rotation Curve Z\":true,\"Easing\":true,\"Animation Speed Curve\":true,\"Start Time Curve\":true,\"Start Distance Curve\":true,\"Retransition\":true,\"Retransition/Retransition Speed Curve\":true,\"Retransition/Retransition Start Time Curve\":true,\"Retransition/Retransition Easing Curve\":true,\"Retransition/Retransition Distance Curve\":true,\"Retransition/Retransition Distance Scaler\":true,\"Tween Stop\":true,\"Tween Stop/Tween Stop Start Time Curve\":true,\"Tween Stop/Tween Stop Delay\":true,\"Multi Trigger\":true,\"Multi Trigger/Trigger 1\":true,\"Multi Trigger/Trigger 1/Offset\":true,\"Multi Trigger/Trigger 1/Offset To Camera\":true,\"Multi Trigger/Trigger 1/Rotation\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 1/Easing\":true,\"Multi Trigger/Trigger 1/Animation Speed Curve\":true,\"Multi Trigger/Trigger 1/Start Time Curve\":true,\"Multi Trigger/Trigger 1/Start Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Scaler\":true,\"Multi Trigger/Trigger 1/Tween Stop\":true,\"Multi Trigger/Trigger 1/Tween Stop/Tween Stop Start Time Curve\":true,\"Multi Trigger/Trigger 1/Tween Stop/Tween Stop Delay\":true},\"cv\":2,\"parent\":[\"New Group (16)\"]},{\"id\":\"custom50\",\"title\":\"35 FT - 1 - C Copy\",\"kind\":\"pose\",\"family\":\"desktop\",\"collapsed\":true,\"sub\":{\"Offset\":true,\"Offset To Camera\":true,\"Rotation\":true,\"Rotation/Rotation Curve X\":true,\"Rotation/Rotation Curve Y\":true,\"Rotation/Rotation Curve Z\":true,\"Easing\":true,\"Animation Speed Curve\":true,\"Start Time Curve\":true,\"Start Distance Curve\":true,\"Retransition\":true,\"Retransition/Retransition Speed Curve\":true,\"Retransition/Retransition Start Time Curve\":true,\"Retransition/Retransition Easing Curve\":true,\"Retransition/Retransition Distance Curve\":true,\"Retransition/Retransition Distance Scaler\":true,\"Multi Trigger\":true,\"Multi Trigger/Trigger 1\":true,\"Multi Trigger/Trigger 1/Offset\":true,\"Multi Trigger/Trigger 1/Offset To Camera\":true,\"Multi Trigger/Trigger 1/Rotation\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 1/Easing\":true,\"Multi Trigger/Trigger 1/Animation Speed Curve\":true,\"Multi Trigger/Trigger 1/Start Time Curve\":true,\"Multi Trigger/Trigger 1/Start Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Scaler\":true},\"cv\":2,\"parent\":[\"New Group (16)\"]},{\"id\":\"custom41\",\"title\":\"35 FT - 2 - CH Copy\",\"kind\":\"hold\",\"family\":\"desktop\",\"collapsed\":true,\"sub\":{\"Offset\":true,\"Offset To Camera\":true,\"Rotation\":true,\"Rotation/Rotation Curve X\":true,\"Rotation/Rotation Curve Y\":true,\"Rotation/Rotation Curve Z\":true,\"Easing\":true,\"Animation Speed Curve\":true,\"Start Time Curve\":true,\"Start Distance Curve\":true,\"Retransition\":true,\"Retransition/Retransition Speed Curve\":true,\"Retransition/Retransition Start Time Curve\":true,\"Retransition/Retransition Easing Curve\":true,\"Retransition/Retransition Distance Curve\":true,\"Retransition/Retransition Distance Scaler\":true,\"Tween Stop\":true,\"Tween Stop/Tween Stop Start Time Curve\":true,\"Tween Stop/Tween Stop Delay\":true,\"Multi Trigger\":true},\"cv\":2,\"parent\":[\"New Group (16)\"]},{\"id\":\"custom51\",\"title\":\"20 FT - 1 - C Copy\",\"kind\":\"hold\",\"family\":\"desktop\",\"collapsed\":true,\"sub\":{\"Offset\":true,\"Offset To Camera\":true,\"Rotation\":true,\"Rotation/Rotation Curve X\":true,\"Rotation/Rotation Curve Y\":true,\"Rotation/Rotation Curve Z\":true,\"Easing\":true,\"Animation Speed Curve\":true,\"Start Time Curve\":true,\"Start Distance Curve\":true,\"Retransition\":true,\"Retransition/Retransition Speed Curve\":true,\"Retransition/Retransition Start Time Curve\":true,\"Retransition/Retransition Easing Curve\":true,\"Retransition/Retransition Distance Curve\":true,\"Retransition/Retransition Distance Scaler\":true,\"Tween Stop\":true,\"Tween Stop/Tween Stop Start Time Curve\":true,\"Tween Stop/Tween Stop Delay\":true,\"Multi Trigger\":true,\"Multi Trigger/Trigger 1\":true,\"Multi Trigger/Trigger 1/Offset\":true,\"Multi Trigger/Trigger 1/Offset To Camera\":true,\"Multi Trigger/Trigger 1/Rotation\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 1/Easing\":true,\"Multi Trigger/Trigger 1/Animation Speed Curve\":true,\"Multi Trigger/Trigger 1/Start Time Curve\":true,\"Multi Trigger/Trigger 1/Start Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Scaler\":true,\"Multi Trigger/Trigger 1/Tween Stop\":true,\"Multi Trigger/Trigger 1/Tween Stop/Tween Stop Start Time Curve\":true,\"Multi Trigger/Trigger 1/Tween Stop/Tween Stop Delay\":true,\"Multi Trigger/Trigger 2\":true,\"Multi Trigger/Trigger 2/Offset\":true,\"Multi Trigger/Trigger 2/Offset To Camera\":true,\"Multi Trigger/Trigger 2/Rotation\":true,\"Multi Trigger/Trigger 2/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 2/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 2/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 2/Easing\":true,\"Multi Trigger/Trigger 2/Animation Speed Curve\":true,\"Multi Trigger/Trigger 2/Start Time Curve\":true,\"Multi Trigger/Trigger 2/Start Distance Curve\":true,\"Multi Trigger/Trigger 2/Retransition\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Distance Scaler\":true,\"Multi Trigger/Trigger 2/Tween Stop\":true,\"Multi Trigger/Trigger 2/Tween Stop/Tween Stop Start Time Curve\":true,\"Multi Trigger/Trigger 2/Tween Stop/Tween Stop Delay\":true},\"cv\":2,\"parent\":[\"New Group (16)\"]},{\"id\":\"custom52\",\"title\":\"20 FT - R - CH Copy\",\"kind\":\"pose\",\"family\":\"desktop\",\"collapsed\":true,\"sub\":{\"Offset\":true,\"Offset To Camera\":true,\"Rotation\":true,\"Rotation/Rotation Curve X\":true,\"Rotation/Rotation Curve Y\":true,\"Rotation/Rotation Curve Z\":true,\"Easing\":true,\"Animation Speed Curve\":true,\"Start Time Curve\":true,\"Start Distance Curve\":true,\"Retransition\":true,\"Retransition/Retransition Speed Curve\":true,\"Retransition/Retransition Start Time Curve\":false,\"Retransition/Retransition Easing Curve\":true,\"Retransition/Retransition Distance Curve\":true,\"Retransition/Retransition Distance Scaler\":false,\"Multi Trigger\":false,\"Multi Trigger/Trigger 1\":true,\"Multi Trigger/Trigger 1/Offset\":true,\"Multi Trigger/Trigger 1/Offset To Camera\":true,\"Multi Trigger/Trigger 1/Rotation\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 1/Easing\":true,\"Multi Trigger/Trigger 1/Animation Speed Curve\":true,\"Multi Trigger/Trigger 1/Start Time Curve\":true,\"Multi Trigger/Trigger 1/Start Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Scaler\":true,\"Multi Trigger/Trigger 2\":true,\"Multi Trigger/Trigger 2/Offset\":true,\"Multi Trigger/Trigger 2/Offset To Camera\":true,\"Multi Trigger/Trigger 2/Rotation\":true,\"Multi Trigger/Trigger 2/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 2/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 2/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 2/Easing\":true,\"Multi Trigger/Trigger 2/Animation Speed Curve\":true,\"Multi Trigger/Trigger 2/Start Time Curve\":true,\"Multi Trigger/Trigger 2/Start Distance Curve\":true,\"Multi Trigger/Trigger 2/Retransition\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Distance Scaler\":true},\"cv\":2,\"parent\":[\"New Group (16)\"]}]",
       "customFunctionSelector": [
         {
           "name": "SCROLL",
@@ -421,42 +421,42 @@
           "fnId": "custom29"
         },
         {
-          "name": "15 FT - R - C",
+          "name": "35 FT - R - C",
           "fnId": "custom52",
           "group": "20 FOV TEST"
         },
         {
-          "name": "15 FT - R - CH",
+          "name": "35 FT - R - CH",
           "fnId": "custom51",
           "group": "20 FOV TEST"
         },
         {
-          "name": "15 FT - 1 - C",
+          "name": "35 FT - 1 - C",
           "fnId": "custom50",
           "group": "20 FOV TEST"
         },
         {
-          "name": "15 FT - 1 - CH",
+          "name": "35  FT - 1 - CH",
           "fnId": "custom39",
           "group": "20 FOV TEST"
         },
         {
-          "name": "15 FT - 2 - C",
+          "name": "35 FT - 2 - C",
           "fnId": "custom40",
           "group": "20 FOV TEST"
         },
         {
-          "name": "15 FT - 2 - CH",
+          "name": "35 FT - 2 - CH",
           "fnId": "custom41",
           "group": "20 FOV TEST"
         },
         {
-          "name": "15 FT - 3 - C",
+          "name": "35 FT - 3 - C",
           "fnId": "custom42",
           "group": "20 FOV TEST"
         },
         {
-          "name": "15 FT - 3 - CH",
+          "name": "35 FT - 3 - CH",
           "fnId": "custom43",
           "group": "20 FOV TEST"
         }
@@ -8415,28 +8415,28 @@
           ]
         }
       ],
-      "cameraX": 1.963636363636364,
-      "cameraY": 9.184850993605146e-15,
-      "cameraZ": 257.48779599525176,
-      "cameraFov": 15,
+      "cameraX": 1.9534883720930232,
+      "cameraY": 2.0272434216195883e-13,
+      "cameraZ": 223.4004898795015,
+      "cameraFov": 20,
       "cameraYaw": 0,
       "cameraPitch": 0,
       "cameraRoll": 0,
-      "cameraDefaultPreset": "{\"cameraX\":1.963636363636364,\"cameraY\":9.184850993605146e-15,\"cameraZ\":257.48779599525176,\"cameraFov\":15,\"cameraZoom\":149.99999999999994,\"cameraRoll\":0,\"targetX\":1.963636363636364,\"targetY\":0,\"targetZ\":107.4877959952518}",
-      "cameraZoom": 149.99999999999994,
+      "cameraDefaultPreset": "{\"cameraX\":1.9534883720930232,\"cameraY\":2.0272434216195883e-13,\"cameraZ\":223.4004898795015,\"cameraFov\":20,\"cameraZoom\":99,\"cameraRoll\":0,\"targetX\":1.9534883720930232,\"targetY\":1.9666234050617943e-13,\"targetZ\":124.40048987950149}",
+      "cameraZoom": 99,
       "cameraZoomSpeed": 0.3,
       "savedCameras": [
         {
-          "name": "HD - DESKTOP - 15 FOV",
-          "cameraX": 1.963636363636364,
-          "cameraY": 9.184850993605146e-15,
-          "cameraZ": 257.48779599525176,
-          "cameraFov": 15,
-          "cameraZoom": 149.99999999999994,
+          "name": "HD - DESKTOP - 20 FOV",
+          "cameraX": 1.9534883720930232,
+          "cameraY": 2.0272434216195883e-13,
+          "cameraZ": 223.4004898795015,
+          "cameraFov": 20,
+          "cameraZoom": 99,
           "cameraRoll": 0,
-          "targetX": 1.963636363636364,
-          "targetY": 0,
-          "targetZ": 107.4877959952518
+          "targetX": 1.9534883720930232,
+          "targetY": 1.9666234050617943e-13,
+          "targetZ": 124.40048987950149
         }
       ],
       "lockCameraPan": true,
@@ -9582,7 +9582,7 @@
       "custom39CameraOffsetYCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.324820628419056,\"y\":0},\"bg\":0.64,\"m\":\"linear\"},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.467575665942766,\"y\":0}}]",
       "custom39CameraOffsetYRange": "{\"min\":-1,\"max\":2}",
       "custom39CameraOffsetZEnabled": true,
-      "custom39CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.07823417756679524,\"y\":0}},{\"x\":0.11190598139370292,\"y\":0.5177083333333333,\"h2\":{\"x\":-0.04377344773317037,\"y\":0.20000000000000007},\"h1\":{\"x\":0.06734360765381536,\"y\":-0.29333343505859366}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.6608093427746702,\"y\":0.09104181925455734}}]",
+      "custom39CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.2194142514188381,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-1,\"y\":0}}]",
       "custom39CameraOffsetZRange": "{\"min\":5,\"max\":45}",
       "custom39RotationCurveVisibleOnly": true,
       "custom39RotationXCurveEnabled": false,
@@ -9618,7 +9618,7 @@
       "custom39EasingCurveEnabled": true,
       "custom39EasingCurve": "[{\"x\":0,\"y\":0.5639582316080729,\"h1\":{\"x\":0.31143422537808685,\"y\":0.10374984741210935}},{\"x\":0.5114378003582828,\"y\":0.8504165649414063,\"h2\":{\"x\":-0.217053360727685,\"y\":0.013333384195963527},\"h1\":{\"x\":0.23886151703848635,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2702726881540415,\"y\":0.16374994913736984}}]",
       "custom39RetransitionEasingCurveEnabled": true,
-      "custom39RetransitionEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.42983859032236926,\"y\":0.20052083333333337}},{\"x\":0.5000090617275154,\"y\":0.7653124491373697,\"h2\":{\"x\":-0.274628427178499,\"y\":0},\"h1\":{\"x\":0.28158102656376904,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.44474229855675507,\"y\":0.2738543192545573}}]",
+      "custom39RetransitionEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.2565192606738039,\"y\":0}},{\"x\":0.5000090617275154,\"y\":0.7653124491373697,\"h2\":{\"x\":-0.21889825254187922,\"y\":-0.0009373982747394871},\"h1\":{\"x\":0.25489640554523973,\"y\":0.019062550862630312}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.35493617403165045,\"y\":0}}]",
       "custom39SpeedCurveEnabled": true,
       "custom39SpeedCurveVisibleOnly": true,
       "custom39SpeedCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.3614426923386011,\"y\":-0.06291694641113277}},{\"x\":0.5434193258084055,\"y\":0,\"h1\":{\"x\":0.1377118711641958,\"y\":0},\"h2\":{\"x\":-0.1619136237453131,\"y\":-0.0011459350585938388}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.45658067419159454,\"y\":0}}]",
@@ -9641,7 +9641,7 @@
       "custom39RetransitionDistCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom39RetransitionDistRange": "{\"min\":50,\"max\":2000}",
       "custom39RetransitionScalerEnabled": true,
-      "custom39RetransitionScalerCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.5140945168802775,\"y\":-0.12760416666666663}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.278253513093899,\"y\":0.6923957824707031}}]",
+      "custom39RetransitionScalerCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.4794814747874683,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.278253513093899,\"y\":0.6923957824707031}}]",
       "custom39RetransitionScalerMulRange": "{\"min\":0.1,\"max\":0.8}",
       "custom39RetransitionScalerDistRange": "{\"min\":0,\"max\":800}",
       "custom39RetransitionStartTimeCurveEnabled": true,
@@ -9652,7 +9652,7 @@
       "custom39TweenRetransitionSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.6073672705792005,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.3644149408348759,\"y\":0}}]",
       "custom39TweenRetransitionSpeedCurveRange": "{\"min\":26766,\"max\":36366}",
       "custom39TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.35062653339382605,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.350678091120192,\"y\":0}}]",
-      "custom39TweenRetransitionStartTimeRange": "{\"min\":0,\"max\":3000}",
+      "custom39TweenRetransitionStartTimeRange": "{\"min\":3000,\"max\":4000}",
       "custom39TweenStopEnabled": true,
       "custom39TweenStopStartTimeCurveEnabled": true,
       "custom39TweenStopStartTimeCurveVisibleOnly": true,
@@ -10129,7 +10129,7 @@
       "custom39Trig5CameraOffsetYCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom39Trig5CameraOffsetYRange": "{\"min\":0,\"max\":10}",
       "custom39Trig5CameraOffsetZEnabled": true,
-      "custom39Trig5CameraOffsetZCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.36575475011058206,\"y\":0.001041920979817701}},{\"x\":0.47146219136654566,\"y\":0.407708485921224,\"h2\":{\"x\":-0.3127363861552631,\"y\":-0.0399998982747396},\"h1\":{\"x\":0.17325511035152086,\"y\":0.06000010172526038}},{\"x\":1,\"y\":1,\"h2\":{\"x\":0,\"y\":-0.492291514078776}}]",
+      "custom39Trig5CameraOffsetZCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.29344133786255555,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-1,\"y\":0}}]",
       "custom39Trig5CameraOffsetZRange": "{\"min\":-25,\"max\":-5}",
       "custom39Trig5RotationCurveVisibleOnly": true,
       "custom39Trig5RotationXCurveEnabled": false,
@@ -10164,7 +10164,7 @@
       "custom39Trig5TransitionSpeedMs": 400,
       "custom39Trig5EasingCurveEnabled": true,
       "custom39Trig5EasingCurve": "[{\"x\":0,\"y\":0},{\"x\":0.5324305524740706,\"y\":1},{\"x\":1,\"y\":0}]",
-      "custom39Trig5RetransitionEasingCurveEnabled": false,
+      "custom39Trig5RetransitionEasingCurveEnabled": true,
       "custom39Trig5RetransitionEasingCurve": "[{\"x\":0,\"y\":0.5},{\"x\":1,\"y\":0.5}]",
       "custom39Trig5SpeedCurveEnabled": true,
       "custom39Trig5SpeedCurveVisibleOnly": true,
@@ -10187,10 +10187,10 @@
       "custom39Trig5RetransitionDistCurveEnabled": false,
       "custom39Trig5RetransitionDistCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom39Trig5RetransitionDistRange": "{\"min\":50,\"max\":2000}",
-      "custom39Trig5RetransitionScalerEnabled": false,
-      "custom39Trig5RetransitionScalerCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom39Trig5RetransitionScalerMulRange": "{\"min\":0.5,\"max\":2}",
-      "custom39Trig5RetransitionScalerDistRange": "{\"min\":0,\"max\":50}",
+      "custom39Trig5RetransitionScalerEnabled": true,
+      "custom39Trig5RetransitionScalerCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.4513359606672014,\"y\":0}},{\"x\":1,\"y\":0}]",
+      "custom39Trig5RetransitionScalerMulRange": "{\"min\":0.01,\"max\":1}",
+      "custom39Trig5RetransitionScalerDistRange": "{\"min\":0,\"max\":300}",
       "custom39Trig5RetransitionStartTimeCurveEnabled": true,
       "custom39Trig5RetransitionStartTimeCurveVisibleOnly": true,
       "custom39Trig5RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -10198,8 +10198,8 @@
       "custom39Trig5TweenRetransitionSpeedMs": 800,
       "custom39Trig5TweenRetransitionSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.9417530103612434,\"y\":0}},{\"x\":1,\"y\":1}]",
       "custom39Trig5TweenRetransitionSpeedCurveRange": "{\"min\":26130,\"max\":30830}",
-      "custom39Trig5TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom39Trig5TweenRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom39Trig5TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.4103779883090869,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.3097434453202007,\"y\":0}}]",
+      "custom39Trig5TweenRetransitionStartTimeRange": "{\"min\":3000,\"max\":4000}",
       "custom39Trig5TweenStopEnabled": true,
       "custom39Trig5TweenStopStartTimeCurveEnabled": false,
       "custom39Trig5TweenStopStartTimeCurveVisibleOnly": true,
@@ -11541,7 +11541,7 @@
       "custom52EasingCurveEnabled": true,
       "custom52EasingCurve": "[{\"x\":0,\"y\":0},{\"x\":0.5227021422192623,\"y\":1},{\"x\":1,\"y\":0}]",
       "custom52RetransitionEasingCurveEnabled": true,
-      "custom52RetransitionEasingCurve": "[{\"x\":0,\"y\":0},{\"x\":0.5253180363191781,\"y\":0.9197916666666667},{\"x\":1,\"y\":0}]",
+      "custom52RetransitionEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.22864903081401367,\"y\":0.020937093098958304}},{\"x\":0.5253180363191781,\"y\":0.9197916666666667,\"h2\":{\"x\":-0.1835484326959056,\"y\":0.03447875976562498},\"h1\":{\"x\":0.2377845720980386,\"y\":0.041145833333333326}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.24017619800918888,\"y\":0.00760396321614587}}]",
       "custom52SpeedCurveEnabled": true,
       "custom52SpeedCurveVisibleOnly": true,
       "custom52SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -11559,19 +11559,19 @@
       "custom52RetransitionSpeedMs": 400,
       "custom52RetransitionSpeedCurveEnabled": true,
       "custom52RetransitionSpeedCurveVisibleOnly": true,
-      "custom52RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom52RetransitionSpeedCurveRange": "{\"min\":50,\"max\":25000}",
+      "custom52RetransitionSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.34996674476773404,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.47461448477216805,\"y\":0}}]",
+      "custom52RetransitionSpeedCurveRange": "{\"min\":25000,\"max\":35000}",
       "custom52RetransitionDistCurveEnabled": false,
       "custom52RetransitionDistCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom52RetransitionDistRange": "{\"min\":50,\"max\":2000}",
       "custom52RetransitionScalerEnabled": true,
-      "custom52RetransitionScalerCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom52RetransitionScalerCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.5040728982208529,\"y\":0.02614580790201826}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.4893692387694407,\"y\":0}}]",
       "custom52RetransitionScalerMulRange": "{\"min\":0.1,\"max\":1}",
-      "custom52RetransitionScalerDistRange": "{\"min\":0,\"max\":100}",
+      "custom52RetransitionScalerDistRange": "{\"min\":0,\"max\":300}",
       "custom52RetransitionStartTimeCurveEnabled": true,
       "custom52RetransitionStartTimeCurveVisibleOnly": true,
-      "custom52RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom52RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom52RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.36308222063025153,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.4041190208984198,\"y\":-0.025000000000000022}}]",
+      "custom52RetransitionStartTimeRange": "{\"min\":4000,\"max\":5000}",
       "custom52MultiTriggerEnabled": false,
       "custom52MultiTriggers": "[{\"prefix\":\"custom52Trig1\",\"title\":\"Trigger 1\"},{\"prefix\":\"custom52Trig2\",\"title\":\"Trigger 2\"}]",
       "custom52Trig1Enabled": true,
@@ -11932,11 +11932,11 @@
       "fieldBoundsZMin": "-800",
       "fieldBoundsZMinCurveEnabled": true,
       "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.9528458288968122,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.25137871577513693,\"y\":0}}]",
-      "fieldBoundsZMinCurveRange": "{\"min\":-300,\"max\":-100}",
+      "fieldBoundsZMinCurveRange": "{\"min\":-200,\"max\":-100}",
       "fieldBoundsZMax": "240",
       "fieldBoundsZMaxCurveEnabled": true,
       "fieldBoundsZMaxCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.7710241189949432,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":0,\"y\":1}}]",
-      "fieldBoundsZMaxCurveRange": "{\"min\":5,\"max\":100}",
+      "fieldBoundsZMaxCurveRange": "{\"min\":5,\"max\":50}",
       "fieldBoundsX": "{\"min\":-300,\"max\":300}",
       "fieldBoundsY": "{\"min\":-300,\"max\":300}",
       "fieldBoundsZ": "{\"min\":-400,\"max\":200}",
@@ -12208,7 +12208,7 @@
       "loadingPreviewSequenceHoldMs": 0,
       "loadingPreviewSize": 1390,
       "loadingPreviewRotationX": -85.46571581217302,
-      "loadingPreviewRotationY": -109.10457274713559,
+      "loadingPreviewRotationY": -109.10457274713558,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0,
       "loadingPreviewOffsetY": 0,
@@ -12224,7 +12224,7 @@
       "loadingPreviewTextOffsetX": -104,
       "loadingPreviewTextOffsetY": 370,
       "loadingPreviewCameraEditMode": false,
-      "customClickFunctionIds": "[{\"id\":\"custom19\",\"title\":\"Custom Click Function 19\",\"kind\":\"pose\",\"family\":\"mobile\",\"collapsed\":true,\"sub\":{\"Offset\":true,\"Offset To Camera\":true,\"Rotation\":true,\"Rotation/Rotation Curve X\":true,\"Rotation/Rotation Curve Y\":true,\"Rotation/Rotation Curve Z\":true,\"Easing\":true,\"Animation Speed Curve\":true,\"Start Time Curve\":true,\"Start Distance Curve\":true,\"Retransition\":true,\"Retransition/Retransition Speed Curve\":true,\"Retransition/Retransition Start Time Curve\":true,\"Retransition/Retransition Easing Curve\":true,\"Retransition/Retransition Distance Curve\":true,\"Retransition/Retransition Distance Scaler\":true,\"Multi Trigger\":true},\"cv\":2},{\"id\":\"custom28\",\"title\":\"Custom Click Function 28\",\"kind\":\"pose\",\"family\":\"mobile\",\"collapsed\":true,\"sub\":{\"Offset\":true,\"Offset To Camera\":true,\"Rotation\":true,\"Rotation/Rotation Curve X\":true,\"Rotation/Rotation Curve Y\":true,\"Rotation/Rotation Curve Z\":true,\"Easing\":true,\"Animation Speed Curve\":true,\"Start Time Curve\":true,\"Start Distance Curve\":true,\"Retransition\":true,\"Retransition/Retransition Speed Curve\":true,\"Retransition/Retransition Start Time Curve\":true,\"Retransition/Retransition Easing Curve\":true,\"Retransition/Retransition Distance Curve\":true,\"Retransition/Retransition Distance Scaler\":true,\"Multi Trigger\":true,\"Multi Trigger/Trigger 1\":true,\"Multi Trigger/Trigger 1/Offset\":true,\"Multi Trigger/Trigger 1/Offset To Camera\":true,\"Multi Trigger/Trigger 1/Rotation\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 1/Easing\":true,\"Multi Trigger/Trigger 1/Animation Speed Curve\":true,\"Multi Trigger/Trigger 1/Start Time Curve\":true,\"Multi Trigger/Trigger 1/Start Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Scaler\":true},\"cv\":2},{\"id\":\"custom29\",\"title\":\"Custom Click Function 29\",\"kind\":\"pose\",\"family\":\"mobile\",\"collapsed\":true,\"sub\":{\"Offset\":true,\"Offset To Camera\":true,\"Rotation\":true,\"Rotation/Rotation Curve X\":true,\"Rotation/Rotation Curve Y\":true,\"Rotation/Rotation Curve Z\":true,\"Easing\":true,\"Animation Speed Curve\":true,\"Start Time Curve\":true,\"Start Distance Curve\":true,\"Retransition\":true,\"Retransition/Retransition Speed Curve\":true,\"Retransition/Retransition Start Time Curve\":true,\"Retransition/Retransition Easing Curve\":true,\"Retransition/Retransition Distance Curve\":true,\"Retransition/Retransition Distance Scaler\":true,\"Multi Trigger\":true,\"Multi Trigger/Trigger 1\":true,\"Multi Trigger/Trigger 1/Offset\":true,\"Multi Trigger/Trigger 1/Offset To Camera\":true,\"Multi Trigger/Trigger 1/Rotation\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 1/Easing\":true,\"Multi Trigger/Trigger 1/Animation Speed Curve\":true,\"Multi Trigger/Trigger 1/Start Time Curve\":true,\"Multi Trigger/Trigger 1/Start Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Scaler\":true,\"Multi Trigger/Trigger 2\":true,\"Multi Trigger/Trigger 2/Offset\":true,\"Multi Trigger/Trigger 2/Offset To Camera\":true,\"Multi Trigger/Trigger 2/Rotation\":true,\"Multi Trigger/Trigger 2/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 2/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 2/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 2/Easing\":true,\"Multi Trigger/Trigger 2/Animation Speed Curve\":true,\"Multi Trigger/Trigger 2/Start Time Curve\":true,\"Multi Trigger/Trigger 2/Start Distance Curve\":true,\"Multi Trigger/Trigger 2/Retransition\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Distance Scaler\":true},\"cv\":2},{\"id\":\"custom39\",\"title\":\"35 FT - 1 - CH Copy\",\"kind\":\"hold\",\"family\":\"desktop\",\"collapsed\":true,\"sub\":{\"Offset\":true,\"Offset To Camera\":true,\"Rotation\":true,\"Rotation/Rotation Curve X\":true,\"Rotation/Rotation Curve Y\":true,\"Rotation/Rotation Curve Z\":true,\"Easing\":true,\"Animation Speed Curve\":true,\"Start Time Curve\":true,\"Start Distance Curve\":true,\"Retransition\":true,\"Retransition/Retransition Speed Curve\":true,\"Retransition/Retransition Start Time Curve\":true,\"Retransition/Retransition Easing Curve\":true,\"Retransition/Retransition Distance Curve\":true,\"Retransition/Retransition Distance Scaler\":true,\"Tween Stop\":true,\"Tween Stop/Tween Stop Start Time Curve\":true,\"Tween Stop/Tween Stop Delay\":true,\"Multi Trigger\":true,\"Multi Trigger/Trigger 1\":true,\"Multi Trigger/Trigger 1/Offset\":true,\"Multi Trigger/Trigger 1/Offset To Camera\":true,\"Multi Trigger/Trigger 1/Rotation\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 1/Easing\":true,\"Multi Trigger/Trigger 1/Animation Speed Curve\":true,\"Multi Trigger/Trigger 1/Start Time Curve\":true,\"Multi Trigger/Trigger 1/Start Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Scaler\":true,\"Multi Trigger/Trigger 1/Tween Stop\":true,\"Multi Trigger/Trigger 1/Tween Stop/Tween Stop Start Time Curve\":true,\"Multi Trigger/Trigger 1/Tween Stop/Tween Stop Delay\":true,\"Multi Trigger/Trigger 2\":true,\"Multi Trigger/Trigger 2/Offset\":true,\"Multi Trigger/Trigger 2/Offset To Camera\":true,\"Multi Trigger/Trigger 2/Rotation\":true,\"Multi Trigger/Trigger 2/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 2/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 2/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 2/Easing\":true,\"Multi Trigger/Trigger 2/Animation Speed Curve\":true,\"Multi Trigger/Trigger 2/Start Time Curve\":true,\"Multi Trigger/Trigger 2/Start Distance Curve\":true,\"Multi Trigger/Trigger 2/Retransition\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Distance Scaler\":true,\"Multi Trigger/Trigger 2/Tween Stop\":true,\"Multi Trigger/Trigger 2/Tween Stop/Tween Stop Start Time Curve\":true,\"Multi Trigger/Trigger 2/Tween Stop/Tween Stop Delay\":true,\"Multi Trigger/Trigger 3\":true,\"Multi Trigger/Trigger 3/Offset\":true,\"Multi Trigger/Trigger 3/Offset To Camera\":true,\"Multi Trigger/Trigger 3/Rotation\":true,\"Multi Trigger/Trigger 3/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 3/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 3/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 3/Easing\":true,\"Multi Trigger/Trigger 3/Animation Speed Curve\":true,\"Multi Trigger/Trigger 3/Start Time Curve\":true,\"Multi Trigger/Trigger 3/Start Distance Curve\":true,\"Multi Trigger/Trigger 3/Retransition\":true,\"Multi Trigger/Trigger 3/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 3/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 3/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 3/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 3/Retransition/Retransition Distance Scaler\":true,\"Multi Trigger/Trigger 3/Tween Stop\":true,\"Multi Trigger/Trigger 3/Tween Stop/Tween Stop Start Time Curve\":true,\"Multi Trigger/Trigger 3/Tween Stop/Tween Stop Delay\":true,\"Multi Trigger/Trigger 4\":true,\"Multi Trigger/Trigger 4/Offset\":true,\"Multi Trigger/Trigger 4/Offset To Camera\":true,\"Multi Trigger/Trigger 4/Rotation\":true,\"Multi Trigger/Trigger 4/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 4/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 4/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 4/Easing\":true,\"Multi Trigger/Trigger 4/Animation Speed Curve\":true,\"Multi Trigger/Trigger 4/Start Time Curve\":true,\"Multi Trigger/Trigger 4/Start Distance Curve\":true,\"Multi Trigger/Trigger 4/Retransition\":true,\"Multi Trigger/Trigger 4/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 4/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 4/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 4/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 4/Retransition/Retransition Distance Scaler\":true,\"Multi Trigger/Trigger 4/Tween Stop\":true,\"Multi Trigger/Trigger 4/Tween Stop/Tween Stop Start Time Curve\":true,\"Multi Trigger/Trigger 4/Tween Stop/Tween Stop Delay\":true,\"Multi Trigger/Trigger 5\":true,\"Multi Trigger/Trigger 5/Offset\":true,\"Multi Trigger/Trigger 5/Offset To Camera\":true,\"Multi Trigger/Trigger 5/Rotation\":true,\"Multi Trigger/Trigger 5/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 5/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 5/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 5/Easing\":true,\"Multi Trigger/Trigger 5/Animation Speed Curve\":true,\"Multi Trigger/Trigger 5/Start Time Curve\":true,\"Multi Trigger/Trigger 5/Start Distance Curve\":true,\"Multi Trigger/Trigger 5/Retransition\":true,\"Multi Trigger/Trigger 5/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 5/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 5/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 5/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 5/Retransition/Retransition Distance Scaler\":true,\"Multi Trigger/Trigger 5/Tween Stop\":true,\"Multi Trigger/Trigger 5/Tween Stop/Tween Stop Start Time Curve\":true,\"Multi Trigger/Trigger 5/Tween Stop/Tween Stop Delay\":true},\"cv\":2,\"parent\":[\"New Group (16)\"]},{\"id\":\"custom40\",\"title\":\"35 FT - Copy\",\"kind\":\"pose\",\"family\":\"desktop\",\"collapsed\":true,\"sub\":{\"Offset\":true,\"Offset To Camera\":true,\"Rotation\":true,\"Rotation/Rotation Curve X\":true,\"Rotation/Rotation Curve Y\":true,\"Rotation/Rotation Curve Z\":true,\"Easing\":true,\"Animation Speed Curve\":true,\"Start Time Curve\":true,\"Start Distance Curve\":true,\"Retransition\":true,\"Retransition/Retransition Speed Curve\":true,\"Retransition/Retransition Start Time Curve\":true,\"Retransition/Retransition Easing Curve\":true,\"Retransition/Retransition Distance Curve\":true,\"Retransition/Retransition Distance Scaler\":true,\"Multi Trigger\":true,\"Multi Trigger/Trigger 1\":true,\"Multi Trigger/Trigger 1/Offset\":true,\"Multi Trigger/Trigger 1/Offset To Camera\":true,\"Multi Trigger/Trigger 1/Rotation\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 1/Easing\":true,\"Multi Trigger/Trigger 1/Animation Speed Curve\":true,\"Multi Trigger/Trigger 1/Start Time Curve\":true,\"Multi Trigger/Trigger 1/Start Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Scaler\":true},\"cv\":2,\"parent\":[\"New Group (16)\"]},{\"id\":\"custom42\",\"title\":\"35 FT - 3 - C Copy\",\"kind\":\"pose\",\"family\":\"desktop\",\"collapsed\":true,\"sub\":{\"Offset\":true,\"Offset To Camera\":true,\"Rotation\":true,\"Rotation/Rotation Curve X\":true,\"Rotation/Rotation Curve Y\":true,\"Rotation/Rotation Curve Z\":true,\"Easing\":true,\"Animation Speed Curve\":true,\"Start Time Curve\":true,\"Start Distance Curve\":true,\"Retransition\":true,\"Retransition/Retransition Speed Curve\":true,\"Retransition/Retransition Start Time Curve\":true,\"Retransition/Retransition Easing Curve\":true,\"Retransition/Retransition Distance Curve\":true,\"Retransition/Retransition Distance Scaler\":true,\"Multi Trigger\":true,\"Multi Trigger/Trigger 1\":true,\"Multi Trigger/Trigger 1/Offset\":true,\"Multi Trigger/Trigger 1/Offset To Camera\":true,\"Multi Trigger/Trigger 1/Rotation\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 1/Easing\":true,\"Multi Trigger/Trigger 1/Animation Speed Curve\":true,\"Multi Trigger/Trigger 1/Start Time Curve\":true,\"Multi Trigger/Trigger 1/Start Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Scaler\":true},\"cv\":2,\"parent\":[\"New Group (16)\"]},{\"id\":\"custom43\",\"title\":\"35 FT - 3 - CH Copy\",\"kind\":\"hold\",\"family\":\"desktop\",\"collapsed\":true,\"sub\":{\"Offset\":true,\"Offset To Camera\":true,\"Rotation\":true,\"Rotation/Rotation Curve X\":true,\"Rotation/Rotation Curve Y\":true,\"Rotation/Rotation Curve Z\":true,\"Easing\":true,\"Animation Speed Curve\":true,\"Start Time Curve\":true,\"Start Distance Curve\":true,\"Retransition\":true,\"Retransition/Retransition Speed Curve\":true,\"Retransition/Retransition Start Time Curve\":true,\"Retransition/Retransition Easing Curve\":true,\"Retransition/Retransition Distance Curve\":true,\"Retransition/Retransition Distance Scaler\":true,\"Tween Stop\":true,\"Tween Stop/Tween Stop Start Time Curve\":true,\"Tween Stop/Tween Stop Delay\":true,\"Multi Trigger\":true,\"Multi Trigger/Trigger 1\":true,\"Multi Trigger/Trigger 1/Offset\":true,\"Multi Trigger/Trigger 1/Offset To Camera\":true,\"Multi Trigger/Trigger 1/Rotation\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 1/Easing\":true,\"Multi Trigger/Trigger 1/Animation Speed Curve\":true,\"Multi Trigger/Trigger 1/Start Time Curve\":true,\"Multi Trigger/Trigger 1/Start Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Scaler\":true,\"Multi Trigger/Trigger 1/Tween Stop\":true,\"Multi Trigger/Trigger 1/Tween Stop/Tween Stop Start Time Curve\":true,\"Multi Trigger/Trigger 1/Tween Stop/Tween Stop Delay\":true},\"cv\":2,\"parent\":[\"New Group (16)\"]},{\"id\":\"custom50\",\"title\":\"35 FT - 1 - C Copy\",\"kind\":\"pose\",\"family\":\"desktop\",\"collapsed\":true,\"sub\":{\"Offset\":true,\"Offset To Camera\":true,\"Rotation\":true,\"Rotation/Rotation Curve X\":true,\"Rotation/Rotation Curve Y\":true,\"Rotation/Rotation Curve Z\":true,\"Easing\":true,\"Animation Speed Curve\":true,\"Start Time Curve\":true,\"Start Distance Curve\":true,\"Retransition\":true,\"Retransition/Retransition Speed Curve\":true,\"Retransition/Retransition Start Time Curve\":true,\"Retransition/Retransition Easing Curve\":true,\"Retransition/Retransition Distance Curve\":true,\"Retransition/Retransition Distance Scaler\":true,\"Multi Trigger\":true,\"Multi Trigger/Trigger 1\":true,\"Multi Trigger/Trigger 1/Offset\":true,\"Multi Trigger/Trigger 1/Offset To Camera\":true,\"Multi Trigger/Trigger 1/Rotation\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 1/Easing\":true,\"Multi Trigger/Trigger 1/Animation Speed Curve\":true,\"Multi Trigger/Trigger 1/Start Time Curve\":true,\"Multi Trigger/Trigger 1/Start Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Scaler\":true},\"cv\":2,\"parent\":[\"New Group (16)\"]},{\"id\":\"custom41\",\"title\":\"35 FT - 2 - CH Copy\",\"kind\":\"hold\",\"family\":\"desktop\",\"collapsed\":true,\"sub\":{\"Offset\":true,\"Offset To Camera\":true,\"Rotation\":true,\"Rotation/Rotation Curve X\":true,\"Rotation/Rotation Curve Y\":true,\"Rotation/Rotation Curve Z\":true,\"Easing\":true,\"Animation Speed Curve\":true,\"Start Time Curve\":true,\"Start Distance Curve\":true,\"Retransition\":true,\"Retransition/Retransition Speed Curve\":true,\"Retransition/Retransition Start Time Curve\":true,\"Retransition/Retransition Easing Curve\":true,\"Retransition/Retransition Distance Curve\":true,\"Retransition/Retransition Distance Scaler\":true,\"Tween Stop\":true,\"Tween Stop/Tween Stop Start Time Curve\":true,\"Tween Stop/Tween Stop Delay\":true,\"Multi Trigger\":true},\"cv\":2,\"parent\":[\"New Group (16)\"]},{\"id\":\"custom51\",\"title\":\"20 FT - 1 - C Copy\",\"kind\":\"hold\",\"family\":\"desktop\",\"collapsed\":true,\"sub\":{\"Offset\":true,\"Offset To Camera\":true,\"Rotation\":true,\"Rotation/Rotation Curve X\":true,\"Rotation/Rotation Curve Y\":true,\"Rotation/Rotation Curve Z\":true,\"Easing\":true,\"Animation Speed Curve\":true,\"Start Time Curve\":true,\"Start Distance Curve\":true,\"Retransition\":true,\"Retransition/Retransition Speed Curve\":true,\"Retransition/Retransition Start Time Curve\":true,\"Retransition/Retransition Easing Curve\":true,\"Retransition/Retransition Distance Curve\":true,\"Retransition/Retransition Distance Scaler\":true,\"Tween Stop\":true,\"Tween Stop/Tween Stop Start Time Curve\":true,\"Tween Stop/Tween Stop Delay\":true,\"Multi Trigger\":true,\"Multi Trigger/Trigger 1\":true,\"Multi Trigger/Trigger 1/Offset\":true,\"Multi Trigger/Trigger 1/Offset To Camera\":true,\"Multi Trigger/Trigger 1/Rotation\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 1/Easing\":true,\"Multi Trigger/Trigger 1/Animation Speed Curve\":true,\"Multi Trigger/Trigger 1/Start Time Curve\":true,\"Multi Trigger/Trigger 1/Start Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Scaler\":true,\"Multi Trigger/Trigger 1/Tween Stop\":true,\"Multi Trigger/Trigger 1/Tween Stop/Tween Stop Start Time Curve\":true,\"Multi Trigger/Trigger 1/Tween Stop/Tween Stop Delay\":true,\"Multi Trigger/Trigger 2\":true,\"Multi Trigger/Trigger 2/Offset\":true,\"Multi Trigger/Trigger 2/Offset To Camera\":true,\"Multi Trigger/Trigger 2/Rotation\":true,\"Multi Trigger/Trigger 2/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 2/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 2/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 2/Easing\":true,\"Multi Trigger/Trigger 2/Animation Speed Curve\":true,\"Multi Trigger/Trigger 2/Start Time Curve\":true,\"Multi Trigger/Trigger 2/Start Distance Curve\":true,\"Multi Trigger/Trigger 2/Retransition\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Distance Scaler\":true,\"Multi Trigger/Trigger 2/Tween Stop\":true,\"Multi Trigger/Trigger 2/Tween Stop/Tween Stop Start Time Curve\":true,\"Multi Trigger/Trigger 2/Tween Stop/Tween Stop Delay\":true},\"cv\":2,\"parent\":[\"New Group (16)\"]},{\"id\":\"custom52\",\"title\":\"20 FT - R - CH Copy\",\"kind\":\"pose\",\"family\":\"desktop\",\"collapsed\":true,\"sub\":{\"Offset\":true,\"Offset To Camera\":true,\"Rotation\":true,\"Rotation/Rotation Curve X\":true,\"Rotation/Rotation Curve Y\":true,\"Rotation/Rotation Curve Z\":true,\"Easing\":true,\"Animation Speed Curve\":true,\"Start Time Curve\":true,\"Start Distance Curve\":true,\"Retransition\":true,\"Retransition/Retransition Speed Curve\":true,\"Retransition/Retransition Start Time Curve\":true,\"Retransition/Retransition Easing Curve\":true,\"Retransition/Retransition Distance Curve\":true,\"Retransition/Retransition Distance Scaler\":true,\"Multi Trigger\":true,\"Multi Trigger/Trigger 1\":true,\"Multi Trigger/Trigger 1/Offset\":true,\"Multi Trigger/Trigger 1/Offset To Camera\":true,\"Multi Trigger/Trigger 1/Rotation\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 1/Easing\":true,\"Multi Trigger/Trigger 1/Animation Speed Curve\":true,\"Multi Trigger/Trigger 1/Start Time Curve\":true,\"Multi Trigger/Trigger 1/Start Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Scaler\":true,\"Multi Trigger/Trigger 2\":true,\"Multi Trigger/Trigger 2/Offset\":true,\"Multi Trigger/Trigger 2/Offset To Camera\":true,\"Multi Trigger/Trigger 2/Rotation\":true,\"Multi Trigger/Trigger 2/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 2/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 2/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 2/Easing\":true,\"Multi Trigger/Trigger 2/Animation Speed Curve\":true,\"Multi Trigger/Trigger 2/Start Time Curve\":true,\"Multi Trigger/Trigger 2/Start Distance Curve\":true,\"Multi Trigger/Trigger 2/Retransition\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Distance Scaler\":true},\"cv\":2,\"parent\":[\"New Group (16)\"]}]",
+      "customClickFunctionIds": "[{\"id\":\"custom19\",\"title\":\"Custom Click Function 19\",\"kind\":\"pose\",\"family\":\"mobile\",\"collapsed\":true,\"sub\":{\"Offset\":true,\"Offset To Camera\":true,\"Rotation\":true,\"Rotation/Rotation Curve X\":true,\"Rotation/Rotation Curve Y\":true,\"Rotation/Rotation Curve Z\":true,\"Easing\":true,\"Animation Speed Curve\":true,\"Start Time Curve\":true,\"Start Distance Curve\":true,\"Retransition\":true,\"Retransition/Retransition Speed Curve\":true,\"Retransition/Retransition Start Time Curve\":true,\"Retransition/Retransition Easing Curve\":true,\"Retransition/Retransition Distance Curve\":true,\"Retransition/Retransition Distance Scaler\":true,\"Multi Trigger\":true},\"cv\":2},{\"id\":\"custom28\",\"title\":\"Custom Click Function 28\",\"kind\":\"pose\",\"family\":\"mobile\",\"collapsed\":true,\"sub\":{\"Offset\":true,\"Offset To Camera\":true,\"Rotation\":true,\"Rotation/Rotation Curve X\":true,\"Rotation/Rotation Curve Y\":true,\"Rotation/Rotation Curve Z\":true,\"Easing\":true,\"Animation Speed Curve\":true,\"Start Time Curve\":true,\"Start Distance Curve\":true,\"Retransition\":true,\"Retransition/Retransition Speed Curve\":true,\"Retransition/Retransition Start Time Curve\":true,\"Retransition/Retransition Easing Curve\":true,\"Retransition/Retransition Distance Curve\":true,\"Retransition/Retransition Distance Scaler\":true,\"Multi Trigger\":true,\"Multi Trigger/Trigger 1\":true,\"Multi Trigger/Trigger 1/Offset\":true,\"Multi Trigger/Trigger 1/Offset To Camera\":true,\"Multi Trigger/Trigger 1/Rotation\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 1/Easing\":true,\"Multi Trigger/Trigger 1/Animation Speed Curve\":true,\"Multi Trigger/Trigger 1/Start Time Curve\":true,\"Multi Trigger/Trigger 1/Start Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Scaler\":true},\"cv\":2},{\"id\":\"custom29\",\"title\":\"Custom Click Function 29\",\"kind\":\"pose\",\"family\":\"mobile\",\"collapsed\":true,\"sub\":{\"Offset\":true,\"Offset To Camera\":true,\"Rotation\":true,\"Rotation/Rotation Curve X\":true,\"Rotation/Rotation Curve Y\":true,\"Rotation/Rotation Curve Z\":true,\"Animation Speed Curve\":true,\"Start Time Curve\":true,\"Start Distance Curve\":true,\"Multi Trigger\":true,\"Multi Trigger/Trigger 1\":true,\"Multi Trigger/Trigger 1/Offset\":true,\"Multi Trigger/Trigger 1/Offset To Camera\":true,\"Multi Trigger/Trigger 1/Rotation\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 1/Easing\":true,\"Multi Trigger/Trigger 1/Animation Speed Curve\":true,\"Multi Trigger/Trigger 1/Start Time Curve\":true,\"Multi Trigger/Trigger 1/Start Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Scaler\":true,\"Multi Trigger/Trigger 2\":true,\"Multi Trigger/Trigger 2/Offset\":true,\"Multi Trigger/Trigger 2/Offset To Camera\":true,\"Multi Trigger/Trigger 2/Rotation\":true,\"Multi Trigger/Trigger 2/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 2/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 2/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 2/Easing\":true,\"Multi Trigger/Trigger 2/Animation Speed Curve\":true,\"Multi Trigger/Trigger 2/Start Time Curve\":true,\"Multi Trigger/Trigger 2/Start Distance Curve\":true,\"Multi Trigger/Trigger 2/Retransition\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Distance Scaler\":true},\"cv\":2},{\"id\":\"custom39\",\"title\":\"35 FT - 1 - CH Copy\",\"kind\":\"hold\",\"family\":\"desktop\",\"collapsed\":false,\"sub\":{\"Offset\":true,\"Offset To Camera\":true,\"Rotation\":true,\"Rotation/Rotation Curve X\":true,\"Rotation/Rotation Curve Y\":true,\"Rotation/Rotation Curve Z\":true,\"Easing\":true,\"Animation Speed Curve\":true,\"Start Time Curve\":true,\"Start Distance Curve\":true,\"Retransition\":false,\"Retransition/Retransition Speed Curve\":true,\"Retransition/Retransition Start Time Curve\":true,\"Retransition/Retransition Easing Curve\":true,\"Retransition/Retransition Distance Curve\":true,\"Retransition/Retransition Distance Scaler\":false,\"Tween Stop\":true,\"Tween Stop/Tween Stop Start Time Curve\":true,\"Tween Stop/Tween Stop Delay\":true,\"Multi Trigger\":false,\"Multi Trigger/Trigger 5\":false,\"Multi Trigger/Trigger 5/Offset\":true,\"Multi Trigger/Trigger 5/Offset To Camera\":true,\"Multi Trigger/Trigger 5/Rotation\":true,\"Multi Trigger/Trigger 5/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 5/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 5/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 5/Easing\":true,\"Multi Trigger/Trigger 5/Animation Speed Curve\":true,\"Multi Trigger/Trigger 5/Start Time Curve\":true,\"Multi Trigger/Trigger 5/Start Distance Curve\":true,\"Multi Trigger/Trigger 5/Retransition\":false,\"Multi Trigger/Trigger 5/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 5/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 5/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 5/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 5/Retransition/Retransition Distance Scaler\":true,\"Multi Trigger/Trigger 5/Tween Stop\":true,\"Multi Trigger/Trigger 5/Tween Stop/Tween Stop Start Time Curve\":true,\"Multi Trigger/Trigger 5/Tween Stop/Tween Stop Delay\":true},\"cv\":2,\"parent\":[\"New Group (16)\"]},{\"id\":\"custom40\",\"title\":\"35 FT - Copy\",\"kind\":\"pose\",\"family\":\"desktop\",\"collapsed\":true,\"sub\":{\"Offset\":true,\"Offset To Camera\":true,\"Rotation\":true,\"Rotation/Rotation Curve X\":true,\"Rotation/Rotation Curve Y\":true,\"Rotation/Rotation Curve Z\":true,\"Easing\":true,\"Animation Speed Curve\":true,\"Start Time Curve\":true,\"Start Distance Curve\":true,\"Retransition\":true,\"Retransition/Retransition Speed Curve\":true,\"Retransition/Retransition Start Time Curve\":true,\"Retransition/Retransition Easing Curve\":true,\"Retransition/Retransition Distance Curve\":true,\"Retransition/Retransition Distance Scaler\":true,\"Multi Trigger\":true,\"Multi Trigger/Trigger 1\":true,\"Multi Trigger/Trigger 1/Offset\":true,\"Multi Trigger/Trigger 1/Offset To Camera\":true,\"Multi Trigger/Trigger 1/Rotation\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 1/Easing\":true,\"Multi Trigger/Trigger 1/Animation Speed Curve\":true,\"Multi Trigger/Trigger 1/Start Time Curve\":true,\"Multi Trigger/Trigger 1/Start Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Scaler\":true},\"cv\":2,\"parent\":[\"New Group (16)\"]},{\"id\":\"custom42\",\"title\":\"35 FT - 3 - C Copy\",\"kind\":\"pose\",\"family\":\"desktop\",\"collapsed\":true,\"sub\":{\"Offset\":true,\"Offset To Camera\":true,\"Rotation\":true,\"Rotation/Rotation Curve X\":true,\"Rotation/Rotation Curve Y\":true,\"Rotation/Rotation Curve Z\":true,\"Easing\":true,\"Animation Speed Curve\":true,\"Start Time Curve\":true,\"Start Distance Curve\":true,\"Retransition\":true,\"Retransition/Retransition Speed Curve\":true,\"Retransition/Retransition Start Time Curve\":true,\"Retransition/Retransition Easing Curve\":true,\"Retransition/Retransition Distance Curve\":true,\"Retransition/Retransition Distance Scaler\":true,\"Multi Trigger\":true,\"Multi Trigger/Trigger 1\":true,\"Multi Trigger/Trigger 1/Offset\":true,\"Multi Trigger/Trigger 1/Offset To Camera\":true,\"Multi Trigger/Trigger 1/Rotation\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 1/Easing\":true,\"Multi Trigger/Trigger 1/Animation Speed Curve\":true,\"Multi Trigger/Trigger 1/Start Time Curve\":true,\"Multi Trigger/Trigger 1/Start Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Scaler\":true},\"cv\":2,\"parent\":[\"New Group (16)\"]},{\"id\":\"custom43\",\"title\":\"35 FT - 3 - CH Copy\",\"kind\":\"hold\",\"family\":\"desktop\",\"collapsed\":true,\"sub\":{\"Offset\":true,\"Offset To Camera\":true,\"Rotation\":true,\"Rotation/Rotation Curve X\":true,\"Rotation/Rotation Curve Y\":true,\"Rotation/Rotation Curve Z\":true,\"Easing\":true,\"Animation Speed Curve\":true,\"Start Time Curve\":true,\"Start Distance Curve\":true,\"Retransition\":true,\"Retransition/Retransition Speed Curve\":true,\"Retransition/Retransition Start Time Curve\":true,\"Retransition/Retransition Easing Curve\":true,\"Retransition/Retransition Distance Curve\":true,\"Retransition/Retransition Distance Scaler\":true,\"Tween Stop\":true,\"Tween Stop/Tween Stop Start Time Curve\":true,\"Tween Stop/Tween Stop Delay\":true,\"Multi Trigger\":true,\"Multi Trigger/Trigger 1\":true,\"Multi Trigger/Trigger 1/Offset\":true,\"Multi Trigger/Trigger 1/Offset To Camera\":true,\"Multi Trigger/Trigger 1/Rotation\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 1/Easing\":true,\"Multi Trigger/Trigger 1/Animation Speed Curve\":true,\"Multi Trigger/Trigger 1/Start Time Curve\":true,\"Multi Trigger/Trigger 1/Start Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Scaler\":true,\"Multi Trigger/Trigger 1/Tween Stop\":true,\"Multi Trigger/Trigger 1/Tween Stop/Tween Stop Start Time Curve\":true,\"Multi Trigger/Trigger 1/Tween Stop/Tween Stop Delay\":true},\"cv\":2,\"parent\":[\"New Group (16)\"]},{\"id\":\"custom50\",\"title\":\"35 FT - 1 - C Copy\",\"kind\":\"pose\",\"family\":\"desktop\",\"collapsed\":true,\"sub\":{\"Offset\":true,\"Offset To Camera\":true,\"Rotation\":true,\"Rotation/Rotation Curve X\":true,\"Rotation/Rotation Curve Y\":true,\"Rotation/Rotation Curve Z\":true,\"Easing\":true,\"Animation Speed Curve\":true,\"Start Time Curve\":true,\"Start Distance Curve\":true,\"Retransition\":true,\"Retransition/Retransition Speed Curve\":true,\"Retransition/Retransition Start Time Curve\":true,\"Retransition/Retransition Easing Curve\":true,\"Retransition/Retransition Distance Curve\":true,\"Retransition/Retransition Distance Scaler\":true,\"Multi Trigger\":true,\"Multi Trigger/Trigger 1\":true,\"Multi Trigger/Trigger 1/Offset\":true,\"Multi Trigger/Trigger 1/Offset To Camera\":true,\"Multi Trigger/Trigger 1/Rotation\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 1/Easing\":true,\"Multi Trigger/Trigger 1/Animation Speed Curve\":true,\"Multi Trigger/Trigger 1/Start Time Curve\":true,\"Multi Trigger/Trigger 1/Start Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Scaler\":true},\"cv\":2,\"parent\":[\"New Group (16)\"]},{\"id\":\"custom41\",\"title\":\"35 FT - 2 - CH Copy\",\"kind\":\"hold\",\"family\":\"desktop\",\"collapsed\":true,\"sub\":{\"Offset\":true,\"Offset To Camera\":true,\"Rotation\":true,\"Rotation/Rotation Curve X\":true,\"Rotation/Rotation Curve Y\":true,\"Rotation/Rotation Curve Z\":true,\"Easing\":true,\"Animation Speed Curve\":true,\"Start Time Curve\":true,\"Start Distance Curve\":true,\"Retransition\":true,\"Retransition/Retransition Speed Curve\":true,\"Retransition/Retransition Start Time Curve\":true,\"Retransition/Retransition Easing Curve\":true,\"Retransition/Retransition Distance Curve\":true,\"Retransition/Retransition Distance Scaler\":true,\"Tween Stop\":true,\"Tween Stop/Tween Stop Start Time Curve\":true,\"Tween Stop/Tween Stop Delay\":true,\"Multi Trigger\":true},\"cv\":2,\"parent\":[\"New Group (16)\"]},{\"id\":\"custom51\",\"title\":\"20 FT - 1 - C Copy\",\"kind\":\"hold\",\"family\":\"desktop\",\"collapsed\":true,\"sub\":{\"Offset\":true,\"Offset To Camera\":true,\"Rotation\":true,\"Rotation/Rotation Curve X\":true,\"Rotation/Rotation Curve Y\":true,\"Rotation/Rotation Curve Z\":true,\"Easing\":true,\"Animation Speed Curve\":true,\"Start Time Curve\":true,\"Start Distance Curve\":true,\"Retransition\":true,\"Retransition/Retransition Speed Curve\":true,\"Retransition/Retransition Start Time Curve\":true,\"Retransition/Retransition Easing Curve\":true,\"Retransition/Retransition Distance Curve\":true,\"Retransition/Retransition Distance Scaler\":true,\"Tween Stop\":true,\"Tween Stop/Tween Stop Start Time Curve\":true,\"Tween Stop/Tween Stop Delay\":true,\"Multi Trigger\":true,\"Multi Trigger/Trigger 1\":true,\"Multi Trigger/Trigger 1/Offset\":true,\"Multi Trigger/Trigger 1/Offset To Camera\":true,\"Multi Trigger/Trigger 1/Rotation\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 1/Easing\":true,\"Multi Trigger/Trigger 1/Animation Speed Curve\":true,\"Multi Trigger/Trigger 1/Start Time Curve\":true,\"Multi Trigger/Trigger 1/Start Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Scaler\":true,\"Multi Trigger/Trigger 1/Tween Stop\":true,\"Multi Trigger/Trigger 1/Tween Stop/Tween Stop Start Time Curve\":true,\"Multi Trigger/Trigger 1/Tween Stop/Tween Stop Delay\":true,\"Multi Trigger/Trigger 2\":true,\"Multi Trigger/Trigger 2/Offset\":true,\"Multi Trigger/Trigger 2/Offset To Camera\":true,\"Multi Trigger/Trigger 2/Rotation\":true,\"Multi Trigger/Trigger 2/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 2/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 2/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 2/Easing\":true,\"Multi Trigger/Trigger 2/Animation Speed Curve\":true,\"Multi Trigger/Trigger 2/Start Time Curve\":true,\"Multi Trigger/Trigger 2/Start Distance Curve\":true,\"Multi Trigger/Trigger 2/Retransition\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Distance Scaler\":true,\"Multi Trigger/Trigger 2/Tween Stop\":true,\"Multi Trigger/Trigger 2/Tween Stop/Tween Stop Start Time Curve\":true,\"Multi Trigger/Trigger 2/Tween Stop/Tween Stop Delay\":true},\"cv\":2,\"parent\":[\"New Group (16)\"]},{\"id\":\"custom52\",\"title\":\"20 FT - R - CH Copy\",\"kind\":\"pose\",\"family\":\"desktop\",\"collapsed\":true,\"sub\":{\"Offset\":true,\"Offset To Camera\":true,\"Rotation\":true,\"Rotation/Rotation Curve X\":true,\"Rotation/Rotation Curve Y\":true,\"Rotation/Rotation Curve Z\":true,\"Easing\":true,\"Animation Speed Curve\":true,\"Start Time Curve\":true,\"Start Distance Curve\":true,\"Retransition\":true,\"Retransition/Retransition Speed Curve\":true,\"Retransition/Retransition Start Time Curve\":false,\"Retransition/Retransition Easing Curve\":true,\"Retransition/Retransition Distance Curve\":true,\"Retransition/Retransition Distance Scaler\":false,\"Multi Trigger\":false,\"Multi Trigger/Trigger 1\":true,\"Multi Trigger/Trigger 1/Offset\":true,\"Multi Trigger/Trigger 1/Offset To Camera\":true,\"Multi Trigger/Trigger 1/Rotation\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 1/Easing\":true,\"Multi Trigger/Trigger 1/Animation Speed Curve\":true,\"Multi Trigger/Trigger 1/Start Time Curve\":true,\"Multi Trigger/Trigger 1/Start Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Scaler\":true,\"Multi Trigger/Trigger 2\":true,\"Multi Trigger/Trigger 2/Offset\":true,\"Multi Trigger/Trigger 2/Offset To Camera\":true,\"Multi Trigger/Trigger 2/Rotation\":true,\"Multi Trigger/Trigger 2/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 2/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 2/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 2/Easing\":true,\"Multi Trigger/Trigger 2/Animation Speed Curve\":true,\"Multi Trigger/Trigger 2/Start Time Curve\":true,\"Multi Trigger/Trigger 2/Start Distance Curve\":true,\"Multi Trigger/Trigger 2/Retransition\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Distance Scaler\":true},\"cv\":2,\"parent\":[\"New Group (16)\"]}]",
       "customFunctionSelector": [
         {
           "name": "SCROLL",
@@ -12239,42 +12239,42 @@
           "fnId": "custom29"
         },
         {
-          "name": "15 FT - R - C",
+          "name": "35 FT - R - C",
           "fnId": "custom52",
           "group": "20 FOV TEST"
         },
         {
-          "name": "15 FT - R - CH",
+          "name": "35 FT - R - CH",
           "fnId": "custom51",
           "group": "20 FOV TEST"
         },
         {
-          "name": "15 FT - 1 - C",
+          "name": "35 FT - 1 - C",
           "fnId": "custom50",
           "group": "20 FOV TEST"
         },
         {
-          "name": "15 FT - 1 - CH",
+          "name": "35  FT - 1 - CH",
           "fnId": "custom39",
           "group": "20 FOV TEST"
         },
         {
-          "name": "15 FT - 2 - C",
+          "name": "35 FT - 2 - C",
           "fnId": "custom40",
           "group": "20 FOV TEST"
         },
         {
-          "name": "15 FT - 2 - CH",
+          "name": "35 FT - 2 - CH",
           "fnId": "custom41",
           "group": "20 FOV TEST"
         },
         {
-          "name": "15 FT - 3 - C",
+          "name": "35 FT - 3 - C",
           "fnId": "custom42",
           "group": "20 FOV TEST"
         },
         {
-          "name": "15 FT - 3 - CH",
+          "name": "35 FT - 3 - CH",
           "fnId": "custom43",
           "group": "20 FOV TEST"
         }
@@ -20240,21 +20240,21 @@
       "cameraYaw": 0,
       "cameraPitch": 0,
       "cameraRoll": 0,
-      "cameraDefaultPreset": "{\"cameraX\":1.963636363636364,\"cameraY\":9.184850993605146e-15,\"cameraZ\":257.48779599525176,\"cameraFov\":15,\"cameraZoom\":149.99999999999994,\"cameraRoll\":0,\"targetX\":1.963636363636364,\"targetY\":0,\"targetZ\":107.4877959952518}",
+      "cameraDefaultPreset": "{\"cameraX\":1.9534883720930232,\"cameraY\":2.0272434216195883e-13,\"cameraZ\":223.4004898795015,\"cameraFov\":20,\"cameraZoom\":99,\"cameraRoll\":0,\"targetX\":1.9534883720930232,\"targetY\":1.9666234050617943e-13,\"targetZ\":124.40048987950149}",
       "cameraZoom": 260.17068872666084,
       "cameraZoomSpeed": 1,
       "savedCameras": [
         {
-          "name": "HD - DESKTOP - 15 FOV",
-          "cameraX": 1.963636363636364,
-          "cameraY": 9.184850993605146e-15,
-          "cameraZ": 257.48779599525176,
-          "cameraFov": 15,
-          "cameraZoom": 149.99999999999994,
+          "name": "HD - DESKTOP - 20 FOV",
+          "cameraX": 1.9534883720930232,
+          "cameraY": 2.0272434216195883e-13,
+          "cameraZ": 223.4004898795015,
+          "cameraFov": 20,
+          "cameraZoom": 99,
           "cameraRoll": 0,
-          "targetX": 1.963636363636364,
-          "targetY": 0,
-          "targetZ": 107.4877959952518
+          "targetX": 1.9534883720930232,
+          "targetY": 1.9666234050617943e-13,
+          "targetZ": 124.40048987950149
         }
       ],
       "lockCameraPan": true,
@@ -21400,7 +21400,7 @@
       "custom39CameraOffsetYCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.324820628419056,\"y\":0},\"bg\":0.64,\"m\":\"linear\"},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.467575665942766,\"y\":0}}]",
       "custom39CameraOffsetYRange": "{\"min\":-1,\"max\":2}",
       "custom39CameraOffsetZEnabled": true,
-      "custom39CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.07823417756679524,\"y\":0}},{\"x\":0.11190598139370292,\"y\":0.5177083333333333,\"h2\":{\"x\":-0.04377344773317037,\"y\":0.20000000000000007},\"h1\":{\"x\":0.06734360765381536,\"y\":-0.29333343505859366}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.6608093427746702,\"y\":0.09104181925455734}}]",
+      "custom39CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.2194142514188381,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-1,\"y\":0}}]",
       "custom39CameraOffsetZRange": "{\"min\":5,\"max\":45}",
       "custom39RotationCurveVisibleOnly": true,
       "custom39RotationXCurveEnabled": false,
@@ -21436,7 +21436,7 @@
       "custom39EasingCurveEnabled": true,
       "custom39EasingCurve": "[{\"x\":0,\"y\":0.5639582316080729,\"h1\":{\"x\":0.31143422537808685,\"y\":0.10374984741210935}},{\"x\":0.5114378003582828,\"y\":0.8504165649414063,\"h2\":{\"x\":-0.217053360727685,\"y\":0.013333384195963527},\"h1\":{\"x\":0.23886151703848635,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2702726881540415,\"y\":0.16374994913736984}}]",
       "custom39RetransitionEasingCurveEnabled": true,
-      "custom39RetransitionEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.42983859032236926,\"y\":0.20052083333333337}},{\"x\":0.5000090617275154,\"y\":0.7653124491373697,\"h2\":{\"x\":-0.274628427178499,\"y\":0},\"h1\":{\"x\":0.28158102656376904,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.44474229855675507,\"y\":0.2738543192545573}}]",
+      "custom39RetransitionEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.2565192606738039,\"y\":0}},{\"x\":0.5000090617275154,\"y\":0.7653124491373697,\"h2\":{\"x\":-0.21889825254187922,\"y\":-0.0009373982747394871},\"h1\":{\"x\":0.25489640554523973,\"y\":0.019062550862630312}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.35493617403165045,\"y\":0}}]",
       "custom39SpeedCurveEnabled": true,
       "custom39SpeedCurveVisibleOnly": true,
       "custom39SpeedCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.3614426923386011,\"y\":-0.06291694641113277}},{\"x\":0.5434193258084055,\"y\":0,\"h1\":{\"x\":0.1377118711641958,\"y\":0},\"h2\":{\"x\":-0.1619136237453131,\"y\":-0.0011459350585938388}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.45658067419159454,\"y\":0}}]",
@@ -21459,7 +21459,7 @@
       "custom39RetransitionDistCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom39RetransitionDistRange": "{\"min\":50,\"max\":2000}",
       "custom39RetransitionScalerEnabled": true,
-      "custom39RetransitionScalerCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.5140945168802775,\"y\":-0.12760416666666663}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.278253513093899,\"y\":0.6923957824707031}}]",
+      "custom39RetransitionScalerCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.4794814747874683,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.278253513093899,\"y\":0.6923957824707031}}]",
       "custom39RetransitionScalerMulRange": "{\"min\":0.1,\"max\":0.8}",
       "custom39RetransitionScalerDistRange": "{\"min\":0,\"max\":800}",
       "custom39RetransitionStartTimeCurveEnabled": true,
@@ -21470,7 +21470,7 @@
       "custom39TweenRetransitionSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.6073672705792005,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.3644149408348759,\"y\":0}}]",
       "custom39TweenRetransitionSpeedCurveRange": "{\"min\":26766,\"max\":36366}",
       "custom39TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.35062653339382605,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.350678091120192,\"y\":0}}]",
-      "custom39TweenRetransitionStartTimeRange": "{\"min\":0,\"max\":3000}",
+      "custom39TweenRetransitionStartTimeRange": "{\"min\":3000,\"max\":4000}",
       "custom39TweenStopEnabled": true,
       "custom39TweenStopStartTimeCurveEnabled": true,
       "custom39TweenStopStartTimeCurveVisibleOnly": true,
@@ -21947,7 +21947,7 @@
       "custom39Trig5CameraOffsetYCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom39Trig5CameraOffsetYRange": "{\"min\":0,\"max\":10}",
       "custom39Trig5CameraOffsetZEnabled": true,
-      "custom39Trig5CameraOffsetZCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.36575475011058206,\"y\":0.001041920979817701}},{\"x\":0.47146219136654566,\"y\":0.407708485921224,\"h2\":{\"x\":-0.3127363861552631,\"y\":-0.0399998982747396},\"h1\":{\"x\":0.17325511035152086,\"y\":0.06000010172526038}},{\"x\":1,\"y\":1,\"h2\":{\"x\":0,\"y\":-0.492291514078776}}]",
+      "custom39Trig5CameraOffsetZCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.29344133786255555,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-1,\"y\":0}}]",
       "custom39Trig5CameraOffsetZRange": "{\"min\":-25,\"max\":-5}",
       "custom39Trig5RotationCurveVisibleOnly": true,
       "custom39Trig5RotationXCurveEnabled": false,
@@ -22006,9 +22006,9 @@
       "custom39Trig5RetransitionDistCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom39Trig5RetransitionDistRange": "{\"min\":50,\"max\":2000}",
       "custom39Trig5RetransitionScalerEnabled": false,
-      "custom39Trig5RetransitionScalerCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom39Trig5RetransitionScalerMulRange": "{\"min\":0.5,\"max\":2}",
-      "custom39Trig5RetransitionScalerDistRange": "{\"min\":0,\"max\":50}",
+      "custom39Trig5RetransitionScalerCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.4513359606672014,\"y\":0}},{\"x\":1,\"y\":0}]",
+      "custom39Trig5RetransitionScalerMulRange": "{\"min\":0.01,\"max\":1}",
+      "custom39Trig5RetransitionScalerDistRange": "{\"min\":0,\"max\":300}",
       "custom39Trig5RetransitionStartTimeCurveEnabled": true,
       "custom39Trig5RetransitionStartTimeCurveVisibleOnly": true,
       "custom39Trig5RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -22016,8 +22016,8 @@
       "custom39Trig5TweenRetransitionSpeedMs": 800,
       "custom39Trig5TweenRetransitionSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.9417530103612434,\"y\":0}},{\"x\":1,\"y\":1}]",
       "custom39Trig5TweenRetransitionSpeedCurveRange": "{\"min\":26130,\"max\":30830}",
-      "custom39Trig5TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom39Trig5TweenRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom39Trig5TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.4103779883090869,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.3097434453202007,\"y\":0}}]",
+      "custom39Trig5TweenRetransitionStartTimeRange": "{\"min\":3000,\"max\":4000}",
       "custom39Trig5TweenStopEnabled": true,
       "custom39Trig5TweenStopStartTimeCurveEnabled": false,
       "custom39Trig5TweenStopStartTimeCurveVisibleOnly": true,
@@ -23359,7 +23359,7 @@
       "custom52EasingCurveEnabled": true,
       "custom52EasingCurve": "[{\"x\":0,\"y\":0},{\"x\":0.5227021422192623,\"y\":1},{\"x\":1,\"y\":0}]",
       "custom52RetransitionEasingCurveEnabled": true,
-      "custom52RetransitionEasingCurve": "[{\"x\":0,\"y\":0},{\"x\":0.5253180363191781,\"y\":0.9197916666666667},{\"x\":1,\"y\":0}]",
+      "custom52RetransitionEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.22864903081401367,\"y\":0.020937093098958304}},{\"x\":0.5253180363191781,\"y\":0.9197916666666667,\"h2\":{\"x\":-0.1835484326959056,\"y\":0.03447875976562498},\"h1\":{\"x\":0.2377845720980386,\"y\":0.041145833333333326}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.24017619800918888,\"y\":0.00760396321614587}}]",
       "custom52SpeedCurveEnabled": true,
       "custom52SpeedCurveVisibleOnly": true,
       "custom52SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -23377,19 +23377,19 @@
       "custom52RetransitionSpeedMs": 400,
       "custom52RetransitionSpeedCurveEnabled": true,
       "custom52RetransitionSpeedCurveVisibleOnly": true,
-      "custom52RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom52RetransitionSpeedCurveRange": "{\"min\":50,\"max\":25000}",
+      "custom52RetransitionSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.34996674476773404,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.47461448477216805,\"y\":0}}]",
+      "custom52RetransitionSpeedCurveRange": "{\"min\":25000,\"max\":35000}",
       "custom52RetransitionDistCurveEnabled": false,
       "custom52RetransitionDistCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom52RetransitionDistRange": "{\"min\":50,\"max\":2000}",
       "custom52RetransitionScalerEnabled": true,
-      "custom52RetransitionScalerCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom52RetransitionScalerCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.5040728982208529,\"y\":0.02614580790201826}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.4893692387694407,\"y\":0}}]",
       "custom52RetransitionScalerMulRange": "{\"min\":0.1,\"max\":1}",
-      "custom52RetransitionScalerDistRange": "{\"min\":0,\"max\":100}",
+      "custom52RetransitionScalerDistRange": "{\"min\":0,\"max\":300}",
       "custom52RetransitionStartTimeCurveEnabled": true,
       "custom52RetransitionStartTimeCurveVisibleOnly": true,
-      "custom52RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom52RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom52RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.36308222063025153,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.4041190208984198,\"y\":-0.025000000000000022}}]",
+      "custom52RetransitionStartTimeRange": "{\"min\":4000,\"max\":5000}",
       "custom52MultiTriggerEnabled": false,
       "custom52MultiTriggers": "[{\"prefix\":\"custom52Trig1\",\"title\":\"Trigger 1\"},{\"prefix\":\"custom52Trig2\",\"title\":\"Trigger 2\"}]",
       "custom52Trig1Enabled": true,
@@ -23750,11 +23750,11 @@
       "fieldBoundsZMin": "-800",
       "fieldBoundsZMinCurveEnabled": true,
       "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.9528458288968122,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.25137871577513693,\"y\":0}}]",
-      "fieldBoundsZMinCurveRange": "{\"min\":-300,\"max\":-100}",
+      "fieldBoundsZMinCurveRange": "{\"min\":-200,\"max\":-100}",
       "fieldBoundsZMax": "240",
       "fieldBoundsZMaxCurveEnabled": true,
       "fieldBoundsZMaxCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.7710241189949432,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":0,\"y\":1}}]",
-      "fieldBoundsZMaxCurveRange": "{\"min\":5,\"max\":100}",
+      "fieldBoundsZMaxCurveRange": "{\"min\":5,\"max\":50}",
       "fieldBoundsX": "{\"min\":-300,\"max\":300}",
       "fieldBoundsY": "{\"min\":-300,\"max\":300}",
       "fieldBoundsZ": "{\"min\":-400,\"max\":200}",
@@ -24026,7 +24026,7 @@
       "loadingPreviewSequenceHoldMs": 0,
       "loadingPreviewSize": 1600,
       "loadingPreviewRotationX": -85.46571581217302,
-      "loadingPreviewRotationY": -109.10457274713559,
+      "loadingPreviewRotationY": -109.10457274713558,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0,
       "loadingPreviewOffsetY": 0,
@@ -24042,7 +24042,7 @@
       "loadingPreviewTextOffsetX": 0,
       "loadingPreviewTextOffsetY": 0,
       "loadingPreviewCameraEditMode": true,
-      "customClickFunctionIds": "[{\"id\":\"custom19\",\"title\":\"Custom Click Function 19\",\"kind\":\"pose\",\"family\":\"mobile\",\"collapsed\":true,\"sub\":{\"Offset\":true,\"Offset To Camera\":true,\"Rotation\":true,\"Rotation/Rotation Curve X\":true,\"Rotation/Rotation Curve Y\":true,\"Rotation/Rotation Curve Z\":true,\"Easing\":true,\"Animation Speed Curve\":true,\"Start Time Curve\":true,\"Start Distance Curve\":true,\"Retransition\":true,\"Retransition/Retransition Speed Curve\":true,\"Retransition/Retransition Start Time Curve\":true,\"Retransition/Retransition Easing Curve\":true,\"Retransition/Retransition Distance Curve\":true,\"Retransition/Retransition Distance Scaler\":true,\"Multi Trigger\":true},\"cv\":2},{\"id\":\"custom28\",\"title\":\"Custom Click Function 28\",\"kind\":\"pose\",\"family\":\"mobile\",\"collapsed\":true,\"sub\":{\"Offset\":true,\"Offset To Camera\":true,\"Rotation\":true,\"Rotation/Rotation Curve X\":true,\"Rotation/Rotation Curve Y\":true,\"Rotation/Rotation Curve Z\":true,\"Easing\":true,\"Animation Speed Curve\":true,\"Start Time Curve\":true,\"Start Distance Curve\":true,\"Retransition\":true,\"Retransition/Retransition Speed Curve\":true,\"Retransition/Retransition Start Time Curve\":true,\"Retransition/Retransition Easing Curve\":true,\"Retransition/Retransition Distance Curve\":true,\"Retransition/Retransition Distance Scaler\":true,\"Multi Trigger\":true,\"Multi Trigger/Trigger 1\":true,\"Multi Trigger/Trigger 1/Offset\":true,\"Multi Trigger/Trigger 1/Offset To Camera\":true,\"Multi Trigger/Trigger 1/Rotation\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 1/Easing\":true,\"Multi Trigger/Trigger 1/Animation Speed Curve\":true,\"Multi Trigger/Trigger 1/Start Time Curve\":true,\"Multi Trigger/Trigger 1/Start Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Scaler\":true},\"cv\":2},{\"id\":\"custom29\",\"title\":\"Custom Click Function 29\",\"kind\":\"pose\",\"family\":\"mobile\",\"collapsed\":true,\"sub\":{\"Offset\":true,\"Offset To Camera\":true,\"Rotation\":true,\"Rotation/Rotation Curve X\":true,\"Rotation/Rotation Curve Y\":true,\"Rotation/Rotation Curve Z\":true,\"Easing\":true,\"Animation Speed Curve\":true,\"Start Time Curve\":true,\"Start Distance Curve\":true,\"Retransition\":true,\"Retransition/Retransition Speed Curve\":true,\"Retransition/Retransition Start Time Curve\":true,\"Retransition/Retransition Easing Curve\":true,\"Retransition/Retransition Distance Curve\":true,\"Retransition/Retransition Distance Scaler\":true,\"Multi Trigger\":true,\"Multi Trigger/Trigger 1\":true,\"Multi Trigger/Trigger 1/Offset\":true,\"Multi Trigger/Trigger 1/Offset To Camera\":true,\"Multi Trigger/Trigger 1/Rotation\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 1/Easing\":true,\"Multi Trigger/Trigger 1/Animation Speed Curve\":true,\"Multi Trigger/Trigger 1/Start Time Curve\":true,\"Multi Trigger/Trigger 1/Start Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Scaler\":true,\"Multi Trigger/Trigger 2\":true,\"Multi Trigger/Trigger 2/Offset\":true,\"Multi Trigger/Trigger 2/Offset To Camera\":true,\"Multi Trigger/Trigger 2/Rotation\":true,\"Multi Trigger/Trigger 2/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 2/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 2/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 2/Easing\":true,\"Multi Trigger/Trigger 2/Animation Speed Curve\":true,\"Multi Trigger/Trigger 2/Start Time Curve\":true,\"Multi Trigger/Trigger 2/Start Distance Curve\":true,\"Multi Trigger/Trigger 2/Retransition\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Distance Scaler\":true},\"cv\":2},{\"id\":\"custom39\",\"title\":\"35 FT - 1 - CH Copy\",\"kind\":\"hold\",\"family\":\"desktop\",\"collapsed\":true,\"sub\":{\"Offset\":true,\"Offset To Camera\":true,\"Rotation\":true,\"Rotation/Rotation Curve X\":true,\"Rotation/Rotation Curve Y\":true,\"Rotation/Rotation Curve Z\":true,\"Easing\":true,\"Animation Speed Curve\":true,\"Start Time Curve\":true,\"Start Distance Curve\":true,\"Retransition\":true,\"Retransition/Retransition Speed Curve\":true,\"Retransition/Retransition Start Time Curve\":true,\"Retransition/Retransition Easing Curve\":true,\"Retransition/Retransition Distance Curve\":true,\"Retransition/Retransition Distance Scaler\":true,\"Tween Stop\":true,\"Tween Stop/Tween Stop Start Time Curve\":true,\"Tween Stop/Tween Stop Delay\":true,\"Multi Trigger\":true,\"Multi Trigger/Trigger 1\":true,\"Multi Trigger/Trigger 1/Offset\":true,\"Multi Trigger/Trigger 1/Offset To Camera\":true,\"Multi Trigger/Trigger 1/Rotation\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 1/Easing\":true,\"Multi Trigger/Trigger 1/Animation Speed Curve\":true,\"Multi Trigger/Trigger 1/Start Time Curve\":true,\"Multi Trigger/Trigger 1/Start Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Scaler\":true,\"Multi Trigger/Trigger 1/Tween Stop\":true,\"Multi Trigger/Trigger 1/Tween Stop/Tween Stop Start Time Curve\":true,\"Multi Trigger/Trigger 1/Tween Stop/Tween Stop Delay\":true,\"Multi Trigger/Trigger 2\":true,\"Multi Trigger/Trigger 2/Offset\":true,\"Multi Trigger/Trigger 2/Offset To Camera\":true,\"Multi Trigger/Trigger 2/Rotation\":true,\"Multi Trigger/Trigger 2/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 2/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 2/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 2/Easing\":true,\"Multi Trigger/Trigger 2/Animation Speed Curve\":true,\"Multi Trigger/Trigger 2/Start Time Curve\":true,\"Multi Trigger/Trigger 2/Start Distance Curve\":true,\"Multi Trigger/Trigger 2/Retransition\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Distance Scaler\":true,\"Multi Trigger/Trigger 2/Tween Stop\":true,\"Multi Trigger/Trigger 2/Tween Stop/Tween Stop Start Time Curve\":true,\"Multi Trigger/Trigger 2/Tween Stop/Tween Stop Delay\":true,\"Multi Trigger/Trigger 3\":true,\"Multi Trigger/Trigger 3/Offset\":true,\"Multi Trigger/Trigger 3/Offset To Camera\":true,\"Multi Trigger/Trigger 3/Rotation\":true,\"Multi Trigger/Trigger 3/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 3/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 3/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 3/Easing\":true,\"Multi Trigger/Trigger 3/Animation Speed Curve\":true,\"Multi Trigger/Trigger 3/Start Time Curve\":true,\"Multi Trigger/Trigger 3/Start Distance Curve\":true,\"Multi Trigger/Trigger 3/Retransition\":true,\"Multi Trigger/Trigger 3/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 3/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 3/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 3/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 3/Retransition/Retransition Distance Scaler\":true,\"Multi Trigger/Trigger 3/Tween Stop\":true,\"Multi Trigger/Trigger 3/Tween Stop/Tween Stop Start Time Curve\":true,\"Multi Trigger/Trigger 3/Tween Stop/Tween Stop Delay\":true,\"Multi Trigger/Trigger 4\":true,\"Multi Trigger/Trigger 4/Offset\":true,\"Multi Trigger/Trigger 4/Offset To Camera\":true,\"Multi Trigger/Trigger 4/Rotation\":true,\"Multi Trigger/Trigger 4/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 4/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 4/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 4/Easing\":true,\"Multi Trigger/Trigger 4/Animation Speed Curve\":true,\"Multi Trigger/Trigger 4/Start Time Curve\":true,\"Multi Trigger/Trigger 4/Start Distance Curve\":true,\"Multi Trigger/Trigger 4/Retransition\":true,\"Multi Trigger/Trigger 4/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 4/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 4/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 4/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 4/Retransition/Retransition Distance Scaler\":true,\"Multi Trigger/Trigger 4/Tween Stop\":true,\"Multi Trigger/Trigger 4/Tween Stop/Tween Stop Start Time Curve\":true,\"Multi Trigger/Trigger 4/Tween Stop/Tween Stop Delay\":true,\"Multi Trigger/Trigger 5\":true,\"Multi Trigger/Trigger 5/Offset\":true,\"Multi Trigger/Trigger 5/Offset To Camera\":true,\"Multi Trigger/Trigger 5/Rotation\":true,\"Multi Trigger/Trigger 5/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 5/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 5/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 5/Easing\":true,\"Multi Trigger/Trigger 5/Animation Speed Curve\":true,\"Multi Trigger/Trigger 5/Start Time Curve\":true,\"Multi Trigger/Trigger 5/Start Distance Curve\":true,\"Multi Trigger/Trigger 5/Retransition\":true,\"Multi Trigger/Trigger 5/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 5/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 5/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 5/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 5/Retransition/Retransition Distance Scaler\":true,\"Multi Trigger/Trigger 5/Tween Stop\":true,\"Multi Trigger/Trigger 5/Tween Stop/Tween Stop Start Time Curve\":true,\"Multi Trigger/Trigger 5/Tween Stop/Tween Stop Delay\":true},\"cv\":2,\"parent\":[\"New Group (16)\"]},{\"id\":\"custom40\",\"title\":\"35 FT - Copy\",\"kind\":\"pose\",\"family\":\"desktop\",\"collapsed\":true,\"sub\":{\"Offset\":true,\"Offset To Camera\":true,\"Rotation\":true,\"Rotation/Rotation Curve X\":true,\"Rotation/Rotation Curve Y\":true,\"Rotation/Rotation Curve Z\":true,\"Easing\":true,\"Animation Speed Curve\":true,\"Start Time Curve\":true,\"Start Distance Curve\":true,\"Retransition\":true,\"Retransition/Retransition Speed Curve\":true,\"Retransition/Retransition Start Time Curve\":true,\"Retransition/Retransition Easing Curve\":true,\"Retransition/Retransition Distance Curve\":true,\"Retransition/Retransition Distance Scaler\":true,\"Multi Trigger\":true,\"Multi Trigger/Trigger 1\":true,\"Multi Trigger/Trigger 1/Offset\":true,\"Multi Trigger/Trigger 1/Offset To Camera\":true,\"Multi Trigger/Trigger 1/Rotation\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 1/Easing\":true,\"Multi Trigger/Trigger 1/Animation Speed Curve\":true,\"Multi Trigger/Trigger 1/Start Time Curve\":true,\"Multi Trigger/Trigger 1/Start Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Scaler\":true},\"cv\":2,\"parent\":[\"New Group (16)\"]},{\"id\":\"custom42\",\"title\":\"35 FT - 3 - C Copy\",\"kind\":\"pose\",\"family\":\"desktop\",\"collapsed\":true,\"sub\":{\"Offset\":true,\"Offset To Camera\":true,\"Rotation\":true,\"Rotation/Rotation Curve X\":true,\"Rotation/Rotation Curve Y\":true,\"Rotation/Rotation Curve Z\":true,\"Easing\":true,\"Animation Speed Curve\":true,\"Start Time Curve\":true,\"Start Distance Curve\":true,\"Retransition\":true,\"Retransition/Retransition Speed Curve\":true,\"Retransition/Retransition Start Time Curve\":true,\"Retransition/Retransition Easing Curve\":true,\"Retransition/Retransition Distance Curve\":true,\"Retransition/Retransition Distance Scaler\":true,\"Multi Trigger\":true,\"Multi Trigger/Trigger 1\":true,\"Multi Trigger/Trigger 1/Offset\":true,\"Multi Trigger/Trigger 1/Offset To Camera\":true,\"Multi Trigger/Trigger 1/Rotation\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 1/Easing\":true,\"Multi Trigger/Trigger 1/Animation Speed Curve\":true,\"Multi Trigger/Trigger 1/Start Time Curve\":true,\"Multi Trigger/Trigger 1/Start Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Scaler\":true},\"cv\":2,\"parent\":[\"New Group (16)\"]},{\"id\":\"custom43\",\"title\":\"35 FT - 3 - CH Copy\",\"kind\":\"hold\",\"family\":\"desktop\",\"collapsed\":true,\"sub\":{\"Offset\":true,\"Offset To Camera\":true,\"Rotation\":true,\"Rotation/Rotation Curve X\":true,\"Rotation/Rotation Curve Y\":true,\"Rotation/Rotation Curve Z\":true,\"Easing\":true,\"Animation Speed Curve\":true,\"Start Time Curve\":true,\"Start Distance Curve\":true,\"Retransition\":true,\"Retransition/Retransition Speed Curve\":true,\"Retransition/Retransition Start Time Curve\":true,\"Retransition/Retransition Easing Curve\":true,\"Retransition/Retransition Distance Curve\":true,\"Retransition/Retransition Distance Scaler\":true,\"Tween Stop\":true,\"Tween Stop/Tween Stop Start Time Curve\":true,\"Tween Stop/Tween Stop Delay\":true,\"Multi Trigger\":true,\"Multi Trigger/Trigger 1\":true,\"Multi Trigger/Trigger 1/Offset\":true,\"Multi Trigger/Trigger 1/Offset To Camera\":true,\"Multi Trigger/Trigger 1/Rotation\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 1/Easing\":true,\"Multi Trigger/Trigger 1/Animation Speed Curve\":true,\"Multi Trigger/Trigger 1/Start Time Curve\":true,\"Multi Trigger/Trigger 1/Start Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Scaler\":true,\"Multi Trigger/Trigger 1/Tween Stop\":true,\"Multi Trigger/Trigger 1/Tween Stop/Tween Stop Start Time Curve\":true,\"Multi Trigger/Trigger 1/Tween Stop/Tween Stop Delay\":true},\"cv\":2,\"parent\":[\"New Group (16)\"]},{\"id\":\"custom50\",\"title\":\"35 FT - 1 - C Copy\",\"kind\":\"pose\",\"family\":\"desktop\",\"collapsed\":true,\"sub\":{\"Offset\":true,\"Offset To Camera\":true,\"Rotation\":true,\"Rotation/Rotation Curve X\":true,\"Rotation/Rotation Curve Y\":true,\"Rotation/Rotation Curve Z\":true,\"Easing\":true,\"Animation Speed Curve\":true,\"Start Time Curve\":true,\"Start Distance Curve\":true,\"Retransition\":true,\"Retransition/Retransition Speed Curve\":true,\"Retransition/Retransition Start Time Curve\":true,\"Retransition/Retransition Easing Curve\":true,\"Retransition/Retransition Distance Curve\":true,\"Retransition/Retransition Distance Scaler\":true,\"Multi Trigger\":true,\"Multi Trigger/Trigger 1\":true,\"Multi Trigger/Trigger 1/Offset\":true,\"Multi Trigger/Trigger 1/Offset To Camera\":true,\"Multi Trigger/Trigger 1/Rotation\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 1/Easing\":true,\"Multi Trigger/Trigger 1/Animation Speed Curve\":true,\"Multi Trigger/Trigger 1/Start Time Curve\":true,\"Multi Trigger/Trigger 1/Start Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Scaler\":true},\"cv\":2,\"parent\":[\"New Group (16)\"]},{\"id\":\"custom41\",\"title\":\"35 FT - 2 - CH Copy\",\"kind\":\"hold\",\"family\":\"desktop\",\"collapsed\":true,\"sub\":{\"Offset\":true,\"Offset To Camera\":true,\"Rotation\":true,\"Rotation/Rotation Curve X\":true,\"Rotation/Rotation Curve Y\":true,\"Rotation/Rotation Curve Z\":true,\"Easing\":true,\"Animation Speed Curve\":true,\"Start Time Curve\":true,\"Start Distance Curve\":true,\"Retransition\":true,\"Retransition/Retransition Speed Curve\":true,\"Retransition/Retransition Start Time Curve\":true,\"Retransition/Retransition Easing Curve\":true,\"Retransition/Retransition Distance Curve\":true,\"Retransition/Retransition Distance Scaler\":true,\"Tween Stop\":true,\"Tween Stop/Tween Stop Start Time Curve\":true,\"Tween Stop/Tween Stop Delay\":true,\"Multi Trigger\":true},\"cv\":2,\"parent\":[\"New Group (16)\"]},{\"id\":\"custom51\",\"title\":\"20 FT - 1 - C Copy\",\"kind\":\"hold\",\"family\":\"desktop\",\"collapsed\":true,\"sub\":{\"Offset\":true,\"Offset To Camera\":true,\"Rotation\":true,\"Rotation/Rotation Curve X\":true,\"Rotation/Rotation Curve Y\":true,\"Rotation/Rotation Curve Z\":true,\"Easing\":true,\"Animation Speed Curve\":true,\"Start Time Curve\":true,\"Start Distance Curve\":true,\"Retransition\":true,\"Retransition/Retransition Speed Curve\":true,\"Retransition/Retransition Start Time Curve\":true,\"Retransition/Retransition Easing Curve\":true,\"Retransition/Retransition Distance Curve\":true,\"Retransition/Retransition Distance Scaler\":true,\"Tween Stop\":true,\"Tween Stop/Tween Stop Start Time Curve\":true,\"Tween Stop/Tween Stop Delay\":true,\"Multi Trigger\":true,\"Multi Trigger/Trigger 1\":true,\"Multi Trigger/Trigger 1/Offset\":true,\"Multi Trigger/Trigger 1/Offset To Camera\":true,\"Multi Trigger/Trigger 1/Rotation\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 1/Easing\":true,\"Multi Trigger/Trigger 1/Animation Speed Curve\":true,\"Multi Trigger/Trigger 1/Start Time Curve\":true,\"Multi Trigger/Trigger 1/Start Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Scaler\":true,\"Multi Trigger/Trigger 1/Tween Stop\":true,\"Multi Trigger/Trigger 1/Tween Stop/Tween Stop Start Time Curve\":true,\"Multi Trigger/Trigger 1/Tween Stop/Tween Stop Delay\":true,\"Multi Trigger/Trigger 2\":true,\"Multi Trigger/Trigger 2/Offset\":true,\"Multi Trigger/Trigger 2/Offset To Camera\":true,\"Multi Trigger/Trigger 2/Rotation\":true,\"Multi Trigger/Trigger 2/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 2/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 2/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 2/Easing\":true,\"Multi Trigger/Trigger 2/Animation Speed Curve\":true,\"Multi Trigger/Trigger 2/Start Time Curve\":true,\"Multi Trigger/Trigger 2/Start Distance Curve\":true,\"Multi Trigger/Trigger 2/Retransition\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Distance Scaler\":true,\"Multi Trigger/Trigger 2/Tween Stop\":true,\"Multi Trigger/Trigger 2/Tween Stop/Tween Stop Start Time Curve\":true,\"Multi Trigger/Trigger 2/Tween Stop/Tween Stop Delay\":true},\"cv\":2,\"parent\":[\"New Group (16)\"]},{\"id\":\"custom52\",\"title\":\"20 FT - R - CH Copy\",\"kind\":\"pose\",\"family\":\"desktop\",\"collapsed\":true,\"sub\":{\"Offset\":true,\"Offset To Camera\":true,\"Rotation\":true,\"Rotation/Rotation Curve X\":true,\"Rotation/Rotation Curve Y\":true,\"Rotation/Rotation Curve Z\":true,\"Easing\":true,\"Animation Speed Curve\":true,\"Start Time Curve\":true,\"Start Distance Curve\":true,\"Retransition\":true,\"Retransition/Retransition Speed Curve\":true,\"Retransition/Retransition Start Time Curve\":true,\"Retransition/Retransition Easing Curve\":true,\"Retransition/Retransition Distance Curve\":true,\"Retransition/Retransition Distance Scaler\":true,\"Multi Trigger\":true,\"Multi Trigger/Trigger 1\":true,\"Multi Trigger/Trigger 1/Offset\":true,\"Multi Trigger/Trigger 1/Offset To Camera\":true,\"Multi Trigger/Trigger 1/Rotation\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 1/Easing\":true,\"Multi Trigger/Trigger 1/Animation Speed Curve\":true,\"Multi Trigger/Trigger 1/Start Time Curve\":true,\"Multi Trigger/Trigger 1/Start Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Scaler\":true,\"Multi Trigger/Trigger 2\":true,\"Multi Trigger/Trigger 2/Offset\":true,\"Multi Trigger/Trigger 2/Offset To Camera\":true,\"Multi Trigger/Trigger 2/Rotation\":true,\"Multi Trigger/Trigger 2/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 2/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 2/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 2/Easing\":true,\"Multi Trigger/Trigger 2/Animation Speed Curve\":true,\"Multi Trigger/Trigger 2/Start Time Curve\":true,\"Multi Trigger/Trigger 2/Start Distance Curve\":true,\"Multi Trigger/Trigger 2/Retransition\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Distance Scaler\":true},\"cv\":2,\"parent\":[\"New Group (16)\"]}]",
+      "customClickFunctionIds": "[{\"id\":\"custom19\",\"title\":\"Custom Click Function 19\",\"kind\":\"pose\",\"family\":\"mobile\",\"collapsed\":true,\"sub\":{\"Offset\":true,\"Offset To Camera\":true,\"Rotation\":true,\"Rotation/Rotation Curve X\":true,\"Rotation/Rotation Curve Y\":true,\"Rotation/Rotation Curve Z\":true,\"Easing\":true,\"Animation Speed Curve\":true,\"Start Time Curve\":true,\"Start Distance Curve\":true,\"Retransition\":true,\"Retransition/Retransition Speed Curve\":true,\"Retransition/Retransition Start Time Curve\":true,\"Retransition/Retransition Easing Curve\":true,\"Retransition/Retransition Distance Curve\":true,\"Retransition/Retransition Distance Scaler\":true,\"Multi Trigger\":true},\"cv\":2},{\"id\":\"custom28\",\"title\":\"Custom Click Function 28\",\"kind\":\"pose\",\"family\":\"mobile\",\"collapsed\":true,\"sub\":{\"Offset\":true,\"Offset To Camera\":true,\"Rotation\":true,\"Rotation/Rotation Curve X\":true,\"Rotation/Rotation Curve Y\":true,\"Rotation/Rotation Curve Z\":true,\"Easing\":true,\"Animation Speed Curve\":true,\"Start Time Curve\":true,\"Start Distance Curve\":true,\"Retransition\":true,\"Retransition/Retransition Speed Curve\":true,\"Retransition/Retransition Start Time Curve\":true,\"Retransition/Retransition Easing Curve\":true,\"Retransition/Retransition Distance Curve\":true,\"Retransition/Retransition Distance Scaler\":true,\"Multi Trigger\":true,\"Multi Trigger/Trigger 1\":true,\"Multi Trigger/Trigger 1/Offset\":true,\"Multi Trigger/Trigger 1/Offset To Camera\":true,\"Multi Trigger/Trigger 1/Rotation\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 1/Easing\":true,\"Multi Trigger/Trigger 1/Animation Speed Curve\":true,\"Multi Trigger/Trigger 1/Start Time Curve\":true,\"Multi Trigger/Trigger 1/Start Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Scaler\":true},\"cv\":2},{\"id\":\"custom29\",\"title\":\"Custom Click Function 29\",\"kind\":\"pose\",\"family\":\"mobile\",\"collapsed\":true,\"sub\":{\"Offset\":true,\"Offset To Camera\":true,\"Rotation\":true,\"Rotation/Rotation Curve X\":true,\"Rotation/Rotation Curve Y\":true,\"Rotation/Rotation Curve Z\":true,\"Animation Speed Curve\":true,\"Start Time Curve\":true,\"Start Distance Curve\":true,\"Multi Trigger\":true,\"Multi Trigger/Trigger 1\":true,\"Multi Trigger/Trigger 1/Offset\":true,\"Multi Trigger/Trigger 1/Offset To Camera\":true,\"Multi Trigger/Trigger 1/Rotation\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 1/Easing\":true,\"Multi Trigger/Trigger 1/Animation Speed Curve\":true,\"Multi Trigger/Trigger 1/Start Time Curve\":true,\"Multi Trigger/Trigger 1/Start Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Scaler\":true,\"Multi Trigger/Trigger 2\":true,\"Multi Trigger/Trigger 2/Offset\":true,\"Multi Trigger/Trigger 2/Offset To Camera\":true,\"Multi Trigger/Trigger 2/Rotation\":true,\"Multi Trigger/Trigger 2/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 2/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 2/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 2/Easing\":true,\"Multi Trigger/Trigger 2/Animation Speed Curve\":true,\"Multi Trigger/Trigger 2/Start Time Curve\":true,\"Multi Trigger/Trigger 2/Start Distance Curve\":true,\"Multi Trigger/Trigger 2/Retransition\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Distance Scaler\":true},\"cv\":2},{\"id\":\"custom39\",\"title\":\"35 FT - 1 - CH Copy\",\"kind\":\"hold\",\"family\":\"desktop\",\"collapsed\":false,\"sub\":{\"Offset\":true,\"Offset To Camera\":true,\"Rotation\":true,\"Rotation/Rotation Curve X\":true,\"Rotation/Rotation Curve Y\":true,\"Rotation/Rotation Curve Z\":true,\"Easing\":true,\"Animation Speed Curve\":true,\"Start Time Curve\":true,\"Start Distance Curve\":true,\"Retransition\":false,\"Retransition/Retransition Speed Curve\":true,\"Retransition/Retransition Start Time Curve\":true,\"Retransition/Retransition Easing Curve\":true,\"Retransition/Retransition Distance Curve\":true,\"Retransition/Retransition Distance Scaler\":false,\"Tween Stop\":true,\"Tween Stop/Tween Stop Start Time Curve\":true,\"Tween Stop/Tween Stop Delay\":true,\"Multi Trigger\":false,\"Multi Trigger/Trigger 5\":false,\"Multi Trigger/Trigger 5/Offset\":true,\"Multi Trigger/Trigger 5/Offset To Camera\":true,\"Multi Trigger/Trigger 5/Rotation\":true,\"Multi Trigger/Trigger 5/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 5/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 5/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 5/Easing\":true,\"Multi Trigger/Trigger 5/Animation Speed Curve\":true,\"Multi Trigger/Trigger 5/Start Time Curve\":true,\"Multi Trigger/Trigger 5/Start Distance Curve\":true,\"Multi Trigger/Trigger 5/Retransition\":false,\"Multi Trigger/Trigger 5/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 5/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 5/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 5/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 5/Retransition/Retransition Distance Scaler\":true,\"Multi Trigger/Trigger 5/Tween Stop\":true,\"Multi Trigger/Trigger 5/Tween Stop/Tween Stop Start Time Curve\":true,\"Multi Trigger/Trigger 5/Tween Stop/Tween Stop Delay\":true},\"cv\":2,\"parent\":[\"New Group (16)\"]},{\"id\":\"custom40\",\"title\":\"35 FT - Copy\",\"kind\":\"pose\",\"family\":\"desktop\",\"collapsed\":true,\"sub\":{\"Offset\":true,\"Offset To Camera\":true,\"Rotation\":true,\"Rotation/Rotation Curve X\":true,\"Rotation/Rotation Curve Y\":true,\"Rotation/Rotation Curve Z\":true,\"Easing\":true,\"Animation Speed Curve\":true,\"Start Time Curve\":true,\"Start Distance Curve\":true,\"Retransition\":true,\"Retransition/Retransition Speed Curve\":true,\"Retransition/Retransition Start Time Curve\":true,\"Retransition/Retransition Easing Curve\":true,\"Retransition/Retransition Distance Curve\":true,\"Retransition/Retransition Distance Scaler\":true,\"Multi Trigger\":true,\"Multi Trigger/Trigger 1\":true,\"Multi Trigger/Trigger 1/Offset\":true,\"Multi Trigger/Trigger 1/Offset To Camera\":true,\"Multi Trigger/Trigger 1/Rotation\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 1/Easing\":true,\"Multi Trigger/Trigger 1/Animation Speed Curve\":true,\"Multi Trigger/Trigger 1/Start Time Curve\":true,\"Multi Trigger/Trigger 1/Start Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Scaler\":true},\"cv\":2,\"parent\":[\"New Group (16)\"]},{\"id\":\"custom42\",\"title\":\"35 FT - 3 - C Copy\",\"kind\":\"pose\",\"family\":\"desktop\",\"collapsed\":true,\"sub\":{\"Offset\":true,\"Offset To Camera\":true,\"Rotation\":true,\"Rotation/Rotation Curve X\":true,\"Rotation/Rotation Curve Y\":true,\"Rotation/Rotation Curve Z\":true,\"Easing\":true,\"Animation Speed Curve\":true,\"Start Time Curve\":true,\"Start Distance Curve\":true,\"Retransition\":true,\"Retransition/Retransition Speed Curve\":true,\"Retransition/Retransition Start Time Curve\":true,\"Retransition/Retransition Easing Curve\":true,\"Retransition/Retransition Distance Curve\":true,\"Retransition/Retransition Distance Scaler\":true,\"Multi Trigger\":true,\"Multi Trigger/Trigger 1\":true,\"Multi Trigger/Trigger 1/Offset\":true,\"Multi Trigger/Trigger 1/Offset To Camera\":true,\"Multi Trigger/Trigger 1/Rotation\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 1/Easing\":true,\"Multi Trigger/Trigger 1/Animation Speed Curve\":true,\"Multi Trigger/Trigger 1/Start Time Curve\":true,\"Multi Trigger/Trigger 1/Start Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Scaler\":true},\"cv\":2,\"parent\":[\"New Group (16)\"]},{\"id\":\"custom43\",\"title\":\"35 FT - 3 - CH Copy\",\"kind\":\"hold\",\"family\":\"desktop\",\"collapsed\":true,\"sub\":{\"Offset\":true,\"Offset To Camera\":true,\"Rotation\":true,\"Rotation/Rotation Curve X\":true,\"Rotation/Rotation Curve Y\":true,\"Rotation/Rotation Curve Z\":true,\"Easing\":true,\"Animation Speed Curve\":true,\"Start Time Curve\":true,\"Start Distance Curve\":true,\"Retransition\":true,\"Retransition/Retransition Speed Curve\":true,\"Retransition/Retransition Start Time Curve\":true,\"Retransition/Retransition Easing Curve\":true,\"Retransition/Retransition Distance Curve\":true,\"Retransition/Retransition Distance Scaler\":true,\"Tween Stop\":true,\"Tween Stop/Tween Stop Start Time Curve\":true,\"Tween Stop/Tween Stop Delay\":true,\"Multi Trigger\":true,\"Multi Trigger/Trigger 1\":true,\"Multi Trigger/Trigger 1/Offset\":true,\"Multi Trigger/Trigger 1/Offset To Camera\":true,\"Multi Trigger/Trigger 1/Rotation\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 1/Easing\":true,\"Multi Trigger/Trigger 1/Animation Speed Curve\":true,\"Multi Trigger/Trigger 1/Start Time Curve\":true,\"Multi Trigger/Trigger 1/Start Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Scaler\":true,\"Multi Trigger/Trigger 1/Tween Stop\":true,\"Multi Trigger/Trigger 1/Tween Stop/Tween Stop Start Time Curve\":true,\"Multi Trigger/Trigger 1/Tween Stop/Tween Stop Delay\":true},\"cv\":2,\"parent\":[\"New Group (16)\"]},{\"id\":\"custom50\",\"title\":\"35 FT - 1 - C Copy\",\"kind\":\"pose\",\"family\":\"desktop\",\"collapsed\":true,\"sub\":{\"Offset\":true,\"Offset To Camera\":true,\"Rotation\":true,\"Rotation/Rotation Curve X\":true,\"Rotation/Rotation Curve Y\":true,\"Rotation/Rotation Curve Z\":true,\"Easing\":true,\"Animation Speed Curve\":true,\"Start Time Curve\":true,\"Start Distance Curve\":true,\"Retransition\":true,\"Retransition/Retransition Speed Curve\":true,\"Retransition/Retransition Start Time Curve\":true,\"Retransition/Retransition Easing Curve\":true,\"Retransition/Retransition Distance Curve\":true,\"Retransition/Retransition Distance Scaler\":true,\"Multi Trigger\":true,\"Multi Trigger/Trigger 1\":true,\"Multi Trigger/Trigger 1/Offset\":true,\"Multi Trigger/Trigger 1/Offset To Camera\":true,\"Multi Trigger/Trigger 1/Rotation\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 1/Easing\":true,\"Multi Trigger/Trigger 1/Animation Speed Curve\":true,\"Multi Trigger/Trigger 1/Start Time Curve\":true,\"Multi Trigger/Trigger 1/Start Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Scaler\":true},\"cv\":2,\"parent\":[\"New Group (16)\"]},{\"id\":\"custom41\",\"title\":\"35 FT - 2 - CH Copy\",\"kind\":\"hold\",\"family\":\"desktop\",\"collapsed\":true,\"sub\":{\"Offset\":true,\"Offset To Camera\":true,\"Rotation\":true,\"Rotation/Rotation Curve X\":true,\"Rotation/Rotation Curve Y\":true,\"Rotation/Rotation Curve Z\":true,\"Easing\":true,\"Animation Speed Curve\":true,\"Start Time Curve\":true,\"Start Distance Curve\":true,\"Retransition\":true,\"Retransition/Retransition Speed Curve\":true,\"Retransition/Retransition Start Time Curve\":true,\"Retransition/Retransition Easing Curve\":true,\"Retransition/Retransition Distance Curve\":true,\"Retransition/Retransition Distance Scaler\":true,\"Tween Stop\":true,\"Tween Stop/Tween Stop Start Time Curve\":true,\"Tween Stop/Tween Stop Delay\":true,\"Multi Trigger\":true},\"cv\":2,\"parent\":[\"New Group (16)\"]},{\"id\":\"custom51\",\"title\":\"20 FT - 1 - C Copy\",\"kind\":\"hold\",\"family\":\"desktop\",\"collapsed\":true,\"sub\":{\"Offset\":true,\"Offset To Camera\":true,\"Rotation\":true,\"Rotation/Rotation Curve X\":true,\"Rotation/Rotation Curve Y\":true,\"Rotation/Rotation Curve Z\":true,\"Easing\":true,\"Animation Speed Curve\":true,\"Start Time Curve\":true,\"Start Distance Curve\":true,\"Retransition\":true,\"Retransition/Retransition Speed Curve\":true,\"Retransition/Retransition Start Time Curve\":true,\"Retransition/Retransition Easing Curve\":true,\"Retransition/Retransition Distance Curve\":true,\"Retransition/Retransition Distance Scaler\":true,\"Tween Stop\":true,\"Tween Stop/Tween Stop Start Time Curve\":true,\"Tween Stop/Tween Stop Delay\":true,\"Multi Trigger\":true,\"Multi Trigger/Trigger 1\":true,\"Multi Trigger/Trigger 1/Offset\":true,\"Multi Trigger/Trigger 1/Offset To Camera\":true,\"Multi Trigger/Trigger 1/Rotation\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 1/Easing\":true,\"Multi Trigger/Trigger 1/Animation Speed Curve\":true,\"Multi Trigger/Trigger 1/Start Time Curve\":true,\"Multi Trigger/Trigger 1/Start Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Scaler\":true,\"Multi Trigger/Trigger 1/Tween Stop\":true,\"Multi Trigger/Trigger 1/Tween Stop/Tween Stop Start Time Curve\":true,\"Multi Trigger/Trigger 1/Tween Stop/Tween Stop Delay\":true,\"Multi Trigger/Trigger 2\":true,\"Multi Trigger/Trigger 2/Offset\":true,\"Multi Trigger/Trigger 2/Offset To Camera\":true,\"Multi Trigger/Trigger 2/Rotation\":true,\"Multi Trigger/Trigger 2/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 2/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 2/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 2/Easing\":true,\"Multi Trigger/Trigger 2/Animation Speed Curve\":true,\"Multi Trigger/Trigger 2/Start Time Curve\":true,\"Multi Trigger/Trigger 2/Start Distance Curve\":true,\"Multi Trigger/Trigger 2/Retransition\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Distance Scaler\":true,\"Multi Trigger/Trigger 2/Tween Stop\":true,\"Multi Trigger/Trigger 2/Tween Stop/Tween Stop Start Time Curve\":true,\"Multi Trigger/Trigger 2/Tween Stop/Tween Stop Delay\":true},\"cv\":2,\"parent\":[\"New Group (16)\"]},{\"id\":\"custom52\",\"title\":\"20 FT - R - CH Copy\",\"kind\":\"pose\",\"family\":\"desktop\",\"collapsed\":true,\"sub\":{\"Offset\":true,\"Offset To Camera\":true,\"Rotation\":true,\"Rotation/Rotation Curve X\":true,\"Rotation/Rotation Curve Y\":true,\"Rotation/Rotation Curve Z\":true,\"Easing\":true,\"Animation Speed Curve\":true,\"Start Time Curve\":true,\"Start Distance Curve\":true,\"Retransition\":true,\"Retransition/Retransition Speed Curve\":true,\"Retransition/Retransition Start Time Curve\":false,\"Retransition/Retransition Easing Curve\":true,\"Retransition/Retransition Distance Curve\":true,\"Retransition/Retransition Distance Scaler\":false,\"Multi Trigger\":false,\"Multi Trigger/Trigger 1\":true,\"Multi Trigger/Trigger 1/Offset\":true,\"Multi Trigger/Trigger 1/Offset To Camera\":true,\"Multi Trigger/Trigger 1/Rotation\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 1/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 1/Easing\":true,\"Multi Trigger/Trigger 1/Animation Speed Curve\":true,\"Multi Trigger/Trigger 1/Start Time Curve\":true,\"Multi Trigger/Trigger 1/Start Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 1/Retransition/Retransition Distance Scaler\":true,\"Multi Trigger/Trigger 2\":true,\"Multi Trigger/Trigger 2/Offset\":true,\"Multi Trigger/Trigger 2/Offset To Camera\":true,\"Multi Trigger/Trigger 2/Rotation\":true,\"Multi Trigger/Trigger 2/Rotation/Rotation Curve X\":true,\"Multi Trigger/Trigger 2/Rotation/Rotation Curve Y\":true,\"Multi Trigger/Trigger 2/Rotation/Rotation Curve Z\":true,\"Multi Trigger/Trigger 2/Easing\":true,\"Multi Trigger/Trigger 2/Animation Speed Curve\":true,\"Multi Trigger/Trigger 2/Start Time Curve\":true,\"Multi Trigger/Trigger 2/Start Distance Curve\":true,\"Multi Trigger/Trigger 2/Retransition\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Speed Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Start Time Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Easing Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Distance Curve\":true,\"Multi Trigger/Trigger 2/Retransition/Retransition Distance Scaler\":true},\"cv\":2,\"parent\":[\"New Group (16)\"]}]",
       "customFunctionSelector": [
         {
           "name": "SCROLL",
@@ -24057,42 +24057,42 @@
           "fnId": "custom29"
         },
         {
-          "name": "15 FT - R - C",
+          "name": "35 FT - R - C",
           "fnId": "custom52",
           "group": "20 FOV TEST"
         },
         {
-          "name": "15 FT - R - CH",
+          "name": "35 FT - R - CH",
           "fnId": "custom51",
           "group": "20 FOV TEST"
         },
         {
-          "name": "15 FT - 1 - C",
+          "name": "35 FT - 1 - C",
           "fnId": "custom50",
           "group": "20 FOV TEST"
         },
         {
-          "name": "15 FT - 1 - CH",
+          "name": "35  FT - 1 - CH",
           "fnId": "custom39",
           "group": "20 FOV TEST"
         },
         {
-          "name": "15 FT - 2 - C",
+          "name": "35 FT - 2 - C",
           "fnId": "custom40",
           "group": "20 FOV TEST"
         },
         {
-          "name": "15 FT - 2 - CH",
+          "name": "35 FT - 2 - CH",
           "fnId": "custom41",
           "group": "20 FOV TEST"
         },
         {
-          "name": "15 FT - 3 - C",
+          "name": "35 FT - 3 - C",
           "fnId": "custom42",
           "group": "20 FOV TEST"
         },
         {
-          "name": "15 FT - 3 - CH",
+          "name": "35 FT - 3 - CH",
           "fnId": "custom43",
           "group": "20 FOV TEST"
         }
@@ -32058,21 +32058,21 @@
       "cameraYaw": 1.464,
       "cameraPitch": -2.946,
       "cameraRoll": 0,
-      "cameraDefaultPreset": "{\"cameraX\":1.963636363636364,\"cameraY\":9.184850993605146e-15,\"cameraZ\":257.48779599525176,\"cameraFov\":15,\"cameraZoom\":149.99999999999994,\"cameraRoll\":0,\"targetX\":1.963636363636364,\"targetY\":0,\"targetZ\":107.4877959952518}",
+      "cameraDefaultPreset": "{\"cameraX\":1.9534883720930232,\"cameraY\":2.0272434216195883e-13,\"cameraZ\":223.4004898795015,\"cameraFov\":20,\"cameraZoom\":99,\"cameraRoll\":0,\"targetX\":1.9534883720930232,\"targetY\":1.9666234050617943e-13,\"targetZ\":124.40048987950149}",
       "cameraZoom": 260.17068872666084,
       "cameraZoomSpeed": 1,
       "savedCameras": [
         {
-          "name": "HD - DESKTOP - 15 FOV",
-          "cameraX": 1.963636363636364,
-          "cameraY": 9.184850993605146e-15,
-          "cameraZ": 257.48779599525176,
-          "cameraFov": 15,
-          "cameraZoom": 149.99999999999994,
+          "name": "HD - DESKTOP - 20 FOV",
+          "cameraX": 1.9534883720930232,
+          "cameraY": 2.0272434216195883e-13,
+          "cameraZ": 223.4004898795015,
+          "cameraFov": 20,
+          "cameraZoom": 99,
           "cameraRoll": 0,
-          "targetX": 1.963636363636364,
-          "targetY": 0,
-          "targetZ": 107.4877959952518
+          "targetX": 1.9534883720930232,
+          "targetY": 1.9666234050617943e-13,
+          "targetZ": 124.40048987950149
         }
       ],
       "lockCameraPan": false,
@@ -33218,7 +33218,7 @@
       "custom39CameraOffsetYCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.324820628419056,\"y\":0},\"bg\":0.64,\"m\":\"linear\"},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.467575665942766,\"y\":0}}]",
       "custom39CameraOffsetYRange": "{\"min\":-1,\"max\":2}",
       "custom39CameraOffsetZEnabled": true,
-      "custom39CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.07823417756679524,\"y\":0}},{\"x\":0.11190598139370292,\"y\":0.5177083333333333,\"h2\":{\"x\":-0.04377344773317037,\"y\":0.20000000000000007},\"h1\":{\"x\":0.06734360765381536,\"y\":-0.29333343505859366}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.6608093427746702,\"y\":0.09104181925455734}}]",
+      "custom39CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.2194142514188381,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-1,\"y\":0}}]",
       "custom39CameraOffsetZRange": "{\"min\":5,\"max\":45}",
       "custom39RotationCurveVisibleOnly": true,
       "custom39RotationXCurveEnabled": false,
@@ -33254,7 +33254,7 @@
       "custom39EasingCurveEnabled": true,
       "custom39EasingCurve": "[{\"x\":0,\"y\":0.5639582316080729,\"h1\":{\"x\":0.31143422537808685,\"y\":0.10374984741210935}},{\"x\":0.5114378003582828,\"y\":0.8504165649414063,\"h2\":{\"x\":-0.217053360727685,\"y\":0.013333384195963527},\"h1\":{\"x\":0.23886151703848635,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2702726881540415,\"y\":0.16374994913736984}}]",
       "custom39RetransitionEasingCurveEnabled": true,
-      "custom39RetransitionEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.42983859032236926,\"y\":0.20052083333333337}},{\"x\":0.5000090617275154,\"y\":0.7653124491373697,\"h2\":{\"x\":-0.274628427178499,\"y\":0},\"h1\":{\"x\":0.28158102656376904,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.44474229855675507,\"y\":0.2738543192545573}}]",
+      "custom39RetransitionEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.2565192606738039,\"y\":0}},{\"x\":0.5000090617275154,\"y\":0.7653124491373697,\"h2\":{\"x\":-0.21889825254187922,\"y\":-0.0009373982747394871},\"h1\":{\"x\":0.25489640554523973,\"y\":0.019062550862630312}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.35493617403165045,\"y\":0}}]",
       "custom39SpeedCurveEnabled": true,
       "custom39SpeedCurveVisibleOnly": true,
       "custom39SpeedCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.3614426923386011,\"y\":-0.06291694641113277}},{\"x\":0.5434193258084055,\"y\":0,\"h1\":{\"x\":0.1377118711641958,\"y\":0},\"h2\":{\"x\":-0.1619136237453131,\"y\":-0.0011459350585938388}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.45658067419159454,\"y\":0}}]",
@@ -33277,7 +33277,7 @@
       "custom39RetransitionDistCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom39RetransitionDistRange": "{\"min\":50,\"max\":2000}",
       "custom39RetransitionScalerEnabled": true,
-      "custom39RetransitionScalerCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.5140945168802775,\"y\":-0.12760416666666663}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.278253513093899,\"y\":0.6923957824707031}}]",
+      "custom39RetransitionScalerCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.4794814747874683,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.278253513093899,\"y\":0.6923957824707031}}]",
       "custom39RetransitionScalerMulRange": "{\"min\":0.1,\"max\":0.8}",
       "custom39RetransitionScalerDistRange": "{\"min\":0,\"max\":800}",
       "custom39RetransitionStartTimeCurveEnabled": true,
@@ -33288,7 +33288,7 @@
       "custom39TweenRetransitionSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.6073672705792005,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.3644149408348759,\"y\":0}}]",
       "custom39TweenRetransitionSpeedCurveRange": "{\"min\":26766,\"max\":36366}",
       "custom39TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.35062653339382605,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.350678091120192,\"y\":0}}]",
-      "custom39TweenRetransitionStartTimeRange": "{\"min\":0,\"max\":3000}",
+      "custom39TweenRetransitionStartTimeRange": "{\"min\":3000,\"max\":4000}",
       "custom39TweenStopEnabled": true,
       "custom39TweenStopStartTimeCurveEnabled": true,
       "custom39TweenStopStartTimeCurveVisibleOnly": true,
@@ -33765,7 +33765,7 @@
       "custom39Trig5CameraOffsetYCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom39Trig5CameraOffsetYRange": "{\"min\":0,\"max\":10}",
       "custom39Trig5CameraOffsetZEnabled": true,
-      "custom39Trig5CameraOffsetZCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.36575475011058206,\"y\":0.001041920979817701}},{\"x\":0.47146219136654566,\"y\":0.407708485921224,\"h2\":{\"x\":-0.3127363861552631,\"y\":-0.0399998982747396},\"h1\":{\"x\":0.17325511035152086,\"y\":0.06000010172526038}},{\"x\":1,\"y\":1,\"h2\":{\"x\":0,\"y\":-0.492291514078776}}]",
+      "custom39Trig5CameraOffsetZCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.29344133786255555,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-1,\"y\":0}}]",
       "custom39Trig5CameraOffsetZRange": "{\"min\":-25,\"max\":-5}",
       "custom39Trig5RotationCurveVisibleOnly": true,
       "custom39Trig5RotationXCurveEnabled": false,
@@ -33800,7 +33800,7 @@
       "custom39Trig5TransitionSpeedMs": 400,
       "custom39Trig5EasingCurveEnabled": true,
       "custom39Trig5EasingCurve": "[{\"x\":0,\"y\":0},{\"x\":0.5324305524740706,\"y\":1},{\"x\":1,\"y\":0}]",
-      "custom39Trig5RetransitionEasingCurveEnabled": false,
+      "custom39Trig5RetransitionEasingCurveEnabled": true,
       "custom39Trig5RetransitionEasingCurve": "[{\"x\":0,\"y\":0.5},{\"x\":1,\"y\":0.5}]",
       "custom39Trig5SpeedCurveEnabled": true,
       "custom39Trig5SpeedCurveVisibleOnly": true,
@@ -33823,10 +33823,10 @@
       "custom39Trig5RetransitionDistCurveEnabled": false,
       "custom39Trig5RetransitionDistCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom39Trig5RetransitionDistRange": "{\"min\":50,\"max\":2000}",
-      "custom39Trig5RetransitionScalerEnabled": false,
-      "custom39Trig5RetransitionScalerCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom39Trig5RetransitionScalerMulRange": "{\"min\":0.5,\"max\":2}",
-      "custom39Trig5RetransitionScalerDistRange": "{\"min\":0,\"max\":50}",
+      "custom39Trig5RetransitionScalerEnabled": true,
+      "custom39Trig5RetransitionScalerCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.4513359606672014,\"y\":0}},{\"x\":1,\"y\":0}]",
+      "custom39Trig5RetransitionScalerMulRange": "{\"min\":0.01,\"max\":1}",
+      "custom39Trig5RetransitionScalerDistRange": "{\"min\":0,\"max\":300}",
       "custom39Trig5RetransitionStartTimeCurveEnabled": true,
       "custom39Trig5RetransitionStartTimeCurveVisibleOnly": true,
       "custom39Trig5RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -33834,8 +33834,8 @@
       "custom39Trig5TweenRetransitionSpeedMs": 800,
       "custom39Trig5TweenRetransitionSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.9417530103612434,\"y\":0}},{\"x\":1,\"y\":1}]",
       "custom39Trig5TweenRetransitionSpeedCurveRange": "{\"min\":26130,\"max\":30830}",
-      "custom39Trig5TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom39Trig5TweenRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom39Trig5TweenRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.4103779883090869,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.3097434453202007,\"y\":0}}]",
+      "custom39Trig5TweenRetransitionStartTimeRange": "{\"min\":3000,\"max\":4000}",
       "custom39Trig5TweenStopEnabled": true,
       "custom39Trig5TweenStopStartTimeCurveEnabled": false,
       "custom39Trig5TweenStopStartTimeCurveVisibleOnly": true,
@@ -35177,7 +35177,7 @@
       "custom52EasingCurveEnabled": true,
       "custom52EasingCurve": "[{\"x\":0,\"y\":0},{\"x\":0.5227021422192623,\"y\":1},{\"x\":1,\"y\":0}]",
       "custom52RetransitionEasingCurveEnabled": true,
-      "custom52RetransitionEasingCurve": "[{\"x\":0,\"y\":0},{\"x\":0.5253180363191781,\"y\":0.9197916666666667},{\"x\":1,\"y\":0}]",
+      "custom52RetransitionEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.22864903081401367,\"y\":0.020937093098958304}},{\"x\":0.5253180363191781,\"y\":0.9197916666666667,\"h2\":{\"x\":-0.1835484326959056,\"y\":0.03447875976562498},\"h1\":{\"x\":0.2377845720980386,\"y\":0.041145833333333326}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.24017619800918888,\"y\":0.00760396321614587}}]",
       "custom52SpeedCurveEnabled": true,
       "custom52SpeedCurveVisibleOnly": true,
       "custom52SpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -35195,19 +35195,19 @@
       "custom52RetransitionSpeedMs": 400,
       "custom52RetransitionSpeedCurveEnabled": true,
       "custom52RetransitionSpeedCurveVisibleOnly": true,
-      "custom52RetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom52RetransitionSpeedCurveRange": "{\"min\":50,\"max\":25000}",
+      "custom52RetransitionSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.34996674476773404,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.47461448477216805,\"y\":0}}]",
+      "custom52RetransitionSpeedCurveRange": "{\"min\":25000,\"max\":35000}",
       "custom52RetransitionDistCurveEnabled": false,
       "custom52RetransitionDistCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom52RetransitionDistRange": "{\"min\":50,\"max\":2000}",
       "custom52RetransitionScalerEnabled": true,
-      "custom52RetransitionScalerCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "custom52RetransitionScalerCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.5040728982208529,\"y\":0.02614580790201826}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.4893692387694407,\"y\":0}}]",
       "custom52RetransitionScalerMulRange": "{\"min\":0.1,\"max\":1}",
-      "custom52RetransitionScalerDistRange": "{\"min\":0,\"max\":100}",
+      "custom52RetransitionScalerDistRange": "{\"min\":0,\"max\":300}",
       "custom52RetransitionStartTimeCurveEnabled": true,
       "custom52RetransitionStartTimeCurveVisibleOnly": true,
-      "custom52RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom52RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
+      "custom52RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.36308222063025153,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.4041190208984198,\"y\":-0.025000000000000022}}]",
+      "custom52RetransitionStartTimeRange": "{\"min\":4000,\"max\":5000}",
       "custom52MultiTriggerEnabled": false,
       "custom52MultiTriggers": "[{\"prefix\":\"custom52Trig1\",\"title\":\"Trigger 1\"},{\"prefix\":\"custom52Trig2\",\"title\":\"Trigger 2\"}]",
       "custom52Trig1Enabled": true,
@@ -35989,14 +35989,14 @@
     },
     {
       "key": "Saved Dev Settings",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [],
       "settings": []
     },
     {
       "key": "New Group (9)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -36379,7 +36379,7 @@
           "type": "group",
           "group": {
             "key": "Field Layout",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -36564,7 +36564,7 @@
                 "type": "group",
                 "group": {
                   "key": "Hand Position Min Z Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
@@ -36590,7 +36590,7 @@
                 "type": "group",
                 "group": {
                   "key": "Hand Position Max Z Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
@@ -37697,9 +37697,6 @@
                       }
                     },
                     {
-                      "type": "row"
-                    },
-                    {
                       "type": "group",
                       "group": {
                         "key": "Retransition",
@@ -37724,11 +37721,26 @@
                                 {
                                   "type": "row",
                                   "key": "rvRetransitionSpeedCurve"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "custom29Trig1RetransitionSpeedCurveVisibleOnly"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "custom29Trig1RetransitionSpeedCurve"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "custom29Trig1RetransitionSpeedCurveRange"
                                 }
                               ],
                               "settings": [
                                 "rvRetransitionSpeedRange",
-                                "rvRetransitionSpeedCurve"
+                                "rvRetransitionSpeedCurve",
+                                "custom29Trig1RetransitionSpeedCurveVisibleOnly",
+                                "custom29Trig1RetransitionSpeedCurve",
+                                "custom29Trig1RetransitionSpeedCurveRange"
                               ]
                             }
                           },
@@ -37746,11 +37758,26 @@
                                 {
                                   "type": "row",
                                   "key": "rvRetransitionStartTimeCurve"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "custom29Trig1RetransitionStartTimeCurveVisibleOnly"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "custom29Trig1RetransitionStartTimeCurve"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "custom29Trig1RetransitionStartTimeRange"
                                 }
                               ],
                               "settings": [
                                 "rvRetransitionStartTimeRange",
-                                "rvRetransitionStartTimeCurve"
+                                "rvRetransitionStartTimeCurve",
+                                "custom29Trig1RetransitionStartTimeCurveVisibleOnly",
+                                "custom29Trig1RetransitionStartTimeCurve",
+                                "custom29Trig1RetransitionStartTimeRange"
                               ]
                             }
                           },
@@ -37764,16 +37791,146 @@
                                 {
                                   "type": "row",
                                   "key": "rvRetransitionEasingCurve"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "custom29Trig1RetransitionEasingCurve"
                                 }
                               ],
                               "settings": [
-                                "rvRetransitionEasingCurve"
+                                "rvRetransitionEasingCurve",
+                                "custom29Trig1RetransitionEasingCurve"
+                              ]
+                            }
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom29RetransitionSpeedMs"
+                          },
+                          {
+                            "type": "group",
+                            "group": {
+                              "key": "Retransition Speed Curve",
+                              "collapsed": true,
+                              "locked": false,
+                              "items": [
+                                {
+                                  "type": "row",
+                                  "key": "custom29RetransitionSpeedCurveVisibleOnly"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "custom29RetransitionSpeedCurve"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "custom29RetransitionSpeedCurveRange"
+                                }
+                              ],
+                              "settings": [
+                                "custom29RetransitionSpeedCurveVisibleOnly",
+                                "custom29RetransitionSpeedCurve",
+                                "custom29RetransitionSpeedCurveRange"
+                              ]
+                            }
+                          },
+                          {
+                            "type": "group",
+                            "group": {
+                              "key": "Retransition Start Time Curve",
+                              "collapsed": true,
+                              "locked": false,
+                              "items": [
+                                {
+                                  "type": "row",
+                                  "key": "custom29RetransitionStartTimeCurveVisibleOnly"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "custom29RetransitionStartTimeCurve"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "custom29RetransitionStartTimeRange"
+                                }
+                              ],
+                              "settings": [
+                                "custom29RetransitionStartTimeCurveVisibleOnly",
+                                "custom29RetransitionStartTimeCurve",
+                                "custom29RetransitionStartTimeRange"
+                              ]
+                            }
+                          },
+                          {
+                            "type": "group",
+                            "group": {
+                              "key": "Retransition Easing Curve",
+                              "collapsed": true,
+                              "locked": false,
+                              "items": [
+                                {
+                                  "type": "row",
+                                  "key": "custom29RetransitionEasingCurve"
+                                }
+                              ],
+                              "settings": [
+                                "custom29RetransitionEasingCurve"
+                              ]
+                            }
+                          },
+                          {
+                            "type": "group",
+                            "group": {
+                              "key": "Retransition Distance Curve",
+                              "collapsed": true,
+                              "locked": false,
+                              "items": [
+                                {
+                                  "type": "row",
+                                  "key": "custom29RetransitionDistCurve"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "custom29RetransitionDistRange"
+                                }
+                              ],
+                              "settings": [
+                                "custom29RetransitionDistCurve",
+                                "custom29RetransitionDistRange"
+                              ]
+                            }
+                          },
+                          {
+                            "type": "group",
+                            "group": {
+                              "key": "Retransition Distance Scaler",
+                              "collapsed": true,
+                              "locked": false,
+                              "items": [
+                                {
+                                  "type": "row",
+                                  "key": "custom29RetransitionScalerCurve"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "custom29RetransitionScalerMulRange"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "custom29RetransitionScalerDistRange"
+                                }
+                              ],
+                              "settings": [
+                                "custom29RetransitionScalerCurve",
+                                "custom29RetransitionScalerMulRange",
+                                "custom29RetransitionScalerDistRange"
                               ]
                             }
                           }
                         ],
                         "settings": [
-                          "rvRetransitionSpeedMs"
+                          "rvRetransitionSpeedMs",
+                          "custom29RetransitionSpeedMs"
                         ]
                       }
                     },
@@ -37787,11 +37944,70 @@
                           {
                             "type": "row",
                             "key": "rvEasingCurve"
+                          },
+                          {
+                            "type": "row",
+                            "key": "custom29EasingCurve"
                           }
                         ],
                         "settings": [
-                          "rvEasingCurve"
+                          "rvEasingCurve",
+                          "custom29EasingCurve"
                         ]
+                      }
+                    },
+                    {
+                      "type": "row"
+                    },
+                    {
+                      "type": "group",
+                      "group": {
+                        "key": "Retransition",
+                        "collapsed": true,
+                        "locked": false,
+                        "items": [
+                          {
+                            "type": "group",
+                            "group": {
+                              "key": "Retransition Speed Curve",
+                              "collapsed": true,
+                              "locked": false,
+                              "items": [],
+                              "settings": []
+                            }
+                          },
+                          {
+                            "type": "group",
+                            "group": {
+                              "key": "Retransition Start Time Curve",
+                              "collapsed": true,
+                              "locked": false,
+                              "items": [],
+                              "settings": []
+                            }
+                          },
+                          {
+                            "type": "group",
+                            "group": {
+                              "key": "Retransition Easing Curve",
+                              "collapsed": true,
+                              "locked": false,
+                              "items": [],
+                              "settings": []
+                            }
+                          }
+                        ],
+                        "settings": []
+                      }
+                    },
+                    {
+                      "type": "group",
+                      "group": {
+                        "key": "Easing",
+                        "collapsed": true,
+                        "locked": false,
+                        "items": [],
+                        "settings": []
                       }
                     }
                   ],
@@ -37841,7 +38057,7 @@
     },
     {
       "key": "Custom Click Functions",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -37890,14 +38106,14 @@
           "type": "group",
           "group": {
             "key": "New Group (16)",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
                 "type": "group",
                 "group": {
                   "key": "35 FT - 1 - CH Copy",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [],
                   "settings": []
@@ -38117,7 +38333,7 @@
           "type": "group",
           "group": {
             "key": "Camera",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -39230,12 +39446,12 @@
     "custom43Trig1Type": "Trigger Type",
     "custom43Trig1ClickCount": "Trigger Count",
     "New Group (14)": "20 FOV - TEST",
-    "35 FT - 3 - CH Copy": "15 FT - 3 - CH",
-    "35 FT - 3 - C Copy": "15 FT - 3 - C",
-    "35 FT - 2 - CH Copy": "15 FT - 2 - CH",
-    "35 FT - Copy": "15 FT - 2 - C",
-    "35 FT - 1 - CH Copy": "15 FT - 1 - CH",
-    "35 FT - 1 - C Copy": "15 FT - 1 - C",
+    "35 FT - 3 - CH Copy": "35 FT - 3 - CH",
+    "35 FT - 3 - C Copy": "35 FT - 3 - C",
+    "35 FT - 2 - CH Copy": "35 FT - 2 - CH",
+    "35 FT - Copy": "35 FT - 2 - C",
+    "35 FT - 1 - CH Copy": "35  FT - 1 - CH",
+    "35 FT - 1 - C Copy": "35 FT - 1 - C",
     "custom44Enabled": "ON/ OFF",
     "custom44Type": "Trigger Type",
     "custom44ClickCount": "Trigger Count",
@@ -39290,11 +39506,11 @@
     "custom50Enabled": "ON/ OFF",
     "custom50Type": "Trigger Type",
     "custom50ClickCount": "Trigger Count",
-    "New Group (16)": "15 FOV - TEST",
+    "New Group (16)": "35 FOV - TEST",
     "custom51Enabled": "ON/ OFF",
     "custom51Type": "Trigger Type",
     "custom51ClickCount": "Trigger Count",
-    "20 FT - 1 - C Copy": "15 FT - R - CH",
+    "20 FT - 1 - C Copy": "35 FT - R - CH",
     "custom51Trig1Enabled": "ON/ OFF",
     "custom51Trig1Type": "Trigger Type",
     "custom51Trig1ClickCount": "Trigger Count",
@@ -39310,7 +39526,8 @@
     "custom52Trig2Enabled": "ON/ OFF",
     "custom52Trig2Type": "Trigger Type",
     "custom52Trig2ClickCount": "Trigger Count",
-    "20 FT - R - CH Copy": "15 FT - R - C"
+    "20 FT - R - CH Copy": "35 FT - R - C",
+    "Trigger 5": "Trigger 1"
   },
   "devVisibility": {
     "custom17Enabled": true,
@@ -42490,8 +42707,8 @@
   "devHotkeys": {},
   "panelGeometry": {
     "desktop": {
-      "left": 1001.625,
-      "top": 0,
+      "left": 839.2250366210938,
+      "top": 5.599999904632568,
       "width": 559.9750366210938,
       "height": 711.6000366210938
     },
