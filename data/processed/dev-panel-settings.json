@@ -114,7 +114,7 @@
       "fieldBoundsZMin": "-800",
       "fieldBoundsZMinCurveEnabled": true,
       "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3627146779827312,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.5849570584390974,\"y\":-0.897479502360026}}]",
-      "fieldBoundsZMinCurveRange": "{\"min\":-500,\"max\":-150}",
+      "fieldBoundsZMinCurveRange": "{\"min\":-300,\"max\":-150}",
       "fieldBoundsZMax": "240",
       "fieldBoundsZMaxCurveEnabled": true,
       "fieldBoundsZMaxCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.7710241189949432,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":0,\"y\":1}}]",
@@ -7915,9 +7915,9 @@
         }
       ],
       "cameraX": 1.9534883720930232,
-      "cameraY": 3.214085524362242e-13,
+      "cameraY": 5.541526766141773e-15,
       "cameraZ": 115.97925521912504,
-      "cameraFov": 33,
+      "cameraFov": 35,
       "cameraYaw": 0,
       "cameraPitch": 0,
       "cameraRoll": 0,
@@ -8093,15 +8093,15 @@
         },
         {
           "name": "DESKTOP 35 FOV",
-          "cameraX": 1.953488372093023,
+          "cameraX": 1.9534883720930232,
           "cameraY": 5.541526766141773e-15,
           "cameraZ": 115.97925521912504,
-          "cameraFov": 33,
+          "cameraFov": 35,
           "cameraZoom": 90.5,
           "cameraRoll": 0,
-          "targetX": 1.953488372093023,
+          "targetX": 1.9534883720930232,
           "targetY": 0,
-          "targetZ": 25.47925521912503
+          "targetZ": 25.479255219125044
         },
         {
           "name": "HD - MOBILE - 35FOV",
@@ -12973,7 +12973,7 @@
       "fieldBoundsZMin": "-800",
       "fieldBoundsZMinCurveEnabled": true,
       "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3627146779827312,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.5849570584390974,\"y\":-0.897479502360026}}]",
-      "fieldBoundsZMinCurveRange": "{\"min\":-500,\"max\":-150}",
+      "fieldBoundsZMinCurveRange": "{\"min\":-300,\"max\":-150}",
       "fieldBoundsZMax": "240",
       "fieldBoundsZMaxCurveEnabled": true,
       "fieldBoundsZMaxCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.7710241189949432,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":0,\"y\":1}}]",
@@ -20952,15 +20952,15 @@
         },
         {
           "name": "DESKTOP 35 FOV",
-          "cameraX": 1.953488372093023,
+          "cameraX": 1.9534883720930232,
           "cameraY": 5.541526766141773e-15,
           "cameraZ": 115.97925521912504,
-          "cameraFov": 33,
+          "cameraFov": 35,
           "cameraZoom": 90.5,
           "cameraRoll": 0,
-          "targetX": 1.953488372093023,
+          "targetX": 1.9534883720930232,
           "targetY": 0,
-          "targetZ": 25.47925521912503
+          "targetZ": 25.479255219125044
         },
         {
           "name": "HD - MOBILE - 35FOV",
@@ -25832,7 +25832,7 @@
       "fieldBoundsZMin": "-800",
       "fieldBoundsZMinCurveEnabled": true,
       "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3627146779827312,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.5849570584390974,\"y\":-0.897479502360026}}]",
-      "fieldBoundsZMinCurveRange": "{\"min\":-500,\"max\":-150}",
+      "fieldBoundsZMinCurveRange": "{\"min\":-300,\"max\":-150}",
       "fieldBoundsZMax": "240",
       "fieldBoundsZMaxCurveEnabled": true,
       "fieldBoundsZMaxCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.7710241189949432,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":0,\"y\":1}}]",
@@ -33811,15 +33811,15 @@
         },
         {
           "name": "DESKTOP 35 FOV",
-          "cameraX": 1.953488372093023,
+          "cameraX": 1.9534883720930232,
           "cameraY": 5.541526766141773e-15,
           "cameraZ": 115.97925521912504,
-          "cameraFov": 33,
+          "cameraFov": 35,
           "cameraZoom": 90.5,
           "cameraRoll": 0,
-          "targetX": 1.953488372093023,
+          "targetX": 1.9534883720930232,
           "targetY": 0,
-          "targetZ": 25.47925521912503
+          "targetZ": 25.479255219125044
         },
         {
           "name": "HD - MOBILE - 35FOV",
@@ -39502,7 +39502,7 @@
           "type": "group",
           "group": {
             "key": "Field Layout",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -39687,7 +39687,7 @@
                 "type": "group",
                 "group": {
                   "key": "Hand Position Min Z Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
@@ -39713,7 +39713,7 @@
                 "type": "group",
                 "group": {
                   "key": "Hand Position Max Z Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
@@ -40587,7 +40587,7 @@
           "type": "group",
           "group": {
             "key": "Small Scale Models",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -40821,7 +40821,7 @@
     },
     {
       "key": "New Group (11)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -40932,7 +40932,7 @@
           "type": "group",
           "group": {
             "key": "Camera",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
