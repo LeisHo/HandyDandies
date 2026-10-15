@@ -8,7 +8,7 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js'
 import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js'
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js'
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js'
-import { DEV_MODE, initDevPanel, syncValue, setControlValue, copyControlState, isApplyingPanelState, forgetControlsWithPrefix, seedControlValue, refreshListPickerTogglesByKey, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab, beginDynamicBatch, endDynamicBatch, refreshListPickerMarksByKey } from './devpanel/devPanel.js?v=82'
+import { DEV_MODE, initDevPanel, syncValue, setControlValue, copyControlState, isApplyingPanelState, forgetControlsWithPrefix, seedControlValue, refreshListPickerTogglesByKey, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab, beginDynamicBatch, endDynamicBatch, refreshListPickerMarksByKey } from './devpanel/devPanel.js?v=83'
 
 // Toon Shading colour gradient (2026-10-12): MeshToonMaterial's getGradientIrradiance() only reads the RED channel of
 // its gradientMap (a grey ramp). Reading RGB instead is identical for every grey ramp (all channels equal) and lets
@@ -15302,6 +15302,11 @@ function cleanupDeletedCustomClickFunctionGroup(target) {
     return
   }
   customClickFunctionIds.splice(idx, 1)
+  // Drop the deleted function's controls and stored values too (2026-10-15, direct report: saved settings did not reflect deletions after a refresh). They used to stay in the panel's registry and in every
+  // Save, so (a) each Save kept carrying values for functions that no longer exist (the saved file had values for 27 functions with 26 listed), (b) every Use / Reset still applied them, and (c) a new
+  // function that got the deleted one's number back (the next number is max id + 1 after a reload) started with its old values.
+  forgetControlsWithPrefix(id)
+  delete customFunctionPendingGroup[id]
   persistCustomClickFunctionIds()
   const keys = kind === 'hold' ? CLICK_HOLD_KEYS : CLICK_POSE_KEYS
   const triggers = kind === 'hold' ? clickHoldPoseTriggers : clickPoseTriggers

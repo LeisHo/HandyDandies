@@ -3623,6 +3623,7 @@ export function initDevPanel(groups, opts = {}) {
     const geomNow = getPanelGeometry(panel)
     try { localStorage.setItem(currentGeomKey(), JSON.stringify(geomNow)) } catch (err) { /* ignore */ }
     snapshot.panelGeometry = { [realDeviceClass()]: geomNow }
+    rememberActiveState() // the live settings are written from the panel below, so the item in use is now the one they came from
     overwriteInUseSavedState() // the item in use in Saved Dev Settings follows every Save (no-op when none is in use)
     if (opts.remoteSave) {
       // returns the promise so a host that must not reload before the save lands (the hand model Use) can wait for it
@@ -3890,6 +3891,9 @@ export function initDevPanel(groups, opts = {}) {
     return entry
   }
   // Which saved state is "the default" (marked with a star, overwritten by the main Save button) is remembered per browser, next to the saved states themselves.
+  // Which saved item the LIVE settings were last saved from: after a refresh the panel shows the live settings, so that is the item "in use" again (not the default one, which may be a different item).
+  function activeStateKey() { return `${storageKeyPrefix}.devActiveState` }
+  function rememberActiveState() { try { if (activeStateName) localStorage.setItem(activeStateKey(), activeStateName); else localStorage.removeItem(activeStateKey()) } catch (err) { /* ignore */ } }
   function defaultStateKey() { return `${storageKeyPrefix}.devDefaultState` }
   function withExtra(snap) { if (devUndoCaptureExtra) snap.extra = devUndoCaptureExtra(); return snap }
   // Puts back the host's own structure (main.js: the custom click function groups that existed when the item was saved) BEFORE the values are applied, exactly as Undo does; an item saved before this existed has no extra and is applied as before.
@@ -4013,7 +4017,8 @@ export function initDevPanel(groups, opts = {}) {
   deleteStateBtn.addEventListener('click', deleteNamedState)
   setDefaultStateBtn.addEventListener('click', setNamedStateAsDefault)
   exportStateBtn.addEventListener('click', exportDevPanelSettings)
-  activeStateName = getDefaultStateName()
+  try { activeStateName = localStorage.getItem(activeStateKey()) || '' } catch (err) { activeStateName = '' }
+  if (!getSavedStates()[activeStateName]) activeStateName = getDefaultStateName()
   renderSavedStatesList()
   // `.dp-collapsed`'s own CSS only hides `.dp-body`/`.dp-resize` -- it
   // can't also shrink the PANEL's own box, for 2 separate reasons that
