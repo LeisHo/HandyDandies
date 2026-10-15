@@ -17545,6 +17545,14 @@ Direct request: while sphere sequences are running a click will not register. ad
   Verified in the page: Camera / Lighting / Toon Shading / Field Layout headers all measure lock 6 px and undock 31 px from the right edge (Camera was 139 px); unchecking Field Of View on Desktop hid that row on Mobile
   (others stayed), the group checkbox went indeterminate, unchecking the whole group hid all Camera sliders on Mobile; on the Mobile tab the Camera header icons stay at 31 / 6.
 
+2026-10-14  -  Startup hold -> cursor tracking: the release ease-in no longer runs out after 24 frames
+  Direct report: with Static Pose On Startup, after the startup sequence the hands all face one way, and on the first click they "rotate 180" and only then track with the user's damping. Checked by stepping animate() frame by
+  frame (new window.__debug.animateFrame) from the real parked state: tracking DOES start from the static pose (wrapper / arm / palm all exactly identity at release) - the jump was the end of the release ease-in added earlier
+  the same day: releaseStartupHold() set hand._handoffSettleFrames to 90, but animate() resets that counter to 24 every frame a hand is overridden by a click function (the click that ends the hold is one), so the Arm / Palm
+  Rotation damping cap ran out after ~24 frames and Arm Rotation (damping default 1 = instant) snapped the remaining distance (measured wrapper angle 92.4 -> 128.3 deg in 5 frames). Fix: inHandoffSettle also holds while
+  hand._startupEase > 0 (its own 90-frame counter), so the cap lasts the whole ease. Measured now from the same repro: 7.5, 62.2, 92.4, 109, 118, 123, 126, 127.5, 128.4, 129.4 deg at frames 0, 10 ... 90, largest single-frame
+  step 7.5 deg, no snap.
+
 2026-10-13  -  Camera: XY Center Field Mid Point button, and pan / zoom lock state re-derived every frame
 
 Direct requests: (1) "in the camera group, add a button XY Center Field Mid Point... my camera will be moved in the xy axes to center the field mid point. zoom and rotation will not be touched"; (2) "when i have my camera fully unlocked. i still cant pan or zoom".
