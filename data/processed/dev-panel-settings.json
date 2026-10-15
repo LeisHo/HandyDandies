@@ -8416,28 +8416,16 @@
         }
       ],
       "cameraX": 1.963636363636364,
-      "cameraY": 5.541526766141773e-15,
-      "cameraZ": 197.98779599525182,
+      "cameraY": 9.184850993605146e-15,
+      "cameraZ": 257.48779599525176,
       "cameraFov": 15,
       "cameraYaw": 0,
       "cameraPitch": 0,
       "cameraRoll": 0,
       "cameraDefaultPreset": "{\"cameraX\":1.963636363636364,\"cameraY\":9.184850993605146e-15,\"cameraZ\":257.48779599525176,\"cameraFov\":15,\"cameraZoom\":149.99999999999994,\"cameraRoll\":0,\"targetX\":1.963636363636364,\"targetY\":0,\"targetZ\":107.4877959952518}",
-      "cameraZoom": 90.50000000000001,
+      "cameraZoom": 149.99999999999994,
       "cameraZoomSpeed": 0.3,
       "savedCameras": [
-        {
-          "name": "HD - MOBILE - 35FOV",
-          "cameraX": -3.1777777777777776,
-          "cameraY": 2.071011807676939e-13,
-          "cameraZ": 260.17068872666084,
-          "cameraFov": 35,
-          "cameraZoom": 260.17068872666084,
-          "cameraRoll": 0,
-          "targetX": -3.1777777777777776,
-          "targetY": 1.9117032070864052e-13,
-          "targetZ": 0
-        },
         {
           "name": "HD - DESKTOP - 15 FOV",
           "cameraX": 1.963636363636364,
@@ -20257,18 +20245,6 @@
       "cameraZoomSpeed": 1,
       "savedCameras": [
         {
-          "name": "HD - MOBILE - 35FOV",
-          "cameraX": -3.1777777777777776,
-          "cameraY": 2.071011807676939e-13,
-          "cameraZ": 260.17068872666084,
-          "cameraFov": 35,
-          "cameraZoom": 260.17068872666084,
-          "cameraRoll": 0,
-          "targetX": -3.1777777777777776,
-          "targetY": 1.9117032070864052e-13,
-          "targetZ": 0
-        },
-        {
           "name": "HD - DESKTOP - 15 FOV",
           "cameraX": 1.963636363636364,
           "cameraY": 9.184850993605146e-15,
@@ -32086,18 +32062,6 @@
       "cameraZoom": 260.17068872666084,
       "cameraZoomSpeed": 1,
       "savedCameras": [
-        {
-          "name": "HD - MOBILE - 35FOV",
-          "cameraX": -3.1777777777777776,
-          "cameraY": 2.071011807676939e-13,
-          "cameraZ": 260.17068872666084,
-          "cameraFov": 35,
-          "cameraZoom": 260.17068872666084,
-          "cameraRoll": 0,
-          "targetX": -3.1777777777777776,
-          "targetY": 1.9117032070864052e-13,
-          "targetZ": 0
-        },
         {
           "name": "HD - DESKTOP - 15 FOV",
           "cameraX": 1.963636363636364,
