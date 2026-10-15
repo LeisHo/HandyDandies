@@ -1,0 +1,32 @@
+/* Bundled fonts for the Loading Preview > Text dropdown (2026-10-15). Latin subset, regular weight, woff2, all SIL Open Font License 1.1 (see ../fonts/README.txt).
+   A browser downloads an @font-face file only when text actually uses that family, so none of these cost anything at startup unless the loading text is on and the font is selected. */
+@font-face { font-family: "Inter"; font-style: normal; font-weight: 400; font-display: swap; src: url("../fonts/inter.woff2") format("woff2"); }
+@font-face { font-family: "Roboto"; font-style: normal; font-weight: 400; font-display: swap; src: url("../fonts/roboto.woff2") format("woff2"); }
+@font-face { font-family: "Open Sans"; font-style: normal; font-weight: 400; font-display: swap; src: url("../fonts/open-sans.woff2") format("woff2"); }
+@font-face { font-family: "Montserrat"; font-style: normal; font-weight: 400; font-display: swap; src: url("../fonts/montserrat.woff2") format("woff2"); }
+@font-face { font-family: "Lato"; font-style: normal; font-weight: 400; font-display: swap; src: url("../fonts/lato.woff2") format("woff2"); }
+@font-face { font-family: "Poppins"; font-style: normal; font-weight: 400; font-display: swap; src: url("../fonts/poppins.woff2") format("woff2"); }
+@font-face { font-family: "Nunito"; font-style: normal; font-weight: 400; font-display: swap; src: url("../fonts/nunito.woff2") format("woff2"); }
+@font-face { font-family: "Raleway"; font-style: normal; font-weight: 400; font-display: swap; src: url("../fonts/raleway.woff2") format("woff2"); }
+@font-face { font-family: "Work Sans"; font-style: normal; font-weight: 400; font-display: swap; src: url("../fonts/work-sans.woff2") format("woff2"); }
+@font-face { font-family: "Source Sans 3"; font-style: normal; font-weight: 400; font-display: swap; src: url("../fonts/source-sans-3.woff2") format("woff2"); }
+@font-face { font-family: "Quicksand"; font-style: normal; font-weight: 400; font-display: swap; src: url("../fonts/quicksand.woff2") format("woff2"); }
+@font-face { font-family: "Josefin Sans"; font-style: normal; font-weight: 400; font-display: swap; src: url("../fonts/josefin-sans.woff2") format("woff2"); }
+@font-face { font-family: "Oswald"; font-style: normal; font-weight: 400; font-display: swap; src: url("../fonts/oswald.woff2") format("woff2"); }
+@font-face { font-family: "DM Sans"; font-style: normal; font-weight: 400; font-display: swap; src: url("../fonts/dm-sans.woff2") format("woff2"); }
+@font-face { font-family: "Fira Sans"; font-style: normal; font-weight: 400; font-display: swap; src: url("../fonts/fira-sans.woff2") format("woff2"); }
+@font-face { font-family: "Playfair Display"; font-style: normal; font-weight: 400; font-display: swap; src: url("../fonts/playfair-display.woff2") format("woff2"); }
+@font-face { font-family: "Merriweather"; font-style: normal; font-weight: 400; font-display: swap; src: url("../fonts/merriweather.woff2") format("woff2"); }
+@font-face { font-family: "Lora"; font-style: normal; font-weight: 400; font-display: swap; src: url("../fonts/lora.woff2") format("woff2"); }
+@font-face { font-family: "Cormorant Garamond"; font-style: normal; font-weight: 400; font-display: swap; src: url("../fonts/cormorant-garamond.woff2") format("woff2"); }
+@font-face { font-family: "EB Garamond"; font-style: normal; font-weight: 400; font-display: swap; src: url("../fonts/eb-garamond.woff2") format("woff2"); }
+@font-face { font-family: "Libre Baskerville"; font-style: normal; font-weight: 400; font-display: swap; src: url("../fonts/libre-baskerville.woff2") format("woff2"); }
+@font-face { font-family: "Crimson Text"; font-style: normal; font-weight: 400; font-display: swap; src: url("../fonts/crimson-text.woff2") format("woff2"); }
+@font-face { font-family: "PT Serif"; font-style: normal; font-weight: 400; font-display: swap; src: url("../fonts/pt-serif.woff2") format("woff2"); }
+@font-face { font-family: "Bitter"; font-style: normal; font-weight: 400; font-display: swap; src: url("../fonts/bitter.woff2") format("woff2"); }
+@font-face { font-family: "Cinzel"; font-style: normal; font-weight: 400; font-display: swap; src: url("../fonts/cinzel.woff2") format("woff2"); }
+@font-face { font-family: "DM Serif Display"; font-style: normal; font-weight: 400; font-display: swap; src: url("../fonts/dm-serif-display.woff2") format("woff2"); }
+@font-face { font-family: "Source Serif 4"; font-style: normal; font-weight: 400; font-display: swap; src: url("../fonts/source-serif-4.woff2") format("woff2"); }
+@font-face { font-family: "Spectral"; font-style: normal; font-weight: 400; font-display: swap; src: url("../fonts/spectral.woff2") format("woff2"); }
+@font-face { font-family: "Zilla Slab"; font-style: normal; font-weight: 400; font-display: swap; src: url("../fonts/zilla-slab.woff2") format("woff2"); }
+@font-face { font-family: "Domine"; font-style: normal; font-weight: 400; font-display: swap; src: url("../fonts/domine.woff2") format("woff2"); }

@@ -731,39 +731,42 @@ let fieldWarmStage = 0, fieldWarmRevealIndex = 0, fieldWarmStartMs = 0, fieldWar
 // Batch size adapts to how much the last batch ADDED to the draw time (not to the absolute draw time, which a slow GPU has even with nothing new): doubled while a batch added under 10 ms, halved (never below 4) when it added over 25 ms -- both thresholds and the floor of 4 are judgment calls, not measurements.
 const FIELD_WARM_CAP_MS = 20000
 // Loading Preview > Text (2026-10-15, direct request): free text shown beside the loading animation. Thirty system fonts in two dropdown groups (see below); each has a fallback stack so a machine without the first choice still gets the same kind.
-// Grouped in the dropdown (an <optgroup> each): fifteen sans-serif, fifteen serif. System fonts only, so the loading screen needs no font download; which ones actually appear depends on what the machine has installed, and each has a fallback stack of the same kind.
+// Bundled web fonts (fonts/*.woff2, declared in src/fonts.css), grouped in the dropdown (an <optgroup> each): fifteen sans-serif, fifteen serif. They load on demand - only the selected family is ever downloaded, so they add nothing to startup while the loading text is off.
+// Each css value falls back to a system font of the same kind while the file loads (font-display: swap) or for characters outside the Latin subset.
 const LOADING_TEXT_FONTS = [
-  { name: 'Arial', group: 'Sans-serif', css: 'Arial, Helvetica, sans-serif' },
-  { name: 'Helvetica', group: 'Sans-serif', css: 'Helvetica, Arial, sans-serif' },
-  { name: 'Verdana', group: 'Sans-serif', css: 'Verdana, Geneva, sans-serif' },
-  { name: 'Trebuchet MS', group: 'Sans-serif', css: '"Trebuchet MS", Tahoma, sans-serif' },
-  { name: 'Tahoma', group: 'Sans-serif', css: 'Tahoma, Geneva, sans-serif' },
-  { name: 'Segoe UI', group: 'Sans-serif', css: '"Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' },
-  { name: 'Calibri', group: 'Sans-serif', css: 'Calibri, Carlito, "Segoe UI", Arial, sans-serif' },
-  { name: 'Candara', group: 'Sans-serif', css: 'Candara, Calibri, "Segoe UI", Arial, sans-serif' },
-  { name: 'Century Gothic', group: 'Sans-serif', css: '"Century Gothic", "URW Gothic", AppleGothic, Arial, sans-serif' },
-  { name: 'Gill Sans', group: 'Sans-serif', css: '"Gill Sans", "Gill Sans MT", Calibri, Arial, sans-serif' },
-  { name: 'Lucida Sans', group: 'Sans-serif', css: '"Lucida Sans", "Lucida Grande", "Lucida Sans Unicode", Verdana, sans-serif' },
-  { name: 'Optima', group: 'Sans-serif', css: 'Optima, Candara, "Segoe UI", Arial, sans-serif' },
-  { name: 'Futura', group: 'Sans-serif', css: 'Futura, "Century Gothic", "Trebuchet MS", Arial, sans-serif' },
-  { name: 'Franklin Gothic Medium', group: 'Sans-serif', css: '"Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif' },
-  { name: 'Avenir', group: 'Sans-serif', css: 'Avenir, "Avenir Next", "Segoe UI", Arial, sans-serif' },
-  { name: 'Georgia', group: 'Serif', css: 'Georgia, serif' },
-  { name: 'Times New Roman', group: 'Serif', css: '"Times New Roman", Times, serif' },
-  { name: 'Garamond', group: 'Serif', css: 'Garamond, "Palatino Linotype", serif' },
-  { name: 'Palatino Linotype', group: 'Serif', css: '"Palatino Linotype", Palatino, "Book Antiqua", serif' },
-  { name: 'Book Antiqua', group: 'Serif', css: '"Book Antiqua", Palatino, Georgia, serif' },
-  { name: 'Cambria', group: 'Serif', css: 'Cambria, Georgia, serif' },
-  { name: 'Constantia', group: 'Serif', css: 'Constantia, Georgia, serif' },
-  { name: 'Baskerville', group: 'Serif', css: 'Baskerville, "Baskerville Old Face", "Times New Roman", serif' },
-  { name: 'Didot', group: 'Serif', css: 'Didot, "Bodoni MT", "Times New Roman", serif' },
-  { name: 'Hoefler Text', group: 'Serif', css: '"Hoefler Text", "Baskerville Old Face", Garamond, serif' },
-  { name: 'Bodoni MT', group: 'Serif', css: '"Bodoni MT", Didot, "Times New Roman", serif' },
-  { name: 'Rockwell', group: 'Serif', css: 'Rockwell, "Courier Bold", Georgia, serif' },
-  { name: 'Century Schoolbook', group: 'Serif', css: '"Century Schoolbook", "New Century Schoolbook", Georgia, serif' },
-  { name: 'Perpetua', group: 'Serif', css: 'Perpetua, "Palatino Linotype", Georgia, serif' },
-  { name: 'Lucida Bright', group: 'Serif', css: '"Lucida Bright", Georgia, serif' }
+  { name: 'Inter', group: 'Sans-serif', css: '"Inter", Arial, Helvetica, sans-serif' },
+  { name: 'Roboto', group: 'Sans-serif', css: '"Roboto", Arial, Helvetica, sans-serif' },
+  { name: 'Open Sans', group: 'Sans-serif', css: '"Open Sans", Arial, Helvetica, sans-serif' },
+  { name: 'Montserrat', group: 'Sans-serif', css: '"Montserrat", Arial, Helvetica, sans-serif' },
+  { name: 'Lato', group: 'Sans-serif', css: '"Lato", Arial, Helvetica, sans-serif' },
+  { name: 'Poppins', group: 'Sans-serif', css: '"Poppins", Arial, Helvetica, sans-serif' },
+  { name: 'Nunito', group: 'Sans-serif', css: '"Nunito", Arial, Helvetica, sans-serif' },
+  { name: 'Raleway', group: 'Sans-serif', css: '"Raleway", Arial, Helvetica, sans-serif' },
+  { name: 'Work Sans', group: 'Sans-serif', css: '"Work Sans", Arial, Helvetica, sans-serif' },
+  { name: 'Source Sans 3', group: 'Sans-serif', css: '"Source Sans 3", Arial, Helvetica, sans-serif' },
+  { name: 'Quicksand', group: 'Sans-serif', css: '"Quicksand", Arial, Helvetica, sans-serif' },
+  { name: 'Josefin Sans', group: 'Sans-serif', css: '"Josefin Sans", Arial, Helvetica, sans-serif' },
+  { name: 'Oswald', group: 'Sans-serif', css: '"Oswald", Arial, Helvetica, sans-serif' },
+  { name: 'DM Sans', group: 'Sans-serif', css: '"DM Sans", Arial, Helvetica, sans-serif' },
+  { name: 'Fira Sans', group: 'Sans-serif', css: '"Fira Sans", Arial, Helvetica, sans-serif' },
+  { name: 'Playfair Display', group: 'Serif', css: '"Playfair Display", Georgia, "Times New Roman", serif' },
+  { name: 'Merriweather', group: 'Serif', css: '"Merriweather", Georgia, "Times New Roman", serif' },
+  { name: 'Lora', group: 'Serif', css: '"Lora", Georgia, "Times New Roman", serif' },
+  { name: 'Cormorant Garamond', group: 'Serif', css: '"Cormorant Garamond", Georgia, "Times New Roman", serif' },
+  { name: 'EB Garamond', group: 'Serif', css: '"EB Garamond", Georgia, "Times New Roman", serif' },
+  { name: 'Libre Baskerville', group: 'Serif', css: '"Libre Baskerville", Georgia, "Times New Roman", serif' },
+  { name: 'Crimson Text', group: 'Serif', css: '"Crimson Text", Georgia, "Times New Roman", serif' },
+  { name: 'PT Serif', group: 'Serif', css: '"PT Serif", Georgia, "Times New Roman", serif' },
+  { name: 'Bitter', group: 'Serif', css: '"Bitter", Georgia, "Times New Roman", serif' },
+  { name: 'Cinzel', group: 'Serif', css: '"Cinzel", Georgia, "Times New Roman", serif' },
+  { name: 'DM Serif Display', group: 'Serif', css: '"DM Serif Display", Georgia, "Times New Roman", serif' },
+  { name: 'Source Serif 4', group: 'Serif', css: '"Source Serif 4", Georgia, "Times New Roman", serif' },
+  { name: 'Spectral', group: 'Serif', css: '"Spectral", Georgia, "Times New Roman", serif' },
+  { name: 'Zilla Slab', group: 'Serif', css: '"Zilla Slab", Georgia, "Times New Roman", serif' },
+  { name: 'Domine', group: 'Serif', css: '"Domine", Georgia, "Times New Roman", serif' }
 ]
+// The first version of this dropdown (2026-10-15) listed system fonts; a saved choice from that list is moved to a bundled font of the same kind by setupLoadingPreviewTextGroup().
+const LOADING_TEXT_LEGACY_SERIF = ['Georgia','Times New Roman','Garamond','Palatino Linotype','Book Antiqua','Cambria','Constantia','Baskerville','Didot','Hoefler Text','Bodoni MT','Rockwell','Century Schoolbook','Perpetua','Lucida Bright']
 let loadingPreviewTextEl = null
 function updateLoadingPreviewText() {
   if (!loadingPreviewTextEl) {
@@ -787,6 +790,8 @@ function updateLoadingPreviewText() {
   el.style.paddingLeft = (cfg.loadingPreviewTextLetterSpacing ?? 0) + 'px' // letter-spacing also trails the last letter; this keeps the text centred on its anchor
   const f = LOADING_TEXT_FONTS.find((x) => x.name === cfg.loadingPreviewTextFont) || LOADING_TEXT_FONTS[0]
   el.style.fontFamily = f.css
+  // Start fetching the selected family now (a no-op once loaded); the text swaps from the fallback font when it arrives.
+  if (cfg.loadingPreviewTextEnabled && document.fonts && document.fonts.load) document.fonts.load('16px "' + f.name + '"').catch(() => {})
   el.style.transform = `translate(calc(-50% + ${cfg.loadingPreviewTextOffsetX ?? 0}px), calc(-50% + ${cfg.loadingPreviewTextOffsetY ?? 0}px))`
 }
 const LOADING_TEXT_ROW_KEYS = ['loadingPreviewTextContent', 'loadingPreviewTextFontSize', 'loadingPreviewTextLetterSpacing', 'loadingPreviewTextColor', 'loadingPreviewTextFont', 'loadingPreviewTextOffsetX', 'loadingPreviewTextOffsetY']
@@ -813,6 +818,7 @@ function setupLoadingPreviewTextGroup() {
   const gb = g.querySelector(':scope > .dp-group-body')
   LOADING_TEXT_ROW_KEYS.forEach((k) => { const row = document.querySelector('.dp-row[data-key="' + k + '"]'); if (row && row.parentElement === lpBody) gb.appendChild(row) })
   gateGroupHeader(LOADING_TEXT_GROUP_KEY, 'loadingPreviewTextEnabled')
+  if (!LOADING_TEXT_FONTS.some((x) => x.name === cfg.loadingPreviewTextFont)) setControlValue('loadingPreviewTextFont', LOADING_TEXT_LEGACY_SERIF.includes(cfg.loadingPreviewTextFont) ? 'Lora' : 'Inter') // a system font saved from the first version of this list
   safeRefreshSelectOptions('loadingPreviewTextFont')
   updateLoadingPreviewTextGroupVisibility()
   updateLoadingPreviewText()
@@ -2463,7 +2469,7 @@ const DEV_GROUPS = [
       { key: 'loadingPreviewTextFontSize', label: 'Font Size (Px)', type: 'slider', min: 8, max: 200, step: 1, def: 32, perDevice: true, onChange: () => updateLoadingPreviewText() },
       { key: 'loadingPreviewTextLetterSpacing', label: 'Letter Spacing (Px)', type: 'slider', min: -10, max: 100, step: 0.5, def: 0, perDevice: true, onChange: () => updateLoadingPreviewText() },
       { key: 'loadingPreviewTextColor', label: 'Font Color', type: 'color', def: '#ffffff', onChange: () => updateLoadingPreviewText() },
-      { key: 'loadingPreviewTextFont', label: 'Font', type: 'select', def: 'Arial', options: () => LOADING_TEXT_FONTS.map((f) => ({ value: f.name, group: f.group })), onChange: () => updateLoadingPreviewText() },
+      { key: 'loadingPreviewTextFont', label: 'Font', type: 'select', def: 'Inter', options: () => LOADING_TEXT_FONTS.map((f) => ({ value: f.name, group: f.group })), onChange: () => updateLoadingPreviewText() },
       { key: 'loadingPreviewTextOffsetX', label: 'Text Offset X (Px)', type: 'slider', min: -1500, max: 1500, step: 1, def: 0, perDevice: true, onChange: () => updateLoadingPreviewText() },
       { key: 'loadingPreviewTextOffsetY', label: 'Text Offset Y (Px)', type: 'slider', min: -1500, max: 1500, step: 1, def: 0, perDevice: true, onChange: () => updateLoadingPreviewText() },
       { key: 'loadingPreviewCameraEditMode', label: 'Loading Preview Camera Edit Mode', type: 'checkbox', def: false, onChange: (v) => { if (loadingPreviewOrbitControls) loadingPreviewOrbitControls.enabled = v; if (loadingPreviewCanvas) loadingPreviewCanvas.style.pointerEvents = v ? 'auto' : 'none' } }
