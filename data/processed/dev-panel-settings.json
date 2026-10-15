@@ -7729,13 +7729,13 @@
         }
       ],
       "cameraX": 1.953488372093023,
-      "cameraY": 2.7309179040067904e-14,
-      "cameraZ": 111.48288549781756,
+      "cameraY": 4.779139668756732e-14,
+      "cameraZ": 111.48288605503994,
       "cameraFov": 35,
       "cameraYaw": 0,
       "cameraPitch": 0,
       "cameraRoll": 0,
-      "cameraZoom": 111.49999999999999,
+      "cameraZoom": 111.49999999999997,
       "cameraZoomSpeed": 0.3,
       "savedCameras": [
         {
@@ -8264,7 +8264,7 @@
       "qualityPreset": "high",
       "staticPoseOnStartup": true,
       "hideFloorAfterHandOffset": true,
-      "handOffsetOnStartupEnabled": false,
+      "handOffsetOnStartupEnabled": true,
       "startupHandMaxClicks": 2,
       "startupHandOffsetZ": 0,
       "startupHandWaitForAll": true,
@@ -8328,7 +8328,7 @@
       "startupFnRetransitionStartTimeCurveVisibleOnly": true,
       "startupFnRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "startupFnRetransitionStartTimeRange": "{\"min\":0,\"max\":225}",
-      "sphereSeqEnabled": false,
+      "sphereSeqEnabled": true,
       "sphereStartZOffset": -15.5,
       "sphereStartRadius": 0.1,
       "sphereSeqDurationMs": 1850,
@@ -30822,7 +30822,7 @@
       "qualityPreset": "high",
       "staticPoseOnStartup": true,
       "hideFloorAfterHandOffset": true,
-      "handOffsetOnStartupEnabled": false,
+      "handOffsetOnStartupEnabled": true,
       "startupHandMaxClicks": 2,
       "startupHandOffsetZ": 0,
       "startupHandWaitForAll": true,
@@ -30886,7 +30886,7 @@
       "startupFnRetransitionStartTimeCurveVisibleOnly": true,
       "startupFnRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "startupFnRetransitionStartTimeRange": "{\"min\":0,\"max\":225}",
-      "sphereSeqEnabled": false,
+      "sphereSeqEnabled": true,
       "sphereStartZOffset": -15.5,
       "sphereStartRadius": 0.1,
       "sphereSeqDurationMs": 1850,
@@ -36009,7 +36009,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -262401,8 +262401,8 @@
     "desktop": {
       "left": 942.4249877929688,
       "top": 30.787500381469727,
-      "width": 559.9750366210938,
-      "height": 647.9874877929688
+      "width": 563.1749877929688,
+      "height": 649.5875244140625
     }
   }
 }
