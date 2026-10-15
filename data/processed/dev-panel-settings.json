@@ -7242,8 +7242,8 @@
           "group": "FIST ROTATE"
         }
       ],
-      "cameraX": 1.5682191670518537,
-      "cameraY": 1.4640212155340318,
+      "cameraX": 1.953488372093023,
+      "cameraY": 6.827405905246493e-15,
       "cameraZ": 111.4792552191253,
       "cameraFov": 35,
       "cameraYaw": 0,
@@ -7406,6 +7406,18 @@
           "targetX": -3.1777777777777776,
           "targetY": 0,
           "targetZ": 0
+        },
+        {
+          "name": "DESKTOP",
+          "cameraX": 1.953488372093023,
+          "cameraY": 6.827405905246493e-15,
+          "cameraZ": 111.4792552191253,
+          "cameraFov": 35,
+          "cameraZoom": 111.49999999999999,
+          "cameraRoll": 0,
+          "targetX": 1.953488372093023,
+          "targetY": 0,
+          "targetZ": -0.020744780874678397
         }
       ],
       "lockCameraPan": false,
@@ -18183,6 +18195,18 @@
           "targetX": -3.1777777777777776,
           "targetY": 0,
           "targetZ": 0
+        },
+        {
+          "name": "DESKTOP",
+          "cameraX": 1.953488372093023,
+          "cameraY": 6.827405905246493e-15,
+          "cameraZ": 111.4792552191253,
+          "cameraFov": 35,
+          "cameraZoom": 111.49999999999999,
+          "cameraRoll": 0,
+          "targetX": 1.953488372093023,
+          "targetY": 0,
+          "targetZ": -0.020744780874678397
         }
       ],
       "lockCameraPan": true,
@@ -28960,6 +28984,18 @@
           "targetX": -3.1777777777777776,
           "targetY": 0,
           "targetZ": 0
+        },
+        {
+          "name": "DESKTOP",
+          "cameraX": 1.953488372093023,
+          "cameraY": 6.827405905246493e-15,
+          "cameraZ": 111.4792552191253,
+          "cameraFov": 35,
+          "cameraZoom": 111.49999999999999,
+          "cameraRoll": 0,
+          "targetX": 1.953488372093023,
+          "targetY": 0,
+          "targetZ": -0.020744780874678397
         }
       ],
       "lockCameraPan": false,
@@ -254895,7 +254931,7 @@
     },
     {
       "key": "New Group (11)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -255094,7 +255130,7 @@
           "type": "group",
           "group": {
             "key": "Camera",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -255481,7 +255517,7 @@
         },
         {
           "key": "Camera",
-          "collapsed": true,
+          "collapsed": false,
           "locked": true,
           "items": [
             {
@@ -255668,7 +255704,7 @@
     },
     {
       "key": "Starting State",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
