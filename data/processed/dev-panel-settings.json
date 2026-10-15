@@ -242,7 +242,7 @@
           "targetZ": -55.38127745817587
         }
       ],
-      "loadingPreviewCameraSelector": "Loading Preview Camera 13",
+      "loadingPreviewCameraSelector": "LOADING - HANDS",
       "loadingPreviewSavedLighting": [
         {
           "name": "3 Tone - SideFront",
@@ -300,7 +300,7 @@
           "ambientGroundColor": "#3a2f2a"
         }
       ],
-      "loadingPreviewLightingSelector": "LOADING",
+      "loadingPreviewLightingSelector": "LOADING HANDS",
       "loadingPreviewKeyAzimuth": 72,
       "loadingPreviewKeyElevation": 55.99999999999999,
       "loadingPreviewKeyTargetHeight": 106,
@@ -21790,7 +21790,7 @@
           "targetZ": -55.38127745817587
         }
       ],
-      "loadingPreviewCameraSelector": "Loading Preview Camera 13",
+      "loadingPreviewCameraSelector": "LOADING - HANDS",
       "loadingPreviewSavedLighting": [
         {
           "name": "3 Tone - SideFront",
@@ -21848,7 +21848,7 @@
           "ambientGroundColor": "#3a2f2a"
         }
       ],
-      "loadingPreviewLightingSelector": "LOADING",
+      "loadingPreviewLightingSelector": "LOADING HANDS",
       "loadingPreviewKeyAzimuth": 72,
       "loadingPreviewKeyElevation": 55.99999999999999,
       "loadingPreviewKeyTargetHeight": 106,
