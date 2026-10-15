@@ -10008,6 +10008,7 @@ function computeResponsiveWristSplayDeg(distanceToCursor, minLiveDist, liveDistR
 //  - wrist splay / finger curl: added at the three places the skeleton is posed (applyPoseValuesToHand(), the idle repose); wrist crop: added to the target arm length.
 const RV_LIN = JSON.stringify([{ x: 0, y: 0 }, { x: 1, y: 1 }])
 const RV_FLAT1 = JSON.stringify([{ x: 0, y: 1 }, { x: 1, y: 1 }])
+const RV_FLAT_HALF = JSON.stringify([{ x: 0, y: 0.5 }, { x: 1, y: 0.5 }]) // an Easing curve is a SPEED profile (constant speed by default), like the click functions' Easing
 const RV_CURVE_X_VELOCITY = 'X: Cursor Velocity (Min -> Max Tracked)'
 const RV_CURVE_X_DIST = 'X: Hand Distance From The Trigger Cursor (where the cursor was when it started moving fast enough; 0 = Min Trigger Distance, 1 = Max Trigger Distance)'
 let rvSetList = [] // [{ prefix, title }] in panel order
@@ -10036,6 +10037,28 @@ function rvCurveY(key, x) { // curve height 0..1 at x (0..1); an unreadable curv
   const xc = THREE.MathUtils.clamp(x, 0, 1)
   if (!Array.isArray(pts) || !pts.length) return xc
   return THREE.MathUtils.clamp(evaluateArmLengthCurve(pts, xc), 0, 1)
+}
+// An Easing curve is a SPEED profile (2026-10-15, direct correction: the Y axis is the retransition / displacement speed, not the amount): y is the relative speed at that progress, so the eased progress is the share
+// of the whole distance covered by then = the running integral of the speed, normalised to 1. A flat curve is constant speed (no easing); the total time stays the duration. A zero speed is floored so the
+// integral always reaches the end. Built once per curve string (64 steps).
+const rvProfileCache = new Map()
+function rvProfile(key, x) {
+  const raw = cfg[key]
+  let tab = rvProfileCache.get(raw)
+  if (!tab) {
+    const N = 64, pts = rvJson(raw, null)
+    tab = new Float32Array(N + 1)
+    for (let i = 0; i < N; i++) {
+      const u = (i + 0.5) / N
+      const y = Array.isArray(pts) && pts.length ? THREE.MathUtils.clamp(evaluateArmLengthCurve(pts, u), 0, 1) : 0.5
+      tab[i + 1] = tab[i] + Math.max(y, 0.02)
+    }
+    for (let i = 1; i <= N; i++) tab[i] /= tab[N]
+    if (rvProfileCache.size > 100) rvProfileCache.clear()
+    rvProfileCache.set(raw, tab)
+  }
+  const f = THREE.MathUtils.clamp(x, 0, 1) * (tab.length - 1), i = Math.min(Math.floor(f), tab.length - 2)
+  return tab[i] + (tab[i + 1] - tab[i]) * (f - i)
 }
 function rvLerp(range, t) { return range.min + (range.max - range.min) * t }
 
@@ -10067,10 +10090,10 @@ function rvSharedControls() {
     { key: 'rvRetransitionStartTimeRange', label: 'Min / Max Retransition Start Time (Ms)', type: 'text', def: '{"min":0,"max":300}', ...pd },
     { key: 'rvRetransitionStartTimeCurve', label: 'Retransition Start Time Curve (Distance -> Start Time)', type: 'text', def: RV_LIN, ...pd },
     { key: 'rvRetransitionEasingCurveEnabled', label: 'On/Off', type: 'checkbox', def: false, ...pd },
-    { key: 'rvRetransitionEasingCurve', label: 'Retransition Easing Curve (Progress -> Amount)', type: 'text', def: RV_LIN, ...pd },
+    { key: 'rvRetransitionEasingCurve', label: 'Retransition Easing Curve (Progress -> Retransition Speed)', type: 'text', def: RV_FLAT_HALF, ...pd },
     // Easing
     { key: 'rvEasingCurveEnabled', label: 'On/Off', type: 'checkbox', def: false, ...pd },
-    { key: 'rvEasingCurve', label: 'Easing Curve (Progress -> Amount)', type: 'text', def: RV_LIN, ...pd },
+    { key: 'rvEasingCurve', label: 'Easing Curve (Progress -> Displacement Speed)', type: 'text', def: RV_FLAT_HALF, ...pd },
     // The list of Displacement Angle sets (bookkeeping; the set groups and their Add button are inserted at this row, i.e. BELOW Retransition and Easing - 2026-10-15, direct request).
     { key: 'rvSets', label: 'Displacement Angle Sets (internal)', type: 'text', def: '[]', onChange: () => rvReconcileSets() }
   ]
@@ -10185,8 +10208,8 @@ async function setupResponsiveVelocity() {
   rvCurveRow('rvRetransitionSpeedCurve', RV_CURVE_X_DIST + '  ·  Y: Retransition Duration (0 = Min, 1 = Max)', [{ x: 0, y: 0 }, { x: 1, y: 1 }])
   rvRangeRow('rvRetransitionStartTimeRange', { trackMin: 0, trackMax: 2000, unit: 'ms', defaultValue: { min: 0, max: 300 } })
   rvCurveRow('rvRetransitionStartTimeCurve', RV_CURVE_X_DIST + '  ·  Y: Retransition Start Time (0 = Min, 1 = Max)', [{ x: 0, y: 0 }, { x: 1, y: 1 }])
-  rvCurveRow('rvRetransitionEasingCurve', 'X: Retransition Progress  ·  Y: Amount Removed (0 = None, 1 = All)', [{ x: 0, y: 0 }, { x: 1, y: 1 }])
-  rvCurveRow('rvEasingCurve', 'X: Displacement Progress  ·  Y: Amount Applied (0 = None, 1 = Full)', [{ x: 0, y: 0 }, { x: 1, y: 1 }])
+  rvCurveRow('rvRetransitionEasingCurve', 'X: Retransition Progress  ·  Y: Retransition Speed (0 = slowest, 1 = fastest; the total time stays the Retransition Speed)', [{ x: 0, y: 0.5 }, { x: 1, y: 0.5 }])
+  rvCurveRow('rvEasingCurve', 'X: Displacement Progress  ·  Y: Displacement Speed (0 = slowest, 1 = fastest; the total time stays the Displacement Speed)', [{ x: 0, y: 0.5 }, { x: 1, y: 0.5 }])
   wrapGatedSubgroup('rvStartTimeEnabled', ['rvStartTimeRange', 'rvStartTimeCurve'], 'Displacement Start Time Curve')
   wrapGatedSubgroup('rvSpeedEnabled', ['rvSpeedRange', 'rvSpeedCurve'], 'Displacement Speed Curve')
   wrapGatedSubgroup('rvRetransitionEnabled', ['rvRetransitionSpeedMs', 'rvRetransitionSpeedCurveEnabled', 'rvRetransitionSpeedRange', 'rvRetransitionSpeedCurve', 'rvRetransitionStartTimeCurveEnabled', 'rvRetransitionStartTimeRange', 'rvRetransitionStartTimeCurve', 'rvRetransitionEasingCurveEnabled', 'rvRetransitionEasingCurve'], 'Retransition')
@@ -10458,7 +10481,7 @@ function updateResponsiveVelocity(nowMs) {
       st.wasTrig = trig
       if (st.p <= 0) continue
       live = true
-      const w = trig ? (easeOn ? rvCurveY('rvEasingCurve', st.p) : st.p) : (retEaseOn ? 1 - rvCurveY('rvRetransitionEasingCurve', 1 - st.p) : st.p)
+      const w = trig ? (easeOn ? rvProfile('rvEasingCurve', st.p) : st.p) : (retEaseOn ? 1 - rvProfile('rvRetransitionEasingCurve', 1 - st.p) : st.p)
       if (st.disp) dispSum.set(dispSum.x + st.wx * st.disp * w, dispSum.y + st.wy * st.disp * w, dispSum.z + st.wz * st.disp * w)
       if (st.arm) tiltSum.set(tiltSum.x + st.wx * st.arm * w, tiltSum.y + st.wy * st.arm * w, tiltSum.z + st.wz * st.arm * w)
       splay += st.splay * w; crop += st.crop * w
