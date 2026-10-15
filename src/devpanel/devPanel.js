@@ -767,7 +767,13 @@ function fillSelectOptions(ctrl, select, preferredValue) {
   })
   const next = values.includes(preferredValue) ? preferredValue : (values[0] || '')
   select.value = next
+  updateUsingLabel(select)
   return next
+}
+function updateUsingLabel(select) {
+  if (!select || !select._usingLabel) return
+  const opt = select.selectedOptions && select.selectedOptions[0]
+  select._usingLabel.textContent = 'Using: ' + (opt && select.value !== '' ? opt.textContent : 'Default')
 }
 // Triggers a real persisted save (the same localStorage/remote write the
 // panel's own Save/Sync button performs) programmatically -- e.g. for a
@@ -1054,8 +1060,15 @@ export function buildRow(ctrl) {
     buildMultiSelectRow(ctrl, row)
   } else if (ctrl.type === 'select') {
     const select = el('select')
-    select.addEventListener('change', () => commit(ctrl, select.value))
+    select.addEventListener('change', () => { commit(ctrl, select.value); updateUsingLabel(select) })
     row.appendChild(select)
+    // Direct request 2026-10-14 ("for all item selectors, show a text somewhere showing the current setting used or the default"): every select whose options come from a host list (saved cameras / lighting / poses / sequences ...)
+    // gets a line under it that names what is in use, or 'Default' when the list has nothing to pick. A select with fixed options (a Mode, a Type) is not an item selector and gets none.
+    if (typeof ctrl.options === 'function') {
+      select._usingLabel = el('div', 'dp-using-label')
+      row.appendChild(select._usingLabel)
+      updateUsingLabel(select)
+    }
     numEls[ctrl.key] = { type: 'select', select }
     // Deliberately does NOT call `ctrl.options()` here: buildRow() runs
     // synchronously inside the host's own `initDevPanel()` call, often
@@ -1408,7 +1421,7 @@ function buildListPickerRow(ctrl, row) {
       // meaningless (and could even collide) in whatever project imports
       // this; the imported items land ungrouped there, same as any other
       // freshly-Saved item.
-      const payload = checked.map(({ group, ...rest }) => rest)
+      const payload = checked.map(({ group, ...rest }) => (ctrl.exportTransform ? ctrl.exportTransform(rest) : rest)) // ctrl.exportTransform (optional): tag / convert an item on its way out (main.js: Loading Preview camera + lighting are in this project's own frame)
       try {
         await navigator.clipboard.writeText(JSON.stringify(payload, null, 2))
         flashBtn(exportBtn, `Copied ${checked.length}!`)

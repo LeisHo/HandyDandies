@@ -8,7 +8,7 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js'
 import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js'
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js'
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js'
-import { DEV_MODE, initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab, beginDynamicBatch, endDynamicBatch } from './devpanel/devPanel.js?v=65'
+import { DEV_MODE, initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab, beginDynamicBatch, endDynamicBatch } from './devpanel/devPanel.js?v=66'
 
 // Toon Shading colour gradient (2026-10-12): MeshToonMaterial's getGradientIrradiance() only reads the RED channel of
 // its gradientMap (a grey ramp). Reading RGB instead is identical for every grey ramp (all channels equal) and lets
@@ -2085,8 +2085,11 @@ const DEV_GROUPS = [
         type: 'list-picker',
         def: [],
         itemLabel: 'Loading Preview Camera',
+        exportable: true,
         importable: true,
-        importTransform: (item) => convertHandoCameraPreset(item),
+        // An exported item is already in this project's own frame (tagged hdFrame); only a HANDO-authored one still needs converting on import.
+        exportTransform: (item) => ({ ...item, hdFrame: true }),
+        importTransform: (item) => importFrameAware(item, convertHandoCameraPreset),
         captureCurrent: () => captureLoadingPreviewCameraPreset(),
         onUse: (item) => applyLoadingPreviewCameraPreset(item),
         // Direct report 2026-09-19 ("those options arent immediatly
@@ -2119,10 +2122,12 @@ const DEV_GROUPS = [
         type: 'list-picker',
         def: [],
         itemLabel: 'Loading Preview Lighting',
+        exportable: true,
         importable: true,
-        importTransform: (item) => convertHandoLightingPreset(item),
+        exportTransform: (item) => ({ ...item, hdFrame: true }),
+        importTransform: (item) => importFrameAware(item, convertHandoLightingPreset),
         captureCurrent: () => captureLoadingPreviewLightingPreset(),
-        onUse: (item) => { if (loadingPreviewKeyLightRef && loadingPreviewHemiLightRef) applyLoadingPreviewLighting(loadingPreviewKeyLightRef, loadingPreviewHemiLightRef, item) },
+        onUse: (item) => { if (loadingPreviewKeyLightRef && loadingPreviewHemiLightRef) { applyLoadingPreviewLighting(loadingPreviewKeyLightRef, loadingPreviewHemiLightRef, item); syncLoadingPreviewLightSliders() } },
         onChange: () => safeRefreshSelectOptions('loadingPreviewLightingSelector')
       },
       // Same fix as loadingPreviewCameraSelector above -- was missing an
@@ -2131,7 +2136,17 @@ const DEV_GROUPS = [
       // lights when the selection is cleared, matching what
       // buildLoadingPreview() itself does at build time for "no preset
       // selected."
-      { key: 'loadingPreviewLightingSelector', label: 'Loading Preview Lighting', type: 'select', def: '', options: () => (cfg.loadingPreviewSavedLighting || []).map((l) => ({ value: l.name, group: l.group || null })), onChange: () => { if (!loadingPreviewKeyLightRef || !loadingPreviewHemiLightRef) return; const item = (cfg.loadingPreviewSavedLighting || []).find((l) => l.name === cfg.loadingPreviewLightingSelector); if (item) applyLoadingPreviewLighting(loadingPreviewKeyLightRef, loadingPreviewHemiLightRef, item); else applyLoadingPreviewLightingDefault() } },
+      { key: 'loadingPreviewLightingSelector', label: 'Loading Preview Lighting', type: 'select', def: '', options: () => (cfg.loadingPreviewSavedLighting || []).map((l) => ({ value: l.name, group: l.group || null })), onChange: () => { if (!loadingPreviewKeyLightRef || !loadingPreviewHemiLightRef) return; const item = (cfg.loadingPreviewSavedLighting || []).find((l) => l.name === cfg.loadingPreviewLightingSelector); if (item) applyLoadingPreviewLighting(loadingPreviewKeyLightRef, loadingPreviewHemiLightRef, item); else applyLoadingPreviewLightingDefault(); syncLoadingPreviewLightSliders() } },
+      // Direct request 2026-10-14 (lighting sliders for the Loading Preview): live editors for the preview's own key / ambient lights. They show whatever the preview is lit with (the selected Saved Lighting, or the main scene's lights
+      // when none is selected) and Save / Overwrite above captures them. Saved slider values are NOT re-applied on reload -- the build re-reads the selected preset and re-syncs them.
+      { key: 'loadingPreviewKeyAzimuth', label: 'Preview Key Light Azimuth (Deg)', type: 'slider', min: 0, max: 360, step: 1, def: 209, onChange: () => applyLoadingPreviewLightSliders() },
+      { key: 'loadingPreviewKeyElevation', label: 'Preview Key Light Elevation (Deg)', type: 'slider', min: -89, max: 89, step: 1, def: 56, onChange: () => applyLoadingPreviewLightSliders() },
+      { key: 'loadingPreviewKeyTargetHeight', label: 'Preview Key Light Aim Height (%)', type: 'slider', min: -100, max: 100, step: 1, def: 2, onChange: () => applyLoadingPreviewLightSliders() },
+      { key: 'loadingPreviewKeyIntensity', label: 'Preview Key Light Intensity (x)', type: 'slider', min: 0, max: 6, step: 0.1, def: 6, onChange: () => applyLoadingPreviewLightSliders() },
+      { key: 'loadingPreviewKeyColor', label: 'Preview Key Light Color', type: 'color', def: '#ffffff', onChange: () => applyLoadingPreviewLightSliders() },
+      { key: 'loadingPreviewAmbientIntensity', label: 'Preview Ambient Intensity (x)', type: 'slider', min: 0, max: 3, step: 0.05, def: 0, onChange: () => applyLoadingPreviewLightSliders() },
+      { key: 'loadingPreviewAmbientSkyColor', label: 'Preview Ambient Sky Color', type: 'color', def: '#cfe8ff', onChange: () => applyLoadingPreviewLightSliders() },
+      { key: 'loadingPreviewAmbientGroundColor', label: 'Preview Ambient Ground Color', type: 'color', def: '#000000', onChange: () => applyLoadingPreviewLightSliders() },
       { key: 'loadingPreviewSpeedMs', label: 'Loading Preview Speed (Ms / Cycle)', type: 'slider', min: 200, max: 5000, step: 50, def: 900 },
       // Sequence Mode - Count/Loop/Oscillate -- direct spec item, the
       // SAME control shape just added to every click function (see
@@ -2801,6 +2816,7 @@ const DEV_GROUPS = [
         key: 'savedCameras',
         label: 'Saved Cameras',
         type: 'list-picker',
+        exportable: true,
         def: [],
         itemLabel: 'Camera',
         importable: true,
@@ -2843,6 +2859,7 @@ const DEV_GROUPS = [
         key: 'savedLighting',
         label: 'Saved Lighting',
         type: 'list-picker',
+        exportable: true,
         def: [],
         itemLabel: 'Lighting',
         importable: true,
@@ -7744,6 +7761,7 @@ function buildLoadingPreview(bypassEnabledGate) {
   loadingPreviewHemiLightRef = hemi
   const lightingPreset = (cfg.loadingPreviewSavedLighting || []).find((l) => l.name === cfg.loadingPreviewLightingSelector)
   if (lightingPreset) applyLoadingPreviewLighting(key, hemi, lightingPreset)
+  syncLoadingPreviewLightSliders()
 
   const clone = cloneSkeletal(modelRoot)
   clone.quaternion.copy(alignQuat)
@@ -8100,7 +8118,7 @@ function captureLoadingPreviewLightingPreset() {
   return {
     keyAzimuth: azimuth,
     keyElevation: elevation,
-    keyTargetHeight: LIGHTING_KEY_DEFAULTS.keyTargetHeight,
+    keyTargetHeight: handBoundsRadiusLocal > 0 ? (loadingPreviewKeyLightRef.target.position.y / handBoundsRadiusLocal) * 100 : LIGHTING_KEY_DEFAULTS.keyTargetHeight,
     keyIntensity: loadingPreviewKeyLightRef.intensity,
     keyColor: '#' + loadingPreviewKeyLightRef.color.getHexString(),
     ambientIntensity: loadingPreviewHemiLightRef.intensity,
@@ -8137,6 +8155,30 @@ function captureLoadingPreviewLightingPreset() {
 // `savedCameras`/`savedLighting` frame the WHOLE FIELD at a completely
 // different (field-radius) scale HANDO has no equivalent of, so this
 // same conversion wouldn't be meaningful there.
+// Items exported from this project's own Loading Preview lists carry hdFrame (already in this frame); anything else is HANDO-authored and gets converted.
+function importFrameAware(item, convert) {
+  if (item && item.hdFrame) { const { hdFrame, ...rest } = item; return rest }
+  return convert(item)
+}
+const LP_LIGHT_SLIDER_KEYS = { keyAzimuth: 'loadingPreviewKeyAzimuth', keyElevation: 'loadingPreviewKeyElevation', keyTargetHeight: 'loadingPreviewKeyTargetHeight', keyIntensity: 'loadingPreviewKeyIntensity', keyColor: 'loadingPreviewKeyColor', ambientIntensity: 'loadingPreviewAmbientIntensity', ambientSkyColor: 'loadingPreviewAmbientSkyColor', ambientGroundColor: 'loadingPreviewAmbientGroundColor' }
+// Sliders -> the preview's lights (live).
+function applyLoadingPreviewLightSliders() {
+  if (!loadingPreviewKeyLightRef || !loadingPreviewHemiLightRef) return
+  const preset = {}
+  Object.keys(LP_LIGHT_SLIDER_KEYS).forEach((k) => { preset[k] = cfg[LP_LIGHT_SLIDER_KEYS[k]] })
+  applyLoadingPreviewLighting(loadingPreviewKeyLightRef, loadingPreviewHemiLightRef, preset)
+}
+// The preview's lights -> sliders (after a build, a Use, or a selector change).
+function syncLoadingPreviewLightSliders() {
+  if (!loadingPreviewKeyLightRef || !loadingPreviewHemiLightRef) return
+  const cur = captureLoadingPreviewLightingPreset()
+  Object.keys(LP_LIGHT_SLIDER_KEYS).forEach((k) => {
+    if (cur[k] === undefined) return
+    const ck = LP_LIGHT_SLIDER_KEYS[k]
+    cfg[ck] = cur[k]
+    try { syncValue(ck, cur[k]) } catch (e) { /* panel not built yet */ }
+  })
+}
 function convertHandoCameraPreset(rawItem) {
   const item = normalizeCameraPresetItem(rawItem)
   const pos = new THREE.Vector3(
