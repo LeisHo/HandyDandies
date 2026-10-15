@@ -34,8 +34,55 @@
           "name": "Handipants OL (Crop Block, Draco)",
           "id": "repo:HandipantsOL_Clip",
           "source": "repo"
+        },
+        {
+          "name": "HD 300 (366 tris)",
+          "id": "repo:HD-300",
+          "source": "repo"
+        },
+        {
+          "name": "HD 500 (488 tris)",
+          "id": "repo:HD-500",
+          "source": "repo"
+        },
+        {
+          "name": "HD 1K (1,018 tris)",
+          "id": "repo:HD-1K",
+          "source": "repo"
+        },
+        {
+          "name": "HD 2k (2,036 tris)",
+          "id": "repo:HD-2k",
+          "source": "repo"
+        },
+        {
+          "name": "HD 3K (3,052 tris)",
+          "id": "repo:HD-3K",
+          "source": "repo"
+        },
+        {
+          "name": "HD 4k (4,074 tris)",
+          "id": "repo:HD-4k",
+          "source": "repo"
+        },
+        {
+          "name": "HD 5K (5,000 tris)",
+          "id": "repo:HD-5K",
+          "source": "repo"
+        },
+        {
+          "name": "HD 6k (6,014 tris)",
+          "id": "repo:HD-6k",
+          "source": "repo"
+        },
+        {
+          "name": "HD 8k (8,144 tris)",
+          "id": "repo:HD-8k",
+          "source": "repo"
         }
       ],
+      "smallScaleModelsEnabled": false,
+      "smallScaleModelLevels": "[]",
       "fieldRows": 43,
       "fieldCols": 60,
       "rowSpacing": 5,
@@ -44,7 +91,7 @@
       "alternateRowOffset": 4,
       "progressiveRowOffset": 1,
       "useProgressiveOffset": false,
-      "hideHands": true,
+      "hideHands": false,
       "fieldOffsetX": 0,
       "fieldOffsetY": 0,
       "fieldOffsetZ": 0,
@@ -343,7 +390,7 @@
       "loadingPreviewSequenceHoldMs": 0,
       "loadingPreviewSize": 1600,
       "loadingPreviewRotationX": -85.46571581217302,
-      "loadingPreviewRotationY": -109.10457274713563,
+      "loadingPreviewRotationY": -109.10457274713559,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0,
       "loadingPreviewOffsetY": 0,
@@ -7856,7 +7903,7 @@
         }
       ],
       "cameraX": 1.9534883720930232,
-      "cameraY": 2.2166107064567122e-13,
+      "cameraY": 2.382856509440966e-13,
       "cameraZ": 115.97925521912504,
       "cameraFov": 33,
       "cameraYaw": 0,
@@ -8413,6 +8460,7 @@
       "pixelRatio": 1.25,
       "resolutionScale": 100,
       "qualityPreset": "high",
+      "skipOffScreenFingerCurls": true,
       "staticPoseOnStartup": true,
       "hideFloorAfterHandOffset": true,
       "handOffsetOnStartupEnabled": true,
@@ -10808,8 +10856,55 @@
           "name": "Handipants OL (Crop Block, Draco)",
           "id": "repo:HandipantsOL_Clip",
           "source": "repo"
+        },
+        {
+          "name": "HD 300 (366 tris)",
+          "id": "repo:HD-300",
+          "source": "repo"
+        },
+        {
+          "name": "HD 500 (488 tris)",
+          "id": "repo:HD-500",
+          "source": "repo"
+        },
+        {
+          "name": "HD 1K (1,018 tris)",
+          "id": "repo:HD-1K",
+          "source": "repo"
+        },
+        {
+          "name": "HD 2k (2,036 tris)",
+          "id": "repo:HD-2k",
+          "source": "repo"
+        },
+        {
+          "name": "HD 3K (3,052 tris)",
+          "id": "repo:HD-3K",
+          "source": "repo"
+        },
+        {
+          "name": "HD 4k (4,074 tris)",
+          "id": "repo:HD-4k",
+          "source": "repo"
+        },
+        {
+          "name": "HD 5K (5,000 tris)",
+          "id": "repo:HD-5K",
+          "source": "repo"
+        },
+        {
+          "name": "HD 6k (6,014 tris)",
+          "id": "repo:HD-6k",
+          "source": "repo"
+        },
+        {
+          "name": "HD 8k (8,144 tris)",
+          "id": "repo:HD-8k",
+          "source": "repo"
         }
       ],
+      "smallScaleModelsEnabled": false,
+      "smallScaleModelLevels": "[]",
       "fieldRows": 45,
       "fieldCols": 30,
       "rowSpacing": 8.5,
@@ -11117,7 +11212,7 @@
       "loadingPreviewSequenceHoldMs": 0,
       "loadingPreviewSize": 1390,
       "loadingPreviewRotationX": -85.46571581217302,
-      "loadingPreviewRotationY": -109.10457274713563,
+      "loadingPreviewRotationY": -109.10457274713559,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0,
       "loadingPreviewOffsetY": 0,
@@ -19187,6 +19282,7 @@
       "pixelRatio": 1.25,
       "resolutionScale": 100,
       "qualityPreset": "high",
+      "skipOffScreenFingerCurls": true,
       "staticPoseOnStartup": true,
       "hideFloorAfterHandOffset": true,
       "handOffsetOnStartupEnabled": true,
@@ -21582,8 +21678,55 @@
           "name": "Handipants OL (Crop Block, Draco)",
           "id": "repo:HandipantsOL_Clip",
           "source": "repo"
+        },
+        {
+          "name": "HD 300 (366 tris)",
+          "id": "repo:HD-300",
+          "source": "repo"
+        },
+        {
+          "name": "HD 500 (488 tris)",
+          "id": "repo:HD-500",
+          "source": "repo"
+        },
+        {
+          "name": "HD 1K (1,018 tris)",
+          "id": "repo:HD-1K",
+          "source": "repo"
+        },
+        {
+          "name": "HD 2k (2,036 tris)",
+          "id": "repo:HD-2k",
+          "source": "repo"
+        },
+        {
+          "name": "HD 3K (3,052 tris)",
+          "id": "repo:HD-3K",
+          "source": "repo"
+        },
+        {
+          "name": "HD 4k (4,074 tris)",
+          "id": "repo:HD-4k",
+          "source": "repo"
+        },
+        {
+          "name": "HD 5K (5,000 tris)",
+          "id": "repo:HD-5K",
+          "source": "repo"
+        },
+        {
+          "name": "HD 6k (6,014 tris)",
+          "id": "repo:HD-6k",
+          "source": "repo"
+        },
+        {
+          "name": "HD 8k (8,144 tris)",
+          "id": "repo:HD-8k",
+          "source": "repo"
         }
       ],
+      "smallScaleModelsEnabled": false,
+      "smallScaleModelLevels": "[]",
       "fieldRows": 15,
       "fieldCols": 3,
       "rowSpacing": 9.5,
@@ -21891,7 +22034,7 @@
       "loadingPreviewSequenceHoldMs": 0,
       "loadingPreviewSize": 1600,
       "loadingPreviewRotationX": -85.46571581217302,
-      "loadingPreviewRotationY": -109.10457274713563,
+      "loadingPreviewRotationY": -109.10457274713559,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0,
       "loadingPreviewOffsetY": 0,
@@ -29961,6 +30104,7 @@
       "pixelRatio": 1.25,
       "resolutionScale": 100,
       "qualityPreset": "high",
+      "skipOffScreenFingerCurls": true,
       "staticPoseOnStartup": true,
       "hideFloorAfterHandOffset": true,
       "handOffsetOnStartupEnabled": true,
@@ -32864,7 +33008,7 @@
     },
     {
       "key": "New Group (9)",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -33247,7 +33391,7 @@
           "type": "group",
           "group": {
             "key": "Field Layout",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -34327,6 +34471,23 @@
               "armRotationOffsetY"
             ]
           }
+        },
+        {
+          "type": "group",
+          "group": {
+            "key": "Small Scale Models",
+            "collapsed": false,
+            "locked": false,
+            "items": [
+              {
+                "type": "row",
+                "key": "smallScaleModelLevels"
+              }
+            ],
+            "settings": [
+              "smallScaleModelLevels"
+            ]
+          }
         }
       ],
       "settings": [
@@ -34793,12 +34954,17 @@
               {
                 "type": "row",
                 "key": "qualityPreset"
+              },
+              {
+                "type": "row",
+                "key": "skipOffScreenFingerCurls"
               }
             ],
             "settings": [
               "pixelRatio",
               "resolutionScale",
-              "qualityPreset"
+              "qualityPreset",
+              "skipOffScreenFingerCurls"
             ]
           }
         },
@@ -39321,8 +39487,8 @@
     "desktop": {
       "left": 928.0250244140625,
       "top": 30.787500381469727,
-      "width": 611.1749877929688,
-      "height": 673.5875244140625
+      "width": 614.375,
+      "height": 675.1875
     },
     "mobile": {
       "left": 20,
