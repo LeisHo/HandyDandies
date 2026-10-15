@@ -1126,7 +1126,7 @@ function tryStartField() {
   // whatever comes next; don't treat this comment's own reasoning above
   // as the settled explanation.
   if (!fieldWarmCompiled) renderer.compile(scene, camera)
-  window.__debug = { refreshCustomFunctionConflictWarnings, enforceExclusiveTrigger, restoreCustomClickFunctions, updateSmallScaleModels, placeSmallScaleModelRows, smallScaleGeomCache, get smallScaleLevels() { return smallScaleLevels }, updateFingerCurlSkip, refreshAllTweenSequenceSelectors, reconcileCustomFunctions, captureCustomFunctionsForUndo, renameCustomFunction, placeHandModelRows, syncHandModelWithSettings, refreshHandModelList, get activeHandModelId() { return activeHandModelId }, importHandModelFile, useHandModel, placeLoadingPreviewLightingRows, applyOffsetRotationToHand, applyOffsetRotationRetransition, parseClickPoseConfig, parseClickHoldConfig, cropPointInWrapperFrame, rotateHandAboutCropPoint, rotateHandAboutWorldPoint, cursorFieldPoint, captureClickCursorPivot, rotationDegAt, applyWorldRigid, rotationModeOf, get customFunctionCollapseReady() { return customFunctionCollapseReady }, markCustomFunctionCollapseReady: () => { customFunctionCollapseReady = true }, applyCustomFunctionCollapse, persistCustomClickFunctionIds, bakeOffsetRotationIntoAccum, loopLapProgress, loopLapEnd, rotateHandAboutArmBase, updateLoadingPreviewHand2, buildLoopTimelines, loopPoseValuesBeyondLap, get palmCenterPosRaw() { return palmCenterPosRaw }, get handoPivotRaw() { return handoPivotRaw }, get handBoundsBoxCenterRaw() { return handBoundsBoxCenterRaw }, get alignQuat() { return alignQuat }, get loadingPreviewModelScale() { return loadingPreviewModelScale }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, handBoundsCenterLocal, LOADING_PREVIEW_REFERENCE_RADIUS, importTwoHandTween, convertHandoCameraPreset, applyLoadingPreviewCameraPreset, animateFrame: (...a) => animate(...a), releaseStartupHold, trackingActiveFor, placeStartupRetransitionGroup, startupHandScale, updateFieldCenterMarker, get fieldCenterPoint() { return fieldCenterPoint }, retransitionScalerMul, startupHandPhaseUnfinished, applyFieldBounds, onFieldBoundsChanged, retransitionDistanceMs, untriggeredVisibleSpheres, allVisibleHandsFinished, handStartupLocked, triggerClickPose, checkStartupFloorHide, get startupFloorHidden() { return startupFloorHidden }, get floorMesh() { return floorMesh }, updateLoadingPreviewAnimation, get loadingPreview2() { return { hand: loadingPreviewHand, hand2: loadingPreviewHand2, scene: loadingPreviewScene, camera: loadingPreviewCamera, renderer: loadingPreviewRenderer } }, updateSphereSequence, get sphereState() { return { stage: sphereStage, mesh: sphereMesh, on: sphereOn, start: sphereStart, dur: sphereDur, cap: sphereCap, done: sphereDone, keep: sphereKeepForHands, clicks: sphereClickCount } }, stackOnDefault, applyCameraOrientation, syncCameraPanelFromLive, curveByDomain, get domains() { return { xyAll: [xyAllMinDist, xyAllDistRange], splayAll: [splayAllMin, splayAllRange], cropAll: [cropAllMin, cropAllRange], restAll: [restAllMinDist, restAllDistRange], live: [liveFieldMinDist, liveFieldDistRange], splay: [splayFieldMin, splayFieldRange], crop: [cropFieldMin, cropFieldRange], xy: [xyFieldMinDist, xyFieldDistRange], rest: [restFieldMinDist, restFieldDistRange] } }, modelBaseFrameQ, computeBaseRotationQuat, cloneBaseRb, makeClipRig, updateClipRigPlanes, setClipRigT, updateOnScreenFlags, evaluateArmLengthCurve, THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose, resolveTweenSegmentsWithAnchor, lerpTweenSegments, lerpLoopSegments, isHoldEntry, updateLoadingPreviewWristClip, lerpPoseValues, get loadingPreviewRenderer() { return loadingPreviewRenderer }, get loadingPreviewScene() { return loadingPreviewScene }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, get handBoundsCenterLocal() { return handBoundsCenterLocal }, multiPointCommit, multiPointEligibleFunctions, get multiPointActiveTouchCount() { return multiPointActiveTouchCount }, get multiPointSessionFiredPoseId() { return multiPointSessionFiredPoseId }, detectPoseJumps, get poseJumpLogEntries() { return poseJumpLogEntries }, applyCurlToSkeletonReference, handLogTriggerLabel, applyAllFingerCurls, syncCameraPanelFromLive, animSpeedMs, chainSequenceCount, applyFieldBounds, cursorDistXY, hexBrightnessPct, toonThresholdForMidBrightness }
+  window.__debug = { cleanupDeletedVelocityGroup, rvReconcileSets, rvDebug: () => ({ vel: [rvVx, rvVy], speed: rvSpeed, sets: rvSetList, hasState: rvHasState }), updateResponsiveVelocity, rvConflicts, rvAddSet, rvRefreshUi, refreshCustomFunctionConflictWarnings, enforceExclusiveTrigger, restoreCustomClickFunctions, updateSmallScaleModels, placeSmallScaleModelRows, smallScaleGeomCache, get smallScaleLevels() { return smallScaleLevels }, updateFingerCurlSkip, refreshAllTweenSequenceSelectors, reconcileCustomFunctions, captureCustomFunctionsForUndo, renameCustomFunction, placeHandModelRows, syncHandModelWithSettings, refreshHandModelList, get activeHandModelId() { return activeHandModelId }, importHandModelFile, useHandModel, placeLoadingPreviewLightingRows, applyOffsetRotationToHand, applyOffsetRotationRetransition, parseClickPoseConfig, parseClickHoldConfig, cropPointInWrapperFrame, rotateHandAboutCropPoint, rotateHandAboutWorldPoint, cursorFieldPoint, captureClickCursorPivot, rotationDegAt, applyWorldRigid, rotationModeOf, get customFunctionCollapseReady() { return customFunctionCollapseReady }, markCustomFunctionCollapseReady: () => { customFunctionCollapseReady = true }, applyCustomFunctionCollapse, persistCustomClickFunctionIds, bakeOffsetRotationIntoAccum, loopLapProgress, loopLapEnd, rotateHandAboutArmBase, updateLoadingPreviewHand2, buildLoopTimelines, loopPoseValuesBeyondLap, get palmCenterPosRaw() { return palmCenterPosRaw }, get handoPivotRaw() { return handoPivotRaw }, get handBoundsBoxCenterRaw() { return handBoundsBoxCenterRaw }, get alignQuat() { return alignQuat }, get loadingPreviewModelScale() { return loadingPreviewModelScale }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, handBoundsCenterLocal, LOADING_PREVIEW_REFERENCE_RADIUS, importTwoHandTween, convertHandoCameraPreset, applyLoadingPreviewCameraPreset, animateFrame: (...a) => animate(...a), releaseStartupHold, trackingActiveFor, placeStartupRetransitionGroup, startupHandScale, updateFieldCenterMarker, get fieldCenterPoint() { return fieldCenterPoint }, retransitionScalerMul, startupHandPhaseUnfinished, applyFieldBounds, onFieldBoundsChanged, retransitionDistanceMs, untriggeredVisibleSpheres, allVisibleHandsFinished, handStartupLocked, triggerClickPose, checkStartupFloorHide, get startupFloorHidden() { return startupFloorHidden }, get floorMesh() { return floorMesh }, updateLoadingPreviewAnimation, get loadingPreview2() { return { hand: loadingPreviewHand, hand2: loadingPreviewHand2, scene: loadingPreviewScene, camera: loadingPreviewCamera, renderer: loadingPreviewRenderer } }, updateSphereSequence, get sphereState() { return { stage: sphereStage, mesh: sphereMesh, on: sphereOn, start: sphereStart, dur: sphereDur, cap: sphereCap, done: sphereDone, keep: sphereKeepForHands, clicks: sphereClickCount } }, stackOnDefault, applyCameraOrientation, syncCameraPanelFromLive, curveByDomain, get domains() { return { xyAll: [xyAllMinDist, xyAllDistRange], splayAll: [splayAllMin, splayAllRange], cropAll: [cropAllMin, cropAllRange], restAll: [restAllMinDist, restAllDistRange], live: [liveFieldMinDist, liveFieldDistRange], splay: [splayFieldMin, splayFieldRange], crop: [cropFieldMin, cropFieldRange], xy: [xyFieldMinDist, xyFieldDistRange], rest: [restFieldMinDist, restFieldDistRange] } }, modelBaseFrameQ, computeBaseRotationQuat, cloneBaseRb, makeClipRig, updateClipRigPlanes, setClipRigT, updateOnScreenFlags, evaluateArmLengthCurve, THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose, resolveTweenSegmentsWithAnchor, lerpTweenSegments, lerpLoopSegments, isHoldEntry, updateLoadingPreviewWristClip, lerpPoseValues, get loadingPreviewRenderer() { return loadingPreviewRenderer }, get loadingPreviewScene() { return loadingPreviewScene }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, get handBoundsCenterLocal() { return handBoundsCenterLocal }, multiPointCommit, multiPointEligibleFunctions, get multiPointActiveTouchCount() { return multiPointActiveTouchCount }, get multiPointSessionFiredPoseId() { return multiPointSessionFiredPoseId }, detectPoseJumps, get poseJumpLogEntries() { return poseJumpLogEntries }, applyCurlToSkeletonReference, handLogTriggerLabel, applyAllFingerCurls, syncCameraPanelFromLive, animSpeedMs, chainSequenceCount, applyFieldBounds, cursorDistXY, hexBrightnessPct, toonThresholdForMidBrightness }
   // Do NOT hide the loading screen yet: the hands exist but may not have been painted. finalizeReveal() hides it once the field has rendered a couple of frames (or after a 4 s safety net).
   setTimeout(finalizeReveal, 4000)
 }
@@ -3650,6 +3650,7 @@ const cfg = initDevPanel(DEV_GROUPS, {
     prof('placeDepthControlsInFeatureGroups', placeDepthControlsInFeatureGroups)
     prof('placeLoadingPreviewLightingRows', placeLoadingPreviewLightingRows)
     prof('setupLoadingPreviewTextGroup', setupLoadingPreviewTextGroup)
+    try { await setupResponsiveVelocity() } catch (e) { console.error('Responsive Velocity setup failed', e) }
     exclusiveTriggersReady = true // from here on a user turning a click function on / changing its trigger switches an overlapping one off
     refreshCustomFunctionConflictWarnings()
     prof('placeHandModelRows', placeHandModelRows)
@@ -3692,7 +3693,7 @@ const cfg = initDevPanel(DEV_GROUPS, {
   // configured. disableDeletedStaticClickTrigger() (below) closes this
   // specific gap; both cleanup functions run for every deletion and are
   // each a no-op for the case the other one handles.
-  onGroupDeleted: (target) => { cleanupDeletedCustomClickFunction(target); disableDeletedStaticClickTrigger(target) },
+  onGroupDeleted: (target) => { cleanupDeletedCustomClickFunction(target); disableDeletedStaticClickTrigger(target); cleanupDeletedVelocityGroup(target) },
   // Real bug found live 2026-09-24: Custom Click Functions' own tab-
   // dependent visibility (Touch Point Count hidden on Desktop, a
   // function's own group shown/hidden by family, the Zoom/Scroll
@@ -9799,6 +9800,496 @@ function computeResponsiveWristSplayDeg(distanceToCursor, minLiveDist, liveDistR
   return min + (max - min) * curveY
 }
 
+// ---- Responsive Velocity (2026-10-15, direct request) ----
+// "When turned on, the velocity of the moving cursor will cause a displacement or arm rotation or something." Hands near a FAST-moving cursor are pushed (and optionally tilted, splayed, cropped,
+// curled) by an amount that follows the cursor's speed. Everything is built as ONE dynamic panel group nested in Cursor Tracking (shared settings + one or more "Displacement Angle to Velocity"
+// sets, each with its own trigger angle / direction / arm / splay / crop / curl effects); the runtime only ever reads cfg. Effects are stacked on top of what the hand is already doing:
+//  - displacement: added to the model's local position AFTER the frame's pose, so it never accumulates and never feeds back into the trigger geometry (measured from the hand's grid position);
+//  - arm tilt: a world-space rotation of the wrapper after cursor tracking, about the same cut-point pivot as every other wrapper rotation;
+//  - wrist splay / finger curl: added at the three places the skeleton is posed (applyPoseValuesToHand(), the idle repose); wrist crop: added to the target arm length.
+const RV_LIN = JSON.stringify([{ x: 0, y: 0 }, { x: 1, y: 1 }])
+const RV_FLAT1 = JSON.stringify([{ x: 0, y: 1 }, { x: 1, y: 1 }])
+const RV_CURVE_X_VELOCITY = 'X: Cursor Velocity (Min -> Max Tracked)'
+const RV_CURVE_X_DIST = 'X: Hand Distance From Cursor (0 = At The Cursor, 1 = At The Max Trigger Distance)'
+let rvSetList = [] // [{ prefix, title }] in panel order
+let rvNextSetN = 1
+let rvHasState = false // some hand holds velocity-effect state (cleared when the feature is switched off)
+let rvLastMs = 0, rvLastPx = 0, rvLastPy = 0, rvVx = 0, rvVy = 0, rvDirX = 1, rvDirY = 0, rvSpeed = 0
+let rvReconcileBusy = false, rvUiQueued = false
+const rvJsonCache = new Map()
+const _rvR = new THREE.Vector3(), _rvU = new THREE.Vector3(), _rvP = new THREE.Vector3(), _rvD = new THREE.Vector3(), _rvAxis = new THREE.Vector3(), _rvQ = new THREE.Quaternion(), _rvQi = new THREE.Quaternion(), _rvLocal = new THREE.Vector3(), _rvHP = new THREE.Vector3()
+function rvJson(raw, fallback) {
+  if (typeof raw !== 'string') return fallback
+  let hit = rvJsonCache.get(raw)
+  if (hit === undefined) {
+    try { hit = JSON.parse(raw) } catch (e) { hit = null }
+    if (Array.isArray(hit)) hit.sort((a, b) => a.x - b.x)
+    if (rvJsonCache.size > 600) rvJsonCache.clear()
+    rvJsonCache.set(raw, hit)
+  }
+  return hit === null ? fallback : hit
+}
+function rvNum(key, fb) { const v = cfg[key]; return typeof v === 'number' && isFinite(v) ? v : fb }
+function rvRange(key, fbMin, fbMax) { const r = rvJson(cfg[key], null); return r && typeof r.min === 'number' && typeof r.max === 'number' ? r : { min: fbMin, max: fbMax } }
+function rvCurveY(key, x) { // curve height 0..1 at x (0..1); an unreadable curve counts as the identity line
+  const pts = rvJson(cfg[key], null)
+  const xc = THREE.MathUtils.clamp(x, 0, 1)
+  if (!Array.isArray(pts) || !pts.length) return xc
+  return THREE.MathUtils.clamp(evaluateArmLengthCurve(pts, xc), 0, 1)
+}
+function rvLerp(range, t) { return range.min + (range.max - range.min) * t }
+
+function rvSharedControls() {
+  const pd = { perDevice: true, onChange: () => rvQueueUi() }
+  return [
+    { key: 'rvEnabled', label: 'On/Off', type: 'checkbox', def: false, ...pd },
+    { key: 'rvHoldOnly', label: 'On Hold Only', type: 'checkbox', def: false, ...pd },
+    { key: 'rvVelocityRange', label: 'Min / Max Velocity Tracked (Px/S)', type: 'text', def: '{"min":300,"max":3000}', ...pd },
+    // Not requested, but a raw frame-to-frame cursor speed is far too noisy to drive anything with: this is the per-frame fraction of the newest measurement that is blended into the tracked velocity (1 = no smoothing).
+    { key: 'rvVelocitySmoothing', label: 'Velocity Smoothing (x)', type: 'slider', min: 0.02, max: 1, step: 0.01, def: 0.35, ...pd },
+    { key: 'rvTriggerDistanceRange', label: 'Min / Max Trigger Distance (World Units)', type: 'text', def: '{"min":15,"max":90}', ...pd },
+    { key: 'rvTriggerDistanceCurve', label: 'Trigger Distance Curve (Velocity -> Max Distance)', type: 'text', def: RV_LIN, ...pd },
+    // Displacement Start Time Curve
+    { key: 'rvStartTimeEnabled', label: 'On/Off', type: 'checkbox', def: true, ...pd },
+    { key: 'rvStartTimeRange', label: 'Min / Max Start Time (Ms)', type: 'text', def: '{"min":0,"max":300}', ...pd },
+    { key: 'rvStartTimeCurve', label: 'Displacement Start Time Curve (Distance -> Start Time)', type: 'text', def: RV_LIN, ...pd },
+    // Displacement Speed Curve
+    { key: 'rvSpeedEnabled', label: 'On/Off', type: 'checkbox', def: true, ...pd },
+    { key: 'rvSpeedRange', label: 'Min / Max Displacement Speed (Ms)', type: 'text', def: '{"min":150,"max":600}', ...pd },
+    { key: 'rvSpeedCurve', label: 'Displacement Speed Curve (Distance -> Duration)', type: 'text', def: RV_LIN, ...pd },
+    // The list of Displacement Angle sets (bookkeeping; the set groups are inserted at this row).
+    { key: 'rvSets', label: 'Displacement Angle Sets (internal)', type: 'text', def: '[]', onChange: () => rvReconcileSets() },
+    // Retransition
+    { key: 'rvRetransitionEnabled', label: 'On/Off', type: 'checkbox', def: true, ...pd },
+    { key: 'rvRetransitionSpeedMs', label: 'Retransition Speed (Ms)', type: 'slider', min: 0, max: 3000, step: 10, def: 400, ...pd },
+    { key: 'rvRetransitionSpeedCurveEnabled', label: 'On/Off', type: 'checkbox', def: false, ...pd },
+    { key: 'rvRetransitionSpeedRange', label: 'Min / Max Retransition Speed (Ms)', type: 'text', def: '{"min":100,"max":1000}', ...pd },
+    { key: 'rvRetransitionSpeedCurve', label: 'Retransition Speed Curve (Distance -> Duration)', type: 'text', def: RV_LIN, ...pd },
+    { key: 'rvRetransitionStartTimeCurveEnabled', label: 'On/Off', type: 'checkbox', def: false, ...pd },
+    { key: 'rvRetransitionStartTimeRange', label: 'Min / Max Retransition Start Time (Ms)', type: 'text', def: '{"min":0,"max":300}', ...pd },
+    { key: 'rvRetransitionStartTimeCurve', label: 'Retransition Start Time Curve (Distance -> Start Time)', type: 'text', def: RV_LIN, ...pd },
+    { key: 'rvRetransitionEasingCurveEnabled', label: 'On/Off', type: 'checkbox', def: false, ...pd },
+    { key: 'rvRetransitionEasingCurve', label: 'Retransition Easing Curve (Progress -> Amount)', type: 'text', def: RV_LIN, ...pd },
+    // Easing
+    { key: 'rvEasingCurveEnabled', label: 'On/Off', type: 'checkbox', def: false, ...pd },
+    { key: 'rvEasingCurve', label: 'Easing Curve (Progress -> Amount)', type: 'text', def: RV_LIN, ...pd }
+  ]
+}
+function rvSetControls(S) {
+  const pd = { perDevice: true, onChange: () => rvQueueUi() }
+  const effect = (name, defRange, label, unit) => [
+    { key: `${S}${name}Enabled`, label: 'On/Off', type: 'checkbox', def: false, ...pd },
+    { key: `${S}${name}Range`, label: `Min / Max ${label} (${unit})`, type: 'text', def: defRange, ...pd },
+    { key: `${S}${name}Curve`, label: `${label} Curve (Velocity -> ${label})`, type: 'text', def: RV_LIN, ...pd },
+    { key: `${S}${name}DistCurve`, label: `${label} Distance Curve (Distance -> Scaler)`, type: 'text', def: RV_FLAT1, ...pd }
+  ]
+  return [
+    { key: `${S}Enabled`, label: 'On/Off', type: 'checkbox', def: true, ...pd },
+    { key: `${S}Angle`, label: 'Displacement Angle (Deg)', type: 'slider', min: -360, max: 360, step: 1, def: 0, ...pd },
+    { key: `${S}DisplacementRange`, label: 'Min / Max Displacement (World Units)', type: 'text', def: '{"min":0,"max":5}', ...pd },
+    { key: `${S}DisplacementCurve`, label: 'Displacement Curve (Velocity -> Displacement)', type: 'text', def: RV_LIN, ...pd },
+    { key: `${S}DisplacementDistCurve`, label: 'Displacement Distance Curve (Distance -> Scaler)', type: 'text', def: RV_FLAT1, ...pd },
+    { key: `${S}TriggerAngleRange`, label: 'Min / Max Trigger Angle (Deg)', type: 'text', def: '{"min":0,"max":0}', ...pd },
+    { key: `${S}AngleCurveEnabled`, label: 'On/Off', type: 'checkbox', def: false, ...pd },
+    { key: `${S}AngleCurveRange`, label: 'Min / Max Displacement Angle (Deg)', type: 'text', def: '{"min":0,"max":180}', ...pd },
+    { key: `${S}AngleCurve`, label: 'Displacement Angle Curve (Trigger Angle -> Displacement Angle)', type: 'text', def: RV_LIN, ...pd },
+    ...effect('Arm', '{"min":0,"max":12}', 'Rotation', 'Deg'),
+    ...effect('Splay', '{"min":0,"max":25}', 'Splay', 'Deg'),
+    ...effect('Crop', '{"min":0,"max":0.4}', 'Crop', '0-1'),
+    ...effect('Curl', '{"min":0,"max":40}', 'Finger Curl', '%'),
+    { key: `${S}CurlMax`, label: 'Max Finger Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 100, ...pd }
+  ]
+}
+function rvQueueUi() {
+  if (rvUiQueued) return
+  rvUiQueued = true
+  Promise.resolve().then(() => { rvUiQueued = false; rvRefreshUi() })
+}
+function rvListFromCfg() {
+  let l = []
+  try { l = JSON.parse(cfg.rvSets || '[]') } catch (e) { l = [] }
+  return Array.isArray(l) ? l.filter((e) => e && typeof e.prefix === 'string') : []
+}
+function rvPersistSets() {
+  const json = JSON.stringify(rvSetList)
+  cfg.rvSets = json
+  rvReconcileBusy = true
+  try { syncValue('rvSets', json) } catch (e) { /* no panel: cfg already holds it */ } finally { rvReconcileBusy = false }
+}
+function rvGateHeader(g, enabledKey) {
+  const enabledRow = g.querySelector(`.dp-row[data-key="${enabledKey}"]`)
+  const header = g.querySelector(':scope > .dp-group-header')
+  const t = header && header.querySelector(':scope > .dp-group-title-text')
+  if (!enabledRow || !t || header.contains(enabledRow)) return
+  enabledRow.classList.add('dp-group-gate-row')
+  enabledRow.querySelectorAll('.dp-dynamic-device-checkbox, .dp-row-handle').forEach((el) => el.remove())
+  t.insertAdjacentElement('afterend', enabledRow)
+}
+function rvCurveRow(key, caption, defaultPoints) { const r = document.querySelector(`.dp-row[data-key="${key}"]`); if (r) buildGenericCurveWidget(r, { caption, defaultPoints }) }
+function rvRangeRow(key, opts) { const r = document.querySelector(`.dp-row[data-key="${key}"]`); if (r) buildGenericRangeBarWidget(r, opts) }
+// Builds one Displacement Angle set group (runtime state is just cfg; a set is nothing but its controls).
+function rvRegisterSet(prefix, title, mainBody, beforeEl) {
+  const g = renderDynamicGroup({ title, controls: rvSetControls(prefix) }) // seeds cfg regardless of a panel; null without one
+  if (!g || !mainBody) return null
+  g.dataset.rvSetPrefix = prefix
+  mainBody.insertBefore(g, beforeEl || null)
+  const S = prefix
+  const gb = g.querySelector(':scope > .dp-group-body')
+  rvRangeRow(`${S}DisplacementRange`, { trackMin: 0, trackMax: 60, unit: 'wu', decimals: 1, defaultValue: { min: 0, max: 5 } })
+  rvCurveRow(`${S}DisplacementCurve`, RV_CURVE_X_VELOCITY + '  ·  Y: Displacement (0 = Min, 1 = Max)', [{ x: 0, y: 0 }, { x: 1, y: 1 }])
+  rvCurveRow(`${S}DisplacementDistCurve`, RV_CURVE_X_DIST + '  ·  Y: Displacement Scaler (0 - 1)', [{ x: 0, y: 1 }, { x: 1, y: 1 }])
+  rvRangeRow(`${S}TriggerAngleRange`, { trackMin: 0, trackMax: 180, unit: 'deg', defaultValue: { min: 0, max: 0 } })
+  rvRangeRow(`${S}AngleCurveRange`, { trackMin: -360, trackMax: 360, unit: 'deg', defaultValue: { min: 0, max: 180 } })
+  rvCurveRow(`${S}AngleCurve`, 'X: Hand Angle To The Cursor Path (Min -> Max Trigger Angle)  ·  Y: Displacement Angle (0 = Min, 1 = Max)', [{ x: 0, y: 0 }, { x: 1, y: 1 }])
+  const effects = [['Arm', 'Velocity Arm Rotation', 'Rotation', 60, 'deg', 1, { min: 0, max: 12 }], ['Splay', 'Velocity Wrist Splay', 'Splay', 90, 'deg', 1, { min: 0, max: 25 }], ['Crop', 'Velocity Wrist Crop', 'Crop', 1, '', 2, { min: 0, max: 0.4 }], ['Curl', 'Velocity Finger Curl', 'Finger Curl', 200, '%', 0, { min: 0, max: 40 }]]
+  effects.forEach(([name, , label, trackMax, unit, decimals, defVal]) => {
+    rvRangeRow(`${S}${name}Range`, { trackMin: name === 'Curl' ? -200 : (name === 'Arm' || name === 'Splay' ? -trackMax : 0), trackMax, unit: unit || 'x', decimals, defaultValue: defVal })
+    rvCurveRow(`${S}${name}Curve`, RV_CURVE_X_VELOCITY + `  ·  Y: ${label} (0 = Min, 1 = Max)`, [{ x: 0, y: 0 }, { x: 1, y: 1 }])
+    rvCurveRow(`${S}${name}DistCurve`, RV_CURVE_X_DIST + `  ·  Y: ${label} Scaler (0 - 1)`, [{ x: 0, y: 1 }, { x: 1, y: 1 }])
+  })
+  wrapGatedSubgroup(`${S}AngleCurveEnabled`, [`${S}AngleCurveRange`, `${S}AngleCurve`], 'Displacement Angle Curve')
+  effects.forEach(([name, subTitle]) => wrapGatedSubgroup(`${S}${name}Enabled`, [`${S}${name}Range`, `${S}${name}Curve`, `${S}${name}DistCurve`, ...(name === 'Curl' ? [`${S}CurlMax`] : [])], subTitle))
+  rvGateHeader(g, `${S}Enabled`)
+  g.classList.add('collapsed')
+  g.querySelectorAll('.dp-group').forEach((sg) => sg.classList.add('collapsed'))
+  return g
+}
+// The whole feature's group, nested at the end of Cursor Tracking. Called once from onRestore (after the settings landed in cfg); safe with no panel (it then only seeds cfg).
+async function setupResponsiveVelocity() {
+  // The list control does not exist yet (this builds it), so the restored value is read straight from the restored settings.
+  const savedSets = peekRestoredValue('rvSets')
+  if (typeof savedSets === 'string' && cfg.rvSets === undefined) cfg.rvSets = savedSets
+  rvSetList = rvListFromCfg()
+  if (!rvSetList.length) rvSetList = [{ prefix: 'rvSet1', title: 'Displacement Angle to Velocity 1' }]
+  rvNextSetN = Math.max(1, ...rvSetList.map((e) => { const m = /^rvSet(\d+)$/.exec(e.prefix); return m ? parseInt(m[1], 10) + 1 : 1 }))
+  const hostGroup = document.querySelector('.dp-group[data-key="Cursor Tracking"]')
+  const hostBody = hostGroup && hostGroup.querySelector(':scope > .dp-group-body')
+  // A leftover placeholder of this group from the saved layout (applyOrder() runs before this) is removed: the group is rebuilt from cfg every load.
+  if (hostBody) hostBody.querySelectorAll('.dp-group[data-key="Responsive Velocity"]').forEach((g) => g.remove())
+  const g = renderDynamicGroup({ title: 'Responsive Velocity', controls: rvSharedControls() })
+  const sets = rvSetList.slice()
+  if (!g || !hostBody) { sets.forEach((s) => renderDynamicGroup({ title: s.title, controls: rvSetControls(s.prefix) })); rvPersistSets(); return }
+  hostBody.appendChild(g)
+  g.dataset.rvMain = '1'
+  const body = g.querySelector(':scope > .dp-group-body')
+  const anchorRow = g.querySelector('.dp-row[data-key="rvSets"]')
+  if (anchorRow) anchorRow.style.display = 'none'
+  rvRangeRow('rvVelocityRange', { trackMin: 0, trackMax: 8000, unit: 'px/s', defaultValue: { min: 300, max: 3000 } })
+  rvRangeRow('rvTriggerDistanceRange', { trackMin: 0, trackMax: 400, unit: 'wu', defaultValue: { min: 15, max: 90 } })
+  rvCurveRow('rvTriggerDistanceCurve', RV_CURVE_X_VELOCITY + '  ·  Y: Max Trigger Distance (0 = Min, 1 = Max)', [{ x: 0, y: 0 }, { x: 1, y: 1 }])
+  rvRangeRow('rvStartTimeRange', { trackMin: 0, trackMax: 2000, unit: 'ms', defaultValue: { min: 0, max: 300 } })
+  rvCurveRow('rvStartTimeCurve', RV_CURVE_X_DIST + '  ·  Y: Start Time (0 = Min, 1 = Max)', [{ x: 0, y: 0 }, { x: 1, y: 1 }])
+  rvRangeRow('rvSpeedRange', { trackMin: 0, trackMax: 3000, unit: 'ms', defaultValue: { min: 150, max: 600 } })
+  rvCurveRow('rvSpeedCurve', RV_CURVE_X_DIST + '  ·  Y: Displacement Duration (0 = Min, 1 = Max)', [{ x: 0, y: 0 }, { x: 1, y: 1 }])
+  rvRangeRow('rvRetransitionSpeedRange', { trackMin: 0, trackMax: 3000, unit: 'ms', defaultValue: { min: 100, max: 1000 } })
+  rvCurveRow('rvRetransitionSpeedCurve', RV_CURVE_X_DIST + '  ·  Y: Retransition Duration (0 = Min, 1 = Max)', [{ x: 0, y: 0 }, { x: 1, y: 1 }])
+  rvRangeRow('rvRetransitionStartTimeRange', { trackMin: 0, trackMax: 2000, unit: 'ms', defaultValue: { min: 0, max: 300 } })
+  rvCurveRow('rvRetransitionStartTimeCurve', RV_CURVE_X_DIST + '  ·  Y: Retransition Start Time (0 = Min, 1 = Max)', [{ x: 0, y: 0 }, { x: 1, y: 1 }])
+  rvCurveRow('rvRetransitionEasingCurve', 'X: Retransition Progress  ·  Y: Amount Removed (0 = None, 1 = All)', [{ x: 0, y: 0 }, { x: 1, y: 1 }])
+  rvCurveRow('rvEasingCurve', 'X: Displacement Progress  ·  Y: Amount Applied (0 = None, 1 = Full)', [{ x: 0, y: 0 }, { x: 1, y: 1 }])
+  wrapGatedSubgroup('rvStartTimeEnabled', ['rvStartTimeRange', 'rvStartTimeCurve'], 'Displacement Start Time Curve')
+  wrapGatedSubgroup('rvSpeedEnabled', ['rvSpeedRange', 'rvSpeedCurve'], 'Displacement Speed Curve')
+  wrapGatedSubgroup('rvRetransitionEnabled', ['rvRetransitionSpeedMs', 'rvRetransitionSpeedCurveEnabled', 'rvRetransitionSpeedRange', 'rvRetransitionSpeedCurve', 'rvRetransitionStartTimeCurveEnabled', 'rvRetransitionStartTimeRange', 'rvRetransitionStartTimeCurve', 'rvRetransitionEasingCurveEnabled', 'rvRetransitionEasingCurve'], 'Retransition')
+  wrapGatedSubgroup('rvRetransitionSpeedCurveEnabled', ['rvRetransitionSpeedRange', 'rvRetransitionSpeedCurve'], 'Retransition Speed Curve')
+  wrapGatedSubgroup('rvRetransitionStartTimeCurveEnabled', ['rvRetransitionStartTimeRange', 'rvRetransitionStartTimeCurve'], 'Retransition Start Time Curve')
+  wrapGatedSubgroup('rvRetransitionEasingCurveEnabled', ['rvRetransitionEasingCurve'], 'Retransition Easing Curve')
+  wrapGatedSubgroup('rvEasingCurveEnabled', ['rvEasingCurve'], 'Easing')
+  rvGateHeader(g, 'rvEnabled')
+  // The set groups and their Add button go where the hidden bookkeeping row is (between the timing groups and Retransition / Easing).
+  const addRow = document.createElement('div')
+  addRow.className = 'dp-row dp-rv-add-row'
+  const btn = document.createElement('button')
+  btn.type = 'button'
+  btn.textContent = '+ Add Displacement Angle Set'
+  btn.addEventListener('click', () => rvAddSet())
+  addRow.appendChild(btn)
+  body.insertBefore(addRow, anchorRow ? anchorRow.nextSibling : null)
+  body.querySelectorAll(':scope > .dp-group[data-rv-set-prefix]').forEach((x) => x.remove())
+  sets.forEach((s) => rvRegisterSet(s.prefix, s.title, body, addRow))
+  g.classList.add('collapsed')
+  g.querySelectorAll('.dp-group').forEach((sg) => sg.classList.add('collapsed'))
+  rvPersistSets()
+  applyTextOverrides()
+  rvRefreshUi()
+}
+function rvMainBody() { const g = document.querySelector('.dp-group[data-rv-main]'); return g ? g.querySelector(':scope > .dp-group-body') : null }
+function rvAddSet() {
+  const n = rvNextSetN++
+  const prefix = `rvSet${n}`
+  const entry = { prefix, title: `Displacement Angle to Velocity ${n}` }
+  rvSetList.push(entry)
+  const body = rvMainBody()
+  const addRow = body && body.querySelector(':scope > .dp-rv-add-row')
+  rvRegisterSet(prefix, entry.title, body, addRow)
+  rvPersistSets()
+  rvRefreshUi()
+  saveCurrentSettings()
+}
+// A named saved state / Undo can change the list of sets: bring the panel groups in line with it.
+function rvReconcileSets() {
+  if (rvReconcileBusy) return
+  const want = rvListFromCfg()
+  const body = rvMainBody()
+  if (!body) return
+  const have = new Set(rvSetList.map((e) => e.prefix))
+  const wantSet = new Set(want.map((e) => e.prefix))
+  rvSetList.filter((e) => !wantSet.has(e.prefix)).forEach((e) => {
+    const g = body.querySelector(`:scope > .dp-group[data-rv-set-prefix="${e.prefix}"]`)
+    if (g) g.remove()
+    forgetControlsWithPrefix(e.prefix)
+  })
+  const addRow = body.querySelector(':scope > .dp-rv-add-row')
+  want.filter((e) => !have.has(e.prefix)).forEach((e) => rvRegisterSet(e.prefix, e.title || e.prefix, body, addRow))
+  rvSetList = want
+  rvNextSetN = Math.max(rvNextSetN, ...want.map((e) => { const m = /^rvSet(\d+)$/.exec(e.prefix); return m ? parseInt(m[1], 10) + 1 : 1 }))
+  rvRefreshUi()
+}
+// The panel's own Delete button removed a group: keep the set list (and the stored values) in line.
+function cleanupDeletedVelocityGroup(target) {
+  if (!target || !target.dataset) return
+  if (target.dataset.rvSetPrefix) {
+    const prefix = target.dataset.rvSetPrefix
+    rvSetList = rvSetList.filter((e) => e.prefix !== prefix)
+    forgetControlsWithPrefix(prefix)
+    rvPersistSets()
+    hands.forEach((h) => { if (h._rv && h._rv.s) delete h._rv.s[prefix] })
+    rvRefreshUi()
+  } else if (target.dataset.rvMain) {
+    cfg.rvEnabled = false
+    rvSetList = []
+    forgetControlsWithPrefix('rv')
+    rvResetAll()
+  }
+}
+// Show / hide the contents of every switched-off group, and flag conflicting sets in red.
+function rvToggleBody(g, on) { const b = g && g.querySelector(':scope > .dp-group-body'); if (b) b.classList.toggle('dp-startup-off', !on) }
+function rvConflicts() {
+  const out = { sets: new Set(), rows: new Set(), main: new Set() }
+  if (!document.getElementById('dpStartupStyle')) { const st = document.createElement('style'); st.id = 'dpStartupStyle'; st.textContent = '.dp-startup-off > * { display: none !important }'; document.head.appendChild(st) }
+  const vr = rvRange('rvVelocityRange', 300, 3000)
+  if (!(vr.min < vr.max)) out.main.add('rvVelocityRange')
+  const dr = rvRange('rvTriggerDistanceRange', 15, 90)
+  if (dr.min > dr.max) out.main.add('rvTriggerDistanceRange')
+  const on = rvSetList.filter((e) => cfg[`${e.prefix}Enabled`] !== false)
+  on.forEach((e) => {
+    const tr = rvRange(`${e.prefix}TriggerAngleRange`, 0, 0)
+    if (tr.min > tr.max) { out.sets.add(e.prefix); out.rows.add(`${e.prefix}TriggerAngleRange`) }
+  })
+  // Two sets that act on the same hands (overlapping trigger angles) with exactly opposite directions and the same amounts cancel each other out: that is the one case where stacking gives nothing.
+  for (let i = 0; i < on.length; i++) for (let j = i + 1; j < on.length; j++) {
+    const a = on[i].prefix, b = on[j].prefix
+    const ta = rvRange(`${a}TriggerAngleRange`, 0, 0), tb = rvRange(`${b}TriggerAngleRange`, 0, 0)
+    const allA = ta.min === 0 && ta.max === 0, allB = tb.min === 0 && tb.max === 0
+    const overlap = allA || allB || (ta.min <= tb.max && tb.min <= ta.max)
+    const da = rvRange(`${a}DisplacementRange`, 0, 5), db = rvRange(`${b}DisplacementRange`, 0, 5)
+    const opposite = Math.abs((((rvNum(`${a}Angle`, 0) - rvNum(`${b}Angle`, 0)) % 360) + 360) % 360 - 180) < 0.5
+    if (overlap && opposite && !cfg[`${a}AngleCurveEnabled`] && !cfg[`${b}AngleCurveEnabled`] && Math.abs(da.min - db.min) < 1e-6 && Math.abs(da.max - db.max) < 1e-6 && (da.min !== 0 || da.max !== 0)) {
+      out.sets.add(a); out.sets.add(b); out.rows.add(`${a}Angle`); out.rows.add(`${b}Angle`)
+    }
+  }
+  return out
+}
+function rvRefreshUi() {
+  const mainG = document.querySelector('.dp-group[data-rv-main]')
+  if (!mainG) return
+  const c = rvConflicts()
+  rvToggleBody(mainG, !!cfg.rvEnabled)
+  ;[['Displacement Start Time Curve', 'rvStartTimeEnabled'], ['Displacement Speed Curve', 'rvSpeedEnabled'], ['Retransition', 'rvRetransitionEnabled'], ['Retransition Speed Curve', 'rvRetransitionSpeedCurveEnabled'], ['Retransition Start Time Curve', 'rvRetransitionStartTimeCurveEnabled'], ['Retransition Easing Curve', 'rvRetransitionEasingCurveEnabled'], ['Easing', 'rvEasingCurveEnabled']].forEach(([title, key]) => {
+    const row = mainG.querySelector(`.dp-row[data-key="${key}"]`)
+    const sg = row && row.closest('.dp-group')
+    if (sg && sg !== mainG) rvToggleBody(sg, !!cfg[key])
+  })
+  mainG.querySelectorAll('.dp-row').forEach((r) => r.classList.remove('dp-rv-conflict-row'))
+  c.main.forEach((k) => { const r = mainG.querySelector(`.dp-row[data-key="${k}"]`); if (r) r.classList.add('dp-rv-conflict-row') })
+  mainG.querySelectorAll(':scope > .dp-group-body > .dp-group[data-rv-set-prefix]').forEach((sg) => {
+    const p = sg.dataset.rvSetPrefix
+    rvToggleBody(sg, cfg[`${p}Enabled`] !== false)
+    const bad = c.sets.has(p)
+    sg.classList.toggle('dp-rv-conflict', bad)
+    const header = sg.querySelector(':scope > .dp-group-header')
+    if (header) header.title = bad ? 'Conflict: this set cancels another set exactly, or has a Min Trigger Angle above its Max.' : ''
+    ;['Arm', 'Splay', 'Crop', 'Curl', 'AngleCurve'].forEach((n) => {
+      const row = sg.querySelector(`.dp-row[data-key="${p}${n}Enabled"]`)
+      const sub = row && row.closest('.dp-group')
+      if (sub && sub !== sg) rvToggleBody(sub, !!cfg[`${p}${n}Enabled`])
+    })
+    sg.querySelectorAll('.dp-row').forEach((r) => r.classList.toggle('dp-rv-conflict-row', c.rows.has(r.dataset.key)))
+  })
+}
+
+// ---- runtime ----
+function rvResetAll() {
+  hands.forEach((h) => {
+    if (!h._rv && !h._rvSplay && !h._rvCurl && !h._rvCrop) return
+    h._rv = null
+    if (h._rvSplay || h._rvCurl) h._rvRepose = true
+    h._rvSplay = 0; h._rvCurl = 0; h._rvCrop = 0
+    if (h._rvDisp) h._rvDisp.set(0, 0, 0)
+    if (h._rvTilt) h._rvTilt.set(0, 0, 0)
+  })
+  rvHasState = false
+}
+function updateResponsiveVelocity(nowMs) {
+  if (!cfg.rvEnabled || !rvSetList.length) { if (rvHasState) rvResetAll(); rvLastMs = 0; rvVx = rvVy = rvSpeed = 0; return }
+  const W = window.innerWidth, H = window.innerHeight
+  if (!(W > 0 && H > 0)) return
+  const px = (cursorNDC.x + 1) * 0.5 * W, py = (1 - cursorNDC.y) * 0.5 * H
+  const dt = rvLastMs ? THREE.MathUtils.clamp(nowMs - rvLastMs, 1, 100) : 16
+  if (rvLastMs) {
+    const sm = THREE.MathUtils.clamp(rvNum('rvVelocitySmoothing', 0.35), 0.02, 1)
+    rvVx += ((px - rvLastPx) / dt * 1000 - rvVx) * sm
+    rvVy += ((py - rvLastPy) / dt * 1000 - rvVy) * sm
+  }
+  rvLastMs = nowMs; rvLastPx = px; rvLastPy = py
+  rvSpeed = Math.hypot(rvVx, rvVy)
+  if (rvSpeed > 1e-3) { rvDirX = rvVx / rvSpeed; rvDirY = rvVy / rvSpeed }
+  const vr = rvRange('rvVelocityRange', 300, 3000)
+  const trigActive = rvSpeed >= vr.min && rvSpeed > 0 && (!cfg.rvHoldOnly || leftPointerDown)
+  const vn = THREE.MathUtils.clamp((rvSpeed - vr.min) / Math.max(vr.max - vr.min, 1e-6), 0, 1)
+  const dr = rvRange('rvTriggerDistanceRange', 15, 90)
+  const D = trigActive ? Math.max(rvLerp(dr, rvCurveY('rvTriggerDistanceCurve', vn)), 0) : 0
+  const unitsPerPx = screenUnitsPerPx
+  if (!(unitsPerPx > 0)) return
+  const startOn = cfg.rvStartTimeEnabled !== false, speedOn = cfg.rvSpeedEnabled !== false
+  const startR = rvRange('rvStartTimeRange', 0, 300), speedR = rvRange('rvSpeedRange', 150, 600)
+  const retOn = cfg.rvRetransitionEnabled !== false
+  const retSpeedCurveOn = !!cfg.rvRetransitionSpeedCurveEnabled, retStartCurveOn = !!cfg.rvRetransitionStartTimeCurveEnabled
+  const retSpeedR = rvRange('rvRetransitionSpeedRange', 100, 1000), retStartR = rvRange('rvRetransitionStartTimeRange', 0, 300)
+  const retFlatMs = rvNum('rvRetransitionSpeedMs', 400)
+  const easeOn = !!cfg.rvEasingCurveEnabled, retEaseOn = !!cfg.rvRetransitionEasingCurveEnabled
+  _rvR.setFromMatrixColumn(camera.matrixWorld, 0)
+  _rvU.setFromMatrixColumn(camera.matrixWorld, 1)
+  const sets = rvSetList.map((e) => {
+    const S = e.prefix
+    return {
+      S, on: cfg[`${S}Enabled`] !== false, angle: rvNum(`${S}Angle`, 0), disp: rvRange(`${S}DisplacementRange`, 0, 5), trig: rvRange(`${S}TriggerAngleRange`, 0, 0),
+      angleCurve: !!cfg[`${S}AngleCurveEnabled`], angleR: rvRange(`${S}AngleCurveRange`, 0, 180),
+      arm: !!cfg[`${S}ArmEnabled`] && rvRange(`${S}ArmRange`, 0, 12), splay: !!cfg[`${S}SplayEnabled`] && rvRange(`${S}SplayRange`, 0, 25),
+      crop: !!cfg[`${S}CropEnabled`] && rvRange(`${S}CropRange`, 0, 0.4), curl: !!cfg[`${S}CurlEnabled`] && rvRange(`${S}CurlRange`, 0, 40), curlMax: rvNum(`${S}CurlMax`, 100),
+      kAng: `${S}AngleCurve`, kDD: `${S}DisplacementDistCurve`, kD: `${S}DisplacementCurve`, kA: `${S}ArmCurve`, kAD: `${S}ArmDistCurve`, kS: `${S}SplayCurve`, kSD: `${S}SplayDistCurve`, kC: `${S}CropCurve`, kCD: `${S}CropDistCurve`, kL: `${S}CurlCurve`, kLD: `${S}CurlDistCurve`
+    }
+  })
+  let any = false
+  for (let hi = 0; hi < hands.length; hi++) {
+    const hand = hands[hi]
+    let rv = hand._rv
+    if (!trigActive && !(rv && rv.live)) continue
+    if (!rv) { rv = hand._rv = { s: {}, live: false }; if (!hand._rvDisp) { hand._rvDisp = new THREE.Vector3(); hand._rvTilt = new THREE.Vector3() } }
+    // Geometry, measured from the hand's grid position so the hand's own displacement never feeds back into it.
+    const bp = hand.basePosition || hand.wrapper.position
+    _rvHP.copy(bp).project(camera)
+    const rx = (_rvHP.x + 1) * 0.5 * W - px, ry = (1 - _rvHP.y) * 0.5 * H - py
+    const dist = Math.hypot(rx, ry) * unitsPerPx
+    const cross = rvDirX * ry - rvDirY * rx, dot = rvDirX * rx + rvDirY * ry
+    const angAbs = Math.abs(Math.atan2(cross, dot)) * 180 / Math.PI
+    const side = cross >= 0 ? 1 : -1
+    const nd = D > 1e-6 ? THREE.MathUtils.clamp(dist / D, 0, 1) : 0
+    const dispSum = hand._rvDisp.set(0, 0, 0), tiltSum = hand._rvTilt.set(0, 0, 0)
+    let splay = 0, crop = 0, curl = 0, ceil = Infinity, live = false
+    for (let si = 0; si < sets.length; si++) {
+      const c = sets[si]
+      let st = rv.s[c.S]
+      if (!st) st = rv.s[c.S] = { p: 0, wasTrig: false, onAt: 0, delay: 0, dur: 0, offAt: 0, rdelay: 0, rdur: 0, nd: 0, disp: 0, arm: 0, splay: 0, crop: 0, curl: 0, ceil: 100, wx: 0, wy: 0, wz: 0 }
+      const angleOk = (c.trig.min === 0 && c.trig.max === 0) || (angAbs >= c.trig.min && angAbs <= c.trig.max)
+      const trig = trigActive && c.on && dist <= D && angleOk
+      if (trig) {
+        // Target amounts at this moment (kept while the effect is retracting, when the cursor has already stopped).
+        let theta = c.angle
+        if (c.angleCurve) {
+          const span = c.trig.max - c.trig.min
+          theta = rvLerp(c.angleR, rvCurveY(c.kAng, span > 1e-6 ? (angAbs - c.trig.min) / span : 0))
+        }
+        const th = theta * Math.PI / 180, ct = Math.cos(th), sn = Math.sin(th)
+        const ax = -rvDirY * side, ay = rvDirX * side // unit vector away from the path (screen px, y down)
+        const dx = ax * ct + rvDirX * sn, dy = ay * ct + rvDirY * sn
+        st.wx = _rvR.x * dx - _rvU.x * dy; st.wy = _rvR.y * dx - _rvU.y * dy; st.wz = _rvR.z * dx - _rvU.z * dy
+        const dsc = rvCurveY(c.kDD, nd)
+        st.disp = rvLerp(c.disp, rvCurveY(c.kD, vn)) * dsc
+        st.arm = c.arm ? rvLerp(c.arm, rvCurveY(c.kA, vn)) * rvCurveY(c.kAD, nd) : 0
+        st.splay = c.splay ? rvLerp(c.splay, rvCurveY(c.kS, vn)) * rvCurveY(c.kSD, nd) : 0
+        st.crop = c.crop ? rvLerp(c.crop, rvCurveY(c.kC, vn)) * rvCurveY(c.kCD, nd) : 0
+        st.curl = c.curl ? rvLerp(c.curl, rvCurveY(c.kL, vn)) * rvCurveY(c.kLD, nd) : 0
+        st.ceil = c.curlMax
+        st.nd = nd
+      }
+      // Timing: start delay -> onset (duration from the Speed curve) while triggered; start delay -> retransition when not.
+      if (trig) {
+        if (!st.wasTrig) { st.onAt = nowMs; st.delay = startOn ? rvLerp(startR, rvCurveY('rvStartTimeCurve', nd)) : 0; st.dur = speedOn ? rvLerp(speedR, rvCurveY('rvSpeedCurve', nd)) : 0 }
+        if (nowMs - st.onAt >= st.delay) st.p = st.dur > 0 ? Math.min(1, st.p + dt / st.dur) : 1
+      } else {
+        if (st.wasTrig) {
+          st.offAt = nowMs
+          st.rdelay = retOn && retStartCurveOn ? rvLerp(retStartR, rvCurveY('rvRetransitionStartTimeCurve', st.nd)) : 0
+          st.rdur = retSpeedCurveOn ? rvLerp(retSpeedR, rvCurveY('rvRetransitionSpeedCurve', st.nd)) : retFlatMs
+          if (!retOn) st.p = 0
+        }
+        if (st.p > 0 && nowMs - st.offAt >= st.rdelay) st.p = st.rdur > 0 ? Math.max(0, st.p - dt / st.rdur) : 0
+      }
+      st.wasTrig = trig
+      if (st.p <= 0) continue
+      live = true
+      const w = trig ? (easeOn ? rvCurveY('rvEasingCurve', st.p) : st.p) : (retEaseOn ? 1 - rvCurveY('rvRetransitionEasingCurve', 1 - st.p) : st.p)
+      if (st.disp) dispSum.set(dispSum.x + st.wx * st.disp * w, dispSum.y + st.wy * st.disp * w, dispSum.z + st.wz * st.disp * w)
+      if (st.arm) tiltSum.set(tiltSum.x + st.wx * st.arm * w, tiltSum.y + st.wy * st.arm * w, tiltSum.z + st.wz * st.arm * w)
+      splay += st.splay * w; crop += st.crop * w
+      if (st.curl) { curl += st.curl * w; ceil = Math.min(ceil, st.ceil) }
+    }
+    rv.live = live
+    if (live) any = true
+    if (Math.abs(splay - (hand._rvSplay || 0)) > 1e-4 || Math.abs(curl - (hand._rvCurl || 0)) > 1e-4) hand._rvRepose = true
+    hand._rvSplay = splay; hand._rvCrop = crop; hand._rvCurl = curl; hand._rvCurlCeil = ceil
+  }
+  rvHasState = any || rvHasState
+  if (!any && !trigActive) rvHasState = false
+}
+// Arm tilt: a world-space turn of the hand's pointing axis toward the effect direction, after cursor tracking has composed the wrapper rotation.
+function rvApplyArmTilt(trackRan) {
+  if (!rvHasState) return
+  for (let i = 0; i < hands.length; i++) {
+    const hand = hands[i], t = hand._rvTilt
+    if (!t) continue
+    const deg = t.length()
+    if (deg < 1e-4) continue
+    if (!trackRan) hand.wrapper.quaternion.identity()
+    _rvP.copy(pointDirRawModel).applyQuaternion(hand.currentBaseQuat).applyQuaternion(hand.wrapper.quaternion)
+    _rvD.copy(t).divideScalar(deg)
+    _rvD.addScaledVector(_rvP, -_rvD.dot(_rvP))
+    const len = _rvD.length()
+    if (len < 1e-5) continue
+    _rvD.divideScalar(len)
+    _rvAxis.crossVectors(_rvP, _rvD)
+    _rvQ.setFromAxisAngle(_rvAxis.normalize(), deg * Math.PI / 180)
+    hand.wrapper.quaternion.premultiply(_rvQ)
+  }
+}
+// Displacement: added to the clone's local position once the frame's pose is final (applyHandArmLength() rewrites that position every frame, so nothing accumulates).
+function rvApplyDisplacement() {
+  if (!rvHasState) return
+  for (let i = 0; i < hands.length; i++) {
+    const hand = hands[i], d = hand._rvDisp
+    if (!d || d.lengthSq() < 1e-10) continue
+    _rvQi.copy(hand.wrapper.quaternion).invert()
+    _rvLocal.copy(d).applyQuaternion(_rvQi)
+    hand.clone.position.add(_rvLocal)
+  }
+}
+function rvCropTarget(hand, target) { return hand._rvCrop ? THREE.MathUtils.clamp(target + hand._rvCrop, 0, 1) : target }
+function rvSplayOf(hand) { return hand._rvSplay || 0 }
+function rvCurlKey(hand) { return hand._rvCurl ? '|c' + hand._rvCurl.toFixed(3) : '' }
+// The pose values the fingers are curled with: the hand's own values plus the velocity curl (clamped to the Max Finger Curl ceiling, never pulling a finger below where it already is).
+function rvCurlValues(hand, values) {
+  const d = hand._rvCurl
+  if (!d) return values
+  const v = Object.create(values)
+  const ceil = hand._rvCurlCeil ?? 100
+  FINGER_NAMES.forEach((n) => {
+    const key = FINGER_CURL_KEY[n], base = values[key]
+    if (typeof base !== 'number') return
+    v[key] = d > 0 ? Math.min(base + d, Math.max(base, ceil)) : base + d
+  })
+  return v
+}
+
 // Small local DOM helper -- devPanel.js's own `el()` isn't exported, and
 // pulling in a whole helper just for 2 one-off widgets isn't worth it.
 function elLocal(tag, styles, attrs) {
@@ -11022,7 +11513,7 @@ function applyPoseValuesToHand(hand, poseValues, extraSplayDeg) {
   if (!hand.currentBaseRb) hand.currentBaseRb = new THREE.Quaternion()
   hand.currentBaseRb.copy(_poseBaseRb)
   // Wrist BEFORE fingers -- see applyAllFingerPoses()'s own comment.
-  applyWristPoseToSkeleton(hand.skinnedMesh.skeleton, poseValues, extraSplayDeg)
+  applyWristPoseToSkeleton(hand.skinnedMesh.skeleton, poseValues, extraSplayDeg + rvSplayOf(hand)) // + Responsive Velocity > Velocity Wrist Splay (hand.currentSplayDeg below stays the plain value)
   // CORRECTED 2026-09-27 -- direct report: releasing a Click-Hold, waiting
   // a moment, then clicking elsewhere made the wrist visibly SNAP instead
   // of transitioning smoothly. Root cause: `extraSplayDeg` (Responsive
@@ -11040,7 +11531,7 @@ function applyPoseValuesToHand(hand, poseValues, extraSplayDeg) {
   // handoff between the two is never a discontinuity, matching this
   // project's own standing "no interaction ever jumps" rule.
   hand.currentSplayDeg = extraSplayDeg
-  if (!hand._curlSkip) applyAllFingerCurls(hand.skinnedMesh.skeleton, hand.currentBaseQuat, hand.wrapper.quaternion, poseValues) // off-screen skip: see updateFingerCurlSkip()
+  if (!hand._curlSkip) applyAllFingerCurls(hand.skinnedMesh.skeleton, hand.currentBaseQuat, hand.wrapper.quaternion, rvCurlValues(hand, poseValues)) // + Responsive Velocity > Velocity Finger Curl; off-screen skip: see updateFingerCurlSkip()
   // An ABSOLUTE position/scale set from this hand's own stored grid
   // `basePosition`, not an additive nudge -- recomputed fresh from
   // `poseValues` every call, so it can never compound across frames the
@@ -19763,6 +20254,8 @@ function animate(dt, now) {
           hd.currentPalmRollDeg = 0
         }
       }
+      updateResponsiveVelocity(nowVirtual()) // Cursor Tracking > Responsive Velocity (cursor-speed effects)
+      rvApplyArmTilt(armTrackOn || palmTrackOn)
       const __uroStart = performance.now()
       updateRenderOrder()
       applyFieldBounds()
@@ -20194,9 +20687,10 @@ function updateRenderOrder() {
     // mirrors applyHandArmLength()'s own existing "no prior value yet"
     // fallback, so a hand's very first frame still applies its target
     // instantly rather than lerping from nothing.
-    const targetArmLengthT = cfg.armLengthUseDepth === false
+    const targetArmLengthT0 = cfg.armLengthUseDepth === false
       ? computeArmLengthT(hand, hand._trkXY ?? handXYDist(hand), cfg.armLengthVisibleOnly !== false ? trkXYFieldMin : trkXYAllMin, cfg.armLengthVisibleOnly !== false ? trkXYFieldRange : trkXYAllRange) // Wrist Cropping Use Cursor Target Depth off: screen-space XY only
       : computeArmLengthT(hand, hand._cropDist ?? live, hand._cropDist === undefined ? minLiveDist : (cfg.armLengthVisibleOnly !== false ? cropFieldMin : cropAllMin), hand._cropDist === undefined ? liveDistRange : (cfg.armLengthVisibleOnly !== false ? cropFieldRange : cropAllRange)) // distance to the cursor at Wrist Cropping's own depth
+    const targetArmLengthT = rvCropTarget(hand, targetArmLengthT0) // + Responsive Velocity > Velocity Wrist Crop
     let armLengthDampingAmt = THREE.MathUtils.clamp(cfg.armLengthDamping ?? 1, 0.001, 1)
     if (hand._startupEase > 0) { armLengthDampingAmt = Math.min(armLengthDampingAmt, STARTUP_EASE_DAMPING); hand._startupEase-- } // ease-in after the startup hold is released (see releaseStartupHold())
     hand.currentArmLengthT = hand.currentArmLengthT !== undefined
@@ -20322,8 +20816,9 @@ function updateRenderOrder() {
       // hand copies cloneBaseQuat into currentBaseQuat (which is what turns the model), and it only ran with Responsive Wrist Splay on, after a trigger, or on a hand's
       // first frame -- so with Responsive Wrist Splay off the rotation sliders, a pose's rotation applied by Default, and Rotation at Base never reached idle hands.
       const baseChanged = !overridden && hand._cloneBaseVersion !== cloneBaseVersion
-      const needsIdleRepose = !overridden && ((cfg.wristSplayResponsiveEnabled && isThisHandsStaggerTurn) || hand._wasOverriddenLastFrame || !hand.everReposed || baseChanged)
+      const needsIdleRepose = !overridden && ((cfg.wristSplayResponsiveEnabled && isThisHandsStaggerTurn) || hand._wasOverriddenLastFrame || !hand.everReposed || baseChanged || hand._rvRepose)
       if (needsIdleRepose) {
+        hand._rvRepose = false
         hand._cloneBaseVersion = cloneBaseVersion
         const wasEverReposedBeforeThisFrame = hand.everReposed
         hand.everReposed = true
@@ -20409,7 +20904,7 @@ function updateRenderOrder() {
         hand.currentBaseQuat.copy(cloneBaseQuat)
         if (!hand.currentBaseRb) hand.currentBaseRb = new THREE.Quaternion()
         hand.currentBaseRb.copy(cloneBaseRb)
-        applyWristPoseToSkeleton(hand.skinnedMesh.skeleton, cfg, extraSplay)
+        applyWristPoseToSkeleton(hand.skinnedMesh.skeleton, cfg, extraSplay + rvSplayOf(hand)) // + Responsive Velocity > Velocity Wrist Splay
         // Keeps `hand.currentSplayDeg` (see applyPoseValuesToHand()'s own
         // 2026-09-27 comment) current for idle hands too -- this is the
         // ONLY splay-applying path in this file that doesn't already run
@@ -20456,15 +20951,17 @@ function updateRenderOrder() {
         // Skip the finger curl when nothing it depends on changed since this hand's last idle apply: same
         // pose/base signature and the wrist splay within 0.002 deg (the curl axes follow the wrist). Output
         // is identical; saves the dominant per-frame cost for idle hands.
-        if (!hand._curlSkip && (hand._idleCurlSig !== idleCurlSig || Math.abs(extraSplay - hand._idleCurlSplay) >= 0.002)) {
-          applyAllFingerCurls(hand.skinnedMesh.skeleton, hand.currentBaseQuat, hand.wrapper.quaternion, cfg)
-          hand._idleCurlSig = idleCurlSig
-          hand._idleCurlSplay = extraSplay
+        const rvSig = idleCurlSig + rvCurlKey(hand), rvSplayNow = extraSplay + rvSplayOf(hand)
+        if (!hand._curlSkip && (hand._idleCurlSig !== rvSig || Math.abs(rvSplayNow - hand._idleCurlSplay) >= 0.002)) {
+          applyAllFingerCurls(hand.skinnedMesh.skeleton, hand.currentBaseQuat, hand.wrapper.quaternion, rvCurlValues(hand, cfg)) // + Responsive Velocity > Velocity Finger Curl
+          hand._idleCurlSig = rvSig
+          hand._idleCurlSplay = rvSplayNow
         }
       }
       hand._wasOverriddenLastFrame = overridden
     }
   })
+  rvApplyDisplacement() // Responsive Velocity displacement, once every hand's pose is final
   updateSmallScaleModels()
 }
 animate()

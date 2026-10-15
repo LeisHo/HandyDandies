@@ -344,6 +344,10 @@ body:not(.hd-revealed) #pauseButton, body:not(.hd-revealed) #resetButton, body:n
    enabled custom function). The header's own `title` attribute carries
    the actual explanation as a native tooltip. */
 .dp-group.dp-group-conflict-warning { box-shadow: inset 3px 0 0 0 #e0a030; }
+/* Responsive Velocity (Cursor Tracking): a Displacement Angle set whose instructions conflict is red, and so is the setting that conflicts. */
+.dp-group.dp-rv-conflict { background: rgba(239, 68, 68, 0.14); box-shadow: inset 3px 0 0 0 #ef4444; }
+.dp-row.dp-rv-conflict-row { background: rgba(239, 68, 68, 0.28); box-shadow: inset 3px 0 0 #ef4444; }
+.dp-rv-add-row button { width: 100%; }
 /* A group nested one level inside another (see setupReorder's own nesting
    cap) gets an indent + accent border instead of its own top-level
    top-border, so nesting is visually obvious without needing extra text. */
