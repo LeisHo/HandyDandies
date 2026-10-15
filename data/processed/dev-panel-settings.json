@@ -8427,30 +8427,6 @@
       "cameraZoomSpeed": 0.3,
       "savedCameras": [
         {
-          "name": "HD - DESKTOP - 30 FOV",
-          "cameraX": 1.9534883720930232,
-          "cameraY": 5.541526766141773e-15,
-          "cameraZ": 115.97925521912504,
-          "cameraFov": 30,
-          "cameraZoom": 90.5,
-          "cameraRoll": 0,
-          "targetX": 1.9534883720930232,
-          "targetY": 0,
-          "targetZ": 25.479255219125044
-        },
-        {
-          "name": "HD - MOBILE - 30FOV",
-          "cameraX": -3.1777777777777776,
-          "cameraY": 2.071011807676939e-13,
-          "cameraZ": 260.17068872666084,
-          "cameraFov": 35,
-          "cameraZoom": 260.17068872666084,
-          "cameraRoll": 0,
-          "targetX": -3.1777777777777776,
-          "targetY": 1.9117032070864052e-13,
-          "targetZ": 0
-        },
-        {
           "name": "HD - DESKTOP - 20 FOV",
           "cameraX": 1.9534883720930232,
           "cameraY": 2.0272434216195883e-13,
@@ -20269,30 +20245,6 @@
       "cameraZoomSpeed": 1,
       "savedCameras": [
         {
-          "name": "HD - DESKTOP - 30 FOV",
-          "cameraX": 1.9534883720930232,
-          "cameraY": 5.541526766141773e-15,
-          "cameraZ": 115.97925521912504,
-          "cameraFov": 30,
-          "cameraZoom": 90.5,
-          "cameraRoll": 0,
-          "targetX": 1.9534883720930232,
-          "targetY": 0,
-          "targetZ": 25.479255219125044
-        },
-        {
-          "name": "HD - MOBILE - 30FOV",
-          "cameraX": -3.1777777777777776,
-          "cameraY": 2.071011807676939e-13,
-          "cameraZ": 260.17068872666084,
-          "cameraFov": 35,
-          "cameraZoom": 260.17068872666084,
-          "cameraRoll": 0,
-          "targetX": -3.1777777777777776,
-          "targetY": 1.9117032070864052e-13,
-          "targetZ": 0
-        },
-        {
           "name": "HD - DESKTOP - 20 FOV",
           "cameraX": 1.9534883720930232,
           "cameraY": 2.0272434216195883e-13,
@@ -32110,30 +32062,6 @@
       "cameraZoom": 260.17068872666084,
       "cameraZoomSpeed": 1,
       "savedCameras": [
-        {
-          "name": "HD - DESKTOP - 30 FOV",
-          "cameraX": 1.9534883720930232,
-          "cameraY": 5.541526766141773e-15,
-          "cameraZ": 115.97925521912504,
-          "cameraFov": 30,
-          "cameraZoom": 90.5,
-          "cameraRoll": 0,
-          "targetX": 1.9534883720930232,
-          "targetY": 0,
-          "targetZ": 25.479255219125044
-        },
-        {
-          "name": "HD - MOBILE - 30FOV",
-          "cameraX": -3.1777777777777776,
-          "cameraY": 2.071011807676939e-13,
-          "cameraZ": 260.17068872666084,
-          "cameraFov": 35,
-          "cameraZoom": 260.17068872666084,
-          "cameraRoll": 0,
-          "targetX": -3.1777777777777776,
-          "targetY": 1.9117032070864052e-13,
-          "targetZ": 0
-        },
         {
           "name": "HD - DESKTOP - 20 FOV",
           "cameraX": 1.9534883720930232,
