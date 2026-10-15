@@ -730,6 +730,62 @@ let fieldRevealed = false, fieldRevealFrames = 0, fieldWarmCompiled = false
 let fieldWarmStage = 0, fieldWarmRevealIndex = 0, fieldWarmStartMs = 0, fieldWarmBatch = 1, fieldWarmLastRenderMs = 0, fieldWarmPrevRenderMs = 0
 // Batch size adapts to how much the last batch ADDED to the draw time (not to the absolute draw time, which a slow GPU has even with nothing new): doubled while a batch added under 10 ms, halved (never below 4) when it added over 25 ms -- both thresholds and the floor of 4 are judgment calls, not measurements.
 const FIELD_WARM_CAP_MS = 20000
+// Loading Preview > Text (2026-10-15, direct request): free text shown beside the loading animation. Ten web-safe fonts, five sans-serif and five serif; each has a fallback stack so a machine without the first choice still gets the same kind.
+const LOADING_TEXT_FONTS = [
+  { name: 'Arial', css: 'Arial, Helvetica, sans-serif' }, { name: 'Helvetica', css: 'Helvetica, Arial, sans-serif' }, { name: 'Verdana', css: 'Verdana, Geneva, sans-serif' }, { name: 'Trebuchet MS', css: '"Trebuchet MS", Tahoma, sans-serif' }, { name: 'Tahoma', css: 'Tahoma, Geneva, sans-serif' },
+  { name: 'Georgia', css: 'Georgia, serif' }, { name: 'Times New Roman', css: '"Times New Roman", Times, serif' }, { name: 'Garamond', css: 'Garamond, "Palatino Linotype", serif' }, { name: 'Palatino Linotype', css: '"Palatino Linotype", Palatino, "Book Antiqua", serif' }, { name: 'Book Antiqua', css: '"Book Antiqua", Palatino, Georgia, serif' }
+]
+let loadingPreviewTextEl = null
+function updateLoadingPreviewText() {
+  if (!loadingPreviewTextEl) {
+    loadingPreviewTextEl = document.createElement('div')
+    loadingPreviewTextEl.id = 'loadingPreviewText'
+    // Above the loading-preview canvas (z-index 100000) and the loading blocker, below the dev panel (200000); never takes a click.
+    loadingPreviewTextEl.style.cssText = 'position:fixed;left:50%;top:50%;z-index:100002;pointer-events:none;white-space:pre-wrap;text-align:center;line-height:1.2;user-select:none;'
+    document.body.appendChild(loadingPreviewTextEl)
+    const cv0 = document.getElementById('loadingPreviewCanvas')
+    if (cv0 && typeof MutationObserver !== 'undefined') new MutationObserver(() => updateLoadingPreviewText()).observe(cv0, { attributes: true, attributeFilter: ['style'] })
+  }
+  const el = loadingPreviewTextEl
+  const cv = document.getElementById('loadingPreviewCanvas')
+  // Shown while the loading screen is up, and afterwards only while the loading animation itself stays visible (Show Loading Preview live).
+  const animationShown = !cv || cv.style.display !== 'none'
+  el.style.display = (cfg.loadingPreviewTextEnabled && (!fieldRevealed || animationShown)) ? 'block' : 'none'
+  el.textContent = cfg.loadingPreviewTextContent ?? ''
+  el.style.fontSize = (cfg.loadingPreviewTextFontSize ?? 32) + 'px'
+  el.style.color = cfg.loadingPreviewTextColor || '#ffffff'
+  const f = LOADING_TEXT_FONTS.find((x) => x.name === cfg.loadingPreviewTextFont) || LOADING_TEXT_FONTS[0]
+  el.style.fontFamily = f.css
+  el.style.transform = `translate(calc(-50% + ${cfg.loadingPreviewTextOffsetX ?? 0}px), calc(-50% + ${cfg.loadingPreviewTextOffsetY ?? 0}px))`
+}
+const LOADING_TEXT_ROW_KEYS = ['loadingPreviewTextContent', 'loadingPreviewTextFontSize', 'loadingPreviewTextColor', 'loadingPreviewTextFont', 'loadingPreviewTextOffsetX', 'loadingPreviewTextOffsetY']
+const LOADING_TEXT_GROUP_KEY = 'Loading Preview > Text'
+function updateLoadingPreviewTextGroupVisibility() {
+  const g = document.querySelector('.dp-group[data-key="' + LOADING_TEXT_GROUP_KEY + '"]')
+  const body = g && g.querySelector(':scope > .dp-group-body')
+  if (!body) return
+  if (!document.getElementById('dpStartupStyle')) { const st = document.createElement('style'); st.id = 'dpStartupStyle'; st.textContent = '.dp-startup-off > * { display: none !important }'; document.head.appendChild(st) }
+  body.classList.toggle('dp-startup-off', !cfg.loadingPreviewTextEnabled)
+}
+// Builds (or finds again, after a saved layout restored it) the nested "Text" subgroup of Loading Preview, with the On/Off checkbox in its header. Idempotent; rows are only moved from the Loading Preview group's own body, so a layout the user arranged is left alone.
+function setupLoadingPreviewTextGroup() {
+  updateLoadingPreviewText()
+  const lpGroup = document.querySelector('.dp-group[data-key="Loading Preview"]')
+  if (!lpGroup) return
+  let g = document.querySelector('.dp-group[data-key="' + LOADING_TEXT_GROUP_KEY + '"]')
+  if (!g) {
+    g = createGroupElement('Text')
+    g.dataset.key = LOADING_TEXT_GROUP_KEY // a bare "Text" key could be adopted by an unrelated group of the same title
+    lpGroup.querySelector(':scope > .dp-group-body').appendChild(g)
+  }
+  const lpBody = lpGroup.querySelector(':scope > .dp-group-body')
+  const gb = g.querySelector(':scope > .dp-group-body')
+  LOADING_TEXT_ROW_KEYS.forEach((k) => { const row = document.querySelector('.dp-row[data-key="' + k + '"]'); if (row && row.parentElement === lpBody) gb.appendChild(row) })
+  gateGroupHeader(LOADING_TEXT_GROUP_KEY, 'loadingPreviewTextEnabled')
+  safeRefreshSelectOptions('loadingPreviewTextFont')
+  updateLoadingPreviewTextGroupVisibility()
+  updateLoadingPreviewText()
+}
 // Loading Preview's own "Min Loading Time" (direct request) -- captured
 // here, at the earliest point this module runs, so the min-time window
 // starts from the true page-load moment, not from whenever tryStartField()
@@ -985,6 +1041,7 @@ function finalizeReveal() {
   logStartupTiming('reveal finalized (field painted)')
   syncLoadingPreviewBackground() // drops the loading-screen blocker
   loadingEl.classList.add('hidden')
+  updateLoadingPreviewText()
   document.body.classList.add('hd-revealed') // shows the Pause / Reset / Color Presets buttons (style.css hides them until now)
   // The loading-preview canvas is a top-level sibling of #loading now
   // (2026-09-17, decoupled specifically so this moment doesn't force it
@@ -2369,6 +2426,14 @@ const DEV_GROUPS = [
       // just `.enabled` on the controls object itself (which alone would
       // silently do nothing -- the canvas would never even receive the
       // events for OrbitControls to ignore-or-not).
+      // Text shown alongside the loading animation (2026-10-15, direct request). The rows below are moved into a nested, toggleable "Text" subgroup by setupLoadingPreviewTextGroup(); the on-screen element is #loadingPreviewText (updateLoadingPreviewText()).
+      { key: 'loadingPreviewTextEnabled', label: 'Text On/Off', type: 'checkbox', def: false, onChange: () => { updateLoadingPreviewText(); updateLoadingPreviewTextGroupVisibility() } },
+      { key: 'loadingPreviewTextContent', label: 'Text', type: 'text', def: 'Loading...', onChange: () => updateLoadingPreviewText() },
+      { key: 'loadingPreviewTextFontSize', label: 'Font Size (Px)', type: 'slider', min: 8, max: 200, step: 1, def: 32, perDevice: true, onChange: () => updateLoadingPreviewText() },
+      { key: 'loadingPreviewTextColor', label: 'Font Color', type: 'color', def: '#ffffff', onChange: () => updateLoadingPreviewText() },
+      { key: 'loadingPreviewTextFont', label: 'Font', type: 'select', def: 'Arial', options: () => LOADING_TEXT_FONTS.map((f) => f.name), onChange: () => updateLoadingPreviewText() },
+      { key: 'loadingPreviewTextOffsetX', label: 'Text Offset X (Px)', type: 'slider', min: -1500, max: 1500, step: 1, def: 0, perDevice: true, onChange: () => updateLoadingPreviewText() },
+      { key: 'loadingPreviewTextOffsetY', label: 'Text Offset Y (Px)', type: 'slider', min: -1500, max: 1500, step: 1, def: 0, perDevice: true, onChange: () => updateLoadingPreviewText() },
       { key: 'loadingPreviewCameraEditMode', label: 'Loading Preview Camera Edit Mode', type: 'checkbox', def: false, onChange: (v) => { if (loadingPreviewOrbitControls) loadingPreviewOrbitControls.enabled = v; if (loadingPreviewCanvas) loadingPreviewCanvas.style.pointerEvents = v ? 'auto' : 'none' } }
     ]
   },
@@ -3476,6 +3541,7 @@ const cfg = initDevPanel(DEV_GROUPS, {
     prof('enforceCustomClickFunctionsAnchorOrder', enforceCustomClickFunctionsAnchorOrder)
     prof('placeDepthControlsInFeatureGroups', placeDepthControlsInFeatureGroups)
     prof('placeLoadingPreviewLightingRows', placeLoadingPreviewLightingRows)
+    prof('setupLoadingPreviewTextGroup', setupLoadingPreviewTextGroup)
     prof('placeHandModelRows', placeHandModelRows)
     prof('syncHandModelWithSettings', syncHandModelWithSettings)
     startupSettingsReady = true
@@ -3561,6 +3627,7 @@ const cfg = initDevPanel(DEV_GROUPS, {
 })
 onChangeByCtrl.forEach((fn, c) => { c.onChange = fn })
 applyStartupCache()
+updateLoadingPreviewText() // the loading text shows from the first paint when the cache has it (the panel may not exist at all for a normal visitor)
 setupCustomFunctionTabVisibilitySync()
 updateCustomFunctionsAnchorRowVisibility()
 // Internal bookkeeping row, never meant for direct editing -- permanently
@@ -18293,7 +18360,10 @@ function setPaused(v) {
 function updatePauseButtonIcon() {
   const btn = document.getElementById('pauseButton')
   if (!btn) return
-  btn.textContent = isPaused ? '▶' : '⏸' // ▶ (resume) / ⏸ (pause)
+  // Drawn as SVG filled with currentColor (the Icon Color setting, white by default) instead of the ⏸ / ▶ characters: ⏸ (U+23F8) is an emoji on most platforms and renders as an orange tile whatever the CSS color is (2026-10-15, direct report).
+  btn.innerHTML = isPaused
+    ? '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg>'
+    : '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="currentColor" aria-hidden="true"><rect x="6" y="4.5" width="4.2" height="15"/><rect x="13.8" y="4.5" width="4.2" height="15"/></svg>'
   const label = isPaused ? 'Resume' : 'Pause'
   btn.title = label
   btn.setAttribute('aria-label', label)
