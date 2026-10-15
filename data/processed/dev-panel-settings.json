@@ -390,7 +390,7 @@
       "loadingPreviewSequenceHoldMs": 0,
       "loadingPreviewSize": 1600,
       "loadingPreviewRotationX": -85.46571581217302,
-      "loadingPreviewRotationY": -109.10457274713559,
+      "loadingPreviewRotationY": -109.10457274713558,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0,
       "loadingPreviewOffsetY": 0,
@@ -8415,13 +8415,14 @@
           ]
         }
       ],
-      "cameraX": 1.9636363636363634,
-      "cameraY": 5.541526766141773e-15,
-      "cameraZ": 115.97925521912504,
-      "cameraFov": 30,
+      "cameraX": 1.9534883720930232,
+      "cameraY": 2.022038672723212e-13,
+      "cameraZ": 214.9004898795015,
+      "cameraFov": 20,
       "cameraYaw": 0,
       "cameraPitch": 0,
       "cameraRoll": 0,
+      "cameraDefaultPreset": "{\"cameraX\":1.9534883720930232,\"cameraY\":2.0272434216195883e-13,\"cameraZ\":223.4004898795015,\"cameraFov\":20,\"cameraZoom\":99,\"cameraRoll\":0,\"targetX\":1.9534883720930232,\"targetY\":1.9666234050617943e-13,\"targetZ\":124.40048987950149}",
       "cameraZoom": 90.5,
       "cameraZoomSpeed": 0.3,
       "savedCameras": [
@@ -11788,7 +11789,58 @@
       "custom52Trig2RetransitionStartTimeCurveEnabled": true,
       "custom52Trig2RetransitionStartTimeCurveVisibleOnly": true,
       "custom52Trig2RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom52Trig2RetransitionStartTimeRange": "{\"min\":0,\"max\":300}"
+      "custom52Trig2RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
+      "rvEnabled": false,
+      "rvHoldOnly": false,
+      "rvVelocityRange": "{\"min\":300,\"max\":3000}",
+      "rvVelocitySmoothing": 0.35,
+      "rvTriggerDistanceRange": "{\"min\":15,\"max\":90}",
+      "rvTriggerDistanceCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "rvStartTimeEnabled": true,
+      "rvStartTimeRange": "{\"min\":0,\"max\":300}",
+      "rvStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "rvSpeedEnabled": true,
+      "rvSpeedRange": "{\"min\":150,\"max\":600}",
+      "rvSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "rvSets": "[{\"prefix\":\"rvSet1\",\"title\":\"Displacement Angle to Velocity 1\"}]",
+      "rvRetransitionEnabled": true,
+      "rvRetransitionSpeedMs": 400,
+      "rvRetransitionSpeedCurveEnabled": false,
+      "rvRetransitionSpeedRange": "{\"min\":100,\"max\":1000}",
+      "rvRetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "rvRetransitionStartTimeCurveEnabled": false,
+      "rvRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
+      "rvRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "rvRetransitionEasingCurveEnabled": false,
+      "rvRetransitionEasingCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "rvEasingCurveEnabled": false,
+      "rvEasingCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "rvSet1Enabled": true,
+      "rvSet1Angle": 0,
+      "rvSet1DisplacementRange": "{\"min\":0,\"max\":5}",
+      "rvSet1DisplacementCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "rvSet1DisplacementDistCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
+      "rvSet1TriggerAngleRange": "{\"min\":0,\"max\":0}",
+      "rvSet1AngleCurveEnabled": false,
+      "rvSet1AngleCurveRange": "{\"min\":0,\"max\":180}",
+      "rvSet1AngleCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "rvSet1ArmEnabled": false,
+      "rvSet1ArmRange": "{\"min\":0,\"max\":12}",
+      "rvSet1ArmCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "rvSet1ArmDistCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
+      "rvSet1SplayEnabled": false,
+      "rvSet1SplayRange": "{\"min\":0,\"max\":25}",
+      "rvSet1SplayCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "rvSet1SplayDistCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
+      "rvSet1CropEnabled": false,
+      "rvSet1CropRange": "{\"min\":0,\"max\":0.4}",
+      "rvSet1CropCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "rvSet1CropDistCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
+      "rvSet1CurlEnabled": false,
+      "rvSet1CurlRange": "{\"min\":0,\"max\":40}",
+      "rvSet1CurlCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "rvSet1CurlDistCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
+      "rvSet1CurlMax": 100
     },
     "mobile": {
       "pauseBtnXOffset": 12,
@@ -12180,7 +12232,7 @@
       "loadingPreviewSequenceHoldMs": 0,
       "loadingPreviewSize": 1390,
       "loadingPreviewRotationX": -85.46571581217302,
-      "loadingPreviewRotationY": -109.10457274713559,
+      "loadingPreviewRotationY": -109.10457274713558,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0,
       "loadingPreviewOffsetY": 0,
@@ -20212,6 +20264,7 @@
       "cameraYaw": 0,
       "cameraPitch": 0,
       "cameraRoll": 0,
+      "cameraDefaultPreset": "{\"cameraX\":1.9534883720930232,\"cameraY\":2.0272434216195883e-13,\"cameraZ\":223.4004898795015,\"cameraFov\":20,\"cameraZoom\":99,\"cameraRoll\":0,\"targetX\":1.9534883720930232,\"targetY\":1.9666234050617943e-13,\"targetZ\":124.40048987950149}",
       "cameraZoom": 260.17068872666084,
       "cameraZoomSpeed": 1,
       "savedCameras": [
@@ -23578,7 +23631,58 @@
       "custom52Trig2RetransitionStartTimeCurveEnabled": true,
       "custom52Trig2RetransitionStartTimeCurveVisibleOnly": true,
       "custom52Trig2RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom52Trig2RetransitionStartTimeRange": "{\"min\":0,\"max\":300}"
+      "custom52Trig2RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
+      "rvEnabled": false,
+      "rvHoldOnly": false,
+      "rvVelocityRange": "{\"min\":300,\"max\":3000}",
+      "rvVelocitySmoothing": 0.35,
+      "rvTriggerDistanceRange": "{\"min\":15,\"max\":90}",
+      "rvTriggerDistanceCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "rvStartTimeEnabled": true,
+      "rvStartTimeRange": "{\"min\":0,\"max\":300}",
+      "rvStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "rvSpeedEnabled": true,
+      "rvSpeedRange": "{\"min\":150,\"max\":600}",
+      "rvSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "rvSets": "[{\"prefix\":\"rvSet1\",\"title\":\"Displacement Angle to Velocity 1\"}]",
+      "rvRetransitionEnabled": true,
+      "rvRetransitionSpeedMs": 400,
+      "rvRetransitionSpeedCurveEnabled": false,
+      "rvRetransitionSpeedRange": "{\"min\":100,\"max\":1000}",
+      "rvRetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "rvRetransitionStartTimeCurveEnabled": false,
+      "rvRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
+      "rvRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "rvRetransitionEasingCurveEnabled": false,
+      "rvRetransitionEasingCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "rvEasingCurveEnabled": false,
+      "rvEasingCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "rvSet1Enabled": true,
+      "rvSet1Angle": 0,
+      "rvSet1DisplacementRange": "{\"min\":0,\"max\":5}",
+      "rvSet1DisplacementCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "rvSet1DisplacementDistCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
+      "rvSet1TriggerAngleRange": "{\"min\":0,\"max\":0}",
+      "rvSet1AngleCurveEnabled": false,
+      "rvSet1AngleCurveRange": "{\"min\":0,\"max\":180}",
+      "rvSet1AngleCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "rvSet1ArmEnabled": false,
+      "rvSet1ArmRange": "{\"min\":0,\"max\":12}",
+      "rvSet1ArmCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "rvSet1ArmDistCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
+      "rvSet1SplayEnabled": false,
+      "rvSet1SplayRange": "{\"min\":0,\"max\":25}",
+      "rvSet1SplayCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "rvSet1SplayDistCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
+      "rvSet1CropEnabled": false,
+      "rvSet1CropRange": "{\"min\":0,\"max\":0.4}",
+      "rvSet1CropCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "rvSet1CropDistCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
+      "rvSet1CurlEnabled": false,
+      "rvSet1CurlRange": "{\"min\":0,\"max\":40}",
+      "rvSet1CurlCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "rvSet1CurlDistCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
+      "rvSet1CurlMax": 100
     },
     "landscape": {
       "pauseBtnXOffset": 12,
@@ -23970,7 +24074,7 @@
       "loadingPreviewSequenceHoldMs": 0,
       "loadingPreviewSize": 1600,
       "loadingPreviewRotationX": -85.46571581217302,
-      "loadingPreviewRotationY": -109.10457274713559,
+      "loadingPreviewRotationY": -109.10457274713558,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0,
       "loadingPreviewOffsetY": 0,
@@ -32002,6 +32106,7 @@
       "cameraYaw": 1.464,
       "cameraPitch": -2.946,
       "cameraRoll": 0,
+      "cameraDefaultPreset": "{\"cameraX\":1.9534883720930232,\"cameraY\":2.0272434216195883e-13,\"cameraZ\":223.4004898795015,\"cameraFov\":20,\"cameraZoom\":99,\"cameraRoll\":0,\"targetX\":1.9534883720930232,\"targetY\":1.9666234050617943e-13,\"targetZ\":124.40048987950149}",
       "cameraZoom": 260.17068872666084,
       "cameraZoomSpeed": 1,
       "savedCameras": [
@@ -35368,7 +35473,58 @@
       "custom52Trig2RetransitionStartTimeCurveEnabled": true,
       "custom52Trig2RetransitionStartTimeCurveVisibleOnly": true,
       "custom52Trig2RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom52Trig2RetransitionStartTimeRange": "{\"min\":0,\"max\":300}"
+      "custom52Trig2RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
+      "rvEnabled": false,
+      "rvHoldOnly": false,
+      "rvVelocityRange": "{\"min\":300,\"max\":3000}",
+      "rvVelocitySmoothing": 0.35,
+      "rvTriggerDistanceRange": "{\"min\":15,\"max\":90}",
+      "rvTriggerDistanceCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "rvStartTimeEnabled": true,
+      "rvStartTimeRange": "{\"min\":0,\"max\":300}",
+      "rvStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "rvSpeedEnabled": true,
+      "rvSpeedRange": "{\"min\":150,\"max\":600}",
+      "rvSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "rvSets": "[{\"prefix\":\"rvSet1\",\"title\":\"Displacement Angle to Velocity 1\"}]",
+      "rvRetransitionEnabled": true,
+      "rvRetransitionSpeedMs": 400,
+      "rvRetransitionSpeedCurveEnabled": false,
+      "rvRetransitionSpeedRange": "{\"min\":100,\"max\":1000}",
+      "rvRetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "rvRetransitionStartTimeCurveEnabled": false,
+      "rvRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
+      "rvRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "rvRetransitionEasingCurveEnabled": false,
+      "rvRetransitionEasingCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "rvEasingCurveEnabled": false,
+      "rvEasingCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "rvSet1Enabled": true,
+      "rvSet1Angle": 0,
+      "rvSet1DisplacementRange": "{\"min\":0,\"max\":5}",
+      "rvSet1DisplacementCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "rvSet1DisplacementDistCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
+      "rvSet1TriggerAngleRange": "{\"min\":0,\"max\":0}",
+      "rvSet1AngleCurveEnabled": false,
+      "rvSet1AngleCurveRange": "{\"min\":0,\"max\":180}",
+      "rvSet1AngleCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "rvSet1ArmEnabled": false,
+      "rvSet1ArmRange": "{\"min\":0,\"max\":12}",
+      "rvSet1ArmCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "rvSet1ArmDistCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
+      "rvSet1SplayEnabled": false,
+      "rvSet1SplayRange": "{\"min\":0,\"max\":25}",
+      "rvSet1SplayCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "rvSet1SplayDistCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
+      "rvSet1CropEnabled": false,
+      "rvSet1CropRange": "{\"min\":0,\"max\":0.4}",
+      "rvSet1CropCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "rvSet1CropDistCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
+      "rvSet1CurlEnabled": false,
+      "rvSet1CurlRange": "{\"min\":0,\"max\":40}",
+      "rvSet1CurlCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "rvSet1CurlDistCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
+      "rvSet1CurlMax": 100
     }
   },
   "order": [
@@ -35905,14 +36061,14 @@
     },
     {
       "key": "Saved Dev Settings",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [],
       "settings": []
     },
     {
       "key": "New Group (9)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -36284,7 +36440,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -37364,6 +37520,363 @@
               {
                 "type": "row",
                 "key": "armRotationOffsetY"
+              },
+              {
+                "type": "group",
+                "group": {
+                  "key": "Responsive Velocity",
+                  "collapsed": true,
+                  "locked": false,
+                  "items": [
+                    {
+                      "type": "row",
+                      "key": "rvHoldOnly"
+                    },
+                    {
+                      "type": "row",
+                      "key": "rvVelocityRange"
+                    },
+                    {
+                      "type": "row",
+                      "key": "rvVelocitySmoothing"
+                    },
+                    {
+                      "type": "row",
+                      "key": "rvTriggerDistanceRange"
+                    },
+                    {
+                      "type": "row",
+                      "key": "rvTriggerDistanceCurve"
+                    },
+                    {
+                      "type": "group",
+                      "group": {
+                        "key": "Displacement Start Time Curve",
+                        "collapsed": true,
+                        "locked": false,
+                        "items": [
+                          {
+                            "type": "row",
+                            "key": "rvStartTimeRange"
+                          },
+                          {
+                            "type": "row",
+                            "key": "rvStartTimeCurve"
+                          }
+                        ],
+                        "settings": [
+                          "rvStartTimeRange",
+                          "rvStartTimeCurve"
+                        ]
+                      }
+                    },
+                    {
+                      "type": "group",
+                      "group": {
+                        "key": "Displacement Speed Curve",
+                        "collapsed": true,
+                        "locked": false,
+                        "items": [
+                          {
+                            "type": "row",
+                            "key": "rvSpeedRange"
+                          },
+                          {
+                            "type": "row",
+                            "key": "rvSpeedCurve"
+                          }
+                        ],
+                        "settings": [
+                          "rvSpeedRange",
+                          "rvSpeedCurve"
+                        ]
+                      }
+                    },
+                    {
+                      "type": "row",
+                      "key": "rvSets"
+                    },
+                    {
+                      "type": "group",
+                      "group": {
+                        "key": "Displacement Angle to Velocity 1",
+                        "collapsed": true,
+                        "locked": false,
+                        "items": [
+                          {
+                            "type": "row",
+                            "key": "rvSet1Angle"
+                          },
+                          {
+                            "type": "row",
+                            "key": "rvSet1DisplacementRange"
+                          },
+                          {
+                            "type": "row",
+                            "key": "rvSet1DisplacementCurve"
+                          },
+                          {
+                            "type": "row",
+                            "key": "rvSet1DisplacementDistCurve"
+                          },
+                          {
+                            "type": "row",
+                            "key": "rvSet1TriggerAngleRange"
+                          },
+                          {
+                            "type": "group",
+                            "group": {
+                              "key": "Displacement Angle Curve",
+                              "collapsed": true,
+                              "locked": false,
+                              "items": [
+                                {
+                                  "type": "row",
+                                  "key": "rvSet1AngleCurveRange"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "rvSet1AngleCurve"
+                                }
+                              ],
+                              "settings": [
+                                "rvSet1AngleCurveRange",
+                                "rvSet1AngleCurve"
+                              ]
+                            }
+                          },
+                          {
+                            "type": "group",
+                            "group": {
+                              "key": "Velocity Arm Rotation",
+                              "collapsed": true,
+                              "locked": false,
+                              "items": [
+                                {
+                                  "type": "row",
+                                  "key": "rvSet1ArmRange"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "rvSet1ArmCurve"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "rvSet1ArmDistCurve"
+                                }
+                              ],
+                              "settings": [
+                                "rvSet1ArmRange",
+                                "rvSet1ArmCurve",
+                                "rvSet1ArmDistCurve"
+                              ]
+                            }
+                          },
+                          {
+                            "type": "group",
+                            "group": {
+                              "key": "Velocity Wrist Splay",
+                              "collapsed": true,
+                              "locked": false,
+                              "items": [
+                                {
+                                  "type": "row",
+                                  "key": "rvSet1SplayRange"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "rvSet1SplayCurve"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "rvSet1SplayDistCurve"
+                                }
+                              ],
+                              "settings": [
+                                "rvSet1SplayRange",
+                                "rvSet1SplayCurve",
+                                "rvSet1SplayDistCurve"
+                              ]
+                            }
+                          },
+                          {
+                            "type": "group",
+                            "group": {
+                              "key": "Velocity Wrist Crop",
+                              "collapsed": true,
+                              "locked": false,
+                              "items": [
+                                {
+                                  "type": "row",
+                                  "key": "rvSet1CropRange"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "rvSet1CropCurve"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "rvSet1CropDistCurve"
+                                }
+                              ],
+                              "settings": [
+                                "rvSet1CropRange",
+                                "rvSet1CropCurve",
+                                "rvSet1CropDistCurve"
+                              ]
+                            }
+                          },
+                          {
+                            "type": "group",
+                            "group": {
+                              "key": "Velocity Finger Curl",
+                              "collapsed": true,
+                              "locked": false,
+                              "items": [
+                                {
+                                  "type": "row",
+                                  "key": "rvSet1CurlRange"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "rvSet1CurlCurve"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "rvSet1CurlDistCurve"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "rvSet1CurlMax"
+                                }
+                              ],
+                              "settings": [
+                                "rvSet1CurlRange",
+                                "rvSet1CurlCurve",
+                                "rvSet1CurlDistCurve",
+                                "rvSet1CurlMax"
+                              ]
+                            }
+                          }
+                        ],
+                        "settings": [
+                          "rvSet1Angle",
+                          "rvSet1DisplacementRange",
+                          "rvSet1DisplacementCurve",
+                          "rvSet1DisplacementDistCurve",
+                          "rvSet1TriggerAngleRange"
+                        ]
+                      }
+                    },
+                    {
+                      "type": "row"
+                    },
+                    {
+                      "type": "group",
+                      "group": {
+                        "key": "Retransition",
+                        "collapsed": true,
+                        "locked": false,
+                        "items": [
+                          {
+                            "type": "row",
+                            "key": "rvRetransitionSpeedMs"
+                          },
+                          {
+                            "type": "group",
+                            "group": {
+                              "key": "Retransition Speed Curve",
+                              "collapsed": true,
+                              "locked": false,
+                              "items": [
+                                {
+                                  "type": "row",
+                                  "key": "rvRetransitionSpeedRange"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "rvRetransitionSpeedCurve"
+                                }
+                              ],
+                              "settings": [
+                                "rvRetransitionSpeedRange",
+                                "rvRetransitionSpeedCurve"
+                              ]
+                            }
+                          },
+                          {
+                            "type": "group",
+                            "group": {
+                              "key": "Retransition Start Time Curve",
+                              "collapsed": true,
+                              "locked": false,
+                              "items": [
+                                {
+                                  "type": "row",
+                                  "key": "rvRetransitionStartTimeRange"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "rvRetransitionStartTimeCurve"
+                                }
+                              ],
+                              "settings": [
+                                "rvRetransitionStartTimeRange",
+                                "rvRetransitionStartTimeCurve"
+                              ]
+                            }
+                          },
+                          {
+                            "type": "group",
+                            "group": {
+                              "key": "Retransition Easing Curve",
+                              "collapsed": true,
+                              "locked": false,
+                              "items": [
+                                {
+                                  "type": "row",
+                                  "key": "rvRetransitionEasingCurve"
+                                }
+                              ],
+                              "settings": [
+                                "rvRetransitionEasingCurve"
+                              ]
+                            }
+                          }
+                        ],
+                        "settings": [
+                          "rvRetransitionSpeedMs"
+                        ]
+                      }
+                    },
+                    {
+                      "type": "group",
+                      "group": {
+                        "key": "Easing",
+                        "collapsed": true,
+                        "locked": false,
+                        "items": [
+                          {
+                            "type": "row",
+                            "key": "rvEasingCurve"
+                          }
+                        ],
+                        "settings": [
+                          "rvEasingCurve"
+                        ]
+                      }
+                    }
+                  ],
+                  "settings": [
+                    "rvHoldOnly",
+                    "rvVelocityRange",
+                    "rvVelocitySmoothing",
+                    "rvTriggerDistanceRange",
+                    "rvTriggerDistanceCurve",
+                    "rvSets",
+                    null
+                  ]
+                }
               }
             ],
             "settings": [
@@ -37565,7 +38078,7 @@
     },
     {
       "key": "New Group (11)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -37676,7 +38189,7 @@
           "type": "group",
           "group": {
             "key": "Camera",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -37734,6 +38247,10 @@
               {
                 "type": "row",
                 "key": "cameraRoll"
+              },
+              {
+                "type": "row",
+                "key": "cameraDefaultPreset"
               }
             ],
             "settings": [
@@ -37750,7 +38267,8 @@
               "cameraZoom",
               "cameraYaw",
               "cameraPitch",
-              "cameraRoll"
+              "cameraRoll",
+              "cameraDefaultPreset"
             ]
           }
         },
@@ -42044,9 +42562,9 @@
   "devHotkeys": {},
   "panelGeometry": {
     "desktop": {
-      "left": 1001.625,
-      "top": 0,
-      "width": 553.5750122070312,
+      "left": 839.2250366210938,
+      "top": 5.599999904632568,
+      "width": 556.7750244140625,
       "height": 711.6000366210938
     },
     "mobile": {
