@@ -8997,7 +8997,7 @@
       "floorColor": "#000000",
       "floorZOffset": 0,
       "floorXYScale": 1,
-      "pixelRatio": 1.25,
+      "pixelRatio": 2,
       "resolutionScale": 100,
       "qualityPreset": "high",
       "skipOffScreenFingerCurls": true,
@@ -20807,7 +20807,7 @@
         }
       ],
       "cameraX": -3.1777777777777776,
-      "cameraY": 4.938566618306538e-13,
+      "cameraY": 5.416492420078138e-13,
       "cameraZ": 260.17068872666084,
       "cameraFov": 35,
       "cameraYaw": 0,
@@ -21373,7 +21373,7 @@
       "floorColor": "#000000",
       "floorZOffset": 0,
       "floorXYScale": 1,
-      "pixelRatio": 1.25,
+      "pixelRatio": 2,
       "resolutionScale": 100,
       "qualityPreset": "high",
       "skipOffScreenFingerCurls": true,
@@ -33749,7 +33749,7 @@
       "floorColor": "#000000",
       "floorZOffset": 0,
       "floorXYScale": 1,
-      "pixelRatio": 1.25,
+      "pixelRatio": 2,
       "resolutionScale": 100,
       "qualityPreset": "high",
       "skipOffScreenFingerCurls": true,
@@ -43856,6 +43856,12 @@
       "top": 0,
       "width": 540.7750244140625,
       "height": 711.6000366210938
+    },
+    "mobile": {
+      "left": 20,
+      "top": 2.6964285373687744,
+      "width": 397.8571472167969,
+      "height": 524.607177734375
     }
   }
 }
