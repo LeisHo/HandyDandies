@@ -7915,7 +7915,7 @@
         }
       ],
       "cameraX": 1.9534883720930232,
-      "cameraY": 3.0478397213779863e-13,
+      "cameraY": 3.214085524362242e-13,
       "cameraZ": 115.97925521912504,
       "cameraFov": 33,
       "cameraYaw": 0,
@@ -39502,7 +39502,7 @@
           "type": "group",
           "group": {
             "key": "Field Layout",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -46582,8 +46582,8 @@
     "desktop": {
       "left": 908.8250122070312,
       "top": 30.787500381469727,
-      "width": 633.5750122070312,
-      "height": 702.4125366210938
+      "width": 636.7750244140625,
+      "height": 704.0125122070312
     },
     "mobile": {
       "left": 20,
