@@ -8,7 +8,7 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js'
 import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js'
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js'
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js'
-import { DEV_MODE, initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab, beginDynamicBatch, endDynamicBatch } from './devpanel/devPanel.js?v=66'
+import { DEV_MODE, initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab, beginDynamicBatch, endDynamicBatch } from './devpanel/devPanel.js?v=67'
 
 // Toon Shading colour gradient (2026-10-12): MeshToonMaterial's getGradientIrradiance() only reads the RED channel of
 // its gradientMap (a grey ramp). Reading RGB instead is identical for every grey ramp (all channels equal) and lets
@@ -869,7 +869,7 @@ function tryStartField() {
   // whatever comes next; don't treat this comment's own reasoning above
   // as the settled explanation.
   if (!fieldWarmCompiled) renderer.compile(scene, camera)
-  window.__debug = { applyOffsetRotationToHand, bakeOffsetRotationIntoAccum, loopLapProgress, loopLapEnd, rotateHandAboutArmBase, updateLoadingPreviewHand2, get palmCenterPosRaw() { return palmCenterPosRaw }, get handoPivotRaw() { return handoPivotRaw }, get handBoundsBoxCenterRaw() { return handBoundsBoxCenterRaw }, get alignQuat() { return alignQuat }, get loadingPreviewModelScale() { return loadingPreviewModelScale }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, handBoundsCenterLocal, LOADING_PREVIEW_REFERENCE_RADIUS, importTwoHandTween, convertHandoCameraPreset, applyLoadingPreviewCameraPreset, animateFrame: (...a) => animate(...a), releaseStartupHold, trackingActiveFor, placeStartupRetransitionGroup, startupHandScale, updateFieldCenterMarker, get fieldCenterPoint() { return fieldCenterPoint }, retransitionScalerMul, startupHandPhaseUnfinished, applyFieldBounds, onFieldBoundsChanged, retransitionDistanceMs, untriggeredVisibleSpheres, allVisibleHandsFinished, handStartupLocked, triggerClickPose, checkStartupFloorHide, get startupFloorHidden() { return startupFloorHidden }, get floorMesh() { return floorMesh }, updateLoadingPreviewAnimation, get loadingPreview2() { return { hand: loadingPreviewHand, hand2: loadingPreviewHand2, scene: loadingPreviewScene, camera: loadingPreviewCamera, renderer: loadingPreviewRenderer } }, updateSphereSequence, get sphereState() { return { stage: sphereStage, mesh: sphereMesh, on: sphereOn, start: sphereStart, dur: sphereDur, cap: sphereCap, done: sphereDone, keep: sphereKeepForHands, clicks: sphereClickCount } }, stackOnDefault, applyCameraOrientation, syncCameraPanelFromLive, curveByDomain, get domains() { return { xyAll: [xyAllMinDist, xyAllDistRange], splayAll: [splayAllMin, splayAllRange], cropAll: [cropAllMin, cropAllRange], restAll: [restAllMinDist, restAllDistRange], live: [liveFieldMinDist, liveFieldDistRange], splay: [splayFieldMin, splayFieldRange], crop: [cropFieldMin, cropFieldRange], xy: [xyFieldMinDist, xyFieldDistRange], rest: [restFieldMinDist, restFieldDistRange] } }, modelBaseFrameQ, computeBaseRotationQuat, cloneBaseRb, makeClipRig, updateClipRigPlanes, setClipRigT, updateOnScreenFlags, evaluateArmLengthCurve, THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose, resolveTweenSegmentsWithAnchor, lerpTweenSegments, lerpLoopSegments, isHoldEntry, updateLoadingPreviewWristClip, lerpPoseValues, get loadingPreviewRenderer() { return loadingPreviewRenderer }, get loadingPreviewScene() { return loadingPreviewScene }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, get handBoundsCenterLocal() { return handBoundsCenterLocal }, multiPointCommit, multiPointEligibleFunctions, get multiPointActiveTouchCount() { return multiPointActiveTouchCount }, get multiPointSessionFiredPoseId() { return multiPointSessionFiredPoseId }, detectPoseJumps, get poseJumpLogEntries() { return poseJumpLogEntries }, applyCurlToSkeletonReference, handLogTriggerLabel, applyAllFingerCurls, syncCameraPanelFromLive, animSpeedMs, chainSequenceCount, applyFieldBounds, cursorDistXY, hexBrightnessPct, toonThresholdForMidBrightness }
+  window.__debug = { applyOffsetRotationToHand, get customFunctionCollapseReady() { return customFunctionCollapseReady }, markCustomFunctionCollapseReady: () => { customFunctionCollapseReady = true }, applyCustomFunctionCollapse, persistCustomClickFunctionIds, bakeOffsetRotationIntoAccum, loopLapProgress, loopLapEnd, rotateHandAboutArmBase, updateLoadingPreviewHand2, get palmCenterPosRaw() { return palmCenterPosRaw }, get handoPivotRaw() { return handoPivotRaw }, get handBoundsBoxCenterRaw() { return handBoundsBoxCenterRaw }, get alignQuat() { return alignQuat }, get loadingPreviewModelScale() { return loadingPreviewModelScale }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, handBoundsCenterLocal, LOADING_PREVIEW_REFERENCE_RADIUS, importTwoHandTween, convertHandoCameraPreset, applyLoadingPreviewCameraPreset, animateFrame: (...a) => animate(...a), releaseStartupHold, trackingActiveFor, placeStartupRetransitionGroup, startupHandScale, updateFieldCenterMarker, get fieldCenterPoint() { return fieldCenterPoint }, retransitionScalerMul, startupHandPhaseUnfinished, applyFieldBounds, onFieldBoundsChanged, retransitionDistanceMs, untriggeredVisibleSpheres, allVisibleHandsFinished, handStartupLocked, triggerClickPose, checkStartupFloorHide, get startupFloorHidden() { return startupFloorHidden }, get floorMesh() { return floorMesh }, updateLoadingPreviewAnimation, get loadingPreview2() { return { hand: loadingPreviewHand, hand2: loadingPreviewHand2, scene: loadingPreviewScene, camera: loadingPreviewCamera, renderer: loadingPreviewRenderer } }, updateSphereSequence, get sphereState() { return { stage: sphereStage, mesh: sphereMesh, on: sphereOn, start: sphereStart, dur: sphereDur, cap: sphereCap, done: sphereDone, keep: sphereKeepForHands, clicks: sphereClickCount } }, stackOnDefault, applyCameraOrientation, syncCameraPanelFromLive, curveByDomain, get domains() { return { xyAll: [xyAllMinDist, xyAllDistRange], splayAll: [splayAllMin, splayAllRange], cropAll: [cropAllMin, cropAllRange], restAll: [restAllMinDist, restAllDistRange], live: [liveFieldMinDist, liveFieldDistRange], splay: [splayFieldMin, splayFieldRange], crop: [cropFieldMin, cropFieldRange], xy: [xyFieldMinDist, xyFieldDistRange], rest: [restFieldMinDist, restFieldDistRange] } }, modelBaseFrameQ, computeBaseRotationQuat, cloneBaseRb, makeClipRig, updateClipRigPlanes, setClipRigT, updateOnScreenFlags, evaluateArmLengthCurve, THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose, resolveTweenSegmentsWithAnchor, lerpTweenSegments, lerpLoopSegments, isHoldEntry, updateLoadingPreviewWristClip, lerpPoseValues, get loadingPreviewRenderer() { return loadingPreviewRenderer }, get loadingPreviewScene() { return loadingPreviewScene }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, get handBoundsCenterLocal() { return handBoundsCenterLocal }, multiPointCommit, multiPointEligibleFunctions, get multiPointActiveTouchCount() { return multiPointActiveTouchCount }, get multiPointSessionFiredPoseId() { return multiPointSessionFiredPoseId }, detectPoseJumps, get poseJumpLogEntries() { return poseJumpLogEntries }, applyCurlToSkeletonReference, handLogTriggerLabel, applyAllFingerCurls, syncCameraPanelFromLive, animSpeedMs, chainSequenceCount, applyFieldBounds, cursorDistXY, hexBrightnessPct, toonThresholdForMidBrightness }
   // Do NOT hide the loading screen yet: the hands exist but may not have been painted. finalizeReveal() hides it once the field has rendered a couple of frames (or after a 4 s safety net).
   setTimeout(finalizeReveal, 4000)
 }
@@ -3401,6 +3401,7 @@ const cfg = initDevPanel(DEV_GROUPS, {
   // Undo/Redo leaves the live camera sliders alone unless the step was itself a camera-slider edit (2026-10-06).
   undoLiveKeys: ['cameraX', 'cameraY', 'cameraZ', 'cameraFov', 'cameraZoom', 'cameraYaw', 'cameraPitch', 'cameraRoll'],
   // Keep the startup cache in step with what was just saved.
+  onBeforeSave: () => persistCustomClickFunctionIds(),
   onSave: () => writeStartupCache()
 })
 onChangeByCtrl.forEach((fn, c) => { c.onChange = fn })
@@ -6470,7 +6471,7 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       // should only show when Single Pose is selected") -- Enabled, Mode,
       // and Hold Confirm Delay stay visible regardless of mode.
       {
-        key: `${p}Mode`, label: 'Mode', type: 'select', def: 'Single Pose', options: () => ['Single Pose', 'Sequence', 'Chain'],
+        key: `${p}Mode`, label: 'Mode', type: 'select', def: 'Single Pose', options: () => ['Single Pose', 'Sequence', 'Chain', 'None'],
         onChange: () => { updateClickTriggerModeVisibility(p, [], ['LoopMode']); updateLoopHoldVisibility(p); updateSingleTimingGateVisibility(p); updateTweenStopGateVisibility(p); updateChainModeVisibility(p) }
       },
       // Offset/Rotation -- direct request 2026-09-17 ("Offset On and Off,
@@ -6887,7 +6888,7 @@ function makeClickPoseGroup(p, title, defaults = {}) {
       // Mode of "Sequence" shows the selector correctly on first load too,
       // not just after manually re-touching the dropdown.
       {
-        key: `${p}Mode`, label: 'Mode', type: 'select', def: 'Single Pose', options: () => ['Single Pose', 'Sequence'],
+        key: `${p}Mode`, label: 'Mode', type: 'select', def: 'Single Pose', options: () => ['Single Pose', 'Sequence', 'None'],
         onChange: () => { updateClickTriggerModeVisibility(p, ['PauseDurationMs']); updateSingleTimingGateVisibility(p); updateSequencePlayModeVisibility(p); updateChainModeVisibility(p) }
       },
       // Offset/Rotation -- see makeClickHoldPoseGroup()'s own matching
@@ -11702,6 +11703,8 @@ function beginTweenReleaseStop(hand, chp, trig, p, values, live, minLiveDist, li
 // treats that concatenated list as "the sequence," with zero further
 // code changes needed anywhere else in the forward/looping/retransition
 // machinery.
+// Mode 'None' (2026-10-14, direct request): the function changes no pose at all - the hand keeps the pose it has - but everything else (Offset, Offset To Camera, Rotation, Rotation at Base, timing curves, Retransition ...) runs as in Single Pose.
+function isNoPoseMode(p) { return cfg[`${p}Mode`] === 'None' }
 function isSequenceOrChainMode(p) {
   if (p === STARTUP_FN && !cfg.startupHandTweenEnabled) return false // Animation Tween off: Single Pose with no target = offset only
   const m = cfg[`${p}Mode`]
@@ -12081,9 +12084,9 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
         chp.loopDirection = -1
       }
     } else {
-      const targetPose = stackOnDefault((cfg.savedPoses || []).find((sp) => sp.name === cfg[`${p}TargetPose`]))
-      if (!targetPose) return // nothing selected -- leave this hand's pose untouched
-      values = lerpPoseValues(chp.forwardSnapshot, targetPose, cappedT)
+      const targetPose = isNoPoseMode(p) ? null : stackOnDefault((cfg.savedPoses || []).find((sp) => sp.name === cfg[`${p}TargetPose`]))
+      if (!targetPose && !isNoPoseMode(p)) return // nothing selected -- leave this hand's pose untouched
+      values = targetPose ? lerpPoseValues(chp.forwardSnapshot, targetPose, cappedT) : chp.forwardSnapshot // None: the pose stays as it is
     }
     chp.lastAppliedValues = values
     applyPoseValuesToHand(hand, values, splayNow)
@@ -13053,8 +13056,8 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
       values = noSeq ? cp.forwardSnapshot : lerpTweenSequence(cp.tweenPoses, cappedT)
     } else {
       const tpName = (p === STARTUP_FN && !cfg.startupHandTweenEnabled) ? '' : cfg[`${p}TargetPose`]
-      const targetPose = stackOnDefault((cfg.savedPoses || []).find((sp) => sp.name === tpName))
-      if (!targetPose && p !== STARTUP_FN) { cp.phase = 'idle'; return } // nothing selected -- abandon this hand's sequence rather than get stuck
+      const targetPose = isNoPoseMode(p) ? null : stackOnDefault((cfg.savedPoses || []).find((sp) => sp.name === tpName))
+      if (!targetPose && p !== STARTUP_FN && !isNoPoseMode(p)) { cp.phase = 'idle'; return } // nothing selected -- abandon this hand's sequence rather than get stuck
       values = targetPose ? lerpPoseValues(cp.forwardSnapshot, targetPose, cappedT) : cp.forwardSnapshot
     }
     cp.lastAppliedValues = values
@@ -14388,17 +14391,43 @@ let nextCustomFunctionN = 1
 // load, which is the correct, unsurprising default (no user-visible
 // concept of "resume mid-cycle across reloads" was ever requested).
 const customFunctionMultiTriggerIndex = {} // { [id]: number }
+let customFunctionCollapseReady = false
+// Every group nested inside a custom function's group, with its path of group keys below that function ("Retransition/Retransition Speed Curve").
+function customFunctionSubgroups(fnGroup) {
+  const out = []
+  fnGroup.querySelectorAll('.dp-group').forEach((el) => {
+    const keys = [el.dataset.key]
+    for (let p = el.parentElement && el.parentElement.closest('.dp-group'); p && p !== fnGroup; p = p.parentElement && p.parentElement.closest('.dp-group')) keys.unshift(p.dataset.key)
+    out.push({ path: keys.join('/'), el })
+  })
+  return out
+}
+// Direct request 2026-10-14: a custom function and every group inside it start COLLAPSED; the open / closed state recorded at the last Save wins for any group it knows (entry.cv === 2).
+function applyCustomFunctionCollapse(fnGroup, entry) {
+  const known = !!(entry && entry.cv === 2)
+  fnGroup.classList.toggle('collapsed', known ? !!entry.collapsed : true)
+  customFunctionSubgroups(fnGroup).forEach(({ path, el }) => {
+    el.classList.toggle('collapsed', known && entry.sub && path in entry.sub ? !!entry.sub[path] : true)
+  })
+}
 function persistCustomClickFunctionIds() {
   // Capture current collapse state for each custom function group before
   // saving, so the collapse state can be restored on page load (see
   // restoreCustomClickFunctions() for the restore side).
+  // Only after the startup restore has applied the saved states (customFunctionCollapseReady) -- before that the groups are still freshly built and would overwrite the saved states with "all open".
   const anchor = document.querySelector('.dp-group[data-key="Custom Click Functions"]')
-  if (anchor) {
+  if (anchor && customFunctionCollapseReady) {
     const anchorBody = anchor.querySelector(':scope > .dp-group-body')
     if (anchorBody) {
       customClickFunctionIds.forEach((entry) => {
-        const g = anchorBody.querySelector(`.dp-group[data-key="${entry.id}"]`)
-        if (g) entry.collapsed = g.classList.contains('collapsed')
+        // A function's group is keyed by its TITLE (data-key), not its id - the id lives in data-custom-function-id. The old lookup by data-key=id never matched, so no open / closed state was ever saved or restored.
+        const g = anchorBody.querySelector(`:scope > .dp-group[data-custom-function-id="${entry.id}"]`)
+        if (!g) return
+        entry.collapsed = g.classList.contains('collapsed')
+        // Every nested group (Offset, Rotation, Retransition ..., and a Multi Trigger's own) by its path inside this function; cv = 2 marks "recorded by this version" (older saves carried a stale function-level flag only).
+        entry.sub = {}
+        customFunctionSubgroups(g).forEach(({ path, el }) => { entry.sub[path] = el.classList.contains('collapsed') })
+        entry.cv = 2
       })
     }
   }
@@ -15259,9 +15288,7 @@ function applyNewCustomFunctionTemplate(id) {
   const enabledRow = document.querySelector(`.dp-row[data-key="${id}Enabled"]`)
   const group = enabledRow ? enabledRow.closest('.dp-group') : null
   if (group) {
-    group.querySelectorAll(':scope .dp-group').forEach((sub) => {
-      if (NEW_CUSTOM_FUNCTION_COLLAPSED_SUBGROUPS.includes(sub.dataset.key)) sub.classList.add('collapsed')
-    })
+    group.querySelectorAll(':scope .dp-group').forEach((sub) => sub.classList.add('collapsed')) // every subgroup starts collapsed (2026-10-14)
   }
   // Enabled's own value just changed via syncValue() (which deliberately
   // doesn't fire onChange -- see syncCfgAndSlidersFromPose()'s own
@@ -15373,12 +15400,12 @@ async function restoreCustomClickFunctions() {
   // Apply the saved collapse state from each entry's own data.
   if (anchorBody) {
     anchorBody.querySelectorAll(':scope > .dp-group').forEach((g) => {
-      const key = g.dataset.key
-      const entry = saved.find((e) => e && e.id === key)
-      if (entry && entry.collapsed) g.classList.add('collapsed')
-      else if (entry && !entry.collapsed) g.classList.remove('collapsed')
+      const key = g.dataset.customFunctionId
+      const entry = key && saved.find((e) => e && e.id === key)
+      if (entry) applyCustomFunctionCollapse(g, entry)
     })
   }
+  customFunctionCollapseReady = true
   refreshAllCustomFunctionGroupVisibility()
   refreshAllCustomFunctionTypeVisibility()
   updateCustomFunctionsAnchorRowVisibility()
@@ -15397,6 +15424,7 @@ async function restoreCustomClickFunctions() {
   // animate()/renderer-resize code already uses elsewhere.
   setTimeout(() => { refreshAllCustomFunctionGroupVisibility(); refreshAllCustomFunctionTypeVisibility(); updateCustomFunctionsAnchorRowVisibility() }, 600)
 }
+
 // CORRECTED 2026-09-28 -- real bug, direct report: "Hold Conirm Delay is
 // still at the bottom fo the Custom Click Functions group... I dont see
 // the multiclick confirm duration." Root cause, confirmed by direct
@@ -16161,7 +16189,9 @@ function updateClickTriggerModeVisibility(p, extraSinglePoseKeys, extraTweenKeys
   // setting `.hidden` alone would silently do nothing here.
   singlePoseKeys.forEach((suffix) => {
     const row = document.querySelector(`.dp-row[data-key="${p}${suffix}"]`)
-    if (row) row.style.display = mode !== 'Single Pose' ? 'none' : ''
+    // None keeps the Single Pose timing rows but has no pose to pick
+    const visible = mode === 'Single Pose' || (mode === 'None' && suffix !== 'TargetPose' && suffix !== 'SkipIfSamePose')
+    if (row) row.style.display = visible ? '' : 'none'
   })
   // Every other Tween-shared control (speed, curves, loop, retransition)
   // applies to BOTH Sequence and Chain mode alike -- Chain just resolves a
@@ -16217,7 +16247,7 @@ function updateLoopHoldVisibility(p) {
 // own separate Tween-prefixed trio, a disclosed scoping choice, not a
 // literal instruction either way.
 function updateSingleTimingGateVisibility(p) {
-  const showBase = cfg[`${p}Mode`] === 'Single Pose'
+  const showBase = cfg[`${p}Mode`] === 'Single Pose' || cfg[`${p}Mode`] === 'None'
   const setRow = (suffix, visible) => {
     const row = document.querySelector(`.dp-row[data-key="${p}${suffix}"]`)
     if (row) row.style.display = visible ? '' : 'none'
@@ -16633,8 +16663,10 @@ function wrapClickFunctionGatedSubgroups(p) {
   // "Offset To Camera" (2026-10-02) -- its own mandatory gated subgroup,
   // independent of (and stackable with) "Offset" above.
   wrapGatedSubgroup(`${p}CameraOffsetEnabled`, [`${p}CameraOffsetLoopRetransition`, `${p}CameraOffsetVisibleOnly`, ...['X', 'Y', 'Z'].flatMap((ax) => [`${p}CameraOffset${ax}Enabled`, `${p}CameraOffset${ax}Curve`, `${p}CameraOffset${ax}Range`])], 'Offset To Camera')
-  wrapGatedSubgroup(`${p}RotationEnabled`, [`${p}RotationLoopRetransition`, `${p}RotationX`, `${p}RotationY`, `${p}RotationZ`], 'Rotation')
-  wrapGatedSubgroup(`${p}BaseRotationEnabled`, [`${p}BaseRotationLoopRetransition`, `${p}BaseRotationX`, `${p}BaseRotationY`, `${p}BaseRotationZ`], 'Rotation at Base')
+  const rotationGroup = wrapGatedSubgroup(`${p}RotationEnabled`, [`${p}RotationLoopRetransition`, `${p}RotationX`, `${p}RotationY`, `${p}RotationZ`], 'Rotation')
+  const baseRotationGroup = wrapGatedSubgroup(`${p}BaseRotationEnabled`, [`${p}BaseRotationLoopRetransition`, `${p}BaseRotationX`, `${p}BaseRotationY`, `${p}BaseRotationZ`], 'Rotation at Base')
+  // Rotation at Base sits INSIDE the Rotation group by default (direct request 2026-10-14). Custom function groups are rebuilt on every load and this runs for each, so existing and new functions (and Multi Triggers) all get it.
+  if (rotationGroup && baseRotationGroup) rotationGroup.querySelector(':scope > .dp-group-body').appendChild(baseRotationGroup)
   wrapGatedSubgroup(`${p}SpeedCurveEnabled`, [`${p}SpeedCurveVisibleOnly`, `${p}SpeedCurve`, `${p}SpeedCurveRange`], 'Animation Speed Curve')
   // CORRECTED 2026-09-24 (item 7, remainder): Tween mode's own always-on
   // start-time curve (no enable toggle of its own -- see

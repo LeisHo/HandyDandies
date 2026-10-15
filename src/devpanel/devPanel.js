@@ -3348,6 +3348,8 @@ export function initDevPanel(groups, opts = {}) {
     // appended to document.body), so getPanelOrder(groupsEl) below would
     // silently drop it from what gets saved. Must run BEFORE that read.
     dockAllUndockedGroups()
+    // Host hook that runs BEFORE the snapshot below is assembled, for host state that lives in a registered control but is only worked out at save time (main.js: custom click function open/closed groups).
+    if (opts.onBeforeSave) { try { opts.onBeforeSave() } catch (err) { /* host hook must never block a save */ } }
     // Also flashes the HEADER save button (saveHeaderBtn) with a
     // checkmark/X + tooltip -- ported from TEMPLATE_DEV_PANEL.html's own
     // flashDevHeaderSyncStatus() (2026-09-19). The bottom Save button
