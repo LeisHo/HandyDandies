@@ -3623,7 +3623,7 @@ export function initDevPanel(groups, opts = {}) {
     const geomNow = getPanelGeometry(panel)
     try { localStorage.setItem(currentGeomKey(), JSON.stringify(geomNow)) } catch (err) { /* ignore */ }
     snapshot.panelGeometry = { [realDeviceClass()]: geomNow }
-    overwriteDefaultSavedState() // the default item in Saved Dev Settings follows every Save (no-op when none is set)
+    overwriteInUseSavedState() // the item in use in Saved Dev Settings follows every Save (no-op when none is in use)
     if (opts.remoteSave) {
       // returns the promise so a host that must not reload before the save lands (the hand model Use) can wait for it
       return remoteSaveSnapshot(opts.remoteSave, snapshot).then((result) => {
@@ -3843,7 +3843,7 @@ export function initDevPanel(groups, opts = {}) {
   let activeStateName = '' // the item the panel currently shows (last Used / Set Default / Save New / Overwrite, or the default after the main Save); session-only: after a refresh the panel loads the live settings, which are the default item as of the last Save
   const savedStatesBtnRow = el('div', 'dp-actions')
   savedStatesBtnRow.style.flexWrap = 'wrap'
-  const saveStateBtn = el('button', null, { type: 'button', textContent: 'Save New', title: 'Save the current panel as a NEW named item (asks for a name). The main Save button overwrites the default item instead.' })
+  const saveStateBtn = el('button', null, { type: 'button', textContent: 'Save New', title: 'Save the current panel as a NEW named item (asks for a name). The main Save button overwrites the item that is in use instead.' })
   const overwriteStateBtn = el('button', null, { type: 'button', textContent: 'Overwrite', title: 'Replace the selected item with the current panel' })
   const useStateBtn = el('button', null, { type: 'button', textContent: 'Use' })
   const deleteStateBtn = el('button', null, { type: 'button', textContent: 'Delete' })
@@ -3909,34 +3909,37 @@ export function initDevPanel(groups, opts = {}) {
     // The status lines (2026-10-15, direct report: "i still dont see which dev setting save is the default"): nothing is marked until a default has been chosen, which looked like the marker missing.
     savedStatesStatus.innerHTML = ''
     const defLine = el('div', 'dp-ss-status-line')
-    if (def) { defLine.appendChild(document.createTextNode('\u2605 Default: ')); defLine.appendChild(el('b', null, { textContent: def })); defLine.appendChild(document.createTextNode(' \u2014 the main Save button overwrites it')) }
-    else { defLine.textContent = 'No default set. Select an item and press Set Default; until then the main Save only writes the live settings.'; defLine.classList.add('dp-ss-status-none') }
+    if (def) { defLine.appendChild(document.createTextNode('\u2605 Default: ')); defLine.appendChild(el('b', null, { textContent: def })); defLine.appendChild(document.createTextNode(' \u2014 what Set Default put in the live settings')) }
+    else { defLine.textContent = 'No default set. Select an item and press Set Default.'; defLine.classList.add('dp-ss-status-none') }
     savedStatesStatus.appendChild(defLine)
-    if (activeStateName) { const useLine = el('div', 'dp-ss-status-line'); useLine.appendChild(document.createTextNode('\u25CF In use: ')); useLine.appendChild(el('b', null, { textContent: activeStateName })); savedStatesStatus.appendChild(useLine) }
+    // The main Save button overwrites the item IN USE (the last one Used / Set Default / Saved New / Overwritten), not the default one (2026-10-15, direct request).
+    const useLine = el('div', 'dp-ss-status-line')
+    if (activeStateName) { useLine.appendChild(document.createTextNode('\u25CF In use: ')); useLine.appendChild(el('b', null, { textContent: activeStateName })); useLine.appendChild(document.createTextNode(' \u2014 the main Save button overwrites it')) }
+    else { useLine.textContent = 'Nothing in use \u2014 the main Save only writes the live settings.'; useLine.classList.add('dp-ss-status-none') }
+    savedStatesStatus.appendChild(useLine)
     savedStatesList.innerHTML = ''
     if (!names.length) savedStatesList.appendChild(el('div', 'dp-ss-empty', { textContent: 'No saved settings yet' }))
     names.forEach((name) => {
       const row = el('div', 'dp-ss-row' + (name === selectedStateName ? ' selected' : ''))
       row.appendChild(el('span', 'dp-ss-name', { textContent: name, title: name }))
       if (name === activeStateName) row.appendChild(el('span', 'dp-ss-badge dp-ss-badge-use', { textContent: '\u25CF In use', title: 'The settings the panel currently shows' }))
-      if (name === def) row.appendChild(el('span', 'dp-ss-badge', { textContent: '\u2605 Default', title: 'The main Save button overwrites this item' }))
+      if (name === def) row.appendChild(el('span', 'dp-ss-badge', { textContent: '\u2605 Default', title: 'Set Default put this item in the live settings' }))
       row.addEventListener('click', () => { selectedStateName = name; renderSavedStatesList() })
       savedStatesList.appendChild(row)
     })
   }
-  // The main Save button also overwrites the default item with the current panel (2026-10-15, direct request). No default set = nothing to overwrite. Never blocks the real save.
-  async function overwriteDefaultSavedState() {
+  // The main Save button also overwrites the item IN USE with the current panel (2026-10-15, direct request: "even if default is A, but I click Use in B, when I next click Save, it will overwrite B instead of A"). Nothing in use = nothing to overwrite. Never blocks the real save.
+  async function overwriteInUseSavedState() {
     try {
-      const name = getDefaultStateName()
+      const name = activeStateName
       if (!name) return
       const states = getSavedStates()
-      if (!states[name]) { setDefaultStateName(''); renderSavedStatesList(); return }
+      if (!states[name]) { activeStateName = ''; renderSavedStatesList(); return }
       states[name] = await packState(withExtra(captureFullPanelState()))
       const failed = setSavedStates(states)
-      activeStateName = name
       renderSavedStatesList()
-      if (failed) console.warn(`Default saved settings "${name}" not updated: browser storage for the page is full (${failed}).`)
-    } catch (err) { console.warn('Default saved settings not updated', err) }
+      if (failed) console.warn(`Saved settings "${name}" not updated: browser storage for the page is full (${failed}).`)
+    } catch (err) { console.warn('Saved settings in use not updated', err) }
   }
   async function saveNamedState() {
     const name = window.prompt('Save current settings as:')
