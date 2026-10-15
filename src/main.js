@@ -975,7 +975,7 @@ function tryStartField() {
   // whatever comes next; don't treat this comment's own reasoning above
   // as the settled explanation.
   if (!fieldWarmCompiled) renderer.compile(scene, camera)
-  window.__debug = { refreshAllTweenSequenceSelectors, reconcileCustomFunctions, captureCustomFunctionsForUndo, renameCustomFunction, placeHandModelRows, syncHandModelWithSettings, refreshHandModelList, get activeHandModelId() { return activeHandModelId }, importHandModelFile, useHandModel, placeLoadingPreviewLightingRows, applyOffsetRotationToHand, applyOffsetRotationRetransition, parseClickPoseConfig, parseClickHoldConfig, cropPointInWrapperFrame, rotateHandAboutCropPoint, rotateHandAboutWorldPoint, cursorFieldPoint, captureClickCursorPivot, rotationDegAt, applyWorldRigid, rotationModeOf, get customFunctionCollapseReady() { return customFunctionCollapseReady }, markCustomFunctionCollapseReady: () => { customFunctionCollapseReady = true }, applyCustomFunctionCollapse, persistCustomClickFunctionIds, bakeOffsetRotationIntoAccum, loopLapProgress, loopLapEnd, rotateHandAboutArmBase, updateLoadingPreviewHand2, get palmCenterPosRaw() { return palmCenterPosRaw }, get handoPivotRaw() { return handoPivotRaw }, get handBoundsBoxCenterRaw() { return handBoundsBoxCenterRaw }, get alignQuat() { return alignQuat }, get loadingPreviewModelScale() { return loadingPreviewModelScale }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, handBoundsCenterLocal, LOADING_PREVIEW_REFERENCE_RADIUS, importTwoHandTween, convertHandoCameraPreset, applyLoadingPreviewCameraPreset, animateFrame: (...a) => animate(...a), releaseStartupHold, trackingActiveFor, placeStartupRetransitionGroup, startupHandScale, updateFieldCenterMarker, get fieldCenterPoint() { return fieldCenterPoint }, retransitionScalerMul, startupHandPhaseUnfinished, applyFieldBounds, onFieldBoundsChanged, retransitionDistanceMs, untriggeredVisibleSpheres, allVisibleHandsFinished, handStartupLocked, triggerClickPose, checkStartupFloorHide, get startupFloorHidden() { return startupFloorHidden }, get floorMesh() { return floorMesh }, updateLoadingPreviewAnimation, get loadingPreview2() { return { hand: loadingPreviewHand, hand2: loadingPreviewHand2, scene: loadingPreviewScene, camera: loadingPreviewCamera, renderer: loadingPreviewRenderer } }, updateSphereSequence, get sphereState() { return { stage: sphereStage, mesh: sphereMesh, on: sphereOn, start: sphereStart, dur: sphereDur, cap: sphereCap, done: sphereDone, keep: sphereKeepForHands, clicks: sphereClickCount } }, stackOnDefault, applyCameraOrientation, syncCameraPanelFromLive, curveByDomain, get domains() { return { xyAll: [xyAllMinDist, xyAllDistRange], splayAll: [splayAllMin, splayAllRange], cropAll: [cropAllMin, cropAllRange], restAll: [restAllMinDist, restAllDistRange], live: [liveFieldMinDist, liveFieldDistRange], splay: [splayFieldMin, splayFieldRange], crop: [cropFieldMin, cropFieldRange], xy: [xyFieldMinDist, xyFieldDistRange], rest: [restFieldMinDist, restFieldDistRange] } }, modelBaseFrameQ, computeBaseRotationQuat, cloneBaseRb, makeClipRig, updateClipRigPlanes, setClipRigT, updateOnScreenFlags, evaluateArmLengthCurve, THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose, resolveTweenSegmentsWithAnchor, lerpTweenSegments, lerpLoopSegments, isHoldEntry, updateLoadingPreviewWristClip, lerpPoseValues, get loadingPreviewRenderer() { return loadingPreviewRenderer }, get loadingPreviewScene() { return loadingPreviewScene }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, get handBoundsCenterLocal() { return handBoundsCenterLocal }, multiPointCommit, multiPointEligibleFunctions, get multiPointActiveTouchCount() { return multiPointActiveTouchCount }, get multiPointSessionFiredPoseId() { return multiPointSessionFiredPoseId }, detectPoseJumps, get poseJumpLogEntries() { return poseJumpLogEntries }, applyCurlToSkeletonReference, handLogTriggerLabel, applyAllFingerCurls, syncCameraPanelFromLive, animSpeedMs, chainSequenceCount, applyFieldBounds, cursorDistXY, hexBrightnessPct, toonThresholdForMidBrightness }
+  window.__debug = { refreshAllTweenSequenceSelectors, reconcileCustomFunctions, captureCustomFunctionsForUndo, renameCustomFunction, placeHandModelRows, syncHandModelWithSettings, refreshHandModelList, get activeHandModelId() { return activeHandModelId }, importHandModelFile, useHandModel, placeLoadingPreviewLightingRows, applyOffsetRotationToHand, applyOffsetRotationRetransition, parseClickPoseConfig, parseClickHoldConfig, cropPointInWrapperFrame, rotateHandAboutCropPoint, rotateHandAboutWorldPoint, cursorFieldPoint, captureClickCursorPivot, rotationDegAt, applyWorldRigid, rotationModeOf, get customFunctionCollapseReady() { return customFunctionCollapseReady }, markCustomFunctionCollapseReady: () => { customFunctionCollapseReady = true }, applyCustomFunctionCollapse, persistCustomClickFunctionIds, bakeOffsetRotationIntoAccum, loopLapProgress, loopLapEnd, rotateHandAboutArmBase, updateLoadingPreviewHand2, buildLoopTimelines, loopPoseValuesBeyondLap, get palmCenterPosRaw() { return palmCenterPosRaw }, get handoPivotRaw() { return handoPivotRaw }, get handBoundsBoxCenterRaw() { return handBoundsBoxCenterRaw }, get alignQuat() { return alignQuat }, get loadingPreviewModelScale() { return loadingPreviewModelScale }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, handBoundsCenterLocal, LOADING_PREVIEW_REFERENCE_RADIUS, importTwoHandTween, convertHandoCameraPreset, applyLoadingPreviewCameraPreset, animateFrame: (...a) => animate(...a), releaseStartupHold, trackingActiveFor, placeStartupRetransitionGroup, startupHandScale, updateFieldCenterMarker, get fieldCenterPoint() { return fieldCenterPoint }, retransitionScalerMul, startupHandPhaseUnfinished, applyFieldBounds, onFieldBoundsChanged, retransitionDistanceMs, untriggeredVisibleSpheres, allVisibleHandsFinished, handStartupLocked, triggerClickPose, checkStartupFloorHide, get startupFloorHidden() { return startupFloorHidden }, get floorMesh() { return floorMesh }, updateLoadingPreviewAnimation, get loadingPreview2() { return { hand: loadingPreviewHand, hand2: loadingPreviewHand2, scene: loadingPreviewScene, camera: loadingPreviewCamera, renderer: loadingPreviewRenderer } }, updateSphereSequence, get sphereState() { return { stage: sphereStage, mesh: sphereMesh, on: sphereOn, start: sphereStart, dur: sphereDur, cap: sphereCap, done: sphereDone, keep: sphereKeepForHands, clicks: sphereClickCount } }, stackOnDefault, applyCameraOrientation, syncCameraPanelFromLive, curveByDomain, get domains() { return { xyAll: [xyAllMinDist, xyAllDistRange], splayAll: [splayAllMin, splayAllRange], cropAll: [cropAllMin, cropAllRange], restAll: [restAllMinDist, restAllDistRange], live: [liveFieldMinDist, liveFieldDistRange], splay: [splayFieldMin, splayFieldRange], crop: [cropFieldMin, cropFieldRange], xy: [xyFieldMinDist, xyFieldDistRange], rest: [restFieldMinDist, restFieldDistRange] } }, modelBaseFrameQ, computeBaseRotationQuat, cloneBaseRb, makeClipRig, updateClipRigPlanes, setClipRigT, updateOnScreenFlags, evaluateArmLengthCurve, THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose, resolveTweenSegmentsWithAnchor, lerpTweenSegments, lerpLoopSegments, isHoldEntry, updateLoadingPreviewWristClip, lerpPoseValues, get loadingPreviewRenderer() { return loadingPreviewRenderer }, get loadingPreviewScene() { return loadingPreviewScene }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, get handBoundsCenterLocal() { return handBoundsCenterLocal }, multiPointCommit, multiPointEligibleFunctions, get multiPointActiveTouchCount() { return multiPointActiveTouchCount }, get multiPointSessionFiredPoseId() { return multiPointSessionFiredPoseId }, detectPoseJumps, get poseJumpLogEntries() { return poseJumpLogEntries }, applyCurlToSkeletonReference, handLogTriggerLabel, applyAllFingerCurls, syncCameraPanelFromLive, animSpeedMs, chainSequenceCount, applyFieldBounds, cursorDistXY, hexBrightnessPct, toonThresholdForMidBrightness }
   // Do NOT hide the loading screen yet: the hands exist but may not have been painted. finalizeReveal() hides it once the field has rendered a couple of frames (or after a 4 s safety net).
   setTimeout(finalizeReveal, 4000)
 }
@@ -10497,7 +10497,7 @@ const CLICK_HOLD_KEYS = []
 const LEGACY_REMOVED_HOLD_KEYS = ['chp', 'rchp', 'dcHold', 'tripleClickHold', 'quadClickHold']
 const LEGACY_REMOVED_POSE_KEYS = ['click', 'dblclick', 'rc', 'tripleClick', 'quadClick']
 const clickHoldPoseTriggers = Object.fromEntries([...CLICK_HOLD_KEYS, ...LEGACY_REMOVED_HOLD_KEYS].map((p) => [p, {
-  active: false, holdStartTime: 0, forwardSnapshot: null, loopPoses: null, rawChainEntries: null, loopSegmentMs: 1,
+  active: false, holdStartTime: 0, forwardSnapshot: null, loopPoses: null, rawChainEntries: null, loopRing: null, loopRingW: 0, loopFwd: null, loopFwdW: 0, loopSegmentMs: 1,
   startCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], startRangeParsed: { min: 0, max: 300 },
   speedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], speedRangeParsed: { min: 50, max: 2000 },
   tweenStartCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStartRangeParsed: { min: 0, max: 300 },
@@ -11672,6 +11672,30 @@ function lerpLoopSegments(ringSegments, tCyclic) {
   const last = ringSegments[ringSegments.length - 1]
   return lerpPoseValues(last.poseA, last.poseB, 1)
 }
+// HOLDS IN LOOP / OSCILLATE (2026-10-15, direct report: "i dont see the hold occur ... make sure the hold is applied in all functions that read imported tweens"). Loop Mode used to cycle a flat
+// list of named poses and drop every Hold (resolveTweenSequencePoses() maps entries as pose-name strings). This builds the same two timelines from the RAW entries (Hold objects intact) as WEIGHTED
+// segments, the same weighting the forward pass already uses (a pose-to-pose transition = 1, a Hold = percent / 100 of one transition):
+//   fwd  = first named pose -> ... -> last named pose, Holds included (Oscillate's one-way lap)
+//   ring = fwd + a closing segment last -> first of weight 1 (Loop's full wrap)
+// ringW / fwdW are the total weights (the lap lengths, in weight units). With no Hold every weight is 1, so ringW = number of poses and fwdW = poses - 1: exactly the old segment counts.
+function buildLoopTimelines(entries) {
+  const list = entries || []
+  let firstIdx = -1
+  let firstPose = null
+  for (let i = 0; i < list.length; i++) {
+    const e = list[i]
+    if (typeof e !== 'string' || !e) continue
+    const matches = (cfg.savedPoses || []).filter((sp) => sp.name === e)
+    const found = matches[matches.length - 1]
+    if (found) { firstIdx = i; firstPose = stackOnDefault(found); break }
+  }
+  if (!firstPose) return { ring: null, ringW: 0, fwd: null, fwdW: 0 }
+  const fwd = resolveTweenSegmentsWithAnchor(firstPose, list.slice(firstIdx + 1), true)
+  const last = fwd.length > 0 ? fwd[fwd.length - 1].poseB : firstPose
+  const ring = fwd.concat([{ poseA: last, poseB: firstPose, weight: 1 }])
+  const sumW = (a) => a.reduce((sum, seg) => sum + seg.weight, 0)
+  return { ring, ringW: sumW(ring), fwd, fwdW: sumW(fwd) }
+}
 // Double Click Hold Tween's own Loop mode, and now also Click Hold-Pose/
 // Right-Click Hold-Pose's own Loop Mode dropdown (direct follow-up
 // request): once the initial forward pass finishes, keep cycling
@@ -11704,7 +11728,7 @@ function lerpLoopSequence(poses, tCyclic) {
 // playthrough of the sequence"). Duration of one named-pose segment, in ms.
 function loopSegmentMsFor(p, chp, trig) {
   return (cfg[`${p}SpeedCurveEnabled`] && chp.frozenSpeedMs > 0)
-    ? Math.max(chp.frozenSpeedMs * chainSequenceCount(p) / Math.max(trig.loopPoses.length, 1), 1)
+    ? Math.max(chp.frozenSpeedMs * chainSequenceCount(p) / Math.max(trig.loopRingW || trig.loopPoses.length, 1), 1)
     : trig.loopSegmentMs
 }
 // Pose at `elapsedSegments` segments into a lap that began in direction
@@ -11713,14 +11737,14 @@ function loopSegmentMsFor(p, chp, trig) {
 // each end, so a decelerating hand keeps travelling through the sequence.
 function loopPoseValuesBeyondLap(p, chp, trig, elapsedSegments) {
   if (cfg[`${p}LoopMode`] === 'Oscillate') {
-    const segments = trig.loopPoses.length - 1
+    const segments = trig.loopFwdW || (trig.loopPoses.length - 1)
     const m = ((elapsedSegments / segments) % 2 + 2) % 2
     const lapT = m <= 1 ? m : 2 - m // triangle wave: out, then back
     const position = chp.loopDirection === 1 ? segments * lapT : segments * (1 - lapT)
-    return lerpTweenSequence(trig.loopPoses, (position / segments) * chp.frozenTweenFractionCap)
+    return trig.loopFwd ? lerpTweenSegments(trig.loopFwd, (position / segments) * chp.frozenTweenFractionCap) : lerpTweenSequence(trig.loopPoses, (position / segments) * chp.frozenTweenFractionCap)
   }
-  const segments = trig.loopPoses.length
-  return lerpLoopSequence(trig.loopPoses, (segments - 1) + elapsedSegments)
+  const segments = trig.loopRingW || trig.loopPoses.length
+  return trig.loopRing ? lerpLoopSegments(trig.loopRing, (segments - 1) + elapsedSegments) : lerpLoopSequence(trig.loopPoses, (segments - 1) + elapsedSegments)
 }
 // Same as computeStartDelayMs(), but the nearest-to-farthest domain is chosen by this function's own "Visible Hands Only" checkbox (`${p}${flag}`, default on):
 // on = hands that are on screen, off = all hands. xy = current-position screen distance (every click-function curve).
@@ -12432,14 +12456,14 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     const elapsedSegments = (chp.loopNom ?? (now - chp.loopStartTime)) / loopSegMs
     let values, lapT
     if (cfg[`${p}LoopMode`] === 'Oscillate') {
-      const segments = trig.loopPoses.length - 1
+      const segments = trig.loopFwdW || (trig.loopPoses.length - 1) // lap length in weight units (a Hold counts), = poses - 1 without Holds
       const startPos = chp.loopDirection === 1 ? 0 : segments
       const endPos = chp.loopDirection === 1 ? segments : 0
       lapT = THREE.MathUtils.clamp(elapsedSegments / segments, 0, 1)
       const position = startPos + (endPos - startPos) * lapT
       // Start Distance Curve (2026-09-27) -- capped the same way the
       // initial forward pass is; see this function's own top comment.
-      values = lerpTweenSequence(trig.loopPoses, (position / segments) * chp.frozenTweenFractionCap)
+      values = trig.loopFwd ? lerpTweenSegments(trig.loopFwd, (position / segments) * chp.frozenTweenFractionCap) : lerpTweenSequence(trig.loopPoses, (position / segments) * chp.frozenTweenFractionCap)
     } else {
       // "Start at the WRAP segment, not segment 0" -- the forward pass
       // just ended exactly at the last pose, so starting the cycle at
@@ -12458,10 +12482,10 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
       // `tCyclic` accumulates continuously ACROSS laps, same disclosed
       // scoping limitation as updateClickPoseForHand()'s own matching
       // wrap-back branch.
-      const segments = trig.loopPoses.length
+      const segments = trig.loopRingW || trig.loopPoses.length // lap length in weight units (a Hold counts), = number of poses without Holds
       lapT = elapsedSegments / segments
       const tCyclic = (segments - 1) + Math.min(elapsedSegments, segments)
-      values = lerpLoopSequence(trig.loopPoses, tCyclic)
+      values = trig.loopRing ? lerpLoopSegments(trig.loopRing, tCyclic) : lerpLoopSequence(trig.loopPoses, tCyclic)
     }
     chp.lastAppliedValues = values
     applyPoseValuesToHand(hand, values, chp.frozenSplayDeg)
@@ -12699,9 +12723,20 @@ function startClickHoldPose(p) {
           return seq ? (seq.tweenPoses || []) : []
         })
       : selectedSequenceEntries(p)
+    // Hold-aware Loop / Oscillate timelines (see buildLoopTimelines()). Each weight unit lasts what one pose-to-pose segment used to, so lap length = total weight x loopSegmentMs.
+    const tl = buildLoopTimelines(trig.rawChainEntries)
+    trig.loopRing = tl.ring
+    trig.loopRingW = tl.ringW
+    trig.loopFwd = tl.fwd
+    trig.loopFwdW = tl.fwdW
+    if (tl.ringW > 0) trig.loopSegmentMs = Math.max(safeTweenSpeedMs(cfg[`${p}TweenSpeedMs`]) * chainSequenceCount(p) / tl.ringW, 1)
   } else {
     trig.loopPoses = null
     trig.rawChainEntries = null
+    trig.loopRing = null
+    trig.loopRingW = 0
+    trig.loopFwd = null
+    trig.loopFwdW = 0
   }
   // Direct request: "When a click and hold is occurring, during the
   // hold, moving the cursor should not trigger any panning. Instead, it
@@ -12906,7 +12941,7 @@ function endClickHoldPose(p) {
       // (2026-10-04) instead of freezing it for the whole delay. A hand
       // released during the end-of-lap Hold Duration sits at the lap end.
       if (chp.stoppingWasLooping && trig.loopPoses && trig.loopPoses.length >= 2) {
-        const lapSegments = cfg[`${p}LoopMode`] === 'Oscillate' ? trig.loopPoses.length - 1 : trig.loopPoses.length
+        const lapSegments = cfg[`${p}LoopMode`] === 'Oscillate' ? (trig.loopFwdW || trig.loopPoses.length - 1) : (trig.loopRingW || trig.loopPoses.length)
         chp.stoppingLoopBaseSegments = (chp.loopHoldEndTime && now < chp.loopHoldEndTime)
           ? lapSegments
           : Math.max(chp.loopNom ?? (now - chp.loopStartTime), 0) / loopSegmentMsFor(p, chp, trig)
@@ -13280,7 +13315,23 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
     const startNamed = sequenceStartPoses(p, cp.pendingNamedPoses)
     cp.tweenPoses = (startNamed && startNamed.length >= 1) ? [anchor, ...startNamed] : null
     cp.glideScale = firstGlideScale(p)
-    cp.glideTimeFactor = poseGlideTimeFactor(p, cp.tweenPoses)
+    // HOLDS (2026-10-15, direct report: an imported tween's Hold did not play in the startup sequence or in Click Functions). The sequence used to be a flat pose list played in N-1 EQUAL segments
+    // (lerpTweenSequence), so every Hold was dropped by resolveTweenSequencePoses(). It is now a WEIGHTED timeline from the raw entries, the same resolver the hold-kind functions use
+    // (resolveTweenSegmentsWithAnchor / lerpTweenSegments): a transition weighs 1, a Hold percent / 100. With no Hold every weight is 1 and the result is identical to before.
+    // cp.tweenSegments plays the first pass (First Transition Time Scale is folded into the weights, as the hold-kind functions do); cp.lapSegments is the unscaled copy the later laps use,
+    // because laps never had the first-glide scaling.
+    cp.tweenSegments = null
+    cp.lapSegments = null
+    cp.glideTimeFactor = 1
+    if (cp.tweenPoses && cp.pendingRawEntries) {
+      const segs = resolveTweenSegmentsWithAnchor(anchor, sequenceStartEntries(p, cp.pendingRawEntries), true)
+      if (segs.length > 0) {
+        cp.lapSegments = segs.map((sg) => ({ ...sg }))
+        cp.tweenSegments = segs
+        cp.glideTimeFactor = applyFirstGlideScale(p, cp.tweenSegments)
+      }
+    }
+    if (!cp.tweenSegments) cp.glideTimeFactor = poseGlideTimeFactor(p, cp.tweenPoses)
     cp.phase = 'forward'
     cp.triggerTime = now
     cp.fwdNom = 0; cp.liveTick = now
@@ -13328,7 +13379,7 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
     // progress below -- Offset/Rotation is a separate system the spec
     // never asked to couple with this one.
     // First Transition Time Scale: remap so the first segment (current pose -> Pose 1) takes glideScale x its share
-    const poseT = (isTween && cp.glideScale && cp.glideScale !== 1 && cp.tweenPoses) ? remapGlideProgress(easedProgress, cp.tweenPoses.length - 1, cp.glideScale) : easedProgress
+    const poseT = (isTween && !cp.tweenSegments && cp.glideScale && cp.glideScale !== 1 && cp.tweenPoses) ? remapGlideProgress(easedProgress, cp.tweenPoses.length - 1, cp.glideScale) : easedProgress // (with cp.tweenSegments the first-glide scale is already in the weights)
     const cappedT = poseT * cp.frozenTweenFractionCap
     // CORRECTED 2026-09-27 -- see updateClickHoldPoseForHand()'s own
     // matching comment. Ramps splay from wherever it actually was at
@@ -13339,7 +13390,7 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
     if (isTween) {
       const noSeq = !cp.tweenPoses || cp.tweenPoses.length < 2
       if (noSeq && p !== STARTUP_FN) { cp.phase = 'idle'; return } // nothing selected -- abandon this hand's sequence rather than get stuck (the startup transition just moves the hands)
-      values = noSeq ? cp.forwardSnapshot : lerpTweenSequence(cp.tweenPoses, cappedT)
+      values = noSeq ? cp.forwardSnapshot : (cp.tweenSegments ? lerpTweenSegments(cp.tweenSegments, cappedT) : lerpTweenSequence(cp.tweenPoses, cappedT))
     } else {
       const tpName = (p === STARTUP_FN && !cfg.startupHandTweenEnabled) ? '' : cfg[`${p}TargetPose`]
       const targetPose = isNoPoseMode(p) ? null : stackOnDefault((cfg.savedPoses || []).find((sp) => sp.name === tpName))
@@ -13411,12 +13462,12 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
       // Start Distance Curve (2026-09-27) -- capped the same way the
       // initial forward pass is (see this phase's own top comment).
       const t = (cp.sequenceDirection === 1 ? lapT : 1 - lapT) * cp.frozenTweenFractionCap
-      values = lerpTweenSequence(cp.tweenPoses, t)
+      values = cp.lapSegments ? lerpTweenSegments(cp.lapSegments, t) : lerpTweenSequence(cp.tweenPoses, t)
     } else if (cfg[`${p}SequenceLoopTransition`] === false) {
       // Instant jump back to frame 1 between laps -- each lap plays the
       // SAME forward pass (no smooth wrap segment), matching the
       // control's own "Off = instant jump back to frame 1" wording.
-      values = lerpTweenSequence(cp.tweenPoses, lapT * cp.frozenTweenFractionCap)
+      values = cp.lapSegments ? lerpTweenSegments(cp.lapSegments, lapT * cp.frozenTweenFractionCap) : lerpTweenSequence(cp.tweenPoses, lapT * cp.frozenTweenFractionCap)
     } else {
       // Smooth wrap-back -- reuses lerpLoopSequence()'s own cyclic
       // segment math (same as Click Hold-Pose's own Loop Mode), an
@@ -13428,9 +13479,16 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
       // subtly wrong implementation of the trickiest case. Disclosed
       // limitation, not an oversight -- see this session's own final
       // report/CHANGELOG entry.
-      const segments = cp.tweenPoses.length
-      const tCyclic = (cp.sequenceLapIndex - 1) * segments + lapT * segments
-      values = lerpLoopSequence(cp.tweenPoses, tCyclic)
+      if (cp.lapSegments) {
+        // weighted ring: this lap's forward segments (Holds included) + one closing segment last pose -> first pose of weight 1 (same ring the Loading Preview builds)
+        const ring = cp.lapSegments.concat([{ poseA: cp.lapSegments[cp.lapSegments.length - 1].poseB, poseB: cp.lapSegments[0].poseA, weight: 1 }])
+        const totalRingWeight = ring.reduce((sum, sg) => sum + sg.weight, 0)
+        values = lerpLoopSegments(ring, (cp.sequenceLapIndex - 1 + lapT) * totalRingWeight)
+      } else {
+        const segments = cp.tweenPoses.length
+        const tCyclic = (cp.sequenceLapIndex - 1) * segments + lapT * segments
+        values = lerpLoopSequence(cp.tweenPoses, tCyclic)
+      }
     }
     cp.lastAppliedValues = values
     applyPoseValuesToHand(hand, values, cp.frozenSplayDeg)
@@ -13625,8 +13683,10 @@ function triggerClickPose(p, onlyHands = null) {
   POSE_PRESET_KEYS.forEach((key) => { forwardSnapshot[key] = cfg[key] })
   const isTween = isSequenceOrChainMode(p)
   let namedPoses = null
+  let rawEntries = null // the sequence's raw entries, Hold objects intact (2026-10-15: pose-kind functions now play Holds)
   if (isTween) {
-    const resolved = resolveTweenSequencePoses(selectedSequenceEntries(p), true)
+    rawEntries = selectedSequenceEntries(p)
+    const resolved = resolveTweenSequencePoses(rawEntries, true)
     if (resolved.length >= 1) namedPoses = resolved
   }
   let minD = Infinity, maxD = -Infinity
@@ -13683,6 +13743,7 @@ function triggerClickPose(p, onlyHands = null) {
     cp.pendingPressAt = now; cp.pendingIsTween = isTween // live Start Time (refreshLiveDistanceState)
     cp.pendingForwardSnapshot = forwardSnapshot
     cp.pendingNamedPoses = namedPoses
+    cp.pendingRawEntries = rawEntries
     cp.pendingTweenFractionCap = tweenFractionCap
     // Frozen for this hand's entire sequence (forward/paused/
     // retransition) -- see updateClickHoldPoseForHand()'s own top
@@ -15516,7 +15577,7 @@ function registerCustomClickFunction(id, title, kind, family, yielder) {
   if (kind === 'hold') {
     CLICK_HOLD_KEYS.push(id)
     clickHoldPoseTriggers[id] = {
-      active: false, holdStartTime: 0, forwardSnapshot: null, loopPoses: null, rawChainEntries: null, loopSegmentMs: 1,
+      active: false, holdStartTime: 0, forwardSnapshot: null, loopPoses: null, rawChainEntries: null, loopRing: null, loopRingW: 0, loopFwd: null, loopFwdW: 0, loopSegmentMs: 1,
       startCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], startRangeParsed: { min: 0, max: 300 },
       speedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], speedRangeParsed: { min: 50, max: 2000 },
       tweenStartCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStartRangeParsed: { min: 0, max: 300 },
@@ -16160,7 +16221,7 @@ async function registerMultiTriggerTrigger(prefix, title, mtBody, addBtnRow, kin
     if (!CLICK_HOLD_KEYS.includes(prefix)) CLICK_HOLD_KEYS.push(prefix)
     if (!clickHoldPoseTriggers[prefix]) {
       clickHoldPoseTriggers[prefix] = {
-        active: false, holdStartTime: 0, forwardSnapshot: null, loopPoses: null, rawChainEntries: null, loopSegmentMs: 1,
+        active: false, holdStartTime: 0, forwardSnapshot: null, loopPoses: null, rawChainEntries: null, loopRing: null, loopRingW: 0, loopFwd: null, loopFwdW: 0, loopSegmentMs: 1,
         startCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], startRangeParsed: { min: 0, max: 300 },
         speedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], speedRangeParsed: { min: 50, max: 2000 },
         tweenStartCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStartRangeParsed: { min: 0, max: 300 },
@@ -18530,12 +18591,13 @@ setupColorPresetUi()
 // anchor is the only feasible choice, same tradeoff already accepted
 // elsewhere in this file). Deliberately NOT gated by Global Pause (direct
 // request) -- see animate()'s own preview-render block.
-let previewTweenPlay = null // { poses, startMs, speedMs }
+let previewTweenPlay = null // { poses, segments, startMs, speedMs } -- segments = the Hold-aware weighted timeline (2026-10-15), poses the flat list it replaces
 function runTweenSequenceOnPreview(item) {
   if (!previewHand || !item) return
   const namedPoses = resolveTweenSequencePoses(item.tweenPoses)
   if (namedPoses.length < 1) return
-  previewTweenPlay = { poses: [poseDefaultValues, ...namedPoses], startMs: nowVirtual(), speedMs: Math.max(safeTweenSpeedMs(cfg.tweenPreviewSpeedMs), 1) }
+  const segments = resolveTweenSegmentsWithAnchor(poseDefaultValues, item.tweenPoses) // from the default pose through every entry; a Hold holds the pose before it
+  previewTweenPlay = { poses: [poseDefaultValues, ...namedPoses], segments: segments.length > 0 ? segments : null, startMs: nowVirtual(), speedMs: Math.max(safeTweenSpeedMs(cfg.tweenPreviewSpeedMs), 1) }
 }
 // Both Saved Tween Sequences' new "Edit"/"Run" buttons act on the list-
 // picker's own currently-SELECTED row -- same convention as Saved Poses'
@@ -19191,7 +19253,7 @@ function animate(dt, now) {
       if (previewTweenPlay) {
         const elapsed = nowVirtual() - previewTweenPlay.startMs
         const progress = THREE.MathUtils.clamp(elapsed / previewTweenPlay.speedMs, 0, 1)
-        previewPosePreset(lerpTweenSequence(previewTweenPlay.poses, progress))
+        previewPosePreset(previewTweenPlay.segments ? lerpTweenSegments(previewTweenPlay.segments, progress) : lerpTweenSequence(previewTweenPlay.poses, progress))
         if (progress >= 1) previewTweenPlay = null
       }
       previewRenderer.render(previewScene, previewCamera)
