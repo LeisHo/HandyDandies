@@ -3892,6 +3892,64 @@ export function initDevPanel(groups, opts = {}) {
   function setSavedStates(states) {
     try { localStorage.setItem(savedStatesKey(), JSON.stringify(states)); return null } catch (err) { return (err && err.name) || 'storage error' }
   }
+  // ---- Where the saved items live (2026-10-15, direct request: "make saved Dev settings the same across desktop and mobile") ----
+  // They used to live only in this browser's localStorage, so a phone started with an empty list. When the shared store answers (/api/saved-states, one file per item in the repo, written like the live settings)
+  // every device lists the same items and the same default; without a backend (local dev server, offline) the list falls back to this browser's own storage. The item in use stays per device.
+  const ssEndpoint = (opts.remoteSave && opts.remoteSave.endpoint) ? opts.remoteSave.endpoint.replace(/save-settings/, 'saved-states') : ''
+  let ssRemoteNames = null // string[] once the shared store answered, else null (this browser's storage is used)
+  let ssRemoteDefault = ''
+  let ssNote = '' // why the shared store is not in use, or what was moved into it
+  const ssBodies = new Map() // name -> stored item, a cache of what was fetched or written
+  async function ssCall(method, query, body) {
+    const init = { method, cache: 'no-store', headers: {} }
+    if (method === 'POST') { init.headers['Content-Type'] = 'application/json'; init.headers['X-Dev-Panel-Secret'] = opts.remoteSave.secret; init.body = JSON.stringify(body) }
+    const resp = await fetch(ssEndpoint + (query || ''), init)
+    const json = await resp.json().catch(() => ({}))
+    if (!resp.ok || json.ok !== true) throw new Error(json.error || ('HTTP ' + resp.status))
+    return json
+  }
+  function ssNames() { return ssRemoteNames ? ssRemoteNames.slice() : Object.keys(getSavedStates()) }
+  function ssDefaultName() { return ssRemoteNames ? ssRemoteDefault : getDefaultStateName() }
+  async function ssGet(name) {
+    if (!ssRemoteNames) return getSavedStates()[name]
+    if (!ssBodies.has(name)) { const j = await ssCall('GET', '?name=' + encodeURIComponent(name)); ssBodies.set(name, j.state) }
+    return ssBodies.get(name)
+  }
+  // Returns null on success, or a short reason.
+  async function ssPut(name, entry) {
+    if (ssRemoteNames) {
+      try { await ssCall('POST', '', { name, state: entry }) } catch (err) { return (err && err.message) || 'failed' }
+      ssBodies.set(name, entry)
+      if (!ssRemoteNames.includes(name)) { ssRemoteNames.push(name); ssRemoteNames.sort() }
+      return null
+    }
+    const states = getSavedStates()
+    states[name] = entry
+    return setSavedStates(states)
+  }
+  async function ssDelete(name) {
+    if (ssRemoteNames) {
+      try { await ssCall('POST', '', { delete: name }) } catch (err) { return (err && err.message) || 'failed' }
+      ssBodies.delete(name)
+      ssRemoteNames = ssRemoteNames.filter((n) => n !== name)
+      if (ssRemoteDefault === name) ssRemoteDefault = ''
+      return null
+    }
+    const states = getSavedStates()
+    delete states[name]
+    const failed = setSavedStates(states)
+    if (name === getDefaultStateName()) setDefaultStateName('')
+    return failed
+  }
+  async function ssSetDefault(name) {
+    if (ssRemoteNames) {
+      try { await ssCall('POST', '', { default: name }) } catch (err) { return (err && err.message) || 'failed' }
+      ssRemoteDefault = name
+      return null
+    }
+    setDefaultStateName(name)
+    return null
+  }
   // A saved state is stored gzip-compressed (base64) as { gz }, about a tenth of its size; older plain states are still read as they are and are compressed the next time anything is saved.
   async function gzipToB64(str) {
     const cs = new CompressionStream('gzip')
@@ -3931,12 +3989,11 @@ export function initDevPanel(groups, opts = {}) {
   function setDefaultStateName(name) { try { if (name) localStorage.setItem(defaultStateKey(), name); else localStorage.removeItem(defaultStateKey()) } catch (err) { /* ignore */ } }
   function flashStateBtn(btn, msg) { const orig = btn.textContent; btn.textContent = msg; setTimeout(() => { btn.textContent = orig }, 900) }
   function renderSavedStatesList() {
-    const states = getSavedStates()
-    const names = Object.keys(states)
-    let def = getDefaultStateName()
-    if (def && !states[def]) { setDefaultStateName(''); def = '' } // the default item was deleted
-    if (!states[selectedStateName]) selectedStateName = ''
-    if (!states[activeStateName]) activeStateName = ''
+    const names = ssNames()
+    let def = ssDefaultName()
+    if (def && !names.includes(def)) { def = ''; if (!ssRemoteNames) setDefaultStateName('') } // the default item was deleted
+    if (!names.includes(selectedStateName)) selectedStateName = ''
+    if (!names.includes(activeStateName)) activeStateName = ''
     // The status lines (2026-10-15, direct report: "i still dont see which dev setting save is the default"): nothing is marked until a default has been chosen, which looked like the marker missing.
     savedStatesStatus.innerHTML = ''
     const defLine = el('div', 'dp-ss-status-line')
@@ -3948,6 +4005,13 @@ export function initDevPanel(groups, opts = {}) {
     if (activeStateName) { useLine.appendChild(document.createTextNode('\u25CF In use: ')); useLine.appendChild(el('b', null, { textContent: activeStateName })); useLine.appendChild(document.createTextNode(' \u2014 the main Save button overwrites it')) }
     else { useLine.textContent = 'Nothing in use \u2014 the main Save only writes the live settings.'; useLine.classList.add('dp-ss-status-none') }
     savedStatesStatus.appendChild(useLine)
+    // Where the items live: shared (same on every device) or this browser only.
+    if (ssEndpoint) {
+      const storeLine = el('div', 'dp-ss-status-line' + (ssRemoteNames ? '' : ' dp-ss-status-none'))
+      storeLine.textContent = ssRemoteNames ? 'Shared: the same saved settings on every device.' : (ssNote || 'Checking the shared store...')
+      savedStatesStatus.appendChild(storeLine)
+      if (ssRemoteNames && ssNote) savedStatesStatus.appendChild(el('div', 'dp-ss-status-line', { textContent: ssNote }))
+    }
     savedStatesList.innerHTML = ''
     if (!names.length) savedStatesList.appendChild(el('div', 'dp-ss-empty', { textContent: 'No saved settings yet' }))
     names.forEach((name) => {
@@ -3964,27 +4028,27 @@ export function initDevPanel(groups, opts = {}) {
     try {
       const name = activeStateName
       if (!name) return
-      const states = getSavedStates()
-      if (!states[name]) { activeStateName = ''; renderSavedStatesList(); return }
-      states[name] = await packState(withExtra(captureFullPanelState()))
-      const failed = setSavedStates(states)
+      if (!ssNames().includes(name)) { activeStateName = ''; renderSavedStatesList(); return }
+      const failed = await ssPut(name, await packState(withExtra(captureFullPanelState())))
       renderSavedStatesList()
-      if (failed) console.warn(`Saved settings "${name}" not updated: browser storage for the page is full (${failed}).`)
+      if (failed) console.warn(`Saved settings "${name}" not updated: ${failed}`)
     } catch (err) { console.warn('Saved settings in use not updated', err) }
   }
   async function saveNamedState() {
     const name = window.prompt('Save current settings as:')
     if (!name) return
-    const states = getSavedStates()
-    if (states[name] && !window.confirm(`"${name}" already exists. Overwrite it?`)) return
+    if (ssNames().includes(name) && !window.confirm(`"${name}" already exists. Overwrite it?`)) return
     const snapshot = captureFullPanelState()
     if (devUndoCaptureExtra) snapshot.extra = devUndoCaptureExtra() // which custom click functions exist, so Use can rebuild them
-    // Compress this one and any older plain ones first, so a full storage frees up before the write is tried.
-    for (const k of Object.keys(states)) if (states[k] && typeof states[k].gz !== 'string') states[k] = await packState(states[k])
-    states[name] = await packState(snapshot)
-    const failed = setSavedStates(states)
+    if (!ssRemoteNames) {
+      // This browser's own storage: compress older plain items first, so a full storage frees up before the write is tried.
+      const states = getSavedStates()
+      for (const k of Object.keys(states)) if (states[k] && typeof states[k].gz !== 'string') states[k] = await packState(states[k])
+      setSavedStates(states)
+    }
+    const failed = await ssPut(name, await packState(snapshot))
     if (failed) {
-      window.alert(`Could not save "${name}": this browser's storage for the page is full (${failed}). Delete some saved settings with Delete and try again.`)
+      window.alert(ssRemoteNames ? `Could not save "${name}" to the shared store: ${failed}` : `Could not save "${name}": this browser's storage for the page is full (${failed}). Delete some saved settings with Delete and try again.`)
       return
     }
     selectedStateName = name
@@ -3995,46 +4059,39 @@ export function initDevPanel(groups, opts = {}) {
     const name = selectedStateName
     if (!name) { flashStateBtn(overwriteStateBtn, 'Select one'); return }
     if (!window.confirm(`Replace "${name}" with the current settings?`)) return
-    const states = getSavedStates()
-    for (const k of Object.keys(states)) if (states[k] && typeof states[k].gz !== 'string') states[k] = await packState(states[k])
-    states[name] = await packState(withExtra(captureFullPanelState()))
-    const failed = setSavedStates(states)
-    if (failed) { window.alert(`Could not save "${name}": this browser's storage for the page is full (${failed}).`); return }
+    const failed = await ssPut(name, await packState(withExtra(captureFullPanelState())))
+    if (failed) { window.alert(`Could not save "${name}": ${failed}`); return }
     activeStateName = name
     renderSavedStatesList()
   }
   async function useNamedState() {
     const name = selectedStateName
     if (!name) { flashStateBtn(useStateBtn, 'Select one'); return }
-    const states = getSavedStates()
-    if (!states[name]) return
     let state
     const tU = performance.now()
-    try { state = await unpackState(states[name]) } catch (err) { window.alert(`Could not read "${name}" (${(err && err.message) || err}).`); return }
-    dpMark('Use: unpack', tU)
+    try { state = await unpackState(await ssGet(name)) } catch (err) { window.alert(`Could not read "${name}" (${(err && err.message) || err}).`); return }
+    dpMark('Use: load + unpack', tU)
     if (state) { const tE = performance.now(); await applyStateExtra(state); dpMark('Use: applyStateExtra (rebuild functions)', tE); const tA = performance.now(); applyFullPanelState(state); dpMark('Use: applyFullPanelState', tA); activeStateName = name; const tR = performance.now(); renderSavedStatesList(); dpMark('Use: render list', tR) }
   }
-  function deleteNamedState() {
+  async function deleteNamedState() {
     const name = selectedStateName
     if (!name) { flashStateBtn(deleteStateBtn, 'Select one'); return }
-    if (!window.confirm(`Delete "${name}"?${name === getDefaultStateName() ? ' It is the default item.' : ''}`)) return
-    const states = getSavedStates()
-    delete states[name]
-    setSavedStates(states)
-    if (name === getDefaultStateName()) setDefaultStateName('')
+    if (!window.confirm(`Delete "${name}"?${name === ssDefaultName() ? ' It is the default item.' : ''}${ssRemoteNames ? ' It is removed for every device.' : ''}`)) return
+    const failed = await ssDelete(name)
+    if (failed) window.alert(`Could not delete "${name}": ${failed}`)
     selectedStateName = ''
+    if (activeStateName === name) activeStateName = ''
     renderSavedStatesList()
   }
   async function setNamedStateAsDefault() {
     const name = selectedStateName
     if (!name) { flashStateBtn(setDefaultStateBtn, 'Select one'); return }
-    const states = getSavedStates()
-    if (!states[name]) return
     let state
-    try { state = await unpackState(states[name]) } catch (err) { window.alert(`Could not read "${name}" (${(err && err.message) || err}).`); return }
+    try { state = await unpackState(await ssGet(name)) } catch (err) { window.alert(`Could not read "${name}" (${(err && err.message) || err}).`); return }
     if (!state) return
     activeStateName = name
-    setDefaultStateName(name) // marked before the save below, which then refreshes this item from the panel (the same state)
+    const failed = await ssSetDefault(name) // marked before the save below, which then refreshes this item from the panel (the same state)
+    if (failed) window.alert(`The default could not be saved to the shared store: ${failed}`)
     renderSavedStatesList()
     await applyStateExtra(state)
     applyFullPanelState(state)
@@ -4049,6 +4106,39 @@ export function initDevPanel(groups, opts = {}) {
   try { activeStateName = localStorage.getItem(activeStateKey()) || '' } catch (err) { activeStateName = '' }
   if (!getSavedStates()[activeStateName]) activeStateName = getDefaultStateName()
   renderSavedStatesList()
+  // Switch to the shared store when it answers, and move what this browser already holds into it ONCE (the local copies stay as a backup but are no longer listed; a flag stops a deleted item coming back).
+  async function initSharedSavedStates() {
+    if (!ssEndpoint) return
+    try {
+      const j = await ssCall('GET', '')
+      ssRemoteNames = (Array.isArray(j.names) ? j.names : []).slice().sort()
+      ssRemoteDefault = j.default || ''
+    } catch (err) {
+      ssNote = `Shared storage unavailable (${(err && err.message) || err}) - items are kept in this browser only.`
+      renderSavedStatesList()
+      return
+    }
+    const migratedKey = `${storageKeyPrefix}.devSavedStatesMigrated`
+    let alreadyMigrated = false
+    try { alreadyMigrated = localStorage.getItem(migratedKey) === '1' } catch (err) { /* ignore */ }
+    if (!alreadyMigrated) {
+      const local = getSavedStates()
+      const missing = Object.keys(local).filter((n) => !ssRemoteNames.includes(n))
+      let uploaded = 0, stopped = false
+      for (const n of missing) {
+        const why = await ssPut(n, local[n] && typeof local[n].gz === 'string' ? local[n] : await packState(local[n]))
+        if (why) { ssNote = `Could not upload "${n}" to the shared store: ${why}`; stopped = true; break }
+        uploaded++
+      }
+      const ld = getDefaultStateName()
+      if (!ssRemoteDefault && ld && ssRemoteNames.includes(ld)) await ssSetDefault(ld)
+      if (uploaded) ssNote = `Uploaded ${uploaded} saved setting${uploaded === 1 ? '' : 's'} from this browser so every device shows them.`
+      if (!stopped) { try { localStorage.setItem(migratedKey, '1') } catch (err) { /* ignore */ } }
+    }
+    if (!ssRemoteNames.includes(activeStateName)) activeStateName = ssRemoteNames.includes(ssRemoteDefault) ? ssRemoteDefault : ''
+    renderSavedStatesList()
+  }
+  initSharedSavedStates()
   // `.dp-collapsed`'s own CSS only hides `.dp-body`/`.dp-resize` -- it
   // can't also shrink the PANEL's own box, for 2 separate reasons that
   // BOTH had to be fixed: `panel.style.height` is set as an explicit
