@@ -11448,6 +11448,19 @@ function normOffsetProgress(v) { return typeof v === 'number' ? { o: v, c: v, r:
 function applyOffsetRotationToHand(hand, p, progressIn) {
   const pr = normOffsetProgress(progressIn)
   const progress = pr.o // plain number for the startup-only curves below
+  // Once per hand per frame (2026-10-15, direct report: "after i trigger it, the hands seem to jump to a new rotation then start their sequence"). Every active function applies its offset / rotation in the same pass,
+  // and click rotations MULTIPLY onto the wrapper's orientation. On the frame a function commits, the function it interrupts can already have applied this frame (it comes earlier in the key order), and its in-flight
+  // part has just been baked into the shared accumulators, so the committing function applied them a SECOND time on top: the hand showed its accumulated rotation twice for one frame (measured 84.6 deg, one frame, at the
+  // commit), then dropped back. Position never doubled (applyPoseValuesToHand() resets it before every apply), only the orientation did. The orientation the first call started from is kept, and a second call
+  // in the same frame starts again from it, so the last function to apply wins, exactly like the pose.
+  if (hand._orFrame === idleReposeFrameCounter) {
+    hand.wrapper.quaternion.copy(hand._orQuat0)
+    hand._cfRot && hand._cfRot.identity()
+  } else {
+    hand._orFrame = idleReposeFrameCounter
+    if (!hand._orQuat0) hand._orQuat0 = new THREE.Quaternion()
+    hand._orQuat0.copy(hand.wrapper.quaternion)
+  }
   if (!hand._customOffsetAccum) hand._customOffsetAccum = { x: 0, y: 0, z: 0 }
   if (!hand._customRotationAccum) hand._customRotationAccum = new THREE.Quaternion()
   // CORRECTED 2026-09-27 (4th round of this same jump investigation) --
