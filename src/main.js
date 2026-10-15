@@ -8,7 +8,7 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js'
 import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js'
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js'
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js'
-import { DEV_MODE, initDevPanel, syncValue, setControlValue, copyControlState, isApplyingPanelState, onPanelStateApplied, peekRestoredValue, forgetControlsWithPrefix, seedControlValue, refreshListPickerTogglesByKey, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab, beginDynamicBatch, endDynamicBatch, refreshListPickerMarksByKey } from './devpanel/devPanel.js?v=85'
+import { DEV_MODE, initDevPanel, syncValue, setControlValue, copyControlState, isApplyingPanelState, onPanelStateApplied, peekRestoredValue, forgetControlsWithPrefix, seedControlValue, refreshListPickerTogglesByKey, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab, beginDynamicBatch, endDynamicBatch, refreshListPickerMarksByKey } from './devpanel/devPanel.js?v=86'
 
 // Toon Shading colour gradient (2026-10-12): MeshToonMaterial's getGradientIrradiance() only reads the RED channel of
 // its gradientMap (a grey ramp). Reading RGB instead is identical for every grey ramp (all channels equal) and lets
@@ -3105,6 +3105,8 @@ const DEV_GROUPS = [
       { key: 'cameraYaw', label: 'Camera Yaw (Deg)', type: 'slider', min: -180, max: 180, step: 0.5, def: 1.464, perDevice: true, onChange: () => applyCameraOrientation() },
       { key: 'cameraPitch', label: 'Camera Pitch (Deg)', type: 'slider', min: -89, max: 89, step: 0.5, def: -2.946, perDevice: true, onChange: () => applyCameraOrientation() },
       { key: 'cameraRoll', label: 'Camera Roll (Deg)', type: 'slider', min: -180, max: 180, step: 0.5, def: 0, perDevice: true, onChange: () => applyCameraOrientation() },
+      // The Default camera of this set of settings (2026-10-15): Default on a Saved Camera stores the full view here (position, field of view, zoom, roll AND the pan target), so it is saved with every dev setting, comes back on load and on Use, and marks the right item. Hidden bookkeeping row.
+      { key: 'cameraDefaultPreset', label: 'Default Camera (internal)', type: 'text', def: '' },
       // Direct 2-way binding with scroll/pinch zoom, same pattern as the
       // X/Y/Z sliders above: this slider both SETS the camera's distance
       // to its own pan target (setCameraDistance(), below) and is kept in
@@ -3655,6 +3657,8 @@ const cfg = initDevPanel(DEV_GROUPS, {
     refreshCustomFunctionConflictWarnings()
     prof('placeHandModelRows', placeHandModelRows)
     prof('placeSmallScaleModelRows', placeSmallScaleModelRows)
+    prof('loadCameraDefaultFromCfg', loadCameraDefaultFromCfg)
+    try { const dr = document.querySelector('.dp-row[data-key="cameraDefaultPreset"]'); if (dr) dr.style.display = 'none' } catch (e) { /* no panel */ }
     prof('refreshItemSelectorMarks', refreshAllItemSelectorMarks)
     prof('syncHandModelWithSettings', syncHandModelWithSettings)
     startupSettingsReady = true
@@ -3731,6 +3735,7 @@ const cfg = initDevPanel(DEV_GROUPS, {
   // (normally) not redrawing at all while nothing has actually changed.
   onAnyValueChange: () => { sceneNeedsRedraw = true },
   // Undo/Redo leaves the live camera sliders alone unless the step was itself a camera-slider edit (2026-10-06).
+  onSavedStateApplied: () => applySavedStateDefaults(),
   undoLiveKeys: ['cameraX', 'cameraY', 'cameraZ', 'cameraFov', 'cameraZoom', 'cameraYaw', 'cameraPitch', 'cameraRoll'],
   // Keep the startup cache in step with what was just saved.
   onBeforeSave: () => persistCustomClickFunctionIds(),
@@ -7612,10 +7617,57 @@ function poseItemMatchesDefault(item) {
 }
 function cameraItemMatchesDefault(rawItem) {
   const item = normalizeCameraPresetItem(rawItem)
-  return CAMERA_PRESET_KEYS.every((k) => nearNum(item[k] !== undefined ? item[k] : CAMERA_KEY_DEFAULTS[k], cameraDefaultValues[k], 1e-6))
-    && nearNum(item.targetX !== undefined ? item.targetX : 0, cameraDefaultValues.targetX, 1e-6)
-    && nearNum(item.targetY !== undefined ? item.targetY : 0, cameraDefaultValues.targetY, 1e-6)
-    && nearNum(item.targetZ !== undefined ? item.targetZ : 0, cameraDefaultValues.targetZ, 1e-6)
+  const v = (k) => (item[k] !== undefined ? item[k] : CAMERA_KEY_DEFAULTS[k])
+  if (!(nearNum(v('cameraX'), cameraDefaultValues.cameraX, 0.01) && nearNum(v('cameraY'), cameraDefaultValues.cameraY, 0.01) && nearNum(v('cameraZ'), cameraDefaultValues.cameraZ, 0.01) && nearNum(v('cameraFov'), cameraDefaultValues.cameraFov, 0.01))) return false
+  if (cameraDefaultTargetKnown) {
+    return nearNum(item.targetX !== undefined ? item.targetX : 0, cameraDefaultValues.targetX, 0.01) && nearNum(item.targetY !== undefined ? item.targetY : 0, cameraDefaultValues.targetY, 0.01) && nearNum(item.targetZ !== undefined ? item.targetZ : 0, cameraDefaultValues.targetZ, 0.01)
+  }
+  // The pan target of an older default was never kept: same place and field of view, looking the same way (yaw / pitch of the stored default).
+  if (item.targetX === undefined || !cameraDefaultDir) return true
+  _camMatchDir.set(item.targetX - v('cameraX'), item.targetY - v('cameraY'), item.targetZ - v('cameraZ'))
+  return _camMatchDir.lengthSq() < 1e-12 || _camMatchDir.normalize().dot(cameraDefaultDir) >= 0.9995
+}
+const _camMatchDir = new THREE.Vector3()
+let cameraDefaultTargetKnown = false, cameraDefaultDir = null
+function cameraDirFromCfg() {
+  _camEuler.set(THREE.MathUtils.degToRad(cfg.cameraPitch || 0), THREE.MathUtils.degToRad(cfg.cameraYaw || 0), 0, 'YXZ')
+  _camQ.setFromEuler(_camEuler)
+  return new THREE.Vector3(0, 0, -1).applyQuaternion(_camQ)
+}
+// The Default camera of the settings now in cfg: the stored full view when there is one, else the camera sliders (an older setting, which never stored it).
+function loadCameraDefaultFromCfg() {
+  let p = null
+  try { p = cfg.cameraDefaultPreset ? JSON.parse(cfg.cameraDefaultPreset) : null } catch (e) { p = null }
+  if (p && typeof p === 'object' && typeof p.cameraX === 'number') {
+    CAMERA_PRESET_KEYS.forEach((k) => { cameraDefaultValues[k] = p[k] !== undefined ? p[k] : CAMERA_KEY_DEFAULTS[k] })
+    cameraDefaultValues.targetX = p.targetX || 0; cameraDefaultValues.targetY = p.targetY || 0; cameraDefaultValues.targetZ = p.targetZ || 0
+    cameraDefaultTargetKnown = true
+    cameraDefaultDir = null
+  } else {
+    CAMERA_PRESET_KEYS.forEach((k) => { cameraDefaultValues[k] = cfg[k] !== undefined ? cfg[k] : CAMERA_KEY_DEFAULTS[k] })
+    cameraDefaultValues.targetX = 0; cameraDefaultValues.targetY = 0; cameraDefaultValues.targetZ = 0
+    cameraDefaultTargetKnown = false
+    cameraDefaultDir = cameraDirFromCfg()
+  }
+  updateCameraMaxExtentsBound()
+}
+// After a whole saved dev setting was applied (Use / Set Default; direct request 2026-10-15: "when I click Use ... make sure the camera uses the default camera for that dev setting set", "it should indicate
+// [the default] regardless"): re-derive every default from the settings now in cfg, put the live camera on the set's default camera, and refresh all item selector marks.
+function applySavedStateDefaults() {
+  resyncPoseDefaultValues()
+  loadCameraDefaultFromCfg()
+  if (cameraDefaultTargetKnown) {
+    applyCameraPreset({ ...cameraDefaultValues })
+  } else {
+    camera.position.set(cfg.cameraX ?? CAMERA_KEY_DEFAULTS.cameraX, cfg.cameraY ?? CAMERA_KEY_DEFAULTS.cameraY, cfg.cameraZ ?? CAMERA_KEY_DEFAULTS.cameraZ)
+    camera.fov = cfg.cameraFov ?? CAMERA_KEY_DEFAULTS.cameraFov
+    camera.updateProjectionMatrix()
+    controls.target.set(camera.position.x, camera.position.y, camera.position.z - Math.max(cfg.cameraZoom || 1, 1e-3))
+    applyCameraOrientation() // yaw / pitch / roll of the set
+    syncCameraPanelFromLive()
+  }
+  refreshAllItemSelectorMarks()
+  sceneNeedsRedraw = true
 }
 function cameraItemMatchesLive(rawItem) {
   const item = normalizeCameraPresetItem(rawItem)
@@ -7652,6 +7704,10 @@ function setSelectedCameraAsDefault() {
   cameraDefaultValues.targetX = item.targetX !== undefined ? item.targetX : 0
   cameraDefaultValues.targetY = item.targetY !== undefined ? item.targetY : 0
   cameraDefaultValues.targetZ = item.targetZ !== undefined ? item.targetZ : 0
+  cameraDefaultTargetKnown = true
+  cameraDefaultDir = null
+  cfg.cameraDefaultPreset = JSON.stringify({ ...cameraDefaultValues }) // saved with this set of dev settings, so the Default mark survives a reload and a Use
+  try { syncValue('cameraDefaultPreset', cfg.cameraDefaultPreset) } catch (e) { /* no panel */ }
   updateCameraMaxExtentsBound()
   saveCurrentSettings()
   refreshListPickerMarksByKey('savedCameras')

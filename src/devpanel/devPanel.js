@@ -102,6 +102,7 @@ let hostOnAnyValueChange = null
 // camera sliders: they follow the camera as you orbit/pan/zoom on the canvas, but a canvas drag is not an undo step,
 // so restoring an older snapshot used to jump the camera back to where it was at your last panel click.
 let hostUndoLiveKeys = []
+let hostOnSavedStateApplied = null // (state) => void: the host re-derives what depends on a whole saved state (default camera, item selector marks) after Use / Set Default
 const numEls = {} // key -> { slider, numInput } | { type: 'color' } | { type: 'checkbox' }
 // Set by initDevPanel()'s own saveSettings() closure (see its own comment) so
 // the exported saveCurrentSettings() below can trigger a real persisted save.
@@ -1523,10 +1524,15 @@ function buildListPickerRow(ctrl, row) {
     renderListPickerRows(entry)
   })
   deleteBtn.addEventListener('click', () => {
-    if (!entry.selectedItem) return
-    const removing = entry.selectedItem
-    if (ctrl.onBeforeDelete && ctrl.onBeforeDelete(removing, deleteBtn) === false) return // host veto (e.g. the item in use)
-    entry.items = entry.items.filter((it) => it !== entry.selectedItem)
+    // Every selected item goes (2026-10-15, direct request: "allow me to select multiple items, then click delete to delete them all"): Shift-click a range / Ctrl-click to add, then Delete. The one clicked item is deleted as before.
+    const targets = entry.items.filter((it) => entry.multiSelected.has(it) || it === entry.selectedItem)
+    if (!targets.length) return
+    if (targets.length > 1 && !confirm('Delete ' + targets.length + ' items (' + targets.slice(0, 6).map((it) => it.name).join(', ') + (targets.length > 6 ? ', ...' : '') + ')?')) return
+    // A host veto (e.g. the model in use) spares just that item.
+    const removedItems = targets.filter((it) => !(ctrl.onBeforeDelete && ctrl.onBeforeDelete(it, deleteBtn) === false))
+    if (!removedItems.length) return
+    const goneSet = new Set(removedItems)
+    entry.items = entry.items.filter((it) => !goneSet.has(it))
     entry.selectedItem = null
     // Multi-select cleared too (added 2026-09-15) -- a stale reference to
     // the just-deleted item is harmless on its own (it's simply no longer
@@ -1538,7 +1544,7 @@ function buildListPickerRow(ctrl, row) {
     entry.selectAnchor = null
     commit(ctrl, entry.items)
     renderListPickerRows(entry)
-    if (ctrl.onDeleted) ctrl.onDeleted(removing)
+    if (ctrl.onDeleted) removedItems.forEach((it) => ctrl.onDeleted(it))
   })
   // Direct user request: let a picker's own items be organized into groups.
   // Adds an empty group header to drag items into -- see
@@ -3146,6 +3152,7 @@ export function initDevPanel(groups, opts = {}) {
   hostOnDevVisibilityChanged = opts.onDevVisibilityChanged || null
   hostOnAnyValueChange = opts.onAnyValueChange || null
   hostUndoLiveKeys = Array.isArray(opts.undoLiveKeys) ? opts.undoLiveKeys : []
+  hostOnSavedStateApplied = typeof opts.onSavedStateApplied === 'function' ? opts.onSavedStateApplied : null
   editingDevice = realDeviceClass()
   // cfg/store are populated from defaults regardless of DEV_MODE -- these
   // values are the app's real, shipped defaults for every visitor; DEV_MODE
@@ -3868,16 +3875,18 @@ export function initDevPanel(groups, opts = {}) {
   const savedStatesStatus = el('div', 'dp-ss-status') // always says which item is the default (or that none is), and which one is in use
   const savedStatesList = el('div', 'dp-ss-list')
   let selectedStateName = ''
+  let selectedStateNames = new Set() // every selected item (Shift-click a range / Ctrl-click to add); selectedStateName stays the one Use / Overwrite / Rename act on
   let activeStateName = '' // the item the panel currently shows (last Used / Set Default / Save New / Overwrite, or the default after the main Save); session-only: after a refresh the panel loads the live settings, which are the default item as of the last Save
   const savedStatesBtnRow = el('div', 'dp-actions')
   savedStatesBtnRow.style.flexWrap = 'wrap'
   const saveStateBtn = el('button', null, { type: 'button', textContent: 'Save New', title: 'Save the current panel as a NEW named item (asks for a name). The main Save button overwrites the item that is in use instead.' })
   const overwriteStateBtn = el('button', null, { type: 'button', textContent: 'Overwrite', title: 'Replace the selected item with the current panel' })
   const useStateBtn = el('button', null, { type: 'button', textContent: 'Use' })
-  const deleteStateBtn = el('button', null, { type: 'button', textContent: 'Delete' })
+  const renameStateBtn = el('button', null, { type: 'button', textContent: 'Rename', title: 'Rename the selected item' })
+  const deleteStateBtn = el('button', null, { type: 'button', textContent: 'Delete', title: 'Delete the selected item. Shift-click a range or Ctrl-click to select several first and delete them all.' })
   const setDefaultStateBtn = el('button', null, { type: 'button', textContent: 'Set Default' })
   const exportStateBtn = el('button', null, { type: 'button', textContent: 'Export' })
-  savedStatesBtnRow.append(saveStateBtn, overwriteStateBtn, useStateBtn, deleteStateBtn, setDefaultStateBtn, exportStateBtn)
+  savedStatesBtnRow.append(saveStateBtn, overwriteStateBtn, useStateBtn, renameStateBtn, deleteStateBtn, setDefaultStateBtn, exportStateBtn)
   savedStatesBody.append(savedStatesStatus, savedStatesList, savedStatesBtnRow)
   groupsEl.insertBefore(savedStatesGroup, groupsEl.firstChild)
 
@@ -3993,6 +4002,8 @@ export function initDevPanel(groups, opts = {}) {
     let def = ssDefaultName()
     if (def && !names.includes(def)) { def = ''; if (!ssRemoteNames) setDefaultStateName('') } // the default item was deleted
     if (!names.includes(selectedStateName)) selectedStateName = ''
+    selectedStateNames = new Set([...selectedStateNames].filter((n) => names.includes(n)))
+    if (selectedStateName) selectedStateNames.add(selectedStateName)
     if (!names.includes(activeStateName)) activeStateName = ''
     // The status lines (2026-10-15, direct report: "i still dont see which dev setting save is the default"): nothing is marked until a default has been chosen, which looked like the marker missing.
     savedStatesStatus.innerHTML = ''
@@ -4015,11 +4026,20 @@ export function initDevPanel(groups, opts = {}) {
     savedStatesList.innerHTML = ''
     if (!names.length) savedStatesList.appendChild(el('div', 'dp-ss-empty', { textContent: 'No saved settings yet' }))
     names.forEach((name) => {
-      const row = el('div', 'dp-ss-row' + (name === selectedStateName ? ' selected' : ''))
+      const row = el('div', 'dp-ss-row' + (name === selectedStateName || selectedStateNames.has(name) ? ' selected' : ''))
       row.appendChild(el('span', 'dp-ss-name', { textContent: name, title: name }))
       if (name === activeStateName) row.appendChild(el('span', 'dp-ss-badge dp-ss-badge-use', { textContent: '\u25CF In use', title: 'The settings the panel currently shows' }))
       if (name === def) row.appendChild(el('span', 'dp-ss-badge', { textContent: '\u2605 Default', title: 'Set Default put this item in the live settings' }))
-      row.addEventListener('click', () => { selectedStateName = name; renderSavedStatesList() })
+      row.addEventListener('click', (e) => {
+        if (e.shiftKey && selectedStateName) {
+          const a = names.indexOf(selectedStateName), b = names.indexOf(name)
+          selectedStateNames = new Set(names.slice(Math.min(a, b), Math.max(a, b) + 1)) // the clicked-first item stays the anchor
+        } else if (e.ctrlKey || e.metaKey) {
+          if (selectedStateNames.has(name) && name !== selectedStateName) selectedStateNames.delete(name)
+          else { selectedStateNames.add(name); selectedStateName = name }
+        } else { selectedStateName = name; selectedStateNames = new Set([name]) }
+        renderSavedStatesList()
+      })
       savedStatesList.appendChild(row)
     })
   }
@@ -4071,16 +4091,49 @@ export function initDevPanel(groups, opts = {}) {
     const tU = performance.now()
     try { state = await unpackState(await ssGet(name)) } catch (err) { window.alert(`Could not read "${name}" (${(err && err.message) || err}).`); return }
     dpMark('Use: load + unpack', tU)
-    if (state) { const tE = performance.now(); await applyStateExtra(state); dpMark('Use: applyStateExtra (rebuild functions)', tE); const tA = performance.now(); applyFullPanelState(state); dpMark('Use: applyFullPanelState', tA); activeStateName = name; const tR = performance.now(); renderSavedStatesList(); dpMark('Use: render list', tR) }
+    if (state) { const tE = performance.now(); await applyStateExtra(state); dpMark('Use: applyStateExtra (rebuild functions)', tE); const tA = performance.now(); applyFullPanelState(state); dpMark('Use: applyFullPanelState', tA); activeStateName = name; if (hostOnSavedStateApplied) { try { hostOnSavedStateApplied(state) } catch (err) { console.warn('onSavedStateApplied failed', err) } }; const tR = performance.now(); renderSavedStatesList(); dpMark('Use: render list', tR) }
   }
   async function deleteNamedState() {
-    const name = selectedStateName
-    if (!name) { flashStateBtn(deleteStateBtn, 'Select one'); return }
-    if (!window.confirm(`Delete "${name}"?${name === ssDefaultName() ? ' It is the default item.' : ''}${ssRemoteNames ? ' It is removed for every device.' : ''}`)) return
-    const failed = await ssDelete(name)
-    if (failed) window.alert(`Could not delete "${name}": ${failed}`)
+    const all = ssNames()
+    const picked = (selectedStateNames.size ? [...selectedStateNames] : (selectedStateName ? [selectedStateName] : [])).filter((n) => all.includes(n))
+    if (!picked.length) { flashStateBtn(deleteStateBtn, 'Select one'); return }
+    const shared = ssRemoteNames ? ' They are removed for every device.' : ''
+    const msg = picked.length === 1
+      ? `Delete "${picked[0]}"?${picked[0] === ssDefaultName() ? ' It is the default item.' : ''}${ssRemoteNames ? ' It is removed for every device.' : ''}`
+      : `Delete ${picked.length} saved settings (${picked.join(', ')})?${picked.includes(ssDefaultName()) ? ' One of them is the default item.' : ''}${shared}`
+    if (!window.confirm(msg)) return
+    const failures = []
+    for (const name of picked) {
+      const failed = await ssDelete(name)
+      if (failed) failures.push(`"${name}": ${failed}`)
+      else if (activeStateName === name) activeStateName = ''
+    }
+    if (failures.length) window.alert(`Could not delete ${failures.join('; ')}`)
     selectedStateName = ''
-    if (activeStateName === name) activeStateName = ''
+    selectedStateNames = new Set()
+    rememberActiveState()
+    renderSavedStatesList()
+  }
+  // Rename (2026-10-15, direct request: "for Saved Dev Settings, allow me to rename"): the item is stored under its new name first and the old one removed after, so a failure part way never loses it; the default
+  // marker, the item in use and the selection follow the new name.
+  async function renameNamedState() {
+    const old = selectedStateName
+    if (!old) { flashStateBtn(renameStateBtn, 'Select one'); return }
+    const nn = (window.prompt('Rename to:', old) || '').trim()
+    if (!nn || nn === old) return
+    if (ssNames().includes(nn)) { window.alert(`"${nn}" already exists. Pick another name.`); return }
+    let entry
+    try { entry = await ssGet(old) } catch (err) { window.alert(`Could not read "${old}" (${(err && err.message) || err}).`); return }
+    if (!entry) return
+    const wasDefault = ssDefaultName() === old
+    const putFailed = await ssPut(nn, entry)
+    if (putFailed) { window.alert(`Could not rename "${old}": ${putFailed}`); return }
+    if (wasDefault) { const f = await ssSetDefault(nn); if (f) window.alert(`The default marker could not be moved to "${nn}": ${f}`) }
+    const delFailed = await ssDelete(old)
+    if (delFailed) window.alert(`"${nn}" was created but the old item "${old}" could not be removed: ${delFailed}`)
+    if (activeStateName === old) { activeStateName = nn; rememberActiveState() }
+    selectedStateName = nn
+    selectedStateNames = new Set([nn])
     renderSavedStatesList()
   }
   async function setNamedStateAsDefault() {
@@ -4095,11 +4148,13 @@ export function initDevPanel(groups, opts = {}) {
     renderSavedStatesList()
     await applyStateExtra(state)
     applyFullPanelState(state)
+    if (hostOnSavedStateApplied) { try { hostOnSavedStateApplied(state) } catch (err) { console.warn('onSavedStateApplied failed', err) } }
     saveSettings()
   }
   saveStateBtn.addEventListener('click', saveNamedState)
   overwriteStateBtn.addEventListener('click', overwriteNamedState)
   useStateBtn.addEventListener('click', useNamedState)
+  renameStateBtn.addEventListener('click', renameNamedState)
   deleteStateBtn.addEventListener('click', deleteNamedState)
   setDefaultStateBtn.addEventListener('click', setNamedStateAsDefault)
   exportStateBtn.addEventListener('click', exportDevPanelSettings)
