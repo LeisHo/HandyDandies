@@ -8,7 +8,7 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js'
 import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js'
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js'
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js'
-import { DEV_MODE, initDevPanel, syncValue, setControlValue, copyControlState, isApplyingPanelState, forgetControlsWithPrefix, seedControlValue, refreshListPickerTogglesByKey, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab, beginDynamicBatch, endDynamicBatch, refreshListPickerMarksByKey } from './devpanel/devPanel.js?v=83'
+import { DEV_MODE, initDevPanel, syncValue, setControlValue, copyControlState, isApplyingPanelState, onPanelStateApplied, peekRestoredValue, forgetControlsWithPrefix, seedControlValue, refreshListPickerTogglesByKey, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab, beginDynamicBatch, endDynamicBatch, refreshListPickerMarksByKey } from './devpanel/devPanel.js?v=84'
 
 // Toon Shading colour gradient (2026-10-12): MeshToonMaterial's getGradientIrradiance() only reads the RED channel of
 // its gradientMap (a grey ramp). Reading RGB instead is identical for every grey ramp (all channels equal) and lets
@@ -748,6 +748,46 @@ const FIELD_WARM_CAP_MS = 20000
 // Exclusive click-function triggers (see enforceExclusiveTrigger()); declared up here because Enabled onChange handlers run during the very first settings restore, before the code further down has executed.
 let exclusiveTriggerSuppress = 0
 let exclusiveTriggersReady = false
+// Bulk-apply batching (2026-10-15, direct report: Use / Set Default on a saved setting took a minute or more). A Use applies every control of every click function (about 7,700 with the real settings) and each
+// control's onChange re-ran the SAME per-function UI refresh (row visibility of ~100 rows, trigger config parsing, ...): measured with the real settings, 108.7 s of the 122.7 s in applyStoredValues went to ~4,600
+// onChange calls of 45-135 ms each, almost all of them these refreshes. While a whole state is being applied (isApplyingPanelState()) these refreshes are only recorded, one per function / kind, and run ONCE
+// when the apply is over (onPanelStateApplied). They read the final settings, so the end state is the same; they only stop being repeated.
+const deferredUiUpdates = new Map()
+function deferWhileApplying(key, fn) {
+  if (window.__noDeferUi || !isApplyingPanelState()) return false // window.__noDeferUi: switches the batching off (to compare against the old per-control behaviour)
+  deferredUiUpdates.delete(key) // re-inserted at the END: the refreshes run in the order of their LAST call, as the per-control calls used to leave them
+  deferredUiUpdates.set(key, fn)
+  return true
+}
+function flushDeferredUiUpdates() {
+  // The per-function "Enabled" refresh goes LAST: when a function is built it is the final step (it hides every row of a disabled function and re-runs the sub-refreshes of an enabled one), so a refresh that ran after it would show rows of a disabled function.
+  const entries = Array.from(deferredUiUpdates.entries())
+  deferredUiUpdates.clear()
+  const isLate = (k) => k.startsWith('enabled:') || k.startsWith('typeVis:')
+  const late = entries.filter(([k]) => isLate(k)).sort((x, y) => (x[0].startsWith('typeVis:') ? 1 : 0) - (y[0].startsWith('typeVis:') ? 1 : 0)) // Enabled first, then the Type / Touch-count row visibility
+  const fns = entries.filter(([k]) => !isLate(k)).concat(late).map(([, fn]) => fn)
+  fns.forEach((fn) => { try { fn() } catch (err) { console.warn('deferred UI refresh threw:', err) } })
+}
+{
+  const o = {
+    gate: updateSingleTimingGateVisibility, mode: updateClickTriggerModeVisibility, chain: updateChainModeVisibility, seq: updateSequencePlayModeVisibility,
+    offrot: updateOffsetRotationVisibility, enabled: updateClickFunctionEnabledVisibility, tweenStop: updateTweenStopGateVisibility, loopHold: updateLoopHoldVisibility,
+    parseHold: parseClickHoldConfig, parsePose: parseClickPoseConfig, typeVis: updateCustomFunctionTypeVisibility, conflicts: refreshCustomFunctionConflictWarnings
+  }
+  updateSingleTimingGateVisibility = (p) => { if (!deferWhileApplying('gate:' + p, () => o.gate(p))) o.gate(p) }
+  updateClickTriggerModeVisibility = (p, a, b) => { if (!deferWhileApplying('mode:' + p, () => o.mode(p, a, b))) o.mode(p, a, b) }
+  updateChainModeVisibility = (p) => { if (!deferWhileApplying('chain:' + p, () => o.chain(p))) o.chain(p) }
+  updateSequencePlayModeVisibility = (p) => { if (!deferWhileApplying('seq:' + p, () => o.seq(p))) o.seq(p) }
+  updateOffsetRotationVisibility = (p) => { if (!deferWhileApplying('offrot:' + p, () => o.offrot(p))) o.offrot(p) }
+  updateClickFunctionEnabledVisibility = (p) => { if (!deferWhileApplying('enabled:' + p, () => o.enabled(p))) o.enabled(p) }
+  updateTweenStopGateVisibility = (p) => { if (!deferWhileApplying('tweenStop:' + p, () => o.tweenStop(p))) o.tweenStop(p) }
+  updateLoopHoldVisibility = (p) => { if (!deferWhileApplying('loopHold:' + p, () => o.loopHold(p))) o.loopHold(p) }
+  parseClickHoldConfig = (p) => { if (!deferWhileApplying('parseHold:' + p, () => o.parseHold(p))) o.parseHold(p) }
+  parseClickPoseConfig = (p) => { if (!deferWhileApplying('parsePose:' + p, () => o.parsePose(p))) o.parsePose(p) }
+  updateCustomFunctionTypeVisibility = (id) => { if (!deferWhileApplying('typeVis:' + id, () => o.typeVis(id))) o.typeVis(id) }
+  refreshCustomFunctionConflictWarnings = () => { if (!deferWhileApplying('conflicts', () => o.conflicts())) o.conflicts() }
+  onPanelStateApplied(flushDeferredUiUpdates)
+}
 // Loading Preview > Text (2026-10-15, direct request): free text shown beside the loading animation. Thirty system fonts in two dropdown groups (see below); each has a fallback stack so a machine without the first choice still gets the same kind.
 // Bundled web fonts (fonts/*.woff2, declared in src/fonts.css), grouped in the dropdown (an <optgroup> each): fifteen sans-serif, fifteen serif. They load on demand - only the selected family is ever downloaded, so they add nothing to startup while the loading text is off.
 // Each css value falls back to a system font of the same kind while the file loads (font-display: swap) or for characters outside the Latin subset.
@@ -15221,6 +15261,7 @@ function persistCustomClickFunctionIds() {
         if (parents.length) entry.parent = parents
         else delete entry.parent
         entry.collapsed = g.classList.contains('collapsed')
+        { const t = cfg[`${entry.id}Type`]; if (t) entry.kind = kindForCustomFunctionType(t) } // never save a kind that disagrees with the function's Type
         // Every nested group (Offset, Rotation, Retransition ..., and a Multi Trigger's own) by its path inside this function; cv = 2 marks "recorded by this version" (older saves carried a stale function-level flag only).
         entry.sub = {}
         customFunctionSubgroups(g).forEach(({ path, el }) => { entry.sub[path] = el.classList.contains('collapsed') })
@@ -16230,6 +16271,10 @@ async function restoreCustomClickFunctions() {
     // and as a single block it froze the loading hand for ~2 s.
     for (const entry of saved) {
       if (!entry || !entry.id) continue
+      // The group is built in the shape its saved Type needs. A saved list can disagree with it (a function switched to Click+Hold whose entry still said "pose"): built as the wrong kind, the first Use / Reset that applied
+      // the Type rebuilt the whole group (~18 s each with the real settings), so the kind comes from the Type.
+      const savedType = peekRestoredValue(`${entry.id}Type`)
+      if (savedType) entry.kind = kindForCustomFunctionType(savedType)
       await registerCustomClickFunction(entry.id, entry.title || entry.id, entry.kind || 'pose', entry.family || 'desktop', yielder)
       const m = /^custom(\d+)$/.exec(entry.id)
       if (m) maxN = Math.max(maxN, parseInt(m[1], 10))

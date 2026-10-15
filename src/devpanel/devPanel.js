@@ -125,6 +125,8 @@ function settingsKey() { return `${storageKeyPrefix}.devSettings` }
 // {label, ms, ...} entries onto window.__dpProfile so a slow restore can be
 // broken down from the live page without a debugger. No-op otherwise.
 const DP_PROFILE = typeof location !== 'undefined' && /[?&]debugTiming=1/.test(location.search)
+// Records a stage that spans an await (dpTime only wraps synchronous work): ?debugTiming=1 -> window.__dpProfile.
+function dpMark(label, t0) { if (DP_PROFILE) (window.__dpProfile = window.__dpProfile || []).push({ label, atMs: Math.round(t0), ms: Math.round(performance.now() - t0) }) }
 function dpTime(label, fn) {
   if (!DP_PROFILE) return fn()
   const t0 = performance.now()
@@ -161,6 +163,14 @@ function savedStatesKey() { return `${storageKeyPrefix}.devSavedStates` }
 // Landscape exactly as before.
 function isTouchCapableDevice() {
   return (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) || navigator.maxTouchPoints > 0
+}
+// The value the last settings restore held for `key` (this device first, then Desktop), or undefined. A host that builds controls AFTER the restore (main.js: custom click function groups) uses it to build them in the right shape.
+export function peekRestoredValue(key) {
+  const v = lastRestoredValues
+  if (!v) return undefined
+  const own = v[realDeviceClass()]
+  if (own && own[key] !== undefined) return own[key]
+  return v.desktop ? v.desktop[key] : undefined
 }
 export function realDeviceClass() {
   const w = window.innerWidth, h = window.innerHeight
@@ -2795,7 +2805,19 @@ function applyOrder(groupsEl, order) {
 // moved the camera), so those keys must be skipped, not re-applied with their current values.
 // True while applyStoredValues() runs (settings restore, Use, Set Default, Undo / Redo, Reset): the onChange calls it makes are not user edits, so a host that reacts to a single edit (main.js: only one of two overlapping click functions stays on) checks this first.
 let applyingStoredDepth = 0
+let applyErrorLogged = false
 export function isApplyingPanelState() { return applyingStoredDepth > 0 }
+// Callbacks run once, after every control's onChange of the OUTERMOST applyStoredValues() and BEFORE the row displays are refreshed (the order the per-control refreshes used to have): a host defers its per-control UI
+// refreshes while isApplyingPanelState() and runs them once here (main.js: one refresh per click function instead of one per control). The flag is cleared while they run so they act normally.
+const panelStateAppliedCallbacks = []
+export function onPanelStateApplied(fn) { panelStateAppliedCallbacks.push(fn) }
+function runPanelStateAppliedCallbacks() {
+  if (applyingStoredDepth !== 1) return // a nested apply: the outer one flushes
+  const t0 = DP_PROFILE ? performance.now() : 0
+  applyingStoredDepth = 0
+  try { panelStateAppliedCallbacks.forEach((cb) => { try { cb() } catch (err) { console.warn('post-apply callback threw:', err) } }) } finally { applyingStoredDepth = 1 }
+  dpMark('applied callbacks (deferred UI refresh)', t0)
+}
 function applyStoredValues(values, skipKeys = null) {
   if (!values) return
   applyingStoredDepth++
@@ -2817,17 +2839,22 @@ function applyStoredValuesInner(values, skipKeys = null) {
     if (realValue !== undefined) {
       cfg[ctrl.key] = realValue
       if (ctrl.onChange) {
-        if (DP_PROFILE) {
-          const t = performance.now()
-          ctrl.onChange(realValue)
-          const dt = performance.now() - t
-          nOnChange++; onChangeMs += dt
-          if (dt > 4) slow.push([ctrl.key, Math.round(dt)])
-        } else ctrl.onChange(realValue)
+        // One control's handler throwing must not abort the whole apply (2026-10-15: a function whose Type switched kind mid-apply rebuilt its own controls, the stale ones threw, and the rest of a Use / Set Default was never applied).
+        try {
+          if (DP_PROFILE) {
+            const t = performance.now()
+            ctrl.onChange(realValue)
+            const dt = performance.now() - t
+            nOnChange++; onChangeMs += dt
+            { const k = ctrl.key.replace(/^custom\d+(Trig\d+)?/, '$1~'); const a = (window.__dpAgg = window.__dpAgg || {}); const e = a[k] || (a[k] = { n: 0, ms: 0 }); e.n++; e.ms += dt }
+            if (dt > 4) slow.push([ctrl.key, Math.round(dt)])
+          } else ctrl.onChange(realValue)
+        } catch (err) { if (DP_PROFILE || !applyErrorLogged) { applyErrorLogged = true; console.warn('onChange of ' + ctrl.key + ' threw while applying settings (the rest was still applied):', err) } }
       }
     }
   }))
   const profT1 = DP_PROFILE ? performance.now() : 0
+  runPanelStateAppliedCallbacks()
   refreshRowDisplaysForEditingTab()
   if (DP_PROFILE) {
     slow.sort((a, b) => b[1] - a[1])
@@ -3755,12 +3782,12 @@ export function initDevPanel(groups, opts = {}) {
   // assumes is possible.
   function applyFullPanelState(state, skipKeys = null) {
     if (!state) return
-    applyOrder(groupsEl, state.order)
+    dpTime('state: applyOrder', () => applyOrder(groupsEl, state.order))
     devVisibility = state.devVisibility || {}
     devIndependence = state.devIndependence || { mobile: {}, landscape: {} }
     applyStoredValues(state.values, skipKeys)
     textOverrides = { ...(state.textOverrides || {}) }
-    applyTextOverrides()
+    dpTime('state: applyTextOverrides', applyTextOverrides)
     // Set Hotkey feature -- re-renders every control's own hotkey badge
     // from the just-restored map (Undo/Redo/Save/Reset/Load/Use/Set-as-
     // Default all flow through this one function).
@@ -3982,8 +4009,10 @@ export function initDevPanel(groups, opts = {}) {
     const states = getSavedStates()
     if (!states[name]) return
     let state
+    const tU = performance.now()
     try { state = await unpackState(states[name]) } catch (err) { window.alert(`Could not read "${name}" (${(err && err.message) || err}).`); return }
-    if (state) { await applyStateExtra(state); applyFullPanelState(state); activeStateName = name; renderSavedStatesList() }
+    dpMark('Use: unpack', tU)
+    if (state) { const tE = performance.now(); await applyStateExtra(state); dpMark('Use: applyStateExtra (rebuild functions)', tE); const tA = performance.now(); applyFullPanelState(state); dpMark('Use: applyFullPanelState', tA); activeStateName = name; const tR = performance.now(); renderSavedStatesList(); dpMark('Use: render list', tR) }
   }
   function deleteNamedState() {
     const name = selectedStateName
