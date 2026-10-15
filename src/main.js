@@ -8,7 +8,7 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js'
 import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js'
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js'
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js'
-import { DEV_MODE, initDevPanel, syncValue, setControlValue, copyControlState, refreshListPickerTogglesByKey, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab, beginDynamicBatch, endDynamicBatch } from './devpanel/devPanel.js?v=71'
+import { DEV_MODE, initDevPanel, syncValue, setControlValue, copyControlState, forgetControlsWithPrefix, seedControlValue, refreshListPickerTogglesByKey, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab, beginDynamicBatch, endDynamicBatch } from './devpanel/devPanel.js?v=72'
 
 // Toon Shading colour gradient (2026-10-12): MeshToonMaterial's getGradientIrradiance() only reads the RED channel of
 // its gradientMap (a grey ramp). Reading RGB instead is identical for every grey ramp (all channels equal) and lets
@@ -927,7 +927,7 @@ function tryStartField() {
   // whatever comes next; don't treat this comment's own reasoning above
   // as the settled explanation.
   if (!fieldWarmCompiled) renderer.compile(scene, camera)
-  window.__debug = { placeHandModelRows, syncHandModelWithSettings, refreshHandModelList, get activeHandModelId() { return activeHandModelId }, importHandModelFile, useHandModel, placeLoadingPreviewLightingRows, applyOffsetRotationToHand, applyOffsetRotationRetransition, parseClickPoseConfig, parseClickHoldConfig, cropPointInWrapperFrame, rotateHandAboutCropPoint, rotateHandAboutWorldPoint, cursorFieldPoint, captureClickCursorPivot, rotationDegAt, applyWorldRigid, rotationModeOf, get customFunctionCollapseReady() { return customFunctionCollapseReady }, markCustomFunctionCollapseReady: () => { customFunctionCollapseReady = true }, applyCustomFunctionCollapse, persistCustomClickFunctionIds, bakeOffsetRotationIntoAccum, loopLapProgress, loopLapEnd, rotateHandAboutArmBase, updateLoadingPreviewHand2, get palmCenterPosRaw() { return palmCenterPosRaw }, get handoPivotRaw() { return handoPivotRaw }, get handBoundsBoxCenterRaw() { return handBoundsBoxCenterRaw }, get alignQuat() { return alignQuat }, get loadingPreviewModelScale() { return loadingPreviewModelScale }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, handBoundsCenterLocal, LOADING_PREVIEW_REFERENCE_RADIUS, importTwoHandTween, convertHandoCameraPreset, applyLoadingPreviewCameraPreset, animateFrame: (...a) => animate(...a), releaseStartupHold, trackingActiveFor, placeStartupRetransitionGroup, startupHandScale, updateFieldCenterMarker, get fieldCenterPoint() { return fieldCenterPoint }, retransitionScalerMul, startupHandPhaseUnfinished, applyFieldBounds, onFieldBoundsChanged, retransitionDistanceMs, untriggeredVisibleSpheres, allVisibleHandsFinished, handStartupLocked, triggerClickPose, checkStartupFloorHide, get startupFloorHidden() { return startupFloorHidden }, get floorMesh() { return floorMesh }, updateLoadingPreviewAnimation, get loadingPreview2() { return { hand: loadingPreviewHand, hand2: loadingPreviewHand2, scene: loadingPreviewScene, camera: loadingPreviewCamera, renderer: loadingPreviewRenderer } }, updateSphereSequence, get sphereState() { return { stage: sphereStage, mesh: sphereMesh, on: sphereOn, start: sphereStart, dur: sphereDur, cap: sphereCap, done: sphereDone, keep: sphereKeepForHands, clicks: sphereClickCount } }, stackOnDefault, applyCameraOrientation, syncCameraPanelFromLive, curveByDomain, get domains() { return { xyAll: [xyAllMinDist, xyAllDistRange], splayAll: [splayAllMin, splayAllRange], cropAll: [cropAllMin, cropAllRange], restAll: [restAllMinDist, restAllDistRange], live: [liveFieldMinDist, liveFieldDistRange], splay: [splayFieldMin, splayFieldRange], crop: [cropFieldMin, cropFieldRange], xy: [xyFieldMinDist, xyFieldDistRange], rest: [restFieldMinDist, restFieldDistRange] } }, modelBaseFrameQ, computeBaseRotationQuat, cloneBaseRb, makeClipRig, updateClipRigPlanes, setClipRigT, updateOnScreenFlags, evaluateArmLengthCurve, THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose, resolveTweenSegmentsWithAnchor, lerpTweenSegments, lerpLoopSegments, isHoldEntry, updateLoadingPreviewWristClip, lerpPoseValues, get loadingPreviewRenderer() { return loadingPreviewRenderer }, get loadingPreviewScene() { return loadingPreviewScene }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, get handBoundsCenterLocal() { return handBoundsCenterLocal }, multiPointCommit, multiPointEligibleFunctions, get multiPointActiveTouchCount() { return multiPointActiveTouchCount }, get multiPointSessionFiredPoseId() { return multiPointSessionFiredPoseId }, detectPoseJumps, get poseJumpLogEntries() { return poseJumpLogEntries }, applyCurlToSkeletonReference, handLogTriggerLabel, applyAllFingerCurls, syncCameraPanelFromLive, animSpeedMs, chainSequenceCount, applyFieldBounds, cursorDistXY, hexBrightnessPct, toonThresholdForMidBrightness }
+  window.__debug = { reconcileCustomFunctions, captureCustomFunctionsForUndo, renameCustomFunction, placeHandModelRows, syncHandModelWithSettings, refreshHandModelList, get activeHandModelId() { return activeHandModelId }, importHandModelFile, useHandModel, placeLoadingPreviewLightingRows, applyOffsetRotationToHand, applyOffsetRotationRetransition, parseClickPoseConfig, parseClickHoldConfig, cropPointInWrapperFrame, rotateHandAboutCropPoint, rotateHandAboutWorldPoint, cursorFieldPoint, captureClickCursorPivot, rotationDegAt, applyWorldRigid, rotationModeOf, get customFunctionCollapseReady() { return customFunctionCollapseReady }, markCustomFunctionCollapseReady: () => { customFunctionCollapseReady = true }, applyCustomFunctionCollapse, persistCustomClickFunctionIds, bakeOffsetRotationIntoAccum, loopLapProgress, loopLapEnd, rotateHandAboutArmBase, updateLoadingPreviewHand2, get palmCenterPosRaw() { return palmCenterPosRaw }, get handoPivotRaw() { return handoPivotRaw }, get handBoundsBoxCenterRaw() { return handBoundsBoxCenterRaw }, get alignQuat() { return alignQuat }, get loadingPreviewModelScale() { return loadingPreviewModelScale }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, handBoundsCenterLocal, LOADING_PREVIEW_REFERENCE_RADIUS, importTwoHandTween, convertHandoCameraPreset, applyLoadingPreviewCameraPreset, animateFrame: (...a) => animate(...a), releaseStartupHold, trackingActiveFor, placeStartupRetransitionGroup, startupHandScale, updateFieldCenterMarker, get fieldCenterPoint() { return fieldCenterPoint }, retransitionScalerMul, startupHandPhaseUnfinished, applyFieldBounds, onFieldBoundsChanged, retransitionDistanceMs, untriggeredVisibleSpheres, allVisibleHandsFinished, handStartupLocked, triggerClickPose, checkStartupFloorHide, get startupFloorHidden() { return startupFloorHidden }, get floorMesh() { return floorMesh }, updateLoadingPreviewAnimation, get loadingPreview2() { return { hand: loadingPreviewHand, hand2: loadingPreviewHand2, scene: loadingPreviewScene, camera: loadingPreviewCamera, renderer: loadingPreviewRenderer } }, updateSphereSequence, get sphereState() { return { stage: sphereStage, mesh: sphereMesh, on: sphereOn, start: sphereStart, dur: sphereDur, cap: sphereCap, done: sphereDone, keep: sphereKeepForHands, clicks: sphereClickCount } }, stackOnDefault, applyCameraOrientation, syncCameraPanelFromLive, curveByDomain, get domains() { return { xyAll: [xyAllMinDist, xyAllDistRange], splayAll: [splayAllMin, splayAllRange], cropAll: [cropAllMin, cropAllRange], restAll: [restAllMinDist, restAllDistRange], live: [liveFieldMinDist, liveFieldDistRange], splay: [splayFieldMin, splayFieldRange], crop: [cropFieldMin, cropFieldRange], xy: [xyFieldMinDist, xyFieldDistRange], rest: [restFieldMinDist, restFieldDistRange] } }, modelBaseFrameQ, computeBaseRotationQuat, cloneBaseRb, makeClipRig, updateClipRigPlanes, setClipRigT, updateOnScreenFlags, evaluateArmLengthCurve, THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose, resolveTweenSegmentsWithAnchor, lerpTweenSegments, lerpLoopSegments, isHoldEntry, updateLoadingPreviewWristClip, lerpPoseValues, get loadingPreviewRenderer() { return loadingPreviewRenderer }, get loadingPreviewScene() { return loadingPreviewScene }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, get handBoundsCenterLocal() { return handBoundsCenterLocal }, multiPointCommit, multiPointEligibleFunctions, get multiPointActiveTouchCount() { return multiPointActiveTouchCount }, get multiPointSessionFiredPoseId() { return multiPointSessionFiredPoseId }, detectPoseJumps, get poseJumpLogEntries() { return poseJumpLogEntries }, applyCurlToSkeletonReference, handLogTriggerLabel, applyAllFingerCurls, syncCameraPanelFromLive, animSpeedMs, chainSequenceCount, applyFieldBounds, cursorDistXY, hexBrightnessPct, toonThresholdForMidBrightness }
   // Do NOT hide the loading screen yet: the hands exist but may not have been painted. finalizeReveal() hides it once the field has rendered a couple of frames (or after a 4 s safety net).
   setTimeout(finalizeReveal, 4000)
 }
@@ -2486,7 +2486,9 @@ const DEV_GROUPS = [
           isOn: (item) => !!cfg[`${item.fnId}Enabled`],
           setOn: (item, on) => setCustomFunctionEnabled(item.fnId, on)
         },
-        onDuplicate: (item, opts) => { duplicateCustomClickFunction(item.fnId, opts) }
+        buttons: ['duplicate', 'rename', 'group'],
+        onDuplicate: (item, opts) => duplicateCustomClickFunction(item.fnId, opts), // returns the promise: a group's functions are duplicated one after another
+        onRename: (item, name) => renameCustomFunction(item.fnId, name)
       },
       // MOVED to the top of this group 2026-09-28 (direct request) -- both
       // were previously elsewhere (Hold Confirm Delay lower in this same
@@ -3504,6 +3506,8 @@ const cfg = initDevPanel(DEV_GROUPS, {
   undoLiveKeys: ['cameraX', 'cameraY', 'cameraZ', 'cameraFov', 'cameraZoom', 'cameraYaw', 'cameraPitch', 'cameraRoll'],
   // Keep the startup cache in step with what was just saved.
   onBeforeSave: () => persistCustomClickFunctionIds(),
+  undoCaptureExtra: () => captureCustomFunctionsForUndo(),
+  undoApplyExtra: (extra) => reconcileCustomFunctions(extra),
   onSave: () => writeStartupCache()
 })
 onChangeByCtrl.forEach((fn, c) => { c.onChange = fn })
@@ -7647,9 +7651,24 @@ async function importTwoHandTween(btn) {
   const h2 = data.hand2 || {}
   const placement = {}
   HAND2_CONFIG_KEYS.forEach((k) => { if (h2[k] !== undefined) placement[k] = h2[k] })
+  // HANDO world units per raw model unit (2026-10-14): HANDO multiplies the model by its scaleCorrection (388.436 for this hand), so its offsets (-43 ...) are in a world where the hand is ~3.9x bigger than the raw model; the
+  // preview has to turn them into ITS units with that factor, not with this app's own bounds. A HANDO export carries scene.palmPivot (the wrist / middle-base midpoint in HANDO's model space = the raw one * that factor), and the
+  // same point is handoPivotRaw here, so the factor is their length ratio - exact, with no bounding-box assumption (HANDO's and this app's boxes are not measured alike: radius 75.477 / 388.436 = 0.1943 there, 0.2295 here).
+  // Missing (an export from before scene existed): left undefined and updateLoadingPreviewHand2() keeps its previous scaling.
+  let handoScale
+  const pp = data.scene && data.scene.palmPivot
+  if (pp && typeof pp.x === 'number' && handoPivotRaw.length() > 1e-9) {
+    const sc = Math.hypot(pp.x, pp.y, pp.z) / handoPivotRaw.length()
+    if (isFinite(sc) && sc >= 1 && sc <= 5000) handoScale = sc
+  }
+  // HANDO's exact mirror anchor (scene.mirrorAnchor, its world) back in raw model units: this app's own box centre is not HANDO's (the boxes are measured differently), and the 2nd hand's X is 2 * anchor.x - ..., so a 1.5-unit
+  // difference in the anchor moved the pair 3 units. Same formula in updateLoadingPreviewHand2(), only the point it is given.
+  let handoAnchorRaw
+  const ma = data.scene && data.scene.mirrorAnchor
+  if (handoScale && ma && typeof ma.x === 'number') handoAnchorRaw = { x: ma.x / handoScale, y: ma.y / handoScale, z: ma.z / handoScale }
   const incomingSeqs = (Array.isArray(data.tweenSequences) && data.tweenSequences.length ? data.tweenSequences : [{ name: data.name || 'Two-Hand Tween', tweenPoses: data.tweenPoses, tweenPosesHand2: data.tweenPosesHand2 }])
     .filter((q) => q && typeof q.name === 'string')
-    .map((q) => ({ name: q.name, tweenPoses: Array.isArray(q.tweenPoses) ? q.tweenPoses : (data.tweenPoses || []), tweenPosesHand2: Array.isArray(q.tweenPosesHand2) ? q.tweenPosesHand2 : (data.tweenPosesHand2 || []), twoHand: h2.show2ndHand !== false, hand2: placement }))
+    .map((q) => ({ name: q.name, tweenPoses: Array.isArray(q.tweenPoses) ? q.tweenPoses : (data.tweenPoses || []), tweenPosesHand2: Array.isArray(q.tweenPosesHand2) ? q.tweenPosesHand2 : (data.tweenPosesHand2 || []), twoHand: h2.show2ndHand !== false, hand2: placement, ...(handoScale ? { handoScale } : {}), ...(handoAnchorRaw ? { handoAnchorRaw } : {}) }))
   if (!incomingSeqs.length) { flash('No sequence found'); return }
   const sequences = mergeByName(cfg.savedTweenSequences || [], incomingSeqs)
   cfg.savedTweenSequences = sequences
@@ -7688,7 +7707,7 @@ function ensureLoadingPreviewHand2(seq) {
   loadingPreviewHand2 = { clone, skinnedMesh, wristClipPlane: plane, clipRig: rig }
 }
 const _lp2U = new THREE.Matrix4(), _lp2Pivot = new THREE.Matrix4(), _lp2Tmp = new THREE.Matrix4(), _lp2A = new THREE.Matrix4(), _lp2Ai = new THREE.Matrix4(), _lp2Mir = new THREE.Matrix4(), _lp2Final = new THREE.Matrix4()
-const _lp2Rh = new THREE.Quaternion()
+const _lp2Rh = new THREE.Quaternion(), _lp2Anchor = new THREE.Vector3()
 const _lp2Q = new THREE.Quaternion(), _lp2Base = new THREE.Quaternion(), _lp2V = new THREE.Vector3(), _lp2V2 = new THREE.Vector3(), _lp2S = new THREE.Vector3(), _lp2Eul = new THREE.Euler()
 function updateLoadingPreviewHand2(seq, lapStyle, t) {
   const hand2 = loadingPreviewHand2
@@ -7724,7 +7743,8 @@ function updateLoadingPreviewHand2(seq, lapStyle, t) {
   _lp2Pivot.compose(handoPivotRaw, _lp2Q, _lp2S.set(s2, s2, s2))
   _lp2Pivot.multiply(_lp2Tmp.makeTranslation(-handoPivotRaw.x, -handoPivotRaw.y, -handoPivotRaw.z))
   // offset: HANDO units -> this preview's frame (alignQuat), scaled with the preview hand (the hand is sized to HANDO's units when a camera preset is in use)
-  const unit = c1.scale.x / (LOADING_PREVIEW_REFERENCE_RADIUS / handBoundsRadiusLocal)
+  // preview units per HANDO unit: the preview hand's scale over HANDO's own raw->world factor (seq.handoScale, from the export); an import without it keeps the old assumption (HANDO scale = the reference-radius ratio)
+  const unit = seq.handoScale ? c1.scale.x / seq.handoScale : c1.scale.x / (LOADING_PREVIEW_REFERENCE_RADIUS / handBoundsRadiusLocal)
   _lp2V.set((cfg2.hand2OffsetX || 0) + (cfg.loadingPreviewHand2ExtraX || 0), (cfg2.hand2OffsetY || 0) + (cfg.loadingPreviewHand2ExtraY || 0), (cfg2.hand2OffsetZ || 0) + (cfg.loadingPreviewHand2ExtraZ || 0)).applyQuaternion(alignQuat).multiplyScalar(unit)
   _lp2U.copy(c1.matrix).multiply(_lp2Pivot)
   _lp2U.premultiply(_lp2Tmp.makeTranslation(_lp2V.x, _lp2V.y, _lp2V.z)) // un-mirrored placement
@@ -7749,7 +7769,7 @@ function updateLoadingPreviewHand2(seq, lapStyle, t) {
     // (A non-zero Pose Offset on the main hand moves HANDO's hand but not its anchor; the preview adds it to the position, so that case is left as it was.)
     const sMain = loadingPreviewModelScale > 0 ? c1.scale.x / loadingPreviewModelScale : 1
     _lp2Rh.copy(alignQuat).invert().multiply(c1.quaternion)
-    _lp2V2.copy(handoPivotRaw).applyQuaternion(_lp2Rh).multiplyScalar(sMain).add(handBoundsBoxCenterRaw).sub(handoPivotRaw).applyQuaternion(alignQuat).multiplyScalar(loadingPreviewModelScale).add(c1.position)
+    _lp2V2.copy(handoPivotRaw).applyQuaternion(_lp2Rh).multiplyScalar(sMain).add(seq.handoAnchorRaw ? _lp2Anchor.set(seq.handoAnchorRaw.x, seq.handoAnchorRaw.y, seq.handoAnchorRaw.z) : handBoundsBoxCenterRaw).sub(handoPivotRaw).applyQuaternion(alignQuat).multiplyScalar(loadingPreviewModelScale).add(c1.position)
     _lp2Final.makeTranslation(_lp2V2.x, _lp2V2.y, _lp2V2.z).multiply(_lp2Mir).multiply(_lp2Tmp.makeTranslation(-_lp2V2.x, -_lp2V2.y, -_lp2V2.z)).multiply(_lp2U)
   } else {
     _lp2Final.copy(_lp2U)
@@ -14662,6 +14682,66 @@ function watchCustomFunctionTitles() {
   customFunctionSelectorObserver.observe(anchor, { subtree: true, characterData: true, childList: true })
 }
 // Duplicate (selector button): a new function of the same kind / family with every setting of the source copied - all three devices' values, Show-in-Mobile / Landscape and Independent flags, and the Multi Trigger list with each trigger's own settings.
+// Rename button in the selector: the function's own group title (a display override, the same one the dev panel's rename mode sets), so the selector and the panel show the same name.
+function renameCustomFunction(id, name) {
+  const g = document.querySelector(`.dp-group[data-custom-function-id="${id}"]`)
+  if (!g || !name) return
+  setDevTextOverride(g.dataset.key, name)
+  applyTextOverrides()
+  refreshCustomFunctionSelector()
+}
+// ---- Undo / Redo of function groups (2026-10-14) ----
+// The panel's Undo / Redo restores values, layout and names from snapshots; a function group that was created (Add / Duplicate) or removed has to be built / torn down as well. undoCaptureExtra records which
+// functions exist; undoApplyExtra puts that set back BEFORE the values are applied, so a recreated function is there to receive its values.
+function unregisterCustomFunctionById(id) {
+  const idx = customClickFunctionIds.findIndex((e) => e.id === id)
+  if (idx === -1) return
+  const entry = customClickFunctionIds[idx]
+  const own = (k) => k === id || (typeof k === 'string' && k.startsWith(id) && /^[A-Z]/.test(k.slice(id.length))) // the function and its Multi Trigger prefixes (custom1Trig1 ...)
+  ;[CLICK_POSE_KEYS, CLICK_HOLD_KEYS].forEach((keys) => { for (let i = keys.length - 1; i >= 0; i--) if (own(keys[i])) keys.splice(i, 1) })
+  ;[clickPoseTriggers, clickHoldPoseTriggers].forEach((t) => Object.keys(t).forEach((k) => { if (own(k)) delete t[k] }))
+  hands.forEach((hand) => { ;[hand._cp, hand._chp].forEach((st) => { if (st) Object.keys(st).forEach((k) => { if (own(k)) delete st[k] }) }) })
+  const g = document.querySelector(`.dp-group[data-custom-function-id="${id}"]`)
+  if (g) g.remove()
+  forgetControlsWithPrefix(id)
+  customClickFunctionIds.splice(idx, 1)
+  delete customFunctionPendingGroup[id]
+  delete clickCursorPivots[id]
+  return entry
+}
+async function reconcileCustomFunctions(extra) {
+  const target = extra && extra.customFunctions
+  if (!Array.isArray(target)) return
+  const want = new Set(target.map((e) => e.id))
+  const gone = customClickFunctionIds.filter((e) => !want.has(e.id)).map((e) => e.id)
+  gone.forEach(unregisterCustomFunctionById)
+  const missing = target.filter((e) => !customClickFunctionIds.some((x) => x.id === e.id))
+  if (missing.length) {
+    beginDynamicBatch()
+    try {
+      for (const e of missing) {
+        // the Multi Trigger list has to be there before the function is built, or its trigger groups are not created
+        const mt = extra.multiTriggers && extra.multiTriggers[e.id]
+        if (mt !== undefined) seedControlValue(`${e.id}MultiTriggers`, mt)
+        customClickFunctionIds.push({ id: e.id, title: e.title, kind: e.kind, family: e.family })
+        await registerCustomClickFunction(e.id, e.title, e.kind, e.family)
+        const g = document.querySelector(`.dp-group[data-custom-function-id="${e.id}"]`)
+        if (g) applyCustomFunctionCollapse(g, { collapsed: true })
+      }
+    } finally { endDynamicBatch() }
+  }
+  if (gone.length || missing.length) {
+    persistCustomClickFunctionIds()
+    refreshAllCustomFunctionGroupVisibility()
+    refreshAllCustomFunctionTypeVisibility()
+    updateCustomFunctionsAnchorRowVisibility()
+  }
+}
+function captureCustomFunctionsForUndo() {
+  const multiTriggers = {}
+  customClickFunctionIds.forEach((e) => { const v = cfg[`${e.id}MultiTriggers`]; if (v && v !== '[]') multiTriggers[e.id] = v })
+  return { customFunctions: customClickFunctionIds.map(({ id, title, kind, family }) => ({ id, title, kind, family })), multiTriggers }
+}
 // opts.group: the selector group path the copy goes into (duplicating a whole group) - read by refreshCustomFunctionSelector() when it first lists the new function.
 const customFunctionPendingGroup = {}
 async function duplicateCustomClickFunction(srcId, opts) {

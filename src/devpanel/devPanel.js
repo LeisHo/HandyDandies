@@ -513,6 +513,7 @@ function renderListPickerItemRow(entry, item) {
   // moves the anchor there, same as clicking away from a multi-selection
   // in any standard list UI.
   row.addEventListener('click', (e) => {
+    entry.lastPick = 'item'
     if (e.shiftKey && entry.selectAnchor) {
       const rows = Array.from(entry.listEl.querySelectorAll('.dp-list-picker-row'))
       const anchorIdx = rows.findIndex((r) => r.__item === entry.selectAnchor)
@@ -560,6 +561,25 @@ function renderListPickerItemRow(entry, item) {
 // "Parent" -> "Renamed" turns "Parent/Child" into "Renamed/Child" -- for a
 // leaf/nested group this prefix pass is simply a no-op (nothing else
 // starts with its own exact path plus a separator).
+// Renames the group at `path` (its last segment) and everything under it - items, empty groups, the order list, collapsed state.
+function renameListPickerGroup(entry, path) {
+  const oldLeaf = path.split(LP_GROUP_PATH_SEP).pop()
+  const newLeaf = prompt('Rename group to:', oldLeaf)
+  if (!newLeaf || newLeaf === oldLeaf) return
+  if (newLeaf.includes(LP_GROUP_PATH_SEP)) { alert(`Group name can't contain "${LP_GROUP_PATH_SEP}"`); return }
+  const segments = path.split(LP_GROUP_PATH_SEP)
+  segments[segments.length - 1] = newLeaf
+  const newPath = segments.join(LP_GROUP_PATH_SEP)
+  const prefix = path + LP_GROUP_PATH_SEP
+  const rename = (p) => (p === path ? newPath : (p.startsWith(prefix) ? newPath + LP_GROUP_PATH_SEP + p.slice(prefix.length) : p))
+  entry.items.forEach((it) => { if (it.group) it.group = rename(it.group) })
+  entry.pendingGroups = (entry.pendingGroups || []).map(rename)
+  entry.groupOrder = (entry.groupOrder || []).map(rename)
+  if (entry.collapsedGroups.has(path)) { entry.collapsedGroups.delete(path); entry.collapsedGroups.add(newPath) }
+  entry.selectedGroups = new Set()
+  commit(entry.ctrl, entry.items)
+  renderListPickerRows(entry)
+}
 function buildGroupHeader(entry, path) {
   const header = el('div', 'dp-lp-group-header')
   header.appendChild(el('span', 'dp-lp-group-handle', { textContent: '⠿' }))
@@ -573,25 +593,8 @@ function buildGroupHeader(entry, path) {
     })
     header.appendChild(gcb)
   }
+  // A group is renamed only through the Rename button (Ctrl / Cmd-click its header to pick it first) - clicking its title no longer prompts, which used to get in the way of picking a group (2026-10-14, direct request).
   const titleSpan = el('span', 'dp-lp-group-title', { textContent: path.split(LP_GROUP_PATH_SEP).pop() })
-  titleSpan.addEventListener('click', (e) => {
-    e.stopPropagation()
-    const oldLeaf = path.split(LP_GROUP_PATH_SEP).pop()
-    const newLeaf = prompt('Rename group to:', oldLeaf)
-    if (!newLeaf || newLeaf === oldLeaf) return
-    if (newLeaf.includes(LP_GROUP_PATH_SEP)) { alert(`Group name can't contain "${LP_GROUP_PATH_SEP}"`); return }
-    const segments = path.split(LP_GROUP_PATH_SEP)
-    segments[segments.length - 1] = newLeaf
-    const newPath = segments.join(LP_GROUP_PATH_SEP)
-    const prefix = path + LP_GROUP_PATH_SEP
-    const rename = (p) => (p === path ? newPath : (p.startsWith(prefix) ? newPath + LP_GROUP_PATH_SEP + p.slice(prefix.length) : p))
-    entry.items.forEach((it) => { if (it.group) it.group = rename(it.group) })
-    entry.pendingGroups = (entry.pendingGroups || []).map(rename)
-    entry.groupOrder = (entry.groupOrder || []).map(rename)
-    if (entry.collapsedGroups.has(path)) { entry.collapsedGroups.delete(path); entry.collapsedGroups.add(newPath) }
-    commit(entry.ctrl, entry.items)
-    renderListPickerRows(entry)
-  })
   header.appendChild(titleSpan)
   const removeBtn = el('button', 'dp-lp-group-remove', { type: 'button', textContent: '×' })
   removeBtn.addEventListener('click', (e) => {
@@ -615,10 +618,11 @@ function buildGroupHeader(entry, path) {
   header.appendChild(removeBtn)
   header.addEventListener('click', (e) => {
     const g = header.closest('.dp-lp-group')
-    if ((e.ctrlKey || e.metaKey) && entry.ctrl.onDuplicate) {
-      // Ctrl / Cmd-click a group header (2026-10-14): pick the whole group for Duplicate instead of collapsing it
+    if (e.ctrlKey || e.metaKey) {
+      // Ctrl / Cmd-click a group header (2026-10-14): pick the group (for Rename / Duplicate) instead of collapsing it
       if (entry.selectedGroups.has(path)) entry.selectedGroups.delete(path)
       else entry.selectedGroups.add(path)
+      entry.lastPick = 'group'
       g.classList.toggle('dp-lp-group-selected', entry.selectedGroups.has(path))
       return
     }
@@ -1336,7 +1340,7 @@ function buildListPickerRow(ctrl, row) {
   // ctrl.buttons (optional, with hostManaged): exactly these buttons, in this order - 'use', 'delete', 'import' (ctrl.onImportClick(button)), 'duplicate', 'group'.
   const hostImportBtn = el('button', null, { type: 'button', textContent: 'Import' })
   if (ctrl.hostManaged && Array.isArray(ctrl.buttons)) {
-    const byName = { use: useBtn, delete: deleteBtn, import: hostImportBtn, duplicate: duplicateBtn, group: addGroupBtn }
+    const byName = { use: useBtn, delete: deleteBtn, import: hostImportBtn, duplicate: duplicateBtn, rename: renameBtn, group: addGroupBtn }
     ctrl.buttons.forEach((n) => { if (byName[n]) btnRow.append(byName[n]) })
   }
   else if (ctrl.hostManaged) { if (ctrl.onDuplicate) btnRow.append(duplicateBtn); btnRow.append(addGroupBtn) }
@@ -1395,7 +1399,8 @@ function buildListPickerRow(ctrl, row) {
     // their own drag on the next re-render.
     groupOrder: [],
     collapsedGroups: new Set(), pendingGroups: [], exportChecked: new Set(),
-    selectedGroups: new Set() // group paths picked with Ctrl / Cmd-click on a header (for Duplicate)
+    selectedGroups: new Set(), // group paths picked with Ctrl / Cmd-click on a header (for Rename / Duplicate)
+    lastPick: 'item' // 'item' | 'group': which kind the Rename button acts on
   }
   numEls[ctrl.key] = entry
 
@@ -1444,10 +1449,16 @@ function buildListPickerRow(ctrl, row) {
     if (entry.selectedItem && ctrl.onUse) ctrl.onUse(entry.selectedItem)
   })
   renameBtn.addEventListener('click', () => {
-    if (!entry.selectedItem) return
+    if (entry.lastPick === 'group' && entry.selectedGroups.size) {
+      if (entry.selectedGroups.size !== 1) { flashBtn(renameBtn, 'Pick one group'); return }
+      renameListPickerGroup(entry, Array.from(entry.selectedGroups)[0])
+      return
+    }
+    if (!entry.selectedItem) { flashBtn(renameBtn, 'Select one'); return }
     const target = entry.selectedItem
     const name = prompt('Rename to:', target.name)
     if (!name || name === target.name) return
+    if (ctrl.onRename) { ctrl.onRename(target, name); return } // a host-managed list renames the real thing (ctrl.onRename), not just the label
     entry.items = entry.items.map((it) => (it === target ? { ...it, name } : it))
     entry.selectedItem = entry.items.find((it) => it === target) || null
     commit(ctrl, entry.items)
@@ -1500,7 +1511,9 @@ function buildListPickerRow(ctrl, row) {
     if (!picked.length && !groups.length && entry.selectedItem) picked.push(entry.selectedItem)
     if (!picked.length && !groups.length) { flashBtn(duplicateBtn, 'Select one'); return }
     if (!ctrl.onDuplicate) return
-    picked.forEach((it) => ctrl.onDuplicate(it)) // every selected item, in list order
+    // Run one after another (each duplicate builds a whole function group and awaits), never all at once.
+    const tasks = []
+    picked.forEach((it) => tasks.push(() => ctrl.onDuplicate(it))) // every selected item, in list order
     const taken = new Set([...entry.items.map((it) => it.group).filter(Boolean), ...entry.pendingGroups])
     groups.forEach((path) => {
       const parts = path.split(LP_GROUP_PATH_SEP)
@@ -1512,8 +1525,9 @@ function buildListPickerRow(ctrl, row) {
       const newPath = make(nm)
       taken.add(newPath)
       entry.items.filter((it) => it.group && (it.group === path || it.group.startsWith(path + LP_GROUP_PATH_SEP)))
-        .forEach((it) => ctrl.onDuplicate(it, { group: newPath + it.group.slice(path.length) }))
+        .forEach((it) => tasks.push(() => ctrl.onDuplicate(it, { group: newPath + it.group.slice(path.length) })))
     })
+    ;(async () => { for (const task of tasks) { try { await task() } catch (err) { console.error('Duplicate failed', err) } } })()
     entry.selectedGroups = new Set()
     entry.listEl.querySelectorAll('.dp-lp-group-selected').forEach((g) => g.classList.remove('dp-lp-group-selected'))
   })
@@ -2052,6 +2066,31 @@ function addCustomGroup(groupsEl) {
 // exactly mirroring `applyStoredValues()`'s own per-control resolution --
 // falling back to `c.def` only when nothing was ever restored for this key
 // (a brand-new control, or no remote/local settings existed at all yet).
+// Drops every control whose key is `prefix` + an upper-case suffix (a removed custom click function's) from the registry, the stored values on every device, the Show-in-Mobile / Independent flags and cfg - so a function that is
+// undone away leaves nothing behind to be saved. Counterpart of renderDynamicGroup().
+export function forgetControlsWithPrefix(prefix) {
+  const match = (k) => typeof k === 'string' && k.startsWith(prefix) && /^[A-Z]/.test(k.slice(prefix.length))
+  let removed = 0
+  for (let i = devGroups.length - 1; i >= 0; i--) { // in place: the host holds the same array (DEV_GROUPS)
+    const g = devGroups[i]
+    const keep = g.controls.filter((c) => !match(c.key))
+    if (keep.length === g.controls.length) continue
+    removed += g.controls.length - keep.length
+    g.controls = keep
+    if (!keep.length) devGroups.splice(i, 1) // the group spec renderDynamicGroup() pushed for it is now empty
+  }
+  DEVICES.forEach((d) => { Object.keys(store[d]).forEach((k) => { if (match(k)) delete store[d][k] }) })
+  Object.keys(cfg).forEach((k) => { if (match(k)) delete cfg[k] })
+  Object.keys(numEls).forEach((k) => { if (match(k)) delete numEls[k] })
+  Object.keys(devVisibility).forEach((k) => { if (match(k)) delete devVisibility[k] })
+  ;['mobile', 'landscape'].forEach((d) => { if (devIndependence[d]) Object.keys(devIndependence[d]).forEach((k) => { if (match(k)) delete devIndependence[d][k] }) })
+  return removed
+}
+// Writes a value for a control that does not exist yet (every device slot and cfg), so renderDynamicGroup() builds it with that value instead of its default.
+export function seedControlValue(key, value) {
+  DEVICES.forEach((d) => { store[d][key] = JSON.parse(JSON.stringify(value)) })
+  cfg[key] = store[realDeviceClass()][key]
+}
 export function renderDynamicGroup(groupSpec) {
   devGroups.push(groupSpec)
   const real = realDeviceClass()
@@ -4059,8 +4098,8 @@ export function initDevPanel(groups, opts = {}) {
   // devSaveCaptureExtra/devSaveApplyExtra (below, near saveSettings()) are
   // the equivalent pair for Save/Reset specifically -- Undo/Redo alone
   // would otherwise silently lose this same state across a Save/reload.
-  let devUndoCaptureExtra = null
-  let devUndoApplyExtra = null
+  let devUndoCaptureExtra = opts.undoCaptureExtra || null // () => json: host state outside the registered controls (main.js: which custom click functions exist)
+  let devUndoApplyExtra = opts.undoApplyExtra || null // (extra) => void | Promise: puts that state back; runs BEFORE the values are applied so recreated controls exist to receive them
   // devSaveCaptureExtra/devSaveApplyExtra -- the equivalent pair for
   // Save/Reset (see saveSettings()/resetSettings() below), so the same
   // host state Undo/Redo can now cover also survives a real Save/reload,
@@ -4118,9 +4157,25 @@ export function initDevPanel(groups, opts = {}) {
         extra: extra !== undefined ? JSON.parse(JSON.stringify(extra)) : undefined,
         liveEdit: entry.liveEdit
       })
-      applyUndoEntryState(entry)
-      if (entry.extra !== undefined && devUndoApplyExtra) devUndoApplyExtra(entry.extra)
+      return applyUndoEntryAfterExtra(entry)
     }
+  }
+  // The host's structure (e.g. which function groups exist) is put back first - it may be async, a group has to exist before its values can be applied to it - then the values / order / names.
+  function applyUndoEntryAfterExtra(entry) {
+    const res = (entry.extra !== undefined && devUndoApplyExtra) ? devUndoApplyExtra(entry.extra) : undefined
+    if (res && typeof res.then === 'function') return res.then(() => applyUndoEntryState(entry))
+    applyUndoEntryState(entry)
+  }
+  // Undo / Redo can be async now; presses that arrive while one is running wait their turn.
+  let devUndoBusy = false
+  const devUndoQueue = []
+  function runUndoRedoExclusive(op) {
+    if (devUndoBusy) { devUndoQueue.push(op); return }
+    devUndoBusy = true
+    const done = () => { devUndoBusy = false; const next = devUndoQueue.shift(); if (next) runUndoRedoExclusive(next) }
+    let r
+    try { r = op() } catch (err) { done(); throw err }
+    Promise.resolve(r).then(done, (err) => { console.error('Undo/Redo failed', err); done() })
   }
   function redoDevPanelChange() {
     if (!devRedoStack.length) return
@@ -4130,8 +4185,7 @@ export function initDevPanel(groups, opts = {}) {
       entry.node.remove()
     } else {
       pushDevPanelUndoSnapshot(entry.liveEdit)
-      applyUndoEntryState(entry)
-      if (entry.extra !== undefined && devUndoApplyExtra) devUndoApplyExtra(entry.extra)
+      return applyUndoEntryAfterExtra(entry)
     }
   }
   // How long a "gesture" may hold the undo-push gate open with no
@@ -4189,8 +4243,8 @@ export function initDevPanel(groups, opts = {}) {
   // reliably regains focus the instant a native color/file/date picker
   // closes, even though the page itself never saw a pointerup.
   window.addEventListener('focus', resetDevUndoGesture)
-  undoBtn.addEventListener('click', undoDevPanelChange)
-  redoBtn.addEventListener('click', redoDevPanelChange)
+  undoBtn.addEventListener('click', () => runUndoRedoExclusive(undoDevPanelChange))
+  redoBtn.addEventListener('click', () => runUndoRedoExclusive(redoDevPanelChange))
   // Ctrl+Z / Ctrl+Shift+Z / Ctrl+Y -- ignored while focus is in a genuine
   // text-input context (a rename textarea, a text-type control, the
   // search box) so it doesn't fight the browser/OS's own native
@@ -4204,7 +4258,7 @@ export function initDevPanel(groups, opts = {}) {
     if (tag === 'TEXTAREA' || (tag === 'INPUT' && document.activeElement.type === 'text')) return
     e.preventDefault()
     const isRedo = (e.key === 'y' || e.key === 'Y') || ((e.key === 'z' || e.key === 'Z') && e.shiftKey)
-    if (isRedo) redoDevPanelChange(); else undoDevPanelChange()
+    runUndoRedoExclusive(isRedo ? redoDevPanelChange : undoDevPanelChange)
   })
   // Clears the undo AND redo stacks on Save/Sync -- per the feature's own
   // "until i click save, then it starts new again" requirement; wired
