@@ -618,7 +618,9 @@ function buildGroupHeader(entry, path) {
     const gcb = el('input', 'dp-lp-group-toggle', { type: 'checkbox' })
     gcb.addEventListener('click', (e) => e.stopPropagation())
     gcb.addEventListener('change', () => {
-      listPickerGroupItems(entry, path).forEach((it) => entry.ctrl.itemToggle.setOn(it, gcb.checked))
+      // Read ONCE, before the loop: switching the first item re-syncs every checkbox from the host (refreshListPickerToggles), which unticks this group checkbox while some items are still off - re-reading gcb.checked per item then switched the rest the wrong way (2026-10-15: ticking a group enabled only its first function).
+      const on = gcb.checked
+      listPickerGroupItems(entry, path).forEach((it) => entry.ctrl.itemToggle.setOn(it, on))
       refreshListPickerToggles(entry)
     })
     header.appendChild(gcb)
