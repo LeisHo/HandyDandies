@@ -7907,8 +7907,8 @@
         }
       ],
       "lockCameraPan": true,
-      "lockCameraZoom": false,
-      "cameraMaxExtentsEnabled": false,
+      "lockCameraZoom": true,
+      "cameraMaxExtentsEnabled": true,
       "keyAzimuth": 27,
       "keyElevation": 67,
       "keyTargetHeight": 65,
