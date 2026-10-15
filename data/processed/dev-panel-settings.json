@@ -27,7 +27,7 @@
       "fieldCols": 60,
       "rowSpacing": 5,
       "columnSpacing": 9,
-      "handScale": 0.7,
+      "handScale": 0.6,
       "alternateRowOffset": 4,
       "progressiveRowOffset": 1,
       "useProgressiveOffset": false,
@@ -34503,14 +34503,14 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
           "type": "group",
           "group": {
             "key": "Field Layout",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -36323,7 +36323,7 @@
       "subgroups": [
         {
           "key": "Field Layout",
-          "collapsed": true,
+          "collapsed": false,
           "locked": true,
           "items": [
             {
