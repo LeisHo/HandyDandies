@@ -8,7 +8,7 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js'
 import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js'
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js'
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js'
-import { DEV_MODE, initDevPanel, syncValue, setControlValue, copyControlState, forgetControlsWithPrefix, seedControlValue, refreshListPickerTogglesByKey, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab, beginDynamicBatch, endDynamicBatch } from './devpanel/devPanel.js?v=74'
+import { DEV_MODE, initDevPanel, syncValue, setControlValue, copyControlState, forgetControlsWithPrefix, seedControlValue, refreshListPickerTogglesByKey, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab, beginDynamicBatch, endDynamicBatch, refreshListPickerMarksByKey } from './devpanel/devPanel.js?v=75'
 
 // Toon Shading colour gradient (2026-10-12): MeshToonMaterial's getGradientIrradiance() only reads the RED channel of
 // its gradientMap (a grey ramp). Reading RGB instead is identical for every grey ramp (all channels equal) and lets
@@ -2320,6 +2320,7 @@ const DEV_GROUPS = [
       // select dropdown's own live-apply made it redundant; asked back).
       {
         key: 'loadingPreviewSavedCameras',
+        isInUse: (item) => !!cfg.loadingPreviewCameraSelector && cfg.loadingPreviewCameraSelector === item.name,
         label: 'Loading Preview Saved Cameras',
         type: 'list-picker',
         def: [],
@@ -2357,6 +2358,7 @@ const DEV_GROUPS = [
       // an equivalent of), so it stays separate and untouched.
       {
         key: 'loadingPreviewSavedLighting',
+        isInUse: (item) => !!cfg.loadingPreviewLightingSelector && cfg.loadingPreviewLightingSelector === item.name,
         label: 'Loading Preview Saved Lighting',
         type: 'list-picker',
         def: [],
@@ -2811,6 +2813,7 @@ const DEV_GROUPS = [
       // (where Hide Wrist is a plain static crop with no reactive mode).
       {
         key: 'savedPoses',
+        isDefault: (item) => poseItemMatchesDefault(item),
         label: 'Saved Poses',
         type: 'list-picker',
         def: [
@@ -3085,6 +3088,8 @@ const DEV_GROUPS = [
       // Pose Preview exists for hand poses.
       {
         key: 'savedCameras',
+        isDefault: (item) => cameraItemMatchesDefault(item),
+        isInUse: (item) => cameraItemMatchesLive(item),
         label: 'Saved Cameras',
         type: 'list-picker',
         exportable: true,
@@ -3128,6 +3133,7 @@ const DEV_GROUPS = [
       // either). See captureLightingPreset()/applyLightingPreset() below.
       {
         key: 'savedLighting',
+        isInUse: (item) => lightingItemMatchesLive(item),
         label: 'Saved Lighting',
         type: 'list-picker',
         exportable: true,
@@ -3602,6 +3608,7 @@ const cfg = initDevPanel(DEV_GROUPS, {
     prof('setupLoadingPreviewTextGroup', setupLoadingPreviewTextGroup)
     prof('placeHandModelRows', placeHandModelRows)
     prof('placeSmallScaleModelRows', placeSmallScaleModelRows)
+    prof('refreshItemSelectorMarks', refreshAllItemSelectorMarks)
     prof('syncHandModelWithSettings', syncHandModelWithSettings)
     startupSettingsReady = true
     prof('refreshStartupPreviewAfterRestore', refreshStartupPreviewAfterRestore)
@@ -7425,6 +7432,7 @@ function setSelectedPoseAsDefault() {
   POSE_PRESET_KEYS.forEach((key) => { poseDefaultValues[key] = next[key] })
   syncPoseSlidersTo(next)
   saveCurrentSettings()
+  refreshListPickerMarksByKey('savedPoses')
 }
 // Injects the "Default" button directly into the Saved Poses list-
 // picker's own button row (next to Save/Overwrite/Use/Rename/Delete),
@@ -7548,6 +7556,42 @@ function getSelectedSavedCameraItem() {
   const selectedRow = document.querySelector('.dp-row[data-key="savedCameras"] .dp-list-picker-row-selected')
   return selectedRow ? selectedRow.__item : null
 }
+// ---- Item selector marks (2026-10-15): which Saved Pose / Camera is the Default, which Camera / Lighting matches what is live ----
+// An item is the default when its values equal the stored default values (the Default buttons copy an item's values, not its name), and "in use" when its values equal the live camera / lighting. Reading these while the panel is
+// first built can hit a not-yet-initialised module value; devPanel.js treats a throw as false and the marks are refreshed once setup has finished.
+const nearNum = (a, b, eps) => (typeof a === 'number' && typeof b === 'number') ? Math.abs(a - b) <= eps : a === b
+function poseItemMatchesDefault(item) {
+  return POSE_PRESET_KEYS.every((k) => nearNum(item[k] !== undefined ? item[k] : POSE_KEY_DEFAULTS[k], poseDefaultValues[k], 1e-6))
+}
+function cameraItemMatchesDefault(rawItem) {
+  const item = normalizeCameraPresetItem(rawItem)
+  return CAMERA_PRESET_KEYS.every((k) => nearNum(item[k] !== undefined ? item[k] : CAMERA_KEY_DEFAULTS[k], cameraDefaultValues[k], 1e-6))
+    && nearNum(item.targetX !== undefined ? item.targetX : 0, cameraDefaultValues.targetX, 1e-6)
+    && nearNum(item.targetY !== undefined ? item.targetY : 0, cameraDefaultValues.targetY, 1e-6)
+    && nearNum(item.targetZ !== undefined ? item.targetZ : 0, cameraDefaultValues.targetZ, 1e-6)
+}
+function cameraItemMatchesLive(rawItem) {
+  const item = normalizeCameraPresetItem(rawItem)
+  const t = controls.target
+  return nearNum(item.cameraX !== undefined ? item.cameraX : CAMERA_KEY_DEFAULTS.cameraX, camera.position.x, 0.01)
+    && nearNum(item.cameraY !== undefined ? item.cameraY : CAMERA_KEY_DEFAULTS.cameraY, camera.position.y, 0.01)
+    && nearNum(item.cameraZ !== undefined ? item.cameraZ : CAMERA_KEY_DEFAULTS.cameraZ, camera.position.z, 0.01)
+    && nearNum(item.cameraFov !== undefined ? item.cameraFov : CAMERA_KEY_DEFAULTS.cameraFov, camera.fov, 0.01)
+    && nearNum(item.cameraRoll !== undefined ? item.cameraRoll : 0, cfg.cameraRoll || 0, 0.05)
+    && nearNum(item.targetX !== undefined ? item.targetX : 0, t.x, 0.01)
+    && nearNum(item.targetY !== undefined ? item.targetY : 0, t.y, 0.01)
+    && nearNum(item.targetZ !== undefined ? item.targetZ : 0, t.z, 0.01)
+}
+function lightingItemMatchesLive(item) {
+  return LIGHTING_PRESET_KEYS.every((k) => {
+    const a = item[k] !== undefined ? item[k] : LIGHTING_KEY_DEFAULTS[k]
+    const b = cfg[k]
+    return typeof a === 'string' && typeof b === 'string' ? a.toLowerCase() === b.toLowerCase() : nearNum(a, b, 1e-3)
+  })
+}
+function refreshAllItemSelectorMarks() {
+  ;['savedPoses', 'savedCameras', 'savedLighting', 'loadingPreviewSavedCameras', 'loadingPreviewSavedLighting'].forEach(refreshListPickerMarksByKey)
+}
 function setSelectedCameraAsDefault() {
   const rawItem = getSelectedSavedCameraItem()
   if (!rawItem) return
@@ -7563,6 +7607,7 @@ function setSelectedCameraAsDefault() {
   cameraDefaultValues.targetZ = item.targetZ !== undefined ? item.targetZ : 0
   updateCameraMaxExtentsBound()
   saveCurrentSettings()
+  refreshListPickerMarksByKey('savedCameras')
 }
 // Max Extents (direct request, refined over several corrections in the
 // same message thread down to this exact model): a standard bounding
@@ -19688,7 +19733,19 @@ safeRefreshSelectOptions('renderOrderFallback2Except')
 mergeExceptSelects()
 buildRenderOrderWidgets()
 placeSmallScaleModelRows()
+refreshAllItemSelectorMarks()
 buildToonGradientWidget()
+// Keep the marks current while the camera / lighting / loading-preview selection changes (checked every 6th frame, a few numbers).
+let marksLastSig = ''
+let marksFrame = 0
+armLengthWidgetResyncs.push(() => {
+  if (++marksFrame % 6 !== 0) return
+  const t = controls.target
+  const sig = [camera.position.x, camera.position.y, camera.position.z, camera.fov, cfg.cameraRoll || 0, t.x, t.y, t.z].map((v) => Math.round(v * 100)).join(',') + '|' + LIGHTING_PRESET_KEYS.map((k) => cfg[k]).join(',') + '|' + cfg.loadingPreviewCameraSelector + '|' + cfg.loadingPreviewLightingSelector
+  if (sig === marksLastSig) return
+  marksLastSig = sig
+  refreshListPickerMarksByKey('savedCameras'); refreshListPickerMarksByKey('savedLighting'); refreshListPickerMarksByKey('loadingPreviewSavedCameras'); refreshListPickerMarksByKey('loadingPreviewSavedLighting')
+})
 gateGroupHeader('Floor', 'floorEnabled')
 updateFloorRowVisibility()
 updateFloor()

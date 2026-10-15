@@ -470,6 +470,10 @@ body:not(.hd-revealed) #pauseButton, body:not(.hd-revealed) #resetButton, body:n
   font-size: var(--dp-body-font-size, 11px); color: var(--dp-text-color, #c9c9d8);
 }
 .dp-list-picker-row-selected { background: #3a3a4a; color: var(--dp-title-color, #e8e8f0); }
+/* Default item of a selector (left accent bar) and the item that matches what is live right now (accent-coloured name); see listPickerMarks() in devPanel.js. */
+.dp-list-picker-row-default { box-shadow: inset 3px 0 0 var(--dp-accent, #6c8cff); }
+.dp-list-picker-row-default .dp-lp-row-label { font-weight: 600; }
+.dp-list-picker-row-inuse .dp-lp-row-label { color: var(--dp-accent, #6c8cff); }
 /* Shift-click multi-select (added 2026-09-15) -- a distinct outline, not
    the same solid fill as -selected above, so the single "active" item
    (what Use/Rename/Overwrite/Delete act on) stays visually distinguishable

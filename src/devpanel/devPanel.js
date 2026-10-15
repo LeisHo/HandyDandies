@@ -454,10 +454,40 @@ function syncListPickerFromDom(entry) {
 // unstable); the small drag handle is a SEPARATE hit-target from the rest
 // of the row (setupReorder only starts a drag from '.dp-lp-row-handle'),
 // so tapping the row body still just selects it.
+// ctrl.isDefault(item) / ctrl.isInUse(item) (2026-10-15, direct request: the item selectors did not show which item is the default or is in use): optional host callbacks. The default item gets a left accent bar and "(default)", the one
+// matching what is live right now gets "(in use)". A callback that throws counts as false (a host value it reads may not exist yet while the panel is first built); refreshListPickerMarks() re-evaluates them without redrawing the list.
+function listPickerMarks(entry, item) {
+  const c = entry.ctrl
+  let d = false, u = false
+  try { if (c.isDefault) d = !!c.isDefault(item) } catch (e) { d = false }
+  try { if (c.isInUse) u = !!c.isInUse(item) } catch (e) { u = false }
+  return { d, u, text: (u ? '  (in use)' : '') + (d ? '  (default)' : '') }
+}
+function listPickerRowLabel(entry, item, marks) { return item.name + marks.text + (entry.ctrl.itemBadge ? (entry.ctrl.itemBadge(item) || '') : '') }
+function refreshListPickerMarks(entry) {
+  if (!entry || !entry.listEl || (!entry.ctrl.isDefault && !entry.ctrl.isInUse)) return
+  entry.listEl.querySelectorAll('.dp-list-picker-row').forEach((row) => {
+    const item = row.__item
+    if (!item) return
+    const m = listPickerMarks(entry, item)
+    row.classList.toggle('dp-list-picker-row-default', m.d)
+    row.classList.toggle('dp-list-picker-row-inuse', m.u)
+    const lab = row.querySelector('.dp-lp-row-label')
+    const text = listPickerRowLabel(entry, item, m)
+    if (lab && lab.textContent !== text) lab.textContent = text
+  })
+}
+export function refreshListPickerMarksByKey(key) {
+  const entry = numEls[key]
+  if (entry && entry.type === 'list-picker') refreshListPickerMarks(entry)
+}
 function renderListPickerItemRow(entry, item) {
+  const marks = listPickerMarks(entry, item)
   const row = el('div', 'dp-list-picker-row'
     + (item === entry.selectedItem ? ' dp-list-picker-row-selected' : '')
-    + (entry.multiSelected.has(item) ? ' dp-list-picker-row-multi-selected' : ''))
+    + (entry.multiSelected.has(item) ? ' dp-list-picker-row-multi-selected' : '')
+    + (marks.d ? ' dp-list-picker-row-default' : '')
+    + (marks.u ? ' dp-list-picker-row-inuse' : ''))
   row.appendChild(el('span', 'dp-lp-row-handle', { textContent: '⠿' }))
   // Export checkbox -- opt-in per control (ctrl.exportable), so only a
   // picker that actually wants cross-project export (HANDO's own
@@ -484,7 +514,7 @@ function renderListPickerItemRow(entry, item) {
     tcb.addEventListener('change', () => { entry.ctrl.itemToggle.setOn(item, tcb.checked); refreshListPickerToggles(entry) })
     row.appendChild(tcb)
   }
-  row.appendChild(el('span', 'dp-lp-row-label', { textContent: item.name + (entry.ctrl.itemBadge ? (entry.ctrl.itemBadge(item) || '') : '') })) // ctrl.itemBadge(item): optional suffix such as "  (in use)"
+  row.appendChild(el('span', 'dp-lp-row-label', { textContent: listPickerRowLabel(entry, item, marks) })) // ctrl.itemBadge(item): optional suffix such as "  (in use)"
   row.__item = item
   // Direct user report, 2026-09-11: on mobile, tapping a name and hitting
   // "Use" applied a DIFFERENT (adjacent) saved item's data, even though
