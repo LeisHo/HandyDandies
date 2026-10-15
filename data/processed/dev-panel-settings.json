@@ -50,15 +50,15 @@
       "fieldBoundsYMax": "300",
       "fieldBoundsYMaxCurveEnabled": false,
       "fieldBoundsYMaxCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
-      "fieldBoundsYMaxCurveRange": "{\"min\":-300,\"max\":300}",
+      "fieldBoundsYMaxCurveRange": "{\"min\":-275,\"max\":300}",
       "fieldBoundsZMin": "-800",
       "fieldBoundsZMinCurveEnabled": true,
       "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3627146779827312,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.5849570584390974,\"y\":-0.897479502360026}}]",
-      "fieldBoundsZMinCurveRange": "{\"min\":-500,\"max\":-180}",
+      "fieldBoundsZMinCurveRange": "{\"min\":-500,\"max\":-150}",
       "fieldBoundsZMax": "240",
       "fieldBoundsZMaxCurveEnabled": true,
       "fieldBoundsZMaxCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.7710241189949432,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.29398888077240737,\"y\":0.005729166666666674}}]",
-      "fieldBoundsZMaxCurveRange": "{\"min\":100,\"max\":200}",
+      "fieldBoundsZMaxCurveRange": "{\"min\":100,\"max\":170}",
       "fieldBoundsX": "{\"min\":-300,\"max\":300}",
       "fieldBoundsY": "{\"min\":-300,\"max\":300}",
       "fieldBoundsZ": "{\"min\":-400,\"max\":200}",
@@ -8748,7 +8748,7 @@
       "custom21CameraOffsetYRange": "{\"min\":-1,\"max\":2}",
       "custom21CameraOffsetZEnabled": true,
       "custom21CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0,\"y\":-0.25962320963541674}},{\"x\":1,\"y\":0,\"h2\":{\"x\":0,\"y\":1}}]",
-      "custom21CameraOffsetZRange": "{\"min\":-80,\"max\":-10}",
+      "custom21CameraOffsetZRange": "{\"min\":-80,\"max\":100}",
       "custom21RotationEnabled": false,
       "custom21RotationX": 0,
       "custom21RotationY": -5,
@@ -9225,7 +9225,7 @@
       "custom21Trig5CameraOffsetYRange": "{\"min\":0.5,\"max\":1}",
       "custom21Trig5CameraOffsetZEnabled": true,
       "custom21Trig5CameraOffsetZCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0,\"y\":0.10781249999999998}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.8975052951125256,\"y\":0}}]",
-      "custom21Trig5CameraOffsetZRange": "{\"min\":-60,\"max\":-15}",
+      "custom21Trig5CameraOffsetZRange": "{\"min\":-100,\"max\":-15}",
       "custom21Trig5RotationEnabled": false,
       "custom21Trig5RotationX": 0,
       "custom21Trig5RotationY": -5,
@@ -11363,15 +11363,15 @@
       "fieldBoundsYMax": "300",
       "fieldBoundsYMaxCurveEnabled": false,
       "fieldBoundsYMaxCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
-      "fieldBoundsYMaxCurveRange": "{\"min\":-300,\"max\":300}",
+      "fieldBoundsYMaxCurveRange": "{\"min\":-275,\"max\":300}",
       "fieldBoundsZMin": "-800",
       "fieldBoundsZMinCurveEnabled": true,
       "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3627146779827312,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.5849570584390974,\"y\":-0.897479502360026}}]",
-      "fieldBoundsZMinCurveRange": "{\"min\":-500,\"max\":-180}",
+      "fieldBoundsZMinCurveRange": "{\"min\":-500,\"max\":-150}",
       "fieldBoundsZMax": "240",
       "fieldBoundsZMaxCurveEnabled": true,
       "fieldBoundsZMaxCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.7710241189949432,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.29398888077240737,\"y\":0.005729166666666674}}]",
-      "fieldBoundsZMaxCurveRange": "{\"min\":100,\"max\":200}",
+      "fieldBoundsZMaxCurveRange": "{\"min\":100,\"max\":170}",
       "fieldBoundsX": "{\"min\":-300,\"max\":300}",
       "fieldBoundsY": "{\"min\":-300,\"max\":300}",
       "fieldBoundsZ": "{\"min\":-400,\"max\":200}",
@@ -20061,7 +20061,7 @@
       "custom21CameraOffsetYRange": "{\"min\":-1,\"max\":2}",
       "custom21CameraOffsetZEnabled": true,
       "custom21CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0,\"y\":-0.25962320963541674}},{\"x\":1,\"y\":0,\"h2\":{\"x\":0,\"y\":1}}]",
-      "custom21CameraOffsetZRange": "{\"min\":-80,\"max\":-10}",
+      "custom21CameraOffsetZRange": "{\"min\":-80,\"max\":100}",
       "custom21RotationEnabled": false,
       "custom21RotationX": 0,
       "custom21RotationY": -5,
@@ -20538,7 +20538,7 @@
       "custom21Trig5CameraOffsetYRange": "{\"min\":0.5,\"max\":1}",
       "custom21Trig5CameraOffsetZEnabled": true,
       "custom21Trig5CameraOffsetZCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0,\"y\":0.10781249999999998}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.8975052951125256,\"y\":0}}]",
-      "custom21Trig5CameraOffsetZRange": "{\"min\":-60,\"max\":-15}",
+      "custom21Trig5CameraOffsetZRange": "{\"min\":-100,\"max\":-15}",
       "custom21Trig5RotationEnabled": false,
       "custom21Trig5RotationX": 0,
       "custom21Trig5RotationY": -5,
@@ -22676,15 +22676,15 @@
       "fieldBoundsYMax": "300",
       "fieldBoundsYMaxCurveEnabled": false,
       "fieldBoundsYMaxCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
-      "fieldBoundsYMaxCurveRange": "{\"min\":-300,\"max\":300}",
+      "fieldBoundsYMaxCurveRange": "{\"min\":-275,\"max\":300}",
       "fieldBoundsZMin": "-800",
       "fieldBoundsZMinCurveEnabled": true,
       "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3627146779827312,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.5849570584390974,\"y\":-0.897479502360026}}]",
-      "fieldBoundsZMinCurveRange": "{\"min\":-500,\"max\":-180}",
+      "fieldBoundsZMinCurveRange": "{\"min\":-500,\"max\":-150}",
       "fieldBoundsZMax": "240",
       "fieldBoundsZMaxCurveEnabled": true,
       "fieldBoundsZMaxCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.7710241189949432,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.29398888077240737,\"y\":0.005729166666666674}}]",
-      "fieldBoundsZMaxCurveRange": "{\"min\":100,\"max\":200}",
+      "fieldBoundsZMaxCurveRange": "{\"min\":100,\"max\":170}",
       "fieldBoundsX": "{\"min\":-300,\"max\":300}",
       "fieldBoundsY": "{\"min\":-300,\"max\":300}",
       "fieldBoundsZ": "{\"min\":-400,\"max\":200}",
@@ -31374,7 +31374,7 @@
       "custom21CameraOffsetYRange": "{\"min\":-1,\"max\":2}",
       "custom21CameraOffsetZEnabled": true,
       "custom21CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0,\"y\":-0.25962320963541674}},{\"x\":1,\"y\":0,\"h2\":{\"x\":0,\"y\":1}}]",
-      "custom21CameraOffsetZRange": "{\"min\":-80,\"max\":-10}",
+      "custom21CameraOffsetZRange": "{\"min\":-80,\"max\":100}",
       "custom21RotationEnabled": false,
       "custom21RotationX": 0,
       "custom21RotationY": -5,
@@ -31851,7 +31851,7 @@
       "custom21Trig5CameraOffsetYRange": "{\"min\":0.5,\"max\":1}",
       "custom21Trig5CameraOffsetZEnabled": true,
       "custom21Trig5CameraOffsetZCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0,\"y\":0.10781249999999998}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.8975052951125256,\"y\":0}}]",
-      "custom21Trig5CameraOffsetZRange": "{\"min\":-60,\"max\":-15}",
+      "custom21Trig5CameraOffsetZRange": "{\"min\":-100,\"max\":-15}",
       "custom21Trig5RotationEnabled": false,
       "custom21Trig5RotationX": 0,
       "custom21Trig5RotationY": -5,
@@ -36178,7 +36178,7 @@
                 "group": {
                   "key": "Render Order",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [],
                   "settings": [],
                   "subgroups": []
@@ -36193,7 +36193,7 @@
                 "group": {
                   "key": "Hand Position Min X Curve",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [
                     {
                       "type": "row",
@@ -36220,7 +36220,7 @@
                 "group": {
                   "key": "Hand Position Max X Curve",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [
                     {
                       "type": "row",
@@ -36247,7 +36247,7 @@
                 "group": {
                   "key": "Hand Position Min Y Curve",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [
                     {
                       "type": "row",
@@ -36273,8 +36273,8 @@
                 "type": "group",
                 "group": {
                   "key": "Hand Position Max Y Curve",
-                  "collapsed": false,
-                  "locked": false,
+                  "collapsed": true,
+                  "locked": true,
                   "items": [
                     {
                       "type": "row",
@@ -36297,22 +36297,23 @@
                 "key": "fieldBoundsZMin"
               },
               {
-                "type": "row",
-                "key": "fieldBoundsZMinCurve"
-              },
-              {
                 "type": "group",
                 "group": {
                   "key": "Hand Position Min Z Curve",
                   "collapsed": false,
-                  "locked": false,
+                  "locked": true,
                   "items": [
+                    {
+                      "type": "row",
+                      "key": "fieldBoundsZMinCurve"
+                    },
                     {
                       "type": "row",
                       "key": "fieldBoundsZMinCurveRange"
                     }
                   ],
                   "settings": [
+                    "fieldBoundsZMinCurve",
                     "fieldBoundsZMinCurveRange"
                   ],
                   "subgroups": []
@@ -36327,7 +36328,7 @@
                 "group": {
                   "key": "Hand Position Max Z Curve",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [
                     {
                       "type": "row",
@@ -36367,14 +36368,13 @@
               "fieldBoundsYMin",
               "fieldBoundsYMax",
               "fieldBoundsZMin",
-              "fieldBoundsZMinCurve",
               "fieldBoundsZMax"
             ],
             "subgroups": [
               {
                 "key": "Render Order",
                 "collapsed": true,
-                "locked": false,
+                "locked": true,
                 "items": [],
                 "settings": [],
                 "subgroups": []
@@ -36382,7 +36382,7 @@
               {
                 "key": "Hand Position Min X Curve",
                 "collapsed": true,
-                "locked": false,
+                "locked": true,
                 "items": [
                   {
                     "type": "row",
@@ -36402,7 +36402,7 @@
               {
                 "key": "Hand Position Max X Curve",
                 "collapsed": true,
-                "locked": false,
+                "locked": true,
                 "items": [
                   {
                     "type": "row",
@@ -36422,7 +36422,7 @@
               {
                 "key": "Hand Position Min Y Curve",
                 "collapsed": true,
-                "locked": false,
+                "locked": true,
                 "items": [
                   {
                     "type": "row",
@@ -36441,8 +36441,8 @@
               },
               {
                 "key": "Hand Position Max Y Curve",
-                "collapsed": false,
-                "locked": false,
+                "collapsed": true,
+                "locked": true,
                 "items": [
                   {
                     "type": "row",
@@ -36462,14 +36462,19 @@
               {
                 "key": "Hand Position Min Z Curve",
                 "collapsed": false,
-                "locked": false,
+                "locked": true,
                 "items": [
+                  {
+                    "type": "row",
+                    "key": "fieldBoundsZMinCurve"
+                  },
                   {
                     "type": "row",
                     "key": "fieldBoundsZMinCurveRange"
                   }
                 ],
                 "settings": [
+                  "fieldBoundsZMinCurve",
                   "fieldBoundsZMinCurveRange"
                 ],
                 "subgroups": []
@@ -36477,7 +36482,7 @@
               {
                 "key": "Hand Position Max Z Curve",
                 "collapsed": true,
-                "locked": false,
+                "locked": true,
                 "items": [
                   {
                     "type": "row",
@@ -36502,7 +36507,7 @@
           "group": {
             "key": "Render Order",
             "collapsed": true,
-            "locked": false,
+            "locked": true,
             "items": [
               {
                 "type": "row",
@@ -36647,7 +36652,7 @@
                 "group": {
                   "key": "New Group (8)",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [
                     {
                       "type": "row",
@@ -36675,7 +36680,7 @@
                 "group": {
                   "key": "Whole-Hand Rotation & Thumb",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [
                     {
                       "type": "row",
@@ -36703,7 +36708,7 @@
                 "group": {
                   "key": "Wrist",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [
                     {
                       "type": "row",
@@ -36731,7 +36736,7 @@
                 "group": {
                   "key": "New Group (6)",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [
                     {
                       "type": "row",
@@ -36784,7 +36789,7 @@
                 "group": {
                   "key": "Index",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [
                     {
                       "type": "row",
@@ -36837,7 +36842,7 @@
                 "group": {
                   "key": "Middle",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [
                     {
                       "type": "row",
@@ -36890,7 +36895,7 @@
                 "group": {
                   "key": "Ring",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [
                     {
                       "type": "row",
@@ -36943,7 +36948,7 @@
                 "group": {
                   "key": "Pinky",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [
                     {
                       "type": "row",
@@ -36996,7 +37001,7 @@
                 "group": {
                   "key": "Whole-Hand Rotation at Base",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [
                     {
                       "type": "row",
@@ -37029,7 +37034,7 @@
               {
                 "key": "New Group (8)",
                 "collapsed": true,
-                "locked": false,
+                "locked": true,
                 "items": [
                   {
                     "type": "row",
@@ -37054,7 +37059,7 @@
               {
                 "key": "Whole-Hand Rotation & Thumb",
                 "collapsed": true,
-                "locked": false,
+                "locked": true,
                 "items": [
                   {
                     "type": "row",
@@ -37079,7 +37084,7 @@
               {
                 "key": "Wrist",
                 "collapsed": true,
-                "locked": false,
+                "locked": true,
                 "items": [
                   {
                     "type": "row",
@@ -37104,7 +37109,7 @@
               {
                 "key": "New Group (6)",
                 "collapsed": true,
-                "locked": false,
+                "locked": true,
                 "items": [
                   {
                     "type": "row",
@@ -37154,7 +37159,7 @@
               {
                 "key": "Index",
                 "collapsed": true,
-                "locked": false,
+                "locked": true,
                 "items": [
                   {
                     "type": "row",
@@ -37204,7 +37209,7 @@
               {
                 "key": "Middle",
                 "collapsed": true,
-                "locked": false,
+                "locked": true,
                 "items": [
                   {
                     "type": "row",
@@ -37254,7 +37259,7 @@
               {
                 "key": "Ring",
                 "collapsed": true,
-                "locked": false,
+                "locked": true,
                 "items": [
                   {
                     "type": "row",
@@ -37304,7 +37309,7 @@
               {
                 "key": "Pinky",
                 "collapsed": true,
-                "locked": false,
+                "locked": true,
                 "items": [
                   {
                     "type": "row",
@@ -37354,7 +37359,7 @@
               {
                 "key": "Whole-Hand Rotation at Base",
                 "collapsed": true,
-                "locked": false,
+                "locked": true,
                 "items": [
                   {
                     "type": "row",
@@ -37412,7 +37417,7 @@
           "group": {
             "key": "Cursor Tracking",
             "collapsed": true,
-            "locked": false,
+            "locked": true,
             "items": [
               {
                 "type": "row",
@@ -37431,7 +37436,7 @@
                 "group": {
                   "key": "Responsive Arm Rotation",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [
                     {
                       "type": "row",
@@ -37489,7 +37494,7 @@
                 "group": {
                   "key": "New Group (3)",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [
                     {
                       "type": "row",
@@ -37547,7 +37552,7 @@
                 "group": {
                   "key": "Responsive Wrist Splay",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [
                     {
                       "type": "row",
@@ -37610,7 +37615,7 @@
                 "group": {
                   "key": "New Group (4)",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [
                     {
                       "type": "row",
@@ -37688,7 +37693,7 @@
               {
                 "key": "Responsive Arm Rotation",
                 "collapsed": true,
-                "locked": false,
+                "locked": true,
                 "items": [
                   {
                     "type": "row",
@@ -37743,7 +37748,7 @@
               {
                 "key": "New Group (3)",
                 "collapsed": true,
-                "locked": false,
+                "locked": true,
                 "items": [
                   {
                     "type": "row",
@@ -37798,7 +37803,7 @@
               {
                 "key": "Responsive Wrist Splay",
                 "collapsed": true,
-                "locked": false,
+                "locked": true,
                 "items": [
                   {
                     "type": "row",
@@ -37858,7 +37863,7 @@
               {
                 "key": "New Group (4)",
                 "collapsed": true,
-                "locked": false,
+                "locked": true,
                 "items": [
                   {
                     "type": "row",
@@ -37986,7 +37991,7 @@
               "group": {
                 "key": "Render Order",
                 "collapsed": true,
-                "locked": false,
+                "locked": true,
                 "items": [],
                 "settings": [],
                 "subgroups": []
@@ -38001,7 +38006,7 @@
               "group": {
                 "key": "Hand Position Min X Curve",
                 "collapsed": true,
-                "locked": false,
+                "locked": true,
                 "items": [
                   {
                     "type": "row",
@@ -38028,7 +38033,7 @@
               "group": {
                 "key": "Hand Position Max X Curve",
                 "collapsed": true,
-                "locked": false,
+                "locked": true,
                 "items": [
                   {
                     "type": "row",
@@ -38055,7 +38060,7 @@
               "group": {
                 "key": "Hand Position Min Y Curve",
                 "collapsed": true,
-                "locked": false,
+                "locked": true,
                 "items": [
                   {
                     "type": "row",
@@ -38081,8 +38086,8 @@
               "type": "group",
               "group": {
                 "key": "Hand Position Max Y Curve",
-                "collapsed": false,
-                "locked": false,
+                "collapsed": true,
+                "locked": true,
                 "items": [
                   {
                     "type": "row",
@@ -38105,22 +38110,23 @@
               "key": "fieldBoundsZMin"
             },
             {
-              "type": "row",
-              "key": "fieldBoundsZMinCurve"
-            },
-            {
               "type": "group",
               "group": {
                 "key": "Hand Position Min Z Curve",
                 "collapsed": false,
-                "locked": false,
+                "locked": true,
                 "items": [
+                  {
+                    "type": "row",
+                    "key": "fieldBoundsZMinCurve"
+                  },
                   {
                     "type": "row",
                     "key": "fieldBoundsZMinCurveRange"
                   }
                 ],
                 "settings": [
+                  "fieldBoundsZMinCurve",
                   "fieldBoundsZMinCurveRange"
                 ],
                 "subgroups": []
@@ -38135,7 +38141,7 @@
               "group": {
                 "key": "Hand Position Max Z Curve",
                 "collapsed": true,
-                "locked": false,
+                "locked": true,
                 "items": [
                   {
                     "type": "row",
@@ -38175,14 +38181,13 @@
             "fieldBoundsYMin",
             "fieldBoundsYMax",
             "fieldBoundsZMin",
-            "fieldBoundsZMinCurve",
             "fieldBoundsZMax"
           ],
           "subgroups": [
             {
               "key": "Render Order",
               "collapsed": true,
-              "locked": false,
+              "locked": true,
               "items": [],
               "settings": [],
               "subgroups": []
@@ -38190,7 +38195,7 @@
             {
               "key": "Hand Position Min X Curve",
               "collapsed": true,
-              "locked": false,
+              "locked": true,
               "items": [
                 {
                   "type": "row",
@@ -38210,7 +38215,7 @@
             {
               "key": "Hand Position Max X Curve",
               "collapsed": true,
-              "locked": false,
+              "locked": true,
               "items": [
                 {
                   "type": "row",
@@ -38230,7 +38235,7 @@
             {
               "key": "Hand Position Min Y Curve",
               "collapsed": true,
-              "locked": false,
+              "locked": true,
               "items": [
                 {
                   "type": "row",
@@ -38249,8 +38254,8 @@
             },
             {
               "key": "Hand Position Max Y Curve",
-              "collapsed": false,
-              "locked": false,
+              "collapsed": true,
+              "locked": true,
               "items": [
                 {
                   "type": "row",
@@ -38270,14 +38275,19 @@
             {
               "key": "Hand Position Min Z Curve",
               "collapsed": false,
-              "locked": false,
+              "locked": true,
               "items": [
+                {
+                  "type": "row",
+                  "key": "fieldBoundsZMinCurve"
+                },
                 {
                   "type": "row",
                   "key": "fieldBoundsZMinCurveRange"
                 }
               ],
               "settings": [
+                "fieldBoundsZMinCurve",
                 "fieldBoundsZMinCurveRange"
               ],
               "subgroups": []
@@ -38285,7 +38295,7 @@
             {
               "key": "Hand Position Max Z Curve",
               "collapsed": true,
-              "locked": false,
+              "locked": true,
               "items": [
                 {
                   "type": "row",
@@ -38307,7 +38317,7 @@
         {
           "key": "Render Order",
           "collapsed": true,
-          "locked": false,
+          "locked": true,
           "items": [
             {
               "type": "row",
@@ -38446,7 +38456,7 @@
               "group": {
                 "key": "New Group (8)",
                 "collapsed": true,
-                "locked": false,
+                "locked": true,
                 "items": [
                   {
                     "type": "row",
@@ -38474,7 +38484,7 @@
               "group": {
                 "key": "Whole-Hand Rotation & Thumb",
                 "collapsed": true,
-                "locked": false,
+                "locked": true,
                 "items": [
                   {
                     "type": "row",
@@ -38502,7 +38512,7 @@
               "group": {
                 "key": "Wrist",
                 "collapsed": true,
-                "locked": false,
+                "locked": true,
                 "items": [
                   {
                     "type": "row",
@@ -38530,7 +38540,7 @@
               "group": {
                 "key": "New Group (6)",
                 "collapsed": true,
-                "locked": false,
+                "locked": true,
                 "items": [
                   {
                     "type": "row",
@@ -38583,7 +38593,7 @@
               "group": {
                 "key": "Index",
                 "collapsed": true,
-                "locked": false,
+                "locked": true,
                 "items": [
                   {
                     "type": "row",
@@ -38636,7 +38646,7 @@
               "group": {
                 "key": "Middle",
                 "collapsed": true,
-                "locked": false,
+                "locked": true,
                 "items": [
                   {
                     "type": "row",
@@ -38689,7 +38699,7 @@
               "group": {
                 "key": "Ring",
                 "collapsed": true,
-                "locked": false,
+                "locked": true,
                 "items": [
                   {
                     "type": "row",
@@ -38742,7 +38752,7 @@
               "group": {
                 "key": "Pinky",
                 "collapsed": true,
-                "locked": false,
+                "locked": true,
                 "items": [
                   {
                     "type": "row",
@@ -38795,7 +38805,7 @@
               "group": {
                 "key": "Whole-Hand Rotation at Base",
                 "collapsed": true,
-                "locked": false,
+                "locked": true,
                 "items": [
                   {
                     "type": "row",
@@ -38828,7 +38838,7 @@
             {
               "key": "New Group (8)",
               "collapsed": true,
-              "locked": false,
+              "locked": true,
               "items": [
                 {
                   "type": "row",
@@ -38853,7 +38863,7 @@
             {
               "key": "Whole-Hand Rotation & Thumb",
               "collapsed": true,
-              "locked": false,
+              "locked": true,
               "items": [
                 {
                   "type": "row",
@@ -38878,7 +38888,7 @@
             {
               "key": "Wrist",
               "collapsed": true,
-              "locked": false,
+              "locked": true,
               "items": [
                 {
                   "type": "row",
@@ -38903,7 +38913,7 @@
             {
               "key": "New Group (6)",
               "collapsed": true,
-              "locked": false,
+              "locked": true,
               "items": [
                 {
                   "type": "row",
@@ -38953,7 +38963,7 @@
             {
               "key": "Index",
               "collapsed": true,
-              "locked": false,
+              "locked": true,
               "items": [
                 {
                   "type": "row",
@@ -39003,7 +39013,7 @@
             {
               "key": "Middle",
               "collapsed": true,
-              "locked": false,
+              "locked": true,
               "items": [
                 {
                   "type": "row",
@@ -39053,7 +39063,7 @@
             {
               "key": "Ring",
               "collapsed": true,
-              "locked": false,
+              "locked": true,
               "items": [
                 {
                   "type": "row",
@@ -39103,7 +39113,7 @@
             {
               "key": "Pinky",
               "collapsed": true,
-              "locked": false,
+              "locked": true,
               "items": [
                 {
                   "type": "row",
@@ -39153,7 +39163,7 @@
             {
               "key": "Whole-Hand Rotation at Base",
               "collapsed": true,
-              "locked": false,
+              "locked": true,
               "items": [
                 {
                   "type": "row",
@@ -39205,7 +39215,7 @@
         {
           "key": "Cursor Tracking",
           "collapsed": true,
-          "locked": false,
+          "locked": true,
           "items": [
             {
               "type": "row",
@@ -39224,7 +39234,7 @@
               "group": {
                 "key": "Responsive Arm Rotation",
                 "collapsed": true,
-                "locked": false,
+                "locked": true,
                 "items": [
                   {
                     "type": "row",
@@ -39282,7 +39292,7 @@
               "group": {
                 "key": "New Group (3)",
                 "collapsed": true,
-                "locked": false,
+                "locked": true,
                 "items": [
                   {
                     "type": "row",
@@ -39340,7 +39350,7 @@
               "group": {
                 "key": "Responsive Wrist Splay",
                 "collapsed": true,
-                "locked": false,
+                "locked": true,
                 "items": [
                   {
                     "type": "row",
@@ -39403,7 +39413,7 @@
               "group": {
                 "key": "New Group (4)",
                 "collapsed": true,
-                "locked": false,
+                "locked": true,
                 "items": [
                   {
                     "type": "row",
@@ -39481,7 +39491,7 @@
             {
               "key": "Responsive Arm Rotation",
               "collapsed": true,
-              "locked": false,
+              "locked": true,
               "items": [
                 {
                   "type": "row",
@@ -39536,7 +39546,7 @@
             {
               "key": "New Group (3)",
               "collapsed": true,
-              "locked": false,
+              "locked": true,
               "items": [
                 {
                   "type": "row",
@@ -39591,7 +39601,7 @@
             {
               "key": "Responsive Wrist Splay",
               "collapsed": true,
-              "locked": false,
+              "locked": true,
               "items": [
                 {
                   "type": "row",
@@ -39651,7 +39661,7 @@
             {
               "key": "New Group (4)",
               "collapsed": true,
-              "locked": false,
+              "locked": true,
               "items": [
                 {
                   "type": "row",
@@ -39709,7 +39719,7 @@
     },
     {
       "key": "Custom Click Functions",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -109278,7 +109288,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 21",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -109437,7 +109447,7 @@
                 "type": "group",
                 "group": {
                   "key": "Offset To Camera",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -116285,6 +116295,10 @@
                               "items": [
                                 {
                                   "type": "row",
+                                  "key": "custom21Trig5CameraOffsetZCurve"
+                                },
+                                {
+                                  "type": "row",
                                   "key": "custom21Trig5CameraOffsetVisibleOnly"
                                 },
                                 {
@@ -116317,14 +116331,11 @@
                                 },
                                 {
                                   "type": "row",
-                                  "key": "custom21Trig5CameraOffsetZCurve"
-                                },
-                                {
-                                  "type": "row",
                                   "key": "custom21Trig5CameraOffsetZRange"
                                 }
                               ],
                               "settings": [
+                                "custom21Trig5CameraOffsetZCurve",
                                 "custom21Trig5CameraOffsetVisibleOnly",
                                 "custom21Trig5CameraOffsetXEnabled",
                                 "custom21Trig5CameraOffsetXCurve",
@@ -116333,7 +116344,6 @@
                                 "custom21Trig5CameraOffsetYCurve",
                                 "custom21Trig5CameraOffsetYRange",
                                 "custom21Trig5CameraOffsetZEnabled",
-                                "custom21Trig5CameraOffsetZCurve",
                                 "custom21Trig5CameraOffsetZRange"
                               ],
                               "subgroups": []
@@ -117026,6 +117036,10 @@
                             "items": [
                               {
                                 "type": "row",
+                                "key": "custom21Trig5CameraOffsetZCurve"
+                              },
+                              {
+                                "type": "row",
                                 "key": "custom21Trig5CameraOffsetVisibleOnly"
                               },
                               {
@@ -117058,14 +117072,11 @@
                               },
                               {
                                 "type": "row",
-                                "key": "custom21Trig5CameraOffsetZCurve"
-                              },
-                              {
-                                "type": "row",
                                 "key": "custom21Trig5CameraOffsetZRange"
                               }
                             ],
                             "settings": [
+                              "custom21Trig5CameraOffsetZCurve",
                               "custom21Trig5CameraOffsetVisibleOnly",
                               "custom21Trig5CameraOffsetXEnabled",
                               "custom21Trig5CameraOffsetXCurve",
@@ -117074,7 +117085,6 @@
                               "custom21Trig5CameraOffsetYCurve",
                               "custom21Trig5CameraOffsetYRange",
                               "custom21Trig5CameraOffsetZEnabled",
-                              "custom21Trig5CameraOffsetZCurve",
                               "custom21Trig5CameraOffsetZRange"
                             ],
                             "subgroups": []
@@ -123831,6 +123841,10 @@
                             "items": [
                               {
                                 "type": "row",
+                                "key": "custom21Trig5CameraOffsetZCurve"
+                              },
+                              {
+                                "type": "row",
                                 "key": "custom21Trig5CameraOffsetVisibleOnly"
                               },
                               {
@@ -123863,14 +123877,11 @@
                               },
                               {
                                 "type": "row",
-                                "key": "custom21Trig5CameraOffsetZCurve"
-                              },
-                              {
-                                "type": "row",
                                 "key": "custom21Trig5CameraOffsetZRange"
                               }
                             ],
                             "settings": [
+                              "custom21Trig5CameraOffsetZCurve",
                               "custom21Trig5CameraOffsetVisibleOnly",
                               "custom21Trig5CameraOffsetXEnabled",
                               "custom21Trig5CameraOffsetXCurve",
@@ -123879,7 +123890,6 @@
                               "custom21Trig5CameraOffsetYCurve",
                               "custom21Trig5CameraOffsetYRange",
                               "custom21Trig5CameraOffsetZEnabled",
-                              "custom21Trig5CameraOffsetZCurve",
                               "custom21Trig5CameraOffsetZRange"
                             ],
                             "subgroups": []
@@ -124572,6 +124582,10 @@
                           "items": [
                             {
                               "type": "row",
+                              "key": "custom21Trig5CameraOffsetZCurve"
+                            },
+                            {
+                              "type": "row",
                               "key": "custom21Trig5CameraOffsetVisibleOnly"
                             },
                             {
@@ -124604,14 +124618,11 @@
                             },
                             {
                               "type": "row",
-                              "key": "custom21Trig5CameraOffsetZCurve"
-                            },
-                            {
-                              "type": "row",
                               "key": "custom21Trig5CameraOffsetZRange"
                             }
                           ],
                           "settings": [
+                            "custom21Trig5CameraOffsetZCurve",
                             "custom21Trig5CameraOffsetVisibleOnly",
                             "custom21Trig5CameraOffsetXEnabled",
                             "custom21Trig5CameraOffsetXCurve",
@@ -124620,7 +124631,6 @@
                             "custom21Trig5CameraOffsetYCurve",
                             "custom21Trig5CameraOffsetYRange",
                             "custom21Trig5CameraOffsetZEnabled",
-                            "custom21Trig5CameraOffsetZCurve",
                             "custom21Trig5CameraOffsetZRange"
                           ],
                           "subgroups": []
@@ -125294,7 +125304,7 @@
               },
               {
                 "key": "Offset To Camera",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -132118,6 +132128,10 @@
                             "items": [
                               {
                                 "type": "row",
+                                "key": "custom21Trig5CameraOffsetZCurve"
+                              },
+                              {
+                                "type": "row",
                                 "key": "custom21Trig5CameraOffsetVisibleOnly"
                               },
                               {
@@ -132150,14 +132164,11 @@
                               },
                               {
                                 "type": "row",
-                                "key": "custom21Trig5CameraOffsetZCurve"
-                              },
-                              {
-                                "type": "row",
                                 "key": "custom21Trig5CameraOffsetZRange"
                               }
                             ],
                             "settings": [
+                              "custom21Trig5CameraOffsetZCurve",
                               "custom21Trig5CameraOffsetVisibleOnly",
                               "custom21Trig5CameraOffsetXEnabled",
                               "custom21Trig5CameraOffsetXCurve",
@@ -132166,7 +132177,6 @@
                               "custom21Trig5CameraOffsetYCurve",
                               "custom21Trig5CameraOffsetYRange",
                               "custom21Trig5CameraOffsetZEnabled",
-                              "custom21Trig5CameraOffsetZCurve",
                               "custom21Trig5CameraOffsetZRange"
                             ],
                             "subgroups": []
@@ -132859,6 +132869,10 @@
                           "items": [
                             {
                               "type": "row",
+                              "key": "custom21Trig5CameraOffsetZCurve"
+                            },
+                            {
+                              "type": "row",
                               "key": "custom21Trig5CameraOffsetVisibleOnly"
                             },
                             {
@@ -132891,14 +132905,11 @@
                             },
                             {
                               "type": "row",
-                              "key": "custom21Trig5CameraOffsetZCurve"
-                            },
-                            {
-                              "type": "row",
                               "key": "custom21Trig5CameraOffsetZRange"
                             }
                           ],
                           "settings": [
+                            "custom21Trig5CameraOffsetZCurve",
                             "custom21Trig5CameraOffsetVisibleOnly",
                             "custom21Trig5CameraOffsetXEnabled",
                             "custom21Trig5CameraOffsetXCurve",
@@ -132907,7 +132918,6 @@
                             "custom21Trig5CameraOffsetYCurve",
                             "custom21Trig5CameraOffsetYRange",
                             "custom21Trig5CameraOffsetZEnabled",
-                            "custom21Trig5CameraOffsetZCurve",
                             "custom21Trig5CameraOffsetZRange"
                           ],
                           "subgroups": []
@@ -139664,6 +139674,10 @@
                           "items": [
                             {
                               "type": "row",
+                              "key": "custom21Trig5CameraOffsetZCurve"
+                            },
+                            {
+                              "type": "row",
                               "key": "custom21Trig5CameraOffsetVisibleOnly"
                             },
                             {
@@ -139696,14 +139710,11 @@
                             },
                             {
                               "type": "row",
-                              "key": "custom21Trig5CameraOffsetZCurve"
-                            },
-                            {
-                              "type": "row",
                               "key": "custom21Trig5CameraOffsetZRange"
                             }
                           ],
                           "settings": [
+                            "custom21Trig5CameraOffsetZCurve",
                             "custom21Trig5CameraOffsetVisibleOnly",
                             "custom21Trig5CameraOffsetXEnabled",
                             "custom21Trig5CameraOffsetXCurve",
@@ -139712,7 +139723,6 @@
                             "custom21Trig5CameraOffsetYCurve",
                             "custom21Trig5CameraOffsetYRange",
                             "custom21Trig5CameraOffsetZEnabled",
-                            "custom21Trig5CameraOffsetZCurve",
                             "custom21Trig5CameraOffsetZRange"
                           ],
                           "subgroups": []
@@ -140405,6 +140415,10 @@
                         "items": [
                           {
                             "type": "row",
+                            "key": "custom21Trig5CameraOffsetZCurve"
+                          },
+                          {
+                            "type": "row",
                             "key": "custom21Trig5CameraOffsetVisibleOnly"
                           },
                           {
@@ -140437,14 +140451,11 @@
                           },
                           {
                             "type": "row",
-                            "key": "custom21Trig5CameraOffsetZCurve"
-                          },
-                          {
-                            "type": "row",
                             "key": "custom21Trig5CameraOffsetZRange"
                           }
                         ],
                         "settings": [
+                          "custom21Trig5CameraOffsetZCurve",
                           "custom21Trig5CameraOffsetVisibleOnly",
                           "custom21Trig5CameraOffsetXEnabled",
                           "custom21Trig5CameraOffsetXCurve",
@@ -140453,7 +140464,6 @@
                           "custom21Trig5CameraOffsetYCurve",
                           "custom21Trig5CameraOffsetYRange",
                           "custom21Trig5CameraOffsetZEnabled",
-                          "custom21Trig5CameraOffsetZCurve",
                           "custom21Trig5CameraOffsetZRange"
                         ],
                         "subgroups": []
@@ -217656,7 +217666,7 @@
         },
         {
           "key": "Custom Click Function 21",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -217815,7 +217825,7 @@
               "type": "group",
               "group": {
                 "key": "Offset To Camera",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -224663,6 +224673,10 @@
                             "items": [
                               {
                                 "type": "row",
+                                "key": "custom21Trig5CameraOffsetZCurve"
+                              },
+                              {
+                                "type": "row",
                                 "key": "custom21Trig5CameraOffsetVisibleOnly"
                               },
                               {
@@ -224695,14 +224709,11 @@
                               },
                               {
                                 "type": "row",
-                                "key": "custom21Trig5CameraOffsetZCurve"
-                              },
-                              {
-                                "type": "row",
                                 "key": "custom21Trig5CameraOffsetZRange"
                               }
                             ],
                             "settings": [
+                              "custom21Trig5CameraOffsetZCurve",
                               "custom21Trig5CameraOffsetVisibleOnly",
                               "custom21Trig5CameraOffsetXEnabled",
                               "custom21Trig5CameraOffsetXCurve",
@@ -224711,7 +224722,6 @@
                               "custom21Trig5CameraOffsetYCurve",
                               "custom21Trig5CameraOffsetYRange",
                               "custom21Trig5CameraOffsetZEnabled",
-                              "custom21Trig5CameraOffsetZCurve",
                               "custom21Trig5CameraOffsetZRange"
                             ],
                             "subgroups": []
@@ -225404,6 +225414,10 @@
                           "items": [
                             {
                               "type": "row",
+                              "key": "custom21Trig5CameraOffsetZCurve"
+                            },
+                            {
+                              "type": "row",
                               "key": "custom21Trig5CameraOffsetVisibleOnly"
                             },
                             {
@@ -225436,14 +225450,11 @@
                             },
                             {
                               "type": "row",
-                              "key": "custom21Trig5CameraOffsetZCurve"
-                            },
-                            {
-                              "type": "row",
                               "key": "custom21Trig5CameraOffsetZRange"
                             }
                           ],
                           "settings": [
+                            "custom21Trig5CameraOffsetZCurve",
                             "custom21Trig5CameraOffsetVisibleOnly",
                             "custom21Trig5CameraOffsetXEnabled",
                             "custom21Trig5CameraOffsetXCurve",
@@ -225452,7 +225463,6 @@
                             "custom21Trig5CameraOffsetYCurve",
                             "custom21Trig5CameraOffsetYRange",
                             "custom21Trig5CameraOffsetZEnabled",
-                            "custom21Trig5CameraOffsetZCurve",
                             "custom21Trig5CameraOffsetZRange"
                           ],
                           "subgroups": []
@@ -232209,6 +232219,10 @@
                           "items": [
                             {
                               "type": "row",
+                              "key": "custom21Trig5CameraOffsetZCurve"
+                            },
+                            {
+                              "type": "row",
                               "key": "custom21Trig5CameraOffsetVisibleOnly"
                             },
                             {
@@ -232241,14 +232255,11 @@
                             },
                             {
                               "type": "row",
-                              "key": "custom21Trig5CameraOffsetZCurve"
-                            },
-                            {
-                              "type": "row",
                               "key": "custom21Trig5CameraOffsetZRange"
                             }
                           ],
                           "settings": [
+                            "custom21Trig5CameraOffsetZCurve",
                             "custom21Trig5CameraOffsetVisibleOnly",
                             "custom21Trig5CameraOffsetXEnabled",
                             "custom21Trig5CameraOffsetXCurve",
@@ -232257,7 +232268,6 @@
                             "custom21Trig5CameraOffsetYCurve",
                             "custom21Trig5CameraOffsetYRange",
                             "custom21Trig5CameraOffsetZEnabled",
-                            "custom21Trig5CameraOffsetZCurve",
                             "custom21Trig5CameraOffsetZRange"
                           ],
                           "subgroups": []
@@ -232950,6 +232960,10 @@
                         "items": [
                           {
                             "type": "row",
+                            "key": "custom21Trig5CameraOffsetZCurve"
+                          },
+                          {
+                            "type": "row",
                             "key": "custom21Trig5CameraOffsetVisibleOnly"
                           },
                           {
@@ -232982,14 +232996,11 @@
                           },
                           {
                             "type": "row",
-                            "key": "custom21Trig5CameraOffsetZCurve"
-                          },
-                          {
-                            "type": "row",
                             "key": "custom21Trig5CameraOffsetZRange"
                           }
                         ],
                         "settings": [
+                          "custom21Trig5CameraOffsetZCurve",
                           "custom21Trig5CameraOffsetVisibleOnly",
                           "custom21Trig5CameraOffsetXEnabled",
                           "custom21Trig5CameraOffsetXCurve",
@@ -232998,7 +233009,6 @@
                           "custom21Trig5CameraOffsetYCurve",
                           "custom21Trig5CameraOffsetYRange",
                           "custom21Trig5CameraOffsetZEnabled",
-                          "custom21Trig5CameraOffsetZCurve",
                           "custom21Trig5CameraOffsetZRange"
                         ],
                         "subgroups": []
@@ -233672,7 +233682,7 @@
             },
             {
               "key": "Offset To Camera",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -240496,6 +240506,10 @@
                           "items": [
                             {
                               "type": "row",
+                              "key": "custom21Trig5CameraOffsetZCurve"
+                            },
+                            {
+                              "type": "row",
                               "key": "custom21Trig5CameraOffsetVisibleOnly"
                             },
                             {
@@ -240528,14 +240542,11 @@
                             },
                             {
                               "type": "row",
-                              "key": "custom21Trig5CameraOffsetZCurve"
-                            },
-                            {
-                              "type": "row",
                               "key": "custom21Trig5CameraOffsetZRange"
                             }
                           ],
                           "settings": [
+                            "custom21Trig5CameraOffsetZCurve",
                             "custom21Trig5CameraOffsetVisibleOnly",
                             "custom21Trig5CameraOffsetXEnabled",
                             "custom21Trig5CameraOffsetXCurve",
@@ -240544,7 +240555,6 @@
                             "custom21Trig5CameraOffsetYCurve",
                             "custom21Trig5CameraOffsetYRange",
                             "custom21Trig5CameraOffsetZEnabled",
-                            "custom21Trig5CameraOffsetZCurve",
                             "custom21Trig5CameraOffsetZRange"
                           ],
                           "subgroups": []
@@ -241237,6 +241247,10 @@
                         "items": [
                           {
                             "type": "row",
+                            "key": "custom21Trig5CameraOffsetZCurve"
+                          },
+                          {
+                            "type": "row",
                             "key": "custom21Trig5CameraOffsetVisibleOnly"
                           },
                           {
@@ -241269,14 +241283,11 @@
                           },
                           {
                             "type": "row",
-                            "key": "custom21Trig5CameraOffsetZCurve"
-                          },
-                          {
-                            "type": "row",
                             "key": "custom21Trig5CameraOffsetZRange"
                           }
                         ],
                         "settings": [
+                          "custom21Trig5CameraOffsetZCurve",
                           "custom21Trig5CameraOffsetVisibleOnly",
                           "custom21Trig5CameraOffsetXEnabled",
                           "custom21Trig5CameraOffsetXCurve",
@@ -241285,7 +241296,6 @@
                           "custom21Trig5CameraOffsetYCurve",
                           "custom21Trig5CameraOffsetYRange",
                           "custom21Trig5CameraOffsetZEnabled",
-                          "custom21Trig5CameraOffsetZCurve",
                           "custom21Trig5CameraOffsetZRange"
                         ],
                         "subgroups": []
@@ -248042,6 +248052,10 @@
                         "items": [
                           {
                             "type": "row",
+                            "key": "custom21Trig5CameraOffsetZCurve"
+                          },
+                          {
+                            "type": "row",
                             "key": "custom21Trig5CameraOffsetVisibleOnly"
                           },
                           {
@@ -248074,14 +248088,11 @@
                           },
                           {
                             "type": "row",
-                            "key": "custom21Trig5CameraOffsetZCurve"
-                          },
-                          {
-                            "type": "row",
                             "key": "custom21Trig5CameraOffsetZRange"
                           }
                         ],
                         "settings": [
+                          "custom21Trig5CameraOffsetZCurve",
                           "custom21Trig5CameraOffsetVisibleOnly",
                           "custom21Trig5CameraOffsetXEnabled",
                           "custom21Trig5CameraOffsetXCurve",
@@ -248090,7 +248101,6 @@
                           "custom21Trig5CameraOffsetYCurve",
                           "custom21Trig5CameraOffsetYRange",
                           "custom21Trig5CameraOffsetZEnabled",
-                          "custom21Trig5CameraOffsetZCurve",
                           "custom21Trig5CameraOffsetZRange"
                         ],
                         "subgroups": []
@@ -248783,6 +248793,10 @@
                       "items": [
                         {
                           "type": "row",
+                          "key": "custom21Trig5CameraOffsetZCurve"
+                        },
+                        {
+                          "type": "row",
                           "key": "custom21Trig5CameraOffsetVisibleOnly"
                         },
                         {
@@ -248815,14 +248829,11 @@
                         },
                         {
                           "type": "row",
-                          "key": "custom21Trig5CameraOffsetZCurve"
-                        },
-                        {
-                          "type": "row",
                           "key": "custom21Trig5CameraOffsetZRange"
                         }
                       ],
                       "settings": [
+                        "custom21Trig5CameraOffsetZCurve",
                         "custom21Trig5CameraOffsetVisibleOnly",
                         "custom21Trig5CameraOffsetXEnabled",
                         "custom21Trig5CameraOffsetXCurve",
@@ -248831,7 +248842,6 @@
                         "custom21Trig5CameraOffsetYCurve",
                         "custom21Trig5CameraOffsetYRange",
                         "custom21Trig5CameraOffsetZEnabled",
-                        "custom21Trig5CameraOffsetZCurve",
                         "custom21Trig5CameraOffsetZRange"
                       ],
                       "subgroups": []
@@ -263785,9 +263795,9 @@
       "height": 649.5875244140625
     },
     "mobile": {
-      "left": 95.3214340209961,
+      "left": 88.46428680419922,
       "top": 76.01786041259766,
-      "width": 299.1011962890625,
+      "width": 305.96429443359375,
       "height": 35.52381134033203
     }
   }
