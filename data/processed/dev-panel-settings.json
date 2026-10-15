@@ -8415,15 +8415,15 @@
           ]
         }
       ],
-      "cameraX": 1.9534883720930232,
-      "cameraY": 2.022038672723212e-13,
-      "cameraZ": 214.9004898795015,
+      "cameraX": 1.9636363636363634,
+      "cameraY": 6.062001655779398e-15,
+      "cameraZ": 223.4004898795015,
       "cameraFov": 20,
       "cameraYaw": 0,
       "cameraPitch": 0,
       "cameraRoll": 0,
       "cameraDefaultPreset": "{\"cameraX\":1.9534883720930232,\"cameraY\":2.0272434216195883e-13,\"cameraZ\":223.4004898795015,\"cameraFov\":20,\"cameraZoom\":99,\"cameraRoll\":0,\"targetX\":1.9534883720930232,\"targetY\":1.9666234050617943e-13,\"targetZ\":124.40048987950149}",
-      "cameraZoom": 90.5,
+      "cameraZoom": 98.99999999999999,
       "cameraZoomSpeed": 0.3,
       "savedCameras": [
         {
