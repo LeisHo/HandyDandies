@@ -7729,13 +7729,13 @@
         }
       ],
       "cameraX": 1.953488372093023,
-      "cameraY": 6.827405905246493e-15,
-      "cameraZ": 111.4792552191253,
-      "cameraFov": 35,
+      "cameraY": 1.0654427152581974e-14,
+      "cameraZ": 199.47925521912504,
+      "cameraFov": 24,
       "cameraYaw": 0,
       "cameraPitch": 0,
       "cameraRoll": 0,
-      "cameraZoom": 111.49999999999999,
+      "cameraZoom": 174,
       "cameraZoomSpeed": 0.3,
       "savedCameras": [
         {
@@ -7896,19 +7896,19 @@
         {
           "name": "DESKTOP",
           "cameraX": 1.953488372093023,
-          "cameraY": 6.827405905246493e-15,
-          "cameraZ": 111.4792552191253,
-          "cameraFov": 35,
-          "cameraZoom": 111.49999999999999,
+          "cameraY": 1.0654427152581974e-14,
+          "cameraZ": 199.47925521912504,
+          "cameraFov": 24,
+          "cameraZoom": 174,
           "cameraRoll": 0,
           "targetX": 1.953488372093023,
           "targetY": 0,
-          "targetZ": -0.020744780874678397
+          "targetZ": 25.47925521912503
         }
       ],
       "lockCameraPan": true,
-      "lockCameraZoom": true,
-      "cameraMaxExtentsEnabled": true,
+      "lockCameraZoom": false,
+      "cameraMaxExtentsEnabled": false,
       "keyAzimuth": 27,
       "keyElevation": 67,
       "keyTargetHeight": 65,
@@ -19175,14 +19175,14 @@
         {
           "name": "DESKTOP",
           "cameraX": 1.953488372093023,
-          "cameraY": 6.827405905246493e-15,
-          "cameraZ": 111.4792552191253,
-          "cameraFov": 35,
-          "cameraZoom": 111.49999999999999,
+          "cameraY": 1.0654427152581974e-14,
+          "cameraZ": 199.47925521912504,
+          "cameraFov": 24,
+          "cameraZoom": 174,
           "cameraRoll": 0,
           "targetX": 1.953488372093023,
           "targetY": 0,
-          "targetZ": -0.020744780874678397
+          "targetZ": 25.47925521912503
         }
       ],
       "lockCameraPan": true,
@@ -30454,14 +30454,14 @@
         {
           "name": "DESKTOP",
           "cameraX": 1.953488372093023,
-          "cameraY": 6.827405905246493e-15,
-          "cameraZ": 111.4792552191253,
-          "cameraFov": 35,
-          "cameraZoom": 111.49999999999999,
+          "cameraY": 1.0654427152581974e-14,
+          "cameraZ": 199.47925521912504,
+          "cameraFov": 24,
+          "cameraZoom": 174,
           "cameraRoll": 0,
           "targetX": 1.953488372093023,
           "targetY": 0,
-          "targetZ": -0.020744780874678397
+          "targetZ": 25.47925521912503
         }
       ],
       "lockCameraPan": false,
@@ -109353,7 +109353,7 @@
                 "type": "group",
                 "group": {
                   "key": "Offset To Camera",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -109490,7 +109490,7 @@
                 "type": "group",
                 "group": {
                   "key": "Start Time Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -125210,7 +125210,7 @@
               },
               {
                 "key": "Offset To Camera",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -125335,7 +125335,7 @@
               },
               {
                 "key": "Start Time Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -217731,7 +217731,7 @@
               "type": "group",
               "group": {
                 "key": "Offset To Camera",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -217868,7 +217868,7 @@
               "type": "group",
               "group": {
                 "key": "Start Time Curve",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -233588,7 +233588,7 @@
             },
             {
               "key": "Offset To Camera",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -233713,7 +233713,7 @@
             },
             {
               "key": "Start Time Curve",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -256401,7 +256401,7 @@
     },
     {
       "key": "New Group (11)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -256600,7 +256600,7 @@
           "type": "group",
           "group": {
             "key": "Camera",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -256987,7 +256987,7 @@
         },
         {
           "key": "Camera",
-          "collapsed": true,
+          "collapsed": false,
           "locked": true,
           "items": [
             {
