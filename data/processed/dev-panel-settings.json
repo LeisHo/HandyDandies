@@ -421,42 +421,42 @@
           "fnId": "custom29"
         },
         {
-          "name": "20 FT - R - C",
+          "name": "15 FT - R - C",
           "fnId": "custom52",
           "group": "20 FOV TEST"
         },
         {
-          "name": "20 FT - R - CH",
+          "name": "15 FT - R - CH",
           "fnId": "custom51",
           "group": "20 FOV TEST"
         },
         {
-          "name": "20 FT - 1 - C",
+          "name": "15 FT - 1 - C",
           "fnId": "custom50",
           "group": "20 FOV TEST"
         },
         {
-          "name": "20 FT - 1 - CH",
+          "name": "15 FT - 1 - CH",
           "fnId": "custom39",
           "group": "20 FOV TEST"
         },
         {
-          "name": "20 FT - 2 - C",
+          "name": "15 FT - 2 - C",
           "fnId": "custom40",
           "group": "20 FOV TEST"
         },
         {
-          "name": "20 FT - 2 - CH",
+          "name": "15 FT - 2 - CH",
           "fnId": "custom41",
           "group": "20 FOV TEST"
         },
         {
-          "name": "20 FT - 3 - C",
+          "name": "15 FT - 3 - C",
           "fnId": "custom42",
           "group": "20 FOV TEST"
         },
         {
-          "name": "20 FT - 3 - CH",
+          "name": "15 FT - 3 - CH",
           "fnId": "custom43",
           "group": "20 FOV TEST"
         }
@@ -12199,42 +12199,42 @@
           "fnId": "custom29"
         },
         {
-          "name": "20 FT - R - C",
+          "name": "15 FT - R - C",
           "fnId": "custom52",
           "group": "20 FOV TEST"
         },
         {
-          "name": "20 FT - R - CH",
+          "name": "15 FT - R - CH",
           "fnId": "custom51",
           "group": "20 FOV TEST"
         },
         {
-          "name": "20 FT - 1 - C",
+          "name": "15 FT - 1 - C",
           "fnId": "custom50",
           "group": "20 FOV TEST"
         },
         {
-          "name": "20 FT - 1 - CH",
+          "name": "15 FT - 1 - CH",
           "fnId": "custom39",
           "group": "20 FOV TEST"
         },
         {
-          "name": "20 FT - 2 - C",
+          "name": "15 FT - 2 - C",
           "fnId": "custom40",
           "group": "20 FOV TEST"
         },
         {
-          "name": "20 FT - 2 - CH",
+          "name": "15 FT - 2 - CH",
           "fnId": "custom41",
           "group": "20 FOV TEST"
         },
         {
-          "name": "20 FT - 3 - C",
+          "name": "15 FT - 3 - C",
           "fnId": "custom42",
           "group": "20 FOV TEST"
         },
         {
-          "name": "20 FT - 3 - CH",
+          "name": "15 FT - 3 - CH",
           "fnId": "custom43",
           "group": "20 FOV TEST"
         }
@@ -23977,42 +23977,42 @@
           "fnId": "custom29"
         },
         {
-          "name": "20 FT - R - C",
+          "name": "15 FT - R - C",
           "fnId": "custom52",
           "group": "20 FOV TEST"
         },
         {
-          "name": "20 FT - R - CH",
+          "name": "15 FT - R - CH",
           "fnId": "custom51",
           "group": "20 FOV TEST"
         },
         {
-          "name": "20 FT - 1 - C",
+          "name": "15 FT - 1 - C",
           "fnId": "custom50",
           "group": "20 FOV TEST"
         },
         {
-          "name": "20 FT - 1 - CH",
+          "name": "15 FT - 1 - CH",
           "fnId": "custom39",
           "group": "20 FOV TEST"
         },
         {
-          "name": "20 FT - 2 - C",
+          "name": "15 FT - 2 - C",
           "fnId": "custom40",
           "group": "20 FOV TEST"
         },
         {
-          "name": "20 FT - 2 - CH",
+          "name": "15 FT - 2 - CH",
           "fnId": "custom41",
           "group": "20 FOV TEST"
         },
         {
-          "name": "20 FT - 3 - C",
+          "name": "15 FT - 3 - C",
           "fnId": "custom42",
           "group": "20 FOV TEST"
         },
         {
-          "name": "20 FT - 3 - CH",
+          "name": "15 FT - 3 - CH",
           "fnId": "custom43",
           "group": "20 FOV TEST"
         }
@@ -37364,7 +37364,7 @@
     },
     {
       "key": "Custom Click Functions",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -37413,7 +37413,7 @@
           "type": "group",
           "group": {
             "key": "New Group (16)",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -37640,7 +37640,7 @@
           "type": "group",
           "group": {
             "key": "Camera",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -38748,12 +38748,12 @@
     "custom43Trig1Type": "Trigger Type",
     "custom43Trig1ClickCount": "Trigger Count",
     "New Group (14)": "20 FOV - TEST",
-    "35 FT - 3 - CH Copy": "20 FT - 3 - CH",
-    "35 FT - 3 - C Copy": "20 FT - 3 - C",
-    "35 FT - 2 - CH Copy": "20 FT - 2 - CH",
-    "35 FT - Copy": "20 FT - 2 - C",
-    "35 FT - 1 - CH Copy": "20 FT - 1 - CH",
-    "35 FT - 1 - C Copy": "20 FT - 1 - C",
+    "35 FT - 3 - CH Copy": "15 FT - 3 - CH",
+    "35 FT - 3 - C Copy": "15 FT - 3 - C",
+    "35 FT - 2 - CH Copy": "15 FT - 2 - CH",
+    "35 FT - Copy": "15 FT - 2 - C",
+    "35 FT - 1 - CH Copy": "15 FT - 1 - CH",
+    "35 FT - 1 - C Copy": "15 FT - 1 - C",
     "custom44Enabled": "ON/ OFF",
     "custom44Type": "Trigger Type",
     "custom44ClickCount": "Trigger Count",
@@ -38808,11 +38808,11 @@
     "custom50Enabled": "ON/ OFF",
     "custom50Type": "Trigger Type",
     "custom50ClickCount": "Trigger Count",
-    "New Group (16)": "20 FOV - TEST",
+    "New Group (16)": "15 FOV - TEST",
     "custom51Enabled": "ON/ OFF",
     "custom51Type": "Trigger Type",
     "custom51ClickCount": "Trigger Count",
-    "20 FT - 1 - C Copy": "20 FT - R - CH",
+    "20 FT - 1 - C Copy": "15 FT - R - CH",
     "custom51Trig1Enabled": "ON/ OFF",
     "custom51Trig1Type": "Trigger Type",
     "custom51Trig1ClickCount": "Trigger Count",
@@ -38828,7 +38828,7 @@
     "custom52Trig2Enabled": "ON/ OFF",
     "custom52Trig2Type": "Trigger Type",
     "custom52Trig2ClickCount": "Trigger Count",
-    "20 FT - R - CH Copy": "20 FT - R - C"
+    "20 FT - R - CH Copy": "15 FT - R - C"
   },
   "devVisibility": {
     "custom17Enabled": true,
