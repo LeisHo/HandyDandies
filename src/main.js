@@ -754,11 +754,13 @@ function updateLoadingPreviewText() {
   el.textContent = cfg.loadingPreviewTextContent ?? ''
   el.style.fontSize = (cfg.loadingPreviewTextFontSize ?? 32) + 'px'
   el.style.color = cfg.loadingPreviewTextColor || '#ffffff'
+  el.style.letterSpacing = (cfg.loadingPreviewTextLetterSpacing ?? 0) + 'px'
+  el.style.paddingLeft = (cfg.loadingPreviewTextLetterSpacing ?? 0) + 'px' // letter-spacing also trails the last letter; this keeps the text centred on its anchor
   const f = LOADING_TEXT_FONTS.find((x) => x.name === cfg.loadingPreviewTextFont) || LOADING_TEXT_FONTS[0]
   el.style.fontFamily = f.css
   el.style.transform = `translate(calc(-50% + ${cfg.loadingPreviewTextOffsetX ?? 0}px), calc(-50% + ${cfg.loadingPreviewTextOffsetY ?? 0}px))`
 }
-const LOADING_TEXT_ROW_KEYS = ['loadingPreviewTextContent', 'loadingPreviewTextFontSize', 'loadingPreviewTextColor', 'loadingPreviewTextFont', 'loadingPreviewTextOffsetX', 'loadingPreviewTextOffsetY']
+const LOADING_TEXT_ROW_KEYS = ['loadingPreviewTextContent', 'loadingPreviewTextFontSize', 'loadingPreviewTextLetterSpacing', 'loadingPreviewTextColor', 'loadingPreviewTextFont', 'loadingPreviewTextOffsetX', 'loadingPreviewTextOffsetY']
 const LOADING_TEXT_GROUP_KEY = 'Loading Preview > Text'
 function updateLoadingPreviewTextGroupVisibility() {
   const g = document.querySelector('.dp-group[data-key="' + LOADING_TEXT_GROUP_KEY + '"]')
@@ -2430,6 +2432,7 @@ const DEV_GROUPS = [
       { key: 'loadingPreviewTextEnabled', label: 'Text On/Off', type: 'checkbox', def: false, onChange: () => { updateLoadingPreviewText(); updateLoadingPreviewTextGroupVisibility() } },
       { key: 'loadingPreviewTextContent', label: 'Text', type: 'text', def: 'Loading...', onChange: () => updateLoadingPreviewText() },
       { key: 'loadingPreviewTextFontSize', label: 'Font Size (Px)', type: 'slider', min: 8, max: 200, step: 1, def: 32, perDevice: true, onChange: () => updateLoadingPreviewText() },
+      { key: 'loadingPreviewTextLetterSpacing', label: 'Letter Spacing (Px)', type: 'slider', min: -10, max: 100, step: 0.5, def: 0, perDevice: true, onChange: () => updateLoadingPreviewText() },
       { key: 'loadingPreviewTextColor', label: 'Font Color', type: 'color', def: '#ffffff', onChange: () => updateLoadingPreviewText() },
       { key: 'loadingPreviewTextFont', label: 'Font', type: 'select', def: 'Arial', options: () => LOADING_TEXT_FONTS.map((f) => f.name), onChange: () => updateLoadingPreviewText() },
       { key: 'loadingPreviewTextOffsetX', label: 'Text Offset X (Px)', type: 'slider', min: -1500, max: 1500, step: 1, def: 0, perDevice: true, onChange: () => updateLoadingPreviewText() },
