@@ -3235,6 +3235,8 @@ const POSE_SUBGROUP_SPECS = [
 // workspace-wide shared secret, not a per-project one.
 const DEV_PANEL_SAVE_SECRET = 'PkrbMti03M6xm3FEThYXa8gGW_08BOGj'
 const SAVE_SETTINGS_ENDPOINT = '/api/save-settings'
+// Camera group (direct request 2026-10-14): its sliders are perDevice, which has no Show in Mobile/Landscape checkbox of its own; opt them into the visibility-only one so the group has it like every other group.
+;(DEV_GROUPS.find((g) => g.title === 'Camera') || { controls: [] }).controls.forEach((c) => { if (c.perDevice && c.type === 'slider') c.visibilityToggle = true })
 const cfg = initDevPanel(DEV_GROUPS, {
   storageKeyPrefix: 'handyDandies',
   organizeSubgroups: (groupsEl) => { organizeGroupSubgroups(groupsEl, 'Pose', POSE_SUBGROUP_SPECS); organizeGroupSubgroups(groupsEl, 'Field Layout', FIELD_LAYOUT_SUBGROUP_SPECS); organizeGroupSubgroups(groupsEl, 'Debug', SNAPSHOT_SUBGROUP_SPECS) },

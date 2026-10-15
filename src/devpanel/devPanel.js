@@ -214,6 +214,9 @@ function isDynamicDeviceCtrl(ctrl) {
   if (NO_DYNAMIC_DEVICE_TYPES.includes(ctrl.type)) return false
   return ctrl.dynamicDevice !== false
 }
+// Visibility-only checkbox (direct request 2026-10-14, Camera group): a perDevice control keeps its own value per device (so it has no Independent checkbox), but can opt into the Show in Mobile/Landscape checkbox with
+// `visibilityToggle: true` - unchecked, its row is hidden on the Mobile / Landscape tabs. Also counted by the group header's own Show in Mobile/Landscape cascade checkbox.
+function isVisibilityToggleCtrl(ctrl) { return !!ctrl.perDevice && !!ctrl.visibilityToggle && !NO_DYNAMIC_DEVICE_TYPES.includes(ctrl.type) }
 export function isDevRowVisible(key) { return devVisibility[key] !== false }
 // Thin setter mirroring setDevTextOverride()'s own pattern -- a host
 // occasionally needs to set a KNOWN, already-decided Show-in-Mobile/
@@ -1186,6 +1189,16 @@ export function buildRow(ctrl) {
     row.appendChild(visCheckbox)
     row.appendChild(indepCheckbox)
     if (numEls[ctrl.key]) { numEls[ctrl.key].visCheckbox = visCheckbox; numEls[ctrl.key].indepCheckbox = indepCheckbox }
+  } else if (isVisibilityToggleCtrl(ctrl)) {
+    const visCheckbox = el('input', 'dp-dynamic-device-checkbox', { type: 'checkbox', title: 'Show in Mobile/Landscape' })
+    visCheckbox.addEventListener('click', (e) => e.stopPropagation())
+    visCheckbox.addEventListener('change', () => {
+      devVisibility[ctrl.key] = visCheckbox.checked
+      refreshRowDisplaysForEditingTab()
+      if (hostOnDevVisibilityChanged) hostOnDevVisibilityChanged(ctrl.key)
+    })
+    row.appendChild(visCheckbox)
+    if (numEls[ctrl.key]) numEls[ctrl.key].visCheckbox = visCheckbox
   }
   return row
 }
@@ -1598,7 +1611,7 @@ export function createGroupElement(title) {
   visCascadeCheckbox.style.display = 'none'
   visCascadeCheckbox.addEventListener('click', (e) => e.stopPropagation())
   visCascadeCheckbox.addEventListener('change', () => {
-    forEachDynamicDeviceDescendant(g, (ctrl) => { devVisibility[ctrl.key] = visCascadeCheckbox.checked })
+    forEachVisibilityDescendant(g, (ctrl) => { devVisibility[ctrl.key] = visCascadeCheckbox.checked })
     refreshRowDisplaysForEditingTab()
     // Host extension point, added 2026-09-24 -- see buildRow()'s own
     // identical row-level call for the full reasoning; `null` (not one
@@ -1653,6 +1666,7 @@ export function createGroupElement(title) {
   g.appendChild(h)
   g.appendChild(gb)
   g._visCascadeCheckbox = visCascadeCheckbox
+  g._undockBtn = undockBtn
   g._indepCascadeCheckbox = indepCascadeCheckbox
   return g
 }
@@ -1753,6 +1767,13 @@ export function forEachDynamicDeviceDescendant(g, fn) {
     if (ctrl && isDynamicDeviceCtrl(ctrl)) fn(ctrl)
   })
 }
+// Controls the group's Show in Mobile/Landscape cascade checkbox covers: every dynamicDevice control plus the visibility-only (perDevice + visibilityToggle) ones.
+function forEachVisibilityDescendant(g, fn) {
+  g.querySelectorAll(':scope .dp-row[data-key]').forEach((row) => {
+    const ctrl = findCtrl(row.dataset.key)
+    if (ctrl && (isDynamicDeviceCtrl(ctrl) || isVisibilityToggleCtrl(ctrl))) fn(ctrl)
+  })
+}
 // Recomputes one group's own 2 cascade checkboxes: visible only if it has
 // at least one dynamicDevice descendant AND the relevant tab is active
 // (visibility cascade on Desktop, independence cascade on Mobile/
@@ -1763,12 +1784,14 @@ function refreshGroupCascadeChrome(g) {
   const onDesktop = editingDevice === 'desktop'
   const ctrls = []
   forEachDynamicDeviceDescendant(g, (ctrl) => ctrls.push(ctrl))
+  const visCtrls = []
+  forEachVisibilityDescendant(g, (ctrl) => visCtrls.push(ctrl))
   const vis = g._visCascadeCheckbox
   const indep = g._indepCascadeCheckbox
   if (vis) {
-    vis.style.display = (onDesktop && ctrls.length) ? '' : 'none'
-    if (ctrls.length) {
-      const states = ctrls.map((c) => isDevRowVisible(c.key))
+    vis.style.display = (onDesktop && visCtrls.length) ? '' : 'none'
+    if (visCtrls.length) {
+      const states = visCtrls.map((c) => isDevRowVisible(c.key))
       vis.indeterminate = states.some((s) => s) && states.some((s) => !s)
       vis.checked = !vis.indeterminate && states[0]
     }
@@ -1781,6 +1804,10 @@ function refreshGroupCascadeChrome(g) {
       indep.checked = !indep.indeterminate && states[0]
     }
   }
+  // The undock arrow and lock icon sit on the far right of every group header: the first visible cascade checkbox carries the auto left margin (CSS), and when NEITHER is shown (a group with nothing to cascade) the
+  // undock arrow takes it instead, so the icons are right-aligned in every group.
+  const anyCheckbox = (vis && vis.style.display !== 'none') || (indep && indep.style.display !== 'none')
+  if (g._undockBtn) g._undockBtn.style.marginLeft = anyCheckbox ? '' : 'auto'
 }
 
 // "+ Add Group" -- lets the user organize existing settings into their own
@@ -2578,7 +2605,21 @@ function applyStoredValues(values, skipKeys = null) {
   }
 }
 
+function refreshVisibilityToggleRowChrome(ctrl) {
+  const row = document.querySelector(`.dp-row[data-key="${CSS.escape(ctrl.key)}"]`)
+  if (!row) return
+  const entry = numEls[ctrl.key]
+  const onDesktop = editingDevice === 'desktop'
+  row.classList.toggle('dp-row-device-hidden', !onDesktop && !isDevRowVisible(ctrl.key))
+  if (entry && entry.visCheckbox) { entry.visCheckbox.style.display = onDesktop ? '' : 'none'; entry.visCheckbox.checked = isDevRowVisible(ctrl.key) }
+}
 function refreshRowDisplayForCtrl(ctrl) {
+  if (isVisibilityToggleCtrl(ctrl)) {
+    const v = store[editingDevice][ctrl.key]
+    if (v !== undefined) displayValue(ctrl, v)
+    refreshVisibilityToggleRowChrome(ctrl)
+    return
+  }
   if (isDynamicDeviceCtrl(ctrl)) {
     const showing = editingDevice === 'desktop' || isDevRowIndependent(editingDevice, ctrl)
     const v = showing ? store[editingDevice][ctrl.key] : store.desktop[ctrl.key]
