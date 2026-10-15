@@ -10823,7 +10823,7 @@
       "alternateRowOffset": -7,
       "progressiveRowOffset": 1,
       "useProgressiveOffset": false,
-      "hideHands": true,
+      "hideHands": false,
       "fieldOffsetX": 0,
       "fieldOffsetY": 0,
       "fieldOffsetZ": 0,
@@ -32879,7 +32879,7 @@
     },
     {
       "key": "New Group (9)",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -33204,7 +33204,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -39292,10 +39292,10 @@
       "height": 668.7875366210938
     },
     "mobile": {
-      "left": 65.56547546386719,
+      "left": 62.136905670166016,
       "top": 88.04762268066406,
-      "width": 328.8571472167969,
-      "height": 423.6547546386719
+      "width": 332.28570556640625,
+      "height": 425.1785888671875
     }
   }
 }
