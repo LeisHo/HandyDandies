@@ -248,6 +248,9 @@ body:not(.hd-revealed) #pauseButton, body:not(.hd-revealed) #resetButton, body:n
 .dp-ss-status { margin-bottom: 4px; font-size: 0.9em; line-height: 1.35; }
 .dp-ss-status-line b { font-weight: 700; }
 .dp-ss-status-none { color: #fbbf24; }
+/* Item selector rows whose triggers overlap another enabled item (Custom Click Function Selector) */
+.dp-list-picker-row-conflict { background: rgba(239, 68, 68, 0.22); box-shadow: inset 3px 0 0 #ef4444; }
+.dp-list-picker-row-conflict .dp-lp-row-label { color: #fecaca; }
 .dp-ss-empty { opacity: 0.6; padding: 4px 6px; }
 .dp-actions button {
   flex: 1 1 auto; background: var(--dp-button-bg-color, #3a3a4a); border: none; border-radius: 4px;

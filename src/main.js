@@ -8,7 +8,7 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js'
 import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js'
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js'
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js'
-import { DEV_MODE, initDevPanel, syncValue, setControlValue, copyControlState, forgetControlsWithPrefix, seedControlValue, refreshListPickerTogglesByKey, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab, beginDynamicBatch, endDynamicBatch, refreshListPickerMarksByKey } from './devpanel/devPanel.js?v=79'
+import { DEV_MODE, initDevPanel, syncValue, setControlValue, copyControlState, isApplyingPanelState, forgetControlsWithPrefix, seedControlValue, refreshListPickerTogglesByKey, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab, beginDynamicBatch, endDynamicBatch, refreshListPickerMarksByKey } from './devpanel/devPanel.js?v=80'
 
 // Toon Shading colour gradient (2026-10-12): MeshToonMaterial's getGradientIrradiance() only reads the RED channel of
 // its gradientMap (a grey ramp). Reading RGB instead is identical for every grey ramp (all channels equal) and lets
@@ -745,6 +745,9 @@ let fieldRevealed = false, fieldRevealFrames = 0, fieldWarmCompiled = false
 let fieldWarmStage = 0, fieldWarmRevealIndex = 0, fieldWarmStartMs = 0, fieldWarmBatch = 1, fieldWarmLastRenderMs = 0, fieldWarmPrevRenderMs = 0
 // Batch size adapts to how much the last batch ADDED to the draw time (not to the absolute draw time, which a slow GPU has even with nothing new): doubled while a batch added under 10 ms, halved (never below 4) when it added over 25 ms -- both thresholds and the floor of 4 are judgment calls, not measurements.
 const FIELD_WARM_CAP_MS = 20000
+// Exclusive click-function triggers (see enforceExclusiveTrigger()); declared up here because Enabled onChange handlers run during the very first settings restore, before the code further down has executed.
+let exclusiveTriggerSuppress = 0
+let exclusiveTriggersReady = false
 // Loading Preview > Text (2026-10-15, direct request): free text shown beside the loading animation. Thirty system fonts in two dropdown groups (see below); each has a fallback stack so a machine without the first choice still gets the same kind.
 // Bundled web fonts (fonts/*.woff2, declared in src/fonts.css), grouped in the dropdown (an <optgroup> each): fifteen sans-serif, fifteen serif. They load on demand - only the selected family is ever downloaded, so they add nothing to startup while the loading text is off.
 // Each css value falls back to a system font of the same kind while the file loads (font-display: swap) or for characters outside the Latin subset.
@@ -1083,7 +1086,7 @@ function tryStartField() {
   // whatever comes next; don't treat this comment's own reasoning above
   // as the settled explanation.
   if (!fieldWarmCompiled) renderer.compile(scene, camera)
-  window.__debug = { restoreCustomClickFunctions, updateSmallScaleModels, placeSmallScaleModelRows, smallScaleGeomCache, get smallScaleLevels() { return smallScaleLevels }, updateFingerCurlSkip, refreshAllTweenSequenceSelectors, reconcileCustomFunctions, captureCustomFunctionsForUndo, renameCustomFunction, placeHandModelRows, syncHandModelWithSettings, refreshHandModelList, get activeHandModelId() { return activeHandModelId }, importHandModelFile, useHandModel, placeLoadingPreviewLightingRows, applyOffsetRotationToHand, applyOffsetRotationRetransition, parseClickPoseConfig, parseClickHoldConfig, cropPointInWrapperFrame, rotateHandAboutCropPoint, rotateHandAboutWorldPoint, cursorFieldPoint, captureClickCursorPivot, rotationDegAt, applyWorldRigid, rotationModeOf, get customFunctionCollapseReady() { return customFunctionCollapseReady }, markCustomFunctionCollapseReady: () => { customFunctionCollapseReady = true }, applyCustomFunctionCollapse, persistCustomClickFunctionIds, bakeOffsetRotationIntoAccum, loopLapProgress, loopLapEnd, rotateHandAboutArmBase, updateLoadingPreviewHand2, buildLoopTimelines, loopPoseValuesBeyondLap, get palmCenterPosRaw() { return palmCenterPosRaw }, get handoPivotRaw() { return handoPivotRaw }, get handBoundsBoxCenterRaw() { return handBoundsBoxCenterRaw }, get alignQuat() { return alignQuat }, get loadingPreviewModelScale() { return loadingPreviewModelScale }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, handBoundsCenterLocal, LOADING_PREVIEW_REFERENCE_RADIUS, importTwoHandTween, convertHandoCameraPreset, applyLoadingPreviewCameraPreset, animateFrame: (...a) => animate(...a), releaseStartupHold, trackingActiveFor, placeStartupRetransitionGroup, startupHandScale, updateFieldCenterMarker, get fieldCenterPoint() { return fieldCenterPoint }, retransitionScalerMul, startupHandPhaseUnfinished, applyFieldBounds, onFieldBoundsChanged, retransitionDistanceMs, untriggeredVisibleSpheres, allVisibleHandsFinished, handStartupLocked, triggerClickPose, checkStartupFloorHide, get startupFloorHidden() { return startupFloorHidden }, get floorMesh() { return floorMesh }, updateLoadingPreviewAnimation, get loadingPreview2() { return { hand: loadingPreviewHand, hand2: loadingPreviewHand2, scene: loadingPreviewScene, camera: loadingPreviewCamera, renderer: loadingPreviewRenderer } }, updateSphereSequence, get sphereState() { return { stage: sphereStage, mesh: sphereMesh, on: sphereOn, start: sphereStart, dur: sphereDur, cap: sphereCap, done: sphereDone, keep: sphereKeepForHands, clicks: sphereClickCount } }, stackOnDefault, applyCameraOrientation, syncCameraPanelFromLive, curveByDomain, get domains() { return { xyAll: [xyAllMinDist, xyAllDistRange], splayAll: [splayAllMin, splayAllRange], cropAll: [cropAllMin, cropAllRange], restAll: [restAllMinDist, restAllDistRange], live: [liveFieldMinDist, liveFieldDistRange], splay: [splayFieldMin, splayFieldRange], crop: [cropFieldMin, cropFieldRange], xy: [xyFieldMinDist, xyFieldDistRange], rest: [restFieldMinDist, restFieldDistRange] } }, modelBaseFrameQ, computeBaseRotationQuat, cloneBaseRb, makeClipRig, updateClipRigPlanes, setClipRigT, updateOnScreenFlags, evaluateArmLengthCurve, THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose, resolveTweenSegmentsWithAnchor, lerpTweenSegments, lerpLoopSegments, isHoldEntry, updateLoadingPreviewWristClip, lerpPoseValues, get loadingPreviewRenderer() { return loadingPreviewRenderer }, get loadingPreviewScene() { return loadingPreviewScene }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, get handBoundsCenterLocal() { return handBoundsCenterLocal }, multiPointCommit, multiPointEligibleFunctions, get multiPointActiveTouchCount() { return multiPointActiveTouchCount }, get multiPointSessionFiredPoseId() { return multiPointSessionFiredPoseId }, detectPoseJumps, get poseJumpLogEntries() { return poseJumpLogEntries }, applyCurlToSkeletonReference, handLogTriggerLabel, applyAllFingerCurls, syncCameraPanelFromLive, animSpeedMs, chainSequenceCount, applyFieldBounds, cursorDistXY, hexBrightnessPct, toonThresholdForMidBrightness }
+  window.__debug = { refreshCustomFunctionConflictWarnings, enforceExclusiveTrigger, restoreCustomClickFunctions, updateSmallScaleModels, placeSmallScaleModelRows, smallScaleGeomCache, get smallScaleLevels() { return smallScaleLevels }, updateFingerCurlSkip, refreshAllTweenSequenceSelectors, reconcileCustomFunctions, captureCustomFunctionsForUndo, renameCustomFunction, placeHandModelRows, syncHandModelWithSettings, refreshHandModelList, get activeHandModelId() { return activeHandModelId }, importHandModelFile, useHandModel, placeLoadingPreviewLightingRows, applyOffsetRotationToHand, applyOffsetRotationRetransition, parseClickPoseConfig, parseClickHoldConfig, cropPointInWrapperFrame, rotateHandAboutCropPoint, rotateHandAboutWorldPoint, cursorFieldPoint, captureClickCursorPivot, rotationDegAt, applyWorldRigid, rotationModeOf, get customFunctionCollapseReady() { return customFunctionCollapseReady }, markCustomFunctionCollapseReady: () => { customFunctionCollapseReady = true }, applyCustomFunctionCollapse, persistCustomClickFunctionIds, bakeOffsetRotationIntoAccum, loopLapProgress, loopLapEnd, rotateHandAboutArmBase, updateLoadingPreviewHand2, buildLoopTimelines, loopPoseValuesBeyondLap, get palmCenterPosRaw() { return palmCenterPosRaw }, get handoPivotRaw() { return handoPivotRaw }, get handBoundsBoxCenterRaw() { return handBoundsBoxCenterRaw }, get alignQuat() { return alignQuat }, get loadingPreviewModelScale() { return loadingPreviewModelScale }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, handBoundsCenterLocal, LOADING_PREVIEW_REFERENCE_RADIUS, importTwoHandTween, convertHandoCameraPreset, applyLoadingPreviewCameraPreset, animateFrame: (...a) => animate(...a), releaseStartupHold, trackingActiveFor, placeStartupRetransitionGroup, startupHandScale, updateFieldCenterMarker, get fieldCenterPoint() { return fieldCenterPoint }, retransitionScalerMul, startupHandPhaseUnfinished, applyFieldBounds, onFieldBoundsChanged, retransitionDistanceMs, untriggeredVisibleSpheres, allVisibleHandsFinished, handStartupLocked, triggerClickPose, checkStartupFloorHide, get startupFloorHidden() { return startupFloorHidden }, get floorMesh() { return floorMesh }, updateLoadingPreviewAnimation, get loadingPreview2() { return { hand: loadingPreviewHand, hand2: loadingPreviewHand2, scene: loadingPreviewScene, camera: loadingPreviewCamera, renderer: loadingPreviewRenderer } }, updateSphereSequence, get sphereState() { return { stage: sphereStage, mesh: sphereMesh, on: sphereOn, start: sphereStart, dur: sphereDur, cap: sphereCap, done: sphereDone, keep: sphereKeepForHands, clicks: sphereClickCount } }, stackOnDefault, applyCameraOrientation, syncCameraPanelFromLive, curveByDomain, get domains() { return { xyAll: [xyAllMinDist, xyAllDistRange], splayAll: [splayAllMin, splayAllRange], cropAll: [cropAllMin, cropAllRange], restAll: [restAllMinDist, restAllDistRange], live: [liveFieldMinDist, liveFieldDistRange], splay: [splayFieldMin, splayFieldRange], crop: [cropFieldMin, cropFieldRange], xy: [xyFieldMinDist, xyFieldDistRange], rest: [restFieldMinDist, restFieldDistRange] } }, modelBaseFrameQ, computeBaseRotationQuat, cloneBaseRb, makeClipRig, updateClipRigPlanes, setClipRigT, updateOnScreenFlags, evaluateArmLengthCurve, THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose, resolveTweenSegmentsWithAnchor, lerpTweenSegments, lerpLoopSegments, isHoldEntry, updateLoadingPreviewWristClip, lerpPoseValues, get loadingPreviewRenderer() { return loadingPreviewRenderer }, get loadingPreviewScene() { return loadingPreviewScene }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, get handBoundsCenterLocal() { return handBoundsCenterLocal }, multiPointCommit, multiPointEligibleFunctions, get multiPointActiveTouchCount() { return multiPointActiveTouchCount }, get multiPointSessionFiredPoseId() { return multiPointSessionFiredPoseId }, detectPoseJumps, get poseJumpLogEntries() { return poseJumpLogEntries }, applyCurlToSkeletonReference, handLogTriggerLabel, applyAllFingerCurls, syncCameraPanelFromLive, animSpeedMs, chainSequenceCount, applyFieldBounds, cursorDistXY, hexBrightnessPct, toonThresholdForMidBrightness }
   // Do NOT hide the loading screen yet: the hands exist but may not have been painted. finalizeReveal() hides it once the field has rendered a couple of frames (or after a 4 s safety net).
   setTimeout(finalizeReveal, 4000)
 }
@@ -1112,7 +1115,7 @@ function finalizeReveal() {
     loadingPreviewCanvas.style.display = 'none'
   }
 }
-setTimeout(() => { logStartupTiming('startupSettingsReady = true (6000ms fallback timeout)'); startupSettingsReady = true; startupValuesApplied = true; maybeBuildStartupLoadingPreview(); startFieldBuild(); tryStartField() }, 6000)
+setTimeout(() => { logStartupTiming('startupSettingsReady = true (6000ms fallback timeout)'); startupSettingsReady = true; exclusiveTriggersReady = true; startupValuesApplied = true; maybeBuildStartupLoadingPreview(); startFieldBuild(); tryStartField() }, 6000)
 let framedOnce = false // camera/lighting/target-plane are framed ONCE, on first build -- Field Layout changes must never re-trigger this (direct request)
 const hands = [] // { wrapper: Group, clone: Object3D, skinnedMesh: SkinnedMesh|null, outlineMesh: Mesh|null, emissionMesh: SkinnedMesh|null }
 const sceneState = { fieldRadius: 10 }
@@ -2658,6 +2661,7 @@ const DEV_GROUPS = [
           isOn: (item) => !!cfg[`${item.fnId}Enabled`],
           setOn: (item, on) => setCustomFunctionEnabled(item.fnId, on)
         },
+        itemWarn: (item) => { const o = customFunctionOverlapNames(item.fnId); return o.length ? `Overlaps with: ${o.join(', ')} -- same trigger, both enabled. Turning one on switches the others off.` : '' },
         buttons: ['duplicate', 'rename', 'group'],
         onDuplicate: (item, opts) => duplicateCustomClickFunction(item.fnId, opts), // returns the promise: a group's functions are duplicated one after another
         onRename: (item, name) => renameCustomFunction(item.fnId, name)
@@ -3606,6 +3610,8 @@ const cfg = initDevPanel(DEV_GROUPS, {
     prof('placeDepthControlsInFeatureGroups', placeDepthControlsInFeatureGroups)
     prof('placeLoadingPreviewLightingRows', placeLoadingPreviewLightingRows)
     prof('setupLoadingPreviewTextGroup', setupLoadingPreviewTextGroup)
+    exclusiveTriggersReady = true // from here on a user turning a click function on / changing its trigger switches an overlapping one off
+    refreshCustomFunctionConflictWarnings()
     prof('placeHandModelRows', placeHandModelRows)
     prof('placeSmallScaleModelRows', placeSmallScaleModelRows)
     prof('refreshItemSelectorMarks', refreshAllItemSelectorMarks)
@@ -6759,7 +6765,7 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       // corrected 2026-09-19 after re-reading the verbatim spec text --
       // this was previously unbuilt) -- see updateClickFunctionEnabledVisibility()'s
       // own comment.
-      { key: `${p}Enabled`, label: `${title} (Master On/Off)`, type: 'checkbox', def: defaults.enabled ?? false, onChange: () => updateClickFunctionEnabledVisibility(p) },
+      { key: `${p}Enabled`, label: `${title} (Master On/Off)`, type: 'checkbox', def: defaults.enabled ?? false, onChange: () => { updateClickFunctionEnabledVisibility(p); enforceExclusiveTrigger(p) } },
       // Mode + the Tween Sequence select right below it, added 2026-09-15
       // (direct follow-up request, "implement it to all click functions
       // in the dev panel," porting Right Click's own Mode dropdown here)
@@ -7165,7 +7171,7 @@ function makeClickPoseGroup(p, title, defaults = {}) {
     controls: withDynamicDevice([
       // "If Off, hide all settings for this function" -- see
       // makeClickHoldPoseGroup()'s own matching comment.
-      { key: `${p}Enabled`, label: `${title} (Master On/Off)`, type: 'checkbox', def: defaults.enabled ?? false, onChange: () => updateClickFunctionEnabledVisibility(p) },
+      { key: `${p}Enabled`, label: `${title} (Master On/Off)`, type: 'checkbox', def: defaults.enabled ?? false, onChange: () => { updateClickFunctionEnabledVisibility(p); enforceExclusiveTrigger(p) } },
       // Mode + Tween Sequence -- added 2026-09-15, originally built only
       // for Right Click, then generalized here so Click Pose/Double-Click
       // Pose get it "the same as the others" (direct follow-up request).
@@ -15092,6 +15098,7 @@ async function duplicateCustomClickFunction(srcId, opts) {
     const addBtnRow = mtBody ? mtBody.querySelector(':scope > .dp-multi-trigger-add-row') : null
     await Promise.all(newTriggers.map((t) => registerMultiTriggerTrigger(t.prefix, t.title, mtBody, addBtnRow, src.kind, id)))
   }
+  exclusiveTriggerSuppress++ // the copy carries the source's trigger, so copying its Enabled must not switch the source off (the copy is switched off below if they overlap)
   // Copy every setting: the source's keys are the function id followed by an upper-case suffix (custom1Enabled, custom1Trig2OffsetX ...); custom10... does not start a custom1 key.
   const skip = new Set([`${srcId}MultiTriggers`])
   const pairs = []
@@ -15111,6 +15118,8 @@ async function duplicateCustomClickFunction(srcId, opts) {
   try { if (src.kind === 'hold') parseClickHoldConfig(id); else parseClickPoseConfig(id) } catch (e) { /* trigger state not ready */ }
   newTriggers.forEach((t) => { try { parseClickPoseConfig(t.prefix) } catch (e) { /* hold kind has no triggers */ } })
   copyControlState(`${srcId}MultiTriggerEnabled`, `${id}MultiTriggerEnabled`, true)
+  exclusiveTriggerSuppress--
+  if (customFunctionOverlapNames(id).length) setCustomFunctionEnabled(id, false) // a copy of an enabled function would otherwise overlap its source: it starts off
   updateCustomFunctionTypeVisibility(id)
   updateClickFunctionEnabledVisibility(id)
   // the copy's group sits right after the source's, collapsed like every other
@@ -15547,7 +15556,26 @@ function nextFreeCustomFunctionClickCountOrdinal(type, family) {
 // sharing a gesture both simply fire together (same "whichever runs last
 // this frame wins" disclosed pattern already true of chp-vs-rchp
 // elsewhere in this file), so this is a heads-up, not a hard stop.
+// Click functions never overlap (2026-10-15, direct request): when two ENABLED custom functions share a trigger (same family, Type and Click / Touch selector -- customFunctionConflictBucketKey()), only the one turned on /
+// changed last stays on and the others are switched off. Not enforced while the page is still restoring its settings or while a Use / Undo / Reset applies a whole saved state (those are not user edits, and half-applied
+// values would give false overlaps); a saved set that already overlaps is only flagged red in the selector until the user turns one on.
+function customFunctionOverlapNames(id) {
+  const key = customFunctionConflictBucketKey(id)
+  if (!key) return []
+  return customClickFunctionIds.filter((e) => e.id !== id && customFunctionConflictBucketKey(e.id) === key).map((e) => customFunctionDisplayName(e))
+}
+function enforceExclusiveTrigger(id) {
+  if (!exclusiveTriggersReady || exclusiveTriggerSuppress > 0 || isApplyingPanelState()) { refreshCustomFunctionConflictWarnings(); return }
+  if (!customClickFunctionIds.some((e) => e.id === id)) return
+  const key = customFunctionConflictBucketKey(id)
+  if (!key) { refreshCustomFunctionConflictWarnings(); return }
+  customClickFunctionIds.forEach((e) => {
+    if (e.id !== id && customFunctionConflictBucketKey(e.id) === key) setCustomFunctionEnabled(e.id, false)
+  })
+  refreshCustomFunctionConflictWarnings()
+}
 function refreshCustomFunctionConflictWarnings() {
+  refreshListPickerMarksByKey('customFunctionSelector')
   const bucketCounts = new Map()
   customClickFunctionIds.forEach(({ id }) => {
     const key = customFunctionConflictBucketKey(id)
@@ -15613,8 +15641,8 @@ async function renderCustomClickFunctionGroup(id, title, kind, family, yielder) 
     // below), so the checkbox's OTHER half ("Show in Mobile/Landscape") is
     // simply never reachable here -- consistent with this setting being a
     // touch-only concept with no Desktop relevance to begin with.
-    { key: `${id}TouchPointCount`, label: 'Touch Point Count', type: 'slider', min: 1, max: 10, step: 1, def: 1, dynamicDevice: true, onChange: () => refreshCustomFunctionConflictWarnings() },
-    { key: `${id}ClickCount`, label: kind === 'hold' ? 'Triggers On (Nth Press-And-Hold)' : 'Triggers On (Nth Click)', type: 'select', def: ['1st', '2nd', '3rd', '4th'][defaultClickCountOrdinal - 1], options: () => ['1st', '2nd', '3rd', '4th'], onChange: () => refreshCustomFunctionConflictWarnings() }
+    { key: `${id}TouchPointCount`, label: 'Touch Point Count', type: 'slider', min: 1, max: 10, step: 1, def: 1, dynamicDevice: true, onChange: () => { refreshCustomFunctionConflictWarnings(); enforceExclusiveTrigger(id) } },
+    { key: `${id}ClickCount`, label: kind === 'hold' ? 'Triggers On (Nth Press-And-Hold)' : 'Triggers On (Nth Click)', type: 'select', def: ['1st', '2nd', '3rd', '4th'][defaultClickCountOrdinal - 1], options: () => ['1st', '2nd', '3rd', '4th'], onChange: () => { refreshCustomFunctionConflictWarnings(); enforceExclusiveTrigger(id) } }
   )
   // No bespoke "Show in Mobile/Landscape" control here -- CORRECTED
   // 2026-09-24 (direct follow-up: "the click functions already have a
@@ -15762,6 +15790,7 @@ function handleCustomFunctionTypeChange(id, title, family) {
   if (newKind === oldKind) {
     updateCustomFunctionTypeVisibility(id)
     refreshCustomFunctionConflictWarnings()
+    enforceExclusiveTrigger(id)
     return
   }
   const oldKeys = oldKind === 'hold' ? CLICK_HOLD_KEYS : CLICK_POSE_KEYS
@@ -15778,7 +15807,7 @@ function handleCustomFunctionTypeChange(id, title, family) {
   if (oldGroup) oldGroup.remove()
   if (entry) entry.kind = newKind
   persistCustomClickFunctionIds()
-  registerCustomClickFunction(id, title, newKind, family)
+  Promise.resolve(registerCustomClickFunction(id, title, newKind, family)).then(() => enforceExclusiveTrigger(id))
 }
 // Registers a new (or, on restore, a previously-saved) custom function
 // into every generic pipeline this project's existing 10 triggers
@@ -15788,7 +15817,14 @@ function handleCustomFunctionTypeChange(id, title, family) {
 // code needed. The trigger-state object mirrors the exact shape every
 // other entry of its own kind already has (see clickPoseTriggers'/
 // clickHoldPoseTriggers' own declarations).
+// Group building seeds values one control at a time, so the onChange calls it makes see half-restored settings: no overlap decisions are made while it runs.
 function registerCustomClickFunction(id, title, kind, family, yielder) {
+  exclusiveTriggerSuppress++
+  let r
+  try { r = registerCustomClickFunctionInner(id, title, kind, family, yielder) } catch (e) { exclusiveTriggerSuppress--; throw e }
+  return Promise.resolve(r).finally(() => { exclusiveTriggerSuppress-- })
+}
+function registerCustomClickFunctionInner(id, title, kind, family, yielder) {
   if (kind === 'hold') {
     CLICK_HOLD_KEYS.push(id)
     clickHoldPoseTriggers[id] = {

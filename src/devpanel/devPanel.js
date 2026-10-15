@@ -461,17 +461,22 @@ function listPickerMarks(entry, item) {
   let d = false, u = false
   try { if (c.isDefault) d = !!c.isDefault(item) } catch (e) { d = false }
   try { if (c.isInUse) u = !!c.isInUse(item) } catch (e) { u = false }
-  return { d, u, text: (u ? '  (in use)' : '') + (d ? '  (default)' : '') }
+  let w = ''
+  try { if (c.itemWarn) w = c.itemWarn(item) || '' } catch (e) { w = '' }
+  return { d, u, w, text: (u ? '  (in use)' : '') + (d ? '  (default)' : '') }
 }
 function listPickerRowLabel(entry, item, marks) { return item.name + marks.text + (entry.ctrl.itemBadge ? (entry.ctrl.itemBadge(item) || '') : '') }
 function refreshListPickerMarks(entry) {
-  if (!entry || !entry.listEl || (!entry.ctrl.isDefault && !entry.ctrl.isInUse)) return
+  if (!entry || !entry.listEl || (!entry.ctrl.isDefault && !entry.ctrl.isInUse && !entry.ctrl.itemWarn)) return
   entry.listEl.querySelectorAll('.dp-list-picker-row').forEach((row) => {
     const item = row.__item
     if (!item) return
     const m = listPickerMarks(entry, item)
     row.classList.toggle('dp-list-picker-row-default', m.d)
     row.classList.toggle('dp-list-picker-row-inuse', m.u)
+    row.classList.toggle('dp-list-picker-row-conflict', !!m.w)
+    if (m.w) row.title = m.w; else if (row.title && row.dataset.warnTitle === '1') row.removeAttribute('title')
+    row.dataset.warnTitle = m.w ? '1' : ''
     const lab = row.querySelector('.dp-lp-row-label')
     const text = listPickerRowLabel(entry, item, m)
     if (lab && lab.textContent !== text) lab.textContent = text
@@ -487,7 +492,9 @@ function renderListPickerItemRow(entry, item) {
     + (item === entry.selectedItem ? ' dp-list-picker-row-selected' : '')
     + (entry.multiSelected.has(item) ? ' dp-list-picker-row-multi-selected' : '')
     + (marks.d ? ' dp-list-picker-row-default' : '')
-    + (marks.u ? ' dp-list-picker-row-inuse' : ''))
+    + (marks.u ? ' dp-list-picker-row-inuse' : '')
+    + (marks.w ? ' dp-list-picker-row-conflict' : ''))
+  if (marks.w) { row.title = marks.w; row.dataset.warnTitle = '1' }
   row.appendChild(el('span', 'dp-lp-row-handle', { textContent: '⠿' }))
   // Export checkbox -- opt-in per control (ctrl.exportable), so only a
   // picker that actually wants cross-project export (HANDO's own
@@ -2786,8 +2793,15 @@ function applyOrder(groupsEl, order) {
 // Used by Undo/Redo for the live camera sliders (see hostUndoLiveKeys): merely re-running a camera slider's
 // onChange with its own current value is not free (applyCameraControl() re-applies position/zoom sequentially and
 // moved the camera), so those keys must be skipped, not re-applied with their current values.
+// True while applyStoredValues() runs (settings restore, Use, Set Default, Undo / Redo, Reset): the onChange calls it makes are not user edits, so a host that reacts to a single edit (main.js: only one of two overlapping click functions stays on) checks this first.
+let applyingStoredDepth = 0
+export function isApplyingPanelState() { return applyingStoredDepth > 0 }
 function applyStoredValues(values, skipKeys = null) {
   if (!values) return
+  applyingStoredDepth++
+  try { applyStoredValuesInner(values, skipKeys) } finally { applyingStoredDepth-- }
+}
+function applyStoredValuesInner(values, skipKeys = null) {
   const real = realDeviceClass()
   const profT0 = DP_PROFILE ? performance.now() : 0
   const slow = []
@@ -3874,6 +3888,11 @@ export function initDevPanel(groups, opts = {}) {
   }
   // Which saved state is "the default" (marked with a star, overwritten by the main Save button) is remembered per browser, next to the saved states themselves.
   function defaultStateKey() { return `${storageKeyPrefix}.devDefaultState` }
+  function withExtra(snap) { if (devUndoCaptureExtra) snap.extra = devUndoCaptureExtra(); return snap }
+  // Puts back the host's own structure (main.js: the custom click function groups that existed when the item was saved) BEFORE the values are applied, exactly as Undo does; an item saved before this existed has no extra and is applied as before.
+  async function applyStateExtra(state) {
+    if (state && state.extra !== undefined && devUndoApplyExtra) { const r = devUndoApplyExtra(state.extra); if (r && typeof r.then === 'function') await r }
+  }
   function getDefaultStateName() { try { return localStorage.getItem(defaultStateKey()) || '' } catch (err) { return '' } }
   function setDefaultStateName(name) { try { if (name) localStorage.setItem(defaultStateKey(), name); else localStorage.removeItem(defaultStateKey()) } catch (err) { /* ignore */ } }
   function flashStateBtn(btn, msg) { const orig = btn.textContent; btn.textContent = msg; setTimeout(() => { btn.textContent = orig }, 900) }
@@ -3909,7 +3928,7 @@ export function initDevPanel(groups, opts = {}) {
       if (!name) return
       const states = getSavedStates()
       if (!states[name]) { setDefaultStateName(''); renderSavedStatesList(); return }
-      states[name] = await packState(captureFullPanelState())
+      states[name] = await packState(withExtra(captureFullPanelState()))
       const failed = setSavedStates(states)
       activeStateName = name
       renderSavedStatesList()
@@ -3922,6 +3941,7 @@ export function initDevPanel(groups, opts = {}) {
     const states = getSavedStates()
     if (states[name] && !window.confirm(`"${name}" already exists. Overwrite it?`)) return
     const snapshot = captureFullPanelState()
+    if (devUndoCaptureExtra) snapshot.extra = devUndoCaptureExtra() // which custom click functions exist, so Use can rebuild them
     // Compress this one and any older plain ones first, so a full storage frees up before the write is tried.
     for (const k of Object.keys(states)) if (states[k] && typeof states[k].gz !== 'string') states[k] = await packState(states[k])
     states[name] = await packState(snapshot)
@@ -3940,7 +3960,7 @@ export function initDevPanel(groups, opts = {}) {
     if (!window.confirm(`Replace "${name}" with the current settings?`)) return
     const states = getSavedStates()
     for (const k of Object.keys(states)) if (states[k] && typeof states[k].gz !== 'string') states[k] = await packState(states[k])
-    states[name] = await packState(captureFullPanelState())
+    states[name] = await packState(withExtra(captureFullPanelState()))
     const failed = setSavedStates(states)
     if (failed) { window.alert(`Could not save "${name}": this browser's storage for the page is full (${failed}).`); return }
     activeStateName = name
@@ -3953,7 +3973,7 @@ export function initDevPanel(groups, opts = {}) {
     if (!states[name]) return
     let state
     try { state = await unpackState(states[name]) } catch (err) { window.alert(`Could not read "${name}" (${(err && err.message) || err}).`); return }
-    if (state) { applyFullPanelState(state); activeStateName = name; renderSavedStatesList() }
+    if (state) { await applyStateExtra(state); applyFullPanelState(state); activeStateName = name; renderSavedStatesList() }
   }
   function deleteNamedState() {
     const name = selectedStateName
@@ -3977,6 +3997,7 @@ export function initDevPanel(groups, opts = {}) {
     activeStateName = name
     setDefaultStateName(name) // marked before the save below, which then refreshes this item from the panel (the same state)
     renderSavedStatesList()
+    await applyStateExtra(state)
     applyFullPanelState(state)
     saveSettings()
   }
