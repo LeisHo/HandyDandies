@@ -30,6 +30,20 @@ function safeRefreshSelectOptions(key) {
 function safeRefreshMultiSelectOptions(key) {
   try { refreshMultiSelectOptions(key) } catch (err) { console.error(`safeRefreshMultiSelectOptions('${key}') failed`, err) }
 }
+// Every dropdown that lists the saved tween sequences: the Loading Tween Sequence, and the Sequence / Chain rows of EVERY click function (the Starting State one, custom functions, their Multi Triggers).
+// Found by the rows that exist right now instead of a hard-coded key list, which missed the loading preview and every custom function (2026-10-15, direct report: an imported tween did not show up in them).
+function refreshAllTweenSequenceSelectors() {
+  const keys = new Set(['loadingPreviewTweenSelector', 'dcHoldTweenSelector', 'rcTweenSelector', 'chpTweenSelector', 'rchpTweenSelector', 'clickTweenSelector', 'dblclickTweenSelector'])
+  const chains = new Set()
+  document.querySelectorAll('.dp-row[data-key]').forEach((row) => {
+    const k = row.dataset.key
+    if (/TweenSelector$/.test(k)) keys.add(k)
+    else if (/TweenChain$/.test(k)) chains.add(k)
+  })
+  CLICK_HOLD_KEYS.forEach((p) => chains.add(`${p}TweenChain`))
+  keys.forEach(safeRefreshSelectOptions)
+  chains.forEach(safeRefreshMultiSelectOptions)
+}
 
 const MODEL_URL = '../data/processed/HAND3D/HandipantsOL_Clip.glb' // Draco-compressed, carries the 'Clipping Block' mesh (2026-10-11) - no longer loaded directly, see resolveHandModelUrl()
 // ---- Hand model (2026-10-14, direct request: use HandipantsFixedBone.glb; Hand group > item selector with Use / Delete / Import) ----
@@ -709,6 +723,13 @@ const _identityQuatTrack = new THREE.Quaternion()
 // The loading screen (text + preview hand + blocker) stays up until the field has actually PAINTED, not just until it was built (2026-10-11): fieldStarted flips when the min-time gate passes,
 // fieldRevealed flips a couple of rendered frames later. See finalizeReveal().
 let fieldRevealed = false, fieldRevealFrames = 0, fieldWarmCompiled = false
+// Field warm-up (2026-10-15, direct report: the loading-preview hands froze for ~5 s between the end of the loading sequence and the live field). The cost was the FIRST draw of the whole field -- every shader program
+// finishing its link, every hand's first GPU upload -- all landing in ONE frame right after `fieldStarted`, so the loading preview (rendered in the same animate() call) stopped dead while the main thread was busy.
+// The field is now warmed behind the loading screen while the preview keeps animating: 1 = compiling the programs without blocking (renderer.compileAsync), 2 = the hands are made visible a few per frame so each
+// frame's first-draw cost stays small, 3 = done (tryStartField() may start the field). The 20000 ms cap is an UNMEASURED judgment call: if warming has not finished by then (a stuck compile), the rest is revealed at once.
+let fieldWarmStage = 0, fieldWarmRevealIndex = 0, fieldWarmStartMs = 0, fieldWarmBatch = 1, fieldWarmLastRenderMs = 0, fieldWarmPrevRenderMs = 0
+// Batch size adapts to how much the last batch ADDED to the draw time (not to the absolute draw time, which a slow GPU has even with nothing new): doubled while a batch added under 10 ms, halved (never below 4) when it added over 25 ms -- both thresholds and the floor of 4 are judgment calls, not measurements.
+const FIELD_WARM_CAP_MS = 20000
 // Loading Preview's own "Min Loading Time" (direct request) -- captured
 // here, at the earliest point this module runs, so the min-time window
 // starts from the true page-load moment, not from whenever tryStartField()
@@ -829,6 +850,26 @@ function startFieldBuild() {
     tryStartField()
   })
 }
+// Called every frame by animate() while fieldWarmStage is 1 or 2.
+function advanceFieldWarmup() {
+  const capped = performance.now() - fieldWarmStartMs > FIELD_WARM_CAP_MS
+  if (fieldWarmStage === 1 && !capped) return // programs still linking (non-blocking); the loading preview keeps animating
+  if (fieldWarmRevealIndex > 0) {
+    const added = fieldWarmLastRenderMs - fieldWarmPrevRenderMs
+    if (added < 10) fieldWarmBatch = Math.min(hands.length, Math.max(4, fieldWarmBatch * 2)); else if (added > 25) fieldWarmBatch = Math.max(4, Math.floor(fieldWarmBatch / 2))
+  }
+  fieldWarmPrevRenderMs = fieldWarmLastRenderMs
+  const batch = capped ? hands.length : fieldWarmBatch // starts at 1: the first hand alone carries the one-time geometry upload
+  let shown = 0
+  while (fieldWarmRevealIndex < hands.length && shown < batch) { hands[fieldWarmRevealIndex++]._warmHidden = false; shown++ }
+  updateHandsVisibility()
+  if (fieldWarmRevealIndex >= hands.length) {
+    hands.forEach((h) => { h._warmHidden = false })
+    fieldWarmStage = 3
+    logStartupTiming('field warm-up finished (' + hands.length + ' hands shown over ' + Math.round(performance.now() - fieldWarmStartMs) + 'ms)' + (capped ? ' -- CAPPED' : ''))
+    tryStartField()
+  }
+}
 function tryStartField() {
   logStartupTiming(`tryStartField() called (fieldStarted=${fieldStarted} modelReady=${modelMeasurementsReady} settingsReady=${startupSettingsReady})`)
   if (fieldStarted || !modelMeasurementsReady || !startupSettingsReady) return
@@ -842,7 +883,14 @@ function tryStartField() {
   if (!fieldBuildDone) return
   // Compile the field's shader programs NOW, behind the loading screen, while the min-time wait runs, instead of inside the reveal itself (2026-10-11): with thousands of per-hand materials
   // that compile is a long synchronous block, and doing it at the reveal froze the loading hand and then showed an empty screen until the field's first frames came out.
-  if (!fieldWarmCompiled) { fieldWarmCompiled = true; try { renderer.compile(scene, camera) } catch (err) { /* the reveal compiles again */ } }
+  if (fieldWarmStage === 0) {
+    fieldWarmStage = 1; fieldWarmCompiled = true; fieldWarmStartMs = performance.now()
+    const t0 = performance.now()
+    const done = () => { logStartupTiming('renderer.compileAsync() ready after ' + Math.round(performance.now() - t0) + 'ms (' + hands.length + ' hands)'); if (fieldWarmStage === 1) fieldWarmStage = 2 }
+    try { renderer.compileAsync(scene, camera).then(done, done) } catch (err) { done() }
+    setTimeout(() => { if (fieldWarmStage < 3) advanceFieldWarmup() }, FIELD_WARM_CAP_MS + 100) // animate() may not be ticking (hidden tab): finish regardless
+  }
+  if (fieldWarmStage !== 3) return // advanceFieldWarmup() (animate) calls tryStartField() again when the hands are warmed
   if (cfg.loadingPreviewEnabled) {
     const minMs = Math.max(0, cfg.loadingMinTimeMs || 0)
     const elapsed = performance.now() - pageLoadStartMs
@@ -886,7 +934,7 @@ function tryStartField() {
   logStartupTiming('fieldStarted = true')
   logLoadingPreview(`field starting -- loading screen hides; preview ${cfg.loadingPreviewShowLive ? 'stays visible (Show Loading Preview is on)' : 'is hidden'}`)
   // (the field itself was built in slices earlier -- see rebuildFieldChunked())
-  buildPosePreview()
+  { const __t = performance.now(); buildPosePreview(); logStartupTiming('buildPosePreview() took ' + Math.round(performance.now() - __t) + 'ms') }
   // ROOT CAUSE of the REAL startup jank, found 2026-09-16 after the
   // settings-restore-race fix above turned out NOT to be it (direct user
   // report: same issue persisted after that fix; further direct report --
@@ -927,7 +975,7 @@ function tryStartField() {
   // whatever comes next; don't treat this comment's own reasoning above
   // as the settled explanation.
   if (!fieldWarmCompiled) renderer.compile(scene, camera)
-  window.__debug = { reconcileCustomFunctions, captureCustomFunctionsForUndo, renameCustomFunction, placeHandModelRows, syncHandModelWithSettings, refreshHandModelList, get activeHandModelId() { return activeHandModelId }, importHandModelFile, useHandModel, placeLoadingPreviewLightingRows, applyOffsetRotationToHand, applyOffsetRotationRetransition, parseClickPoseConfig, parseClickHoldConfig, cropPointInWrapperFrame, rotateHandAboutCropPoint, rotateHandAboutWorldPoint, cursorFieldPoint, captureClickCursorPivot, rotationDegAt, applyWorldRigid, rotationModeOf, get customFunctionCollapseReady() { return customFunctionCollapseReady }, markCustomFunctionCollapseReady: () => { customFunctionCollapseReady = true }, applyCustomFunctionCollapse, persistCustomClickFunctionIds, bakeOffsetRotationIntoAccum, loopLapProgress, loopLapEnd, rotateHandAboutArmBase, updateLoadingPreviewHand2, get palmCenterPosRaw() { return palmCenterPosRaw }, get handoPivotRaw() { return handoPivotRaw }, get handBoundsBoxCenterRaw() { return handBoundsBoxCenterRaw }, get alignQuat() { return alignQuat }, get loadingPreviewModelScale() { return loadingPreviewModelScale }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, handBoundsCenterLocal, LOADING_PREVIEW_REFERENCE_RADIUS, importTwoHandTween, convertHandoCameraPreset, applyLoadingPreviewCameraPreset, animateFrame: (...a) => animate(...a), releaseStartupHold, trackingActiveFor, placeStartupRetransitionGroup, startupHandScale, updateFieldCenterMarker, get fieldCenterPoint() { return fieldCenterPoint }, retransitionScalerMul, startupHandPhaseUnfinished, applyFieldBounds, onFieldBoundsChanged, retransitionDistanceMs, untriggeredVisibleSpheres, allVisibleHandsFinished, handStartupLocked, triggerClickPose, checkStartupFloorHide, get startupFloorHidden() { return startupFloorHidden }, get floorMesh() { return floorMesh }, updateLoadingPreviewAnimation, get loadingPreview2() { return { hand: loadingPreviewHand, hand2: loadingPreviewHand2, scene: loadingPreviewScene, camera: loadingPreviewCamera, renderer: loadingPreviewRenderer } }, updateSphereSequence, get sphereState() { return { stage: sphereStage, mesh: sphereMesh, on: sphereOn, start: sphereStart, dur: sphereDur, cap: sphereCap, done: sphereDone, keep: sphereKeepForHands, clicks: sphereClickCount } }, stackOnDefault, applyCameraOrientation, syncCameraPanelFromLive, curveByDomain, get domains() { return { xyAll: [xyAllMinDist, xyAllDistRange], splayAll: [splayAllMin, splayAllRange], cropAll: [cropAllMin, cropAllRange], restAll: [restAllMinDist, restAllDistRange], live: [liveFieldMinDist, liveFieldDistRange], splay: [splayFieldMin, splayFieldRange], crop: [cropFieldMin, cropFieldRange], xy: [xyFieldMinDist, xyFieldDistRange], rest: [restFieldMinDist, restFieldDistRange] } }, modelBaseFrameQ, computeBaseRotationQuat, cloneBaseRb, makeClipRig, updateClipRigPlanes, setClipRigT, updateOnScreenFlags, evaluateArmLengthCurve, THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose, resolveTweenSegmentsWithAnchor, lerpTweenSegments, lerpLoopSegments, isHoldEntry, updateLoadingPreviewWristClip, lerpPoseValues, get loadingPreviewRenderer() { return loadingPreviewRenderer }, get loadingPreviewScene() { return loadingPreviewScene }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, get handBoundsCenterLocal() { return handBoundsCenterLocal }, multiPointCommit, multiPointEligibleFunctions, get multiPointActiveTouchCount() { return multiPointActiveTouchCount }, get multiPointSessionFiredPoseId() { return multiPointSessionFiredPoseId }, detectPoseJumps, get poseJumpLogEntries() { return poseJumpLogEntries }, applyCurlToSkeletonReference, handLogTriggerLabel, applyAllFingerCurls, syncCameraPanelFromLive, animSpeedMs, chainSequenceCount, applyFieldBounds, cursorDistXY, hexBrightnessPct, toonThresholdForMidBrightness }
+  window.__debug = { refreshAllTweenSequenceSelectors, reconcileCustomFunctions, captureCustomFunctionsForUndo, renameCustomFunction, placeHandModelRows, syncHandModelWithSettings, refreshHandModelList, get activeHandModelId() { return activeHandModelId }, importHandModelFile, useHandModel, placeLoadingPreviewLightingRows, applyOffsetRotationToHand, applyOffsetRotationRetransition, parseClickPoseConfig, parseClickHoldConfig, cropPointInWrapperFrame, rotateHandAboutCropPoint, rotateHandAboutWorldPoint, cursorFieldPoint, captureClickCursorPivot, rotationDegAt, applyWorldRigid, rotationModeOf, get customFunctionCollapseReady() { return customFunctionCollapseReady }, markCustomFunctionCollapseReady: () => { customFunctionCollapseReady = true }, applyCustomFunctionCollapse, persistCustomClickFunctionIds, bakeOffsetRotationIntoAccum, loopLapProgress, loopLapEnd, rotateHandAboutArmBase, updateLoadingPreviewHand2, get palmCenterPosRaw() { return palmCenterPosRaw }, get handoPivotRaw() { return handoPivotRaw }, get handBoundsBoxCenterRaw() { return handBoundsBoxCenterRaw }, get alignQuat() { return alignQuat }, get loadingPreviewModelScale() { return loadingPreviewModelScale }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, handBoundsCenterLocal, LOADING_PREVIEW_REFERENCE_RADIUS, importTwoHandTween, convertHandoCameraPreset, applyLoadingPreviewCameraPreset, animateFrame: (...a) => animate(...a), releaseStartupHold, trackingActiveFor, placeStartupRetransitionGroup, startupHandScale, updateFieldCenterMarker, get fieldCenterPoint() { return fieldCenterPoint }, retransitionScalerMul, startupHandPhaseUnfinished, applyFieldBounds, onFieldBoundsChanged, retransitionDistanceMs, untriggeredVisibleSpheres, allVisibleHandsFinished, handStartupLocked, triggerClickPose, checkStartupFloorHide, get startupFloorHidden() { return startupFloorHidden }, get floorMesh() { return floorMesh }, updateLoadingPreviewAnimation, get loadingPreview2() { return { hand: loadingPreviewHand, hand2: loadingPreviewHand2, scene: loadingPreviewScene, camera: loadingPreviewCamera, renderer: loadingPreviewRenderer } }, updateSphereSequence, get sphereState() { return { stage: sphereStage, mesh: sphereMesh, on: sphereOn, start: sphereStart, dur: sphereDur, cap: sphereCap, done: sphereDone, keep: sphereKeepForHands, clicks: sphereClickCount } }, stackOnDefault, applyCameraOrientation, syncCameraPanelFromLive, curveByDomain, get domains() { return { xyAll: [xyAllMinDist, xyAllDistRange], splayAll: [splayAllMin, splayAllRange], cropAll: [cropAllMin, cropAllRange], restAll: [restAllMinDist, restAllDistRange], live: [liveFieldMinDist, liveFieldDistRange], splay: [splayFieldMin, splayFieldRange], crop: [cropFieldMin, cropFieldRange], xy: [xyFieldMinDist, xyFieldDistRange], rest: [restFieldMinDist, restFieldDistRange] } }, modelBaseFrameQ, computeBaseRotationQuat, cloneBaseRb, makeClipRig, updateClipRigPlanes, setClipRigT, updateOnScreenFlags, evaluateArmLengthCurve, THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose, resolveTweenSegmentsWithAnchor, lerpTweenSegments, lerpLoopSegments, isHoldEntry, updateLoadingPreviewWristClip, lerpPoseValues, get loadingPreviewRenderer() { return loadingPreviewRenderer }, get loadingPreviewScene() { return loadingPreviewScene }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, get handBoundsCenterLocal() { return handBoundsCenterLocal }, multiPointCommit, multiPointEligibleFunctions, get multiPointActiveTouchCount() { return multiPointActiveTouchCount }, get multiPointSessionFiredPoseId() { return multiPointSessionFiredPoseId }, detectPoseJumps, get poseJumpLogEntries() { return poseJumpLogEntries }, applyCurlToSkeletonReference, handLogTriggerLabel, applyAllFingerCurls, syncCameraPanelFromLive, animSpeedMs, chainSequenceCount, applyFieldBounds, cursorDistXY, hexBrightnessPct, toonThresholdForMidBrightness }
   // Do NOT hide the loading screen yet: the hands exist but may not have been painted. finalizeReveal() hides it once the field has rendered a couple of frames (or after a 4 s safety net).
   setTimeout(finalizeReveal, 4000)
 }
@@ -2849,7 +2897,7 @@ const DEV_GROUPS = [
         // group's own Tween Selector dropdown reads this same list via
         // options(), which devPanel.js only rebuilds on an explicit
         // refreshSelectOptions() call.
-        onChange: () => { safeRefreshSelectOptions('dcHoldTweenSelector'); safeRefreshSelectOptions('rcTweenSelector'); safeRefreshSelectOptions('chpTweenSelector'); safeRefreshSelectOptions('rchpTweenSelector'); safeRefreshSelectOptions('clickTweenSelector'); safeRefreshSelectOptions('dblclickTweenSelector'); CLICK_HOLD_KEYS.forEach((p) => safeRefreshMultiSelectOptions(`${p}TweenChain`)) }
+        onChange: () => refreshAllTweenSequenceSelectors()
       }
     ])
   },
@@ -3768,7 +3816,7 @@ function updateFloor() {
 // The startup function's controls: the pose-kind click function's own battery (built by makeClickPoseGroup, so they match the click functions exactly) minus the rows that make no sense here - Enabled (forced on in code),
 // Skip If Same Pose, and the function's own Offset / Offset To Camera / Rotation (the transition drives its own offset from the three sliders above).
 function startupFnControls() {
-  const drop = /^(Enabled|SkipIfSamePose|OffsetEnabled|OffsetMode|OffsetX|OffsetY|OffsetZ|CursorOffset|CameraOffset|Rotation)/
+  const drop = /^(Enabled|SkipIfSamePose|PauseDurationMs|OffsetEnabled|OffsetMode|OffsetX|OffsetY|OffsetZ|CursorOffset|CameraOffset|Rotation)/
   return makeClickPoseGroup(STARTUP_FN, 'Hand Offset On Startup', { transitionSpeedMs: 1000 }).controls.filter((c) => !drop.test(c.key.slice(STARTUP_FN.length)))
 }
 // The sphere sequence's borrowed click-function controls: Animation Speed Curve, Easing, Start Time Curve and Start Distance Curve (the pose-kind factory's own rows, so they match the click functions exactly). The Start
@@ -5680,7 +5728,7 @@ function updateHandsVisibility() {
   // CORRECTED 2026-10-13 (direct request: "all hand models should be loaded on startup, so they will be visible on startup if not being covered by the floor object"): the Field Grid Sphere Sequence no longer hides the hands
   // until its second click; they are always built and shown, and the Floor's clipping plane is what covers them.
   const hide = !!cfg.hideHands
-  hands.forEach((h) => { h.wrapper.visible = !hide })
+  hands.forEach((h) => { h.wrapper.visible = !hide && !h._warmHidden })
 }
 
 // -----------------------------------------------------------------------
@@ -7673,7 +7721,7 @@ async function importTwoHandTween(btn) {
   const sequences = mergeByName(cfg.savedTweenSequences || [], incomingSeqs)
   cfg.savedTweenSequences = sequences
   syncValue('savedTweenSequences', sequences)
-  ;['loadingPreviewTweenSelector', 'chpTweenSelector', 'rchpTweenSelector', 'dcHoldTweenSelector', 'rcTweenSelector'].forEach((k) => { try { safeRefreshSelectOptions(k) } catch (e) { /* control may not exist */ } })
+  refreshAllTweenSequenceSelectors()
   const pick = incomingSeqs[incomingSeqs.length - 1].name
   cfg.loadingPreviewTweenSelector = pick
   syncValue('loadingPreviewTweenSelector', pick)
@@ -13433,7 +13481,8 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
     // symmetric with the hold family: RetransitionEnabled governs both
     // modes here too.
     if (cfg[`${p}RetransitionEnabled`] === false) return
-    const pauseDurationMs = Math.max(cfg[`${p}PauseDurationMs`], 0)
+    // The startup transition never holds at its end (2026-10-15, direct report: the hands paused before retransitioning). Its Pause Duration row is gone and its saved value (the 500 ms factory default) is ignored.
+    const pauseDurationMs = p === STARTUP_FN ? 0 : Math.max(cfg[`${p}PauseDurationMs`], 0)
     if (now - cp.pauseStartTime >= pauseDurationMs) {
       cp.phase = 'retransition'
       cp.retransitionStart = cp.lastAppliedValues || { ...poseDefaultValues }
@@ -17905,7 +17954,8 @@ async function rebuildFieldChunked() {
   }
   hands.forEach((hand) => scene.remove(hand.wrapper))
   hands.length = 0
-  pending.forEach((hand) => { scene.add(hand.wrapper); hands.push(hand) })
+  // Behind the loading screen the hands are added HIDDEN and shown a few per frame (advanceFieldWarmup()) so the field's first draw is not one big frame.
+  pending.forEach((hand) => { if (!fieldStarted) hand._warmHidden = true; scene.add(hand.wrapper); hands.push(hand) })
   fieldBuildInProgress = false
   finishRebuildField()
   logLoadingPreview(`field built behind the loading screen: ${total} hands in ${slices} slices over ${Math.round(performance.now() - t0All)}ms`)
@@ -18629,8 +18679,7 @@ async function importPosesAndTweenSequences(btn) {
     cfg.savedTweenSequences = items
     syncValue('savedTweenSequences', items)
     tweensCount = count
-    safeRefreshSelectOptions('dcHoldTweenSelector'); safeRefreshSelectOptions('rcTweenSelector'); safeRefreshSelectOptions('chpTweenSelector'); safeRefreshSelectOptions('rchpTweenSelector'); safeRefreshSelectOptions('clickTweenSelector'); safeRefreshSelectOptions('dblclickTweenSelector')
-    CLICK_HOLD_KEYS.forEach((p) => safeRefreshMultiSelectOptions(`${p}TweenChain`))
+    refreshAllTweenSequenceSelectors()
   }
   if (posesCount === 0 && tweensCount === 0) { flashImportButton(btn, 'Nothing to import'); return }
   flashImportButton(btn, `Imported ${posesCount} pose(s), ${tweensCount} tween(s)!`)
@@ -19080,6 +19129,7 @@ function animate(dt, now) {
     // flag, in case some future change mutates the scene without going
     // through either trigger. controls.update()/panel-sync above are NOT
     // throttled -- camera orbit/pan/zoom stays responsive even while paused.
+    if (fieldWarmStage === 1 || fieldWarmStage === 2) advanceFieldWarmup()
     const __nowForRender = performance.now()
     const __pausedRenderIntervalMs = 1000 / Math.max(1, cfg.pausedRenderFps ?? 15)
     const __pausedSafetyNetIntervalMs = 2000
@@ -19092,6 +19142,8 @@ function animate(dt, now) {
       const __renderStart = performance.now()
       composer.render()
       __frameProfiler.composerRenderMs += performance.now() - __renderStart
+      window.__lastComposerMs = performance.now() - __renderStart
+      fieldWarmLastRenderMs = window.__lastComposerMs
       __frameProfiler.frames++
       if (fieldStarted && !fieldRevealed && ++fieldRevealFrames >= 2) finalizeReveal() // two painted field frames, then the loading screen goes
     }
@@ -19104,6 +19156,7 @@ function animate(dt, now) {
     // (fps=4.2 with both of those reading normal) where the missing time
     // had to be somewhere this line now actually measures.
     __frameProfiler.animateTotalMs += performance.now() - __animateTotalStart
+    if (DEBUG_TIMING && fieldStarted && (window.__postStartFrames = (window.__postStartFrames || 0) + 1) <= 8) logStartupTiming('post-start animate #' + window.__postStartFrames + ' total ' + Math.round(performance.now() - __animateTotalStart) + 'ms (composer ' + Math.round(window.__lastComposerMs || 0) + ')')
     {
       const elapsed = performance.now() - __frameProfiler.windowStart
       if (elapsed >= 1000) {
