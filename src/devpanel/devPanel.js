@@ -2918,6 +2918,8 @@ function refreshEmptyGroupVisibility() {
     .forEach((g) => {
       const body = g.querySelector(':scope > .dp-group-body')
       if (!body) return
+      // A group whose content is not made of per-device rows (Saved Dev Settings: a status line, a list and buttons) has none of the rows this check looks for, so it was hidden on Mobile / Landscape; it is marked always-visible instead.
+      if (g.dataset.alwaysVisible === '1') { g.classList.remove('dp-group-hidden-empty'); return }
       const hasVisibleRow = !!Array.from(body.children).find((child) => child.classList.contains('dp-row') && !child.classList.contains('dp-row-device-hidden'))
       const hasVisibleSubgroup = !!Array.from(body.children).find((child) => child.classList.contains('dp-group') && !child.classList.contains('dp-group-hidden-empty'))
       g.classList.toggle('dp-group-hidden-empty', !hasVisibleRow && !hasVisibleSubgroup)
@@ -3832,6 +3834,7 @@ export function initDevPanel(groups, opts = {}) {
   // position -- the select/buttons stay exactly where they already are in
   // the DOM, never touched by applyOrder()'s row-placement logic.
   const savedStatesGroup = createGroupElement('Saved Dev Settings')
+  savedStatesGroup.dataset.alwaysVisible = '1' // shown on the Desktop, Mobile and Landscape tabs alike (see refreshEmptyGroupVisibility())
   const savedStatesBody = savedStatesGroup.querySelector(':scope > .dp-group-body')
   // An item selector (2026-10-15, direct request) instead of a dropdown: one row per saved state, click to select, the default one carries a star badge.
   const savedStatesStatus = el('div', 'dp-ss-status') // always says which item is the default (or that none is), and which one is in use
