@@ -2500,8 +2500,15 @@ function initResizeHandles(panel) {
 // that might still read them directly (there's nothing in this file as
 // of this change, but it's cheap insurance) sees a sane, consistent
 // value.
+// SIZE (2026-10-14, direct report: "the save continually fails"): the saved layout was the bulk of the Save request - 3.4 MB of a 4.5 MB body with ~30 custom click functions, against Vercel's 4.5 MB request limit, so
+// Save started failing outright. Two causes, both fixed here:
+//  1. every nested group was written TWICE per level - once inside `items` and again inside `subgroups` - so a group three levels down was stored 8 times. applyOrder() only reads `subgroups` for a layout saved before `items`
+//     existed (2026-09-19), so new captures leave it out; `settings` (just the row keys) stays.
+//  2. a group the host rebuilds from its own data on every load (a custom click function, a Multi Trigger - data-custom-function-id / data-multi-trigger-prefix) is recorded as the group only, not its ~300 rows and subgroups:
+//     applyOrder() runs before the host rebuilds them and the host clears whatever it created for them, so those insides were never restored from here anyway.
 function captureGroup(g) {
-  const items = Array.from(g.querySelectorAll(':scope > .dp-group-body > .dp-row, :scope > .dp-group-body > .dp-group')).map((el) => {
+  const opaque = !!(g.dataset.customFunctionId || g.dataset.multiTriggerPrefix)
+  const items = opaque ? [] : Array.from(g.querySelectorAll(':scope > .dp-group-body > .dp-row, :scope > .dp-group-body > .dp-group')).map((el) => {
     return el.classList.contains('dp-row')
       ? { type: 'row', key: el.dataset.key }
       : { type: 'group', group: captureGroup(el) }
@@ -2512,7 +2519,6 @@ function captureGroup(g) {
     locked: g.classList.contains('dp-group-locked'),
     items,
     settings: items.filter((it) => it.type === 'row').map((it) => it.key),
-    subgroups: items.filter((it) => it.type === 'group').map((it) => it.group),
   }
 }
 function getPanelOrder(groupsEl) {
@@ -2876,6 +2882,9 @@ async function remoteSaveSnapshot(remoteSave, snapshot) {
   // field like HANDO's own `defaultCamera`, per this function's own
   // top comment).
   const merged = { ...base, ...snapshot }
+  // Vercel rejects a request body over 4.5 MB (the function never runs, the client only sees a failure); say so instead of a vague error.
+  const approxBytes = JSON.stringify(merged).length
+  if (approxBytes > 4.4 * 1024 * 1024) return { ok: false, error: 'settings are ' + (approxBytes / 1048576).toFixed(1) + ' MB, over the 4.5 MB request limit' }
   // 2026-10-04: panelGeometry is keyed per device class; keep the devices
   // this save did not touch rather than letting the spread replace the map.
   if (snapshot.panelGeometry) merged.panelGeometry = { ...(base.panelGeometry || {}), ...snapshot.panelGeometry }
