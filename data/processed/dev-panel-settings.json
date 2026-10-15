@@ -54,11 +54,11 @@
       "fieldBoundsZMin": "-800",
       "fieldBoundsZMinCurveEnabled": true,
       "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.07681410990834386,\"y\":0.014791870117187522}},{\"x\":0.20627049423198482,\"y\":0.12145843505859377,\"h1\":{\"x\":0.3511503930941846,\"y\":0.43333333333333324},\"h2\":{\"x\":-0.10194695203855877,\"y\":-0.12145843505859377}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.7257649533817951,\"y\":0}}]",
-      "fieldBoundsZMinCurveRange": "{\"min\":-800,\"max\":-200}",
+      "fieldBoundsZMinCurveRange": "{\"min\":-250,\"max\":-200}",
       "fieldBoundsZMax": "240",
       "fieldBoundsZMaxCurveEnabled": true,
       "fieldBoundsZMaxCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.7710241189949432,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.29398888077240737,\"y\":0.005729166666666674}}]",
-      "fieldBoundsZMaxCurveRange": "{\"min\":100,\"max\":160}",
+      "fieldBoundsZMaxCurveRange": "{\"min\":36,\"max\":65}",
       "fieldBoundsX": "{\"min\":-300,\"max\":300}",
       "fieldBoundsY": "{\"min\":-300,\"max\":300}",
       "fieldBoundsZ": "{\"min\":-400,\"max\":200}",
@@ -7729,13 +7729,13 @@
         }
       ],
       "cameraX": 1.953488372093023,
-      "cameraY": 1.0654427152581974e-14,
-      "cameraZ": 199.47925521912504,
-      "cameraFov": 24,
+      "cameraY": 5.541526766141773e-15,
+      "cameraZ": 115.97925521912504,
+      "cameraFov": 33,
       "cameraYaw": 0,
       "cameraPitch": 0,
       "cameraRoll": 0,
-      "cameraZoom": 174,
+      "cameraZoom": 90.5,
       "cameraZoomSpeed": 0.3,
       "savedCameras": [
         {
@@ -7900,6 +7900,18 @@
           "cameraZ": 199.47925521912504,
           "cameraFov": 24,
           "cameraZoom": 174,
+          "cameraRoll": 0,
+          "targetX": 1.953488372093023,
+          "targetY": 0,
+          "targetZ": 25.47925521912503
+        },
+        {
+          "name": "DESKTOP 35 FOV",
+          "cameraX": 1.953488372093023,
+          "cameraY": 5.541526766141773e-15,
+          "cameraZ": 115.97925521912504,
+          "cameraFov": 33,
+          "cameraZoom": 90.5,
           "cameraRoll": 0,
           "targetX": 1.953488372093023,
           "targetY": 0,
@@ -8714,7 +8726,7 @@
       "custom21CameraOffsetYRange": "{\"min\":-1,\"max\":2}",
       "custom21CameraOffsetZEnabled": true,
       "custom21CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.1799256816928027,\"y\":-0.012916819254557343}},{\"x\":0.22390180991738773,\"y\":0.5604166666666667,\"h1\":{\"x\":0.09344735901548248,\"y\":-0.2333333333333334},\"h2\":{\"x\":-0.09016867766752461,\"y\":0.23999989827473955}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.6795430133837066,\"y\":0}}]",
-      "custom21CameraOffsetZRange": "{\"min\":-30,\"max\":30}",
+      "custom21CameraOffsetZRange": "{\"min\":-30,\"max\":10}",
       "custom21RotationEnabled": false,
       "custom21RotationX": 0,
       "custom21RotationY": -5,
@@ -11333,11 +11345,11 @@
       "fieldBoundsZMin": "-800",
       "fieldBoundsZMinCurveEnabled": true,
       "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.07681410990834386,\"y\":0.014791870117187522}},{\"x\":0.20627049423198482,\"y\":0.12145843505859377,\"h1\":{\"x\":0.3511503930941846,\"y\":0.43333333333333324},\"h2\":{\"x\":-0.10194695203855877,\"y\":-0.12145843505859377}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.7257649533817951,\"y\":0}}]",
-      "fieldBoundsZMinCurveRange": "{\"min\":-800,\"max\":-200}",
+      "fieldBoundsZMinCurveRange": "{\"min\":-250,\"max\":-200}",
       "fieldBoundsZMax": "240",
       "fieldBoundsZMaxCurveEnabled": true,
       "fieldBoundsZMaxCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.7710241189949432,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.29398888077240737,\"y\":0.005729166666666674}}]",
-      "fieldBoundsZMaxCurveRange": "{\"min\":100,\"max\":160}",
+      "fieldBoundsZMaxCurveRange": "{\"min\":36,\"max\":65}",
       "fieldBoundsX": "{\"min\":-300,\"max\":300}",
       "fieldBoundsY": "{\"min\":-300,\"max\":300}",
       "fieldBoundsZ": "{\"min\":-400,\"max\":200}",
@@ -19183,6 +19195,18 @@
           "targetX": 1.953488372093023,
           "targetY": 0,
           "targetZ": 25.47925521912503
+        },
+        {
+          "name": "DESKTOP 35 FOV",
+          "cameraX": 1.953488372093023,
+          "cameraY": 5.541526766141773e-15,
+          "cameraZ": 115.97925521912504,
+          "cameraFov": 33,
+          "cameraZoom": 90.5,
+          "cameraRoll": 0,
+          "targetX": 1.953488372093023,
+          "targetY": 0,
+          "targetZ": 25.47925521912503
         }
       ],
       "lockCameraPan": true,
@@ -19993,7 +20017,7 @@
       "custom21CameraOffsetYRange": "{\"min\":-1,\"max\":2}",
       "custom21CameraOffsetZEnabled": true,
       "custom21CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.1799256816928027,\"y\":-0.012916819254557343}},{\"x\":0.22390180991738773,\"y\":0.5604166666666667,\"h1\":{\"x\":0.09344735901548248,\"y\":-0.2333333333333334},\"h2\":{\"x\":-0.09016867766752461,\"y\":0.23999989827473955}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.6795430133837066,\"y\":0}}]",
-      "custom21CameraOffsetZRange": "{\"min\":-30,\"max\":30}",
+      "custom21CameraOffsetZRange": "{\"min\":-30,\"max\":10}",
       "custom21RotationEnabled": false,
       "custom21RotationX": 0,
       "custom21RotationY": -5,
@@ -22612,11 +22636,11 @@
       "fieldBoundsZMin": "-800",
       "fieldBoundsZMinCurveEnabled": true,
       "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.07681410990834386,\"y\":0.014791870117187522}},{\"x\":0.20627049423198482,\"y\":0.12145843505859377,\"h1\":{\"x\":0.3511503930941846,\"y\":0.43333333333333324},\"h2\":{\"x\":-0.10194695203855877,\"y\":-0.12145843505859377}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.7257649533817951,\"y\":0}}]",
-      "fieldBoundsZMinCurveRange": "{\"min\":-800,\"max\":-200}",
+      "fieldBoundsZMinCurveRange": "{\"min\":-250,\"max\":-200}",
       "fieldBoundsZMax": "240",
       "fieldBoundsZMaxCurveEnabled": true,
       "fieldBoundsZMaxCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.7710241189949432,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.29398888077240737,\"y\":0.005729166666666674}}]",
-      "fieldBoundsZMaxCurveRange": "{\"min\":100,\"max\":160}",
+      "fieldBoundsZMaxCurveRange": "{\"min\":36,\"max\":65}",
       "fieldBoundsX": "{\"min\":-300,\"max\":300}",
       "fieldBoundsY": "{\"min\":-300,\"max\":300}",
       "fieldBoundsZ": "{\"min\":-400,\"max\":200}",
@@ -30462,6 +30486,18 @@
           "targetX": 1.953488372093023,
           "targetY": 0,
           "targetZ": 25.47925521912503
+        },
+        {
+          "name": "DESKTOP 35 FOV",
+          "cameraX": 1.953488372093023,
+          "cameraY": 5.541526766141773e-15,
+          "cameraZ": 115.97925521912504,
+          "cameraFov": 33,
+          "cameraZoom": 90.5,
+          "cameraRoll": 0,
+          "targetX": 1.953488372093023,
+          "targetY": 0,
+          "targetZ": 25.47925521912503
         }
       ],
       "lockCameraPan": false,
@@ -31272,7 +31308,7 @@
       "custom21CameraOffsetYRange": "{\"min\":-1,\"max\":2}",
       "custom21CameraOffsetZEnabled": true,
       "custom21CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.1799256816928027,\"y\":-0.012916819254557343}},{\"x\":0.22390180991738773,\"y\":0.5604166666666667,\"h1\":{\"x\":0.09344735901548248,\"y\":-0.2333333333333334},\"h2\":{\"x\":-0.09016867766752461,\"y\":0.23999989827473955}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.6795430133837066,\"y\":0}}]",
-      "custom21CameraOffsetZRange": "{\"min\":-30,\"max\":30}",
+      "custom21CameraOffsetZRange": "{\"min\":-30,\"max\":10}",
       "custom21RotationEnabled": false,
       "custom21RotationX": 0,
       "custom21RotationY": -5,
@@ -36009,14 +36045,14 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
           "type": "group",
           "group": {
             "key": "Field Layout",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -36206,7 +36242,7 @@
                 "type": "group",
                 "group": {
                   "key": "Hand Position Min Z Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -36233,7 +36269,7 @@
                 "type": "group",
                 "group": {
                   "key": "Hand Position Max Z Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -36367,7 +36403,7 @@
               },
               {
                 "key": "Hand Position Min Z Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -36387,7 +36423,7 @@
               },
               {
                 "key": "Hand Position Max Z Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -37829,7 +37865,7 @@
       "subgroups": [
         {
           "key": "Field Layout",
-          "collapsed": true,
+          "collapsed": false,
           "locked": true,
           "items": [
             {
@@ -38019,7 +38055,7 @@
               "type": "group",
               "group": {
                 "key": "Hand Position Min Z Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -38046,7 +38082,7 @@
               "type": "group",
               "group": {
                 "key": "Hand Position Max Z Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -38180,7 +38216,7 @@
             },
             {
               "key": "Hand Position Min Z Curve",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -38200,7 +38236,7 @@
             },
             {
               "key": "Hand Position Max Z Curve",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -39625,7 +39661,7 @@
     },
     {
       "key": "Custom Click Functions",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -109194,7 +109230,7 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 21",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -109353,7 +109389,7 @@
                 "type": "group",
                 "group": {
                   "key": "Offset To Camera",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -125210,7 +125246,7 @@
               },
               {
                 "key": "Offset To Camera",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -217572,7 +217608,7 @@
         },
         {
           "key": "Custom Click Function 21",
-          "collapsed": false,
+          "collapsed": true,
           "locked": false,
           "items": [
             {
@@ -217731,7 +217767,7 @@
               "type": "group",
               "group": {
                 "key": "Offset To Camera",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": false,
                 "items": [
                   {
@@ -233588,7 +233624,7 @@
             },
             {
               "key": "Offset To Camera",
-              "collapsed": false,
+              "collapsed": true,
               "locked": false,
               "items": [
                 {
@@ -256401,7 +256437,7 @@
     },
     {
       "key": "New Group (11)",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -256600,7 +256636,7 @@
           "type": "group",
           "group": {
             "key": "Camera",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -256987,7 +257023,7 @@
         },
         {
           "key": "Camera",
-          "collapsed": false,
+          "collapsed": true,
           "locked": true,
           "items": [
             {
