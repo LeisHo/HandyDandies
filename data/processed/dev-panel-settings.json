@@ -8426,18 +8426,6 @@
       "cameraZoomSpeed": 0.3,
       "savedCameras": [
         {
-          "name": "HD - DESKTOP - 15 FOV",
-          "cameraX": 1.5544272264775378,
-          "cameraY": 2.336607621164705e-13,
-          "cameraZ": 257.48779599525176,
-          "cameraFov": 15,
-          "cameraZoom": 149.99999999999997,
-          "cameraRoll": 0,
-          "targetX": 1.5544272264775378,
-          "targetY": 2.2447591112286533e-13,
-          "targetZ": 107.48779599525179
-        },
-        {
           "name": "HD - MOBILE - 35FOV",
           "cameraX": -3.1777777777777776,
           "cameraY": 2.071011807676939e-13,
@@ -8451,15 +8439,15 @@
         },
         {
           "name": "DESKTOP 20 FOV",
-          "cameraX": 1.9534883720930232,
-          "cameraY": 2.0272434216195883e-13,
-          "cameraZ": 223.4004898795015,
-          "cameraFov": 20,
-          "cameraZoom": 99,
+          "cameraX": 1.5544272264775378,
+          "cameraY": 2.336607621164705e-13,
+          "cameraZ": 257.48779599525176,
+          "cameraFov": 15,
+          "cameraZoom": 149.99999999999997,
           "cameraRoll": 0,
-          "targetX": 1.9534883720930232,
-          "targetY": 1.9666234050617943e-13,
-          "targetZ": 124.40048987950149
+          "targetX": 1.5544272264775378,
+          "targetY": 2.2447591112286533e-13,
+          "targetZ": 107.48779599525179
         }
       ],
       "lockCameraPan": true,
@@ -20216,18 +20204,6 @@
       "cameraZoomSpeed": 1,
       "savedCameras": [
         {
-          "name": "HD - DESKTOP - 15 FOV",
-          "cameraX": 1.5544272264775378,
-          "cameraY": 2.336607621164705e-13,
-          "cameraZ": 257.48779599525176,
-          "cameraFov": 15,
-          "cameraZoom": 149.99999999999997,
-          "cameraRoll": 0,
-          "targetX": 1.5544272264775378,
-          "targetY": 2.2447591112286533e-13,
-          "targetZ": 107.48779599525179
-        },
-        {
           "name": "HD - MOBILE - 35FOV",
           "cameraX": -3.1777777777777776,
           "cameraY": 2.071011807676939e-13,
@@ -20241,15 +20217,15 @@
         },
         {
           "name": "DESKTOP 20 FOV",
-          "cameraX": 1.9534883720930232,
-          "cameraY": 2.0272434216195883e-13,
-          "cameraZ": 223.4004898795015,
-          "cameraFov": 20,
-          "cameraZoom": 99,
+          "cameraX": 1.5544272264775378,
+          "cameraY": 2.336607621164705e-13,
+          "cameraZ": 257.48779599525176,
+          "cameraFov": 15,
+          "cameraZoom": 149.99999999999997,
           "cameraRoll": 0,
-          "targetX": 1.9534883720930232,
-          "targetY": 1.9666234050617943e-13,
-          "targetZ": 124.40048987950149
+          "targetX": 1.5544272264775378,
+          "targetY": 2.2447591112286533e-13,
+          "targetZ": 107.48779599525179
         }
       ],
       "lockCameraPan": true,
@@ -32006,18 +31982,6 @@
       "cameraZoomSpeed": 1,
       "savedCameras": [
         {
-          "name": "HD - DESKTOP - 15 FOV",
-          "cameraX": 1.5544272264775378,
-          "cameraY": 2.336607621164705e-13,
-          "cameraZ": 257.48779599525176,
-          "cameraFov": 15,
-          "cameraZoom": 149.99999999999997,
-          "cameraRoll": 0,
-          "targetX": 1.5544272264775378,
-          "targetY": 2.2447591112286533e-13,
-          "targetZ": 107.48779599525179
-        },
-        {
           "name": "HD - MOBILE - 35FOV",
           "cameraX": -3.1777777777777776,
           "cameraY": 2.071011807676939e-13,
@@ -32031,15 +31995,15 @@
         },
         {
           "name": "DESKTOP 20 FOV",
-          "cameraX": 1.9534883720930232,
-          "cameraY": 2.0272434216195883e-13,
-          "cameraZ": 223.4004898795015,
-          "cameraFov": 20,
-          "cameraZoom": 99,
+          "cameraX": 1.5544272264775378,
+          "cameraY": 2.336607621164705e-13,
+          "cameraZ": 257.48779599525176,
+          "cameraFov": 15,
+          "cameraZoom": 149.99999999999997,
           "cameraRoll": 0,
-          "targetX": 1.9534883720930232,
-          "targetY": 1.9666234050617943e-13,
-          "targetZ": 124.40048987950149
+          "targetX": 1.5544272264775378,
+          "targetY": 2.2447591112286533e-13,
+          "targetZ": 107.48779599525179
         }
       ],
       "lockCameraPan": false,
