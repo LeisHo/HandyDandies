@@ -1068,7 +1068,7 @@ function tryStartField() {
   // whatever comes next; don't treat this comment's own reasoning above
   // as the settled explanation.
   if (!fieldWarmCompiled) renderer.compile(scene, camera)
-  window.__debug = { refreshAllTweenSequenceSelectors, reconcileCustomFunctions, captureCustomFunctionsForUndo, renameCustomFunction, placeHandModelRows, syncHandModelWithSettings, refreshHandModelList, get activeHandModelId() { return activeHandModelId }, importHandModelFile, useHandModel, placeLoadingPreviewLightingRows, applyOffsetRotationToHand, applyOffsetRotationRetransition, parseClickPoseConfig, parseClickHoldConfig, cropPointInWrapperFrame, rotateHandAboutCropPoint, rotateHandAboutWorldPoint, cursorFieldPoint, captureClickCursorPivot, rotationDegAt, applyWorldRigid, rotationModeOf, get customFunctionCollapseReady() { return customFunctionCollapseReady }, markCustomFunctionCollapseReady: () => { customFunctionCollapseReady = true }, applyCustomFunctionCollapse, persistCustomClickFunctionIds, bakeOffsetRotationIntoAccum, loopLapProgress, loopLapEnd, rotateHandAboutArmBase, updateLoadingPreviewHand2, buildLoopTimelines, loopPoseValuesBeyondLap, get palmCenterPosRaw() { return palmCenterPosRaw }, get handoPivotRaw() { return handoPivotRaw }, get handBoundsBoxCenterRaw() { return handBoundsBoxCenterRaw }, get alignQuat() { return alignQuat }, get loadingPreviewModelScale() { return loadingPreviewModelScale }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, handBoundsCenterLocal, LOADING_PREVIEW_REFERENCE_RADIUS, importTwoHandTween, convertHandoCameraPreset, applyLoadingPreviewCameraPreset, animateFrame: (...a) => animate(...a), releaseStartupHold, trackingActiveFor, placeStartupRetransitionGroup, startupHandScale, updateFieldCenterMarker, get fieldCenterPoint() { return fieldCenterPoint }, retransitionScalerMul, startupHandPhaseUnfinished, applyFieldBounds, onFieldBoundsChanged, retransitionDistanceMs, untriggeredVisibleSpheres, allVisibleHandsFinished, handStartupLocked, triggerClickPose, checkStartupFloorHide, get startupFloorHidden() { return startupFloorHidden }, get floorMesh() { return floorMesh }, updateLoadingPreviewAnimation, get loadingPreview2() { return { hand: loadingPreviewHand, hand2: loadingPreviewHand2, scene: loadingPreviewScene, camera: loadingPreviewCamera, renderer: loadingPreviewRenderer } }, updateSphereSequence, get sphereState() { return { stage: sphereStage, mesh: sphereMesh, on: sphereOn, start: sphereStart, dur: sphereDur, cap: sphereCap, done: sphereDone, keep: sphereKeepForHands, clicks: sphereClickCount } }, stackOnDefault, applyCameraOrientation, syncCameraPanelFromLive, curveByDomain, get domains() { return { xyAll: [xyAllMinDist, xyAllDistRange], splayAll: [splayAllMin, splayAllRange], cropAll: [cropAllMin, cropAllRange], restAll: [restAllMinDist, restAllDistRange], live: [liveFieldMinDist, liveFieldDistRange], splay: [splayFieldMin, splayFieldRange], crop: [cropFieldMin, cropFieldRange], xy: [xyFieldMinDist, xyFieldDistRange], rest: [restFieldMinDist, restFieldDistRange] } }, modelBaseFrameQ, computeBaseRotationQuat, cloneBaseRb, makeClipRig, updateClipRigPlanes, setClipRigT, updateOnScreenFlags, evaluateArmLengthCurve, THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose, resolveTweenSegmentsWithAnchor, lerpTweenSegments, lerpLoopSegments, isHoldEntry, updateLoadingPreviewWristClip, lerpPoseValues, get loadingPreviewRenderer() { return loadingPreviewRenderer }, get loadingPreviewScene() { return loadingPreviewScene }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, get handBoundsCenterLocal() { return handBoundsCenterLocal }, multiPointCommit, multiPointEligibleFunctions, get multiPointActiveTouchCount() { return multiPointActiveTouchCount }, get multiPointSessionFiredPoseId() { return multiPointSessionFiredPoseId }, detectPoseJumps, get poseJumpLogEntries() { return poseJumpLogEntries }, applyCurlToSkeletonReference, handLogTriggerLabel, applyAllFingerCurls, syncCameraPanelFromLive, animSpeedMs, chainSequenceCount, applyFieldBounds, cursorDistXY, hexBrightnessPct, toonThresholdForMidBrightness }
+  window.__debug = { updateFingerCurlSkip, refreshAllTweenSequenceSelectors, reconcileCustomFunctions, captureCustomFunctionsForUndo, renameCustomFunction, placeHandModelRows, syncHandModelWithSettings, refreshHandModelList, get activeHandModelId() { return activeHandModelId }, importHandModelFile, useHandModel, placeLoadingPreviewLightingRows, applyOffsetRotationToHand, applyOffsetRotationRetransition, parseClickPoseConfig, parseClickHoldConfig, cropPointInWrapperFrame, rotateHandAboutCropPoint, rotateHandAboutWorldPoint, cursorFieldPoint, captureClickCursorPivot, rotationDegAt, applyWorldRigid, rotationModeOf, get customFunctionCollapseReady() { return customFunctionCollapseReady }, markCustomFunctionCollapseReady: () => { customFunctionCollapseReady = true }, applyCustomFunctionCollapse, persistCustomClickFunctionIds, bakeOffsetRotationIntoAccum, loopLapProgress, loopLapEnd, rotateHandAboutArmBase, updateLoadingPreviewHand2, buildLoopTimelines, loopPoseValuesBeyondLap, get palmCenterPosRaw() { return palmCenterPosRaw }, get handoPivotRaw() { return handoPivotRaw }, get handBoundsBoxCenterRaw() { return handBoundsBoxCenterRaw }, get alignQuat() { return alignQuat }, get loadingPreviewModelScale() { return loadingPreviewModelScale }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, handBoundsCenterLocal, LOADING_PREVIEW_REFERENCE_RADIUS, importTwoHandTween, convertHandoCameraPreset, applyLoadingPreviewCameraPreset, animateFrame: (...a) => animate(...a), releaseStartupHold, trackingActiveFor, placeStartupRetransitionGroup, startupHandScale, updateFieldCenterMarker, get fieldCenterPoint() { return fieldCenterPoint }, retransitionScalerMul, startupHandPhaseUnfinished, applyFieldBounds, onFieldBoundsChanged, retransitionDistanceMs, untriggeredVisibleSpheres, allVisibleHandsFinished, handStartupLocked, triggerClickPose, checkStartupFloorHide, get startupFloorHidden() { return startupFloorHidden }, get floorMesh() { return floorMesh }, updateLoadingPreviewAnimation, get loadingPreview2() { return { hand: loadingPreviewHand, hand2: loadingPreviewHand2, scene: loadingPreviewScene, camera: loadingPreviewCamera, renderer: loadingPreviewRenderer } }, updateSphereSequence, get sphereState() { return { stage: sphereStage, mesh: sphereMesh, on: sphereOn, start: sphereStart, dur: sphereDur, cap: sphereCap, done: sphereDone, keep: sphereKeepForHands, clicks: sphereClickCount } }, stackOnDefault, applyCameraOrientation, syncCameraPanelFromLive, curveByDomain, get domains() { return { xyAll: [xyAllMinDist, xyAllDistRange], splayAll: [splayAllMin, splayAllRange], cropAll: [cropAllMin, cropAllRange], restAll: [restAllMinDist, restAllDistRange], live: [liveFieldMinDist, liveFieldDistRange], splay: [splayFieldMin, splayFieldRange], crop: [cropFieldMin, cropFieldRange], xy: [xyFieldMinDist, xyFieldDistRange], rest: [restFieldMinDist, restFieldDistRange] } }, modelBaseFrameQ, computeBaseRotationQuat, cloneBaseRb, makeClipRig, updateClipRigPlanes, setClipRigT, updateOnScreenFlags, evaluateArmLengthCurve, THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose, resolveTweenSegmentsWithAnchor, lerpTweenSegments, lerpLoopSegments, isHoldEntry, updateLoadingPreviewWristClip, lerpPoseValues, get loadingPreviewRenderer() { return loadingPreviewRenderer }, get loadingPreviewScene() { return loadingPreviewScene }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, get handBoundsCenterLocal() { return handBoundsCenterLocal }, multiPointCommit, multiPointEligibleFunctions, get multiPointActiveTouchCount() { return multiPointActiveTouchCount }, get multiPointSessionFiredPoseId() { return multiPointSessionFiredPoseId }, detectPoseJumps, get poseJumpLogEntries() { return poseJumpLogEntries }, applyCurlToSkeletonReference, handLogTriggerLabel, applyAllFingerCurls, syncCameraPanelFromLive, animSpeedMs, chainSequenceCount, applyFieldBounds, cursorDistXY, hexBrightnessPct, toonThresholdForMidBrightness }
   // Do NOT hide the loading screen yet: the hands exist but may not have been painted. finalizeReveal() hides it once the field has rendered a couple of frames (or after a 4 s safety net).
   setTimeout(finalizeReveal, 4000)
 }
@@ -3233,7 +3233,9 @@ const DEV_GROUPS = [
         qualityState.pixelRatio = preset.pixelRatio
         qualityState.resolutionScale = preset.resolutionScale / 100
         applyQualityState()
-      } }
+      } },
+      // Off-screen finger-curl skip (2026-10-15, direct request): a hand outside every camera's view (plus a margin) keeps updating all its pose numbers but does not write its finger bones until it is back in view.
+      { key: 'skipOffScreenFingerCurls', label: 'Skip Finger Curls For Off-Screen Hands', type: 'checkbox', def: true, perDevice: true }
     ]
   },
   // Starting State (2026-10-11, direct request): with Static Pose On Startup on, the hands stay in their default pose - no cursor tracking (arm / palm rotation, reactive wrist splay, reactive arm length) - until the first
@@ -5053,6 +5055,11 @@ function detectPoseJumps() {
       h.clone.traverse((o) => { if (o.isBone) h._jb.push(o) })
       h._jq = h._jb.map((b) => b.quaternion.clone())
       h._jp = h.wrapper.position.clone()
+      continue
+    }
+    if (h._curlSkip || h._curlResumed) { // finger curl skipped / just caught up off screen: re-seat the baseline instead of reporting a jump nobody can see
+      for (let b = 0; b < h._jb.length; b++) h._jq[b].copy(h._jb[b].quaternion)
+      h._jp.copy(h.wrapper.position)
       continue
     }
     let worst = 0, wi = -1
@@ -10887,7 +10894,7 @@ function applyPoseValuesToHand(hand, poseValues, extraSplayDeg) {
   // handoff between the two is never a discontinuity, matching this
   // project's own standing "no interaction ever jumps" rule.
   hand.currentSplayDeg = extraSplayDeg
-  applyAllFingerCurls(hand.skinnedMesh.skeleton, hand.currentBaseQuat, hand.wrapper.quaternion, poseValues)
+  if (!hand._curlSkip) applyAllFingerCurls(hand.skinnedMesh.skeleton, hand.currentBaseQuat, hand.wrapper.quaternion, poseValues) // off-screen skip: see updateFingerCurlSkip()
   // An ABSOLUTE position/scale set from this hand's own stored grid
   // `basePosition`, not an additive nudge -- recomputed fresh from
   // `poseValues` every call, so it can never compound across frames the
@@ -10972,6 +10979,40 @@ function updateScreenUnitsPerPx() {
 // On-screen test (2026-10-11): every distance curve / Min-Max range normalises against the NEAREST and FARTHEST hand
 // that is actually on screen; hands off screen keep their effect, extrapolated past x = 1 (see evaluateArmLengthCurve()).
 // `_onScr` is read as `!== false`, so an unset flag counts as on screen; if no hand is on screen at all every hand counts.
+// Off-screen finger-curl skip (2026-10-15). The finger curl (applyAllFingerCurls) is the dominant per-hand cost and is a pure function of values that are cheap to keep current (the pose numbers, the wrist bone, the base
+// rotation): each joint is reset to its rest rotation and rotated from those inputs, nothing accumulates frame to frame. So a hand nobody can see can skip it and compute it once when it returns. Everything else
+// (pose / tween / damping state, wrist, position, scale, arm length) keeps running for every hand. Tracking points and render order read bone HEADS (rForearmBend / rHand / rMid1), which do not depend on finger rotation.
+// The test is a bounding sphere around the hand's position, 3x its own size, against every camera that draws this scene (the main camera plus any Camera Preview panels). If the projection is unusable (NaN) the
+// frustum test cannot reject, so every hand counts as visible.
+const _cullMat = new THREE.Matrix4()
+const _cullSphere = new THREE.Sphere()
+const _cullFrustums = []
+function updateFingerCurlSkip() {
+  if (cfg.skipOffScreenFingerCurls === false || !(handBoundsRadiusLocal > 0)) {
+    for (let i = 0; i < hands.length; i++) { hands[i]._curlResumed = !!hands[i]._curlSkip; hands[i]._curlSkip = false }
+    return
+  }
+  const cams = [camera]
+  if (typeof cameraPreviews !== 'undefined' && cameraPreviews && cameraPreviews.length) for (const pc of cameraPreviews) if (pc && pc.camera) cams.push(pc.camera)
+  for (let k = 0; k < cams.length; k++) {
+    cams[k].updateMatrixWorld()
+    _cullMat.multiplyMatrices(cams[k].projectionMatrix, cams[k].matrixWorldInverse)
+    if (!_cullFrustums[k]) _cullFrustums[k] = new THREE.Frustum()
+    _cullFrustums[k].setFromProjectionMatrix(_cullMat)
+  }
+  for (let i = 0; i < hands.length; i++) {
+    const h = hands[i]
+    const wasSkipped = !!h._curlSkip
+    let visible = !h.wrapper
+    if (!visible) {
+      _cullSphere.center.copy(h.wrapper.position)
+      _cullSphere.radius = handBoundsRadiusLocal * (h.clone ? h.clone.scale.x : 1) * 3
+      for (let k = 0; k < cams.length; k++) if (_cullFrustums[k].intersectsSphere(_cullSphere)) { visible = true; break }
+    }
+    h._curlSkip = !visible
+    h._curlResumed = wasSkipped && visible
+  }
+}
 const _onScrV = new THREE.Vector3()
 function isOnScreen(pos) {
   _onScrV.copy(pos).project(camera)
@@ -19509,6 +19550,7 @@ function updateRenderOrder() {
   idleReposeFrameCounter++
   updateTrackingPoints(true) // before the on-screen flags: every hand-to-cursor measure below uses the tracking point
   updateOnScreenFlags()
+  updateFingerCurlSkip()
   refreshTrackingDomains() // the tracking domains need this frame's on-screen flags
   updateScreenUnitsPerPx() // world units per screen pixel at the field plane, for the screen-space click-function distance
   // Everything an IDLE hand's finger curl depends on, as one string (2026-10-04): pose settings (finger,
@@ -19951,7 +19993,7 @@ function updateRenderOrder() {
         // Skip the finger curl when nothing it depends on changed since this hand's last idle apply: same
         // pose/base signature and the wrist splay within 0.002 deg (the curl axes follow the wrist). Output
         // is identical; saves the dominant per-frame cost for idle hands.
-        if (hand._idleCurlSig !== idleCurlSig || Math.abs(extraSplay - hand._idleCurlSplay) >= 0.002) {
+        if (!hand._curlSkip && (hand._idleCurlSig !== idleCurlSig || Math.abs(extraSplay - hand._idleCurlSplay) >= 0.002)) {
           applyAllFingerCurls(hand.skinnedMesh.skeleton, hand.currentBaseQuat, hand.wrapper.quaternion, cfg)
           hand._idleCurlSig = idleCurlSig
           hand._idleCurlSplay = extraSplay
