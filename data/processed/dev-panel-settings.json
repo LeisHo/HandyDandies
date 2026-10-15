@@ -7915,13 +7915,13 @@
         }
       ],
       "cameraX": 1.9534883720930232,
-      "cameraY": 5.541526766141773e-15,
-      "cameraZ": 115.97925521912504,
-      "cameraFov": 35,
+      "cameraY": 1.1598705435868485e-14,
+      "cameraZ": 214.9004898795015,
+      "cameraFov": 20,
       "cameraYaw": 0,
       "cameraPitch": 0,
       "cameraRoll": 0,
-      "cameraZoom": 90.5,
+      "cameraZoom": 189.42123466037646,
       "cameraZoomSpeed": 0.3,
       "savedCameras": [
         {
@@ -8114,11 +8114,23 @@
           "targetX": -3.1777777777777776,
           "targetY": 1.9117032070864052e-13,
           "targetZ": 0
+        },
+        {
+          "name": "DESKTOP 20 FOV",
+          "cameraX": 1.9534883720930232,
+          "cameraY": 1.1598705435868485e-14,
+          "cameraZ": 214.9004898795015,
+          "cameraFov": 20,
+          "cameraZoom": 189.42123466037646,
+          "cameraRoll": 0,
+          "targetX": 1.9534883720930232,
+          "targetY": 0,
+          "targetZ": 25.479255219125044
         }
       ],
-      "lockCameraPan": true,
-      "lockCameraZoom": true,
-      "cameraMaxExtentsEnabled": true,
+      "lockCameraPan": false,
+      "lockCameraZoom": false,
+      "cameraMaxExtentsEnabled": false,
       "keyAzimuth": 27,
       "keyElevation": 67,
       "keyTargetHeight": 65,
@@ -20973,6 +20985,18 @@
           "targetX": -3.1777777777777776,
           "targetY": 1.9117032070864052e-13,
           "targetZ": 0
+        },
+        {
+          "name": "DESKTOP 20 FOV",
+          "cameraX": 1.9534883720930232,
+          "cameraY": 1.1598705435868485e-14,
+          "cameraZ": 214.9004898795015,
+          "cameraFov": 20,
+          "cameraZoom": 189.42123466037646,
+          "cameraRoll": 0,
+          "targetX": 1.9534883720930232,
+          "targetY": 0,
+          "targetZ": 25.479255219125044
         }
       ],
       "lockCameraPan": true,
@@ -33832,6 +33856,18 @@
           "targetX": -3.1777777777777776,
           "targetY": 1.9117032070864052e-13,
           "targetZ": 0
+        },
+        {
+          "name": "DESKTOP 20 FOV",
+          "cameraX": 1.9534883720930232,
+          "cameraY": 1.1598705435868485e-14,
+          "cameraZ": 214.9004898795015,
+          "cameraFov": 20,
+          "cameraZoom": 189.42123466037646,
+          "cameraRoll": 0,
+          "targetX": 1.9534883720930232,
+          "targetY": 0,
+          "targetZ": 25.479255219125044
         }
       ],
       "lockCameraPan": false,
@@ -40821,7 +40857,7 @@
     },
     {
       "key": "New Group (11)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -40932,7 +40968,7 @@
           "type": "group",
           "group": {
             "key": "Camera",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
