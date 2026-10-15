@@ -41505,57 +41505,6 @@
       "locked": true,
       "items": [
         {
-          "type": "group",
-          "group": {
-            "key": "New Group (13)",
-            "collapsed": true,
-            "locked": false,
-            "items": [
-              {
-                "type": "group",
-                "group": {
-                  "key": "2 - CH Copy",
-                  "collapsed": true,
-                  "locked": false,
-                  "items": [],
-                  "settings": []
-                }
-              },
-              {
-                "type": "group",
-                "group": {
-                  "key": "2 - C Copy",
-                  "collapsed": true,
-                  "locked": false,
-                  "items": [],
-                  "settings": []
-                }
-              },
-              {
-                "type": "group",
-                "group": {
-                  "key": "1 - CH Copy",
-                  "collapsed": true,
-                  "locked": false,
-                  "items": [],
-                  "settings": []
-                }
-              },
-              {
-                "type": "group",
-                "group": {
-                  "key": "1 - C Copy",
-                  "collapsed": true,
-                  "locked": false,
-                  "items": [],
-                  "settings": []
-                }
-              }
-            ],
-            "settings": []
-          }
-        },
-        {
           "type": "row",
           "key": "holdConfirmMs"
         },
@@ -41612,6 +41561,57 @@
         {
           "type": "row",
           "key": "customClickFunctionIds"
+        },
+        {
+          "type": "group",
+          "group": {
+            "key": "New Group (13)",
+            "collapsed": true,
+            "locked": false,
+            "items": [
+              {
+                "type": "group",
+                "group": {
+                  "key": "2 - CH Copy",
+                  "collapsed": true,
+                  "locked": false,
+                  "items": [],
+                  "settings": []
+                }
+              },
+              {
+                "type": "group",
+                "group": {
+                  "key": "2 - C Copy",
+                  "collapsed": true,
+                  "locked": false,
+                  "items": [],
+                  "settings": []
+                }
+              },
+              {
+                "type": "group",
+                "group": {
+                  "key": "1 - CH Copy",
+                  "collapsed": true,
+                  "locked": false,
+                  "items": [],
+                  "settings": []
+                }
+              },
+              {
+                "type": "group",
+                "group": {
+                  "key": "1 - C Copy",
+                  "collapsed": true,
+                  "locked": false,
+                  "items": [],
+                  "settings": []
+                }
+              }
+            ],
+            "settings": []
+          }
         },
         {
           "type": "group",
