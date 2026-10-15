@@ -50408,9 +50408,51 @@
     },
     {
       "key": "Custom Click Functions",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
+        {
+          "type": "row",
+          "key": "holdConfirmMs"
+        },
+        {
+          "type": "row",
+          "key": "multiClickWindowMs"
+        },
+        {
+          "type": "row",
+          "key": "customFunctionSelector"
+        },
+        {
+          "type": "group",
+          "group": {
+            "key": "Custom Click Function 29",
+            "collapsed": true,
+            "locked": false,
+            "items": [],
+            "settings": []
+          }
+        },
+        {
+          "type": "group",
+          "group": {
+            "key": "Custom Click Function 28",
+            "collapsed": true,
+            "locked": false,
+            "items": [],
+            "settings": []
+          }
+        },
+        {
+          "type": "group",
+          "group": {
+            "key": "Custom Click Function 19",
+            "collapsed": true,
+            "locked": false,
+            "items": [],
+            "settings": []
+          }
+        },
         {
           "type": "group",
           "group": {
@@ -50473,52 +50515,10 @@
           }
         },
         {
-          "type": "row",
-          "key": "holdConfirmMs"
-        },
-        {
-          "type": "row",
-          "key": "multiClickWindowMs"
-        },
-        {
-          "type": "row",
-          "key": "customFunctionSelector"
-        },
-        {
-          "type": "group",
-          "group": {
-            "key": "Custom Click Function 29",
-            "collapsed": true,
-            "locked": false,
-            "items": [],
-            "settings": []
-          }
-        },
-        {
-          "type": "group",
-          "group": {
-            "key": "Custom Click Function 28",
-            "collapsed": true,
-            "locked": false,
-            "items": [],
-            "settings": []
-          }
-        },
-        {
-          "type": "group",
-          "group": {
-            "key": "Custom Click Function 19",
-            "collapsed": true,
-            "locked": false,
-            "items": [],
-            "settings": []
-          }
-        },
-        {
           "type": "group",
           "group": {
             "key": "New Group (14)",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -50887,7 +50887,7 @@
           "type": "group",
           "group": {
             "key": "Camera",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
